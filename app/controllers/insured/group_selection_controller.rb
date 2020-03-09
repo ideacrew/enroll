@@ -35,6 +35,8 @@ class Insured::GroupSelectionController < ApplicationController
 
     insure_hbx_enrollment_for_shop_qle_flow
 
+    set_change_plan
+
     # Benefit group is what we will need to change
     @benefit_group = @adapter.select_benefit_group(params)
     @new_effective_on = @adapter.calculate_new_effective_on(params)
@@ -229,6 +231,12 @@ class Insured::GroupSelectionController < ApplicationController
     params.permit!
   end
 
+  def set_change_plan
+    @adapter.if_family_has_active_shop_sep do
+      @change_plan = 'change_by_qle'
+    end
+  end
+
   def select_enrollment_members(hbx_enrollment, family_member_ids)
     hbx_enrollment.hbx_enrollment_members = hbx_enrollment.hbx_enrollment_members.select do |member|
       family_member_ids.include? member.applicant_id
@@ -250,6 +258,9 @@ class Insured::GroupSelectionController < ApplicationController
       @adapter.if_employee_role_unset_but_can_be_derived(@employee_role) do |e_role|
         @employee_role = e_role
       end
+
+      set_change_plan
+
       benefit_group = nil
       benefit_group_assignment = nil
 
