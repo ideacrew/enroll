@@ -55,7 +55,11 @@ class Insured::GroupSelectionController < ApplicationController
 
     @waivable = @adapter.can_waive?(@hbx_enrollment, params)
     @fm_hash = {}
-    @family.family_members.each do |family_member|
+    # Only check eligibility for *active* family members because
+    # family members "deleted" with family#remove_family_member
+    # are set to is_active = false
+    @active_family_members = @family.family_members.active
+    @active_family_members.each do |family_member|
       family_member_eligibility_check(family_member)
     end
     if @fm_hash.present? && @fm_hash.values.flatten.detect{|err| err.to_s.match(/incarcerated_not_answered/)}
