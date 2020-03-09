@@ -72,7 +72,6 @@ test:
         # low amounts for fast failures.
         max_retries: 2
         retry_interval: 0
-        j: true
 production:
   clients:
     default:
