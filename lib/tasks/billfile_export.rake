@@ -1,15 +1,15 @@
 require 'csv'
 
 namespace :billfile do
-  desc "Create a BillFile for Wells Fargo."
+  desc 'Create a BillFile for Wells Fargo.'
   # Usage rake billfile:from_file_path
   task :export => [:environment] do
 
     TITLE = "maconnector_#{DateTime.now.strftime('%Y%m%d_%H%M%S')}.csv"
     FILE_PATH = Rails.root.join TITLE
 
-    CSV.open(FILE_PATH, "w") do |csv|
-      headers = ["Reference Number", "Other Data", "Company Name", "Due Date", "Amount Due"]
+    CSV.open(FILE_PATH, 'w') do |csv|
+      headers = ['Reference Number', 'Other Data', 'Company Name', 'Due Date', 'Amount Due']
       csv << headers
 
       BenefitSponsors::Organizations::Organization.employer_profiles.each do |org|
@@ -17,14 +17,16 @@ namespace :billfile do
           benefit_sponsorship = org.active_benefit_sponsorship
           benefit_sponsorship_account = benefit_sponsorship.benefit_sponsorship_account
           if benefit_sponsorship && benefit_sponsorship_account
-            due_date = format_due_date(benefit_sponsorship_account.current_statement_date.end_of_month) if benefit_sponsorship_account.current_statement_date.present?
+            current_statement_date = benefit_sponsorship_account.current_statement_date
+            sponsored_due_date = current_statement_date.beginning_of_month + 22.days
+            due_date = current_statement_date.present? ? format_due_date(sponsored_due_date) : nil
             # due_date = pull_due_date(benefit_sponsorship_account)
             total_due = format_total_due(benefit_sponsorship_account.total_due)
             row = []
             row += [org.hbx_id, org.fein, org.legal_name.gsub(',',''), due_date, total_due]
             csv << row if row.present?
           end
-        rescue Exception => e
+        rescue StandardError => e
           puts "Unable to pull account information for #{org.legal_name} due to #{e}"
         end
       end #Closes orgs
