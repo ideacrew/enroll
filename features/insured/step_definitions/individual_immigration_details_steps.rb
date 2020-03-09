@@ -70,7 +70,7 @@ end
 Then(/(.*) selects Certificate of Citizenship document and fills required details (.*)$/) do |text, correct_or_incorrect|
   find('.label', :text => 'Select document type', wait: 20).click
   find('li', :text => "Certificate of Citizenship", match: :prefer_exact, wait: 10).click
-  fill_in 'Citizenship Number', with: (correct_or_incorrect == 'correctly' ? '123456789' : '@23#5678901')
+  fill_in 'Certificate Number', with: (correct_or_incorrect == 'correctly' ? '123456789' : '@23#5678901')
 end
 
 Then("Individual should see the Certificate of Citizenship document text") do
@@ -179,6 +179,7 @@ end
 
 Then("Individual should see the Other With Alien Number document text") do
   step "Individual should see the i327 document text"
+  expect(page).to have_content("Enter the type of document, using no more than 35 characters.")
 end
 
 Then(/(.*) selects Other With i94 Number document and fills required details (.*)$/) do |text, correct_or_incorrect|
@@ -190,4 +191,5 @@ end
 
 Then("Individual should see the Other With i94 Number document text") do
   step "Individual should see the i94 document text"
+  expect(page).to have_content("Enter the type of document, using no more than 35 characters.")
 end
