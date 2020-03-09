@@ -38,5 +38,11 @@ RSpec.describe "insured/plan_shoppings/_waive_confirmation.html.erb" do
       expect(rendered).to have_selector("input[disabled=disabled]", count: 1)
       expect(rendered).to have_selector("input[value='Submit']", count: 1)
     end
+
+    it "should have disabled waiver reason if dental plan" do
+      # Does translation affect this test?
+      assign(:mc_coverage_kind, 'dental')
+      expect(rendered).not_to have_content("Select Waive Reason")
+    end
   end
 end
