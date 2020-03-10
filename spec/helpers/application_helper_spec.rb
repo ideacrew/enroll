@@ -244,7 +244,8 @@ RSpec.describe ApplicationHelper, :type => :helper do
         assign(:status, "denied")
         expect(helper.date_col_name_for_broker_roaster).to eq 'Denied Date'
       end
-      assign(:status, "extended")
+      it "should return extended" do
+        assign(:status, "extended")
         expect(helper.date_col_name_for_broker_roaster).to eq 'Extended Date'
       end
     end
