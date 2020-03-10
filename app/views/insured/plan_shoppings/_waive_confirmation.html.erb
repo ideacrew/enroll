@@ -23,7 +23,7 @@
             <button type="button" class="btn btn-default" data-dismiss="modal"><%= l10n("close") %></button>
             <% if @mc_coverage_kind == 'dental' %>
               <!-- translation needed? -->
-              <%= submit_tag l10n("confirm"), class: 'btn btn-primary', id: 'waiver_reason_submit', disabled: true %>
+              <%= submit_tag l10n("confirm"), class: 'btn btn-primary', id: 'waiver_reason_submit', disabled: false %>
             <% else %>
               <%= submit_tag l10n("submit"), class: 'btn btn-primary', id: 'waiver_reason_submit', disabled: true %>
             <% end %>
