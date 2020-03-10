@@ -1,7 +1,7 @@
 require 'rails_helper'
 require Rails.root.join("lib", "sbc", "sbc_processor2015")
 
-describe SbcProcessor2015, dbclean: :after_each do
+describe SbcProcessor2015, dbclean: :around_each do
   let(:csv_path) { Dir.glob(File.join(Rails.root, 'spec/test_data/plan_data/sbc/*.csv')).first }
   let(:pdf_path) { Dir.glob(File.join(Rails.root, 'spec/test_data/plan_data/sbc/pdf/')).first }
   let(:product) { FactoryBot.create(
