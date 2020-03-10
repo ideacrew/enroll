@@ -39,6 +39,30 @@ describe FamilyMember, "given a person", dbclean: :after_each do
     person.families.first.family_members << family_member
     expect(family_member.errors.full_messages.join(",")).to match(/Family members Duplicate family_members for person/)
   end
+
+  context "attempting to save family when family member with same hbx_id as new family member" do
+    let!(:person) { create :person, :with_family}
+    let!(:person_to_become_family_member) { create(:person, hbx_id: '1') }
+    let(:family) { person.families.first }
+
+    before :each do
+      person.person_relationships.create!(kind: "child", relative_id: person_to_become_family_member.id)
+      family.family_members.create!(person: person_to_become_family_member, is_primary_applicant: false)
+      expect(family.family_members.size).to eq(2)
+      family.reload
+    end
+
+    it "should error when trying to save duplicate family member" do
+      # Duplicate
+      duplicate_family_member = FamilyMember.new(person: person_to_become_family_member, is_primary_applicant: false)
+      family.family_members << duplicate_family_member
+      # Currently this returns to true rather than false
+      expect(family.family_members.size).to eq(3)
+      expect { family.save! }.to raise_error
+      expect(family.errors[:family_members][0]).to eq("is invalid")
+      expect(family.errors[:family_members][1]).to include("Duplicate family_members for person:")
+    end
+  end
 end
 
 describe FamilyMember, dbclean: :after_each do

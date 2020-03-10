@@ -165,5 +165,8 @@ class FamilyMember
     family.family_members.group_by { |appl| appl.person_id }.select { |k, v| v.size > 1 }.each_pair do |k, v|
       errors.add(:family_members, "Duplicate family_members for person: #{k}\n")
     end
+    family.family_members.group_by { |appl| appl.hbx_id }.select { |k, v| v.size > 1 }.each_pair do |k, v|
+      errors.add(:family_members, "Duplicate family_members for person: #{k}\n")
+    end
   end
 end
