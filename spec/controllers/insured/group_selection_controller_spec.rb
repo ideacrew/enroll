@@ -335,6 +335,28 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
 
     end
 
+    context 'dual role household' do
+      include_context "setup benefit market with market catalogs and product packages"
+      include_context "setup initial benefit application"
+      let!(:sponsored_benefit_package) { initial_application.benefit_packages[0] }
+      let!(:employer_profile) {benefit_sponsorship.profile}
+      let(:employee_role_person)     { FactoryBot.create(:person, :with_employee_role)}
+      let(:consumer_role_person)     { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
+      let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: employee_role_person)}
+      let!(:census_employee) { FactoryBot.create(:census_employee, employer_profile: employer_profile, employee_role_id: employee_role_person.employee_roles.first.id) }
+
+      before do
+        family_member = FamilyMember.new(:person => consumer_role_person)
+        family.family_members << family_member
+      end
+
+      it 'should return success response if primary has employee role and dependent has consumer role' do
+        sign_in user
+        get :new, params: { person_id: person.id, employee_role_id: employee_role_person.employee_roles.first.id }
+        expect(response).to have_http_status(:success)
+      end
+    end
+
   end
 
   context 'IVL edit plan paths', dbclean: :after_each do
