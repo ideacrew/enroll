@@ -11,10 +11,11 @@
               h4.modal-title = l10n("confirm_waive")
             - else
               h4.modal-title = l10n("select_waive_reason")
-          .modal-body
-            - if @mc_coverage_kind == 'dental'
-              = hidden_field_tag "waiver_reason", ""
-            - else
+              
+          - if @mc_coverage_kind == 'dental'
+            = hidden_field_tag "waiver_reason", ""
+          - else
+            .modal-body
               = select_tag "waiver_reason", options_for_select(HbxEnrollment::WAIVER_REASONS), include_blank: l10n("please_select_waive_reason"), id: "waiver_reason_selection_dropdown"
           .modal-footer class="#{pundit_class Family, :updateable?}"
             button.btn.btn-default type="button" data-dismiss="modal" = l10n("close")
