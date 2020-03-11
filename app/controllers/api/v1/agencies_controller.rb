@@ -13,7 +13,7 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
   def agency_staff
     query = Queries::People::NonPrimaryAgentsQuery.new
     render json: query.to_json(
-      :only => [:_id,:first_name, :last_name, :hbx_id],
+      :only => [:_id, :first_name, :last_name, :hbx_id],
       :methods => [:agency_roles]
     )
   end
@@ -28,8 +28,8 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
 
   def agency_staff_detail
     render json: Person.find(params[:person_id]).to_json(
-      :only => [:first_name, :last_name, :hbx_id, :dob],
-      :methods => [:agency_roles, :agent_emails, :ssn]
+      :only => [:_id, :first_name, :last_name, :hbx_id, :dob],
+      :methods => [:agency_roles, :agent_emails]
     )
   end
 
