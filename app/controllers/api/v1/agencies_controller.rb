@@ -1,6 +1,6 @@
 class Api::V1::AgenciesController < Api::V1::ApiBaseController
 
-  before_action :authenticate_user!, only: [:index, :agency_staff, :primary_agency_staff, :terminate]
+  before_action :authenticate_user!, only: [:index, :agency_staff, :agency_staff_detail, :primary_agency_staff, :terminate]
 
   def index
     query = Queries::AgenciesQuery.new
