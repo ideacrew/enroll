@@ -75,7 +75,7 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
         office_locations_attributes: {
           "0"=> {
             "address_attributes" => {"kind"=>"primary", "address_1"=>"234 nfgjkhghf", "address_2"=>"", "city"=>"jfhgdfhgjgdf", "state"=>"DC", "zip"=>"35645"},
-            "phone_attributes"=> {"kind"=>"phone main", "area_code"=>"564", "number"=>"111-1111", "extension"=>"111"}
+            "phone_attributes" => { "kind" => "work", "area_code" => "564", "number" => "111-1111", "extension" => "111" }
           }
         }
       }
