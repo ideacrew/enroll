@@ -40,28 +40,23 @@ module SponsoredBenefits
       pdo = SponsoredBenefits::Organizations::PlanDesignOrganization.find(params[:id])
 
       if pdo.is_prospect?
-        ola = organization_params[:office_locations_attributes]
-        status = validate_and_assign(pdo)
+        ola = org_params_save[:office_locations_attributes]
+        pdo.assign_attributes(org_params_save)
 
         if ola.blank?
           flash[:error] = "Prospect Employer must have one Primary Office Location."
           redirect_to employers_organizations_broker_agency_profile_path(pdo.broker_agency_profile)
-        elsif status && pdo.save
+        elsif pdo.save
           flash[:success] = "Prospect Employer (#{pdo.legal_name}) Updated Successfully."
           redirect_to employers_organizations_broker_agency_profile_path(pdo.broker_agency_profile)
         else
-          init_organization(organization_params)
+          init_organization(org_params_revert)
           render :edit
         end
       else
         flash[:error] = "Updating of Client employer records not allowed"
         redirect_to employers_organizations_broker_agency_profile_path(pdo.broker_agency_profile)
       end
-    end
-
-    def validate_and_assign(pdo)
-      pdo.assign_attributes(organization_params) if pdo.office_locations.count < 1 || pdo.valid?
-      pdo.valid?
     end
 
     def destroy
@@ -102,15 +97,34 @@ module SponsoredBenefits
       @broker_agency_profile = ::BrokerAgencyProfile.find(params[:plan_design_organization_id])
     end
 
-    def organization_params
+    def org_params_save
       org_params = params.require(:organization).permit(
         :legal_name, :dba, :entity_kind, :sic_code,
         :office_locations_attributes => [
-          {:address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :county]},
-          {:phone_attributes => [:kind, :area_code, :number, :extension]},
+          :id,:_destroy,
+          {:address_attributes => [:id, :kind, :address_1, :address_2, :city, :state, :zip, :county]},
+          {:phone_attributes => [:id, :kind, :area_code, :number, :extension]},
           {:email_attributes => [:kind, :address]},
           :is_primary
         ]
+      )
+
+      if org_params[:office_locations_attributes].present?
+        org_params[:office_locations_attributes].delete_if {|key, value| value.blank?}
+      end
+
+      org_params
+    end
+
+    def org_params_revert
+      org_params = params.require(:organization).permit(
+          :legal_name, :dba, :entity_kind, :sic_code,
+          :office_locations_attributes => [
+              {:address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :county]},
+              {:phone_attributes => [:kind, :area_code, :number, :extension]},
+              {:email_attributes => [:kind, :address]},
+              :is_primary
+          ]
       )
 
       if org_params[:office_locations_attributes].present?

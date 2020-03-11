@@ -30,10 +30,13 @@
               </div>
             </div>
 
-            <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd delete_address">
-              <%= link_to image_tag('delete.png'), 'javascript:void(0)', class: 'remove_fields close-2' %>
-            </div>
+          <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd delete_address">
+            <%= f.hidden_field :office_location_id, class: "office_location_id", :value => f.object.id.to_s %>
+            <%= f.hidden_field :office_location_index, class: "office_location_index", :value => f.index %>
+            <%= link_to image_tag("delete.png"), "javascript:void(0)", :class=>"office_fields close-2", :data => {:value => "#{f.object.id}"}  %>
+            <%= f.hidden_field(:_destroy, id: "office_location_#{f.object.id.to_s}", value: false) %>
           </div>
+        </div>
 
           <div class="row row-form-wrapper no-buffer">
             <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
@@ -85,5 +88,12 @@
 </fieldset>
 
 <script>
-	var disableSelectric = true;
+  var disableSelectric = true;
+
+  $(".office_fields").click(function() {
+    var office_location_id = $(this).data('value');
+    $(this).closest('fieldset').addClass('hidden');
+    document.getElementById("office_location_" + office_location_id).value = true;
+  });
+
 </script>

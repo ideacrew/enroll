@@ -33,7 +33,7 @@ module SponsoredBenefits
 
       embeds_many :office_locations, class_name: "SponsoredBenefits::Organizations::OfficeLocation", cascade_callbacks: true, validate: true
 
-      accepts_nested_attributes_for :office_locations, class_name: "SponsoredBenefits::Organizations::OfficeLocation"
+      accepts_nested_attributes_for :office_locations, class_name: "SponsoredBenefits::Organizations::OfficeLocation", allow_destroy: true
 
       validates_presence_of :legal_name, :office_locations
 
@@ -59,21 +59,27 @@ module SponsoredBenefits
       end
 
       def office_location_kinds
-        location_kinds = self.office_locations.select{|l| !l.persisted?}.flat_map(&:address).compact.flat_map(&:kind)
+        location_kinds = self.office_locations.reject(&:persisted?).flat_map(&:address).compact.flat_map(&:kind)
+
+        return if location_kinds.empty? && office_locations.select(&:marked_for_destruction?).count < 1
+        return errors.add(:base, 'must select one primary address') if primary_office_size < 1
+        return errors.add(:base, "can't have multiple primary addresses") if primary_office_size > 1
+        return errors.add(:base, "can't have more than one mailing address") if mailing_office_size > 1
+
         # should validate only office location which are not persisted AND kinds ie. primary, mailing, branch
-        return if no_primary = location_kinds.detect{|kind| kind == 'work' || kind == 'home'}
-        unless location_kinds.empty?
-          if location_kinds.count('primary').zero?
-            errors.add(:base, "must select one primary address")
-          elsif location_kinds.count('primary') > 1
-            errors.add(:base, "can't have multiple primary addresses")
-          elsif location_kinds.count('mailing') > 1
-            errors.add(:base, "can't have more than one mailing address")
-          end
-          if !errors.any?# this means that the validation succeeded and we can delete all the persisted ones
-            self.office_locations.delete_if{|l| l.persisted?}
-          end
-        end
+        return if location_kinds.detect {|kind| kind == 'work' || kind == 'home'}
+      end
+
+      def primary_office_size
+        primary_count = office_locations.select {|o| o.address.kind == 'primary'}.count
+        primary_destroy_count = office_locations.select {|o| o.marked_for_destruction? && o.address.kind == 'primary'}.count
+        primary_count - primary_destroy_count
+      end
+
+      def mailing_office_size
+        mailing_count = office_locations.select {|o| o.address.kind == 'mailing'}.count
+        mailing_destroy_count = office_locations.select {|o| o.marked_for_destruction? && o.address.kind == 'mailing'}.count
+        mailing_count - mailing_destroy_count
       end
 
       def check_legal_name_or_fein_changed?
