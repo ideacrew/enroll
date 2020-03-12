@@ -54,9 +54,9 @@ module BenefitSponsors
       end
 
       def has_renewal_product?
-        base_product = @base_enrollment.product
-        return true unless base_product.present?
-        renewal_product = base_product.renewal_product
+        return true if @base_enrollment.is_coverage_waived?
+
+        renewal_product = @base_enrollment.product.renewal_product
         @sponsored_benefit.products(@new_effective_on).include?(renewal_product)
       end
 
