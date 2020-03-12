@@ -19,7 +19,7 @@ module BenefitSponsors
 
     let(:phone_attributes) {
       {
-        :kind => "phone main",
+        :kind => "work",
         :number => "8768776",
         :area_code => "876",
         :extension => "extension"

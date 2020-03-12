@@ -55,7 +55,7 @@ module EventsHelper
   end
 
   def is_office_location_address_valid?(office_location)
-    office_location.present? && office_location.address.present? && (['mailing', 'work', 'primary'].include? office_location.address.kind)
+    office_location.present? && office_location.phone.present? && (['work', 'home', 'main'].include? office_location.phone.kind)
   end
 
   def is_office_location_phone_valid?(office_location)

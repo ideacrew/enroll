@@ -89,7 +89,7 @@ class BrokerRole
   end
 
   def phone
-    parent.phones.where(kind: "phone main").first || broker_agency_profile.phone || parent.phones.where(kind: "work").first rescue ""
+    parent.phones.where(kind: "work").first || parent.phones.where(kind: "main").first || broker_agency_profile.phone
   end
 
   def email
