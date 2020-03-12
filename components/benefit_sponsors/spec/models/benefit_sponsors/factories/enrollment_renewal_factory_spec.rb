@@ -12,9 +12,10 @@ module BenefitSponsors
     let(:enrollment) do
       double("enrollment",
              benefit_group_assignment: benefit_group_assignment,
-             is_coverage_waived?: true,
+             is_coverage_waived?: false,
              coverage_kind: "health",
-             product: product)
+             product: product,
+             aasm_state: 'active')
     end
 
     let(:product) do
