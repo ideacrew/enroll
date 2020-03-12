@@ -157,35 +157,36 @@ RSpec.describe Api::V1::AgenciesController, :type => :controller, :dbclean => :a
   end
 
   describe "POST #terminate with an active role" do
-    let(:person) { FactoryBot.create(:person) }
-    let(:broker_agency) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile) }
-
     before :each do
       sign_in(user)
     end
 
     context "has a valid role to terminate" do
-      let(:broker_agency_staff_role) {FactoryBot.create(
+      let(:person) { FactoryBot.create(:person, broker_agency_staff_roles: broker_agency_staff_role) }
+      let(:broker_agency) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile) }
+      let(:broker_agency_staff_role) {[FactoryBot.create(
         :broker_agency_staff_role,
         aasm_state: "active",
         benefit_sponsors_broker_agency_profile_id: broker_agency.id
-        )}
+        )]}
 
       it "is successful the first time" do
-        post :terminate, params: { person_id: person.id.to_s, role_id: broker_agency_staff_role.id.to_s }
+        post :terminate, params: { person_id: person.id.to_s, role_id: broker_agency_staff_role.first.id.to_s }
         expect(response.status).to eq(200)
       end
     end
 
     context "has a role that can't be terminated" do
-      let(:broker_agency_staff_role) {FactoryBot.create(
+      let(:person) { FactoryBot.create(:person, broker_agency_staff_roles: broker_agency_staff_role) }
+      let(:broker_agency) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile) }
+      let(:broker_agency_staff_role) {[FactoryBot.create(
         :broker_agency_staff_role,
         aasm_state: "broker_agency_terminate",
         benefit_sponsors_broker_agency_profile_id: broker_agency.id
-        )}
+        )]}
 
       it "fails to transition" do
-        post :terminate, params: { person_id: person.id.to_s, role_id: broker_agency_staff_role.id.to_s }
+        post :terminate, params: { person_id: person.id.to_s, role_id: broker_agency_staff_role.first.id.to_s }
         expect(response.status).to eq(409)
       end
     end
