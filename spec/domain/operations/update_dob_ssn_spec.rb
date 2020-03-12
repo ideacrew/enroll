@@ -19,21 +19,25 @@ RSpec.describe Operations::UpdateDobSsn, type: :model, dbclean: :after_each do
 
     context 'success' do
       before do
-        @result = subject.call(person_id: person.id.to_s, params: test_params, info_changed: false, dc_status: false, current_user: 'c_user')
+        @result = subject.call(person_id: person.id.to_s, params: test_params, info_changed: false, dc_status: false, current_user: 'c_user', ssn_require: false)
       end
 
       it 'should return success' do
         expect(@result).to be_a Dry::Monads::Result::Success
       end
+
+      it 'should return success' do
+        expect(@result.success).to eq([nil, nil])
+      end
     end
 
     context 'failure' do
       before do
-        @result = subject.call(person_id: 'person_id', params: test_params, info_changed: false, dc_status: false, current_user: 'c_user')
+        @result = subject.call(person_id: 'person_id', params: test_params, info_changed: false, dc_status: false, current_user: 'c_user', ssn_require: false)
       end
 
       it 'should return Failure' do
-        expect(@result.failure).to eq({person: ['Person not found']})
+        expect(@result.failure).to eq([{person: ['Person not found']}, nil])
       end
     end
   end
