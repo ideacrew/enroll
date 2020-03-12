@@ -90,6 +90,8 @@ class BrokerRole
 
   def phone
     parent.phones.where(kind: "work").first || parent.phones.where(kind: "main").first || broker_agency_profile.phone
+  rescue StandardError => _e
+    ""
   end
 
   def email
