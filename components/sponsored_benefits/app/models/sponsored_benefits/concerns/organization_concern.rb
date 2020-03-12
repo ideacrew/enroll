@@ -70,18 +70,6 @@ module SponsoredBenefits
         return if location_kinds.detect {|kind| kind == 'work' || kind == 'home'}
       end
 
-      def primary_office_size
-        primary_count = office_locations.select {|o| o.address.kind == 'primary'}.count
-        primary_destroy_count = office_locations.select {|o| o.marked_for_destruction? && o.address.kind == 'primary'}.count
-        primary_count - primary_destroy_count
-      end
-
-      def mailing_office_size
-        mailing_count = office_locations.select {|o| o.address.kind == 'mailing'}.count
-        mailing_destroy_count = office_locations.select {|o| o.marked_for_destruction? && o.address.kind == 'mailing'}.count
-        mailing_count - mailing_destroy_count
-      end
-
       def check_legal_name_or_fein_changed?
         fein_changed? || legal_name_changed?
       end
@@ -128,6 +116,20 @@ module SponsoredBenefits
       ]
 
       FIELD_AND_EVENT_NAMES_MAP = {"legal_name" => "name_changed", "fein" => "fein_corrected"}
+    end
+
+    private
+
+    def primary_office_size
+      primary_count = office_locations.select {|o| o.address.kind == 'primary'}.count
+      primary_destroy_count = office_locations.select {|o| o.marked_for_destruction? && o.address.kind == 'primary'}.count
+      primary_count - primary_destroy_count
+    end
+
+    def mailing_office_size
+      mailing_count = office_locations.select {|o| o.address.kind == 'mailing'}.count
+      mailing_destroy_count = office_locations.select {|o| o.marked_for_destruction? && o.address.kind == 'mailing'}.count
+      mailing_count - mailing_destroy_count
     end
   end
 end

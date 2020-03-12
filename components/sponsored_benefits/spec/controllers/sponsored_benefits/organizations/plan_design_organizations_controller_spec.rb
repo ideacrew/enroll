@@ -38,7 +38,8 @@ module SponsoredBenefits
         "sic_code"    =>  "0116",
         "office_locations_attributes" =>
               {"0"=>
-                  { "address_attributes" =>
+                  { "_destroy" => "false",
+                    "address_attributes" =>
                       { "kind"      =>  "primary",
                         "address_1" =>  "",
                         "address_2" =>  "",
@@ -46,12 +47,6 @@ module SponsoredBenefits
                         "state"     =>  "",
                         "zip"       =>  "01001",
                         "county"    =>  "Hampden"
-                      },
-                    "phone_attributes" =>
-                      { "kind"      =>  "phone main",
-                        "area_code" =>  "",
-                        "number"    =>  "",
-                        "extension" =>  ""
                       }
                   }
         }
@@ -169,6 +164,32 @@ module SponsoredBenefits
           end
 
           context "with valid params" do
+            let!(:valid_attributes) {
+              {
+                  "legal_name"  =>  "Some Name",
+                  "dba"         =>  "",
+                  "entity_kind" =>  "",
+                  "sic_code"    =>  "0116",
+                  "office_locations_attributes" =>
+                      {
+                          "0"=>
+                              {"id" => prospect_plan_design_organization.office_locations.first.id.to_s,
+                               "_destroy" => "false",
+                               "address_attributes" =>
+                                   { "id" => prospect_plan_design_organization.office_locations.first.address.id.to_s,
+                                     "kind"      =>  "primary",
+                                     "address_1" =>  "",
+                                     "address_2" =>  "",
+                                     "city"      =>  "",
+                                     "state"     =>  "",
+                                     "zip"       =>  "01001",
+                                     "county"    =>  "Hampden"
+                                   }
+                              }
+                      }
+              }
+            }
+
             let(:updated_valid_attributes) {
               valid_attributes["legal_name"] = "Some New Name"
               valid_attributes
@@ -216,6 +237,56 @@ module SponsoredBenefits
               )
             end
 
+            let!(:valid_attributes) {
+              {
+                "legal_name"  =>  "Some Name",
+                "dba"         =>  "",
+                "entity_kind" =>  "",
+                "sic_code"    =>  "0116",
+                "office_locations_attributes" =>
+                  {
+                    "0" =>
+                      {"id" => prospect_plan_design_organization.office_locations.first.id.to_s,
+                       "_destroy" => "false",
+                       "address_attributes" =>
+                         {"id" => prospect_plan_design_organization.office_locations.first.address.id.to_s,
+                          "kind" => "primary",
+                          "address_1" => "",
+                          "address_2" => "",
+                          "city" => "",
+                          "state" => "",
+                          "zip" => "01001",
+                          "county" => "Hampden"
+                         }
+                      }
+                  }
+              }
+            }
+
+            let!(:new_attributes) {
+              {
+                "legal_name"  =>  "Some Name",
+                "dba"         =>  "",
+                "entity_kind" =>  "",
+                "sic_code"    =>  "0116",
+                "office_locations_attributes" =>
+                  {
+                    "0"=>
+                      {"_destroy" => "false",
+                       "address_attributes" =>
+                         { "kind"      =>  "primary",
+                           "address_1" =>  "test 2nd primary",
+                           "address_2" =>  "",
+                           "city"      =>  "",
+                           "state"     =>  "mn",
+                           "zip"       =>  "01001",
+                           "county"    =>  "Hampden"
+                         }
+                      }
+                  }
+              }
+            }
+
             let(:profile) {SponsoredBenefits::Organizations::AcaShopCcaEmployerProfile.new}
             let(:updated_valid_attributes) {
               valid_attributes['legal_name'] = 'Some New Name'
@@ -255,6 +326,15 @@ module SponsoredBenefits
               prospect_plan_design_organization.reload
               address_1_after_update = prospect_plan_design_organization.office_locations.first.address
               expect(address_1_after_update).not_to eq address_1_before_update
+            end
+
+            it 'should not update office locations when embedded models are valid and primary location exists' do
+              locations_before_update = prospect_plan_design_organization.office_locations.count
+              patch :update, {organization: updated_valid_attributes, id: prospect_plan_design_organization.id, format: 'js'}, valid_session
+              expect(subject).to redirect_to(employers_organizations_broker_agency_profile_path(broker_agency_profile))
+              prospect_plan_design_organization.reload
+              locations_after_update = prospect_plan_design_organization.office_locations.count
+              expect(locations_before_update).to eq locations_after_update
             end
           end
 

@@ -14,13 +14,13 @@ module SponsoredBenefits
     def create
       # old_broker_agency_profile = ::BrokerAgencyProfile.find(params[:broker_agency_id])
       broker_agency_profile = SponsoredBenefits::Organizations::BrokerAgencyProfile.find_or_initialize_broker_profile(@broker_agency_profile).broker_agency_profile
-      broker_agency_profile.plan_design_organizations.new(organization_params.merge(owner_profile_id: @broker_agency_profile.id))
+      broker_agency_profile.plan_design_organizations.new(org_params_save.merge(owner_profile_id: @broker_agency_profile.id))
 
       if broker_agency_profile.save
-        flash[:success] = "Prospect Employer (#{organization_params[:legal_name]}) Added Successfully."
+        flash[:success] = "Prospect Employer (#{org_params_save[:legal_name]}) Added Successfully."
         redirect_to employers_organizations_broker_agency_profile_path(@broker_agency_profile)
       else
-        init_organization(organization_params)
+        init_organization(org_params_revert)
         render :new
       end
     end
