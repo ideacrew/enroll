@@ -39,7 +39,7 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
       person = Person.find(permitted[:person_id])
       role_id = permitted[:role_id]
       role = person.broker_agency_staff_roles.select{ |role| role._id.to_s == role_id }.first ||
-             person.general_agency_staff_roles.select{ |role| role._id.to_s == :role_id }.first
+             person.general_agency_staff_roles.select{ |role| role._id.to_s == role_id }.first
       if role
         role.class.name == "BrokerAgencyStaffRole" ? role.broker_agency_terminate! : role.general_agency_terminate!
         render json: { status: "success" }, status: 200
