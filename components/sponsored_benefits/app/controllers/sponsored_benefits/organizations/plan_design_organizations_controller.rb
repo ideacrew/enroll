@@ -47,7 +47,6 @@ module SponsoredBenefits
           redirect_to employers_organizations_broker_agency_profile_path(pdo.broker_agency_profile)
         else
           flash[:error] = "Prospect Employer Update failed with errors: #{pdo.errors.full_messages}"
-          @organization = pdo
           redirect_to edit_organizations_plan_design_organization_path(pdo)
         end
       else
