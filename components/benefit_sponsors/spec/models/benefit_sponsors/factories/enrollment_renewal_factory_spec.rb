@@ -6,8 +6,6 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_applicatio
 
 module BenefitSponsors
   RSpec.describe Factories::EnrollmentRenewalFactory, type: :model, :dbclean => :after_each do
-    include_context "setup benefit market with market catalogs and product packages"
-    include_context "setup initial benefit application"
 
     let(:enrollment) do
       double("enrollment",
@@ -49,11 +47,8 @@ module BenefitSponsors
     end
 
     context 'passive renewals for initial enrollment in waived status' do
-      before(:each) do
-        allow(census_employee).to receive(:benefit_package_assignment_for).with(benefit_package).and_return(benefit_group_assignment)
-        allow(benefit_package).to receive(:sponsored_benefit_for).with(enrollment.coverage_kind).and_return(sponsored_benefit)
-        allow(sponsored_benefit).to receive(:products).with(benefit_package.start_on).and_return([product])
-      end
+      include_context "setup benefit market with market catalogs and product packages"
+      include_context "setup initial benefit application"
 
       let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_month }
       let(:effective_on) { current_effective_date }
@@ -64,7 +59,7 @@ module BenefitSponsors
       let(:shop_family) {FactoryGirl.create(:family, :with_primary_family_member)}
       let(:aasm_state) { 'inactive' }
       let(:census_employee) { create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package, hired_on: hired_on, created_at: employee_created_at, updated_at: employee_updated_at) }
-      let(:employee_role) { FactoryGirl.create(:employee_role, benefit_sponsors_employer_profile_id: abc_profile.id, hired_on: census_employee.hired_on, census_employee_id: census_employee.id) }
+      let(:employee_role) { FactoryGirl.create(:benefit_sponsors_employee_role, person: person, employer_profile: abc_profile, census_employee_id: census_employee.id, hired_on: census_employee.hired_on) }
       let(:enrollment_kind) { 'open_enrollment' }
       let(:special_enrollment_period_id) { nil }
       let(:waived_enrollment) do
@@ -79,13 +74,14 @@ module BenefitSponsors
                            sponsored_benefit_package_id: current_benefit_package.id,
                            sponsored_benefit_id: current_benefit_package.sponsored_benefits[0].id,
                            employee_role_id: employee_role.id,
-                           benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id,
                            special_enrollment_period_id: special_enrollment_period_id,
                            aasm_state: aasm_state
         )
       end
 
       it 'should create renewal enrollment in waived status when base enrollment is waived' do
+        waived_enrollment.benefit_group_assignment = census_employee.active_benefit_group_assignment
+        waived_enrollment.save
         enrollment_renewal_factory = BenefitSponsors::Factories::EnrollmentRenewalFactory.new(waived_enrollment, current_benefit_package)
         expect(enrollment_renewal_factory.renewal_enrollment.aasm_state).to eq 'renewing_waived'
       end
