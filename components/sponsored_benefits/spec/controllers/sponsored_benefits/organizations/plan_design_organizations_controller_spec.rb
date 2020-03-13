@@ -154,6 +154,33 @@ module SponsoredBenefits
     end
 
     describe "PATCH #update" do
+
+      let!(:valid_attributes) {
+        {
+          "legal_name"  =>  "Some Name",
+          "dba"         =>  "",
+          "entity_kind" =>  "",
+          "sic_code"    =>  "0116",
+          "office_locations_attributes" =>
+            {
+              "0"=>
+                {"id" => prospect_plan_design_organization.office_locations.first.id.to_s,
+                 "_destroy" => "false",
+                 "address_attributes" =>
+                   { "id" => prospect_plan_design_organization.office_locations.first.address.id.to_s,
+                     "kind"      =>  "primary",
+                     "address_1" =>  "",
+                     "address_2" =>  "",
+                     "city"      =>  "",
+                     "state"     =>  "",
+                     "zip"       =>  "01001",
+                     "county"    =>  "Hampden"
+                   }
+                }
+            }
+        }
+      }
+
       USER_ROLES.each do |role|
         context "for user #{role}" do
           before do
@@ -164,32 +191,6 @@ module SponsoredBenefits
           end
 
           context "with valid params" do
-            let!(:valid_attributes) {
-              {
-                  "legal_name"  =>  "Some Name",
-                  "dba"         =>  "",
-                  "entity_kind" =>  "",
-                  "sic_code"    =>  "0116",
-                  "office_locations_attributes" =>
-                      {
-                          "0"=>
-                              {"id" => prospect_plan_design_organization.office_locations.first.id.to_s,
-                               "_destroy" => "false",
-                               "address_attributes" =>
-                                   { "id" => prospect_plan_design_organization.office_locations.first.address.id.to_s,
-                                     "kind"      =>  "primary",
-                                     "address_1" =>  "",
-                                     "address_2" =>  "",
-                                     "city"      =>  "",
-                                     "state"     =>  "",
-                                     "zip"       =>  "01001",
-                                     "county"    =>  "Hampden"
-                                   }
-                              }
-                      }
-              }
-            }
-
             let(:updated_valid_attributes) {
               valid_attributes["legal_name"] = "Some New Name"
               valid_attributes
@@ -236,32 +237,6 @@ module SponsoredBenefits
                 enrollment_frequency: 'rolling_month'
               )
             end
-
-            let!(:valid_attributes) {
-              {
-                "legal_name"  =>  "Some Name",
-                "dba"         =>  "",
-                "entity_kind" =>  "",
-                "sic_code"    =>  "0116",
-                "office_locations_attributes" =>
-                  {
-                    "0" =>
-                      {"id" => prospect_plan_design_organization.office_locations.first.id.to_s,
-                       "_destroy" => "false",
-                       "address_attributes" =>
-                         {"id" => prospect_plan_design_organization.office_locations.first.address.id.to_s,
-                          "kind" => "primary",
-                          "address_1" => "",
-                          "address_2" => "",
-                          "city" => "",
-                          "state" => "",
-                          "zip" => "01001",
-                          "county" => "Hampden"
-                         }
-                      }
-                  }
-              }
-            }
 
             let!(:new_attributes) {
               {
@@ -313,7 +288,7 @@ module SponsoredBenefits
               address_1_before_update = prospect_plan_design_organization.office_locations.first.address.address_1
               prospect_plan_design_organization.plan_design_proposals.first.profile.benefit_sponsorships.first.benefit_applications.first.benefit_groups.first.relationship_benefits.delete_all
               patch :update, {organization: updated_valid_attributes, id: prospect_plan_design_organization.id, format: 'js'}, valid_session
-              expect(response).to render_template(:edit)
+              expect(subject).to redirect_to(edit_organizations_plan_design_organization_path(prospect_plan_design_organization))
               prospect_plan_design_organization.reload
               address_1_after_update = prospect_plan_design_organization.office_locations.first.address
               expect(address_1_after_update.address_1).to eq address_1_before_update
@@ -347,26 +322,7 @@ module SponsoredBenefits
 
             it "renders edit with flash error" do
               patch :update, { organization: invalid_attributes, id: prospect_plan_design_organization.id, format: 'js' }, valid_session
-              expect(response).to render_template(:edit)
-            end
-          end
-
-          context "with params missing office_location_attributes" do
-            let(:params_missing_ol_attrs) {
-              valid_attributes.delete "office_locations_attributes"
-              valid_attributes
-            }
-
-            it "does not update Organizations::PlanDesignOrganization" do
-              expect {
-                patch :update, { organization: params_missing_ol_attrs, id: prospect_plan_design_organization.id, format: 'js' }, valid_session
-              }.not_to change { prospect_plan_design_organization.reload.legal_name }
-            end
-
-            it "redirects to employers_organizations_broker_agency_profile_path(broker_agency_profile) with flash error" do
-              patch :update, { organization: params_missing_ol_attrs, id: prospect_plan_design_organization.id, format: 'js' }, valid_session
-               expect(subject).to redirect_to(employers_organizations_broker_agency_profile_path(broker_agency_profile))
-               expect(flash[:error]).to match(/Prospect Employer must have one Primary Office Location./)
+              expect(subject).to redirect_to(edit_organizations_plan_design_organization_path(prospect_plan_design_organization))
             end
           end
         end

@@ -14,13 +14,13 @@ module SponsoredBenefits
     def create
       # old_broker_agency_profile = ::BrokerAgencyProfile.find(params[:broker_agency_id])
       broker_agency_profile = SponsoredBenefits::Organizations::BrokerAgencyProfile.find_or_initialize_broker_profile(@broker_agency_profile).broker_agency_profile
-      broker_agency_profile.plan_design_organizations.new(org_params_save.merge(owner_profile_id: @broker_agency_profile.id))
+      broker_agency_profile.plan_design_organizations.new(organization_params.merge(owner_profile_id: @broker_agency_profile.id))
 
       if broker_agency_profile.save
-        flash[:success] = "Prospect Employer (#{org_params_save[:legal_name]}) Added Successfully."
+        flash[:success] = "Prospect Employer (#{organization_params[:legal_name]}) Added Successfully."
         redirect_to employers_organizations_broker_agency_profile_path(@broker_agency_profile)
       else
-        init_organization(org_params_revert)
+        init_organization(organization_params)
         render :new
       end
     end
@@ -40,18 +40,15 @@ module SponsoredBenefits
       pdo = SponsoredBenefits::Organizations::PlanDesignOrganization.find(params[:id])
 
       if pdo.is_prospect?
-        ola = org_params_save[:office_locations_attributes]
-        pdo.assign_attributes(org_params_save)
+        pdo.assign_attributes(organization_params)
 
-        if ola.blank?
-          flash[:error] = "Prospect Employer must have one Primary Office Location."
-          redirect_to employers_organizations_broker_agency_profile_path(pdo.broker_agency_profile)
-        elsif pdo.save
+        if pdo.save
           flash[:success] = "Prospect Employer (#{pdo.legal_name}) Updated Successfully."
           redirect_to employers_organizations_broker_agency_profile_path(pdo.broker_agency_profile)
         else
-          init_organization(org_params_revert)
-          render :edit
+          flash[:error] = "Prospect Employer Update failed with errors: #{pdo.errors.full_messages}"
+          @organization = pdo
+          redirect_to edit_organizations_plan_design_organization_path(pdo)
         end
       else
         flash[:error] = "Updating of Client employer records not allowed"
@@ -97,7 +94,7 @@ module SponsoredBenefits
       @broker_agency_profile = ::BrokerAgencyProfile.find(params[:plan_design_organization_id])
     end
 
-    def org_params_save
+    def organization_params
       org_params = params.require(:organization).permit(
         :legal_name, :dba, :entity_kind, :sic_code,
         :office_locations_attributes => [
@@ -107,24 +104,6 @@ module SponsoredBenefits
           {:email_attributes => [:kind, :address]},
           :is_primary
         ]
-      )
-
-      if org_params[:office_locations_attributes].present?
-        org_params[:office_locations_attributes].delete_if {|key, value| value.blank?}
-      end
-
-      org_params
-    end
-
-    def org_params_revert
-      org_params = params.require(:organization).permit(
-          :legal_name, :dba, :entity_kind, :sic_code,
-          :office_locations_attributes => [
-              {:address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :county]},
-              {:phone_attributes => [:kind, :area_code, :number, :extension]},
-              {:email_attributes => [:kind, :address]},
-              :is_primary
-          ]
       )
 
       if org_params[:office_locations_attributes].present?
