@@ -24,6 +24,10 @@ module Queries
       end
     end
 
+    def policy_class
+      AngularAdminApplicationPolicy
+    end
+
     def agency_aggregate
       BenefitSponsors::Organizations::Organization.collection.aggregate([
         {"$match" => {

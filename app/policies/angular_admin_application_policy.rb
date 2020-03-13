@@ -13,4 +13,16 @@ class AngularAdminApplicationPolicy < ApplicationPolicy
       permission.view_the_configuration_tab &&
       permission.view_personal_info_page
   end
+
+  def list_agencies?
+    visit?
+  end
+
+  def list_agency_staff?
+    visit?
+  end
+
+  def list_primary_agency_staff?
+    visit?
+  end
 end

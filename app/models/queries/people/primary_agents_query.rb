@@ -21,6 +21,10 @@ module Queries
         end
       end
 
+      def policy_class
+        AngularAdminApplicationPolicy
+      end
+
       protected
 
       def person_query

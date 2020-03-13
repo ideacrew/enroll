@@ -4,6 +4,7 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
 
   def index
     query = Queries::AgenciesQuery.new
+    authorize query, :list_agencies?
     render json: query.to_json(
              :only => [:dba, :legal_name],
              :methods => [:agency_profile_id, :organization_id, :agency_profile_type]
@@ -12,6 +13,7 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
 
   def agency_staff
     query = Queries::People::NonPrimaryAgentsQuery.new
+    authorize query, :list_agency_staff?
     render json: query.to_json(
       :only => [:_id, :first_name, :last_name, :hbx_id],
       :methods => [:agency_roles]
@@ -20,12 +22,14 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
 
   def primary_agency_staff
     query = Queries::People::PrimaryAgentsQuery.new
+    authorize query, :list_primary_agency_staff?
     render json: query.to_json(
       :only => [:first_name, :last_name, :hbx_id],
       :methods => [:agent_npn, :agent_role_id, :connected_profile_id]
     )
   end
 
+  # TODO: The below need proper queries and/or commands.
   def agency_staff_detail
     render json: Person.find(params[:person_id]).to_json(
       :only => [:_id, :first_name, :last_name, :hbx_id, :dob],
