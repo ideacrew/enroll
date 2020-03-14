@@ -29,9 +29,10 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
     )
   end
 
-  # TODO: The below need proper queries and/or commands.
   def agency_staff_detail
-    render json: Person.find(params[:person_id]).to_json(
+    query = Queries::People::AgencyStaffDetailQuery.new(params[:person_id])
+    authorize query, :view_agency_staff_details?
+    render json: query.person.to_json(
       :only => [:_id, :first_name, :last_name, :hbx_id, :dob],
       :methods => [:agency_roles, :agent_emails]
     )
@@ -39,18 +40,16 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
 
   def terminate
     permitted = params.permit(:person_id, :role_id)
-    begin
-      person = Person.find(permitted[:person_id])
-      role_id = permitted[:role_id]
-      role = person.broker_agency_staff_roles.select{ |role| role._id.to_s == role_id }.first ||
-             person.general_agency_staff_roles.select{ |role| role._id.to_s == role_id }.first
-      if role
-        role.class.name == "BrokerAgencyStaffRole" ? role.broker_agency_terminate! : role.general_agency_terminate!
-        render json: { status: "success" }, status: 200
-      else
-        render json: { status: "error", message: "Unable to find role" }, status: 409
-      end
-    rescue
+    terminate_agency_staff = Operations::TerminateAgencyStaff.new(permitted[:person_id], permitted[:role_id])
+    authorize terminate_agency_staff, :terminate_agency_staff?
+    case terminate_agency_staff.call
+    when :ok
+      render json: { status: "success" }, status: 200
+    when :person_not_found
+      render json: { status: "error" }, status: 404
+    when :no_role_found
+      render json: { status: "error", message: "Unable to find role" }, status: 422
+    else
       render json: { status: "error" }, status: 409
     end
   end

@@ -25,4 +25,12 @@ class AngularAdminApplicationPolicy < ApplicationPolicy
   def list_primary_agency_staff?
     visit?
   end
+
+  def view_agency_staff_details?
+    visit?
+  end
+
+  def terminate_agency_staff?
+    visit?
+  end
 end

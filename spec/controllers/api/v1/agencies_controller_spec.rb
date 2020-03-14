@@ -23,6 +23,16 @@ RSpec.describe Api::V1::AgenciesController, :type => :controller, :dbclean => :a
       expect(response.status).to eq(403)
     end
 
+    it "forbids access to GET #agency_staff_detail" do
+      get :agency_staff_detail, params: { person_id: "1234" }
+      expect(response.status).to eq(403)
+    end
+
+    it "forbids access to POST #terminate" do
+      post :terminate, params: { person_id: "1234", role_id: "5678" }
+      expect(response.status).to eq(403)
+    end
+
   end
 
   describe "when authorized" do
@@ -243,6 +253,12 @@ RSpec.describe Api::V1::AgenciesController, :type => :controller, :dbclean => :a
     describe "POST #terminate with an active role" do
       before :each do
         sign_in(user)
+        allow(AngularAdminApplicationPolicy).to receive(:new) do |u, resource|
+          expect(u).to eq user
+          expect(resource.class).to eq Operations::TerminateAgencyStaff
+          policy
+        end
+        allow(policy).to receive(:terminate_agency_staff?).and_return(true)
       end
 
       context "has a valid role to terminate" do
@@ -257,6 +273,13 @@ RSpec.describe Api::V1::AgenciesController, :type => :controller, :dbclean => :a
         it "is successful the first time" do
           post :terminate, params: { person_id: person.id.to_s, role_id: broker_agency_staff_role.first.id.to_s }
           expect(response.status).to eq(200)
+        end
+      end
+
+      context "with a person that doesn't exist" do
+        it "returns not found" do
+          post :terminate, params: { person_id: "aksdfuidfa", role_id: "blargh" }
+          expect(response.status).to eq(404)
         end
       end
 
