@@ -2167,6 +2167,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
 
     context "when ER has imported applications" do
+      let(:bga1) {double("BenefitGroupAssignment", created_at: TimeKeeper.date_of_record - 25.days, start_on: TimeKeeper.date_of_record - 2.days, benefit_end_date: TimeKeeper.date_of_record + 2.days, is_active: false, benefit_package: double("benefit_package", is_active: true))}
+      let(:bga2) {double("BenefitGroupAssignment", created_at: TimeKeeper.date_of_record, start_on: TimeKeeper.date_of_record - 2.days, benefit_end_date: TimeKeeper.date_of_record + 2.days, is_active: false, benefit_package: double("benefit_package", is_active: true))}
 
       it "should return nil if given effective_on date is in imported benefit application" do
         initial_application.update_attributes(aasm_state: :imported)
@@ -2178,6 +2180,11 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
         initial_application.update_attributes(aasm_state: :imported)
         coverage_date = census_employee.benefit_group_assignments.first.start_on - 1.month
         expect(census_employee.benefit_group_assignment_for_date(coverage_date)).to eq nil
+      end
+
+      it "should return latest bga when multiple present" do
+        allow(census_employee).to receive(:benefit_group_assignments).and_return [bga1, bga2]
+        expect(census_employee.benefit_group_assignment_for_date(TimeKeeper.date_of_record)).to eq bga2
       end
     end
 
