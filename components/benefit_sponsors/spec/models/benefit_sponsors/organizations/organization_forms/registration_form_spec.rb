@@ -73,11 +73,13 @@ module BenefitSponsors
                    "working_hours"=>"1",
                    "accept_new_clients"=>"1",
                    "referred_by"=>"Other",
+                   "contact_method"=>"paper_and_electronic",
                    "referred_reason"=>"other reason",
                    "office_locations_attributes"=>
-                       {"0"=>
-                            {"address_attributes"=>{"address_1"=>"new address", "kind"=>"primary", "address_2"=>"", "city"=>"ma_city", "state"=>"MA","zip"=>"01026", "county"=>"Berkshire"},
-                             "phone_attributes" => { "kind" => "work", "area_code" => "222", "number" => "2221111", "extension" => "" }}},
+                      {"0"=>
+                        {"address_attributes"=>{"address_1"=>"new address", "kind"=>"primary", "address_2"=>"", "city"=>"ma_city", "state"=>"MA","zip"=>"01026", "county"=>"Berkshire"},
+                         "phone_attributes" => { "kind" => "work", "area_code" => "222", "number" => "2221111", "extension" => "" }}}}},
+
          "profile_id"=>nil,
          "current_user_id"=> profile_type == "benefit_sponsor" ? FactoryBot.create(:user).id: nil}
       end
