@@ -307,6 +307,47 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         expect(assigns(:new_effective_on)).to eq TimeKeeper.date_of_record
       end
 
+      context "non active family member has is incarcerated/inactive" do
+        let!(:person_to_deactivate) do
+          FactoryBot.create(:person)
+        end
+
+        before do
+          family = person.primary_family
+          expect(family.family_members.count).to eq(1)
+          person.primary_family.family_members.create!(person_id: person_to_deactivate.id)
+          expect(family.family_members.count).to eq(2)
+          # This would ressemble the actual deletion from the manage_family UI, such as in the case of a
+          # duplicate family member
+          incarcerated_family_member = family.family_members.where(person_id: person_to_deactivate).first
+          # this will set is_active to false
+          family.remove_family_member(person_to_deactivate, person)
+          family.save!
+          incarcerated_family_member.reload
+        end
+
+        it "should only consider active family members and redirect to coverage household page" do
+          sign_in user
+          get(
+            :new,
+            params: {
+              person_id: person.id,
+              consumer_role_id: consumer_role.id,
+              change_plan: "change",
+              hbx_enrollment_id: "123",
+              coverage_kind: hbx_enrollment.coverage_kind
+            }
+          )
+          fm_hash = assigns(:fm_hash)
+          active_family_members = assigns(:active_family_members)
+          expect(fm_hash.values.flatten.detect{|err| err.to_s.match(/incarcerated_not_answered/)}).to eq(nil)
+          incarcerated_family_member = family.family_members.where(person_id: person_to_deactivate).first
+          expect(active_family_members).to_not include(incarcerated_family_member)
+          expect(active_family_members.length).to eq(1)
+          expect(response).to have_http_status("200")
+        end
+      end
+
       it "should not redirect to coverage household page if incarceration is unanswered" do
         person.unset(:is_incarcerated)
         HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.last.benefit_packages[0].incarceration_status = ["incarceration_status"]
