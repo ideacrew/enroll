@@ -622,6 +622,14 @@ When(/^Primary Broker have submit the security questions$/) do
   step 'I have submitted the security questions'
 end
 
+And(/^Hbx Admin select the all security question and give the answer$/) do
+  step 'I select the all security question and give the answer'
+end
+
+When(/^Hbx Admin have submitted the security questions$/) do
+  step 'I have submitted the security questions'
+end
+
 And(/^Broker Assisted select the all security question and give the answer$/) do
   step 'I select the all security question and give the answer'
 end
