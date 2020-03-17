@@ -92,6 +92,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     end
 
     it "when kind is employer_sponsored" do
+      allow(hbx_enrollment).to receive(:is_reterminated_enrollment?).and_return(false)
       allow(hbx_enrollment).to receive(:kind).and_return('employer_sponsored')
       allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
       allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(false)
@@ -103,6 +104,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     end
 
     it "when kind is employer_sponsored_cobra" do
+      allow(hbx_enrollment).to receive(:is_reterminated_enrollment?).and_return(false)
       allow(hbx_enrollment).to receive(:kind).and_return('employer_sponsored_cobra')
       allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
       allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(true)
@@ -113,6 +115,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
     if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     it "when kind is individual" do
+      allow(hbx_enrollment).to receive(:is_reterminated_enrollment?).and_return(false)
       allow(hbx_enrollment).to receive(:kind).and_return('individual')
       allow(hbx_enrollment).to receive(:is_ivl_by_kind?)
       allow(hbx_enrollment).to receive(:is_enrolled_by_aasm_state?)
@@ -198,6 +201,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     end
 
     before :each do
+      allow(hbx_enrollment).to receive(:is_reterminated_enrollment?).and_return(false)
       allow(hbx_enrollment).to receive(:is_reinstated_enrollment?).and_return(false)
       allow(hbx_enrollment).to receive(:kind).and_return('employer_sponsored')
       allow(hbx_enrollment).to receive(:display_make_changes_for_ivl?).and_return(true)
