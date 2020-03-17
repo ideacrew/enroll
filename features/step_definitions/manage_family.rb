@@ -65,9 +65,11 @@ Then(/^the family of (.*) does not contain two new family members or person reco
   family_member_spouse_person_id_count = []
   family_member_person_ids.each { |id| family_member_spouse_person_id_count << id if id == spouse_person_id }
   expect(family_member_spouse_person_id_count.length).to eq(1)
-end                                                                         # features/employee/manage_family.feature:155
+end    
 
-
+Then(/the Employee should see a message that they were not able to create the spouse because they are a duplicate$/) do 
+  expect(page).to have_content("can not have multiple spouse or life partner")
+end                                                                   # features/employee/manage_family.feature:155
 
 Then(/^they should see a password does not match error$/) do
   expect(page).to have_text "That password does not match the one we have stored"

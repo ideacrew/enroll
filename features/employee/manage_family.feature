@@ -152,7 +152,7 @@ Feature: Employees can update their password or security questions
     When Employee clicks confirm member
     Then the family of Patrick Doe does not contain two new family members or person records with the spouse HBX ID
 
-    Scenario: An employee attempts to create a duplicate spouse record for existing spouse
+  Scenario: An employee attempts to create a duplicate spouse record for existing spouse
     Given Employer exists and logs in
     And initial employer Acme Inc. has enrollment_open benefit application
     And Acme Inc. employer visit the Employee Roster
@@ -177,3 +177,4 @@ Feature: Employees can update their password or security questions
     Then Employee should see the new dependent form
     When Employee enters the dependent info of Patrick wife
     When Employee clicks confirm member
+    Then the Employee should see a message that they were not able to create the spouse because they are a duplicate
