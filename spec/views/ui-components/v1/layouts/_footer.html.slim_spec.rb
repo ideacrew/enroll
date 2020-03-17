@@ -11,11 +11,11 @@ RSpec.describe "_footer.html.slim", :type => :view, dbclean: :after_each  do
       expect(rendered).to have_text(Settings.contact_center.email_address)
     end
 
-    it "should display TTY Phone numer" do
+    it "should display Phone numer" do
       expect(rendered).to have_text(Settings.contact_center.short_number)
     end
 
-    it "should display TTY tty numer" do
+    it "should display TTY numer" do
       expect(rendered).to have_text(Settings.contact_center.tty_number)
     end
 
