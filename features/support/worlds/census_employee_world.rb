@@ -100,32 +100,32 @@ module CensusEmployeeWorld
     end
     sponsorship = benefit_sponsorship(organization)
     benefit_group = fetch_benefit_group(organization.legal_name)
-    @census_employee ||= {}
+    @census_employee = {}
     # A broker employee may not have ssn when initially created through UI
-    @census_employee[person] ||= if person[:broker_census_employee]
-                                   FactoryGirl.create(
-                                     :census_employee,
-                                     :with_active_assignment,
-                                     first_name: person[:first_name],
-                                     last_name: person[:last_name],
-                                     dob: person[:dob_date],
-                                     benefit_sponsorship: sponsorship,
-                                     employer_profile: organization.profiles.first,
-                                     benefit_group: benefit_group
-                                   )
-                                 else
-                                   FactoryGirl.create(
-                                     :census_employee,
-                                     :with_active_assignment,
-                                     first_name: person[:first_name],
-                                     last_name: person[:last_name],
-                                     dob: person[:dob_date],
-                                     ssn: person[:ssn],
-                                     benefit_sponsorship: sponsorship,
-                                     employer_profile: organization.profiles.first,
-                                     benefit_group: benefit_group
-                                   )
-                                 end
+    @census_employee[person] = if person[:broker_census_employee]
+                                 FactoryGirl.create(
+                                   :census_employee,
+                                   :with_active_assignment,
+                                   first_name: person[:first_name],
+                                   last_name: person[:last_name],
+                                   dob: person[:dob_date],
+                                   benefit_sponsorship: sponsorship,
+                                   employer_profile: organization.profiles.first,
+                                   benefit_group: benefit_group
+                                 )
+                               else
+                                 FactoryGirl.create(
+                                   :census_employee,
+                                   :with_active_assignment,
+                                   first_name: person[:first_name],
+                                   last_name: person[:last_name],
+                                   dob: person[:dob_date],
+                                   ssn: person[:ssn],
+                                   benefit_sponsorship: sponsorship,
+                                   employer_profile: organization.profiles.first,
+                                   benefit_group: benefit_group
+                                 )
+                               end
   end
 
   def census_employee_from_person(person)
