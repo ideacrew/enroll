@@ -227,7 +227,7 @@ class Family
     where(:"_id".in => HbxEnrollment.where(
     :"sponsored_benefit_package_id".in => benefit_application.benefit_packages.pluck(:_id),
     :"aasm_state".nin => %w(coverage_canceled shopping coverage_terminated),
-    coverage_kind: "health",
+    :coverage_kind.in => ["health", "dental"],
     :"family_id".in => active_family_ids
     ).distinct(:family_id)
   ) }
@@ -681,6 +681,8 @@ class Family
     else
       # This will also destroy the coverage_household_member
       if family_member.present?
+        # Note: Forms::FamilyMember.rb calls the save on destroy!
+        # here is_active is only set in memory
         family_member.is_active = false
         active_household.remove_family_member(family_member)
       end
