@@ -117,7 +117,7 @@ Feature: Employees can update their password or security questions
     When I have submitted the security questions
     Then I should see page redirected to Manage Family
 
-  Scenario: An employee acidentally modifies an existing spouse with child attributes, no duplicate person/family member with identical HBX ID is created
+  Scenario: An employee acidentally modifies an existing spouse with child attributes, no duplicate person/family member with identical HBX ID is created and the original spouse is simply updated as the child
     Given Employer exists and logs in
     And initial employer Acme Inc. has enrollment_open benefit application
     And Acme Inc. employer visit the Employee Roster

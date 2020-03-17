@@ -69,7 +69,7 @@ end
 
 Then(/the Employee should see a message that they were not able to create the spouse because they are a duplicate$/) do 
   expect(page).to have_content("can not have multiple spouse or life partner")
-end                                                                   # features/employee/manage_family.feature:155
+end
 
 Then(/^they should see a password does not match error$/) do
   expect(page).to have_text "That password does not match the one we have stored"
