@@ -96,3 +96,5 @@ angular_documentation
 angular_coverage
 rubocop
 coverage
+
+.env
