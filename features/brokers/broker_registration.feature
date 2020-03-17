@@ -11,13 +11,10 @@ Feature: Broker Agency Registration
     And Primary Broker enters office location for default_office_location
     Then Primary Broker should see broker registration successful message
 
-    Given a Hbx admin with read and write permissions and employers
-    When Hbx Admin logs on to the Hbx Portal
-    And user fills out the security questions modal
-    When Hbx Admin have submitted the security questions
+    Given that a user with a HBX staff role with Super Admin subrole exists and is logged in
     And Hbx Admin is on Broker Index of the Admin Dashboard
     Then Hbx Admin is on Broker Index and clicks Broker Applicants
-    When Hbx Admin clicks on the current broker applicant show button
+    When Hbx Admin selects the broker
     Then Hbx Admin should see the broker application with carrier appointments
     When Hbx Admin click approve broker button
     Then Hbx Admin should see the broker successfully approved message
@@ -26,7 +23,7 @@ Feature: Broker Agency Registration
     # Set up employer
     And benefit market catalog exists for enrollment_open renewal employer with health benefits
     And there is an employer Acme Inc.
-    And renewal employer Acme Inc. has active and renewal enrollment_open benefit applications
+    And employer Acme Inc. has active and renewing enrollment_open benefit applications
     # And Acme Inc. employer has a staff role
     And there is a census employee record and employee role for Ricky Martin for employer Acme Inc.
     And census employee Ricky Martin is a newly_designated_eligible employee

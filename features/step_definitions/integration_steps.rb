@@ -853,6 +853,10 @@ When(/^.+ clicks? my insured portal link$/) do
   click_link 'My Insured Portal'
 end
 
+When(/^.+ selects the broker$/) do
+  click_link("Ricky Martin", :visible => true)
+end
+
 When(/^.+ clicks? shop for plans button$/) do
   click_button "Shop for Plans"
 end
