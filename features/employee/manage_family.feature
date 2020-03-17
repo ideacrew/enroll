@@ -117,7 +117,7 @@ Feature: Employees can update their password or security questions
     When I have submitted the security questions
     Then I should see page redirected to Manage Family
 
-  Scenario: An employee cannot modify an existing spouse family member with a new child and create duplicate people
+  Scenario: An employee acidentally modifies an existing spouse with child attributes, no duplicate person/family member with identical HBX ID is created
     Given Employer exists and logs in
     And initial employer Acme Inc. has enrollment_open benefit application
     And Acme Inc. employer visit the Employee Roster
@@ -147,21 +147,33 @@ Feature: Employees can update their password or security questions
     When Employee clicks on Confirm button on the coverage summary page
     Then Employee should see the receipt page
     Then Employee should see the "my account" page
-    # Scenario starts here
     Then Employee should click on Manage Family button
-    # Then Employee should click on the Personal Tab link
     And Employee Patrick Doe replaces their spouse personal information with that of their child
-    And Employee Patrick Doe clicks update record
-    Then Employee employee sees an error message that they cannot create duplicate people
+    When Employee clicks confirm member
+    Then the family of Patrick Doe does not contain two new family members or person records with the spouse HBX ID
 
-  Scenario: Employee is primary for one family and dependent for another, both have the proper manage family page.
-    # TODO: Some steps missing here
-    Given that person Soren White is primary family member for one family
-    And person Andy White is a primary family member for one family
-    And Soren White is a dependent for the family of person Andy White
-    When I visit the manage family tab for the family page where Soren White is the primary family member
-    And I should see the proper manage family page where Soren White is the primary family member
-    When I visit the manage family tab for the family page where Andy White is the primary family member
-    And I should see the proper manage family page where Andy White is the primary family member
-
-
+    Scenario: An employee attempts to create a duplicate spouse record for existing spouse
+    Given Employer exists and logs in
+    And initial employer Acme Inc. has enrollment_open benefit application
+    And Acme Inc. employer visit the Employee Roster
+    And there is a census employee record for Patrick Doe for employer Acme Inc.
+    Then Employer logs out
+    And Employee has not signed up as an HBX user
+    And Patrick Doe visits the employee portal
+    When Patrick Doe creates an HBX account
+    When Employee goes to register as an employee
+    Then Employee should see the employee search page
+    When Employee enters the identifying info of Patrick Doe
+    Then Employee should see the matched employee record form
+    When Employee accepts the matched employer
+    When Employee completes the matched employee form for Patrick Doe
+    Then Employee should see the dependents page
+    When Employee clicks Add Member
+    Then Employee should see the new dependent form
+    When Employee enters the dependent info of Patrick wife
+    When Employee clicks confirm member
+    Then Employee should see the dependents page
+    When Employee clicks Add Member
+    Then Employee should see the new dependent form
+    When Employee enters the dependent info of Patrick wife
+    When Employee clicks confirm member

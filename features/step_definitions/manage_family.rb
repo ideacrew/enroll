@@ -36,19 +36,37 @@ Then(/^Employee will submit with wrong password$/) do
 end
 
 And(/^Employee (.*) replaces their spouse personal information with that of their child$/) do |named_person|
+  # Click the family tab
+  click_link 'Family'
   person = people[named_person]
   person_record = Person.where(first_name: person[:first_name], last_name: person[:last_name]).first
-  spouse = person_record.person_relationships.where(kind: "spouse").first.person
-  links = page.all('a')
-  edit_link_for_dependent = links.detect { |link| link.text == "Edit Dependent #{spouse.first_name} #{spouse.last_name}" }
-  binding.pry
-  edit_link_for_dependent.click
-  fill_in('person[first_name]', with: spouse.first_name)
-  fill_in('person[last_name]', with: spouse.last_name)
-  choose('person_gender_female')
-  binding.pry
-
+  spouse = person_record.person_relationships.where(kind: "spouse").first.relative
+  # The edit link
+  find("a[title='Edit Dependent #{spouse.full_name}']").click
+  fill_in('dependent[first_name]', with: "Amanda")
+  fill_in('dependent[last_name]', with: "Doe")
+  fill_in('jq_datepicker_ignore_dependent[dob]', with: "01/01/2019")
+  fill_in('dependent[ssn]', with: "994857643")
+  select("child", from: "dependent[relationship]")
 end
+
+Then(/^the family of (.*) does not contain two new family members or person records with the spouse HBX ID$/) do |named_person|
+  person = people[named_person]
+  person_record = Person.where(first_name: person[:first_name], last_name: person[:last_name]).first
+  family_record = person_record.primary_family
+  spouse = person_record.person_relationships.where(kind: "spouse").first.relative
+  spouse_hbx_id = spouse.hbx_id.to_s
+  spouse_person_id = spouse.id.to_s
+  family_member_hbx_ids = family_record.family_members.map { |fm| fm.hbx_id.to_s }
+  family_member_spouse_hbx_id_count = []
+  family_member_hbx_ids.each { |id| family_member_spouse_hbx_id_count << id if id == spouse_hbx_id }
+  expect(family_member_spouse_hbx_id_count.length).to eq(1)
+  family_member_person_ids = family_record.family_members.map { |fm| fm.person_id.to_s }
+  family_member_spouse_person_id_count = []
+  family_member_person_ids.each { |id| family_member_spouse_person_id_count << id if id == spouse_person_id }
+  expect(family_member_spouse_person_id_count.length).to eq(1)
+end                                                                         # features/employee/manage_family.feature:155
+
 
 
 Then(/^they should see a password does not match error$/) do
