@@ -58,6 +58,10 @@ module BenefitSponsors
 
     subject { BenefitSponsors::Factories::EnrollmentRenewalFactory.call(enrollment, benefit_package) }
 
+    before :each do
+      enrollment.update_attributes(product_id: nil) if enrollment_status == :inactive
+    end
+
     context 'Renewal factory invoked with health coverage' do
 
       let(:enrollment_status) { :coverage_selected }
@@ -120,6 +124,7 @@ module BenefitSponsors
     end
 
     describe '.has_renewal_product?' do
+      let(:enrollment_status) { :coverage_selected }
       let!(:enrollment) do
         double("enrollment",
                benefit_group_assignment: benefit_group_assignment,
