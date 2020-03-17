@@ -1,0 +1,83 @@
+name: Ruby
+
+on: push
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-18.04] #ubuntu-16.04
+        node: [10]
+        mongodb-version: ["4.2"]
+
+    steps:
+    - name: Launch MongoDB
+      uses: wbari/start-mongoDB@v0.2
+      with:
+        mongoDBVersion: ${{ matrix.mongodb-version }}
+    - uses: actions/checkout@v2
+    - name: Set up Ruby 2.5.1
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 2.5.1
+    - name: Setup Node.js for use with actions
+      uses: actions/setup-node@v1.1.0
+      with:
+        # Version Spec of the version to use.  Examples: 10.x, 10.15.1, >=10.15.0, lts
+        version: 10.16.3
+    - name: bundle install, yarn install
+      run: |
+        gem update --system
+        gem install bundler
+        bundle install --jobs 4 --retry 3
+        yarn install
+        ./bin/webpack
+    - name: rspec
+      run:  bundle exec rspec
+    # Need to fix sbc_preprocessor2015_spec.rb
+    #- name: rake parallel:spec[4]
+    #  run:  bundle exec rake "parallel:spec[4]"
+  build_engines:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-18.04] #ubuntu-16.04
+        node: [10]
+        mongodb-version: ["4.2"]
+
+    steps:
+    - name: Launch MongoDB
+      uses: wbari/start-mongoDB@v0.2
+      with:
+        mongoDBVersion: ${{ matrix.mongodb-version }}
+    - uses: actions/checkout@v2
+    - name: Set up Ruby 2.5.1
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 2.5.1
+    - name: Setup Node.js for use with actions
+      uses: actions/setup-node@v1.1.0
+      with:
+        # Version Spec of the version to use.  Examples: 10.x, 10.15.1, >=10.15.0, lts
+        version: 10.16.3
+    - name: bundle install, yarn install
+      run: |
+        gem update --system
+        gem install bundler
+        bundle install --jobs 4 --retry 3
+        yarn install
+        RAILS_ENV=test NODE_ENV=test rake webpacker:compile
+    - name: cd components/engine, rspec
+      run: |
+        root=`pwd -P`
+        for test_dir in `ls -1 $root/components/ | grep -v old_sponsored_benefits`; do
+          echo $root/components/$test_dir
+          cd $root/components/$test_dir
+          bundle install
+          bundle exec rspec --fail-fast
+          if [ $? -ne 0 ]; then
+            echo "ENGINE FAILED"
+            exit $?
+          fi
+        done
