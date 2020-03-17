@@ -33,11 +33,21 @@ Then(/^Employee will submit with wrong password$/) do
   page.find_button('Change my password').click
 end
 
-
 Then(/^they should see a password does not match error$/) do
   expect(page).to have_text "That password does not match the one we have stored"
 end
 
 Then(/^I should see page redirected to Manage Family$/) do
   expect(page).to have_text "Manage Family"
+end
+
+Then(/Employee should not see phone main field in the personal information fields/) do
+  expect(page).not_to have_content(/Phone Main/)
+end
+
+And(/Employee (.*) should only have phone with work kind/) do |named_person|
+  person = people[named_person]
+  person = Person.where(first_name: person[:first_name], last_name: person[:last_name]).first
+  expect(person.phones.where(kind: "phone main").blank?).to eq(true)
+  expect(person.phones.first.kind).to eq("work")
 end
