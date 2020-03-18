@@ -20,11 +20,7 @@
               br
               span
                 i.fas.fa-phone.mr-1
-              strong = Settings.contact_center.short_number
-              br
-              span
-                i.fas.fa-phone.mr-1
-              strong = "TTY: #{Settings.contact_center.tty_number}"
+              strong = "#{Settings.contact_center.short_number} / TTY: #{Settings.contact_center.tty_number}"
           - if signed_in?
             li
               span.my-portal-links
