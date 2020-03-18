@@ -20,7 +20,12 @@ module SponsoredBenefits
         flash[:success] = "Prospect Employer (#{organization_params[:legal_name]}) Added Successfully."
         redirect_to employers_organizations_broker_agency_profile_path(@broker_agency_profile)
       else
-        init_organization(organization_params)
+        revert_params = organization_params
+        keys = revert_params['office_locations_attributes'].keys
+        keys.each do |key|
+          revert_params['office_locations_attributes'][key].delete('_destroy')
+        end
+        init_organization(revert_params)
         render :new
       end
     end
