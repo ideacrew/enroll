@@ -81,3 +81,42 @@ jobs:
             exit $?
           fi
         done
+  cucumber:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-18.04] #ubuntu-16.04
+        node: [10]
+        mongodb-version: ["4.2"]
+
+    steps:
+    - name: Launch MongoDB
+      uses: wbari/start-mongoDB@v0.2
+      with:
+        mongoDBVersion: ${{ matrix.mongodb-version }}
+    - uses: actions/checkout@v2
+    - name: Set up Ruby 2.5.1
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 2.5.1
+    - name: Set up Node.js for use with actions
+      uses: actions/setup-node@v1.1.0
+      with:
+        # Version Spec of the version to use.  Examples: 10.x, 10.15.1, >=10.15.0, lts
+        version: 10.16.3
+    - name: Set up Chromedriver
+      uses: nanasess/setup-chromedriver@master
+      with:
+        # Optional: do not specify to match Chrome's version
+        chromedriver-version: '77.0.3865.40'
+    - name: bundle install, yarn install
+      run: |
+        gem update --system
+        gem install bundler
+        bundle install --jobs 4 --retry 3
+        yarn install
+        RAILS_ENV=test NODE_ENV=test rake webpacker:compile
+    - name: cucumber
+      run: |
+        export DISPLAY=:99
+        cucumber
