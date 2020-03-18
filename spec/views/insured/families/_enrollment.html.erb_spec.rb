@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe "insured/families/_enrollment.html.erb" do
+  let(:sponsored_benefit_package) { double("SponsoredBenefitPakage") }
   let(:person) { double(id: '31111113') }
   let(:family) { double(is_eligible_to_enroll?: true, updateable?: true, list_enrollments?: true) }
 
@@ -78,12 +79,15 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
         consumer_role_id: nil,
         consumer_role: nil,
         future_enrollment_termination_date: "",
+        is_ivl_by_kind?: false,
         covered_members_first_names: []
       )
     end
 
     before :each do
       allow(hbx_enrollment).to receive(:is_reinstated_enrollment?).and_return(false)
+      allow(hbx_enrollment).to receive(:sponsored_benefit_package).and_return(sponsored_benefit_package)
+      allow(sponsored_benefit_package).to receive(:open_enrollment_contains?).with(TimeKeeper.date_of_record)
       allow(view).to receive(:disable_make_changes_button?).with(hbx_enrollment).and_return(true)
     end
 
@@ -145,6 +149,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
         terminated_on: terminated_on,
         consumer_role_id: nil,
         consumer_role: nil,
+        is_ivl_by_kind?: false,
         future_enrollment_termination_date: future_enrollment_termination_date, 
         covered_members_first_names: []
       )
@@ -187,6 +192,8 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       allow(hbx_enrollment).to receive(:kind).and_return('employer_sponsored')
       allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
       allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(false)
+      allow(hbx_enrollment).to receive(:sponsored_benefit_package).and_return(sponsored_benefit_package)
+      allow(sponsored_benefit_package).to receive(:open_enrollment_contains?).with(TimeKeeper.date_of_record)
       allow(view).to receive(:disable_make_changes_button?).with(hbx_enrollment).and_return(false)
       allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
@@ -286,6 +293,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
         employee_role: employee_role,
         census_employee: census_employee,
         status_step: 2,
+        is_ivl_by_kind?: false,
         aasm_state: 'coverage_selected'
       )
     end
@@ -358,6 +366,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
         benefit_group: nil,
         consumer_role_id: nil,
         consumer_role: nil,
+        is_ivl_by_kind?: false,
         future_enrollment_termination_date: "",
         covered_members_first_names: []
       )
@@ -365,6 +374,8 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
     before :each do
       allow(hbx_enrollment).to receive(:is_reinstated_enrollment?).and_return(false)
+      allow(hbx_enrollment).to receive(:sponsored_benefit_package).and_return(sponsored_benefit_package)
+      allow(sponsored_benefit_package).to receive(:open_enrollment_contains?).with(TimeKeeper.date_of_record)
       allow(view).to receive(:disable_make_changes_button?).with(hbx_enrollment).and_return(true)
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
     end
@@ -409,6 +420,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
         benefit_group: nil,
         consumer_role_id: nil,
         consumer_role: nil,
+        is_ivl_by_kind?: false,
         future_enrollment_termination_date: "",
         covered_members_first_names: []
       )
@@ -418,6 +430,8 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
     before :each do
       allow(hbx_enrollment).to receive(:is_reinstated_enrollment?).and_return(false)
+      allow(hbx_enrollment).to receive(:sponsored_benefit_package).and_return(sponsored_benefit_package)
+      allow(sponsored_benefit_package).to receive(:open_enrollment_contains?).with(TimeKeeper.date_of_record)
       allow(view).to receive(:disable_make_changes_button?).with(hbx_enrollment).and_return true
       allow(view).to receive(:enrollment_coverage_end).with(hbx_enrollment).and_return end_on
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
@@ -470,12 +484,15 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
         consumer_role_id: nil,
         consumer_role: nil,
         future_enrollment_termination_date: "",
+        is_ivl_by_kind?: false,
         covered_members_first_names: [],
         parent_enrollment: nil
       )
     end
 
     before :each do
+      allow(hbx_enrollment).to receive(:sponsored_benefit_package).and_return(sponsored_benefit_package)
+      allow(sponsored_benefit_package).to receive(:open_enrollment_contains?).with(TimeKeeper.date_of_record)
       allow(view).to receive(:disable_make_changes_button?).with(hbx_enrollment).and_return true
     end
 
