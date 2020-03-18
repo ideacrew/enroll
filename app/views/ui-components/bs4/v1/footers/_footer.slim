@@ -10,13 +10,7 @@ footer.footer-wrapper
                 span
                   i.fas.fa-phone.fa-lg.fa-rotate-90
                   | &nbsp;
-                  = contact_center_short_number
-            li.mr-3
-              a.call-customer-service href="tel:#{contact_center_tty_number}"
-                span
-                  i.fas.fa-phone.fa-lg.fa-rotate-90
-                  | &nbsp;
-                  = "TTY: #{Settings.contact_center.tty_number}"
+                  = "#{Settings.contact_center.short_number} / TTY: #{Settings.contact_center.tty_number}"
             li.mr-3
               = mail_to contact_center_email_address, target: '_blank' do
                 span
