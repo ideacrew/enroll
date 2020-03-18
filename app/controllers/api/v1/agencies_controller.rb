@@ -1,6 +1,6 @@
 class Api::V1::AgenciesController < Api::V1::ApiBaseController
 
-  before_action :authenticate_user!
+  #before_action :authenticate_user!
 
   def index
     query = Queries::AgenciesQuery.new
@@ -54,20 +54,15 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
     end
   end
 
-  def approve_general_agency_staff
-    #{"person_id"=>"5e4954c7b0b6c5c34cc4110e", "profile_id"=>"5e4953d3b0b6c5c34cc410f5", "id"=>"5e4953d3b0b6c5c34cc410f5"}
-    # @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_approve(general_agency_staff_params)
-    # authorize @staff
-    # begin
-    #   @status, @result = @staff.approve
-    #   if @status
-    #     flash[:notice] = "Role approved successfully"
-    #   else
-    #     flash[:error] = "Role was not approved because " + @result
-    #   end
-    # rescue Exception => e
-    #   flash[:error] = "Role was not approved because " + e.message
-    # end
-    # redirect_to profiles_general_agencies_general_agency_profile_path(id: params[:staff][:profile_id])
+  def update_person
+    permitted = params.permit(:person_id, :dob)
+    person = Person.find(permitted[:person_id])
+    person.update_attributes({dob: permitted[:dob]})
+    render json: { status: "person object updated" }, status: 200
   end
+
+  def update_email
+    render json: { status: "email updated" }, status: 200
+  end
+
 end

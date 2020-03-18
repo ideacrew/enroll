@@ -716,6 +716,8 @@ Rails.application.routes.draw do
           get :agency_staff
           get 'agency_staff/:person_id', to: 'agencies#agency_staff_detail'
           post 'agency_staff/:person_id/terminate/:role_id', to: 'agencies#terminate'
+          patch 'agency_staff/:person_id', to: 'agencies#update_person'
+          patch 'agency_staff/:person_id/email/:email_id', to: 'agencies#update_email'
           get :primary_agency_staff
         end
       end
