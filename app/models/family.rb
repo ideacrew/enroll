@@ -681,6 +681,8 @@ class Family
     else
       # This will also destroy the coverage_household_member
       if family_member.present?
+        # Note: Forms::FamilyMember.rb calls the save on destroy!
+        # here is_active is only set in memory
         family_member.is_active = false
         active_household.remove_family_member(family_member)
       end
