@@ -88,7 +88,6 @@ module CapybaraHelpers
     find(:xpath, xpath, wait: 5).click
     begin
       find_field(field_name, with: value, checked: true, visible: :all, disabled: :all, wait: 10)
-      sleep 5
     rescue
       all(:xpath, "//input[@name=\"#{field_name}\"]", visible: :all).each do |ele|
         puts xpath
