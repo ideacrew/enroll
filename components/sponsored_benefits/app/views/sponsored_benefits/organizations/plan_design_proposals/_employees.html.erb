@@ -11,11 +11,11 @@
         </div>
 
         <div class="row">
-          <div class="col-xs-12" >
-            <div class= "effectivedatatable">
+          <div class="col-xs-12">
+            <div class="effectivedatatable">
               <% if @census_employees.empty? %>
               <% else %>
-              <%= raw render_datatable(@datatable) %>
+                <%= raw render_datatable(@datatable, {dom: "<'row'<'col-sm-7 col-md-7'B> <'col-sm-5 col-md-5'B>>" + "<'row'<'col-sm-12 col-md-12'>>" + "<'row'<'col-sm-11 col-md-11't><'col-sm-1 col-md-1'>>"+"<'row'<'col-sm-10 col-md-10'i> <'col-sm-1 col-md-1'l> >" + "<'row'<'col-sm-12 col-md-12'p>>", autoWidth: false}) %>
               <% end %>
             </div>
           </div>
