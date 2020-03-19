@@ -277,7 +277,8 @@ module SponsoredBenefits
               bg = benefit_application.benefit_groups.build
               bg.build_relationship_benefits
               bg.build_composite_tier_contributions
-              bg.assign_attributes(reference_plan_id: plan.id, plan_option_kind: 'sole_source', elected_plans: [plan])
+              bg.assign_attributes(reference_plan_id: plan.id, plan_option_kind: 'sole_source')
+              bg.elected_plan_ids << plan.id
               bg.composite_tier_contributions[0].employer_contribution_percent = 60
               bg.composite_tier_contributions[3].employer_contribution_percent = 50
               bg.save!
