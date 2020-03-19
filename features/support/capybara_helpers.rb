@@ -84,10 +84,11 @@ module CapybaraHelpers
   # UI toolkit can do to radio buttons, mainly on the IVL page.
   def click_and_wait_on_stylized_radio(xpath, input_id, field_name, value)
     find_field(field_name, id: input_id, visible: :all, disabled: :all, wait: 5)
-    find(:xpath, xpath).click
-    find(:xpath, xpath).click
+    find(:xpath, xpath, wait: 5).click
+    find(:xpath, xpath, wait: 5).click
     begin
-      find_field(field_name, with: value, checked: true, visible: :all, disabled: :all, wait: 5)
+      find_field(field_name, with: value, checked: true, visible: :all, disabled: :all, wait: 10)
+      sleep 5
     rescue
       all(:xpath, "//input[@name=\"#{field_name}\"]", visible: :all).each do |ele|
         puts xpath

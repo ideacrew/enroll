@@ -920,6 +920,7 @@ end
 
 When(/^I click on "(.*?)" button on household info page$/) do |select_action|
   click_link "Continue"
+  sleep 5
   click_button "Shop for new plan"
 end
 
