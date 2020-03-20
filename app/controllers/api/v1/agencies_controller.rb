@@ -1,6 +1,6 @@
 class Api::V1::AgenciesController < Api::V1::ApiBaseController
 
-  #before_action :authenticate_user!
+  before_action :authenticate_user!
 
   def index
     query = Queries::AgenciesQuery.new
@@ -55,14 +55,36 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
   end
 
   def update_person
-    permitted = params.permit(:person_id, :dob)
-    person = Person.find(permitted[:person_id])
-    person.update_attributes({dob: permitted[:dob]})
-    render json: { status: "person object updated" }, status: 200
+    people = Person.where(first_name: /^#{update_person_params[:first_name]}$/i, last_name: /^#{update_person_params[:last_name]}$/i, dob: Date.strptime(update_person_params[:dob], "%m/%d/%Y").to_date)
+    if people.present?
+      render json: { status: "Updating Staff Failed. Given details matces with another record. Contact Admin" }, status: 200
+      return
+    end
+    person = Person.find(update_person_params[:person_id])
+    person.update_attributes(first_name: update_person_params[:first_name], last_name: update_person_params[:last_name], dob: Date.strptime(update_person_params[:dob], "%m/%d/%Y").to_date)
+    render json: { status: "Succesfully updated!!" }, status: 200
   end
 
   def update_email
-    render json: { status: "email updated" }, status: 200
+    person = Person.find(update_email_params[:person_id])
+    update_email_params[:emails].each do |record|
+      email = person.emails.find(record[:id])
+      email.assign_attributes(address: record[:new_email])
+    end
+    if person.save
+      render json: { status: "Succesfully updated!!" }, status: 200
+    else
+      render json: { status: "Email Updare Failed: #{person.errors.full_messages}" }, status: 200
+    end
   end
 
+  private
+
+  def update_person_params
+    params.permit(:person_id, :dob, :first_name, :last_name)
+  end
+
+  def update_email_params
+    params.permit(:person_id, emails: [:id, :new_email])
+  end
 end
