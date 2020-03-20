@@ -1,0 +1,13 @@
+<% if flash.present? %>
+  <div class="alert alert-danger">
+    <h4>The following <%= pluralize(flash[:error].count, 'error') %> require your attention:</h4>
+    <ul>
+      <% flash.each do |k, errors| %>
+        <% errors.each do |error| %>
+          <li><%= error unless (error.is_a?(Hash)) %></li>
+        <% end %>
+      <% end %>
+    </ul>
+  </div>
+  <% flash.clear %>
+<% end %>

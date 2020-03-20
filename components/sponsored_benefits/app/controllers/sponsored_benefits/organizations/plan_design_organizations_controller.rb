@@ -20,12 +20,7 @@ module SponsoredBenefits
         flash[:success] = "Prospect Employer (#{organization_params[:legal_name]}) Added Successfully."
         redirect_to employers_organizations_broker_agency_profile_path(@broker_agency_profile)
       else
-        revert_params = organization_params
-        keys = revert_params['office_locations_attributes'].keys
-        keys.each do |key|
-          revert_params['office_locations_attributes'][key].delete('_destroy')
-        end
-        init_organization(revert_params)
+        init_organization(organization_params)
         render :new
       end
     end
@@ -51,8 +46,7 @@ module SponsoredBenefits
           flash[:success] = "Prospect Employer (#{pdo.legal_name}) Updated Successfully."
           redirect_to employers_organizations_broker_agency_profile_path(pdo.broker_agency_profile)
         else
-          flash[:error] = "Prospect Employer Update failed with errors: #{pdo.errors.full_messages}"
-          redirect_to edit_organizations_plan_design_organization_path(pdo)
+          redirect_to edit_organizations_plan_design_organization_path(pdo), flash: {:error =>  pdo.errors.full_messages}
         end
       else
         flash[:error] = "Updating of Client employer records not allowed"

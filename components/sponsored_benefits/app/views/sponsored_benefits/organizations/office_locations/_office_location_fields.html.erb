@@ -31,9 +31,11 @@
             </div>
 
           <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd delete_address">
-            <%= f.hidden_field :office_location_id, class: "office_location_id", :value => f.object.id.to_s %>
-            <%= link_to image_tag("delete.png"), "javascript:void(0)", :class=>"office_fields close-2", :data => {:value => "#{f.object.id}"}  %>
-            <%= f.hidden_field(:_destroy, id: "office_location_#{f.object.id.to_s}", value: false) %>
+            <%= link_to image_tag("delete.png"), "javascript:void(0)", :class => "office_fields close-2", :data => {:value => "#{f.object.id}", is_persisted: "#{f.object.persisted?}"} %>
+            <% if f.object.persisted? %>
+                <%= f.hidden_field :office_location_id, class: "office_location_id", :value => f.object.id.to_s %>
+                <%= f.hidden_field(:_destroy, id: "office_location_#{f.object.id.to_s}", value: false) %>
+            <% end %>
           </div>
         </div>
 
@@ -89,10 +91,15 @@
 <script>
   var disableSelectric = true;
 
-  $(".office_fields").click(function() {
+  $(".office_fields").click(function () {
     var office_location_id = $(this).data('value');
+    var is_persisted = $(this).data('isPersisted');
+
     $(this).closest('fieldset').addClass('hidden');
-    document.getElementById("office_location_" + office_location_id).value = true;
+
+    if (is_persisted) {
+      document.getElementById("office_location_" + office_location_id).value = true;
+    }
   });
 
 </script>
