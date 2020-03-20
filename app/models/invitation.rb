@@ -104,7 +104,6 @@ class Invitation
       if broker_role.is_primary_broker? && !user_obj.roles.include?("broker_agency_staff")
         user_obj.roles << "broker_agency_staff"
       end
-      user_obj.last_portal_visited = redirection_obj.benefit_sponsors.profiles_broker_agencies_broker_agency_profile_path(broker_agency_profile)
       user_obj.save!
       redirection_obj.redirect_to_broker_agency_profile(broker_agency_profile)
     end
@@ -118,7 +117,6 @@ class Invitation
       person.save!
       broker_agency_profile = staff_role.broker_agency_profile
       user_obj.roles << "broker_agency_staff" unless user_obj.roles.include?("broker_agency_staff")
-      user_obj.last_portal_visited = redirection_obj.benefit_sponsors.profiles_broker_agencies_broker_agency_profile_path(broker_agency_profile)
       user_obj.save!
       redirection_obj.redirect_to_broker_agency_profile(broker_agency_profile)
     end
@@ -132,7 +130,6 @@ class Invitation
       person.save!
       general_agency_profile = staff_role.general_agency_profile
       user_obj.roles << "general_agency_staff" unless user_obj.roles.include?("general_agency_staff")
-      user_obj.last_portal_visited = redirection_obj.benefit_sponsors.profiles_general_agencies_general_agency_profile_path(general_agency_profile)
       user_obj.save!
       redirection_obj.redirect_to_general_agency_profile(general_agency_profile)
     end
@@ -145,7 +142,6 @@ class Invitation
       person.user = user_obj
       person.save!
       user_obj.roles << "assister" unless user_obj.roles.include?("assister")
-      user_obj.last_portal_visited = home_exchanges_agents_path
       user_obj.save!
       redirection_obj.redirect_to_agents_path
     end
@@ -159,7 +155,6 @@ class Invitation
       person.user = user_obj
       person.save!
       user_obj.roles << 'csr' unless user_obj.roles.include?('csr')
-      user_obj.last_portal_visited = home_exchanges_agents_path
       user_obj.save!
       redirection_obj.redirect_to_agents_path
     end
@@ -172,7 +167,6 @@ class Invitation
       person.user = user_obj
       person.save!
       user_obj.roles << "hbx_staff" unless user_obj.roles.include?("hbx_staff")
-      user_obj.last_portal_visited = exchanges_hbx_profiles_root_path
       user_obj.save!
       redirection_obj.redirect_to_hbx_portal
     end
