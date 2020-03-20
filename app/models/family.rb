@@ -1052,10 +1052,10 @@ class Family
     else
       all.each do |family|
         unless family.all_persons_vlp_documents_status.parameterize.underscore == scope_status
-          # Use reject to keep it as mongo collection but remove unwanted from scope
           scoped_family_ids = []
           scoped_family_ids << family._id
-          scoped_families = Family.where(:"_id".nin => scoped_family_ids)
+          # This is to allow scoped_families to respond like a mongo query
+          scoped_families = scoped_families.where(:"_id".nin => scoped_family_ids)
         end
       end
       scoped_families
