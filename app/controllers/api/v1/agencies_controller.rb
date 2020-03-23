@@ -55,26 +55,38 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
   end
 
   def update_person
-    people = Person.where(first_name: /^#{update_person_params[:first_name]}$/i, last_name: /^#{update_person_params[:last_name]}$/i, dob: Date.strptime(update_person_params[:dob], "%m/%d/%Y").to_date)
-    if people.present?
-      render json: { status: "Updating Staff Failed. Given details matces with another record. Contact Admin" }, status: 200
-      return
+    begin
+      people = Person.where(first_name: /^#{update_person_params[:first_name]}$/i, last_name: /^#{update_person_params[:last_name]}$/i, dob: Date.strptime(update_person_params[:dob], "%m/%d/%Y").to_date)
+      if people.present?
+        render json: { status: "error", message: "Updating Staff Failed. Given details matces with another record. Contact Admin" }, status: 404
+        return
+      end
+      person = Person.find(update_person_params[:person_id])
+      person.update_attributes(first_name: update_person_params[:first_name], last_name: update_person_params[:last_name], dob: Date.strptime(update_person_params[:dob], "%m/%d/%Y").to_date)
+      render json: { status: "Succesfully updated!!" }, status: 200
+    rescue Mongoid::Errors::DocumentNotFound
+      render json: { status: "error", message: "Updating Staff Failed. Person Not Found" }, status: 404
+    rescue
+      render json: { status: "error", message: "Unexpected Error" }, status: 409
     end
-    person = Person.find(update_person_params[:person_id])
-    person.update_attributes(first_name: update_person_params[:first_name], last_name: update_person_params[:last_name], dob: Date.strptime(update_person_params[:dob], "%m/%d/%Y").to_date)
-    render json: { status: "Succesfully updated!!" }, status: 200
   end
 
   def update_email
-    person = Person.find(update_email_params[:person_id])
-    update_email_params[:emails].each do |record|
-      email = person.emails.find(record[:id])
-      email.assign_attributes(address: record[:new_email])
-    end
-    if person.save
-      render json: { status: "Succesfully updated!!" }, status: 200
-    else
-      render json: { status: "Email Updare Failed: #{person.errors.full_messages}" }, status: 200
+    begin
+      person = Person.find(update_email_params[:person_id])
+      update_email_params[:emails].each do |record|
+        email = person.emails.find(record[:id])
+        email.assign_attributes(address: record[:new_email])
+      end
+      if person.save
+        render json: { status: "Succesfully updated!!" }, status: 200
+      else
+        render json: { status: "error", message: "Email Update Failed: #{person.errors.full_messages}" }, status: 404
+      end
+    rescue Mongoid::Errors::DocumentNotFound
+      render json: { status: "error", message: "Updating Staff Failed. Person Not Found" }, status: 404
+    rescue
+      render json: { status: "error", message: "Unexpected Error" }, status: 409
     end
   end
 
