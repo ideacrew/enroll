@@ -55,6 +55,8 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
   end
 
   def update_person
+    query = Queries::People::AgencyStaffDetailQuery.new(params[:person_id])
+    authorize query, :update_staff?
     begin
       people = Person.where(first_name: /^#{update_person_params[:first_name]}$/i, last_name: /^#{update_person_params[:last_name]}$/i, dob: Date.strptime(update_person_params[:dob], "%m/%d/%Y").to_date)
       if people.present?
@@ -72,6 +74,8 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
   end
 
   def update_email
+    query = Queries::People::AgencyStaffDetailQuery.new(params[:person_id])
+    authorize query, :update_staff?
     begin
       person = Person.find(update_email_params[:person_id])
       update_email_params[:emails].each do |record|
