@@ -54,6 +54,7 @@ And(/user should see your information page$/) do
   expect(page).to have_content("Your Information")
   expect(page).to have_content("CONTINUE")
   click_link "CONTINUE"
+  sleep 5
 end
 
 When(/user goes to register as an individual$/) do
@@ -96,7 +97,7 @@ Then(/Individual should see a form to enter personal information$/) do
   fill_in "person_addresses_attributes_0_city", :with=> "Washington"
   #find('.interaction-choice-control-state-id', text: 'SELECT STATE *').click
   find(:xpath, '//*[@id="address_info"]/div/div[3]/div[2]/div/div[2]/span').click
-  first('li', :text => 'DC').click
+  first('li', :text => 'DC', wait: 5).click
   fill_in "person[addresses_attributes][0][zip]", :with => "20002"
 
   sleep 2
@@ -197,7 +198,7 @@ When(/click eligible immigration status yes/) do
 end
 
 Then(/should find I-551 doc type/) do
-  find('.label', :text => 'I-551 (Permanent Resident Card)')
+  find('.label', :text => 'I-551 (Permanent Resident Card)', wait: 10)
 end
 
 And(/should find alien number/) do
@@ -238,6 +239,7 @@ Then(/^\w+ agrees? to the privacy agreeement/) do
   expect(page).to have_content('Authorization and Consent')
   find(:xpath, '//label[@for="agreement_agree"]').click
   click_link "Continue"
+  sleep 2
 end
 
 When /^Individual clicks on Individual and Family link should be on verification page/ do
@@ -248,8 +250,8 @@ end
 
 Then(/^\w+ should see identity verification page and clicks on submit/) do
   expect(page).to have_content('Verify Identity')
-  find(:xpath, '//label[@for="interactive_verification_questions_attributes_0_response_id_a"]').click
-  find(:xpath, '//label[@for="interactive_verification_questions_attributes_1_response_id_c"]').click
+  find(:xpath, '//label[@for="interactive_verification_questions_attributes_0_response_id_a"]', wait: 5).click
+  find(:xpath, '//label[@for="interactive_verification_questions_attributes_1_response_id_c"]', wait: 5).click
   screenshot("identify_verification")
   click_button "Submit"
   screenshot("override")
@@ -315,6 +317,7 @@ end
 
 Then(/Individual creates a new HBX account$/) do
   # find('.interaction-click-control-create-account').click
+  sleep 5
   fill_in "user[oim_id]", :with => "testflow@test.com"
   fill_in "user[password]", :with => "aA1!aA1!aA1!"
   fill_in "user[password_confirmation]", :with => "aA1!aA1!aA1!"
@@ -350,8 +353,8 @@ And(/^.+ click on sign in existing account$/) do
 end
 
 And(/I signed in$/) do
-  find('.btn-link', :text => 'Sign In Existing Account').click
-  sleep 1
+  find('.btn-link', :text => 'Sign In Existing Account', wait: 5).click
+  sleep 5
   fill_in "user[login]", :with => "testflow@test.com"
   fill_in "user[password]", :with => "aA1!aA1!aA1!"
   find('.sign-in-btn').click
@@ -394,6 +397,7 @@ And(/I click on continue button to go to the individual home page/) do
 end
 
 And(/I should see the individual home page/) do
+  sleep 5
   expect(page).to have_content "My #{Settings.site.short_name}"
   screenshot("my_account")
   # something funky about these tabs in JS
