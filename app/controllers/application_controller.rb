@@ -212,7 +212,7 @@ class ApplicationController < ActionController::Base
           redirect_path = last_portal_visited
         end
       else
-        redirect_path = local_path
+        redirect_path = root_path
       end
 
       redirect_path
