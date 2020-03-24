@@ -682,7 +682,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
 
     def fetch_effective_date_of_new_enrollment
       enr_created_datetime = DateTime.now.in_time_zone('Eastern Time (US & Canada)')
-      offset_month = enr_created_datetime.day <= 15 ? 1 : 2
+      offset_month = enr_created_datetime.day <= HbxProfile::IndividualEnrollmentDueDayOfMonth ? 1 : 2
       year = enr_created_datetime.year
       month = enr_created_datetime.month + offset_month
       if month > 12
@@ -698,7 +698,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
 
     it 'should update current enrollment(cancel/terminate)' do
       hbx_enrollment.reload
-      if TimeKeeper.date_of_record.day >= 15
+      if TimeKeeper.date_of_record.day >= HbxProfile::IndividualEnrollmentDueDayOfMonth
         expect(hbx_enrollment.aasm_state).to eq 'coverage_terminated'
         expect(hbx_enrollment.terminated_on.to_date).to eq hbx_enrollment.effective_on.end_of_month.to_date
       else
