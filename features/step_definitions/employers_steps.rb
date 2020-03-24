@@ -857,6 +857,12 @@ Then /^employer should see the (.*) success flash notice$/ do |status|
   expect(page).to have_content result
 end
 
+Then /^employer should see the Initiate cobra error flash notice$/ do
+  # Phantom JS starts checking before Rails Action complete
+  sleep(3)
+  expect(page).to have_content /COBRA cannot be initiated for this employee/
+end
+
 Then /^employer should see the error flash notice$/ do
   # Phantom JS starts checking before Rails Action complete
   sleep(3)
@@ -1057,6 +1063,11 @@ end
 And(/^employer sets cobra start date to two months after termination date$/) do
   date = @census_employees.first.employment_terminated_on + 2.months
   page.execute_script("$('.datepicker').val(#{date.to_s})")
+end
+
+And(/^employer sets cobra start date to two months before termination date$/) do
+  date = @census_employees.first.employment_terminated_on - 2.months
+  find('input.text-center.date-picker').set date
 end
 
 When(/^EnterPrise Limited employer clicks on Initiate COBRA button$/) do
