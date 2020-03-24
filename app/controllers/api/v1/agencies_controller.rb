@@ -58,13 +58,13 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
     begin
       query = Queries::People::AgencyStaffDetailQuery.new(current_user.person_id)
       authorize query, :update_staff?
-      people = Person.where(first_name: /^#{update_person_params[:first_name]}$/i, last_name: /^#{update_person_params[:last_name]}$/i, dob: Date.strptime(update_person_params[:dob], "%m/%d/%Y").to_date)
+      people = Person.where(first_name: /^#{update_person_params[:first_name]}$/i, last_name: /^#{update_person_params[:last_name]}$/i, dob: Date.strptime(update_person_params[:dob], "%Y-%m-%d").to_date)
       if people.present?
         render json: { status: "error", message: "Updating Staff Failed. Given details matces with another record. Contact Admin" }, status: 404
         return
       end
       person = Person.find(update_person_params[:person_id])
-      person.update_attributes(first_name: update_person_params[:first_name], last_name: update_person_params[:last_name], dob: Date.strptime(update_person_params[:dob], "%m/%d/%Y").to_date)
+      person.update_attributes(first_name: update_person_params[:first_name], last_name: update_person_params[:last_name], dob: Date.strptime(update_person_params[:dob], "%Y-%m-%d").to_date)
       render json: { status: "Succesfully updated!!" }, status: 200
     rescue Mongoid::Errors::DocumentNotFound
       render json: { status: "error", message: "Updating Staff Failed. Person Not Found" }, status: 404

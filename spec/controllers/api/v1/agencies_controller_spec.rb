@@ -312,7 +312,7 @@ RSpec.describe Api::V1::AgenciesController, :type => :controller, :dbclean => :a
             policy
           end
           allow(policy).to receive(:update_staff?).and_return(true)
-          patch :update_person, params: {person_id: person.id, first_name: 'test updated', last_name: 'test', dob: (TimeKeeper.date_of_record - 35.years).to_s}
+          patch :update_person, params: {person_id: person.id, first_name: 'test updated', last_name: 'test', dob: (TimeKeeper.date_of_record - 35.years).strftime('%F')}
           person.reload
         end
 
@@ -340,7 +340,7 @@ RSpec.describe Api::V1::AgenciesController, :type => :controller, :dbclean => :a
             policy
           end
           allow(policy).to receive(:update_staff?).and_return(true)
-          patch :update_person, params: {person_id: person.id, first_name: 'test updated', last_name: 'test', dob: (TimeKeeper.date_of_record - 35.years).to_s}
+          patch :update_person, params: {person_id: person.id, first_name: 'test updated', last_name: 'test', dob: (TimeKeeper.date_of_record - 35.years).strftime('%F')}
           person.reload
         end
 
