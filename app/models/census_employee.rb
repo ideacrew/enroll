@@ -1224,15 +1224,10 @@ class CensusEmployee < CensusMember
   end
 
   def can_elect_cobra?
-    if current_user.try(:has_hbx_staff_role?)
-      ['employment_terminated'].include?(aasm_state)
-    else
-      ['employment_terminated'].include?(aasm_state) && (cobra_begin_date >= coverage_terminated_on)
-    end
+    ['employment_terminated'].include?(aasm_state)
   end
 
   def have_valid_date_for_cobra?(current_user = nil)
-    return true if current_user.try(:has_hbx_staff_role?)
     return false unless cobra_begin_date.present?
     return false unless coverage_terminated_on
     return false unless coverage_terminated_on <= cobra_begin_date
