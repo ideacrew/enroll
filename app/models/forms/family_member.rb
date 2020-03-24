@@ -192,7 +192,7 @@ module Forms
     end
 
     def destroy!
-      family.remove_family_member(family_member.person, family_member)
+      family.remove_family_member(family_member.person)
       family.save!
     end
 
