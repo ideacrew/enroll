@@ -306,6 +306,12 @@ RSpec.describe Api::V1::AgenciesController, :type => :controller, :dbclean => :a
 
         before :each do
           sign_in(user)
+          allow(AngularAdminApplicationPolicy).to receive(:new) do |u, resource|
+            expect(u).to eq user
+            expect(resource.class).to eq Queries::People::AgencyStaffDetailQuery
+            policy
+          end
+          allow(policy).to receive(:update_staff?).and_return(true)
           patch :update_person, params: {person_id: person.id, first_name: 'test updated', last_name: 'test', dob: (TimeKeeper.date_of_record - 35.years).to_s}
           person.reload
         end
@@ -328,12 +334,18 @@ RSpec.describe Api::V1::AgenciesController, :type => :controller, :dbclean => :a
 
         before :each do
           sign_in(user)
+          allow(AngularAdminApplicationPolicy).to receive(:new) do |u, resource|
+            expect(u).to eq user
+            expect(resource.class).to eq Queries::People::AgencyStaffDetailQuery
+            policy
+          end
+          allow(policy).to receive(:update_staff?).and_return(true)
           patch :update_person, params: {person_id: person.id, first_name: 'test updated', last_name: 'test', dob: (TimeKeeper.date_of_record - 35.years).to_s}
           person.reload
         end
 
         it "is successful" do
-          expect(response.status).to eq(200)
+          expect(response.status).to eq(404)
         end
 
         it "should not update person first name" do
@@ -351,6 +363,12 @@ RSpec.describe Api::V1::AgenciesController, :type => :controller, :dbclean => :a
       let(:work_email) { FactoryBot.build(:email, kind: 'work', address: 'test@test.com')}
       before :each do
         sign_in(user)
+        allow(AngularAdminApplicationPolicy).to receive(:new) do |u, resource|
+          expect(u).to eq user
+          expect(resource.class).to eq Queries::People::AgencyStaffDetailQuery
+          policy
+        end
+        allow(policy).to receive(:update_staff?).and_return(true)
         patch :update_email, params: {person_id: person.id, emails: [id: work_email.id, new_email: 'testupdated@test.com']}
         person.reload
       end

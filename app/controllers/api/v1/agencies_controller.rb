@@ -55,9 +55,9 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
   end
 
   def update_person
-    query = Queries::People::AgencyStaffDetailQuery.new(params[:person_id])
-    authorize query, :update_staff?
     begin
+      query = Queries::People::AgencyStaffDetailQuery.new(current_user.person_id)
+      authorize query, :update_staff?
       people = Person.where(first_name: /^#{update_person_params[:first_name]}$/i, last_name: /^#{update_person_params[:last_name]}$/i, dob: Date.strptime(update_person_params[:dob], "%m/%d/%Y").to_date)
       if people.present?
         render json: { status: "error", message: "Updating Staff Failed. Given details matces with another record. Contact Admin" }, status: 404
@@ -74,9 +74,9 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
   end
 
   def update_email
-    query = Queries::People::AgencyStaffDetailQuery.new(params[:person_id])
-    authorize query, :update_staff?
     begin
+      query = Queries::People::AgencyStaffDetailQuery.new(current_user.person_id)
+      authorize query, :update_staff?
       person = Person.find(update_email_params[:person_id])
       update_email_params[:emails].each do |record|
         email = person.emails.find(record[:id])
