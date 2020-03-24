@@ -27,9 +27,15 @@
               </td>
 
               <td>
-                <%= link_to(profiles_general_agencies_general_agency_staff_role_path(profile_id:@general_agency_profile.id, person_id: staff_member.id), :id => "destroy", :class => "disable-link", hidden: can_show_destroy?(current_user, staff_member, ga_staff.count), method: 'delete') do %>
-                  <i class="far fa-trash-alt fa-2x role-trashcan right center"></i>
-                <% end %>
+                <%=  link_to(
+                          profiles_general_agencies_general_agency_staff_role_path(
+                          profile_id: @general_agency_profile.id, person_id: staff_member.id
+                      ),
+                      :id => "destroy",
+                      hidden: !can_show_destroy?(current_user, staff_member, ga_staff.count),
+                      method: 'delete') do %>
+                       <i class="far fa-trash-alt fa-2x role-trashcan right center"></i>
+                  <% end %>
               </td>
 
             </tbody>
