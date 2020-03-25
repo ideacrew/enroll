@@ -481,7 +481,6 @@ Then(/Individual asks for help$/) do
   #TODO bombs on help_first_name sometimes
   fill_in "help_first_name", with: "Sherry"
   fill_in "help_last_name", with: "Buckner"
-  sleep(2)
   screenshot("help_from_a_csr")
   find("#search_for_plan_shopping_help").click
   find(".interaction-click-control-×").click

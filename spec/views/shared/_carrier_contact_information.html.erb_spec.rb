@@ -12,15 +12,11 @@ describe "shared/_carrier_contact_information.html.erb", dbclean: :after_each do
     double("IssuerProfile")
   }
 
-  let!(:person)          { FactoryBot.create(:person, :with_consumer_role) }
-  let!(:family)          { FactoryBot.create(:family, :with_primary_family_member, person: person) }
-  let!(:hbx_enrollment)  { FactoryBot.create(:hbx_enrollment, household: family.active_household, family: family) }
-
   context 'for BMC HealthNet Plan' do
     before :each do
       allow(plan).to receive(:kind).and_return('health')
       allow(issuer_profile).to receive(:legal_name).and_return('BMC HealthNet Plan')
-      render partial: "shared/carrier_contact_information", locals: { plan: plan, hbx_enrollment: hbx_enrollment }
+      render partial: "shared/carrier_contact_information", locals: { plan: plan }
     end
 
     it "should display the carrier name and number" do
@@ -35,7 +31,7 @@ describe "shared/_carrier_contact_information.html.erb", dbclean: :after_each do
     before :each do
       allow(plan).to receive(:kind).and_return('health')
       allow(issuer_profile).to receive(:legal_name).and_return('Fallon Health')
-      render partial: "shared/carrier_contact_information", locals: { plan: plan, hbx_enrollment: hbx_enrollment }
+      render partial: "shared/carrier_contact_information", locals: { plan: plan }
     end
 
     it "should display the carrier name and number" do
@@ -50,7 +46,7 @@ describe "shared/_carrier_contact_information.html.erb", dbclean: :after_each do
     before :each do
       allow(plan).to receive(:kind).and_return('health')
       allow(issuer_profile).to receive(:legal_name).and_return('Health New England')
-      render partial: "shared/carrier_contact_information", locals: { plan: plan, hbx_enrollment: hbx_enrollment }
+      render partial: "shared/carrier_contact_information", locals: { plan: plan }
     end
 
     it "should display the carrier name and number" do
@@ -65,7 +61,7 @@ describe "shared/_carrier_contact_information.html.erb", dbclean: :after_each do
     before :each do
       allow(plan).to receive(:kind).and_return('health')
       allow(issuer_profile).to receive(:legal_name).and_return('United Healthcare')
-      render partial: "shared/carrier_contact_information", locals: { plan: plan, hbx_enrollment: hbx_enrollment }
+      render partial: "shared/carrier_contact_information", locals: { plan: plan }
     end
 
     it "should display the carrier name and number" do
@@ -79,7 +75,7 @@ describe "shared/_carrier_contact_information.html.erb", dbclean: :after_each do
     before :each do
       allow(plan).to receive(:kind).and_return('health')
       allow(issuer_profile).to receive(:legal_name).and_return('Harvard Pilgrim Health Care')
-      render partial: "shared/carrier_contact_information", locals: { plan: plan, hbx_enrollment: hbx_enrollment }
+      render partial: "shared/carrier_contact_information", locals: { plan: plan }
     end
 
     it "should display the carrier name and number" do
@@ -94,7 +90,7 @@ describe "shared/_carrier_contact_information.html.erb", dbclean: :after_each do
     before :each do
       allow(plan).to receive(:kind).and_return('health')
       allow(issuer_profile).to receive(:legal_name).and_return('AllWays Health Partners')
-      render partial: "shared/carrier_contact_information", locals: { plan: plan, hbx_enrollment: hbx_enrollment }
+      render partial: "shared/carrier_contact_information", locals: { plan: plan }
     end
 
     it "should display the carrier name and number" do
@@ -109,7 +105,7 @@ describe "shared/_carrier_contact_information.html.erb", dbclean: :after_each do
     before :each do
       allow(plan).to receive(:kind).and_return('Dental')
       allow(issuer_profile).to receive(:legal_name).and_return('Altus Dental')
-      render partial: "shared/carrier_contact_information", locals: { plan: plan, hbx_enrollment: hbx_enrollment }
+      render partial: "shared/carrier_contact_information", locals: { plan: plan }
     end
 
     it "should display the carrier name and number" do
@@ -124,7 +120,7 @@ describe "shared/_carrier_contact_information.html.erb", dbclean: :after_each do
     before :each do
       allow(plan).to receive(:kind).and_return('Dental')
       allow(issuer_profile).to receive(:legal_name).and_return('Delta Dental')
-      render partial: "shared/carrier_contact_information", locals: { plan: plan, hbx_enrollment: hbx_enrollment }
+      render partial: "shared/carrier_contact_information", locals: { plan: plan }
     end
 
     it "should display the carrier name and number" do
