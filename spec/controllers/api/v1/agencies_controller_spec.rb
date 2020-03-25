@@ -308,7 +308,7 @@ RSpec.describe Api::V1::AgenciesController, :type => :controller, :dbclean => :a
           sign_in(user)
           allow(AngularAdminApplicationPolicy).to receive(:new) do |u, resource|
             expect(u).to eq user
-            expect(resource.class).to eq Queries::People::AgencyStaffDetailQuery
+            expect(resource.class).to eq Operations::UpdateStaff
             policy
           end
           allow(policy).to receive(:update_staff?).and_return(true)
@@ -336,7 +336,7 @@ RSpec.describe Api::V1::AgenciesController, :type => :controller, :dbclean => :a
           sign_in(user)
           allow(AngularAdminApplicationPolicy).to receive(:new) do |u, resource|
             expect(u).to eq user
-            expect(resource.class).to eq Queries::People::AgencyStaffDetailQuery
+            expect(resource.class).to eq Operations::UpdateStaff
             policy
           end
           allow(policy).to receive(:update_staff?).and_return(true)
@@ -345,7 +345,7 @@ RSpec.describe Api::V1::AgenciesController, :type => :controller, :dbclean => :a
         end
 
         it "is successful" do
-          expect(response.status).to eq(404)
+          expect(response.status).to eq(422)
         end
 
         it "should not update person first name" do
@@ -365,7 +365,7 @@ RSpec.describe Api::V1::AgenciesController, :type => :controller, :dbclean => :a
         sign_in(user)
         allow(AngularAdminApplicationPolicy).to receive(:new) do |u, resource|
           expect(u).to eq user
-          expect(resource.class).to eq Queries::People::AgencyStaffDetailQuery
+          expect(resource.class).to eq Operations::UpdateStaff
           policy
         end
         allow(policy).to receive(:update_staff?).and_return(true)
