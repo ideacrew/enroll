@@ -1509,8 +1509,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     let(:person100) { FactoryBot.create(:person, :with_hbx_staff_role) }
     let(:user100) { FactoryBot.create(:user, person: person100) }
 
-    it "should return true as the current_user is a valid admin" do
-      expect(census_employee100.have_valid_date_for_cobra?(user100)).to eq true
+    it "should return false even if current_user is a valid admin" do
+      expect(census_employee100.have_valid_date_for_cobra?(user100)).to eq false
     end
 
     it "should return false as census_employee doesn't meet the requirements" do
