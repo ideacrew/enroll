@@ -321,7 +321,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
           # duplicate family member
           incarcerated_family_member = family.family_members.where(person_id: person_to_deactivate).first
           # this will set is_active to false
-          family.remove_family_member(person_to_deactivate)
+          family.remove_family_member(person_to_deactivate, person)
           family.save!
           incarcerated_family_member.reload
         end

@@ -2,7 +2,6 @@
 
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "remove_dependent")
-require File.join(Rails.root, "lib", "remove_family_member")
 
 describe RemoveDependent, dbclean: :after_each do
 
