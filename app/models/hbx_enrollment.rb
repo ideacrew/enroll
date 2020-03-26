@@ -2146,7 +2146,7 @@ class HbxEnrollment
   end
 
   def is_admin_cancel_eligible?
-    ["coverage_selected","renewing_coverage_selected","coverage_enrolled","auto_renewing"].include?(aasm_state.to_s)
+    ["coverage_selected", "renewing_coverage_selected", "coverage_enrolled", "auto_renewing", "unverified"].include?(aasm_state.to_s)
   end
 
   def is_admin_reinstate_or_end_date_update_eligible?
