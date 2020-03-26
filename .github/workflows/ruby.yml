@@ -34,4 +34,6 @@ jobs:
         yarn install
         ./bin/webpack
     - name: rspec
-      run:  bundle exec rake "parallel:spec[4]"
+      run: |
+        bundle exec rake "parallel:spec[4]"
+        cat order*.log
