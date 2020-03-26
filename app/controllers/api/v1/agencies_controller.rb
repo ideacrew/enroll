@@ -93,6 +93,6 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
   end
 
   def update_email_params
-    params.permit(:person_id, emails: [:id, :new_email])
+    params.permit(:person_id, emails: [:id, :address])
   end
 end

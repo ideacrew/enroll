@@ -369,7 +369,7 @@ RSpec.describe Api::V1::AgenciesController, :type => :controller, :dbclean => :a
           policy
         end
         allow(policy).to receive(:update_staff?).and_return(true)
-        patch :update_email, params: {person_id: person.id, emails: [id: work_email.id, new_email: 'testupdated@test.com']}
+        patch :update_email, params: {person_id: person.id, emails: [id: work_email.id, address: 'testupdated@test.com']}
         person.reload
       end
 

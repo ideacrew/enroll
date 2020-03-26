@@ -26,7 +26,7 @@ module Operations
         attrs[:emails].each do |record|
           begin
             email = person.emails.find(record[:id])
-            email.assign_attributes(address: record[:new_email])
+            email.assign_attributes(address: record[:address])
           rescue
             return :email_not_found
           end
