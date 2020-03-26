@@ -34,7 +34,4 @@ jobs:
         yarn install
         ./bin/webpack
     - name: rspec
-      run:  bundle exec rspec ./spec/models/factories/eligibility_factory_spec.rb:268
-    # Need to fix sbc_preprocessor2015_spec.rb
-    #- name: rake parallel:spec[4]
-    #  run:  bundle exec rake "parallel:spec[4]"
+      run:  bundle exec rake "parallel:spec[4]"
