@@ -27,15 +27,17 @@
               </td>
 
               <td>
-                <%=  link_to(
+                <% if current_user.has_hbx_staff_role? || current_user.person.general_agency_primary_staff.present? %>
+                  <%=  link_to(
                           profiles_general_agencies_general_agency_staff_role_path(
                           profile_id: @general_agency_profile.id, person_id: staff_member.id
                       ),
                       :id => "destroy",
-                      hidden: !can_show_destroy?(current_user, staff_member, ga_staff.count),
+                      hidden: !can_show_destroy_for_ga?(current_user, staff_member, ga_staff.count),
                       method: 'delete') do %>
                        <i class="far fa-trash-alt fa-2x role-trashcan right center"></i>
                   <% end %>
+                <% end %>
               </td>
 
             </tbody>
@@ -43,7 +45,6 @@
     </table>
   </div>
 <% end %>
-
 
 <%= link_to 'Add General Agency Staff Role', new_profiles_general_agencies_general_agency_staff_role_path(profile_id:@general_agency_profile.id), disabled: disable_edit_general_agency?(current_user), id: "add_staff", remote: true, class: 'btn btn-default pull-left col-12' %>
 
