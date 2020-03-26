@@ -47,7 +47,7 @@ module Operations
     end
 
     def matched_people
-      Person.where(attrs)
+      Person.where(first_name: /^#{attrs[:first_name]}$/i, last_name: /^#{attrs[:last_name]}$/i, dob: attrs[:dob])
     end
 
     def sanitize_staff_params
