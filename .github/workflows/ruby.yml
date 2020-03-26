@@ -34,10 +34,7 @@ jobs:
         yarn install
         ./bin/webpack
     - name: rspec
-      run:  bundle exec rspec
-    # Need to fix sbc_preprocessor2015_spec.rb
-    #- name: rake parallel:spec[4]
-    #  run:  bundle exec rake "parallel:spec[4]"
+      run:  bundle exec rake "parallel:spec[4]"
   engines_rspecs:
     runs-on: ${{ matrix.os }}
     strategy:
