@@ -612,7 +612,6 @@ And(/^.+ sees the (.*) page and clicks Continue$/) do |which_page|
   # expect(page).to have_content(which_page)
   continue = find('.interaction-click-control-continue', text: 'CONTINUE', wait:10)
   continue.click
-  sleep 2
 end
 
 And(/^.+ clicks Confirm$/) do

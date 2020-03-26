@@ -279,7 +279,7 @@ RSpec.describe Api::V1::AgenciesController, :type => :controller, :dbclean => :a
       context "with a person that doesn't exist" do
         it "returns not found" do
           post :terminate, params: { person_id: "aksdfuidfa", role_id: "blargh" }
-          expect(response.status).to eq(404)
+          expect(response.status).to eq(400)
         end
       end
 
