@@ -33,8 +33,9 @@ jobs:
         bundle install --jobs 4 --retry 3
         yarn install
         ./bin/webpack
-    - name: rspec
-      run:  bundle exec rake "parallel:spec[4]"
+      run: |
+        bundle exec rake "parallel:spec[4]"
+        cat order*.log
   engines_rspecs:
     runs-on: ${{ matrix.os }}
     strategy:
