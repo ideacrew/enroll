@@ -122,6 +122,7 @@ describe UsersController, dbclean: :after_each do
     context 'When admin is not authorized for lockable then User status can not be changed' do
       let(:can_lock) { false }
       before do
+        allow(admin).to receive(:person).and_return nil
         sign_in(admin)
       end
       it "does not toggle the lock status" do

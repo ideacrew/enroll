@@ -592,7 +592,7 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
 
   describe "GET benefit_group", dbclean: :around_each do
     it "should be render benefit_group template" do
-      sign_in
+      sign_in @user
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(CensusEmployee).to receive(:find).and_return(census_employee)
       post :benefit_group, params: {id: census_employee.id, employer_profile_id: employer_profile_id, census_employee: {}}
