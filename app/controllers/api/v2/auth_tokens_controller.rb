@@ -3,6 +3,7 @@ module Api
     class AuthTokensController < ApiBaseController
       def logout
         current_user.revoke_all_jwts!
+        Devise.sign_out_all_scopes
         head :ok
       end
 

@@ -279,7 +279,7 @@ RSpec.describe Api::V1::AgenciesController, :type => :controller, :dbclean => :a
       context "with a person that doesn't exist" do
         it "returns not found" do
           post :terminate, params: { person_id: "aksdfuidfa", role_id: "blargh" }
-          expect(response.status).to eq(404)
+          expect(response.status).to eq(400)
         end
       end
 
@@ -296,6 +296,89 @@ RSpec.describe Api::V1::AgenciesController, :type => :controller, :dbclean => :a
           post :terminate, params: { person_id: person.id.to_s, role_id: broker_agency_staff_role.first.id.to_s }
           expect(response.status).to eq(409)
         end
+      end
+    end
+
+    describe "PATCH #update_person" do
+      let(:person) { FactoryBot.create(:person, first_name: 'test', last_name: 'test', dob: TimeKeeper.date_of_record - 25.years) }
+
+      context 'valid case' do
+
+        before :each do
+          sign_in(user)
+          allow(AngularAdminApplicationPolicy).to receive(:new) do |u, resource|
+            expect(u).to eq user
+            expect(resource.class).to eq Operations::UpdateStaff
+            policy
+          end
+          allow(policy).to receive(:update_staff?).and_return(true)
+          patch :update_person, params: {person_id: person.id, first_name: 'test updated', last_name: 'test', dob: (TimeKeeper.date_of_record - 35.years).strftime('%F')}
+          person.reload
+        end
+
+        it "is successful" do
+          expect(response.status).to eq(200)
+        end
+
+        it "should update person first name" do
+          expect(person.first_name).to eq 'test updated'
+        end
+
+        it "should update person dob" do
+          expect(person.dob).to eq TimeKeeper.date_of_record - 35.years
+        end
+      end
+
+      context 'invalid case' do
+        let!(:duplicate_person) { FactoryBot.create(:person, first_name: 'test updated', last_name: 'test', dob: TimeKeeper.date_of_record - 35.years) }
+
+        before :each do
+          sign_in(user)
+          allow(AngularAdminApplicationPolicy).to receive(:new) do |u, resource|
+            expect(u).to eq user
+            expect(resource.class).to eq Operations::UpdateStaff
+            policy
+          end
+          allow(policy).to receive(:update_staff?).and_return(true)
+          patch :update_person, params: {person_id: person.id, first_name: 'test updated', last_name: 'test', dob: (TimeKeeper.date_of_record - 35.years).strftime('%F')}
+          person.reload
+        end
+
+        it "is successful" do
+          expect(response.status).to eq(422)
+        end
+
+        it "should not update person first name" do
+          expect(person.first_name).not_to eq 'test updated'
+        end
+
+        it "should not update person dob" do
+          expect(person.dob).not_to eq TimeKeeper.date_of_record - 35.years
+        end
+      end
+    end
+
+    describe "PATCH #update_email" do
+      let(:person) { FactoryBot.create(:person, emails: [work_email]) }
+      let(:work_email) { FactoryBot.build(:email, kind: 'work', address: 'test@test.com')}
+      before :each do
+        sign_in(user)
+        allow(AngularAdminApplicationPolicy).to receive(:new) do |u, resource|
+          expect(u).to eq user
+          expect(resource.class).to eq Operations::UpdateStaff
+          policy
+        end
+        allow(policy).to receive(:update_staff?).and_return(true)
+        patch :update_email, params: {person_id: person.id, emails: [id: work_email.id, address: 'testupdated@test.com']}
+        person.reload
+      end
+
+      it "is successful" do
+        expect(response.status).to eq(200)
+      end
+
+      it "should update person's work email'" do
+        expect(person.emails.first.address).to eq 'testupdated@test.com'
       end
     end
   end
