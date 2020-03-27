@@ -12,6 +12,9 @@
 </div>
 <br>
 
+<div id="family_error_messages">
+</div>
+
 <ul class="" id="dependent_ul">
   <% @family.active_family_members.reject(&:is_primary_applicant).each do |dependent| %>
       <% if dependent.person.is_resident_role_active? %>

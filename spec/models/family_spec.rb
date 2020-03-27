@@ -1494,6 +1494,28 @@ describe "remove_family_member" do
       expect(chmms.map(&:family_member_id).map(&:to_s)).not_to include(duplicate_family_member_1.id.to_s)
     end
 
+    it 'should return false if duplicate members are present on enrollments' do
+      enrollment.update_attributes(aasm_state: "coverage_selected")
+      status, message = family.remove_family_member(dependent1.person)
+
+      expect(status).to eq false
+      expect(message).to eq "Cannot remove the duplicate members as they are present on enrollments/tax households"
+    end
+
+    it 'should return false if duplicate members are present on active tax households' do
+      allow(family).to receive(:duplicate_members_present_on_active_tax_households?).and_return true
+      status, message = family.remove_family_member(dependent1.person)
+      expect(status).to eq false
+      expect(message).to eq "Cannot remove the duplicate members as they are present on enrollments/tax households"
+    end
+
+    it 'should return true if duplicate members are not present on active tax households or enrollments' do
+      allow(family).to receive(:duplicate_members_present_on_active_tax_households?).and_return false
+      allow(family).to receive(:duplicate_members_present_on_enrollments?).and_return false
+      status, message = family.remove_family_member(dependent1.person)
+      expect(status).to eq true
+    end
+
   end
 end
 

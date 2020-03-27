@@ -674,9 +674,14 @@ class Family
     family_members_with_person_id = family_members.where(person_id: person.id)
     # Deleting the family member  if there is more than 1 object with same person id
     if family_members_with_person_id.count > 1
-      status, messages = remove_duplicate_members(family_members_with_person_id.map(&:id))
-      self.reload
-      status
+      fm_ids = family_members_with_person_id.pluck(:id)
+      if duplicate_enr_members_or_tax_members_present?(fm_ids)
+        return [false, "Cannot remove the duplicate members as they are present on enrollments/tax households"]
+      else
+        status, messages = remove_duplicate_members(fm_ids)
+        self.reload
+        [status, "Successfully removed duplicate members"]
+      end
     else
       # This will also destroy the coverage_household_member
       if family_members_with_person_id.present?
@@ -686,10 +691,24 @@ class Family
         family_member.is_active = false
         active_household.remove_family_member(family_member)
       end
-      family_member
+      [true, "Successfully removed family member"]
     end
   end
 
+  def duplicate_members_present_on_enrollments?(fm_ids)
+    enrollments = hbx_enrollments.where(:"aasm_state".nin => ["shopping"])
+    enrollment_member_fm_ids = enrollments.flat_map(&:hbx_enrollment_members).map(&:applicant_id)
+    (enrollment_member_fm_ids & fm_ids).present?
+  end
+
+  def duplicate_members_present_on_active_tax_households?(fm_ids)
+    tax_household_applicant_ids =  active_household.tax_household_applicant_ids
+    (tax_household_applicant_ids & fm_ids).present?
+  end
+
+  def duplicate_enr_members_or_tax_members_present?(fm_ids)
+    duplicate_members_present_on_enrollments?(fm_ids) || duplicate_members_present_on_active_tax_households?(fm_ids)
+  end
   # Determine if {Person} is a member of this family
   #
   # @example Is this person a family member?

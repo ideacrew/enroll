@@ -13,7 +13,7 @@ module RemoveFamilyMember
     dup_hbx_members_exists = @hbx_member_fm_ids.include?(bson_id)
     dup_th_members_exists = @th_member_ids.include?(bson_id)
     if dup_fms_exists
-      if !dup_th_members_exists && (dup_hbx_members_exists || dup_chms_exists)
+      if (dup_hbx_members_exists || dup_chms_exists)
       'other_dependencies'
       else
       'no_dependency'
