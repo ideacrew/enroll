@@ -8,6 +8,10 @@ module ExternalApplications
       @policy_class = self.class.const_get(setting_set.pundit_policy)
     end
 
+    def is_authorized_for?(current_user)
+      @policy_class.new(current_user, nil).visit?
+    end
+
     def self.find_by_application_name(app_name)
       external_apps = load_external_applications()
       external_apps.detect do |ea|
