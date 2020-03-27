@@ -54,13 +54,15 @@ RSpec.describe Importers::Transcripts::EnrollmentTranscript, type: :model, dbcle
       other_family.family_members.build(is_primary_applicant: false, person: child1)
     end
 
+    let(:hired_on) {TimeKeeper.date_of_record - 2.days}
     let(:employee_role1) {FactoryGirl.create(:benefit_sponsors_employee_role, person: person, employer_profile: abc_profile)}
     let(:census_employee) do
       census_employee = FactoryGirl.create(:census_employee, :with_active_assignment, first_name: person.first_name,
                                            last_name: person.last_name, benefit_sponsorship: benefit_sponsorship,
                                            employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package,
                                            employee_role_id: employee_role1.id)
-      census_employee.update_attributes(ssn: person.ssn, dob: person.dob)
+      census_employee.update_attributes(ssn: person.ssn, dob: person.dob, hired_on: hired_on)
+      employee_role1.update_attributes(census_employee_id: census_employee.id)
       census_employee
     end
 
