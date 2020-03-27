@@ -707,7 +707,6 @@ class Family
   end
 
   def duplicate_enr_members_or_tax_members_present?(fm_ids)
-    binding.pry
     duplicate_members_present_on_enrollments?(fm_ids) || duplicate_members_present_on_active_tax_households?(fm_ids)
   end
   # Determine if {Person} is a member of this family
