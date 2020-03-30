@@ -12,6 +12,7 @@ module Operations
       begin
         return :matching_record_found if matched_people.present?
         return :information_missing unless has_required_keys?
+        return :invalid_dob if dob_invalid?
         person.update_attributes(attrs)
         return :ok
       rescue Mongoid::Errors::DocumentNotFound
@@ -57,6 +58,10 @@ module Operations
 
     def has_required_keys?
       (attrs.keys.sort & required_keys) == required_keys
+    end
+
+    def dob_invalid?
+      attrs[:dob] > (TimeKeeper.date_of_record - 18.years)
     end
 
     def policy_class
