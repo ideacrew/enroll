@@ -26,7 +26,8 @@ RSpec.describe Insured::ConsumerRolesController do
         is_resident_role_active?: false,
         no_dc_address: false,
         has_multiple_roles?: false,
-        id: person_id
+        id: person_id,
+        agent?: false
       )
     end
     let(:consumer_role) do
