@@ -120,7 +120,7 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
 
   describe "GET index",dbclean: :after_each do
     let(:user) { double("user", :has_hbx_staff_role? => true, :has_broker_agency_staff_role? => false)}
-    let(:person) { double("person")}
+    let(:person) { double("person", agent?: true)}
     let(:hbx_staff_role) { double("hbx_staff_role")}
     let(:hbx_profile) { double("hbx_profile")}
 
@@ -145,7 +145,7 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
 
   describe "CREATE post",dbclean: :after_each do
     let(:user){ double(:save => double("user")) }
-    let(:person){ double(:broker_agency_contact => double("test")) }
+    let(:person){ double(:broker_agency_contact => double("test"), agent?: true) }
     let(:broker_agency_profile){ double("test") }
     let(:form){double("test", :broker_agency_profile => broker_agency_profile)}
     let(:organization) {double("organization")}

@@ -134,6 +134,7 @@ class ApplicationController < ActionController::Base
     end
 
     def update_url
+      return if current_user&.person&.agent?
       if (controller_name == "employer_profiles" && action_name == "show") ||
           (controller_name == "families" && action_name == "home") ||
           (controller_name == "profiles" && action_name == "new") ||
