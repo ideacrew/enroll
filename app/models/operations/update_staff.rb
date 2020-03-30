@@ -12,7 +12,7 @@ module Operations
       begin
         return :matching_record_found if matched_people.present?
         return :information_missing unless has_required_keys?
-        return :invalid_dob if dob_invalid?
+        return :dob_under_18 if dob_invalid?
         person.update_attributes(attrs)
         return :ok
       rescue Mongoid::Errors::DocumentNotFound
