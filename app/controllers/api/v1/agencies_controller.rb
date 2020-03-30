@@ -44,30 +44,57 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
     authorize terminate_agency_staff, :terminate_agency_staff?
     case terminate_agency_staff.call
     when :ok
-      render json: { status: "success" }, status: 200
+      render json: { status: "success" }, status: :ok
     when :person_not_found
-      render json: { status: "error" }, status: 404
+      render json: { status: "error", message: "Person could not be found." }, status: :bad_request
     when :no_role_found
-      render json: { status: "error", message: "Unable to find role" }, status: 422
+      render json: { status: "error", message: "Unable to find role" }, status: :unprocessable_entity
     else
-      render json: { status: "error" }, status: 409
+      render json: { status: "error" }, status: :conflict
     end
   end
 
-  def approve_general_agency_staff
-    #{"person_id"=>"5e4954c7b0b6c5c34cc4110e", "profile_id"=>"5e4953d3b0b6c5c34cc410f5", "id"=>"5e4953d3b0b6c5c34cc410f5"}
-    # @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_approve(general_agency_staff_params)
-    # authorize @staff
-    # begin
-    #   @status, @result = @staff.approve
-    #   if @status
-    #     flash[:notice] = "Role approved successfully"
-    #   else
-    #     flash[:error] = "Role was not approved because " + @result
-    #   end
-    # rescue Exception => e
-    #   flash[:error] = "Role was not approved because " + e.message
-    # end
-    # redirect_to profiles_general_agencies_general_agency_profile_path(id: params[:staff][:profile_id])
+  def update_person
+    operation = Operations::UpdateStaff.new(update_person_params)
+    authorize operation, :update_staff?
+    case operation.update_person
+    when :ok
+      render json: { status: "success", message: 'Succesfully updated!!' }, status: :ok
+    when :person_not_found
+      render json: { status: "error", message: "Updating Staff Failed. Person Not Found" }, status: :bad_request
+    when :information_missing
+      render json: { status: "error", message: "Updating Staff Failed. Required properties missing" }, status: :bad_request
+    when :matching_record_found
+      render json: { status: "error", message: "Updating Staff Failed. Given details matces with another record. Contact Admin" }, status: :unprocessable_entity
+    when :invalid_dob
+      render json: { status: "error", message: "Updating Staff Failed. Invalid Dob" }, status: :unprocessable_entity
+    else
+      render json: { status: "error", message: "Unexpected Error" }, status: :conflict
+    end
+  end
+
+  def update_email
+    operation = Operations::UpdateStaff.new(update_email_params)
+    authorize operation, :update_staff?
+    case operation.update_email
+    when :ok
+      render json: { status: "success", message: 'Succesfully updated!!' }, status: :ok
+    when :person_not_found
+      render json: { status: "error", message: "Updating Staff Failed. Person Not Found" }, status: :bad_request
+    when :email_not_found
+      render json: { status: "error", message: "Updating Staff Failed. Email not found" }, status: :unprocessable_entity
+    else
+      render json: { status: "error", message: "Unexpected Error" }, status: :conflict
+    end
+  end
+
+  private
+
+  def update_person_params
+    params.permit(:person_id, :dob, :first_name, :last_name)
+  end
+
+  def update_email_params
+    params.permit(:person_id, emails: [:id, :address])
   end
 end

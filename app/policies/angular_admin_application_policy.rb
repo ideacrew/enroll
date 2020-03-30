@@ -33,4 +33,8 @@ class AngularAdminApplicationPolicy < ApplicationPolicy
   def terminate_agency_staff?
     visit?
   end
+
+  def update_staff?
+    visit?
+  end
 end
