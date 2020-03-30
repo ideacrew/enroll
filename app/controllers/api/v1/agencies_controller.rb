@@ -51,7 +51,7 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
     when :ok
       render json: { status: "success" }, status: OK_REQUEST_STATUS
     when :person_not_found
-      render json: { status: "error" }, status: BAD_REQUEST_STATUS
+      render json: { status: "error", message: "Person could not be found." }, status: BAD_REQUEST_STATUS
     when :no_role_found
       render json: { status: "error", message: "Unable to find role" }, status: UNPROCESSABLE_ENTITY_STATUS
     else
