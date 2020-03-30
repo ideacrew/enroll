@@ -25,7 +25,7 @@ end_time = previous_day.end_of_day.utc
 CSV.open(file_name, 'w', force_quotes: true) do |csv|
   csv << field_names
   families = Family.where(:"households.tax_households.created_at" => { "$gte" => start_time, "$lte" => end_time})
-  families.inject() do |_dummy, family|
+  families.inject(0) do |_dummy, family|
     primary_person = family.primary_person
     e_case_id = family.has_valid_e_case_id? ? family.e_case_id.split('#').last : 'N/A'
     tax_households = family.active_household.tax_households
@@ -42,7 +42,7 @@ CSV.open(file_name, 'w', force_quotes: true) do |csv|
       if active_enrollments.present?
         active_enrollments.each do |enrollment|
           csv << [primary_person.first_name, primary_person.last_name,
-                  primary_person.hbx_id, e_case_id,  current_ed&.max_aptc&.to_f,
+                  primary_person.hbx_id, e_case_id, current_ed&.max_aptc&.to_f,
                   new_ed.max_aptc.to_f, current_ed&.csr_percent_as_integer,
                   new_ed.csr_percent_as_integer, new_ed.determined_on,
                   current_ed&.csr_eligibility_kind, new_ed.csr_eligibility_kind,
@@ -51,7 +51,7 @@ CSV.open(file_name, 'w', force_quotes: true) do |csv|
         end
       else
         csv << [primary_person.first_name, primary_person.last_name,
-                primary_person.hbx_id, e_case_id,  current_ed&.max_aptc&.to_f,
+                primary_person.hbx_id, e_case_id, current_ed&.max_aptc&.to_f,
                 new_ed.max_aptc.to_f, current_ed&.csr_percent_as_integer,
                 new_ed.csr_percent_as_integer, new_ed.determined_on,
                 current_ed&.csr_eligibility_kind, new_ed.csr_eligibility_kind,
