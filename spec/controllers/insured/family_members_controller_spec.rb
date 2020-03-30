@@ -251,19 +251,47 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
 
     before :each do
       sign_in(user)
-      allow(Forms::FamilyMember).to receive(:find).with(dependent_id).and_return(dependent)
     end
 
     it "should destroy the dependent" do
+      allow(Forms::FamilyMember).to receive(:find).with(dependent_id).and_return(dependent)
       expect(dependent).to receive(:destroy!)
       delete :destroy, params: {id: dependent_id}
     end
 
     it "should render the index template" do
+      allow(Forms::FamilyMember).to receive(:find).with(dependent_id).and_return(dependent)
       allow(dependent).to receive(:destroy!)
       delete :destroy, params: {id: dependent_id}
       expect(response).to have_http_status(:success)
       expect(response).to render_template("index")
+    end
+
+    context "Delete Duplicate FM members" do
+      let(:family) { FactoryBot.create(:family, :with_primary_family_member_and_dependent)}
+      let(:dependent1) { family.family_members.where(is_primary_applicant: false).first }
+      let(:dependent2) { family.family_members.where(is_primary_applicant: false).last }
+      let!(:duplicate_family_member_1) do
+        family.family_members << FamilyMember.new(person_id: dependent1.person.id)
+        dup_fm = family.family_members.last
+        dup_fm.save(validate: false)
+        dup_fm
+      end
+      let!(:duplicate_family_member_2) do
+        family.family_members << FamilyMember.new(person_id: dependent1.person.id)
+        dup_fm = family.family_members.last
+        dup_fm.save(validate: false)
+        dup_fm
+      end
+
+      it 'should destroy the duplicate dependents if exists' do
+        expect(family.family_members.active.count).to eq 5
+        delete :destroy, params: {id: dependent1.id}
+        expect(response).to have_http_status(:success)
+        family.reload
+        expect(family.family_members.active.count).to eq 3
+      end
+
     end
   end
 
