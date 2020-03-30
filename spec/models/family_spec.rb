@@ -1499,14 +1499,14 @@ describe "remove_family_member" do
       status, message = family.remove_family_member(dependent1.person)
 
       expect(status).to eq false
-      expect(message).to eq "Cannot remove the duplicate members as they are present on enrollments/tax households"
+      expect(message).to eq "Cannot remove the duplicate members as they are present on enrollments/tax households. Please call customer service at 1-855-532-5465"
     end
 
     it 'should return false if duplicate members are present on active tax households' do
       allow(family).to receive(:duplicate_members_present_on_active_tax_households?).and_return true
       status, message = family.remove_family_member(dependent1.person)
       expect(status).to eq false
-      expect(message).to eq "Cannot remove the duplicate members as they are present on enrollments/tax households"
+      expect(message).to eq "Cannot remove the duplicate members as they are present on enrollments/tax households. Please call customer service at 1-855-532-5465"
     end
 
     it 'should return true if duplicate members are not present on active tax households or enrollments' do
