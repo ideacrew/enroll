@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  mount Rswag::Ui::Engine => '/api-docs'
+  mount Rswag::Api::Engine => '/api-docs'
   require 'resque/server'
 #  mount Resque::Server, at: '/jobs'
   mount BenefitSponsors::Engine,      at: "/benefit_sponsors"

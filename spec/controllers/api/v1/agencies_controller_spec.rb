@@ -1,9 +1,11 @@
+require 'swagger_helper'
 require 'rails_helper'
 
 RSpec.describe Api::V1::AgenciesController, :type => :controller, :dbclean => :after_each do
   let(:user) { FactoryBot.create(:user) }
 
   describe "when unauthorized" do
+    path '/blogs' do
     before :each do
       sign_in(user)
     end
@@ -43,73 +45,88 @@ RSpec.describe Api::V1::AgenciesController, :type => :controller, :dbclean => :a
       )
     end
 
-    describe "GET #index, with no records" do
-      before :each do
-        sign_in(user)
-        allow(AngularAdminApplicationPolicy).to receive(:new) do |u, resource|
-          expect(u).to eq user
-          expect(resource.class).to eq Queries::AgenciesQuery
-          policy
+    path '/agencies' do
+      response '200', 'list of agencies' do
+        before :each do
+          sign_in(user)
+          allow(AngularAdminApplicationPolicy).to receive(:new) do |u, resource|
+            expect(u).to eq user
+            expect(resource.class).to eq Queries::AgenciesQuery
+            policy
+          end
+          allow(policy).to receive(:list_agencies?).and_return(true)
+          get :index
         end
-        allow(policy).to receive(:list_agencies?).and_return(true)
-        get :index
+        schema type: :array,
+          items: {
+            properties: {
+              id: { type: :integer },
+              title: { type: :string },
+              content: { type: :string }
+            },
+            required: [ 'id', 'title', 'content' ]
+          }
+
+        run_test!
       end
 
-      it "is successful" do
-        expect(response.status).to eq(200)
-      end
 
-      it "has and empty json response" do
-        expect(response.body).to eq("[]")
-      end
-    end
-
-    describe "GET #index, with a broker agency" do
-      let(:broker_agency) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile) }
-
-      before :each do
-        broker_agency
-        sign_in(user)
-        allow(AngularAdminApplicationPolicy).to receive(:new) do |u, resource|
-          expect(u).to eq user
-          expect(resource.class).to eq Queries::AgenciesQuery
-          policy
+        it "is successful" do
+          expect(response.status).to eq(200)
         end
-        allow(policy).to receive(:list_agencies?).and_return(true)
-        get :index
-      end
 
-      it "is successful" do
-        expect(response.status).to eq(200)
-      end
-
-      it "has and empty json response" do
-        expect(response.body).not_to eq("[]")
-      end
-    end
-
-    describe "GET #index, with a general agency" do
-      let(:org) { FactoryBot.build(:benefit_sponsors_organizations_exempt_organization) }
-      let(:general_agency) { FactoryBot.create(:benefit_sponsors_organizations_general_agency_profile, organization: org) }
-
-      before :each do
-        general_agency
-        sign_in(user)
-        allow(AngularAdminApplicationPolicy).to receive(:new) do |u, resource|
-          expect(u).to eq user
-          expect(resource.class).to eq Queries::AgenciesQuery
-          policy
+        it "has and empty json response" do
+          expect(response.body).to eq("[]")
         end
-        allow(policy).to receive(:list_agencies?).and_return(true)
-        get :index
       end
 
-      it "is successful" do
-        expect(response.status).to eq(200)
+      describe "GET #index, with a broker agency" do
+        let(:broker_agency) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile) }
+
+        before :each do
+          broker_agency
+          sign_in(user)
+          allow(AngularAdminApplicationPolicy).to receive(:new) do |u, resource|
+            expect(u).to eq user
+            expect(resource.class).to eq Queries::AgenciesQuery
+            policy
+          end
+          allow(policy).to receive(:list_agencies?).and_return(true)
+          get :index
+        end
+
+        it "is successful" do
+          expect(response.status).to eq(200)
+        end
+
+        it "has and empty json response" do
+          expect(response.body).not_to eq("[]")
+        end
       end
 
-      it "has and empty json response" do
-        expect(response.body).not_to eq("[]")
+      describe "GET #index, with a general agency" do
+        let(:org) { FactoryBot.build(:benefit_sponsors_organizations_exempt_organization) }
+        let(:general_agency) { FactoryBot.create(:benefit_sponsors_organizations_general_agency_profile, organization: org) }
+
+        before :each do
+          general_agency
+          sign_in(user)
+          allow(AngularAdminApplicationPolicy).to receive(:new) do |u, resource|
+            expect(u).to eq user
+            expect(resource.class).to eq Queries::AgenciesQuery
+            policy
+          end
+          allow(policy).to receive(:list_agencies?).and_return(true)
+          get :index
+        end
+
+        it "is successful" do
+          expect(response.status).to eq(200)
+        end
+
+        it "has and empty json response" do
+          expect(response.body).not_to eq("[]")
+        end
       end
     end
 

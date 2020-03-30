@@ -141,6 +141,7 @@ group :development, :test do
   gem 'railroady',              '~> 1.5.3'
   gem 'rspec-rails'
   gem 'rspec_junit_formatter'
+  gem 'rswag'
   gem 'yard',                   '~> 0.9.12',  require: false
   gem 'yard-mongoid',           '~> 0.1',     require: false
   gem 'rails-controller-testing'
