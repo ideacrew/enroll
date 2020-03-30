@@ -676,7 +676,7 @@ class Family
     if family_members_with_person_id.count > 1
       fm_ids = family_members_with_person_id.pluck(:id)
       if duplicate_enr_members_or_tax_members_present?(fm_ids)
-        return [false, "Cannot remove the duplicate members as they are present on enrollments/tax households"]
+        return [false, "Cannot remove the duplicate members as they are present on enrollments/tax households. Please call customer service at 1-855-532-5465"]
       else
         status, messages = remove_duplicate_members(fm_ids)
         self.reload
