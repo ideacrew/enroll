@@ -36,6 +36,7 @@ jobs:
     - name: rspec
       run: bundle exec rake "parallel:spec[4]"
     - uses: actions/upload-artifact@v1
+      if: failure()
       with:
         name: upload parallel timings
         path: tmp/parallel_runtime_rspec.log
