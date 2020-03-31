@@ -29,6 +29,7 @@ RSpec.describe BrokerAgencies::ProfilesHelper, dbclean: :after_each, :type => :h
         expect(helper.can_show_destroy?(user, person, 1)).to be_falsey
       end
     end
+
     context "with broker role" do
       it 'should return true if current user is logged in' do
         allow(person).to receive(:broker_role).and_return true
@@ -45,16 +46,24 @@ RSpec.describe BrokerAgencies::ProfilesHelper, dbclean: :after_each, :type => :h
         expect(helper.can_show_destroy?(user, person2, 2)).to be_falsey
       end
     end
+  end
+
+  describe 'can_show_destroy_for_ga?' do
+    context "total general agency staff count" do
+      it "should return false if single staff member remains" do
+        expect(helper.can_show_destroy_for_ga?(user, person, 1)).to be_falsey
+      end
+    end
 
     context "with general agency staff" do
-      it 'should return true if staff has ga staff role' do
+      it 'should return false if staff has primary ga staff role' do
         allow(person).to receive(:general_agency_primary_staff).and_return true
-        expect(helper.can_show_destroy?(user, person, 2)).to eq true
+        expect(helper.can_show_destroy_for_ga?(user, person, 2)).to be_falsey
       end
 
-      it 'should return false if staff has broker role' do
+      it 'should return true if staff DOES NOT HAVE has primary ga staff role' do
         allow(person).to receive(:general_agency_primary_staff).and_return false
-        expect(helper.can_show_destroy?(user, person2, 2)).to be_falsey
+        expect(helper.can_show_destroy_for_ga?(user, person2, 2)).to be_truthy
       end
     end
   end

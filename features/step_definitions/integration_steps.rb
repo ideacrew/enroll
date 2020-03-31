@@ -801,6 +801,7 @@ When(/^.+ clicks? on Confirm button on the coverage summary page$/) do
 end
 
 Then(/^.+ should see the receipt page$/) do
+  find('h1.darkblue', wait: 10)
   expect(page).to have_content('Enrollment Submitted')
   screenshot("receipt_page")
   find('.interaction-click-control-continue').click
@@ -920,6 +921,7 @@ end
 
 When(/^I click on "(.*?)" button on household info page$/) do |select_action|
   click_link "Continue"
+  sleep 5
   click_button "Shop for new plan"
 end
 

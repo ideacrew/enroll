@@ -17,6 +17,10 @@ describe SbcProcessor2015, dbclean: :around_each do
     sbc_document: product.sbc_document
   )}
 
+  before :all do
+    DatabaseCleaner.clean
+  end
+
   context "should initialize " do
 
     before(:each) do
