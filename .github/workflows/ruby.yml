@@ -35,6 +35,10 @@ jobs:
         ./bin/webpack
     - name: rspec
       run: bundle exec rake "parallel:spec[4]"
+    - uses: actions/upload-artifact@v1
+      with:
+        name: upload parallel timings
+        path: tmp/parallel_runtime_rspec.log
     - name: cat order
       if: failure()
       run: for log in order*.log; do echo $log; cat $log; done
