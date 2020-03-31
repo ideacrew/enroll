@@ -46,7 +46,7 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
     when :ok
       render json: { status: "success" }, status: :ok
     when :person_not_found
-      render json: { status: "error", message: "Person could not be found." }, status: :bad_request
+      render json: { status: "error", message: "Terminate staff failed: Person could not be found." }, status: :bad_request
     when :no_role_found
       render json: { status: "error", message: "Unable to find role" }, status: :unprocessable_entity
     else
