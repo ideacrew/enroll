@@ -67,7 +67,7 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
     when :matching_record_found
       render json: { status: "error", message: "Update staff failed: Given details match with another record." }, status: :conflict
     when :invalid_dob
-      render json: { status: "error", message: "Updating Staff Failed. Invalid Dob" }, status: :unprocessable_entity
+      render json: { status: "error", message: "Update staff failed: Date of birth is invalid." }, status: :bad_request
     else
       render json: { status: "error", message: "Update staff failed: Unknown error." }, status: :internal_server_error
     end
