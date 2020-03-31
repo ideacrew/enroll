@@ -218,16 +218,14 @@ module BenefitSponsors
 
     scope :may_transmit_renewal_enrollment?, lambda { |compare_date = TimeKeeper.date_of_record, transition_at = nil|
       if transition_at.blank?
-        where(:benefit_applications => {:$elemMatch => {:predecessor_id => { :$exists => true },
+        where(:benefit_applications => {:$elemMatch => {:predecessor_id => { :$exists => true, :$ne => nil },
                                                         :"effective_period.min" => compare_date,
-                                                        :aasm_state.in => BenefitSponsors::BenefitApplications::BenefitApplication::RENEWAL_TRANSMISSION_STATES}},
-              :aasm_state => :active)
+                                                        :aasm_state.in => BenefitSponsors::BenefitApplications::BenefitApplication::RENEWAL_TRANSMISSION_STATES}})
       else
-        where(:benefit_applications => {:$elemMatch => {:predecessor_id => { :$exists => true }, :"effective_period.min" => compare_date,
+        where(:benefit_applications => {:$elemMatch => {:predecessor_id => { :$exists => true, :$ne => nil }, :"effective_period.min" => compare_date,
                                                         :aasm_state.in => [:enrollment_eligible, :active],
                                                         :workflow_state_transitions => {"$elemMatch" => {"to_state" => :enrollment_eligible, "transition_at" => { "$gte" => TimeKeeper.start_of_exchange_day_from_utc(transition_at),
-                                                                                                                                                                  "$lt" => TimeKeeper.end_of_exchange_day_from_utc(transition_at)}}}}},
-              :aasm_state => :active)
+                                                                                                                                                                  "$lt" => TimeKeeper.end_of_exchange_day_from_utc(transition_at)}}}}})
       end
     }
 

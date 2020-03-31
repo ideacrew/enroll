@@ -864,7 +864,8 @@ module BenefitSponsors
           )
         end
 
-        it "should fetch only valid renewal applications" do 
+        it "should fetch only valid renewal applications" do
+          april_wrong_sponsorship_renewal_sponsors.each {|bs| bs.renewal_benefit_application.update_attributes(predecessor_id: nil)}
           applications = subject.may_transmit_renewal_enrollment?(april_effective_date)
 
           expect(applications & april_renewal_sponsors).to eq april_renewal_sponsors
