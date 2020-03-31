@@ -255,6 +255,7 @@ module BenefitSponsors
     index({ hbx_id: 1 })
     index({ aasm_state: 1 })
     index({ profile_id: 1 })
+    index({ created_at: 1 })
 
     index({"benefit_application._id" => 1})
     index({"benefit_application.predecessor_id" => 1})

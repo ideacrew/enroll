@@ -9,6 +9,8 @@ module Effective
 
       datatable do
 
+        table_column :created_at, visible: false, filter: false
+
         bulk_actions_column(partial: 'datatables/employers/bulk_actions_column') do
           bulk_action 'Generate Invoice', generate_invoice_exchanges_hbx_profiles_path, data: { confirm: 'Generate Invoices?', no_turbolink: true }
           bulk_action 'Mark Binder Paid', binder_paid_exchanges_hbx_profiles_path, data: {  confirm: 'Mark Binder Paid?', no_turbolink: true }
@@ -22,8 +24,8 @@ module Effective
         table_column :fein, :label => 'FEIN', :proc => Proc.new { |row| row.organization.fein }, :sortable => false, :filter => false
         table_column :hbx_id, :label => 'HBX ID', :proc => Proc.new { |row| row.organization.hbx_id }, :sortable => false, :filter => false
         table_column :broker, :proc => Proc.new { |row|
-            @employer_profile.try(:active_broker_agency_legal_name).try(:titleize) #if row.employer_profile.broker_agency_profile.present?
-          }, :filter => false
+          @employer_profile.try(:active_broker_agency_legal_name).try(:titleize) #if row.employer_profile.broker_agency_profile.present?
+        }, :filter => false, sortable: false
 
         # TODO: Make this based on settings. MA does not use, but others might.
         # table_column :general_agency, :proc => Proc.new { |row|
@@ -130,7 +132,7 @@ module Effective
       def collection
         return @employer_collection if defined? @employer_collection
 
-        benefit_sponsorships ||= BenefitSponsors::BenefitSponsorships::BenefitSponsorship.all
+        benefit_sponsorships ||= BenefitSponsors::BenefitSponsorships::BenefitSponsorship.unscoped
 
         if attributes[:employers].present? && !['all'].include?(attributes[:employers])
           benefit_sponsorships = benefit_sponsorships.send(attributes[:employers]) if employer_kinds.include?(attributes[:employers])
