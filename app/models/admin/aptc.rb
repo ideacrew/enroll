@@ -7,6 +7,7 @@ class Admin::Aptc < ApplicationController
   $months_array = Date::ABBR_MONTHNAMES.compact
 
   class << self
+    include FloatHelper
 
     def build_household_level_aptc_csr_data(year, family, hbxs=nil, max_aptc=nil, csr_percentage=nil, applied_aptc_array=nil,  member_ids=nil)
       max_aptc_vals             = build_max_aptc_values(year, family, max_aptc, hbxs)
@@ -213,7 +214,7 @@ class Admin::Aptc < ApplicationController
       benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
       #eligibility_determinations = family.active_household.latest_active_tax_household.eligibility_determinations
       #date = Date.new(year, 1, 1)
-      benefit_coverage_period = benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}
+      benefit_coverage_period = benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.date_of_record)}
       slcsp = benefit_coverage_period.second_lowest_cost_silver_plan
       if member_ids.present?
         aptc_members = family.active_household.latest_active_tax_household.tax_household_members.select {|m| member_ids.include?(m.person.id.to_s) }
@@ -222,7 +223,7 @@ class Admin::Aptc < ApplicationController
       end
       cost = aptc_members.map do |member|
         product = ::BenefitMarkets::Products::ProductFactory.new({product_id: slcsp.id})
-        product.cost_for(TimeKeeper.datetime_of_record, member.age_on_effective_date)
+        product.cost_for(TimeKeeper.date_of_record, member.age_on_effective_date)
       end.inject(:+) || 0
       return '%.2f' % cost
     end
@@ -302,22 +303,21 @@ class Admin::Aptc < ApplicationController
     def update_aptc_applied_for_enrollments(family, params, year)
       current_datetime = TimeKeeper.datetime_of_record
       enrollment_update_result = false
-      # For every HbxEnrollment, if Applied APTC was updated, clone a new enrtollment with the new Applied APTC and make the current one inactive.
-      #family = Family.find(params[:person][:family_id])
-      max_aptc = family.active_household.latest_active_tax_household_with_year(year).latest_eligibility_determination.max_aptc.to_f
-      active_aptc_hbxs = family.active_household.hbx_enrollments_with_aptc_by_year(params[:year].to_i)
 
+      # For every HbxEnrollment, if Applied APTC was updated, clone a new enrtollment with the new Applied APTC and make the current one inactive.
       params.each do |key, aptc_value|
         if key.include?('aptc_applied_')
+          max_aptc = family.active_household.latest_active_tax_household_with_year(year).latest_eligibility_determination.max_aptc.to_f
+
           # TODO enrollment duplication has to be refactored once Ram promotes reusable module to create HbxEnrollment copy
           hbx_id = key.sub("aptc_applied_", "")
-          updated_aptc_value = aptc_value.to_f
-          actual_aptc_value = HbxEnrollment.find(hbx_id).applied_aptc_amount.to_f
+          original_hbx = HbxEnrollment.find(hbx_id)
+          updated_aptc_value = aptc_to_apply(original_hbx, aptc_value.to_f)
+          actual_aptc_value = original_hbx.applied_aptc_amount.to_f
           # Only create enrollments if the APTC values were updated.
           if actual_aptc_value != updated_aptc_value # TODO: check if the effective_on doesnt go to next year?????
             percent_sum_for_all_enrolles = 0.0
             enrollment_update_result = true
-            original_hbx = HbxEnrollment.find(hbx_id)
             aptc_ratio_by_member = family.active_household.latest_active_tax_household.aptc_ratio_by_member
 
             # Duplicate Enrollment
@@ -360,7 +360,6 @@ class Admin::Aptc < ApplicationController
             duplicate_hbx.reload
             duplicate_hbx.select_coverage!
 
-
             # Cancel or Terminate Coverage.
             if original_hbx.may_terminate_coverage? && (duplicate_hbx.effective_on > original_hbx.effective_on)
               original_hbx.terminate_coverage!
@@ -377,7 +376,8 @@ class Admin::Aptc < ApplicationController
 
     # 15th of the month rule
     def find_enrollment_effective_on_date(hbx_created_datetime)
-      offset_month = hbx_created_datetime.day <= 15 ? 1 : 2
+      # offset_month = hbx_created_datetime.day <= 15 ? 1 : 2
+      offset_month = hbx_created_datetime.day <= HbxProfile::IndividualEnrollmentDueDayOfMonth ? 1 : 2
       year = hbx_created_datetime.year
       month = hbx_created_datetime.month + offset_month
       # Based on the 15th of the month rule, if the effective date happpens to be after the policy's life (next year),
@@ -445,7 +445,7 @@ class Admin::Aptc < ApplicationController
     def years_with_tax_household(family)
       year_set = family.active_household.tax_households.map(&:effective_starting_on).map(&:year)
       current_hbx = HbxProfile.current_hbx
-      oe_start_year = Settings.aca.individual_market.open_enrollment.start_on.year
+      oe_start_year = Settings.aca.individual_market.open_enrollment.start_on.to_date.year
       current_year = TimeKeeper.date_of_record.year
 
       if current_hbx && current_hbx.under_open_enrollment? && oe_start_year == current_year
@@ -453,6 +453,18 @@ class Admin::Aptc < ApplicationController
       end
 
       year_set.uniq
+    end
+
+    private
+
+    def aptc_to_apply(original_hbx, aptc_value)
+      ehb_value = original_hbx.product.ehb
+
+      total_ehb_premium = original_hbx.hbx_enrollment_members.reduce(0.00) do |sum, member|
+        (sum + round_down_float_two_decimals(original_hbx.premium_for(member) * ehb_value))
+      end
+
+      aptc_value < total_ehb_premium ? aptc_value : total_ehb_premium
     end
 
   end #  end of class << self

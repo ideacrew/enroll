@@ -15,7 +15,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerFinalRemainderToPub
     :aasm_state => 'draft',
     :effective_period =>  start_on..(start_on + 1.year) - 1.day
   )}
-  let!(:date_mock_object) { double("Date", day: Settings.aca.shop_market.initial_application.publish_due_day_of_month - 2)}
+  let!(:date_mock_object) { Date.new(start_on.year, start_on.prev_month.month, (Settings.aca.shop_market.initial_application.publish_due_day_of_month - 2))}
 
   describe "ModelEvent" do
     it "should trigger model event" do

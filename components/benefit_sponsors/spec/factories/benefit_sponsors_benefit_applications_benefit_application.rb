@@ -98,7 +98,7 @@ FactoryBot.define do
           (evaluator.predecessor_application_catalog ? :with_benefit_sponsor_catalog : :without_benefit_sponsor_catalog),
           :with_benefit_package,
           benefit_sponsorship: benefit_application.benefit_sponsorship,
-          effective_period: (benefit_application.effective_period.begin - 1.year)..(benefit_application.effective_period.end - 1.year),
+          effective_period: (benefit_application.effective_period.begin - 1.year)..((benefit_application.effective_period.end - 1.year).end_of_month),
           open_enrollment_period: (benefit_application.open_enrollment_period.begin - 1.year)..(benefit_application.open_enrollment_period.end - 1.year),
           dental_sponsored_benefit: evaluator.dental_sponsored_benefit,
           aasm_state: evaluator.predecessor_application_state,

@@ -262,6 +262,15 @@ class HbxEnrollment
   )
 
   index(
+    {
+      "family_id"  => 1,
+      "aasm_state" => 1,
+      "product_id" => 1
+    },
+    {name: "family_home_page_hidden_enrollments_lookup"}
+  )
+
+  index(
       {
           "benefit_group_id" => 1,
           "coverage_kind" => 1
@@ -326,12 +335,11 @@ class HbxEnrollment
   scope :canceled, -> { where(:aasm_state.in => CANCELED_STATUSES) }
   scope :family_home_page_hidden_enrollments, ->(family) do
     where(
-      family_id: family.id,
-      :product_id.nin => [nil],
-      aasm_state: "coverage_canceled"
+      :family_id => family.id,
+      :aasm_state => "coverage_canceled",
+      :product_id.nin => [nil]
     ).order(
-      effective_on: :desc,
-      submitted_at: :desc, coverage_kind: :desc
+      effective_on: :desc, submitted_at: :desc, coverage_kind: :desc
     )
   end
   #scope :terminated, -> { where(:aasm_state.in => TERMINATED_STATUSES, :terminated_on.gte => TimeKeeper.date_of_record.beginning_of_day) }
@@ -421,6 +429,10 @@ class HbxEnrollment
   after_save :check_created_at
   after_save :notify_on_save
 
+  # def max_aptc
+  #   family&.active_household&.latest_active_tax_household_with_year(effective_on.year)&.total_aptc_available_amount_for_enrollment(self)
+  # end
+
   # This method checks to see if there is at least one subscriber in the hbx_enrollment_members nested document.
   # If not, it assigns it to the oldest person.
   def check_for_subscriber
@@ -462,6 +474,12 @@ class HbxEnrollment
       enrollment
     rescue Exception => e
     end
+  end
+
+  def has_at_least_one_aptc_eligible_member?(year)
+    tax_households = family.active_household.tax_households.tax_household_with_year(year)
+    return false if tax_households.blank?
+    tax_households.first.tax_household_members.any?(&:is_ia_eligible?)
   end
 
   class << self
@@ -587,9 +605,28 @@ class HbxEnrollment
     end
   end
 
+  PREDECESSOR_ID_INTRODUCTION_DATE = Date.new(2017,8,1)
+
   def parent_enrollment
-    return nil if predecessor_enrollment_id.blank?
-    HbxEnrollment.find(predecessor_enrollment_id)
+    return HbxEnrollment.find(predecessor_enrollment_id) if predecessor_enrollment_id.present?
+    return nil if effective_on >= PREDECESSOR_ID_INTRODUCTION_DATE
+    return nil if created_at.present? && created_at >= PREDECESSOR_ID_INTRODUCTION_DATE
+    return nil if is_shop? && (effective_on == sponsored_benefit_package.start_on)
+    search_for_predecessor
+  end
+
+  def search_for_predecessor
+    possible_enrollments = family.hbx_enrollments.where({effective_on: {"$lt" => effective_on},
+                                                         sponsored_benefit_package_id: sponsored_benefit_package_id,
+                                                         coverage_kind: coverage_kind,
+                                                         kind: kind,
+                                                         external_enrollment: {'$ne' => true},
+                                                         product_id: {"$ne" => nil},
+                                                         employee_role_id: employee_role_id,
+                                                         aasm_state: {"$nin": ["shopping", "coverage_canceled", "void", "inactive", "renewing_waived"]}})
+    possible_enrollments.select do |pe|
+      pe.terminated_on && (pe.terminated_on == (effective_on - 1.day))
+    end.first
   end
 
   def census_employee
@@ -756,17 +793,21 @@ class HbxEnrollment
 
     # waive only renewal enrollments if waives coverage after clicking "make changes" on renewing coverage
     aasm_state = parent_enrollment.aasm_state if parent_enrollment
-    enrollments = if (RENEWAL_STATUSES + WAIVED_STATUSES).include?(aasm_state)
+    enrollments = if WAIVED_STATUSES.include?(aasm_state)
                     parent_enrollment.to_a
                   elsif is_open_enrollment? && renewing_enrollments.present?
                     update(predecessor_enrollment_id: renewing_enrollments.first.id)
-                    renewing_enrollments
+                    (renewing_enrollments + terminating_enrollments).uniq
                   else
                     terminating_enrollments
                   end
 
     enrollments.each do |enrollment|
-      coverage_end_date = family.terminate_date_for_shop_by_enrollment(enrollment)
+      coverage_end_date = if benefit_application.is_renewing? && benefit_application.start_on == effective_on && predecessor_benefit_application.effective_period.cover?(enrollment.effective_on)
+                            enrollment.sponsored_benefit_package.end_on
+                          else
+                            family.terminate_date_for_shop_by_enrollment(enrollment)
+                          end
       term_or_cancel_enrollment(enrollment, coverage_end_date)
     end
   end
@@ -809,12 +850,20 @@ class HbxEnrollment
   def term_or_cancel_enrollment(enrollment, coverage_end_date, term_reason = nil)
     if enrollment.effective_on >= coverage_end_date
       enrollment.cancel_coverage! if enrollment.may_cancel_coverage? # cancel coverage if enrollment is future effective
-    elsif coverage_end_date >= TimeKeeper.date_of_record
+    elsif coverage_end_date >= TimeKeeper.date_of_record && enrollment.is_shop?
       enrollment.schedule_coverage_termination!(coverage_end_date) if enrollment.may_schedule_coverage_termination?
     elsif enrollment.may_terminate_coverage?
       enrollment.terminate_coverage!(coverage_end_date)
     end
     enrollment.update(terminate_reason: term_reason, termination_submitted_on: TimeKeeper.datetime_of_record) if term_reason.present?
+  end
+
+  def should_term_or_cancel_ivl
+    if self.effective_on > TimeKeeper.date_of_record
+      'cancel'
+    elsif (self.effective_on <= TimeKeeper.date_of_record || self.may_terminate_coverage?)
+      'terminate'
+    end
   end
 
   def waiver_enrollment_present?
@@ -841,7 +890,8 @@ class HbxEnrollment
   end
 
   def terminate_coverage_with(termination_date)
-    if termination_date >= TimeKeeper.datetime_of_record
+    # IVL enrollments go automatically to coverage_terminated
+    if termination_date >= TimeKeeper.datetime_of_record && is_shop?
       schedule_coverage_termination!(termination_date) if may_schedule_coverage_termination?
     else
       if may_terminate_coverage?
@@ -896,19 +946,25 @@ class HbxEnrollment
     return unless enrollment_benefit_application.successors.include?(successor_application)
 
     passive_renewals_under(successor_application).each{|en| en.cancel_coverage! if en.may_cancel_coverage? }
-    renew_benefit(successor_benefit_package) if active_renewals_under(successor_application).blank? && successor_application.coverage_renewable? && non_inactive_transition?
+    renew_benefit(successor_benefit_package) if active_renewals_under(successor_application).blank? && successor_application.coverage_renewable? && non_inactive_transition? && non_terminated_enrollment?
   end
 
   def non_inactive_transition?
     !(aasm.from_state == :inactive && aasm.to_state == :inactive)
   end
 
+  def non_terminated_enrollment?
+    ['coverage_terminated', 'coverage_termination_pending'].exclude?(aasm_state)
+  end
+
   def renewal_enrollments(successor_application)
-    HbxEnrollment.where({:sponsored_benefit_package_id.in => successor_application.benefit_packages.pluck(:_id),
-                         :coverage_kind => coverage_kind,
-                         :kind => kind,
-                         :family_id => family_id,
-                         :effective_on => successor_application.start_on})
+    HbxEnrollment.where({
+      :sponsored_benefit_package_id.in => successor_application.benefit_packages.pluck(:_id),
+      :coverage_kind => coverage_kind,
+      :kind => kind,
+      :family_id => family_id,
+      :effective_on => successor_application.start_on
+    })
   end
 
   def active_renewals_under(successor_application)
@@ -1020,7 +1076,7 @@ class HbxEnrollment
 
   def <=>(other)
     other_members = other.hbx_enrollment_members # - other.terminated_members
-    [plan.hios_id, effective_on, hbx_enrollment_members.sort_by{|x| x.hbx_id}] <=> [other.plan.hios_id, other.effective_on, other_members.sort_by{|x| x.hbx_id}]
+    [product.hios_id, effective_on, hbx_enrollment_members.sort_by(&:hbx_id)] <=> [other.product.hios_id, other.effective_on, other_members.sort_by(&:hbx_id)]
   end
 
   # This performs employee summary count for waived and enrolled in the latest plan year
@@ -1251,6 +1307,15 @@ class HbxEnrollment
     end
   end
 
+  def display_make_changes_for_ivl?
+    return true if is_shop?
+
+    benefit_sponsorship = HbxProfile.current_hbx.try(:benefit_sponsorship)
+    benefit_coverage_period = benefit_sponsorship.current_benefit_period
+    is_ivl_by_kind? && (family.latest_ivl_sep&.start_on&.year == effective_on.year ||
+      (family.is_under_ivl_open_enrollment? && effective_on >= benefit_coverage_period.start_on))
+  end
+
   def build_plan_premium(qhp_plan: nil, elected_aptc: false, tax_household: nil, apply_aptc: nil)
     qhp_plan ||= product
 
@@ -1314,6 +1379,11 @@ class HbxEnrollment
     if self.consumer_role.present? && self.consumer_role_id == pre_hbx.consumer_role_id
       pre_hbx.update_attributes!(is_active: false, changing: false)
     end
+  end
+
+  def self.family_canceled_enrollments(family)
+    canceled_enrollments = HbxEnrollment.family_home_page_hidden_enrollments(family)
+    canceled_enrollments.reject{|enrollment| enrollment.is_shop? && enrollment.sponsored_benefit_id.blank? }
   end
 
   # TODO: Fix this to properly respect mulitiple possible employee roles for the same employer
@@ -1565,7 +1635,7 @@ class HbxEnrollment
 
   def self.all_enrollments_under_benefit_application(benefit_application)
     id_list = benefit_application.benefit_packages.collect(&:_id).uniq
-    benefit_application.enrolled_families.inject([]) do |enrollments, family|
+    benefit_application.active_and_cobra_enrolled_families.inject([]) do |enrollments, family|
       enrollments += family.active_household.hbx_enrollments.where(:sponsored_benefit_package_id.in => id_list).enrolled_waived_and_renewing.to_a
     end
   end
@@ -1792,12 +1862,11 @@ class HbxEnrollment
   def ivl_decorated_hbx_enrollment(enrollment_product = nil)
     return @cost_decorator if @cost_decorator
     enrollment_product ||= product
-
     if enrollment_product.present? && (resident_role.present? || consumer_role.present?)
       @cost_decorator = UnassistedPlanCostDecorator.new(enrollment_product, self)
     else
       log("#3835 hbx_enrollment without benefit_group and consumer_role. hbx_enrollment_id: #{id}, plan: #{product}", {:severity => 'error'})
-      @cost_decorator = OpenStruct.new(:total_premium => 0.00, :total_employer_contribution => 0.00, :total_employee_cost => 0.00)
+      @cost_decorator = OpenStruct.new(:total_premium => 0.00, :total_employer_contribution => 0.00, :total_employee_cost => 0.00, :total_ehb_premium => 0.00)
     end
   end
 

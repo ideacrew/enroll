@@ -11,10 +11,12 @@
           <td style="padding-bottom: 5px;"><%= sub_heading.html_safe %></td>
         </tr>
       <% end %>
-      <% contents.each do |para| %>
-        <tr>
-          <td style="padding-bottom: <%= bottom_margin if defined? bottom_margin %>;"><%= para.html_safe %></td>
-        </tr>
+      <% if contents.present? %>
+        <% contents.each do |para| %>
+          <tr>
+            <td style="padding-bottom: <%= bottom_margin if defined? bottom_margin %>;"><%= para.html_safe %></td>
+          </tr>
+        <% end %>
       <% end %>
     </tbody>
   </table>

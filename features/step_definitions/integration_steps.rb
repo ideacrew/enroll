@@ -453,7 +453,7 @@ Then(/^(?:.+) should be logged on as an unlinked employee$/) do
 end
 
 When (/^(.*) logs? out$/) do |someone|
-  find_link('Logout', wait: 1)
+  find_link('Logout', wait: 5)
   click_link "Logout"
   visit "/"
   find('.container.welcome', wait: 5) do |element|
@@ -603,6 +603,7 @@ When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
   fill_in "person[phones_attributes][0][full_phone_number]", :with => phone_number
   screenshot("personal_info_complete")
   expect(page).to have_field("HOME PHONE", with: phone_number) if person[:home_phone].present?
+  expect(page).to have_selector('.selectric', text: Settings.aca.shop_market.employee.default_contact_method)
   find('.interaction-click-control-continue', text: 'CONTINUE', wait: 5).click
 end
 
@@ -800,6 +801,7 @@ When(/^.+ clicks? on Confirm button on the coverage summary page$/) do
 end
 
 Then(/^.+ should see the receipt page$/) do
+  find('h1.darkblue', wait: 10)
   expect(page).to have_content('Enrollment Submitted')
   screenshot("receipt_page")
   find('.interaction-click-control-continue').click
@@ -919,6 +921,7 @@ end
 
 When(/^I click on "(.*?)" button on household info page$/) do |select_action|
   click_link "Continue"
+  sleep 5
   click_button "Shop for new plan"
 end
 

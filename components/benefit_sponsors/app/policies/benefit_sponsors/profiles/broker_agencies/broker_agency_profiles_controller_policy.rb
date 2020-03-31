@@ -20,11 +20,12 @@ module BenefitSponsors
         end
 
         def redirect_signup?
-          user.present?
+          return false if user.blank?
+          self.send(:family_index?)
         end
 
         def staff_index?
-          self.send(:index?)
+          user.has_hbx_staff_role? || user.has_csr_role? || user.has_consumer_role?
         end
       end
     end

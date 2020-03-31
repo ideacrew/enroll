@@ -7,6 +7,7 @@ class TaxHousehold
   include HasFamilyMembers
   include Acapi::Notifiers
   include Mongoid::Autoinc
+  include ApplicationHelper
 
   # A set of applicants, grouped according to IRS and ACA rules, who are considered a single unit
   # when determining eligibility for Insurance Assistance and Medicaid
@@ -149,28 +150,28 @@ class TaxHousehold
   end
 
   # Pass hbx_enrollment and get the total amount of APTC available by hbx_enrollment_members
-  def total_aptc_available_amount_for_enrollment(hbx_enrollment)
+  def total_aptc_available_amount_for_enrollment(hbx_enrollment, excluding_enrollment = nil)
     return 0 if hbx_enrollment.blank?
     return 0 if is_all_non_aptc?(hbx_enrollment)
     total = family.active_family_members.reduce(0) do |sum, member|
-      sum + (aptc_available_amount_by_member[member.id.to_s] || 0)
+      sum + (aptc_available_amount_by_member(excluding_enrollment)[member.id.to_s] || 0)
     end
     family_members = unwanted_family_members(hbx_enrollment)
     unchecked_aptc_fms = find_aptc_family_members(family_members)
-    deduction_amount = total_benchmark_amount(unchecked_aptc_fms) if unchecked_aptc_fms
+    deduction_amount = total_benchmark_amount(unchecked_aptc_fms, hbx_enrollment) if unchecked_aptc_fms
     total = total - deduction_amount
-    (total < 0.00) ? 0.00 : total
+    (total < 0.00) ? 0.00 : float_fix(total)
   end
 
-  def total_benchmark_amount(family_members)
+  def total_benchmark_amount(family_members, hbx_enrollment)
     total_sum = 0
     family_members.each do |family_member|
-      total_sum += family_member.aptc_benchmark_amount
+      total_sum += family_member.aptc_benchmark_amount(hbx_enrollment)
     end
     total_sum
   end
 
-  def aptc_available_amount_by_member
+  def aptc_available_amount_by_member(excluding_enrollment_id = nil)
     # Find HbxEnrollments for aptc_members in the current plan year where they have used aptc
     # subtract from available amount
     aptc_available_amount_hash = {}
@@ -178,7 +179,9 @@ class TaxHousehold
       aptc_available_amount_hash[member_id] = current_max_aptc.to_f * ratio
     end
     # FIXME should get hbx_enrollments by effective_starting_on
-    household.hbx_enrollments_with_aptc_by_year(effective_starting_on.year).map(&:hbx_enrollment_members).flatten.each do |enrollment_member|
+    enrollments = household.hbx_enrollments_with_aptc_by_year(effective_starting_on.year)
+    enrollments = enrollments.where(:id.ne => BSON::ObjectId.from_string(excluding_enrollment_id)) if excluding_enrollment_id
+    enrollments.map(&:hbx_enrollment_members).flatten.each do |enrollment_member|
       applicant_id = enrollment_member.applicant_id.to_s
       if aptc_available_amount_hash.has_key?(applicant_id)
         aptc_available_amount_hash[applicant_id] -= (enrollment_member.applied_aptc_amount || 0).try(:to_f)

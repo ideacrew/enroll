@@ -328,7 +328,7 @@ module BenefitSponsors
       def effectuate_member_benefits
         activate_benefit_group_assignments if predecessor_application.present?
 
-        enrolled_families.each do |family|
+        enrolled_families.no_timeout.each do |family|
           enrollments = HbxEnrollment.by_benefit_package(self).where(family_id: family.id).show_enrollments_sans_canceled
 
           sponsored_benefits.each do |sponsored_benefit|
@@ -339,7 +339,7 @@ module BenefitSponsors
       end
 
       def expire_member_benefits
-        enrolled_families.each do |family|
+        enrolled_families.no_timeout.each do |family|
           enrollments = HbxEnrollment.by_benefit_package(self).where(family_id: family.id).enrolled_and_waived
 
           sponsored_benefits.each do |sponsored_benefit|
@@ -350,6 +350,7 @@ module BenefitSponsors
       end
  
       def terminate_member_benefits(term_date: nil, enroll_term_reason: nil, enroll_notify: false)
+        terminate_benefit_group_assignments
         enrolled_and_terminated_families.each do |family|
           enrollments = family.hbx_enrollments.enrolled_waived_terminated_and_expired.by_benefit_package(self)
           enrollments.each do |hbx_enrollment|
@@ -372,7 +373,8 @@ module BenefitSponsors
       end
 
       def termination_pending_member_benefits(term_date: nil, enroll_term_reason: nil, enroll_notify: false)
-        enrolled_families.each do |family|
+        terminate_benefit_group_assignments
+        enrolled_families.no_timeout.each do |family|
           enrollments = family.hbx_enrollments.enrolled_waived_terminated_and_expired.by_benefit_package(self)
           enrollments.each do |hbx_enrollment|
             if hbx_enrollment.effective_on > enrollment_term_date(term_date)
@@ -394,7 +396,7 @@ module BenefitSponsors
       def cancel_member_benefits(delete_benefit_package: false, enroll_notify: false)
         deactivate_benefit_group_assignments
 
-        enrolled_families.each do |family|
+        enrolled_families.no_timeout.each do |family|
           enrollments = HbxEnrollment.by_benefit_package(self).where(family_id: family.id).show_enrollments_sans_canceled
           enrollments.each do |hbx_enrollment|
             if hbx_enrollment.may_cancel_coverage?
@@ -495,6 +497,15 @@ module BenefitSponsors
           benefit_group_assignments = ce.benefit_group_assignments.where(benefit_package_id: self.id)
           benefit_group_assignments.each do |benefit_group_assignment|
             benefit_group_assignment.update(is_active: false) unless is_renewing?
+          end
+        end
+      end
+
+      def terminate_benefit_group_assignments
+        benefit_application.benefit_sponsorship.census_employees.each do |ce|
+          benefit_group_assignments = ce.benefit_group_assignments.where(benefit_package_id: id)
+          benefit_group_assignments.each do |benefit_group_assignment|
+            benefit_group_assignment.update(end_on: end_on) if benefit_group_assignment&.end_on != end_on
           end
         end
       end

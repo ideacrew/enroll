@@ -20,7 +20,7 @@ class EmployeeRole
   field :terminated_on, type: Date
   field :is_active, type: Boolean, default: true
   field :bookmark_url, type: String, default: nil
-  field :contact_method, type: String, default: "Paper and Electronic communications"
+  field :contact_method, type: String, default: Settings.aca.shop_market.employee.default_contact_method
   field :language_preference, type: String, default: "English"
 
   track_history :on => [:fields],
@@ -184,6 +184,11 @@ class EmployeeRole
   def is_under_open_enrollment?
     return employer_profile.show_plan_year.present? && employer_profile.show_plan_year.open_enrollment_contains?(TimeKeeper.date_of_record) if is_case_old?
     employer_profile.published_benefit_application.present? && employer_profile.published_benefit_application.open_enrollment_contains?(TimeKeeper.date_of_record)
+  end
+
+  def benefit_begin_date
+    return employer_profile.show_plan_year.start_on if is_case_old?
+    employer_profile.published_benefit_application.start_on
   end
 
   def is_eligible_to_enroll_without_qle?

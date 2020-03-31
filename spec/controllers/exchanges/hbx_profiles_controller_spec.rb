@@ -703,6 +703,8 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
 
   describe "POST update_dob_ssn", :dbclean => :after_each do
+    render_views
+
     include_context 'setup benefit market with market catalogs and product packages'
     include_context 'setup initial benefit application'
 
@@ -719,8 +721,22 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     let(:valid_ssn) { "234-45-8390" }
     let(:valid_dob) { "03/17/1987" }
     let(:valid_dob2) {'1987-03-17'}
-    let(:employee_role) { FactoryBot.build(:benefit_sponsors_employee_role, person: person, employer_profile: abc_profile, census_employee_id: census_employee.id, benefit_sponsors_employer_profile_id: abc_profile.id)}
-    let(:census_employee)  { FactoryBot.create(:benefit_sponsors_census_employee, employer_profile: abc_profile) }
+    let(:employer_profile) { abc_profile }
+    let(:organization) { abc_organization }
+    let(:hired_on) {TimeKeeper.date_of_record.beginning_of_month}
+
+    let!(:census_employees) {
+      FactoryBot.create :benefit_sponsors_census_employee, :owner, employer_profile: employer_profile, benefit_sponsorship: organization.active_benefit_sponsorship
+      FactoryBot.create :benefit_sponsors_census_employee, employer_profile: employer_profile, hired_on: hired_on, benefit_sponsorship: organization.active_benefit_sponsorship
+    }
+
+    let(:ce) {employer_profile.census_employees.non_business_owner.first}
+
+    let(:employee_role) {
+      employee_person = FactoryBot.create(:person, last_name: ce.last_name, first_name: ce.first_name, ssn: valid_ssn, no_ssn: false)
+      FactoryBot.create(:benefit_sponsors_employee_role, person: employee_person, census_employee: ce, employer_profile: employer_profile)
+    }
+
 
     before do
       allow(employee_role.census_employee).to receive(:employer_profile).and_return(abc_profile)
@@ -778,6 +794,47 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       sign_in(user)
       get :update_dob_ssn, xhr: true
       expect(response).not_to have_http_status(:success)
+    end
+
+
+    it "should set instance variable dont_update_ssn to true if employer has ssn/tin functionality enabled" do
+      allow(hbx_staff_role).to receive(:permission).and_return permission_yes
+      sign_in(user)
+      expect(response).to have_http_status(:success)
+      @params = {:person => {:pid => employee_role.person.id, :ssn => "", :dob => valid_dob2}, :jq_datepicker_ignore_person => {:dob => valid_dob}, :format => 'js'}
+      get :update_dob_ssn, xhr:  true, params:  @params
+      expect(assigns(:dont_update_ssn)). to eq true
+    end
+
+    it "cannot update ssn for employee if employer has ssn/tin functionality enabled" do
+      allow(hbx_staff_role).to receive(:permission).and_return permission_yes
+      sign_in(user)
+      expect(response).to have_http_status(:success)
+      @params = {:person => {:pid => employee_role.person.id, :ssn => "", :dob => valid_dob2}, :jq_datepicker_ignore_person => {:dob => valid_dob}, :format => 'js'}
+      get :update_dob_ssn, xhr:  true, params:  @params
+      expect(response).to render_template("update_enrollment")
+      expect(response.body).to have_content((/SSN cannot be removed from this person as they are linked to at least one employer roster that requires and SSN/))
+    end
+
+    it "should set instance variable dont_update_ssn to nil if employer has ssn/tin functionality disabled" do
+      allow(hbx_staff_role).to receive(:permission).and_return permission_yes
+      employer_profile.active_benefit_sponsorship.update_attributes!(is_no_ssn_enabled: true)
+      sign_in(user)
+      expect(response).to have_http_status(:success)
+      @params = {:person => {:pid => employee_role.person.id, :ssn => "", :dob => valid_dob2}, :jq_datepicker_ignore_person => {:dob => valid_dob}, :format => 'js'}
+      get :update_dob_ssn, xhr:  true, params:  @params
+      expect(assigns(:dont_update_ssn)). to eq nil
+    end
+
+    it "can update ssn for employee if employer has ssn/tin functionality disabled" do
+      allow(hbx_staff_role).to receive(:permission).and_return permission_yes
+      employer_profile.active_benefit_sponsorship.update_attributes!(is_no_ssn_enabled: true)
+      sign_in(user)
+      expect(response).to have_http_status(:success)
+      @params = {:person => {:pid => employee_role.person.id, :ssn => "", :dob => valid_dob2}, :jq_datepicker_ignore_person => {:dob => valid_dob}, :format => 'js'}
+      get :update_dob_ssn, xhr:  true, params:  @params
+      expect(response).to render_template("update_enrollment")
+      expect(response.body).to have_content(("DOB / SSN Update Successful"))
     end
 
   end
@@ -1080,13 +1137,17 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     let(:user) { double("User", :has_hbx_staff_role? => true)}
     let(:person) { double("Person", id: double)}
     let(:family_id) { double("Family_ID")}
-    let(:employer_id) { double("Employer_ID") }
+    let(:employer_id) { "employer_id_1234" }
     let(:organization) { double("Organization")}
+    let(:employer_profile) { double }
 
     before do
       sign_in user
       allow(Person).to receive(:find).with("#{person.id}").and_return person
-      allow(EmployerProfile).to receive(:find).and_return(double(organization: organization))
+      allow( BenefitSponsors::Organizations::Profile).to receive(:find).with(
+        "1234"
+      ).and_return(employer_profile)
+      allow(employer_profile).to receive(:organization).and_return(organization)
     end
 
     context "when action called through families datatable" do
@@ -1107,8 +1168,11 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     context "when action called through employers datatable" do
 
       before do
-        allow(Organization).to receive(:find).and_return organization
-        get :get_user_info, params: {employers_action_id: employer_id, people_id: [person.id]}, xhr: true
+        allow( BenefitSponsors::Organizations::Profile).to receive(:find).with(
+          "1234"
+        ).and_return(employer_profile)
+        allow(employer_profile).to receive(:organization).and_return(organization)
+        get :get_user_info, params: {employer_actions_id: employer_id, people_id: [person.id]}, xhr: true
       end
 
       it "should not populate the person instance variable" do

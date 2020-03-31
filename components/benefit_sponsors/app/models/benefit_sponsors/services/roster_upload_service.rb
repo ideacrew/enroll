@@ -62,7 +62,7 @@ module BenefitSponsors
           row = Hash[[columns, sheet.row(id)].transpose]
           result << Forms::CensusRecordForm.new(
             employer_assigned_family_id: parse_text(row["employer_assigned_family_id"]),
-            employee_relationship: parse_relationship(row["employee_relationship"]),
+            employee_relationship: parse_relationship(row["employee_relationship"], parse_date(row["dob"])),
             last_name: parse_text(row["last_name"]),
             first_name: parse_text(row["first_name"]),
             middle_name: parse_text(row["middle_name"]),
@@ -148,7 +148,7 @@ module BenefitSponsors
         if @terminate_queue.present?
           return false if self.errors.present?
           @terminate_queue.each do |row, employee_termination_map|
-            employee_termination_map.employee.terminate_employment(employee_termination_map.employment_terminated_on)
+            employee_termination_map.employee.terminate_employment(Date.strptime(employee_termination_map.employment_terminated_on, '%m/%d/%Y'))
           end
         end
         true
@@ -300,8 +300,9 @@ module BenefitSponsors
         census_employee.may_terminate_employee_role?
       end
 
-      def parse_relationship(cell)
+      def parse_relationship(cell, dob)
         return nil if cell.blank?
+        age = Date.today.year - dob.year
         case parse_text(cell).downcase
           when "employee"
             "self"
@@ -310,7 +311,11 @@ module BenefitSponsors
           when "domestic partner"
             "domestic_partner"
           when "child"
-            "child_under_26"
+            if age <= 26
+              "child_under_26"
+            else
+              "child_26_and_over"
+            end
           when "disabled child"
             "disabled_child_26_and_over"
           else

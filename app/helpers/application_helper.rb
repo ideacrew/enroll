@@ -1,4 +1,5 @@
 module ApplicationHelper
+  include FloatHelper
 
   def can_employee_shop?(date)
     return false if date.blank?
@@ -58,24 +59,21 @@ module ApplicationHelper
     (a_tab == current_tab) ? raw(" class=\"active\"") : ""
   end
 
-  def current_cost(plan_cost, ehb=0, hbx_enrollment=nil, source=nil, can_use_aptc=true)
+  #Purchased enrollment family premium (family home page - view details button on the enrollment)
+  def current_cost(hbx_enrollment = nil, source = nil)
     # source is account or shopping
-    if source == 'account' && hbx_enrollment.present? && hbx_enrollment.try(:applied_aptc_amount).to_f > 0
-      if hbx_enrollment.coverage_kind == 'health'
-        return (hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f)
-      else
-        return hbx_enrollment.total_premium
-      end
-    end
+    return unless source == 'account' && hbx_enrollment.present? && hbx_enrollment.coverage_kind == 'health'
 
-    if session['elected_aptc'].present? && session['max_aptc'].present? && can_use_aptc
-      aptc_amount = session['elected_aptc'].to_f
-      ehb_premium = plan_cost * ehb
-      cost = plan_cost - [ehb_premium, aptc_amount].min
-      cost > 0 ? cost : 0
-    else
-      plan_cost
-    end
+    (hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f)
+  end
+
+  #Shopping enrollment family premium (plan shopping page)
+  def shopping_group_premium(plan_cost, plan_ehb_cost, can_use_aptc=true)
+    return plan_cost unless session['elected_aptc'].present? && session['max_aptc'].present? && can_use_aptc
+
+    aptc_amount = session['elected_aptc'].to_f
+    cost = float_fix(plan_cost - [plan_ehb_cost, aptc_amount].min)
+    cost > 0 ? cost.round(2) : 0
   end
 
   def datepicker_control(f, field_name, options = {}, value = "")
@@ -547,10 +545,19 @@ module ApplicationHelper
     end
   end
 
+  def is_plan_year_eligible_for_flexible_rules?(plan_year)
+    !plan_year.is_renewing? && flexible_contribution_model_enabled_for_period.cover?(plan_year.start_on)
+  end
+
   def calculate_participation_minimum
     if @current_plan_year.present?
-      return 0 if @current_plan_year.eligible_to_enroll_count == 0
-      return (@current_plan_year.eligible_to_enroll_count * Settings.aca.shop_market.employee_participation_ratio_minimum).ceil
+      if @current_plan_year.eligible_to_enroll_count == 0
+        0
+      elsif is_plan_year_eligible_for_flexible_rules?(@current_plan_year)
+        flexible_employer_participation_ratio_minimum
+      else
+        (@current_plan_year.eligible_to_enroll_count * Settings.aca.shop_market.employee_participation_ratio_minimum).ceil
+      end
     end
   end
 

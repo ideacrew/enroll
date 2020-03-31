@@ -104,8 +104,8 @@ module Queries
     end
 
     def quiet_period
-      # quiet period check not needed for renewal application(quiet period: OE close to 26th of month) just for initial(quiet period: OE close to 8th of next month)
-      # transmission date 26th of month
+      # quiet period check not needed for renewal application(quiet period: OE close to 11th of month) just for initial(quiet period: OE close to 28th of next month)
+      # transmission date 16th of month
       quiet_period_start = Date.new( @effective_on.prev_month.year,  @effective_on.prev_month.month, Settings.aca.shop_market.open_enrollment.monthly_end_on + 1)
       quiet_period_end =  @effective_on + (Settings.aca.shop_market.initial_application.quiet_period.month_offset.months) + (Settings.aca.shop_market.initial_application.quiet_period.mday - 1).days
       TimeKeeper.start_of_exchange_day_from_utc(quiet_period_start)..TimeKeeper.end_of_exchange_day_from_utc(quiet_period_end)
@@ -124,7 +124,7 @@ module Queries
     def quiet_period_coverage_expression
       {
         "sponsored_benefit_id" => { "$in" => collect_benefit_group_ids },
-        "kind" => "employer_sponsored",
+        "kind" => {"$in" => ["employer_sponsored", "employer_sponsored_cobra"]},
         "workflow_state_transitions" => { 
           "$elemMatch" => quiet_period_expression 
         }
@@ -135,7 +135,7 @@ module Queries
       {
           "effective_on" => {"$gt" => @effective_on},
           "sponsored_benefit_id" => { "$in" => collect_benefit_group_ids },
-          "kind" => "employer_sponsored",
+          "kind" => {"$in" => ["employer_sponsored", "employer_sponsored_cobra"]},
           "submitted_at" => {"$lt" => quiet_period.begin}
       }
     end
@@ -224,7 +224,7 @@ module Queries
       @feins.collect{|e| prepend_zeros(e.to_s, 9) }.inject([]) do |id_list, fein|
         benefit_sponsorship = BenefitSponsors::Organizations::Organization.where(fein: fein).try(:first).try(:active_benefit_sponsorship)
         if benefit_sponsorship.present?
-          benefit_application = benefit_sponsorship.benefit_applications.where(:predecessor_id => nil, :"effective_period.min" => effective_on || @effective_on , :aasm_state => :active).first
+          benefit_application = benefit_sponsorship.benefit_applications.where(:predecessor_id => nil, :"effective_period.min" => effective_on || @effective_on, :aasm_state.in => [:binder_paid, :active]).first
         end
 
         if benefit_application.blank?

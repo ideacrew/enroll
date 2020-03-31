@@ -43,17 +43,20 @@ class Exchanges::BrokerApplicantsController < ApplicationController
       broker_role.deny!
       flash[:notice] = "Broker applicant denied."
     elsif params['update']
-      all_carrier_appointment = "BrokerRole::#{Settings.site.key.upcase}_BROKER_CARRIER_APPOINTMENTS".constantize.stringify_keys
-      permitted_params = params[:person][:broker_role_attributes][:carrier_appointments].permit!
-      all_carrier_appointment.merge!(permitted_params) if permitted_params
-      params[:person][:broker_role_attributes][:carrier_appointments]= all_carrier_appointment
-      broker_role.update(params.require(:person).require(:broker_role_attributes).permit!.except(:id))
+      if broker_role.update!(broker_role_update_params)
+        flash[:notice] = "Broker applicant successfully updated."
+      else
+        flash[:error] = "Unable to update broker applicant."
+      end
     elsif params['decertify']
       broker_role.decertify!
       flash[:notice] = "Broker applicant decertified."
     elsif params['recertify']
       broker_role.recertify!
       flash[:notice] = "Broker applicant is now approved."
+    elsif params['extend']
+      broker_role.extend_application!
+      flash[:notice] = "Broker applicant is now extended."
     elsif params['pending']
       broker_carrier_appointments
       broker_role.update(params.require(:person).require(:broker_role_attributes).permit!.except(:id))
@@ -81,6 +84,12 @@ class Exchanges::BrokerApplicantsController < ApplicationController
   end
 
   private
+
+  def broker_role_update_params
+    # Only assign if nil
+    params[:person][:broker_role_attributes][:carrier_appointments] ||= {}
+    params[:person][:broker_role_attributes].permit(:license, :training, :carrier_appointments => {})
+  end
 
   def broker_carrier_appointments
     all_carrier_appointment = "BrokerRole::#{Settings.site.key.upcase}_BROKER_CARRIER_APPOINTMENTS".constantize.stringify_keys

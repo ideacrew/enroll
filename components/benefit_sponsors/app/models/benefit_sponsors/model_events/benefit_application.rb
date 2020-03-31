@@ -144,9 +144,9 @@ module BenefitSponsors
             is_initial_employer_no_binder_payment_received = true
           end
 
-          if new_date.day == Settings.aca.shop_market.initial_application.advertised_deadline_of_month - 2 # 2 days prior to advertised deadline(1st) of month
+          if (new_date + 2.days).day == Settings.aca.shop_market.initial_application.advertised_deadline_of_month # 2 days prior to advertised deadline(1st) of month
             is_initial_employer_first_reminder_to_publish_plan_year = true
-          elsif new_date.day == Settings.aca.shop_market.initial_application.advertised_deadline_of_month - 1 # 1 day prior to advertised deadline(1st) of month
+          elsif (new_date + 1.day).day == Settings.aca.shop_market.initial_application.advertised_deadline_of_month # 1 day prior to advertised deadline(1st) of month
             is_initial_employer_second_reminder_to_publish_plan_year = true
           elsif new_date.day == Settings.aca.shop_market.initial_application.publish_due_day_of_month - 2 # 2 days prior to publish due day(5th) of month
             is_initial_employer_final_reminder_to_publish_plan_year = true

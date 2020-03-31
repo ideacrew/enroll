@@ -177,6 +177,14 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
   describe "#view_market_places" do
     let(:person) { FactoryBot.create(:person) }
 
+    it 'returns shop, individual and coverall if all 3 are true' do
+      allow(person).to receive(:is_consumer_role_active?).and_return(true)
+      allow(person).to receive(:has_employer_benefits?).and_return(true)
+      allow(person).to receive(:is_resident_role_active?).and_return(true)
+
+      expect(helper.view_market_places(person)).to eq(['shop', 'individual', 'coverall'])
+    end
+
     it "should return shop & individual if can_shop_both_markets? return true" do
       allow(person).to receive(:is_consumer_role_active?).and_return(true)
       allow(person).to receive(:has_employer_benefits?).and_return(true)
@@ -191,6 +199,25 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
 
     it "should return coverall if can_shop_resident? return true" do
       allow(person).to receive(:is_resident_role_active?).and_return(true)
+      expect(helper.view_market_places(person)).to eq ["coverall"]
+    end
+
+    it "should return individual & coverall if can_shop_individual_or_resident? return true" do
+      allow(person).to receive(:is_consumer_role_active?).and_return(true)
+      allow(person).to receive(:has_active_resident_member?).and_return(true)
+      expect(helper.view_market_places(person)).to eq ["individual", "coverall"]
+    end
+
+    it "should return individual if can_shop_individual_or_resident? return false" do
+      allow(person).to receive(:is_consumer_role_active?).and_return(true)
+      allow(person).to receive(:has_active_resident_member?).and_return(false)
+      expect(helper.view_market_places(person)).to eq ["individual"]
+    end
+
+    it "should return coverall if can_shop_individual_or_resident? return false" do
+      allow(person).to receive(:is_consumer_role_active?).and_return(false)
+      allow(person).to receive(:is_resident_role_active?).and_return(true)
+      allow(person).to receive(:has_active_resident_member?).and_return(false)
       expect(helper.view_market_places(person)).to eq ["coverall"]
     end
   end

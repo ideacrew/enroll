@@ -7,7 +7,9 @@ module BenefitSponsors
     let!(:previous_service_area) { create_default(:benefit_markets_locations_service_area, active_year: Date.current.year - 1) }
     let!(:rating_area) { create_default(:benefit_markets_locations_rating_area) }
     let!(:service_area) { create_default(:benefit_markets_locations_service_area) }
-
+    let!(:next_rating_area) { create_default(:benefit_markets_locations_rating_area, active_year: Date.current.year + 1) }
+    let!(:next_service_area) { create_default(:benefit_markets_locations_service_area, active_year: Date.current.year + 1) }
+  
     let(:site) { ::BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_benefit_market }
     let(:benefit_market)  { site.benefit_markets.first }
 
@@ -777,6 +779,57 @@ module BenefitSponsors
           expect(applications & april_wrong_sponsorship_initial_sponsors).to be_empty
         end
 
+        context 'initial_enrollment and sponsorship with active state' do
+
+          let(:initial_application_state) { :active }
+          let(:sponsorship_state) { :active }
+
+          let!(:april_ineligible_initial_sponsors) do
+            create_list(:benefit_sponsors_benefit_sponsorship, 2, :with_organization_cca_profile, :with_initial_benefit_application,
+                        initial_application_state: :enrollment_ineligible,
+                        default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)),
+                        site: site, aasm_state: sponsorship_state)
+
+          end
+
+          let!(:april_wrong_sponsorship_initial_sponsors) do
+            create_list(:benefit_sponsors_benefit_sponsorship, 2, :with_organization_cca_profile, :with_initial_benefit_application,
+                        initial_application_state: :enrollment_ineligible,
+                        default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)),
+                        site: site, aasm_state: :initial_enrollment_ineligible)
+
+          end
+
+          it "should fetch only valid initial applications" do
+            applications = subject.may_transmit_initial_enrollment?(april_effective_date)
+
+            expect(applications & april_sponsors).to eq april_sponsors
+            expect(applications & april_ineligible_initial_sponsors).to be_empty
+            expect(applications & april_wrong_sponsorship_initial_sponsors).to be_empty
+          end
+        end
+
+        context 'initial_enrollment with matching workflow state transition ' do
+          let!(:april_eligible_benefit_sponsorhip_1)  { april_sponsors[0]}
+          let!(:april_eligible_benefit_sponsorhip_2)  { april_sponsors[1]}
+          let(:transition_at) {TimeKeeper.start_of_exchange_day_from_utc(TimeKeeper.date_of_record)}
+          let(:transition_at_2) {TimeKeeper.start_of_exchange_day_from_utc(TimeKeeper.date_of_record - 1.day)}
+          let!(:create_workflow_state_transition) do
+            april_eligible_benefit_sponsorhip_1.benefit_applications.first.workflow_state_transitions.create(from_state: :enrollment_closed, to_state: :binder_paid, transition_at: transition_at)
+            april_eligible_benefit_sponsorhip_2.benefit_applications.first.workflow_state_transitions.create(from_state: :enrollment_closed, to_state: :binder_paid, transition_at: transition_at_2)
+          end
+
+          it "should fetch only valid initial applications with matching transition state and time" do
+            applications = subject.may_transmit_initial_enrollment?(april_effective_date, transition_at)
+            expect(applications & april_sponsors).to eq [april_eligible_benefit_sponsorhip_1]
+          end
+
+          it "should fetch only valid initial applications with matching transition state and time" do
+            applications = subject.may_transmit_initial_enrollment?(april_effective_date, transition_at_2)
+            expect(applications & april_sponsors).to eq [april_eligible_benefit_sponsorhip_2]
+          end
+        end
+
       end
 
       context '.may_transmit_renewal_enrollment?' do
@@ -817,6 +870,31 @@ module BenefitSponsors
           expect(applications & april_renewal_sponsors).to eq april_renewal_sponsors
           expect(applications & april_ineligible_renewal_sponsors).to eq april_ineligible_renewal_sponsors
           expect(applications & april_wrong_sponsorship_renewal_sponsors).to be_empty
+        end
+
+        context 'renewal_enrollment with matching workflow state transition' do
+          let!(:april_renewal_eligible_benefit_sponsorhip_1)  { april_renewal_sponsors[0]}
+          let!(:april_renewal_eligible_benefit_sponsorhip_2)  { april_renewal_sponsors[1]}
+
+          let!(:april_renewal_app_1)  { april_renewal_eligible_benefit_sponsorhip_1.benefit_applications.where(aasm_state: :enrollment_eligible).first}
+          let!(:april_renewal_app_2)  { april_renewal_eligible_benefit_sponsorhip_2.benefit_applications.where(aasm_state: :enrollment_eligible).first}
+          let(:transition_at) {TimeKeeper.start_of_exchange_day_from_utc(TimeKeeper.date_of_record)}
+          let(:transition_at_2) {TimeKeeper.start_of_exchange_day_from_utc(TimeKeeper.date_of_record - 1.day)}
+
+          let!(:create_workflow_state_transition) do
+            april_renewal_app_1.workflow_state_transitions.create(from_state: :enrollment_closed, to_state: :enrollment_eligible, transition_at: transition_at)
+            april_renewal_app_2.workflow_state_transitions.create(from_state: :enrollment_closed, to_state: :enrollment_eligible, transition_at: transition_at_2)
+          end
+
+          it "should fetch only valid renewal applications with matching transition state and time" do
+            applications = subject.may_transmit_renewal_enrollment?(april_effective_date, TimeKeeper.date_of_record)
+            expect(applications & april_renewal_sponsors).to eq [april_renewal_eligible_benefit_sponsorhip_1]
+          end
+
+          it "should fetch only valid renewal applications with matching transition state and time" do
+            applications = subject.may_transmit_renewal_enrollment?(april_effective_date, transition_at_2)
+            expect(applications & april_renewal_sponsors).to eq [april_renewal_eligible_benefit_sponsorhip_2]
+          end
         end
       end
 
@@ -916,6 +994,8 @@ module BenefitSponsors
 
       let(:this_year)                       { TimeKeeper.date_of_record.year }
       let(:april_effective_date)            { Date.new(this_year,4,1) }
+      let(:april_open_enrollment_begin_on)  { april_effective_date - 1.month }
+      let(:april_open_enrollment_end_on)    { april_open_enrollment_begin_on + 9.days }
 
       let!(:april_sponsor) do
         create(
@@ -1015,9 +1095,9 @@ module BenefitSponsors
 
       context '.oe_extended_applications' do
 
-        before { 
-          allow(april_sponsor).to receive(:open_enrollment_period_for).and_return(april_effective_date - 20.days..april_effective_date - 10.days)
-          TimeKeeper.set_date_of_record_unprotected!(current_date)
+        before {
+          allow(april_sponsor).to receive(:open_enrollment_period_for).and_return(april_open_enrollment_begin_on..april_open_enrollment_end_on)
+          TimeKeeper.set_date_of_record_unprotected!(april_open_enrollment_end_on + 1.day)
         }
 
         context "when open enrollment extended application present" do
@@ -1029,7 +1109,7 @@ module BenefitSponsors
 
             it "should not return application for close of open enrollment" do
               expect(april_sponsor.oe_extended_applications).to be_empty
-            end 
+            end
           end
 
           context "and monthly open enrollment end date reached" do
@@ -1038,7 +1118,7 @@ module BenefitSponsors
 
             it "should not return application for close of open enrollment" do
               expect(april_sponsor.oe_extended_applications).to be_empty
-            end 
+            end
           end
 
           context "and monthly open enrollment end date passed" do
@@ -1047,7 +1127,15 @@ module BenefitSponsors
 
             it "should not return application for close of open enrollment" do
               expect(april_sponsor.oe_extended_applications).to be_empty
-            end 
+            end
+          end
+
+          context "and monthly open enrollment end date passed for initial application" do
+            let(:current_date)  { april_sponsor.open_enrollment_period_for(april_effective_date).max + 2.days }
+
+            it "should return initial application for close of open enrollment" do
+              expect(april_sponsor.oe_extended_applications.present?).to eq true
+            end
           end
         end
       end
