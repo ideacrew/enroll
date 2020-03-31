@@ -84,7 +84,7 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
     when :email_not_found
       render json: { status: "error", message: "Updating Staff Failed. Email not found" }, status: :unprocessable_entity
     else
-      render json: { status: "error", message: "Unexpected Error" }, status: :conflict
+      render json: { status: "error", message: "Update staff failed: Unknown error." }, status: :internal_server_error
     end
   end
 
