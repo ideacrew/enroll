@@ -61,7 +61,7 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
     when :ok
       render json: { status: "success" }, status: :ok
     when :person_not_found
-      render json: { status: "error", message: "Updating Staff Failed. Person Not Found" }, status: :bad_request
+      render json: { status: "error", message: "Update staff failed: Person not found." }, status: :bad_request
     when :information_missing
       render json: { status: "error", message: "Updating Staff Failed. Required properties missing" }, status: :bad_request
     when :matching_record_found
