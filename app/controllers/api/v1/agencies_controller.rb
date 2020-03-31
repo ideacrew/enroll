@@ -34,7 +34,7 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
     authorize query, :view_agency_staff_details?
     render json: query.person.to_json(
       :only => [:_id, :first_name, :last_name, :hbx_id, :dob],
-      :methods => [:agency_roles, :agent_emails]
+      :methods => [:agency_roles, :agent_emails, :has_active_enrollment]
     )
   end
 
