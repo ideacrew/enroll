@@ -78,7 +78,7 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
     authorize operation, :update_staff?
     case operation.update_email
     when :ok
-      render json: { status: "success", message: 'Succesfully updated!!' }, status: :ok
+      render json: { status: "success" }, status: :ok
     when :person_not_found
       render json: { status: "error", message: "Update staff failed: Person not found." }, status: :bad_request
     when :email_not_found
