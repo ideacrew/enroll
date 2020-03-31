@@ -210,56 +210,6 @@ class Household
     end
   end
 
-  def latest_active_thh
-    return tax_households.first if tax_households.length == 1
-    tax_households.active_tax_household.order_by(:'created_at'.desc).first
-  end
-
-  def latest_active_thh_with_year(year)
-    tax_households.tax_household_with_year(year).active_tax_household.order_by(:'created_at'.desc).first
-  end
-
-  def active_thh_with_year(year)
-    tax_households.tax_household_with_year(year).active_tax_household
-  end
-
-  def build_thh_and_eligibility(max_aptc, csr, date, slcsp)
-    th = tax_households.build(
-        allocated_aptc: 0.0,
-        effective_starting_on: Date.new(date.year, date.month, date.day),
-        is_eligibility_determined: true,
-        submitted_at: Date.today
-    )
-
-    th.tax_household_members.build(
-        family_member: family.primary_family_member,
-        is_subscriber: true,
-        is_ia_eligible: true,
-    )
-
-    deter = th.eligibility_determinations.build(
-        source: "Admin_Script",
-        benchmark_plan_id: slcsp,
-        max_aptc: max_aptc.to_f,
-        csr_percent_as_integer: csr.to_i,
-        determined_on: Date.today
-    )
-    deter.save!
-
-    end_multiple_thh
-
-    th.save!
-
-    family.dependents.each do |fm|
-      ath = latest_active_thh
-      ath.tax_household_members.build(
-          family_member: fm,
-          is_subscriber: false,
-          is_ia_eligible: true
-      )
-      ath.save!
-    end
-  end
 
   def latest_active_thh
     return tax_households.first if tax_households.length == 1
@@ -324,6 +274,15 @@ class Household
       acc + he.applicant_ids
     end
     (th_applicant_ids + ch_applicant_ids + hbxe_applicant_ids).distinct
+  end
+
+  def tax_household_applicant_ids
+    year = TimeKeeper.date_of_record.year
+    current_tax_household_applicants = latest_active_thh_with_year(year)&.applicant_ids || []
+
+    #need to consider during IVL OE
+    future_tax_household_applicants = latest_active_thh_with_year(year + 1)&.applicant_ids || []
+    (current_tax_household_applicants + future_tax_household_applicants).compact.uniq
   end
 
   # This will set the effective_ending_on of previously active household to 1 day
