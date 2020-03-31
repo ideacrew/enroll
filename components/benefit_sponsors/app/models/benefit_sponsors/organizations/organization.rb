@@ -109,6 +109,7 @@ module BenefitSponsors
 
 
       index({ legal_name: 1 })
+      index({ legal_name: 1, created_at: -1}, { :name => "default_dt_org_search_index" })
       index({ dba: 1 },   { sparse: true })
       index({ fein: 1 },  { unique: true, sparse: true })
       index({ :"profiles._id" => 1 })
