@@ -65,7 +65,7 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
     when :information_missing
       render json: { status: "error", message: "Update staff failed: Required properties missing." }, status: :bad_request
     when :matching_record_found
-      render json: { status: "error", message: "Updating Staff Failed. Given details matces with another record. Contact Admin" }, status: :unprocessable_entity
+      render json: { status: "error", message: "Update staff failed: Given details match with another record." }, status: :conflict
     when :invalid_dob
       render json: { status: "error", message: "Updating Staff Failed. Invalid Dob" }, status: :unprocessable_entity
     else
