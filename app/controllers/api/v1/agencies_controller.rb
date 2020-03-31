@@ -69,7 +69,7 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
     when :invalid_dob
       render json: { status: "error", message: "Updating Staff Failed. Invalid Dob" }, status: :unprocessable_entity
     else
-      render json: { status: "error", message: "Unexpected Error" }, status: :conflict
+      render json: { status: "error", message: "Update staff failed: Unknown error." }, status: :internal_server_error
     end
   end
 
