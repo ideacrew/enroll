@@ -50,7 +50,7 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
     when :no_role_found
       render json: { status: "error", message: "Terminate staff failed: Unable to find role." }, status: :bad_request
     else
-      render json: { status: "error" }, status: :conflict
+      render json: { status: "error", message: "Terminate staff failed: Unknown error." }, status: :internal_server_error
     end
   end
 
