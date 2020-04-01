@@ -14,7 +14,7 @@ describe 'daily_eligibility_determination_change_report' do
     @vlp_doc = @consumer_role.vlp_documents.first
     @vlp_doc.update_attributes!(subject: 'Other (With I-94)')
     invoke_fix_vlp_document_other_i94
-    @file_context = CSV.read("#{Rails.root}/other_i94_vlp_issue_people_with_consumer_aasm_state.csv")
+    @file_content = CSV.read("#{Rails.root}/other_i94_vlp_issue_people_with_consumer_aasm_state.csv")
   end
 
   it 'should update the vlp document subject' do
@@ -23,31 +23,31 @@ describe 'daily_eligibility_determination_change_report' do
   end
 
   it 'should add data to the file' do
-    expect(@file_context.size).to be > 1
+    expect(@file_content.size).to be > 1
   end
 
   it 'should match with the first name' do
-    expect(@file_context[1][0]).to eq(person.first_name)
+    expect(@file_content[1][0]).to eq(person.first_name)
   end
 
   it 'should match with the last name' do
-    expect(@file_context[1][1]).to eq(person.last_name)
+    expect(@file_content[1][1]).to eq(person.last_name)
   end
 
   it 'should match with the hbx id' do
-    expect(@file_context[1][2]).to eq(person.hbx_id)
+    expect(@file_content[1][2]).to eq(person.hbx_id)
   end
 
   it 'should match with the consumer_role aasm_state' do
-    expect(@file_context[1][3]).to eq(@consumer_role.aasm_state)
+    expect(@file_content[1][3]).to eq(@consumer_role.aasm_state)
   end
 
   it 'should match with the vlp_document id' do
-    expect(@file_context[1][4]).to eq(@vlp_doc.id.to_s)
+    expect(@file_content[1][4]).to eq(@vlp_doc.id.to_s)
   end
 
   after :each do
-    FileUtils.rm_rf("#{Rails.root}/daily_eligibility_report_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv")
+    FileUtils.rm_rf("#{Rails.root}/other_i94_vlp_issue_people_with_consumer_aasm_state.csv")
   end
 end
 
