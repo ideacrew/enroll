@@ -5,18 +5,19 @@ class RemoveAllDuplicateFamilyMembers < MongoidMigrationTask
     most_recent_active_enrollment_hbx_id = ENV['most_recent_active_enrollment_hbx_id'].to_s
     if most_recent_active_enrollment_hbx_id.blank?
       puts("Please supply the hbx_id of the most recent active HbxEnrollment for the family.") unless Rails.env.test?
-      return
+      false
     else
       hbx_enrollment = HbxEnrollment.by_hbx_id(most_recent_active_enrollment_hbx_id).first
     end
     if hbx_enrollment.blank?
       puts("HbxEnrollment with this hbx_id does not exist.") unless Rails.env.test?
-      return
+      false
     else
       @active_enrollment = hbx_enrollment
       @family = hbx_enrollment.family
       @person = hbx_enrollment.family.primary_person
       @authority_family_members_collection = authority_family_members_attached_to_most_recent_active_enrollment
+      true
     end
   end
 
@@ -103,20 +104,21 @@ class RemoveAllDuplicateFamilyMembers < MongoidMigrationTask
   end
 
   def migrate
-    initialize_instance_variables
-    destroy_unnecessary_shopping_enrollments
-    destroy_duplicate_family_members_unless_currently_enrolled
-    @family.reload
-    family_members = @family.family_members
-    # Coverage household members and tax household members are created just with family member ids, so all old ones
-    # can safely be destroyed
-    destroy_coverage_household_and_tax_household_members
-    family_members.each do |family_member|
-      create_coverage_household_member(family_member)
-      create_tax_household_member(family_member)
+    if initialize_instance_variables
+      destroy_unnecessary_shopping_enrollments
+      destroy_duplicate_family_members_unless_currently_enrolled
+      @family.reload
+      family_members = @family.family_members
+      # Coverage household members and tax household members are created just with family member ids, so all old ones
+      # can safely be destroyed
+      destroy_coverage_household_and_tax_household_members
+      family_members.each do |family_member|
+        create_coverage_household_member(family_member)
+        create_tax_household_member(family_member)
+      end
+      output_message
     end
-    output_message
-  rescue StandardError => e
-    puts(e.message) unless Rails.env.test?
+    rescue StandardError => e
+      puts(e.message) unless Rails.env.test?
   end
 end
