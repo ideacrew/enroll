@@ -3,7 +3,7 @@ name: Rspec and Cucumbers
 on: push
 
 jobs:
-  rspec:
+  rspec-1-of-4:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -29,17 +29,117 @@ jobs:
     - name: bundle install, yarn install
       run: |
         gem update --system
-        gem install bundler
+        gem install bundler -v '2.0.1'
         bundle install --jobs 4 --retry 3
         yarn install
         ./bin/webpack
     - name: rspec
-      run: bundle exec rake "parallel:spec[4]"
-    - uses: actions/upload-artifact@v1
+      run: parallel_rspec --only-group 1 -t rspec --runtime-log 'tmp/github-actions-parallel_runtime_rspec.log' spec
+    - name: cat order
       if: failure()
+      run: for log in order*.log; do echo $log; cat $log; done
+  rspec-2-of-4:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-18.04] #ubuntu-16.04
+        node: [10]
+        mongodb-version: ["4.2"]
+
+    steps:
+    - name: Launch MongoDB
+      uses: wbari/start-mongoDB@v0.2
       with:
-        name: upload parallel timings
-        path: tmp/parallel_runtime_rspec.log
+        mongoDBVersion: ${{ matrix.mongodb-version }}
+    - uses: actions/checkout@v2
+    - name: Set up Ruby 2.5.1
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 2.5.1
+    - name: Setup Node.js for use with actions
+      uses: actions/setup-node@v1.1.0
+      with:
+        # Version Spec of the version to use.  Examples: 10.x, 10.15.1, >=10.15.0, lts
+        version: 10.16.3
+    - name: bundle install, yarn install
+      run: |
+        gem update --system
+        gem install bundler -v '2.0.1'
+        bundle install --jobs 4 --retry 3
+        yarn install
+        ./bin/webpack
+    - name: rspec
+      run: parallel_rspec --only-group 2 -t rspec --runtime-log 'tmp/github-actions-parallel_runtime_rspec.log' spec
+    - name: cat order
+      if: failure()
+      run: for log in order*.log; do echo $log; cat $log; done
+  rspec-3-of-4:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-18.04] #ubuntu-16.04
+        node: [10]
+        mongodb-version: ["4.2"]
+
+    steps:
+    - name: Launch MongoDB
+      uses: wbari/start-mongoDB@v0.2
+      with:
+        mongoDBVersion: ${{ matrix.mongodb-version }}
+    - uses: actions/checkout@v2
+    - name: Set up Ruby 2.5.1
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 2.5.1
+    - name: Setup Node.js for use with actions
+      uses: actions/setup-node@v1.1.0
+      with:
+        # Version Spec of the version to use.  Examples: 10.x, 10.15.1, >=10.15.0, lts
+        version: 10.16.3
+    - name: bundle install, yarn install
+      run: |
+        gem update --system
+        gem install bundler -v '2.0.1'
+        bundle install --jobs 4 --retry 3
+        yarn install
+        ./bin/webpack
+    - name: rspec
+      run: parallel_rspec --only-group 3 -t rspec --runtime-log 'tmp/github-actions-parallel_runtime_rspec.log' spec
+    - name: cat order
+      if: failure()
+      run: for log in order*.log; do echo $log; cat $log; done
+  rspec-4-of-4:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-18.04] #ubuntu-16.04
+        node: [10]
+        mongodb-version: ["4.2"]
+
+    steps:
+    - name: Launch MongoDB
+      uses: wbari/start-mongoDB@v0.2
+      with:
+        mongoDBVersion: ${{ matrix.mongodb-version }}
+    - uses: actions/checkout@v2
+    - name: Set up Ruby 2.5.1
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 2.5.1
+    - name: Setup Node.js for use with actions
+      uses: actions/setup-node@v1.1.0
+      with:
+        # Version Spec of the version to use.  Examples: 10.x, 10.15.1, >=10.15.0, lts
+        version: 10.16.3
+    - name: bundle install, yarn install
+      run: |
+        gem update --system
+        gem install bundler -v '2.0.1'
+        bundle install --jobs 4 --retry 3
+        yarn install
+        ./bin/webpack
+    - name: rspec
+      run: parallel_rspec --only-group 4 -t rspec --runtime-log 'tmp/github-actions-parallel_runtime_rspec.log' spec
     - name: cat order
       if: failure()
       run: for log in order*.log; do echo $log; cat $log; done
