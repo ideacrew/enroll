@@ -85,6 +85,7 @@ private
   end
 
   def set_effective_on
+    puts "set_effective_on effective_on_kind #{effective_on_kind}"
     return unless self.start_on.present? && self.qualifying_life_event_kind.present?
 
     self.effective_on = case effective_on_kind

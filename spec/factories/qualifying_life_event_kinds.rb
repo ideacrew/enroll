@@ -29,7 +29,7 @@ FactoryBot.define do
     end
 
     trait :effective_on_event_date_and_first_month do
-      title { "Had a baby" }
+      title { "Losing coverage" }
       edi_code { "02-BIRTH" }
       effective_on_kinds { ["date_of_event", "first_of_next_month"] }
       tool_tip { "Enroll or add a family member due to birth" }

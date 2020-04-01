@@ -221,9 +221,16 @@ module Insured
     end
 
     def is_member_checked?(benefit_type, is_health_coverage, is_dental_coverage, is_ivl_coverage)
+      puts "is_member_checked?"
+      puts "benefit_type.present? #{benefit_type.present?}"
+      puts "benefit_type.present? && benefit_type != 'health' #{benefit_type.present? && benefit_type != "health"}"
+      puts "is_health_coverage.nil? ? is_ivl_coverage : is_health_coverage #{is_health_coverage.nil? ? is_ivl_coverage : is_health_coverage}"
+      puts "is_health_coverage #{is_health_coverage}"
+      puts "is_ivl_coverage #{is_ivl_coverage}"
       if benefit_type.present? && benefit_type != "health"
         is_dental_coverage.nil? ? is_ivl_coverage : is_dental_coverage
       else
+        puts "is_health_coverage.nil? #{is_health_coverage.nil?}"
         is_health_coverage.nil? ? is_ivl_coverage : is_health_coverage
       end
     end

@@ -278,6 +278,23 @@ When(/Employee select a past qle date/) do
   expect(page).to have_content "Married"
   screenshot("past_qle_date")
   date = [renewal_effective_date - 5.days, TimeKeeper.date_of_record - 5.days].min
+  puts "filling in with #{date.inspect}"
+  fill_in "qle_date", :with => date.strftime("%m/%d/%Y")
+  within '#qle-date-chose' do
+    find('.interaction-click-control-continue').click
+  end
+end
+
+Then(/Employee selects "First of next month" for their effective date/) do
+  select 'First of next month', from: 'effective_on_kind'
+  find(".interaction-click-control-continue").click
+end
+
+When(/Employee select a current qle date/) do
+  expect(page).to have_content "Married"
+  screenshot("past_qle_date")
+  date = [renewal_effective_date, TimeKeeper.date_of_record].min
+  puts "filling in with #{date.inspect}"
   fill_in "qle_date", :with => date.strftime("%m/%d/%Y")
   within '#qle-date-chose' do
     find('.interaction-click-control-continue').click

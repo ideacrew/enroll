@@ -398,6 +398,7 @@ class GroupSelectionPrevaricationAdapter
   end
 
   def get_benefit_group(benefit_group, employee_role, qle)
+    #binding.pry
     if benefit_group.present? && (employee_role.employer_profile == benefit_group.sponsor_profile)
       benefit_group
     else
