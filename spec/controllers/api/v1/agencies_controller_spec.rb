@@ -294,7 +294,7 @@ RSpec.describe Api::V1::AgenciesController, :type => :controller, :dbclean => :a
 
         it "fails to transition" do
           post :terminate, params: { person_id: person.id.to_s, role_id: broker_agency_staff_role.first.id.to_s }
-          expect(response.status).to eq(409)
+          expect(response.status).to eq(500)
         end
       end
     end
@@ -345,7 +345,7 @@ RSpec.describe Api::V1::AgenciesController, :type => :controller, :dbclean => :a
         end
 
         it "is successful" do
-          expect(response.status).to eq(422)
+          expect(response.status).to eq(409)
         end
 
         it "should not update person first name" do
