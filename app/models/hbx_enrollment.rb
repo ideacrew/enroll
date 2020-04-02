@@ -1874,8 +1874,9 @@ class HbxEnrollment
     if (enrollment_kind == "special_enrollment")
       return "unknown_sep" if special_enrollment_period.blank?
       qle_reason = special_enrollment_period.qualifying_life_event_kind.reason
-      qle_reason == 'covid-19' ? "unknown_sep" : qle_reason
+      return qle_reason == 'covid-19' ? "unknown_sep" : qle_reason
     end
+
     return "open_enrollment" if !is_shop?
     if is_shop? && is_cobra_status?
       if cobra_eligibility_date == effective_on
