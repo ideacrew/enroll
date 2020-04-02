@@ -1,5 +1,4 @@
 name: Rspec and Cucumbers
-
 on: push
 
 jobs:
@@ -9,7 +8,7 @@ jobs:
       matrix:
         os: [ubuntu-18.04] #ubuntu-16.04
         node: [10]
-        mongodb-version: ["4.2"]
+        mongodb-version: ["3.6"]
 
     steps:
     - name: Launch MongoDB
@@ -45,7 +44,7 @@ jobs:
       matrix:
         os: [ubuntu-18.04] #ubuntu-16.04
         node: [10]
-        mongodb-version: ["4.2"]
+        mongodb-version: ["3.6"]
 
     steps:
     - name: Launch MongoDB
@@ -81,7 +80,7 @@ jobs:
       matrix:
         os: [ubuntu-18.04] #ubuntu-16.04
         node: [10]
-        mongodb-version: ["4.2"]
+        mongodb-version: ["3.6"]
 
     steps:
     - name: Launch MongoDB
@@ -117,7 +116,7 @@ jobs:
       matrix:
         os: [ubuntu-18.04] #ubuntu-16.04
         node: [10]
-        mongodb-version: ["4.2"]
+        mongodb-version: ["3.6"]
 
     steps:
     - name: Launch MongoDB
@@ -153,7 +152,7 @@ jobs:
       matrix:
         os: [ubuntu-18.04] #ubuntu-16.04
         node: [10]
-        mongodb-version: ["4.2"]
+        mongodb-version: ["3.6"]
 
     steps:
     - name: Launch MongoDB
@@ -196,7 +195,7 @@ jobs:
       matrix:
         os: [ubuntu-18.04] #ubuntu-16.04
         node: [10]
-        mongodb-version: ["4.2"]
+        mongodb-version: ["3.6"]
 
     steps:
     - name: Launch MongoDB
@@ -223,12 +222,13 @@ jobs:
         gem update --system
         gem install bundler
         bundle install --jobs 4 --retry 3
+        gem install semaphore_test_boosters
         yarn install
         RAILS_ENV=test NODE_ENV=test rake webpacker:compile
     - name: cucumber-1-of-2
       run: |
         export DISPLAY=:99
-        if cucumber_booster --job 1/2
+        if cucumber_booster --job 1/2 features
         then
           echo "Cucumber passed the first time!"
           exit 0
@@ -254,7 +254,7 @@ jobs:
       matrix:
         os: [ubuntu-18.04] #ubuntu-16.04
         node: [10]
-        mongodb-version: ["4.2"]
+        mongodb-version: ["3.6"]
 
     steps:
     - name: Launch MongoDB
@@ -281,6 +281,7 @@ jobs:
         gem update --system
         gem install bundler
         bundle install --jobs 4 --retry 3
+        gem install semaphore_test_boosters
         yarn install
         RAILS_ENV=test NODE_ENV=test rake webpacker:compile
     - name: cucumber-2-of-2
