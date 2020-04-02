@@ -31,10 +31,11 @@ jobs:
         gem update --system
         gem install bundler -v '2.0.1'
         bundle install --jobs 4 --retry 3
+        gem install semaphore_test_boosters
         yarn install
         ./bin/webpack
     - name: rspec
-      run: parallel_rspec --only-group 1 -t rspec --runtime-log 'tmp/github-actions-parallel_runtime_rspec.log' spec
+      run: rspec_booster --job 1/4
     - name: cat order
       if: failure()
       run: for log in order*.log; do echo $log; cat $log; done
@@ -66,10 +67,11 @@ jobs:
         gem update --system
         gem install bundler -v '2.0.1'
         bundle install --jobs 4 --retry 3
+        gem install semaphore_test_boosters
         yarn install
         ./bin/webpack
     - name: rspec
-      run: parallel_rspec --only-group 2 -t rspec --runtime-log 'tmp/github-actions-parallel_runtime_rspec.log' spec
+      run: rspec_booster --job 2/4
     - name: cat order
       if: failure()
       run: for log in order*.log; do echo $log; cat $log; done
@@ -101,10 +103,11 @@ jobs:
         gem update --system
         gem install bundler -v '2.0.1'
         bundle install --jobs 4 --retry 3
+        gem install semaphore_test_boosters
         yarn install
         ./bin/webpack
     - name: rspec
-      run: parallel_rspec --only-group 3 -t rspec --runtime-log 'tmp/github-actions-parallel_runtime_rspec.log' spec
+      run: rspec_booster --job 3/4
     - name: cat order
       if: failure()
       run: for log in order*.log; do echo $log; cat $log; done
@@ -136,10 +139,11 @@ jobs:
         gem update --system
         gem install bundler -v '2.0.1'
         bundle install --jobs 4 --retry 3
+        gem install semaphore_test_boosters
         yarn install
         ./bin/webpack
     - name: rspec
-      run: parallel_rspec --only-group 4 -t rspec --runtime-log 'tmp/github-actions-parallel_runtime_rspec.log' spec
+      run: rspec_booster --job 4/4
     - name: cat order
       if: failure()
       run: for log in order*.log; do echo $log; cat $log; done

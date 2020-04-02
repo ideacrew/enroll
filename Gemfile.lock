@@ -782,6 +782,7 @@ GEM
     selenium-webdriver (3.142.3)
       childprocess (>= 0.5, < 2.0)
       rubyzip (~> 1.2, >= 1.2.2)
+    semaphore_test_boosters (0.9.1)
     serverengine (1.5.11)
       sigdump (~> 0.2.2)
     sexp_processor (4.12.1)
@@ -988,6 +989,7 @@ DEPENDENCIES
   sass-rails (~> 5)
   sassc (~> 1.12)
   sdoc (~> 1.0)
+  semaphore_test_boosters
   shoulda-matchers (~> 3)
   simple_calendar!
   simplecov (~> 0.14)
