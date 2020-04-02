@@ -54,6 +54,7 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
     end
   end
 
+  # update staff record
   def update_person
     operation = Operations::UpdateStaff.new(update_person_params)
     authorize operation, :update_staff?
