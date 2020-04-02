@@ -21,7 +21,7 @@ class QualifyingLifeEventKind
   MARKET_KINDS = %w[shop individual fehb].freeze
 
   # first_of_next_month: not subject to 15th of month effective date rule
-  EffectiveOnKinds = %w(date_of_event first_of_month first_of_next_month fixed_first_of_next_month exact_date)
+  EffectiveOnKinds = %w(date_of_event first_of_month first_of_this_month first_of_next_month fixed_first_of_next_month exact_date)
 
   REASON_KINDS = [
     "lost_access_to_mec",
@@ -115,14 +115,6 @@ class QualifyingLifeEventKind
       {:start_on => {:$eq => nil}, :end_on => {:$eq => nil}}
     ]
   )}
-  
-  def qle_date_guards
-    errors.add(:start_on, "start_on cannot be nil when end_on date present") if end_on.present? && start_on.blank?
-
-    if start_on.present? && end_on.present?
-      errors.add(:end_on, "end_on cannot preceed start_on date") if self.end_on < self.start_on
-    end
-  end
 
   # Business rules for EmployeeGainingMedicare
   # If coverage ends on last day of month and plan selected before loss of coverage:
@@ -267,5 +259,15 @@ class QualifyingLifeEventKind
   def active?
     return false unless is_active
     end_on.blank? || (start_on..end_on).cover?(TimeKeeper.date_of_record)
+  end
+
+  private
+
+  def qle_date_guards
+    errors.add(:start_on, "start_on cannot be nil when end_on date present") if end_on.present? && start_on.blank?
+
+    if start_on.present? && end_on.present?
+      errors.add(:end_on, "end_on cannot preceed start_on date") if self.end_on < self.start_on
+    end
   end
 end
