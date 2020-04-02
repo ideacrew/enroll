@@ -222,11 +222,8 @@ class Insured::GroupSelectionController < ApplicationController
              family_member.person.resident_role
            end
 
-    rule = if can_shop_individual_or_resident?(@person)
-              InsuredEligibleForBenefitRule.new(role, @benefit, {family: @family, coverage_kind: @coverage_kind, new_effective_on: @new_effective_on, market_kind: "individual"})
-            else
-              InsuredEligibleForBenefitRule.new(role, @benefit, {family: @family, coverage_kind: @coverage_kind, new_effective_on: @new_effective_on, market_kind: @market_kind})
-            end
+    rule = InsuredEligibleForBenefitRule.new(role, @benefit, {family: @family, coverage_kind: @coverage_kind, new_effective_on: @new_effective_on, market_kind: get_ivl_market_kind(@person)})
+
     is_ivl_coverage, errors = rule.satisfied?
     person = family_member.person
     incarcerated = person.is_consumer_role_active? && person.is_incarcerated.nil? ? "incarcerated_not_answered" : family_member.person.is_incarcerated
