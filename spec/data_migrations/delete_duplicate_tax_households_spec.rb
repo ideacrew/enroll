@@ -51,7 +51,7 @@ describe DeleteDuplicateTaxHouseholds, dbclean: :after_each do
         person.reload
       end
 
-      it 'should delete duplicate address' do
+      it 'should delete duplicate tax households' do
         expect { person.primary_family.active_household.tax_households.count.to eq(1) }
       end
     end
