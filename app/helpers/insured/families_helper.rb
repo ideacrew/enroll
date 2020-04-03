@@ -99,7 +99,8 @@ module Insured::FamiliesHelper
     data = {
       title: qle.title, id: qle.id.to_s, label: qle.event_kind_label,
       is_self_attested: qle.is_self_attested,
-      current_date: TimeKeeper.date_of_record.strftime("%m/%d/%Y")
+      current_date: TimeKeeper.date_of_record.strftime("%m/%d/%Y"),
+      qle_event_date_kind: qle.qle_event_date_kind.to_s
     }
 
     if qle.tool_tip.present?

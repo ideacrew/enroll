@@ -61,6 +61,8 @@ class QualifyingLifeEventKind
     "eligibility_documents_provided"
   ]
 
+  QLE_EVENT_DATE_KINDS = [:submitted_at, :qle_on]
+
   field :event_kind_label, type: String
   field :action_kind, type: String
 
@@ -79,6 +81,7 @@ class QualifyingLifeEventKind
 
   field :is_active, type: Boolean, default: true
   field :event_on, type: Date
+  field :qle_event_date_kind, type: Symbol, default: :qle_on
   field :coverage_effective_on, type: Date
   field :start_on, type: Date
   field :end_on, type: Date
