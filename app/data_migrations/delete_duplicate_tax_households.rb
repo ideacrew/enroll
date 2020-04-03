@@ -35,4 +35,5 @@ class DeleteDuplicateTaxHouseholds < MongoidMigrationTask
     rescue StandardError => e
       puts e.message unless Rails.env.test?
     end
+  end
 end
