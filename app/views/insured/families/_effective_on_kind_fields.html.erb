@@ -4,7 +4,7 @@
     <% if @qle.reason == 'birth' || @qle.reason == 'adoption' %>
       <%= select_tag 'effective_on_kind', options_for_select(generate_options_for_effective_on_kinds(@qle.effective_on_kinds, @qle_date)), include_blank: "#{l10n('.select_effective_date').to_s.upcase} *" %>
     <% else %>
-      <%= select_tag 'effective_on_kind', options_for_select(@qle.effective_on_kinds.map{|k| [k.humanize, k]}), include_blank: "#{l10n('.select_effective_date').to_s.upcase} *" %>
+      <%= select_tag 'effective_on_kind', options_for_select(@qle.effective_on_kinds_for_display), include_blank: "#{l10n('.select_effective_date').to_s.upcase} *" %>
     <% end %>
   </div>
 <% else %>
