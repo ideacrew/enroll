@@ -435,7 +435,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       end
 
       it 'return http success and render' do
-        sign_in
+        sign_in user
         @family.special_enrollment_periods << @sep
         attrs = {hbx_enrollment_id: @enrollment.id.to_s, family_id: @family.id}
         get :edit_plan, params: attrs
@@ -698,7 +698,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
 
     it 'should update current enrollment(cancel/terminate)' do
       hbx_enrollment.reload
-      if TimeKeeper.date_of_record.day >= HbxProfile::IndividualEnrollmentDueDayOfMonth
+      if TimeKeeper.date_of_record.day > HbxProfile::IndividualEnrollmentDueDayOfMonth
         expect(hbx_enrollment.aasm_state).to eq 'coverage_terminated'
         expect(hbx_enrollment.terminated_on.to_date).to eq hbx_enrollment.effective_on.end_of_month.to_date
       else
@@ -736,7 +736,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
 
   context "GET terminate_selection" do
     it "return http success and render" do
-      sign_in
+      sign_in user
       get :terminate_selection, params: { person_id: person.id }
       expect(response).to have_http_status(:success)
       expect(response).to render_template(:terminate_selection)
@@ -746,7 +746,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
   context "POST terminate" do
 
     before do
-      sign_in
+      sign_in user
       request.env["HTTP_REFERER"] = edit_plan_insured_group_selections_path(person_id: person.id, hbx_enrollment_id: hbx_enrollment.id)
       allow(HbxEnrollment).to receive(:find).and_return(hbx_enrollment)
     end
@@ -783,7 +783,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
 
     before do
       allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
-      sign_in
+      sign_in user
       family.reload
     end
 

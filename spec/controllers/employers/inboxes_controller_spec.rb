@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe Employers::InboxesController, :type => :controller do
   let(:hbx_profile) { double(id: double("hbx_profile_id"))}
   let(:user) { double("user") }
-  let(:person) { double(:employer_staff_roles => [double("person", :employer_profile_id => double)])}
+  let(:person) { double(:employer_staff_roles => [double("person", :employer_profile_id => double)], agent?: false)}
 
   describe "Get new" do
     let(:inbox_provider){double(id: double("id"),legal_name: double("inbox_provider"), inbox: double(messages: double(build: double("inbox"))))}

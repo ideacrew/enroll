@@ -43,6 +43,7 @@ RSpec.describe Insured::FamilyMembersController do
 
     before(:each) do
       sign_in(user)
+      allow(person).to receive(:agent?).and_return(false)
       allow(Forms::FamilyMember).to receive(:find).with(dependent_id).and_return(dependent)
       allow(Family).to receive(:find).with(family_id).and_return(family)
       allow(dependent).to receive(:update_attributes).with(dependent_controller_parameters).and_return(true)

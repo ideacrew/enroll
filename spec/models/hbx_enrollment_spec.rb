@@ -588,6 +588,26 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
     #   end
     # end
 
+    context "scopes" do
+      context "cancel_eligible" do
+        let(:family) {FactoryBot.create(:family, :with_primary_family_member)}
+        let(:census_employee) {FactoryBot.create(:census_employee)}
+        let(:benefit_group_assignment) {FactoryBot.create(:benefit_group_assignment, benefit_group: package, census_employee: census_employee)}
+        let(:application) {double(:start_on => TimeKeeper.date_of_record.beginning_of_month, :end_on => (TimeKeeper.date_of_record.beginning_of_month + 1.year) - 1.day, :aasm_state => :active)}
+        let(:package) {double("BenefitPackage", :is_a? => BenefitSponsors::BenefitPackages::BenefitPackage, :_id => "id", :plan_year => application, :benefit_application => application, start_on: Date.new(Time.current.year,4,1),end_on: Date.new(2020,3,31))}
+        let(:existing_shop_enrollment) {FactoryBot.create(:hbx_enrollment, :shop, household: family.active_household, family: family)}
+
+        before :each do
+          existing_shop_enrollment
+          allow(existing_shop_enrollment).to receive(:aasm_state).and_return("unverified")
+        end
+
+        it "should include proper scopes" do
+          expect(HbxEnrollment.cancel_eligible.include?(existing_shop_enrollment)).to eq(true)
+        end
+      end
+    end
+
     context "new_from" do
       include_context "BradyWorkAfterAll"
 
@@ -955,10 +975,17 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
     context "cancel_coverage!" do
       let(:family) {FactoryBot.create(:family, :with_primary_family_member)}
       let(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, household: family.active_household, family: family, aasm_state: "inactive")}
+      let(:terminated_enrollment) {FactoryBot.create(:hbx_enrollment, household: family.active_household, family: family, aasm_state: "coverage_terminated")}
 
       it "should cancel the enrollment" do
         hbx_enrollment.cancel_coverage!
         expect(hbx_enrollment.aasm_state).to eq "coverage_canceled"
+      end
+
+      it "should cancel the terminated enrollment" do
+        expect(terminated_enrollment.aasm_state).to eq "coverage_terminated"
+        terminated_enrollment.cancel_coverage!
+        expect(terminated_enrollment.aasm_state).to eq "coverage_canceled"
       end
 
       it "should not populate the terminated on" do
