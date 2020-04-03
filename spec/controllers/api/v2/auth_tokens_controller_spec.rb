@@ -17,14 +17,14 @@ RSpec.describe Api::V2::AuthTokensController, :type => :controller, :dbclean => 
   describe "DELETE logout, when NOT logged in" do
     it "is denied" do
       delete :logout
-      expect(response.status).to eq 403
+      expect(response.status).to eq 401
     end
   end
 
   describe "POST refresh, when NOT logged in" do
     it "is denied" do
       post :refresh
-      expect(response.status).to eq 403
+      expect(response.status).to eq 401
     end
   end
 

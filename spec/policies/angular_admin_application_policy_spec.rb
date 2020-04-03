@@ -95,15 +95,7 @@ describe AngularAdminApplicationPolicy do
       instance_double(
         Permission,
         {
-          approve_broker: false,
-          approve_ga: false,
-          view_admin_tabs: false,
-          can_change_fein: false,
-          modify_admin_tabs: false,
-          can_access_user_account_tab: false,
-          view_login_history: false,
-          view_the_configuration_tab: false,
-          view_personal_info_page: false
+          view_agency_staff: false
         }
       )
     end
@@ -148,15 +140,7 @@ describe AngularAdminApplicationPolicy do
       instance_double(
         Permission,
         {
-          approve_broker: true,
-          approve_ga: true,
-          view_admin_tabs: true,
-          can_change_fein: true,
-          modify_admin_tabs: true,
-          can_access_user_account_tab: true,
-          view_login_history: true,
-          view_the_configuration_tab: true,
-          view_personal_info_page: true
+          view_agency_staff: true
         }
       )
     end

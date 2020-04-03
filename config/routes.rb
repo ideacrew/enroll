@@ -736,6 +736,12 @@ Rails.application.routes.draw do
           delete :logout
         end
       end
+
+      resources :users, only: [] do
+        collection do
+          get :current
+        end
+      end
     end
   end
 
