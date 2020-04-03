@@ -141,7 +141,6 @@ group :development, :test do
   gem 'railroady',              '~> 1.5.3'
   gem 'rspec-rails'
   gem 'rspec_junit_formatter'
-  gem 'semaphore_test_boosters'
   gem 'yard',                   '~> 0.9.12',  require: false
   gem 'yard-mongoid',           '~> 0.1',     require: false
 end
