@@ -9,6 +9,13 @@ env: # https://stackoverflow.com/questions/59867124/how-can-i-access-github-acti
   YELLR_URL: ${{ secrets.YELLR_URL }}
 
 jobs:
+  brakeman:
+    runs-on: ubuntu-18.04
+    steps:
+    - name: Brakeman
+      uses: devmasx/brakeman-linter-action@v1.0.0
+      env:
+        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
   rspec-1-of-4:
     runs-on: ${{ matrix.os }}
     strategy:
