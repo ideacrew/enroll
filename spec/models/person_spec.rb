@@ -31,6 +31,7 @@ describe Person, :dbclean => :after_each do
         end
 
         it 'should generate hbx_id' do
+          expect(true).to be_falsy #fail
           expect(person.hbx_id).to be_truthy
         end
 
