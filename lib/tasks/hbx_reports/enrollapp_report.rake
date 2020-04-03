@@ -18,7 +18,7 @@ namespace :reports do
     total_count = enrollments.size
     timestamp = Time.now.strftime('%Y%m%d%H%M')
     CSV.open("enrollment_report_#{timestamp}.csv", 'w') do |csv|
-      csv << ["Subscriber ID", "Member ID" , "Policy ID", "Enrollment Group ID", "Status",
+      csv << ["Subscriber ID", "Member ID" , "Policy ID",  "Status",
               "First Name", "Last Name","SSN", "DOB", "Gender", "Relationship", "Benefit Type",
               "Plan Name", "HIOS ID", "Plan Metal Level", "Carrier Name",
               "Premium Amount", "Premium Total", "Policy APTC", "Policy Employer Contribution",
@@ -42,7 +42,7 @@ namespace :reports do
                 premium_amount = (enr.is_ivl_by_kind? ? enr.premium_for(en): (enr.decorated_hbx_enrollment.member_enrollments.find { |enrollment| enrollment.member_id == en.id }).product_price).to_f.round(2)
                 next if per.blank?
                 csv << [
-                  primary_person_hbx_id, per.id, enr._id, enr.hbx_id, enr.aasm_state,
+                  primary_person_hbx_id, per.hbx_id, enr.hbx_id, enr.aasm_state,
                   per.first_name,
                   per.last_name,
                   per.ssn,
@@ -51,7 +51,7 @@ namespace :reports do
                   en.primary_relationship,
                   enr.coverage_kind,
                   product.name, product.hios_id, product.metal_level, product.carrier_profile.abbrev,
-                  premium_amount, enr.total_premium, en.applied_aptc_amount, enr.total_employer_contribution,
+                  premium_amount, enr.total_premium, enr.applied_aptc_amount, enr.total_employer_contribution,
                   enr.effective_on.blank? ? nil : enr.effective_on.strftime("%Y%m%d"),
                   enr.terminated_on.blank? ? nil : enr.terminated_on.strftime("%Y%m%d"),
                   enr.employee_role_id.blank? ? nil : enr.employer_profile.legal_name,
