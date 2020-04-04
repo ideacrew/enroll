@@ -265,6 +265,7 @@ jobs:
           exit 0
         else
           echo "Give cucumber one more try"
+          ls -ltr && ls -ltr tmp
           if bundle exec cucumber tmp/cucumber_failures.log --format summary --out cucumber_2.summary --format rerun --out tmp/cucumber_failures_2.log
           then
             echo "Cucumber worked on retry"
@@ -328,6 +329,7 @@ jobs:
           exit 0
         else
           echo "Give cucumber one more try"
+          ls -ltr && ls -ltr tmp
           if bundle exec cucumber tmp/cucumber_failures.log --format summary --out cucumber_2.summary --format rerun --out tmp/cucumber_failures_2.log
           then
             echo "Cucumber worked on retry"
