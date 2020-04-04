@@ -254,6 +254,7 @@ jobs:
         gem install bundler
         bundle install --jobs 4 --retry 3
         gem install semaphore_test_boosters
+        cucumber-booster-config inject . --dry-run
         yarn install
         RAILS_ENV=test NODE_ENV=test rake webpacker:compile
     - name: cucumber-1-of-2
