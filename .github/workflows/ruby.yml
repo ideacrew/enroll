@@ -122,15 +122,15 @@ jobs:
         path: vendor/bundle
         key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
         restore-keys: |
-          ${{ runner.os }}-gems-
+          ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
     - name: Cache Node Modules
       id: npm-cache
       uses: actions/cache@v1
       with:
         path: node_modules
-        key: ${{ runner.os }}-node_modules-${{ hashFiles('**/yarn.lock') }}
+        key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
         restore-keys: |
-          ${{ runner.os }}-node_modules-
+          ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
     - name: bundle install
       run: |
         gem update --system
