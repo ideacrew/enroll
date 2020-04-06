@@ -15,7 +15,8 @@ module BenefitSponsors
         # @return [ enrollment_eligibility_hash ] enrollment_eligibility_hash
         def call(effective_date:, benefit_sponsorship:)
           effective_date             = yield validate_effective_date(effective_date)
-          eligibility_params         = yield eligibility_params(effective_date, benefit_sponsorship)
+          service_areas_entities     = yield get_service_areas_entities(effective_date, benefit_sponsorship)
+          eligibility_params         = yield eligibility_params(effective_date, benefit_sponsorship, service_areas_entities)
 
           Success(eligibility_params)
         end
@@ -35,15 +36,34 @@ module BenefitSponsors
           end
         end
 
-        def eligibility_params(effective_date, benefit_sponsorship)
+        def eligibility_params(effective_date, benefit_sponsorship, service_areas_entities)
           params = {
             market_kind: benefit_sponsorship.market_kind,
             benefit_sponsorship_id: benefit_sponsorship._id,
             effective_date: effective_date,
-            benefit_application_kind: application_type(effective_date, benefit_sponsorship)
+            benefit_application_kind: application_type(effective_date, benefit_sponsorship),
+            service_areas: service_areas_entities.as_json
           }
 
           Success(params)
+        end
+
+        def get_service_areas_entities(effective_date, benefit_sponsorship_entity)
+          benefit_sponsorship = find_benefit_sponsorship(benefit_sponsorship_entity._id)
+          service_areas = benefit_sponsorship.service_areas_on(effective_date).collect do |service_area|
+            BenefitMarkets::Operations::ServiceAreas::Create.new.call(service_area_params: service_area.as_json).value!
+          end
+
+          Success(service_areas)
+        end
+
+        def find_benefit_sponsorship(benefit_sponsorship_entity_id)
+          result = BenefitSponsors::Operations::BenefitSponsorship::FindModel.new.call(benefit_sponsorship_id: benefit_sponsorship_entity_id)
+          if result.success?
+            result.value!
+          else
+            result.failure
+          end
         end
 
         def is_initial_sponsor?(benefit_applications, effective_date)

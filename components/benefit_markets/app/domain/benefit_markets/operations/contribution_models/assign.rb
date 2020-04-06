@@ -19,7 +19,7 @@ module BenefitMarkets
           filtered_criteria      = yield filter_criteria(criteria, product_package_values[:contribution_models])
           matched_criterion      = yield match_criterion(filtered_criteria, enrollment_eligibility)
           product_package_values = yield assign(product_package_values, matched_criterion)
-          
+
           Success({product_package_values: product_package_values })
         end
 
@@ -45,7 +45,7 @@ module BenefitMarkets
           if criteria.size > 1
             sorted_criteria = criteria.sort_by{|ele| ele.setting(:order).item}
             criterion       = sorted_criteria.detect {|criterion| criterion_matches?(criterion, enrollment_eligibility) }
-            criterion       = filtered_criteria.detect {|criterion| criterion.setting(:default).item } if criterion.blank?
+            criterion       = criteria.detect {|criterion| criterion.setting(:default).item } if criterion.blank?
           else
             criterion = criteria.first
           end
