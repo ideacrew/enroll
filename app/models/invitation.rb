@@ -358,6 +358,8 @@ class Invitation
       invitation
   end
 
+  # TODO: Could add a string to the invitation model such as "invitation_email_kind" to better gauge specific emails being sent
+  # I.E. invitation_email_kind = "renewal_email"
   def self.invitation_already_sent?(source_record, role, email_address, created_at_date_or_range)
     matching_invitation = self.where(
       :role => role, # Pass string such as "employee_role"
