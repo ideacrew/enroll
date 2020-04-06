@@ -254,14 +254,22 @@ class Invitation
 
   def self.invite_renewal_employee!(census_employee)
     if !census_employee.email_address.blank?
-      invitation = self.create(
-        :role => "employee_role",
-        :source_kind => "census_employee",
-        :source_id => census_employee.id,
-        :invitation_email => census_employee.email_address
+      created_at_range = (TimeKeeper.date_of_record.beginning_of_day..TimeKeeper.date_of_record.end_of_day)
+      unless self.invitation_already_sent?(
+        census_employee,
+        'employee_role',
+        census_employee.email_address,
+        created_at_range
       )
-      invitation.send_renewal_invitation!(census_employee)
-      invitation
+        invitation = self.create(
+          :role => "employee_role",
+          :source_kind => "census_employee",
+          :source_id => census_employee.id,
+          :invitation_email => census_employee.email_address
+        )
+        invitation.send_renewal_invitation!(census_employee)
+        invitation
+      end
     end
   end
 
@@ -348,5 +356,15 @@ class Invitation
       )
       invitation.send_agent_invitation!(hbx_staff_role.parent.full_name)
       invitation
+  end
+
+  def self.invitation_already_sent?(source_record, role, email_address, created_at_date_or_range)
+    matching_invitation = self.where(
+      :role => role, # Pass string such as "employee_role"
+      :source_kind => source_record.class.name.underscore.to_s, # Pass string such as "census_employee"
+      :invitation_email => email_address, # String
+      :created_at => created_at_date_or_range
+    )
+    return true if matching_invitation.present?
   end
 end

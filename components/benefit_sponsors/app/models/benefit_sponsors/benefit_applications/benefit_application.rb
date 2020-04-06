@@ -743,14 +743,6 @@ module BenefitSponsors
       end
     end
 
-    def send_employee_renewal_invites
-      email_addresses_sent_to = []
-      benefit_sponsorship.census_employees.non_terminated.each do |ce|
-        email_addresses_sent_to << ce.email.address
-        ::Invitation.invite_renewal_employee!(ce) unless email_addresses_sent_to.include?(ce.email.address)
-      end
-    end
-
     def send_employee_initial_enrollment_invites
       benefit_sponsorship.census_employees.non_terminated.each do |ce|
         ::Invitation.invite_initial_employee!(ce)

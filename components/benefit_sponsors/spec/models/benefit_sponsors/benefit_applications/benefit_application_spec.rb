@@ -531,6 +531,32 @@ module BenefitSponsors
           expect(renewal_application.benefit_sponsor_catalog).to eq renewal_benefit_sponsor_catalog
         end
 
+        context "send_employee_renewal_invites" do
+          let!(:census_employee_1) { FactoryBot.create(:census_employee) }
+          let!(:census_employee_2) { FactoryBot.create(:census_employee) }
+          let(:census_employee_scope) do
+            CensusEmployee.where(:"_id".in => [census_employee_1.id, census_employee_2.id])
+          end
+          # To be used as duplicate email
+          let(:email) { double(address: email_address) }
+          let(:fake_email_address) {"fakeemail1@fakeemail.com" }
+          before :each do
+            Invitation.destroy_all
+            renewal_application.save!
+            renewal_bga
+            allow(renewal_application.benefit_sponsorship).to receive(:census_employees).and_return(census_employee_scope)
+            allow_any_instance_of(CensusEmployee).to receive(:email_address).and_return(fake_email_address)
+            [census_employee_1, census_employee_2].each do |ce|
+              allow(ce.renewal_benefit_group_assignment).to receive(:benefit_application).and_return(renewal_application)
+            end
+          end
+          
+          it "should not send duplicate invitations" do
+            renewal_application.send_employee_renewal_invites
+            expect(Invitation.count).to eq(1)
+          end
+        end
+
         context "when renewal application saved" do
 
           before do
