@@ -143,7 +143,7 @@ jobs:
       run: 'curl -H "Content-Type: application/json" -H "X-API-Key: ${{ env.YELLR_KEY }}" -X POST ${{ env.YELLR_URL }} -d "{\"project\":\"enroll_dc\",\"branch\":\"${GITHUB_REF#refs/heads/}\",\"sha\":\"${{ env.SHA }}\",\"status\":\"failing\"}"'
   notify-of-success:
     runs-on: ubuntu-latest
-    needs: [rspec-1-of-4, rspec-2-of-4, rspec-3-of-4, rspec-4-of-4, engines-rspecs, cucumber-1-of-2, cucumber-2-of-2]
+    needs: [cucumber-1-of-2, cucumber-2-of-2]
     steps:
     - name: Notify Yellr of success
       run: 'curl -H "Content-Type: application/json" -H "X-API-Key: ${{ env.YELLR_KEY }}" -X POST ${{ env.YELLR_URL }} -d "{\"project\":\"enroll_dc\",\"branch\":\"${GITHUB_REF#refs/heads/}\",\"sha\":\"${{ env.SHA }}\",\"status\":\"passing\"}"'
