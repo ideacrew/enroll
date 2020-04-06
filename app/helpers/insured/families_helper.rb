@@ -108,7 +108,10 @@ module Insured::FamiliesHelper
     else
       options.merge!(data: data)
     end
-    link_to qle.title, "javascript:void(0)", options
+
+    qle_title_html = "<u>#{qle.title}</u>".html_safe if qle.reason == 'covid-19'
+    
+    link_to qle_title_html || qle.title, "javascript:void(0)", options
   end
 
   def qle_link_generator_for_an_existing_qle(qle, link_title=nil)
