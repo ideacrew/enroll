@@ -356,6 +356,18 @@ class Person
     end
   end
 
+  def has_active_enrollment
+    if self.families.present?
+      self.families.each do |family|
+        household = family.active_household
+        if household && household.hbx_enrollments.where(:'aasm_state'.in => HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES).present?
+          return true
+        end
+      end
+    end
+    false
+  end
+
   def agent_npn
     self.general_agency_staff_roles.select{|role| role.is_primary }.try(:first).try(:npn) || self.broker_role.try(:npn)
   end
