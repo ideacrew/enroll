@@ -15,10 +15,10 @@ module BenefitMarkets
         # @param [ Array<BenefitMarkets::Entities::ServiceArea> ] service_areas Service Areas based on Benefit Sponsor primary office location
         # @param [ Symbol ] market_kind Benefit Marketplace Type
         # @return [ BenefitMarkets::Entities::BenefitSponsorCatalog ] benefit_sponsor_catalog
-        def call(service_areas:, enrollment_eligibility:)
+        def call(enrollment_eligibility:)
           benefit_market_catalog = yield find_benefit_market_catalog(enrollment_eligibility)
-          sponsor_catalog_params = yield get_enrollment_policies(benefit_market_catalog, enrollment_eligibility, service_areas)
-          product_packages       = yield build_product_packages(benefit_market_catalog, service_areas, sponsor_catalog_params[:effective_period], enrollment_eligibility)
+          sponsor_catalog_params = yield get_enrollment_policies(benefit_market_catalog, enrollment_eligibility)
+          product_packages       = yield build_product_packages(benefit_market_catalog, sponsor_catalog_params[:effective_period], enrollment_eligibility)
           sponsor_catalog        = yield create(sponsor_catalog_params, product_packages)
 
           Success(sponsor_catalog)
@@ -26,7 +26,7 @@ module BenefitMarkets
 
         private
 
-        def get_enrollment_policies(benefit_market_catalog, enrollment_eligibility, service_areas)
+        def get_enrollment_policies(benefit_market_catalog, enrollment_eligibility)
           benefit_market_catalog = benefit_market_catalog.value!
           effective_date = enrollment_eligibility.effective_date
           policies = {
@@ -34,17 +34,17 @@ module BenefitMarkets
             effective_period: benefit_market_catalog.effective_period_on(effective_date),
             open_enrollment_period: benefit_market_catalog.open_enrollment_period_on(effective_date),
             probation_period_kinds: benefit_market_catalog.probation_period_kinds,
-            service_area_ids: service_areas.pluck(:_id)
+            service_area_ids: enrollment_eligibility.service_areas.pluck(:_id)
           }
 
           Success(policies)
         end
 
-        def build_product_packages(benefit_market_catalog, service_areas, application_period, enrollment_eligibility)
+        def build_product_packages(benefit_market_catalog, application_period, enrollment_eligibility)
           benefit_market_catalog = benefit_market_catalog.value!
 
           product_packages = benefit_market_catalog.product_packages.collect do |product_package|
-            product_package_entity_for(product_package, service_areas, application_period, enrollment_eligibility)
+            product_package_entity_for(product_package, application_period, enrollment_eligibility)
           end
 
           if product_packages.none?(&:failure?)
@@ -54,15 +54,15 @@ module BenefitMarkets
           end
         end
 
-        def product_package_entity_for(product_package, service_areas, application_period, enrollment_eligibility)
+        def product_package_entity_for(product_package, application_period, enrollment_eligibility)
           package_kind               = product_package[:package_kind]
           product_package_params     = product_package.as_json.deep_symbolize_keys.except(:products)
           contribution_models_params = product_package_params.delete(:contribution_models)
           contribution_model_params  = product_package_params.delete(:contribution_model)
           pricing_units_params       = product_package_params[:pricing_model].delete(:pricing_units)
-          product_package_params[:application_period]            = application_period
-          product_package_params[:products]                      = filter_products_by_service_areas(product_package, enrollment_eligibility.effective_date, service_areas).value!
-          product_package_params[:contribution_models]           = contribution_models_for(contribution_models_params)
+          product_package_params[:application_period]  = application_period
+          product_package_params[:products]            = filter_products_by_service_areas(product_package, enrollment_eligibility).value!
+          product_package_params[:contribution_models] = contribution_models_for(contribution_models_params)
           product_package_params[:contribution_model]            = build_contribution_model_entity(contribution_model_params)
           product_package_params[:pricing_model][:pricing_units] = build_pricing_units_entities(pricing_units_params, package_kind)
 
@@ -85,8 +85,8 @@ module BenefitMarkets
           Success(market_catalog)
         end
 
-        def filter_products_by_service_areas(product_package, effective_date, service_areas)
-          ::BenefitMarkets::Operations::Products::Find.new.call(effective_date: effective_date, service_areas: service_areas, product_package: product_package)
+        def filter_products_by_service_areas(product_package, enrollment_eligibility)
+          ::BenefitMarkets::Operations::Products::Find.new.call(effective_date: enrollment_eligibility.effective_date, service_areas: enrollment_eligibility.service_areas, product_package: product_package)
         end
 
         def contribution_unit_models_for(contribution_model_params)

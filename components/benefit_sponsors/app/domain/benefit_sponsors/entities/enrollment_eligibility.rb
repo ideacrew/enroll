@@ -9,6 +9,7 @@ module BenefitSponsors
       attribute :benefit_sponsorship_id,          Types::Bson
       attribute :effective_date,                  Types::Strict::Date
       attribute :benefit_application_kind,        Types::Strict::Symbol
+      attribute :service_areas,                   Types::Array.of(BenefitMarkets::Entities::ServiceArea)
 
     end
   end

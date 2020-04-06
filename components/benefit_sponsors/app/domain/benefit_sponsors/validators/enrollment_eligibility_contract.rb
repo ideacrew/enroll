@@ -9,6 +9,7 @@ module BenefitSponsors
         required(:benefit_sponsorship_id).filled(Types::Bson)
         required(:effective_date).filled(:date)
         required(:benefit_application_kind).filled(:symbol)
+        required(:service_areas).array(:hash)
       end
     end
   end
