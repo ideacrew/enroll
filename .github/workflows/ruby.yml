@@ -39,10 +39,10 @@ jobs:
                   exit $?
                 fi
               done
-          - name: cucumber 1/3
+          - name: cucumber 1/4
             test_command: |
               export DISPLAY=:99
-              if cucumber_booster --job 1/3 features
+              if cucumber_booster --job 1/4 features
               then
                 echo "Cucumber passed the first time!"
                 exit 0
@@ -58,10 +58,10 @@ jobs:
                 fi
               fi
             needs_chromedriver: true
-          - name: cucumber 2/3
+          - name: cucumber 2/4
             test_command: |
               export DISPLAY=:99
-              if cucumber_booster --job 2/3 features
+              if cucumber_booster --job 2/4 features
               then
                 echo "Cucumber passed the first time!"
                 exit 0
@@ -76,10 +76,30 @@ jobs:
                   bundle exec cucumber tmp/cucumber_failures_2.log --format summary --out cucumber_3.summary --format rerun --out tmp/cucumber_failures_3.log
                 fi
               fi
-          - name: cucumber 3/3
+            needs_chromedriver: true
+          - name: cucumber 3/4
             test_command: |
               export DISPLAY=:99
-              if cucumber_booster --job 3/3 features
+              if cucumber_booster --job 3/4 features
+              then
+                echo "Cucumber passed the first time!"
+                exit 0
+              else
+                echo "Give cucumber one more try"
+                if bundle exec cucumber tmp/cucumber_failures.log --format summary --out cucumber_2.summary --format rerun --out tmp/cucumber_failures_2.log
+                then
+                  echo "Cucumber worked on retry"
+                  exit 0
+                else
+                  echo "Give cucumber yet another try"
+                  bundle exec cucumber tmp/cucumber_failures_2.log --format summary --out cucumber_3.summary --format rerun --out tmp/cucumber_failures_3.log
+                fi
+              fi
+            needs_chromedriver: true
+          - name: cucumber 4/4
+            test_command: |
+              export DISPLAY=:99
+              if cucumber_booster --job 4/4 features
               then
                 echo "Cucumber passed the first time!"
                 exit 0
@@ -122,15 +142,15 @@ jobs:
         path: vendor/bundle
         key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
         restore-keys: |
-          ${{ runner.os }}-gems-
+          ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
     - name: Cache Node Modules
       id: npm-cache
       uses: actions/cache@v1
       with:
         path: node_modules
-        key: ${{ runner.os }}-node_modules-${{ hashFiles('**/yarn.lock') }}
+        key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
         restore-keys: |
-          ${{ runner.os }}-node_modules-
+          ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
     - name: bundle install
       run: |
         gem update --system
