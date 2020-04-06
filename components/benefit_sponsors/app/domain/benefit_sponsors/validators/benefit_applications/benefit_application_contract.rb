@@ -9,7 +9,7 @@ module BenefitSponsors
           required(:expiration_date).filled(:date)
           required(:effective_period).filled(type?: Range)
           required(:open_enrollment_period).filled(type?: Range)
-          required(:terminated_on).filled(:date)
+          optional(:terminated_on).maybe(:date)
           required(:aasm_state).filled(:symbol)
           optional(:fte_count).maybe(:integer)
           optional(:pte_count).maybe(:integer)
