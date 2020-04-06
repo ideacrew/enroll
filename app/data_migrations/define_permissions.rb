@@ -10,7 +10,7 @@ class DefinePermissions < MigrationTask
       .update_attributes!(modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
                           send_broker_agency_message: true, approve_broker: true, approve_ga: true, can_update_ssn: false, can_complete_resident_application: false,
                           can_add_sep: false, can_lock_unlock: true, can_view_username_and_email: false, can_reset_password: false, modify_admin_tabs: true,
-                          view_admin_tabs: true,  view_the_configuration_tab: true, can_submit_time_travel_request: false)
+                          view_admin_tabs: true,  view_the_configuration_tab: true, can_submit_time_travel_request: false, view_agency_staff: true)
     Permission
       .find_or_initialize_by(name: 'hbx_read_only')
       .update_attributes!(modify_family: true, modify_employer: false, revert_application: false, list_enrollments: true,
@@ -41,14 +41,46 @@ class DefinePermissions < MigrationTask
       .update_attributes!(modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
                           send_broker_agency_message: true, approve_broker: true, approve_ga: true, can_update_ssn: false, can_complete_resident_application: false,
                           can_add_sep: false, can_lock_unlock: false, can_view_username_and_email: false, can_reset_password: false, modify_admin_tabs: true,
-                          view_admin_tabs: true,  view_the_configuration_tab: true, can_submit_time_travel_request: false)
+                          view_admin_tabs: true,  view_the_configuration_tab: true, can_submit_time_travel_request: false,
+                          view_agency_staff: true
+                        )
     Permission
       .find_or_initialize_by(name: 'super_admin')
       .update_attributes!(modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
                           send_broker_agency_message: true, approve_broker: true, approve_ga: true, can_update_ssn: false, can_complete_resident_application: false,
                           can_add_sep: false, can_lock_unlock: true, can_view_username_and_email: false, can_reset_password: false, modify_admin_tabs: true,
-                          view_admin_tabs: true, can_extend_open_enrollment: true, view_the_configuration_tab: true, can_submit_time_travel_request: false)
+                          view_admin_tabs: true, can_extend_open_enrollment: true, view_the_configuration_tab: true, can_submit_time_travel_request: false,
+                          view_agency_staff: true, manage_agency_staff: true
+                        )
       #puts 'Permissions Updated!'
+  end
+
+  def assign_current_permissions
+    initial_hbx
+    hbx_admin_can_update_ssn
+    hbx_admin_can_access_user_account_tab
+    hbx_admin_can_view_login_history
+    hbx_admin_csr_view_personal_info_page
+    hbx_admin_can_complete_resident_application
+    hbx_admin_can_add_sep
+    hbx_admin_can_lock_unlock
+    hbx_admin_can_add_pdc
+    hbx_admin_can_view_username_and_email
+    hbx_admin_can_reset_password
+    hbx_admin_can_change_fein
+    hbx_admin_can_force_publish
+    hbx_admin_can_modify_plan_year
+    hbx_admin_can_extend_open_enrollment
+    hbx_admin_can_create_benefit_application
+    hbx_admin_can_view_application_types
+    hbx_admin_can_access_new_consumer_application_sub_tab
+    hbx_admin_can_access_identity_verification_sub_tab
+    hbx_admin_can_access_outstanding_verification_sub_tab
+    hbx_admin_can_access_accept_reject_identity_documents
+    hbx_admin_can_access_accept_reject_paper_application_documents
+    hbx_admin_can_transition_family_members
+    hbx_admin_can_delete_identity_application_documents
+    hbx_admin_can_access_pay_now
   end
 
   def build_test_roles
