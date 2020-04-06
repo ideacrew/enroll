@@ -263,21 +263,7 @@ class QualifyingLifeEventKind
     return false unless is_active
     end_on.blank? || (start_on..end_on).cover?(TimeKeeper.date_of_record)
   end
-
-  def effective_on_kinds_for_display
-    if reason == 'covid-19'
-      effective_on_kinds.map do |effective_on_kind|
-        if effective_on_kind == 'fixed_first_of_next_month'
-          ['First of next month', effective_on_kind]
-        else
-          [effective_on_kind.humanize, effective_on_kind]
-        end
-      end
-    else
-      effective_on_kinds.map{|effective_on_kind| [effective_on_kind.humanize, effective_on_kind]}
-    end
-  end
-
+  
   private
 
   def qle_date_guards

@@ -115,8 +115,18 @@ end
 
 And(/Employee select "(.*?)" for "(.*?)" sep effective on kind and clicks continue/) do |effective_on_kind, qle_reason|
   expect(page).to have_content "Based on the information you entered, you may be eligible to enroll now but there is limited time"
-  if qle_reason == 'covid-19' && effective_on_kind == 'fixed_first_of_next_month'
-    select 'First of next month', from: 'effective_on_kind'
+
+  if qle_reason == 'covid-19'
+    qle_on = TimeKeeper.date_of_record
+    
+    effective_on_kind_date = case effective_on_kind
+    when 'fixed_first_of_next_month'
+      qle_on.end_of_month.next_day.to_s
+    when 'first_of_this_month'
+      qle_on.beginning_of_month.to_s
+    end
+
+    select effective_on_kind_date, from: 'effective_on_kind'
   else
     select effective_on_kind.humanize, from: 'effective_on_kind'
   end

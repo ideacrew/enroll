@@ -134,6 +134,8 @@ module Insured::FamiliesHelper
       case kind
       when 'date_of_event'
         options << [qle_date.to_s, kind]
+      when 'first_of_this_month'
+        options << [qle_date.beginning_of_month.to_s, kind]
       when 'fixed_first_of_next_month'
         options << [(qle_date.end_of_month + 1.day).to_s, kind]
       end
