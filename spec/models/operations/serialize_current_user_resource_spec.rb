@@ -26,7 +26,8 @@ describe Operations::SerializeCurrentUserResource do
     let(:user) do
       instance_double(
         User,
-        oim_id: oim_id
+        oim_id: oim_id,
+        email: nil
       )
     end
 
