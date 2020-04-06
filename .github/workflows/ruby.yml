@@ -19,13 +19,15 @@ jobs:
         mongodb-version: ["3.6"]
         command_configs:
           - name: rspec 1/4
-            test_command: rspec_booster --job 1/4
-          - name: rspec 2/4
-            test_command: rspec_booster --job 2/4
-          - name: rspec 3/4
-            test_command: rspec_booster --job 3/4
-          - name: rspec 4/4
-            test_command: rspec_booster --job 4/4
+            test_command: rspec_booster --job 1/5
+          - name: rspec 2/5
+            test_command: rspec_booster --job 2/5
+          - name: rspec 3/5
+            test_command: rspec_booster --job 3/5
+          - name: rspec 4/5
+            test_command: rspec_booster --job 4/5
+          - name: rspec 5/5
+            test_command: rspec_booster --job 5/5
           - name: engine rspecs
             test_command: |
               root=`pwd -P`
