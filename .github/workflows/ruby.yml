@@ -76,6 +76,7 @@ jobs:
                   bundle exec cucumber tmp/cucumber_failures_2.log --format summary --out cucumber_3.summary --format rerun --out tmp/cucumber_failures_3.log
                 fi
               fi
+            needs_chromedriver: true
           - name: cucumber 3/4
             test_command: |
               export DISPLAY=:99
