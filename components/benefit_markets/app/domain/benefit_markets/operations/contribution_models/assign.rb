@@ -45,7 +45,7 @@ module BenefitMarkets
           if criteria.size > 1
             sorted_criteria = criteria.sort_by{|ele| ele.setting(:order).item}
             criterion       = sorted_criteria.detect {|criterion| criterion_matches?(criterion, enrollment_eligibility) }
-            criterion       = filtered_criteria.detect {|criterion| criterion.setting(:default).item } if criterion.blank?
+            criterion       = criteria.detect {|criterion| criterion.setting(:default).item } if criterion.blank?
           else
             criterion = criteria.first
           end
