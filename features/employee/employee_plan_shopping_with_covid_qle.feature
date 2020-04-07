@@ -18,8 +18,8 @@ Feature: Shop Employees can purchase coverage through covid QLE
     And employee Patrick Doe already matched with employer Acme Inc. and logged into employee portal
     Then Employee should see the "Covid-19" at the top of the shop qle list
     When Employee click the "Covid-19" in qle carousel
-    And Employee select a current qle date and clicks continue
-    And Employee select "first_of_this_month" for effective on kinds and clicks continue
+    And Employee should see today date and clicks continue
+    And Employee select "first_of_this_month" for "covid-19" sep effective on kind and clicks continue
     Then Employee should see family members page and clicks continue
     Then Employee should see the group selection page with "first_of_this_month" effective date
 
@@ -37,8 +37,8 @@ Feature: Shop Employees can purchase coverage through covid QLE
     And employee Patrick Doe already matched with employer Acme Inc. and logged into employee portal
     Then Employee should see the "Covid-19" at the top of the shop qle list
     When Employee click the "Covid-19" in qle carousel
-    And Employee select a current qle date and clicks continue
-    And Employee select "fixed_first_of_next_month" for effective on kinds and clicks continue
+    And Employee should see today date and clicks continue
+    And Employee select "fixed_first_of_next_month" for "covid-19" sep effective on kind and clicks continue
     Then Employee should see family members page and clicks continue
     Then Employee should see the group selection page with "fixed_first_of_next_month" effective date
 

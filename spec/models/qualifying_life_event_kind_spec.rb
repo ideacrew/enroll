@@ -312,27 +312,4 @@ RSpec.describe QualifyingLifeEventKind, :type => :model do
       end
     end
   end
-
-  describe "effective_on_kinds_for_display" do
-
-    context "for covid qle" do
-      let(:covid_qle) {
-        build(:qualifying_life_event_kind, title: "COVID-19", action_kind: "add_benefit", reason: "covid-19", market_kind: "shop", effective_on_kinds: ["first_of_this_month", "fixed_first_of_next_month"])
-      }
-
-      it 'should return First of next month' do
-        expect(covid_qle.effective_on_kinds_for_display).to eq [["First of this month", "first_of_this_month"], ["First of next month", "fixed_first_of_next_month"]]
-      end
-    end
-
-    context "for non covid qle" do
-      let(:non_covid_qle) {
-        build(:qualifying_life_event_kind, title: "Had a baby", action_kind: "add_benefit", reason: "birth", market_kind: "shop", effective_on_kinds: ["first_of_this_month", "fixed_first_of_next_month"])
-      }
-
-      it 'should return fixed first of next month' do
-        expect(non_covid_qle.effective_on_kinds_for_display).to eq [["First of this month", "first_of_this_month"], ["Fixed first of next month", "fixed_first_of_next_month"]]
-      end
-    end
-  end
 end
