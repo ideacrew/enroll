@@ -55,11 +55,16 @@ module BenefitMarkets
         end
 
         def product_package_entity_for(product_package, service_areas, application_period, enrollment_eligibility)
+          package_kind               = product_package[:package_kind]
           product_package_params     = product_package.as_json.deep_symbolize_keys.except(:products)
           contribution_models_params = product_package_params.delete(:contribution_models)
-          product_package_params[:application_period]  = application_period
-          product_package_params[:products]            = filter_products_by_service_areas(product_package, enrollment_eligibility.effective_date, service_areas).value!
-          product_package_params[:contribution_models] = contribution_models_for(contribution_models_params)
+          contribution_model_params  = product_package_params.delete(:contribution_model)
+          pricing_units_params       = product_package_params[:pricing_model].delete(:pricing_units)
+          product_package_params[:application_period]            = application_period
+          product_package_params[:products]                      = filter_products_by_service_areas(product_package, enrollment_eligibility.effective_date, service_areas).value!
+          product_package_params[:contribution_models]           = contribution_models_for(contribution_models_params)
+          product_package_params[:contribution_model]            = build_contribution_model_entity(contribution_model_params)
+          product_package_params[:pricing_model][:pricing_units] = build_pricing_units_entities(pricing_units_params, package_kind)
 
           ::BenefitMarkets::Operations::ProductPackages::Create.new.call(product_package_params: product_package_params, enrollment_eligibility: enrollment_eligibility)
         end
@@ -84,9 +89,33 @@ module BenefitMarkets
           ::BenefitMarkets::Operations::Products::Find.new.call(effective_date: effective_date, service_areas: service_areas, product_package: product_package)
         end
 
+        def contribution_unit_models_for(contribution_model_params)
+          sponsor_contribution_kind = contribution_model_params[:sponsor_contribution_kind]
+          contribution_model_params[:contribution_units].collect do |contribution_unit_params|
+            result = ::BenefitMarkets::Operations::ContributionUnits::Create.new.call(contribution_unit_params: contribution_unit_params, sponsor_contribution_kind: sponsor_contribution_kind)
+            if result.success?
+              result.value!
+            else
+              Failure(result)
+            end
+          end
+        end
+
+        def build_pricing_units_entities(pricing_units_params, package_kind)
+          pricing_units_params.collect do |pricing_unit_params|
+            ::BenefitMarkets::Operations::PricingUnits::Create.new.call(pricing_unit_params: pricing_unit_params, package_kind: package_kind).value!
+          end
+        end
+
+        def build_contribution_model_entity(params)
+          params[:contribution_units] = contribution_unit_models_for(params)
+          contribution_model_entity = ::BenefitMarkets::Operations::ContributionModels::Create.new.call(contribution_params: params).value!
+        end
+
+
         def contribution_models_for(contribution_models_params)
-          contribution_models_params.collect do |contribution_params|
-            ::BenefitMarkets::Operations::ContributionModels::Create.new.call(contribution_params: contribution_params).value!
+          contribution_models_params.collect do |contribution_model_params|
+            build_contribution_model_entity(contribution_model_params)
           end
         end
       end
