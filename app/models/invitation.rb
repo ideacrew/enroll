@@ -21,6 +21,8 @@ class Invitation
   field :source_kind, type: String
   field :aasm_state, type: String
   field :invitation_email, type: String
+  field :invitation_email_type, type: String
+  field :benefit_sponsors_employer_profile_id, type: String
 
   belongs_to :user, optional: true
 
@@ -258,14 +260,16 @@ class Invitation
       unless self.invitation_already_sent?(
         census_employee,
         'employee_role',
-        census_employee.email_address,
-        created_at_range
+        created_at_range,
+        "renewal_invitation_email"
       )
         invitation = self.create(
           :role => "employee_role",
           :source_kind => "census_employee",
           :source_id => census_employee.id,
-          :invitation_email => census_employee.email_address
+          :invitation_email => census_employee.email_address,
+          :invitation_email_type => "renewal_invitation_email",
+          :benefit_sponsors_employer_profile_id => census_employee.benefit_sponsors_employer_profile_id.to_s
         )
         invitation.send_renewal_invitation!(census_employee)
         invitation
@@ -360,13 +364,18 @@ class Invitation
 
   # TODO: Could add a string to the invitation model such as "invitation_email_kind" to better gauge specific emails being sent
   # I.E. invitation_email_kind = "renewal_email"
-  def self.invitation_already_sent?(source_record, role, email_address, created_at_date_or_range)
-    matching_invitation = self.where(
-      :role => role, # Pass string such as "employee_role"
-      :source_kind => source_record.class.name.underscore.to_s, # Pass string such as "census_employee"
-      :invitation_email => email_address, # String
-      :created_at => created_at_date_or_range
-    )
-    return true if matching_invitation.present?
+  def self.invitation_already_sent?(source_record, role, created_at_date_or_range, invitation_email_type)
+    # TODO: Can add other cases for source records
+    if source_record.class.name.underscore.to_s == 'census_employee'
+      matching_invitation = self.where(
+        :role => role, # Pass string such as "employee_role"
+        :source_kind => source_record.class.name.underscore.to_s, # Pass string such as "census_employee"
+        :invitation_email => source_record.email_address, # String
+        :created_at => created_at_date_or_range,
+        :benefit_sponsors_employer_profile_id => source_record.benefit_sponsors_employer_profile_id.to_s,
+        :invitation_email_type => invitation_email_type
+      )
+      return true if matching_invitation.present?
+    end
   end
 end

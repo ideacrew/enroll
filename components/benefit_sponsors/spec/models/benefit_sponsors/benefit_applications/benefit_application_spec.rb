@@ -532,28 +532,54 @@ module BenefitSponsors
         end
 
         context "send_employee_renewal_invites" do
-          let!(:census_employee_1) { FactoryBot.create(:census_employee) }
-          let!(:census_employee_2) { FactoryBot.create(:census_employee) }
+          let!(:census_employee_1) { FactoryBot.create(:census_employee, benefit_sponsors_employer_profile_id: employer_profile.id, benefit_sponsorship: benefit_sponsorship, :benefit_group_assignments => [benefit_group_assignment]) }
+          let!(:census_employee_2) { FactoryBot.create(:census_employee, benefit_sponsors_employer_profile_id: employer_profile.id, benefit_sponsorship: benefit_sponsorship, :benefit_group_assignments => [benefit_group_assignment]) }
           let(:census_employee_scope) do
             CensusEmployee.where(:"_id".in => [census_employee_1.id, census_employee_2.id])
           end
           # To be used as duplicate email
           let(:email) { double(address: email_address) }
           let(:fake_email_address) {"fakeemail1@fakeemail.com" }
-          before :each do
-            Invitation.destroy_all
-            renewal_application.save!
-            renewal_bga
-            allow(renewal_application.benefit_sponsorship).to receive(:census_employees).and_return(census_employee_scope)
-            allow_any_instance_of(CensusEmployee).to receive(:email_address).and_return(fake_email_address)
-            [census_employee_1, census_employee_2].each do |ce|
-              allow(ce.renewal_benefit_group_assignment).to receive(:benefit_application).and_return(renewal_application)
+
+          context "same employer, same email" do
+            before :each do
+              Invitation.destroy_all
+              renewal_application.save!
+              renewal_bga
+              allow(renewal_application.benefit_sponsorship).to receive(:census_employees).and_return(census_employee_scope)
+              allow_any_instance_of(CensusEmployee).to receive(:email_address).and_return(fake_email_address)
+              [census_employee_1, census_employee_2].each do |ce|
+                allow(ce.renewal_benefit_group_assignment).to receive(:benefit_application).and_return(renewal_application)
+                allow(ce).to receive(:benefit_sponsors_employer_profile_id).and_return(employer_profile.id)
+              end
+              census_employee_scope
+            end
+          
+            it "should not send duplicate invitations" do
+              renewal_application.send_employee_renewal_invites
+              expect(Invitation.count).to eq(1)
             end
           end
-          
-          it "should not send duplicate invitations" do
-            renewal_application.send_employee_renewal_invites
-            expect(Invitation.count).to eq(1)
+
+          context "different employers, same email and invitation_email_type" do
+            before :each do
+              Invitation.destroy_all
+              renewal_application.save!
+              renewal_bga
+              allow(renewal_application.benefit_sponsorship).to receive(:census_employees).and_return(census_employee_scope)
+              allow_any_instance_of(CensusEmployee).to receive(:email_address).and_return(fake_email_address)
+              [census_employee_1, census_employee_2].each do |ce|
+                allow(ce.renewal_benefit_group_assignment).to receive(:benefit_application).and_return(renewal_application)
+              end
+              # This stimulates a second employer
+              second_employer_profile_id = BSON::ObjectId.new
+              allow(census_employee_2).to receive(:benefit_sponsors_employer_profile_id).and_return(second_employer_profile_id)
+            end
+
+            it "should send an email for each employer" do
+              renewal_application.send_employee_renewal_invites
+              expect(Invitation.count).to eq(2)
+            end
           end
         end
 
