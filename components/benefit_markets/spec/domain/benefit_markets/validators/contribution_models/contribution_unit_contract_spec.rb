@@ -11,7 +11,7 @@ RSpec.describe BenefitMarkets::Validators::ContributionModels::ContributionUnitC
   let(:member_relationship_map) { ::BenefitMarkets::ContributionModels::MemberRelationshipMap.new(member_relationship_map_params).as_json }
   let(:member_relationship_maps)  { [member_relationship_map] }
 
-  let(:missing_params)            { {name: name1, display_name: display_name, member_relationship_maps: member_relationship_maps} }
+  let(:missing_params)            { {_id: BSON::ObjectId('5b044e499f880b5d6f36c78d'), name: name1, display_name: display_name, member_relationship_maps: member_relationship_maps} }
   let(:invalid_params)            { missing_params.merge({order: 'one'}) }
   let(:required_params)           { missing_params.merge({ order: 1}) }
 

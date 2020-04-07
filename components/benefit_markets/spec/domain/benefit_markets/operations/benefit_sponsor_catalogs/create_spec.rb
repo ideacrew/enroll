@@ -9,7 +9,7 @@ RSpec.describe BenefitMarkets::Operations::BenefitSponsorCatalogs::Create, dbcle
   let(:service_area)            { create_default(:benefit_markets_locations_service_area) }
   let(:effective_date)          { TimeKeeper.date_of_record.next_month.beginning_of_month }
   let(:application_period)      { effective_date..(effective_date + 1.year).prev_day }
-  let(:pricing_units)           { [{name: 'name', display_name: 'Employee Only', order: 1}] }
+  let(:pricing_units)           { [{_id: BSON::ObjectId('5b044e499f880b5d6f36c78d'), name: 'name', display_name: 'Employee Only', order: 1}] }
   let(:premium_tuples)          { {age: 12, cost: 227.07} }
   let(:effective_period)        { effective_date.beginning_of_year..effective_date.end_of_year }
   let(:premium_tables)          { [{effective_period: effective_period, rating_area_id: BSON::ObjectId.new, premium_tuples: [premium_tuples]}] }
@@ -20,6 +20,7 @@ RSpec.describe BenefitMarkets::Operations::BenefitSponsorCatalogs::Create, dbcle
 
   let(:pricing_model) do
     {
+      _id: BSON::ObjectId('5b044e499f880b5d6f36c78d'),
       name: 'name', price_calculator_kind: 'price_calculator_kind', pricing_units: pricing_units,
       product_multiplicities: [:product_multiplicities], member_relationships: member_relationships
     }
@@ -27,6 +28,7 @@ RSpec.describe BenefitMarkets::Operations::BenefitSponsorCatalogs::Create, dbcle
 
   let(:contribution_unit) do
     {
+      _id: BSON::ObjectId('5b044e499f880b5d6f36c78d'),
       name: "Employee",
       display_name: "Employee Only",
       order: 1,
@@ -36,6 +38,7 @@ RSpec.describe BenefitMarkets::Operations::BenefitSponsorCatalogs::Create, dbcle
 
   let(:contribution_model) do
     {
+      _id: BSON::ObjectId('5b044e499f880b5d6f36c78d'),
       title: 'title', key: :key, sponsor_contribution_kind: 'sponsor_contribution_kind', contribution_calculator_kind: 'contribution_calculator_kind',
       many_simultaneous_contribution_units: true, product_multiplicities: [:product_multiplicities1, :product_multiplicities2],
       member_relationships: member_relationships, contribution_units: [contribution_unit]

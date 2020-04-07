@@ -8,7 +8,7 @@ RSpec.describe BenefitMarkets::Entities::ContributionUnit do
 
     let(:contract)                  { BenefitMarkets::Validators::ContributionModels::ContributionUnitContract.new }
     let(:member_relationship_map)    { {relationship_name: :employee, operator: :==, count: 1} }
-    let(:required_params)            { {name: 'name1', display_name: 'display_name', order: 1, member_relationship_maps: [member_relationship_map]} }
+    let(:required_params)            { {_id: BSON::ObjectId('5b044e499f880b5d6f36c78d'), name: 'name1', display_name: 'display_name', order: 1, member_relationship_maps: [member_relationship_map]} }
 
     context "with all/required params" do
 
