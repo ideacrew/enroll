@@ -6,6 +6,7 @@ module BenefitMarkets
       class ContributionModelContract < Dry::Validation::Contract
 
         params do
+          required(:_id).filled(Types::Bson)
           required(:title).filled(:string)
           optional(:key).maybe(:symbol)
           required(:sponsor_contribution_kind).filled(:string)

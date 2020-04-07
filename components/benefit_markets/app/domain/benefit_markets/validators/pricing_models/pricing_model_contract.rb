@@ -6,6 +6,7 @@ module BenefitMarkets
       class PricingModelContract < Dry::Validation::Contract
 
         params do
+          required(:_id).filled(Types::Bson)
           required(:name).filled(:string)
           required(:price_calculator_kind).filled(:string)
           required(:product_multiplicities).array(:symbol)
