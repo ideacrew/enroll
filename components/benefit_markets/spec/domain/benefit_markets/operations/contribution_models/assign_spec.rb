@@ -25,21 +25,145 @@ RSpec.describe BenefitMarkets::Operations::ContributionModels::Assign, dbclean: 
     }
   end
 
-  let(:contribution_unit) do
-    {
-      name: "Employee",
-      display_name: "Employee Only",
-      order: 1,
-      member_relationship_maps: [relationship_name: :employee, operator: :==, count: 1]
-    }
+  let(:zero_percent_contribution_units) do
+    [
+      {
+        _id: BSON::ObjectId('5e3873a0c324df234bfafc7d'),
+        created_at: nil,
+        default_contribution_factor: 0.0,
+        display_name: "Employee",
+        member_relationship_maps: [
+          {_id: BSON::ObjectId('5b044e499f880b5d6f36c792'), count: 1, created_at: nil, operator: :==, relationship_name: :employee, updated_at: nil}
+        ],
+        minimum_contribution_factor: 0.0,
+        name: "employee",
+        order: 0,
+        updated_at: nil
+      },
+      {
+        _id: BSON::ObjectId('5e3873a0c324df234bfafc7e'),
+        created_at: nil,
+        default_contribution_factor: 0.0,
+        display_name: "Spouse",
+        member_relationship_maps: [
+          {_id: BSON::ObjectId('5b044e499f880b5d6f36c794'), count: 1, created_at: nil, operator: :>=, relationship_name: :spouse, updated_at: nil}
+        ],
+        minimum_contribution_factor: 0.0,
+        name: "spouse",
+        order: 1,
+        updated_at: nil
+      },
+      {
+        _id: BSON::ObjectId('5e3873a0c324df234bfafc7f'),
+        created_at: nil,
+        default_contribution_factor: 0.0,
+        display_name: "Domestic Partner",
+        member_relationship_maps: [
+          {_id: BSON::ObjectId('5b117fa19f880b34354e4e71'), count: 1, created_at: nil, operator: :>=, relationship_name: :domestic_partner, updated_at: nil}
+        ],
+        minimum_contribution_factor: 0.0,
+        name: "domestic_partner",
+        order: 2,
+        updated_at: nil
+      },
+      {
+        _id: BSON::ObjectId('5e3873a0c324df234bfafc80'),
+        created_at: nil,
+        default_contribution_factor: 0.0,
+        display_name: "Child Under 26",
+        member_relationship_maps: [
+          {_id: BSON::ObjectId('5b044e499f880b5d6f36c796'), count: 1, created_at: nil, operator: :>=, relationship_name: :dependent, updated_at: nil}
+        ],
+        minimum_contribution_factor: 0.0,
+        name: "dependent",
+        order: 3,
+        updated_at: nil
+      }
+    ]
   end
 
-  let(:contribution_model) do
+  let(:fifty_percent_contribution_units) do
+    [
+      {
+        _id: BSON::ObjectId('5e3873a0c324df234bfafc89'),
+        created_at: nil,
+        default_contribution_factor: 0.5,
+        display_name: "Employee",
+        member_relationship_maps: [
+          {_id: BSON::ObjectId('5b044e499f880b5d6f36c792'), count: 1, created_at: nil, operator: :==, relationship_name: :employee, updated_at: nil}
+        ],
+        minimum_contribution_factor: 0.5,
+        name: "employee",
+        order: 0,
+        updated_at: nil
+      },
+      {
+        _id: BSON::ObjectId('5e3873a0c324df234bfafc8a'),
+        created_at: nil,
+        default_contribution_factor: 0.0,
+        display_name: "Spouse",
+        member_relationship_maps: [
+          {_id: BSON::ObjectId('5b044e499f880b5d6f36c794'), count: 1, created_at: nil, operator: :>=, relationship_name: :spouse, updated_at: nil}
+        ],
+        minimum_contribution_factor: 0.0,
+        name: "spouse",
+        order: 1,
+        updated_at: nil
+      },
+      {
+        _id: BSON::ObjectId('5e3873a0c324df234bfafc8b'),
+        created_at: nil,
+        default_contribution_factor: 0.0,
+        display_name: "Domestic Partner",
+        member_relationship_maps: [
+          {_id: BSON::ObjectId('5b117fa19f880b34354e4e71'), count: 1, created_at: nil, operator: :>=, relationship_name: :domestic_partner, updated_at: nil}
+        ],
+        minimum_contribution_factor: 0.0,
+        name: "domestic_partner",
+        order: 2,
+        updated_at: nil
+      },
+      {
+        _id: BSON::ObjectId('5e3873a0c324df234bfafc8c'),
+        created_at: nil,
+        default_contribution_factor: 0.0,
+        display_name: "Child Under 26",
+        member_relationship_maps: [
+          {_id: BSON::ObjectId('5b044e499f880b5d6f36c796'), count: 1, created_at: nil, operator: :>=, relationship_name: :dependent, updated_at: nil}
+        ],
+        minimum_contribution_factor: 0.0,
+        name: "dependent",
+        order: 3,
+        updated_at: nil
+      }
+    ]
+  end
+
+  let(:zero_percent_contribution_model) do
     ::BenefitMarkets::Entities::ContributionModel.new({
-      title: 'title', key: :zero_percent_sponsor_fixed_percent_contribution_model, sponsor_contribution_kind: 'sponsor_contribution_kind',
-      contribution_calculator_kind: 'contribution_calculator_kind', many_simultaneous_contribution_units: true,
+      _id: BSON::ObjectId('5e3873a0c324df234bfafc91'),
+      title: 'title',
+      key: :zero_percent_sponsor_fixed_percent_contribution_model,
+      sponsor_contribution_kind: '"::BenefitSponsors::SponsoredBenefits::FixedPercentSponsorContribution"',
+      contribution_calculator_kind: 'contribution_calculator_kind',
+      many_simultaneous_contribution_units: true,
       product_multiplicities: [:product_multiplicities1, :product_multiplicities2],
-      member_relationships: member_relationships, contribution_units: [contribution_unit]
+      member_relationships: member_relationships,
+      contribution_units: zero_percent_contribution_units
+    })
+  end
+
+  let(:fifty_percent_contribution_model) do
+    ::BenefitMarkets::Entities::ContributionModel.new({
+      _id: BSON::ObjectId('5e3873a0c324df234bfafc92'),
+      title: 'title',
+      key: :fifty_percent_sponsor_fixed_percent_contribution_model,
+      sponsor_contribution_kind: '"::BenefitSponsors::SponsoredBenefits::FixedPercentSponsorContribution"',
+      contribution_calculator_kind: 'contribution_calculator_kind',
+      many_simultaneous_contribution_units: true,
+      product_multiplicities: [:product_multiplicities1, :product_multiplicities2],
+      member_relationships: member_relationships,
+      contribution_units: fifty_percent_contribution_units
     })
   end
 
@@ -66,7 +190,7 @@ RSpec.describe BenefitMarkets::Operations::ContributionModels::Assign, dbclean: 
   let(:product_package_params) do
     {
       application_period: application_period, benefit_kind: :benefit_kind, product_kind: :product_kind, package_kind: :package_kind,
-      title: 'Title', products: [product_entity], contribution_model: contribution_model.to_h, contribution_models: [contribution_model],
+      title: 'Title', products: [product_entity], contribution_model: zero_percent_contribution_model.to_h, contribution_models: [zero_percent_contribution_model, fifty_percent_contribution_model],
       pricing_model: pricing_model, description: 'description'
     }
   end
@@ -81,27 +205,28 @@ RSpec.describe BenefitMarkets::Operations::ContributionModels::Assign, dbclean: 
       expect(result.success?).to be_truthy
       key = result.success[:product_package_values][:assigned_contribution_model].key
 
-      # if effective_date.month == 1
-      # 	expect(key).to eq (:zero_percent_sponsor_fixed_percent_contribution_model)
-      # else
-      # 	expect(key).to eq (:zero_percent_sponsor_fixed_percent_contribution_model)
-      # end
+      if effective_date.month == 1
+        expect(key).to eq (:zero_percent_sponsor_fixed_percent_contribution_model)
+      else
+        expect(key).to eq (:zero_percent_sponsor_fixed_percent_contribution_model)
+      end
     end
   end
 
   context 'sending required parameters' do
   	let(:enrollment_eligibility_renewal)  { double(effective_date: effective_date, market_kind: market_kind, benefit_application_kind: :renewal, service_areas: service_areas) }
+    let(:params)                          {{ product_package_values: product_package_params, enrollment_eligibility: enrollment_eligibility_renewal }}
 
     it 'should assign ContributionModel for renewal' do
     	result = subject.call(params)
       expect(result.success?).to be_truthy
       key = result.success[:product_package_values][:assigned_contribution_model].key
 
-    #   if effective_date.month == 1
-    #   	expect(key).to eq (:zero_percent_sponsor_fixed_percent_contribution_model)
-    #   else
-    #   	expect(key).to eq (:fifty_percent_sponsor_fixed_percent_contribution_model)
-    #   end
+      if effective_date.month == 1
+        expect(key).to eq (:zero_percent_sponsor_fixed_percent_contribution_model)
+      else
+        expect(key).to eq (:fifty_percent_sponsor_fixed_percent_contribution_model)
+      end
     end
   end
 end
