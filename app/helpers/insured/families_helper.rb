@@ -99,7 +99,8 @@ module Insured::FamiliesHelper
     data = {
       title: qle.title, id: qle.id.to_s, label: qle.event_kind_label,
       is_self_attested: qle.is_self_attested,
-      current_date: TimeKeeper.date_of_record.strftime("%m/%d/%Y")
+      current_date: TimeKeeper.date_of_record.strftime("%m/%d/%Y"),
+      qle_event_date_kind: qle.qle_event_date_kind.to_s
     }
 
     if qle.tool_tip.present?
@@ -133,6 +134,8 @@ module Insured::FamiliesHelper
       case kind
       when 'date_of_event'
         options << [qle_date.to_s, kind]
+      when 'first_of_this_month'
+        options << [qle_date.beginning_of_month.to_s, kind]
       when 'fixed_first_of_next_month'
         options << [(qle_date.end_of_month + 1.day).to_s, kind]
       end
@@ -240,7 +243,7 @@ module Insured::FamiliesHelper
   end
 
   def person_has_any_roles?
-    @person.consumer_role.present? || @person.resident_role.present? || @person.active_employee_roles.any? || current_user.has_hbx_staff_role?
+    @person.consumer_role.present? || @person.resident_role.present? || @person.active_employee_roles.any?
   end
 
   def is_strictly_open_enrollment_case?
