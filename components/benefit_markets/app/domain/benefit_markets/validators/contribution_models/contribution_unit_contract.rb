@@ -6,6 +6,7 @@ module BenefitMarkets
       class ContributionUnitContract < Dry::Validation::Contract
 
         params do
+          required(:_id).filled(Types::Bson)
           required(:name).filled(:string)
           required(:display_name).filled(:string)
           required(:order).filled(:integer)
