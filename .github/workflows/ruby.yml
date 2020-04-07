@@ -181,7 +181,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: [testing_matrix]
     steps:
-      - name: Notify Yellr of success
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: echo results
         env:
           STATUS: passing
         run: |
