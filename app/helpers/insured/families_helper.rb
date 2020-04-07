@@ -108,7 +108,10 @@ module Insured::FamiliesHelper
     else
       options.merge!(data: data)
     end
-    link_to qle.title, "javascript:void(0)", options
+
+    qle_title_html = "<u>#{qle.title}</u>".html_safe if qle.reason == 'covid-19'
+    
+    link_to qle_title_html || qle.title, "javascript:void(0)", options
   end
 
   def qle_link_generator_for_an_existing_qle(qle, link_title=nil)
@@ -237,7 +240,7 @@ module Insured::FamiliesHelper
   end
 
   def person_has_any_roles?
-    @person.consumer_role.present? || @person.resident_role.present? || @person.active_employee_roles.any? || current_user.has_hbx_staff_role?
+    @person.consumer_role.present? || @person.resident_role.present? || @person.active_employee_roles.any?
   end
 
   def is_strictly_open_enrollment_case?
