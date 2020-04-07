@@ -42,7 +42,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::ApplicationCoverageSelected', :dbc
     hbx_enrollment
   }
 
-  describe "when employee plan coverage selected" do
+  describe "when employee plan coverage selected", dbclean: :after_each do
     context "ModelEvent" do
       before do
         allow(model_instance).to receive(:can_select_coverage?).and_return(true)
@@ -59,7 +59,8 @@ RSpec.describe 'BenefitSponsors::ModelEvents::ApplicationCoverageSelected', :dbc
       end
     end
 
-    context "NoticeTrigger" do
+    context "NoticeTrigger", dbclean: :after_each do
+      DatabaseCleaner.clean
       subject { BenefitSponsors::Observers::HbxEnrollmentObserver.new }
       let(:model_event) { ::BenefitSponsors::ModelEvents::ModelEvent.new(:application_coverage_selected, model_instance, {}) }
 
@@ -86,7 +87,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::ApplicationCoverageSelected', :dbc
     end
   end
 
-  describe "NoticeBuilder" do
+  describe "NoticeBuilder", dbclean: :after_each do
 
     let(:data_elements) {
       [
@@ -106,7 +107,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::ApplicationCoverageSelected', :dbc
       "event_object_id" => model_instance.id
     } }
 
-    context "when notice event received" do
+    context "when notice event received", dbclean: :after_each do
 
       subject { Notifier::NoticeKind.new(template: template, recipient: recipient) }
 
@@ -148,7 +149,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::ApplicationCoverageSelected', :dbc
     end
   end
 
-  describe "NoticeBuilder" do
+  describe "NoticeBuilder", dbclean: :after_each do
 
     let(:data_elements) {
       [

@@ -19,7 +19,7 @@ PATH
       i18n (= 0.7.0)
       mini_portile2 (= 2.0.0)
       mongoid (~> 5.4.0)
-      nokogiri (= 1.6.7.2)
+      nokogiri
       pundit (~> 1.0.1)
       rails (~> 4.2.7.1)
       slim (~> 3.0.9)
