@@ -457,17 +457,16 @@ def employer_poc
 
   def update_enrollment_termianted_on_date
     begin
+      enrollment = HbxEnrollment.find(params[:enrollment_id].strip)
       @row = params[:family_actions_id]
-      params[:new_term_date] = Date.strptime(params["new_term_date"], "%m/%d/%Y")
-      params[:edi_required] = params[:edi_required].present? ? true : false
-      result = HbxEnrollments::Operations::EndDateChange.new.call(params.permit!.to_h)
-      message = if result.success?
-                  {notice: "Enrollment Updated Successfully."}
-                else
-                  {notice: "Unable To Update Enrollment."}
-                end
+      termination_date = Date.strptime(params["new_termination_date"], "%m/%d/%Y")
+      if enrollment.present? && enrollment.reterm_enrollment_with_earlier_date(termination_date, params["edi_required"].present?)
+        message = {notice: "Enrollment Updated Successfully."}
+      else
+        message = {notice: "Unable to find/update Enrollment."}
+      end
     rescue Exception => e
-      message = {error: "Unable To Update Enrollment: #{e}"}
+      message = {error: e.to_s}
     end
     redirect_to exchanges_hbx_profiles_root_path, flash: message
   end
