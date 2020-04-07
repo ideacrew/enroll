@@ -6,6 +6,8 @@ source 'https://rubygems.org'
 gem "transport_gateway", path: File.expand_path("../../transport_gateway", __FILE__)
 gem 'acapi', git: "https://github.com/dchbx/acapi.git", branch: 'development'
 
+gem "rspec-rails", '3.9.1', group: [:test]
+
 gemspec
 
 # Declare any dependencies that are still in development here instead of in
