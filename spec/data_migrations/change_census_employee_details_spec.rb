@@ -1,11 +1,10 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "change_census_employee_details")
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 describe ChangeCensusEmployeeDetails, dbclean: :after_each do
   skip "ToDo rake was never updated to new model, check if we can remove it" do
-    let(:given_task_name) { "change_census_employee_details" }
-    subject { ChangeCensusEmployeeDetails.new(given_task_name, double(:current_scope => nil)) }
-
     describe "given a task name" do
       it "has the given task name" do
         expect(subject.name).to eql given_task_name
@@ -98,47 +97,40 @@ describe ChangeCensusEmployeeDetails, dbclean: :after_each do
         expect(census_employee.aasm_state).to eq "eligible"
       end
     end
+  end
 
-    describe "link_or_construct_employee_role" do
-      let!(:person) { FactoryGirl.create(:person, 
-        first_name: census_employee.first_name,
-        last_name: census_employee.last_name,
-        dob: census_employee.dob,
-        ssn: census_employee.ssn
-      )}
-      let(:census_employee) { FactoryGirl.create :census_employee_with_active_assignment}
-      let(:benefit_group) { FactoryGirl.create :benefit_group}
-      let(:employer_profile) { FactoryGirl.create :employer_profile}
+  describe 'link_or_construct_employee_role' do
+    include_context "setup benefit market with market catalogs and product packages"
+    include_context "setup initial benefit application"
 
-      before :each do
-        allow(ENV).to receive(:[]).with("ssn").and_return census_employee.ssn
-        allow(ENV).to receive(:[]).with("employer_fein").and_return employer_profile.organization.fein
-        allow(census_employee).to receive(:has_benefit_group_assignment?).and_return true
-        census_employee.active_benefit_group_assignment.update_attributes(benefit_group_id: benefit_group.id)
-        benefit_group.plan_year.update_attributes(aasm_state: "active")
-        census_employee.update_attributes(:employer_profile_id => employer_profile.id, aasm_state: "eligible")
-      end
+    let(:given_task_name) {'change_census_employee_details'}
+    let!(:benefit_package) {initial_application.benefit_packages.first}
+    let!(:benefit_group_assignment) {FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_package)}
+    let!(:employee_role) {FactoryGirl.create(:benefit_sponsors_employee_role, person: person, employer_profile: benefit_sponsorship.profile, census_employee_id: census_employee.id)}
+    let!(:census_employee) {FactoryGirl.create(:census_employee, employer_profile: benefit_sponsorship.profile, benefit_sponsorship: benefit_sponsorship, benefit_group_assignments: [benefit_group_assignment])}
+    let!(:person) {FactoryGirl.create(:person)}
 
-      it "should construct the employee role" do
-        expect(census_employee.employee_role).to eq nil
-        subject.send(:link_or_construct_employee_role)
-        census_employee.reload
-        expect(census_employee.employee_role).not_to eq nil
-      end
-
-      it "should link the employee role" do
-        subject.send(:link_or_construct_employee_role)
-        census_employee.reload
-        expect(census_employee.aasm_state).to eq "employee_role_linked"
-      end
-    end
+    subject {ChangeCensusEmployeeDetails.new(given_task_name, double(:current_scope => nil))}
 
     before :each do
-      CensusEmployee.skip_callback(:save, :after, :assign_default_benefit_package)
+      census_employee.update_attributes(:employee_role_id => employee_role.id)
+      Person.all.first.update_attributes!(first_name: census_employee.first_name, last_name: census_employee.last_name, dob: census_employee.dob, encrypted_ssn: Person.encrypt_ssn(census_employee.ssn))
+      allow(ENV).to receive(:[]).with('hbx_id').and_return person.hbx_id
+      allow(ENV).to receive(:[]).with('employer_fein').and_return benefit_sponsorship.organization.fein
     end
 
-    after :each do
-      CensusEmployee.set_callback(:save, :after, :assign_default_benefit_package)
+    it 'should link census employee' do
+      subject.send(:link_or_construct_employee_role)
+      census_employee.reload
+      expect(census_employee.aasm_state).to eq "employee_role_linked"
     end
+  end
+
+  before :each do
+    CensusEmployee.skip_callback(:save, :after, :assign_default_benefit_package)
+  end
+
+  after :each do
+    CensusEmployee.set_callback(:save, :after, :assign_default_benefit_package)
   end
 end
