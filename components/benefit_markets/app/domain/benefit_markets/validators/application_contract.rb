@@ -11,7 +11,7 @@ module BenefitMarkets
 
       # @!macro ruleeach
       #   Validates a nested array of $0 params
-      #   @!method rule(contribution_models)
+      #   @!method rule(product_packages)
       rule(:product_packages).each do
         if key? && value
           if !value.is_a?(::BenefitMarkets::Entities::ProductPackage)
