@@ -174,8 +174,8 @@ jobs:
       - name: tell Yellr if failed
         if: failure()
         run: |
-        chmod +x ./test_utilities/report_to_yellr.sh
-        ./test_utilities/report_to_yellr.sh
+          chmod +x ./test_utilities/report_to_yellr.sh
+          ./test_utilities/report_to_yellr.sh
   notify-of-success:
     runs-on: ubuntu-latest
     needs: [testing_matrix]
@@ -184,5 +184,5 @@ jobs:
         env:
           STATUS: passing
         run: |
-        chmod +x ./test_utilities/report_to_yellr.sh
-        ./test_utilities/report_to_yellr.sh
+          chmod +x ./test_utilities/report_to_yellr.sh
+          ./test_utilities/report_to_yellr.sh
