@@ -547,7 +547,7 @@ module BenefitSponsors
 
           context "same employer, same email" do
             before :each do
-              Invitation.destroy_all
+              ::Invitation.destroy_all
               renewal_application.save!
               renewal_bga
               allow_any_instance_of(CensusEmployee).to receive(:email_address).and_return(fake_email_address)
@@ -560,13 +560,13 @@ module BenefitSponsors
           
             it "should not send duplicate invitations" do
               renewal_application.send_employee_renewal_invites
-              expect(Invitation.count).to eq(1)
+              expect(::Invitation.count).to eq(1)
             end
           end
 
           context "different employers, same email and invitation_email_type" do
             before :each do
-              Invitation.destroy_all
+              ::Invitation.destroy_all
               renewal_application.save!
               renewal_bga
  
@@ -581,7 +581,7 @@ module BenefitSponsors
 
             it "should send an email for each employer" do
               renewal_application.send_employee_renewal_invites
-              expect(Invitation.count).to eq(2)
+              expect(::Invitation.count).to eq(2)
             end
           end
         end
