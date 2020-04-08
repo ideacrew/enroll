@@ -1,5 +1,4 @@
 require 'rails_helper'
-require_relative '../../../../../../app/models/invitation.rb'
 require File.join(File.dirname(__FILE__), "..", "..", "..", "support/benefit_sponsors_site_spec_helpers")
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
@@ -542,14 +541,12 @@ module BenefitSponsors
           let(:census_employee_scope) do
             CensusEmployee.where(:"_id".in => [census_employee_1.id, census_employee_2.id])
           end
-          # To be used as duplicate email
-          let(:email) { double(address: email_address) }
+
           let(:fake_email_address) {"fakeemail1@fakeemail.com" }
 
           context "same employer, same email" do
             before :each do
               ::Invitation.destroy_all
-              ce_module_for_component_engine
               renewal_application.save!
               renewal_bga
               CensusEmployee.all.each do |ce|
@@ -562,26 +559,7 @@ module BenefitSponsors
           
             it "should not send duplicate invitations" do
               renewal_application.send_employee_renewal_invites
-              expect(::Invitation.count).to eq(1)
-            end
-          end
-
-          context "different employers, same email and invitation_email_type" do
-            before :each do
-              ::Invitation.destroy_all
-              ce_module_for_component_engine
-              renewal_application.save!
-              renewal_bga
-              CensusEmployee.all.each do |ce|
-                allow(ce).to receive(:email_address).and_return(fake_email_address)
-                allow(ce.renewal_benefit_group_assignment).to receive(:benefit_application).and_return(renewal_application)
-              end
-              allow(renewal_application.benefit_sponsorship).to receive(:census_employees).and_return(census_employee_scope)
-              # This stimulates a second employer
-              census_employee_2.update_attributes!(benefit_sponsors_employer_profile_id: BSON::ObjectId.new)
-            end
-
-            it "should send an email for each employer" do
+              expect(::Invitation.count).to eq(2)
               renewal_application.send_employee_renewal_invites
               expect(::Invitation.count).to eq(2)
             end
