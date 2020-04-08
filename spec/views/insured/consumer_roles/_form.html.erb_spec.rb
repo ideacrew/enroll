@@ -1,6 +1,10 @@
 require "rails_helper"
 include ActionView::Context
 RSpec.describe "insured/consumer_roles/_form.html.erb" do
+  after :all do
+    DatabaseCleaner.clean
+  end
+
   context "render insured consumer role form" do
     let(:person) { Person.new }
     let(:current_user) {FactoryBot.create(:user)}
