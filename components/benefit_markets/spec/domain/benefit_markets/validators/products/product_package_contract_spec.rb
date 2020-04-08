@@ -12,10 +12,11 @@ RSpec.describe BenefitMarkets::Validators::Products::ProductPackageContract do
   let(:title)                         { 'Title' }
   let(:description)                   { 'Description' }
 
-  let(:pricing_units)                 { [{name: 'name', display_name: 'Employee Only', order: 1}] }
+  let(:pricing_units)                 { [{_id: BSON::ObjectId('5b044e499f880b5d6f36c78d'), name: 'name', display_name: 'Employee Only', order: 1}] }
   let(:member_relationships)          { [{relationship_name: :employee, relationship_kinds: ['self'], age_threshold: 18, age_comparison: :==, disability_qualifier: true}] }
   let(:pricing_model) do
     {
+      _id: BSON::ObjectId('5b044e499f880b5d6f36c78d'),
       name: 'name', price_calculator_kind: 'price_calculator_kind', pricing_units: pricing_units,
       product_multiplicities: [:product_multiplicities], member_relationships: member_relationships
     }
@@ -36,6 +37,7 @@ RSpec.describe BenefitMarkets::Validators::Products::ProductPackageContract do
 
   let(:contribution_model) do
     {
+      _id: BSON::ObjectId('5b044e499f880b5d6f36c78d'),
       title: 'title', key: :key, sponsor_contribution_kind: 'sponsor_contribution_kind', contribution_calculator_kind: 'contribution_calculator_kind',
       many_simultaneous_contribution_units: true, product_multiplicities: [:product_multiplicities1, :product_multiplicities2],
       member_relationships: member_relationships, contribution_units: contribution_units

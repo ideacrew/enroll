@@ -7,7 +7,7 @@ RSpec.describe BenefitMarkets::Entities::PricingUnit do
   context "Given valid required parameters" do
 
     let(:contract)         { BenefitMarkets::Validators::PricingModels::PricingUnitContract.new }
-    let(:required_params)  { {name: 'employee', display_name: 'Employee Only', order: 1} }
+    let(:required_params)  { {_id: BSON::ObjectId('5b044e499f880b5d6f36c78d'), name: 'employee', display_name: 'Employee Only', order: 1} }
 
     context "with all/required params" do
 

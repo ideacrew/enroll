@@ -10,6 +10,7 @@ RSpec.describe BenefitMarkets::Entities::ContributionModel do
     let(:member_relationship_map)   { {relationship_name: :employee, operator: :==, count: 1} }
     let(:contribution_unit) do
       {
+        _id: BSON::ObjectId('5b044e499f880b5d6f36c78d'),
         name: "Employee",
         display_name: "Employee Only",
         order: 1,
@@ -22,6 +23,7 @@ RSpec.describe BenefitMarkets::Entities::ContributionModel do
 
     let(:required_params) do
       {
+        _id: BSON::ObjectId('5b044e499f880b5d6f36c78d'),
         title: 'title', sponsor_contribution_kind: 'sponsor_contribution_kind',
         contribution_calculator_kind: 'contribution_calculator_kind',
         product_multiplicities: [:product_multiplicities1, :product_multiplicities2],

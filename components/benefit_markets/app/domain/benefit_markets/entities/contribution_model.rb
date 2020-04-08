@@ -5,6 +5,7 @@ module BenefitMarkets
     class ContributionModel < Dry::Struct
       transform_keys(&:to_sym)
 
+      attribute :_id,                                   Types::Bson
       attribute :title,                                 Types::Strict::String
       attribute :key,                                   Types::Symbol.optional.meta(omittable: true)
       attribute :sponsor_contribution_kind,             Types::Strict::String

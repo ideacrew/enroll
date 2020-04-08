@@ -7,11 +7,12 @@ RSpec.describe BenefitMarkets::Entities::PricingModel do
   context "Given valid required parameters" do
 
     let(:contract)           { BenefitMarkets::Validators::PricingModels::PricingModelContract.new }
-    let(:pricing_units)            { [{name: 'name', display_name: 'Employee Only', order: 1}] }
+    let(:pricing_units)            { [{_id: BSON::ObjectId('5b044e499f880b5d6f36c78d'), name: 'name', display_name: 'Employee Only', order: 1}] }
     let(:member_relationships)     { [{relationship_name: :employee, relationship_kinds: [{}], age_threshold: 18, age_comparison: :==, disability_qualifier: true  }] }
 
     let(:required_params)  do
       {
+        _id: BSON::ObjectId('5b044e499f880b5d6f36c78d'),
         price_calculator_kind: 'price_calculator_kind', name: 'Composite Price Model', pricing_units: pricing_units,
         member_relationships: member_relationships, product_multiplicities: [:product_multiplicities1, :product_multiplicities2]
       }
