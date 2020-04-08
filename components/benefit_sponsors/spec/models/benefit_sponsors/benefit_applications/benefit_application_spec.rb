@@ -1,4 +1,5 @@
 require 'rails_helper'
+require_relative '../../../../../../app/models/invitation.rb'
 require File.join(File.dirname(__FILE__), "..", "..", "..", "support/benefit_sponsors_site_spec_helpers")
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
@@ -548,10 +549,11 @@ module BenefitSponsors
           context "same employer, same email" do
             before :each do
               ::Invitation.destroy_all
+              ce_module_for_component_engine
               renewal_application.save!
               renewal_bga
-              allow_any_instance_of(CensusEmployee).to receive(:email_address).and_return(fake_email_address)
-              [census_employee_1, census_employee_2].each do |ce|
+              CensusEmployee.all.each do |ce|
+                allow(ce).to receive(:email_address).and_return(fake_email_address)
                 allow(ce.renewal_benefit_group_assignment).to receive(:benefit_application).and_return(renewal_application)
                 allow(ce).to receive(:benefit_sponsors_employer_profile_id).and_return(employer_profile.id)
               end
@@ -567,11 +569,11 @@ module BenefitSponsors
           context "different employers, same email and invitation_email_type" do
             before :each do
               ::Invitation.destroy_all
+              ce_module_for_component_engine
               renewal_application.save!
               renewal_bga
- 
-              allow_any_instance_of(CensusEmployee).to receive(:email_address).and_return(fake_email_address)
-              [census_employee_1, census_employee_2].each do |ce|
+              CensusEmployee.all.each do |ce|
+                allow(ce).to receive(:email_address).and_return(fake_email_address)
                 allow(ce.renewal_benefit_group_assignment).to receive(:benefit_application).and_return(renewal_application)
               end
               allow(renewal_application.benefit_sponsorship).to receive(:census_employees).and_return(census_employee_scope)
