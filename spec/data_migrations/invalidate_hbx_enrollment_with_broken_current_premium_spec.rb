@@ -17,20 +17,33 @@ describe InvalidateHbxEnrollmentWithBrokenCurrentPremium do
     let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household) }
 
     context "void enrollment" do
+      before :each do
+        hbx_enrollment.update_attributes!(:aasm_state => "inactive")
+        hbx_enrollment.stub(:total_premium).and_raise(StandardError.new("error"))
+      end
+
       it "should invalidate enrollment" do
-        ClimateControl.modify :enrollment_id => hbx_enrollment._id, :plan_id => plan._id do
-          expect(hbx_enrollment.plan_id).to eq nil
-          expect(hbx_enrollment.carrier_profile_id).to eq nil
+        ClimateControl.modify :person_hbx_id => family.primary_person.hbx_id.to_s do
           subject.migrate
           hbx_enrollment.reload
-          expect(hbx_enrollment.plan_id).to eq plan.id
-          expect(hbx_enrollment.carrier_profile_id).to eq plan.carrier_profile_id
+          expect(hbx_enrollment.aasm_state).to eq("void")
         end
       end
     end
 
     context "active enrollment" do
-      it "should throw error message and not invalidate active enrollment" do
+      before :each do
+        hbx_enrollment.update_attributes!(:aasm_state => "coverage_selected")
+        hbx_enrollment.stub(:total_premium).and_raise(StandardError.new("error"))
+      end
+
+      it "should not invalidate active enrollment" do
+        ClimateControl.modify :person_hbx_id => family.primary_person.hbx_id.to_s do
+          hbx_enrollment.stub(:total_premium).and_raise(StandardError.new("error"))
+          subject.migrate
+          hbx_enrollment.reload
+          expect(hbx_enrollment.aasm_state).to eq("coverage_selected")
+        end
       end
     end
   end

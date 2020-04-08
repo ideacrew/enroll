@@ -1,13 +1,13 @@
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
-class InalidateHbxEnrollmentWithBrokenCurrentPremium < MongoidMigrationTask
+class InvalidateHbxEnrollmentWithBrokenCurrentPremium < MongoidMigrationTask
   # By running invalidate_enrollment, enrollments won't appear under the scope
   # of the families#home page
   def migrate
     person_hbx_id = ENV['person_hbx_id'].to_s
     @person = Person.where(hbx_id: person_hbx_id).first
-    @family = person.primary_family
-    @hbx_enrollments = @person.primary_family.hbx_enrollments
+    @family = @person.primary_family
+    @hbx_enrollments = @family.hbx_enrollments
     unless Rails.env.test?
       abort("Aborted! Unable to find person with hbx_id #{@person_hbx_id}.") if @person.blank?
       abort("Aborted! No family record found for person with hbx_id #{@person_hbx_id}.") if @family.blank?
