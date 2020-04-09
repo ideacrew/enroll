@@ -5,8 +5,8 @@ report_field_names = %w[First_Name
                         Last_Name
                         HBX_ID
                         IC_Number
-                        Current_APTC_max
-                        New_APTC_max
+                        Current_APTC_Max
+                        New_APTC_Max
                         Current_CSR
                         New_CSR
                         Payload_Determination_Date
@@ -15,7 +15,7 @@ report_field_names = %w[First_Name
                         Application_Year
                         Current_Plan_Name
                         Current_HIOS_ID
-                        Current_applied_APTC]
+                        Current_Applied_APTC]
 
 logger_field_names = %w[Family_ID Backtrace]
 
@@ -25,6 +25,7 @@ previous_day = Time.now.getlocal.prev_day
 start_time = previous_day.beginning_of_day.utc
 end_time = previous_day.end_of_day.utc
 
+source_mapper = { 'Admin_Script' => 'Create Eligibility or Renewals', 'Admin' =>  'Edit Aptc Csr', nil => 'Curam'}
 CSV.open(logger_file_name, 'w', force_quotes: true) do |logger_csv|
   logger_csv << logger_field_names
   CSV.open(report_file_name, 'w', force_quotes: true) do |report_csv|
@@ -41,11 +42,13 @@ CSV.open(logger_file_name, 'w', force_quotes: true) do |logger_csv|
         active_enrollments = family.hbx_enrollments.by_year(year).individual_market.where(:aasm_state.in => active_statuses, coverage_kind: 'health')
         new_thh = thhs_created_yesterday.tax_household_with_year(year).desc(:created_at).first
         new_ed = new_thh.latest_eligibility_determination
+
+        new_csr_kind = source_mapper[new_ed.source]
         current_thh = tax_households.tax_household_with_year(year).where(:id.ne => new_thh.id).desc(:created_at).first
         current_ed = current_thh&.latest_eligibility_determination
         current_max_aptc = current_ed&.max_aptc&.to_f.present? ? format('%.2f', current_ed.max_aptc.to_f) : 'N/A'
-        current_csr_percent = current_ed&.csr_percent_as_integer.present? ? current_ed.csr_percent_as_integer : 'N/A'
-        current_csr_kind = current_ed&.csr_eligibility_kind.present? ? current_ed.csr_eligibility_kind : 'N/A'
+        current_csr_percent = current_ed&.csr_percent_as_integer.present? ? current_ed.csr_percent_as_integer.to_s : 'N/A'
+        current_csr_kind = current_ed&.source.present? ? source_mapper[current_ed.source] : 'N/A'
 
         if active_enrollments.present?
           active_enrollments.each do |enrollment|
@@ -53,7 +56,7 @@ CSV.open(logger_file_name, 'w', force_quotes: true) do |logger_csv|
                            primary_person.hbx_id, e_case_id, current_max_aptc,
                            format('%.2f', new_ed.max_aptc.to_f), current_csr_percent,
                            new_ed.csr_percent_as_integer, new_ed.determined_on,
-                           current_csr_kind, new_ed.csr_eligibility_kind,
+                           current_csr_kind, new_csr_kind,
                            year, enrollment.product&.title, enrollment.product&.hios_id,
                            enrollment&.applied_aptc_amount]
           end
@@ -62,7 +65,7 @@ CSV.open(logger_file_name, 'w', force_quotes: true) do |logger_csv|
                          primary_person.hbx_id, e_case_id, current_max_aptc,
                          format('%.2f', new_ed.max_aptc.to_f), current_csr_percent,
                          new_ed.csr_percent_as_integer, new_ed.determined_on,
-                         current_csr_kind, new_ed.csr_eligibility_kind,
+                         current_csr_kind, new_csr_kind,
                          year, 'N/A', 'N/A', 'N/A']
         end
       end

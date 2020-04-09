@@ -7,7 +7,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
   describe "various index" do
     let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
-    let(:person) { double("person")}
+    let(:person) { double("person", agent?: true)}
     let(:hbx_staff_role) { double("hbx_staff_role")}
     let(:hbx_profile) { double("HbxProfile")}
 
@@ -46,7 +46,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
   describe "binder methods" do
     let(:user) { double("user")}
-    let(:person) { double("person")}
+    let(:person) { double("person", agent?: true)}
     let(:hbx_profile) { double("HbxProfile") }
     let(:hbx_staff_role) { double("hbx_staff_role", permission: FactoryBot.create(:permission))}
     let(:employer_profile){ FactoryBot.create(:employer_profile, aasm_state: "enrolling") }
@@ -75,9 +75,10 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
   describe "new" do
     let(:user) { double("User")}
-    let(:person) { double("Person")}
+    let(:person) { double("person", agent?: true)}
 
     it "renders new" do
+      allow(user).to receive(:person).and_return person
       allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
       sign_in(user)
@@ -88,7 +89,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
   describe "inbox" do
     let(:user) { double("User")}
-    let(:person) { double("Person")}
+    let(:person) { double("person", agent?: true)}
     let(:hbx_staff_role) { double("hbx_staff_role")}
     let(:hbx_profile) { double("HbxProfile", id: double("id"))}
 
@@ -217,7 +218,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
   describe "#check_hbx_staff_role" do
     let(:user) { double("user")}
-    let(:person) { double("person")}
+    let(:person) { double("person", agent?: true)}
 
     it "should render the new template" do
       allow(user).to receive(:has_hbx_staff_role?).and_return(false)
@@ -231,7 +232,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
   describe "#view_the_configuration_tab?" do
     let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
     let(:user_2) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
-    let(:person) { double("person")}
+    let(:person) { double("person", agent?: true)}
     let(:hbx_staff_role) { double("hbx_staff_role")}
     let(:hbx_profile) { double("hbx_profile")}
     let(:admin_permission) { double("permission", name: "super_admin", view_the_configuration_tab: true)}
@@ -306,7 +307,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
   describe "Show" do
     let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false, :has_csr_role? => false, :last_portal_visited => nil)}
-    let(:person) { double("person")}
+    let(:person) { double("person", agent?: true)}
     let(:hbx_staff_role) { double("hbx_staff_role")}
     let(:hbx_profile) { double("hbx_profile", inbox: double("inbox", unread_messages: double("test")))}
 
@@ -335,12 +336,14 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
   end
 
   describe "#generate_invoice" do
+    let(:person) { double("person", agent?: true)}
     let(:user) { double("user", :has_hbx_staff_role? => true)}
     let(:employer_profile) { double("EmployerProfile", id: double("id"))}
     let(:organization){ Organization.new }
     let(:hbx_enrollment) { FactoryBot.build_stubbed :hbx_enrollment }
 
     before :each do
+      allow(user).to receive(:person).and_return(person)
       sign_in(user)
       allow(organization).to receive(:employer_profile?).and_return(employer_profile)
       allow(employer_profile).to receive(:enrollments_for_billing).and_return([hbx_enrollment])
@@ -431,7 +434,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
   describe "CSR redirection from Show" do
     let(:user) { double("user", :has_hbx_staff_role? => false, :has_employer_staff_role? => false, :has_csr_role? => true, :last_portal_visited => nil)}
-    let(:person) { double("person")}
+    let(:person) { double("person", agent?: true)}
     let(:hbx_staff_role) { double("hbx_staff_role")}
     let(:hbx_profile) { double("hbx_profile", inbox: double("inbox", unread_messages: double("test")))}
 
@@ -453,7 +456,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
   describe "GET employer index" do
     let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
-    let(:person) { double("person")}
+    let(:person) { double("person", agent?: true)}
     let(:hbx_staff_role) { double("hbx_staff_role")}
     let(:hbx_profile) { double("hbx_profile")}
 
@@ -476,7 +479,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
   describe "GET family index" do
     let(:user) { double("User")}
-    let(:person) { double("Person")}
+    let(:person) { double("person", agent?: true)}
     let(:hbx_staff_role) { double("hbx_staff_role")}
     let(:hbx_profile) { double("hbx_profile")}
     let(:csr_role) { double("csr_role", cac: false)}
@@ -1197,7 +1200,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
   describe "extend open enrollment" do
 
     let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
-    let(:person) { double("person")}
+    let(:person) { double("person", agent?: true)}
     let(:permission) { double(can_extend_open_enrollment: true) }
     let(:hbx_staff_role) { double("hbx_staff_role", permission: permission)}
     let(:hbx_profile) { double("HbxProfile")}
@@ -1278,7 +1281,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
   describe "close open enrollment", :dbclean => :around_each do
 
     let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
-    let(:person) { double("person")}
+    let(:person) { double("person", agent?: true)}
     let(:permission) { double(can_extend_open_enrollment: true) }
     let(:hbx_staff_role) { double("hbx_staff_role", permission: permission)}
     let(:hbx_profile) { double("HbxProfile")}

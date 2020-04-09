@@ -61,6 +61,8 @@ class QualifyingLifeEventKind
     "eligibility_documents_provided"
   ]
 
+  QLE_EVENT_DATE_KINDS = [:submitted_at, :qle_on]
+
   field :event_kind_label, type: String
   field :action_kind, type: String
 
@@ -79,6 +81,7 @@ class QualifyingLifeEventKind
 
   field :is_active, type: Boolean, default: true
   field :event_on, type: Date
+  field :qle_event_date_kind, type: Symbol, default: :qle_on
   field :coverage_effective_on, type: Date
   field :start_on, type: Date
   field :end_on, type: Date
@@ -260,21 +263,7 @@ class QualifyingLifeEventKind
     return false unless is_active
     end_on.blank? || (start_on..end_on).cover?(TimeKeeper.date_of_record)
   end
-
-  def effective_on_kinds_for_display
-    if reason == 'covid-19'
-      effective_on_kinds.map do |effective_on_kind|
-        if effective_on_kind == 'fixed_first_of_next_month'
-          ['First of next month', effective_on_kind]
-        else
-          [effective_on_kind.humanize, effective_on_kind]
-        end
-      end
-    else
-      effective_on_kinds.map{|effective_on_kind| [effective_on_kind.humanize, effective_on_kind]}
-    end
-  end
-
+  
   private
 
   def qle_date_guards
