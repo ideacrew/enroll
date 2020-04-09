@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe 'BenefitSponsors::ModelEvents::ApplicationCoverageSelected', :dbclean => :after_each do
+RSpec.describe 'BenefitSponsors::ModelEvents::ApplicationCoverageSelected', :dbclean => :around_each do
   let(:start_on) {  (TimeKeeper.date_of_record + 2.months).beginning_of_month }
   let(:current_effective_date)  { TimeKeeper.date_of_record }
 
@@ -69,7 +69,15 @@ RSpec.describe 'BenefitSponsors::ModelEvents::ApplicationCoverageSelected', :dbc
         allow(model_instance).to receive(:enrollment_kind).and_return('special_enrollment')
         allow(model_instance).to receive(:census_employee).and_return(census_employee)
         allow(census_employee).to receive(:employee_role).and_return(employee_role)
-
+        hbx_enrollment = model_event.klass_instance
+        puts "hbx_enrollment.submitted_at #{hbx_enrollment.submitted_at.inspect}"
+        puts "hbx_enrollment.created_at #{hbx_enrollment.created_at.inspect}"
+        puts "(hbx_enrollment.sponsored_benefit_package.benefit_application.open_enrollment_period.cover?(hbx_enrollment.submitted_at) || hbx_enrollment.sponsored_benefit_package.benefit_application.open_enrollment_period.cover?(hbx_enrollment.created_at))"
+        puts (hbx_enrollment.sponsored_benefit_package.benefit_application.open_enrollment_period.cover?(hbx_enrollment.submitted_at) || hbx_enrollment.sponsored_benefit_package.benefit_application.open_enrollment_period.cover?(hbx_enrollment.created_at)).inspect
+        puts "hbx_enrollment.sponsored_benefit_package.benefit_application.open_enrollment_period.cover?(hbx_enrollment.submitted_at)"
+        puts hbx_enrollment.sponsored_benefit_package.benefit_application.open_enrollment_period.cover?(hbx_enrollment.submitted_at).inspect
+        puts "hbx_enrollment.sponsored_benefit_package.benefit_application.open_enrollment_period.cover?(hbx_enrollment.created_at)"
+        puts hbx_enrollment.sponsored_benefit_package.benefit_application.open_enrollment_period.cover?(hbx_enrollment.created_at).inspect
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employer.employee_mid_year_plan_change_notice_to_employer"
           expect(payload[:employer_id]).to eq model_instance.employer_profile.hbx_id.to_s
