@@ -21,12 +21,12 @@ RSpec.describe BenefitMarkets::Entities::BenefitSponsorCatalog do
 
     let(:premium_ages)            { 16..40 }
 
-    let(:pricing_units)           { [{_id: BSON::ObjectId('5b044e499f880b5d6f36c791'), name: 'name', display_name: 'Employee Only', order: 1}] }
-    let(:member_relationships)          { [{relationship_name: :employee, relationship_kinds: ['self'], age_threshold: 18, age_comparison: :==, disability_qualifier: true}] }
+    let(:pricing_units)           { [{_id: BSON::ObjectId.new, name: 'name', display_name: 'Employee Only', order: 1}] }
+    let(:member_relationships)          { [{_id: BSON::ObjectId.new, relationship_name: :employee, relationship_kinds: ['self'], age_threshold: 18, age_comparison: :==, disability_qualifier: true}] }
 
     let(:pricing_model) do
       {
-        _id: BSON::ObjectId('5b044e499f880b5d6f36c791'),
+        _id: BSON::ObjectId.new,
         name: 'name', price_calculator_kind: 'price_calculator_kind', pricing_units: pricing_units,
         product_multiplicities: [:product_multiplicities], member_relationships: member_relationships
       }
@@ -35,16 +35,16 @@ RSpec.describe BenefitMarkets::Entities::BenefitSponsorCatalog do
     let(:contribution_unit) do
       {
         name: "Employee",
-         _id: BSON::ObjectId('5b044e499f880b5d6f36c791'),
+        _id: BSON::ObjectId.new,
         display_name: "Employee Only",
         order: 1,
-        member_relationship_maps: [relationship_name: :employee, operator: :==, count: 1]
+        member_relationship_maps: [_id: BSON::ObjectId.new, relationship_name: :employee, operator: :==, count: 1]
       }
     end
 
     let(:contribution_model) do
       {
-        _id: BSON::ObjectId('5b044e499f880b5d6f36c791'),
+        _id: BSON::ObjectId.new,
         title: 'title', key: :key, sponsor_contribution_kind: 'sponsor_contribution_kind', contribution_calculator_kind: 'contribution_calculator_kind',
         many_simultaneous_contribution_units: true, product_multiplicities: [:product_multiplicities1, :product_multiplicities2],
         member_relationships: member_relationships, contribution_units: [contribution_unit]
@@ -58,8 +58,8 @@ RSpec.describe BenefitMarkets::Entities::BenefitSponsorCatalog do
       }
     end
 
-    let(:premium_tuples)   { {age: 12, cost: 227.07} }
-    let(:premium_tables)   { [{effective_period: effective_period, rating_area_id: BSON::ObjectId.new, premium_tuples: [premium_tuples]}] }
+    let(:premium_tuples)   { {_id: BSON::ObjectId.new, age: 12, cost: 227.07} }
+    let(:premium_tables)   { [{_id: BSON::ObjectId.new, effective_period: effective_period, rating_area_id: BSON::ObjectId.new, premium_tuples: [premium_tuples]}] }
 
     let(:product) do
       {

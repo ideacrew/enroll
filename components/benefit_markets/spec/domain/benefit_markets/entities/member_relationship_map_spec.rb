@@ -7,7 +7,7 @@ RSpec.describe BenefitMarkets::Entities::MemberRelationshipMap do
   context "Given valid required parameters" do
 
     let(:contract)                  { BenefitMarkets::Validators::ContributionModels::MemberRelationshipMapContract.new }
-    let(:required_params) { {relationship_name: :employee, count: 1, operator: :==} }
+    let(:required_params)           { {_id: BSON::ObjectId.new, relationship_name: :employee, count: 1, operator: :==} }
 
     context "with all/required params" do
 

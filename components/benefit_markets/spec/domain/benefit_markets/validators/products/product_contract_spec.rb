@@ -33,7 +33,7 @@ RSpec.describe BenefitMarkets::Validators::Products::ProductContract do
     }
   end
 
-  let(:premium_tables)   { [{effective_period: effective_period, rating_area_id: BSON::ObjectId.new}] }
+  let(:premium_tables)   { [{_id: BSON::ObjectId.new, effective_period: effective_period, rating_area_id: BSON::ObjectId.new}] }
   let(:missing_params) do
     {
       _id: id,
@@ -64,9 +64,9 @@ RSpec.describe BenefitMarkets::Validators::Products::ProductContract do
 
   context "Given valid required parameters" do
     context "with all/required params" do
-      let(:premium_tuples)   { {age: 12, cost: 227.07} }
+      let(:premium_tuples)   { {_id: BSON::ObjectId.new, age: 12, cost: 227.07} }
 
-      let(:premium_tables)   { [{effective_period: effective_period, premium_tuples: [premium_tuples], rating_area_id: BSON::ObjectId.new}] }
+      let(:premium_tables)   { [{_id: BSON::ObjectId.new, effective_period: effective_period, premium_tuples: [premium_tuples], rating_area_id: BSON::ObjectId.new}] }
       let(:all_params)       { missing_params.merge({kind: kind, premium_tables: premium_tables })}
 
       it "should pass validation" do

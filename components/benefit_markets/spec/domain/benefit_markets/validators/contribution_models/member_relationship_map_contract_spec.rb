@@ -6,7 +6,7 @@ RSpec.describe BenefitMarkets::Validators::ContributionModels::MemberRelationshi
 
   let(:relationship_name)  { :employee }
   let(:count)              { 1 }
-  let(:missing_params)     { {relationship_name: relationship_name, count: count} }
+  let(:missing_params)     { {_id: BSON::ObjectId.new, relationship_name: relationship_name, count: count} }
   let(:invalid_params)     { missing_params.merge({operator: 'operator'}) }
   let(:error_message1)     { {:operator => ["is missing"]} }
   let(:error_message2)     { {:operator => ["unsupported operator for member relationship map"]} }

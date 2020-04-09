@@ -35,7 +35,7 @@ RSpec.describe BenefitMarkets::Validators::ContributionModels::ContributionModel
 
   let(:missing_params) do
     {
-      _id: BSON::ObjectId('5b044e499f880b5d6f36c78d'),
+      _id: BSON::ObjectId.new,
       title: title, key: key,
       sponsor_contribution_kind: sponsor_contribution_kind,
       contribution_calculator_kind: contribution_calculator_kind,

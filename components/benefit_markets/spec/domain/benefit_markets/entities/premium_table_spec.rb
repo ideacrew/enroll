@@ -10,7 +10,7 @@ RSpec.describe BenefitMarkets::Entities::PremiumTable do
     let(:effective_date)      { TimeKeeper.date_of_record.next_month.beginning_of_month }
     let(:effective_period)    { effective_date.beginning_of_year..effective_date.end_of_year }
 
-    let(:required_params)     { {effective_period: effective_period, rating_area_id: BSON::ObjectId.new} }
+    let(:required_params)     { {_id: BSON::ObjectId.new, effective_period: effective_period, rating_area_id: BSON::ObjectId.new} }
 
     context "with required only" do
 
@@ -25,7 +25,7 @@ RSpec.describe BenefitMarkets::Entities::PremiumTable do
     end
 
     context "with all params" do
-      let(:all_params) { required_params.merge({premium_tuples: [{age: 12, cost: 227.07}]}) }
+      let(:all_params) { required_params.merge({premium_tuples: [{_id: BSON::ObjectId.new, age: 12, cost: 227.07}]}) }
 
       it "contract validation should pass" do
         expect(contract.call(all_params).to_h).to eq all_params

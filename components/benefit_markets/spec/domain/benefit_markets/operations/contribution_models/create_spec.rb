@@ -15,7 +15,7 @@ RSpec.describe BenefitMarkets::Operations::ContributionModels::Create, dbclean: 
   let(:member_relationship_maps)              { [member_relationship_map] }
   let(:contribution_unit) do
     ::BenefitMarkets::ContributionModels::ContributionUnit.new(
-      _id: BSON::ObjectId('5e3873a0c324df234bfafc80'),
+      _id: BSON::ObjectId.new,
       name: "Employee",
       display_name: "Employee Only",
       order: 1,
@@ -35,7 +35,7 @@ RSpec.describe BenefitMarkets::Operations::ContributionModels::Create, dbclean: 
 
   let(:params) do
     {
-      _id: BSON::ObjectId('5e3873a0c324df234bfafc89'),
+      _id: BSON::ObjectId.new,
       title: title, key: key,
       sponsor_contribution_kind: sponsor_contribution_kind,
       contribution_calculator_kind: contribution_calculator_kind,

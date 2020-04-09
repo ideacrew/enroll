@@ -11,15 +11,16 @@ RSpec.describe BenefitMarkets::Operations::ContributionModels::Assign, dbclean: 
   let(:application_period)      { effective_date..(effective_date + 1.year).prev_day }
   let(:market_kind)             { :aca_shop }
   let(:service_areas)           { FactoryBot.create(:benefit_markets_locations_service_area).to_a }
-  let(:pricing_units)           { [{name: 'name', display_name: 'Employee Only', order: 1}] }
-  let(:premium_tuples)          { {age: 12, cost: 227.07} }
-  let(:premium_tables)          { [{effective_period: effective_period, rating_area_id: BSON::ObjectId.new, premium_tuples: [premium_tuples]}] }
-  let(:member_relationships)    { [{relationship_name: :employee, relationship_kinds: ['self'], age_threshold: 18, age_comparison: :==, disability_qualifier: true}] }
+  let(:pricing_units)           { [{_id: BSON::ObjectId.new, name: 'name', display_name: 'Employee Only', order: 1}] }
+  let(:premium_tuples)          { {_id: BSON::ObjectId.new, age: 12, cost: 227.07} }
+  let(:premium_tables)          { [{_id: BSON::ObjectId.new, effective_period: effective_period, rating_area_id: BSON::ObjectId.new, premium_tuples: [premium_tuples]}] }
+  let(:member_relationships)    { [{_id: BSON::ObjectId.new, relationship_name: :employee, relationship_kinds: ['self'], age_threshold: 18, age_comparison: :==, disability_qualifier: true}] }
   let(:oe_start_on)             { TimeKeeper.date_of_record.beginning_of_month}
   let(:open_enrollment_period)  { oe_start_on..(oe_start_on + 10.days) }
 
   let(:pricing_model) do
     {
+      _id: BSON::ObjectId.new,
       name: 'name', price_calculator_kind: 'price_calculator_kind', pricing_units: pricing_units,
       product_multiplicities: [:product_multiplicities], member_relationships: member_relationships
     }
@@ -28,12 +29,12 @@ RSpec.describe BenefitMarkets::Operations::ContributionModels::Assign, dbclean: 
   let(:zero_percent_contribution_units) do
     [
       {
-        _id: BSON::ObjectId('5e3873a0c324df234bfafc7d'),
+        _id: BSON::ObjectId.new,
         created_at: nil,
         default_contribution_factor: 0.0,
         display_name: "Employee",
         member_relationship_maps: [
-          {_id: BSON::ObjectId('5b044e499f880b5d6f36c792'), count: 1, created_at: nil, operator: :==, relationship_name: :employee, updated_at: nil}
+          {_id: BSON::ObjectId.new, count: 1, created_at: nil, operator: :==, relationship_name: :employee, updated_at: nil}
         ],
         minimum_contribution_factor: 0.0,
         name: "employee",
@@ -41,12 +42,12 @@ RSpec.describe BenefitMarkets::Operations::ContributionModels::Assign, dbclean: 
         updated_at: nil
       },
       {
-        _id: BSON::ObjectId('5e3873a0c324df234bfafc7e'),
+        _id: BSON::ObjectId.new,
         created_at: nil,
         default_contribution_factor: 0.0,
         display_name: "Spouse",
         member_relationship_maps: [
-          {_id: BSON::ObjectId('5b044e499f880b5d6f36c794'), count: 1, created_at: nil, operator: :>=, relationship_name: :spouse, updated_at: nil}
+          {_id: BSON::ObjectId.new, count: 1, created_at: nil, operator: :>=, relationship_name: :spouse, updated_at: nil}
         ],
         minimum_contribution_factor: 0.0,
         name: "spouse",
@@ -54,12 +55,12 @@ RSpec.describe BenefitMarkets::Operations::ContributionModels::Assign, dbclean: 
         updated_at: nil
       },
       {
-        _id: BSON::ObjectId('5e3873a0c324df234bfafc7f'),
+        _id: BSON::ObjectId.new,
         created_at: nil,
         default_contribution_factor: 0.0,
         display_name: "Domestic Partner",
         member_relationship_maps: [
-          {_id: BSON::ObjectId('5b117fa19f880b34354e4e71'), count: 1, created_at: nil, operator: :>=, relationship_name: :domestic_partner, updated_at: nil}
+          {_id: BSON::ObjectId.new, count: 1, created_at: nil, operator: :>=, relationship_name: :domestic_partner, updated_at: nil}
         ],
         minimum_contribution_factor: 0.0,
         name: "domestic_partner",
@@ -67,12 +68,12 @@ RSpec.describe BenefitMarkets::Operations::ContributionModels::Assign, dbclean: 
         updated_at: nil
       },
       {
-        _id: BSON::ObjectId('5e3873a0c324df234bfafc80'),
+        _id: BSON::ObjectId.new,
         created_at: nil,
         default_contribution_factor: 0.0,
         display_name: "Child Under 26",
         member_relationship_maps: [
-          {_id: BSON::ObjectId('5b044e499f880b5d6f36c796'), count: 1, created_at: nil, operator: :>=, relationship_name: :dependent, updated_at: nil}
+          {_id: BSON::ObjectId.new, count: 1, created_at: nil, operator: :>=, relationship_name: :dependent, updated_at: nil}
         ],
         minimum_contribution_factor: 0.0,
         name: "dependent",
@@ -85,12 +86,12 @@ RSpec.describe BenefitMarkets::Operations::ContributionModels::Assign, dbclean: 
   let(:fifty_percent_contribution_units) do
     [
       {
-        _id: BSON::ObjectId('5e3873a0c324df234bfafc89'),
+        _id: BSON::ObjectId.new,
         created_at: nil,
         default_contribution_factor: 0.5,
         display_name: "Employee",
         member_relationship_maps: [
-          {_id: BSON::ObjectId('5b044e499f880b5d6f36c792'), count: 1, created_at: nil, operator: :==, relationship_name: :employee, updated_at: nil}
+          {_id: BSON::ObjectId.new, count: 1, created_at: nil, operator: :==, relationship_name: :employee, updated_at: nil}
         ],
         minimum_contribution_factor: 0.5,
         name: "employee",
@@ -98,12 +99,12 @@ RSpec.describe BenefitMarkets::Operations::ContributionModels::Assign, dbclean: 
         updated_at: nil
       },
       {
-        _id: BSON::ObjectId('5e3873a0c324df234bfafc8a'),
+        _id: BSON::ObjectId.new,
         created_at: nil,
         default_contribution_factor: 0.0,
         display_name: "Spouse",
         member_relationship_maps: [
-          {_id: BSON::ObjectId('5b044e499f880b5d6f36c794'), count: 1, created_at: nil, operator: :>=, relationship_name: :spouse, updated_at: nil}
+          {_id: BSON::ObjectId.new, count: 1, created_at: nil, operator: :>=, relationship_name: :spouse, updated_at: nil}
         ],
         minimum_contribution_factor: 0.0,
         name: "spouse",
@@ -111,12 +112,12 @@ RSpec.describe BenefitMarkets::Operations::ContributionModels::Assign, dbclean: 
         updated_at: nil
       },
       {
-        _id: BSON::ObjectId('5e3873a0c324df234bfafc8b'),
+        _id: BSON::ObjectId.new,
         created_at: nil,
         default_contribution_factor: 0.0,
         display_name: "Domestic Partner",
         member_relationship_maps: [
-          {_id: BSON::ObjectId('5b117fa19f880b34354e4e71'), count: 1, created_at: nil, operator: :>=, relationship_name: :domestic_partner, updated_at: nil}
+          {_id: BSON::ObjectId.new, count: 1, created_at: nil, operator: :>=, relationship_name: :domestic_partner, updated_at: nil}
         ],
         minimum_contribution_factor: 0.0,
         name: "domestic_partner",
@@ -124,12 +125,12 @@ RSpec.describe BenefitMarkets::Operations::ContributionModels::Assign, dbclean: 
         updated_at: nil
       },
       {
-        _id: BSON::ObjectId('5e3873a0c324df234bfafc8c'),
+        _id: BSON::ObjectId.new,
         created_at: nil,
         default_contribution_factor: 0.0,
         display_name: "Child Under 26",
         member_relationship_maps: [
-          {_id: BSON::ObjectId('5b044e499f880b5d6f36c796'), count: 1, created_at: nil, operator: :>=, relationship_name: :dependent, updated_at: nil}
+          {_id: BSON::ObjectId.new, count: 1, created_at: nil, operator: :>=, relationship_name: :dependent, updated_at: nil}
         ],
         minimum_contribution_factor: 0.0,
         name: "dependent",
@@ -141,7 +142,7 @@ RSpec.describe BenefitMarkets::Operations::ContributionModels::Assign, dbclean: 
 
   let(:zero_percent_contribution_model) do
     ::BenefitMarkets::Entities::ContributionModel.new({
-      _id: BSON::ObjectId('5e3873a0c324df234bfafc91'),
+      _id: BSON::ObjectId.new,
       title: 'title',
       key: :zero_percent_sponsor_fixed_percent_contribution_model,
       sponsor_contribution_kind: '"::BenefitSponsors::SponsoredBenefits::FixedPercentSponsorContribution"',
@@ -155,7 +156,7 @@ RSpec.describe BenefitMarkets::Operations::ContributionModels::Assign, dbclean: 
 
   let(:fifty_percent_contribution_model) do
     ::BenefitMarkets::Entities::ContributionModel.new({
-      _id: BSON::ObjectId('5e3873a0c324df234bfafc92'),
+      _id: BSON::ObjectId.new,
       title: 'title',
       key: :fifty_percent_sponsor_fixed_percent_contribution_model,
       sponsor_contribution_kind: '"::BenefitSponsors::SponsoredBenefits::FixedPercentSponsorContribution"',

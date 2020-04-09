@@ -12,17 +12,17 @@ RSpec.describe BenefitMarkets::Validators::Products::ProductPackageContract do
   let(:title)                         { 'Title' }
   let(:description)                   { 'Description' }
 
-  let(:pricing_units)                 { [{_id: BSON::ObjectId('5b044e499f880b5d6f36c78d'), name: 'name', display_name: 'Employee Only', order: 1}] }
-  let(:member_relationships)          { [{relationship_name: :employee, relationship_kinds: ['self'], age_threshold: 18, age_comparison: :==, disability_qualifier: true}] }
+  let(:pricing_units)                 { [{_id: BSON::ObjectId.new, name: 'name', display_name: 'Employee Only', order: 1}] }
+  let(:member_relationships)          { [{_id: BSON::ObjectId.new, relationship_name: :employee, relationship_kinds: ['self'], age_threshold: 18, age_comparison: :==, disability_qualifier: true}] }
   let(:pricing_model) do
     {
-      _id: BSON::ObjectId('5b044e499f880b5d6f36c78d'),
+      _id: BSON::ObjectId.new,
       name: 'name', price_calculator_kind: 'price_calculator_kind', pricing_units: pricing_units,
       product_multiplicities: [:product_multiplicities], member_relationships: member_relationships
     }
   end
 
-  let(:member_relationship_map)       { ::BenefitMarkets::ContributionModels::MemberRelationshipMap.new(relationship_name: 'Employee', count: 1).as_json }
+  let(:member_relationship_map)       { ::BenefitMarkets::ContributionModels::MemberRelationshipMap.new(_id: BSON::ObjectId.new, relationship_name: 'Employee', count: 1).as_json }
   let(:member_relationship_maps)      { [member_relationship_map] }
   let(:contribution_unit) do
     ::BenefitMarkets::ContributionModels::ContributionUnit.new(
@@ -37,7 +37,7 @@ RSpec.describe BenefitMarkets::Validators::Products::ProductPackageContract do
 
   let(:contribution_model) do
     {
-      _id: BSON::ObjectId('5b044e499f880b5d6f36c78d'),
+      _id: BSON::ObjectId.new,
       title: 'title', key: :key, sponsor_contribution_kind: 'sponsor_contribution_kind', contribution_calculator_kind: 'contribution_calculator_kind',
       many_simultaneous_contribution_units: true, product_multiplicities: [:product_multiplicities1, :product_multiplicities2],
       member_relationships: member_relationships, contribution_units: contribution_units
@@ -54,8 +54,8 @@ RSpec.describe BenefitMarkets::Validators::Products::ProductPackageContract do
       language: 'language', type: 'type', source: 'source'
     }
   end
-  let(:premium_tables)   { [{effective_period: effective_period, premium_tuples: [premium_tuples], rating_area_id: BSON::ObjectId.new}] }
-  let(:premium_tuples)   { {age: 12, cost: 227.07} }
+  let(:premium_tables)   { [{_id: BSON::ObjectId.new, effective_period: effective_period, premium_tuples: [premium_tuples], rating_area_id: BSON::ObjectId.new}] }
+  let(:premium_tuples)   { {_id: BSON::ObjectId.new, age: 12, cost: 227.07} }
   let(:effective_period) { effective_date.beginning_of_year..(effective_date.end_of_year) }
 
   let(:product) do

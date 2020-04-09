@@ -7,7 +7,7 @@ RSpec.describe BenefitMarkets::Entities::PremiumTuple do
   context "Given valid required parameters" do
 
     let(:contract)           { BenefitMarkets::Validators::Products::PremiumTupleContract.new }
-    let(:required_params)    { {age: 20, cost: 227.07} }
+    let(:required_params)    { {_id: BSON::ObjectId.new, age: 20, cost: 227.07} }
 
     context "with all/required params" do
 

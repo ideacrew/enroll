@@ -51,9 +51,9 @@ RSpec.describe BenefitSponsors::Validators::SponsoredBenefits::SponsoredBenefitC
         }
       end
 
-      let(:premium_tuples)   { {age: 12, cost: 227.07} }
+      let(:premium_tuples)   { {_id: BSON::ObjectId.new, age: 12, cost: 227.07} }
 
-      let(:premium_tables)   { [{effective_period: effective_date.beginning_of_year..(effective_date.end_of_year), premium_tuples: [premium_tuples], rating_area_id: BSON::ObjectId.new}] }
+      let(:premium_tables)   { [{_id: BSON::ObjectId.new, effective_period: effective_date.beginning_of_year..(effective_date.end_of_year), premium_tuples: [premium_tuples], rating_area_id: BSON::ObjectId.new}] }
 
       let(:reference_product) do
         {

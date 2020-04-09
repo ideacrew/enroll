@@ -7,7 +7,7 @@ RSpec.describe BenefitMarkets::Entities::CountyZip do
   context "Given valid required parameters" do
 
     let(:contract)          { BenefitMarkets::Validators::Locations::CountyZipContract.new }
-    let(:required_params)   { {county_name: 'abc county', zip: '22222', state: 'dc'} }
+    let(:required_params)   { {_id: BSON::ObjectId.new, county_name: 'abc county', zip: '22222', state: 'dc'} }
 
     context "with all/required params" do
 

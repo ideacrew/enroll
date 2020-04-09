@@ -7,10 +7,10 @@ RSpec.describe BenefitMarkets::Entities::ContributionModel do
   context "Given valid required parameters" do
 
     let(:contract)                  { BenefitMarkets::Validators::ContributionModels::ContributionModelContract.new }
-    let(:member_relationship_map)   { {relationship_name: :employee, operator: :==, count: 1} }
+    let(:member_relationship_map)   { {_id: BSON::ObjectId.new, relationship_name: :employee, operator: :==, count: 1} }
     let(:contribution_unit) do
       {
-        _id: BSON::ObjectId('5b044e499f880b5d6f36c78d'),
+        _id: BSON::ObjectId.new,
         name: "Employee",
         display_name: "Employee Only",
         order: 1,
@@ -19,11 +19,11 @@ RSpec.describe BenefitMarkets::Entities::ContributionModel do
     end
 
     let(:contribution_units)         { [contribution_unit] }
-    let(:member_relationships)       { [{relationship_name: :employee, relationship_kinds: [{}]}] }
+    let(:member_relationships)       { [{_id: BSON::ObjectId.new, relationship_name: :employee, relationship_kinds: [{}]}] }
 
     let(:required_params) do
       {
-        _id: BSON::ObjectId('5b044e499f880b5d6f36c78d'),
+        _id: BSON::ObjectId.new,
         title: 'title', sponsor_contribution_kind: 'sponsor_contribution_kind',
         contribution_calculator_kind: 'contribution_calculator_kind',
         product_multiplicities: [:product_multiplicities1, :product_multiplicities2],

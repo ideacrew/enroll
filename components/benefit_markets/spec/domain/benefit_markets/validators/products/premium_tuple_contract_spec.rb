@@ -7,7 +7,7 @@ RSpec.describe BenefitMarkets::Validators::Products::PremiumTupleContract do
   let(:age)            { 12 }
   let(:cost)          { 227.07 }
 
-  let(:missing_params)   { {age: age} }
+  let(:missing_params)   { {_id: BSON::ObjectId.new, age: age} }
   let(:required_params)  { missing_params.merge({cost: cost}) }
   let(:error_message)   { {:cost => ["is missing"]} }
 

@@ -8,7 +8,7 @@ RSpec.describe BenefitMarkets::Validators::Locations::CountyZipContract do
   let(:zip)           { "Zip" }
   let(:state)         { "State" }
 
-  let(:missing_params)      { {county_name: county_name, zip: zip} }
+  let(:missing_params)      { {_id: BSON::ObjectId.new, county_name: county_name, zip: zip} }
   let(:invalid_params)      { missing_params.merge({state: ''}) }
   let(:error_message1)      { {:state => ["is missing"]} }
   let(:error_message2)      { {:state => ["must be filled"]} }

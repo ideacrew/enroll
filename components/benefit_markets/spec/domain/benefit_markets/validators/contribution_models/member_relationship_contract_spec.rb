@@ -7,9 +7,9 @@ RSpec.describe BenefitMarkets::Validators::ContributionModels::MemberRelationshi
   let(:relationship_name)   { :Employee }
   let(:relationship_kinds)  { ['self'] }
 
-  let(:missing_params)      { {relationship_name: relationship_name} }
-  let(:invalid_params)      { {relationship_name: relationship_name, relationship_kinds: [{}]} }
-  let(:required_params)     { {relationship_name: relationship_name, relationship_kinds: relationship_kinds} }
+  let(:missing_params)      { {_id: BSON::ObjectId.new, relationship_name: relationship_name} }
+  let(:invalid_params)      { {_id: BSON::ObjectId.new, relationship_name: relationship_name, relationship_kinds: [{}]} }
+  let(:required_params)     { {_id: BSON::ObjectId.new, relationship_name: relationship_name, relationship_kinds: relationship_kinds} }
   let(:error_message)       { {:relationship_kinds => ["is missing"]} }
   let(:error_message2)      { {:relationship_kinds => {0 => ["must be a string"]}} }
 

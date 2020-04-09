@@ -6,6 +6,7 @@ module BenefitMarkets
       class PremiumTableContract < Dry::Validation::Contract
 
         params do
+          required(:_id).filled(Types::Bson)
           required(:effective_period).filled(type?: Range)
           required(:rating_area_id).filled(Types::Bson)
           optional(:premium_tuples).array(:hash)

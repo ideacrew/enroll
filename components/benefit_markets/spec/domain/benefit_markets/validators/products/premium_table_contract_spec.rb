@@ -6,11 +6,11 @@ RSpec.describe BenefitMarkets::Validators::Products::PremiumTableContract do
 
   let(:effective_date)      { TimeKeeper.date_of_record.next_month.beginning_of_month }
   let(:effective_period)    { effective_date.beginning_of_year..(effective_date.end_of_year) }
-  let(:premium_tuples)      { {age: 12, cost: 227.07} }
+  let(:premium_tuples)      { {_id: BSON::ObjectId.new, age: 12, cost: 227.07} }
   let(:rating_area_id)      { BSON::ObjectId.new }
 
-  let(:missing_params)      { {effective_period: effective_period, premium_tuples: [premium_tuples]} }
-  let(:invalid_params)      { {premium_tuples: [premium_tuples], effective_period: effective_date, rating_area_id: rating_area_id} }
+  let(:missing_params)      { {_id: BSON::ObjectId.new, effective_period: effective_period, premium_tuples: [premium_tuples]} }
+  let(:invalid_params)      { {_id: BSON::ObjectId.new, premium_tuples: [premium_tuples], effective_period: effective_date, rating_area_id: rating_area_id} }
   let(:error_message1)      { {:rating_area_id => ["is missing"]} }
   let(:error_message2)      { {:effective_period => ["must be Range"]} }
 

@@ -6,7 +6,7 @@ RSpec.describe BenefitMarkets::Operations::PricingUnits::Create, dbclean: :after
 
   let(:ee_pricing_unit) do
     {
-      "_id"=>BSON::ObjectId('5b044e499f880b5d6f36c78d'),
+      "_id"=>BSON::ObjectId.new,
       "created_at"=>nil,
       "discounted_above_threshold"=>nil,
       "display_name"=>"Employee",

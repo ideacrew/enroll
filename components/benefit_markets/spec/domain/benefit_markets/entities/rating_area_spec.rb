@@ -7,7 +7,7 @@ RSpec.describe BenefitMarkets::Entities::RatingArea do
   context "Given valid required parameters" do
 
     let(:contract)          { BenefitMarkets::Validators::Locations::RatingAreaContract.new }
-    let(:required_params)   { {active_year: 2020, exchange_provided_code: 'code', county_zip_ids: [{}], covered_states: [{}] } }
+    let(:required_params)   { {_id: BSON::ObjectId.new, active_year: 2020, exchange_provided_code: 'code', county_zip_ids: [{}], covered_states: [{}] } }
 
     context "with all/required params" do
 

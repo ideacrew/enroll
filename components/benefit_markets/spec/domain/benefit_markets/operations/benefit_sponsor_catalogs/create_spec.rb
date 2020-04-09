@@ -9,18 +9,18 @@ RSpec.describe BenefitMarkets::Operations::BenefitSponsorCatalogs::Create, dbcle
   let(:service_area)            { create_default(:benefit_markets_locations_service_area) }
   let(:effective_date)          { TimeKeeper.date_of_record.next_month.beginning_of_month }
   let(:application_period)      { effective_date..(effective_date + 1.year).prev_day }
-  let(:pricing_units)           { [{_id: BSON::ObjectId('5b044e499f880b5d6f36c78d'), name: 'name', display_name: 'Employee Only', order: 1}] }
-  let(:premium_tuples)          { {age: 12, cost: 227.07} }
+  let(:pricing_units)           { [{_id: BSON::ObjectId.new, name: 'name', display_name: 'Employee Only', order: 1}] }
+  let(:premium_tuples)          { {_id: BSON::ObjectId.new, age: 12, cost: 227.07} }
   let(:effective_period)        { effective_date.beginning_of_year..effective_date.end_of_year }
-  let(:premium_tables)          { [{effective_period: effective_period, rating_area_id: BSON::ObjectId.new, premium_tuples: [premium_tuples]}] }
-  let(:member_relationships)    { [{relationship_name: :employee, relationship_kinds: [{}], age_threshold: 18, age_comparison: :==, disability_qualifier: true}] }
+  let(:premium_tables)          { [{_id: BSON::ObjectId.new, effective_period: effective_period, rating_area_id: BSON::ObjectId.new, premium_tuples: [premium_tuples]}] }
+  let(:member_relationships)    { [{_id: BSON::ObjectId.new, relationship_name: :employee, relationship_kinds: [{}], age_threshold: 18, age_comparison: :==, disability_qualifier: true}] }
   let(:oe_start_on)             { TimeKeeper.date_of_record.beginning_of_month}
   let(:open_enrollment_period)  { oe_start_on..(oe_start_on + 10.days) }
   let(:probation_period_kinds)  { [] }
 
   let(:pricing_model) do
     {
-      _id: BSON::ObjectId('5b044e499f880b5d6f36c78d'),
+      _id: BSON::ObjectId.new,
       name: 'name', price_calculator_kind: 'price_calculator_kind', pricing_units: pricing_units,
       product_multiplicities: [:product_multiplicities], member_relationships: member_relationships
     }
@@ -28,17 +28,17 @@ RSpec.describe BenefitMarkets::Operations::BenefitSponsorCatalogs::Create, dbcle
 
   let(:contribution_unit) do
     {
-      _id: BSON::ObjectId('5b044e499f880b5d6f36c78d'),
+      _id: BSON::ObjectId.new,
       name: "Employee",
       display_name: "Employee Only",
       order: 1,
-      member_relationship_maps: [relationship_name: :employee, operator: :==, count: 1]
+      member_relationship_maps: [_id: BSON::ObjectId.new, relationship_name: :employee, operator: :==, count: 1]
     }
   end
 
   let(:contribution_model) do
     {
-      _id: BSON::ObjectId('5b044e499f880b5d6f36c78d'),
+      _id: BSON::ObjectId.new,
       title: 'title', key: :key, sponsor_contribution_kind: 'sponsor_contribution_kind', contribution_calculator_kind: 'contribution_calculator_kind',
       many_simultaneous_contribution_units: true, product_multiplicities: [:product_multiplicities1, :product_multiplicities2],
       member_relationships: member_relationships, contribution_units: [contribution_unit]

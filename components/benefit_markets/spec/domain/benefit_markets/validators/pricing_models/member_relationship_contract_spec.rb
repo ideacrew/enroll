@@ -10,7 +10,7 @@ RSpec.describe BenefitMarkets::Validators::PricingModels::MemberRelationshipCont
   let(:age_comparison)         { :== }
   let(:disability_qualifier)   { false }
 
-  let(:missing_params)          { {relationship_kinds: relationship_kinds, age_threshold: age_threshold} }
+  let(:missing_params)          { {_id: BSON::ObjectId.new, relationship_kinds: relationship_kinds, age_threshold: age_threshold} }
   let(:required_params)         { missing_params.merge({relationship_name: relationship_name}) }
   let(:invalid_params)          { required_params.merge({relationship_name: 123})}
   let(:error_message1)          { {:relationship_name => ["is missing"]} }
