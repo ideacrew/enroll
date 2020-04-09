@@ -70,6 +70,8 @@ RSpec.describe 'BenefitSponsors::ModelEvents::ApplicationCoverageSelected', :dbc
         allow(model_instance).to receive(:census_employee).and_return(census_employee)
         allow(census_employee).to receive(:employee_role).and_return(employee_role)
         hbx_enrollment = model_event.klass_instance
+        puts "hbx_enrollment.sponsored_benefit_package.benefit_application.open_enrollment_period"
+        puts hbx_enrollment.sponsored_benefit_package.benefit_application.open_enrollment_period.inspect
         puts "hbx_enrollment.submitted_at #{hbx_enrollment.submitted_at.inspect}"
         puts "hbx_enrollment.created_at #{hbx_enrollment.created_at.inspect}"
         puts "(hbx_enrollment.sponsored_benefit_package.benefit_application.open_enrollment_period.cover?(hbx_enrollment.submitted_at) || hbx_enrollment.sponsored_benefit_package.benefit_application.open_enrollment_period.cover?(hbx_enrollment.created_at))"
