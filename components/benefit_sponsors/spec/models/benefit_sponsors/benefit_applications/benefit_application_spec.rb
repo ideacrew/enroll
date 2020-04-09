@@ -531,6 +531,41 @@ module BenefitSponsors
           expect(renewal_application.benefit_sponsor_catalog).to eq renewal_benefit_sponsor_catalog
         end
 
+        context "send_employee_renewal_invites" do
+          let!(:census_employee_1) do
+            FactoryBot.create(:census_employee, benefit_sponsors_employer_profile_id: employer_profile.id, benefit_sponsorship: benefit_sponsorship, :benefit_group_assignments => [benefit_group_assignment])
+          end
+          let!(:census_employee_2) do
+            FactoryBot.create(:census_employee, benefit_sponsors_employer_profile_id: employer_profile.id, benefit_sponsorship: benefit_sponsorship, :benefit_group_assignments => [benefit_group_assignment])
+          end
+          let(:census_employee_scope) do
+            CensusEmployee.where(:"_id".in => [census_employee_1.id, census_employee_2.id])
+          end
+
+          let(:fake_email_address) {"fakeemail1@fakeemail.com" }
+
+          context "same employer, same email" do
+            before :each do
+              ::Invitation.destroy_all
+              renewal_application.save!
+              renewal_bga
+              CensusEmployee.all.each do |ce|
+                allow(ce).to receive(:email_address).and_return(fake_email_address)
+                allow(ce.renewal_benefit_group_assignment).to receive(:benefit_application).and_return(renewal_application)
+                allow(ce).to receive(:benefit_sponsors_employer_profile_id).and_return(employer_profile.id)
+              end
+              allow(renewal_application.benefit_sponsorship).to receive(:census_employees).and_return(census_employee_scope)
+            end
+          
+            it "should not send duplicate invitations" do
+              renewal_application.send_employee_renewal_invites
+              expect(::Invitation.count).to eq(2)
+              renewal_application.send_employee_renewal_invites
+              expect(::Invitation.count).to eq(2)
+            end
+          end
+        end
+
         context "when renewal application saved" do
 
           before do
