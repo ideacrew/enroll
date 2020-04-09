@@ -7,6 +7,7 @@ env: # https://stackoverflow.com/questions/59867124/how-can-i-access-github-acti
   YELLR_KEY: ${{ secrets.YELLR_KEY }}
   YELLR_URL: ${{ secrets.YELLR_URL }}
   STATUS: failing
+  CUCUMBER_SPLIT_CONFIGURATION_PATH: ./config/cucumber.yml
   TEST_BOOSTERS_RSPEC_TEST_FILE_PATTERN: "{spec,components/benefit_markets/spec,components/benefit_sponsors,components/notifier,components/sponsored_benefits,components/transport_gateway,components/transport_profiles}/**/*_spec.rb"
 
 jobs:
