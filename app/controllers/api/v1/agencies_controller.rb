@@ -46,11 +46,11 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
     when :ok
       render json: { status: "success" }, status: :ok
     when :person_not_found
-      render json: { status: "error", message: "Terminate staff failed: Person could not be found." }, status: :bad_request
+      render json: { status: "error", message: "Person could not be found" }, status: :bad_request
     when :no_role_found
-      render json: { status: "error", message: "Terminate staff failed: Unable to find role." }, status: :bad_request
+      render json: { status: "error", message: "Unable to find role" }, status: :bad_request
     else
-      render json: { status: "error", message: "Terminate staff failed: Unknown error." }, status: :internal_server_error
+      render json: { status: "error", message: "Unknown error" }, status: :internal_server_error
     end
   end
 
@@ -62,15 +62,15 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
     when :ok
       render json: { status: "success" }, status: :ok
     when :person_not_found
-      render json: { status: "error", message: "Update staff failed: Person not found." }, status: :bad_request
+      render json: { status: "error", message: "Person could not be found" }, status: :bad_request
     when :information_missing
-      render json: { status: "error", message: "Update staff failed: Required properties missing." }, status: :bad_request
+      render json: { status: "error", message: "Required properties missing" }, status: :bad_request
     when :matching_record_found
-      render json: { status: "error", message: "Update staff failed: Given details match with another record." }, status: :conflict
+      render json: { status: "error", message: "Given details match another record" }, status: :conflict
     when :invalid_dob
-      render json: { status: "error", message: "Update staff failed: Date of birth is invalid." }, status: :bad_request
+      render json: { status: "error", message: "Date of birth is invalid" }, status: :bad_request
     else
-      render json: { status: "error", message: "Update staff failed: Unknown error." }, status: :internal_server_error
+      render json: { status: "error", message: "Unknown error" }, status: :internal_server_error
     end
   end
 
@@ -81,11 +81,11 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
     when :ok
       render json: { status: "success" }, status: :ok
     when :person_not_found
-      render json: { status: "error", message: "Update staff failed: Person not found." }, status: :bad_request
+      render json: { status: "error", message: "Person not found" }, status: :bad_request
     when :email_not_found
-      render json: { status: "error", message: "Update staff failed: Email not found." }, status: :bad_request
+      render json: { status: "error", message: "Email not found" }, status: :bad_request
     else
-      render json: { status: "error", message: "Update staff failed: Unknown error." }, status: :internal_server_error
+      render json: { status: "error", message: "Unknown error" }, status: :internal_server_error
     end
   end
 
