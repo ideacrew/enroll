@@ -138,6 +138,14 @@ def people
       email: "sherry.buckner@dc.gov",
       password: 'aA1!aA1!aA1!'
     },
+    "Ricky Martin" => {
+      first_name: "Ricky",
+      last_name: "Martin",
+      dob_date: '10/10/1984',
+      broker_census_employee: true,
+      password: 'aA1!aA1!aA1!',
+      ssn: "222335220"
+    },
     "Hbx AdminEnrollments" => {
       first_name: "Hbx Admin",
       last_name: "Enrollments#{rand(1000)}",
@@ -614,6 +622,14 @@ When(/^Primary Broker have submit the security questions$/) do
   step 'I have submitted the security questions'
 end
 
+And(/^Hbx Admin select the all security question and give the answer$/) do
+  step 'I select the all security question and give the answer'
+end
+
+When(/^Hbx Admin have submitted the security questions$/) do
+  step 'I have submitted the security questions'
+end
+
 And(/^Broker Assisted select the all security question and give the answer$/) do
   step 'I select the all security question and give the answer'
 end
@@ -835,6 +851,10 @@ end
 
 When(/^.+ clicks? my insured portal link$/) do
   click_link 'My Insured Portal'
+end
+
+When(/^.+ selects the broker$/) do
+  click_link("Ricky Martin", :visible => true)
 end
 
 When(/^.+ clicks? shop for plans button$/) do
