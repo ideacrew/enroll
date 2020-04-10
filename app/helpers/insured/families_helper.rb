@@ -21,12 +21,19 @@ module Insured::FamiliesHelper
   end
 
   def current_premium hbx_enrollment
-    if hbx_enrollment.is_shop?
-      hbx_enrollment.total_employee_cost
-    elsif hbx_enrollment.kind == 'coverall'
-      hbx_enrollment.total_premium
-    else
-      hbx_enrollment.total_premium > hbx_enrollment.applied_aptc_amount.to_f ? hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f : 0
+    begin
+      if hbx_enrollment.is_shop?
+        hbx_enrollment.total_employee_cost
+      elsif hbx_enrollment.kind == 'coverall'
+        hbx_enrollment.total_premium
+      else
+        hbx_enrollment.total_premium > hbx_enrollment.applied_aptc_amount.to_f ? hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f : 0
+      end
+    rescue Exception => e
+      exception_message = "Current Premium calculation error for HBX Enrollment: #{hbx_enrollment.hbx_id.to_s}"
+      Rails.logger.error(exception_message) unless Rails.env.test?
+      puts(exception_message) unless Rails.env.test?
+      'Not Available.'
     end
   end
 
