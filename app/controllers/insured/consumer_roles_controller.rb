@@ -7,6 +7,7 @@ class Insured::ConsumerRolesController < ApplicationController
   before_action :find_consumer_role, only: [:edit, :update]
   before_action :individual_market_is_enabled?
   before_action :decrypt_params, only: [:create]
+  before_action :set_cache_headers, only: [:edit]
 
   FIELDS_TO_ENCRYPT = [:ssn,:dob,:first_name,:middle_name,:last_name,:gender,:user_id]
 
@@ -353,6 +354,11 @@ class Insured::ConsumerRolesController < ApplicationController
       current_user.save!
       # render 'privacy'
     end
+  end
+
+  def set_cache_headers
+    response.headers["Cache-Control"] = "no-cache, no-store, private, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
   end
 
   def set_error_message(message)
