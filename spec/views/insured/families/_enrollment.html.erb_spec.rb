@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe "insured/families/_enrollment.html.erb" do
   let(:sponsored_benefit_package) { double("SponsoredBenefitPakage") }
   let(:person) { double(id: '31111113') }
-  let(:family) { double(is_eligible_to_enroll?: true, updateable?: true, list_enrollments?: true) }
+  let(:family) { double(is_eligible_to_enroll?: true, updateable?: true, list_enrollments?: true, id: 'familyid', :enrollment_is_not_most_recent_sep_enrollment? => false) }
 
   let(:employee_role) do
     instance_double(EmployeeRole)
@@ -80,7 +80,9 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
         consumer_role: nil,
         future_enrollment_termination_date: "",
         is_ivl_by_kind?: false,
-        covered_members_first_names: []
+        covered_members_first_names: [],
+        :is_ivl_actively_outstanding? => false,
+        :is_active_renewal_purchase? => false
       )
     end
 
@@ -150,8 +152,9 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
         consumer_role_id: nil,
         consumer_role: nil,
         is_ivl_by_kind?: false,
-        future_enrollment_termination_date: future_enrollment_termination_date, 
-        covered_members_first_names: []
+        future_enrollment_termination_date: future_enrollment_termination_date,
+        covered_members_first_names: [],
+        :is_active_renewal_purchase? => false
       )
     end
 

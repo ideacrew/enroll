@@ -1746,10 +1746,6 @@ class HbxEnrollment
     !(shopping_plan_year.effective_period.min== effective_on)
   end
 
-  def is_under_sep_and_eligible_to_enroll?
-    family&.is_under_special_enrollment_period? && family&.is_eligible_to_enroll?
-  end
-
   def update_coverage_kind_by_plan
     if plan.present? && coverage_kind != plan.coverage_kind
       self.update(coverage_kind: plan.coverage_kind)

@@ -124,13 +124,10 @@ module Insured::FamiliesHelper
     # Return false for IVL
     return false unless hbx_enrollment.is_shop?
 
-    return false unless hbx_enrollment&.sponsored_benefit_package
-
-    hbx_enrollment&.sponsored_benefit_package&.open_enrollment_contains?(TimeKeeper.date_of_record) &&
-      hbx_enrollment.is_under_sep_and_eligible_to_enroll? &&
-      !(hbx_enrollment&.coverage_terminated? || hbx_enrollment&.coverage_canceled?) &&
-      hbx_enrollment.active_during?(hbx_enrollment&.family&.current_sep&.effective_on) &&
-      hbx_enrollment&.family&.most_recent_enrollment_by_coverage_kind_is_not_sep?(hbx_enrollment)
+    hbx_enrollment.family.is_eligible_to_enroll? &&
+      hbx_enrollment.display_make_changes_for_ivl? &&
+      !(hbx_enrollment.coverage_terminated? || hbx_enrollment.coverage_canceled?) &&
+      (hbx_enrollment&.family&.enrollment_is_not_most_recent_sep_enrollment?(hbx_enrollment) || !hbx_enrollment.is_active_renewal_purchase?)
   end
 
   def enable_make_changes_states
@@ -144,12 +141,12 @@ module Insured::FamiliesHelper
 
   def disable_make_changes_button?(hbx_enrollment)
     # return false if IVL
-    return false if hbx_enrollment.census_employee.blank?
+    return false if [hbx_enrollment.census_employee.blank?, !hbx_enrollment.is_shop?].any?
     return false if !hbx_enrollment.is_shop?
     # Enable the button under these conditions
       # 1) plan year under open enrollment period
       # 2) new hire covered under enrolment period
-      # 3) qle enrollment period check
+      # 3) qle enrolmlent period check
     return false if hbx_enrollment.sponsored_benefit_package.open_enrollment_contains?(TimeKeeper.date_of_record)
     return false if hbx_enrollment.employee_role&.can_enroll_as_new_hire?
     return false if hbx_enrollment.family.is_under_special_enrollment_period? && hbx_enrollment.active_during?(hbx_enrollment.family.current_sep.effective_on)
@@ -157,6 +154,7 @@ module Insured::FamiliesHelper
     # Disable only  if non of the above conditions match
     true
   end
+
 
   def all_active_enrollment_with_aptc(family)
     family.active_household.active_hbx_enrollments_with_aptc_by_year(TimeKeeper.datetime_of_record.year)
