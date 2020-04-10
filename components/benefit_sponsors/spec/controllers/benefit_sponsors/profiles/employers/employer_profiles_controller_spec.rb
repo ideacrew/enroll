@@ -83,9 +83,12 @@ module BenefitSponsors
           get :show, id: benefit_sponsor.profiles.first.id, tab: 'families'
         end
 
-        it "should redirect_to home page" do
-          home_url = profiles_employers_employer_profile_path(tab: 'home')
-          expect(subject).to redirect_to(home_url)
+        it "should render show template" do
+          expect(response).to render_template("show")
+        end
+
+        it "should return http success" do
+          expect(response).to have_http_status(:success)
         end
       end
     end
