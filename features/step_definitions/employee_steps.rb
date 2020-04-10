@@ -94,24 +94,42 @@ And(/employee (.*) with a dependent has (.*) relationship with age (.*) than 26/
 end
 
 Given(/^Covid QLE present with top ordinal position$/) do
-  FactoryBot.create(:qualifying_life_event_kind, title: 'Covid-19', reason: 'Covid-19', market_kind: "shop", post_event_sep_in_days: 30,  effective_on_kinds: ["first_of_this_month", "fixed_first_of_next_month"], ordinal_position: 5)
+  FactoryBot.create(:qualifying_life_event_kind, title: 'Covid-19', reason: 'covid-19', market_kind: "shop", post_event_sep_in_days: 30,  effective_on_kinds: ["first_of_this_month", "fixed_first_of_next_month"], ordinal_position: 5, qle_event_date_kind: :submitted_at)
 end
 
 Then(/^Employee should see the "(.*?)" at the top of the shop qle list$/) do |qle_event|
   expect(find('.qles-panel #carousel-qles .item.active').find_all('p.no-op')[0]).to have_content(qle_event)
 end
 
-And(/Employee select a current qle date and clicks continue/) do
+And(/Employee should see today date and clicks continue/) do
   screenshot("current_qle_date")
-  fill_in "qle_date", :with => TimeKeeper.date_of_record.strftime("%m/%d/%Y")
+  
+  expect(find('#qle_date').value).to eq TimeKeeper.date_of_record.strftime("%m/%d/%Y")
+  expect(find('#qle_date')['readonly']).to eq 'true'
+  expect(find('input#qle_date', style: {'pointer-events': 'none'})).to be_truthy
+
   within '#qle-date-chose' do
     find('.interaction-click-control-continue').click
   end
 end
 
-And(/Employee select "(.*?)" for effective on kinds and clicks continue/) do |effective_on_kind|
+And(/Employee select "(.*?)" for "(.*?)" sep effective on kind and clicks continue/) do |effective_on_kind, qle_reason|
   expect(page).to have_content "Based on the information you entered, you may be eligible to enroll now but there is limited time"
-  select effective_on_kind.humanize, from: 'effective_on_kind'
+
+  if qle_reason == 'covid-19'
+    qle_on = TimeKeeper.date_of_record
+    
+    effective_on_kind_date = case effective_on_kind
+    when 'fixed_first_of_next_month'
+      qle_on.end_of_month.next_day.to_s
+    when 'first_of_this_month'
+      qle_on.beginning_of_month.to_s
+    end
+
+    select effective_on_kind_date, from: 'effective_on_kind'
+  else
+    select effective_on_kind.humanize, from: 'effective_on_kind'
+  end
   click_button "Continue"
 end
 

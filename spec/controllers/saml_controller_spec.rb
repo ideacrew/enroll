@@ -166,7 +166,7 @@ RSpec.describe SamlController do
 
     context "user not logged on" do
       it "should redirect user to login URL" do
-        allow(controller).to receive(:current_user).and_return(false)
+        allow(controller).to receive(:current_user).and_return(nil)
         get :navigate_to_assistance
         expect(response).to redirect_to(SamlInformation.iam_login_url)
       end

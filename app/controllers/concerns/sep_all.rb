@@ -14,11 +14,12 @@ module SepAll
     qle = QualifyingLifeEventKind.find(params[:id]) if params[:id].present?
 
     if qle.reason == 'covid-19'
-      params[:effective_kind] = "fixed first of next month" if params[:effective_kind] == 'First of next month'
+      @eff_kind = params[:effective_kind]
+    else
+      @eff_kind = params[:effective_kind].split.join("_").downcase
     end
 
-    @eff_kind  = params[:effective_kind].split.join("_") if params[:effective_kind].present?
-    special_enrollment_period = @family.special_enrollment_periods.new(effective_on_kind: params[:effective_kind].split.join("_").downcase)
+    special_enrollment_period = @family.special_enrollment_periods.new(effective_on_kind: @eff_kind)
     special_enrollment_period.qualifying_life_event_kind = qle
     special_enrollment_period.qle_on = Date.strptime(params[:eventDate], "%m/%d/%Y")
     @start_on = special_enrollment_period.start_on
@@ -33,15 +34,16 @@ module SepAll
     end_month_rule = 'End of Month'
 
     if @qle.reason == 'covid-19'
-      @effective_kinds = @qle.effective_on_kinds.map{|t|
-        if t == 'fixed_first_of_next_month'
-          'First of next month'
-        else
-          t.humanize
+      qle_on = TimeKeeper.date_of_record
+      @effective_kinds = @qle.effective_on_kinds.map do |t|
+        if t == 'first_of_this_month'
+          [qle_on.beginning_of_month.to_s, t]
+        elsif t == 'fixed_first_of_next_month'
+          [(qle_on.end_of_month + 1.day).to_s, t]
         end
-      }
+      end
     else
-      @effective_kinds = @qle.effective_on_kinds.map{|t|
+      @effective_kinds = @qle.effective_on_kinds.map do |t|
         if t == 'first_of_month'
           fifteen_day_rule
         elsif t == 'first_of_next_month'
@@ -49,7 +51,7 @@ module SepAll
         else
           t.humanize
         end
-      }
+      end
     end
   end
 
