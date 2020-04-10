@@ -256,24 +256,23 @@ class Invitation
 
   def self.invite_renewal_employee!(census_employee)
     if !census_employee.email_address.blank?
-      created_at_range = (TimeKeeper.date_of_record.beginning_of_day..TimeKeeper.date_of_record.end_of_day)
-      unless self.invitation_already_sent?(
+      created_at_range = Date.today.all_day
+      return if self.invitation_already_sent?(
         census_employee,
         'employee_role',
         created_at_range,
         "renewal_invitation_email"
       )
-        invitation = self.create(
-          :role => "employee_role",
-          :source_kind => "census_employee",
-          :source_id => census_employee.id,
-          :invitation_email => census_employee.email_address,
-          :invitation_email_type => "renewal_invitation_email",
-          :benefit_sponsors_employer_profile_id => census_employee.benefit_sponsors_employer_profile_id.to_s
-        )
-        invitation.send_renewal_invitation!(census_employee)
-        invitation
-      end
+      invitation = self.create(
+        :role => "employee_role",
+        :source_kind => "census_employee",
+        :source_id => census_employee.id,
+        :invitation_email => census_employee.email_address,
+        :invitation_email_type => "renewal_invitation_email",
+        :benefit_sponsors_employer_profile_id => census_employee.benefit_sponsors_employer_profile_id.to_s
+      )
+      invitation.send_renewal_invitation!(census_employee)
+      invitation
     end
   end
 
