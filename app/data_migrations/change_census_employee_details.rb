@@ -65,24 +65,30 @@ class ChangeCensusEmployeeDetails < MongoidMigrationTask
   end
 
   def link_or_construct_employee_role
-    census_employee = census_employee(ENV['ssn'], ENV['employer_fein'])
-        
-# After 14163 deployed we can just do census_employee.save
-    if census_employee.active_benefit_group_assignment.present?
-      if census_employee.employee_role.present?
-        census_employee.link_employee_role! if census_employee.may_link_employee_role?
-      else
-        if census_employee.has_benefit_group_assignment?
-          employee_relationship = Forms::EmployeeCandidate.new({first_name: census_employee.first_name,
-                                                        last_name: census_employee.last_name,
-                                                        ssn: census_employee.ssn,
-                                                        dob: census_employee.dob.strftime("%Y-%m-%d")})
-          person = employee_relationship.match_person if employee_relationship.present?
-          return false if person.blank? || (person.present? && person.has_active_employee_role_for_census_employee?(self))
-          Factories::EnrollmentFactory.build_employee_role(person, nil, census_employee.employer_profile, census_employee, census_employee.hired_on)
-          puts "Build Employee Role" unless Rails.env.test?
-        end
-      end
+    person = Person.by_hbx_id(ENV['hbx_id'].to_s).first
+    return if person.blank?
+
+    ssn = person.ssn
+    census_employee = census_employee(ssn, ENV['employer_fein'])
+    return unless census_employee.active_benefit_group_assignment.present?
+
+    if census_employee.employee_role.present? && census_employee.may_link_employee_role?
+      fix_benefit_group_assignment(census_employee) unless census_employee.valid?
+      census_employee.link_employee_role!
+      puts 'Census Employee successfully linked' unless Rails.env.test?
+    elsif census_employee.has_benefit_group_assignment?
+      Factories::EnrollmentFactory.build_employee_role(person, nil, census_employee.employer_profile, census_employee, census_employee.hired_on)
+      puts 'Build Employee Role' unless Rails.env.test?
+    end
+  end
+
+  def fix_benefit_group_assignment(census_employee)
+    census_employee.benefit_group_assignments.each do |benefit_group_assignment|
+      next if benefit_group_assignment.valid?
+
+      hbx_enrollment = benefit_group_assignment.hbx_enrollment
+      hbx_enrollment.sponsored_benefit_package_id = benefit_group_assignment.benefit_package_id
+      hbx_enrollment.save
     end
   end
 
@@ -101,9 +107,9 @@ class ChangeCensusEmployeeDetails < MongoidMigrationTask
   end
 
   def census_employee(ssn, employer_fein)
-    employer_profile_id = Organization.where(fein: employer_fein).first.employer_profile.id
+    organization = BenefitSponsors::Organizations::Organization.employer_by_fein(employer_fein).first
+    employer_profile_id = organization.employer_profile.id if organization
     census_employees = CensusEmployee.by_ssn(ssn).by_employer_profile_id(employer_profile_id)
-
     if census_employees.count == 0
       raise("Census_employee not found SSN #{ssn} Employer FEIN #{employer_fein}")
     else
