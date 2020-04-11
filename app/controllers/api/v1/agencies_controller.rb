@@ -68,7 +68,7 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
     when :matching_record_found
       render json: { status: "error", message: "Given details match another record" }, status: :conflict
     when :invalid_dob
-      render json: { status: "error", message: "Date of birth is invalid" }, status: :bad_request
+      render json: { status: "error", message: "Date of birth invalid" }, status: :bad_request
     else
       render json: { status: "error", message: "Unknown error" }, status: :internal_server_error
     end
