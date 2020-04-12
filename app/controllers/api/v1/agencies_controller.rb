@@ -62,7 +62,7 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
     when :ok
       render json: { status: "success" }, status: :ok
     when :person_not_found
-      render json: { status: "error", message: "Person could not be found" }, status: :bad_request
+      render json: { status: "error", message: "Person not found" }, status: :bad_request
     when :information_missing
       render json: { status: "error", message: "Required properties missing" }, status: :bad_request
     when :matching_record_found
