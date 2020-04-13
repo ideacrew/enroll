@@ -167,7 +167,7 @@ module Insured::FamiliesHelper
     hbx_enrollment.family.is_eligible_to_enroll? &&
     hbx_enrollment.display_make_changes_for_ivl? &&
     !(hbx_enrollment.coverage_terminated? || hbx_enrollment.coverage_canceled?) &&
-    (hbx_enrollment&.family&.enrollment_is_not_most_recent_sep_enrollment?(hbx_enrollment) || !hbx_enrollment.is_active_renewal_purchase?)
+    (hbx_enrollment&.family.enrollment_is_not_most_recent_sep_enrollment?(hbx_enrollment) || !hbx_enrollment.is_active_renewal_purchase?)
   end
 
   def enable_make_changes_button?(hbx_enrollment)
