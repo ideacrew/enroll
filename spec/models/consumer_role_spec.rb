@@ -1107,6 +1107,35 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     end
   end
 
+  describe 'verification_types' do
+    context 'types_include_to_notices' do
+      let!(:person) { FactoryBot.create(:person, :with_consumer_role) }
+
+      before :each do
+        @consumer_role = person.consumer_role
+        @verification_type = person.verification_types.first
+      end
+
+      context 'uploaded docuemnts exists' do
+        before do
+          uploaded_doc = VlpDocument.new(title: 'title', creator: 'creator', identifier: 'identifier')
+          @verification_type.vlp_documents = [uploaded_doc]
+          @verification_type.save!
+        end
+
+        it 'should return verification_type if vlp_doc exists' do
+          expect(@consumer_role.types_include_to_notices).to include(@verification_type)
+        end
+      end
+
+      context 'uploaded docuemnts do not exists' do
+        it 'should return verification_type if vlp_doc exists' do
+          expect(@consumer_role.types_include_to_notices).to include(@verification_type)
+        end
+      end
+    end
+  end
+
   describe 'vlp documents' do
     context 'i551' do
       let!(:consumer_role) { FactoryBot.create(:consumer_role, vlp_documents: [vlp_doc]) }
