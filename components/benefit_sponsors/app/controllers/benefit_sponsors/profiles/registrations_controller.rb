@@ -14,6 +14,7 @@ module BenefitSponsors
         @agency = BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_new(profile_type: profile_type, portal: params[:portal])
         authorize @agency
         authorize @agency, :redirect_home?
+        set_ie_flash_by_announcement
         respond_to do |format|
           format.html
           format.js

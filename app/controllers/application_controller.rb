@@ -333,6 +333,21 @@ class ApplicationController < ActionController::Base
       authorize(controller_name.classify.constantize, "#{action_name}?".to_sym)
     end
 
+    def set_ie_flash_by_announcement
+      if browser.ie?
+        set_web_flash_by_announcement
+      end
+    end
+
+    def set_web_flash_by_announcement
+      if flash.blank? || flash[:warning].blank?
+        announcements = Announcement.get_announcements_for_web
+        dismiss_announcements = JSON.parse(session[:dismiss_announcements] || "[]") rescue []
+        announcements -= dismiss_announcements
+        flash.now[:warning] = announcements
+      end
+    end
+
     def set_flash_by_announcement
       return if current_user.blank?
       if flash.blank? || flash[:warning].blank?
