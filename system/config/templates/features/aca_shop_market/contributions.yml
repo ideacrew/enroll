@@ -231,7 +231,7 @@ registry:
       - :catalog_2019
       - :contribution_model_criteria
     features:
-      - key: :initial_sponsor_jan_default_2019
+      - key: :initial_fehb_sponsor_jan_default_2019
         item: :contribution_model_criterion
         is_enabled: true
         settings:
@@ -246,8 +246,8 @@ registry:
           - key: :default
             item: false
           - key: :renewal_criterion_key
-            item: :initial_sponsor_jan_default
-      - key: :initial_sponsor_default_2019
+            item: :initial_fehb_sponsor_jan_default
+      - key: :initial_fehb_sponsor_default_2019
         item: :contribution_model_criterion
         is_enabled: true
         settings:
@@ -262,8 +262,8 @@ registry:
           - key: :default
             item: true
           - key: :renewal_criterion_key
-            item: :initial_sponsor_default
-      - key: :renewal_sponsor_jan_default_2019
+            item: :initial_fehb_sponsor_default
+      - key: :renewal_fehb_sponsor_jan_default_2019
         item: :contribution_model_criterion
         is_enabled: true
         settings:
@@ -278,8 +278,8 @@ registry:
           - key: :default
             item: false
           - key: :renewal_criterion_key
-            item: :renewal_sponsor_jan_default
-      - key: :renewal_sponsor_default_2019
+            item: :renewal_fehb_sponsor_jan_default
+      - key: :renewal_fehb_sponsor_default_2019
         item: :contribution_model_criterion
         is_enabled: true
         settings:
@@ -294,7 +294,7 @@ registry:
           - key: :default
             item: true
           - key: :renewal_criterion_key
-            item: :renewal_sponsor_default
+            item: :renewal_fehb_sponsor_default
   - namespace:
       - :enroll_app
       - :fehb_market
@@ -302,7 +302,7 @@ registry:
       - :catalog_2020
       - :contribution_model_criteria
     features:
-      - key: :initial_sponsor_jan_default_2020
+      - key: :initial_fehb_sponsor_jan_default_2020
         item: :contribution_model_criterion
         is_enabled: true
         settings:
@@ -317,8 +317,8 @@ registry:
           - key: :default
             item: false
           - key: :renewal_criterion_key
-            item: :initial_sponsor_jan_default
-      - key: :initial_sponsor_default_2020
+            item: :initial_fehb_sponsor_jan_default
+      - key: :initial_fehb_sponsor_default_2020
         item: :contribution_model_criterion
         is_enabled: true
         settings:
@@ -333,8 +333,8 @@ registry:
           - key: :default
             item: true
           - key: :renewal_criterion_key
-            item: :initial_sponsor_default
-      - key: :renewal_sponsor_jan_default_2020
+            item: :initial_fehb_sponsor_default
+      - key: :renewal_fehb_sponsor_jan_default_2020
         item: :contribution_model_criterion
         is_enabled: true
         settings:
@@ -349,8 +349,8 @@ registry:
           - key: :default
             item: false
           - key: :renewal_criterion_key
-            item: :renewal_sponsor_jan_default
-      - key: :renewal_sponsor_default_2020
+            item: :renewal_fehb_sponsor_jan_default
+      - key: :renewal_fehb_sponsor_default_2020
         item: :contribution_model_criterion
         is_enabled: true
         settings:
@@ -365,7 +365,7 @@ registry:
           - key: :default
             item: true
           - key: :renewal_criterion_key
-            item: :renewal_sponsor_default
+            item: :renewal_fehb_sponsor_default
   - namespace:
     - :enroll_app
     - :fehb_market
@@ -373,7 +373,7 @@ registry:
     - :catalog_2021
     - :contribution_model_criteria
     features:
-      - key: :initial_sponsor_jan_default_2021
+      - key: :initial_fehb_sponsor_jan_default_2021
         item: :contribution_model_criterion
         is_enabled: true
         settings:
@@ -388,8 +388,8 @@ registry:
           - key: :default
             item: false
           - key: :renewal_criterion_key
-            item: :initial_sponsor_jan_default
-      - key: :initial_sponsor_default_2021
+            item: :initial_fehb_sponsor_jan_default
+      - key: :initial_fehb_sponsor_default_2021
         item: :contribution_model_criterion
         is_enabled: true
         settings:
@@ -404,8 +404,8 @@ registry:
           - key: :default
             item: true
           - key: :renewal_criterion_key
-            item: :initial_sponsor_default
-      - key: :renewal_sponsor_jan_default_2021
+            item: :initial_fehb_sponsor_default
+      - key: :renewal_fehb_sponsor_jan_default_2021
         item: :contribution_model_criterion
         is_enabled: true
         settings:
@@ -420,8 +420,8 @@ registry:
           - key: :default
             item: false
           - key: :renewal_criterion_key
-            item: :renewal_sponsor_jan_default
-      - key: :renewal_sponsor_default_2021
+            item: :renewal_fehb_sponsor_jan_default
+      - key: :renewal_fehb_sponsor_default_2021
         item: :contribution_model_criterion
         is_enabled: true
         settings:
@@ -436,4 +436,4 @@ registry:
           - key: :default
             item: true
           - key: :renewal_criterion_key
-            item: :renewal_sponsor_default
+            item: :renewal_fehb_sponsor_default
