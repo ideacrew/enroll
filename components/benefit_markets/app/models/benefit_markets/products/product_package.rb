@@ -12,11 +12,7 @@ module BenefitMarkets
     # Added this module as a temporary fix for EMPLOYER FLEXIBILITY PROJECT
     module ContributionModuleAssociation
       def contribution_model
-        if packagable.is_a?(BenefitMarkets::BenefitSponsorCatalog) && packagable.benefit_application&.is_renewing?
-          BenefitMarkets::ContributionModels::ContributionModel.by_title("DC Shop Simple List Bill Contribution Model")
-        else
-          super
-        end
+        assigned_contribution_model || super
       end
     end
 

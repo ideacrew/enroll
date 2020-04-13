@@ -11,21 +11,32 @@ module BenefitSponsors
   RSpec.describe BenefitApplications::BenefitApplication, type: :model, :dbclean => :after_each do
     let(:site) { ::BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_benefit_market }
     let(:benefit_market)          { site.benefit_markets.first }
-    let(:employer_organization)   { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
-    let(:benefit_sponsorship)    { BenefitSponsors::BenefitSponsorships::BenefitSponsorship.new(profile: employer_organization.employer_profile) }
+    let(:employer_organization)   { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{site.site_key}_employer_profile".to_sym, site: site) }
+    let(:employer_profile_1)        { employer_organization.employer_profile }
+    let(:benefit_sponsorship) do
+      sponsorship_1 = employer_profile_1.add_benefit_sponsorship
+      sponsorship_1.save
+      sponsorship_1
+    end
     let(:benefit_sponsor_catalog) { FactoryBot.create(:benefit_markets_benefit_sponsor_catalog, service_areas: [service_area]) }
 
     let(:rating_area)  { create_default(:benefit_markets_locations_rating_area) }
     let(:service_area) { create_default(:benefit_markets_locations_service_area) }
     let(:sic_code)      { "001" }
 
-    let(:effective_period_start_on) { TimeKeeper.date_of_record.end_of_month + 1.day + 1.month }
+    let(:effective_period_start_on) { TimeKeeper.date_of_record.beginning_of_month + 2.months }
     let(:effective_period_end_on)   { effective_period_start_on + 1.year - 1.day }
     let(:effective_period)          { effective_period_start_on..effective_period_end_on }
 
     let(:open_enrollment_period_start_on) { effective_period_start_on.prev_month }
     let(:open_enrollment_period_end_on)   { open_enrollment_period_start_on + 9.days }
     let(:open_enrollment_period)          { open_enrollment_period_start_on..open_enrollment_period_end_on }
+
+    let(:application_period_prev_year)        { (Date.new(effective_period_start_on.prev_year.year, 1, 1))..(Date.new(effective_period_start_on.prev_year.year, 12, 31)) }
+    let(:application_period_next_year)        { (Date.new(effective_period_start_on.next_year.year, 1, 1))..(Date.new(effective_period_start_on.next_year.year, 12, 31)) }
+    let!(:issuer_profile)  { FactoryBot.create :benefit_sponsors_organizations_issuer_profile, assigned_site: site}
+    let!(:benefit_market_catalog_next_year)   { FactoryBot.create(:benefit_markets_benefit_market_catalog, :with_product_packages, issuer_profile: issuer_profile, benefit_market: benefit_market, application_period: application_period_next_year) }
+    let!(:benefit_market_catalog_prev_year)   { FactoryBot.create(:benefit_markets_benefit_market_catalog, :with_product_packages, issuer_profile: issuer_profile, benefit_market: benefit_market, application_period: application_period_prev_year) }
 
     let(:params) do
       {
@@ -511,24 +522,21 @@ module BenefitSponsors
 
         # let(:benefit_sponsorship) { create(:benefit_sponsors_benefit_sponsorship, benefit_market: benefit_market) }
 
+        let(:application_period_next_year)        { (Date.new(renewal_effective_date.year,1,1))..(Date.new(renewal_effective_date.year,12,31)) }
         let!(:employer_profile) {benefit_sponsorship.profile}
         let!(:initial_application) { create(:benefit_sponsors_benefit_application, benefit_sponsor_catalog: benefit_sponsor_catalog, effective_period: effective_period,benefit_sponsorship:benefit_sponsorship, aasm_state: :active) }
         let(:product_package)           { initial_application.benefit_sponsor_catalog.product_packages.detect { |package| package.package_kind == package_kind } }
         let(:benefit_package)   { create(:benefit_sponsors_benefit_packages_benefit_package, health_sponsored_benefit: true, product_package: product_package, benefit_application: initial_application) }
-
-        let(:renewal_benefit_sponsor_catalog) { build(:benefit_markets_benefit_sponsor_catalog, effective_date: renewal_effective_date, effective_period: renewal_effective_date..renewal_effective_date.next_year.prev_day, open_enrollment_period: renewal_effective_date.prev_month..(renewal_effective_date - 15.days)) }
-
         let(:benefit_group_assignment) { FactoryBot.build(:benefit_group_assignment, start_on: benefit_package.start_on, benefit_group_id:nil, benefit_package_id: benefit_package.id, is_active:true)}
         let!(:census_employee) { FactoryBot.create(:census_employee, employer_profile_id: nil, benefit_sponsors_employer_profile_id: employer_profile.id, benefit_sponsorship: benefit_sponsorship, :benefit_group_assignments => [benefit_group_assignment]) }
 
-        let!(:renewal_application) {initial_application.renew(renewal_benefit_sponsor_catalog)}
+        let(:renewal_application) {initial_application.renew}
         let(:renewal_bga) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: renewal_application.benefit_packages.first, census_employee: census_employee, is_active: false)}
 
 
         it "should generate renewal application" do
           expect(renewal_application.predecessor).to eq initial_application
           expect(renewal_application.effective_period.begin).to eq renewal_effective_date
-          expect(renewal_application.benefit_sponsor_catalog).to eq renewal_benefit_sponsor_catalog
         end
 
         context "when renewal application saved" do

@@ -26,7 +26,7 @@ module BenefitSponsors
           if result.success?
             Success(result.to_h)
           else
-            Failure("Unable to validate product with hios_id #{params[:hios_id]}")
+            Failure("Unable to validate benefit sponsorship #{params[:_id]}")
           end
         end
 

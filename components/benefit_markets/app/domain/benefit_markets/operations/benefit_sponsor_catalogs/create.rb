@@ -24,7 +24,7 @@ module BenefitMarkets
         private
 
         def validate(sponsor_catalog_params)
-          result = ::BenefitMarkets::Validators::BenefitSponsorCatalogContract.new.call(sponsor_catalog_params)
+          result = ::BenefitMarkets::Validators::BenefitSponsorCatalogs::BenefitSponsorCatalogContract.new.call(sponsor_catalog_params)
 
           if result.success?
             Success(result.to_h)

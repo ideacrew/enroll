@@ -28,32 +28,38 @@ FactoryBot.define do
         )
       ]
 
+      contribution_factor = contribution_model.key == :zero_percent_sponsor_fixed_percent_contribution_model ? 0.0 : 0.5
+
       contribution_model.contribution_units = [
         build(:benefit_markets_contribution_models_fixed_percent_contribution_unit,
               :with_member_relationship_maps,
               name: "employee",
               display_name: "Employee",
               order: 0,
-              default_contribution_factor: 0.75,
+              default_contribution_factor: contribution_factor,
+              minimum_contribution_factor: contribution_factor,
               member_relationship_operator: :==),
         build(:benefit_markets_contribution_models_fixed_percent_contribution_unit,
               :with_member_relationship_maps,
               name: "spouse",
               display_name: "Spouse",
               order: 1,
-              default_contribution_factor: 0.50),
+              default_contribution_factor: 0.0,
+              minimum_contribution_factor: 0.0),
         build(:benefit_markets_contribution_models_fixed_percent_contribution_unit,
               :with_member_relationship_maps,
               name: "domestic_partner",
               display_name: "Domestic Partner",
               order: 2,
-              default_contribution_factor: 0.25),
+              default_contribution_factor: 0.0,
+              minimum_contribution_factor: 0.0),
         build(:benefit_markets_contribution_models_fixed_percent_contribution_unit,
               :with_member_relationship_maps,
               name: "dependent",
               display_name: "Child Under 26",
               order: 3,
-              default_contribution_factor: 0.25)
+              default_contribution_factor: 0.0,
+              minimum_contribution_factor: 0.0)
       ]
     end
 

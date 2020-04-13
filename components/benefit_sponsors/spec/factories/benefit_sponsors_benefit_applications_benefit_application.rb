@@ -57,7 +57,7 @@ FactoryBot.define do
         if evaluator.passed_benefit_sponsor_catalog
           benefit_sponsor_catalog = evaluator.passed_benefit_sponsor_catalog
         else
-          benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(benefit_application.resolve_service_areas, benefit_application.effective_period.min)
+          benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(benefit_application.effective_period.min)
         end
         benefit_sponsor_catalog.save
         benefit_application.benefit_sponsor_catalog = (benefit_sponsor_catalog || ::BenefitMarkets::BenefitSponsorCatalog.new)

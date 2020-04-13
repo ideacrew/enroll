@@ -510,28 +510,6 @@ module BenefitSponsors
         contribution_models: ::BenefitSponsors::ContributionModelSpecHelpers.contribution_models
       }
     end
-    
-    def metal_level_health_product_package_from_product_props(product_props_list, effective_period)
-      selected_products = product_props_list.select do |p_props|
-        p_props[:product_package_kinds].include?(:metal_level) && (p_props[:kind] == :health)
-      end
-      product_package_id = BSON::ObjectId.new
-      {
-        "_id": product_package_id,
-        title: "Metal Level",
-        application_period: {
-          min: effective_period.min,
-          max: effective_period.max
-        },
-        benefit_kind: :aca_shop,
-        product_kind: :health,
-        package_kind: :metal_level,
-        products: selected_products,
-        pricing_model: ::BenefitSponsors::PricingModelSpecHelpers.list_bill_pricing_model,
-        contribution_model: ::BenefitSponsors::ContributionModelSpecHelpers.list_bill_contribution_model,
-        contribution_models: ::BenefitSponsors::ContributionModelSpecHelpers.contribution_models
-      }
-    end
 
     def dental_multi_product_package_from_product_props(product_props_list, effective_period)
       selected_products = product_props_list.select do |p_props|

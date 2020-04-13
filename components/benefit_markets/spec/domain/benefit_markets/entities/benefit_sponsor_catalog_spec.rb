@@ -6,7 +6,7 @@ RSpec.describe BenefitMarkets::Entities::BenefitSponsorCatalog do
 
   context "Given valid required parameters" do
 
-    let(:contract)                { BenefitMarkets::Validators::BenefitSponsorCatalogContract.new }
+    let(:contract)                { BenefitMarkets::Validators::BenefitSponsorCatalogs::BenefitSponsorCatalogContract.new }
 
     let(:effective_date)          { TimeKeeper.date_of_record.next_month.beginning_of_month }
     let(:effective_period)        { effective_date..((effective_date + 1.year).prev_day) }

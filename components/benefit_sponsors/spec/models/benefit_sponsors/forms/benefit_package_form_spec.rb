@@ -11,7 +11,11 @@ module BenefitSponsors
     let(:organization)          { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let(:employer_profile)      { organization.employer_profile }
     let(:employer_attestation)  { BenefitSponsors::Documents::EmployerAttestation.new(aasm_state: "approved") }
-    let(:benefit_sponsorship)   { employer_profile.add_benefit_sponsorship }
+    let(:benefit_sponsorship) do
+      sponsorship = employer_profile.add_benefit_sponsorship
+      sponsorship.save
+      sponsorship
+    end
     let(:benefit_application)   {
       application = FactoryBot.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship)
       application.benefit_sponsor_catalog.save!

@@ -26,7 +26,11 @@ module BenefitMarkets
           benefit_market = benefit_market(params)
           benefit_market_catalog = benefit_market.benefit_market_catalog_for(params[:effective_date])
           
-          Success(benefit_market_catalog)
+          if benefit_market_catalog
+            Success(benefit_market_catalog)
+          else
+            Failure("benefit_market_catalog not found for effective date: #{params[:effective_date]}")
+          end
         end
 
         def benefit_market(params)
