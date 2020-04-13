@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe 'BenefitSponsors::ModelEvents::ApplicationCoverageSelected', :dbclean => :after_each do
+RSpec.describe 'BenefitSponsors::ModelEvents::ApplicationCoverageSelected', :dbclean => :around_each do
   let(:start_on) {  (TimeKeeper.date_of_record + 2.months).beginning_of_month }
   let(:current_effective_date)  { TimeKeeper.date_of_record }
 
@@ -22,7 +22,8 @@ RSpec.describe 'BenefitSponsors::ModelEvents::ApplicationCoverageSelected', :dbc
   let!(:benefit_application) {
     application = FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, :with_benefit_package, 
       aasm_state: "enrollment_eligible", 
-      benefit_sponsorship: benefit_sponsorship
+      benefit_sponsorship: benefit_sponsorship,
+      default_open_enrollment_period: (current_effective_date.beginning_of_year..current_effective_date.beginning_of_year.end_of_month)
       )
     application.benefit_sponsor_catalog.save!
     application
@@ -69,7 +70,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::ApplicationCoverageSelected', :dbc
         allow(model_instance).to receive(:enrollment_kind).and_return('special_enrollment')
         allow(model_instance).to receive(:census_employee).and_return(census_employee)
         allow(census_employee).to receive(:employee_role).and_return(employee_role)
-
+        hbx_enrollment = model_event.klass_instance
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employer.employee_mid_year_plan_change_notice_to_employer"
           expect(payload[:employer_id]).to eq model_instance.employer_profile.hbx_id.to_s
