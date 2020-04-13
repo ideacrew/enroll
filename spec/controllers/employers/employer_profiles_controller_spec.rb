@@ -83,7 +83,7 @@ RSpec.describe Employers::EmployerProfilesController, dbclean: :after_each do
 
   describe "GET search", dbclean: :after_each do
     let(:user) { double("user")}
-    let(:person) { double("Person")}
+    let(:person) { double("Person", agent?: false)}
     before(:each) do
       allow(user).to receive(:person).and_return(person)
       sign_in user

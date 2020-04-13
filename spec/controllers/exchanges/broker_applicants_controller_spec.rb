@@ -27,7 +27,8 @@ RSpec.describe Exchanges::BrokerApplicantsController do
   end
 
   describe ".edit" do
-    let(:user) { instance_double("User", :has_hbx_staff_role? => true) }
+    let(:user) { instance_double("User", :has_hbx_staff_role? => true, :person => person) }
+    let(:person) { instance_double("Person", :agent? => false) }
     let(:broker_role) {FactoryBot.create(:broker_role)}
 
     before :each do
@@ -43,7 +44,8 @@ RSpec.describe Exchanges::BrokerApplicantsController do
   end
 
   describe ".update" do
-    let(:user) { instance_double("User", :has_hbx_staff_role? => true) }
+    let(:user) { instance_double("User", :has_hbx_staff_role? => true, :person => person) }
+    let(:person) { instance_double("Person", :agent? => false) }
     let(:broker_role) {FactoryBot.create(:broker_role)}
 
     before :all do
