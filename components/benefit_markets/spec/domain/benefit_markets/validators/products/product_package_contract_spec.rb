@@ -54,6 +54,7 @@ RSpec.describe BenefitMarkets::Validators::Products::ProductPackageContract do
       language: 'language', type: 'type', source: 'source'
     }
   end
+
   let(:premium_tables)   { [{_id: BSON::ObjectId.new, effective_period: effective_period, premium_tuples: [premium_tuples], rating_area_id: BSON::ObjectId.new}] }
   let(:premium_tuples)   { {_id: BSON::ObjectId.new, age: 12, cost: 227.07} }
   let(:effective_period) { effective_date.beginning_of_year..(effective_date.end_of_year) }

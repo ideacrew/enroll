@@ -424,7 +424,6 @@ module BenefitSponsors
       benefit_market.benefit_market_catalog_effective_on(effective_date)
     end
 
-    # TODO: Enable it for new domain benefit sponsor catalog
     def benefit_sponsor_catalog_for(effective_date)
       benefit_sponsor_catalog_entity = BenefitSponsors::Operations::BenefitSponsorCatalog::Build.new.call(effective_date: effective_date, benefit_sponsorship_id: self._id).value!
       BenefitMarkets::BenefitSponsorCatalog.new(benefit_sponsor_catalog_entity.to_h)

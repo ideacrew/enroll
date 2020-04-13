@@ -629,7 +629,6 @@ module BenefitSponsors
     # BenefitApplication instance's effective_period
     # @return [ BenefitApplication ] The built renewal application instance and submodels
     
-    # TODO: Enable this method for new domain benefit sponsor catalog
     def renew(async_workflow_id = nil)
       renewal_effective_date = end_on.next_day.to_date
 
@@ -656,6 +655,7 @@ module BenefitSponsors
 
       renewal_application
     end
+
 
     def predecessor_benefit_package(current_benefit_package)
       *previous_title, _b = current_benefit_package.title.split('(')

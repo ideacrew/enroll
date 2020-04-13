@@ -26,7 +26,6 @@ module BenefitMarkets
           optional(:nationwide).maybe(:bool)
           optional(:dc_in_network).maybe(:bool)
           optional(:renewal_product_id).maybe(Types::Bson)
-
           optional(:sbc_document).maybe(:hash)
           required(:premium_tables).array(:hash)
         end

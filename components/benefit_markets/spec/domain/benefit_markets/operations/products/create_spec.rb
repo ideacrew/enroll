@@ -14,7 +14,7 @@ RSpec.describe BenefitMarkets::Operations::Products::Create, dbclean: :after_eac
 
   let(:pricing_model) do
     {
-      _id: BSON::ObjectId.new, 
+      _id: BSON::ObjectId.new,
       name: 'name', price_calculator_kind: 'price_calculator_kind', pricing_units: pricing_units,
       product_multiplicities: [:product_multiplicities], member_relationships: member_relationships
     }

@@ -10,8 +10,6 @@ module BenefitSponsors
       @messages = {}
     end
 
-
-    # TODO: Enable it for new domain based benefit sponsor catalogs
     def renew_application(async_workflow_id = nil)
       if business_policy_satisfied_for?(:renew_benefit_application)
         renewal_application = benefit_application.renew(async_workflow_id)
