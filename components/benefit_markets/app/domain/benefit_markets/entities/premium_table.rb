@@ -7,7 +7,7 @@ module BenefitMarkets
 
       attribute :effective_period,    Types::Range
       attribute :rating_area_id,      Types::Bson
-      attribute :premium_tuples,      Types::Array.of(BenefitMarkets::Entities::PremiumTuple).meta(omittable: true)
+      attribute :premium_tuples,      Types::Array.of(BenefitMarkets::Entities::PremiumTuple).optional.meta(omittable: true)
 
     end
   end

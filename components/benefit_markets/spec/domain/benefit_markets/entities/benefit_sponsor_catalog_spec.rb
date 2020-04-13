@@ -51,13 +51,6 @@ RSpec.describe BenefitMarkets::Entities::BenefitSponsorCatalog do
       }
     end
 
-    let(:sbc_document) do
-      {
-        title: 'title', creator: 'creator', publisher: 'publisher', format: 'file_format',
-        language: 'language', type: 'type', source: 'source'
-      }
-    end
-
     let(:premium_tuples)   { {age: 12, cost: 227.07} }
     let(:premium_tables)   { [{effective_period: effective_period, rating_area_id: BSON::ObjectId.new, premium_tuples: [premium_tuples]}] }
 
@@ -70,7 +63,7 @@ RSpec.describe BenefitMarkets::Entities::BenefitSponsorCatalog do
         issuer_profile_id: BSON::ObjectId.new, premium_ages: 19..60, provider_directory_url: 'provider_directory_url',
         is_reference_plan_eligible: true, deductible: '123', family_deductible: '345', rx_formulary_url: 'rx_formulary_url',
         issuer_assigned_id: 'issuer_assigned_id', service_area_id: BSON::ObjectId.new, network_information: 'network_information',
-        nationwide: true, dc_in_network: false, sbc_document: sbc_document, premium_tables: premium_tables
+        nationwide: true, dc_in_network: false, sbc_document: nil, premium_tables: premium_tables, renewal_product_id: nil
       }
     end
 
@@ -78,8 +71,7 @@ RSpec.describe BenefitMarkets::Entities::BenefitSponsorCatalog do
       {
         application_period: effective_period, benefit_kind: :benefit_kind, product_kind: :product_kind, package_kind: :package_kind,
         title: 'Title', products: [product], contribution_model: contribution_model, contribution_models: [contribution_model],
-        assigned_contribution_model: contribution_model,
-        pricing_model: pricing_model
+        assigned_contribution_model: contribution_model, description: nil, pricing_model: pricing_model
       }
     end
 

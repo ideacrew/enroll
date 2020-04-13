@@ -36,12 +36,6 @@ RSpec.describe BenefitMarkets::Operations::Products::Create, dbclean: :after_eac
     }
   end
 
-  let(:sbc_document) do
-    {
-      title: 'title', creator: 'creator', publisher: 'publisher', format: 'file_format', language: 'language', type: 'type', source: 'source'
-    }
-  end
-
   let(:product_params) do
     {
       _id: BSON::ObjectId.new, hios_id: '9879', hios_base_id: '34985', metal_level_kind: :silver,
@@ -51,7 +45,7 @@ RSpec.describe BenefitMarkets::Operations::Products::Create, dbclean: :after_eac
       issuer_profile_id: BSON::ObjectId.new, premium_ages: 19..60, provider_directory_url: 'provider_directory_url',
       is_reference_plan_eligible: true, deductible: '123', family_deductible: '345', rx_formulary_url: 'rx_formulary_url',
       issuer_assigned_id: 'issuer_assigned_id', service_area_id: BSON::ObjectId.new, network_information: 'network_information',
-      nationwide: true, dc_in_network: false, sbc_document: sbc_document, premium_tables: premium_tables
+      nationwide: true, dc_in_network: false, sbc_document: nil, premium_tables: premium_tables, renewal_product_id: nil,
     }
   end
 

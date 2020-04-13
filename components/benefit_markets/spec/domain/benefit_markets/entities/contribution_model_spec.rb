@@ -19,7 +19,7 @@ RSpec.describe BenefitMarkets::Entities::ContributionModel do
     end
 
     let(:contribution_units)         { [contribution_unit] }
-    let(:member_relationships)       { [{relationship_name: :employee, relationship_kinds: [{}]}] }
+    let(:member_relationships)       { [{relationship_name: :employee, relationship_kinds: [{}], age_threshold: nil, age_comparison: nil, disability_qualifier: nil}] }
 
     let(:required_params) do
       {
@@ -29,7 +29,8 @@ RSpec.describe BenefitMarkets::Entities::ContributionModel do
         product_multiplicities: [:product_multiplicities1, :product_multiplicities2],
         contribution_units: contribution_units,
         many_simultaneous_contribution_units: true,
-        member_relationships: member_relationships
+        member_relationships: member_relationships,
+        key: nil
       }
     end
 
@@ -46,7 +47,7 @@ RSpec.describe BenefitMarkets::Entities::ContributionModel do
     end
 
     context "with all params" do
-      let(:all_params) {required_params.merge({key: :key})}
+      let(:all_params) { required_params.merge({key: :key}) }
 
       it "contract validation should pass" do
         expect(contract.call(all_params).to_h).to eq all_params
