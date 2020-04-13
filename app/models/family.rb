@@ -232,10 +232,6 @@ class Family
     ).distinct(:family_id)
   ) }
 
-  def most_recent_enrollment_by_coverage_kind_is_not_sep?(hbx_enrollment)
-    !most_recent_enrollment_by_coverage_kind_is_sep?(hbx_enrollment)
-  end
-
   def enrollment_is_not_most_recent_sep_enrollment?(hbx_enrollment)
     coverage_kind = hbx_enrollment.coverage_kind
     target_enrollment_effective_on = hbx_enrollment.effective_on
