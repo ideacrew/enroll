@@ -21,7 +21,24 @@ module BenefitSponsors
     # ENROLLMENT_RATIO_MINIMUM = 0.75
     rule  :minimum_participation_rule,
             # validate: ->(benefit_application){ benefit_application.enrollment_ratio >= ENROLLMENT_RATIO_MINIMUM },
-            validate: ->(benefit_application){benefit_application.enrollment_ratio >= benefit_application.employee_participation_ratio_minimum },
+            validate: ->(benefit_application){
+              start_on_year = benefit_application.start_on.year
+              market_kind   = benefit_application.benefit_market.kind
+
+              if ::EnrollRegistry.feature_enabled?("#{market_kind}_fetch_enrollment_minimum_participation_#{start_on_year}")
+                sponsored_benefit = benefit_application.benefit_packages.first.health_sponsored_benefit
+                employee_participation_ratio_minimum = ::EnrollRegistry["#{market_kind}_fetch_enrollment_minimum_participation_#{start_on_year}"] {
+                  {
+                    product_package: sponsored_benefit.product_package,
+                    calender_year: start_on_year
+                  }
+                }.value!
+              else
+                employee_participation_ratio_minimum = benefit_application.employee_participation_ratio_minimum
+              end
+
+              benefit_application.enrollment_ratio >= employee_participation_ratio_minimum
+            },
             success:  ->(benefit_application){"validated successfully"},
             fail:     ->(benefit_application){"Number of eligible members enrolling: (#{benefit_application.total_enrolled_count}) is less than minimum required: #{benefit_application.eligible_to_enroll_count * benefit_application.employee_participation_ratio_minimum}" }
 
