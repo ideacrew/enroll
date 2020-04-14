@@ -158,6 +158,7 @@ aca:
   security_questions: true
   user_accounts_enabled: true
   autopay_enabled: true
+  support_for_ie_browser: false
   plan_options_available: ["sole_source", "single_carrier", "metal_level"]
   dental_plan_options_available: ["single_plan"]
   ## acceptable options are ["sole_source", "single_carrier", "metal_level", "single_plan"]

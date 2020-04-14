@@ -42,7 +42,9 @@ module BenefitSponsors
     end
 
     def set_ie_flash_by_announcement
-      set_web_flash_by_announcement
+      if browser.ie? && !Settings.aca.support_for_ie_browser
+        set_web_flash_by_announcement
+      end
     end
 
     def set_web_flash_by_announcement

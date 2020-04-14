@@ -334,7 +334,7 @@ class ApplicationController < ActionController::Base
     end
 
     def set_ie_flash_by_announcement
-      if browser.ie?
+      if browser.ie? && !support_for_ie_browser?
         set_web_flash_by_announcement
       end
     end
