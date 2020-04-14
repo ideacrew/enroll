@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe BenefitMarkets::Validators::Products::ProductPackageContract do
+RSpec.describe BenefitMarkets::Validators::Products::LegacyProductPackageContract do
 
   let(:effective_date)                { TimeKeeper.date_of_record.next_month.beginning_of_month }
   let(:application_period)            { effective_date..(effective_date + 1.year).prev_day }
@@ -75,8 +75,8 @@ RSpec.describe BenefitMarkets::Validators::Products::ProductPackageContract do
   let(:products)        { [product] }
 
   context "Given invalid required parameters" do
-    let(:invalid_params)   { missing_params.merge({pricing_model: {}, contribution_model: contribution_model, contribution_models: contribution_models, assigned_contribution_model: assigned_contribution_model})}
-    let(:error_message1)   { {:assigned_contribution_model=>["is missing"], :pricing_model => ["is missing"], :contribution_model => ["is missing"], :contribution_models => ["is missing"] } }
+    let(:invalid_params)   { missing_params.merge({pricing_model: {}, contribution_model: contribution_model, contribution_models: contribution_models })}
+    let(:error_message1)   { {:pricing_model => ["is missing"], :contribution_model => ["is missing"], :contribution_models => ["is missing"] } }
     let(:error_message2)   { {:pricing_model => ["must be filled"]} }
 
 
@@ -94,7 +94,7 @@ RSpec.describe BenefitMarkets::Validators::Products::ProductPackageContract do
   context "Given valid required parameters" do
     let(:required_params) do
       missing_params.merge({contribution_model: contribution_model, contribution_models: contribution_models,
-                            pricing_model: pricing_model, products: products, assigned_contribution_model: assigned_contribution_model})
+                            pricing_model: pricing_model, products: products})
     end
 
     context "with a required only" do

@@ -30,14 +30,13 @@ module BenefitMarkets
           contribution_model_criteria = EnrollRegistry.features_by_namespace(namespace).collect do |feature_key|
             EnrollRegistry[[namespace, feature_key.to_s].join('.')]
           end
-          
+
           Success(contribution_model_criteria)
         end
 
         def filter_criteria(criteria, contribution_models)
           contribution_keys = contribution_models.map(&:key)
           filtered_criteria = criteria.select{|criterion| contribution_keys.include?(criterion.setting(:contribution_model_key).item) }
-          
           Success(filtered_criteria)
         end
 

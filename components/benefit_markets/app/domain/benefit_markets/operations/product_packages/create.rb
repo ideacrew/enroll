@@ -15,8 +15,8 @@ module BenefitMarkets
         # @param [ Array<BenefitMarkets::Entities::Product> ] products Product
         # @return [ BenefitMarkets::Entities::ProductPackage ] product_package Product Package
         def call(product_package_params:, enrollment_eligibility:)
-          product_package_values      = yield validate(product_package_params)
-          product_package_values      = yield set_assigned_contribution_model(product_package_values, enrollment_eligibility)
+          product_package_attrs       = yield set_assigned_contribution_model(product_package_params, enrollment_eligibility)
+          product_package_values      = yield validate(product_package_attrs, enrollment_eligibility)
           product_package             = yield create(product_package_values)
 
           Success(product_package)
@@ -24,8 +24,13 @@ module BenefitMarkets
 
         private
 
-        def validate(product_package_params)
-          result = ::BenefitMarkets::Validators::Products::ProductPackageContract.new.call(product_package_params)
+        def validate(product_package_params, enrollment_eligibility)
+          result =
+            if enrollment_eligibility.market_kind == :fehb
+              ::BenefitMarkets::Validators::Products::LegacyProductPackageContract.new.call(product_package_params)
+            else
+              ::BenefitMarkets::Validators::Products::ProductPackageContract.new.call(product_package_params)
+            end
 
           if result.success?
             Success(result.to_h)
@@ -35,14 +40,22 @@ module BenefitMarkets
         end
 
         def set_assigned_contribution_model(product_package_values, enrollment_eligibility)
-          result = ::EnrollRegistry[:assign_contribution_model] {
-            {
-              product_package_values: product_package_values,
-              enrollment_eligibility: enrollment_eligibility
-            }
-          }.value!
+          key = "assign_contribution_model_#{enrollment_eligibility.market_kind}".to_sym
+          result =
+            if ::EnrollRegistry.feature_enabled?(key)
+              contribution_model = ::EnrollRegistry[key] {
+                {
+                  product_package_values: product_package_values,
+                  enrollment_eligibility: enrollment_eligibility
+                }
+              }.value!
+              contribution_model[:product_package_values]
+            else
+              product_package_values[:assigned_contribution_model] = nil
+              product_package_values
+            end
 
-          Success(result[:product_package_values])
+          Success(result)
         end
 
         def create(product_package_values)

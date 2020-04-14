@@ -41,7 +41,7 @@ module BenefitSponsors
           result = BenefitMarkets::Operations::BenefitMarkets::CreateBenefitSponsorCatalog.new.call({
             enrollment_eligibility: enrollment_eligibility
           })
-          
+
           if result.success?
             Success(result.value!)
           else

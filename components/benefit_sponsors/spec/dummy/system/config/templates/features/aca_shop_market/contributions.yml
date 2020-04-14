@@ -1,22 +1,35 @@
 ---
 registry:
   - namespace:
-      - :enroll_app
-      - :aca_shop_market
-      - :benefit_market_catalog
+    - :enroll_app
+    - :aca_shop_market
+    - :benefit_market_catalog
     features:
-      - key: :contribution_model
+      - key: :contribution_model_aca_shop
         item: BenefitMarkets::Operations::ContributionModels::Create.new
         is_enabled: true
-      - key: :assign_contribution_model
+      - key: :assign_contribution_model_aca_shop
         item: BenefitMarkets::Operations::ContributionModels::Assign.new
         is_enabled: true
+
   - namespace:
-      - :enroll_app
-      - :aca_shop_market
-      - :benefit_market_catalog
-      - :catalog_2019
-      - :contribution_model_criteria
+    - :enroll_app
+    - :fehb_market
+    - :benefit_market_catalog
+    features:
+      - key: :contribution_model_fehb
+        item: BenefitMarkets::Operations::ContributionModels::Create.new
+        is_enabled: true
+      - key: :assign_contribution_model_fehb
+        item: BenefitMarkets::Operations::ContributionModels::Assign.new
+        is_enabled: false
+
+  - namespace:
+    - :enroll_app
+    - :aca_shop_market
+    - :benefit_market_catalog
+    - :catalog_2019
+    - :contribution_model_criteria
     features:
       - key: :initial_sponsor_jan_default_2019
         item: :contribution_model_criterion
@@ -83,11 +96,11 @@ registry:
           - key: :renewal_criterion_key
             item: :renewal_sponsor_default
   - namespace:
-      - :enroll_app
-      - :aca_shop_market
-      - :benefit_market_catalog
-      - :catalog_2020
-      - :contribution_model_criteria
+    - :enroll_app
+    - :aca_shop_market
+    - :benefit_market_catalog
+    - :catalog_2020
+    - :contribution_model_criteria
     features:
       - key: :initial_sponsor_jan_default_2020
         item: :contribution_model_criterion
