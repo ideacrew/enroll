@@ -251,6 +251,29 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       expect(assigns(:disable_market_kind)).to eq "individual"
     end
 
+    context 'in ivl annual open enrollment for dual role' do
+      let!(:hbx_profile1) {FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)}
+
+      before do
+        allow(person).to receive(:consumer_role).and_return(consumer_role)
+        allow(person).to receive(:active_employee_roles).and_return [employee_role]
+        allow(person).to receive(:has_active_employee_role?).and_return true
+        allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile1
+        sign_in user
+      end
+
+      it 'should disable shop market if employee role is not under open enrollment' do
+        allow(employee_role).to receive(:is_eligible_to_enroll_without_qle?).and_return(false)
+        get :new, params: { person_id: person.id, employee_role_id: employee_role.id, change_plan: 'change_plan', shop_for_plans: 'shop_for_plans' }
+        expect(assigns(:disable_market_kind)).to eq "shop"
+      end
+
+      it 'should not disable shop market if employee role is under open enrollment' do
+        get :new, params: { person_id: person.id, employee_role_id: employee_role.id, change_plan: 'change_plan', shop_for_plans: 'shop_for_plans' }
+        expect(assigns(:disable_market_kind)).to eq nil
+      end
+    end
+
     context "it should set the instance variables" do
 
       before do
