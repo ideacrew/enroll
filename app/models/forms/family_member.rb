@@ -125,7 +125,8 @@ module Forms
         address = primary_person.home_address
         if address.present?
           person.home_address.try(:destroy)
-          person.addresses << address
+          attrs = address.attributes.slice('address_1', 'address_2', 'address_3', 'county', 'country_name', 'kind', 'city', 'state', 'zip')
+          person.addresses << ::Address.new(attrs)
           person.save
         end
       else
