@@ -7,21 +7,21 @@ module BenefitMarkets
 
       attribute :title,               Types::Strict::String
       attribute :creator,             Types::Strict::String
-      attribute :subject,             Types::String.optional.meta(omittable: true)
-      attribute :description,         Types::String.optional.meta(omittable: true)
+      attribute :subject,             Types::String.optional
+      attribute :description,         Types::String.optional
       attribute :publisher,           Types::Strict::String
-      attribute :contributor,         Types::String.optional.meta(omittable: true)
-      attribute :date,                Types::Date.optional.meta(omittable: true)
+      attribute :contributor,         Types::String.optional
+      attribute :date,                Types::Date.optional
       attribute :type,                Types::Strict::String
       attribute :format,              Types::Strict::String
-      attribute :identifier,          Types::String.optional.meta(omittable: true)
+      attribute :identifier,          Types::String.optional
       attribute :source,              Types::Strict::String
       attribute :language,            Types::Strict::String
-      attribute :relation,            Types::String.optional.meta(omittable: true)
-      attribute :coverage,            Types::String.optional.meta(omittable: true)
-      attribute :rights,              Types::String.optional.meta(omittable: true)
-      attribute :tags,                Types::Array.optional.meta(omittable: true)
-      attribute :size,                Types::String.optional.meta(omittable: true)
+      attribute :relation,            Types::String.optional
+      attribute :coverage,            Types::String.optional
+      attribute :rights,              Types::String.optional
+      attribute :tags,                Types::Array.optional
+      attribute :size,                Types::String.optional
     end
   end
 end
