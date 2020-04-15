@@ -37,6 +37,10 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
   let(:citizenship_type) { FactoryBot.build(:verification_type, type_name: 'Citizenship')}
   let(:ssn_type) { FactoryBot.build(:verification_type, type_name: 'Social Security Number')}
 
+  after(:each) do
+    DatabaseCleaner.clean
+  end
+
   describe "New" do
     before do
       allow(person).to receive_message_chain("families.first.primary_applicant.person").and_return(person)
