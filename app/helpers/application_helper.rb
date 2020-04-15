@@ -835,4 +835,25 @@ module ApplicationHelper
 
     hbx_staff_role.permission.can_access_pay_now
   end
+
+  def float_fix(float_number)
+    BigDecimal((float_number).to_s).round(8).to_f
+  end
+
+  def round_down_float_two_decimals(float_number)
+    BigDecimal((float_number).to_s).round(8).round(2, BigDecimal::ROUND_DOWN).to_f
+  end
+
+  def external_application_configured?(application_name)
+    external_app = ExternalApplications::ApplicationProfile.find_by_application_name(application_name)
+    return false unless external_app
+    return false unless external_app.is_authorized_for?(current_user)
+    !external_app.url.blank?
+  end
+
+  def jwt_for_external_application
+    current_token = WhitelistedJwt.newest
+    return current_token.token if current_token
+    current_user.generate_jwt(warden.config[:default_scope], nil)
+  end
 end
