@@ -30,13 +30,13 @@
     </li>
     <li>Pay by Mail <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="right" title="Slowest payment option – takes up to 2 weeks to process."></i>
       <div class="row col-md-offset-1">
-        <%= Settings.site.short_name %>
+        <%= contact_center_mailing_address_name %>
       </div>
       <div class="row col-md-offset-1">
-        <%= Settings.contact_center.po_box %>
+        <%= contact_center_address_one %>
       </div>
       <div class="row col-md-offset-1">
-        <%= Settings.contact_center.city %>, <%= Settings.contact_center.state %> <%= Settings.contact_center.zip_code %>
+        <%= contact_center_city %>,&nbsp;<%= contact_center_state %> <%= contact_center_postal_code %>
       </div>
     </li>
   </ol>
@@ -44,4 +44,4 @@
 <h4>**Please include your account number on your check.</h4>
 <h4>Check that your mailing address is up to date - click on
   <%= link_to 'Update Business Info', edit_profiles_registration_path(@employer_profile.id, :tab=>'profile', add_staff: 'no') %>.
-</h4> 
+</h4>
