@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Employers::InboxesController, :type => :controller do
-  let(:hbx_profile) { double(id: double("hbx_profile_id"))}
+  let(:hbx_profile) { FactoryBot.create(:benefit_sponsors_organizations_hbx_profile)}
   let(:user) { double("user") }
   let(:person) { double(:employer_staff_roles => [double("person", :employer_profile_id => double)], agent?: false)}
 
@@ -10,7 +10,6 @@ RSpec.describe Employers::InboxesController, :type => :controller do
     before do
       sign_in
       allow(EmployerProfile).to receive(:find).and_return(inbox_provider)
-      allow(HbxProfile).to receive(:find).and_return(hbx_profile)
     end
 
     it "render new template" do
@@ -29,7 +28,6 @@ RSpec.describe Employers::InboxesController, :type => :controller do
       allow(user).to receive(:person).and_return(person)
       sign_in(user)
       allow(EmployerProfile).to receive(:find).and_return(inbox_provider)
-      allow(HbxProfile).to receive(:find).and_return(hbx_profile)
       allow(inbox_provider).to receive(:inbox).and_return(inbox)
       allow(inbox_provider.inbox).to receive(:post_message).and_return(inbox)
       allow(hbx_profile).to receive(:inbox).and_return(inbox)
