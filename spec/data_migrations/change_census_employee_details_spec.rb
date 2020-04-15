@@ -3,7 +3,7 @@ require File.join(Rails.root, "app", "data_migrations", "change_census_employee_
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
-describe ChangeCensusEmployeeDetails, dbclean: :after_each do
+describe ChangeCensusEmployeeDetails, dbclean: :around_each do
   skip "ToDo rake was never updated to new model, check if we can remove it" do
     describe "given a task name" do
       it "has the given task name" do
