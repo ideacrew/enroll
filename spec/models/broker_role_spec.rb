@@ -315,11 +315,11 @@ describe BrokerRole, dbclean: :after_each do
         b1 = BrokerRole.create(person: person0, npn: 10000000+rand(10000), provider_kind: provider_kind, broker_agency_profile: @ba)
         expect(b1.phone.to_s).to eq b1.broker_agency_profile.phone
       end
-      it 'should return main office phone' do
+      it 'should return work office phone' do
         b1 = BrokerRole.create(person: person0, npn: 10000000+rand(10000), provider_kind: provider_kind, broker_agency_profile: @ba)
-        person0.phones[1].update_attributes!(kind: 'phone main')
+        person0.phones[1].update_attributes!(kind: 'work')
         expect(b1.phone.to_s).not_to eq b1.broker_agency_profile.phone
-        expect(b1.phone.to_s).to eq person0.phones.where(kind: "phone main").first.to_s
+        expect(b1.phone.to_s).to eq person0.phones.where(kind: "work").first.to_s
       end
 
       it 'should return work phone if office phone & broker agency profile phone not present' do

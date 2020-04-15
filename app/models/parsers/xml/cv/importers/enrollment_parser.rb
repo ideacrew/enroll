@@ -13,20 +13,19 @@ module Parsers::Xml::Cv::Importers
       individual_market = enrollment.individual_market
       elected_aptc_pct = individual_market.present? ? individual_market.elected_aptc_percent.to_f : 0
       applied_aptc_amount = individual_market.present? ? individual_market.applied_aptc_amount.to_f : 0
-      if e_plan = enrollment.plan
-        metal_level = e_plan.metal_level.strip.split("#").last
-        coverage_type = e_plan.coverage_type.strip.split("#").last
-        plan = Plan.new(
-          id: e_plan.id,
-          hios_id: e_plan.id,
-          name: e_plan.name,
-          active_year: e_plan.active_year,
-          metal_level: metal_level,
-          coverage_kind: coverage_type,
-          ehb: e_plan.ehb_percent.to_f,
-          #plan_type: ,
-        )
-      end
+      e_product = enrollment.plan
+      metal_level = e_product.metal_level.strip.split("#").last
+      coverage_type = e_product.coverage_type.strip.split("#").last
+      product_class = coverage_type == "health" ? BenefitMarkets::Products::HealthProducts::HealthProduct : BenefitMarkets::Products::DentalProducts::DentalProduct
+      product = product_class.new(
+        id: e_product.id,
+        hios_id: e_product.id,
+        title: e_product.name,
+        application_period: (Date.new(e_product.active_year.to_i, 1, 1)..Date.new(e_product.active_year.to_i, 12, 31)),
+        metal_level_kind: metal_level,
+        kind: coverage_type == "health" ? :health : :dental,
+        ehb: e_product.ehb_percent.to_f
+      )
       hbx_enrollment_members = []
       policy.enrollees.each do |enrollee|
         hbx_enrollment_members << HbxEnrollmentMember.new(
@@ -47,13 +46,9 @@ module Parsers::Xml::Cv::Importers
         kind: kind,
         elected_aptc_pct: elected_aptc_pct,
         applied_aptc_amount: applied_aptc_amount,
-        plan: plan,
-        carrier_profile_id: enrollment.plan.try(:carrier).try(:id),
-        #writing_agent_id: broker_link.id,
-        #terminated_on: ,
+        product: product,
+        issuer_profile_id: enrollment.plan.try(:carrier).try(:id),
         coverage_kind: coverage_type,
-        #enrollment_kind: ,
-        #count_of_members: policy.enrollees.length,
         hbx_enrollment_members: hbx_enrollment_members,
         household: get_household_by_policy_xml(policy),
         effective_on: effective_on,
@@ -95,15 +90,10 @@ module Parsers::Xml::Cv::Importers
     def get_employee_role_by_shop_market_xml(shop_market)
       return nil if shop_market.blank?
       employer = shop_market.employer_link
-      fein = employer.id.strip.split('#').last rescue ''
-      org = Organization.new(
-        fein: fein,
-        legal_name: employer.try(:name)
-      )
-      
-      EmployeeRole.new(
-        employer_profile: EmployerProfile.new(organization: org)
-      )
+      hbx_id = employer.id.strip.split('#').last
+      org = BenefitSponsors::Organizations::Organization.new(hbx_id: hbx_id, legal_name: employer.try(:name))
+      profile_class = Settings.site.key == :ma ? BenefitSponsors::Organizations::AcaShopDcEmployerProfile : BenefitSponsors::Organizations::AcaShopCcaEmployerProfile
+      EmployeeRole.new(employer_profile: profile_class.new(organization: org))
     end
 
     def get_household_by_policy_xml(policy)

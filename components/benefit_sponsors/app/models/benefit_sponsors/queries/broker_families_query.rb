@@ -49,7 +49,10 @@ module BenefitSponsors
           :broker_agency_accounts => {"$elemMatch" => {:benefit_sponsors_broker_agency_profile_id => @broker_agency_profile_id, is_active: true}}
         )
 
-        @census_employee_ids = benefit_sponsorships.flat_map(&:census_employees).map(&:id)
+        @census_employees = benefit_sponsorships.flat_map(&:census_employees)
+
+        # only select active census employees
+        @census_employee_ids = @census_employees.select { |ce| CensusEmployee::EMPLOYMENT_ACTIVE_STATES.include?(ce.aasm_state) }.map(&:id)
 
         employee_person_ids ||= Person.unscoped.where("employee_roles.census_employee_id" => {"$in" => @census_employee_ids}).pluck(:_id)
       end

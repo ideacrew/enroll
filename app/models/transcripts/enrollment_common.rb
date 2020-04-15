@@ -34,12 +34,12 @@ module Transcripts
       family ||= enrollment.family
 
       family.active_household.hbx_enrollments.where({
-        :coverage_kind => enrollment.coverage_kind, 
-        :kind => enrollment.kind,
-        :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES)
-        }).order_by(:effective_on.asc)
-        .select{|e| e.plan.active_year == enrollment.plan.active_year} #.reject{|en| en.void?}
-        .reject{|en| en.subscriber.present? && enrollment.subscriber.present? && (en.subscriber.hbx_id != enrollment.subscriber.hbx_id)}
+                                                      :coverage_kind => enrollment.coverage_kind,
+                                                      :kind => enrollment.kind,
+                                                      :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES)
+                                                    }).order_by(:effective_on.asc)
+            .select {|e| e.product.active_year == enrollment.product.active_year} #.reject{|en| en.void?}
+            .select {|en| en.subscriber.present? && enrollment.subscriber.present? && (en.subscriber.hbx_id == enrollment.subscriber.hbx_id)}
     end
 
     def matching_shop_coverages(enrollment, family=nil)
@@ -53,18 +53,18 @@ module Transcripts
         end
       else
         # TODO: Fix this for Conversion ER
-        plan_year = enrollment.employer_profile.find_plan_year_by_effective_date(enrollment.effective_on)
+        employer_profile = BenefitSponsors::Organizations::Organization.employer_by_hbx_id(enrollment.employer_profile.hbx_id).first.employer_profile
+        plan_year = employer_profile.find_plan_year_by_effective_date(enrollment.effective_on)
         id_list = plan_year.benefit_groups.collect(&:_id).uniq if plan_year.present?
       end
 
       family ||= enrollment.family
       return [] if family.blank? || id_list.blank?
 
-      family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).where({
-        :coverage_kind => enrollment.coverage_kind, 
-        :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES)
-        }).order_by(:effective_on.asc).reject{|en| en.void?}
-        .reject{|en| en.subscriber.hbx_id != enrollment.subscriber.hbx_id}
+      family.active_household.hbx_enrollments.where(:sponsored_benefit_package_id.in => id_list).where({
+                                                                                                           :coverage_kind => enrollment.coverage_kind,
+                                                                                                           :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES)
+                                                                                                       }).order_by(:effective_on.asc).reject(&:void?).select { |en| en.subscriber.hbx_id == enrollment.subscriber.hbx_id }
     end
 
     def match_person_instance(person)

@@ -45,6 +45,20 @@ class EmployeeRole
     self.benefit_sponsors_employer_profile_id.blank?
   end
 
+  def self.find_by_old_employer_profile(employer_profile)
+    Person.where("employee_roles.employer_profile_id" => employer_profile.id).reduce([]) do |list, person|
+      list << person.employee_roles.detect { |ee| ee.employer_profile_id == employer_profile.id }
+    end
+  end
+
+  def self.find_by_employer_profile(employer_profile)
+    return find_by_old_employer_profile(employer_profile) if employer_profile.is_a?(::EmployerProfile)
+
+    Person.where("employee_roles.benefit_sponsors_employer_profile_id" => employer_profile.id).reduce([]) do |list, person|
+      list << person.employee_roles.detect { |ee| ee.benefit_sponsors_employer_profile_id == employer_profile.id }
+    end
+  end
+
   def employer_profile=(new_employer_profile)
     raise ArgumentError.new("expected EmployerProfile") unless new_employer_profile.class.to_s.match(/EmployerProfile/)
     if new_employer_profile.kind_of?(BenefitSponsors::Organizations::AcaShopCcaEmployerProfile)

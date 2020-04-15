@@ -75,7 +75,7 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
         office_locations_attributes: {
           "0"=> {
             "address_attributes" => {"kind"=>"primary", "address_1"=>"234 nfgjkhghf", "address_2"=>"", "city"=>"jfhgdfhgjgdf", "state"=>"DC", "zip"=>"35645"},
-            "phone_attributes"=> {"kind"=>"phone main", "area_code"=>"564", "number"=>"111-1111", "extension"=>"111"}
+            "phone_attributes" => { "kind" => "work", "area_code" => "564", "number" => "111-1111", "extension" => "111" }
           }
         }
       }
@@ -89,7 +89,7 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
     end
 
     it "should update person main phone" do
-      broker_agency_profile.primary_broker_role.person.phones[0].update_attributes(kind: "phone main")
+      broker_agency_profile.primary_broker_role.person.phones[0].update_attributes(kind: "work")
       post :update, id: broker_agency_profile.id, organization: organization_params
        broker_agency_profile.primary_broker_role.person.reload
        expect(broker_agency_profile.primary_broker_role.person.phones[0].extension).to eq "111"
