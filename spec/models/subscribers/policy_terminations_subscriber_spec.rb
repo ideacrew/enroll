@@ -32,7 +32,7 @@ describe Subscribers::PolicyTerminationsSubscriber do
     end
   end
 
-  describe "given a termination event with termination date before than start date" do
+  describe "given a termination event with termination date before the start date" do
     let(:existing_enrollment) { instance_double(HbxEnrollment, :hbx_id => 1, effective_on: Date.new(2017, 1, 1)) }
     let!(:termination_date) { Date.new(2016, 12, 31) }
 
