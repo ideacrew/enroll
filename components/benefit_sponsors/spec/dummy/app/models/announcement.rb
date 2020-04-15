@@ -3,7 +3,7 @@ class Announcement
   include SetCurrentUser
   include Mongoid::Timestamps
 
-  AUDIENCE_KINDS = %W{Employer Employee IVL Broker GA WEB_PAGE}
+  AUDIENCE_KINDS = %W{Employer Employee IVL Broker GA Webpage}
 
   field :content, type: String
   field :start_date, type: Date
@@ -71,7 +71,7 @@ class Announcement
     end
 
     def get_announcements_for_web
-      Announcement.current_msg_for_web_page
+      Announcement.current_msg_for_webpage
     end
   end
 end
