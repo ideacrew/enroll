@@ -6,7 +6,7 @@ RSpec.describe "employee_enrollments.html.slim.rb", :type => :view, dbclean: :af
   include_context "setup benefit market with market catalogs and product packages"
   include_context "setup initial benefit application"
 
-  let(:current_effective_date)  { Date.new(2018,2,1) }
+  let(:current_effective_date)  { Date.new(TimeKeeper.date_of_record.year, 2, 1) }
   let(:census_employees) { FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package) }
 
   describe "employer profile home page" do

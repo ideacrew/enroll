@@ -11,7 +11,7 @@ describe EmployeeRole, dbclean: :after_each do
   let(:person) {FactoryBot.create(:person, :with_family)}
 
   before do
-    TimeKeeper.set_date_of_record_unprotected!(Date.new(2015, 6, 20))
+    TimeKeeper.set_date_of_record_unprotected!(Date.new(Date.today.year, 6, 20))
   end
 
   after :all do
