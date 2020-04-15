@@ -722,12 +722,14 @@ class HbxEnrollment
   end
 
   def renewal_enrollments(successor_application)
-    family.active_household.hbx_enrollments.where({
-      :sponsored_benefit_package_id.in => successor_application.benefit_packages.pluck(:_id), 
-      :coverage_kind => coverage_kind,
-      :kind => kind,
-      :effective_on => successor_application.start_on
-    })
+    family.active_household.hbx_enrollments.where(
+      {
+        :sponsored_benefit_package_id.in => successor_application.benefit_packages.pluck(:_id),
+        :coverage_kind => coverage_kind,
+        :kind => kind,
+        :effective_on => successor_application.start_on
+      }
+    )
   end
 
   def active_renewals_under(successor_application)
@@ -895,13 +897,13 @@ class HbxEnrollment
 
   def sponsored_benefit
     return @sponsored_benefit if defined? @sponsored_benefit
-    @sponsored_benefit = sponsored_benefit_package.sponsored_benefits.detect{ |sb| sb.id == sponsored_benefit_id }    
+    @sponsored_benefit = sponsored_benefit_package.sponsored_benefits.detect{ |sb| sb.id == sponsored_benefit_id }
   end
 
   def sponsored_benefit=(sponsored_benefit)
     raise ArgumentError.new("expected BenefitSponsors::SponsoredBenefits::SponsoredBenefit") unless sponsored_benefit.is_a? ::BenefitSponsors::SponsoredBenefits::SponsoredBenefit
     self.sponsored_benefit_id = sponsored_benefit._id
-    @sponsored_benefit = sponsored_benefit    
+    @sponsored_benefit = sponsored_benefit
   end
 
   def rating_area
@@ -1066,6 +1068,49 @@ class HbxEnrollment
       plan_selection = PlanSelection.new(self, self.plan)
       self.hbx_enrollment_members = plan_selection.same_plan_enrollment.hbx_enrollment_members
     end
+  end
+
+  # Enable make_changes IVL button under the following conditions:
+  ## 1. HBX Enrollment is IVL, meaning the "kind" field is set to one of these:
+  ## ["individual", "coverall", "unassisted_qhp", "insurance_assisted_qhp",
+  ### "streamlined_medicaid", "emergency_medicaid", "hcr_chip"]
+  ### and NOT "[employer_sponsored", "employer_sponsored_cobra"]
+  ## 2. The latest IVL SEP's start on year is equal to the effective on year
+  #### OR
+  #### The family is under IVL open enrollment and the effective on is greater than or equal to the benefit coverage period start on date.
+  ## 3. aasm_state field is set to one of the following:
+  ### ['coverage_selected', 'auto_renewing', 'unverified', 'renewing_coverage_selected', 'transmitted_to_carrier']
+  def display_make_changes_for_ivl?
+    return false unless is_ivl_by_kind?
+
+    valid_states = ['coverage_selected', 'auto_renewing', 'unverified', 'renewing_coverage_selected', 'transmitted_to_carrier']
+    is_make_changes_valid_aasm_state = valid_states.include?(aasm_state)
+    benefit_sponsorship = HbxProfile.current_hbx.try(:benefit_sponsorship)
+    benefit_coverage_period = benefit_sponsorship.current_benefit_period
+    # Based off of original display_make_changes_for_ivl? :
+    # https://github.com/dchbx/enroll/blame/c756b8e2075599c8e33f670ce87fe66cfc017b4c/app/models/hbx_enrollment.rb#L1310
+    return true if (family.latest_ivl_sep&.start_on&.year == effective_on.year ||
+      (family.is_under_ivl_open_enrollment? && effective_on >= benefit_coverage_period.start_on)) && is_make_changes_valid_aasm_state
+    # Based off of original enable_make_changes_button? in families_helper.rb:
+    # https://github.com/dchbx/enroll/blame/c756b8e2075599c8e33f670ce87fe66cfc017b4c/app/helpers/insured/families_helper.rb#L335
+    return true if is_make_changes_valid_aasm_state
+  end
+
+  # Make Changes Buttons
+  # Enable make changes SHOP button under the following conditions:
+  ## 1. Enrollment is SHOP, meaning the "kind" value is one of these: ['employer_sponsored', 'employer_sponsored_cobra']
+  ## 2. Family is eligible to enroll, aasm_state is not in coverage terminated or coverage cancelled,
+  ## 3. HBX Enrollment is NOT the most current SEP enrollment
+  #### OR EITHER
+  #### HBX Enrollment is under annual open enrollment OR under new hire open enrollment
+  def display_make_changes_for_shop?
+    return false unless is_shop?
+    return false unless family.is_eligible_to_enroll?
+    return false if coverage_terminated? || coverage_canceled?
+
+    family.enrollment_is_not_most_recent_sep_enrollment?(self) ||
+      employee_role&.can_enroll_as_new_hire? ||
+      sponsored_benefit_package&.open_enrollment_contains?(TimeKeeper.date_of_record)
   end
 
   def build_plan_premium(qhp_plan: nil, elected_aptc: false, tax_household: nil, apply_aptc: nil)
@@ -1404,7 +1449,7 @@ class HbxEnrollment
     return false unless can_be_reinstated?
     return false if has_active_or_term_exists_for_reinstated_date?
     reinstate_enrollment = Enrollments::Replicator::Reinstatement.new(self, terminated_on.next_day).build
-    
+
     if self.is_shop?
       census_employee = benefit_group_assignment.try(:census_employee)
       if census_employee
