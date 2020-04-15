@@ -18,8 +18,7 @@ module BenefitMarkets
         private
 
         def fetch(product_package, calender_year)
-          contribution_model = product_package.assigned_contribution_model || product_package.contribution_model
-          minimum_participation = ::EnrollRegistry["#{product_package.benefit_kind}_fetch_enrollment_minimum_participation_#{calender_year}"].setting(contribution_model.key).item
+          minimum_participation = ::EnrollRegistry["#{product_package.benefit_kind}_fetch_enrollment_minimum_participation_#{calender_year}"].setting(product_package.contribution_model.key).item
 
           Success(minimum_participation)
         end

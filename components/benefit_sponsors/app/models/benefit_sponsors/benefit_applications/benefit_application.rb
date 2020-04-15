@@ -1001,10 +1001,12 @@ module BenefitSponsors
       false
     end
 
+    def system_min_participation_default_for(date)
+      date.yday == 1 ? 0 : Settings.aca.shop_market.employee_participation_ratio_minimum.to_f
+    end
+
     ### TODO FIX Move these methods to domain logic
     def employee_participation_ratio_minimum
-      return Settings.aca.shop_market.employee_participation_ratio_minimum.to_f if benefit_market.kind == :fehb
-
       if ::EnrollRegistry.feature_enabled?("#{benefit_market.kind}_fetch_enrollment_minimum_participation_#{start_on.year}")
         product_package = benefit_packages[0]&.health_sponsored_benefit&.product_package
         product_package ||= benefit_sponsor_catalog.product_packages[0]
@@ -1015,9 +1017,11 @@ module BenefitSponsors
             calender_year: start_on.year
           }
         }.value!
+      else
+        system_min_participation_default_for(start_on)
       end
     rescue ResourceRegistry::Error::FeatureNotFoundError
-      start_on.yday == 1 ? 0 : Settings.aca.shop_market.employee_participation_ratio_minimum.to_f
+      system_min_participation_default_for(start_on)
     end
 
     def eligible_for_export?
