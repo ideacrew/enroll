@@ -269,10 +269,20 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
   context "build resident role " do
     let(:person) { FactoryBot.create(:person)}
     let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
+    let(:consumer_person) { FactoryBot.create(:person, :with_family, :with_consumer_role) }
 
-    it "should build consumer role for a person" do
+    it "should build resident role for a person" do
       helper.build_resident_role(person,family)
       expect(person.resident_role.present?). to eq true
+      expect(person.resident_role.contact_method). to eq "Paper and Electronic communications"
+    end
+
+    it "should build resident role for a person and with their consumer role contact method" do
+      expect(consumer_person.consumer_role.contact_method). to eq "Paper and Electronic communications"
+      consumer_person.consumer_role.update_attributes!(contact_method: "Only Electronic communications")
+      helper.build_resident_role(consumer_person, consumer_person.primary_family)
+      expect(consumer_person.resident_role.present?). to eq true
+      expect(consumer_person.resident_role.contact_method). to eq "Only Electronic communications"
     end
   end
 
