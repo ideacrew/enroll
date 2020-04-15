@@ -1002,55 +1002,69 @@ module BenefitSponsors
     end
 
     ### TODO FIX Move these methods to domain logic
-            def employee_participation_ratio_minimum
-              Settings.aca.shop_market.employee_participation_ratio_minimum.to_f
-            end
+    def employee_participation_ratio_minimum
+      return Settings.aca.shop_market.employee_participation_ratio_minimum.to_f if benefit_market.kind == :fehb
 
-            def eligible_for_export?
-              return false if self.aasm_state.blank?
-              return false if self.imported?
-              return false if self.effective_period.blank?
-              return true if enrollment_eligible? || binder_paid? || active?
+      if ::EnrollRegistry.feature_enabled?("#{benefit_market.kind}_fetch_enrollment_minimum_participation_#{start_on.year}")
+        product_package = benefit_packages[0]&.health_sponsored_benefit&.product_package
+        product_package ||= benefit_sponsor_catalog.product_packages[0]
 
-              terminated? || termination_pending? || expired?
-            end
+        ::EnrollRegistry["#{benefit_market.kind}_fetch_enrollment_minimum_participation_#{start_on.year}"] {
+          {
+            product_package: product_package,
+            calender_year: start_on.year
+          }
+        }.value!
+      end
+    rescue ResourceRegistry::Error::FeatureNotFoundError
+      start_on.yday == 1 ? 0 : Settings.aca.shop_market.employee_participation_ratio_minimum.to_f
+    end
 
-            def enrollment_quiet_period
-              if predecessor_id.present?
-                # Weird things can happen when you extend open enrollment past
-                # what would 'normally' be the quiet period end.  Can really
-                # only happen on renewals.
-                expected_renewal_transmission_deadline = renewal_quiet_period_end(start_on)
-                deadline_because_of_open_enrollment_end = nil
-                if open_enrollment_end_on.blank?
-                  deadline_because_of_open_enrollment_end = expected_renewal_transmission_deadline
-                else
-                  deadline_because_of_open_enrollment_end = open_enrollment_end_on
-                end
-                quiet_period_start = open_enrollment_start_on
-                quiet_period_end = [expected_renewal_transmission_deadline, deadline_because_of_open_enrollment_end].max
-                TimeKeeper.start_of_exchange_day_from_utc(quiet_period_start)..TimeKeeper.end_of_exchange_day_from_utc(quiet_period_end)
-              else
-                if open_enrollment_end_on.blank?
-                  prev_month = start_on.prev_month
-                  quiet_period_start = Date.new(prev_month.year, prev_month.month, Settings.aca.shop_market.open_enrollment.monthly_end_on + 1)
-                else
-                  quiet_period_start = open_enrollment_end_on + 1.day
-                end
-                expected_intial_or_offcyclerenewal_transmission_deadline = initial_quiet_period_end(start_on)
-                # Scenario when you extend open enrollment beyond start date for initial or offcycle renewal.
-                quiet_period_end = [expected_intial_or_offcyclerenewal_transmission_deadline, quiet_period_start].max
-                TimeKeeper.start_of_exchange_day_from_utc(quiet_period_start)..TimeKeeper.end_of_exchange_day_from_utc(quiet_period_end)
-              end
-            end
+    def eligible_for_export?
+      return false if self.aasm_state.blank?
+      return false if self.imported?
+      return false if self.effective_period.blank?
+      return true if enrollment_eligible? || binder_paid? || active?
 
-            def initial_quiet_period_end(start_on)
-              start_on + (Settings.aca.shop_market.initial_application.quiet_period.month_offset.months) + (Settings.aca.shop_market.initial_application.quiet_period.mday - 1).days
-            end
+      terminated? || termination_pending? || expired?
+    end
 
-            def renewal_quiet_period_end(start_on)
-              start_on + (Settings.aca.shop_market.renewal_application.quiet_period.month_offset.months) + (Settings.aca.shop_market.renewal_application.quiet_period.mday - 1).days
-            end
+    def enrollment_quiet_period
+      if predecessor_id.present?
+        # Weird things can happen when you extend open enrollment past
+        # what would 'normally' be the quiet period end.  Can really
+        # only happen on renewals.
+        expected_renewal_transmission_deadline = renewal_quiet_period_end(start_on)
+        deadline_because_of_open_enrollment_end = nil
+        if open_enrollment_end_on.blank?
+          deadline_because_of_open_enrollment_end = expected_renewal_transmission_deadline
+        else
+          deadline_because_of_open_enrollment_end = open_enrollment_end_on
+        end
+        quiet_period_start = open_enrollment_start_on
+        quiet_period_end = [expected_renewal_transmission_deadline, deadline_because_of_open_enrollment_end].max
+        TimeKeeper.start_of_exchange_day_from_utc(quiet_period_start)..TimeKeeper.end_of_exchange_day_from_utc(quiet_period_end)
+      else
+        if open_enrollment_end_on.blank?
+          prev_month = start_on.prev_month
+          quiet_period_start = Date.new(prev_month.year, prev_month.month, Settings.aca.shop_market.open_enrollment.monthly_end_on + 1)
+        else
+          quiet_period_start = open_enrollment_end_on + 1.day
+        end
+        expected_intial_or_offcyclerenewal_transmission_deadline = initial_quiet_period_end(start_on)
+        # Scenario when you extend open enrollment beyond start date for initial or offcycle renewal.
+        quiet_period_end = [expected_intial_or_offcyclerenewal_transmission_deadline, quiet_period_start].max
+        TimeKeeper.start_of_exchange_day_from_utc(quiet_period_start)..TimeKeeper.end_of_exchange_day_from_utc(quiet_period_end)
+      end
+    end
+
+    def initial_quiet_period_end(start_on)
+      start_on + (Settings.aca.shop_market.initial_application.quiet_period.month_offset.months) + (Settings.aca.shop_market.initial_application.quiet_period.mday - 1).days
+    end
+
+    def renewal_quiet_period_end(start_on)
+      start_on + (Settings.aca.shop_market.renewal_application.quiet_period.month_offset.months) + (Settings.aca.shop_market.renewal_application.quiet_period.mday - 1).days
+    end
     ###
 
 
