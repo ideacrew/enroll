@@ -42,17 +42,18 @@ describe ::Importers::Mhc::ConversionEmployerPlanYearCreate, dbclean: :after_eac
 
   before :each do
     allow(CarrierServiceArea).to receive(:service_areas_for).and_return([carrier_one_service_area])
-    importer = Importers::Mhc::ConversionEmployerSet.new(file_name, out_stream, registered_on.strftime('%Y-%m-%d'))
+    importer = Importers::Mhc::ConversionEmployerSet.new(file_name, out_stream, registered_on.strftime('%Y-%m-%d'), plan)
     importer.import!
     out_stream.rewind
   end
 
-  pending "provided with employer date" do
+  describe "provided with employer date" do
     before do
       @employer = EmployerProfile.find_by_fein(fein)
     end
 
     it "should create plan year" do
+      pending 'employer date'
       expect(@employer.present?).to be_truthy
       expect(@employer.plan_years.empty?).to be_truthy
 
@@ -65,6 +66,7 @@ describe ::Importers::Mhc::ConversionEmployerPlanYearCreate, dbclean: :after_eac
     end
 
     it "should create benefit group with sole source plan offerings" do
+      pending 'employer date'
       subject.save
       employer_profile = @employer.reload
       plan_year = employer_profile.plan_years.first
@@ -76,6 +78,7 @@ describe ::Importers::Mhc::ConversionEmployerPlanYearCreate, dbclean: :after_eac
     end
 
     it "should create composite tiers" do
+      pending 'employer date'
       subject.save
 
       employer_profile = @employer.reload
