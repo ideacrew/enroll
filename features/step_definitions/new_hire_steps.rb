@@ -181,7 +181,7 @@ Then(/Employee (.*) should see confirm your plan selection page/) do |named_pers
 end
 
 Then (/(.*) should see renewal policy in active status/) do |named_person|
-  enrollment = page.all('.hbx-enrollment-panel').first
+  enrollment = page.all('.hbx-enrollment-panel')[1]
   enrollment.find('.panel-heading', text: 'Coverage Selected')
 end
 

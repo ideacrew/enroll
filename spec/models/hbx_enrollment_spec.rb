@@ -2753,7 +2753,7 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
                         effective_on: TimeKeeper.date_of_record.beginning_of_year,
                         aasm_state: 'coverage_selected')
     end
-    let(:employee_role_double) { double }
+    let(:employee_role_double) { double(id: 1) }
 
     context 'for ivl' do
       before do
