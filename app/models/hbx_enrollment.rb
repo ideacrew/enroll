@@ -1113,9 +1113,9 @@ class HbxEnrollment
     # enrollment_is_active_with_upcoming_auto_renewing
     return true if ENROLLED_STATUSES.include?(aasm_state) && family.hbx_enrollments.by_kind(kind).last.aasm_state == "auto_renewing"
     return false if aasm_state == 'auto_renewing' && family.hbx_enrollments.by_kind(kind).to_a[-2].aasm_state == "coverage_selected"
-    return true if family.enrollment_is_not_most_recent_sep_enrollment?(self ||
-    (employee_role&.can_enroll_as_new_hire? || sponsored_benefit_package&.open_enrollment_contains?(TimeKeeper.date_of_record)) ||
-     !is_active_renewal_purchase?)
+    family.enrollment_is_not_most_recent_sep_enrollment?(self) ||
+      employee_role&.can_enroll_as_new_hire? ||
+      sponsored_benefit_package&.open_enrollment_contains?(TimeKeeper.date_of_record)
   end
 
   def build_plan_premium(qhp_plan: nil, elected_aptc: false, tax_household: nil, apply_aptc: nil)
