@@ -7,7 +7,7 @@ module BenefitMarkets
 
       attribute :hios_id,                       Types::Strict::String
       attribute :hios_base_id,                  Types::Strict::String
-      attribute :csr_variant_id,                Types::String.optional.meta(omittable: true)
+      attribute :csr_variant_id,                Types::String.optional
       attribute :dental_level,                  Types::Strict::Symbol
       attribute :dental_plan_kind,              Types::Strict::Symbol
       attribute :ehb,                           Types::Strict::Float

@@ -25,7 +25,8 @@ class AddContributionModelsToProductPackage < MongoidMigrationTask
       end
       product_package.save
     end
-    benefit_market_catalog.save
+
+    benefit_market_catalog.save!
   end
 
   def create_contribution_model(contribution_model)
@@ -37,6 +38,8 @@ class AddContributionModelsToProductPackage < MongoidMigrationTask
 
   def update_title_and_contribution_percentages(contribution_model, title, pct)
     contribution_model.title = title.to_s.humanize.titleize
+    contribution_model.key = title.to_s.parameterize(separator: '_').to_sym
+
     contribution_model.contribution_units.each do |contribution_unit|
       if contribution_unit.name == 'employee'
         contribution_unit.default_contribution_factor = pct

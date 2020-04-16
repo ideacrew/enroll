@@ -462,7 +462,7 @@ module BenefitSponsors
         package_kind: :single_product,
         products: selected_products,
         pricing_model: ::BenefitSponsors::PricingModelSpecHelpers.list_bill_pricing_model,
-        contribution_model: ::BenefitSponsors::ContributionModelSpecHelpers.list_bill_contribution_model,
+        contribution_model: ::BenefitSponsors::ContributionModelSpecHelpers.fifty_percent_contribution_model,
         contribution_models: ::BenefitSponsors::ContributionModelSpecHelpers.contribution_models
       }
     end
@@ -484,7 +484,7 @@ module BenefitSponsors
         package_kind: :metal_level,
         products: selected_products,
         pricing_model: ::BenefitSponsors::PricingModelSpecHelpers.list_bill_pricing_model,
-        contribution_model: ::BenefitSponsors::ContributionModelSpecHelpers.list_bill_contribution_model,
+        contribution_model: ::BenefitSponsors::ContributionModelSpecHelpers.fifty_percent_contribution_model,
         contribution_models: ::BenefitSponsors::ContributionModelSpecHelpers.contribution_models
       }
     end
@@ -506,7 +506,7 @@ module BenefitSponsors
         package_kind: :single_issuer,
         products: selected_products,
         pricing_model: ::BenefitSponsors::PricingModelSpecHelpers.list_bill_pricing_model,
-        contribution_model: ::BenefitSponsors::ContributionModelSpecHelpers.list_bill_contribution_model,
+        contribution_model: ::BenefitSponsors::ContributionModelSpecHelpers.fifty_percent_contribution_model,
         contribution_models: ::BenefitSponsors::ContributionModelSpecHelpers.contribution_models
       }
     end
@@ -528,7 +528,7 @@ module BenefitSponsors
         package_kind: :multi_product,
         products: selected_products,
         pricing_model: ::BenefitSponsors::PricingModelSpecHelpers.list_bill_pricing_model,
-        contribution_model: ::BenefitSponsors::ContributionModelSpecHelpers.list_bill_contribution_model,
+        contribution_model: ::BenefitSponsors::ContributionModelSpecHelpers.fifty_percent_contribution_model,
         contribution_models: ::BenefitSponsors::ContributionModelSpecHelpers.contribution_models
       }
     end
@@ -550,7 +550,7 @@ module BenefitSponsors
         package_kind: :single_issuer,
         products: selected_products,
         pricing_model: ::BenefitSponsors::PricingModelSpecHelpers.list_bill_pricing_model,
-        contribution_model: ::BenefitSponsors::ContributionModelSpecHelpers.list_bill_contribution_model,
+        contribution_model: ::BenefitSponsors::ContributionModelSpecHelpers.fifty_percent_contribution_model,
         contribution_models: ::BenefitSponsors::ContributionModelSpecHelpers.contribution_models
       }
     end
@@ -572,7 +572,7 @@ module BenefitSponsors
         package_kind: :single_product,
         products: selected_products,
         pricing_model: ::BenefitSponsors::PricingModelSpecHelpers.list_bill_pricing_model,
-        contribution_model: ::BenefitSponsors::ContributionModelSpecHelpers.list_bill_contribution_model,
+        contribution_model: ::BenefitSponsors::ContributionModelSpecHelpers.fifty_percent_contribution_model,
         contribution_models: ::BenefitSponsors::ContributionModelSpecHelpers.contribution_models
       }
     end

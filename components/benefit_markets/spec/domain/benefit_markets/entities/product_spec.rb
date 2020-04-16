@@ -20,10 +20,12 @@ RSpec.describe BenefitMarkets::Entities::Product do
 
     let(:sbc_document) do
       {
-        title: 'title', creator: 'creator', publisher: 'publisher', format: 'file_format', tags: [{}],
-        language: 'language', type: 'type', source: 'source', subject: 'subject', identifier: 'identifier'
+        title: 'title', creator: 'creator', publisher: 'publisher', format: 'file_format', tags: [{}], description: nil, date: nil,
+        language: 'language', type: 'type', source: 'source', subject: 'subject', identifier: 'identifier', contributor: nil,
+        relation: nil, coverage: nil, rights: nil, tags: nil, size: nil
       }
     end
+
     let(:required_params) do
       {
         _id: BSON::ObjectId.new,
@@ -31,7 +33,7 @@ RSpec.describe BenefitMarkets::Entities::Product do
         product_package_kinds: [:product_package_kinds], provider_directory_url: 'provider_directory_url', issuer_profile_id:  BSON::ObjectId.new,
         premium_ages: premium_ages, is_reference_plan_eligible: true, deductible: 'deductible', family_deductible: 'family_deductible',
         issuer_assigned_id: 'issuer_assigned_id', service_area_id: BSON::ObjectId.new, network_information: 'network_information', nationwide: true,
-        dc_in_network: false, sbc_document: sbc_document, premium_tables: premium_tables
+        dc_in_network: false, sbc_document: sbc_document, premium_tables: premium_tables, description: nil, renewal_product_id: nil
       }
     end
 

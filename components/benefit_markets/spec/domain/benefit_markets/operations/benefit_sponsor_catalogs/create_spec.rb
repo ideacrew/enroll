@@ -45,21 +45,15 @@ RSpec.describe BenefitMarkets::Operations::BenefitSponsorCatalogs::Create, dbcle
     }
   end
 
-  let(:sbc_document) do
-    {
-      title: 'title', creator: 'creator', publisher: 'publisher', format: 'file_format', language: 'language', type: 'type', source: 'source'
-    }
-  end
-
   let(:product) do
     {
       _id: BSON::ObjectId.new,
       benefit_market_kind: :benefit_market_kind, application_period: application_period, kind: :kind,
       hbx_id: 'hbx_id', title: 'title', description: 'description', product_package_kinds: [:product_package_kinds],
       issuer_profile_id: BSON::ObjectId.new, premium_ages: 16..40, provider_directory_url: 'provider_directory_url',
-      is_reference_plan_eligible: true, deductible: '123', family_deductible: '345',
+      is_reference_plan_eligible: true, deductible: '123', family_deductible: '345', renewal_product_id: nil,
       issuer_assigned_id: 'issuer_assigned_id', service_area_id: BSON::ObjectId.new, network_information: 'network_information',
-      nationwide: true, dc_in_network: false, sbc_document: sbc_document, premium_tables: premium_tables
+      nationwide: true, dc_in_network: false, sbc_document: nil, premium_tables: premium_tables
     }
   end
 

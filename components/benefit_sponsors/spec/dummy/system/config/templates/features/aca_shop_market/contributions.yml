@@ -237,3 +237,47 @@ registry:
             item: true
           - key: :renewal_criterion_key
             item: :renewal_sponsor_default
+  - namespace:
+      - :enroll_app
+      - :aca_shop_market
+      - :benefit_market_catalog
+      - :catalog_2020
+    features:
+      - key: :aca_shop_fetch_enrollment_minimum_participation_2020
+        item: BenefitMarkets::Operations::BenefitSponsorCatalogs::FetchMinimumParticipation.new
+        is_enabled: true
+        settings:
+          - key: :zero_percent_sponsor_fixed_percent_contribution_model
+            item: 0
+          - key: :fifty_percent_sponsor_fixed_percent_contribution_model
+            item: <%= 2 / 3.0 %>
+      - key: :fehb_fetch_enrollment_minimum_participation_2020
+        item: BenefitMarkets::Operations::BenefitSponsorCatalogs::FetchMinimumParticipation.new
+        is_enabled: false
+        settings:
+          - key: :zero_percent_sponsor_fixed_percent_contribution_model
+            item: 0
+          - key: :fifty_percent_sponsor_fixed_percent_contribution_model
+            item: <%= 2 / 3.0 %>
+  - namespace:
+      - :enroll_app
+      - :aca_shop_market
+      - :benefit_market_catalog
+      - :catalog_2019
+    features:
+      - key: :aca_shop_fetch_enrollment_minimum_participation_2019
+        item: BenefitMarkets::Operations::BenefitSponsorCatalogs::FetchMinimumParticipation.new
+        is_enabled: true
+        settings:
+          - key: :zero_percent_sponsor_fixed_percent_contribution_model
+            item: 0
+          - key: :fifty_percent_sponsor_fixed_percent_contribution_model
+            item: <%= 2 / 3.0 %>
+      - key: :fehb_fetch_enrollment_minimum_participation_2019
+        item: BenefitMarkets::Operations::BenefitSponsorCatalogs::FetchMinimumParticipation.new
+        is_enabled: false
+        settings:
+          - key: :zero_percent_sponsor_fixed_percent_contribution_model
+            item: 0
+          - key: :fifty_percent_sponsor_fixed_percent_contribution_model
+            item: <%= 2 / 3.0 %>

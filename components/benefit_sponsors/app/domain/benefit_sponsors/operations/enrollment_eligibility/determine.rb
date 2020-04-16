@@ -51,8 +51,13 @@ module BenefitSponsors
         def get_service_areas_entities(effective_date, benefit_sponsorship_entity)
           benefit_sponsorship = find_benefit_sponsorship(benefit_sponsorship_entity._id)
           service_areas = benefit_sponsorship.service_areas_on(effective_date).collect do |service_area|
-            BenefitMarkets::Operations::ServiceAreas::Create.new.call(service_area_params: service_area.as_json).value!
-          end
+            result = BenefitMarkets::Operations::ServiceAreas::Create.new.call(service_area_params: service_area.as_json)
+            if result.success?
+              result.value!
+            else
+              nil
+            end
+          end.compact
 
           Success(service_areas)
         end

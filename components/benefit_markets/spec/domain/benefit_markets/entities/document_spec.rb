@@ -10,7 +10,9 @@ RSpec.describe BenefitMarkets::Entities::Document do
     let(:required_params) do
       {
         title: 'Title', creator: 'The Creator', publisher: 'The Publisher', type: 'Type',
-        format: 'PDF', source: 'Source', language: 'English'
+        format: 'PDF', source: 'Source', language: 'English', subject: nil, description: nil,
+        contributor: nil, date: nil, identifier: nil, relation: nil, coverage: nil, rights: nil,
+        tags: nil, size: nil
       }
     end
 
