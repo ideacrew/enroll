@@ -183,7 +183,9 @@
         <% if hbx_enrollment.display_make_changes_for_shop? || hbx_enrollment.display_make_changes_for_ivl? %>
           <div class="col-lg-3">
             <!-- cna class will hide the element -->
-            <% cna_class = hbx_enrollment.display_make_changes_for_shop? ? "" : "cna" %>
+            <% if hbx_enrollment.is_shop? %>
+              <% cna_class = hbx_enrollment.display_make_changes_for_shop? ? "" : "cna" %>
+            <% end %>
             <div class="row <%= cna_class %>">
               <% if hbx_enrollment.display_make_changes_for_shop? %>
                 <%= pundit_span Family, :updateable? %>
