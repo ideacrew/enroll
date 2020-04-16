@@ -64,7 +64,7 @@ class ApplicationController < ActionController::Base
 
   def authenticate_me!
     # Skip auth if you are trying to log in
-    return true if ["welcome","saml", "broker_roles", "office_locations", "invitations", 'security_question_responses'].include?(controller_name.downcase)
+    return true if (["welcome","saml", "broker_roles", "office_locations", "invitations", 'security_question_responses'].include?(controller_name.downcase) || action_name == 'unsupportive_browser')
     authenticate_user!
   end
 
@@ -147,6 +147,7 @@ class ApplicationController < ActionController::Base
   protected
   # Broker Signup form should be accessibile for anonymous users
     def authentication_not_required?
+      action_name == 'unsupportive_browser' ||
       devise_controller? ||
       (controller_name == "broker_roles") ||
       (controller_name == "office_locations") ||
