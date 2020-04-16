@@ -1336,7 +1336,9 @@ class HbxEnrollment
   # Enable make changes SHOP button under the following conditions:
   ## 1. Enrollment is SHOP, meaning the "kind" value is one of these: ['employer_sponsored', 'employer_sponsored_cobra']
   ## 2. Family is eligible to enroll, aasm_state is not in coverage terminated or coverage cancelled,
-  ## 3. HBX Enrollment is NOT the most current SEP enrollment 
+  ## 3. HBX Enrollment is NOT the most current SEP enrollment
+  ###  OR
+  #####  Hbx Enrollment is coverage selected with an upcoming auto renewing
   #### OR EITHER
   #### HBX Enrollment is under annual open enrollment OR under new hire open enrollment
   def display_make_changes_for_shop?
