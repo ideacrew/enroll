@@ -12,9 +12,9 @@
   </div>
   <div class="panel-body">
     <% if hbx_enrollment.renewing_waived? %>
-      <%= renewing_message = "insured.waived_coverage_for_year_renewing" %>
+      <% renewing_message = "insured.waived_coverage_for_year_renewing" %>
     <% else %>
-      <%= renewing_message = "insured.waived_coverage_for_year" %>
+      <% renewing_message = "insured.waived_coverage_for_year" %>
     <% end %>
       <h4>
         <%= l10n(renewing_message, coverage_kind: hbx_enrollment.coverage_kind, year: hbx_enrollment.parent_enrollment.present? ? hbx_enrollment.parent_enrollment.sponsored_benefit_package.start_on.year : hbx_enrollment.effective_on.year) %>
