@@ -16,7 +16,7 @@ module Config::AcaHelper
   end
 
   def flexible_contribution_model_enabled_for_bqt_for_period
-    app_period = ::EnrollRegistry[:flexible_contribution_model_for_bqt].setting(:initial_application_period).item
+    app_period = ::EnrollRegistry[:flexible_contribution_model_for_bqt].setting(:initial_application_period).item.split('..')
     start_on = retrive_date(app_period[0])
     end_on = retrive_date(app_period[1])
     start_on..end_on
