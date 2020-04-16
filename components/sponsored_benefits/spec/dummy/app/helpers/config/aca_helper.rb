@@ -16,7 +16,7 @@ module Config::AcaHelper
   end
 
   def flexible_contribution_model_enabled_for_bqt_for_period
-    app_period = EnrollRegistry[:flexible_contribution_model_for_bqt].setting(:initial_application_period).item
+    app_period = ::EnrollRegistry[:flexible_contribution_model_for_bqt].setting(:initial_application_period).item
     start_on = retrive_date(app_period[0])
     end_on = retrive_date(app_period[1])
     start_on..end_on
@@ -27,11 +27,11 @@ module Config::AcaHelper
   end
 
   def flexible_family_contribution_percent_minimum_for_bqt
-    @flexible_family_contribution_percent_minimum_for_bqt ||= EnrollRegistry[:flexible_contribution_model_for_bqt].setting(:employer_family_contribution_percent_minimum).item
+    @flexible_family_contribution_percent_minimum_for_bqt ||= ::EnrollRegistry[:flexible_contribution_model_for_bqt].setting(:employer_family_contribution_percent_minimum).item
   end
 
   def flexible_employer_contribution_percent_minimum_for_bqt
-    @flexible_employer_contribution_percent_minimum_for_bqt ||= EnrollRegistry[:flexible_contribution_model_for_bqt].setting(:employer_contribution_percent_minimum).item
+    @flexible_employer_contribution_percent_minimum_for_bqt ||= ::EnrollRegistry[:flexible_contribution_model_for_bqt].setting(:employer_contribution_percent_minimum).item
   end
 
   def family_contribution_percent_minimum_for_application_start_on(start_on, is_renewing)
