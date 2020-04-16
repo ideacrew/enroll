@@ -1101,16 +1101,21 @@ class HbxEnrollment
   ## 1. Enrollment is SHOP, meaning the "kind" value is one of these: ['employer_sponsored', 'employer_sponsored_cobra']
   ## 2. Family is eligible to enroll, aasm_state is not in coverage terminated or coverage cancelled,
   ## 3. HBX Enrollment is NOT the most current SEP enrollment
+  ###  OR
+  #####  Hbx Enrollment is coverage selected with an upcoming auto renewing
   #### OR EITHER
   #### HBX Enrollment is under annual open enrollment OR under new hire open enrollment
   def display_make_changes_for_shop?
     return false unless is_shop?
     return false unless family.is_eligible_to_enroll?
     return false if coverage_terminated? || coverage_canceled?
-
-    family.enrollment_is_not_most_recent_sep_enrollment?(self) ||
-      employee_role&.can_enroll_as_new_hire? ||
-      sponsored_benefit_package&.open_enrollment_contains?(TimeKeeper.date_of_record)
+    # See scenario features/employee/employee_passive_renewal_update.feature
+    # enrollment_is_active_with_upcoming_auto_renewing
+    return true if ENROLLED_STATUSES.include?(aasm_state) && family.hbx_enrollments.by_kind(kind).last.aasm_state == "auto_renewing"
+    return false if aasm_state == 'auto_renewing' && family.hbx_enrollments.by_kind(kind).to_a[-2].aasm_state == "coverage_selected"
+    return true if family.enrollment_is_not_most_recent_sep_enrollment?(self ||
+    (employee_role&.can_enroll_as_new_hire? || sponsored_benefit_package&.open_enrollment_contains?(TimeKeeper.date_of_record)) ||
+     !is_active_renewal_purchase?)
   end
 
   def build_plan_premium(qhp_plan: nil, elected_aptc: false, tax_household: nil, apply_aptc: nil)
