@@ -26,7 +26,7 @@ module BenefitMarkets
 
         def validate(product_package_params, enrollment_eligibility)
           result =
-            if enrollment_eligibility.market_kind == :fehb
+            if enrollment_eligibility.market_kind == :fehb || product_package_params[:product_kind] != :health
               ::BenefitMarkets::Validators::Products::LegacyProductPackageContract.new.call(product_package_params)
             else
               ::BenefitMarkets::Validators::Products::ProductPackageContract.new.call(product_package_params)
@@ -42,7 +42,7 @@ module BenefitMarkets
         def set_assigned_contribution_model(product_package_values, enrollment_eligibility)
           key = "assign_contribution_model_#{enrollment_eligibility.market_kind}".to_sym
           result =
-            if ::EnrollRegistry.feature_enabled?(key)
+            if ::EnrollRegistry.feature_enabled?(key) && product_package_values[:product_kind] == :health
               contribution_model = ::EnrollRegistry[key] {
                 {
                   product_package_values: product_package_values,

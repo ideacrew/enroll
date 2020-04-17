@@ -69,14 +69,7 @@ module BenefitMarkets
         def criterion_matches?(criterion, enrollment_eligibility)
           criterion_application_kind = criterion.setting(:benefit_application_kind).item
 
-          (criterion_application_kind == enrollment_eligibility.benefit_application_kind) && criterion_effective_period_for(criterion).cover?(enrollment_eligibility.effective_date)
-        end
-
-        def criterion_effective_period_for(criterion)
-          effective_period = criterion.setting(:effective_period).item
-          dates = effective_period.split(/\.\./)
-
-          Range.new(Date.strptime(dates.min, "%Y-%m-%d"), Date.strptime(dates.max, "%Y-%m-%d"))
+          (criterion_application_kind == enrollment_eligibility.benefit_application_kind) && criterion.setting(:effective_period).item.cover?(enrollment_eligibility.effective_date)
         end
       end
     end
