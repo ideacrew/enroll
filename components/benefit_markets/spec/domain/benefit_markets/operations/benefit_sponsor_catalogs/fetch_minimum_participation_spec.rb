@@ -23,7 +23,7 @@ RSpec.describe BenefitMarkets::Operations::BenefitSponsorCatalogs::FetchMinimumP
   }
 
   let(:product_package) {
-    double(assigned_contribution_model: contribution_model, benefit_kind: :aca_shop)
+    double(assigned_contribution_model: contribution_model, benefit_kind: :aca_shop, contribution_model: contribution_model)
   }
 
   let(:contribution_model) {

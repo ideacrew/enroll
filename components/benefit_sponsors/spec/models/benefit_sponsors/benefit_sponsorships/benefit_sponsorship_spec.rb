@@ -290,11 +290,14 @@ module BenefitSponsors
     describe "Transitioning a BenefitSponsorship through Initial Application Workflow States" do
       let(:benefit_sponsorship)                 { employer_profile.add_benefit_sponsorship }
       let(:this_year)                           { Date.today.year }
+      let(:benefit_sponsor_catalog) { FactoryBot.create(:benefit_markets_benefit_sponsor_catalog, service_areas: [service_area]) }
+      let(:service_area) { create_default(:benefit_markets_locations_service_area) }
       let(:benefit_application) do
         build(
           :benefit_sponsors_benefit_application,
           benefit_sponsorship: benefit_sponsorship,
-          recorded_service_areas: benefit_sponsorship.service_areas
+          recorded_service_areas: benefit_sponsorship.service_areas,
+          benefit_sponsor_catalog: benefit_sponsor_catalog
         )
       end
 
