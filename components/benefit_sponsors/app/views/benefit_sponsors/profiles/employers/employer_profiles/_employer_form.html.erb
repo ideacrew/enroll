@@ -47,12 +47,12 @@
     <div class='table-responsive col-12'>
       <table style='width: 100%; border-collapse: collapse; border: 1px solid #d5d5d5'>
         <thead style='height: 40px;'>
-        <th style='width: 18%; height: 40px; padding: 10px'>First Name</th>
-        <th style='width: 18%'>Last Name</th>
-        <th style='width: 18%'> Email</th>
-        <th style='width: 18%'> Phone</th>
-        <th style='width: 18%'> Status</th>
-        <th style='width: 12%'> Remove Role</th>
+          <th style='width: 18%; height: 40px; padding: 10px'>First Name</th>
+          <th style='width: 18%'>Last Name</th>
+          <th style='width: 18%'> Email</th>
+          <th style='width: 18%'> Phone</th>
+          <th style='width: 18%'> Status</th>
+          <th style='width: 12%'> Remove Role</th>
         </thead>
         <% @agency.staff_roles.each do |staff| %>
           <% next unless staff.person_id.present? %>
