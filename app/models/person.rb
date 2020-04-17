@@ -1,6 +1,7 @@
 class Person
   include Config::AcaModelConcern
   include Config::SiteModelConcern
+  include Config::ContactCenterModelConcern
   include Mongoid::Document
   include SetCurrentUser
   include Mongoid::Timestamps
