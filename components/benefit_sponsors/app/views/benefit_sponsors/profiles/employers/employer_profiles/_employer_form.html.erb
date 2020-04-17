@@ -55,32 +55,34 @@
         <th style='width: 12%'> Remove Role</th>
         </thead>
         <% @agency.staff_roles.each do |staff| %>
-          <tr style='border: 1px solid #d5d5d5; height: 50px; '>
-            <td style='padding: 10px'><%= staff.first_name %></td>
-            <td><%= staff.last_name %></td>
-            <td>
-              <%= staff.email %>
-            </td>
-            <td>
-              <%= staff.phone %>
-            </td>
-            <td>
-              <% status = staff.status.split(" ") %>
-              <%= status[1] %>
-              <% if staff.status.match(/Is Applicant/i) %>
-                  <%=  link_to(approve_profiles_employers_employer_staff_role_path(id: @agency.profile_id, person_id: staff.person_id)) do %>
-                      approve
-                  <% end %>
-              <% end %>
-              </br>
-              <%= status[2] %>
-            </td>
-            <td>
-              <%= link_to(profiles_employers_employer_staff_role_path(id: @agency.profile_id, person_id: staff.person_id), method: 'delete', data: {confirm: 'Delete this role?'}) do %>
-                  <i class="far fa-trash-alt fa-2x role-trashcan"></i>
-              <%end%>
-            </td>
-          </tr>
+          <% next unless staff.person_id.present? %>
+            <tr style='border: 1px solid #d5d5d5; height: 50px; '>
+              <td style='padding: 10px'><%= staff.first_name %></td>
+              <td><%= staff.last_name %></td>
+              <td>
+                <%= staff.email %>
+              </td>
+              <td>
+                <%= staff.phone %>
+              </td>
+              <td>
+                <% status = staff.status.split(" ") %>
+                <%= status[1] %>
+                <% if staff.status.match(/Is Applicant/i) %>
+                    <%=  link_to(approve_profiles_employers_employer_staff_role_path(id: @agency.profile_id, person_id: staff.person_id)) do %>
+                        approve
+                    <% end %>
+                <% end %>
+                </br>
+                <%= status[2] %>
+              </td>
+              <td>
+                <%= link_to(profiles_employers_employer_staff_role_path(id: @agency.profile_id, person_id: staff.person_id), method: 'delete', data: {confirm: 'Delete this role?'}) do %>
+                    <i class="far fa-trash-alt fa-2x role-trashcan"></i>
+                <%end%>
+              </td>
+            </tr>
+          <% end %>
         <% end %>
       </table>
     </div>
