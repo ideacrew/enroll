@@ -16,7 +16,7 @@ module BenefitSponsors
           optional(:predecessor_id).maybe(Types::Bson)
           required(:source_kind).filled(:symbol)
           required(:registered_on).filled(:date)
-          required(:is_no_ssn_enabled).filled(:bool)
+          optional(:is_no_ssn_enabled).value(:bool)
           optional(:ssn_enabled_on).maybe(:date)
           optional(:ssn_disabled_on).maybe(:date)
           required(:aasm_state).filled(:symbol)

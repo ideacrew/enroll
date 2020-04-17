@@ -14,7 +14,7 @@ RSpec.describe BenefitSponsors::Validators::BenefitSponsorships::BenefitSponsors
   let(:termination_reason)             { "non_payment_termination_reason"}  
   let(:missing_params)                 { {_id: BSON::ObjectId.new, hbx_id: '1234567', aasm_state: :draft, profile_id: BSON::ObjectId.new, source_kind: :self_serve  } }
   let(:invalid_params)                 { missing_params.merge({is_no_ssn_enabled: 1, market_kind: :aca_shop, registered_on: 'today' })}
-  let(:error_message1)                 { {:is_no_ssn_enabled => ["is missing"], :market_kind => ["is missing"], :organization_id => ["is missing"], :registered_on => ["is missing"]} }
+  let(:error_message1)                 { {:market_kind => ["is missing"], :organization_id => ["is missing"], :registered_on => ["is missing"]} }
   let(:error_message2)                 { {:organization_id => ["is missing"], :registered_on => ["must be a date"]} }
 
   describe "Given invalid required parameters" do

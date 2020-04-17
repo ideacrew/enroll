@@ -13,6 +13,7 @@ RSpec.describe "employee_enrollments.html.slim.rb", :type => :view, dbclean: :af
 
     before :each do
       assign(:current_plan_year, initial_application)
+      allow(initial_application).to receive(:employee_participation_ratio_minimum).and_return(Settings.aca.shop_market.employee_participation_ratio_minimum)
       render partial: "ui-components/v1/cards/employee_enrollments"
     end
 

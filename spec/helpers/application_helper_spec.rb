@@ -317,13 +317,17 @@ RSpec.describe ApplicationHelper, :type => :helper do
         let(:standard_plan_year) { double("PlanYear", start_on: Date.new(2029, 3, 1), eligible_to_enroll_count: 5, is_renewing?: false) }
 
         let(:min_participation_count_for_flex) do
-          (flex_plan_year.eligible_to_enroll_count * Settings.aca.shop_market.initial_application.flexible_contribution_model.employee_participation_ratio_minimum).ceil
+          (flex_plan_year.eligible_to_enroll_count * 0).ceil
         end
 
         let(:min_participation_count_for_standard) do
           (standard_plan_year.eligible_to_enroll_count * Settings.aca.shop_market.employee_participation_ratio_minimum).ceil
         end
 
+        before do
+          allow(flex_plan_year).to receive(:employee_participation_ratio_minimum).and_return(0)
+          allow(standard_plan_year).to receive(:employee_participation_ratio_minimum).and_return(Settings.aca.shop_market.employee_participation_ratio_minimum)
+        end
 
         it 'for employer eligible for flexible contribution model' do
           @current_plan_year = flex_plan_year
@@ -341,6 +345,10 @@ RSpec.describe ApplicationHelper, :type => :helper do
       let(:renewing_plan_year) { double("PlanYear", eligible_to_enroll_count: 5, is_renewing?: true) }
       let(:min_participation_count) do
         (renewing_plan_year.eligible_to_enroll_count * Settings.aca.shop_market.employee_participation_ratio_minimum).ceil
+      end
+
+      before do
+        allow(renewing_plan_year).to receive(:employee_participation_ratio_minimum).and_return(Settings.aca.shop_market.employee_participation_ratio_minimum)
       end
 
       it 'should calculate eligible_to_enroll_count' do

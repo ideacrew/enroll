@@ -1172,5 +1172,83 @@ module BenefitSponsors
       end
     end
 
+
+    describe '.employee_participation_ratio_minimum' do
+
+      let(:application) { subject.class.new(effective_period: effective_period) }
+      let(:market) { double(kind: :aca_shop) }
+      let(:start_on) { TimeKeeper.date_of_record }
+      let(:benefit_sponsor_catalog) { double(product_packages: [product_package])}
+      let(:product_package) { double(benefit_kind: :aca_shop, contribution_model: double(key: :fifty_percent_sponsor_fixed_percent_contribution_model))}
+
+      before do
+        allow(application).to receive(:benefit_market).and_return(market)
+        allow(application).to receive(:benefit_sponsor_catalog).and_return(benefit_sponsor_catalog)
+      end
+
+      context 'when resource registry feature not found' do
+
+        let(:start_on) { TimeKeeper.date_of_record + 2.years }
+
+        context "start on is on january 1st" do 
+          let(:effective_period) { start_on.beginning_of_year..start_on.end_of_year }
+
+          it 'should return system default minimum ratio' do
+            expect(application.employee_participation_ratio_minimum).to eq application.system_min_participation_default_for(effective_period.min)
+          end
+        end
+
+        context "start on is not on january 1st" do
+          let(:effective_period) { Date.new(start_on.year, 2, 1)..Date.new(start_on.year+1, 1, 31) }
+
+          it 'should return system default minimum ratio' do
+            expect(application.employee_participation_ratio_minimum).to eq application.system_min_participation_default_for(effective_period.min)
+          end
+        end
+      end
+
+      context 'when resource registry feature not enabled' do
+        let(:market) { double(kind: :fehb) }
+
+        context "fehb market" do
+          it 'should have feature disabled' do
+            expect(::EnrollRegistry.feature_enabled?("#{market.kind}_fetch_enrollment_minimum_participation_#{start_on.year}")).to be_falsey
+          end 
+        end
+
+        context "start on is on january 1st" do 
+          let(:effective_period) { start_on.beginning_of_year..start_on.end_of_year }
+
+          it 'should return system default minimum ratio' do
+            expect(application.employee_participation_ratio_minimum).to eq application.system_min_participation_default_for(effective_period.min)
+          end
+        end
+
+        context "start on is not on january 1st" do
+          let(:effective_period) { Date.new(start_on.year, 2, 1)..Date.new(start_on.year+1, 1, 31) }
+
+          it 'should return system default minimum ratio' do
+            expect(application.employee_participation_ratio_minimum).to eq application.system_min_participation_default_for(effective_period.min)
+          end
+        end
+      end
+
+      context 'when resourcer registry feature enabled' do
+        context "shop market" do
+          it 'should have feature disabled' do
+            expect(::EnrollRegistry.feature_enabled?("#{market.kind}_fetch_enrollment_minimum_participation_#{start_on.year}")).to be_truthy
+          end
+        end
+
+        context "start on is not on january 1st" do
+          let(:effective_period) { Date.new(start_on.year, 2, 1)..Date.new(start_on.year+1, 1, 31) }
+          let(:feature) { ::EnrollRegistry["#{market.kind}_fetch_enrollment_minimum_participation_#{start_on.year}"] }
+
+          it 'should return minimum participation ratio from registry' do
+            expect(application.employee_participation_ratio_minimum).to eq feature.settings(:fifty_percent_sponsor_fixed_percent_contribution_model).item
+          end
+        end
+      end
+    end
   end
 end
