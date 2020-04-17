@@ -267,8 +267,9 @@ module BenefitSponsors
 
     context '.update' do
       context 'when type is benefit sponsor' do
+
         let!(:abc_organization) do
-          FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site)
+          FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, :with_broker_agency_profile, site: site)
         end
         let!(:benefit_sponsorship) do
           benefit_sponsorship = employer_profile.add_benefit_sponsorship
@@ -279,6 +280,12 @@ module BenefitSponsors
         let(:employer_profile) { abc_organization.employer_profile }
         let(:new_organization_name) { "Texas Tech Agency" }
         let(:office_location) { abc_organization.employer_profile.primary_office_location }
+        let(:broker_agency_profile) { abc_organization.profiles.first }
+        let(:plan_design_organization) { FactoryBot.create(:sponsored_benefits_plan_design_organization,
+          owner_profile_id: employer_profile.id,
+          sponsor_profile_id: broker_agency_profile.id
+        )}
+        let!(:update_plan_design) {plan_design_organization.update_attributes!(has_active_broker_relationship: true)}
 
         let(:valid_employer_params_update) do
           {
@@ -345,6 +352,12 @@ module BenefitSponsors
 
         it 'should update phone' do
           expect(abc_organization.employer_profile.primary_office_location.phone.number).to eq phone_number
+        end
+
+        it 'should update plan design organization' do
+          plan_design_organization.reload
+          expect(abc_organization.legal_name).to eq plan_design_organization.legal_name
+          expect(abc_organization.dba).to eq plan_design_organization.dba
         end
       end
 
