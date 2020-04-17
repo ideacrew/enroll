@@ -5,7 +5,7 @@ module BenefitSponsors
     class BenefitApplication < Dry::Struct
       transform_keys(&:to_sym)
 
-      attribute :expiration_date,             Types::Strict::Date
+      attribute :expiration_date,             Types::Date.optional
       attribute :effective_period,            Types::Range
       attribute :open_enrollment_period,      Types::Range
       attribute :terminated_on,               Types::Date.optional

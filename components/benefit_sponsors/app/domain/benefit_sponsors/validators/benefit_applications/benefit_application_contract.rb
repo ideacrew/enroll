@@ -6,7 +6,7 @@ module BenefitSponsors
       class BenefitApplicationContract < Dry::Validation::Contract
 
         params do
-          required(:expiration_date).filled(:date)
+          optional(:expiration_date).maybe(:date)
           required(:effective_period).filled(type?: Range)
           required(:open_enrollment_period).filled(type?: Range)
           optional(:terminated_on).maybe(:date)
