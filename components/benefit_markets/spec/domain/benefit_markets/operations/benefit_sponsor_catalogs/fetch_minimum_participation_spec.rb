@@ -54,5 +54,31 @@ RSpec.describe BenefitMarkets::Operations::BenefitSponsorCatalogs::FetchMinimumP
         expect(result.success).to eq 0
       end
     end
+
+    context 'when contribution model key missing' do
+      let(:contribution_model) {
+        double(key: nil)
+      }
+
+      it 'should return failure' do
+        result = subject.call(params)
+
+        expect(result.failure?).to be_truthy
+        expect(result.failure).to eq "contribution key missing."
+      end
+    end
+
+    context 'when contribution model key different from settings' do
+      let(:contribution_model) {
+        double(key: :list_bill_contribution_model)
+      }
+
+      it 'should return failure' do
+        result = subject.call(params)
+
+        expect(result.failure?).to be_truthy
+        expect(result.failure).to eq "unable to find minimum contribution for given contribution model."
+      end
+    end
   end
 end

@@ -1011,15 +1011,19 @@ module BenefitSponsors
         product_package = benefit_packages[0]&.health_sponsored_benefit&.product_package
         product_package ||= benefit_sponsor_catalog.product_packages[0]
 
-        ::EnrollRegistry["#{benefit_market.kind}_fetch_enrollment_minimum_participation_#{start_on.year}"] {
+        result = ::EnrollRegistry["#{benefit_market.kind}_fetch_enrollment_minimum_participation_#{start_on.year}"] {
           {
             product_package: product_package,
             calender_year: start_on.year
           }
-        }.value!
-      else
-        system_min_participation_default_for(start_on)
+        }
+
+        if result.success?
+          minimum_participation = result.value!
+        end
       end
+
+      minimum_participation || system_min_participation_default_for(start_on)
     rescue ResourceRegistry::Error::FeatureNotFoundError
       system_min_participation_default_for(start_on)
     end
