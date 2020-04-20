@@ -70,6 +70,10 @@ class TaxHousehold
     tax_household_members.find_all(&:is_ia_eligible?)
   end
 
+  def applicant_ids
+    tax_household_members.map(&:applicant_id)
+  end
+
   def aptc_ratio_by_member
     # if APTC is $100, we need to apportion it between member
     # For example, given family of 4, with 2 adults & 2 children, all who are eligible
