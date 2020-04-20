@@ -60,7 +60,7 @@ module BenefitSponsors
           @broker_inbox = broker_person.build_inbox
           @broker_inbox.save!
           welcome_subject = "Welcome to #{Settings.site.short_name}"
-          welcome_body = "#{Settings.site.short_name} is ready to help you get quality, affordable medical or dental coverage that meets your needs and budget.<br/><br/>Now that you’ve created an account, take a moment to explore your account features. Remember there’s limited time to sign up for a plan. Make sure you pay attention to deadlines.<br/><br/>If you have any questions or concerns, we’re here to help.<br/><br/>#{Settings.site.short_name}<br/>#{Settings.contact_center.short_number}<br/>TTY: #{Settings.contact_center.tty_number}"
+          welcome_body = "#{Settings.site.short_name} is the #{Settings.aca.state_name}'s on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
           broker_message = @broker_inbox.messages.create(subject: welcome_subject, body: welcome_body)
           sign_in broker_user
         end
@@ -97,7 +97,7 @@ module BenefitSponsors
           @broker_inbox = broker_person.build_inbox
           @broker_inbox.save!
           welcome_subject = "Welcome to #{Settings.site.short_name}"
-          welcome_body = "#{Settings.site.short_name} is ready to help you get quality, affordable medical or dental coverage that meets your needs and budget.<br/><br/>Now that you’ve created an account, take a moment to explore your account features. Remember there’s limited time to sign up for a plan. Make sure you pay attention to deadlines.<br/><br/>If you have any questions or concerns, we’re here to help.<br/><br/>#{Settings.site.short_name}<br/>#{Settings.contact_center.short_number}<br/>TTY: #{Settings.contact_center.tty_number}"
+          welcome_body = "#{Settings.site.short_name} is the #{Settings.aca.state_name}'s on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
           broker_message = @broker_inbox.messages.create(subject: welcome_subject, body: welcome_body)
           sign_in admin_user
         end
