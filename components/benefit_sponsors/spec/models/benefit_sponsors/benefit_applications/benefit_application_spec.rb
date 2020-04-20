@@ -1235,7 +1235,7 @@ module BenefitSponsors
 
       context 'when resourcer registry feature enabled' do
         context "shop market" do
-          it 'should have feature disabled' do
+          it 'should have feature enabled' do
             expect(::EnrollRegistry.feature_enabled?("#{market.kind}_fetch_enrollment_minimum_participation_#{start_on.year}")).to be_truthy
           end
         end
@@ -1246,6 +1246,48 @@ module BenefitSponsors
 
           it 'should return minimum participation ratio from registry' do
             expect(application.employee_participation_ratio_minimum).to eq feature.settings(:fifty_percent_sponsor_fixed_percent_contribution_model).item
+          end
+        end
+
+        context "contribution key missing" do
+          let(:effective_period) { Date.new(start_on.year, 2, 1)..Date.new(start_on.year+1, 1, 31) }
+          let(:product_package) { double(benefit_kind: :aca_shop, contribution_model: double(key: nil))}
+
+          it 'should return error' do
+            result = ::EnrollRegistry["#{market.kind}_fetch_enrollment_minimum_participation_#{start_on.year}"] {
+              {
+                product_package: product_package,
+                calender_year: application.start_on.year
+              }
+            }
+
+            expect(result.failure?).to be_truthy
+            expect(result.failure).to eq "contribution key missing."
+          end
+
+          it 'should return minimum participation ratio using system default' do
+            expect(application.employee_participation_ratio_minimum).to eq application.system_min_participation_default_for(application.start_on)
+          end
+        end
+
+        context "contribution key is different from registry setting" do
+          let(:effective_period) { Date.new(start_on.year, 1, 1)..Date.new(start_on.year, 12, 31) }
+          let(:product_package) { double(benefit_kind: :aca_shop, contribution_model: double(key: :list_bill_contribution_model))}
+
+          it 'should return error' do
+            result = ::EnrollRegistry["#{market.kind}_fetch_enrollment_minimum_participation_#{start_on.year}"] {
+              {
+                product_package: product_package,
+                calender_year: application.start_on.year
+              }
+            }
+
+            expect(result.failure?).to be_truthy
+            expect(result.failure).to eq "unable to find minimum contribution for given contribution model."
+          end
+
+          it 'should return minimum participation ratio using system default' do
+            expect(application.employee_participation_ratio_minimum).to eq application.system_min_participation_default_for(application.start_on)
           end
         end
       end
