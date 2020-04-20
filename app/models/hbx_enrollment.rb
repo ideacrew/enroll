@@ -355,6 +355,7 @@ class HbxEnrollment
   scope :non_terminated, -> { where(:aasm_state.ne => 'coverage_terminated') }
   scope :non_external, -> { where(:external_enrollment => false) }
   scope :non_expired_and_non_terminated,  -> { any_of([enrolled.selector, renewing.selector, waived.selector]).order(created_at: :desc) }
+  scope :by_employee_role,     -> (employee_role) { where(employee_role_id: employee_role.id) }
   scope :by_benefit_sponsorship,   -> (benefit_sponsorship) { where(:benefit_sponsorship_id => benefit_sponsorship.id) }
   scope :by_benefit_package,       -> (benefit_package) { where(:sponsored_benefit_package_id => benefit_package.id) }
   scope :by_enrollment_period,     -> (enrollment_period) { where(:effective_on.gte => enrollment_period.min, :effective_on.lte => enrollment_period.max) }
@@ -1347,8 +1348,11 @@ class HbxEnrollment
     return false if (coverage_terminated? || coverage_canceled?)
     # See scenario features/employee/employee_passive_renewal_update.feature
     # enrollment_is_active_with_upcoming_auto_renewing
-    return true if ENROLLED_STATUSES.include?(aasm_state) && family.hbx_enrollments.by_kind(kind).by_benefit_sponsorship(benefit_sponsorship).last.aasm_state == "auto_renewing"
-    return false if aasm_state == 'auto_renewing' && family.hbx_enrollments.by_kind(kind).by_benefit_sponsorship(benefit_sponsorship).to_a[-2].aasm_state == "coverage_selected"
+    # This makes sure it is not compared with enrollments for other employers
+    return true if ENROLLED_STATUSES.include?(aasm_state) &&
+    family.hbx_enrollments.by_kind(kind)&.by_employee_role(employee_role)&.last&.aasm_state == "auto_renewing"
+    return false if aasm_state == 'auto_renewing' &&
+    family.hbx_enrollments.by_kind(kind)&.by_employee_role(employee_role)&.to_a[-2]&.aasm_state == "coverage_selected"
     return true if (family.enrollment_is_not_most_recent_sep_enrollment?(self) ||
     (employee_role&.can_enroll_as_new_hire? || sponsored_benefit_package&.open_enrollment_contains?(TimeKeeper.date_of_record)))
   end
