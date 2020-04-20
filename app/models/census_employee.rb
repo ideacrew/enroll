@@ -615,7 +615,10 @@ class CensusEmployee < CensusMember
 
     term_eligible_active_enrollments = active_benefit_group_enrollments.show_enrollments_sans_canceled.non_terminated if active_benefit_group_enrollments.present?
     term_eligible_renewal_enrollments = renewal_benefit_group_enrollments.show_enrollments_sans_canceled.non_terminated if renewal_benefit_group_enrollments.present?
-    enrollments = (Array.wrap(term_eligible_active_enrollments) + Array.wrap(term_eligible_renewal_enrollments)).compact
+
+    expired_benefit_group_assignment = benefit_group_assignments.sort_by(&:created_at).select{ |bga| (bga.benefit_group.start_on..bga.benefit_group.end_on).include?(coverage_terminated_on) && bga.plan_year.aasm_state == :expired}.last
+    term_eligible_expired_enrollments = expired_benefit_group_enrollments(expired_benefit_group_assignment.benefit_group).show_enrollments_sans_canceled.non_terminated if expired_benefit_group_assignment.present?
+    enrollments = (Array.wrap(term_eligible_active_enrollments) + Array.wrap(term_eligible_renewal_enrollments) + Array.wrap(term_eligible_expired_enrollments)).compact.uniq
 
     enrollments.each do |enrollment|
       if enrollment.effective_on > self.coverage_terminated_on
@@ -877,7 +880,7 @@ class CensusEmployee < CensusMember
         csv << %w(employer_assigned_family_id employee_relationship last_name first_name  middle_name name_sfx  email ssn dob gender  hire_date termination_date  is_business_owner benefit_group plan_year kind  address_1 address_2 city  state zip)
         csv << columns
         census_employees_query_criteria(employer_profile_id).each do |rec|
-          is_active = rec["benefit_group_assignments"].any?{|bga| bga["is_active"] == true}
+          is_active = rec["benefit_group_assignments"].present? ? rec["benefit_group_assignments"].any?{|bga| bga["is_active"] == true} : false
           csv << insert_census_data(rec, is_active)
 
           if rec["census_dependents"].present?
@@ -1357,6 +1360,16 @@ class CensusEmployee < CensusMember
           :"employee_role_id" => self.employee_role_id,
           :"aasm_state".ne => "shopping"
       }) || []
+  end
+
+
+  def expired_benefit_group_enrollments(expired_benefit_group)
+    return nil if employee_role.blank?
+    HbxEnrollment.where({
+                            :"sponsored_benefit_package_id".in => [expired_benefit_group.id].compact,
+                            :"employee_role_id" => self.employee_role_id,
+                            :"aasm_state".ne => "shopping"
+                        }) || []
   end
 
   # Enrollments eligible for Cobra

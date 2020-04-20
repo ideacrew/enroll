@@ -83,7 +83,7 @@ class ApplicationController < ActionController::Base
 
   private
 
-    def strong_params 
+    def strong_params
       params.permit!
     end
 
@@ -134,6 +134,7 @@ class ApplicationController < ActionController::Base
     end
 
     def update_url
+      return if current_user&.person&.agent?
       if (controller_name == "employer_profiles" && action_name == "show") ||
           (controller_name == "families" && action_name == "home") ||
           (controller_name == "profiles" && action_name == "new") ||
@@ -196,9 +197,32 @@ class ApplicationController < ActionController::Base
       log(message, :severity=>'error')
     end
 
+    def confirm_last_portal(request, resource)
+      # This is only necessary in environments other than production.
+      # If data is imported from production to another environment a user's :last_portal_visited may still point to prod, causing errors.
+      # In the case a user's last_portal_visited is not from the current environment, it will redirect to root of the current environment.
+      current_host = URI(request.referrer).host
+      last_portal_visited = resource.try(:last_portal_visited)
+      if last_portal_visited
+        local_path = current_host + URI(last_portal_visited).path
+        # get host of url. If localhost return last portal path, if remote host check that host environments match between last_portals
+        last_portal_host = URI(last_portal_visited).host
+        if last_portal_host
+          redirect_path = current_host == last_portal_host ? last_portal_visited : local_path
+        else
+          redirect_path = last_portal_visited
+        end
+      else
+        redirect_path = root_path
+      end
+
+      redirect_path
+    end
+
     def after_sign_in_path_for(resource)
       if request.referrer =~ /sign_in/
-        session[:portal] || resource.try(:last_portal_visited) || root_path
+        redirect_path = confirm_last_portal(request, resource)
+        session[:portal] || redirect_path
       else
         session[:portal] || request.referer || root_path
       end

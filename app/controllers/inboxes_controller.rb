@@ -52,7 +52,7 @@ class InboxesController < ApplicationController
   end
 
   def find_hbx_profile
-    @profile = HbxProfile.find(params["profile_id"])
+    @profile = ::BenefitSponsors::Organizations::HbxProfile.find(params["profile_id"])
   end
 
   def find_message
