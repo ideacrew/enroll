@@ -299,17 +299,3 @@ registry:
           item: 0
         - key: :employer_family_contribution_percent_minimum
           item: 0
-
-  - namespace:
-    - :enroll_app
-    - :aca_shop_market
-    - :initial_application
-    features:
-      - key: :flexible_contribution_model_for_initials
-        item: :contribution_model
-        is_enabled: true
-        settings:
-        - key: :application_period
-          item: <%= Date.new(2020,03,01)..Date.new(2020,12,31) %>
-        - key: :employee_participation_ratio_minimum
-          item: 0
