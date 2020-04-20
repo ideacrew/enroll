@@ -79,12 +79,7 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
     And census employee Patrick Doe new_hire_enrollment_period is greater than date of record
     When Employee click the "Married" in qle carousel
     And Employee select a past qle date
-    Then Employee should see confirmation and clicks continue
-    Then Employee should see family members page and clicks continue
-    Then Employee should see the group selection page
-    When Employee clicks continue on the group selection page
-
-    Then Patrick Doe should see "You're not yet eligible under your employer-sponsored benefits" error message
+    Then Employee should see error message
 
   Scenario: New Hire can buy coverage during open enrollment of renewing plan year
     Given a CCA site exists with a benefit market
@@ -155,7 +150,7 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
     And renewal employer ABC Widgets has imported and renewal enrollment_open benefit applications
     
     Given there exists Patrick Doe employee for employer ABC Widgets
-    And employee Patrick Doe has current hired on date
+    And employee Patrick Doe has past hired on date
     And employee Patrick Doe already matched with employer ABC Widgets and logged into employee portal
     When Employee click the "Married" in qle carousel
     And Employee select a past qle date
