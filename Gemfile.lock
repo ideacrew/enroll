@@ -134,6 +134,14 @@ PATH
       aasm (~> 4.8.0)
       config (~> 2.0)
       devise (~> 4.5)
+      dry-auto_inject (= 0.6.1)
+      dry-container
+      dry-initializer
+      dry-monads
+      dry-schema (~> 1.0)
+      dry-struct
+      dry-types
+      dry-validation (~> 1.0)
       ffi (~> 1.9)
       kaminari (~> 0.17.0)
       mongoid (~> 7.0.2)
