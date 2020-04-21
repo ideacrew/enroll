@@ -52,6 +52,7 @@ module BenefitMarkets
               contribution_model[:product_package_values]
             else
               product_package_values[:assigned_contribution_model] = nil
+              product_package_values[:contribution_models] = []
               product_package_values
             end
 
