@@ -193,8 +193,12 @@ module Forms
     end
 
     def destroy!
-      family.remove_family_member(family_member.person, family_member)
-      family.save!
+      status, messages = family.remove_family_member(family_member.person)
+      if status
+        family.save
+      else
+        self.errors.add(:base, messages)
+      end
     end
 
     def family
