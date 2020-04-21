@@ -120,7 +120,7 @@ describe Forms::FamilyMember do
   context "assign_person_address" do
     let(:addr1) {Address.new(zip: '1234', state: 'DC')}
     let(:addr2) {Address.new(zip: '4321', state: 'DC')}
-    let(:addr3) {Address.new(zip: '1234', state: 'DC', 'address_3' => "abc")}
+    let(:addr3) { FactoryBot.build(:address) }
     let(:person) {FactoryBot.create(:person)}
     let(:primary) {FactoryBot.create(:person)}
     let(:family) {double(primary_family_member: double(person: primary))}
@@ -142,15 +142,24 @@ describe Forms::FamilyMember do
       end
 
       it "add new address if address present" do
-        allow(primary).to receive(:home_address).and_return addr3
+        primary_home_address = primary.home_address
+        person.home_address.destroy
+        person.save!
         employee_dependent.assign_person_address(person)
-        expect(person.addresses.include?(addr3)).to eq true
+        expect(person.home_address.matches_addresses?(primary_home_address)).to be_truthy
       end
 
       it "not add new address if address blank" do
+        dep_home_address = person.home_address
         allow(primary).to receive(:home_address).and_return nil
         employee_dependent.assign_person_address(person)
-        expect(person.addresses.include?(addr3)).to eq false
+        expect(person.home_address).to eq(dep_home_address)
+      end
+
+      it 'should not copy the address object id' do
+        primary_home_address = primary.home_address
+        employee_dependent.assign_person_address(person)
+        expect(person.addresses.pluck(:id)).not_to include(primary_home_address.id)
       end
     end
 
