@@ -1,7 +1,7 @@
 <div class="container" style="margin-top: 5px;">
   <div class="alert alert-success" role="alert">
     <h4 class="alert-heading"><strong>Your browser is not supported</strong></h4>
-    <p>On <%=  Date.strptime(Settings.aca.block_ie_browser_after, '%m/%d/%y').strftime('%B %d, %Y') %>, HCB stopped supporting older versions of Internet Explorer. To use this website, please download the latest version of one of the compatible browsers below:</p>
+    <p>On <%=  Date.strptime(Settings.aca.block_ie_browser_after.to_s, '%m/%d/%y').strftime('%B %d, %Y') %>, HCB stopped supporting older versions of Internet Explorer. To use this website, please download the latest version of one of the compatible browsers below:</p>
     <br>
     <ul>
       <li><a href='https://www.microsoft.com/en-us/edge' target='_blank'>Microsoft Edge</a></li>
