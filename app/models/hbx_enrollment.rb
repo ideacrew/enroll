@@ -1339,7 +1339,7 @@ class HbxEnrollment
   ## 2. Family is eligible to enroll, aasm_state is not in coverage terminated or coverage cancelled,
   ## 3. HBX Enrollment is NOT the most current SEP enrollment
   ###  OR
-  #####  Hbx Enrollment is coverage selected with an upcoming auto renewing
+  #####  Hbx Enrollment is coverage selected with an upcoming auto renewing enrollment for that employer present
   #### OR EITHER
   #### HBX Enrollment is under annual open enrollment OR under new hire open enrollment
   def display_make_changes_for_shop?
@@ -1350,9 +1350,9 @@ class HbxEnrollment
     # enrollment_is_active_with_upcoming_auto_renewing
     # This makes sure it is not compared with enrollments for other employers
     return true if ENROLLED_STATUSES.include?(aasm_state) &&
-    family.hbx_enrollments.by_kind(kind)&.by_employee_role(employee_role)&.last&.aasm_state == "auto_renewing"
+    family.hbx_enrollments.by_kind(kind)&.by_employee_role(employee_role)&.auto_renewing.present?
     return false if aasm_state == 'auto_renewing' &&
-    family.hbx_enrollments.by_kind(kind)&.by_employee_role(employee_role)&.to_a[-2]&.aasm_state == "coverage_selected"
+    family.hbx_enrollments.by_kind(kind)&.by_employee_role(employee_role)&.coverage_selected.present?
     return true if (family.enrollment_is_not_most_recent_sep_enrollment?(self) ||
     (employee_role&.can_enroll_as_new_hire? || sponsored_benefit_package&.open_enrollment_contains?(TimeKeeper.date_of_record)))
   end
