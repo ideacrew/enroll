@@ -5,7 +5,7 @@
 
     - flash.each do |key, value|
       div class="alert alert-#{key} alert-dismissible" role="alert"
-        - [value].to_a.each do |v|
+        - [value].to_a.flatten.each do |v|
           button.close type="button" data-dismiss="alert" aria-label="Close"
             span aria-hidden="true" &times
           = raw v
