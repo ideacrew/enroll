@@ -150,8 +150,14 @@ class Insured::FamiliesController < FamiliesController
       @qle_reason_val = params[:qle_reason_val] if params[:qle_reason_val].present?
       @qle_end_on = @qle_date + @qle.post_event_sep_in_days.try(:days)
     end
+    qle_qualified = start_date <= @qle_date && @qle_date <= end_date ? true : false
+    @qualified_date = if @qle&.shop?
+                        census_employees = @person.active_employee_roles.map(&:census_employee)
+                        census_employees.any?{|ce| @qle_date >= ce.hired_on } ? qle_qualified : false
+                      else
+                        qle_qualified
+                      end
 
-    @qualified_date = (start_date <= @qle_date && @qle_date <= end_date) ? true : false
     if @person.has_active_employee_role? && !(@qle.present? && @qle.individual?)
       @future_qualified_date = (@qle_date > today) ? true : false
     end

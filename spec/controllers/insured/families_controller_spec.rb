@@ -720,6 +720,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       include_context "setup initial benefit application"
 
       let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_month }
+      let(:qle) { FactoryBot.create(:qualifying_life_event_kind, pre_event_sep_in_days: 30, post_event_sep_in_days: 0) }
 
       let!(:user) { FactoryBot.create(:user) }
       let!(:person1) { FactoryBot.create(:person) }
@@ -737,7 +738,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       context "normal qle event" do
         it "should return true" do
           date = TimeKeeper.date_of_record.strftime("%m/%d/%Y")
-       get :check_qle_date,params: {date_val: date, format: :js}
+       get :check_qle_date,params: {date_val: date, qle_id: qle.id, format: :js}
           expect(response).to have_http_status(:success)
           expect(assigns(:qualified_date)).to eq true
         end
@@ -745,9 +746,29 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
         it "should return false" do
           sign_in user
           date = (TimeKeeper.date_of_record + 40.days).strftime("%m/%d/%Y")
-       get :check_qle_date, params: {date_val: date, format: :js}
+       get :check_qle_date, params: {date_val: date, qle_id: qle.id, format: :js}
           expect(response).to have_http_status(:success)
           expect(assigns(:qualified_date)).to eq false
+        end
+      end
+
+      context "comparing qle event date and census hired on" do
+        it "should return false if qle date is less than census hired on" do
+          sign_in user
+          census_employee.update_attributes(hired_on: TimeKeeper.date_of_record + 10.days)
+          date = TimeKeeper.date_of_record.strftime("%m/%d/%Y")
+          get :check_qle_date,params: {date_val: date, qle_id: qle.id, format: :js}
+          expect(response).to have_http_status(:success)
+          expect(assigns(:qualified_date)).to eq false
+        end
+
+        it "should return true if qle date is greater than or equal census hired on " do
+          sign_in user
+          census_employee.update_attributes(hired_on: TimeKeeper.date_of_record)
+          date = (TimeKeeper.date_of_record).strftime("%m/%d/%Y")
+          get :check_qle_date, params: {date_val: date, qle_id: qle.id, format: :js}
+          expect(response).to have_http_status(:success)
+          expect(assigns(:qualified_date)).to eq true
         end
       end
 

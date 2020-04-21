@@ -298,6 +298,11 @@ Then(/Employee should see confirmation and clicks continue/) do
   click_button "Continue"
 end
 
+Then(/Employee should see error message/) do
+  wait_for_ajax
+  expect(page).to have_content "The date you submitted does not qualify for special enrollment"
+end
+
 Then(/Employee should see family members page and clicks continue/) do
   expect(page).to have_content "Household Info: Family Members"
   find('#dependent_buttons .interaction-click-control-continue', :wait => 5).click

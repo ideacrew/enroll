@@ -198,7 +198,7 @@ When(/click eligible immigration status yes/) do
 end
 
 Then(/should find I-551 doc type/) do
-  find('.label', :text => 'I-551 (Permanent Resident Card)', wait: 10)
+  find('.label', :text => 'I-551 (Permanent Resident Card)',  visible: true, wait: 10)
 end
 
 And(/should find alien number/) do
