@@ -134,6 +134,22 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       get :receipt, params: {id: "id"}
       expect(assigns(:employer_profile)).to eq abc_profile
     end
+
+    context "#send_receipt_emails" do
+      it "should send email template for IVL" do
+        allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
+        sign_in(user)
+        get :receipt, params: {id: "id"}
+        expect(assigns(:template_string)).to eq("user_mailer/secure_ivl_purchase_confirmation.html.erb")
+      end
+
+      it "should send email template for SHOP" do
+        allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
+        sign_in(user)
+        get :receipt, params: {id: "id"}
+        expect(assigns(:template_string)).to eq("user_mailer/secure_purchase_confirmation.html.erb")
+      end
+    end
   end
 
   context "GET thankyou", :dbclean => :around_each do
