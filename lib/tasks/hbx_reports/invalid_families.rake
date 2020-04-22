@@ -29,9 +29,10 @@ namespace :reports do
 
               @duplicate_family_member_families += 1
               person = family.primary_person
+              dup_created_at = family.family_members.group_by { |appl| appl.person_id }.select { |k, v| v.size > 1 }.last.created_at
               error_reason.slice!('The following errors were found: ')
               e_case_id = family.has_valid_e_case_id? ? family.e_case_id.split('#').last : 'N/A'
-              csv << [family.id, e_case_id, person.hbx_id, person.full_name, error_reason]
+              csv << [family.id, e_case_id, person.hbx_id, person.full_name, error_reason, dup_created_at]
             rescue => error
               puts "Error: #{error.message}, Family: #{family.id}"
             end
