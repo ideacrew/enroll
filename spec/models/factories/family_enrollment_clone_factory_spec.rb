@@ -63,13 +63,15 @@ RSpec.describe Factories::FamilyEnrollmentCloneFactory, :type => :model, dbclean
 
   let!(:clone_enrollment){family.enrollments.select{|e| e.kind == "employer_sponsored"}.first}
 
-  let(:generate_cobra_enrollment) {
+  let(:fam_enrollment_fact) do
     factory = Factories::FamilyEnrollmentCloneFactory.new
     factory.family = family
     factory.census_employee = ce
     factory.enrollment = clone_enrollment
-    factory.clone_for_cobra
-  }
+    factory
+  end
+
+  let(:generate_cobra_enrollment) { fam_enrollment_fact.clone_for_cobra }
 
   before do
     allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).and_return(100.0)
@@ -86,6 +88,10 @@ RSpec.describe Factories::FamilyEnrollmentCloneFactory, :type => :model, dbclean
     }
 
     context "#clone_cobra_enrollment" do
+      before :each do
+        enrollment_factory.new_effective_date = enrollment_factory.effective_on_for_cobra(enrollment_factory.enrollment)
+      end
+
       it "should successfully clone the enrollment" do
         expect(enrollment_factory.clone_cobra_enrollment.class).to eq(HbxEnrollment)
       end
@@ -141,5 +147,46 @@ RSpec.describe Factories::FamilyEnrollmentCloneFactory, :type => :model, dbclean
       expect(cobra_enrollment.hbx_enrollment_members.first.coverage_start_on).to eq clone_enrollment.effective_on
     end
 
+  end
+
+  context 'when cobra enrollment effective date falls under renewal benefit application' do
+    let(:external_enrollment) { true }
+
+    before :each do
+      ce.coverage_terminated_on = initial_application.end_on
+      ce.save
+    end
+
+    context 'when employer is offering renewal product in renewal benefit application' do
+      before :each do
+        generate_cobra_enrollment
+        @cobra_enrollment = family.enrollments.detect(&:is_cobra_status?)
+      end
+
+      it 'should generate external cobra enrollment under renewal plan year' do
+        expect(@cobra_enrollment.external_enrollment).to be_truthy
+        expect(@cobra_enrollment.auto_renewing?).to be_truthy
+        expect(@cobra_enrollment.effective_on).to eq renewal_application.start_on
+      end
+
+      it 'cobra enrollment member coverage_start_on should be same as enrollment effective_on' do
+        expect(@cobra_enrollment.hbx_enrollment_members.first.coverage_start_on).to eq clone_enrollment.effective_on
+      end
+    end
+
+    context 'when employer is not offering the renewal product in renewal benefit application' do
+      let!(:health_product) { FactoryBot.create(:benefit_markets_products_health_products_health_product) }
+
+      before do
+        product.renewal_product = health_product
+        product.update_attributes!(renewal_product_id: health_product.id)
+        product.save!
+        fam_enrollment_fact.new_effective_date = fam_enrollment_fact.effective_on_for_cobra(fam_enrollment_fact.enrollment)
+      end
+
+      it 'should raise error' do
+        expect{generate_cobra_enrollment}.to raise_error("Unable to create cobra enrollment Errors: Employer Sponsored Benefits no longer offers the product #{product.renewal_product.title}.")
+      end
+    end
   end
 end
