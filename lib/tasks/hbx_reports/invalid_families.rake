@@ -8,7 +8,7 @@ namespace :reports do
   task generate_report_for_invalid_families: :environment do
 
     file_name = "#{Rails.root}/report_for_invalid_families_#{TimeKeeper.date_of_record.strftime('%Y-%m-%d')}.csv"
-    field_names = %w[FamilyID ECaseID PrimaryHbxID PersonFullName ErrorReason]
+    field_names = %w[FamilyID ECaseID PrimaryHbxID PersonFullName ErrorReason CreatedAt]
     CSV.open(file_name, 'w', force_quotes: true) do |csv|
       csv << field_names
       @total_invalid_families = 0
