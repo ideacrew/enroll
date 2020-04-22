@@ -12,7 +12,7 @@ module BenefitMarkets
           required(:benefit_kind).filled(:symbol)
           required(:product_kind).filled(:symbol)
           required(:title).filled(:string)
-          required(:contribution_models).value(:array)
+          optional(:contribution_models).value(:array)
           required(:pricing_model).filled(:hash)
           required(:products).value(:array)
           optional(:description).maybe(:string)
