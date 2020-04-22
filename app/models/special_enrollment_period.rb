@@ -68,7 +68,7 @@ class SpecialEnrollmentPeriod
   # ADMIN FLAG
   field :admin_flag, type:Boolean
 
-  validate :optional_effective_on_dates_within_range, :next_poss_effective_date_within_range, on: :create
+  validate :optional_effective_on_dates_within_range, :next_poss_effective_date_within_range, :check_if_census_employee_eligible?, on: :create
 
   validates :csl_num,
     length: { minimum: 5, maximum: 10, message: "should be a minimum of 5 digits" },
@@ -194,6 +194,15 @@ private
       elsif !date_option.between?(min_date, max_date)
         errors.add(:optional_effective_on, "Date #{index+1} option out of range.")
       end
+    end
+  end
+
+  def check_if_census_employee_eligible?
+    return true unless is_shop_or_fehb? && family.has_primary_active_employee?
+    primary_person = family.primary_person
+    census_employees = primary_person.active_employee_roles.map(&:census_employee)
+    if census_employees.any?{|ce| qle_on < ce.hired_on }
+      errors.add(:qle_on, "Event date is less than census hired on")
     end
   end
 

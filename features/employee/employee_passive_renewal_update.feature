@@ -11,7 +11,7 @@ Feature: Passive renewal should be updated when EE updates his current coverage
 
   Scenario: Employee enters a SEP
     Given there exists Patrick Doe employee for employer ABC Widgets
-    And employee Patrick Doe has current hired on date
+    And employee Patrick Doe has past hired on date
     And employee Patrick Doe already matched with employer ABC Widgets and logged into employee portal
     And Patrick Doe has active coverage and passive renewal
     # Then Patrick Doe should see active and renewing enrollments
