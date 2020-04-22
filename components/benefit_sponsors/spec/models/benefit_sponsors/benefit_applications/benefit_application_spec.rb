@@ -977,6 +977,7 @@ module BenefitSponsors
         ce.benefit_group_assignments.first.update_attributes!(start_on: renewal_application.effective_period.min + 1.day)
         ce.aasm_state = 'employment_terminated'
         ce.employment_terminated_on = term_date
+        ce.benefit_group_assignments.last.update(benefit_package_id: renewal_application.benefit_packages.first.id)
         ce.save(validate: false)
         expect(renewal_application.active_census_employees_under_py.count).to eq 4
       end
@@ -988,6 +989,7 @@ module BenefitSponsors
         ce.benefit_group_assignments.first.update_attributes!(start_on: renewal_application.effective_period.min + 1.day)
         ce.aasm_state = 'employee_termination_pending'
         ce.employment_terminated_on = term_date
+        ce.benefit_group_assignments.last.update(benefit_package_id: renewal_application.benefit_packages.first.id)
         ce.save(validate: false)
         expect(renewal_application.active_census_employees_under_py.count).to eq 4
       end
