@@ -365,7 +365,12 @@ class Insured::PlanShoppingsController < ApplicationController
   def send_receipt_emails
     email = @person.work_email_or_best
     UserMailer.generic_consumer_welcome(@person.first_name, @person.hbx_id, email).deliver_now
-    body = render_to_string 'user_mailer/secure_purchase_confirmation.html.erb', layout: false
+    template_string = if @enrollment.kind == 'shop'
+      'user_mailer/secure_purchase_confirmation.html.erb'
+    else
+      'user_mailer/secure_ivl_purchase_confirmation.html.erb'
+    end
+    body = render_to_string template_string, layout: false
     from_provider = HbxProfile.current_hbx
     message_params = {
       sender_id: from_provider.try(:id),
