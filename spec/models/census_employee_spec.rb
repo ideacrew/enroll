@@ -1354,6 +1354,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
         benefit_sponsorship: benefit_sponsorship
       )
     end
+    let!(:benefit_group_assignment1) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: renewal_application.benefit_packages.first, census_employee: census_employee, is_active: false)}
 
     it 'should have active benefit group assignment' do
       expect(census_employee.active_benefit_group_assignment.present?).to be_truthy
