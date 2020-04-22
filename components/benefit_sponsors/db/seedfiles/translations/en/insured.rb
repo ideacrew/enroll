@@ -240,6 +240,7 @@ INSURED_TRANSLATIONS = {
   "en.coverage" => "Coverage",
   "en.waived" => "Waived",
   "en.insured.waived_coverage_for_year" => "You have selected to waive your employer %{coverage_kind} coverage for %{year}",
+  "en.insured.waived_coverage_for_year_renewing" => "Based upon your choice in a previous year, the system has automatically renewed your decision to waive %{coverage_kind} coverage for %{year}.",
   "en.waived_date" => "Waived Date",
   "en.reason_waived" => "Reason Waived",
   "en.back" => "Back",
