@@ -136,18 +136,20 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     end
 
     context "#send_receipt_emails" do
-      it "should send email template for IVL" do
+      it "should send send secure message to IVL person inbox" do
         allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
         sign_in(user)
+        expect(person.inbox.messages.count).to eq(1)
         get :receipt, params: {id: "id"}
-        expect(assigns(:template_string)).to eq("user_mailer/secure_ivl_purchase_confirmation.html.erb")
+        expect(person.inbox.messages.count).to eq(2)
       end
 
-      it "should send email template for SHOP" do
+      it "should send send secure message to SHOP person inbox"do
         allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
         sign_in(user)
+        expect(person.inbox.messages.count).to eq(1)
         get :receipt, params: {id: "id"}
-        expect(assigns(:template_string)).to eq("user_mailer/secure_purchase_confirmation.html.erb")
+        expect(person.inbox.messages.count).to eq(2)
       end
     end
   end
