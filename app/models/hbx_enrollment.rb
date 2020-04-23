@@ -1101,7 +1101,7 @@ class HbxEnrollment
   # Enable make changes SHOP button under the following conditions:
   ## 1. Enrollment is SHOP, meaning the "kind" value is one of these: ['employer_sponsored', 'employer_sponsored_cobra']
   ## 2. Family is eligible to enroll, aasm_state is not in coverage terminated or coverage cancelled,
-  ## 3. HBX Enrollment is NOT the most current SEP enrollment
+  ## 3. HBX Enrollment is NOT the most recent SEP enrollment with enrolled status present
   ###  OR
   #####  Hbx Enrollment is coverage selected with an upcoming auto renewing enrollment for that employer present
   #### OR EITHER
@@ -1115,9 +1115,9 @@ class HbxEnrollment
     # This makes sure it is not compared with enrollments for other employers
     return true if ENROLLED_STATUSES.include?(aasm_state) && family.hbx_enrollments.by_kind(kind)&.by_employee_role(employee_role)&.auto_renewing.present?
     return false if aasm_state == 'auto_renewing' && family.hbx_enrollments.by_kind(kind)&.by_employee_role(employee_role)&.coverage_selected.present?
-    return true if family.enrollment_is_not_most_recent_sep_enrollment?(self) ||
-      employee_role&.can_enroll_as_new_hire? ||
-      sponsored_benefit_package&.open_enrollment_contains?(TimeKeeper.date_of_record)
+    # Do not display if SEP enrollment with previous enrollment for employer in enrolled status
+    return false if is_special_enrollment? && family.hbx_enrollments.by_kind(kind)&.by_employee_role(employee_role)&.enrolled_statuses.present?
+    return true if family.enrollment_is_not_most_recent_sep_enrollment?(self) || employee_role&.can_enroll_as_new_hire? || sponsored_benefit_package&.open_enrollment_contains?(TimeKeeper.date_of_record)
   end
 
   def build_plan_premium(qhp_plan: nil, elected_aptc: false, tax_household: nil, apply_aptc: nil)
