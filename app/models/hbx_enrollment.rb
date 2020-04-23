@@ -1116,7 +1116,10 @@ class HbxEnrollment
     return true if ENROLLED_STATUSES.include?(aasm_state) && family.hbx_enrollments.by_kind(kind)&.by_employee_role(employee_role)&.auto_renewing.present?
     return false if aasm_state == 'auto_renewing' && family.hbx_enrollments.by_kind(kind)&.by_employee_role(employee_role)&.coverage_selected.present?
     # Do not display if SEP enrollment with previous enrollment for employer in enrolled status
-    return false if is_special_enrollment? && family.hbx_enrollments.by_kind(kind)&.by_employee_role(employee_role)&.enrolled_statuses.present?
+    # Reject to exclude current enrollment
+    # See scenario cucumber features/group_selection/dual_role_plan_shopping.feature
+    # Scenario: Purchasing an enrollment through SEP with active enrollment should NOT cause "Make Changes" button to appear on the SEP enrollment tile
+    return false if is_special_enrollment? && family.hbx_enrollments.by_kind(kind)&.by_employee_role(employee_role)&.enrolled_statuses&.reject { |enrollment| enrollment == self }.present?
     return true if family.enrollment_is_not_most_recent_sep_enrollment?(self) || employee_role&.can_enroll_as_new_hire? || sponsored_benefit_package&.open_enrollment_contains?(TimeKeeper.date_of_record)
   end
 
