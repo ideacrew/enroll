@@ -363,17 +363,9 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def send_receipt_emails
-    # TODO: Refactor this with notifier kinds
-    # ivl_notice_kind = ::Notifier::NoticeKind.where(event_name: "ivl_enrollment_confirmation").first
-    # shop_notice_kind = ::Notifier::NoticeKind.where(event_name: "shop_enrollment_confirmation").first
     email = @person.work_email_or_best
     UserMailer.generic_consumer_welcome(@person.first_name, @person.hbx_id, email).deliver_now
-    @template_string = if @enrollment.is_shop?
-      'user_mailer/secure_purchase_confirmation.html.erb'
-    else
-      'user_mailer/secure_ivl_purchase_confirmation.html.erb'
-    end
-    body = render_to_string @template_string, layout: false
+    body = render_to_string 'user_mailer/secure_purchase_confirmation.html.erb', layout: false
     from_provider = HbxProfile.current_hbx
     message_params = {
       sender_id: from_provider.try(:id),
