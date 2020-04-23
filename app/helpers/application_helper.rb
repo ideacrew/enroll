@@ -503,7 +503,7 @@ module ApplicationHelper
     p_min = 0 if p_min.nil?
     
     unless eligible.zero?
-      condition = (eligible <= 2) ? ((enrolled > (eligible - 1)) && (non_owner > 0)) : ((enrolled >= p_min) && (non_owner > 0))
+      condition = enrolled >= p_min && non_owner > 0
       condition = false if covered == 0 && waived > 0
       progress_bar_class = condition ? 'progress-bar-success' : 'progress-bar-danger'
       progress_bar_width = (enrolled * 100)/eligible
