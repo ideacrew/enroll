@@ -37,6 +37,9 @@ class EligibilityDetermination
   field :determined_at, type: DateTime
 
   # DEPRECATED - use determined_at
+  # 4/24/2020: This will be removed as per ticket 42408
+  # after eligibility_determination_determined_on_migration.rb has been run
+  # and all determined_on have been converted to determinated_at
   field :determined_on, type: DateTime
 
   # Source will tell who determined / redetermined eligibility. Eg: Curam or Admin
