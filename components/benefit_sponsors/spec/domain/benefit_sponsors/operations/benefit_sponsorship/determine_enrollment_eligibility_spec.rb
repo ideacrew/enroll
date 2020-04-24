@@ -94,7 +94,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitSponsorship::DetermineEnrollm
   end
 
   describe 'for renewing application' do
-    it_behaves_like "enrollment eligibility determination", "active", :renewing, TimeKeeper.date_of_record.beginning_of_month.prev_year, TimeKeeper.date_of_record.beginning_of_month.prev_year.next_year
+    it_behaves_like "enrollment eligibility determination", "active", :renewal, TimeKeeper.date_of_record.beginning_of_month.prev_year, TimeKeeper.date_of_record.beginning_of_month.prev_year.next_year
   end
 end
 

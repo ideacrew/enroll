@@ -30,7 +30,7 @@ module BenefitSponsors
         def application_type(effective_date, benefit_sponsorship)
           benefit_applications = benefit_sponsorship.benefit_applications
           if is_renewing_sponsor?(benefit_applications, effective_date)
-            'renewing'
+            'renewal'
           elsif is_initial_sponsor?(benefit_applications, effective_date)
             'initial'
           end
