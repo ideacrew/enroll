@@ -174,6 +174,44 @@ RSpec.describe ApplicationHelper, :type => :helper do
       expect(helper.enrollment_progress_bar(plan_year, 1, minimum: false)).to include('<div class="progress-wrapper employer-dummy">')
     end
 
+    context 'when only one employee is enrolled out of 2' do
+      let!(:census_employees) { create_list(:census_employee, 2, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package) }
+
+      context 'for employers with relaxed rules - no minimum participation requirement' do
+        # No minimum participation requirements
+        let(:minimum_participation) { 0 }
+
+        before do
+          allow(plan_year).to receive(:total_enrolled_count).and_return(1)
+          allow(plan_year).to receive_message_chain(:non_business_owner_enrolled, :count).and_return(1)
+          allow(plan_year).to receive(:progressbar_covered_count).and_return(1)
+          allow(plan_year).to receive(:waived_count).and_return(0)
+
+        end
+
+        it 'should display in green' do
+          expect(helper.enrollment_progress_bar(plan_year, minimum_participation)).to include('<div class="progress-bar progress-bar-success')
+        end
+      end
+
+      context 'for regular employers' do
+        # 2/3 minimum participation is required
+        let(:minimum_participation) { 2 }
+
+        before do
+          allow(plan_year).to receive(:total_enrolled_count).and_return(1)
+          allow(plan_year).to receive_message_chain(:non_business_owner_enrolled, :count).and_return(1)
+          allow(plan_year).to receive(:progressbar_covered_count).and_return(1)
+          allow(plan_year).to receive(:waived_count).and_return(0)
+
+        end
+
+        it 'should display in green' do
+          expect(helper.enrollment_progress_bar(plan_year, minimum_participation)).to include('<div class="progress-bar progress-bar-danger')
+        end
+      end
+    end
+
     context ">200 census employees" do
       let!(:census_employees) { create_list(:census_employee, 201, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package) }
       context "greater than 200 employees " do
