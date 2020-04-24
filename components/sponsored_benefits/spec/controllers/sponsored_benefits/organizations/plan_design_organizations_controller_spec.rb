@@ -38,7 +38,8 @@ module SponsoredBenefits
         "sic_code"    =>  "0116",
         "office_locations_attributes" =>
               {"0"=>
-                  { "address_attributes" =>
+                  { "_destroy" => "false",
+                    "address_attributes" =>
                       { "kind"      =>  "primary",
                         "address_1" =>  "",
                         "address_2" =>  "",
@@ -46,12 +47,6 @@ module SponsoredBenefits
                         "state"     =>  "",
                         "zip"       =>  "01001",
                         "county"    =>  "Hampden"
-                      },
-                    "phone_attributes" =>
-                      { "kind"      =>  "work",
-                        "area_code" =>  "",
-                        "number"    =>  "",
-                        "extension" =>  ""
                       }
                   }
         }
@@ -159,6 +154,33 @@ module SponsoredBenefits
     end
 
     describe "PATCH #update" do
+
+      let!(:valid_attributes) {
+        {
+          "legal_name"  =>  "Some Name",
+          "dba"         =>  "",
+          "entity_kind" =>  "",
+          "sic_code"    =>  "0116",
+          "office_locations_attributes" =>
+            {
+              "0"=>
+                {"id" => prospect_plan_design_organization.office_locations.first.id.to_s,
+                 "_destroy" => "false",
+                 "address_attributes" =>
+                   { "id" => prospect_plan_design_organization.office_locations.first.address.id.to_s,
+                     "kind"      =>  "primary",
+                     "address_1" =>  "",
+                     "address_2" =>  "",
+                     "city"      =>  "",
+                     "state"     =>  "",
+                     "zip"       =>  "01001",
+                     "county"    =>  "Hampden"
+                   }
+                }
+            }
+        }
+      }
+
       USER_ROLES.each do |role|
         context "for user #{role}" do
           before do
@@ -192,6 +214,106 @@ module SponsoredBenefits
             end
           end
 
+          context 'office locations #update' do
+            let(:effective_period_start_on) {TimeKeeper.date_of_record.end_of_month + 1.day + 1.month}
+            let(:effective_period_end_on) {effective_period_start_on + 1.year - 1.day}
+            let(:effective_period) {effective_period_start_on..effective_period_end_on}
+
+            let(:open_enrollment_period_start_on) {effective_period_start_on.prev_month}
+            let(:open_enrollment_period_end_on) {open_enrollment_period_start_on + 9.days}
+            let(:open_enrollment_period) {open_enrollment_period_start_on..open_enrollment_period_end_on}
+
+            let(:params) do
+              {
+                effective_period: effective_period,
+                open_enrollment_period: open_enrollment_period,
+              }
+            end
+            let(:plan_design_proposal) {build(:plan_design_proposal)}
+            let(:benefit_application) {SponsoredBenefits::BenefitApplications::BenefitApplication.new(params)}
+            let(:benefit_sponsorship) do
+              SponsoredBenefits::BenefitSponsorships::BenefitSponsorship.new(
+                benefit_market: 'aca_shop_cca',
+                enrollment_frequency: 'rolling_month'
+              )
+            end
+
+            let!(:new_attributes) {
+              {
+                "legal_name"  =>  "Some Name",
+                "dba"         =>  "",
+                "entity_kind" =>  "",
+                "sic_code"    =>  "0116",
+                "office_locations_attributes" =>
+                  {
+                    "0"=>
+                      {"_destroy" => "false",
+                       "address_attributes" =>
+                         { "kind"      =>  "primary",
+                           "address_1" =>  "test 2nd primary",
+                           "address_2" =>  "",
+                           "city"      =>  "",
+                           "state"     =>  "mn",
+                           "zip"       =>  "01001",
+                           "county"    =>  "Hampden"
+                         }
+                      }
+                  }
+              }
+            }
+
+            let(:profile) {SponsoredBenefits::Organizations::AcaShopCcaEmployerProfile.new}
+            let(:updated_valid_attributes) {
+              valid_attributes['legal_name'] = 'Some New Name'
+              valid_attributes
+            }
+            let(:plan) {FactoryGirl.create(:plan, :with_premium_tables)}
+
+            before do
+              prospect_plan_design_organization.plan_design_proposals << [plan_design_proposal]
+              plan_design_proposal.profile = profile
+              profile.benefit_sponsorships = [benefit_sponsorship]
+              benefit_sponsorship.benefit_applications = [benefit_application]
+              bg = benefit_application.benefit_groups.build
+              bg.build_relationship_benefits
+              bg.build_composite_tier_contributions
+              bg.assign_attributes(reference_plan_id: plan.id, plan_option_kind: 'sole_source')
+              bg.elected_plan_ids << plan.id
+              bg.composite_tier_contributions[0].employer_contribution_percent = 60
+              bg.composite_tier_contributions[3].employer_contribution_percent = 50
+              bg.save!
+              prospect_plan_design_organization.save
+            end
+
+            it 'should not delete persisted office locations when embedded models are invalid' do
+              address_1_before_update = prospect_plan_design_organization.office_locations.first.address.address_1
+              prospect_plan_design_organization.plan_design_proposals.first.profile.benefit_sponsorships.first.benefit_applications.first.benefit_groups.first.relationship_benefits.delete_all
+              patch :update, {organization: updated_valid_attributes, id: prospect_plan_design_organization.id, format: 'js'}, valid_session
+              expect(subject).to redirect_to(edit_organizations_plan_design_organization_path(prospect_plan_design_organization))
+              prospect_plan_design_organization.reload
+              address_1_after_update = prospect_plan_design_organization.office_locations.first.address
+              expect(address_1_after_update.address_1).to eq address_1_before_update
+            end
+
+            it 'should update office locations when embedded models are valid' do
+              address_1_before_update = prospect_plan_design_organization.office_locations.first.address.address_1
+              patch :update, {organization: updated_valid_attributes, id: prospect_plan_design_organization.id, format: 'js'}, valid_session
+              expect(subject).to redirect_to(employers_organizations_broker_agency_profile_path(broker_agency_profile))
+              prospect_plan_design_organization.reload
+              address_1_after_update = prospect_plan_design_organization.office_locations.first.address
+              expect(address_1_after_update).not_to eq address_1_before_update
+            end
+
+            it 'should not update office locations when embedded models are valid and primary location exists' do
+              locations_before_update = prospect_plan_design_organization.office_locations.count
+              patch :update, {organization: updated_valid_attributes, id: prospect_plan_design_organization.id, format: 'js'}, valid_session
+              expect(subject).to redirect_to(employers_organizations_broker_agency_profile_path(broker_agency_profile))
+              prospect_plan_design_organization.reload
+              locations_after_update = prospect_plan_design_organization.office_locations.count
+              expect(locations_before_update).to eq locations_after_update
+            end
+          end
+
           context "with invalid params" do
             it "does not update Organizations::PlanDesignOrganization" do
               expect {
@@ -201,26 +323,7 @@ module SponsoredBenefits
 
             it "renders edit with flash error" do
               patch :update, { organization: invalid_attributes, id: prospect_plan_design_organization.id, format: 'js' }, valid_session
-              expect(response).to render_template(:edit)
-            end
-          end
-
-          context "with params missing office_location_attributes" do
-            let(:params_missing_ol_attrs) {
-              valid_attributes.delete "office_locations_attributes"
-              valid_attributes
-            }
-
-            it "does not update Organizations::PlanDesignOrganization" do
-              expect {
-                patch :update, { organization: params_missing_ol_attrs, id: prospect_plan_design_organization.id, format: 'js' }, valid_session
-              }.not_to change { prospect_plan_design_organization.reload.legal_name }
-            end
-
-            it "redirects to employers_organizations_broker_agency_profile_path(broker_agency_profile) with flash error" do
-              patch :update, { organization: params_missing_ol_attrs, id: prospect_plan_design_organization.id, format: 'js' }, valid_session
-               expect(subject).to redirect_to(employers_organizations_broker_agency_profile_path(broker_agency_profile))
-               expect(flash[:error]).to match(/Prospect Employer must have one Primary Office Location./)
+              expect(subject).to redirect_to(edit_organizations_plan_design_organization_path(prospect_plan_design_organization))
             end
           end
         end

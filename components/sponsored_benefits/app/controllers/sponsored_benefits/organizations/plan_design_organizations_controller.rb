@@ -41,17 +41,12 @@ module SponsoredBenefits
 
       if pdo.is_prospect?
         pdo.assign_attributes(organization_params)
-        ola = organization_params[:office_locations_attributes]
 
-        if ola.blank?
-          flash[:error] = "Prospect Employer must have one Primary Office Location."
-          redirect_to employers_organizations_broker_agency_profile_path(pdo.broker_agency_profile)
-        elsif pdo.save
+        if pdo.save
           flash[:success] = "Prospect Employer (#{pdo.legal_name}) Updated Successfully."
           redirect_to employers_organizations_broker_agency_profile_path(pdo.broker_agency_profile)
         else
-          init_organization(organization_params)
-          render :edit
+          redirect_to edit_organizations_plan_design_organization_path(pdo), flash: {:error =>  pdo.errors.full_messages}
         end
       else
         flash[:error] = "Updating of Client employer records not allowed"
@@ -101,8 +96,9 @@ module SponsoredBenefits
       org_params = params.require(:organization).permit(
         :legal_name, :dba, :entity_kind, :sic_code,
         :office_locations_attributes => [
-          {:address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :county]},
-          {:phone_attributes => [:kind, :area_code, :number, :extension]},
+          :id,:_destroy,
+          {:address_attributes => [:id, :kind, :address_1, :address_2, :city, :state, :zip, :county]},
+          {:phone_attributes => [:id, :kind, :area_code, :number, :extension]},
           {:email_attributes => [:kind, :address]},
           :is_primary
         ]
