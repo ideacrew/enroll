@@ -71,7 +71,7 @@ RSpec.describe BenefitSponsors::Operations::EnrollmentEligibility::Determine, db
 
     it 'should return eligibility_params' do
       expect(result.success[:market_kind]).to eq benefit_sponsorship.market_kind
-      expect(result.success[:benefit_application_kind]).to eq 'renewing'
+      expect(result.success[:benefit_application_kind]).to eq 'renewal'
       expect(result.success[:effective_date]).to eq effective_date
     end
   end
