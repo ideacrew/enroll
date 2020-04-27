@@ -46,7 +46,7 @@ class EligibilityDetermination
   field :source, type: String
 
   before_validation :set_premium_credit_strategy, :set_determined_at
-
+  # DEPRECATED - Fix this to validate determined_at
   validates_presence_of :determined_on, :max_aptc, :csr_percent_as_integer
 
   validates :premium_credit_strategy_kind,

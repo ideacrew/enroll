@@ -28,13 +28,13 @@ class EligibilityDeterminationDeterminedOnMigration < MongoidMigrationTask
         return
       else
         processed_count = 0
-        Dir.mkdir("eligibility_determination_migration") unless File.exists?("eligibility_determination_migration_report")
         file_name = "#{Rails.root}/eligibility_determination_migration/eligibility_determination_migration_report.csv"
-        CSV.open(file_name, "w", force_quotes: true) do |csv|
+        CSV.open(file_name, 'wb', headers: true) do |csv|
           csv << field_names
           eligibility_determinations.each do |determination|
             if determination.determined_on.present?
-              csv << [family&.person&.hbx_id, eligibility_determinations._id.to_s]
+              family = determination.tax_household.household.family
+              csv << [family&.person&.hbx_id.to_s, determination._id.to_s]
               processed_count += 1
               # determined_ at is the proper field name
               determination.update_attributes!(determined_at: determination.determined_on)
@@ -48,3 +48,5 @@ class EligibilityDeterminationDeterminedOnMigration < MongoidMigrationTask
     end
   end
 end
+
+
