@@ -312,7 +312,7 @@ And(/^employees for (.*?) have a selected coverage$/) do |legal_name|
                     employee_role: @census_employees.first.employee_role,
                     sponsored_benefit_package_id: benefit_package.id,
                     rating_area_id: rating_area_id,
-                    sponsored_benefit_id: sponsored_benefit_id})
+                    sponsored_benefit_id: sponsored_benefit_id}, :with_health_product)
 end
 
 And(/^employer (.*?) with employee (.*?) is under open enrollment$/) do |legal_name, named_person|
