@@ -8,6 +8,7 @@ describe "insured/family_members/index.html.erb" do
   let(:dependent) { Forms::FamilyMember.new(family_id: family.id) }
   let(:employee_role) { FactoryBot.build(:employee_role) }
   let(:consumer_role) { FactoryBot.build(:consumer_role) }
+  let(:resident_role) { FactoryBot.build(:resident_role) }
 
   before :each do
     sign_in user
@@ -49,6 +50,20 @@ describe "insured/family_members/index.html.erb" do
     it "should call individual_progress" do
       expect(rendered).to match /Verify Identity/
       expect(rendered).to have_selector("a[href='/insured/families/find_sep?consumer_role_id=#{consumer_role.id}']", text: 'Continue')
+    end
+  end
+
+  context "when resident" do
+    before :each do
+      assign :type, "resident"
+      assign :resident_role, resident_role
+      allow(view).to receive(:is_under_open_enrollment?).and_return false
+      render template: "insured/family_members/index.html.erb"
+    end
+
+    it "should call individual_progress" do
+      expect(rendered).to match /Verify Identity/
+      expect(rendered).not_to have_selector("label.static_label", text: 'SOCIAL SECURITY')
     end
   end
 end
