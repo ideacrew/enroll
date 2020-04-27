@@ -16,7 +16,7 @@ describe EligibilityDeterminationDeterminedOnMigration, dbclean: :after_each do
 
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member) }
     let!(:household) { FactoryBot.create(:household, family: family) }
-    let!(:tax_household) { FactoryBot.create(:tax_household, household: household) }
+    let!(:tax_household) { FactoryBot.create(:tax_household, household: household, submitted_at: determined_at_initial_value) }
     let(:eligibility_determination) do
       FactoryBot.create(
         :eligibility_determination,
