@@ -122,7 +122,7 @@ GEM
       net-ssh (>= 2.6.5)
     net-ssh (4.2.0)
     nio4r (2.3.1)
-    nokogiri (1.10.2)
+    nokogiri (1.10.9)
       mini_portile2 (~> 2.4.0)
     public_suffix (3.0.3)
     rack (2.0.6)

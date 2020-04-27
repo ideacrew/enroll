@@ -111,7 +111,6 @@ PATH
       ckeditor (= 4.2.4)
       combine_pdf
       config
-      curl
       money-rails (~> 1.13)
       mongoid (~> 7.0.2)
       non-stupid-digest-assets
@@ -599,7 +598,7 @@ GEM
     net-ssh (4.2.0)
     newrelic_rpm (5.7.0.350)
     nio4r (2.3.1)
-    nokogiri (1.10.3)
+    nokogiri (1.10.9)
       mini_portile2 (~> 2.4.0)
     nokogiri-happymapper (0.8.1)
       nokogiri (~> 1.5)
@@ -954,7 +953,7 @@ DEPENDENCIES
   mongoid_userstamp (~> 0.4)!
   net-ssh (= 4.2.0)
   newrelic_rpm (~> 5.0)
-  nokogiri (~> 1.10)
+  nokogiri (~> 1.10.8)
   nokogiri-happymapper (~> 0.8.0)
   non-stupid-digest-assets
   notifier!
