@@ -144,7 +144,7 @@ GEM
     jaro_winkler (1.5.2)
     jsonapi-renderer (0.2.2)
     language_list (1.2.1)
-    loofah (2.2.3)
+    loofah (2.3.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
     mail (2.7.1)

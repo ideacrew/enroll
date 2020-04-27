@@ -106,6 +106,7 @@ gem 'wicked_pdf',               '~> 1.1.0'
 gem 'wkhtmltopdf-binary-edge',  '~> 0.12.3.0'
 gem 'webpacker',                '~> 4.0.2'
 gem 'fast_jsonapi'
+gem 'loofah', '~> 2.3.1'
 
 group :doc do
   gem 'sdoc',                   '~> 1.0'
