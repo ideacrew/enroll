@@ -888,7 +888,7 @@ GEM
     wkhtmltopdf-binary-edge (0.12.3.0)
     xpath (3.2.0)
       nokogiri (~> 1.8)
-    yard (0.9.19)
+    yard (0.9.24)
     yard-mongoid (0.1.0)
       yard (>= 0.8.4)
 
@@ -1013,7 +1013,7 @@ DEPENDENCIES
   webpacker (~> 4.0.2)
   wicked_pdf (~> 1.1.0)
   wkhtmltopdf-binary-edge (~> 0.12.3.0)
-  yard (~> 0.9.12)
+  yard (~> 0.9.20)
   yard-mongoid (~> 0.1)
 
 RUBY VERSION
