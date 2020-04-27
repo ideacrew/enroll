@@ -3,6 +3,7 @@ module BenefitSponsors
     class ContributionLevel
       include Mongoid::Document
       include Mongoid::Timestamps
+      include ::FloatHelper
 
 
       embedded_in :sponsor_contribution,
@@ -34,6 +35,10 @@ module BenefitSponsors
       def contribution_unit
         return @contribution_unit if defined? @contribution_unit
         @contribution_unit = contribution_model.find_contribution_unit(contribution_unit_id)
+      end
+
+      def contribution_factor=(value)
+        write_attribute(:contribution_factor, float_fix(value))
       end
     end
   end

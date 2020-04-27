@@ -37,6 +37,11 @@ class BenefitGroup
   embeds_many :composite_tier_contributions, cascade_callbacks: true
   accepts_nested_attributes_for :composite_tier_contributions, reject_if: :all_blank, allow_destroy: true
 
+  validates_presence_of :relationship_benefits, :effective_on_kind, :terminate_on_kind, :effective_on_offset,
+                        :reference_plan_id, :plan_option_kind, :elected_plan_ids
+
+  validates_uniqueness_of :title
+
   def reference_plan=(new_reference_plan)
     raise ArgumentError.new("expected Plan") unless new_reference_plan.is_a? Plan
     self.reference_plan_id = new_reference_plan._id
