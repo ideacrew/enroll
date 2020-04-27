@@ -10,7 +10,7 @@ FactoryBot.define do
     roles { ['web_service'] }
 
     transient do
-      with_security_questions { true }
+      with_security_questions { false }
     end
 
     after(:create) do |user, evaluator|
