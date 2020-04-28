@@ -17,7 +17,7 @@ describe EligibilityDeterminationDeterminedOnMigration, dbclean: :after_each do
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member) }
     let!(:household) { FactoryBot.create(:household, family: family) }
     let!(:tax_household) { FactoryBot.create(:tax_household, household: household, submitted_at: determined_at_initial_value) }
-    let(:eligibility_determination) do
+    let!(:eligibility_determination) do
       FactoryBot.create(
         :eligibility_determination,
         tax_household: tax_household,
@@ -34,7 +34,7 @@ describe EligibilityDeterminationDeterminedOnMigration, dbclean: :after_each do
       expect(eligibility_determination.determined_at).to eq(determined_at_initial_value)
       subject.migrate
       eligibility_determination.reload
-      filename = "#{Rails.root}/eligibility_determination_migration/eligibility_determination_migration_report.csv"
+      filename = "#{Rails.root}//eligibility_determination_migration_report.csv"
       expect(File.exists?(filename)).to eq(true)
       csv = CSV.read(filename)
       expect(csv[1][0]).to eq(family.person.hbx_id.to_s)

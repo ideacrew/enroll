@@ -4,7 +4,7 @@ class EligibilityDeterminationDeterminedOnMigration < MongoidMigrationTask
   def migrate
     begin
       field_names = %w(Enrolled_Member_HBX_ID EligibilityDetermination_bson_object_id)
-      families = Family.all
+      families = Family.all.to_a
       households = []
       families.each do |family|
         family.households.each do |household|
@@ -28,8 +28,9 @@ class EligibilityDeterminationDeterminedOnMigration < MongoidMigrationTask
         return
       else
         processed_count = 0
-        file_name = "#{Rails.root}/eligibility_determination_migration/eligibility_determination_migration_report.csv"
-        CSV.open(file_name, 'wb', headers: true) do |csv|
+        file_name = "#{Rails.root}/eligibility_determination_migration_report.csv"
+        FileUtils.touch(file_name)  unless File.exist?(file_name)
+        CSV.open(file_name, 'w+', headers: true) do |csv|
           csv << field_names
           eligibility_determinations.each do |determination|
             if determination.determined_on.present?
@@ -48,5 +49,3 @@ class EligibilityDeterminationDeterminedOnMigration < MongoidMigrationTask
     end
   end
 end
-
-
