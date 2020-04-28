@@ -85,7 +85,25 @@ describe Person, :dbclean => :after_each do
           expect(person.inbox.unread_messages.count).to eq 1
         end
 
+        it "has correct welcome message for consumer role" do
+          person.save
+          expect(person.inbox.messages.first.body).to include("Make sure you pay attention to deadlines.")
+        end
+      end
 
+      context "with broker role" do
+        let(:params) {valid_params}
+        let(:person) {Person.new(**params)}
+        let(:broker_agency_profile) {FactoryBot.create(:broker_agency_profile)}
+
+        before do
+          FactoryBot.create(:broker_agency_staff_role, broker_agency_profile_id: broker_agency_profile.id, person: person, broker_agency_profile: broker_agency_profile, aasm_state: 'active')
+        end
+
+        it "has correct welcome message for broker role" do
+          person.save
+          expect(person.inbox.messages.first.body).not_to include("Make sure you pay attention to deadlines.")
+        end
       end
 
       context "with no first_name" do
