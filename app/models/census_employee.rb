@@ -161,7 +161,7 @@ class CensusEmployee < CensusMember
         :$elemMatch => {
           :start_on.gte => effective_on,
           :benefit_package_id => benefit_package.id,
-          :is_active => is_active 
+          :is_active => is_active
         }
       }
     )
@@ -485,8 +485,8 @@ class CensusEmployee < CensusMember
   end
 
   def renewal_benefit_group_assignment
-    return benefit_group_assignments.order_by(:'updated_at'.desc).detect{ |assignment| assignment.plan_year && assignment.plan_year.is_renewing? } if is_case_old?
-    benefit_group_assignments.order_by(:'updated_at'.desc).detect{ |assignment| assignment.benefit_application && assignment.benefit_application.is_renewing? }
+    return benefit_group_assignments.order_by(:created_at.desc).detect{ |assignment| assignment.plan_year &. is_renewing? } if is_case_old?
+    benefit_group_assignments.order_by(:created_at.desc).detect{ |assignment| assignment.benefit_application &. is_renewing? }
   end
 
   def inactive_benefit_group_assignments
@@ -1231,7 +1231,6 @@ class CensusEmployee < CensusMember
   end
 
   def have_valid_date_for_cobra?(current_user = nil)
-    return true if current_user.try(:has_hbx_staff_role?)
     return false unless cobra_begin_date.present?
     return false unless coverage_terminated_on
     return false unless coverage_terminated_on <= cobra_begin_date

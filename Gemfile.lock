@@ -837,7 +837,7 @@ GEM
     temple (0.8.2)
     terrapin (0.6.0)
       climate_control (>= 0.0.3, < 1.0)
-    test-prof (0.5.0)
+    test-prof (0.11.3)
     thor (1.0.1)
     thread (0.1.7)
     thread_safe (0.3.6)
@@ -1000,7 +1000,7 @@ DEPENDENCIES
   spring (~> 1.6)
   spring-watcher-listen (~> 2.0)
   symmetric-encryption (~> 3.9.1)
-  test-prof (~> 0.5.0)
+  test-prof
   transport_gateway!
   transport_profiles!
   turbolinks (~> 5)

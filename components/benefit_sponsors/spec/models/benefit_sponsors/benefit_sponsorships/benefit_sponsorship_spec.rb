@@ -1025,6 +1025,8 @@ module BenefitSponsors
         let(:current_date)  { Date.new(this_year, 4, 10) }
         before { TimeKeeper.set_date_of_record_unprotected!(current_date) }
 
+        after { TimeKeeper.set_date_of_record_unprotected!(Date.today) }
+
         context "when overlapping benefit application present with status as" do
           let(:new_effective_date)            { Date.new(this_year,4,1) }
 
@@ -1107,6 +1109,8 @@ module BenefitSponsors
           allow(april_sponsor).to receive(:open_enrollment_period_for).and_return(april_open_enrollment_begin_on..april_open_enrollment_end_on)
           TimeKeeper.set_date_of_record_unprotected!(april_open_enrollment_end_on + 1.day)
         }
+
+        after { TimeKeeper.set_date_of_record_unprotected!(Date.today) }
 
         context "when open enrollment extended application present" do
           let(:aasm_state) { :enrollment_extended }
