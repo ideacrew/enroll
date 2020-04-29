@@ -6,10 +6,10 @@ require 'rails_helper'
 
 class DentalPricingContributionModelImportSpecHelper
 
-  def self.invoke_models_task
-    Rake::Task["seed:dental_contribution_and_pricing_model"].reenable
-    Rake::Task["seed:dental_contribution_and_pricing_model"].invoke
-  end
+def self.invoke_models_task
+  Rake::Task["seed:dental_contribution_and_pricing_model"].reenable
+  Rake::Task["seed:dental_contribution_and_pricing_model"].invoke
+end
 end
 
 RSpec.describe 'load_dental_pricing_and_contribution_models', :type => :task, :dbclean => :around_each do
