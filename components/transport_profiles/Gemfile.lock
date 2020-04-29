@@ -21,7 +21,7 @@ PATH
       transport_gateway
 
 PATH
-  remote: /Users/tevans/proj/enroll_ma/components/transport_gateway
+  remote: /Users/raghuram/MAHealthConnector/enroll/components/transport_gateway
   specs:
     transport_gateway (0.0.1)
       aws-sdk (~> 2.2.4)
@@ -211,4 +211,4 @@ DEPENDENCIES
   webmock
 
 BUNDLED WITH
-   1.14.6
+   1.17.3
