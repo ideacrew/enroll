@@ -84,25 +84,26 @@ module Factories
       effective_on = effective_on_for_cobra(enrollment)
       benefit_application = enrollment.sponsored_benefit_package.benefit_application
       if benefit_application.effective_period.cover?(effective_on)
-        benefit_package = enrollment.sponsored_benefit_package
+        enrollment.sponsored_benefit_package
       else
-        renewal_bp = benefit_application.successor_benefit_package(enrollment.sponsored_benefit_package)
-        benefit_package = renewal_bp if renewal_bp.benefit_application.effective_period.cover?(effective_on)
+        renewal_application = benefit_application.successors[0]
+        if renewal_application && renewal_application.benefit_packages.count == 1
+          renewal_application.benefit_packages[0]
+        else
+          renewal_bp = benefit_application.successor_benefit_package(enrollment.sponsored_benefit_package)
+          renewal_bp if renewal_bp && renewal_bp.benefit_application.effective_period.cover?(effective_on)
+        end
       end
-
-      benefit_package
     end
 
     def fetch_product(enrollment, sponsored_benefit_package, effective_on)
       if enrollment.sponsored_benefit_package_id == sponsored_benefit_package.id
-        product = enrollment.product
+        enrollment.product
       else
         sponsored_benefit = sponsored_benefit_package.sponsored_benefit_for(enrollment.coverage_kind)
         renewal_product = enrollment.product.renewal_product
-        product = renewal_product if sponsored_benefit.products(effective_on).include?(renewal_product)
+        renewal_product if renewal_product && sponsored_benefit.products(effective_on).include?(renewal_product)
       end
-
-      product
     end
 
     def assign_enrollment_to_benefit_package_assignment(enrollment)
