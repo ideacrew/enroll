@@ -243,7 +243,7 @@ class Household
         benchmark_plan_id: slcsp,
         max_aptc: max_aptc.to_f,
         csr_percent_as_integer: csr.to_i,
-        determined_on: Date.today
+        determined_at: Date.today
     )
 
     deter.save!

@@ -9,4 +9,5 @@ FactoryBot.define do
     premium_credit_strategy_kind { "allocated_lump_sum_credit" }
     e_pdc_id { "3110344" }
   end
+
 end
