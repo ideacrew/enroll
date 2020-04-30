@@ -39,6 +39,10 @@ class User
     self.errors[attribute_name].blank?
   end
 
+  def self.primary_key
+    :id
+  end
+
   def switch_to_idp!
     # new_password = self.class.generate_valid_password
     # self.password = new_password

@@ -151,6 +151,10 @@ namespace :permissions do
   DefinePermissions.define_task :hbx_admin_can_access_pay_now => :environment
 end
 
+namespace :permissions do
+  desc 'assign the most current permissions'
+  DefinePermissions.define_task :assign_current_permissions => :environment
+end
 
 #rake permissions:hbx_admin_can_reset_password
 
