@@ -87,7 +87,7 @@
 
 
   h3.header-title Filter Results
-  - if @market_kind == 'individual' || @sponsored_benefit.try(:product_package_kind) == :single_issuer
+  - if @market_kind == 'individual' || @market_kind == 'coverall' || @sponsored_benefit.try(:product_package_kind) == :single_issuer
     .checkbox-filter-wrapper-uc
       h5
         strong Metal Level
