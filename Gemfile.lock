@@ -276,7 +276,7 @@ GEM
     bunny (1.7.1)
       amq-protocol (~> 1.9.2)
     byebug (11.1.1)
-    capistrano (3.12.1)
+    capistrano (3.11.0)
       airbrussh (>= 1.0.0)
       i18n
       rake (>= 10.0.0)
@@ -842,7 +842,7 @@ GEM
     temple (0.8.2)
     terrapin (0.6.0)
       climate_control (>= 0.0.3, < 1.0)
-    test-prof (0.5.0)
+    test-prof (0.11.3)
     thor (1.0.1)
     thread (0.1.7)
     thread_safe (0.3.6)
@@ -1013,7 +1013,7 @@ DEPENDENCIES
   spring (~> 1.6)
   spring-watcher-listen (~> 2.0)
   symmetric-encryption (~> 3.9.1)
-  test-prof (~> 0.5.0)
+  test-prof
   transport_gateway!
   transport_profiles!
   turbolinks (~> 5)

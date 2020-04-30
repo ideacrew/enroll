@@ -304,7 +304,8 @@ module Insured::FamiliesHelper
 
   def build_consumer_role(person, family)
     if family.primary_applicant.person == person
-      person.build_consumer_role({:is_applicant => true})
+      contact_method = person.resident_role&.contact_method ? person.resident_role.contact_method : "Paper and Electronic communications"
+      person.build_consumer_role({:is_applicant => true, :contact_method => contact_method})
       person.save!
     else
       person.build_consumer_role({:is_applicant => false})
@@ -314,7 +315,8 @@ module Insured::FamiliesHelper
 
   def build_resident_role(person, family)
     if family.primary_applicant.person == person
-      person.build_resident_role({:is_applicant => true})
+      contact_method = person.consumer_role&.contact_method ? person.consumer_role.contact_method : "Paper and Electronic communications"
+      person.build_resident_role({:is_applicant => true, :contact_method => contact_method })
       person.save!
     else
       person.build_resident_role({:is_applicant => false})

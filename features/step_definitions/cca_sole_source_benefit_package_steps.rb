@@ -34,7 +34,7 @@ Given (/^.*a CCA sole source employer health benefit package, in open enrollment
         kind: "work"
       }
     ),
-    :phone => BenefitSponsors::Locations::Phone.new({:area_code => "555", :number => "5555555", :kind => "phone main"}),
+    :phone => BenefitSponsors::Locations::Phone.new({:area_code => "555", :number => "5555555", :kind => "work"}),
     is_primary: true
   })
   e_profile = ::BenefitSponsors::Organizations::AcaShopCcaEmployerProfile.new({

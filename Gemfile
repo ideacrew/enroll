@@ -163,7 +163,7 @@ group :test do
   gem 'ruby-progressbar',             '~> 1'
   gem 'shoulda-matchers',             '~> 3'
   gem 'simplecov',                    '~> 0.14',  :require => false
-  gem 'test-prof',                    '~> 0.5.0'
+  gem 'test-prof'
   gem 'warden',                       '~> 1.2.7'
   gem 'watir',                        '~> 6.10.3'
   gem 'webdrivers', '~> 3.0'

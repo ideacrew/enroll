@@ -1,6 +1,7 @@
 class Person
   include Config::AcaModelConcern
   include Config::SiteModelConcern
+  include Config::ContactCenterModelConcern
   include Mongoid::Document
   include SetCurrentUser
   include Mongoid::Timestamps
@@ -281,9 +282,10 @@ class Person
   #scope :broker_role_having_agency, -> { where("broker_role.broker_agency_profile_id" => { "$ne" => nil }) }
   scope :broker_role_having_agency, -> { where("broker_role.benefit_sponsors_broker_agency_profile_id" => { "$ne" => nil }) }
   scope :broker_role_applicant,     -> { where("broker_role.aasm_state" => { "$eq" => :applicant })}
-  scope :broker_role_pending,       -> { where(:'broker_role.aasm_state' => { "$in" => [:broker_agency_pending, :application_extended] })}
+  scope :broker_role_pending,       -> { where("broker_role.aasm_state" => { "$eq" => :broker_agency_pending })}
   scope :broker_role_certified,     -> { where("broker_role.aasm_state" => { "$in" => [:active]})}
   scope :broker_role_decertified,   -> { where("broker_role.aasm_state" => { "$eq" => :decertified })}
+  scope :broker_role_extended,      -> { where("broker_role.aasm_state" => { "$eq" => :application_extended })}
   scope :broker_role_denied,        -> { where("broker_role.aasm_state" => { "$eq" => :denied })}
   scope :by_ssn,                    ->(ssn) { where(encrypted_ssn: Person.encrypt_ssn(ssn)) }
   scope :unverified_persons,        -> { where(:'consumer_role.aasm_state' => { "$ne" => "fully_verified" })}
@@ -606,7 +608,7 @@ class Person
   end
 
   def main_phone
-    phones.detect { |phone| phone.kind == "phone main" }
+    phones.detect { |phone| phone.kind == "main" }
   end
 
   def home_phone
@@ -1199,7 +1201,11 @@ class Person
 
   def create_inbox
     welcome_subject = "Welcome to #{site_short_name}"
-    welcome_body = "#{site_short_name} is the #{aca_state_name}'s on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
+    if broker_role || broker_agency_staff_roles.present?
+      welcome_body = "#{Settings.site.short_name} is the #{Settings.aca.state_name}'s on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
+    else
+      welcome_body = "#{site_short_name} is ready to help you get quality, affordable medical or dental coverage that meets your needs and budget.<br/><br/>Now that you’ve created an account, take a moment to explore your account features. Remember there’s limited time to sign up for a plan. Make sure you pay attention to deadlines.<br/><br/>If you have any questions or concerns, we’re here to help.<br/><br/>#{site_short_name}<br/>#{contact_center_short_number}<br/>TTY: #{contact_center_tty_number}"
+    end
     mailbox = Inbox.create(recipient: self)
     mailbox.messages.create(subject: welcome_subject, body: welcome_body, from: "#{site_short_name}")
   end

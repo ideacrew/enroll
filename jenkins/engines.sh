@@ -19,7 +19,7 @@ nvm use 10 || exit -1
 npm install --global yarn
 yarn install
 
-NODE_ENV=test RAILS_ENV=test bundle exec ./bin/webpack || exit 1
+NODE_ENV=test RAILS_ENV=test ./bin/webpack || exit 1
 
 for test_dir in `ls -1 $root/components/ | grep -v old_sponsored_benefits`; do
   echo $root/components/$test_dir
