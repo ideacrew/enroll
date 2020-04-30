@@ -1,5 +1,7 @@
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
+# Note: Even after this migration is run, the determined_on field
+# should NOT BE REMOVED
 class EligibilityDeterminationDeterminedOnMigration < MongoidMigrationTask
   def migrate
     begin
@@ -19,17 +21,20 @@ class EligibilityDeterminationDeterminedOnMigration < MongoidMigrationTask
               household.tax_households.each do |tax_household|
                 tax_household.eligibility_determinations.each do |determination|
                   if determination.determined_on.present?
-                    csv << [family&.person&.hbx_id.to_s, determination._id.to_s]
-                    processed_count += 1
-                    # determined_ at is the proper field name
+                    # Update before sending to CSV
+                    # determined_at is the proper field name
                     determination.update_attributes!(determined_at: determination.determined_on)
+                    csv << [family&.primary_person&.hbx_id.to_s, determination._id.to_s]
+                    processed_count += 1
                   end
                 end
               end
             end
           end
         end
-        puts("Total eligibility determinations with deprecated determined_on field are #{processed_count}. HBX and EligibilityDetermination MongoId outputted to: #{file_name}")
+        unless Rails.env.test?
+          puts("Total eligibility determinations with deprecated determined_on field are #{processed_count}. HBX and EligibilityDetermination MongoId outputted to: #{file_name}")
+        end
       end
     rescue => e
       e.message

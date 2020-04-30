@@ -1,7 +1,6 @@
 FactoryBot.define do
   factory :eligibility_determination do
     tax_household
-    # determined_on will be deprecated
     determined_on { TimeKeeper.datetime_of_record }
     determined_at { TimeKeeper.datetime_of_record }
     max_aptc  { 225.13 }

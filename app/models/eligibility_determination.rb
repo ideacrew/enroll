@@ -36,18 +36,15 @@ class EligibilityDetermination
 
   field :determined_at, type: DateTime
 
-  # DEPRECATED - use determined_at
-  # 4/24/2020: This will be removed as per ticket 42408
-  # after eligibility_determination_determined_on_migration.rb has been run
-  # and all determined_on have been converted to determinated_at
+  # DEPRECATED - use determined_at. See ticket 42408
   field :determined_on, type: DateTime
 
   # Source will tell who determined / redetermined eligibility. Eg: Curam or Admin
   field :source, type: String
 
   before_validation :set_premium_credit_strategy, :set_determined_at
-  # DEPRECATED - Fix this to validate determined_at
-  validates_presence_of :determined_on, :max_aptc, :csr_percent_as_integer
+
+  validates_presence_of :determined_at, :max_aptc, :csr_percent_as_integer
 
   validates :premium_credit_strategy_kind,
     allow_blank: false,
