@@ -3,12 +3,12 @@
 require 'rails_helper'
 require File.join(Rails.root, 'spec/shared_contexts/ivl_eligibility')
 
-RSpec.describe Factories::IvlPlanShoppingEligibilityFactory, dbclean: :after_each do
-  before :each do
+RSpec.describe Factories::IvlPlanShoppingEligibilityFactory do
+  before :all do
     # Overcome any timekeeper weirdness.
     # TODO: Find out who the bad citizen is that isn't resetting timekeeper
     #       after playing with it.
-    TimeKeeper.set_date_of_record_unprotected!(Date.current)
+    TimeKeeper.set_date_of_record_unprotected!(Date.new(2020, 3, 4))
   end
 
   def reset_premium_tuples
@@ -24,7 +24,7 @@ RSpec.describe Factories::IvlPlanShoppingEligibilityFactory, dbclean: :after_eac
       let!(:enrollment1) { FactoryBot.create(:hbx_enrollment, :individual_shopping, family: family, household: family.active_household, effective_on: current_date) }
       let!(:enrollment_member1) { FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: enrollment1, applicant_id: family_member.id, eligibility_date: current_date, coverage_start_on: current_date) }
 
-      before :each do
+      before :all do
         @product = FactoryBot.create(:benefit_markets_products_health_products_health_product, metal_level_kind: :silver, benefit_market_kind: :aca_individual)
         reset_premium_tuples
         benefit_sponsorship = FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period).benefit_sponsorship
@@ -310,5 +310,10 @@ RSpec.describe Factories::IvlPlanShoppingEligibilityFactory, dbclean: :after_eac
         end
       end
     end
+  end
+
+  after(:all) do
+    DatabaseCleaner.clean
+    TimeKeeper.set_date_of_record_unprotected!(Date.today)
   end
 end
