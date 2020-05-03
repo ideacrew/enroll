@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '2.4.1'
+ruby '2.6.5'
 
 gem "benefit_markets", path: "components/benefit_markets"
 gem "benefit_sponsors", path: "components/benefit_sponsors"
@@ -23,7 +23,9 @@ gem 'coffee-rails', '~> 4.1.0'
 gem 'combine_pdf'
 gem 'config', '~> 1.0.0'
 gem 'curl'
-gem 'devise', '>= 3.5.4'
+# gem 'devise', '>= 3.5.4'
+
+gem 'devise',  '~> 4.5'
 gem 'effective_datatables', path: './project_gems/effective_datatables-2.6.14'
 gem 'haml'
 gem 'httparty'
@@ -55,9 +57,11 @@ gem 'nokogiri-happymapper', :require => 'happymapper'
 gem 'non-stupid-digest-assets', '~> 1.0', '>= 1.0.9'
 gem "notifier",           path: "components/notifier"
 gem 'openhbx_cv2', git: 'https://github.com/dchbx/openhbx_cv2.git', branch: 'master'
+gem 'resource_registry',  path:  "/Users/saidineshmekala/IDEACREW/resource_registry"#, branch: 'branch_0.7.0'
+gem 'pry'
 gem 'prawn', :git => 'https://github.com/prawnpdf/prawn.git', :ref => '8028ca0cd2'
 gem 'pundit', '~> 1.0.1'
-gem 'rails', '4.2.8'
+gem 'rails', '4.2.11'
 gem 'rails-i18n', '4.0.8'
 gem 'recurring_select', :git => 'https://github.com/brianweiner/recurring_select'
 gem "recaptcha", '4.3.1', require: 'recaptcha/rails'
@@ -132,7 +136,7 @@ end
 
 group :test do
   gem 'action_mailer_cache_delivery', '~> 0.3.7'
-  gem 'capybara'
+  gem 'capybara',                     '~> 3.12'
   gem 'capybara-screenshot'
   gem 'cucumber', '3.1.2'
   gem 'cucumber-rails', '1.6.0', :require => false

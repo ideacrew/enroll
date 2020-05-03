@@ -555,8 +555,8 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     it "when present" do
       assign :market_kind, "shop"
       render file: "insured/group_selection/new.html.erb"
-      expect(rendered).to have_selector("input[type='hidden']")
-      expect(rendered).to have_selector("input[value='shop']")
+      expect(rendered).to have_selector("input[type='hidden']", visible: false)
+      expect(rendered).to have_selector("input[value='shop']", visible: false)
     end
 
     context "when blank" do
