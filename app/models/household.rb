@@ -128,7 +128,7 @@ class Household
         benchmark_plan_id: benchmark_plan_id,
         max_aptc: latest_eligibility_determination.maximum_aptc,
         csr_percent_as_integer: latest_eligibility_determination.csr_percent,
-        determined_on: latest_eligibility_determination.determination_date
+        determined_at: latest_eligibility_determination.determination_date
       )
       th.save!
     end
@@ -243,7 +243,7 @@ class Household
         benchmark_plan_id: slcsp,
         max_aptc: max_aptc.to_f,
         csr_percent_as_integer: csr.to_i,
-        determined_on: Date.today
+        determined_at: Date.today
     )
 
     deter.save!
@@ -423,7 +423,7 @@ class Household
       benchmark_plan_id: slcsp_id,
       max_aptc: params["max_aptc"].to_f,
       csr_percent_as_integer: params["csr"].to_i,
-      determined_on: TimeKeeper.datetime_of_record
+      determined_at: TimeKeeper.datetime_of_record
     )
 
     params["family_members"].each do |person_hbx_id, thhm_info|
