@@ -695,6 +695,20 @@ Then /^employer sees termination date column$/ do
   expect(page).to have_content 'Terminated On'
 end
 
+Then("employer updates open enrollment end date to {int}") do |int|
+  current_oe_date = @new_application.open_enrollment_period.max
+  new_oe_date = Date.new(current_oe_date.year, current_oe_date.month, int).to_s
+  fill_in 'benefit_application[open_enrollment_end_on]', :with => new_oe_date
+end
+
+Then(/^employer clicks on update plan year$/) do
+  click_button 'Update Plan Year'
+end
+
+Then(/^employer should see a success message$/) do
+  expect(page).to have_content 'Benefit Application updated successfully.'
+end
+
 And /^employer clicks on terminated employee$/ do
   expect(page).to have_content "Eddie Vedder"
   click_link 'Eddie Vedder'
