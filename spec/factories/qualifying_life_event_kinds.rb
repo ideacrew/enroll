@@ -28,6 +28,14 @@ FactoryBot.define do
       tool_tip { "Enroll or add a family member because of marriage" }
     end
 
+    trait :effective_on_fixed_first_of_next_month do
+      title { "Losing other health insurance" }
+      edi_code { "33-LOST ACCESS TO MEC" }
+      reason { "lost_access_to_mec" }
+      effective_on_kinds { ["fixed_first_of_next_month"] }
+      tool_tip { "Someone in the household is losing other health insurance involuntarily" }
+    end
+
     trait :effective_on_event_date_and_first_month do
       title { "Had a baby" }
       edi_code { "02-BIRTH" }
