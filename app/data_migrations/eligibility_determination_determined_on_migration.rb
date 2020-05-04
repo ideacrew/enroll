@@ -37,7 +37,7 @@ class EligibilityDeterminationDeterminedOnMigration < MongoidMigrationTask
         end
       end
     rescue => e
-      e.message
+      puts e.message
     end
   end
 end
