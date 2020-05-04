@@ -70,7 +70,7 @@ PATH
       mongoid (~> 5.4.0)
       nokogiri
       pundit (~> 1.0.1)
-      rails (~> 4.2.8)
+      rails (~> 4.2.11)
       slim (~> 3.0.9)
       symmetric-encryption (~> 3.6.0)
       virtus (= 1.0.5)
@@ -109,7 +109,7 @@ PATH
       money-rails (~> 1.10.0)
       mongoid (~> 5.4.0)
       non-stupid-digest-assets
-      rails (~> 4.2.8)
+      rails (~> 4.2.11)
       redcarpet (~> 3.4.0)
       roo (~> 2.1.0)
       slim (= 3.0.9)
@@ -124,7 +124,7 @@ PATH
       aasm (~> 4.8.0)
       config
       mongoid (~> 5.4.0)
-      rails (~> 4.2.8)
+      rails (~> 4.2.11)
       roo (~> 2.1.0)
       slim (~> 3.0.8)
       symmetric-encryption (~> 3.6.0)

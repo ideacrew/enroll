@@ -21,7 +21,7 @@ PATH
       mongoid (~> 5.4.0)
       nokogiri
       pundit (~> 1.0.1)
-      rails (~> 4.2.8)
+      rails (~> 4.2.11)
       slim (~> 3.0.9)
       symmetric-encryption (~> 3.6.0)
       virtus (= 1.0.5)
@@ -39,7 +39,7 @@ PATH
       money-rails (~> 1.10.0)
       mongoid (~> 5.4.0)
       non-stupid-digest-assets
-      rails (~> 4.2.8)
+      rails (~> 4.2.11)
       redcarpet (~> 3.4.0)
       roo (~> 2.1.0)
       slim (= 3.0.9)
@@ -54,7 +54,7 @@ PATH
       aasm (~> 4.8.0)
       config
       mongoid (~> 5.4.0)
-      rails (~> 4.2.8)
+      rails (~> 4.2.11)
       roo (~> 2.1.0)
       slim (~> 3.0.8)
       symmetric-encryption (~> 3.6.0)
@@ -66,7 +66,7 @@ PATH
       aasm (~> 4.8.0)
       active_model_serializers
       config
-      devise (~> 3.5.4)
+      devise (~> 4.5)
       interactor (= 3.1.0)
       interactor-rails (= 2.0.2)
       language_list (~> 1.1.0)
@@ -74,7 +74,7 @@ PATH
       mongoid (~> 5.4.0)
       mongoid-autoinc
       pundit (~> 1.0.1)
-      rails (~> 4.2.8)
+      rails (~> 4.2.11)
       roo (~> 2.1.0)
       slim (~> 3.0.8)
       symmetric-encryption (~> 3.6.0)
@@ -174,12 +174,11 @@ GEM
     deep_merge (1.2.1)
     descendants_tracker (0.0.4)
       thread_safe (~> 0.3, >= 0.3.1)
-    devise (3.5.10)
+    devise (4.7.1)
       bcrypt (~> 3.0)
       orm_adapter (~> 0.1)
-      railties (>= 3.2.6, < 5)
+      railties (>= 4.1.0)
       responders
-      thread_safe (~> 0.1)
       warden (~> 1.2.3)
     diff-lcs (1.3)
     domain_name (0.5.20190701)
