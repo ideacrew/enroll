@@ -48,6 +48,28 @@ GIT
       rails (>= 3.0)
 
 GIT
+  remote: https://github.com/ideacrew/resource_registry.git
+  revision: f6a53190d356dc4f983ad6fdb1d6e9f2d63d4fbf
+  branch: branch_0.7.0
+  specs:
+    resource_registry (0.7.0)
+      bootsnap (~> 1.0)
+      deep_merge (>= 1.0.0)
+      dry-configurable (= 0.9)
+      dry-container (~> 0.7)
+      dry-matcher (~> 0.7)
+      dry-monads (~> 1.2)
+      dry-struct (~> 1.0)
+      dry-types (~> 1.0)
+      dry-validation (~> 1.2)
+      i18n (>= 0.7.0)
+      loofah (>= 2.3.1)
+      mime-types
+      nokogiri (>= 1.9.1)
+      ox (~> 2.0)
+      rack (>= 1.6.13)
+
+GIT
   remote: https://github.com/prawnpdf/prawn.git
   revision: 8028ca0cd2aae8c72df9fc4bf16388948423bcb2
   ref: 8028ca0cd2
@@ -232,6 +254,8 @@ GEM
     benchmark-trend (0.4.0)
     binding_of_caller (0.8.0)
       debug_inspector (>= 0.0.1)
+    bootsnap (1.4.6)
+      msgpack (~> 1.0)
     bootstrap-multiselect-rails (0.9.9)
       rails (>= 4.0.0)
     bootstrap-slider-rails (6.0.17)
@@ -318,6 +342,7 @@ GEM
     combine_pdf (1.0.16)
       ruby-rc4 (>= 0.1.5)
     commonjs (0.2.7)
+    concurrent-ruby (1.1.6)
     config (1.0.0)
       activesupport (>= 3.0)
       deep_merge (~> 1.0.0)
@@ -362,6 +387,54 @@ GEM
       warden (~> 1.2.3)
     diff-lcs (1.3)
     docile (1.1.5)
+    dry-configurable (0.9.0)
+      concurrent-ruby (~> 1.0)
+      dry-core (~> 0.4, >= 0.4.7)
+    dry-container (0.7.2)
+      concurrent-ruby (~> 1.0)
+      dry-configurable (~> 0.1, >= 0.1.3)
+    dry-core (0.4.9)
+      concurrent-ruby (~> 1.0)
+    dry-equalizer (0.3.0)
+    dry-inflector (0.2.0)
+    dry-initializer (3.0.3)
+    dry-logic (1.0.6)
+      concurrent-ruby (~> 1.0)
+      dry-core (~> 0.2)
+      dry-equalizer (~> 0.2)
+    dry-matcher (0.8.3)
+      dry-core (>= 0.4.8)
+    dry-monads (1.3.5)
+      concurrent-ruby (~> 1.0)
+      dry-core (~> 0.4, >= 0.4.4)
+      dry-equalizer
+    dry-schema (1.5.0)
+      concurrent-ruby (~> 1.0)
+      dry-configurable (~> 0.8, >= 0.8.3)
+      dry-core (~> 0.4)
+      dry-equalizer (~> 0.2)
+      dry-initializer (~> 3.0)
+      dry-logic (~> 1.0)
+      dry-types (~> 1.4)
+    dry-struct (1.3.0)
+      dry-core (~> 0.4, >= 0.4.4)
+      dry-equalizer (~> 0.3)
+      dry-types (~> 1.3)
+      ice_nine (~> 0.11)
+    dry-types (1.4.0)
+      concurrent-ruby (~> 1.0)
+      dry-container (~> 0.3)
+      dry-core (~> 0.4, >= 0.4.4)
+      dry-equalizer (~> 0.3)
+      dry-inflector (~> 0.1, >= 0.1.2)
+      dry-logic (~> 1.0, >= 1.0.2)
+    dry-validation (1.5.0)
+      concurrent-ruby (~> 1.0)
+      dry-container (~> 0.7, >= 0.7.1)
+      dry-core (~> 0.4)
+      dry-equalizer (~> 0.2)
+      dry-initializer (~> 3.0)
+      dry-schema (~> 1.5)
     easy_diff (1.0.0)
     email_spec (2.0.0)
       htmlentities (~> 4.3.3)
@@ -503,6 +576,7 @@ GEM
     mongoid_userstamp (0.4.0)
       mongoid (>= 3.0.4)
     mono_logger (1.1.0)
+    msgpack (1.3.3)
     multi_json (1.14.1)
     multi_test (0.1.2)
     multi_xml (0.6.0)
@@ -524,6 +598,7 @@ GEM
     overcommit (0.53.0)
       childprocess (>= 0.6.3, < 4)
       iniparse (~> 1.4)
+    ox (2.13.2)
     parallel (1.19.1)
     parallel_tests (2.26.2)
       parallel
@@ -876,6 +951,7 @@ DEPENDENCIES
   recurring_select!
   redcarpet (= 3.4.0)
   redis-rails
+  resource_registry!
   resque
   roo (~> 2.1.0)
   rspec-benchmark
