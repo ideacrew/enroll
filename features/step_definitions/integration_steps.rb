@@ -753,6 +753,10 @@ Then(/^.+ should see the list of plans$/) do
   screenshot("plan_shopping")
 end
 
+And(/^.+ should see the Metal Level filter$/) do
+  expect(page).to have_content('Metal Level')
+end
+
 When(/^.+ sorts by (.*)/) do |sort|
   @plan_names = find_all('.plan-row').collect{|row| row.find('h3 a', wait: 5).text}
   find(".interaction-click-control-#{sort.downcase.gsub(/\s/, '-')}", wait: 5).click

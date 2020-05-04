@@ -1397,6 +1397,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
         benefit_sponsorship: benefit_sponsorship
       )
     end
+    let!(:benefit_group_assignment1) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: renewal_application.benefit_packages.first, census_employee: census_employee, is_active: false)}
 
     it 'should have active benefit group assignment' do
       expect(census_employee.active_benefit_group_assignment.present?).to be_truthy
@@ -1410,6 +1411,13 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       expect(census_employee.renewal_benefit_group_assignment.benefit_package).to eq benefit_sponsorship.renewal_benefit_application.benefit_packages.first
     end
 
+    it 'should have most recent renewal benefit group assignment' do
+      renewal_application.update_attributes(predecessor_id: benefit_application.id)
+      benefit_sponsorship.benefit_applications << renewal_application
+      benefit_group_assignment1.update_attributes(created_at: census_employee.benefit_group_assignments.last.created_at + 1.day)
+      census_employee.benefit_group_assignments << benefit_group_assignment1
+      expect(census_employee.renewal_benefit_group_assignment.created_at).to eq benefit_group_assignment1.created_at
+    end
   end
 
   context '.find_or_create_benefit_group_assignment' do
