@@ -11,6 +11,8 @@ module BenefitSponsors
 
 
     let(:current_user) { FactoryBot.create :user }
+    let(:current_user_2) { FactoryBot.create :user }
+    let(:person) { FactoryBot.create(:person, first_name: "Dany", last_name: "Targ", dob: dob, user: current_user_2) }
     let(:fein) { "878998789" }
     let(:dob) { TimeKeeper.date_of_record - 60.years }
     let(:state) { Settings.aca.state_abbreviation }
@@ -179,6 +181,18 @@ module BenefitSponsors
         it 'should return redirection url' do
           expect(profile_factory.redirection_url(profile_factory.pending, true)).to eq "sponsor_home_registration_url@#{profile_factory.profile.id}"
         end
+      end
+
+      context 'when person matching the provided personal information already exists' do
+        let(:invalid_employer_params) {valid_employer_params.merge!({person_id: person.id})}
+        let(:profile_factory) do
+          profile_factory_class.call(invalid_employer_params)
+        end
+
+        it 'should throw an error' do
+          expect(profile_factory.errors.messages[:staff_role]).to eq ["a person matching the provided personal information has already been claimed by another user.  Please contact HBX."]
+        end
+
       end
 
       context 'when type is broker agency' do
