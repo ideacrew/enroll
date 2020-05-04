@@ -49,7 +49,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/resource_registry.git
-  revision: f6a53190d356dc4f983ad6fdb1d6e9f2d63d4fbf
+  revision: 8593064c8e19f5de352e7e016f8c3d8bdd30c7f5
   branch: branch_0.7.0
   specs:
     resource_registry (0.7.0)
