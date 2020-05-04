@@ -3,7 +3,7 @@
 require 'rails_helper'
 require File.join(Rails.root, 'spec/shared_contexts/ivl_eligibility')
 
-RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each do
+RSpec.describe Factories::EligibilityFactory, type: :model do
 
   before :all do
     DatabaseCleaner.clean
@@ -177,7 +177,8 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
       let!(:enrollment1) { FactoryBot.create(:hbx_enrollment, :individual_shopping, household: family.active_household, family: family, effective_on: Date.today.beginning_of_year) }
       let!(:enrollment_member1) { FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: enrollment1, applicant_id: family_member.id) }
 
-      before :each do
+      before :all do
+        TimeKeeper.set_date_of_record_unprotected!(Date.new(2020, 3, 4))
         @product = FactoryBot.create(:benefit_markets_products_health_products_health_product, metal_level_kind: :silver, benefit_market_kind: :aca_individual)
         reset_premium_tuples
         benefit_sponsorship = FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period).benefit_sponsorship
@@ -535,6 +536,11 @@ RSpec.describe Factories::EligibilityFactory, type: :model, dbclean: :after_each
             end
           end
         end
+      end
+
+      after(:all) do
+        DatabaseCleaner.clean
+        TimeKeeper.set_date_of_record_unprotected!(Date.today)
       end
     end
   end
