@@ -72,7 +72,8 @@
   "scripts": {
     "angular-docs": "compodoc -p app/javascript/incremental_angular/tsconfig.app.json -d angular_documentation --unitTestCoverage angular_coverage/coverage-summary.json",
     "test": "jest",
-    "test-watch": "jest --watch"
+    "test-watch": "jest --watch",
+    "start:angular": "ANGULAR_ADMIN_APPLICATION_URL=http://localhost:4200 bundle exec rails s"
   },
   "jest": {
     "testURL": "http://localhost",

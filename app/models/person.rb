@@ -1,6 +1,7 @@
 class Person
   include Config::AcaModelConcern
   include Config::SiteModelConcern
+  include Config::ContactCenterModelConcern
   include Mongoid::Document
   include SetCurrentUser
   include Mongoid::Timestamps
@@ -201,8 +202,9 @@ class Person
   index({"broker_role.broker_agency_id" => 1})
   index({"broker_role.benefit_sponsors_broker_agency_profile_id" => 1})
   index({"broker_role.npn" => 1}, {sparse: true, unique: true})
+
   index({"general_agency_staff_roles.npn" => 1}, {sparse: true})
-  index({"general_agency_staff_roles.is_primary" => 1}, {sparse: true})
+  index({"general_agency_staff_roles.is_primary" => 1})
   index({"general_agency_staff_roles.benefit_sponsors_general_agency_profile_id" => 1}, {sparse: true})
 
   index({"first_name" => 1, "last_name" => 1, "broker_role.npn" => 1}, {name: "first_name_last_name_broker_npn_search"})
@@ -244,6 +246,11 @@ class Person
   index({"hbx_csr_role._id" => 1})
   index({"hbx_assister._id" => 1})
 
+  index(
+    {"broker_agency_staff_roles._id" => 1},
+    {name: "person_broker_agency_staff_role_id_search"}
+  )
+
   scope :all_consumer_roles,          -> { exists(consumer_role: true) }
   scope :all_resident_roles,          -> { exists(resident_role: true) }
   scope :all_employee_roles,          -> { exists(employee_roles: true) }
@@ -255,6 +262,17 @@ class Person
   scope :all_hbx_staff_roles,         -> { exists(hbx_staff_role: true) }
   scope :all_csr_roles,               -> { exists(csr_role: true) }
   scope :all_assister_roles,          -> { exists(assister_role: true) }
+  scope :all_broker_staff_roles,      -> { exists(broker_agency_staff_roles: true) }
+  scope :all_agency_staff_roles,      -> do
+    where(
+      {
+      "$or" => [
+          { "broker_agency_staff_roles" => { "$exists" => true } },
+          { "general_agency_staff_roles" => { "$exists" => true }, "general_agency_staff_roles.is_primary" => {"$ne" => false} }
+        ]
+      }
+    )
+  end
 
   scope :by_hbx_id, ->(person_hbx_id) { where(hbx_id: person_hbx_id) }
   scope :by_broker_role_npn, ->(br_npn) { where("broker_role.npn" => br_npn) }
@@ -264,9 +282,10 @@ class Person
   #scope :broker_role_having_agency, -> { where("broker_role.broker_agency_profile_id" => { "$ne" => nil }) }
   scope :broker_role_having_agency, -> { where("broker_role.benefit_sponsors_broker_agency_profile_id" => { "$ne" => nil }) }
   scope :broker_role_applicant,     -> { where("broker_role.aasm_state" => { "$eq" => :applicant })}
-  scope :broker_role_pending,       -> { where(:'broker_role.aasm_state' => { "$in" => [:broker_agency_pending, :application_extended] })}
+  scope :broker_role_pending,       -> { where("broker_role.aasm_state" => { "$eq" => :broker_agency_pending })}
   scope :broker_role_certified,     -> { where("broker_role.aasm_state" => { "$in" => [:active]})}
   scope :broker_role_decertified,   -> { where("broker_role.aasm_state" => { "$eq" => :decertified })}
+  scope :broker_role_extended,      -> { where("broker_role.aasm_state" => { "$eq" => :application_extended })}
   scope :broker_role_denied,        -> { where("broker_role.aasm_state" => { "$eq" => :denied })}
   scope :by_ssn,                    ->(ssn) { where(encrypted_ssn: Person.encrypt_ssn(ssn)) }
   scope :unverified_persons,        -> { where(:'consumer_role.aasm_state' => { "$ne" => "fully_verified" })}
@@ -289,6 +308,79 @@ class Person
   after_create :notify_created
   after_update :notify_updated
 
+  def self.api_staff_roles
+    Person.where(
+      {
+      "is_active" => true,
+      "$or" => [
+          { "broker_agency_staff_roles" => { "$exists" => true, "$not" => {"$size" => 0} } },
+          { "general_agency_staff_roles.is_primary" =>  false }
+        ]
+      }
+    )
+  end
+
+  def self.api_primary_staff_roles
+    Person.where(
+      {
+      "is_active" => true,
+      "$or" => [
+          { "broker_role._id" => {"$exists" => true} },
+          { "general_agency_staff_roles.is_primary" =>  true }
+        ]
+      }
+    )
+  end
+
+  def agency_roles
+    role_data(broker_agency_staff_roles, :benefit_sponsors_broker_agency_profile_id) + role_data(general_agency_staff_roles, :benefit_sponsors_general_agency_profile_id)
+  end
+
+  def role_data(data, agency)
+    data.collect do |role|
+      {
+        aasm_state: role.aasm_state,
+        agency_profile_id: role.try(agency).to_s,
+        type: role.class.name,
+        role_id: role._id.to_s,
+        history: role.workflow_state_transitions
+      }
+    end
+  end
+
+  def agent_emails
+    self.emails.collect do |email|
+      {
+        id: email.id.to_s,
+        kind: email.kind,
+        address: email.address
+      }
+    end
+  end
+
+  def has_active_enrollment
+    if self.families.present?
+      self.families.each do |family|
+        household = family.active_household
+        if household && household.hbx_enrollments.where(:'aasm_state'.in => HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES).present?
+          return true
+        end
+      end
+    end
+    false
+  end
+
+  def agent_npn
+    self.general_agency_staff_roles.select{|role| role.is_primary }.try(:first).try(:npn) || self.broker_role.try(:npn)
+  end
+
+  def agent_role_id
+    self.general_agency_staff_roles.select{|role| role.is_primary }.try(:first).try(:id) || self.broker_role.try(:id)
+  end
+
+  def connected_profile_id
+    self.general_agency_staff_roles.select{|role| role.is_primary }.try(:first).try(:benefit_sponsors_general_agency_profile_id) || self.broker_role.try(:benefit_sponsors_broker_agency_profile_id)
+  end
 
   def active_general_agency_staff_roles
     general_agency_staff_roles.where(:aasm_state => :active)
@@ -1109,7 +1201,11 @@ class Person
 
   def create_inbox
     welcome_subject = "Welcome to #{site_short_name}"
-    welcome_body = "#{site_short_name} is the #{aca_state_name}'s on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
+    if broker_role || broker_agency_staff_roles.present?
+      welcome_body = "#{Settings.site.short_name} is the #{Settings.aca.state_name}'s on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
+    else
+      welcome_body = "#{site_short_name} is ready to help you get quality, affordable medical or dental coverage that meets your needs and budget.<br/><br/>Now that you’ve created an account, take a moment to explore your account features. Remember there’s limited time to sign up for a plan. Make sure you pay attention to deadlines.<br/><br/>If you have any questions or concerns, we’re here to help.<br/><br/>#{site_short_name}<br/>#{contact_center_short_number}<br/>TTY: #{contact_center_tty_number}"
+    end
     mailbox = Inbox.create(recipient: self)
     mailbox.messages.create(subject: welcome_subject, body: welcome_body, from: "#{site_short_name}")
   end
