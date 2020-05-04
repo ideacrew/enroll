@@ -23,8 +23,6 @@ gem 'coffee-rails', '~> 4.1.0'
 gem 'combine_pdf'
 gem 'config', '~> 1.0.0'
 gem 'curl'
-# gem 'devise', '>= 3.5.4'
-
 gem 'devise',  '~> 4.5'
 gem 'effective_datatables', path: './project_gems/effective_datatables-2.6.14'
 gem 'haml'
@@ -57,8 +55,8 @@ gem 'nokogiri-happymapper', :require => 'happymapper'
 gem 'non-stupid-digest-assets', '~> 1.0', '>= 1.0.9'
 gem "notifier",           path: "components/notifier"
 gem 'openhbx_cv2', git: 'https://github.com/dchbx/openhbx_cv2.git', branch: 'master'
-gem 'resource_registry',  path:  "/Users/saidineshmekala/IDEACREW/resource_registry"#, branch: 'branch_0.7.0'
-gem 'pry'
+#gem 'resource_registry',  path:  "/Users/saidineshmekala/IDEACREW/resource_registry"#, branch: 'branch_0.7.0'
+#gem 'pry'
 gem 'prawn', :git => 'https://github.com/prawnpdf/prawn.git', :ref => '8028ca0cd2'
 gem 'pundit', '~> 1.0.1'
 gem 'rails', '4.2.11'
@@ -136,7 +134,7 @@ end
 
 group :test do
   gem 'action_mailer_cache_delivery', '~> 0.3.7'
-  gem 'capybara',                     '~> 3.12'
+  gem 'capybara'
   gem 'capybara-screenshot'
   gem 'cucumber', '3.1.2'
   gem 'cucumber-rails', '1.6.0', :require => false
