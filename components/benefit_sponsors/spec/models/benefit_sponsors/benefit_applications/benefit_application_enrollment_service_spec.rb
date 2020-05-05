@@ -871,6 +871,46 @@ module BenefitSponsors
         end
       end
 
+      context 'when an employer is termination pending' do
+        include_context "setup initial benefit application"
+        subject {BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService}
+
+        context 'with end of the month date' do
+          before do
+            start_on = TimeKeeper.date_of_record.beginning_of_month - 6.months
+            end_on = TimeKeeper.date_of_record.end_of_month + 4.months
+            initial_application.reload
+            initial_application.update_attributes(effective_period: start_on..end_on, aasm_state: :termination_pending, terminated_on: TimeKeeper.date_of_record, termination_kind: "voluntary", termination_reason: "Company went out of business/bankrupt")
+            ba = initial_application
+            @result1 = subject.new(initial_application).terminate(end_on, ba.terminated_on, ba.termination_kind, ba.termination_reason)
+            initial_application.reload
+          end
+
+          it 'should terminate benefit application' do
+            expect(initial_application.aasm_state).to eq :terminated
+          end
+        end
+
+        context 'with mid month date' do
+          before do
+            start_on = TimeKeeper.date_of_record.beginning_of_month - 6.months
+            end_on = TimeKeeper.date_of_record.end_of_month - 15.day + 4.months
+            initial_application.reload
+            initial_application.update_attributes(effective_period: start_on..end_on, aasm_state: :termination_pending, terminated_on: TimeKeeper.date_of_record, termination_kind: "voluntary", termination_reason: "Company went out of business/bankrupt")
+            ba = initial_application
+            @result2 = subject.new(initial_application).terminate(end_on, ba.terminated_on, ba.termination_kind, ba.termination_reason)
+            initial_application.reload
+          end
+
+          it 'should not terminate benefit application' do
+            expect(initial_application.aasm_state).to eq :termination_pending
+          end
+
+          it 'should generate error' do
+            expect(@result2[2][:mid_month_voluntary_term]).to eq "Exchange doesn't allow mid month voluntary terminations"
+          end
+        end
+      end
     end
 
     describe '.reinstate' do
