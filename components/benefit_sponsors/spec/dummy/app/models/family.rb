@@ -805,7 +805,7 @@ class Family
         kind: 'individual',
         aasm_state: 'auto_renewing'
       )
-      begin 
+      begin
         ivl_enrollments.each do |enrollment|
           enrollment.begin_coverage! if enrollment.may_begin_coverage?
           @logger.info "Processed enrollment: #{enrollment.hbx_id}"
@@ -1062,7 +1062,7 @@ class Family
     self.active_family_members.each do |member|
       outstanding_types = outstanding_types + member.person.verification_types.active.select{|type| ["outstanding", "pending", "review"].include? type.validation_status }
     end
-    fully_uploaded = outstanding_types.any? ? outstanding_types.all?{ |type| (type.type_documents.any? && !type.rejected) } : nil
+    fully_uploaded = outstanding_types.any? ? nil : outstanding_types.all?{ |type| type.type_verified? || (type.type_documents.any? && !type.rejected) }
     partially_uploaded = outstanding_types.any? ? outstanding_types.any?{ |type| (type.type_documents.any? && !type.rejected)} : nil
     if fully_uploaded
       "Fully Uploaded"
