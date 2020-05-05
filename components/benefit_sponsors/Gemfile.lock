@@ -485,6 +485,7 @@ DEPENDENCIES
   benefit_markets!
   benefit_sponsors!
   capybara (= 2.6.2)
+  climate_control (~> 0.2.0)
   database_cleaner
   effective_datatables!
   factory_girl_rails (= 4.6.0)
