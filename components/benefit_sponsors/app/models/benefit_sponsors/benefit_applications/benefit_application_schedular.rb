@@ -34,17 +34,17 @@ module BenefitSponsors
       end
 
       # Responsible for calculating all the possible dataes
-      def start_on_options_with_schedule(admin_datatable_action = false)
+      def start_on_options_with_schedule(is_renewing, admin_datatable_action = false)
         possible_dates = Hash.new
         calculate_start_on_dates(admin_datatable_action).each do |date|
           next if !admin_datatable_action && !is_start_on_valid?(date)
-          possible_dates[date] = enrollment_schedule(date).merge(open_enrollment_dates(date, admin_datatable_action))
+          possible_dates[date] = enrollment_schedule(date).merge(open_enrollment_dates(is_renewing, date, admin_datatable_action))
         end
         possible_dates
       end
 
-      def open_enrollment_dates(start_on, admin_datatable_action = false)
-        calculate_open_enrollment_date(start_on, admin_datatable_action)
+      def open_enrollment_dates(is_renewing, start_on, admin_datatable_action = false)
+        calculate_open_enrollment_date(is_renewing, start_on, admin_datatable_action)
       end
 
       def enrollment_schedule(start_on)
@@ -94,7 +94,7 @@ module BenefitSponsors
         end
       end
 
-      def calculate_open_enrollment_date(start_on, admin_datatable_action = nil)
+      def calculate_open_enrollment_date(is_renewing, start_on, admin_datatable_action = nil)
         start_on = start_on.to_date
 
         # open_enrollment_start_on = [start_on - 1.month, TimeKeeper.date_of_record].max
@@ -106,7 +106,7 @@ module BenefitSponsors
         #   candidate_open_enrollment_end_on
         # end
 
-        open_enrollment_period = open_enrollment_period_by_effective_date(start_on, admin_datatable_action)
+        open_enrollment_period = open_enrollment_period_by_effective_date(is_renewing, start_on, admin_datatable_action)
 
 
         #candidate_open_enrollment_end_on = Date.new(open_enrollment_start_on.year, open_enrollment_start_on.month, Settings.aca.shop_market.open_enrollment.monthly_end_on)
@@ -126,7 +126,7 @@ module BenefitSponsors
         }
       end
 
-      def open_enrollment_period_by_effective_date(start_on, admin_datatable_action = nil)
+      def open_enrollment_period_by_effective_date(is_renewing, start_on, admin_datatable_action = nil)
         open_enrollment_start_on = (start_on - Settings.aca.shop_market.open_enrollment.maximum_length.months.months)
         if start_on.future?
           open_enrollment_start_on = [open_enrollment_start_on, TimeKeeper.date_of_record].max
@@ -134,7 +134,9 @@ module BenefitSponsors
 
         oe_min_days = Settings.aca.shop_market.open_enrollment.minimum_length.days
 
-        open_enrollment_end_on   = ("#{start_on.prev_month.year}-#{start_on.prev_month.month}-#{Settings.aca.shop_market.open_enrollment.monthly_end_on}").to_date
+        oe_monthly_end_on = is_renewing ? Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on : Settings.aca.shop_market.open_enrollment.monthly_end_on
+
+        open_enrollment_end_on   = ("#{start_on.prev_month.year}-#{start_on.prev_month.month}-#{oe_monthly_end_on}").to_date
 
         if admin_datatable_action && ((open_enrollment_end_on - open_enrollment_start_on) < oe_min_days)
           open_enrollment_end_on = (open_enrollment_start_on + oe_min_days)
