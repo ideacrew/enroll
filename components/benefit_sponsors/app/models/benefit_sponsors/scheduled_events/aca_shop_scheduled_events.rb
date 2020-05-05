@@ -110,8 +110,8 @@ module BenefitSponsors
       end
 
       def auto_transmit_monthly_ineligible_benefit_sponsors
-        if aca_shop_market_transmit_monthly_ineligible_benefit_sponsors # TODO settings
-          if (new_date.mday) == aca_shop_market_ineligible_employer_transmission_day_of_month # TODO settings
+        if EnrollRegistry.feature_enabled?(:automation_of_ineligible_benefit_sponsors)
+          if (new_date.mday) == EnrollRegistry[:automation_of_ineligible_benefit_sponsors].setting(:ineligible_employer_transmission_day_of_month).item
             auto_transmit_ineligible_renewal_benefit_sponsors(new_date)
           end
         end
@@ -125,7 +125,7 @@ module BenefitSponsors
 
         renewal_benefit_sponsorships = benefit_sponsors.may_transmit_renewal_enrollment?(start_on, transition_at)
         execute_sponsor_event(renewal_benefit_sponsorships, :transmit_renewal_eligible_event)
-        execute_sponsor_event(renewal_benefit_sponsorships, :transmit_renewal_carrier_drop_event) #TODO settings
+        execute_sponsor_event(renewal_benefit_sponsorships, :transmit_renewal_carrier_drop_event)
 
         initial_benefit_sponsorships = benefit_sponsors.may_transmit_initial_enrollment?(start_on, transition_at)
         execute_sponsor_event(initial_benefit_sponsorships, :transmit_initial_eligible_event)

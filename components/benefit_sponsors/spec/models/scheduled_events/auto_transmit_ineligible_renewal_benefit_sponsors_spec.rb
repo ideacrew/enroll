@@ -5,7 +5,7 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_applicatio
 module BenefitSponsors
   RSpec.describe "auto transmit ineligible renewal benefit sponsors", dbclean: :after_each do
 
-    describe "renewal employer monthly transmission for the month MARCH:
+    describe "renewal ineligble employer monthly transmission for the month MARCH:
        - employer A renewing benefit application :
          - published renewal benefit application
          - Open Enrollment Closed
@@ -14,7 +14,7 @@ module BenefitSponsors
        - employer B renewing benefit application:
          - published renewal benefit application
          - Open Enrollment Closed
-         - benefit application moved to enrollment_ineligible state
+         - benefit application moved to inenrollment_ineligible state
     ", dbclean: :after_each do
 
       before :all do
