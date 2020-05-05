@@ -348,13 +348,15 @@ module BenefitSponsors
     def validate_benefit_application_termination_date(end_on, termination_kind)
       errors = {}
       result = true
+      end_on = end_on.to_date
+
       if termination_kind == 'voluntary'
-        if !allow_mid_month_voluntary_terms? && end_on != end_on.end_of_month.to_date
+        if !allow_mid_month_voluntary_terms? && end_on != end_on.end_of_month
           result = false
           errors[:mid_month_voluntary_term] = "Exchange doesn't allow mid month voluntary terminations"
         end
       elsif termination_kind == 'nonpayment'
-        if !allow_mid_month_non_payment_terms? && end_on != end_on.end_of_month.to_date
+        if !allow_mid_month_non_payment_terms? && end_on != end_on.end_of_month
           result = false
           errors[:mid_month_non_payment_term] = "Exchange doesn't allow mid month non payment terminations"
         end
