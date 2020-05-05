@@ -2,10 +2,9 @@
 registry:
   - namespace:
     - :enroll_app
-    - :cca_shop_market
+    - :aca_shop_market
     features:
       - key: :automation_of_ineligible_benefit_sponsors
-        item: :ineligble_benefit_sponsors_automation
         is_enabled: true
         settings:
           - key: :ineligible_employer_transmission_day_of_month

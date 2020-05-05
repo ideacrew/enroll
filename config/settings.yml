@@ -272,8 +272,6 @@ aca:
 
     transmit_scheduled_employers: true
     employer_transmission_day_of_month: 26
-    transmit_scheduled_ineligible_employers: true
-    ineligible_employer_transmission_day_of_month: 1
 
     mid_month_benefit_application_terminations:
       voluntary: false
