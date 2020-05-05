@@ -51,3 +51,22 @@ Feature: IVL plan purchase
     When consumer checks the primary person
     And consumer clicked on shop for new plan
     Then consumer should see primary person
+
+  Scenario: IVL selects enrolls in same plan as last year with SEP and sees the SAME premium amount on Choose Plan 50%, Confirm your Plan Selection 75%, and Enrollment Submitted (100%) 
+    Given a consumer exists
+    And consumer has active individual enrollment
+    And the consumer is logged in
+    And consumer has successful ridp
+    And consumer clicked on "Married" qle
+    And I select a past qle date
+    Then I should see confirmation and continue
+    When I click on continue button on household info form
+    And I click the Shop for new plan button
+    Then consumer should see the list of plans
+    When consumer selects the same plan as the previous year on the plan shopping page
+    And the consumer sees the premium for the plan is the same as preceeding year
+    When Employee clicks on Confirm button on the coverage summary page
+    And the consumer sees the premium for the plan is the same as preceeding year
+    Then Employee clicks back to my account button
+    And the consumer sees the premium for the plan is the same as preceeding year
+
