@@ -24,7 +24,7 @@ module BenefitSponsors
         :health_insurance_exchange,
       ]
 
-      FIELD_AND_EVENT_NAMES_MAP = {"legal_name" => "name_changed", "fein" => "fein_corrected"}
+      FIELD_AND_EVENT_NAMES_MAP = {"legal_name" => "name_changed", "fein" => "fein_corrected", "dba" => "name_changed"}.freeze
 
       field :hbx_id, type: String
 
