@@ -34,6 +34,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'mongoid-autoinc'
   s.add_dependency 'interactor', '3.1.0'
   s.add_dependency 'interactor-rails', '2.0.2'
+  s.add_dependency 'browser', '2.7.0'
 
   s.test_files = Dir["spec/**/*"]
 

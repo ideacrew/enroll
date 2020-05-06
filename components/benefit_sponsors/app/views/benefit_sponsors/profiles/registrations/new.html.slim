@@ -2,12 +2,13 @@
   .broker-registration-container.mt-4.pt-4.pl-3.pr-3.pb-3
 
     h1.heading-text Broker Registration
-    
+
     - flash.each do |key, value|
-			div class="alert alert-#{key} alert-dismissible" role="alert"
-				button.close type="button" data-dismiss="alert" aria-label="Close"
-					span aria-hidden="true" &times
-				= value
+      div class="alert alert-#{key} alert-dismissible" role="alert"
+        - [value].to_a.flatten.each do |v|
+          button.close type="button" data-dismiss="alert" aria-label="Close"
+            span aria-hidden="true" &times
+          = raw v
 
     = form_for @agency, as: :agency, url: {action: "create"}, html: { class: "needs-validation s508", id:'broker_registration_form', novalidate:true } do |f|
     

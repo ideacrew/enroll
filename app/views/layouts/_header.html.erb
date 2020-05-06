@@ -78,7 +78,7 @@
   </script>
 <% end %>
 <script>
-  if (bowser.msie && bowser.version <= 8 || bowser.chrome && bowser.version <= 28 || bowser.firefox && bowser.version <= 22) {
+  if (bowser.chrome && bowser.version <= 28 || bowser.firefox && bowser.version <= 22) {
     $('body').before('<div id="modal-wrapper"></div>')
     $('#modal-wrapper').html('<%= escape_javascript(render(:partial => "shared/update_browser_warning")) %>');
     $('#modal-wrapper').fadeIn();

@@ -193,6 +193,13 @@ describe UsersController do
     end
   end
 
+  describe '#unsupportive_browser' do
+    it 'should be succesful' do
+      get :unsupportive_browser
+      expect(response).to be_success
+    end
+  end
+
   describe '.confirm_reset_password' do
     let(:can_reset_password) { false }
     
