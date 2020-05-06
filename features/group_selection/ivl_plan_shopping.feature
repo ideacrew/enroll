@@ -53,10 +53,21 @@ Feature: IVL plan purchase
     Then consumer should see primary person
 
   Scenario: IVL selects enrolls in same plan as last year with SEP and sees the SAME premium amount on Choose Plan 50%, Confirm your Plan Selection 75%, and Enrollment Submitted (100%) 
-    Given a consumer exists
-    And consumer has active individual enrollment
-    And the consumer is logged in
+    Given benefit sponsorship exists for individual market
+    And Qualifying life events are present
+    And user for consumer Patrick Doe present
+    And consumer Patrick Doe has active individual enrollment
+    And active individual enrollment for Patrick Doe has product with title of IVL Test Plan Gold
+    And user for consumer Patrick Doe is logged in
     And consumer has successful ridp
+    When current user visits the family home page
+    When Admin clicks CONTINUE button
+    And consumer should see identity verification page and clicks on submit
+    When Admin clicks CONTINUE button
+    And I click on continue button on household info form
+    When current user visits the family home page
+    And I click on continue button on group selection page
+    And I see $200.00 premium for my plan IVL Test Plan Gold
     And consumer clicked on "Married" qle
     And I select a past qle date
     Then I should see confirmation and continue
