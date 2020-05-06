@@ -796,11 +796,11 @@ module BenefitSponsors
         end
 
         it "should provide a valid an enrollment timetabe hash for that effective date" do
-          expect(subject.enrollment_timetable_by_effective_date(effective_date)).to eq valid_timetable
+          expect(subject.enrollment_timetable_by_effective_date(false, effective_date)).to eq valid_timetable
         end
 
         it "timetable date values should be valid" do
-          timetable = subject.enrollment_timetable_by_effective_date(effective_date)
+          timetable = subject.enrollment_timetable_by_effective_date(false, effective_date)
 
           expect(BenefitApplications::BenefitApplication.new(
                               effective_period: timetable[:effective_period],
