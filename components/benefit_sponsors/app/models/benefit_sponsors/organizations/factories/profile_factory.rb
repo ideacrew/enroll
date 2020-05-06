@@ -227,7 +227,7 @@ module BenefitSponsors
           if matched_people.count == 1
             mp = matched_people.first
             if is_employer_profile? && mp.user.present?
-              if mp.user.id.to_s != current_user.id
+              if mp.user.id.to_s != current_user.id.to_s
                 errors.add(:staff_role, "a person matching the provided personal information has already been claimed by another user.  Please contact HBX.")
                 return false
               end
