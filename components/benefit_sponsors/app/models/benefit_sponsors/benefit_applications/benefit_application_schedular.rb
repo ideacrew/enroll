@@ -51,10 +51,10 @@ module BenefitSponsors
         shop_enrollment_timetable(start_on)
       end
 
-      def enrollment_timetable_by_effective_date(effective_date)
+      def enrollment_timetable_by_effective_date(is_renewing, effective_date)
         effective_date            = effective_date.to_date.beginning_of_month
         effective_period          = effective_date..(effective_date + 1.year - 1.day)
-        open_enrollment_period    = open_enrollment_period_by_effective_date(effective_date)
+        open_enrollment_period    = open_enrollment_period_by_effective_date(is_renewing, effective_date)
 
         prior_month               = effective_date - 1.month
         binder_payment_due_on     = Date.new(prior_month.year, prior_month.month, Settings.aca.shop_market.binder_payment_due_on)
@@ -117,7 +117,7 @@ module BenefitSponsors
         #  candidate_open_enrollment_end_on
         #end
 
-        binder_payment_due_date = map_binder_payment_due_date_by_start_on(start_on)
+        binder_payment_due_date = map_binder_payment_due_date_by_start_on(is_renewing, start_on)
 
         {
           open_enrollment_start_on: open_enrollment_period.begin,
@@ -152,14 +152,14 @@ module BenefitSponsors
 
       #TODO: Implement the binder payment due dates using BankHolidaysHelper
       #TODO: Logic around binder payment due dates is not clear at this point. Hence hard-coding the due dates for now.
-      def map_binder_payment_due_date_by_start_on(start_on)
+      def map_binder_payment_due_date_by_start_on(is_renewing, start_on)
         dates_map = {}
 
         Settings.aca.shop_market.binder_payment_dates.each do |dates_pair|
           dates_map[dates_pair.first[0].to_s] = Date.strptime(dates_pair.first[1], '%Y,%m,%d')
         end
 
-        dates_map[start_on.strftime('%Y-%m-%d')] || enrollment_timetable_by_effective_date(start_on)[:binder_payment_due_on]
+        dates_map[start_on.strftime('%Y-%m-%d')] || enrollment_timetable_by_effective_date(is_renewing, start_on)[:binder_payment_due_on]
       end
 
       def shop_enrollment_timetable(new_effective_date)
@@ -223,10 +223,10 @@ module BenefitSponsors
         date
       end
 
-      def default_dates_for_coverage_starting_on(coverage_start_date)
+      def default_dates_for_coverage_starting_on(is_renewing, coverage_start_date)
         effective_date            = coverage_start_date.to_date.beginning_of_month
         effective_period          = effective_date..(effective_date + 1.year - 1.day)
-        open_enrollment_period    = open_enrollment_period_by_effective_date(effective_date)
+        open_enrollment_period    = open_enrollment_period_by_effective_date(is_renewing, effective_date)
         {
             effective_period: effective_period,
             open_enrollment_period: open_enrollment_period,
