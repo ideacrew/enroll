@@ -26,7 +26,7 @@ Feature: IVL plan purchase
     When ivl clicked continue on household info page
     Then consumer should see all the family members names
     When consumer unchecks the primary person
-    And consumer clicked on shop for new plan
+    And consumer clicks Shop for new plan button
     Then consumer should only see the dependent name
 
   Scenario: IVL having an ineligible family member & doing plan shop
@@ -58,6 +58,7 @@ Feature: IVL plan purchase
     And user for consumer Patrick Doe present
     And consumer Patrick Doe has active individual enrollment
     And active individual enrollment for Patrick Doe has product with title of IVL Test Plan Gold
+    And only product available is that of active enrollment for Patrick Doe
     And user for consumer Patrick Doe is logged in
     And consumer has successful ridp
     When current user visits the family home page
@@ -66,18 +67,19 @@ Feature: IVL plan purchase
     When Admin clicks CONTINUE button
     And I click on continue button on household info form
     When current user visits the family home page
-    And I click on continue button on group selection page
     And I see $200.00 premium for my plan IVL Test Plan Gold
     And consumer clicked on "Married" qle
     And I select a past qle date
     Then I should see confirmation and continue
     When I click on continue button on household info form
-    And I click the Shop for new plan button
+    And consumer clicks Shop for new plan button
     Then consumer should see the list of plans
-    When consumer selects the same plan as the previous year on the plan shopping page
-    And the consumer sees the premium for the plan is the same as preceeding year
-    When Employee clicks on Confirm button on the coverage summary page
-    And the consumer sees the premium for the plan is the same as preceeding year
-    Then Employee clicks back to my account button
-    And the consumer sees the premium for the plan is the same as preceeding year
+    And I see $200.00 premium for my plan IVL Test Plan Gold
+    When Patrick Doe selects the same health plan as the previous year on the plan shopping page
+    And I see $200.00 premium for my plan IVL Test Plan Gold
+    And Patrick Doe enters their name to sign and clicks the confirmation checkbox
+    When consumer clicks on Confirm button on the coverage summary page
+    And I see $200.00 premium for my plan IVL Test Plan Gold
+    Then consumer clicks back to my account button
+    And I see $200.00 premium for my plan IVL Test Plan Gold
 
