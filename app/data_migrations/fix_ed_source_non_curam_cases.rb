@@ -27,6 +27,7 @@ CSV.open(file_name, 'w', force_quotes: true) do |csv|
   csv << field_names
 
   Family.where(:"households.tax_households.eligibility_determinations.source" => 'Admin_Script').inject([]) do |_dummy, family|
+    person = family.primary_person
     family.active_household.tax_households.where(:"eligibility_determinations.source" => 'Admin_Script').each do |thh|
       thh.eligibility_determinations.where(source: 'Admin_Script').each do |ed|
         next ed if ed.source != 'Admin_Script'
