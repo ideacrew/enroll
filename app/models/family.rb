@@ -1065,7 +1065,6 @@ class Family
 
   def all_persons_vlp_documents_status
     outstanding_types = []
-    outstanding_types = []
     fully_uploaded = []
     in_review = []
     self.active_family_members.each do |member|
@@ -1073,7 +1072,7 @@ class Family
       in_review = in_review + member.person.verification_types.active.select{|type| ["review"].include? type.validation_status }
       fully_uploaded = fully_uploaded + member.person.verification_types.active.select{ |type| type.type_verified? }
     end
-    
+
     if (fully_uploaded.any? || in_review.any?) && !outstanding_types.any?
       "Fully Uploaded"
     elsif outstanding_types.any? && in_review.any?
