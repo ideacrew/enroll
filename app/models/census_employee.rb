@@ -560,7 +560,7 @@ class CensusEmployee < CensusMember
   end
 
   def active_benefit_group_assignment
-    benefit_package_assignment_on(TimeKeeper.date_of_record) || benefit_group_assignments.benefit_group_assignments.order_by(:start_on.asc).last
+    benefit_package_assignment_on(TimeKeeper.date_of_record) || benefit_group_assignments.order_by(:start_on.asc).last
   end
 
   def renewal_benefit_group_assignment
