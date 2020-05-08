@@ -126,7 +126,8 @@ And(/(.*) selects eligible immigration status$/) do |text|
     find(:xpath, '//label[@for="dependent_eligible_immigration_status_true"]').click
   else
     find(:xpath, '//label[@for="person_us_citizen_false"]').click
-    find(:xpath, '//label[@for="person_eligible_immigration_status_true"]').click
+    find('label[for=person_eligible_immigration_status_true]').click
+    choose 'person_eligible_immigration_status_true', visible: false, allow_label_click: true
   end
 end
 
@@ -136,11 +137,9 @@ Then(/Individual should see the i94 text/) do
   expect(page).to have_content("The I-94 number is also called the admissions number. It is an 11 character sequence found printed on Arrival/Departure records (For I-94 or Form I-94A.) It can also be found on the form I-9.")
 end
 
-Then(/selects i94 document and fills required details (.*)$/) do |correct_or_incorrect|
-  find('.label', :text => 'Select document type', wait: 10).click
-  find('li', :text => "I-94 (Arrival/Departure Record)", match: :prefer_exact, wait: 10).click
-  fill_in 'I 94 Number', with: (correct_or_incorrect == 'correctly' ? '123456789a1' : '@23#5678901')
-  step 'should fill in valid sevis, expiration_date, tribe_member and incarcerated details'
+Then(/selects the i94 document and fills required details (.*)$/) do |correct_or_incorrect|
+  step "user selects i94 document and fills required details #{correct_or_incorrect}"
+  step 'should fill in valid sevis, passport expiration_date, tribe_member and incarcerated details'
 end
 
 Then(/selects i94 unexpired foreign passport document and fills required details (.*)$/) do |correct_or_incorrect|
@@ -149,23 +148,25 @@ Then(/selects i94 unexpired foreign passport document and fills required details
   fill_in 'I 94 Number', with: (correct_or_incorrect == 'correctly' ? '123456789a1' : '@23#5678901')
   fill_in 'Passport Number', with: 'A123456'
   fill_in 'Visa number', with: 'V1234567'
-  step 'should fill in valid sevis, expiration_date, tribe_member and incarcerated details'
+  step 'should fill in valid sevis, passport expiration_date, tribe_member and incarcerated details'
 end
 
 Then(/selects Other With I-94 Number document and fills required details (.*)$/) do |correct_or_incorrect|
   find('.label', :text => 'Select document type', wait: 10).click
-  find('li', :text => "Other (With I-94 Number)", match: :prefer_exact, wait: 10).click
+  find('li', :text => 'Other (With I-94 Number)', match: :prefer_exact, wait: 10).click
   fill_in 'I 94 Number', with: (correct_or_incorrect == 'correctly' ? '123456789a1' : '@23#5678901')
   fill_in 'Passport Number', with: 'A123456'
-  step 'should fill in valid sevis, expiration_date, tribe_member and incarcerated details'
+  fill_in 'Document Description', with: 'Other With I94 Number'
+  step 'should fill in valid sevis, passport expiration_date, tribe_member and incarcerated details'
 end
 
-And(/should fill in valid sevis, expiration_date, tribe_member and incarcerated details/) do
+And(/should fill in valid sevis, passport expiration_date, tribe_member and incarcerated details/) do
   fill_in 'SEVIS ID', with: '1234567891'
-  fill_in 'Expiration Date', with: TimeKeeper.date_of_record.to_s
+  fill_in 'Passport Expiration Date', with: TimeKeeper.date_of_record.to_s
   click_link((TimeKeeper.date_of_record + 10.days).day.to_s)
   find('label[for=indian_tribe_member_no]', wait: 20).click
   find('label[for=radio_incarcerated_no]', wait: 10).click
+  choose 'radio_incarcerated_no', visible: false, allow_label_click: true
 end
 
 Then /^Individual (.*) go to Authorization and Consent page$/ do |argument|
@@ -181,7 +182,7 @@ Then(/select I-551 doc and fill details/) do
   find('li', :text => 'I-551 (Permanent Resident Card)', wait: 10).click
   fill_in 'Alien Number', with: '987654323'
   fill_in 'Card Number', with: 'aaa1231231231'
-  fill_in 'Expiration Date', with: TimeKeeper.date_of_record.to_s
+  fill_in 'I-551 Expiration Date', with: TimeKeeper.date_of_record.to_s
   click_link((TimeKeeper.date_of_record + 10.days).day)
 end
 
@@ -194,7 +195,8 @@ Then(/click citizen no/) do
 end
 
 When(/click eligible immigration status yes/) do
-  find(:xpath, '//label[@for="person_eligible_immigration_status_true"]').click
+  find('label[for=person_eligible_immigration_status_true]', wait: 20).click
+  choose 'person_eligible_immigration_status_true', visible: false, allow_label_click: true
 end
 
 Then(/should find I-551 doc type/) do
