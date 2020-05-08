@@ -135,6 +135,7 @@ describe Subscribers::PolicyTerminationsSubscriber do
     before :each do
       allow(existing_enrollment).to receive(:may_terminate_coverage?).and_return(true)
       allow(existing_enrollment).to receive(:may_terminate_for_non_payment?).and_return(true)
+      allow(existing_enrollment).to receive(:update_attributes).and_return(true)
     end
 
     context "given termination date less than termination date on enrollment" do
@@ -174,6 +175,7 @@ describe Subscribers::PolicyTerminationsSubscriber do
     before :each do
       allow(existing_enrollment).to receive(:may_terminate_coverage?).and_return(true)
       allow(existing_enrollment).to receive(:may_terminate_for_non_payment?).and_return(true)
+      allow(existing_enrollment).to receive(:update_attributes).and_return(true)
     end
 
     context "given termination date less than termination date on enrollment" do
