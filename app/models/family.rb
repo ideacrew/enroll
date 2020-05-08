@@ -18,6 +18,7 @@ class Family
   include Sortable
   include Mongoid::Autoinc
   include DocumentsVerificationStatus
+  include RemoveFamilyMember
 
   IMMEDIATE_FAMILY = %w(self spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter stepchild domestic_partner)
 
@@ -668,28 +669,46 @@ class Family
   # Remove {FamilyMember} referenced by this {Person}
   #
   # @param [ Person ] person The {Person} to remove from the family.
-  def remove_family_member(person, family_member = nil)
+  def remove_family_member(person)
     # Check if duplicate family member that shares person record with another family_member
-    family_member = find_family_member_by_person(person)
     family_members_with_person_id = family_members.where(person_id: person.id)
-    # This destroys the duplicate family member.
+    # Deleting the family member  if there is more than 1 object with same person id
     if family_members_with_person_id.count > 1
-      family_members.where(id: family_member.id).first.destroy
-      # Households will sometimes only have one coverage_household_member for a family member as
-      # expected, so for duplicates this method will NOT destroy
-      # the coverage household member unless its the undisputed final family_member
+      fm_ids = family_members_with_person_id.pluck(:id)
+      if duplicate_enr_members_or_tax_members_present?(fm_ids)
+        return [false, "Cannot remove the duplicate members as they are present on enrollments/tax households. Please call customer service at 1-855-532-5465"]
+      else
+        status, messages = remove_duplicate_members(fm_ids)
+        self.reload
+        [status, "Successfully removed duplicate members"]
+      end
     else
       # This will also destroy the coverage_household_member
-      if family_member.present?
+      if family_members_with_person_id.present?
+        family_member = family_members_with_person_id.first
         # Note: Forms::FamilyMember.rb calls the save on destroy!
         # here is_active is only set in memory
         family_member.is_active = false
         active_household.remove_family_member(family_member)
       end
-      family_member
+      [true, "Successfully removed family member"]
     end
   end
 
+  def duplicate_members_present_on_enrollments?(fm_ids)
+    enrollments = hbx_enrollments.where(:"aasm_state".nin => ["shopping"])
+    enrollment_member_fm_ids = enrollments.flat_map(&:hbx_enrollment_members).map(&:applicant_id)
+    (enrollment_member_fm_ids & fm_ids).present?
+  end
+
+  def duplicate_members_present_on_active_tax_households?(fm_ids)
+    tax_household_applicant_ids =  active_household.tax_household_applicant_ids
+    (tax_household_applicant_ids & fm_ids).present?
+  end
+
+  def duplicate_enr_members_or_tax_members_present?(fm_ids)
+    duplicate_members_present_on_enrollments?(fm_ids) || duplicate_members_present_on_active_tax_households?(fm_ids)
+  end
   # Determine if {Person} is a member of this family
   #
   # @example Is this person a family member?

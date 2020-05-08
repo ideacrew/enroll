@@ -45,6 +45,7 @@ RSpec.describe Products::QhpController, :type => :controller, dbclean: :around_e
     family: family,
     household: family.active_household,
     product: health_product,
+    employee_role_id: employee_role.id,
     sponsored_benefit_id: package.health_sponsored_benefit.id,
     benefit_sponsorship_id: benefit_sponsorship.id,
     sponsored_benefit_package_id: package.id,
