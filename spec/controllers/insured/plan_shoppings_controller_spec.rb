@@ -142,7 +142,6 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
         expect(person.inbox.messages.count).to eq(1)
         get :receipt, params: {id: "id"}
         expect(person.inbox.messages.count).to eq(2)
-        expect(person.inbox.messages.last.subject).to eq("Your Enrollment Confirmation")
       end
 
       it "should send send secure message to SHOP person inbox"do
@@ -151,7 +150,6 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
         expect(person.inbox.messages.count).to eq(1)
         get :receipt, params: {id: "id"}
         expect(person.inbox.messages.count).to eq(2)
-        expect(person.inbox.messages.last.subject).to eq("Your Enrollment Confirmation")
       end
     end
   end

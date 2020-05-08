@@ -893,14 +893,8 @@ end
 Then(/^.+ should see the appropriate (.*?) template text$/) do |market_name|
   case market_name
   when 'SHOP'
-    expect(page).to have_content("Your Enrollment Confirmation")
     expect(page).to have_content('plan offered by your employer.')
     expect(page).to have_content('Your employer contributes')
-    expect(page).to have_content('Thank you for enrolling in coverage through DC Health Link')
-    # In the email signature
-    [Settings.site.short_name, Settings.contact_center.short_number, Settings.contact_center.tty].each do |email_signature_line|
-      expect(page).to have_content(email_signature_line)
-    end
   end
 end
 
