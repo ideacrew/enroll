@@ -1,0 +1,17 @@
+<div class="container" style="margin-top: 5px;">
+  <div class="alert alert-success" role="alert">
+    <h4 class="alert-heading"><strong>Your browser is not supported</strong></h4>
+    <p>On <%=  Date.strptime(Settings.aca.block_ie_browser_after.to_s, '%m/%d/%y').strftime('%B %d, %Y') %>, HCB stopped supporting older versions of Internet Explorer. To use this website, please download the latest version of one of the compatible browsers below:</p>
+    <br>
+    <ul>
+      <li><a href='https://www.microsoft.com/en-us/edge' target='_blank'>Microsoft Edge</a></li>
+      <li><a href='https://www.google.com/chrome/' target='_blank'>Chrome</a></li>
+      <li><a href='https://www.mozilla.org/en-US/firefox/' target='_blank'>Firefox</a></li>
+      <li><a href='https://www.opera.com/download' target='_blank'>Opera</a></li>
+    </ul>
+    <hr>
+    <p class="mb-0"><strong>Questions?</strong></p>
+    <br>
+    <p>Call customer service at <%=  Settings.contact_center.alt_phone_number %> (TTY: <%=  Settings.contact_center.tty_number %> for people who are deaf, hard of hearing, or speech disabled.) We’re available Monday through Friday, 8:00 a.m. to 6:00 p.m.</p>
+  </div>
+</div>

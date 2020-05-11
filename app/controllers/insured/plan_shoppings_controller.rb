@@ -156,6 +156,9 @@ class Insured::PlanShoppingsController < ApplicationController
     @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
     sponsored_cost_calculator = HbxEnrollmentSponsoredCostCalculator.new(@hbx_enrollment)
     products = @hbx_enrollment.sponsored_benefit.products(@hbx_enrollment.sponsored_benefit.rate_schedule_date)
+
+    #Refs #87282. Search the products again to get the updated hsa_eligibility.
+    products = ::BenefitMarkets::Products::Product.find(products.map(&:id))
     @issuer_profiles = []
     @issuer_profile_ids = products.map(&:issuer_profile_id).uniq
     ip_lookup_table = {}

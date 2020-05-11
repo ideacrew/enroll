@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
   before_filter :confirm_existing_password, only: [:change_password]
-  before_action :set_user, except: [:confirm_lock]
+  before_action :set_user, except: [:confirm_lock, :unsupportive_browser]
 
   def confirm_lock
     params.permit!
@@ -88,6 +88,9 @@ class UsersController < ApplicationController
 
   def login_history
     @user_login_history = SessionIdHistory.for_user(user_id: user.id).order('created_at DESC').page(params[:page]).per(15)
+  end
+
+  def unsupportive_browser
   end
   
   private

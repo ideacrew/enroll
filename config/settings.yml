@@ -158,6 +158,9 @@ aca:
   security_questions: true
   user_accounts_enabled: true
   autopay_enabled: true
+  support_for_ie_browser: false
+  block_ie_browser: true
+  block_ie_browser_after: <%= Date.new(2020,6,1) %>
   plan_options_available: ["sole_source", "single_carrier", "metal_level"]
   dental_plan_options_available: ["single_plan"]
   ## acceptable options are ["sole_source", "single_carrier", "metal_level", "single_plan"]
