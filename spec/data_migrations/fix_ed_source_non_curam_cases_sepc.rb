@@ -11,27 +11,48 @@ describe 'fix_ed_source_non_curam_cases' do
   let(:year) { TimeKeeper.date_of_record.year }
 
   context 'ed creation using Create Eligibility tool' do
-    before :each do
-      eligibilty_determination.assign_attributes({source: 'Admin_Script', created_at: Date.new(year, 12, 26)})
-      eligibilty_determination.save!(validate: false)
-      invoke_fix_ed_source_non_curam_cases
-      @file_content = CSV.read("#{Rails.root}/list_of_ed_object_ids_for_non_curam_cases.csv")
+    context 'with source Admin_Script' do
+      before :each do
+        eligibilty_determination.assign_attributes({source: 'Admin_Script', created_at: Date.new(year, 12, 26)})
+        eligibilty_determination.save!(validate: false)
+        invoke_fix_ed_source_non_curam_cases
+        eligibilty_determination.reload
+        @file_content = CSV.read("#{Rails.root}/list_of_ed_object_ids_for_non_curam_cases.csv")
+      end
+
+      it 'should add data to the file' do
+        expect(@file_content.size).to be > 1
+      end
+
+      it 'should match with the person hbx_id' do
+        expect(@file_content[1][0]).to eq(person.hbx_id)
+      end
+
+      it 'should match with the ed_object_id' do
+        expect(@file_content[1][1]).to eq(eligibilty_determination.id.to_s)
+      end
+
+      it 'should match with the expected source' do
+        expect(@file_content[1][2]).to eq('Admin')
+      end
+
+      it 'should return Admin as the source Create Eligibility tool' do
+        expect(eligibilty_determination.source).to eq('Admin')
+      end
     end
 
-    it 'should add data to the file' do
-      expect(@file_content.size).to be > 1
-    end
+    context 'with source nil' do
+      before :each do
+        eligibilty_determination.assign_attributes({source: nil, created_at: Date.new(year, 12, 26)})
+        eligibilty_determination.save!(validate: false)
+        invoke_fix_ed_source_non_curam_cases
+        eligibilty_determination.reload
+        @file_content = CSV.read("#{Rails.root}/list_of_ed_object_ids_for_non_curam_cases.csv")
+      end
 
-    it 'should match with the person hbx_id' do
-      expect(@file_content[1][0]).to eq(person.hbx_id)
-    end
-
-    it 'should match with the ed_object_id' do
-      expect(@file_content[1][1]).to eq(eligibilty_determination.id.to_s)
-    end
-
-    it 'should return Admin as the source Create Eligibility tool' do
-      expect(@file_content[1][2]).to eq('Admin')
+      it 'should return Admin as the source Create Eligibility tool' do
+        expect(eligibilty_determination.source).to eq('Admin')
+      end
     end
   end
 
