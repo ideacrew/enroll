@@ -9,27 +9,46 @@ describe 'fix_ed_source_curam_cases' do
   end
   include_context 'setup one tax household with one ia member'
 
-  before :each do
-    eligibilty_determination.assign_attributes({source: nil})
-    eligibilty_determination.save!(validate: false)
-    invoke_fix_ed_source_curam_cases
-    @file_content = CSV.read("#{Rails.root}/list_of_ed_object_ids_for_curam_cases.csv")
+  context 'valid curam determination' do
+    before :each do
+      eligibilty_determination.assign_attributes({e_pdc_id: '3023385'})
+      eligibilty_determination.save!(validate: false)
+      invoke_fix_ed_source_curam_cases
+      @file_content = CSV.read("#{Rails.root}/list_of_ed_object_ids_for_curam_cases.csv")
+    end
+
+    it 'should add data to the file' do
+      expect(@file_content.size).to be > 1
+    end
+
+    it 'should match with the person hbx_id' do
+      expect(@file_content[1][0]).to eq(person.hbx_id)
+    end
+
+    it 'should match with the ed_object_id' do
+      expect(@file_content[1][1]).to eq(eligibilty_determination.id.to_s)
+    end
+
+    it 'should match with the expected source' do
+      expect(@file_content[1][2]).to eq('Curam')
+    end
+
+    it 'should update the eligibilty_determination object' do
+      expect(eligibilty_determination.source).to eq('Curam')
+    end
   end
 
-  it 'should add data to the file' do
-    expect(@file_content.size).to be > 1
-  end
+  context 'invalid curam determination' do
+    before do
+      eligibilty_determination.assign_attributes({e_pdc_id: nil, source: 'Admin'})
+      eligibilty_determination.save!(validate: false)
+      invoke_fix_ed_source_curam_cases
+      @file_content = CSV.read("#{Rails.root}/list_of_ed_object_ids_for_curam_cases.csv")
+    end
 
-  it 'should match with the person hbx_id' do
-    expect(@file_content[1][0]).to eq(person.hbx_id)
-  end
-
-  it 'should match with the ed_object_id' do
-    expect(@file_content[1][1]).to eq(eligibilty_determination.id.to_s)
-  end
-
-  it 'should return Curam as the source Curam' do
-    expect(@file_content[1][2]).to eq('Curam')
+    it 'should not update the eligibilty_determination object' do
+      expect(eligibilty_determination.source).not_to eq('Curam')
+    end
   end
 
   after :each do
