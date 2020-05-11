@@ -11,14 +11,12 @@ file_name = "#{Rails.root}/list_of_ed_object_ids_for_curam_cases.csv"
 CSV.open(file_name, 'w', force_quotes: true) do |csv|
   csv << field_names
 
-  Family.where(:"households.tax_households.eligibility_determinations.source" => nil).inject([]) do |_dummy, family|
+  Family.where(:"households.tax_households.eligibility_determinations.e_pdc_id".ne => nil).inject([]) do |_dummy, family|
     person = family.primary_person
-    family.active_household.tax_households.where(:"eligibility_determinations.source" => nil).each do |thh|
-      thh.eligibility_determinations.where(source: nil).each do |ed|
-        if ed.source.nil?
-          ed.update_attributes!(source: 'Curam')
-          csv << [person.hbx_id, ed.id, ed.source]
-        end
+    family.active_household.tax_households.where(:"eligibility_determinations.e_pdc_id".ne => nil).each do |thh|
+      thh.eligibility_determinations.where(:e_pdc_id.ne => nil).each do |ed|
+        ed.update_attributes!(source: 'Curam')
+        csv << [person.hbx_id, ed.id, ed.source]
       end
     end
   rescue StandardError => e
