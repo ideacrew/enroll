@@ -1,5 +1,8 @@
 require 'rails_helper'
 describe Forms::ConsumerCandidate, "asked to match a person", dbclean: :after_each do
+  before do
+    DatabaseCleaner.clean
+  end
 
   let(:user){ create(:user) }
   let!(:person) { create(:person, :with_ssn, user: user) }
