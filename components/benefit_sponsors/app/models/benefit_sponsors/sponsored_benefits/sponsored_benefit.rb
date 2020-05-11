@@ -40,6 +40,7 @@ module BenefitSponsors
 
       def product_package_exists
         if product_package.blank? && source_kind == :benefit_sponsor_catalog
+          byebug
           self.errors.add(:base => "Unable to find mappable product package")
         end
       end
@@ -84,8 +85,9 @@ module BenefitSponsors
       end
 
       def issuers_offered
-        return [] if product_package.blank?
-        product_package.products.pluck(:issuer_profile_id).uniq
+        return [] if products(benefit_package.start_on).blank?
+
+        products(benefit_package.start_on).map(&:issuer_profile_id).uniq
       end
 
       def latest_pricing_determination
