@@ -26,13 +26,11 @@ end
 CSV.open(file_name, 'w', force_quotes: true) do |csv|
   csv << field_names
 
-  Family.where(:"households.tax_households.eligibility_determinations.source" => 'Admin_Script').inject([]) do |_dummy, family|
+  Family.where(:"households.tax_households.eligibility_determinations.source".in => ['Admin_Script', nil]).inject([]) do |_dummy, family|
     person = family.primary_person
-    family.active_household.tax_households.where(:"eligibility_determinations.source" => 'Admin_Script').each do |thh|
-      thh.eligibility_determinations.where(source: 'Admin_Script').each do |ed|
-        next ed if ed.source != 'Admin_Script'
-
-        if object_created_by_renewals(ed)
+    family.active_household.tax_households.where(:"eligibility_determinations.source".in => ['Admin_Script', nil]).each do |thh|
+      thh.eligibility_determinations.where(:source.in => ['Admin_Script', nil]).each do |ed|
+        if ed.source == 'Admin_Script' && object_created_by_renewals(ed)
           ed.update_attributes!(source: 'Renewals')
         else
           ed.update_attributes!(source: 'Admin')
