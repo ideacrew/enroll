@@ -69,9 +69,9 @@ namespace :reports do
                   per&.race,
                   per&.ethnicity,
                   per&.citizen_status,
-                  py.blank? ? nil : py.start_on,
-                  py.blank? ? nil : py.end_on,
-                  py.blank? ? nil : py.aasm_state,
+                  py&.start_on,
+                  py&.end_on,
+                  py&.aasm_state,
                 ]
               end
             end
