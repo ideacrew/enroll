@@ -33,21 +33,40 @@ describe 'fix_ed_source_curam_cases' do
       expect(@file_content[1][2]).to eq('Curam')
     end
 
+    it 'should add e_pdc_id data' do
+      expect(@file_content[1][3]).to be_truthy
+    end
+
     it 'should update the eligibilty_determination object' do
       expect(eligibilty_determination.source).to eq('Curam')
     end
   end
 
   context 'invalid curam determination' do
-    before do
-      eligibilty_determination.assign_attributes({e_pdc_id: nil, source: 'Admin'})
-      eligibilty_determination.save!(validate: false)
-      invoke_fix_ed_source_curam_cases
-      @file_content = CSV.read("#{Rails.root}/list_of_ed_object_ids_for_curam_cases.csv")
+    context 'with e_pdc_id nil' do
+      before do
+        eligibilty_determination.assign_attributes({e_pdc_id: nil, source: 'Admin'})
+        eligibilty_determination.save!(validate: false)
+        invoke_fix_ed_source_curam_cases
+        @file_content = CSV.read("#{Rails.root}/list_of_ed_object_ids_for_curam_cases.csv")
+      end
+
+      it 'should not update the eligibilty_determination object' do
+        expect(eligibilty_determination.source).not_to eq('Curam')
+      end
     end
 
-    it 'should not update the eligibilty_determination object' do
-      expect(eligibilty_determination.source).not_to eq('Curam')
+    context 'with e_pdc_id MANUALLY_9_2_2016LOADING530' do
+      before do
+        eligibilty_determination.assign_attributes({e_pdc_id: 'MANUALLY_9_2_2016LOADING530', source: 'Admin'})
+        eligibilty_determination.save!(validate: false)
+        invoke_fix_ed_source_curam_cases
+        @file_content = CSV.read("#{Rails.root}/list_of_ed_object_ids_for_curam_cases.csv")
+      end
+
+      it 'should not update the eligibilty_determination object' do
+        expect(eligibilty_determination.source).not_to eq('Curam')
+      end
     end
   end
 
