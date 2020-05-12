@@ -10,7 +10,7 @@ require File.join(Rails.root, 'lib/mongoid_migration_task')
 # and cannot differentiate if the object got created
 # via Create Eligibility or Renewals.
 
-field_names = %w[person_hbx_id ed_object_id source]
+field_names = %w[person_hbx_id ed_object_id source e_pdc_id]
 file_name = "#{Rails.root}/list_of_ed_object_ids_for_non_curam_cases.csv"
 
 # Assuming the objects with source 'Admin_Script' that got created
@@ -35,7 +35,7 @@ CSV.open(file_name, 'w', force_quotes: true) do |csv|
         else
           ed.update_attributes!(source: 'Admin')
         end
-        csv << [person.hbx_id, ed.id, ed.source]
+        csv << [person.hbx_id, ed.id, ed.source, ed.e_pdc_id]
       end
     end
   rescue StandardError => e
