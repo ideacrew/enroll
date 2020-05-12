@@ -36,6 +36,10 @@ describe 'fix_ed_source_non_curam_cases' do
         expect(@file_content[1][2]).to eq('Admin')
       end
 
+      it 'should add e_pdc_id data' do
+        expect(@file_content[1][3]).to be_truthy
+      end
+
       it 'should return Admin as the source Create Eligibility tool' do
         expect(eligibilty_determination.source).to eq('Admin')
       end
