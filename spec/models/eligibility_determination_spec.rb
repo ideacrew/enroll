@@ -2,14 +2,14 @@ require 'rails_helper'
 
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
-  it { should validate_presence_of :determined_on }
+  it { should validate_presence_of :determined_at }
   it { should validate_presence_of :max_aptc }
   it { should validate_presence_of :csr_percent_as_integer }
 
   let(:family)                        { FactoryBot.create(:family, :with_primary_family_member) }
   let(:household)                     { family.households.first }
   let(:tax_household)                 { FactoryBot.create(:tax_household, household: household) }
-  let(:determined_on)                 { TimeKeeper.datetime_of_record }
+  let(:determined_at)                 { TimeKeeper.datetime_of_record }
   let(:max_aptc)                      { 217.85 }
   let(:csr_percent_as_integer)        { 94 }
   let(:csr_eligibility_kind)          { "csr_94" }
@@ -23,7 +23,7 @@ RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
   let(:valid_params){
       {
         tax_household: tax_household,
-        determined_on: determined_on,
+        determined_at: determined_at,
         max_aptc: max_aptc,
         csr_percent_as_integer: csr_percent_as_integer,
         e_pdc_id: e_pdc_id,
@@ -46,11 +46,23 @@ RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
       end
     end
 
-    context "with no determined on" do
-      let(:params) {valid_params.except(:determined_on)}
+    context "with no determined at" do
+      let(:valid_params){
+        {
+          tax_household: tax_household,
+          determined_at: nil,
+          max_aptc: max_aptc,
+          csr_percent_as_integer: csr_percent_as_integer,
+          e_pdc_id: e_pdc_id,
+          premium_credit_strategy_kind: premium_credit_strategy_kind,
+        }
+      }
+      before :each do
+        allow(tax_household).to receive(:submitted_at).and_return(nil)
+      end
 
       it "should fail validation" do
-        expect(EligibilityDetermination.create(**params).errors[:determined_on].any?).to be_truthy
+        expect(EligibilityDetermination.create(**valid_params).errors[:determined_at].any?).to be_truthy
       end
     end
 
