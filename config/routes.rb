@@ -308,7 +308,11 @@ Rails.application.routes.draw do
 
     resources :group_selections, controller: "group_selection", only: [:new, :create] do
       collection do
+        post :cancel
+        post :edit_aptc
+        post :term_or_cancel
         post :terminate
+        get :edit_plan
         get :terminate_selection
         get :terminate_confirm
       end
@@ -552,16 +556,6 @@ Rails.application.routes.draw do
 
   resources :translations
 
-  namespace :api, :defaults => {:format => 'xml'} do
-    namespace :v1 do
-      resources :slcsp, :only => []  do
-        collection do
-          post :plan
-        end
-      end
-    end
-  end
-
   ############################# TO DELETE BELOW ##############################
 
   # FIXME: Do this properly later
@@ -700,5 +694,56 @@ Rails.application.routes.draw do
   #   end
   #
   # You can have the root of your site routed with "root"
+
+  # API check_ach_routing
+
+  resources :external_applications, only: [:show]
+
+  namespace :api, defaults: {format: 'json'} do
+    namespace :v1 do
+      scope module: :api do
+        get :ping
+      end
+
+      resources :brokers, only: %i[index show] do
+        collection do
+          get :broker_staff
+        end
+      end
+
+      resources :agencies, only: %i[index] do
+        collection do
+          get :agency_staff
+          get 'agency_staff/:person_id', to: 'agencies#agency_staff_detail'
+          post 'agency_staff/:person_id/terminate/:role_id', to: 'agencies#terminate'
+          patch 'agency_staff/:person_id', to: 'agencies#update_person'
+          patch 'agency_staff/:person_id/email', to: 'agencies#update_email'
+          get :primary_agency_staff
+        end
+      end
+
+      resources :slcsp, :only => []  do
+        collection do
+          post :plan
+        end
+      end
+    end
+
+    namespace :v2 do
+      resources :auth_tokens, only: [] do
+        collection do
+          post :refresh
+          delete :logout
+        end
+      end
+
+      resources :users, only: [] do
+        collection do
+          get :current
+        end
+      end
+    end
+  end
+
   root 'welcome#index'
 end

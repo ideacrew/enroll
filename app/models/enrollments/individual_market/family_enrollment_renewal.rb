@@ -59,20 +59,17 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   end
 
   def can_renew_assisted_product?(renewal_enrollment)
-    if @assisted
-      tax_household = enrollment.family.active_household.latest_active_thh_with_year(renewal_coverage_start.year)
-      members = tax_household.tax_household_members
-      enrollment_members_in_thh = members.where(:applicant_id.in => renewal_enrollment.hbx_enrollment_members.map(&:applicant_id))
-      enrollment_members_in_thh.all? {|m| m.is_ia_eligible == true}
-    else
-      false
-    end
+    return false unless @assisted
+
+    tax_household = enrollment.family.active_household.latest_active_thh_with_year(renewal_coverage_start.year)
+    members = tax_household.tax_household_members
+    enrollment_members_in_thh = members.where(:applicant_id.in => renewal_enrollment.hbx_enrollment_members.map(&:applicant_id))
+    enrollment_members_in_thh.all? {|m| m.is_ia_eligible == true}
   end
 
   def assisted_enrollment(renewal_enrollment)
     renewal_service = Services::IvlEnrollmentRenewalService.new(renewal_enrollment)
     renewal_service.assign(@aptc_values)
-    renewal_service.hbx_enrollment
   end
 
   def is_dependent_dropped?
@@ -115,7 +112,10 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
 
   def fetch_cat_age_off_product(product)
     # As per ticket: 61716
-    if renewal_coverage_start.year.to_s == "2020" && CAT_AGE_OFF_HIOS_IDS.include?(product.hios_base_id)
+    # FIXME: DON'T EVER DO THIS!
+    # We are incrementing the year to do for all future years too,
+    # which won't work because the HIOS IDs won't be the same
+    if renewal_coverage_start.year.to_i >= 2020 && CAT_AGE_OFF_HIOS_IDS.include?(product.hios_base_id)
       base_id = if product.hios_base_id == "94506DC0390008"
                   "94506DC0390010"
                 elsif product.hios_base_id == "86052DC0400004"

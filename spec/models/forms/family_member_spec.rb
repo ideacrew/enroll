@@ -120,7 +120,7 @@ describe Forms::FamilyMember do
   context "assign_person_address" do
     let(:addr1) {Address.new(zip: '1234', state: 'DC')}
     let(:addr2) {Address.new(zip: '4321', state: 'DC')}
-    let(:addr3) {Address.new(zip: '1234', state: 'DC', 'address_3' => "abc")}
+    let(:addr3) { FactoryBot.build(:address) }
     let(:person) {FactoryBot.create(:person)}
     let(:primary) {FactoryBot.create(:person)}
     let(:family) {double(primary_family_member: double(person: primary))}
@@ -142,15 +142,24 @@ describe Forms::FamilyMember do
       end
 
       it "add new address if address present" do
-        allow(primary).to receive(:home_address).and_return addr3
+        primary_home_address = primary.home_address
+        person.home_address.destroy
+        person.save!
         employee_dependent.assign_person_address(person)
-        expect(person.addresses.include?(addr3)).to eq true
+        expect(person.home_address.matches_addresses?(primary_home_address)).to be_truthy
       end
 
       it "not add new address if address blank" do
+        dep_home_address = person.home_address
         allow(primary).to receive(:home_address).and_return nil
         employee_dependent.assign_person_address(person)
-        expect(person.addresses.include?(addr3)).to eq false
+        expect(person.home_address).to eq(dep_home_address)
+      end
+
+      it 'should not copy the address object id' do
+        primary_home_address = primary.home_address
+        employee_dependent.assign_person_address(person)
+        expect(person.addresses.pluck(:id)).not_to include(primary_home_address.id)
       end
     end
 
@@ -566,6 +575,36 @@ describe Forms::FamilyMember, "relationship validation" do
 
       expect(dependent.valid?).to be true
       expect(dependent.errors[:base].any?).to be_falsey
+    end
+  end
+
+  context "deletion of a duplicate family member" do
+    # This creates a child
+    let!(:individual_family) { FactoryBot.create(:individual_market_family_with_spouse_and_two_disabled_children) }
+    let!(:first_dependent_person_id ) do
+      first_dependent.person_id
+    end
+    let!(:first_dependent) do
+      individual_family.dependents[1]
+    end
+    let(:last_dependent) do
+      individual_family.dependents[2]
+    end
+    let(:dependent) { Forms::FamilyMember.find(first_dependent.id) }
+
+    before :each do
+      allow(::FamilyMember.find(first_dependent.id)).to receive(:person).and_return(first_dependent.person)
+      expect(individual_family.dependents.count).to eq(3)
+      # Set new child to original child dependent person id
+      first_dependent.person_id = last_dependent.person_id
+      first_dependent.save(:validate => false)
+      expect(first_dependent.person_id).to eq(last_dependent.person_id)
+      # Calling the Forms::FamilyMember#destroy
+      dependent.destroy!
+      individual_family.reload
+    end
+    it "should delete the duplicate family member" do
+      expect(individual_family.dependents.count).to eq(2)
     end
   end
 end

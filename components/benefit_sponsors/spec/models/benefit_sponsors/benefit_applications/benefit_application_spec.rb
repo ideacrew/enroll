@@ -531,6 +531,42 @@ module BenefitSponsors
           expect(renewal_application.benefit_sponsor_catalog).to eq renewal_benefit_sponsor_catalog
         end
 
+        context "send_employee_renewal_invites" do
+          let!(:census_employee_1) do
+            FactoryBot.create(:census_employee, benefit_sponsors_employer_profile_id: employer_profile.id, benefit_sponsorship: benefit_sponsorship, :benefit_group_assignments => [benefit_group_assignment])
+          end
+          let!(:census_employee_2) do
+            FactoryBot.create(:census_employee, benefit_sponsors_employer_profile_id: employer_profile.id, benefit_sponsorship: benefit_sponsorship, :benefit_group_assignments => [benefit_group_assignment])
+          end
+          let(:census_employee_scope) do
+            CensusEmployee.where(:"_id".in => [census_employee_1.id, census_employee_2.id])
+          end
+
+          let(:fake_email_address) {"fakeemail1@fakeemail.com" }
+
+          context "same employer, same email" do
+            before :each do
+              ::Invitation.destroy_all
+              renewal_application.save!
+              renewal_bga
+              CensusEmployee.all.each do |ce|
+                allow(ce).to receive(:email_address).and_return(fake_email_address)
+                allow(ce.renewal_benefit_group_assignment).to receive(:benefit_application).and_return(renewal_application)
+                allow(ce).to receive(:benefit_sponsors_employer_profile_id).and_return(employer_profile.id)
+              end
+              allow(renewal_application.benefit_sponsorship).to receive(:census_employees).and_return(census_employee_scope)
+              allow(TimeKeeper).to receive(:date_of_record).and_return(Time.now + 1.month)
+            end
+          
+            it "should not send duplicate invitations, even with time travel activated" do
+              renewal_application.send_employee_renewal_invites
+              expect(::Invitation.count).to eq(2)
+              renewal_application.send_employee_renewal_invites
+              expect(::Invitation.count).to eq(2)
+            end
+          end
+        end
+
         context "when renewal application saved" do
 
           before do
@@ -904,6 +940,54 @@ module BenefitSponsors
       end
     end
 
+    describe '.active_and_cobra_enrolled_families',dbclean: :after_each do
+      include_context "setup benefit market with market catalogs and product packages"
+      include_context "setup initial benefit application"
+      include_context "setup employees with benefits"
+
+      let!(:people) { create_list(:person, 5, :with_employee_role, :with_family) }
+
+      before do
+        people.each_with_index do |person, i|
+          ce = census_employees[i]
+          family = person.primary_family
+          ce.update_attributes!(employee_role_id: person.employee_roles.first.id)
+          FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
+        end
+      end
+
+      it 'should return enrolled families count' do
+        expect(initial_application.active_and_cobra_enrolled_families.count).to eq benefit_sponsorship.census_employees.count
+      end
+
+      context 'when family has only enrolled in dental coverage' do
+
+        let(:dental_person) { FactoryBot.create(:person, :with_employee_role, :with_family) }
+        let(:dental_family) { dental_person.primary_family }
+        let!(:dental_sponsored_benefit) { true }
+        let(:dental_census_employee) do
+          ce = FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package)
+          ce.update_attributes!(employee_role_id: dental_person.employee_roles.first.id)
+          ce
+        end
+
+        let!(:dental_enrollment) do
+          FactoryBot.create(
+            :hbx_enrollment,
+            family: dental_family,
+            household: dental_family.active_household,
+            benefit_group_assignment: dental_census_employee.benefit_group_assignments.first,
+            sponsored_benefit_package_id: dental_census_employee.benefit_group_assignments.first.benefit_package.id,
+            coverage_kind: 'dental'
+          )
+        end
+
+        it 'should return enrolled families count' do
+          expect(initial_application.active_and_cobra_enrolled_families.count).to eq benefit_sponsorship.census_employees.count
+        end
+      end
+    end
+
     describe '.predecessor_benefit_package', dbclean: :after_each do
       include_context "setup benefit market with market catalogs and product packages"
       include_context "setup renewal application"
@@ -929,6 +1013,7 @@ module BenefitSponsors
         ce.benefit_group_assignments.first.update_attributes!(start_on: renewal_application.effective_period.min + 1.day)
         ce.aasm_state = 'employment_terminated'
         ce.employment_terminated_on = term_date
+        ce.benefit_group_assignments.last.update(benefit_package_id: renewal_application.benefit_packages.first.id)
         ce.save(validate: false)
         expect(renewal_application.active_census_employees_under_py.count).to eq 4
       end
@@ -940,6 +1025,7 @@ module BenefitSponsors
         ce.benefit_group_assignments.first.update_attributes!(start_on: renewal_application.effective_period.min + 1.day)
         ce.aasm_state = 'employee_termination_pending'
         ce.employment_terminated_on = term_date
+        ce.benefit_group_assignments.last.update(benefit_package_id: renewal_application.benefit_packages.first.id)
         ce.save(validate: false)
         expect(renewal_application.active_census_employees_under_py.count).to eq 4
       end
@@ -1075,5 +1161,46 @@ module BenefitSponsors
       end
 
     end
+
+    describe '.enrollment_quiet_period', dbclean: :after_each do
+      include_context "setup benefit market with market catalogs and product packages"
+      include_context "setup initial benefit application"
+
+      let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_month }
+
+      context "when intital application open enrollment end date inside plan year start date", dbclean: :after_each do
+
+        it 'return next day of open_enrollment_end date as quiet_period start date' do
+          quiet_period = initial_application.enrollment_quiet_period
+          expect(quiet_period.min.to_date).to eq initial_application.open_enrollment_period.max + 1.day
+        end
+
+        it 'return default quiet_period end date' do
+          quiet_period = initial_application.enrollment_quiet_period
+          initial_quiet_period_end = initial_application.start_on + Settings.aca.shop_market.initial_application.quiet_period.month_offset.months + (Settings.aca.shop_market.initial_application.quiet_period.mday - 1).days
+          expect(quiet_period.max).to eq TimeKeeper.end_of_exchange_day_from_utc(initial_quiet_period_end)
+        end
+      end
+
+      context "when intital application open enrollment end date outside plan year start date", dbclean: :after_each do
+
+        before do
+          initial_application.open_enrollment_period = (current_effective_date - 15.days..current_effective_date + 4.days)
+          initial_application.save
+        end
+
+        it 'return next day of open_enrollment_end date as quiet_period start date' do
+          quiet_period = initial_application.enrollment_quiet_period
+          expect(quiet_period.min.to_date).to eq initial_application.open_enrollment_period.max + 1.day
+        end
+
+        it 'return next day of quiet_period start date as quiet_period end date' do
+          quiet_period = initial_application.enrollment_quiet_period
+          expect(quiet_period.max).to eq quiet_period.min + 1.day
+        end
+
+      end
+    end
+
   end
 end

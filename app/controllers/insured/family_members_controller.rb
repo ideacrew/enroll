@@ -47,7 +47,7 @@ class Insured::FamilyMembersController < ApplicationController
       special_enrollment_period.save
       @market_kind = qle.market_kind
     end
-
+    @market_kind = params[:market_kind] if params[:market_kind].present?
     if request.referer.present?
       @prev_url_include_intractive_identity = request.referer.include?("interactive_identity_verifications")
       @prev_url_include_consumer_role_id = request.referer.include?("consumer_role_id")
@@ -59,7 +59,7 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   def new
-    @dependent = Forms::FamilyMember.new(:family_id => params.require(:family_id))
+    @dependent = ::Forms::FamilyMember.new(:family_id => params.require(:family_id))
     respond_to do |format|
       format.html
       format.js
@@ -67,7 +67,7 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   def create
-    @dependent = Forms::FamilyMember.new(params.require(:dependent).permit!)
+    @dependent = ::Forms::FamilyMember.new(params.require(:dependent).permit!)
 
     if ((Family.find(@dependent.family_id)).primary_applicant.person.resident_role?)
       if @dependent.save
@@ -180,7 +180,7 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   def new_resident_dependent
-    @dependent = Forms::FamilyMember.new(:family_id => params.require(:family_id))
+    @dependent = ::Forms::FamilyMember.new(:family_id => params.require(:family_id))
     respond_to do |format|
       format.html
       format.js
@@ -188,7 +188,7 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   def edit_resident_dependent
-    @dependent = Forms::FamilyMember.find(params.require(:id))
+    @dependent = ::Forms::FamilyMember.find(params.require(:id))
     respond_to do |format|
       format.html
       format.js
@@ -196,7 +196,7 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   def show_resident_dependent
-    @dependent = Forms::FamilyMember.find(params.require(:id))
+    @dependent = ::Forms::FamilyMember.find(params.require(:id))
     respond_to do |format|
       format.html
       format.js
@@ -229,6 +229,6 @@ private
   end
 
   def set_dependent
-    @dependent = Forms::FamilyMember.find(params.require(:id))
+    @dependent = ::Forms::FamilyMember.find(params.require(:id))
   end
 end

@@ -14,6 +14,11 @@ class Users::SessionsController < Devise::SessionsController
     respond_with resource, location: location
   end
 
+  def destroy
+    current_user.revoke_all_jwts!
+    super
+  end
+
   private
 
   def log_failed_login

@@ -52,7 +52,8 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       no_dc_address_reason: "",
       is_consumer_role_active?: false,
       has_active_employee_role?: true,
-      has_multiple_roles?: false
+      has_multiple_roles?: false,
+      agent?: false
     )
   end
   let(:family) { instance_double(Family, active_household: household, :model_name => "Family", id: 1) }
@@ -176,8 +177,6 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
         expect(response).to redirect_to(edit_insured_consumer_role_path(consumer_role))
       end
     end
-
-
 
     context "#init_qle" do
       before :each do
@@ -534,7 +533,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     end
 
     context "with a person with an address" do
-      let(:person) { double("Person", id: "test", addresses: true, no_dc_address: false, no_dc_address_reason: "") }
+      let(:person) { double("Person", id: "test", addresses: true, no_dc_address: false, no_dc_address_reason: "", agent?: false) }
 
       it "should be a success" do
         expect(response).to have_http_status(:success)
@@ -806,6 +805,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       let(:family) {FactoryBot.build(:family)}
       before :each do
         allow(person).to receive(:hbx_staff_role).and_return(double('hbx_staff_role', permission: double('permission',modify_family: true)))
+        allow(person).to receive(:agent?).and_return(true)
         family.broker_agency_accounts = [
           FactoryBot.build(:broker_agency_account, family: family, employer_profile: nil)
         ]

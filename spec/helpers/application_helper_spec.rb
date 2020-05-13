@@ -244,6 +244,10 @@ RSpec.describe ApplicationHelper, :type => :helper do
         assign(:status, "denied")
         expect(helper.date_col_name_for_broker_roaster).to eq 'Denied Date'
       end
+      it "should return extended" do
+        assign(:status, "extended")
+        expect(helper.date_col_name_for_broker_roaster).to eq 'Extended Date'
+      end
     end
   end
 
@@ -301,17 +305,52 @@ RSpec.describe ApplicationHelper, :type => :helper do
   end
 
   describe "#calculate_participation_minimum" do
-    let(:plan_year_1) { double("PlanYear", eligible_to_enroll_count: 5) }
-    before do
-      @current_plan_year = plan_year_1
-    end
-    it "should  return 0 when eligible_to_enroll_count is zero" do
-      expect(@current_plan_year).to receive(:eligible_to_enroll_count).and_return(0)
-      expect(helper.calculate_participation_minimum).to eq 0
+
+    context 'initial employers' do
+
+      let(:plan_year_1) { double("PlanYear", eligible_to_enroll_count: 5, is_renewing?: false) }
+
+      it "should return 0 when eligible_to_enroll_count is zero" do
+        @current_plan_year = plan_year_1
+        expect(@current_plan_year).to receive(:eligible_to_enroll_count).and_return(0)
+        expect(helper.calculate_participation_minimum).to eq 0
+      end
+
+      context "should calculate eligible_to_enroll_count when not zero" do
+        let(:flex_plan_year) { double("PlanYear", start_on: Date.new(2020, 3, 1), eligible_to_enroll_count: 5, is_renewing?: false) }
+        let(:standard_plan_year) { double("PlanYear", start_on: Date.new(2029, 3, 1), eligible_to_enroll_count: 5, is_renewing?: false) }
+
+        let(:min_participation_count_for_flex) do
+          (flex_plan_year.eligible_to_enroll_count * Settings.aca.shop_market.initial_application.flexible_contribution_model.employee_participation_ratio_minimum).ceil
+        end
+
+        let(:min_participation_count_for_standard) do
+          (standard_plan_year.eligible_to_enroll_count * Settings.aca.shop_market.employee_participation_ratio_minimum).ceil
+        end
+
+
+        it 'for employer eligible for flexible contribution model' do
+          @current_plan_year = flex_plan_year
+          expect(helper.calculate_participation_minimum.ceil).to eq min_participation_count_for_flex
+        end
+
+        it 'for employer NOT eligible for flexible contribution model' do
+          @current_plan_year = standard_plan_year
+          expect(helper.calculate_participation_minimum.ceil).to eq min_participation_count_for_standard
+        end
+      end
     end
 
-    it "should calculate eligible_to_enroll_count when not zero" do
-      expect(helper.calculate_participation_minimum.ceil).to eq 4
+    context 'renewing employers' do
+      let(:renewing_plan_year) { double("PlanYear", eligible_to_enroll_count: 5, is_renewing?: true) }
+      let(:min_participation_count) do
+        (renewing_plan_year.eligible_to_enroll_count * Settings.aca.shop_market.employee_participation_ratio_minimum).ceil
+      end
+
+      it 'should calculate eligible_to_enroll_count' do
+        @current_plan_year = renewing_plan_year
+        expect(helper.calculate_participation_minimum.ceil).to eq min_participation_count
+      end
     end
   end
 
@@ -323,43 +362,55 @@ RSpec.describe ApplicationHelper, :type => :helper do
       expect(bucket).to eq("#{Settings.site.s3_prefix}-sbc")
     end
   end
-  describe "current_cost" do
-    it "should return cost without session" do
-      expect(helper.current_cost(100, 0.9)).to eq 100
+
+  describe 'current_cost' do
+    let(:hbx_enrollment) {double(applied_aptc_amount: 10, total_premium: 100, coverage_kind: 'health')}
+    let(:hbx_enrollment2) {double(applied_aptc_amount: 0.0, total_premium: 100, coverage_kind: 'health')}
+
+    it 'should return nil when shopping' do
+      expect(helper.current_cost(hbx_enrollment, 'shopping')).to eq nil
     end
 
-    context "with session" do
+    it 'should return family premium' do
+      expect(helper.current_cost(hbx_enrollment, 'account')).to eq 90
+    end
+
+    it 'should return total premium when 0 aptc' do
+      expect(helper.current_cost(hbx_enrollment2, 'account')).to eq 100
+    end
+  end
+
+
+  describe 'shopping_group_premium' do
+    it 'should return cost without session' do
+      expect(helper.shopping_group_premium(100, 98.44)).to eq 100
+    end
+
+    context 'with session' do
       before :each do
         session['elected_aptc'] = 100
         session['max_aptc'] = 200
       end
 
-      it "when ehb_premium > aptc_amount" do
-        expect(helper.current_cost(200, 0.9)).to eq (200 - 0.5*200)
+      it 'when ehb_premium > aptc_amount' do
+        expect(helper.shopping_group_premium(200, 196.88)).to eq(100)
       end
 
-      it "when ehb_premium < aptc_amount" do
-        expect(helper.current_cost(100, 0.9)).to eq (100 - 0.9*100)
+      it 'when ehb_premium < aptc_amount' do
+        expect(helper.shopping_group_premium(100, 98.44)).to eq(1.56)
       end
 
-      it "should return 0" do
-        session['elected_aptc'] = 160
-        expect(helper.current_cost(100, 1.2)).to eq 0
+      it 'should return rounded plan cost value' do
+        session['elected_aptc'] = nil
+        expect(helper.shopping_group_premium(520.48, 512.360512)).to eq 520.48
       end
 
-      it "when can_use_aptc is false" do
-        expect(helper.current_cost(100, 1.2, nil, 'shopping', false)).to eq 100
+      it 'when can_use_aptc is false' do
+        expect(helper.shopping_group_premium(100, 98.44, false)).to eq 100
       end
 
-      it "when can_use_aptc is true" do
-        expect(helper.current_cost(100, 1.2, nil, 'shopping', true)).to eq 0
-      end
-    end
-
-    context "with hbx_enrollment" do
-      let(:hbx_enrollment) {double(applied_aptc_amount: 10, total_premium: 100, coverage_kind: 'health')}
-      it "should return cost from hbx_enrollment" do
-        expect(helper.current_cost(100, 0.8, hbx_enrollment, 'account')).to eq 90
+      it 'when can_use_aptc is true' do
+        expect(helper.shopping_group_premium(100, 98.44, true)).to eq 1.56
       end
     end
   end

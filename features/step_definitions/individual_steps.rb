@@ -54,6 +54,7 @@ And(/user should see your information page$/) do
   expect(page).to have_content("Your Information")
   expect(page).to have_content("CONTINUE")
   click_link "CONTINUE"
+  sleep 5
 end
 
 When(/user goes to register as an individual$/) do
@@ -86,24 +87,26 @@ Then(/Individual should click on Individual market for plan shopping/) do
 end
 
 Then(/Individual should see a form to enter personal information$/) do
-  find(:xpath, '//label[@for="person_us_citizen_true"]').click
-  find(:xpath, '//label[@for="person_naturalized_citizen_false"]').click
-  find(:xpath, '//label[@for="indian_tribe_member_no"]').click
+  click_and_wait_on_stylized_radio('//label[@for="person_us_citizen_true"]', "person_us_citizen_true", "person[us_citizen]", "true")
+  click_and_wait_on_stylized_radio('//label[@for="person_naturalized_citizen_false"]', "person_naturalized_citizen_false", "person[naturalized_citizen]", "false")
+  click_and_wait_on_stylized_radio('//label[@for="indian_tribe_member_no"]', "indian_tribe_member_no", "person[indian_tribe_member]", "false")
+  click_and_wait_on_stylized_radio('//label[@for="radio_incarcerated_no"]', "radio_incarcerated_no", "person[is_incarcerated]", "false")
 
-  find(:xpath, '//label[@for="radio_incarcerated_no"]', :wait => 10).click
   fill_in "person_addresses_attributes_0_address_1", :with => "4900 USAA BLVD"
   fill_in "person_addresses_attributes_0_address_2", :with => "212"
   fill_in "person_addresses_attributes_0_city", :with=> "Washington"
   #find('.interaction-choice-control-state-id', text: 'SELECT STATE *').click
   find(:xpath, '//*[@id="address_info"]/div/div[3]/div[2]/div/div[2]/span').click
-  find('li', :text => 'DC').click
+  first('li', :text => 'DC', wait: 5).click
   fill_in "person[addresses_attributes][0][zip]", :with => "20002"
+
+  sleep 2
   screenshot("personal_form")
 end
 
 And(/^.+ selects (.*) for coverage$/) do |coverage|
   if coverage == "applying"
-  find(:xpath, '//label[@for="is_applying_coverage_true"]').click
+    find(:xpath, '//label[@for="is_applying_coverage_true"]').click
   else
     find(:xpath, '//label[@for="is_applying_coverage_false"]').click
   end
@@ -123,7 +126,54 @@ And(/(.*) selects eligible immigration status$/) do |text|
     find(:xpath, '//label[@for="dependent_eligible_immigration_status_true"]').click
   else
     find(:xpath, '//label[@for="person_us_citizen_false"]').click
-    find(:xpath, '//label[@for="person_eligible_immigration_status_true"]').click
+    find('label[for=person_eligible_immigration_status_true]').click
+    choose 'person_eligible_immigration_status_true', visible: false, allow_label_click: true
+  end
+end
+
+Then(/Individual should see the i94 text/) do
+  expect(page).to have_content('When entering the I-94 Number, only include 9 numbers followed by a letter or a number in the 10th position and a number in the 11th position.')
+  expect(page).to have_content('You must enter exactly 11 characters into the I-94 field.')
+  expect(page).to have_content("The I-94 number is also called the admissions number. It is an 11 character sequence found printed on Arrival/Departure records (For I-94 or Form I-94A.) It can also be found on the form I-9.")
+end
+
+Then(/selects the i94 document and fills required details (.*)$/) do |correct_or_incorrect|
+  step "user selects i94 document and fills required details #{correct_or_incorrect}"
+  step 'should fill in valid sevis, passport expiration_date, tribe_member and incarcerated details'
+end
+
+Then(/selects i94 unexpired foreign passport document and fills required details (.*)$/) do |correct_or_incorrect|
+  find('.label', :text => 'Select document type', wait: 10).click
+  find('li', :text => "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport", match: :prefer_exact, wait: 10).click
+  fill_in 'I 94 Number', with: (correct_or_incorrect == 'correctly' ? '123456789a1' : '@23#5678901')
+  fill_in 'Passport Number', with: 'A123456'
+  fill_in 'Visa number', with: 'V1234567'
+  step 'should fill in valid sevis, passport expiration_date, tribe_member and incarcerated details'
+end
+
+Then(/selects Other With I-94 Number document and fills required details (.*)$/) do |correct_or_incorrect|
+  find('.label', :text => 'Select document type', wait: 10).click
+  find('li', :text => 'Other (With I-94 Number)', match: :prefer_exact, wait: 10).click
+  fill_in 'I 94 Number', with: (correct_or_incorrect == 'correctly' ? '123456789a1' : '@23#5678901')
+  fill_in 'Passport Number', with: 'A123456'
+  fill_in 'Document Description', with: 'Other With I94 Number'
+  step 'should fill in valid sevis, passport expiration_date, tribe_member and incarcerated details'
+end
+
+And(/should fill in valid sevis, passport expiration_date, tribe_member and incarcerated details/) do
+  fill_in 'SEVIS ID', with: '1234567891'
+  fill_in 'Passport Expiration Date', with: TimeKeeper.date_of_record.to_s
+  click_link((TimeKeeper.date_of_record + 10.days).day.to_s)
+  find('label[for=indian_tribe_member_no]', wait: 20).click
+  find('label[for=radio_incarcerated_no]', wait: 10).click
+  choose 'radio_incarcerated_no', visible: false, allow_label_click: true
+end
+
+Then /^Individual (.*) go to Authorization and Consent page$/ do |argument|
+  if argument == 'does'
+    expect(page).to have_content('Authorization and Consent')
+  else
+    expect(page).not_to have_content('Authorization and Consent')
   end
 end
 
@@ -132,7 +182,7 @@ Then(/select I-551 doc and fill details/) do
   find('li', :text => 'I-551 (Permanent Resident Card)', wait: 10).click
   fill_in 'Alien Number', with: '987654323'
   fill_in 'Card Number', with: 'aaa1231231231'
-  fill_in 'Expiration Date', with: TimeKeeper.date_of_record.to_s
+  fill_in 'I-551 Expiration Date', with: TimeKeeper.date_of_record.to_s
   click_link((TimeKeeper.date_of_record + 10.days).day)
 end
 
@@ -145,11 +195,12 @@ Then(/click citizen no/) do
 end
 
 When(/click eligible immigration status yes/) do
-  find(:xpath, '//label[@for="person_eligible_immigration_status_true"]').click
+  find('label[for=person_eligible_immigration_status_true]', wait: 20).click
+  choose 'person_eligible_immigration_status_true', visible: false, allow_label_click: true
 end
 
 Then(/should find I-551 doc type/) do
-  find('.label', :text => 'I-551 (Permanent Resident Card)')
+  find('.label', :text => 'I-551 (Permanent Resident Card)', wait: 10)
 end
 
 And(/should find alien number/) do
@@ -186,9 +237,11 @@ When /^Individual clicks on Individual and Family link should be on privacy agre
 end
 
 Then(/^\w+ agrees? to the privacy agreeement/) do
+  wait_for_ajax
   expect(page).to have_content('Authorization and Consent')
   find(:xpath, '//label[@for="agreement_agree"]').click
   click_link "Continue"
+  sleep 2
 end
 
 When /^Individual clicks on Individual and Family link should be on verification page/ do
@@ -199,8 +252,8 @@ end
 
 Then(/^\w+ should see identity verification page and clicks on submit/) do
   expect(page).to have_content('Verify Identity')
-  find(:xpath, '//label[@for="interactive_verification_questions_attributes_0_response_id_a"]').click
-  find(:xpath, '//label[@for="interactive_verification_questions_attributes_1_response_id_c"]').click
+  find(:xpath, '//label[@for="interactive_verification_questions_attributes_0_response_id_a"]', wait: 5).click
+  find(:xpath, '//label[@for="interactive_verification_questions_attributes_1_response_id_c"]', wait: 5).click
   screenshot("identify_verification")
   click_button "Submit"
   screenshot("override")
@@ -260,8 +313,13 @@ And(/I click on continue button on household info form/) do
   click_link 'Continue', :wait => 10
 end
 
+Then(/consumer clicked on Go To My Account/) do
+  click_link 'GO TO MY ACCOUNT'
+end
+
 Then(/Individual creates a new HBX account$/) do
   # find('.interaction-click-control-create-account').click
+  sleep 5
   fill_in "user[oim_id]", :with => "testflow@test.com"
   fill_in "user[password]", :with => "aA1!aA1!aA1!"
   fill_in "user[password_confirmation]", :with => "aA1!aA1!aA1!"
@@ -297,8 +355,8 @@ And(/^.+ click on sign in existing account$/) do
 end
 
 And(/I signed in$/) do
-  find('.btn-link', :text => 'Sign In Existing Account').click
-  sleep 1
+  find('.btn-link', :text => 'Sign In Existing Account', wait: 5).click
+  sleep 5
   fill_in "user[login]", :with => "testflow@test.com"
   fill_in "user[password]", :with => "aA1!aA1!aA1!"
   find('.sign-in-btn').click
@@ -341,6 +399,7 @@ And(/I click on continue button to go to the individual home page/) do
 end
 
 And(/I should see the individual home page/) do
+  sleep 5
   expect(page).to have_content "My #{Settings.site.short_name}"
   screenshot("my_account")
   # something funky about these tabs in JS
@@ -419,10 +478,12 @@ Then(/Individual asks for help$/) do
   expect(page).to have_content "Help"
   find(:id => "CSR", :wait => 10).click
   wait_for_ajax(5,2.5)
+  sleep(2)
   expect(page).to have_content "First Name"
   #TODO bombs on help_first_name sometimes
   fill_in "help_first_name", with: "Sherry"
   fill_in "help_last_name", with: "Buckner"
+  sleep(2)
   screenshot("help_from_a_csr")
   find("#search_for_plan_shopping_help").click
   find(".interaction-click-control-×").click
@@ -473,6 +534,7 @@ When(/I click on the header link to return to CSR page/) do
 end
 
 Then(/CSR clicks on New Consumer Paper Application/) do
+  find_link("New Consumer Paper Application")
   click_link "New Consumer Paper Application"
 end
 
@@ -650,6 +712,18 @@ Then(/Aptc user should see aptc amount on individual home page/) do
   screenshot("my_account")
 end
 
+And(/consumer has successful ridp/) do
+  user.identity_final_decision_code = "acc"
+  user.save
+  FactoryBot.create(:qualifying_life_event_kind, market_kind: "individual")
+  hbx_profile = FactoryBot.create(:hbx_profile, :no_open_enrollment_coverage_period)
+  BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
+  start_on = TimeKeeper.date_of_record
+  current_product = BenefitMarkets::Products::Product.all.by_year(start_on.year).where(metal_level_kind: :silver).first
+  benefit_sponsorship = hbx_profile.benefit_sponsorship
+  benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(start_on)}.update_attributes!(slcsp_id: current_product.id)
+end
+
 When(/consumer visits home page after successful ridp/) do
   user.identity_final_decision_code = "acc"
   user.save
@@ -659,6 +733,14 @@ When(/consumer visits home page after successful ridp/) do
   visit "/families/home"
 end
 
+And(/current user visits the family home page/) do
+  visit "/families/home"
+end
+
 And(/consumer clicked on "Married" qle/) do
   click_link "Married"
+end
+
+When("consumer visits home page") do
+  visit "/families/home"
 end

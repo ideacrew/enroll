@@ -56,6 +56,37 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
     end
   end
 
+  describe "#current_premium", dbclean: :after_each do
+    let!(:hbx_enrollment_double) do
+      double(
+        :is_shop? => false,
+        :kind => "coverall",
+        :hbx_id => "12345"
+      )
+    end
+
+    context "SHOP hbx_enrollment" do
+      before :each do
+        allow(hbx_enrollment_double).to receive(:is_shop?).and_return(true)
+        allow(hbx_enrollment_double).to receive(:total_employee_cost).and_return("$100.00")
+      end
+
+      it "shows total employee cost" do
+        expect(helper.current_premium(hbx_enrollment_double)).to eq("$100.00")
+      end
+    end
+
+    context "hbx_enrollment total_premium throws error" do
+      before :each do
+        hbx_enrollment_double.stub(:total_premium).and_raise(StandardError.new("error"))
+      end
+
+      it "should not throw exception" do
+        expect(helper.current_premium(hbx_enrollment_double)).to eq('Not Available.')
+      end
+    end
+  end
+
   describe "#show_employer_panel", dbclean: :after_each do
     let(:person) {FactoryBot.build(:person)}
     let(:employee_role) {FactoryBot.build(:employee_role)}
@@ -238,10 +269,20 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
   context "build resident role " do
     let(:person) { FactoryBot.create(:person)}
     let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
+    let(:consumer_person) { FactoryBot.create(:person, :with_family, :with_consumer_role) }
 
-    it "should build consumer role for a person" do
+    it "should build resident role for a person" do
       helper.build_resident_role(person,family)
       expect(person.resident_role.present?). to eq true
+      expect(person.resident_role.contact_method). to eq "Paper and Electronic communications"
+    end
+
+    it "should build resident role for a person and with their consumer role contact method" do
+      expect(consumer_person.consumer_role.contact_method). to eq "Paper and Electronic communications"
+      consumer_person.consumer_role.update_attributes!(contact_method: "Only Electronic communications")
+      helper.build_resident_role(consumer_person, consumer_person.primary_family)
+      expect(consumer_person.resident_role.present?). to eq true
+      expect(consumer_person.resident_role.contact_method). to eq "Only Electronic communications"
     end
   end
 
@@ -490,6 +531,16 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
       it "should return terminated date for term enrollment" do
         expect(enrollment_coverage_end(termed_shop_hbx_enrollment)).to eq terminated_on
       end
+    end
+  end
+
+  describe '#render_product_type_details', dbclean: :after_each do
+    it 'should return gold icon with nationwide' do
+      expect(helper.render_product_type_details(:gold, true)).to eq "<span class=\"gold-icon\">Gold</span>&nbsp<label class='separator'></label>NATIONWIDE NETWORK"
+    end
+
+    it 'should return gold icon without nationwide' do
+      expect(helper.render_product_type_details(:gold, false)).to eq "<span class=\"gold-icon\">Gold</span>"
     end
   end
 end

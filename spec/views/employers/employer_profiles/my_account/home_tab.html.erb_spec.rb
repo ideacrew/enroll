@@ -187,6 +187,7 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
         benefit_groups: benefit_groups,
         aasm_state: 'draft',
         predecessor_id: nil,
+        is_renewing?: false,
         employer_profile: double(census_employees: double(active: active_employees))
         )
     end
@@ -291,27 +292,6 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
     it "should not display minimum participation requirement" do
         assign :end_on, end_on_negative
         expect(rendered).to_not match(/or more needed by/i)
-    end
-
-  end
-
-  context "employer profile without current plan year", :pending => "This Route is no longer used since similar view is there in engine" do
-    let(:employer_profile){ FactoryBot.create(:employer_profile) }
-
-    before :each do
-      allow(view).to receive(:pundit_class).and_return(double("EmployerProfilePolicy", updateable?: true))
-      allow(view).to receive(:policy_helper).and_return(double("EmployerProfilePolicy", updateable?: true))
-      assign :employer_profile, employer_profile
-      render partial: "employers/employer_profiles/my_account/home_tab"
-    end
-
-    it "should not display employee enrollment information" do
-      expect(rendered).to_not match(/Employee Enrollments and Waivers/i)
-    end
-
-    it "should display a link to download employer guidance pdf" do
-      render partial: "employers/employer_profiles/my_account/employer_welcome"
-      expect(rendered).to have_selector(".icon-left-download", text: /Download Step-by-Step Instructions/i)
     end
 
   end

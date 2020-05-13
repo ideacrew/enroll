@@ -779,6 +779,57 @@ module BenefitSponsors
           expect(applications & april_wrong_sponsorship_initial_sponsors).to be_empty
         end
 
+        context 'initial_enrollment and sponsorship with active state' do
+
+          let(:initial_application_state) { :active }
+          let(:sponsorship_state) { :active }
+
+          let!(:april_ineligible_initial_sponsors) do
+            create_list(:benefit_sponsors_benefit_sponsorship, 2, :with_organization_cca_profile, :with_initial_benefit_application,
+                        initial_application_state: :enrollment_ineligible,
+                        default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)),
+                        site: site, aasm_state: sponsorship_state)
+
+          end
+
+          let!(:april_wrong_sponsorship_initial_sponsors) do
+            create_list(:benefit_sponsors_benefit_sponsorship, 2, :with_organization_cca_profile, :with_initial_benefit_application,
+                        initial_application_state: :enrollment_ineligible,
+                        default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)),
+                        site: site, aasm_state: :initial_enrollment_ineligible)
+
+          end
+
+          it "should fetch only valid initial applications" do
+            applications = subject.may_transmit_initial_enrollment?(april_effective_date)
+
+            expect(applications & april_sponsors).to eq april_sponsors
+            expect(applications & april_ineligible_initial_sponsors).to be_empty
+            expect(applications & april_wrong_sponsorship_initial_sponsors).to be_empty
+          end
+        end
+
+        context 'initial_enrollment with matching workflow state transition ' do
+          let!(:april_eligible_benefit_sponsorhip_1)  { april_sponsors[0]}
+          let!(:april_eligible_benefit_sponsorhip_2)  { april_sponsors[1]}
+          let(:transition_at) {TimeKeeper.start_of_exchange_day_from_utc(TimeKeeper.date_of_record)}
+          let(:transition_at_2) {TimeKeeper.start_of_exchange_day_from_utc(TimeKeeper.date_of_record - 1.day)}
+          let!(:create_workflow_state_transition) do
+            april_eligible_benefit_sponsorhip_1.benefit_applications.first.workflow_state_transitions.create(from_state: :enrollment_closed, to_state: :binder_paid, transition_at: transition_at)
+            april_eligible_benefit_sponsorhip_2.benefit_applications.first.workflow_state_transitions.create(from_state: :enrollment_closed, to_state: :binder_paid, transition_at: transition_at_2)
+          end
+
+          it "should fetch only valid initial applications with matching transition state and time" do
+            applications = subject.may_transmit_initial_enrollment?(april_effective_date, transition_at)
+            expect(applications & april_sponsors).to eq [april_eligible_benefit_sponsorhip_1]
+          end
+
+          it "should fetch only valid initial applications with matching transition state and time" do
+            applications = subject.may_transmit_initial_enrollment?(april_effective_date, transition_at_2)
+            expect(applications & april_sponsors).to eq [april_eligible_benefit_sponsorhip_2]
+          end
+        end
+
       end
 
       context '.may_transmit_renewal_enrollment?' do
@@ -813,12 +864,38 @@ module BenefitSponsors
           )
         end
 
-        it "should fetch only valid renewal applications" do 
+        it "should fetch only valid renewal applications" do
+          april_wrong_sponsorship_renewal_sponsors.each {|bs| bs.renewal_benefit_application.update_attributes(predecessor_id: nil)}
           applications = subject.may_transmit_renewal_enrollment?(april_effective_date)
 
           expect(applications & april_renewal_sponsors).to eq april_renewal_sponsors
           expect(applications & april_ineligible_renewal_sponsors).to eq april_ineligible_renewal_sponsors
           expect(applications & april_wrong_sponsorship_renewal_sponsors).to be_empty
+        end
+
+        context 'renewal_enrollment with matching workflow state transition' do
+          let!(:april_renewal_eligible_benefit_sponsorhip_1)  { april_renewal_sponsors[0]}
+          let!(:april_renewal_eligible_benefit_sponsorhip_2)  { april_renewal_sponsors[1]}
+
+          let!(:april_renewal_app_1)  { april_renewal_eligible_benefit_sponsorhip_1.benefit_applications.where(aasm_state: :enrollment_eligible).first}
+          let!(:april_renewal_app_2)  { april_renewal_eligible_benefit_sponsorhip_2.benefit_applications.where(aasm_state: :enrollment_eligible).first}
+          let(:transition_at) {TimeKeeper.start_of_exchange_day_from_utc(TimeKeeper.date_of_record)}
+          let(:transition_at_2) {TimeKeeper.start_of_exchange_day_from_utc(TimeKeeper.date_of_record - 1.day)}
+
+          let!(:create_workflow_state_transition) do
+            april_renewal_app_1.workflow_state_transitions.create(from_state: :enrollment_closed, to_state: :enrollment_eligible, transition_at: transition_at)
+            april_renewal_app_2.workflow_state_transitions.create(from_state: :enrollment_closed, to_state: :enrollment_eligible, transition_at: transition_at_2)
+          end
+
+          it "should fetch only valid renewal applications with matching transition state and time" do
+            applications = subject.may_transmit_renewal_enrollment?(april_effective_date, TimeKeeper.date_of_record)
+            expect(applications & april_renewal_sponsors).to eq [april_renewal_eligible_benefit_sponsorhip_1]
+          end
+
+          it "should fetch only valid renewal applications with matching transition state and time" do
+            applications = subject.may_transmit_renewal_enrollment?(april_effective_date, transition_at_2)
+            expect(applications & april_renewal_sponsors).to eq [april_renewal_eligible_benefit_sponsorhip_2]
+          end
         end
       end
 
@@ -941,6 +1018,8 @@ module BenefitSponsors
         let(:current_date)  { Date.new(this_year, 4, 10) }
         before { TimeKeeper.set_date_of_record_unprotected!(current_date) }
 
+        after { TimeKeeper.set_date_of_record_unprotected!(Date.today) }
+
         context "when overlapping benefit application present with status as" do
           let(:new_effective_date)            { Date.new(this_year,4,1) }
 
@@ -1023,6 +1102,8 @@ module BenefitSponsors
           allow(april_sponsor).to receive(:open_enrollment_period_for).and_return(april_open_enrollment_begin_on..april_open_enrollment_end_on)
           TimeKeeper.set_date_of_record_unprotected!(april_open_enrollment_end_on + 1.day)
         }
+
+        after { TimeKeeper.set_date_of_record_unprotected!(Date.today) }
 
         context "when open enrollment extended application present" do
           let(:aasm_state) { :enrollment_extended }
