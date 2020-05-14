@@ -779,6 +779,10 @@ describe Person, :dbclean => :after_each do
         it 'should have the new relationship' do
           expect(person10.person_relationships.first.relative_id).to eq(person11.id)
         end
+
+        it 'should have fixed number of relationships' do
+          expect(person10.person_relationships.count).to eq(1)
+        end
       end
     end
 
@@ -799,6 +803,10 @@ describe Person, :dbclean => :after_each do
         it "should correct the existing relationship" do
           expect(person10.person_relationships.first.kind).to eq('spouse')
         end
+
+        it 'should not have the old relationship' do
+          expect(person10.person_relationships.count).to eq(1)
+        end
       end
     end
 
@@ -810,6 +818,10 @@ describe Person, :dbclean => :after_each do
 
       it 'should not create any relationships' do
         expect(person10.person_relationships).to be_empty
+      end
+
+      it 'should have fixed number of relationships' do
+        expect(person10.person_relationships.count).to be_zero
       end
     end
   end
