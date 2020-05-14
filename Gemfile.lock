@@ -64,10 +64,6 @@ PATH
       aasm (~> 4.8)
       active_model_serializers (~> 0.10)
       config (~> 2.0)
-      dry-monads
-      dry-struct
-      dry-types
-      dry-validation
       language_list (~> 1)
       money-rails (~> 1.13)
       mongoid (~> 7.0.2)
@@ -88,9 +84,7 @@ PATH
       dry-auto_inject (= 0.6.1)
       dry-container
       dry-initializer
-      dry-monads
       dry-schema (~> 1.0)
-      dry-struct
       dry-types
       dry-validation (~> 1.0)
       interactor (~> 3.0)
@@ -133,14 +127,6 @@ PATH
       aasm (~> 4.8.0)
       config (~> 2.0)
       devise (~> 4.5)
-      dry-auto_inject (= 0.6.1)
-      dry-container
-      dry-initializer
-      dry-monads
-      dry-schema (~> 1.0)
-      dry-struct
-      dry-types
-      dry-validation (~> 1.0)
       ffi (~> 1.9)
       kaminari (~> 0.17.0)
       mongoid (~> 7.0.2)
