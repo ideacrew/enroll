@@ -307,6 +307,47 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         expect(assigns(:new_effective_on)).to eq TimeKeeper.date_of_record
       end
 
+      context "non active family member has is incarcerated/inactive" do
+        let!(:person_to_deactivate) do
+          FactoryBot.create(:person)
+        end
+
+        before do
+          family = person.primary_family
+          expect(family.family_members.count).to eq(1)
+          person.primary_family.family_members.create!(person_id: person_to_deactivate.id)
+          expect(family.family_members.count).to eq(2)
+          # This would ressemble the actual deletion from the manage_family UI, such as in the case of a
+          # duplicate family member
+          incarcerated_family_member = family.family_members.where(person_id: person_to_deactivate).first
+          # this will set is_active to false
+          family.remove_family_member(person_to_deactivate)
+          family.save!
+          incarcerated_family_member.reload
+        end
+
+        it "should only consider active family members and redirect to coverage household page" do
+          sign_in user
+          get(
+            :new,
+            params: {
+              person_id: person.id,
+              consumer_role_id: consumer_role.id,
+              change_plan: "change",
+              hbx_enrollment_id: "123",
+              coverage_kind: hbx_enrollment.coverage_kind
+            }
+          )
+          fm_hash = assigns(:fm_hash)
+          active_family_members = assigns(:active_family_members)
+          expect(fm_hash.values.flatten.detect{|err| err.to_s.match(/incarcerated_not_answered/)}).to eq(nil)
+          incarcerated_family_member = family.family_members.where(person_id: person_to_deactivate).first
+          expect(active_family_members).to_not include(incarcerated_family_member)
+          expect(active_family_members.length).to eq(1)
+          expect(response).to have_http_status("200")
+        end
+      end
+
       it "should not redirect to coverage household page if incarceration is unanswered" do
         person.unset(:is_incarcerated)
         HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.last.benefit_packages[0].incarceration_status = ["incarceration_status"]
@@ -333,6 +374,28 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         expect(response).to redirect_to(insured_plan_shopping_path(id: new_household.hbx_enrollments(true).first.id, change_plan: 'change', coverage_kind: 'health', market_kind: 'individual', enrollment_kind: 'sep'))
       end
 
+    end
+
+    context 'dual role household' do
+      include_context "setup benefit market with market catalogs and product packages"
+      include_context "setup initial benefit application"
+      let!(:sponsored_benefit_package) { initial_application.benefit_packages[0] }
+      let!(:employer_profile) {benefit_sponsorship.profile}
+      let(:employee_role_person)     { FactoryBot.create(:person, :with_employee_role)}
+      let(:consumer_role_person)     { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
+      let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: employee_role_person)}
+      let!(:census_employee) { FactoryBot.create(:census_employee, employer_profile: employer_profile, employee_role_id: employee_role_person.employee_roles.first.id) }
+
+      before do
+        family_member = FamilyMember.new(:person => consumer_role_person)
+        family.family_members << family_member
+      end
+
+      it 'should return success response if primary has employee role and dependent has consumer role' do
+        sign_in user
+        get :new, params: { person_id: person.id, employee_role_id: employee_role_person.employee_roles.first.id }
+        expect(response).to have_http_status(:success)
+      end
     end
 
   end
@@ -372,7 +435,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       end
 
       it 'return http success and render' do
-        sign_in
+        sign_in user
         @family.special_enrollment_periods << @sep
         attrs = {hbx_enrollment_id: @enrollment.id.to_s, family_id: @family.id}
         get :edit_plan, params: attrs
@@ -619,7 +682,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
 
     def fetch_effective_date_of_new_enrollment
       enr_created_datetime = DateTime.now.in_time_zone('Eastern Time (US & Canada)')
-      offset_month = enr_created_datetime.day <= 15 ? 1 : 2
+      offset_month = enr_created_datetime.day <= HbxProfile::IndividualEnrollmentDueDayOfMonth ? 1 : 2
       year = enr_created_datetime.year
       month = enr_created_datetime.month + offset_month
       if month > 12
@@ -635,7 +698,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
 
     it 'should update current enrollment(cancel/terminate)' do
       hbx_enrollment.reload
-      if TimeKeeper.date_of_record.day >= 15
+      if TimeKeeper.date_of_record.day > HbxProfile::IndividualEnrollmentDueDayOfMonth
         expect(hbx_enrollment.aasm_state).to eq 'coverage_terminated'
         expect(hbx_enrollment.terminated_on.to_date).to eq hbx_enrollment.effective_on.end_of_month.to_date
       else
@@ -673,7 +736,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
 
   context "GET terminate_selection" do
     it "return http success and render" do
-      sign_in
+      sign_in user
       get :terminate_selection, params: { person_id: person.id }
       expect(response).to have_http_status(:success)
       expect(response).to render_template(:terminate_selection)
@@ -683,7 +746,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
   context "POST terminate" do
 
     before do
-      sign_in
+      sign_in user
       request.env["HTTP_REFERER"] = edit_plan_insured_group_selections_path(person_id: person.id, hbx_enrollment_id: hbx_enrollment.id)
       allow(HbxEnrollment).to receive(:find).and_return(hbx_enrollment)
     end
@@ -720,7 +783,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
 
     before do
       allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
-      sign_in
+      sign_in user
       family.reload
     end
 

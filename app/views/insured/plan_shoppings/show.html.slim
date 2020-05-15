@@ -452,7 +452,7 @@ javascript:
                       <img width="80px" src="${logo}">
                     </div>
                     <div class="col-md-7" id="plans">
-                      <h3 class="no-buffer pl-1"><a data-remote="true">${result.product.title}</a>
+                      <h3 class="no-buffer pl-1"><a href="/products/plans/summary?active_year=${result.coverage_start_on.split('-')[0]}&coverage_kind=${result.product.kind}&enrollment_kind=&hbx_enrollment_id=#{@hbx_enrollment.id.to_s}&market_kind=${result.product.benefit_market_kind.replace('aca_', '')}&standard_component_id=${result.product.hios_id}" data-remote="true">${result.product.title}</a>
                         <br>
                         <small>${result.product.issuer_name}</small>
                       </h3>

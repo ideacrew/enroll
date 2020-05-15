@@ -21,12 +21,19 @@ module Insured::FamiliesHelper
   end
 
   def current_premium hbx_enrollment
-    if hbx_enrollment.is_shop?
-      hbx_enrollment.total_employee_cost
-    elsif hbx_enrollment.kind == 'coverall'
-      hbx_enrollment.total_premium
-    else
-      hbx_enrollment.total_premium > hbx_enrollment.applied_aptc_amount.to_f ? hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f : 0
+    begin
+      if hbx_enrollment.is_shop?
+        hbx_enrollment.total_employee_cost
+      elsif hbx_enrollment.kind == 'coverall'
+        hbx_enrollment.total_premium
+      else
+        hbx_enrollment.total_premium > hbx_enrollment.applied_aptc_amount.to_f ? hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f : 0
+      end
+    rescue Exception => e
+      exception_message = "Current Premium calculation error for HBX Enrollment: #{hbx_enrollment.hbx_id.to_s}"
+      Rails.logger.error(exception_message) unless Rails.env.test?
+      puts(exception_message) unless Rails.env.test?
+      'Not Available.'
     end
   end
 
@@ -99,7 +106,8 @@ module Insured::FamiliesHelper
     data = {
       title: qle.title, id: qle.id.to_s, label: qle.event_kind_label,
       is_self_attested: qle.is_self_attested,
-      current_date: TimeKeeper.date_of_record.strftime("%m/%d/%Y")
+      current_date: TimeKeeper.date_of_record.strftime("%m/%d/%Y"),
+      qle_event_date_kind: qle.qle_event_date_kind.to_s
     }
 
     if qle.tool_tip.present?
@@ -108,7 +116,10 @@ module Insured::FamiliesHelper
     else
       options.merge!(data: data)
     end
-    link_to qle.title, "javascript:void(0)", options
+
+    qle_title_html = "<u>#{qle.title}</u>".html_safe if qle.reason == 'covid-19'
+    
+    link_to qle_title_html || qle.title, "javascript:void(0)", options
   end
 
   def qle_link_generator_for_an_existing_qle(qle, link_title=nil)
@@ -130,6 +141,8 @@ module Insured::FamiliesHelper
       case kind
       when 'date_of_event'
         options << [qle_date.to_s, kind]
+      when 'first_of_this_month'
+        options << [qle_date.beginning_of_month.to_s, kind]
       when 'fixed_first_of_next_month'
         options << [(qle_date.end_of_month + 1.day).to_s, kind]
       end
@@ -291,7 +304,8 @@ module Insured::FamiliesHelper
 
   def build_consumer_role(person, family)
     if family.primary_applicant.person == person
-      person.build_consumer_role({:is_applicant => true})
+      contact_method = person.resident_role&.contact_method ? person.resident_role.contact_method : "Paper and Electronic communications"
+      person.build_consumer_role({:is_applicant => true, :contact_method => contact_method})
       person.save!
     else
       person.build_consumer_role({:is_applicant => false})
@@ -301,7 +315,8 @@ module Insured::FamiliesHelper
 
   def build_resident_role(person, family)
     if family.primary_applicant.person == person
-      person.build_resident_role({:is_applicant => true})
+      contact_method = person.consumer_role&.contact_method ? person.consumer_role.contact_method : "Paper and Electronic communications"
+      person.build_resident_role({:is_applicant => true, :contact_method => contact_method })
       person.save!
     else
       person.build_resident_role({:is_applicant => false})

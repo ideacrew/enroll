@@ -143,8 +143,8 @@ class Family
 
 
   scope :by_eligibility_determination_date_range, ->(start_at, end_at){ where(
-                                                        :"households.tax_households.eligibility_determinations.determined_on".gte => start_at).and(
-                                                        :"households.tax_households.eligibility_determinations.determined_on".lte => end_at
+                                                        :"households.tax_households.eligibility_determinations.determined_at".gte => start_at).and(
+                                                        :"households.tax_households.eligibility_determinations.determined_at".lte => end_at
                                                       )
                                                     }
 
@@ -212,7 +212,7 @@ class Family
     where(:"_id".in => HbxEnrollment.where(
       :"sponsored_benefit_package_id".in => benefit_application.benefit_packages.pluck(:_id),
       :"aasm_state".nin => %w(coverage_canceled shopping coverage_terminated),
-      coverage_kind: "health",
+      :coverage_kind.in => ["health", "dental"],
       :"family_id".in => active_family_ids
     ).distinct(:family_id)
     ) }

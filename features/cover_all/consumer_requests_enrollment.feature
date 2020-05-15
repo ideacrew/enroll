@@ -23,11 +23,13 @@ Feature: Consumer requests enrollment in CoverAll
     Then Employee should see confirmation and clicks continue
     When I click on continue button on group selection page during a sep
     Then HBX Admin should see the list of plans
+    And HBX admin should see the Metal Level filter
     When HBX Admin selects a plan from shopping plan page
     Then HBX Admin should see the summary page of plan selection
     When HBX Admin clicks on Confirm button on the summary page of plan selection
     Then HBX Admin should see the enrollment receipt page
     When CONTINUE is clicked by HBX Admin
+    Then HBX Admin should see broker assister search box
     Then HBX Admin should see the home page with text coverage selected
     And Hbx Admin logs out
 

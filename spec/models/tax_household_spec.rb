@@ -226,18 +226,18 @@ RSpec.describe TaxHousehold, type: :model do
     end
 
     it "return max aptc when in the same year" do
-      #allow(@tax_household).to receive(:latest_eligibility_determination).and_return(double(determined_on: TimeKeeper.date_of_record, max_aptc: 100))
+      #allow(@tax_household).to receive(:latest_eligibility_determination).and_return(double(determined_at: TimeKeeper.date_of_record, max_aptc: 100))
       #expect(@tax_household.current_max_aptc).to eq 100
     end
 
     it "return 0 when not in the same year" do
-      allow(@tax_household).to receive(:latest_eligibility_determination).and_return(double(determined_on: TimeKeeper.date_of_record + 1.year, max_aptc: 0))
+      allow(@tax_household).to receive(:latest_eligibility_determination).and_return(double(determined_at: TimeKeeper.date_of_record + 1.year, max_aptc: 0))
       expect(@tax_household.current_max_aptc).to eq 0
     end
   end
 
   context "current_csr_eligibility_kind" do
-    let(:eligibility_determination) {EligibilityDetermination.new(csr_eligibility_kind: 'csr_87', determined_on: TimeKeeper.date_of_record)}
+    let(:eligibility_determination) {EligibilityDetermination.new(csr_eligibility_kind: 'csr_87', determined_at: TimeKeeper.date_of_record)}
     let(:tax_household) {TaxHousehold.new}
 
     it "should equal to the csr_eligibility_kind of latest_eligibility_determination" do
@@ -252,7 +252,7 @@ RSpec.describe TaxHousehold, type: :model do
     let(:hbx_member1) { double(applicant_id: 'member1') }
     let(:hbx_member2) { double(applicant_id: 'member2') }
     let(:hbx_enrollment) { double(hbx_enrollment_members: [hbx_member1, hbx_member2], family: family) }
-    let(:eligibility_determination) {EligibilityDetermination.new(csr_eligibility_kind: 'csr_87', determined_on: TimeKeeper.date_of_record)}
+    let(:eligibility_determination) {EligibilityDetermination.new(csr_eligibility_kind: 'csr_87', determined_at: TimeKeeper.date_of_record)}
     let(:tax_household) do
       tax_household = TaxHousehold.new
       tax_household.tax_household_members.build(is_ia_eligible: true, applicant_id: 'member1')

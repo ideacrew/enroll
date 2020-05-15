@@ -531,6 +531,42 @@ module BenefitSponsors
           expect(renewal_application.benefit_sponsor_catalog).to eq renewal_benefit_sponsor_catalog
         end
 
+        context "send_employee_renewal_invites" do
+          let!(:census_employee_1) do
+            FactoryBot.create(:census_employee, benefit_sponsors_employer_profile_id: employer_profile.id, benefit_sponsorship: benefit_sponsorship, :benefit_group_assignments => [benefit_group_assignment])
+          end
+          let!(:census_employee_2) do
+            FactoryBot.create(:census_employee, benefit_sponsors_employer_profile_id: employer_profile.id, benefit_sponsorship: benefit_sponsorship, :benefit_group_assignments => [benefit_group_assignment])
+          end
+          let(:census_employee_scope) do
+            CensusEmployee.where(:"_id".in => [census_employee_1.id, census_employee_2.id])
+          end
+
+          let(:fake_email_address) {"fakeemail1@fakeemail.com" }
+
+          context "same employer, same email" do
+            before :each do
+              ::Invitation.destroy_all
+              renewal_application.save!
+              renewal_bga
+              CensusEmployee.all.each do |ce|
+                allow(ce).to receive(:email_address).and_return(fake_email_address)
+                allow(ce.renewal_benefit_group_assignment).to receive(:benefit_application).and_return(renewal_application)
+                allow(ce).to receive(:benefit_sponsors_employer_profile_id).and_return(employer_profile.id)
+              end
+              allow(renewal_application.benefit_sponsorship).to receive(:census_employees).and_return(census_employee_scope)
+              allow(TimeKeeper).to receive(:date_of_record).and_return(Time.now + 1.month)
+            end
+          
+            it "should not send duplicate invitations, even with time travel activated" do
+              renewal_application.send_employee_renewal_invites
+              expect(::Invitation.count).to eq(2)
+              renewal_application.send_employee_renewal_invites
+              expect(::Invitation.count).to eq(2)
+            end
+          end
+        end
+
         context "when renewal application saved" do
 
           before do
@@ -724,7 +760,7 @@ module BenefitSponsors
         let(:valid_open_enrollment_period)    { valid_open_enrollment_begin_on..valid_open_enrollment_end_on }
 
         it "should provide a valid open enrollment period for that effective date" do
-          expect(subject.open_enrollment_period_by_effective_date(effective_date)).to eq valid_open_enrollment_period
+          expect(subject.open_enrollment_period_by_effective_date(false, effective_date)).to eq valid_open_enrollment_period
         end
       end
 
@@ -760,11 +796,11 @@ module BenefitSponsors
         end
 
         it "should provide a valid an enrollment timetabe hash for that effective date" do
-          expect(subject.enrollment_timetable_by_effective_date(effective_date)).to eq valid_timetable
+          expect(subject.enrollment_timetable_by_effective_date(false, effective_date)).to eq valid_timetable
         end
 
         it "timetable date values should be valid" do
-          timetable = subject.enrollment_timetable_by_effective_date(effective_date)
+          timetable = subject.enrollment_timetable_by_effective_date(false, effective_date)
 
           expect(BenefitApplications::BenefitApplication.new(
                               effective_period: timetable[:effective_period],
@@ -923,6 +959,33 @@ module BenefitSponsors
       it 'should return enrolled families count' do
         expect(initial_application.active_and_cobra_enrolled_families.count).to eq benefit_sponsorship.census_employees.count
       end
+
+      context 'when family has only enrolled in dental coverage' do
+
+        let(:dental_person) { FactoryBot.create(:person, :with_employee_role, :with_family) }
+        let(:dental_family) { dental_person.primary_family }
+        let!(:dental_sponsored_benefit) { true }
+        let(:dental_census_employee) do
+          ce = FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package)
+          ce.update_attributes!(employee_role_id: dental_person.employee_roles.first.id)
+          ce
+        end
+
+        let!(:dental_enrollment) do
+          FactoryBot.create(
+            :hbx_enrollment,
+            family: dental_family,
+            household: dental_family.active_household,
+            benefit_group_assignment: dental_census_employee.benefit_group_assignments.first,
+            sponsored_benefit_package_id: dental_census_employee.benefit_group_assignments.first.benefit_package.id,
+            coverage_kind: 'dental'
+          )
+        end
+
+        it 'should return enrolled families count' do
+          expect(initial_application.active_and_cobra_enrolled_families.count).to eq benefit_sponsorship.census_employees.count
+        end
+      end
     end
 
     describe '.predecessor_benefit_package', dbclean: :after_each do
@@ -950,6 +1013,7 @@ module BenefitSponsors
         ce.benefit_group_assignments.first.update_attributes!(start_on: renewal_application.effective_period.min + 1.day)
         ce.aasm_state = 'employment_terminated'
         ce.employment_terminated_on = term_date
+        ce.benefit_group_assignments.last.update(benefit_package_id: renewal_application.benefit_packages.first.id)
         ce.save(validate: false)
         expect(renewal_application.active_census_employees_under_py.count).to eq 4
       end
@@ -961,6 +1025,7 @@ module BenefitSponsors
         ce.benefit_group_assignments.first.update_attributes!(start_on: renewal_application.effective_period.min + 1.day)
         ce.aasm_state = 'employee_termination_pending'
         ce.employment_terminated_on = term_date
+        ce.benefit_group_assignments.last.update(benefit_package_id: renewal_application.benefit_packages.first.id)
         ce.save(validate: false)
         expect(renewal_application.active_census_employees_under_py.count).to eq 4
       end

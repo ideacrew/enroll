@@ -10,11 +10,13 @@ INSURED_TRANSLATIONS = {
   -li- How to find Citizenship Certification Number: The Certificate of Citizenship certification number is most often in the upper right hand corner of the Certificate. \
   The Certificate of Citizenship certification number is printed in red on all US Certificates of Citizenship issued since September 27, 1906.",
   "en.insured.consumer_roles.docs_shared.country_of_citizenship" => "Country of Citizenship",
+  "en.insured.consumer_roles.docs_shared.document_description" => "Document Description",
+  "en.insured.consumer_roles.docs_shared.document_description_req" => "Enter the type of document, using no more than 35 characters.",
   "en.insured.consumer_roles.docs_shared.expiration_date" => "%{name} Expiration Date",
   "en.insured.consumer_roles.docs_shared.i94_number" => "I 94 Number",
-  "en.insured.consumer_roles.docs_shared.i94_number_req" => "When entering the I-94 Number, only include numbers.  Do not enter any other characters, letters, or spaces. -li- You must enter exactly 11 digits into the I-94 Number field. \
+  "en.insured.consumer_roles.docs_shared.i94_number_req" => "When entering the I-94 Number, only include 9 numbers followed by a letter or a number in the 10th position and a number in the 11th position. Do not enter any other characters or spaces. -li- You must enter exactly 11 characters into the I-94 field. \
   -li- How to find the I-94 Number: \
-  The I-94 Number is also called an admission number. It is an 11 digit number found printed on Arrival/Departure Records (Form I-94 or Form I-94A). It can also be found on Form I-9.",
+  The I-94 number is also called the admissions number. It is an 11 character sequence found printed on Arrival/Departure records (For I-94 or Form I-94A.) It can also be found on the form I-9.",
   "en.insured.consumer_roles.docs_shared.naturalization_number" => "Naturalization Number",
   "en.insured.consumer_roles.docs_shared.naturalization_number_req" => "When entering a Naturalization Number, include all numbers and letters. Do not enter any  other characters or spaces. -li- The Naturalization Number entered must have between 6 and 12 numbers and letters. How to find the Naturalization Number: The Naturalization Certificate Number is most often in the upper right hand corner of the Certificate. The Naturalization Certificate Number is printed in red on all US Certificates of Citizenship issued since September 27, 1906.",
   "en.insured.passport_number" => "Passport Number",
@@ -137,7 +139,7 @@ INSURED_TRANSLATIONS = {
   "en.insured.what_is_an_assister?" => "What is an Assister?",
   "en.insured.answer_for_assister" => "Assisters help Individuals, Families and Small Businesses in the District find quality, affordable health insurance through %{site_short_name}. Assisters are trained experts with deep roots and trusted relationships in the District and its communities. They include consumer and patient advocates, civic and faith-based organizations, business leaders and others. Assisters must complete more than 30 hours of rigorous training and pass criminal background checks prior to service. There is no cost to use an Assister.",
   "en.insured.what_is_a_broker?" => "What is a Broker?",
-  "en.insured.answer_for_broker" => "Brokers are licensed professionals with health insurance expertise and long-s`t`anding relationships with Small Business owners, Individuals and Families. Brokers help clients identify their options and make choices that are in their best interest and meet their needs and budget. In the District of Columbia, Brokers must have an active DC license in good standing, complete training on %{site_short_name}, and have contractual relationships with each carrier in %{site_short_name} for the market in which he/she intends to sell. There is no cost to use an insurance Broker.",
+  "en.insured.answer_for_broker" => "Brokers are licensed professionals with health insurance expertise and long-standing relationships with Small Business owners, Individuals and Families. Brokers help clients identify their options and make choices that are in their best interest and meet their needs and budget. In the District of Columbia, Brokers must have an active DC license in good standing, complete training on %{site_short_name}, and have contractual relationships with each carrier in %{site_short_name} for the market in which he/she intends to sell. There is no cost to use an insurance Broker.",
   "en.insured.find_assistance_another_way" => "Find Assistance Another Way",
   "en.please_select_effective_date" => "Please Select Effective Date",
   "en.select_effective_date" => "Select Effective Date",
@@ -246,6 +248,7 @@ INSURED_TRANSLATIONS = {
   "en.coverage" => "Coverage",
   "en.waived" => "Waived",
   "en.insured.waived_coverage_for_year" => "You have selected to waive your employer %{coverage_kind} coverage for %{year}",
+  "en.insured.waived_coverage_for_year_renewing" => "Based upon your choice in a previous year, the system has automatically renewed your decision to waive %{coverage_kind} coverage for %{year}.",
   "en.waived_date" => "Waived Date",
   "en.reason_waived" => "Reason Waived",
   "en.back" => "Back",

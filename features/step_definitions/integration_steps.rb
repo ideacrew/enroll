@@ -150,6 +150,14 @@ def people
     "CSR" => {
       email: "sherry.buckner@dc.gov",
       password: 'aA1!aA1!aA1!'
+    },
+    "Ricky Martin" => {
+      first_name: "Ricky",
+      last_name: "Martin",
+      dob_date: '10/10/1984',
+      broker_census_employee: true,
+      password: 'aA1!aA1!aA1!',
+      ssn: "222335220"
     }
   }
 end
@@ -745,6 +753,10 @@ Then(/^.+ should see the list of plans$/) do
   screenshot("plan_shopping")
 end
 
+And(/^.+ should see the Metal Level filter$/) do
+  expect(page).to have_content('Metal Level')
+end
+
 When(/^.+ sorts by (.*)/) do |sort|
   @plan_names = find_all('.plan-row').collect{|row| row.find('h3 a', wait: 5).text}
   find(".interaction-click-control-#{sort.downcase.gsub(/\s/, '-')}", wait: 5).click
@@ -801,6 +813,7 @@ When(/^.+ clicks? on Confirm button on the coverage summary page$/) do
 end
 
 Then(/^.+ should see the receipt page$/) do
+  find('h1.darkblue', wait: 10)
   expect(page).to have_content('Enrollment Submitted')
   screenshot("receipt_page")
   find('.interaction-click-control-continue').click
@@ -920,6 +933,7 @@ end
 
 When(/^I click on "(.*?)" button on household info page$/) do |select_action|
   click_link "Continue"
+  sleep 5
   click_button "Shop for new plan"
 end
 

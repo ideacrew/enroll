@@ -55,7 +55,11 @@ class Insured::GroupSelectionController < ApplicationController
 
     @waivable = @adapter.can_waive?(@hbx_enrollment, params)
     @fm_hash = {}
-    @family.family_members.each do |family_member|
+    # Only check eligibility for *active* family members because
+    # family members "deleted" with family#remove_family_member
+    # are set to is_active = false
+    @active_family_members = @family.family_members.active
+    @active_family_members.each do |family_member|
       family_member_eligibility_check(family_member)
     end
     if @fm_hash.present? && @fm_hash.values.flatten.detect{|err| err.to_s.match(/incarcerated_not_answered/)}
@@ -210,17 +214,16 @@ class Insured::GroupSelectionController < ApplicationController
   private
 
   def family_member_eligibility_check(family_member)
+    return unless (@adapter.can_shop_individual?(@person) || @adapter.can_shop_resident?(@person))
+
     role = if family_member.person.is_consumer_role_active?
              family_member.person.consumer_role
            elsif family_member.person.is_resident_role_active?
              family_member.person.resident_role
            end
 
-    rule = if can_shop_individual_or_resident?(@person)
-              InsuredEligibleForBenefitRule.new(role, @benefit, {family: @family, coverage_kind: @coverage_kind, new_effective_on: @new_effective_on, market_kind: "individual"})
-            else
-              InsuredEligibleForBenefitRule.new(role, @benefit, {family: @family, coverage_kind: @coverage_kind, new_effective_on: @new_effective_on, market_kind: @market_kind})
-            end
+    rule = InsuredEligibleForBenefitRule.new(role, @benefit, {family: @family, coverage_kind: @coverage_kind, new_effective_on: @new_effective_on, market_kind: get_ivl_market_kind(@person)})
+
     is_ivl_coverage, errors = rule.satisfied?
     person = family_member.person
     incarcerated = person.is_consumer_role_active? && person.is_incarcerated.nil? ? "incarcerated_not_answered" : family_member.person.is_incarcerated

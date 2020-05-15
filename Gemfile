@@ -69,6 +69,8 @@ gem 'combine_pdf',              '~> 1.0'
 gem 'config',                   '~> 2.0'
 gem 'curl',                     '~> 0.0.9'
 gem 'devise',                   '~> 4.5'
+gem 'devise-jwt', "~> 0.5.9"
+gem 'jwt', "~> 2.2.1"
 gem 'haml',                     '~> 5.0'
 gem 'httparty',                 '~> 0.16'
 gem 'i18n',                     '~> 1.5'
@@ -131,18 +133,18 @@ group :development, :test do
   # gem 'bundler-audit',          '~> 0.6'
   gem 'capistrano',             '~> 3.1'
   gem 'capistrano-rails',       '1.4'
+  gem 'climate_control',        '~> 0.2.0'
   gem 'email_spec',             '~> 2'
   gem 'factory_bot_rails',      '~> 4.11'
   gem 'forgery',                '~> 0.7.0'
   gem 'parallel_tests',         '~> 2.26.2'
   gem 'puma',                   '~> 3.11'
+  gem 'rails-controller-testing'
   gem 'railroady',              '~> 1.5.3'
   gem 'rspec-rails'
   gem 'rspec_junit_formatter'
   gem 'yard',                   '~> 0.9.12',  require: false
   gem 'yard-mongoid',           '~> 0.1',     require: false
-  gem 'rails-controller-testing'
-  gem 'climate_control', '~> 0.2.0'
 end
 
 group :test do
@@ -159,7 +161,7 @@ group :test do
   gem 'ruby-progressbar',             '~> 1'
   gem 'shoulda-matchers',             '~> 3'
   gem 'simplecov',                    '~> 0.14',  :require => false
-  gem 'test-prof',                    '~> 0.5.0'
+  gem 'test-prof'
   gem 'warden',                       '~> 1.2.7'
   gem 'watir',                        '~> 6.10.3'
   gem 'webdrivers', '~> 3.0'
