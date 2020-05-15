@@ -92,15 +92,15 @@
                 <%#= l10n("insured.you_are_not_under_open_enrollment_period") %>
               <% elsif @employee_role&.is_under_open_enrollment? && @employee_role&.census_employee.is_employee_in_term_pending? && @family.active_seps.blank?  %>
                 <p><%= "You have been terminated by your employer" %> "<%= @employee_role.employer_profile.legal_name %>"
-                  <%= "with an effective date of" %> <%= format_date @employee_role.census_employee.employment_terminated_on %> </p>
+                  <%= "with an effective date of" %> <%= format_date @employee_role.census_employee.employment_terminated_on.end_of_month %> </p>
               <% else %>
                 <% if @employee_role.present? && @employee_role.census_employee.is_employee_in_term_pending? %>
                 <% else %>
                   <p>If you <%= link_to 'enroll today', new_insured_group_selection_path(options) %>, coverage will begin
-                  <% if @employee_role.blank? && is_under_open_enrollment?  %>
-                    <%= format_date ivl_enrollment_effective_date %>.
-                  <%elsif @employee_role.try(:is_under_open_enrollment?) %>
+                  <% if @employee_role.try(:is_under_open_enrollment?)  %>
                     <%= format_date @employee_role.benefit_begin_date %>.
+                  <%elsif is_under_open_enrollment? %>
+                    <%= format_date ivl_enrollment_effective_date %>.
                   <% end %>
                   </p>
                 <% end %>
