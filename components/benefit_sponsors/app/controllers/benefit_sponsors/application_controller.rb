@@ -55,6 +55,20 @@ module BenefitSponsors
       end
     end
 
+    def set_ie_flash_by_announcement
+      return unless check_browser_compatibility
+      return unless flash.blank? || flash[:warning].blank?
+
+      announcements = Announcement.announcements_for_web
+      dismiss_announcements = JSON.parse(session[:dismiss_announcements] || '[]')
+      announcements -= dismiss_announcements
+      flash.now[:warning] = announcements
+    end
+
+    def check_browser_compatibility
+      browser.ie? && !Settings.site.support_for_ie_browser
+    end
+
     def cur_page_no(alph="a")
       page_string = params.permit(:page)[:page]
       page_string.blank? ? alph : page_string.to_s
