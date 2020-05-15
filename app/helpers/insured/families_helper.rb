@@ -3,7 +3,7 @@ module Insured::FamiliesHelper
   def previous_same_plan_enrollment(hbx_enrollment, plan)
     previous_same_plan_enrollment = hbx_enrollment.family.hbx_enrollments.where(
       :product_id.nin => [nil],
-      :aasm_state.nin => ["shopping"],
+      :aasm_state.nin => ["shopping"] + HbxEnrollment::ENROLLED_STATUSES,
       :coverage_kind.in => [plan.kind.to_s]
       ).where(
       :_id.nin => [hbx_enrollment.id]
