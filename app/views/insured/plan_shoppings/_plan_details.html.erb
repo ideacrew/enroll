@@ -28,10 +28,11 @@
       </div>
       <div class="col-md-3">
         <div class="price-wrapper pull-right">
-          <% if @tax_household.present? && params[:market_kind]=='individual' %>
-            <h2 class="no-buffer plan-premium"><%= number_to_currency(current_premium(@hbx_enrollment), precision: 2) %></h2>
+          <%# Premium for IVL %>
+          <% if !@hbx_enrollment.is_shop? %>
+            <h2 class="no-buffer plan-premium ivl-premium"><%= number_to_currency(current_premium(@hbx_enrollment), precision: 2) %></h2>
           <% else %>
-            <h2 class="no-buffer plan-premium"><%= number_to_currency(plan.total_employee_cost) %></h2>
+            <h2 class="no-buffer plan-premium shop-premium"><%= number_to_currency(plan.total_employee_cost) %></h2>
           <% end %>
           <small>/<%= l10n("month") %></small>
         </div>
