@@ -30,7 +30,15 @@
         <div class="price-wrapper pull-right">
           <%# Premium for IVL %>
           <% if !@hbx_enrollment.is_shop? %>
-            <h2 class="no-buffer plan-premium ivl-premium"><%= number_to_currency(current_premium(@hbx_enrollment), precision: 2) %></h2>
+            <h2 class="no-buffer plan-premium ivl-premium">
+              <% previous_same_plan_enrollment = previous_same_plan_enrollment(@hbx_enrollment, plan) %>
+              <% if previous_same_plan_enrollment&.product&.hios_id&.to_s == plan.hios_id.to_s %>
+                <% cost_decorator = previous_same_plan_enrollment_cost_decorator(previous_same_plan_enrollment) %>
+                <%= number_to_currency(cost_decorator.total_employee_cost) %>
+              <% else %>
+                 <%= number_to_currency(shopping_group_premium(plan.total_employee_cost, plan.total_ehb_premium, plan.can_use_aptc?)) %>
+              <% end %>  
+            </h2>
           <% else %>
             <h2 class="no-buffer plan-premium shop-premium"><%= number_to_currency(plan.total_employee_cost) %></h2>
           <% end %>
