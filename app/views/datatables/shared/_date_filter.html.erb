@@ -7,3 +7,9 @@ From:
 &nbsp;&nbsp;<div class="btn btn-default" id="date_range_apply">Apply</div>
 </div>
 <br>
+
+<script type="text/javascript">
+  $('#date_range_apply').on('click', function(){
+    $('.effective-datatable').DataTable().draw()
+  })
+</script>
