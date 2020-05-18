@@ -1598,5 +1598,31 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         end
       end
     end
+
+    context 'mark_residency_authorized' do
+      let(:person1000) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
+
+      context 'self_attest_residency' do
+        before :each do
+          args = OpenStruct.new
+          args.self_attest_residency = true
+          person1000.consumer_role.mark_residency_authorized(args)
+        end
+
+        it 'should attest dc residency type' do
+          expect(person1000.verification_type_by_name('DC Residency').validation_status).to eq('attested')
+        end
+      end
+
+      context 'verified dc residency' do
+        before :each do
+          person1000.consumer_role.mark_residency_authorized
+        end
+
+        it 'should attest dc residency type' do
+          expect(person1000.verification_type_by_name('DC Residency').validation_status).to eq('verified')
+        end
+      end
+    end
   end
 end

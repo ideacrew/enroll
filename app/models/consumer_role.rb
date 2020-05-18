@@ -892,7 +892,12 @@ class ConsumerRole
   def mark_residency_authorized(*args)
     update_attributes(:residency_determined_at => DateTime.now,
                       :is_state_resident => true)
-    verification_types.by_name("DC Residency").first.pass_type
+
+    if args&.first&.self_attest_residency
+      verification_types.by_name('DC Residency').first.attest_type
+    else
+      verification_types.by_name('DC Residency').first.pass_type
+    end
   end
 
   def lawful_presence_pending?
