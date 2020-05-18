@@ -18,7 +18,7 @@ module IvlAssistanceWorld
     tax_household.eligibility_determinations << EligibilityDetermination.new(
         max_aptc: 100.00,
         csr_percent_as_integer: 87,
-        determined_on: (TimeKeeper.date_of_record - 30.days)
+        determined_at: (TimeKeeper.date_of_record - 30.days)
     )
     tax_household.save!
     family.save!
