@@ -34,9 +34,9 @@ h1.heading-text Add Benefit Package
     - oe_end_on = f.object.open_enrollment_end_on.present? ? Date.strptime(f.object.open_enrollment_end_on, "%m/%d/%Y") : nil
     .row.row-form-wrapper#uic-wrapper
       .col-md-6.col-sm-12
-        = f.text_field :open_enrollment_start_on, class: "form-control", required: true, placeholder: 'OPEN ENROLLMENT START DATE', onmouseover:"showDatepicker('benefit_application_open_enrollment_start_on')", :"data-date-min" => f.object.start_on ? (Date.strptime(f.object.start_on, "%m/%d/%Y") - 2.months) : "", "data-oe-start-date" => oe_start_on
+        = f.text_field :open_enrollment_start_on, class: "form-control", required: true, placeholder: 'OPEN ENROLLMENT START DATE', onmouseover:"showDatepicker('benefit_application_open_enrollment_start_on')", :"data-date-min" => f.object.start_on ? ((Date.strptime(f.object.start_on, "%m/%d/%Y") - 2.months) < Date.today ? Date.today : (Date.strptime(f.object.start_on, "%m/%d/%Y") - 2.months)) : "", "data-oe-start-date" => oe_start_on
       .col-md-6.col-sm-12
-        = f.text_field :open_enrollment_end_on, class: "form-control interaction-field-control-plan_year-open_enrollment_end_on", required: true, placeholder: 'OPEN ENROLLMENT END DATE', onmouseover:"showDatepicker('benefit_application_open_enrollment_end_on')", "data-oe-end-date" => oe_end_on
+        = f.text_field :open_enrollment_end_on, class: "form-control interaction-field-control-plan_year-open_enrollment_end_on", required: true, placeholder: 'OPEN ENROLLMENT END DATE', onmouseover:"showDatepicker('benefit_application_open_enrollment_end_on')", "data-oe-end-date" => oe_end_on, :"data-date-max" => f.object.start_on ? Date.new(Date.today.year, (Date.strptime(f.object.start_on, "%m/%d/%Y") - 1.month).month, 10).strftime("%m/%d/%Y") : ""
 .row.pl-1
   h3 Add the total number of employees in your workforce
 .row
@@ -158,7 +158,8 @@ javascript:
   function showDatepicker(id) {
     //selectedDate(document.getElementById("baStartDate"));
     var minDate = document.querySelector("input#benefit_application_open_enrollment_start_on").dataset.dateMin;
-    var maxDate = document.querySelector("input#benefit_application_open_enrollment_end_on").dataset.oeEndDate;
+    // var maxDate = document.querySelector("input#benefit_application_open_enrollment_end_on").dataset.oeEndDate;
+    var maxDate = document.querySelector("input#benefit_application_open_enrollment_end_on").dataset.dateMax;
     if (minDate) {
       initDatepicker(id,new Date(minDate),new Date(maxDate));
     } else {
@@ -182,8 +183,9 @@ javascript:
     });
   }
 
+  // REMOVED: breaks row styling on refresh after incorrect dates input
   // Temporary fix to Select your open enrollment dates row width and alignment
-  (function() {
+  /*(function() {
     var element = document.querySelectorAll('.col-md-12')[1].querySelector('#uic-wrapper');
     element.style.marginLeft = "10px"
     element.style.width = "98%"
@@ -191,7 +193,7 @@ javascript:
     element2.querySelectorAll('input').forEach(function(input) {
       input.style.height = "23px"
     })
-  })();
+  })();*/
 
   $('#baStartDate').change(function() {
     var date = $(this).val();
