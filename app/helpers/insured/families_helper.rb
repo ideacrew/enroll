@@ -13,7 +13,7 @@ module Insured::FamiliesHelper
   def previous_same_plan_enrollment_cost_decorator(previous_same_plan_enrollment)
     previous_plan = previous_same_plan_enrollment.product
     previous_tax_household = previous_same_plan_enrollment.household.tax_households.last
-    UnassistedPlanCostDecorator.new(previous_plan, previous_same_plan_enrollment, previous_tax_household)
+    UnassistedPlanCostDecorator.new(previous_plan, previous_same_plan_enrollment, nil, previous_tax_household)
   end
 
   def display_change_tax_credits_button?(hbx_enrollment)
