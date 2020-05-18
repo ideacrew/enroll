@@ -31,6 +31,7 @@
           <%# Premium for IVL %>
           <% if !@hbx_enrollment.is_shop? %>
             <h2 class="no-buffer plan-premium ivl-premium">
+              <!-- Assures that the end user will see the proper premium if continuous coverage -->
               <% previous_same_plan_enrollment = previous_same_plan_enrollment(@hbx_enrollment, plan) %>
               <% if previous_same_plan_enrollment&.product&.hios_id&.to_s == plan.hios_id.to_s %>
                 <% cost_decorator = previous_same_plan_enrollment_cost_decorator(previous_same_plan_enrollment) %>
