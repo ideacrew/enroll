@@ -82,6 +82,11 @@ class VerificationType
     update_attributes(:validation_status => "curam")
   end
 
+  # This self_attestion status is only used for DC Residency
+  def attest_type
+    update_attributes(validation_status: 'attested')
+  end
+
   def pass_type
     update_attributes(:validation_status => "verified")
   end

@@ -55,5 +55,15 @@ RSpec.describe VerificationType, :type => :model, dbclean: :after_each do
       expect(person.verification_types.all?{|type| type.validation_status == "pending"}).to be true
     end
 
+    context 'DC Residency' do
+      before do
+        @residency_verification_type = person.verification_types.by_name('DC Residency').first
+        @residency_verification_type.attest_type
+      end
+
+      it 'attest verification type' do
+        expect(@residency_verification_type.validation_status).to eq('attested')
+      end
+    end
   end
 end
