@@ -1,4 +1,5 @@
 <% calculate = (defined? calculate) ? calculate : true %>
+
 <div class="table-border table-responsive">
   <table class="table table-striped">
     <thead>
@@ -12,7 +13,7 @@
       </tr>
     </thead>
     <tbody>
-      <% current_enrollment.hbx_enrollment_members.each do |member| %>
+      <% enrollment_for_cost_estimation.hbx_enrollment_members.each do |member| %>
         <tr>
           <td><%= member.person.full_name %></td>
           <td><%= member.primary_relationship %></td>
