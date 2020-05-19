@@ -75,9 +75,7 @@ module Subscribers
     end
 
     def fetch_event_args
-      args = OpenStruct.new
-      args.self_attest_residency = true
-      args
+      OpenStruct.new(self_attest_residency: true)
     end
   end
 end
