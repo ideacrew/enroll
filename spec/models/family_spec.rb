@@ -1317,10 +1317,15 @@ end
 describe "min_verification_due_date", dbclean: :after_each do
   let!(:today) { Date.today }
   let!(:family) { create(:family, :with_primary_family_member, min_verification_due_date: 5.days.ago) }
+  let!(:family2) { create(:family, :with_primary_family_member, min_verification_due_date: nil) }
 
   context "::min_verification_due_date_range" do
     it "returns a family in the range" do
       expect(Family.min_verification_due_date_range(10.days.ago, today).to_a).to eq([family])
+    end
+
+    it "return empty array when date is not in min_verification_due_date_range" do
+      expect(Family.min_verification_due_date_range(2.days.ago, today).to_a).to eq []
     end
   end
 end

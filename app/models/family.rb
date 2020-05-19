@@ -177,8 +177,9 @@ class Family
   }
 
   scope :outstanding_verification_datatable,   ->{ where(
-    :"_id".in => HbxEnrollment.individual_market.enrolled_and_renewing.by_unverified.distinct(:family_id))
+    :"_id".in => HbxEnrollment.by_kind('individual').enrolled_and_renewing.by_unverified.distinct(:family_id))
   }
+
   scope :monthly_reports_scope, lambda { |start_date, end_date|
     where(
       :"_id".in => HbxEnrollment.where(
@@ -1054,13 +1055,8 @@ class Family
     active_household.hbx_enrollments.where(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES).flat_map(&:hbx_enrollment_members).flat_map(&:family_member).flat_map(&:person).include?(person)
   end
 
-  def self.min_verification_due_date_range(start_date,end_date)
-    timekeeper_date = TimeKeeper.date_of_record + 95.days
-    if timekeeper_date >= start_date.to_date && timekeeper_date <= end_date.to_date
-      self.or(:"min_verification_due_date" => { :"$gte" => start_date, :"$lte" => end_date}).or(:"min_verification_due_date" => nil)
-    else
-     self.or(:"min_verification_due_date" => { :"$gte" => start_date, :"$lte" => end_date})
-    end
+  def self.min_verification_due_date_range(start_date, end_date)
+    self.or(:"min_verification_due_date" => { :"$gte" => start_date, :"$lte" => end_date})
   end
 
   def all_persons_vlp_documents_status
