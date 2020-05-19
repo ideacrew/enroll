@@ -2,7 +2,7 @@ puts "*"*80
 puts "::: Cleaning ApplicationEventKinds :::"
 ApplicationEventKind.delete_all
 
-ivl_notice_triggers = []
+if Settings.aca.market_kinds.include? 'individual'
 
   ivl_notice_triggers = [
     {
@@ -585,7 +585,8 @@ ivl_notice_triggers = []
     }
   ]
 else
-  puts "No state selected"
+  puts "IVL Market not enabled"
+  ivl_notice_triggers = []
 end
 
 ivl_notice_triggers.each do |trigger_params|
