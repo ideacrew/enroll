@@ -1149,12 +1149,12 @@ class ConsumerRole
   end
 
   def record_transition(*args)
-    workflow_state_transitions << WorkflowStateTransition.new(
-      from_state: aasm.from_state,
-      to_state: aasm.to_state,
-      event: aasm.current_event,
-      user_id: SAVEUSER[:current_user_id]
-    )
+    wfst_params = { from_state: aasm.from_state,
+                    to_state: aasm.to_state,
+                    event: aasm.current_event,
+                    user_id: SAVEUSER[:current_user_id] }
+    wfst_params.merge!({ reason: 'Self Attest DC Residency' }) if args&.first&.self_attest_residency
+    workflow_state_transitions << WorkflowStateTransition.new(wfst_params)
   end
 
   def verification_attr(*authority)

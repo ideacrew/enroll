@@ -52,11 +52,12 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           allow(subject).to receive(:xml_to_hash).with(xml).and_return(xml_hash)
           allow(subject).to receive(:find_person).with(individual_id).and_return(person)
           subject.call(nil, nil, nil, nil, payload)
+          @consumer_role = person.consumer_role
         end
 
         if self_attest_residency_enabled?
           it 'should fully verify consumer role' do
-            expect(person.consumer_role.aasm_state).to eq('fully_verified')
+            expect(@consumer_role.aasm_state).to eq('fully_verified')
           end
 
           it 'should attest dc residency type' do
@@ -64,11 +65,15 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           end
 
           it 'should store the ADDRESS_NOT_IN_AREA payload' do
-            expect(person.consumer_role.local_residency_responses.first.body).to include('ADDRESS_NOT_IN_AREA')
+            expect(@consumer_role.local_residency_responses.first.body).to include('ADDRESS_NOT_IN_AREA')
+          end
+
+          it 'should add reason to newly created workflow_state_transition' do
+            expect(@consumer_role.workflow_state_transitions.last.reason).to eq('Self Attest DC Residency')
           end
         else
           it 'should update consumer role state to outstanding' do
-            expect(person.consumer_role.aasm_state).to eq('verification_outstanding')
+            expect(@consumer_role.aasm_state).to eq('verification_outstanding')
           end
 
           it 'should store dc residency type status to outstanding' do
@@ -76,8 +81,8 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           end
 
           it 'should store the response payload' do
-            expect(person.consumer_role.local_residency_responses.count).to eq(1)
-            expect(person.consumer_role.local_residency_responses.first.body).to eq(payload[:body])
+            expect(@consumer_role.local_residency_responses.count).to eq(1)
+            expect(@consumer_role.local_residency_responses.first.body).to eq(payload[:body])
           end
         end
       end
