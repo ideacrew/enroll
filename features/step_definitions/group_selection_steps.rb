@@ -52,7 +52,7 @@ Given (/a matched Employee exists with consumer role/) do
   )
   ce.save!
   @person.employee_roles.first.update_attributes(census_employee_id: ce.id)
-  FactoryBot.create(:hbx_profile)
+  FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)
 end
 
 
