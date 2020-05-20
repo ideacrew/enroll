@@ -3,17 +3,26 @@
 require 'rails_helper'
 require File.join(Rails.root, 'spec/shared_contexts/ivl_eligibility')
 
-describe 'fix_ed_source_curam_cases' do
+describe FixEdSourceCuramCases, dbclean: :after_each do
   before do
     DatabaseCleaner.clean
   end
   include_context 'setup one tax household with one ia member'
 
+  let(:given_task_name) { 'fix_ed_source_curam_cases' }
+  subject { FixEdSourceCuramCases.new(given_task_name, double(:current_scope => nil)) }
+
+  context 'given a task name' do
+    it 'has the given task name' do
+      expect(subject.name).to eql given_task_name
+    end
+  end
+
   context 'valid curam determination' do
     before :each do
       eligibilty_determination.assign_attributes({e_pdc_id: '3023385'})
       eligibilty_determination.save!(validate: false)
-      invoke_fix_ed_source_curam_cases
+      subject.migrate
       @file_content = CSV.read("#{Rails.root}/list_of_ed_object_ids_for_curam_cases.csv")
     end
 
@@ -47,7 +56,7 @@ describe 'fix_ed_source_curam_cases' do
       before do
         eligibilty_determination.assign_attributes({e_pdc_id: nil, source: 'Admin'})
         eligibilty_determination.save!(validate: false)
-        invoke_fix_ed_source_curam_cases
+        subject.migrate
         @file_content = CSV.read("#{Rails.root}/list_of_ed_object_ids_for_curam_cases.csv")
       end
 
@@ -60,7 +69,7 @@ describe 'fix_ed_source_curam_cases' do
       before do
         eligibilty_determination.assign_attributes({e_pdc_id: 'MANUALLY_9_2_2016LOADING530', source: 'Admin'})
         eligibilty_determination.save!(validate: false)
-        invoke_fix_ed_source_curam_cases
+        subject.migrate
         @file_content = CSV.read("#{Rails.root}/list_of_ed_object_ids_for_curam_cases.csv")
       end
 
@@ -73,9 +82,4 @@ describe 'fix_ed_source_curam_cases' do
   after :each do
     FileUtils.rm_rf("#{Rails.root}/list_of_ed_object_ids_for_curam_cases.csv")
   end
-end
-
-def invoke_fix_ed_source_curam_cases
-  fix_ed_source_curam_cases = File.join(Rails.root, 'app/data_migrations/fix_ed_source_curam_cases.rb')
-  load fix_ed_source_curam_cases
 end

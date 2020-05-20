@@ -3,19 +3,27 @@
 require 'rails_helper'
 require File.join(Rails.root, 'spec/shared_contexts/ivl_eligibility')
 
-describe 'fix_ed_source_non_curam_cases' do
+describe FixEdSourceNonCuramCases do
   before do
     DatabaseCleaner.clean
   end
   include_context 'setup one tax household with one ia member'
   let(:year) { TimeKeeper.date_of_record.year }
+  let(:given_task_name) { 'fix_ed_source_non_curam_cases' }
+  subject { FixEdSourceNonCuramCases.new(given_task_name, double(:current_scope => nil)) }
+
+  context 'given a task name' do
+    it 'has the given task name' do
+      expect(subject.name).to eql given_task_name
+    end
+  end
 
   context 'ed creation using Create Eligibility tool' do
     context 'with source Admin_Script' do
       before :each do
         eligibilty_determination.assign_attributes({source: 'Admin_Script', created_at: Date.new(year, 12, 26)})
         eligibilty_determination.save!(validate: false)
-        invoke_fix_ed_source_non_curam_cases
+        subject.migrate
         eligibilty_determination.reload
         @file_content = CSV.read("#{Rails.root}/list_of_ed_object_ids_for_non_curam_cases.csv")
       end
@@ -49,7 +57,7 @@ describe 'fix_ed_source_non_curam_cases' do
       before :each do
         eligibilty_determination.assign_attributes({source: nil, created_at: Date.new(year, 12, 26)})
         eligibilty_determination.save!(validate: false)
-        invoke_fix_ed_source_non_curam_cases
+        subject.migrate
         eligibilty_determination.reload
         @file_content = CSV.read("#{Rails.root}/list_of_ed_object_ids_for_non_curam_cases.csv")
       end
@@ -66,7 +74,7 @@ describe 'fix_ed_source_non_curam_cases' do
     before :each do
       eligibilty_determination.assign_attributes({source: 'Admin_Script', created_at: date})
       eligibilty_determination.save!(validate: false)
-      invoke_fix_ed_source_non_curam_cases
+      subject.migrate
       @file_content = CSV.read("#{Rails.root}/list_of_ed_object_ids_for_non_curam_cases.csv")
     end
 
@@ -90,9 +98,4 @@ describe 'fix_ed_source_non_curam_cases' do
   after :each do
     FileUtils.rm_rf("#{Rails.root}/list_of_ed_object_ids_for_non_curam_cases.csv")
   end
-end
-
-def invoke_fix_ed_source_non_curam_cases
-  fix_ed_source_non_curam_cases = File.join(Rails.root, 'app/data_migrations/fix_ed_source_non_curam_cases.rb')
-  load fix_ed_source_non_curam_cases
 end
