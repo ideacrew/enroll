@@ -3,7 +3,7 @@ FactoryBot.define do
   sequence(:random_count) do |n|
     @random ||= Random.new
     @random_counts ||= (1..25).to_a.shuffle
-    @random_counts[@random.rand(26)]
+    @random_counts[@random.rand(25)]
   end
 
   factory :benefit_sponsors_benefit_application, class: 'BenefitSponsors::BenefitApplications::BenefitApplication' do
@@ -57,7 +57,7 @@ FactoryBot.define do
         if evaluator.passed_benefit_sponsor_catalog
           benefit_sponsor_catalog = evaluator.passed_benefit_sponsor_catalog
         else
-          benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(benefit_application.resolve_service_areas, benefit_application.effective_period.min)
+          benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(benefit_application.effective_period.min)
         end
         benefit_sponsor_catalog.save
         benefit_application.benefit_sponsor_catalog = (benefit_sponsor_catalog || ::BenefitMarkets::BenefitSponsorCatalog.new)
