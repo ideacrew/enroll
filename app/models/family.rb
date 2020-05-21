@@ -144,8 +144,8 @@ class Family
 
 
   scope :by_eligibility_determination_date_range, ->(start_at, end_at){ where(
-                                                        :"households.tax_households.eligibility_determinations.determined_on".gte => start_at).and(
-                                                        :"households.tax_households.eligibility_determinations.determined_on".lte => end_at
+                                                        :"households.tax_households.eligibility_determinations.determined_at".gte => start_at).and(
+                                                        :"households.tax_households.eligibility_determinations.determined_at".lte => end_at
                                                       )
                                                     }
   scope :all_with_hbx_enrollments, -> { where(:"_id".in => HbxEnrollment.all.distinct(:family_id)) }

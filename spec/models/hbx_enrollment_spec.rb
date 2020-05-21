@@ -348,7 +348,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
       let!(:tax_household) {FactoryBot.create(:tax_household,  effective_ending_on: nil, household: family.households.first)}
       let!(:household) { family.active_household}
-      let!(:eligibility_determination) {FactoryBot.create(:eligibility_determination, csr_eligibility_kind: "csr_87", determined_on: TimeKeeper.date_of_record, tax_household: tax_household)}
+      let!(:eligibility_determination) {FactoryBot.create(:eligibility_determination, csr_eligibility_kind: "csr_87", determined_at: TimeKeeper.date_of_record, tax_household: tax_household)}
       let(:coverage_household) { family.households.first.coverage_households.first }
       let(:hbx_profile) {FactoryBot.create(:hbx_profile)}
       let(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
