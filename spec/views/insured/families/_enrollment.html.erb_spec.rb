@@ -305,3 +305,36 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     end
   end
 end
+
+RSpec.describe "insured/families/_enrollment.html.erb" do
+  context "IVL Enrollment" do
+    let!(:person) { FactoryBot.create(:person, last_name: 'John', first_name: 'Doe') }
+    let!(:family) { FactoryBot.create(:family, :with_primary_family_member, :person => person) }
+    let(:issuer_profile) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
+    let!(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01', issuer_profile: issuer_profile)}
+    let!(:hbx_enrollment) do
+      FactoryBot.create(
+        :hbx_enrollment,
+        created_at: (TimeKeeper.date_of_record.in_time_zone("Eastern Time (US & Canada)") - 2.days),
+        family: family,
+        household: family.households.first,
+        coverage_kind: "health",
+        kind: "individual",
+        aasm_state: 'coverage_selected',
+        product: product
+      )
+    end
+
+    before :each do
+      allow(view).to receive(:policy_helper).and_return(family)
+      @family = family
+      @person = person
+      allow(hbx_enrollment).to receive(:display_make_changes_for_ivl?).and_return(true)
+      render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
+    end
+
+    it "displays make changes button for active IVL enrollment" do
+      expect(rendered.scan(/(?=Make Changes)/).count).to eq(1)
+    end
+  end
+end
