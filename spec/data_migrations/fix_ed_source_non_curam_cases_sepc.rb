@@ -25,7 +25,7 @@ describe FixEdSourceNonCuramCases do
         eligibilty_determination.save!(validate: false)
         subject.migrate
         eligibilty_determination.reload
-        @file_content = CSV.read("#{Rails.root}/list_of_ed_object_ids_for_non_curam_cases.csv")
+        @file_content = CSV.read("#{Rails.root}/list_of_ed_object_ids_for_non_curam_cases_1.csv")
       end
 
       it 'should add data to the file' do
@@ -59,7 +59,6 @@ describe FixEdSourceNonCuramCases do
         eligibilty_determination.save!(validate: false)
         subject.migrate
         eligibilty_determination.reload
-        @file_content = CSV.read("#{Rails.root}/list_of_ed_object_ids_for_non_curam_cases.csv")
       end
 
       it 'should return Admin as the source Create Eligibility tool' do
@@ -75,7 +74,7 @@ describe FixEdSourceNonCuramCases do
       eligibilty_determination.assign_attributes({source: 'Admin_Script', created_at: date})
       eligibilty_determination.save!(validate: false)
       subject.migrate
-      @file_content = CSV.read("#{Rails.root}/list_of_ed_object_ids_for_non_curam_cases.csv")
+      @file_content = CSV.read("#{Rails.root}/list_of_ed_object_ids_for_non_curam_cases_1.csv")
     end
 
     it 'should add data to the file' do
@@ -96,6 +95,6 @@ describe FixEdSourceNonCuramCases do
   end
 
   after :each do
-    FileUtils.rm_rf("#{Rails.root}/list_of_ed_object_ids_for_non_curam_cases.csv")
+    FileUtils.rm_rf("#{Rails.root}/list_of_ed_object_ids_for_non_curam_cases_1.csv")
   end
 end
