@@ -48,7 +48,6 @@ RSpec.describe BenefitSponsors::Entities::BenefitSponsorship do
       end
 
       it "contract validation should pass when is_no_ssn_enabled is nil" do
-        binding.pry
         expect(contract.call(required_params_1).to_h).to eq required_params_1
       end
 
