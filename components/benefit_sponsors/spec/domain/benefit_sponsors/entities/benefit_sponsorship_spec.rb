@@ -35,6 +35,8 @@ RSpec.describe BenefitSponsors::Entities::BenefitSponsorship do
       }
     end
 
+    let(:required_params_1) { required_params.merge({is_no_ssn_enabled: nil}) }
+
     context "with required only" do
 
       it "contract validation should pass" do
@@ -43,6 +45,15 @@ RSpec.describe BenefitSponsors::Entities::BenefitSponsorship do
 
       it "should create new BenefitSponsorship instance" do
         expect(described_class.new(required_params)).to be_a BenefitSponsors::Entities::BenefitSponsorship
+      end
+
+      it "contract validation should pass when is_no_ssn_enabled is nil" do
+        binding.pry
+        expect(contract.call(required_params_1).to_h).to eq required_params_1
+      end
+
+      it "should create new BenefitSponsorship instance when is_no_ssn_enabled is nil" do
+        expect(described_class.new(required_params_1)).to be_a BenefitSponsors::Entities::BenefitSponsorship
       end
     end
   end
