@@ -348,6 +348,8 @@ module BenefitSponsors
     def validate_benefit_application_termination_date(end_on, termination_kind)
       errors = {}
       result = true
+      end_on = end_on.to_date
+
       if termination_kind == 'voluntary'
         if !allow_mid_month_voluntary_terms? && end_on != end_on.end_of_month
           result = false
