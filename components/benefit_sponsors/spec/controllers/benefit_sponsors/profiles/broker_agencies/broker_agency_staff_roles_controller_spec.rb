@@ -5,6 +5,10 @@ module BenefitSponsors
 
     routes { BenefitSponsors::Engine.routes }
 
+    before do
+      DatabaseCleaner.clean
+    end
+
     let!(:site)                          { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
     let(:organization_with_hbx_profile)  { site.owner_organization }
     let!(:organization)                  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
@@ -26,6 +30,7 @@ module BenefitSponsors
     describe "GET new" do
 
       before do
+        allow(controller).to receive(:set_ie_flash_by_announcement).and_return true
         get :new, params: { profile_type: "broker_agency_staff" }
       end
 
