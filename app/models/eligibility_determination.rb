@@ -36,7 +36,7 @@ class EligibilityDetermination
 
   field :determined_at, type: DateTime
 
-  # DEPRECATED - use determined_at
+  # DEPRECATED - use determined_at. See ticket 42408
   field :determined_on, type: DateTime
 
   # Source will tell who determined / redetermined eligibility. Eg: Curam or Admin
@@ -44,7 +44,7 @@ class EligibilityDetermination
 
   before_validation :set_premium_credit_strategy, :set_determined_at
 
-  validates_presence_of :determined_on, :max_aptc, :csr_percent_as_integer
+  validates_presence_of :determined_at, :max_aptc, :csr_percent_as_integer
 
   validates :premium_credit_strategy_kind,
     allow_blank: false,
