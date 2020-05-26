@@ -712,14 +712,29 @@ module BenefitSponsors
                                                                 aasm_state: :applicant)
         }
 
-        it "should fetch only valid renewal applications" do 
+        let!(:april_applicant_sponsorship_renewal_sponsors) do
+          create_list(:benefit_sponsors_benefit_sponsorship, 1,
+                      :with_organization_cca_profile,
+                      :with_renewal_benefit_application,
+                      initial_application_state: initial_application_state,
+                      renewal_application_state: :enrollment_eligible,
+                      default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)),
+                      site: site,
+                      aasm_state: :applicant)
+        end
+
+        it 'should fetch only valid renewal applications' do
           applications = subject.may_transmit_renewal_enrollment?(april_effective_date)
 
           expect(applications & april_renewal_sponsors).to eq april_renewal_sponsors
           expect(applications & april_ineligible_renewal_sponsors).to be_empty
-          expect(applications & april_wrong_sponsorship_renewal_sponsors).to be_empty
         end
-        
+
+        it 'should fetch renewal applications even for applicant sponsorship' do
+          applications = subject.may_transmit_renewal_enrollment?(april_effective_date)
+          expect(applications & april_applicant_sponsorship_renewal_sponsors).not_to be_empty
+        end
+
         context 'renewal_enrollment with matching workflow state transition' do
           let!(:april_renewal_eligible_benefit_sponsorhip_1)  { april_renewal_sponsors[0]}
           let!(:april_renewal_eligible_benefit_sponsorhip_2)  { april_renewal_sponsors[1]}
