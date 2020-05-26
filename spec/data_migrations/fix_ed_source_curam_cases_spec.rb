@@ -23,7 +23,7 @@ describe FixEdSourceCuramCases, dbclean: :after_each do
       eligibilty_determination.assign_attributes({e_pdc_id: '3023385'})
       eligibilty_determination.save!(validate: false)
       subject.migrate
-      @file_content = CSV.read("#{Rails.root}/list_of_ed_object_ids_for_curam_cases.csv")
+      @file_content = CSV.read("#{Rails.root}/list_of_ed_object_ids_for_curam_cases_1.csv")
     end
 
     it 'should add data to the file' do
@@ -57,7 +57,6 @@ describe FixEdSourceCuramCases, dbclean: :after_each do
         eligibilty_determination.assign_attributes({e_pdc_id: nil, source: 'Admin'})
         eligibilty_determination.save!(validate: false)
         subject.migrate
-        @file_content = CSV.read("#{Rails.root}/list_of_ed_object_ids_for_curam_cases.csv")
       end
 
       it 'should not update the eligibilty_determination object' do
@@ -70,7 +69,6 @@ describe FixEdSourceCuramCases, dbclean: :after_each do
         eligibilty_determination.assign_attributes({e_pdc_id: 'MANUALLY_9_2_2016LOADING530', source: 'Admin'})
         eligibilty_determination.save!(validate: false)
         subject.migrate
-        @file_content = CSV.read("#{Rails.root}/list_of_ed_object_ids_for_curam_cases.csv")
       end
 
       it 'should not update the eligibilty_determination object' do
@@ -80,6 +78,6 @@ describe FixEdSourceCuramCases, dbclean: :after_each do
   end
 
   after :each do
-    FileUtils.rm_rf("#{Rails.root}/list_of_ed_object_ids_for_curam_cases.csv")
+    FileUtils.rm_rf("#{Rails.root}/list_of_ed_object_ids_for_curam_cases_1.csv")
   end
 end

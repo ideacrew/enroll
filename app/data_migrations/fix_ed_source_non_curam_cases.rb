@@ -12,16 +12,13 @@ class FixEdSourceNonCuramCases < MongoidMigrationTask
     (date.month == 11 && date.day == 1) || (date.month == 10 && date.day == 31)
   end
 
-  def migrate
+  def process_families(families, file_name, offset_count)
     field_names = %w[person_hbx_id ed_object_id source e_pdc_id]
-    file_name = "#{Rails.root}/list_of_ed_object_ids_for_non_curam_cases.csv"
-
     CSV.open(file_name, 'w', force_quotes: true) do |csv|
       csv << field_names
-
-      Family.where(:"households.tax_households.eligibility_determinations.source".in => ['Admin_Script', nil]).inject([]) do |_dummy, family|
+      families.limit(10_000).offset(offset_count).no_timeout.inject([]) do |_dummy, family|
         person = family.primary_person
-        family.active_household.tax_households.where(:"eligibility_determinations.source".in => ['Admin_Script', nil]).each do |thh|
+        family.active_household.tax_households.where(:eligibility_determinations => {:$elemMatch => {:source.in => ['Admin_Script', nil]}}).each do |thh|
           thh.eligibility_determinations.where(:source.in => ['Admin_Script', nil]).each do |ed|
             if ed.source == 'Admin_Script' && object_created_by_renewals(ed)
               ed.update_attributes!(source: 'Renewals')
@@ -32,8 +29,27 @@ class FixEdSourceNonCuramCases < MongoidMigrationTask
           end
         end
       rescue StandardError => e
-        puts e.message
+        puts e.message unless Rails.env.test?
       end
     end
+  end
+
+  def migrate
+    start_time = DateTime.current
+    puts "FixEdSourceNonCuramCases start_time: #{start_time}" unless Rails.env.test?
+    families = Family.where(:"households.tax_households.eligibility_determinations" => {:$elemMatch => {:source.in => ['Admin_Script', nil]}})
+    total_count = families.count
+    familes_per_iteration = 10_000.0
+    number_of_iterations = (total_count / familes_per_iteration).ceil
+    counter = 0
+
+    while counter < number_of_iterations
+      file_name = "#{Rails.root}/list_of_ed_object_ids_for_non_curam_cases_#{counter + 1}.csv"
+      offset_count = familes_per_iteration * counter
+      process_families(families, file_name, offset_count)
+      counter += 1
+    end
+    end_time = DateTime.current
+    puts "FixEdSourceNonCuramCases end_time: #{end_time}, total_time_taken_in_minutes: #{((end_time - start_time) * 24 * 60).to_i}" unless Rails.env.test?
   end
 end
