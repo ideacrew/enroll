@@ -18,6 +18,8 @@ class PopulateAssignedContributionModel < MongoidMigrationTask
         begin
           benefit_application = benefit_sponsorship.benefit_applications.where(:created_at.gte => time).first
           benefit_sponsor_catalog = benefit_application.benefit_sponsor_catalog
+          next if benefit_sponsor_catalog.product_packages.any? { |product_package| product_package.assigned_contribution_model.present? }
+
           benefit_sponsor_catalog.product_packages.where(product_kind: :health).each do |product_package|
             contribution_unit = product_package.contribution_model.contribution_units.where(name: :employee).first
             market_product_package = benefit_market_catalog.product_packages.where(product_kind: product_package.product_kind, package_kind: product_package.package_kind).first
