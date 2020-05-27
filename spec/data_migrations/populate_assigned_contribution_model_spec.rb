@@ -22,9 +22,16 @@ describe PopulateAssignedContributionModel do
     include_context 'setup initial benefit application'
 
     let(:current_effective_date) { TimeKeeper.date_of_record }
-    let!(:product_packages) { benefit_sponsor_catalog.product_packages }
+    let!(:product_packages) do
+      benefit_sponsor_catalog.product_packages.by_product_kind(:health).each do |product_package|
+        product_package.assigned_contribution_model = nil
+        product_package.save
+      end
+      benefit_sponsor_catalog.save!
+    end
 
     it 'should update assigned_contribution_model on health product_packages' do
+      expect(benefit_sponsor_catalog.product_packages.by_product_kind(:health).first.assigned_contribution_model.present?).to be_falsey
       subject.migrate
       benefit_sponsor_catalog.reload
       benefit_sponsor_catalog.product_packages.by_product_kind(:health).each do |product_package|
