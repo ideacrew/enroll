@@ -63,7 +63,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
   def create_benefit_application
-    @ba_form = BenefitSponsors::Forms::BenefitApplicationForm.for_create(create_ba_params)
+    @ba_form = BenefitSponsors::Forms::BenefitApplicaionForm.for_create(create_ba_params)
     authorize @ba_form, :updateable?
     @save_errors = benefit_application_error_messages(@ba_form) unless @ba_form.save
     @element_to_replace_id = params[:employer_actions_id]
@@ -549,6 +549,33 @@ def employer_poc
     end
   end
 
+  def send_secure_message_form
+    @person = Person.find(params[:person_id])
+    @element_to_replace_id = params[:family_actions_id]
+  end
+
+  def send_secure_message
+    @person = Person.find(params_hash[:person][:person_id])
+    @element_to_replace_id = params[:person][:family_actions_id]
+    @subject = params[:subject].present? ? params[:subject] : nil
+    @body = params[:body].present? ? params[:body] : nil
+    validate_params = ::Validators::SecureMessageContract.new.call(params_hash)
+    if validate_params.success?
+      result = ::Operations::SecureMessage.new.call(params: validate_params.to_h)
+      message = {notice: "Message Sent successfully."}
+      @error_on_save = result.failure? ? result.failure : nil
+    else
+      @error_on_save = validate_params.errors.to_h
+    end
+    respond_to do |format|
+      if @error_on_save
+        format.js { render "send_secure_message_form", person: @person, subject: @subject, :family_actions_id => validate_params[:person][:family_actions_id]  }
+      else
+        format.html { redirect_to exchanges_hbx_profiles_root_path, :flash => { :success => "Message Sent successfully" } }
+      end
+    end
+  end
+
   def view_terminated_hbx_enrollments
     @person = Person.find(params[:person_id])
     @element_to_replace_id = params[:family_actions_id]
@@ -771,6 +798,10 @@ def employer_poc
   end
 
   private
+
+  def params_hash
+    params.permit!.to_h
+  end
 
   def group_enrollments_by_year_and_market(all_enrollments)
     current_year = TimeKeeper.date_of_record.year

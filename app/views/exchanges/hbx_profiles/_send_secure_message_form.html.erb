@@ -1,0 +1,44 @@
+<%if @error_on_save %>
+  <div class='alert alert-error'><a class='close' data-dismiss='alert'>x</a>
+    <%@error_on_save.each do |err|%>
+      <li><%=err[1][0]%></li>
+    <%end%>
+  </div>
+<%end%>
+
+<div id="add_sep">
+  <div class="bottom-pd">
+    <%= form_for @person, :url => send_secure_message_path, remote: true, html: {multipart: true}, authenticity_token: true,  method: :post do |f|%>
+      <div class="row no-buffer">
+        <div class="col-md-6 col-md-offset-3 input-no-pd bottom-pd">
+          <h3>New Message</h3>
+
+          <table class="table table-message-wrapper">
+            <tbody>
+            <tr>
+              <th>Recipient:</th>
+              <td>&nbsp; &nbsp;<b><%= @person.full_name %></b></td>
+            </tr>
+            <tr>
+              <th>Subject<span class="text-danger">*</span>:</th>
+              <td><%= text_field_tag :subject, @subject, placeholder: 'Subject', maxlength: 100, include_blank: false %></td>
+            </tr>
+            <tr>
+              <th style="vertical-align: top;">Content<span class="text-danger">*</span>:</th>
+              <td><%= text_area_tag 'body', @body , rows: 5, cols: 2, placeholder: 'Write here...', include_blank: false %></td>
+            </tr>
+            <tr>
+              <th style="vertical-align: top;">Document(optional)<span class="text-danger"></span>:</th>
+              <td><%= file_field_tag "file", type: :file, accept: 'application/pdf', class: "doc-upload-file"%></td>
+            </tr>
+            </tbody>
+          </table>
+          <%= f.hidden_field :person_id, value: @person.id %>
+          <%= f.hidden_field :family_actions_id, value: @element_to_replace_id %>
+          <%= f.submit 'Send', class: "btn btn-primary interaction-control-inbox-send" %>
+          <button type="button" class="btn btn-default" id="reviewClose">Cancel</button>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

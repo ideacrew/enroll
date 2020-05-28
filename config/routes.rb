@@ -151,6 +151,7 @@ Rails.application.routes.draw do
         get :identity_verification
         post :identity_verification_datatable
         get :new_eligibility
+        get :send_secure_message_form, format: :js
       end
 
       member do
@@ -590,6 +591,8 @@ Rails.application.routes.draw do
   match "hbx_profiles/update_dob_ssn" => "exchanges/hbx_profiles#update_dob_ssn", as: :update_dob_ssn, via: [:get, :post], defaults: { format: 'js' }
   match "hbx_profiles/verify_dob_change" => "exchanges/hbx_profiles#verify_dob_change", as: :verify_dob_change, via: [:get], defaults: { format: 'js' }
   match "hbx_profiles/create_eligibility" => "exchanges/hbx_profiles#create_eligibility", as: :create_eligibility, via: [:post], defaults: { format: 'js' }
+  match "hbx_profiles/send_secure_message_form" => "exchanges/hbx_profiles#send_secure_message_form", as: :send_secure_message_form, via: [:get, :post]
+  match "hbx_profiles/send_secure_message" => "exchanges/hbx_profiles#send_secure_message", as: :send_secure_message, via: [:get, :post]
 
   resources :families do
     get 'page/:page', :action => :index, :on => :collection
