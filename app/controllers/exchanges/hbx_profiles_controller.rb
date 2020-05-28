@@ -63,7 +63,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
   def create_benefit_application
-    @ba_form = BenefitSponsors::Forms::BenefitApplicaionForm.for_create(create_ba_params)
+    @ba_form = BenefitSponsors::Forms::BenefitApplicationForm.for_create(create_ba_params)
     authorize @ba_form, :updateable?
     @save_errors = benefit_application_error_messages(@ba_form) unless @ba_form.save
     @element_to_replace_id = params[:employer_actions_id]
