@@ -5,7 +5,7 @@
       button.close type="button" data-dismiss="alert" aria-label="Close"
         span aria-hidden="true" &times
       - value.to_a.flatten.each do |v|
-        = v
+        = raw v
   = form_for @staff, as: :staff, url: {action: "create"}, remote: true,  html: {class: "needs-ajax-validation s508", id: 'general_agency_staff_registration_form', novalidate:true} do |f|
     div#general_agency_staff
     = render partial: './ui-components/v1/forms/general_agency_registration/general_agency_staff_information', locals: {f: f}
