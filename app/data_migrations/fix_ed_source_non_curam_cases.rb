@@ -16,7 +16,7 @@ class FixEdSourceNonCuramCases < MongoidMigrationTask
     field_names = %w[person_hbx_id ed_object_id source e_pdc_id]
     CSV.open(file_name, 'w', force_quotes: true) do |csv|
       csv << field_names
-      families.limit(10_000).offset(offset_count).no_timeout.inject([]) do |_dummy, family|
+      families.no_timeout.limit(10_000).offset(offset_count).inject([]) do |_dummy, family|
         person = family.primary_person
         family.active_household.tax_households.where(:eligibility_determinations => {:$elemMatch => {:source.in => ['Admin_Script', nil]}}).each do |thh|
           thh.eligibility_determinations.where(:source.in => ['Admin_Script', nil]).each do |ed|
