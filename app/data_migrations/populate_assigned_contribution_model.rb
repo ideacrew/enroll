@@ -37,6 +37,7 @@ class PopulateAssignedContributionModel < MongoidMigrationTask
                 cu = sponsor_contribution.contribution_model.contribution_units.where(display_name: contribution_level.display_name).first
                 raise "contribution_unit not found for benefit_sponsorship.legal_name - contribution_level id - #{contribution_level.id}" unless cu
 
+                next if cu.id == contribution_level.contribution_unit_id
                 contribution_level.update_attributes!(contribution_unit_id: cu.id)
               end
             end
