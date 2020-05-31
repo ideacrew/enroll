@@ -30,6 +30,18 @@ class PopulateAssignedContributionModel < MongoidMigrationTask
               puts "#{benefit_sponsorship.legal_name} - #{benefit_sponsor_catalog.created_at} - #{benefit_application.created_at} - #{benefit_application.start_on} - #{contribution_unit.minimum_contribution_factor} - #{contribution_unit.default_contribution_factor}" unless Rails.env.test?
             end
           end
+          benefit_application.benefit_packages.each do |benefit_package|
+            benefit_package.sponsored_benefits.each do |sponsored_benefit|
+              sponsor_contribution = sponsored_benefit.sponsor_contribution
+              sponsor_contribution.contribution_levels.each do |contribution_level|
+                cu = sponsor_contribution.contribution_model.contribution_units.where(display_name: contribution_level.display_name).first
+                raise "contribution_unit not found for benefit_sponsorship.legal_name - contribution_level id - #{contribution_level.id}" unless cu
+
+                contribution_level.update_attributes!(contribution_unit_id: cu.id)
+              end
+            end
+          end
+          benefit_application.save!
           benefit_sponsor_catalog.save!
         rescue Exception => e
           p "Unable to save assigned_contribution_model for #{benefit_sponsorship.legal_name} due to #{e.inspect}"
