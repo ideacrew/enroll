@@ -42,7 +42,7 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
   end
 
   def is_csr?(enrollment)
-    csr_product_variants = EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP.except('csr_100').values
+    csr_product_variants = EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP.except('csr_0').values
     (enrollment.product.metal_level == :silver) && csr_product_variants.include?(enrollment.product.csr_variant_id)
   end
 

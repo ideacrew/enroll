@@ -225,7 +225,7 @@ class BenefitCoveragePeriod
 
   def extract_csr_kind(tax_household, shopping_family_member_ids)
     csr_kind = tax_household.latest_eligibility_determination.csr_eligibility_kind
-    tax_household.tax_household_members.where(:applicant_id.in => shopping_family_member_ids).map(&:is_ia_eligible).include?(false) ? 'csr_100' : csr_kind
+    tax_household.tax_household_members.where(:applicant_id.in => shopping_family_member_ids).map(&:is_ia_eligible).include?(false) ? 'csr_0' : csr_kind
   end
 
   def end_date_follows_start_date
