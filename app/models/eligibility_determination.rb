@@ -13,13 +13,14 @@ class EligibilityDetermination
   #   csr_0:   "02", # Native Americans
   #   limited: "03", # limited?
   CSR_KIND_TO_PLAN_VARIANT_MAP = {
-      "csr_100" => "01",
+      'csr_100' => '02',
       "csr_94"  => "06",
       "csr_87"  => "05",
       "csr_73"  => "04",
-      "csr_0"   => "02",
+      'csr_0'   => '01',
       "limited" => "03"
-    }
+  }
+
   CSR_KIND_TO_PLAN_VARIANT_MAP.default = "01"
 
   field :e_pdc_id, type: String
@@ -34,7 +35,7 @@ class EligibilityDetermination
   #   the plan actuarial value (the average out-of-pocket costs an insurer pays on a plan)
   # Available to households with income between 100-250% of FPL and enrolled in Silver plan.
   field :csr_percent_as_integer, type: Integer, default: 0  #values in DC: 0, 73, 87, 94
-  field :csr_eligibility_kind, type: String, default: "csr_100"
+  field :csr_eligibility_kind, type: String, default: 'csr_0'
 
   field :determined_at, type: DateTime
 
