@@ -70,15 +70,17 @@ class EligibilityDetermination
   def csr_percent_as_integer=(new_csr_percent)
     super
     self.csr_eligibility_kind = case csr_percent_as_integer
-    when 73
-      "csr_73"
-    when 87
-      "csr_87"
-    when 94
-      "csr_94"
-    else
-      "csr_100"
-    end
+                                when 73
+                                  'csr_73'
+                                when 87
+                                  'csr_87'
+                                when 94
+                                  'csr_94'
+                                when 100
+                                  'csr_100'
+                                else
+                                  'csr_0'
+                                end
   end
 
   def family
