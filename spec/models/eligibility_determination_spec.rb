@@ -18,7 +18,7 @@ RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
 
   let(:max_aptc_default)                { 0.00 }
   let(:csr_percent_as_integer_default)  { 0 }
-  let(:csr_eligibility_kind_default)    { "csr_100" }
+  let(:csr_eligibility_kind_default)    { 'csr_0' }
 
   let(:valid_params){
       {
