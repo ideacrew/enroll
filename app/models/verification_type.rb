@@ -84,7 +84,7 @@ class VerificationType
 
   # This self_attestion status is only used for DC Residency
   def attest_type
-    update_attributes(validation_status: 'attested')
+    update_attributes({validation_status: 'attested', update_reason: 'Self Attest DC Residency'})
   end
 
   def pass_type
