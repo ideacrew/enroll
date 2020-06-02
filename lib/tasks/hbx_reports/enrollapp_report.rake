@@ -41,7 +41,7 @@ namespace :reports do
               enr.hbx_enrollment_members.each do |en|
                 per = en.person
                 premium_amount = (enr.is_ivl_by_kind? ? enr.premium_for(en): (enr.decorated_hbx_enrollment.member_enrollments.find { |enrollment| enrollment.member_id == en.id }).product_price).to_f.round(2)
-                py = enr.employee_role_id.blank? ? nil : enr.employer_profile.latest_plan_year
+                py = enr.sponsored_benefit_package&.benefit_application
                 next if per.blank?
                 csv << [
                   primary_person_hbx_id, per.hbx_id, enr.hbx_id, enr.aasm_state,
