@@ -8,7 +8,7 @@ class EligibilityDetermination
 
   SOURCE_KINDS = %w[Curam Admin Renewals].freeze
 
-  CSR_KINDS = %w(csr_100 csr_94 csr_87 csr_73)
+  CSR_KINDS = %w(csr_100 csr_94 csr_87 csr_73 csr_0)
 
   #   csr_0:   "02", # Native Americans
   #   limited: "03", # limited?
