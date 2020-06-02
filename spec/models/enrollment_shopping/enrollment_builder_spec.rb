@@ -363,7 +363,7 @@ RSpec.describe EnrollmentShopping::EnrollmentBuilder, dbclean: :around_each do
           context "during special enrollment period with change to bga for two benefit packages case" do
             let!(:benefit_package2) { FactoryBot.create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: initial_application) }
             let!(:dental_benefit) { FactoryBot.create(:benefit_sponsors_sponsored_benefits_dental_sponsored_benefit, benefit_package: benefit_package2) }
-            let!(:bga2) { FactoryBot.create(:benefit_group_assignment, benefit_package: benefit_package2, census_employee: ce) }
+            let!(:bga2) { FactoryBot.create(:benefit_group_assignment, benefit_package: benefit_package2, census_employee: ce, start_on: initial_application.effective_period.min) }
 
             before :each do
               ce.benefit_group_assignments.first.update_attributes(end_on: start_on.end_of_month, is_active: false)
