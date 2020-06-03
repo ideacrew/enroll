@@ -233,7 +233,9 @@ javascript:
     for (contribution of contributions) {
       index += 1;
       var attrPrefix = 'benefit_package[sponsored_benefits_attributes][0][sponsor_contribution_attributes][contribution_levels_attributes][' + index + ']';
-      var div = document.createElement('div')
+      var div = document.createElement('div');
+      var is_employee_cl = contribution.display_name === "Employee" || contribution.display_name === "Employee Only" ;
+
       div.setAttribute('id', 'yourAvailableContributions')
       div.innerHTML =
 			'<div class="row">\
@@ -243,7 +245,7 @@ javascript:
 			      <div class="row sc-container">\
 			        <div class="col-xs-12 ml-2 mt-2">\
 			          <label class="container ml-1">' +contribution.display_name+'\
-			            <input type="checkbox" checked="checked" id="' + attrPrefix + '[is_offered]" class="contribution_handler" name="' + attrPrefix +'[is_offered]" value="' + contribution["is_offered"] +'" data-displayname="'+contribution.display_name+'" onchange="newContributionAmounts(this)"/>\
+			            <input type="checkbox" checked="checked" '+ (is_employee_cl ? "disabled" : "")+' id="' + attrPrefix + '[is_offered]" class="contribution_handler" name="' + attrPrefix +'[is_offered]" value="' + contribution["is_offered"] +'" data-displayname="'+contribution.display_name+'" onchange="newContributionAmounts(this)"/>\
 			            <span class="checkmark"></span>\
 			          </label>\
 			        </div>\
