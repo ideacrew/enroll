@@ -6,7 +6,7 @@ RSpec.describe HbxAdminController, :type => :controller do
   let(:family) { person_with_family.primary_family }
   let(:person_with_fam_hbx_enrollment) { person_with_family.primary_family.active_household.hbx_enrollments.build }
   let(:tax_household) { family.active_household.tax_households.build }
-  let(:eligibility_determination) { family.active_household.tax_households.first.eligibility_determinations.build }
+  let(:eligibility_determination) { family.active_household.tax_households.first.eligibility_determinations.build(source: 'Admin') }
   let(:organization) do
     FactoryBot.create(:organization, hbx_profile: FactoryBot.create(:hbx_profile))
   end
