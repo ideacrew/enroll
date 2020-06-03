@@ -54,7 +54,7 @@ CSV.open(logger_file_name, 'w', force_quotes: true) do |logger_csv|
             report_csv << [primary_person.first_name, primary_person.last_name,
                            primary_person.hbx_id, e_case_id, current_max_aptc,
                            format('%.2f', new_ed.max_aptc.to_f), current_csr_percent,
-                           new_ed.csr_percent_as_integer, new_ed.determined_on,
+                           new_ed.csr_percent_as_integer, new_ed.determined_at,
                            current_csr_kind, new_csr_kind,
                            year, enrollment.product&.title, enrollment.product&.hios_id,
                            enrollment&.applied_aptc_amount]
@@ -63,7 +63,7 @@ CSV.open(logger_file_name, 'w', force_quotes: true) do |logger_csv|
           report_csv << [primary_person.first_name, primary_person.last_name,
                          primary_person.hbx_id, e_case_id, current_max_aptc,
                          format('%.2f', new_ed.max_aptc.to_f), current_csr_percent,
-                         new_ed.csr_percent_as_integer, new_ed.determined_on,
+                         new_ed.csr_percent_as_integer, new_ed.determined_at,
                          current_csr_kind, new_csr_kind,
                          year, 'N/A', 'N/A', 'N/A']
         end
