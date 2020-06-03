@@ -2611,10 +2611,12 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     end
 
     context "when EE termination date falls under expired application" do
+      let!(:date) { benefit_sponsorship.benefit_applications.expired.first.effective_period.max }
       before do
-        census_employee.employment_terminated_on = TimeKeeper.date_of_record.last_month.end_of_month - 2.months
-        census_employee.coverage_terminated_on = TimeKeeper.date_of_record.last_month.end_of_month - 2.months
+        census_employee.employment_terminated_on = date - 15.days
+        census_employee.coverage_terminated_on = date
         census_employee.aasm_state = "employment_terminated"
+        census_employee.benefit_group_assignments.where(is_active: false).first.end_on = date
         census_employee.save
         census_employee.terminate_employee_enrollments
         expired_enrollment.reload
@@ -2622,9 +2624,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       end
 
       it "should termiante, expired enrollment with terminated date = ee coverage termination date" do
-
         expect(expired_enrollment.aasm_state).to eq "coverage_terminated"
-        expect(expired_enrollment.terminated_on).to eq TimeKeeper.date_of_record.last_month.end_of_month - 2.months
+        expect(expired_enrollment.terminated_on).to eq date
       end
 
       it "should cancel active coverage" do
