@@ -262,7 +262,6 @@ GEM
     builder (3.2.3)
     bunny (1.7.1)
       amq-protocol (~> 1.9.2)
-    byebug (11.1.1)
     capistrano (3.11.0)
       airbrussh (>= 1.0.0)
       i18n
@@ -893,7 +892,7 @@ GEM
       railties (>= 4.2)
     websocket-driver (0.7.1)
       websocket-extensions (>= 0.1.0)
-    websocket-extensions (0.1.4)
+    websocket-extensions (0.1.5)
     wicked_pdf (1.1.0)
     wkhtmltopdf-binary-edge (0.12.3.0)
     xpath (3.2.0)
@@ -917,7 +916,6 @@ DEPENDENCIES
   benefit_sponsors!
   bootsnap (>= 1.1)
   bson (~> 4.3)
-  byebug
   capistrano (~> 3.1)
   capistrano-rails (= 1.4)
   capybara (~> 3.12)
