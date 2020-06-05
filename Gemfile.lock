@@ -26,8 +26,8 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/resource_registry.git
-  revision: 872f087693c26a07fb84b09b93e159de88f3fea1
-  branch: branch_0.7.0
+  revision: 2f0cb0c88230739c04cce34c5805a2c0750f1379
+  branch: master
   specs:
     resource_registry (0.7.0)
       bootsnap (~> 1.0)
@@ -481,7 +481,7 @@ GEM
     httparty (0.18.0)
       mime-types (~> 3.0)
       multi_xml (>= 0.5.2)
-    i18n (1.8.2)
+    i18n (1.8.3)
       concurrent-ruby (~> 1.0)
     ice_cube (0.16.3)
     ice_nine (0.11.2)
