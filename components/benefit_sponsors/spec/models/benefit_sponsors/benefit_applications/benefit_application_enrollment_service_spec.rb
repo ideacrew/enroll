@@ -878,7 +878,7 @@ module BenefitSponsors
         context 'with end of the month date' do
           before do
             start_on = TimeKeeper.date_of_record.beginning_of_month - 6.months
-            end_on = TimeKeeper.date_of_record.end_of_month + 4.months
+            end_on = (TimeKeeper.date_of_record.end_of_month + 4.months ).end_of_month
             initial_application.reload
             initial_application.update_attributes(effective_period: start_on..end_on, aasm_state: :termination_pending, terminated_on: TimeKeeper.date_of_record, termination_kind: "voluntary", termination_reason: "Company went out of business/bankrupt")
             ba = initial_application
