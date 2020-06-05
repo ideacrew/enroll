@@ -580,6 +580,13 @@ class ConsumerRole
       transitions from: :verification_period_ended, to: :unverified
     end
 
+    event :pass_native_status, :after => [:record_transition, :notify_of_eligibility_change] do
+      transitions from: :verification_outstanding, to: :fully_verified
+    end
+    event :fail_native_status, :after => [:record_transition, :notify_of_eligibility_change] do
+      transitions from: :verification_outstanding, to: :verification_outstanding
+    end
+
     event :verifications_backlog, :after => [:record_transition] do
       transitions from: :verification_outstanding, to: :verification_outstanding
     end
@@ -1065,14 +1072,20 @@ class ConsumerRole
   end
 
   def return_doc_for_deficiency(v_type, update_reason, *authority)
+    message = "#{v_type.type_name} was rejected."
     v_type.update_attributes(:validation_status => "outstanding", :update_reason => update_reason, :rejected => true)
     if  v_type.type_name == "DC Residency"
       mark_residency_denied
     elsif ["Citizenship", "Immigration status"].include? v_type.type_name
       lawful_presence_determination.deny!(verification_attr(authority.first))
+    elsif ["American Indian Status"].include?(v_type.type_name)
+      if verification_outstanding?
+        fail_native_status!
+        return message
+      end
     end
     reject!(verification_attr(authority.first))
-    "#{v_type.type_name} was rejected."
+    message
   end
 
   def return_ridp_doc_for_deficiency(ridp_type, update_reason)
@@ -1095,13 +1108,19 @@ class ConsumerRole
 
   def update_verification_type(v_type, update_reason, *authority)
     status = authority.first == "curam" ? "curam" : "verified"
+    message = "#{v_type.type_name} successfully verified."
     self.verification_types.find(v_type).update_attributes(:validation_status => status, :update_reason => update_reason)
     if v_type.type_name == "DC Residency"
       update_attributes(:is_state_resident => true, :residency_determined_at => TimeKeeper.datetime_of_record)
     elsif ["Citizenship", "Immigration status"].include? v_type.type_name
       lawful_presence_determination.authorize!(verification_attr(authority.first))
+    elsif ["American Indian Status"].include?(v_type.type_name) && all_types_verified?
+      if verification_outstanding?
+        pass_native_status!
+        return message
+      end
     end
-    (all_types_verified? && !fully_verified?) ? verify_ivl_by_admin(authority.first) : "#{v_type.type_name} successfully verified."
+    (all_types_verified? && !fully_verified?) ? verify_ivl_by_admin(authority.first) : message
   end
 
   def redetermine_verification!(verification_attr)
