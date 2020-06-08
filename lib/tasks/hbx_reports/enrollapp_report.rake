@@ -71,7 +71,7 @@ namespace :reports do
                   per&.citizen_status,
                   py&.start_on,
                   py&.end_on,
-                  py&.aasm_state,
+                  py&.aasm_state
                 ]
               end
             end
