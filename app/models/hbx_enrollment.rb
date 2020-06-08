@@ -1127,7 +1127,7 @@ class HbxEnrollment
 
   def sponsored_benefit_package
     return @sponsored_benefit_package if defined? @sponsored_benefit_package
-    @sponsored_benefit_package = ::BenefitSponsors::BenefitPackages::BenefitPackage.find(sponsored_benefit_package_id)
+    @sponsored_benefit_package = ::BenefitSponsors::BenefitPackages::BenefitPackage.find(sponsored_benefit_package_id) if sponsored_benefit_package_id.present?
   end
 
   def sponsored_benefit_package=(benefit_package)
