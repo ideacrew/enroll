@@ -5,7 +5,7 @@ registry:
     features:
       - key: :enroll_app
         is_enabled: true
-        meta: 
+        meta:
           label: Enroll Application
           type: :boolean
           default: true
@@ -17,12 +17,12 @@ registry:
           - key: :copyright_period_start
             item: "2013"
           - key: :policies_url
-            item: "https://dchealthlink.com/"         
+            item: "https://dchealthlink.com/"
           - key: :faqs_url
-            item: "https://www.dchealthlink.com/Frequently-Asked-Questions"   
+            item: "https://www.dchealthlink.com/Frequently-Asked-Questions"
           - key: :help_url
-            item: "https://www.dchealthlink.com/help"  
+            item: "https://www.dchealthlink.com/help"
           - key: :business_resource_center_url
-            item: "https://dchealthlink.com/smallbusiness/"    
+            item: "https://dchealthlink.com/smallbusiness/"
           - key: :nondiscrimination_notice_url
             item: "https://www.dchealthlink.com/nondiscrimination"

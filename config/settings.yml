@@ -56,6 +56,7 @@ site:
   faa_enabled: false # TODO: Remove this after configuring the settings.
   ivl_responsibility_url: "https://dchealthlink.com/individual-responsibility-requirement"
   curam_enabled?: true
+  publisher: "dchl"
 
   exchange_name: "Washington DC Health Benefit Exchange"
   social_media:
