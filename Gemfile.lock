@@ -26,8 +26,8 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/resource_registry.git
-  revision: 872f087693c26a07fb84b09b93e159de88f3fea1
-  branch: branch_0.7.0
+  revision: 2f0cb0c88230739c04cce34c5805a2c0750f1379
+  branch: master
   specs:
     resource_registry (0.7.0)
       bootsnap (~> 1.0)
@@ -83,6 +83,7 @@ PATH
     benefit_sponsors (0.0.1)
       aasm (~> 4.8)
       active_model_serializers (~> 0.10)
+      browser (= 2.7.0)
       config (~> 2.0)
       devise (~> 4.5)
       dry-auto_inject (= 0.6.1)
@@ -115,7 +116,6 @@ PATH
       ckeditor (= 4.2.4)
       combine_pdf
       config
-      curl
       money-rails (~> 1.13)
       mongoid (~> 7.0.2)
       non-stupid-digest-assets
@@ -168,7 +168,7 @@ PATH
     transport_profiles (0.0.1)
       mongoid (~> 7.0.2)
       rails (= 5.2.3)
-      rubyzip (>= 1.2.1)
+      rubyzip (>= 1.3.0)
       symmetric-encryption (~> 3.9.1)
       transport_gateway
 
@@ -271,6 +271,7 @@ GEM
     bindex (0.8.1)
     bootsnap (1.4.6)
       msgpack (~> 1.0)
+    browser (2.7.0)
     bson (4.8.2)
     builder (3.2.4)
     bunny (1.7.1)
@@ -496,7 +497,7 @@ GEM
     httparty (0.18.0)
       mime-types (~> 3.0)
       multi_xml (>= 0.5.2)
-    i18n (1.8.2)
+    i18n (1.8.3)
       concurrent-ruby (~> 1.0)
     ice_cube (0.16.3)
     ice_nine (0.11.2)
@@ -919,6 +920,7 @@ DEPENDENCIES
   benefit_markets!
   benefit_sponsors!
   bootsnap (>= 1.1)
+  browser (= 2.7.0)
   bson (~> 4.3)
   capistrano (~> 3.1)
   capistrano-rails (= 1.4)
@@ -955,6 +957,7 @@ DEPENDENCIES
   kaminari (~> 0.17)
   language_list (~> 1)
   listen (>= 3.0.5, < 3.2)
+  loofah (~> 2.5.0)
   mail (~> 2.7)
   maskedinput-rails (~> 1.4)
   money-rails (~> 1.13)
@@ -968,7 +971,7 @@ DEPENDENCIES
   mongoid_userstamp (~> 0.4)!
   net-ssh (= 4.2.0)
   newrelic_rpm (~> 5.0)
-  nokogiri (~> 1.10)
+  nokogiri (~> 1.10.8)
   nokogiri-happymapper (~> 0.8.0)
   non-stupid-digest-assets
   notifier!
@@ -977,7 +980,7 @@ DEPENDENCIES
   parallel_tests (~> 2.26.2)
   poltergeist (~> 1.18.0)
   prawn!
-  puma (~> 3.11)
+  puma (~> 3.12.4)
   pundit (~> 2.0)
   railroady (~> 1.5.3)
   rails (~> 5.2.3)
@@ -999,6 +1002,7 @@ DEPENDENCIES
   rubocop-rspec
   ruby-progressbar (~> 1)
   ruby-saml (~> 1.3)
+  rubyzip (>= 1.3.0)
   sass-rails (~> 5)
   sassc (~> 1.12)
   sdoc (~> 1.0)
@@ -1026,7 +1030,7 @@ DEPENDENCIES
   webpacker (~> 4.0.2)
   wicked_pdf (~> 1.1.0)
   wkhtmltopdf-binary-edge (~> 0.12.3.0)
-  yard (~> 0.9.12)
+  yard (~> 0.9.20)
   yard-mongoid (~> 0.1)
 
 RUBY VERSION
