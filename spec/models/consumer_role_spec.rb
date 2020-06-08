@@ -1613,5 +1613,43 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         end
       end
     end
+
+    context 'mark_residency_authorized' do
+      let(:person1000) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
+
+      context 'self_attest_residency' do
+        before :each do
+          @consumer_role = person1000.consumer_role
+          @consumer_role.mark_residency_authorized(OpenStruct.new(self_attest_residency: true))
+        end
+
+        it 'should attest dc residency type' do
+          expect(person1000.verification_type_by_name('DC Residency').validation_status).to eq('attested')
+        end
+      end
+
+      context 'verified dc residency' do
+        before :each do
+          person1000.consumer_role.mark_residency_authorized
+        end
+
+        it 'should attest dc residency type' do
+          expect(person1000.verification_type_by_name('DC Residency').validation_status).to eq('verified')
+        end
+      end
+    end
+
+    context 'workflow_state_transitions' do
+      let(:person100) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
+
+      before do
+        @consumer_role = person100.consumer_role
+        @consumer_role.record_transition(OpenStruct.new(self_attest_residency: true))
+      end
+
+      it 'should add reason to newly created workflow_state_transition' do
+        expect(@consumer_role.workflow_state_transitions.last.reason).to eq('Self Attest DC Residency')
+      end
+    end
   end
 end
