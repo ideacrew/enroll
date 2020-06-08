@@ -1,3 +1,5 @@
+include Config::SiteHelper
+
 Dir.glob("db/seedfiles/translations/en/#{site_key}/*").each do |file|
   require_relative "translations/en/#{site_key}/" + File.basename(file,File.extname(file))
 end
