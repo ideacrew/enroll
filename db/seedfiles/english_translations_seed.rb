@@ -1,4 +1,8 @@
-site_key = BenefitSponsors::Site.all.first.site_key
+site_key = if Rails.env.test?
+             'cca'
+           else
+             BenefitSponsors::Site.all.first.site_key
+           end
 
 Dir.glob("db/seedfiles/translations/en/#{site_key}/*").each do |file|
   require_relative "translations/en/#{site_key}/" + File.basename(file,File.extname(file))
