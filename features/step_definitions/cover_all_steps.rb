@@ -57,6 +57,7 @@ Then(/^Hbx Admin should see text Household Info$/) do
   expect(page).to have_content('get insurance coverage for other members of your household')
   find_link('Add Member').visible?
   find('.btn', text: 'CONTINUE').click
+  wait_for_ajax
 end
 
 Then(/^Hbx Admin should see text Special Enrollment Period$/) do
