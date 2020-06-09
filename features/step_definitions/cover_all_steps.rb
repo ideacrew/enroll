@@ -57,12 +57,11 @@ Then(/^Hbx Admin should see text Household Info$/) do
   expect(page).to have_content('get insurance coverage for other members of your household')
   find_link('Add Member').visible?
   find('.btn', text: 'CONTINUE').click
-  wait_for_ajax
 end
 
 Then(/^Hbx Admin should see text Special Enrollment Period$/) do
-  wait_for_ajax
   FactoryBot.create(:qualifying_life_event_kind, market_kind: "individual")
+  sleep 2
   expect(page).to have_content('Special Enrollment Period')
   expect(page).to have_content('TOP LIFE CHANGES')
   expect(page).to have_content('Married')
