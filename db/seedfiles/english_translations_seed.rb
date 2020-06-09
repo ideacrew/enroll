@@ -1,7 +1,7 @@
-@site_key = BenefitSponsors::Site.first.site_key
+site_key = BenefitSponsors::Site.first.site_key
 
-Dir.glob("db/seedfiles/translations/en/#{@site_key}/*").each do |file|
-  require_relative "translations/en/#{@site_key}/" + File.basename(file,File.extname(file))
+Dir.glob("db/seedfiles/translations/en/#{site_key}/*").each do |file|
+  require_relative "translations/en/#{site_key}/" + File.basename(file,File.extname(file))
 end
 
 puts '*' * 80 unless Rails.env.test?
@@ -39,11 +39,11 @@ end
 
 unless Rails.env.test?
   puts 'TRANSLATIONS'
-  p send("#{@site_key}_translations")
+  p send("#{site_key}_translations")
 end
 
-send("#{@site_key}_translations").keys.each do |k|
-  Translation.where(key: k).first_or_create.update_attributes!(value: "\"#{send("#{@site_key}_translations")[k]}\"")
+send("#{site_key}_translations").keys.each do |k|
+  Translation.where(key: k).first_or_create.update_attributes!(value: "\"#{send("#{site_key}_translations")[k]}\"")
 end
 
 puts '::: English Translations Complete :::'
