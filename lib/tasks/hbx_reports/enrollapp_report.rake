@@ -9,7 +9,7 @@ namespace :reports do
     start_on = ENV['start_on']
     end_on = ENV['end_on']
     enrollments = HbxEnrollment.where(
-      :"aasm_state".nin => ["shopping", "coverage_canceled"],
+      :"aasm_state".nin => ["shopping", "coverage_canceled", "void"],
       :effective_on => { "$gte" => Date.strptime(start_on, "%m/%d/%Y"), "$lt" => Date.strptime(end_on, "%m/%d/%Y")}
     )
     count = 0
