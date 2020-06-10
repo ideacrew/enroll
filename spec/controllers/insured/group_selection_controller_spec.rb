@@ -7,7 +7,6 @@ require "#{BenefitSponsors::Engine.root}/spec/support/benefit_sponsors_product_s
 
 RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean: :after_each do
     #include_context "setup benefit market with market catalogs and product packages"
-  include_context "setup initial benefit application"
 
   let(:site) { BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_empty_benefit_market }
   let(:benefit_market) { site.benefit_markets.first }
@@ -18,7 +17,9 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     ).first
   end
 
-  let(:current_effective_date) { TimeKeeper.date_of_record.end_of_month + 1.day + 1.month }
+  let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_month + 2.months }
+
+  include_context "setup initial benefit application"
 
   let(:service_areas) do
     ::BenefitMarkets::Locations::ServiceArea.where(
@@ -957,8 +958,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       person.reload
       post :create, params: { person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids }
       expect(response).to have_http_status(:redirect)
-      expect(flash[:error]).to match /You may not enroll for cobra after/
-      expect(response).to redirect_to(new_insured_group_selection_path(person_id: person.id, employee_role_id: person.employee_roles.first.id, change_plan: '', market_kind: 'shop', enrollment_kind: ''))
+      expect(response).to redirect_to(insured_plan_shopping_path(id: family.active_household.hbx_enrollments[0].id, coverage_kind: 'health', market_kind: 'shop', enrollment_kind: ''))
     end
 
     it "should render group selection page if without family_member_ids" do

@@ -37,6 +37,8 @@ gem "benefit_sponsors",   path: "components/benefit_sponsors"
 gem "notifier",           path: "components/notifier"
 gem 'openhbx_cv2',        git:  'https://github.com/dchbx/openhbx_cv2.git', branch: 'master'
 gem 'resource_registry',  git:  'https://github.com/ideacrew/resource_registry.git', branch: 'master'
+# gem 'resource_registry',  git: '../resource_registry'
+
 gem "sponsored_benefits", path: "components/sponsored_benefits"
 gem "transport_gateway",  path: "components/transport_gateway"
 gem "transport_profiles", path: "components/transport_profiles"
