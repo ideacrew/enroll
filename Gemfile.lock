@@ -49,8 +49,8 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/resource_registry.git
-  revision: 8593064c8e19f5de352e7e016f8c3d8bdd30c7f5
-  branch: branch_0.7.0
+  revision: 2f0cb0c88230739c04cce34c5805a2c0750f1379
+  branch: master
   specs:
     resource_registry (0.7.0)
       bootsnap (~> 1.0)
@@ -103,6 +103,7 @@ PATH
     benefit_sponsors (0.0.1)
       aasm (~> 4.8.0)
       active_model_serializers
+      browser (= 2.7.0)
       config
       devise (~> 4.5)
       interactor (= 3.1.0)
@@ -260,6 +261,7 @@ GEM
       rails (>= 4.0.0)
     bootstrap-slider-rails (6.0.17)
       railties (>= 3.2, < 5.0)
+    browser (2.7.0)
     bson (4.3.0)
     builder (3.2.4)
     bunny (1.7.1)
@@ -408,7 +410,7 @@ GEM
       concurrent-ruby (~> 1.0)
       dry-core (~> 0.4, >= 0.4.4)
       dry-equalizer
-    dry-schema (1.5.0)
+    dry-schema (1.5.1)
       concurrent-ruby (~> 1.0)
       dry-configurable (~> 0.8, >= 0.8.3)
       dry-core (~> 0.4)
@@ -883,6 +885,7 @@ DEPENDENCIES
   benefit_sponsors!
   bootstrap-multiselect-rails (~> 0.9.9)
   bootstrap-slider-rails (= 6.0.17)
+  browser (= 2.7.0)
   bson (~> 4.3.0)
   capistrano (= 3.3.5)
   capistrano-rails (= 1.1.6)
