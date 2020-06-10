@@ -27,8 +27,22 @@ module Config::AcaHelper
     @aca_shop_market_employer_family_contribution_percent_minimum ||= Settings.aca.shop_market.employer_family_contribution_percent_minimum
   end
 
+  def flexible_contribution_model_enabled_for_period
+    app_period = Settings.aca.shop_market.initial_application.flexible_contribution_model.application_period.split('..')
+    start_on = retrive_date(app_period[0])
+    end_on = retrive_date(app_period[1])
+    start_on..end_on
+  end
+
+  def flexible_employer_participation_ratio_minimum
+    @flexible_employer_participation_ratio_minimum ||= Settings.aca.shop_market.initial_application.flexible_contribution_model.employee_participation_ratio_minimum
+  end
+
   def flexible_contribution_model_enabled_for_bqt_for_period
-    ::EnrollRegistry[:flexible_contribution_model_for_bqt].setting(:initial_application_period).item
+    app_period = Settings.aca.shop_market.broker_quoting_tool.flexible_contribution_model.initial_application_period.split('..')
+    start_on = retrive_date(app_period[0])
+    end_on = retrive_date(app_period[1])
+    start_on..end_on
   end
 
   def retrive_date(val)
@@ -36,11 +50,11 @@ module Config::AcaHelper
   end
 
   def flexible_family_contribution_percent_minimum_for_bqt
-    @flexible_family_contribution_percent_minimum_for_bqt ||= ::EnrollRegistry[:flexible_contribution_model_for_bqt].setting(:employer_family_contribution_percent_minimum).item
+    @flexible_family_contribution_percent_minimum_for_bqt ||= Settings.aca.shop_market.broker_quoting_tool.flexible_contribution_model.employer_family_contribution_percent_minimum
   end
 
   def flexible_employer_contribution_percent_minimum_for_bqt
-    @flexible_employer_contribution_percent_minimum_for_bqt ||= ::EnrollRegistry[:flexible_contribution_model_for_bqt].setting(:employer_contribution_percent_minimum).item
+    @flexible_employer_contribution_percent_minimum_for_bqt ||= Settings.aca.shop_market.broker_quoting_tool.flexible_contribution_model.employer_contribution_percent_minimum
   end
 
   def family_contribution_percent_minimum_for_application_start_on(start_on, is_renewing)
@@ -52,7 +66,7 @@ module Config::AcaHelper
   end
 
   def flexbile_contribution_model_enabled_for_bqt_for_renewals
-    @flexbile_contribution_model_enabled_for_bqt_for_renewals ||= ::EnrollRegistry[:flexible_contribution_model_for_bqt].setting(:enabled_for_renewal_applications).item
+    @flexbile_contribution_model_enabled_for_bqt_for_renewals ||= Settings.aca.shop_market.broker_quoting_tool.flexible_contribution_model.enabled_for_renewal_applications
   end
 
   def aca_shop_market_employer_contribution_percent_minimum
@@ -97,10 +111,6 @@ module Config::AcaHelper
 
   def individual_market_is_enabled?
     @individual_market_is_enabled ||= Settings.aca.market_kinds.include?("individual")
-  end
-
-  def self_attest_residency_enabled?
-    ::EnrollRegistry.feature_enabled?(:residency_self_attestation) && ::EnrollRegistry[:residency_self_attestation].setting(:effective_period).item.cover?(TimeKeeper.date_of_record)
   end
 
   def fehb_market_is_enabled?

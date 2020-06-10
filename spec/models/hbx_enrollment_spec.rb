@@ -2231,7 +2231,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
         let(:current_user) { FactoryBot.create :user }
 
         it 'should raise error' do
-          expect {hbx_enrollment.validate_for_cobra_eligiblity(employee_role, current_user)}.not_to raise_error("You may not enroll for cobra after #{Settings.aca.shop_market.cobra_enrollment_period.months} months later of coverage terminated.")
+          expect {hbx_enrollment.validate_for_cobra_eligiblity(employee_role, current_user)}.to raise_error("You may not enroll for cobra after #{Settings.aca.shop_market.cobra_enrollment_period.months} months later of coverage terminated.")
         end
       end
     end
@@ -2493,7 +2493,9 @@ describe HbxEnrollment, type: :model, :dbclean => :around_each do
 
         let(:renewal_application) {
           renewal_effective_date = current_effective_date.next_year
-          r_application = initial_application.renew
+          service_areas = initial_application.benefit_sponsorship.service_areas_on(renewal_effective_date)
+          benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(service_areas, renewal_effective_date)
+          r_application = initial_application.renew(benefit_sponsor_catalog)
           r_application.save
           r_application
         }

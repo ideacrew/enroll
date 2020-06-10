@@ -13,7 +13,7 @@ module BenefitSponsors
     let(:site) { ::BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_benefit_market }
     let(:benefit_market)  { site.benefit_markets.first }
 
-    let(:employer_organization)   { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+    let(:employer_organization)   { FactoryBot.build(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let(:employer_profile)        { employer_organization.employer_profile }
 
     describe "A new model instance" do
@@ -185,15 +185,10 @@ module BenefitSponsors
     end
 
     describe "Finding a BenefitSponsorCatalog" do
-      let(:benefit_sponsorship) do
-        sponsorship = employer_profile.add_benefit_sponsorship
-        sponsorship.save
-        sponsorship
-      end
+      let(:benefit_sponsorship)                 { employer_profile.add_benefit_sponsorship }
       let(:next_year)                           { Date.today.year + 1 }
       let(:application_period_next_year)        { (Date.new(next_year,1,1))..(Date.new(next_year,12,31)) }
-      let!(:issuer_profile)  { FactoryBot.create :benefit_sponsors_organizations_issuer_profile, assigned_site: site}
-      let!(:benefit_market_catalog_next_year)   { FactoryBot.create(:benefit_markets_benefit_market_catalog, :with_product_packages, issuer_profile: issuer_profile, benefit_market: benefit_market, application_period: application_period_next_year) }
+      let!(:benefit_market_catalog_next_year)   { FactoryBot.build(:benefit_markets_benefit_market_catalog, benefit_market: nil, application_period: application_period_next_year) }
 
       before { benefit_market.add_benefit_market_catalog(benefit_market_catalog_next_year) }
 
@@ -209,7 +204,7 @@ module BenefitSponsors
 
         # before { benefit_market.benefit_market_catalogs = benefit_market_catalogs }
         it "should find a benefit_market_catalog" do
-          expect(benefit_sponsorship.benefit_sponsor_catalog_for(effective_date)).to be_an_instance_of(BenefitMarkets::BenefitSponsorCatalog)
+          expect(benefit_sponsorship.benefit_sponsor_catalog_for([], effective_date)).to be_an_instance_of(BenefitMarkets::BenefitSponsorCatalog)
         end
       end
 
@@ -217,7 +212,7 @@ module BenefitSponsors
         let(:future_effective_date)  { Date.new((next_year + 2),1,1) }
 
         it "should not find a benefit_market_catalog" do
-          expect{benefit_sponsorship.benefit_sponsor_catalog_for(future_effective_date)}.to raise_error(/benefit_market_catalog not found for effective date: #{future_effective_date}/)
+          expect{benefit_sponsorship.benefit_sponsor_catalog_for([], future_effective_date)}.to raise_error(/benefit_market_catalog not found for effective date: #{future_effective_date}/)
         end
       end
     end
@@ -290,14 +285,11 @@ module BenefitSponsors
     describe "Transitioning a BenefitSponsorship through Initial Application Workflow States" do
       let(:benefit_sponsorship)                 { employer_profile.add_benefit_sponsorship }
       let(:this_year)                           { Date.today.year }
-      let(:benefit_sponsor_catalog) { FactoryBot.create(:benefit_markets_benefit_sponsor_catalog, service_areas: [service_area]) }
-      let(:service_area) { create_default(:benefit_markets_locations_service_area) }
       let(:benefit_application) do
         build(
           :benefit_sponsors_benefit_application,
           benefit_sponsorship: benefit_sponsorship,
-          recorded_service_areas: benefit_sponsorship.service_areas,
-          benefit_sponsor_catalog: benefit_sponsor_catalog
+          recorded_service_areas: benefit_sponsorship.service_areas
         )
       end
 
@@ -782,7 +774,7 @@ module BenefitSponsors
         it "should fetch only valid initial applications" do 
           applications = subject.may_transmit_initial_enrollment?(april_effective_date)
 
-          expect((applications & april_sponsors).sort).to eq april_sponsors.sort
+          expect(applications & april_sponsors).to eq april_sponsors
           expect(applications & april_ineligible_initial_sponsors).to be_empty
           expect(applications & april_wrong_sponsorship_initial_sponsors).to be_empty
         end
@@ -811,7 +803,7 @@ module BenefitSponsors
           it "should fetch only valid initial applications" do
             applications = subject.may_transmit_initial_enrollment?(april_effective_date)
 
-            expect((applications & april_sponsors).sort).to eq april_sponsors.sort
+            expect(applications & april_sponsors).to eq april_sponsors
             expect(applications & april_ineligible_initial_sponsors).to be_empty
             expect(applications & april_wrong_sponsorship_initial_sponsors).to be_empty
           end

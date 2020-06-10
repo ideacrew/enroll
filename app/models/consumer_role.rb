@@ -580,13 +580,6 @@ class ConsumerRole
       transitions from: :verification_period_ended, to: :unverified
     end
 
-    event :pass_native_status, :after => [:record_transition, :notify_of_eligibility_change] do
-      transitions from: :verification_outstanding, to: :fully_verified
-    end
-    event :fail_native_status, :after => [:record_transition, :notify_of_eligibility_change] do
-      transitions from: :verification_outstanding, to: :verification_outstanding
-    end
-
     event :verifications_backlog, :after => [:record_transition] do
       transitions from: :verification_outstanding, to: :verification_outstanding
     end
@@ -899,12 +892,7 @@ class ConsumerRole
   def mark_residency_authorized(*args)
     update_attributes(:residency_determined_at => DateTime.now,
                       :is_state_resident => true)
-
-    if args&.first&.self_attest_residency
-      verification_types.by_name('DC Residency').first.attest_type
-    else
-      verification_types.by_name('DC Residency').first.pass_type
-    end
+    verification_types.by_name("DC Residency").first.pass_type
   end
 
   def lawful_presence_pending?
@@ -1077,20 +1065,14 @@ class ConsumerRole
   end
 
   def return_doc_for_deficiency(v_type, update_reason, *authority)
-    message = "#{v_type.type_name} was rejected."
     v_type.update_attributes(:validation_status => "outstanding", :update_reason => update_reason, :rejected => true)
     if  v_type.type_name == "DC Residency"
       mark_residency_denied
     elsif ["Citizenship", "Immigration status"].include? v_type.type_name
       lawful_presence_determination.deny!(verification_attr(authority.first))
-    elsif ["American Indian Status"].include?(v_type.type_name)
-      if verification_outstanding?
-        fail_native_status!
-        return message
-      end
     end
     reject!(verification_attr(authority.first))
-    message
+    "#{v_type.type_name} was rejected."
   end
 
   def return_ridp_doc_for_deficiency(ridp_type, update_reason)
@@ -1113,19 +1095,13 @@ class ConsumerRole
 
   def update_verification_type(v_type, update_reason, *authority)
     status = authority.first == "curam" ? "curam" : "verified"
-    message = "#{v_type.type_name} successfully verified."
     self.verification_types.find(v_type).update_attributes(:validation_status => status, :update_reason => update_reason)
     if v_type.type_name == "DC Residency"
       update_attributes(:is_state_resident => true, :residency_determined_at => TimeKeeper.datetime_of_record)
     elsif ["Citizenship", "Immigration status"].include? v_type.type_name
       lawful_presence_determination.authorize!(verification_attr(authority.first))
-    elsif ["American Indian Status"].include?(v_type.type_name) && all_types_verified?
-      if verification_outstanding?
-        pass_native_status!
-        return message
-      end
     end
-    (all_types_verified? && !fully_verified?) ? verify_ivl_by_admin(authority.first) : message
+    (all_types_verified? && !fully_verified?) ? verify_ivl_by_admin(authority.first) : "#{v_type.type_name} successfully verified."
   end
 
   def redetermine_verification!(verification_attr)
@@ -1168,12 +1144,12 @@ class ConsumerRole
   end
 
   def record_transition(*args)
-    wfst_params = { from_state: aasm.from_state,
-                    to_state: aasm.to_state,
-                    event: aasm.current_event,
-                    user_id: SAVEUSER[:current_user_id] }
-    wfst_params.merge!({ reason: 'Self Attest DC Residency' }) if args&.first&.is_a?(OpenStruct) && args&.first&.self_attest_residency
-    workflow_state_transitions << WorkflowStateTransition.new(wfst_params)
+    workflow_state_transitions << WorkflowStateTransition.new(
+      from_state: aasm.from_state,
+      to_state: aasm.to_state,
+      event: aasm.current_event,
+      user_id: SAVEUSER[:current_user_id]
+    )
   end
 
   def verification_attr(*authority)

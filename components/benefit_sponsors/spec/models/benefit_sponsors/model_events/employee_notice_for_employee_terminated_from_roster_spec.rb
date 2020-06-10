@@ -104,6 +104,9 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeTerminationNoticeToEmploye
       before do
         allow(subject).to receive(:resource).and_return(terminated_employee.employee_role)
         allow(subject).to receive(:payload).and_return(payload)
+        # model_instance.terminate_employment(termination_date)
+        # model_instance.save!
+        # binding.pry
       end
       
       it "should retrun merge model" do
