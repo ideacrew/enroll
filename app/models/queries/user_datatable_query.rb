@@ -56,7 +56,7 @@ module Queries
                 end
               else
                 if @search_string.present?
-                  user_datable_search(@search_string)
+                  user_datatable_search(@search_string)
                 else
                   user.all
                 end
@@ -64,7 +64,7 @@ module Queries
       users
     end
 
-    def user_datable_search(query)
+    def user_datatable_search(query)
       clean_str = query.strip
       people_user_ids = if clean_str =~ /[a-z]/i
                           Person.collection.aggregate([
