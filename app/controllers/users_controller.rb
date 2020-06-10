@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
   before_action :confirm_existing_password, only: [:change_password]
-  before_action :set_user, except: [:confirm_lock, :unsupported_browser]
+  before_action :set_user, except: [:confirm_lock]
 
 
   def confirm_lock
@@ -96,8 +96,6 @@ class UsersController < ApplicationController
     flash[:alert] = "You are not authorized for this action."
     render inline: "location.reload();"
   end
-
-  def unsupported_browser; end
 
   private
 

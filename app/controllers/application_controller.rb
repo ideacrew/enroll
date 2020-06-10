@@ -8,8 +8,6 @@ class ApplicationController < ActionController::Base
   after_action :update_url, :unless => :format_js?
   helper BenefitSponsors::Engine.helpers
 
-  NON_AUTHENTICATE_KINDS = %w[welcome saml broker_roles office_locations invitations security_question_responses].freeze
-
   def format_js?
    request.format.js?
   end
@@ -67,7 +65,7 @@ class ApplicationController < ActionController::Base
 
   def authenticate_me!
     # Skip auth if you are trying to log in
-    return true if (NON_AUTHENTICATE_KINDS.include?(controller_name.downcase) || action_name == 'unsupported_browser')
+    return true if ["welcome","saml", "broker_roles", "office_locations", "invitations", 'security_question_responses'].include?(controller_name.downcase)
     authenticate_user!
   end
 
@@ -156,7 +154,6 @@ class ApplicationController < ActionController::Base
   protected
   # Broker Signup form should be accessibile for anonymous users
     def authentication_not_required?
-      action_name == 'unsupported_browser' ||
       devise_controller? ||
       (controller_name == "broker_roles") ||
       (controller_name == "office_locations") ||
@@ -415,18 +412,4 @@ class ApplicationController < ActionController::Base
         flash.now[:warning] = announcements
       end
     end
-
-  def set_ie_flash_by_announcement
-    return unless check_browser_compatibility
-    return unless flash.blank? || flash[:warning].blank?
-
-    announcements = Announcement.announcements_for_web
-    dismiss_announcements = JSON.parse(session[:dismiss_announcements] || '[]')
-    announcements -= dismiss_announcements
-    flash.now[:warning] = announcements
-  end
-
-  def check_browser_compatibility
-    browser.ie? && !support_for_ie_browser?
-  end
 end

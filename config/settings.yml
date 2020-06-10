@@ -57,9 +57,6 @@ site:
   ivl_responsibility_url: "https://dchealthlink.com/individual-responsibility-requirement"
   curam_enabled?: true
   publisher: "dchl"
-  support_for_ie_browser: false
-  block_ie_browser: true
-  block_ie_browser_after: <%= Date.new(2020,6,1) %>
 
   exchange_name: "Washington DC Health Benefit Exchange"
   social_media:

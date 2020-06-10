@@ -5,8 +5,6 @@ module BenefitSponsors
 
         def new
           @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_new
-          set_ie_flash_by_announcement
-
           respond_to do |format|
             format.html { render 'new', layout: false} if params[:profile_type]
             format.js  { render 'new'}

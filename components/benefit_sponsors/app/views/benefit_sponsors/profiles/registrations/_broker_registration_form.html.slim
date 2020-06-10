@@ -5,8 +5,7 @@
     div class="alert alert-#{key} alert-dismissible" role="alert"
       button.close type="button" data-dismiss="alert" aria-label="Close"
         span aria-hidden="true" &times
-      - [value].flatten.each do |v|
-        = raw v
+      = value
 
   = form_for @agency, as: :agency, url: {action: "create"}, html: {class: "needs-validation s508", id: 'broker_registration_form', novalidate: true} do |f|
 
