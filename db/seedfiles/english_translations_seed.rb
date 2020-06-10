@@ -33,12 +33,15 @@ def dc_translations
     DEVISE_TRANSLATIONS,
     EMPLOYER_TRANSLATIONS,
     PLAN_TRANSLATIONS,
-    HBX_PROFILES_TRANSLATIONS
+    HBX_PROFILES_TRANSLATIONS,
+    CENSUS_EMPLOYEE_TRANSLATIONS
   ].reduce({}, :merge)
 end
 
 def cca_translations
-  [].reduce({}, :merge)
+  [
+    CENSUS_EMPLOYEE_TRANSLATIONS
+  ].reduce({}, :merge)
 end
 
 unless Rails.env.test?
