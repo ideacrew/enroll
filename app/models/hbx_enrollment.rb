@@ -1405,7 +1405,7 @@ class HbxEnrollment
           # we always have benefit group unless QLE gives an effective date before plan year start on
           # return employee_role.census_employee.coverage_effective_on if benefit_group.blank?
           # benefit_group.effective_on_for(employee_role.hired_on)
-          employee_role.census_employee.coverage_effective_on(benefit_group)
+          employee_role.census_employee.coverage_effective_on(benefit_group).to_date
         end
       when 'individual'
         if qle && family.is_under_special_enrollment_period?
