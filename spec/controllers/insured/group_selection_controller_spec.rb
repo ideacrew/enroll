@@ -822,7 +822,6 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         sign_in user
         allow(old_hbx).to receive(:is_shop?).and_return true
         family.active_household.reload
-        old_hbx.update_attributes(effective_on: employee_role.census_employee.employer_profile.plan_years.first.effective_period.min)
         post :create, params: { person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids, commit: 'Keep existing plan', change_plan: 'change', hbx_enrollment_id: old_hbx.id }
         family.reload
         family.active_household.reload

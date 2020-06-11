@@ -358,6 +358,7 @@ RSpec.describe EnrollmentShopping::EnrollmentBuilder, dbclean: :around_each do
             expect(enrollment.sponsored_benefit_package).to eq current_benefit_package
             expect(enrollment.sponsored_benefit).to eq current_benefit_package.sponsored_benefit_for(coverage_kind)
             expect(enrollment.waiver_reason).to eq "this is waiver reason" if state == "waiver"
+<<<<<<< HEAD
           end
 
           context "during special enrollment period with change to bga for two benefit packages case" do
@@ -382,6 +383,9 @@ RSpec.describe EnrollmentShopping::EnrollmentBuilder, dbclean: :around_each do
               expect(enrollment.waiver_reason).to eq "this is waiver reason" if state == "waiver"
             end
           end
+=======
+          end      
+>>>>>>> parent of f84f609db4... Merge remote-tracking branch 'origin/code_refactor_87299' into ops_release_branch
         end
       end
     end
