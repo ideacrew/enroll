@@ -3,27 +3,23 @@
 require 'rails_helper'
 require File.join(Rails.root, 'spec/shared_contexts/ivl_eligibility')
 
-describe FixEdSourceCuramCases, dbclean: :after_each do
+describe 'fix_ed_source_curam_cases' do
   before do
     DatabaseCleaner.clean
   end
   include_context 'setup one tax household with one ia member'
 
-  let(:given_task_name) { 'fix_ed_source_curam_cases' }
-  subject { FixEdSourceCuramCases.new(given_task_name, double(:current_scope => nil)) }
-
-  context 'given a task name' do
-    it 'has the given task name' do
-      expect(subject.name).to eql given_task_name
-    end
-  end
-
   context 'valid curam determination' do
     before :each do
       eligibilty_determination.assign_attributes({e_pdc_id: '3023385'})
       eligibilty_determination.save!(validate: false)
+<<<<<<< HEAD
       subject.migrate
       @file_content = CSV.read("#{Rails.root}/list_of_ed_object_ids_for_curam_cases_1.csv")
+=======
+      invoke_fix_ed_source_curam_cases
+      @file_content = CSV.read("#{Rails.root}/list_of_ed_object_ids_for_curam_cases.csv")
+>>>>>>> parent of 165afbdce5... Merge remote-tracking branch 'origin/surge_integration_5/22' into ops_release_branch
     end
 
     it 'should add data to the file' do
@@ -56,7 +52,12 @@ describe FixEdSourceCuramCases, dbclean: :after_each do
       before do
         eligibilty_determination.assign_attributes({e_pdc_id: nil, source: 'Admin'})
         eligibilty_determination.save!(validate: false)
+<<<<<<< HEAD
         subject.migrate
+=======
+        invoke_fix_ed_source_curam_cases
+        @file_content = CSV.read("#{Rails.root}/list_of_ed_object_ids_for_curam_cases.csv")
+>>>>>>> parent of 165afbdce5... Merge remote-tracking branch 'origin/surge_integration_5/22' into ops_release_branch
       end
 
       it 'should not update the eligibilty_determination object' do
@@ -68,7 +69,12 @@ describe FixEdSourceCuramCases, dbclean: :after_each do
       before do
         eligibilty_determination.assign_attributes({e_pdc_id: 'MANUALLY_9_2_2016LOADING530', source: 'Admin'})
         eligibilty_determination.save!(validate: false)
+<<<<<<< HEAD
         subject.migrate
+=======
+        invoke_fix_ed_source_curam_cases
+        @file_content = CSV.read("#{Rails.root}/list_of_ed_object_ids_for_curam_cases.csv")
+>>>>>>> parent of 165afbdce5... Merge remote-tracking branch 'origin/surge_integration_5/22' into ops_release_branch
       end
 
       it 'should not update the eligibilty_determination object' do
@@ -80,4 +86,9 @@ describe FixEdSourceCuramCases, dbclean: :after_each do
   after :each do
     FileUtils.rm_rf("#{Rails.root}/list_of_ed_object_ids_for_curam_cases_1.csv")
   end
+end
+
+def invoke_fix_ed_source_curam_cases
+  fix_ed_source_curam_cases = File.join(Rails.root, 'app/data_migrations/fix_ed_source_curam_cases.rb')
+  load fix_ed_source_curam_cases
 end
