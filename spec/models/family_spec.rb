@@ -1580,7 +1580,7 @@ describe Family, "scopes", dbclean: :after_each do
         plan_id: plan.id,
         sponsored_benefit_package_id: current_benefit_package.id,
         aasm_state:"coverage_selected"
-
+  
         )
       }
 
@@ -1602,20 +1602,7 @@ describe Family, "scopes", dbclean: :after_each do
     end
   end
 
-  context 'scopes' do
-    context "outstanding verifications" do
-      let(:none_uploaded_person) do
-        FactoryBot.create(:person)
-      end
-      let!(:none_uploaded_family) do
-        FactoryBot.create(:family, :with_primary_family_member, person: none_uploaded_person)
-      end
-
-      it "should not return uploaded verifications" do
-        expect(none_uploaded_family.all_persons_vlp_documents_status).to eq("None")
-      end
-    end
-
+  context 'scopes' do 
     context '.all_enrollments_by_benefit_package' do
       let(:benefit_package_to_test) do
         double(:benefit_package, :_id => 1)
@@ -1683,8 +1670,8 @@ describe Family, "scopes", dbclean: :after_each do
     end
   end
 
-  context 'send_enrollment_notice_for_ivl ' do
-    it '.enrollment_notice_for_ivl_families' do
+  context 'send_enrollment_notice_for_ivl ' do 
+    it '.enrollment_notice_for_ivl_families' do 
       expect(Family.send_enrollment_notice_for_ivl(created_at)).to include family
     end
   end

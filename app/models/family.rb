@@ -1081,17 +1081,14 @@ class Family
 
   def all_persons_vlp_documents_status
     outstanding_types = []
-    fully_uploaded = []
-    in_review = []
     self.active_family_members.each do |member|
-      outstanding_types = outstanding_types + member.person.verification_types.active.select{|type| ["outstanding", "pending"].include? type.validation_status }
-      in_review = in_review + member.person.verification_types.active.select{|type| ["review"].include? type.validation_status }
-      fully_uploaded = fully_uploaded + member.person.verification_types.active.select{ |type| type.type_verified? }
+      outstanding_types = outstanding_types + member.person.verification_types.active.select{|type| ["outstanding", "pending", "review"].include? type.validation_status }
     end
-
-    if (fully_uploaded.any? || in_review.any?) && !outstanding_types.any?
+    fully_uploaded = outstanding_types.any? ? outstanding_types.all?{ |type| (type.type_documents.any? && !type.rejected) } : nil
+    partially_uploaded = outstanding_types.any? ? outstanding_types.any?{ |type| (type.type_documents.any? && !type.rejected)} : nil
+    if fully_uploaded
       "Fully Uploaded"
-    elsif outstanding_types.any? && in_review.any?
+    elsif partially_uploaded
       "Partially Uploaded"
     else
       "None"
