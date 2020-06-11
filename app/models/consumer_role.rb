@@ -892,12 +892,7 @@ class ConsumerRole
   def mark_residency_authorized(*args)
     update_attributes(:residency_determined_at => DateTime.now,
                       :is_state_resident => true)
-
-    if args&.first&.self_attest_residency
-      verification_types.by_name('DC Residency').first.attest_type
-    else
-      verification_types.by_name('DC Residency').first.pass_type
-    end
+    verification_types.by_name("DC Residency").first.pass_type
   end
 
   def lawful_presence_pending?
@@ -1149,12 +1144,12 @@ class ConsumerRole
   end
 
   def record_transition(*args)
-    wfst_params = { from_state: aasm.from_state,
-                    to_state: aasm.to_state,
-                    event: aasm.current_event,
-                    user_id: SAVEUSER[:current_user_id] }
-    wfst_params.merge!({ reason: 'Self Attest DC Residency' }) if args&.first&.is_a?(OpenStruct) && args&.first&.self_attest_residency
-    workflow_state_transitions << WorkflowStateTransition.new(wfst_params)
+    workflow_state_transitions << WorkflowStateTransition.new(
+      from_state: aasm.from_state,
+      to_state: aasm.to_state,
+      event: aasm.current_event,
+      user_id: SAVEUSER[:current_user_id]
+    )
   end
 
   def verification_attr(*authority)
