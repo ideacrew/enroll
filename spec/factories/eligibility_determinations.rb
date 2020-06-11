@@ -8,7 +8,6 @@ FactoryBot.define do
     csr_eligibility_kind { "csr_94" }
     premium_credit_strategy_kind { "allocated_lump_sum_credit" }
     e_pdc_id { "3110344" }
-    source { 'Curam' }
   end
 
 end
