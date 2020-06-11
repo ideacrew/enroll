@@ -19,6 +19,10 @@ describe Forms::ConsumerCandidate, "asked to match a person", dbclean: :after_ea
 
   let(:subject) { Forms::ConsumerCandidate.new(params) }
 
+  after(:each) do
+    DatabaseCleaner.clean
+  end
+
   context "uniq ssn" do
 
     context 'when ssn blank' do
