@@ -225,7 +225,7 @@ class Household
     tax_households.tax_household_with_year(year).active_tax_household
   end
 
-  def build_thh_and_eligibility(max_aptc, csr, date, slcsp, source)
+  def build_thh_and_eligibility(max_aptc, csr, date, slcsp)
     th = tax_households.build(
         allocated_aptc: 0.0,
         effective_starting_on: Date.new(date.year, date.month, date.day),
@@ -240,7 +240,7 @@ class Household
     )
 
     deter = th.eligibility_determinations.build(
-      source: source,
+      source: Admin_Script,
         benchmark_plan_id: slcsp,
         max_aptc: max_aptc.to_f,
         csr_percent_as_integer: csr.to_i,
@@ -420,7 +420,7 @@ class Household
     )
 
     th.eligibility_determinations.create(
-      source: 'Admin',
+      source: 'Admin_Script',
       benchmark_plan_id: slcsp_id,
       max_aptc: params["max_aptc"].to_f,
       csr_percent_as_integer: params["csr"].to_i,
