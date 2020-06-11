@@ -10,6 +10,7 @@ class ConsumerRole
   include StateTransitionPublisher
   include Mongoid::History::Trackable
   include DocumentsVerificationStatus
+  include Config::AcaIndividualMarketHelper
 
   embedded_in :person
 
@@ -28,8 +29,6 @@ class ConsumerRole
   #ridp
   IDENTITY_VALIDATION_STATES = %w(na valid outstanding pending)
   APPLICATION_VALIDATION_STATES = %w(na valid outstanding pending)
-
-  VERIFICATION_SENSITIVE_ATTR = %w(first_name last_name ssn us_citizen naturalized_citizen eligible_immigration_status dob indian_tribe_member)
 
   US_CITIZEN_STATUS_KINDS = %W(
   us_citizen
@@ -808,7 +807,7 @@ class ConsumerRole
   end
 
   def sensitive_information_changed?(person_params)
-    person_params.select{|k,v| VERIFICATION_SENSITIVE_ATTR.include?(k) }.any?{|field,v| sensitive_information_changed(field, person_params)}
+    person_params.select{|k,v| verification_sensitive_attributes.include?(k) }.any?{|field,v| sensitive_information_changed(field, person_params)}
   end
 
   def check_for_critical_changes(family, opts)
