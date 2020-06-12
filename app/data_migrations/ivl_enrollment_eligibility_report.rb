@@ -25,7 +25,7 @@ class IvlEnrollmentEligibilityReport < MongoidMigrationTask
       hbx_enrollments.no_timeout.limit(5_000).offset(offset_count).inject([]) do |_dummy, enrollment|
         family = enrollment.family
         e_case_id = family.has_valid_e_case_id? ? family.e_case_id.split('#').last : 'N/A'
-        enr_type = enrollment_type(enrollment)
+        enr_type = enrollment_type(enrollment) ? 'AQHP' : 'UQHP'
 
         enrollment.hbx_enrollment_members.each do |member|
           person = member.person
