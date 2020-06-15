@@ -859,6 +859,19 @@ class ConsumerRole
     person.verification_types.active.where(applied_roles: "consumer_role") if person
   end
 
+  def check_native_status(family, native_status_changed)
+    return unless native_status_changed
+    return unless family.person_has_an_active_enrollment?(person)
+
+    if person.tribal_id.present?
+      fail_indian_tribe
+      fail_native_status!
+    else
+      pass_native_status! if all_types_verified? && !fully_verified?
+    end
+  end
+
+
   #class methods
   class << self
     #this method will be used to check 90 days verification period for outstanding verification
@@ -1154,19 +1167,6 @@ class ConsumerRole
   def citizenship_immigration_processing?
     dhs_pending? || ssa_pending?
   end
-
-  def check_native_status(family, native_status_changed)
-    return unless native_status_changed
-    return unless family.person_has_an_active_enrollment?(person)
-
-    if person.tribal_id.present?
-      fail_indian_tribe
-      fail_native_status!
-    else
-      pass_native_status! if all_types_verified? && !fully_verified?
-    end
-  end
-
 
   def sensitive_information_changed(field, person_params)
     if field == "dob"
