@@ -210,5 +210,6 @@ BROKER_AGENCIES_TRANSLATIONS = {
 	"en.carrier_appointments" => "Carrier Appointments",
 	"en.reason" => "Reason",
 	"en.broker_carrier_appointments_enabled_note" => "Note: Carrier appointments for broker are not necessary for participation in %{site_long_name}.",
-	"en.write_here" => "Write here"
+	"en.write_here" => "Write here",
+	"en.broker_agencies.profiles.npn_taken_error" => "NPN has already been claimed by another broker. Please contact HBX-Customer Service - Call (855) 532-5465."
 }
