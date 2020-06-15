@@ -4,8 +4,8 @@
 - show_benefit_application_tile = params[:show_benefit_application_tile] ||= false
 
 - if @benefit_package_form.new_record?
-  h1.heading-text Select Your Plan Offering
-  h4 Let your plan participants choose any plan offered by one carrier, any plan available within a specific metal level or you can offer just one plan. It doesn't cost you more to let them choose by carrier (insurance company) or metal level.
+  h1.heading-text = l10n("employers.plan_years.benefit_package.select_your_plan_offering")
+  h4 = l10n("employers.plan_years.benefit_package.select_your_plan_offering.content")
   br
 - else
   .edit-offering.health
