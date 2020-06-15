@@ -318,7 +318,7 @@ class HbxEnrollment
   scope :enrolled_and_renewal, ->{where(:aasm_state.in => ENROLLED_AND_RENEWAL_STATUSES )}
   scope :enrolled_waived_and_renewing, -> { where(:aasm_state.in => (ENROLLED_STATUSES + RENEWAL_STATUSES + WAIVED_STATUSES)) }
   scope :enrolled_and_renewing, -> { where(:aasm_state.in => (ENROLLED_STATUSES + RENEWAL_STATUSES)) }
-  scope :enrolled_and_renewing_and_terminated, -> { where(:aasm_state.in => (ENROLLED_STATUSES + RENEWAL_STATUSES + TERMINATED_STATUSES)) }
+  scope :enrolled_renewing_and_terminated, -> { where(:aasm_state.in => (ENROLLED_STATUSES + RENEWAL_STATUSES + TERMINATED_STATUSES)) }
   scope :enrolled_and_renewing_and_shopping, -> { where(:aasm_state.in => (ENROLLED_STATUSES + RENEWAL_STATUSES + ['shopping'])) }
   scope :enrolled_and_renewing_and_expired, -> { where(:aasm_state.in => (ENROLLED_STATUSES + RENEWAL_STATUSES + ['coverage_expired'])) }
   scope :effective_asc,      -> { order(effective_on: :asc) }

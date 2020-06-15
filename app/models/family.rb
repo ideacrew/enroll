@@ -280,7 +280,7 @@ class Family
     enrolled_enrollments = active_household.hbx_enrollments.enrolled_and_renewing.by_coverage_kind(enrollment.coverage_kind)
 
     if enrolled_enrollments.blank?
-      enrolled_enrollments = active_household.hbx_enrollments.enrolled_and_renewing_and_terminated.by_coverage_kind(enrollment.coverage_kind).by_terminated_period((enrollment.effective_on - 1.day))
+      enrolled_enrollments = active_household.hbx_enrollments.enrolled_renewing_and_terminated.by_coverage_kind(enrollment.coverage_kind).by_terminated_period((enrollment.effective_on - 1.day))
     end
     enrolled_enrollments.map(&:product)
   end
