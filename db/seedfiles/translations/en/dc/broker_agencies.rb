@@ -210,9 +210,5 @@ BROKER_AGENCIES_TRANSLATIONS = {
 	"en.carrier_appointments" => "Carrier Appointments",
 	"en.reason" => "Reason",
 	"en.broker_carrier_appointments_enabled_note" => "Note: Carrier appointments for broker are not necessary for participation in %{site_long_name}.",
-	"en.write_here" => "Write here",
-	"en.broker_agencies.profiles.detailed_roster_information" => "To create a quote for a new, prospective group, please upload an employee roster. To create a quote for an existing group, use the roster below and update it as needed to reflect the plan enrollees.",
-	"en.broker_agencies.profiles.detailed_roster_information_important" => "When using this quoting tool for employers that currently offer coverage through DC Health Link it is important to know that the current employee roster may not reflect the current enrollments for the group. Any changes to enrollment information that has been made through an employee account may not be reflected on the employee roster. Please review the employee roster for accuracy prior to using this quoting tool for a more accurate estimate for your group.",
-	"en.broker_agencies.profiles.select_plan" => "Select the plan you wish to quote for all enrollees.",
-	"en.broker_agencies.profiles.to_compare_plans" => "To compare plans before making your selection, use the checkboxes next to the plan names. You can select up to 3 plans to compare at one time. When comparing costs, note that the maximum monthly cost for employers is based on:"
+	"en.write_here" => "Write here"
 }

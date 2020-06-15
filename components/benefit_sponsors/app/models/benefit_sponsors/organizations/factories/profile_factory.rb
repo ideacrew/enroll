@@ -561,7 +561,7 @@ module BenefitSponsors
         def npn_already_taken?(npn)
           if is_broker_profile?
             if Person.where("broker_role.npn" => npn).any?
-              errors.add(:organization, "NPN has already been claimed by another broker. Please contact Health Connector for Business Customer Service at 1-888-813-9220")
+              errors.add(:organization, "NPN has already been claimed by another broker. Please contact HBX-Customer Service - Call (855) 532-5465.")
               return true
             end
           end
