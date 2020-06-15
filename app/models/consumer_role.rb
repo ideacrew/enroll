@@ -584,7 +584,7 @@ class ConsumerRole
       transitions from: :verification_outstanding, to: :fully_verified
     end
     event :fail_native_status, :after => [:record_transition, :notify_of_eligibility_change] do
-      transitions from: :verification_outstanding, to: :verification_outstanding
+      transitions from: [:verification_outstanding, :ssa_pending, :dhs_pending, :fully_verified, :sci_verified],  to: :verification_outstanding
     end
 
     event :verifications_backlog, :after => [:record_transition] do
@@ -1154,6 +1154,18 @@ class ConsumerRole
 
   def citizenship_immigration_processing?
     dhs_pending? || ssa_pending?
+  end
+
+  def check_native_status(family, native_status_changed)
+    return unless native_status_changed
+    return unless family.person_has_an_active_enrollment?(person)
+
+    if person.tribal_id.present?
+      fail_indian_tribe
+      fail_native_status!
+    else
+      pass_native_status! if all_types_verified? && !fully_verified?
+    end
   end
 
 
