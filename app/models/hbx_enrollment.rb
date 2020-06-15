@@ -318,6 +318,7 @@ class HbxEnrollment
   scope :enrolled_and_renewal, ->{where(:aasm_state.in => ENROLLED_AND_RENEWAL_STATUSES )}
   scope :enrolled_waived_and_renewing, -> { where(:aasm_state.in => (ENROLLED_STATUSES + RENEWAL_STATUSES + WAIVED_STATUSES)) }
   scope :enrolled_and_renewing, -> { where(:aasm_state.in => (ENROLLED_STATUSES + RENEWAL_STATUSES)) }
+  scope :enrolled_and_renewing_and_terminated, -> { where(:aasm_state.in => (ENROLLED_STATUSES + RENEWAL_STATUSES + TERMINATED_STATUSES)) }
   scope :enrolled_and_renewing_and_shopping, -> { where(:aasm_state.in => (ENROLLED_STATUSES + RENEWAL_STATUSES + ['shopping'])) }
   scope :enrolled_and_renewing_and_expired, -> { where(:aasm_state.in => (ENROLLED_STATUSES + RENEWAL_STATUSES + ['coverage_expired'])) }
   scope :effective_asc,      -> { order(effective_on: :asc) }
@@ -362,6 +363,10 @@ class HbxEnrollment
   scope :by_effective_period,      ->(effective_period) { where(
                                                           :"effective_on".gte => effective_period.min,
                                                           :"effective_on".lte => effective_period.max
+                                                        )}
+  scope :by_terminated_period,      ->(term_date) { where(
+                                                          :"terminated_on".gte => term_date,
+                                                          :"terminated_on".lte => term_date
                                                         )}
   scope :by_benefit_application_and_sponsored_benefit,  ->(benefit_application, sponsored_benefit, end_date) do
     where(
