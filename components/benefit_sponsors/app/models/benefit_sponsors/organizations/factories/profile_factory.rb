@@ -558,6 +558,15 @@ module BenefitSponsors
           npn_already_taken?(npn) || !valid_office_location_kinds?
         end
 
+        # Add this in its own file and include.
+        def l10n(translation_key, interpolated_keys={})
+          begin
+            I18n.t(translation_key, interpolated_keys.merge(raise: true)).html_safe
+          rescue I18n::MissingTranslationData
+            translation_key.gsub(/\W+/, '').titleize
+          end
+        end
+
         def npn_already_taken?(npn)
           if is_broker_profile?
             if Person.where("broker_role.npn" => npn).any?
