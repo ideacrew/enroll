@@ -296,6 +296,7 @@ class Admin::Aptc < ApplicationController
         thh.tax_household_members.build(thh_member_params).save!
       end
       thh.save!
+      household.end_multiple_thh
     end
 
     # Redetermine Eligibility on Max APTC / CSR Update.

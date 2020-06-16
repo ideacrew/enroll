@@ -66,6 +66,10 @@ RSpec.describe HbxAdminController, :type => :controller do
     it 'should create a new tax household object when there is a determination change' do
       expect(family.active_household.tax_households.count).to eq(2)
     end
+
+    it 'should end date the old tax_households' do
+      expect(family.active_household.tax_households.active_tax_household.count).to eq(1)
+    end
   end
 
   describe "GET calculate_aptc_csr" do
