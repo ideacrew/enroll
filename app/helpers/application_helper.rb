@@ -1,4 +1,5 @@
 module ApplicationHelper
+  include FloatHelper
 
   def can_employee_shop?(date)
     return false if date.blank?
@@ -58,24 +59,21 @@ module ApplicationHelper
     (a_tab == current_tab) ? raw(" class=\"active\"") : ""
   end
 
-  def current_cost(plan_cost, ehb=0, hbx_enrollment=nil, source=nil, can_use_aptc=true)
+  #Purchased enrollment family premium (family home page - view details button on the enrollment)
+  def current_cost(hbx_enrollment = nil, source = nil)
     # source is account or shopping
-    if source == 'account' && hbx_enrollment.present? && hbx_enrollment.try(:applied_aptc_amount).to_f > 0
-      if hbx_enrollment.coverage_kind == 'health'
-        return (hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f)
-      else
-        return hbx_enrollment.total_premium
-      end
-    end
+    return unless source == 'account' && hbx_enrollment.present? && hbx_enrollment.coverage_kind == 'health'
 
-    if session['elected_aptc'].present? && session['max_aptc'].present? && can_use_aptc
-      aptc_amount = session['elected_aptc'].to_f
-      ehb_premium = plan_cost * ehb
-      cost = plan_cost - [ehb_premium, aptc_amount].min
-      cost > 0 ? cost : 0
-    else
-      plan_cost
-    end
+    (hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f)
+  end
+
+  #Shopping enrollment family premium (plan shopping page)
+  def shopping_group_premium(plan_cost, plan_ehb_cost, can_use_aptc=true)
+    return plan_cost unless session['elected_aptc'].present? && session['max_aptc'].present? && can_use_aptc
+
+    aptc_amount = session['elected_aptc'].to_f
+    cost = float_fix(plan_cost - [plan_ehb_cost, aptc_amount].min)
+    cost > 0 ? cost.round(2) : 0
   end
 
   def datepicker_control(f, field_name, options = {}, value = "")
@@ -479,6 +477,8 @@ module ApplicationHelper
         'Decertified Date'
       when 'denied'
         'Denied Date'
+      when 'extended'
+        'Extended Date'
       else
       end
     end
@@ -844,5 +844,18 @@ module ApplicationHelper
 
   def round_down_float_two_decimals(float_number)
     BigDecimal((float_number).to_s).round(8).round(2, BigDecimal::ROUND_DOWN).to_f
+  end
+
+  def external_application_configured?(application_name)
+    external_app = ExternalApplications::ApplicationProfile.find_by_application_name(application_name)
+    return false unless external_app
+    return false unless external_app.is_authorized_for?(current_user)
+    !external_app.url.blank?
+  end
+
+  def jwt_for_external_application
+    current_token = WhitelistedJwt.newest
+    return current_token.token if current_token
+    current_user.generate_jwt(warden.config[:default_scope], nil)
   end
 end

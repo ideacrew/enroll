@@ -102,6 +102,10 @@ module PermissionsWorld
     hbx_admin_can_create_benefit_application
     hbx_admin_can_access_user_account_tab
   end
+
+  def create_indexes
+    Person.create_indexes
+  end
 end
 
 World(PermissionsWorld)
@@ -109,4 +113,5 @@ World(PermissionsWorld)
 Given(/all permissions are present$/) do
   define_permissions
   make_all_permissions
+  create_indexes
 end

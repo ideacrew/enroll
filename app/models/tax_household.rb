@@ -33,7 +33,7 @@ class TaxHousehold
   scope :active_tax_household, ->{ where(effective_ending_on: nil) }
 
   def latest_eligibility_determination
-    eligibility_determinations.sort {|a, b| a.determined_on <=> b.determined_on}.last
+    eligibility_determinations.sort {|a, b| a.determined_at <=> b.determined_at}.last
   end
 
   def group_by_year
@@ -57,9 +57,10 @@ class TaxHousehold
 
   def current_max_aptc
     eligibility_determination = latest_eligibility_determination
-    #TODO need business rule to decide how to get the max aptc
-    #during open enrollment and determined_at
-    if eligibility_determination.present? #and eligibility_determination.determined_on.year == TimeKeeper.date_of_record.year
+    # TODO: need business rule to decide how to get the max aptc
+    # during open enrollment and determined_at
+    # Please reference ticket 42408 for more info on the determined on to determined_at migration
+    if eligibility_determination.present? #and eligibility_determination.determined_at.year == TimeKeeper.date_of_record.year
       eligibility_determination.max_aptc
     else
       0
@@ -68,6 +69,10 @@ class TaxHousehold
 
   def aptc_members
     tax_household_members.find_all(&:is_ia_eligible?)
+  end
+
+  def applicant_ids
+    tax_household_members.map(&:applicant_id)
   end
 
   def aptc_ratio_by_member
@@ -150,11 +155,11 @@ class TaxHousehold
   end
 
   # Pass hbx_enrollment and get the total amount of APTC available by hbx_enrollment_members
-  def total_aptc_available_amount_for_enrollment(hbx_enrollment)
+  def total_aptc_available_amount_for_enrollment(hbx_enrollment, excluding_enrollment = nil)
     return 0 if hbx_enrollment.blank?
     return 0 if is_all_non_aptc?(hbx_enrollment)
     total = family.active_family_members.reduce(0) do |sum, member|
-      sum + (aptc_available_amount_by_member[member.id.to_s] || 0)
+      sum + (aptc_available_amount_by_member(excluding_enrollment)[member.id.to_s] || 0)
     end
     family_members = unwanted_family_members(hbx_enrollment)
     unchecked_aptc_fms = find_aptc_family_members(family_members)
@@ -171,7 +176,7 @@ class TaxHousehold
     total_sum
   end
 
-  def aptc_available_amount_by_member
+  def aptc_available_amount_by_member(excluding_enrollment_id = nil)
     # Find HbxEnrollments for aptc_members in the current plan year where they have used aptc
     # subtract from available amount
     aptc_available_amount_hash = {}
@@ -179,7 +184,9 @@ class TaxHousehold
       aptc_available_amount_hash[member_id] = current_max_aptc.to_f * ratio
     end
     # FIXME should get hbx_enrollments by effective_starting_on
-    household.hbx_enrollments_with_aptc_by_year(effective_starting_on.year).map(&:hbx_enrollment_members).flatten.each do |enrollment_member|
+    enrollments = household.hbx_enrollments_with_aptc_by_year(effective_starting_on.year)
+    enrollments = enrollments.where(:id.ne => BSON::ObjectId.from_string(excluding_enrollment_id)) if excluding_enrollment_id
+    enrollments.map(&:hbx_enrollment_members).flatten.each do |enrollment_member|
       applicant_id = enrollment_member.applicant_id.to_s
       if aptc_available_amount_hash.has_key?(applicant_id)
         aptc_available_amount_hash[applicant_id] -= (enrollment_member.applied_aptc_amount || 0).try(:to_f)

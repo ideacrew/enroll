@@ -1376,6 +1376,149 @@ context "verifying employee_role is active?" do
   end
 end
 
+describe "remove_family_member" do
+  let(:family) { FactoryBot.create(:family, :with_primary_family_member_and_dependent)}
+  let(:dependent1) { family.family_members.where(is_primary_applicant: false).first }
+  let(:dependent2) { family.family_members.where(is_primary_applicant: false).last }
+
+  context "should remove family member and set is active to false if no duplicates FM exists" do
+
+    it "should set is active to false for dependent1" do
+      expect(family.family_members.active.count).to eq 3
+      family.remove_family_member(dependent1.person)
+      expect(family.family_members.active.count).to eq 2
+      expect(dependent1.is_active).to eq false
+    end
+  end
+
+  context "should remove all duplicate family members" do
+
+    let!(:duplicate_family_member_1) do
+      family.family_members << FamilyMember.new(person_id: dependent1.person.id)
+      dup_fm = family.family_members.last
+      dup_fm.save(validate: false)
+      dup_fm
+    end
+    let!(:duplicate_family_member_2) do
+      family.family_members << FamilyMember.new(person_id: dependent1.person.id)
+      dup_fm = family.family_members.last
+      dup_fm.save(validate: false)
+      dup_fm
+    end
+
+    it "should set is active to false for dependent1" do
+      expect(family.family_members.active.count).to eq 5
+      family.remove_family_member(dependent1.person)
+      expect(family.family_members.active.count).to eq 3
+    end
+  end
+
+  context "should remove all family members along with coverage household members" do
+
+    let!(:duplicate_family_member_1) do
+      family.family_members << FamilyMember.new(person_id: dependent1.person.id)
+      dup_fm = family.family_members.last
+      dup_fm.save(validate: false)
+      family.active_household.add_household_coverage_member(dup_fm)
+      dup_fm
+    end
+    let!(:duplicate_family_member_2) do
+      family.family_members << FamilyMember.new(person_id: dependent1.person.id)
+      dup_fm = family.family_members.last
+      dup_fm.save(validate: false)
+      family.active_household.add_household_coverage_member(dup_fm)
+      dup_fm
+    end
+
+    it 'should raise document not found error' do
+      family.remove_family_member(dependent1.person)
+      expect { family.family_members.find(duplicate_family_member_1.id.to_s) }.to raise_error(Mongoid::Errors::DocumentNotFound)
+    end
+
+    it 'should delete CHM record' do
+      family.remove_family_member(dependent1.person)
+      chmms = family.active_household.coverage_households.flat_map(&:coverage_household_members)
+      expect(family.family_members.count).to eq(chmms.count)
+      expect(chmms.map(&:family_member_id).map(&:to_s)).not_to include(duplicate_family_member_1.id.to_s)
+    end
+  end
+
+  context "should remove all family members along with coverage household members and hbx enrollment members(in shopping enrollments)" do
+    let!(:duplicate_family_member_1) do
+      family.family_members << FamilyMember.new(person_id: dependent1.person.id)
+      dup_fm = family.family_members.last
+      dup_fm.save(validate: false)
+      family.active_household.add_household_coverage_member(dup_fm)
+      dup_fm
+    end
+
+    let!(:duplicate_family_member_2) do
+      family.family_members << FamilyMember.new(person_id: dependent1.person.id)
+      dup_fm = family.family_members.last
+      dup_fm.save(validate: false)
+      family.active_household.add_household_coverage_member(dup_fm)
+      dup_fm
+    end
+
+    let!(:enrollment) do
+      enr = FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, aasm_state: "shopping")
+      enr.hbx_enrollment_members << HbxEnrollmentMember.new(applicant_id: dependent1.id.to_s, eligibility_date: Time.zone.today, coverage_start_on: Time.zone.today)
+      enr.hbx_enrollment_members.first.save!
+      enr.save!
+      enr
+    end
+
+    let!(:matched_hbx_member_1) do
+      enrollment.hbx_enrollment_members << HbxEnrollmentMember.new(applicant_id: duplicate_family_member_1.id.to_s, eligibility_date: Time.zone.today, coverage_start_on: Time.zone.today)
+      enrollment.hbx_enrollment_members.last.save!
+      enrollment.save!
+      enrollment.hbx_enrollment_members.last
+    end
+
+
+    let!(:matched_hbx_member_2) do
+      enrollment.hbx_enrollment_members << HbxEnrollmentMember.new(applicant_id: duplicate_family_member_1.id.to_s, eligibility_date: Time.zone.today, coverage_start_on: Time.zone.today)
+      enrollment.hbx_enrollment_members.last.save!
+      enrollment.save!
+      enrollment.hbx_enrollment_members.last
+    end
+
+    let!(:size) {enrollment.hbx_enrollment_members.count}
+
+    it 'should delete FM, CHM and HBXM records' do
+      family.remove_family_member(dependent1.person)
+      chmms = family.active_household.coverage_households.flat_map(&:coverage_household_members)
+      expect(family.family_members.count).to eq(chmms.count)
+      enrollment.reload
+      expect(enrollment.hbx_enrollment_members.count).not_to eq(size)
+      expect(chmms.map(&:family_member_id).map(&:to_s)).not_to include(duplicate_family_member_1.id.to_s)
+    end
+
+    it 'should return false if duplicate members are present on enrollments' do
+      enrollment.update_attributes(aasm_state: "coverage_selected")
+      status, message = family.remove_family_member(dependent1.person)
+
+      expect(status).to eq false
+      expect(message).to eq "Cannot remove the duplicate members as they are present on enrollments/tax households. Please call customer service at 1-855-532-5465"
+    end
+
+    it 'should return false if duplicate members are present on active tax households' do
+      allow(family).to receive(:duplicate_members_present_on_active_tax_households?).and_return true
+      status, message = family.remove_family_member(dependent1.person)
+      expect(status).to eq false
+      expect(message).to eq "Cannot remove the duplicate members as they are present on enrollments/tax households. Please call customer service at 1-855-532-5465"
+    end
+
+    it 'should return true if duplicate members are not present on active tax households or enrollments' do
+      allow(family).to receive(:duplicate_members_present_on_active_tax_households?).and_return false
+      allow(family).to receive(:duplicate_members_present_on_enrollments?).and_return false
+      status, message = family.remove_family_member(dependent1.person)
+      expect(status).to eq true
+    end
+
+  end
+end
+
 describe "active dependents" do
   let!(:person) { FactoryBot.create(:person, :with_consumer_role)}
   let!(:person2) { FactoryBot.create(:person, :with_consumer_role)}
@@ -1437,7 +1580,7 @@ describe Family, "scopes", dbclean: :after_each do
         plan_id: plan.id,
         sponsored_benefit_package_id: current_benefit_package.id,
         aasm_state:"coverage_selected"
-  
+
         )
       }
 
@@ -1459,7 +1602,20 @@ describe Family, "scopes", dbclean: :after_each do
     end
   end
 
-  context 'scopes' do 
+  context 'scopes' do
+    context "outstanding verifications" do
+      let(:none_uploaded_person) do
+        FactoryBot.create(:person)
+      end
+      let!(:none_uploaded_family) do
+        FactoryBot.create(:family, :with_primary_family_member, person: none_uploaded_person)
+      end
+
+      it "should not return uploaded verifications" do
+        expect(none_uploaded_family.all_persons_vlp_documents_status).to eq("None")
+      end
+    end
+
     context '.all_enrollments_by_benefit_package' do
       let(:benefit_package_to_test) do
         double(:benefit_package, :_id => 1)
@@ -1516,13 +1672,19 @@ describe Family, "scopes", dbclean: :after_each do
       expect(Family.enrolled_under_benefit_application(initial_application)).to include family
     end
 
+    it '.active_and_cobra_enrolled' do
+      allow(census_employee).to receive(:family).and_return(family)
+      allow(initial_application).to receive(:active_census_employees).and_return([census_employee])
+      expect(Family.active_and_cobra_enrolled(initial_application)).to include family
+    end
+
     it '.by_enrollment_shop_market' do
       expect(Family.by_enrollment_shop_market).to include family
     end
   end
 
-  context 'send_enrollment_notice_for_ivl ' do 
-    it '.enrollment_notice_for_ivl_families' do 
+  context 'send_enrollment_notice_for_ivl ' do
+    it '.enrollment_notice_for_ivl_families' do
       expect(Family.send_enrollment_notice_for_ivl(created_at)).to include family
     end
   end

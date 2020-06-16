@@ -266,7 +266,7 @@ class HbxEnrollment
   scope :effective_desc,      ->{ order(effective_on: :desc, submitted_at: :desc, coverage_kind: :desc) }
   scope :waived,              ->{ where(:aasm_state.in => WAIVED_STATUSES )}
   scope :expired,             ->{ where(:aasm_state => "coverage_expired")}
-  scope :cancel_eligible,     ->{ where(:aasm_state.in => ["coverage_selected","renewing_coverage_selected","coverage_enrolled","auto_renewing"])}
+  scope :cancel_eligible,     ->{ where(:aasm_state.in => ["coverage_selected","renewing_coverage_selected","coverage_enrolled","auto_renewing", "unverified"])}
   scope :changing,            ->{ where(changing: true) }
   scope :with_in,             ->(time_limit){ where(:created_at.gte => time_limit) }
   scope :shop_market,         ->{ where(:kind.in => ["employer_sponsored", "employer_sponsored_cobra"]) }
@@ -596,9 +596,10 @@ class HbxEnrollment
         census_employee = role.census_employee
         self.kind = 'employer_sponsored_cobra'
         self.effective_on = census_employee.cobra_begin_date if census_employee.cobra_begin_date > self.effective_on
-        if census_employee.coverage_terminated_on.present? && !census_employee.have_valid_date_for_cobra?
-          raise "You may not enroll for cobra after #{Settings.aca.shop_market.cobra_enrollment_period.months} months later of coverage terminated."
-        end
+        # removing 6 months eligibility rule for cobra EE during shopping, however the 6months rules needs to be validated during cobra initiation for CE.
+        # if census_employee.coverage_terminated_on.present? && !census_employee.have_valid_date_for_cobra?
+        #   raise "You may not enroll for cobra after #{Settings.aca.shop_market.cobra_enrollment_period.months} months later of coverage terminated."
+        # end
       end
     end
   end
@@ -1952,7 +1953,7 @@ class HbxEnrollment
   end
 
   def is_admin_cancel_eligible?
-    ["coverage_selected","renewing_coverage_selected","coverage_enrolled","auto_renewing"].include?(aasm_state.to_s)
+    ["coverage_selected", "renewing_coverage_selected", "coverage_enrolled", "auto_renewing", "unverified"].include?(aasm_state.to_s)
   end
 
   def is_admin_terminate_eligible?

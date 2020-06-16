@@ -122,6 +122,9 @@ class ConsumerRole
   field :identity_rejected, type: Boolean, default: false
   field :application_rejected, type: Boolean, default: false
 
+  # field to determine the user's active selection
+  field :active_vlp_document_id, type: BSON::ObjectId
+
   delegate :hbx_id, :hbx_id=, to: :person, allow_nil: true
   delegate :ssn,    :ssn=,    to: :person, allow_nil: true
   delegate :no_ssn,    :no_ssn=,    to: :person, allow_nil: true
@@ -275,7 +278,7 @@ class ConsumerRole
   #use this method to check what verification types needs to be included to the notices
   def types_include_to_notices
     verification_types.find_all do |type|
-      type.unverified_no_docs?
+      type.type_unverified?
     end
   end
 
@@ -397,7 +400,7 @@ class ConsumerRole
   end
 
   def has_i327?
-    vlp_documents.any?{|doc| doc.subject == "I-327 (Reentry Permit)" }
+    vlp_documents.any?{|doc| doc.subject == "I-327 (Reentry Permit)" && doc.alien_number.present? }
   end
 
   def has_i571?
@@ -405,27 +408,27 @@ class ConsumerRole
   end
 
   def has_cert_of_citizenship?
-    vlp_documents.any?{|doc| doc.subject == "Certificate of Citizenship" }
+    vlp_documents.any?{|doc| doc.subject == "Certificate of Citizenship" && doc.citizenship_number.present?}
   end
 
   def has_cert_of_naturalization?
-    vlp_documents.any?{|doc| doc.subject == "Naturalization Certificate" }
+    vlp_documents.any?{|doc| doc.subject == "Naturalization Certificate" && doc.naturalization_number.present? }
   end
 
   def has_temp_i551?
-    vlp_documents.any?{|doc| doc.subject == "Temporary I-551 Stamp (on passport or I-94)" }
+    vlp_documents.any?{|doc| doc.subject == "Temporary I-551 Stamp (on passport or I-94)" && doc.alien_number.present? }
   end
 
   def has_i94?
-    vlp_documents.any?{|doc| doc.subject == "I-94 (Arrival/Departure Record)" || doc.subject == "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport"}
+    vlp_documents.any?{|doc| doc.i94_number.present? && (doc.subject == "I-94 (Arrival/Departure Record)" || (doc.subject == "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport" && doc.passport_number.present? && doc.expiration_date.present?))}
   end
 
   def has_i20?
-    vlp_documents.any?{|doc| doc.subject == "I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)" }
+    vlp_documents.any?{|doc| doc.subject == "I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)" && doc.sevis_id.present? }
   end
 
   def has_ds2019?
-    vlp_documents.any?{|doc| doc.subject == "DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)" }
+    vlp_documents.any?{|doc| doc.subject == "DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)" && doc.sevis_id.present? }
   end
 
   def i551
@@ -437,23 +440,23 @@ class ConsumerRole
   end
 
   def mac_read_i551
-    vlp_documents.select{|doc| doc.subject == "Machine Readable Immigrant Visa (with Temporary I-551 Language)" && doc.issuing_country.present? && doc.passport_number.present? && doc.expiration_date.present? }.first
+    vlp_documents.select{|doc| doc.subject == "Machine Readable Immigrant Visa (with Temporary I-551 Language)" && doc.passport_number.present? && doc.alien_number.present? }.first
   end
 
   def foreign_passport_i94
-    vlp_documents.select{|doc| doc.subject == "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport" && doc.issuing_country.present? && doc.passport_number.present? && doc.expiration_date.present? }.first
+    vlp_documents.select{|doc| doc.subject == "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport" && doc.i94_number.present? && doc.passport_number.present? && doc.expiration_date.present? }.first
   end
 
   def foreign_passport
-    vlp_documents.select{|doc| doc.subject == "Unexpired Foreign Passport" && doc.issuing_country.present? && doc.passport_number.present? && doc.expiration_date.present? }.first
+    vlp_documents.select{|doc| doc.subject == "Unexpired Foreign Passport" && doc.passport_number.present? && doc.expiration_date.present? }.first
   end
 
   def case1
-    vlp_documents.select{|doc| doc.subject == "Other (With Alien Number)" }.first
+    vlp_documents.select{|doc| doc.subject == "Other (With Alien Number)" && doc.alien_number.present? && doc.description.present? }.first
   end
 
   def case2
-    vlp_documents.select{|doc| doc.subject == "Other (With I-94 Number)" }.first
+    vlp_documents.select{|doc| doc.subject == "Other (With I-94 Number)" && doc.i94_number.present? && doc.description.present? }.first
   end
 
   def can_receive_paper_communication?
@@ -548,6 +551,7 @@ class ConsumerRole
 
     event :trigger_residency, :after => [:mark_residency_pending, :record_transition, :start_residency_verification_process, :notify_of_eligibility_change] do
       transitions from: :ssa_pending, to: :ssa_pending
+      transitions from: :unverified, to: :unverified
       transitions from: :dhs_pending, to: :dhs_pending
       transitions from: :sci_verified, to: :sci_verified
       transitions from: :verification_outstanding, to: :sci_verified, :guard => :ssa_citizenship_verified?
@@ -574,6 +578,13 @@ class ConsumerRole
       transitions from: :fully_verified, to: :unverified
       transitions from: :sci_verified, to: :unverified
       transitions from: :verification_period_ended, to: :unverified
+    end
+
+    event :pass_native_status, :after => [:record_transition, :notify_of_eligibility_change] do
+      transitions from: :verification_outstanding, to: :fully_verified
+    end
+    event :fail_native_status, :after => [:record_transition, :notify_of_eligibility_change] do
+      transitions from: :verification_outstanding, to: :verification_outstanding
     end
 
     event :verifications_backlog, :after => [:record_transition] do
@@ -888,7 +899,12 @@ class ConsumerRole
   def mark_residency_authorized(*args)
     update_attributes(:residency_determined_at => DateTime.now,
                       :is_state_resident => true)
-    verification_types.by_name("DC Residency").first.pass_type
+
+    if args&.first&.self_attest_residency
+      verification_types.by_name('DC Residency').first.attest_type
+    else
+      verification_types.by_name('DC Residency').first.pass_type
+    end
   end
 
   def lawful_presence_pending?
@@ -1061,14 +1077,20 @@ class ConsumerRole
   end
 
   def return_doc_for_deficiency(v_type, update_reason, *authority)
+    message = "#{v_type.type_name} was rejected."
     v_type.update_attributes(:validation_status => "outstanding", :update_reason => update_reason, :rejected => true)
     if  v_type.type_name == "DC Residency"
       mark_residency_denied
     elsif ["Citizenship", "Immigration status"].include? v_type.type_name
       lawful_presence_determination.deny!(verification_attr(authority.first))
+    elsif ["American Indian Status"].include?(v_type.type_name)
+      if verification_outstanding?
+        fail_native_status!
+        return message
+      end
     end
     reject!(verification_attr(authority.first))
-    "#{v_type.type_name} was rejected."
+    message
   end
 
   def return_ridp_doc_for_deficiency(ridp_type, update_reason)
@@ -1091,13 +1113,19 @@ class ConsumerRole
 
   def update_verification_type(v_type, update_reason, *authority)
     status = authority.first == "curam" ? "curam" : "verified"
+    message = "#{v_type.type_name} successfully verified."
     self.verification_types.find(v_type).update_attributes(:validation_status => status, :update_reason => update_reason)
     if v_type.type_name == "DC Residency"
       update_attributes(:is_state_resident => true, :residency_determined_at => TimeKeeper.datetime_of_record)
     elsif ["Citizenship", "Immigration status"].include? v_type.type_name
       lawful_presence_determination.authorize!(verification_attr(authority.first))
+    elsif ["American Indian Status"].include?(v_type.type_name) && all_types_verified?
+      if verification_outstanding?
+        pass_native_status!
+        return message
+      end
     end
-    (all_types_verified? && !fully_verified?) ? verify_ivl_by_admin(authority.first) : "#{v_type.type_name} successfully verified."
+    (all_types_verified? && !fully_verified?) ? verify_ivl_by_admin(authority.first) : message
   end
 
   def redetermine_verification!(verification_attr)
@@ -1140,12 +1168,12 @@ class ConsumerRole
   end
 
   def record_transition(*args)
-    workflow_state_transitions << WorkflowStateTransition.new(
-      from_state: aasm.from_state,
-      to_state: aasm.to_state,
-      event: aasm.current_event,
-      user_id: SAVEUSER[:current_user_id]
-    )
+    wfst_params = { from_state: aasm.from_state,
+                    to_state: aasm.to_state,
+                    event: aasm.current_event,
+                    user_id: SAVEUSER[:current_user_id] }
+    wfst_params.merge!({ reason: 'Self Attest DC Residency' }) if args&.first&.is_a?(OpenStruct) && args&.first&.self_attest_residency
+    workflow_state_transitions << WorkflowStateTransition.new(wfst_params)
   end
 
   def verification_attr(*authority)

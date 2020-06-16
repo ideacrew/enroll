@@ -150,6 +150,14 @@ def people
     "CSR" => {
       email: "sherry.buckner@dc.gov",
       password: 'aA1!aA1!aA1!'
+    },
+    "Ricky Martin" => {
+      first_name: "Ricky",
+      last_name: "Martin",
+      dob_date: '10/10/1984',
+      broker_census_employee: true,
+      password: 'aA1!aA1!aA1!',
+      ssn: "222335220"
     }
   }
 end
@@ -453,7 +461,7 @@ Then(/^(?:.+) should be logged on as an unlinked employee$/) do
 end
 
 When (/^(.*) logs? out$/) do |someone|
-  find_link('Logout', wait: 1)
+  find_link('Logout', wait: 5)
   click_link "Logout"
   visit "/"
   find('.container.welcome', wait: 5) do |element|
@@ -745,6 +753,10 @@ Then(/^.+ should see the list of plans$/) do
   screenshot("plan_shopping")
 end
 
+And(/^.+ should see the Metal Level filter$/) do
+  expect(page).to have_content('Metal Level')
+end
+
 When(/^.+ sorts by (.*)/) do |sort|
   @plan_names = find_all('.plan-row').collect{|row| row.find('h3 a', wait: 5).text}
   find(".interaction-click-control-#{sort.downcase.gsub(/\s/, '-')}", wait: 5).click
@@ -801,6 +813,7 @@ When(/^.+ clicks? on Confirm button on the coverage summary page$/) do
 end
 
 Then(/^.+ should see the receipt page$/) do
+  find('h1.darkblue', wait: 10)
   expect(page).to have_content('Enrollment Submitted')
   screenshot("receipt_page")
   find('.interaction-click-control-continue').click
@@ -855,6 +868,25 @@ end
 
 When(/^.+ goes to to home tab$/) do
   @browser.element(class: /interaction-click-control-my-dc-health-link/).fire_event('onclick')
+end
+
+And(/^.+ clicks the most recent message in the inbox$/) do
+  message_link = page.all('tr').detect { |tr| tr[:class] == "msg-inbox-unread" }
+  message_link.click
+end
+
+Then(/^.+ should see the appropriate (.*?) template text$/) do |market_name|
+  case market_name
+  when 'SHOP'
+    expect(page).to have_content("Your Enrollment Confirmation")
+    expect(page).to have_content('plan offered by your employer.')
+    expect(page).to have_content('Your employer contributes')
+    expect(page).to have_content('Thank you for enrolling in coverage through DC Health Link')
+    # In the email signature
+    [Settings.site.short_name, Settings.contact_center.short_number, Settings.contact_center.tty].each do |email_signature_line|
+      expect(page).to have_content(email_signature_line)
+    end
+  end
 end
 
 Then(/^.+ should see the current plan year$/) do
@@ -920,6 +952,7 @@ end
 
 When(/^I click on "(.*?)" button on household info page$/) do |select_action|
   click_link "Continue"
+  sleep 5
   click_button "Shop for new plan"
 end
 
