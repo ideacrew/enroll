@@ -457,3 +457,16 @@ strong {
     }
   }
 }
+
+.table-responsive {
+  .table {
+    tbody {
+      tr {
+        td {
+          word-break: break-word; // IE & Edge compatibility
+          overflow-wrap: break-word;
+        }
+      }
+    }
+  }
+}
