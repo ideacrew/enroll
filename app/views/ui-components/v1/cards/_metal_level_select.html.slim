@@ -77,9 +77,9 @@
 
         #referencePlans.hidden
           .row
-            h2.heading-text.pull-left.pl-1 Select Your Reference Plan
-
-          h4 Now select a reference plan. The reference plan is used to cap employer costs. You’ll choose a reference plan. Then, your contribution towards employee premiums will be applied to the reference plan you choose regardless of which plans your employees select. After you select your reference plan, scroll down to review your costs.
+            h2.heading-text.pull-left.pl-1
+              =l10n("employers.plan_years.benefit_package.select_your_reference_plan")
+          h4 =l10n("employers.plan_years.benefit_package.select_your_reference_plan.content")
           #yourPlans
             .float-right.mb-2
               #yourPlanTotals
