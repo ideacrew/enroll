@@ -123,7 +123,13 @@ module BenefitSponsors
       def validate_oe_dates
         if admin_datatable_action && open_enrollment_end_on <= open_enrollment_start_on
           errors.add(:base, "Open Enrollment Start Date can't be later than the Open Enrollment End Date")
+        elsif id.nil? && open_enrollment_start_on >= open_enrollment_end_on
+          errors.add(:base, "Open Enrollment Dates are not valid")
         end
+      end
+
+      def parse_date_from_string(string)
+        Date.strptime(string, '%m/%d/%Y')
       end
 
       def validate_application_dates
