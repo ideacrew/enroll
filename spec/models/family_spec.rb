@@ -1729,6 +1729,7 @@ describe "#currently_enrolled_products", dbclean: :after_each do
   let!(:household) { FactoryBot.create(:household, family: family) }
   let!(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
   let!(:effective_on) { TimeKeeper.date_of_record.beginning_of_month}
+  let!(:hbx_enrollment_member) { FactoryBot.build(:hbx_enrollment_member, applicant_id: family.primary_applicant.id) }
 
   let!(:active_enrollment) {
     FactoryBot.create(:hbx_enrollment,
@@ -1736,7 +1737,8 @@ describe "#currently_enrolled_products", dbclean: :after_each do
                       household: family.active_household,
                       coverage_kind: "health",
                       product: product,
-                      aasm_state: 'coverage_selected'
+                      aasm_state: 'coverage_selected',
+                      hbx_enrollment_members: [hbx_enrollment_member]
     )}
   let!(:shopping_enrollment) {
     FactoryBot.create(:hbx_enrollment,
@@ -1744,7 +1746,8 @@ describe "#currently_enrolled_products", dbclean: :after_each do
                       effective_on: effective_on,
                       household: family.active_household,
                       coverage_kind: "health",
-                      aasm_state: 'shopping'
+                      aasm_state: 'shopping',
+                      hbx_enrollment_members: [hbx_enrollment_member]
     )}
 
 
@@ -1763,7 +1766,8 @@ describe "#currently_enrolled_products", dbclean: :after_each do
                         coverage_kind: "health",
                         product: product,
                         terminated_on: effective_on - 1.day,
-                        aasm_state: 'coverage_terminated'
+                        aasm_state: 'coverage_terminated',
+                        hbx_enrollment_members: [hbx_enrollment_member]
       )}
 
     before do
@@ -1784,7 +1788,8 @@ describe "#currently_enrolled_products", dbclean: :after_each do
                         coverage_kind: "health",
                         product: product,
                         terminated_on: effective_on - 2.day,
-                        aasm_state: 'coverage_terminated'
+                        aasm_state: 'coverage_terminated',
+                        hbx_enrollment_members: [hbx_enrollment_member]
       )}
 
     before do
