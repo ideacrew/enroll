@@ -49,7 +49,7 @@ module BenefitSponsors
       end
 
       let(:benefit_application_form) { FactoryBot.build(:benefit_sponsors_forms_benefit_application) }
-      let!(:invalid_application_form) { BenefitSponsors::Forms::BenefitApplicationForm.new}
+      let!(:invalid_application_form) { BenefitSponsors::Forms::BenefitApplicationForm.new(open_enrollment_end_on: open_enrollment_period_start_on, open_enrollment_start_on: open_enrollment_period_start_on)}
       let!(:invalid_benefit_application) { BenefitSponsors::BenefitApplications::BenefitApplication.new }
 
       let!(:organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
