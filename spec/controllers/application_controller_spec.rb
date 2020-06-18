@@ -15,10 +15,10 @@ RSpec.describe ApplicationController do
       expect(flash[:warning]).to eq nil
     end
 
-    it 'should have ie flash message set when browser is ie' do
+    it 'should not have ie flash message set when browser is ie' do
       allow(controller).to receive(:browser).and_return browser
       controller.send(:set_ie_flash_by_announcement)
-      expect(flash[:warning]).not_to eq nil
+      expect(flash[:warning]).to eq nil
     end
   end
 
