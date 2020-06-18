@@ -5,40 +5,71 @@
     <%end%>
   </div>
 <%end%>
-
 <div id="add_sep">
   <div class="bottom-pd">
-    <%= form_for @person, :url => send_secure_message_path, remote: true, html: {multipart: true}, authenticity_token: true,  method: :post do |f|%>
-      <div class="row no-buffer">
-        <div class="col-md-6 col-md-offset-3 input-no-pd bottom-pd">
-          <h3>New Message</h3>
-
-          <table class="table table-message-wrapper">
-            <tbody>
-            <tr>
-              <th>Recipient:</th>
-              <td>&nbsp; &nbsp;<b><%= @person.full_name %></b></td>
-            </tr>
-            <tr>
-              <th>Subject<span class="text-danger">*</span>:</th>
-              <td><%= text_field_tag :subject, @subject, placeholder: 'Subject', maxlength: 100, include_blank: false %></td>
-            </tr>
-            <tr>
-              <th style="vertical-align: top;">Content<span class="text-danger">*</span>:</th>
-              <td><%= text_area_tag 'body', @body , rows: 5, cols: 2, placeholder: 'Write here...', include_blank: false %></td>
-            </tr>
-            <tr>
-              <th style="vertical-align: top;">Document(optional)<span class="text-danger"></span>:</th>
-              <td><%= file_field_tag "file", type: :file, accept: 'application/pdf', class: "doc-upload-file"%></td>
-            </tr>
-            </tbody>
-          </table>
-          <%= f.hidden_field :person_id, value: @person.id %>
-          <%= f.hidden_field :family_actions_id, value: @element_to_replace_id %>
-          <%= f.submit 'Send', class: "btn btn-primary interaction-control-inbox-send" %>
-          <button type="button" class="btn btn-default" id="reviewClose">Cancel</button>
-        </div>
+    <div class="row no-buffer">
+      <div class="col-md-6 col-md-offset-3 input-no-pd bottom-pd">
+        <h3>New Message</h3>
+        <table class="table table-message-wrapper">
+          <tbody>
+          <tr>
+            <th>Recipient:</th>
+            <td>&nbsp; &nbsp;<b><%= @person&.full_name || @profile&.legal_name %></b></td>
+          </tr>
+          <tr>
+            <th>Subject<span class="text-danger">*</span>:</th>
+            <td><%= text_field_tag :subject, @subject, placeholder: 'Subject', maxlength: 100, include_blank: false %></td>
+          </tr>
+          <tr>
+            <th style="vertical-align: top;">Content<span class="text-danger">*</span>:</th>
+            <td><%= text_area_tag 'body', @body , rows: 5, cols: 2, placeholder: 'Write here...', include_blank: false %></td>
+          </tr>
+          <tr>
+            <th style="vertical-align: top;">Document(optional)<span class="text-danger"></span>:</th>
+            <td><%= file_field_tag "file", type: :file, accept: 'application/pdf', class: "doc-upload-file"%></td>
+          </tr>
+          </tbody>
+        </table>
+        <%= hidden_field_tag :person_id, @person.present? ? @person.id : nil %>
+        <%= hidden_field_tag :profile_id, @profile.present? ? @profile.id : nil %>
+        <%= hidden_field_tag :actions_id, @element_to_replace_id %>
+        <%= button_tag 'Send', class: "btn btn-primary interaction-control-inbox-send", id: "send_secure", data: { disable_with: "Please wait..." }%>
+        <button type="button" class="btn btn-default" id="reviewClose">Cancel</button>
       </div>
-    <% end %>
+    </div>
   </div>
 </div>
+<script>
+  $(document).on('click turbolinks:load', '#send_secure', function(e) {
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    $(".interaction-control-inbox-send").attr('disabled', 'disabled');
+    var body = document.getElementById('body').value
+    var person_id = document.getElementById('person_id').value
+    var profile_id = document.getElementById('profile_id').value
+    var actions_id = document.getElementById('actions_id').value
+    var subject = document.getElementById('subject').value
+    var fileInput = document.querySelector('input[type=file]');
+    var attachment = fileInput.files[0];
+
+    var formData = new FormData();
+    
+    formData.append('person_id', person_id);
+    formData.append('subject', subject);
+    formData.append('body', body);
+    formData.append('profile_id', profile_id);
+    formData.append('actions_id', actions_id);
+    if (attachment != undefined) {
+      formData.append('file', attachment);
+    }
+    $.ajax({
+      url: '/hbx_profiles/send_secure_message.js',
+      type: "POST",
+      data : formData,
+      contentType: false,
+      processData: false
+    });
+  });
+</script>

@@ -550,28 +550,29 @@ def employer_poc
   end
 
   def send_secure_message_form
-    @person = Person.find(params[:person_id])
-    @element_to_replace_id = params[:family_actions_id]
+    @person = Person.find(params[:person_id]) if params[:person_id]
+    @profile = BenefitSponsors::Organizations::Profile.find(params[:profile_id]) if params[:profile_id]
+    @element_to_replace_id = params[:family_actions_id] || params[:employer_actions_id]
   end
 
   def send_secure_message
-    @person = Person.find(params_hash[:person][:person_id])
-    @element_to_replace_id = params[:person][:family_actions_id]
-    @subject = params[:subject].present? ? params[:subject] : nil
-    @body = params[:body].present? ? params[:body] : nil
+    @person = Person.find(params_hash[:person_id]) if params[:person_id].present?
+    @profile = BenefitSponsors::Organizations::Profile.find(params[:profile_id]) if params[:profile_id].present?
+    @element_to_replace_id = params[:actions_id]
+    @subject = params[:subject].presence
+    @body = params[:body].presence
     validate_params = ::Validators::SecureMessageContract.new.call(params_hash)
     if validate_params.success?
       result = ::Operations::SecureMessage.new.call(params: validate_params.to_h)
-      message = {notice: "Message Sent successfully."}
       @error_on_save = result.failure? ? result.failure : nil
     else
       @error_on_save = validate_params.errors.to_h
     end
     respond_to do |format|
       if @error_on_save
-        format.js { render "send_secure_message_form", person: @person, subject: @subject, :family_actions_id => validate_params[:person][:family_actions_id]  }
+        format.js { render "send_secure_message_form" }
       else
-        format.html { redirect_to exchanges_hbx_profiles_root_path, :flash => { :success => "Message Sent successfully" } }
+        format.js { flash[:notice] = "Message Sent successfully"  }
       end
     end
   end
