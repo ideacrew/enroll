@@ -1041,11 +1041,15 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
     let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
     let(:person) { FactoryBot.create(:person) }
+    let!(:spon_cal) { double('HbxEnrollmentSponsoredCostCalculator') }
     let(:ivl_person)       { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
     let(:ivl_family)       { FactoryBot.create(:family, :with_primary_family_member, person: ivl_person) }
     let(:user) { FactoryBot.create(:user, person: person) }
+    let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_year }
     let(:ivl_user) { FactoryBot.create(:user, person: ivl_person) }
     let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
+    let!(:hbx_enrollment_member) { FactoryBot.build(:hbx_enrollment_member, applicant_id: family.primary_applicant.id) }
+    let!(:ivl_hbx_enrollment_member) { FactoryBot.build(:hbx_enrollment_member, applicant_id: ivl_family.primary_applicant.id) }
     let(:hbx_enrollment) do
       FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
                         household: family.active_household,
@@ -1055,7 +1059,8 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
                         rating_area_id: initial_application.recorded_rating_area_id,
                         sponsored_benefit_id: initial_application.benefit_packages.first.health_sponsored_benefit.id,
                         sponsored_benefit_package_id: initial_application.benefit_packages.first.id,
-                        benefit_sponsorship_id: initial_application.benefit_sponsorship.id)
+                        benefit_sponsorship_id: initial_application.benefit_sponsorship.id,
+                        hbx_enrollment_members:[hbx_enrollment_member])
     end
 
     let(:ivl_enrollment) do
@@ -1066,11 +1071,14 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
                         enrollment_kind: "open_enrollment",
                         kind: "individual",
                         product: product,
-                        aasm_state: "coverage_selected")
+                        aasm_state: "coverage_selected",
+                        hbx_enrollment_members:[ivl_hbx_enrollment_member])
     end
 
     context "for shop" do
       before :each do
+        allow(::HbxEnrollmentSponsoredCostCalculator).to receive(:new).with(hbx_enrollment).and_return(spon_cal)
+        allow(spon_cal).to receive(:groups_for_products).with([hbx_enrollment.product]).and_return('')
         allow(person).to receive(:primary_family).and_return(family)
         allow(hbx_enrollment).to receive(:reset_dates_on_previously_covered_members).and_return(true)
         sign_in(user)
