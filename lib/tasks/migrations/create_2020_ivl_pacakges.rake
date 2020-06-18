@@ -38,12 +38,12 @@ namespace :import do
 
     ivl_products = BenefitMarkets::Products::Product.aca_individual_market
 
-    ivl_health_plans_2020          = ivl_products.where( kind: "health", hios_id: /-01$/ ).not_in(metal_level_kind: "catastrophic").select{|a| a.active_year == 2020}.entries.collect(&:_id)
-    ivl_na_02_plans_2020           = ivl_products.where( kind: "health", hios_id: /-02$/, metal_level_kind: "silver" ).select{|a| a.active_year == 2020}.entries.collect(&:_id)
-    ivl_na_03_health_plans_2020    = ivl_products.where( kind: "health", hios_id: /-03$/, metal_level_kind: "silver" ).select{|a| a.active_year == 2020}.entries.collect(&:_id)
-    ivl_na_plans_2020              = ivl_na_02_plans_2020 + ivl_na_03_health_plans_2020
-    ivl_dental_plans_2020          = ivl_products.where( kind: "dental").select{|a| a.active_year == 2020}.entries.collect(&:_id)
-    ivl_and_cat_health_plans_2020  = ivl_products.where( kind: "health", hios_id: /-01$/ ).select{|a| a.active_year == 2020}.entries.collect(&:_id)
+    ivl_health_plans_2020         = ivl_products.where( kind: "health", hios_id: /-01$/ ).not_in(metal_level_kind: "catastrophic").select{|a| a.active_year == 2020}.entries.collect(&:_id)
+    ivl_na_02_plans_2020          = ivl_products.where( kind: "health", hios_id: /-02$/, metal_level_kind: "silver" ).select{|a| a.active_year == 2020}.entries.collect(&:_id)
+    ivl_na_03_health_plans_2020   = ivl_products.where( kind: "health", hios_id: /-03$/, metal_level_kind: "silver" ).select{|a| a.active_year == 2020}.entries.collect(&:_id)
+    ivl_na_plans_2020             = ivl_na_02_plans_2020 + ivl_na_03_health_plans_2020
+    ivl_dental_plans_2020         = ivl_products.where( kind: "dental").select{|a| a.active_year == 2020}.entries.collect(&:_id)
+    ivl_and_cat_health_plans_2020 = ivl_products.where( kind: "health", hios_id: /-01$/ ).select{|a| a.active_year == 2020}.entries.collect(&:_id)
 
 
     individual_health_benefit_package = BenefitPackage.new(
