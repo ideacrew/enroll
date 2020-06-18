@@ -743,6 +743,14 @@ Rails.application.routes.draw do
         end
       end
     end
+
+    namespace :hbxinternal do
+      namespace :v1 do 
+        scope module: :rake_trigger do
+          get :say_hello
+        end  
+      end  
+    end  
   end
 
   root 'welcome#index'
