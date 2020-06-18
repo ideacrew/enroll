@@ -38,9 +38,12 @@ namespace :import do
 
     ivl_products = BenefitMarkets::Products::Product.aca_individual_market
 
-    ivl_health_plans_2020         = ivl_products.where( kind: "health", hios_id: /-01$/ ).not_in(metal_level_kind: "catastrophic").select{|a| a.active_year == 2020}.entries.collect(&:_id)
-    ivl_dental_plans_2020         = ivl_products.where( kind: "dental").select{|a| a.active_year == 2020}.entries.collect(&:_id)
-    ivl_and_cat_health_plans_2020 = ivl_products.where( kind: "health", hios_id: /-01$/ ).select{|a| a.active_year == 2020}.entries.collect(&:_id)
+    ivl_health_plans_2020           = ivl_products.where( kind: "health", hios_id: /-01$/ ).not_in(metal_level_kind: "catastrophic").select{|a| a.active_year == 2020}.entries.collect(&:_id)
+    ivl_na_health_plans_2020        = ivl_products.where( kind: "health", hios_id: /-02$/, metal_level_kind: "silver" ).select{|a| a.active_year == 2020}.entries.collect(&:_id)
+    ivl_na_alasks_health_plans_2020 = ivl_products.where( kind: "health", hios_id: /-03$/, metal_level_kind: "silver" ).select{|a| a.active_year == 2020}.entries.collect(&:_id)
+    ivl_na_plans_2020               = ivl_na_health_plans_2020 + ivl_na_alasks_health_plans_2020
+    ivl_dental_plans_2020           = ivl_products.where( kind: "dental").select{|a| a.active_year == 2020}.entries.collect(&:_id)
+    ivl_and_cat_health_plans_2020   = ivl_products.where( kind: "health", hios_id: /-01$/ ).select{|a| a.active_year == 2020}.entries.collect(&:_id)
 
 
     individual_health_benefit_package = BenefitPackage.new(
@@ -97,7 +100,7 @@ namespace :import do
     native_american_health_benefit_package = BenefitPackage.new(
         title: "native_american_health_benefits_2020",
         elected_premium_credit_strategy: "unassisted",
-        benefit_ids:          ivl_health_plans_2020,
+        benefit_ids:          ivl_na_plans_2020,
         benefit_eligibility_element_group: BenefitEligibilityElementGroup.new(
             market_places:        ["individual"],
             enrollment_periods:   ["open_enrollment", "special_enrollment"],
