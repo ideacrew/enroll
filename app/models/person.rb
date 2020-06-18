@@ -844,6 +844,18 @@ class Person
       end
     end
 
+    def brokers_matching_search_criteria(search_str)
+      broker_role_certified.search_first_name_last_name_npn(search_str)
+    end
+
+    def agencies_with_matching_broker(search_str)
+      if brokers_matching_search_criteria(search_str).exists(:"broker_role.benefit_sponsors_broker_agency_profile_id" => true)
+        brokers_matching_search_criteria(search_str).map(&:broker_role).map(&:benefit_sponsors_broker_agency_profile_id)
+      else
+        brokers_matching_search_criteria(search_str).map(&:broker_role).map(&:broker_agency_profile_id)
+      end
+    end
+
     def general_agencies_matching_search_criteria(search_str)
       general_agency_staff_certified.search_first_name_last_name_npn(search_str)
     end
