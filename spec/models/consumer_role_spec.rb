@@ -793,7 +793,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     let(:person) { FactoryBot.create(:person, :with_consumer_role) }
     let(:consumer_role) { person.consumer_role }
     let(:verification_types) { consumer.verification_types }
-    let(:verification_attr) { OpenStruct.new({ :determined_at => Time.zone.now, :vlp_authority => "hbx" })}
+    let(:verification_attr) { OpenStruct.new({ :determined_at => Time.zone.now, :vlp_authority => "ssa" })}
 
     context 'Responses from local hub and ssa hub' do
 
@@ -853,6 +853,21 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         consumer_role.update_verification_type(american_indian_status, "admin verified")
         expect(consumer_role.aasm_state). to eq 'fully_verified'
         expect(american_indian_status.validation_status). to eq 'verified'
+        expect(consumer_role.lawful_presence_determination.vlp_authority). to eq 'ssa'
+      end
+    end
+
+    context 'admin rejects american indian status document' do
+      it 'consumer aasm state should be in fully_verified if all verification types are verified' do
+        person.update_attributes!(tribal_id: "12345")
+        consumer_role.coverage_purchased!(verification_attr)
+        consumer_role.pass_residency!
+        consumer_role.ssn_valid_citizenship_valid!(verification_attr)
+        american_indian_status = consumer_role.verification_types.by_name("American Indian Status").first
+        consumer_role.return_doc_for_deficiency(american_indian_status, "Invalid Document")
+        expect(consumer_role.aasm_state). to eq 'verification_outstanding'
+        expect(american_indian_status.validation_status). to eq 'outstanding'
+        expect(consumer_role.lawful_presence_determination.vlp_authority). to eq 'ssa'
       end
     end
 
@@ -1596,6 +1611,44 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         it 'should not return any object of type VlpDocument' do
           expect(consumer_role.case2).to be_nil
         end
+      end
+    end
+
+    context 'mark_residency_authorized' do
+      let(:person1000) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
+
+      context 'self_attest_residency' do
+        before :each do
+          @consumer_role = person1000.consumer_role
+          @consumer_role.mark_residency_authorized(OpenStruct.new(self_attest_residency: true))
+        end
+
+        it 'should attest dc residency type' do
+          expect(person1000.verification_type_by_name('DC Residency').validation_status).to eq('attested')
+        end
+      end
+
+      context 'verified dc residency' do
+        before :each do
+          person1000.consumer_role.mark_residency_authorized
+        end
+
+        it 'should attest dc residency type' do
+          expect(person1000.verification_type_by_name('DC Residency').validation_status).to eq('verified')
+        end
+      end
+    end
+
+    context 'workflow_state_transitions' do
+      let(:person100) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
+
+      before do
+        @consumer_role = person100.consumer_role
+        @consumer_role.record_transition(OpenStruct.new(self_attest_residency: true))
+      end
+
+      it 'should add reason to newly created workflow_state_transition' do
+        expect(@consumer_role.workflow_state_transitions.last.reason).to eq('Self Attest DC Residency')
       end
     end
   end

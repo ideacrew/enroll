@@ -251,6 +251,29 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       expect(assigns(:disable_market_kind)).to eq "individual"
     end
 
+    context 'in ivl annual open enrollment for dual role' do
+      let!(:hbx_profile1) {FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)}
+
+      before do
+        allow(person).to receive(:consumer_role).and_return(consumer_role)
+        allow(person).to receive(:active_employee_roles).and_return [employee_role]
+        allow(person).to receive(:has_active_employee_role?).and_return true
+        allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile1
+        sign_in user
+      end
+
+      it 'should disable shop market if employee role is not under open enrollment' do
+        allow(employee_role).to receive(:is_eligible_to_enroll_without_qle?).and_return(false)
+        get :new, params: { person_id: person.id, employee_role_id: employee_role.id, change_plan: 'change_plan', shop_for_plans: 'shop_for_plans' }
+        expect(assigns(:disable_market_kind)).to eq "shop"
+      end
+
+      it 'should not disable shop market if employee role is under open enrollment' do
+        get :new, params: { person_id: person.id, employee_role_id: employee_role.id, change_plan: 'change_plan', shop_for_plans: 'shop_for_plans' }
+        expect(assigns(:disable_market_kind)).to eq nil
+      end
+    end
+
     context "it should set the instance variables" do
 
       before do
@@ -821,7 +844,9 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         user = FactoryBot.create(:user, person: FactoryBot.create(:person))
         sign_in user
         allow(old_hbx).to receive(:is_shop?).and_return true
+        allow(employee_role.census_employee).to receive(:coverage_effective_on).with(hbx_enrollment.sponsored_benefit_package).and_return(hbx_enrollment.effective_on)
         family.active_household.reload
+        old_hbx.update_attributes(effective_on: employee_role.census_employee.employer_profile.plan_years.first.effective_period.min)
         post :create, params: { person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids, commit: 'Keep existing plan', change_plan: 'change', hbx_enrollment_id: old_hbx.id }
         family.reload
         family.active_household.reload
@@ -932,8 +957,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       person.reload
       post :create, params: { person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids }
       expect(response).to have_http_status(:redirect)
-      expect(flash[:error]).to match /You may not enroll for cobra after/
-      expect(response).to redirect_to(new_insured_group_selection_path(person_id: person.id, employee_role_id: person.employee_roles.first.id, change_plan: '', market_kind: 'shop', enrollment_kind: ''))
+      expect(response).to redirect_to(insured_plan_shopping_path(id: family.active_household.hbx_enrollments[0].id, coverage_kind: 'health', market_kind: 'shop', enrollment_kind: ''))
     end
 
     it "should render group selection page if without family_member_ids" do

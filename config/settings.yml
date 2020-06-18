@@ -59,6 +59,7 @@ site:
   support_for_ie_browser: true
   block_ie_browser: false
   block_ie_browser_after: <%= Date.new(2020,6,1) %>
+  publisher: "dchl"
 
   exchange_name: "Washington DC Health Benefit Exchange"
   social_media:
