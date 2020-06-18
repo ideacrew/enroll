@@ -52,7 +52,7 @@ RSpec.describe "insured/thankyou.html.erb", dbclean: :after_each do
     it 'should display the correct plan selection text' do
       render :template => "insured/plan_shoppings/thankyou.html.erb"
       expect(rendered).to have_selector('h1', text: 'Confirm Your Plan Selection')
-      expect(rendered).to have_selector('h4', text: /Please review your current plan selection. Select PREVIOUS if /)
+      expect(rendered).to have_selector('h4', text: /Please review your current plan selection. If you want to change your plan, select 'Previous' to go back/)
     end
 
     it 'should render coverage_information partial' do
