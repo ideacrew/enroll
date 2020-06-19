@@ -2272,4 +2272,111 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       end
     end
   end
+
+  describe "#is_cobra_possible" do
+    let(:params) { valid_params.merge(:aasm_state => aasm_state) }
+    let(:census_employee) { CensusEmployee.new(**params) }
+
+    context "if censue employee is cobra linked" do
+      let(:aasm_state) {"cobra_linked"}
+
+      it "should return false" do
+        expect(census_employee.is_cobra_possible?).to eq false
+      end
+    end
+
+    context "if censue employee is cobra linked" do
+      let(:aasm_state) {"employee_termination_pending"}
+
+      it "should return false" do
+        expect(census_employee.is_cobra_possible?).to eq true
+      end
+    end
+
+    context "if censue employee is cobra linked" do
+      let(:aasm_state) {"employment_terminated"}
+
+      before do
+        allow(census_employee).to receive(:employment_terminated_on).and_return TimeKeeper.date_of_record.last_month
+      end
+
+      it "should return false" do
+        expect(census_employee.is_cobra_possible?).to eq true
+      end
+    end
+  end
+
+  describe "#is_rehired_possible" do
+    let(:params) { valid_params.merge(:aasm_state => aasm_state) }
+    let(:census_employee) { CensusEmployee.new(**params) }
+
+    context "if censue employee is cobra linked" do
+      let(:aasm_state) {"cobra_eligible"}
+
+      it "should return false" do
+        expect(census_employee.is_rehired_possible?).to eq false
+      end
+    end
+
+    context "if censue employee is cobra linked" do
+      let(:aasm_state) {"rehired"}
+
+      it "should return false" do
+        expect(census_employee.is_rehired_possible?).to eq false
+      end
+    end
+
+    context "if censue employee is cobra linked" do
+      let(:aasm_state) {"cobra_terminated"}
+
+      it "should return false" do
+        expect(census_employee.is_rehired_possible?).to eq true
+      end
+    end
+  end
+
+  describe "#is_terminate_possible" do
+    let(:params) { valid_params.merge(:aasm_state => aasm_state) }
+    let(:census_employee) { CensusEmployee.new(**params) }
+
+    context "if censue employee is cobra linked" do
+      let(:aasm_state) {"employment_terminated"}
+
+      it "should return false" do
+        expect(census_employee.is_terminate_possible?).to eq true
+      end
+    end
+
+    context "if censue employee is cobra linked" do
+      let(:aasm_state) {"eligible"}
+
+      it "should return false" do
+        expect(census_employee.is_terminate_possible?).to eq false
+      end
+    end
+
+    context "if censue employee is cobra linked" do
+      let(:aasm_state) {"cobra_eligible"}
+
+      it "should return false" do
+        expect(census_employee.is_terminate_possible?).to eq false
+      end
+    end
+
+    context "if censue employee is cobra linked" do
+      let(:aasm_state) {"cobra_linked"}
+
+      it "should return false" do
+        expect(census_employee.is_terminate_possible?).to eq false
+      end
+    end
+
+    context "if censue employee is newly designatede linked" do
+      let(:aasm_state) {"newly_designated_linked"}
+
+      it "should return false" do
+        expect(census_employee.is_terminate_possible?).to eq false
+      end
+    end
+  end
 end

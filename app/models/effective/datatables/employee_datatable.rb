@@ -80,21 +80,15 @@ module Effective
       end
 
       def cobra_possible? census_employee
-        return 'disabled' if census_employee.cobra_linked?
-        return 'disabled' if census_employee.cobra_eligible?
-        return 'disabled' if census_employee.rehired?
-        census_employee.active_or_pending_termination? ? 'ajax' : 'disabled'
+        census_employee.is_cobra_possible? ? 'ajax' : 'disabled'
       end
 
       def rehire_possible? census_employee
-        return 'disabled' if census_employee.cobra_linked?
-        return 'disabled' if census_employee.cobra_eligible?
-        return 'disabled' if census_employee.rehired?
-        census_employee.active_or_pending_termination? ? 'ajax' : 'disabled'
+        census_employee.is_rehired_possible? ? 'ajax' : 'disabled'
       end
 
       def terminate_possible? census_employee
-        census_employee.active_or_pending_termination? ? 'disabled' : 'ajax'
+        census_employee.is_terminate_possible? ? 'disabled' : 'ajax'
       end
 
       def nested_filter_definition
