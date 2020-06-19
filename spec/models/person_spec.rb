@@ -1351,6 +1351,7 @@ describe Person, :dbclean => :after_each do
     let(:broker_agency_profile) {FactoryBot.create(:broker_agency_profile)}
 
     before do
+      Person.create_indexes
       FactoryBot.create(:broker_agency_staff_role, broker_agency_profile_id: broker_agency_profile.id, person: person, broker_agency_profile: broker_agency_profile, aasm_state: 'active')
       person.broker_role.update_attributes!(aasm_state: "active")
       person.broker_role.update_attributes!(npn: "11111111")
