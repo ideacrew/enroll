@@ -1349,6 +1349,7 @@ describe Person, :dbclean => :after_each do
   describe '.brokers_matching_search_criteria' do
     let(:person) { FactoryBot.create(:person, :with_broker_role)}
     let(:broker_agency_profile) {FactoryBot.create(:broker_agency_profile)}
+    let(:name) { person.full_name}
 
     before do
       Person.create_indexes
@@ -1360,9 +1361,9 @@ describe Person, :dbclean => :after_each do
 
     context 'when searched with first_name and last_name' do
       it 'should return matching agency' do
-        people = Person.brokers_matching_search_criteria("John Smith2")
+        people = Person.brokers_matching_search_criteria(name)
         expect(people.count).to eq(1)
-        expect(people.first.full_name).to eq(person.full_name)
+        expect(people.first.full_name).to eq(name)
       end
     end
 
