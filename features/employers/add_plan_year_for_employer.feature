@@ -34,7 +34,6 @@ Feature: Add Plan Year For Employer
 
 
   Scenario Outline: Creating a new plan year should honor contribution factor from benefit market catalogs
-    And <minimum_contribution_factor> is updated on benefit market catalog
     When ABC Widgets is logged in and on the home page
     And staff role person clicked on benefits tab
     Then employer should see add plan year button
@@ -53,6 +52,7 @@ Feature: Add Plan Year For Employer
     And employer should see that the create plan year is <plan_year_btn_enabled>
 
     Examples:
-      | minimum_contribution_factor | contribution_percent | plan_year_btn_enabled |
-      | 0.5                         | 100                  | true                  |
-      | 0.5                         | 20                   | false                 |
+      | contribution_percent | plan_year_btn_enabled |
+      | 100                  | true                  |
+      | 60                   | true                  |
+      | 20                   | true                  |

@@ -23,7 +23,7 @@ module BenefitSponsors
       embeds_many :pricing_determinations, 
                   class_name: "::BenefitSponsors::SponsoredBenefits::PricingDetermination"
 
-      # delegate :contribution_model, to: :product_package, allow_nil: true
+      delegate :contribution_model, to: :product_package, allow_nil: true
       delegate :pricing_model, to: :product_package, allow_nil: true
       delegate :pricing_calculator, to: :product_package, allow_nil: true
       delegate :contribution_calculator, to: :product_package, allow_nil: true
@@ -42,15 +42,6 @@ module BenefitSponsors
       def product_package_exists
         if product_package.blank? && source_kind == :benefit_sponsor_catalog
           self.errors.add(:base, "Unable to find mappable product package")
-        end
-      end
-
-      # Added this method as a temporary fix for EMPLOYER FLEXIBILITY PROJECT
-      def contribution_model
-        if benefit_package.benefit_application.is_renewing?
-          BenefitMarkets::ContributionModels::ContributionModel.by_title("DC Shop Simple List Bill Contribution Model")
-        else
-          product_package.contribution_model
         end
       end
 

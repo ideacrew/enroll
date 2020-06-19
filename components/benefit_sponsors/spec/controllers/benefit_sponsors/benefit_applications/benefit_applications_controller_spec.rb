@@ -97,6 +97,8 @@ module BenefitSponsors
           fte_count: "5",
           pte_count: "5",
           msp_count: "5",
+          benefit_sponsor_catalog_id: BSON::ObjectId.new
+
         }
       }
 

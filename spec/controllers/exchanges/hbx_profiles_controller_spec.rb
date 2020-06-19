@@ -1329,12 +1329,16 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
                                 bs.save!
                                 bs
                                }
-    let(:effective_period)     { (TimeKeeper.date_of_record + 3.months)..(TimeKeeper.date_of_record + 1.year + 3.months - 1.day) }
+    let(:start_on)              { TimeKeeper.date_of_record.beginning_of_month + 2.months }
+    let!(:effective_period)     { start_on..start_on.next_year.prev_day }
     let!(:current_benefit_market_catalog) do
-      BenefitSponsors::ProductSpecHelpers.construct_benefit_market_catalog_with_renewal_catalog(site, benefit_market, effective_period)
+      BenefitSponsors::ProductSpecHelpers.construct_simple_benefit_market_catalog(site, benefit_market, effective_period)
       benefit_market.benefit_market_catalogs.where(
-        "application_period.min" => effective_period.min.to_s
+        "application_period.min" => effective_period.min.to_date
       ).first
+    end
+    let!(:benefit_application) do
+      create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, effective_period:effective_period, aasm_state: :draft)
     end
 
     let!(:valid_params)   {
@@ -1342,8 +1346,8 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
         benefit_sponsorship_id: benefit_sponsorship.id.to_s,
         start_on: effective_period.min,
         end_on: effective_period.max,
-        open_enrollment_start_on: TimeKeeper.date_of_record + 2.months,
-        open_enrollment_end_on: TimeKeeper.date_of_record + 2.months + 20.day
+        open_enrollment_start_on: start_on.prev_month,
+        open_enrollment_end_on: start_on - 20.days
       }
     }
 

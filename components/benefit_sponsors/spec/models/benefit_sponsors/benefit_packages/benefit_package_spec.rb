@@ -75,8 +75,8 @@ module BenefitSponsors
     describe ".renew" do
       context "when passed renewal benefit package to current benefit package for renewal" do
 
-        let(:renewal_benefit_sponsor_catalog) { benefit_sponsorship.benefit_sponsor_catalog_for(benefit_sponsorship.service_areas_on(renewal_effective_date), renewal_effective_date) }
-        let(:renewal_application)             { initial_application.renew(renewal_benefit_sponsor_catalog) }
+        let(:renewal_application)             { initial_application.renew }
+        let(:renewal_benefit_sponsor_catalog) { renewal_application.benefit_sponsor_catalog }
         let!(:renewal_benefit_package)        { renewal_application.benefit_packages.build }
 
         before do
@@ -137,8 +137,8 @@ module BenefitSponsors
         let(:product_kinds)            { [:health, :dental] }
         let(:dental_sponsored_benefit) { true }
 
-        let(:renewal_benefit_sponsor_catalog) { benefit_sponsorship.benefit_sponsor_catalog_for(benefit_sponsorship.service_areas_on(renewal_effective_date), renewal_effective_date) }
-        let(:renewal_application)             { initial_application.renew(renewal_benefit_sponsor_catalog) }
+        let(:renewal_application)             { initial_application.renew }
+        let(:renewal_benefit_sponsor_catalog) { renewal_application.benefit_sponsor_catalog }
         let(:renewal_bp)  { renewal_application.benefit_packages.build }
 
         let(:current_app) { benefit_sponsorship.benefit_applications[0] }
@@ -491,7 +491,7 @@ module BenefitSponsors
         reference_product.save!
       end
       
-      let(:renewal_benefit_sponsor_catalog) { benefit_sponsorship.benefit_sponsor_catalog_for(benefit_sponsorship.service_areas_on(renewal_effective_date), renewal_effective_date) }
+      let(:renewal_benefit_sponsor_catalog) { benefit_sponsorship.benefit_sponsor_catalog_for(renewal_effective_date) }
       let(:renewal_application)             { initial_application.renew(renewal_benefit_sponsor_catalog) }
       let(:renewal_benefit_package)         { renewal_application.benefit_packages.build }
 
@@ -535,7 +535,7 @@ module BenefitSponsors
       end
 
       context "when renewal product not offered by employer" do
-        let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product) }
+        let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile) }
         let(:hbx_enrollment) do
           double(
             product: current_benefit_package.sponsored_benefits.first.reference_product,

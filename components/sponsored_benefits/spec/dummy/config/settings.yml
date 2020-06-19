@@ -303,13 +303,6 @@ aca:
       non_payment: true
       show_termination_reasons: false
 
-    broker_quoting_tool:
-      flexible_contribution_model:
-        initial_application_period: <%= Date.new(2020,03,01)..Date.new(2020,12,31) %>
-        enabled_for_renewal_applications: false
-        employer_contribution_percent_minimum: 0
-        employer_family_contribution_percent_minimum: 0
-
   transmit_employers_immediately: false
   employer_has_sic_field: false
   employer_registration_has_referred_by_field: false
