@@ -1,7 +1,7 @@
 <div class="module employer-welcome col-xs-12">
   <div class="row">
     <p class='lead'>
-      <%=l10n("employers.employer_profiles.welcome")%>
+      <%=l10n("employers.employer_profiles.welcome", find_a_broker: profiles_employers_employer_profile_path(@employer_profile.id, tab: 'brokers'))%>
     </p>
   </div>
 
@@ -18,7 +18,7 @@
             <%=l10n("employers.employer_profiles.welcome.submit_verification_documents")%>
           </h3>
           <p class="twenty">
-            <%=l10n("employers.employer_profiles.welcome.submit_verification_documents.content")%>
+            <%=l10n("employers.employer_profiles.welcome.submit_verification_documents.content", documents: profiles_employers_employer_profile_path(@employer_profile.id, :tab=>'documents'))%>
           </p>
         </div>
       </div>
