@@ -3,6 +3,7 @@ module BenefitSponsors
   module Organizations
     module Factories
       class ProfileFactory
+        include BenefitSponsors::RegistrationHelper
         include ActiveModel::Validations
         include BenefitSponsors::Forms::NpnField
 
