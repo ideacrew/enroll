@@ -3,6 +3,7 @@ module BenefitSponsors
   module Organizations
     module Factories
       class ProfileFactory
+        include BenefitSponsors::RegistrationHelper
         include ActiveModel::Validations
         include BenefitSponsors::Forms::NpnField
 
@@ -556,15 +557,6 @@ module BenefitSponsors
 
         def broker_agency_profile_validity_failed?
           npn_already_taken?(npn) || !valid_office_location_kinds?
-        end
-
-        # Add this in its own file and include.
-        def l10n(translation_key, interpolated_keys={})
-          begin
-            I18n.t(translation_key, interpolated_keys.merge(raise: true)).html_safe
-          rescue I18n::MissingTranslationData
-            translation_key.gsub(/\W+/, '').titleize
-          end
         end
 
         def npn_already_taken?(npn)
