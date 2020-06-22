@@ -515,7 +515,7 @@ describe Family do
       end
 
       it "when qle_on is less than hbx effective_on" do
-        effective_on = date + 10.days
+        effective_on = date.end_of_month
         allow(family).to receive(:latest_shop_sep).and_return normal_sep
         allow(hbx).to receive(:effective_on).and_return effective_on
         expect(family.terminate_date_for_shop_by_enrollment(hbx)).to eq effective_on

@@ -209,6 +209,7 @@ class HbxEnrollment
                                                           :"effective_on".gte => effective_period.min,
                                                           :"effective_on".lte => effective_period.max
                                                         )}
+  scope :enrolled_and_renewing_and_expired, -> { where(:aasm_state.in => (ENROLLED_STATUSES + RENEWAL_STATUSES + ['coverage_expired'])) }
 
   embeds_many :workflow_state_transitions, as: :transitional
 
@@ -532,15 +533,7 @@ class HbxEnrollment
   def propogate_waiver
     return false unless is_shop? # there is no concept of waiver in ivl case
 
-    if parent_enrollment.present?
-      update_existing_shop_coverage
-    end
-
-    if coverage_kind == 'health' && census_employee.benefit_group_assignments.present?
-      census_employee.benefit_group_assignments.each do |benefit_group_assignment|
-        benefit_group_assignment.waive_coverage! if benefit_group_assignment.may_waive_coverage?
-      end
-    end
+    benefit_group_assignment.waive_coverage! if coverage_kind == 'health' && benefit_group_assignment.present? && benefit_group_assignment.may_waive_coverage?
 
     true
   end
@@ -551,9 +544,116 @@ class HbxEnrollment
     end
   end
 
-  def waive_coverage_by_benefit_group_assignment(waiver_reason)
-    update_current(waiver_reason: waiver_reason)
+  def construct_waiver_enrollment(waiver_reason = nil)
+    qle = (family.is_under_special_enrollment_period? && family.latest_shop_sep.present?)
+    coverage_hh = employee_role.person.primary_family.active_household.immediate_family_coverage_household
+    waived_enrollment = coverage_hh.household.new_hbx_enrollment_from(employee_role: employee_role, coverage_household: coverage_hh, benefit_package: sponsored_benefit_package, benefit_group_assignment: benefit_group_assignment, qle: qle)
+    waived_enrollment.coverage_kind = coverage_kind
+    waived_enrollment.enrollment_kind = (qle ? 'special_enrollment' : 'open_enrollment')
+    waived_enrollment.kind = 'employer_sponsored_cobra' if employee_role.present? && employee_role.is_cobra_status?
+    waived_enrollment.terminate_reason = terminate_reason if terminate_reason
+    waived_enrollment.waiver_reason = waiver_reason
+    waived_enrollment.predecessor_enrollment_id = _id
+    waived_enrollment.generate_hbx_signature
+    waived_enrollment.submitted_at = Time.now
+    waived_enrollment.save!
+    waived_enrollment
+  end
+
+  def collect_terminating_package_ids(benefit_application)
+    package_ids = collect_predecessor_package_ids(benefit_application)
+
+    if package_ids.blank?
+      future_application = employer_profile.find_plan_year_by_effective_date(benefit_application.effective_period.max.to_date.next_day)
+      future_application.benefit_packages.pluck(:id) if future_application.present?
+    end
+  end
+
+  def term_existing_shop_enrollments
+    benefit_application = sponsored_benefit_package.benefit_application
+    terminating_package_ids = benefit_application.benefit_packages.pluck(:id)
+    terminating_package_ids += collect_terminating_package_ids(benefit_application)
+    terminating_enrollments = household.hbx_enrollments.where({:sponsored_benefit_package_id.in => terminating_package_ids,
+                                                               :coverage_kind => coverage_kind}).enrolled_and_renewing_and_expired
+
+    renewing_enrollments = household.hbx_enrollments.where({:sponsored_benefit_package_id.in => terminating_package_ids,
+                                                            :coverage_kind => coverage_kind}).renewing
+
+    aasm_state = parent_enrollment.aasm_state if parent_enrollment
+    enrollments = if WAIVED_STATUSES.include?(aasm_state)
+                    parent_enrollment.to_a
+                  elsif is_open_enrollment? && renewing_enrollments.present?
+                    update(predecessor_enrollment_id: renewing_enrollments.first.id)
+                    (renewing_enrollments + terminating_enrollments).uniq
+                  else
+                    terminating_enrollments
+                  end
+
+    enrollments.each do |enrollment|
+      coverage_end_date = if benefit_application.is_renewing? && benefit_application.start_on == effective_on && @predecessor_application.effective_period.cover?(enrollment.effective_on)
+                            enrollment.sponsored_benefit_package.end_on
+                          else
+                            family.terminate_date_for_shop_by_enrollment(enrollment)
+                          end
+      term_or_cancel_enrollment(enrollment, coverage_end_date)
+    end
+  end
+
+  def collect_predecessor_package_ids(benefit_application)
+    if benefit_application.is_renewing? && (effective_on == sponsored_benefit_package.start_on) && employer_profile
+      @predecessor_application = employer_profile.benefit_applications.published_benefit_applications_by_date(effective_on.prev_day).first
+      @predecessor_application.benefit_packages.pluck(:id) if @predecessor_application
+    end
+  end
+
+  def set_predecessor_if_exists
+    benefit_application = sponsored_benefit_package.benefit_application
+    predecessor_package_ids = collect_predecessor_package_ids(benefit_application)
+    predecessor_package_ids = [sponsored_benefit_package.id] if predecessor_package_ids.blank?
+
+    predecessor_enrollment = household.hbx_enrollments.where({:sponsored_benefit_package_id.in => predecessor_package_ids,
+                                                              :aasm_state.in => ENROLLED_STATUSES,
+                                                              :coverage_kind => coverage_kind}).first
+
+    update(predecessor_enrollment_id: predecessor_enrollment.id) if predecessor_enrollment.present?
+  end
+
+  def waive_enrollment
+    return unless is_shop? && may_waive_coverage?
     waive_coverage!
+    set_predecessor_if_exists if predecessor_enrollment_id.blank?
+    term_existing_shop_enrollments
+  end
+
+  def terminate_enrollment(coverage_end_date = TimeKeeper.date_of_record.end_of_month, terminate_reason)
+    term_or_cancel_enrollment(self, coverage_end_date, terminate_reason)
+
+    return unless is_shop? && (coverage_termination_pending? || coverage_terminated? || coverage_canceled?)
+
+    return if waiver_enrollment_present?
+
+    waiver = construct_waiver_enrollment
+    waiver.waive_coverage! if waiver.may_waive_coverage?
+  end
+
+  def term_or_cancel_enrollment(enrollment, coverage_end_date, term_reason = nil)
+    if enrollment.effective_on >= coverage_end_date
+      enrollment.cancel_coverage! if enrollment.may_cancel_coverage? # cancel coverage if enrollment is future effective
+    elsif coverage_end_date >= TimeKeeper.date_of_record
+      enrollment.schedule_coverage_termination!(coverage_end_date) if enrollment.may_schedule_coverage_termination?
+    elsif enrollment.may_terminate_coverage?
+      enrollment.terminate_coverage!(coverage_end_date)
+    end
+    enrollment.update(terminate_reason: term_reason, termination_submitted_on: TimeKeeper.datetime_of_record) if term_reason.present?
+  end
+
+  def waiver_enrollment_present?
+    return false if employee_role.blank?
+
+    family = employee_role.person.primary_family
+    return false if family.blank?
+
+    family.enrollments.where({:predecessor_enrollment_id => id, :aasm_state.in => WAIVED_STATUSES}).present?
   end
 
   def cancel_previous(year)
@@ -1153,6 +1253,7 @@ class HbxEnrollment
 
         enrollment.benefit_group_id = benefit_group.id
         enrollment.benefit_group_assignment_id = benefit_group_assignment.id
+        enrollment.sponsored_benefit_package_id = benefit_package.id if benefit_package
       when consumer_role.present?
         enrollment.consumer_role = consumer_role
         enrollment.kind = "individual"

@@ -175,6 +175,10 @@ module BenefitSponsors
         end
       end
 
+      def trigger_employee_waiver_confirmation_notice(hbx_enrollment)
+        deliver(recipient: hbx_enrollment.employee_role, event_object: hbx_enrollment, notice_event: "employee_waiver_confirmation")
+      end
+
       def hbx_enrollment_update(new_model_event)
         raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)
 
