@@ -1,4 +1,7 @@
 source 'https://rubygems.org'
+git_source(:github) { |repo| "https://github.com/#{repo}.git" }
+
+ruby '2.6.5'
 
 gem "benefit_markets", path: "components/benefit_markets"
 gem "benefit_sponsors", path: "components/benefit_sponsors"
@@ -20,7 +23,7 @@ gem 'coffee-rails', '~> 4.1.0'
 gem 'combine_pdf'
 gem 'config', '~> 1.0.0'
 gem 'curl'
-gem 'devise', '>= 3.5.4'
+gem 'devise',  '~> 4.5'
 gem 'effective_datatables', path: './project_gems/effective_datatables-2.6.14'
 gem 'haml'
 gem 'httparty'
@@ -37,7 +40,7 @@ gem 'language_list', '~> 1.1.0'
 gem 'less-rails-bootstrap', '~> 3.3.1.0'
 gem 'mail', '2.6.3'
 gem 'maskedinput-rails'
-gem 'money-rails', '~> 1.3.0'
+gem 'money-rails', '~> 1.10.0'
 gem 'mongo', '2.5.1'
 gem 'mongo_session_store-rails4', '~> 6.0.0'
 gem 'mongoid', '~> 5.4.0'
@@ -52,9 +55,10 @@ gem 'nokogiri-happymapper', :require => 'happymapper'
 gem 'non-stupid-digest-assets', '~> 1.0', '>= 1.0.9'
 gem "notifier",           path: "components/notifier"
 gem 'openhbx_cv2', git: 'https://github.com/dchbx/openhbx_cv2.git', branch: 'master'
+gem 'resource_registry',  git:  'https://github.com/ideacrew/resource_registry.git', branch: 'master'
 gem 'prawn', :git => 'https://github.com/prawnpdf/prawn.git', :ref => '8028ca0cd2'
 gem 'pundit', '~> 1.0.1'
-gem 'rails', '4.2.7.1'
+gem 'rails', '4.2.11'
 gem 'rails-i18n', '4.0.8'
 gem 'recurring_select', :git => 'https://github.com/brianweiner/recurring_select'
 gem "recaptcha", '4.3.1', require: 'recaptcha/rails'

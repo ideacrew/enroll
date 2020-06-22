@@ -63,8 +63,8 @@ RSpec.configure do |config|
   end
 
   config.include ModelMatcherHelpers, :type => :model
-  config.include Devise::TestHelpers, :type => :controller
-  config.include Devise::TestHelpers, :type => :view
+  config.include Devise::Test::ControllerHelpers, :type => :controller
+  config.include Devise::Test::ControllerHelpers, :type => :view
   config.extend ControllerMacros, :type => :controller #real logins for integration testing
   config.include ControllerHelpers, :type => :controller #stubbed logins for unit testing
   config.include FactoryGirl::Syntax::Methods
@@ -75,4 +75,21 @@ RSpec.configure do |config|
 
   config.include Capybara::DSL
 
+end
+
+# error: ThreadError: already initialized
+# solution found here https://github.com/rails/rails/issues/34790#issuecomment-450502805
+if RUBY_VERSION>='2.6.0'
+  if Rails.version < '5'
+    class ActionController::TestResponse < ActionDispatch::TestResponse
+      def recycle!
+        # hack to avoid MonitorMixin double-initialize error:
+        @mon_mutex_owner_object_id = nil
+        @mon_mutex = nil
+        initialize
+      end
+    end
+  else
+    puts "Monkeypatch for ActionController::TestResponse no longer needed"
+  end
 end

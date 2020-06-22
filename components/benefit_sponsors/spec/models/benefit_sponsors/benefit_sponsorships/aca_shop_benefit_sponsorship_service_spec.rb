@@ -190,5 +190,55 @@ module BenefitSponsors
       expect(error_messages[1].first).to eq ("FEIN matches HBX ID #{exisitng_org.hbx_id}, #{exisitng_org.legal_name}")
      end
    end
+
+    describe ".transmit_renewal_carrier_drop_event" do
+      let!(:benefit_market) { site.benefit_markets.first }
+      let!(:benefit_market_catalog)  { benefit_market.benefit_market_catalogs.first }
+      let(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile_renewal_application, site: site)}
+      let(:employer_profile) {organization.employer_profile}
+      let(:benefit_package) { employer_profile.latest_benefit_application.benefit_packages.first }
+      let!(:health_sponsored_benefit) {benefit_package.health_sponsored_benefit}
+      let!(:issuer_profile)  { FactoryGirl.create(:benefit_sponsors_organizations_issuer_profile) }
+      let!(:renewal_application)  { employer_profile.renewal_benefit_application }
+      let!(:active_application)  { employer_profile.active_benefit_application }
+      let!(:active_application_product)  do
+        FactoryGirl.create(:benefit_markets_products_health_products_health_product,
+                          application_period: TimeKeeper.date_of_record.beginning_of_year.last_year..TimeKeeper.date_of_record.end_of_year.last_year,
+                          issuer_profile_id: issuer_profile.id)
+      end
+      let!(:new_renewal_app_product)  { FactoryGirl.create(:benefit_markets_products_health_products_health_product)}
+      let!(:update_benefit_application) do
+        active_application.benefit_sponsor_catalog.product_packages.where(product_kind: :health).first.update_attributes(package_kind: :single_product)
+        renewal_application.benefit_sponsor_catalog.product_packages.where(product_kind: :health).first.update_attributes(package_kind: :single_product)
+        renewal_application.update_attributes!(aasm_state: :enrollment_eligible)
+        active_application.benefit_packages.first.health_sponsored_benefit.update_attributes(reference_product_id: active_application_product.id, product_package_kind: :single_product)
+        renewal_application.benefit_packages.first.health_sponsored_benefit.update_attributes(product_package_kind: :single_product)
+        product = renewal_application.benefit_packages.first.health_sponsored_benefit.reference_product
+        product.update_attributes(issuer_profile_id: issuer_profile.id)
+      end
+
+      let!(:service_instance)  { subject.new(benefit_sponsorship: employer_profile.active_benefit_sponsorship) }
+
+      context "change in renewal application products" do
+        before do
+          sponsored_benefit = renewal_application.benefit_packages.first.health_sponsored_benefit
+          sponsored_benefit.update_attributes(reference_product_id: new_renewal_app_product.id)
+        end
+
+        it "should notify carrier drop event" do
+          expect(service_instance).to receive(:notify).with('acapi.info.events.employer.benefit_coverage_renewal_carrier_dropped', {employer_id: employer_profile.hbx_id, event_name: "benefit_coverage_renewal_carrier_dropped"})
+          service_instance.transmit_renewal_carrier_drop_event
+        end
+      end
+
+      context "NO change in renewal application products" do
+
+        it "should not notify carrier drop event" do
+          expect(service_instance).to receive(:notify).exactly(0).times
+          service_instance.transmit_renewal_carrier_drop_event
+        end
+      end
+
+    end
   end
 end

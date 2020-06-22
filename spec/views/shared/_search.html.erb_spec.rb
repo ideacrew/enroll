@@ -10,7 +10,7 @@ RSpec.describe "shared/_search.html.erb"  do |variable|
   end
 
   it 'should have broker_agency_profile.id in id field' do
-    expect(rendered).to have_selector("input#id[value=\"#{@broker_agency_profile.id}\"]")
+    expect(rendered).to have_selector("input#id[value=\"#{@broker_agency_profile.id}\"]", visible: false)
   end
 
   it "should have search box with id=q" do
