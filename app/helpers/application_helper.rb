@@ -858,4 +858,11 @@ module ApplicationHelper
     return current_token.token if current_token
     current_user.generate_jwt(warden.config[:default_scope], nil)
   end
+
+  def csr_percentage_options_for_select
+    EligibilityDetermination::CSR_PERCENT_VALUES.inject([]) do |csr_options, csr|
+      ui_display = csr == '-1' ? 'limited' : csr
+      csr_options << [ui_display, csr]
+    end
+  end
 end

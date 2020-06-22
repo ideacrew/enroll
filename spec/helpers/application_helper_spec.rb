@@ -676,4 +676,10 @@ end
     it_behaves_like 'rounding float number', 866.07512, 866.07
     it_behaves_like 'rounding float number', (2.76 + 2.43), 5.19
   end
+
+  context 'csr_percentage_options_for_select' do
+    it 'should return the expected outcome' do
+      expect(helper.csr_percentage_options_for_select).to eq([['100', '100'], ['94', '94'], ['87', '87'], ['73', '73'], ['0', '0'], ['limited', '-1']])
+    end
+  end
 end
