@@ -30,10 +30,19 @@ describe Fix2020IvlBenefitPackages, dbclean: :after_each do
       @bc_period_2020.reload
       @csr_0_benefit_package = @bc_period_2020.benefit_packages.where(:"benefit_eligibility_element_group.cost_sharing" => 'csr_0').first
       @csr_100_benefit_package = @bc_period_2020.benefit_packages.where(:"benefit_eligibility_element_group.cost_sharing" => 'csr_100').first
+      @csr_limited_benefit_package = @bc_period_2020.benefit_packages.where(:"benefit_eligibility_element_group.cost_sharing" => 'csr_limited').first
     end
 
     it 'should create a benefit_package associated with csr_0' do
       expect(@csr_0_benefit_package).to be_truthy
+    end
+
+    it 'should create a benefit_package associated with csr_limited' do
+      expect(@csr_limited_benefit_package).to be_truthy
+    end
+
+    it 'should create a benefit_package associated with csr_limited' do
+      expect(@csr_limited_benefit_package.cost_sharing).to eq('csr_limited')
     end
 
     it 'should update the benefit_package associated with csr_100 with new benefit_ids' do

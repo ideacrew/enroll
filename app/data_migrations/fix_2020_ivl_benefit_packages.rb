@@ -46,6 +46,36 @@ class Fix2020IvlBenefitPackages < MongoidMigrationTask
     bc_period_2020.save!
   end
 
+  def create_benefit_package_csr_limited(bc_period_2020, ivl_products)
+    ivl_health_plans_2020_for_csr_limited = ivl_products.where(
+      "$and" => [{ :kind => 'health'},
+                 {"$or" => [{:metal_level_kind.in => %w[platinum gold bronze], hios_id: /-03$/ },
+                            {:metal_level_kind => 'silver', hios_id: /-03$/ }]}]
+    ).select{|a| a.active_year == 2020}.entries.collect(&:_id)
+
+    benefit_eligibility_element_group_params = { market_places: ['individual'],
+                                                 enrollment_periods: ['open_enrollment', 'special_enrollment'],
+                                                 family_relationships: BenefitEligibilityElementGroup::INDIVIDUAL_MARKET_RELATIONSHIP_CATEGORY_KINDS,
+                                                 benefit_categories: ['health'],
+                                                 incarceration_status: ['unincarcerated'],
+                                                 age_range: 0..0,
+                                                 cost_sharing: 'csr_limited',
+                                                 citizenship_status: ['us_citizen', 'naturalized_citizen', 'alien_lawfully_present', 'lawful_permanent_resident'],
+                                                 residency_status: ['state_resident'],
+                                                 ethnicity: ['any'] }
+
+    benefit_package_params = { title: 'individual_health_benefits_csr_limited_2020',
+                               elected_premium_credit_strategy: 'allocated_lump_sum_credit',
+                               benefit_ids: ivl_health_plans_2020_for_csr_limited,
+                               benefit_eligibility_element_group: BenefitEligibilityElementGroup.new(benefit_eligibility_element_group_params) }
+
+    individual_health_benefit_package_for_csr_limited = BenefitPackage.new(benefit_package_params)
+
+    bc_period_2020.benefit_packages << individual_health_benefit_package_for_csr_limited
+    bc_period_2020.benefit_packages.each(&:save!)
+    bc_period_2020.save!
+  end
+
   def migrate
     hbx = HbxProfile.current_hbx
     bc_period_2020 = hbx.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp.start_on.year == 2020 }
