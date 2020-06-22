@@ -24,10 +24,10 @@ class TaxHousehold
   field :effective_ending_on, type: Date
   field :submitted_at, type: DateTime
 
-  embeds_many :tax_household_members
+  embeds_many :tax_household_members, cascade_callbacks: true
   accepts_nested_attributes_for :tax_household_members
 
-  embeds_many :eligibility_determinations
+  embeds_many :eligibility_determinations, cascade_callbacks: true
 
   scope :tax_household_with_year, ->(year) { where( effective_starting_on: (Date.new(year)..Date.new(year).end_of_year)) }
   scope :active_tax_household, ->{ where(effective_ending_on: nil) }
