@@ -1346,6 +1346,35 @@ describe Person, :dbclean => :after_each do
     end
   end
 
+  describe '.brokers_matching_search_criteria' do
+    let(:person) { FactoryBot.create(:person, :with_broker_role)}
+    let(:broker_agency_profile) {FactoryBot.create(:broker_agency_profile)}
+    let(:name) { person.full_name}
+
+    before do
+      Person.create_indexes
+      FactoryBot.create(:broker_agency_staff_role, broker_agency_profile_id: broker_agency_profile.id, person: person, broker_agency_profile: broker_agency_profile, aasm_state: 'active')
+      person.broker_role.update_attributes!(aasm_state: "active")
+      person.broker_role.update_attributes!(npn: "11111111")
+      person.save!
+    end
+
+    context 'when searched with first_name and last_name' do
+      it 'should return matching agency' do
+        people = Person.brokers_matching_search_criteria(name)
+        expect(people.count).to eq(1)
+        expect(people.first.full_name).to eq(name)
+      end
+    end
+
+    context 'when searched with npn' do
+      it 'should return matching agency' do
+        people = Person.brokers_matching_search_criteria("11111111")
+        expect(people.count).to eq(1)
+        expect(people.first.broker_role.npn).to eq(person.broker_role.npn)
+      end
+    end
+  end
 
   describe "staff_for_employer", dbclean: :around_each do
     include_context "setup benefit market with market catalogs and product packages"
