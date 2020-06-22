@@ -90,7 +90,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
   # You can put the params you want to permit in the empty array.
   def configure_sign_up_params
-    devise_parameter_sanitizer.for(:sign_up) << :oim_id
+    devise_parameter_sanitizer.permit(:sign_up, keys: [:oim_id])
   end
 
   # You can put the params you want to permit in the empty array.

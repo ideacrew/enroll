@@ -238,6 +238,12 @@ module BenefitSponsors
       )
     }
 
+    scope :may_transmit_as_renewal_ineligible?, -> (compare_date = TimeKeeper.date_of_record) {
+      where(:benefit_applications => {
+                :$elemMatch => {:predecessor_id => { :$exists => true }, :"effective_period.min" => compare_date, :aasm_state.in => BenefitSponsors::BenefitApplications::BenefitApplication::INELIGIBLE_RENEWAL_TRANSMISSION_STATES }}
+      )
+    }
+
     scope :benefit_application_find,     ->(ids) {
       where(:"benefit_applications._id".in => [ids].flatten.collect{|id| BSON::ObjectId.from_string(id)})
     }
@@ -540,8 +546,6 @@ module BenefitSponsors
     def is_renewal_carrier_drop?
       if is_renewal_transmission_eligible?
         carriers_dropped_for(:health).any? || carriers_dropped_for(:dental).any?
-      else
-        true
       end
     end
 

@@ -18,8 +18,9 @@ describe "exchanges/hbx_profiles/_edit_enrollment.html.erb" do
   let(:with_premium_implications)     { {enrollment.id => true} }
   let(:without_premium_implications)  { {} }
 
-  let(:premium_implication_mesage)    { "Active enrollment(s) for this person exists. Updating DOB has implications as 
-                                         it could result in the change of premium for the following enrollment\(s\)" }
+  let(:premium_implication_mesage) do
+    "Active enrollment(s) for this person exists. Updating DOB has implications as it could result in the change of premium for the following enrollment\(s\)"
+  end
 
   before :each do
     allow(user).to receive(:has_hbx_staff_role?).and_return true
@@ -31,7 +32,7 @@ describe "exchanges/hbx_profiles/_edit_enrollment.html.erb" do
   it "display premium implications message if there exists any enrollment that is affected by DOB change" do
     assign(:premium_implications, with_premium_implications)
     render template: "exchanges/hbx_profiles/_edit_enrollment.html.erb"
-    expect(rendered).to have_text(premium_implication_mesage)
+    expect(rendered).to have_text(premium_implication_mesage, normalize_ws: :true)
   end
 
   it "Do NOT display premium implications message if there is no enrollment affected by DOB change" do

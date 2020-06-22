@@ -57,7 +57,7 @@ RSpec.describe PlanCostDecoratorCongress, dbclean: :after_each do
         let(:premium_constant) { 800.0 }
 
         it "should have an employer contribution for employee" do
-          expect(plan_cost_decorator.employer_contribution_for(hem_employee)).to eq benefit_group.employee_max_amt
+          expect(plan_cost_decorator.employer_contribution_for(hem_employee)).to eq benefit_group.employee_max_amt.to_f
         end
       end
     end
@@ -86,7 +86,7 @@ RSpec.describe PlanCostDecoratorCongress, dbclean: :after_each do
         end
 
         it "should have a total employer contribution" do
-          expect(plan_cost_decorator.total_employer_contribution).to eq benefit_group.first_dependent_max_amt
+          expect(plan_cost_decorator.total_employer_contribution).to eq benefit_group.first_dependent_max_amt.to_f
         end
       end
 
