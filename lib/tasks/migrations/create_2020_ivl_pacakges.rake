@@ -145,6 +145,12 @@ namespace :import do
                             {:metal_level_kind => 'silver', hios_id: /-02$/ }]}]
     ).select{|a| a.active_year == 2020}.entries.collect(&:_id)
 
+    ivl_health_plans_2020_for_csr_limited = ivl_products.where(
+      "$and" => [{ :kind => 'health'},
+                 {"$or" => [{:metal_level_kind.in => %w[platinum gold bronze], hios_id: /-03$/ },
+                            {:metal_level_kind => 'silver', hios_id: /-03$/ }]}]
+    ).select{|a| a.active_year == 2020}.entries.collect(&:_id)
+
     ivl_health_plans_2020_for_csr_94 = ivl_products.where(
         "$and" => [
             { :kind => "health"},
@@ -207,6 +213,24 @@ namespace :import do
         incarceration_status: ['unincarcerated'],
         age_range:            0..0,
         cost_sharing:         'csr_0',
+        citizenship_status:   ['us_citizen', 'naturalized_citizen', 'alien_lawfully_present', 'lawful_permanent_resident'],
+        residency_status:     ['state_resident'],
+        ethnicity:            ['any']
+      )
+    )
+
+    individual_health_benefit_package_for_csr_limited = BenefitPackage.new(
+      title: 'individual_health_benefits_csr_limited_2020',
+      elected_premium_credit_strategy: 'allocated_lump_sum_credit',
+      benefit_ids:          ivl_health_plans_2020_for_csr_limited,
+      benefit_eligibility_element_group: BenefitEligibilityElementGroup.new(
+        market_places:        ['individual'],
+        enrollment_periods:   ['open_enrollment', 'special_enrollment'],
+        family_relationships: BenefitEligibilityElementGroup::INDIVIDUAL_MARKET_RELATIONSHIP_CATEGORY_KINDS,
+        benefit_categories:   ['health'],
+        incarceration_status: ['unincarcerated'],
+        age_range:            0..0,
+        cost_sharing:         'csr_limited',
         citizenship_status:   ['us_citizen', 'naturalized_citizen', 'alien_lawfully_present', 'lawful_permanent_resident'],
         residency_status:     ['state_resident'],
         ethnicity:            ['any']
@@ -277,7 +301,8 @@ namespace :import do
         individual_health_benefit_package_for_csr_94,
         individual_health_benefit_package_for_csr_87,
       individual_health_benefit_package_for_csr_73,
-      individual_health_benefit_package_for_csr_0
+      individual_health_benefit_package_for_csr_0,
+      individual_health_benefit_package_for_csr_limited
     ]
 
     bc_period_2020.save!
