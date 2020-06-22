@@ -58,6 +58,8 @@ describe Fix2020IvlBenefitPackages, dbclean: :after_each do
     @bc_period_2020.reload
     csr_0_benefit_package_id = @bc_period_2020.benefit_packages.where(:"benefit_eligibility_element_group.cost_sharing" => 'csr_0').first.id
     @bc_period_2020.benefit_packages.find(csr_0_benefit_package_id.to_s).destroy!
+    csr_limited_benefit_package_id = @bc_period_2020.benefit_packages.where(:"benefit_eligibility_element_group.cost_sharing" => 'csr_limited').first.id
+    @bc_period_2020.benefit_packages.find(csr_limited_benefit_package_id.to_s).destroy!
     ivl_health_plans_2020_for_csr_0 = BenefitMarkets::Products::Product.aca_individual_market.where(
       "$and" => [{ :kind => 'health'},
                  {"$or" => [{:metal_level_kind.in => %w[platinum gold bronze], hios_id: /-01$/ },

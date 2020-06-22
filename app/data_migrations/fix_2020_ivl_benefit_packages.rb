@@ -82,6 +82,7 @@ class Fix2020IvlBenefitPackages < MongoidMigrationTask
     ivl_products = BenefitMarkets::Products::Product.aca_individual_market
     update_benefit_package_csr_100(bc_period_2020, ivl_products)
     create_benefit_package_csr_0(bc_period_2020, ivl_products)
+    create_benefit_package_csr_limited(bc_period_2020, ivl_products)
     puts 'Successfully updated benefit_package with csr_100 and created benefit_package for csr_0' unless Rails.env.test?
   rescue StandardError => e
     puts "---FAILED--- to fix 2020 ivl benefit packages, error: #{e.message}" unless Rails.env.test?
