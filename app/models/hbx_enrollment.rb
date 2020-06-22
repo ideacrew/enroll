@@ -934,6 +934,7 @@ class HbxEnrollment
 
   def update_renewal_coverage
     return unless is_shop?
+    return if census_employee&.is_employee_in_term_pending?
 
     enrollment_benefit_application = sponsored_benefit_package.benefit_application
 
