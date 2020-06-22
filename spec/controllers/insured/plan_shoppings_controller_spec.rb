@@ -113,7 +113,6 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       allow(benefit_group).to receive(:reference_plan).and_return(reference_plan)
       allow(hbx_enrollment).to receive(:build_plan_premium).and_return(true)
       allow(hbx_enrollment).to receive(:census_employee).and_return(census_employee)
-      allow(subject).to receive(:employee_mid_year_plan_change).and_return(true)
       allow(sponsored_benefit).to receive(:rate_schedule_date).and_return(rate_schedule_date)
       allow(HbxEnrollmentSponsoredCostCalculator).to receive(:new).with(hbx_enrollment).and_return(cost_calculator)
       allow(cost_calculator).to receive(:groups_for_products).with([product]).and_return([member_group])
