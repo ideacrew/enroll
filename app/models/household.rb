@@ -122,8 +122,8 @@ class Household
 
       benchmark_plan_id = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.slcsp
 
-      csr_percent = latest_eligibility_determination.csr_percent == 'limited' ? '-1' : latest_eligibility_determination.csr_percent
       latest_eligibility_determination = verified_tax_household.eligibility_determinations.max_by(&:determination_date)
+      csr_percent = latest_eligibility_determination.csr_percent == 'limited' ? '-1' : latest_eligibility_determination.csr_percent
       th.eligibility_determinations.build(
         source: 'Curam',
         e_pdc_id: latest_eligibility_determination.id,
