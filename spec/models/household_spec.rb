@@ -302,6 +302,13 @@ describe "financial assistance eligibiltiy for a family", type: :model, dbclean:
       expect(@ed.source).to eq('Renewals')
     end
   end
+
+  it 'should create determination with limited csr' do
+    active_household.build_thh_and_eligibility(200, 'limited', date, slcsp)
+    @eligibility_determination = active_household.latest_active_thh.latest_eligibility_determination
+    expect(@eligibility_determination.csr_percent_as_integer).to eq(-1)
+    expect(@eligibility_determination.csr_eligibility_kind).to eq('csr_limited')
+  end
 end
 
 describe Household, "for creating a new taxhousehold using create eligibility", type: :model, dbclean: :after_each do
@@ -323,7 +330,9 @@ describe Household, "for creating a new taxhousehold using create eligibility", 
 
   context "create_new_tax_household" do
     before :each do
+      params.merge!({'csr' => 'limited'})
       household100.create_new_tax_household(params)
+      @determination = household100.tax_households.active_tax_household.first.latest_eligibility_determination
     end
 
     it "should create new tax_household instance" do
@@ -336,6 +345,14 @@ describe Household, "for creating a new taxhousehold using create eligibility", 
 
     it "should create new eligibility_determination instance" do
       expect(household100.tax_households[0].eligibility_determinations).not_to be []
+    end
+
+    it 'should match with expected csr percent' do
+      expect(@determination.csr_percent_as_integer).to eq(-1)
+    end
+
+    it 'should match with expected csr eligibility kind' do
+      expect(@determination.csr_eligibility_kind).to eq('csr_limited')
     end
   end
 end

@@ -8,17 +8,19 @@ class EligibilityDetermination
 
   SOURCE_KINDS = %w[Curam Admin Renewals].freeze
 
-  CSR_KINDS = %w(csr_100 csr_94 csr_87 csr_73 csr_0)
+  CSR_KINDS = %w(csr_100 csr_94 csr_87 csr_73 csr_0 csr_limited)
+
+  CSR_PERCENT_VALUES = %w[100 94 87 73 0 -1].freeze
 
   #   csr_0:   "02", # Native Americans
   #   limited: "03", # limited?
   CSR_KIND_TO_PLAN_VARIANT_MAP = {
-      'csr_100' => '02',
+    'csr_100' => '02',
       "csr_94"  => "06",
       "csr_87"  => "05",
       "csr_73"  => "04",
-      'csr_0'   => '01',
-      "limited" => "03"
+    'csr_0' => '01',
+    'csr_limited' => '03'
   }
 
   CSR_KIND_TO_PLAN_VARIANT_MAP.default = "01"
@@ -79,6 +81,8 @@ class EligibilityDetermination
                                   'csr_94'
                                 when 100
                                   'csr_100'
+                                when -1
+                                  'csr_limited'
                                 else
                                   'csr_0'
                                 end
