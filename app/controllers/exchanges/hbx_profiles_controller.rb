@@ -133,7 +133,7 @@ class Exchanges::HbxProfilesController < ApplicationController
 
   def send_secure_message_form
     @profile = BenefitSponsors::Organizations::Profile.find(params[:profile_id]) if params[:profile_id]
-    @element_to_replace_id = params[:family_actions_id] || params[:employer_actions_id]
+    @element_to_replace_id = params[:employer_actions_id]
   end
 
   def disable_ssn_requirement
@@ -549,7 +549,7 @@ def employer_poc
 
   def configuration
     @time_keeper = Forms::TimeKeeper.new
-    respond_to do |format|
+    respond_to do |format
       format.html { render '/exchanges/hbx_profiles/configuration_index.html.erb' }
     end
   end
