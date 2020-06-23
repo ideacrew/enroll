@@ -177,6 +177,12 @@ class Employers::CensusEmployeesController < ApplicationController
     render "#{confirmation_type}_effective_date"
   end
 
+    def retro_effective_date
+    confirmation_type = params[:type]
+    render "#{confirmation_type}_effective_date"
+  end
+
+
   def cobra_reinstate
     if @census_employee.reinstate_eligibility!
       flash[:notice] = "Successfully update Census Employee."

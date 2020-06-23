@@ -74,6 +74,7 @@ module Effective
               # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
               ['Edit', main_app.edit_employers_employer_profile_census_employee_path(@employer_profile, row.id, tab: 'employees'), 'static'],
               ['Terminate', main_app.confirm_effective_date_employers_employer_profile_census_employees_path(@employer_profile, census_employee_id: row.id, census_employee: row.id, type: 'terminate', tab: 'employees'), terminate_possible?(row)],
+              ['Retro - Terminate', main_app.confirm_effective_date_employers_employer_profile_census_employees_path(@employer_profile, census_employee_id: row.id, census_employee: row.id, type: 'retro_terminate', tab: 'employees'), terminate_possible?(row)],
               ['Rehire', main_app.confirm_effective_date_employers_employer_profile_census_employees_path(@employer_profile, census_employee_id: row.id, census_employee: row.id, type: 'rehire', tab: 'employees'), rehire_possible?(row)],
               ['Initiate cobra', main_app.confirm_effective_date_employers_employer_profile_census_employees_path(@employer_profile, census_employee_id: row.id, type: 'cobra'), cobra_possible?(row)]
           ]
