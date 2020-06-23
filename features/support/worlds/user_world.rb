@@ -93,6 +93,10 @@ Then(/^the user will not see the Extend Open Enrollment button$/) do
   expect(page).to_not have_css('.btn.btn-xs', text: 'Extend Open Enrollment')
 end
 
+Then(/^the user will see the Plan Years button$/) do
+  find('.btn.btn-xs', text: 'Plan Years').click
+end
+
 When(/^the user clicks Extend Open Enrollment$/) do
   find('.btn.btn-xs', text: 'Extend Open Enrollment').click
 end
