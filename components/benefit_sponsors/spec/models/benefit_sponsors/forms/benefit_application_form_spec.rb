@@ -220,5 +220,58 @@ module BenefitSponsors
         end
       end
     end
+
+    describe 'validate form for oe dates - non admin' do
+
+      let(:start_on) { TimeKeeper.date_of_record + 3.months }
+      let(:oe_start_on) { TimeKeeper.date_of_record + 2.months }
+
+      let(:valid_params) do
+        {
+          admin_datatable_action: false,
+          benefit_sponsorship_id: 'id',
+          start_on: start_on,
+          end_on: start_on.next_year.prev_day,
+          open_enrollment_start_on: oe_start_on,
+          open_enrollment_end_on: oe_start_on.next_week
+        }
+      end
+
+      let(:invalid_params) do
+        {
+          admin_datatable_action: false,
+          benefit_sponsorship_id: 'id',
+          start_on: start_on,
+          end_on: start_on.next_year.prev_day,
+          open_enrollment_start_on: oe_start_on,
+          open_enrollment_end_on: oe_start_on
+        }
+      end
+
+      context 'for valid params' do
+        before :each do
+          @ba_form1 = ::BenefitSponsors::Forms::BenefitApplicationForm.new(valid_params)
+        end
+
+        it 'should return true when validated' do
+          expect(@ba_form1.valid?).to be_truthy
+        end
+      end
+
+      context 'for invalid params' do
+        before :each do
+          @ba_form2 = ::BenefitSponsors::Forms::BenefitApplicationForm.new(invalid_params)
+        end
+
+        it 'should return false when validated' do
+          expect(@ba_form2.valid?).to be_falsey
+        end
+
+        it 'should add errors to the form instance' do
+          @ba_form2.valid?
+          expect(@ba_form2.errors.full_messages).to include("Open Enrollment Dates are not valid")
+        end
+      end
+    end
   end
 end
