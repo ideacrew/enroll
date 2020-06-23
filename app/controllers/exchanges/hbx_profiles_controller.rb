@@ -549,7 +549,7 @@ def employer_poc
 
   def configuration
     @time_keeper = Forms::TimeKeeper.new
-    respond_to do |format
+    respond_to do |format|
       format.html { render '/exchanges/hbx_profiles/configuration_index.html.erb' }
     end
   end
