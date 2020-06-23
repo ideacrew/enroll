@@ -12,7 +12,7 @@ describe PersonPolicy do
   context 'hbx_staff_role subroles' do
     it 'hbx_staff' do
       allow(hbx_staff_role).to receive(:permission).and_return(FactoryBot.create(:permission, :hbx_staff))
-      expect(policy.updateable?).to be true
+      expect(policy.updateable?).to be false
     end
 
     it 'hbx_read_only' do 
