@@ -21,6 +21,7 @@ RSpec.describe "views/benefit_sponsors/profiles/employers/employer_profiles/my_a
       view.extend BenefitSponsors::PermissionHelper
       view.extend BenefitSponsors::ApplicationHelper
       view.extend BenefitSponsors::Employers::EmployerHelper
+      view.extend BenefitSponsors::L10nHelper
 
       benefit_sponsorship.benefit_applications.flat_map(&:benefit_packages).each { |bp| bp.sponsored_benefits.delete_all }
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true, revert_application?: true, list_enrollments?: true))

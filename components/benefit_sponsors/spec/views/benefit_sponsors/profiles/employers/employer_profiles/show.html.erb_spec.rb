@@ -19,6 +19,7 @@ RSpec.describe "views/benefit_sponsors/profiles/employers/employer_profiles/_sho
   before :each do
     view.extend Pundit
     view.extend BenefitSponsors::ApplicationHelper
+    view.extend BenefitSponsors::L10nHelper
     view.extend BenefitSponsors::Engine.routes.url_helpers
     @employer_profile = employer_profile
     assign(:census_employees, [census_employee1, census_employee2, census_employee3])
