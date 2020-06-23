@@ -109,6 +109,7 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb",dbclean: :arou
         end
 
         it 'should show text terminated by employer if census employee is terminated and has no active seps' do
+          census_employee.update_attributes(employment_terminated_on: TimeKeeper.date_of_record)
           allow(census_employee).to receive(:is_employee_in_term_pending?).and_return(true)
           render "insured/families/shop_for_plans_widget"
           expect(rendered).to have_text "You have been terminated by your employer"

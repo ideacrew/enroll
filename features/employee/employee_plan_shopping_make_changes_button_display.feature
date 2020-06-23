@@ -10,7 +10,7 @@ Feature: Make Changes Button Appears on Tile
     And employee Patrick Doe has past hired on date
     And employee Patrick Doe already matched with employer ABC Widgets and logged into employee portal
 
-  Scenario: Reporting a SEP and not finishing the enrollment SHOULD NOT cause "Make Changes" button to appear on the current enrollment tile
+  Scenario: Reporting a SEP and not finishing the enrollment SHOULD NOT cause "Make Changes" button to appear on the SEP enrollment tile
     And Patrick Doe has active coverage in coverage enrolled state
     When I click the "Had a baby" in qle carousel
     And I select current date as qle date

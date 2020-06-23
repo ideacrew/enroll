@@ -4,6 +4,10 @@ describe Forms::ConsumerCandidate, "asked to match a person", dbclean: :after_ea
     DatabaseCleaner.clean
   end
 
+  before :each do
+    DatabaseCleaner.clean
+  end
+
   let(:user){ create(:user) }
   let!(:person) { create(:person, :with_ssn, user: user) }
 
