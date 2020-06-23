@@ -1,5 +1,9 @@
-Then(/^the user will see the Send Secure Message button$/) do
-  expect(page).to have_css('.btn.btn-xs', text: 'Send Secure Message')
+Then(/^the user will( not)? see the Send Secure Message button$/) do |visible|
+  if visible.blank?
+    expect(page).to have_css('.btn.btn-xs', text: 'Send Secure Message')
+  else
+    expect(page).to_not have_css('.btn.btn-xs', text: 'Send Secure Message')
+  end
 end
 
 When(/^the user clicks the Send Secure Message button for this Employer$/) do
