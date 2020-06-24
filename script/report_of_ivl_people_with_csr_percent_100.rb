@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # This report generates a list of people who have csr percent 100 with enrollment and eligibility details.
-# rails runner /Users/saikumar/dchbx/enroll/script/report_of_ivl_people_with_csr_percent_100.rb -e production
+# rails runner script/report_of_ivl_people_with_csr_percent_100.rb -e production
 require 'csv'
 field_names = %w[First_Name
                  Last_Name
