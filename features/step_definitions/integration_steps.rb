@@ -219,6 +219,19 @@ def non_dc_office_location
   }
 end
 
+And(/^(.*) clicks family home page link for (.*)/) do |person_name_and_role, family_primary_person|
+  click_link family_primary_person
+end
+
+And(/^(.*) clicks Manage Family link/) do |person_name_and_role|
+  click_link 'Manage Family'
+end
+
+Then(/^(.*) should see a message saying that they do not have the necessary permissions to perform that action/) do |named_person|
+  binding.pry
+end
+
+
 Given(/^User has existing security questions/) do
 
 end

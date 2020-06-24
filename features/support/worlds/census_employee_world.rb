@@ -169,6 +169,13 @@ end
 Given(/^there exists (.*?) employee for employer (.*?)(?: and (.*?))?$/) do |named_person, legal_name, legal_name2|
   person = people[named_person]
   sponsorship =  employer(legal_name).benefit_sponsorships.first
+  person_record = Person.where(first_name: /#{person[:first_name]}/i, last_name: /#{person[:last_name]}/i).first || FactoryBot.create(
+    :person,
+    :with_family,
+    first_name: person[:first_name],
+    last_name: person[:last_name]
+  )
+  employee_role = FactoryBot.create(:employee_role, person: person_record, employer_profile: employer(legal_name).employer_profile)
   census_employees 1,
                    benefit_sponsorship: sponsorship, employer_profile: sponsorship.profile,
                    first_name: person[:first_name],
@@ -176,6 +183,9 @@ Given(/^there exists (.*?) employee for employer (.*?)(?: and (.*?))?$/) do |nam
                    ssn: person[:ssn],
                    dob: person[:dob],
                    email: FactoryBot.build(:email, address: person[:email])
+  census_employee = CensusEmployee.where(:first_name => /#{person[:first_name]}/i,
+                       :last_name => /#{person[:last_name]}/i).first
+  employee_role.update_attributes!(census_employee_id: census_employee.id)
   if legal_name2.present?
     sponsorship2 = employer(legal_name2).benefit_sponsorships.first
     FactoryBot.create_list(:census_employee, 1,
@@ -251,7 +261,9 @@ end
 And(/(.*) has active coverage in coverage enrolled state/) do |named_person|
   person = people[named_person]
   ce = CensusEmployee.where(:first_name => /#{person[:first_name]}/i, :last_name => /#{person[:last_name]}/i).first
+  raise("Census Employee record not present #{person[:first_name]} #{person[:last_name]}") if ce.blank?
   person_rec = Person.where(first_name: /#{person[:first_name]}/i, last_name: /#{person[:last_name]}/i).first
+  raise("Person record not present #{person[:first_name]} #{person[:last_name]}") if person_rec.blank?
   benefit_package = ce.active_benefit_group_assignment.benefit_package
   active_enrollment = FactoryBot.create(:hbx_enrollment,
                                          family: person_rec.primary_family,
