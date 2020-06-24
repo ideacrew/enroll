@@ -156,6 +156,11 @@ namespace :permissions do
   DefinePermissions.define_task :assign_current_permissions => :environment
 end
 
+namespace :permissions do
+  desc 'hbx admin can terminate employee'
+  DefinePermissions.define_task :hbx_admin_terminate_employee => :environment
+end
+
 #rake permissions:hbx_admin_can_reset_password
 
 #rake permissions:hbx_admin_access_new_consumer_application_sub_tab
