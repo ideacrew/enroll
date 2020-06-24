@@ -1,6 +1,6 @@
 class Employers::CensusEmployeesController < ApplicationController
   before_action :find_employer
-  before_action :find_census_employee, only: [:edit, :update, :show, :delink, :terminate, :rehire, :benefit_group, :cobra ,:cobra_reinstate, :confirm_effective_date]
+  before_action :find_census_employee, only: [:edit, :update, :show, :delink, :terminate, :retro_terminate, :rehire, :benefit_group, :cobra ,:cobra_reinstate, :confirm_effective_date]
   before_action :updateable?, except: [:edit, :show, :update, :benefit_group]
   layout "two_column"
   def new
@@ -114,6 +114,32 @@ class Employers::CensusEmployeesController < ApplicationController
     render js: "window.location = '#{employers_employer_profile_census_employee_path(@employer_profile.id, @census_employee.id, status: status)}'"
   end
 
+  def retro_terminate
+    status = params[:status]
+    termination_date = params["termination_date"]
+
+    if termination_date.present?
+      termination_date = DateTime.strptime(termination_date, '%m/%d/%Y').try(:to_date)
+      @fa = @census_employee.terminate_employment(termination_date)
+    end
+
+    respond_to do |format|
+      format.js {
+        if termination_date.present? && @fa
+          flash[:notice] = "Successfully retro-terminated Census Employee."
+        else
+          flash[:error] = "Census Employee could not be terminated"
+        end
+      }
+      format.all {
+        flash[:notice] = "Successfully terminated Census Employee."
+      }
+    end
+    flash.keep(:error)
+    flash.keep(:notice)
+    render js: "window.location = '#{employers_employer_profile_census_employee_path(@employer_profile.id, @census_employee.id, status: status)}'"
+  end
+
   def rehire
     authorize EmployerProfile, :updateable?
     status = params[:status]
@@ -176,12 +202,6 @@ class Employers::CensusEmployeesController < ApplicationController
     confirmation_type = params[:type]
     render "#{confirmation_type}_effective_date"
   end
-
-    def retro_effective_date
-    confirmation_type = params[:type]
-    render "#{confirmation_type}_effective_date"
-  end
-
 
   def cobra_reinstate
     if @census_employee.reinstate_eligibility!
