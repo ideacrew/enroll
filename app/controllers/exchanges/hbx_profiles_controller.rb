@@ -131,6 +131,11 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
   end
 
+  def send_secure_message_form
+    @profile = BenefitSponsors::Organizations::Profile.find(params[:profile_id]) if params[:profile_id]
+    @element_to_replace_id = params[:employer_actions_id]
+  end
+
   def disable_ssn_requirement
     @benfit_sponsorships = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:"_id".in => params[:ids])
 
