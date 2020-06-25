@@ -634,10 +634,14 @@ class CensusEmployee < CensusMember
   end
 
 
-   def terminate_employment!(employment_terminated_on)
+  def terminate_employment!(employment_terminated_on)
     if may_schedule_employee_termination?
       self.employment_terminated_on = employment_terminated_on
-      self.coverage_terminated_on = earliest_coverage_termination_on(employment_terminated_on)
+      if employment_terminated_on < (TimeKeeper.date_of_record - 60.days)
+        self.coverage_terminated_on = employment_terminated_on.end_of_month
+      else
+        self.coverage_terminated_on = earliest_coverage_termination_on(employment_terminated_on)
+      end
     end
 
     if employment_terminated_on < TimeKeeper.date_of_record
