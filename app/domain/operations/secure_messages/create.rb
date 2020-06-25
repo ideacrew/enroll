@@ -25,7 +25,7 @@ module Operations
       end
 
       def validate_message_payload(params)
-        result = ::Validators::MessageContract.new.call(params)
+        result = ::Validators::SecureMessages::MessageContract.new.call(params)
         result.success? ? Success(result.to_h) : Failure(result.errors.to_h)
       end
 
