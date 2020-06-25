@@ -1279,5 +1279,49 @@ module BenefitSponsors
         expect(benefit_sponsorship.aasm_state).to eq :applicant
       end
     end
+
+
+    describe '.late_renewal_benefit_application', :dbclean => :after_each do
+
+      let(:effective_date)            { TimeKeeper.date_of_record.next_month.beginning_of_month  }
+      let!(:benefit_sponsorship) do
+        create(
+            :benefit_sponsors_benefit_sponsorship,
+            :with_organization_cca_profile,
+            :with_renewal_benefit_application,
+            initial_application_state: :active,
+            renewal_application_state: :enrollment_ineligible,
+            default_effective_period: (effective_date..(effective_date + 1.year - 1.day)),
+            site: site,
+            aasm_state: :active
+        )
+      end
+      let!(:expired_benefit_application) do
+        expired_application = FactoryBot.create(:benefit_sponsors_benefit_application,
+                          benefit_sponsorship: benefit_sponsorship,
+                          recorded_service_areas: benefit_sponsorship.primary_office_service_areas,
+                          aasm_state: :expired,
+                          effective_period: (benefit_sponsorship.active_benefit_application.start_on - 1.year..benefit_sponsorship.active_benefit_application.start_on - 1.day))
+        active_application = benefit_sponsorship.active_benefit_application
+        active_application.predecessor = expired_application
+        active_application.save
+        expired_application
+      end
+
+      context "when renewal application is ineligible" do
+        it 'should return nil' do
+          expect(benefit_sponsorship.late_renewal_benefit_application).to eq nil
+        end
+      end
+
+      context "when renewal application is eligible" do
+        before do
+          benefit_sponsorship.renewal_benefit_application.update_attributes(aasm_state:'enrollment_eligible')
+        end
+        it 'should return renewal application' do
+          expect(benefit_sponsorship.late_renewal_benefit_application).to eq benefit_sponsorship.renewal_benefit_application
+        end
+      end
+    end
   end
 end
