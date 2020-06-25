@@ -4,8 +4,8 @@
 - show_benefit_application_tile = params[:show_benefit_application_tile] ||= false
 
 - if @benefit_package_form.new_record?
-  h1.heading-text Select Your Plan Offering
-  h4 Let your plan participants choose any plan offered by one carrier, any plan available within a specific metal level or you can offer just one plan. It doesn't cost you more to let them choose by carrier (insurance company) or metal level.
+  h1.heading-text = l10n("employers.plan_years.benefit_package.select_your_plan_offering")
+  h4 = l10n("employers.plan_years.benefit_package.select_your_plan_offering.content")
   br
 - else
   .edit-offering.health
@@ -77,9 +77,9 @@
 
         #referencePlans.hidden
           .row
-            h2.heading-text.pull-left.pl-1 Select Your Reference Plan
-
-          h4 Now select a reference plan. The reference plan is used to cap employer costs. You’ll choose a reference plan. Then, your contribution towards employee premiums will be applied to the reference plan you choose regardless of which plans your employees select. After you select your reference plan, scroll down to review your costs.
+            h2.heading-text.pull-left.pl-1
+              =l10n("employers.plan_years.benefit_package.select_your_reference_plan")
+          h4 =l10n("employers.plan_years.benefit_package.select_your_reference_plan.content")
           #yourPlans
             .float-right.mb-2
               #yourPlanTotals

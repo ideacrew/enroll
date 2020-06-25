@@ -612,7 +612,7 @@ And /^clicks on terminate employee$/ do
 end
 
 Then /^employer clicks on terminated filter$/ do
-  expect(page).to have_content "Select 'Add New Employee' to continue building your roster, or select 'Upload Employee Roster' if you're ready to download or upload the roster template"
+  expect(page).to have_content "To add one employee at a time, select "
   find_by_id('Tab:terminated').click
   wait_for_ajax
 end
@@ -718,7 +718,7 @@ And /^employer should also see termination date$/ do
 end
 
 And /^employer clicks on all employees$/ do
-  expect(page).to have_content "Select 'Add New Employee' to continue building your roster, or select 'Upload Employee Roster' if you're ready to download or upload the roster template"
+  expect(page).to have_content "To add one employee at a time, select "
   find_by_id('Tab:all').click
 
   wait_for_ajax

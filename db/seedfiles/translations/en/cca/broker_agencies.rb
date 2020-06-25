@@ -39,6 +39,7 @@ BROKER_AGENCIES_TRANSLATIONS = {
 	"en.broker_agencies.profiles.ee_count" => "EE Count",
 	"en.broker_agencies.profiles.er_state" => "ER State",
 	"en.general_agency" => "General Agency",
+	"en.no_general_agencies_found" => "No General Agencies Found",
 	"en.families" => "Families",
 	"en.hbx_id" => "HBX ID",
 	"en.review" => "Review",
@@ -202,5 +203,9 @@ BROKER_AGENCIES_TRANSLATIONS = {
 	"en.carrier_appointments" => "Carrier Appointments",
 	"en.reason" => "Reason",
 	"en.broker_carrier_appointments_enabled_note" => "Note: Carrier appointments for broker are not necessary for participation in %{site_long_name}.",
-	"en.write_here" => "Write here"
+	"en.write_here" => "Write here",
+	"en.broker_agencies.profiles.select_plan" => "Select the plan you wish to quote for all enrollees.",
+	"en.broker_agencies.profiles.npn_taken_error" => "NPN has already been claimed by another broker. Please contact Health Connector for Business Customer Service at 1-888-813-9220",
+	"en.broker_agencies.profiles.detailed_roster_information" => "To create a quote for a new, prospective group, please <a href='%{upload_employee_roster}' onclick='return false;' data-remote='true'><i class='fa fa-file-text-o' aria-hidden='true'></i>upload an employee roster</a>. To create a quote for an existing group, use the roster below and update it as needed to reflect the plan enrollees.",
+	"en.broker_agencies.profiles.to_compare_plans" => "To compare plans before making your selection, use the checkboxes next to the plan names. You can select up to 3 plans to compare at one time. When comparing costs, note that the maximum monthly cost for employers is based on:"
 }

@@ -71,7 +71,11 @@
         <h3 class="panel-title">Benefit Package Selection</h3>
       </div>
       <div class="panel-body">
-        <p>Select the plan you wish to offer to all enrollees.  Your maximum monthly cost will be based on the benefit cost, contribution amount and expected participation as specified on the employee roster.</p><br />
+        <p><%= l10n("broker_agencies.profiles.select_plan") %></p>
+        <p><%= l10n("broker_agencies.profiles.to_compare_plans") %></p>
+        <p>-Plan premium</p>
+        <p>-Employer contribution rate</p>
+        <p>-Expected employee participation, as indicated in the employee roster</p>
         <div class="col-md-10">
           <div class="reference-plans"></div>
         </div>
@@ -137,11 +141,11 @@
         $(this).text("Show Details");
     };
   });
-	$(function() {
-		a = document.querySelectorAll('.fa-dot-circle');
-		a.forEach((icon)=> icon.classList.add('hidden'))
-		b = document.querySelectorAll('.fa-square');
-		b.forEach((icon)=> icon.classList.add('hidden'))
-	})
-	
+  $(function() {
+    a = document.querySelectorAll('.fa-dot-circle');
+    a.forEach((icon)=> icon.classList.add('hidden'))
+    b = document.querySelectorAll('.fa-square');
+    b.forEach((icon)=> icon.classList.add('hidden'))
+  })
+  
 </script>
