@@ -11,8 +11,9 @@ module Operations
       def call(params:)
         validate_params = yield validate_params(params)
         resource = yield fetch_resource(validate_params)
+        result = yield upload_secure_message(resource, validate_params)
 
-        Success(resource)
+        Success(result)
       end
 
       private
@@ -27,6 +28,10 @@ module Operations
         if validate_params[:profile_id].present?
           BenefitSponsors::Operations::Profiles::FindProfile.new.call(profile_id: validate_params[:profile_id])
         end
+      end
+
+      def upload_secure_message(resource, params)
+        ::Operations::SecureMessages::Create.new.call(resource: resource, message_params: params)
       end
 
     end
