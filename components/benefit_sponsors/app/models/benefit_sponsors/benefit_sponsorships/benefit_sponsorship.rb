@@ -511,7 +511,7 @@ module BenefitSponsors
     # use this only for EDI
     def late_renewal_benefit_application
       benefit_applications.order_by(:created_at.desc).detect do |application|
-        application.predecessor.present? && [:active, :enrollment_eligible].include?(application.aasm_state)
+        application.predecessor.present? && application.start_on.year == TimeKeeper.date_of_record.year && [:active, :enrollment_eligible].include?(application.aasm_state)
       end
     end
 
