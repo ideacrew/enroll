@@ -12,8 +12,9 @@ module Operations
       def call(params)
         payload = yield construct_message_payload(params[:message_params])
         validated_payload = yield validate_message_payload(payload)
+        message_entity = yield create_message_entity(validated_payload)
 
-        Success(validated_payload)
+        Success(message_entity)
       end
 
       private
@@ -26,7 +27,12 @@ module Operations
         result = ::Validators::MessageContract.new.call(params)
         result.success? ? Success(result.to_h) : Failure(result.errors.to_h)
       end
-      
+
+      def create_message_entity(params)
+        message = ::Entities::SecureMessages::Message.new(params)
+        Success(message)
+      end
+
     end
   end
 end
