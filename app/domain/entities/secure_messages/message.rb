@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Entities
-  module SecureMessage
+  module SecureMessages
     class Message < Dry::Struct
       transform_keys(&:to_sym)
 
