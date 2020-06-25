@@ -18,7 +18,7 @@ RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
 
   let(:max_aptc_default)                { 0.00 }
   let(:csr_percent_as_integer_default)  { 0 }
-  let(:csr_eligibility_kind_default)    { "csr_100" }
+  let(:csr_eligibility_kind_default)    { 'csr_0' }
 
   let(:valid_params){
       {
@@ -97,6 +97,27 @@ RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
         it "should be findable by ID" do
           expect(EligibilityDetermination.find(eligibility_determination.id)).to eq eligibility_determination
         end
+      end
+    end
+
+    context 'for csr_eligibility_kind' do
+      shared_examples_for 'ensures csr_eligibility_kind field value' do |csr_percent_as_integer, csr_eligibility_kind|
+        before do
+          @eligibility_determination = EligibilityDetermination.new({csr_percent_as_integer: csr_percent_as_integer})
+        end
+
+        it 'should match with expected csr_eligibility_kind for given csr_percent_as_integer' do
+          expect(@eligibility_determination.csr_eligibility_kind).to eq(csr_eligibility_kind)
+        end
+      end
+
+      context 'a valid csr_percent_as_integer' do
+        it_behaves_like 'ensures csr_eligibility_kind field value', 100, 'csr_100'
+        it_behaves_like 'ensures csr_eligibility_kind field value', 94, 'csr_94'
+        it_behaves_like 'ensures csr_eligibility_kind field value', 87, 'csr_87'
+        it_behaves_like 'ensures csr_eligibility_kind field value', 73, 'csr_73'
+        it_behaves_like 'ensures csr_eligibility_kind field value', 0, 'csr_0'
+        it_behaves_like 'ensures csr_eligibility_kind field value', -1, 'csr_limited'
       end
     end
   end

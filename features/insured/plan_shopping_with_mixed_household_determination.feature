@@ -1,4 +1,3 @@
-@wip
 Feature: plan shopping with mixed household determination
 
   Background: Consumer work flow while plan shopping for mixed household determinations
@@ -11,9 +10,6 @@ Feature: plan shopping with mixed household determination
     When user clicks on continue button
     Then user should see heading labeled personal information
     Then Individual should see a form to enter personal information
-    #after save and exit , should login in back, no respective scenario found.
-#    When Individual clicks on Save and Exit
-#    Then Individual resumes enrollment
     Then Individual sees previously saved address
     Then Individual agrees to the privacy agreeement
     Then Individual should see identity verification page and clicks on submit
@@ -21,8 +17,9 @@ Feature: plan shopping with mixed household determination
     And Individual clicks on add member button
     And Individual clicks on confirm member
     When csr plans exists in db
-    Then user clicks continue button on household info form
+    Then I click on continue button on household info form
 
+  @wip
   Scenario: plan shopping with mixed pdc eligible taxhoushold members
     Given all plan shopping are of mixed determination
     And I click on continue button on group selection page
@@ -35,7 +32,8 @@ Feature: plan shopping with mixed household determination
     Then the page should have csr plans
     And Individual logs out
 
-  Scenario: plan shopping with all eligible taxhoushold members
+  @wip
+  Scenario: plan shopping with all eligible taxhoushold members shops for CSR plan
     Given every individual is eligible for Plan shopping for CSR plans
     And I click on continue button on group selection page
     Then the page should have csr plans
@@ -43,7 +41,8 @@ Feature: plan shopping with mixed household determination
     Then the page should redirect to thankyou page
     And Individual logs out
 
-  Scenario: plan shopping with all eligible taxhoushold members
+  @wip
+  Scenario: plan shopping with all eligible taxhoushold members shops for non CSR plan
     Given every individual is eligible for Plan shopping for CSR plans
     When the db has standard plans
     And I click on continue button on group selection page
