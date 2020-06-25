@@ -1,4 +1,12 @@
-<form>
+<%if @error_on_save %>
+  <div class='alert alert-error'><a class='close' data-dismiss='alert'>x</a>
+    <%@error_on_save.each do |err|%>
+      <li><%=err[1][0]%></li>
+    <%end%>
+  </div>
+<%end%>
+
+<form id="secure_message_form">
   <div id="add_sep">
     <div class="bottom-pd">
       <div class="row no-buffer">
@@ -36,6 +44,24 @@
 
 
 <script type="text/javascript">
+
+  $(document).on('click', '#send_secure_message', function(e) {
+
+    e.preventDefault();
+    e.stopImmediatePropagation();
+
+    $(".interaction-control-inbox-send").attr('disabled', 'disabled');
+
+    var formData = new FormData($('#secure_message_form')[0]);
+
+    $.ajax({
+      url: '/exchanges/hbx_profiles/send_secure_message.js',
+      type: "POST",
+      data : formData,
+      contentType: false,
+      processData: false
+    });
+  });
 
   function closeRow(element) {
     element.closest('tr').remove();
