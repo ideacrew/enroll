@@ -154,7 +154,7 @@ jobs:
         with:
           ruby-version: 2.5.1
       - name: Setup Node.js for use with actions
-        uses: actions/setup-node@v1.1.0
+        uses: actions/setup-node@v1
         with:
           # Version Spec of the version to use.  Examples: 10.x, 10.15.1, >=10.15.0, lts
           version: 10.16.3
