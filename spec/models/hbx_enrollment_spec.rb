@@ -942,6 +942,17 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
         expect(enrollment.is_any_enrollment_member_outstanding?). to be_truthy
       end
     end
+
+    context 'for event expire_coverage' do
+      before :each do
+        enrollment.update_attributes!(aasm_state: 'unverified')
+        enrollment.expire_coverage!
+      end
+
+      it 'should transition a enrollment which is in unverified aasm_state' do
+        expect(enrollment.coverage_expired?).to be_truthy
+      end
+    end
   end
 
   context "can_terminate_coverage?" do
