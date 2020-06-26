@@ -565,14 +565,16 @@ class HbxEnrollment
 
     if package_ids.blank?
       future_application = employer_profile.find_plan_year_by_effective_date(benefit_application.effective_period.max.to_date.next_day)
-      future_application.benefit_packages.pluck(:id) if future_application.present?
+      return future_application.benefit_packages.pluck(:id) if future_application.present?
     end
+    package_ids
   end
 
   def term_existing_shop_enrollments
     benefit_application = sponsored_benefit_package.benefit_application
     terminating_package_ids = benefit_application.benefit_packages.pluck(:id)
-    terminating_package_ids += collect_terminating_package_ids(benefit_application)
+    package_ids = collect_terminating_package_ids(benefit_application)
+    terminating_package_ids += package_ids if package_ids
     terminating_enrollments = household.hbx_enrollments.where({:sponsored_benefit_package_id.in => terminating_package_ids,
                                                                :coverage_kind => coverage_kind}).enrolled_and_renewing_and_expired
 
