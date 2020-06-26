@@ -166,9 +166,6 @@ jobs:
       - name: Set up Chromedriver
         if: matrix.command_configs.needs_chromedriver
         uses: nanasess/setup-chromedriver@master
-        with:
-          # Optional: do not specify to match Chrome's version
-          chromedriver-version: "77.0.3865.40"
       - name: Cache Gems
         uses: actions/cache@v1
         with:
