@@ -7,7 +7,13 @@
     </div>
     <% end %>
     <div class="col-xs-8">
-      <h1 class="heading-text"><%= l10n("employers.plan_years.benefits_title") %></h1>
+      <h1 class="heading-text">
+        <% if @benefit_applications.blank? || (@benefit_applications.coverage_effective.blank? && @benefit_applications.draft_state.present?) %>
+          <%= l10n("employers.plan_years.benefits_title_with_draft_py") %>
+        <% else %>
+          <%= l10n("employers.plan_years.benefits_title") %>
+        <% end %>
+      </h1>
     </div>
     <div class="col-xs-4">
       <% if site_broker_claim_quoting_enabled? %>
