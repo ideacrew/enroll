@@ -142,7 +142,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     @body = params[:body].presence
     @element_to_replace_id = params[:actions_id]
     @name = params[:name].presence
-    result = ::Operations::SecureMessages::SecureMessage.new.call(params: params.permit!.to_h)
+    result = ::Operations::SecureMessageAction.new.call(params: params.permit!.to_h)
     @error_on_save = result.failure if result.failure?
     respond_to do |format|
       if @error_on_save

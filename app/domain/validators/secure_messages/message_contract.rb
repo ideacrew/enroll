@@ -5,9 +5,9 @@ module Validators
     class MessageContract < ::Dry::Validation::Contract
 
       params do
-        required(:subject).filled(:string)
-        required(:body).filled(:string)
-        optional(:from).filled(:string)
+        required(:subject).value(:string)
+        required(:body).value(:string)
+        optional(:from).maybe(:string)
       end
 
       rule(:subject) do
