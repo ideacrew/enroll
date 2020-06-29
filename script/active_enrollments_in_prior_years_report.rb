@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# This script generates a report to list all the ivl active
+# enrollments in the prior plan years
+# rails runner script/active_enrollments_in_prior_years_report.rb -e production
 require 'csv'
 field_names = %w[First_Name
                  Last_Name
