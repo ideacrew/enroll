@@ -4,11 +4,20 @@ module Validators
   class SecureMessageActionContract < ::Dry::Validation::Contract
 
     params do
-      optional(:profile_id).maybe(:string)
+      required(:resource_id).value(:string)
+      required(:resource_name).value(:string)
       required(:actions_id).filled(:string)
       required(:subject).value(:string)
       required(:body).value(:string)
       optional(:file)
+    end
+
+    rule(:resource_id) do
+      key.failure('Unable to find the resource') if value.blank?
+    end
+
+    rule(:resource_name) do
+      key.failure('Unable to find the resource') if value.blank?
     end
 
     rule(:file) do

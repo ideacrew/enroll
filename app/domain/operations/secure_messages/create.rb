@@ -9,11 +9,18 @@ module Operations
       include Config::SiteConcern
       send(:include, Dry::Monads[:result, :do])
 
-      def call(params)
-        payload = yield construct_message_payload(params[:message_params])
+      #resource can be a profile or person who has inbox as embedded document
+
+      def call(resource:, message_params:)
+
+        if resource.blank?
+          return Failure({:message => ['Please find valid resource to send the message']})
+        end
+
+        payload = yield construct_message_payload(message_params)
         validated_payload = yield validate_message_payload(payload)
         message_entity = yield create_message_entity(validated_payload)
-        resource = yield create(params[:resource], message_entity.to_h)
+        resource = yield create(resource, message_entity.to_h)
 
         Success(resource)
       end

@@ -2,61 +2,90 @@
 
 require 'rails_helper'
 
-RSpec.describe Validators::SecureMessageActionContract,  dbclean: :after_each do
+module Validators
+  RSpec.describe SecureMessageActionContract,  dbclean: :after_each do
 
-  describe "secure message action contract" do
+    subject do
+      described_class.new.call(params)
+    end
 
-    context "sending with missing values should return errors" do
-      let(:invalid_params)   { {profile_id: '1234321',  actions_id: '1234', subject: '', body: '' } }
-      let(:error_message)   { {:subject => ["Please enter subject"], :body => ["Please enter content"]} }
+    describe "given empty :subject" do
 
-      before do
-        @result = subject.call(invalid_params)
-      end
+      let(:params) { { subject: '', body: 'test', actions_id: '1234', resource_id: '1234', resource_name: 'person' }}
+      let(:error_message) {{:subject => ['Please enter subject']}}
 
-      it 'should be a container-ready operation' do
-        expect(subject.respond_to?(:call)).to be_truthy
-      end
 
-      it 'should return Dry::Validation::Result object' do
-        expect(@result).to be_a ::Dry::Validation::Result
-      end
-
-      it 'should throw errors' do
-        expect(@result.errors.to_h).to eq error_message
+      it "fails" do
+        expect(subject).not_to be_success
+        expect(subject.errors.to_h).to eq error_message
       end
     end
 
-    context "sending with missing keys should return errors" do
+    describe "given empty :body" do
 
-      let(:invalid_params)   { {profile_id: '1234321',  actions_id: '1234' } }
-      let(:error_message)   { {:subject => ["is missing"], :body => ["is missing"]} }
+      let(:params) { { subject: 'test', body: '', actions_id: '1234', resource_id: '1234', resource_name: 'person' }}
+      let(:error_message) {{:body => ['Please enter content']}}
 
-      before do
-        @result = subject.call(invalid_params)
-      end
 
-      it 'should throw errors' do
-        expect(@result.errors.to_h).to eq error_message
+      it "fails" do
+        expect(subject).not_to be_success
+        expect(subject.errors.to_h).to eq error_message
       end
     end
 
-    context "sending with all keys and values should not errors" do
+    describe "given empty :body and :subject" do
 
-      let(:valid_params)   { {profile_id: '1234321',  actions_id: '1234', subject: 'text', body: 'text' } }
+      let(:params) { { subject: '', body: '', actions_id: '1234', resource_id: '1234', resource_name: 'person' }}
+      let(:error_message) {{:subject => ['Please enter subject'], :body => ['Please enter content']}}
 
-      before do
-        @result = subject.call(valid_params)
-      end
 
-      it 'should return Dry::Validation::Result object' do
-        expect(@result).to be_a ::Dry::Validation::Result
-      end
-
-      it 'should not return any errors' do
-        expect(@result.errors.to_h).to be_empty
+      it "fails" do
+        expect(subject).not_to be_success
+        expect(subject.errors.to_h).to eq error_message
       end
     end
 
+    describe "given empty :resource_id and :resource_name" do
+
+      let(:params) { { subject: 'test', body: 'test', actions_id: '1234', resource_id: '', resource_name: '' }}
+      let(:error_message) {{:resource_id => ['Unable to find the resource'], :resource_name => ['Unable to find the resource']}}
+
+      it "fails" do
+        expect(subject).not_to be_success
+        expect(subject.errors.to_h).to eq error_message
+      end
+    end
+
+    describe "not passing :resource_id and :resource_name" do
+
+      let(:params) { { subject: 'test', body: 'test', actions_id: '1234'}}
+      let(:error_message) {{:resource_id => ['is missing'], :resource_name => ['is missing']}}
+
+      it "fails" do
+        expect(subject).not_to be_success
+        expect(subject.errors.to_h).to eq error_message
+      end
+    end
+
+    describe "not passing :resource_id, :subject, :actions_id, :body :resource_name" do
+
+      let(:params) { { }}
+      let(:error_message) {{:resource_id => ['is missing'], :resource_name => ['is missing'], :actions_id => ['is missing'], :subject => ['is missing'], :body => ['is missing']}}
+
+      it "fails" do
+        expect(subject).not_to be_success
+        expect(subject.errors.to_h).to eq error_message
+      end
+    end
+
+    describe "passing all values" do
+
+      let(:params) { { subject: 'test', body: 'test', actions_id: '1234', resource_id: '1234', resource_name: 'test' }}
+
+      it "passes" do
+        expect(subject).to be_success
+        expect(subject.errors.to_h).to be_empty
+      end
+    end
   end
 end
