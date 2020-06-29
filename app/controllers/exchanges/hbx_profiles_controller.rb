@@ -141,14 +141,14 @@ class Exchanges::HbxProfilesController < ApplicationController
     @subject = params[:subject].presence
     @body = params[:body].presence
     @element_to_replace_id = params[:actions_id]
-    @name = params[:name].presence
+    @resource_name = params[:resource_name].presence
     result = ::Operations::SecureMessageAction.new.call(params.permit!.to_h)
     @error_on_save = result.failure if result.failure?
     respond_to do |format|
       if @error_on_save
         format.js { render "send_secure_message_form" }
       else
-        format.js { flash[:notice] = "Message Sent successfully"  }
+        format.js { "Message Sent successfully"  }
       end
     end
   end
