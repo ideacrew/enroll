@@ -14,6 +14,22 @@ Feature: As a Super Admin I will have the ability to see and access "Send Secure
     When the user clicks the Send Secure Message button for this Employer
     Then the user will see the Send Secure Message option form
 
+  Scenario: HBX Staff with Super Admin sub roles should be able to send message
+    When the user clicks the Send Secure Message button for this Employer
+    Then the user will see the Send Secure Message option form
+    Then Admin enters form with subject and content and click send
+    Then Should see a dialog box for confirmation
+    Then Should click on confirm button
+    Then Should see success message
+
+  Scenario: HBX Staff with Super Admin sub roles will be able to cancel at confirmation
+    When the user clicks the Send Secure Message button for this Employer
+    Then the user will see the Send Secure Message option form
+    Then Admin enters form with subject and content and click send
+    Then Should see a dialog box for confirmation
+    Then Should click on cancel button
+    Then Should not see a dialog box for confirmation
+
   Scenario: Super Admin sub roles clicks the Send Secure Message Form recipient field should be populated
     When the user clicks the Send Secure Message button for this Employer
     Then the Recipient field should auto populate with the Employer groups name ABC Widgets

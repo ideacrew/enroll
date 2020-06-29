@@ -10,9 +10,35 @@ When(/^the user clicks the Send Secure Message button for this Employer$/) do
   find('.btn.btn-xs', text: 'Send Secure Message').click
 end
 
-Then("the Secure message form should have Subject and Content as required fields") do
+Then(/^the Secure message form should have Subject and Content as required fields$/) do
   find_field('subject')[:required].should be_present
   find_field('body')[:required].should be_present
+end
+
+Then(/^Admin enters form with subject and content and click send$/) do
+  fill_in 'subject', :with => 'Send Secure Subject.'
+  fill_in 'body', :with => 'Send secure message regarding.'
+  page.find('#send_secure_message').click
+end
+
+Then(/^Should( not)? see a dialog box for confirmation$/) do |visible|
+  if visible.blank?
+    page.find('#sendSecure')
+  else
+    expect(page).to_not have_text('Are you sure?')
+  end
+end
+
+Then(/^Should click on confirm button$/) do
+  find('.btn.btn-primary', text: 'CONFIRM').click
+end
+
+Then(/^Should click on cancel button$/) do
+  find('.btn.btn-default.pull-left', text: 'Cancel').click
+end
+
+Then(/^Should see success message$/) do
+  expect(page).to have_text('Message sent successfully')
 end
 
 Then(/^the user will see the Send Secure Message option form$/) do
@@ -37,7 +63,7 @@ Then(/^the user will not see the Send Secure Message option form$/) do
   expect(page).not_to have_button('Cancel', disabled: false)
 end
 
-When("the user clicks cancel button") do
+When(/^the user clicks cancel button$/) do
   find("#secureMessageFormClose").click
 end
 
