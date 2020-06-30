@@ -764,15 +764,65 @@ describe Person, :dbclean => :after_each do
     end
   end
 
-  describe "with no relationship to a dependent" do
-    describe "after ensure_relationship_with" do
-      it "should have the new relationship"
-    end
-  end
+  describe 'ensure_relationship_with' do
+    let(:person10) { FactoryBot.create(:person) }
 
-  describe "with an existing relationship to a dependent" do
-    describe "after ensure_relationship_with a different type of relationship" do
-      it "should correct the existing relationship"
+    describe 'with no relationship to a dependent' do
+      context 'after ensure_relationship_with' do
+        let(:person11) { FactoryBot.create(:person) }
+
+        before do
+          person10.ensure_relationship_with(person11, 'child')
+          person10.save!
+        end
+
+        it 'should have the new relationship' do
+          expect(person10.person_relationships.first.relative_id).to eq(person11.id)
+        end
+
+        it 'should have fixed number of relationships' do
+          expect(person10.person_relationships.count).to eq(1)
+        end
+      end
+    end
+
+    describe 'with an existing relationship to a dependent' do
+      context 'after ensure_relationship_with a different type of relationship' do
+        let(:person11) do
+          human = FactoryBot.create(:person)
+          person10.person_relationships << PersonRelationship.new(relative_id: human.id, kind: 'child')
+          person10.save!
+          human
+        end
+
+        before do
+          person10.ensure_relationship_with(person11, 'spouse')
+          person10.save!
+        end
+
+        it "should correct the existing relationship" do
+          expect(person10.person_relationships.first.kind).to eq('spouse')
+        end
+
+        it 'should not have the old relationship' do
+          expect(person10.person_relationships.count).to eq(1)
+        end
+      end
+    end
+
+    context 'should not create a relationship from self to self' do
+      before do
+        person10.ensure_relationship_with(person10, 'unrelated')
+        person10.save!
+      end
+
+      it 'should not create any relationships' do
+        expect(person10.person_relationships).to be_empty
+      end
+
+      it 'should have fixed number of relationships' do
+        expect(person10.person_relationships.count).to be_zero
+      end
     end
   end
 
