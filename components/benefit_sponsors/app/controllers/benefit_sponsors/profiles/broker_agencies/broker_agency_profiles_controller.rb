@@ -198,8 +198,8 @@ module BenefitSponsors
         end
 
         def eligible_brokers
-          Person.where('broker_role.benefit_sponsors_broker_agency_profile_id': {:$exists => true})
-                .where(:'broker_role.aasm_state' => 'active').any_in(:'broker_role.market_kind' => [person_market_kind, 'both'])
+          broker_profile_ids= BenefitSponsors::Organizations::Organization.broker_agency_profiles.approved_broker_agencies.broker_agencies_by_market_kind(['both', person_market_kind]).map(&:broker_agency_profile).pluck(:id)
+          Person.where(:"broker_role.benefit_sponsors_broker_agency_profile_id".in => broker_profile_ids, :"broker_role.aasm_state" => "active")
         end
 
         def update_ga_for_employers(broker_agency_profile, old_default_ga=nil)
