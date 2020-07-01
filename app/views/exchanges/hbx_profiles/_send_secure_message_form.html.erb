@@ -6,7 +6,7 @@
   </div>
 <%end%>
 
-<form id="secure_message_form">
+<form id="secure_message_form" onsubmit="return false;" >
   <div id="add_sep">
     <div class="bottom-pd">
       <div class="row no-buffer">
@@ -42,17 +42,33 @@
       </div>
     </div>
   </div>
+  <div class="modal" id="sendSecure" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-body">
+          <p>Are you sure?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary interaction-control-send" onclick='confirmSecureMsg(); return false;'>Confirm</button>
+          <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </form>
 
 
 <script type="text/javascript">
 
-  $(document).on('submit', '#secure_message_form', function(e) {
+  $(document).on('click', '#send_secure_message', function(e) {
+    if ( $('#secure_message_form')[0].checkValidity() ) {
+      $('#sendSecure').modal('show')
+    }
+  });
 
-    e.preventDefault();
-    e.stopImmediatePropagation();
-
-    $(".interaction-control-inbox-send").attr('disabled', 'disabled');
+  function confirmSecureMsg(){
+    $('.modal-backdrop').removeClass('modal-backdrop');
+    $('.modal-open').removeClass('modal-open');
 
     var formData = new FormData($('#secure_message_form')[0]);
 
@@ -61,9 +77,9 @@
       type: "POST",
       data : formData,
       contentType: false,
-      processData: false
+      processData: false,
     });
-  });
+  }
 
   function closeRow(element) {
     element.closest('tr').remove();
