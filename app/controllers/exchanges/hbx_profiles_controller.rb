@@ -136,6 +136,22 @@ class Exchanges::HbxProfilesController < ApplicationController
     @element_to_replace_id = params[:employer_actions_id]
   end
 
+  def send_secure_message
+    @profile = BenefitSponsors::Organizations::Profile.find(params[:resource_id]) if params[:resource_id].present?
+    @subject = params[:subject].presence
+    @body = params[:body].presence
+    @element_to_replace_id = params[:actions_id]
+    result = ::Operations::SecureMessageAction.new.call(params.permit!.to_h)
+    @error_on_save = result.failure if result.failure?
+    respond_to do |format|
+      if @error_on_save
+        format.js { render "send_secure_message_form" }
+      else
+        format.js { "Message Sent successfully"  }
+      end
+    end
+  end
+
   def disable_ssn_requirement
     @benfit_sponsorships = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:"_id".in => params[:ids])
 

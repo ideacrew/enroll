@@ -1,4 +1,12 @@
-<form>
+<%if @error_on_save %>
+  <div class='alert alert-error'><a class='close' data-dismiss='alert'>x</a>
+    <%@error_on_save.each do |err|%>
+      <li><%=err[1][0]%></li>
+    <%end%>
+  </div>
+<%end%>
+
+<form id="secure_message_form" onsubmit="return false;" >
   <div id="add_sep">
     <div class="bottom-pd">
       <div class="row no-buffer">
@@ -24,10 +32,25 @@
             </tr>
             </tbody>
           </table>
-          <%= hidden_field_tag :profile_id, @profile.present? ? @profile.id : nil %>
+          <% resource = @profile %>
+          <%= hidden_field_tag :resource_id, resource.id %>
+          <%= hidden_field_tag :resource_name, resource.class %>
           <%= hidden_field_tag :actions_id, @element_to_replace_id %>
           <%= button_tag 'Send', class: "btn btn-primary interaction-control-send", id: "send_secure_message"%>
           <button type="button" class="btn btn-default" id="secureMessageFormClose" onclick="closeRow(this)">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal" id="sendSecure" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-body">
+          <p>Are you sure?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary interaction-control-send" onclick='confirmSecureMsg(); return false;'>Confirm</button>
+          <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancel</button>
         </div>
       </div>
     </div>
@@ -36,6 +59,27 @@
 
 
 <script type="text/javascript">
+
+  $(document).on('click', '#send_secure_message', function(e) {
+    if ( $('#secure_message_form')[0].checkValidity() ) {
+      $('#sendSecure').modal('show')
+    }
+  });
+
+  function confirmSecureMsg(){
+    $('.modal-backdrop').removeClass('modal-backdrop');
+    $('.modal-open').removeClass('modal-open');
+
+    var formData = new FormData($('#secure_message_form')[0]);
+
+    $.ajax({
+      url: '/exchanges/hbx_profiles/send_secure_message.js',
+      type: "POST",
+      data : formData,
+      contentType: false,
+      processData: false,
+    });
+  }
 
   function closeRow(element) {
     element.closest('tr').remove();
