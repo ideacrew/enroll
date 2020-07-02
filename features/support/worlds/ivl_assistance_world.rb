@@ -17,7 +17,7 @@ module IvlAssistanceWorld
 
   def create_tax_household_and_eligibility_determination(family)
     tax_household = TaxHousehold.new(
-      effective_starting_on: (TimeKeeper.date_of_record - 30.days),
+      effective_starting_on: TimeKeeper.date_of_record,
       is_eligibility_determined: true,
       submitted_at: TimeKeeper.date_of_record
       )
@@ -28,7 +28,7 @@ module IvlAssistanceWorld
       source: 'Admin',
       max_aptc: 100.00,
       csr_percent_as_integer: 100,
-      determined_at: (TimeKeeper.date_of_record - 30.days)
+      determined_at: TimeKeeper.date_of_record
       )
     tax_household.eligibility_determinations.each { |ed| ed.save!}
     tax_household.save!
