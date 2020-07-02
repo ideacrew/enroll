@@ -7,6 +7,7 @@ field_names = %w[First_Name
                  Last_Name
                  HBX_ID
                  IC_Number
+                 Determination_Effective_Date
                  Current_APTC_Max
                  Current_CSR_Percentage
                  Current_CSR_Eligibility_Kind
@@ -30,14 +31,15 @@ CSV.open(file_name, 'w', force_quotes: true) do |csv|
       active_enrollments.each do |enrollment|
         product = enrollment.product
         csv << [primary_person.first_name, primary_person.last_name, primary_person.hbx_id, e_case_id,
-                eligibility_determination.max_aptc.to_f, eligibility_determination.csr_percent_as_integer,
-                eligibility_determination.csr_eligibility_kind, product.title, product.hios_id,
-                enrollment.applied_aptc_amount]
+                tax_household.effective_starting_on, eligibility_determination.max_aptc.to_f,
+                eligibility_determination.csr_percent_as_integer, eligibility_determination.csr_eligibility_kind,
+                product.title, product.hios_id, enrollment.applied_aptc_amount]
       end
     else
       csv << [primary_person.first_name, primary_person.last_name, primary_person.hbx_id, e_case_id,
-              eligibility_determination.max_aptc.to_f, eligibility_determination.csr_percent_as_integer,
-              eligibility_determination.csr_eligibility_kind, 'N/A', 'N/A', 'N/A']
+              tax_household.effective_starting_on, eligibility_determination.max_aptc.to_f,
+              eligibility_determination.csr_percent_as_integer, eligibility_determination.csr_eligibility_kind,
+              'N/A', 'N/A', 'N/A']
     end
   rescue StandardError => e
     puts "Unable to process family with id: #{family.id}, error: #{e.message}" unless Rails.env.test?
