@@ -11,7 +11,7 @@ class ExpirePriorYearIvlActiveEnrollments < MongoidMigrationTask
                      Enrollment_hbx_id
                      Aasm_state]
 
-    file_name = "#{Rails.root}/active_enrollments_in_prior_years_list.csv"
+    file_name = "#{Rails.root}/expired_active_enrollments_in_prior_years.csv"
 
     CSV.open(file_name, 'w', force_quotes: true) do |csv|
       csv << field_names

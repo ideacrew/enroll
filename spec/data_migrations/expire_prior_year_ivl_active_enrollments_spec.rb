@@ -30,14 +30,14 @@ describe ExpirePriorYearIvlActiveEnrollments, dbclean: :after_each do
     end
 
     after :each do
-      FileUtils.rm_rf("#{Rails.root}/active_enrollments_in_prior_years_list.csv")
+      FileUtils.rm_rf("#{Rails.root}/expired_active_enrollments_in_prior_years.csv")
     end
 
     context 'effective_on is in the prior year' do
       before :each do
         subject.migrate
         hbx_enrollment.reload
-        @file_content = CSV.read("#{Rails.root}/active_enrollments_in_prior_years_list.csv")
+        @file_content = CSV.read("#{Rails.root}/expired_active_enrollments_in_prior_years.csv")
       end
 
       it 'should add data to the file' do
@@ -65,7 +65,7 @@ describe ExpirePriorYearIvlActiveEnrollments, dbclean: :after_each do
       before :each do
         hbx_enrollment.update_attributes!(effective_on: TimeKeeper.date_of_record.beginning_of_year)
         subject.migrate
-        @file_content = CSV.read("#{Rails.root}/active_enrollments_in_prior_years_list.csv")
+        @file_content = CSV.read("#{Rails.root}/expired_active_enrollments_in_prior_years.csv")
       end
 
       it 'should not add any additional data to the file' do
