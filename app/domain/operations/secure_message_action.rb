@@ -25,7 +25,7 @@ module Operations
 
     def fetch_resource(validate_params)
       if validate_params[:resource_name].classify.constantize == Person
-        Success(true)
+        ::Operations::People::Find.new.call(person_id: validate_params[:resource_id])
       else
         BenefitSponsors::Operations::Profiles::FindProfile.new.call(profile_id: validate_params[:resource_id])
       end
