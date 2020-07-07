@@ -367,7 +367,9 @@ module Factories
       applicant = family.primary_applicant
       applicant ||= initialize_primary_applicant(family, person)
       person.relatives.each do |related_person|
-        family.add_family_member(related_person)
+        if family.find_family_member_by_person(related_person).is_active?
+          family.add_family_member(related_person)
+        end
       end
       dependents.each do |dependent|
         initialize_dependent(family, person, dependent)

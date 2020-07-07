@@ -705,9 +705,10 @@ class HbxEnrollment
         census_employee = role.census_employee
         self.kind = 'employer_sponsored_cobra'
         self.effective_on = census_employee.cobra_begin_date if census_employee.cobra_begin_date > self.effective_on
-        if census_employee.coverage_terminated_on.present? && !census_employee.have_valid_date_for_cobra?(current_user)
-          raise "You may not enroll for cobra after #{Settings.aca.shop_market.cobra_enrollment_period.months} months later of coverage terminated."
-        end
+        # removing 6 months eligibility rule for cobra EE during shopping, however the 6months rules needs to be validated during cobra initiation for CE.
+        # if census_employee.coverage_terminated_on.present? && !census_employee.have_valid_date_for_cobra?(current_user)
+        #   raise "You may not enroll for cobra after #{Settings.aca.shop_market.cobra_enrollment_period.months} months later of coverage terminated."
+        # end
       end
     end
   end
@@ -933,6 +934,7 @@ class HbxEnrollment
 
   def update_renewal_coverage
     return unless is_shop?
+    return if census_employee&.is_employee_in_term_pending?
 
     enrollment_benefit_application = sponsored_benefit_package.benefit_application
 
@@ -1404,7 +1406,7 @@ class HbxEnrollment
           # we always have benefit group unless QLE gives an effective date before plan year start on
           # return employee_role.census_employee.coverage_effective_on if benefit_group.blank?
           # benefit_group.effective_on_for(employee_role.hired_on)
-          employee_role.census_employee.coverage_effective_on(benefit_group)
+          employee_role.census_employee.coverage_effective_on(benefit_group).to_date
         end
       when 'individual'
         if qle && family.is_under_special_enrollment_period?
