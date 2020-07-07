@@ -1,0 +1,11 @@
+---
+registry:
+  - namespace:
+    - :enroll_app
+    - :aca_shop_market
+    features:
+      - key: :automation_of_ineligible_benefit_sponsors
+        is_enabled: true
+        settings:
+          - key: :ineligible_employer_transmission_day_of_month
+            item: 1

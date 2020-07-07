@@ -153,7 +153,8 @@ describe BenefitGroup, "instance methods", dbclean: :after_each do
     end
 
     it "should have same employer_max_amount" do
-      expect(benefit_list.map(&:employer_max_amt)).to eq Array.new(5, 200)
+      benefit_list_employer_max_amts = benefit_list.map(&:employer_max_amt)
+      expect(benefit_list_employer_max_amts.all? {|x| x == benefit_list_employer_max_amts[0]}).to eq(true)
     end
 
     it "should have different premium_pct" do

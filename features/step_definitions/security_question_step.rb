@@ -110,7 +110,8 @@ Then(/^I select the all security question and give the answer$/) do
       sleep 1
     end
 
-    page.all('.security-question-select', visible: false)[num].set("Security Question #{num + 1}")
+    # page.all('div.selectric-wrapper.selectric-security-question-select', visible: false)[num].find('.selectric-scroll').click
+    # page.all('.security-question-select', visible: false)[num].set("Security Question #{num + 1}") #TODO verify why we are setting question here.
     page.all('.interaction-field-control-security-question-response-question-answer', visible: false)[num].set("Answer #{num+1}")
   end
 end

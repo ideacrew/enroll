@@ -3,6 +3,7 @@ module BenefitSponsors
     class PricingDetermination
       include Mongoid::Document
       include Mongoid::Timestamps
+      include ::FloatHelper
 
       embedded_in :sponsored_benefit, class_name: "::BenefitSponsors::SponsoredBenefits::SponsoredBenefit", inverse_of: :pricing_determinations
       embeds_many :pricing_determination_tiers, class_name: "::BenefitSponsors::SponsoredBenefits::PricingDeterminationTier"
@@ -14,7 +15,7 @@ module BenefitSponsors
       field :participation_rate, type: Float, default: 0.01
 
       def participation_percent
-        participation_rate * 100.00
+        float_fix(participation_rate * 100.00)
       end
     
     end

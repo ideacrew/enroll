@@ -62,7 +62,7 @@ RSpec.describe User, :type => :model, dbclean: :after_each do
     end
 
     context 'when email doesnt match' do
-      let(:params){valid_params.deep_merge!({email: "test@test"})}
+      let(:params){valid_params.deep_merge!({email: "test@@test"})}
       it 'does not match' do
         expect(User.create(**params).errors[:email].any?).to be_truthy
         expect(User.create(**params).errors[:email]).to eq ["is invalid"]

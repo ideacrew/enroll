@@ -16,6 +16,7 @@ require 'factory_girl_rails'
 require 'test_prof'
 require 'test_prof/recipes/rspec/factory_default'
 require 'pundit/rspec'
+require 'climate_control'
 
 
 FactoryGirl.definition_file_paths = [
@@ -92,5 +93,20 @@ RSpec.configure do |config|
     DatabaseCleaner.clean
     example.run
     DatabaseCleaner.clean
+  end
+end
+
+if RUBY_VERSION>='2.6.0'
+  if Rails.version < '5'
+    class ActionController::TestResponse < ActionDispatch::TestResponse
+      def recycle!
+        # hack to avoid MonitorMixin double-initialize error:
+        @mon_mutex_owner_object_id = nil
+        @mon_mutex = nil
+        initialize
+      end
+    end
+  else
+    puts "Monkeypatch for ActionController::TestResponse no longer needed"
   end
 end

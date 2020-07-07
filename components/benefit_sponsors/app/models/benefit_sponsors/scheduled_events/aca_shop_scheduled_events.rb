@@ -17,6 +17,7 @@ module BenefitSponsors
         shop_daily_events
         auto_submit_renewal_applications
         # process_applications_missing_binder_payment #refs 39124 - Had to comment out as we got rid of states on BS.
+        auto_transmit_monthly_ineligible_benefit_sponsors
         auto_cancel_ineligible_applications
         auto_transmit_monthly_benefit_sponsors
         close_enrollment_quiet_period
@@ -108,6 +109,14 @@ module BenefitSponsors
         end
       end
 
+      def auto_transmit_monthly_ineligible_benefit_sponsors
+        if EnrollRegistry.feature_enabled?(:automation_of_ineligible_benefit_sponsors)
+          if (new_date.mday) == EnrollRegistry[:automation_of_ineligible_benefit_sponsors].setting(:ineligible_employer_transmission_day_of_month).item
+            auto_transmit_ineligible_renewal_benefit_sponsors(new_date)
+          end
+        end
+      end
+
       def transmit_scheduled_benefit_sponsors(new_date, feins=[])
         start_on = new_date.prev_day.next_month.beginning_of_month
         transition_at = (new_date.prev_day.mday + 1) == aca_shop_market_employer_transmission_day_of_month ? nil : new_date.prev_day
@@ -120,6 +129,15 @@ module BenefitSponsors
 
         initial_benefit_sponsorships = benefit_sponsors.may_transmit_initial_enrollment?(start_on, transition_at)
         execute_sponsor_event(initial_benefit_sponsorships, :transmit_initial_eligible_event)
+      end
+
+      def auto_transmit_ineligible_renewal_benefit_sponsors(new_date, feins=[])
+        start_on = new_date.prev_day.next_month.beginning_of_month
+        benefit_sponsors = BenefitSponsors::BenefitSponsorships::BenefitSponsorship
+        benefit_sponsors = benefit_sponsors.find_by_feins(feins) if feins.any?
+
+        ineligible_renewal_benefit_sponsorships = benefit_sponsors.may_transmit_as_renewal_ineligible?(start_on)
+        execute_sponsor_event(ineligible_renewal_benefit_sponsorships, :transmit_ineligible_renewal_carrier_drop_event)
       end
 
       def close_enrollment_quiet_period

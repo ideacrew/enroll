@@ -26,7 +26,7 @@ def build_csv_report(file_name_DC, file_name_MA, organizations)
 
     @products_info = load_products
 
-    organizations.each do |organization|
+    organizations.no_timeout.each do |organization|
       begin
         employer_profile = organization.employer_profile
         next if employer_profile.census_employees.blank?

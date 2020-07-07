@@ -2739,6 +2739,7 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
       context "enrollment that already terminated with future date" do
         context "with new future termination date" do
           it "should update enrollment with new end date and notify enrollment" do
+            enrollment.update_attributes(terminated_on: TimeKeeper.date_of_record.next_month.end_of_month)
             expect(enrollment).to receive(:notify).with("acapi.info.events.hbx_enrollment.terminated", {:reply_to=>glue_event_queue_name, "hbx_enrollment_id" => enrollment.hbx_id, "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment", "is_trading_partner_publishable" => false})
             enrollment.reterm_enrollment_with_earlier_date(TimeKeeper.date_of_record + 1.day, false)
             enrollment.reload
@@ -2779,6 +2780,7 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
       context "enrollment that already terminated with future date" do
         context "with new future termination date" do
           it "should update enrollment with new end date and notify enrollment" do
+            enrollment.update_attributes(terminated_on: TimeKeeper.date_of_record.next_month.end_of_month)
             expect(enrollment).to receive(:notify).with("acapi.info.events.hbx_enrollment.terminated", {:reply_to=>glue_event_queue_name, "hbx_enrollment_id" => enrollment.hbx_id, "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment", "is_trading_partner_publishable" => false})
             enrollment.reterm_enrollment_with_earlier_date(TimeKeeper.date_of_record + 1.day, false)
             enrollment.reload

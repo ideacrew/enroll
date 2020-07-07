@@ -62,7 +62,7 @@ class PlanCostDecoratorCongress < SimpleDelegator
 
   def total_employer_contribution
     return 0 if @member_provider.present? && @member_provider.is_cobra_status?
-    ([total_premium * employer_contribution_percent / 100.00, total_max_employer_contribution.cents/100.00].min).round(2)
+    ([total_premium.to_f * employer_contribution_percent / 100.00, total_max_employer_contribution.cents/100.00].min).round(2)
   end
 
   def total_employee_cost

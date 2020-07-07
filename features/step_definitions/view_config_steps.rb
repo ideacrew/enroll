@@ -29,6 +29,6 @@ Then(/^the user will not see the Time Tavel option$/) do
 end
 
 Then(/^the user will see the Time Tavel option$/) do
-  expect(page).to have_button('Set Current Date', disabled: "")
+  expect(page).to have_button('Set Current Date', disabled: false)
 end
 

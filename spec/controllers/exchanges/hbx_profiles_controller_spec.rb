@@ -841,7 +841,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
                          coverage_kind: "health",
                          kind: 'employer_sponsored',
                          effective_on: TimeKeeper.date_of_record.last_month.beginning_of_month,
-                         terminated_on: TimeKeeper.date_of_record.end_of_month,
+                         terminated_on: TimeKeeper.date_of_record.next_month.end_of_month,
                          aasm_state: 'coverage_termination_pending'
       )}
     let!(:glue_event_queue_name) { "#{Rails.application.config.acapi.hbx_id}.#{Rails.application.config.acapi.environment_name}.q.glue.enrollment_event_batch_handler" }

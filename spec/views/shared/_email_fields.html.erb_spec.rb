@@ -16,7 +16,7 @@ describe "shared/_email_fields.html.erb" do
   end
 
   it "should have a hidden input field" do
-    expect(rendered).to have_selector('input[type="hidden"]')
+    expect(rendered).to have_selector('input[type="hidden"]', visible: false)
   end
 
   it "should have a required input field" do

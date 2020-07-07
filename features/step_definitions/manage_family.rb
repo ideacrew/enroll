@@ -16,6 +16,7 @@ Then(/^Employee should click on Change my Password link$/) do
 end
 
 Then(/they can submit a new password/) do
+  sleep 1
   fill_in 'user[password]', with: "aA1!aA1!aA1!"
   sleep 1
   fill_in 'user[new_password]', with: "NewPass!@$1234"

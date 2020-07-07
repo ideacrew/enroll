@@ -47,7 +47,7 @@ describe "CcaCarrierProfilesMigration" do
     end
 
     it "should match attribute" do
-      expect(@migrated_organizations.first.issuer_profile.issuer_hios_ids.first).to eq @old_organizations.first.carrier_profile.issuer_hios_ids.first
+      expect(@migrated_organizations.first.issuer_profile.issuer_hios_ids.first).to eq @old_organizations.where(hbx_id: @migrated_organizations.first.hbx_id).first.carrier_profile.issuer_hios_ids.first
     end
 
     it "should match office locations" do
