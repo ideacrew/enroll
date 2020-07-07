@@ -34,6 +34,10 @@ Given(/^a Hbx admin with hbx_staff role exists$/) do
   hbx_admin_with_subrole 'hbx_staff'
 end
 
+Given(/^a Hbx admin with hbx_tier3 role exists$/) do
+  hbx_admin_with_subrole 'hbx_tier3'
+end
+
 Given(/^a Hbx admin with hbx_read_only role exists$/) do
   hbx_admin_with_subrole 'hbx_read_only'
 end
