@@ -16,7 +16,7 @@
             <tbody>
             <tr>
               <th>Recipient:</th>
-              <td>&nbsp; &nbsp;<b><%= @profile&.legal_name %></b></td>
+              <td>&nbsp; &nbsp;<b><%=  @resource.try(:full_name) ||  @resource.try(:legal_name) %></b></td>
             </tr>
             <tr>
               <th>Subject<span class="text-danger">*</span>:</th>
@@ -32,7 +32,7 @@
             </tr>
             </tbody>
           </table>
-          <% resource = @profile %>
+          <% resource = @resource %>
           <%= hidden_field_tag :resource_id, resource.id %>
           <%= hidden_field_tag :resource_name, resource.class %>
           <%= hidden_field_tag :actions_id, @element_to_replace_id %>
@@ -49,7 +49,7 @@
           <p>Are you sure?</p>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-primary interaction-control-send" onclick='confirmSecureMsg(); return false;'>Confirm</button>
+          <button type="button" class="btn btn-primary btn-confirmation" onclick='confirmSecureMsg(event); return false;'>Confirm</button>
           <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancel</button>
         </div>
       </div>
@@ -66,7 +66,12 @@
     }
   });
 
-  function confirmSecureMsg(){
+  function confirmSecureMsg(event){
+    $(".btn-confirmation").attr('disabled', 'disabled');
+
+    event.preventDefault();
+    event.stopImmediatePropagation();
+
     $('.modal-backdrop').removeClass('modal-backdrop');
     $('.modal-open').removeClass('modal-open');
 

@@ -10,6 +10,12 @@ When(/^the user clicks the Send Secure Message button for this Employer$/) do
   find('.btn.btn-xs', text: 'Send Secure Message').click
 end
 
+When(/^the user clicks the Send Secure Message button for this Person$/) do
+  skip_this_scenario unless ::EnrollRegistry.feature_enabled?(:send_secure_message_family)
+
+  find('.btn.btn-xs', text: 'Send Secure Message').click
+end
+
 Then(/^the Secure message form should have Subject and Content as required fields$/) do
   find_field('subject')[:required].should be_present
   find_field('body')[:required].should be_present

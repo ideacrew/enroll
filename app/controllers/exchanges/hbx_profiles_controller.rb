@@ -132,12 +132,12 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
   def send_secure_message_form
-    @profile = BenefitSponsors::Organizations::Profile.find(params[:profile_id]) if params[:profile_id]
-    @element_to_replace_id = params[:employer_actions_id]
+    @resource = get_resource_for_secure_form(params)
+    @element_to_replace_id = params[:employer_actions_id] || params[:family_actions_id]
   end
 
   def send_secure_message
-    @profile = BenefitSponsors::Organizations::Profile.find(params[:resource_id]) if params[:resource_id].present?
+    @resource = get_resource(params)
     @subject = params[:subject].presence
     @body = params[:body].presence
     @element_to_replace_id = params[:actions_id]
@@ -854,6 +854,24 @@ def employer_poc
 
   def permit_params
     params.permit!
+  end
+
+  def get_resource(params)
+    return nil if params[:resource_id].blank?
+
+    if params[:resource_name].classify.constantize == Person
+      Person.find(params[:resource_id])
+    else
+      BenefitSponsors::Organizations::Profile.find(params[:resource_id])
+    end
+  end
+
+  def get_resource_for_secure_form(params)
+    if params[:person_id].present?
+      Person.find(params[:person_id])
+    elsif params[:profile_id].present?
+      BenefitSponsors::Organizations::Profile.find(params[:profile_id])
+    end
   end
 
   def benefit_application_error_messages(obj)
