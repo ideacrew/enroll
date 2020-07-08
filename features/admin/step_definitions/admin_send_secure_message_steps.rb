@@ -1,6 +1,10 @@
 Then(/^the user will( not)? see the Send Secure Message button$/) do |visible|
   if visible.blank?
-    expect(page).to have_css('.btn.btn-xs', text: 'Send Secure Message')
+    if ::EnrollRegistry.feature_enabled?(:send_secure_message_employer) == true
+      expect(page).to have_css('.btn.btn-xs', text: 'Send Secure Message')
+    else
+      expect(page).to_not have_css('.btn.btn-xs', text: 'Send Secure Message')
+    end
   else
     expect(page).to_not have_css('.btn.btn-xs', text: 'Send Secure Message')
   end
