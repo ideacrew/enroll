@@ -1,15 +1,15 @@
 require 'csv'
 
-#this report generate current IVL and SHOP enrollees from EnrollApp. 
+#this report generate current IVL and SHOP enrollees from EnrollApp.
 # The task to run is RAILS_ENV=production bundle exec rake reports:enrollapp_report start_on="1/1/2020" end_on="12/31/2020"
-# 
+#
 namespace :reports do
   desc "List of ivl and shop enrollees from EnrollApp"
   task :enrollapp_report => :environment do
     start_on = ENV['start_on']
     end_on = ENV['end_on']
     enrollments = HbxEnrollment.where(
-      :"aasm_state".nin => ["shopping"],
+      :"aasm_state".in => ["coverage_enrolled", "coverage_selected", "coverage_termination_pending"],
       :effective_on => { "$gte" => Date.strptime(start_on, "%m/%d/%Y"), "$lt" => Date.strptime(end_on, "%m/%d/%Y")}
     )
     count = 0
@@ -24,7 +24,8 @@ namespace :reports do
               "Premium Amount", "Premium Total", "Policy APTC", "Policy Employer Contribution",
               "Coverage Start", "Coverage End",
               "Employer Name", "Employer DBA", "Employer FEIN", "Employer HBX ID",
-              "Home Address", "Mailing Address","Work Email", "Home Email", "Phone Number","Broker", "Race", "Ethnicity", "Citizen Status"]
+              "Home Address", "Mailing Address","Work Email", "Home Email", "Phone Number","Broker", "Race", "Ethnicity", "Citizen Status",
+              "Plan Year Start", "Plan Year End", "Plan Year Status"]
       while offset<= total_count
         enrollments.offset(offset).limit(batch_size).no_timeout.each do |enr|
           count += 1
@@ -40,6 +41,7 @@ namespace :reports do
               enr.hbx_enrollment_members.each do |en|
                 per = en.person
                 premium_amount = (enr.is_ivl_by_kind? ? enr.premium_for(en): (enr.decorated_hbx_enrollment.member_enrollments.find { |enrollment| enrollment.member_id == en.id }).product_price).to_f.round(2)
+                py = enr.sponsored_benefit_package&.benefit_application
                 next if per.blank?
                 csv << [
                   primary_person_hbx_id, per.hbx_id, enr.hbx_id, enr.aasm_state,
@@ -66,7 +68,10 @@ namespace :reports do
                   family&.active_broker_agency_account&.writing_agent&.person&.full_name,
                   per&.race,
                   per&.ethnicity,
-                  per&.citizen_status
+                  per&.citizen_status,
+                  py&.start_on,
+                  py&.end_on,
+                  py&.aasm_state
                 ]
               end
             end
