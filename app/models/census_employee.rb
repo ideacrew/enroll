@@ -132,12 +132,16 @@ class CensusEmployee < CensusMember
   index({"benefit_sponsors_employer_profile_id" => 1})
   index({"benefit_group_assignments._id" => 1})
   index({"benefit_group_assignments.benefit_group_id" => 1})
-  index({"benefit_group_assignments.aasm_state" => 1})
   index({"benefit_group_assignments.benefit_package_id" => 1})
-  index({"benefit_group_assignments.benefit_package_id" => 1,
-         "benefit_group_assignments.start_on" => 1,
-         "benefit_group_assignments.is_active" => 1 },
-        {name: "benefit_group_assignments_renewal_search_index"})
+  index(
+    {
+      "benefit_group_assignments.benefit_package_id" => 1,
+      "benefit_group_assignments.start_on" => 1,
+    },
+    {
+      name: "benefit_group_assignments_renewal_search_index"
+    }
+  )
 
   scope :active,            ->{ any_in(aasm_state: EMPLOYMENT_ACTIVE_STATES) }
   scope :terminated,        ->{ any_in(aasm_state: EMPLOYMENT_TERMINATED_STATES) }
@@ -155,7 +159,7 @@ class CensusEmployee < CensusMember
   scope :employee_profiles_terminated,         ->{ where(aasm_state: "employment_terminated")}
   scope :eligible_without_term_pending, ->{ any_in(aasm_state: (ELIGIBLE_STATES - PENDING_STATES)) }
 
-  scope :by_benefit_package_and_assignment_on_or_later, ->(benefit_package, effective_on, is_active) do
+  scope :by_benefit_package_and_assignment_on_or_later, ->(benefit_package, effective_on) do
     where(
       :benefit_group_assignments => {
         :$elemMatch => {
@@ -171,21 +175,48 @@ class CensusEmployee < CensusMember
   end
 
   #TODO - need to add fix for multiple plan years
+  # AASM_STATE deprecated for benefit group assignment
   # scope :enrolled,    ->{ where("benefit_group_assignments.aasm_state" => ["coverage_selected", "coverage_waived"]) }
   # scope :covered,     ->{ where( "benefit_group_assignments.aasm_state" => "coverage_selected" ) }
   # scope :waived,      ->{ where( "benefit_group_assignments.aasm_state" => "coverage_waived" ) }
+  
+  # TODO: Need to refactor others like this to compensate for no aasm state
+  scope :covered, -> {
+    ces_with_covered_start_ons_and_enrollments = where(
+      :"benefit_group_assignments" => {
+        :$elemMatch => { :hbx_enrollment_id.nin => [nil], :start_on.lte => TimeKeeper.date_of_record }
+      }
+    )
+    covered_ce_ids = ces_with_covered_start_ons_and_enrollments.select do |ce|
+      if [ce.active_benefit_group_assignment, ce.active_benefit_group_assignment&.hbx_enrollment_id].all?
+        HbxEnrollment::ENROLLED_STATUSES.include?(ce.active_benefit_group_assignment.hbx_enrollment.aasm_state)
+      elsif ce.employee_role
+        HbxEnrollment.where(employee_role_id: ce.employee_role.id, :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES).present?
+      end
+    end.map(&:id)
+    where(:"_id".in => covered_ce_ids)
+  }
 
-  scope :covered,    ->{ where(:"benefit_group_assignments" => {
-    :$elemMatch => { :aasm_state => "coverage_selected", :is_active => true }
-    })}
+  scope :waived, -> {
+    ces_with_hbx_enrollments = where(
+      :"benefit_group_assignments" => {
+        :$elemMatch => { :hbx_enrollment_id.nin => [nil]}
+      }
+    )
+    enrolled_ce_ids = ces_with_hbx_enrollments.select do |ce|
+      if [ce.active_benefit_group_assignment, ce.active_benefit_group_assignment&.hbx_enrollment_id].all?
+        HbxEnrollment::WAIVED_STATUSES.include?(ce.active_benefit_group_assignment.hbx_enrollment.aasm_state)
+      elsif ce.employee_role
+        HbxEnrollment.where(employee_role_id: ce.employee_role.id, :aasm_state.in => HbxEnrollment::WAIVED_STATUSES).present?
+      end
+    end.map(&:id)
+    where(:"_id".in => enrolled_ce_ids)
+  }
+
 
   scope :covered_progressbar,    ->{ where(:"benefit_group_assignments" => {
-    :$elemMatch => { :aasm_state.in => ["coverage_selected","coverage_renewing"], :is_active => true }
-    })}
-
-  scope :waived,    ->{ where(:"benefit_group_assignments" => {
-    :$elemMatch => { :aasm_state => "coverage_waived", :is_active => true }
-    })}
+    :$elemMatch => { :aasm_state.in => ["coverage_selected","coverage_renewing"]}
+  })}
 
   scope :enrolled, -> { any_of([covered.selector, waived.selector]) }
 
@@ -203,13 +234,12 @@ class CensusEmployee < CensusMember
   scope :by_benefit_group_ids,            ->(benefit_group_ids) { any_in("benefit_group_assignments.benefit_group_id" => benefit_group_ids) }
   scope :by_ssn,                          ->(ssn) { where(encrypted_ssn: CensusMember.encrypt_ssn(ssn)).and(:encrypted_ssn.nin => ["", nil]) }
 
-  scope :by_benefit_package_and_assignment_on,->(benefit_package, effective_on, is_active) {
+  scope :by_benefit_package_and_assignment_on,->(benefit_package, effective_on) {
     where(:"benefit_group_assignments" => {
       :$elemMatch =>
       {
         :benefit_package_id => benefit_package.id,
         :start_on => effective_on,
-        :is_active => is_active
       }
     })
   }
@@ -421,18 +451,20 @@ class CensusEmployee < CensusMember
       end
     end
   end
-
-  # Deactuives benefit group assignments for the given +benefit_package_ids+.
+  
+  # TODO: Need to figure out wha the criteria for "deactivate" here is.
+  # Maybe can delete this, doesn't seem to be called anywhere.
+  # Deactivates benefit group assignments for the given +benefit_package_ids+.
   # @param benefit_package_ids [Array<Integer>]
-  def deactive_benefit_group_assignments(benefit_package_ids)
-    assignments = benefit_group_assignments.where(:benefit_package_id.in => benefit_package_ids)
-    assignments.each do |assignment|
-      if assignment.may_delink_coverage?
-        assignment.delink_coverage!
-        assignment.update_attribute(:is_active, false)
-      end
-    end
-  end
+  # def deactive_benefit_group_assignments(benefit_package_ids)
+  #  assignments = benefit_group_assignments.where(:benefit_package_id.in => benefit_package_ids)
+  #  assignments.each do |assignment|
+  #    if assignment.may_delink_coverage?
+  #      assignment.delink_coverage!
+  #      assignment.update_attribute(:is_active, false)
+  #    end
+  #  end
+  # end
 
   # Assigns census employee to +benefit_package+ with +start_on+ being set to +assignment_on+.
   # @param benefit_package [BenefitPackage]
@@ -441,11 +473,10 @@ class CensusEmployee < CensusMember
   def assign_to_benefit_package(benefit_package, assignment_on)
     return if benefit_package.blank?
 
-    benefit_group_assignments.create(
+    benefit_group_assignments.create!(
       start_on: assignment_on,
       end_on:   benefit_package.effective_period.max,
       benefit_package: benefit_package,
-      is_active: false
     )
   end
 
@@ -563,6 +594,7 @@ class CensusEmployee < CensusMember
   end
 
   def active_benefit_group_assignment(coverage_date = TimeKeeper.date_of_record)
+    # TODO: Need to figure out if this should be considered
     benefit_package_assignment_on(coverage_date) || benefit_group_assignments.order_by(:start_on.asc).last
   end
 
@@ -639,7 +671,7 @@ class CensusEmployee < CensusMember
   end
 
   def is_covered_or_waived?
-    ["coverage_selected", "coverage_waived"].include?(active_benefit_group_assignment.aasm_state)
+    ["coverage_selected", "coverage_waived"].include?(active_benefit_group_assignment.hbx_enrollment.aasm_state)
   end
 
   def terminate_employment(employment_terminated_on)
@@ -711,8 +743,7 @@ class CensusEmployee < CensusMember
         end
       end
     end
-  end
-
+   end
 
    def terminate_employment!(employment_terminated_on)
     if may_schedule_employee_termination?
@@ -868,7 +899,7 @@ class CensusEmployee < CensusMember
   end
 
   def newhire_enrollment_eligible?
-    active_benefit_group_assignment.present? && active_benefit_group_assignment.initialized?
+    active_benefit_group_assignment.present?
   end
 
   # Deprecated in Main app
@@ -960,7 +991,7 @@ class CensusEmployee < CensusMember
         csv << %w(employer_assigned_family_id employee_relationship last_name first_name  middle_name name_sfx  email ssn dob gender  hire_date termination_date  is_business_owner benefit_group plan_year kind  address_1 address_2 city  state zip)
         csv << columns
         census_employees_query_criteria(employer_profile_id).each do |rec|
-          is_active = rec["benefit_group_assignments"].present? ? rec["benefit_group_assignments"].any?{|bga| bga["is_active"] == true} : false
+          is_active = rec["benefit_group_assignments"].present? ? rec["benefit_group_assignments"].any?{|bga| (bga["start_on"]..bga["end_on"]).cover?(TimeKeeper.date_of_record)} : false
           csv << insert_census_data(rec, is_active)
 
           if rec["census_dependents"].present?
@@ -1034,7 +1065,7 @@ class CensusEmployee < CensusMember
           {"$sort" => {"last_name" => 1, "first_name" => 1}},
           { "$project" => { "first_name" => 1, "last_name" => 1, "middle_name" => 1, "name_sfx" => 1,
                             "dob" => 1, "gender" => 1, "hired_on" => 1, "aasm_state" => 1, "encrypted_ssn" =>1,
-                            "employment_terminated_on" => 1, "benefit_group_assignments.is_active" => 1,
+                            "employment_terminated_on" => 1,
                             "email.address" => 1, "address" => 1, "employee_relationship" => 1,"is_business_owner" => 1,
                             "employer_assigned_family_id" => 1,
                             "census_dependents" => { "$concatArrays" => ["$census_dependents", "$census_dependents.email", "$census_dependents.address"] } } },
@@ -1393,7 +1424,7 @@ class CensusEmployee < CensusMember
 
   def waived?
     bga = renewal_benefit_group_assignment || active_benefit_group_assignment
-    return bga.present? ? bga.aasm_state == 'coverage_waived' : false
+    return bga.present? ? bga&.hbx_enrollment&.aasm_state == 'coverage_waived' : false
   end
 
   # TODO: Implement for 16219
@@ -1491,7 +1522,7 @@ class CensusEmployee < CensusMember
     assignments = benefit_group_assignments.select do |assignment|
       (assignment.start_on..assignment.benefit_end_date).cover?(coverage_date) && assignment.benefit_package.is_active
     end
-    assignments.detect(&:is_active) || assignments.sort_by(&:created_at).reverse.first
+    assignments.detect { |assignment| assignment.benefit_package.is_active } || assignments.sort_by(&:created_at).reverse.first
   end
 
   def ssn=(new_ssn)

@@ -933,7 +933,31 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
   end
 
   describe 'scopes' do
-    context 'by_benefit_package_and_assignment_on_or_later' do
+    context ".covered" do
+      let(:site)                  { build(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+      let(:benefit_sponsor)        { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile_initial_application, site: site) }
+      let(:benefit_sponsorship)    { benefit_sponsor.active_benefit_sponsorship }
+      let(:employer_profile)      {  benefit_sponsorship.profile }
+      let!(:benefit_package) { benefit_sponsorship.benefit_applications.first.benefit_packages.first}
+      let(:census_employee_for_scope_testing)   { FactoryBot.create(:census_employee, employer_profile: employer_profile) }
+      let(:household) { FactoryBot.create(:household, family: family)}
+      let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
+      let!(:enrollment) do
+        FactoryBot.create(:hbx_enrollment, household: household, family: family, aasm_state: 'coverage_selected', sponsored_benefit_package_id: census_employee_for_scope_testing.active_benefit_group_assignment.benefit_package.id)
+      end
+
+      before do
+        census_employee_for_scope_testing.active_benefit_group_assignment.hbx_enrollment_id = enrollment.id
+        census_employee_for_scope_testing.active_benefit_group_assignment.start_on = TimeKeeper.date_of_record
+        census_employee_for_scope_testing.active_benefit_group_assignment.save(:validate => false)
+      end
+
+      it "should return covered employees" do
+        expect(CensusEmployee.covered).to include(census_employee_for_scope_testing)
+      end
+    end
+
+ context 'by_benefit_package_and_assignment_on_or_later' do
       include_context "setup employees"
       before do
         date = TimeKeeper.date_of_record.beginning_of_month
@@ -1068,17 +1092,14 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     end
 
     let(:benefit_group_assignment) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee)}
-    before do
-      allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
-    end
 
     it "should return true when active_benefit_group_assignment is initialized" do
-      allow(benefit_group_assignment).to receive(:initialized?).and_return true
+      allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
       expect(census_employee.newhire_enrollment_eligible?).to eq true
     end
 
     it "should return false when active_benefit_group_assignment is not initialized" do
-      allow(benefit_group_assignment).to receive(:initialized?).and_return false
+      allow(census_employee).to receive(:active_benefit_group_assignment).and_return nil
       expect(census_employee.newhire_enrollment_eligible?).to eq false
     end
   end
@@ -1358,7 +1379,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
         benefit_sponsorship: benefit_sponsorship
       )
     end
-    let!(:benefit_group_assignment1) {FactoryBot.create(:benefit_group_assignment, benefit_group: renewal_application.benefit_packages.first, census_employee: census_employee, is_active: false, start_on: renewal_application.benefit_packages.first.start_on, end_on: renewal_application.benefit_packages.first.end_on)}
+    let!(:benefit_group_assignment1) {FactoryBot.create(:benefit_group_assignment, benefit_group: renewal_application.benefit_packages.first, census_employee: census_employee, start_on: renewal_application.benefit_packages.first.start_on, end_on: renewal_application.benefit_packages.first.end_on)}
 
     it 'should have active benefit group assignment' do
       expect(census_employee.active_benefit_group_assignment.present?).to be_truthy
@@ -1394,46 +1415,98 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     end
 
     context 'when benefit group assignment with benefit group already exists' do
-      let!(:blue_collar_benefit_group_assignment) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: blue_collar_benefit_group, census_employee: census_employee, is_active: false, start_on: blue_collar_benefit_group.start_on, end_on: blue_collar_benefit_group.end_on)}
-      let!(:white_collar_benefit_group_assignment) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: white_collar_benefit_group, census_employee: census_employee, is_active: true, start_on: white_collar_benefit_group.start_on, end_on: white_collar_benefit_group.end_on)}
-
-      # Dependency on make_active
-      # it 'should activate existing benefit_group_assignment' do
-      #   expect(census_employee.benefit_group_assignments.size).to eq 2
-      #   expect(census_employee.active_benefit_group_assignment).to eq white_collar_benefit_group_assignment
-      #   census_employee.find_or_create_benefit_group_assignment([blue_collar_benefit_group])
-      #   expect(census_employee.benefit_group_assignments.size).to eq 2
-      #   expect(census_employee.active_benefit_group_assignment).to eq blue_collar_benefit_group_assignment
-      # end
+      let!(:blue_collar_benefit_group_assignment) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: blue_collar_benefit_group, census_employee: census_employee)}
+      let!(:white_collar_benefit_group_assignment) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: white_collar_benefit_group, census_employee: census_employee)}
+      
+      before do
+        [blue_collar_benefit_group_assignment, white_collar_benefit_group_assignment].each do |bga|
+          if bga.census_employee.employee_role_id.nil?
+            person = FactoryBot.create(:person, :with_family, first_name: bga.census_employee.first_name, last_name: bga.census_employee.last_name, dob: bga.census_employee.dob, ssn: bga.census_employee.ssn)
+            family = person.primary_family
+            employee_role = person.employee_roles.build(census_employee_id: bga.census_employee.id, ssn: person.ssn, hired_on: bga.census_employee.hired_on, benefit_sponsors_employer_profile_id: bga.census_employee.benefit_sponsors_employer_profile_id)
+            employee_role.save!
+            employee_role = person.employee_roles.last
+            bga.census_employee.update_attributes!(employee_role_id: employee_role.id)
+          else
+            person = bga.census_employee.employee_role.person
+            family = person.primary_family
+          end
+          hbx_enrollment = FactoryBot.create(
+            :hbx_enrollment,
+            household: family.households.last,
+            family: family,
+            coverage_kind: "health",
+            kind: "employer_sponsored",
+            benefit_sponsorship_id: bga.census_employee.benefit_sponsorship.id,
+            employee_role_id: bga.census_employee.employee_role_id,
+            sponsored_benefit_package_id: bga.benefit_package_id,
+          )
+          bga.update_attributes!(hbx_enrollment_id: hbx_enrollment.id)
+        end
+      end
+      it 'should activate existing benefit_group_assignment' do
+        expect(census_employee.benefit_group_assignments.size).to eq 2
+        expect(census_employee.active_benefit_group_assignment).to eq white_collar_benefit_group_assignment
+        census_employee.find_or_create_benefit_group_assignment([blue_collar_benefit_group])
+        expect(census_employee.benefit_group_assignments.size).to eq 2
+        census_employee.reload
+        expect(census_employee.active_benefit_group_assignment).to eq blue_collar_benefit_group_assignment
+      end
     end
 
     context 'when multiple benefit group assignments with benefit group exists' do
-      let!(:blue_collar_benefit_group_assignment1) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: blue_collar_benefit_group, census_employee: census_employee, created_at: TimeKeeper.date_of_record - 2.days, is_active: false)}
-      let!(:blue_collar_benefit_group_assignment2) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: blue_collar_benefit_group, census_employee: census_employee, created_at: TimeKeeper.date_of_record - 1.day, is_active: false)}
-      let!(:blue_collar_benefit_group_assignment3) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: blue_collar_benefit_group, census_employee: census_employee, is_active: false)}
-      let!(:white_collar_benefit_group_assignment) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: white_collar_benefit_group, census_employee: census_employee, is_active: true)}
+      let!(:blue_collar_benefit_group_assignment1) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: blue_collar_benefit_group, census_employee: census_employee, created_at: TimeKeeper.date_of_record - 2.days)}
+      let!(:blue_collar_benefit_group_assignment2) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: blue_collar_benefit_group, census_employee: census_employee, created_at: TimeKeeper.date_of_record - 1.day)}
+      let!(:blue_collar_benefit_group_assignment3) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: blue_collar_benefit_group, census_employee: census_employee)}
+      let!(:white_collar_benefit_group_assignment) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: white_collar_benefit_group, census_employee: census_employee)}
 
       before do
-        blue_collar_benefit_group_assignment1.aasm_state = 'coverage_selected'
+        expect(census_employee.benefit_group_assignments.size).to eq 4
+        [blue_collar_benefit_group_assignment1, blue_collar_benefit_group_assignment2].each do |bga|
+          if bga.census_employee.employee_role_id.nil?
+            person = FactoryBot.create(:person, :with_family, first_name: bga.census_employee.first_name, last_name: bga.census_employee.last_name, dob: bga.census_employee.dob, ssn: bga.census_employee.ssn)
+            family = person.primary_family
+            employee_role = person.employee_roles.build(census_employee_id: bga.census_employee.id, ssn: person.ssn, hired_on: bga.census_employee.hired_on, benefit_sponsors_employer_profile_id: bga.census_employee.benefit_sponsors_employer_profile_id)
+            employee_role.save!
+            employee_role = person.employee_roles.last
+            bga.census_employee.update_attributes!(employee_role_id: employee_role.id)
+          else
+            person = bga.census_employee.employee_role.person
+            family = person.primary_family
+          end
+          hbx_enrollment = FactoryBot.create(
+            :hbx_enrollment,
+            household: family.households.last,
+            family: family,
+            coverage_kind: "health",
+            kind: "employer_sponsored",
+            benefit_sponsorship_id: bga.census_employee.benefit_sponsorship.id,
+            employee_role_id: bga.census_employee.employee_role_id,
+            sponsored_benefit_package_id: bga.benefit_package_id,
+          )
+          bga.update_attributes!(hbx_enrollment_id: hbx_enrollment.id)
+        end
+        blue_collar_benefit_group_assignment1.hbx_enrollment.aasm_state = 'coverage_selected'
         blue_collar_benefit_group_assignment1.save!(:validate => false)
-        blue_collar_benefit_group_assignment2.aasm_state = 'coverage_waived'
-        blue_collar_benefit_group_assignment2.save!(:validate => false)
+        blue_collar_benefit_group_assignment2.hbx_enrollment.aasm_state = 'coverage_waived'
+        blue_collar_benefit_group_assignment2.hbx_enrollment.save!(:validate => false)
       end
 
-      # Dependency on make_active
-      # it 'should activate benefit group assignment with valid enrollment status' do
-      #   expect(census_employee.benefit_group_assignments.size).to eq 4
-      #   expect(census_employee.active_benefit_group_assignment).to eq white_collar_benefit_group_assignment
-      #   expect(blue_collar_benefit_group_assignment2.activated_at).to be_nil
-      #   census_employee.find_or_create_benefit_group_assignment([blue_collar_benefit_group])
-      #   expect(census_employee.benefit_group_assignments.size).to eq 4
-      #   expect(census_employee.active_benefit_group_assignment(blue_collar_benefit_group.start_on)).to eq blue_collar_benefit_group_assignment2
-      #   expect(blue_collar_benefit_group_assignment2.activated_at).not_to be_nil
-      # end
+
+      it 'should activate benefit group assignment with valid enrollment status' do
+        expect(census_employee.benefit_group_assignments.size).to eq 4
+        expect(census_employee.active_benefit_group_assignment).to eq white_collar_benefit_group_assignment
+        expect(blue_collar_benefit_group_assignment2.activated_at).to be_nil
+        census_employee.find_or_create_benefit_group_assignment([blue_collar_benefit_group])
+        expect(census_employee.benefit_group_assignments.size).to eq 4
+        expect(census_employee.active_benefit_group_assignment(blue_collar_benefit_group.start_on)).to eq blue_collar_benefit_group_assignment2
+        blue_collar_benefit_group_assignment2.reload
+        expect(blue_collar_benefit_group_assignment2.activated_at).not_to be_nil
+      end
     end
 
     context 'when none present with given benefit group' do
-      let!(:blue_collar_benefit_group_assignment) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: blue_collar_benefit_group, census_employee: census_employee, is_active: true)}
+      let!(:blue_collar_benefit_group_assignment) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: blue_collar_benefit_group, census_employee: census_employee)}
       it 'should create new benefit group assignment' do
         expect(census_employee.benefit_group_assignments.size).to eq 1
         expect(census_employee.active_benefit_group_assignment.benefit_group).to eq blue_collar_benefit_group
@@ -1675,7 +1748,6 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
         aasm_state: "coverage_terminated",
         terminated_on: TimeKeeper.date_of_record,
         coverage_kind: 'health'
-        # family: census_employee.employee_role.person.primary_family
       )
     end
 
@@ -1814,7 +1886,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       )
       person = FactoryBot.create(:person, last_name: ce.last_name, first_name: ce.first_name)
       employee_role = FactoryBot.build(:benefit_sponsors_employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
-      FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: renewal_application.benefit_packages.first, census_employee: ce, is_active: false)
+      FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: renewal_application.benefit_packages.first, census_employee: ce)
       ce.update_attributes({employee_role: employee_role})
       Family.find_or_build_from_employee_role(employee_role)
       ce
@@ -1917,7 +1989,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     it 'should return auto renewing health enrollment' do
       renewal_application.approve_application! if renewal_application.may_approve_application?
       benefit_sponsorship.benefit_applications << renewal_application
-      benefit_sponsorship.save
+      benefit_sponsorship.save!
       expect(census_employee.enrollments_for_display[0]).to eq auto_renewing_health_enrollment
     end
 
@@ -1963,13 +2035,13 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
 
       person = FactoryBot.create(:person, last_name: ce.last_name, first_name: ce.first_name)
       employee_role = FactoryBot.build(:benefit_sponsors_employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
-      FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: renewal_application.benefit_packages.first, census_employee: ce, is_active: false)
+      FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: renewal_application.benefit_packages.first, census_employee: ce)
       ce.update_attributes({employee_role: employee_role})
       Family.find_or_build_from_employee_role(employee_role)
       ce
     end
 
-    let(:past_benefit_group_assignment) { FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: benefit_application.benefit_packages.first, census_employee: census_employee, is_active: false) }
+    let(:past_benefit_group_assignment) { FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: benefit_application.benefit_packages.first, census_employee: census_employee) }
 
     let!(:enrollment) do
       FactoryBot.create(
@@ -2165,21 +2237,25 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
                        benefit_sponsorship: organization.active_benefit_sponsorship,
                        benefit_group_assignments: [benefit_group_assignment]
     end
-    let(:benefit_group_assignment) {FactoryBot.build(:benefit_sponsors_benefit_group_assignment, benefit_group: benefit_group, aasm_state: "coverage_waived")}
+    let(:waived_hbx_enrollment_double) { double(aasm_state: 'coverage_waived') }
+    let(:coverage_selected_hbx_enrollment_double) { double(aasm_state: 'coverage_selected') }
+
+    let(:benefit_group_assignment) {FactoryBot.build(:benefit_sponsors_benefit_group_assignment, benefit_group: benefit_group)}
 
     it "returns true when employees waive the coverage" do
+      allow(benefit_group_assignment).to receive(:hbx_enrollment).and_return(waived_hbx_enrollment_double)
       expect(census_employee.waived?).to be_truthy
     end
     it "returns false for employees who are enrolling" do
-      benefit_group_assignment.aasm_state = "coverage_selected"
+      allow(benefit_group_assignment).to receive(:hbx_enrollment).and_return(coverage_selected_hbx_enrollment_double)
       expect(census_employee.waived?).to be_falsey
     end
   end
 
-  context "when active employeees has renewal benifit group" do
+  context "when active employeees has renewal benefit group" do
     let(:census_employee) {CensusEmployee.new(**valid_params)}
     let(:benefit_group_assignment) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee)}
-
+    let(:waived_hbx_enrollment_double) { double(aasm_state: 'coverage_waived') }
     before do
       benefit_group_assignment.update_attribute(:updated_at, benefit_group_assignment.updated_at + 1.day)
       benefit_group_assignment.plan_year.update_attribute(:aasm_state, "renewing_enrolled")
@@ -2189,7 +2265,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       expect(census_employee.waived?).to be_falsey
     end
     it "returns false for employees who are enrolling" do
-      benefit_group_assignment.aasm_state = "coverage_waived"
+      allow(benefit_group_assignment).to receive(:hbx_enrollment).and_return(waived_hbx_enrollment_double)
       expect(census_employee.waived?).to be_truthy
     end
   end
@@ -2385,7 +2461,6 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       it "should return latest bga for given coverage_date" do
         bga = census_employee.benefit_group_assignments.first
         coverage_date = bga.start_on
-        bga.update_attributes(is_active: false)
         bga1 = bga.dup
         bga.update_attributes(created_at: bga.created_at - 1.day)
         census_employee.benefit_group_assignments << bga1
@@ -2405,8 +2480,6 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       end
 
       it "should return renewal benefit_package if given effective_on date is in renewal benefit application" do
-        census_employee.active_benefit_group_assignment.update_attributes!(is_active: false)
-        census_employee.benefit_group_assignments.first.benefit_package.update_attributes!(is_active: false)
         benefit_group_assignment_two
         coverage_date = renewal_application.start_on
         expect(census_employee.benefit_package_for_date(coverage_date)).to eq renewal_application.benefit_packages.first
@@ -2443,8 +2516,6 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
         census_employee.benefit_group_assignments.where(:benefit_package_id.in => benefit_application.benefit_packages.map(&:id)).each do |bga|
           # when there is both MYC & Imported Plan years, is_active for imported plan year's bga's should be false
           # to allow plan shop through myc plan years
-          bga.update_attributes!(is_active: false)
-          bga.benefit_package.update_attributes!(is_active: false)
         end
         expect(census_employee.benefit_package_for_date(coverage_date)).to eq myc_application.benefit_packages.first
       end
@@ -2579,8 +2650,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       ce
     end
 
-    let!(:active_bga) { FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: renewal_benefit_group, census_employee: census_employee, is_active: true) }
-    let!(:inactive_bga) { FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: current_benefit_package, census_employee: census_employee, is_active: false) }
+    let!(:active_bga) { FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: renewal_benefit_group, census_employee: census_employee) }
+    let!(:inactive_bga) { FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: current_benefit_package, census_employee: census_employee) }
 
     let!(:active_enrollment) do
       FactoryBot.create(
@@ -2626,7 +2697,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
         active_enrollment.reload
       end
 
-      it "should termiante, expired enrollment with terminated date = ee coverage termination date" do
+      it "should terminate, expired enrollment with terminated date = ee coverage termination date" do
 
         expect(expired_enrollment.aasm_state).to eq "coverage_terminated"
         expect(expired_enrollment.terminated_on).to eq TimeKeeper.date_of_record.last_month.end_of_month - 2.months

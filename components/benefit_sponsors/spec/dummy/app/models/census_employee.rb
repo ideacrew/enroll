@@ -72,13 +72,12 @@ class CensusEmployee < CensusMember
   scope :active_alone,      ->{ any_in(aasm_state: EMPLOYMENT_ACTIVE_ONLY) }
   scope :by_ssn,            ->(ssn) { where(encrypted_ssn: CensusMember.encrypt_ssn(ssn)).and(:encrypted_ssn.nin => ["", nil]) }
 
-  scope :by_benefit_package_and_assignment_on_or_later,->(benefit_package, effective_on, is_active) do
+  scope :by_benefit_package_and_assignment_on_or_later,->(benefit_package, effective_on) do
     where(
       :benefit_group_assignments => {
         :$elemMatch => {
           :start_on.gte => effective_on,
-          :benefit_package_id => benefit_package.id,
-          :is_active => is_active
+          :benefit_package_id => benefit_package.id
         }
       }
     )
@@ -339,9 +338,8 @@ class CensusEmployee < CensusMember
   def find_or_create_benefit_group_assignment(benefit_packages)
     if benefit_packages.present?
       bg_assignments = benefit_group_assignments.where(:benefit_package_id.in => benefit_packages.map(&:_id)).order_by(:'created_at'.desc)
-
       if bg_assignments.present?
-        valid_bg_assignment = bg_assignments.where(:aasm_state.ne => 'initialized').first || bg_assignments.first
+        valid_bg_assignment = bg_assignments.detect { |bg_assignment| HbxEnrollment::ENROLLED_STATUSES.include?(bg_assignment.hbx_enrollment.aasm_state) } || bg_assignments.first
         valid_bg_assignment.make_active
       else
         add_benefit_group_assignment(benefit_packages.first, benefit_packages.first.benefit_application.start_on)
@@ -527,11 +525,10 @@ class CensusEmployee < CensusMember
   def assign_to_benefit_package(benefit_package, assignment_on)
     return if benefit_package.blank?
 
-    benefit_group_assignments.create(
+    benefit_group_assignments.create!(
         start_on: assignment_on,
         end_on:   benefit_package.effective_period.max,
         benefit_package: benefit_package,
-        is_active: false
     )
   end
 

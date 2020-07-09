@@ -6,7 +6,7 @@ module Eligibility
 
       py = employer_profile.plan_years.published.first || employer_profile.plan_years.where(aasm_state: 'draft').first
       if py.present?
-        if active_benefit_group_assignment.blank? || active_benefit_group_assignment.benefit_group.plan_year != py
+        if active_benefit_group_assignment.blank? || active_benefit_group_assignment&.benefit_group&.plan_year != py
           find_or_create_benefit_group_assignment(py.benefit_groups)
         end
       end
@@ -19,28 +19,27 @@ module Eligibility
     end
 
     # Deprecated
-    def find_or_create_benefit_group_assignment_deprecated(benefit_groups)
-      bg_assignments = benefit_group_assignments.where(:benefit_group_id.in => benefit_groups.map(&:_id)).order_by(:'created_at'.desc)
+    #def find_or_create_benefit_group_assignment_deprecated(benefit_groups)
+    #  bg_assignments = benefit_group_assignments.where(:benefit_group_id.in => benefit_groups.map(&:_id)).order_by(:'created_at'.desc)
 
-      if bg_assignments.present?
-        valid_bg_assignment = bg_assignments.where(:aasm_state.ne => 'initialized').first || bg_assignments.first
-        valid_bg_assignment.make_active
-      else
-        add_benefit_group_assignment(benefit_groups.first, benefit_groups.first.plan_year.start_on)
-      end
-    end
+    #  if bg_assignments.present?
+    #    valid_bg_assignment = bg_assignments.where(:aasm_state.ne => 'initialized').first || bg_assignments.first
+    #    valid_bg_assignment.make_active
+    #  else
+    #    add_benefit_group_assignment(benefit_groups.first, benefit_groups.first.plan_year.start_on)
+    #  end
+    #send
 
     def find_or_create_benefit_group_assignment(benefit_packages)
-      return find_or_create_benefit_group_assignment_deprecated(benefit_packages) if is_case_old?
 
       if benefit_packages.present?
         bg_assignments = benefit_group_assignments.where(:benefit_package_id.in => benefit_packages.map(&:_id)).order_by(:'created_at'.desc)
-
+        # TODO: Need to figure out if this should be considered
         if bg_assignments.present?
-          valid_bg_assignment = bg_assignments.where(:aasm_state.ne => 'initialized').first || bg_assignments.first
+          valid_bg_assignment =  bg_assignments.select { |bga| HbxEnrollment::ENROLLED_STATUSES.include?(bga.hbx_enrollment&.aasm_state) }.last || bg_assignments.first
           valid_bg_assignment.make_active
         else
-          add_benefit_group_assignment(benefit_packages.first, benefit_packages.first.benefit_application.start_on)
+          add_benefit_group_assignment(benefit_packages.first, benefit_packages.first.plan_year.start_on)
         end
       end
     end
@@ -56,7 +55,6 @@ module Eligibility
     # end
 
     def add_renew_benefit_group_assignment(renewal_benefit_packages)
-      return add_renew_benefit_group_assignment_deprecated(renewal_benefit_packages.first) if is_case_old?
       if renewal_benefit_packages.present?
         benefit_group_assignments.renewing.each do |benefit_group_assignment|
           if renewal_benefit_packages.map(&:id).include?(benefit_group_assignment.benefit_package.id)
@@ -64,7 +62,7 @@ module Eligibility
           end
         end
 
-        bga = BenefitGroupAssignment.new(benefit_group: renewal_benefit_packages.first, start_on: renewal_benefit_packages.first.start_on, is_active: false)
+        bga = BenefitGroupAssignment.new(benefit_group: renewal_benefit_packages.first, start_on: renewal_benefit_packages.first.start_on)
         benefit_group_assignments << bga
       end
     end
@@ -80,7 +78,7 @@ module Eligibility
         end
       end
 
-      bga = BenefitGroupAssignment.new(benefit_group: new_benefit_group, start_on: new_benefit_group.start_on, is_active: false)
+      bga = BenefitGroupAssignment.new(benefit_group: new_benefit_group, start_on: new_benefit_group.start_on)
       benefit_group_assignments << bga
     end
 
@@ -133,14 +131,14 @@ module Eligibility
     end
 
     def reset_active_benefit_group_assignments(new_benefit_group)
-      benefit_group_assignments.select { |assignment| assignment.is_active? }.each do |benefit_group_assignment|
+      benefit_group_assignments.select { |assignment| assignment.start_on <= TimeKeeper.date_of_record }.each do |benefit_group_assignment|
         end_on = benefit_group_assignment.end_on || (new_benefit_group.start_on - 1.day)
         if is_case_old?
           end_on = benefit_group_assignment.plan_year.end_on unless benefit_group_assignment.plan_year.coverage_period_contains?(end_on)
         else
           end_on = benefit_group_assignment.benefit_application.end_on unless benefit_group_assignment.benefit_application.effective_period.cover?(end_on)
         end
-        benefit_group_assignment.update_attributes(is_active: false, end_on: end_on)
+        benefit_group_assignment.update_attributes(end_on: end_on)
       end
     end
 

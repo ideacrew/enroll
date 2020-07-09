@@ -475,8 +475,8 @@ module BenefitSponsors
         end
       end
 
-      def eligible_assigned_census_employees(effective_date, is_active = true)
-        CensusEmployee.by_benefit_package_and_assignment_on_or_later(self, effective_date, is_active).non_term_and_pending
+      def eligible_assigned_census_employees(effective_date)
+        CensusEmployee.by_benefit_package_and_assignment_on_or_later(self, effective_date).non_term_and_pending
       end
 
       def assign_other_benefit_package(other_benefit_package)
@@ -490,7 +490,7 @@ module BenefitSponsors
       end
 
       def activate_benefit_group_assignments
-        CensusEmployee.by_benefit_package_and_assignment_on(self, start_on, false).non_terminated.each do |ce|
+        CensusEmployee.by_benefit_package_and_assignment_on(self, start_on).non_terminated.each do |ce|
           ce.benefit_group_assignments.each do |bga|
             if bga.benefit_package_id == self.id
               bga.make_active
@@ -499,11 +499,14 @@ module BenefitSponsors
         end
       end
 
+      # TODO: Figure this out and depracate
       def deactivate_benefit_group_assignments
         self.benefit_application.benefit_sponsorship.census_employees.each do |ce|
           benefit_group_assignments = ce.benefit_group_assignments.where(benefit_package_id: self.id)
           benefit_group_assignments.each do |benefit_group_assignment|
-            benefit_group_assignment.update(is_active: false) unless is_renewing?
+            # TODO: FIgure out what our new definition of deactivatin gwill be
+            # Maybe remove the dates?
+            # benefit_group_assignment.update(is_active: false) unless is_renewing?
           end
         end
       end
@@ -535,8 +538,8 @@ module BenefitSponsors
         sponsored_benefit_for(:dental).present?
       end
 
-      def census_employees_assigned_on(effective_date, is_active = true)
-        CensusEmployee.by_benefit_package_and_assignment_on(self, effective_date, is_active).non_term_and_pending
+      def census_employees_assigned_on(effective_date)
+        CensusEmployee.by_benefit_package_and_assignment_on(self, effective_date).non_term_and_pending
       end
 
       def census_employees_eligible_for_renewal(effective_date)
