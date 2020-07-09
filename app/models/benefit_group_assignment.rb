@@ -38,7 +38,7 @@ class BenefitGroupAssignment
       {
         :$or => [
           {:start_on.lte => compare_date, :end_on.gte => compare_date},
-          {:start_on => compare_date, :end_on => nil},
+          {:start_on.lte => compare_date, :end_on => nil},
           {:start_on.lte => compare_date, :end_on => nil, :is_active => true}
         ]
       }
@@ -57,8 +57,13 @@ class BenefitGroupAssignment
     # we need to deal with multiples returned
     #   1) canceled benefit group assignments
     #   2) multiple draft applications
-    if result.size > 1 && result.and(is_active: true).any?
-      result.and(is_active: true)
+    if result.size > 1
+      date_matched = result.and(start_on: compare_date)
+      if date_matched.any?
+        date_matched.and(is_active: true).any? ? date_matched.and(is_active: true) : date_matched
+      else
+        result.where(:end_on => {:exists => true}).any? ? result.where(:end_on => {:exists => true}) : result
+      end
     else
       result
     end
@@ -77,13 +82,30 @@ class BenefitGroupAssignment
     end
 
     def on_date(census_employee, date)
-      assignments = census_employee.benefit_group_assignments.cover_date(date)
+      assignments = census_employee.benefit_group_assignments
+      assignments_with_no_end_on, assignments_with_end_on = assignments.partition { |bga| bga.end_on.nil? }
 
-      if assignments.size > 1
-        assignments.detect{|assignment| assignment.end_on.blank? } || assignments.first
-      else
-        assignments.first
+      if assignments_with_end_on.present?
+        valid_assignments_with_end_on = assignments_with_end_on.select { |assignment| (assignment.start_on..assignment.end_on).cover?(date) }
+        if valid_assignments_with_end_on.size > 1
+          valid_assignments_with_end_on.sort_by { |assignment| (assignment.start_on.to_time - date.to_time).abs }.first
+        else
+          valid_assignments_with_end_on.first
+        end
+      elsif assignments_with_no_end_on.present?
+        valid_assignments_with_no_end_on = assignments_with_no_end_on.select { |assignment| (assignment.start_on..assignment.start_on.next_year.prev_day).cover?(date) }
+        if valid_assignments_with_no_end_on.size > 1
+          valid_assignments_with_no_end_on.detect { |assignment| assignment.is_active? } ||
+          valid_assignments_with_no_end_on.sort_by { |assignment| (assignment.start_on.to_time - date.to_time).abs }.first
+        else
+          valid_assignments_with_no_end_on.first
+        end
       end
+      # if assignments.size > 1
+      #   assignments.detect{|assignment| assignment.end_on.blank? } || assignments.first
+      # else
+      #   assignments.first
+      # end
     end
 
     def by_benefit_group_id(bg_id)

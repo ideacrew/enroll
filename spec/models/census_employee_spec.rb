@@ -1376,7 +1376,6 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       renewal_application.update_attributes(predecessor_id: benefit_application.id)
       benefit_sponsorship.benefit_applications << renewal_application
       benefit_group_assignment1.update_attributes(created_at: census_employee.benefit_group_assignments.last.created_at + 1.day)
-      census_employee.benefit_group_assignments << benefit_group_assignment1
       expect(census_employee.renewal_benefit_group_assignment.created_at).to eq benefit_group_assignment1.created_at
     end
   end
@@ -1426,7 +1425,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
         expect(blue_collar_benefit_group_assignment2.activated_at).to be_nil
         census_employee.find_or_create_benefit_group_assignment([blue_collar_benefit_group])
         expect(census_employee.benefit_group_assignments.size).to eq 4
-        expect(census_employee.active_benefit_group_assignment).to eq blue_collar_benefit_group_assignment2
+        expect(census_employee.active_benefit_group_assignment(blue_collar_benefit_group.start_on)).to eq blue_collar_benefit_group_assignment2
         expect(blue_collar_benefit_group_assignment2.activated_at).not_to be_nil
       end
     end
@@ -2198,11 +2197,10 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
 
     let(:renewal_benefit_group) { renewal_application.benefit_packages.first}
     let(:census_employee) {FactoryBot.create(:benefit_sponsors_census_employee, employer_profile: employer_profile, benefit_sponsorship: organization.active_benefit_sponsorship)}
-    let(:benefit_group_assignment_two) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: renewal_benefit_group, census_employee: census_employee)}
+    let(:benefit_group_assignment_two) { BenefitGroupAssignment.on_date(census_employee, renewal_effective_date) }
 
 
     it "should select the latest renewal benefit group assignment" do
-      benefit_group_assignment_two.update_attribute(:updated_at, benefit_group_assignment_two.updated_at + 1.day)
       expect(census_employee.renewal_benefit_group_assignment).to eq benefit_group_assignment_two
     end
   end
@@ -2406,7 +2404,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
 
       it "should return renewal benefit_package if given effective_on date is in renewal benefit application" do
         census_employee.active_benefit_group_assignment.update_attributes!(is_active: false)
-        census_employee.inactive_benefit_group_assignments.first.benefit_package.update_attributes!(is_active: false)
+        census_employee.benefit_group_assignments.first.benefit_package.update_attributes!(is_active: false)
         benefit_group_assignment_two
         coverage_date = renewal_application.start_on
         expect(census_employee.benefit_package_for_date(coverage_date)).to eq renewal_application.benefit_packages.first
@@ -2562,7 +2560,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
 
     include_context "setup renewal application"
 
-    let(:renewal_effective_date) { Date.new(2020,3,1) }
+    let(:renewal_effective_date) { TimeKeeper.date_of_record.beginning_of_month - 2.months }
     let(:predecessor_state) { :expired }
     let(:renewal_state) { :active }
     let(:renewal_benefit_group) { renewal_application.benefit_packages.first}
@@ -2616,11 +2614,12 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
 
     context "when EE termination date falls under expired application" do
       before do
-        census_employee.employment_terminated_on = TimeKeeper.date_of_record.last_month.end_of_month - 2.months
+        employment_terminated_on = TimeKeeper.date_of_record.last_month.end_of_month - 2.months
+        census_employee.employment_terminated_on = employment_terminated_on
         census_employee.coverage_terminated_on = TimeKeeper.date_of_record.last_month.end_of_month - 2.months
         census_employee.aasm_state = "employment_terminated"
         census_employee.save
-        census_employee.terminate_employee_enrollments
+        census_employee.terminate_employee_enrollments(employment_terminated_on)
         expired_enrollment.reload
         active_enrollment.reload
       end
@@ -2637,12 +2636,14 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     end
 
     context "when EE termination date falls under active application" do
+      let(:employment_terminated_on) { TimeKeeper.date_of_record.end_of_month }
+
       before do
-        census_employee.employment_terminated_on = TimeKeeper.date_of_record.end_of_month
+        census_employee.employment_terminated_on = employment_terminated_on
         census_employee.coverage_terminated_on = TimeKeeper.date_of_record.end_of_month
         census_employee.aasm_state = "employment_terminated"
         census_employee.save
-        census_employee.terminate_employee_enrollments
+        census_employee.terminate_employee_enrollments(employment_terminated_on)
         expired_enrollment.reload
         active_enrollment.reload
       end

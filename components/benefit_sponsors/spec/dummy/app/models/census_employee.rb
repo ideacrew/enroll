@@ -406,7 +406,7 @@ class CensusEmployee < CensusMember
     end
   end
 
-  def terminate_employee_enrollments
+  def terminate_employee_enrollments(employment_terminated_on)
     term_eligible_active_enrollments = active_benefit_group_enrollments.show_enrollments_sans_canceled.non_terminated if active_benefit_group_enrollments.present?
     term_eligible_renewal_enrollments = renewal_benefit_group_enrollments.show_enrollments_sans_canceled.non_terminated if renewal_benefit_group_enrollments.present?
     enrollments = (Array.wrap(term_eligible_active_enrollments) + Array.wrap(term_eligible_renewal_enrollments)).compact
@@ -443,7 +443,7 @@ class CensusEmployee < CensusMember
     else # Schedule Future Terminations as employment_terminated_on is in the future
       schedule_employee_termination! if may_schedule_employee_termination?
     end
-    terminate_employee_enrollments
+    terminate_employee_enrollments(employment_terminated_on)
     self
   end
 
