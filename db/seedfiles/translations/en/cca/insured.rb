@@ -388,7 +388,7 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.insured.plan_shoppings.print_waiver.print_waiver_html' => "<h3>Waiver confirmation</h3><p>You have successfully waived the coverage at %{updated_at}. </p><p>Waiver Reason : %{waiver_reason}. </p><p>Please print this page for your records. </p>",
   :'en.print' => "Print",
   :'en.insured.plan_shoppings.show.title' => "Enroll in a plan",
-  :'en.insured.plan_shoppings.show.title.content' => "Select the plan below that you’d like to enroll in. If you don’t want coverage because you have it through another source, please select Waive Coverage instead. If your employer is offering more than one plan for you to choose from, you’ll see all the available options below. You can view plan details and use the filter and compare plan tools to narrow your choices.When you’ve decided on a plan, choose 'Select Plan' to continue.",
+  :'en.insured.plan_shoppings.show.title.content' => "Select the plan below that you’d like to enroll in. If you don’t want coverage because you have it through another source, please select Waive Coverage instead.</br></br>If your employer is offering more than one plan for you to choose from, you’ll see all the available options below. You can view plan details and use the filter and compare plan tools to narrow your choices.When you’ve decided on a plan, choose 'Select Plan' to continue.",
   :'en.compare_plans' => "Compare Plans",
   :'en.insured.plan_shoppings.final_cost_change' => "Please note your final cost may change based on the final enrollment of all employees.",
   :'en.sort_by' => "Sort By",
