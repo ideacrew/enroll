@@ -87,25 +87,29 @@ class BenefitGroupAssignment
 
       if assignments_with_end_on.present?
         valid_assignments_with_end_on = assignments_with_end_on.select { |assignment| (assignment.start_on..assignment.end_on).cover?(date) }
-        if valid_assignments_with_end_on.size > 1
-          valid_assignments_with_end_on.sort_by { |assignment| (assignment.start_on.to_time - date.to_time).abs }.first
+        if valid_assignments_with_end_on.present?
+          valid_assignments_with_end_on.sort_by { |assignment| (assignment.start_on.to_time - date.to_time).abs }.first || valid_assignments_with_end_on.first
         else
-          valid_assignments_with_end_on.first
+          filter_assignments_with_no_end_on(assignments_with_no_end_on, date)
         end
       elsif assignments_with_no_end_on.present?
-        valid_assignments_with_no_end_on = assignments_with_no_end_on.select { |assignment| (assignment.start_on..assignment.start_on.next_year.prev_day).cover?(date) }
-        if valid_assignments_with_no_end_on.size > 1
-          valid_assignments_with_no_end_on.detect { |assignment| assignment.is_active? } ||
-          valid_assignments_with_no_end_on.sort_by { |assignment| (assignment.start_on.to_time - date.to_time).abs }.first
-        else
-          valid_assignments_with_no_end_on.first
-        end
+        filter_assignments_with_no_end_on(assignments_with_no_end_on, date)
       end
       # if assignments.size > 1
       #   assignments.detect{|assignment| assignment.end_on.blank? } || assignments.first
       # else
       #   assignments.first
       # end
+    end
+
+    def filter_assignments_with_no_end_on(assignments, date)
+      valid_assignments_with_no_end_on = assignments.select { |assignment| (assignment.start_on..assignment.start_on.next_year.prev_day).cover?(date) }
+      if valid_assignments_with_no_end_on.size > 1
+        valid_assignments_with_no_end_on.detect { |assignment| assignment.is_active? } ||
+        valid_assignments_with_no_end_on.sort_by { |assignment| (assignment.start_on.to_time - date.to_time).abs }.first
+      else
+        valid_assignments_with_no_end_on.first
+      end
     end
 
     def by_benefit_group_id(bg_id)
