@@ -161,7 +161,10 @@ class CensusEmployee < CensusMember
         :$elemMatch => {
           :start_on.gte => effective_on,
           :benefit_package_id => benefit_package.id,
-          :is_active => is_active
+          "$or" => [
+            {"end_on" => nil},
+            {"end_on" => {"$lt" => effective_on}}
+          ]
         }
       }
     )
