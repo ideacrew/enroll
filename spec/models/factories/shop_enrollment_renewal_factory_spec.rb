@@ -114,7 +114,7 @@ RSpec.describe Factories::ShopEnrollmentRenewalFactory, :type => :model, dbclean
           #   expect(health_renewal.present?).to be_truthy
           #   expect(health_renewal.hbx_enrollment_members.size).to eq 2
           #   expect(health_renewal.hbx_enrollment_members.collect{|e| e.hbx_id}).to eq [person.hbx_id, spouse.hbx_id]
-          end
+          # end
         end
       end
     end
