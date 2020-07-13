@@ -6,7 +6,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
   include_context "setup benefit market with market catalogs and product packages"
   include_context "setup initial benefit application"
 
-  let(:person) {FactoryGirl.create(:person)}
+  let(:person) {FactoryGirl.create(:person, :with_family)}
   let(:user) { FactoryGirl.create(:user, person: person) }
   let(:family){ FactoryGirl.create(:family, :with_primary_family_member_and_dependent) }
   let(:family_members){ family.family_members.where(is_primary_applicant: false).to_a }
@@ -113,7 +113,6 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       allow(benefit_group).to receive(:reference_plan).and_return(reference_plan)
       allow(hbx_enrollment).to receive(:build_plan_premium).and_return(true)
       allow(hbx_enrollment).to receive(:census_employee).and_return(census_employee)
-      allow(subject).to receive(:employee_mid_year_plan_change).and_return(true)
       allow(sponsored_benefit).to receive(:rate_schedule_date).and_return(rate_schedule_date)
       allow(HbxEnrollmentSponsoredCostCalculator).to receive(:new).with(hbx_enrollment).and_return(cost_calculator)
       allow(cost_calculator).to receive(:groups_for_products).with([product]).and_return([member_group])
@@ -253,16 +252,43 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     end
   end
 
-  context "POST terminate" do
+  context "POST terminate", :dbclean => :around_each do
+    let(:coverage_start_on) {TimeKeeper.date_of_record.last_month.beginning_of_month}
+    let(:hbx_enrollment) do
+      FactoryGirl.create(:hbx_enrollment, :with_product,
+                        sponsored_benefit_package_id: benefit_group_assignment.benefit_group.id,
+                        household: household,
+                        hbx_enrollment_members: [hbx_enrollment_member],
+                        coverage_kind: "health",
+                        effective_on: coverage_start_on,
+                        external_enrollment: false,
+                        sponsored_benefit_id: sponsored_benefit.id,
+                        rating_area_id: rating_area.id)
+    end
+
+    let(:waiver_enrollment) do
+      FactoryGirl.create(:hbx_enrollment, :with_product,
+                        sponsored_benefit_package_id: benefit_group_assignment.benefit_group.id,
+                        household: household,
+                        hbx_enrollment_members: [hbx_enrollment_member],
+                        coverage_kind: "health",
+                        external_enrollment: false,
+                        sponsored_benefit_id: sponsored_benefit.id,
+                        predecessor_enrollment_id: hbx_enrollment.id,
+                        rating_area_id: rating_area.id)
+    end
+    let(:coverage_end_on) {TimeKeeper.date_of_record.end_of_month}
+
     before do
       allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(hbx_enrollment)
-      allow(hbx_enrollment).to receive(:may_schedule_coverage_termination?).and_return(true)
-      allow(hbx_enrollment).to receive(:schedule_coverage_termination!).and_return(true)
+      allow(hbx_enrollment).to receive(:employee_role_id).and_return(employee_role.id)
       allow(person).to receive(:primary_family).and_return(family)
       allow(hbx_enrollment).to receive(:rating_area).and_return(rating_area)
       allow(hbx_enrollment).to receive(:sponsored_benefit).and_return(sponsored_benefit)
       allow(sponsored_benefit).to receive(:rate_schedule_date).and_return(rate_schedule_date)
       allow(HbxEnrollmentSponsoredCostCalculator).to receive(:new).with(hbx_enrollment).and_return(cost_calculator)
+      allow(waiver_enrollment).to receive(:parent_enrollment).and_return(hbx_enrollment)
+      request.env["HTTP_REFERER"] = terminate_insured_plan_shopping_url(1)
       sign_in user
     end
 
@@ -272,35 +298,59 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     end
 
     it "goes back" do
-      request.env["HTTP_REFERER"] = terminate_insured_plan_shopping_url(1)
-      allow(hbx_enrollment).to receive(:may_schedule_coverage_termination?).and_return(false)
       post :terminate, id: "hbx_id"
-      expect(response).to redirect_to(:back)
+      expect(response).to have_http_status(:redirect)
     end
 
     it "should record termination submitted date on terminate of hbx_enrollment" do
       expect(hbx_enrollment.termination_submitted_on).to eq nil
-      post :terminate, id: "hbx_id"
+      post :terminate, id: "hbx_id", terminate_reason: "Because"
+      expect(hbx_enrollment.terminated_on).to eq coverage_end_on
       expect(hbx_enrollment.termination_submitted_on).to be_within(1.second).of TimeKeeper.datetime_of_record
-      expect(response).to be_redirect
+      expect(response).to have_http_status(:redirect)
+    end
+
+    it "should create a new inactive enrollment" do
+      post :terminate, id: "hbx_id", terminate_reason: "Because"
+      hbx_enrollment.reload
+      expect(hbx_enrollment.terminate_reason).to eq "Because"
     end
   end
 
-  context "GET waive" do
+  context "GET waive", :dbclean => :around_each do
     before :each do
       allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(hbx_enrollment)
+      allow(hbx_enrollment).to receive(:may_waive_coverage?).and_return(true)
+      allow(hbx_enrollment).to receive(:waive_enrollment).and_return(true)
+      allow(hbx_enrollment).to receive(:shopping?).and_return(true)
       sign_in user
     end
 
     it "should get success flash message" do
-      allow(hbx_enrollment).to receive(:waive_coverage_by_benefit_group_assignment).with("Because").and_return(true)
+      allow(hbx_enrollment).to receive(:valid?).and_return(true)
+      allow(hbx_enrollment).to receive(:save).and_return(true)
+      allow(hbx_enrollment).to receive(:waive_coverage).and_return(true)
+      allow(hbx_enrollment).to receive(:waiver_reason=).with("Because").and_return(true)
+      allow(hbx_enrollment).to receive(:inactive?).and_return(true)
+      get :waive, id: "hbx_id", waiver_reason: "Because"
+      expect(flash[:notice]).to eq "Waive Coverage Successful"
+      expect(response).to be_redirect
+    end
+
+    it "should get success flash mesage when enrollment is terminated" do
+      allow(hbx_enrollment).to receive(:coverage_termination_pending?).and_return(true)
+      allow(hbx_enrollment).to receive(:waiver_reason=).with("Because").and_return(true)
+      allow(hbx_enrollment).to receive(:valid?).and_return(true)
+      allow(hbx_enrollment).to receive(:inactive?).and_return(true)
       get :waive, id: "hbx_id", waiver_reason: "Because"
       expect(flash[:notice]).to eq "Waive Coverage Successful"
       expect(response).to be_redirect
     end
 
     it "should get failure flash message" do
-      allow(hbx_enrollment).to receive(:waive_coverage_by_benefit_group_assignment).with("Because").and_raise(StandardError.new("WAIVE FAILED"))
+      allow(hbx_enrollment).to receive(:waiver_reason=).with("Because").and_return(false)
+      allow(hbx_enrollment).to receive(:valid?).and_return(false)
+      allow(hbx_enrollment).to receive(:inactive?).and_return(false)
       get :waive, id: "hbx_id", waiver_reason: "Because"
       expect(flash[:alert]).to eq "Waive Coverage Failed"
       expect(response).to be_redirect

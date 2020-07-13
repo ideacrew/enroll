@@ -498,12 +498,6 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
         enrollment_for_waiver.propogate_waiver
         expect(benefit_group_assignment.aasm_state).not_to eq "coverage_waived"
       end
-
-      it "should cancel the shop enrollment" do
-        enrollment_for_waiver.propogate_waiver
-        existing_shop_enrollment.reload
-        expect(existing_shop_enrollment.aasm_state).to eq "coverage_canceled"
-      end
     end
   end
 

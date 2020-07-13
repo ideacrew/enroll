@@ -105,7 +105,7 @@ Then(/(.+) should see \"my account\" page with waiver and passive renewal should
   statuses = enrollments.collect{|e| e.find('.panel-heading').find('.label-success').text()}
 
   expect(statuses).to include('Waived')
-  expect(statuses).to include('Coverage Selected')
+  expect(statuses).to include('Coverage Termination Pending')
   expect(statuses).not_to include('Auto Renewing')
 end
 

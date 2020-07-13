@@ -136,7 +136,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
         coverage_year: 2018,
         employer_profile: employer_profile,
         coverage_terminated?: false,
-        coverage_termination_pending?: true,
+        coverage_termination_pending?: false,
         coverage_expired?: false,
         total_premium: 200.00,
         total_employer_contribution: 100.00,
@@ -235,8 +235,19 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
     context "coverage_termination_pending" do
       let(:terminated_on) { TimeKeeper.date_of_record.next_month.end_of_month }
+      let(:terminated_on) { TimeKeeper.date_of_record.end_of_month }
       let(:enrollment_aasm_state) { "coverage_termination_pending" }
       let(:future_enrollment_termination_date) { Date.today }
+
+      before :each do
+        allow(hbx_enrollment).to receive(:kind).and_return('employer_sponsored')
+        allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
+        allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(false)
+        allow(view).to receive(:disable_make_changes_button?).with(hbx_enrollment).and_return(false)
+        allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
+        allow(hbx_enrollment).to receive(:coverage_termination_pending?).and_return(true)
+        render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
+      end
 
       it 'displays future_enrollment_termination_date when enrollment is in coverage_termination_pending state' do
         expect(rendered).to match /Future enrollment termination date:/
@@ -459,7 +470,8 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
         consumer_role_id: nil,
         consumer_role: nil,
         future_enrollment_termination_date: "",
-        covered_members_first_names: []
+        covered_members_first_names: [],
+        parent_enrollment: nil
       )
     end
 
