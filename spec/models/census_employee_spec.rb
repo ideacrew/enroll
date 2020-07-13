@@ -2661,7 +2661,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       it "should cancel future active coverage" do
         active_enrollment.effective_on = TimeKeeper.date_of_record.next_month
         active_enrollment.save
-        census_employee.terminate_employee_enrollments
+        census_employee.terminate_employee_enrollments(employment_terminated_on)
         active_enrollment.reload
         expect(active_enrollment.aasm_state).to eq "coverage_canceled"
       end
