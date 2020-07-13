@@ -24,10 +24,10 @@ class TaxHousehold
   field :effective_ending_on, type: Date
   field :submitted_at, type: DateTime
 
-  embeds_many :tax_household_members
+  embeds_many :tax_household_members, cascade_callbacks: true
   accepts_nested_attributes_for :tax_household_members
 
-  embeds_many :eligibility_determinations
+  embeds_many :eligibility_determinations, cascade_callbacks: true
 
   scope :tax_household_with_year, ->(year) { where( effective_starting_on: (Date.new(year)..Date.new(year).end_of_year)) }
   scope :active_tax_household, ->{ where(effective_ending_on: nil) }
@@ -48,7 +48,7 @@ class TaxHousehold
     csr_kind = latest_eligibility_determination.csr_eligibility_kind
     shopping_family_member_ids = hbx_enrollment.hbx_enrollment_members.map(&:applicant_id)
     ia_eligible = tax_household_members.where(:applicant_id.in => shopping_family_member_ids).map(&:is_ia_eligible)
-    ia_eligible.empty? || ia_eligible.include?(false) ? "csr_100" : csr_kind
+    ia_eligible.empty? || ia_eligible.include?(false) ? 'csr_0' : csr_kind
   end
 
   def current_csr_percent

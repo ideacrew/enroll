@@ -706,6 +706,7 @@ Then(/Aptc user should see aptc amount on receipt page/) do
 end
 
 Then(/Aptc user should see aptc amount on individual home page/) do
+  wait_for_ajax
   expect(page).to have_content "My #{Settings.site.short_name}"
   expect(page).to have_content '$20.00'
   expect(page).to have_content 'APTC amount'
