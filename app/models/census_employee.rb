@@ -1342,6 +1342,14 @@ class CensusEmployee < CensusMember
     end
   end
 
+  def is_employee_in_term_pending?
+    return false if employment_terminated_on.blank?
+    return false if active_benefit_group_assignment.blank?
+
+    effective_period = active_benefit_group_assignment.benefit_package.effective_period
+    employment_terminated_on <= effective_period.max
+  end
+
   # Enrollments with current active and renewal benefit applications
   def active_benefit_group_enrollments
     return nil if employee_role.blank?

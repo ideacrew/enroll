@@ -307,7 +307,7 @@ class Insured::PlanShoppingsController < ApplicationController
     set_plans_by(hbx_enrollment_id: params.require(:id))
     @tax_household = @person.primary_family.latest_household.latest_active_tax_household_with_year(@hbx_enrollment.effective_on.year) rescue nil
     if @tax_household.present?
-      if is_eligibility_determined_and_not_csr_100?(@person, @tax_household)
+      if is_eligibility_determined_and_not_csr_0?(@person, @tax_household)
         sort_for_csr(@plans)
       else
         sort_by_standard_plans(@plans)
@@ -357,9 +357,9 @@ class Insured::PlanShoppingsController < ApplicationController
     @plans = standard_plans + non_standard_plans + non_silver_plans
   end
 
-  def is_eligibility_determined_and_not_csr_100?(person, tax_household)
+  def is_eligibility_determined_and_not_csr_0?(person, tax_household)
     valid_csr_eligibility_kind = tax_household.valid_csr_kind(@hbx_enrollment)
-    (EligibilityDetermination::CSR_KINDS.include? "#{valid_csr_eligibility_kind}") && ("#{valid_csr_eligibility_kind}" != "csr_100")
+    (EligibilityDetermination::CSR_KINDS.include? valid_csr_eligibility_kind.to_s) && (valid_csr_eligibility_kind.to_s != 'csr_0')
   end
 
   def send_receipt_emails

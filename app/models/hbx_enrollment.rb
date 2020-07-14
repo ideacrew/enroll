@@ -934,6 +934,7 @@ class HbxEnrollment
 
   def update_renewal_coverage
     return unless is_shop?
+    return if census_employee&.is_employee_in_term_pending?
 
     enrollment_benefit_application = sponsored_benefit_package.benefit_application
 
@@ -1741,7 +1742,7 @@ class HbxEnrollment
     end
 
     event :expire_coverage, :after => :record_transition do
-      transitions from: [:shopping, :coverage_selected, :transmitted_to_carrier, :coverage_enrolled],
+      transitions from: [:shopping, :coverage_selected, :transmitted_to_carrier, :coverage_enrolled, :unverified],
                   to: :coverage_expired, :guard  => :can_be_expired?
     end
 
