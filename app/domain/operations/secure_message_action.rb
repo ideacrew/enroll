@@ -10,7 +10,8 @@ module Operations
     def call(params)
       validate_params = yield validate_params(params)
       resource = yield fetch_resource(validate_params)
-      result = yield upload_secure_message(resource, validate_params)
+      secure_message_result = yield upload_secure_message(resource, validate_params)
+      result = yield send_generic_notice_alert(secure_message_result)
 
       Success(result)
     end
@@ -33,6 +34,10 @@ module Operations
 
     def upload_secure_message(resource, params)
       ::Operations::SecureMessages::Create.new.call(resource: resource, message_params: params)
+    end
+
+    def send_generic_notice_alert(resource)
+      ::Operations::SendGenericNoticeAlert.new.call(resource: resource)
     end
 
   end
