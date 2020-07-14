@@ -6,7 +6,7 @@ class CensusEmployee < CensusMember
   include Config::AcaModelConcern
   include BenefitSponsors::Concerns::Observable
   include ::BenefitSponsors::ModelEvents::CensusEmployee
-  include Ssn
+  include BenefitSponsors::Concerns::Ssn
 
   require 'roo'
 
