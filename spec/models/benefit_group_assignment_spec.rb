@@ -251,6 +251,22 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
           end
 
         end
+
+        context "and coverage is cancelled" do
+          let(:employee_role)   { FactoryBot.build(:employee_role, employer_profile: employer_profile )}
+          let(:hbx_enrollment)  { HbxEnrollment.new(sponsored_benefit_package: benefit_package, employee_role: census_employee.employee_role, effective_on: TimeKeeper.date_of_record + 3.days, aasm_state: :coverage_selected ) }
+
+          before {
+            hbx_enrollment.benefit_group_assignment = benefit_group_assignment
+            benefit_group_assignment.hbx_enrollment = hbx_enrollment
+            hbx_enrollment.term_or_cancel_enrollment(hbx_enrollment, TimeKeeper.date_of_record - 1.day)
+          }
+
+          it "should update the end_on date to cancel date" do
+            expect(benefit_group_assignment.end_on).to eq(TimeKeeper.date_of_record - 1.day)
+          end
+
+        end
       end
     end
   end
