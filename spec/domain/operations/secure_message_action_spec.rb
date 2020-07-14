@@ -43,7 +43,7 @@ module Operations
 
       it "should pass" do
         expect(subject).to be_success
-        expect(subject.success).to eq employer_profile
+        expect(subject.success).to eq true
       end
     end
   end
