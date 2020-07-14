@@ -15,7 +15,7 @@ describe 'Cancel employer plan year & enrollments', :dbclean => :around_each do
   let(:enrollment) { FactoryBot.build(:hbx_enrollment, family: family, household: family.active_household, employee_role: census_employee.employee_role)}
   let(:enrollment2) { FactoryBot.build(:hbx_enrollment,family: family, household: family.active_household, employee_role: census_employee.employee_role,aasm_state:'auto_renewing')}
   let!(:active_benefit_group_assignment) do
-    bga = FactoryBot.build(:benefit_group_assignment, benefit_group_id: benefit_group.id, is_active: true, census_employee: census_employee, hbx_enrollment_id: enrollment.id, aasm_state: 'coverage_selected')
+    bga = FactoryBot.build(:benefit_group_assignment, benefit_group_id: benefit_group.id, census_employee: census_employee, hbx_enrollment_id: enrollment.id)
     bga.save(:validate => false)
     bga
   end

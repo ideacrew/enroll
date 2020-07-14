@@ -78,7 +78,7 @@ class BenefitGroupAssignment
     end
 
     def on_date(census_employee, date)
-      assignments = census_employee.benefit_group_assignments.select{ |bga| bga.persisted? }
+      assignments = census_employee.benefit_group_assignments.select{ |bga| bga.persisted? && bga.activated_at.blank? }
       assignments_with_no_end_on, assignments_with_end_on = assignments.partition { |bga| bga.end_on.nil? }
 
       if assignments_with_end_on.present?
@@ -267,7 +267,7 @@ class BenefitGroupAssignment
   # end
 
   def hbx_enrollment
-    HbxEnrollment.where(id: hbx_enrollment_id).first || hbx_enrollments.max_by(&:created_at)
+    @hbx_enrollment ||= HbxEnrollment.where(id: hbx_enrollment_id).first || hbx_enrollments.max_by(&:created_at)
   end
 
   def end_benefit(end_date)
@@ -309,25 +309,26 @@ class BenefitGroupAssignment
     end
   end
 
-  def waive_benefit
-    # waive_coverage! if may_waive_coverage?
-    make_active
+  def waive_benefit(date = TimeKeeper.date_of_record)
+    make_active(date)
   end
 
-  def begin_benefit
-    # select_coverage! if may_select_coverage?
-    make_active
+  def begin_benefit(date = TimeKeeper.date_of_record)
+    make_active(date)
   end
 
-  # TODO: Need to figure out the criteria for this
-  def is_active?
-    start_on <= TimeKeeper.date_of_record
-    #(benefit_package.start_on.to_datetime..benefit_package.end_on.to_datetime).cover?(TimeKeeper.date_of_record)
+  def is_active
+    is_active?
+  end
+
+  def is_active?(date = TimeKeeper.date_of_record)
+    end_date = end_on || start_on.next_year.prev_day
+    (start_on..end_date).cover?(date)
   end
 
   def make_active
     census_employee.benefit_group_assignments.each do |benefit_group_assignment|
-      if benefit_group_assignment.id != self.id
+      if benefit_group_assignment.is_active? && benefit_group_assignment.id != self.id  
         end_on = benefit_group_assignment.end_on || (start_on - 1.day)
         if is_case_old?
           end_on = benefit_group_assignment.plan_year.end_on unless benefit_group_assignment.plan_year.coverage_period_contains?(end_on)
