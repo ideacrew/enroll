@@ -3,7 +3,7 @@ require 'rails_helper'
 describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
   it { should validate_presence_of :benefit_package_id }
   it { should validate_presence_of :start_on }
-  it { should validate_presence_of :is_active }
+  # it { should validate_presence_of :is_active }
 
   let(:site)                  { build(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
   let(:benefit_sponsor)       { create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile_initial_application, site: site) }
@@ -237,10 +237,17 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
         end
 
         context "and coverage is terminated" do
-          before { benefit_group_assignment.terminate_coverage }
+          let(:employee_role)   { FactoryBot.build(:employee_role, employer_profile: employer_profile )}
+          let(:hbx_enrollment)  { HbxEnrollment.new(sponsored_benefit_package: benefit_package, employee_role: census_employee.employee_role, effective_on: TimeKeeper.date_of_record, aasm_state: :coverage_selected ) }
 
-          it "should transistion to coverage coverage_unused state" do
-            expect(benefit_group_assignment.coverage_void?).to be_truthy
+          before {
+            hbx_enrollment.benefit_group_assignment = benefit_group_assignment
+            benefit_group_assignment.hbx_enrollment = hbx_enrollment
+            hbx_enrollment.term_or_cancel_enrollment(hbx_enrollment, TimeKeeper.date_of_record + 2.days)
+          }
+
+          it "should update the end_on date to terminated date" do
+            expect(benefit_group_assignment.end_on).to eq(TimeKeeper.date_of_record + 2.days)
           end
 
         end
@@ -331,9 +338,9 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
   describe '.make_active' do
     let!(:census_employee) { FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: employer_profile, benefit_group: benefit_package ) }
 
-    before(:each) do
-      census_employee.benefit_group_assignments.last.update(is_active:false)
-    end
+    # before(:each) do
+    #   census_employee.benefit_group_assignments.last.update(is_active:false)
+    # end
 
     context "and benefit coverage activity occurs" do
       it "should update the benfefit group assignment" do
@@ -439,17 +446,17 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
 
     context 'for multiple assignments' do
       let!(:assignment_one) do
-        bga = census_employee.benefit_group_assignments.build(start_on: Date.new(2018,5,1), end_on: nil, is_active: false, benefit_package_id: benefit_package.id)
+        bga = census_employee.benefit_group_assignments.build(start_on: Date.new(2018,5,1), end_on: nil, benefit_package_id: benefit_package.id)
         bga.save(validate: false)
         bga
       end
       let!(:assignment_two) do
-        bga = census_employee.benefit_group_assignments.build(start_on: Date.new(2018,8,1), end_on: nil, is_active: false, benefit_package_id: benefit_package.id)
+        bga = census_employee.benefit_group_assignments.build(start_on: Date.new(2018,8,1), end_on: nil, benefit_package_id: benefit_package.id)
         bga.save(validate: false)
         bga
       end
       let!(:assignment_three) do
-        bga = census_employee.benefit_group_assignments.build(start_on: Date.new(2019,5,1), end_on: nil, is_active: true, benefit_package_id: benefit_package.id)
+        bga = census_employee.benefit_group_assignments.build(start_on: Date.new(2019,5,1), end_on: nil, benefit_package_id: benefit_package.id)
         bga.save(validate: false)
         bga
       end
@@ -462,5 +469,4 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
     end
   end
 
-  de
 end
