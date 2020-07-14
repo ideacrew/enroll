@@ -84,6 +84,7 @@ class Family
   index({"households.tax_households.eligibility_determinations.determined_on" => 1})
   index({"households.tax_households.eligibility_determinations.determined_at" => 1})
   index({"households.tax_households.eligibility_determinations.max_aptc.cents" => 1})
+  index({"households.tax_households.eligibility_determinations.csr_percent_as_integer" => 1}, {name: 'csr_percent_as_integer_index'})
 
   index({"irs_groups.hbx_assigned_id" => 1})
 

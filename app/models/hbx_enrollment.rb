@@ -1742,7 +1742,7 @@ class HbxEnrollment
     end
 
     event :expire_coverage, :after => :record_transition do
-      transitions from: [:shopping, :coverage_selected, :transmitted_to_carrier, :coverage_enrolled],
+      transitions from: [:shopping, :coverage_selected, :transmitted_to_carrier, :coverage_enrolled, :unverified],
                   to: :coverage_expired, :guard  => :can_be_expired?
     end
 
