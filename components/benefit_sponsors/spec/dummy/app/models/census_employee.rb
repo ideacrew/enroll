@@ -6,7 +6,8 @@ class CensusEmployee < CensusMember
   include Config::AcaModelConcern
   include BenefitSponsors::Concerns::Observable
   include ::BenefitSponsors::ModelEvents::CensusEmployee
-  
+  include Ssn
+
   require 'roo'
 
   # @!group AASM state groupings
