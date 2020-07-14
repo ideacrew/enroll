@@ -190,7 +190,7 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
                   expect(benefit_group_assignment.errors[:hbx_enrollment].any?).to be_truthy
                 end
               end
-           
+
               # context "because it has different employee role" do
               #   before { hbx_enrollment.employee_role = other_benefit_group }
 
@@ -311,7 +311,7 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
                           benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id,
                           aasm_state: state
                           )}
-      
+
       it "#covered_families" do
         expect(census_employee.active_benefit_group_assignment.covered_families.count).to eq 1
       end
@@ -461,6 +461,6 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
       end
     end
   end
+
+  de
 end
-
-
