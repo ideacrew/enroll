@@ -717,9 +717,8 @@ class HbxEnrollment
   end
 
   def propogate_cancel(term_date = TimeKeeper.date_of_record.end_of_month)
-    self.terminated_on ||= term_date
     if benefit_group_assignment
-      benefit_group_assignment.end_benefit(terminated_on)
+      benefit_group_assignment.end_benefit(term_date)
       benefit_group_assignment.save
     end
   end
@@ -728,7 +727,7 @@ class HbxEnrollment
     self.terminated_on ||= term_date
     if benefit_group_assignment
       benefit_group_assignment.end_benefit(terminated_on)
-      benefit_group_assignment.save
+      benefit_group_assignment.save!
     end
 
     if should_transmit_update?
@@ -850,6 +849,7 @@ class HbxEnrollment
   def term_or_cancel_enrollment(enrollment, coverage_end_date, term_reason = nil)
     if enrollment.effective_on >= coverage_end_date
       enrollment.cancel_coverage! if enrollment.may_cancel_coverage? # cancel coverage if enrollment is future effective
+      propogate_cancel(coverage_end_date)
     elsif coverage_end_date >= TimeKeeper.date_of_record && enrollment.is_shop?
       enrollment.schedule_coverage_termination!(coverage_end_date) if enrollment.may_schedule_coverage_termination?
     elsif enrollment.may_terminate_coverage?
