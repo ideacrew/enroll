@@ -53,10 +53,10 @@ end
 
 Then(/^the user will see the Send Secure Message option form$/) do
   expect(page).to have_css('input[type="file"]')
-  expect(page).to have_text('RECIPIENT')
-  expect(page).to have_text('SUBJECT')
-  expect(page).to have_text('CONTENT')
-  expect(page).to have_text('DOCUMENT')
+  expect(page).to have_text('Recipient')
+  expect(page).to have_text('Subject')
+  expect(page).to have_text('Content')
+  expect(page).to have_text('Document')
   expect(page).to have_css("textarea[placeholder='Write here...']")
   expect(page).to have_button('Send', disabled: false)
   expect(page).to have_button('Cancel', disabled: false)
@@ -64,10 +64,10 @@ end
 
 Then(/^the user will not see the Send Secure Message option form$/) do
   expect(page).not_to have_css('input[type="file"]')
-  expect(page).not_to have_text('RECIPIENT')
-  expect(page).not_to have_text('SUBJECT')
-  expect(page).not_to have_text('CONTENT')
-  expect(page).not_to have_text('DOCUMENT')
+  expect(page).not_to have_text('Recipient')
+  expect(page).not_to have_text('Subject')
+  expect(page).not_to have_text('Content')
+  expect(page).not_to have_text('Document')
   expect(page).not_to have_css("textarea[placeholder='Write here...']")
   expect(page).not_to have_button('Send', disabled: false)
   expect(page).not_to have_button('Cancel', disabled: false)
