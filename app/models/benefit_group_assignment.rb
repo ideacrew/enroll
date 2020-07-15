@@ -17,7 +17,7 @@ class BenefitGroupAssignment
   field :start_on, type: Date
   field :end_on, type: Date
 
-  field :coverage_end_on, type: Date # Deprecate
+  # field :coverage_end_on, type: Date # Deprecate
   field :aasm_state, type: String, default: "initialized"
   field :is_active, type: Boolean, default: true
   field :activated_at, type: DateTime
@@ -184,7 +184,7 @@ class BenefitGroupAssignment
 
   def covered_families
     Family.where(:"_id".in => HbxEnrollment.where(
-      benefit_group_assignment_id: BSON::ObjectId.from_string(self.id) 
+      benefit_group_assignment_id: BSON::ObjectId.from_string(self.id)
     ).pluck(:family_id)
   )
   end
@@ -217,7 +217,7 @@ class BenefitGroupAssignment
 
     if census_employee.cobra_begin_date.present?
       coverage_terminated_on = census_employee.cobra_begin_date.prev_day
-      hbx_enrollments = hbx_enrollments.select do |e| 
+      hbx_enrollments = hbx_enrollments.select do |e|
         e.effective_on < census_employee.cobra_begin_date && (e.terminated_on.blank? || e.terminated_on == coverage_terminated_on)
       end
     end
@@ -282,7 +282,7 @@ class BenefitGroupAssignment
 
   def end_benefit(end_date)
     return if coverage_waived?
-    self.coverage_end_on = end_date
+    self[:end_on] = end_date
     terminate_coverage! if may_terminate_coverage?
   end
 
