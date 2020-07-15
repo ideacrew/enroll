@@ -288,6 +288,18 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
           end
         end
 
+        context "and benefit group is disabled" do
+          before {
+            census_employee.benefit_group_assignments << benefit_group_assignment
+            benefit_sponsorship.census_employees << census_employee
+            benefit_package.cancel_member_benefits
+          }
+
+          it "should update the benefit application group end on date" do
+            expect(benefit_group_assignment.end_on).to eq(benefit_group_assignment.start_on)
+          end
+        end
+
       end
     end
   end

@@ -261,7 +261,7 @@ module BenefitSponsors
         #        as I am not sure what tests rely on renewal.
         #        Correct and updates specs IMMEDIATELY.
 
-        census_employees_assigned_on(effective_period.min, false).each do |member| 
+        census_employees_assigned_on(effective_period.min, false).each do |member|
           if Rails.env.test?
             renew_member_benefit(member)
           else
@@ -288,7 +288,7 @@ module BenefitSponsors
 
         # family.validate_member_eligibility_policy
         if true #family.is_valid?
-          
+
           enrollments = family.active_household.hbx_enrollments.enrolled_and_waived
           .by_benefit_sponsorship(benefit_sponsorship).by_effective_period(predecessor_application.effective_period)
 
@@ -296,7 +296,7 @@ module BenefitSponsors
             hbx_enrollment = enrollments.by_coverage_kind(sponsored_benefit.product_kind).first
 
             if hbx_enrollment && is_renewal_benefit_available?(hbx_enrollment)
-              renewed_enrollment = hbx_enrollment.renew_benefit(self)       
+              renewed_enrollment = hbx_enrollment.renew_benefit(self)
             end
 
             trigger_renewal_model_event(sponsored_benefit, census_employee, renewed_enrollment)
@@ -355,7 +355,7 @@ module BenefitSponsors
           end
         end
       end
- 
+
       def terminate_member_benefits(term_date: nil, enroll_term_reason: nil, enroll_notify: false)
         terminate_benefit_group_assignments
         enrolled_and_terminated_families.each do |family|
@@ -503,7 +503,7 @@ module BenefitSponsors
         self.benefit_application.benefit_sponsorship.census_employees.each do |ce|
           benefit_group_assignments = ce.benefit_group_assignments.where(benefit_package_id: self.id)
           benefit_group_assignments.each do |benefit_group_assignment|
-            benefit_group_assignment.update(is_active: false) unless is_renewing?
+            benefit_group_assignment.update(end_on: benefit_group_assignment.start_on) unless is_renewing?
           end
         end
       end
