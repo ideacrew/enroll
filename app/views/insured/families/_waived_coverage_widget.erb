@@ -12,7 +12,7 @@
   </div>
   <div class="panel-body">
     <h4>
-      <%= l10n("insured.waived_coverage_for_year", coverage_kind: hbx_enrollment.coverage_kind, year: hbx_enrollment.effective_on.year) %>
+      <%= l10n("insured.waived_coverage_for_year", coverage_kind: hbx_enrollment.coverage_kind, year: hbx_enrollment.parent_enrollment.present? ? hbx_enrollment.parent_enrollment.sponsored_benefit_package.start_on.year : hbx_enrollment.effective_on.year) %>
     </h4>
     <div class="enrollment-submitted-at info">
       <strong>
@@ -25,7 +25,7 @@
       <strong>
         <%= l10n("reason_waived") %>:
       </strong>
-      <%= hbx_enrollment.waiver_reason %>
+      <%= hbx_enrollment.waiver_reason || hbx_enrollment.terminate_reason %>
     </div>
   </div>
   <% if read_only != true %>

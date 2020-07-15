@@ -833,7 +833,7 @@ When(/^(?:(?!Employee).)+ clicks? continue on the group selection page$/) do
 end
 
 Then(/^.+ should see the plan shopping welcome page$/) do
-  expect(page).to have_content('Choose Plan')
+  expect(page).to have_content('Enroll in a plan')
   screenshot("plan_shopping_welcome")
 end
 
