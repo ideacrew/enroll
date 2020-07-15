@@ -267,6 +267,27 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
           end
 
         end
+
+        context "and benefit application is terminated" do
+          let(:ba) { benefit_sponsorship.benefit_applications.first }
+
+          before { ba.terminate_enrollment }
+
+          it "should terminate the benefit group assignment" do
+            expect(benefit_group_assignment.end_on).to eq(ba.terminated_on)
+          end
+        end
+
+        context "and benefit application is cancelled" do
+          let(:ba) { benefit_sponsorship.benefit_applications.first }
+
+          before { ba.cancel! }
+
+          it "should cancel the benefit group assignment" do
+            expect(benefit_group_assignment.end_on).to eq(ba.terminated_on)
+          end
+        end
+
       end
     end
   end

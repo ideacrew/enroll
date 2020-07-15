@@ -628,7 +628,7 @@ module BenefitSponsors
     # @param [ BenefitSponsorCatalog ] The catalog valid for the effective_period immediately following this
     # BenefitApplication instance's effective_period
     # @return [ BenefitApplication ] The built renewal application instance and submodels
-    
+
     def renew(async_workflow_id = nil)
       renewal_effective_date = end_on.next_day.to_date
 
@@ -985,6 +985,22 @@ module BenefitSponsors
       # if (aasm.to_state == :initial_enrollment_ineligible) && may_deny_enrollment_eligiblity?
       #   deny_enrollment_eligiblity!
       # end
+
+      if ( aasm.current_event == :cancel! )
+        benefit_packages.each do |benefit_package|
+          bga = BenefitGroupAssignment.by_benefit_package(benefit_package.id)
+          bga.end_on = terminated_on
+          bga.save!
+        end
+      end
+
+      if ( aasm.current_event == :terminate_enrollment )
+        benefit_packages.each do |benefit_package|
+          bga = BenefitGroupAssignment.by_benefit_package(benefit_package.id)
+          bga.end_on = terminated_on
+          bga.save!
+        end
+      end
 
       if (aasm.to_state == :applicant && aasm.current_event == :cancel!)
         cancel! if (enrollment_ineligible? || enrollment_closed?) && may_cancel?
