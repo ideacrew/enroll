@@ -284,7 +284,8 @@ class CensusEmployee < CensusMember
   end
 
   def active_benefit_group_assignment
-    benefit_group_assignments.detect { |assignment| assignment.is_active? }
+    # TODO: "is_active" depracated
+    benefit_group_assignments
   end
 
   def renewal_benefit_group_assignment
@@ -293,6 +294,7 @@ class CensusEmployee < CensusMember
   end
 
   def inactive_benefit_group_assignments
+    # TODO: "is_active" depracated
     benefit_group_assignments.reject(&:is_active?)
   end
 
@@ -336,14 +338,15 @@ class CensusEmployee < CensusMember
   end
 
   def find_or_create_benefit_group_assignment(benefit_packages)
+
     if benefit_packages.present?
       bg_assignments = benefit_group_assignments.where(:benefit_package_id.in => benefit_packages.map(&:_id)).order_by(:'created_at'.desc)
-
+      # TODO: Need to figure out if this should be considered
       if bg_assignments.present?
-        valid_bg_assignment = bg_assignments.where(:aasm_state.ne => 'initialized').first || bg_assignments.first
+        valid_bg_assignment =  bg_assignments.select { |bga| HbxEnrollment::ENROLLED_STATUSES.include?(bga.hbx_enrollment&.aasm_state) }.last || bg_assignments.first
         valid_bg_assignment.make_active
       else
-        add_benefit_group_assignment(benefit_packages.first, benefit_packages.first.benefit_application.start_on)
+        add_benefit_group_assignment(benefit_packages.first, benefit_packages.first.plan_year.start_on)
       end
     end
   end
@@ -357,7 +360,6 @@ class CensusEmployee < CensusMember
   def reset_active_benefit_group_assignments(new_benefit_group)
     benefit_group_assignments.select { |assignment| assignment.is_active? }.each do |benefit_group_assignment|
       benefit_group_assignment.end_on = [new_benefit_group.start_on - 1.day, benefit_group_assignment.start_on].max
-      benefit_group_assignment.update_attributes(is_active: false)
     end
   end
 
@@ -520,7 +522,7 @@ class CensusEmployee < CensusMember
   end
 
   def benefit_package_assignment_on(effective_date)
-    benefit_group_assignments.effective_on(effective_date).active.first
+    benefit_group_assignments.effective_on(effective_date).first
   end
 
   def assign_to_benefit_package(benefit_package, assignment_on)
@@ -530,12 +532,11 @@ class CensusEmployee < CensusMember
         start_on: assignment_on,
         end_on:   benefit_package.effective_period.max,
         benefit_package: benefit_package,
-        is_active: false
     )
   end
 
   def active_benefit_group_assignment
-    benefit_group_assignments.detect { |assignment| assignment.is_active? }
+    benefit_group_assignments.last
   end
 
   def renewal_benefit_group_assignment
