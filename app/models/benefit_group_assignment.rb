@@ -339,13 +339,13 @@ class BenefitGroupAssignment
       end
     end
     # TODO: Hack to get census employee spec to pass
-    bga_to_activate = census_employee.benefit_group_assignments.select { |bga| HbxEnrollment::ENROLLED_STATUSES.include?(bga.hbx_enrollment&.aasm_state) }.last 
-    if bga_to_activate.present?
-      bga_to_activate.update_attributes!(activated_at: TimeKeeper.datetime_of_record)
-    else
-      # TODO: Not sure why this isn't working right
-      update_attributes!(activated_at: TimeKeeper.datetime_of_record)
-    end
+    #bga_to_activate = census_employee.benefit_group_assignments.select { |bga| HbxEnrollment::ENROLLED_STATUSES.include?(bga.hbx_enrollment&.aasm_state) }.last 
+    #if bga_to_activate.present?
+    # bga_to_activate.update_attributes!(activated_at: TimeKeeper.datetime_of_record)
+    #else
+    # TODO: Not sure why this isn't working right
+    update_attributes!(activated_at: TimeKeeper.datetime_of_record)
+    #end
   end
 
   private
