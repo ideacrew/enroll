@@ -986,22 +986,6 @@ module BenefitSponsors
       #   deny_enrollment_eligiblity!
       # end
 
-      if ( aasm.current_event == :cancel! )
-        benefit_packages.each do |benefit_package|
-          bga = BenefitGroupAssignment.by_benefit_package(benefit_package.id)
-          bga.end_on = terminated_on
-          bga.save!
-        end
-      end
-
-      if ( aasm.current_event == :terminate_enrollment )
-        benefit_packages.each do |benefit_package|
-          bga = BenefitGroupAssignment.by_benefit_package(benefit_package.id)
-          bga.end_on = terminated_on
-          bga.save!
-        end
-      end
-
       if (aasm.to_state == :applicant && aasm.current_event == :cancel!)
         cancel! if (enrollment_ineligible? || enrollment_closed?) && may_cancel?
       end
