@@ -2,9 +2,10 @@ require "rails_helper"
 
 module Operations
   RSpec.describe SecureMessageAction do
+    let(:user) { FactoryBot.create(:user) }
 
     subject do
-      described_class.new.call(params)
+      described_class.new.call(params: params, user: user)
     end
 
     describe "not passing :resource_id, :subject, :actions_id, :body :resource_name" do
@@ -32,6 +33,7 @@ module Operations
         expect(subject.failure).to eq error_message
       end
     end
+
 
     describe "passing all params but with valid data" do
 

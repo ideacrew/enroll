@@ -7,12 +7,12 @@ module Operations
   class SecureMessageAction
     send(:include, Dry::Monads[:result, :do, :try])
 
-    def call(params)
+    def call(params:, user:)
       validate_params = yield validate_params(params)
       resource = yield fetch_resource(validate_params)
+      upload_doc_result = yield upload_document(resource, validate_params, user)
       secure_message_result = yield upload_secure_message(resource, validate_params)
       result = yield send_generic_notice_alert(secure_message_result)
-
       Success(result)
     end
 
@@ -29,6 +29,14 @@ module Operations
         ::Operations::People::Find.new.call(person_id: validate_params[:resource_id])
       else
         BenefitSponsors::Operations::Profiles::FindProfile.new.call(profile_id: validate_params[:resource_id])
+      end
+    end
+
+    def upload_document(resource, params, user)
+      if params[:file].present?
+        ::Operations::Cartafact::Upload.new.call(resource: resource, file_params: params, user: user)
+      else
+        Success(true)
       end
     end
 
