@@ -34,7 +34,6 @@ module Operations
       end
     end
 
-
     describe "passing all params but with valid data" do
 
       let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key) }

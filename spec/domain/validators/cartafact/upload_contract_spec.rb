@@ -49,6 +49,5 @@ RSpec.describe Validators::Cartafact::UploadContract,  dbclean: :after_each do
         expect(subject.call(valid_params).errors.to_h).to be_empty
       end
     end
-
   end
 end

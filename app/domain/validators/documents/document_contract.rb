@@ -29,7 +29,7 @@ module Validators
       end
 
       rule(:format) do
-        key.failure('Invalid file format.') if value != "application/pdf"
+        key.failure('Invalid file format.') unless ["application/pdf", "image/png", "image/jpeg"].include?value
       end
     end
   end

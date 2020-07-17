@@ -152,7 +152,6 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
   end
 
-
   def disable_ssn_requirement
     @benfit_sponsorships = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:"_id".in => params[:ids])
 
@@ -793,7 +792,6 @@ def employer_poc
   end
 
   private
-
 
   def group_enrollments_by_year_and_market(all_enrollments)
     current_year = TimeKeeper.date_of_record.year
