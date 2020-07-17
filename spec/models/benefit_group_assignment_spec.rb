@@ -393,7 +393,7 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
 
     context "and benefit coverage activity occurs" do
       it "should update the benfefit group assignment" do
-        expect(census_employee.benefit_group_assignments.first.make_active).to eq(true)
+        expect(census_employee.benefit_group_assignments.first.make_active).to be_truthy
       end
     end
   end
