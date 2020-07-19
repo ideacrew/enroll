@@ -1,7 +1,7 @@
 require "rails_helper"
 
 module Operations
-  module Cartafact
+  module Documents
     RSpec.describe Upload do
 
       subject do
@@ -23,7 +23,7 @@ module Operations
                           "language"=>"en",
                           "format"=>"application/octet-stream",
                           "source"=>"enroll_system",
-                          "type"=>"notice",
+                          "document_type"=>"notice",
                           "subjects"=>[{"id"=>"BSON::ObjectId.new.to_s", "type"=>"test"}],
                           "id"=>BSON::ObjectId.new.to_s,
                           "extension"=>"pdf"
@@ -40,14 +40,13 @@ module Operations
       end
 
       describe "when response has empty subjects" do
-        let(:params) { {resource: employer_profile,
-                        file_params: {subject: 'test', body: 'test', file: Rack::Test::UploadedFile.new(tempfile, "application/pdf")},
-                        user: user }}
+        let(:params) {{resource: employer_profile,
+                       file_params: {subject: 'test', body: 'test', file: Rack::Test::UploadedFile.new(tempfile, "application/pdf")}, user: user }}
         let(:error_message) {{:subjects => ['Missing attributes for subjects']}}
 
         it "fails" do
           doc_storage[:subjects] = []
-          result = Operations::Cartafact::Upload.new.validate_params(doc_storage.transform_keys(&:to_sym))
+          result = Operations::Documents::Upload.new.validate_response(doc_storage.transform_keys(&:to_sym))
           expect(result).not_to be_success
           expect(result.failure).to eq error_message
         end
@@ -61,7 +60,7 @@ module Operations
 
         it "fails" do
           doc_storage[:id] = ""
-          result = Operations::Cartafact::Upload.new.validate_params(doc_storage.transform_keys(&:to_sym))
+          result = Operations::Documents::Upload.new.validate_response(doc_storage.transform_keys(&:to_sym))
           expect(result).not_to be_success
           expect(result.failure).to eq error_message
         end
@@ -71,11 +70,11 @@ module Operations
         let(:params) { {resource: employer_profile,
                         file_params: {subject: 'test', body: 'test', file: Rack::Test::UploadedFile.new(tempfile, "application/pdf")},
                         user: user }}
-        let(:error_message) {{:type => ['Please enter document type']}}
+        let(:error_message) {{:document_type => ['Document type is missing']}}
 
         it "fails" do
-          doc_storage[:type] = ""
-          result = Operations::Cartafact::Upload.new.validate_params(doc_storage.transform_keys(&:to_sym))
+          doc_storage[:document_type] = ""
+          result = Operations::Documents::Upload.new.validate_response(doc_storage.transform_keys(&:to_sym))
           expect(result).not_to be_success
           expect(result.failure).to eq error_message
         end
@@ -89,7 +88,7 @@ module Operations
 
         it "fails" do
           doc_storage[:source] = ""
-          result = Operations::Cartafact::Upload.new.validate_params(doc_storage.transform_keys(&:to_sym))
+          result = Operations::Documents::Upload.new.validate_response(doc_storage.transform_keys(&:to_sym))
           expect(result).not_to be_success
           expect(result.failure).to eq error_message
         end
@@ -101,10 +100,15 @@ module Operations
                         user: user }}
 
         it "success" do
-          validated_params = Operations::Cartafact::Upload.new.validate_params(doc_storage.transform_keys(&:to_sym))
-          file_entity = Operations::Cartafact::Upload.new.create_file_entity(validated_params.value!)
-          file = Operations::Cartafact::Upload.new.create_document(employer_profile, params[:file_params], file_entity.value!.to_h)
+          validated_params = Operations::Documents::Upload.new.validate_response(doc_storage.transform_keys(&:to_sym))
+          file = Operations::Documents::Upload.new.create_document(employer_profile, params[:file_params], validated_params.value!)
           expect(file.success?).to eq true
+        end
+
+        it "should save document ot profile" do
+          validated_params = Operations::Documents::Upload.new.validate_response(doc_storage.transform_keys(&:to_sym))
+          Operations::Documents::Upload.new.create_document(employer_profile, params[:file_params], validated_params.value!)
+          expect(employer_profile.documents.count).to eq 1
         end
       end
     end

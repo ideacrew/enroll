@@ -13,7 +13,7 @@ module Operations
       let(:employer_profile) {organization.employer_profile}
 
       describe 'given empty resource' do
-        let(:params) {{resource: nil, message_params: {subject: 'test', body: 'test'}}}
+        let(:params) {{resource: nil, message_params: {subject: 'test', body: 'test'}, document: nil}}
         let(:error_message) {{:message => ['Please find valid resource to send the message']}}
 
         it 'fails' do
@@ -24,7 +24,7 @@ module Operations
 
       describe "given empty :subject" do
 
-        let(:params) { {resource: employer_profile,  message_params: {subject: '', body: 'test'} }}
+        let(:params) { {resource: employer_profile,  message_params: {subject: '', body: 'test'}, document: nil }}
         let(:error_message) {{:subject => ['Please enter subject']}}
 
 
@@ -36,7 +36,7 @@ module Operations
 
       describe "given empty :body" do
 
-        let(:params) { { resource: employer_profile, message_params: {subject: 'test', body: '' }}}
+        let(:params) { { resource: employer_profile, message_params: {subject: 'test', body: '' }, document: nil}}
         let(:error_message) {{:body => ['Please enter content']}}
 
 
@@ -48,7 +48,7 @@ module Operations
 
       describe "given empty :body and :subject" do
 
-        let(:params) { { resource: employer_profile, message_params: {subject: '', body: ''}}}
+        let(:params) { { resource: employer_profile, message_params: {subject: '', body: ''}, document: nil}}
         let(:error_message) {{:subject => ['Please enter subject'], :body => ['Please enter content']}}
 
 
@@ -60,19 +60,20 @@ module Operations
 
       describe "not passing keys :body and :subject" do
 
-        let(:params) { { resource: employer_profile, message_params: { }}}
+        let(:params) { {} }
         let(:error_message) {{:subject => ['is missing'], :body => ['is missing']}}
 
 
         it "fails" do
-          expect(subject).not_to be_success
-          expect(subject.failure).to eq error_message
+          result = Operations::SecureMessages::Create.new.validate_message_payload(params)
+          expect(result).not_to be_success
+          expect(result.failure).to eq error_message
         end
       end
 
       describe "passing valid data" do
 
-        let(:params) { { resource: employer_profile, message_params: {subject: 'test', body: 'test'}}}
+        let(:params) { { resource: employer_profile, message_params: {subject: 'test', body: 'test'}, document: nil}}
 
         it "success" do
           expect(subject).to be_success

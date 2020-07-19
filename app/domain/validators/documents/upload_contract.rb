@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
 module Validators
-  module Cartafact
+  module Documents
     class UploadContract < ::Dry::Validation::Contract
 
       params do
         required(:subjects).value(:array)
         required(:id).value(:string)
-        required(:type).value(:string)
+        required(:document_type).value(:string)
         required(:source).value(:string)
       end
 
@@ -19,8 +19,8 @@ module Validators
         key.failure('Doc storage Identifier is blank') if value.blank?
       end
 
-      rule(:type) do
-        key.failure('Please enter document type') if value.blank?
+      rule(:document_type) do
+        key.failure('Document type is missing') if value.blank?
       end
 
       rule(:source) do

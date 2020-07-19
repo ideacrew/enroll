@@ -10,8 +10,12 @@ module Operations
     def call(params:, user:)
       validate_params = yield validate_params(params)
       resource = yield fetch_resource(validate_params)
-      upload_doc_result = yield upload_document(resource, validate_params, user)
-      secure_message_result = yield upload_secure_message(resource, validate_params)
+
+      if params[:file].present?
+        uploaded_doc = yield upload_document(resource, validate_params, user)
+      end
+
+      secure_message_result = yield upload_secure_message(resource, validate_params, uploaded_doc)
       result = yield send_generic_notice_alert(secure_message_result)
       Success(result)
     end
@@ -33,15 +37,11 @@ module Operations
     end
 
     def upload_document(resource, params, user)
-      if params[:file].present?
-        ::Operations::Cartafact::Upload.new.call(resource: resource, file_params: params, user: user)
-      else
-        Success(true)
-      end
+      ::Operations::Documents::Upload.new.call(resource: resource, file_params: params, user: user)
     end
 
-    def upload_secure_message(resource, params)
-      ::Operations::SecureMessages::Create.new.call(resource: resource, message_params: params)
+    def upload_secure_message(resource, params, document)
+      ::Operations::SecureMessages::Create.new.call(resource: resource, message_params: params, document: document)
     end
 
     def send_generic_notice_alert(resource)

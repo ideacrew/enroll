@@ -12,7 +12,7 @@ module Operations
         if resource.blank?
           return Failure({:message => ['Please find valid resource to create document.']})
         end
-        payload = construct_doc_payload(document_params, doc_identifier)
+        payload = yield construct_doc_payload(document_params, doc_identifier)
         validated_params = yield validate_params(payload)
         document_entity = yield create_document_entity(validated_params)
         document = yield create(resource, document_entity.to_h)
@@ -33,7 +33,7 @@ module Operations
 
       def create(resource, document_entity)
         document = resource.documents.build(document_entity)
-        resource.save!
+        document.save!
         Success(document)
       end
 
@@ -46,13 +46,13 @@ module Operations
       end
 
       def construct_doc_payload(params, doc_identifier)
-        {
+        Success({
             "title": fetch_file_name(params),
             "format": fetch_file_content_type(params),
             "creator": "hbx_staff",
             "subject": "notice",
             "doc_identifier": doc_identifier
-        }
+        })
       end
     end
   end
