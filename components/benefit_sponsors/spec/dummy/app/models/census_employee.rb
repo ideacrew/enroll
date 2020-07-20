@@ -283,11 +283,6 @@ class CensusEmployee < CensusMember
     end
   end
 
-  def active_benefit_group_assignment
-    # TODO: "is_active" depracated
-    benefit_group_assignments
-  end
-
   def renewal_benefit_group_assignment
     return benefit_group_assignments.order_by(:created_at.desc).detect{ |assignment| assignment.plan_year &. is_renewing? } if is_case_old?
     benefit_group_assignments.order_by(:created_at.desc).detect{ |assignment| assignment.benefit_application &. is_renewing? }
@@ -307,20 +302,6 @@ class CensusEmployee < CensusMember
  def waived?
     bga = renewal_benefit_group_assignment || active_benefit_group_assignment
     return bga.present? ? bga&.hbx_enrollment&.aasm_state == 'coverage_waived' : false
-  end
-
-  def active_benefit_group_assignment=(benefit_package_id)
-    benefit_application = BenefitSponsors::BenefitApplications::BenefitApplication.where(
-      :"benefit_packages._id" => benefit_package_id
-    ).first || employer_profile.active_benefit_sponsorship.current_benefit_application
-
-    if benefit_application.present?
-      benefit_packages = benefit_package_id.present? ? [benefit_application.benefit_packages.find(benefit_package_id)] : benefit_application.benefit_packages
-    end
-
-    if benefit_packages.present? && (active_benefit_group_assignment.blank? || !benefit_packages.map(&:id).include?(active_benefit_group_assignment.benefit_package.id))
-      create_benefit_group_assignment(benefit_packages)
-    end
   end
 
   def renewal_benefit_group_assignment=(renewal_package_id)
@@ -536,7 +517,7 @@ class CensusEmployee < CensusMember
   end
 
   def active_benefit_group_assignment(coverage_date = TimeKeeper.date_of_record)
-    benefit_package_assignment_on(coverage_date) || benefit_group_assignments.reject { |bga| bga.activated_at.present? }.sort_by(&:start_on).last
+    benefit_package_assignment_on(coverage_date) || benefit_group_assignments.reject { |bga| bga.activated_at.present? }.sort_by(&:start_on).reverse.last
   end
 
   def renewal_benefit_group_assignment
