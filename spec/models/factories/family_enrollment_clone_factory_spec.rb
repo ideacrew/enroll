@@ -99,11 +99,7 @@ RSpec.describe Factories::FamilyEnrollmentCloneFactory, :type => :model, dbclean
       expect(family.enrollments.size).to eq 1
       expect(family.enrollments.map(&:kind)).not_to include('employer_sponsored_cobra')
       generate_cobra_enrollment
-      # TODO: This was changed from 2 to 3 on here https://github.com/dchbx/enroll/pull/1173/files
-      # expect(family.enrollments.by_coverage_kind('health').size).to eq 3
-      # It returns 2 after the BGA attributes deprecation. But where? It isn't clear.
-      # why would a "clone" create 2 new health enrollments?
-      expect(family.enrollments.by_coverage_kind('health').size).to eq 2
+      expect(family.enrollments.by_coverage_kind('health').size).to eq 3
       expect(family.enrollments.map(&:kind)).to include('employer_sponsored_cobra')
     end
 
