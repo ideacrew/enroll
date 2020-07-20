@@ -177,7 +177,7 @@ module BenefitSponsors
         it "should redirect to new" do
           [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
             sign_in_and_do_create(login_user)
-            expect(response).to render_template("new")
+            expect(response).to have_http_status(:redirect)
           end
         end
 
