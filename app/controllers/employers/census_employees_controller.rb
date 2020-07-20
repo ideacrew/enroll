@@ -152,11 +152,12 @@ class Employers::CensusEmployeesController < ApplicationController
       @cobra_date = DateTime.strptime(cobra_date, '%m/%d/%Y').try(:to_date)
     else
       @cobra_date = ""
+      flash[:error] = "Please enter cobra date."
     end
 
     if @cobra_date.present?
       if !@census_employee.can_elect_cobra?
-        flash[:error] = "Cobra can only be initiated for employees who are in terminated or termination pending status"
+        flash[:error] = "COBRA can only be initiated for employees who are in terminated or termination pending status"
       else
         if @census_employee.update_for_cobra(@cobra_date, current_user)
           flash[:notice] = "Successfully update Census Employee."
@@ -164,12 +165,10 @@ class Employers::CensusEmployeesController < ApplicationController
           if @census_employee.coverage_terminated_on <= @cobra_date
             flash[:error] = "COBRA cannot be initiated for this employee because cobra initiation date should be after coverage termination date"
           else
-            flash[:error] = "COBRA cannot be initiated for this employee because termination date is over 6 months in the past. Please contact #{site_short_name} at #{contact_center_phone_number} for further assistance."
+            flash[:error] = "COBRA cannot be initiated for this employee because of invalid date. Please contact #{site_short_name} at #{contact_center_phone_number} for further assistance."
           end
         end
       end
-    else
-      flash[:error] = "Please enter cobra date."
     end
   end
 
