@@ -9,6 +9,9 @@ RSpec.describe ShopEmployeeNotices::OpenEnrollmentNoticeForAutoRenewal, :dbclean
   let(:person) {FactoryBot.create(:person)}
   let(:family){ FactoryBot.create(:family, :with_primary_family_member, person: person) }
   let(:household){ family.active_household }
+  let(:benefit_sponsor)       { create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile_initial_application, site: site) }
+  let(:benefit_sponsorship) { benefit_sponsor.active_benefit_sponsorship }
+  let!(:benefit_package)      { benefit_sponsorship.benefit_applications.first.benefit_packages.first}
   let!(:census_employee) { FactoryBot.create(:census_employee_with_active_and_renewal_assignment, employee_role_id: employee_role.id, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: benefit_package ) }
   let!(:employee_role) { FactoryBot.create(:employee_role, person: person, employer_profile: abc_profile) }
   let(:benefit_group_assignment) { census_employee.renewal_benefit_group_assignment }
