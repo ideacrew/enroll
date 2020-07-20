@@ -1723,6 +1723,85 @@ describe "terminated_enrollments", dbclean: :after_each do
   end
 end
 
+describe "#currently_enrolled_products", dbclean: :after_each do
+  let!(:person) { FactoryBot.create(:person)}
+  let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+  let!(:household) { FactoryBot.create(:household, family: family) }
+  let!(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
+  let!(:effective_on) { TimeKeeper.date_of_record.beginning_of_month}
+  let!(:hbx_enrollment_member) { FactoryBot.build(:hbx_enrollment_member, applicant_id: family.primary_applicant.id) }
+
+  let!(:active_enrollment) {
+    FactoryBot.create(:hbx_enrollment,
+                      family: family,
+                      household: family.active_household,
+                      coverage_kind: "health",
+                      product: product,
+                      aasm_state: 'coverage_selected',
+                      hbx_enrollment_members: [hbx_enrollment_member]
+    )}
+  let!(:shopping_enrollment) {
+    FactoryBot.create(:hbx_enrollment,
+                      family: family,
+                      effective_on: effective_on,
+                      household: family.active_household,
+                      coverage_kind: "health",
+                      aasm_state: 'shopping',
+                      hbx_enrollment_members: [hbx_enrollment_member]
+    )}
+
+
+  context "when consumer has active enrollment" do
+    it "should return current active enrolled product" do
+      expect(family.currently_enrolled_products(shopping_enrollment)).to eq [active_enrollment.product]
+    end
+  end
+
+  context "when consumer has contionus coverage" do
+
+    let!(:term_enrollment) {
+      FactoryBot.create(:hbx_enrollment,
+                        family: family,
+                        household: family.active_household,
+                        coverage_kind: "health",
+                        product: product,
+                        terminated_on: effective_on - 1.day,
+                        aasm_state: 'coverage_terminated',
+                        hbx_enrollment_members: [hbx_enrollment_member]
+      )}
+
+    before do
+      active_enrollment.cancel_coverage!
+    end
+
+    it "should return contionus coverage product" do
+      expect(family.currently_enrolled_products(shopping_enrollment)).to eq [term_enrollment.product]
+    end
+  end
+
+  context "when consumer no contionus coverage" do
+
+    let!(:term_enrollment) {
+      FactoryBot.create(:hbx_enrollment,
+                        family: family,
+                        household: family.active_household,
+                        coverage_kind: "health",
+                        product: product,
+                        terminated_on: effective_on - 2.day,
+                        aasm_state: 'coverage_terminated',
+                        hbx_enrollment_members: [hbx_enrollment_member]
+      )}
+
+    before do
+      active_enrollment.cancel_coverage!
+    end
+
+    it "should return []" do
+      expect(family.currently_enrolled_products(shopping_enrollment)).to eq []
+    end
+  end
+end
+
 shared_examples_for 'has aptc enrollment' do |created_at, applied_aptc, market_kind, result|
   let(:family) { FactoryBot.build(:family, :with_primary_family_member) }
   let(:enrollment) do
