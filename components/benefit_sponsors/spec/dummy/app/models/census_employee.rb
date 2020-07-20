@@ -516,6 +516,21 @@ class CensusEmployee < CensusMember
     )
   end
 
+  def active_benefit_group_assignment=(benefit_package_id)
+    benefit_application = BenefitSponsors::BenefitApplications::BenefitApplication.where(
+      :"benefit_packages._id" => benefit_package_id
+    ).first || employer_profile.active_benefit_sponsorship.current_benefit_application
+
+    if benefit_application.present?
+      benefit_packages = benefit_package_id.present? ? [benefit_application.benefit_packages.find(benefit_package_id)] : benefit_application.benefit_packages
+    end
+
+    if benefit_packages.present? && (active_benefit_group_assignment.blank? || !benefit_packages.map(&:id).include?(active_benefit_group_assignment.benefit_package.id))
+      create_benefit_group_assignment(benefit_packages)
+    end
+  end
+
+
   def active_benefit_group_assignment(coverage_date = TimeKeeper.date_of_record)
     benefit_package_assignment_on(coverage_date) || benefit_group_assignments.reject { |bga| bga.activated_at.present? }.sort_by(&:start_on).reverse.last
   end
