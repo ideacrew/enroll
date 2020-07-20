@@ -627,22 +627,6 @@ class HbxEnrollment
     end
   end
 
-  def propogate_waiver
-    return false unless is_shop? # there is no concept of waiver in ivl case
-
-    if coverage_kind == 'health' && benefit_group_assignment.present?
-      benefit_group_assignment.waive_coverage! if benefit_group_assignment.may_waive_coverage?
-    end
-
-    true
-  end
-
-  def propagate_renewal
-    if is_shop? && coverage_kind == 'health'
-      benefit_group_assignment.renew_coverage! if benefit_group_assignment.may_renew_coverage?
-    end
-  end
-
   def construct_waiver_enrollment(waiver_reason = nil)
     qle = family.is_under_special_enrollment_period? && (family.earliest_effective_shop_sep.present? || family.earliest_effective_fehb_sep.present?)
     coverage_hh = employee_role.person.primary_family.active_household.immediate_family_coverage_household
@@ -1533,7 +1517,7 @@ class HbxEnrollment
     # after_all_transitions :perform_employer_plan_year_count
 
     event :renew_enrollment, :after => :record_transition do
-      transitions from: :shopping, to: :auto_renewing, after: :propagate_renewal
+      transitions from: :shopping, to: :auto_renewing
     end
 
     event :renew_waived, :after => :record_transition do
@@ -1564,7 +1548,7 @@ class HbxEnrollment
 
     event :waive_coverage, :after => :record_transition do
       transitions from: [:shopping, :coverage_selected, :auto_renewing, :renewing_coverage_selected],
-                  to: :inactive, after: :propogate_waiver
+                  to: :inactive
     end
 
     event :begin_coverage, :after => :record_transition do
