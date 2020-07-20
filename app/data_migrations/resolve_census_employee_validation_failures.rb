@@ -56,7 +56,7 @@ class ResolveCensusEmployeeValidationFailures < MongoidMigrationTask
 
 
           if census_employee.active_benefit_group_assignment.blank?
-            census_employee.find_or_create_benefit_group_assignment(active_plan_year.benefit_groups)
+            census_employee.create_benefit_group_assignment(active_plan_year.benefit_groups)
           end
         end
       end

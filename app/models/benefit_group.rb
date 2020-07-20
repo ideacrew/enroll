@@ -538,7 +538,7 @@ class BenefitGroup
           # ce.add_renew_benefit_group_assignment(other_benefit_group)
           ce.add_renew_benefit_group_assignment([other_benefit_group])
         else
-          ce.find_or_create_benefit_group_assignment([other_benefit_group])
+          ce.create_benefit_group_assignment([other_benefit_group])
         end
       end
     end

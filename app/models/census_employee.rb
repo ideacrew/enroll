@@ -167,7 +167,7 @@ class CensusEmployee < CensusMember
           :benefit_package_id => benefit_package.id,
           "$or" => [
             {"end_on" => nil},
-            {"end_on" => {"$lt" => effective_on}}
+            {"end_on" => {"$gt" => effective_on}}
           ]
         }
       }
@@ -834,7 +834,7 @@ class CensusEmployee < CensusMember
     end
 
     if benefit_packages.present? && (active_benefit_group_assignment.blank? || !benefit_packages.map(&:id).include?(active_benefit_group_assignment.benefit_package.id))
-      find_or_create_benefit_group_assignment(benefit_packages)
+      create_benefit_group_assignment(benefit_packages)
     end
   end
 
@@ -1500,11 +1500,12 @@ class CensusEmployee < CensusMember
     (active_benefit_group_cobra_eligible_enrollments + renewal_benefit_group_cobra_eligible_enrollments).flatten
   end
 
-  # Retrieves the last updated benefit_group_assignment with a given +package_id+
-  # @param package_id [Integer]
+  # Retrieves the last updated benefit_group_assignment with a given +package_id+ & +start_on+
+  # @param package_id & start_on [Integer]
   # @return [BenefitGroupAssignment]
-  def benefit_group_assignment_by_package(package_id)
-    benefit_group_assignments.where(benefit_package_id: package_id).order_by(:'updated_at'.desc).first
+  def benefit_group_assignment_by_package(package_id, start_on)
+    # benefit_group_assignments.where(benefit_package_id: package_id).order_by(:'updated_at'.desc).first
+    benefit_group_assignments.detect { |benefit_group_assignment| benefit_group_assignment.benefit_package_id == package_id && benefit_group_assignment.is_active?(start_on) }
   end
 
   def benefit_package_for_date(coverage_date)

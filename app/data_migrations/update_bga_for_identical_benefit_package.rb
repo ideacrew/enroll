@@ -25,7 +25,7 @@ class UpdateBgaForIdenticalBenefitPackage < MongoidMigrationTask
               puts "New benefit_group_assignment assigned to census_employee #{ce.full_name} of ER: #{benefit_sponsorship.legal_name}" unless Rails.env.test?
             end
           else
-            ce.find_or_create_benefit_group_assignment([new_benefit_package])
+            ce.create_benefit_group_assignment([new_benefit_package])
           end
         end
 

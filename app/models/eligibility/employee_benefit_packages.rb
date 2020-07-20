@@ -7,7 +7,7 @@ module Eligibility
       py = employer_profile.plan_years.published.first || employer_profile.plan_years.where(aasm_state: 'draft').first
       if py.present?
         if active_benefit_group_assignment.blank? || active_benefit_group_assignment&.benefit_group&.plan_year != py
-          find_or_create_benefit_group_assignment(py.benefit_groups)
+          create_benefit_group_assignment(py.benefit_groups)
         end
       end
 
@@ -19,7 +19,7 @@ module Eligibility
     end
 
     # Deprecated
-    #def find_or_create_benefit_group_assignment_deprecated(benefit_groups)
+    #def create_benefit_group_assignment_deprecated(benefit_groups)
     #  bg_assignments = benefit_group_assignments.where(:benefit_group_id.in => benefit_groups.map(&:_id)).order_by(:'created_at'.desc)
 
     #  if bg_assignments.present?
@@ -30,17 +30,22 @@ module Eligibility
     #  end
     #send
 
-    def find_or_create_benefit_group_assignment(benefit_packages)
+    # R4 Updates
+    # When switching benefit package, we are always creating a new BGA and terminating/cancelling previous BGA
+    # TODO: Creating BGA for first benefit group only
 
+    def create_benefit_group_assignment(benefit_packages)
       if benefit_packages.present?
-        bg_assignments = benefit_group_assignments.where(:benefit_package_id.in => benefit_packages.map(&:_id)).order_by(:'created_at'.desc)
+        # bg_assignments = benefit_group_assignments.where(:benefit_package_id.in => benefit_packages.map(&:_id)).order_by(:'created_at'.desc)
         # TODO: Need to figure out if this should be considered
-        if bg_assignments.present?
-          valid_bg_assignment =  bg_assignments.select { |bga| HbxEnrollment::ENROLLED_STATUSES.include?(bga.hbx_enrollment&.aasm_state) }.last || bg_assignments.first
-          valid_bg_assignment.make_active
-        else
-          add_benefit_group_assignment(benefit_packages.first, benefit_packages.first.plan_year.start_on)
+        # valid_bg_assignment =  bg_assignments.select { |bga| HbxEnrollment::ENROLLED_STATUSES.include?(bga.hbx_enrollment&.aasm_state) }.last || bg_assignments.first
+        # valid_bg_assignment.make_active
+
+        benefit_group_assignments.where(start_on: benefit_packages.first.start_on).each do |benefit_group_assignment|
+          benefit_group_assignment.is_active? ? benefit_group_assignment.end_benefit(TimeKeeper.date_of_record) : benefit_group_assignment.end_benefit(benefit_group_assignment.start_on)
         end
+
+        add_benefit_group_assignment(benefit_packages.first, benefit_packages.first.start_on, benefit_packages.first.end_on)
       end
     end
 
@@ -82,11 +87,11 @@ module Eligibility
       benefit_group_assignments << bga
     end
 
-    def add_benefit_group_assignment(new_benefit_group, start_on = nil)
+    def add_benefit_group_assignment(new_benefit_group, start_on = nil, end_on = nil)
       return add_benefit_group_assignment_deprecated(new_benefit_group) if is_case_old?
       raise ArgumentError, "expected BenefitGroup" unless new_benefit_group.is_a?(BenefitSponsors::BenefitPackages::BenefitPackage)
-      reset_active_benefit_group_assignments(new_benefit_group)
-      benefit_group_assignments << BenefitGroupAssignment.new(benefit_group: new_benefit_group, start_on: (start_on || new_benefit_group.start_on))
+      # reset_active_benefit_group_assignments(new_benefit_group)
+      benefit_group_assignments << BenefitGroupAssignment.new(benefit_group: new_benefit_group, start_on: (start_on || new_benefit_group.start_on), end_on: end_on || new_benefit_group.end_on)
     end
 
     # Deprecated

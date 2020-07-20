@@ -484,7 +484,7 @@ module BenefitSponsors
           if is_renewing?
             ce.add_renew_benefit_group_assignment([other_benefit_package])
           else
-            ce.find_or_create_benefit_group_assignment([other_benefit_package])
+            ce.create_benefit_group_assignment([other_benefit_package])
           end
         end
       end

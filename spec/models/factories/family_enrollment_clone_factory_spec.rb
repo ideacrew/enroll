@@ -95,7 +95,7 @@ RSpec.describe Factories::FamilyEnrollmentCloneFactory, :type => :model, dbclean
   context 'family under renewing employer' do
     let(:external_enrollment) { false }
 
-    it 'should recive cobra enrollment' do
+    it 'should receive cobra enrollment' do
       expect(family.enrollments.size).to eq 1
       expect(family.enrollments.map(&:kind)).not_to include('employer_sponsored_cobra')
       generate_cobra_enrollment

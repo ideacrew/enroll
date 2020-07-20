@@ -319,7 +319,7 @@ class CensusEmployee < CensusMember
     end
 
     if benefit_packages.present? && (active_benefit_group_assignment.blank? || !benefit_packages.map(&:id).include?(active_benefit_group_assignment.benefit_package.id))
-      find_or_create_benefit_group_assignment(benefit_packages)
+      create_benefit_group_assignment(benefit_packages)
     end
   end
 
@@ -337,7 +337,7 @@ class CensusEmployee < CensusMember
     end
   end
 
-  def find_or_create_benefit_group_assignment(benefit_packages)
+  def create_benefit_group_assignment(benefit_packages)
 
     if benefit_packages.present?
       bg_assignments = benefit_group_assignments.where(:benefit_package_id.in => benefit_packages.map(&:_id)).order_by(:'created_at'.desc)
