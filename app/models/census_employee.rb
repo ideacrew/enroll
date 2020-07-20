@@ -594,7 +594,7 @@ class CensusEmployee < CensusMember
   end
 
   def active_benefit_group_assignment(coverage_date = TimeKeeper.date_of_record)
-    benefit_package_assignment_on(coverage_date) || benefit_group_assignments.reject { |bga| bga.activated_at.present? }.sort_by(&:start_on).last
+    benefit_package_assignment_on(coverage_date) || benefit_group_assignments.reject { |bga| bga.activated_at.present? }.sort_by(&:start_on).reverse.last
   end
 
   # Pass in active coverage_date to get the renewal benefit group assignment
