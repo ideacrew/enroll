@@ -18,7 +18,7 @@ module Operations
 
         header = yield construct_headers(resource, user)
         body = yield construct_body(resource, file_params)
-        response = yield upload_to_doc_storage(header, body)
+        response = yield upload_to_doc_storage(resource, header, body)
         validated_params = yield validate_response(response.transform_keys(&:to_sym))
         file = yield create_document(resource, file_params, validated_params)
         Success(file)
@@ -57,7 +57,7 @@ module Operations
                 })
       end
 
-      def upload_to_doc_storage(header, body)
+      def upload_to_doc_storage(resource, header, body)
         if Rails.env.production?
           response = HTTParty.post(url, :body => body, :headers => header)
 

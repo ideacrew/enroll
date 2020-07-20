@@ -51,6 +51,18 @@ Then(/^Should see success message$/) do
   expect(page).to have_text('Message sent successfully')
 end
 
+When(/^Admin lands on Employers Home page$/) do
+  find('.interaction-click-control-abc-widgets').click
+end
+
+When(/^when Admin clicks messages tab$/) do
+  find(:xpath, '/html/body/div[3]/div/div/div[1]/nav/ul/li[7]/a').click
+end
+
+Then(/^Admin should see Secure message$/) do
+  expect(page).to have_text('Send Secure Subject.')
+end
+
 Then(/^the user will see the Send Secure Message option form$/) do
   expect(page).to have_css('input[type="file"]')
   expect(page).to have_text('Recipient')
@@ -60,6 +72,13 @@ Then(/^the user will see the Send Secure Message option form$/) do
   expect(page).to have_css("textarea[placeholder='Write here...']")
   expect(page).to have_button('Send', disabled: false)
   expect(page).to have_button('Cancel', disabled: false)
+end
+
+Then(/^Admin enters form with subject content and uploads file and clicks send$/) do
+  fill_in 'subject', :with => 'Send Secure Subject.'
+  fill_in 'body', :with => 'Send secure message regarding.'
+  attach_file('file', "#{Rails.root}/lib/pdf_templates/blank.pdf")
+  page.find('#send_secure_message').click
 end
 
 Then(/^the user will not see the Send Secure Message option form$/) do
