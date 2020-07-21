@@ -529,7 +529,6 @@ class BenefitGroup
           bga.hbx_enrollments.each do |enrollment|
             enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
           end
-          bga.update(is_active: false) unless self.plan_year.is_renewing?
         end
 
         other_benefit_group = self.plan_year.benefit_groups.detect{ |bg| bg.id != self.id}
