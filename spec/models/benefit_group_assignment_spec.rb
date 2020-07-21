@@ -289,6 +289,14 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
       it "should update the benfefit group assignment" do
         expect(census_employee.benefit_group_assignments.first.make_active).to eq(true)
       end
+
+      it "should not update end_on date for inactive BGA" do
+        census_employee.benefit_group_assignments.first.update_attributes!(end_on: nil)
+        allow(census_employee.benefit_group_assignments.first).to receive(:is_active?).and_return(false)
+        census_employee.benefit_group_assignments.first.make_active
+        census_employee.benefit_group_assignments.first.reload
+        expect(census_employee.benefit_group_assignments.first.end_on).to eq(nil)
+      end
     end
   end
 

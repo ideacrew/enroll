@@ -1528,6 +1528,29 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     # end
   end
 
+  context ".is_covered_or_waived?" do
+    let(:census_employee) {CensusEmployee.new}
+    let!(:bga) { census_employee.benefit_group_assignments.new(hbx_enrollment_id: hbx_enrollment.id) }
+    let!(:hbx_enrollment) { HbxEnrollment.new(id: 1) }
+    it "should return true if coverage selected" do
+      hbx_enrollment.aasm_state = 'coverage_selected'
+      allow(bga).to receive(:hbx_enrollment).and_return(hbx_enrollment)
+      expect(census_employee.is_covered_or_waived?).to eq(true)
+    end
+
+    it "should return true if coverage waived" do
+      hbx_enrollment.aasm_state = 'coverage_waived'
+      allow(bga).to receive(:hbx_enrollment).and_return(hbx_enrollment)
+      expect(census_employee.is_covered_or_waived?).to eq(true)
+    end
+
+    it "should return false if different aasm state" do
+      hbx_enrollment.aasm_state = 'void'
+      allow(bga).to receive(:hbx_enrollment).and_return(hbx_enrollment)
+      expect(census_employee.is_covered_or_waived?).to eq(false)
+    end
+  end
+
   context "current_state" do
     let(:census_employee) {CensusEmployee.new}
 
