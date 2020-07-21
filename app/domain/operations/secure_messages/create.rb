@@ -11,13 +11,13 @@ module Operations
 
       #resource can be a profile or person who has inbox as embedded document
 
-      def call(resource:, message_params:)
+      def call(resource:, message_params:, document:)
 
         if resource.blank?
           return Failure({:message => ['Please find valid resource to send the message']})
         end
 
-        payload = yield construct_message_payload(message_params)
+        payload = yield construct_message_payload(resource, message_params, document)
         validated_payload = yield validate_message_payload(payload)
         message_entity = yield create_message_entity(validated_payload)
         resource = yield create(resource, message_entity.to_h)
@@ -27,8 +27,19 @@ module Operations
 
       private
 
-      def construct_message_payload(message_params)
-        Success(message_params.merge!(from: site_short_name))
+      def construct_message_payload(resource, message_params, document)
+
+        body = if document.present?
+                 message_params[:body] + "<br>You can download the notice by clicking this link " +
+                   "<a href=" + "#{Rails.application.routes.url_helpers.authorized_document_download_path(resource.class.to_s, resource.id, 'documents', document.id )}?content_type=#{document.format}&filename=#{document.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + document.title.gsub(/[^0-9a-z]/i,'') + "</a>"
+               else
+                 message_params[:body]
+               end
+
+        Success({ :subject => message_params[:subject],
+                  :body => body,
+                  :from => site_short_name
+                })
       end
 
       def validate_message_payload(params)

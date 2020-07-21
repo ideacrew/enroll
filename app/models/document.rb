@@ -63,6 +63,8 @@ class Document
 
   field :size, type: String
 
+  field :doc_identifier, type: String
+
   validates_presence_of :title, :creator, :publisher, :type, :format, :source, :language
 
   validates :rights,

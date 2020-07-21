@@ -22,6 +22,17 @@ Feature: As a Super Admin I will have the ability to see and access "Send Secure
     Then Should click on confirm button
     Then Should see success message
 
+  Scenario: HBX Staff with Super Admin sub roles should be able to send message with file attached
+    When the user clicks the Send Secure Message button for this Employer
+    And the user will see the Send Secure Message option form
+    When Admin enters form with subject content and uploads file and clicks send
+    And Should see a dialog box for confirmation
+    When Should click on confirm button
+    Then Should see success message
+    When Admin lands on Employers Home page
+    And when Admin clicks messages tab
+    Then Admin should see Secure message
+
   Scenario: HBX Staff with Super Admin sub roles will be able to cancel at confirmation
     When the user clicks the Send Secure Message button for this Employer
     Then the user will see the Send Secure Message option form
