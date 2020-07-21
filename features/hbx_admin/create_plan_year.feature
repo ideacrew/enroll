@@ -48,3 +48,18 @@ Feature: Create Benefit Application by admin UI
         | Enrolled              | binder_paid           | Enrolled                          | Existing plan year with overlapping coverage exists |
         | Enrollment Ineligible | enrollment_ineligible | Enrollment Ineligible             | Existing plan year with overlapping coverage exists |
         | Active                | active                | Active                            | Existing plan year with overlapping coverage exists |
+
+  Scenario: Creating New Plan Year with application in termination_pending
+    # And staff role person logged in
+    And update rating area
+    When ABC Widgets is logged in and on the home page
+    And initial employer ABC Widgets has active benefit application
+    Given that a user with a HBX staff role with HBX staff subrole exists and is logged in
+    And the user is on the Employer Index of the Admin Dashboard
+    When the user clicks Action for that Employer
+    And the user clicks the Plan Years button
+    Then the user will see ABC Widgets Employer
+    And staff role person clicked on benefits tab
+    Then employer should see edit plan year button
+    And employer clicked on edit plan year button
+    Then employer should see form for benefit application and benefit package
