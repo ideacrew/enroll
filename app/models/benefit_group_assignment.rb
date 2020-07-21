@@ -17,6 +17,10 @@ class BenefitGroupAssignment
   field :start_on, type: Date
   field :end_on, type: Date
 
+  field :coverage_end_on, type: Date # Deprecate
+  field :aasm_state, type: String, default: "initialized"
+  field :is_active, type: Boolean, default: true
+
   field :activated_at, type: DateTime
 
   embeds_many :workflow_state_transitions, as: :transitional
@@ -78,7 +82,7 @@ class BenefitGroupAssignment
     end
 
     def on_date(census_employee, date)
-      assignments = census_employee.benefit_group_assignments.select{ |bga| bga.persisted? && bga.activated_at.blank? }
+      assignments = census_employee.benefit_group_assignments.select{ |bga| bga.persisted? && bga.activated_at.blank? && !bga.canceled? }
       assignments_with_no_end_on, assignments_with_end_on = assignments.partition { |bga| bga.end_on.nil? }
 
       if assignments_with_end_on.present?
@@ -309,6 +313,51 @@ class BenefitGroupAssignment
     end
   end
 
+  def change_state_without_event(new_state)
+    old_state = self.aasm_state
+    self.update(aasm_state: new_state.to_s)
+    self.workflow_state_transitions.create(from_state: old_state, to_state: new_state)
+  end
+
+  aasm do
+    state :initialized, initial: true
+    state :coverage_selected
+    state :coverage_waived
+    state :coverage_terminated
+    state :coverage_void
+    state :coverage_renewing
+    state :coverage_expired
+
+    #FIXME create new hbx_enrollment need to create a new benefitgroup_assignment
+    #then we will not need from coverage_terminated to coverage_selected
+    event :select_coverage, :after => :record_transition do
+      transitions from: [:initialized, :coverage_waived, :coverage_terminated, :coverage_renewing], to: :coverage_selected
+    end
+
+    event :waive_coverage, :after => :record_transition do
+      transitions from: [:initialized, :coverage_selected, :coverage_renewing], to: :coverage_waived
+    end
+
+    event :renew_coverage, :after => :record_transition do
+      transitions from: :initialized , to: :coverage_renewing
+    end
+
+    event :terminate_coverage, :after => :record_transition do
+      transitions from: :initialized, to: :coverage_void
+      transitions from: :coverage_selected, to: :coverage_terminated
+      transitions from: :coverage_renewing, to: :coverage_terminated
+    end
+
+    event :expire_coverage, :after => :record_transition do
+      transitions from: [:coverage_selected, :coverage_renewing], to: :coverage_expired, :guard  => :can_be_expired?
+    end
+
+    event :delink_coverage, :after => :record_transition do
+      transitions from: [:coverage_selected, :coverage_waived, :coverage_terminated, :coverage_void, :coverage_renewing, :coverage_waived], to: :initialized, after: :propogate_delink
+    end
+  end
+
+
   def waive_benefit(date = TimeKeeper.date_of_record)
     make_active(date)
   end
@@ -352,6 +401,14 @@ class BenefitGroupAssignment
 
   def can_be_expired?
     benefit_group.end_on <= TimeKeeper.date_of_record
+  end
+
+  def record_transition
+    self.workflow_state_transitions << WorkflowStateTransition.new(
+      from_state: aasm.from_state,
+      to_state: aasm.to_state,
+      event: aasm.current_event
+    )
   end
 
   def propogate_delink
