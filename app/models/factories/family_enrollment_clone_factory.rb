@@ -47,7 +47,8 @@ module Factories
       clone_enrollment.sponsored_benefit_id = enrollment.sponsored_benefit_id
       clone_enrollment.rating_area_id = enrollment.rating_area_id
       clone_enrollment.issuer_profile_id = enrollment.issuer_profile_id
-      assignment = census_employee.benefit_group_assignment_by_package(enrollment.sponsored_benefit_package_id, effective_on)
+      # assignment = census_employee.benefit_group_assignment_by_package(enrollment.sponsored_benefit_package_id, effective_on)
+      assignment = census_employee.create_benefit_package_assignment(enrollment.sponsored_benefit_package, effective_on)
       clone_enrollment.benefit_group_assignment_id = assignment.id
       clone_enrollment.hbx_enrollment_members = clone_enrollment_members
 

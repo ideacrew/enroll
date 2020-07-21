@@ -358,7 +358,7 @@ class CensusEmployee < CensusMember
   end
 
   def create_benefit_package_assignment(new_benefit_package, start_on)
-    new_assignment = benefit_group_assignments.build(start_on: start_on, end_on: nil, benefit_package: new_benefit_package)
+    new_assignment = benefit_group_assignments.build(start_on: start_on, end_on: new_benefit_package.end_on, benefit_package: new_benefit_package)
 
     if new_assignment.save
       new_assignment
