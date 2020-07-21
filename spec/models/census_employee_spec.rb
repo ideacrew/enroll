@@ -1368,6 +1368,42 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     end
   end
 
+  context '.benefit_group_assignment_by_package' do
+    include_context "setup renewal application"
+
+    let(:census_employee) do
+      FactoryBot.create(
+        :benefit_sponsors_census_employee,
+        employer_profile: employer_profile,
+        benefit_sponsorship: benefit_sponsorship
+      )
+    end
+    let(:benefit_group_assignment1) do
+      FactoryBot.create(
+        :benefit_group_assignment,
+        benefit_group: renewal_application.benefit_packages.first,
+        census_employee: census_employee,
+        start_on: renewal_application.benefit_packages.first.start_on,
+        end_on: renewal_application.benefit_packages.first.end_on
+      )
+    end
+
+    before :each do
+      census_employee.benefit_group_assignments.destroy_all
+    end
+
+    it "should return the first benefit group assignment by benefit package id and active start on date" do
+      benefit_group_assignment1
+      expect(census_employee.benefit_group_assignment_by_package(benefit_group_assignment1.benefit_package_id, benefit_group_assignment1.start_on)).to eq(benefit_group_assignment1)
+    end
+
+    it "should return nil if no benefit group assignments match criteria" do
+      expect(
+        census_employee.benefit_group_assignment_by_package(benefit_group_assignment1.benefit_package_id, benefit_group_assignment1.start_on + 1.year)
+      ).to eq(nil)
+    end
+  end
+
   context '.assign_default_benefit_package' do
     include_context "setup renewal application"
 
