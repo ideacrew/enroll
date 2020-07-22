@@ -39,7 +39,7 @@ module Operations
       end
 
       def fetch_url
-        Rails.application.config.cartafact_document_upload_url
+        Rails.application.config.cartafact_document_base_url
       end
 
       def construct_headers(resource, user)
@@ -59,7 +59,7 @@ module Operations
 
       def upload_to_doc_storage(resource, header, body)
         if Rails.env.production?
-          response = HTTParty.post(url, :body => body, :headers => header)
+          response = HTTParty.post(fetch_url, :body => body, :headers => header)
 
           (response["errors"] || response["error"]).present? ? Failure({:message => ['Unable to upload document']}) : Success(response)
         else

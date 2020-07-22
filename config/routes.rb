@@ -616,6 +616,7 @@ Rails.application.routes.draw do
 
   get "document/download/:bucket/:key" => "documents#download", as: :document_download
   get "document/authorized_download/:model/:model_id/:relation/:relation_id" => "documents#authorized_download", as: :authorized_document_download
+  get "document/cartafact_download/:model/:model_id/:relation/:relation_id" => "documents#cartafact_download", as: :cartafact_document_download
 
   resources :documents, only: [ :new, :create, :destroy, :update] do
     get :document_reader,on: :member
