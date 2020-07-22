@@ -82,6 +82,7 @@ class DefinePermissions < MigrationTask
     hbx_admin_can_transition_family_members
     hbx_admin_can_delete_identity_application_documents
     hbx_admin_can_access_pay_now
+    hbx_admin_can_access_age_off_excluded
   end
 
   def build_test_roles
