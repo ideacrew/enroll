@@ -60,7 +60,23 @@ module BenefitSponsors
           end
         end
 
+        def set_benefit_application_kind_while_termination_pending(enrollment_eligibility_params)
+          benefit_sponsorship = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.find(enrollment_eligibility_params[:benefit_sponsorship_id])
+          benefit_applications = benefit_sponsorship.benefit_applications
+          termination_pending_applications = benefit_applications.termination_pending
+          if termination_pending_applications && benefit_applications.last.aasm_state == :termination_pending && benefit_applications.none?(&:is_renewing?)
+            enrollment_eligibility_params[:benefit_application_kind] = :initial
+            enrollment_eligibility_params
+          else
+            enrollment_eligibility_params
+          end
+        end
+
         def create(enrollment_eligibility_params)
+          # TODO: Added in because post termination pending, for some reason benefit_application_kind is blank
+          if enrollment_eligibility_params[:benefit_application_kind].blank?
+            enrollment_eligibility_params = set_benefit_application_kind_while_termination_pending(enrollment_eligibility_params)
+          end
           enrollment_eligibility = BenefitSponsors::Operations::EnrollmentEligibility::Create.new.call(enrollment_eligibility_params: enrollment_eligibility_params)
 
           Success(enrollment_eligibility.value!)

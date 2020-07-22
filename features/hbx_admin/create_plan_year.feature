@@ -49,17 +49,80 @@ Feature: Create Benefit Application by admin UI
         | Enrollment Ineligible | enrollment_ineligible | Enrollment Ineligible             | Existing plan year with overlapping coverage exists |
         | Active                | active                | Active                            | Existing plan year with overlapping coverage exists |
 
-  Scenario: Creating New Plan Year with application in termination_pending
-    # And staff role person logged in
-    And update rating area
-    When ABC Widgets is logged in and on the home page
+  Scenario: Creating New Plan Year while application is in termination_pending aasm_state
     And initial employer ABC Widgets has active benefit application
     Given that a user with a HBX staff role with HBX staff subrole exists and is logged in
     And the user is on the Employer Index of the Admin Dashboard
     When the user clicks Action for that Employer
     And the user clicks the Plan Years button
-    Then the user will see ABC Widgets Employer
+    Then the user will select benefit application to terminate
+    When the user clicks Actions for current benefit application
+    When the user clicks Actions for that benefit application
+    Then the user will see Terminate button
+    When the user enters last_day and other details for voluntary termination
+    When user clicks submit button
+    Then user should see termination successful message
+    And user logs out
+    And staff role person logged in
+    And update rating area
+    When ABC Widgets is logged in and on the home page
     And staff role person clicked on benefits tab
-    Then employer should see edit plan year button
-    And employer clicked on edit plan year button
-    Then employer should see form for benefit application and benefit package
+    And staff role person clicked on benefits tab
+    Then employer should see benefit application in termination pending state
+    And employer should see Add Plan Year link
+    Then employer should see add plan year button
+    And employer clicks Add Plan Year link
+    And employer clicks OK in warning modal
+    #Then employer should see continue button disabled
+    And employer filled all the fields on benefit application form
+    And employer clicked on continue button
+    Then employer should see form for benefit package
+    And employer filled all the fields on benefit package form
+    And employer selected by metal level plan offerings
+    Then employer should see gold metal level type
+    And employer clicked on gold metal level
+    Then employer should see create plan year button disabled
+    And employer selected 100 contribution percent for the application
+    Then employer should see your estimated montly cost
+    And employer should see that the create plan year is true
+
+
+  Scenario: Census Employee Roster will show off cycle benefit packages
+    And initial employer ABC Widgets has active benefit application
+    Given that a user with a HBX staff role with HBX staff subrole exists and is logged in
+    And the user is on the Employer Index of the Admin Dashboard
+    When the user clicks Action for that Employer
+    And the user clicks the Plan Years button
+    Then the user will select benefit application to terminate
+    When the user clicks Actions for current benefit application
+    When the user clicks Actions for that benefit application
+    Then the user will see Terminate button
+    When the user enters last_day and other details for voluntary termination
+    When user clicks submit button
+    Then user should see termination successful message
+    And user logs out
+    And staff role person logged in
+    And update rating area
+    When ABC Widgets is logged in and on the home page
+    And staff role person clicked on benefits tab
+    And staff role person clicked on benefits tab
+    Then employer should see benefit application in termination pending state
+    And employer should see Add Plan Year link
+    Then employer should see add plan year button
+    And employer clicks Add Plan Year link
+    And employer clicks OK in warning modal
+    #Then employer should see continue button disabled
+    And employer filled all the fields on benefit application form
+    And employer clicked on continue button
+    Then employer should see form for benefit package
+    And employer filled all the fields on benefit package form
+    And employer selected by metal level plan offerings
+    Then employer should see gold metal level type
+    And employer clicked on gold metal level
+    Then employer should see create plan year button disabled
+    And employer selected 100 contribution percent for the application
+    Then employer should see your estimated montly cost
+    And employer should see that the create plan year is true
+    And staff role person clicked on employees tab
+    And staff role person clicks on first employee
+    Then the user should see a dropdown for Off Plan Year benefit packages

@@ -606,6 +606,13 @@ class CensusEmployee < CensusMember
     benefit_package_assignment_on(renewal_begin_date)
   end
 
+  def off_cycle_benefit_group_assignment(coverage_date = TimeKeeper.date_of_record)
+    benefit_sponsorship = employer_profile.active_benefit_sponsorship
+    if benefit_sponsorship.off_cycle_benefit_application.present?
+      benefit_group_assignments.reject { |bga| bga.activated_at.present? }.sort_by(&:start_on).reverse.last
+    end
+  end
+
   # DEPRECATE IF POSSIBLE
   def published_benefit_group_assignment
     benefit_group_assignments.select do |benefit_group_assignment|

@@ -508,6 +508,15 @@ module BenefitSponsors
       benefit_applications.where(:aasm_state.ne => :canceled).order_by(:"effective_period.min".desc).first || latest_benefit_application
     end
 
+    def off_cycle_benefit_application
+      # Second to last benefit application is in termination pending and current one is in active
+      if !self.benefit_applications[-2].nil? &&
+        self.benefit_applications[-2]&.aasm_state == :termination_pending &&
+        BenefitSponsors::BenefitApplications::BenefitApplication::SUBMITTED_STATES.reject! { |state| state == :termination_pending }.include?(benefit_applications.last.aasm_state)
+        benefit_applications.last
+      end
+    end
+
     # use this only for EDI
     def late_renewal_benefit_application
       benefit_applications.order_by(:created_at.desc).detect do |application|

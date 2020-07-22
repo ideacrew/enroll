@@ -609,7 +609,6 @@ And /^employer clicked on continue button$/ do
 end
 
 Then(/^employer should see form for benefit application and benefit package$/) do
-  binding.pry
   expect(page).to have_content 'Benefit Application Details'
   expect(page).to have_content 'Benefit Package - Set Up'
 end
