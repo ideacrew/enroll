@@ -20,7 +20,7 @@ module Operations
 
       describe 'given empty user' do
         let(:params) {{params: {}, user: nil}}
-        let(:error_message) {{:errors => "Please login to download the document"}}
+        let(:error_message) {{:message => "Please login to download the document"}}
 
         it 'fails' do
           expect(subject).not_to be_success
