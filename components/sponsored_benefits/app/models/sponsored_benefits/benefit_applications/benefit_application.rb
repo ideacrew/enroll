@@ -390,7 +390,7 @@ module SponsoredBenefits
 
       def update_benefit_sponsor_catalog(benefit_application, benefit_sponsorship)
         #update benefit sponsor catalog details
-        benefit_application.benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(benefit_application.resolve_service_areas, benefit_application.effective_period.begin)
+        benefit_application.benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(benefit_application.effective_period.begin)
         catalog = benefit_application.benefit_sponsor_catalog
         catalog.benefit_application = benefit_application
         catalog.save
