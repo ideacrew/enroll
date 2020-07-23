@@ -61,6 +61,7 @@ end
 
 Then(/^Hbx Admin should see text Special Enrollment Period$/) do
   FactoryBot.create(:qualifying_life_event_kind, market_kind: "individual")
+  sleep 2
   expect(page).to have_content('Special Enrollment Period')
   expect(page).to have_content('TOP LIFE CHANGES')
   expect(page).to have_content('Married')

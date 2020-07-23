@@ -11,8 +11,6 @@ RSpec.describe "insured/group_selection/new.html.erb" do
 
   let(:adapter) { instance_double(GroupSelectionPrevaricationAdapter) }
   context "coverage selection", dbclean: :after_each do
-  
-  include_context "setup initial benefit application"
 
   let(:site) { BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_empty_benefit_market }
   let(:benefit_market) { site.benefit_markets.first }
@@ -23,6 +21,8 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       "application_period.min" => effective_period_start_on
     ).first
   end
+
+  include_context "setup initial benefit application"
 
   let(:effective_period_start_on) { current_effective_date }
   let(:effective_period_end_on) { effective_period_start_on + 1.year - 1.day }

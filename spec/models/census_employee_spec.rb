@@ -520,9 +520,13 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     let(:open_enrollment_period) {effective_period.min.prev_month..(effective_period.min - 10.days)}
     let!(:employer_profile_2) {FactoryBot.create(:benefit_sponsors_organizations_aca_shop_cca_employer_profile, :with_organization_and_site, site: organization.site)}
     let(:organization2) {employer_profile_2.organization}
-    let!(:benefit_sponsorship2) {employer_profile_2.add_benefit_sponsorship}
+    let!(:benefit_sponsorship2) do
+      sponsorship = employer_profile_2.add_benefit_sponsorship
+      sponsorship.save
+      sponsorship
+    end
     let!(:service_areas2) {benefit_sponsorship2.service_areas_on(effective_period.min)}
-    let(:benefit_sponsor_catalog2) {benefit_sponsorship2.benefit_sponsor_catalog_for(service_areas2, effective_period.min)}
+    let(:benefit_sponsor_catalog2) {benefit_sponsorship2.benefit_sponsor_catalog_for(effective_period.min)}
     let(:initial_application2) do
       BenefitSponsors::BenefitApplications::BenefitApplication.new(
         benefit_sponsor_catalog: benefit_sponsor_catalog2,
