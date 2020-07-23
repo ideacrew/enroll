@@ -6,7 +6,7 @@ module Forms
 
     attr_accessor :id, :family_id, :is_consumer_role, :is_resident_role, :vlp_document_id
     attr_accessor :gender, :relationship
-    attr_accessor :addresses, :no_dc_address, :no_dc_address_reason, :same_with_primary, :is_applying_coverage
+    attr_accessor :addresses, :no_dc_address, :no_dc_address_reason, :same_with_primary, :is_applying_coverage, :age_off_excluded
     attr_writer :family
     include ::Forms::PeopleNames
     include ::Forms::ConsumerFields
@@ -184,7 +184,8 @@ module Forms
         :citizen_status => @citizen_status,
         :tribal_id => tribal_id,
         :no_dc_address => no_dc_address,
-        :no_dc_address_reason => no_dc_address_reason
+        :no_dc_address_reason => no_dc_address_reason,
+        :age_off_excluded => age_off_excluded
       }
     end
 
@@ -239,7 +240,8 @@ module Forms
         :same_with_primary => has_same_address_with_primary.to_s,
         :no_dc_address => has_same_address_with_primary ? '' : found_family_member.try(:person).try(:no_dc_address),
         :no_dc_address_reason => has_same_address_with_primary ? '' : found_family_member.try(:person).try(:no_dc_address_reason),
-        :addresses => [home_address, mailing_address]
+        :addresses => [home_address, mailing_address],
+        :age_off_excluded => found_family_member.try(:person).try(:age_off_excluded)
       })
     end
 
