@@ -146,7 +146,7 @@ Rails.application.routes.draw do
         post :close_extended_open_enrollment
         get :new_benefit_application
         get :new_secure_message
-        post :create_secure_message
+        post :create_send_secure_message
         post :create_benefit_application
         get :edit_fein
         post :update_fein

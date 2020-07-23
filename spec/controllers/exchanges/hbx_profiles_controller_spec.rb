@@ -704,7 +704,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     end
   end
 
-  describe 'POST create_secure_message, :dbclean => :after_each' do
+  describe 'POST create_send_secure_message, :dbclean => :after_each' do
     render_views
 
     let(:person) { FactoryBot.create(:person, :with_family) }
@@ -723,20 +723,20 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     end
 
     it 'should render back to new_secure_message if there is a failure' do
-      get :create_secure_message, xhr:  true, params:  invalid_params
+      get :create_send_secure_message, xhr:  true, params:  invalid_params
 
       expect(response).to render_template('new_secure_message')
     end
 
     it 'should throw error message if subject and body is not passed' do
-      get :create_secure_message, xhr:  true, params:  invalid_params
+      get :create_send_secure_message, xhr:  true, params:  invalid_params
 
       expect(response.body).to have_content('Please enter subject')
     end
 
     it 'should throw error message if actions id is not passed' do
       invalid_params = {resource_id: employer_profile.id, subject: 'test', body: 'test', actions_id: '', resource_name: employer_profile.class.to_s}
-      get :create_secure_message, xhr:  true, params:  invalid_params
+      get :create_send_secure_message, xhr:  true, params:  invalid_params
 
       expect(response.body).to have_content('must be filled')
     end
@@ -744,7 +744,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     context 'when resource is profile' do
       it 'should set instance variables' do
         invalid_params = {resource_id: employer_profile.id, subject: 'test', body: 'test', actions_id: '', resource_name: employer_profile.class.to_s}
-        get :create_secure_message, xhr:  true, params:  invalid_params
+        get :create_send_secure_message, xhr:  true, params:  invalid_params
 
         expect(assigns(:resource)).to eq employer_profile
         expect(assigns(:subject)).to eq invalid_params[:subject]
@@ -752,9 +752,9 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       end
 
       it 'should send secure message if all values are passed' do
-        get :create_secure_message, xhr:  true, params:  profile_valid_params
+        get :create_send_secure_message, xhr:  true, params:  profile_valid_params
 
-        expect(response).to render_template("create_secure_message")
+        expect(response).to render_template("create_send_secure_message")
         expect(response.body).to have_content((/Message Sent successfully/i))
       end
     end
@@ -762,7 +762,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     context 'when resource is person' do
       it 'should set instance variables' do
         invalid_params = {resource_id: person.id, subject: 'test', body: 'test', actions_id: '', resource_name: person.class.to_s}
-        get :create_secure_message, xhr:  true, params:  invalid_params
+        get :create_send_secure_message, xhr:  true, params:  invalid_params
 
         expect(assigns(:resource)).to eq person
         expect(assigns(:subject)).to eq invalid_params[:subject]
@@ -770,9 +770,9 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       end
 
       it 'should send secure message if all values are passed' do
-        get :create_secure_message, xhr:  true, params:  person_valid_params
+        get :create_send_secure_message, xhr:  true, params:  person_valid_params
 
-        expect(response).to render_template("create_secure_message")
+        expect(response).to render_template("create_send_secure_message")
         expect(response.body).to have_content((/Message Sent successfully/i))
       end
     end

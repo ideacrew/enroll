@@ -136,7 +136,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     @element_to_replace_id = params[:employer_actions_id] || params[:family_actions_id]
   end
 
-  def create_secure_message
+  def create_send_secure_message
     @resource = get_resource(params)
     @subject = params[:subject].presence
     @body = params[:body].presence
