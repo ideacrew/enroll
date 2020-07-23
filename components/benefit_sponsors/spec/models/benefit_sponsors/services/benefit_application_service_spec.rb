@@ -228,8 +228,8 @@ module BenefitSponsors
       end
 
       context 'for admin_datatable_action' do
-        let!(:ba)   { FactoryBot.create(:benefit_sponsors_benefit_application, benefit_sponsorship: benefit_sponsorship, aasm_state: :imported) }
-        let!(:ba2)  { FactoryBot.create(:benefit_sponsors_benefit_application, benefit_sponsorship: benefit_sponsorship, aasm_state: :draft) }
+        let!(:ba)   { FactoryBot.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, aasm_state: :imported) }
+        let!(:ba2)  { FactoryBot.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, aasm_state: :draft) }
 
         before :each do
           create_ba_params.merge!({ pte_count: '0', msp_count: '0', admin_datatable_action: true })

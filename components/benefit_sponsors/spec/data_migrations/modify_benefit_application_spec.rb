@@ -242,7 +242,9 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
     end
 
     context "Should update effective period and approve initial benefit application", dbclean: :after_each do
-      let(:effective_date) { predecessor_application.effective_period.min }
+      let(:current_effective_date)   { (TimeKeeper.date_of_record + 2.months).beginning_of_month }
+
+      let(:effective_date) { current_effective_date.prev_year }
       let(:new_start_date) { effective_date.next_month }
       let(:new_end_date) { new_start_date + 1.year }
 

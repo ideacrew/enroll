@@ -7,7 +7,6 @@ require "#{BenefitSponsors::Engine.root}/spec/support/benefit_sponsors_product_s
 
 RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean: :after_each do
     #include_context "setup benefit market with market catalogs and product packages"
-  include_context "setup initial benefit application"
 
   let(:site) { BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_empty_benefit_market }
   let(:benefit_market) { site.benefit_markets.first }
@@ -18,7 +17,9 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     ).first
   end
 
-  let(:current_effective_date) { TimeKeeper.date_of_record.end_of_month + 1.day + 1.month }
+  let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_month + 2.months }
+
+  include_context "setup initial benefit application"
 
   let(:service_areas) do
     ::BenefitMarkets::Locations::ServiceArea.where(

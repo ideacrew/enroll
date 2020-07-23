@@ -12,11 +12,7 @@ module BenefitMarkets
     # Added this module as a temporary fix for EMPLOYER FLEXIBILITY PROJECT
     module ContributionModuleAssociation
       def contribution_model
-        if packagable.is_a?(BenefitMarkets::BenefitSponsorCatalog) && packagable.benefit_application&.is_renewing?
-          BenefitMarkets::ContributionModels::ContributionModel.by_title("DC Shop Simple List Bill Contribution Model")
-        else
-          super
-        end
+        assigned_contribution_model || super
       end
     end
 
@@ -35,6 +31,12 @@ module BenefitMarkets
                 class_name: "BenefitMarkets::Products::Product"
 
     embeds_one  :contribution_model,
+                class_name: "BenefitMarkets::ContributionModels::ContributionModel"
+
+    embeds_one  :assigned_contribution_model,
+                class_name: "BenefitMarkets::ContributionModels::ContributionModel"
+
+    embeds_many :contribution_models,
                 class_name: "BenefitMarkets::ContributionModels::ContributionModel"
 
     embeds_one  :pricing_model,
@@ -57,6 +59,17 @@ module BenefitMarkets
         :application_period, :product_kind, :package_kind, :title, :description, :product_multiplicity,
         :contribution_model, :pricing_model
         ]
+    end
+
+    def products=(attributes)
+      attributes.each do |attribute|
+        if attribute.is_a?(Hash)
+          kind = attribute[:kind].to_s.titleize
+          self.products.build(attribute.merge(_type: "BenefitMarkets::Products::#{kind}Products::#{kind}Product"))
+        else
+          self.products.push(attribute)
+        end
+      end
     end
 
     def lowest_cost_product(effective_date)
