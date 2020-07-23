@@ -123,11 +123,13 @@ class Household
       benchmark_plan_id = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.slcsp
 
       latest_eligibility_determination = verified_tax_household.eligibility_determinations.max_by(&:determination_date)
+      csr_percent = latest_eligibility_determination.csr_percent == 'limited' ? '-1' : latest_eligibility_determination.csr_percent
       th.eligibility_determinations.build(
+        source: 'Curam',
         e_pdc_id: latest_eligibility_determination.id,
         benchmark_plan_id: benchmark_plan_id,
         max_aptc: latest_eligibility_determination.maximum_aptc,
-        csr_percent_as_integer: latest_eligibility_determination.csr_percent,
+        csr_percent_as_integer: csr_percent,
         determined_at: latest_eligibility_determination.determination_date
       )
       th.save!
@@ -224,7 +226,7 @@ class Household
     tax_households.tax_household_with_year(year).active_tax_household
   end
 
-  def build_thh_and_eligibility(max_aptc, csr, date, slcsp)
+  def build_thh_and_eligibility(max_aptc, csr, date, slcsp, source)
     th = tax_households.build(
         allocated_aptc: 0.0,
         effective_starting_on: Date.new(date.year, date.month, date.day),
@@ -239,10 +241,10 @@ class Household
     )
 
     deter = th.eligibility_determinations.build(
-        source: "Admin_Script",
+      source: source,
         benchmark_plan_id: slcsp,
         max_aptc: max_aptc.to_f,
-        csr_percent_as_integer: csr.to_i,
+        csr_percent_as_integer: (csr == 'limited' ? '-1' : csr),
         determined_at: Date.today
     )
 
@@ -419,10 +421,10 @@ class Household
     )
 
     th.eligibility_determinations.create(
-      source: "Admin_Script",
+      source: 'Admin',
       benchmark_plan_id: slcsp_id,
       max_aptc: params["max_aptc"].to_f,
-      csr_percent_as_integer: params["csr"].to_i,
+      csr_percent_as_integer: (params['csr'] == 'limited' ? '-1' : params['csr']),
       determined_at: TimeKeeper.datetime_of_record
     )
 

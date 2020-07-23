@@ -84,6 +84,7 @@ class Family
   index({"households.tax_households.eligibility_determinations.determined_on" => 1})
   index({"households.tax_households.eligibility_determinations.determined_at" => 1})
   index({"households.tax_households.eligibility_determinations.max_aptc.cents" => 1})
+  index({"households.tax_households.eligibility_determinations.csr_percent_as_integer" => 1}, {name: 'csr_percent_as_integer_index'})
 
   index({"irs_groups.hbx_assigned_id" => 1})
 
@@ -233,22 +234,6 @@ class Family
     ).distinct(:family_id)
   ) }
 
-  def enrollment_is_not_most_recent_sep_enrollment?(hbx_enrollment)
-    coverage_kind = hbx_enrollment.coverage_kind
-    target_enrollment_effective_on = hbx_enrollment.effective_on
-    most_recent_sep_enrollment_by_coverage_kind = hbx_enrollments.where(
-      coverage_kind: coverage_kind,
-      enrollment_kind: 'special_enrollment'
-    ).last
-    # Return false if no SEP enrollments
-    return false if most_recent_sep_enrollment_by_coverage_kind.blank?
-    # Return true if referring to the same target enrollment being checked
-    return true if hbx_enrollment == most_recent_sep_enrollment_by_coverage_kind
-    # Return true here because you should be able to edit the most recent enrollment only,
-    # but if this is trying to render on an old enrollment, don't show
-    return true if most_recent_sep_enrollment_by_coverage_kind.effective_on > target_enrollment_effective_on
-  end
-
   def active_broker_agency_account
     broker_agency_accounts.detect { |baa| baa.is_active? }
   end
@@ -293,7 +278,15 @@ class Family
   end
 
   def currently_enrolled_products(enrollment)
-    enrolled_enrollments = active_household.hbx_enrollments.enrolled_and_renewing.by_coverage_kind(enrollment.coverage_kind)
+    enrolled_enrollments = active_household.hbx_enrollments.enrolled_and_renewing.by_coverage_kind(enrollment.coverage_kind).select do |enr|
+      enr.subscriber.applicant_id == enrollment.subscriber.applicant_id
+    end
+
+    if enrolled_enrollments.blank?
+      enrolled_enrollments = active_household.hbx_enrollments.terminated.by_coverage_kind(enrollment.coverage_kind).by_terminated_period((enrollment.effective_on - 1.day)).select do |enr|
+        enr.subscriber.applicant_id == enrollment.subscriber.applicant_id
+      end
+    end
     enrolled_enrollments.map(&:product)
   end
 

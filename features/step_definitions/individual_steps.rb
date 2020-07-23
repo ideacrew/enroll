@@ -675,8 +675,8 @@ Then(/^Prepare taxhousehold info for aptc user$/) do
   future_product = BenefitMarkets::Products::Product.all.by_year(future_start_on.year).where(metal_level_kind: :silver).first
 
   if household.tax_households.blank?
-    household.build_thh_and_eligibility(80, 0, start_on, current_product.id)
-    household.build_thh_and_eligibility(80, 0, future_start_on, future_product.id)
+    household.build_thh_and_eligibility(80, 0, start_on, current_product.id, 'Admin')
+    household.build_thh_and_eligibility(80, 0, future_start_on, future_product.id, 'Admin')
     household.save!
   end
   benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
@@ -706,6 +706,7 @@ Then(/Aptc user should see aptc amount on receipt page/) do
 end
 
 Then(/Aptc user should see aptc amount on individual home page/) do
+  wait_for_ajax
   expect(page).to have_content "My #{Settings.site.short_name}"
   expect(page).to have_content '$20.00'
   expect(page).to have_content 'APTC amount'

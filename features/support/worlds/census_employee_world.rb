@@ -248,35 +248,12 @@ And(/employee (.*) already matched with employer (.*?)(?: and (.*?))? and logged
   visit "/families/home"
 end
 
-And(/(.*) has active coverage in coverage enrolled state/) do |named_person|
-  person = people[named_person]
-  ce = CensusEmployee.where(:first_name => /#{person[:first_name]}/i, :last_name => /#{person[:last_name]}/i).first
-  person_rec = Person.where(first_name: /#{person[:first_name]}/i, last_name: /#{person[:last_name]}/i).first
-  benefit_package = ce.active_benefit_group_assignment.benefit_package
-  active_enrollment = FactoryBot.create(:hbx_enrollment,
-                                         family: person_rec.primary_family,
-                                         household: person_rec.primary_family.active_household,
-                                         coverage_kind: "health",
-                                         effective_on: TimeKeeper.date_of_record - 1.month,
-                                         enrollment_kind: "open_enrollment",
-                                         kind: "employer_sponsored",
-                                         submitted_at: benefit_package.start_on - 1.month,
-                                         employee_role_id: person_rec.active_employee_roles.first.id,
-                                         benefit_group_assignment_id: ce.active_benefit_group_assignment.id,
-                                         benefit_sponsorship_id: ce.benefit_sponsorship.id,
-                                         sponsored_benefit_package_id: benefit_package.id,
-                                         sponsored_benefit_id: benefit_package.health_sponsored_benefit.id,
-                                         rating_area_id: benefit_package.rating_area.id,
-                                         product_id: benefit_package.health_sponsored_benefit.products(benefit_package.start_on).first.id,
-                                         issuer_profile_id: benefit_package.health_sponsored_benefit.products(benefit_package.start_on).first.issuer_profile.id)
-  active_enrollment.update_attributes!(aasm_state: 'coverage_enrolled')
-end
-
 And(/(.*) has active coverage and passive renewal/) do |named_person|
   person = people[named_person]
   ce = CensusEmployee.where(:first_name => /#{person[:first_name]}/i, :last_name => /#{person[:last_name]}/i).first
   person_rec = Person.where(first_name: /#{person[:first_name]}/i, last_name: /#{person[:last_name]}/i).first
   benefit_package = ce.active_benefit_group_assignment.benefit_package
+  hbx_enrollment_member = FactoryBot.build(:hbx_enrollment_member, applicant_id: person_rec.primary_family.primary_applicant.id)
   active_enrollment = FactoryBot.create(:hbx_enrollment,
                                          family: person_rec.primary_family,
                                          household: person_rec.primary_family.active_household,
@@ -292,7 +269,8 @@ And(/(.*) has active coverage and passive renewal/) do |named_person|
                                          sponsored_benefit_id: benefit_package.health_sponsored_benefit.id,
                                          rating_area_id: benefit_package.rating_area.id,
                                          product_id: benefit_package.health_sponsored_benefit.products(benefit_package.start_on).first.id,
-                                         issuer_profile_id: benefit_package.health_sponsored_benefit.products(benefit_package.start_on).first.issuer_profile.id)
+                                         issuer_profile_id: benefit_package.health_sponsored_benefit.products(benefit_package.start_on).first.issuer_profile.id,
+                                         hbx_enrollment_members: [hbx_enrollment_member])
   new_benefit_package = benefit_sponsorship.renewal_benefit_application.benefit_packages.first
   active_enrollment.renew_benefit(new_benefit_package)
 end
