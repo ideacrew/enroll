@@ -52,19 +52,19 @@ class Announcement
       announcements = []
 
       case
-      when portal_path.include?("employers/employer_profiles")
-        announcements.concat(Announcement.current_msg_for_employer)
-      when portal_path.include?("families/home")
-        announcements.concat(Announcement.current_msg_for_employee) if person && person.has_active_employee_role?
-        announcements.concat(Announcement.current_msg_for_ivl) if person && person.is_consumer_role_active?
-      when portal_path.include?("employee")
-        announcements.concat(Announcement.current_msg_for_employee) if person && person.has_active_employee_role?
-      when portal_path.include?("consumer")
-        announcements.concat(Announcement.current_msg_for_ivl) if person && person.is_consumer_role_active?
-      when portal_path.include?("broker_agencies")
-        announcements.concat(Announcement.current_msg_for_broker)
-      when portal_path.include?("general_agencies")
-        announcements.concat(Announcement.current_msg_for_ga)
+        when portal_path.include?("employers/employer_profiles")
+          announcements.concat(Announcement.current_msg_for_employer)
+        when portal_path.include?("families/home")
+          announcements.concat(Announcement.current_msg_for_employee) if person && person.has_active_employee_role?
+          announcements.concat(Announcement.current_msg_for_ivl) if person && person.is_consumer_role_active?
+        when portal_path.include?("employee")
+          announcements.concat(Announcement.current_msg_for_employee) if person && person.has_active_employee_role?
+        when portal_path.include?("consumer")
+          announcements.concat(Announcement.current_msg_for_ivl) if person && person.is_consumer_role_active?
+        when portal_path.include?("broker_agencies")
+          announcements.concat(Announcement.current_msg_for_broker)
+        when portal_path.include?("general_agencies")
+          announcements.concat(Announcement.current_msg_for_ga)
       end
 
       announcements.uniq
