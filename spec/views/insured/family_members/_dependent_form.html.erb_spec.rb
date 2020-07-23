@@ -81,6 +81,11 @@ describe "insured/family_members/_dependent_form.html.erb" do
       end
       expect(rendered).to have_selector("option", text: "This Person Is #{person.first_name}'s *")
     end
+
+    it "should have age off exclusion field for consumer role only" do
+      expect(rendered).to match /Ageoff Exclusion/
+      expect(rendered).to have_field('age_off_excluded', checked: false) 
+    end
   end
 
   context "without consumer_role" do
@@ -126,6 +131,11 @@ describe "insured/family_members/_dependent_form.html.erb" do
     it "should have address info area" do
       expect(rendered).to have_selector('#address_info')
       expect(rendered).to match /Home Address/
+    end
+
+    it "should have age off exclusion field for employee role only" do
+      expect(rendered).to match /Ageoff Exclusion/
+      expect(rendered).to have_field('age_off_excluded', checked: false) 
     end
   end
 end
