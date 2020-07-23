@@ -400,6 +400,19 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
           it "the previously terminated census employee should be in rehired state" do
             expect(initial_census_employee.aasm_state).to eq "rehired"
           end
+
+          context 'when rehired within the past 2 months' do
+
+            let!(:rehire_cobra_employee) do
+              cobra_rehire.hired_on = TimeKeeper.date_of_record - 50.days
+              cobra_rehire.save
+              cobra_rehire
+            end
+
+            it 'should be able to shop based on new hire rules' do
+              expect(rehire_cobra_employee.new_hire_enrollment_period.cover?(TimeKeeper.date_of_record)).to be_truthy
+            end
+          end
         end
       end
     end
