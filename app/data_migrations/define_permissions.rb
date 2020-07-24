@@ -123,6 +123,12 @@ class DefinePermissions < MigrationTask
     Permission.super_admin.update_attributes!(can_update_ssn: true)
     Permission.hbx_tier3.update_attributes!(can_update_ssn: true)
   end
+
+  def hbx_admin_can_access_user_account_tab
+    Permission.hbx_staff.update_attributes!(can_access_user_account_tab: true)
+    Permission.super_admin.update_attributes!(can_access_user_account_tab: true)
+    Permission.hbx_tier3.update_attributes!(can_access_user_account_tab: true)
+  end
   
   def hbx_admin_can_access_age_off_excluded
     Permission.hbx_staff.update_attributes!(can_access_age_off_excluded: true)
