@@ -2805,7 +2805,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
         census_employee.employment_terminated_on = employment_terminated_on
         census_employee.coverage_terminated_on = TimeKeeper.date_of_record.last_month.end_of_month - 2.months
         census_employee.aasm_state = "employment_terminated"
-        census_employee.benefit_group_assignments.where(is_active: false).first.end_on = date
+        # census_employee.benefit_group_assignments.where(is_active: false).first.end_on = date
         census_employee.save
         census_employee.terminate_employee_enrollments(employment_terminated_on)
         expired_enrollment.reload
