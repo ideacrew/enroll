@@ -11,7 +11,7 @@ module Operations
         yield can_process_event(new_date)
         shop_logger = yield initialize_logger("shop")
         query_criteria = yield shop_query_criteria
-        yield process_shop_dep_age_off(query_criteria, shop_logger, new_date)
+        process_shop_dep_age_off(query_criteria, shop_logger, new_date)
       end
 
       private
@@ -34,6 +34,7 @@ module Operations
       end
 
       def process_shop_dep_age_off(enrollments, shop_logger, new_date)
+        cut_off_age = EnrollRegistry[:aca_shop_dependent_age_off].settings(:age_eligibility).item
         enrollments.inject([]) do |_result, enrollment|
           next if enrollment.employer_profile&.is_fehb?
           primary_person = enrollment.family.primary_person
@@ -44,7 +45,7 @@ module Operations
           relations = fetch_relation_objects(primary_person, covered_members_ids)
           next if relations.blank?
 
-          aged_off_dependent_people = fetch_aged_off_people(relations, new_date)
+          aged_off_dependent_people = fetch_aged_off_people(relations, new_date, cut_off_age)
           next if aged_off_dependent_people.empty?
           dep_age_off_people_ids = aged_off_dependent_people.pluck(:id)
           age_off_family_members = covered_family_members.select{|fm| dep_age_off_people_ids.include?(fm.person_id)}.pluck(:id)
@@ -58,8 +59,8 @@ module Operations
         Success('Successfully dropped dependents for SHOP market')
       end
 
-      def fetch_aged_off_people(relations, new_date)
-        relations.select{|dep| (dep.relative.age_on(new_date)) >= 26}.flat_map(&:relative).select{|p| p.age_off_excluded == false}
+      def fetch_aged_off_people(relations, new_date, cut_off_age)
+        relations.select{|dep| (dep.relative.age_on(new_date)) >= cut_off_age}.flat_map(&:relative).select{|p| p.age_off_excluded == false}
       end
 
       def fetch_relation_objects(primary_person, covered_members_ids)
