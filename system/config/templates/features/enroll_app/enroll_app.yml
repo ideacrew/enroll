@@ -26,3 +26,26 @@ registry:
             item: "https://dchealthlink.com/smallbusiness/"
           - key: :nondiscrimination_notice_url
             item: "https://www.dchealthlink.com/nondiscrimination"
+      - key: :dependent_age_off
+        is_enabled: true
+        settings:
+          - key: :shop
+            item: :yearly
+            options: {is_enabled: true}
+          - key: :ivl
+            item: :yearly
+            options: {is_enabled: true}
+          - key: :fehb
+            item: :monthly
+            options: {is_enabled: true}
+  - namespace:
+      - :features
+      - :enroll_app
+      - :aca_shop
+    features:
+      - key: :aca_shop_dependent_age_off
+        item: Operations::Shop::DependentAgeOff.new
+        is_enabled: true
+        settings:
+          - key: :period
+            item: :annual
