@@ -258,7 +258,7 @@ class BenefitGroupAssignment
     end
 
     event :renew_coverage, :after => :record_transition do
-      transitions from: :initialized , to: :coverage_renewing
+      transitions from: [:initialized, :coverage_waived] , to: :coverage_renewing
     end
 
     event :terminate_coverage, :after => :record_transition do
