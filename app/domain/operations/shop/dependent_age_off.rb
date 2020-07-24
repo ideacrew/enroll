@@ -34,7 +34,7 @@ module Operations
       end
 
       def process_shop_dep_age_off(enrollments, shop_logger, new_date)
-        cut_off_age = EnrollRegistry[:aca_shop_dependent_age_off].settings(:age_eligibility).item
+        cut_off_age = EnrollRegistry[:aca_shop_dependent_age_off].settings(:cut_off_age).item
         enrollments.inject([]) do |_result, enrollment|
           next if enrollment.employer_profile&.is_fehb?
           primary_person = enrollment.family.primary_person

@@ -37,5 +37,5 @@ registry:
         settings:
           - key: :period
             item: :annual
-          - key: :age_eligibility
+          - key: :cut_off_age
             item: 26
