@@ -363,6 +363,10 @@ class HbxEnrollment
                                                           :"effective_on".gte => effective_period.min,
                                                           :"effective_on".lte => effective_period.max
                                                         )}
+  scope :by_terminated_period,      ->(term_date) { where(
+                                                          :"terminated_on".gte => term_date,
+                                                          :"terminated_on".lte => term_date
+                                                        )}
   scope :by_benefit_application_and_sponsored_benefit,  ->(benefit_application, sponsored_benefit, end_date) do
     where(
       :"sponsored_benefit_id" => sponsored_benefit._id,
@@ -1742,7 +1746,7 @@ class HbxEnrollment
     end
 
     event :expire_coverage, :after => :record_transition do
-      transitions from: [:shopping, :coverage_selected, :transmitted_to_carrier, :coverage_enrolled],
+      transitions from: [:shopping, :coverage_selected, :transmitted_to_carrier, :coverage_enrolled, :unverified],
                   to: :coverage_expired, :guard  => :can_be_expired?
     end
 

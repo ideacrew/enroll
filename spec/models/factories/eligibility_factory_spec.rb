@@ -102,7 +102,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
 
           it { expect(@available_eligibility[:aptc][family_member.id.to_s]).to eq 100.00 }
           it { expect(@available_eligibility[:total_available_aptc]).to eq 100.00 }
-          it { expect(@available_eligibility[:csr]).to eq 'csr_100' }
+          it { expect(@available_eligibility[:csr]).to eq 'csr_0' }
         end
 
         context 'with an existing enrollment' do
@@ -238,7 +238,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
 
             it { expect(@available_eligibility[:aptc][family_member.id.to_s]).to eq 0.00 }
             it { expect(@available_eligibility[:total_available_aptc]).to eq 0.00 }
-            it { expect(@available_eligibility[:csr]).to eq 'csr_100' }
+            it { expect(@available_eligibility[:csr]).to eq 'csr_0' }
           end
         end
 
@@ -297,7 +297,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
             it { expect(@available_eligibility[:aptc][family_member.id.to_s]).to eq 500.00 }
             it { expect(@available_eligibility[:aptc][family_member2.id.to_s]).to eq 0.00 }
             it { expect(@available_eligibility[:total_available_aptc]).to eq 500.00 }
-            it { expect(@available_eligibility[:csr]).to eq 'csr_100' }
+            it { expect(@available_eligibility[:csr]).to eq 'csr_0' }
           end
         end
 
@@ -358,7 +358,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
             it { expect(@available_eligibility[:aptc][family_member.id.to_s]).to eq 450.00 }
             it { expect(@available_eligibility[:aptc][family_member2.id.to_s]).to eq 0 }
             it { expect(@available_eligibility[:total_available_aptc]).to eq 450.00 }
-            it { expect(@available_eligibility[:csr]).to eq 'csr_100' }
+            it { expect(@available_eligibility[:csr]).to eq 'csr_0' }
           end
         end
       end

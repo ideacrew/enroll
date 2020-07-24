@@ -61,47 +61,6 @@ module BenefitSponsors
       end
     end
 
-    describe "Validates non_minimum_participation_enrollment_eligiblity_policy business policy" do
-
-      let!(:policy_name) {:non_minimum_participation_enrollment_eligiblity_policy}
-      let!(:policy) {subject.business_policies[policy_name]}
-
-      context "When all the census employees are emrolled" do
-
-        before do
-          benefit_sponsorship.census_employees.each do |ce|
-            family = FactoryBot.create(:family, :with_primary_family_member)
-            allow(ce).to receive(:family).and_return(family)
-            allow(benefit_application).to receive(:active_census_employees_under_py).and_return([ce])
-            FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
-            ce.save
-          end
-        end
-
-        it "should satisfy rules" do
-          expect(policy.is_satisfied?(benefit_application)).to eq true
-        end
-
-      end
-
-      context "When less then minimum participation of the census employees are emrolled" do
-
-        before do
-          benefit_sponsorship.census_employees.each do |ce|
-            family = FactoryBot.create(:family, :with_primary_family_member)
-            allow(ce).to receive(:family).and_return(family)
-            allow(benefit_application).to receive(:active_census_employees_under_py).and_return([ce])
-            FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
-            ce.save
-          end
-        end
-
-        it "should satisfy rules" do
-          expect(policy.is_satisfied?(benefit_application)).to eq true
-        end
-      end
-    end
-
     describe "For business_policies_for 1/1 effective date" do
 
       let!(:benefit_application_update) {benefit_application.update_attributes(:fte_count => 5,
@@ -212,12 +171,11 @@ module BenefitSponsors
         it "should fail the policy" do
           policy = subject.business_policies_for(benefit_application, :end_open_enrollment)
           # Making the system to default to amnesty rules for release 1.
-          expect(policy.is_satisfied?(benefit_application)).to eq true
-          # if benefit_application.start_on.yday == 1
-          #   expect(policy.is_satisfied?(benefit_application)).to eq true
-          # else
-          #   expect(policy.is_satisfied?(benefit_application)).to eq false
-          # end
+          if benefit_application.start_on.yday == 1
+            expect(policy.is_satisfied?(benefit_application)).to eq true
+          else
+            expect(policy.is_satisfied?(benefit_application)).to eq false
+          end
         end
       end
     end

@@ -942,6 +942,17 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
         expect(enrollment.is_any_enrollment_member_outstanding?). to be_truthy
       end
     end
+
+    context 'for event expire_coverage' do
+      before :each do
+        enrollment.update_attributes!(aasm_state: 'unverified')
+        enrollment.expire_coverage!
+      end
+
+      it 'should transition a enrollment which is in unverified aasm_state' do
+        expect(enrollment.coverage_expired?).to be_truthy
+      end
+    end
   end
 
   context "can_terminate_coverage?" do
@@ -2486,9 +2497,7 @@ describe HbxEnrollment, type: :model, :dbclean => :around_each do
 
         let(:renewal_application) {
           renewal_effective_date = current_effective_date.next_year
-          service_areas = initial_application.benefit_sponsorship.service_areas_on(renewal_effective_date)
-          benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(service_areas, renewal_effective_date)
-          r_application = initial_application.renew(benefit_sponsor_catalog)
+          r_application = initial_application.renew
           r_application.save
           r_application
         }

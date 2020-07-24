@@ -86,11 +86,12 @@ module BenefitMarkets
             {name: "products_premium_tables_search_index"}
           )
 
-    scope :by_product_package,    ->(product_package) { by_application_period(product_package.application_period).where(
+    scope :by_product_package,    ->(product_package) { 
+              where(
                 :"benefit_market_kind"          => product_package.benefit_kind,
                 :"kind"                         => product_package.product_kind,
                 :"product_package_kinds".in     => [product_package.package_kind]
-              )
+              ).by_application_period(product_package.application_period)
             }
 
     scope :aca_shop_market,             ->{where(benefit_market_kind: :aca_shop) }
@@ -146,7 +147,7 @@ module BenefitMarkets
 
     scope :by_product_ids, ->(product_ids) { where(:id => {'$in' => product_ids}) }
 
-    scope :by_csr_kind_with_catastrophic, lambda {|csr_kind = 'csr_100'|
+    scope :by_csr_kind_with_catastrophic, lambda {|csr_kind = 'csr_0'|
       where('$or' => [{:metal_level_kind.in => [:platinum, :gold, :bronze, :catastrophic], :csr_variant_id => '01'},
                       {:metal_level_kind => :silver, :csr_variant_id => CSR_KIND_TO_PRODUCT_VARIANT_MAP[csr_kind]}])
     }

@@ -37,6 +37,8 @@ gem "benefit_sponsors",   path: "components/benefit_sponsors"
 gem "notifier",           path: "components/notifier"
 gem 'openhbx_cv2',        git:  'https://github.com/dchbx/openhbx_cv2.git', branch: 'master'
 gem 'resource_registry',  git:  'https://github.com/ideacrew/resource_registry.git', branch: 'master'
+# gem 'resource_registry',  git: '../resource_registry'
+
 gem "sponsored_benefits", path: "components/sponsored_benefits"
 gem "transport_gateway",  path: "components/transport_gateway"
 gem "transport_profiles", path: "components/transport_profiles"
@@ -63,6 +65,7 @@ gem 'recurring_select'
 gem 'aws-sdk',                  '~> 2.2.4'
 gem 'bcrypt',                   '~> 3.1'
 gem 'bootsnap',                 '>= 1.1', require: false
+gem 'browser',                  '2.7.0'
 gem 'ckeditor',                 '~> 4.2.4'
 gem 'coffee-rails',             '~> 4.2.2'
 gem 'combine_pdf',              '~> 1.0'

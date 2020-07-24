@@ -17,7 +17,7 @@ module Importers::Mhc
       benefit_application.recorded_service_areas = benefit_sponsorship.service_areas_on(catalog_date)
       benefit_application.recorded_rating_area = benefit_sponsorship.rating_area_on(catalog_date)
 
-      benefit_application.benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(benefit_application.recorded_service_areas, catalog_date)
+      benefit_application.benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(catalog_date)
 
      BenefitSponsors::Importers::BenefitPackageImporter.call(benefit_application, benefit_package_attributes)
 
