@@ -140,6 +140,26 @@ RSpec.describe Factories::FamilyEnrollmentCloneFactory, :type => :model, dbclean
       cobra_enrollment = family.enrollments.detect {|e| e.is_cobra_status?}
       expect(cobra_enrollment.hbx_enrollment_members.first.coverage_start_on).to eq clone_enrollment.effective_on
     end
+  end
 
+  describe 'cobra effective on matches renewal application start on' do
+
+    let(:external_enrollment)          { false }
+    let(:terminated_on)                { renewal_application.effective_period.min.prev_day }
+    let!(:terminated_census_employee)  { ce.update_attributes(aasm_state: 'cobra_linked', cobra_begin_date: terminated_on.next_day, coverage_terminated_on: terminated_on)}
+
+    it 'should generate cobra enrollment under renewal application' do
+      generate_cobra_enrollment
+      cobra_enrollment = family.enrollments.detect(&:is_cobra_status?)
+      expect(cobra_enrollment.coverage_selected?).to be_truthy
+      expect(cobra_enrollment.effective_on).to eq renewal_application.effective_period.min
+      expect(cobra_enrollment.sponsored_benefit_package_id).to eq renewal_application.benefit_packages.first.id
+    end
+
+    it 'should not generate enrollment if product is not offering under renewal application' do
+      allow(clone_enrollment.product).to receive(:renewal_product).and_return(nil)
+      generate_cobra_enrollment
+      expect(family.enrollments.map(&:kind)).not_to include('employer_sponsored_cobra')
+    end
   end
 end

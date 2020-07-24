@@ -24,16 +24,16 @@ class TaxHousehold
   field :effective_ending_on, type: Date
   field :submitted_at, type: DateTime
 
-  embeds_many :tax_household_members
+  embeds_many :tax_household_members, cascade_callbacks: true
   accepts_nested_attributes_for :tax_household_members
 
-  embeds_many :eligibility_determinations
+  embeds_many :eligibility_determinations, cascade_callbacks: true
 
   scope :tax_household_with_year, ->(year) { where( effective_starting_on: (Date.new(year)..Date.new(year).end_of_year)) }
   scope :active_tax_household, ->{ where(effective_ending_on: nil) }
 
   def latest_eligibility_determination
-    eligibility_determinations.sort {|a, b| a.determined_on <=> b.determined_on}.last
+    eligibility_determinations.sort {|a, b| a.determined_at <=> b.determined_at}.last
   end
 
   def group_by_year
@@ -48,7 +48,7 @@ class TaxHousehold
     csr_kind = latest_eligibility_determination.csr_eligibility_kind
     shopping_family_member_ids = hbx_enrollment.hbx_enrollment_members.map(&:applicant_id)
     ia_eligible = tax_household_members.where(:applicant_id.in => shopping_family_member_ids).map(&:is_ia_eligible)
-    ia_eligible.empty? || ia_eligible.include?(false) ? "csr_100" : csr_kind
+    ia_eligible.empty? || ia_eligible.include?(false) ? 'csr_0' : csr_kind
   end
 
   def current_csr_percent
@@ -57,9 +57,10 @@ class TaxHousehold
 
   def current_max_aptc
     eligibility_determination = latest_eligibility_determination
-    #TODO need business rule to decide how to get the max aptc
-    #during open enrollment and determined_at
-    if eligibility_determination.present? #and eligibility_determination.determined_on.year == TimeKeeper.date_of_record.year
+    # TODO: need business rule to decide how to get the max aptc
+    # during open enrollment and determined_at
+    # Please reference ticket 42408 for more info on the determined on to determined_at migration
+    if eligibility_determination.present? #and eligibility_determination.determined_at.year == TimeKeeper.date_of_record.year
       eligibility_determination.max_aptc
     else
       0

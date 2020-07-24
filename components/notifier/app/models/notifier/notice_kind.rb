@@ -1,5 +1,3 @@
-require 'curl'
-
 module Notifier
   class NoticeKind
     include Mongoid::Document

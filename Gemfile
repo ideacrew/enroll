@@ -65,6 +65,7 @@ gem 'recurring_select'
 gem 'aws-sdk',                  '~> 2.2.4'
 gem 'bcrypt',                   '~> 3.1'
 gem 'bootsnap',                 '>= 1.1', require: false
+gem 'browser',                  '2.7.0'
 gem 'ckeditor',                 '~> 4.2.4'
 gem 'coffee-rails',             '~> 4.2.2'
 gem 'combine_pdf',              '~> 1.0'
@@ -86,7 +87,7 @@ gem 'mail',                     '~> 2.7'
 gem 'maskedinput-rails',        '~> 1.4'
 gem 'money-rails',              '~> 1.13'
 gem 'net-ssh',                  '= 4.2.0'
-gem 'nokogiri',                 '~> 1.10'
+gem 'nokogiri',                 '~> 1.10.8'
 gem 'nokogiri-happymapper',     '~> 0.8.0', :require => 'happymapper'
 gem 'non-stupid-digest-assets'
 gem 'pundit',                   '~> 2.0'
@@ -96,6 +97,7 @@ gem 'redis',                    '~> 4.0'
 gem 'redis-rails',              '~> 5.0.2'
 gem 'resque',                   '~> 2.0'
 gem 'roo',                      '~> 2.1'
+gem 'rubyzip', '>= 1.3.0'
 gem 'ruby-saml',                '~> 1.3'
 gem 'sassc',                    '~> 1.12'
 gem 'sass-rails',               '~> 5'
@@ -109,6 +111,7 @@ gem 'wicked_pdf',               '~> 1.1.0'
 gem 'wkhtmltopdf-binary-edge',  '~> 0.12.3.0'
 gem 'webpacker',                '~> 4.0.2'
 gem 'fast_jsonapi'
+gem 'loofah', '~> 2.3.1'
 
 group :doc do
   gem 'sdoc',                   '~> 1.0'
@@ -140,12 +143,12 @@ group :development, :test do
   gem 'factory_bot_rails',      '~> 4.11'
   gem 'forgery',                '~> 0.7.0'
   gem 'parallel_tests',         '~> 2.26.2'
-  gem 'puma',                   '~> 3.11'
+  gem 'puma',                   '~> 3.12.4'
   gem 'rails-controller-testing'
   gem 'railroady',              '~> 1.5.3'
   gem 'rspec-rails'
   gem 'rspec_junit_formatter'
-  gem 'yard',                   '~> 0.9.12',  require: false
+  gem 'yard',                   '~> 0.9.20',  require: false
   gem 'yard-mongoid',           '~> 0.1',     require: false
 end
 

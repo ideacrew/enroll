@@ -141,7 +141,7 @@ class PeopleController < ApplicationController
       @dependent = family.family_members.new(id: params[:family_member][:id], person: member)
       respond_to do |format|
         if member.save && @dependent.save
-          @person.person_relationships.create(kind: params[:family_member][:primary_relationship], relative_id: member.id)
+          @person.ensure_relationship_with(member, params[:family_member][:primary_relationship])
           family.households.first.coverage_households.first.coverage_household_members.find_or_create_by(applicant_id: params[:family_member][:id])
           format.js { flash.now[:notice] = "Family Member Added." }
         else
@@ -200,9 +200,11 @@ class PeopleController < ApplicationController
       redirect_path = family_account_path
     end
     @info_changed, @dc_status = sensitive_info_changed?(@person.consumer_role)
+    @native_status_changed = native_status_changed?(@person.consumer_role)
     respond_to do |format|
       if @valid_vlp != false && @person.update_attributes(person_params.except(:is_applying_coverage))
         if @person.is_consumer_role_active?
+          @person.consumer_role.check_native_status(@family, native_changed: @native_status_changed)
           @person.consumer_role.check_for_critical_changes(@family, info_changed: @info_changed, no_dc_address: person_params["no_dc_address"], dc_status: @dc_status)
         end
         @person.consumer_role.update_attribute(:is_applying_coverage, person_params[:is_applying_coverage]) if @person.consumer_role.present? && (!person_params[:is_applying_coverage].nil?)

@@ -25,7 +25,6 @@ Gem::Specification.new do |s|
   s.add_dependency "wkhtmltopdf-binary-edge", "~> 0.12.3.0"
   s.add_dependency "wicked_pdf", "1.1.0"
   s.add_dependency "combine_pdf"
-  s.add_dependency "curl"
   s.add_dependency "ckeditor", '4.2.4'
   s.add_dependency "non-stupid-digest-assets"
   s.add_dependency "roo", "~> 2.1.0"

@@ -88,6 +88,14 @@ module Insured
       end
     end
 
+    def get_ivl_market_kind(person)
+      if can_shop_individual?(person) || can_shop_individual_or_resident?(person)
+        'individual'
+      elsif can_shop_resident?(person)
+        'coverall'
+      end
+    end
+
     def select_benefit_group(qle, employee_role)
       if (@market_kind == "shop" || @market_kind == "fehb") && employee_role.present?
         employee_role.benefit_group(qle: qle)
