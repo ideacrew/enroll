@@ -2250,6 +2250,40 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     end
   end
 
+  context ".waiving_on_eod?" do
+    let(:census_employee) {CensusEmployee.new(**valid_params)}
+    let!(:benefit_group_assignment) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee)}
+
+    context "for initial application" do
+      
+      it "should return true when employees waive the coverage" do
+        benefit_group_assignment.aasm_state = "coverage_waived"
+        expect(census_employee.waiving_on_eod?).to be_truthy
+      end
+
+      it "should return false for employees who are enrolling" do
+        benefit_group_assignment.aasm_state = "coverage_selected"
+        expect(census_employee.waiving_on_eod?).to be_falsey
+      end
+    end
+
+    context "when active employeees has renewal benifit group" do
+
+      before do
+        benefit_group_assignment.benefit_application.update_attribute(:aasm_state, "renewing_enrolled")
+      end
+
+      it "should return false when employees who are enrolling" do
+        expect(census_employee.waiving_on_eod?).to be_falsey
+      end
+
+      it "should return true for employees waive the coverage" do
+        benefit_group_assignment.aasm_state = "coverage_waived"
+        expect(census_employee.waiving_on_eod?).to be_truthy
+      end
+    end
+  end
+
   context "and congressional newly designated employees are added" do
     let(:employer_profile_congressional) {employer_profile}
     let(:plan_year) {benefit_application}
