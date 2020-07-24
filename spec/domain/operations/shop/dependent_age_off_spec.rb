@@ -49,15 +49,25 @@ RSpec.describe Operations::Shop::DependentAgeOff, type: :model, dbclean: :after_
     expect(subject.respond_to?(:call)).to be_truthy
   end
 
-  context 'invalid date' do
-    it 'Should fail when configured annually' do
-      result = subject.call(new_date: Date.new(2020,7,31))
-      process_result = if ::EnrollRegistry[:aca_shop_dependent_age_off].settings(:period).item == :annual
-                         "Cannot process the request, because shop dependent_age_off is not set for end of every month"
-                       else
-                         "Successfully dropped dependents for SHOP market"
-                       end
-      expect(result.failure).to eq(process_result)
+
+  describe "Automation period check" do
+    if ::EnrollRegistry[:aca_shop_dependent_age_off].settings(:period).item == :annual
+      context 'Annual' do
+        it 'Should fail when configured annually' do
+          result = subject.call(new_date: Date.new(2020,7,31))
+          expect(result.failure).to eq("Cannot process the request, because shop dependent_age_off is not set for end of every month")
+        end
+      end
+    end
+
+
+    if ::EnrollRegistry[:aca_shop_dependent_age_off].settings(:period).item == :monthly
+      context 'Monthly' do
+        it 'Should fail when configured annually' do
+          result = subject.call(new_date: Date.new(2020,7,31))
+          expect(result.success).to eq("Successfully dropped dependents for SHOP market")
+        end
+      end
     end
   end
 
@@ -69,7 +79,7 @@ RSpec.describe Operations::Shop::DependentAgeOff, type: :model, dbclean: :after_
                        else
                          "Successfully dropped dependents for SHOP market"
                        end
-      expect(result).to eq(process_result)
+      expect(result.success).to eq(process_result)
     end
   end
 
@@ -91,7 +101,7 @@ RSpec.describe Operations::Shop::DependentAgeOff, type: :model, dbclean: :after_
       expect(shop_family.active_household.hbx_enrollments.count).to eq(1)
       expect(shop_enrollment.hbx_enrollment_members.count).to eq(3)
       result = subject.call(new_date: TimeKeeper.date_of_record.end_of_year)
-      expect(result).to eq("Successfully dropped dependents for SHOP market")
+      expect(result.success).to eq("Successfully dropped dependents for SHOP market")
       shop_family.reload
       expect(shop_family.active_household.hbx_enrollments.count).to eq(2)
       expect(shop_family.active_household.hbx_enrollments.to_a.first.aasm_state).to eq("coverage_terminated")
@@ -111,7 +121,7 @@ RSpec.describe Operations::Shop::DependentAgeOff, type: :model, dbclean: :after_
       expect(shop_family.active_household.hbx_enrollments.count).to eq(1)
       expect(shop_enrollment.hbx_enrollment_members.count).to eq(3)
       result = subject.call(new_date: TimeKeeper.date_of_record.end_of_year)
-      expect(result).to eq("Successfully dropped dependents for SHOP market")
+      expect(result.success).to eq("Successfully dropped dependents for SHOP market")
       shop_family.reload
       expect(shop_family.active_household.hbx_enrollments.count).to eq(2)
       expect(shop_family.active_household.hbx_enrollments.to_a.first.aasm_state).to eq("coverage_terminated")
