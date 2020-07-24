@@ -20,7 +20,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'mongoid', "~> 7.0.2"
   s.add_dependency 'transport_gateway'
   s.add_dependency 'symmetric-encryption', '~> 3.9.1'
-  s.add_dependency 'rubyzip', '>= 1.2.1'
+  s.add_dependency 'rubyzip', '>= 1.3.0'
 
   s.add_development_dependency 'rspec-rails'
   s.add_development_dependency 'shoulda-matchers'

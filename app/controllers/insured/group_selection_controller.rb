@@ -93,12 +93,10 @@ class Insured::GroupSelectionController < ApplicationController
 
       raise "Unable to find employer-sponsored benefits for enrollment year #{hbx_enrollment.effective_on.year}" unless hbx_enrollment.sponsored_benefit_package.shoppable?
 
-      if @employee_role.census_employee.newly_designated?
-        newly_designated_effective_on = @employee_role.census_employee.coverage_effective_on(hbx_enrollment.sponsored_benefit_package)
-        if newly_designated_effective_on > hbx_enrollment.effective_on
-          raise 'You are attempting to purchase coverage through Qualifying Life Event prior to your eligibility date.'\
-                ' Please contact your Employer for assistance. You are eligible for employer benefits from ' + newly_designated_effective_on.strftime('%m/%d/%Y')
-        end
+      census_effective_on = @employee_role.census_employee.coverage_effective_on(hbx_enrollment.sponsored_benefit_package)
+      if census_effective_on > hbx_enrollment.effective_on
+        raise 'You are attempting to purchase coverage through Qualifying Life Event prior to your eligibility date.'\
+              ' Please contact your Employer for assistance. You are eligible for employer benefits from ' + census_effective_on.strftime('%m/%d/%Y')
       end
 
       if @adapter.is_waiving?(params)
@@ -222,11 +220,8 @@ class Insured::GroupSelectionController < ApplicationController
              family_member.person.resident_role
            end
 
-    rule = if can_shop_individual_or_resident?(@person)
-              InsuredEligibleForBenefitRule.new(role, @benefit, {family: @family, coverage_kind: @coverage_kind, new_effective_on: @new_effective_on, market_kind: "individual"})
-            else
-              InsuredEligibleForBenefitRule.new(role, @benefit, {family: @family, coverage_kind: @coverage_kind, new_effective_on: @new_effective_on, market_kind: @market_kind})
-            end
+    rule = InsuredEligibleForBenefitRule.new(role, @benefit, {family: @family, coverage_kind: @coverage_kind, new_effective_on: @new_effective_on, market_kind: get_ivl_market_kind(@person)})
+
     is_ivl_coverage, errors = rule.satisfied?
     person = family_member.person
     incarcerated = person.is_consumer_role_active? && person.is_incarcerated.nil? ? "incarcerated_not_answered" : family_member.person.is_incarcerated

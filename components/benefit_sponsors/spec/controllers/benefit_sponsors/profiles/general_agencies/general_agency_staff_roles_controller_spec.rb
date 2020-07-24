@@ -27,6 +27,7 @@ module BenefitSponsors
     describe "GET new" do
 
       before do
+        allow(controller).to receive(:set_ie_flash_by_announcement).and_return true
         get :new, params: { profile_type: "general_agency_staff" }
       end
 

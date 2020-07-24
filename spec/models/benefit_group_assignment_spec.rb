@@ -3,23 +3,25 @@ require 'rails_helper'
 describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
   it { should validate_presence_of :benefit_package_id }
   it { should validate_presence_of :start_on }
-  # it { should validate_presence_of :is_active }
 
   let(:site)                  { build(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-  let(:benefit_sponsor)       { create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile_initial_application, site: site) }
-  let(:benefit_sponsorship)   { benefit_sponsor.active_benefit_sponsorship }
-  let(:employer_profile)      { benefit_sponsorship.profile }
-  let!(:benefit_package)      { benefit_sponsorship.benefit_applications.first.benefit_packages.first}
-  let(:census_employee)       { create(:census_employee, employer_profile: employer_profile) }
-  let(:start_on)              { benefit_package.start_on }
+  let(:benefit_sponsor)        { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile_initial_application, site: site) }
+  let(:benefit_sponsorship)    { benefit_sponsor.active_benefit_sponsorship }
+  let(:employer_profile)      {  benefit_sponsorship.profile }
+  let!(:benefit_package) { benefit_sponsorship.benefit_applications.first.benefit_packages.first}
+  let(:census_employee)   { FactoryBot.create(:census_employee, employer_profile: employer_profile) }
+  let(:start_on)          { benefit_package.start_on }
+  let(:hbx_enrollment)  { HbxEnrollment.new(sponsored_benefit_package: benefit_package, employee_role: census_employee.employee_role ) }
 
 
-  describe '.new' do
+
+  describe ".new" do
     let(:valid_params) do
       {
         census_employee: census_employee,
         benefit_package: benefit_package,
-        start_on: start_on
+        start_on: start_on,
+        hbx_enrollment: hbx_enrollment
       }
     end
 
@@ -137,31 +139,19 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
       end
 
       context "and benefit coverage activity occurs" do
-        it "should start in initialized state" do
-          expect(benefit_group_assignment.initialized?).to be_truthy
-        end
-
-        context "and employee is terminated before selecting or waiving coverage" do
-          before { benefit_group_assignment.terminate_coverage }
-
-          it "should transition to coverage void status" do
-            expect(benefit_group_assignment.aasm_state).to eq "coverage_void"
-          end
-        end
-
         context "and coverage is selected" do
-          before { benefit_group_assignment.select_coverage }
-
-          it "should transistion to coverage selected state" do
-            expect(benefit_group_assignment.coverage_selected?).to be_truthy
-          end
-
-          context "without an associated hbx_enrollment" do
-            it "should be invalid" do
-              expect(benefit_group_assignment.valid?).to be_falsey
-              expect(benefit_group_assignment.errors[:hbx_enrollment].any?).to be_truthy
-            end
-          end
+          # TODO: Not sure if this can really exist if we depracate aasm_state from here. Previously the hbx_enrollment was checked if coverage_selected?
+          # which references the aasm_state, but if thats depracated, not sure hbx_enrollment can be checked any longer.
+          # CensusEmployee model has an instance method called create_benefit_package_assignment(new_benefit_package, start_on)
+          # which creates a BGA without hbx enrollment.
+          # context "without an associated hbx_enrollment" do
+          #  let(:params) {valid_params}
+          #  let(:invalid_benefit_group_assignment)  { BenefitGroupAssignment.new(**params.except(:hbx_enrollment)) }
+          #  it "should be invalid" do
+          #    expect(invalid_benefit_group_assignment.valid?).to be_falsey
+          #    expect(invalid_benefit_group_assignment.errors[:hbx_enrollment].any?).to be_truthy
+          #  end
+          # end
 
           context "with an associated, matching hbx_enrollment" do
             let(:employee_role)   { FactoryBot.build(:employee_role, employer_profile: employer_profile )}
@@ -183,7 +173,10 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
               let(:other_employee_role)     { FactoryBot.create(:employee_role, employer_profile: employer_profile2) }
 
               context "because it has different benefit group" do
-                before { hbx_enrollment.sponsored_benefit_package = other_benefit_package }
+                before do
+                  allow(benefit_group_assignment).to receive(:hbx_enrollment).and_return(hbx_enrollment)
+                  hbx_enrollment.sponsored_benefit_package = other_benefit_package
+                end
 
                 it "should be invalid" do
                   expect(benefit_group_assignment.valid?).to be_falsey
@@ -304,11 +297,12 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
     end
   end
 
-  describe '.hbx_enrollments' do
+  describe '#hbx_enrollments', dbclean: :after_each do
 
     let(:household) { FactoryBot.create(:household, family: family)}
     let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
-    let!(:benefit_group_assignment) { FactoryBot.create(:benefit_group_assignment, benefit_package: benefit_package, census_employee: census_employee)}
+    let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: household, family: family, aasm_state: 'coverage_selected', sponsored_benefit_package_id: benefit_package.id) }
+    let!(:benefit_group_assignment) { FactoryBot.create(:benefit_group_assignment, benefit_package: benefit_package, census_employee: census_employee, hbx_enrollment: hbx_enrollment)}
 
     shared_examples_for "active, waived and terminated enrollments" do |state, status, result|
 
@@ -330,11 +324,12 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
     it_behaves_like "active, waived and terminated enrollments", "inactive", "", "enrollment"
   end
 
-  describe '.active_and_waived_enrollments' do
+  describe '#active_and_waived_enrollments', dbclean: :after_each do
 
     let(:household) { FactoryBot.create(:household, family: family)}
     let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
-    let!(:benefit_group_assignment) { FactoryBot.create(:benefit_group_assignment, benefit_package: benefit_package, census_employee: census_employee)}
+    let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: household, family: family, aasm_state: 'renewing_waived', sponsored_benefit_package_id: benefit_package.id) }
+    let!(:benefit_group_assignment) { FactoryBot.create(:benefit_group_assignment, benefit_package: benefit_package, census_employee: census_employee, hbx_enrollment: hbx_enrollment)}
 
     shared_examples_for "active and waived enrollments" do |state, status, result|
 
@@ -355,15 +350,16 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
     it_behaves_like "active and waived enrollments", "inactive", "", "active_enrollment"
   end
 
-  describe '.active_enrollments' do
+  describe '#active_enrollments', dbclean: :after_each do
 
     let(:household) { FactoryBot.create(:household, family: family)}
     let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
-    let!(:benefit_group_assignment) { FactoryBot.create(:benefit_group_assignment, benefit_package: benefit_package, census_employee: census_employee)}
+    let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: household, family: family, aasm_state: 'coverage_selected', sponsored_benefit_package_id: benefit_package.id) }
+    let!(:benefit_group_assignment) { FactoryBot.create(:benefit_group_assignment, benefit_package: benefit_package, census_employee: census_employee, hbx_enrollment: hbx_enrollment)}
 
     shared_examples_for "active enrollments" do |state, status, result|
 
-      let!(:enrollment) { FactoryBot.create(:hbx_enrollment, household: household, family:family,
+       let!(:enrollment) { FactoryBot.create(:hbx_enrollment, household: household, family:family,
                           benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id,
                           aasm_state: state
                           )}
@@ -387,13 +383,17 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
   describe '.make_active' do
     let!(:census_employee) { FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: employer_profile, benefit_group: benefit_package ) }
 
-    # before(:each) do
-    #   census_employee.benefit_group_assignments.last.update(is_active:false)
-    # end
-
     context "and benefit coverage activity occurs" do
       it "should update the benfefit group assignment" do
         expect(census_employee.benefit_group_assignments.first.make_active).to be_truthy
+      end
+
+      it "should not update end_on date for inactive BGA" do
+        census_employee.benefit_group_assignments.first.update_attributes!(end_on: nil)
+        allow(census_employee.benefit_group_assignments.first).to receive(:is_active?).and_return(false)
+        census_employee.benefit_group_assignments.first.make_active
+        census_employee.benefit_group_assignments.first.reload
+        expect(census_employee.benefit_group_assignments.first.end_on).to eq(nil)
       end
     end
   end

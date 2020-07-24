@@ -32,7 +32,7 @@ module BenefitSponsors
              employer_profile: benefit_sponsorship.profile,
              benefit_group: current_benefit_package,
              hired_on: hired_on)
-      census_employee.benefit_group_assignments << build(:benefit_group_assignment, benefit_group: benefit_package, census_employee: census_employee, is_active: false)
+      census_employee.benefit_group_assignments << build(:benefit_group_assignment, benefit_group: benefit_package, census_employee: census_employee)
       census_employee
     end
 

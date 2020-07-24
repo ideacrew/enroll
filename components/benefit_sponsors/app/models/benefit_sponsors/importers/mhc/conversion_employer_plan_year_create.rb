@@ -34,7 +34,7 @@ module Importers::Mhc
         end
       end
 
-      formed_params = service.default_dates_for_coverage_starting_on(plan_year_begin)
+      formed_params = service.default_dates_for_coverage_starting_on(false, plan_year_begin)
       
       if mid_year_conversion
         effective_period = formed_params[:effective_period]

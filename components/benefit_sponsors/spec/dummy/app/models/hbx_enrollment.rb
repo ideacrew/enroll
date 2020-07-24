@@ -375,7 +375,7 @@ class HbxEnrollment
     begin
       enrollment = BenefitSponsors::Factories::EnrollmentRenewalFactory.call(self, new_benefit_package)
       if enrollment.save
-        assignment = self.employee_role.census_employee.benefit_group_assignment_by_package(enrollment.sponsored_benefit_package_id)
+        assignment = self.employee_role.census_employee.benefit_group_assignment_by_package(enrollment.sponsored_benefit_package_id, enrollment.effective_on)
         assignment.update_attributes(hbx_enrollment_id: enrollment.id)
       end
       enrollment
@@ -596,9 +596,10 @@ class HbxEnrollment
         census_employee = role.census_employee
         self.kind = 'employer_sponsored_cobra'
         self.effective_on = census_employee.cobra_begin_date if census_employee.cobra_begin_date > self.effective_on
-        if census_employee.coverage_terminated_on.present? && !census_employee.have_valid_date_for_cobra?
-          raise "You may not enroll for cobra after #{Settings.aca.shop_market.cobra_enrollment_period.months} months later of coverage terminated."
-        end
+        # removing 6 months eligibility rule for cobra EE during shopping, however the 6months rules needs to be validated during cobra initiation for CE.
+        # if census_employee.coverage_terminated_on.present? && !census_employee.have_valid_date_for_cobra?
+        #   raise "You may not enroll for cobra after #{Settings.aca.shop_market.cobra_enrollment_period.months} months later of coverage terminated."
+        # end
       end
     end
   end
@@ -624,22 +625,6 @@ class HbxEnrollment
 
     if should_transmit_update?
       notify(ENROLLMENT_UPDATED_EVENT_NAME, {policy_id: self.hbx_id})
-    end
-  end
-
-  def propogate_waiver
-    return false unless is_shop? # there is no concept of waiver in ivl case
-
-    if coverage_kind == 'health' && benefit_group_assignment.present?
-      benefit_group_assignment.waive_coverage! if benefit_group_assignment.may_waive_coverage?
-    end
-
-    true
-  end
-
-  def propagate_renewal
-    if is_shop? && coverage_kind == 'health'
-      benefit_group_assignment.renew_coverage! if benefit_group_assignment.may_renew_coverage?
     end
   end
 
@@ -1533,7 +1518,7 @@ class HbxEnrollment
     # after_all_transitions :perform_employer_plan_year_count
 
     event :renew_enrollment, :after => :record_transition do
-      transitions from: :shopping, to: :auto_renewing, after: :propagate_renewal
+      transitions from: :shopping, to: :auto_renewing
     end
 
     event :renew_waived, :after => :record_transition do
@@ -1564,7 +1549,7 @@ class HbxEnrollment
 
     event :waive_coverage, :after => :record_transition do
       transitions from: [:shopping, :coverage_selected, :auto_renewing, :renewing_coverage_selected],
-                  to: :inactive, after: :propogate_waiver
+                  to: :inactive
     end
 
     event :begin_coverage, :after => :record_transition do

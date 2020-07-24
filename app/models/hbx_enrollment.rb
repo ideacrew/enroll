@@ -363,6 +363,10 @@ class HbxEnrollment
                                                           :"effective_on".gte => effective_period.min,
                                                           :"effective_on".lte => effective_period.max
                                                         )}
+  scope :by_terminated_period,      ->(term_date) { where(
+                                                          :"terminated_on".gte => term_date,
+                                                          :"terminated_on".lte => term_date
+                                                        )}
   scope :by_benefit_application_and_sponsored_benefit,  ->(benefit_application, sponsored_benefit, end_date) do
     where(
       :"sponsored_benefit_id" => sponsored_benefit._id,
@@ -468,8 +472,8 @@ class HbxEnrollment
     begin
       enrollment = BenefitSponsors::Factories::EnrollmentRenewalFactory.call(self, new_benefit_package)
       if enrollment.save
-        assignment = self.employee_role.census_employee.benefit_group_assignment_by_package(enrollment.sponsored_benefit_package_id)
-        assignment.update_attributes(hbx_enrollment_id: enrollment.id)
+        assignment = self.employee_role.census_employee.benefit_group_assignment_by_package(enrollment.sponsored_benefit_package_id, enrollment.effective_on)
+        assignment.update_attributes!(hbx_enrollment_id: enrollment.id)
       end
       enrollment
     rescue Exception => e
@@ -705,9 +709,10 @@ class HbxEnrollment
         census_employee = role.census_employee
         self.kind = 'employer_sponsored_cobra'
         self.effective_on = census_employee.cobra_begin_date if census_employee.cobra_begin_date > self.effective_on
-        if census_employee.coverage_terminated_on.present? && !census_employee.have_valid_date_for_cobra?(current_user)
-          raise "You may not enroll for cobra after #{Settings.aca.shop_market.cobra_enrollment_period.months} months later of coverage terminated."
-        end
+        # removing 6 months eligibility rule for cobra EE during shopping, however the 6months rules needs to be validated during cobra initiation for CE.
+        # if census_employee.coverage_terminated_on.present? && !census_employee.have_valid_date_for_cobra?(current_user)
+        #   raise "You may not enroll for cobra after #{Settings.aca.shop_market.cobra_enrollment_period.months} months later of coverage terminated."
+        # end
       end
     end
   end
@@ -746,11 +751,6 @@ class HbxEnrollment
     true
   end
 
-  def propagate_renewal
-    if is_shop? && coverage_kind == 'health'
-      benefit_group_assignment.renew_coverage! if benefit_group_assignment.may_renew_coverage?
-    end
-  end
 
   def construct_waiver_enrollment(waiver_reason = nil)
     qle = family.is_under_special_enrollment_period? && (family.earliest_effective_shop_sep.present? || family.earliest_effective_fehb_sep.present?)
@@ -920,9 +920,8 @@ class HbxEnrollment
     end
 
     if benefit_group_assignment
-      benefit_group_assignment.select_coverage if benefit_group_assignment.may_select_coverage?
       benefit_group_assignment.hbx_enrollment = self
-      benefit_group_assignment.save
+      benefit_group_assignment.save!
     end
   end
 
@@ -933,6 +932,7 @@ class HbxEnrollment
 
   def update_renewal_coverage
     return unless is_shop?
+    return if census_employee&.is_employee_in_term_pending?
 
     enrollment_benefit_application = sponsored_benefit_package.benefit_application
 
@@ -1125,7 +1125,7 @@ class HbxEnrollment
 
   def sponsored_benefit_package
     return @sponsored_benefit_package if defined? @sponsored_benefit_package
-    @sponsored_benefit_package = ::BenefitSponsors::BenefitPackages::BenefitPackage.find(sponsored_benefit_package_id)
+    @sponsored_benefit_package = ::BenefitSponsors::BenefitPackages::BenefitPackage.find(sponsored_benefit_package_id) if sponsored_benefit_package_id.present?
   end
 
   def sponsored_benefit_package=(benefit_package)
@@ -1404,7 +1404,7 @@ class HbxEnrollment
           # we always have benefit group unless QLE gives an effective date before plan year start on
           # return employee_role.census_employee.coverage_effective_on if benefit_group.blank?
           # benefit_group.effective_on_for(employee_role.hired_on)
-          employee_role.census_employee.coverage_effective_on(benefit_group)
+          employee_role.census_employee.coverage_effective_on(benefit_group).to_date
         end
       when 'individual'
         if qle && family.is_under_special_enrollment_period?
@@ -1462,9 +1462,13 @@ class HbxEnrollment
     end
 
     census_employee = employee_role.census_employee
-    benefit_group_assignment = plan_year.is_renewing? ?
-        census_employee.renewal_benefit_group_assignment : (plan_year.aasm_state == "expired" && qle) ? census_employee.benefit_group_assignments.order_by(:'created_at'.desc).detect { |bga| bga.plan_year.aasm_state == "expired"} : census_employee.active_benefit_group_assignment
-
+    benefit_group_assignment = if plan_year.is_renewing? && census_employee.renewal_benefit_group_assignment
+                                 census_employee.renewal_benefit_group_assignment
+                               elsif(plan_year.aasm_state == "expired" && qle)
+                                census_employee.benefit_group_assignments.order_by(:'created_at'.desc).detect { |bga| bga.plan_year.aasm_state == "expired"}
+                              else
+                                census_employee.active_benefit_group_assignment
+                              end
     if benefit_group_assignment.blank? || benefit_group_assignment.plan_year != plan_year
       raise "Unable to find an active or renewing benefit group assignment for enrollment year #{effective_date.year}"
     end
@@ -1694,7 +1698,7 @@ class HbxEnrollment
     # after_all_transitions :perform_employer_plan_year_count
 
     event :renew_enrollment, :after => :record_transition do
-      transitions from: :shopping, to: :auto_renewing, after: :propagate_renewal
+      transitions from: :shopping, to: :auto_renewing
     end
 
     event :renew_waived, :after => :record_transition do
@@ -1725,7 +1729,7 @@ class HbxEnrollment
 
     event :waive_coverage, :after => :record_transition do
       transitions from: [:shopping, :coverage_selected, :auto_renewing, :renewing_coverage_selected],
-                  to: :inactive, after: :propogate_waiver
+                  to: :inactive
     end
 
     event :begin_coverage, :after => :record_transition do
@@ -1740,7 +1744,7 @@ class HbxEnrollment
     end
 
     event :expire_coverage, :after => :record_transition do
-      transitions from: [:shopping, :coverage_selected, :transmitted_to_carrier, :coverage_enrolled],
+      transitions from: [:shopping, :coverage_selected, :transmitted_to_carrier, :coverage_enrolled, :unverified],
                   to: :coverage_expired, :guard  => :can_be_expired?
     end
 

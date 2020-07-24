@@ -529,7 +529,10 @@ class BenefitGroup
           bga.hbx_enrollments.each do |enrollment|
             enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
           end
+<<<<<<< HEAD
           bga.update(end_on: bga.start_on) unless self.plan_year.is_renewing?
+=======
+>>>>>>> feature_2020_er_eligibility_r4
         end
 
         other_benefit_group = self.plan_year.benefit_groups.detect{ |bg| bg.id != self.id}
@@ -538,7 +541,7 @@ class BenefitGroup
           # ce.add_renew_benefit_group_assignment(other_benefit_group)
           ce.add_renew_benefit_group_assignment([other_benefit_group])
         else
-          ce.find_or_create_benefit_group_assignment([other_benefit_group])
+          ce.create_benefit_group_assignment([other_benefit_group])
         end
       end
     end

@@ -143,8 +143,8 @@ class Family
 
 
   scope :by_eligibility_determination_date_range, ->(start_at, end_at){ where(
-                                                        :"households.tax_households.eligibility_determinations.determined_on".gte => start_at).and(
-                                                        :"households.tax_households.eligibility_determinations.determined_on".lte => end_at
+                                                        :"households.tax_households.eligibility_determinations.determined_at".gte => start_at).and(
+                                                        :"households.tax_households.eligibility_determinations.determined_at".lte => end_at
                                                       )
                                                     }
 
@@ -805,7 +805,7 @@ class Family
         kind: 'individual',
         aasm_state: 'auto_renewing'
       )
-      begin 
+      begin
         ivl_enrollments.each do |enrollment|
           enrollment.begin_coverage! if enrollment.may_begin_coverage?
           @logger.info "Processed enrollment: #{enrollment.hbx_id}"
@@ -1059,14 +1059,17 @@ class Family
 
   def all_persons_vlp_documents_status
     outstanding_types = []
+    fully_uploaded = []
+    in_review = []
     self.active_family_members.each do |member|
-      outstanding_types = outstanding_types + member.person.verification_types.active.select{|type| ["outstanding", "pending", "review"].include? type.validation_status }
+      outstanding_types = outstanding_types + member.person.verification_types.active.select{|type| ["outstanding", "pending"].include? type.validation_status }
+      in_review = in_review + member.person.verification_types.active.select{|type| ["review"].include? type.validation_status }
+      fully_uploaded = fully_uploaded + member.person.verification_types.active.select{ |type| type.type_verified? }
     end
-    fully_uploaded = outstanding_types.any? ? outstanding_types.all?{ |type| (type.type_documents.any? && !type.rejected) } : nil
-    partially_uploaded = outstanding_types.any? ? outstanding_types.any?{ |type| (type.type_documents.any? && !type.rejected)} : nil
-    if fully_uploaded
+
+    if (fully_uploaded.any? || in_review.any?) && !outstanding_types.any?
       "Fully Uploaded"
-    elsif partially_uploaded
+    elsif outstanding_types.any? && in_review.any?
       "Partially Uploaded"
     else
       "None"

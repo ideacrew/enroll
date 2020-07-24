@@ -30,12 +30,18 @@ RSpec.describe BenefitSponsors::Validators::BenefitSponsorships::BenefitSponsors
   end
 
   describe "Given valid parameters" do
-    let(:valid_params) { missing_params.merge({is_no_ssn_enabled: true, market_kind: :aca_shop, organization_id: BSON::ObjectId.new, registered_on: oe_start_on})}
+    let(:valid_params_1) { missing_params.merge({is_no_ssn_enabled: true, market_kind: :aca_shop, organization_id: BSON::ObjectId.new, registered_on: oe_start_on})}
+    let(:valid_params_2) { missing_params.merge({is_no_ssn_enabled: true, market_kind: :aca_shop, organization_id: BSON::ObjectId.new, registered_on: oe_start_on})}
 
     context "with required params" do
       it "should pass validation" do
-        expect(subject.call(valid_params).success?).to be_truthy
-        expect(subject.call(valid_params).to_h).to eq valid_params
+        expect(subject.call(valid_params_1).success?).to be_truthy
+        expect(subject.call(valid_params_1).to_h).to eq valid_params_1
+      end
+
+      it "should pass validation" do
+        expect(subject.call(valid_params_2).success?).to be_truthy
+        expect(subject.call(valid_params_2).to_h).to eq valid_params_2
       end
     end
 
@@ -47,7 +53,7 @@ RSpec.describe BenefitSponsors::Validators::BenefitSponsorships::BenefitSponsors
         }   
       end 
       let(:all_params) do
-        valid_params.merge({benefit_applications: [benefit_application], effective_begin_on: effective_period.min, effective_end_on: effective_period.max,
+        valid_params_1.merge({benefit_applications: [benefit_application], effective_begin_on: effective_period.min, effective_end_on: effective_period.max,
                             ssn_enabled_on: nil , ssn_disabled_on: nil })
       end 
 

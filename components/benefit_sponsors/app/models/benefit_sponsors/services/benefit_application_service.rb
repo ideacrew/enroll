@@ -16,7 +16,7 @@ module BenefitSponsors
         schedular = BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
         find_benefit_sponsorship(form)
         form.has_active_ba = has_an_active_ba? if form.admin_datatable_action
-        form.start_on_options = schedular.start_on_options_with_schedule(form.admin_datatable_action)
+        form.start_on_options = schedular.start_on_options_with_schedule(form.is_renewing?, form.admin_datatable_action)
       end
 
       def load_form_params_from_resource(form)

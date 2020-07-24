@@ -18,7 +18,7 @@ module Services
       individual_market_enrollments = HbxEnrollment.where(
         :effective_on.lt => current_benefit_period.start_on,
         kind: 'individual',
-        :"aasm_state".in => HbxEnrollment::ENROLLED_STATUSES - ['coverage_termination_pending', 'unverified']
+        :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES - ['coverage_termination_pending']
       )
       begin
         individual_market_enrollments.each do |enrollment|

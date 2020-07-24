@@ -1580,7 +1580,7 @@ describe Family, "scopes", dbclean: :after_each do
         plan_id: plan.id,
         sponsored_benefit_package_id: current_benefit_package.id,
         aasm_state:"coverage_selected"
-  
+
         )
       }
 
@@ -1602,7 +1602,20 @@ describe Family, "scopes", dbclean: :after_each do
     end
   end
 
-  context 'scopes' do 
+  context 'scopes' do
+    context "outstanding verifications" do
+      let(:none_uploaded_person) do
+        FactoryBot.create(:person)
+      end
+      let!(:none_uploaded_family) do
+        FactoryBot.create(:family, :with_primary_family_member, person: none_uploaded_person)
+      end
+
+      it "should not return uploaded verifications" do
+        expect(none_uploaded_family.all_persons_vlp_documents_status).to eq("None")
+      end
+    end
+
     context '.all_enrollments_by_benefit_package' do
       let(:benefit_package_to_test) do
         double(:benefit_package, :_id => 1)
@@ -1670,8 +1683,8 @@ describe Family, "scopes", dbclean: :after_each do
     end
   end
 
-  context 'send_enrollment_notice_for_ivl ' do 
-    it '.enrollment_notice_for_ivl_families' do 
+  context 'send_enrollment_notice_for_ivl ' do
+    it '.enrollment_notice_for_ivl_families' do
       expect(Family.send_enrollment_notice_for_ivl(created_at)).to include family
     end
   end
@@ -1707,6 +1720,85 @@ describe "terminated_enrollments", dbclean: :after_each do
   it "should include termination and termination pending enrollments only" do
     expect(family.terminated_enrollments.count).to eq 2
     expect(family.terminated_enrollments.map(&:aasm_state)).to eq ["coverage_termination_pending", "coverage_terminated"]
+  end
+end
+
+describe "#currently_enrolled_products", dbclean: :after_each do
+  let!(:person) { FactoryBot.create(:person)}
+  let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+  let!(:household) { FactoryBot.create(:household, family: family) }
+  let!(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
+  let!(:effective_on) { TimeKeeper.date_of_record.beginning_of_month}
+  let!(:hbx_enrollment_member) { FactoryBot.build(:hbx_enrollment_member, applicant_id: family.primary_applicant.id) }
+
+  let!(:active_enrollment) {
+    FactoryBot.create(:hbx_enrollment,
+                      family: family,
+                      household: family.active_household,
+                      coverage_kind: "health",
+                      product: product,
+                      aasm_state: 'coverage_selected',
+                      hbx_enrollment_members: [hbx_enrollment_member]
+    )}
+  let!(:shopping_enrollment) {
+    FactoryBot.create(:hbx_enrollment,
+                      family: family,
+                      effective_on: effective_on,
+                      household: family.active_household,
+                      coverage_kind: "health",
+                      aasm_state: 'shopping',
+                      hbx_enrollment_members: [hbx_enrollment_member]
+    )}
+
+
+  context "when consumer has active enrollment" do
+    it "should return current active enrolled product" do
+      expect(family.currently_enrolled_products(shopping_enrollment)).to eq [active_enrollment.product]
+    end
+  end
+
+  context "when consumer has contionus coverage" do
+
+    let!(:term_enrollment) {
+      FactoryBot.create(:hbx_enrollment,
+                        family: family,
+                        household: family.active_household,
+                        coverage_kind: "health",
+                        product: product,
+                        terminated_on: effective_on - 1.day,
+                        aasm_state: 'coverage_terminated',
+                        hbx_enrollment_members: [hbx_enrollment_member]
+      )}
+
+    before do
+      active_enrollment.cancel_coverage!
+    end
+
+    it "should return contionus coverage product" do
+      expect(family.currently_enrolled_products(shopping_enrollment)).to eq [term_enrollment.product]
+    end
+  end
+
+  context "when consumer no contionus coverage" do
+
+    let!(:term_enrollment) {
+      FactoryBot.create(:hbx_enrollment,
+                        family: family,
+                        household: family.active_household,
+                        coverage_kind: "health",
+                        product: product,
+                        terminated_on: effective_on - 2.day,
+                        aasm_state: 'coverage_terminated',
+                        hbx_enrollment_members: [hbx_enrollment_member]
+      )}
+
+    before do
+      active_enrollment.cancel_coverage!
+    end
+
+    it "should return []" do
+      expect(family.currently_enrolled_products(shopping_enrollment)).to eq []
+    end
   end
 end
 

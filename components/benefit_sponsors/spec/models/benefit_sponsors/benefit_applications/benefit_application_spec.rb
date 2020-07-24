@@ -527,11 +527,11 @@ module BenefitSponsors
         let!(:initial_application) { create(:benefit_sponsors_benefit_application, benefit_sponsor_catalog: benefit_sponsor_catalog, effective_period: effective_period,benefit_sponsorship:benefit_sponsorship, aasm_state: :active) }
         let(:product_package)           { initial_application.benefit_sponsor_catalog.product_packages.detect { |package| package.package_kind == package_kind } }
         let(:benefit_package)   { create(:benefit_sponsors_benefit_packages_benefit_package, health_sponsored_benefit: true, product_package: product_package, benefit_application: initial_application) }
-        let(:benefit_group_assignment) { FactoryBot.build(:benefit_group_assignment, start_on: benefit_package.start_on, benefit_group_id:nil, benefit_package_id: benefit_package.id, is_active:true)}
+        let(:benefit_group_assignment) { FactoryBot.build(:benefit_group_assignment, start_on: benefit_package.start_on, benefit_group_id:nil, benefit_package_id: benefit_package.id)}
         let!(:census_employee) { FactoryBot.create(:census_employee, employer_profile_id: nil, benefit_sponsors_employer_profile_id: employer_profile.id, benefit_sponsorship: benefit_sponsorship, :benefit_group_assignments => [benefit_group_assignment]) }
 
         let(:renewal_application) {initial_application.renew}
-        let(:renewal_bga) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: renewal_application.benefit_packages.first, census_employee: census_employee, is_active: false)}
+        let(:renewal_bga) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: renewal_application.benefit_packages.first, census_employee: census_employee)}
 
 
         it "should generate renewal application" do
@@ -583,13 +583,12 @@ module BenefitSponsors
           end
 
           it "should create renewal benefit group assignment" do
-            expect(census_employee.active_benefit_group_assignment.benefit_application).to eq initial_application
+            #expect(census_employee.active_benefit_group_assignment.benefit_application).to eq initial_application
             expect(census_employee.renewal_benefit_group_assignment.benefit_application).to eq renewal_application
           end
 
           it "renewal benefit group assignment is_active set to false" do
-            expect(census_employee.renewal_benefit_group_assignment.is_active).to eq false
-            expect(census_employee.active_benefit_group_assignment.is_active).to eq true
+            expect(census_employee.renewal_benefit_group_assignment.activated_at).to eq nil
           end
         end
 
@@ -607,10 +606,8 @@ module BenefitSponsors
           it "should not update benefit group assignments" do
             expect(renewal_application.aasm_state).to eq :enrollment_open
 
-            expect(census_employee.renewal_benefit_group_assignment.is_active).to eq false
             expect(census_employee.renewal_benefit_group_assignment.benefit_application).to eq renewal_application
 
-            expect(census_employee.active_benefit_group_assignment.is_active).to eq true
             expect(census_employee.active_benefit_group_assignment.benefit_application).to eq initial_application
           end
         end
@@ -629,15 +626,10 @@ module BenefitSponsors
             renewal_application.activate_enrollment!
           end
 
-          it "should activate renewal benefit group assignment & set is_active to true" do
+          it "should activate renewal benefit group assignment" do
             expect(renewal_application.aasm_state).to eq :active
             renewal_bga = census_employee.benefit_group_assignments.effective_on(renewal_application.effective_period.min).first
             expect(renewal_bga.benefit_application).to eq renewal_application
-            expect(census_employee.active_benefit_group_assignment.is_active).to eq true
-          end
-
-          xit "should deactivate active benefit group assignment" do
-            expect(census_employee.benefit_group_assignments.where(benefit_package_id:benefit_package.id).first.is_active).to eq false
           end
         end
       end
@@ -652,7 +644,7 @@ module BenefitSponsors
         end
       end
 
-      context "HbxEnrollment avalaibale for benefit application return the enrollment with the given date" do
+      context "HbxEnrollment available for benefit application return the enrollment with the given date" do
         before do
           enrollment = HbxEnrollment.new(effective_on: Date.today.next_month.beginning_of_month)
           enrollment1 = HbxEnrollment.new(effective_on: Date.today.next_month.beginning_of_month + 2.months)
@@ -768,7 +760,7 @@ module BenefitSponsors
         let(:valid_open_enrollment_period)    { valid_open_enrollment_begin_on..valid_open_enrollment_end_on }
 
         it "should provide a valid open enrollment period for that effective date" do
-          expect(subject.open_enrollment_period_by_effective_date(effective_date)).to eq valid_open_enrollment_period
+          expect(subject.open_enrollment_period_by_effective_date(false, effective_date)).to eq valid_open_enrollment_period
         end
       end
 
@@ -804,11 +796,11 @@ module BenefitSponsors
         end
 
         it "should provide a valid an enrollment timetabe hash for that effective date" do
-          expect(subject.enrollment_timetable_by_effective_date(effective_date)).to eq valid_timetable
+          expect(subject.enrollment_timetable_by_effective_date(false, effective_date)).to eq valid_timetable
         end
 
         it "timetable date values should be valid" do
-          timetable = subject.enrollment_timetable_by_effective_date(effective_date)
+          timetable = subject.enrollment_timetable_by_effective_date(false, effective_date)
 
           expect(BenefitApplications::BenefitApplication.new(
                               effective_period: timetable[:effective_period],

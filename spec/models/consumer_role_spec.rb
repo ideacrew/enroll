@@ -681,8 +681,30 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       end
     end
 
+    describe "#check_native_status" do
+      let(:person) {FactoryBot.create(:person, :with_consumer_role)}
+      let(:consumer_role) {person.consumer_role}
+      let(:family) { double("Family", :person_has_an_active_enrollment? => true)}
+
+      it 'should fail indian tribe status if person updates native status field' do
+        person.update_attributes(tribal_id: "1234567")
+        consumer_role.update_attributes(aasm_state: "ssa_pending")
+        consumer_role.check_native_status(family, true)
+        expect(consumer_role.verification_types.map(&:type_name)).to include('American Indian Status')
+        expect(consumer_role.aasm_state).to include('verification_outstanding')
+      end
+
+      it 'should fail indian tribe status if no change in native status' do
+        consumer_role.update_attributes(aasm_state: "ssa_pending")
+        consumer_role.check_native_status(family, true)
+        expect(consumer_role.verification_types.map(&:type_name)).not_to include('American Indian Status')
+        expect(consumer_role.aasm_state).to include('ssa_pending')
+      end
+
+    end
+
     describe "#check_for_critical_changes" do
-      sensitive_fields = ConsumerRole::VERIFICATION_SENSITIVE_ATTR
+      sensitive_fields = ConsumerRole.new.verification_sensitive_attributes
       all_fields = FactoryBot.build(:person, :encrypted_ssn => "111111111", :gender => "male", "updated_by_id": "any").attributes.keys
       mask_hash = all_fields.map{|v| [v, (sensitive_fields.include?(v) ? "call" : "don't call")]}.to_h
       subject { ConsumerRole.new(:person => person) }
@@ -793,7 +815,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     let(:person) { FactoryBot.create(:person, :with_consumer_role) }
     let(:consumer_role) { person.consumer_role }
     let(:verification_types) { consumer.verification_types }
-    let(:verification_attr) { OpenStruct.new({ :determined_at => Time.zone.now, :vlp_authority => "hbx" })}
+    let(:verification_attr) { OpenStruct.new({ :determined_at => Time.zone.now, :vlp_authority => "ssa" })}
 
     context 'Responses from local hub and ssa hub' do
 
@@ -853,6 +875,21 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         consumer_role.update_verification_type(american_indian_status, "admin verified")
         expect(consumer_role.aasm_state). to eq 'fully_verified'
         expect(american_indian_status.validation_status). to eq 'verified'
+        expect(consumer_role.lawful_presence_determination.vlp_authority). to eq 'ssa'
+      end
+    end
+
+    context 'admin rejects american indian status document' do
+      it 'consumer aasm state should be in fully_verified if all verification types are verified' do
+        person.update_attributes!(tribal_id: "12345")
+        consumer_role.coverage_purchased!(verification_attr)
+        consumer_role.pass_residency!
+        consumer_role.ssn_valid_citizenship_valid!(verification_attr)
+        american_indian_status = consumer_role.verification_types.by_name("American Indian Status").first
+        consumer_role.return_doc_for_deficiency(american_indian_status, "Invalid Document")
+        expect(consumer_role.aasm_state). to eq 'verification_outstanding'
+        expect(american_indian_status.validation_status). to eq 'outstanding'
+        expect(consumer_role.lawful_presence_determination.vlp_authority). to eq 'ssa'
       end
     end
 
@@ -1105,6 +1142,35 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       person.consumer_role.lawful_presence_determination.update_attributes(citizen_status: nil)
       expect_any_instance_of(LawfulPresenceDetermination).to receive(:notify).with('local.enroll.lawful_presence.vlp_verification_request', {:person => person, :coverage_start_date => start_date})
       person.consumer_role.coverage_purchased!
+    end
+  end
+
+  describe 'verification_types' do
+    context 'types_include_to_notices' do
+      let!(:person) { FactoryBot.create(:person, :with_consumer_role) }
+
+      before :each do
+        @consumer_role = person.consumer_role
+        @verification_type = person.verification_types.first
+      end
+
+      context 'uploaded docuemnts exists' do
+        before do
+          uploaded_doc = VlpDocument.new(title: 'title', creator: 'creator', identifier: 'identifier')
+          @verification_type.vlp_documents = [uploaded_doc]
+          @verification_type.save!
+        end
+
+        it 'should return verification_type if vlp_doc exists' do
+          expect(@consumer_role.types_include_to_notices).to include(@verification_type)
+        end
+      end
+
+      context 'uploaded docuemnts do not exists' do
+        it 'should return verification_type if vlp_doc exists' do
+          expect(@consumer_role.types_include_to_notices).to include(@verification_type)
+        end
+      end
     end
   end
 
@@ -1567,6 +1633,44 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         it 'should not return any object of type VlpDocument' do
           expect(consumer_role.case2).to be_nil
         end
+      end
+    end
+
+    context 'mark_residency_authorized' do
+      let(:person1000) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
+
+      context 'self_attest_residency' do
+        before :each do
+          @consumer_role = person1000.consumer_role
+          @consumer_role.mark_residency_authorized(OpenStruct.new(self_attest_residency: true))
+        end
+
+        it 'should attest dc residency type' do
+          expect(person1000.verification_type_by_name('DC Residency').validation_status).to eq('attested')
+        end
+      end
+
+      context 'verified dc residency' do
+        before :each do
+          person1000.consumer_role.mark_residency_authorized
+        end
+
+        it 'should attest dc residency type' do
+          expect(person1000.verification_type_by_name('DC Residency').validation_status).to eq('verified')
+        end
+      end
+    end
+
+    context 'workflow_state_transitions' do
+      let(:person100) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
+
+      before do
+        @consumer_role = person100.consumer_role
+        @consumer_role.record_transition(OpenStruct.new(self_attest_residency: true))
+      end
+
+      it 'should add reason to newly created workflow_state_transition' do
+        expect(@consumer_role.workflow_state_transitions.last.reason).to eq('Self Attest DC Residency')
       end
     end
   end

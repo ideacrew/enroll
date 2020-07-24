@@ -242,7 +242,7 @@ module BenefitSponsors
           let(:profile_factory)           { profile_factory_class.call(invalid_broker_params) }
 
           it 'should throw an error' do
-            expect(profile_factory.errors.messages[:organization]).to eq ["NPN has already been claimed by another broker. Please contact HBX-Customer Service - Call (855) 532-5465."]
+            expect(profile_factory.errors.messages[:organization].first).to match /npn/i
           end
         end
       end
