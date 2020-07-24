@@ -577,10 +577,10 @@ class CensusEmployee < CensusMember
   end
 
   def is_terminate_possible?
-    return true if employment_terminated? || cobra_terminated?
-    return false if cobra_linked?
+    return false if employment_terminated? || cobra_terminated?
+    return true if cobra_linked?
 
-    !(is_eligible? || is_linked?)
+    is_eligible? || is_linked?
   end
 
   def employee_relationship

@@ -88,7 +88,7 @@ module Effective
       end
 
       def terminate_possible? census_employee
-        census_employee.is_terminate_possible? ? 'disabled' : 'ajax'
+        census_employee.is_terminate_possible? ? 'ajax' : 'disabled'
       end
 
       def nested_filter_definition
