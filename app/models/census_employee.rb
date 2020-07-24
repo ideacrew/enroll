@@ -1432,6 +1432,16 @@ class CensusEmployee < CensusMember
     active_benefit_group_assignment.benefit_package.earliest_benefit_package_after(coverage_date)
   end
 
+  def waiving_on_eod?
+    if renewal_benefit_group_assignment.present?
+      renewal_benefit_group_assignment.aasm_state == 'coverage_waived' || active_benefit_group_assignment.aasm_state == 'coverage_waived'
+    elsif active_benefit_group_assignment.present?
+      active_benefit_group_assignment.aasm_state == 'coverage_waived'
+    else
+      false
+    end
+  end
+
   def ssn=(new_ssn)
     if !new_ssn.blank?
       write_attribute(:encrypted_ssn, CensusMember.encrypt_ssn(new_ssn))
