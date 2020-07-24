@@ -57,7 +57,7 @@ RSpec.describe Operations::Shop::DependentAgeOff, type: :model, dbclean: :after_
                        else
                          "Successfully dropped dependents for SHOP market"
                        end
-      expect(result).to eq(process_result)
+      expect(result.failure).to eq(process_result)
     end
   end
 
