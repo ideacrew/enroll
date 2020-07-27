@@ -2,23 +2,23 @@
 require 'dry/monads'
 require 'dry/monads/do'
 module Operations
-  module Shop
+  module Individual
     class DependentAgeOff
       include Config::SiteConcern
       send(:include, Dry::Monads[:result, :do])
 
       def call(new_date:)
         yield can_process_event(new_date)
-        shop_logger = yield initialize_logger("shop")
-        query_criteria = yield shop_query_criteria
+        shop_logger = yield initialize_logger("individual")
+        query_criteria = yield ivl_query_criteria
         process_shop_dep_age_off(query_criteria, shop_logger, new_date)
       end
 
       private
 
       def can_process_event(new_date)
-        if new_date != TimeKeeper.date_of_record.end_of_year && ::EnrollRegistry[:aca_shop_dependent_age_off].settings(:period).item == :annual
-          Failure('Cannot process the request, because shop dependent_age_off is not set for end of every month')
+        if new_date != TimeKeeper.date_of_record.end_of_year && ::EnrollRegistry[:aca_ivl_dependent_age_off].settings(:period).item == :annual
+          Failure('Cannot process the request, because individual dependent_age_off is not set for end of every month')
         else
           Success('')
         end
@@ -29,12 +29,12 @@ module Operations
         Success(logger_file)
       end
 
-      def shop_query_criteria
-        Success(HbxEnrollment.enrolled.shop_market.all_with_multiple_enrollment_members)
+      def ivl_query_criteria
+        Success(HbxEnrollment.enrolled.individual_market.all_with_multiple_enrollment_members)
       end
 
       def process_shop_dep_age_off(enrollments, shop_logger, new_date)
-        cut_off_age = EnrollRegistry[:aca_shop_dependent_age_off].settings(:cut_off_age).item
+        cut_off_age = EnrollRegistry[:aca_ivl_dependent_age_off].settings(:cut_off_age).item
         enrollments.no_timeout.inject([]) do |_result, enrollment|
           next if enrollment.employer_profile&.is_fehb?
           primary_person = enrollment.family.primary_person
@@ -56,7 +56,7 @@ module Operations
           rescue Exception => e
           shop_logger.info "Unable to terminated enrollment #{enrollment.hbx_id} for #{e.message}"
         end
-        Success('Successfully dropped dependents for SHOP market')
+        Success('Successfully dropped dependents for IVL market')
       end
 
       def fetch_aged_off_people(relations, new_date, cut_off_age)
@@ -73,7 +73,6 @@ module Operations
         if reinstate_enrollment.may_reinstate_coverage?
           reinstate_enrollment.reinstate_coverage!
           reinstate_enrollment.begin_coverage! if reinstate_enrollment.may_begin_coverage?
-          reinstate_enrollment.begin_coverage! if reinstate_enrollment.may_begin_coverage? && self.effective_on <= TimeKeeper.date_of_record
         end
       end
     end
