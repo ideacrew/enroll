@@ -9,9 +9,9 @@ module Operations
 
       def call(new_date:)
         yield can_process_event(new_date)
-        shop_logger = yield initialize_logger("individual")
+        ivl_logger = yield initialize_logger("individual")
         query_criteria = yield ivl_query_criteria
-        process_shop_dep_age_off(query_criteria, shop_logger, new_date)
+        process_ivl_dep_age_off(query_criteria, ivl_logger, new_date)
       end
 
       private
@@ -33,7 +33,7 @@ module Operations
         Success(HbxEnrollment.enrolled.individual_market.all_with_multiple_enrollment_members)
       end
 
-      def process_shop_dep_age_off(enrollments, shop_logger, new_date)
+      def process_ivl_dep_age_off(enrollments, ivl_logger, new_date)
         cut_off_age = EnrollRegistry[:aca_ivl_dependent_age_off].settings(:cut_off_age).item
         enrollments.no_timeout.inject([]) do |_result, enrollment|
           next if enrollment.employer_profile&.is_fehb?
@@ -54,7 +54,7 @@ module Operations
           effective_date = new_date + 1.day
           terminate_and_reinstate_enrollment(enrollment, effective_date, eligible_dependents)
           rescue Exception => e
-          shop_logger.info "Unable to terminated enrollment #{enrollment.hbx_id} for #{e.message}"
+          ivl_logger.info "Unable to terminated enrollment #{enrollment.hbx_id} for #{e.message}"
         end
         Success('Successfully dropped dependents for IVL market')
       end
