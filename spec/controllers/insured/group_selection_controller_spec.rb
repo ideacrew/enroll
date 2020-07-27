@@ -496,8 +496,9 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       person.reload
       post :create, person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids
       expect(response).to have_http_status(:redirect)
-      expect(flash[:error]).to match /You may not enroll for cobra after/
-      expect(response).to redirect_to(new_insured_group_selection_path(person_id: person.id, employee_role_id: person.employee_roles.first.id, change_plan: '', market_kind: 'shop', enrollment_kind: ''))
+      expect(flash[:error]).to eq nil
+      family.reload
+      expect(response).to redirect_to(insured_plan_shopping_path(id: family.active_household.hbx_enrollments.where(aasm_state: 'shopping').last.id, coverage_kind: 'health', market_kind: 'shop', enrollment_kind: ''))
     end
 
     it "should render group selection page if without family_member_ids" do
