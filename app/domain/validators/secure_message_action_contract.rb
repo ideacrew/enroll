@@ -29,7 +29,7 @@ module Validators
     end
 
     rule(:body) do
-      key.failure('Please enter content') if value.blank?
+      key.failure('Please enter content') if values[:file].blank? && value.blank?
     end
   end
 end
