@@ -67,12 +67,12 @@ describe ResolveCensusEmployeeValidationFailures do
           end
 
           # Old model code. Not being used anywhere in the system
-          it 'should remove the incorrect enrollment id' do
-            assignment = ce.active_benefit_group_assignment
-            subject.migrate
-            assignment.reload
-            expect(assignment.hbx_enrollment_id).to be_nil
-          end
+          # it 'should remove the incorrect enrollment id' do
+          #   assignment = ce.active_benefit_group_assignment
+          #   subject.migrate
+          #   assignment.reload
+          #   expect(assignment.hbx_enrollment_id).to be_nil
+          # end
         end
 
         context 'when census employee missing benefit group assignment' do
