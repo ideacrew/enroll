@@ -59,6 +59,27 @@ module BenefitSponsors
           expect(policy.is_satisfied?(benefit_application)).to eq false
         end
       end
+
+      context "When all the census employees are waived" do
+        before do
+          employees = []
+          benefit_sponsorship.census_employees.each do |ce|
+            family = FactoryBot.create(:family, :with_primary_family_member)
+            allow(ce).to receive(:family).and_return(family)
+            employees << ce
+            FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
+            ce.active_benefit_group_assignment.aasm_state = 'coverage_waived'
+            ce.active_benefit_group_assignment.save
+            ce.save
+          end
+          allow(benefit_application).to receive(:active_census_employees_under_py).and_return(employees)
+        end
+
+        it "should fail the policy" do
+          policy = subject.business_policies_for(benefit_application, :end_open_enrollment)
+          expect(policy.is_satisfied?(benefit_application)).to eq false
+        end
+      end
     end
 
     describe "For business_policies_for 1/1 effective date" do
