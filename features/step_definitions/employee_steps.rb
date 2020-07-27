@@ -173,11 +173,9 @@ And(/staff role person clicks on employee (.*?)$/) do |named_person|
   expect(page.current_path).to include("census_employee")
 end
 
-Then(/the user should see a dropdown for Off Plan Year benefit packages$/) do
+Then(/the user should see a dropdown for Off Plan Year benefit package$/) do
+  # Selectric is weird
   Capybara.ignore_hidden_elements = false
-  selects = page.all('select')
-  benefit_packages_select = selects.detect { |sel| sel[:class] == 'interaction-choice-control-census-employee-benefit-group-assignments-attributes-0-benefit-group-id' }
-  benefit_packages_select.click
-  binding.pry
-  find(:xpath, "//select[@name='organization[entity_kind]']/option[@value='c_corporation']")
+  expect(page).to have_text("Off Cycle Benefit Package")
+  Capybara.ignore_hidden_elements = true
 end 

@@ -87,10 +87,11 @@ Feature: Create Benefit Application by admin UI
     And employer should see that the create plan year is true
 
 
-  Scenario: Census Employee Roster will show off cycle benefit packages
+  Scenario: Census Employee Roster will show off cycle benefit packages and employee can shop with off cycle benefit package
+    Given Qualifying life events are present
     And initial employer ABC Widgets has active benefit application
     And there is a census employee record and employee role for Patrick Doe for employer ABC Widgets
-    And employees for ABC Widgets have a selected coverage
+    And employees for employer ABC Widgets have selected a coverage
     Given that a user with a HBX staff role with HBX staff subrole exists and is logged in
     And the user is on the Employer Index of the Admin Dashboard
     When the user clicks Action for that Employer
@@ -125,7 +126,21 @@ Feature: Create Benefit Application by admin UI
     And employer selected 100 contribution percent for the application
     Then employer should see your estimated montly cost
     And employer should see that the create plan year is true
+    And employer clicks Create Plan Year
     And staff role person clicked on employees tab
     And staff role person clicks on employees link
     And staff role person clicks on employee Patrick Doe
-    Then the user should see a dropdown for Off Plan Year benefit packages
+    Then the user should see a dropdown for Off Plan Year benefit package
+    And employee Patrick Doe already matched with employer ABC Widgets and logged into employee portal
+    # When Employee click the "Had a baby" in qle carousel
+    # And Employee select a past qle date
+    # Then Employee should see confirmation and clicks continue
+     #Then Employee should see family members page and clicks continue
+    # Then Employee should see the group selection page
+    # When Employee clicks continue on the group selection page
+    # Then Employee should see the list of plans
+    # And Patrick Doe should see the plans from the expired plan year
+    # When Employee selects a plan on the plan shopping page
+    # Then Patrick Doe should see coverage summary page with qle effective date
+    # Then Patrick Doe should see the receipt page with qle effective date as effective date
+    # Then Patrick Doe should see "my account" page with enrollment

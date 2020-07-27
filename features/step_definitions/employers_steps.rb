@@ -1069,6 +1069,11 @@ And(/^employer should see that the create plan year is (.*)$/) do |plan_year_btn
   end
 end
 
+And(/^employer clicks Create Plan Year$/) do
+  click_button 'Create Plan Year'
+end
+
+
 And(/^employer should see default cobra start date$/) do
   terminated_on = @census_employees.first.employment_terminated_on.next_month.beginning_of_month.to_s
   expect(find('input.text-center.date-picker').value).to eq terminated_on

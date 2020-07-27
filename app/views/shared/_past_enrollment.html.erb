@@ -1,4 +1,4 @@
-<% plan = past_enrollment.product %>
+<% plan = past_enrollment.product || past_enrollment.plan %>
 <tr>
   <td>
     <%= enrollment_coverage_end(past_enrollment) %>
