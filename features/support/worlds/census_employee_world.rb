@@ -241,7 +241,12 @@ And(/employee (.*) already matched with employer (.*?)(?: and (.*?))? and logged
   sponsorship.benefit_applications.each do |benefit_application|
     benefit_application.benefit_packages.each{|benefit_package| ce.add_benefit_group_assignment(benefit_package) }
   end
-  ce.update_attributes(employee_role_id: person_record.employee_roles.first.id)
+  if person_record.employee_roles.present?
+    ce.update_attributes(employee_role_id: person_record.employee_roles.first.id)
+  else
+    employee_role = FactoryBot.create(:employee_role, person: person_record, benefit_sponsors_employer_profile_id: profile.id)
+    ce.update_attributes(employee_role_id: employee_role.id)
+  end
   FactoryBot.create(:family, :with_primary_family_member, person: person_record) if person_record.primary_family.blank?
   user = FactoryBot.create(:user,
                             person: person_record,
@@ -327,6 +332,43 @@ And(/^employees for (.*?) have a selected coverage$/) do |legal_name|
                     sponsored_benefit_package_id: benefit_package.id,
                     rating_area_id: rating_area_id,
                     sponsored_benefit_id: sponsored_benefit_id}, :with_health_product)
+end
+
+
+And(/employees for employer (.*?) have selected a coverage$/) do |legal_name|
+  employer_profile = employer(legal_name).employer_profile
+  census_employees_by_legal_name(legal_name).each do |census_employee|
+    person = Person.where(first_name: census_employee.first_name, last_name: census_employee.last_name).last ||
+    FactoryBot.create(:person, :with_family, first_name: census_employee.first_name, last_name: census_employee.last_name, dob: census_employee.dob, ssn: census_employee.ssn)
+    if census_employee.employee_role 
+      employee_role = census_employee.employee_role
+    else 
+      employee_role = FactoryBot.create(:employee_role, person: person, benefit_sponsors_employer_profile_id: employer_profile.id)
+      census_employee.update_attributes(employee_role_id: employee_role.id)
+      census_employee.employee_role.update_attributes(census_employee_id: census_employee.id)
+    end
+    bga =  census_employee.active_benefit_group_assignment
+    benefit_package = fetch_benefit_group(legal_name)
+    coverage_household = person.primary_family.households.first
+    rating_area_id =  benefit_package.benefit_application.recorded_rating_area_id
+    sponsored_benefit_id = benefit_package.sponsored_benefits.first.id
+    enrollment = FactoryBot.create(:hbx_enrollment,
+                                         family: person.primary_family,
+                                         household: person.primary_family.active_household,
+                                         coverage_kind: "health",
+                                         effective_on: benefit_package.start_on,
+                                         enrollment_kind: "open_enrollment",
+                                         kind: "employer_sponsored",
+                                         submitted_at: benefit_package.start_on - 20.days,
+                                         employee_role_id: census_employee.employee_role.id,
+                                         benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id,
+                                         benefit_sponsorship_id: census_employee.benefit_sponsorship.id,
+                                         sponsored_benefit_package_id: benefit_package.id,
+                                         sponsored_benefit_id: benefit_package.health_sponsored_benefit.id,
+                                         rating_area_id: benefit_package.rating_area.id,
+                                         product_id: benefit_package.health_sponsored_benefit.products(benefit_package.start_on).first.id,
+                                         issuer_profile_id: benefit_package.health_sponsored_benefit.products(benefit_package.start_on).first.issuer_profile.id)
+  end
 end
 
 And(/^employer (.*?) with employee (.*?) is under open enrollment$/) do |legal_name, named_person|

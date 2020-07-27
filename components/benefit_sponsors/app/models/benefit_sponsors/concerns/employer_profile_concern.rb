@@ -86,6 +86,10 @@ module BenefitSponsors
         is_converting? && published_benefit_application.is_renewing?
       end
 
+      def off_cycle_benefit_application
+        active_benefit_sponsorship.off_cycle_benefit_application
+      end
+
       def renewal_benefit_application
         active_benefit_sponsorship.renewal_benefit_application
       end

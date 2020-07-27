@@ -748,7 +748,6 @@ When(/^.+ clicks Shop for new plan button$/) do
 end
 
 Then(/^.+ should see the list of plans$/) do
-  binding.pry
   find('#planContainer', wait: 10)
   expect(page).to have_link('Select')
   screenshot("plan_shopping")

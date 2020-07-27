@@ -131,11 +131,12 @@ Feature: Create Benefit Application by admin UI
     And staff role person clicks on employees link
     And staff role person clicks on employee Patrick Doe
     Then the user should see a dropdown for Off Plan Year benefit package
-    And employee Patrick Doe already matched with employer ABC Widgets and logged into employee portal
+    And census employee Patrick Doe has benefit group assignment of the off cycle benefit application
+    # And employee Patrick Doe already matched with employer ABC Widgets and logged into employee portal
     # When Employee click the "Had a baby" in qle carousel
     # And Employee select a past qle date
     # Then Employee should see confirmation and clicks continue
-     #Then Employee should see family members page and clicks continue
+    # Then Employee should see family members page and clicks continue
     # Then Employee should see the group selection page
     # When Employee clicks continue on the group selection page
     # Then Employee should see the list of plans

@@ -178,4 +178,12 @@ Then(/the user should see a dropdown for Off Plan Year benefit package$/) do
   Capybara.ignore_hidden_elements = false
   expect(page).to have_text("Off Cycle Benefit Package")
   Capybara.ignore_hidden_elements = true
-end 
+end
+
+And(/census employee (.*?) has benefit group assignment of the off cycle benefit application$/) do |named_person|
+  click_button 'Update Employee'
+  person = people[named_person]
+  ce = CensusEmployee.where(:first_name => /#{person[:first_name]}/i, :last_name => /#{person[:last_name]}/i).first
+  expect(ce.active_benefit_group_assignment.benefit_application == ce.benefit_sponsorship.benefit_applications.last).to eq(true)
+  expect(ce.benefit_sponsorship.benefit_applications.last == ce.off_cycle_benefit_group_assignment.benefit_application).to eq(true)
+end
