@@ -92,7 +92,7 @@ class Person
   field :no_dc_address_reason, type: String, default: ""
 
   field :is_active, type: Boolean, default: true
-  field :is_age_off_excluded, type: Boolean, default: false
+  field :age_off_excluded, type: Boolean, default: false
   field :updated_by, type: String
   field :no_ssn, type: String #ConsumerRole TODO TODOJF
   field :is_physically_disabled, type: Boolean
