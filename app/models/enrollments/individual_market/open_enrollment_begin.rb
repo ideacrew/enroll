@@ -62,6 +62,3 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
     end
   end
 end
-
-
-
