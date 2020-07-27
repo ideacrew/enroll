@@ -36,7 +36,7 @@ module Effective
            ]
 
           if ::EnrollRegistry.feature_enabled?(:send_secure_message_family)
-            dropdown.insert(8, ['Send Secure Message', send_secure_message_form_exchanges_hbx_profiles_path(person_id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id.to_s}"), secure_message_link_type(row, current_user)])
+            dropdown.insert(8, ['Send Secure Message', new_secure_message_exchanges_hbx_profiles_path(person_id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id.to_s}"), secure_message_link_type(row, current_user)])
           else
             dropdown.insert(8, ['Send Secure Message', new_insured_inbox_path(id: row.primary_applicant.person.id, profile_id: current_user.person.hbx_staff_role.hbx_profile.id, to: row.primary_applicant.person.last_name + ', ' + row.primary_applicant.person.first_name, family_actions_id: "family_actions_#{row.id.to_s}"), secure_message_link_type(row, current_user)])
           end

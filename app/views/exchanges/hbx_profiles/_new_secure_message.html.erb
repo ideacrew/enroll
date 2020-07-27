@@ -43,9 +43,9 @@
     </div>
   </div>
   <div class="modal" id="sendSecure" role="dialog">
-    <div class="modal-dialog">
+    <div class="modal-dialog" style="width: 500px;">
       <div class="modal-content">
-        <div class="modal-body">
+        <div class="modal-body" style="text-align: center;">
           <p>Are you sure?</p>
         </div>
         <div class="modal-footer">
@@ -81,7 +81,7 @@
     var formData = new FormData($('#secure_message_form')[0]);
 
     $.ajax({
-      url: '/exchanges/hbx_profiles/send_secure_message.js',
+      url: '/exchanges/hbx_profiles/create_send_secure_message.js',
       type: "POST",
       data : formData,
       contentType: false,

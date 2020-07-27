@@ -131,12 +131,12 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
   end
 
-  def send_secure_message_form
+  def new_secure_message
     @resource = get_resource_for_secure_form(params)
     @element_to_replace_id = params[:employer_actions_id] || params[:family_actions_id]
   end
 
-  def send_secure_message
+  def create_send_secure_message
     @resource = get_resource(params)
     @subject = params[:subject].presence
     @body = params[:body].presence
@@ -145,7 +145,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     @error_on_save = result.failure if result.failure?
     respond_to do |format|
       if @error_on_save
-        format.js { render "send_secure_message_form" }
+        format.js { render "new_secure_message"}
       else
         format.js { "Message Sent successfully"  }
       end
