@@ -85,6 +85,17 @@ module CensusEmployeeWorld
     end
   end
 
+  def census_employees(legal_name = nil)
+    if legal_name
+      sponsorship = employer(legal_name).benefit_sponsorships.first
+    end
+    if @census_employees
+      @census_employees
+    else
+      @census_employees = CensusEmployee.where(benefit_sponsorship: benefit_sponsorship)
+    end 
+  end
+
   def census_employee(named_person = nil)
     @census_employee ||= {}
 
@@ -154,7 +165,7 @@ And(/^there is a census employee record and employee role for (.*?) for employer
   create_census_employee_from_person(named_person, legal_name)
   person = people[named_person]
   organization = employer(legal_name)
-  person_record = Person.where(first_name: person[:first_name], last_name: person[:last_name]).first
+  person_record = Person.where(first_name: person[:first_name], last_name: person[:last_name]).first || FactoryBot.create(:person, :with_family, ssn: person[:ssn], first_name: person[:first_name], last_name: person[:last_name])
   employer_profile = employer_profile(legal_name)
   employer_staff_role = FactoryBot.build(:benefit_sponsor_employer_staff_role, aasm_state: 'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)
   person_record.employee_roles <<  employer_staff_role
@@ -281,9 +292,9 @@ And(/^Employees for (.*?) have both Benefit Group Assignments Employee role$/) d
   step "Assign benefit group assignments to #{legal_name} employee"
 
   employer_profile = employer(legal_name).employer_profile
-
-  @census_employees.each do |employee|
-    person = FactoryBot.create(:person, :with_family, first_name: employee.first_name, last_name: employee.last_name, dob: employee.dob, ssn: employee.ssn)
+  census_employees(legal_name).each do |employee|
+    person = Person.where(first_name: employee.first_name, last_name: employee.last_name).last ||
+    FactoryBot.create(:person, :with_family, first_name: employee.first_name, last_name: employee.last_name, dob: employee.dob, ssn: employee.ssn)
     employee_role = FactoryBot.create(:employee_role, person: person, benefit_sponsors_employer_profile_id: employer_profile.id)
     employee.update_attributes(employee_role_id: employee_role.id)
   end
@@ -292,7 +303,7 @@ end
 And(/^Assign benefit group assignments to (.*?) employee$/) do |legal_name|
   # try to fetch it from benefit application world
   benefit_package = fetch_benefit_group(legal_name)
-  @census_employees.each do |employee|
+  census_employees(legal_name).each do |employee|
     employee.add_benefit_group_assignment(benefit_package)
   end
 end

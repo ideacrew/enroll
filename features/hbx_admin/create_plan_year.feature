@@ -89,6 +89,8 @@ Feature: Create Benefit Application by admin UI
 
   Scenario: Census Employee Roster will show off cycle benefit packages
     And initial employer ABC Widgets has active benefit application
+    And there is a census employee record and employee role for Patrick Doe for employer ABC Widgets
+    And employees for ABC Widgets have a selected coverage
     Given that a user with a HBX staff role with HBX staff subrole exists and is logged in
     And the user is on the Employer Index of the Admin Dashboard
     When the user clicks Action for that Employer
@@ -124,5 +126,6 @@ Feature: Create Benefit Application by admin UI
     Then employer should see your estimated montly cost
     And employer should see that the create plan year is true
     And staff role person clicked on employees tab
-    And staff role person clicks on first employee
+    And staff role person clicks on employees link
+    And staff role person clicks on employee Patrick Doe
     Then the user should see a dropdown for Off Plan Year benefit packages

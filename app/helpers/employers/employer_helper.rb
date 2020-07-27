@@ -163,7 +163,7 @@ module Employers::EmployerHelper
   end
 
   def get_off_cycle_benefit_packages_for_census_employee
-    off_cycle_benefit_packages = benefit_sponsorship.off_cycle_benefit_application.benefit_packages if @benefit_sponsorship.off_cycle_benefit_application.present?
+    off_cycle_benefit_packages = @benefit_sponsorship.off_cycle_benefit_application.benefit_packages if @benefit_sponsorship.off_cycle_benefit_application.present?
     return off_cycle_benefit_packages || []
   end
 

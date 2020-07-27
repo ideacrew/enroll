@@ -509,10 +509,12 @@ module BenefitSponsors
     end
 
     def off_cycle_benefit_application
-      # Second to last benefit application is in termination pending and current one is in active
+      # Second to last benefit application is in termination pending and current one is in active or draft
       if !self.benefit_applications[-2].nil? &&
         self.benefit_applications[-2]&.aasm_state == :termination_pending &&
-        BenefitSponsors::BenefitApplications::BenefitApplication::SUBMITTED_STATES.reject! { |state| state == :termination_pending }.include?(benefit_applications.last.aasm_state)
+        (::BenefitSponsors::BenefitApplications::BenefitApplication::SUBMITTED_STATES + ::BenefitSponsors::BenefitApplications::BenefitApplication::APPLICATION_DRAFT_STATES).reject do |state|
+          state == :termination_pending
+        end.include?(benefit_applications.last.aasm_state)
         benefit_applications.last
       end
     end

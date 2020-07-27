@@ -162,3 +162,22 @@ Then(/Employee should see (.*?) page with "(.*?)" as coverage effective date/) d
     find('.interaction-click-control-go-to-my-account').click
   end
 end
+
+And(/staff role person clicks on employees link$/) do
+  click_link 'Employees'
+end
+
+And(/staff role person clicks on employee (.*?)$/) do |named_person|
+  click_link named_person
+  sleep(2)
+  expect(page.current_path).to include("census_employee")
+end
+
+Then(/the user should see a dropdown for Off Plan Year benefit packages$/) do
+  Capybara.ignore_hidden_elements = false
+  selects = page.all('select')
+  benefit_packages_select = selects.detect { |sel| sel[:class] == 'interaction-choice-control-census-employee-benefit-group-assignments-attributes-0-benefit-group-id' }
+  benefit_packages_select.click
+  binding.pry
+  find(:xpath, "//select[@name='organization[entity_kind]']/option[@value='c_corporation']")
+end 
