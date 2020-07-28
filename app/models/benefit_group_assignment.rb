@@ -105,8 +105,7 @@ class BenefitGroupAssignment
     def filter_assignments_with_no_end_on(assignments, date)
       valid_assignments_with_no_end_on = assignments.select { |assignment| (assignment.start_on..assignment.start_on.next_year.prev_day).cover?(date) }
       if valid_assignments_with_no_end_on.size > 1
-        valid_assignments_with_no_end_on.detect { |assignment| assignment.is_active? } ||
-        valid_assignments_with_no_end_on.sort_by { |assignment| (assignment.start_on.to_time - date.to_time).abs }.first
+        valid_assignments_with_no_end_on.detect { |assignment| assignment.is_active? } || valid_assignments_with_no_end_on.sort_by { |assignment| (assignment.start_on.to_time - date.to_time).abs }.first
       else
         valid_assignments_with_no_end_on.first
       end
@@ -184,7 +183,7 @@ class BenefitGroupAssignment
 
   def covered_families
     Family.where(:"_id".in => HbxEnrollment.where(
-      benefit_group_assignment_id: BSON::ObjectId.from_string(self.id) 
+      benefit_group_assignment_id: BSON::ObjectId.from_string(self.id)
     ).pluck(:family_id)
   )
   end
@@ -217,7 +216,7 @@ class BenefitGroupAssignment
 
     if census_employee.cobra_begin_date.present?
       coverage_terminated_on = census_employee.cobra_begin_date.prev_day
-      hbx_enrollments = hbx_enrollments.select do |e| 
+      hbx_enrollments = hbx_enrollments.select do |e|
         e.effective_on < census_employee.cobra_begin_date && (e.terminated_on.blank? || e.terminated_on == coverage_terminated_on)
       end
     end
@@ -275,7 +274,6 @@ class BenefitGroupAssignment
   end
 
   def end_benefit(end_date)
-    # return if hbx_enrollment.is_coverage_waived?
     self.update_attributes!(end_on: end_date)
   end
 
@@ -377,7 +375,7 @@ class BenefitGroupAssignment
 
   def make_active
     census_employee.benefit_group_assignments.each do |benefit_group_assignment|
-      if benefit_group_assignment.is_active? && benefit_group_assignment.id != self.id  
+      if benefit_group_assignment.is_active? && benefit_group_assignment.id != self.id
         end_on = benefit_group_assignment.end_on || (start_on - 1.day)
         if is_case_old?
           end_on = benefit_group_assignment.plan_year.end_on unless benefit_group_assignment.plan_year.coverage_period_contains?(end_on)
@@ -387,8 +385,9 @@ class BenefitGroupAssignment
         benefit_group_assignment.update_attributes(end_on: end_on)
       end
     end
+
     # TODO: Hack to get census employee spec to pass
-    #bga_to_activate = census_employee.benefit_group_assignments.select { |bga| HbxEnrollment::ENROLLED_STATUSES.include?(bga.hbx_enrollment&.aasm_state) }.last 
+    #bga_to_activate = census_employee.benefit_group_assignments.select { |bga| HbxEnrollment::ENROLLED_STATUSES.include?(bga.hbx_enrollment&.aasm_state) }.last
     #if bga_to_activate.present?
     # bga_to_activate.update_attributes!(activated_at: TimeKeeper.datetime_of_record)
     #else
@@ -420,7 +419,7 @@ class BenefitGroupAssignment
 
   def model_integrity
     self.errors.add(:benefit_group, "benefit_group required") unless benefit_group.present?
-    
+
     # TODO: Not sure if this can really exist if we depracate aasm_state from here. Previously the hbx_enrollment was checked if coverage_selected?
     # which references the aasm_state, but if thats depracated, not sure hbx_enrollment can be checked any longer. CensusEmployee model has an instance method
     # called create_benefit_package_assignment(new_benefit_package, start_on) which creates a BGA without hbx enrollment.

@@ -628,7 +628,7 @@ module BenefitSponsors
     # @param [ BenefitSponsorCatalog ] The catalog valid for the effective_period immediately following this
     # BenefitApplication instance's effective_period
     # @return [ BenefitApplication ] The built renewal application instance and submodels
-    
+
     def renew(async_workflow_id = nil)
       renewal_effective_date = end_on.next_day.to_date
 

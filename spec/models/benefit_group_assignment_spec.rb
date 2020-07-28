@@ -3,6 +3,7 @@ require 'rails_helper'
 describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
   it { should validate_presence_of :benefit_package_id }
   it { should validate_presence_of :start_on }
+
   let(:site)                  { build(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
   let(:benefit_sponsor)        { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile_initial_application, site: site) }
   let(:benefit_sponsorship)    { benefit_sponsor.active_benefit_sponsorship }
@@ -182,7 +183,7 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
                   expect(benefit_group_assignment.errors[:hbx_enrollment].any?).to be_truthy
                 end
               end
-           
+
               # context "because it has different employee role" do
               #   before { hbx_enrollment.employee_role = other_benefit_group }
 
@@ -195,6 +196,87 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
             end
           end
         end
+
+        context "and coverage is waived" do
+          before { benefit_group_assignment.waive_coverage }
+
+          it "should transistion to coverage waived state" do
+            expect(benefit_group_assignment.coverage_waived?).to be_truthy
+          end
+
+          context "and waived coverage is terminated" do
+
+            it "should fail transition and remain in coverage waived state" do
+              expect { benefit_group_assignment.terminate_coverage! }.to raise_error AASM::InvalidTransition
+              expect(benefit_group_assignment.coverage_waived?).to be_truthy
+            end
+          end
+
+          context "and the employee reconsiders and selects coverage" do
+            before { benefit_group_assignment.select_coverage }
+
+            it "should transistion back to coverage selcted state" do
+              expect(benefit_group_assignment.coverage_selected?).to be_truthy
+            end
+
+            context "and coverage is terminated" do
+              before { benefit_group_assignment.terminate_coverage }
+
+              it "should transistion to coverage terminated state" do
+                expect(benefit_group_assignment.coverage_terminated?).to be_truthy
+              end
+            end
+          end
+        end
+
+        context "and coverage is terminated" do
+          let(:employee_role)   { FactoryBot.build(:employee_role, employer_profile: employer_profile )}
+          let(:hbx_enrollment)  { HbxEnrollment.new(sponsored_benefit_package: benefit_package, employee_role: census_employee.employee_role, effective_on: TimeKeeper.date_of_record, aasm_state: :coverage_selected ) }
+
+          before {
+            hbx_enrollment.benefit_group_assignment = benefit_group_assignment
+            benefit_group_assignment.hbx_enrollment = hbx_enrollment
+            hbx_enrollment.term_or_cancel_enrollment(hbx_enrollment, TimeKeeper.date_of_record + 2.days)
+          }
+
+          it "should update the end_on date to terminated date" do
+            expect(benefit_group_assignment.end_on).to eq(TimeKeeper.date_of_record + 2.days)
+          end
+
+        end
+
+        context "and benefit application is terminated" do
+          let(:ba) { benefit_sponsorship.benefit_applications.first }
+
+          before { ba.terminate_enrollment }
+
+          it "should terminate the benefit group assignment" do
+            expect(benefit_group_assignment.end_on).to eq(ba.terminated_on)
+          end
+        end
+
+        context "and benefit application is cancelled" do
+          let(:ba) { benefit_sponsorship.benefit_applications.first }
+
+          before { ba.cancel! }
+
+          it "should cancel the benefit group assignment" do
+            expect(benefit_group_assignment.end_on).to eq(ba.terminated_on)
+          end
+        end
+
+        context "and benefit group is disabled" do
+          before {
+            census_employee.benefit_group_assignments << benefit_group_assignment
+            benefit_sponsorship.census_employees << census_employee
+            benefit_package.cancel_member_benefits
+          }
+
+          it "should update the benefit application group end on date" do
+            expect(benefit_group_assignment.end_on).to eq(benefit_group_assignment.start_on)
+          end
+        end
+
       end
     end
   end
@@ -265,7 +347,7 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
                           benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id,
                           aasm_state: state
                           )}
-      
+
       it "#covered_families" do
         expect(census_employee.active_benefit_group_assignment.covered_families.count).to eq 1
       end
@@ -287,7 +369,7 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
 
     context "and benefit coverage activity occurs" do
       it "should update the benfefit group assignment" do
-        expect(census_employee.benefit_group_assignments.first.make_active).to eq(true)
+        expect(census_employee.benefit_group_assignments.first.make_active).to be_truthy
       end
 
       it "should not update end_on date for inactive BGA" do
@@ -419,4 +501,5 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
       end
     end
   end
+
 end
