@@ -21,6 +21,11 @@ module BenefitSponsors
       attribute :termination_kind,            Types::String.optional
       attribute :termination_reason,          Types::String.optional
 
+
+      def is_termed_or_ineligible?
+        [:terminated, :termination_pending, :enrollment_ineligible].include? aasm_state
+      end
+
     end
   end
 end
