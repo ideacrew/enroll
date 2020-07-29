@@ -21,8 +21,6 @@ module OneLogin
       SENDER_VOUCHES = 'urn:oasis:names:tc:SAML:2.0:cm:sendervouches'
       NAME_FORMAT = 'urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified'
       PASSWORD = 'urn:oasis:names:tc:SAML:2.0:ac:classes:Password'
-      PRIVATE_KEY_LOCATION = '/var/www/deployments/enroll/current/config/ssl/wfpk.pem'
-      X509_CERT_LOCATION = '/var/www/deployments/enroll/current/config/ssl/x509.pem'
 
       attr_reader :transaction_id, :hbx_enrollment, :private_key, :cert
 
@@ -31,8 +29,8 @@ module OneLogin
         @hbx_enrollment = hbx_enrollment
 
         if Rails.env.production?
-          @private_key = OpenSSL::PKey::RSA.new(File.read(PRIVATE_KEY_LOCATION))
-          @cert = OpenSSL::X509::Certificate.new(File.read(X509_CERT_LOCATION))
+          @private_key = OpenSSL::PKey::RSA.new(File.read(SamlInformation.kp_pay_now_private_key_location))
+          @cert = OpenSSL::X509::Certificate.new(File.read(SamlInformation.kp_pay_now_x509_cert_location))
         end
       end
 
