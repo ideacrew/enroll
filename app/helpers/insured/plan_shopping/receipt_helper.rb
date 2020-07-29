@@ -2,7 +2,6 @@ module Insured
   module PlanShopping
     module ReceiptHelper
       def show_pay_now?
-        return false
         (carrier_with_payment_option? && individual? && (!has_any_previous_kaiser_enrollments? || has_break_in_coverage_enrollments?)) && pay_now_button_timed_out?
       end
 
