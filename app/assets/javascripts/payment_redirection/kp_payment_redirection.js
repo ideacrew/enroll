@@ -39,17 +39,24 @@ var KpPaymentRedirection = (function(){
     function paymentRedirectionRequest(){
         $('#payNowModal').modal('hide');
         if (saml_response){
+            window.open(
             $.ajax({
                 type: "POST",
-                url: "/saml/redirection_test",
+                url: kp_pay_now_url.value,
                 data: {"SAMLResponse": saml_response},
                 success: function(data, textStatus, jqXHR){
                     //response handler
                 },
                 error: function(jqXHR, textStatus, errorThrown){
-                    //error handler
+                        if(jqXHR.status == 403) {
+                            alert('Pay now functionality is unable to process your request. Please try later.')
+                        }
+                        else {
+                           alert('Pay now functionality is current unavailable. Please try later.')
+                        }
                 }
-            });
+            })
+            );
         } else {
             generatePaymentData();
         }

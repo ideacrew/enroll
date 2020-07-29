@@ -101,7 +101,7 @@ module OneLogin
         when 'Market Indicator'
           hbx_enrollment.kind
         when 'Assigned QHP Identifier'
-          hbx_enrollment.plan.hios_id
+          hbx_enrollment.product.hios_id
         when 'Total Amount Owed'
           hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f
         when 'Premium Amount Total'
@@ -125,7 +125,7 @@ module OneLogin
         when 'Zip Code'
           hbx_enrollment.subscriber.person.mailing_address.zip
         when 'Additional Information'
-          hbx_enrollment.hbx_enrollment_members.map(&:person).map{|person| person. first_name_last_name_and_suffix(',')}.join(';')
+          hbx_enrollment.hbx_enrollment_members.map(&:person).map{|person| person.first_name_last_name_and_suffix(',')}.join(';')
         end
       end
 

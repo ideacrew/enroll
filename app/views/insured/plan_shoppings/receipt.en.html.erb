@@ -292,8 +292,8 @@
         </p>
       </div>
       <div class="modal-footer">
-
-        <%= link_to "LEAVE DC HEALTH LINK", SamlInformation.kp_pay_now, {type: "button", class: "btn btn-default pull-left", id: "payment-redirect-kp", target: "_blank"} %>
+        <%= hidden_field_tag :kp_pay_now_url, @kp_pay_now_url%>
+        <button class="btn btn-default pull-left" id="payment-redirect-kp">LEAVE DC HEALTH LINK</button>
         <button type="button" class="btn btn-default" data-dismiss="modal">GO BACK</button>
       </div>
     </div><!-- /.modal-content -->
