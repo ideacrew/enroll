@@ -594,11 +594,7 @@ class CensusEmployee < CensusMember
   end
 
   def active_benefit_group_assignment(coverage_date = TimeKeeper.date_of_record)
-    if off_cycle_benefit_group_assignment.present?
-      off_cycle_benefit_group_assignment
-    else
-      benefit_package_assignment_on(coverage_date) || benefit_group_assignments.reject { |bga| bga.activated_at.present? }.sort_by(&:start_on).reverse.last
-    end
+    benefit_package_assignment_on(coverage_date) || benefit_group_assignments.reject { |bga| bga.activated_at.present? }.sort_by(&:start_on).reverse.last
   end
 
   # Pass in active coverage_date to get the renewal benefit group assignment
@@ -610,17 +606,10 @@ class CensusEmployee < CensusMember
     benefit_package_assignment_on(renewal_begin_date)
   end
 
-  def off_cycle_benefit_group_assignment(coverage_date = TimeKeeper.date_of_record)
-    return unless employer_profile
-    return unless employer_profile.organization
-    benefit_sponsorship = employer_profile.try(:active_benefit_sponsorship) || employer_profile.try(:organization).try(:active_benefit_sponsorship)
-    if benefit_sponsorship&.off_cycle_benefit_application&.present?
-      assignment = benefit_group_assignments.where(benefit_package: benefit_sponsorship.off_cycle_benefit_application.benefit_packages.last).last ||
-      benefit_group_assignments.create!(
-        benefit_package: benefit_sponsorship.off_cycle_benefit_application.benefit_packages.last,
-        start_on: benefit_sponsorship.off_cycle_benefit_application.start_on
-      )
-      assignment
+  def off_cycle_benefit_group_assignment#(coverage_date = TimeKeeper.date_of_record)
+    if active_benefit_group_assignment
+      benefit_package_ids = benefit_sponsorship.off_cycle_benefit_application.benefit_packages.map(&:id)
+      benefit_group_assignments.where(:start_on.gt => active_benefit_group_assignment.start_on, :benefit_package_id => benefit_package_ids).first
     end
   end
 

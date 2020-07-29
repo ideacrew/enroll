@@ -101,13 +101,12 @@ module BenefitSponsors
       provider.inbox.messages.select {|m| folder == (m.folder.try(:capitalize) || 'Inbox')}.sort_by(&:created_at).reverse
     end
 
-    def add_plan_year_button_business_rule(benefit_applications)
+    def add_plan_year_button_business_rule(benefit_sponsorship, benefit_applications)
       canceled_rule_check = benefit_applications.active.present? && benefit_applications.canceled.select{ |ba| ba.start_on > benefit_applications.active.first.end_on }.present?
       ineligible_rule_check = benefit_applications.enrollment_ineligible.effective_date_begin_on
       published_and_ineligible_apps = benefit_applications.published + benefit_applications.enrollment_ineligible
-      termination_pending_and_no_published_or_active_apps = benefit_applications.termination_pending && benefit_applications.active.blank? &&
-      benefit_applications.all? { |ba| BenefitSponsors::BenefitApplications::BenefitApplication::SUBMITTED_STATES.reject! { |state| state == :termination_pending } }
-      ((published_and_ineligible_apps - ineligible_rule_check).blank? || canceled_rule_check || termination_pending_and_no_published_or_active_apps) && benefit_applications.none?(&:is_renewing?)
+      terminated_or_termination_pending_apps = benefit_applications.terminated_or_termination_pending
+      ((published_and_ineligible_apps - ineligible_rule_check).blank? || canceled_rule_check || benefit_sponsorship.is_potential_off_cycle_employer?) && benefit_applications.none?(&:is_renewing?)
     end
 
     def benefit_application_claim_quote_warnings(benefit_applications)
