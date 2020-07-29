@@ -517,10 +517,11 @@ module BenefitSponsors
       #   end.include?(benefit_applications.last.aasm_state)
       #   benefit_applications.last
       # end
-      recent_bas = benefit_applications.order_by(:"created_at".desc).last(3)
-      termed_or_ineligible_app = recent_bas.termed_or_ineligible.first
+      recent_bas = benefit_applications.order_by(:"created_at".desc).to_a.last(3)
+      termed_or_ineligible_app = recent_bas.detect { |recent_ba| recent_ba.is_termed_or_ineligible? }
+      return nil unless termed_or_ineligible_app
 
-      recent_bas.future_effective_date(termed_or_ineligible_app.end_on).non_canceled.first
+      recent_bas.select { |recent_ba| recent_ba.start_on > termed_or_ineligible_app.end_on && recent_ba.aasm_state != :canceled }.first
     end
 
     # use this only for EDI

@@ -184,6 +184,6 @@ And(/census employee (.*?) has benefit group assignment of the off cycle benefit
   click_button 'Update Employee'
   person = people[named_person]
   ce = CensusEmployee.where(:first_name => /#{person[:first_name]}/i, :last_name => /#{person[:last_name]}/i).first
-  expect(ce.active_benefit_group_assignment.benefit_application == ce.benefit_sponsorship.benefit_applications.last).to eq(true)
-  expect(ce.benefit_sponsorship.benefit_applications.last == ce.off_cycle_benefit_group_assignment.benefit_application).to eq(true)
+  benefit_package_id = ce.benefit_sponsorship.off_cycle_benefit_application.benefit_packages[0].id #there's only one benefit package
+  expect(ce.benefit_group_assignments.pluck(:benefit_package_id).include?(benefit_package_id)).to be_truthy
 end
