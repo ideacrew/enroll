@@ -89,7 +89,16 @@ module BenefitSponsors
           service_obj.save(benefit_application_form)
           benefit_sponsorship.reload
           expect(benefit_sponsorship.aasm_state).to eq :applicant
+        end
+      end
 
+      context ".update" do
+        let!(:application) { benefit_application_factory.call(benefit_sponsorship, params) }
+
+        it "should not create benefit sponsor catalog on update/edit" do
+          expect(benefit_sponsorship).not_to receive(:benefit_sponsor_catalog_for)
+          service_obj = Services::BenefitApplicationService.new(benefit_application_factory)
+          service_obj.store(benefit_application_form, application, true)
         end
       end
 
