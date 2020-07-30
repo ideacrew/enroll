@@ -98,9 +98,12 @@ module CensusEmployeeWorld
 
   def census_employee(named_person = nil)
     @census_employee ||= {}
+    person = people[named_person]
 
-    if named_person.present?
+    if named_person.present? && @census_employee[named_person]
       @census_employee[named_person]
+    elsif CensusEmployee.where(first_name: person[:first_name], last_name: person[:last_name]).present?
+      CensusEmployee.where(first_name: person[:first_name], last_name: person[:last_name]).last
     else
       @census_employee.values.first
     end
@@ -408,6 +411,23 @@ And(/^employer (.*?) with employee (.*?) has hbx_enrollment with health product$
                     sponsored_benefit_package_id: benefit_package.id,
                     rating_area_id: rating_area_id,
                     sponsored_benefit_id: sponsored_benefit_id}, :with_health_product)
+end
+
+And(/^employee (.*?) of employer (.*?) most recent HBX Enrollment should be under the off cycle benefit application$/) do |named_person, legal_name|
+  census_employee = census_employee(named_person)
+  person = people[named_person]
+  person_record = Person.where(first_name: person[:first_name], last_name: person[:last_name]).last
+  benefit_sponsorship = census_employee.benefit_sponsorship
+  # TODO: This is returning nil now
+  # off_cycle_benefit_application = benefit_sponsorship.off_cycle_benefit_application
+  # TODO: Is this really the off cycle benefit application?
+  off_cycle_benefit_application = census_employee.benefit_sponsorship.current_benefit_application
+  benefit_package = off_cycle_benefit_application.benefit_packages[0]
+  sponsored_benefit = benefit_package.sponsored_benefits.first
+  end_date = off_cycle_benefit_application.end_on
+  off_cycle_enrollments = HbxEnrollment.by_benefit_application_and_sponsored_benefit(off_cycle_benefit_application, sponsored_benefit, end_date)
+  most_recent_enrollment = person_record.primary_family.hbx_enrollments.last
+  expect(off_cycle_enrollments).to include(most_recent_enrollment)
 end
 
 And(/^employer (.*?) with employee (.*?) has has person and user record present$/) do |legal_name, named_person|

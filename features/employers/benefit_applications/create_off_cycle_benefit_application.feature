@@ -49,16 +49,13 @@ Feature: Ability for employer to create an off-cycle benefit application and all
       And staff role person clicks on employee Patrick Doe
       Then the user should see a dropdown for Off Plan Year benefit package
       And census employee Patrick Doe has benefit group assignment of the off cycle benefit application
-      # And employee Patrick Doe already matched with employer ABC Widgets and logged into employee portal
-      # When Employee click the "Had a baby" in qle carousel
-      # And Employee select a past qle date
-      # Then Employee should see confirmation and clicks continue
-      # Then Employee should see family members page and clicks continue
-      # Then Employee should see the group selection page
-      # When Employee clicks continue on the group selection page
-      # Then Employee should see the list of plans
-      # And Patrick Doe should see the plans from the expired plan year
-      # When Employee selects a plan on the plan shopping page
-      # Then Patrick Doe should see coverage summary page with qle effective date
-      # Then Patrick Doe should see the receipt page with qle effective date as effective date
-      # Then Patrick Doe should see "my account" page with enrollment
+      And employee Patrick Doe already matched with employer ABC Widgets and logged into employee portal
+      When Patrick Doe clicks "Shop for Plans" on my account page
+      Then Employee should see the group selection page
+      When Employee clicks continue on the group selection page
+      Then Employee should see the list of plans
+      When Employee selects a plan on the plan shopping page
+      When Employee clicks on Confirm button on the coverage summary page
+      Then Employee should see the receipt page
+      Then Employee should see the "my account" page
+      And employee Patrick Doe of employer ABC Widgets most recent HBX Enrollment should be under the off cycle benefit application
