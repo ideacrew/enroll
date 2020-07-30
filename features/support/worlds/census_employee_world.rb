@@ -98,11 +98,15 @@ module CensusEmployeeWorld
 
   def census_employee(named_person = nil)
     @census_employee ||= {}
-    person = people[named_person]
+    person = if named_person
+      people[named_person]
+    else
+      nil
+    end
 
     if named_person.present? && @census_employee[named_person]
       @census_employee[named_person]
-    elsif CensusEmployee.where(first_name: person[:first_name], last_name: person[:last_name]).present?
+    elsif named_person.present?
       CensusEmployee.where(first_name: person[:first_name], last_name: person[:last_name]).last
     else
       @census_employee.values.first
