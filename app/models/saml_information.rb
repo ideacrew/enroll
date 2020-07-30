@@ -25,7 +25,7 @@ class SamlInformation
     'account_recovery_url',
     'iam_login_url',
     'curam_broker_dashboard',
-    'kp_pay_now',
+    'kp_pay_now_url',
     'kp_pay_now_private_key_location',
     'kp_pay_now_x509_cert_location'
   ]
