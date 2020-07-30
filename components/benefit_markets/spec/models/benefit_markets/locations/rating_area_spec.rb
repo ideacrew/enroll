@@ -2,6 +2,10 @@ require 'rails_helper'
 
 module BenefitMarkets
   RSpec.describe Locations::RatingArea do
+    before :each do
+      DatabaseCleaner.clean
+    end
+    
     describe "given nothing" do
       before :each do
         subject.valid?
