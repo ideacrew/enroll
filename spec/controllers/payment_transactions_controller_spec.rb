@@ -3,7 +3,8 @@ require 'rails_helper'
 RSpec.describe PaymentTransactionsController, :type => :controller do
   let(:user){ FactoryBot.create(:user, :consumer) }
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member_and_dependent) }
-  let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, aasm_state: 'shopping') }
+  let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
+  let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, aasm_state: 'shopping', product: product) }
   let(:build_saml_repsonse) {double}
   let(:encode_saml_response) {double}
 
@@ -28,7 +29,7 @@ RSpec.describe PaymentTransactionsController, :type => :controller do
     it 'should build payment transaction with enrollment effective date and carrier id' do
       get :generate_saml_response, params: {:enrollment_id => hbx_enrollment.hbx_id}
       expect(family.payment_transactions.first.enrollment_effective_date).to eq hbx_enrollment.effective_on
-      expect(family.payment_transactions.first.carrier_id).to eq hbx_enrollment.plan.carrier_profile_id
+      expect(family.payment_transactions.first.carrier_id).to eq hbx_enrollment.product.issuer_profile_id
     end
   end
 end
