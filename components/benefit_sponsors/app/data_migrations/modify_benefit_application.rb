@@ -87,6 +87,7 @@ class ModifyBenefitApplication< MongoidMigrationTask
       benefit_application.benefit_sponsor_catalog.delete
       benefit_sponsor_catalog.save!
       benefit_application.benefit_sponsor_catalog =  benefit_sponsor_catalog
+      update_contribution_unit_ids(benefit_application)
       benefit_application.save!
       benefit_sponsorship.census_employees.each do |ee|
         ee.benefit_group_assignments.where(benefit_package_id: benefit_package.id).each do|bga|
@@ -106,6 +107,21 @@ class ModifyBenefitApplication< MongoidMigrationTask
       end
     else
       raise "No benefit application found."
+    end
+  end
+
+  def update_contribution_unit_ids(benefit_application)
+    benefit_application.benefit_packages.each do |benefit_package|
+      benefit_package.sponsored_benefits.each do |sponsored_benefit|
+        sponsor_contribution = sponsored_benefit.sponsor_contribution
+        sponsor_contribution.contribution_levels.each do |contribution_level|
+          cu = sponsor_contribution.contribution_model.contribution_units.where(display_name: contribution_level.display_name).first
+          raise "contribution_unit not found for #{benefit_application.benefit_sponsorship.legal_name} - contribution_level id - #{contribution_level.id}" unless cu
+
+          next if cu.id == contribution_level.contribution_unit_id
+          contribution_level.update_attributes!(contribution_unit_id: cu.id)
+        end
+      end
     end
   end
 
