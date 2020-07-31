@@ -459,36 +459,3 @@ And(/^employer (.*?) with employee (.*?) has (.*?) hbx_enrollment with health pr
   attributes[:sponsored_benefit_package_id] = benefit_package.id
   build_enrollment(attributes, :with_health_product)
 end
-
-And(/^user clicks Update Employee button$/) do
-  click_button 'Update Employee'
-end
-
-And(/^user selects new benefit package from (.*?) dropdown$/) do |which_select|
-  # Selectric is weird
-  Capybara.ignore_hidden_elements = false
-  selects = page.all('select')
-  case which_select
-  when 'Off Cycle'
-    select_id = "#census_employee_off_cycle_benefit_group_assignments_benefit_group_id"
-    select_name = nil
-  when 'Benefit Package'
-    select_id = "#census_employee_benefit_group_assignments_attributes_0_benefit_group_id"
-    select_name = "census_employee[benefit_group_assignments_attributes][0][benefit_group_id]"
-  end
-  # TODO: NOT SURE IF THIS IS DOING WHAT I THINK IT IS
-  # REALLY HARD TO TELL WHATS BEING SELECTED
-  first_select_option = find(select_id + " > option:nth-child(1)").text
-  select(first_select_option, :from => select_name)
-
-  Capybara.ignore_hidden_elements = true
-end
-
-Then(/^the benefit package for census employee (.*?) should have been successfully updated$/) do |named_person|
-  person = people[named_person]
-  person_record = Person.where(first_name: person[:first_name], last_name: person[:last_name]).last
-  ce = census_employee(named_person)
-  # TODO: Not sure what to do here
-  # NEED AN ACTUAL EXPECTATION
-  expect(ce.active_benefit_group_assignment.benefit_package).to eq(ce.benefit_sponsorship.benefit_applications.last.benefit_packages.last)
-end

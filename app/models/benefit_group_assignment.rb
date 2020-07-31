@@ -84,22 +84,16 @@ class BenefitGroupAssignment
     def on_date(census_employee, date)
       assignments = census_employee.benefit_group_assignments.select{ |bga| bga.persisted? && bga.activated_at.blank? && !bga.canceled? }
       assignments_with_no_end_on, assignments_with_end_on = assignments.partition { |bga| bga.end_on.nil? }
-
       if assignments_with_end_on.present?
         valid_assignments_with_end_on = assignments_with_end_on.select { |assignment| (assignment.start_on..assignment.end_on).cover?(date) }
         if valid_assignments_with_end_on.present?
-          valid_assignments_with_end_on.sort_by { |assignment| (assignment.start_on.to_time - date.to_time).abs }.first || valid_assignments_with_end_on.first
+          valid_assignments_with_end_on.sort_by { |assignment| (assignment.start_on.to_time - date.to_time).abs }.last || valid_assignments_with_end_on.last
         else
           filter_assignments_with_no_end_on(assignments_with_no_end_on, date)
         end
       elsif assignments_with_no_end_on.present?
         filter_assignments_with_no_end_on(assignments_with_no_end_on, date)
       end
-      # if assignments.size > 1
-      #   assignments.detect{|assignment| assignment.end_on.blank? } || assignments.first
-      # else
-      #   assignments.first
-      # end
     end
 
     def filter_assignments_with_no_end_on(assignments, date)

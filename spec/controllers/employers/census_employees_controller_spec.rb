@@ -177,7 +177,7 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
     let(:child1) { FactoryBot.build(:census_dependent, employee_relationship: "child_under_26", ssn: 123123714) }
     let(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person)}
     # let(:census_employee) { FactoryBot.create(:census_employee_with_active_assignment, employer_profile_id: employer.id, hired_on: "2014-11-11", first_name: "aqzz", last_name: "White", dob: "11/11/1990", ssn: "123123123", gender: "male", benefit_group: benefit_group) }
-
+ 
     before do
       allow(@hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
       sign_in @user
@@ -212,11 +212,52 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
     end
 
     context "get flash notice", dbclean: :around_each do
-      it "with benefit_group_id" do
-        # TODO after setting Benefit Package Factories
-        # allow(controller).to receive(:benefit_group_id).and_return(benefit_group.id)
-        post :update, params: {id: census_employee.id, employer_profile_id: employer_profile_id, census_employee: census_employee_params}
-        # expect(flash[:notice]).to eq "Census Employee is successfully updated."
+      context "second benefit package ID is passed" do
+        before do
+          expect(initial_application.benefit_packages.count).to eq(1)
+          # Initial benefit group assignment
+          expect(census_employee.active_benefit_group_assignment.benefit_package).to eq(initial_application.benefit_packages[0])
+          effective_period = current_effective_date..(current_effective_date.next_year.prev_day)
+          benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(effective_period.min)
+          package_kind = :single_issuer
+          product_package = benefit_sponsor_catalog.product_packages.detect { |package| package.package_kind == package_kind }
+          second_benefit_package = FactoryBot.create(
+            :benefit_sponsors_benefit_packages_benefit_package,
+            title: "Second Benefit Package",
+            benefit_application: initial_application,
+            product_package: product_package
+          )
+          expect(initial_application.benefit_packages.count).to eq(2)
+          census_employee_update_benefit_package_params = {
+            "first_name" => census_employee.first_name,
+            "middle_name" => "",
+            "last_name" => census_employee.last_name,
+            "gender" => "male",
+            "is_business_owner" => true,
+            "hired_on" => "05/02/2019",
+            "benefit_group_assignments_attributes" => {
+              "0" => {
+                "benefit_group_id" => second_benefit_package.id,
+                "id" => ""
+              }
+            }
+          }
+          post(
+            :update,
+            params: {
+              id: census_employee.id,
+              employer_profile_id: census_employee.employer_profile.id,
+              census_employee: census_employee_update_benefit_package_params
+            }
+          )
+        end
+
+        it "successfully updates the active benefit group assignment to the second benefit package id" do
+          expect(flash[:notice]).to eq "Census Employee is successfully updated."
+          census_employee.reload
+          expect(census_employee.active_benefit_group_assignment.benefit_package).to eq(initial_application.benefit_packages[1])
+          expect(census_employee.active_benefit_group_assignment.benefit_package).to_not eq(initial_application.benefit_packages[0])
+        end
       end
 
       it "with no benefit_group_id" do
