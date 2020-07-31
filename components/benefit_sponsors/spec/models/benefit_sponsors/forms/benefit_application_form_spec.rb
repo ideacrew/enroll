@@ -4,6 +4,10 @@ module BenefitSponsors
   RSpec.describe Forms::BenefitApplicationForm, type: :model, dbclean: :after_each do
 
     subject { BenefitSponsors::Forms::BenefitApplicationForm.new }
+    let!(:site) { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key) }
+    let!(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site) }
+    let!(:employer_profile)    { organization.employer_profile }
+    let!(:benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
 
     describe "model attributes" do
       it {
@@ -85,8 +89,7 @@ module BenefitSponsors
     end
 
     describe ".submit_application" do
-      let!(:benefit_sponsorship) { FactoryBot.build(:benefit_sponsors_benefit_sponsorship)}
-      let(:benefit_application) { FactoryBot.create(:benefit_sponsors_benefit_application, benefit_sponsorship:benefit_sponsorship) }
+      let(:benefit_application) { FactoryBot.create(:benefit_sponsors_benefit_application, :with_benefit_package, benefit_sponsorship:benefit_sponsorship) }
       let(:benefit_application_form) { BenefitSponsors::Forms::BenefitApplicationForm.new(id: benefit_application.id) }
       let!(:service_object) { double("BenefitApplicationService")}
       context "has to submit application and" do
@@ -105,7 +108,6 @@ module BenefitSponsors
     end
 
     describe ".force_submit_application_with_eligibility_errors" do
-      let!(:benefit_sponsorship) { FactoryBot.build(:benefit_sponsors_benefit_sponsorship)}
       let(:benefit_application) { FactoryBot.create(:benefit_sponsors_benefit_application, benefit_sponsorship:benefit_sponsorship) }
       let(:benefit_application_form) { BenefitSponsors::Forms::BenefitApplicationForm.new(id: benefit_application.id) }
       let!(:service_object) { double("BenefitApplicationService")}
@@ -119,7 +121,6 @@ module BenefitSponsors
     end
 
     describe ".revert" do
-      let!(:benefit_sponsorship) { FactoryBot.build(:benefit_sponsors_benefit_sponsorship)}
       let(:benefit_application) { FactoryBot.create(:benefit_sponsors_benefit_application, benefit_sponsorship:benefit_sponsorship) }
       let(:benefit_application_form) { BenefitSponsors::Forms::BenefitApplicationForm.new(id: benefit_application.id) }
       let!(:service_object) { double("BenefitApplicationService")}
@@ -139,7 +140,6 @@ module BenefitSponsors
     end
 
     describe ".persist" do
-      let!(:benefit_sponsorship) { FactoryBot.build(:benefit_sponsors_benefit_sponsorship)}
       let(:benefit_application) { FactoryBot.create(:benefit_sponsors_benefit_application, benefit_sponsorship:benefit_sponsorship) }
       let(:benefit_application_form) { FactoryBot.build(:benefit_sponsors_forms_benefit_application)}
       let!(:service_object) { double("BenefitApplicationService")}
