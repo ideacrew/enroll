@@ -29,10 +29,18 @@ describe "shared/inboxes/_message_list.html.erb" do
   end
 
   it "should have the latest message listed first" do
-    expect(rendered).to have_selector(:xpath, "//tr[@class=\"msg-inbox-unread\"][1]/td[2]", :text => "11/01/2016")
+    expect(rendered).to have_selector(
+      :xpath,
+      "//tr[@class=\"msg-inbox-unread\"][1]/td[2]",
+      :text => TimeKeeper.format_date(message_2.created_at)
+    )
   end
 
   it "should have the older message listed last" do
-    expect(rendered).to have_selector(:xpath, "//tr[@class=\"msg-inbox-unread\"][2]/td[2]", :text => "01/10/2016")
+    expect(rendered).to have_selector(
+      :xpath,
+      "//tr[@class=\"msg-inbox-unread\"][2]/td[2]",
+      :text => TimeKeeper.format_date(message_1.created_at)
+    )
   end
 end
