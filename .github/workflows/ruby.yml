@@ -52,6 +52,7 @@ jobs:
                   exit 0
                 else
                   echo "Give cucumber yet another try"
+                  cp -f config/cucumber.yml.bak config/cucumber.yml
                   bundle exec cucumber @tmp/cucumber_failures_2.log --profile second_rerun
                 fi
               fi
@@ -80,6 +81,7 @@ jobs:
                   exit 0
                 else
                   echo "Give cucumber yet another try"
+                  cp -f config/cucumber.yml.bak config/cucumber.yml
                   bundle exec cucumber @tmp/cucumber_failures_2.log --profile second_rerun
                 fi
               fi
@@ -108,6 +110,7 @@ jobs:
                   exit 0
                 else
                   echo "Give cucumber yet another try"
+                  cp -f config/cucumber.yml.bak config/cucumber.yml
                   bundle exec cucumber @tmp/cucumber_failures_2.log --profile second_rerun
                 fi
               fi
