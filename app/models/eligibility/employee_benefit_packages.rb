@@ -65,7 +65,6 @@ module Eligibility
       raise ArgumentError, "expected BenefitGroup" unless new_benefit_group.is_a?(BenefitSponsors::BenefitPackages::BenefitPackage)
       # reset_active_benefit_group_assignments(new_benefit_group)
       benefit_group_assignments << BenefitGroupAssignment.new(benefit_group: new_benefit_group, start_on: (start_on || new_benefit_group.start_on), end_on: end_on || new_benefit_group.end_on)
-      self.save
     end
 
     # Deprecated
