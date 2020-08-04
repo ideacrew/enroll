@@ -488,10 +488,11 @@ describe Family do
       let(:family_member_person) { FamilyMember.new(is_primary_applicant: true, is_consent_applicant: true, person: person) }
 
       let(:qlek) { FactoryGirl.build(:qualifying_life_event_kind, reason: 'death') }
-      let(:date) { TimeKeeper.date_of_record - 10.days }
+      let(:date) { (TimeKeeper.date_of_record + 1.month).beginning_of_month + 20.days }
       let(:normal_sep) { FactoryGirl.build(:special_enrollment_period, family: family, qle_on: date) }
       let(:death_sep) { FactoryGirl.build(:special_enrollment_period, family: family, qle_on: date, qualifying_life_event_kind: qlek) }
       let(:hbx) { HbxEnrollment.new }
+      let(:end_of_month) { date.end_of_month }
 
       before do
         allow(family).to receive(:primary_applicant).and_return family_member_person
@@ -511,7 +512,7 @@ describe Family do
         allow(family).to receive(:latest_shop_sep).and_return normal_sep
         allow(normal_sep).to receive(:qle_on).and_return date.end_of_month
         allow(hbx).to receive(:effective_on).and_return (date.end_of_month)
-        expect(family.terminate_date_for_shop_by_enrollment(hbx)).to eq (TimeKeeper.date_of_record.end_of_month)
+        expect(family.terminate_date_for_shop_by_enrollment(hbx)).to eq end_of_month
       end
 
       it "when qle_on is less than hbx effective_on" do
