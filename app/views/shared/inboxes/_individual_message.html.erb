@@ -4,7 +4,7 @@
     <%= message.try(:to)   if @folder == 'Sent'%>
   </td>
   <td>
-    <%=message.created_at.in_time_zone("Eastern Time (US & Canada)").strftime("%m/%d/%Y") %>
+    <%= TimeKeeper.format_date(message.created_at) %>
     <td>
       <%= message.try(:subject) %>
     </td>
