@@ -60,7 +60,7 @@ module OneLogin
         assertion.attributes['Version'] = '2.0'
 
         issuer = assertion.add_element 'saml:Issuer', { 'Format' => NAME_ID_FORMAT }
-        issuer.text = SamlInformation.issuer
+        issuer.text = SamlInformation.kp_pay_now_issuer
 
         # sign the assertion
         response_doc.sign_document(@private_key, @cert, signature_method, digest_method)
