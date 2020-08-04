@@ -6,7 +6,7 @@ module Insured
       end
 
       def carrier_with_payment_option?
-        @enrollment.product.issuer_profile.legal_name == 'Kaiser'
+        @enrollment.product.issuer_profile.legal_name == EnrollRegistry[:pay_now_functionality].setting(:carriers).item
       end
 
       def individual?
@@ -14,7 +14,7 @@ module Insured
       end
 
       def has_any_previous_kaiser_enrollments?
-        all_kaiser_enrollments = @enrollment.family.hbx_enrollments.select { |enr| enr.product.issuer_profile.legal_name == 'Kaiser' && enr.effective_on.year == @enrollment.effective_on.year }
+        all_kaiser_enrollments = @enrollment.family.hbx_enrollments.select { |enr| enr.product.issuer_profile.legal_name == EnrollRegistry[:pay_now_functionality].setting(:carriers).item && enr.effective_on.year == @enrollment.effective_on.year }
         enrollments = all_kaiser_enrollments - @enrollment.to_a
         enrollments.present? ? true : false
       end
@@ -25,7 +25,7 @@ module Insured
 
       def has_break_in_coverage_enrollments?
         enrollments = @enrollment.family.enrollments.current_year.where(aasm_state: "coverage_terminated")
-        enrollments.any? { |enr| enr.product.issuer_profile.legal_name == 'Kaiser' && enr.terminated_on.year == @enrollment.effective_on.year && (@enrollment.effective_on - enr.terminated_on) > 1 }
+        enrollments.any? { |enr| enr.product.issuer_profile.legal_name == EnrollRegistry[:pay_now_functionality].setting(:carriers).item && enr.terminated_on.year == @enrollment.effective_on.year && (@enrollment.effective_on - enr.terminated_on) > 1 }
       end
     end
   end
