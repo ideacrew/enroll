@@ -40,8 +40,6 @@ jobs:
                 exit 0
               else
                 cat config/cucumber.yml
-                cp -f config/cucumber.yml.bak config/cucumber.yml
-                cat config/cucumber.yml
                 ls -ltr && ls -ltr tmp
                 echo "catting rerun.txt"
                 cat rerun.txt
@@ -52,7 +50,7 @@ jobs:
                   exit 0
                 else
                   echo "Give cucumber yet another try"
-                  cp -f config/cucumber.yml.bak config/cucumber.yml
+                  cat config/cucumber.yml
                   bundle exec cucumber @tmp/cucumber_failures_2.log --profile second_rerun
                 fi
               fi
@@ -69,8 +67,6 @@ jobs:
                 exit 0
               else
                 cat config/cucumber.yml
-                cp -f config/cucumber.yml.bak config/cucumber.yml
-                cat config/cucumber.yml
                 ls -ltr && ls -ltr tmp
                 echo "catting rerun.txt"
                 cat rerun.txt
@@ -81,7 +77,7 @@ jobs:
                   exit 0
                 else
                   echo "Give cucumber yet another try"
-                  cp -f config/cucumber.yml.bak config/cucumber.yml
+                  cat config/cucumber.yml
                   bundle exec cucumber @tmp/cucumber_failures_2.log --profile second_rerun
                 fi
               fi
@@ -98,8 +94,6 @@ jobs:
                 exit 0
               else
                 cat config/cucumber.yml
-                cp -f config/cucumber.yml.bak config/cucumber.yml
-                cat config/cucumber.yml
                 ls -ltr && ls -ltr tmp
                 echo "catting rerun.txt"
                 cat rerun.txt
@@ -110,7 +104,7 @@ jobs:
                   exit 0
                 else
                   echo "Give cucumber yet another try"
-                  cp -f config/cucumber.yml.bak config/cucumber.yml
+                  cat config/cucumber.yml
                   bundle exec cucumber @tmp/cucumber_failures_2.log --profile second_rerun
                 fi
               fi
