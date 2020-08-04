@@ -17,17 +17,16 @@ class SetMinimumContributionFactorOnContributionLevel < MongoidMigrationTask
           benefit_application = benefit_sponsorship.benefit_applications.where(:"effective_period.min".gte => time).first
           benefit_sponsor_catalog = benefit_application.benefit_sponsor_catalog
           benefit_application.benefit_packages.each do |benefit_package|
-            benefit_package.sponsored_benefits.each do |sponsored_benefit|
-              sponsor_contribution = sponsored_benefit.sponsor_contribution
-              sponsor_contribution.contribution_levels.each do |contribution_level|
-                if contribution_level.display_name.match(/Employee/i)
-                  contribution_level.update_attributes!(min_contribution_factor: 0.5)
-                else
-                  contribution_level.update_attributes!(min_contribution_factor: 0.33)
-                end
-                benefit_application.save!
-                benefit_sponsor_catalog.save!
+            sponsored_benefit = benefit_package.health_sponsored_benefit
+            sponsor_contribution = sponsored_benefit.sponsor_contribution
+            sponsor_contribution.contribution_levels.each do |contribution_level|
+              if contribution_level.display_name.match(/Employee/i)
+                contribution_level.update_attributes!(min_contribution_factor: 0.5)
+              else
+                contribution_level.update_attributes!(min_contribution_factor: 0.33)
               end
+              benefit_application.save!
+              benefit_sponsor_catalog.save!
             end
           end
         rescue Exception => e
