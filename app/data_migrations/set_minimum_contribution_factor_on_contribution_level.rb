@@ -29,7 +29,7 @@ class SetMinimumContributionFactorOnContributionLevel < MongoidMigrationTask
               benefit_sponsor_catalog.save!
             end
           end
-        rescue Exception => e
+        rescue StandardError => e
           p "Unable to save assigned_contribution_model for #{benefit_sponsorship.legal_name} due to #{e.inspect}"
         end
       end
