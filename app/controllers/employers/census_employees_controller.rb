@@ -155,23 +155,7 @@ class Employers::CensusEmployeesController < ApplicationController
       flash[:error] = "Please enter cobra date."
     end
 
-    if @cobra_date.present?
-      if !@census_employee.can_elect_cobra?
-        flash[:error] = "COBRA can only be initiated for employees who are in terminated or termination pending status"
-      else
-        if @census_employee.update_for_cobra(@cobra_date, current_user)
-          flash[:notice] = "Successfully update Census Employee."
-        else
-          if @census_employee.coverage_terminated_on.blank?
-            flash[:error] = "COBRA cannot be initiated for this employee as coverage termination date is not present"
-          elsif @census_employee.coverage_terminated_on <= @cobra_date
-            flash[:error] = "COBRA cannot be initiated for this employee because cobra initiation date should be after coverage termination date"
-          else
-            flash[:error] = "COBRA cannot be initiated for this employee because of invalid date. Please contact #{site_short_name} at #{contact_center_phone_number} for further assistance."
-          end
-        end
-      end
-    end
+    elect_cobra if @cobra_date.present?
   end
 
   def confirm_effective_date
@@ -303,6 +287,22 @@ class Employers::CensusEmployeesController < ApplicationController
     @census_employee.build_email
     @census_employee.benefit_group_assignments.build
     @census_employee
+  end
+
+  def elect_cobra
+    return flash[:error] = "COBRA can only be initiated for employees who are in terminated or termination pending status" if !@census_employee.can_elect_cobra?
+    update_cobra
+  end
+
+  def update_cobra
+    return flash[:notice] = "Successfully update Census Employee." if @census_employee.update_for_cobra(@cobra_date, current_user)
+    set_cobra_error_flash
+  end
+
+  def set_cobra_error_flash
+    return flash[:error] = "COBRA cannot be initiated for this employee as coverage termination date is not present" if @census_employee.coverage_terminated_on.blank?
+    return flash[:error] = "COBRA cannot be initiated for this employee because cobra initiation date should be after coverage termination date" if @census_employee.coverage_terminated_on <= @cobra_date
+    flash[:error] = "COBRA cannot be initiated for this employee because of invalid date. Please contact #{site_short_name} at #{contact_center_phone_number} for further assistance."
   end
 
   private
