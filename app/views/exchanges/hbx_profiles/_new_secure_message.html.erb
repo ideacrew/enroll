@@ -23,7 +23,7 @@
               <td><%= text_field_tag :subject, @subject, :size => "55", placeholder: 'Subject', include_blank: false, required: true %></td>
             </tr>
             <tr>
-              <th style="vertical-align: top; text-transform: capitalize;">Content<span class="text-danger">*</span>:</th>
+              <th style="vertical-align: top; text-transform: capitalize;">Content<span class="text-danger"></span>:</th>
               <td><%= text_area_tag 'body', @body , rows: 5, cols: 50, placeholder: 'Write here...', include_blank: false, required: true  %></td>
             </tr>
             <tr>
@@ -46,7 +46,7 @@
     <div class="modal-dialog" style="width: 500px;">
       <div class="modal-content">
         <div class="modal-body" style="text-align: center;">
-          <p>Are you sure?</p>
+          <p>Are you sure you want to <b>Send/Upload</b> this message?</p>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-primary btn-confirmation" onclick='confirmSecureMsg(event); return false;'>Confirm</button>
@@ -62,7 +62,13 @@
 
   $(document).on('click', '#send_secure_message', function(e) {
 
+    var file_value = $('#file')[0].value;
+
     $(".btn-confirmation").removeAttr('disabled');
+
+    if (file_value != "") {
+      $('#body').attr('required', false)
+    }
 
     if ( $('#secure_message_form')[0].checkValidity() ) {
       $('#sendSecure').modal('show')

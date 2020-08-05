@@ -35,7 +35,7 @@ Then(/^Should( not)? see a dialog box for confirmation$/) do |visible|
   if visible.blank?
     page.find('#sendSecure')
   else
-    expect(page).to_not have_text('Are you sure?')
+    expect(page).to_not have_text('Are you sure you want to Send/Upload this message?')
   end
 end
 
