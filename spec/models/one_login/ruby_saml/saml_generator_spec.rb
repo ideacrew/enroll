@@ -34,6 +34,7 @@ module OneLogin
       let(:protocol) { 'urn:oasis:names:tc:SAML:2.0:protocol' }
       let(:name_id_format) { 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified' }
       let(:sender_token) { 'urn:oasis:names:tc:SAML:2.0:cm:sendervouches' }
+      let(:bearer) { 'urn:oasis:names:tc:SAML:2.0:cm:bearer' }
       it 'should build return a string with encoded value' do
         expect(@saml_response.class). to eq XMLSecurity::Document
       end
@@ -53,39 +54,40 @@ module OneLogin
       end
 
       it 'should assert valid arguments to assertion tag' do
-        expect(@noko.xpath('//samlp:Response').children[1].namespace.href). to eq assertion
-        expect(@noko.xpath('//samlp:Response').children[1].name). to eq 'Assertion'
+        expect(@noko.xpath('//samlp:Response').children[3].namespace.href). to eq assertion
+        expect(@noko.xpath('//samlp:Response').children[3].name). to eq 'Assertion'
       end
 
       it 'assertion should have issuer child node present' do
-        assertion = @noko.xpath('//samlp:Response').children[1]
+        assertion = @noko.xpath('//samlp:Response').children[3]
         expect(assertion.children[0].name). to eq 'Issuer'
         expect(assertion.children[0].attributes.first[1].name). to eq 'Format'
         expect(assertion.children[0].attributes.first[1].value). to eq name_id_format
       end
 
       it 'name id should have the format and value present' do
-        assertion = @noko.xpath('//samlp:Response').children[1]
-        subject = assertion.children[2]
+        assertion = @noko.xpath('//samlp:Response').children[3]
+        subject = assertion.children[1]
         expect(subject.children[0].attributes['Format'].value). to eq name_id_format
-        expect(subject.children[0].children.first.text). to eq 'FFM'
+        expect(subject.children[0].children.first.text). to eq hbx_enrollment.hbx_id
       end
 
-      it 'assertion should have signature node present' do
-        assertion = @noko.xpath('//samlp:Response').children[1]
-        expect(assertion.children[1].name). to eq 'Signature'
-        expect(assertion.children[1].namespace.prefix). to eq 'ds'
+      it 'root should have signature node present' do
+        signature = @noko.xpath('//samlp:Response').children[1]
+        expect(signature.name). to eq 'Signature'
+        expect(signature.namespace.prefix). to eq 'ds'
       end
 
-      it 'should have send vouches as subject confirmation method' do
-        assertion = @noko.xpath('//samlp:Response').children[1]
-        expect(assertion.children[2].children[1].attributes['Method'].name). to eq 'Method'
-        expect(assertion.children[2].children[1].attributes['Method'].value). to eq sender_token
+      it 'should have send BEARER as subject confirmation method' do
+        assertion = @noko.xpath('//samlp:Response').children[3]
+        expect(assertion.children[1].children[1].attributes['Method'].name). to eq 'Method'
+        expect(assertion.children[1].children[1].attributes['Method'].value). to eq bearer
       end
 
       it 'should sign the assertion and not the response' do
-        assertion = @noko.xpath('//samlp:Response').children[1]
-        expect(assertion.children.map(&:name)).to include('Signature')
+        assertion = @noko.xpath('//samlp:Response').children[3]
+        assertion = @noko.xpath('//samlp:Response').children[3]
+        expect(assertion.children.map(&:name)).not_to include('Signature')
       end
     end
 
