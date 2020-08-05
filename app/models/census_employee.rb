@@ -412,8 +412,10 @@ class CensusEmployee < CensusMember
 
   # Initialize a new, refreshed instance for rehires via deep copy
   def replicate_for_rehire
-    return nil unless self.employment_terminated?
+    return nil unless employment_terminated? || cobra_terminated?
     new_employee = self.dup
+    new_employee.created_at = TimeKeeper.datetime_of_record
+    new_employee.updated_at = TimeKeeper.datetime_of_record
     new_employee.hired_on = nil
     new_employee.employment_terminated_on = nil
     new_employee.employee_role_id = nil
@@ -559,11 +561,26 @@ class CensusEmployee < CensusMember
     EMPLOYMENT_TERMINATED_STATES.include?(aasm_state)
   end
 
-  def active_or_pending_termination?
+  def is_cobra_possible?
+    return false if cobra_linked? || cobra_eligible? || rehired? || cobra_terminated?
     return true if self.employment_terminated_on.present?
     return true if PENDING_STATES.include?(self.aasm_state)
-    return false if self.rehired?
-    !(self.is_eligible? || self.employee_role_linked?)
+    
+    !(is_eligible? || employee_role_linked?)
+  end
+
+  def is_rehired_possible?
+    return false if cobra_linked? || cobra_eligible? || rehired?
+    return true if employment_terminated? || cobra_terminated?
+
+    !(is_eligible? || employee_role_linked?)
+  end
+
+  def is_terminate_possible?
+    return false if employment_terminated? || cobra_terminated?
+    return true if cobra_linked?
+
+    is_eligible? || is_linked?
   end
 
   def employee_relationship

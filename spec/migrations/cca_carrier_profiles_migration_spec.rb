@@ -66,6 +66,7 @@ describe "CcaCarrierProfilesMigration" do
   end
   after(:all) do
     FileUtils.rm_rf(Dir["#{Rails.root}//hbx_report//carrier_profile_migration_*"])
+    DatabaseCleaner.clean
   end
 end
 

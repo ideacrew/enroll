@@ -371,6 +371,49 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
             expect(initial_census_employee.aasm_state).to eq "rehired"
           end
         end
+
+        context "and the COBRA terminated employee is rehired" do
+
+          before do
+            initial_census_employee.update_for_cobra(hired_on.next_day)
+            initial_census_employee.terminate_employee_role!
+          end
+
+          let!(:cobra_rehire) { initial_census_employee.replicate_for_rehire }
+
+          it "rehired census employee instance should have same demographic info" do
+            expect(cobra_rehire.first_name).to eq initial_census_employee.first_name
+            expect(cobra_rehire.last_name).to eq initial_census_employee.last_name
+            expect(cobra_rehire.gender).to eq initial_census_employee.gender
+            expect(cobra_rehire.ssn).to eq initial_census_employee.ssn
+            expect(cobra_rehire.dob).to eq initial_census_employee.dob
+            expect(cobra_rehire.employer_profile).to eq initial_census_employee.employer_profile
+          end
+
+          it "rehired census employee instance should be initialized state" do
+            expect(cobra_rehire.eligible?).to be_truthy
+            expect(cobra_rehire.hired_on).to_not eq initial_census_employee.hired_on
+            expect(cobra_rehire.active_benefit_group_assignment.present?).to be_falsey
+            expect(cobra_rehire.employee_role.present?).to be_falsey
+          end
+
+          it "the previously terminated census employee should be in rehired state" do
+            expect(initial_census_employee.aasm_state).to eq "rehired"
+          end
+
+          context 'when rehired within the past 2 months' do
+
+            let!(:rehire_cobra_employee) do
+              cobra_rehire.hired_on = TimeKeeper.date_of_record - 50.days
+              cobra_rehire.save
+              cobra_rehire
+            end
+
+            it 'should be able to shop based on new hire rules' do
+              expect(rehire_cobra_employee.new_hire_enrollment_period.cover?(TimeKeeper.date_of_record)).to be_truthy
+            end
+          end
+        end
       end
     end
   end
@@ -2239,6 +2282,113 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
           bga.benefit_package.update_attributes!(is_active: false)
         end
         expect(census_employee.benefit_package_for_date(coverage_date)).to eq myc_application.benefit_packages.first
+      end
+    end
+  end
+
+  describe "#is_cobra_possible" do
+    let(:params) { valid_params.merge(:aasm_state => aasm_state) }
+    let(:census_employee) { CensusEmployee.new(**params) }
+
+    context "if censue employee is cobra linked" do
+      let(:aasm_state) {"cobra_linked"}
+
+      it "should return false" do
+        expect(census_employee.is_cobra_possible?).to eq false
+      end
+    end
+
+    context "if censue employee is cobra linked" do
+      let(:aasm_state) {"employee_termination_pending"}
+
+      it "should return false" do
+        expect(census_employee.is_cobra_possible?).to eq true
+      end
+    end
+
+    context "if censue employee is cobra linked" do
+      let(:aasm_state) {"employment_terminated"}
+
+      before do
+        allow(census_employee).to receive(:employment_terminated_on).and_return TimeKeeper.date_of_record.last_month
+      end
+
+      it "should return false" do
+        expect(census_employee.is_cobra_possible?).to eq true
+      end
+    end
+  end
+
+  describe "#is_rehired_possible" do
+    let(:params) { valid_params.merge(:aasm_state => aasm_state) }
+    let(:census_employee) { CensusEmployee.new(**params) }
+
+    context "if censue employee is cobra linked" do
+      let(:aasm_state) {"cobra_eligible"}
+
+      it "should return false" do
+        expect(census_employee.is_rehired_possible?).to eq false
+      end
+    end
+
+    context "if censue employee is cobra linked" do
+      let(:aasm_state) {"rehired"}
+
+      it "should return false" do
+        expect(census_employee.is_rehired_possible?).to eq false
+      end
+    end
+
+    context "if censue employee is cobra linked" do
+      let(:aasm_state) {"cobra_terminated"}
+
+      it "should return false" do
+        expect(census_employee.is_rehired_possible?).to eq true
+      end
+    end
+  end
+
+  describe "#is_terminate_possible" do
+    let(:params) { valid_params.merge(:aasm_state => aasm_state) }
+    let(:census_employee) { CensusEmployee.new(**params) }
+
+    context "if censue employee is cobra linked" do
+      let(:aasm_state) {"employment_terminated"}
+
+      it "should return false" do
+        expect(census_employee.is_terminate_possible?).to be_falsey
+      end
+    end
+
+    context "if censue employee is cobra linked" do
+      let(:aasm_state) {"eligible"}
+
+      it "should return true" do
+        expect(census_employee.is_terminate_possible?).to be_truthy
+      end
+    end
+
+    context "if censue employee is cobra linked" do
+      let(:aasm_state) {"cobra_eligible"}
+
+      it "should return true" do
+        expect(census_employee.is_terminate_possible?).to be_truthy
+      end
+    end
+
+    context "if censue employee is cobra linked" do
+      let(:aasm_state) {"cobra_linked"}
+
+      it "should return true" do
+        expect(census_employee.is_terminate_possible?).to be_truthy
+      end
+    end
+
+    context "if censue employee is newly designatede linked" do
+      let(:aasm_state) {"newly_designated_linked"}
+
+      it "should return true" do
+        expect(census_employee.is_terminate_possible?).to be_truthy
       end
     end
   end

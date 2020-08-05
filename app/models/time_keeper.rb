@@ -31,14 +31,14 @@ class TimeKeeper
   def self.start_of_exchange_day_from_utc(date)
     start_of_day = date.beginning_of_day
     Time.use_zone(exchange_zone) do
-      Time.local(start_of_day.year, start_of_day.month, start_of_day.day, 0,0,0)
+      Time.zone.local(start_of_day.year, start_of_day.month, start_of_day.day, 0,0,0)
     end.utc
   end
 
   def self.end_of_exchange_day_from_utc(date)
     start_of_next_day = (date + 1.day).beginning_of_day
     Time.use_zone(exchange_zone) do
-      Time.local(start_of_next_day.year, start_of_next_day.month, start_of_next_day.day, 0,0,0)
+      Time.zone.local(start_of_next_day.year, start_of_next_day.month, start_of_next_day.day, 0,0,0)
     end.utc
   end
 
