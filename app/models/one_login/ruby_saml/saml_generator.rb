@@ -41,7 +41,7 @@ module OneLogin
         digest_method = XMLSecurity::Document::SHA1
 
         response_doc = XMLSecurity::Document.new
-        assertion_doc = XMLSecurity::Document.new
+        # assertion_doc = XMLSecurity::Document.new
 
         root = response_doc.add_element 'samlp:Response', { 'xmlns:samlp' => PROTOCOL }
         root.attributes['ID'] = "_#{generate_uuid}"
