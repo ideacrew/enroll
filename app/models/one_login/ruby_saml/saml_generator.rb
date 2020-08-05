@@ -19,6 +19,7 @@ module OneLogin
       SUCCESS =  'urn:oasis:names:tc:SAML:2.0:status:Success'
       NAME_ID_FORMAT = 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified'
       SENDER_VOUCHES = 'urn:oasis:names:tc:SAML:2.0:cm:sendervouches'
+      BEARER = 'urn:oasis:names:tc:SAML:2.0:cm:bearer'
       NAME_FORMAT = 'urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified'
       PASSWORD = 'urn:oasis:names:tc:SAML:2.0:ac:classes:Password'
 
@@ -40,11 +41,17 @@ module OneLogin
         digest_method = XMLSecurity::Document::SHA1
 
         response_doc = XMLSecurity::Document.new
+        assertion_doc = XMLSecurity::Document.new
 
         root = response_doc.add_element 'samlp:Response', { 'xmlns:samlp' => PROTOCOL }
         root.attributes['ID'] = "_#{generate_uuid}"
+        # root.attributes['Issuer'] = SamlInformation.kp_pay_now_issuer
         root.attributes['IssueInstant'] = time
         root.attributes['Version'] = '2.0'
+
+        issuer = root.add_element 'saml:Issuer', { 'xmlns:saml' => ASSERTION }
+        issuer.attributes['Format'] = NAME_ID_FORMAT
+        issuer.text = SamlInformation.kp_pay_now_issuer
 
         # add success message
         status = root.add_element 'samlp:Status'
@@ -62,16 +69,16 @@ module OneLogin
         issuer = assertion.add_element 'saml:Issuer', { 'Format' => NAME_ID_FORMAT }
         issuer.text = SamlInformation.kp_pay_now_issuer
 
-        # sign the assertion
-        response_doc.sign_document(@private_key, @cert, signature_method, digest_method)
-
         # subject
         subject = assertion.add_element 'saml:Subject'
         name_id = subject.add_element 'saml:NameID', { 'Format' => NAME_ID_FORMAT }
-        name_id.text = 'FFM'
+        name_id.text = @hbx_enrollment.hbx_id
 
         # subject confirmation
-        subject.add_element 'saml:SubjectConfirmation', { 'Method' => SENDER_VOUCHES }
+        subject_confirmation = subject.add_element 'saml:SubjectConfirmation', { 'Method' => BEARER }
+        confirmation_data = subject_confirmation.add_element 'saml:SubjectConfirmationData'
+        confirmation_data.attributes['NotOnOrAfter'] = "#{not_on_or_after_condition}"
+        confirmation_data.attributes['Recipient'] = "https://sso.healthplan.com/sp/ACS.saml2"
 
         # conditions
         assertion.add_element 'saml:Conditions', { 'NotBefore' => "#{not_before}",  'NotOnOrAfter' => "#{not_on_or_after_condition}" }
@@ -91,6 +98,11 @@ module OneLogin
           value = attribute.add_element 'saml:AttributeValue'
           value.text = set_attribute_values(attr_name, @hbx_enrollment)
         end
+
+        # sign the assertion
+        response_doc.sign_document(@private_key, @cert, signature_method, digest_method)
+        # assertion = root.add_element assertion
+
         response_doc
       end
 
@@ -163,3 +175,4 @@ module OneLogin
     end
   end
 end
+
