@@ -393,13 +393,11 @@ end
 And(/I should click on pay now button/) do
   find('.interaction-click-control-pay-now').click
   expect(page).to_not have_css('.font modal-open')
-  # expect(page).to have_content('PAY NOW')
 end
 
 And(/I should see model pop up/) do
   expect(page).to_not have_css('.font modal-open')
   find('.interaction-click-control-leave-dc-link').click
-  # expect(page).to have_content('PAY NOW')
 end
 
 And(/I should see Leave DC LINK buttton/) do

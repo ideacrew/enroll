@@ -23,7 +23,3 @@ Feature: Individual pay now process
     And I should see model pop up
     And I should see Leave DC LINK buttton
     And I should be able to click  Leave DC LINK buttton
-#    * I click on continue button to go to the individual home page
-#    * I should see Documents link
-#    * I click on verification link
-#    * I should see page for documents verification
