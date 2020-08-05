@@ -390,6 +390,26 @@ And(/I click on purchase button on confirmation page/) do
   click_link "Confirm"
 end
 
+And(/I should click on pay now button/) do
+  find('.interaction-click-control-pay-now').click
+  expect(page).to_not have_css('.font modal-open')
+  # expect(page).to have_content('PAY NOW')
+end
+
+And(/I should see model pop up/) do
+  expect(page).to_not have_css('.font modal-open')
+  find('.interaction-click-control-leave-dc-link').click
+  # expect(page).to have_content('PAY NOW')
+end
+
+And(/I should see Leave DC LINK buttton/) do
+  expect(page).to have_content('Leave DC LINK')
+end
+
+And(/I should be able to click  Leave DC LINK buttton/) do
+  find('.interaction-click-control-leave-dc-link').click
+end
+
 And(/I click on continue button to go to the individual home page/) do
   if page.has_link?('CONTINUE')
     click_link "CONTINUE"
