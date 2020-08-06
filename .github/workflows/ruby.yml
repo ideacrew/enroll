@@ -225,4 +225,4 @@ jobs:
   #       run: |
   #         NODE_ENV=test RAILS_ENV=test ./bin/webpack
   #     - name: run tests
-        run: ${{matrix.command_configs.test_command}}
+  #       run: ${{matrix.command_configs.test_command}}
