@@ -10,8 +10,6 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
-        with:
-          fetch-depth: 2
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "2.5.1"
@@ -29,7 +27,9 @@ jobs:
           bundle config path vendor/bundle
           bundle install --jobs 4 --retry 3
       - name: Run rubocop
-        run: bundle exec rubocop-git origin/master
+        run: |
+          git fetch --no-tags origin
+          bundle exec rubocop-git origin/master
   # testing_matrix:
   #   name: ${{matrix.command_configs.name}}
   #   runs-on: ${{ matrix.os }}
