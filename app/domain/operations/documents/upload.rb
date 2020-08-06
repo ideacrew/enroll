@@ -52,7 +52,13 @@ module Operations
       end
 
       def construct_body(resource, file_params)
-        Success({ document: { subjects: [{"id": resource.id.to_s, "type": resource.class.to_s}], "document_type": 'notice' }.to_json,
+        Success({ document: { subjects: [{"id": resource.id.to_s, "type": resource.class.to_s}], "document_type": 'notice', 'creator': Settings.site.publisher,
+                              'publisher': Settings.site.publisher,
+                              'type': 'text',
+                              'format': 'application/octet-stream',
+                              'source': 'enroll_system',
+                              'language': 'en',
+                              'date_submitted': TimeKeeper.date_of_record }.to_json,
                   content: fetch_file(file_params)
                 })
       end
