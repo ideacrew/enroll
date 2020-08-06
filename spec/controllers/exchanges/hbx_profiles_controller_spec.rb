@@ -755,7 +755,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
         get :create_send_secure_message, xhr:  true, params:  profile_valid_params
 
         expect(response).to render_template("create_send_secure_message")
-        expect(response.body).to have_content((/Message Sent successfully/i))
+        expect(response.body).to have_content /Message Sent successfully/i
       end
     end
 

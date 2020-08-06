@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Then(/^the user will( not)? see the Send Secure Message button$/) do |visible|
   if visible.blank?
     if ::EnrollRegistry.feature_enabled?(:send_secure_message_employer) == true
@@ -96,6 +98,6 @@ When(/^the user clicks cancel button$/) do
   find("#secureMessageFormClose").click
 end
 
-Then(/^the Recipient field should auto populate with the Employer groups name (.*?)$/) do|legal_name|
+Then(/^the Recipient field should auto populate with the Employer groups name (.*?)$/) do |legal_name|
   expect(page).to have_text(legal_name)
 end

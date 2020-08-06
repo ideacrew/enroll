@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 module Operations
@@ -18,18 +20,22 @@ module Operations
       let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key) }
       let(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, site: site)}
       let(:employer_profile) {organization.employer_profile}
-      let(:doc_payload) {{
+      let(:doc_payload) do
+        {
           "title": "test",
           "format": "application/pdf",
           "creator": "hbx_staff",
           "subject": "notice",
           "doc_identifier": BSON::ObjectId.new.to_s
-      }}
+        }
+      end
 
       describe 'given empty resource' do
-        let(:params) {{resource: nil,
-                       document_params: {subject: 'test', body: 'test', file: Rack::Test::UploadedFile.new(tempfile, "application/pdf")},
-                       doc_identifier: BSON::ObjectId.new.to_s}}
+        let(:params) do
+          { resource: nil,
+            document_params: {subject: 'test', body: 'test', file: Rack::Test::UploadedFile.new(tempfile, "application/pdf")},
+            doc_identifier: BSON::ObjectId.new.to_s }
+        end
         let(:error_message) {{:message => ['Please find valid resource to create document.']}}
 
         it 'fails' do
@@ -39,11 +45,14 @@ module Operations
       end
 
       describe "given empty doc_identifier" do
-        let(:params) { {resource: employer_profile,
-                        document_params: {subject: 'test', body: 'test', file: Rack::Test::UploadedFile.new(tempfile, "application/pdf")},
-                        doc_identifier: "" }}
-        let(:error_message) {{:doc_identifier => ['Response missing doc identifier.']}}
-
+        let(:params) do
+          { resource: employer_profile,
+            document_params: { subject: 'test', body: 'test', file: Rack::Test::UploadedFile.new(tempfile, "application/pdf")},
+            doc_identifier: "" }
+        end
+        let(:error_message) do
+          {:doc_identifier => ['Response missing doc identifier.']}
+        end
 
         it "fails" do
           expect(subject).not_to be_success
@@ -52,10 +61,14 @@ module Operations
       end
 
       describe "given empty title" do
-        let(:params) { {resource: employer_profile,
-                        document_params: {subject: 'test', body: 'test', file: Rack::Test::UploadedFile.new(tempfile, "application/pdf")},
-                        doc_identifier: BSON::ObjectId.new.to_s }}
-        let(:error_message) {{:title => ['Missing title for document.']}}
+        let(:params) do
+          { resource: employer_profile,
+            document_params: {subject: 'test', body: 'test', file: Rack::Test::UploadedFile.new(tempfile, "application/pdf")},
+            doc_identifier: BSON::ObjectId.new.to_s }
+        end
+        let(:error_message) do
+          {:title => ['Missing title for document.']}
+        end
 
         it "fails" do
           doc_payload[:title] = ""
@@ -66,10 +79,14 @@ module Operations
       end
 
       describe "given empty title" do
-        let(:params) { {resource: employer_profile,
-                        document_params: {subject: 'test', body: 'test', file: Rack::Test::UploadedFile.new(tempfile, "application/pdf")},
-                        doc_identifier: BSON::ObjectId.new.to_s }}
-        let(:error_message) {{:creator => ['Missing creator for document.']}}
+        let(:params) do
+          { resource: employer_profile,
+            document_params: {subject: 'test', body: 'test', file: Rack::Test::UploadedFile.new(tempfile, "application/pdf")},
+            doc_identifier: BSON::ObjectId.new.to_s }
+        end
+        let(:error_message) do
+          {:creator => ['Missing creator for document.']}
+        end
 
         it "fails" do
           doc_payload[:creator] = ""
@@ -80,10 +97,14 @@ module Operations
       end
 
       describe "given empty subject" do
-        let(:params) { {resource: employer_profile,
-                        document_params: {subject: 'test', body: 'test', file: Rack::Test::UploadedFile.new(tempfile, "application/pdf")},
-                        doc_identifier: BSON::ObjectId.new.to_s }}
-        let(:error_message) {{:subject => ['Missing subject for document.']}}
+        let(:params) do
+          { resource: employer_profile,
+            document_params: {subject: 'test', body: 'test', file: Rack::Test::UploadedFile.new(tempfile, "application/pdf")},
+            doc_identifier: BSON::ObjectId.new.to_s }
+        end
+        let(:error_message) do
+          {:subject => ['Missing subject for document.']}
+        end
 
         it "fails" do
           doc_payload[:subject] = ""
@@ -94,10 +115,14 @@ module Operations
       end
 
       describe "given empty format" do
-        let(:params) { {resource: employer_profile,
-                        document_params: {subject: 'test', body: 'test', file: Rack::Test::UploadedFile.new(tempfile, "application/pdf")},
-                        doc_identifier: BSON::ObjectId.new.to_s }}
-        let(:error_message) {{:format => ['Invalid file format.']}}
+        let(:params) do
+          { resource: employer_profile,
+            document_params: {subject: 'test', body: 'test', file: Rack::Test::UploadedFile.new(tempfile, "application/pdf")},
+            doc_identifier: BSON::ObjectId.new.to_s }
+        end
+        let(:error_message) do
+          {:format => ['Invalid file format.']}
+        end
 
         it "fails" do
           doc_payload[:format] = ""
@@ -108,7 +133,9 @@ module Operations
       end
 
       describe "passing valid data" do
-        let(:params) { { resource: employer_profile, message_params: {subject: 'test', body: 'test'}}}
+        let(:params) do
+          { resource: employer_profile, message_params: {subject: 'test', body: 'test'}}
+        end
 
         it "success" do
           validated_params = Operations::Documents::Create.new.validate_params(doc_payload)

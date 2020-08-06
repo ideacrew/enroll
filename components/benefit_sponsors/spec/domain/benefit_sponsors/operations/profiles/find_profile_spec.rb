@@ -13,14 +13,14 @@ RSpec.describe BenefitSponsors::Operations::Profiles::FindProfile, dbclean: :aft
     let(:invalid_params) { {profile_id: organization.id} }
 
     it 'should return ER profile' do
-      result =  subject.call(valid_params)
+      result = subject.call(valid_params)
 
       expect(result.success?). to be_truthy
       expect(result.success). to be_a BenefitSponsors::Organizations::AcaShopDcEmployerProfile
     end
 
     it 'should throw an error' do
-      result =  subject.call(invalid_params)
+      result = subject.call(invalid_params)
 
       expect(result.success?). to be_falsey
       expect(result.failure[:message]). to eq(["Profile not found"])

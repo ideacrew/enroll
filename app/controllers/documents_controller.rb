@@ -43,18 +43,16 @@ class DocumentsController < ApplicationController
   end
 
   def cartafact_download
-    begin
-      result = ::Operations::Documents::Download.call({params: params.permit!.to_h, user: current_user})
-      if result.success?
-        response_data = result.value!
-        send_data response_data, get_options(params)
-      else
-        errors = result.failure
-        redirect_back(fallback_location: root_path, :flash => {error: errors[:message]})
-      end
-    rescue => e
-      redirect_back(fallback_location: root_path, :flash => {error: e.message})
+    result = ::Operations::Documents::Download.call({params: params.permit!.to_h, user: current_user})
+    if result.success?
+      response_data = result.value!
+      send_data response_data, get_options(params)
+    else
+      errors = result.failure
+      redirect_back(fallback_location: root_path, :flash => {error: errors[:message]})
     end
+    rescue StandardError => e
+    redirect_back(fallback_location: root_path, :flash => {error: e.message})
   end
 
   def update_verification_type

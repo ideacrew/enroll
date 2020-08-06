@@ -4,12 +4,14 @@ require 'rails_helper'
 
 RSpec.describe Validators::Documents::UploadContract,  dbclean: :after_each do
 
-  describe "message contract" do
+  describe 'message contract' do
 
-    context "sending with missing values should return errors" do
+    context 'sending with missing values should return errors' do
       let(:invalid_params) { {subjects: [], id: "", document_type: "", source: "" } }
-      let(:error_message) { {:subjects => ["Missing attributes for subjects"], :id => ["Doc storage Identifier is blank"],
-                             :document_type => ["Document type is missing"], :source => ["Invalid source"]}}
+      let(:error_message) do
+        {:subjects => ['Missing attributes for subjects'], :id => ['Doc storage Identifier is blank'],
+         :document_type => ['Document type is missing'], :source => ['Invalid source']}
+      end
 
       it 'should be a container-ready operation' do
         expect(subject.respond_to?(:call)).to be_truthy
@@ -27,18 +29,22 @@ RSpec.describe Validators::Documents::UploadContract,  dbclean: :after_each do
     context "sending with missing keys should return errors" do
 
       let(:invalid_params) { {} }
-      let(:error_message) {{:subjects => ["is missing"], :id => ["is missing"],
-                             :document_type => ["is missing"], :source => ["is missing"]}}
+      let(:error_message) do
+        {:subjects => ['is missing'], :id => ['is missing'],
+         :document_type => ['is missing'], :source => ['is missing']}
+      end
 
       it 'should throw errors' do
         expect(subject.call(invalid_params).errors.to_h).to eq error_message
       end
     end
 
-    context "sending with all keys and values should not errors" do
+    context 'sending with all keys and values should not errors' do
 
-      let(:valid_params) {{subjects: [id: BSON::ObjectId.new.to_s, type: "notice" ],
-                            id: BSON::ObjectId.new.to_s, document_type: "test", source: "enroll_system"}}
+      let(:valid_params) do
+        {subjects: [id: BSON::ObjectId.new.to_s, type: 'notice' ],
+         id: BSON::ObjectId.new.to_s, document_type: 'test', source: 'enroll_system'}
+      end
 
 
       it 'should return Dry::Validation::Result object' do

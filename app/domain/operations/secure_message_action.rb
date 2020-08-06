@@ -10,11 +10,7 @@ module Operations
     def call(params:, user:)
       validate_params = yield validate_params(params)
       resource = yield fetch_resource(validate_params)
-
-      if params[:file].present?
-        uploaded_doc = yield upload_document(resource, validate_params, user)
-      end
-
+      uploaded_doc = yield upload_document(resource, validate_params, user) if params[:file].present?
       secure_message_result = yield upload_secure_message(resource, validate_params, uploaded_doc)
       result = yield send_generic_notice_alert(secure_message_result)
       Success(result)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 module Operations
@@ -19,15 +21,16 @@ module Operations
       let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key) }
       let(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, site: site)}
       let(:employer_profile) {organization.employer_profile}
-      let(:doc_storage) {{"title"=>"untitled",
-                          "language"=>"en",
-                          "format"=>"application/octet-stream",
-                          "source"=>"enroll_system",
-                          "document_type"=>"notice",
-                          "subjects"=>[{"id"=>"BSON::ObjectId.new.to_s", "type"=>"test"}],
-                          "id"=>BSON::ObjectId.new.to_s,
-                          "extension"=>"pdf"
-      }}
+      let(:doc_storage) do
+        {:title => 'untitled',
+         :language => 'en',
+         :format => 'application/octet-stream',
+         :source => 'enroll_system',
+         :document_type => 'notice',
+         :subjects => [{:id => BSON::ObjectId.new.to_s, :type => 'test'}],
+         :id => BSON::ObjectId.new.to_s,
+         :extension => 'pdf' }
+      end
 
       describe 'given empty resource' do
         let(:params) {{resource: nil, file_params: {subject: 'test', body: 'test', file: Rack::Test::UploadedFile.new(tempfile, "application/pdf")}, user: user}}
@@ -40,9 +43,13 @@ module Operations
       end
 
       describe "when response has empty subjects" do
-        let(:params) {{resource: employer_profile,
-                       file_params: {subject: 'test', body: 'test', file: Rack::Test::UploadedFile.new(tempfile, "application/pdf")}, user: user }}
-        let(:error_message) {{:subjects => ['Missing attributes for subjects']}}
+        let(:params) do
+          {resource: employer_profile,
+           file_params: {subject: 'test', body: 'test', file: Rack::Test::UploadedFile.new(tempfile, "application/pdf")}, user: user }
+        end
+        let(:error_message) do
+          {:subjects => ['Missing attributes for subjects']}
+        end
 
         it "fails" do
           doc_storage[:subjects] = []
@@ -53,10 +60,14 @@ module Operations
       end
 
       describe "when response has empty id" do
-        let(:params) { {resource: employer_profile,
-                        file_params: {subject: 'test', body: 'test', file: Rack::Test::UploadedFile.new(tempfile, "application/pdf")},
-                        user: user }}
-        let(:error_message) {{:id => ['Doc storage Identifier is blank']}}
+        let(:params) do
+          {resource: employer_profile,
+           file_params: {subject: 'test', body: 'test', file: Rack::Test::UploadedFile.new(tempfile, "application/pdf")},
+           user: user }
+        end
+        let(:error_message) do
+          {:id => ['Doc storage Identifier is blank']}
+        end
 
         it "fails" do
           doc_storage[:id] = ""
@@ -67,9 +78,11 @@ module Operations
       end
 
       describe "when response has empty type" do
-        let(:params) { {resource: employer_profile,
-                        file_params: {subject: 'test', body: 'test', file: Rack::Test::UploadedFile.new(tempfile, "application/pdf")},
-                        user: user }}
+        let(:params) do
+          {resource: employer_profile,
+           file_params: {subject: 'test', body: 'test', file: Rack::Test::UploadedFile.new(tempfile, "application/pdf")},
+           user: user }
+        end
         let(:error_message) {{:document_type => ['Document type is missing']}}
 
         it "fails" do
@@ -81,10 +94,14 @@ module Operations
       end
 
       describe "when response has empty source" do
-        let(:params) { {resource: employer_profile,
-                        file_params: {subject: 'test', body: 'test', file: Rack::Test::UploadedFile.new(tempfile, "application/pdf")},
-                        user: user }}
-        let(:error_message) {{:source => ['Invalid source']}}
+        let(:params) do
+          {resource: employer_profile,
+           file_params: {subject: 'test', body: 'test', file: Rack::Test::UploadedFile.new(tempfile, "application/pdf")},
+           user: user }
+        end
+        let(:error_message) do
+          {:source => ['Invalid source']}
+        end
 
         it "fails" do
           doc_storage[:source] = ""
@@ -95,10 +112,11 @@ module Operations
       end
 
       describe "passing valid data" do
-        let(:params) { {resource: employer_profile,
-                        file_params: {subject: 'test', body: 'test', file: Rack::Test::UploadedFile.new(tempfile, "application/pdf")},
-                        user: user }}
-
+        let(:params) do
+          {resource: employer_profile,
+           file_params: {subject: 'test', body: 'test', file: Rack::Test::UploadedFile.new(tempfile, "application/pdf")},
+           user: user }
+        end
         it "success" do
           validated_params = Operations::Documents::Upload.new.validate_response(doc_storage.transform_keys(&:to_sym))
           file = Operations::Documents::Upload.new.create_document(employer_profile, params[:file_params], validated_params.value!)

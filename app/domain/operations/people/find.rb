@@ -18,7 +18,6 @@ module Operations
       private
 
       def fetch_person(person_id)
-
         person = Person.where(id: person_id).first
 
         if person

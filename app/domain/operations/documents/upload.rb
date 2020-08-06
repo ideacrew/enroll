@@ -11,10 +11,7 @@ module Operations
       include Config::SiteHelper
 
       def call(resource:, file_params:, user:)
-
-        if resource.blank?
-          return Failure({:message => ['Please find valid resource to create document.']})
-        end
+        return Failure({:message => ['Please find valid resource to create document.']}) if resource.blank?
 
         header = yield construct_headers(resource, user)
         body = yield construct_body(resource, file_params)
@@ -59,8 +56,7 @@ module Operations
                               'source': 'enroll_system',
                               'language': 'en',
                               'date_submitted': TimeKeeper.date_of_record }.to_json,
-                  content: fetch_file(file_params)
-                })
+                  content: fetch_file(file_params) })
       end
 
       def upload_to_doc_storage(resource, header, body)
@@ -84,15 +80,14 @@ module Operations
       end
 
       def test_env_response(resource)
-        {"title"=>"untitled",
-         "language"=>"en",
-         "format"=>"application/octet-stream",
-         "source"=>"enroll_system",
-         "document_type"=>"notice",
-         "subjects"=>[{"id"=>resource.id.to_s, "type"=>resource.class.to_s}],
-         "id"=> BSON::ObjectId.new.to_s,
-         "extension"=>"pdf"
-         }
+        {:title => 'untitled',
+         :language => 'en',
+         :format => 'application/octet-stream',
+         :source => 'enroll_system',
+         :document_type => 'notice',
+         :subjects => [{:id => resource.id.to_s, :type => resource.class.to_s}],
+         :id => BSON::ObjectId.new.to_s,
+         :extension => 'pdf' }
       end
     end
   end

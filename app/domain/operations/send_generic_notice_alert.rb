@@ -10,17 +10,12 @@ module Operations
     include Config::SiteHelper
 
     def call(resource:)
-
-      if resource.blank?
-        return Failure({:message => ['Please find valid resource to send the alert message']})
-      end
+      return Failure({:message => ['Please find valid resource to send the alert message']}) if resource.blank?
 
       @resource = resource
       recipient_target = yield fetch_recipient_target
 
-      if recipient_target.blank?
-        return Success(true)
-      end
+      return Success(true) if recipient_target.blank?
 
       recipient_name = yield fetch_recipient_name(recipient_target)
       recipient_email = yield fetch_recipient_email(recipient_target)

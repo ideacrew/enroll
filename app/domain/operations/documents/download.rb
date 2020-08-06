@@ -15,9 +15,8 @@ module Operations
       end
 
       def call(opts)
-        if opts[:user].blank?
-          return Failure({:message => 'Please login to download the document'})
-        end
+        return Failure({:message => 'Please login to download the document'}) if opts[:user].blank?
+
         payload = yield validate_params(opts[:params])
         resource = yield fetch_resource(payload)
         document = yield fetch_document(resource, opts[:params][:relation_id])
@@ -76,14 +75,12 @@ module Operations
                               "authorized_subjects": [{"type": "notice", "id": resource.id.to_s}] }
 
         Success({ 'HTTP-X-REQUESTINGIDENTITY' => encoded_payload(payload_to_encode),
-                  'HTTP-X-REQUESTINGIDENTITYSIGNATURE' => Base64.strict_encode64(OpenSSL::HMAC.digest("SHA256", fetch_secret_key, encoded_payload(payload_to_encode)))
-                })
+                  'HTTP-X-REQUESTINGIDENTITYSIGNATURE' => Base64.strict_encode64(OpenSSL::HMAC.digest("SHA256", fetch_secret_key, encoded_payload(payload_to_encode))) })
       end
 
       def construct_body(resource, document)
         Success({ document: { subjects: [{"id": resource.id.to_s, "type": resource.class.to_s}], "document_type": 'notice' }.to_json,
-                  id: document.doc_identifier
-                })
+                  id: document.doc_identifier })
       end
 
       def download_from_doc_storage(document, header, body)

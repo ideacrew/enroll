@@ -19,7 +19,6 @@ module BenefitSponsors
         private
 
         def benefit_sponsor_profile(profile_id)
-
           sponsor_profile = ::BenefitSponsors::Organizations::Profile.find(profile_id)
 
           if sponsor_profile
