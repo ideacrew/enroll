@@ -1031,8 +1031,8 @@ module BenefitSponsors
     end
 
     def all_waived_member_count
-      waived_employees = active_census_employees_under_py.select{|ce| ce.waiving_on_eod?}
-      waived_employees.collect{|census_employee| census_employee.family }.compact.count
+      waived_employees = active_census_employees_under_py.select(&:waiving_on_eod?)
+      waived_employees.collect(&:family).compact.count
     end
 
     def eligible_for_export?

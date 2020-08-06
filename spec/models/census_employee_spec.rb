@@ -2255,7 +2255,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     let!(:benefit_group_assignment) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee)}
 
     context "for initial application" do
-      
+
       it "should return true when employees waive the coverage" do
         benefit_group_assignment.aasm_state = "coverage_waived"
         expect(census_employee.waiving_on_eod?).to be_truthy
