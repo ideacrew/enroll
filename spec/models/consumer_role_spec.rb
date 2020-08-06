@@ -536,7 +536,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             consumer.fail_dhs! verification_attr
           end
           it 'should remain in review' do
-            expect(verification_types.reject{|type| VerificationType::NON_CITIZEN_IMMIGRATION_TYPES.include? type.type_name }.each{ |type| type.validation_status == 'review' }).to be_truthy
+            expect(verification_types.reject{|type| VerificationType::NON_CITIZEN_IMMIGRATION_TYPES.include? type.type_name }.each{ |type| ['review'].include?(type.validation_status) }).to be_truthy
           end
         end
       end
