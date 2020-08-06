@@ -61,26 +61,87 @@ RSpec.describe Operations::Individual::RenewEnrollment, type: :model, dbclean: :
 
     context 'assisted cases' do
       context 'renewal enrollment with assigned aptc' do
-        before do
+        before :each do
           tax_household.update_attributes!(effective_starting_on: next_year_date.beginning_of_year)
           tax_household.tax_household_members.first.update_attributes!(applicant_id: family_member.id)
-          @result = subject.call(hbx_enrollment: enrollment, effective_on: effective_on)
         end
 
-        it 'should return success' do
-          expect(@result).to be_a(Dry::Monads::Result::Success)
+        context 'ehb premium is less than the selected aptc' do
+          before do
+            @result = subject.call(hbx_enrollment: enrollment, effective_on: effective_on)
+          end
+
+          it 'should return success' do
+            expect(@result).to be_a(Dry::Monads::Result::Success)
+          end
+
+          it 'should renew the given enrollment' do
+            expect(@result.success).to be_a(HbxEnrollment)
+          end
+
+          it 'should assign aptc value to the enrollment which is same as ehb_premium' do
+            expect(@result.success.applied_aptc_amount.to_f).to eq(@result.success.ivl_decorated_hbx_enrollment.total_ehb_premium)
+          end
+
+          it 'should renew enrollment with silver product of 01 variant' do
+            expect(@result.success.product_id).to eq(renewal_product.id)
+          end
         end
 
-        it 'should renew the given enrollment' do
-          expect(@result.success).to be_a(HbxEnrollment)
+        context 'ehb premium is greater than the selected aptc' do
+          before do
+            eligibilty_determination.update_attributes!(max_aptc: 100.00)
+            @result = subject.call(hbx_enrollment: enrollment, effective_on: effective_on)
+          end
+
+          it 'should return success' do
+            expect(@result).to be_a(Dry::Monads::Result::Success)
+          end
+
+          it 'should renew the given enrollment' do
+            expect(@result.success).to be_a(HbxEnrollment)
+          end
+
+          it 'should assign aptc value to the enrollment which is default_percentage times of max_aptc' do
+            default_percentage = EnrollRegistry[:aca_individual_assistance_benefits].setting(:default_applied_aptc_percentage).item
+            expect(@result.success.applied_aptc_amount.to_f).to eq((eligibilty_determination.max_aptc * default_percentage).to_f)
+          end
+
+          it 'should assign aptc value to the enrollment which is not same as ehb_premium' do
+            expect(@result.success.applied_aptc_amount.to_f).not_to eq(@result.success.ivl_decorated_hbx_enrollment.total_ehb_premium)
+          end
+
+          it 'should renew enrollment with silver product of 01 variant' do
+            expect(@result.success.product_id).to eq(renewal_product.id)
+          end
         end
 
-        it 'should assign aptc values to the enrollment' do
-          expect(@result.success.applied_aptc_amount.to_f).to eq(198.86)
-        end
+        context 'current enrollment has some aptc applied' do
+          before do
+            enrollment.update_attributes!(elected_aptc_pct: 0.5, applied_aptc_amount: 50.0)
+            eligibilty_determination.update_attributes!(max_aptc: 100.00)
+            @result = subject.call(hbx_enrollment: enrollment, effective_on: effective_on)
+          end
 
-        it 'should renew enrollment with silver product of 01 variant' do
-          expect(@result.success.product_id).to eq(renewal_product.id)
+          it 'should return success' do
+            expect(@result).to be_a(Dry::Monads::Result::Success)
+          end
+
+          it 'should renew the given enrollment' do
+            expect(@result.success).to be_a(HbxEnrollment)
+          end
+
+          it 'should assign aptc value to the enrollment which is elected_aptc_pct times of max_aptc' do
+            expect(@result.success.applied_aptc_amount.to_f).to eq((eligibilty_determination.max_aptc * enrollment.elected_aptc_pct).to_f)
+          end
+
+          it 'should assign aptc value to the enrollment which is not same as ehb_premium' do
+            expect(@result.success.applied_aptc_amount.to_f).not_to eq(@result.success.ivl_decorated_hbx_enrollment.total_ehb_premium)
+          end
+
+          it 'should renew enrollment with silver product of 01 variant' do
+            expect(@result.success.product_id).to eq(renewal_product.id)
+          end
         end
       end
 
@@ -141,6 +202,57 @@ RSpec.describe Operations::Individual::RenewEnrollment, type: :model, dbclean: :
         expect(@result.success.product_id).to eq(renewal_product.id)
       end
     end
+
+    context 'with an expired enrollment by aasm state' do
+      before :each do
+        enrollment.expire_coverage!
+        @result = subject.call(hbx_enrollment: enrollment, effective_on: effective_on)
+      end
+
+      it 'should return success' do
+        expect(@result).to be_a(Dry::Monads::Result::Success)
+      end
+
+      it 'should renew the given enrollment' do
+        expect(@result.success).to be_a(HbxEnrollment)
+      end
+    end
+
+    context 'dental enrollment with bad aptc values for renewal' do
+      let!(:renewal_product) do
+        FactoryBot.create(:benefit_markets_products_dental_products_dental_product,
+                          :ivl_product,
+                          application_period: next_year_date.beginning_of_year..next_year_date.end_of_year)
+      end
+
+      let!(:product) do
+        FactoryBot.create(:benefit_markets_products_dental_products_dental_product,
+                          :ivl_product,
+                          renewal_product_id: renewal_product.id)
+      end
+
+      before :each do
+        enrollment.expire_coverage!
+        enrollment.update_attributes!(coverage_kind: 'dental',
+                                      elected_aptc_pct: 0.7,
+                                      applied_aptc_amount: 100.00,
+                                      product_id: product.id)
+        @result = subject.call(hbx_enrollment: enrollment, effective_on: effective_on)
+      end
+
+      it 'should return success' do
+        expect(@result).to be_a(Dry::Monads::Result::Success)
+      end
+
+      it 'should renew the given enrollment' do
+        expect(@result.success).to be_a(HbxEnrollment)
+      end
+
+      it 'should not apply any aptc values for dental enrollment' do
+        expect(@result.success.elected_aptc_pct).to be_zero
+        expect(@result.success.applied_aptc_amount).to be_zero
+      end
+    end
   end
 
   context 'for renewal failure' do
@@ -199,7 +311,22 @@ RSpec.describe Operations::Individual::RenewEnrollment, type: :model, dbclean: :
       end
 
       it 'should return failure with message' do
-        expect(@result.failure).to eq('There exists active enrollments for given family in the year with renewal_benefit_coverage_period')
+        expect(@result.failure).to eq('There exists active enrollments for the subscriber in the year with given effective_on')
+      end
+    end
+
+    context 'with non active enrollment by aasm state' do
+      before :each do
+        enrollment.update_attributes!(aasm_state: 'shopping')
+        @result = subject.call(hbx_enrollment: enrollment, effective_on: effective_on)
+      end
+
+      it 'should return failure' do
+        expect(@result).to be_a(Dry::Monads::Result::Failure)
+      end
+
+      it 'should return failure with message' do
+        expect(@result.failure).to eq('Given enrollment is a shopping enrollment by aasm_state')
       end
     end
   end
