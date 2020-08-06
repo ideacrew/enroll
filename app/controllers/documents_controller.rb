@@ -51,7 +51,7 @@ class DocumentsController < ApplicationController
       errors = result.failure
       redirect_back(fallback_location: root_path, :flash => {error: errors[:message]})
     end
-    rescue StandardError => e
+  rescue StandardError => e
     redirect_back(fallback_location: root_path, :flash => {error: e.message})
   end
 

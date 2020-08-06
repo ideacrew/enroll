@@ -49,8 +49,7 @@ module Operations
                   "format": fetch_file_content_type(params),
                   "creator": "hbx_staff",
                   "subject": "notice",
-                  "doc_identifier": doc_identifier
-                })
+                  "doc_identifier": doc_identifier })
       end
     end
   end

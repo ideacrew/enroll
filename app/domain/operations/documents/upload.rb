@@ -44,8 +44,7 @@ module Operations
                               "authorized_subjects": [{"type": "notice", "id": resource.id.to_s}] }
 
         Success({ 'HTTP-X-REQUESTINGIDENTITY' => encoded_payload(payload_to_encode),
-                  'HTTP-X-REQUESTINGIDENTITYSIGNATURE' => Base64.strict_encode64(OpenSSL::HMAC.digest("SHA256", fetch_secret_key, encoded_payload(payload_to_encode)))
-                })
+                  'HTTP-X-REQUESTINGIDENTITYSIGNATURE' => Base64.strict_encode64(OpenSSL::HMAC.digest("SHA256", fetch_secret_key, encoded_payload(payload_to_encode))) })
       end
 
       def construct_body(resource, file_params)

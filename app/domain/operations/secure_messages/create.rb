@@ -27,8 +27,8 @@ module Operations
       def construct_message_payload(resource, message_params, document)
         body = if document.present?
                  message_params[:body] + "<br>You can download the notice by clicking this link " \
-                   "<a href=" + "#{Rails.application.routes.url_helpers.cartafact_document_download_path(resource.class.to_s, resource.id.to_s, 'documents', document.id)}?content_type=#{document.format}&filename=#{document.title.gsub(/[^0-9a-z]/i,'')}
-                    .pdf&disposition=inline" + " target='_blank'>" + document.title.gsub(/[^0-9a-z]/i,'') + "</a>"
+                   "<a href=" + "#{Rails.application.routes.url_helpers.cartafact_document_download_path(resource.class.to_s, resource.id.to_s, 'documents', document.id)}
+                    ?content_type=#{document.format}&filename=#{document.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + document.title.gsub(/[^0-9a-z]/i,'') + "</a>"
                else
                  message_params[:body]
                end

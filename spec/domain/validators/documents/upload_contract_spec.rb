@@ -42,7 +42,7 @@ RSpec.describe Validators::Documents::UploadContract,  dbclean: :after_each do
     context 'sending with all keys and values should not errors' do
 
       let(:valid_params) do
-        {subjects: [id: BSON::ObjectId.new.to_s, type: 'notice' ],
+        {subjects: [id: BSON::ObjectId.new.to_s, type: 'notice'],
          id: BSON::ObjectId.new.to_s, document_type: 'test', source: 'enroll_system'}
       end
 
