@@ -5,6 +5,18 @@ env: # https://stackoverflow.com/questions/59867124/how-can-i-access-github-acti
   TEST_BOOSTERS_RSPEC_TEST_FILE_PATTERN: "{spec,components/benefit_markets/spec,components/benefit_sponsors,components/notifier,components/sponsored_benefits,components/transport_gateway,components/transport_profiles}/**/*_spec.rb"
 
 jobs:
+  rubocop:
+    name: Rubocop
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "2.5.1"
+      - name: Run rubocop
+        run: bundle exec rubocop-git origin/master
   testing_matrix:
     name: ${{matrix.command_configs.name}}
     runs-on: ${{ matrix.os }}
@@ -14,11 +26,6 @@ jobs:
         node: [10]
         mongodb-version: ["3.6"]
         command_configs:
-          - name: rubocop
-            skip_js: 'true'
-            test_command: |
-              git fetch --no-tags origin
-              bundle exec rubocop-git origin/master
           - name: rspec 1/4
             test_command: rspec_booster --job 1/4
           - name: rspec 2/4
@@ -157,7 +164,7 @@ jobs:
       - name: Set up Ruby 2.5.1
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 2.5.1
+          ruby-version: "2.5.1"
       - name: Setup Node.js for use with actions
         uses: actions/setup-node@v1
         if: matrix.command_configs.skip_js != 'true'
