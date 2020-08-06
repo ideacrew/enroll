@@ -2,7 +2,11 @@ module Insured
   module PlanShopping
     module ReceiptHelper
       def show_pay_now?
-        (carrier_with_payment_option? && individual? && (!has_any_previous_kaiser_enrollments? || has_break_in_coverage_enrollments?)) && pay_now_button_timed_out?
+        if EnrollRegistry[:pay_now_functionality].feature.is_enabled
+          (carrier_with_payment_option? && individual? && (!has_any_previous_kaiser_enrollments? || has_break_in_coverage_enrollments?)) && pay_now_button_timed_out?
+        else
+          return false 
+        end
       end
 
       def carrier_with_payment_option?
