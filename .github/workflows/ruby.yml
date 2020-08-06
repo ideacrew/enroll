@@ -15,6 +15,15 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "2.5.1"
+      - name: Cache Gems
+        uses: actions/cache@v1
+        with:
+          path: vendor/bundle
+          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+      - name: bundle install
+        run: bundle install
       - name: Run rubocop
         run: bundle exec rubocop-git origin/master
   testing_matrix:
