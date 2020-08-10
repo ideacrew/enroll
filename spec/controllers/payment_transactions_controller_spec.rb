@@ -7,11 +7,13 @@ RSpec.describe PaymentTransactionsController, :type => :controller do
   let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, aasm_state: 'shopping', product: product) }
   let(:build_saml_repsonse) {double}
   let(:encode_saml_response) {double}
+  let(:connection) {double}
 
 
   context 'GET generate saml response' do
     before(:each) do
       sign_in user
+      allow(HTTParty).to receive(:get).and_return connection
       allow_any_instance_of(OneLogin::RubySaml::SamlGenerator).to receive(:build_saml_response).and_return build_saml_repsonse
       allow_any_instance_of(OneLogin::RubySaml::SamlGenerator).to receive(:encode_saml_response).and_return encode_saml_response
     end
