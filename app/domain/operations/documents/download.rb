@@ -21,8 +21,7 @@ module Operations
         resource = yield fetch_resource(payload)
         document = yield fetch_document(resource, opts[:params][:relation_id])
         header = yield construct_headers(resource, opts[:user])
-        body = yield construct_body(resource, document)
-        response = yield download_from_doc_storage(document, header, body)
+        response = yield download_from_doc_storage(document, header)
 
         Success(response)
       end
@@ -78,14 +77,9 @@ module Operations
                   'X-RequestingIdentitySignature' => Base64.strict_encode64(OpenSSL::HMAC.digest("SHA256", fetch_secret_key, encoded_payload(payload_to_encode))) })
       end
 
-      def construct_body(resource, document)
-        Success({ document: { subjects: [{"id": resource.id.to_s, "type": resource.class.to_s}], "document_type": 'notice' }.to_json,
-                  id: document.doc_identifier })
-      end
-
-      def download_from_doc_storage(document, header, body)
+      def download_from_doc_storage(document, header)
         if Rails.env.production?
-          response = HTTParty.get(fetch_url + "/#{document.doc_identifier}/download", :body => body, :headers => header)
+          response = HTTParty.get(fetch_url + "/#{document.doc_identifier}/download", :headers => header)
 
           response.code == 200 ? Success(response) : Failure({:message => 'Unable to download document'})
         else
