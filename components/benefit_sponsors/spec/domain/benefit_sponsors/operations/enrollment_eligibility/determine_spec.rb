@@ -51,6 +51,56 @@ RSpec.describe BenefitSponsors::Operations::EnrollmentEligibility::Determine, db
     end
   end
 
+  describe 'for initial benefit sponsorship' do
+    include_context "setup initial benefit application" do
+      let(:aasm_state) {ba_aasm_state}
+    end
+
+    let(:benefit_sponsorship_params) do
+        sponsorship_params = benefit_sponsorship.as_json.symbolize_keys.except(:benefit_applications)
+        sponsorship_params[:benefit_applications] = benefit_sponsorship.benefit_applications.collect{|ba| ba.as_json.symbolize_keys.except(:benefit_packages)}
+        sponsorship_params[:market_kind] = benefit_sponsorship.market_kind
+        (sponsorship_params)
+    end
+
+    let(:benefit_sponsorship_entity) {BenefitSponsors::Operations::BenefitSponsorship::Create.new.call(params: benefit_sponsorship_params).value!}
+
+    let(:effective_date) { TimeKeeper.date_of_record.next_month.beginning_of_month }
+    let(:params) do
+      {
+        effective_date: effective_date,
+        benefit_sponsorship: benefit_sponsorship_entity
+      }
+    end
+    let(:result) { subject.call(params) }
+
+    context "with termination_pending application" do
+      let(:ba_aasm_state) {"termination_pending"}
+      it 'should be success' do
+        expect(result.success?).to be_truthy
+      end
+
+      it 'should return eligibility_params' do
+        expect(result.success[:market_kind]).to eq benefit_sponsorship.market_kind
+        expect(result.success[:benefit_application_kind]).to eq 'initial'
+        expect(result.success[:effective_date]).to eq effective_date
+      end
+    end
+
+    context "with enrollment_ineligible application" do
+      let(:ba_aasm_state) {"enrollment_ineligible"}
+      it 'should be success' do
+        expect(result.success?).to be_truthy
+      end
+
+      it 'should return eligibility_params' do
+        expect(result.success[:market_kind]).to eq benefit_sponsorship.market_kind
+        expect(result.success[:benefit_application_kind]).to eq 'initial'
+        expect(result.success[:effective_date]).to eq effective_date
+      end
+    end
+  end
+
 
   describe 'for organization with no applications' do
     include_context 'setup renewal application'
