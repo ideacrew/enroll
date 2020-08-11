@@ -86,7 +86,6 @@ module OneLogin
 
       it 'should sign the assertion and not the response' do
         assertion = @noko.xpath('//samlp:Response').children[3]
-        assertion = @noko.xpath('//samlp:Response').children[3]
         expect(assertion.children.map(&:name)).not_to include('Signature')
       end
     end

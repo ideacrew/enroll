@@ -26,7 +26,8 @@ module Insured
 
       def has_break_in_coverage_enrollments?
         enrollments = @enrollment.family.enrollments.current_year.where(aasm_state: "coverage_terminated")
-        enrollments.any? { |enr| enr.product.issuer_profile.legal_name == EnrollRegistry[:pay_now_functionality].setting(:carriers).item && enr.terminated_on.year == @enrollment.effective_on.year && (@enrollment.effective_on - enr.terminated_on) > 1 }
+        carrier = EnrollRegistry[:pay_now_functionality].setting(:carriers).item
+        enrollments.any? { |enr| enr.product.issuer_profile.legal_name == carrier && enr.terminated_on.year == @enrollment.effective_on.year && (@enrollment.effective_on - enr.terminated_on) > 1 }
       end
     end
   end

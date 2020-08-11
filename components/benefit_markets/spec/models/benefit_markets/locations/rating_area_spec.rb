@@ -5,7 +5,6 @@ module BenefitMarkets
     before :each do
       DatabaseCleaner.clean
     end
-    
     describe "given nothing" do
       before :each do
         subject.valid?

@@ -1,3 +1,5 @@
+# frozen_string_literal: false
+
 Given(/^that a person exists in EA$/) do
   visit "/"
   click_link 'Consumer/Family Portal'
@@ -46,7 +48,7 @@ Given(/^Hbx Admin creates a consumer application$/) do
   find('.btn', text: 'CONTINUE', wait: 10).click
 end
 
-And (/^the person has an active consumer role$/) do
+And(/^the person has an active consumer role$/) do
   fill_in "person_first_name", with: "John"
   fill_in "person_last_name", with: "Smith"
   fill_in "jq_datepicker_ignore_person_dob", with: "11/11/1991"
@@ -58,7 +60,7 @@ And (/^the person has an active consumer role$/) do
   find('.interaction-click-control-continue', text: 'CONTINUE', :wait => 10).click
 end
 
-And (/^the person has an active resident role$/) do
+And(/^the person has an active resident role$/) do
   fill_in "person_first_name", with: "John"
   fill_in "person_last_name", with: "Smith"
   fill_in "jq_datepicker_ignore_person_dob", with: "11/11/1991"

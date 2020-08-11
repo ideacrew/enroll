@@ -19,7 +19,7 @@ module OneLogin
       SUCCESS =  'urn:oasis:names:tc:SAML:2.0:status:Success'
       NAME_ID_FORMAT = 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified'
       SENDER_VOUCHES = 'urn:oasis:names:tc:SAML:2.0:cm:sendervouches'
-      BEARER = 'urn:oasis:names:tc:SAML:2.0:cm:bearer'
+      BEARER = 'urn:oasis:names:tc:SAML:2.0:cm:bearer'.freeze
       NAME_FORMAT = 'urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified'
       PASSWORD = 'urn:oasis:names:tc:SAML:2.0:ac:classes:Password'
 
@@ -80,7 +80,7 @@ module OneLogin
         # subject confirmation
         subject_confirmation = subject.add_element 'saml:SubjectConfirmation', { 'Method' => BEARER }
         confirmation_data = subject_confirmation.add_element 'saml:SubjectConfirmationData'
-        confirmation_data.attributes['NotOnOrAfter'] = "#{not_on_or_after_condition}"
+        confirmation_data.attributes['NotOnOrAfter'] = not_on_or_after_condition.to_s
         confirmation_data.attributes['Recipient'] = "https://sso.healthplan.com/sp/ACS.saml2"
 
         # conditions
