@@ -5,7 +5,7 @@ module OneLogin
     let(:transaction_id)   { '1234' }
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member_and_dependent) }
     let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
-    let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: family.active_household, aasm_state: 'shopping', family: family, product: product) }
+    let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, hbx_id: "123456789", household: family.active_household, aasm_state: 'shopping', family: family, product: product) }
     let!(:hbx_enrollment_member1) { FactoryBot.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, is_subscriber: true, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: hbx_enrollment) }
     let!(:hbx_enrollment_member2) { FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members[1].id, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: hbx_enrollment) }
     let(:saml_generator) { OneLogin::RubySaml::SamlGenerator.new(transaction_id,hbx_enrollment) }
@@ -80,13 +80,41 @@ module OneLogin
 
       it 'should have send BEARER as subject confirmation method' do
         assertion = @noko.xpath('//samlp:Response').children[3]
-        expect(assertion.children[1].children[1].attributes['Method'].name). to eq 'Method'
-        expect(assertion.children[1].children[1].attributes['Method'].value). to eq bearer
+        expect(assertion.children[1].children[1].attributes['Method'].name).to eq 'Method'
+        expect(assertion.children[1].children[1].attributes['Method'].value).to eq bearer
       end
 
       it 'should sign the assertion and not the response' do
         assertion = @noko.xpath('//samlp:Response').children[3]
         expect(assertion.children.map(&:name)).not_to include('Signature')
+      end
+
+      it 'should have payment transaction ID with 13 characters' do
+        attr_stmt = @noko.xpath('//samlp:Response').children[3].children[4]
+        expect(attr_stmt.children[0].attributes['Name'].value).to eq 'Payment Transaction ID'
+        expect(attr_stmt.children[0].children[0].children[0].text.length).to eq 13
+      end
+
+      it 'should have aqhp product id as hios id without -' do
+        attr_stmt = @noko.xpath('//samlp:Response').children[3].children[4]
+        expect(attr_stmt.children[2].attributes['Name'].value).to eq 'Assigned QHP Identifier'
+        expect(attr_stmt.children[2].children[0].children[0].text).to eq hbx_enrollment.product.hios_id.gsub('-', '')
+      end
+
+      it 'should have street name' do
+        attr_stmt = @noko.xpath('//samlp:Response').children[3].children[4]
+        expect(attr_stmt.children[10].attributes['Name'].value).to eq 'Street Name 2'
+      end
+
+      it 'should have street name' do
+        attr_stmt = @noko.xpath('//samlp:Response').children[3].children[4]
+        expect(attr_stmt.children[14].attributes['Name'].value).to eq 'Contact Email Address'
+      end
+
+      it 'should have subscriber ID' do
+        attr_stmt = @noko.xpath('//samlp:Response').children[3].children[4]
+        expect(attr_stmt.children[15].attributes['Name'].value).to eq 'Subscriber Identifier'
+        expect(attr_stmt.children[15].children[0].children.text).to eq hbx_enrollment.subscriber.hbx_id
       end
     end
 

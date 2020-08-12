@@ -13,7 +13,9 @@ require 'xml_security/document'
 module OneLogin
   module RubySaml
     class SamlGenerator < SamlMessage
-      REQUIRED_ATTRIBUTES = ['Payment Transaction ID', 'Market Indicator', 'Assigned QHP Identifier', 'Total Amount Owed', 'Premium Amount Total', 'APTC Amount', 'Proposed Coverage Effective Date', 'First Name', 'Last Name', 'Partner Assigned Consumer ID','Street Name 1', 'City Name', 'State', 'Zip Code','Additional Information']
+      REQUIRED_ATTRIBUTES = ['Payment Transaction ID', 'Market Indicator', 'Assigned QHP Identifier', 'Total Amount Owed', 'Premium Amount Total', 'APTC Amount',
+                             'Proposed Coverage Effective Date', 'First Name', 'Last Name', 'Street Name 1', 'Street Name 2', 'City Name', 'State', 'Zip Code',
+                             'Contact Email Address', 'Subscriber Identifier', 'Additional Information'].freeze
       ASSERTION = 'urn:oasis:names:tc:SAML:2.0:assertion'
       PROTOCOL = 'urn:oasis:names:tc:SAML:2.0:protocol'
       SUCCESS =  'urn:oasis:names:tc:SAML:2.0:status:Success'
@@ -112,11 +114,11 @@ module OneLogin
       def set_attribute_values(attr_name, hbx_enrollment)
         case attr_name
         when 'Payment Transaction ID'
-          @transaction_id
+          hbx_enrollment.hbx_id.rjust(13, '0')
         when 'Market Indicator'
           hbx_enrollment.kind
         when 'Assigned QHP Identifier'
-          hbx_enrollment.product.hios_id
+          hbx_enrollment.product.hios_id.gsub('-', '')
         when 'Total Amount Owed'
           hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f
         when 'Premium Amount Total'
@@ -129,16 +131,20 @@ module OneLogin
           hbx_enrollment.subscriber.person.first_name
         when 'Last Name'
           hbx_enrollment.subscriber.person.last_name
-        when 'Partner Assigned Consumer ID'
-          hbx_enrollment.subscriber.person.hbx_id
         when 'Street Name 1'
           hbx_enrollment.subscriber.person.mailing_address.address_1
+        when 'Street Name 2'
+          hbx_enrollment.subscriber.person.mailing_address.address_2
         when 'City Name'
           hbx_enrollment.subscriber.person.mailing_address.city
         when 'State'
           hbx_enrollment.subscriber.person.mailing_address.state
         when 'Zip Code'
           hbx_enrollment.subscriber.person.mailing_address.zip
+        when 'Contact Email Address'
+          hbx_enrollment.subscriber.person.work_email_or_best
+        when 'Subscriber Identifier'
+          hbx_enrollment.subscriber.person.hbx_id
         when 'Additional Information'
           hbx_enrollment.hbx_enrollment_members.map(&:person).map{|person| person.first_name_last_name_and_suffix(',')}.join(';')
         end
