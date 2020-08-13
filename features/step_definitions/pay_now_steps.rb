@@ -106,7 +106,7 @@ When(/^the person enrolls in a Kaiser plan$/) do
   find_all('.plan-select')[0].click
 end
 
-And(/I click on purchase confirm button for matched person/) do
+And(/^I click on purchase confirm button for matched person$/) do
   find('.interaction-choice-control-value-terms-check-thank-you').click
   fill_in 'first_name_thank_you', with: "John"
   fill_in 'last_name_thank_you', with: "Smith"
@@ -114,19 +114,23 @@ And(/I click on purchase confirm button for matched person/) do
   click_link "Confirm"
 end
 
-Then(/I should click on pay now button/) do
+Then(/^I should click on pay now button$/) do
   find('.interaction-click-control-pay-now').click
 end
 
-And(/I should see model pop up/) do
+And(/^I should see model pop up$/) do
   expect(page).to have_css('.modal-open')
 end
 
-And(/I should see Leave DC LINK buttton/) do
+And(/^I should see Leave DC LINK buttton$/) do
   expect(page).to have_content('Leave DC LINK')
 end
 
-And(/I should be able to click  Leave DC LINK buttton/) do
+And(/^I should be able to click  Leave DC LINK buttton$/) do
   find('.interaction-click-control-leave-dc-link').click
   sleep 5
+end
+
+And(/^I should see an alert with error message$/) do
+  expect(page.driver.browser.switch_to.alert.text).to have_content("We're sorry, but something went wrong. You can try again, or pay once you receive your invoice.")
 end

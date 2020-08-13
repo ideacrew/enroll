@@ -16,6 +16,7 @@ Feature: User should be able to pay for plan
     And I should see model pop up
     Then I should see Leave DC LINK buttton
     And I should be able to click  Leave DC LINK buttton
+    And I should see an alert with error message
 
   Examples:
   | role          |
