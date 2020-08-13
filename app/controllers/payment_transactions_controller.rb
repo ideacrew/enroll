@@ -11,8 +11,8 @@ class PaymentTransactionsController < ApplicationController
     response_doc = saml_generator.build_saml_response
     @saml_response = saml_generator.encode_saml_response(response_doc)
     render json: {"SAMLResponse": @saml_response, status: 200}
-    rescue Exception => e
-      render json: {status: 500}
+  rescue StandardError => e
+    render json: {status: 500, error: e}
   end
 end
 
