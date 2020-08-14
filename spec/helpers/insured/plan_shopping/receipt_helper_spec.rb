@@ -124,6 +124,12 @@ RSpec.describe Insured::PlanShopping::ReceiptHelper, :type => :helper do
       issuer_profile.update_attributes(legal_name: 'Something')
       expect(helper.has_any_previous_kaiser_enrollments?).to eq false
     end
+
+    it 'should return false if enrollments do not have product' do
+      hbx_enrollment.update_attributes(product_id: "")
+      hbx_enrollment1.update_attributes(product_id: "")
+      expect(helper.has_any_previous_kaiser_enrollments?).to eq false
+    end
   end
 
   describe 'Whether family has break in coverage enrollments' do
