@@ -15,7 +15,8 @@ module Insured
       end
 
       def has_any_previous_kaiser_enrollments?
-        all_kaiser_enrollments = @enrollment.family.hbx_enrollments.select { |enr| enr.product.issuer_profile.legal_name == EnrollRegistry[:pay_now_functionality].setting(:carriers).item && enr.effective_on.year == @enrollment.effective_on.year }
+        carrier = EnrollRegistry[:pay_now_functionality].setting(:carriers).item
+        all_kaiser_enrollments = @enrollment.family.hbx_enrollments.to_a.select { |enr| !enr.product_id.nil? && enr.product.issuer_profile.legal_name == carrier && enr.effective_on.year == @enrollment.effective_on.year }
         enrollments = all_kaiser_enrollments - @enrollment.to_a
         enrollments.present? ? true : false
       end

@@ -13,7 +13,7 @@ RSpec.describe PaymentTransactionsController, :type => :controller do
   context 'GET generate saml response' do
     before(:each) do
       sign_in user
-      allow(HTTParty).to receive(:get).and_return connection
+      allow(HTTParty).to receive(:post).and_return connection
       allow_any_instance_of(OneLogin::RubySaml::SamlGenerator).to receive(:build_saml_response).and_return build_saml_repsonse
       allow_any_instance_of(OneLogin::RubySaml::SamlGenerator).to receive(:encode_saml_response).and_return encode_saml_response
     end
