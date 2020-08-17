@@ -14,7 +14,7 @@ jobs:
         with:
           ruby-version: "2.5.1"
       - name: Cache Gems
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: vendor/bundle
           key: ${{ runner.os }}-gems-rubocop-${{ hashFiles('**/Gemfile.lock') }}
@@ -43,7 +43,23 @@ jobs:
       - uses: wbari/start-mongoDB@v0.2
         with:
           mongoDBVersion: "3.6"
-      - uses: actions/cache@v1
+      - name: Cache Node Modules
+        id: npm-cache
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
+      - name: yarn install
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: |
+          yarn install
+      - name: run webpack
+        run: |
+          NODE_ENV=test RAILS_ENV=test ./bin/webpack
+      - name: Cache project gems
+        uses: actions/cache@v2
         with:
           path: vendor/bundle
           key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
@@ -220,7 +236,7 @@ jobs:
   #       if: matrix.command_configs.needs_chromedriver
   #       uses: nanasess/setup-chromedriver@master
   #     - name: Cache Gems
-  #       uses: actions/cache@v1
+  #       uses: actions/cache@v2
   #       with:
   #         path: vendor/bundle
   #         key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
@@ -229,7 +245,7 @@ jobs:
   #     - name: Cache Node Modules
   #       id: npm-cache
   #       if: matrix.command_configs.skip_js != 'true'
-  #       uses: actions/cache@v1
+  #       uses: actions/cache@v2
   #       with:
   #         path: node_modules
   #         key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
