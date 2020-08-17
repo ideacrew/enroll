@@ -23,7 +23,7 @@ module OneLogin
       SENDER_VOUCHES = 'urn:oasis:names:tc:SAML:2.0:cm:sendervouches'
       BEARER = 'urn:oasis:names:tc:SAML:2.0:cm:bearer'.freeze
       NAME_FORMAT = 'urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified'
-      PASSWORD = 'urn:oasis:names:tc:SAML:2.0:ac:classes:Password'
+      PASSWORD = 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport'.freeze
 
       attr_reader :transaction_id, :hbx_enrollment, :private_key, :cert
 
@@ -42,8 +42,8 @@ module OneLogin
 
       def build_saml_response
         time = Time.now.utc.iso8601
-        signature_method = XMLSecurity::Document::RSA_SHA1
-        digest_method = XMLSecurity::Document::SHA1
+        signature_method = XMLSecurity::Document::RSA_SHA256
+        digest_method = XMLSecurity::Document::SHA256
 
         response_doc = XMLSecurity::Document.new
         # assertion_doc = XMLSecurity::Document.new
@@ -175,7 +175,7 @@ module OneLogin
       end
 
       def not_on_or_after_condition
-        iso { now + 86400 }
+        iso { now + 300 }
       end
 
       def generate_uuid
