@@ -43,6 +43,20 @@ jobs:
       - uses: wbari/start-mongoDB@v0.2
         with:
           mongoDBVersion: "3.6"
+      - name: Cache project gems
+        uses: actions/cache@v2
+        with:
+          path: vendor/bundle
+          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+      - name: bundle install
+        run: |
+          gem update --system
+          gem install bundler -v '2.0.1'
+          bundle config path vendor/bundle
+          bundle install --jobs 4 --retry 3
+          gem install treye-semaphore_test_boosters --version '2.5.1'
       - name: Cache Node Modules
         id: npm-cache
         uses: actions/cache@v2
@@ -58,20 +72,6 @@ jobs:
       - name: run webpack
         run: |
           NODE_ENV=test RAILS_ENV=test ./bin/webpack
-      - name: Cache project gems
-        uses: actions/cache@v2
-        with:
-          path: vendor/bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
-      - name: bundle install
-        run: |
-          gem update --system
-          gem install bundler -v '2.0.1'
-          bundle config path vendor/bundle
-          bundle install --jobs 4 --retry 3
-          gem install treye-semaphore_test_boosters --version '2.5.1'
       - name: test engine
         run: |
           root=`pwd -P`
