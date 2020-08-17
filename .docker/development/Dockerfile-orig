@@ -1,0 +1,49 @@
+FROM ruby:2.5.1 AS enroll_base
+
+LABEL author="IdeaCrew"
+
+# Configure app home directory
+ENV HOME /enroll
+RUN mkdir -p $HOME
+WORKDIR $HOME
+
+# Install required packages/libraries
+RUN apt-get update && \
+    apt-get -yq dist-upgrade && \
+    apt-get install -y git gcc openssl libyaml-dev libyaml-cpp-dev libyaml-cpp0.5v5 libffi-dev libffi6 libreadline-dev zlibc libgdbm-dev libncurses-dev autoconf fontconfig unzip zip sshpass bzip2 libxrender1 libxext6 && \
+    apt-get autoremove -y 
+
+# Configure bundler and PATH, install bundler version
+ENV LANG=C.UTF-8 \
+    GEM_HOME=/bundle \
+    BUNDLE_JOBS=4 \
+    BUNDLE_RETRY=3
+ENV BUNDLE_PATH $GEM_HOME
+ENV BUNDLE_APP_CONFIG=$BUNDLE_PATH \
+    BUNDLE_BIN=$BUNDLE_PATH/bin
+ENV PATH /enroll/bin:$BUNDLE_BIN:$PATH
+
+ARG BUNDLER_VERSION
+
+RUN gem install bundler:$BUNDLER_VERSION
+
+# Download node version manager and install/configure node
+ENV NVM_DIR=$HOME/.nvm
+RUN mkdir -p $NVM_DIR
+RUN git clone https://github.com/nvm-sh/nvm.git $NVM_DIR && \
+    . $NVM_DIR/nvm.sh && \
+    nvm install 10.16 && \
+    nvm use 10 && \
+    nvm alias default 10 && \
+    . $NVM_DIR/nvm.sh && \
+    npm install --global yarn
+
+COPY . $HOME
+
+# Setting env up
+ENV RAILS_ENV='development'
+ENV NODE_ENV='development'
+
+RUN yarn install --check-files && \
+    bundle config set deployment 'true' && \
+    bundle install
