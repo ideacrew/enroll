@@ -45,8 +45,16 @@ Rails.application.configure do
   # Raises helpful error messages.
   config.assets.raise_runtime_errors = true
 
-  config.acapi.publish_amqp_events = :log
+  #config.acapi.publish_amqp_events = :log
+  config.acapi.publish_amqp_events = true
   config.acapi.app_id = "enroll"
+  config.acapi.remote_broker_uri = "amqp://guest:guest@#{ENV['ACAPI_BROKER_HOST']}:#{ENV['ACAPI_BROKER_PORT']}"
+  config.acapi.remote_request_exchange = "#{ENV['HBX_ID']}.#{ENV['ENV_NAME']}.e.fanout.requests"
+  config.acapi.remote_event_queue = "#{ENV['HBX_ID']}.#{ENV['ENV_NAME']}.q.application.enroll.inbound_events"
+  config.action_mailer.default_url_options = { :host => "localhost" }
+  config.acapi.hbx_id = "#{ENV['HBX_ID']}"
+  config.acapi.environment_name = "#{ENV['ENV_NAME']}"
+
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
 
