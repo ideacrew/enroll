@@ -23,7 +23,7 @@ module OneLogin
       SENDER_VOUCHES = 'urn:oasis:names:tc:SAML:2.0:cm:sendervouches'
       BEARER = 'urn:oasis:names:tc:SAML:2.0:cm:bearer'.freeze
       NAME_FORMAT = 'urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified'
-      PASSWORD = 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport'
+      PASSWORD = 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport'.freeze
 
       attr_reader :transaction_id, :hbx_enrollment, :private_key, :cert
 
