@@ -114,7 +114,7 @@ module OneLogin
       it 'should have subscriber ID' do
         attr_stmt = @noko.xpath('//samlp:Response').children[3].children[4]
         expect(attr_stmt.children[15].attributes['Name'].value).to eq 'Subscriber Identifier'
-        expect(attr_stmt.children[15].children[0].children.text).to eq hbx_enrollment.subscriber.hbx_id
+        expect(attr_stmt.children[15].children[0].children.text).to eq hbx_enrollment.subscriber.hbx_id.rjust(10, '0')
       end
     end
 
