@@ -35,6 +35,7 @@ module OneLogin
       let(:name_id_format) { 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified' }
       let(:sender_token) { 'urn:oasis:names:tc:SAML:2.0:cm:sendervouches' }
       let(:bearer) { 'urn:oasis:names:tc:SAML:2.0:cm:bearer' }
+      let(:password) { 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport' }
       it 'should build return a string with encoded value' do
         expect(@saml_response.class). to eq XMLSecurity::Document
       end
@@ -76,6 +77,7 @@ module OneLogin
         signature = @noko.xpath('//samlp:Response').children[1]
         expect(signature.name). to eq 'Signature'
         expect(signature.namespace.prefix). to eq 'ds'
+        expect(signature.children[0].children[1].attributes['Algorithm'].value.include?("sha256")).to eq true
       end
 
       it 'should have send BEARER as subject confirmation method' do
@@ -87,6 +89,7 @@ module OneLogin
       it 'should sign the assertion and not the response' do
         assertion = @noko.xpath('//samlp:Response').children[3]
         expect(assertion.children.map(&:name)).not_to include('Signature')
+        expect(assertion.children[3].children[0].children[0].text).to eq password
       end
 
       it 'should have payment transaction ID with 13 characters' do
