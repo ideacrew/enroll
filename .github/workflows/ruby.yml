@@ -24,7 +24,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gems-rubocop-${{ hashFiles('**/Gemfile.lock') }}
       - name: bundle install
-        run: bundle install --jobs 2
+        run: |
+          gem update --system
+          bundle install --jobs 2
       - name: Run rubocop
         run: |
           git fetch --no-tags origin
@@ -51,6 +53,7 @@ jobs:
             ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
       - name: bundle install
         run: |
+          gem update --system
           bundle install --jobs 2
           gem install treye-semaphore_test_boosters --version '2.5.1'
       - name: Cache Node Modules
