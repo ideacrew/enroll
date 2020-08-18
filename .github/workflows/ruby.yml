@@ -67,15 +67,13 @@ jobs:
         # if: steps.gem-cache.outputs.cache-hit != 'true'
         run: |
           gem update --system --quiet --silent
-          echo setting bundle path to vendor/bundle
-          bundle config path vendor/bundle
+          echo setting bundle path to $HOME/vendor/bundle
+          bundle config path $HOME/vendor/bundle
           echo starting bundle installation
           bundle install --jobs 2 --quiet
           root=`pwd -P`
           echo $root/components/${{ matrix.engine-name }}
           cd $root/components/${{ matrix.engine-name }}
-          echo updating bundle path to ../../vendor/bundle 
-          bundle config path ../../vendor/bundle
           echo starting bundle installation
           bundle install --jobs 2 --quiet
       # - name: Cache Node Modules
