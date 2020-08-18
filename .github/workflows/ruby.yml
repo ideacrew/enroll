@@ -53,7 +53,8 @@ jobs:
       - uses: wbari/start-mongoDB@v0.2
         with:
           mongoDBVersion: "3.6"
-      - uses: actions/cache@v2
+      - name: Cache Project Gems
+        uses: actions/cache@v2
         with:
           path: vendor/bundle
           key: v5-${{ matrix.engine-name }}-${{ hashFiles('**/Gemfile.lock') }}
@@ -67,6 +68,7 @@ jobs:
           echo switching to ${{ matrix.engine-name }}
           cd components/${{ matrix.engine-name }}
           bundle config path ../../vendor/bundle
+          echo testing caching
           echo installing ${{ matrix.engine-name }} dependencies
           bundle install
       - name: Cache Node Modules
