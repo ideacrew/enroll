@@ -67,6 +67,7 @@ jobs:
           echo switching to ${{ matrix.engine-name }}
           cd components/${{ matrix.engine-name }}
           echo installing ${{ matrix.engine-name }} dependencies
+          echo something else
           bundle install
       - name: Cache Node Modules
         id: npm-cache
