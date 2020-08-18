@@ -66,7 +66,6 @@ jobs:
       - name: install project gems and update bundler
         # if: steps.gem-cache.outputs.cache-hit != 'true'
         run: |
-          bundle config 
           gem update --system
           bundle config 
           bundle install --jobs 2
