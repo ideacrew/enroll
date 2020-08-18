@@ -106,10 +106,6 @@ jobs:
       matrix:
         group: [1, 2, 3, 4]
     steps:
-      - name: log info
-        run: |
-          echo group number ${{ matrix.group }}
-          echo strategy job-total ${{ strategy.job-total }}
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
       - uses: actions/setup-node@v1
@@ -145,7 +141,7 @@ jobs:
       - name: run webpack
         run: NODE_ENV=test RAILS_ENV=test ./bin/webpack
       - name: Run tests
-        run: rspec_booster --job ${{ matrix.group }}/${{ matrix.group-total }}
+        run: rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
   # testing_matrix:
   #   name: ${{matrix.command_configs.name}}
   #   runs-on: ${{ matrix.os }}
