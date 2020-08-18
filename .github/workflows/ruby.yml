@@ -5,35 +5,46 @@ env:
   TEST_BOOSTERS_RSPEC_TEST_FILE_PATTERN: "{spec,components/benefit_markets/spec,components/benefit_sponsors,components/notifier,components/sponsored_benefits,components/transport_gateway,components/transport_profiles}/**/*_spec.rb"
 
 jobs:
-  rubocop:
-    name: Rubocop
-    runs-on: ubuntu-18.04
-    steps:
-      - uses: actions/checkout@v2
-      - uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: "2.5.1"
-      - uses: actions/setup-node@v1
-        with:
-          node-version: "10"
-      - name: Cache Gems
-        uses: actions/cache@v2
-        with:
-          path: vendor/bundle
-          key: ${{ runner.os }}-gems-rubocop-${{ hashFiles('**/Gemfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-gems-rubocop-${{ hashFiles('**/Gemfile.lock') }}
-      - name: bundle install
-        run: |
-          gem update --system
-          bundle install --jobs 2
-      - name: Run rubocop
-        run: |
-          git fetch --no-tags origin
-          bundle exec rubocop-git origin/master
+  # rubocop:
+  #   name: Rubocop
+  #   runs-on: ubuntu-18.04
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: ruby/setup-ruby@v1
+  #       with:
+  #         ruby-version: "2.5.1"
+  #     - uses: actions/setup-node@v1
+  #       with:
+  #         node-version: "10"
+  #     - name: Cache Gems
+  #       uses: actions/cache@v2
+  #       with:
+  #         path: vendor/bundle
+  #         key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+  #     - name: bundle install
+  #       run: |
+  #         gem update --system
+  #         bundle install --jobs 2
+  #     - name: Run rubocop
+  #       run: |
+  #         git fetch --no-tags origin
+  #         bundle exec rubocop-git origin/master
   engine:
     name: engine
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        engine-name:
+          [
+            "benefit_markets",
+            "benefit_sponsors",
+            "notifier",
+            "sponsored_benefits",
+            "transport_gateway",
+            "transport_profiles",
+          ]
     steps:
       - uses: actions/checkout@v2
         with:
@@ -47,13 +58,13 @@ jobs:
       - uses: wbari/start-mongoDB@v0.2
         with:
           mongoDBVersion: "3.6"
-      - name: Cache project gems
-        uses: actions/cache@v2
-        with:
-          path: vendor/bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+      # - name: Cache project gems
+      #   uses: actions/cache@v2
+      #   with:
+      #     path: vendor/bundle
+      #     key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
       - name: bundle install
         run: |
           gem update --system
@@ -77,17 +88,15 @@ jobs:
       - name: test engine
         run: |
           root=`pwd -P`
-          for test_dir in `ls -1 $root/components/ | grep -v old_sponsored_benefits`; do
-            echo $root/components/$test_dir
-            cd $root/components/$test_dir
-            bundle config path ../../vendor/bundle
-            bundle install
-            bundle exec rspec --fail-fast
-            if [ $? -ne 0 ]; then
-              echo "ENGINE FAILED"
-              exit $?
-            fi
-          done
+          echo $root/components/${{ matrix.engine }}
+          cd $root/components/${{ matrix.engine }}
+          bundle config path ../../vendor/bundle
+          bundle install
+          bundle exec 'rake parallel:spec[2]'
+          if [ $? -ne 0 ]; then
+            echo "ENGINE FAILED"
+            exit $?
+          fi
   # testing_matrix:
   #   name: ${{matrix.command_configs.name}}
   #   runs-on: ${{ matrix.os }}
