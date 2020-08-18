@@ -1124,6 +1124,13 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       census_employee.benefit_group_assignments << BenefitGroupAssignment.new(benefit_group: active_benefit_package, start_on: active_benefit_package.benefit_application.start_on)
       expect(census_employee.is_employee_in_term_pending?).to eq true
     end
+
+    it 'should return false if census employee has no active benefit group assignment' do
+      active_benefit_package = census_employee.active_benefit_group_assignment.benefit_package
+      census_employee.update_attributes(employment_terminated_on: active_benefit_package.end_on - 1.month)
+      census_employee.existing_cobra = 'true'
+      expect(census_employee.is_employee_in_term_pending?).to eq false
+    end
   end
 
   context "generate_and_deliver_checkbook_url" do

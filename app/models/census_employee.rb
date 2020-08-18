@@ -1345,6 +1345,7 @@ class CensusEmployee < CensusMember
   def is_employee_in_term_pending?
     return false if employment_terminated_on.blank?
     return false if active_benefit_group_assignment.blank?
+    return false if is_cobra_status?
 
     effective_period = active_benefit_group_assignment.benefit_package.effective_period
     employment_terminated_on <= effective_period.max
