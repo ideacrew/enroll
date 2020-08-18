@@ -56,9 +56,14 @@ jobs:
         with:
           mongoDBVersion: "3.6"
       - name: set up bundler
+        env:
+          CURRENT_ENGINE: ${{ matrix.engine-name }}
+          ROOT: `pwd -P`
         run: |
           gem update --system --quiet --silent
           bundle config path $HOME/vendor/bundle
+          echo hashed gemfile for $ROOT/components/$CURRENT_ENGINE 
+          echo trying to hash $ROOT/components/$CURRENT_ENGINE/Gemfile.lock
       - name: Cache project gems
         id: gem-cache
         uses: actions/cache@v2
