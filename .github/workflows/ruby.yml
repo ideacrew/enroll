@@ -5,33 +5,33 @@ env:
   TEST_BOOSTERS_RSPEC_TEST_FILE_PATTERN: "{spec,components/benefit_markets/spec,components/benefit_sponsors,components/notifier,components/sponsored_benefits,components/transport_gateway,components/transport_profiles}/**/*_spec.rb"
 
 jobs:
-  # rubocop:
-  #   name: Rubocop
-  #   runs-on: ubuntu-18.04
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - uses: ruby/setup-ruby@v1
-  #       with:
-  #         ruby-version: "2.5.1"
-  #     - uses: actions/setup-node@v1
-  #       with:
-  #         node-version: "10"
-  #     - name: Cache Gems
-  #       uses: actions/cache@v2
-  #       with:
-  #         path: vendor/bundle
-  #         key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
-  #         restore-keys: |
-  #           ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
-  #     - name: bundle install
-  #       run: |
-  #         gem update --system
-  #         bundle install --jobs 2
-  #     - name: Run rubocop
-  #       run: |
-  #         git fetch --no-tags origin
-  #         bundle exec rubocop-git origin/master
+  rubocop:
+    name: Rubocop
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ruby/setup-ruby@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "10"
+      - name: Cache Gems
+        uses: actions/cache@v2
+        with:
+          path: vendor/bundle
+          key: v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            v2-${{ runner.os }}-gems-
+      - name: bundle install
+        run: |
+          gem update --system
+          bundle config path vendor/bundle
+          bundle install
+      - name: Run rubocop
+        run: |
+          git fetch --no-tags origin
+          bundle exec rubocop-git origin/master
   engine:
+    needs: [rubocop]
     name: engine
     runs-on: ubuntu-latest
     strategy:
@@ -56,7 +56,7 @@ jobs:
       - uses: wbari/start-mongoDB@v0.2
         with:
           mongoDBVersion: "3.6"
-      - name: Cache Project Gems
+      - name: Restore Project Gems
         uses: actions/cache@v2
         with:
           path: vendor/bundle
@@ -74,7 +74,7 @@ jobs:
           echo testing caching
           echo installing ${{ matrix.engine-name }} dependencies
           bundle install
-      - name: Cache Node Modules
+      - name: Restore Node Modules
         id: npm-cache
         uses: actions/cache@v2
         with:
