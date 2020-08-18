@@ -66,14 +66,18 @@ jobs:
       - name: install project gems and update bundler
         # if: steps.gem-cache.outputs.cache-hit != 'true'
         run: |
-          gem update --system --quiet
+          gem update --system --quiet --silent
+          echo setting bundle path to vendor/bundle
           bundle config path vendor/bundle
-          bundle install --jobs 2
+          echo starting bundle installation
+          bundle install --jobs 2 --quiet
           root=`pwd -P`
           echo $root/components/${{ matrix.engine-name }}
           cd $root/components/${{ matrix.engine-name }}
+          echo updating bundle path to ../../vendor/bundle 
           bundle config path ../../vendor/bundle
-          bundle install --jobs 2
+          echo starting bundle installation
+          bundle install --jobs 2 --quiet
       # - name: Cache Node Modules
       #   id: npm-cache
       #   uses: actions/cache@v2
@@ -88,6 +92,8 @@ jobs:
           yarn install
       - name: run webpack
         run: |
+          echo bundle config
+          bundle config list
           NODE_ENV=test RAILS_ENV=test ./bin/webpack
       - name: test engine
         run: |
