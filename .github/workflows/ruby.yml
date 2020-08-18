@@ -85,12 +85,14 @@ jobs:
         run: |
           echo bundle config
           bundle config list
+          bundle config path vendor/bundle
           NODE_ENV=test RAILS_ENV=test ./bin/webpack
       - name: test engine
         run: |
           root=`pwd -P`
           echo $root/components/${{ matrix.engine-name }}
           cd $root/components/${{ matrix.engine-name }}
+          bundle config path ../../vendor/bundle
           bundle exec rspec --fail-fast
   # testing_matrix:
   #   name: ${{matrix.command_configs.name}}
