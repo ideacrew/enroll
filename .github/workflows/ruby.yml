@@ -59,6 +59,7 @@ jobs:
         with:
           mongoDBVersion: "3.6"
       - name: Cache project gems
+        id: gems-cache
         uses: actions/cache@v2
         with:
           path: vendor/bundle
@@ -66,6 +67,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gems-${{ matrix.engine-name }}-${{ hashFiles('**/Gemfile.lock') }}
       - name: install project gems and update bundler
+        if: steps.gem-cache.outputs.cache-hit != 'true'
         run: |
           gem update --system
           bundle install --jobs 2
