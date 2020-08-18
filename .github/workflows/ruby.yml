@@ -58,54 +58,52 @@ jobs:
       - name: set up bundler
         env:
           CURRENT_ENGINE: ${{ matrix.engine-name }}
-          ROOT: pwd -P
         run: |
           gem update --system --quiet --silent
           bundle config path $HOME/vendor/bundle
           rt=`pwd -P`
-          echo hashed gemfile for $ROOT/components/$CURRENT_ENGINE 
           echo hashed gemfile for $rt/components/$CURRENT_ENGINE 
-          echo trying to hash $ROOT/components/$CURRENT_ENGINE/Gemfile.lock
           echo trying to hash $rt/components/$CURRENT_ENGINE/Gemfile.lock
-      - name: Cache project gems
-        id: gem-cache
-        uses: actions/cache@v2
-        with:
-          path: vendor/bundle
-          key: ${{ runner.os }}-gems-v2-${{ matrix.engine-name }}-${{ hashFiles('**/Gemfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-gems-v2-${{ matrix.engine-name }}-${{ hashFiles('**/Gemfile.lock') }}
-      - name: install necessary gems
-        if: steps.gem-cache.outputs.cache-hit != 'true'
-        run: |
-          bundle install --quiet
-          root=`pwd -P`
-          cd $root/components/${{ matrix.engine-name }}
-          echo starting bundle installation
-          bundle install --quiet
-      - name: Cache Node Modules
-        id: npm-cache
-        uses: actions/cache@v2
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
-      - name: yarn install
-        if: steps.npm-cache.outputs.cache-hit != 'true'
-        run: |
-          yarn install
-      - name: run webpack
-        run: |
-          echo bundle config
-          bundle config list
-          NODE_ENV=test RAILS_ENV=test ./bin/webpack
-      - name: test engine
-        run: |
-          root=`pwd -P`
-          echo $root/components/${{ matrix.engine-name }}
-          cd $root/components/${{ matrix.engine-name }}
-          bundle exec rspec --fail-fast
+          echo ${{ hashFiles($rt/components/$CURRENT_ENGINE/ + 'Gemfile.lock') }}
+      # - name: Cache project gems
+      #   id: gem-cache
+      #   uses: actions/cache@v2
+      #   with:
+      #     path: vendor/bundle
+      #     key: ${{ runner.os }}-gems-v2-${{ matrix.engine-name }}-${{ hashFiles('**/Gemfile.lock') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-gems-v2-${{ matrix.engine-name }}-${{ hashFiles('**/Gemfile.lock') }}
+      # - name: install necessary gems
+      #   if: steps.gem-cache.outputs.cache-hit != 'true'
+      #   run: |
+      #     bundle install --quiet
+      #     root=`pwd -P`
+      #     cd $root/components/${{ matrix.engine-name }}
+      #     echo starting bundle installation
+      #     bundle install --quiet
+      # - name: Cache Node Modules
+      #   id: npm-cache
+      #   uses: actions/cache@v2
+      #   with:
+      #     path: node_modules
+      #     key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
+      # - name: yarn install
+      #   if: steps.npm-cache.outputs.cache-hit != 'true'
+      #   run: |
+      #     yarn install
+      # - name: run webpack
+      #   run: |
+      #     echo bundle config
+      #     bundle config list
+      #     NODE_ENV=test RAILS_ENV=test ./bin/webpack
+      # - name: test engine
+      #   run: |
+      #     root=`pwd -P`
+      #     echo $root/components/${{ matrix.engine-name }}
+      #     cd $root/components/${{ matrix.engine-name }}
+      #     bundle exec rspec --fail-fast
   # testing_matrix:
   #   name: ${{matrix.command_configs.name}}
   #   runs-on: ${{ matrix.os }}
