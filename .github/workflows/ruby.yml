@@ -32,6 +32,7 @@ jobs:
           bundle exec rubocop-git origin/master
   testing_matrix:
     name: ${{matrix.command_configs.name}}
+    needs: [rubocop]
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
