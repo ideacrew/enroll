@@ -56,9 +56,9 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: vendor/bundle
-          key: v4-${{ matrix.engine-name }}-${{ hashFiles('**/Gemfile.lock') }}
+          key: v5-${{ matrix.engine-name }}-${{ hashFiles('**/Gemfile.lock') }}
           restore-keys: |
-            v4-${{ matrix.engine-name }}-
+            v5-${{ matrix.engine-name }}-
       - name: bundle install
         run: |
           gem update --system --quiet --silent
@@ -66,6 +66,7 @@ jobs:
           bundle install
           echo switching to ${{ matrix.engine-name }}
           cd components/${{ matrix.engine-name }}
+          bundle config path ../../vendor/bundle
           echo installing ${{ matrix.engine-name }} dependencies
           bundle install
       - name: Cache Node Modules
