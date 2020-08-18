@@ -36,19 +36,26 @@ module BenefitSponsors
             success:  ->(benefit_application){"validated successfully"},
             fail:     ->(benefit_application){"At least one member must be eligible to enroll" }
 
+    rule :all_waived_members_eligiblity,
+         validate: ->(benefit_application){ benefit_application.total_enrolled_count > benefit_application.all_waived_member_count },
+         success: ->(_benefit_application){"validated successfully"},
+         fail: ->(_benefit_application){"At least one eligible member enrolling must not be waived" }
+
+
     business_policy :enrollment_elgibility_policy,
                     rules: [:minimum_participation_rule, :non_business_owner_enrollment_count, :minimum_eligible_member_count]
 
+    business_policy :enrollment_elgibility_extended_policy,
+                    rules: [:minimum_participation_rule, :non_business_owner_enrollment_count, :minimum_eligible_member_count, :all_waived_members_eligiblity]
+
     def business_policies_for(model_instance, event_name)
       if model_instance.is_a?(BenefitSponsors::BenefitApplications::BenefitApplication)
-        enrollment_eligiblity_policy_for(model_instance)
+        if ::EnrollRegistry.feature_enabled?(:waived_members_eligiblity) && event_name == :end_open_enrollment
+          business_policies[:enrollment_elgibility_extended_policy]
+        else
+          business_policies[:enrollment_elgibility_policy]
+        end
       end
-    end
-
-    private
-
-    def enrollment_eligiblity_policy_for(model_instance)
-      business_policies[:enrollment_elgibility_policy]
     end
   end
 end
