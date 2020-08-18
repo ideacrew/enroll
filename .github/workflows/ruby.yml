@@ -36,12 +36,15 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        engine-name: ["benefit_markets"]
-    # "benefit_sponsors",
-    # "notifier",
-    # "sponsored_benefits",
-    # "transport_gateway",
-    # "transport_profiles",
+        engine-name:
+          [
+            "benefit_markets",
+            "benefit_sponsors",
+            "notifier",
+            "sponsored_benefits",
+            "transport_gateway",
+            "transport_profiles",
+          ]
     steps:
       - uses: actions/checkout@v2
         with:
