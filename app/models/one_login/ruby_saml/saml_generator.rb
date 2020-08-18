@@ -144,7 +144,7 @@ module OneLogin
         when 'Contact Email Address'
           hbx_enrollment.subscriber.person.work_email_or_best
         when 'Subscriber Identifier'
-          hbx_enrollment.subscriber.person.hbx_id
+          hbx_enrollment.subscriber.person.hbx_id.rjust(10, '0')
         when 'Additional Information'
           hbx_enrollment.hbx_enrollment_members.map(&:person).map{|person| person.first_name_last_name_and_suffix(',')}.join(';')
         end
