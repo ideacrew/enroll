@@ -66,14 +66,16 @@ jobs:
       - name: install project gems and update bundler
         # if: steps.gem-cache.outputs.cache-hit != 'true'
         run: |
+          bundle config 
           gem update --system
+          bundle config 
           bundle install --jobs 2
           bundle config 
           root=`pwd -P`
           echo $root/components/${{ matrix.engine-name }}
           cd $root/components/${{ matrix.engine-name }}
           bundle config path ../../vendor/bundle
-          bundle config
+          echo bundle config
           bundle install
       # - name: Cache Node Modules
       #   id: npm-cache
