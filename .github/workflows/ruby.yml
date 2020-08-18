@@ -56,9 +56,9 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: vendor/bundle
-          key: ${{ matrix.engine-name }}-${{ hashFiles('**/Gemfile.lock') }}
+          key: v2-${{ matrix.engine-name }}-${{ hashFiles('**/Gemfile.lock') }}
           restore-keys: |
-            ${{ matrix.engine-name }}-
+            v2-${{ matrix.engine-name }}-
       - name: bundle install
         run: |
           gem update --system --quiet --silent
