@@ -55,27 +55,26 @@ jobs:
       - uses: wbari/start-mongoDB@v0.2
         with:
           mongoDBVersion: "3.6"
-      # - name: Cache project gems
-      #   id: gem-cache
-      #   uses: actions/cache@v2
-      #   with:
-      #     path: vendor/bundle
-      #     key: ${{ runner.os }}-gems-v2-${{ matrix.engine-name }}-${{ hashFiles('**/Gemfile.lock') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-gems-v2-${{ matrix.engine-name }}-${{ hashFiles('**/Gemfile.lock') }}
-      - name: install project gems and update bundler
-        # if: steps.gem-cache.outputs.cache-hit != 'true'
+      - name: set up bundler
         run: |
           gem update --system --quiet --silent
-          echo setting bundle path to $HOME/vendor/bundle
           bundle config path $HOME/vendor/bundle
-          echo starting bundle installation
-          bundle install --jobs 2 --quiet
+      - name: Cache project gems
+        id: gem-cache
+        uses: actions/cache@v2
+        with:
+          path: vendor/bundle
+          key: ${{ runner.os }}-gems-v2-${{ matrix.engine-name }}-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-gems-v2-${{ matrix.engine-name }}-${{ hashFiles('**/Gemfile.lock') }}
+      - name: install necessary gems
+        if: steps.gem-cache.outputs.cache-hit != 'true'
+        run: |
+          bundle install --quiet
           root=`pwd -P`
-          echo $root/components/${{ matrix.engine-name }}
           cd $root/components/${{ matrix.engine-name }}
           echo starting bundle installation
-          bundle install --jobs 2 --quiet
+          bundle install --quiet
       - name: Cache Node Modules
         id: npm-cache
         uses: actions/cache@v2
