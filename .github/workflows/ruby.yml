@@ -65,11 +65,10 @@ jobs:
           key: ${{ runner.os }}-gems-${{ matrix.engine-name }}-${{ hashFiles('**/Gemfile.lock') }}
           restore-keys: |
             ${{ runner.os }}-gems-${{ matrix.engine-name }}-${{ hashFiles('**/Gemfile.lock') }}
-      - name: bundle install
+      - name: install project gems and update bundler
         run: |
           gem update --system
           bundle install --jobs 2
-          gem install treye-semaphore_test_boosters --version '2.5.1'
       - name: Cache Node Modules
         id: npm-cache
         uses: actions/cache@v2
@@ -97,12 +96,7 @@ jobs:
           root=`pwd -P`
           echo $root/components/${{ matrix.engine-name }}
           cd $root/components/${{ matrix.engine-name }}
-
           bundle exec rspec --fail-fast
-          if [ $? -ne 0 ]; then
-            echo "ENGINE FAILED"
-            exit $?
-          fi
   # testing_matrix:
   #   name: ${{matrix.command_configs.name}}
   #   runs-on: ${{ matrix.os }}
