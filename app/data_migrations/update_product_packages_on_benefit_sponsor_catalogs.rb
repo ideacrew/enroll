@@ -21,7 +21,7 @@ class UpdateProductPackagesOnBenefitSponsorCatalogs < MongoidMigrationTask
           market_catalog = BenefitSponsors::Site.all.where(site_key: :dc).first.benefit_market_for(:aca_shop).benefit_market_catalogs.detect{|market| market.product_active_year == 2020}
           sponsor_catalog = ba.benefit_sponsor_catalog
           sponsor_catalog.product_packages.where(benefit_kind: :aca_shop, product_kind: :health).destroy_all
-          sponsor_catalog.product_packages << market_catalog.product_packages.where( benefit_kind: :aca_shop, product_kind: :health).collect do |product_package|
+          sponsor_catalog.product_packages << market_catalog.product_packages.where(benefit_kind: :aca_shop, product_kind: :health).collect do |product_package|
             construct_sponsor_product_package(product_package, sponsor_catalog)
           end
           count += 1
