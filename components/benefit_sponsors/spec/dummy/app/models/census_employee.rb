@@ -6,9 +6,9 @@ class CensusEmployee < CensusMember
   include Config::AcaModelConcern
   include BenefitSponsors::Concerns::Observable
   include ::BenefitSponsors::ModelEvents::CensusEmployee
-  
+
   require 'roo'
-  
+
   EMPLOYMENT_ACTIVE_STATES = %w(eligible employee_role_linked employee_termination_pending newly_designated_eligible newly_designated_linked cobra_eligible cobra_linked cobra_termination_pending)
   EMPLOYMENT_TERMINATED_STATES = %w(employment_terminated cobra_terminated rehired)
   ELIGIBLE_STATES = %w(eligible newly_designated_eligible cobra_eligible employee_termination_pending cobra_termination_pending)
@@ -322,6 +322,16 @@ class CensusEmployee < CensusMember
     end
   end
 
+  def waiving_on_eod?
+    if renewal_benefit_group_assignment.present?
+      renewal_benefit_group_assignment.aasm_state == 'coverage_waived' || active_benefit_group_assignment.aasm_state == 'coverage_waived'
+    elsif active_benefit_group_assignment.present?
+      active_benefit_group_assignment.aasm_state == 'coverage_waived'
+    else
+      false
+    end
+  end
+  
   def renewal_benefit_group_assignment=(renewal_package_id)
     benefit_application = BenefitSponsors::BenefitApplications::BenefitApplication.where(
       :"benefit_packages._id" => renewal_package_id
@@ -378,7 +388,7 @@ class CensusEmployee < CensusMember
   def coverage_effective_on(package = nil)
   package = possible_benefit_package if (package.blank? || package.is_conversion?) # cautious
   if package.present?
-    
+
     effective_on_date = package.effective_on_for(hired_on)
     if newly_designated_eligible? || newly_designated_linked?
       effective_on_date = [effective_on_date, newly_eligible_earlist_eligible_date].max
@@ -396,7 +406,7 @@ end
 
   def earliest_eligible_date
     benefit_group_assignment = renewal_benefit_group_assignment || active_benefit_group_assignment
-    
+
     if benefit_group_assignment
       benefit_group_assignment.benefit_group.eligible_on(hired_on)
     end

@@ -565,7 +565,7 @@ module BenefitSponsors
               allow(renewal_application.benefit_sponsorship).to receive(:census_employees).and_return(census_employee_scope)
               allow(TimeKeeper).to receive(:date_of_record).and_return(Time.now + 1.month)
             end
-          
+
             it "should not send duplicate invitations, even with time travel activated" do
               renewal_application.send_employee_renewal_invites
               expect(::Invitation.count).to eq(2)
@@ -1057,6 +1057,29 @@ module BenefitSponsors
       end
     end
 
+    describe '.all_waived_member_count', dbclean: :after_each do
+      include_context "setup benefit market with market catalogs and product packages"
+      include_context "setup renewal application"
+      include_context "setup employees with benefits"
+
+      before :each do
+        employees = []
+        benefit_sponsorship.census_employees.each do |ce|
+          family = FactoryBot.create(:family, :with_primary_family_member)
+          allow(ce).to receive(:family).and_return(family)
+          employees << ce
+          ce.active_benefit_group_assignment.aasm_state = 'coverage_waived'
+          ce.active_benefit_group_assignment.save
+          ce.save
+        end
+        allow(renewal_application).to receive(:active_census_employees_under_py).and_return(employees)
+      end
+
+      it 'should not return the waived EEs count' do
+        expect(renewal_application.all_waived_member_count).to eq 5
+      end
+    end
+
     describe '.successor_benefit_package', dbclean: :after_each do
       include_context "setup benefit market with market catalogs and product packages"
       include_context "setup renewal application"
@@ -1263,7 +1286,7 @@ end
 
         let(:start_on) { TimeKeeper.date_of_record + 2.years }
 
-        context "start on is on january 1st" do 
+        context "start on is on january 1st" do
           let(:effective_period) { start_on.beginning_of_year..start_on.end_of_year }
 
           it 'should return system default minimum ratio' do
@@ -1286,10 +1309,10 @@ end
         context "fehb market" do
           it 'should have feature disabled' do
             expect(::EnrollRegistry.feature_enabled?("#{market.kind}_fetch_enrollment_minimum_participation_#{start_on.year}")).to be_falsey
-          end 
+          end
         end
 
-        context "start on is on january 1st" do 
+        context "start on is on january 1st" do
           let(:effective_period) { start_on.beginning_of_year..start_on.end_of_year }
 
           it 'should return system default minimum ratio' do

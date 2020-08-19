@@ -17,9 +17,9 @@ jobs:
         uses: actions/cache@v1
         with:
           path: vendor/bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+          key: ${{ runner.os }}-gems-rubocop-${{ hashFiles('**/Gemfile.lock') }}
           restore-keys: |
-            ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+            ${{ runner.os }}-gems-rubocop-${{ hashFiles('**/Gemfile.lock') }}
       - name: bundle install
         run: |
           gem update --system
@@ -32,6 +32,7 @@ jobs:
           bundle exec rubocop-git origin/master
   testing_matrix:
     name: ${{matrix.command_configs.name}}
+    needs: [rubocop]
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
