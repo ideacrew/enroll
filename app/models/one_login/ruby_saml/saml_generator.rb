@@ -83,7 +83,7 @@ module OneLogin
         subject_confirmation = subject.add_element 'saml:SubjectConfirmation', { 'Method' => BEARER }
         confirmation_data = subject_confirmation.add_element 'saml:SubjectConfirmationData'
         confirmation_data.attributes['NotOnOrAfter'] = not_on_or_after_condition.to_s
-        confirmation_data.attributes['Recipient'] = "https://sso.healthplan.com/sp/ACS.saml2"
+        confirmation_data.attributes['Recipient'] = SamlInformation.kp_pay_now_url
 
         # conditions
         assertion.add_element 'saml:Conditions', { 'NotBefore' => "#{not_before}",  'NotOnOrAfter' => "#{not_on_or_after_condition}" }
