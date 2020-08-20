@@ -28,7 +28,8 @@ class SamlInformation
     'kp_pay_now_issuer',
     'kp_pay_now_url',
     'kp_pay_now_private_key_location',
-    'kp_pay_now_x509_cert_location'
+    'kp_pay_now_x509_cert_location',
+    'kp_pay_now_audience'
   ]
 
   attr_reader :config
