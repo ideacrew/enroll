@@ -29,8 +29,7 @@ async function getJson() {
       filePath: removeLeadingDotSlash(key),
       ...value,
     }))
-    .sort((a, b) => (a.runTime < b.runTime ? 1 : -1))
-    .slice(0, 200);
+    .sort((a, b) => (a.runTime < b.runTime ? 1 : -1));
 
   const splitConfig = splitFilesIntoGroups(20, arrayOfSlowFiles);
 
