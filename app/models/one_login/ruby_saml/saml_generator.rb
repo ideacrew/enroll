@@ -87,7 +87,7 @@ module OneLogin
         confirmation_data.attributes['Recipient'] = SamlInformation.kp_pay_now_url
 
         # conditions
-        conditions = assertion.add_element 'saml:Conditions', { 'NotBefore' => "#{not_before}",  'NotOnOrAfter' => "#{not_on_or_after_condition}" }
+        conditions = assertion.add_element 'saml:Conditions', { 'NotBefore' => not_before.to_s,  'NotOnOrAfter' => not_on_or_after_condition.to_s }
         audience_restriction = conditions.add_element 'saml:AudienceRestriction'
         audience = audience_restriction.add_element 'saml:Audience'
         audience.text = SamlInformation.kp_pay_now_audience
