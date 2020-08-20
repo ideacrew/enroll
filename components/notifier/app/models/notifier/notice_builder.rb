@@ -218,7 +218,7 @@ module Notifier
 
     def invoice_date
       date_string = file_name.split("_")[1]
-      Date.strptime(date_string, "%m%d%Y")
+      Date.strptime(date_string, "%m%d%Y%H%M")
     end
 
     def recipient_name
