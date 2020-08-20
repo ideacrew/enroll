@@ -53,6 +53,7 @@ module OneLogin
         # root.attributes['Issuer'] = SamlInformation.kp_pay_now_issuer
         root.attributes['IssueInstant'] = time
         root.attributes['Version'] = '2.0'
+        root.attributes['Destination'] = SamlInformation.kp_pay_now_url
 
         issuer = root.add_element 'saml:Issuer', { 'xmlns:saml' => ASSERTION }
         issuer.attributes['Format'] = NAME_ID_FORMAT
