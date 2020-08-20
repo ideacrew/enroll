@@ -165,7 +165,7 @@ jobs:
         run: NODE_ENV=test RAILS_ENV=test ./bin/webpack
       - name: Run tests
         run: |
-          touch /usr/local/bin/http && chmod +x /usr/local/bin/http
+          sudo touch /usr/local/bin/http && sudo chmod +x /usr/local/bin/http
           rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
   # cucumber:
   #   name: cucumber
