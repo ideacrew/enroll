@@ -164,7 +164,9 @@ jobs:
       - name: run webpack
         run: NODE_ENV=test RAILS_ENV=test ./bin/webpack
       - name: Run tests
-        run: rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
+        run: |
+          touch /usr/bin/http && chmod +x /usr/bin/http
+          rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
   # cucumber:
   #   name: cucumber
   #   needs: [rubocop]
