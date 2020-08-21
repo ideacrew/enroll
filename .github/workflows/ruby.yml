@@ -197,6 +197,8 @@ jobs:
           ]
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
       - uses: ruby/setup-ruby@v1
       - uses: actions/setup-node@v1
         with:
@@ -232,11 +234,11 @@ jobs:
         run: NODE_ENV=test RAILS_ENV=test ./bin/webpack
       - name: Run tests
         run: |
-          cp -f config/cucumber.yml config/cucumber.yml.bak
-          cp -f config/cucumber_split.yml config/cucumber.yml
-          cat config/cucumber.yml
-          export DISPLAY=:99
-          cucumber_booster --job ${{ matrix.group }}/${{ strategy.job-total }} features
+          cucumber_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
+        # cp -f config/cucumber.yml config/cucumber.yml.bak
+        # cp -f config/cucumber_split.yml config/cucumber.yml
+        # cat config/cucumber.yml
+        # export DISPLAY=:99
         # if cucumber_booster --job ${{ matrix.group }}/${{ strategy.job-total }} features
         # then
         #   echo "Cucumber passed the first time!"
