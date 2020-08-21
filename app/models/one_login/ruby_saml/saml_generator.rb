@@ -56,7 +56,7 @@ module OneLogin
         root.attributes['Destination'] = SamlInformation.kp_pay_now_url
 
         issuer = root.add_element 'saml:Issuer', { 'xmlns:saml' => ASSERTION }
-        issuer.attributes['Format'] = NAME_ID_FORMAT
+        #issuer.attributes['Format'] = NAME_ID_FORMAT
         issuer.text = SamlInformation.kp_pay_now_issuer
 
         # add success message
@@ -72,7 +72,7 @@ module OneLogin
         assertion.attributes['IssueInstant'] =  time
         assertion.attributes['Version'] = '2.0'
 
-        issuer = assertion.add_element 'saml:Issuer', { 'Format' => NAME_ID_FORMAT }
+        issuer = assertion.add_element 'saml:Issuer' #, { 'Format' => NAME_ID_FORMAT }
         issuer.text = SamlInformation.kp_pay_now_issuer
 
         # subject
