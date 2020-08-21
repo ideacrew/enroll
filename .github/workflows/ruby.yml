@@ -168,7 +168,7 @@ jobs:
   #       run: rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
   cucumber:
     name: cucumber
-    needs: [rubocop]
+    # needs: [rubocop]
     runs-on: ubuntu-latest
     strategy:
       matrix:
