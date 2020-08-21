@@ -35,7 +35,7 @@ async function getJson() {
 
   const jsonList = JSON.stringify(splitConfig);
 
-  await fs.writeFile("./ci/split-config.json", jsonList);
+  await fs.writeFile("./ci/rspec-split-config.json", jsonList);
 }
 
 getJson();
@@ -44,10 +44,10 @@ function splitFilesIntoGroups(numberOfGroups, arr) {
   console.log("Splitting", arr.length, "files into", numberOfGroups, "groups");
   let split = [];
 
-  for (let i = 0; i < arr.length; i++) {
+  const length = arr.length;
+  for (let i = 0; i < length; i++) {
+    // e.g. 0 % 20 = 0, 1 % 20 = 1, 43 % 20 = 3
     const bucket = i % numberOfGroups;
-
-    console.log("Putting files into bucket", bucket);
 
     split[bucket] =
       split[bucket] === undefined
