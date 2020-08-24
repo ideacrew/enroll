@@ -104,6 +104,7 @@ jobs:
           bundle exec rspec --fail-fast
   rspec:
     name: rspec
+    needs: [rubocop]
     runs-on: ubuntu-latest
     strategy:
       matrix:
