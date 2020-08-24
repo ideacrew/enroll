@@ -305,6 +305,7 @@ And(/Individual again clicks on add member button/) do
   #testing
   screenshot("added member")
   all(:css, ".mz").last.click
+  sleep 2
 end
 
 

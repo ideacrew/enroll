@@ -7,10 +7,6 @@ module BenefitSponsors
 
     routes { BenefitSponsors::Engine.routes }
 
-    before :all do
-      DatabaseCleaner.clean
-    end
-
     let!(:site)                          { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
     let(:organization_with_hbx_profile)  { site.owner_organization }
     let!(:organization)                  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_general_agency_profile, site: site) }
@@ -133,6 +129,7 @@ module BenefitSponsors
     describe "GET search_general_agency" do
 
       before do
+        Person.create_indexes
         general_agency_staff_role.update_attributes!(is_primary: true)
         general_agency_profile1.approve!
         organization.reload

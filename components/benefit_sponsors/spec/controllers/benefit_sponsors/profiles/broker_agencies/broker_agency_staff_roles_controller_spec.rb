@@ -246,9 +246,10 @@ module BenefitSponsors
       end
     end
 
-    xdescribe "GET search_broker_agency", dbclean: :after_each  do
+    describe "GET search_broker_agency" do
 
       before do
+        Person.create_indexes
         broker_agency_profile1.update_attributes!(primary_broker_role_id: broker_role1.id)
         broker_agency_profile1.approve!
         organization.reload
@@ -256,7 +257,7 @@ module BenefitSponsors
         get :search_broker_agency, params: params, format: :js, xhr: true
       end
 
-      context "return result if broker agency is present", dbclean: :after_each  do
+      context "return result if broker agency is present" do
 
         let!(:params) do
           {
@@ -278,7 +279,7 @@ module BenefitSponsors
         end
       end
 
-      context "should not return result", dbclean: :after_each  do
+      context "should not return result" do
 
         let!(:params) do
           {
