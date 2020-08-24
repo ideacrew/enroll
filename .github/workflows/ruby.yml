@@ -9,7 +9,7 @@ env:
 
 jobs:
   rubocop:
-    name: Rubocop
+    name: rubocop
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
@@ -31,7 +31,7 @@ jobs:
           bundle install
       - name: Run rubocop
         run: |
-          git fetch --no-tags origin
+          git fetch --no-tags --depth=1 origin master
           bundle exec rubocop-git origin/master
   engine:
     needs: [rubocop]
