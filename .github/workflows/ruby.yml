@@ -2,200 +2,156 @@ name: Rspec and Cucumbers
 on: push
 
 env:
-  REPORT_PATH: "ci/cuke-report.json"
-  CUCUMBER_SPLIT_CONFIGURATION_PATH: "ci/cucumber-split-config.json"
-  RSPEC_SPLIT_CONFIGURATION_PATH: "ci/rspec-split-config.json"
+  # REPORT_PATH: "ci/cuke-report.json"
+  # CUCUMBER_SPLIT_CONFIGURATION_PATH: "ci/cucumber-split-config.json"
+  # RSPEC_SPLIT_CONFIGURATION_PATH: "ci/rspec-split-config.json"
   TEST_BOOSTERS_RSPEC_TEST_FILE_PATTERN: "{spec,components/benefit_markets/spec,components/benefit_sponsors,components/notifier,components/sponsored_benefits,components/transport_gateway,components/transport_profiles}/**/*_spec.rb"
 
 jobs:
-  # rubocop:
-  #   name: Rubocop
-  #   runs-on: ubuntu-18.04
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - uses: ruby/setup-ruby@v1
-  #     - uses: actions/setup-node@v1
-  #       with:
-  #         node-version: "10"
-  #     - name: Cache Gems
-  #       uses: actions/cache@v2
-  #       with:
-  #         path: vendor/bundle
-  #         key: v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
-  #         restore-keys: |
-  #           v2-${{ runner.os }}-gems-
-  #     - name: bundle install
-  #       run: |
-  #         gem update --system
-  #         bundle config path vendor/bundle
-  #         bundle install
-  #     - name: Run rubocop
-  #       run: |
-  #         git fetch --no-tags origin
-  #         bundle exec rubocop-git origin/master
-  # engine:
-  #   needs: [rubocop]
-  #   name: engine
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     matrix:
-  #       engine-name:
-  #         [
-  #           "benefit_markets",
-  #           "benefit_sponsors",
-  #           "notifier",
-  #           "sponsored_benefits",
-  #           "transport_gateway",
-  #           "transport_profiles",
-  #         ]
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #       with:
-  #         fetch-depth: 1
-  #     - uses: ruby/setup-ruby@v1
-  #     - uses: actions/setup-node@v1
-  #       with:
-  #         node-version: "10"
-  #     - uses: wbari/start-mongoDB@v0.2
-  #       with:
-  #         mongoDBVersion: "3.6"
-  #     - name: Restore Project Gems
-  #       uses: actions/cache@v2
-  #       with:
-  #         path: vendor/bundle
-  #         key: v5-${{ matrix.engine-name }}-${{ hashFiles('**/Gemfile.lock') }}
-  #         restore-keys: |
-  #           v5-${{ matrix.engine-name }}-
-  #     - name: bundle install
-  #       run: |
-  #         gem update --system --quiet --silent
-  #         bundle config path vendor/bundle
-  #         bundle install
-  #         echo switching to ${{ matrix.engine-name }}
-  #         cd components/${{ matrix.engine-name }}
-  #         bundle config path ../../vendor/bundle
-  #         echo testing caching
-  #         echo installing ${{ matrix.engine-name }} dependencies
-  #         bundle install
-  #     - name: Restore Node Modules
-  #       id: npm-cache
-  #       uses: actions/cache@v2
-  #       with:
-  #         path: node_modules
-  #         key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
-  #         restore-keys: |
-  #           ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
-  #     - name: yarn install
-  #       if: steps.npm-cache.outputs.cache-hit != 'true'
-  #       run: |
-  #         yarn install
-  #     - name: run webpack
-  #       run: |
-  #         echo bundle config
-  #         bundle config list
-  #         bundle config path vendor/bundle
-  #         NODE_ENV=test RAILS_ENV=test ./bin/webpack
-  #     - name: test engine
-  #       run: |
-  #         root=`pwd -P`
-  #         echo $root/components/${{ matrix.engine-name }}
-  #         cd $root/components/${{ matrix.engine-name }}
-  #         bundle config path ../../vendor/bundle
-  #         bundle exec rspec --fail-fast
-  # rspec:
-  #   name: rspec
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     matrix:
-  #       group:
-  #         [
-  #           1,
-  #           2,
-  #           3,
-  #           4,
-  #           5,
-  #           6,
-  #           7,
-  #           8,
-  #           9,
-  #           10,
-  #           11,
-  #           12,
-  #           13,
-  #           14,
-  #           15,
-  #           16,
-  #           17,
-  #           18,
-  #           19,
-  #           20,
-  #         ]
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - uses: ruby/setup-ruby@v1
-  #     - uses: actions/setup-node@v1
-  #       with:
-  #         node-version: "10"
-  #     - uses: wbari/start-mongoDB@v0.2
-  #       with:
-  #         mongoDBVersion: "3.6"
-  #     - name: Restore project gems
-  #       uses: actions/cache@v2
-  #       with:
-  #         path: vendor/bundle
-  #         key: v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
-  #         restore-keys: |
-  #           v2-${{ runner.os }}-gems-
-  #     - name: Install project gems
-  #       run: |
-  #         gem update --system
-  #         bundle config path vendor/bundle
-  #         bundle install
-  #         gem install treye-semaphore_test_boosters --version '2.5.2'
-  #     - name: Restore Node Modules
-  #       id: npm-cache
-  #       uses: actions/cache@v2
-  #       with:
-  #         path: node_modules
-  #         key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
-  #         restore-keys: |
-  #           ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
-  #     - name: Install node dependencies
-  #       if: steps.npm-cache.outputs.cache-hit != 'true'
-  #       run: yarn install
-  #     - name: run webpack
-  #       run: NODE_ENV=test RAILS_ENV=test ./bin/webpack
-  #     - name: Run tests
-  #       run: rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
-  cucumber:
-    name: cucumber
-    # needs: [rubocop]
+  rubocop:
+    name: Rubocop
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ruby/setup-ruby@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "10"
+      - name: Cache Gems
+        uses: actions/cache@v2
+        with:
+          path: vendor/bundle
+          key: v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            v2-${{ runner.os }}-gems-
+      - name: bundle install
+        run: |
+          gem update --system
+          bundle config path vendor/bundle
+          bundle install
+      - name: Run rubocop
+        run: |
+          git fetch --no-tags origin
+          bundle exec rubocop-git origin/master
+  engine:
+    needs: [rubocop]
+    name: engine
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        group:
+        engine-name:
           [
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7,
-            8,
-            9,
-            10,
-            11,
-            12,
-            13,
-            14,
-            15,
-            16,
-            17,
-            18,
-            19,
-            20,
+            "benefit_markets",
+            "benefit_sponsors",
+            "notifier",
+            "sponsored_benefits",
+            "transport_gateway",
+            "transport_profiles",
           ]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+      - uses: ruby/setup-ruby@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "10"
+      - uses: wbari/start-mongoDB@v0.2
+        with:
+          mongoDBVersion: "3.6"
+      - name: Restore Project Gems
+        uses: actions/cache@v2
+        with:
+          path: vendor/bundle
+          key: v5-${{ matrix.engine-name }}-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            v5-${{ matrix.engine-name }}-
+      - name: bundle install
+        run: |
+          gem update --system --quiet --silent
+          bundle config path vendor/bundle
+          bundle install
+          echo switching to ${{ matrix.engine-name }}
+          cd components/${{ matrix.engine-name }}
+          bundle config path ../../vendor/bundle
+          echo testing caching
+          echo installing ${{ matrix.engine-name }} dependencies
+          bundle install
+      - name: Restore Node Modules
+        id: npm-cache
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
+      - name: yarn install
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: |
+          yarn install
+      - name: run webpack
+        run: |
+          echo bundle config
+          bundle config list
+          bundle config path vendor/bundle
+          NODE_ENV=test RAILS_ENV=test ./bin/webpack
+      - name: test engine
+        run: |
+          root=`pwd -P`
+          echo $root/components/${{ matrix.engine-name }}
+          cd $root/components/${{ matrix.engine-name }}
+          bundle config path ../../vendor/bundle
+          bundle exec rspec --fail-fast
+  rspec:
+    name: rspec
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        group: [1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ruby/setup-ruby@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "10"
+      - uses: wbari/start-mongoDB@v0.2
+        with:
+          mongoDBVersion: "3.6"
+      - name: Restore project gems
+        uses: actions/cache@v2
+        with:
+          path: vendor/bundle
+          key: v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            v2-${{ runner.os }}-gems-
+      - name: Install project gems
+        run: |
+          gem update --system
+          bundle config path vendor/bundle
+          bundle install
+          gem install treye-semaphore_test_boosters --version '2.5.2'
+      - name: Restore Node Modules
+        id: npm-cache
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
+      - name: Install node dependencies
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: yarn install
+      - name: run webpack
+        run: NODE_ENV=test RAILS_ENV=test ./bin/webpack
+      - name: Run tests
+        run: rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
+  cucumber:
+    name: cucumber
+    needs: [rubocop]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        group: [1, 2, 3, 4]
     steps:
       - uses: actions/checkout@v2
         with:
@@ -235,29 +191,28 @@ jobs:
         run: NODE_ENV=test RAILS_ENV=test ./bin/webpack
       - name: Run tests
         run: |
-          cucumber_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
-        # cp -f config/cucumber.yml config/cucumber.yml.bak
-        # cp -f config/cucumber_split.yml config/cucumber.yml
-        # cat config/cucumber.yml
-        # export DISPLAY=:99
-        # if cucumber_booster --job ${{ matrix.group }}/${{ strategy.job-total }} features
-        # then
-        #   echo "Cucumber passed the first time!"
-        #   exit 0
-        # else
-        #   cat config/cucumber.yml
-        #   cp -f config/cucumber.yml.bak config/cucumber.yml
-        #   cat config/cucumber.yml
-        #   ls -ltr && ls -ltr tmp
-        #   echo "catting rerun.txt"
-        #   cat rerun.txt
-        #   echo "Give cucumber one more try"
-        #   if bundle exec cucumber @rerun.txt --profile first_rerun
-        #   then
-        #     echo "Cucumber worked on retry"
-        #     exit 0
-        #   else
-        #     echo "Give cucumber yet another try"
-        #     bundle exec cucumber @tmp/cucumber_failures_2.log --profile second_rerun
-        #   fi
-        # fi
+          cp -f config/cucumber.yml config/cucumber.yml.bak
+          cp -f config/cucumber_split.yml config/cucumber.yml
+          cat config/cucumber.yml
+          export DISPLAY=:99
+          if cucumber_booster --job ${{ matrix.group }}/${{ strategy.job-total }} features
+          then
+            echo "Cucumber passed the first time!"
+            exit 0
+          else
+            cat config/cucumber.yml
+            cp -f config/cucumber.yml.bak config/cucumber.yml
+            cat config/cucumber.yml
+            ls -ltr && ls -ltr tmp
+            echo "catting rerun.txt"
+            cat rerun.txt
+            echo "Give cucumber one more try"
+            if bundle exec cucumber @rerun.txt --profile first_rerun
+            then
+              echo "Cucumber worked on retry"
+              exit 0
+            else
+              echo "Give cucumber yet another try"
+              bundle exec cucumber @tmp/cucumber_failures_2.log --profile second_rerun
+            fi
+          fi
