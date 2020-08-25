@@ -5,31 +5,30 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 class UpdateProductPackagesOnBenefitSponsorCatalogs < MongoidMigrationTask
 
   def migrate
-    benefit_sponsors_collection = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:benefit_applications => {:$elemMatch => {:"effective_period.min" => Date.new(2020,1,1), :created_at.lte => Date.new(2019,10,30).beginning_of_day}})
+    benefit_sponsors_collection = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:benefit_applications => {:$elemMatch => {:"effective_period.min" => Date.new(2020,1,1), :created_at.lte => Date.new(2019,10,30).beginning_of_day,
+                                                                                                                                           :aasm_state.nin => [:draft, :canceled]}})
     count = 0
     batch_size = 100
     offset = 0
     total_count = benefit_sponsors_collection.count
+    puts "Total Benefit Sponsorships count #{total_count}" unless Rails.env.test?
+
+    market_catalog = BenefitSponsors::Site.all.where(site_key: :dc).first.benefit_market_for(:aca_shop).benefit_market_catalog_for(Date.new(2020,1,1))
 
     while offset <= total_count
       benefit_sponsors_collection.offset(offset).limit(batch_size).no_timeout.each do |bs|
-        bs.benefit_applications.where(:"effective_period.min" => Date.new(2020,1,1)).each do |ba|
-          if ba.blank?
-            puts "NO Application ---- #{bs.fein}"  unless Rails.env.test?
-            next
-          end
-          market_catalog = BenefitSponsors::Site.all.where(site_key: :dc).first.benefit_market_for(:aca_shop).benefit_market_catalogs.detect{|market| market.product_active_year == 2020}
+        bs.benefit_applications.where(:"effective_period.min" => Date.new(2020,1,1), :created_at.lte => Date.new(2019,10,30).beginning_of_day, :aasm_state.nin => [:draft, :canceled]).each do |ba|
           sponsor_catalog = ba.benefit_sponsor_catalog
-          sponsor_catalog.product_packages.where(benefit_kind: :aca_shop, product_kind: :health).destroy_all
+          sponsor_catalog.product_packages.by_product_kind(:health).destroy_all
           sponsor_catalog.product_packages << market_catalog.product_packages.where(benefit_kind: :aca_shop, product_kind: :health).collect do |product_package|
             construct_sponsor_product_package(product_package, sponsor_catalog)
           end
           count += 1
-          puts "Updated products packages for benefit application #{bs.fein} ---- #{ba.aasm_state}"  unless Rails.env.test?
+          puts "Updated products packages for Employer #{bs.fein} ---- with benefit application state - #{ba.aasm_state}"  unless Rails.env.test?
         end
         puts "Total Number of applications updated #{count}"  unless Rails.env.test?
       rescue StandardError => e
-        puts "Unable to create product packages #{e}" unless Rails.env.test?
+        puts "Unable to create product packages for employer #{bs.fein} ---- #{e}" unless Rails.env.test?
       end
       offset += batch_size
     end
