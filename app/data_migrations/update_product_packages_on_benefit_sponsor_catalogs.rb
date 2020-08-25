@@ -5,18 +5,16 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 class UpdateProductPackagesOnBenefitSponsorCatalogs < MongoidMigrationTask
 
   def migrate
-    benefit_sponsors_collection = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:benefit_applications => {:$elemMatch => {:"effective_period.min" => Date.new(2020,1,1), :created_at.lte => Date.new(2019,10,30).beginning_of_day,
-                                                                                                                                           :aasm_state.nin => [:draft, :canceled]}})
     count = 0
     batch_size = 100
     offset = 0
-    total_count = benefit_sponsors_collection.count
+    total_count = fetch_benefit_sponsorships.count
     puts "Total Benefit Sponsorships count #{total_count}" unless Rails.env.test?
 
     market_catalog = BenefitSponsors::Site.all.where(site_key: :dc).first.benefit_market_for(:aca_shop).benefit_market_catalog_for(Date.new(2020,1,1))
 
     while offset <= total_count
-      benefit_sponsors_collection.offset(offset).limit(batch_size).no_timeout.each do |bs|
+      fetch_benefit_sponsorships.offset(offset).limit(batch_size).no_timeout.each do |bs|
         bs.benefit_applications.where(:"effective_period.min" => Date.new(2020,1,1), :created_at.lte => Date.new(2019,10,30).beginning_of_day, :aasm_state.nin => [:draft, :canceled]).each do |ba|
           sponsor_catalog = ba.benefit_sponsor_catalog
           sponsor_catalog.product_packages.by_product_kind(:health).destroy_all
@@ -32,6 +30,11 @@ class UpdateProductPackagesOnBenefitSponsorCatalogs < MongoidMigrationTask
       end
       offset += batch_size
     end
+  end
+
+  def fetch_benefit_sponsorships
+    BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:benefit_applications => {:$elemMatch => {:"effective_period.min" => Date.new(2020,1,1), :created_at.lte => Date.new(2019,10,30).beginning_of_day,
+                                                                                                             :aasm_state.nin => [:draft, :canceled]}})
   end
 
   def construct_sponsor_product_package(market_product_package, benefit_sponsor_catalog)
