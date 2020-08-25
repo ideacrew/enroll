@@ -938,7 +938,7 @@ class HbxEnrollment
       begin
         person = hbx_enrollment_members.where(is_subscriber: true).first.person
         address_attrs = person.mailing_address && person.mailing_address.attributes.except(:'_id')
-        notify('acapi.info.events.hbx_enrollment.coverage_selected', {employer_legal_name: benefit_sponsor.legal_name, fein: benefit_sponsor.fein, employer_hbx_id: benefit_sponsor.hbx_id, hbx_id: person.hbx_id, first_name: person.first_name, last_name: person.last_name, address: address_attrs, email: person.work_email_or_best, phone: person.work_phone_or_best, plan_name: product.title, coverage_type: coverage_kind, premium_amount: total_premium, benefit_begin_date: effective_on.to_s})
+        notify('acapi.info.events.hbx_enrollment.coverage_selected', {employer_legal_name: benefit_sponsor.legal_name, fein: benefit_sponsor.fein, employer_hbx_id: benefit_sponsor.hbx_id, hbx_id: person.hbx_id, first_name: person.first_name, last_name: person.last_name, address: address_attrs, email: person.work_email_or_best, phone: person.work_phone_or_best, plan_name: product.title, coverage_kind: coverage_kind, premium_amount: total_premium, benefit_begin_date: effective_on.to_s})
       rescue Exception => e
         Rails.logger.error {"** Exception while notifying ledger employee - #{e} **"}
       end
