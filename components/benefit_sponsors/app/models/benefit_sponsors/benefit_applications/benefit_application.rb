@@ -712,6 +712,17 @@ module BenefitSponsors
       end
     end
 
+    def notify_ledger
+      begin
+        if self.predecessor_id.blank?
+          office_location = sponsor_profile.primary_office_location
+          notify("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {hbx_id: sponsor_profile.hbx_id, employer_legal_name: sponsor_profile.legal_name, fein: sponsor_profile.fein, address: office_location.address.attributes, phone: office_location.phone.full_phone_number, email: Person.staff_for_employer(sponsor_profile).first.work_email_or_best})
+        end
+      rescue Exception => e
+        Rails.logger.error {"** Exception while notifying ledger - #{e} **"}
+      end
+    end
+
     def transition_benefit_package_members
       transition_kind = BENEFIT_PACKAGE_MEMBERS_TRANSITION_MAP[aasm_state]
       return if transition_kind.blank?
@@ -830,7 +841,7 @@ module BenefitSponsors
       state :enrollment_extended, :after_enter => :reinstate_canceled_benefit_package_members
       state :enrollment_closed
       state :binder_paid            # made binder payment - used by initial applications only
-      state :enrollment_eligible    # Enrollment meets criteria necessary for sponsored members to effectuate selected benefits
+      state :enrollment_eligible , :after_enter => :notify_ledger   # Enrollment meets criteria necessary for sponsored members to effectuate selected benefits
       state :enrollment_ineligible  # open enrollment did not meet eligibility criteria
 
       state :active,     :after_enter => :transition_benefit_package_members  # Application benefit coverage is in-force
