@@ -716,7 +716,7 @@ module BenefitSponsors
       begin
         if self.predecessor_id.blank?
           office_location = sponsor_profile.primary_office_location
-          notify("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {hbx_id: sponsor_profile.hbx_id, employer_legal_name: sponsor_profile.legal_name, fein: sponsor_profile.fein, address: office_location.address.attributes, phone: office_location.phone.full_phone_number, email: Person.staff_for_employer(sponsor_profile).first.work_email_or_best})
+          notify("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {hbx_id: sponsor_profile.hbx_id, employer_legal_name: sponsor_profile.legal_name, fein: sponsor_profile.fein, address: office_location.address.attributes.except(:'_id'), phone: office_location.phone.full_phone_number, email: Person.staff_for_employer(sponsor_profile).first.work_email_or_best})
         end
       rescue Exception => e
         Rails.logger.error {"** Exception while notifying ledger - #{e} **"}
