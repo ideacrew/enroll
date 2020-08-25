@@ -840,8 +840,8 @@ module BenefitSponsors
       state :enrollment_open, after_enter: [:recalc_pricing_determinations, :renew_benefit_package_members, :send_employee_invites] # Approved application has entered open enrollment period
       state :enrollment_extended, :after_enter => :reinstate_canceled_benefit_package_members
       state :enrollment_closed
-      state :binder_paid            # made binder payment - used by initial applications only
-      state :enrollment_eligible , :after_enter => :notify_ledger   # Enrollment meets criteria necessary for sponsored members to effectuate selected benefits
+      state :binder_paid, :after_enter => :notify_ledger            # made binder payment - used by initial applications only
+      state :enrollment_eligible    # Enrollment meets criteria necessary for sponsored members to effectuate selected benefits
       state :enrollment_ineligible  # open enrollment did not meet eligibility criteria
 
       state :active,     :after_enter => :transition_benefit_package_members  # Application benefit coverage is in-force
