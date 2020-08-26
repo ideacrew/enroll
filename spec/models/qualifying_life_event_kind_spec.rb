@@ -426,6 +426,22 @@ RSpec.describe QualifyingLifeEventKind, :type => :model, dbclean: :after_each do
           expect { qlek.schedule_expiration!(TimeKeeper.date_of_record.next_day) }.to raise_error AASM::InvalidTransition
         end
       end
+
+      context "failure" do
+        let!(:qlek) { create(:qualifying_life_event_kind, start_on: TimeKeeper.date_of_record.next_day, is_active: true, aasm_state: :active)}
+
+        before do
+          active_qlek.update_attributes(end_on: TimeKeeper.date_of_record, aasm_state: :expire_pending)
+        end
+
+        it "can_be_expire_pending? guard" do
+          expect(active_qlek.may_schedule_expiration?(TimeKeeper.date_of_record.next_day)).to eq false
+        end
+
+        it "should raise error for invalid transition" do
+          expect { active_qlek.schedule_expiration!(TimeKeeper.date_of_record.next_day) }.to raise_error AASM::InvalidTransition
+        end
+      end
     end
 
     context "expire", dbclean: :after_each do

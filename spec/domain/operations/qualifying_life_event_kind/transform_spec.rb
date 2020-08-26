@@ -76,6 +76,26 @@ RSpec.describe Operations::QualifyingLifeEventKind::Transform, type: :model, dbc
         expect(@result.failure).to eq([qlek, "End on: Expiration date must be on or after #{TimeKeeper.date_of_record - 1.day}"])
       end
     end
+
+    context 'end date overlaps with active SEP' do
+      let!(:qlek2) { FactoryBot.create(:qualifying_life_event_kind, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month, end_on: TimeKeeper.date_of_record.next_month.end_of_month, is_active: true) }
+      before :each do
+        qlek.update_attributes!(aasm_state: :active,
+                                start_on: TimeKeeper.date_of_record.beginning_of_month,
+                                end_on: TimeKeeper.date_of_record.end_of_month)
+        @end_on = TimeKeeper.date_of_record.next_month.beginning_of_month
+        @result = subject.call(params: {qle_id: qlek.id.to_s, end_on: @end_on.strftime("%Y-%m-%d")})
+        qlek.reload
+      end
+
+      it 'should return failure' do
+        expect(@result).to be_a(Dry::Monads::Result::Failure)
+      end
+
+      it 'should return failure message' do
+        expect(@result.failure).to eq([qlek, "End on: Expiration date overlaps with Active SEP Type. Expiration date must be on or before #{qlek2.start_on - 1.day}"])
+      end
+    end
   end
 
   context 'for expired case with future date' do

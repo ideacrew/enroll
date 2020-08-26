@@ -431,7 +431,8 @@ if EnrollRegistry.feature_enabled?(:sep_types)
 
         context 'success case', :dbclean => :after_each do
           before do
-            q1.update_attributes!(start_on: TimeKeeper.date_of_record - 10.days)
+            q2.update_attributes(start_on: TimeKeeper.date_of_record.last_month.beginning_of_month, end_on: TimeKeeper.date_of_record.last_month.end_of_month)
+            q1.update_attributes!(start_on: TimeKeeper.date_of_record.beginning_of_month)
             post :expire_sep_type, params: {
               qualifying_life_event_kind: {end_on: TimeKeeper.date_of_record.strftime("%Y-%m-%d")},
               qle_id: q1.id, qle_action_id: "sep_type_actions_#{q1.id}"
