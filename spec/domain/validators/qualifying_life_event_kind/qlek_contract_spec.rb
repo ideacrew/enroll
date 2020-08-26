@@ -224,7 +224,7 @@ RSpec.describe Validators::QualifyingLifeEventKind::QlekContract, type: :model, 
 
       context 'active sep title without overlaping coverage' do
         before  do
-          qlek.update_attribute(start_on: TimeKeeper.date_of_record.last_month, end_on: TimeKeeper.date_of_record - 1.day)
+          qlek.update_attributes(start_on: TimeKeeper.date_of_record.last_month, end_on: TimeKeeper.date_of_record - 1.day)
           contract_params.merge!({reason: "test_reason", publish: 'Publish'})
           @result = subject.call(contract_params)
         end
