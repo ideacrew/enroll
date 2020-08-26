@@ -56,7 +56,7 @@ module Validators
 
       rule(:title) do
         if values[:publish].present? && values[:publish] == 'Publish'
-          titles = ::QualifyingLifeEventKind.by_market_kind(values[:market_kind]).active_by_state.pluck(:title).map(&:parameterize).uniq
+          titles = ::QualifyingLifeEventKind.by_market_kind(values[:market_kind]).by_date(values[:start_on]).active_by_state.pluck(:title).map(&:parameterize).uniq
           key.failure(l10n("validators.qualifying_life_event_kind.title")) if titles.include?(value.parameterize)
         end
       end
