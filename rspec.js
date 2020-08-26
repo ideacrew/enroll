@@ -1,6 +1,7 @@
 const { promises: fs } = require("fs");
 
 async function getJson() {
+  const [numberOfGroups] = process.argv.slice(2);
   const response = await fs.readFile("./ci/rspec-report.json", "utf-8");
 
   const { version, examples, summary, summary_line } = JSON.parse(response);
@@ -31,7 +32,7 @@ async function getJson() {
     }))
     .sort((a, b) => (a.runTime < b.runTime ? 1 : -1));
 
-  const splitConfig = splitFilesIntoGroups(20, arrayOfSlowFiles);
+  const splitConfig = splitFilesIntoGroups(numberOfGroups, arrayOfSlowFiles);
 
   const jsonList = JSON.stringify(splitConfig);
 
