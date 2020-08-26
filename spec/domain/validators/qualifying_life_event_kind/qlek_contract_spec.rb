@@ -202,23 +202,40 @@ RSpec.describe Validators::QualifyingLifeEventKind::QlekContract, type: :model, 
 
     context 'duplicate title' do
       let!(:qlek) do
-        FactoryBot.create(:qualifying_life_event_kind, reason: 'lost_access_to_mec', market_kind: 'individual')
+        FactoryBot.create(:qualifying_life_event_kind, start_on: TimeKeeper.date_of_record, reason: 'lost_access_to_mec', market_kind: 'individual')
+      end
+      context 'active sep title with overlaping coverage' do
+        before  do
+          contract_params.merge!({reason: "test_reason", publish: 'Publish'})
+          @result = subject.call(contract_params)
+        end
+
+        it 'should return failure' do
+          expect(@result.failure?).to be_truthy
+        end
+        it 'should have any errors' do
+          expect(@result.errors.empty?).to be_falsy
+        end
+
+        it 'should return error message if title already exists' do
+          expect(@result.errors.messages.first.text).to eq('Active SEP type exists with same title')
+        end
       end
 
-      before  do
-        contract_params.merge!({reason: "test_reason", publish: 'Publish'})
-        @result = subject.call(contract_params)
-      end
+      context 'active sep title without overlaping coverage' do
+        before  do
+          qlek.update_attribute(start_on: TimeKeeper.date_of_record.last_month, end_on: TimeKeeper.date_of_record - 1.day)
+          contract_params.merge!({reason: "test_reason", publish: 'Publish'})
+          @result = subject.call(contract_params)
+        end
 
-      it 'should return failure' do
-        expect(@result.failure?).to be_truthy
-      end
-      it 'should have any errors' do
-        expect(@result.errors.empty?).to be_falsy
-      end
+        it 'should return success' do
+          expect(@result.success?).to be_truthy
+        end
 
-      it 'should return error message if title already exists' do
-        expect(@result.errors.messages.first.text).to eq('Active SEP type exists with same title')
+        it 'should not have any errors' do
+          expect(@result.errors.empty?).to be_truthy
+        end
       end
     end
 
