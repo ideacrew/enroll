@@ -38,6 +38,9 @@ module Operations
           Failure([qlek, "End on: #{end_on} must be after start on date"])
         elsif end_on < TimeKeeper.date_of_record - 1.day
           Failure([qlek, "End on: Expiration date must be on or after #{TimeKeeper.date_of_record - 1.day}"])
+        elsif ::QualifyingLifeEventKind.by_market_kind(qlek.market_kind).by_date(end_on).active_by_state.where(:id.ne => qlek.id).pluck(:title).map(&:parameterize).uniq.include?(qlek.title.parameterize)
+          active_qlek = ::QualifyingLifeEventKind.by_market_kind(qlek.market_kind).by_date(end_on).active_by_state.where(title: qlek.title).first
+          Failure([qlek, "End on: Expiration date overlaps with Active SEP Type. Expiration date must be on or before #{active_qlek.start_on - 1.day}"])
         else
           Success('')
         end

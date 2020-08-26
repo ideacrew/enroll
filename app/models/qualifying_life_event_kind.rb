@@ -333,7 +333,8 @@ class QualifyingLifeEventKind
   private
 
   def can_be_expire_pending?(end_date = TimeKeeper.date_of_record)
-    [:active, :expire_pending].include?(aasm_state) && end_date >= TimeKeeper.date_of_record
+    [:active, :expire_pending].include?(aasm_state) && end_date >= TimeKeeper.date_of_record &&
+      self.class.by_market_kind(market_kind).by_date(end_date).active_by_state.where(:id.ne => id).pluck(:title).map(&:parameterize).uniq.exclude?(title.parameterize)
   end
 
   def can_be_expired?(end_date = TimeKeeper.date_of_record)
@@ -341,7 +342,7 @@ class QualifyingLifeEventKind
   end
 
   def has_valid_title?
-    self.class.by_market_kind(market_kind).active_by_state.pluck(:title).map(&:parameterize).uniq.exclude?(title.parameterize)
+    self.class.by_market_kind(market_kind).by_date(start_on).active_by_state.pluck(:title).map(&:parameterize).uniq.exclude?(title.parameterize)
   end
 
   def update_end_date(end_date = TimeKeeper.date_of_record)
