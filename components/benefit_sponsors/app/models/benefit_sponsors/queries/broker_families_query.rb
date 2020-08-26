@@ -2,10 +2,11 @@ module BenefitSponsors
   module Queries
     class BrokerFamiliesQuery
 
-      def initialize(s_string, broker_agency_id)
+      def initialize(s_string, broker_agency_id, market_kind)
         @use_search = !s_string.blank?
         @search_string = s_string
         @broker_agency_profile_id = broker_agency_id
+        @market_kind = market_kind
       end
 
       def build_base_scope
@@ -20,12 +21,17 @@ module BenefitSponsors
       def build_filtered_scope
         return build_base_scope unless @use_search
         person_id = Person.where(Person.search_hash(@search_string)).limit(700).pluck(:_id)
-        {
-          "$and" => [
-            { 'family_members.person_id' => {"$in" => person_id} },
-            build_base_scope
-          ]
-        }
+
+        if @market_kind == :shop
+          { "family_members.person_id" => {"$in" => employee_person_ids }}
+        else
+          {
+            "$and" => [
+              { 'family_members.person_id' => {"$in" => person_id} },
+              build_base_scope
+            ]
+          }
+        end
       end
 
       def filtered_scope
@@ -49,7 +55,7 @@ module BenefitSponsors
           :broker_agency_accounts => {"$elemMatch" => {:benefit_sponsors_broker_agency_profile_id => @broker_agency_profile_id, is_active: true}}
         )
 
-        @census_employee_ids = benefit_sponsorships.flat_map(&:census_employees).map(&:id)
+        @census_employee_ids ||= benefit_sponsorships.flat_map(&:census_employees).pluck(:id)
 
         employee_person_ids ||= Person.unscoped.where("employee_roles.census_employee_id" => {"$in" => @census_employee_ids}).pluck(:_id)
       end
