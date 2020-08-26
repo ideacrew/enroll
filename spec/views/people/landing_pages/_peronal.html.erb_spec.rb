@@ -53,7 +53,7 @@ RSpec.describe "people/landing_pages/_personal.html.erb", dbclean: :around_each 
       end
 
       it "should have age off exclusion checbox" do
-        expect(rendered).to match /Ageoff Exclusion/
+        expect(rendered).to match "Ageoff Exclusion"
         expect(rendered).to have_field('age_off_excluded', checked: false)
       end
     end
@@ -156,8 +156,8 @@ RSpec.describe "people/landing_pages/_personal.html.erb", dbclean: :around_each 
     end
 
     it "should have age off exclusion checbox" do
-        expect(rendered).not_to match /Ageoff Exclusion/
-        expect(rendered).not_to have_field('age_off_excluded', checked: false)
+      expect(rendered).not_to match "Ageoff Exclusion"
+      expect(rendered).not_to have_field('age_off_excluded', checked: false)
     end
   end
 
