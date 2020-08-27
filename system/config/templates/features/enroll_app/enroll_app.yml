@@ -31,7 +31,7 @@ registry:
       - :enroll_app
       - :aca_shop
     features:
-      - key: :shop_dependent_age_off
+      - key: :aca_shop_dependent_age_off
         item: Operations::Shop::DependentAgeOff.new
         is_enabled: true
         settings:
