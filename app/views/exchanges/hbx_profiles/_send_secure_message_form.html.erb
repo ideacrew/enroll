@@ -1,0 +1,44 @@
+<form>
+  <div id="add_sep">
+    <div class="bottom-pd">
+      <div class="row no-buffer">
+        <div class="col-md-6 col-md-offset-3 input-no-pd bottom-pd">
+          <h3>New Message</h3>
+          <table class="table table-message-wrapper">
+            <tbody>
+            <tr>
+              <th>Recipient:</th>
+              <td>&nbsp; &nbsp;<b><%= @profile&.legal_name %></b></td>
+            </tr>
+            <tr>
+              <th>Subject<span class="text-danger">*</span>:</th>
+              <td><%= text_field_tag :subject, @subject, placeholder: 'Subject', maxlength: 100, include_blank: false, required: true %></td>
+            </tr>
+            <tr>
+              <th style="vertical-align: top;">Content<span class="text-danger">*</span>:</th>
+              <td><%= text_area_tag 'body', @body , rows: 5, cols: 2, placeholder: 'Write here...', include_blank: false, required: true  %></td>
+            </tr>
+            <tr>
+              <th style="vertical-align: top;">Document(optional)<span class="text-danger"></span>:</th>
+              <td><%= file_field_tag "file", type: :file, accept: 'application/pdf', class: "doc-upload-file"%></td>
+            </tr>
+            </tbody>
+          </table>
+          <%= hidden_field_tag :profile_id, @profile.present? ? @profile.id : nil %>
+          <%= hidden_field_tag :actions_id, @element_to_replace_id %>
+          <%= button_tag 'Send', class: "btn btn-primary interaction-control-send", id: "send_secure_message"%>
+          <button type="button" class="btn btn-default" id="secureMessageFormClose" onclick="closeRow(this)">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+
+<script type="text/javascript">
+
+  function closeRow(element) {
+    element.closest('tr').remove();
+  }
+
+</script>
