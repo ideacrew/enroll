@@ -52,6 +52,7 @@ Feature: Insured Plan Shopping on Individual market
     And I should see the individual home page
     Then Individual logs out
 
+  @flaky
   Scenario: New insured user purchases on individual market and click on 'Make changes' button on enrollment
     Given Individual resumes enrollment
     And Individual click on Sign In
