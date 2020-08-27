@@ -3557,6 +3557,52 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
       end
     end
   end
+
+  context 'cancel_ivl_enrollment' do
+    let!(:person12)         { FactoryBot.create(:person, :with_consumer_role) }
+    let!(:family12)         { FactoryBot.create(:family, :with_primary_family_member, person: person12) }
+    let!(:hbx_enrollment12) { FactoryBot.create(:hbx_enrollment, household: family12.active_household, family: family12) }
+
+    context 'shop enrollment' do
+      before do
+        hbx_enrollment12.cancel_ivl_enrollment
+      end
+
+      it 'should not cancel the enrollment' do
+        expect(hbx_enrollment12.aasm_state).not_to eq('coverage_canceled')
+      end
+    end
+
+    context 'ivl health enrollment' do
+      before do
+        hbx_enrollment12.update_attributes!(kind: 'individual')
+        hbx_enrollment12.cancel_ivl_enrollment
+      end
+
+      it 'should cancel the enrollment' do
+        expect(hbx_enrollment12.aasm_state).to eq('coverage_canceled')
+      end
+
+      it 'should create the workflow_state_transition object' do
+        expect(hbx_enrollment12.workflow_state_transitions.count).to eq(1)
+      end
+    end
+
+    context 'ivl dental enrollment' do
+      before do
+        hbx_enrollment12.update_attributes!(kind: 'individual', coverage_kind: 'dental')
+        hbx_enrollment12.cancel_ivl_enrollment
+      end
+
+      it 'should cancel the enrollment' do
+        expect(hbx_enrollment12.aasm_state).to eq('coverage_canceled')
+      end
+
+      it 'should create the workflow_state_transition object' do
+        expect(hbx_enrollment12.workflow_state_transitions.count).to eq(1)
+      end
+    end
+  end
 end
 
 describe ".parent enrollments", dbclean: :around_each do
