@@ -977,8 +977,7 @@ DEPENDENCIES
   coffee-rails (~> 4.2.2)
   combine_pdf (~> 1.0)
   config (~> 2.0)
-  cucumber (~> 3)
-  cucumber-rails (~> 1.6)
+  cucumber-rails
   curl (~> 0.0.9)
   database_cleaner (~> 1.7)
   devise (~> 4.5)
