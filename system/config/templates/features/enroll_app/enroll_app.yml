@@ -31,7 +31,7 @@ registry:
       - :enroll_app
       - :aca_shop
     features:
-      - key: :aca_shop_dependent_age_off
+      - key: :shop_dependent_age_off
         item: Operations::Shop::DependentAgeOff.new
         is_enabled: true
         settings:
@@ -39,3 +39,27 @@ registry:
             item: :annual
           - key: :cut_off_age
             item: 26
+          - key: :relationship_kinds
+            item: ['child', 'ward', 'foster_child', 'adopted_child']
+      - key: :fehb_dependent_age_off
+        item: Operations::Shop::DependentAgeOff.new
+        is_enabled: true
+        settings:
+          - key: :period
+            item: :monthly
+          - key: :cut_off_age
+            item: 26
+          - key: :relationship_kinds
+            item: ['child', 'ward', 'foster_child', 'adopted_child']
+      - key: :aca_individual_dependent_age_off
+        is_enabled: true
+        settings:
+          - key: :period
+            item: :annual
+          - key: :cut_off_age
+            item: 26
+          - key: :relationship_kinds
+            item: ['child', 'ward', 'foster_child', 'adopted_child']
+      - key: :age_off_relaxed_eligibility
+        item: Operations::AgeOffRelaxedEligibility.new
+        is_enabled: true
