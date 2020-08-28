@@ -221,4 +221,34 @@ RSpec.describe DocumentsController, :type => :controller do
       end
     end
   end
+
+  describe "GET cartafact_download" do
+
+    context 'not passing current user' do
+      let(:tempfile) do
+        tf = Tempfile.new('test.pdf')
+        tf.write("DATA GOES HERE")
+        tf.rewind
+        tf
+      end
+
+      let(:operation_success) do
+        double(
+          success?: true,
+          value!: tempfile
+        )
+      end
+
+      before do
+        allow(Operations::Documents::Download).to receive(:call).and_return(operation_success)
+        get :cartafact_download, params: {model: "test", model_id: "1234", relation: "test", relation_id: "1234"}
+      end
+
+      it 'should pass' do
+        expect(response.status).to eq(200)
+        expect(response.headers["Content-Disposition"]).to eq 'attachment'
+      end
+
+    end
+  end
 end
