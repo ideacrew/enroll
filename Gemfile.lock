@@ -1068,8 +1068,8 @@ DEPENDENCIES
   slim (~> 3.0)
   slim-rails (~> 3.2)
   sponsored_benefits!
-  spring (~> 1.6)
-  spring-watcher-listen (~> 2.0)
+  spring
+  spring-watcher-listen
   symmetric-encryption (~> 3.9.1)
   test-prof
   transport_gateway!
