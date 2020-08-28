@@ -66,9 +66,8 @@ module BenefitSponsors
         if clean_str =~ /[a-z]/i
           Person.collection.aggregate([
             {"$match" => {
-                "$text" => {"$search" => clean_str}
-            }.merge(Person.search_hash(clean_str))
-            },
+              "$text" => {"$search" => clean_str}
+            }.merge(Person.search_hash(clean_str))},
             {"$project" => {"first_name" => 1, "last_name" => 1, "hbx_id" => 1}},
             {"$sort" => {"last_name" => 1, "first_name" => 1}},
             {"$project" => {"_id" => 1}}
