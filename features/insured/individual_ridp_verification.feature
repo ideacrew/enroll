@@ -1,5 +1,6 @@
 Feature: Consumer RIDP verification process
 
+  @flaky
   Background: Individual RIDP Verification process
     Given Individual has not signed up as an HBX user
     Given the FAA feature configuration is enabled
@@ -213,4 +214,4 @@ Feature: Consumer RIDP verification process
     And Individual click on Sign In
     And I signed in
     Then I should land on home page
-    
+
