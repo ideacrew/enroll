@@ -62,8 +62,6 @@ module OneLogin
       it 'assertion should have issuer child node present' do
         assertion = @noko.xpath('//samlp:Response').children[3]
         expect(assertion.children[0].name). to eq 'Issuer'
-        expect(assertion.children[0].attributes.first[1].name). to eq 'Format'
-        expect(assertion.children[0].attributes.first[1].value). to eq name_id_format
       end
 
       it 'name id should have the format and value present' do
