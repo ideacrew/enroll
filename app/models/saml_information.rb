@@ -27,6 +27,7 @@ class SamlInformation
     'curam_broker_dashboard',
     'kp_pay_now_issuer',
     'kp_pay_now_url',
+    'kp_relay_state',
     'kp_pay_now_private_key_location',
     'kp_pay_now_x509_cert_location',
     'kp_pay_now_audience'
