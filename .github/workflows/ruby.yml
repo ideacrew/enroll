@@ -196,24 +196,4 @@ jobs:
           cp -f config/cucumber_split.yml config/cucumber.yml
           cat config/cucumber.yml
           export DISPLAY=:99
-          if cucumber_booster --job ${{ matrix.group }}/${{ strategy.job-total }} features
-          then
-            echo "Cucumber passed the first time!"
-            exit 0
-          else
-            cat config/cucumber.yml
-            cp -f config/cucumber.yml.bak config/cucumber.yml
-            cat config/cucumber.yml
-            ls -ltr && ls -ltr tmp
-            echo "catting rerun.txt"
-            cat rerun.txt
-            echo "Give cucumber one more try"
-            if bundle exec cucumber @rerun.txt --profile first_rerun
-            then
-              echo "Cucumber worked on retry"
-              exit 0
-            else
-              echo "Give cucumber yet another try"
-              bundle exec cucumber @tmp/cucumber_failures_2.log --profile second_rerun
-            fi
-          fi
+          cucumber_booster --job ${{ matrix.group }}/${{ strategy.job-total }} features
