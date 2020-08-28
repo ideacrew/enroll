@@ -43,7 +43,7 @@ class DefinePermissions < MigrationTask
                           send_broker_agency_message: true, approve_broker: true, approve_ga: true, can_update_ssn: false, can_complete_resident_application: false,
                           can_add_sep: false, can_lock_unlock: false, can_view_username_and_email: false, can_reset_password: false, modify_admin_tabs: true,
                           view_admin_tabs: true,  view_the_configuration_tab: true, can_submit_time_travel_request: false,
-                          view_agency_staff: true, manage_agency_staff: true
+                          view_agency_staff: true, manage_agency_staff: true, can_send_secure_message: true
                         )
     Permission
       .find_or_initialize_by(name: 'super_admin')
@@ -51,7 +51,7 @@ class DefinePermissions < MigrationTask
                           send_broker_agency_message: true, approve_broker: true, approve_ga: true, can_update_ssn: false, can_complete_resident_application: false,
                           can_add_sep: false, can_lock_unlock: true, can_view_username_and_email: false, can_reset_password: false, modify_admin_tabs: true,
                           view_admin_tabs: true, can_extend_open_enrollment: true, view_the_configuration_tab: true, can_submit_time_travel_request: false,
-                          view_agency_staff: true, manage_agency_staff: true
+                          view_agency_staff: true, manage_agency_staff: true, can_send_secure_message: true
                         )
       #puts 'Permissions Updated!'
   end
@@ -70,6 +70,7 @@ class DefinePermissions < MigrationTask
     hbx_admin_can_reset_password
     hbx_admin_can_change_fein
     hbx_admin_can_force_publish
+    hbx_admin_can_send_secure_message
     hbx_admin_can_modify_plan_year
     hbx_admin_can_extend_open_enrollment
     hbx_admin_can_create_benefit_application
@@ -190,6 +191,11 @@ class DefinePermissions < MigrationTask
   def hbx_admin_can_force_publish
     Permission.super_admin.update_attributes(can_force_publish: true)
     Permission.hbx_tier3.update_attributes(can_force_publish: true)
+  end
+
+  def hbx_admin_can_send_secure_message
+    Permission.super_admin.update_attributes(can_send_secure_message: true)
+    Permission.hbx_tier3.update_attributes(can_send_secure_message: true)
   end
 
   def hbx_admin_can_modify_plan_year
