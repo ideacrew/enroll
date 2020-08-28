@@ -21,7 +21,7 @@ namespace :new_model do
     Rake::Task['xml:rates'].invoke
 
     puts "loading 2021 benefit market catalog" unless Rails.env.test?
-    # Rake::Task['load:dc_benefit_market_catalog'].invoke
+    Rake::Task['load:dc_benefit_market_catalog'].invoke
 
     puts "loading 2021 ivl benefit pacakges" unless Rails.env.test?
     Rake::Task['import:create_2021_ivl_packages'].invoke
