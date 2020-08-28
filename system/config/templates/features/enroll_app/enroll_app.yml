@@ -14,6 +14,8 @@ registry:
           is_required: true
           is_visible: true
         settings:
+          - key: :application_name
+            item: "enroll_dc"
           - key: :copyright_period_start
             item: "2013"
           - key: :policies_url
@@ -32,3 +34,6 @@ registry:
         settings:
         - key: :carriers
           item: 'Kaiser'
+      - key: :send_secure_message_family
+        item: :send_secure_message
+        is_enabled: true
