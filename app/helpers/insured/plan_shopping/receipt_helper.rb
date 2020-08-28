@@ -3,7 +3,7 @@ module Insured
     module ReceiptHelper
       def show_pay_now?
         return false unless EnrollRegistry[:pay_now_functionality].feature.is_enabled
-        (carrier_with_payment_option? && individual? && (!has_any_previous_kaiser_enrollments? || has_break_in_coverage_enrollments?)) && pay_now_button_timed_out?
+        (carrier_with_payment_option? && individual? && (has_break_in_coverage_enrollments? || !has_any_previous_kaiser_enrollments?)) && pay_now_button_timed_out?
       end
 
       def carrier_with_payment_option?
@@ -27,8 +27,7 @@ module Insured
 
       def has_break_in_coverage_enrollments?
         enrollments = @enrollment.family.enrollments.current_year.where(aasm_state: "coverage_terminated")
-        carrier = EnrollRegistry[:pay_now_functionality].setting(:carriers).item
-        enrollments.any? { |enr| enr.product.issuer_profile.legal_name == carrier && enr.terminated_on.year == @enrollment.effective_on.year && (@enrollment.effective_on - enr.terminated_on) > 1 }
+        enrollments.any? { |enr| enr.terminated_on.year == @enrollment.effective_on.year && (@enrollment.effective_on - enr.terminated_on) > 1 }
       end
     end
   end

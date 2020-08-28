@@ -107,11 +107,23 @@ When(/^the person enrolls in a Kaiser plan$/) do
 end
 
 And(/^I click on purchase confirm button for matched person$/) do
+  sleep 4
   find('.interaction-choice-control-value-terms-check-thank-you').click
   fill_in 'first_name_thank_you', with: "John"
   fill_in 'last_name_thank_you', with: "Smith"
   screenshot("purchase")
   click_link "Confirm"
+end
+
+And(/^tries to purchase with a break in coverage$/) do
+  find('.btn', text: 'CONTINUE').click
+  person = Person.where(first_name: /John/i, last_name: /Smith/i).to_a.first
+  person.primary_family.hbx_enrollments.first.update_attributes(aasm_state: "coverage_terminated", terminated_on: (TimeKeeper.date_of_record - 5.day))
+  click_button "Shop for Plans"
+  click_link "Shop Now"
+  find('.btn', text: 'CONTINUE').click
+  click_button "Shop for new plan"
+  find_all('.plan-select')[1].click
 end
 
 Then(/^I should click on pay now button$/) do
