@@ -22,7 +22,7 @@ registry:
               label: Start Date *
               content_type: :date
               default: ''
-              description: Enter Start Date
+              description: ''
               is_required: true
               is_visible: true
           - key: :end_on
@@ -31,7 +31,7 @@ registry:
               label: End Date
               content_type: :date
               default: ''
-              description: Enter End Date
+              description: ''
               is_required: false
               is_visible: true
           - key: :title
@@ -40,7 +40,7 @@ registry:
               label: SEP Name *
               content_type: :text_field
               default: ''
-              description: Enter SEP Name
+              description: ''
               is_required: true
               is_visible: true
           - key: :tool_tip
@@ -49,7 +49,7 @@ registry:
               label: SEP Name Tool Tip
               content_type: :text_field
               default: ''
-              description: Enter SEP Name Tool Tip
+              description: ''
               is_required: false
               is_visible: true
           - key: :pre_event_sep_in_days
@@ -58,7 +58,7 @@ registry:
               label: Days Eligible Before Event Date *
               content_type: :number
               default: ''
-              description: Enter Days Eligible Before Event Date
+              description: ''
               is_required: true
               is_visible: true
           - key: :post_event_sep_in_days
@@ -67,7 +67,7 @@ registry:
               label: Days Eligible After Event Date *
               content_type: :number
               default: ''
-              description: Enter Days Eligible After Event Date
+              description: ''
               is_required: true
               is_visible: true
           - key: :market_kind
@@ -77,7 +77,7 @@ registry:
               content_type: :radio_select
               enum: [{individual: "Individual"}, {shop: "SHOP"}, {fehb: "Congress"}]
               default: :individual
-              description: Select Market Kind
+              description: ''
               is_required: true
               is_visible: true
           - key: :is_self_attested
@@ -87,7 +87,7 @@ registry:
               content_type: :radio_select
               default: true
               enum: [ {'true': 'Self-Service' }, { 'false': 'Admin Only'} ]
-              description: Select Self Attestation Type
+              description: ''
               is_required: true
               is_visible: true
           - key: :reason
@@ -96,7 +96,7 @@ registry:
               label: EDI Reason Code *
               content_type: :text_field
               default: ''
-              description: Enter EDI Reason Code
+              description: ''
               is_required: true
               is_visible: true
           - key: :effective_on_kinds
@@ -106,7 +106,7 @@ registry:
               enum: [{date_of_event: Date of Event},
               {first_of_this_month: First of Event Month},
               {fixed_first_of_next_month: First of Month after Event},
-              {first_of_next_month: Event First of Next Month},
+              {first_of_next_month: Event First of Next Month},   # 15 month rule
               {first_of_month_plan_selection: First of the Month following Plan Selection},
               {first_of_month: 15th of Month Plan Shopping},
               {first_of_reporting_month: First of Reporting Month},
@@ -114,7 +114,7 @@ registry:
               {exact_date: Exact Date}]
               content_type: :checkbox_select
               default: ''
-              description: Select Effective Date Rules
+              description: ''
               is_required: false
               is_visible: true
           - key: :termination_on_kinds
@@ -124,7 +124,7 @@ registry:
               enum: [{end_of_event_month: Last Day of Event Month}, {date_before_event: Day before Event}, {end_of_last_month_of_reporting: Last Day of Month before Reporting}, {end_of_reporting_month: Last Day of Reporting Month}, {exact_date: Exact Date}]
               content_type: :checkbox_select
               default: ''
-              description: Select Termination Effective Type
+              description: ''
               is_required: false
               is_visible: true
           - key: :coverage_start_on
@@ -133,7 +133,7 @@ registry:
               label: Eligibility Start Date
               content_type: :date
               default: ''
-              description: Enter Eligibility Start Date
+              description: ''
               is_required: false
               is_visible: true
           - key: :coverage_end_on
@@ -142,7 +142,7 @@ registry:
               label: Eligibility End Date
               content_type: :date
               default: ''
-              description: Enter Eligibility End Date
+              description: ''
               is_required: false
               is_visible: true
           - key: :is_visible
@@ -152,7 +152,7 @@ registry:
               content_type: :radio_select
               default: true
               enum: [ {'true': 'Customer & Admin' }, { 'false': 'Admin Only'} ]
-              description: Select Visibility
+              description: ''
               is_required: true
               is_visible: true
           - key: :date_options_available
@@ -162,7 +162,7 @@ registry:
               content_type: :radio_select
               default: false
               enum: [ {'true': 'True' }, { 'false': 'False'} ]
-              description: Select Date Options Availabilty
+              description: ''
               is_required: true
               is_visible: true
           - key: :event_kind_label
@@ -171,7 +171,7 @@ registry:
               label: Event Date Label *
               content_type: :text_field
               default: ''
-              description: Enter Event Date Label
+              description: ''
               is_required: true
               is_visible: true
           - key: :qle_event_date_kind
@@ -181,7 +181,7 @@ registry:
               content_type: :radio_select
               enum: [ {qle_on: 'Event Date' }, { submitted_at: 'Reported Date'} ]
               default: :qle_on
-              description: Select Eligibility Kind
+              description: ''
               is_required: true
               is_visible: true
       - key: :expire_sep_type

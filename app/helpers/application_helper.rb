@@ -115,6 +115,56 @@ module ApplicationHelper
     return html
   end
 
+  #TODO: *********************Resoure Registry Changes*********************
+  def input_text_control(setting, form)
+    id = setting[:key].to_s
+
+    meta = setting[:meta]
+    input_value = value_for(setting, form) || setting.item || meta&.default
+    # aria_describedby = id
+    is_required = meta&.is_required == false ? meta.is_required : true
+    placholder = "Enter #{meta[:label]}".gsub('*','') if meta[:description].blank?
+
+    # if meta[:attribute]
+    #   tag.input(nil, type: "text", value: input_value, id: id, name: form&.object_name.to_s + "[#{id}]",class: "form-control", required: true)
+    # else
+    tag.input(nil, type: "text", value: input_value, placeholder: placholder, id: id, name: input_name_for(setting, form),class: "form-control", required: is_required)
+    # end
+  end
+
+  def input_date_control(setting, form)
+    id = setting[:key].to_s
+
+    date_value = value_for(setting, form)
+    date_value = date_value.to_date if date_value.is_a?(Time)
+    date_value = date_value.to_s(:db) if date_value.is_a?(Date)
+
+    meta = setting[:meta]
+    input_value = date_value || setting.item || meta&.default
+    # aria_describedby = id
+
+    is_required = meta&.is_required == false ? meta.is_required : true
+
+    tag.input(nil, type: "date", value: input_value, placeholder: "mm/dd/yyyy", id: id, name: input_name_for(setting, form),class: "form-control", required: is_required)
+  end
+
+  def input_number_control(setting, form)
+    id = setting[:key].to_s
+    meta = setting[:meta]
+    input_value = value_for(setting, form) || meta.value || meta.default
+    # input_value = setting[:value] || setting[:default]
+    # aria_describedby = id
+
+    placholder = "Enter #{meta[:label]}".gsub('*','')  if meta[:description].blank?
+
+    # if setting[:attribute]
+    tag.input(nil, type: "number", step: "any", value: input_value, placeholder: placholder, id: id, name: input_name_for(setting, form),class: "form-control", required: true, oninput: "check(this)")
+    # else
+    #   tag.input(nil, type: "number", step:"any", value: input_value, id: id, name: form&.object_name.to_s + "[value]",class: "form-control", required: true, oninput: "check(this)")
+    # end
+  end
+
+  #TODO: *********************Resoure Registry Changes*********************
   # Formats version information in HTML string for the referenced object instance
   def version_for_record(obj)
     ver  = "version: #{obj.version}" if obj.respond_to?('version')
