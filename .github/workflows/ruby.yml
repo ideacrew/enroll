@@ -93,7 +93,7 @@ jobs:
           echo $root/components/${{ matrix.engine-name }}
           cd $root/components/${{ matrix.engine-name }}
           bundle config path ../../vendor/bundle
-          rspec_booster ./spec/**_spec.rb --job ${{ matrix.group }}/${{ strategy.job-total }}
+          rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
   engine:
     name: engine
     runs-on: ubuntu-latest
