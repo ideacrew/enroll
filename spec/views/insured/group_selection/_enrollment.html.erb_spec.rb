@@ -77,8 +77,8 @@ RSpec.describe "insured/group_selection/_enrollment.html.erb", dbclean: :after_e
     end
 
     it 'should have css terminated_on' do
-      expect(rendered).to have_css("select#terminated_on")
-      expect(rendered).to have_selector('#terminated_on')
+      expect(rendered).to have_css("select[name='terminated_on']")
+      expect(rendered).to have_selector("[name='terminated_on']")
     end
   end
 
