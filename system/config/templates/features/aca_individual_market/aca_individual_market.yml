@@ -20,4 +20,6 @@ registry:
         is_enabled: true
         settings:
           - key: :individual_market_monthly_enrollment_due_on
+            item: 20
+          - key: :fifteenth_of_the_month
             item: 15

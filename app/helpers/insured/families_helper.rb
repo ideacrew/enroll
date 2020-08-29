@@ -136,7 +136,7 @@ module Insured::FamiliesHelper
 
   def generate_options_for_effective_on_kinds(qle, qle_date)
     return [] if qle&.effective_on_kinds.blank?
-    qle.effective_on_kinds.collect { |kind| [find_effective_on(qle, qle_date, kind).to_s, kind] }
+    qle.effective_on_kinds.collect { |kind| [find_effective_on(qle, qle_date, kind).to_s, kind] }.uniq(&:first)
   end
 
   def find_effective_on(qle, qle_date, kind)

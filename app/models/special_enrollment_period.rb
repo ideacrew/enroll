@@ -265,14 +265,17 @@ private
                           fixed_first_of_next_month_effective_date
                         when "first_of_month_plan_selection"
                           first_of_month_plan_selection_effective_date
+                        when "fifteenth_of_month_plan_selection"
+                          fifteenth_of_month_plan_selection_effective_date
                         when "first_of_reporting_month"
                           first_of_reporting_month_effective_date
                         when "fixed_first_of_next_month_reporting"
                           fixed_first_of_next_month_reporting_effective_date
+                        when "fifteenth_of_the_month"
+                          fifteenth_of_the_month_effective_date
                         end
   end
 
-  # follows 15th of month rule
   def first_of_month_effective_date
     if @reference_date.day <= EnrollRegistry[:special_enrollment_period].setting(:individual_market_monthly_enrollment_due_on).item
       # if submitted_at.day <= Settings.aca.individual_market.monthly_enrollment_due_on
@@ -283,7 +286,7 @@ private
   end
 
   def first_of_this_month_effective_date
-    @earliest_effective_date.beginning_of_month
+    qle_on.beginning_of_month
   end
 
   def first_of_next_month_effective_date
@@ -331,10 +334,14 @@ private
   end
 
   def first_of_month_plan_selection_effective_date
-    if qle_on < TimeKeeper.date_of_record
-      TimeKeeper.date_of_record.next_month.beginning_of_month
+    TimeKeeper.date_of_record.end_of_month + 1.day
+  end
+
+  def fifteenth_of_month_plan_selection_effective_date
+    if TimeKeeper.date_of_record.day <= EnrollRegistry[:special_enrollment_period].setting(:fifteenth_of_the_month).item
+      TimeKeeper.date_of_record.end_of_month + 1.day
     else
-      @earliest_effective_date.end_of_month + 1.day
+      TimeKeeper.date_of_record.next_month.end_of_month + 1.day
     end
   end
 
@@ -344,6 +351,14 @@ private
 
   def fixed_first_of_next_month_reporting_effective_date
     submitted_at.to_date.end_of_month + 1.day
+  end
+
+  def fifteenth_of_the_month_effective_date
+    if qle_on.day <= EnrollRegistry[:special_enrollment_period].setting(:fifteenth_of_the_month).item
+      qle_on.end_of_month + 1.day
+    else
+      qle_on.next_month.end_of_month + 1.day
+    end
   end
 
   ## TODO - Validation for SHOP, EE SEP cannot be granted unless effective_on >= initial coverage effective on, except for
