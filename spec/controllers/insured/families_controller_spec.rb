@@ -1169,7 +1169,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
         get :purchase, params: { id: family.id,
                                  hbx_enrollment_id: hbx_enrollment.id,
                                  terminate: 'terminate',
-                                 terminate_date: TimeKeeper.date_of_record.to_s}
+                                 "terminate_date_#{hbx_enrollment.hbx_id}": TimeKeeper.date_of_record.to_s}
       end
 
       it "should get hbx_enrollment" do

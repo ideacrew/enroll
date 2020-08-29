@@ -601,7 +601,8 @@ class Family
   end
 
   def latest_active_sep_for(enrollment)
-    enrollment.fehb_profile.present? ? latest_fehb_sep : latest_shop_sep if enrollment.is_shop?
+    return unless enrollment.is_shop?
+    enrollment.fehb_profile.present? ? latest_fehb_sep : latest_shop_sep
   end
 
   def options_for_termination_dates(enrollments)
