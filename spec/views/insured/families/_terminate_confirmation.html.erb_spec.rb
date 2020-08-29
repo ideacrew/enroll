@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe "insured/families/_terminate_confirmation.html.erb" do
-  let(:hbx) { HbxEnrollment.new }
+  let(:hbx) { HbxEnrollment.new(hbx_id: 1) }
   before :each do
     render "insured/families/terminate_confirmation", enrollment: hbx
   end
@@ -35,7 +35,7 @@ RSpec.describe "insured/families/_terminate_confirmation.html.erb" do
     end
 
     it 'should have hidden field terminate_date' do
-      expect(rendered).to have_selector("input[name='terminate_date']", visible: false)
+      expect(rendered).to have_selector("input[name='terminate_date_#{hbx.hbx_id}']", visible: false)
     end
   end
 end
