@@ -34,7 +34,7 @@ jobs:
           git fetch --no-tags --depth=1 origin master
           bundle exec rubocop-git origin/master | grep "no offenses detected"
   benefit_sponsors:
-    name: engine
+    name: benefit_sponsors
     runs-on: ubuntu-latest
     strategy:
       matrix:
