@@ -187,9 +187,11 @@ class SpecialEnrollmentPeriod
     when 'date_before_event'
       qle_on - 1.day
     when 'end_of_last_month_of_reporting'
-      submitted_at.prev_month.end_of_month
+      submitted_at.prev_month.end_of_month.to_date
     when 'end_of_reporting_month'
-      submitted_at.end_of_month
+      submitted_at.end_of_month.to_date
+    when 'end_of_month_before_last'
+      (submitted_at - 2.months).end_of_month.to_date
     when 'exact_date'
       qle_on
     end

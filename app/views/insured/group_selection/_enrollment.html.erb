@@ -40,13 +40,13 @@
             </div>
             <% if hbx_enrollment.is_shop? %>
               <div>
-                <% if @family.latest_shop_sep_termination_kinds.present? %>
+                <% if @family.latest_shop_sep_termination_kinds(hbx_enrollment).present? %>
                   <div class="row">
                     <div class="col-md-4">
                       <label><%= l10n("termination_date") %>: </label>
                     </div>
                     <div class="col-md-6 termination_date no-pd-left">
-                      <%= select_tag :terminated_on, options_for_select(@termination_date_options[hbx_enrollment.id.to_s], selected: hbx_enrollment.terminated_on), {prompt: 'Choose..', required: true, id: 'terminated_on', name: 'terminated_on'} %>
+                      <%= select_tag :terminated_on, options_for_select(@termination_date_options[hbx_enrollment.id.to_s], selected: hbx_enrollment.terminated_on), {prompt: 'Choose..', required: true, id: hbx_enrollment.hbx_id, name: hbx_enrollment.hbx_id} %>
                     </div>
                   </div>
                 <% else %>

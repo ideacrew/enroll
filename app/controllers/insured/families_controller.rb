@@ -219,7 +219,7 @@ class Insured::FamiliesController < FamiliesController
 
       @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
       @terminate = params[:terminate].present? ? params[:terminate] : ''
-      @terminate_date = fetch_terminate_date(params[:terminate_date]) if @terminate.present?
+      @terminate_date = fetch_terminate_date(params["terminate_date_#{@enrollment.hbx_id}"]) if @terminate.present?
       @terminate_reason = params[:terminate_reason] || ''
       render :layout => 'application'
     else

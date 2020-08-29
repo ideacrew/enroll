@@ -40,7 +40,7 @@ function enableTransition() {
 
 }
 
-function fetchDate(){
-  var date = document.getElementById('terminated_on').value;
-  document.getElementById('terminate_date').value = date;
+function fetchDate(id){
+  var date = document.getElementById(id).value;
+  document.getElementById(`terminate_date_${id}`).value = date;
 }
