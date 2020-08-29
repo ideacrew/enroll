@@ -132,4 +132,3 @@ module Exchanges
     end
   end
 end
-
