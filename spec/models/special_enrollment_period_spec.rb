@@ -705,7 +705,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
     let(:valid_params){
       {
         family: family,
-        qualifying_life_event_kind: covid_qle,
+        qualifying_life_event_kind: qle,
         qle_on: qle_on,
       }
     }
@@ -713,7 +713,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
     let(:params) { valid_params.merge(qle_on: qle_on, effective_on_kind: effective_on_kind) }
     let(:special_enrollment_period) { SpecialEnrollmentPeriod.new(**params) }
 
-    let!(:covid_qle) { create(:qualifying_life_event_kind, title: "covid-19", market_kind: "shop", reason: "covid-19") }
+    let!(:qle) { create(:qualifying_life_event_kind, title: "covid-19", market_kind: "shop", reason: "covid-19") }
 
     let!(:sep) do
       sep = special_enrollment_period
@@ -802,27 +802,62 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
     end
 
     context 'when first_of_month is selected' do
+
+
       let(:effective_on_kind) { 'first_of_month' }
 
-      context 'qle_on is middle of month' do
-        let(:qle_on) { TimeKeeper.date_of_record.beginning_of_month + 21.days }
-        let(:reporting_date) { TimeKeeper.date_of_record }
+      context "IVL" do
+        let!(:qle) { create(:qualifying_life_event_kind, market_kind: "individual") }
 
-        it 'should set effective date as next of next month beginning of month' do
-          date = [qle_on,reporting_date].max <= 20 ? qle_on.end_of_month + 1.day : qle_on.next_month.end_of_month + 1.day
-          expect(sep.effective_on).to eq date
+        context 'qle_on is middle of month' do
+          let(:qle_on) { TimeKeeper.date_of_record.beginning_of_month + 21.days }
+          let(:reporting_date) { TimeKeeper.date_of_record }
+
+          it 'should set effective date as next of next month beginning of month' do
+            report_date = [sep.end_on, reporting_date].min
+            eff_date = [qle_on, report_date].max
+            date = report_date.day <= 20 ? eff_date.end_of_month + 1.day : eff_date.next_month.end_of_month + 1.day
+            expect(sep.effective_on).to eq date
+          end
+        end
+
+        context 'qle_on is beginning of momth' do
+          let(:qle_on) { TimeKeeper.date_of_record.beginning_of_month }
+          let(:reporting_date) { TimeKeeper.date_of_record }
+
+          it 'should set effective date as beginning of next month' do
+            report_date = [sep.end_on, reporting_date].min
+            eff_date = [qle_on, report_date].max
+            date = report_date.day <= 20 ? eff_date.end_of_month + 1.day : eff_date.next_month.end_of_month + 1.day
+            expect(sep.effective_on).to eq date
+          end
         end
       end
 
-      context 'qle_on is beginning of momth' do
-        let(:qle_on) { TimeKeeper.date_of_record.beginning_of_month }
-        let(:reporting_date) { TimeKeeper.date_of_record }
+      context "SHOP" do
+        context 'qle_on is middle of month' do
+          let(:qle_on) { TimeKeeper.date_of_record.beginning_of_month + 21.days }
+          let(:reporting_date) { TimeKeeper.date_of_record }
 
-        it 'should set effective date as beginning of next month' do
-          date = [qle_on,reporting_date].max <= 20 ? qle_on.end_of_month + 1.day : qle_on.next_month.end_of_month + 1.day
-          expect(sep.effective_on).to eq date
+          it 'should set effective date as next of next month beginning of month' do
+            report_date = [sep.end_on, reporting_date].min
+            date = report_date.day <= 20 ? qle_on.end_of_month + 1.day : qle_on.next_month.end_of_month + 1.day
+            expect(sep.effective_on).to eq date
+          end
+        end
+
+        context 'qle_on is beginning of momth' do
+          let(:qle_on) { TimeKeeper.date_of_record.beginning_of_month }
+          let(:reporting_date) { TimeKeeper.date_of_record }
+
+          it 'should set effective date as beginning of next month' do
+            report_date = [sep.end_on, reporting_date].min
+            date = report_date.day <= 20 ? qle_on.end_of_month + 1.day : qle_on.next_month.end_of_month + 1.day
+            expect(sep.effective_on).to eq date
+          end
         end
       end
+
     end
 
     context 'when first_of_next_month is selected' do

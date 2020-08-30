@@ -346,11 +346,11 @@ private
   end
 
   def first_of_reporting_month_effective_date
-    submitted_at.to_date.beginning_of_month
+    (self.created_at ||= TimeKeeper.date_of_record).to_date.beginning_of_month
   end
 
   def fixed_first_of_next_month_reporting_effective_date
-    submitted_at.to_date.end_of_month + 1.day
+    (self.created_at ||= TimeKeeper.date_of_record).to_date.end_of_month + 1.day
   end
 
   def fifteenth_of_the_month_effective_date
