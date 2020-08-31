@@ -278,9 +278,11 @@ end
 
 Given(/^a Hbx admin with super admin access exists$/) do
   #Note: creates an enrollment for testing purposes in the UI
-  p_staff = Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
-      send_broker_agency_message: true, approve_broker: true, approve_ga: true,
-      modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true, can_complete_resident_application: true)
+  p_staff = Permission.create(name: 'hbx_staff',
+                              modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
+                              send_broker_agency_message: true, approve_broker: true, approve_ga: true,
+                              modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true, can_complete_resident_application: true,
+                              can_access_new_consumer_application_sub_tab: true, can_access_accept_reject_paper_application_documents: true, can_access_pay_now: true)
   person = people['Hbx Admin']
   hbx_profile = FactoryBot.create :hbx_profile, :no_open_enrollment_coverage_period
   user = FactoryBot.create :user, :with_family, :with_hbx_staff_role, email: person[:email], password: person[:password], password_confirmation: person[:password]
