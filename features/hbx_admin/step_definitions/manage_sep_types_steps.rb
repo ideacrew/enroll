@@ -377,6 +377,8 @@ And(/Admin fills active title for (.*) SEP type form$/) do |market_kind|
 end
 
 And("Admin selects effective on kinds for Create SEP Type") do
+  element = find("input[type='checkbox'][name='forms_qualifying_life_event_kind_form[effective_on_kinds][]'][value='date_of_event']")
+  scroll_to(element, align: :top)
   find("input[type='checkbox'][name='forms_qualifying_life_event_kind_form[effective_on_kinds][]'][value='date_of_event']").set(true)
 end
 
