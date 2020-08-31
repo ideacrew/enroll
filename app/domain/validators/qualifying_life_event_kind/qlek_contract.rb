@@ -26,12 +26,15 @@ module Validators
         required(:date_options_available).filled(:bool)
         optional(:publish).maybe(:string)
         required(:qle_event_date_kind).maybe(:string)
+        optional(:other_reason).maybe(:string)
 
         before(:value_coercer) do |result|
           result_hash = result.to_h
           other_params = {}
           other_params[:ordinal_position] = 0 if result_hash[:ordinal_position].nil?
-          other_params[:reason] = result_hash[:reason].parameterize.underscore
+          result_hash[:reason] = "" if result_hash[:reason] == 'Choose...'
+          other_params[:reason] = result_hash[:other_reason] if result_hash[:reason] == 'other'
+          other_params[:reason] = (other_params[:reason] ? other_params : result_hash)[:reason].parameterize.underscore
           other_params[:termination_on_kinds] = [] if result_hash[:market_kind].to_s == 'individual' || result_hash[:termination_on_kinds].nil?
           result_hash.merge(other_params)
         end

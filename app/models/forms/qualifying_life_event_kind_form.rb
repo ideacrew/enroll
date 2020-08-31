@@ -30,6 +30,8 @@ module Forms
     attribute :date_options_available, Types::Bool
     attribute :reason, Types::String
     attribute :draft, Types::Bool
+    attribute :other_reason, Types::String
+    attribute :qlek_reasons, Types::Array.of(Types::String)
 
     def self.for_new(params = {})
       if params.blank?
@@ -37,6 +39,7 @@ module Forms
       else
         schema.each {|item| params[item.name] = nil unless params.key?(item.name)}
       end
+      set_params(params)
 
       new params
     end
@@ -65,8 +68,14 @@ module Forms
                  else
                    qle.attributes
                  end
-        params[:reason] = params[:reason].humanize if params[:reason]
-        params.merge!({draft: qle.draft?})
+        set_params(params, qle)
+        params
+      end
+
+      def set_params(params, qle = nil)
+        params[:reason] = 'other' if params[:other_reason]
+        params[:qlek_reasons] = ::Types::QLEKREASONS.values
+        params[:draft] = qle.draft? if qle
       end
 
       def default_keys_hash

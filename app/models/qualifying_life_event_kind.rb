@@ -233,7 +233,7 @@ class QualifyingLifeEventKind
     state :expire_pending
     state :expired
 
-    event :publish, :after => [:record_transition] do
+    event :publish, :after => [:record_transition, :update_qle_reason_types] do
       transitions from: :draft, to: :active, :guard => :has_valid_title?, :after => [:activate_qle, :set_ordinal_position]
     end
 
@@ -352,6 +352,12 @@ class QualifyingLifeEventKind
   def set_ordinal_position
     qlek = self.class.by_market_kind(market_kind).active_by_state.order(ordinal_position: :asc).last
     self.update_attributes(ordinal_position: qlek.ordinal_position + 1) if qlek
+  end
+
+  def update_qle_reason_types
+    reasons = self.class.non_draft.pluck(:reason).uniq
+    Types.send(:remove_const, "QLEKREASONS")
+    Types.const_set("QLEKREASONS", Types::Coercible::String.enum(*reasons))
   end
 
   def activate_qle

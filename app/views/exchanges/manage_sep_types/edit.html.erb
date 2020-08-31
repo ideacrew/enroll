@@ -3,6 +3,8 @@
     <div class="container" style="margin-top: 15px; height: 100px; padding-left: 50px;" data-controller="sep-types">
       <meta data-target='sep-types.metadata'
         data-qle-reason="<%= @qle.reason%>"
+        data-qlek-reasons="<%= @qle.qlek_reasons%>"
+        data-other-reason="<%= @qle.other_reason || ''%>"
         data-termination-kinds="<%= @qle.termination_on_kinds%>"
         data-effective-kinds="<%= @qle.effective_on_kinds%>"
         data-qle-market="<%= @qle.market_kind%>"
@@ -44,8 +46,9 @@
             </div>
             <%= build_option_field(EnrollRegistry[:sep_types].setting(:pre_event_sep_in_days),f) %>
           </div>
-          <div class="col-6">
+          <div class="col-6" data-action='change->sep-types#reasonChange'>
             <%= build_option_field(EnrollRegistry[:sep_types].setting(:reason),f) %>
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:other_reason),f) %>
             <%= build_option_field(EnrollRegistry[:sep_types].setting(:qle_event_date_kind),f) %>
           </div>
 
