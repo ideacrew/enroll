@@ -40,25 +40,24 @@
             <div id= "market_kind" data-action='change->sep-types#marketChange'>
               <%= build_option_field(EnrollRegistry[:sep_types].setting(:market_kind),f) %>
             </div>
-            <%= build_option_field(EnrollRegistry[:sep_types].setting(:pre_event_sep_in_days),f) %>
           </div>
           <div class="col-6" data-action='change->sep-types#reasonChange'>
             <%= build_option_field(EnrollRegistry[:sep_types].setting(:reason),f) %>
             <%= build_option_field(EnrollRegistry[:sep_types].setting(:other_reason),f) %>
-            <%= build_option_field(EnrollRegistry[:sep_types].setting(:qle_event_date_kind),f) %>
           </div>
-
           <div class="col-6">
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:qle_event_date_kind),f) %>
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:is_self_attested),f) %>
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:pre_event_sep_in_days),f) %>
             <%= build_option_field(EnrollRegistry[:sep_types].setting(:post_event_sep_in_days),f) %>
             <%= build_option_field(EnrollRegistry[:sep_types].setting(:coverage_start_on),f) %>
-            <%= build_option_field(EnrollRegistry[:sep_types].setting(:coverage_end_on),f) %>
-            <%= build_option_field(EnrollRegistry[:sep_types].setting(:is_visible),f) %>
           </div>
           <div class="col-6" id="effective_on_kinds">
             <%= build_option_field(EnrollRegistry[:sep_types].setting(:effective_on_kinds),f) %>
           </div>
           <div class="col-6">
-            <%= build_option_field(EnrollRegistry[:sep_types].setting(:is_self_attested),f) %>
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:coverage_end_on),f) %>
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:is_visible),f) %>
             <%= build_option_field(EnrollRegistry[:sep_types].setting(:date_options_available),f) %>
           </div>
           <div class="col-6" id= "termination_on_kinds" >
