@@ -412,9 +412,9 @@ class Insured::FamiliesController < FamiliesController
         @qualifying_life_events += QualifyingLifeEventKind.send @manually_picked_role + '_without_transition_member_action' if @manually_picked_role == "individual_market_events"
       else
         if @manually_picked_role == "individual_market_events"
-          @qualifying_life_events += QualifyingLifeEventKind.individual_market_events_admin
+          @qualifying_life_events += QualifyingLifeEventKind.individual_market_events
         elsif @manually_picked_role
-          @qualifying_life_events += QualifyingLifeEventKind.send employee_qle_market_scope + '_admin'
+          @qualifying_life_events += QualifyingLifeEventKind.send employee_qle_market_scope
         end
       end
     elsif @person.active_employee_roles.present? || @person.consumer_role.present? || @person.resident_role.present?
