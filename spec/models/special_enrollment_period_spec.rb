@@ -1058,7 +1058,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
 
       it 'should not have duplicate term dates' do
         @termination_dates = sep.termination_dates(TimeKeeper.date_of_record - 20.days)
-         expect(@termination_dates.select { |date| @termination_dates.count(date) > 1 }).to eq []
+        expect(@termination_dates.select { |date| @termination_dates.count(date) > 1 }).to eq []
       end
     end
   end
