@@ -177,7 +177,7 @@ class SpecialEnrollmentPeriod
                else
                  term_date
                end
-    end
+    end.uniq
   end
 
   def fetch_termiation_date(termination_kind)

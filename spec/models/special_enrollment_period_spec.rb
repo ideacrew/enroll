@@ -1012,36 +1012,53 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
   end
 
   context 'for termination_dates' do
-    let!(:family10) { FactoryBot.create(:family, :with_primary_family_member) }
-    let!(:sep10) do
-      sep = FactoryBot.create(:special_enrollment_period, family: family10)
-      sep.qualifying_life_event_kind.update_attributes!(termination_on_kinds: ['end_of_event_month', 'exact_date'])
-      sep
-    end
 
-    before do
-      @termination_dates = sep10.termination_dates(TimeKeeper.date_of_record - 20.days)
-    end
+    context "term dates for termination kinds" do
+      let!(:family10) { FactoryBot.create(:family, :with_primary_family_member) }
+      let!(:sep10) do
+        sep = FactoryBot.create(:special_enrollment_period, family: family10)
+        sep.qualifying_life_event_kind.update_attributes!(termination_on_kinds: ['end_of_event_month', 'exact_date'])
+        sep
+      end
 
-    it 'should include sep qle_on' do
-      expect(@termination_dates).to include(sep10.qle_on)
-    end
-
-    it 'should include end_of_month of sep qle_on' do
-      expect(@termination_dates).to include(sep10.qle_on.end_of_month)
-    end
-
-    context 'effective_on_date is greater than qle_on' do
       before do
-        @termination_dates = sep10.termination_dates(TimeKeeper.date_of_record)
+        @termination_dates = sep10.termination_dates(TimeKeeper.date_of_record - 20.days)
       end
 
-      it 'should not include qle_on for exact_date' do
-        expect(@termination_dates).not_to include(sep10.qle_on)
+      it 'should include sep qle_on' do
+        expect(@termination_dates).to include(sep10.qle_on)
       end
 
-      it 'should include given date and not qle_on' do
-        expect(@termination_dates).to include(TimeKeeper.date_of_record)
+      it 'should include end_of_month of sep qle_on' do
+        expect(@termination_dates).to include(sep10.qle_on.end_of_month)
+      end
+
+      context 'effective_on_date is greater than qle_on' do
+        before do
+          @termination_dates = sep10.termination_dates(TimeKeeper.date_of_record)
+        end
+
+        it 'should not include qle_on for exact_date' do
+          expect(@termination_dates).not_to include(sep10.qle_on)
+        end
+
+        it 'should include given date and not qle_on' do
+          expect(@termination_dates).to include(TimeKeeper.date_of_record)
+        end
+      end
+    end
+
+    context 'duplicate terminate dates' do
+      let!(:family) { FactoryBot.create(:family, :with_primary_family_member) }
+      let!(:sep) do
+        sep = FactoryBot.create(:special_enrollment_period, family: family)
+        sep.qualifying_life_event_kind.update_attributes!(termination_on_kinds: ['end_of_event_month', 'exact_date', 'date_before_event','end_of_last_month_of_reporting','end_of_reporting_month', 'end_of_month_before_last'])
+        sep
+      end
+
+      it 'should not have duplicate term dates' do
+        @termination_dates = sep.termination_dates(TimeKeeper.date_of_record - 20.days)
+         expect(@termination_dates.select { |date| @termination_dates.count(date) > 1 }).to eq []
       end
     end
   end

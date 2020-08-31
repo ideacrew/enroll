@@ -610,7 +610,7 @@ class Family
 
     enrollments.inject({}) do |date_hash, enrollment|
       latest_sep = latest_active_sep_for(enrollment)
-      term_date = latest_sep ? latest_sep.termination_dates(enrollment.effective_on) : TimeKeeper.date_of_record.end_of_month
+      term_date = latest_sep.termination_dates(enrollment.effective_on)
       date_hash[enrollment.id.to_s] = term_date
       date_hash
     end
