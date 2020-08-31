@@ -239,6 +239,9 @@ end
 
 Given(/(.*) Qualifying life events of (.*) market is present$/) do |state, market_kind|
   qlek = FactoryBot.create(:qualifying_life_event_kind, :domestic_partnership, market_kind: market_kind, aasm_state: state, start_on: Date.new(2019,1,1), end_on: Date.new(2019,12,31), reason: 'domestic partnership')
+  reasons = QualifyingLifeEventKind.non_draft.pluck(:reason).uniq
+  Types.send(:remove_const, "QLEKREASONS")
+  Types.const_set("QLEKREASONS", Types::Coercible::String.enum(*reasons))
   if market_kind == "individual"
     qlek.update_attributes(effective_on_kinds: ['date_of_event'])
   elsif market_kind == 'shop'
@@ -347,17 +350,18 @@ And(/Admin selects (.*) market radio button$/) do |market_kind|
 end
 
 And("Admin fills Create SEP Type form with Reason") do
-  fill_in "EDI Reason Code *", with: "domestic partnership"
+  find(:xpath, '//select[@id="reason"]', :wait => 10).click
+  find("option[value='domestic partnership']").click
 end
 
 And(/Admin fills active reason for (.*) SEP type form$/) do |market_kind|
   sleep(2)
   if market_kind == 'individual'
-    fill_in "EDI Reason Code *", with: "birth'"
+    find("option[value='birth']").click
   elsif market_kind == 'shop'
-    fill_in "EDI Reason Code *", with: "marriage'"
+    find("option[value='marriage']").click
   else
-    fill_in "EDI Reason Code *", with: "adoption'"
+    find("option[value='adoption']").click
   end
 end
 

@@ -12,6 +12,7 @@ if EnrollRegistry.feature_enabled?(:sep_types)
 
     after :all do
       DatabaseCleaner.clean
+      invoke_dry_types_script
     end
 
     let!(:person) do
@@ -46,6 +47,9 @@ if EnrollRegistry.feature_enabled?(:sep_types)
         expect(assigns(:qle)).to be_a(Forms::QualifyingLifeEventKindForm)
       end
 
+      it 'should load qlek reasons on to the form object' do
+        expect(assigns(:qle).qlek_reasons).to eq QualifyingLifeEventKind.non_draft.map(&:reason).uniq
+      end
 
       context 'updateable?' do
         before do
@@ -79,7 +83,7 @@ if EnrollRegistry.feature_enabled?(:sep_types)
                                                       market_kind: 'individual',
                                                       effective_on_kinds: ['date_of_event'],
                                                       coverage_start_on: TimeKeeper.date_of_record.strftime("%Y-%m-%d"),
-                                                      coverage_end_on: TimeKeeper.date_of_record.end_of_month.strftime("%Y-%m-%d"),
+                                                      coverage_end_on: TimeKeeper.date_of_record.next_month.end_of_month.strftime("%Y-%m-%d"),
                                                       event_kind_label: 'event kind label',
                                                       is_visible: true,
                                                       qle_event_date_kind: :qle_on,
@@ -204,6 +208,10 @@ if EnrollRegistry.feature_enabled?(:sep_types)
         expect(assigns(:qle).effective_on_kinds).to eq(q1.effective_on_kinds)
       end
 
+      it 'should load qlek reasons on to the form object' do
+        expect(assigns(:qle).qlek_reasons).to eq QualifyingLifeEventKind.non_draft.map(&:reason).uniq
+      end
+
       context 'updateable?' do
         before do
           person.hbx_staff_role.permission.update_attributes!(can_manage_qles: false)
@@ -237,7 +245,7 @@ if EnrollRegistry.feature_enabled?(:sep_types)
                                                       market_kind: 'individual',
                                                       effective_on_kinds: ['date_of_event'],
                                                       coverage_start_on: TimeKeeper.date_of_record.strftime("%Y-%m-%d"),
-                                                      coverage_end_on: TimeKeeper.date_of_record.end_of_month.strftime("%Y-%m-%d"),
+                                                      coverage_end_on: TimeKeeper.date_of_record.next_month.end_of_month.strftime("%Y-%m-%d"),
                                                       event_kind_label: 'event kind label',
                                                       qle_event_date_kind: :qle_on,
                                                       is_visible: true,
@@ -301,7 +309,7 @@ if EnrollRegistry.feature_enabled?(:sep_types)
                                                         market_kind: 'individual',
                                                         effective_on_kinds: ['date_of_event'],
                                                         coverage_start_on: TimeKeeper.date_of_record.strftime("%Y-%m-%d"),
-                                                        coverage_end_on: TimeKeeper.date_of_record.end_of_month.strftime("%Y-%m-%d"),
+                                                        coverage_end_on: TimeKeeper.date_of_record.next_month.end_of_month.strftime("%Y-%m-%d"),
                                                         event_kind_label: 'event kind label',
                                                         qle_event_date_kind: :qle_on,
                                                         is_visible: true,
@@ -372,6 +380,7 @@ if EnrollRegistry.feature_enabled?(:sep_types)
     context 'for clone' do
       before do
         sign_in(current_user)
+        invoke_dry_types_script
         get :clone, params: {id: q1.id}
       end
 
@@ -385,6 +394,10 @@ if EnrollRegistry.feature_enabled?(:sep_types)
 
       it 'should assign instance variable' do
         expect(assigns(:qle)).to be_a(Forms::QualifyingLifeEventKindForm)
+      end
+
+      it 'should load qlek reasons on to the form object' do
+        expect(assigns(:qle).qlek_reasons).to eq QualifyingLifeEventKind.non_draft.map(&:reason).uniq
       end
 
       context 'updateable?' do
@@ -626,5 +639,10 @@ if EnrollRegistry.feature_enabled?(:sep_types)
       end
     end
 
+    def invoke_dry_types_script
+      types_module_constants = Types.constants(false)
+      Types.send(:remove_const, :QLEKREASONS) if types_module_constants.include?(:QLEKREASONS)
+      load File.join(Rails.root, 'app/domain/types.rb')
+    end
   end
 end

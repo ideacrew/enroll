@@ -8,14 +8,19 @@ RSpec.describe Forms::QualifyingLifeEventKindForm, type: :model, dbclean: :after
   end
 
   context 'for for_new' do
-    let!(:qlek) { FactoryBot.create(:qualifying_life_event_kind, is_active: true) }
+    let!(:qlek) { FactoryBot.create(:qualifying_life_event_kind, aasm_state: :active, is_active: true) }
 
     before :each do
+      invoke_dry_types_script
       @qlek_form = Forms::QualifyingLifeEventKindForm.for_new
     end
 
     it 'should initialize QualifyingLifeEventKindForm object' do
       expect(@qlek_form).to be_a(Forms::QualifyingLifeEventKindForm)
+    end
+
+    it 'should load qlek reasons on to the form object' do
+      expect(@qlek_form.qlek_reasons).to eq QualifyingLifeEventKind.non_draft.map(&:reason).uniq
     end
   end
 
@@ -23,6 +28,7 @@ RSpec.describe Forms::QualifyingLifeEventKindForm, type: :model, dbclean: :after
     let!(:qlek) { FactoryBot.create(:qualifying_life_event_kind, reason: "test_reason", is_active: true) }
 
     before :each do
+      invoke_dry_types_script
       @qlek_form = Forms::QualifyingLifeEventKindForm.for_edit({:id => qlek.id.to_s})
     end
 
@@ -31,7 +37,7 @@ RSpec.describe Forms::QualifyingLifeEventKindForm, type: :model, dbclean: :after
     end
 
     it 'should set reason & humanize on to the QualifyingLifeEventKindForm' do
-      expect(@qlek_form.reason).to eq(qlek.reason.humanize)
+      expect(@qlek_form.reason).to eq(qlek.reason)
     end
 
     it 'should set id value on to the QualifyingLifeEventKindForm id' do
@@ -45,6 +51,10 @@ RSpec.describe Forms::QualifyingLifeEventKindForm, type: :model, dbclean: :after
     it 'should set market_kind value on to the QualifyingLifeEventKindForm market_kind' do
       expect(@qlek_form.market_kind).to eq(qlek.market_kind)
     end
+
+    it 'should load qlek reasons on to the form object' do
+      expect(@qlek_form.qlek_reasons).to eq QualifyingLifeEventKind.non_draft.map(&:reason).uniq
+    end
   end
 
   context 'for for_update' do
@@ -52,6 +62,7 @@ RSpec.describe Forms::QualifyingLifeEventKindForm, type: :model, dbclean: :after
     let(:update_params){ qlek.attributes.transform_keys(&:to_sym).merge({:_id => qlek.id.to_s, :market_kind => 'individual'}) }
 
     before :each do
+      invoke_dry_types_script
       @qlek_form = Forms::QualifyingLifeEventKindForm.for_update(update_params)
     end
 
@@ -60,11 +71,15 @@ RSpec.describe Forms::QualifyingLifeEventKindForm, type: :model, dbclean: :after
     end
 
     it 'should set reason & humanize on to the QualifyingLifeEventKindForm' do
-      expect(@qlek_form.reason).to eq(qlek.reason.humanize)
+      expect(@qlek_form.reason).to eq(qlek.reason)
     end
 
     it 'should set id value on to the QualifyingLifeEventKindForm id' do
       expect(@qlek_form._id.to_s).to eq(qlek.id.to_s)
+    end
+
+    it 'should load qlek reasons on to the form object' do
+      expect(@qlek_form.qlek_reasons).to eq QualifyingLifeEventKind.non_draft.map(&:reason).uniq
     end
 
     it 'should set post_event_sep_in_days value on to the QualifyingLifeEventKindForm post_event_sep_in_days' do
@@ -81,6 +96,7 @@ RSpec.describe Forms::QualifyingLifeEventKindForm, type: :model, dbclean: :after
     let!(:qlek) { FactoryBot.create(:qualifying_life_event_kind, reason: "test_reason", is_active: true) }
 
     before :each do
+      invoke_dry_types_script
       @qlek_form = Forms::QualifyingLifeEventKindForm.for_clone({:id => qlek.id.to_s})
     end
 
@@ -89,7 +105,7 @@ RSpec.describe Forms::QualifyingLifeEventKindForm, type: :model, dbclean: :after
     end
 
     it 'should set reason & humanize on to the QualifyingLifeEventKindForm' do
-      expect(@qlek_form.reason).to eq(qlek.reason.humanize)
+      expect(@qlek_form.reason).to eq(qlek.reason)
     end
 
     it 'should not set ID on to the QualifyingLifeEventKindForm' do
@@ -143,6 +159,15 @@ RSpec.describe Forms::QualifyingLifeEventKindForm, type: :model, dbclean: :after
     it 'should set event_kind_label value on to the QualifyingLifeEventKindForm' do
       expect(@qlek_form.event_kind_label).to eq(qlek.event_kind_label)
     end
+
+    it 'should load qlek reasons on to the form object' do
+      expect(@qlek_form.qlek_reasons).to eq QualifyingLifeEventKind.non_draft.map(&:reason).uniq
+    end
   end
 
+  def invoke_dry_types_script
+    types_module_constants = Types.constants(false)
+    Types.send(:remove_const, :QLEKREASONS) if types_module_constants.include?(:QLEKREASONS)
+    load File.join(Rails.root, 'app/domain/types.rb')
+  end
 end
