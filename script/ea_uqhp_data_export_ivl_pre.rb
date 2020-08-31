@@ -2,7 +2,11 @@ batch_size = 500
 offset = 0
 enrollment_count = HbxEnrollment.current_year.count
 
-product_ids = BenefitMarkets::Products::Product.aca_individual_market.by_year(2019).pluck(:_id)
+unless ARGV[0].present?
+  puts "Please include the year to pull active enrollments from (e.g. 2020)" unless Rails.env.test?
+  exit
+end
+product_ids = BenefitMarkets::Products::Product.aca_individual_market.by_year(ARGV[0].to_i).pluck(:_id)
 
 csv = CSV.open("ea_uqhp_data_export_ivl_pre_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv", "w")
 csv << %w(family.id policy.id policy.subscriber.coverage_start_on policy.aasm_state policy.plan.coverage_kind policy.plan.metal_level policy.plan.plan_name policy.subscriber.person.hbx_id
