@@ -300,7 +300,7 @@ Given(/^a Hbx admin with tier 3 access exists$/) do
   hbx_profile = FactoryBot.create :hbx_profile, :no_open_enrollment_coverage_period
   user = FactoryBot.create :user, :with_family, :with_hbx_staff_role, email: person[:email], password: person[:password], password_confirmation: person[:password]
   FactoryBot.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
-  FactoryBot.create :hbx_enrollment,family:user.primary_family, household:user.primary_family.active_household
+  FactoryBot.create :hbx_enrollment,family: user.primary_family, household: user.primary_family.active_household
 end
 
 Given(/^a Hbx admin with read only permissions exists$/) do
