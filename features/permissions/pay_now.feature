@@ -9,8 +9,9 @@ Feature: Hbx Admin creates a New Consumer Application for ivl users
     And creates a consumer with SEP
     When the person enrolls in a Kaiser plan
     And I click on purchase confirm button for matched person
-    Then I should click on pay now button
+    Then I should <action> pay now button
 
   Examples:
-  | subrole      |
-  | super admin  |
+  | subrole      |   action   |
+  | super admin  |    see     |
+  | tier 3       |    see     |

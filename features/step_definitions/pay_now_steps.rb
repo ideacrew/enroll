@@ -130,6 +130,14 @@ Then(/^I should click on pay now button$/) do
   find('.interaction-click-control-pay-now').click
 end
 
+Then(/^I should see( not)? pay now button$/) do |visible|
+  if visible.blank?
+    expect(page).to have_css('.interaction-click-control-pay-now')
+  else
+    expect(page).not_to have_css('.interaction-click-control-pay-now')
+  end
+end
+
 And(/^I should see model pop up$/) do
   expect(page).to have_css('.modal-open')
 end
