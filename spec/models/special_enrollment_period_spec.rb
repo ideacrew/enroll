@@ -1076,7 +1076,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
     end
 
     it 'should return end of last of last month from reporting date' do
-      expect(sep10.fetch_termiation_date('end_of_month_before_last')).to eq((sep10.submitted_at - 2.months).end_of_month.to_date)
+      expect(sep10.fetch_termiation_date('end_of_month_before_last')).to eq((sep10.created_at - 2.months).end_of_month.to_date)
     end
 
     it 'should return day before qle_on' do
@@ -1084,11 +1084,11 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
     end
 
     it 'should return end_of_month of previous month of sep submitted_at date' do
-      expect(sep10.fetch_termiation_date('end_of_last_month_of_reporting')).to eq(sep10.submitted_at.prev_month.end_of_month.to_date)
+      expect(sep10.fetch_termiation_date('end_of_last_month_of_reporting')).to eq(sep10.created_at.prev_month.end_of_month.to_date)
     end
 
     it 'should return end_of_month of sep submitted_at date' do
-      expect(sep10.fetch_termiation_date('end_of_reporting_month')).to eq(sep10.submitted_at.end_of_month.to_date)
+      expect(sep10.fetch_termiation_date('end_of_reporting_month')).to eq(sep10.created_at.end_of_month.to_date)
     end
 
     it 'should return sep qle_on date' do
