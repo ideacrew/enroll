@@ -146,6 +146,8 @@ Rails.application.routes.draw do
         post :extend_open_enrollment
         post :close_extended_open_enrollment
         get :new_benefit_application
+        get :new_secure_message
+        post :create_send_secure_message
         post :create_benefit_application
         get :edit_fein
         post :update_fein
@@ -615,6 +617,7 @@ Rails.application.routes.draw do
 
   get "document/download/:bucket/:key" => "documents#download", as: :document_download
   get "document/authorized_download/:model/:model_id/:relation/:relation_id" => "documents#authorized_download", as: :authorized_document_download
+  get "document/cartafact_download/:model/:model_id/:relation/:relation_id" => "documents#cartafact_download", as: :cartafact_document_download
 
   resources :documents, only: [ :new, :create, :destroy, :update] do
     get :document_reader,on: :member

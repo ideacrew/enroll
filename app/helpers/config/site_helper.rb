@@ -60,6 +60,10 @@ module Config::SiteHelper
     EnrollRegistry[:enroll_app].setting(:copyright_period_start).item
   end
 
+  def site_name
+    EnrollRegistry[:enroll_app].setting(:application_name).item
+  end
+
   def site_help_url
     EnrollRegistry[:enroll_app].setting(:help_url).item
   end

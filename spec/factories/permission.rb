@@ -125,6 +125,7 @@ FactoryBot.define do
       view_the_configuration_tab { false }
       can_submit_time_travel_request { false }
       can_access_age_off_excluded {true}
+      can_send_secure_message { true }
     end
 
     trait :super_admin do
@@ -133,6 +134,7 @@ FactoryBot.define do
       can_add_sep { true }
       can_extend_open_enrollment { true }
       can_modify_plan_year { true }
+      can_send_secure_message { true }
       can_create_benefit_application { true }
       can_force_publish { true }
       view_the_configuration_tab { true }
