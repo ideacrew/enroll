@@ -158,7 +158,6 @@
                   </tr>
 
                 </table>
-              </div>
             </div>
           </div>
         <% end %>
@@ -228,12 +227,9 @@
                 </table>
               </div>
             </div>
-
             <% package.sponsored_benefits.each do |sponsored_benefit| %>
               <%= render 'sponsored_benefit', sponsored_benefit: sponsored_benefit, skip_calcs: can_skip_calculations_for(benefit_application) %>
             <% end %>
-
-
             <br class="clear"/>
           </div>
             <%= pundit_span @employer_profile, :updateable? %>
@@ -246,13 +242,10 @@
         </div>
         <br/>
         <br/>
-
         <div class="col-xs-12"></div>
-
         <%= render "benefit_sponsors/benefit_applications/benefit_applications/submit_application_modal", benefit_application: benefit_application %>
         <%= render "benefit_sponsors/benefit_applications/benefit_applications/revert_application_modal", benefit_application: benefit_application %>
       </div>
-
     <% end %>
   <% else %>
       <h4>

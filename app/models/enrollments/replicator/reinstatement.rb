@@ -4,7 +4,7 @@ module Enrollments
 
       attr_accessor :base_enrollment, :new_effective_date, :new_aptc, :year, :duplicate_hbx, :reinstate_enrollment, :eligible_dependents
 
-      def initialize(enrollment, effective_date, new_aptc=nil, eligible_dependents=nil)
+      def initialize(enrollment, effective_date, new_aptc = nil, eligible_dependents = nil)
         @base_enrollment = enrollment
         @new_effective_date = effective_date
         @new_aptc = new_aptc

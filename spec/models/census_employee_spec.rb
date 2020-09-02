@@ -1124,6 +1124,13 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       census_employee.benefit_group_assignments << BenefitGroupAssignment.new(benefit_group: active_benefit_package, start_on: active_benefit_package.benefit_application.start_on)
       expect(census_employee.is_employee_in_term_pending?).to eq true
     end
+
+    it 'should return false if census employee has no active benefit group assignment' do
+      active_benefit_package = census_employee.active_benefit_group_assignment.benefit_package
+      census_employee.update_attributes(employment_terminated_on: active_benefit_package.end_on - 1.month)
+      census_employee.existing_cobra = 'true'
+      expect(census_employee.is_employee_in_term_pending?).to eq false
+    end
   end
 
   context "generate_and_deliver_checkbook_url" do
@@ -2247,6 +2254,40 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     it "should select the latest renewal benefit group assignment" do
       benefit_group_assignment_two.update_attribute(:updated_at, benefit_group_assignment_two.updated_at + 1.day)
       expect(census_employee.renewal_benefit_group_assignment).to eq benefit_group_assignment_two
+    end
+  end
+
+  context ".waiving_on_eod?" do
+    let(:census_employee) {CensusEmployee.new(**valid_params)}
+    let!(:benefit_group_assignment) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee)}
+
+    context "for initial application" do
+
+      it "should return true when employees waive the coverage" do
+        benefit_group_assignment.aasm_state = "coverage_waived"
+        expect(census_employee.waiving_on_eod?).to be_truthy
+      end
+
+      it "should return false for employees who are enrolling" do
+        benefit_group_assignment.aasm_state = "coverage_selected"
+        expect(census_employee.waiving_on_eod?).to be_falsey
+      end
+    end
+
+    context "when active employeees has renewal benifit group" do
+
+      before do
+        benefit_group_assignment.benefit_application.update_attribute(:aasm_state, "renewing_enrolled")
+      end
+
+      it "should return false when employees who are enrolling" do
+        expect(census_employee.waiving_on_eod?).to be_falsey
+      end
+
+      it "should return true for employees waive the coverage" do
+        benefit_group_assignment.aasm_state = "coverage_waived"
+        expect(census_employee.waiving_on_eod?).to be_truthy
+      end
     end
   end
 

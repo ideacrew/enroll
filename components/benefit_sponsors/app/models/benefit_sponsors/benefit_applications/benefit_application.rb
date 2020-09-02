@@ -483,9 +483,13 @@ module BenefitSponsors
       IMPORTED_STATES.include?(aasm_state)
     end
 
+    # rubocop:disable Style/InverseMethods
     def is_renewing?
-      predecessor.present? && (APPLICATION_APPROVED_STATES + APPLICATION_DRAFT_STATES + ENROLLING_STATES + ENROLLMENT_ELIGIBLE_STATES + ENROLLMENT_INELIGIBLE_STATES).include?(aasm_state)
+      required_states = (APPLICATION_APPROVED_STATES + APPLICATION_DRAFT_STATES + ENROLLING_STATES + ENROLLMENT_ELIGIBLE_STATES)
+      applications = sponsor_profile.benefit_applications.where(:"effective_period.min".gt => effective_period.min, :aasm_state.in => required_states + [:active, :expired])
+      predecessor.present? && (required_states + ENROLLMENT_INELIGIBLE_STATES).include?(aasm_state) && !(applications.count > 0)
     end
+    # rubocop:enable Style/InverseMethods
 
     def is_renewal_enrolling?
       predecessor.present? && (ENROLLING_STATES).include?(aasm_state)
@@ -628,7 +632,7 @@ module BenefitSponsors
     # @param [ BenefitSponsorCatalog ] The catalog valid for the effective_period immediately following this
     # BenefitApplication instance's effective_period
     # @return [ BenefitApplication ] The built renewal application instance and submodels
-    
+
     def renew(async_workflow_id = nil)
       renewal_effective_date = end_on.next_day.to_date
 
@@ -1026,6 +1030,11 @@ module BenefitSponsors
       minimum_participation || system_min_participation_default_for(start_on)
     rescue ResourceRegistry::Error::FeatureNotFoundError
       system_min_participation_default_for(start_on)
+    end
+
+    def all_waived_member_count
+      waived_employees = active_census_employees_under_py.select(&:waiving_on_eod?)
+      waived_employees.collect(&:family).compact.count
     end
 
     def eligible_for_export?

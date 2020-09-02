@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'dry/monads'
 require 'dry/monads/do'
 module Operations
@@ -35,7 +36,7 @@ module Operations
 
       def process_shop_dep_age_off(enrollments, shop_logger, new_date)
         cut_off_age = EnrollRegistry[:aca_shop_dependent_age_off].settings(:cut_off_age).item
-        enrollments.no_timeout.inject([]) do |_result, enrollment|
+        enrollments.inject([]) do |_result, enrollment|
           next if enrollment.employer_profile&.is_fehb?
           primary_person = enrollment.family.primary_person
           enr_members = enrollment.hbx_enrollment_members
@@ -53,14 +54,14 @@ module Operations
           eligible_dependents = enr_members - age_off_enr_member
           effective_date = new_date + 1.day
           terminate_and_reinstate_enrollment(enrollment, effective_date, eligible_dependents)
-          rescue Exception => e
+        rescue StandardError => e
           shop_logger.info "Unable to terminated enrollment #{enrollment.hbx_id} for #{e.message}"
         end
         Success('Successfully dropped dependents for SHOP market')
       end
 
       def fetch_aged_off_people(relations, new_date, cut_off_age)
-        relations.select{|dep| (dep.relative.age_on(new_date)) >= cut_off_age}.flat_map(&:relative).select{|p| p.age_off_excluded == false}
+        relations.select{|dep| dep.relative.age_on(new_date) >= cut_off_age}.flat_map(&:relative).select{|p| p.age_off_excluded == false}
       end
 
       def fetch_relation_objects(primary_person, covered_members_ids)
@@ -70,11 +71,10 @@ module Operations
       def terminate_and_reinstate_enrollment(enrollment, effective_date, eligible_dependents)
         reinstate_enrollment = Enrollments::Replicator::Reinstatement.new(enrollment, effective_date, nil, eligible_dependents).build
         reinstate_enrollment.save!
-        if reinstate_enrollment.may_reinstate_coverage?
-          reinstate_enrollment.reinstate_coverage!
-          reinstate_enrollment.begin_coverage! if reinstate_enrollment.may_begin_coverage?
-          reinstate_enrollment.begin_coverage! if reinstate_enrollment.may_begin_coverage? && self.effective_on <= TimeKeeper.date_of_record
-        end
+        return unless reinstate_enrollment.may_reinstate_coverage?
+        reinstate_enrollment.reinstate_coverage!
+        reinstate_enrollment.begin_coverage! if reinstate_enrollment.may_begin_coverage?
+        reinstate_enrollment.begin_coverage! if reinstate_enrollment.may_begin_coverage? && self.effective_on <= TimeKeeper.date_of_record
       end
     end
   end
