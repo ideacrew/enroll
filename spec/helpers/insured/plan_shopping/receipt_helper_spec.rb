@@ -115,6 +115,12 @@ RSpec.describe Insured::PlanShopping::ReceiptHelper, :type => :helper do
       expect(helper.has_any_previous_kaiser_enrollments?).to eq false
     end
 
+    it 'return true if household has kaiser enrollments in current benefit coverage period' do
+      hbx_enrollment.update_attributes(kind: "employer_sponsored")
+      hbx_enrollment1.update_attributes(kind: "employer_sponsored")
+      expect(helper.has_any_previous_kaiser_enrollments?).to eq false
+    end
+
     it 'return false if household has kaiser enrollments in a previous benefit coverage period year' do
       hbx_enrollment1.update_attributes(effective_on: TimeKeeper.date_of_record.last_year)
       expect(helper.has_any_previous_kaiser_enrollments?).to eq false

@@ -17,7 +17,8 @@ module Insured
       def has_any_previous_kaiser_enrollments?
         carrier = EnrollRegistry[:pay_now_functionality].setting(:carriers).item
         all_kaiser_enrollments = @enrollment.family.hbx_enrollments.to_a.select do |enr|
-          !enr.product_id.nil? && enr.product.issuer_profile.legal_name == carrier && enr.effective_on.year == @enrollment.effective_on.year && enr.subscriber.id == @enrollment.subscriber.id
+          enr_carrier = enr.product.issuer_profile.legal_name
+          !enr.product_id.nil? && !["employer_sponsored", "employer_sponsored_cobra"].include?(enr.kind) && enr_carrier == carrier && enr.effective_on.year == @enrollment.effective_on.year && enr.subscriber.id == @enrollment.subscriber.id
         end
         enrollments = all_kaiser_enrollments - @enrollment.to_a
         enrollments.present? ? true : false
