@@ -704,6 +704,80 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     end
   end
 
+  describe 'POST create_send_secure_message, :dbclean => :after_each' do
+    render_views
+
+    let(:person) { FactoryBot.create(:person, :with_family) }
+    let(:user) { double("user", person: person, :has_hbx_staff_role? => true) }
+    let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key) }
+    let(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, site: site)}
+    let(:employer_profile) {organization.employer_profile}
+
+    let(:profile_valid_params) {{resource_id: employer_profile.id, subject: 'test', body: 'test', actions_id: '1234', resource_name: employer_profile.class.to_s}}
+    let(:person_valid_params) {{resource_id: person.id, subject: 'test', body: 'test', actions_id: '1234', resource_name: person.class.to_s}}
+
+    let(:invalid_params) {{resource_id: employer_profile.id, subject: '', body: '', actions_id: '1234', resource_name: employer_profile.class.to_s}}
+
+    before do
+      sign_in(user)
+    end
+
+    it 'should render back to new_secure_message if there is a failure' do
+      get :create_send_secure_message, xhr:  true, params:  invalid_params
+
+      expect(response).to render_template('new_secure_message')
+    end
+
+    it 'should throw error message if subject and body is not passed' do
+      get :create_send_secure_message, xhr:  true, params:  invalid_params
+
+      expect(response.body).to have_content('Please enter subject')
+    end
+
+    it 'should throw error message if actions id is not passed' do
+      invalid_params = {resource_id: employer_profile.id, subject: 'test', body: 'test', actions_id: '', resource_name: employer_profile.class.to_s}
+      get :create_send_secure_message, xhr:  true, params:  invalid_params
+
+      expect(response.body).to have_content('must be filled')
+    end
+
+    context 'when resource is profile' do
+      it 'should set instance variables' do
+        invalid_params = {resource_id: employer_profile.id, subject: 'test', body: 'test', actions_id: '', resource_name: employer_profile.class.to_s}
+        get :create_send_secure_message, xhr:  true, params:  invalid_params
+
+        expect(assigns(:resource)).to eq employer_profile
+        expect(assigns(:subject)).to eq invalid_params[:subject]
+        expect(assigns(:body)).to eq invalid_params[:body]
+      end
+
+      it 'should send secure message if all values are passed' do
+        get :create_send_secure_message, xhr:  true, params:  profile_valid_params
+
+        expect(response).to render_template("create_send_secure_message")
+        expect(response.body).to have_content(/Message Sent successfully/i)
+      end
+    end
+
+    context 'when resource is person' do
+      it 'should set instance variables' do
+        invalid_params = {resource_id: person.id, subject: 'test', body: 'test', actions_id: '', resource_name: person.class.to_s}
+        get :create_send_secure_message, xhr:  true, params:  invalid_params
+
+        expect(assigns(:resource)).to eq person
+        expect(assigns(:subject)).to eq invalid_params[:subject]
+        expect(assigns(:body)).to eq invalid_params[:body]
+      end
+
+      it 'should send secure message if all values are passed' do
+        get :create_send_secure_message, xhr:  true, params:  person_valid_params
+
+        expect(response).to render_template("create_send_secure_message")
+        expect(response.body).to have_content(/Message Sent successfully/i)
+      end
+    end
+
+  end
 
   describe "POST update_dob_ssn", :dbclean => :after_each do
     render_views
