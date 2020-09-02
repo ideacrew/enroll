@@ -111,8 +111,8 @@ RSpec.describe Insured::PlanShopping::ReceiptHelper, :type => :helper do
       assign(:enrollment, hbx_enrollment)
     end
 
-    it 'return true if household has kaiser enrollments in current benefit coverage period' do
-      expect(helper.has_any_previous_kaiser_enrollments?).to eq true
+    it 'return false if household has kaiser enrollments in current benefit coverage period with same subscriber' do
+      expect(helper.has_any_previous_kaiser_enrollments?).to eq false
     end
 
     it 'return true if household has kaiser enrollments in current benefit coverage period' do
