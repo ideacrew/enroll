@@ -44,3 +44,11 @@ registry:
             item: :annual
           - key: :cut_off_age
             item: 26
+      - key: :aca_ivl_dependent_age_off
+        item: Operations::Individual::DependentAgeOff.new
+        is_enabled: true
+        settings:
+          - key: :period
+            item: :annual
+          - key: :cut_off_age
+            item: 26
