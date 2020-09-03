@@ -74,7 +74,6 @@ RSpec.describe Operations::Shop::DependentAgeOff, type: :model, dbclean: :after_
       end
     end
   end
-
   # rubocop:disable Style/IdenticalConditionalBranches
   context 'valid date' do
     it 'Should process the request when configured annually' do
