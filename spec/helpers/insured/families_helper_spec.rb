@@ -201,6 +201,15 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
           expect(options).to eq [[date.to_s, 'exact_date']]
         end
       end
+
+      context "QLE with event and reporting effective kinds" do
+
+        it "it should return dates based on effective kinds" do
+          qle.update_attributes(qle_event_date_kind: :submitted_at, effective_on_kinds: ['date_of_event', 'first_of_reporting_month'])
+          options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record.last_month)
+          expect(options).to eq [[TimeKeeper.date_of_record.last_month.to_s, 'date_of_event'],[TimeKeeper.date_of_record.beginning_of_month.to_s, 'first_of_reporting_month']]
+        end
+      end
     end
   end
 
