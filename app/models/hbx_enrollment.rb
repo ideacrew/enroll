@@ -500,7 +500,7 @@ class HbxEnrollment
 
     def terminate_dep_age_off_enrollments
       ::EnrollRegistry[:aca_shop_dependent_age_off] { {new_date: TimeKeeper.date_of_record} }
-      ::EnrollRegistry[:aca_ivl_dependent_age_off] { {new_date: TimeKeeper.date_of_record} }
+      ::EnrollRegistry[:aca_individual_dependent_age_off] { {new_date: TimeKeeper.date_of_record} }
     end
 
     def enrollments_for_display(family_id)

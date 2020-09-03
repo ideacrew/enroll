@@ -56,7 +56,7 @@ registry:
             item: 26
           - key: :relationship_kinds
             item: ['child', 'ward', 'foster_child', 'adopted_child']
-      - key: :aca_ivl_dependent_age_off
+      - key: :aca_individual_dependent_age_off
         item: Operations::Individual::DependentAgeOff.new
         is_enabled: true
         settings:
