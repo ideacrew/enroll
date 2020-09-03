@@ -80,7 +80,6 @@ class GroupSelectionPrevaricationAdapter
     return unless @previous_hbx_enrollment.present?
     return unless @previous_hbx_enrollment.is_shop?
     return unless latest_shop_or_fehb_sep.present?
-    # if @previous_hbx_enrollment.present? && @previous_hbx_enrollment.is_shop? && latest_shop_or_fehb_sep.present?
     benefit_package = @previous_hbx_enrollment.sponsored_benefit_package
     return unless benefit_package.effective_period.cover?(latest_shop_or_fehb_sep.effective_on)
     @change_plan = 'change_by_qle'
