@@ -1,7 +1,7 @@
 require 'rails_helper'
 
-module BenefitSponsors
-  RSpec.describe SponsoredBenefits::DentalSponsoredBenefit, type: :model, :dbclean => :after_each do
+module BenefitSponsors::SponsoredBenefits
+  RSpec.describe DentalSponsoredBenefit, type: :model, :dbclean => :after_each do
 
     describe '.verify_elected_choices' do
 
