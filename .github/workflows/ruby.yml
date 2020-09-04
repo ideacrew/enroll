@@ -54,21 +54,16 @@ jobs:
         uses: actions/cache@v2
         with:
           path: vendor/bundle
-          key: v5-${{ matrix.engine-name }}-${{ hashFiles('**/Gemfile.lock') }}
+          key: benefit_sponsors-${{ hashFiles('**/Gemfile.lock') }}
           restore-keys: |
-            v5-${{ matrix.engine-name }}-
+            benefit_sponsors-
       - name: bundle install
         run: |
           gem update --system --quiet --silent
           bundle config path vendor/bundle
-          bundle config list
           bundle install
-          echo switching to benefit_sponsors
           cd components/benefit_sponsors
           bundle config path ../../vendor/bundle
-          bundle config list
-          echo testing caching
-          echo installing benefit_sponsors dependencies
           bundle install
           gem install treye-semaphore_test_boosters --version '2.5.2'
       - name: Restore Node Modules
@@ -85,15 +80,12 @@ jobs:
           yarn install
       - name: run webpack
         run: |
-          echo bundle config
-          bundle config list
           bundle config path vendor/bundle
           NODE_ENV=test RAILS_ENV=test ./bin/webpack
       - name: test engine
         run: |
           cd components/benefit_sponsors
           bundle config path ../../vendor/bundle
-          bundle config list
           rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
   # engine:
   #   name: engine
@@ -153,7 +145,7 @@ jobs:
   #     - name: run webpack
   #       run: |
   #         echo bundle config
-  #         bundle config list
+  #
   #         bundle config path vendor/bundle
   #         NODE_ENV=test RAILS_ENV=test ./bin/webpack
   #     - name: test engine
