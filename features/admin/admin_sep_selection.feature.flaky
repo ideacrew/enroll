@@ -21,7 +21,7 @@ Feature: Update DOB and SSN
     And Individual clicks on add member button
     And Individual again clicks on add member button #TODO re-write this step
     And I click on continue button on household info form
-    And I click on continue button on group selection page
+    And I click on continue button on group selection page <------ flaky step
     And I select three plans to compare
     And I should not see any plan which premium is 0
     And I select a plan on plan shopping page
