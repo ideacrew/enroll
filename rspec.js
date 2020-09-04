@@ -70,8 +70,6 @@ function splitFilesIntoGroups(numberOfGroups, arr, targetRuntimePerGroup) {
     runTime: 0,
   }));
 
-  const length = arr.length;
-
   let bucket = 0;
 
   for (let file of arr) {
