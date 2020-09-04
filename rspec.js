@@ -34,7 +34,18 @@ async function getJson() {
     }))
     .sort((a, b) => (a.runTime < b.runTime ? 1 : -1));
 
-  const splitConfig = splitFilesIntoGroups(numberOfGroups, arrayOfSlowFiles);
+  const totalRuntime = arrayOfSlowFiles.reduce(
+    (runtime, file) => runtime + file.runTime,
+    0
+  );
+
+  const targetRuntimePerGroup = Math.floor(totalRuntime / numberOfGroups);
+
+  const splitConfig = splitFilesIntoGroups(
+    numberOfGroups,
+    arrayOfSlowFiles,
+    targetRuntimePerGroup
+  );
 
   const jsonList = JSON.stringify(splitConfig);
 
@@ -43,11 +54,20 @@ async function getJson() {
 
 getJson();
 
-function splitFilesIntoGroups(numberOfGroups, arr) {
-  console.log("Splitting", arr.length, "files into", numberOfGroups, "groups");
+function splitFilesIntoGroups(numberOfGroups, arr, targetRuntimePerGroup) {
+  console.log(
+    "Splitting",
+    arr.length,
+    "files into",
+    numberOfGroups,
+    "groups, each being around",
+    targetRuntimePerGroup,
+    "seconds long."
+  );
   let split = [];
 
   const length = arr.length;
+
   for (let i = 0; i < length; i++) {
     // e.g. 0 % 20 = 0, 1 % 20 = 1, 43 % 20 = 3
     const bucket = i % numberOfGroups;
