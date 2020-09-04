@@ -96,7 +96,6 @@ jobs:
       matrix:
         engine-name:
           [
-            "benefit_sponsors",
             "benefit_markets",
             "notifier",
             "sponsored_benefits",
