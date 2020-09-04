@@ -84,7 +84,7 @@ jobs:
           NODE_ENV=test RAILS_ENV=test ./bin/webpack
       - name: test engine
         env:
-          RSPEC_SPLIT_CONFIGURATION_PATH: "ci/engines/benefit_sponsors/rspec-split-config.json"
+          RSPEC_SPLIT_CONFIGURATION_PATH: "../../ci/engines/benefit_sponsors/rspec-split-config.json"
         run: |
           cd components/benefit_sponsors
           bundle config path ../../vendor/bundle
