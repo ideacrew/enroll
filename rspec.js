@@ -73,7 +73,6 @@ function splitFilesIntoGroups(numberOfGroups, arr, targetRuntimePerGroup) {
   let bucket = 0;
 
   for (let file of arr) {
-    console.log("Starting with bucket", bucket, bucketTimes[bucket]);
     const currentBucketTime = bucketTimes[bucket].runTime;
 
     if (currentBucketTime + file.runTime < targetRuntimePerGroup) {
@@ -85,7 +84,9 @@ function splitFilesIntoGroups(numberOfGroups, arr, targetRuntimePerGroup) {
       bucketTimes[bucket].runTime += file.runTime;
     } else {
       console.log(file.filePath, "is to large to go into bucket", bucket);
-      bucket += 1;
+      if (bucket < numberOfGroups - 1) {
+        bucket += 1;
+      }
       split[bucket] =
         split[bucket] === undefined
           ? { files: [file.filePath] }
