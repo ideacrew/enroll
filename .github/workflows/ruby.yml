@@ -8,45 +8,37 @@ env:
   TEST_BOOSTERS_RSPEC_TEST_FILE_PATTERN: "{spec,components/benefit_markets/spec,components/benefit_sponsors,components/notifier,components/sponsored_benefits,components/transport_gateway,components/transport_profiles}/**/*_spec.rb"
 
 jobs:
-  rubocop:
-    name: rubocop
-    runs-on: ubuntu-18.04
-    steps:
-      - uses: actions/checkout@v2
-      - uses: ruby/setup-ruby@v1
-      - uses: actions/setup-node@v1
-        with:
-          node-version: "10"
-      - name: Cache Gems
-        uses: actions/cache@v2
-        with:
-          path: vendor/bundle
-          key: v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
-          restore-keys: |
-            v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
-      - name: bundle install
-        run: |
-          bundle config path vendor/bundle
-          bundle install
-      - name: Run rubocop
-        run: |
-          git config diff.renameLimit 800
-          git fetch --no-tags --depth=1 origin master
-          bundle exec rubocop-git origin/master | grep "no offenses detected"
-  engine:
-    name: engine
+  # rubocop:
+  #   name: rubocop
+  #   runs-on: ubuntu-18.04
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: ruby/setup-ruby@v1
+  #     - uses: actions/setup-node@v1
+  #       with:
+  #         node-version: "10"
+  #     - name: Cache Gems
+  #       uses: actions/cache@v2
+  #       with:
+  #         path: vendor/bundle
+  #         key: v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
+  #         restore-keys: |
+  #           v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
+  #     - name: bundle install
+  #       run: |
+  #         bundle config path vendor/bundle
+  #         bundle install
+  #     - name: Run rubocop
+  #       run: |
+  #         git config diff.renameLimit 800
+  #         git fetch --no-tags --depth=1 origin master
+  #         bundle exec rubocop-git origin/master | grep "no offenses detected"
+  benefit_sponsors:
+    name: benefit_sponsors
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        engine-name:
-          [
-            "benefit_sponsors",
-            "benefit_markets",
-            "notifier",
-            "sponsored_benefits",
-            "transport_gateway",
-            "transport_profiles",
-          ]
+        group: [1, 2, 3]
     steps:
       - uses: actions/checkout@v2
         with:
@@ -69,13 +61,16 @@ jobs:
         run: |
           gem update --system --quiet --silent
           bundle config path vendor/bundle
+          bundle config list
           bundle install
-          echo switching to ${{ matrix.engine-name }}
-          cd components/${{ matrix.engine-name }}
+          echo switching to benefit_sponsors
+          cd components/benefit_sponsors
           bundle config path ../../vendor/bundle
+          bundle config list
           echo testing caching
-          echo installing ${{ matrix.engine-name }} dependencies
+          echo installing benefit_sponsors dependencies
           bundle install
+          gem install treye-semaphore_test_boosters --version '2.5.2'
       - name: Restore Node Modules
         id: npm-cache
         uses: actions/cache@v2
@@ -96,100 +91,167 @@ jobs:
           NODE_ENV=test RAILS_ENV=test ./bin/webpack
       - name: test engine
         run: |
-          root=`pwd -P`
-          echo $root/components/${{ matrix.engine-name }}
-          cd $root/components/${{ matrix.engine-name }}
+          cd components/benefit_sponsors
           bundle config path ../../vendor/bundle
-          bundle exec rspec --fail-fast
-  rspec:
-    name: rspec
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        group: [1, 2, 3, 4, 5, 6, 7]
-    steps:
-      - uses: actions/checkout@v2
-      - uses: ruby/setup-ruby@v1
-      - uses: actions/setup-node@v1
-        with:
-          node-version: "10"
-      - uses: wbari/start-mongoDB@v0.2
-        with:
-          mongoDBVersion: "3.6"
-      - name: Restore project gems
-        uses: actions/cache@v2
-        with:
-          path: vendor/bundle
-          key: v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
-          restore-keys: |
-            v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
-      - name: Install project gems
-        run: |
-          bundle config path vendor/bundle
-          bundle install
-          gem install treye-semaphore_test_boosters --version '2.5.2'
-      - name: Restore Node Modules
-        id: npm-cache
-        uses: actions/cache@v2
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
-      - name: Install node dependencies
-        if: steps.npm-cache.outputs.cache-hit != 'true'
-        run: yarn install
-      - name: run webpack
-        run: NODE_ENV=test RAILS_ENV=test ./bin/webpack
-      - name: Run tests
-        run: rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
-  cucumber:
-    name: cucumber
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        group: [1, 2, 3, 4, 5, 6, 7]
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 1
-      - uses: ruby/setup-ruby@v1
-      - uses: actions/setup-node@v1
-        with:
-          node-version: "10"
-      - uses: wbari/start-mongoDB@v0.2
-        with:
-          mongoDBVersion: "3.6"
-      - name: Restore project gems
-        uses: actions/cache@v2
-        with:
-          path: vendor/bundle
-          key: v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
-          restore-keys: |
-            v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
-      - name: Install project gems
-        run: |
-          gem update --system
-          bundle config path vendor/bundle
-          bundle install
-          gem install treye-semaphore_test_boosters --version '2.5.2'
-      - name: Restore Node Modules
-        id: npm-cache
-        uses: actions/cache@v2
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
-      - name: Install node dependencies
-        if: steps.npm-cache.outputs.cache-hit != 'true'
-        run: yarn install
-      - name: run webpack
-        run: NODE_ENV=test RAILS_ENV=test ./bin/webpack
-      - name: Run tests
-        run: |
-          cp -f config/cucumber.yml config/cucumber.yml.bak
-          cp -f config/cucumber_split.yml config/cucumber.yml
-          cat config/cucumber.yml
-          export DISPLAY=:99
-          cucumber_booster --job ${{ matrix.group }}/${{ strategy.job-total }} features
+          bundle config list
+          rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
+  # engine:
+  #   name: engine
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     matrix:
+  #       engine-name:
+  #         [
+  #           "benefit_sponsors",
+  #           "benefit_markets",
+  #           "notifier",
+  #           "sponsored_benefits",
+  #           "transport_gateway",
+  #           "transport_profiles",
+  #         ]
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #       with:
+  #         fetch-depth: 1
+  #     - uses: ruby/setup-ruby@v1
+  #     - uses: actions/setup-node@v1
+  #       with:
+  #         node-version: "10"
+  #     - uses: wbari/start-mongoDB@v0.2
+  #       with:
+  #         mongoDBVersion: "3.6"
+  #     - name: Restore Project Gems
+  #       uses: actions/cache@v2
+  #       with:
+  #         path: vendor/bundle
+  #         key: v5-${{ matrix.engine-name }}-${{ hashFiles('**/Gemfile.lock') }}
+  #         restore-keys: |
+  #           v5-${{ matrix.engine-name }}-
+  #     - name: bundle install
+  #       run: |
+  #         gem update --system --quiet --silent
+  #         bundle config path vendor/bundle
+  #         bundle install
+  #         echo switching to ${{ matrix.engine-name }}
+  #         cd components/${{ matrix.engine-name }}
+  #         bundle config path ../../vendor/bundle
+  #         echo testing caching
+  #         echo installing ${{ matrix.engine-name }} dependencies
+  #         bundle install
+  #     - name: Restore Node Modules
+  #       id: npm-cache
+  #       uses: actions/cache@v2
+  #       with:
+  #         path: node_modules
+  #         key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
+  #     - name: yarn install
+  #       if: steps.npm-cache.outputs.cache-hit != 'true'
+  #       run: |
+  #         yarn install
+  #     - name: run webpack
+  #       run: |
+  #         echo bundle config
+  #         bundle config list
+  #         bundle config path vendor/bundle
+  #         NODE_ENV=test RAILS_ENV=test ./bin/webpack
+  #     - name: test engine
+  #       run: |
+  #         root=`pwd -P`
+  #         echo $root/components/${{ matrix.engine-name }}
+  #         cd $root/components/${{ matrix.engine-name }}
+  #         bundle config path ../../vendor/bundle
+  #         bundle exec rspec --fail-fast
+  # rspec:
+  #   name: rspec
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     matrix:
+  #       group: [1, 2, 3, 4, 5, 6, 7]
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: ruby/setup-ruby@v1
+  #     - uses: actions/setup-node@v1
+  #       with:
+  #         node-version: "10"
+  #     - uses: wbari/start-mongoDB@v0.2
+  #       with:
+  #         mongoDBVersion: "3.6"
+  #     - name: Restore project gems
+  #       uses: actions/cache@v2
+  #       with:
+  #         path: vendor/bundle
+  #         key: v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
+  #         restore-keys: |
+  #           v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
+  #     - name: Install project gems
+  #       run: |
+  #         bundle config path vendor/bundle
+  #         bundle install
+  #         gem install treye-semaphore_test_boosters --version '2.5.2'
+  #     - name: Restore Node Modules
+  #       id: npm-cache
+  #       uses: actions/cache@v2
+  #       with:
+  #         path: node_modules
+  #         key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
+  #     - name: Install node dependencies
+  #       if: steps.npm-cache.outputs.cache-hit != 'true'
+  #       run: yarn install
+  #     - name: run webpack
+  #       run: NODE_ENV=test RAILS_ENV=test ./bin/webpack
+  #     - name: Run tests
+  #       run: rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
+  # cucumber:
+  #   name: cucumber
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     matrix:
+  #       group: [1, 2, 3, 4, 5, 6, 7]
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #       with:
+  #         fetch-depth: 1
+  #     - uses: ruby/setup-ruby@v1
+  #     - uses: actions/setup-node@v1
+  #       with:
+  #         node-version: "10"
+  #     - uses: wbari/start-mongoDB@v0.2
+  #       with:
+  #         mongoDBVersion: "3.6"
+  #     - name: Restore project gems
+  #       uses: actions/cache@v2
+  #       with:
+  #         path: vendor/bundle
+  #         key: v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
+  #         restore-keys: |
+  #           v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
+  #     - name: Install project gems
+  #       run: |
+  #         gem update --system
+  #         bundle config path vendor/bundle
+  #         bundle install
+  #         gem install treye-semaphore_test_boosters --version '2.5.2'
+  #     - name: Restore Node Modules
+  #       id: npm-cache
+  #       uses: actions/cache@v2
+  #       with:
+  #         path: node_modules
+  #         key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
+  #     - name: Install node dependencies
+  #       if: steps.npm-cache.outputs.cache-hit != 'true'
+  #       run: yarn install
+  #     - name: run webpack
+  #       run: NODE_ENV=test RAILS_ENV=test ./bin/webpack
+  #     - name: Run tests
+  #       run: |
+  #         cp -f config/cucumber.yml config/cucumber.yml.bak
+  #         cp -f config/cucumber_split.yml config/cucumber.yml
+  #         cat config/cucumber.yml
+  #         export DISPLAY=:99
+  #         cucumber_booster --job ${{ matrix.group }}/${{ strategy.job-total }} features
