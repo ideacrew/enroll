@@ -32,7 +32,7 @@ async function getJson() {
       filePath: removeLeadingDotSlash(key),
       ...value,
     }))
-    .sort((a, b) => (a.runTime < b.runTime ? 1 : -1));
+    .sort((a, b) => (a.runTime < b.runTime ? -1 : 1));
 
   const totalRuntime = arrayOfSlowFiles.reduce(
     (runtime, file) => runtime + file.runTime,
@@ -66,17 +66,37 @@ function splitFilesIntoGroups(numberOfGroups, arr, targetRuntimePerGroup) {
   );
   let split = [];
 
+  let bucketTimes = Array.from({ length: numberOfGroups }, () => ({
+    runTime: 0,
+  }));
+
   const length = arr.length;
 
-  for (let i = 0; i < length; i++) {
-    // e.g. 0 % 20 = 0, 1 % 20 = 1, 43 % 20 = 3
-    const bucket = i % numberOfGroups;
+  let bucket = 0;
 
-    split[bucket] =
-      split[bucket] === undefined
-        ? { files: [arr[i].filePath] }
-        : { files: [...split[bucket].files, arr[i].filePath] };
+  for (let file of arr) {
+    console.log("Starting with bucket", bucket, bucketTimes[bucket]);
+    const currentBucketTime = bucketTimes[bucket].runTime;
+
+    if (currentBucketTime + file.runTime < targetRuntimePerGroup) {
+      split[bucket] =
+        split[bucket] === undefined
+          ? { files: [file.filePath] }
+          : { files: [...split[bucket].files, file.filePath] };
+
+      bucketTimes[bucket].runTime += file.runTime;
+    } else {
+      console.log(file.filePath, "is to large to go into bucket", bucket);
+      bucket += 1;
+      split[bucket] =
+        split[bucket] === undefined
+          ? { files: [file.filePath] }
+          : { files: [...split[bucket].files, file.filePath] };
+      bucketTimes[bucket].runTime += file.runTime;
+    }
   }
+
+  console.log(bucketTimes);
 
   return split;
 }
