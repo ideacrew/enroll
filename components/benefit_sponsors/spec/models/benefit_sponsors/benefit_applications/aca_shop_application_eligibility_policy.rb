@@ -20,12 +20,15 @@ module BenefitSponsors
    context "Validates passes_open_enrollment_period_policy business policy" do
 
     let!(:benefit_sponsorship) { FactoryGirl.build(:benefit_sponsors_benefit_sponsorship)}
-    let!(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application,
-      :with_benefit_package,
-      :fte_count => 1,
-      :benefit_sponsorship => benefit_sponsorship,
-      :open_enrollment_period => Range.new(Date.today, Date.today + BenefitApplications::AcaShopApplicationEligibilityPolicy::OPEN_ENROLLMENT_DAYS_MIN),
-    )}
+    let!(:benefit_application) do
+      FactoryGirl.create(
+        :benefit_sponsors_benefit_application,
+        :with_benefit_package,
+        :fte_count => 1,
+        :benefit_sponsorship => benefit_sponsorship,
+        :open_enrollment_period => Range.new(Date.today, Date.today + BenefitApplications::AcaShopApplicationEligibilityPolicy::OPEN_ENROLLMENT_DAYS_MIN),
+      )
+    end
     let!(:policy_name) { :passes_open_enrollment_period_policy }
     let!(:policy) { subject.business_policies[policy_name]}
 
@@ -41,12 +44,15 @@ module BenefitSponsors
 
   context "Fails passes_open_enrollment_period_policy business policy" do
     let!(:benefit_sponsorship) { FactoryGirl.build(:benefit_sponsors_benefit_sponsorship)}
-    let(:benefit_application) { FactoryGirl.build(:benefit_sponsors_benefit_application,
-      :with_benefit_package,
-      :fte_count => 3,
-      :benefit_sponsorship => benefit_sponsorship,
-      :open_enrollment_period => Range.new(Date.today+5, Date.today + BenefitApplications::AcaShopApplicationEligibilityPolicy::OPEN_ENROLLMENT_DAYS_MIN),
-    )}
+    let(:benefit_application) do
+      FactoryGirl.build(
+        :benefit_sponsors_benefit_application,
+        :with_benefit_package,
+        :fte_count => 3,
+        :benefit_sponsorship => benefit_sponsorship,
+        :open_enrollment_period => Range.new(Date.today + 5, Date.today + BenefitApplications::AcaShopApplicationEligibilityPolicy::OPEN_ENROLLMENT_DAYS_MIN)
+      )
+    end
     let!(:policy_name) { :passes_open_enrollment_period_policy }
     let!(:policy) { subject.business_policies[policy_name]}
 
