@@ -1,8 +1,11 @@
 const { promises: fs } = require("fs");
 
+// Usage
+// node split rspec <path-to-report> <split-groups> <folder-to-save-config>
+
 async function getJson() {
-  const [numberOfGroups] = process.argv.slice(2);
-  const response = await fs.readFile("./ci/rspec-report.json", "utf-8");
+  const [filePath, numberOfGroups, outputPath] = process.argv.slice(2);
+  const response = await fs.readFile(`./${filePath}`, "utf-8");
 
   const { version, examples, summary, summary_line } = JSON.parse(response);
 
@@ -24,7 +27,6 @@ async function getJson() {
     }
   }, {});
 
-  // 20 slowest files
   const arrayOfSlowFiles = Object.entries(filesByRuntime)
     .map(([key, value]) => ({
       filePath: removeLeadingDotSlash(key),
@@ -36,7 +38,7 @@ async function getJson() {
 
   const jsonList = JSON.stringify(splitConfig);
 
-  await fs.writeFile("./ci/rspec-split-config.json", jsonList);
+  await fs.writeFile(`./${outputPath}/rspec-split-config.json`, jsonList);
 }
 
 getJson();
