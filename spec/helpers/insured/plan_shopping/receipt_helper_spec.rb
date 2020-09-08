@@ -44,6 +44,7 @@ RSpec.describe Insured::PlanShopping::ReceiptHelper, :type => :helper do
     end
   end
 
+
   describe "Carrier with NO payment options" do
     let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
     let(:product) do
@@ -269,16 +270,20 @@ RSpec.describe Insured::PlanShopping::ReceiptHelper, :type => :helper do
     end
 
     before :each do
+      hbx_enrollment.workflow_state_transitions << WorkflowStateTransition.new(
+        from_state: hbx_enrollment.aasm_state,
+        to_state: "coverage_selected"
+      )
       assign(:enrollment, hbx_enrollment)
     end
 
-    it 'should return false if enrollment submitted_at is less than 15 minutes' do
-      hbx_enrollment.update_attributes(aasm_state: 'coverage_terminated', submitted_at: TimeKeeper.datetime_of_record - 15.minutes)
-      expect(helper.pay_now_button_timed_out?).to eq false
+    it 'should return true if transition time is greater 15 minutes' do
+      hbx_enrollment.workflow_state_transitions.first.update_attributes(transition_at: TimeKeeper.date_of_record - 20.minutes)
+      expect(helper.pay_now_button_timed_out?).to eq true
     end
 
-    it 'should return true if enrollment submitted_at is greater than 15 minutes' do
-      hbx_enrollment.update_attributes(aasm_state: 'coverage_terminated', submitted_at: TimeKeeper.datetime_of_record)
+    it 'should return false if transition time is within 15 minutes' do
+      hbx_enrollment.workflow_state_transitions.first.update_attributes(transition_at: TimeKeeper.date_of_record - 10.minutes)
       expect(helper.pay_now_button_timed_out?).to eq true
     end
   end
