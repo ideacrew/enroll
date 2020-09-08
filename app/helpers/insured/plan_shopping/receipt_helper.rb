@@ -3,7 +3,7 @@ module Insured
     module ReceiptHelper
       def show_pay_now?
         return false unless EnrollRegistry[:pay_now_functionality].feature.is_enabled
-        (carrier_with_payment_option? && individual? && (has_break_in_coverage_enrollments? || !has_any_previous_kaiser_enrollments?)) && pay_now_button_timed_out?
+        (carrier_with_payment_option? && individual? && (has_break_in_coverage_enrollments? || !has_any_previous_kaiser_enrollments?)) && !pay_now_button_timed_out?
       end
 
       def carrier_with_payment_option?
@@ -25,7 +25,8 @@ module Insured
       end
 
       def pay_now_button_timed_out?
-        @enrollment.submitted_at + 15.minutes > TimeKeeper.datetime_of_record
+        covered_time = @enrollment.workflow_state_transitions.where(to_state: 'coverage_selected').first
+        covered_time.transition_at + 15.minutes <= Time.now
       end
 
       def has_break_in_coverage_enrollments?
