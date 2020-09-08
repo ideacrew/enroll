@@ -132,6 +132,7 @@ module BenefitSponsors
         general_agency_staff_role.update_attributes!(is_primary: true)
         general_agency_profile1.approve!
         organization.reload
+        Person.create_indexes
         get :search_general_agency, params: params, format: :js, xhr: true
       end
 
