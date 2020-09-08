@@ -252,6 +252,7 @@ module BenefitSponsors
         broker_agency_profile1.update_attributes!(primary_broker_role_id: broker_role1.id)
         broker_agency_profile1.approve!
         organization.reload
+        Person.create_indexes
         get :search_broker_agency, params: params, format: :js, xhr: true
       end
 
