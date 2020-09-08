@@ -116,7 +116,37 @@ RSpec.describe Insured::PlanShopping::ReceiptHelper, :type => :helper do
       expect(helper.has_any_previous_kaiser_enrollments?).to eq false
     end
 
-    it 'return true if household has kaiser enrollments in current benefit coverage period' do
+    it 'return false previous enrollment is shopping state' do
+      hbx_enrollment.update_attributes(aasm_state: 'shopping')
+      hbx_enrollment1.update_attributes(effective_on: TimeKeeper.date_of_record.last_year)
+      expect(helper.has_any_previous_kaiser_enrollments?).to eq false
+    end
+
+    it 'return false previous enrollment is canceled state' do
+      hbx_enrollment.update_attributes(aasm_state: 'coverage_canceled')
+      hbx_enrollment1.update_attributes(effective_on: TimeKeeper.date_of_record.last_year)
+      expect(helper.has_any_previous_kaiser_enrollments?).to eq false
+    end
+
+    it 'return false previous enrollment is inactive state' do
+      hbx_enrollment.update_attributes(aasm_state: 'inactive')
+      hbx_enrollment1.update_attributes(effective_on: TimeKeeper.date_of_record.last_year)
+      expect(helper.has_any_previous_kaiser_enrollments?).to eq false
+    end
+
+    it 'return false previous enrollment is inactive state' do
+      hbx_enrollment.hbx_enrollment_members.detect(&:is_subscriber).update_attributes(is_subscriber: false)
+      hbx_enrollment1.update_attributes(effective_on: TimeKeeper.date_of_record.last_year)
+      expect(helper.has_any_previous_kaiser_enrollments?).to eq false
+    end
+
+    it 'return false previous enrollment has no product' do
+      hbx_enrollment.unset(:product_id)
+      hbx_enrollment1.update_attributes(effective_on: TimeKeeper.date_of_record.last_year)
+      expect(helper.has_any_previous_kaiser_enrollments?).to eq false
+    end
+
+    it 'return false if household has kaiser enrollments in current benefit coverage period' do
       hbx_enrollment.update_attributes(kind: "employer_sponsored")
       hbx_enrollment1.update_attributes(kind: "employer_sponsored")
       expect(helper.has_any_previous_kaiser_enrollments?).to eq false
