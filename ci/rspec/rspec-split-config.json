@@ -1199,10 +1199,5 @@
       "components/benefit_sponsors/spec/models/benefit_sponsors/benefit_applications/benefit_application_spec.rb",
       "spec/views/welcome/index.html.slim_spec.rb"
     ]
-  },
-  {
-    "files": [
-      "spec/views/welcome/index.html.slim_spec.rb"
-    ]
   }
 ]

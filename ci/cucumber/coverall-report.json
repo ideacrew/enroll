@@ -1,0 +1,1525 @@
+[
+  {
+    "uri": "features/cover_all/consumer_requests_enrollment.feature",
+    "id": "consumer-requests-enrollment-in-coverall",
+    "keyword": "Feature",
+    "name": "Consumer requests enrollment in CoverAll",
+    "description": "  As a person who is aware in advance that he is not qualified for QHP through the\n  exchange, and has not initialized an application through EA, he can request to\n  be enrolled in CoverAll. The HBX admin can then enter their information and\n  process their application through the families index page.",
+    "line": 2,
+    "elements": [
+      {
+        "id": "consumer-requests-enrollment-in-coverall;when-we-login-as-hbx-admin-with-read-and-write-permissions-then-on-family-tab-we-should-see-link-dc-resident-application",
+        "keyword": "Scenario",
+        "name": "When we login as Hbx admin with read and write permissions then on family tab we should see link DC Resident Application",
+        "description": "",
+        "line": 8,
+        "type": "scenario",
+        "before": [
+          {
+            "match": {
+              "location": "capybara-3.31.0/lib/capybara/cucumber.rb:14"
+            },
+            "result": { "status": "passed", "duration": 15000 }
+          },
+          {
+            "match": {
+              "location": "capybara-3.31.0/lib/capybara/cucumber.rb:22"
+            },
+            "result": { "status": "passed", "duration": 10000 }
+          },
+          {
+            "match": {
+              "location": "email_spec-2.2.0/lib/email_spec/cucumber.rb:10"
+            },
+            "result": { "status": "passed", "duration": 336000 }
+          },
+          {
+            "match": {
+              "location": "capybara-screenshot-1.0.24/lib/capybara-screenshot/cucumber.rb:3"
+            },
+            "result": { "status": "passed", "duration": 13000 }
+          },
+          {
+            "match": { "location": "features/support/rails_cache.rb:1" },
+            "result": { "status": "passed", "duration": 26000 }
+          },
+          {
+            "match": { "location": "features/support/rails_cache_clear.rb:1" },
+            "result": { "status": "passed", "duration": 38386000 }
+          },
+          {
+            "match": { "location": "features/support/screenshots.rb:1" },
+            "result": { "status": "passed", "duration": 42000 }
+          }
+        ],
+        "steps": [
+          {
+            "keyword": "Given ",
+            "name": "a Hbx admin with super admin access exists",
+            "line": 9,
+            "match": {
+              "location": "features/step_definitions/integration_steps.rb:279"
+            },
+            "result": { "status": "passed", "duration": 870433000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 15000 }
+              }
+            ]
+          },
+          {
+            "keyword": "When ",
+            "name": "Hbx Admin logs on to the Hbx Portal",
+            "line": 10,
+            "match": {
+              "location": "features/step_definitions/integration_steps.rb:365"
+            },
+            "result": { "status": "passed", "duration": 3995109000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 18000 }
+              }
+            ]
+          },
+          {
+            "keyword": "When ",
+            "name": "Hbx Admin click Families dropdown",
+            "line": 11,
+            "match": {
+              "location": "features/step_definitions/edit_aptc_csr_steps.rb:13"
+            },
+            "result": { "status": "passed", "duration": 1045817000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 17000 }
+              }
+            ]
+          },
+          {
+            "keyword": "Then ",
+            "name": "Hbx Admin should see an DC Resident Application link",
+            "line": 12,
+            "match": {
+              "location": "features/step_definitions/cover_all_steps.rb:1"
+            },
+            "result": { "status": "passed", "duration": 15557000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 16000 }
+              }
+            ]
+          },
+          {
+            "keyword": "When ",
+            "name": "Hbx Admin clicks on DC Resident Application link",
+            "line": 13,
+            "match": {
+              "location": "features/step_definitions/cover_all_steps.rb:22"
+            },
+            "result": { "status": "passed", "duration": 764499000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 22000 }
+              }
+            ]
+          },
+          {
+            "keyword": "Then ",
+            "name": "Hbx Admin should see DC Resident Personal Information page",
+            "line": 14,
+            "match": {
+              "location": "features/step_definitions/cover_all_steps.rb:26"
+            },
+            "result": { "status": "passed", "duration": 105802000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 21000 }
+              }
+            ]
+          },
+          {
+            "keyword": "When ",
+            "name": "HBX Admin goes to register an user as individual",
+            "line": 15,
+            "match": {
+              "location": "features/step_definitions/cover_all_steps.rb:30"
+            },
+            "result": { "status": "passed", "duration": 882396000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 20000 }
+              }
+            ]
+          },
+          {
+            "keyword": "Then ",
+            "name": "HBX Admin clicks on continue button",
+            "line": 16,
+            "match": {
+              "location": "features/step_definitions/cover_all_steps.rb:39"
+            },
+            "result": { "status": "passed", "duration": 817115000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 27000 }
+              }
+            ]
+          },
+          {
+            "keyword": "Then ",
+            "name": "user should see heading labeled personal information",
+            "line": 17,
+            "match": {
+              "location": "features/step_definitions/individual_steps.rb:79"
+            },
+            "result": { "status": "passed", "duration": 367836000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 34000 }
+              }
+            ]
+          },
+          {
+            "keyword": "Then ",
+            "name": "HBX Admin should see a form to enter personal information",
+            "line": 18,
+            "match": {
+              "location": "features/step_definitions/cover_all_steps.rb:43"
+            },
+            "result": { "status": "passed", "duration": 1025122000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 16000 }
+              }
+            ]
+          },
+          {
+            "keyword": "Then ",
+            "name": "Hbx Admin should see text Household Info",
+            "line": 19,
+            "match": {
+              "location": "features/step_definitions/cover_all_steps.rb:55"
+            },
+            "result": { "status": "passed", "duration": 214397000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 16000 }
+              }
+            ]
+          },
+          {
+            "keyword": "Then ",
+            "name": "Hbx Admin should see text Special Enrollment Period",
+            "line": 20,
+            "match": {
+              "location": "features/step_definitions/cover_all_steps.rb:62"
+            },
+            "result": { "status": "passed", "duration": 2139246000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 18000 }
+              }
+            ]
+          },
+          {
+            "keyword": "When ",
+            "name": "Hbx Admin click the \"Married\" in qle carousel",
+            "line": 21,
+            "match": {
+              "location": "features/step_definitions/cover_all_steps.rb:70"
+            },
+            "result": { "status": "passed", "duration": 68223000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 21000 }
+              }
+            ]
+          },
+          {
+            "keyword": "And ",
+            "name": "Hbx Admin select a past qle date",
+            "line": 22,
+            "match": {
+              "location": "features/step_definitions/cover_all_steps.rb:74"
+            },
+            "result": { "status": "passed", "duration": 265195000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 16000 }
+              }
+            ]
+          },
+          {
+            "keyword": "Then ",
+            "name": "Employee should see confirmation and clicks continue",
+            "line": 23,
+            "match": {
+              "location": "features/step_definitions/conversion_employee_steps.rb:304"
+            },
+            "result": { "status": "passed", "duration": 800118000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 23000 }
+              }
+            ]
+          },
+          {
+            "keyword": "When ",
+            "name": "I click on continue button on group selection page during a sep",
+            "line": 24,
+            "match": {
+              "location": "features/step_definitions/individual_steps.rb:366"
+            },
+            "result": { "status": "passed", "duration": 967872000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 27000 }
+              }
+            ]
+          },
+          {
+            "keyword": "Then ",
+            "name": "HBX Admin should see the list of plans",
+            "line": 25,
+            "match": {
+              "location": "features/step_definitions/integration_steps.rb:750"
+            },
+            "result": { "status": "passed", "duration": 314703000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 22000 }
+              }
+            ]
+          },
+          {
+            "keyword": "And ",
+            "name": "HBX admin should see the Metal Level filter",
+            "line": 26,
+            "match": {
+              "location": "features/step_definitions/integration_steps.rb:756"
+            },
+            "result": { "status": "passed", "duration": 206207000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 18000 }
+              }
+            ]
+          },
+          {
+            "keyword": "When ",
+            "name": "HBX Admin selects a plan from shopping plan page",
+            "line": 27,
+            "match": {
+              "location": "features/step_definitions/cover_all_steps.rb:89"
+            },
+            "result": { "status": "passed", "duration": 616330000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 19000 }
+              }
+            ]
+          },
+          {
+            "keyword": "Then ",
+            "name": "HBX Admin should see the summary page of plan selection",
+            "line": 28,
+            "match": {
+              "location": "features/step_definitions/cover_all_steps.rb:93"
+            },
+            "result": { "status": "passed", "duration": 84907000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 26000 }
+              }
+            ]
+          },
+          {
+            "keyword": "When ",
+            "name": "HBX Admin clicks on Confirm button on the summary page of plan selection",
+            "line": 29,
+            "match": {
+              "location": "features/step_definitions/cover_all_steps.rb:98"
+            },
+            "result": { "status": "passed", "duration": 777817000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 20000 }
+              }
+            ]
+          },
+          {
+            "keyword": "Then ",
+            "name": "HBX Admin should see the enrollment receipt page",
+            "line": 30,
+            "match": {
+              "location": "features/step_definitions/cover_all_steps.rb:105"
+            },
+            "result": { "status": "passed", "duration": 79359000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 32000 }
+              }
+            ]
+          },
+          {
+            "keyword": "When ",
+            "name": "CONTINUE is clicked by HBX Admin",
+            "line": 31,
+            "match": {
+              "location": "features/step_definitions/cover_all_steps.rb:114"
+            },
+            "result": { "status": "passed", "duration": 87085000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 28000 }
+              }
+            ]
+          },
+          {
+            "keyword": "Then ",
+            "name": "HBX Admin should see broker assister search box",
+            "line": 32,
+            "match": {
+              "location": "features/step_definitions/cover_all_steps.rb:123"
+            },
+            "result": { "status": "passed", "duration": 951395000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 23000 }
+              }
+            ]
+          },
+          {
+            "keyword": "Then ",
+            "name": "HBX Admin should see the home page with text coverage selected",
+            "line": 33,
+            "match": {
+              "location": "features/step_definitions/cover_all_steps.rb:118"
+            },
+            "result": { "status": "passed", "duration": 89930000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 16000 }
+              }
+            ]
+          },
+          {
+            "keyword": "And ",
+            "name": "Hbx Admin logs out",
+            "line": 34,
+            "match": {
+              "location": "features/step_definitions/integration_steps.rb:463"
+            },
+            "result": { "status": "passed", "duration": 656077000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 22000 }
+              }
+            ]
+          }
+        ],
+        "after": [
+          {
+            "match": { "location": "features/support/warden.rb:3" },
+            "result": { "status": "passed", "duration": 26000 }
+          },
+          {
+            "match": { "location": "features/support/user_cleanup.rb:1" },
+            "result": { "status": "passed", "duration": 5300000 }
+          },
+          {
+            "match": {
+              "location": "capybara-screenshot-1.0.24/lib/capybara-screenshot/cucumber.rb:7"
+            },
+            "result": { "status": "passed", "duration": 19000 }
+          },
+          {
+            "match": {
+              "location": "email_spec-2.2.0/lib/email_spec/cucumber.rb:19"
+            },
+            "result": { "status": "passed", "duration": 12000 }
+          },
+          {
+            "match": {
+              "location": "capybara-3.31.0/lib/capybara/cucumber.rb:10"
+            },
+            "result": { "status": "passed", "duration": 67534000 }
+          }
+        ]
+      },
+      {
+        "id": "consumer-requests-enrollment-in-coverall;when-we-login-as-hbx-admin-with-only-read-permissions-then-on-family-tab-we-should-not-see-link-new-dc-resident-application",
+        "keyword": "Scenario",
+        "name": "When we login as Hbx admin with only read permissions then on family tab we should not see link New DC Resident Application",
+        "description": "",
+        "line": 36,
+        "type": "scenario",
+        "before": [
+          {
+            "match": {
+              "location": "capybara-3.31.0/lib/capybara/cucumber.rb:14"
+            },
+            "result": { "status": "passed", "duration": 14000 }
+          },
+          {
+            "match": {
+              "location": "capybara-3.31.0/lib/capybara/cucumber.rb:22"
+            },
+            "result": { "status": "passed", "duration": 11000 }
+          },
+          {
+            "match": {
+              "location": "email_spec-2.2.0/lib/email_spec/cucumber.rb:10"
+            },
+            "result": { "status": "passed", "duration": 267000 }
+          },
+          {
+            "match": {
+              "location": "capybara-screenshot-1.0.24/lib/capybara-screenshot/cucumber.rb:3"
+            },
+            "result": { "status": "passed", "duration": 15000 }
+          },
+          {
+            "match": { "location": "features/support/rails_cache.rb:1" },
+            "result": { "status": "passed", "duration": 18000 }
+          },
+          {
+            "match": { "location": "features/support/rails_cache_clear.rb:1" },
+            "result": { "status": "passed", "duration": 33851000 }
+          },
+          {
+            "match": { "location": "features/support/screenshots.rb:1" },
+            "result": { "status": "passed", "duration": 36000 }
+          }
+        ],
+        "steps": [
+          {
+            "keyword": "Given ",
+            "name": "a Hbx admin with read only permissions exists",
+            "line": 37,
+            "match": {
+              "location": "features/step_definitions/integration_steps.rb:291"
+            },
+            "result": { "status": "passed", "duration": 1162772000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 21000 }
+              }
+            ]
+          },
+          {
+            "keyword": "When ",
+            "name": "Hbx Admin logs on to the Hbx Portal",
+            "line": 38,
+            "match": {
+              "location": "features/step_definitions/integration_steps.rb:365"
+            },
+            "result": { "status": "passed", "duration": 641755000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 17000 }
+              }
+            ]
+          },
+          {
+            "keyword": "When ",
+            "name": "Hbx Admin click Families dropdown",
+            "line": 39,
+            "match": {
+              "location": "features/step_definitions/edit_aptc_csr_steps.rb:13"
+            },
+            "result": { "status": "passed", "duration": 719161000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 70000 }
+              }
+            ]
+          },
+          {
+            "keyword": "Then ",
+            "name": "Hbx Admin should see a DC Resident Application link disabled",
+            "line": 40,
+            "match": {
+              "location": "features/step_definitions/cover_all_steps.rb:9"
+            },
+            "result": { "status": "passed", "duration": 20108000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 18000 }
+              }
+            ]
+          },
+          {
+            "keyword": "And ",
+            "name": "Hbx Admin logs out",
+            "line": 41,
+            "match": {
+              "location": "features/step_definitions/integration_steps.rb:463"
+            },
+            "result": { "status": "passed", "duration": 536771000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 18000 }
+              }
+            ]
+          }
+        ],
+        "after": [
+          {
+            "match": { "location": "features/support/warden.rb:3" },
+            "result": { "status": "passed", "duration": 16000 }
+          },
+          {
+            "match": { "location": "features/support/user_cleanup.rb:1" },
+            "result": { "status": "passed", "duration": 4513000 }
+          },
+          {
+            "match": {
+              "location": "capybara-screenshot-1.0.24/lib/capybara-screenshot/cucumber.rb:7"
+            },
+            "result": { "status": "passed", "duration": 10000 }
+          },
+          {
+            "match": {
+              "location": "email_spec-2.2.0/lib/email_spec/cucumber.rb:19"
+            },
+            "result": { "status": "passed", "duration": 9000 }
+          },
+          {
+            "match": {
+              "location": "capybara-3.31.0/lib/capybara/cucumber.rb:10"
+            },
+            "result": { "status": "passed", "duration": 44753000 }
+          }
+        ]
+      },
+      {
+        "id": "consumer-requests-enrollment-in-coverall;when-we-login-as-hbx-admin-with-read-and-write-permissions-then-on-family-tab-we-should-not-see-link-new-dc-resident-application",
+        "keyword": "Scenario",
+        "name": "When we login as Hbx admin with read and write permissions then on family tab we should not see link New DC Resident Application",
+        "description": "",
+        "line": 43,
+        "type": "scenario",
+        "before": [
+          {
+            "match": {
+              "location": "capybara-3.31.0/lib/capybara/cucumber.rb:14"
+            },
+            "result": { "status": "passed", "duration": 11000 }
+          },
+          {
+            "match": {
+              "location": "capybara-3.31.0/lib/capybara/cucumber.rb:22"
+            },
+            "result": { "status": "passed", "duration": 8000 }
+          },
+          {
+            "match": {
+              "location": "email_spec-2.2.0/lib/email_spec/cucumber.rb:10"
+            },
+            "result": { "status": "passed", "duration": 257000 }
+          },
+          {
+            "match": {
+              "location": "capybara-screenshot-1.0.24/lib/capybara-screenshot/cucumber.rb:3"
+            },
+            "result": { "status": "passed", "duration": 10000 }
+          },
+          {
+            "match": { "location": "features/support/rails_cache.rb:1" },
+            "result": { "status": "passed", "duration": 15000 }
+          },
+          {
+            "match": { "location": "features/support/rails_cache_clear.rb:1" },
+            "result": { "status": "passed", "duration": 34293000 }
+          },
+          {
+            "match": { "location": "features/support/screenshots.rb:1" },
+            "result": { "status": "passed", "duration": 37000 }
+          }
+        ],
+        "steps": [
+          {
+            "keyword": "Given ",
+            "name": "a Hbx admin with super admin access exists",
+            "line": 44,
+            "match": {
+              "location": "features/step_definitions/integration_steps.rb:279"
+            },
+            "result": { "status": "passed", "duration": 874343000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 18000 }
+              }
+            ]
+          },
+          {
+            "keyword": "When ",
+            "name": "Hbx Admin logs on to the Hbx Portal",
+            "line": 45,
+            "match": {
+              "location": "features/step_definitions/integration_steps.rb:365"
+            },
+            "result": { "status": "passed", "duration": 750434000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 17000 }
+              }
+            ]
+          },
+          {
+            "keyword": "When ",
+            "name": "Hbx Admin click Families dropdown",
+            "line": 46,
+            "match": {
+              "location": "features/step_definitions/edit_aptc_csr_steps.rb:13"
+            },
+            "result": { "status": "passed", "duration": 757424000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 27000 }
+              }
+            ]
+          },
+          {
+            "keyword": "Then ",
+            "name": "Hbx Admin should not see an New DC Resident Application link",
+            "line": 47,
+            "match": {
+              "location": "features/step_definitions/cover_all_steps.rb:5"
+            },
+            "result": { "status": "passed", "duration": 50746000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 17000 }
+              }
+            ]
+          },
+          {
+            "keyword": "And ",
+            "name": "Hbx Admin logs out",
+            "line": 48,
+            "match": {
+              "location": "features/step_definitions/integration_steps.rb:463"
+            },
+            "result": { "status": "passed", "duration": 512798000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 45000 }
+              }
+            ]
+          }
+        ],
+        "after": [
+          {
+            "match": { "location": "features/support/warden.rb:3" },
+            "result": { "status": "passed", "duration": 15000 }
+          },
+          {
+            "match": { "location": "features/support/user_cleanup.rb:1" },
+            "result": { "status": "passed", "duration": 3987000 }
+          },
+          {
+            "match": {
+              "location": "capybara-screenshot-1.0.24/lib/capybara-screenshot/cucumber.rb:7"
+            },
+            "result": { "status": "passed", "duration": 10000 }
+          },
+          {
+            "match": {
+              "location": "email_spec-2.2.0/lib/email_spec/cucumber.rb:19"
+            },
+            "result": { "status": "passed", "duration": 9000 }
+          },
+          {
+            "match": {
+              "location": "capybara-3.31.0/lib/capybara/cucumber.rb:10"
+            },
+            "result": { "status": "passed", "duration": 43665000 }
+          }
+        ]
+      },
+      {
+        "id": "consumer-requests-enrollment-in-coverall;when-we-login-as-hbx-admin-then-on-family-tab-admin-should-not-see-link-new-consumer-phone-application-and-new-consumer-paper-application",
+        "keyword": "Scenario",
+        "name": "When we login as Hbx admin then on family tab admin should not see link New Consumer Phone Application and New Consumer Paper Application",
+        "description": "",
+        "line": 50,
+        "type": "scenario",
+        "before": [
+          {
+            "match": {
+              "location": "capybara-3.31.0/lib/capybara/cucumber.rb:14"
+            },
+            "result": { "status": "passed", "duration": 11000 }
+          },
+          {
+            "match": {
+              "location": "capybara-3.31.0/lib/capybara/cucumber.rb:22"
+            },
+            "result": { "status": "passed", "duration": 9000 }
+          },
+          {
+            "match": {
+              "location": "email_spec-2.2.0/lib/email_spec/cucumber.rb:10"
+            },
+            "result": { "status": "passed", "duration": 264000 }
+          },
+          {
+            "match": {
+              "location": "capybara-screenshot-1.0.24/lib/capybara-screenshot/cucumber.rb:3"
+            },
+            "result": { "status": "passed", "duration": 9000 }
+          },
+          {
+            "match": { "location": "features/support/rails_cache.rb:1" },
+            "result": { "status": "passed", "duration": 16000 }
+          },
+          {
+            "match": { "location": "features/support/rails_cache_clear.rb:1" },
+            "result": { "status": "passed", "duration": 32446000 }
+          },
+          {
+            "match": { "location": "features/support/screenshots.rb:1" },
+            "result": { "status": "passed", "duration": 41000 }
+          }
+        ],
+        "steps": [
+          {
+            "keyword": "Given ",
+            "name": "a Hbx admin with read and write permissions exists",
+            "line": 51,
+            "match": {
+              "location": "features/step_definitions/integration_steps.rb:267"
+            },
+            "result": { "status": "passed", "duration": 927289000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 18000 }
+              }
+            ]
+          },
+          {
+            "keyword": "When ",
+            "name": "Hbx Admin logs on to the Hbx Portal",
+            "line": 52,
+            "match": {
+              "location": "features/step_definitions/integration_steps.rb:365"
+            },
+            "result": { "status": "passed", "duration": 696017000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 17000 }
+              }
+            ]
+          },
+          {
+            "keyword": "When ",
+            "name": "Hbx Admin click Families dropdown",
+            "line": 53,
+            "match": {
+              "location": "features/step_definitions/edit_aptc_csr_steps.rb:13"
+            },
+            "result": { "status": "passed", "duration": 732433000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 28000 }
+              }
+            ]
+          },
+          {
+            "keyword": "Then ",
+            "name": "Hbx Admin should not see an New Consumer Phone Application link and New Consumer Paper Application link",
+            "line": 54,
+            "match": {
+              "location": "features/step_definitions/cover_all_steps.rb:17"
+            },
+            "result": { "status": "passed", "duration": 82631000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 19000 }
+              }
+            ]
+          }
+        ],
+        "after": [
+          {
+            "match": { "location": "features/support/warden.rb:3" },
+            "result": { "status": "passed", "duration": 40000 }
+          },
+          {
+            "match": { "location": "features/support/user_cleanup.rb:1" },
+            "result": { "status": "passed", "duration": 4053000 }
+          },
+          {
+            "match": {
+              "location": "capybara-screenshot-1.0.24/lib/capybara-screenshot/cucumber.rb:7"
+            },
+            "result": { "status": "passed", "duration": 10000 }
+          },
+          {
+            "match": {
+              "location": "email_spec-2.2.0/lib/email_spec/cucumber.rb:19"
+            },
+            "result": { "status": "passed", "duration": 9000 }
+          },
+          {
+            "match": {
+              "location": "capybara-3.31.0/lib/capybara/cucumber.rb:10"
+            },
+            "result": { "status": "passed", "duration": 66867000 }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "uri": "features/cover_all/transition_family_member.feature",
+    "id": "can-transition-family-members",
+    "keyword": "Feature",
+    "name": "can Transition family members",
+    "description": "",
+    "line": 1,
+    "elements": [
+      {
+        "keyword": "Background",
+        "name": "Hbx Admin can Transition family members",
+        "description": "",
+        "line": 3,
+        "type": "background",
+        "before": [
+          {
+            "match": {
+              "location": "capybara-3.31.0/lib/capybara/cucumber.rb:14"
+            },
+            "result": { "status": "passed", "duration": 60000 }
+          },
+          {
+            "match": {
+              "location": "capybara-3.31.0/lib/capybara/cucumber.rb:22"
+            },
+            "result": { "status": "passed", "duration": 8000 }
+          },
+          {
+            "match": {
+              "location": "email_spec-2.2.0/lib/email_spec/cucumber.rb:10"
+            },
+            "result": { "status": "passed", "duration": 585000 }
+          },
+          {
+            "match": {
+              "location": "capybara-screenshot-1.0.24/lib/capybara-screenshot/cucumber.rb:3"
+            },
+            "result": { "status": "passed", "duration": 10000 }
+          },
+          {
+            "match": { "location": "features/support/rails_cache.rb:1" },
+            "result": { "status": "passed", "duration": 17000 }
+          },
+          {
+            "match": { "location": "features/support/rails_cache_clear.rb:1" },
+            "result": { "status": "passed", "duration": 34008000 }
+          },
+          {
+            "match": { "location": "features/support/screenshots.rb:1" },
+            "result": { "status": "passed", "duration": 36000 }
+          }
+        ],
+        "steps": [
+          {
+            "keyword": "Given ",
+            "name": "a Hbx admin with hbx_staff role exists",
+            "line": 4,
+            "match": { "location": "features/support/worlds/hbx_admin.rb:33" },
+            "result": { "status": "passed", "duration": 443025000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 18000 }
+              }
+            ]
+          },
+          {
+            "keyword": "And ",
+            "name": "a consumer exists",
+            "line": 5,
+            "match": {
+              "location": "features/step_definitions/verification_process_steps.rb:31"
+            },
+            "result": { "status": "passed", "duration": 98024000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 15000 }
+              }
+            ]
+          },
+          {
+            "keyword": "And ",
+            "name": "a Hbx admin logs on to Portal",
+            "line": 6,
+            "match": { "location": "features/support/worlds/hbx_admin.rb:53" },
+            "result": { "status": "passed", "duration": 848847000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 23000 }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "can-transition-family-members;only-hbx-admin-can-view-transition-family-members-link-actions-dropdown-in-families-index-page",
+        "keyword": "Scenario",
+        "name": "Only Hbx Admin can view Transition family members link actions dropdown in families index page",
+        "description": "",
+        "line": 8,
+        "type": "scenario",
+        "steps": [
+          {
+            "keyword": "When ",
+            "name": "Hbx Admin click Families link",
+            "line": 9,
+            "match": {
+              "location": "features/step_definitions/edit_aptc_csr_steps.rb:5"
+            },
+            "result": { "status": "passed", "duration": 1554227000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 18000 }
+              }
+            ]
+          },
+          {
+            "keyword": "Then ",
+            "name": "Hbx Admin should see the list of primary applicants and an Action button",
+            "line": 10,
+            "match": {
+              "location": "features/step_definitions/edit_dob_ssn_steps.rb:1"
+            },
+            "result": { "status": "passed", "duration": 24069000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 17000 }
+              }
+            ]
+          },
+          {
+            "keyword": "When ",
+            "name": "Hbx Admin clicks Action button",
+            "line": 11,
+            "match": {
+              "location": "features/step_definitions/edit_dob_ssn_steps.rb:18"
+            },
+            "result": { "status": "passed", "duration": 133073000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 19000 }
+              }
+            ]
+          },
+          {
+            "keyword": "Then ",
+            "name": "Hbx Admin should see an Transition family members link",
+            "line": 12,
+            "match": {
+              "location": "features/step_definitions/cover_all_steps.rb:127"
+            },
+            "result": { "status": "passed", "duration": 16783000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 19000 }
+              }
+            ]
+          }
+        ],
+        "after": [
+          {
+            "match": { "location": "features/support/warden.rb:3" },
+            "result": { "status": "passed", "duration": 17000 }
+          },
+          {
+            "match": { "location": "features/support/user_cleanup.rb:1" },
+            "result": { "status": "passed", "duration": 4271000 }
+          },
+          {
+            "match": {
+              "location": "capybara-screenshot-1.0.24/lib/capybara-screenshot/cucumber.rb:7"
+            },
+            "result": { "status": "passed", "duration": 13000 }
+          },
+          {
+            "match": {
+              "location": "email_spec-2.2.0/lib/email_spec/cucumber.rb:19"
+            },
+            "result": { "status": "passed", "duration": 10000 }
+          },
+          {
+            "match": {
+              "location": "capybara-3.31.0/lib/capybara/cucumber.rb:10"
+            },
+            "result": { "status": "passed", "duration": 38179000 }
+          }
+        ]
+      },
+      {
+        "keyword": "Background",
+        "name": "Hbx Admin can Transition family members",
+        "description": "",
+        "line": 3,
+        "type": "background",
+        "before": [
+          {
+            "match": {
+              "location": "capybara-3.31.0/lib/capybara/cucumber.rb:14"
+            },
+            "result": { "status": "passed", "duration": 11000 }
+          },
+          {
+            "match": {
+              "location": "capybara-3.31.0/lib/capybara/cucumber.rb:22"
+            },
+            "result": { "status": "passed", "duration": 8000 }
+          },
+          {
+            "match": {
+              "location": "email_spec-2.2.0/lib/email_spec/cucumber.rb:10"
+            },
+            "result": { "status": "passed", "duration": 587000 }
+          },
+          {
+            "match": {
+              "location": "capybara-screenshot-1.0.24/lib/capybara-screenshot/cucumber.rb:3"
+            },
+            "result": { "status": "passed", "duration": 11000 }
+          },
+          {
+            "match": { "location": "features/support/rails_cache.rb:1" },
+            "result": { "status": "passed", "duration": 17000 }
+          },
+          {
+            "match": { "location": "features/support/rails_cache_clear.rb:1" },
+            "result": { "status": "passed", "duration": 34106000 }
+          },
+          {
+            "match": { "location": "features/support/screenshots.rb:1" },
+            "result": { "status": "passed", "duration": 36000 }
+          }
+        ],
+        "steps": [
+          {
+            "keyword": "Given ",
+            "name": "a Hbx admin with hbx_staff role exists",
+            "line": 4,
+            "match": { "location": "features/support/worlds/hbx_admin.rb:33" },
+            "result": { "status": "passed", "duration": 392923000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 16000 }
+              }
+            ]
+          },
+          {
+            "keyword": "And ",
+            "name": "a consumer exists",
+            "line": 5,
+            "match": {
+              "location": "features/step_definitions/verification_process_steps.rb:31"
+            },
+            "result": { "status": "passed", "duration": 87475000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 12000 }
+              }
+            ]
+          },
+          {
+            "keyword": "And ",
+            "name": "a Hbx admin logs on to Portal",
+            "line": 6,
+            "match": { "location": "features/support/worlds/hbx_admin.rb:53" },
+            "result": { "status": "passed", "duration": 801112000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 40000 }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "can-transition-family-members;transition-family-member-from-consumer-role-to-cover-all",
+        "keyword": "Scenario",
+        "name": "Transition family member from consumer role to cover all",
+        "description": "",
+        "line": 14,
+        "type": "scenario",
+        "steps": [
+          {
+            "keyword": "When ",
+            "name": "Hbx Admin click Families link",
+            "line": 15,
+            "match": {
+              "location": "features/step_definitions/edit_aptc_csr_steps.rb:5"
+            },
+            "result": { "status": "passed", "duration": 1463955000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 28000 }
+              }
+            ]
+          },
+          {
+            "keyword": "Then ",
+            "name": "Hbx Admin should see the list of primary applicants and an Action button",
+            "line": 16,
+            "match": {
+              "location": "features/step_definitions/edit_dob_ssn_steps.rb:1"
+            },
+            "result": { "status": "passed", "duration": 24923000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 19000 }
+              }
+            ]
+          },
+          {
+            "keyword": "When ",
+            "name": "Hbx Admin clicks Action button",
+            "line": 17,
+            "match": {
+              "location": "features/step_definitions/edit_dob_ssn_steps.rb:18"
+            },
+            "result": { "status": "passed", "duration": 115515000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 30000 }
+              }
+            ]
+          },
+          {
+            "keyword": "Then ",
+            "name": "Hbx Admin should see an Transition family members link",
+            "line": 18,
+            "match": {
+              "location": "features/step_definitions/cover_all_steps.rb:127"
+            },
+            "result": { "status": "passed", "duration": 12514000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 17000 }
+              }
+            ]
+          },
+          {
+            "keyword": "When ",
+            "name": "Hbx Admin clicks Transition family members link",
+            "line": 19,
+            "match": {
+              "location": "features/step_definitions/cover_all_steps.rb:131"
+            },
+            "result": { "status": "passed", "duration": 64912000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 16000 }
+              }
+            ]
+          },
+          {
+            "keyword": "And ",
+            "name": "Hbx Admin should see the form being rendered to transition each family members seperately",
+            "line": 20,
+            "match": {
+              "location": "features/step_definitions/cover_all_steps.rb:136"
+            },
+            "result": { "status": "passed", "duration": 160113000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 16000 }
+              }
+            ]
+          },
+          {
+            "keyword": "And ",
+            "name": "Hbx Admin enter/update information of each member individually",
+            "line": 21,
+            "match": {
+              "location": "features/step_definitions/cover_all_steps.rb:141"
+            },
+            "result": { "status": "passed", "duration": 201401000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 18000 }
+              }
+            ]
+          },
+          {
+            "keyword": "And ",
+            "name": "Hbx Admin clicks submit button",
+            "line": 22,
+            "match": {
+              "location": "features/step_definitions/cover_all_steps.rb:147"
+            },
+            "result": { "status": "passed", "duration": 73416000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 17000 }
+              }
+            ]
+          },
+          {
+            "keyword": "And ",
+            "name": "Hbx Admin should show the Transition Results and the close button",
+            "line": 23,
+            "match": {
+              "location": "features/step_definitions/cover_all_steps.rb:151"
+            },
+            "result": { "status": "passed", "duration": 311415000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 17000 }
+              }
+            ]
+          },
+          {
+            "keyword": "When ",
+            "name": "Hbx Admin clicks close button",
+            "line": 24,
+            "match": {
+              "location": "features/step_definitions/cover_all_steps.rb:157"
+            },
+            "result": { "status": "passed", "duration": 59584000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 15000 }
+              }
+            ]
+          },
+          {
+            "keyword": "Then ",
+            "name": "Transition family members form should be closed",
+            "line": 25,
+            "match": {
+              "location": "features/step_definitions/cover_all_steps.rb:161"
+            },
+            "result": { "status": "passed", "duration": 142882000 },
+            "after": [
+              {
+                "match": {
+                  "location": "features/step_definitions/employer_profile_steps.rb:315"
+                },
+                "result": { "status": "passed", "duration": 18000 }
+              }
+            ]
+          }
+        ],
+        "after": [
+          {
+            "match": { "location": "features/support/warden.rb:3" },
+            "result": { "status": "passed", "duration": 16000 }
+          },
+          {
+            "match": { "location": "features/support/user_cleanup.rb:1" },
+            "result": { "status": "passed", "duration": 4140000 }
+          },
+          {
+            "match": {
+              "location": "capybara-screenshot-1.0.24/lib/capybara-screenshot/cucumber.rb:7"
+            },
+            "result": { "status": "passed", "duration": 9000 }
+          },
+          {
+            "match": {
+              "location": "email_spec-2.2.0/lib/email_spec/cucumber.rb:19"
+            },
+            "result": { "status": "passed", "duration": 9000 }
+          },
+          {
+            "match": {
+              "location": "capybara-3.31.0/lib/capybara/cucumber.rb:10"
+            },
+            "result": { "status": "passed", "duration": 41338000 }
+          }
+        ]
+      }
+    ]
+  }
+]
