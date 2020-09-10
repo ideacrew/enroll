@@ -266,6 +266,4 @@ jobs:
         run: |
           cp -f config/cucumber.yml config/cucumber.yml.bak
           cp -f config/cucumber_split.yml config/cucumber.yml
-          cat config/cucumber.yml
-          export DISPLAY=:99
-          cucumber_booster --job ${{ matrix.group }}/${{ strategy.job-total }} features
+          cucumber_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
