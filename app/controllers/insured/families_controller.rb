@@ -175,12 +175,10 @@ class Insured::FamiliesController < FamiliesController
       reporting_deadline = @qle_date > today ? today : @qle_date + 30.days
       employee_role = @person.active_employee_roles.first
       if Settings.site.key == :cca
-        trigger_notice_observer(employee_role, benefit_application, 'employee_notice_for_sep_denial',
-                                qle_title: @qle.title, qle_reporting_deadline: reporting_deadline.strftime("%m/%d/%Y"), qle_event_on: @qle_event_date)
+        trigger_notice_observer(employee_role, benefit_application, 'employee_notice_for_sep_denial', qle_title: @qle.title, qle_reporting_deadline: reporting_deadline.strftime("%m/%d/%Y"), qle_event_on: @qle_event_date.strftime("%m/%d/%Y"))
       elsif Settings.site.key == :dc
         event_name = @person.has_multiple_active_employers? ? 'sep_denial_notice_for_ee_active_on_multiple_rosters' : 'sep_denial_notice_for_ee_active_on_single_roster'
-        trigger_notice_observer(employee_role, benefit_application, event_name,
-                                qle_title: @qle.title, qle_reporting_deadline: reporting_deadline.strftime("%m/%d/%Y"), qle_event_on: @qle_event_date)
+        trigger_notice_observer(employee_role, benefit_application, event_name, qle_title: @qle.title, qle_reporting_deadline: reporting_deadline.strftime("%m/%d/%Y"), qle_event_on: @qle_event_date.strftime("%m/%d/%Y"))
       end
     end
   end
