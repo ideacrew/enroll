@@ -263,7 +263,4 @@ jobs:
       - name: run webpack
         run: NODE_ENV=test RAILS_ENV=test ./bin/webpack
       - name: Run tests
-        run: |
-          cp -f config/cucumber.yml config/cucumber.yml.bak
-          cp -f config/cucumber_split.yml config/cucumber.yml
-          cucumber_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
+        run: cucumber_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
