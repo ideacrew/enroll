@@ -1,2 +1,2 @@
-default: --format pretty --strict --tags 'not @wip' --tags 'not @more_than_sole_source' -r features --profile semaphoreci
-semaphoreci: --format pretty --strict --tags 'not @wip' --tags 'not @more_than_sole_source' -r features
+default: --format pretty --strict --tags 'not @wip' --tags 'not @more_than_sole_source' --tags 'not @flaky' -r features --profile semaphoreci
+semaphoreci: --format pretty --strict --tags 'not @wip' --tags 'not @more_than_sole_source' --tags 'not @flaky' -r features
