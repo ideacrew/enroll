@@ -11,7 +11,7 @@ class LoadIssuerProfiles < MongoidMigrationTask
       {fein: "042452600", issuer_hios_ids: ["36046"], legal_name: "Harvard Pilgrim Health Care", abbreviation: "HPHC", hbx_carrier_id: 20008, shop_health: true },
       {fein: "234547586", issuer_hios_ids: ["41304"], legal_name: "AllWays Health Partners", abbreviation: "NHP", hbx_carrier_id: 20010, shop_health: true },
       {fein: "800721489", issuer_hios_ids: ["59763"], legal_name: "Tufts Health Direct", abbreviation: "THPD", hbx_carrier_id: 20011, shop_health: true },
-      {fein: "042674079", issuer_hios_ids: ["29125"], legal_name: "Tufts Health Premier", abbreviation: "THPP", hbx_carrier_id: 20012, shop_health: true },
+      {fein: "042674079", issuer_hios_ids: ["29125", "38712"], legal_name: "Tufts Health Premier", abbreviation: "THPP", hbx_carrier_id: 20_012, shop_health: true },
       {fein: "362739571", issuer_hios_ids: ["31779"], legal_name: "UnitedHealthcare", abbreviation: "UHIC", hbx_carrier_id: 20014, shop_health: true },
       {fein: "050513223", issuer_hios_ids: ["18076"], legal_name: "Altus Dental", abbreviation: "ALT", hbx_carrier_id: 20001, shop_dental: true },
       {fein: "046143185", issuer_hios_ids: ["80538", "11821"], legal_name: "Delta Dental", abbreviation: "DDA", hbx_carrier_id: 20004, shop_dental: true }
