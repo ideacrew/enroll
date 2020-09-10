@@ -1,1 +1,2 @@
-default: --format pretty --strict --tags 'not @wip' -r features
+default: --format pretty --strict --tags 'not @wip' -r features --profile semaphoreci
+semaphoreci: --format pretty --strict --tags 'not @wip' -r features
