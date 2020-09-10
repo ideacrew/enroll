@@ -129,6 +129,11 @@ module BenefitMarkets
         ])
     }
 
+    scope :by_year, lambda {|year|
+      where('$and' => [{'application_period.min' => {'$lte' => Date.new(year.to_i)}},
+                       {'application_period.max' => {'$gte' => Date.new(year.to_i).end_of_year}}])
+    }
+
     #Products retrieval by type
     scope :health_products,            ->{ where(:"_type" => /.*HealthProduct$/) }
     scope :dental_products,            ->{ where(:"_type" => /.*DentalProduct$/)}
