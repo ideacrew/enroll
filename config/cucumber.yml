@@ -1,1 +1,1 @@
-default: --format pretty --strict --tags 'not @wip' -r features --profile
+default: --format pretty --strict --tags 'not @wip' -r features
