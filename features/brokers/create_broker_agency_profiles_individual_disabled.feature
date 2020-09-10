@@ -52,7 +52,7 @@ Feature: Create Primary Broker and Broker Agency
     When Primary Broker registers with valid information
     Then Primary Broker should see successful message with broker agency home page
     And Primary Broker select the all security question and give the answer
-    When Primary Broker have submit the security questions    
+    When Primary Broker have submit the security questions
     And Primary Broker logs out
 
     Given Employer has not signed up as an HBX user
