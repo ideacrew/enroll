@@ -27,10 +27,10 @@ class SbcProcessor2015
 
       # new model
       products = if hios_id.include? '-'
-        ::BenefitMarkets::Products::Product.where(hios_id:hios_id)
-      else
-        ::BenefitMarkets::Products::Product.where(hios_id:/#{hios_id}/)
-      end.select{|a| a.active_year.to_i  == row[2].strip.to_i}
+                   ::BenefitMarkets::Products::Product.where(hios_id: hios_id)
+                 else
+                   ::BenefitMarkets::Products::Product.where(hios_id: /#{hios_id}/)
+                 end.by_year(row[2].strip)
 
       products.each do |product|
         file_name = row[1].strip
@@ -49,14 +49,14 @@ class SbcProcessor2015
         product.sbc_document.save!
         product.save!
         counter += 1
-        puts "Product #{product.title} #{product.hios_id}updated, SBC #{file_name}, Document uri #{product.sbc_document.identifier}" unless Rails.env.test?
+        puts "Product #{product.title} #{product.hios_id} updated, SBC #{file_name}, Document uri #{product.sbc_document.identifier}" unless Rails.env.test?
         # end of new model
       end
     end
 
     # old model
     Plan.where(active_year: 2021).each do |plan|
-      product = ::BenefitMarkets::Products::Product.where(hios_id: plan.hios_id).select{|a| a.active_year.to_i  == plan.active_year.to_i}.first
+      product = ::BenefitMarkets::Products::Product.by_year(plan.active_year).where(hios_id: plan.hios_id).first
 
       if product.present?
         plan.sbc_document = product.sbc_document
