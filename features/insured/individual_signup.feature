@@ -101,6 +101,7 @@ Feature: Insured Plan Shopping on Individual market
     Then Individual should see identity verification page and clicks on submit
     Then Individual logs out
 
+  @flaky
   Scenario: Individual should see document errors when proceeds without uploading document.
     Given Individual resumes enrollment
     And Individual click on Sign In

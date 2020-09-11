@@ -6,5 +6,5 @@ export interface FileWithRuntimeDictionary {
 
 export interface FileWithRuntime {
   filePath: string;
-  runTime: number;
+  runTime: number; // in milliseconds
 }

@@ -1,18 +1,19 @@
 import { FileWithRuntime, SplitConfig } from '../models';
+import { groupCount } from './numberOfGroups';
 
 export function splitFilesIntoGroups(
   numberOfGroups: number,
-  arr: FileWithRuntime[]
+  files: FileWithRuntime[]
   // targetRuntimePerGroup: number
 ): SplitConfig[] {
-  const totalRuntime = arr.reduce((runtime, file) => {
+  const totalRuntime = files.reduce((runtime, file) => {
     return runtime + file.runTime;
   }, 0);
   const targetRuntimePerGroup = Math.floor(totalRuntime / +numberOfGroups);
 
   console.log(
     'Splitting',
-    arr.length,
+    files.length,
     'files into',
     numberOfGroups,
     'groups, each being around',
@@ -20,7 +21,9 @@ export function splitFilesIntoGroups(
     'minutes long.'
   );
 
-  console.log(arr.map((file) => file.runTime).slice(0, 10));
+  groupCount(files);
+
+  // console.log(files.map((file) => file.runTime).slice(0, 10));
   let split: SplitConfig[] = [];
 
   let bucketTimes = Array.from({ length: numberOfGroups }, () => ({
@@ -29,7 +32,7 @@ export function splitFilesIntoGroups(
 
   let bucket = 0;
 
-  for (let file of arr) {
+  for (let file of files) {
     const currentBucketTime = bucketTimes[bucket].runTime;
 
     if (currentBucketTime + file.runTime < targetRuntimePerGroup) {
@@ -40,7 +43,7 @@ export function splitFilesIntoGroups(
 
       bucketTimes[bucket].runTime += file.runTime;
     } else {
-      console.log(file.filePath, 'is too large to go into bucket', bucket);
+      // console.log(file.filePath, 'is too large to go into bucket', bucket);
       if (bucket < numberOfGroups - 1) {
         bucket += 1;
       }
@@ -52,7 +55,7 @@ export function splitFilesIntoGroups(
     }
   }
 
-  // console.log(bucketTimes);
+  console.log(bucketTimes);
 
   return split;
 }

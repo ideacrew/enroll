@@ -31,6 +31,8 @@ async function createCucumberSplitConfig() {
   // Generate list of slow files
   const arrayOfSlowFiles: FileWithRuntime[] = report
     .map((feature: CucumberFeature) => {
+
+      // totalRunTime is in nanoseconds
       const totalRunTime = feature.elements.reduce((totalTime, element) => {
         const stepRunTime = calculateStepsRuntime(element.steps);
 
@@ -41,6 +43,7 @@ async function createCucumberSplitConfig() {
         filePath: feature.uri,
         runTime: totalRunTime / 1_000_000,
       };
+
       return runtimeInfo;
     })
     .sort((a, b) => (a.runTime < b.runTime ? -1 : 1));
