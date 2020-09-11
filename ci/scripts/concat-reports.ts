@@ -2,7 +2,10 @@ const { promises: fs } = require('fs');
 
 async function getJson() {
   const admin = await fs.readFile('./ci/cucumber/admin-report.json', 'utf-8');
-  const broker = await fs.readFile('./ci/cucumber/broker-report.json', 'utf-8');
+  const broker = await fs.readFile(
+    './ci/cucumber/brokers-report.json',
+    'utf-8'
+  );
   const coverall = await fs.readFile(
     './ci/cucumber/coverall-report.json',
     'utf-8'
@@ -23,11 +26,11 @@ async function getJson() {
     './ci/cucumber/group-selection-report.json',
     'utf-8'
   );
+  const hbx = await fs.readFile('./ci/cucumber/hbx-report.json', 'utf-8');
   const hbxAdmin = await fs.readFile(
     './ci/cucumber/hbx-admin-report.json',
     'utf-8'
   );
-  const hbx = await fs.readFile('./ci/cucumber/hbx-report.json', 'utf-8');
   const insured = await fs.readFile(
     './ci/cucumber/insured-report.json',
     'utf-8'
@@ -70,7 +73,7 @@ async function getJson() {
 
   const jsonList = JSON.stringify(allReports);
 
-  await fs.writeFile('./ci/cucumber-report.json', jsonList);
+  await fs.writeFile('./ci/cucumber/cucumber-report.json', jsonList);
 }
 
 getJson();

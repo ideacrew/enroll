@@ -11,6 +11,7 @@ Feature: Insured Plan Shopping on Individual market
     When user clicks on continue button
     Then Individual logs out
 
+  @flaky
   Scenario: New insured user purchases on individual market
     Given Individual resumes enrollment
     And Individual click on Sign In
@@ -52,39 +53,39 @@ Feature: Insured Plan Shopping on Individual market
     And I should see the individual home page
     Then Individual logs out
 
-  # @flaky
-  # Scenario: New insured user purchases on individual market and click on 'Make changes' button on enrollment
-  #   Given Individual resumes enrollment
-  #   And Individual click on Sign In
-  #   And I signed in
-  #   Then user should see heading labeled personal information
-  #   Then Individual should click on Individual market for plan shopping #TODO re-write this step
-  #   Then Individual should see a form to enter personal information
-  #   When Individual clicks on Save and Exit
-  #   Then Individual resumes enrollment
-  #   And Individual click on Sign In
-  #   And I signed in
-  #   Then Individual sees previously saved address
-  #   Then Individual agrees to the privacy agreeement
-  #   Then Individual should see identity verification page and clicks on submit
-  #   Then Individual should be on the Help Paying for Coverage page
-  #   Then Individual does not apply for assistance and clicks continue
-  #   Then the user clicks on add member button
-  #   And the user fills the the add member form
-  #   Then Individual should see the dependents form
-  #   And Individual clicks on add member button
-  #   And Individual again clicks on add member button #TODO re-write this step
-  #   And I click on continue button on household info form
-  #   And I click on continue button on group selection page
-  #   And I select three plans to compare
-  #   And I should not see any plan which premium is 0
-  #   And I select a plan on plan shopping page
-  #   And I click on purchase button on confirmation page
-  #   And I click on continue button to go to the individual home page
-  #   Then I should see the individual home page
-  #   When consumer clicked on make changes button
-  #   Then I should not see any plan which premium is 0
-  #   Then Individual logs out
+  @flaky
+  Scenario: New insured user purchases on individual market and click on 'Make changes' button on enrollment
+    Given Individual resumes enrollment
+    And Individual click on Sign In
+    And I signed in
+    Then user should see heading labeled personal information
+    Then Individual should click on Individual market for plan shopping #TODO re-write this step
+    Then Individual should see a form to enter personal information
+    When Individual clicks on Save and Exit
+    Then Individual resumes enrollment
+    And Individual click on Sign In
+    And I signed in
+    Then Individual sees previously saved address
+    Then Individual agrees to the privacy agreeement
+    Then Individual should see identity verification page and clicks on submit
+    Then Individual should be on the Help Paying for Coverage page
+    Then Individual does not apply for assistance and clicks continue
+    Then the user clicks on add member button
+    And the user fills the the add member form
+    Then Individual should see the dependents form
+    And Individual clicks on add member button
+    And Individual again clicks on add member button #TODO re-write this step
+    And I click on continue button on household info form
+    And I click on continue button on group selection page
+    And I select three plans to compare
+    And I should not see any plan which premium is 0
+    And I select a plan on plan shopping page
+    And I click on purchase button on confirmation page
+    And I click on continue button to go to the individual home page
+    Then I should see the individual home page
+    When consumer clicked on make changes button
+    Then I should not see any plan which premium is 0
+    Then Individual logs out
 
   Scenario: Individual should not see document errors when not applying for coverage.
     Given Individual resumes enrollment
@@ -112,6 +113,7 @@ Feature: Insured Plan Shopping on Individual market
     Then Individual should see error message Document type cannot be blank
     Then Individual logs out
 
+  @flaky
   Scenario: Dependents should see document errors when proceeds without uploading document.
     Given Individual resumes enrollment
     And Individual click on Sign In

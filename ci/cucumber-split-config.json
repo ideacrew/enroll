@@ -1,124 +1,131 @@
 [
   {
     "files": [
+      "features/employers/employer_billing_tab.feature",
       "features/employers/employer_claim_code.feature",
       "features/employers/employer_attestation_sole_source.feature",
-      "features/employers/employer_billing_tab.feature",
-      "features/admin/edit_aptc_csr.feature",
       "features/brokers/create_broker_agency_profiles_individual_disabled.feature",
+      "features/admin/edit_aptc_csr.feature",
       "features/admin/search_broker_agency.feature",
-      "features/plan_shopping/employee_plan_filters.feature",
-      "features/employee/employee_home_page.feature",
       "features/plan_shopping/employee_plan_sort.feature",
+      "features/employee/employee_home_page.feature",
+      "features/plan_shopping/employee_plan_filters.feature",
+      "features/admin/employer_search.feature",
       "features/admin/outstanding_verifications.feature",
       "features/brokers/employer_broker_search.feature",
       "features/permissions/extend_open_enrollment_cancelled.feature",
-      "features/admin/employer_search.feature",
       "features/admin/paper_phone.feature",
       "features/employee/newly_designated_employee.feature",
       "features/employee/fehb_employee_plan_shopping.feature",
-      "features/employers/edit_plan_year_for_renewing_employer.feature",
-      "features/cover_all/transition_family_member.feature",
       "features/employee/passive_renewal_cancellation_upon_ee_coverage_waiver.feature",
-      "features/admin/update_username_email.feature",
-      "features/brokers/employer_hires_broker.feature",
-      "features/integration/employee_sign_up.feature",
       "features/brokers/broker_applicant_edit.feature",
+      "features/employers/edit_plan_year_for_renewing_employer.feature",
       "features/general_agencies/ga_registration.feature",
+      "features/cover_all/transition_family_member.feature",
+      "features/admin/update_username_email.feature",
+      "features/integration/employee_sign_up.feature",
       "features/brokers/create_general_agency_profiles.feature",
       "features/group_selection/dual_role_plan_shopping.feature",
-      "features/employee/passive_renewal_cancellation_upon_ee_coverage_selection.feature",
-      "features/brokers/employer_terminates_and_hires_new_broker.feature",
-      "features/plan_shopping/cca_employer_sole_source_health_shopping.feature",
-      "features/admin/families_tab_access.feature"
+      "features/permissions/send_secure_message.feature"
     ]
   },
   {
     "files": [
+      "features/employee/passive_renewal_cancellation_upon_ee_coverage_selection.feature",
+      "features/brokers/employer_terminates_and_hires_new_broker.feature",
+      "features/plan_shopping/cca_employer_sole_source_health_shopping.feature",
       "features/brokers/create_broker_agency_staff.feature",
+      "features/admin/families_tab_access.feature",
       "features/admin/new_plan_year.feature",
-      "features/employers/census_details_page.feature",
       "features/group_selection/resident_plan_shopping.feature",
-      "features/employers/edit_renewing_plan_year_for_employer.feature",
-      "features/group_selection/ivl_plan_shopping.feature",
-      "features/employee/employee_plan_shopping_with_covid_qle.feature",
+      "features/cover_all/consumer_requests_enrollment.feature",
       "features/admin/add_sep_read_only.feature",
+      "features/group_selection/ivl_plan_shopping.feature",
+      "features/employee/employee_plan_shopping_with_covid_qle.feature"
+    ]
+  },
+  {
+    "files": [
+      "features/insured/individual_curam_document.feature",
+      "features/employers/census_details_page.feature",
       "features/admin/in_person_application.feature",
       "features/brokers/broker_manages_employer_account.feature",
-      "features/insured/individual_curam_document.feature",
+      "features/employers/edit_renewing_plan_year_for_employer.feature",
       "features/employee/employee_hired_during_renewal_period.feature",
+      "features/hbx/broker_agency_pending.feature",
+      "features/permissions/new_plan_year_button.feature",
       "features/permissions/force_publish.feature"
     ]
   },
   {
     "files": [
-      "features/permissions/new_plan_year_button.feature",
-      "features/employers/edit_plan_year_for_employer.feature",
-      "features/hbx/broker_agency_pending.feature",
       "features/permissions/extend_open_enrollment.feature",
+      "features/employers/edit_plan_year_for_employer.feature",
+      "features/general_agencies/create_general_agency_staff.feature",
       "features/permissions/view_configuration_tab.feature",
-      "features/employers/cobra.feature",
       "features/employers/cobra_sole_source.feature",
-      "features/permissions/change_fein.feature",
-      "features/employers/add_plan_year_for_employer.feature",
-      "features/general_agencies/create_general_agency_staff.feature"
+      "features/employers/cobra.feature",
+      "features/admin/employer_send_secure_message.feature"
     ]
   },
   {
     "files": [
       "features/brokers/broker_manages_employee_account.feature",
+      "features/permissions/change_fein.feature",
+      "features/admin/family_send_secure_message.feature",
+      "features/employers/add_plan_year_for_employer.feature",
       "features/employee/employee_passive_renewal_update.feature",
-      "features/admin/curam_mobile_application.feature",
-      "features/insured/individual_assisted_signup.feature",
-      "features/insured/plan_shopping_with_mixed_household_determination.feature",
-      "features/brokers/broker_registration.feature",
-      "features/cover_all/consumer_requests_enrollment.feature"
+      "features/insured/individual_assisted_signup.feature"
     ]
   },
   {
     "files": [
+      "features/admin/curam_mobile_application.feature",
+      "features/brokers/broker_registration.feature",
       "features/admin/paper_application.feature",
       "features/integration/employee_group_selection_dependents.feature",
-      "features/employee/employee_with_past_doh.feature",
+      "features/employee/employee_with_past_doh.feature"
+    ]
+  },
+  {
+    "files": [
+      "features/insured/individual_verification.feature",
+      "features/insured/individual_dependent_address.feature",
       "features/admin/admin_new_consumer_application.feature",
-      "features/brokers/broker_reapplication.feature",
-      "features/insured/individual_verification.feature"
+      "features/brokers/broker_reapplication.feature"
     ]
   },
   {
     "files": [
       "features/employee/employee_with_future_doh.feature",
-      "features/admin/admin_sep_selection.feature",
       "features/hbx_admin/create_plan_year.feature",
-      "features/employers/roster.feature"
+      "features/insured/individual_with_existing_sep.feature"
     ]
   },
   {
     "files": [
-      "features/insured/individual_with_existing_sep.feature",
+      "features/employers/roster.feature",
       "features/employee/employee_plan_shopping.feature",
-      "features/admin/open_enrollment_button.feature",
-      "features/brokers/broker_quote_for_renewal_employer.feature"
+      "features/admin/open_enrollment_button.feature"
     ]
   },
   {
     "files": [
       "features/insured/csr.feature",
-      "features/employee/conversion_employee.feature",
-      "features/insured/individual_dependent_address.feature"
+      "features/brokers/broker_quote_for_renewal_employer.feature"
     ]
   },
   {
     "files": [
       "features/admin/user_account.feature",
-      "features/group_selection/change_tax_credits.feature"
+      "features/employee/conversion_employee.feature"
     ]
   },
+  { "files": ["features/group_selection/change_tax_credits.feature"] },
   { "files": ["features/employers/employer_profile.feature"] },
-  { "files": ["features/brokers/broker_quote.feature"] },
   { "files": ["features/insured/individual_sep_signup.feature"] },
-  { "files": ["features/insured/individual_vlp_verification.feature"] },
   { "files": ["features/insured/individual_signup.feature"] },
-  { "files": ["features/insured/individual_ridp_verification.feature"] },
+  { "files": ["features/brokers/broker_quote.feature"] },
+  { "files": ["features/insured/individual_vlp_verification.feature"] },
   { "files": ["features/insured/individual_immigration_details.feature"] }
 ]

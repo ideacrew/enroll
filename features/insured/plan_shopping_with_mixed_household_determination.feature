@@ -29,6 +29,7 @@ Feature: plan shopping with mixed household determination
   #   Then the page should not have any csr plans
   #   And Individual logs out
 
+  @flaky
   Scenario: plan shopping with all eligible taxhoushold members
     Given every individual is eligible for Plan shopping for CSR plans
     And I click on continue button on group selection page
