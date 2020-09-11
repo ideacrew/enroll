@@ -16,3 +16,10 @@ registry:
         settings:
           - key: :demographic_attributes
             item: ['first_name', 'last_name', 'ssn', 'us_citizen', 'naturalized_citizen', 'eligible_immigration_status', 'dob']
+      - key: :special_enrollment_period
+        is_enabled: true
+        settings:
+          - key: :individual_market_monthly_enrollment_due_on
+            item: 20
+          - key: :fifteenth_of_the_month
+            item: 15

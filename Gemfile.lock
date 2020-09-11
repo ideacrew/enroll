@@ -26,7 +26,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/resource_registry.git
-  revision: 2f0cb0c88230739c04cce34c5805a2c0750f1379
+  revision: f313d71aafd697e97b9e491410ab3f2ec5ea824c
   branch: master
   specs:
     resource_registry (0.7.0)
@@ -83,6 +83,7 @@ PATH
     benefit_sponsors (0.0.1)
       aasm (~> 4.8)
       active_model_serializers (~> 0.10)
+      browser (= 2.7.0)
       config (~> 2.0)
       devise (~> 4.5)
       dry-auto_inject (= 0.6.1)
@@ -268,8 +269,9 @@ GEM
     benchmark-perf (0.6.0)
     benchmark-trend (0.4.0)
     bindex (0.8.1)
-    bootsnap (1.4.6)
+    bootsnap (1.4.8)
       msgpack (~> 1.0)
+    browser (2.7.0)
     bson (4.8.2)
     builder (3.2.4)
     bunny (1.7.1)
@@ -349,7 +351,7 @@ GEM
     coffee-script-source (1.12.2)
     combine_pdf (1.0.16)
       ruby-rc4 (>= 0.1.5)
-    concurrent-ruby (1.1.6)
+    concurrent-ruby (1.1.7)
     config (2.2.1)
       deep_merge (~> 1.2, >= 1.2.1)
       dry-validation (~> 1.0, >= 1.0.0)
@@ -409,7 +411,7 @@ GEM
     dry-equalizer (0.3.0)
     dry-inflector (0.2.0)
     dry-initializer (3.0.3)
-    dry-logic (1.0.6)
+    dry-logic (1.0.7)
       concurrent-ruby (~> 1.0)
       dry-core (~> 0.2)
       dry-equalizer (~> 0.2)
@@ -419,7 +421,7 @@ GEM
       concurrent-ruby (~> 1.0)
       dry-core (~> 0.4, >= 0.4.4)
       dry-equalizer
-    dry-schema (1.5.1)
+    dry-schema (1.5.4)
       concurrent-ruby (~> 1.0)
       dry-configurable (~> 0.8, >= 0.8.3)
       dry-core (~> 0.4)
@@ -439,7 +441,7 @@ GEM
       dry-equalizer (~> 0.3)
       dry-inflector (~> 0.1, >= 0.1.2)
       dry-logic (~> 1.0, >= 1.0.2)
-    dry-validation (1.5.0)
+    dry-validation (1.5.5)
       concurrent-ruby (~> 1.0)
       dry-container (~> 0.7, >= 0.7.1)
       dry-core (~> 0.4)
@@ -495,7 +497,7 @@ GEM
     httparty (0.18.0)
       mime-types (~> 3.0)
       multi_xml (>= 0.5.2)
-    i18n (1.8.3)
+    i18n (1.8.5)
       concurrent-ruby (~> 1.0)
     ice_cube (0.16.3)
     ice_nine (0.11.2)
@@ -601,7 +603,7 @@ GEM
     net-ssh (4.2.0)
     newrelic_rpm (5.7.0.350)
     nio4r (2.5.2)
-    nokogiri (1.10.9)
+    nokogiri (1.10.10)
       mini_portile2 (~> 2.4.0)
     nokogiri-happymapper (0.8.1)
       nokogiri (~> 1.5)
@@ -611,7 +613,7 @@ GEM
     overcommit (0.52.1)
       childprocess (>= 0.6.3, < 4)
       iniparse (~> 1.4)
-    ox (2.13.2)
+    ox (2.13.3)
     parallel (1.19.1)
     parallel_tests (2.26.2)
       parallel
@@ -631,7 +633,7 @@ GEM
     puma (3.12.4)
     pundit (2.1.0)
       activesupport (>= 3.0.0)
-    rack (2.2.2)
+    rack (2.2.3)
     rack-protection (2.0.8.1)
       rack
     rack-proxy (0.6.5)
@@ -918,6 +920,7 @@ DEPENDENCIES
   benefit_markets!
   benefit_sponsors!
   bootsnap (>= 1.1)
+  browser (= 2.7.0)
   bson (~> 4.3)
   capistrano (~> 3.1)
   capistrano-rails (= 1.4)

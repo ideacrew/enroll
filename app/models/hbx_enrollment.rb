@@ -730,7 +730,12 @@ class HbxEnrollment
   end
 
   def propogate_terminate(term_date = TimeKeeper.date_of_record.end_of_month)
-    self.terminated_on ||= term_date
+    if terminated_on.present? && term_date < terminated_on
+      self.terminated_on = term_date
+    else
+      self.terminated_on ||= term_date
+    end
+
     if benefit_group_assignment
       benefit_group_assignment.end_benefit(terminated_on)
       benefit_group_assignment.save
@@ -1880,7 +1885,7 @@ class HbxEnrollment
     if (enrollment_kind == "special_enrollment")
       return "unknown_sep" if special_enrollment_period.blank?
       qle_reason = special_enrollment_period.qualifying_life_event_kind.reason
-      return qle_reason == 'covid-19' ? "unknown_sep" : qle_reason
+      return QualifyingLifeEventKind::REASON_KINDS.include?(qle_reason) ? qle_reason : "unknown_sep"
     end
 
     return "open_enrollment" if !is_shop?

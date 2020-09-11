@@ -600,6 +600,29 @@ class Family
     special_enrollment_periods.individual_market.order_by(:submitted_at.desc).to_a.detect(&:is_active?)
   end
 
+  def latest_active_sep_for(enrollment)
+    return unless enrollment.is_shop?
+    enrollment.fehb_profile.present? ? latest_fehb_sep : latest_shop_sep
+  end
+
+  def options_for_termination_dates(enrollments)
+    return {} unless enrollments
+
+    enrollments.inject({}) do |date_hash, enrollment|
+      latest_sep = latest_active_sep_for(enrollment)
+      term_date = latest_sep ? latest_sep.termination_dates(enrollment.effective_on) : TimeKeeper.date_of_record.end_of_month
+      date_hash[enrollment.id.to_s] = term_date
+      date_hash
+    end
+  end
+
+  def latest_shop_sep_termination_kinds(enrollment)
+    latest_sep = latest_active_sep_for(enrollment)
+    return unless latest_sep
+
+    latest_sep.qualifying_life_event_kind.termination_on_kinds
+  end
+
   def terminate_date_for_shop_by_enrollment(enrollment=nil)
     latest_sep = latest_shop_sep || latest_fehb_sep
     if latest_sep.present?
