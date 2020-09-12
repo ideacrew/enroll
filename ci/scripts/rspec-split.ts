@@ -14,13 +14,9 @@ import {
 
 async function createSplitConfig(): Promise<void> {
   // Read cli arguments
-  const [filePath, numberOfGroups, outputPath] = process.argv.slice(2);
+  const [filePath, outputPath] = process.argv.slice(2);
 
-  if (
-    filePath === undefined ||
-    numberOfGroups === undefined ||
-    outputPath === undefined
-  ) {
+  if (filePath === undefined || outputPath === undefined) {
     throw new Error('Please provide the required cli arguments.');
   }
 
@@ -28,7 +24,7 @@ async function createSplitConfig(): Promise<void> {
   const rspecReport = await fs.readFile(`./${filePath}`, 'utf-8');
 
   // Convert string to workable object
-  const examples: RspecExample[] = JSON.parse(rspecReport);
+  const examples: RspecExample[] = JSON.parse(rspecReport).examples;
 
   // Create a dictionary of
   const filesByRuntime: FileWithRuntimeDictionary = createFileDictionary(
@@ -39,12 +35,9 @@ async function createSplitConfig(): Promise<void> {
     filesByRuntime
   );
 
-  const splitConfig: SplitConfig[] = splitFilesIntoGroups(
-    +numberOfGroups, // comes in as a string, need to coerce into a number
-    arrayOfSlowFiles
-  );
+  const splitConfig: SplitConfig[] = splitFilesIntoGroups(arrayOfSlowFiles);
 
-  // await fs.writeFile(`./${outputPath}/rspec-split-config.json`, JSON.stringify(splitConfig));
+  await fs.writeFile(`./${outputPath}/rspec-split-config.json`, JSON.stringify(splitConfig));
 }
 
 createSplitConfig();

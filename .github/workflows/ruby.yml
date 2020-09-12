@@ -155,58 +155,14 @@ jobs:
   #         cd $root/components/${{ matrix.engine-name }}
   #         bundle config path ../../vendor/bundle
   #         bundle exec rspec --fail-fast
-  # rspec:
-  # name: rspec
-  # runs-on: ubuntu-latest
-  # strategy:
-  #   matrix:
-  #     group: [1, 2, 3, 4, 5, 6, 7]
-  # steps:
-  #   - uses: actions/checkout@v2
-  #   - uses: ruby/setup-ruby@v1
-  #   - uses: actions/setup-node@v1
-  #     with:
-  #       node-version: "10"
-  #   - uses: wbari/start-mongoDB@v0.2
-  #     with:
-  #       mongoDBVersion: "3.6"
-  #   - name: Restore project gems
-  #     uses: actions/cache@v2
-  #     with:
-  #       path: vendor/bundle
-  #       key: v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
-  #       restore-keys: |
-  #         v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
-  #   - name: Install project gems
-  #     run: |
-  #       bundle config path vendor/bundle
-  #       bundle install
-  #       gem install treye-semaphore_test_boosters --version '2.5.2'
-  #   - name: Restore Node Modules
-  #     id: npm-cache
-  #     uses: actions/cache@v2
-  #     with:
-  #       path: node_modules
-  #       key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
-  #       restore-keys: |
-  #         ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
-  #   - name: Install node dependencies
-  #     if: steps.npm-cache.outputs.cache-hit != 'true'
-  #     run: yarn install
-  #   - name: run webpack
-  #     run: NODE_ENV=test RAILS_ENV=test ./bin/webpack
-  #   - name: Run tests
-  #     run: rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
-  cucumber:
-    name: cucumber
+  rspec:
+    name: rspec
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        group: [1, 2, 3, 4, 5, 6, 7, 8]
+        group: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     steps:
       - uses: actions/checkout@v2
-        with:
-          fetch-depth: 1
       - uses: ruby/setup-ruby@v1
       - uses: actions/setup-node@v1
         with:
@@ -223,7 +179,6 @@ jobs:
             v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
       - name: Install project gems
         run: |
-          gem update --system
           bundle config path vendor/bundle
           bundle install
           gem install treye-semaphore_test_boosters --version '2.5.2'
@@ -241,4 +196,49 @@ jobs:
       - name: run webpack
         run: NODE_ENV=test RAILS_ENV=test ./bin/webpack
       - name: Run tests
-        run: cucumber_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
+        run: rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
+  # cucumber:
+  #   name: cucumber
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     matrix:
+  #       group: [1, 2, 3, 4, 5, 6, 7, 8]
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #       with:
+  #         fetch-depth: 1
+  #     - uses: ruby/setup-ruby@v1
+  #     - uses: actions/setup-node@v1
+  #       with:
+  #         node-version: '10'
+  #     - uses: wbari/start-mongoDB@v0.2
+  #       with:
+  #         mongoDBVersion: '3.6'
+  #     - name: Restore project gems
+  #       uses: actions/cache@v2
+  #       with:
+  #         path: vendor/bundle
+  #         key: v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
+  #         restore-keys: |
+  #           v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
+  #     - name: Install project gems
+  #       run: |
+  #         gem update --system
+  #         bundle config path vendor/bundle
+  #         bundle install
+  #         gem install treye-semaphore_test_boosters --version '2.5.2'
+  #     - name: Restore Node Modules
+  #       id: npm-cache
+  #       uses: actions/cache@v2
+  #       with:
+  #         path: node_modules
+  #         key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
+  #     - name: Install node dependencies
+  #       if: steps.npm-cache.outputs.cache-hit != 'true'
+  #       run: yarn install
+  #     - name: run webpack
+  #       run: NODE_ENV=test RAILS_ENV=test ./bin/webpack
+  #     - name: Run tests
+  #       run: cucumber_booster --job ${{ matrix.group }}/${{ strategy.job-total }}

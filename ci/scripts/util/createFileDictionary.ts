@@ -3,10 +3,12 @@ import { FileWithRuntimeDictionary, RspecExample } from '../models';
 export function createFileDictionary(
   examples: RspecExample[]
 ): FileWithRuntimeDictionary {
-  return examples.reduce(
+  const dictionary = examples.reduce(
     (totalConfig: FileWithRuntimeDictionary, example: RspecExample) => {
       const filePath = example.file_path;
-
+      // if (example.run_time > 5) {
+      //   console.log({ example: example.run_time });
+      // }
       if (totalConfig[filePath] !== undefined) {
         const currentTotal = totalConfig[filePath].runTime;
 
@@ -23,4 +25,8 @@ export function createFileDictionary(
     },
     {}
   );
+
+  console.log(dictionary);
+
+  return dictionary;
 }
