@@ -66,7 +66,6 @@ async function getJson() {
 
   const allReports = jsonFiles.reduce((allReports, report) => {
     const parsed = JSON.parse(report);
-    // console.log(parsed);
 
     return [...allReports, ...parsed];
   }, []);

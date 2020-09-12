@@ -11,7 +11,7 @@ export function createFilesWithRuntime(
         runTime: runTime * 1000,
       };
     })
-    .sort((a, b) => (a.runTime < b.runTime ? -1 : 1));
+    .sort((a, b) => (a.runTime < b.runTime ? 1 : -1));
 }
 
 function removeLeadingDotSlash(filePath: string) {

@@ -7,11 +7,6 @@ export function groupCount(files: FileWithRuntime[]): any {
   }, 0);
 
   const suggestedGroupCount = Math.ceil(totalRuntime / longestTest.runTime);
-  console.log({
-    longestTest: longestTest.runTime,
-    totalRuntime,
-    suggestedGroupCount,
-  });
 
   return {
     longestTest: longestTest.runTime,

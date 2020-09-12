@@ -1,6 +1,6 @@
 const { promises: fs } = require('fs');
 
-import { FeatureStep, FileWithRuntime, SplitConfig } from './models';
+import { FeatureStep, FileWithRuntime, FileGroup } from './models';
 import { CucumberFeature } from './models';
 import { splitFilesIntoGroups } from './util';
 
@@ -9,9 +9,6 @@ const SPLIT_CONFIG_PATH = './ci/cucumber-split-config.json';
 
 function calculateStepsRuntime(steps: FeatureStep[]) {
   return steps.reduce((runTime, step) => {
-    if (typeof step.result.duration !== 'number') {
-      console.log(step.result);
-    }
     return runTime + step.result.duration;
   }, 0);
 }
@@ -40,9 +37,7 @@ async function createCucumberSplitConfig() {
     })
     .sort((a, b) => (a.runTime < b.runTime ? -1 : 1));
 
-  const splitConfig: SplitConfig[] = splitFilesIntoGroups(
-    arrayOfSlowFiles
-  );
+  const splitConfig: FileGroup[] = splitFilesIntoGroups(arrayOfSlowFiles);
 
   await fs.writeFile(SPLIT_CONFIG_PATH, JSON.stringify(splitConfig));
 }

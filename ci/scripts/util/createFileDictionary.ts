@@ -26,7 +26,5 @@ export function createFileDictionary(
     {}
   );
 
-  console.log(dictionary);
-
   return dictionary;
 }
