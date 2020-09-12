@@ -1,6 +1,6 @@
 import { FileWithRuntime } from '../models';
 
-export function groupCount(files: FileWithRuntime[]): number {
+export function groupCount(files: FileWithRuntime[]): any {
   const [longestTest] = files.sort((a, b) => (a.runTime > b.runTime ? -1 : 1));
   const totalRuntime = files.reduce((runtime, file) => {
     return runtime + file.runTime;
@@ -12,5 +12,10 @@ export function groupCount(files: FileWithRuntime[]): number {
     totalRuntime,
     suggestedGroupCount,
   });
-  return suggestedGroupCount;
+
+  return {
+    longestTest: longestTest.runTime,
+    totalRuntime,
+    suggestedGroupCount,
+  };
 }

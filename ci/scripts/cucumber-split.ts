@@ -17,13 +17,6 @@ function calculateStepsRuntime(steps: FeatureStep[]) {
 }
 
 async function createCucumberSplitConfig() {
-  // Read in cli arguments
-  const [numberOfGroups] = process.argv.slice(2);
-
-  if (numberOfGroups === undefined) {
-    throw new Error('Please provide the required cli arguments.');
-  }
-
   // Parse cucumber report
   const cucumberReport = await fs.readFile(REPORT_PATH, 'utf-8');
   const report: CucumberFeature[] = JSON.parse(cucumberReport);
@@ -31,7 +24,6 @@ async function createCucumberSplitConfig() {
   // Generate list of slow files
   const arrayOfSlowFiles: FileWithRuntime[] = report
     .map((feature: CucumberFeature) => {
-
       // totalRunTime is in nanoseconds
       const totalRunTime = feature.elements.reduce((totalTime, element) => {
         const stepRunTime = calculateStepsRuntime(element.steps);
@@ -49,7 +41,6 @@ async function createCucumberSplitConfig() {
     .sort((a, b) => (a.runTime < b.runTime ? -1 : 1));
 
   const splitConfig: SplitConfig[] = splitFilesIntoGroups(
-    +numberOfGroups,
     arrayOfSlowFiles
   );
 
