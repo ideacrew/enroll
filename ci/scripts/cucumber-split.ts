@@ -42,24 +42,4 @@ async function createCucumberSplitConfig() {
   await fs.writeFile(SPLIT_CONFIG_PATH, JSON.stringify(splitConfig));
 }
 
-// function splitFilesIntoGroups(
-//   numberOfGroups: number,
-//   arr: FileWithRuntime[]
-// ): SplitConfig[] {
-//   let split: SplitConfig[] = [];
-
-//   const length = arr.length;
-//   for (let i = 0; i < length; i++) {
-//     // e.g. 0 % 20 = 0, 1 % 20 = 1, 43 % 20 = 3
-//     const bucket = i % numberOfGroups;
-
-//     split[bucket] =
-//       split[bucket] === undefined
-//         ? { files: [arr[i].filePath] }
-//         : { files: [...split[bucket].files, arr[i].filePath] };
-//   }
-
-//   return split;
-// }
-
 createCucumberSplitConfig();
