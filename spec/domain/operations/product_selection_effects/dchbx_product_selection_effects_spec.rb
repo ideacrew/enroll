@@ -244,6 +244,26 @@ RSpec.describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects
       end
     end
 
+    context 'new enrollment in prior plan year for dependent drop' do
+      let!(:enr_member1) do
+        FactoryBot.create(:hbx_enrollment_member,
+                          hbx_enrollment: family.hbx_enrollments.first,
+                          applicant_id: family.family_members[1].id)
+      end
+      before do
+        predecessor_enrollment.expire_coverage!
+        product_selection = Entities::ProductSelection.new({:enrollment => predecessor_enrollment, :product => predecessor_product, :family => family})
+        @result = subject.call(product_selection)
+      end
+
+      it 'should create a renewal enrollment with all the eligible enrollment members for dependent drop' do
+        expect(family.hbx_enrollments.first.hbx_enrollment_members.count).to eq(2)
+        expect(predecessor_enrollment.hbx_enrollment_members.size).to eq 1
+        expect(family.hbx_enrollments.count).to eq(3)
+        expect(family.hbx_enrollments.last.hbx_enrollment_members.size).to eq 1
+      end
+    end
+
     context 'new enrollment in current plan year' do
       before do
         predecessor_enrollment.update_attributes!(effective_on: predecessor_enrollment.effective_on + 1.year)
