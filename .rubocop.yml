@@ -96,9 +96,6 @@ Metrics/BlockLength:
 Metrics/MethodLength:
   Max: 50
 
-Metrics/ModuleLength:
-  Max: 300
-
 Metrics/PerceivedComplexity:
   Max: 15
 

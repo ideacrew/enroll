@@ -47,7 +47,7 @@ Then(/^I can see the error message (.*?)$/) do |message|
 end
 
 And 'I select a effective date from list' do
-  select 'Date of event', from: 'effective_on_kind'
+  find("[name='effective_on_kind'] option[value='date_of_event']").select_option
 end
 
 And(/user should see your information page$/) do
@@ -305,6 +305,7 @@ And(/Individual again clicks on add member button/) do
   #testing
   screenshot("added member")
   all(:css, ".mz").last.click
+  sleep 2
 end
 
 
@@ -338,11 +339,8 @@ And(/I click on back to my account button$/) do
   find('.interaction-click-control-back-to-my-account').click
 end
 
-And(/consumer clicked on continue for plan shopping/) do
-  find(".interaction-click-control-continue").click
-end
-
 Then(/I should land on home page$/) do
+  sleep 1
   expect(page).to have_content "My #{Settings.site.short_name}"
 end
 
@@ -355,6 +353,7 @@ And(/^.+ click on sign in existing account$/) do
 end
 
 And(/I signed in$/) do
+  sleep 2
   find('.btn-link', :text => 'Sign In Existing Account', wait: 5).click
   sleep 5
   fill_in "user[login]", :with => "testflow@test.com"

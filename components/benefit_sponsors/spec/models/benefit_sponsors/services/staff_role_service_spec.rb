@@ -279,6 +279,11 @@ module BenefitSponsors
     end
 
     describe ".broker_agency_search!", dbclean: :after_each do
+
+      before do
+        Person.create_indexes
+      end
+
       context 'when broker agency profile is in approved state' do
 
         let(:staff_role_form) do
@@ -304,6 +309,11 @@ module BenefitSponsors
     end
 
     describe ".general_agency_search!", dbclean: :after_each do
+
+      before do
+        Person.create_indexes
+      end
+
       context 'when general agency profile is in approved state' do
 
         let(:staff_role_form) do

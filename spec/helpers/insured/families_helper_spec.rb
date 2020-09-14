@@ -1,8 +1,8 @@
 require "rails_helper"
 
-RSpec.describe Insured::FamiliesHelper, :type => :helper do
+RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  do
 
-  describe "#plan_shopping_dependent_text" do
+  describe "#plan_shopping_dependent_text", dbclean: :after_each  do
     let(:person) { FactoryBot.build_stubbed(:person)}
     let(:family) { FactoryBot.build_stubbed(:family, :with_primary_family_member, person: person) }
     let(:household) { FactoryBot.build_stubbed(:household, family: family) }
@@ -25,16 +25,191 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
 
   end
 
-  describe "#generate_options_for_effective_on_kinds" do
-    it "it should return blank array" do
-      options = helper.generate_options_for_effective_on_kinds([], TimeKeeper.date_of_record)
-      expect(options).to eq []
+  describe "#generate_options_for_effective_on_kinds", dbclean: :after_each  do
+    let(:qle) {FactoryBot.create(:qualifying_life_event_kind, effective_on_kinds: ['date_of_event', 'fixed_first_of_next_month'])}
+    let(:person) {FactoryBot.create(:person, :with_family)}
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
+    let(:date) { TimeKeeper.date_of_record }
+
+    context "QLEK with no effective_on_kind" do
+      it "it should return blank array" do
+        options = helper.generate_options_for_effective_on_kinds(nil, TimeKeeper.date_of_record)
+        expect(options).to eq []
+      end
     end
 
-    it "it should return options" do
-      date = TimeKeeper.date_of_record
-      options = helper.generate_options_for_effective_on_kinds(['date_of_event', 'fixed_first_of_next_month'], TimeKeeper.date_of_record)
-      expect(options).to eq [[date.to_s, 'date_of_event'], [(date.end_of_month+1.day).to_s, 'fixed_first_of_next_month']]
+    context "QLEK with effective_on_kind" do
+
+      before :each do
+        assign(:family, family)
+      end
+
+      context "QLEK with date_of_event, fixed_first_of_next_month effective_on_kind" do
+        it "it should return options" do
+          options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
+          expect(options).to eq [[date.to_s, 'date_of_event'], [(date.end_of_month + 1.day).to_s, 'fixed_first_of_next_month']]
+        end
+      end
+
+      context "QLEK with first_of_this_month effective_on_kind" do
+
+        it "it should return options for first_of_this_month for shop market" do
+          qle.update_attributes(market_kind: 'shop', effective_on_kinds: ['first_of_this_month'])
+          options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
+          expect(options).to eq [[date.beginning_of_month.to_s, 'first_of_this_month']]
+        end
+
+        it "it should return options for first_of_this_month for individual market" do
+          qle.update_attributes(market_kind: 'individual', effective_on_kinds: ['first_of_this_month'])
+          options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
+          expect(options).to eq [[date.beginning_of_month.to_s, 'first_of_this_month']]
+        end
+      end
+
+      context "QLEK with first_of_month effective_on_kind" do
+
+        it "it should return options for first_of_month for shop market" do
+          qle.update_attributes(market_kind: 'shop', effective_on_kinds: ['first_of_month'])
+          options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
+          effective_date = date.day <= 20 ? date.end_of_month + 1.day : date.next_month.end_of_month + 1.day
+          expect(options).to eq [[effective_date.to_s, 'first_of_month']]
+        end
+
+        it "it should return options for first_of_month for individual market" do
+          qle.update_attributes(market_kind: 'individual', effective_on_kinds: ['first_of_month'])
+          options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
+          effective_date = date.day <= 20 ? date.end_of_month + 1.day : date.next_month.end_of_month + 1.day
+          expect(options).to eq [[effective_date.to_s, 'first_of_month']]
+        end
+      end
+
+      context "QLEK with first_of_next_month effective_on_kind" do
+
+        it "it should return options for first_of_next_month for shop market" do
+          qle.update_attributes(market_kind: 'shop', effective_on_kinds: ['first_of_next_month'])
+          options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
+          effective_date = date <= date.beginning_of_month ? date : date.end_of_month + 1.day
+          expect(options).to eq [[effective_date.to_s, 'first_of_next_month']]
+        end
+
+        it "it should return options for first_of_next_month for individual market" do
+          qle.update_attributes(market_kind: 'individual', effective_on_kinds: ['first_of_next_month'])
+          options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
+          expect(options).to eq [[(date.end_of_month + 1.day).to_s, 'first_of_next_month']]
+        end
+      end
+
+      context "QLEK with first_of_month_plan_selection effective_on_kind" do
+
+        it "it should return options for first_of_month_plan_selection for shop market" do
+          qle.update_attributes(market_kind: 'shop', effective_on_kinds: ['first_of_month_plan_selection'])
+          options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
+          expect(options).to eq [[(date.end_of_month + 1.day).to_s, 'first_of_month_plan_selection']]
+        end
+
+        it "it should return options for first_of_month_plan_selection for individual market" do
+          qle.update_attributes(market_kind: 'individual', effective_on_kinds: ['first_of_month_plan_selection'])
+          options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
+          expect(options).to eq [[(date.end_of_month + 1.day).to_s, 'first_of_month_plan_selection']]
+        end
+      end
+
+      context "QLEK with fifteenth_of_month_plan_selection effective_on_kind" do
+
+        it "it should return options for fifteenth_of_month_plan_selection for shop market" do
+          qle.update_attributes(market_kind: 'shop', effective_on_kinds: ['fifteenth_of_month_plan_selection'])
+          options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
+          effective_date = date.day <= 15 ? date.end_of_month + 1.day : date.next_month.end_of_month + 1.day
+          expect(options).to eq [[effective_date.to_s, 'fifteenth_of_month_plan_selection']]
+        end
+
+        it "it should return options for fifteenth_of_month_plan_selection for individual market" do
+          qle.update_attributes(market_kind: 'individual', effective_on_kinds: ['fifteenth_of_month_plan_selection'])
+          options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
+          effective_date = date.day <= 15 ? date.end_of_month + 1.day : date.next_month.end_of_month + 1.day
+          expect(options).to eq [[effective_date.to_s, 'fifteenth_of_month_plan_selection']]
+        end
+      end
+
+      context "QLEK with fifteenth_of_the_month effective_on_kind" do
+        it "it should return options for fifteenth_of_the_month for shop market" do
+          qle.update_attributes(market_kind: 'shop', effective_on_kinds: ['fifteenth_of_the_month'])
+          options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
+          effective_date = date.day <= 15 ? date.end_of_month + 1.day : date.next_month.end_of_month + 1.day
+          expect(options).to eq [[effective_date.to_s, 'fifteenth_of_the_month']]
+        end
+
+        it "it should return options for fifteenth_of_the_month for individual market" do
+          qle.update_attributes(market_kind: 'individual', effective_on_kinds: ['fifteenth_of_the_month'])
+          options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
+          effective_date = date.day <= 15 ? date.end_of_month + 1.day : date.next_month.end_of_month + 1.day
+          expect(options).to eq [[effective_date.to_s, 'fifteenth_of_the_month']]
+        end
+      end
+
+      context "QLEK with first_of_reporting_month effective_on_kind" do
+
+        it "it should return options for first_of_reporting_month for shop market" do
+          qle.update_attributes(market_kind: 'shop', effective_on_kinds: ['first_of_reporting_month'])
+          options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
+          expect(options).to eq [[date.beginning_of_month.to_s, 'first_of_reporting_month']]
+        end
+
+        it "it should return options for first_of_reporting_month for individual market" do
+          qle.update_attributes(market_kind: 'individual', effective_on_kinds: ['first_of_reporting_month'])
+          options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
+          expect(options).to eq [[date.beginning_of_month.to_s, 'first_of_reporting_month']]
+        end
+      end
+
+      context "QLEK with fixed_first_of_next_month_reporting effective_on_kind" do
+
+        it "it should return options for fixed_first_of_next_month_reporting for shop market" do
+          qle.update_attributes(market_kind: 'shop', effective_on_kinds: ['fixed_first_of_next_month_reporting'])
+          options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
+          expect(options).to eq [[(date.end_of_month + 1.day).to_s, 'fixed_first_of_next_month_reporting']]
+        end
+
+        it "it should return options for fixed_first_of_next_month_reporting for individual market" do
+          qle.update_attributes(market_kind: 'individual', effective_on_kinds: ['fixed_first_of_next_month_reporting'])
+          options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
+          expect(options).to eq [[(date.end_of_month + 1.day).to_s, 'fixed_first_of_next_month_reporting']]
+        end
+      end
+
+      context "QLEK with exact_date effective_on_kind" do
+
+        it "it should return options for exact_date for shop market" do
+          qle.update_attributes(market_kind: 'shop', effective_on_kinds: ['exact_date'])
+          options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
+          expect(options).to eq [[date.to_s, 'exact_date']]
+        end
+
+        it "it should return options for exact_date for individual market" do
+          qle.update_attributes(market_kind: 'individual', effective_on_kinds: ['exact_date'])
+          options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
+          expect(options).to eq [[date.to_s, 'exact_date']]
+        end
+      end
+
+      context "QLEK with similar effective_on_kinds" do
+
+        it "it should return uniq options" do
+          qle.update_attributes(market_kind: 'shop', effective_on_kinds: ['exact_date', 'date_of_event'])
+          options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
+          expect(options.count).to eq 1
+          expect(options).to eq [[date.to_s, 'exact_date']]
+        end
+      end
+
+      context "QLE with event and reporting effective kinds" do
+
+        it "it should return dates based on effective kinds" do
+          qle.update_attributes(qle_event_date_kind: :submitted_at, effective_on_kinds: ['date_of_event', 'first_of_reporting_month'])
+          options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record.last_month)
+          expect(options).to eq [[TimeKeeper.date_of_record.last_month.to_s, 'date_of_event'],[TimeKeeper.date_of_record.beginning_of_month.to_s, 'first_of_reporting_month']]
+        end
+      end
     end
   end
 

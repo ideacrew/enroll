@@ -16,6 +16,7 @@ RSpec.describe EnrollmentPeriod::SpecialEnrollment, :type => :model do
                               pre_event_sep_in_days: 0,
                               post_event_sep_in_days: 30,
                               is_self_attested: true,
+                              is_visible: true,
                               ordinal_position: 20,
                               event_kind_label: 'Date of domestic partnership',
                               tool_tip: "Enroll or add a family member due to a new domestic partnership"
@@ -33,7 +34,9 @@ RSpec.describe EnrollmentPeriod::SpecialEnrollment, :type => :model do
                               effective_on_kinds: ["date_of_event", "fixed_first_of_next_month"],
                               pre_event_sep_in_days: 0,
                               post_event_sep_in_days: 30,
-                              is_self_attested: true
+                              is_self_attested: true,
+                              is_visible: true,
+                              is_active: true
                             )
                           }
   let(:qle_on)         { Date.current }
@@ -181,8 +184,8 @@ RSpec.describe EnrollmentPeriod::SpecialEnrollment, :type => :model do
 
       context "and 'effective on kind' is 'first of month' and date is IndividualEnrollmentDueDayOfMonth of month or later" do
         # Need to revert the qle_on_date with following changes back on 5/1/2020
-        # let(:qle_on_date)         { today.day <= HbxProfile::IndividualEnrollmentDueDayOfMonth ? today.beginning_of_month - 1.day : today }
-        let(:qle_on_date) { today.day <= 15 ? today.beginning_of_month - 1.day : today }
+        let(:qle_on_date)         { today.day <= HbxProfile::IndividualEnrollmentDueDayOfMonth ? today.beginning_of_month - 1.day : today }
+        #let(:qle_on_date) { today.day <= 15 ? today.beginning_of_month - 1.day : today }
         let(:fifteenth_of_month_rule_date)  { qle_on_date.next_month.end_of_month + 1.day }
         before do
           TimeKeeper.set_date_of_record_unprotected!(Date.new(2015,10,20))
