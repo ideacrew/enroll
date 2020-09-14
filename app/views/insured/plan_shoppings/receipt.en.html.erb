@@ -295,11 +295,11 @@
         <form action=<%= @kp_pay_now_url %> method="post" target="_blank" id="pay_now_form">
           <input type="hidden" name="SAMLResponse" value="response" id="sp"/>
           <input type="hidden" name="RelayState" value=<%= @kp_relay_state %>/> 
-          <button type="submit" class="btn btn-default pull-left sp interaction-click-control-print-purchase-confirmation" id="pay-now" value="<%= @enrollment.hbx_id %>">
-            Leave DC LINK
+          <button type="submit" class="btn btn-primary pull-right sp interaction-click-control-print-purchase-confirmation" id="pay-now" value="<%= @enrollment.hbx_id %>">
+            Leave DC Health LINK
           </button>
         </form>
-        <button type="button" class="btn btn-default" data-dismiss="modal">GO BACK</button>
+        <button type="button" class="btn btn-default pull-left" data-dismiss="modal">GO BACK</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
