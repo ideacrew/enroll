@@ -3,5 +3,6 @@
     "nanasess",
     "serializers",
     "wbari"
-  ]
+  ],
+  "git.ignoreLimitWarning": true
 }

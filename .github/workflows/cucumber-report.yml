@@ -2,8 +2,8 @@ name: cucumber report
 on: push
 
 jobs:
-  cucumber:
-    name: cucumber
+  cucumber-report:
+    name: cucumber report
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
@@ -45,6 +45,6 @@ jobs:
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
-          git add .
+          git add ci/cucumber/gh-cucumber-report.json
           git commit -m "update cucumber report"
           git push
