@@ -142,12 +142,12 @@ And(/^I should see model pop up$/) do
   expect(page).to have_css('.modal-open')
 end
 
-And(/^I should see Leave DC LINK buttton$/) do
-  expect(page).to have_content('Leave DC LINK')
+And(/^I should see Leave DC Health LINK buttton$/) do
+  expect(page).to have_content('LEAVE DC HEALTH LINK')
 end
 
-And(/^I should be able to click  Leave DC LINK buttton$/) do
-  find('.interaction-click-control-leave-dc-link').click
+And(/^I should be able to click  Leave DC Health LINK buttton$/) do
+  find('.interaction-click-control-leave-dc-health-link').click
   sleep 5
 end
 
