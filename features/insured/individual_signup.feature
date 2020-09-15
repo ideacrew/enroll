@@ -135,6 +135,7 @@ Feature: Insured Plan Shopping on Individual market
     Then Dependent should see error message Document type cannot be blank
     Then Individual logs out
 
+  @flaky
   Scenario: Dependents should not see document errors when not applying for coverage.
     Given Individual resumes enrollment
     And Individual click on Sign In
