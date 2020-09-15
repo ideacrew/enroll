@@ -264,7 +264,7 @@ aca:
     renewal_application:
       earliest_start_prior_to_effective_on:
         months: -3
-        day_of_month: 0
+        day_of_month: 16
       monthly_open_enrollment_end_on: 13
       publish_due_day_of_month: 10
       application_submission_soft_deadline: 5
