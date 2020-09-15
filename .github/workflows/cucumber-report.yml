@@ -47,4 +47,5 @@ jobs:
           git config user.email github-actions@github.com
           git add ci/cucumber/gh-cucumber-report.json
           git commit -m "update cucumber report"
+          git pull
           git push

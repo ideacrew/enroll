@@ -47,4 +47,5 @@ jobs:
           git config user.email github-actions@github.com
           git add ci/rspec/gh-rspec-report.json
           git commit -m "update rspec report"
+          git pull
           git push
