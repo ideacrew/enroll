@@ -27,7 +27,7 @@ Feature: UI Validations for Document Type (Required/Optional) will match V37 VLP
       | document type                     |
       | i327                              |
       | i551                              |
-      | i571                              |
+      # | i571                              | # flaky
       | i766                              |
       | Certificate of Citizenship        |
       | Naturalization Certificate        |
