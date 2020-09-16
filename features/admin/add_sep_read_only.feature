@@ -13,6 +13,7 @@ Feature: Add Sep with read only permissions
   Scenario: Click on Add Sep
     Then the Add SEP option should be disabled
 
+  @flaky
   Scenario: Click on Cancel Enrollment
     Then the Cancel Enrollment option should be disabled
 
