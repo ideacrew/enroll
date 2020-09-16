@@ -138,20 +138,30 @@ class Insured::FamiliesController < FamiliesController
 
   def check_qle_date
     today = TimeKeeper.date_of_record
-    @qle_date = Date.strptime(params[:date_val], "%m/%d/%Y")
     start_date = today - 30.days
     end_date = today + 30.days
+    @qle_event_date = Date.strptime(params[:date_val], "%m/%d/%Y")
 
     if params[:qle_id].present?
       @qle = QualifyingLifeEventKind.find(params[:qle_id])
+      @qle_date = @qle.qle_event_date_kind == :qle_on ? @qle_event_date : today
       start_date = today - @qle.post_event_sep_in_days.try(:days)
       end_date = today + @qle.pre_event_sep_in_days.try(:days)
-      @effective_on_options = @qle.employee_gaining_medicare(@qle_date) if @qle.is_dependent_loss_of_coverage?
+      @effective_on_options = @qle.employee_gaining_medicare(@qle_event_date) if @qle.is_dependent_loss_of_coverage?
       @qle_reason_val = params[:qle_reason_val] if params[:qle_reason_val].present?
       @qle_end_on = @qle_date + @qle.post_event_sep_in_days.try(:days)
     end
+    @qle_date ||= if @qle
+                    @qle.qle_event_date_kind == :qle_on ? @qle_event_date : today
+                  else
+                    @qle_event_date
+                  end
+    @qualified_date = if @qle && @qle.coverage_start_on.present? && @qle.coverage_end_on.present?
+                        (@qle.coverage_start_on..@qle.coverage_end_on).cover?(@qle_date)
+                      else
+                        (start_date..end_date).cover?(@qle_date)
+                      end
 
-    @qualified_date = (start_date <= @qle_date && @qle_date <= end_date) ? true : false
     if @person.has_active_employee_role? && !(@qle.present? && @qle.individual?)
       @future_qualified_date = (@qle_date > today) ? true : false
     end
@@ -165,10 +175,10 @@ class Insured::FamiliesController < FamiliesController
       reporting_deadline = @qle_date > today ? today : @qle_date + 30.days
       employee_role = @person.active_employee_roles.first
       if Settings.site.key == :cca
-        trigger_notice_observer(employee_role, benefit_application, 'employee_notice_for_sep_denial', qle_title: @qle.title, qle_reporting_deadline: reporting_deadline.strftime("%m/%d/%Y"), qle_event_on: @qle_date.strftime("%m/%d/%Y"))
+        trigger_notice_observer(employee_role, benefit_application, 'employee_notice_for_sep_denial', qle_title: @qle.title, qle_reporting_deadline: reporting_deadline.strftime("%m/%d/%Y"), qle_event_on: @qle_event_date.strftime("%m/%d/%Y"))
       elsif Settings.site.key == :dc
         event_name = @person.has_multiple_active_employers? ? 'sep_denial_notice_for_ee_active_on_multiple_rosters' : 'sep_denial_notice_for_ee_active_on_single_roster'
-        trigger_notice_observer(employee_role, benefit_application, event_name, qle_title: @qle.title, qle_reporting_deadline: reporting_deadline.strftime("%m/%d/%Y"), qle_event_on: @qle_date.strftime("%m/%d/%Y"))
+        trigger_notice_observer(employee_role, benefit_application, event_name, qle_title: @qle.title, qle_reporting_deadline: reporting_deadline.strftime("%m/%d/%Y"), qle_event_on: @qle_event_date.strftime("%m/%d/%Y"))
       end
     end
   end
@@ -208,7 +218,7 @@ class Insured::FamiliesController < FamiliesController
 
       @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
       @terminate = params[:terminate].present? ? params[:terminate] : ''
-      @terminate_date = @family.terminate_date_for_shop_by_enrollment(@enrollment) if @terminate.present?
+      @terminate_date = fetch_terminate_date(params["terminate_date_#{@enrollment.hbx_id}"]) if @terminate.present?
       @terminate_reason = params[:terminate_reason] || ''
       render :layout => 'application'
     else
@@ -319,6 +329,17 @@ class Insured::FamiliesController < FamiliesController
 
   private
 
+  def fetch_terminate_date(terminate_date)
+    term_date = @family.terminate_date_for_shop_by_enrollment(@enrollment)
+    return term_date unless terminate_date.present?
+
+    begin
+      Date.strptime(terminate_date, "%m/%d/%Y")
+    rescue StandardError
+      term_date
+    end
+  end
+
   def can_view_entire_family_enrollment_history?
     authorize Family, :can_view_entire_family_enrollment_history?
   end
@@ -390,9 +411,9 @@ class Insured::FamiliesController < FamiliesController
         @qualifying_life_events += QualifyingLifeEventKind.send @manually_picked_role + '_without_transition_member_action' if @manually_picked_role == "individual_market_events"
       else
         if @manually_picked_role == "individual_market_events"
-          @qualifying_life_events += QualifyingLifeEventKind.individual_market_events_admin
+          @qualifying_life_events += QualifyingLifeEventKind.individual_market_events
         elsif @manually_picked_role
-          @qualifying_life_events += QualifyingLifeEventKind.send employee_qle_market_scope + '_admin'
+          @qualifying_life_events += QualifyingLifeEventKind.send employee_qle_market_scope
         end
       end
     elsif @person.active_employee_roles.present? || @person.consumer_role.present? || @person.resident_role.present?
@@ -462,11 +483,16 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def calculate_dates
-    @qle_date = Date.strptime(params[:date_val], "%m/%d/%Y")
+    @qle_event_date = Date.strptime(params[:date_val], "%m/%d/%Y")
     @qle = QualifyingLifeEventKind.find(params[:qle_id])
+    @qle_date = @qle.qle_event_date_kind == :qle_on ? @qle_event_date : TimeKeeper.date_of_record
     start_date = TimeKeeper.date_of_record - @qle.post_event_sep_in_days.try(:days)
     end_date = TimeKeeper.date_of_record + @qle.pre_event_sep_in_days.try(:days)
-    @qualified_date = (start_date <= @qle_date && @qle_date <= end_date) ? true : false
+    @qualified_date = if @qle && @qle.coverage_start_on.present? && @qle.coverage_end_on.present?
+                        (@qle.coverage_start_on..@qle.coverage_end_on).cover?(@qle_date)
+                      else
+                        (start_date..end_date).cover?(@qle_date)
+                      end
     @qle_date_calc = @qle_date - aca_qle_period.days
 
     if @person.resident_role?

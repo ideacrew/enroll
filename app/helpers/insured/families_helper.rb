@@ -107,7 +107,8 @@ module Insured::FamiliesHelper
       title: qle.title, id: qle.id.to_s, label: qle.event_kind_label,
       is_self_attested: qle.is_self_attested,
       current_date: TimeKeeper.date_of_record.strftime("%m/%d/%Y"),
-      qle_event_date_kind: qle.qle_event_date_kind.to_s
+      qle_event_date_kind: qle.qle_event_date_kind.to_s,
+      reason: qle.reason
     }
 
     if qle.tool_tip.present?
@@ -133,22 +134,16 @@ module Insured::FamiliesHelper
     link_to link_title.present? ? link_title: "Shop for Plans", "javascript:void(0)", options
   end
 
-  def generate_options_for_effective_on_kinds(effective_on_kinds, qle_date)
-    return [] if effective_on_kinds.blank?
+  def generate_options_for_effective_on_kinds(qle, qle_date)
+    return [] if qle&.effective_on_kinds.blank?
+    qle.effective_on_kinds.collect { |kind| [find_effective_on(qle, qle_date, kind).to_s, kind] }.uniq(&:first)
+  end
 
-    options = []
-    effective_on_kinds.each do |kind|
-      case kind
-      when 'date_of_event'
-        options << [qle_date.to_s, kind]
-      when 'first_of_this_month'
-        options << [qle_date.beginning_of_month.to_s, kind]
-      when 'fixed_first_of_next_month'
-        options << [(qle_date.end_of_month + 1.day).to_s, kind]
-      end
-    end
-
-    options
+  def find_effective_on(qle, qle_date, kind)
+    special_enrollment_period = SpecialEnrollmentPeriod.new(effective_on_kind: kind)
+    special_enrollment_period.qualifying_life_event_kind = qle
+    special_enrollment_period.qle_on = qle_date
+    special_enrollment_period.effective_on
   end
 
   def newhire_enrollment_eligible?(employee_role)

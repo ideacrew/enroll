@@ -564,7 +564,9 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
             effective_on_kinds: ["first_of_next_month"],
             pre_event_sep_in_days: 0,
             post_event_sep_in_days: 30,
-            is_self_attested: true
+            is_self_attested: true,
+            is_visible: true,
+            is_active: true
         )
       end
 
@@ -765,6 +767,19 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       expect(response).to have_http_status(:success)
       expect(response).to render_template(:terminate_selection)
     end
+
+    context 'for termination_date_options' do
+      before :each do
+        @shop_sep = person.primary_family.latest_shop_sep
+        @shop_sep.qualifying_life_event_kind.update_attributes!(termination_on_kinds: ['exact_date'])
+        sign_in user
+        get :terminate_selection, params: { person_id: person.id }
+      end
+
+      it 'should assign termination_date_options' do
+        expect(assigns(:termination_date_options)).to eq({ hbx_enrollment.id.to_s => [@shop_sep.qle_on] })
+      end
+    end
   end
 
   context "POST terminate" do
@@ -884,7 +899,9 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
           effective_on_kinds: ["first_of_next_month"],
           pre_event_sep_in_days: 0,
           post_event_sep_in_days: 30,
-          is_self_attested: true
+          is_self_attested: true,
+          is_visible: true,
+          is_active: true
         )
       end
       let(:special_enrollment_period) {[double("SpecialEnrollmentPeriod")]}
