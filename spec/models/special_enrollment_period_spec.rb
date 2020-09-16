@@ -1150,7 +1150,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
       end
     end
 
-    context 'QLEK with qle_event_date_kind == submitted_at' do
+    context 'qualifying life event kind with qle_event_date_kind == submitted_at' do
       let!(:qle) { create(:qualifying_life_event_kind, pre_event_sep_in_days: 0, post_event_sep_in_days: 30, coverage_start_on: TimeKeeper.date_of_record.last_month, coverage_end_on: TimeKeeper.date_of_record.end_of_month) }
       let!(:sep) do
         subject.qualifying_life_event_kind = qle
