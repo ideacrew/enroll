@@ -347,7 +347,7 @@ RSpec.describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects
                           applicant_id: family.family_members[1].id)
       end
       before do
-        # predecessor_enrollment.expire_coverage!
+        predecessor_enrollment.expire_coverage!
         product_selection = Entities::ProductSelection.new({:enrollment => predecessor_enrollment, :product => predecessor_product, :family => family})
         @result = subject.call(product_selection)
       end
