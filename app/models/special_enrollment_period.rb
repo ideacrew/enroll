@@ -239,7 +239,7 @@ private
 
   def set_date_period
     qle = @qualifying_life_event_kind
-    targeted_date = ((qle.coverage_start_on.present? && qle.coverage_end_on.present?) || qle.qle_event_date_kind == :submitted_at) ? (self.created_at ||= TimeKeeper.date_of_record).to_date : qle_on
+    targeted_date = (qle.coverage_start_on.present? && qle.coverage_end_on.present?) || qle.qle_event_date_kind == :submitted_at ? (self.created_at ||= TimeKeeper.date_of_record).to_date : qle_on
     self.start_on = targeted_date - qle.pre_event_sep_in_days.days
     self.end_on   = targeted_date + qle.post_event_sep_in_days.days
 
