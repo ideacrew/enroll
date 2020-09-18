@@ -426,7 +426,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
     end
   end
 
-describe 'can_show_covid_message_on_sep_carousel?' do
+  describe 'can_show_covid_message_on_sep_carousel?' do
     let(:person) {FactoryBot.create(:person)}
     let(:shop_employer) {double(BenefitSponsors::Organizations::AcaShopDcEmployerProfile.new, id: BSON::ObjectId.new)}
     let(:fehb_employer) {double(BenefitSponsors::Organizations::FehbEmployerProfile.new, id: BSON::ObjectId.new)}
@@ -618,7 +618,7 @@ describe 'can_show_covid_message_on_sep_carousel?' do
   end
 end
 
-  describe "Enabled/Disabled IVL market" do
+describe "Enabled/Disabled IVL market" do
     shared_examples_for "IVL market status" do |value|
        if value == true
         it "should return true if IVL market is enabled" do
