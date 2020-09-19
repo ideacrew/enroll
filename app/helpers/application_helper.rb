@@ -779,7 +779,7 @@ module ApplicationHelper
     return false unless sep_carousel_message_enabled?
     return false unless person.present?
     return true if person.consumer_role.present? || person.resident_role.present?
-    person.present? && person.active_employee_roles.present? && person.active_employee_roles.any?{|r| r.employer_profile.is_a?(BenefitSponsors::Organizations::AcaShopDcEmployerProfile)}
+    person&.active_employee_roles&.any?{ |employee_role| employee_role.market_kind == 'shop'}
   end
 
   def transition_family_members_link_type row, allow

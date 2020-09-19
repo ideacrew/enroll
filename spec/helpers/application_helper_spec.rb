@@ -434,8 +434,8 @@ RSpec.describe ApplicationHelper, :type => :helper do
     let(:census_employee_1) {double("CensusEmployee", benefit_sponsors_employer_profile_id: shop_employer.id)}
     let(:census_employee_2) {double("CensusEmployee", benefit_sponsors_employer_profile_id: fehb_employer.id)}
 
-    let(:active_shop_employee) {double("EmployeeRole", :census_employee => census_employee_1, employer_profile: shop_employer)}
-    let(:active_fehb_employee) {double("EmployeeRole", :census_employee => census_employee_2, employer_profile: fehb_employer)}
+    let(:active_shop_employee) {double("EmployeeRole", :census_employee => census_employee_1, employer_profile: shop_employer, market_kind: 'shop')}
+    let(:active_fehb_employee) {double("EmployeeRole", :census_employee => census_employee_2, employer_profile: fehb_employer, market_kind: 'fehb')}
 
     it 'should return false if feature is disabled' do
       allow(helper).to receive(:sep_carousel_message_enabled?).and_return false
