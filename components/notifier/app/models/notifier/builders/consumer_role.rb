@@ -332,7 +332,7 @@ module Notifier
           if uqhp_notice?
             false
           else
-            payload['notice_params']['primary_member']['aqhp_eligible'].casecmp('YES').zero?
+            payload['notice_params']['primary_member']['aqhp_eligible']&.casecmp('YES')&.zero?
           end
       end
 
@@ -341,7 +341,7 @@ module Notifier
           if uqhp_notice?
             false
           else
-            payload['notice_params']['primary_member']['totally_inelig'].casecmp('YES').zero?
+            payload['notice_params']['primary_member']['totally_ineligible']&.casecmp('YES')&.zero?
           end
       end
 
@@ -350,7 +350,7 @@ module Notifier
           if uqhp_notice?
             true
           else
-            payload['notice_params']['primary_member']['uqhp_eligible'].casecmp('YES').zero? ? true : false
+            payload['notice_params']['primary_member']['uqhp_eligible']&.casecmp('YES')&.zero? ? true : false
           end
       end
 
@@ -364,7 +364,7 @@ module Notifier
           if uqhp_notice?
             false
           else
-            payload['notice_params']['primary_member']['irs_consent'].casecmp('YES').zero?
+            payload['notice_params']['primary_member']['irs_consent']&.casecmp('YES')&.zero?
           end
       end
 
@@ -373,7 +373,7 @@ module Notifier
           if uqhp_notice?
             false
           else
-            payload['notice_params']['primary_member']['magi_medicaid'].casecmp('YES').zero?
+            payload['notice_params']['primary_member']['magi_medicaid']&.casecmp('YES')&.zero?
           end
       end
 
@@ -382,13 +382,13 @@ module Notifier
           if uqhp_notice?
             true
           else
-            payload['notice_params']['primary_member']['non_magi_medicaid'].casecmp('YES').zero?
+            payload['notice_params']['primary_member']['non_magi_medicaid']&.casecmp('YES').zero?
           end
       end
 
       def csr
         return if primary_nil?
-        merge_model.csr = payload['notice_params']['primary_member']['csr'].casecmp('YES').zero?
+        merge_model.csr = payload['notice_params']['primary_member']['csr']&.casecmp('YES').zero?
       end
 
       def aqhp_event
