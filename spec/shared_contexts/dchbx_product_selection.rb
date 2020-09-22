@@ -167,7 +167,49 @@ RSpec.shared_context 'family with two members and one enrollment and one predece
     FactoryBot.create(:benefit_markets_products_health_products_health_product,
                       :ivl_product,
                       :silver,
-                      issuer_name: 'BlueChoice',
+                      issuer_name: 'Kaiser',
+                      renewal_product_id: new_product.id,
+                      application_period: previous_year..previous_year.end_of_year)
+  end
+
+  let!(:predecessor_enrollment) do
+    FactoryBot.create(:hbx_enrollment,
+                      product_id: new_predecessor_product.id,
+                      kind: 'individual',
+                      family: family,
+                      consumer_role_id: family.primary_person.consumer_role.id,
+                      effective_on: predecessor_bcp.start_on)
+  end
+
+  let!(:predecessor_enrollment_member) do
+    FactoryBot.create(:hbx_enrollment_member,
+                      hbx_enrollment: predecessor_enrollment,
+                      applicant_id: family_member.id)
+  end
+end
+
+RSpec.shared_context 'family with two members and one enrollment and one predecessor enrollment with plan switch', :shared_context => :metadata do
+  include_context 'family with one member and one enrollment'
+
+  let!(:new_renewal_product) do
+    FactoryBot.create(:benefit_markets_products_health_products_health_product,
+                      :ivl_product,
+                      :silver,
+                      application_period: next_year_date.beginning_of_year..next_year_date.end_of_year)
+  end
+
+  let!(:new_product) do
+    FactoryBot.create(:benefit_markets_products_health_products_health_product,
+                      :ivl_product,
+                      :silver,
+                      renewal_product_id: new_renewal_product.id,
+                      application_period: start_of_year..end_of_year)
+  end
+
+  let!(:new_predecessor_product) do
+    FactoryBot.create(:benefit_markets_products_health_products_health_product,
+                      :ivl_product,
+                      :silver,
                       renewal_product_id: new_product.id,
                       application_period: previous_year..previous_year.end_of_year)
   end

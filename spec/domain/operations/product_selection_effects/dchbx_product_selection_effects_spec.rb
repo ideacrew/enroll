@@ -300,6 +300,23 @@ RSpec.describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects
       end
     end
 
+    context 'new enrollment in prior plan year with previous year active coverage to switch plan with same carrier' do
+      include_context 'family with two members and one enrollment and one predecessor enrollment with plan switch'
+
+      before do
+        product_selection = Entities::ProductSelection.new({:enrollment => predecessor_enrollment, :product => predecessor_product, :family => family})
+        @result = subject.call(product_selection)
+      end
+
+      it 'should create a renewal enrollment with all the eligible enrollment members' do
+        expect(family.hbx_enrollments.count).to eq(3)
+        expect(family.hbx_enrollments.second.product.renewal_product.id).to eq(family.hbx_enrollments.last.product.id)
+        expect(family.hbx_enrollments.second.product.renewal_product.title).to eq(family.hbx_enrollments.last.product.title)
+        expect(family.hbx_enrollments.first.product.renewal_product.id).not_to eq(family.hbx_enrollments.last.product.id)
+        expect(family.hbx_enrollments.first.product.renewal_product.title).not_to eq(family.hbx_enrollments.last.product.title)
+      end
+    end
+
     context 'new enrollment in prior plan year for dependent add with previous year active coverage' do
       include_context 'family with one members and one enrollment and one predecessor enrollment with carrier switch and existing coverage'
 
