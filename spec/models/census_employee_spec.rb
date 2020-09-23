@@ -2257,20 +2257,27 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     end
   end
 
-  context ".waiving_on_eod?" do
+  context ".is_waived_under?" do
     let(:census_employee) {CensusEmployee.new(**valid_params)}
     let!(:benefit_group_assignment) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee)}
+
+    before do
+      family = FactoryBot.create(:family, :with_primary_family_member)
+      allow(census_employee).to receive(:family).and_return(family)
+      enrollment = FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, benefit_group_assignment: census_employee.benefit_group_assignments.first, sponsored_benefit_package_id: census_employee.benefit_group_assignments.first.benefit_package.id)
+      allow(benefit_group_assignment).to receive(:hbx_enrollment).and_return(enrollment)
+    end
 
     context "for initial application" do
 
       it "should return true when employees waive the coverage" do
-        benefit_group_assignment.aasm_state = "coverage_waived"
-        expect(census_employee.waiving_on_eod?).to be_truthy
+        benefit_group_assignment.hbx_enrollment.aasm_state = "inactive"
+        benefit_group_assignment.hbx_enrollment.save
+        expect(census_employee.is_waived_under?(benefit_group_assignment.benefit_application)).to be_truthy
       end
 
       it "should return false for employees who are enrolling" do
-        benefit_group_assignment.aasm_state = "coverage_selected"
-        expect(census_employee.waiving_on_eod?).to be_falsey
+        expect(census_employee.is_waived_under?(benefit_group_assignment.benefit_application)).to be_falsey
       end
     end
 
@@ -2281,12 +2288,13 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       end
 
       it "should return false when employees who are enrolling" do
-        expect(census_employee.waiving_on_eod?).to be_falsey
+        expect(census_employee.is_waived_under?(benefit_group_assignment.benefit_application)).to be_falsey
       end
 
       it "should return true for employees waive the coverage" do
-        benefit_group_assignment.aasm_state = "coverage_waived"
-        expect(census_employee.waiving_on_eod?).to be_truthy
+        benefit_group_assignment.hbx_enrollment.aasm_state = "renewing_waived"
+        benefit_group_assignment.hbx_enrollment.save
+        expect(census_employee.is_waived_under?(benefit_group_assignment.benefit_application)).to be_truthy
       end
     end
   end

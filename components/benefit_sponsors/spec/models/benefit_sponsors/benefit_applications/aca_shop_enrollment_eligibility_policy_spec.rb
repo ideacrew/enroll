@@ -66,11 +66,8 @@ module BenefitSponsors
           benefit_sponsorship.census_employees.each do |ce|
             family = FactoryBot.create(:family, :with_primary_family_member)
             allow(ce).to receive(:family).and_return(family)
+            allow(ce).to receive(:is_waived_under?).and_return true
             employees << ce
-            FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
-            ce.active_benefit_group_assignment.aasm_state = 'coverage_waived'
-            ce.active_benefit_group_assignment.save
-            ce.save
           end
           allow(benefit_application).to receive(:active_census_employees_under_py).and_return(employees)
         end
