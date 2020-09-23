@@ -322,16 +322,14 @@ class CensusEmployee < CensusMember
     end
   end
 
-  def waiving_on_eod?
-    if renewal_benefit_group_assignment.present?
-      renewal_benefit_group_assignment.aasm_state == 'coverage_waived' || active_benefit_group_assignment.aasm_state == 'coverage_waived'
-    elsif active_benefit_group_assignment.present?
-      active_benefit_group_assignment.aasm_state == 'coverage_waived'
-    else
-      false
+  def is_waived_under?(benefit_application)
+    assignment_by_application = [renewal_benefit_group_assignment, active_benefit_group_assignment].compact.detect do |assignment|
+      assignment.benefit_application && (assignment.benefit_application == benefit_application)
     end
+    return false if assignment_by_application.blank? || assignment_by_application.hbx_enrollment.blank?
+    assignment_by_application.hbx_enrollment.is_coverage_waived?
   end
-  
+
   def renewal_benefit_group_assignment=(renewal_package_id)
     benefit_application = BenefitSponsors::BenefitApplications::BenefitApplication.where(
       :"benefit_packages._id" => renewal_package_id
