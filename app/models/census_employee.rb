@@ -1433,14 +1433,12 @@ class CensusEmployee < CensusMember
     active_benefit_group_assignment.benefit_package.earliest_benefit_package_after(coverage_date)
   end
 
-  def waiving_on_eod?
-    if renewal_benefit_group_assignment.present?
-      renewal_benefit_group_assignment.aasm_state == 'coverage_waived' || active_benefit_group_assignment.aasm_state == 'coverage_waived'
-    elsif active_benefit_group_assignment.present?
-      active_benefit_group_assignment.aasm_state == 'coverage_waived'
-    else
-      false
+  def is_waived_under?(benefit_application)
+    assignment_by_application = [renewal_benefit_group_assignment, active_benefit_group_assignment].compact.detect do |assignment|
+      assignment.benefit_application && (assignment.benefit_application == benefit_application)
     end
+    return false if assignment_by_application.blank? || assignment_by_application.hbx_enrollment.blank?
+    assignment_by_application.hbx_enrollment.is_coverage_waived?
   end
 
   def ssn=(new_ssn)
