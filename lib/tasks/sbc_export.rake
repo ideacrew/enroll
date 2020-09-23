@@ -6,7 +6,7 @@ namespace :sbc do
   task :data_export, [:year] => :environment do |task, args|
 
     field_names  = %w(
-        hios_id year identifier title
+        product_name hios_id year identifier title
       )
 
     file_name = "sbc_export.csv"
@@ -17,6 +17,7 @@ namespace :sbc do
 
       ::BenefitMarkets::Products::Product.by_year(year).each do |product|
         csv << [
+          product.title,
           product.hios_id,
           product.active_year,
           product.sbc_document.identifier,
