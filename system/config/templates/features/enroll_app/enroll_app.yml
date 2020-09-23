@@ -29,7 +29,7 @@ registry:
             item: "https://www.dchealthlink.com/nondiscrimination"
       - key: :pay_now_functionality
         item: "kaiser_enabled"
-        is_enabled: false
+        is_enabled: true
         settings:
         - key: :carriers
           item: 'Kaiser'
