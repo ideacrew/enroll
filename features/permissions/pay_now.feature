@@ -1,5 +1,3 @@
-@wip
-
 Feature: Hbx Admin creates a New Consumer Application for ivl users
 
   Background: Setup site, employer, and benefit application
