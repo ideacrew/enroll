@@ -25,8 +25,6 @@ namespace :sbc do
         ]
 
       end
-
     end
   end
-
 end
