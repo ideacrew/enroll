@@ -2264,7 +2264,12 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     before do
       family = FactoryBot.create(:family, :with_primary_family_member)
       allow(census_employee).to receive(:family).and_return(family)
-      enrollment = FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, benefit_group_assignment: census_employee.benefit_group_assignments.first, sponsored_benefit_package_id: census_employee.benefit_group_assignments.first.benefit_package.id)
+      enrollment = FactoryBot.create(
+        :hbx_enrollment, family: family,
+                         household: family.active_household,
+                         benefit_group_assignment: census_employee.benefit_group_assignments.first,
+                         sponsored_benefit_package_id: census_employee.benefit_group_assignments.first.benefit_package.id
+      )
       allow(benefit_group_assignment).to receive(:hbx_enrollment).and_return(enrollment)
     end
 
