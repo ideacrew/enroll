@@ -108,8 +108,9 @@ class SpecialEnrollmentPeriod
 
   def qualifying_life_event_kind=(new_qualifying_life_event_kind)
     raise ArgumentError.new("expected QualifyingLifeEventKind") unless new_qualifying_life_event_kind.is_a?(QualifyingLifeEventKind)
-    raise ArgumentError.new("Qualifying life event kind is expired")  unless new_qualifying_life_event_kind.active?
-
+    unless new_qualifying_life_event_kind.active?
+      raise StandardError, "Qualifying life event kind is expired" if (self.created_at.present? && (new_qualifying_life_event_kind.start_on..new_qualifying_life_event_kind.end_on).exclude?(self.created_at.to_date)) || self.created_at.blank?
+    end
     self.qualifying_life_event_kind_id = new_qualifying_life_event_kind._id
     self.title = new_qualifying_life_event_kind.title
     @qualifying_life_event_kind = new_qualifying_life_event_kind
