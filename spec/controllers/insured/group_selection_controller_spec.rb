@@ -510,8 +510,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
   end
 
   context 'family with active enrollment and sep' do
-    let!(:person) {FactoryGirl.create(:person, :with_family, :with_employee_role, first_name: 'mock')}
-    let!(:family) {person.primary_family}
+    let!(:update_family) {family.special_enrollment_periods.delete_all}
     let!(:hbx_enrollment) {FactoryGirl.create(:hbx_enrollment, household: family.active_household, sponsored_benefit_package_id: initial_application.benefit_packages.first.id)}
     let!(:start_on) {TimeKeeper.date_of_record}
     let!(:benefit_package) {hbx_enrollment.sponsored_benefit_package}
@@ -533,20 +532,19 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       )
     end
 
-    let!(:sep) do
-      family.special_enrollment_periods.create(
-        qualifying_life_event_kind: qle,
+    let(:sep_params) do
+      { qualifying_life_event_kind: qle,
         qle_on: qle.created_at,
         effective_on_kind: qle.event_kind_label,
         effective_on: benefit_package.effective_period.min,
         start_on: start_on,
-        end_on: start_on + 30.days
-      )
+        end_on: start_on + 30.days}
     end
 
     it 'should assign change_plan as change_by_qle for make changes on the existing enrollment' do
+      family.special_enrollment_periods.create(sep_params)
       sign_in user
-      get :new, person_id: person.id, employee_role_id: person.employee_roles.first.id, change_plan: "change_plan", hbx_enrollment_id: hbx_enrollment.id
+      get :new, person_id: person.id, employee_role_id: person.employee_roles.first.id, change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id
       expect(assigns(:change_plan)).to eq 'change_by_qle'
     end
   end
