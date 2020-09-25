@@ -33,7 +33,7 @@ module Operations
       end
 
       def fetch_bcp_by_oe_period
-        HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.detect do |bcp|
+        HbxProfile&.current_hbx&.benefit_sponsorship&.benefit_coverage_periods&.detect do |bcp|
           bcp.open_enrollment_contains?(TimeKeeper.date_of_record)
         end
       end
