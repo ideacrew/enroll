@@ -50,7 +50,7 @@ module Operations
         expect(subject).not_to be_success
         expect(subject.failure).to eq "Given enrollment is not IVL by kind"
       end
-    end 
+    end
 
     describe "Should throw an error when the enrollment is shopping " do
       before do
@@ -79,6 +79,6 @@ module Operations
         expect(subject).not_to be_success
         expect(subject.failure).to eq "System is not under open enrollment"
       end
-    end       
+    end
   end
 end

@@ -30,7 +30,7 @@ module Operations
       def under_oe?(enrollment)
         bcp = fetch_bcp_by_oe_period
         bcp.nil? || current_enrollment_is_in_renewal_plan_year?(enrollment, bcp)
-      end 
+      end
 
       def fetch_bcp_by_oe_period
         HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.detect do |bcp|
@@ -53,7 +53,7 @@ module Operations
         renewal_enrollments.each do |enr|
           enr.cancel_ivl_enrollment if enr&.subscriber&.applicant_id == enrollment&.subscriber&.applicant_id
         end
-      end     
+      end
     end
   end
 end
