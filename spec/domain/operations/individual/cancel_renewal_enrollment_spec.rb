@@ -26,14 +26,14 @@ module Operations
         allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 11, 1))
       end
 
-      include_context 'family with two members and one enrollment and one predecessor enrollment with one member with previous year active coverage'
+      include_context 'family with previous enrollment for termination and passive renewal'
       let(:params) { expired_enrollment }
 
       it 'should cancel renewal enrollment when passed an active enrollment' do
-        expect(family.hbx_enrollments.second.aasm_state).to eq "coverage_selected"
+        expect(family.hbx_enrollments.third.aasm_state).to eq "coverage_selected"
         expect(subject).to be_success
-        family.hbx_enrollments.second.reload
-        expect(family.hbx_enrollments.second.aasm_state).to eq "coverage_canceled"
+        family.hbx_enrollments.third.reload
+        expect(family.hbx_enrollments.third.aasm_state).to eq "coverage_canceled"
       end
     end
 
@@ -43,7 +43,7 @@ module Operations
         allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 11, 1))
       end
 
-      include_context 'family with two members and one enrollment and one predecessor enrollment with one member with previous year active coverage'
+      include_context 'family with previous enrollment for termination and passive renewal'
       let(:params) { expired_enrollment }
 
       it 'should cancel renewal enrollment when passed an active enrollment' do
@@ -58,7 +58,7 @@ module Operations
         allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 11, 1))
       end
 
-      include_context 'family with two members and one enrollment and one predecessor enrollment with one member with previous year active coverage'
+      include_context 'family with previous enrollment for termination and passive renewal'
       let(:params) { expired_enrollment }
 
       it 'should cancel renewal enrollment when passed an active enrollment' do
@@ -72,7 +72,7 @@ module Operations
         expired_enrollment.update_attributes(aasm_state: :coverage_selected)
       end
 
-      include_context 'family with two members and one enrollment and one predecessor enrollment with one member with previous year active coverage'
+      include_context 'family with previous enrollment for termination and passive renewal'
       let(:params) { expired_enrollment }
 
       it 'should cancel renewal enrollment when passed an active enrollment' do
