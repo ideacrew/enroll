@@ -29,5 +29,9 @@ module Notifier
         "Ineligible Immigration Status"
       end
     end
+
+    def ivl_citizen_status(uqhp_notice, status)
+      uqhp_notice ? uqhp_citizen_status(status) : aqhp_citizen_status(status)
+    end
   end
 end

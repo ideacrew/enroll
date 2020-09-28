@@ -106,8 +106,12 @@ module Notifier
       end
 
       def dependents
+        primary_member = []
+        primary_member << payload['notice_params']['primary_member']
+        dependent_members = payload['notice_params']['dependents']
+        members = primary_member + dependent_members
         merge_model.dependents =
-          payload['notice_params']['dependents'].uniq { |dependent| dependent['member_id'] }.collect do |member|
+          members.uniq { |dependent| dependent['member_id'] }.collect do |member|
             dependent = ::Notifier::Services::DependentService.new(uqhp_notice?, member, renewing_enrollments)
             dependent_hash(dependent, member)
           end
@@ -123,11 +127,13 @@ module Notifier
       end
 
       def tax_households
+        tax_households = []
         primary_member = payload['notice_params']['primary_member']
         return [] unless primary_member['aqhp_eligible']&.upcase == "YES"
 
-        tax_household = ::Notifier::Services::TaxHouseholdService.new(primary_member)
-        merge_model.tax_households << tax_households_hash(tax_household)
+        thh = ::Notifier::Services::TaxHouseholdService.new(primary_member)
+        tax_households << tax_households_hash(thh)
+        merge_model.tax_households = tax_households
       end
 
       def tax_hh_with_csr
@@ -239,8 +245,8 @@ module Notifier
         primary_member_object = payload['notice_params']['primary_member'].present? ? payload['notice_params']['primary_member'] : nil
         primary_member << primary_member_object
         dependent_members = payload['notice_params']['dependents']
-        family_members = primary_member + dependent_members
-        family_members.compact.each do |member|
+        members = primary_member + dependent_members
+        members.compact.each do |member|
           next if member["magi_medicaid"] != "Yes"
 
           fam_member = ::Notifier::Services::DependentService.new(uqhp_notice?, member, renewing_enrollments)
@@ -254,8 +260,8 @@ module Notifier
         primary_member_object = payload['notice_params']['primary_member'].present? ? payload['notice_params']['primary_member'] : nil
         primary_member << primary_member_object
         dependent_members = payload['notice_params']['dependents']
-        family_members = primary_member + dependent_members
-        family_members.compact.each do |member|
+        members = primary_member + dependent_members
+        members.compact.each do |member|
           next unless member["aqhp_eligible"] == "Yes" || member["non_magi_medicaid"] == "Yes"
 
           fam_member = ::Notifier::Services::DependentService.new(uqhp_notice?, member, renewing_enrollments)
@@ -269,8 +275,8 @@ module Notifier
         primary_member_object = payload['notice_params']['primary_member'].present? ? payload['notice_params']['primary_member'] : nil
         primary_member << primary_member_object
         dependent_members = payload['notice_params']['dependents']
-        family_members = primary_member + dependent_members
-        family_members.compact.each do |member|
+        members = primary_member + dependent_members
+        members.compact.each do |member|
           next unless member["uqhp_eligible"] == "Yes" || member["non_magi_medicaid"] == "Yes"
 
           fam_member = ::Notifier::Services::DependentService.new(uqhp_notice?, member, renewing_enrollments)
@@ -311,7 +317,8 @@ module Notifier
 
       def citizenship
         return if primary_nil?
-        merge_model.citizenship = citizen_status(payload['notice_params']['primary_member']['citizen_status'])
+
+        merge_model.citizenship = ivl_citizen_status(uqhp_notice?, payload['notice_params']['primary_member']['citizen_status'])
       end
 
       def tax_household_size

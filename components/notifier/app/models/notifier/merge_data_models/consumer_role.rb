@@ -276,11 +276,11 @@ module Notifier
       end
 
       def eligibility_notice_display_medicaid(ivl)
-        ivl.is_medicaid_chip_eligible || ivl.is_non_magi_medicaid_eligible || ivl.no_medicaid_because_of_immigration || (!(ivl.is_medicaid_chip_eligible || ivl.is_non_magi_medicaid_eligible) && (ivl.is_ia_eligible || ivl.is_without_assistance))
+        ivl.is_medicaid_chip_eligible || ivl.is_non_magi_medicaid_eligible || ivl.no_medicaid_because_of_immigration || (!(ivl.is_medicaid_chip_eligible || ivl.is_non_magi_medicaid_eligible) && (ivl.aqhp_eligible || ivl.uqhp_eligible))
       end
 
       def eligibility_notice_display_aptc(ivl)
-        (tax_households[0].max_aptc > 0) || ivl.no_aptc_because_of_income || ivl.is_medicaid_chip_eligible || ivl.no_aptc_because_of_mec || ivl.no_aptc_because_of_tax || ivl.is_ia_eligible
+        (tax_households[0].max_aptc > 0) || ivl.no_aptc_because_of_income || ivl.is_medicaid_chip_eligible || ivl.no_aptc_because_of_mec || ivl.no_aptc_because_of_tax || ivl.aqhp_eligible
       end
 
       def eligibility_notice_display_csr(ivl)
