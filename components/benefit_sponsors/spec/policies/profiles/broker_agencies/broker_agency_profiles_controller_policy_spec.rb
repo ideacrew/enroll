@@ -19,6 +19,7 @@ module BenefitSponsors
       it_behaves_like "should not permit for invalid user", :index?
       it_behaves_like "should not permit for invalid user", :show?
       it_behaves_like "should not permit for invalid user", :staff_index?
+      it_behaves_like "should not permit for invalid user", :redirect_signup?
     end
 
     context 'for a user with hbx staff role' do
@@ -48,6 +49,7 @@ module BenefitSponsors
 
       it_behaves_like "should permit for a user with broker role", :family_index?
       it_behaves_like "should permit for a user with broker role", :family_datatable?
+      it_behaves_like "should permit for a user with broker role", :redirect_signup?
 
       it "should not permit the user with broker role for index?" do
         expect(policy.send(:index?)).to be false
