@@ -116,7 +116,8 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
   @data_hash.each do |ic_number , members|
     begin
       next if InitialEvents.include?(event) && members.any?{ |m| @excluded_list.include?(m["member_id"]) }
-      subscriber = members.detect{ |m| m["dependent"].present? && m["dependent"].upcase == "NO"}
+      subscriber = members.detect{ |m| m["dependent"].casecmp('NO').zero? }
+      dependents = members.select{|m| m["dependent"].casecmp('YES').zero? }
       next if subscriber.nil?
 
       primary_person = get_primary_person(members, subscriber) if members.present? && subscriber.present?
@@ -137,7 +138,7 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
           notice_event: 'final_eligibility_notice',
           notice_params: {
             primary_member: subscriber.to_hash,
-            dependents: members.map(&:to_hash),
+            dependents: dependents.map(&:to_hash),
             active_enrollment_ids: active_enrollments.pluck(:hbx_id),
             renewing_enrollment_ids: renewing_enrollments.pluck(:hbx_id),
             uqhp_event: 'uqhp_projected_eligibility_notice_1'

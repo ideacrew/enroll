@@ -61,7 +61,7 @@ module Notifier
     end
 
     def responsible_amount(enrollment)
-      format_currency((enrollment.total_premium - enrollment.applied_aptc_amount.to_f), 2)
+      format_currency((enrollment.total_premium.to_f - enrollment.applied_aptc_amount.to_f), 2)
     end
 
     def is_receiving_assistance?(enrollment)
