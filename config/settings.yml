@@ -251,7 +251,8 @@ aca:
       non_binder_paid_notice_day_of_month: 16
       earliest_start_prior_to_effective_on:
         months: -3
-        day_of_month: 0
+        # Will occur the day after the date here
+        day_of_month: 15
       appeal_period_after_application_denial:
         days: 30
       # After submitting an ineligible plan year application, time period an Employer must wait
