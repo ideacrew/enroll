@@ -38,6 +38,10 @@ report_name = if Rails.env.production?
               "#{Rails.root}/spec/test_data/notices/#{event}_report_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv"
             end
 
+def notice_type(event)
+  event == 'final_eligibility_notice_uqhp' ? 'uqhp_projected_eligibility_notice_1' : 'aqhp_projected_eligibility_notice_2'
+end
+
 def valid_enrollments(person)
   renewing_hbx_enrollments = []
   active_hbx_enrollments = []
@@ -141,7 +145,7 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
             dependents: dependents.map(&:to_hash),
             active_enrollment_ids: active_enrollments.pluck(:hbx_id),
             renewing_enrollment_ids: renewing_enrollments.pluck(:hbx_id),
-            uqhp_event: 'uqhp_projected_eligibility_notice_1'
+            uqhp_event: notice_type(event)
           }
         )
 

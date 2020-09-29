@@ -143,7 +143,7 @@ module Notifier
       # there can be multiple health and dental enrollments for the same coverage year
       # Renewing health enrollments
       def renewing_health_enrollments
-        renewing_enrollments.select { |e| e.coverage_kind == 'health' && e.effective_on.year.to_s == coverage_year}
+        renewing_enrollments.select { |e| e.coverage_kind == 'health' && e.effective_on.year.to_s == coverage_year.to_s}
       end
 
       def renewing_health_enrollments_present?
@@ -152,17 +152,17 @@ module Notifier
 
       # Renewing dental enrollments
       def renewing_dental_enrollments
-        renewing_enrollments.select { |e| e.coverage_kind == 'dental' && e.effective_on.year.to_s == coverage_year }
+        renewing_enrollments.select { |e| e.coverage_kind == 'dental' && e.effective_on.year.to_s == coverage_year.to_s }
       end
 
       # Current active health enrollments
       def current_health_enrollments
-        active_enrollments.select { |e| e.coverage_kind == "health" && e.effective_on.year.to_s == previous_coverage_year}
+        active_enrollments.select { |e| e.coverage_kind == "health" && e.effective_on.year.to_s == previous_coverage_year.to_s}
       end
 
       # Current active dental enrollments
       def current_dental_enrollments
-        active_enrollments.select { |e| e.coverage_kind == "dental" && e.effective_on.year.to_s == previous_coverage_year}
+        active_enrollments.select { |e| e.coverage_kind == "dental" && e.effective_on.year.to_s == previous_coverage_year.to_s}
       end
 
       # Renewing health product

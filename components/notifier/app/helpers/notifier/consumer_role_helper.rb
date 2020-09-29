@@ -13,7 +13,7 @@ module Notifier
           federal_tax_filing_status: filer_type(member['filer_type']),
           expected_income_for_coverage_year: format_currency(member['actual_income']),
           citizenship: ivl_citizen_status(dependent.is_uqhp_notice, member["citizen_status"]),
-          dc_resident: member['resident']&.capitalize,
+          dc_resident: member['resident'].upcase == 'YES',
           tax_household_size: member['tax_hh_count'],
           incarcerated: member['incarcerated'] == 'N' ? 'No' : 'Yes',
           other_coverage: member["mec"].presence || 'No',
