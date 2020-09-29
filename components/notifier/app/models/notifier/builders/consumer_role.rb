@@ -111,7 +111,7 @@ module Notifier
         dependent_members = payload['notice_params']['dependents']
         members = primary_member + dependent_members
         merge_model.dependents =
-          members.uniq { |dependent| dependent['member_id'] }.collect do |member|
+          members.compact.uniq { |dependent| dependent['member_id'] }.collect do |member|
             dependent = ::Notifier::Services::DependentService.new(uqhp_notice?, member, renewing_enrollments)
             dependent_hash(dependent, member)
           end
