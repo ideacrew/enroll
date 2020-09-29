@@ -171,12 +171,12 @@ RSpec.describe 'Components::Notifier::Builders::ConsumerRole', :dbclean => :afte
       it "should have dependent filer type attributes" do
         expect(subject.dependents.first['federal_tax_filing_status']).to eq('Tax Filer')
         expect(subject.dependents.last['federal_tax_filing_status']).to eq('Married Filing Separately')
-        expect(subject.dependents.count).to eq(2)
+        expect(subject.dependents.count).to eq(3)
       end
 
       it "should have dependent citizen_status attributes" do
         expect(subject.citizen_status("US")).to eq('US Citizen')
-        expect(subject.dependents.count).to eq(2)
+        expect(subject.dependents.count).to eq(3)
       end
 
       it "should have magi_medicaid_members_present" do
