@@ -4,6 +4,7 @@ module Notifier
     include ActionView::Helpers::NumberHelper
 
     attribute :coverage_start_on, String
+    attribute :effective_on, Date
     attribute :coverage_year, Integer
     attribute :plan_name, String
     attribute :employee_responsible_amount, String
@@ -58,6 +59,7 @@ module Notifier
         waiver_coverage_end_on: end_on,
         is_receiving_assistance: false,
         aptc_amount: '5',
+        effective_on: TimeKeeper.date_of_record.next.beginning_of_month,
         responsible_amount: '458'
       })
 

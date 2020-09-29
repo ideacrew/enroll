@@ -7,7 +7,7 @@ module Notifier
     def enrollment_hash(enrollment)
       MergeDataModels::Enrollment.new(
         {
-          coverage_start_on: enrollment.effective_on,
+          effective_on: enrollment.effective_on,
           coverage_year: enrollment.effective_on.year,
           premium_amount: enrollment.total_premium,
           product: product_hash(enrollment),
