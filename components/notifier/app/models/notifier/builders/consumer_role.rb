@@ -34,17 +34,15 @@ module Notifier
       end
 
       def notice_date
-        merge_model.notice_date = TimeKeeper.date_of_record
-                                            .strftime('%B %d, %Y')
+        merge_model.notice_date = TimeKeeper.date_of_record.strftime('%B %d, %Y')
       end
 
       def first_name
-        merge_model.first_name =
-          if uqhp_notice? && consumer_role.present?
-            consumer_role.person.first_name
-          else
-            payload['notice_params']['primary_member']['first_name'].titleize
-         end
+        merge_model.first_name = if uqhp_notice? && consumer_role.present?
+                                   consumer_role.person.first_name
+                                 else
+                                   payload['notice_params']['primary_member']['first_name'].titleize
+                                 end
       end
 
       def last_name
