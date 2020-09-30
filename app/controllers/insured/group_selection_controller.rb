@@ -31,6 +31,7 @@ class Insured::GroupSelectionController < ApplicationController
     end
     @qle = @adapter.is_qle?
 
+    set_change_plan
     # Benefit group is what we will need to change
     @benefit_group = @adapter.select_benefit_group(params)
     @new_effective_on = @adapter.calculate_new_effective_on(params)
@@ -145,6 +146,12 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   private
+
+  def set_change_plan
+    @adapter.if_family_has_active_shop_sep do
+      @change_plan = 'change_by_qle'
+    end
+  end
 
   def build_hbx_enrollment(family_member_ids)
     case @market_kind

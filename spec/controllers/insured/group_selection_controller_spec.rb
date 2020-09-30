@@ -508,4 +508,44 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       expect(response).to redirect_to(new_insured_group_selection_path(person_id: person.id, employee_role_id: employee_role.id, change_plan: '', market_kind: 'shop', enrollment_kind: ''))
     end
   end
+
+  context 'family with active enrollment and sep' do
+    let!(:update_family) {family.special_enrollment_periods.delete_all}
+    let!(:hbx_enrollment) {FactoryGirl.create(:hbx_enrollment, household: family.active_household, sponsored_benefit_package_id: initial_application.benefit_packages.first.id)}
+    let!(:start_on) {TimeKeeper.date_of_record}
+    let!(:benefit_package) {hbx_enrollment.sponsored_benefit_package}
+
+    let(:qle) do
+      QualifyingLifeEventKind.create(
+        title: 'Married',
+        tool_tip: 'Enroll or add a family member because of marriage',
+        action_kind: 'add_benefit',
+        event_kind_label: 'Date of married',
+        market_kind: 'shop',
+        ordinal_position: 15,
+        reason: 'marriage',
+        edi_code: '32-MARRIAGE',
+        effective_on_kinds: ['first_of_next_month'],
+        pre_event_sep_in_days: 0,
+        post_event_sep_in_days: 30,
+        is_self_attested: true
+      )
+    end
+
+    let(:sep_params) do
+      { qualifying_life_event_kind: qle,
+        qle_on: qle.created_at,
+        effective_on_kind: qle.event_kind_label,
+        effective_on: benefit_package.effective_period.min,
+        start_on: start_on,
+        end_on: start_on + 30.days}
+    end
+
+    it 'should assign change_plan as change_by_qle for make changes on the existing enrollment' do
+      family.special_enrollment_periods.create(sep_params)
+      sign_in user
+      get :new, person_id: person.id, employee_role_id: person.employee_roles.first.id, change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id
+      expect(assigns(:change_plan)).to eq 'change_by_qle'
+    end
+  end
 end
