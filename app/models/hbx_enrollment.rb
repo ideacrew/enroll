@@ -360,6 +360,7 @@ class HbxEnrollment
   scope :by_benefit_package,       -> (benefit_package) { where(:sponsored_benefit_package_id => benefit_package.id) }
   scope :by_enrollment_period,     -> (enrollment_period) { where(:effective_on.gte => enrollment_period.min, :effective_on.lte => enrollment_period.max) }
 
+  scope :all_with_multiple_enrollment_members,  ->{ exists({:'hbx_enrollment_members.1' => true})  }
   scope :by_effective_period,      ->(effective_period) { where(
                                                           :"effective_on".gte => effective_period.min,
                                                           :"effective_on".lte => effective_period.max
@@ -498,6 +499,11 @@ class HbxEnrollment
       end
     end
 
+    def terminate_dep_age_off_enrollments
+      ::EnrollRegistry[:aca_shop_dependent_age_off] { {new_date: TimeKeeper.date_of_record} }
+      ::EnrollRegistry[:aca_individual_dependent_age_off] { {new_date: TimeKeeper.date_of_record} }
+    end
+
     def enrollments_for_display(family_id)
       HbxEnrollment.collection.aggregate(
         [
@@ -571,7 +577,7 @@ class HbxEnrollment
       #     end
       #   end
       # end
-
+      HbxEnrollment.terminate_dep_age_off_enrollments if TimeKeeper.date_of_record == TimeKeeper.date_of_record.end_of_month
       HbxEnrollment.terminate_scheduled_enrollments
     end
 

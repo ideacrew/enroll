@@ -15,6 +15,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     let(:aptc_values) {{}}
     let(:assisted) { nil }
 
+
     let!(:family) do
       primary = FactoryBot.create(:person, :with_consumer_role, dob: primary_dob)
       FactoryBot.create(:family, :with_primary_family_member, :person => primary)
@@ -116,25 +117,51 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
     describe ".clone_enrollment_members" do
 
-      before do
-        allow(child1).to receive(:relationship).and_return('child')
-        allow(child2).to receive(:relationship).and_return('child')
+      context "when dependent age off feature is turned off" do
+        before do
+          allow(child1).to receive(:relationship).and_return('child')
+          allow(child2).to receive(:relationship).and_return('child')
+          allow(EnrollRegistry[:age_off_relaxed_eligibility].feature).to receive(:is_enabled).and_return(false)
+        end
+        context "When a child is aged off" do
+          it "should not include child" do
+
+            applicant_ids = subject.clone_enrollment_members.collect(&:applicant_id)
+
+            expect(applicant_ids).to include(family.primary_applicant.id)
+            expect(applicant_ids).to include(spouse.id)
+            expect(applicant_ids).not_to include(child1.id)
+            expect(applicant_ids).to include(child2.id)
+          end
+
+          it "should generate passive renewal in coverage_selected state" do
+            renewal = subject.renew
+            expect(renewal.coverage_selected?).to be_truthy
+          end
+        end
       end
 
-      context "When a child is aged off" do
-        it "should not include child" do
-
-          applicant_ids = subject.clone_enrollment_members.collect(&:applicant_id)
-
-          expect(applicant_ids).to include(family.primary_applicant.id)
-          expect(applicant_ids).to include(spouse.id)
-          expect(applicant_ids).not_to include(child1.id)
-          expect(applicant_ids).to include(child2.id)
+      context "when dependent age off feature is turned on" do
+        before do
+          allow(child1).to receive(:relationship).and_return('child')
+          allow(child2).to receive(:relationship).and_return('child')
+          allow(EnrollRegistry[:age_off_relaxed_eligibility].feature).to receive(:is_enabled).and_return(true)
         end
+        context "When a child is aged off" do
+          it "should include child" do
 
-        it "should generate passive renewal in coverage_selected state" do
-          renewal = subject.renew
-          expect(renewal.coverage_selected?).to be_truthy
+            applicant_ids = subject.clone_enrollment_members.collect(&:applicant_id)
+
+            expect(applicant_ids).to include(family.primary_applicant.id)
+            expect(applicant_ids).to include(spouse.id)
+            expect(applicant_ids).to include(child1.id)
+            expect(applicant_ids).to include(child2.id)
+          end
+
+          it "should generate passive renewal in auto renewing state" do
+            renewal = subject.renew
+            expect(renewal.auto_renewing?).to be_truthy
+          end
         end
       end
 
