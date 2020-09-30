@@ -392,7 +392,7 @@ module Notifier
 
       def csr
         return if primary_nil?
-        merge_model.csr = payload['notice_params']['primary_member']['csr']&.casecmp('YES').zero?
+        merge_model.csr = payload['notice_params']['primary_member']['csr']&.casecmp('YES')&.zero?
       end
 
       def has_atleast_one_csr_member?
