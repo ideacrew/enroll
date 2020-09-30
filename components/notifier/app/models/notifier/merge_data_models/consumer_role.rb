@@ -48,6 +48,13 @@ module Notifier
       attribute :primary_member_present, Boolean
       attribute :same_health_product, Boolean # checks if family is enrolled into same health product
       attribute :same_dental_product, Boolean # checks if family is enrolled into same dental product
+      attribute :person_hbx_id, String
+      attribute :notification_type, String
+      # TODO: Am I doing this right???
+      attribute :due_date, Date
+      attribute :ssa_unverified, Array
+      attribute :dhs_unverified, Array
+      attribute :residency_inconsistency, Array
 
       def self.stubbed_object
         notice = Notifier::MergeDataModels::ConsumerRole.new(
@@ -82,7 +89,8 @@ module Notifier
             csr: true,
             csr_percent: 73,
             ivl_oe_start_date: Date.parse('November 01, 2020').strftime('%B %d, %Y'),
-            ivl_oe_end_date: Date.parse('January 31, 2021').strftime('%B %d, %Y')
+            ivl_oe_end_date: Date.parse('January 31, 2021').strftime('%B %d, %Y'),
+            person_hbx_id: 2
           }
         )
 
@@ -98,7 +106,7 @@ module Notifier
       end
 
       def collections
-        %w[addresses tax_households dependents magi_medicaid_members aqhp_or_non_magi_medicaid_members uqhp_or_non_magi_medicaid_members ineligible_applicants]
+        %w[addresses tax_households dependents magi_medicaid_members aqhp_or_non_magi_medicaid_members uqhp_or_non_magi_medicaid_members ineligible_applicants ssa_unverified]
       end
 
       def conditions
@@ -109,7 +117,12 @@ module Notifier
             aqhp_event_and_irs_consent_no? csr_is_73? csr_is_87?
             csr_is_94? csr_is_100? csr_is_zero? csr_is_nil? non_magi_medicaid?
             aptc_is_zero? totally_ineligible? aqhp_event? uqhp_event? totally_ineligible_members_present? primary_member_present?
+            documents_needed?
         ]
+      end
+
+      def primary_identifier
+        # primary_identifier
       end
 
       # there can be multiple renewing health and dental enrollments for the same coverage year
@@ -136,6 +149,25 @@ module Notifier
 
       def renewing_enrollments
         enrollments.select { |enrollment| enrollment.coverage_year == coverage_year }
+      end
+
+      def aqhp_enrollments
+        enrollments.select{ |enrollment| enrollment.is_receiving_assistance == true}
+      end
+
+      def ssa_unverified
+        # TODO: What am I supposed to do here?
+        # Do I have to put anything here if I do merge_model.ssa_unverified <<
+        # from the consumer_role_builder?
+        # If I put ssa_unverified here I get some kind of stack trace error thing that crashes
+        # my whole server
+        # ssa_unverified
+        []
+      end
+
+      def dhs_unverified
+        # TODO: Same question as above
+        []
       end
 
       def tax_hh_with_csr

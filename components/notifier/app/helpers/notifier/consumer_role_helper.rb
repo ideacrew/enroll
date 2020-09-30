@@ -89,6 +89,27 @@ module Notifier
               .end_on.strftime('%B %d, %Y')
     end
 
+    def min_notice_due_date(family)
+      due_dates = []
+      family.contingent_enrolled_active_family_members.each do |family_member|
+        family_member.person.verification_types.each do |v_type|
+          due_dates << family.document_due_date(v_type)
+        end
+      end
+      due_dates.compact!
+      earliest_future_due_date = due_dates.select{ |d| d > TimeKeeper.date_of_record }.min
+      if due_dates.present? && earliest_future_due_date.present?
+        earliest_future_due_date.to_date
+      else
+        nil
+      end
+    end
+
+    def notice_due_date_value
+      family = person.primary_family
+      (family.min_verification_due_date.present? && (family.min_verification_due_date > date)) ? family.min_verification_due_date : min_notice_due_date(family)
+    end
+
     def expected_income_for_coverage_year_value(payload)
       if payload['notice_params']['primary_member']['actual_income'].present?
         ActionController::Base.helpers.number_to_currency(

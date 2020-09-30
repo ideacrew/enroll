@@ -33,6 +33,10 @@ module Notifier
         enrollments
       end
 
+      def notification_type
+        merge_model.notification_type
+      end
+
       def notice_date
         merge_model.notice_date = TimeKeeper.date_of_record.strftime('%B %d, %Y')
       end
@@ -140,6 +144,10 @@ module Notifier
 
       # there can be multiple health and dental enrollments for the same coverage year
       # Renewing health enrollments
+      def aqhp_enrollments
+        enrollments.select{ |enrollment| enrollment.is_receiving_assistance == true}
+      end
+
       def renewing_health_enrollments
         renewing_enrollments.select { |e| e.coverage_kind == 'health' && e.effective_on.year.to_s == coverage_year.to_s}
       end
@@ -282,6 +290,14 @@ module Notifier
         end
       end
 
+      def due_date
+        if uqhp_notice?
+          merge_model.due_date = family.min_verification_due_date
+        else # AQHP
+          merge_model.due_date = TimeKeeper.date_of_record + 95.days
+        end
+      end
+
       def ivl_oe_start_date
         merge_model.ivl_oe_start_date = ivl_oe_start_date_value
       end
@@ -387,6 +403,31 @@ module Notifier
             payload['notice_params']['primary_member']['non_magi_medicaid'].casecmp('YES').zero?
           end
       end
+      
+      # TODO: See app/notices/ivl_notices/ivl_to_coverall_transition_notice_builder.rb for guidance
+      def unverified_people(type_name, merge_model_attribute)
+        outstanding_people = []
+        family = consumer_role&.person&.primary_family
+        return false unless family.present?
+        people = family.family_members.map { |fm| fm.person }
+        people.each do |person|
+          outstanding_verification_types = person&.consumer_role&.outstanding_verification_types
+           if person.consumer_role && outstanding_verification_types.present?
+            if outstanding_verification_types.detect { |verification_type| verification_type.type_name == type_name }
+              outstanding_people << person
+            end
+          end
+        end
+        merge_model[merge_model_attribute] = outstanding_people.flatten
+      end
+
+      def ssa_unverified
+        unverified_people("Social Security Number", :ssa_unverified)
+      end
+
+      def documents_needed?
+        unverified_people("Social Security Number", :ssa_unverified).present? ? true : false
+      end
 
       def csr
         return if primary_nil?
@@ -395,6 +436,28 @@ module Notifier
 
       def has_atleast_one_csr_member?
         csr? || dependents.any? { |dependent| dependent.csr == true }
+      end
+
+      def primary_identifier
+        consumer_role&.person&.hbx_id
+      end
+
+      def notification_type
+        if payload['notice_params']['uqhp_event'].present?
+          merge_model.notification_type = payload['notice_params']['uqhp_event']
+        elsif payload['notice_params']['aqhp_event'].present?
+          merge_model.notification_type =  payload['notice_params']['aqhp_event']
+        else
+          merge_model.notification_type = ''
+        end
+      end
+
+      def past_due_text
+        'PAST DUE'
+      end
+
+      def primary_identifier
+        consumer_role.person_hbx_id
       end
 
       def aqhp_event
@@ -442,7 +505,8 @@ module Notifier
 
         date.strftime('%B %d, %Y')
       end
-
+      
+      # TODO: Is this misspelled?
       def depents
         true
       end
