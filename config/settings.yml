@@ -1,5 +1,5 @@
 site:
-  key: :cca
+  key: :dc
   subdomain: "dchbx"
   domain_name: "dchealthlink.com"
   site_title: "Access Health Connecticut"
