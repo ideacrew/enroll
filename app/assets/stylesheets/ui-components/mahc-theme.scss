@@ -30,7 +30,7 @@ body {
   padding-bottom: 70px;
   font-size: 14px;
   line-height: 1.42857143;
-  color: #333;
+  color: #005e81;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -41,7 +41,7 @@ h1,h2,h3,h4,h5,h6 {
 }
 
 .heading-text {
-  color: #333333;
+  color: $mhc-dark-blue;
 }
 .sub-text {
   color: $mhc-darker-blue;
@@ -80,7 +80,7 @@ h1,h2,h3,h4,h5,h6 {
           line-height: 50px;
           padding: 23px 15px;
           font-weight: 600;
-          color: $primary-black;
+          color: #F0592A;
           &:hover {
             background-color: $background-hover;
             text-decoration: none;
@@ -308,7 +308,7 @@ fieldset[disabled] .btn-default.active {
   border-color: $secondary-button-border;
 }
 .btn-default .badge {
-  color: #337ab7;
+  color: #005e81;
   background-color: $secondary-button-background;
 }
 .fa-trash {
