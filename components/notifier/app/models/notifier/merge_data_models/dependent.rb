@@ -54,6 +54,7 @@ module Notifier
     attribute :nonmedi_reason, String
     attribute :nonaptc_reason, String
     attribute :noncsr_reason, String
+    attribute :due_date, Date
     # TODO: person_hbx_id and dob missing, what to do?
 
     def self.stubbed_object

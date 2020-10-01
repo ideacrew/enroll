@@ -290,12 +290,100 @@ module Notifier
         end
       end
 
-      def due_date
+      def family
+        consumer_role&.person&.primary_family
+      end
+
+      def documents_needed
+        merge_model.documents_needed =
         if uqhp_notice?
-          merge_model.due_date = family.min_verification_due_date
-        else # AQHP
-          merge_model.due_date = TimeKeeper.date_of_record + 95.days
+          unverified_individuals.present?
+        else
+          primary_member = payload['notice_params']['primary_member']
+          dependent_members = payload['notice_params']['dependents']
+          members = [primary_member] + dependent_members
+          members.compact.any? { |member| member['docs_needed'].try(:upcase) == 'Y' }
         end
+      end
+
+      def unverified_individuals
+        check_for_unverified_individuals(family)
+      end
+
+      def ssa_unverified_individuals
+        merge_model.ssa_unverified_individuals =
+          unverified_individuals.collect do |individual|
+            if ssn_outstanding?(individual)
+              unverified_individual_hash(individual, due_date)
+            end
+          end
+      end
+
+      def dhs_unverified_individuals
+        merge_model.dhs_unverified_individuals =
+          unverified_individuals.collect do |individual|
+            if lawful_presence_outstanding?(individual)
+              unverified_individual_hash(individual, due_date)
+            end
+          end
+      end
+
+      def immigration_unverified_individuals
+        merge_model.immigration_unverified_individuals =
+          unverified_individuals.collect do |individual|
+            if immigration_status_outstanding?(individual)
+              unverified_individual_hash(individual, due_date)
+            end
+          end
+      end
+
+      def residency_inconsistency_individuals
+        merge_model.residency_inconsistency_individuals =
+          unverified_individuals.collect do |individual|
+            if residency_outstanding?(individual)
+              unverified_individual_hash(individual, due_date)
+            end
+          end
+      end
+
+      def american_indian_unverified_individuals
+        merge_model.american_indian_unverified_individuals =
+          unverified_individuals.collect do |individual|
+            if american_indian_status_outstanding?(individual)
+              unverified_individual_hash(individual, due_date)
+            end
+          end
+      end
+
+      def dhs_unverified_individuals_present
+        dhs_unverified_individuals
+        merge_model.dhs_unverified_individuals_present = dhs_unverified_individuals.present?
+      end
+
+      def ssa_unverified_individuals_present
+        ssa_unverified_individuals
+        merge_model.ssa_unverified_individuals_present = ssa_unverified_individuals.present?
+      end
+
+      def immigration_unverified_individuals_present
+        immigration_unverified_individuals
+        merge_model.immigration_unverified_individuals_present = immigration_unverified_individuals.present?
+      end
+
+      def residency_inconsistency_individuals_present
+        residency_inconsistency_individuals
+        merge_model.residency_inconsistency_individuals_present = residency_inconsistency_individuals.present?
+      end
+
+      def american_indian_unverified_individuals_present
+        american_indian_unverified_individuals
+        merge_model.american_indian_unverified_individuals_present = american_indian_unverified_individuals.present?
+      end
+
+      def due_date
+        return nil unless family
+
+        merge_model.due_date = family.min_verification_due_date
       end
 
       def ivl_oe_start_date

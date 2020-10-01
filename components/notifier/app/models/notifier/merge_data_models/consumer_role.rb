@@ -29,10 +29,11 @@ module Notifier
       attribute :aqhp_or_non_magi_medicaid_members, Array[MergeDataModels::Dependent]
       attribute :uqhp_or_non_magi_medicaid_members, Array[MergeDataModels::Dependent]
       attribute :ineligible_applicants, Array[MergeDataModels::Dependent]
-      attribute :ssa_unverified, Array[MergeDataModels::Dependent]
-      attribute :dhs_unverified, Array[MergeDataModels::Dependent]
-      attribute :residency_inconsistency, Array[MergeDataModels::Dependent]
-      attribute :american_indian_unverified, Array[MergeDataModels::Dependent]
+      attribute :ssa_unverified_individuals, Array[MergeDataModels::Dependent]
+      attribute :dhs_unverified_individuals, Array[MergeDataModels::Dependent]
+      attribute :immigration_unverified_individuals, Array[MergeDataModels::Dependent]
+      attribute :residency_inconsistency_individuals, Array[MergeDataModels::Dependent]
+      attribute :american_indian_unverified_individuals, Array[MergeDataModels::Dependent]
       attribute :addresses, Array[MergeDataModels::Address]
       attribute :aqhp_eligible, Boolean
       attribute :totally_ineligible, Boolean
@@ -48,18 +49,19 @@ module Notifier
       attribute :aqhp_or_non_magi_medicaid_members_present, Boolean
       attribute :uqhp_or_non_magi_medicaid_members_present, Boolean
       attribute :totally_ineligible_members_present, Boolean
-      attribute :dhs_unverified_present, Boolean
-      attribute :ssa_unverified_present, Boolean
-      attribute :residency_inconsistency_present, Boolean
-      attribute :american_indian_unverified_present, Boolean
+      attribute :dhs_unverified_individuals_present, Boolean
+      attribute :ssa_unverified_individuals_present, Boolean
+      attribute :immigration_unverified_individuals_present, Boolean
+      attribute :residency_inconsistency_individuals_present, Boolean
+      attribute :american_indian_unverified_individuals_present, Boolean
       attribute :irs_consent_not_needed, Boolean
       attribute :primary_member_present, Boolean
       attribute :same_health_product, Boolean # checks if family is enrolled into same health product
       attribute :same_dental_product, Boolean # checks if family is enrolled into same dental product
       attribute :person_hbx_id, String
       attribute :notification_type, String
-      # TODO: Am I doing this right???
       attribute :due_date, Date
+      attribute :documents_needed, Boolean
 
       def self.stubbed_object
         notice = Notifier::MergeDataModels::ConsumerRole.new(
