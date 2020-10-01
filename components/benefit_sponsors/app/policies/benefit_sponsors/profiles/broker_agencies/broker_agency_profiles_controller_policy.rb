@@ -21,7 +21,8 @@ module BenefitSponsors
 
         def redirect_signup?
           return false if user.blank?
-          self.send(:family_index?)
+
+          family_index?
         end
 
         def staff_index?
