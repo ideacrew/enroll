@@ -5,9 +5,9 @@ class GenerateCcaSite < Mongoid::Migration
         @site = BenefitSponsors::Site.new(
           site_key: :cca,
           byline: "The Right Place for the Right Plan",
-          short_name: "Health Connector",
+          short_name: "Access Health",
           domain_name: "hbxshop.org",
-          long_name: "Massachusetts Health Connector")
+          long_name: "Connecticut Access Health")
 
         @old_org = Organization.unscoped.exists(hbx_profile: true).first
         @old_profile = @old_org.hbx_profile

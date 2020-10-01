@@ -25,7 +25,7 @@ class State
     [ "Louisiana", "LA" ],
     [ "Maine", "ME" ],
     [ "Maryland", "MD" ],
-    [ "Massachusetts", "MA" ],
+    [ "Connecticut", "MA" ],
     [ "Michigan", "MI" ],
     [ "Minnesota", "MN" ],
     [ "Mississippi", "MS" ],

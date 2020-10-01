@@ -23,10 +23,10 @@ describe UpdateSubjectForMessages, dbclean: :after_each do
     end
 
     it 'should update subject' do
-      ClimateControl.modify fein: organization.fein, incorrect_subject: 'Welcome to MA Health Link', correct_subject: 'Welcome to Health Connector' do
+      ClimateControl.modify fein: organization.fein, incorrect_subject: 'Welcome to MA Health Link', correct_subject: 'Welcome to Access Health' do
         subject.migrate
         employer_profile.inbox.messages.first.reload
-        expect(employer_profile.inbox.messages.first.subject).to eql ('Welcome to Health Connector')
+        expect(employer_profile.inbox.messages.first.subject).to eql ('Welcome to Access Health')
       end
     end
   end

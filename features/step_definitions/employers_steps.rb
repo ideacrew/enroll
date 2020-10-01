@@ -322,7 +322,7 @@ When(/^(.*?) go[es]+ to the benefits tab I should see plan year information$/) d
   visit  benefit_sponsors.profiles_employers_employer_profile_path(profile.id, :tab=>'benefits')
 end
 
-When(/^I go to MY Health Connector tab$/) do
+When(/^I go to MY Access Health tab$/) do
  find('.interaction-click-control-my-health-connector').click
  wait_for_ajax
   expect(page).to have_content('My Health Benefits Program')

@@ -508,7 +508,7 @@ module BenefitSponsors
         let(:effective_period) { current_effective_date..current_effective_date.next_year.prev_day }
         let(:package_kind)            { :single_issuer }
 
-        # let(:benefit_market) { create(:benefit_markets_benefit_market, site_urn: 'mhc', kind: :aca_shop, title: "MA Health Connector SHOP Market") }
+        # let(:benefit_market) { create(:benefit_markets_benefit_market, site_urn: 'mhc', kind: :aca_shop, title: "MA Access Health SHOP Market") }
 
         # let(:current_benefit_market_catalog) { build(:benefit_markets_benefit_market_catalog, :with_product_packages,
         #   title: "SHOP Benefits for #{current_effective_date.year}",

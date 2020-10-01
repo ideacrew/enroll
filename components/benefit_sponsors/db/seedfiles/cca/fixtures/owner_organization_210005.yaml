@@ -10,7 +10,7 @@ attributes: !ruby/hash:BSON::Document
   fein: '123123456'
   hbx_id: '210005'
   home_page: 
-  legal_name: Health Connector
+  legal_name: Access Health
   updated_at: 2018-06-04 19:15:50.725000000 Z
   site_id: !ruby/object:BSON::ObjectId
     raw_data: !binary |-
