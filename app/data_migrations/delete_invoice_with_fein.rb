@@ -37,7 +37,7 @@ class DeleteInvoiceWithFein < MongoidMigrationTask
 
   def delete_message_from_inbox(orgs)
     orgs.each do |org|
-      messages = org.employer_profile.inbox.messages.select{|message| message.subject == "Your Invoice is Now Available in your DC Health Link Account" }
+      messages = org.employer_profile.inbox.messages.select{|message| message.subject == "Your Invoice is Now Available in your Access Health CT Account" }
       next if messages.blank?
 
       messages.map(&:destroy)

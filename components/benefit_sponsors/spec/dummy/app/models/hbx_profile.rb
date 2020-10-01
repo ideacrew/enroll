@@ -125,9 +125,9 @@ class HbxProfile
   ## HBX general settings
   StateName = "District of Columbia"
   StateAbbreviation = "DC"
-  CallCenterName = "DC Health Link's Customer Care Center"
+  CallCenterName = "Access Health CT's Customer Care Center"
   CallCenterPhoneNumber = "1-855-532-5465"
-  ShortName = "DC Health Link"
+  ShortName = "Access Health CT"
 
   # IndividualEnrollmentDueDayOfMonth = 15
   # Temporary change for Dec 2015 extension

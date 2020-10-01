@@ -10,7 +10,7 @@ attributes: !ruby/hash:BSON::Document
   fein: '123123456'
   hbx_id: 3191d463c7704714b39043b45e6b46b9
   home_page: 
-  legal_name: DC Health Link
+  legal_name: Access Health CT
   updated_at: 2019-08-22 02:09:36.692000000 Z
   site_id: !ruby/object:BSON::ObjectId
     raw_data: !binary |-

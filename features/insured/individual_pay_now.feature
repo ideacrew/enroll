@@ -14,8 +14,8 @@ Feature: User should be able to pay for plan
     And I click on purchase confirm button for matched person
     Then I should click on pay now button
     And I should see model pop up
-    Then I should see Leave DC Health LINK buttton
-    And I should be able to click  Leave DC Health LINK buttton
+    Then I should see Leave Access Health CT buttton
+    And I should be able to click  Leave Access Health CT buttton
     And I should see an alert with error message
 
   Examples:

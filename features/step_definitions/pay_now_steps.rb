@@ -31,7 +31,7 @@ Given(/^Hbx Admin creates a consumer application$/) do
   fill_in "person_ssn", with: '212-31-3131'
   find(:xpath, '//label[@for="radio_male"]', wait: 10).click
   find('.btn', text: 'CONTINUE', wait: 10).click
-  expect(page).to have_content('Thank you. Next, we need to verify if you or you and your family are eligible to enroll in coverage through DC Health Link. Please select CONTINUE.')
+  expect(page).to have_content('Thank you. Next, we need to verify if you or you and your family are eligible to enroll in coverage through Access Health CT. Please select CONTINUE.')
   find('.interaction-click-control-continue', wait: 10).click
   find(:xpath, "//*[@id='new_person_wrapper']/div/div[1]/div[1]/div[2]/div/div[2]", wait: 10).click
   find("li", :text => "Paper").click
@@ -142,11 +142,11 @@ And(/^I should see model pop up$/) do
   expect(page).to have_css('.modal-open')
 end
 
-And(/^I should see Leave DC Health LINK buttton$/) do
-  expect(page).to have_content('LEAVE DC HEALTH LINK')
+And(/^I should see Leave Access Health CT buttton$/) do
+  expect(page).to have_content('LEAVE Access Health CT')
 end
 
-And(/^I should be able to click  Leave DC Health LINK buttton$/) do
+And(/^I should be able to click  Leave Access Health CT buttton$/) do
   find('.interaction-click-control-leave-dc-health-link').click
   sleep 5
 end
@@ -166,7 +166,7 @@ And(/^creates a consumer with SEP$/) do
   fill_in "person_ssn", with: '212-31-3131'
   find(:xpath, '//label[@for="radio_male"]', wait: 10).click
   find('.btn', text: 'CONTINUE', wait: 10).click
-  expect(page).to have_content('Thank you. Next, we need to verify if you or you and your family are eligible to enroll in coverage through DC Health Link. Please select CONTINUE.')
+  expect(page).to have_content('Thank you. Next, we need to verify if you or you and your family are eligible to enroll in coverage through Access Health CT. Please select CONTINUE.')
   find('.interaction-click-control-continue', wait: 10).click
   find(:xpath, "//*[@id='new_person_wrapper']/div/div[1]/div[1]/div[2]/div/div[2]", wait: 10).click
   find("li", :text => "Paper").click

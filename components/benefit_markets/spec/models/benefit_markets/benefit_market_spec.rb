@@ -5,7 +5,7 @@ module BenefitMarkets
 
     let(:kind)            { :aca_shop }
     let(:site_urn)        { 'dc' }
-    let(:title)           {  "DC Health Link SHOP Market" }
+    let(:title)           {  "Access Health CT SHOP Market" }
     let(:description)     {  "Health Insurance Marketplace for District Employers and Employees" }
     let(:configuration)   { build :benefit_markets_aca_shop_configuration }
 

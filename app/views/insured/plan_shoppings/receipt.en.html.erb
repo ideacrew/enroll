@@ -87,7 +87,7 @@
                 <li>
                   <% if show_pay_now? %>
                     You must pay your first month’s premium directly to Kaiser Permanente to activate your
-                    coverage. DC Health Link does not collect premium payments.<br/><br/>
+                    coverage. Access Health CT does not collect premium payments.<br/><br/>
                     There are two ways to pay your first month’s premium and activate your coverage:
                     <br/>
                     <br/>
@@ -279,14 +279,14 @@
             It’s only available to make your first payment.
           </li>
           <li>The information that Kaiser Permanente collects and maintains as a result of your visit to its website is
-            different from the information that DC Health Link collects and maintains.
+            different from the information that Access Health CT collects and maintains.
           </li>
-          <li>DC Health Link cannot help you with any information regarding this website, including your username or
+          <li>Access Health CT cannot help you with any information regarding this website, including your username or
             password, or other technical issues.
           </li>
           <br/>
         </ul>
-        By linking to this private business, DC Health Link is not endorsing its products, services, or privacy or
+        By linking to this private business, Access Health CT is not endorsing its products, services, or privacy or
         security policies. We recommend you review the business's information collection policy or terms and conditions
         to fully understand what information is collected by Kaiser Permanente.
         </p>
@@ -294,9 +294,9 @@
       <div class="modal-footer">
         <form action=<%= @kp_pay_now_url %> method="post" target="_blank" id="pay_now_form">
           <input type="hidden" name="SAMLResponse" value="response" id="sp"/>
-          <input type="hidden" name="RelayState" value=<%= @kp_relay_state %>/> 
+          <input type="hidden" name="RelayState" value=<%= @kp_relay_state %>/>
           <button type="submit" class="btn btn-primary pull-right sp interaction-click-control-print-purchase-confirmation" id="pay-now" value="<%= @enrollment.hbx_id %>">
-            Leave DC Health LINK
+            Leave Access Health CT
           </button>
         </form>
         <button type="button" class="btn btn-default pull-left" data-dismiss="modal">GO BACK</button>

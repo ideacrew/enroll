@@ -3,7 +3,7 @@ FactoryBot.define do
     site_urn { 'acme' }
     site  { build(:benefit_sponsors_site) }
     kind { :aca_shop }
-    title { "DC Health Link SHOP Market" }
+    title { "Access Health CT SHOP Market" }
     description { "Health Insurance Marketplace for District Employers and Employees" }
 
     after :build do |benefit_market|

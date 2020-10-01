@@ -5,7 +5,7 @@ class GenerateDcSite < Mongoid::Migration
         @site = BenefitSponsors::Site.new(
             site_key: :dc,
             byline: "DC's Online Health Insurance Marketplace",
-            short_name: "DC Health Link",
+            short_name: "Access Health CT",
             domain_name: "https://enroll.dchealthlink.com",
             long_name: "DC Health Exchange Benefit")
         # TODO check on domain_name & long_name

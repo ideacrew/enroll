@@ -46,10 +46,10 @@
 
 <% if notice.aqhp_enrollments.present? %>
     <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-        content: "We recently renewed your insurance through DC Health Link. This letter tells you what you need to do next to keep your insurance and cost savings. You’ll want to keep this letter in case you have questions during the #{notice.coverage_year} coverage year. "} %>
+        content: "We recently renewed your insurance through Access Health CT. This letter tells you what you need to do next to keep your insurance and cost savings. You’ll want to keep this letter in case you have questions during the #{notice.coverage_year} coverage year. "} %>
 <% else%>
     <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-        content: "We recently renewed your insurance through DC Health Link. This letter tells you what you need to do next to keep your insurance. You’ll want to keep this letter in case you have questions during the #{notice.coverage_year} coverage year. "} %>
+        content: "We recently renewed your insurance through Access Health CT. This letter tells you what you need to do next to keep your insurance. You’ll want to keep this letter in case you have questions during the #{notice.coverage_year} coverage year. "} %>
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {

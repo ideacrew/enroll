@@ -6,7 +6,7 @@ attributes: !ruby/hash:BSON::Document
       XV35UpPE50KO21Du
   site_key: :dc
   byline: DC's Online Health Insurance Marketplace
-  short_name: DC Health Link
+  short_name: Access Health CT
   domain_name: https://enroll.dchealthlink.com
   long_name: DC Health Exchange Benefit
   copyright_period_start: '2019'

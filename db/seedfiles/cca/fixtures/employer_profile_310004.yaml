@@ -70,7 +70,7 @@ attributes: !ruby/hash:BSON::Document
         _id: !ruby/object:BSON::ObjectId
           raw_data: !binary |-
             WwR5Veq153KWlF6g
-        from: DC Health Link
+        from: Access Health CT
         to: Employer Mailbox
         subject: Welcome to HC
         folder: inbox
