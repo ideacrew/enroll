@@ -54,7 +54,7 @@ end
 
 Then(/^Hbx Admin should see text Household Info$/) do
   expect(page).to have_content('Household Info')
-  expect(page).to have_content('get insurance coverage for other members of your household')
+  expect(page).to have_content('get health insurance coverage for other members of your family')
   find_link('Add Member').visible?
   find('.btn', text: 'CONTINUE').click
 end
