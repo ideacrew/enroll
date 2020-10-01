@@ -596,6 +596,8 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
         let(:application) {double(:start_on => TimeKeeper.date_of_record.beginning_of_month, :end_on => (TimeKeeper.date_of_record.beginning_of_month + 1.year) - 1.day, :aasm_state => :active)}
         let(:package) {double("BenefitPackage", :is_a? => BenefitSponsors::BenefitPackages::BenefitPackage, :_id => "id", :plan_year => application, :benefit_application => application, start_on: Date.new(Time.current.year,4,1),end_on: Date.new(2020,3,31))}
         let(:existing_shop_enrollment) {FactoryBot.create(:hbx_enrollment, :shop, household: family.active_household, family: family)}
+        let!(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
+        let!(:existing_shop_enrollment1) {FactoryBot.create(:hbx_enrollment, :shop, product: product, household: family.active_household, family: family)}
 
         before :each do
           existing_shop_enrollment
@@ -604,6 +606,11 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
 
         it "should include proper scopes" do
           expect(HbxEnrollment.cancel_eligible.include?(existing_shop_enrollment)).to eq(true)
+        end
+
+        it "should have enrollments only with product id" do
+          expect(HbxEnrollment.unscoped.count).to eq 2
+          expect(HbxEnrollment.unscoped.with_product.count).to eq 1
         end
       end
     end
@@ -983,6 +990,33 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       end
     end
 
+    context 'terminate_coverage' do
+      let!(:family) {FactoryBot.create(:family, :with_primary_family_member)}
+      let!(:hbx_enrollment) do
+        FactoryBot.create(:hbx_enrollment,
+                          household: family.active_household,
+                          family: family,
+                          aasm_state: 'coverage_termination_pending',
+                          terminated_on: TimeKeeper.date_of_record.next_month.end_of_month)
+      end
+
+      before do
+        hbx_enrollment.terminate_coverage!(TimeKeeper.date_of_record - 10.days)
+      end
+
+      it 'should update terminated_on date for given hbx_enrollment' do
+        expect(hbx_enrollment.terminated_on).to eq(TimeKeeper.date_of_record - 10.days)
+      end
+
+      it 'should not have same terminated_on date' do
+        expect(hbx_enrollment.terminated_on).not_to eq(TimeKeeper.date_of_record.next_month.end_of_month)
+      end
+
+      it 'should also transition the hbx_enrollment to terminated' do
+        expect(hbx_enrollment.aasm_state).to eq('coverage_terminated')
+      end
+    end
+
     context "cancel_coverage!" do
       let(:family) {FactoryBot.create(:family, :with_primary_family_member)}
       let(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, household: family.active_household, family: family, aasm_state: "inactive")}
@@ -1276,10 +1310,12 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       let(:qle_on) {Date.today}
 
       before :each do
-        allow(subject).to receive(:special_enrollment_period).and_return(SpecialEnrollmentPeriod.new(
-          :qualifying_life_event_kind => QualifyingLifeEventKind.new(:reason => "birth"),
-          :qle_on => qle_on
-          ))
+        allow(subject).to receive(:special_enrollment_period).and_return(
+          SpecialEnrollmentPeriod.new(
+            :qualifying_life_event_kind => QualifyingLifeEventKind.new(:reason => "birth", is_active: true),
+            :qle_on => qle_on
+          )
+        )
       end
 
       it "should have the eligibility event date of the qle_on" do
@@ -1295,10 +1331,29 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       let(:qle_on) {Date.today}
 
       before :each do
-        allow(subject).to receive(:special_enrollment_period).and_return(SpecialEnrollmentPeriod.new(
-          :qualifying_life_event_kind => QualifyingLifeEventKind.new(:reason => "covid-19"),
-          :qle_on => qle_on
-          ))
+        allow(subject).to receive(:special_enrollment_period).and_return(
+          SpecialEnrollmentPeriod.new(
+            :qualifying_life_event_kind => QualifyingLifeEventKind.new(:reason => "covid-19", is_active: true),
+            :qle_on => qle_on
+          )
+        )
+      end
+
+      it "should have the eligibility event date of the qle_on" do
+        expect(subject.eligibility_event_date).to eq qle_on
+      end
+
+      it "should have eligibility_event_kind of 'unknown_sep'" do
+        expect(subject.eligibility_event_kind).to eq "unknown_sep"
+      end
+    end
+
+    describe "and given a special enrollment period, with a new reason of 'test_reason'", dbclean: :after_each do
+      let(:qle_on) {Date.today}
+
+      before :each do
+        allow(subject).to receive(:special_enrollment_period).and_return(SpecialEnrollmentPeriod.new(:qualifying_life_event_kind => QualifyingLifeEventKind.new(:reason => "test_reason", is_active: true),
+                                                                                                     :qle_on => qle_on))
       end
 
       it "should have the eligibility event date of the qle_on" do

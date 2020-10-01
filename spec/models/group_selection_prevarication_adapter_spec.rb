@@ -264,7 +264,8 @@ RSpec.describe GroupSelectionPrevaricationAdapter, dbclean: :after_each do
           effective_on_kinds: ["first_of_next_month"],
           pre_event_sep_in_days: 0,
           post_event_sep_in_days: 30,
-          is_self_attested: true
+          is_self_attested: true,
+          is_active: true
         )
       end
 

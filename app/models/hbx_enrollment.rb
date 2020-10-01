@@ -351,6 +351,7 @@ class HbxEnrollment
   scope :show_enrollments_sans_canceled, -> { any_of([enrolled.selector, renewing.selector, terminated.selector, waived.selector]).order(created_at: :desc) }
   scope :enrollments_for_cobra, -> { where(:aasm_state.in => ['coverage_terminated', 'coverage_termination_pending', 'auto_renewing']).order(created_at: :desc) }
   scope :with_plan, -> { where(:plan_id.ne => nil) }
+  scope :with_product, -> { where(:product_id.ne => nil) }
   scope :coverage_selected_and_waived, -> {where(:aasm_state.in => SELECTED_AND_WAIVED).order(created_at: :desc)}
   scope :non_terminated, -> { where(:aasm_state.ne => 'coverage_terminated') }
   scope :non_external, -> { where(:external_enrollment => false) }
@@ -730,7 +731,12 @@ class HbxEnrollment
   end
 
   def propogate_terminate(term_date = TimeKeeper.date_of_record.end_of_month)
-    self.terminated_on ||= term_date
+    if terminated_on.present? && term_date < terminated_on
+      self.terminated_on = term_date
+    else
+      self.terminated_on ||= term_date
+    end
+
     if benefit_group_assignment
       benefit_group_assignment.end_benefit(terminated_on)
       benefit_group_assignment.save
@@ -1880,7 +1886,7 @@ class HbxEnrollment
     if (enrollment_kind == "special_enrollment")
       return "unknown_sep" if special_enrollment_period.blank?
       qle_reason = special_enrollment_period.qualifying_life_event_kind.reason
-      return qle_reason == 'covid-19' ? "unknown_sep" : qle_reason
+      return QualifyingLifeEventKind::REASON_KINDS.include?(qle_reason) ? qle_reason : "unknown_sep"
     end
 
     return "open_enrollment" if !is_shop?

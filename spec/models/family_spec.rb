@@ -2,7 +2,7 @@ require 'rails_helper'
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
-describe Family, "given a primary applicant and a dependent" do
+describe Family, "given a primary applicant and a dependent", dbclean: :after_each do
   let(:person) { Person.new }
   let(:dependent) { Person.new }
   let(:household) { Household.new(:is_active => true) }
@@ -528,6 +528,76 @@ describe Family, dbclean: :around_each do
         allow(family).to receive(:latest_shop_sep).and_return normal_sep
         allow(hbx).to receive(:effective_on).and_return effective_on
         expect(family.terminate_date_for_shop_by_enrollment(hbx)).to eq effective_on
+      end
+    end
+  end
+
+  context 'for options_for_termination_dates', dbclean: :after_each do
+    let!(:family10) { FactoryBot.create(:family, :with_primary_family_member) }
+    let!(:sep10) do
+      sep = FactoryBot.create(:special_enrollment_period, family: family10)
+      sep.qualifying_life_event_kind.update_attributes!(termination_on_kinds: ['end_of_event_month', 'exact_date'])
+      sep
+    end
+    let!(:enrollment) { FactoryBot.create(:hbx_enrollment, family: family) }
+
+    before do
+      @termination_dates = family10.options_for_termination_dates([enrollment])
+    end
+
+    it 'should include sep qle_on' do
+      expect(@termination_dates[enrollment.id.to_s]).to include(sep10.qle_on)
+    end
+
+    it 'should include end_of_month of sep qle_on' do
+      expect(@termination_dates[enrollment.id.to_s]).to include(sep10.qle_on.end_of_month)
+    end
+  end
+
+  context 'for latest_shop_sep_termination_kinds' do
+    let!(:family10) { FactoryBot.create(:family, :with_primary_family_member) }
+    let!(:enrollment) { FactoryBot.create(:hbx_enrollment, family: family10) }
+    let!(:sep10) do
+      sep = FactoryBot.create(:special_enrollment_period, family: family10)
+      sep.qualifying_life_event_kind.update_attributes!(market_kind: 'shop', termination_on_kinds: ['end_of_event_month', 'exact_date'])
+      sep
+    end
+
+    let!(:fehb_sep) do
+      sep = FactoryBot.create(:special_enrollment_period, family: family10)
+      sep.qualifying_life_event_kind.update_attributes!(market_kind: 'fehb', termination_on_kinds: ['end_of_reporting_month', 'end_of_month_before_last'])
+      sep
+    end
+
+    context "termination kinds for SHOP sep" do
+
+      before do
+        @termination_kinds = family10.latest_shop_sep_termination_kinds(enrollment)
+        allow(enrollment).to receive(:fehb_profile).and_return false
+      end
+
+      it 'should include exact_date' do
+        expect(@termination_kinds).to include('exact_date')
+      end
+
+      it 'should include end_of_event_month' do
+        expect(@termination_kinds).to include('end_of_event_month')
+      end
+    end
+
+    context "termination kinds for FEHB sep" do
+
+      before do
+        allow(enrollment).to receive(:fehb_profile).and_return true
+        @termination_kinds = family10.latest_shop_sep_termination_kinds(enrollment)
+      end
+
+      it 'should include exact_date' do
+        expect(@termination_kinds).to include('end_of_reporting_month')
+      end
+
+      it 'should include end_of_event_month' do
+        expect(@termination_kinds).to include('end_of_month_before_last')
       end
     end
   end

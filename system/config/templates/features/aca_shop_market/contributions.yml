@@ -241,6 +241,28 @@ registry:
       - :enroll_app
       - :aca_shop_market
       - :benefit_market_catalog
+      - :catalog_2021
+    features:
+      - key: :aca_shop_fetch_enrollment_minimum_participation_2021
+        item: BenefitMarkets::Operations::BenefitSponsorCatalogs::FetchMinimumParticipation.new
+        is_enabled: true
+        settings:
+          - key: :zero_percent_sponsor_fixed_percent_contribution_model
+            item: 0
+          - key: :fifty_percent_sponsor_fixed_percent_contribution_model
+            item: <%= 2 / 3.0 %>
+      - key: :fehb_fetch_enrollment_minimum_participation_2021
+        item: BenefitMarkets::Operations::BenefitSponsorCatalogs::FetchMinimumParticipation.new
+        is_enabled: false
+        settings:
+          - key: :zero_percent_sponsor_fixed_percent_contribution_model
+            item: 0
+          - key: :fifty_percent_sponsor_fixed_percent_contribution_model
+            item: <%= 2 / 3.0 %>
+  - namespace:
+      - :enroll_app
+      - :aca_shop_market
+      - :benefit_market_catalog
       - :catalog_2020
     features:
       - key: :aca_shop_fetch_enrollment_minimum_participation_2020
