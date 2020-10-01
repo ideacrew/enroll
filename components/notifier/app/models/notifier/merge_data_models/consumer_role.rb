@@ -29,6 +29,10 @@ module Notifier
       attribute :aqhp_or_non_magi_medicaid_members, Array[MergeDataModels::Dependent]
       attribute :uqhp_or_non_magi_medicaid_members, Array[MergeDataModels::Dependent]
       attribute :ineligible_applicants, Array[MergeDataModels::Dependent]
+      attribute :ssa_unverified, Array[MergeDataModels::Dependent]
+      attribute :dhs_unverified, Array[MergeDataModels::Dependent]
+      attribute :residency_inconsistency, Array[MergeDataModels::Dependent]
+      attribute :american_indian_unverified, Array[MergeDataModels::Dependent]
       attribute :addresses, Array[MergeDataModels::Address]
       attribute :aqhp_eligible, Boolean
       attribute :totally_ineligible, Boolean
@@ -44,6 +48,10 @@ module Notifier
       attribute :aqhp_or_non_magi_medicaid_members_present, Boolean
       attribute :uqhp_or_non_magi_medicaid_members_present, Boolean
       attribute :totally_ineligible_members_present, Boolean
+      attribute :dhs_unverified_present, Boolean
+      attribute :ssa_unverified_present, Boolean
+      attribute :residency_inconsistency_present, Boolean
+      attribute :american_indian_unverified_present, Boolean
       attribute :irs_consent_not_needed, Boolean
       attribute :primary_member_present, Boolean
       attribute :same_health_product, Boolean # checks if family is enrolled into same health product
@@ -52,9 +60,6 @@ module Notifier
       attribute :notification_type, String
       # TODO: Am I doing this right???
       attribute :due_date, Date
-      attribute :ssa_unverified, Array
-      attribute :dhs_unverified, Array
-      attribute :residency_inconsistency, Array
 
       def self.stubbed_object
         notice = Notifier::MergeDataModels::ConsumerRole.new(
@@ -82,6 +87,10 @@ module Notifier
             aqhp_or_non_magi_medicaid_members_present: true,
             uqhp_or_non_magi_medicaid_members_present: false,
             totally_ineligible_members_present: false,
+            dhs_unverified_present: true,
+            ssa_unverified_present: true,
+            residency_inconsistency_present: false,
+            american_indian_unverified_present: false,
             non_magi_medicaid: false,
             magi_medicaid: 'No',
             irs_consent: false,
@@ -98,6 +107,10 @@ module Notifier
         notice.addresses = [notice.mailing_address]
         notice.tax_households = [Notifier::MergeDataModels::TaxHousehold.stubbed_object]
         notice.dependents = [Notifier::MergeDataModels::Dependent.stubbed_object]
+        residency.american_indian_unverified = [Notifier::MergeDataModels::Dependent.stubbed_object]
+        notice.residency_inconsistency = [Notifier::MergeDataModels::Dependent.stubbed_object]
+        notice.dhs_unverified = [Notifier::MergeDataModels::Dependent.stubbed_object]
+        notice.ssa_unverified = [Notifier::MergeDataModels::Dependent.stubbed_object]
         notice.ineligible_applicants = [Notifier::MergeDataModels::Dependent.stubbed_object]
         notice.aqhp_or_non_magi_medicaid_members = [notice]
         notice.magi_medicaid_members = [Notifier::MergeDataModels::Dependent.stubbed_object]
@@ -106,7 +119,11 @@ module Notifier
       end
 
       def collections
-        %w[addresses tax_households dependents magi_medicaid_members aqhp_or_non_magi_medicaid_members uqhp_or_non_magi_medicaid_members ineligible_applicants ssa_unverified]
+        %w[
+          addresses tax_households dependents magi_medicaid_members
+          aqhp_or_non_magi_medicaid_members uqhp_or_non_magi_medicaid_members
+          ineligible_applicants ssa_unverified dhs_unverified american_indian_unverified residency_inconsistency
+        ]
       end
 
       def conditions
@@ -117,7 +134,7 @@ module Notifier
             aqhp_event_and_irs_consent_no? csr_is_73? csr_is_87?
             csr_is_94? csr_is_100? csr_is_zero? csr_is_nil? non_magi_medicaid?
             aptc_is_zero? totally_ineligible? aqhp_event? uqhp_event? totally_ineligible_members_present? primary_member_present?
-            documents_needed?
+            documents_needed? ssa_unverified_present? dhs_unverified_present? american_indian_unverified_present? residency_inconsistency_present?
         ]
       end
 
@@ -155,20 +172,20 @@ module Notifier
         enrollments.select{ |enrollment| enrollment.is_receiving_assistance == true}
       end
 
-      def ssa_unverified
+      # def ssa_unverified
         # TODO: What am I supposed to do here?
         # Do I have to put anything here if I do merge_model.ssa_unverified <<
         # from the consumer_role_builder?
         # If I put ssa_unverified here I get some kind of stack trace error thing that crashes
         # my whole server
         # ssa_unverified
-        []
-      end
+        #[]
+      #end
 
-      def dhs_unverified
+      # def dhs_unverified
         # TODO: Same question as above
-        []
-      end
+      #  []
+      # end
 
       def tax_hh_with_csr
         tax_households.reject{ |thh| thh.csr_percent_as_integer == 100}
@@ -260,6 +277,14 @@ module Notifier
 
       def aqhp_event_and_irs_consent_no?
         aqhp_event? && !irs_consent?
+      end
+
+      def dhs_unverified_present
+        dhs_unverified_present
+      end
+
+      def ssa_unverified_present
+        ssa_unverified_present
       end
 
       def csr_is_73?

@@ -421,6 +421,14 @@ module Notifier
         merge_model[merge_model_attribute] = outstanding_people.flatten
       end
 
+      def american_indian_unverified
+        unverified_people("American Indian Status", :american_indian_unverified)
+      end
+
+      def dhs_unverified
+        unverified_people("Citizenship", :dhs_unverified)
+      end
+
       def ssa_unverified
         unverified_people("Social Security Number", :ssa_unverified)
       end
@@ -489,6 +497,11 @@ module Notifier
       def uqhp_or_non_magi_medicaid_members_present
         uqhp_or_non_magi_medicaid_members
         merge_model.uqhp_or_non_magi_medicaid_members_present = merge_model.uqhp_or_non_magi_medicaid_members.present?
+      end
+
+      def dhs_unverified_present
+        dhs_unverified
+        merge_model.dhs_unverified_present = merge_model.dhs_unverified.present?
       end
 
       def csr_percent
