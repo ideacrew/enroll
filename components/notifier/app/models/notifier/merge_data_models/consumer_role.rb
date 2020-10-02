@@ -177,7 +177,7 @@ module Notifier
       end
 
       def renewal_csr_enrollments
-        enrollments.select { |enrollment| enrollment.coverage_year == coverage_year && enrollment.product.is_csr ==  true }
+        enrollments.select { |enrollment| enrollment.coverage_year == coverage_year && enrollment.product.is_csr}
       end
 
       def tax_hh_with_csr
@@ -185,7 +185,7 @@ module Notifier
       end
 
       def has_atleast_one_csr_member?
-        csr? || dependents.any? { |dependent| dependent.csr == true }
+        csr? || dependents.any?(&:csr)
       end
 
       def aqhp_eligible?

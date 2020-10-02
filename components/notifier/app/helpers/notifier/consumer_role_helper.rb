@@ -98,16 +98,12 @@ module Notifier
       end
       due_dates.compact!
       earliest_future_due_date = due_dates.select{ |d| d > TimeKeeper.date_of_record }.min
-      if due_dates.present? && earliest_future_due_date.present?
-        earliest_future_due_date.to_date
-      else
-        nil
-      end
+      earliest_future_due_date.to_date if due_dates.present? && earliest_future_due_date.present?
     end
 
     def notice_due_date_value
       family = person.primary_family
-      (family.min_verification_due_date.present? && (family.min_verification_due_date > date)) ? family.min_verification_due_date : min_notice_due_date(family)
+      family.min_verification_due_date.present? && family.min_verification_due_date > date ? family.min_verification_due_date : min_notice_due_date(family)
     end
 
     def expected_income_for_coverage_year_value(payload)

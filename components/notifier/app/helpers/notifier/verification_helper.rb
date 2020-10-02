@@ -64,7 +64,7 @@ module Notifier
     end
 
     def immigration_status_outstanding?(person, uqhp)
-      if uqhp        
+      if uqhp
         outstanding_verification_types(person).include?('Immigration status')
       else
         person["immigration_doc_needed"].try(:upcase) == "Y"
@@ -109,8 +109,8 @@ module Notifier
       outstanding_people = []
       return outstanding_people unless family
 
-      family_members = enrollments(family).inject([]) do |family_members, enrollment|
-        family_members += enrollment.hbx_enrollment_members.map(&:family_member)
+      enrollments(family).inject([]) do |family_members, enrollment|
+        family_members << enrollment.hbx_enrollment_members.map(&:family_member)
       end.uniq
 
       people = family_members.map(&:person).uniq

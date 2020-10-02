@@ -19,7 +19,7 @@ RSpec.describe 'Components::Notifier::Builders::ConsumerRole', :dbclean => :afte
     end
 
     let!(:person) { FactoryBot.create(:person, :with_consumer_role, hbx_id: "a16f4029916445fcab3dbc44bb7aadd0", first_name: "Test", last_name: "Data", middle_name: "M", name_sfx: "Jr") }
-    let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+    let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person, min_verification_due_date: TimeKeeper.date_of_record) }
 
     subject do
       consumer = Notifier::Builders::ConsumerRole.new
@@ -49,28 +49,11 @@ RSpec.describe 'Components::Notifier::Builders::ConsumerRole', :dbclean => :afte
           expect(subject.uqhp_or_non_magi_medicaid_members.first["actual_income"].length).to be > 1
         end
       end
-
-      context "unverified_people" do
-        it "ssa_unverified should return array of members if any have verification types" do
-          allow(subject.person.primary_family.family_members.first.person.consumer_role).to receive(
-            :outstanding_verification_types).and_return(
-            [double(type_name: "Social Security Number")]
-          )
-          expect(subject.unverified_people("Social Security Number", :ssa_unverified).first.class).to eq(Person)
-        end
-      end
     end
 
     context "Model attributes" do
       it "should return a due date" do
         expect(subject.due_date.class).to eq(Date)
-      end
-      it "should return blank string if aqhp_event and uqhp_event params blank" do
-        expect(subject.notification_type).to eq("")
-      end
-
-      it "should return PAST DUE text" do
-        expect(subject.past_due_text).to eq("PAST DUE")
       end
 
       it "should return dc_resident status" do
@@ -214,16 +197,6 @@ RSpec.describe 'Components::Notifier::Builders::ConsumerRole', :dbclean => :afte
     end
 
     context "Conditional attributes" do
-      context "documents needed" do
-        it "should return true if outstanding verification types are present" do
-          allow(subject.person.primary_family.family_members.first.person.consumer_role).to receive(:outstanding_verification_types).and_return([double(type_name: "Social Security Number")])
-          expect(subject.documents_needed?).to eq(true)
-        end
-
-        it "should return false if no outstanding verification types are present" do
-          expect(subject.documents_needed?). to eq(false)
-        end
-      end
       it "should be aqhp_eligible?" do
         expect(subject.aqhp_eligible?).to eq(true)
       end

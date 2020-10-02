@@ -149,7 +149,7 @@ module Notifier
       # there can be multiple health and dental enrollments for the same coverage year
       # Renewing health enrollments
       def aqhp_enrollments
-        enrollments.select{ |enrollment| enrollment.is_receiving_assistance == true}
+        enrollments.select(&:is_receiving_assistance)
       end
 
       def renewing_health_enrollments
@@ -176,7 +176,7 @@ module Notifier
       end
 
       def renewal_csr_enrollments
-        enrollments.select { |enrollment| enrollment.product.is_csr ==  true }
+        enrollments.select { |enrollment| enrollment.product.is_csr }
       end
 
       # Renewing health product
@@ -318,63 +318,49 @@ module Notifier
       def ssa_unverified_individuals
         merge_model.ssa_unverified_individuals =
           unverified_individuals.collect do |individual|
-            if ssn_outstanding?(individual, uqhp_notice?)
-              unverified_individual_hash(individual, due_date, uqhp_notice?)
-            end
+            unverified_individual_hash(individual, due_date, uqhp_notice?) if ssn_outstanding?(individual, uqhp_notice?)
           end
       end
 
       def dhs_unverified_individuals
         merge_model.dhs_unverified_individuals =
           unverified_individuals.collect do |individual|
-            if lawful_presence_outstanding?(individual, uqhp_notice?)
-              unverified_individual_hash(individual, due_date, uqhp_notice?)
-            end
+            unverified_individual_hash(individual, due_date, uqhp_notice?) if lawful_presence_outstanding?(individual, uqhp_notice?)
           end
       end
 
       def immigration_unverified_individuals
         merge_model.immigration_unverified_individuals =
           unverified_individuals.collect do |individual|
-            if immigration_status_outstanding?(individual, uqhp_notice?)
-              unverified_individual_hash(individual, due_date, uqhp_notice?)
-            end
+            unverified_individual_hash(individual, due_date, uqhp_notice?) if immigration_status_outstanding?(individual, uqhp_notice?)
           end
       end
 
       def residency_inconsistency_individuals
         merge_model.residency_inconsistency_individuals =
           unverified_individuals.collect do |individual|
-            if residency_outstanding?(individual, uqhp_notice?)
-              unverified_individual_hash(individual, due_date, uqhp_notice?)
-            end
+            unverified_individual_hash(individual, due_date, uqhp_notice?) if residency_outstanding?(individual, uqhp_notice?)
           end
       end
 
       def american_indian_unverified_individuals
         merge_model.american_indian_unverified_individuals =
           unverified_individuals.collect do |individual|
-            if american_indian_status_outstanding?(individual, uqhp_notice?)
-              unverified_individual_hash(individual, due_date, uqhp_notice?)
-            end
+            unverified_individual_hash(individual, due_date, uqhp_notice?) if american_indian_status_outstanding?(individual, uqhp_notice?)
           end
       end
 
       def income_unverified_individuals
         merge_model.income_unverified_individuals =
           unverified_individuals.collect do |individual|
-            if income_outstanding?(individual, uqhp_notice?)
-              unverified_individual_hash(individual, due_date, uqhp_notice?)
-            end
+            unverified_individual_hash(individual, due_date, uqhp_notice?) if income_outstanding?(individual, uqhp_notice?)
           end
       end
 
       def mec_conflict_individuals
         merge_model.mec_conflict_individuals =
           unverified_individuals.collect do |individual|
-            if other_coverage_outstanding?(individual, uqhp_notice?)
-              unverified_individual_hash(individual, due_date, uqhp_notice?)
-            end
+            unverified_individual_hash(individual, due_date, uqhp_notice?) if other_coverage_outstanding?(individual, uqhp_notice?)
           end
       end
 
@@ -531,7 +517,7 @@ module Notifier
       end
 
       def has_atleast_one_csr_member?
-        csr? || dependents.any? { |dependent| dependent.csr == true }
+        csr? || dependents.any?(&:csr)
       end
 
       def primary_identifier

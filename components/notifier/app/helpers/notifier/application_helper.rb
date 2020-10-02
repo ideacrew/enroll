@@ -76,7 +76,7 @@ module Notifier
 
     def calculate_age_by_dob(dob)
       now = TimeKeeper.date_of_record
-      now.year - dob.year - ((now.month > dob.month || (now.month == dob.month && now.day >= dob.day)) ? 0 : 1)
+      now.year - dob.year - (now.month > dob.month || (now.month == dob.month && now.day >= dob.day) ? 0 : 1)
     end
   end
 end
