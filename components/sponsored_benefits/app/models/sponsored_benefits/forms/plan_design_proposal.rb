@@ -86,7 +86,7 @@ module SponsoredBenefits
 
       def ensure_profile
         if @profile.blank?
-          @profile = "SponsoredBenefits::Organizations::AcaShop#{Settings.aca.state_key.capitalize}EmployerProfile".constantize.new
+          @profile = "SponsoredBenefits::Organizations::AcaShopDcEmployerProfile".constantize.new
           sponsorship = @profile.benefit_sponsorships.first
           sponsorship.benefit_applications.build
         end
