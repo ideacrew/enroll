@@ -1,6 +1,6 @@
 require 'csv'
  # This is a weekly report that pulls the newly enrolled people in that time period.
- # The task to run is RAILS_ENV=production bundle exec rake reports:new_people:total_new_people_list
+ # The task to run is RAILS_ENV=production bundle exec rake reports:new_people:total_new_people_list start_date="10/01/2020" end_date="10/02/2020"
  namespace :reports do
    namespace :new_people do
  
@@ -8,8 +8,8 @@ require 'csv'
      task :total_new_people_list => :environment do
        include Config::AcaHelper
 
-      start_date = Date.new(2020, 10, 01)
-      end_date = TimeKeeper.date_of_record + 1.day
+      start_date = ENV['start_date'].present? ? Date.strptime(ENV['start_date'].to_s, "%m/%d/%Y") : Date.new(2020, 10, 01)
+      end_date =  ENV['end_date'].present? ? Date.strptime(ENV['end_date'].to_s, "%m/%d/%Y") : TimeKeeper.date_of_record + 1.day
  
        field_names  = %w(
            FAMILY_ID
@@ -116,8 +116,8 @@ require 'csv'
         end
       end
 
-      pubber = Publishers::Legacy::NewPeopleApplicationReportPublisher.new
-      pubber.publish URI.join("file://", file_name)
+      # pubber = Publishers::Legacy::NewPeopleApplicationReportPublisher.new
+      # pubber.publish URI.join("file://", file_name)
 
       puts "Total person's that are created in a time frame of #{start_date}-#{end_date - 1.day} count is #{count}"
      end
