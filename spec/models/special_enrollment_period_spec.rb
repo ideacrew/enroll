@@ -152,7 +152,29 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
       let(:params) {valid_params.merge(qualifying_life_event_kind: inactive_qle, qle_on: TimeKeeper.date_of_record)}
 
       it "should raise inactive qle exception" do
-        expect{SpecialEnrollmentPeriod.create(**params)}.to raise_error(ArgumentError, "Qualifying life event kind is expired")
+        expect{SpecialEnrollmentPeriod.create(**params)}.to raise_error(StandardError, "Qualifying life event kind is expired")
+      end
+    end
+
+    context "special enrollment peroid created when qle is active" do
+      let(:active_qle) { create(:qualifying_life_event_kind, title: "Married", market_kind: "shop", reason: "marriage", start_on: TimeKeeper.date_of_record.prev_month.beginning_of_month, end_on: TimeKeeper.date_of_record.next_month.end_of_month) }
+      let!(:sep) {FactoryBot.create(:special_enrollment_period, family: family, qualifying_life_event_kind: active_qle, market_kind: 'ivl', created_at: TimeKeeper.date_of_record - 2.day)}
+
+      it "should not raise inactive qle exception" do
+        active_qle.update_attributes(is_active: false, end_on: TimeKeeper.date_of_record - 1.day)
+        valid_params = sep.attributes.except("effective_on", "submitted_at", "_id").merge(family: family, qualifying_life_event_kind: active_qle, title: "tttt")
+        expect{SpecialEnrollmentPeriod.create(valid_params)}.not_to raise_error(StandardError, "Qualifying life event kind is expired")
+      end
+    end
+
+    context "special enrollment peroid created when qle not active" do
+      let(:active_qle) { create(:qualifying_life_event_kind, title: "Married", market_kind: "shop", reason: "marriage", start_on: TimeKeeper.date_of_record.prev_month.beginning_of_month, end_on: TimeKeeper.date_of_record.next_month.end_of_month) }
+      let!(:sep) {FactoryBot.create(:special_enrollment_period, family: family, qualifying_life_event_kind: active_qle, market_kind: 'ivl', created_at: TimeKeeper.date_of_record)}
+
+      it "should raise inactive qle exception" do
+        active_qle.update_attributes(is_active: false, end_on: TimeKeeper.date_of_record - 1.day)
+        valid_params = sep.attributes.except("effective_on", "submitted_at", "_id").merge(family: family, qualifying_life_event_kind: active_qle, title: "tttt")
+        expect{SpecialEnrollmentPeriod.create(valid_params)}.to raise_error(StandardError, "Qualifying life event kind is expired")
       end
     end
 
@@ -1109,17 +1131,20 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
 
       it 'should return sep range' do
         sep_dates = sep.send(:set_date_period)
-        expect(sep_dates).to eq TimeKeeper.date_of_record..TimeKeeper.date_of_record + qle.post_event_sep_in_days.days
+        date = (subject.created_at ||= TimeKeeper.date_of_record).to_date
+        expect(sep_dates).to eq date..date + qle.post_event_sep_in_days.days
       end
 
       it 'should set start on based qle submitted' do
         sep.send(:set_date_period)
-        expect(sep.start_on).to eq sep.submitted_at.to_date
+        date = (subject.created_at ||= TimeKeeper.date_of_record).to_date
+        expect(sep.start_on).to eq date
       end
 
       it 'should set end on based qle submitted' do
         sep.send(:set_date_period)
-        expect(sep.end_on).to eq sep.submitted_at.to_date + qle.post_event_sep_in_days.days
+        date = (subject.created_at ||= TimeKeeper.date_of_record).to_date
+        expect(sep.end_on).to eq date + qle.post_event_sep_in_days.days
       end
     end
 
@@ -1144,6 +1169,32 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
       it 'should set end on based qle_on' do
         sep.send(:set_date_period)
         expect(sep.end_on).to eq qle_on + qle.post_event_sep_in_days.days
+      end
+    end
+
+    context 'qualifying life event kind with qle_event_date_kind == submitted_at' do
+      let!(:qle) { create(:qualifying_life_event_kind, pre_event_sep_in_days: 0, post_event_sep_in_days: 30, coverage_start_on: TimeKeeper.date_of_record.last_month, coverage_end_on: TimeKeeper.date_of_record.end_of_month) }
+      let!(:sep) do
+        subject.qualifying_life_event_kind = qle
+        subject
+      end
+
+      it 'should return sep range' do
+        sep_dates = sep.send(:set_date_period)
+        date = (subject.created_at ||= TimeKeeper.date_of_record).to_date
+        expect(sep_dates).to eq date..date + qle.post_event_sep_in_days.days
+      end
+
+      it 'should set start on based qle created' do
+        sep.send(:set_date_period)
+        date = (subject.created_at ||= TimeKeeper.date_of_record).to_date
+        expect(sep.start_on).to eq date
+      end
+
+      it 'should set end on based qle created' do
+        sep.send(:set_date_period)
+        date = (subject.created_at ||= TimeKeeper.date_of_record).to_date
+        expect(sep.end_on).to eq date + qle.post_event_sep_in_days.days
       end
     end
   end

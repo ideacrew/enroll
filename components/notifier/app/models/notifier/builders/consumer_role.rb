@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Notifier
   module Builders
     class ConsumerRole
@@ -97,10 +98,11 @@ module Notifier
       def magi_medicaid_members
         primary_member = []
         merge_model.magi_medicaid_members = []
-        primary_member << payload['notice_params']['primary_member']
+        primary_member_object = payload['notice_params']['primary_member'].present? ? payload['notice_params']['primary_member'] : nil
+        primary_member << primary_member_object
         dependent_members = payload['notice_params']['dependents']
         family_members = primary_member + dependent_members
-        family_members.each do |member|
+        family_members.compact.each do |member|
           next if member["magi_medicaid"] != "Yes"
 
           fam_member = ::Notifier::Services::DependentService.new(uqhp_notice?, member)
@@ -111,10 +113,11 @@ module Notifier
       def aqhp_or_non_magi_medicaid_members
         primary_member = []
         merge_model.aqhp_or_non_magi_medicaid_members = []
-        primary_member << payload['notice_params']['primary_member']
+        primary_member_object = payload['notice_params']['primary_member'].present? ? payload['notice_params']['primary_member'] : nil
+        primary_member << primary_member_object
         dependent_members = payload['notice_params']['dependents']
         family_members = primary_member + dependent_members
-        family_members.each do |member|
+        family_members.compact.each do |member|
           next unless member["aqhp_eligible"] == "Yes" || member["non_magi_medicaid"] == "Yes"
 
           fam_member = ::Notifier::Services::DependentService.new(uqhp_notice?, member)
@@ -125,10 +128,11 @@ module Notifier
       def uqhp_or_non_magi_medicaid_members
         primary_member = []
         merge_model.uqhp_or_non_magi_medicaid_members = []
-        primary_member << payload['notice_params']['primary_member']
+        primary_member_object = payload['notice_params']['primary_member'].present? ? payload['notice_params']['primary_member'] : nil
+        primary_member << primary_member_object
         dependent_members = payload['notice_params']['dependents']
         family_members = primary_member + dependent_members
-        family_members.each do |member|
+        family_members.compact.each do |member|
           next unless member["uqhp_eligible"] == "Yes" || member["non_magi_medicaid"] == "Yes"
 
           fam_member = ::Notifier::Services::DependentService.new(uqhp_notice?, member)
@@ -153,27 +157,32 @@ module Notifier
       end
 
       def dc_resident
-        merge_model.dc_resident =
-          payload['notice_params']['primary_member']['resident'].capitalize
+        return if primary_nil?
+        merge_model.dc_resident = payload['notice_params']['primary_member']['resident'].capitalize
       end
 
       def expected_income_for_coverage_year
+        return if uqhp_notice?
         merge_model.expected_income_for_coverage_year = expected_income_for_coverage_year_value(payload)
       end
 
       def federal_tax_filing_status
+        return if primary_nil?
         merge_model.federal_tax_filing_status = filer_type(payload['notice_params']['primary_member']['filer_type'])
       end
 
       def citizenship
+        return if primary_nil?
         merge_model.citizenship = citizen_status(payload['notice_params']['primary_member']['citizen_status'])
       end
 
       def tax_household_size
+        return if primary_nil?
         merge_model.tax_household_size = payload['notice_params']['primary_member']['tax_hh_count'].to_i
       end
 
       def actual_income
+        return if primary_nil?
         merge_model.actual_income = payload['notice_params']['primary_member']['actual_income'].to_i
       end
 
@@ -205,6 +214,7 @@ module Notifier
       end
 
       def incarcerated
+        return if primary_nil?
         merge_model.incarcerated = (payload['notice_params']['primary_member']['incarcerated'] == 'N' || payload['notice_params']['primary_member']['incarcerated'] == '') ? 'No' : 'Yes'
       end
 
@@ -236,6 +246,7 @@ module Notifier
       end
 
       def csr
+        return if primary_nil?
         merge_model.csr = payload['notice_params']['primary_member']['csr'].casecmp('YES').zero?
       end
 
@@ -245,6 +256,14 @@ module Notifier
 
       def uqhp_event
         merge_model.uqhp_event =  payload['notice_params']['uqhp_event'] == 'uqhp_projected_eligibility_notice_1'
+      end
+
+      def primary_member_present
+        merge_model.primary_member_present = payload['notice_params']['primary_member'].present?
+      end
+
+      def primary_member_present?
+        primary_member_present
       end
 
       def magi_medicaid_members_present
@@ -263,6 +282,7 @@ module Notifier
       end
 
       def csr_percent
+        return if primary_nil?
         merge_model.csr_percent = payload['notice_params']['primary_member']['csr_percent'].blank? ? nil : Integer(payload['notice_params']['primary_member']['csr_percent'])
       end
 
@@ -403,6 +423,10 @@ module Notifier
 
       def uqhp_notice?
         payload['notice_params']['uqhp_event'] == 'uqhp_projected_eligibility_notice_1'
+      end
+
+      def primary_nil?
+        payload['notice_params']['primary_member'].nil?
       end
     end
   end
