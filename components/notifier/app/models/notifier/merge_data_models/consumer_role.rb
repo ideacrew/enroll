@@ -102,7 +102,8 @@ module Notifier
             csr_percent: 73,
             ivl_oe_start_date: Date.parse('November 01, 2020').strftime('%B %d, %Y'),
             ivl_oe_end_date: Date.parse('January 31, 2021').strftime('%B %d, %Y'),
-            primary_identifier: '00000'
+            primary_identifier: '00000',
+            documents_needed: true
           }
         )
 
@@ -110,21 +111,17 @@ module Notifier
         notice.addresses = [notice.mailing_address]
         notice.tax_households = [Notifier::MergeDataModels::TaxHousehold.stubbed_object]
         notice.dependents = [Notifier::MergeDataModels::Dependent.stubbed_object]
-        residency.american_indian_unverified = [Notifier::MergeDataModels::Dependent.stubbed_object]
-        notice.residency_inconsistency = [Notifier::MergeDataModels::Dependent.stubbed_object]
-        notice.dhs_unverified = [Notifier::MergeDataModels::Dependent.stubbed_object]
-        notice.ssa_unverified = [Notifier::MergeDataModels::Dependent.stubbed_object]
         notice.ineligible_applicants = [Notifier::MergeDataModels::Dependent.stubbed_object]
         notice.aqhp_or_non_magi_medicaid_members = [notice]
         notice.magi_medicaid_members = [Notifier::MergeDataModels::Dependent.stubbed_object]
         notice.enrollments = [Notifier::MergeDataModels::Enrollment.stubbed_object]
-        notice.ssa_unverified_individuals, Array[MergeDataModels::Dependent.stubbed_object]
-        notice.dhs_unverified_individuals, Array[MergeDataModels::Dependent.stubbed_object]
-        notice.immigration_unverified_individuals, Array[MergeDataModels::Dependent.stubbed_object]
-        notice.residency_inconsistency_individuals, Array[MergeDataModels::Dependent.stubbed_object]
-        notice.american_indian_unverified_individuals, Array[MergeDataModels::Dependent.stubbed_object]
-        notice.income_unverified_individuals, Array[MergeDataModels::Dependent.stubbed_object]
-        notice.mec_conflict_individuals, Array[MergeDataModels::Dependent.stubbed_object]
+        notice.ssa_unverified_individuals = Array[MergeDataModels::Dependent.stubbed_object]
+        notice.dhs_unverified_individuals = Array[MergeDataModels::Dependent.stubbed_object]
+        notice.immigration_unverified_individuals = Array[MergeDataModels::Dependent.stubbed_object]
+        notice.residency_inconsistency_individuals = Array[MergeDataModels::Dependent.stubbed_object]
+        notice.american_indian_unverified_individuals = Array[MergeDataModels::Dependent.stubbed_object]
+        notice.income_unverified_individuals = Array[MergeDataModels::Dependent.stubbed_object]
+        notice.mec_conflict_individuals = Array[MergeDataModels::Dependent.stubbed_object]
         notice
       end
 
@@ -132,7 +129,9 @@ module Notifier
         %w[
           addresses tax_households dependents magi_medicaid_members
           aqhp_or_non_magi_medicaid_members uqhp_or_non_magi_medicaid_members
-          ineligible_applicants ssa_unverified dhs_unverified american_indian_unverified residency_inconsistency
+          ineligible_applicants ssa_unverified_individuals dhs_unverified_individuals
+          immigration_unverified_individuals residency_inconsistency_individuals
+          american_indian_unverified_individuals income_unverified_individuals mec_conflict_individuals
         ]
       end
 
