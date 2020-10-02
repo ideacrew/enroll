@@ -8,7 +8,12 @@ require 'csv'
      task :total_new_people_list => :environment do
        include Config::AcaHelper
 
+<<<<<<< Updated upstream
       date = TimeKeeper.date_of_record - 1.day
+=======
+      start_date = Date.new(2020, 10, 01)
+      end_date = TimeKeeper.date_of_record + 1.day
+>>>>>>> Stashed changes
  
        field_names  = %w(
            FAMILY_ID
@@ -47,7 +52,11 @@ require 'csv'
       CSV.open(file_name, "w", force_quotes: true) do |csv|
          csv << field_names
 
+<<<<<<< Updated upstream
          families = Family.where(:"created_at" => { "$gte" => date})
+=======
+         families = Family.where(:"created_at" => { "$gte" => start_date, "$lt" => end_date})
+>>>>>>> Stashed changes
          families.each do |family|
           primary_fm = family.primary_family_member
           family.family_members.each do |fm|
@@ -118,7 +127,11 @@ require 'csv'
       pubber = Publishers::Legacy::NewPeopleApplicationReportPublisher.new
       pubber.publish URI.join("file://", file_name)
 
+<<<<<<< Updated upstream
       puts "Total persons created through #{date} is #{count}"
+=======
+      puts "Total person's that are created in a time frame of #{start_date}-#{end_date - 1.day} count is #{count}"
+>>>>>>> Stashed changes
      end
    end
  end
