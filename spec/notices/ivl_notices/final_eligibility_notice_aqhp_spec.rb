@@ -8,7 +8,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
     let!(:person3) { FactoryBot.create(:person, :with_consumer_role, hbx_id: "141890", first_name: "John", last_name: "Smith") }
     let!(:person4) { FactoryBot.create(:person, :with_consumer_role, hbx_id: "141891", first_name: "John", last_name: "Smith1") }
-  
+
     let!(:family3) { FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person3) }
     let!(:family_member4) { FactoryBot.create(:family_member, family: family3, person: person4) }
     let!(:dependents) { family3.family_members }
@@ -90,7 +90,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     let!(:input_file) { Rails.root.join("spec", "test_data", "notices", "ivl_fel_aqhp_test_data.csv") }
 
     describe "NoticeBuilder" do
-      let(:data_elements) {
+      let(:data_elements) do
         [
           "consumer_role.notice_date",
           "consumer_role.coverage_year",
@@ -108,30 +108,32 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           "consumer_role.renewing_dental_enrollments",
           "consumer_role.renewing_health_enrollments",
           "consumer_role.same_health_product",
-          "consumer_role.same_dental_product",
+          "consumer_role.same_dental_product"
         ]
-      }
+      end
 
       let(:merge_model) { subject.construct_notice_object }
       let(:recipient)   { "Notifier::MergeDataModels::ConsumerRole" }
       let(:template)    { Notifier::Template.new(data_elements: data_elements) }
-      
+
       let(:data_hash)  { build_data_hash }
-      let(:members)    { data_hash.select { |k,v| v.any? { |x| x['member_id'] == '141890' } }.first[1] }
+      let(:members)    { data_hash.select { |_k,v| v.any? { |x| x['member_id'] == '141890' } }.first[1] }
       let(:subscriber) { members.detect{ |m| m["dependent"].casecmp('NO').zero? } }
       let(:dependents_array) { members.select{|m| m["dependent"].casecmp('YES').zero? } }
 
-      let(:payload)   { {
+      let(:payload) do
+        {
           "event_object_kind" => "ConsumerRole",
           "event_object_id" => consumer_role.id,
-          "notice_params" => { "primary_member" => subscriber.to_hash,
-                               "dependents" => dependents_array.map(&:to_hash),
-                               "active_enrollment_ids" => [current_enrollment.hbx_id],
-                               "renewing_enrollment_ids" => [renewing_enrollment.hbx_id],
-                               "uqhp_event" => 'aqhp_projected_eligibility_notice_2'
-                              }
-
-      } }
+          "notice_params" => {
+            "primary_member" => subscriber.to_hash,
+            "dependents" => dependents_array.map(&:to_hash),
+            "active_enrollment_ids" => [current_enrollment.hbx_id],
+            "renewing_enrollment_ids" => [renewing_enrollment.hbx_id],
+            "uqhp_event" => 'aqhp_projected_eligibility_notice_2'
+          }
+        }
+      end
 
       context "when notice event received" do
 
@@ -155,28 +157,28 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           end_date = Settings.aca.individual_market.upcoming_open_enrollment.end_on.strftime('%B %d, %Y')
           expect(merge_model.ivl_oe_end_date).to eq end_date
         end
-        
+
         it 'should return if it is magi medicaid' do
           expect(merge_model.magi_medicaid?).to eq false
         end
-        
+
         it 'should return a boolean if aqhp or uqhp' do
           expect(merge_model.aqhp_or_non_magi_medicaid_members_present?).to eq true
           expect(merge_model.uqhp_or_non_magi_medicaid_members_present?).to eq false
         end
-        
+
         it 'should return if aqhp eligible' do
           expect(merge_model.aqhp_eligible?).to eq true
         end
-        
+
         it 'should return tax households if any' do
           expect(merge_model.tax_households).to all(be_a(Notifier::MergeDataModels::TaxHousehold))
         end
-        
+
         it 'should return if there is any csr member' do
           expect(merge_model.has_atleast_one_csr_member?).to eq false
         end
-        
+
         it 'should return tah households with csr if any' do
           expect(merge_model.tax_hh_with_csr).to eq []
         end
@@ -205,7 +207,7 @@ private
 
 def build_data_hash
   @data_hash = {}
-  CSV.foreach(input_file,:headers =>true).each do |d|
+  CSV.foreach(input_file,:headers => true).each do |d|
     if @data_hash[d["ic_number"]].present?
       @data_hash[d["ic_number"]] << d
     else
