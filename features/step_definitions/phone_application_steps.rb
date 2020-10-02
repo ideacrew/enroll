@@ -86,5 +86,5 @@ When(/^the Admin clicks CONTINUE after uploading and verifying an application$/)
 end
 
 Then(/^the Admin can navigate to the next page and finish the application$/) do
-  expect(page).to have_content('Household Info: Family Members')
+  expect(page).to have_content("#{l10n('family_information')}")
 end

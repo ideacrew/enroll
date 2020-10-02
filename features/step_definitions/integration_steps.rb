@@ -851,8 +851,8 @@ When(/^.+ clicks? a qle event$/) do
   @browser.element(text: /You may be eligible for a special enrollment period./i).wait_until_present
   expect(@browser.element(text: /You may be eligible for a special enrollment period./i).visible?).to be_truthy
   scroll_then_click(@browser.element(class: /interaction-click-control-continue/))
-  @browser.element(text: /Household Info: Family Members/i).wait_until_present
-  expect(@browser.element(text: /Household Info: Family Members/i).visible?).to be_truthy
+  @browser.element(text: "#{l10n('family_information')}").wait_until_present
+  expect(@browser.element(text: "#{l10n('family_information')}").visible?).to be_truthy
   scroll_then_click(@browser.a(id: /btn_household_continue/))
   @browser.element(text: /Choose Benefits: Covered Family Members/i).wait_until_present
   expect(@browser.element(text: /Choose Benefits: Covered Family Members/i).visible?).to be_truthy
@@ -1019,7 +1019,7 @@ end
 
 Then(/^I should see the dependents and group selection page$/) do
   #@browser.element(text: /Household Info: Family Members/i).wait_until_present
-  expect(@browser.element(text: /Household Info: Family Members/i).visible?).to be_truthy
+  expect(@browser.element(text: "#{l10n('family_information')}").visible?).to be_truthy
   @browser.element(class: /interaction-click-control-continue/).wait_until_present
   @browser.execute_script("$('.interaction-click-control-continue')[1].click();")
   @browser.element(text: /Choose Benefits: Covered Family Members/i).wait_until_present

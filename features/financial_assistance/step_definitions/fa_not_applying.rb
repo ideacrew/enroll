@@ -73,7 +73,7 @@ Given(/^the user navigates to the "Household Info" page with "no" selected$/) do
   find(:xpath, '//label[@for="radio2"]').click
   create_plan
   find('.btn', text: 'CONTINUE').click
-  expect(page).to have_content('Household Info: Family Members')
+  expect(page).to have_content("#{l10n('family_information')}")
 end
 
 When(/the user clicks on add member button/) do
@@ -98,7 +98,7 @@ And(/^the user fills the the add member form/) do
   find(:xpath, '//label[@for="radio_incarcerated_no"]').click
   screenshot("add_member")
   all(:css, ".mz").last.click
-  expect(page).to have_content('Household Info: Family Members')
+  expect(page).to have_content("#{l10n('family_information')}")
 end
 
 And(/^the user clicks the PREVIOUS link1/) do
@@ -121,7 +121,6 @@ end
 When(/^the user clicks on CONTINUE button/) do
   find('.btn', text: 'CONTINUE').click
 end
-
 Then(/^the user will navigate to FAA Household Info: Family Members page/) do
-  expect(page).to have_content('Household Info: Family Members')
+  expect(page).to have_content("#{l10n('family_information')}")
 end

@@ -99,9 +99,9 @@
 
       <li class="list-box step-tabs <%= li_nav_classes_for(:household_info) %> global-nav indent-w no-hover">
         <% if @application.present? && @application.is_draft?  %>
-          <a href="<%= financial_assistance.edit_application_path(@application) %>">Household Info</a>
+          <a href="<%= financial_assistance.edit_application_path(@application) %>"><%= l10n('family_info') %></a>
         <% else %>
-          <a href="javascript:void(0);" class="cna">Household Info</a>
+          <a href="javascript:void(0);" class="cna"><%= l10n('family_info') %></a>
         <% end %>
       </li>
 

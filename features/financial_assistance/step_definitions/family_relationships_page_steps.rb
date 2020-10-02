@@ -7,7 +7,7 @@ Given(/^at least two other household members exist$/) do
   fill_in 'applicant[last_name]', :with => 'smith'
   fill_in 'jq_datepicker_ignore_applicant[dob]', :with => '10/10/1984'
   #click_link(10)
-  click_outside_datepicker('Household Info: Family Members')
+  click_outside_datepicker("#{l10n('family_information')}")
   fill_in 'applicant[ssn]', :with => '123456543'
   find("span", :text => "choose").click
   find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Spouse')]").click
@@ -24,7 +24,7 @@ Given(/^at least two other household members exist$/) do
   fill_in 'applicant[last_name]', :with => 'johnson'
   fill_in 'jq_datepicker_ignore_applicant[dob]', :with => '10/10/2010'
   #click_link(10)
-  click_outside_datepicker('Household Info: Family Members')
+  click_outside_datepicker("#{l10n('family_information')}")
   fill_in 'applicant[ssn]', :with => '123456549'
   find("span", :text => "choose").click
   find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Child')]").click

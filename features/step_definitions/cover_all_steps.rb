@@ -53,7 +53,7 @@ Then(/HBX Admin should see a form to enter personal information$/) do
 end
 
 Then(/^Hbx Admin should see text Household Info$/) do
-  expect(page).to have_content('Household Info')
+  expect(page).to have_content("#{l10n('family_information')}")
   expect(page).to have_content('get health insurance coverage for other members of your family')
   find_link('Add Member').visible?
   find('.btn', text: 'CONTINUE').click

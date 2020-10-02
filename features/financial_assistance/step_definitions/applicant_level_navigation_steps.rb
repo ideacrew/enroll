@@ -5,7 +5,7 @@ When(%r{^the user clicks ADD/EDIT INCOME & COVERAGE INFO button for a given hous
 end
 
 Then(/^the user will navigate to the Tax Info page for the corresponding applicant\.$/) do
-  expect(page).to have_content('Household Info: Family Members')
+  expect(page).to have_content("#{l10n('family_information')}")
 end
 
 Given(/^that the user is on the Tax Info page for a given applicant$/) do
