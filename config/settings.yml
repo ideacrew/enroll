@@ -26,7 +26,7 @@ site:
   logo_file_name: "logo_ct.png"
   make_their_premium_payments_online: "https://www.e-billexpress.com/ebpp/DCHEALTHPAY/"
   tab_icon: 'favicon.ico'
-  mailer_logo_file_name: "dchealthlink.jpg"
+  mailer_logo_file_name: "logo_ct.png"
   employer_application_deadline_link: "https://dchealthlink.com/smallbusiness/employer-coverage-deadlines"
   s3_prefix: "dchbx"
   broker_quoting_enabled: false
