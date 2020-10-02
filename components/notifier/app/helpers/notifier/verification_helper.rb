@@ -33,10 +33,14 @@ module Notifier
     end
 
     def unverified_individual_hash(person, due_date, uqhp)
-      first_name = uqhp ? person.first_name.titleize : person['first_name'].titleize
-      last_name = uqhp ? person.last_name.titleize : person['last_name'].titleize
-      age = uqhp ? person.age_on(TimeKeeper.date_of_record) : calculate_age_by_dob(Date.strptime(datum["dob"], '%m/%d/%Y'))
-      Notifier::MergeDataModels::Dependent.new({ first_name: individual.first_name.titleize, last_name: individual.last_name.titleize, due_date: due_date, age: individual.age_on(TimeKeeper.date_of_record)})
+      first_name, last_name, age, mec_type_1, mec_type_2 =
+        if uqhp
+          person.first_name.titleize, person.last_name.titleize, person.age_on(TimeKeeper.date_of_record)
+        else
+          person['first_name'].titleize, person['last_name'].titleize, calculate_age_by_dob(Date.strptime(datum["dob"], '%m/%d/%Y')), person['mec_type_1'], person['mec_type_2']
+        end
+
+      Notifier::MergeDataModels::Dependent.new({ first_name: individual.first_name.titleize, last_name: individual.last_name.titleize, due_date: due_date, age: individual.age_on(TimeKeeper.date_of_record), mec_type_2: mec_type_2, mec_type_1: mec_type_1})
     end
 
     def outstanding_verification_types(person)

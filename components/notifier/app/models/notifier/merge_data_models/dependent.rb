@@ -26,6 +26,8 @@ module Notifier
     attribute :totally_ineligible_members_present, Boolean
     attribute :magi_medicaid_members_present, Boolean
     attribute :mec, Boolean
+    attribute :mec_type_1, String
+    attribute :mec_type_2, String
     attribute :indian_conflict, Boolean
     attribute :is_medicaid_chip_eligible, Boolean
     attribute :is_non_magi_medicaid_eligible, Boolean
