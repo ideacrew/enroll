@@ -25,7 +25,7 @@ attributes: !ruby/hash:BSON::Document
     cms_id: DC0
     created_at: 2015-10-10 00:11:19.711000000 Z
     updated_at: 2015-10-10 00:11:19.711000000 Z
-    us_state_abbreviation: DC
+    us_state_abbreviation: CT
     is_benefit_sponsorship_eligible: true
     office_locations:
     - !ruby/hash:BSON::Document
