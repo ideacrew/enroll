@@ -1067,10 +1067,8 @@ module BenefitSponsors
         benefit_sponsorship.census_employees.each do |ce|
           family = FactoryBot.create(:family, :with_primary_family_member)
           allow(ce).to receive(:family).and_return(family)
+          allow(ce).to receive(:is_waived_under?).and_return true
           employees << ce
-          ce.active_benefit_group_assignment.aasm_state = 'coverage_waived'
-          ce.active_benefit_group_assignment.save
-          ce.save
         end
         allow(renewal_application).to receive(:active_census_employees_under_py).and_return(employees)
       end
