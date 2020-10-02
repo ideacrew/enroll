@@ -422,3 +422,4 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.plan_shoppings.thankyou.you_must_complete_steps_to_enroll' => "You must complete these steps to enroll.",
   :'en.insured.plan_shoppings.thankyou.additional_administration_msg' => "* Your employer may charge an additional administration fee for your COBRA/Continuation coverage. If you have any questions, please direct them to the Employer."
 }.freeze
+
