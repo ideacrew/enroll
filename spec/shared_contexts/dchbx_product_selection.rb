@@ -372,6 +372,57 @@ RSpec.shared_context 'family with previous enrollment for termination and passiv
 end
 
 
+RSpec.shared_context 'family with previous enrollment for termination and second passive renewal', :shared_context => :metadata do
+  include_context 'family with one member and one enrollment'
+
+  let!(:expired_enrollment) do
+    FactoryBot.create(:hbx_enrollment,
+                      product_id: predecessor_product.id,
+                      kind: 'individual',
+                      family: family,
+                      aasm_state: :coverage_expired,
+                      consumer_role_id: family.primary_person.consumer_role.id,
+                      effective_on: start_of_year)
+  end
+
+  let!(:expired_enrollment_member) do
+    FactoryBot.create(:hbx_enrollment_member,
+                      hbx_enrollment: expired_enrollment,
+                      applicant_id: family_member.id)
+  end
+
+  let!(:renewal_enrollment) do
+    FactoryBot.create(:hbx_enrollment,
+                      product_id: product.id,
+                      kind: 'individual',
+                      family: family,
+                      consumer_role_id: family.primary_person.consumer_role.id,
+                      effective_on: start_of_year.next_year)
+  end
+
+  let!(:renewal_enrollment_member) do
+    FactoryBot.create(:hbx_enrollment_member,
+                      hbx_enrollment: renewal_enrollment,
+                      applicant_id: family_member.id)
+  end
+
+  let!(:renewal_enrollment2) do
+    FactoryBot.create(:hbx_enrollment,
+                      product_id: product.id,
+                      kind: 'individual',
+                      family: family,
+                      aasm_state: :coverage_selected,
+                      consumer_role_id: family.primary_person.consumer_role.id,
+                      effective_on: start_of_year.next_month.next_year)
+  end
+
+  let!(:renewal_enrollment2_member) do
+    FactoryBot.create(:hbx_enrollment_member,
+                      hbx_enrollment: renewal_enrollment2,
+                      applicant_id: family_member.id)
+  end
+end
+
 RSpec.shared_context 'family with two members and one enrollment and one predecessor enrollment with two members with previous year active coverage', :shared_context => :metadata do
   include_context 'family with one member and one enrollment'
 
