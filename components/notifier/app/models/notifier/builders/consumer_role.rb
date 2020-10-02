@@ -33,10 +33,6 @@ module Notifier
         enrollments
       end
 
-      def notification_type
-        merge_model.notification_type
-      end
-
       def notice_date
         merge_model.notice_date = TimeKeeper.date_of_record.strftime('%B %d, %Y')
       end
@@ -87,6 +83,14 @@ module Notifier
           else
             age_of_aqhp_person(TimeKeeper.date_of_record, Date.strptime(payload['notice_params']['primary_member']['dob'],"%m/%d/%Y"))
           end
+      end
+
+      def family_members_hash
+        primary_member = []
+        primary_member << payload['notice_params']['primary_member']
+        dependent_members = payload['notice_params']['dependents']
+        members = primary_member + dependent_members
+        members.compact
       end
 
       def append_contact_details
@@ -169,6 +173,10 @@ module Notifier
       # Current active dental enrollments
       def current_dental_enrollments
         active_enrollments.select { |e| e.coverage_kind == "dental" && e.effective_on.year.to_s == previous_coverage_year.to_s}
+      end
+
+      def renewal_csr_enrollments
+        enrollments.select { |enrollment| enrollment.product.is_csr ==  true }
       end
 
       # Renewing health product
@@ -296,25 +304,22 @@ module Notifier
 
       def documents_needed
         merge_model.documents_needed =
-        if uqhp_notice?
-          unverified_individuals.present?
-        else
-          primary_member = payload['notice_params']['primary_member']
-          dependent_members = payload['notice_params']['dependents']
-          members = [primary_member] + dependent_members
-          members.compact.any? { |member| member['docs_needed'].try(:upcase) == 'Y' }
-        end
+          if uqhp_notice?
+            unverified_individuals.present?
+          else
+            family_members_hash.any? { |member| member['docs_needed'].try(:upcase) == 'Y' }
+          end
       end
 
       def unverified_individuals
-        check_for_unverified_individuals(family)
+        uqhp_notice? ? check_for_unverified_individuals(family) : family_members_hash
       end
 
       def ssa_unverified_individuals
         merge_model.ssa_unverified_individuals =
           unverified_individuals.collect do |individual|
-            if ssn_outstanding?(individual)
-              unverified_individual_hash(individual, due_date)
+            if ssn_outstanding?(individual, uqhp_notice?)
+              unverified_individual_hash(individual, due_date, uqhp_notice?)
             end
           end
       end
@@ -322,8 +327,8 @@ module Notifier
       def dhs_unverified_individuals
         merge_model.dhs_unverified_individuals =
           unverified_individuals.collect do |individual|
-            if lawful_presence_outstanding?(individual)
-              unverified_individual_hash(individual, due_date)
+            if lawful_presence_outstanding?(individual, uqhp_notice?)
+              unverified_individual_hash(individual, due_date, uqhp_notice?)
             end
           end
       end
@@ -331,8 +336,8 @@ module Notifier
       def immigration_unverified_individuals
         merge_model.immigration_unverified_individuals =
           unverified_individuals.collect do |individual|
-            if immigration_status_outstanding?(individual)
-              unverified_individual_hash(individual, due_date)
+            if immigration_status_outstanding?(individual, uqhp_notice?)
+              unverified_individual_hash(individual, due_date, uqhp_notice?)
             end
           end
       end
@@ -340,8 +345,8 @@ module Notifier
       def residency_inconsistency_individuals
         merge_model.residency_inconsistency_individuals =
           unverified_individuals.collect do |individual|
-            if residency_outstanding?(individual)
-              unverified_individual_hash(individual, due_date)
+            if residency_outstanding?(individual, uqhp_notice?)
+              unverified_individual_hash(individual, due_date, uqhp_notice?)
             end
           end
       end
@@ -349,8 +354,26 @@ module Notifier
       def american_indian_unverified_individuals
         merge_model.american_indian_unverified_individuals =
           unverified_individuals.collect do |individual|
-            if american_indian_status_outstanding?(individual)
-              unverified_individual_hash(individual, due_date)
+            if american_indian_status_outstanding?(individual, uqhp_notice?)
+              unverified_individual_hash(individual, due_date, uqhp_notice?)
+            end
+          end
+      end
+
+      def income_unverified_individuals
+        merge_model.income_unverified_individuals =
+          unverified_individuals.collect do |individual|
+            if income_outstanding?(individual, uqhp_notice?)
+              unverified_individual_hash(individual, due_date, uqhp_notice?)
+            end
+          end
+      end
+
+      def mec_conflict_individuals
+        merge_model.mec_conflict_individuals =
+          unverified_individuals.collect do |individual|
+            if other_coverage_outstanding?(individual, uqhp_notice?)
+              unverified_individual_hash(individual, due_date, uqhp_notice?)
             end
           end
       end
@@ -378,6 +401,16 @@ module Notifier
       def american_indian_unverified_individuals_present
         american_indian_unverified_individuals
         merge_model.american_indian_unverified_individuals_present = american_indian_unverified_individuals.present?
+      end
+
+      def income_unverified_individuals_present
+        income_unverified_individuals
+        merge_model.income_unverified_individuals_present = income_unverified_individuals.present?
+      end
+
+      def mec_conflict_individuals_present
+        mec_conflict_individuals
+        merge_model.mec_conflict_individuals_present = mec_conflict_individuals.present?
       end
 
       def due_date
@@ -491,39 +524,6 @@ module Notifier
             payload['notice_params']['primary_member']['non_magi_medicaid'].casecmp('YES').zero?
           end
       end
-      
-      # TODO: See app/notices/ivl_notices/ivl_to_coverall_transition_notice_builder.rb for guidance
-      def unverified_people(type_name, merge_model_attribute)
-        outstanding_people = []
-        family = consumer_role&.person&.primary_family
-        return false unless family.present?
-        people = family.family_members.map { |fm| fm.person }
-        people.each do |person|
-          outstanding_verification_types = person&.consumer_role&.outstanding_verification_types
-           if person.consumer_role && outstanding_verification_types.present?
-            if outstanding_verification_types.detect { |verification_type| verification_type.type_name == type_name }
-              outstanding_people << person
-            end
-          end
-        end
-        merge_model[merge_model_attribute] = outstanding_people.flatten
-      end
-
-      def american_indian_unverified
-        unverified_people("American Indian Status", :american_indian_unverified)
-      end
-
-      def dhs_unverified
-        unverified_people("Citizenship", :dhs_unverified)
-      end
-
-      def ssa_unverified
-        unverified_people("Social Security Number", :ssa_unverified)
-      end
-
-      def documents_needed?
-        unverified_people("Social Security Number", :ssa_unverified).present? ? true : false
-      end
 
       def csr
         return if primary_nil?
@@ -535,25 +535,7 @@ module Notifier
       end
 
       def primary_identifier
-        consumer_role&.person&.hbx_id
-      end
-
-      def notification_type
-        if payload['notice_params']['uqhp_event'].present?
-          merge_model.notification_type = payload['notice_params']['uqhp_event']
-        elsif payload['notice_params']['aqhp_event'].present?
-          merge_model.notification_type =  payload['notice_params']['aqhp_event']
-        else
-          merge_model.notification_type = ''
-        end
-      end
-
-      def past_due_text
-        'PAST DUE'
-      end
-
-      def primary_identifier
-        consumer_role.person_hbx_id
+        merge_model.primary_identifier = consumer_role.person.hbx_id
       end
 
       def aqhp_event
@@ -587,11 +569,6 @@ module Notifier
         merge_model.uqhp_or_non_magi_medicaid_members_present = merge_model.uqhp_or_non_magi_medicaid_members.present?
       end
 
-      def dhs_unverified_present
-        dhs_unverified
-        merge_model.dhs_unverified_present = merge_model.dhs_unverified.present?
-      end
-
       def csr_percent
         return if primary_nil?
         merge_model.csr_percent = payload['notice_params']['primary_member']['csr_percent'].blank? ? nil : Integer(payload['notice_params']['primary_member']['csr_percent'])
@@ -606,8 +583,7 @@ module Notifier
 
         date.strftime('%B %d, %Y')
       end
-      
-      # TODO: Is this misspelled?
+
       def depents
         true
       end

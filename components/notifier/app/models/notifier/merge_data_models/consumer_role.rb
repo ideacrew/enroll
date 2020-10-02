@@ -34,6 +34,8 @@ module Notifier
       attribute :immigration_unverified_individuals, Array[MergeDataModels::Dependent]
       attribute :residency_inconsistency_individuals, Array[MergeDataModels::Dependent]
       attribute :american_indian_unverified_individuals, Array[MergeDataModels::Dependent]
+      attribute :income_unverified_individuals, Array[MergeDataModels::Dependent]
+      attribute :mec_conflict_individuals, Array[MergeDataModels::Dependent]
       attribute :addresses, Array[MergeDataModels::Address]
       attribute :aqhp_eligible, Boolean
       attribute :totally_ineligible, Boolean
@@ -54,12 +56,13 @@ module Notifier
       attribute :immigration_unverified_individuals_present, Boolean
       attribute :residency_inconsistency_individuals_present, Boolean
       attribute :american_indian_unverified_individuals_present, Boolean
+      attribute :income_unverified_individuals_present, Boolean
+      attribute :mec_conflict_individuals_present, Boolean
       attribute :irs_consent_not_needed, Boolean
       attribute :primary_member_present, Boolean
       attribute :same_health_product, Boolean # checks if family is enrolled into same health product
       attribute :same_dental_product, Boolean # checks if family is enrolled into same dental product
-      attribute :person_hbx_id, String
-      attribute :notification_type, String
+      attribute :primary_identifier, String
       attribute :due_date, Date
       attribute :documents_needed, Boolean
 
@@ -89,11 +92,9 @@ module Notifier
             aqhp_or_non_magi_medicaid_members_present: true,
             uqhp_or_non_magi_medicaid_members_present: false,
             totally_ineligible_members_present: false,
-            dhs_unverified_present: true,
-            ssa_unverified_present: true,
-            residency_inconsistency_present: false,
-            american_indian_unverified_present: false,
             non_magi_medicaid: false,
+            income_unverified_individuals_present: true,
+            mec_conflict_individuals_present: true,
             magi_medicaid: 'No',
             irs_consent: false,
             totally_ineligible: 'No',
@@ -101,7 +102,7 @@ module Notifier
             csr_percent: 73,
             ivl_oe_start_date: Date.parse('November 01, 2020').strftime('%B %d, %Y'),
             ivl_oe_end_date: Date.parse('January 31, 2021').strftime('%B %d, %Y'),
-            person_hbx_id: 2
+            primary_identifier: '00000'
           }
         )
 
@@ -117,6 +118,13 @@ module Notifier
         notice.aqhp_or_non_magi_medicaid_members = [notice]
         notice.magi_medicaid_members = [Notifier::MergeDataModels::Dependent.stubbed_object]
         notice.enrollments = [Notifier::MergeDataModels::Enrollment.stubbed_object]
+        notice.ssa_unverified_individuals, Array[MergeDataModels::Dependent.stubbed_object]
+        notice.dhs_unverified_individuals, Array[MergeDataModels::Dependent.stubbed_object]
+        notice.immigration_unverified_individuals, Array[MergeDataModels::Dependent.stubbed_object]
+        notice.residency_inconsistency_individuals, Array[MergeDataModels::Dependent.stubbed_object]
+        notice.american_indian_unverified_individuals, Array[MergeDataModels::Dependent.stubbed_object]
+        notice.income_unverified_individuals, Array[MergeDataModels::Dependent.stubbed_object]
+        notice.mec_conflict_individuals, Array[MergeDataModels::Dependent.stubbed_object]
         notice
       end
 
@@ -130,18 +138,13 @@ module Notifier
 
       def conditions
         %w[
-            aqhp_eligible? uqhp_eligible? incarcerated? irs_consent?
-            magi_medicaid? magi_medicaid_members_present? aqhp_or_non_magi_medicaid_members_present? uqhp_or_non_magi_medicaid_members_present?
-            irs_consent_not_needed? aptc_amount_available? csr?
-            aqhp_event_and_irs_consent_no? csr_is_73? csr_is_87?
-            csr_is_94? csr_is_100? csr_is_zero? csr_is_nil? non_magi_medicaid?
-            aptc_is_zero? totally_ineligible? aqhp_event? uqhp_event? totally_ineligible_members_present? primary_member_present?
-            documents_needed? ssa_unverified_present? dhs_unverified_present? american_indian_unverified_present? residency_inconsistency_present?
+          aqhp_eligible? uqhp_eligible? incarcerated? irs_consent?
+          magi_medicaid? magi_medicaid_members_present? aqhp_or_non_magi_medicaid_members_present? uqhp_or_non_magi_medicaid_members_present?
+          irs_consent_not_needed? aptc_amount_available? csr?
+          aqhp_event_and_irs_consent_no? csr_is_73? csr_is_87?
+          csr_is_94? csr_is_100? csr_is_zero? csr_is_nil? non_magi_medicaid?
+          aptc_is_zero? totally_ineligible? aqhp_event? uqhp_event? totally_ineligible_members_present? primary_member_present?
         ]
-      end
-
-      def primary_identifier
-        # primary_identifier
       end
 
       # there can be multiple renewing health and dental enrollments for the same coverage year
@@ -171,23 +174,12 @@ module Notifier
       end
 
       def aqhp_enrollments
-        enrollments.select{ |enrollment| enrollment.is_receiving_assistance == true}
+        enrollments.select { |enrollment| enrollment.coverage_year == coverage_year && enrollment.is_receiving_assistance }
       end
 
-      # def ssa_unverified
-        # TODO: What am I supposed to do here?
-        # Do I have to put anything here if I do merge_model.ssa_unverified <<
-        # from the consumer_role_builder?
-        # If I put ssa_unverified here I get some kind of stack trace error thing that crashes
-        # my whole server
-        # ssa_unverified
-        #[]
-      #end
-
-      # def dhs_unverified
-        # TODO: Same question as above
-      #  []
-      # end
+      def renewal_csr_enrollments
+        enrollments.select { |enrollment| enrollment.coverage_year == coverage_year && enrollment.product.is_csr ==  true }
+      end
 
       def tax_hh_with_csr
         tax_households.reject{ |thh| thh.csr_percent_as_integer == 100}
@@ -279,14 +271,6 @@ module Notifier
 
       def aqhp_event_and_irs_consent_no?
         aqhp_event? && !irs_consent?
-      end
-
-      def dhs_unverified_present
-        dhs_unverified_present
-      end
-
-      def ssa_unverified_present
-        ssa_unverified_present
       end
 
       def csr_is_73?

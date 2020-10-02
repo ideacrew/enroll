@@ -103,6 +103,7 @@ module Notifier
           no_csr_because_of_mec: true,
           non_applicant: false,
           person_hbx_id: 1,
+          due_date: TimeKeeper.date_of_record.next_month,
           dob: (Date.today - 20.years)
         }
       )
