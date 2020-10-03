@@ -55,7 +55,7 @@ function runGlossary() {
       },
       {
         "term": "Alaskan Native",
-        "description": "Alaskan Native Claims Settlement Act (ANCSA) corporation shareholders, members of <a href='https://dchealthlink.com/glossary#federally_recognized_tribe' target='_blank'>federally recognized tribes<\/a>, or those eligible for services from the <a href='https://dchealthlink.com/glossary#indian_health_service' target='_blank'>Indian Health Service<\/a>, Tribal Program, or Urban Indian Health Program, are likely eligible for enhanced savings, benefits and protections through DC Health Link. Apply for <a href='https://dchealthlink.com/glossary#financial_assistance' target='_blank'>financial assistance<\/a> prior to enrolling in a health plan to determine eligibility for the savings, benefits and protections available."
+        "description": "Alaska Native Claims Settlement Act (ANCSA) corporation shareholders, members of <a href='https://dchealthlink.com/glossary#federally_recognized_tribe' target='_blank'>federally recognized Tribes<\/a>, or those eligible for services from the <a href='https://dchealthlink.com/glossary#indian_health_service' target='_blank'>Indian Health Service<\/a>, Tribal Program, or Urban Indian Health Program, are eligible for enhanced savings, benefits and protections through DC Health Link. Apply for <a href='https://dchealthlink.com/glossary#financial_assistance' target='_blank'>financial assistance<\/a> prior to enrolling in a health plan to determine eligibility for the savings, benefits and protections available."
       },
       {
         "term": "Allowed Amount",
