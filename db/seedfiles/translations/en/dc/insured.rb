@@ -298,6 +298,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.confirm_member' => "Confirm Member",
   :'en.household_info' => "Household Info",
   :'en.family_info' => "Family Info",
+  :'en.account_setup' => "Account setup",
   :'en.family_information' => "Family Information",
   :'en.insured.homeless_dc' => "A homeless DC resident.",
   :'en.insured.temp_outside_dc' => "I'm living outside of DC and plan to return, or am moving to DC but don’t have a DC address yet.",
