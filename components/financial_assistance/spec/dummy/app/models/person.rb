@@ -1311,9 +1311,9 @@ class Person
   end
 
   def native_american_validation
-    self.errors.add(:base, "American Indian / Alaskan Native status is required.") if indian_tribe_member.to_s.blank?
+    self.errors.add(:base, "American Indian / Alaska Native status is required.") if indian_tribe_member.to_s.blank?
     if !tribal_id.present? && @us_citizen == true && @indian_tribe_member == true
-      self.errors.add(:base, "Tribal id is required when native american / alaskan native is selected")
+      self.errors.add(:base, "Tribal id is required when native american / alaska native is selected")
     elsif tribal_id.present? && !tribal_id.match("[0-9]{9}")
       self.errors.add(:base, "Tribal id must be 9 digits")
     end

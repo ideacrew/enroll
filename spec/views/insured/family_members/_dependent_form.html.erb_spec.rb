@@ -44,7 +44,7 @@ describe "insured/family_members/_dependent_form.html.erb" do
 
       it "should have show tribal_container" do
         expect(rendered).to have_selector('div#tribal_container')
-        expect(rendered).to have_content('Are you a member of an American Indian or Alaskan Native tribe? *')
+        expect(rendered).to have_content('Are you a member of an American Indian or Alaska Native tribe? *')
       end
 
       it "should display the is_applying_coverage field option" do
@@ -62,7 +62,7 @@ describe "insured/family_members/_dependent_form.html.erb" do
 
       it "should have show tribal_container" do
         expect(rendered).to_not have_selector('div#tribal_container')
-        expect(rendered).to_not have_content('Are you a member of an American Indian or Alaskan Native tribe? *')
+        expect(rendered).to_not have_content('Are you a member of an American Indian or Alaska Native tribe? *')
       end
     end
 

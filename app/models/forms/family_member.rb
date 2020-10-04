@@ -52,11 +52,11 @@ module Forms
         end
 
         if @indian_tribe_member.nil?
-          self.errors.add(:base, "native american / alaskan native status is required")
+          self.errors.add(:base, "native american / alaska native status is required")
         end
 
         if !tribal_id.present? && @indian_tribe_member
-          self.errors.add(:tribal_id, "is required when native american / alaskan native is selected")
+          self.errors.add(:tribal_id, "is required when native american / alaska native is selected")
         end
 
         if @is_incarcerated.nil?

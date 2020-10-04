@@ -53,7 +53,7 @@ module FinancialAssistance
       rental_and_royalty: 'Rent and royalties',
       unemployment_insurance: 'Unemployment',
       social_security_benefit: 'Social Security',
-      american_indian_and_alaskan_native: "American Indian/Alaskan Native income",
+      american_indian_and_alaskan_native: "American Indian/Alaska Native income",
       employer_funded_disability: 'Employer-funded disability payments',
       estate_trust: 'Estate and trust',
       farming_and_fishing: 'Farming or fishing',

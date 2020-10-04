@@ -388,8 +388,8 @@ describe Person, :dbclean => :after_each do
         errors = { citizenship: "Citizenship status is required.",
                          naturalized: "Naturalized citizen is required.",
                          immigration: "Eligible immigration status is required.",
-                         native: "American Indian / Alaskan Native status is required.",
-                         tribal_id_presence: "Tribal id is required when native american / alaskan native is selected",
+                         native: "American Indian / Alaska Native status is required.",
+                         tribal_id_presence: "Tribal id is required when native american / alaska native is selected",
                          tribal_id: "Tribal id must be 9 digits",
                          incarceration: "Incarceration status is required." }
 

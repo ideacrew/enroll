@@ -52,8 +52,8 @@ module FinancialAssistance
         return unless @is_consumer_role.to_s == "true" && is_applying_coverage.to_s == "true"
 
         validate_citizen_status
-        self.errors.add(:base, "native american / alaskan native status is required") if @indian_tribe_member.nil?
-        self.errors.add(:tribal_id, "is required when native american / alaskan native is selected") if !tribal_id.present? && @indian_tribe_member
+        self.errors.add(:base, "native american / alaska native status is required") if @indian_tribe_member.nil?
+        self.errors.add(:tribal_id, "is required when native american / alaska native is selected") if !tribal_id.present? && @indian_tribe_member
         self.errors.add(:base, "Incarceration status is required") if @is_incarcerated.nil?
       end
 
