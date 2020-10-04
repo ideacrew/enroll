@@ -99,7 +99,7 @@ module Effective
       end
 
       def dc?
-        aca_state_abbreviation == "DC"
+        aca_state_abbreviation != "MA"
       end
 
       def on_general_agency_portal?

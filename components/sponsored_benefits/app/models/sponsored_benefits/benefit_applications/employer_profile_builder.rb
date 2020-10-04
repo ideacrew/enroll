@@ -26,7 +26,7 @@ module SponsoredBenefits
       end
 
       def quote_valid?
-        return true if aca_state_abbreviation == "DC"
+        return true if aca_state_abbreviation != "MA"
         validate_effective_date
       end
 

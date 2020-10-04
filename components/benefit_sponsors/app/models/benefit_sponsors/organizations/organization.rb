@@ -262,7 +262,7 @@ module BenefitSponsors
       end
 
       def entity_kinds
-        if aca_state_abbreviation == "DC"
+        if aca_state_abbreviation != "MA"
           DC_ENTITY_KINDS
         else
           ENTITY_KINDS

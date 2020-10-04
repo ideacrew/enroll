@@ -26,7 +26,7 @@ module Effective
           @employer_profile.try(:active_broker_agency_legal_name).try(:titleize) #if row.employer_profile.broker_agency_profile.present?
         }, :filter => false
 
-        if aca_state_abbreviation == 'DC'
+        if aca_state_abbreviation != 'MA'
           table_column :general_agency, :label => 'General Agency', :proc => proc {
             @employer_profile.try(:active_ga_legal_name).try(:titleize)
           }, :filter => false

@@ -5,7 +5,7 @@ module Effective
 
       datatable do
 
-        unless aca_state_abbreviation == "DC"
+        if aca_state_abbreviation == "MA"
           bulk_actions_column do
             bulk_action 'Employee will enroll',
                         main_app.change_expected_selection_employers_employer_profile_census_employees_path(@employer_profile,:expected_selection => "enroll"),
