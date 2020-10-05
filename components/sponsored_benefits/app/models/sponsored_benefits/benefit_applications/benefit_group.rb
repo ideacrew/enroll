@@ -4,6 +4,7 @@ module SponsoredBenefits
       embedded_in :benefit_application
       delegate :effective_period, to: :benefit_application
       delegate :sic_code, to: :benefit_application
+      delegate :start_on, to: :benefit_application
       delegate :rating_area, to: :benefit_application
       delegate :census_employees, to: :benefit_application
       delegate :plan_design_organization, to: :benefit_application
