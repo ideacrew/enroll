@@ -177,7 +177,7 @@ function validationForIndianTribeMember() {
       return true;
     }
     if (!$("input#indian_tribe_member_yes").is(':checked') && !$("input#indian_tribe_member_no").is(':checked')) {
-      alert("Please select the option for 'Are you a member of an American Indian or Alaska Native tribe?'");
+      alert("Please select the option for 'Are you a member of an American Indian or Alaska Native Tribe?'");
       e.preventDefault && e.preventDefault();
       return false;
     };
