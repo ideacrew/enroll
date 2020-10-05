@@ -1085,6 +1085,8 @@ And(/^employer sets cobra start date to two months before termination date$/) do
 end
 
 When(/^EnterPrise Limited employer clicks on Initiate COBRA button$/) do
+  # Clcik out of any other elements
+  page.all('body')[0].click
   id = @census_employees.first.id.to_s
   find(:xpath, "//*[@id='cobra-#{id}']").click
 end
