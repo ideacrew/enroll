@@ -182,7 +182,7 @@ module Notifier
     end
 
     def ivl_appeal_rights
-      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'ivl_appeal_rights.pdf')] if ['final_eligibility_notice'].include?(event_name)
+      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'ivl_appeal_rights.pdf')] if ['final_eligibility_notice', 'final_eligibility_notice_renewal'].include?(event_name)
     end
 
     def employee_appeal_rights

@@ -323,49 +323,49 @@ module Notifier
         merge_model.ssa_unverified_individuals =
           unverified_individuals.collect do |individual|
             unverified_individual_hash(individual, due_date, uqhp_notice?) if ssn_outstanding?(individual, uqhp_notice?)
-          end
+          end.compact
       end
 
       def dhs_unverified_individuals
         merge_model.dhs_unverified_individuals =
           unverified_individuals.collect do |individual|
             unverified_individual_hash(individual, due_date, uqhp_notice?) if lawful_presence_outstanding?(individual, uqhp_notice?)
-          end
+          end.compact
       end
 
       def immigration_unverified_individuals
         merge_model.immigration_unverified_individuals =
           unverified_individuals.collect do |individual|
             unverified_individual_hash(individual, due_date, uqhp_notice?) if immigration_status_outstanding?(individual, uqhp_notice?)
-          end
+          end.compact
       end
 
       def residency_inconsistency_individuals
         merge_model.residency_inconsistency_individuals =
           unverified_individuals.collect do |individual|
             unverified_individual_hash(individual, due_date, uqhp_notice?) if residency_outstanding?(individual, uqhp_notice?)
-          end
+          end.compact
       end
 
       def american_indian_unverified_individuals
         merge_model.american_indian_unverified_individuals =
           unverified_individuals.collect do |individual|
             unverified_individual_hash(individual, due_date, uqhp_notice?) if american_indian_status_outstanding?(individual, uqhp_notice?)
-          end
+          end.compact
       end
 
       def income_unverified_individuals
         merge_model.income_unverified_individuals =
           unverified_individuals.collect do |individual|
             unverified_individual_hash(individual, due_date, uqhp_notice?) if income_outstanding?(individual, uqhp_notice?)
-          end
+          end.compact
       end
 
       def mec_conflict_individuals
         merge_model.mec_conflict_individuals =
           unverified_individuals.collect do |individual|
             unverified_individual_hash(individual, due_date, uqhp_notice?) if other_coverage_outstanding?(individual, uqhp_notice?)
-          end
+          end.compact
       end
 
       def dhs_unverified_individuals_present
@@ -406,7 +406,7 @@ module Notifier
       def due_date
         return nil unless family
 
-        merge_model.due_date = family.min_verification_due_date
+        merge_model.due_date = family.min_verification_due_date.strftime('%B %d, %Y')
       end
 
       def ivl_oe_start_date
