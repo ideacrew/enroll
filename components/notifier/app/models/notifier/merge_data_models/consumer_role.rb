@@ -63,7 +63,7 @@ module Notifier
       attribute :same_health_product, Boolean # checks if family is enrolled into same health product
       attribute :same_dental_product, Boolean # checks if family is enrolled into same dental product
       attribute :primary_identifier, String
-      attribute :due_date, Date
+      attribute :due_date, String
       attribute :documents_needed, Boolean
 
       def self.stubbed_object

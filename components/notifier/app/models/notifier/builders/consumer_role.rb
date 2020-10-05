@@ -529,7 +529,7 @@ module Notifier
       end
 
       def aqhp_event
-        merge_model.aqhp_event = payload['notice_params']['aqhp_event'].upcase == 'AQHP'
+        merge_model.aqhp_event = payload['notice_params']['uqhp_event'].upcase == 'AQHP'
       end
 
       def uqhp_event

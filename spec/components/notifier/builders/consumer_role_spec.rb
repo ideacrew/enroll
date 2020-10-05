@@ -14,7 +14,7 @@ RSpec.describe 'Components::Notifier::Builders::ConsumerRole', :dbclean => :afte
       {"consumer_role_id" => "5c61bf485f326d4e4f00000c",
        "event_object_kind" => "ConsumerRole",
        "event_object_id" => "5bcdec94eab5e76691000cec",
-       "notice_params" => {"dependents" => data.select{ |m| m["dependent"].casecmp('YES').zero? }.map(&:to_hash),
+       "notice_params" => {"dependents" => data.select{ |m| m["dependent"].casecmp('YES').zero? }.map(&:to_hash), "uqhp_event" => "AQHP",
                            "primary_member" => data.detect{ |m| m["dependent"].casecmp('NO').zero? }.to_hash}}
     end
 
@@ -53,7 +53,7 @@ RSpec.describe 'Components::Notifier::Builders::ConsumerRole', :dbclean => :afte
 
     context "Model attributes" do
       it "should return a due date" do
-        expect(subject.due_date.class).to eq(Date)
+        expect(subject.due_date.class).to eq(String)
       end
 
       it "should return dc_resident status" do
@@ -254,7 +254,7 @@ RSpec.describe 'Components::Notifier::Builders::ConsumerRole', :dbclean => :afte
 
         it 'should return  for projected uqhp notice' do
           allow(subject).to receive(:uqhp_notice?).and_return(false)
-          expect(subject.aqhp_event_and_irs_consent_no?).to eq(false)
+          expect(subject.aqhp_event_and_irs_consent_no?).to eq(true)
         end
       end
     end
@@ -387,6 +387,7 @@ RSpec.describe 'Components::Notifier::Builders::ConsumerRole', :dbclean => :afte
         "event_object_kind" =>  "ConsumerRole",
         "event_object_id" => "5bcdec94eab5e76691000cec",
         "notice_params" => {
+          "uqhp_event" => "AQHP",
           "primary_member" => data.select{ |m| m["dependent"].casecmp('NO').zero? && m["uqhp_eligible"].casecmp('YES').zero?}.first.to_hash
         }
       }
