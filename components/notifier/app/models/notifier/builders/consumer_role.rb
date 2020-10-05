@@ -406,7 +406,7 @@ module Notifier
       def due_date
         return nil unless family
 
-        merge_model.due_date = family.min_verification_due_date.strftime('%B %d, %Y')
+        merge_model.due_date = family.min_verification_due_date&.strftime('%B %d, %Y')
       end
 
       def ivl_oe_start_date

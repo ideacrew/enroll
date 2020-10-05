@@ -118,7 +118,7 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
   csv << field_names
   @data_hash.each do |ic_number , members|
     begin
-      next if InitialEvents.include?(event_name) && members.any?{ |m| @excluded_list.include?(m["member_id"]) }
+      next if InitialEvents.include?(event_name) && eligibility_kind.upcase == 'UQHP' && members.any?{ |m| @excluded_list.include?(m["member_id"]) }
       subscriber = members.detect{ |m| m["dependent"].casecmp('NO').zero? }
       dependents = members.select{|m| m["dependent"].casecmp('YES').zero? }
       next if subscriber.nil?

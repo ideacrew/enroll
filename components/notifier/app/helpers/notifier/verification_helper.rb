@@ -115,7 +115,7 @@ module Notifier
 
       people = family_members.flatten.map(&:person).uniq
       people.compact.each do |person|
-        outstanding_people << person if person.consumer_role.outstanding_verification_types.present?
+        outstanding_people << person if person.consumer_role&.outstanding_verification_types.present?
       end
 
       outstanding_people.uniq!
