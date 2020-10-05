@@ -110,7 +110,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           "consumer_role.income_unverified_individuals_present",
           "consumer_role.residency_inconsistency_individuals_present",
           "consumer_role.mec_conflict_individuals_present",
-          "consumer_role.american_indian_unverified_individuals_present",
+          "consumer_role.american_indian_unverified_individuals_present"
         ]
       end
 
