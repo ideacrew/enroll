@@ -153,7 +153,7 @@ module SponsoredBenefits
       end
 
       def dc?
-        Settings.aca.state_abbreviation == "DC"
+        Settings.aca.state_abbreviation != "MA"
       end
     end
   end

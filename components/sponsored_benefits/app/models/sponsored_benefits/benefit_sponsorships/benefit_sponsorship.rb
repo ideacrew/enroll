@@ -106,11 +106,11 @@ module SponsoredBenefits
       end
 
       def sic_code
-        benefit_sponsorable.sic_code if Settings.aca.state_abbreviation != "DC"
+        benefit_sponsorable.sic_code if Settings.aca.state_abbreviation == "MA"
       end
 
       def rating_area
-        benefit_sponsorable.rating_area if Settings.aca.state_abbreviation != "DC"
+        benefit_sponsorable.rating_area if Settings.aca.state_abbreviation == "MA"
       end
 
       class << self
