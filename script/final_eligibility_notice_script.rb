@@ -2,16 +2,17 @@ include VerificationHelper
 
 puts "-------------------------------------- Start of rake: #{TimeKeeper.datetime_of_record} --------------------------------------" unless Rails.env.test?
 
-InitialEvents = []
+InitialEvents = ['final_eligibility_notice_renewal', 'final_eligibility_notice']
 
-unless ARGV[0].present? && ARGV[1].present?
-  raise "Please include mandatory arguments: File name and Event name. Example: rails runner script/final_eligibility_notice_script.rb <file_name> <event_name> <eligibility_kind>"
+unless ARGV[0].present? && ARGV[1].present? && ARGV[2].present?
+  raise "Please include mandatory arguments: File name and Event name. Example: rails runner script/final_eligibility_notice_script.rb <file_name> <event_name> <eligibility_kind> <file_path_to_exclude>"
 end
 
 begin
   file_name = ARGV[0]
   event_name = ARGV[1]
   eligibility_kind = ARGV[2]
+  excluded_list_file_path = ARGV[3]
   @data_hash = {}
   CSV.foreach(file_name,:headers =>true).each do |d|
     if @data_hash[d["ic_number"]].present?
@@ -104,10 +105,11 @@ def get_primary_person(members, subscriber)
 end
 
 #need to exlude this list from UQHP_FEL data set.
-if InitialEvents.include?(event)
+if InitialEvents.include?(event_name) && eligibility_kind.upcase == 'UQHP'
   @excluded_list = []
-  file_name = event == "final_eligibility_notice_uqhp" ? "final_fel_aqhp_data_set.csv" : "final_fre_aqhp_data_set.csv"
-  CSV.foreach(file_name, :headers => true).each do |d|
+  raise 'Please provide file path to exclude individuals from notice generation' unless excluded_list_file_path.present?
+
+  CSV.foreach(excluded_list_file_path, :headers => true).each do |d|
     @excluded_list << d["subscriber_id"]
   end
 end
@@ -116,7 +118,7 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
   csv << field_names
   @data_hash.each do |ic_number , members|
     begin
-      next if InitialEvents.include?(event) && members.any?{ |m| @excluded_list.include?(m["member_id"]) }
+      next if InitialEvents.include?(event_name) && members.any?{ |m| @excluded_list.include?(m["member_id"]) }
       subscriber = members.detect{ |m| m["dependent"].casecmp('NO').zero? }
       dependents = members.select{|m| m["dependent"].casecmp('YES').zero? }
       next if subscriber.nil?
@@ -132,6 +134,11 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
 
       consumer_role = primary_person.consumer_role
       if consumer_role.present?
+        if ((InitialEvents.include? event_name) || event_name == 'ivl_backlog_verification_notice_uqhp')
+          family = primary_person.primary_family
+          family.set_due_date_on_verification_types
+          family.update_attributes(min_verification_due_date: (family.min_verification_due_date_on_family || (TimeKeeper.date_of_record + 95.days)))
+        end
         @notifier = Services::NoticeService.new
         @notifier.deliver(
           recipient: consumer_role,
@@ -157,7 +164,7 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
         puts "Error for ic_number - #{ic_number} -- #{e}" unless Rails.env.test?
       end
     rescue Exception => e
-      puts "Unable to deliver #{event} notice to family - #{ic_number} due to the following error #{e.backtrace}" unless Rails.env.test?
+      puts "Unable to deliver #{event_name} notice to family - #{ic_number} due to the following error #{e.backtrace}" unless Rails.env.test?
     end
   end
 end
