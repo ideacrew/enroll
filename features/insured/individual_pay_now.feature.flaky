@@ -19,10 +19,10 @@ Feature: User should be able to pay for plan
     And I should be able to click  Leave DC Health LINK buttton
     And I should see an alert with error message
 
-  Examples:
-  | role          |
-  | consumer role |
-  | resident role |
+    Examples:
+      | role          |
+      | consumer role |
+      | resident role |
 
   Scenario Outline: Hbx Admin uploads and verifies application document
     Given the FAA feature configuration is disabled
