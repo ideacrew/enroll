@@ -51,7 +51,7 @@ module Notifier
 
       reason_for_ineligibility << "this person isn’t a resident of the District of Columbia. Go to healthcare.gov to learn how to apply for coverage in the right state." unless person.is_dc_resident?
       reason_for_ineligibility << "this person is currently serving time in jail or prison for a criminal conviction." if person.is_incarcerated
-      if lawful_presence_outstanding?(person)
+      if is_lawful_presence_outstanding?(person)
         reason_for_ineligibility << "this person doesn’t have an eligible immigration status,
                                   but may be eligible for a local medical assistance program
                                   called the DC Health Care Alliance. For more information, please
@@ -60,7 +60,7 @@ module Notifier
       reason_for_ineligibility
     end
 
-    def lawful_presence_outstanding?(person)
+    def is_lawful_presence_outstanding?(person)
       person.consumer_role.types_include_to_notices.include?('Citizenship')
     end
 

@@ -180,6 +180,10 @@ module Notifier
         enrollments.select { |enrollment| enrollment.coverage_year == coverage_year && enrollment.product.is_csr}
       end
 
+      def renewal_csr_enrollments_present?
+        renewal_csr_enrollments.present?
+      end
+
       def tax_hh_with_csr
         tax_households.reject{ |thh| thh.csr_percent_as_integer == 100}
       end

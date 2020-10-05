@@ -5,12 +5,13 @@ puts "-------------------------------------- Start of rake: #{TimeKeeper.datetim
 InitialEvents = []
 
 unless ARGV[0].present? && ARGV[1].present?
-  raise "Please include mandatory arguments: File name and Event name. Example: rails runner script/final_eligibility_notice_script.rb <file_name> <event_name>"
+  raise "Please include mandatory arguments: File name and Event name. Example: rails runner script/final_eligibility_notice_script.rb <file_name> <event_name> <eligibility_kind>"
 end
 
 begin
   file_name = ARGV[0]
-  event = ARGV[1]
+  event_name = ARGV[1]
+  eligibility_kind = ARGV[2]
   @data_hash = {}
   CSV.foreach(file_name,:headers =>true).each do |d|
     if @data_hash[d["ic_number"]].present?
@@ -33,14 +34,10 @@ field_names = %w(
       )
 
 report_name = if Rails.env.production?
-              "#{Rails.root}/#{event}_report_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv"
+              "#{Rails.root}/#{event_name}_#{eligibility_kind}_report_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv"
             else
-              "#{Rails.root}/spec/test_data/notices/#{event}_report_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv"
+              "#{Rails.root}/spec/test_data/notices/#{event_name}_#{eligibility_kind}_report_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv"
             end
-
-def notice_type(event)
-  event == 'final_eligibility_notice_uqhp' ? 'uqhp_projected_eligibility_notice_1' : 'aqhp_projected_eligibility_notice_2'
-end
 
 def valid_enrollments(person)
   renewing_hbx_enrollments = []
@@ -139,13 +136,13 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
         @notifier.deliver(
           recipient: consumer_role,
           event_object: consumer_role,
-          notice_event: 'final_eligibility_notice',
+          notice_event: event_name,
           notice_params: {
             primary_member: subscriber.to_hash,
             dependents: dependents.map(&:to_hash),
             active_enrollment_ids: active_enrollments.pluck(:hbx_id),
             renewing_enrollment_ids: renewing_enrollments.pluck(:hbx_id),
-            uqhp_event: notice_type(event)
+            uqhp_event: eligibility_kind
           }
         )
 

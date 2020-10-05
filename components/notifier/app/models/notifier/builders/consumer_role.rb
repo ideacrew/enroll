@@ -176,7 +176,11 @@ module Notifier
       end
 
       def renewal_csr_enrollments
-        enrollments.select { |enrollment| enrollment.product.is_csr }
+        merge_model.enrollments.select { |enrollment| enrollment.product.is_csr }
+      end
+
+      def renewal_csr_enrollments_present?
+        renewal_csr_enrollments.present?
       end
 
       # Renewing health product
@@ -366,37 +370,37 @@ module Notifier
 
       def dhs_unverified_individuals_present
         dhs_unverified_individuals
-        merge_model.dhs_unverified_individuals_present = dhs_unverified_individuals.present?
+        merge_model.dhs_unverified_individuals_present = merge_model.dhs_unverified_individuals.present?
       end
 
       def ssa_unverified_individuals_present
         ssa_unverified_individuals
-        merge_model.ssa_unverified_individuals_present = ssa_unverified_individuals.present?
+        merge_model.ssa_unverified_individuals_present = merge_model.ssa_unverified_individuals.present?
       end
 
       def immigration_unverified_individuals_present
         immigration_unverified_individuals
-        merge_model.immigration_unverified_individuals_present = immigration_unverified_individuals.present?
+        merge_model.immigration_unverified_individuals_present = merge_model.immigration_unverified_individuals.present?
       end
 
       def residency_inconsistency_individuals_present
         residency_inconsistency_individuals
-        merge_model.residency_inconsistency_individuals_present = residency_inconsistency_individuals.present?
+        merge_model.residency_inconsistency_individuals_present = merge_model.residency_inconsistency_individuals.present?
       end
 
       def american_indian_unverified_individuals_present
         american_indian_unverified_individuals
-        merge_model.american_indian_unverified_individuals_present = american_indian_unverified_individuals.present?
+        merge_model.american_indian_unverified_individuals_present = merge_model.american_indian_unverified_individuals.present?
       end
 
       def income_unverified_individuals_present
         income_unverified_individuals
-        merge_model.income_unverified_individuals_present = income_unverified_individuals.present?
+        merge_model.income_unverified_individuals_present = merge_model.income_unverified_individuals.present?
       end
 
       def mec_conflict_individuals_present
         mec_conflict_individuals
-        merge_model.mec_conflict_individuals_present = mec_conflict_individuals.present?
+        merge_model.mec_conflict_individuals_present = merge_model.mec_conflict_individuals.present?
       end
 
       def due_date
@@ -525,11 +529,11 @@ module Notifier
       end
 
       def aqhp_event
-        merge_model.aqhp_event =  payload['notice_params']['aqhp_event'] == 'aqhp_projected_eligibility_notice_2'
+        merge_model.aqhp_event = payload['notice_params']['aqhp_event'].upcase == 'AQHP'
       end
 
       def uqhp_event
-        merge_model.uqhp_event =  payload['notice_params']['uqhp_event'] == 'uqhp_projected_eligibility_notice_1'
+        merge_model.uqhp_event = payload['notice_params']['uqhp_event'].upcase == 'UQHP'
       end
 
       def primary_member_present
@@ -696,7 +700,7 @@ module Notifier
       end
 
       def uqhp_notice?
-        payload['notice_params']['uqhp_event'] == 'uqhp_projected_eligibility_notice_1'
+        payload['notice_params']['uqhp_event'].upcase == 'UQHP'
       end
 
       def primary_nil?

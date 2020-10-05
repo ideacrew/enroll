@@ -37,19 +37,19 @@ module Notifier
         if uqhp
           [person.first_name.titleize, person.last_name.titleize, person.age_on(TimeKeeper.date_of_record)]
         else
-          [person['first_name'].titleize, person['last_name'].titleize, calculate_age_by_dob(Date.strptime(datum["dob"], '%m/%d/%Y')), person['mec_type_1'], person['mec_type_2']]
+          [person['first_name'].titleize, person['last_name'].titleize, calculate_age_by_dob(Date.strptime(person["dob"], '%m/%d/%Y')), person['mec_type_1'], person['mec_type_2']]
         end
 
       Notifier::MergeDataModels::Dependent.new({ first_name: first_name, last_name: last_name, due_date: due_date, age: age, mec_type_2: mec_type_2, mec_type_1: mec_type_1})
     end
 
-    def outstanding_verification_types(person)
+    def outstanding_verifications(person)
       person.consumer_role.outstanding_verification_types.map(&:type_name)
     end
 
     def ssn_outstanding?(person, uqhp)
       if uqhp
-        outstanding_verification_types(person).include?("Social Security Number")
+        outstanding_verifications(person).include?("Social Security Number")
       else
         person["ssn_doc_needed"].try(:upcase) == "Y"
       end
@@ -57,7 +57,7 @@ module Notifier
 
     def lawful_presence_outstanding?(person, uqhp)
       if uqhp
-        outstanding_verification_types(person).include?('Citizenship')
+        outstanding_verifications(person).include?('Citizenship')
       else
         person["citizenship_doc_needed"].try(:upcase) == "Y"
       end
@@ -65,7 +65,7 @@ module Notifier
 
     def immigration_status_outstanding?(person, uqhp)
       if uqhp
-        outstanding_verification_types(person).include?('Immigration status')
+        outstanding_verifications(person).include?('Immigration status')
       else
         person["immigration_doc_needed"].try(:upcase) == "Y"
       end
@@ -74,13 +74,13 @@ module Notifier
     def american_indian_status_outstanding?(person, uqhp)
       return false unless uqhp
 
-      outstanding_verification_types(person).include?('American Indian Status')
+      outstanding_verifications(person).include?('American Indian Status')
     end
 
     def residency_outstanding?(person, uqhp)
       return false unless uqhp
 
-      outstanding_verification_types(person).include?('DC Residency')
+      outstanding_verifications(person).include?('DC Residency')
     end
 
     def income_outstanding?(person, uqhp)
@@ -99,7 +99,7 @@ module Notifier
       uqhp_notice ? uqhp_citizen_status(status) : aqhp_citizen_status(status)
     end
 
-    def enrollments(family)
+    def enrollments_by_family(family)
       HbxEnrollment.where(family_id: family.id, :aasm_state.nin => ['coverage_canceled', 'shopping', 'inactive', 'coverage_terminated']).select do |hbx_enrollment|
         !hbx_enrollment.is_shop? && (hbx_enrollment.terminated_on.blank? || hbx_enrollment.terminated_on >= TimeKeeper.date_of_record)
       end
@@ -109,16 +109,17 @@ module Notifier
       outstanding_people = []
       return outstanding_people unless family
 
-      enrollments(family).inject([]) do |family_members, enrollment|
-        family_members << enrollment.hbx_enrollment_members.map(&:family_member)
+      family_members = enrollments_by_family(family).flatten.compact.inject([]) do |members, enrollment|
+        members << enrollment.hbx_enrollment_members.map(&:family_member)
       end.uniq
 
-      people = family_members.map(&:person).uniq
-      people.each do |person|
+      people = family_members.flatten.map(&:person).uniq
+      people.compact.each do |person|
         outstanding_people << person if person.consumer_role.outstanding_verification_types.present?
       end
 
       outstanding_people.uniq!
+      outstanding_people
     end
   end
 end
