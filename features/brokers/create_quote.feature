@@ -1,8 +1,8 @@
 @quoting_enabled
 Feature: Create Employee Roster
-  In order for Brokers to give a quote to employers
-  The Broker should be able to add emloyees
-  And Generate a quote
+    In order for Brokers to give a quote to employers
+    The Broker should be able to add emloyees
+    And Generate a quote
 
   Scenario: Broker should be able to add employee to employee roster
     Given that a broker exists
@@ -15,6 +15,7 @@ Feature: Create Employee Roster
     When the broker clicks on the Save Changes button
     Then the broker should see a successful message
 
+  @broken
   Scenario: Broker should be able to add employees to the employee roster using Upload Employee Roster button
     Given that a broker exists
     And the broker is signed in
@@ -47,7 +48,7 @@ Feature: Create Employee Roster
     And the broker clicks Delete Quote
     Then the quote should be deleted
     And Broker logs out
-    
+
   Scenario: Broker should be able to assign benefit group to a family
     Given that a broker exists
     And the broker is signed in
@@ -60,7 +61,8 @@ Feature: Create Employee Roster
     And the broker saves the quote
     And Broker logs out
 
-  @quoting_enabled
+  # @quoting_enabled
+  @broken
   Scenario: Broker should create a quote with health and dental plans
     Given that a broker exists
     And the Plans exist

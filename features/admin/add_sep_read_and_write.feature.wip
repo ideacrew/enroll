@@ -18,4 +18,4 @@ Feature: Add Sep with read and write permissions
 #  Scenario: Click on Terminate Enrollment
 #    Then the Terminate Enrollment option should be enabled
 
-  #TODO: Need to a similar test for the Edit APTC/CSR link when APTC functionality is implemented
+#TODO: Need to a similar test for the Edit APTC/CSR link when APTC functionality is implemented

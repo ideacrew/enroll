@@ -1,3 +1,3 @@
-default: --format pretty --strict --tags 'not @wip' --tags 'not @more_than_sole_source' --tags 'not @flaky' -r features --profile semaphoreci
+default: --format pretty --fail-fast --retry 1 --order random --strict --tags 'not @wip and not @broken' -r features --profile semaphoreci
 everything: --format pretty --strict -r features
-semaphoreci: --format pretty --strict --tags 'not @wip' --tags 'not @more_than_sole_source' --tags 'not @flaky' -r features
+semaphoreci: -q

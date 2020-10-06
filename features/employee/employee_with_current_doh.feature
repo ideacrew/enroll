@@ -1,7 +1,7 @@
-Feature: Employee with past date of hire
+Feature: Employee with current date of hire
     In order for the New Employee to purchase insurance
     Given Employer exists with active plan year
-    Given New Employee is on the Census Employee Roster with past date as DOH and roster entry date as today
+    Given New Employee is on the Census Employee Roster
     Given New Employee does not have a pre-existing person
     Then New Employee should be able to match Employer
     And Employee should be able to purchase Insurance
@@ -15,9 +15,9 @@ Feature: Employee with past date of hire
     And Acme Inc. employer has a staff role
     And there is a census employee record for Patrick Doe for employer Acme Inc.
 
-  Scenario: New hire has enrollment period based on roster entry date
+  Scenario: New hire has enrollment period based on hired date
     Given staff role person logged in
-    And Employee has past hired on date
+    And Employee has current hired on date
     And Acme Inc. employer visit the Employee Roster
     Then Employer logs out
     Given Employee has not signed up as an HBX user
@@ -40,6 +40,10 @@ Feature: Employee with past date of hire
     Then Employee tries to complete purchase of another plan
     Then Employee should see the "my account" page
 
+    Given Acme Inc. eligibility rule has been set to first of the month following date of hire
+    Then Employee tries to complete purchase of another plan
+    Then Employee should see the "my account" page
+
     Given Acme Inc. eligibility rule has been set to first of month following 30 days
     Then Employee tries to complete purchase of another plan
     Then Employee should see the "my account" page
@@ -47,3 +51,10 @@ Feature: Employee with past date of hire
     Given Acme Inc. eligibility rule has been set to first of month following 60 days
     Then Employee tries to complete purchase of another plan
     Then Employee should see the "my account" page
+
+# Requires further testing if follwing still works in the same way:
+# Given Acme Inc. eligibility rule has been set to first of month following or coinciding with date of hire
+# Given Employee new hire enrollment window is closed
+# When Employee clicks "Shop for Plans" on my account page
+# When Employee clicks continue on the group selection page
+# Then Employee should see "may not enroll until eligible" error message

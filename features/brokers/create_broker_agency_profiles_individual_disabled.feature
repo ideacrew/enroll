@@ -22,7 +22,7 @@ Feature: Create Primary Broker and Broker Agency
     And Primary Broker enters office location for default_office_location
     Then Primary Broker should see broker registration successful message
 
-  @more_than_sole_source
+  @broken
   Scenario: Primary Broker has not signed up on the HBX
     When Primary Broker visits the HBX Broker Registration form
     Given a valid ach record exists
