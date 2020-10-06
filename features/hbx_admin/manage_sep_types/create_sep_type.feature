@@ -89,6 +89,7 @@ Feature: Admin has ability to create a new SEP Type
       | shop        | not selected |
       | fehb        | not selected |
 
+  @flaky
   Scenario: Admin should see failure when creating SEP type with past start date
     Given Admin can navigate to the Manage SEPs screen
     When Admin clicks on the Create SEP Type button

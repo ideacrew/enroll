@@ -1,9 +1,9 @@
 name: cucumber report
 on:
-  push
-  # schedule:
-  #   # every monday at 4am
-  #   - cron: '0 4 * * 1'
+  # push
+  schedule:
+    # every monday at 4am
+    - cron: '0 4 * * 1'
 
 jobs:
   cucumber-report:
