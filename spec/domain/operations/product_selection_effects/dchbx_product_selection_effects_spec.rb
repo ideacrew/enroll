@@ -15,16 +15,16 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
   let(:consumer_role) { FactoryBot.create(:consumer_role) }
   let(:hbx_profile) do
     FactoryBot.create(
-      :hbx_profile,
-      :normal_ivl_open_enrollment,
-      coverage_year: coverage_year
+        :hbx_profile,
+        :normal_ivl_open_enrollment,
+        coverage_year: coverage_year
     )
   end
   let(:benefit_package) { benefit_coverage_period.benefit_packages.first }
   let(:benefit_coverage_period) do
     hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect do |bcp|
       (bcp.start_on.year == coverage_year) &&
-        bcp.start_on > bcp.open_enrollment_start_on
+          bcp.start_on > bcp.open_enrollment_start_on
     end
   end
   let(:family) {FactoryBot.create(:family, :with_primary_family_member, person: consumer_role.person)}
@@ -33,11 +33,11 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
   end
   let(:ivl_enrollment) do
     FactoryBot.create(
-      :hbx_enrollment,
-      :individual_unassisted,
-      household: family.active_household,
-      effective_on: Date.new(coverage_year, 11, 1),
-      family: family
+        :hbx_enrollment,
+        :individual_unassisted,
+        household: family.active_household,
+        effective_on: Date.new(coverage_year, 11, 1),
+        family: family
     )
   end
 
@@ -71,23 +71,23 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
   let(:consumer_role) { FactoryBot.create(:consumer_role) }
   let(:hbx_profile) do
     FactoryBot.create(
-      :hbx_profile,
-      :normal_ivl_open_enrollment,
-      coverage_year: coverage_year
+        :hbx_profile,
+        :normal_ivl_open_enrollment,
+        coverage_year: coverage_year
     )
   end
   let(:benefit_package) { benefit_coverage_period.benefit_packages.first }
   let(:benefit_coverage_period) do
     hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect do |bcp|
       (bcp.start_on.year == coverage_year) &&
-        bcp.start_on > bcp.open_enrollment_start_on
+          bcp.start_on > bcp.open_enrollment_start_on
     end
   end
   let(:family) do
     FactoryBot.create(
-      :family,
-      :with_primary_family_member,
-      person: consumer_role.person
+        :family,
+        :with_primary_family_member,
+        person: consumer_role.person
     )
   end
   let(:product) do
@@ -105,14 +105,14 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
   end
   let(:ivl_enrollment) do
     FactoryBot.create(
-      :hbx_enrollment,
-      :individual_unassisted,
-      :with_enrollment_members,
-      enrollment_members: family.family_members,
-      household: family.active_household,
-      effective_on: Date.new(coverage_year, 11, 1),
-      family: family,
-      product: product
+        :hbx_enrollment,
+        :individual_unassisted,
+        :with_enrollment_members,
+        enrollment_members: family.family_members,
+        household: family.active_household,
+        effective_on: Date.new(coverage_year, 11, 1),
+        family: family,
+        product: product
     )
   end
 
