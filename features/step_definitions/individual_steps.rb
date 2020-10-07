@@ -54,6 +54,8 @@ end
 
 And(/user should see your information page$/) do
   expect(page).to have_content("Your Information")
+  expect(page).to have_content("View Privacy Act statement")
+  expect(page).to have_content("By selecting CONTINUE")
   expect(page).to have_content("CONTINUE")
   click_link "CONTINUE"
   sleep 5
@@ -80,6 +82,7 @@ end
 
 Then(/^.+ should see heading labeled personal information/) do
   expect(page).to have_content("Personal Information")
+  expect(page).to have_css("#gender-tooltip")
 end
 
 Then(/Individual should click on Individual market for plan shopping/) do
@@ -101,7 +104,16 @@ Then(/Individual should see a form to enter personal information$/) do
   find(:xpath, '//*[@id="address_info"]/div/div[3]/div[2]/div/div[2]/span').click
   first('li', :text => 'DC', wait: 5).click
   fill_in "person[addresses_attributes][0][zip]", :with => "20002"
-
+  expect(page).to have_css("#home_address_tooltip")
+  expect(page).to have_content("Enter your personal information and answer the following questions")
+  expect(page).to have_content("Is this person a US citizen or US national")
+  expect(page).to have_content("Is this person a naturalized citizen")
+  expect(page).to have_content("Is this person a member of an American Indian")
+  expect(page).to have_content("Is this person currently incarcerated")
+  expect(page).to have_content("What is your race/ethnicity? (OPTIONAL - check all that apply)")
+  expect(page).to have_content("If Hispanic/Latino/a, ethnicity (OPTIONAL - check all that apply.)")
+  expect(page).to have_css("#us_citizen", visible: false)
+  expect(page).to have_css("#is_incarcerated", visible: false)
   sleep 2
   screenshot("personal_form")
 end
@@ -146,16 +158,16 @@ end
 
 Then(/selects i94 unexpired foreign passport document and fills required details (.*)$/) do |correct_or_incorrect|
   find('.label', :text => 'Select document type', wait: 10).click
-  find('li', :text => "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport", match: :prefer_exact, wait: 10).click
+  find('li', :text => "I-94 – Arrival/departure record in unexpired foreign passport", match: :prefer_exact, wait: 10).click
   fill_in 'I 94 Number', with: (correct_or_incorrect == 'correctly' ? '123456789a1' : '@23#5678901')
   fill_in 'Passport Number', with: 'A123456'
-  fill_in 'Visa number', with: 'V1234567'
+  fill_in 'Visa Number', with: 'V1234567'
   step 'should fill in valid sevis, passport expiration_date, tribe_member and incarcerated details'
 end
 
 Then(/selects Other With I-94 Number document and fills required details (.*)$/) do |correct_or_incorrect|
   find('.label', :text => 'Select document type', wait: 10).click
-  find('li', :text => 'Other (With I-94 Number)', match: :prefer_exact, wait: 10).click
+  find('li', :text => 'Other (with I-94 number)', match: :prefer_exact, wait: 10).click
   fill_in 'I 94 Number', with: (correct_or_incorrect == 'correctly' ? '123456789a1' : '@23#5678901')
   fill_in 'Passport Number', with: 'A123456'
   fill_in 'Document Description', with: 'Other With I94 Number'
@@ -181,7 +193,7 @@ end
 
 Then(/select I-551 doc and fill details/) do
   find('.label', :text => 'Select document type', wait: 10).click
-  find('li', :text => 'I-551 (Permanent Resident Card)', wait: 10).click
+  find('li', :text => 'I-551 – Permanent resident card', wait: 10).click
   fill_in 'Alien Number', with: '987654323'
   fill_in 'Card Number', with: 'aaa1231231231'
   fill_in 'I-551 Expiration Date', with: TimeKeeper.date_of_record.to_s
@@ -202,7 +214,7 @@ When(/click eligible immigration status yes/) do
 end
 
 Then(/should find I-551 doc type/) do
-  find('.label', :text => 'I-551 (Permanent Resident Card)', wait: 10)
+  find('.label', :text => 'I-551 – Permanent resident card', wait: 10)
 end
 
 And(/should find alien number/) do
@@ -241,6 +253,7 @@ end
 Then(/^\w+ agrees? to the privacy agreeement/) do
   wait_for_ajax
   expect(page).to have_content('Authorization and Consent')
+  expect(page).to have_content('US Department of Health and Human Services (HHS).')
   find(:xpath, '//label[@for="agreement_agree"]').click
   click_link "Continue"
   sleep 2
@@ -254,6 +267,7 @@ end
 
 Then(/^\w+ should see identity verification page and clicks on submit/) do
   expect(page).to have_content('Verify Identity')
+  expect(page).to have_content("When you're finished, select SUBMIT.")
   find(:xpath, '//label[@for="interactive_verification_questions_attributes_0_response_id_a"]', wait: 5).click
   find(:xpath, '//label[@for="interactive_verification_questions_attributes_1_response_id_c"]', wait: 5).click
   screenshot("identify_verification")
@@ -360,13 +374,13 @@ And(/I click on log out link$/) do
   find('.interaction-click-control-logout').click
 end
 
-And(/^.+ click on sign in existing account$/) do
+And(/^.+ click on Sign In$/) do
   expect(page).to have_content "Welcome to the District's Health Insurance Marketplace"
 end
 
 And(/I signed in$/) do
   sleep 2
-  find('.btn-link', :text => 'Sign In Existing Account', wait: 5).click
+  find('.btn-link', :text => 'Sign In', wait: 5).click
   sleep 5
   fill_in "user[login]", :with => "testflow@test.com"
   fill_in "user[password]", :with => "aA1!aA1!aA1!"
@@ -386,7 +400,7 @@ end
 
 And(/Aptc user signed in$/) do
   sleep 2
-  find('.btn-link', :text => 'Sign In Existing Account', wait: 5).click
+  find('.btn-link', :text => 'Sign In', wait: 5).click
   sleep 5
   fill_in "user[login]", :with => "aptc@dclink.com"
   fill_in "user[password]", :with => "aA1!aA1!aA1!"
@@ -603,7 +617,7 @@ When(/^\w+ visits the Consumer portal$/i) do
 end
 
 When(/^(\w+) signs in$/) do |person|
-  click_link 'Sign In Existing Account'
+  click_link 'Sign In'
   fill_in 'user[login]', with: (@u.find 'email' + person)
   find('#user_email').set(@u.find 'email' + person)
   fill_in 'user[password]', with: "aA1!aA1!aA1!"
