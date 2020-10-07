@@ -4,6 +4,7 @@ Feature: Create Employee Roster
     The Broker should be able to add emloyees
     And Generate a quote
 
+  @broken
   Scenario: Broker should be able to add employee to employee roster
     Given that a broker exists
     And the broker is signed in
@@ -61,7 +62,6 @@ Feature: Create Employee Roster
     And the broker saves the quote
     And Broker logs out
 
-  # @quoting_enabled
   @broken
   Scenario: Broker should create a quote with health and dental plans
     Given that a broker exists
