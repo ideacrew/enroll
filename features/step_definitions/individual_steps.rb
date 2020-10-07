@@ -6,6 +6,8 @@ When(/^\w+ visits? the Insured portal during open enrollment$/) do
   FactoryBot.create(:qualifying_life_event_kind, :effective_on_event_date_and_first_month, market_kind: "individual")
   BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
   screenshot("individual_start")
+  r_id = BenefitMarkets::Products::Product.all.where(title:  "IVL Test Plan Bronze")[1].id.to_s
+  BenefitMarkets::Products::Product.all.where(title:  "IVL Test Plan Bronze")[0].update_attributes!(renewal_product_id: r_id)
 end
 
 When(/^\w+ visits? the Insured portal outside of open enrollment$/) do
@@ -208,7 +210,7 @@ And(/should find alien number/) do
 end
 
 And(/Individual edits dependent/) do
-  find('.fa-edit').click
+  find(:xpath, './html/body/div[3]/div[2]/div/div/div[2]/div[4]/ul/li/div/div[2]/div[4]/div/div/a').click
   wait_for_ajax
 end
 
@@ -260,8 +262,18 @@ Then(/^\w+ should see identity verification page and clicks on submit/) do
   click_link "Continue Application"
 end
 
+Then(/\w+ should be on the Help Paying for Coverage page/) do
+  expect(page).to have_content("Help Paying for Coverage")
+end
+
+Then(/\w+ does not apply for assistance and clicks continue/) do
+  find(:xpath, '//label[@for="radio2"]').click
+  find('.interaction-click-control-continue').click
+end
+
 Then(/\w+ should see the dependents form/) do
-  expect(page).to have_content('Add Member')
+  #expect(page).to have_content('Add Member')
+  expect(page).to have_content('Add New Person')
   screenshot("dependents")
 end
 
@@ -274,8 +286,8 @@ And(/Individual clicks on add member button/) do
   fill_in "jq_datepicker_ignore_dependent[dob]", :with => @u.adult_dob
   click_link(@u.adult_dob.to_date.day)
   fill_in "dependent[ssn]", :with => @u.ssn
-  find('.label', :text => 'This Person Is', :wait => 10).click
-  find(:xpath, '//*[@id="new_dependent"]/div[1]/div[4]/div[1]/div[1]/div[3]/div/ul/li[3]').click
+  find("span", :text => "choose").click
+  find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Sibling')]").click
   find(:xpath, '//label[@for="radio_female"]').click
   find(:xpath, '//label[@for="dependent_us_citizen_true"]').click
   find(:xpath, '//label[@for="dependent_naturalized_citizen_false"]').click
@@ -294,8 +306,8 @@ And(/Individual again clicks on add member button/) do
   fill_in "jq_datepicker_ignore_dependent[dob]", :with => '01/15/2013'
   click_link('15')
   fill_in 'dependent[ssn]', :with => @u.ssn
-  find('.label', :text => 'This Person Is', :wait => 10).click
-  find(:xpath, '//*[@id="new_dependent"]/div[1]/div[4]/div[1]/div[1]/div[3]/div/ul/li[4]').click
+  find("span", :text => "choose").click
+  find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Sibling')]").click
   find(:xpath, '//label[@for="radio_female"]').click
   find(:xpath, '//label[@for="dependent_us_citizen_true"]').click
   find(:xpath, '//label[@for="dependent_naturalized_citizen_false"]').click
@@ -372,6 +384,15 @@ Then(/I click on back to my account$/) do
   find('.interaction-click-control-back-to-my-account').click
 end
 
+And(/Aptc user signed in$/) do
+  sleep 2
+  find('.btn-link', :text => 'Sign In Existing Account', wait: 5).click
+  sleep 5
+  fill_in "user[login]", :with => "aptc@dclink.com"
+  fill_in "user[password]", :with => "aA1!aA1!aA1!"
+  find('.sign-in-btn').click
+end
+
 And(/^I click on continue button on group selection page$/) do
   click_button 'CONTINUE', :wait => 10
 end
@@ -408,7 +429,7 @@ And(/I should see the individual home page/) do
 end
 
 Then(/^Individual edits a dependents address$/) do
-  click_link 'Add Member'
+  click_link 'Add New Person'
 end
 
 Then(/^Individual fills in the form$/) do
@@ -416,9 +437,9 @@ Then(/^Individual fills in the form$/) do
   fill_in 'dependent[last_name]', :with => (@u.last_name :last_name)
   fill_in 'jq_datepicker_ignore_dependent[dob]', :with => (@u.adult_dob :dob)
   click_link(@u.adult_dob.to_date.day)
-  click_outside_datepicker('Household Info: Family Members')
+  click_outside_datepicker("#{l10n('family_information')}")
   fill_in 'dependent[ssn]', :with => (@u.ssn :ssn)
-  find('.label', :text => 'This Person Is', :wait => 10).click
+  find("span", :text => "choose").click
   find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Sibling')]").click
   find(:xpath, '//label[@for="radio_male"]').click
   find(:xpath, '//label[@for="dependent_us_citizen_true"]').click
@@ -472,7 +493,7 @@ end
 
 Then(/Individual asks for help$/) do
   expect(page).to have_content "Help"
-  find('.container .row div div.btn', text: 'Help').click
+  find('.container div.btn', text: 'Help').click
   wait_for_ajax
   expect(page).to have_content "Help"
   find(:id => "CSR", :wait => 10).click
@@ -659,6 +680,7 @@ Then(/^Aptc user goes to register as individual/) do
 end
 
 Then(/^Aptc user should see a form to enter personal information$/) do
+  sleep 1
   step "Individual should see a form to enter personal information"
   screenshot("aptc_personal")
   find('.btn', text: 'CONTINUE').click
@@ -743,4 +765,23 @@ end
 
 When("consumer visits home page") do
   visit "/families/home"
+end
+
+When(/^\w+ checks? the Insured portal open enrollment dates$/) do
+  current_day = TimeKeeper.date_of_record
+  if (Date.new(current_day.year - 1, 11, 1)..Date.new(current_day.year, 1, 31)).include?(current_day)
+    expect(page).to have_content "Confirm Your Plan Selection"
+  else
+    next_year_date = current_day.next_year
+    bcp = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.first
+    bcp.update_attributes!(open_enrollment_start_on: Date.new(current_day.year - 1, 11, 1),
+                           open_enrollment_end_on: Date.new(current_day.year, 1, 31))
+    successor_bcp = bcp.successor
+    successor_bcp.update_attributes!(open_enrollment_start_on: (current_day - 10.days),
+                                     open_enrollment_end_on: Date.new(next_year_date.year, 1, 31))
+  end
+end
+
+Then("I should see a new renewing enrollment title on home page") do
+  expect(page).to have_content "Auto Renewing"
 end

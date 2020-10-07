@@ -6,6 +6,7 @@ Feature: Admin has ability to sort SEP Types on Sort SEPs Page and save their po
     Given that a user with a HBX staff role with hbx_tier3 subrole exists
     When Hbx Admin logs on to the Hbx Portal
     Given the Admin is on the Main Page
+    And the FAA feature configuration is enabled
     And Qualifying life events of all markets are present
     And the Admin will see the Manage SEPs under admin dropdown
     And Admin can click Manage SEPs link
@@ -57,6 +58,8 @@ Feature: Admin has ability to sort SEP Types on Sort SEPs Page and save their po
     Then Individual sees previously saved address
     Then Individual agrees to the privacy agreeement
     Then Individual should see identity verification page and clicks on submit
+    Then Individual should be on the Help Paying for Coverage page
+    Then Individual does not apply for assistance and clicks continue
     Then Individual should see the dependents form
     And I click on continue button on household info form
     When I click on none of the situations listed above apply checkbox

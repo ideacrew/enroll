@@ -2,6 +2,7 @@ Feature: plan shopping with mixed household determination
 
   Background: Consumer work flow while plan shopping for mixed household determinations
     Given Individual has not signed up as an HBX user
+    When the FAA feature configuration is enabled
     When Individual visits the Insured portal during open enrollment
     Then Individual creates a new HBX account
     Then I should see a successful sign up message
@@ -13,6 +14,8 @@ Feature: plan shopping with mixed household determination
     Then Individual sees previously saved address
     Then Individual agrees to the privacy agreeement
     Then Individual should see identity verification page and clicks on submit
+    Then Individual should be on the Help Paying for Coverage page
+    Then Individual does not apply for assistance and clicks continue
     Then Individual should see the dependents form
     And Individual clicks on add member button
     And Individual clicks on confirm member

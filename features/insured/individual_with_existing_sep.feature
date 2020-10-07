@@ -2,6 +2,7 @@ Feature: Consumer shops for plan with existing seps
 
   Scenario: Consumer work flow if he selects existing sep
     Given Individual has not signed up as an HBX user
+    When the FAA feature configuration is enabled
     When Individual visits the Insured portal outside of open enrollment
     Then Individual creates a new HBX account
     Then I should see a successful sign up message
@@ -18,6 +19,8 @@ Feature: Consumer shops for plan with existing seps
     Then Individual sees previously saved address
     Then Individual agrees to the privacy agreeement
     Then Individual should see identity verification page and clicks on submit
+    Then Individual should be on the Help Paying for Coverage page
+    Then Individual does not apply for assistance and clicks continue
     Then Individual should see the dependents form
     And I click on continue button on household info form
     When I click the "Married" in qle carousel

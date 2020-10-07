@@ -177,7 +177,7 @@ function validationForIndianTribeMember() {
       return true;
     }
     if (!$("input#indian_tribe_member_yes").is(':checked') && !$("input#indian_tribe_member_no").is(':checked')) {
-      alert("Please select the option for 'Are you a member of an American Indian or Alaskan Native tribe?'");
+      alert("Please select the option for 'Are you a member of an American Indian or Alaska Native Tribe?'");
       e.preventDefault && e.preventDefault();
       return false;
     };
@@ -361,6 +361,10 @@ var PersonValidations = (function(window, undefined) {
 })(window);
 
 $(document).on('turbolinks:load', function () {
+  demographicValidations();
+});
+
+function demographicValidations(){
   applyListeners();
   validationForIndianTribeMember();
 
@@ -373,4 +377,4 @@ $(document).on('turbolinks:load', function () {
   });
 
   isApplyingCoverage("person");
-});
+}
