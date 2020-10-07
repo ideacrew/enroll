@@ -238,7 +238,7 @@ private
 
   def validate_address_params(same_with_primary, address_params)
     return [] if same_with_primary == 'true'
-    
+
     errors_array = []
     clean_address_params = address_params.reject{|_key, value| value[:address_1].blank? && value[:city].blank? && value[:state].blank? && value[:zip].blank?}
     clean_address_params.to_h.each do |key, value|
