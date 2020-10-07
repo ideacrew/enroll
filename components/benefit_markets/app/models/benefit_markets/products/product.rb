@@ -183,21 +183,29 @@ module BenefitMarkets
     end
 
     def min_cost_for_application_period(effective_date)
-      p_tables = premium_tables.effective_period_cover(effective_date)
-      if premium_tables.any?
-        p_tables.flat_map(&:premium_tuples).select do |pt|
-          pt.age == premium_ages.min
-        end.min_by { |pt| pt.cost }.cost
-      end
+      BenefitMarkets::Products::Product.collection.aggregate([
+                                    {'$match' => {'_id' => id}},
+                                    {'$unwind' => '$premium_tables'},
+                                    {'$match' => {'premium_tables.effective_period.min' => {'$lte' => effective_date}}},
+                                    {'$match' => {'premium_tables.effective_period.max' => {'$gte' => effective_date}}},
+                                    {'$unwind' => '$premium_tables.premium_tuples'},
+                                    {'$match' => {'premium_tables.premium_tuples.age' => {'$eq' => premium_ages.min}}},
+                                    {'$group' => {'_id' => 0, 'cost' => {'$min' => '$premium_tables.premium_tuples.cost'}}},
+                                    {'$project' => {'_id' => 0}}
+                                ], :allow_disk_use => true).to_a.first['cost']
     end
 
     def max_cost_for_application_period(effective_date)
-      p_tables = premium_tables.effective_period_cover(effective_date)
-      if premium_tables.any?
-        p_tables.flat_map(&:premium_tuples).select do |pt|
-          pt.age == premium_ages.min
-        end.max_by { |pt| pt.cost }.cost
-      end
+      BenefitMarkets::Products::Product.collection.aggregate([
+                                    {'$match' => {'_id' => id}},
+                                    {'$unwind' => '$premium_tables'},
+                                    {'$match' => {'premium_tables.effective_period.min' => {'$lte' => effective_date}}},
+                                    {'$match' => {'premium_tables.effective_period.max' => {'$gte' => effective_date}}},
+                                    {'$unwind' => '$premium_tables.premium_tuples'},
+                                    {'$match' => {'premium_tables.premium_tuples.age' => {'$eq' => premium_ages.min}}},
+                                    {'$group' => {_id: 0, cost: {'$max' => '$premium_tables.premium_tuples.cost'}}},
+                                    {'$project' => {'_id' => 0}}
+                                ], :allow_disk_use => true).to_a.first['cost']
     end
 
     def cost_for_application_period(application_period)
