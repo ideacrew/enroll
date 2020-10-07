@@ -300,6 +300,30 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
       end
     end
 
+    context 'Address attributes' do
+      let(:valid_addresses_attributes) { {"0"=>{"kind"=>"home", "address_1"=>"address1_a", "address_2"=>"", "city"=>"city1", "state"=>"DC", "zip"=>"22211"},
+                                          "1"=>{"kind"=>"mailing", "address_1"=>"address1_b", "address_2"=>"", "city"=>"city1", "state"=>"DC", "zip"=>"22211" } } }
+      let(:invalid_addresses_attributes) { {"0"=>{"kind"=>"home", "address_1"=>"address1_a", "address_2"=>"", "city"=>"city1", "state"=>"DC", "zip"=>"222"},
+                                            "1"=>{"kind"=>"mailing", "address_1"=>"test", "address_2"=>"", "city"=>"test", "state"=>"DC", "zip"=>"223"} } }
+
+      it "should not update existing person with invalid addresses" do
+        person_params[:addresses_attributes] = invalid_addresses_attributes
+        allow(controller).to receive(:update_vlp_documents).and_return(true)
+        put :update, params: { person: person_params, id: "test" }
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template(:edit)
+        expect(person.errors.full_messages).to include 'Home address: zip should be in the form: 12345 or 12345-1234'
+      end
+
+      it "should update existing person with valid addresses" do
+        person_params[:phones_attributes] = valid_addresses_attributes
+        allow(controller).to receive(:update_vlp_documents).and_return(true)
+        put :update, params: { person: person_params, id: "test" }
+        expect(response).to have_http_status(:redirect)
+        expect(response).to redirect_to(ridp_agreement_insured_consumer_role_index_path)
+      end
+    end
+
     context "updates active employee roles if active employee roles are present for dual roles" do
       before :each do
         allow(controller).to receive(:update_vlp_documents).and_return(true)
