@@ -16,6 +16,10 @@
         </div>
       <% end %>
 
+      <% if @address_errors.present? %>
+        <%= render partial: 'shared/address_error_messages', locals: {address_errors: @address_errors} %>
+      <% end %>
+
       <%= token_tag form_authenticity_token %>
 
       <div class="house col-md-12 col-sm-12 col-xs-12 no-pd">
