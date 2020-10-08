@@ -137,7 +137,7 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
         if ((InitialEvents.include? event_name) || event_name == 'ivl_backlog_verification_notice_uqhp')
           family = primary_person.primary_family
           family.set_due_date_on_verification_types
-          family.update_attributes(min_verification_due_date: (family.min_verification_due_date_on_family || (TimeKeeper.date_of_record + 95.days)))
+          family.update_attributes!(min_verification_due_date: (family.min_verification_due_date_on_family || (TimeKeeper.date_of_record + 95.days)))
         end
         @notifier = Services::NoticeService.new
         @notifier.deliver(
