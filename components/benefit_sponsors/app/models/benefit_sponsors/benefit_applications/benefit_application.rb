@@ -490,7 +490,9 @@ module BenefitSponsors
     end
 
     def is_renewing?
-      predecessor.present? && (APPLICATION_APPROVED_STATES + APPLICATION_DRAFT_STATES + ENROLLING_STATES + ENROLLMENT_ELIGIBLE_STATES + ENROLLMENT_INELIGIBLE_STATES).include?(aasm_state)
+      required_states = (APPLICATION_APPROVED_STATES + APPLICATION_DRAFT_STATES + ENROLLING_STATES + ENROLLMENT_ELIGIBLE_STATES )
+      applications = sponsor_profile.benefit_applications.where(:"effective_period.min".gt => effective_period.min, :"aasm_state".in => required_states + [:active, :expired])
+      predecessor.present? && (required_states + ENROLLMENT_INELIGIBLE_STATES).include?(aasm_state) && !(applications.count > 0)
     end
 
     def is_renewal_enrolling?
@@ -1032,6 +1034,10 @@ module BenefitSponsors
       minimum_participation || system_min_participation_default_for(start_on)
     rescue ResourceRegistry::Error::FeatureNotFoundError
       system_min_participation_default_for(start_on)
+    end
+
+    def all_waived_member_count
+      active_census_employees_under_py.select { |census_employee| census_employee.is_waived_under?(self)}.count
     end
 
     def eligible_for_export?

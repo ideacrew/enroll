@@ -560,6 +560,8 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
         let(:application) {double(:start_on => TimeKeeper.date_of_record.beginning_of_month, :end_on => (TimeKeeper.date_of_record.beginning_of_month + 1.year) - 1.day, :aasm_state => :active)}
         let(:package) {double("BenefitPackage", :is_a? => BenefitSponsors::BenefitPackages::BenefitPackage, :_id => "id", :plan_year => application, :benefit_application => application, start_on: Date.new(Time.current.year,4,1),end_on: Date.new(2020,3,31))}
         let(:existing_shop_enrollment) {FactoryBot.create(:hbx_enrollment, :shop, household: family.active_household, family: family)}
+        let!(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
+        let!(:existing_shop_enrollment1) {FactoryBot.create(:hbx_enrollment, :shop, product: product, household: family.active_household, family: family)}
 
         before :each do
           existing_shop_enrollment
@@ -568,6 +570,11 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
 
         it "should include proper scopes" do
           expect(HbxEnrollment.cancel_eligible.include?(existing_shop_enrollment)).to eq(true)
+        end
+
+        it "should have enrollments only with product id" do
+          expect(HbxEnrollment.unscoped.count).to eq 2
+          expect(HbxEnrollment.unscoped.with_product.count).to eq 1
         end
       end
     end
@@ -947,6 +954,33 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       end
     end
 
+    context 'terminate_coverage' do
+      let!(:family) {FactoryBot.create(:family, :with_primary_family_member)}
+      let!(:hbx_enrollment) do
+        FactoryBot.create(:hbx_enrollment,
+                          household: family.active_household,
+                          family: family,
+                          aasm_state: 'coverage_termination_pending',
+                          terminated_on: TimeKeeper.date_of_record.next_month.end_of_month)
+      end
+
+      before do
+        hbx_enrollment.terminate_coverage!(TimeKeeper.date_of_record - 10.days)
+      end
+
+      it 'should update terminated_on date for given hbx_enrollment' do
+        expect(hbx_enrollment.terminated_on).to eq(TimeKeeper.date_of_record - 10.days)
+      end
+
+      it 'should not have same terminated_on date' do
+        expect(hbx_enrollment.terminated_on).not_to eq(TimeKeeper.date_of_record.next_month.end_of_month)
+      end
+
+      it 'should also transition the hbx_enrollment to terminated' do
+        expect(hbx_enrollment.aasm_state).to eq('coverage_terminated')
+      end
+    end
+
     context "cancel_coverage!" do
       let(:family) {FactoryBot.create(:family, :with_primary_family_member)}
       let(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, household: family.active_household, family: family, aasm_state: "inactive")}
@@ -1240,10 +1274,12 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       let(:qle_on) {Date.today}
 
       before :each do
-        allow(subject).to receive(:special_enrollment_period).and_return(SpecialEnrollmentPeriod.new(
-          :qualifying_life_event_kind => QualifyingLifeEventKind.new(:reason => "birth"),
-          :qle_on => qle_on
-          ))
+        allow(subject).to receive(:special_enrollment_period).and_return(
+          SpecialEnrollmentPeriod.new(
+            :qualifying_life_event_kind => QualifyingLifeEventKind.new(:reason => "birth", is_active: true),
+            :qle_on => qle_on
+          )
+        )
       end
 
       it "should have the eligibility event date of the qle_on" do
@@ -1259,10 +1295,29 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       let(:qle_on) {Date.today}
 
       before :each do
-        allow(subject).to receive(:special_enrollment_period).and_return(SpecialEnrollmentPeriod.new(
-          :qualifying_life_event_kind => QualifyingLifeEventKind.new(:reason => "covid-19"),
-          :qle_on => qle_on
-          ))
+        allow(subject).to receive(:special_enrollment_period).and_return(
+          SpecialEnrollmentPeriod.new(
+            :qualifying_life_event_kind => QualifyingLifeEventKind.new(:reason => "covid-19", is_active: true),
+            :qle_on => qle_on
+          )
+        )
+      end
+
+      it "should have the eligibility event date of the qle_on" do
+        expect(subject.eligibility_event_date).to eq qle_on
+      end
+
+      it "should have eligibility_event_kind of 'unknown_sep'" do
+        expect(subject.eligibility_event_kind).to eq "unknown_sep"
+      end
+    end
+
+    describe "and given a special enrollment period, with a new reason of 'test_reason'", dbclean: :after_each do
+      let(:qle_on) {Date.today}
+
+      before :each do
+        allow(subject).to receive(:special_enrollment_period).and_return(SpecialEnrollmentPeriod.new(:qualifying_life_event_kind => QualifyingLifeEventKind.new(:reason => "test_reason", is_active: true),
+                                                                                                     :qle_on => qle_on))
       end
 
       it "should have the eligibility event date of the qle_on" do
@@ -2334,7 +2389,10 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       let(:hbx_profile) {FactoryBot.create(:hbx_profile)}
       let(:benefit_package) {hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first}
       let(:benefit_coverage_period) {hbx_profile.benefit_sponsorship.benefit_coverage_periods.first}
-      let(:family) {mikes_family}
+      let(:family) { mikes_family }
+      let(:product) do
+        BenefitMarkets::Products::Product.find(benefit_package.benefit_ids.first)
+      end
       let(:existing_ivl_enrollment) {FactoryBot.create(:hbx_enrollment, :individual_unassisted, household: family.active_household, effective_on: TimeKeeper.date_of_record.beginning_of_month, family: family, benefit_package_id: benefit_package.id)}
       let(:new_ivl_enrollment) {FactoryBot.create(:hbx_enrollment, :individual_unassisted, household: family.active_household, effective_on: TimeKeeper.date_of_record.beginning_of_month, family: family, benefit_package_id: benefit_package.id)}
 
@@ -2351,7 +2409,15 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       end
 
       it "should cancel the previous enrollment if the effective_on date of the previous and the current are the same." do
-        new_ivl_enrollment.cancel_previous(TimeKeeper.date_of_record.year)
+        ::Operations::ProductSelectionEffects::TerminatePreviousSelections.call(
+          ::Entities::ProductSelection.new(
+            {
+              enrollment: new_ivl_enrollment,
+              product: product,
+              family: family
+            }
+          )
+        )
         existing_ivl_enrollment.reload
         expect(existing_ivl_enrollment.aasm_state).to eq "coverage_canceled"
       end
@@ -2607,6 +2673,31 @@ describe HbxEnrollment, type: :model, :dbclean => :around_each do
   end
 end
 
+describe '#has_at_least_one_aptc_eligible_member?' do
+  let(:person) { FactoryBot.create(:person, :with_consumer_role)}
+  let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+  let!(:household) { family.active_household}
+  let!(:tax_household) {FactoryBot.create(:tax_household,  effective_ending_on: nil, household: household)}
+  let!(:tax_household_member) {FactoryBot.create(:tax_household_member, tax_household: tax_household)}
+  let!(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, effective_on: TimeKeeper.date_of_record.beginning_of_year, family: person.primary_family)}
+  let!(:eligibility_kinds1) {{"is_ia_eligible" => true}}
+  let!(:eligibility_kinds2) {{"is_ia_eligible" => false}}
+  let(:effective_on_year) {hbx_enrollment.effective_on.year}
+  context 'aptc eligible member on tax household' do
+    it 'should return true' do
+      tax_household_member.update_attributes(eligibility_kinds1)
+      hbx_enrollment.reload
+      expect(hbx_enrollment.has_at_least_one_aptc_eligible_member?(effective_on_year)).to eq true
+    end
+  end
+  context 'no aptc eligible member on tax household' do
+    it 'should return false' do
+      tax_household_member.update_attributes(eligibility_kinds2)
+      hbx_enrollment.reload
+      expect(hbx_enrollment.has_at_least_one_aptc_eligible_member?(effective_on_year)).to eq false
+    end
+  end
+end
 
   describe "#notify_enrollment_cancel_or_termination_event", :dbclean => :after_each do
     let(:family) { FactoryBot.build(:family, :with_primary_family_member_and_dependent)}
@@ -3522,4 +3613,73 @@ describe ".parent enrollments", dbclean: :around_each do
     end
   end
 
+  context 'can_renew_coverage?' do
+    let!(:person11)          { FactoryBot.create(:person, :with_consumer_role) }
+    let!(:family11)          { FactoryBot.create(:family, :with_primary_family_member, person: person11) }
+    let!(:hbx_enrollment11)  { FactoryBot.create(:hbx_enrollment, household: family11.active_household, family: family11) }
+    let!(:hbx_profile)       { FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period) }
+    let!(:renewal_bcp)       { HbxProfile.current_hbx.benefit_sponsorship.renewal_benefit_coverage_period }
+
+    context 'shop enrollment' do
+      it 'should return false' do
+        expect(hbx_enrollment11.can_renew_coverage?(renewal_bcp.start_on)).to be_falsey
+      end
+    end
+
+    context 'ivl enrollment' do
+      before do
+        hbx_enrollment11.update_attributes!(kind: 'individual')
+      end
+
+      it 'should return true' do
+        expect(hbx_enrollment11.can_renew_coverage?(renewal_bcp.start_on)).to be_truthy
+      end
+    end
+  end
+
+  context 'cancel_ivl_enrollment' do
+    let!(:person12)         { FactoryBot.create(:person, :with_consumer_role) }
+    let!(:family12)         { FactoryBot.create(:family, :with_primary_family_member, person: person12) }
+    let!(:hbx_enrollment12) { FactoryBot.create(:hbx_enrollment, household: family12.active_household, family: family12) }
+
+    context 'shop enrollment' do
+      before do
+        hbx_enrollment12.cancel_ivl_enrollment
+      end
+
+      it 'should not cancel the enrollment' do
+        expect(hbx_enrollment12.aasm_state).not_to eq('coverage_canceled')
+      end
+    end
+
+    context 'ivl health enrollment' do
+      before do
+        hbx_enrollment12.update_attributes!(kind: 'individual')
+        hbx_enrollment12.cancel_ivl_enrollment
+      end
+
+      it 'should cancel the enrollment' do
+        expect(hbx_enrollment12.aasm_state).to eq('coverage_canceled')
+      end
+
+      it 'should create the workflow_state_transition object' do
+        expect(hbx_enrollment12.workflow_state_transitions.count).to eq(1)
+      end
+    end
+
+    context 'ivl dental enrollment' do
+      before do
+        hbx_enrollment12.update_attributes!(kind: 'individual', coverage_kind: 'dental')
+        hbx_enrollment12.cancel_ivl_enrollment
+      end
+
+      it 'should cancel the enrollment' do
+        expect(hbx_enrollment12.aasm_state).to eq('coverage_canceled')
+      end
+
+      it 'should create the workflow_state_transition object' do
+        expect(hbx_enrollment12.workflow_state_transitions.count).to eq(1)
+      end
+    end
+  end
 end

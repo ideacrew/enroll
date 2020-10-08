@@ -436,7 +436,7 @@ module ApplicationHelper
     carriers.each do |car|
       if Rails.env == "production"
         image = "logo/carrier/#{car.legal_name.parameterize.underscore}.jpg"
-        digest_image = "/assets/#{::Sprockets::Railtie.build_environment(Rails.application).find_asset(image).digest_path}"
+        digest_image = "/assets/#{::Sprockets::Railtie.build_environment(Rails.application).find_asset(image)&.digest_path}"
         carrier_logo_hash[car.legal_name] = digest_image
       else
         image = "/assets/logo/carrier/#{car.legal_name.parameterize.underscore}.jpg"
@@ -756,7 +756,13 @@ module ApplicationHelper
   end
 
   def is_new_paper_application?(current_user, app_type)
+    app_type = app_type&.downcase
     current_user.has_hbx_staff_role? && app_type == "paper"
+  end
+
+  def is_new_in_person_application?(current_user, app_type)
+    app_type = app_type&.humanize&.downcase
+    current_user.has_hbx_staff_role? && app_type == "in person"
   end
 
   def load_captcha_widget?
@@ -773,6 +779,13 @@ module ApplicationHelper
     else
       false
     end
+  end
+
+  def can_show_covid_message_on_sep_carousel?(person)
+    return false unless sep_carousel_message_enabled?
+    return false unless person.present?
+    return true if person.consumer_role.present? || person.resident_role.present?
+    person&.active_employee_roles&.any?{ |employee_role| employee_role.market_kind == 'shop'}
   end
 
   def transition_family_members_link_type row, allow
@@ -842,7 +855,7 @@ module ApplicationHelper
   end
 
   def external_application_configured?(application_name)
-    external_app = ExternalApplications::ApplicationProfile.find_by_application_name(application_name)
+    external_app = ::ExternalApplications::ApplicationProfile.find_by_application_name(application_name)
     return false unless external_app
     return false unless external_app.is_authorized_for?(current_user)
     !external_app.url.blank?
@@ -858,6 +871,14 @@ module ApplicationHelper
     EligibilityDetermination::CSR_PERCENT_VALUES.inject([]) do |csr_options, csr|
       ui_display = csr == '-1' ? 'limited' : csr
       csr_options << [ui_display, csr]
+    end
+  end
+
+  def show_component(url) # rubocop:disable Metrics/CyclomaticComplexity TODO: Remove this
+    if url.split('/')[2] == "consumer_role" || url.split('/')[1] == "insured" && url.split('/')[2] == "interactive_identity_verifications" || url.split('/')[1] == "financial_assistance" && url.split('/')[2] == "applications" || url.split('/')[1] == "insured" && url.split('/')[2] == "family_members" || url.include?("family_relationships")
+      false
+    else
+      true
     end
   end
 end

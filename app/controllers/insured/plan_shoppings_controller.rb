@@ -67,7 +67,8 @@ class Insured::PlanShoppingsController < ApplicationController
     # employee_mid_year_plan_change(@person, @change_plan)
     # @enrollment.ee_plan_selection_confirmation_sep_new_hire #mirror notice
     # @enrollment.mid_year_plan_change_notice #mirror notice
-
+    @kp_pay_now_url = SamlInformation.kp_pay_now_url
+    @kp_relay_state = SamlInformation.kp_pay_now_relay_state
     send_receipt_emails if @person.emails.first
   end
 
@@ -165,7 +166,7 @@ class Insured::PlanShoppingsController < ApplicationController
 
   def terminate
     hbx_enrollment = HbxEnrollment.find(params.require(:id))
-    coverage_end_date = @person.primary_family.terminate_date_for_shop_by_enrollment(hbx_enrollment)
+    coverage_end_date = params[:terminate_date].present? ? Date.strptime(params[:terminate_date], "%m/%d/%Y") : @person.primary_family.terminate_date_for_shop_by_enrollment(hbx_enrollment)
     hbx_enrollment.terminate_enrollment(coverage_end_date, params[:terminate_reason])
     if hbx_enrollment.coverage_terminated? || hbx_enrollment.coverage_termination_pending? || hbx_enrollment.coverage_canceled?
       hbx_enrollment.update_renewal_coverage
@@ -283,10 +284,15 @@ class Insured::PlanShoppingsController < ApplicationController
   def plan_selection_callback
     year = params[:year]
     hios_id = params[:hios_id]
-    selected_plan = BenefitMarkets::Products::Product.where(:hios_id => hios_id, :"application_period.min" => Date.new(year.to_i, 1, 1)).first
-    # selected_plan = Plan.where(:hios_id => params[:hios_id], active_year: Settings.checkbook_services.current_year).first
+    @enrollment = HbxEnrollment.find(params[:id])
+    market_kind = @enrollment.fehb_profile ? 'fehb' : params[:market_kind]
+    selected_plan = if @enrollment.fehb_profile
+                      BenefitMarkets::Products::Product.where(:hios_id => hios_id, :"application_period.min" => Date.new(year.to_i, 1, 1), benefit_market_kind: :fehb).first
+                    else
+                      BenefitMarkets::Products::Product.where(:hios_id => hios_id, :"application_period.min" => Date.new(year.to_i, 1, 1)).first
+                    end
     if selected_plan.present?
-      redirect_to thankyou_insured_plan_shopping_path({plan_id: selected_plan.id.to_s, id: params[:id],coverage_kind: params[:coverage_kind], market_kind: params[:market_kind], change_plan: params[:change_plan]})
+      redirect_to thankyou_insured_plan_shopping_path({plan_id: selected_plan.id.to_s, id: params[:id],coverage_kind: params[:coverage_kind], market_kind: market_kind, change_plan: params[:change_plan]})
     else
       redirect_to insured_plan_shopping_path(request.params), :flash => "No plan selected"
     end

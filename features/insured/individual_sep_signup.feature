@@ -1,5 +1,7 @@
 Feature: Insured Plan Shopping on Individual market
-
+  Background:
+    Given the FAA feature configuration is enabled
+  
   Scenario: New insured user purchases on individual market
     Given Individual has not signed up as an HBX user
     When Individual visits the Insured portal outside of open enrollment
@@ -13,11 +15,13 @@ Feature: Insured Plan Shopping on Individual market
     Then Individual should see a form to enter personal information
     When Individual clicks on Save and Exit
     Then Individual resumes enrollment
-    And Individual click on sign in existing account
+    And Individual click on Sign In
     And I signed in
     Then Individual sees previously saved address
     Then Individual agrees to the privacy agreeement
     Then Individual should see identity verification page and clicks on submit
+    Then Individual should be on the Help Paying for Coverage page
+    Then Individual does not apply for assistance and clicks continue
     Then Individual should see the dependents form
     And Individual clicks on add member button
     And Individual again clicks on add member button
@@ -47,11 +51,13 @@ Feature: Insured Plan Shopping on Individual market
     Then Individual should see a form to enter personal information
     When Individual clicks on Save and Exit
     Then Individual resumes enrollment
-    And Individual click on sign in existing account
+    And Individual click on Sign In
     And I signed in
     Then Individual sees previously saved address
     Then Individual agrees to the privacy agreeement
     Then Individual should see identity verification page and clicks on submit
+    Then Individual should be on the Help Paying for Coverage page
+    Then Individual does not apply for assistance and clicks continue
     Then Individual should see the dependents form
     And I click on continue button on household info form
     When I click on none of the situations listed above apply checkbox
@@ -59,7 +65,7 @@ Feature: Insured Plan Shopping on Individual market
     Then I should land on home page
     And I click on log out link
     Then Individual resumes enrollment
-    And I click on sign in existing account
+    And I click on Sign In
     And I signed in
     Then I should land on home page
     Then Individual logs out
@@ -77,11 +83,13 @@ Feature: Insured Plan Shopping on Individual market
     Then Individual should see a form to enter personal information
     When Individual clicks on Save and Exit
     Then Individual resumes enrollment
-    And Individual click on sign in existing account
+    And Individual click on Sign In
     And I signed in
     Then Individual sees previously saved address
     Then Individual agrees to the privacy agreeement
     Then Individual should see identity verification page and clicks on submit
+    Then Individual should be on the Help Paying for Coverage page
+    Then Individual does not apply for assistance and clicks continue
     Then Individual should see the dependents form
     And I click on continue button on household info form
     When I click the "Married" in qle carousel
@@ -91,7 +99,7 @@ Feature: Insured Plan Shopping on Individual market
     Then I should land on home page
     When I click on log out link
     Then Individual resumes enrollment
-    And I click on sign in existing account
+    And I click on Sign In
     And I signed in
     Then I should land on home page
     Then Individual logs out
@@ -109,11 +117,13 @@ Feature: Insured Plan Shopping on Individual market
     Then Individual should see a form to enter personal information
     When Individual clicks on Save and Exit
     Then Individual resumes enrollment
-    And Individual click on sign in existing account
+    And Individual click on Sign In
     And I signed in
     Then Individual sees previously saved address
     Then Individual agrees to the privacy agreeement
     Then Individual should see identity verification page and clicks on submit
+    Then Individual should be on the Help Paying for Coverage page
+    Then Individual does not apply for assistance and clicks continue
     Then Individual should see the dependents form
     And Individual clicks on add member button
     And Individual again clicks on add member button #TODO re-write this step

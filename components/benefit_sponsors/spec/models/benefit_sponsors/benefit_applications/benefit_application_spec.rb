@@ -565,7 +565,7 @@ module BenefitSponsors
               allow(renewal_application.benefit_sponsorship).to receive(:census_employees).and_return(census_employee_scope)
               allow(TimeKeeper).to receive(:date_of_record).and_return(Time.now + 1.month)
             end
-          
+
             it "should not send duplicate invitations, even with time travel activated" do
               renewal_application.send_employee_renewal_invites
               expect(::Invitation.count).to eq(2)
@@ -1049,6 +1049,27 @@ module BenefitSponsors
       end
     end
 
+    describe '.all_waived_member_count', dbclean: :after_each do
+      include_context "setup benefit market with market catalogs and product packages"
+      include_context "setup renewal application"
+      include_context "setup employees with benefits"
+
+      before :each do
+        employees = []
+        benefit_sponsorship.census_employees.each do |ce|
+          family = FactoryBot.create(:family, :with_primary_family_member)
+          allow(ce).to receive(:family).and_return(family)
+          allow(ce).to receive(:is_waived_under?).and_return true
+          employees << ce
+        end
+        allow(renewal_application).to receive(:active_census_employees_under_py).and_return(employees)
+      end
+
+      it 'should not return the waived EEs count' do
+        expect(renewal_application.all_waived_member_count).to eq 5
+      end
+    end
+
     describe '.successor_benefit_package', dbclean: :after_each do
       include_context "setup benefit market with market catalogs and product packages"
       include_context "setup renewal application"
@@ -1203,6 +1224,41 @@ module BenefitSponsors
     end
 
 
+describe '.is_renewing?' do
+  include_context "setup benefit market with market catalogs and product packages"
+  include_context "setup renewal application"
+
+  let!(:ineligible_application) { FactoryBot.create(:benefit_sponsors_benefit_application,
+    :with_benefit_package,
+    :benefit_sponsorship => benefit_sponsorship,
+    :aasm_state => 'enrollment_ineligible',
+    :effective_period =>  (predecessor_application.effective_period.min - 1.year)..(predecessor_application.effective_period.min.prev_day)
+  )}
+
+  before do
+    benefit_sponsorship.benefit_applications.draft.first.predecessor_id = predecessor_application.id
+  end
+
+  context "finding if plan year is a renewal or not" do
+    it 'renewing application should return true' do
+      expect(benefit_sponsorship.benefit_applications.draft.first.is_renewing?).to eq true
+    end
+
+    it 'active application should return false' do
+      expect(benefit_sponsorship.benefit_applications.active.first.is_renewing?).to eq false
+    end
+
+    it 'old ineligible application should return false' do
+      expect(benefit_sponsorship.benefit_applications.enrollment_ineligible.first.is_renewing?).to eq false
+    end
+
+    it 'renewal application transitions to enrollment ineligible state' do
+      renewal_application.update_attributes(:aasm_state => "enrollment_ineligible")
+      expect(renewal_application.is_renewing?).to eq true
+    end
+  end
+end
+
     describe '.employee_participation_ratio_minimum' do
 
       let(:application) { subject.class.new(effective_period: effective_period) }
@@ -1220,7 +1276,7 @@ module BenefitSponsors
 
         let(:start_on) { TimeKeeper.date_of_record + 2.years }
 
-        context "start on is on january 1st" do 
+        context "start on is on january 1st" do
           let(:effective_period) { start_on.beginning_of_year..start_on.end_of_year }
 
           it 'should return system default minimum ratio' do
@@ -1243,10 +1299,10 @@ module BenefitSponsors
         context "fehb market" do
           it 'should have feature disabled' do
             expect(::EnrollRegistry.feature_enabled?("#{market.kind}_fetch_enrollment_minimum_participation_#{start_on.year}")).to be_falsey
-          end 
+          end
         end
 
-        context "start on is on january 1st" do 
+        context "start on is on january 1st" do
           let(:effective_period) { start_on.beginning_of_year..start_on.end_of_year }
 
           it 'should return system default minimum ratio' do

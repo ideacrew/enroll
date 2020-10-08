@@ -180,7 +180,7 @@ class BenefitGroupAssignment
 
   def covered_families
     Family.where(:"_id".in => HbxEnrollment.where(
-      benefit_group_assignment_id: BSON::ObjectId.from_string(self.id) 
+      benefit_group_assignment_id: BSON::ObjectId.from_string(self.id)
     ).pluck(:family_id)
   )
   end
@@ -213,7 +213,7 @@ class BenefitGroupAssignment
 
     if census_employee.cobra_begin_date.present?
       coverage_terminated_on = census_employee.cobra_begin_date.prev_day
-      hbx_enrollments = hbx_enrollments.select do |e| 
+      hbx_enrollments = hbx_enrollments.select do |e|
         e.effective_on < census_employee.cobra_begin_date && (e.terminated_on.blank? || e.terminated_on == coverage_terminated_on)
       end
     end

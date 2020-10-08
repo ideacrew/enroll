@@ -113,6 +113,36 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
           expect(qle.market_kind).to eq "shop"
         end
       end
+
+      context "when using expired active sep" do
+
+        let(:active_qle) { create(:qualifying_life_event_kind, title: "Married", market_kind: "shop", reason: "marriage", start_on: TimeKeeper.date_of_record.prev_month.beginning_of_month, end_on: TimeKeeper.date_of_record.next_month.end_of_month) }
+
+        before do
+          sep.update_attributes(qualifying_life_event_kind_id: active_qle.id, submitted_at: TimeKeeper.datetime_of_record - 1.day, created_at: sep.created_at - 2.day)
+          active_qle.update_attributes(is_active: false, end_on: TimeKeeper.date_of_record - 1.day)
+        end
+
+        it "should not get assign with old sep" do
+          get :index, params: {sep_id: sep.id, qle_id: sep.qualifying_life_event_kind_id}
+          expect(assigns(:sep)).not_to eq sep
+        end
+
+        it "should duplicate sep" do
+          allow(controller).to receive(:duplicate_sep).and_return dup_sep
+          get :index, params: {sep_id: sep.id, qle_id: sep.qualifying_life_event_kind_id}
+          expect(assigns(:sep)).to eq dup_sep
+        end
+
+        it "should have the today's date as submitted_at" do
+          get :index, params: {sep_id: sep.id, qle_id: sep.qualifying_life_event_kind_id}
+          expect(assigns(:sep).submitted_at.to_date).to eq TimeKeeper.date_of_record
+        end
+
+        it "qle market kind is should be shop" do
+          expect(qle.market_kind).to eq "shop"
+        end
+      end
     end
 
     it "with qle_id" do

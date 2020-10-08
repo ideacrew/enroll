@@ -317,7 +317,7 @@ Then(/(.*) should see the dental enrollment with make changes button/) do |role|
   expect(page).to have_link "Make Changes"
 end
 
-When(/(.*) clicked on make changes button/) do |role|
+When(/(.*) clicked on make changes button/) do |_role|
   click_link('Make Changes',  wait: 10)
 end
 
@@ -445,7 +445,7 @@ And(/(.*) should not see the dental radio button/) do |role|
   expect(page).not_to have_content "Dental"
 end
 
-And(/employee clicked on continue for plan shopping/) do
+And(/(.*) clicked on continue for plan shopping$/) do |_user|
   find(".interaction-click-control-continue").click
 end
 

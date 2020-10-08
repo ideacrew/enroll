@@ -131,6 +131,27 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
   end
 
+  def new_secure_message
+    @resource = get_resource_for_secure_form(params)
+    @element_to_replace_id = params[:employer_actions_id] || params[:family_actions_id]
+  end
+
+  def create_send_secure_message
+    @resource = get_resource(params)
+    @subject = params[:subject].presence
+    @body = params[:body].presence
+    @element_to_replace_id = params[:actions_id]
+    result = ::Operations::SecureMessageAction.new.call(params: params.permit!.to_h, user: current_user)
+    @error_on_save = result.failure if result.failure?
+    respond_to do |format|
+      if @error_on_save
+        format.js { render "new_secure_message"}
+      else
+        format.js { "Message Sent successfully"  }
+      end
+    end
+  end
+
   def disable_ssn_requirement
     @benfit_sponsorships = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:"_id".in => params[:ids])
 
@@ -833,6 +854,24 @@ def employer_poc
 
   def permit_params
     params.permit!
+  end
+
+  def get_resource(params)
+    return nil if params[:resource_id].blank?
+
+    if params[:resource_name].classify.constantize == Person
+      Person.find(params[:resource_id])
+    else
+      BenefitSponsors::Organizations::Profile.find(params[:resource_id])
+    end
+  end
+
+  def get_resource_for_secure_form(params)
+    if params[:person_id].present?
+      Person.find(params[:person_id])
+    elsif params[:profile_id].present?
+      BenefitSponsors::Organizations::Profile.find(params[:profile_id])
+    end
   end
 
   def benefit_application_error_messages(obj)
