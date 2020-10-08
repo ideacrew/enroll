@@ -162,6 +162,7 @@ describe "insured/family_members/_dependent_form.html.erb" do
       allow(person).to receive(:has_active_employee_role?).and_return false
       allow(person).to receive(:broker_role).and_return(broker_role1)
       assign :person, person
+      assign :dependent, dependent
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
       render "insured/family_members/dependent_form", dependent: dependent, person: person
     end
