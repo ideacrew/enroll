@@ -156,6 +156,7 @@ Feature: Insured Plan Shopping on Individual market
     Then Dependent should not see error message Document type cannot be blank
     Then Individual logs out
 
+  @flaky
   Scenario: Individual should see immigration details even after changing radio options
     Given Individual resumes enrollment
     And Individual click on Sign In
