@@ -167,7 +167,6 @@ group :test do
   gem 'cucumber-rails',               :require => false
   gem 'fakeredis',                    '~> 0.7.0', :require => 'fakeredis/rspec'
   gem 'mongoid-rspec',                '~> 4'
-  gem 'poltergeist',                  '~> 1.18.0'
   gem 'rspec-instafail',              '~> 1'
   gem 'rspec-benchmark'
   gem 'ruby-progressbar',             '~> 1'
