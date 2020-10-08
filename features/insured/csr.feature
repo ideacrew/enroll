@@ -1,6 +1,7 @@
 Feature: CSR finishes shopping for Individual
   Scenario: New insured user purchases on individual market
     Given Individual has not signed up as an HBX user
+      When the FAA feature configuration is enabled
       When a CSR exists
       When Individual visits the Insured portal outside of open enrollment
       Then Individual creates a new HBX account
@@ -13,7 +14,7 @@ Feature: CSR finishes shopping for Individual
       Then Individual should see a form to enter personal information
       When Individual clicks on Save and Exit
       Then Individual resumes enrollment
-      And Individual click on sign in existing account
+      And Individual click on Sign In
       And I signed in
       Then Individual sees previously saved address
       Then Individual asks for help
@@ -26,6 +27,8 @@ Feature: CSR finishes shopping for Individual
       Then CSR clicks on Resume Application via phone
       Then CSR agrees to the privacy agreeement
       Then CSR should see identity verification page and clicks on submit
+      Then Individual should be on the Help Paying for Coverage page
+      Then Individual does not apply for assistance and clicks continue
       Then CSR should see the dependents form
       And I click on the header link to return to CSR page
       Then CSR should see the Agent Portal

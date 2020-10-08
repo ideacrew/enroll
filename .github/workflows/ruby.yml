@@ -32,7 +32,6 @@ jobs:
           bundle exec rubocop-git origin/master | grep "no offenses detected"
   testing_matrix:
     name: ${{matrix.command_configs.name}}
-    needs: [rubocop]
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
