@@ -4,7 +4,7 @@ class ChoosePlan
 
   include RSpec::Matchers
   include Capybara::DSL
-      
+
   def i_agree_checkbox
     '//input[@id="terms_check_thank_you"]'
   end

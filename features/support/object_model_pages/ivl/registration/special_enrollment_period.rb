@@ -4,27 +4,27 @@ class SpecialEnrollmentPeriod
 
   include RSpec::Matchers
   include Capybara::DSL
-  
+
   def covid_link
     '//a[@class="qle-menu-item interaction-click-control-covid-19"]'
   end
-  
+
   def had_a_baby_link
     '//a[@class="qle-menu-item interaction-click-control-had-a-baby"]'
   end
-  
+
   def adopted_a_child_link
     '//a[@class="qle-menu-item interaction-click-control-adopted-a-child"]'
   end
-  
+
   def lost_or_will_lose_health_insurance_link
     '//a[@class="qle-menu-item interaction-click-control-lost-or-will-soon-lose-other-health-insurance"]'
   end
-  
+
   def married_link
     '//a[@class="qle-menu-item interaction-click-control-married"]'
   end
-  
+
   def backward_arrow
     '//i[@class="fa fa-angle-left left fa-2x"]'
   end

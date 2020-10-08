@@ -4,7 +4,7 @@ class ChoosePlan
 
   include RSpec::Matchers
   include Capybara::DSL
-    
+
   def find_your_doctor_link
     '//a[@class="interaction-click-control-find-your-doctor"]'
   end

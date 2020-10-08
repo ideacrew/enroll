@@ -4,7 +4,7 @@ class CoverageYouOffer
 
   include RSpec::Matchers
   include Capybara::DSL
-    
+
   def claim_quote_btn
     '//a[contains(@class, "interaction-click-control-claim-quote")]'
   end
