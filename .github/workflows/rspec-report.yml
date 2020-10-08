@@ -1,9 +1,5 @@
 name: rspec report
-on:
-  # push
-  schedule:
-    # every monday at 4am
-    - cron: '0 4 * * 1'
+on: workflow_dispatch
 
 jobs:
   rspec-report:
