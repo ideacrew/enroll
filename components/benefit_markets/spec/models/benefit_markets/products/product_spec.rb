@@ -21,7 +21,7 @@ module BenefitMarkets
     let(:premium_table_q1)    { BenefitMarkets::Products::PremiumTable.new(
                                   effective_period: quarter_1,
                                   rating_area: rating_area,
-                                  premium_tuples: [premium_q1_age_14, premium_q1_age_20, premium_q1_age_30, premium_q1_age_40],
+                                  premium_tuples: [premium_q1_age_14, premium_q1_age_20, premium_q1_age_30, premium_q1_age_40]
                                 ) }
 
     let(:premium2_q1_age_14) {BenefitMarkets::Products::PremiumTuple.new(age: 14, cost: 111)}
@@ -38,19 +38,18 @@ module BenefitMarkets
 
     let(:premium_tables) {[premium_table_q1, premium_table2_q1]}
 
-
     let(:params) do
-        {
-          benefit_market_kind:  benefit_market_kind,
-          application_period:   application_period,
-          hbx_id:               hbx_id,
-          # issuer_profile_urn:   issuer_profile_urn,
-          title:                title,
-          description:          description,
-          service_area:         service_area,
-          premium_tables:       premium_tables,
-          premium_ages:         14..65
-        }
+      {
+        benefit_market_kind: benefit_market_kind,
+        application_period: application_period,
+        hbx_id: hbx_id,
+        # issuer_profile_urn:   issuer_profile_urn,
+        title: title,
+        description: description,
+        service_area: service_area,
+        premium_tables: premium_tables,
+        premium_ages: 14..65
+      }
     end
 
     context "A new Product instance" do
