@@ -2855,9 +2855,9 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     context "when EE termination date falls under expired application" do
       let!(:date) { benefit_sponsorship.benefit_applications.expired.first.effective_period.max }
       before do
-        employment_terminated_on = TimeKeeper.date_of_record.last_month.end_of_month - 2.months
+        employment_terminated_on = TimeKeeper.date_of_record.end_of_month - 3.months
         census_employee.employment_terminated_on = employment_terminated_on
-        census_employee.coverage_terminated_on = TimeKeeper.date_of_record.last_month.end_of_month - 2.months
+        census_employee.coverage_terminated_on = TimeKeeper.date_of_record.end_of_month - 3.months
         census_employee.aasm_state = "employment_terminated"
         # census_employee.benefit_group_assignments.where(is_active: false).first.end_on = date
         census_employee.save
