@@ -264,6 +264,12 @@ namespace :cca_plan_validation do
     puts "Successfully generated 9th Plan validation report for Super Group ID's"
 
     current_date = Date.today.strftime("%Y_%m_%d")
-    workbook.write("#{Rails.root}/CCA_PlanLoadValidation_Report_EA_#{current_date}.xlsx")
+    file_name = "#{Rails.root}/CCA_PlanLoadValidation_Report_EA_#{current_date}.xlsx"
+    workbook.write(file_name)
+
+    if Rails.env.production?
+      pubber = Publishers::Legacy::PlanValidationReportPublisher.new
+      pubber.publish URI.join("file://", file_name)
+    end
   end
 end
