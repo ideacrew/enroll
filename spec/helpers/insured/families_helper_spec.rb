@@ -162,18 +162,18 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
         end
       end
 
-      context "QLEK with fixed_first_of_next_month_reporting effective_on_kind" do
+      context "QLEK with first_of_next_month_reporting effective_on_kind" do
 
-        it "it should return options for fixed_first_of_next_month_reporting for shop market" do
-          qle.update_attributes(market_kind: 'shop', effective_on_kinds: ['fixed_first_of_next_month_reporting'])
+        it "it should return options for first_of_next_month_reporting for shop market" do
+          qle.update_attributes(market_kind: 'shop', effective_on_kinds: ['first_of_next_month_reporting'])
           options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
-          expect(options).to eq [[(date.end_of_month + 1.day).to_s, 'fixed_first_of_next_month_reporting']]
+          expect(options).to eq [[(date.end_of_month + 1.day).to_s, 'first_of_next_month_reporting']]
         end
 
-        it "it should return options for fixed_first_of_next_month_reporting for individual market" do
-          qle.update_attributes(market_kind: 'individual', effective_on_kinds: ['fixed_first_of_next_month_reporting'])
+        it "it should return options for first_of_next_month_reporting for individual market" do
+          qle.update_attributes(market_kind: 'individual', effective_on_kinds: ['first_of_next_month_reporting'])
           options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
-          expect(options).to eq [[(date.end_of_month + 1.day).to_s, 'fixed_first_of_next_month_reporting']]
+          expect(options).to eq [[(date.end_of_month + 1.day).to_s, 'first_of_next_month_reporting']]
         end
       end
 

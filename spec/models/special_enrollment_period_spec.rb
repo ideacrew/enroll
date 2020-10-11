@@ -1028,24 +1028,41 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
       end
     end
 
-    context 'when fixed_first_of_next_month_reporting is selected' do
-      let(:effective_on_kind) { 'fixed_first_of_next_month_reporting' }
+    context 'when first_of_next_month_reporting is selected' do
+      let(:effective_on_kind) { 'first_of_next_month_reporting' }
 
       context 'qle_on is middle of month' do
         let(:qle_on) { TimeKeeper.date_of_record.beginning_of_month + 15.days }
 
-        it 'should set effective date as beginning of next month' do
-          expect(sep.effective_on).to eq TimeKeeper.date_of_record.end_of_month + 1.day
+        it 'should set effective date as beginning of next month from reporting' do
+          expect(sep.effective_on).to eq TimeKeeper.date_of_record.next_month.beginning_of_month
         end
       end
 
       context 'qle_on is beginning of momth' do
         let(:qle_on) { TimeKeeper.date_of_record.beginning_of_month }
 
-        it 'should set effective date as beginning of next month' do
-          expect(sep.effective_on).to eq TimeKeeper.date_of_record.end_of_month + 1.day
+        it 'should set effective date as beginning of next month from reporting' do
+          expect(sep.effective_on).to eq TimeKeeper.date_of_record.next_month.beginning_of_month
         end
       end
+
+      context 'qle_on is last month' do
+        let(:qle_on) { TimeKeeper.date_of_record.beginning_of_month - 1.day }
+
+        it 'should set effective date as beginning of next month from reporting' do
+          expect(sep.effective_on).to eq TimeKeeper.date_of_record.next_month.beginning_of_month
+        end
+      end
+
+      context 'qle_on is future month' do
+        let(:qle_on) { TimeKeeper.date_of_record.next_month.beginning_of_month }
+
+        it 'should set effective date as next month from qle' do
+          expect(sep.effective_on).to eq qle_on.end_of_month + 1.day
+        end
+      end
+
     end
 
     context 'when date_of_event_plus_one is selected' do

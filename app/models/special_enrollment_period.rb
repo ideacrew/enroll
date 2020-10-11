@@ -271,8 +271,8 @@ private
                           fifteenth_of_month_plan_selection_effective_date
                         when "first_of_reporting_month"
                           first_of_reporting_month_effective_date
-                        when "fixed_first_of_next_month_reporting"
-                          fixed_first_of_next_month_reporting_effective_date
+                        when "first_of_next_month_reporting"
+                          first_of_next_month_reporting_effective_date
                         when "fifteenth_of_the_month"
                           fifteenth_of_the_month_effective_date
                         end
@@ -351,8 +351,8 @@ private
     [(self.created_at ||= TimeKeeper.date_of_record).to_date.beginning_of_month , qle_on.end_of_month + 1.day].max
   end
 
-  def fixed_first_of_next_month_reporting_effective_date
-    (self.created_at ||= TimeKeeper.date_of_record).to_date.end_of_month + 1.day
+  def first_of_next_month_reporting_effective_date
+    [(self.created_at ||= TimeKeeper.date_of_record).to_date.end_of_month + 1.day, qle_on.end_of_month + 1.day].max
   end
 
   def fifteenth_of_the_month_effective_date
