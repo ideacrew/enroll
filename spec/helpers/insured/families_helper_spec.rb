@@ -177,28 +177,28 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
         end
       end
 
-      context "QLEK with exact_date effective_on_kind" do
+      context "QLEK with date_of_event effective_on_kind" do
 
-        it "it should return options for exact_date for shop market" do
-          qle.update_attributes(market_kind: 'shop', effective_on_kinds: ['exact_date'])
+        it "it should return options for date_of_event for shop market" do
+          qle.update_attributes(market_kind: 'shop', effective_on_kinds: ['date_of_event'])
           options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
-          expect(options).to eq [[date.to_s, 'exact_date']]
+          expect(options).to eq [[date.to_s, 'date_of_event']]
         end
 
-        it "it should return options for exact_date for individual market" do
-          qle.update_attributes(market_kind: 'individual', effective_on_kinds: ['exact_date'])
+        it "it should return options for date_of_event for individual market" do
+          qle.update_attributes(market_kind: 'individual', effective_on_kinds: ['date_of_event'])
           options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
-          expect(options).to eq [[date.to_s, 'exact_date']]
+          expect(options).to eq [[date.to_s, 'date_of_event']]
         end
       end
 
       context "QLEK with similar effective_on_kinds" do
 
         it "it should return uniq options" do
-          qle.update_attributes(market_kind: 'shop', effective_on_kinds: ['exact_date', 'date_of_event'])
+          qle.update_attributes(market_kind: 'shop', effective_on_kinds: ['date_of_event'])
           options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
           expect(options.count).to eq 1
-          expect(options).to eq [[date.to_s, 'exact_date']]
+          expect(options).to eq [[date.to_s, 'date_of_event']]
         end
       end
 

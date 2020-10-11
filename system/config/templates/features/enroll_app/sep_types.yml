@@ -130,7 +130,6 @@ registry:
               {fifteenth_of_month_plan_selection: 15th of Month Plan Shopping},
               {first_of_reporting_month: First of Reporting Month},
               {fixed_first_of_next_month_reporting: First of Month after Reporting},
-              {exact_date: Exact Date},
               {first_of_month: First of Month},
               {first_of_next_month: First of Next Month}]
               content_type: :checkbox_select

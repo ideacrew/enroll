@@ -531,9 +531,9 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
         expect(sep.effective_on).to eq first_of_following_month
       end
 
-      it "and qle is exact_date" do
+      it "and qle is date_of_event" do
         sep.qualifying_life_event_kind = qle
-        sep.effective_on_kind = "exact_date"
+        sep.effective_on_kind = "date_of_event"
         sep.qle_on = event_date
         expect(sep.effective_on).to eq event_date
       end
@@ -803,8 +803,8 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
       end
     end
 
-    context 'when exact_date is selected' do
-      let(:effective_on_kind) { 'exact_date' }
+    context 'when date_of_event is selected' do
+      let(:effective_on_kind) { 'date_of_event' }
 
       context 'qle_on is middle of month' do
         let(:qle_on) { TimeKeeper.date_of_record.beginning_of_month + 15.days }
