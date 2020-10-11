@@ -348,7 +348,7 @@ private
   end
 
   def first_of_reporting_month_effective_date
-    (self.created_at ||= TimeKeeper.date_of_record).to_date.beginning_of_month
+    [(self.created_at ||= TimeKeeper.date_of_record).to_date.beginning_of_month , qle_on.end_of_month + 1.day].max
   end
 
   def fixed_first_of_next_month_reporting_effective_date

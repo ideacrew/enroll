@@ -998,16 +998,32 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
       context 'qle_on is middle of month' do
         let(:qle_on) { TimeKeeper.date_of_record.beginning_of_month + 15.days }
 
-        it 'should set effective date as beginning of next month' do
+        it 'should set effective date as beginning of next month from qle' do
+          expect(sep.effective_on).to eq qle_on.next_month.beginning_of_month
+        end
+      end
+
+      context 'qle_on is beginning of month' do
+        let(:qle_on) { TimeKeeper.date_of_record.beginning_of_month }
+
+        it 'should set effective date as beginning of next month from qle' do
+          expect(sep.effective_on).to eq qle_on.next_month.beginning_of_month
+        end
+      end
+
+      context 'qle_on is last month' do
+        let(:qle_on) { TimeKeeper.date_of_record.beginning_of_month - 1.day }
+
+        it 'should set effective date as beginning of month from reporting' do
           expect(sep.effective_on).to eq TimeKeeper.date_of_record.beginning_of_month
         end
       end
 
-      context 'qle_on is beginning of momth' do
-        let(:qle_on) { TimeKeeper.date_of_record.beginning_of_month }
+      context 'qle_on is future month' do
+        let(:qle_on) { TimeKeeper.date_of_record.next_month.beginning_of_month }
 
-        it 'should set effective date as beginning of next month' do
-          expect(sep.effective_on).to eq TimeKeeper.date_of_record.beginning_of_month
+        it 'should set effective date as beginning of next month from qle' do
+          expect(sep.effective_on).to eq qle_on.end_of_month + 1.day
         end
       end
     end
