@@ -210,6 +210,21 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
           expect(options).to eq [[TimeKeeper.date_of_record.last_month.to_s, 'date_of_event'],[TimeKeeper.date_of_record.beginning_of_month.to_s, 'first_of_reporting_month']]
         end
       end
+
+      context "QLEK with date_of_event_plus_one effective_on_kind" do
+
+        it "it should return options for date_of_event_plus_one for shop market" do
+          qle.update_attributes(market_kind: 'shop', effective_on_kinds: ['date_of_event_plus_one'])
+          options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
+          expect(options).to eq [[date.next_day.to_s, 'date_of_event_plus_one']]
+        end
+
+        it "it should return options for date_of_event_plus_one for individual market" do
+          qle.update_attributes(market_kind: 'individual', effective_on_kinds: ['date_of_event_plus_one'])
+          options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
+          expect(options).to eq [[date.next_day.to_s, 'date_of_event_plus_one']]
+        end
+      end
     end
   end
 

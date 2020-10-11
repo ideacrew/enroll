@@ -123,6 +123,7 @@ registry:
             meta:
               label: Effective Date Rules *
               enum: [{date_of_event: Date of Event},
+              {date_of_event_plus_one: Date of event + 1},
               {first_of_this_month: First of Event Month},
               {fixed_first_of_next_month: First of Month after Event},
               {fifteenth_of_the_month: Event First of Next Month},

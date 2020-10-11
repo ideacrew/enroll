@@ -255,6 +255,8 @@ private
     self.effective_on = case effective_on_kind
                         when "date_of_event"
                           qle_on
+                        when "date_of_event_plus_one"
+                          qle_on.next_day
                         when "first_of_month"
                           first_of_month_effective_date
                         when "first_of_this_month"

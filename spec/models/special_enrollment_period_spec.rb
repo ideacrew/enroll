@@ -1031,6 +1031,18 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
         end
       end
     end
+
+    context 'when date_of_event_plus_one is selected' do
+      let(:effective_on_kind) { 'date_of_event_plus_one' }
+
+      context 'qle_on is middle of month' do
+        let(:qle_on) { TimeKeeper.date_of_record.beginning_of_month }
+
+        it 'should set effective date as next day of event date' do
+          expect(sep.effective_on).to eq qle_on + 1.day
+        end
+      end
+    end
   end
 
   context 'for termination_dates' do
