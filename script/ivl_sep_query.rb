@@ -17,9 +17,9 @@ class IvlEnrollmentsPublisher
 end
 
 def is_retro_renewal_enrollment?(hbx_id)
-  enrollment = HbxEnrollment.by_hbx_id(hbx_id)
-  retrun false unless enrollment.present?
-  retrun false if enrollment.first.is_shop?
+  enrollment = HbxEnrollment.by_hbx_id(hbx_id).first
+  return false unless enrollment.present?
+  return false if enrollment.is_shop?
   last_date= enrollment.effective_on - 1
   active_enrollment = enrollment.family.hbx_enrollments.where(:kind => enrollment.kind,
                                           :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES - ["coverage_termination_pending"]),
