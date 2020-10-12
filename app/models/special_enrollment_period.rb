@@ -269,16 +269,10 @@ private
                           first_of_next_month_plan_selection_effective_date
                         when "fixed_first_of_next_month"
                           fixed_first_of_next_month_effective_date
-                        when "first_of_month_plan_selection"
-                          first_of_month_plan_selection_effective_date
-                        when "fifteenth_of_month_plan_selection"
-                          fifteenth_of_month_plan_selection_effective_date
                         when "first_of_reporting_month"
                           first_of_reporting_month_effective_date
                         when "first_of_next_month_reporting"
                           first_of_next_month_reporting_effective_date
-                        when "fifteenth_of_the_month"
-                          fifteenth_of_the_month_effective_date
                         end
   end
 
