@@ -278,12 +278,15 @@ private
                         end
   end
 
+  # TODO: Refactor variables
   def first_of_month_effective_date
-    if @reference_date.day <= EnrollRegistry[:special_enrollment_period].setting(:individual_market_monthly_enrollment_due_on).item
+    reference_date = [submitted_at.to_date, end_on].min
+    earliest_effective_date = [reference_date, qle_on].max
+    if reference_date.day <= EnrollRegistry[:special_enrollment_period].setting(:fifteenth_of_the_month).item
       # if submitted_at.day <= Settings.aca.individual_market.monthly_enrollment_due_on
-      @earliest_effective_date.end_of_month + 1.day
+      earliest_effective_date.end_of_month + 1.day
     else
-      @earliest_effective_date.next_month.end_of_month + 1.day
+      earliest_effective_date.next_month.end_of_month + 1.day
     end
   end
 
@@ -348,7 +351,7 @@ private
   end
 
   def first_of_reporting_month_effective_date
-    [(self.created_at ||= TimeKeeper.date_of_record).to_date.beginning_of_month , qle_on.end_of_month + 1.day].max
+    [(self.created_at ||= TimeKeeper.date_of_record).to_date.beginning_of_month, qle_on.end_of_month + 1.day].max
   end
 
   def first_of_next_month_reporting_effective_date

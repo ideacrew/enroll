@@ -302,7 +302,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
 
     context "and QLE is reported before end of SEP" do
       let(:today)                           { TimeKeeper.date_of_record }
-      let(:monthly_enrollment_deadline)     { today.beginning_of_month + EnrollRegistry[:special_enrollment_period].setting(:individual_market_monthly_enrollment_due_on).item.days - 1.day }
+      let(:monthly_enrollment_deadline)     { today.beginning_of_month + EnrollRegistry[:special_enrollment_period].setting(:fifteenth_of_the_month).item.days - 1.day }
 
       let(:qle_on_date)                     { today.beginning_of_month }
 
@@ -825,61 +825,125 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
 
     context 'when first_of_month is selected' do
 
+      after :all do
+        TimeKeeper.set_date_of_record_unprotected!(Date.today)
+      end
 
       let(:effective_on_kind) { 'first_of_month' }
+      let(:new_sep) { family.special_enrollment_periods.build(qualifying_life_event_kind: ivl_qle, qle_on: qle_on, effective_on_kind: effective_on_kind) }
 
       context "IVL" do
         let!(:qle) { create(:qualifying_life_event_kind, market_kind: "individual") }
 
-        context 'qle_on is middle of month' do
-          let(:qle_on) { TimeKeeper.date_of_record.beginning_of_month + 21.days }
-          let(:reporting_date) { TimeKeeper.date_of_record }
+        context 'qle_on is middle of month, reporting_date before 15th of month' do
+          let(:qle_on) { TimeKeeper.date_of_record.beginning_of_month + 16.days }
+          let(:reporting_date) { TimeKeeper.date_of_record.beginning_of_month }
 
-          it 'should set effective date as next of next month beginning of month' do
-            report_date = [sep.end_on, reporting_date].min
-            eff_date = [qle_on, report_date].max
-            date = report_date.day <= 20 ? eff_date.end_of_month + 1.day : eff_date.next_month.end_of_month + 1.day
-            expect(sep.effective_on).to eq date
+          before do
+            TimeKeeper.set_date_of_record_unprotected!(reporting_date)
+          end
+
+          it 'should set effective date as next month beginning of month from qle' do
+            expect(new_sep.effective_on).to eq qle_on.end_of_month + 1.day
           end
         end
 
-        context 'qle_on is beginning of momth' do
+        context 'qle_on is beginning of month, reporting_date before 15th of month' do
           let(:qle_on) { TimeKeeper.date_of_record.beginning_of_month }
-          let(:reporting_date) { TimeKeeper.date_of_record }
+          let(:reporting_date) { TimeKeeper.date_of_record.beginning_of_month }
 
-          it 'should set effective date as beginning of next month' do
-            report_date = [sep.end_on, reporting_date].min
-            eff_date = [qle_on, report_date].max
-            date = report_date.day <= 20 ? eff_date.end_of_month + 1.day : eff_date.next_month.end_of_month + 1.day
-            expect(sep.effective_on).to eq date
+          before do
+            TimeKeeper.set_date_of_record_unprotected!(reporting_date)
+          end
+
+          it 'should set effective date as next month beginning of month from qle' do
+            expect(new_sep.effective_on).to eq qle_on.end_of_month + 1.day
+          end
+        end
+
+        context 'qle_on is middle of month, reporting_date after 15th of month' do
+
+          let(:qle_on) { TimeKeeper.date_of_record.beginning_of_month + 16.days }
+          let!(:reporting_date) { TimeKeeper.date_of_record.beginning_of_month + 16.days }
+
+          before do
+            TimeKeeper.set_date_of_record_unprotected!(reporting_date)
+          end
+
+          it 'should set effective date as next of next month beginning of month' do
+            expect(new_sep.effective_on).to eq [qle_on, reporting_date].max.next_month.end_of_month + 1.day
+          end
+        end
+
+        context 'qle_on is beginning of month, reporting_date after 15th of month' do
+          let(:qle_on) { TimeKeeper.date_of_record.beginning_of_month }
+          let!(:reporting_date) { TimeKeeper.date_of_record.beginning_of_month + 16.days }
+
+          before do
+            TimeKeeper.set_date_of_record_unprotected!(reporting_date)
+          end
+
+          it 'should set effective date as next of next month beginning of month' do
+            expect(new_sep.effective_on).to eq [qle_on, reporting_date].max.next_month.end_of_month + 1.day
           end
         end
       end
 
       context "SHOP" do
-        context 'qle_on is middle of month' do
-          let(:qle_on) { TimeKeeper.date_of_record.beginning_of_month + 21.days }
-          let(:reporting_date) { TimeKeeper.date_of_record }
 
-          it 'should set effective date as next of next month beginning of month' do
-            report_date = [sep.end_on, reporting_date].min
-            date = report_date.day <= 20 ? qle_on.end_of_month + 1.day : qle_on.next_month.end_of_month + 1.day
-            expect(sep.effective_on).to eq date
+        context 'qle_on is middle of month, reporting_date before 15th of month' do
+          let(:qle_on) { TimeKeeper.date_of_record.beginning_of_month + 16.days }
+          let(:reporting_date) { TimeKeeper.date_of_record.beginning_of_month }
+
+          before do
+            TimeKeeper.set_date_of_record_unprotected!(reporting_date)
+          end
+
+          it 'should set effective date as next month beginning of month from qle' do
+            expect(new_sep.effective_on).to eq qle_on.end_of_month + 1.day
           end
         end
 
-        context 'qle_on is beginning of momth' do
+        context 'qle_on is beginning of month, reporting_date before 15th of month' do
           let(:qle_on) { TimeKeeper.date_of_record.beginning_of_month }
-          let(:reporting_date) { TimeKeeper.date_of_record }
+          let(:reporting_date) { TimeKeeper.date_of_record.beginning_of_month }
 
-          it 'should set effective date as beginning of next month' do
-            report_date = [sep.end_on, reporting_date].min
-            date = report_date.day <= 20 ? qle_on.end_of_month + 1.day : qle_on.next_month.end_of_month + 1.day
-            expect(sep.effective_on).to eq date
+          before do
+            TimeKeeper.set_date_of_record_unprotected!(reporting_date)
+          end
+
+          it 'should set effective date as next month beginning of month from qle' do
+            expect(new_sep.effective_on).to eq qle_on.end_of_month + 1.day
+          end
+        end
+
+        context 'qle_on is middle of month, reporting_date after 15th of month' do
+
+          let(:qle_on) { TimeKeeper.date_of_record.beginning_of_month + 16.days }
+          let!(:reporting_date) { TimeKeeper.date_of_record.beginning_of_month + 16.days }
+
+          before do
+            TimeKeeper.set_date_of_record_unprotected!(reporting_date)
+          end
+
+          it 'should set effective date as next of next month beginning of month' do
+            expect(new_sep.effective_on).to eq [qle_on, reporting_date].max.next_month.end_of_month + 1.day
+          end
+        end
+
+        context 'qle_on is beginning of month, reporting_date after 15th of month' do
+          let(:qle_on) { TimeKeeper.date_of_record.beginning_of_month }
+          let!(:reporting_date) { TimeKeeper.date_of_record.beginning_of_month + 16.days }
+
+          before do
+            TimeKeeper.set_date_of_record_unprotected!(reporting_date)
+          end
+
+          it 'should set effective date as next of next month beginning of month' do
+            expect(new_sep.effective_on).to eq [qle_on, reporting_date].max.next_month.end_of_month + 1.day
           end
         end
       end
-
     end
 
     context 'when first_of_next_month is selected' do
