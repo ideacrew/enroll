@@ -115,6 +115,22 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
           expect(options).to eq [[effective_date.to_s, 'first_of_next_month_coinciding']]
         end
       end
+
+      context "QLEK with first_of_next_month_plan_selection effective_on_kind" do
+
+        it "it should return options for first_of_next_month_plan_selection for shop market" do
+          qle.update_attributes(market_kind: 'shop', effective_on_kinds: ['first_of_next_month_plan_selection'])
+          options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
+          expect(options).to eq [[(date.end_of_month + 1.day).to_s, 'first_of_next_month_plan_selection']]
+        end
+
+        it "it should return options for first_of_next_month_plan_selection for individual market" do
+          qle.update_attributes(market_kind: 'individual', effective_on_kinds: ['first_of_next_month_plan_selection'])
+          options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
+          expect(options).to eq [[(date.end_of_month + 1.day).to_s, 'first_of_next_month_plan_selection']]
+        end
+      end
+
       context "QLEK with first_of_month_plan_selection effective_on_kind" do
 
         it "it should return options for first_of_month_plan_selection for shop market" do

@@ -8,4 +8,7 @@ end
 QualifyingLifeEventKind.where(:effective_on_kinds.in=> ['first_of_next_month'], :market_kind.in => ['shop', 'fehb']).each do |qle|
   qle.update_attributes(effective_on_kinds: qle.effective_on_kinds.map{|kind| kind == "first_of_next_month" ? "first_of_next_month_coinciding": kind})
 end
+
+QualifyingLifeEventKind.where(:effective_on_kinds.in=> ['first_of_next_month'], market_kind: 'individual').each do |qle|
+  qle.update_attributes(effective_on_kinds: qle.effective_on_kinds.map{|kind| kind == "first_of_next_month" ? "first_of_next_month_plan_selection": kind})
 end
