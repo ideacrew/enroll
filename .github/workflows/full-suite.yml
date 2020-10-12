@@ -30,6 +30,7 @@ jobs:
           git fetch --no-tags --depth=1 origin master
           bundle exec rubocop-git origin/master | grep "no offenses detected"
   engines:
+    needs: [rubocop]
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -93,6 +94,7 @@ jobs:
           bundle config path ../../vendor/bundle
           bundle exec rspec --fail-fast
   benefit-sponsors:
+    needs: [rubocop]
     runs-on: ubuntu-latest
     strategy:
       matrix:

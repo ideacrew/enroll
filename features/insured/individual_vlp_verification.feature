@@ -67,6 +67,7 @@ Feature: Insured VLP Verification for Individual market
     Then Individual doesnot go to Authorization and Consent page
     Then Individual logs out
 
+  @flaky
   Scenario: Individual should be able to succesfully add a valid alphanumeric i94 number for Other With I-94 Number.
     Given Individual resumes enrollment
     And Individual click on Sign In
