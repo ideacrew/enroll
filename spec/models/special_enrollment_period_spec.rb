@@ -1075,8 +1075,6 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
         end
       end
     end
-
-
   end
 
   context 'for termination_dates' do
