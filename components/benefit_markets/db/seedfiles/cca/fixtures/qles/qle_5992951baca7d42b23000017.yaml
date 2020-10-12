@@ -5,7 +5,7 @@ attributes: !ruby/hash:BSON::Document
     raw_data: !binary |-
       WZKVG6yn1CsjAAAX
   effective_on_kinds:
-  - date_of_event
+  - exact_date
   is_active: true
   title: Court order to provide coverage for someone
   tool_tip: ''
