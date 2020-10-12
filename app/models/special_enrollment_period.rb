@@ -263,6 +263,8 @@ private
                           first_of_this_month_effective_date
                         when "first_of_next_month"
                           first_of_next_month_effective_date
+                        when "first_of_next_month_coinciding"
+                          first_of_next_month_coinciding_effective_date
                         when "fixed_first_of_next_month"
                           fixed_first_of_next_month_effective_date
                         when "first_of_month_plan_selection"
@@ -294,6 +296,20 @@ private
     qle_on.beginning_of_month
   end
 
+  def reference_date
+    [submitted_at.to_date, end_on].min
+  end
+
+  def earliest_effective_date
+    [reference_date, qle_on].max
+  end
+  def first_of_next_month_coinciding_effective_date
+    if earliest_effective_date == earliest_effective_date.beginning_of_month
+      earliest_effective_date
+    else
+      earliest_effective_date.end_of_month + 1.day
+    end
+  end
   def first_of_next_month_effective_date
     if qualifying_life_event_kind.is_dependent_loss_of_coverage?
       qualifying_life_event_kind.employee_gaining_medicare(qle_on, selected_effective_on)
