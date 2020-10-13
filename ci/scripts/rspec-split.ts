@@ -14,11 +14,11 @@ import {
 
 async function createSplitConfig(): Promise<void> {
   // Read cli arguments
-  const [filePath, outputPath, manualGroupCount] = process.argv.slice(2);
+  const [reportPath, splitConfigPath, manualGroupCount] = process.argv.slice(2);
 
   if (
-    filePath === undefined ||
-    outputPath === undefined ||
+    reportPath === undefined ||
+    splitConfigPath === undefined ||
     manualGroupCount === undefined
   ) {
     console.error('Missing cli arguments');
@@ -26,7 +26,7 @@ async function createSplitConfig(): Promise<void> {
   }
 
   // Read in rspec report
-  const rspecReport = await fs.readFile(`./${filePath}`, 'utf-8');
+  const rspecReport = await fs.readFile(`./${reportPath}`, 'utf-8');
 
   // Convert string to workable object
   const examples: RspecExample[] = JSON.parse(rspecReport).examples;
@@ -45,10 +45,14 @@ async function createSplitConfig(): Promise<void> {
     +manualGroupCount
   );
 
-  await fs.writeFile(
-    `./${outputPath}/rspec-split-config.json`,
-    JSON.stringify(splitConfig)
-  );
+  try {
+    await fs.writeFile(
+      `./${splitConfigPath}/rspec-split-config.json`,
+      JSON.stringify(splitConfig)
+    );
+  } catch (e) {
+    console.error(e);
+  }
 }
 
 createSplitConfig();
