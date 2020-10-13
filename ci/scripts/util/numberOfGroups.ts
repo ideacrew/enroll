@@ -1,6 +1,11 @@
 import { FileWithRuntime } from '../models';
 
-export function groupCount(files: FileWithRuntime[]): any {
+/**
+ * Reads file array and returns details about the
+ * nature of the set of files
+ * @param files an array of files with runtime
+ */
+export function runtimeDetails(files: FileWithRuntime[]): any {
   const [longestTest] = files.sort((a, b) => (a.runTime > b.runTime ? -1 : 1));
   const totalRuntime = files.reduce((runtime, file) => {
     return runtime + file.runTime;

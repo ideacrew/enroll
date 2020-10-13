@@ -1,3 +1,4 @@
 default: --format pretty --fail-fast --order random --strict --tags 'not @wip and not @broken and not @flaky and not @ma_only' -r features --profile semaphoreci
 everything: --format pretty --strict -r features
 semaphoreci: -q
+report: --format json --out ci/cucumber/gh-cucumber-report.json --fail-fast --order random --strict --tags 'not @wip and not @broken and not @flaky and not @ma_only' -r features

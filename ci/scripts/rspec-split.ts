@@ -14,9 +14,13 @@ import {
 
 async function createSplitConfig(): Promise<void> {
   // Read cli arguments
-  const [filePath, outputPath] = process.argv.slice(2);
+  const [filePath, outputPath, manualGroupCount] = process.argv.slice(2);
 
-  if (filePath === undefined || outputPath === undefined) {
+  if (
+    filePath === undefined ||
+    outputPath === undefined ||
+    manualGroupCount === undefined
+  ) {
     throw new Error('Please provide the required cli arguments.');
   }
 
@@ -35,7 +39,10 @@ async function createSplitConfig(): Promise<void> {
     filesByRuntime
   );
 
-  const splitConfig: FileGroup[] = splitFilesIntoGroups(arrayOfSlowFiles);
+  const splitConfig: FileGroup[] = splitFilesIntoGroups(
+    arrayOfSlowFiles,
+    +manualGroupCount
+  );
 
   await fs.writeFile(
     `./${outputPath}/rspec-split-config.json`,
