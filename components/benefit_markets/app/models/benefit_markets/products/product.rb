@@ -183,29 +183,37 @@ module BenefitMarkets
     end
 
     def min_cost_for_application_period(effective_date)
-      BenefitMarkets::Products::Product.collection.aggregate([
-                                    {'$match' => {'_id' => id}},
-                                    {'$unwind' => '$premium_tables'},
-                                    {'$match' => {'premium_tables.effective_period.min' => {'$lte' => effective_date}}},
-                                    {'$match' => {'premium_tables.effective_period.max' => {'$gte' => effective_date}}},
-                                    {'$unwind' => '$premium_tables.premium_tuples'},
-                                    {'$match' => {'premium_tables.premium_tuples.age' => {'$eq' => premium_ages.min}}},
-                                    {'$group' => {'_id' => 0, 'cost' => {'$min' => '$premium_tables.premium_tuples.cost'}}},
-                                    {'$project' => {'_id' => 0}}
-                                ], :allow_disk_use => true).to_a.first['cost']
+      Rails.cache.fetch("min-cost-#{id}-#{effective_date}", expires_in: 12.hour) do
+        BenefitMarkets::Products::Product.collection.aggregate(
+          [
+            {'$match' => {'_id' => id}},
+            {'$unwind' => '$premium_tables'},
+            {'$match' => {'premium_tables.effective_period.min' => {'$lte' => effective_date}}},
+            {'$match' => {'premium_tables.effective_period.max' => {'$gte' => effective_date}}},
+            {'$unwind' => '$premium_tables.premium_tuples'},
+            {'$match' => {'premium_tables.premium_tuples.age' => {'$eq' => premium_ages.min}}},
+            {'$group' => {'_id' => 0, 'cost' => {'$min' => '$premium_tables.premium_tuples.cost'}}},
+            {'$project' => {'_id' => 0}}
+          ]
+        ).to_a.first['cost']
+      end
     end
 
     def max_cost_for_application_period(effective_date)
-      BenefitMarkets::Products::Product.collection.aggregate([
-                                    {'$match' => {'_id' => id}},
-                                    {'$unwind' => '$premium_tables'},
-                                    {'$match' => {'premium_tables.effective_period.min' => {'$lte' => effective_date}}},
-                                    {'$match' => {'premium_tables.effective_period.max' => {'$gte' => effective_date}}},
-                                    {'$unwind' => '$premium_tables.premium_tuples'},
-                                    {'$match' => {'premium_tables.premium_tuples.age' => {'$eq' => premium_ages.min}}},
-                                    {'$group' => {_id: 0, cost: {'$max' => '$premium_tables.premium_tuples.cost'}}},
-                                    {'$project' => {'_id' => 0}}
-                                ], :allow_disk_use => true).to_a.first['cost']
+      Rails.cache.fetch("max-cost-#{id}-#{effective_date}", expires_in: 12.hour) do
+        BenefitMarkets::Products::Product.collection.aggregate(
+          [
+            {'$match' => {'_id' => id}},
+            {'$unwind' => '$premium_tables'},
+            {'$match' => {'premium_tables.effective_period.min' => {'$lte' => effective_date}}},
+            {'$match' => {'premium_tables.effective_period.max' => {'$gte' => effective_date}}},
+            {'$unwind' => '$premium_tables.premium_tuples'},
+            {'$match' => {'premium_tables.premium_tuples.age' => {'$eq' => premium_ages.min}}},
+            {'$group' => {'_id' => 0, 'cost' => {'$max' => '$premium_tables.premium_tuples.cost'}}},
+            {'$project' => {'_id' => 0}}
+          ]
+        ).to_a.first['cost']
+      end
     end
 
     def cost_for_application_period(application_period)
