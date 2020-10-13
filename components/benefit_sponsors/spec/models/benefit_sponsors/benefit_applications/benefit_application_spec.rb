@@ -654,9 +654,7 @@ module BenefitSponsors
             end
 
             it "should set minimum contributions percentage" do
-              if flex_setting_enabled && flex_period.cover?(renewal_application.start_on)
-                expect(contribution_model1.key).to eq :fifty_percent_sponsor_fixed_percent_contribution_model
-              end
+              expect(contribution_model1.key).to eq :fifty_percent_sponsor_fixed_percent_contribution_model if flex_setting_enabled && flex_period.cover?(renewal_application.start_on)
             end
           end
 
@@ -683,9 +681,7 @@ module BenefitSponsors
             end
 
             it "should set minimum contributions percentage" do
-              if renewal_flex_setting_enabled && renewal_flex_period.cover?(renewal_effective_period.min)
-                expect(contribution_model2.key).to eq :zero_percent_sponsor_fixed_percent_contribution_model
-              end
+              expect(contribution_model2.key).to eq :zero_percent_sponsor_fixed_percent_contribution_model if renewal_flex_setting_enabled && renewal_flex_period.cover?(renewal_effective_period.min)
             end
           end
 
