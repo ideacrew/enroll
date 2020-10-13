@@ -16,7 +16,12 @@ export function splitFilesIntoGroups(
 
   const bucketMaxRunTime = Math.floor(totalRuntime / groupCount);
 
-  console.log({ longestTest, totalRuntime, bucketMaxRunTime, groupCount });
+  console.log({
+    longestTest: inMinutes(longestTest),
+    totalRuntime: inMinutes(totalRuntime),
+    bucketMaxRunTime: inMinutes(bucketMaxRunTime),
+    groupCount,
+  });
 
   const groupRunTimes: FilesWithRunTime[] = Array.from(
     { length: groupCount },
@@ -66,4 +71,8 @@ function getGroupRunTime(filesWithRunTime: FilesWithRunTime): number {
       return file ? runtime + file?.runTime : 0;
     }, 0)
   );
+}
+
+function inMinutes(runTime: number): string {
+  return `${runTime / 1000 / 60} minutes`;
 }
