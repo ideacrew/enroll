@@ -241,7 +241,7 @@ private
 
     errors_array = []
     clean_address_params = address_params.reject{|_key, value| value[:address_1].blank? && value[:city].blank? && value[:state].blank? && value[:zip].blank?}
-    clean_address_params.to_h.each do
+    clean_address_params.to_h.each do |_key, value|
       if value.is_a?(Hash)
         result = Validators::AddressContract.new.call(value)
         errors_array <<  result.errors.to_h  if result.failure?
