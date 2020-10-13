@@ -149,7 +149,7 @@ class Insured::FamilyMembersController < ApplicationController
     end
     consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
     @info_changed, @dc_status = sensitive_info_changed?(consumer_role)
-    if @address_errors.blank? &&  @dependent.update_attributes(params.require(:dependent)) && update_vlp_documents(consumer_role, 'dependent', @dependent)
+    if @address_errors.blank? && @dependent.update_attributes(params.require(:dependent)) && update_vlp_documents(consumer_role, 'dependent', @dependent)
       consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
       consumer_role.check_for_critical_changes(@dependent.family_member.family, info_changed: @info_changed, is_homeless: params[:dependent]["is_homeless"], is_temporarily_out_of_state: params[:dependent]["is_temporarily_out_of_state"], dc_status: @dc_status) if consumer_role
       consumer_role.update_attribute(:is_applying_coverage,  params[:dependent][:is_applying_coverage]) if consumer_role.present? && (!params[:dependent][:is_applying_coverage].nil?)
@@ -241,7 +241,7 @@ private
 
     errors_array = []
     clean_address_params = address_params.reject{|_key, value| value[:address_1].blank? && value[:city].blank? && value[:state].blank? && value[:zip].blank?}
-    clean_address_params.to_h.each do |key, value|
+    clean_address_params.to_h.each do
       if value.is_a?(Hash)
         result = Validators::AddressContract.new.call(value)
         errors_array <<  result.errors.to_h  if result.failure?

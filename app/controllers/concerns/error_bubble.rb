@@ -51,5 +51,4 @@ module ErrorBubble
   def has_any_address_fields_present?(address)
     address.address_1.present? || address.city.present? || address.state.present? || address.zip.present?
   end
-
 end
