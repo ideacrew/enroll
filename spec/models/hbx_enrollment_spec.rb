@@ -1479,6 +1479,39 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
       end
     end
 
+    context 'when renewing coverage is waived' do
+      include_context "setup initial benefit application"
+
+      let(:enrollment_effective_on) {TimeKeeper.date_of_record - 15.days}
+      let(:renewing_waived_enrollment) do
+        FactoryGirl.create(
+          :hbx_enrollment,
+          household: shop_family.latest_household,
+          coverage_kind: 'health',
+          effective_on: enrollment_effective_on,
+          enrollment_kind: enrollment_kind,
+          kind: 'employer_sponsored',
+          submitted_at: TimeKeeper.date_of_record,
+          benefit_sponsorship_id: benefit_sponsorship.id,
+          sponsored_benefit_package_id: current_benefit_package.id,
+          sponsored_benefit_id: current_benefit_package.sponsored_benefits[0].id,
+          employee_role_id: employee_role.id,
+          benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id,
+          predecessor_enrollment_id: enrollment.id,
+          product_id: enrollment.product_id,
+          aasm_state: 'renewing_waived'
+        )
+      end
+
+      it 'should update benefit_group_assignment state to coverage_waived' do
+        expect(renewing_waived_enrollment.aasm_state).to eq 'renewing_waived'
+        expect(renewing_waived_enrollment.benefit_group_assignment.aasm_state).to eq 'initialized'
+        renewing_waived_enrollment.begin_coverage!
+        expect(renewing_waived_enrollment.aasm_state).to eq 'inactive'
+        expect(renewing_waived_enrollment.benefit_group_assignment.aasm_state).to eq 'coverage_waived'
+      end
+    end
+
     context 'When family passively renewed', dbclean: :after_each do
       include_context "setup renewal application"
 
