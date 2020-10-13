@@ -4,7 +4,7 @@ import { FeatureStep, FileWithRuntime, FileGroup } from './models';
 import { CucumberFeature } from './models';
 import { splitFilesIntoGroups } from './util';
 
-const REPORT_PATH = './ci/cucumber/gh-cucumber-report.json';
+const REPORT_PATH = './ci/cucumber/local-cucumber-report.json';
 const SPLIT_CONFIG_PATH = './ci/cucumber-split-config.json';
 
 function calculateStepsRuntime(steps: FeatureStep[]) {
@@ -48,7 +48,7 @@ async function createCucumberSplitConfig() {
     +manualGroupCount
   );
 
-  // await fs.writeFile(SPLIT_CONFIG_PATH, JSON.stringify(splitConfig));
+  await fs.writeFile(SPLIT_CONFIG_PATH, JSON.stringify(splitConfig));
 }
 
 createCucumberSplitConfig();

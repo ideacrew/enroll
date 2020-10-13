@@ -18,6 +18,10 @@ async function getJson() {
     './ci/cucumber/employers-report.json',
     'utf-8'
   );
+  const financialAssistance = await fs.readFile(
+    './ci/cucumber/financial-assistance-report.json',
+    'utf-8'
+  );
   const generalAgencies = await fs.readFile(
     './ci/cucumber/general-agencies-report.json',
     'utf-8'
@@ -54,6 +58,7 @@ async function getJson() {
     coverall,
     employee,
     employers,
+    financialAssistance,
     generalAgencies,
     groupSelection,
     hbxAdmin,
@@ -72,7 +77,7 @@ async function getJson() {
 
   const jsonList = JSON.stringify(allReports);
 
-  await fs.writeFile('./ci/cucumber/cucumber-report.json', jsonList);
+  await fs.writeFile('./ci/cucumber/local-cucumber-report.json', jsonList);
 }
 
 getJson();
