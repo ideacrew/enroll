@@ -1,5 +1,6 @@
-# To run rake task: RAILS_ENV=production bundle exec rake migrations:update_end_date_on_invalid_tax_households
+# frozen_string_literal: true
 
+# To run rake task: RAILS_ENV=production bundle exec rake migrations:update_end_date_on_invalid_tax_households
 require File.join(Rails.root, "app", "data_migrations", "update_end_date_on_invalid_tax_households")
 
 namespace :migrations do
