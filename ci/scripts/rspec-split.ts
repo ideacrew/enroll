@@ -21,7 +21,8 @@ async function createSplitConfig(): Promise<void> {
     outputPath === undefined ||
     manualGroupCount === undefined
   ) {
-    throw new Error('Please provide the required cli arguments.');
+    console.error('Missing cli arguments');
+    process.exit(1);
   }
 
   // Read in rspec report
