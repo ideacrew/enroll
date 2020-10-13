@@ -175,9 +175,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         it "should navigate to another page which has information for user to signin/recover account" do
           post :match, params: { :person => person_parameters }
           expect(response).to redirect_to(ssn_taken_insured_consumer_role_index_path)
-          expect(flash[:alert]).to eq "The SSN entered is associated with an existing user.
-                                        Please <a href=\"https://iam_login_url\">Sign In</a> with your user name and password or
-                                        <a href=\"https://account_recovery\">Click here</a> if you've forgotten your password."
+          expect(flash[:alert]).to match /The SSN entered is associated with an existing user/i
         end
       end
     end
