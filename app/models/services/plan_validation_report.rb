@@ -80,30 +80,30 @@ module Services
 
     def sheet2
       worksheet2 = workbook.add_worksheet('Report2')
-      headers = %w[PlanYearId CarrierId CarrierName RatingArea Age Sum]
+      headers = %w[PlanYearId CarrierId CarrierName RatingArea Age(Range) IndividualRate]
       generate_excel(headers, worksheet2)
       b = 1
       issuer_hios_ids.each do |issuer_hios_id|
-        issuer_products = products(active_year).where(hios_id: /#{issuer_hios_id}/)
+        issuer_products = products(active_year).where(hios_id: /#{issuer_hios_id}/i)
         rating_area_ids.each do |rating_area_key, rating_area_value|
           premium_tables = issuer_products.map(&:premium_tables).flatten.select do |prem_tab|
             start_date = prem_tab.effective_period.min.to_date
             end_date = prem_tab.effective_period.max.to_date
             (start_date..end_date).cover?(active_date) && prem_tab.rating_area_id.to_s == rating_area_key
           end
-          (0..120).each do |value|
+          (14..64).each do |value|
             age = case value
-                  when 0..14
-                    14
-                  when 64..120
-                    64
+                  when 14
+                    "0-14"
+                  when 64
+                    "64 and over"
                   else
                     value
                   end
-            age_cost = premium_tables.map(&:premium_tuples).flatten.select{|tuple| tuple.age == age}.map(&:cost).sum
+            age_cost = premium_tables.map(&:premium_tuples).flatten.select{|tuple| tuple.age == value}.map(&:cost).sum
             carrier_name = issuer_products.first.issuer_profile.legal_name
             ra_val = rating_area_value.gsub("R-MA00", "Rating Area ")
-            data = [active_year, issuer_hios_id, carrier_name, ra_val, value, age_cost.round(2).to_s]
+            data = [active_year, issuer_hios_id, carrier_name, ra_val, age, age_cost.round(2).to_s]
             generate_data(worksheet2, data, b)
             b += 1
           rescue StandardError

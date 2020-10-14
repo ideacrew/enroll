@@ -40,7 +40,7 @@ describe 'reports generation after plan loading', :dbclean => :after_each do
         workbook = RubyXL::Parser.parse(file_name)
         worksheet1 = workbook[1]
         worksheet1.sheet_data[0]
-        expect(worksheet1.sheet_data[0].cells.map(&:value)).to eq ["PlanYearId", "CarrierId", "CarrierName", "RatingArea", "Age", "Sum"]
+        expect(worksheet1.sheet_data[0].cells.map(&:value)).to eq ["PlanYearId", "CarrierId", "CarrierName", "RatingArea", "Age(Range)", "IndividualRate"]
       end
     end
 
