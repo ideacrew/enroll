@@ -1,14 +1,16 @@
+# frozen_string_literal: true
+
 And(/^.+ sees the list of plans$/) do
   find('#planContainer', wait: 10)
   expect(page).to have_link('Select')
   screenshot("plan_shopping")
 end
 
-When(/(.*) clicks "(.*?)" link in the qle carousel/) do |name, qle_event|
-  click_link "#{qle_event}"
+When(/(.*) clicks "(.*?)" link in the qle carousel/) do |_name, qle_event|
+  click_link qle_event.to_s
 end
 
-When(/(.*) selects a current qle date/) do |person|
+When(/(.*) selects a current qle date/) do |_person|
   expect(page).to have_content "Married"
   screenshot("past_qle_date")
   fill_in "qle_date", :with => TimeKeeper.date_of_record.strftime("%m/%d/%Y")
@@ -17,7 +19,7 @@ When(/(.*) selects a current qle date/) do |person|
   end
 end
 
-Then(/(.*) sees the QLE confirmation message and clicks on continue$/) do |person|
+Then(/(.*) sees the QLE confirmation message and clicks on continue$/) do |_person|
   expect(page).to have_content "Based on the information you entered, you may be eligible to enroll now but there is limited time"
   screenshot("valid_qle")
   click_button "Continue"
