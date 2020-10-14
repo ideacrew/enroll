@@ -44,6 +44,12 @@ module Services
       ::BenefitMarkets::Products::Product.by_year(year)
     end
 
+    def metal_level_kinds
+      health = BenefitMarkets::Products::HealthProducts::HealthProduct::METAL_LEVEL_KINDS
+      dental = BenefitMarkets::Products::DentalProducts::DentalProduct::METAL_LEVEL_KINDS
+      health + dental
+    end
+
     def generate_file(file_name)
       workbook.write(file_name)
       puts "Successfully reports generation process completed" unless Rails.env.test?
@@ -62,18 +68,20 @@ module Services
       headers = %w[PlanYearId CarrierId CarrierName PlanTypeCode Tier Count]
       generate_excel(headers, worksheet)
       a = 1
-      products(active_year).all.each do |product|
-        active_year = product.active_year
-        carrier_id = product.hios_id[0..4]
-        carrier_name = product.issuer_profile.abbrev
-        plan_type_code = product.kind == :health ? "QHP" : "QDP"
-        tier = product.metal_level_kind.to_s
-        product_count = products(active_year).where(hios_id: /#{carrier_id}/i, metal_level_kind: tier).count
-        data = [active_year, carrier_id, carrier_name, plan_type_code, tier, product_count]
-        generate_data(worksheet, data, a)
-        a += 1
-      rescue StandardError
-        puts "Report1 Plan validation issue for product_id: #{product.id}" unless Rails.env.test?
+      issuer_hios_ids.each do |issuer_hios_id|
+        metal_level_kinds.each do |metal_level_kind|
+          products = ::BenefitMarkets::Products::Product.by_year(active_year).where(hios_id: /#{issuer_hios_id}/i, metal_level_kind: metal_level_kind)
+
+          next if products.count < 1
+
+          plan_type_code = products.first.kind == :health ? "QHP" : "QDP"
+          carrier_name = products.first.issuer_profile.legal_name
+          data = [active_year, issuer_hios_id, carrier_name, plan_type_code, metal_level_kind.to_s, products.count]
+          generate_data(worksheet, data, a)
+          a += 1
+        rescue StandardError
+          puts "Report1 Plan validation issue for product_id: #{product.id}" unless Rails.env.test?
+        end
       end
       puts "Successfully generated 1st Plan validation report for Plan Count" unless Rails.env.test?
     end
