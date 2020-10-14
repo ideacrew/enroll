@@ -76,6 +76,26 @@ module Operations
       end
     end
 
+    describe "Should cancel passive renewal enrollment when terminating present enrollment under OR period with effective on not same as renewal previous year" do
+      before do
+        expired_enrollment.update_attributes(aasm_state: :coverage_selected)
+        allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 11, 1))
+      end
+
+      include_context 'family with previous enrollment not beginning of year for termination and second passive renewal'
+      let(:params) { expired_enrollment }
+
+      it 'should cancel renewal enrollment when passed an active enrollment' do
+        expect(renewal_enrollment.aasm_state).to eq "coverage_selected"
+        expect(renewal_enrollment2.aasm_state).to eq "coverage_selected"
+        expect(subject).to be_success
+        renewal_enrollment2.reload
+        renewal_enrollment.reload
+        expect(renewal_enrollment.aasm_state).to eq "coverage_canceled"
+        expect(renewal_enrollment2.aasm_state).to eq "coverage_selected"
+      end
+    end
+
     describe "Should throw an error when the enrollment is not ivl " do
       before do
         expired_enrollment.update_attributes(kind: :employer_sponsored)
