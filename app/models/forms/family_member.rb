@@ -288,6 +288,7 @@ module Forms
       assign_attributes(attr)
       assign_citizen_status
       return false unless valid?
+      assign_person_address(family_member.person)
       return false unless try_update_person(family_member.person)
       if attr["is_consumer_role"] == "true"
         family_member.family.build_consumer_role(family_member, attr["vlp_document_id"])
@@ -295,7 +296,6 @@ module Forms
       elsif attr["is_resident_role"] == "true"
         family_member.family.build_resident_role(family_member)
       end
-      assign_person_address(family_member.person)
       family_member.update_relationship(relationship)
       family_member.save!
       true
