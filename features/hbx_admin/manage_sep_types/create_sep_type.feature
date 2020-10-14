@@ -141,6 +141,7 @@ Feature: Admin has ability to create a new SEP Type
     Then Admin should see failure for eligibility end date
     And Hbx Admin logs out
 
+  @flaky
   Scenario: Admin should see failure when creating SEP type withonly eligibility end date
     Given Admin can navigate to the Manage SEPs screen
     When Admin clicks on the Create SEP Type button
