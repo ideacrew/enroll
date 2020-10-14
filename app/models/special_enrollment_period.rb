@@ -192,7 +192,7 @@ class SpecialEnrollmentPeriod
     when 'end_of_reporting_month'
       [created_at.end_of_month.to_date, qle_on.end_of_month].max
     when 'end_of_month_before_last'
-      (created_at - 2.months).end_of_month.to_date
+      [(created_at - 2.months).end_of_month.to_date, qle_on.end_of_month].max
     when 'exact_date'
       qle_on
     end

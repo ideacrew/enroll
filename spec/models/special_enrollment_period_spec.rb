@@ -1131,8 +1131,9 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
 
   context 'for fetch_termiation_date' do
     let!(:family10) { FactoryBot.create(:family, :with_primary_family_member) }
+    let!(:qle_on) { TimeKeeper.date_of_record - 10.days }
     let!(:sep10) do
-      sep = FactoryBot.create(:special_enrollment_period, family: family10)
+      sep = FactoryBot.create(:special_enrollment_period, qle_on: qle_on, family: family10)
       sep.qualifying_life_event_kind.update_attributes!(termination_on_kinds: ['end_of_event_month', 'exact_date'])
       sep
     end
@@ -1141,8 +1142,27 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
       expect(sep10.fetch_termiation_date('end_of_event_month')).to eq(sep10.qle_on.end_of_month)
     end
 
-    it 'should return end of last of last month from reporting date' do
-      expect(sep10.fetch_termiation_date('end_of_month_before_last')).to eq((sep10.created_at - 2.months).end_of_month.to_date)
+    context "end_of_month_before_last" do
+      context "qle on past month" do
+        let!(:qle_on) { TimeKeeper.date_of_record - 3.months }
+        it 'should return end of last of last month from reporting date' do
+          expect(sep10.fetch_termiation_date('end_of_month_before_last')).to eq((sep10.created_at - 2.months).end_of_month.to_date)
+        end
+      end
+
+      context "qle on current month" do
+        let!(:qle_on) { TimeKeeper.date_of_record }
+        it 'should return end month from event date' do
+          expect(sep10.fetch_termiation_date('end_of_month_before_last')).to eq(sep10.qle_on.end_of_month)
+        end
+      end
+
+      context "qle on future month" do
+        let!(:qle_on) { TimeKeeper.date_of_record.next_month }
+        it 'should return end month from event date' do
+          expect(sep10.fetch_termiation_date('end_of_month_before_last')).to eq(sep10.qle_on.end_of_month)
+        end
+      end
     end
 
     it 'should return day before qle_on' do
