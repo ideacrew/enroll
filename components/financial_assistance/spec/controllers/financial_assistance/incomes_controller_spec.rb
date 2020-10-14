@@ -37,7 +37,7 @@ RSpec.describe FinancialAssistance::IncomesController, dbclean: :after_each, typ
   end
 
   context "POST new" do
-    it "should load template work flow steps" do
+    xit "should load template work flow steps" do
       post :new, params: { application_id: application.id, applicant_id: applicant.id }
       expect(response).to render_template(:financial_assistance_nav)
       expect(response).to render_template 'workflow/step'
@@ -60,7 +60,7 @@ RSpec.describe FinancialAssistance::IncomesController, dbclean: :after_each, typ
         expect(applicant.save).to eq true
       end
 
-      it "should redirect to find_applicant_path when passing params last step" do
+      xit "should redirect to find_applicant_path when passing params last step" do
         post :step, params: { application_id: application.id, applicant_id: applicant.id, id: income.id,income: valid_income_params, employer_address: income_employer_address_params, employer_phone: income_employer_phone_params, commit: "CONTINUE", last_step: true }
         expect(response.headers['Location']).to have_content 'incomes'
         expect(response.status).to eq 302
@@ -68,7 +68,7 @@ RSpec.describe FinancialAssistance::IncomesController, dbclean: :after_each, typ
         expect(response).to redirect_to(application_applicant_incomes_path(application, applicant))
       end
 
-      it "should not redirect to find_applicant_path when not passing params last step" do
+      xit "should not redirect to find_applicant_path when not passing params last step" do
         post :step, params: { application_id: application.id, applicant_id: applicant.id, id: income.id,income: valid_income_params, employer_address: income_employer_address_params, employer_phone: income_employer_phone_params, commit: "CONTINUE" }
         expect(response.status).to eq 200
         expect(response).to render_template 'workflow/step'
@@ -124,7 +124,7 @@ RSpec.describe FinancialAssistance::IncomesController, dbclean: :after_each, typ
   end
 
   context "destroy" do
-    it "should create new income" do
+    xit "should create new income" do
       expect(applicant.incomes.count).to eq 1
       delete :destroy, params: { application_id: application.id, applicant_id: applicant.id, id: income.id }
       applicant.reload
