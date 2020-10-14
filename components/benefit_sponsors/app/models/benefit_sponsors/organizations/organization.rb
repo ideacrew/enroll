@@ -349,9 +349,11 @@ module BenefitSponsors
       end
 
       def update_plan_design_organization
-        ::SponsoredBenefits::Organizations::PlanDesignOrganization.where(:"sponsor_profile_id" => BSON::ObjectId.from_string(employer_profile.id)).each do |pdo|
+        return if employer_profile.present? && legal_name_changed?
+
+        ::SponsoredBenefits::Organizations::PlanDesignOrganization.where(:sponsor_profile_id => BSON::ObjectId.from_string(employer_profile.id)).each do |pdo|
           pdo.update_attributes(legal_name: legal_name)
-        end if employer_profile.present? && legal_name_changed?
+        end
       end
     end
   end
