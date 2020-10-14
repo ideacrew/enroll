@@ -499,5 +499,4 @@ class Insured::FamiliesController < FamiliesController
     end
 
   end
-
 end
