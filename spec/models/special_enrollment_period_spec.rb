@@ -1153,8 +1153,27 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
       expect(sep10.fetch_termiation_date('end_of_last_month_of_reporting')).to eq(sep10.created_at.prev_month.end_of_month.to_date)
     end
 
-    it 'should return end_of_month of sep submitted_at date' do
-      expect(sep10.fetch_termiation_date('end_of_reporting_month')).to eq(sep10.created_at.end_of_month.to_date)
+    context "end_of_reporting_month" do
+      context "qle on past month" do
+        let!(:qle_on) { TimeKeeper.date_of_record - 2.months }
+        it 'should return end_of_month of sep submitted_at date' do
+          expect(sep10.fetch_termiation_date('end_of_reporting_month')).to eq(sep10.created_at.end_of_month.to_date)
+        end
+      end
+
+      context "qle on current month" do
+        let!(:qle_on) { TimeKeeper.date_of_record }
+        it 'should return end month from event date' do
+          expect(sep10.fetch_termiation_date('end_of_reporting_month')).to eq(sep10.created_at.end_of_month.to_date)
+        end
+      end
+
+      context "qle on future month" do
+        let!(:qle_on) { TimeKeeper.date_of_record.next_month }
+        it 'should return end month from event date' do
+          expect(sep10.fetch_termiation_date('end_of_reporting_month')).to eq(sep10.qle_on.end_of_month)
+        end
+      end
     end
 
     it 'should return sep qle_on date' do
