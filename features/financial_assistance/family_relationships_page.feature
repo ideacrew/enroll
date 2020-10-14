@@ -41,6 +41,7 @@ Feature: Functionality for the Family Relationships page
     Then the CONTINUE button will be disabled
     And the family member row will be highlighted
 
+  @flaky
   Scenario: Family relationship value is stored
     Given that the user is on the FAA Family Relationships page
     And there is a nil value for at least one relationship

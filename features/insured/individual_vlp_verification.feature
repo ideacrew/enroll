@@ -39,6 +39,7 @@ Feature: Insured VLP Verification for Individual market
     Then Individual doesnot go to Authorization and Consent page
     Then Individual logs out
 
+  @flaky
   Scenario: Individual should be able to succesfully add a valid alphanumeric i94 number for I-94 (Arrival/Departure Record) in Unexpired Foreign Passport.
     Given Individual resumes enrollment
     And Individual click on Sign In

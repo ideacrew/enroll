@@ -12,9 +12,9 @@ module TimeHelper
   def set_date_max_to_plan_end_of_year (enrollment)
     year = enrollment.effective_on.year
     if (enrollment.kind == "employer_sponsored") || (enrollment.kind == "employer_sponsored_cobra")
-      final_day = enrollment.effective_on + 1.year - 1.day
+      enrollment.sponsored_benefit_package.end_on
     else
-      final_day = Date.new(year, 12, 31)
+      Date.new(year, 12, 31)
     end
   end
 
