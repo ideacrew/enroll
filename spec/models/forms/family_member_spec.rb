@@ -197,7 +197,7 @@ describe Forms::FamilyMember do
 
         it "call update when current address present " do
 
-          expect(addr3).to receive(:update).and_return true
+          expect(person.addresses).to receive(:update).and_return true
           employee_dependent.assign_person_address(person)
         end
 

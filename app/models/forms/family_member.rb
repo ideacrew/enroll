@@ -154,7 +154,7 @@ module Forms
             next
           end
           if current_address.present?
-            current_address.update(address.permit!)
+            person.addresses.update(address.permit!)
           else
             person.addresses.create(address.permit!)
           end
