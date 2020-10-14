@@ -52,7 +52,7 @@ jobs:
       - uses: wbari/start-mongoDB@v0.2
         with:
           mongoDBVersion: '3.6'
-      - name: Restore Project Gems
+      - name: restore Project Gems
         uses: actions/cache@v2
         with:
           path: vendor/bundle
