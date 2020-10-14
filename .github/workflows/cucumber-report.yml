@@ -3,10 +3,9 @@ on: workflow_dispatch
 
 jobs:
   cucumber-report:
-    name: cucumber report
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
       - uses: actions/setup-node@v1
         with:

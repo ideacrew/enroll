@@ -4,7 +4,7 @@ import { FeatureStep, FileWithRuntime, FileGroup } from './models';
 import { CucumberFeature } from './models';
 import { splitFilesIntoGroups } from './util';
 
-const REPORT_PATH = './ci/cucumber/cucumber-report.json';
+const REPORT_PATH = './ci/cucumber/local-cucumber-report.json';
 const SPLIT_CONFIG_PATH = './ci/cucumber-split-config.json';
 
 function calculateStepsRuntime(steps: FeatureStep[]) {
@@ -14,6 +14,12 @@ function calculateStepsRuntime(steps: FeatureStep[]) {
 }
 
 async function createCucumberSplitConfig() {
+  const [manualGroupCount] = process.argv.slice(2);
+
+  if (manualGroupCount === undefined) {
+    throw new Error('Please provide the required cli arguments.');
+  }
+
   // Parse cucumber report
   const cucumberReport = await fs.readFile(REPORT_PATH, 'utf-8');
   const report: CucumberFeature[] = JSON.parse(cucumberReport);
@@ -37,7 +43,10 @@ async function createCucumberSplitConfig() {
     })
     .sort((a, b) => (a.runTime < b.runTime ? -1 : 1));
 
-  const splitConfig: FileGroup[] = splitFilesIntoGroups(arrayOfSlowFiles);
+  const splitConfig: FileGroup[] = splitFilesIntoGroups(
+    arrayOfSlowFiles,
+    +manualGroupCount
+  );
 
   await fs.writeFile(SPLIT_CONFIG_PATH, JSON.stringify(splitConfig));
 }
