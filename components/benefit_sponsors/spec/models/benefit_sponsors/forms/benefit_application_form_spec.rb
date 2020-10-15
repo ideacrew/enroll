@@ -178,8 +178,8 @@ module BenefitSponsors
           benefit_sponsorship_id: 'id',
           start_on: TimeKeeper.date_of_record + 3.months,
           end_on: TimeKeeper.date_of_record + 1.year + 3.months  - 1.day,
-          open_enrollment_start_on: (TimeKeeper.date_of_record + 2.months).strftime("%d/%m/%Y"),
-          open_enrollment_end_on: (TimeKeeper.date_of_record + 2.months + 20.day).strftime("%d/%m/%Y")
+          open_enrollment_start_on: (TimeKeeper.date_of_record + 2.months),
+          open_enrollment_end_on: (TimeKeeper.date_of_record + 2.months + 20.day)
         }
       }
 
@@ -189,8 +189,8 @@ module BenefitSponsors
           benefit_sponsorship_id: 'id',
           start_on: TimeKeeper.date_of_record + 3.months,
           end_on:  TimeKeeper.date_of_record + 1.year + 3.months  - 1.day,
-          open_enrollment_start_on: (TimeKeeper.date_of_record + 2.months + 20.day).strftime("%d/%m/%Y"),
-          open_enrollment_end_on: (TimeKeeper.date_of_record + 2.months).strftime("%d/%m/%Y")
+          open_enrollment_start_on: (TimeKeeper.date_of_record + 2.months + 20.day),
+          open_enrollment_end_on: (TimeKeeper.date_of_record + 2.months)
         }
       }
 
