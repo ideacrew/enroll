@@ -36,7 +36,12 @@ function check_dateformat(date) {
 $(document).on('blur', 'input.jq-datepicker, input.date-picker, input.datepicker-js',  function(){
   var date = $(this).val();
   if(date != "" && !check_dateformat(date)){
-    alert("invalid date format");
+    var memo_element = $('.memo')
+    if (memo_element.length) {
+      memo_element.html("<div class='alert-plan-year alert-error'><h4><b>Invalid date format.</b> You must enter 2 numbers for the month, 2 numbers for the day, and 4 numbers for the year. Example: 05/09/1980.</h4> <br/></div>");
+    }else {
+      alert("invalid date format");
+    }
     $(this).val("");
   }
 });
