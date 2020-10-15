@@ -34,6 +34,7 @@ Feature: Admin has ability to sort SEP Types on Sort SEPs Page and save their po
     Then Admin navigates to SEP Type List page
     And Hbx Admin logs out
 
+  @flaky
   Scenario: Admin will sort Individual market SEP Types and it will reflect the same order on the individual insured home page qle carousel
     Given Admin can navigate to the Manage SEPs screen
     When Admin clicks on the Sort SEPs button
