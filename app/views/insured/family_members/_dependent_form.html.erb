@@ -19,6 +19,10 @@
         </div>
       <% end %>
 
+      <% if @address_errors.present? %>
+        <%= render partial: 'shared/address_error_messages', locals: {address_errors: @address_errors} %>
+      <% end %>
+
       <%if
         @dependent.first_name &&
             @dependent.last_name &&
