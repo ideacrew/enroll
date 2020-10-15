@@ -353,32 +353,12 @@ private
     end
   end
 
-  def first_of_month_plan_selection_effective_date
-    TimeKeeper.date_of_record.end_of_month + 1.day
-  end
-
-  def fifteenth_of_month_plan_selection_effective_date
-    if TimeKeeper.date_of_record.day <= EnrollRegistry[:special_enrollment_period].setting(:fifteenth_of_the_month).item
-      TimeKeeper.date_of_record.end_of_month + 1.day
-    else
-      TimeKeeper.date_of_record.next_month.end_of_month + 1.day
-    end
-  end
-
   def first_of_reporting_month_effective_date
     [(self.created_at ||= TimeKeeper.date_of_record).to_date.beginning_of_month, qle_on.end_of_month + 1.day].max
   end
 
   def first_of_next_month_reporting_effective_date
     [(self.created_at ||= TimeKeeper.date_of_record).to_date.end_of_month + 1.day, qle_on.end_of_month + 1.day].max
-  end
-
-  def fifteenth_of_the_month_effective_date
-    if qle_on.day <= EnrollRegistry[:special_enrollment_period].setting(:fifteenth_of_the_month).item
-      qle_on.end_of_month + 1.day
-    else
-      qle_on.next_month.end_of_month + 1.day
-    end
   end
 
   ## TODO - Validation for SHOP, EE SEP cannot be granted unless effective_on >= initial coverage effective on, except for
