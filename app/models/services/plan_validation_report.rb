@@ -160,7 +160,7 @@ module Services
         carrier_name = profile.abbrev
         profile_id = profile.id.to_s
         profile.issuer_hios_ids.each do |issuer_hios_id|
-          group_sizes = BenefitMarkets::Products::ActuarialFactors::GroupSizeActuarialFactor.all.where(active_year: active_year, issuer_profile_id: profile_id)
+          group_sizes = BenefitMarkets::Products::ActuarialFactors::GroupSizeActuarialFactor.where(active_year: active_year, issuer_profile_id: profile_id)
           group_sizes.each do |group_size|
             group_size_sum = group_size.actuarial_factor_entries.map(&:factor_key).flatten.inject(0) do |sum,i|
               value = i.to_i
@@ -187,14 +187,14 @@ module Services
         carrier_name = profile.abbrev
         profile_id = profile.id.to_s
         profile.issuer_hios_ids.each do |issuer_hios_id|
-          part_rates = ::BenefitMarkets::Products::ActuarialFactors::ParticipationRateActuarialFactor.all.where(active_year: active_year, issuer_profile_id: profile_id)
+          part_rates = ::BenefitMarkets::Products::ActuarialFactors::ParticipationRateActuarialFactor.where(active_year: active_year, issuer_profile_id: profile_id)
           part_rates.each do |part_rate|
             group_size_sum = part_rate.actuarial_factor_entries.map(&:factor_key).flatten.inject(0) do |sum,i|
               value = i.to_i
               sum + value
             end
             participation_rate_sum = part_rate.actuarial_factor_entries.map(&:factor_value).flatten.inject(0) { |sum,i| sum + i }
-            data = [active_year, issuer_hios_id, carrier_name, group_size_sum, participation_rate_sum.round(2).to_s]
+            data = [active_year, issuer_hios_id, carrier_name, (group_size_sum / 100.00), participation_rate_sum.round(2).to_s]
             generate_data(worksheet5, data, e)
             e += 1
           rescue StandardError
@@ -214,7 +214,7 @@ module Services
         carrier_name = profile.abbrev
         profile_id = profile.id.to_s
         profile.issuer_hios_ids.each do |issuer_hios_id|
-          sic_codes = ::BenefitMarkets::Products::ActuarialFactors::SicActuarialFactor.all.where(active_year: active_year, issuer_profile_id: profile_id)
+          sic_codes = ::BenefitMarkets::Products::ActuarialFactors::SicActuarialFactor.where(active_year: active_year, issuer_profile_id: profile_id)
           sic_codes.all.each do |sic_code|
             sic_count = sic_code.actuarial_factor_entries.count
             sic_rate_sum = sic_code.actuarial_factor_entries.map(&:factor_value).flatten.inject(0) { |sum,i| sum + i }
@@ -222,8 +222,10 @@ module Services
             generate_data(worksheet6, data, f)
             f += 1
           rescue StandardError
-            puts "plan validation issue for issuer_hios_id: #{issuer_hios_id}" unless Rails.env.test?
+            puts "Report6 plan validation issue for issuer_hios_id: #{issuer_hios_id}" unless Rails.env.test?
           end
+        rescue StandardError
+          puts "Report6 plan validation issue for issuer_hios_id: #{issuer_hios_id}" unless Rails.env.test?
         end
       end
       puts "Successfully generated 6th Plan validation report for SIC Codes" unless Rails.env.test?
@@ -244,8 +246,10 @@ module Services
           generate_data(worksheet7, data, g)
           g += 1
         rescue StandardError
-          puts "plan validation issue for issuer_hios_id: #{issuer_hios_id}" unless Rails.env.test?
+          puts "Report7 plan validation issue for issuer_hios_id: #{issuer_hios_id}" unless Rails.env.test?
         end
+      rescue StandardError
+        puts "Report7 plan validation issue for issuer_hios_id: #{issuer_hios_id}" unless Rails.env.test?
       end
       puts "Successfully generated 7th Plan validation report for Product Model" unless Rails.env.test?
     end
@@ -264,7 +268,7 @@ module Services
         generate_data(worksheet8, data, h)
         h += 1
       rescue StandardError
-        puts "plan validation issue for Product_id: #{product.id}" unless Rails.env.test?
+        puts "Report8 plan validation issue for Product_id: #{product.id}" unless Rails.env.test?
       end
       puts "Successfully generated 8th Plan validation report for HIOS ID's" unless Rails.env.test?
     end
@@ -283,7 +287,7 @@ module Services
         generate_data(worksheet9, data, i)
         i += 1
       rescue StandardError
-        puts "plan validation issue for Product_id: #{product.id}" unless Rails.env.test?
+        puts "Report9 plan validation issue for Product_id: #{product.id}" unless Rails.env.test?
       end
       puts "Successfully generated 9th Plan validation report for Super Group ID's" unless Rails.env.test?
     end
