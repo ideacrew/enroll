@@ -120,6 +120,13 @@ class UserMailer < ApplicationMailer
     end
   end
 
+  def generic_plan_validation_report_alert(email)
+    return unless email.present?
+
+    mail({to: email, subject: "CCA Plan Load Verification Reports", from: "no-reply@individual.#{site_domain_name}"}) do |format|
+      format.html {render "generic_plan_validation_report_alert"}
+    end
+  end
 
   def generic_notice_alert(first_name, notice_subject, email, files_to_attach={})
     files_to_attach.each do |file_name, file_path|

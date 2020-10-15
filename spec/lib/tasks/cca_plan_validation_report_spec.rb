@@ -22,8 +22,10 @@ describe 'reports generation after plan loading', :dbclean => :after_each do
     end
 
     it 'should generate a xlsx when active date is passed' do
-      Rake::Task["cca_plan_validation:reports"].invoke("2019-12-01")
-      expect(File.exist?(file_name)).to be true
+      ClimateControl.modify active_date: "2019-12-01" do
+        Rake::Task["cca_plan_validation:reports"].invoke
+        expect(File.exist?(file_name)).to be true
+      end
     end
 
     context 'first sheet' do
