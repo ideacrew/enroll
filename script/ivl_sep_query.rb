@@ -27,7 +27,7 @@ def is_retro_renewal_enrollment?(hbx_id)
                                           :effective_on => { "$gte" => last_date.beginning_of_year, "$lt" => last_date}).first
   return false unless active_enrollment.present?
   return false unless active_enrollment.product.renewal_product != enrollment.product
-  enrollment.first.workflow_state_transitions.where(from_state: 'auto_renewing', to_state: 'coverage_selected')
+  enrollment.workflow_state_transitions.where(from_state: 'auto_renewing', to_state: 'coverage_selected').present?
 end
 
 enrollment_kinds = %w(employer_sponsored employer_sponsored_cobra)
