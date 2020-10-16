@@ -1,4 +1,5 @@
 require 'rails_helper'
+require File.join(File.dirname(__FILE__), "..", "..", "..", "support/benefit_sponsors_site_spec_helpers")
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require File.join(File.dirname(__FILE__), "..", "..", "..", "support/benefit_sponsors_product_spec_helpers")
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
@@ -122,6 +123,108 @@ module BenefitSponsors
       it "should assign attributes of benefit application to form" do
         subject.load_form_metadata(benefit_application_form)
         expect(benefit_application_form.start_on_options).not_to be nil
+      end
+    end
+
+    describe ".filter_start_on_options" do
+
+      [:termination_pending, :terminated].each do |aasm_state|
+        context "when overlapping #{aasm_state} benefit application is present" do
+          let(:effective_period_start_on) { TimeKeeper.date_of_record.beginning_of_month - 3.months }
+          let(:current_effective_date) { effective_period_start_on }
+          let(:site) { BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_empty_benefit_market }
+          let(:benefit_market) { site.benefit_markets.first }
+          let(:effective_period) { (effective_period_start_on..effective_period_end_on) }
+          let!(:current_benefit_market_catalog) do
+            BenefitSponsors::ProductSpecHelpers.construct_benefit_market_catalog_with_renewal_catalog(site, benefit_market, effective_period)
+            benefit_market.benefit_market_catalogs.where(
+              "application_period.min" => effective_period_start_on
+            ).first
+          end
+
+          let(:service_areas) do
+            ::BenefitMarkets::Locations::ServiceArea.where(
+              :active_year => current_benefit_market_catalog.application_period.min.year
+            ).all.to_a
+          end
+
+          let(:rating_area) do
+            ::BenefitMarkets::Locations::RatingArea.where(
+              :active_year => current_benefit_market_catalog.application_period.min.year
+            ).first
+          end
+
+          include_context "setup initial benefit application"
+
+          let(:terminated_date) { (effective_period_start_on + 5.months).end_of_month }
+          let(:aasm_state) { aasm_state }
+          let(:benefit_application_form) { BenefitSponsors::Forms::BenefitApplicationForm.new(benefit_sponsorship_id: benefit_sponsorship.id) }
+          let(:subject) { BenefitSponsors::Services::BenefitApplicationService.new }
+          let!(:application) do
+            initial_application.update_attributes(effective_period: effective_period_start_on..terminated_date)
+            initial_application
+          end
+
+          it "should display options" do
+            subject.load_form_metadata(benefit_application_form)
+            expect(benefit_application_form.start_on_options.keys[0]).to eq terminated_date.next_day
+          end
+        end
+      end
+
+      [:draft, :enrollment_ineligible].each do |aasm_state|
+        context "when overlapping #{aasm_state} benefit application is present" do
+          let(:effective_period_start_on) { TimeKeeper.date_of_record.beginning_of_month + 2.months }
+          let(:current_effective_date) { effective_period_start_on }
+          let(:site) { BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_empty_benefit_market }
+          let(:benefit_market) { site.benefit_markets.first }
+          let(:effective_period) { (effective_period_start_on..effective_period_end_on) }
+          let!(:current_benefit_market_catalog) do
+            BenefitSponsors::ProductSpecHelpers.construct_benefit_market_catalog_with_renewal_catalog(site, benefit_market, effective_period)
+            benefit_market.benefit_market_catalogs.where(
+              "application_period.min" => effective_period_start_on
+            ).first
+          end
+
+          let(:service_areas) do
+            ::BenefitMarkets::Locations::ServiceArea.where(
+              :active_year => current_benefit_market_catalog.application_period.min.year
+            ).all.to_a
+          end
+
+          let(:rating_area) do
+            ::BenefitMarkets::Locations::RatingArea.where(
+              :active_year => current_benefit_market_catalog.application_period.min.year
+            ).first
+          end
+
+          include_context "setup initial benefit application"
+          let(:aasm_state) { aasm_state }
+          let(:benefit_application_form) { BenefitSponsors::Forms::BenefitApplicationForm.new(benefit_sponsorship_id: benefit_sponsorship.id) }
+          let(:subject) { BenefitSponsors::Services::BenefitApplicationService.new }
+          let(:start_on_options) do
+            date = TimeKeeper.date_of_record.beginning_of_month.next_month
+            day_of_month = TimeKeeper.date_of_record.day
+            if day_of_month > Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month
+              if day_of_month > 5
+                [date.next_month, date + 2.months]
+              else
+                [date, date.next_month, date + 2.months]
+              end
+            else
+              if day_of_month >= Settings.aca.shop_market.open_enrollment.monthly_end_on
+                [date.next_month]
+              else
+                [date, date.next_month]
+              end
+            end
+          end
+
+          it "should display options" do
+            subject.load_form_metadata(benefit_application_form)
+            expect(benefit_application_form.start_on_options.keys).to eq start_on_options
+          end
+        end
       end
     end
 

@@ -13,10 +13,16 @@ module BenefitSponsors
       end
 
       def load_form_metadata(form)
-        schedular = BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
         find_benefit_sponsorship(form)
         form.has_active_ba = has_an_active_ba? if form.admin_datatable_action
-        form.start_on_options = schedular.start_on_options_with_schedule(form.is_renewing?, form.admin_datatable_action)
+        form.start_on_options = filter_start_on_options(form)
+      end
+
+      def filter_start_on_options(form)
+        schedular = BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
+        options = schedular.start_on_options_with_schedule(form.is_renewing?, form.admin_datatable_action)
+        active_and_terminated_bas = @benefit_sponsorship.benefit_applications.active_and_terminated_states
+        options.reject { |option| active_and_terminated_bas.any? { |ba| ba.effective_period.cover?(option) } }
       end
 
       def load_form_params_from_resource(form)
