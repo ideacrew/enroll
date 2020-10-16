@@ -99,8 +99,8 @@ describe ReinstatePlanYear, dbclean: :after_each do
       let!(:terminated_enrollment) { FactoryBot.create(:hbx_enrollment, :terminated, effective_on:plan_year.start_on, terminated_on: plan_year.end_on, benefit_group_id:benefit_group.id, household: family.active_household, terminate_reason: "")}
       let!(:canceled_enrollment) { FactoryBot.create(:hbx_enrollment, effective_on:renewing_plan_year.start_on, benefit_group_id:renew_benefit_group.id, household: family.active_household, aasm_state:'coverage_canceled')}
 
-      let!(:benefit_group_assignment) { FactoryBot.build(:benefit_group_assignment,hbx_enrollment_id:terminated_enrollment.id,benefit_group_id:benefit_group.id,start_on:start_on,end_on:end_on) }
-      let!(:renewal_benefit_group_assignment) { FactoryBot.build(:benefit_group_assignment, hbx_enrollment_id:canceled_enrollment.id, benefit_group_id:renew_benefit_group.id) }
+      let!(:benefit_group_assignment) { FactoryBot.build(:benefit_group_assignment, hbx_enrollment_id: terminated_enrollment.id, benefit_group_id: benefit_group.id, start_on: start_on, end_on: end_on) }
+      let!(:renewal_benefit_group_assignment) { FactoryBot.build(:benefit_group_assignment, hbx_enrollment_id: canceled_enrollment.id, benefit_group_id: renew_benefit_group.id) }
 
 
       let!(:emp_plan_years) {  employer_profile.plan_years << [renewing_plan_year,plan_year] }

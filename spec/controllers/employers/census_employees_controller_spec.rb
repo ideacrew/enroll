@@ -177,7 +177,7 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
     let(:child1) { FactoryBot.build(:census_dependent, employee_relationship: "child_under_26", ssn: 123123714) }
     let(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person)}
     # let(:census_employee) { FactoryBot.create(:census_employee_with_active_assignment, employer_profile_id: employer.id, hired_on: "2014-11-11", first_name: "aqzz", last_name: "White", dob: "11/11/1990", ssn: "123123123", gender: "male", benefit_group: benefit_group) }
- 
+
     before do
       allow(@hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
       sign_in @user

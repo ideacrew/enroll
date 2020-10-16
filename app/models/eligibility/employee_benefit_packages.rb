@@ -6,9 +6,7 @@ module Eligibility
 
       py = employer_profile.plan_years.published.first || employer_profile.plan_years.where(aasm_state: 'draft').first
       if py.present?
-        if active_benefit_group_assignment.blank? || active_benefit_group_assignment&.benefit_group&.plan_year != py
-          create_benefit_group_assignment(py.benefit_groups)
-        end
+        create_benefit_group_assignment(py.benefit_groups) if active_benefit_group_assignment.blank? || active_benefit_group_assignment&.benefit_group&.plan_year != py
       end
 
       if py = employer_profile.plan_years.renewing.first

@@ -30,15 +30,14 @@ describe ActivateBenefitGroupAssignment do
         expect(benefit_group_assignment1.activated_at).to be_falsey
         subject.migrate
         census_employee.reload
-        expect(census_employee.benefit_group_assignments.where(id:benefit_group_assignment1.id).first.activated_at.class).to eq DateTime
+        expect(census_employee.benefit_group_assignments.where(id: benefit_group_assignment1.id).first.activated_at.class).to eq DateTime
       end
       it 'should_not activate_unrelated_benefit_group_assignment' do
         expect(benefit_group_assignment2.activated_at).to be_falsey
         subject.migrate
         census_employee.reload
-        expect(census_employee.benefit_group_assignments.where(id:benefit_group_assignment2.id).first.activated_at.class).to eq NilClass
+        expect(census_employee.benefit_group_assignments.where(id: benefit_group_assignment2.id).first.activated_at.class).to eq NilClass
       end
     end
   end
-  
 end

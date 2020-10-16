@@ -20,7 +20,16 @@ describe MakeBenefitGroupAssignmentActive, dbclean: :after_each do
     let(:employer_profile)          { benefit_sponsorship.profile }
     let!(:benefit_package)          { benefit_sponsorship.benefit_applications.first.benefit_packages.first}
     let(:benefit_group_assignment)  { FactoryBot.build(:benefit_group_assignment, benefit_package: benefit_package, start_on: benefit_package.start_on) }
-    let!(:census_employee)          { FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: employer_profile, benefit_group: benefit_package, benefit_group_assignments: [benefit_group_assignment] ) }
+    let!(:census_employee) do
+      FactoryBot.create(
+        :census_employee,
+        :with_active_assignment,
+        benefit_sponsorship: benefit_sponsorship,
+        employer_profile: employer_profile,
+        benefit_group: benefit_package,
+        benefit_group_assignments: [benefit_group_assignment]
+      )
+    end
 
     context 'updating benefit group assignment to active', dbclean: :after_each do
       it 'should make the benefit group assignment active' do

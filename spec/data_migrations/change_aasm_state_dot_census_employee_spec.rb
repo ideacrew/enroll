@@ -17,7 +17,7 @@ describe ChangeAasmStateDotCensusEmployee, dbclean: :after_each do
     let(:benefit_sponsorship)   { benefit_sponsor.active_benefit_sponsorship }
     let(:employer_profile)      { benefit_sponsorship.profile }
     let!(:benefit_package)      { benefit_sponsorship.benefit_applications.first.benefit_packages.first}
-    let!(:census_employee)      { FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: employer_profile, benefit_group: benefit_package ) }
+    let!(:census_employee)      { FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: employer_profile, benefit_group: benefit_package) }
 
     before :each do
       census_employee.update_attributes!(aasm_state:'employment_terminated',employment_terminated_on:TimeKeeper.date_of_record,coverage_terminated_on:TimeKeeper.date_of_record)

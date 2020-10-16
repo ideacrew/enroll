@@ -162,9 +162,8 @@ module Employers::EmployerHelper
     return (initial_benefit_packages || []), (renewing_benefit_packages || [])
   end
 
-  def get_off_cycle_benefit_packages_for_census_employee
-    off_cycle_benefit_packages = @benefit_sponsorship.off_cycle_benefit_application&.benefit_packages
-    return off_cycle_benefit_packages || []
+  def off_cycle_benefit_packages_for_census_employee
+    @benefit_sponsorship.off_cycle_benefit_application&.benefit_packages || []
   end
 
   def current_option_for_initial_benefit_package
@@ -178,7 +177,7 @@ module Employers::EmployerHelper
 
   def current_option_for_off_cycle_benefit_package
     bga = @census_employee.off_cycle_benefit_group_assignment
-    return bga.benefit_package_id if bga && bga.benefit_package_id
+    return bga.benefit_package_id if bga&.benefit_package_id
     application = @employer_profile.off_cycle_benefit_application
     return nil if application.blank?
     return nil if application.benefit_packages.empty?

@@ -1475,13 +1475,15 @@ class HbxEnrollment
     end
 
     census_employee = employee_role.census_employee
-    benefit_group_assignment = if plan_year.is_renewing? && census_employee.renewal_benefit_group_assignment
-                                 census_employee.renewal_benefit_group_assignment
-                               elsif(plan_year.aasm_state == "expired" && qle)
-                                census_employee.benefit_group_assignments.order_by(:'created_at'.desc).detect { |bga| bga.plan_year.aasm_state == "expired"}
-                              else
-                                census_employee.active_benefit_group_assignment
-                              end
+    benefit_group_assignment =
+      if plan_year.is_renewing? && census_employee.renewal_benefit_group_assignment
+        census_employee.renewal_benefit_group_assignment
+      elsif plan_year.aasm_state == "expired" && qle
+        census_employee.benefit_group_assignments.order_by(:created_at.desc).detect { |bga| bga.plan_year.aasm_state == "expired"}
+      else
+        census_employee.active_benefit_group_assignment
+      end
+
     if benefit_group_assignment.blank? || benefit_group_assignment.plan_year != plan_year
       raise "Unable to find an active or renewing benefit group assignment for enrollment year #{effective_date.year}"
     end

@@ -39,7 +39,7 @@ class BenefitGroupAssignment
       {
         :$or => [
           {:start_on.lte => compare_date, :end_on.gte => compare_date},
-          {:start_on.lte => compare_date, :end_on => nil},
+          {:start_on.lte => compare_date, :end_on => nil}
         ]
       }
     ).order(start_on: :desc)
@@ -87,7 +87,7 @@ class BenefitGroupAssignment
       if assignments_with_end_on.present?
         valid_assignments_with_end_on = assignments_with_end_on.select { |assignment| (assignment.start_on..assignment.end_on).cover?(date) }
         if valid_assignments_with_end_on.present?
-          valid_assignments_with_end_on.sort_by { |assignment| (assignment.start_on.to_time - date.to_time).abs }.last || valid_assignments_with_end_on.last
+          valid_assignments_with_end_on.max_by { |assignment| (assignment.start_on.to_time - date.to_time).abs } || valid_assignments_with_end_on.last
         else
           filter_assignments_with_no_end_on(assignments_with_no_end_on, date)
         end
@@ -99,7 +99,7 @@ class BenefitGroupAssignment
     def filter_assignments_with_no_end_on(assignments, date)
       valid_assignments_with_no_end_on = assignments.select { |assignment| (assignment.start_on..assignment.start_on.next_year.prev_day).cover?(date) }
       if valid_assignments_with_no_end_on.size > 1
-        valid_assignments_with_no_end_on.detect { |assignment| assignment.is_active? } || valid_assignments_with_no_end_on.sort_by { |assignment| (assignment.start_on.to_time - date.to_time).abs }.first
+        valid_assignments_with_no_end_on.detect(&:is_active?) || valid_assignments_with_no_end_on.max_by { |assignment| (assignment.start_on.to_time - date.to_time).abs }
       else
         valid_assignments_with_no_end_on.first
       end

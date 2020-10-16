@@ -52,7 +52,7 @@ describe 'Cancel employer plan year & enrollments', :dbclean => :around_each do
 
     before do
       enrollment2.update_attributes!(benefit_group_id: benefit_group1.id, aasm_state:'auto_renewing')
-      renewal_benefit_group_assignment.update_attributes(hbx_enrollment_id:enrollment2.id)
+      renewal_benefit_group_assignment.update_attributes(hbx_enrollment_id: enrollment2.id)
       load File.expand_path("#{Rails.root}/lib/tasks/migrations/cancel_employer_renewal.rake", __FILE__)
       Rake::Task.define_task(:environment)
       fein = organization.fein

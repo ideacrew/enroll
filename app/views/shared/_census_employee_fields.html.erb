@@ -19,7 +19,7 @@
       </div>
     </div>
     <% current_benefit_packages, renewing_benefit_packages = get_benefit_packages_for_census_employee %>
-    <% off_cycle_benefit_packages = get_off_cycle_benefit_packages_for_census_employee %>
+    <% off_cycle_benefit_packages = off_cycle_benefit_packages_for_census_employee %>
     <% if renewing_benefit_packages.present? %>
       <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
         <div class="selectric-labeled">

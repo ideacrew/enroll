@@ -12,7 +12,7 @@ describe TerminateACensusEmployee, dbclean: :after_each do
     let(:benefit_sponsorship)   { benefit_sponsor.active_benefit_sponsorship }
     let(:employer_profile)      { benefit_sponsorship.profile }
     let!(:benefit_package)      { benefit_sponsorship.benefit_applications.first.benefit_packages.first}
-    let!(:census_employee)      { FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: employer_profile, benefit_group: benefit_package ) }
+    let!(:census_employee)      { FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: employer_profile, benefit_group: benefit_package) }
 
     around do |example|
      ClimateControl.modify id: census_employee.id,

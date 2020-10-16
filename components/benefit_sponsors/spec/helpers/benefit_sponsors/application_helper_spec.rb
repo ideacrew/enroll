@@ -51,8 +51,8 @@ RSpec.describe BenefitSponsors::ApplicationHelper, type: :helper, dbclean: :afte
 
     context "should return true when terminaton pending benefit applications, non active, and non published" do
       before do
-        other_bas = renewal_application.benefit_sponsorship.benefit_applications.select { |ba| ba != renewal_application }
-        other_bas.each { |ba| ba.destroy }
+        other_bas = renewal_application.benefit_sponsorship.benefit_applications.reject { |ba| ba == renewal_application }
+        other_bas.each(&:destroy)
         renewal_application.update_attributes(aasm_state: :termination_pending)
       end
       it{ expect(add_plan_year_button_business_rule(active_benefit_sponsorship, employer_profile.benefit_applications)).to eq true }
