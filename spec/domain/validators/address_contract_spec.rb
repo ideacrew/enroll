@@ -75,7 +75,18 @@ module Validators
     describe "passing empty address_1, city, kind, state, zip" do
 
       let(:params) { { kind: 'test', address_1: '', address_2: '1234', address_3: 'person', city: '', state: '', zip: '', county: '', county_name: '' }}
-      let(:error_message) {{:address_1 => ["must be filled"], :city => ["must be filled"], :state => ["must be filled"], :zip => ["must be filled"]}}
+      let(:error_message) {{:address_1 => ["Test Addresses: address 1 can't be blank"], :city => ["Test Addresses: city can't be blank"], :state => ["Test Addresses: state can't be blank"], :zip => ["Test Addresses: zip can't be blank"]}}
+
+      it "fails" do
+        expect(subject).not_to be_success
+        expect(subject.errors.to_h).to eq error_message
+      end
+    end
+
+    describe "passing all fields with invalid zip address_1, city, kind, state, zip" do
+
+      let(:params) { { kind: 'test', address_1: '1234', address_2: '1234', address_3: 'person', city: 'city', state: 'DC', zip: '223', county: '', county_name: '' }}
+      let(:error_message) {{:zip => ["Test Addresses: zip should be in the form: 12345 or 12345-1234"]}}
 
       it "fails" do
         expect(subject).not_to be_success
