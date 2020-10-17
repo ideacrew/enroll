@@ -31,8 +31,9 @@ module Operations
         year = TimeKeeper.date_of_record.year + 1
         renewal_enrollments = enrollment.family.hbx_enrollments.by_coverage_kind(enrollment.coverage_kind).by_year(year).show_enrollments_sans_canceled.by_kind(enrollment.kind)
         renewal_enrollments.each do |enr|
-          next unless enr.auto_renewing?
           next unless enr&.subscriber&.applicant_id == enrollment&.subscriber&.applicant_id
+          next if (enr.hbx_enrollment_members.map(&:applicant_id) - enrollment.hbx_enrollment_members.map(&:applicant_id)).any?
+          next if (enrollment.hbx_enrollment_members.map(&:applicant_id) - enr.hbx_enrollment_members.map(&:applicant_id)).any?
           next unless enr.effective_on == enrollment.effective_on.next_year.beginning_of_year
           next unless enr.product_id == enrollment&.product&.renewal_product&._id
           enr.cancel_coverage! if enr.may_cancel_coverage?
