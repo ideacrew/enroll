@@ -72,7 +72,11 @@ terms = HbxEnrollment.collection.aggregate([
     },
     "kind" => {"$nin" => enrollment_kinds}
   }},
-  {"$group" => {"_id" => "$hbx_id"}}
+  {"$group" => {
+      "_id" => "$hbx_id",
+      "created_at" => { "$last" =>  "$created_at" },
+  }},
+  { "$sort" => { "created_at" => 1 } }
 ])
 
 puts purchases.count
