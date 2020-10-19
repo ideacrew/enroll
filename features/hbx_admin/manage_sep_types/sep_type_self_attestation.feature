@@ -8,6 +8,7 @@ Feature: Admin has ability to create a new SEP Type with self attestation option
     And the Admin will see the Manage SEPs under admin dropdown
     And Admin can click Manage SEPs link
 
+  @flaky
   Scenario Outline: Admin will create a new Individual market SEP type by picking self attestation option for <user_attestation>
     Given Admin can navigate to the Manage SEPs screen
     And expired Qualifying life events of individual market is present

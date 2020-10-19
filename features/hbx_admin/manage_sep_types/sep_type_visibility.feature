@@ -77,6 +77,7 @@ Feature: Admin has ability to create a new SEP Type with visibility options for 
       | Customer & Admin | see     |
       | Admin Only       | not see |
 
+  @flaky
   Scenario Outline: Admin will create a new Individual market SEP type by picking visibility option for <user_visibility> with future date
     Given Admin can navigate to the Manage SEPs screen
     And expired Qualifying life events of individual market is present
