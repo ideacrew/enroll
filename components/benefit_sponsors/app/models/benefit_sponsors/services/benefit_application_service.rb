@@ -19,9 +19,10 @@ module BenefitSponsors
       end
 
       def filter_start_on_options(form)
+        active_and_terminated_bas = @benefit_sponsorship&.benefit_applications&.active_and_terminated_states || []
         schedular = BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
         options = schedular.start_on_options_with_schedule(form.is_renewing?, form.admin_datatable_action)
-        active_and_terminated_bas = @benefit_sponsorship.benefit_applications.active_and_terminated_states
+
         options.reject { |option| active_and_terminated_bas.any? { |ba| ba.effective_period.cover?(option) } }
       end
 
