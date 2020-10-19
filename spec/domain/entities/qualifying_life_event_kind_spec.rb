@@ -26,6 +26,9 @@ RSpec.describe ::Entities::QualifyingLifeEventKind, dbclean: :after_each do
         qle_event_date_kind: 'qle_on',
         is_visible: true,
         termination_on_kinds: [],
+        updated_by: '',
+        published_by: '',
+        created_by: '',
         date_options_available: true }
     end
 

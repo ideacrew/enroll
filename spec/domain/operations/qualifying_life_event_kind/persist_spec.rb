@@ -29,8 +29,11 @@ RSpec.describe Operations::QualifyingLifeEventKind::Persist, type: :model, dbcle
           'coverage_start_on': "#{TimeKeeper.date_of_record.year}-07-01",
           'coverage_end_on': "#{TimeKeeper.date_of_record.year}-#{TimeKeeper.date_of_record.next_month.month}-01",
           'event_kind_label': 'event kind label',
-          qle_event_date_kind: 'qle_on',
+          'qle_event_date_kind': 'qle_on',
           'is_visible': true,
+          'updated_by': '',
+          'published_by': '',
+          'created_by': '',
           'date_options_available': true }
 
       end
@@ -98,6 +101,9 @@ RSpec.describe Operations::QualifyingLifeEventKind::Persist, type: :model, dbcle
               'is_visible': true,
               qle_event_date_kind: 'qle_on',
               'id': q2.id.to_s,
+              'updated_by': '',
+              'published_by': '',
+              'created_by': '',
               'publish': 'Publish',
               'date_options_available': true }
           end
@@ -139,6 +145,9 @@ RSpec.describe Operations::QualifyingLifeEventKind::Persist, type: :model, dbcle
           event_kind_label: 'event kind label',
           is_visible: true,
           qle_event_date_kind: 'qle_on',
+          'updated_by': '',
+          'published_by': '',
+          'created_by': '',
           date_options_available: true }
       end
 
@@ -186,6 +195,9 @@ RSpec.describe Operations::QualifyingLifeEventKind::Persist, type: :model, dbcle
           'event_kind_label' => 'event kind label',
           'is_visible' => true,
           qle_event_date_kind: 'qle_on',
+          'updated_by': '',
+          'published_by': '',
+          'created_by': '',
           'date_options_available' => true }
       end
 
@@ -226,6 +238,9 @@ RSpec.describe Operations::QualifyingLifeEventKind::Persist, type: :model, dbcle
           'event_kind_label' => 'event kind label',
           'is_visible' => true,
           qle_event_date_kind: 'qle_on',
+          'updated_by': '',
+          'published_by': '',
+          'created_by': '',
           'date_options_available' => true }
       end
 
