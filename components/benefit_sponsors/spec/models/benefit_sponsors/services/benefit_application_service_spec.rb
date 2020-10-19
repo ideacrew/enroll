@@ -206,17 +206,9 @@ module BenefitSponsors
             date = TimeKeeper.date_of_record.beginning_of_month.next_month
             day_of_month = TimeKeeper.date_of_record.day
             if day_of_month > Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month
-              if day_of_month > 5
-                [date.next_month, date + 2.months]
-              else
-                [date, date.next_month, date + 2.months]
-              end
+              day_of_month > 5 ? [date.next_month, date + 2.months] : [date, date.next_month, date + 2.months]
             else
-              if day_of_month >= Settings.aca.shop_market.open_enrollment.monthly_end_on
-                [date.next_month]
-              else
-                [date, date.next_month]
-              end
+              day_of_month >= Settings.aca.shop_market.open_enrollment.monthly_end_on ? [date.next_month] : [date, date.next_month]
             end
           end
 
