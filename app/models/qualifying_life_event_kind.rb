@@ -111,6 +111,9 @@ class QualifyingLifeEventKind
   field :termination_on_kinds, type: Array, default: []
   field :coverage_start_on, type: Date
   field :coverage_end_on, type: Date
+  field :updated_by, type: BSON::ObjectId
+  field :published_by, type: BSON::ObjectId
+  field :created_by, type: BSON::ObjectId
 
   index({action_kind: 1})
   index({market_kind: 1, ordinal_position: 1 })
