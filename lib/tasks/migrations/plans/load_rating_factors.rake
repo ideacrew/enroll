@@ -1,5 +1,4 @@
 require 'rake'
-require Rails.root.join('app', 'helpers', 'float_helper.rb')
 
 namespace :load_rating_factors do
 
@@ -90,7 +89,7 @@ namespace :load_rating_factors do
                 end
 
                 if is_participation_rate_rating_tier?(rating_factor_class)
-                  factor_key = float_fix(factor_key * 100).to_i
+                  factor_key = (factor_key * 100).round(2).to_i
                 end
 
                 factor_value = sheet.cell(i,carrier_column) || 1.0
@@ -175,7 +174,7 @@ namespace :load_rating_factors do
                     end
 
                     if is_participation_rate_rating_tier?(rating_factor_class)
-                      factor_key = float_fix(factor_key * 100).to_i
+                      factor_key = (factor_key * 100).round(2).to_i
                     end
 
                     factor_set.rating_factor_entries.new(
