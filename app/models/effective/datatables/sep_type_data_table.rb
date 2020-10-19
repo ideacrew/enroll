@@ -9,6 +9,7 @@ module Effective
         table_column :Market, :label => l10n("datatables.sep_type_data_table.market"), :proc => proc { |row|  market_kind(row)}, :filter => false, :sortable => false
         table_column :start_date, :label => l10n("datatables.sep_type_data_table.start_date"), :proc => proc { |row| row.start_on }, :filter => false, :sortable => false
         table_column :state, :label => l10n("datatables.sep_type_data_table.state"), :proc => proc { |row| row.aasm_state}, :filter => false, :sortable => false
+        table_column :published_by, :label => l10n("datatables.sep_type_data_table.published_by"), :proc => proc { |row| User.find(row.published_by).person.full_name rescue "admin"}, :filter => false, :sortable => false
         table_column :actions, :width => '50px', :proc => proc { |row|
           dropdown = [
               [l10n("datatables.sep_type_data_table.expire"), sep_type_to_expire_exchanges_manage_sep_types_path(qle_id: row.id, qle_action_id: "sep_type_actions_#{row.id}"),
