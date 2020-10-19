@@ -42,4 +42,16 @@ describe FakesController do
       expect(subject.calculate_rule).to eq effective_date_options
     end
   end
+
+  context 'For fixed_first_of_next_month rule' do
+    let(:qle) { FactoryBot.build(:qualifying_life_event_kind, effective_on_kinds: ['fixed_first_of_next_month']) }
+
+    before do
+      controller.instance_variable_set("@qle", qle)
+    end
+
+    it 'should return alias name of fixed_first_of_next_month' do
+      expect(subject.calculate_rule).to eq ['First of month after event']
+    end
+  end
 end
