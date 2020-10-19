@@ -213,20 +213,21 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
 
     context "get flash notice", dbclean: :around_each do
       context "second benefit package ID is passed" do
-        before do
-          expect(initial_application.benefit_packages.count).to eq(1)
-          # Initial benefit group assignment
-          expect(census_employee.active_benefit_group_assignment.benefit_package).to eq(initial_application.benefit_packages[0])
-          effective_period = current_effective_date..(current_effective_date.next_year.prev_day)
-          benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(effective_period.min)
-          package_kind = :single_issuer
-          product_package = benefit_sponsor_catalog.product_packages.detect { |package| package.package_kind == package_kind }
-          second_benefit_package = FactoryBot.create(
+        let(:package_kind) { :single_issuer }
+        let(:catalog) { initial_application.benefit_sponsor_catalog }
+        let(:package) { catalog.product_packages.detect { |package| package.package_kind == package_kind } }
+
+        let!(:second_benefit_package) do
+          FactoryBot.create(
             :benefit_sponsors_benefit_packages_benefit_package,
             title: "Second Benefit Package",
             benefit_application: initial_application,
-            product_package: product_package
+            product_package: package
           )
+        end
+        let(:first_benefit_package) { initial_application.benefit_packages.detect { |benefit_package| benefit_package != second_benefit_package } }
+
+        before do
           expect(initial_application.benefit_packages.count).to eq(2)
           census_employee_update_benefit_package_params = {
             "first_name" => census_employee.first_name,
@@ -252,11 +253,14 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
           )
         end
 
-        it "successfully updates the active benefit group assignment to the second benefit package id" do
+        it "display success message" do
           expect(flash[:notice]).to eq "Census Employee is successfully updated."
+        end
+
+        it "successfully updates the active benefit group assignment to the second benefit package id" do
           census_employee.reload
-          expect(census_employee.active_benefit_group_assignment.benefit_package).to eq(initial_application.benefit_packages[1])
-          expect(census_employee.active_benefit_group_assignment.benefit_package).to_not eq(initial_application.benefit_packages[0])
+          expect(census_employee.active_benefit_group_assignment.benefit_package).to eq(second_benefit_package)
+          expect(census_employee.active_benefit_group_assignment.benefit_package).to_not eq(first_benefit_package)
         end
       end
 
