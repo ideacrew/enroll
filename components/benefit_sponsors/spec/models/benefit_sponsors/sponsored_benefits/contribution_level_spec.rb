@@ -18,10 +18,12 @@ module BenefitSponsors
 
     describe 'set minimum contribution factor' do
       let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_month.prev_year + 2.months }
+      let(:initial_sponsor_setting) { EnrollRegistry["initial_sponsor_default_#{current_effective_date.year}".to_sym].feature.settings[0] }
+      let(:renewal_sponsor_setting) { EnrollRegistry["renewal_sponsor_default_#{current_effective_date.next_year.year}".to_sym].feature.settings[0] }
 
       before :each do
-        EnrollRegistry["initial_sponsor_default_#{current_effective_date.year}".to_sym].feature.settings[0].stub(:item).and_return(:fifty_percent_sponsor_fixed_percent_contribution_model)
-        EnrollRegistry["renewal_sponsor_default_#{current_effective_date.next_year.year}".to_sym].feature.settings[0].stub(:item).and_return(:zero_percent_sponsor_fixed_percent_contribution_model)
+        allow(initial_sponsor_setting).to receive(:item).and_return(:fifty_percent_sponsor_fixed_percent_contribution_model)
+        allow(renewal_sponsor_setting).to receive(:item).and_return(:zero_percent_sponsor_fixed_percent_contribution_model)
       end
 
       include_context 'setup benefit market with market catalogs and product packages'
