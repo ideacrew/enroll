@@ -47,7 +47,8 @@ module Effective
       end
 
       def find_user(qle)
-        User.find(qle.published_by).person.full_name
+        user_id = (qle.published_by || qle.created_by)
+        User.find(user_id).person.full_name
       rescue StandardError => _e
         "admin"
       end
