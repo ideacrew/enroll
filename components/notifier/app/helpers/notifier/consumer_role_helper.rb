@@ -51,7 +51,7 @@ module Notifier
 
       reason_for_ineligibility << "this person isn’t a resident of the District of Columbia. Go to healthcare.gov to learn how to apply for coverage in the right state." unless person.is_dc_resident?
       reason_for_ineligibility << "this person is currently serving time in jail or prison for a criminal conviction." if person.is_incarcerated
-      if lawful_presence_outstanding?(person)
+      if is_lawful_presence_outstanding?(person)
         reason_for_ineligibility << "this person doesn’t have an eligible immigration status,
                                   but may be eligible for a local medical assistance program
                                   called the DC Health Care Alliance. For more information, please
@@ -60,7 +60,7 @@ module Notifier
       reason_for_ineligibility
     end
 
-    def lawful_presence_outstanding?(person)
+    def is_lawful_presence_outstanding?(person)
       person.consumer_role.types_include_to_notices.include?('Citizenship')
     end
 
@@ -87,6 +87,23 @@ module Notifier
               .individual_market
               .upcoming_open_enrollment
               .end_on.strftime('%B %d, %Y')
+    end
+
+    def min_notice_due_date(family)
+      due_dates = []
+      family.contingent_enrolled_active_family_members.each do |family_member|
+        family_member.person.verification_types.each do |v_type|
+          due_dates << family.document_due_date(v_type)
+        end
+      end
+      due_dates.compact!
+      earliest_future_due_date = due_dates.select{ |d| d > TimeKeeper.date_of_record }.min
+      earliest_future_due_date.to_date if due_dates.present? && earliest_future_due_date.present?
+    end
+
+    def notice_due_date_value
+      family = person.primary_family
+      family.min_verification_due_date.present? && family.min_verification_due_date > date ? family.min_verification_due_date : min_notice_due_date(family)
     end
 
     def expected_income_for_coverage_year_value(payload)

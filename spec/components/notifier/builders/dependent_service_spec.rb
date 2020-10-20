@@ -20,7 +20,7 @@ RSpec.describe 'Components::Notifier::Builders::DependentService', :dbclean => :
         {"consumer_role_id" => "5c61bf485f326d4e4f00000c",
          "event_object_kind" => "ConsumerRole",
          "event_object_id" => "5bcdec94eab5e76691000cec",
-         "notice_params" => {"dependents" => data.select{ |m| m["dependent"].casecmp('YES').zero? }.map(&:to_hash),
+         "notice_params" => {"dependents" => data.select{ |m| m["dependent"].casecmp('YES').zero? }.map(&:to_hash), "uqhp_event" => "AQHP",
 
                              "primary_member" => data.detect{ |m| m["dependent"].casecmp('NO').zero? }.to_hash}}
       end
@@ -79,7 +79,8 @@ RSpec.describe 'Components::Notifier::Builders::DependentService', :dbclean => :
           "notice_params" => {
             "dependents" => data,
             "active_enrollment_ids" => [current_enrollment.hbx_id],
-            "renewing_enrollment_ids" => [renewing_enrollment.hbx_id]
+            "renewing_enrollment_ids" => [renewing_enrollment.hbx_id],
+            "uqhp_event" => "AQHP"
           }
         }
       end

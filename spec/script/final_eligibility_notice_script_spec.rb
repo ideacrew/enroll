@@ -86,8 +86,7 @@ RSpec.describe "FinalEligibilityNoticeScript", :dbclean => :after_each do
 
   let(:input_file) { Rails.root.join("spec", "test_data", "notices", "ivl_fel_aqhp_test_data.csv") }
 
-  let(:error_message) {"Please include mandatory arguments: File name and Event name. Example: rails runner script/final_eligibility_notice_script.rb <file_name> <event_name>"}
-
+  let(:error_message) {"Please include mandatory arguments: File name and Event name. Example: rails runner script/final_eligibility_notice_script.rb <file_name> <event_name> <eligibility_kind> <file_path_to_exclude>"}
 
   it "should raise error when arguments are not passed" do
     expect{ invoke_script(false) }.to raise_error(RuntimeError, error_message)
@@ -119,10 +118,12 @@ end
 def invoke_script(with_params = true)
   if with_params
     ARGV[0] = input_file
-    ARGV[1] = 'final_eligibility_notice_aqhp'
+    ARGV[1] = 'final_eligibility_notice'
+    ARGV[2] = 'aqhp'
   else
     ARGV[0] = nil
     ARGV[1] = nil
+    ARGV[2] = nil
   end
   final_eligibility_notice = File.join(Rails.root, "script/final_eligibility_notice_script.rb")
   load final_eligibility_notice

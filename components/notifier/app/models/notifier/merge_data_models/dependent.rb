@@ -26,6 +26,8 @@ module Notifier
     attribute :totally_ineligible_members_present, Boolean
     attribute :magi_medicaid_members_present, Boolean
     attribute :mec, Boolean
+    attribute :mec_type_1, String
+    attribute :mec_type_2, String
     attribute :indian_conflict, Boolean
     attribute :is_medicaid_chip_eligible, Boolean
     attribute :is_non_magi_medicaid_eligible, Boolean
@@ -54,6 +56,7 @@ module Notifier
     attribute :nonmedi_reason, String
     attribute :nonaptc_reason, String
     attribute :noncsr_reason, String
+    attribute :due_date, String
     # TODO: person_hbx_id and dob missing, what to do?
 
     def self.stubbed_object
@@ -102,6 +105,7 @@ module Notifier
           no_csr_because_of_mec: true,
           non_applicant: false,
           person_hbx_id: 1,
+          due_date: TimeKeeper.date_of_record.next_month,
           dob: (Date.today - 20.years)
         }
       )

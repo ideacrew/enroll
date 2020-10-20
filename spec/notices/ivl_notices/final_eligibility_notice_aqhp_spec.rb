@@ -130,7 +130,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             "dependents" => dependents_array.map(&:to_hash),
             "active_enrollment_ids" => [current_enrollment.hbx_id],
             "renewing_enrollment_ids" => [renewing_enrollment.hbx_id],
-            "uqhp_event" => 'aqhp_projected_eligibility_notice_2'
+            "uqhp_event" => 'aqhp'
           }
         }
       end

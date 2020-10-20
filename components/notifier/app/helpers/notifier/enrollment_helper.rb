@@ -60,6 +60,10 @@ module Notifier
       end
     end
 
+    def enrollments_for_family(family)
+      @enrollments_for_family ||= HbxEnrollment.where(family_id: family.id)
+    end
+
     def responsible_amount(enrollment)
       format_currency((enrollment.total_premium.to_f - enrollment.applied_aptc_amount.to_f), 2)
     end
