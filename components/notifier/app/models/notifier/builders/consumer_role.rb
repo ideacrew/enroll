@@ -8,6 +8,7 @@ module Notifier
       include ActionView::Helpers::NumberHelper
       include Notifier::ApplicationHelper
       include Notifier::ConsumerRoleHelper
+      include Notifier::EnrollmentHelper
       include Notifier::VerificationHelper
       include Config::ContactCenterHelper
       include Config::SiteHelper
@@ -27,18 +28,21 @@ module Notifier
         @consumer_role = resource
       end
 
+      def append_data
+        dependents
+        enrollments
+      end
+
       def notice_date
-        merge_model.notice_date = TimeKeeper.date_of_record
-                                            .strftime('%B %d, %Y')
+        merge_model.notice_date = TimeKeeper.date_of_record.strftime('%B %d, %Y')
       end
 
       def first_name
-        merge_model.first_name =
-          if uqhp_notice? && consumer_role.present?
-            consumer_role.person.first_name
-          else
-            payload['notice_params']['primary_member']['first_name'].titleize
-         end
+        merge_model.first_name = if uqhp_notice? && consumer_role.present?
+                                   consumer_role.person.first_name
+                                 else
+                                   payload['notice_params']['primary_member']['first_name'].titleize
+                                 end
       end
 
       def last_name
@@ -88,11 +92,149 @@ module Notifier
         merge_model.mailing_address = address_hash(mailing_address)
       end
 
+      def primary_member
+        member = payload['notice_params']['primary_member']
+        dependent = ::Notifier::Services::DependentService.new(uqhp_notice?, member, renewing_enrollments)
+        dependent_hash(dependent, member)
+      end
+
+      def family_members
+        return @family_members if defined? @family_members
+        @family_members = dependents + [primary_member]
+      end
+
       def dependents
-        payload['notice_params']['dependents'].each do |member|
-          dependent = ::Notifier::Services::DependentService.new(uqhp_notice?, member)
-          merge_model.dependents << dependent_hash(dependent, member)
+        primary_member = []
+        primary_member << payload['notice_params']['primary_member']
+        dependent_members = payload['notice_params']['dependents']
+        members = primary_member + dependent_members
+        merge_model.dependents =
+          members.compact.uniq { |dependent| dependent['member_id'] }.collect do |member|
+            dependent = ::Notifier::Services::DependentService.new(uqhp_notice?, member, renewing_enrollments)
+            dependent_hash(dependent, member)
+          end
+      end
+
+      # Loading only renewing enrollments
+      def enrollments
+        return [] unless renewing_enrollments.present?
+
+        renewing_enrollments.each do |enrollment|
+          merge_model.enrollments << enrollment_hash(enrollment)
         end
+      end
+
+      def tax_households
+        tax_households = []
+        primary_member = payload['notice_params']['primary_member']
+        return [] unless primary_member['aqhp_eligible']&.upcase == "YES"
+
+        thh = ::Notifier::Services::TaxHouseholdService.new(primary_member)
+        tax_households << tax_households_hash(thh)
+        merge_model.tax_households = tax_households
+      end
+
+      def tax_hh_with_csr
+        tax_households.reject{ |thh| thh.csr_percent_as_integer == 100}
+      end
+
+      # there can be multiple health and dental enrollments for the same coverage year
+      # Renewing health enrollments
+      def renewing_health_enrollments
+        renewing_enrollments.select { |e| e.coverage_kind == 'health' && e.effective_on.year.to_s == coverage_year.to_s}
+      end
+
+      def renewing_health_enrollments_present?
+        renewing_health_enrollments.present?
+      end
+
+      # Renewing dental enrollments
+      def renewing_dental_enrollments
+        renewing_enrollments.select { |e| e.coverage_kind == 'dental' && e.effective_on.year.to_s == coverage_year.to_s }
+      end
+
+      # Current active health enrollments
+      def current_health_enrollments
+        active_enrollments.select { |e| e.coverage_kind == "health" && e.effective_on.year.to_s == previous_coverage_year.to_s}
+      end
+
+      # Current active dental enrollments
+      def current_dental_enrollments
+        active_enrollments.select { |e| e.coverage_kind == "dental" && e.effective_on.year.to_s == previous_coverage_year.to_s}
+      end
+
+      # Renewing health product
+      def renewing_health_products
+        renewing_health_enrollments.map(&:product)
+      end
+
+      # Renewing dental product
+      def renewing_dental_products
+        renewing_dental_enrollments.map(&:product)
+      end
+
+      # Current active health products
+      def current_health_products
+        current_health_enrollments.map(&:product)
+      end
+
+      # Current active dental product
+      def current_dental_products
+        current_dental_enrollments.map(&:product)
+      end
+
+      def same_health_product
+        merge_model.same_health_product = same_health_product?
+      end
+
+      def same_dental_product
+        merge_model.same_dental_product = same_dental_product?
+      end
+
+      # checks if individual is enrolled into same health product
+      def same_health_product?
+        renewal_health_product_ids = current_health_products.map(&:renewal_product).map(&:id).compact
+        passive_renewal_health_plan_ids = renewing_health_products.map(&:id).compact
+        renewal_health_product_hios_base_ids = current_health_products.map(&:renewal_product).map(&:hios_base_id).compact
+        passive_renewal_health_plan_hios_base_ids = renewing_health_products.map(&:hios_base_id).compact
+
+        return false unless renewal_health_product_ids.present? && passive_renewal_health_plan_ids.present?
+
+        (renewal_health_product_ids.sort == passive_renewal_health_plan_ids.sort) && (renewal_health_product_hios_base_ids.sort == passive_renewal_health_plan_hios_base_ids.sort)
+      end
+
+      # checks if individual is enrolled into same dental product
+      def same_dental_product?
+        renewal_dental_product_ids = current_dental_products.map(&:renewal_product).map(&:id).compact
+        passive_renewal_dental_product_ids = renewing_dental_products.map(&:id).compact
+        renewal_dental_product_hios_base_ids = current_dental_products.map(&:renewal_product).map(&:hios_base_id).compact
+        passive_renewal_dental_product_hios_base_ids = renewing_dental_products.map(&:hios_base_id).compact
+
+        return false unless renewal_dental_product_ids.present? && passive_renewal_dental_product_ids.present?
+
+        (renewal_dental_product_ids.sort == passive_renewal_dental_product_ids.sort) && (renewal_dental_product_hios_base_ids.sort == passive_renewal_dental_product_hios_base_ids.sort)
+      end
+
+      def renewing_enrollments
+        return [] unless payload['notice_params']['renewing_enrollment_ids'].present?
+
+        payload['notice_params']['renewing_enrollment_ids'].collect do |hbx_id|
+          HbxEnrollment.by_hbx_id(hbx_id).first
+        end
+      end
+
+      def active_enrollments
+        return [] unless payload['notice_params']['active_enrollment_ids'].present?
+
+        payload['notice_params']['active_enrollment_ids'].collect do |hbx_id|
+          HbxEnrollment.by_hbx_id(hbx_id).first
+        end
+      end
+
+      def ineligible_applicants
+        return nil unless family_members.present?
+
+        merge_model.ineligible_applicants = family_members.select(&:totally_ineligible)
       end
 
       def magi_medicaid_members
@@ -101,11 +243,11 @@ module Notifier
         primary_member_object = payload['notice_params']['primary_member'].present? ? payload['notice_params']['primary_member'] : nil
         primary_member << primary_member_object
         dependent_members = payload['notice_params']['dependents']
-        family_members = primary_member + dependent_members
-        family_members.compact.each do |member|
+        members = primary_member + dependent_members
+        members.compact.each do |member|
           next if member["magi_medicaid"] != "Yes"
 
-          fam_member = ::Notifier::Services::DependentService.new(uqhp_notice?, member)
+          fam_member = ::Notifier::Services::DependentService.new(uqhp_notice?, member, renewing_enrollments)
           merge_model.magi_medicaid_members << member_hash(fam_member)
         end
       end
@@ -116,11 +258,11 @@ module Notifier
         primary_member_object = payload['notice_params']['primary_member'].present? ? payload['notice_params']['primary_member'] : nil
         primary_member << primary_member_object
         dependent_members = payload['notice_params']['dependents']
-        family_members = primary_member + dependent_members
-        family_members.compact.each do |member|
+        members = primary_member + dependent_members
+        members.compact.each do |member|
           next unless member["aqhp_eligible"] == "Yes" || member["non_magi_medicaid"] == "Yes"
 
-          fam_member = ::Notifier::Services::DependentService.new(uqhp_notice?, member)
+          fam_member = ::Notifier::Services::DependentService.new(uqhp_notice?, member, renewing_enrollments)
           merge_model.aqhp_or_non_magi_medicaid_members << member_hash(fam_member)
         end
       end
@@ -131,11 +273,11 @@ module Notifier
         primary_member_object = payload['notice_params']['primary_member'].present? ? payload['notice_params']['primary_member'] : nil
         primary_member << primary_member_object
         dependent_members = payload['notice_params']['dependents']
-        family_members = primary_member + dependent_members
-        family_members.compact.each do |member|
+        members = primary_member + dependent_members
+        members.compact.each do |member|
           next unless member["uqhp_eligible"] == "Yes" || member["non_magi_medicaid"] == "Yes"
 
-          fam_member = ::Notifier::Services::DependentService.new(uqhp_notice?, member)
+          fam_member = ::Notifier::Services::DependentService.new(uqhp_notice?, member, renewing_enrollments)
           merge_model.uqhp_or_non_magi_medicaid_members << member_hash(fam_member)
         end
       end
@@ -173,7 +315,8 @@ module Notifier
 
       def citizenship
         return if primary_nil?
-        merge_model.citizenship = citizen_status(payload['notice_params']['primary_member']['citizen_status'])
+
+        merge_model.citizenship = ivl_citizen_status(uqhp_notice?, payload['notice_params']['primary_member']['citizen_status'])
       end
 
       def tax_household_size
@@ -191,7 +334,7 @@ module Notifier
           if uqhp_notice?
             false
           else
-            payload['notice_params']['primary_member']['aqhp_eligible'].casecmp('YES').zero?
+            payload['notice_params']['primary_member']['aqhp_eligible']&.casecmp('YES')&.zero?
           end
       end
 
@@ -200,7 +343,7 @@ module Notifier
           if uqhp_notice?
             false
           else
-            payload['notice_params']['primary_member']['totally_inelig'].casecmp('YES').zero?
+            payload['notice_params']['primary_member']['totally_inelig']&.casecmp('YES')&.zero?
           end
       end
 
@@ -209,7 +352,7 @@ module Notifier
           if uqhp_notice?
             true
           else
-            payload['notice_params']['primary_member']['uqhp_eligible'].casecmp('YES').zero? ? true : false
+            payload['notice_params']['primary_member']['uqhp_eligible']&.casecmp('YES')&.zero? ? true : false
           end
       end
 
@@ -223,7 +366,7 @@ module Notifier
           if uqhp_notice?
             false
           else
-            payload['notice_params']['primary_member']['irs_consent'].casecmp('YES').zero?
+            payload['notice_params']['primary_member']['irs_consent']&.casecmp('YES')&.zero?
           end
       end
 
@@ -232,7 +375,7 @@ module Notifier
           if uqhp_notice?
             false
           else
-            payload['notice_params']['primary_member']['magi_medicaid'].casecmp('YES').zero?
+            payload['notice_params']['primary_member']['magi_medicaid']&.casecmp('YES')&.zero?
           end
       end
 
@@ -247,7 +390,11 @@ module Notifier
 
       def csr
         return if primary_nil?
-        merge_model.csr = payload['notice_params']['primary_member']['csr'].casecmp('YES').zero?
+        merge_model.csr = payload['notice_params']['primary_member']['csr']&.casecmp('YES')&.zero?
+      end
+
+      def has_atleast_one_csr_member?
+        csr? || dependents.any? { |dependent| dependent.csr == true }
       end
 
       def aqhp_event
