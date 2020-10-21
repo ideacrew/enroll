@@ -194,7 +194,6 @@ module Insured
         params = subject.find(enrollment.id, family.id)
         expect(params[:elected_aptc_pct]).to eq 0.09
       end
-
     end
   end
 end
