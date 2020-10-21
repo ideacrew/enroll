@@ -167,7 +167,7 @@ module Services
               sum + value
             end
             group_size_factor_sum = group_size.actuarial_factor_entries.map(&:factor_value).flatten.inject(0) { |sum,i| sum + i }
-            data = [active_year, issuer_hios_id, carrier_name, group_size_sum, group_size_factor_sum.round(3).to_s]
+            data = [active_year, issuer_hios_id, carrier_name == "NHP" ? "AHP" : carrier_name, group_size_sum, group_size_factor_sum.round(3).to_s]
             generate_data(worksheet4, data, d)
             d += 1
           rescue StandardError
@@ -194,7 +194,7 @@ module Services
               sum + value
             end
             participation_rate_sum = part_rate.actuarial_factor_entries.map(&:factor_value).flatten.inject(0) { |sum,i| sum + i }
-            data = [active_year, issuer_hios_id, carrier_name, (group_size_sum / 100.00), participation_rate_sum.round(2).to_s]
+            data = [active_year, issuer_hios_id, carrier_name == "NHP" ? "AHP" : carrier_name, (group_size_sum / 100.00), participation_rate_sum.round(2).to_s]
             generate_data(worksheet5, data, e)
             e += 1
           rescue StandardError
@@ -218,7 +218,7 @@ module Services
           sic_codes.all.each do |sic_code|
             sic_count = sic_code.actuarial_factor_entries.count
             sic_rate_sum = sic_code.actuarial_factor_entries.map(&:factor_value).flatten.inject(0) { |sum,i| sum + i }
-            data = [active_year, issuer_hios_id, carrier_name, sic_count, sic_rate_sum.round(2).to_s]
+            data = [active_year, issuer_hios_id, carrier_name == "NHP" ? "AHP" : carrier_name, sic_count, sic_rate_sum.round(2).to_s]
             generate_data(worksheet6, data, f)
             f += 1
           rescue StandardError
@@ -242,7 +242,7 @@ module Services
         offerings = { metal_level: "Horizontal Offering", single_issuer: "Vertical Offering", single_product: "Sole Source Offering" }
         offerings.each do |product_package_kind, offering_type|
           product_count = products.where(:product_package_kinds.in => [product_package_kind]).size
-          data = [issuer_hios_id, carrier_name, offering_type, product_count]
+          data = [issuer_hios_id, carrier_name == "NHP" ? "AHP" : carrier_name, offering_type, product_count]
           generate_data(worksheet7, data, g)
           g += 1
         rescue StandardError
