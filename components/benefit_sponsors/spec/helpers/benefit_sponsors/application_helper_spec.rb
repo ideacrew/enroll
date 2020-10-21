@@ -119,6 +119,14 @@ RSpec.describe BenefitSponsors::ApplicationHelper, type: :helper, dbclean: :afte
       it {expect(add_plan_year_button_business_rule(active_benefit_sponsorship, employer_profile.benefit_applications)).to eq false}
     end
 
+    context 'should return false when renewal application is pending' do
+      before do
+        renewal_application.update_attributes(:aasm_state => :pending)
+        predecessor_application.update_attributes(:aasm_state => :active)
+      end
+      it {expect(add_plan_year_button_business_rule(active_benefit_sponsorship, employer_profile.benefit_applications)).to eq false}
+    end
+
     context 'should return true when active application is termination_pending' do
       before do
         renewal_application.update_attributes(:aasm_state => :canceled)
@@ -149,6 +157,14 @@ RSpec.describe BenefitSponsors::ApplicationHelper, type: :helper, dbclean: :afte
         predecessor_application.update_attributes(:aasm_state => :termination_pending)
       end
       it {expect(add_plan_year_button_business_rule(active_benefit_sponsorship, employer_profile.benefit_applications)).to eq true}
+    end
+
+    context 'should return false when current application(initial) is pending' do
+      before do
+        renewal_application.destroy
+        predecessor_application.update_attributes(:aasm_state => :pending)
+      end
+      it {expect(add_plan_year_button_business_rule(active_benefit_sponsorship, employer_profile.benefit_applications)).to eq false}
     end
   end
 end
