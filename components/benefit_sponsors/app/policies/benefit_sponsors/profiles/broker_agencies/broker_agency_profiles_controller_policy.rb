@@ -20,7 +20,9 @@ module BenefitSponsors
         end
 
         def redirect_signup?
-          user.present?
+          return false if user.blank?
+
+          family_index?
         end
 
         def staff_index?

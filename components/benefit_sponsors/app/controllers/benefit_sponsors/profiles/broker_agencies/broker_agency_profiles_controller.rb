@@ -29,7 +29,8 @@ module BenefitSponsors
         def show
           authorize self, :redirect_signup?
           set_flash_by_announcement
-          @broker_agency_profile = ::BenefitSponsors::Organizations::BrokerAgencyProfile.find(params[:id])
+          find_broker_agency_profile(BSON::ObjectId.from_string(params.permit(:id)[:id]))
+
           @provider = current_user.person
         end
 

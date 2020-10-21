@@ -107,6 +107,21 @@ module BenefitSponsors
           expect(response.location.include?('users/sign_up')).to be_truthy
         end
       end
+
+      context 'for show with other broker_agency_profile_id and with a correct user' do
+        let!(:organization1) {FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site)}
+        let(:bap_id1) {organization1.broker_agency_profile.id}
+
+        before :each do
+          sign_in(user_with_broker_role)
+          allow(controller).to receive(:set_flash_by_announcement).and_return(true)
+          get :show, id: bap_id1
+        end
+
+        it 'should not return success http status' do
+          expect(response).to have_http_status(:redirect)
+        end
+      end
     end
 
     describe "for broker_agency_profile's family_index" do
