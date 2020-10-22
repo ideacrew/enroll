@@ -104,14 +104,14 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
         it "it should return options for first_of_next_month_coinciding for shop market" do
           qle.update_attributes(market_kind: 'shop', effective_on_kinds: ['first_of_next_month_coinciding'])
           options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
-          effective_date = date <= date.beginning_of_month ? date : date.end_of_month + 1.day
+          effective_date = date == date.beginning_of_month ? date : date.end_of_month + 1.day
           expect(options).to eq [[effective_date.to_s, 'first_of_next_month_coinciding']]
         end
 
         it "it should return options for first_of_next_month_coinciding for individual market" do
           qle.update_attributes(market_kind: 'individual', effective_on_kinds: ['first_of_next_month_coinciding'])
           options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
-          effective_date = date <= date.beginning_of_month ? date : date.end_of_month + 1.day
+          effective_date = date == date.beginning_of_month ? date : date.end_of_month + 1.day
           expect(options).to eq [[effective_date.to_s, 'first_of_next_month_coinciding']]
         end
       end

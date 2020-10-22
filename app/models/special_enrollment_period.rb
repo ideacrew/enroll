@@ -302,10 +302,10 @@ private
   end
 
   def first_of_next_month_coinciding_effective_date
-    if earliest_effective_date == earliest_effective_date.beginning_of_month
-      earliest_effective_date
+    if qle_on == qle_on.beginning_of_month
+      qle_on
     else
-      earliest_effective_date.end_of_month + 1.day
+      qle_on.end_of_month + 1.day
     end
   end
 
