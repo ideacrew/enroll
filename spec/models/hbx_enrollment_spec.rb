@@ -1483,7 +1483,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
       include_context "setup initial benefit application"
 
       let(:enrollment_effective_on) {TimeKeeper.date_of_record - 15.days}
-      let(:renewing_waived_enrollment) do
+      let(:shopping_waived_enrollment) do
         FactoryGirl.create(
           :hbx_enrollment,
           household: shop_family.latest_household,
@@ -1499,16 +1499,16 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
           benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id,
           predecessor_enrollment_id: enrollment.id,
           product_id: enrollment.product_id,
-          aasm_state: 'renewing_waived'
+          aasm_state: 'shopping'
         )
       end
 
       it 'should update benefit_group_assignment state to coverage_waived' do
-        expect(renewing_waived_enrollment.aasm_state).to eq 'renewing_waived'
-        expect(renewing_waived_enrollment.benefit_group_assignment.aasm_state).to eq 'initialized'
-        renewing_waived_enrollment.begin_coverage!
-        expect(renewing_waived_enrollment.aasm_state).to eq 'inactive'
-        expect(renewing_waived_enrollment.benefit_group_assignment.aasm_state).to eq 'coverage_waived'
+        expect(shopping_waived_enrollment.aasm_state).to eq 'shopping'
+        expect(shopping_waived_enrollment.benefit_group_assignment.aasm_state).to eq 'initialized'
+        shopping_waived_enrollment.renew_waived!
+        expect(shopping_waived_enrollment.aasm_state).to eq 'renewing_waived'
+        expect(shopping_waived_enrollment.benefit_group_assignment.aasm_state).to eq 'coverage_waived'
       end
     end
 

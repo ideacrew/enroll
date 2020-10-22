@@ -1510,7 +1510,7 @@ class HbxEnrollment
     end
 
     event :renew_waived, :after => :record_transition do
-      transitions from: :shopping, to: :renewing_waived
+      transitions from: :shopping, to: :renewing_waived, after: :propogate_waiver
     end
 
     event :select_coverage, :after => :record_transition do
@@ -1548,7 +1548,7 @@ class HbxEnrollment
                   to: :coverage_enrolled, :guard => :is_shop?
 
       transitions from: [:auto_renewing, :coverage_reinstated], to: :coverage_selected
-      transitions from: :renewing_waived, to: :inactive, after: :propogate_waiver
+      transitions from: :renewing_waived, to: :inactive
     end
 
     event :expire_coverage, :after => :record_transition do
