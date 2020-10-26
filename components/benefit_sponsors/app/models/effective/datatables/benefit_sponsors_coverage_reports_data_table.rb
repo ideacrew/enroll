@@ -47,7 +47,7 @@ module Effective
           content_tag(:div) do 
             "Employee Contribution:".to_s + (number_to_currency (row.group_enrollment.product_cost_total.to_f - row.group_enrollment.sponsor_contribution_total.to_f).to_s) 
           end  +
-          content_tag(:p,  content_tag(:strong, "Total:") +  content_tag(:strong, row.group_enrollment.product_cost_total.to_s))
+            content_tag(:p, content_tag(:strong, 'Total:') + content_tag(:strong, (number_to_currency row.group_enrollment.product_cost_total.to_s)))
         }, :filter => false, :sortable => false
       end
 
