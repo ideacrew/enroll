@@ -171,12 +171,13 @@
             <span class="position-full-name"> <%= @person.full_name %> </span>
           </div>
         </div>
-        <% if current_user.does_not_have_any_staff_role? %>
-          <div class="row row-form-wrapper no-buffer">
+        <% if !current_user.has_insured_role? %>
+          <% if current_user.does_not_have_any_staff_role? %>
+            <div class="row row-form-wrapper no-buffer">
               <%= render 'shared/age_off_excluded', f: f %>
-          </div>
+            </div>
+          <% end %>
         <% end %>
-
         <% if has_active_consumer_dependent?(@person,@dependent) %>
           <%= render 'shared/ssn_coverage_msg' %>
         <% end %>
