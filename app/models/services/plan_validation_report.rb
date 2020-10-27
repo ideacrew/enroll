@@ -139,7 +139,7 @@ module Services
             county_zip_ids = ::BenefitMarkets::Locations::CountyZip.where(:id.in => ids)
           end
           county_count = county_zip_ids.map(&:county_name).uniq.size
-          zip_count = county_zip_ids.map(&:zip).uniq.size
+          zip_count = county_zip_ids.map(&:zip).select{|a| a.exclude?(" ")}.uniq.size
           carrier_name = products.first.issuer_profile.legal_name
           data = [active_year, issuer_hios_id, carrier_name, service_area.issuer_provided_code, products.size, county_count, zip_count]
           generate_data(worksheet3, data, c)
