@@ -177,6 +177,7 @@ Feature: Insured Plan Shopping on Individual market
     And should find alien number
     Then Individual logs out
 
+  @flaky
   Scenario: New insured user purchases on individual market during open enrollment and see a renewal enrollment generation with initial enrollment
     Given Individual resumes enrollment
     And Individual click on Sign In

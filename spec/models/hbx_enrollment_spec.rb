@@ -801,6 +801,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
                               enrollment_signature: true,
                               effective_on: date)
           end
+          let!(:hbx_profile) { FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period, coverage_year: TimeKeeper.date_of_record.year) }
 
           it "should cancel hbx enrollemnt plan1 from carrier1 when choosing plan2 from carrier2" do
             hbx_enrollment1.update_attributes!(effective_on: date + 1.day)
@@ -2821,6 +2822,7 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
 
     context "for Individual market" do
       let(:ivl_family)        { FactoryBot.create(:family, :with_primary_family_member) }
+      let!(:hbx_profile) { FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period, coverage_year: TimeKeeper.date_of_record.year) }
 
       let(:ivl_enrollment)    {
         FactoryBot.create(:hbx_enrollment,
@@ -3399,6 +3401,7 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
     end
 
     context "IVL enrollment" do
+      let!(:hbx_profile) { FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period, coverage_year: TimeKeeper.date_of_record.year) }
 
       before do
         enrollment.kind = "individual"

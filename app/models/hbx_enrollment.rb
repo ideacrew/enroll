@@ -760,6 +760,8 @@ class HbxEnrollment
     if should_transmit_update?
       notify(ENROLLMENT_UPDATED_EVENT_NAME, {policy_id: self.hbx_id})
     end
+
+    ::EnrollRegistry[:cancel_renewals_for_term] { {hbx_enrollment: self} }
   end
 
   def propogate_waiver
