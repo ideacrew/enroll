@@ -15,7 +15,8 @@
           </ul>
         </div>
       <% end %>
-
+      
+      <p class="dependent-invalid-dob"></p>
       <% if @address_errors.present? %>
         <%= render partial: 'shared/address_error_messages', locals: {address_errors: @address_errors} %>
       <% end %>

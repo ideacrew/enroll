@@ -416,6 +416,14 @@ And(/I select a plan on plan shopping page/) do
    find_all('.plan-select')[0].click
 end
 
+And(/I select a non silver plan on plan shopping page/) do
+  find(:xpath, '//*[@id="ivl_plans"]/div[1]/div/div[5]/div[3]/a[1]').click
+end
+
+Then(/Should see the modal pop up for eligibility/) do
+  expect(page).to have_css('.modal-title')
+end
+
 And(/I click on purchase button on confirmation page/) do
   find('.interaction-choice-control-value-terms-check-thank-you').click
   fill_in 'first_name_thank_you', :with => (@u.find :first_name)
@@ -712,6 +720,26 @@ Then(/^Prepare taxhousehold info for aptc user$/) do
   if household.tax_households.blank?
     household.build_thh_and_eligibility(80, 0, start_on, current_product.id, 'Admin')
     household.build_thh_and_eligibility(80, 0, future_start_on, future_product.id, 'Admin')
+    household.save!
+  end
+  benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
+  benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(start_on)}.update_attributes!(slcsp_id: current_product.id)
+  benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(future_start_on)}.update_attributes!(slcsp_id: future_product.id)
+  screenshot("aptc_householdinfo")
+end
+
+Then(/^Prepare taxhousehold info for aptc user with selected eligibility$/) do
+  person = User.find_by(email: 'aptc@dclink.com').person
+  household = person.primary_family.latest_household
+
+  start_on = Date.new(TimeKeeper.date_of_record.year, 1,1)
+  future_start_on = Date.new(TimeKeeper.date_of_record.year + 1, 1,1)
+  current_product = BenefitMarkets::Products::Product.all.by_year(start_on.year).where(metal_level_kind: :silver).first
+  future_product = BenefitMarkets::Products::Product.all.by_year(future_start_on.year).where(metal_level_kind: :silver).first
+
+  if household.tax_households.blank?
+    household.build_thh_and_eligibility(80, 73, start_on, current_product.id, 'Admin')
+    household.build_thh_and_eligibility(80, 73, future_start_on, future_product.id, 'Admin')
     household.save!
   end
   benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
