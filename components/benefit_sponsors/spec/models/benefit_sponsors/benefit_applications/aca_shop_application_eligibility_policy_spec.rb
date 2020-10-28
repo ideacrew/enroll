@@ -5,7 +5,7 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 RSpec.describe BenefitSponsors::BenefitApplications::AcaShopApplicationEligibilityPolicy, type: :model, :dbclean => :after_each do
-  let!(:subject) {BenefitApplications::AcaShopApplicationEligibilityPolicy.new}
+  let!(:subject) {BenefitSponsors::BenefitApplications::AcaShopApplicationEligibilityPolicy.new}
 
   context "A new model instance" do
     it "should have businese_policy" do
@@ -28,14 +28,14 @@ RSpec.describe BenefitSponsors::BenefitApplications::AcaShopApplicationEligibili
         :with_benefit_package,
         :fte_count => 1,
         :benefit_sponsorship => benefit_sponsorship,
-        :open_enrollment_period => Range.new(Date.today, Date.today + BenefitApplications::AcaShopApplicationEligibilityPolicy::OPEN_ENROLLMENT_DAYS_MIN)
+        :open_enrollment_period => Range.new(Date.today, Date.today + BenefitSponsors::BenefitApplications::AcaShopApplicationEligibilityPolicy::OPEN_ENROLLMENT_DAYS_MIN)
       )
     end
     let!(:policy_name) {:passes_open_enrollment_period_policy}
     let!(:policy) {subject.business_policies[policy_name]}
 
     it "should have open_enrollment period lasting more than min" do
-      expect(benefit_application.open_enrollment_length).to be >= BenefitApplications::AcaShopApplicationEligibilityPolicy::OPEN_ENROLLMENT_DAYS_MIN
+      expect(benefit_application.open_enrollment_length).to be >= BenefitSponsors::BenefitApplications::AcaShopApplicationEligibilityPolicy::OPEN_ENROLLMENT_DAYS_MIN
     end
 
     it "should satisfy rules" do
@@ -52,7 +52,7 @@ RSpec.describe BenefitSponsors::BenefitApplications::AcaShopApplicationEligibili
         :with_benefit_package,
         :fte_count => 3,
         :benefit_sponsorship => benefit_sponsorship,
-        :open_enrollment_period => Range.new(Date.today + 5, Date.today + BenefitApplications::AcaShopApplicationEligibilityPolicy::OPEN_ENROLLMENT_DAYS_MIN)
+        :open_enrollment_period => Range.new(Date.today + 5, Date.today + BenefitSponsors::BenefitApplications::AcaShopApplicationEligibilityPolicy::OPEN_ENROLLMENT_DAYS_MIN)
       )
     end
     let!(:policy_name) {:passes_open_enrollment_period_policy}
@@ -108,7 +108,7 @@ RSpec.describe BenefitSponsors::BenefitApplications::AcaShopApplicationEligibili
         initial_application.update_attributes(
           :fte_count => 5,
           effective_period: Date.new(2021, 1, 1)..Date.new(2021, 1, 1).end_of_year + 1.month,
-          :open_enrollment_period => Range.new(Date.today, Date.today + BenefitApplications::AcaShopApplicationEligibilityPolicy::OPEN_ENROLLMENT_DAYS_MIN)
+          :open_enrollment_period => Range.new(Date.today, Date.today + BenefitSponsors::BenefitApplications::AcaShopApplicationEligibilityPolicy::OPEN_ENROLLMENT_DAYS_MIN)
         )
       end
 
@@ -128,7 +128,7 @@ RSpec.describe BenefitSponsors::BenefitApplications::AcaShopApplicationEligibili
         initial_application.update_attributes(
           :fte_count => 5,
           effective_period: Date.new(2021, 2, 1)..Date.new(2021, 1, 1).end_of_year + 1.month,
-          :open_enrollment_period => Range.new(Date.today, Date.today + BenefitApplications::AcaShopApplicationEligibilityPolicy::OPEN_ENROLLMENT_DAYS_MIN)
+          :open_enrollment_period => Range.new(Date.today, Date.today + BenefitSponsors::BenefitApplications::AcaShopApplicationEligibilityPolicy::OPEN_ENROLLMENT_DAYS_MIN)
         )
       end
 
