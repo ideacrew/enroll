@@ -69,13 +69,14 @@ namespace :import do
           ["2019_QHP", "2019_QDP"]
         elsif year == 2020
           ["2020_QHP", "2020_QDP"]
+        elsif year == 2021
+          ["2021_QHP", "2021_QDP"]
         end
         sheets.each do |sheet_name|
           sheet_data = result.sheet(sheet_name)
 
           @header_row = sheet_data.row(1)
           assign_headers
-
           last_row = sheet_data.last_row
           (2..last_row).each do |row_number| # data starts from row 2, row 1 has headers
             row_info = sheet_data.row(row_number)

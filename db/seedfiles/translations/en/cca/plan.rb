@@ -38,8 +38,8 @@ PLAN_TRANSLATIONS = {
   'en.plans.bcbs_email' => 'send secure email after login to member account',
   'en.plans.bcbs_hours' => 'Monday through Friday, 8:00 a.m. to 6:00 p.m. Eastern Time',
 
-  'en.plans.hphc_phone' => '888-333-4742',
-  'en.plans.hphc_href_phone' => 'tel:+18883334742',
+  'en.plans.hphc_phone' => '1-877-907-4742',
+  'en.plans.hphc_href_phone' => 'tel:+18779074742',
   'en.plans.hphc_email' => 'send secure email after login to member account',
   'en.plans.hphc_hours' => 'Monday, Tuesday, & Thursday from 8:00 a.m. to 6:00 p.m.; Wednesday from 10:00 a.m. to 6:00 p.m.; and Friday from 8:00 a.m. to 5:30 p.m',
 
@@ -54,21 +54,16 @@ PLAN_TRANSLATIONS = {
   'en.plans.uh_hours' => '7 AM to 6 PM CST',
 
   'en.plans.thd_phone' => '888-257-1985',
-  'en.plans.thd_href_phone' => 'tel:+18004620224',
+  'en.plans.thd_href_phone' => 'tel:+18882571985',
   'en.plans.thd_email' => 'https://tuftshealthplan.com/contact-us/members-public-plans-form',
   'en.plans.thd_hours' => 'Monday through Friday, from 8 a.m. to 5 p.m., excluding holidays',
 
 
-  'en.plans.thpp_phone' => '800.462.0224',
   'en.plans.thpp_ph' => 'Phone:',
-  'en.plans.thpp_hours' => 'Monday - Thursday 8:00am to 7:00pm; Friday 8:00am to 5:00pm',
-  'en.plans.thpp_time'  => 'Monday - Thursday 8:30am to 5:00pm; Friday 10:00am to 5:00pm',
-  'en.plans.thpp_nurseline' => '24-Hour Nurseline:',
-  'en.plans.thpp_nurseline_number' => '866.201.7919',
-  'en.plans.thpp_under' => 'under Tufts Health Premier',
-  'en.plans.thpp_bh' => 'Behavior Health/Substance Use Services:',
-  'en.plans.thpp_bh_tel' => 'tel:+18002089565',
-  'en.plans.thpp_bh_phone' => '800.208.9565',
+  'en.plans.thpp_phone' => '888-257-1985',
+  'en.plans.thpp_href_phone' => 'tel:+18882571985',
+  'en.plans.thpp_email' => 'https://tuftshealthplan.com/contact-us/members-public-plans-form',
+  'en.plans.thpp_hours' => 'Monday through Friday, from 8 a.m. to 5 p.m., excluding holidays',
 
   'en.plans.cf_phone' => '1-855-444-3119',
   'en.plans.cf_href_phone' => 'tel:+18554443119',
