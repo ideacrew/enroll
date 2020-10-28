@@ -436,6 +436,27 @@ RSpec.describe User, :type => :model, dbclean: :after_each do
     end
   end
 
+  context ".consumer_identity_verified?" do
+    let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+    let(:user) { FactoryBot.create(:user, person: person, identity_verified_date: nil) }
+
+    context "with identity_verified true" do
+      it "should return true" do
+        user.roles = []
+        allow(person.consumer_role).to receive(:identity_verified?).and_return true
+        expect(user.consumer_identity_verified?).to eq true
+      end
+    end
+
+    context "with identity_verified false" do
+      it "should return true" do
+        user.roles = []
+        allow(person.consumer_role).to receive(:identity_verified?).and_return false
+        expect(user.consumer_identity_verified?).to eq false
+      end
+    end
+  end
+
   describe "permission", dbclean: :after_each do
     let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
     let(:person) { double("person")}
