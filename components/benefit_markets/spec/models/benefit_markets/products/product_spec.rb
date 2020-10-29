@@ -14,29 +14,42 @@ module BenefitMarkets
 
     let(:rating_area)         { BenefitMarkets::Locations::RatingArea.new }
     let(:quarter_1)           { Date.new(this_year, 1, 1)..Date.new(this_year, 3, 31) }
+    let(:premium_q1_age_14)   { BenefitMarkets::Products::PremiumTuple.new(age: 14, cost: 101) }
     let(:premium_q1_age_20)   { BenefitMarkets::Products::PremiumTuple.new(age: 20, cost: 201) }
     let(:premium_q1_age_30)   { BenefitMarkets::Products::PremiumTuple.new(age: 30, cost: 301) }
     let(:premium_q1_age_40)   { BenefitMarkets::Products::PremiumTuple.new(age: 40, cost: 401) }
     let(:premium_table_q1)    { BenefitMarkets::Products::PremiumTable.new(
                                   effective_period: quarter_1,
                                   rating_area: rating_area,
-                                  premium_tuples: [premium_q1_age_20, premium_q1_age_30, premium_q1_age_40],
+                                  premium_tuples: [premium_q1_age_14, premium_q1_age_20, premium_q1_age_30, premium_q1_age_40]
                                 ) }
 
-    let(:premium_tables)      { [premium_table_q1] }
+    let(:premium2_q1_age_14) {BenefitMarkets::Products::PremiumTuple.new(age: 14, cost: 111)}
+    let(:premium2_q1_age_20) {BenefitMarkets::Products::PremiumTuple.new(age: 20, cost: 211)}
+    let(:premium2_q1_age_30) {BenefitMarkets::Products::PremiumTuple.new(age: 30, cost: 311)}
+    let(:premium2_q1_age_40) {BenefitMarkets::Products::PremiumTuple.new(age: 40, cost: 411)}
+    let(:premium_table2_q1) do
+      BenefitMarkets::Products::PremiumTable.new(
+        effective_period: quarter_1,
+        rating_area: rating_area,
+        premium_tuples: [premium2_q1_age_14, premium2_q1_age_20, premium2_q1_age_30, premium2_q1_age_40]
+      )
+    end
 
+    let(:premium_tables) {[premium_table_q1, premium_table2_q1]}
 
     let(:params) do
-        {
-          benefit_market_kind:  benefit_market_kind,
-          application_period:   application_period,
-          hbx_id:               hbx_id,
-          # issuer_profile_urn:   issuer_profile_urn,
-          title:                title,
-          description:          description,
-          service_area:         service_area,
-          premium_tables:       premium_tables,
-        }
+      {
+        benefit_market_kind: benefit_market_kind,
+        application_period: application_period,
+        hbx_id: hbx_id,
+        # issuer_profile_urn:   issuer_profile_urn,
+        title: title,
+        description: description,
+        service_area: service_area,
+        premium_tables: premium_tables,
+        premium_ages: 14..65
+      }
     end
 
     context "A new Product instance" do
@@ -282,6 +295,20 @@ module BenefitMarkets
       end
     end
 
+    context "cost_for_application_period" do
+      subject { described_class.new(params) }
 
+      before do
+        subject.save!
+      end
+
+      it "should retrieve lowest cost" do
+        expect(subject.min_cost_for_application_period(quarter_1.min)).to eq 101
+      end
+
+      it "should retrieve highest cost" do
+        expect(subject.max_cost_for_application_period(quarter_1.min)).to eq 111
+      end
+    end
   end
 end
