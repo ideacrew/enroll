@@ -86,9 +86,9 @@ describe "insured/family_members/_dependent_form.html.erb" do
       expect(rendered).to have_selector("option", text: "choose")
     end
 
-    it "should have age off exclusion field for consumer role only" do
-      expect(rendered).to match "Ageoff Exclusion"
-      expect(rendered).to have_field('age_off_excluded', checked: false)
+    it "should have not have age off exclusion field for consumer role only" do
+      expect(rendered).not_to match "Ageoff Exclusion"
+      expect(rendered).not_to have_field('age_off_excluded', checked: false)
     end
   end
 

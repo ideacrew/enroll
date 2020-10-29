@@ -25,6 +25,7 @@ Feature: Non-congressional EE adding non-diabled 26 years old dependent
     And employee selects a current qle date
     And employee sees the QLE confirmation message and clicks on continue
     And employee clicks Add Member
+    And Employee should not see the Ageoff Exclusion checkbox
     And employee sees the new dependent form
     And employee enters the info of his dependent wife
     And employee clicks confirm member
@@ -36,3 +37,6 @@ Feature: Non-congressional EE adding non-diabled 26 years old dependent
     And employee clicks on Confirm button on the coverage summary page
     And employee clicks back to my account button
     Then employee should see his active enrollment including his wife
+    When Employee should click on Manage Family button
+    And Employee should click on the Personal Tab link
+    Then Employee should not see the Ageoff Exclusion checkbox
