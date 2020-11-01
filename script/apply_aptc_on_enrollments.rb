@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# This script is to apply APTC on to the renewal enrollments for all the
+# families that are associated with the person hbx_ids given
+# in the below file.
 require 'csv'
 year = 2021
 filename = "#{Rails.root}/pids/#{year}_THHEligibility.csv"
