@@ -43,7 +43,7 @@ module Insured
         # field :applied_aptc_amount, type: Money, default: 0.0
         enrollment = HbxEnrollment.find(BSON::ObjectId.from_string(enrollment_id))
 
-        new_effective_date = Insured::Factories::SelfServiceFactory.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), enrollment.effective_on)
+        new_effective_date = Insured::Factories::SelfServiceFactory.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), enrollment.effective_on).to_date
         reinstatement = Enrollments::Replicator::Reinstatement.new(enrollment, new_effective_date, applied_aptc_amount).build
         reinstatement.save!
         update_enrollment_for_apcts(reinstatement, applied_aptc_amount)
@@ -111,7 +111,7 @@ module Insured
           family: family,
           qle: qle,
           is_aptc_eligible: is_aptc_eligible(enrollment, family),
-          new_effective_on: Insured::Factories::SelfServiceFactory.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), enrollment.effective_on),
+          new_effective_on: Insured::Factories::SelfServiceFactory.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), enrollment.effective_on).to_date,
           available_aptc: available_aptc,
           default_tax_credit_value: default_tax_credit_value,
           elected_aptc_pct: elected_aptc_pct,

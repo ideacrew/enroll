@@ -138,14 +138,14 @@ module Insured
         @product.save!
         enrollment.update_attributes(product: @product, effective_on: effective_on, aasm_state: "auto_renewing")
         hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.update_attributes!(slcsp_id: @product.id)}
-        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, effective_on + 1.month, person.age_on(TimeKeeper.date_of_record), 'R-DC001').and_return(679.8)
+        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, effective_on, person.age_on(TimeKeeper.date_of_record), 'R-DC001').and_return(679.8)
       end
 
       it 'should return the updated enrollment' do
         subject.update_aptc(enrollment.id, 1000)
         enrollment.reload
         family.reload
-        expect(enrollment.aasm_state).to eq "coverage_terminated"
+        expect(enrollment.aasm_state).to eq "coverage_canceled"
         expect(family.active_household.hbx_enrollments.last.aasm_state).to eq "coverage_selected"
       end
 
