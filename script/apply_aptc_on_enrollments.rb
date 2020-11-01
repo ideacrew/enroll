@@ -31,7 +31,7 @@ CSV.foreach(filename) do |row_with_ssn|
       puts "Renewal Enrollment with hbx_id: #{renewal_enr.hbx_id} has some aptc applied".
       next renewal_enr
     end
-    current_enrollments = family.hbx_enrollments.enrolled_and_renewal.where(:effective_on.gte => Date.new(year - 1, 1, 1), coverage_kind: 'health')
+    current_enrollments = family.hbx_enrollments.enrolled_and_renewal.current_year.where(coverage_kind: 'health')
     current_enrollment = current_enrollments.detect {|enr| enr.subscriber.applicant_id == renewal_enr.subscriber.applicant_id }
 
     tax_household = family.active_household.latest_active_thh_with_year(renewal_enr.effective_on.year)
