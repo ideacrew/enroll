@@ -12,6 +12,7 @@ def float_fix(float_number)
 end
 
 CSV.foreach(filename) do |row_with_ssn|
+  puts "----------- Processing row: #{row_with_ssn} -----------"
   ssn, hbx_id, aptc, csr = row_with_ssn
   person = Person.by_hbx_id(hbx_id).first
   if person.blank?
