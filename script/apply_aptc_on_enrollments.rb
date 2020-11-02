@@ -12,26 +12,17 @@ def float_fix(float_number)
 end
 
 CSV.foreach(filename) do |row_with_ssn|
+  puts '-' * 50
   puts "----------- Processing row: #{row_with_ssn} -----------"
   ssn, hbx_id, aptc, csr = row_with_ssn
   person = Person.by_hbx_id(hbx_id).first
-  if person.blank?
-    puts "Person not found for hbx_id: ##{hbx_id}".
-    next row_with_ssn
-  end
-
+  next row_with_ssn if person.blank?
   family = person.primary_family
-  if family.blank?
-    puts "PrimaryFamily is not found for Person with hbx_id: #{hbx_id}".
-    next row_with_ssn
-  end
+  next row_with_ssn if family.blank?
 
   renewal_enrollments = family.hbx_enrollments.enrolled_and_renewal.where(:effective_on.gte => Date.new(year, 1, 1), coverage_kind: 'health')
   renewal_enrollments.each do |renewal_enr|
-    if renewal_enr.applied_aptc_amount > 0
-      puts "Renewal Enrollment with hbx_id: #{renewal_enr.hbx_id} has some aptc applied".
-      next renewal_enr
-    end
+    next renewal_enr if renewal_enr.applied_aptc_amount > 0
     current_enrollments = family.hbx_enrollments.enrolled_and_renewal.current_year.where(coverage_kind: 'health')
     current_enrollment = current_enrollments.detect {|enr| enr.subscriber.applicant_id == renewal_enr.subscriber.applicant_id }
 
@@ -44,6 +35,7 @@ CSV.foreach(filename) do |row_with_ssn|
 
       attrs = {enrollment_id: renewal_enr.id, elected_aptc_pct: applied_percentage, aptc_applied_total: applied_aptc}
       ::Insured::Forms::SelfTermOrCancelForm.for_aptc_update_post(attrs)
+      puts "Done Processing person: #{hbx_id}"
     else
       puts "No TaxHousehold found for family: #{family.id}, person_hbx_id: #{person.hbx_id}"
     end
