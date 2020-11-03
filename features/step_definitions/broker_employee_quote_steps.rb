@@ -117,6 +117,7 @@ end
 
 When(/^.+ clicks Actions for that Employer$/) do
   find('.dropdown.pull-right', text: 'Actions').click
+  sleep 5
 end
 
 Then(/^.+ sees Create Quote button$/) do
@@ -140,6 +141,7 @@ end
 Then(/^the broker selects plan offerings by metal level and enters (.*) for employee and deps$/) do |int|
   wait_for_ajax(3, 2)
   find(:xpath, "//*[@id='pdp-bms']/div/ul/li[2]/label/div").click
+  wait_for_ajax(3, 2)
   expect(page).to have_content("Gold")
   find(:xpath, "//*[@id='metalLevelCarrierList']/div[3]/div[2]/label/h3").click
   wait_for_ajax(3, 2)
