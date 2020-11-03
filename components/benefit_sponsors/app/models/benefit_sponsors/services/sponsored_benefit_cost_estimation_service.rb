@@ -24,7 +24,7 @@ module BenefitSponsors
             estimated_enrollee_maximum: tier_costs.max
           }
         else
-          issuer_hios_ids = reference_product.carrier_profile.issuer_hios_ids if package.package_kind == :single_issuer
+          issuer_hios_ids = reference_product.carrier_profile_hios_ids if package.package_kind == :single_issuer
 
           lowest_cost_product = package.lowest_cost_product(benefit_application.start_on, issuer_hios_ids)
           highest_cost_product = package.highest_cost_product(benefit_application.start_on, issuer_hios_ids)
@@ -72,7 +72,7 @@ module BenefitSponsors
             estimated_enrollee_maximum: tier_costs.max
           }
         else
-          issuer_hios_ids = reference_product.carrier_profile.issuer_hios_ids if package.package_kind == :single_issuer
+          issuer_hios_ids = reference_product.carrier_profile_hios_ids if package.package_kind == :single_issuer
 
           lowest_cost_product = package.lowest_cost_product(benefit_application.start_on, issuer_hios_ids)
           highest_cost_product = package.highest_cost_product(benefit_application.start_on, issuer_hios_ids)
@@ -147,7 +147,7 @@ module BenefitSponsors
             }
           end
         else
-          issuer_hios_ids = reference_product.carrier_profile.issuer_hios_ids if package.package_kind == :single_issuer
+          issuer_hios_ids = reference_product.carrier_profile_hios_ids if package.package_kind == :single_issuer
 
           lowest_cost_product = package.lowest_cost_product(benefit_application.start_on, issuer_hios_ids)
           highest_cost_product = package.highest_cost_product(benefit_application.start_on, issuer_hios_ids)
@@ -208,7 +208,7 @@ module BenefitSponsors
             estimated_enrollee_maximum: tier_costs.max
           }
         else
-          issuer_hios_ids = reference_product.carrier_profile.issuer_hios_ids if package.package_kind == :single_issuer
+          issuer_hios_ids = reference_product.carrier_profile_hios_ids if package.package_kind == :single_issuer
 
           lowest_cost_product = package.lowest_cost_product(benefit_application.start_on, issuer_hios_ids)
           highest_cost_product = package.highest_cost_product(benefit_application.start_on, issuer_hios_ids)
