@@ -259,15 +259,13 @@ Given(/^the Plans exist$/) do
   sys_year = TimeKeeper.date_of_record.year
 
   # TODO: create bcps with proper OE dates and check the TimeKeeper against it.
-  if (Date.new(sys_year, 11, 1)..Date.new(sys_year, 12, 31)).cover? TimeKeeper.date_of_record
-    previous_year = TimeKeeper.date_of_record.year
-    current_year = previous_year + 1
-  else
-    previous_year = TimeKeeper.date_of_record.year - 1
-    current_year = previous_year + 1
-  end
+  previous_year = if (Date.new(sys_year, 11, 1)..Date.new(sys_year, 12, 31)).cover? TimeKeeper.date_of_record
+                    TimeKeeper.date_of_record.year
+                  else
+                    TimeKeeper.date_of_record.year - 1
+                  end
 
-  [previous_year, current_year].each do |year|
+  [previous_year, (previous_year + 1)].each do |year|
     FactoryBot.create(:plan, :with_rating_factors, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: year, deductible: 2000, csr_variant_id: "01", coverage_kind: 'health')
     FactoryBot.create(:plan, :with_rating_factors, :with_premium_tables, market: 'shop', metal_level: 'silver', active_year: year, deductible: 5000, csr_variant_id: "01", coverage_kind: 'health')
     FactoryBot.create(:plan, :with_rating_factors, :with_premium_tables, market: 'shop', metal_level: 'bronze', active_year: year, deductible: 3000, csr_variant_id: "01", coverage_kind: 'health')
