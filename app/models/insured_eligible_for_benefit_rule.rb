@@ -112,8 +112,8 @@ class InsuredEligibleForBenefitRule
       if EnrollRegistry.feature_enabled?(:age_off_relaxed_eligibility)
         dependent_coverage_eligible = ::EnrollRegistry[:age_off_relaxed_eligibility] do
           {
-            coverage_start: @new_effective_on,
-            person: @role.person,
+            effective_on: @new_effective_on,
+            dob: @role.person.dob,
             market_key: :aca_individual_dependent_age_off,
             relationship_kind: relation_ship_with_primary_applicant
           }

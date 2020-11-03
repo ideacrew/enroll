@@ -4,71 +4,127 @@ require "rails_helper"
 
 module Operations
   RSpec.describe AgeOffRelaxedEligibility do
-    let(:person) {FactoryBot.create(:person, :with_consumer_role)}
+    context 'invalid relationship' do
+      let(:input_params) do
+        {effective_on: Date.new(2021, 2, 1),
+         dob: Date.new(2021 - 26, 3, 15),
+         market_key: :aca_individual_dependent_age_off,
+         relationship_kind: 'parent'}
+      end
 
-    subject do
-      described_class.new.call(coverage_start: coverage_start, person: person, market_key: :aca_individual_dependent_age_off, relationship_kind: relationship_kind)
+      it 'should return a failure with a message' do
+        expect(subject.call(input_params).failure).to eq('Invalid relationship kind')
+      end
     end
 
-    describe 'passing coverage_start, :person, :market_key, :relationship_kind' do
+    context 'with different ages' do
+      context 'age is just below 26 when compared with effective_date' do
+        let(:input_params) do
+          {effective_on: Date.new(2021, 2, 1),
+           dob: Date.new(2021 - 26, 3, 15),
+           market_key: :aca_individual_dependent_age_off,
+           relationship_kind: 'child'}
+        end
 
-      context 'when dependent is 26 in that coverage year' do
-        let(:coverage_start) { Date.new(2020, 1, 1) }
-        let(:person) { FactoryBot.create(:person, :dob => Date.new(1993,9,1)) }
-        let(:relationship_kind) { 'child' }
+        context 'age off period is annual' do
+          it 'should return success' do
+            expect(subject.call(input_params)).to be_a(Dry::Monads::Result::Success)
+          end
+        end
 
-        it "should pass" do
-          expect(subject).to be_success
+        context 'age off period is monthly' do
+          let(:aca_ivl_period_setting) do
+            EnrollRegistry[:aca_individual_dependent_age_off].setting(:period)
+          end
+
+          before do
+            allow(aca_ivl_period_setting).to receive(:item).and_return(:monthly)
+          end
+
+          it 'should return success' do
+            expect(subject.call(input_params)).to be_a(Dry::Monads::Result::Success)
+          end
         end
       end
 
-      context 'when dependent above 26 in that coverage year' do
-        let(:coverage_start) { Date.new(2020, 1, 1) }
-        let(:person) { FactoryBot.create(:person, :dob => Date.new(1992,9,1)) }
-        let(:relationship_kind) { 'child' }
+      context 'age is just above 26 and below 27 when compared with effective_date' do
+        let(:input_params) do
+          {effective_on: Date.new(2021, 2, 1),
+           dob: Date.new(2021 - 26, 1, 1),
+           market_key: :aca_individual_dependent_age_off,
+           relationship_kind: 'child'}
+        end
 
-        it "should fail" do
-          expect(subject).not_to be_success
+        it 'should return Success' do
+          expect(subject.call(input_params)).to be_a(Dry::Monads::Result::Success)
+        end
+
+        context 'age off period is monthly' do
+          let(:aca_ivl_period_setting) do
+            EnrollRegistry[:aca_individual_dependent_age_off].setting(:period)
+          end
+
+          before do
+            allow(aca_ivl_period_setting).to receive(:item).and_return(:monthly)
+          end
+
+          it 'should return failure' do
+            expect(subject.call(input_params)).to be_a(Dry::Monads::Result::Failure)
+          end
         end
       end
 
-      context 'when dependent has a invalid relationship ' do
-        let(:coverage_start) { Date.new(2020, 1, 1) }
-        let(:person) { FactoryBot.create(:person, :dob => Date.new(1992,9,1)) }
-        let(:relationship_kind) { 'parent' }
+      context 'age is just above 27 when compared with effective_date' do
+        let(:input_params) do
+          {effective_on: Date.new(2021, 1, 2),
+           dob: Date.new(2021 - 27, 1, 1),
+           market_key: :aca_individual_dependent_age_off,
+           relationship_kind: 'child'}
+        end
 
-        it "should fail" do
-          expect(subject).not_to be_success
+        it 'should return Failure' do
+          expect(subject.call(input_params)).to be_a(Dry::Monads::Result::Failure)
+        end
+
+        context 'age off period is monthly' do
+          let(:aca_ivl_period_setting) do
+            EnrollRegistry[:aca_individual_dependent_age_off].setting(:period)
+          end
+
+          before do
+            allow(aca_ivl_period_setting).to receive(:item).and_return(:monthly)
+          end
+
+          it 'should return failure' do
+            expect(subject.call(input_params)).to be_a(Dry::Monads::Result::Failure)
+          end
         end
       end
 
-      context 'when dependent has a valid relationship and is 26 in coverage year' do
-        let(:coverage_start) { Date.new(2020, 1, 1) }
-        let(:person) { FactoryBot.create(:person, :dob => Date.new(1993,9,1)) }
-        let(:relationship_kind) { 'ward' }
-
-        it "should pass" do
-          expect(subject).to be_success
+      context 'age is exactly 26 when compared with effective_date' do
+        let(:input_params) do
+          {effective_on: Date.new(2021, 1, 1),
+           dob: Date.new(2021 - 26, 1, 1),
+           market_key: :aca_individual_dependent_age_off,
+           relationship_kind: 'child'}
         end
-      end
 
-      context 'when dependent has a valid relationship and is under 26 in coverage year' do
-        let(:coverage_start) { Date.new(2020, 1, 1) }
-        let(:person) { FactoryBot.create(:person, :dob => Date.new(1994,9,1)) }
-        let(:relationship_kind) { 'ward' }
-
-        it "should pass" do
-          expect(subject).to be_success
+        it 'should return success' do
+          expect(subject.call(input_params)).to be_a(Dry::Monads::Result::Success)
         end
-      end
 
-      context 'when dependent has a valid relationship and turns 26 on coverage start' do
-        let(:coverage_start) { Date.new(2020, 1, 1) }
-        let(:person) { FactoryBot.create(:person, :dob => Date.new(1994,1,1)) }
-        let(:relationship_kind) { 'ward' }
+        context 'age off period is monthly' do
+          let(:aca_ivl_period_setting) do
+            EnrollRegistry[:aca_individual_dependent_age_off].setting(:period)
+          end
 
-        it "should pass" do
-          expect(subject).to be_success
+          before do
+            allow(aca_ivl_period_setting).to receive(:item).and_return(:monthly)
+          end
+
+          it 'should return success' do
+            expect(subject.call(input_params)).to be_a(Dry::Monads::Result::Success)
+          end
         end
       end
     end

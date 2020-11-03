@@ -51,8 +51,8 @@ class GroupSelectionEligibilityChecker
     if EnrollRegistry.feature_enabled?(:age_off_relaxed_eligibility)
       dependent_coverage_eligible = ::EnrollRegistry[:age_off_relaxed_eligibility] do
         {
-          coverage_start: coverage_date,
-          person: family_member.person,
+          effective_on: coverage_date,
+          dob: family_member.person.dob,
           market_key: market_key,
           relationship_kind: rel
         }
