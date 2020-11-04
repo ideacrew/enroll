@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-require "rails_helper"
-
+require 'rails_helper'
 module Operations
   RSpec.describe AgeOffRelaxedEligibility do
     context 'invalid relationship' do
@@ -124,6 +123,118 @@ module Operations
 
           it 'should return success' do
             expect(subject.call(input_params)).to be_a(Dry::Monads::Result::Success)
+          end
+        end
+      end
+
+      context 'additional tests' do
+        context 'ivl annual' do
+          context 'effective_on and dob are same' do
+            let(:input_params) do
+              {effective_on: Date.new(2021, 1, 1),
+               dob: Date.new(1995, 1, 1),
+               market_key: :aca_individual_dependent_age_off,
+               relationship_kind: 'child'}
+            end
+
+            it 'should return success' do
+              expect(subject.call(input_params)).to be_a(Dry::Monads::Result::Success)
+            end
+          end
+
+          context 'effective_on falls after dob' do
+            let(:input_params) do
+              {effective_on: Date.new(2021, 2, 1),
+               dob: Date.new(1995, 1, 1),
+               market_key: :aca_individual_dependent_age_off,
+               relationship_kind: 'child'}
+            end
+
+            it 'should return success' do
+              expect(subject.call(input_params)).to be_a(Dry::Monads::Result::Success)
+            end
+          end
+
+          context 'dob falls after effective_on' do
+            let(:input_params) do
+              {effective_on: Date.new(2021, 1, 1),
+               dob: Date.new(1994, 11, 17),
+               market_key: :aca_fehb_dependent_age_off,
+               relationship_kind: 'child'}
+            end
+
+            it 'should return failure' do
+              expect(subject.call(input_params)).to be_a(Dry::Monads::Result::Failure)
+            end
+          end
+        end
+
+        context 'shop annual' do
+          context 'effective_on and dob are same' do
+            let(:input_params) do
+              {effective_on: Date.new(2021, 1, 1),
+               dob: Date.new(1995, 1, 1),
+               market_key: :aca_shop_dependent_age_off,
+               relationship_kind: 'child'}
+            end
+
+            it 'should return success' do
+              expect(subject.call(input_params)).to be_a(Dry::Monads::Result::Success)
+            end
+          end
+
+          context 'effective_on falls after dob' do
+            let(:input_params) do
+              {effective_on: Date.new(2021, 2, 1),
+               dob: Date.new(1995, 1, 1),
+               market_key: :aca_shop_dependent_age_off,
+               relationship_kind: 'child'}
+            end
+
+            it 'should return success' do
+              expect(subject.call(input_params)).to be_a(Dry::Monads::Result::Success)
+            end
+          end
+        end
+
+        context 'fehb monthly' do
+          context 'effective_on and dob are same' do
+            let(:input_params) do
+              {effective_on: Date.new(2021, 1, 1),
+               dob: Date.new(1995, 1, 1),
+               market_key: :aca_fehb_dependent_age_off,
+               relationship_kind: 'child'}
+            end
+
+            it 'should return success' do
+              expect(subject.call(input_params)).to be_a(Dry::Monads::Result::Success)
+            end
+          end
+
+          context 'effective_on falls after dob aged just above 26 and below 27' do
+            let(:input_params) do
+              {effective_on: Date.new(2021, 2, 1),
+               dob: Date.new(1995, 1, 1),
+               market_key: :aca_fehb_dependent_age_off,
+               relationship_kind: 'child'}
+            end
+
+            it 'should return failure' do
+              expect(subject.call(input_params)).to be_a(Dry::Monads::Result::Failure)
+            end
+          end
+
+          context 'effective_on on falls after dob aged above 27' do
+            let(:input_params) do
+              {effective_on: Date.new(2021, 2, 1),
+               dob: Date.new(1994, 1, 23),
+               market_key: :aca_fehb_dependent_age_off,
+               relationship_kind: 'child'}
+            end
+
+            it 'should return failure' do
+              expect(subject.call(input_params)).to be_a(Dry::Monads::Result::Failure)
+            end
           end
         end
       end

@@ -41,19 +41,9 @@ module Operations
       value ? Success('Valid relationship kind') : Failure('Invalid relationship kind')
     end
 
-    def age_on(date, dob)
-      age = date.year - dob.year
-      if date.month < dob.month || (date.month == dob.month && date.day < dob.day)
-        age - 1
-      else
-        age
-      end
-    end
-
     def is_person_eligible_on_enrollment?(age_off_period, cut_off_age, effective_on, dob)
       comparision_date = (age_off_period == :annual) ? effective_on.beginning_of_year : effective_on.beginning_of_month
-      age = age_on(comparision_date, dob)
-      true_or_false = (age < cut_off_age) || (age == cut_off_age && dob.month >= comparision_date.month)
+      true_or_false = (dob + cut_off_age.years) >= comparision_date
       true_or_false ? Success('Eligible') : Failure('Not eligible')
     end
   end

@@ -77,7 +77,7 @@ module BenefitSponsors
 
       def cloned_enrollment_members(ren_enr)
         @base_enrollment.hbx_enrollment_members.inject([]) do |members, hbx_enrollment_member|
-          if !eligible_to_get_covered?(ren_enr.effective_on, hbx_enrollment_member, ren_enr.dep_age_off_market_key)
+          if eligible_to_get_covered?(ren_enr.effective_on, hbx_enrollment_member, ren_enr.dep_age_off_market_key)
             members << HbxEnrollmentMember.new({
               applicant_id: hbx_enrollment_member.applicant_id,
               eligibility_date: @new_effective_on,
@@ -91,17 +91,18 @@ module BenefitSponsors
 
       def eligible_to_get_covered?(effective_on, hbx_enr_member, market_key)
         return true unless EnrollRegistry.feature_enabled?(:age_off_relaxed_eligibility)
-
+        dep_relationship = hbx_enr_member.family_member.relationship
+        return true unless  EnrollRegistry[market_key].setting(:relationship_kinds).item.include?(dep_relationship)
         ::EnrollRegistry[:age_off_relaxed_eligibility] do
           {
             effective_on: effective_on,
             dob: hbx_enr_member.person.dob,
             market_key: market_key,
-            relationship_kind: hbx_enr_member.family_member.relationship
-          }.success?
-        end
+            relationship_kind: dep_relationship
+          }
+        end.success?
       end
-  
+
       def renewal_enrollment
         @renewal_enrollment
       end
