@@ -78,12 +78,10 @@ module BenefitSponsors
       def cloned_enrollment_members(ren_enr)
         @base_enrollment.hbx_enrollment_members.inject([]) do |members, hbx_enrollment_member|
           if eligible_to_get_covered?(ren_enr.effective_on, hbx_enrollment_member, ren_enr.dep_age_off_market_key)
-            members << HbxEnrollmentMember.new({
-              applicant_id: hbx_enrollment_member.applicant_id,
-              eligibility_date: @new_effective_on,
-              coverage_start_on: @new_effective_on,
-              is_subscriber: hbx_enrollment_member.is_subscriber
-              })
+            members << HbxEnrollmentMember.new({applicant_id: hbx_enrollment_member.applicant_id,
+                                                eligibility_date: @new_effective_on,
+                                                coverage_start_on: @new_effective_on,
+                                                is_subscriber: hbx_enrollment_member.is_subscriber})
           end
           members
         end
