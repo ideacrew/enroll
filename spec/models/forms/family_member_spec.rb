@@ -197,7 +197,7 @@ describe Forms::FamilyMember do
 
         it "call update when current address present " do
 
-          expect(addr3).to receive(:update).and_return true
+          expect(person.addresses).to receive(:update).and_return true
           employee_dependent.assign_person_address(person)
         end
 
@@ -517,6 +517,7 @@ describe Forms::FamilyMember, "which describes an existing family member" do
     end
 
     it "should update the attributes of the person" do
+      allow(subject).to receive(:assign_person_address).and_return true
       expect(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status => nil, :no_ssn => "0", :is_homeless => nil, :is_temporarily_out_of_state => nil, :age_off_excluded => nil}))
       allow(family_member).to receive(:update_relationship).with(relationship)
       allow(person).to receive(:consumer_role).and_return FactoryBot.build(:consumer_role)
