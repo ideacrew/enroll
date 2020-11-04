@@ -21,6 +21,7 @@ module BenefitSponsors
     let(:benefit_sponsor_catalog) { FactoryBot.create(:benefit_markets_benefit_sponsor_catalog, service_areas: [service_area]) }
 
     let(:rating_area)  { create_default(:benefit_markets_locations_rating_area) }
+    let!(:rating_area2) {FactoryBot.create(:benefit_markets_locations_rating_area, active_year: TimeKeeper.date_of_record.next_year.year)}
     let(:service_area) { create_default(:benefit_markets_locations_service_area) }
     let(:sic_code)      { "001" }
 
