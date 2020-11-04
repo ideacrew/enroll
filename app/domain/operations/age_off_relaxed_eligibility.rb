@@ -8,15 +8,25 @@ module Operations
     include Dry::Monads[:result, :do]
 
     def call(effective_on:, dob:, market_key:, relationship_kind:)
+      _values        = yield validate(effective_on, dob, market_key, relationship_kind)
       age_off_period = yield fetch_age_off_period(market_key)
-      cut_off_age = yield fetch_cut_off_age(market_key)
-      _relation = yield validate_relationship(market_key, relationship_kind)
-      result = yield is_person_eligible_on_enrollment?(age_off_period, cut_off_age, effective_on, dob)
+      cut_off_age    = yield fetch_cut_off_age(market_key)
+      _relation      = yield validate_relationship(market_key, relationship_kind)
+      result         = yield is_person_eligible_on_enrollment?(age_off_period, cut_off_age, effective_on, dob)
 
       Success(result)
     end
 
     private
+
+    def validate(effective_on, dob, market_key, relationship_kind)
+      market_keys = [:aca_shop_dependent_age_off, :aca_fehb_dependent_age_off, :aca_individual_dependent_age_off]
+      return Failure('Invalid effective_on') unless effective_on.is_a?(Date)
+      return Failure('Invalid dob') unless effective_on.is_a?(Date)
+      return Failure('Invalid market_key') unless market_keys.include?(market_key)
+
+      Success('Valid params')
+    end
 
     def fetch_age_off_period(market_key)
       Success(EnrollRegistry[market_key].setting(:period).item)

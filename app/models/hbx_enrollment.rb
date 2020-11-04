@@ -2200,6 +2200,12 @@ class HbxEnrollment
     previous_enrollment.enrollment_signature == self.enrollment_signature
   end
 
+  def dep_age_off_market_key
+    product_ref_key = product&.sponsored_benefit&.reference_product
+    return nil unless product_ref_key
+    product_ref_key == :aca_shop ? :aca_shop_dependent_age_off : :aca_fehb_dependent_age_off
+  end
+
   private
 
   def set_is_any_enrollment_member_outstanding
