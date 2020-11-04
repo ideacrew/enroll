@@ -51,13 +51,9 @@ module Operations
     end
 
     def is_person_eligible_on_enrollment?(age_off_period, cut_off_age, effective_on, dob)
-      true_or_false = if age_off_period == :annual
-                        age_on(effective_on.beginning_of_year, dob) <= cut_off_age
-                      elsif age_off_period == :monthly
-                        effective_on_start_of_month = effective_on.beginning_of_month
-                        age = age_on(effective_on_start_of_month, dob)
-                        (age < cut_off_age) || (age == cut_off_age && dob.month >= effective_on_start_of_month.month)
-                      end
+      comparision_date = (age_off_period == :annual) ? effective_on.beginning_of_year : effective_on.beginning_of_month
+      age = age_on(comparision_date, dob)
+      true_or_false = (age < cut_off_age) || (age == cut_off_age && dob.month >= comparision_date.month)
       true_or_false ? Success('Eligible') : Failure('Not eligible')
     end
   end
