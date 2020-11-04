@@ -62,8 +62,8 @@ class CreateRenewalPlanYearAndEnrollment < MongoidMigrationTask
                                                                        })
 
     benefit_sponsorships.each do |benefit_sponsorship|
-      benefit_application = benefit_sponsorship.benefit_applications.where(:'effective_period.min' => Date.strptime(ENV['start_on'].to_s, "%m/%d/%Y"),:"aasm_state" => :active).first
-      if benefit_application.present? && benefit_sponsorship.benefit_applications.detect{|b| b.is_renewing?}.blank?
+      benefit_application = benefit_sponsorship.benefit_applications.where(:'effective_period.min' => Date.strptime(ENV['start_on'].to_s, "%m/%d/%Y"),:aasm_state => :active).first
+      if benefit_application.present? && benefit_sponsorship.benefit_applications.detect(&:is_renewing?).blank?
         organization = benefit_application.sponsor_profile.organization
         create_renewal_plan_year(organization)
       end
