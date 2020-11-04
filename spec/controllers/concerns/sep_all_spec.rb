@@ -54,4 +54,18 @@ describe FakesController do
       expect(subject.calculate_rule).to eq ['First of month after event']
     end
   end
+
+  context 'set qle_ivl for resident role' do
+    let!(:qle) {FactoryBot.create(:qualifying_life_event_kind, market_kind: "individual")}
+    let(:resident_person) {FactoryBot.create(:person, :with_resident_role)}
+    let(:resident_family) { FactoryBot.create(:family, :with_primary_family_member, person: resident_person) }
+
+    before do
+      subject.getMarket(resident_family)
+    end
+
+    it 'should return qle_ivl instance variable for resident role' do
+      expect(subject.instance_variable_get(:@qle_ivl)).to eq [qle]
+    end
+  end
 end
