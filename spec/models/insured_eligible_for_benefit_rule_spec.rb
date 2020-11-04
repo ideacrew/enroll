@@ -272,10 +272,17 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
         expect(rule.is_child_age_satisfied?).to eq false
       end
 
-      it "should return true when child is 26 in effective period" do
+      it "should return true when child is 27+ in effective period" do
         allow(EnrollRegistry[:age_off_relaxed_eligibility].feature).to receive(:is_enabled).and_return(true)
         allow(rule).to receive(:relation_ship_with_primary_applicant).and_return 'child'
         consumer_role.update_attributes(dob: Date.new(1993,9,1))
+        expect(rule.is_child_age_satisfied?).to eq false
+      end
+
+      it "should return true when child is exactly 26 in effective period" do
+        allow(EnrollRegistry[:age_off_relaxed_eligibility].feature).to receive(:is_enabled).and_return(true)
+        allow(rule).to receive(:relation_ship_with_primary_applicant).and_return 'child'
+        consumer_role.update_attributes(dob: Date.new(1994,1,1))
         expect(rule.is_child_age_satisfied?).to eq true
       end
     end

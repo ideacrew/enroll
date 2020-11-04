@@ -44,10 +44,16 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       FactoryBot.create(:family_member, person: child, family: family)
     end
 
+    let!(:child3) do
+      child = FactoryBot.create(:person, dob: child3_dob)
+      FactoryBot.create(:family_member, person: child, family: family)
+    end
+
     let(:primary_dob){ current_date.next_month - 57.years }
     let(:spouse_dob) { current_date.next_month - 55.years }
     let(:child1_dob) { current_date.next_month - 26.years }
     let(:child2_dob) { current_date.next_month - 20.years }
+    let(:child3_dob) { current_benefit_coverage_period.start_on + 2.months - 25.years}
 
     let!(:enrollment) do
       FactoryBot.create(:hbx_enrollment,
@@ -144,23 +150,21 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       context "when dependent age off feature is turned on" do
         before do
           allow(child1).to receive(:relationship).and_return('child')
-          allow(child2).to receive(:relationship).and_return('child')
+          allow(child3).to receive(:relationship).and_return('child')
           allow(EnrollRegistry[:age_off_relaxed_eligibility].feature).to receive(:is_enabled).and_return(true)
         end
         context "When a child is aged off" do
           it "should include child" do
-
             applicant_ids = subject.clone_enrollment_members.collect(&:applicant_id)
-
             expect(applicant_ids).to include(family.primary_applicant.id)
-            expect(applicant_ids).to include(spouse.id)
-            expect(applicant_ids).to include(child1.id)
-            expect(applicant_ids).to include(child2.id)
+            expect(applicant_ids).not_to include(child1.id)
+            expect(applicant_ids).to include(child3.id)
           end
 
-          it "should generate passive renewal in auto renewing state" do
+          it "should generate passive renewal" do
             renewal = subject.renew
-            expect(renewal.auto_renewing?).to be_truthy
+            expect(renewal.aasm_state).to eq "coverage_selected"
+            expect(renewal.effective_on).to eq renewal_benefit_coverage_period.start_on
           end
         end
       end
