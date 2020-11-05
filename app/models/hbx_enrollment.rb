@@ -2201,7 +2201,7 @@ class HbxEnrollment
   end
 
   def dep_age_off_market_key
-    product_ref_key = sponsored_benefit&.reference_product
+    product_ref_key = sponsored_benefit&.reference_product&.benefit_market_kind
     return nil unless product_ref_key
     product_ref_key == :aca_shop ? :aca_shop_dependent_age_off : :aca_fehb_dependent_age_off
   end
