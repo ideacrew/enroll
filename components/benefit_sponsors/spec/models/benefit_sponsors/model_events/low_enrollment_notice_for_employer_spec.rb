@@ -32,16 +32,16 @@ RSpec.describe 'BenefitSponsors::ModelEvents::LowEnrollmentNoticeForEmployer', d
       subject { BenefitSponsors::Observers::BenefitApplicationObserver.new }
 
       let(:model_event) { BenefitSponsors::ModelEvents::ModelEvent.new(:low_enrollment_notice_for_employer, initial_application, {}) }
-      if TimeKeeper.date_of_record.next_month.beginning_of_month.yday != 1
-        it "should trigger notice event" do
+      it "should trigger notice event" do
+        if initial_application.effective_period.min.yday != 1
           expect(subject.notifier).to receive(:notify) do |event_name, payload|
             expect(event_name).to eq "acapi.info.events.employer.low_enrollment_notice_for_employer"
             expect(payload[:employer_id]).to eq abc_profile.hbx_id.to_s
             expect(payload[:event_object_kind]).to eq 'BenefitSponsors::BenefitApplications::BenefitApplication'
             expect(payload[:event_object_id]).to eq initial_application.id.to_s
           end
-          subject.notifications_send(initial_application, model_event)
         end
+        subject.notifications_send(initial_application, model_event)
       end
     end
   end
