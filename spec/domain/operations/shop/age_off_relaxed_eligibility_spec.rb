@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/ModuleLength
 require 'rails_helper'
 module Operations
   RSpec.describe AgeOffRelaxedEligibility do
@@ -241,3 +242,4 @@ module Operations
     end
   end
 end
+# rubocop:enable Metrics/ModuleLength
