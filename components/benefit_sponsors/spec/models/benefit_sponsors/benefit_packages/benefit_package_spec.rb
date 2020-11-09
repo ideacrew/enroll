@@ -531,6 +531,18 @@ module BenefitSponsors
             expect(enrolled_enrollments.count).to eq 1
           end
         end
+
+        context 'coverage canceled renewal enrollment' do
+          it 'should not generate a duplicate coverage_selected enrollment' do
+            renewing_hbx_enrollment.update_attributes(aasm_state: 'coverage_canceled')
+            enrolled_enrollments = family.active_household.hbx_enrollments.enrolled_waived_and_renewing
+                                         .by_benefit_sponsorship(bs).by_effective_period(ra.effective_period)
+            expect(enrolled_enrollments.count).to eq 0
+            rbp.renew_member_benefit(census_employee)
+            family.reload
+            expect(enrolled_enrollments.count).to eq 1
+          end
+        end
       end
     end
 

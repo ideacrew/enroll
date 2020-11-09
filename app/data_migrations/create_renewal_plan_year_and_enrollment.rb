@@ -81,21 +81,35 @@ class CreateRenewalPlanYearAndEnrollment < MongoidMigrationTask
   end
 
   def trigger_passive_renewals_by_effective_date
-    benefit_sponsorships = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:benefit_applications.exists => true,
-                                                                                          :benefit_applications =>
+    benefit_sponsorships = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:benefit_applications =>
                                                                                             { :$elemMatch =>
                                                                                                 {
+                                                                                                  :predecessor_id => { :$exists => true, :$ne => nil },
                                                                                                   :'effective_period.min' => Date.strptime(ENV['start_on'].to_s, "%m/%d/%Y"),
                                                                                                   :aasm_state.in => [:enrollment_open]
                                                                                                 }})
 
     benefit_sponsorships.no_timeout.each do |benefit_sponsorship|
       organization = benefit_sponsorship.organization
-      renewing_plan_year = organization.employer_profile.benefit_applications.where(:aasm_state.in => [:enrollment_open]).first
+
+      next if organization.is_a_fehb_profile?
+
+      renewing_plan_year = organization.employer_profile.benefit_applications.where(:predecessor_id => { :$exists => true, :$ne => nil }, :aasm_state.in => [:enrollment_open]).first
 
       next if renewing_plan_year.blank?
 
-      renewing_plan_year.renew_benefit_package_members
+      renewing_plan_year.benefit_packages.each do |benefit_package|
+        benefit_package.census_employees_assigned_on(benefit_package.effective_period.min, false).each do |census_employee|
+          next if census_employee.renewal_benefit_group_assignment.blank?
+          next if census_employee.renewal_benefit_group_assignment.hbx_enrollment.present?
+
+          if Rails.env.test?
+            benefit_package.renew_member_benefit(census_employee)
+          else
+            benefit_package.trigger_renew_employee_event(census_employee)
+          end
+        end
+      end
       puts "passive renewal generated for organization #{organization.fein}" unless Rails.env.test?
     rescue StandardError => e
       puts "Unable to generate renewal PY for employer #{organization.fein} due to #{e}"

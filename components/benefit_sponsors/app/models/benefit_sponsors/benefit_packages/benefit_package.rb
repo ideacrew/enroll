@@ -258,15 +258,19 @@ module BenefitSponsors
           if Rails.env.test?
             renew_member_benefit(member)
           else
-            notify(
-              "acapi.info.events.benefit_package.renew_employee",
-              {
-                :census_employee_id => member.id.to_s,
-                :benefit_package_id => self.id.to_s
-              }
-            )
+            trigger_renew_employee_event(member)
           end
         end
+      end
+
+      def trigger_renew_employee_event(census_employee)
+        notify(
+          "acapi.info.events.benefit_package.renew_employee",
+          {
+            :census_employee_id => census_employee.id.to_s,
+            :benefit_package_id => self.id.to_s
+          }
+        )
       end
 
       # FIXME: Nowhere do we check the result of this method.
