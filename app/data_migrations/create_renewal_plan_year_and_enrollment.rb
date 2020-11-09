@@ -5,13 +5,18 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 class CreateRenewalPlanYearAndEnrollment < MongoidMigrationTask
 
   def migrate
-     if ENV['action'].to_s == "trigger_renewal_py_for_employers"
-       trigger_renewal_py_for_employers
+    if ENV['action'].to_s == "trigger_renewal_py_for_employers"
+      trigger_renewal_py_for_employers
        return
-     end
+    end
 
-     organization = BenefitSponsors::Organizations::Organization.employer_profiles.where(fein: ENV['fein']).first
-     action = ENV['action'].to_s
+    if ENV['action'].to_s == "trigger_passive_renewals_for_employers"
+      trigger_passive_renewals_by_effective_date
+      return
+    end
+
+    organization = BenefitSponsors::Organizations::Organization.employer_profiles.where(fein: ENV['fein']).first
+    action = ENV['action'].to_s
 
     if organization.present? && organization.employer_profile.active_benefit_application.present?
       case action
@@ -49,7 +54,7 @@ class CreateRenewalPlanYearAndEnrollment < MongoidMigrationTask
     renewing_plan_year = organization.employer_profile.renewing_benefit_application
     if renewing_plan_year.present?
       renewing_plan_year.renew_benefit_package_members
-      puts "passive renewal generated" unless Rails.env.test?
+      puts "passive renewal generated for organization #{organization.fein}" unless Rails.env.test?
     end
   end
 
@@ -70,6 +75,22 @@ class CreateRenewalPlanYearAndEnrollment < MongoidMigrationTask
         organization = benefit_application.sponsor_profile.organization
         create_renewal_plan_year(organization)
       end
+    rescue StandardError => e
+      puts "Unable to generate renewal PY for employer #{organization.fein} due to #{e}"
+    end
+  end
+
+  def trigger_passive_renewals_by_effective_date
+    benefit_sponsorships = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:benefit_applications.exists => true,
+                                                                                          :benefit_applications =>
+                                                                                            { :$elemMatch =>
+                                                                                                {
+                                                                                                  :'effective_period.min' => Date.strptime(ENV['start_on'].to_s, "%m/%d/%Y")
+                                                                                                }})
+
+    benefit_sponsorships.no_timeout.each do |benefit_sponsorship|
+      organization = benefit_sponsorship.organization
+      trigger_passive_renewals(organization)
     rescue StandardError => e
       puts "Unable to generate renewal PY for employer #{organization.fein} due to #{e}"
     end
