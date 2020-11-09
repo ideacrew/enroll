@@ -51,6 +51,7 @@ class GroupSelectionEligibilityChecker
     age_off_period = (EnrollRegistry[market_key].setting(:period).item == :annual)
     fm_dob = age_off_period ? family_member.person.dob.end_of_year : family_member.person.dob.end_of_month
     if EnrollRegistry.feature_enabled?(:age_off_relaxed_eligibility)
+      return false unless EnrollRegistry[market_key].setting(:relationship_kinds).item.include?(rel)
       dependent_coverage_eligible = ::EnrollRegistry[:age_off_relaxed_eligibility] do
         {
           effective_on: coverage_date,
