@@ -85,12 +85,18 @@ class CreateRenewalPlanYearAndEnrollment < MongoidMigrationTask
                                                                                           :benefit_applications =>
                                                                                             { :$elemMatch =>
                                                                                                 {
-                                                                                                  :'effective_period.min' => Date.strptime(ENV['start_on'].to_s, "%m/%d/%Y")
+                                                                                                  :'effective_period.min' => Date.strptime(ENV['start_on'].to_s, "%m/%d/%Y"),
+                                                                                                  :aasm_state.in => [:enrollment_open]
                                                                                                 }})
 
     benefit_sponsorships.no_timeout.each do |benefit_sponsorship|
       organization = benefit_sponsorship.organization
-      trigger_passive_renewals(organization)
+      renewing_plan_year = organization.employer_profile.benefit_applications.where(:aasm_state.in => [:enrollment_open]).first
+
+      next if renewing_plan_year.blank?
+
+      renewing_plan_year.renew_benefit_package_members
+      puts "passive renewal generated for organization #{organization.fein}" unless Rails.env.test?
     rescue StandardError => e
       puts "Unable to generate renewal PY for employer #{organization.fein} due to #{e}"
     end

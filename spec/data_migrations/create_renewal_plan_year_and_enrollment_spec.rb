@@ -137,13 +137,14 @@ describe CreateRenewalPlanYearAndEnrollment, dbclean: :after_each do
       end
 
       it "should create passive enrollments" do
+        renewal_application.update_attributes(aasm_state: :enrollment_open)
         ClimateControl.modify start_on: renewal_application.start_on.to_s, action: "trigger_passive_renewals_for_employers" do
-          expect(abc_organization.employer_profile.renewing_benefit_application.aasm_state).to eq :draft
+          expect(abc_organization.employer_profile.renewing_benefit_application.aasm_state).to eq :enrollment_open
           expect(family.active_household.hbx_enrollments.map(&:aasm_state)).to eq ['coverage_selected']
           subject.migrate
           abc_organization.reload
           family.reload
-          expect(abc_organization.employer_profile.renewing_benefit_application.aasm_state).to eq :draft
+          expect(abc_organization.employer_profile.renewing_benefit_application.aasm_state).to eq :enrollment_open
           expect(family.active_household.hbx_enrollments.map(&:aasm_state)).to eq ['coverage_selected','auto_renewing']
         end
       end
