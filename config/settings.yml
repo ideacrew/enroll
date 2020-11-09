@@ -2,7 +2,7 @@ site:
   key: :dc
   subdomain: "dchbx"
   domain_name: "dchealthlink.com"
-  site_title: "Access Health Connecticut"
+  site_title: "Maine Cover Me"
   home_url: "https://www.dchealthlink.com/"
   home_business_url: "https://www.accesshealthct.com/AHCT/LandingPageCTHIX"
   # copyright_period_start: "2013"
@@ -19,10 +19,10 @@ site:
   main_web_address: "https://www.accesshealthct.com/AHCT/LandingPageCTHIX"
   health_care_website: "www.healthcare.gov"
   health_care_website_url: "https://www.healthcare.gov"
-  short_name: "Access Health Connecticut"
-  byline: "Connecticut's Official Health Insurance Marketplace"
-  long_name: "Access Health Connecticut"
-  header_message: "Connecticut's Official Health Insurance Marketplace"
+  short_name: "Maine Cover Me"
+  byline: "Maine's Official Health Insurance Marketplace"
+  long_name: "Maine Cover Me"
+  header_message: "Maine's Official Health Insurance Marketplace"
   logo_file_name: "logo_ct.png"
   make_their_premium_payments_online: "https://www.e-billexpress.com/ebpp/DCHEALTHPAY/"
   tab_icon: 'favicon.ico'
@@ -61,13 +61,13 @@ site:
   block_ie_browser_after: <%= Date.new(2020,6,1) %>
   publisher: "dchl"
 
-  exchange_name: "Access Health Connecticut"
+  exchange_name: "Maine Cover Me"
   social_media:
     facebook_url: ""
 
 contact_center:
-  name: "Access Health CT's Customer Care Center"
-  alt_name: "Access Health CT Customer Service"
+  name: "Maine Cover Me's Customer Care Center"
+  alt_name: "Maine Cover Me Customer Service"
   po_box: "PO Box 97022"
   phone_number: "1-855-532-5465"
   fax: "1-617-933-3099"
@@ -136,9 +136,9 @@ invoices:
   minimum_invoice_display_year: 2015
 
 aca:
-  state_key : "ct"
-  state_name: "Connecticut"
-  state_abbreviation: "CT"
+  state_key : "me"
+  state_name: "Maine"
+  state_abbreviation: "ME"
   market_kinds: ["shop", "individual", "fehb"]
 
   hbx_abbreviation: "DC Health Benefit Exchange"

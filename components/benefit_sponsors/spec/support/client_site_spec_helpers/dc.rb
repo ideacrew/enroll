@@ -94,7 +94,7 @@ module BenefitSponsors
         byline: "The Right Place for the Right Plan",
         short_name: "Access Health",
         domain_name: "hbxshop.org",
-        long_name: "Connecticut Access Health",
+        long_name: "Maine Cover Me",
         copyright_period_start: '2018'
       }
       org_props = {
