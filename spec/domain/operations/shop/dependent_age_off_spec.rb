@@ -58,8 +58,8 @@ RSpec.describe Operations::Shop::DependentAgeOff, type: :model, dbclean: :after_
     if ::EnrollRegistry[:aca_shop_dependent_age_off].settings(:period).item == :annual
       context 'Annual' do
         it 'Should fail when configured annually' do
-          result = subject.call(new_date: Date.new(2020,7,31))
-          expect(result.failure).to eq("Cannot process the request, because shop dependent_age_off is not set for end of every month")
+          result = subject.call(new_date: Date.new(2020,7,1))
+          expect(result.failure).to eq("Cannot process the request, because shop dependent age off is not set for end of every month")
         end
       end
     end
@@ -68,7 +68,7 @@ RSpec.describe Operations::Shop::DependentAgeOff, type: :model, dbclean: :after_
     if ::EnrollRegistry[:aca_shop_dependent_age_off].settings(:period).item == :monthly
       context 'Monthly' do
         it 'Should fail when configured annually' do
-          result = subject.call(new_date: Date.new(2020,7,31))
+          result = subject.call(new_date: Date.new(2020,7,1))
           expect(result.success).to eq("Successfully dropped dependents for SHOP market")
         end
       end
@@ -78,7 +78,7 @@ RSpec.describe Operations::Shop::DependentAgeOff, type: :model, dbclean: :after_
   # rubocop:disable Style/IdenticalConditionalBranches
   context 'valid date' do
     it 'Should process the request when configured annually' do
-      result = subject.call(new_date: TimeKeeper.date_of_record.end_of_year)
+      result = subject.call(new_date: TimeKeeper.date_of_record.beginning_of_year)
       process_result = if ::EnrollRegistry[:aca_shop_dependent_age_off].settings(:period).item == :annual
                          "Successfully dropped dependents for SHOP market"
                        else
@@ -106,11 +106,11 @@ RSpec.describe Operations::Shop::DependentAgeOff, type: :model, dbclean: :after_
     it 'Should pick shop enrollments and process for age off for 2 dependents.' do
       expect(shop_family.active_household.hbx_enrollments.count).to eq(1)
       expect(shop_enrollment.hbx_enrollment_members.count).to eq(3)
-      result = subject.call(new_date: TimeKeeper.date_of_record.end_of_year)
+      result = subject.call(new_date: TimeKeeper.date_of_record.beginning_of_year)
       expect(result.success).to eq("Successfully dropped dependents for SHOP market")
       shop_family.reload
       expect(shop_family.active_household.hbx_enrollments.count).to eq(2)
-      expect(shop_family.active_household.hbx_enrollments.to_a.first.aasm_state).to eq("coverage_terminated")
+      expect(shop_family.active_household.hbx_enrollments.to_a.first.aasm_state).to eq("coverage_canceled")
       expect(shop_family.active_household.hbx_enrollments.to_a.last.hbx_enrollment_members.count).to eq(1)
     end
   end
@@ -126,11 +126,11 @@ RSpec.describe Operations::Shop::DependentAgeOff, type: :model, dbclean: :after_
     it 'Should pick shop enrollments and process for age off for 1 dependent.' do
       expect(shop_family.active_household.hbx_enrollments.count).to eq(1)
       expect(shop_enrollment.hbx_enrollment_members.count).to eq(3)
-      result = subject.call(new_date: TimeKeeper.date_of_record.end_of_year)
+      result = subject.call(new_date: TimeKeeper.date_of_record.beginning_of_year)
       expect(result.success).to eq("Successfully dropped dependents for SHOP market")
       shop_family.reload
       expect(shop_family.active_household.hbx_enrollments.count).to eq(2)
-      expect(shop_family.active_household.hbx_enrollments.to_a.first.aasm_state).to eq("coverage_terminated")
+      expect(shop_family.active_household.hbx_enrollments.to_a.first.aasm_state).to eq("coverage_canceled")
       expect(shop_family.active_household.hbx_enrollments.to_a.last.hbx_enrollment_members.count).to eq(2)
     end
   end

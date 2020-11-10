@@ -18,8 +18,8 @@ module Operations
       private
 
       def can_process_event(new_date)
-        if new_date != TimeKeeper.date_of_record.end_of_year && ::EnrollRegistry[:aca_shop_dependent_age_off].settings(:period).item == :annual
-          Failure('Cannot process the request, because shop dependent_age_off is not set for end of every month')
+        if new_date != TimeKeeper.date_of_record.beginning_of_year && ::EnrollRegistry[:aca_shop_dependent_age_off].settings(:period).item == :annual
+          Failure('Cannot process the request, because shop dependent age off is not set for end of every month')
         else
           Success('')
         end
@@ -52,8 +52,7 @@ module Operations
           age_off_family_members = covered_family_members.select{|fm| dep_age_off_people_ids.include?(fm.person_id)}.pluck(:id)
           age_off_enr_member = enr_members.select{|hem| age_off_family_members.include?(hem.applicant_id)}
           eligible_dependents = enr_members - age_off_enr_member
-          effective_date = new_date + 1.day
-          terminate_and_reinstate_enrollment(enrollment, effective_date, eligible_dependents)
+          terminate_and_reinstate_enrollment(enrollment, new_date, eligible_dependents)
         rescue StandardError => e
           shop_logger.info "Unable to terminated enrollment #{enrollment.hbx_id} for #{e.message}"
         end
@@ -61,11 +60,12 @@ module Operations
       end
 
       def fetch_aged_off_people(relations, new_date, cut_off_age)
-        relations.select{|dep| dep.relative.age_on(new_date) >= cut_off_age}.flat_map(&:relative).select{|p| p.age_off_excluded == false}
+        relations.select{|dep| dep.relative.age_on(new_date - 1.day) >= cut_off_age}.flat_map(&:relative).select{|p| p.age_off_excluded == false}
       end
 
       def fetch_relation_objects(primary_person, covered_members_ids)
-        primary_person.person_relationships.where(kind: "child").select{ |rel| (covered_members_ids.include? rel.relative_id)}
+        dependent_relations = EnrollRegistry[:aca_shop_dependent_age_off].setting(:relationship_kinds).item
+        primary_person.person_relationships.where(:kind.in => dependent_relations).select{ |rel| (covered_members_ids.include? rel.relative_id)}
       end
 
       def terminate_and_reinstate_enrollment(enrollment, effective_date, eligible_dependents)
@@ -74,7 +74,7 @@ module Operations
         return unless reinstate_enrollment.may_reinstate_coverage?
         reinstate_enrollment.reinstate_coverage!
         reinstate_enrollment.begin_coverage! if reinstate_enrollment.may_begin_coverage?
-        reinstate_enrollment.begin_coverage! if reinstate_enrollment.may_begin_coverage? && self.effective_on <= TimeKeeper.date_of_record
+        reinstate_enrollment.begin_coverage! if reinstate_enrollment.may_begin_coverage? && reinstate_enrollment.effective_on <= TimeKeeper.date_of_record
       end
     end
   end
