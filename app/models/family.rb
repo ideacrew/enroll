@@ -173,6 +173,12 @@ class Family
   scope :vlp_fully_uploaded,                    ->{ where(vlp_documents_status: "Fully Uploaded")}
   scope :vlp_partially_uploaded,                ->{ where(vlp_documents_status: "Partially Uploaded")}
   scope :vlp_none_uploaded,                     ->{ where(:vlp_documents_status.in => ["None",nil])}
+  scope :order_by_name_descending,              ->(family_scope) {
+    where(
+      :"_id".in => family_scope.to_a.map { |family| family.primary_family_member.person }.sort_by(&:last_name).map(&:primary_family).map(&:_id)
+    )
+  }
+  scope :order_by_name_ascending,               -> (family_scope) { order_by_name_descending(family_scope).reverse! }
   scope :outstanding_verification,   ->{ where(
     :"_id".in => HbxEnrollment.individual_market.verification_outstanding.distinct(:family_id))
   }

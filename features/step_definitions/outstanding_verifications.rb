@@ -1,11 +1,14 @@
 Given(/^oustanding verfications users exists$/) do
-  person = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)
-  @person_name = person.full_name
-  person.consumer_role.update_attributes!(aasm_state: "verification_outstanding")
-  family = FactoryBot.create(:family, :with_primary_family_member, person: person)
-  issuer_profile = FactoryBot.create(:benefit_sponsors_organizations_issuer_profile)
-  product = FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: 'aca_individual', issuer_profile: issuer_profile)
-  enrollment = FactoryBot.create(:hbx_enrollment, :with_enrollment_members,
+  people = [["Aaron", "Anderson"], ["Zach", "Zackary"]]
+  people.each do |name_hash|
+    person = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, first_name: name_hash[0], last_name: name_hash[1])
+    @person_names = []
+    @person_names << person.full_name
+    person.consumer_role.update_attributes!(aasm_state: "verification_outstanding")
+    family = FactoryBot.create(:family, :with_primary_family_member, person: person)
+    issuer_profile = FactoryBot.create(:benefit_sponsors_organizations_issuer_profile)
+    product = FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: 'aca_individual', issuer_profile: issuer_profile)
+    enrollment = FactoryBot.create(:hbx_enrollment, :with_enrollment_members,
                                  :family => family,
                                  :household => family.active_household,
                                  :aasm_state => 'coverage_selected',
@@ -13,9 +16,10 @@ Given(/^oustanding verfications users exists$/) do
                                  :kind => 'individual',
                                  :product => product,
                                  :effective_on => TimeKeeper.date_of_record.beginning_of_year)
-  FactoryBot.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, eligibility_date: (TimeKeeper.date_of_record - 2.months), hbx_enrollment: enrollment)
-  enrollment.save!
-  Family.by_enrollment_individual_market.where(:'households.hbx_enrollments.is_any_enrollment_member_outstanding' => true)
+    FactoryBot.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, eligibility_date: (TimeKeeper.date_of_record - 2.months), hbx_enrollment: enrollment)
+    enrollment.save!
+    Family.by_enrollment_individual_market.where(:'households.hbx_enrollments.is_any_enrollment_member_outstanding' => true)
+  end
 end
 
 When(/^Admin clicks Outstanding Verifications$/) do
@@ -50,9 +54,49 @@ Then(/^the Admin has the ability to use the following filters for documents prov
   expect(page).to have_xpath('//*[@id="Tab:all"]', text: 'All')
 end
 
+And(/^Admin clicks the Fully Uploaded filter and does not see results$/) do
+  fully_uploaded = page.all('div').detect { |div| div[:id] == 'Tab:vlp_fully_uploaded' }
+  fully_uploaded.click
+  sleep 5
+  @person_names.each do |person_name|
+    expect(page).to_not have_content(person_name)
+  end
+end
+
+And(/^Admin clicks All and sees all of the results$/) do
+  all_people = page.all('div').detect { |div| div[:id] == 'Tab:all' }
+  all_people.click
+  sleep 5
+  @person_names.each do |person_name|
+    expect(page).to have_content(person_name)
+  end
+end
+
+And(/^Admin clicks Documents Uploaded and sorts results by documents uploaded$/) do
+  documents_uploaded_sort = page.all('th').detect { |th| th[:class] == 'col-string col-documents_uploaded sorting' }
+  documents_uploaded_sort.click
+  sleep 5
+end
+
+
+And(/^Admin clicks Name and sorts results by name$/) do
+  # Name: activate to sort column descending
+  name_sort = page.all('th').detect { |th| th[:class] == 'col-string col-name sorting' }
+  name_sort.click
+  sleep 5
+  # A name will appear here first
+  name_sort = page.all('th').detect { |th| th[:class] == 'col-string col-name sorting_asc' }
+  name_sort.click
+  sleep 5
+  # Z name will appear here first
+end
+
 Then(/^the Admin is directed to that user's My DC Health Link page$/) do
+  # First person name
   page.find(:xpath, "//table[contains(@class, 'effective-datatable')]/tbody/tr/td[1]/a").click
   expect(page).to have_content("My DC Health Link")
-  expect(page).to have_content("#{@person_name}")
+  @person_names.each do |person_name|
+    expect(page).to have_content("#{person_name}")
+  end
 end
 
