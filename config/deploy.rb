@@ -2,7 +2,7 @@
 lock '~> 3.11.0'
 
 set :application, 'enroll'
-set :repo_url, 'https://github.com/dchbx/enroll.git'
+set :repo_url, 'https://github.com/ideacrew/enroll.git'
 
 # Default branch is :master
 # ask :branch, proc { `git rev-parse --abbrev-ref HEAD`.chomp }.call
