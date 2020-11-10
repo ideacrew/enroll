@@ -80,7 +80,7 @@ h1,h2,h3,h4,h5,h6 {
           line-height: 50px;
           padding: 23px 15px;
           font-weight: 600;
-          color: #F0592A;
+          color: #487ba2;
           &:hover {
             background-color: $background-hover;
             text-decoration: none;
@@ -208,7 +208,7 @@ h1,h2,h3,h4,h5,h6 {
 #footer-uic {
   font-size: 14px;
   color: #ffffff;
-  background-color:#003260;
+  background-color:#3d5d6f;
   padding: 15px;
   position: absolute;
   bottom: 0;
@@ -354,7 +354,7 @@ thead {
     padding-right: 6px;
   }
   ul.progress-wrapper li.complete .vertical-line-progress {
-    background-color: #007bc4;
+    background-color: #487ba2;
   }
   .vertical-line-progress {
     background-color: #cacaca;
@@ -377,17 +377,17 @@ thead {
     padding: 5px 0px;
     list-style: none;
     padding-left: 35px;
-    color: #007bc4;
+    color: #487ba2;
   }
   ul.progress-wrapper li.active {
     padding: 5px 0px;
     list-style: none;
     padding-left: 35px;
     font-weight: bold;
-    color: #007bc4;
+    color: #487ba2;
   }
   ul.progress-wrapper li.complete span.circle-progress {
-    background-color: #007bc4;
+    background-color: #487ba2;
     border: none;
     width: 14px;
     left: 9px;

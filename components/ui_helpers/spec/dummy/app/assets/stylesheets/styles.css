@@ -54,7 +54,7 @@ input::-webkit-input-placeholder {
 .form-action {
       margin: 8px 0 20px;
       display: inline-block;
-      color: #007bc4;
+      color: #487ba2;
       font-size: 14px;
       font-weight: none;
       border-radius: 4px;
@@ -65,7 +65,7 @@ input::-webkit-input-placeholder {
 
 .btn {
   margin: 3px 0;
-  border-color: #007bc4;
+  border-color: #487ba2;
 }
         .btn-default {
   color: $secondary-button-text;
@@ -79,7 +79,7 @@ input::-webkit-input-placeholder {
 }
 
 .blue_border_top{
-  background-color: #007BC4; 
+  background-color: #487ba2; 
   border-top-left-radius: 25px;
   border-top-right-radius: 25px;
 }

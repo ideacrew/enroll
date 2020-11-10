@@ -1,9 +1,9 @@
-$mhc-dark-blue:#003260;
-$mhc-blue: #247dc5;
+$mhc-dark-blue:#3d5d6f;
+$mhc-blue: #3d5d6f;
 $mhc-dark-gray: #706f6d;
 $mhc-gray: #6d6e70;
 $mhc-light-gray:#9b9b9b;
-$mhc-orange: #333333;
+$mhc-orange: #487ba2;
 $mhc-red: #812200;
 
 $primary-orange: $mhc-orange;
@@ -164,7 +164,7 @@ $brand-primary: $mhc-dark-blue;
           border-bottom-right-radius: 0px;
           z-index: 100;
 
-          color: #333333;
+          color: #487ba2;
           &:hover {
             background-color: #ffffff;
           }
@@ -177,7 +177,7 @@ $brand-primary: $mhc-dark-blue;
           margin-right: 10px;
           padding: 10px;
           background-color: $primary-blue;
-          border-bottom: solid 3px #003260;
+          border-bottom: solid 3px #3d5d6f;
           border-radius: 6px;
           width: 100%;
           height: 100%;
@@ -185,7 +185,7 @@ $brand-primary: $mhc-dark-blue;
           margin-bottom: 0;
           text-transform: uppercase;
           &:hover {
-            background-color: #003260;
+            background-color: #3d5d6f;
             cursor: pointer;
           }
           i {
@@ -294,7 +294,7 @@ $brand-primary: $mhc-dark-blue;
         background-color: transparent;
         .panel-heading {
           padding: 0 0 5px 0;
-          color: #333333;
+          color: #487ba2;
           background-color: transparent;
           h3 {
             font-size: 12px;
@@ -307,7 +307,7 @@ $brand-primary: $mhc-dark-blue;
           line-height: 110%;
           span {
             font-size: 12px;
-            color: #333333;
+            color: #487ba2;
             text-transform: uppercase;
           }
           .plan-label {
