@@ -57,10 +57,10 @@ module Operations
               age_off_enr_member = enr_members.select{|hem| age_off_family_members.include?(hem.applicant_id)}
               eligible_dependents = enr_members - age_off_enr_member
               terminate_and_reinstate_enrollment(enrollment, new_date, eligible_dependents)
-              rescue StandardError => e
+            rescue StandardError => e
               fehb_logger.info "Unable to terminated enrollment #{enrollment.hbx_id} for #{e.message}"
             end
-            rescue StandardError => e
+          rescue StandardError => e
             fehb_logger.info "Unable to process family to terminate enrollments #{family.hbx_id} for #{e.message}"
           end
         end
