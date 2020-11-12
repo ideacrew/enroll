@@ -1,12 +1,12 @@
 site:
   key: :dc
-  subdomain: "dchbx"
-  domain_name: "dchealthlink.com"
+  subdomain: "cme"
+  domain_name: "cme.enroll.openhbx.org"
   site_title: "Maine Cover Me"
-  home_url: "https://www.dchealthlink.com/"
+  home_url: "https://cme.enroll.openhbx.org/"
   home_business_url: "https://www.accesshealthct.com/AHCT/LandingPageCTHIX"
   # copyright_period_start: "2013"
-  help_url: "https://www.dchealthlink.com/help"
+  help_url: "https://www.coverme.gov/help/"
   # faqs_url: "https://www.dchealthlink.com/Frequently-Asked-Questions"
   # business_resource_center_url: "https://dchealthlink.com/smallbusiness/"
   # nondiscrimination_notice_url: "https://www.dchealthlink.com/nondiscrimination"
@@ -23,10 +23,10 @@ site:
   byline: "Maine's Official Health Insurance Marketplace"
   long_name: "Maine Cover Me"
   header_message: "Maine's Official Health Insurance Marketplace"
-  logo_file_name: "logo_ct.png"
+  logo_file_name: "logo_me.svg"
   make_their_premium_payments_online: "https://www.e-billexpress.com/ebpp/DCHEALTHPAY/"
   tab_icon: 'favicon.ico'
-  mailer_logo_file_name: "logo_ct.png"
+  mailer_logo_file_name: "logo_me.svg"
   employer_application_deadline_link: "https://dchealthlink.com/smallbusiness/employer-coverage-deadlines"
   s3_prefix: "dchbx"
   broker_quoting_enabled: false
@@ -37,7 +37,7 @@ site:
   create_routes: ['/insured/employee/privacy','/employers/employer_profiles/new', '/insured/consumer_role/privacy']
   sign_in_routes: ['/families/home']
   shop_find_your_doctor_url: "https://dc.checkbookhealth.org/dc/"
-  document_verification_checklist_url: "https://www.mahealthconnector.org/business/business-resource-center/employer-verification-checklist"
+  document_verification_checklist_url: "https://www.coverme.gov/help/"
   terms_and_conditions_url: "https://www.dchealthlink.com/terms"
   certification_url: "https://www.dchealthlink.com/brokers/overview"
   registration_path: "https://www.dchealthlink.com/smallbusiness"
@@ -79,12 +79,12 @@ contact_center:
   payment_phone_number: "855-532-LINK"
   ivl_number: "1-877-623-6765"
   ivl_phone_number: "1-877-623-6765"
-  email_address: "smallbusiness@accesshealthconnecticut.org"
+  email_address: "smallbusiness@coverme.gov"
   po_box: "PO Box 97022"
   city: "Washington"
   state: "DC"
   zip_code: "20090"
-  small_business_email: "smallbusiness@accesshealthconnecticut.org"
+  small_business_email: "smallbusiness@coverme.gov"
   non_discrimination_email: "info@dchealthlink.com"
 
   appeals: "info@dchealthlink.com"
@@ -191,7 +191,7 @@ aca:
       end_on: <%= Date.new(2022,01,31) %>
 
   shop_market:
-    valid_employer_attestation_documents_url: 'https://www.mahealthconnector.org/business/business-resource-center/employer-verification-checklist'
+    valid_employer_attestation_documents_url: 'https://www.coverme.gov/business/business-resource-center/employer-verification-checklist'
     small_market_employee_count_maximum: 50
     employer_contribution_percent_minimum: 50
     employer_dental_contribution_percent_minimum: 0
