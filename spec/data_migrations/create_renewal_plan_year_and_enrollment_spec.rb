@@ -191,7 +191,7 @@ describe CreateRenewalPlanYearAndEnrollment, dbclean: :after_each do
       end
 
       context 'when renewing state enrollment is present' do
-        it "should create passive enrollments" do
+        it "should not create a new passive enrollments" do
           renewal_enrollment.update_attributes(aasm_state: 'auto_renewing')
           renewal_application.update_attributes(aasm_state: :enrollment_open)
           ClimateControl.modify start_on: renewal_application.start_on.to_s, action: "trigger_passive_renewals_for_employers" do
