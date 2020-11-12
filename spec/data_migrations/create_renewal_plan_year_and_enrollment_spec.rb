@@ -152,9 +152,9 @@ describe CreateRenewalPlanYearAndEnrollment, dbclean: :after_each do
       context 'when shopping state enrollment is present' do
         let(:renewal_enrollment) do
           FactoryBot.create(:hbx_enrollment, hbx_enrollment_members: [hbx_enrollment_member], family: family, product: reference_product, sponsored_benefit_package_id: benefit_package.id,
-                            effective_on: benefit_package.effective_period.min,
-                            household: family.active_household, benefit_group_assignment_id: renewal_benefit_group_assignment.id,
-                            employee_role_id: employee_role.id, benefit_sponsorship_id: benefit_sponsorship.id)
+                                             effective_on: benefit_package.effective_period.min,
+                                             household: family.active_household, benefit_group_assignment_id: renewal_benefit_group_assignment.id,
+                                             employee_role_id: employee_role.id, benefit_sponsorship_id: benefit_sponsorship.id)
 
 
         end
