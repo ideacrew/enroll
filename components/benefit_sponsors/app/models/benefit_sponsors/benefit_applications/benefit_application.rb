@@ -41,7 +41,8 @@ module BenefitSponsors
                                                   expired:    :expire,
                                                   terminated: :terminate,
                                                   termination_pending: :termination_pending,
-                                                  canceled:   :cancel
+                                                  canceled: :cancel,
+                                                  retroactive_cancel: :cancel
                                                 }
 
     VOLUNTARY_TERMINATED_PLAN_YEAR_EVENT_TAG = "benefit_coverage_period_terminated_voluntary".freeze
@@ -119,6 +120,7 @@ module BenefitSponsors
     field :termination_reason,     type: String
 
     field :cancellation_reason,     type: String
+
     delegate :benefit_market, to: :benefit_sponsorship
 
     embeds_many :benefit_packages,
