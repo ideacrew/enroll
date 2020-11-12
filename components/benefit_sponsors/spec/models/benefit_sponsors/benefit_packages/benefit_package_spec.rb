@@ -1120,7 +1120,7 @@ module BenefitSponsors
         it 'should persist terminate reason to enrollment' do
           expect(hbx_enrollment.terminate_reason).to eq "non_payment"
         end
-       end
+      end
 
       context "when an employee has coverage_termination_pending enrollment", :dbclean => :after_each do
 
@@ -1144,7 +1144,7 @@ module BenefitSponsors
           expect(hbx_enrollment_1.terminated_on).to eq end_on
         end
 
-         context "benefit application with termination_kind and termination_reason" do
+        context "benefit application with termination_kind and termination_reason" do
           it 'should persist terminate reason to enrollment' do
             expect(hbx_enrollment_1.terminate_reason).to eq "nonpayment"
           end
