@@ -150,9 +150,9 @@ describe CreateRenewalPlanYearAndEnrollment, dbclean: :after_each do
       end
 
       context 'when shopping state enrollment is present' do
-        let(:renewal_enrollment) do
+        let!(:renewal_enrollment) do
           FactoryBot.create(:hbx_enrollment, hbx_enrollment_members: [hbx_enrollment_member], family: family, product: reference_product, sponsored_benefit_package_id: benefit_package.id,
-                                             effective_on: benefit_package.effective_period.min,
+                                             effective_on: benefit_package.effective_period.min, aasm_state: 'shopping',
                                              household: family.active_household, benefit_group_assignment_id: renewal_benefit_group_assignment.id,
                                              employee_role_id: employee_role.id, benefit_sponsorship_id: benefit_sponsorship.id)
 
@@ -160,7 +160,6 @@ describe CreateRenewalPlanYearAndEnrollment, dbclean: :after_each do
         end
 
         it "should create passive enrollments" do
-          renewal_enrollment.update_attributes(aasm_state: 'shopping')
           renewal_application.update_attributes(aasm_state: :enrollment_open)
           ClimateControl.modify start_on: renewal_application.start_on.to_s, action: "trigger_passive_renewals_for_employers" do
             expect(abc_organization.employer_profile.renewing_benefit_application.aasm_state).to eq :enrollment_open
@@ -175,8 +174,16 @@ describe CreateRenewalPlanYearAndEnrollment, dbclean: :after_each do
       end
 
       context 'when canceled state enrollment is present' do
+        let!(:renewal_enrollment) do
+          FactoryBot.create(:hbx_enrollment, hbx_enrollment_members: [hbx_enrollment_member], family: family, product: reference_product, sponsored_benefit_package_id: benefit_package.id,
+                                             effective_on: benefit_package.effective_period.min, aasm_state: 'coverage_canceled',
+                                             household: family.active_household, benefit_group_assignment_id: renewal_benefit_group_assignment.id,
+                                             employee_role_id: employee_role.id, benefit_sponsorship_id: benefit_sponsorship.id)
+
+
+        end
+
         it "should create passive enrollments" do
-          renewal_enrollment.update_attributes(aasm_state: 'coverage_canceled')
           renewal_application.update_attributes(aasm_state: :enrollment_open)
           ClimateControl.modify start_on: renewal_application.start_on.to_s, action: "trigger_passive_renewals_for_employers" do
             expect(abc_organization.employer_profile.renewing_benefit_application.aasm_state).to eq :enrollment_open
@@ -191,8 +198,16 @@ describe CreateRenewalPlanYearAndEnrollment, dbclean: :after_each do
       end
 
       context 'when renewing state enrollment is present' do
+        let!(:renewal_enrollment) do
+          FactoryBot.create(:hbx_enrollment, hbx_enrollment_members: [hbx_enrollment_member], family: family, product: reference_product, sponsored_benefit_package_id: benefit_package.id,
+                                             effective_on: benefit_package.effective_period.min, aasm_state: 'auto_renewing',
+                                             household: family.active_household, benefit_group_assignment_id: renewal_benefit_group_assignment.id,
+                                             employee_role_id: employee_role.id, benefit_sponsorship_id: benefit_sponsorship.id)
+
+
+        end
+
         it "should not create a new passive enrollments" do
-          renewal_enrollment.update_attributes(aasm_state: 'auto_renewing')
           renewal_application.update_attributes(aasm_state: :enrollment_open)
           ClimateControl.modify start_on: renewal_application.start_on.to_s, action: "trigger_passive_renewals_for_employers" do
             expect(abc_organization.employer_profile.renewing_benefit_application.aasm_state).to eq :enrollment_open
