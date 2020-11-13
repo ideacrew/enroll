@@ -1112,8 +1112,8 @@ describe Family, 'coverage_waived?' do
 end
 
 describe "#outstanding_verification_datatable scope", dbclean: :after_each do
-  let!(:ivl_person)       { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
-  let!(:ivl_person_2)       { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
+  let!(:ivl_person)       { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, first_name: "Anthony", last_name: "Anderson") }
+  let!(:ivl_person_2)       { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, first_name: "Zack", last_name: "Zachary") }
   let!(:ivl_family)       { FactoryBot.create(:family, :with_primary_family_member, person: ivl_person) }
   let!(:ivl_family_2)       { FactoryBot.create(:family, :with_primary_family_member, person: ivl_person_2) }
   let!(:ivl_enrollment) do
@@ -1159,6 +1159,20 @@ describe "#outstanding_verification_datatable scope", dbclean: :after_each do
     expect(Family.outstanding_verification_datatable.size).to be(1)
     expect(Family.outstanding_verification_datatable.map(&:id)).to include(ivl_family.id)
     expect(Family.outstanding_verification_datatable.map(&:id)).not_to include(ivl_family_2.id)
+  end
+
+  context "sorting alphabetically" do
+    before :each do
+      ivl_enrollment_2.update_attributes!(aasm_state: "coverage_selected")
+    end
+    it "should sort a to z to when ascending" do
+      expect(Family.outstanding_verification_datatable.order_by_name_ascending[0].primary_person.last_name).to eq("Anderson")
+
+    end
+
+    it "should sort z to a when descending" do
+      expect(Family.outstanding_verification_datatable.order_by_name_ascending[0].primary_person.last_name).to eq("Zachary")
+    end
   end
 end
 

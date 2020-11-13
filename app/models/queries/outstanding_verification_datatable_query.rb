@@ -25,9 +25,9 @@ module Queries
       end
       if @order_by.keys.first == "name"
         family = if @order_by[@order_by.keys.first] == 1
-          Family.order_by_name_descending(family)
+          family.order_by_name_descending
         else
-          Family.order_by_name_ascending(family)
+          family.order_by_name_ascending
         end
       end
       #add other scopes here
