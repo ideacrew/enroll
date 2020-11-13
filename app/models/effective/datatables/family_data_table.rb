@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# rubocop:disable Style/Proc
 
 module Effective
   module Datatables
@@ -160,3 +163,6 @@ module Effective
     end
   end
 end
+
+# rubocop:enable Style/Proc
+

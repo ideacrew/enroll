@@ -13,4 +13,11 @@ Feature: Outstanding Verifications screen
     And Admin clicks Documents Uploaded and sorts results by documents uploaded
     And Admin clicks All and sees all of the results
     And Admin clicks Name and sorts results by name
+    And Admin clicks All and sees all of the results
     Then the Admin is directed to that user's My DC Health Link page
+
+  Scenario: Show only fully uploaded people when using Fully Uploaded Filter
+    Given one fully uploaded person exists
+    When Admin clicks Outstanding Verifications
+    Then the Admin is navigated to the Outstanding Verifications screen
+    And Admin clicks the Fully Uploaded filter and only sees fully uploaded results

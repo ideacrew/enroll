@@ -166,23 +166,19 @@ class Family
   scope :sep_eligible,                          ->{ where(:"active_seps.count".gt => 0) }
   scope :coverage_waived,                       ->{ where(:"_id".in => HbxEnrollment.waived.distinct(:family_id))}
   scope :having_unverified_enrollment,          ->{ where(:"_id".in => HbxEnrollment.by_unverified.distinct(:family_id)) }
-  # TODO: Apparently, this needs a ridiculously complex agregate scope
-  scope :order_by_name_ascending,            -> { order(:"person.last_name".asc) }
-  scope :order_by_name_descending,           -> { order(:"person.last_name".desc) }
   scope :with_all_verifications,                ->{ where(:"_id".in => HbxEnrollment.verified.distinct(:family_id))}
   scope :with_partial_verifications,            ->{ where(:"_id".in => HbxEnrollment.partially_verified.distinct(:family_id))}
   scope :with_no_verifications,                 ->{ where(:"_id".in => HbxEnrollment.not_verified.distinct(:family_id))}
   scope :with_reset_verifications,              ->{ where(:"_id".in => HbxEnrollment.reset_verifications.distinct(:family_id))}
-  scope :vlp_fully_uploaded,                    ->{ where(vlp_documents_status: "Fully Uploaded")}
+  scope :vlp_fully_uploaded,                    ->{ by_enrollment_individual_market.where(vlp_documents_status: "Fully Uploaded")}
   scope :vlp_partially_uploaded,                ->{ where(vlp_documents_status: "Partially Uploaded")}
   scope :vlp_none_uploaded,                     ->{ where(:vlp_documents_status.in => ["None",nil])}
-  scope :outstanding_verification,   ->{ where(
-    :"_id".in => HbxEnrollment.individual_market.verification_outstanding.distinct(:family_id))
-  }
+  # These are strings so it should sort alphabetically
+  scope :documents_uploaded_ascending,          ->{ order_by(:vlp_documents_status.asc)}
+  scope :documents_uploaded_descending,         ->{ order_by(:vlp_documents_status.desc)}
+  scope :outstanding_verification,              ->{ where(:_id.in => HbxEnrollment.individual_market.verification_outstanding.distinct(:family_id))}
 
-  scope :outstanding_verification_datatable,   ->{ where(
-    :"_id".in => HbxEnrollment.individual_market.enrolled_and_renewing.by_unverified.distinct(:family_id))
-  }
+  scope :outstanding_verification_datatable,    ->{ where(:_id.in => HbxEnrollment.individual_market.enrolled_and_renewing.by_unverified.distinct(:family_id))}
   scope :monthly_reports_scope, lambda { |start_date, end_date|
     where(
       :"_id".in => HbxEnrollment.where(
@@ -236,6 +232,17 @@ class Family
     :"family_id".in => active_family_ids
     ).distinct(:family_id)
   ) }
+
+  # TODO: Apparently, this needs a ridiculously complex aggregate scope
+  def self.order_by_name_ascending(family_scope)
+    where(
+      :_id.in => family_scope.to_a.map { |family| family.primary_family_member.person }.sort_by(&:last_name).map(&:primary_family).map(&:_id)
+    )
+  end
+
+  def self.order_by_name_descending(family_scope)
+    order_by_name_ascending(family_scope).reverse!
+  end
 
   def active_broker_agency_account
     broker_agency_accounts.detect { |baa| baa.is_active? }

@@ -1,14 +1,40 @@
 Given(/^oustanding verfications users exists$/) do
   people = [["Aaron", "Anderson"], ["Zach", "Zackary"]]
+  @person_names = []
   people.each do |name_hash|
     person = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, first_name: name_hash[0], last_name: name_hash[1])
-    @person_names = []
     @person_names << person.full_name
     person.consumer_role.update_attributes!(aasm_state: "verification_outstanding")
     family = FactoryBot.create(:family, :with_primary_family_member, person: person)
     issuer_profile = FactoryBot.create(:benefit_sponsors_organizations_issuer_profile)
     product = FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: 'aca_individual', issuer_profile: issuer_profile)
-    enrollment = FactoryBot.create(:hbx_enrollment, :with_enrollment_members,
+    enrollment = FactoryBot.create(
+      :hbx_enrollment,
+      :with_enrollment_members,
+      family => family,
+      :household => family.active_household,
+      :aasm_state => 'coverage_selected',
+      :is_any_enrollment_member_outstanding => true,
+      :kind => 'individual',
+      :product => product,
+      :effective_on => TimeKeeper.date_of_record.beginning_of_year
+    )
+    FactoryBot.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, eligibility_date: (TimeKeeper.date_of_record - 2.months), hbx_enrollment: enrollment)
+    enrollment.save!
+    Family.by_enrollment_individual_market.where(:'households.hbx_enrollments.is_any_enrollment_member_outstanding' => true)
+  end
+end
+
+Given(/^one fully uploaded person exists$/) do
+  name_hash = ["Michael", "Fox"]
+  @fully_verified_names = []
+  person = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, first_name: name_hash[0], last_name: name_hash[1])
+  @fully_verified_names << person.full_name
+  person.consumer_role.update_attributes!(aasm_state: "fully_verified")
+  family = FactoryBot.create(:family, :with_primary_family_member, person: person)
+  issuer_profile = FactoryBot.create(:benefit_sponsors_organizations_issuer_profile)
+  product = FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: 'aca_individual', issuer_profile: issuer_profile)
+  enrollment = FactoryBot.create(:hbx_enrollment, :with_enrollment_members,
                                  :family => family,
                                  :household => family.active_household,
                                  :aasm_state => 'coverage_selected',
@@ -16,10 +42,10 @@ Given(/^oustanding verfications users exists$/) do
                                  :kind => 'individual',
                                  :product => product,
                                  :effective_on => TimeKeeper.date_of_record.beginning_of_year)
-    FactoryBot.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, eligibility_date: (TimeKeeper.date_of_record - 2.months), hbx_enrollment: enrollment)
-    enrollment.save!
-    Family.by_enrollment_individual_market.where(:'households.hbx_enrollments.is_any_enrollment_member_outstanding' => true)
-  end
+  FactoryBot.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, eligibility_date: (TimeKeeper.date_of_record - 2.months), hbx_enrollment: enrollment)
+  enrollment.save!
+  family.update_attributes!(vlp_documents_status: "Fully Uploaded")
+  expect(Family.vlp_fully_uploaded.last).to eq(family)
 end
 
 When(/^Admin clicks Outstanding Verifications$/) do
@@ -57,9 +83,25 @@ end
 And(/^Admin clicks the Fully Uploaded filter and does not see results$/) do
   fully_uploaded = page.all('div').detect { |div| div[:id] == 'Tab:vlp_fully_uploaded' }
   fully_uploaded.click
-  sleep 5
+  # TODO: This stopped working
+  sleep 10
   @person_names.each do |person_name|
     expect(page).to_not have_content(person_name)
+  end
+end
+
+And(/^Admin clicks the Fully Uploaded filter and only sees fully uploaded results$/) do
+  expect(Family.vlp_fully_uploaded.count).to eq(1)
+  fully_uploaded = page.all('div').detect { |div| div[:id] == 'Tab:vlp_fully_uploaded' }
+  fully_uploaded.click
+  sleep 10
+  # Not fully uploaded
+  @person_names.each do |person_name|
+    expect(page).to_not have_content(person_name)
+  end
+  # Fully uploaded
+  @fully_verified_names.each do |person_name|
+    expect(page).to have_content(person_name)
   end
 end
 
@@ -93,10 +135,8 @@ end
 
 Then(/^the Admin is directed to that user's My DC Health Link page$/) do
   # First person name
-  page.find(:xpath, "//table[contains(@class, 'effective-datatable')]/tbody/tr/td[1]/a").click
+  click_link @person_names[0]
   expect(page).to have_content("My DC Health Link")
-  @person_names.each do |person_name|
-    expect(page).to have_content("#{person_name}")
-  end
+  expect(page).to have_content(@person_names[0])
 end
 

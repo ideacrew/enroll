@@ -1150,13 +1150,15 @@ describe "#outstanding_verification_datatable scope", dbclean: :after_each do
                       coverage_start_on: TimeKeeper.date_of_record)
   end
 
-
-  it "should include families with only enrolled and enrolling outstanding enrollments" do
+  before :each do
     ivl_person.consumer_role.update_attributes!(aasm_state: "verification_outstanding")
     ivl_person_2.consumer_role.update_attributes!(aasm_state: "verification_outstanding")
     ivl_enrollment.save!
     ivl_enrollment_2.save!
     expect(Family.outstanding_verification_datatable.size).to be(1)
+  end
+
+  it "should include families with only enrolled and enrolling outstanding enrollments" do
     expect(Family.outstanding_verification_datatable.map(&:id)).to include(ivl_family.id)
     expect(Family.outstanding_verification_datatable.map(&:id)).not_to include(ivl_family_2.id)
   end
@@ -1166,12 +1168,11 @@ describe "#outstanding_verification_datatable scope", dbclean: :after_each do
       ivl_enrollment_2.update_attributes!(aasm_state: "coverage_selected")
     end
     it "should sort a to z to when ascending" do
-      expect(Family.outstanding_verification_datatable.order_by_name_ascending[0].primary_person.last_name).to eq("Anderson")
-
+      expect(Family.order_by_name_ascending(Family.outstanding_verification_datatable)[0].primary_person.last_name).to eq("Anderson")
     end
 
     it "should sort z to a when descending" do
-      expect(Family.outstanding_verification_datatable.order_by_name_ascending[0].primary_person.last_name).to eq("Zachary")
+      expect(Family.order_by_name_descending(Family.outstanding_verification_datatable)[0].primary_person.last_name).to eq("Zachary")
     end
   end
 end
