@@ -1599,11 +1599,6 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       expect(census_employee.can_elect_cobra?).to be_truthy
     end
 
-    it "should return true when aasm_state is employee_termination_pending status" do
-      census_employee.aasm_state = 'employee_termination_pending'
-      expect(census_employee.can_elect_cobra?).to be_truthy
-    end
-
     it "should return true when aasm_state is cobra_terminated" do
       census_employee.aasm_state = 'cobra_terminated'
       expect(census_employee.can_elect_cobra?).to be_falsey
