@@ -7,7 +7,7 @@ class GenerateCcaSite < Mongoid::Migration
           byline: "The Right Place for the Right Plan",
           short_name: "Access Health",
           domain_name: "hbxshop.org",
-          long_name: "Maine Cover Me")
+          long_name: "Maine Cover ME")
 
         @old_org = Organization.unscoped.exists(hbx_profile: true).first
         @old_profile = @old_org.hbx_profile

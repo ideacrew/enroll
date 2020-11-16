@@ -125,9 +125,9 @@ class HbxProfile
   ## HBX general settings
   StateName = "District of Columbia"
   StateAbbreviation = "DC"
-  CallCenterName = "Access Health CT's Customer Care Center"
+  CallCenterName = "Cover ME's Customer Care Center"
   CallCenterPhoneNumber = "1-855-532-5465"
-  ShortName = "Access Health CT"
+  ShortName = "Cover ME"
 
   # IndividualEnrollmentDueDayOfMonth = 15
   # Temporary change for Dec 2015 extension

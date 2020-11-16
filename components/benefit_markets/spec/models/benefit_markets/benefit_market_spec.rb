@@ -5,7 +5,7 @@ module BenefitMarkets
 
     let(:kind)            { :aca_shop }
     let(:site_urn)        { 'dc' }
-    let(:title)           {  "Access Health CT SHOP Market" }
+    let(:title)           {  "Cover ME SHOP Market" }
     let(:description)     {  "Health Insurance Marketplace for District Employers and Employees" }
     let(:configuration)   { build :benefit_markets_aca_shop_configuration }
 
@@ -58,9 +58,9 @@ module BenefitMarkets
 
         it "should set a kind-appropropriate configuration setting" do
           expect(benefit_market.kind).to eq valid_kind
-          # TODO: Enable following matcher when configuration assocation enabled. 
+          # TODO: Enable following matcher when configuration assocation enabled.
           #       Currently its disabled due to errors on instantiate
-          # expect(benefit_market.configuration.class.to_s).to eq valid_class_name 
+          # expect(benefit_market.configuration.class.to_s).to eq valid_class_name
           # expect(BenefitMarkets::BenefitMarket.new(kind: shop_kind).configuration_setting.class).to eq configuration_setting_class
           # expect(benefit_market.configuration_setting.class).to eq configuration_setting_class
         end

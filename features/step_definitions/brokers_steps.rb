@@ -112,7 +112,7 @@ end
 
 Then(/^.+ should see broker registration successful message$/) do
   if Settings.site.key == :dc
-    expect(page).to have_content('Complete the following requirements to become a Access Health CT Registered Broker')
+    expect(page).to have_content('Complete the following requirements to become a Cover ME Registered Broker')
   end
   expect(page).to have_content('Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed.')
 end
@@ -417,7 +417,7 @@ Then(/broker (.*?) should receive application (.*?) notification$/) do |broker_n
     when 'approval'
       "Invitation to create your Broker account on #{site_short_name}"
     when 'extended'
-      'Action Needed - Complete Broker Training for Access Health CT for Business'
+      'Action Needed - Complete Broker Training for Cover ME for Business'
     end
   open_email(
     broker_email_address,

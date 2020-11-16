@@ -120,9 +120,9 @@ class HbxProfile
 
   StateName = "District of Columbia"
   StateAbbreviation = "DC"
-  CallCenterName = "Access Health CT's Customer Care Center"
+  CallCenterName = "Cover ME's Customer Care Center"
   CallCenterPhoneNumber = "1-855-532-5465"
-  ShortName = "Access Health CT"
+  ShortName = "Cover ME"
 
   IndividualEnrollmentDueDayOfMonth = Settings.aca.individual_market.monthly_enrollment_due_on
 

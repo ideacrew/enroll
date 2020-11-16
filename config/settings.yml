@@ -2,7 +2,7 @@ site:
   key: :dc
   subdomain: "cme"
   domain_name: "cme.enroll.openhbx.org"
-  site_title: "Maine Cover Me"
+  site_title: "Maine Cover ME"
   home_url: "https://cme.enroll.openhbx.org/"
   home_business_url: "https://www.accesshealthct.com/AHCT/LandingPageCTHIX"
   # copyright_period_start: "2013"
@@ -19,9 +19,9 @@ site:
   main_web_address: "https://www.accesshealthct.com/AHCT/LandingPageCTHIX"
   health_care_website: "www.healthcare.gov"
   health_care_website_url: "https://www.healthcare.gov"
-  short_name: "Maine Cover Me"
+  short_name: "Maine Cover ME"
   byline: "Maine's Official Health Insurance Marketplace"
-  long_name: "Maine Cover Me"
+  long_name: "Maine Cover ME"
   header_message: "Maine's Official Health Insurance Marketplace"
   logo_file_name: "logo_me.svg"
   make_their_premium_payments_online: "https://www.e-billexpress.com/ebpp/DCHEALTHPAY/"
@@ -61,13 +61,13 @@ site:
   block_ie_browser_after: <%= Date.new(2020,6,1) %>
   publisher: "dchl"
 
-  exchange_name: "Maine Cover Me"
+  exchange_name: "Maine Cover ME"
   social_media:
     facebook_url: ""
 
 contact_center:
-  name: "Maine Cover Me's Customer Care Center"
-  alt_name: "Maine Cover Me Customer Service"
+  name: "Maine Cover ME's Customer Care Center"
+  alt_name: "Maine Cover ME Customer Service"
   po_box: "PO Box 97022"
   phone_number: "1-855-532-5465"
   fax: "1-617-933-3099"
@@ -90,7 +90,7 @@ contact_center:
   appeals: "info@dchealthlink.com"
 
   mailing_address:
-    name: "Access Health CT"
+    name: "Cover ME"
     address_1: "PO Box 97022"
     address_2:
     city: "Washington"
@@ -98,7 +98,7 @@ contact_center:
     zip_code: "20090"
 
   appeal_center:
-    name: "Access Health CT"
+    name: "Cover ME"
     address_1: "PO Box 97022"
     address_2:
     city: "Washington"

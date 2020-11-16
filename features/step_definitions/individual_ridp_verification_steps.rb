@@ -222,7 +222,7 @@ And(/^HBX admin click on back to my account button$/) do
 end
 
 Then(/^HBX admin should land on home page$/) do
-  expect(page).to have_content 'My Access Health CT'
+  expect(page).to have_content 'My Cover ME'
 end
 
 And(/^I click on Continue button$/) do

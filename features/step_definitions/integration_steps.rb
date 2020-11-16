@@ -447,7 +447,7 @@ end
 
 Then(/^(?:.+) should see a successful sign up message$/) do
   FactoryBot.create(:sic_code, sic_code: "0111")
-  expect(page).to have_content("Welcome to Access Health CT")
+  expect(page).to have_content("Welcome to Cover ME")
   screenshot("employer_sign_up_welcome")
 end
 
@@ -895,7 +895,7 @@ Then(/^.+ should see the appropriate (.*?) template text$/) do |market_name|
     expect(page).to have_content("Your Enrollment Confirmation")
     expect(page).to have_content('plan offered by your employer.')
     expect(page).to have_content('Your employer contributes')
-    expect(page).to have_content('Thank you for enrolling in coverage through Access Health CT')
+    expect(page).to have_content('Thank you for enrolling in coverage through Cover ME')
     # In the email signature
     [Settings.site.short_name, Settings.contact_center.short_number, Settings.contact_center.tty].each do |email_signature_line|
       expect(page).to have_content(email_signature_line)

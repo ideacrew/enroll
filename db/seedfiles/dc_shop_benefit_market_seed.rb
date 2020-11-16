@@ -2,11 +2,11 @@ require File.expand_path(File.join(File.dirname(__FILE__), "dc_pricing_and_contr
 
 benefit_market = ::BenefitMarkets::BenefitMarket.create!({
   kind: :aca_shop,
-  title: "Access Health CT SHOP Market"
+  title: "Cover ME SHOP Market"
 })
 
 benefit_market_catalog = ::BenefitMarkets::BenefitMarketCatalog.create!({
-  title: "Access Health CT SHOP Benefit Catalog",
+  title: "Cover ME SHOP Benefit Catalog",
   application_interval_kind: :monthly,
   benefit_market: benefit_market,
   application_period: Date.new(2018,1,1)..Date.new(2018,12,31),
