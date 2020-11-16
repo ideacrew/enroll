@@ -1100,7 +1100,7 @@ def self.to_csv
   end
 
   def can_elect_cobra?
-    ['employment_terminated', 'employee_termination_pending'].include?(aasm_state)
+    ['employment_terminated'].include?(aasm_state)
   end
 
   def have_valid_date_for_cobra?(current_user = nil)
