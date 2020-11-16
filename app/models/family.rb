@@ -1096,12 +1096,18 @@ class Family
     active_household.hbx_enrollments.where(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES).flat_map(&:hbx_enrollment_members).flat_map(&:family_member).flat_map(&:person).include?(person)
   end
 
-  def self.min_verification_due_date_range(start_date,end_date)
+  def self.min_verification_due_date_range(start_date, end_date, family_scope = self.outstanding_verification_datatable)
     timekeeper_date = TimeKeeper.date_of_record + 95.days
     if timekeeper_date >= start_date.to_date && timekeeper_date <= end_date.to_date
-      self.or(:"min_verification_due_date" => { :"$gte" => start_date, :"$lte" => end_date}).or(:"min_verification_due_date" => nil)
+      families = family_scope.select do |family|
+        family.best_verification_due_date >= start_date && family.best_verification_due_date <= family.best_verification_due_date || family.min_verification_due_date.nil?
+      end
+      where(:"_id".in => families.map(&:id))
     else
-     self.or(:"min_verification_due_date" => { :"$gte" => start_date, :"$lte" => end_date})
+      families = family_scope.select do |family|
+        family.best_verification_due_date >= start_date && family.best_verification_due_date <= family.best_verification_due_date
+      end
+      where(:"_id".in => families.map(&:id))
     end
   end
 

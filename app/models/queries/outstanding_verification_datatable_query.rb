@@ -35,7 +35,7 @@ module Queries
                  end
       end
       if @custom_attributes[:custom_datatable_date_from].present? & @custom_attributes[:custom_datatable_date_to].present?
-        family = family.min_verification_due_date_range(@custom_attributes[:custom_datatable_date_from], @custom_attributes[:custom_datatable_date_to])
+        family = family.min_verification_due_date_range(@custom_attributes[:custom_datatable_date_from], @custom_attributes[:custom_datatable_date_to], family)
       end
       if @order_by.keys.first == "name"
         family = if @order_by[@order_by.keys.first] == 1
