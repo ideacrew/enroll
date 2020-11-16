@@ -1107,7 +1107,7 @@ def self.to_csv
     return true if current_user.try(:has_hbx_staff_role?)
     return false unless cobra_begin_date.present?
     return false unless coverage_terminated_on
-    return false unless coverage_terminated_on <= cobra_begin_date
+    return false unless coverage_terminated_on < cobra_begin_date
 
     (hired_on <= cobra_begin_date) &&
       (TimeKeeper.date_of_record <= (coverage_terminated_on + aca_shop_market_cobra_enrollment_period_in_months.months)) &&
