@@ -412,7 +412,8 @@ And(/^employee (.*?) of employer (.*?) most recent HBX Enrollment should be unde
   person_record = Person.where(first_name: person[:first_name], last_name: person[:last_name]).last
 
   census_employee = CensusEmployee.where(first_name: person[:first_name], last_name: person[:last_name]).last
-  off_cycle_benefit_application = census_employee.benefit_sponsorship.off_cycle_benefit_application  benefit_package = off_cycle_benefit_application.benefit_packages[0]
+  off_cycle_benefit_application = census_employee.benefit_sponsorship.off_cycle_benefit_application
+  benefit_package = off_cycle_benefit_application.benefit_packages[0]
   sponsored_benefit = benefit_package.sponsored_benefits.first
   end_date = off_cycle_benefit_application.end_on
   off_cycle_enrollments = HbxEnrollment.by_benefit_application_and_sponsored_benefit(off_cycle_benefit_application, sponsored_benefit, end_date)
