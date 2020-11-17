@@ -1100,12 +1100,18 @@ class Family
     timekeeper_date = TimeKeeper.date_of_record + 95.days
     if timekeeper_date >= start_date.to_date && timekeeper_date <= end_date.to_date
       families = family_scope.select do |family|
-        family.best_verification_due_date >= start_date && family.best_verification_due_date <= family.best_verification_due_date || family.min_verification_due_date.nil?
+        if family.best_verification_due_date.present?
+          (family&.best_verification_due_date >= start_date && family&.best_verification_due_date <= family&.best_verification_due_date) || family&.min_verification_due_date.nil?
+        else
+          family&.min_verification_due_date.nil?
+        end
       end
       where(:"_id".in => families.map(&:id))
     else
       families = family_scope.select do |family|
-        family.best_verification_due_date >= start_date && family.best_verification_due_date <= family.best_verification_due_date
+        if family.best_verification_due_date.present?
+          family&.best_verification_due_date >= start_date && family&.best_verification_due_date <= family&.best_verification_due_date
+        end
       end
       where(:"_id".in => families.map(&:id))
     end
