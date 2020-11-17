@@ -137,7 +137,7 @@ def enter_plan_year_info
   rating_area
   wait_for_ajax(2,2)
   find(:xpath, "//p[@class='label'][contains(., 'SELECT START ON')]", :wait => 3).click
-  find('.interaction-choice-control-bastartdate-2', wait: 3).click
+  find('.interaction-choice-control-bastartdate-1', wait: 3).click
   find('.interaction-field-control-fteemployee').click
   fill_in 'benefit_application[fte_count]', with: '3'
   fill_in 'benefit_application[pte_count]', with: '3'
