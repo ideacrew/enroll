@@ -614,6 +614,8 @@ Then(/^employer should see form for benefit application and benefit package$/) d
 end
 
 Then(/^employer should see edit plan year button$/) do
+  sleep 5
+  wait_for_ajax
   expect(page).to have_content "Edit Plan Year"
 end
 
@@ -1085,6 +1087,7 @@ And(/^employer sets cobra start date to two months before termination date$/) do
 end
 
 When(/^EnterPrise Limited employer clicks on Initiate COBRA button$/) do
+  find('h1').click
   id = @census_employees.first.id.to_s
   find(:xpath, "//*[@id='cobra-#{id}']").click
 end

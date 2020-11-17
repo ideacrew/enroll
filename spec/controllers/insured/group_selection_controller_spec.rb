@@ -7,7 +7,6 @@ require "#{BenefitSponsors::Engine.root}/spec/support/benefit_sponsors_product_s
 
 RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean: :after_each do
     #include_context "setup benefit market with market catalogs and product packages"
-  include_context "setup initial benefit application"
 
   let(:site) { BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_empty_benefit_market }
   let(:benefit_market) { site.benefit_markets.first }
@@ -18,7 +17,9 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     ).first
   end
 
-  let(:current_effective_date) { TimeKeeper.date_of_record.end_of_month + 1.day + 1.month }
+  let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_month + 2.months }
+
+  include_context "setup initial benefit application"
 
   let(:service_areas) do
     ::BenefitMarkets::Locations::ServiceArea.where(
@@ -371,6 +372,46 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         end
       end
 
+      context "non applying family member has no incarceration status" do
+        let!(:person_1) { FactoryBot.create(:person, :with_consumer_role)}
+        let!(:family_1) {FactoryBot.create(:family, :with_primary_family_member, :person => person_1)}
+        let!(:person_2) do
+          FactoryBot.create(:person, :with_consumer_role)
+        end
+
+        before do
+          allow(person_1).to receive(:primary_family).and_return(family_1)
+          person_2.update_attributes!(is_incarcerated: nil)
+          person_2.consumer_role.update_attributes!(is_applying_coverage: false)
+          person_1.update_attributes!(is_incarcerated: false)
+          family = person_1.primary_family
+          expect(family.family_members.count).to eq(1)
+          FactoryBot.create(:family_member, family: family, person: person_2)
+          expect(family.family_members.count).to eq(2)
+        end
+
+        it "should not check incarceration status of non-applying family members" do
+          sign_in user
+          get(
+            :new,
+            params: {
+              person_id: person_1.id,
+              consumer_role_id: person.consumer_role.id,
+              change_plan: "change",
+              hbx_enrollment_id: "123",
+              coverage_kind: hbx_enrollment.coverage_kind
+            }
+          )
+          fm_hash = assigns(:fm_hash)
+          active_family_members = assigns(:active_family_members)
+          expect(fm_hash.values.flatten.detect{|err| err.to_s.match(/incarcerated_not_answered/)}).to eq(nil)
+          nonapplying = family.family_members.where(person_id: person_2).first
+          expect(active_family_members).to_not include(nonapplying)
+          expect(active_family_members.length).to eq(1)
+          expect(response).to have_http_status("200")
+        end
+      end
+
       it "should not redirect to coverage household page if incarceration is unanswered" do
         person.unset(:is_incarcerated)
         HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.last.benefit_packages[0].incarceration_status = ["incarceration_status"]
@@ -563,7 +604,9 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
             effective_on_kinds: ["first_of_next_month"],
             pre_event_sep_in_days: 0,
             post_event_sep_in_days: 30,
-            is_self_attested: true
+            is_self_attested: true,
+            is_visible: true,
+            is_active: true
         )
       end
 
@@ -764,6 +807,19 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       expect(response).to have_http_status(:success)
       expect(response).to render_template(:terminate_selection)
     end
+
+    context 'for termination_date_options' do
+      before :each do
+        @shop_sep = person.primary_family.latest_shop_sep
+        @shop_sep.qualifying_life_event_kind.update_attributes!(termination_on_kinds: ['exact_date'])
+        sign_in user
+        get :terminate_selection, params: { person_id: person.id }
+      end
+
+      it 'should assign termination_date_options' do
+        expect(assigns(:termination_date_options)).to eq({ hbx_enrollment.id.to_s => [@shop_sep.qle_on] })
+      end
+    end
   end
 
   context "POST terminate" do
@@ -883,7 +939,9 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
           effective_on_kinds: ["first_of_next_month"],
           pre_event_sep_in_days: 0,
           post_event_sep_in_days: 30,
-          is_self_attested: true
+          is_self_attested: true,
+          is_visible: true,
+          is_active: true
         )
       end
       let(:special_enrollment_period) {[double("SpecialEnrollmentPeriod")]}

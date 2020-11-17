@@ -351,6 +351,7 @@ class HbxEnrollment
   scope :show_enrollments_sans_canceled, -> { any_of([enrolled.selector, renewing.selector, terminated.selector, waived.selector]).order(created_at: :desc) }
   scope :enrollments_for_cobra, -> { where(:aasm_state.in => ['coverage_terminated', 'coverage_termination_pending', 'auto_renewing']).order(created_at: :desc) }
   scope :with_plan, -> { where(:plan_id.ne => nil) }
+  scope :with_product, -> { where(:product_id.ne => nil) }
   scope :coverage_selected_and_waived, -> {where(:aasm_state.in => SELECTED_AND_WAIVED).order(created_at: :desc)}
   scope :non_terminated, -> { where(:aasm_state.ne => 'coverage_terminated') }
   scope :non_external, -> { where(:external_enrollment => false) }
@@ -362,6 +363,10 @@ class HbxEnrollment
   scope :by_effective_period,      ->(effective_period) { where(
                                                           :"effective_on".gte => effective_period.min,
                                                           :"effective_on".lte => effective_period.max
+                                                        )}
+  scope :by_terminated_period,      ->(term_date) { where(
+                                                          :"terminated_on".gte => term_date,
+                                                          :"terminated_on".lte => term_date
                                                         )}
   scope :by_benefit_application_and_sponsored_benefit,  ->(benefit_application, sponsored_benefit, end_date) do
     where(
@@ -476,8 +481,23 @@ class HbxEnrollment
     end
   end
 
+  # checks possibility of coverage renewal for ivl enrollments
+  def can_renew_coverage?(new_effective_on)
+    return false unless is_ivl_by_kind?
+
+    enrollments = family.active_household.hbx_enrollments.where(
+      {:coverage_kind => coverage_kind,
+       :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES + ['auto_renewing', 'renewing_coverage_selected']),
+       :effective_on.gte => new_effective_on,
+       :kind => kind}
+    )
+    return true if enrollments.empty?
+
+    enrollments.none?{|e| subscriber.blank? || subscriber.hbx_id == e.subscriber.hbx_id }
+  end
+
   def has_at_least_one_aptc_eligible_member?(year)
-    tax_households = family.active_household.tax_households.tax_household_with_year(year)
+    tax_households = family.active_household.tax_households.tax_household_with_year(year).active_tax_household
     return false if tax_households.blank?
     tax_households.first.tax_household_members.any?(&:is_ia_eligible?)
   end
@@ -726,7 +746,12 @@ class HbxEnrollment
   end
 
   def propogate_terminate(term_date = TimeKeeper.date_of_record.end_of_month)
-    self.terminated_on ||= term_date
+    if terminated_on.present? && term_date < terminated_on
+      self.terminated_on = term_date
+    else
+      self.terminated_on ||= term_date
+    end
+
     if benefit_group_assignment
       benefit_group_assignment.end_benefit(terminated_on)
       benefit_group_assignment.save
@@ -735,6 +760,8 @@ class HbxEnrollment
     if should_transmit_update?
       notify(ENROLLMENT_UPDATED_EVENT_NAME, {policy_id: self.hbx_id})
     end
+
+    ::EnrollRegistry[:cancel_renewals_for_term] { {hbx_enrollment: self} }
   end
 
   def propogate_waiver
@@ -876,20 +903,6 @@ class HbxEnrollment
     family.enrollments.where({:predecessor_enrollment_id => id, :aasm_state.in => WAIVED_STATUSES}).present?
   end
 
-  def cancel_previous(year)
-    #Perform cancel/terms of previous enrollments for the same plan year
-    previous_enrollments(year).each do |previous_enrollment|
-      generate_signature(previous_enrollment)
-      if same_signatures(previous_enrollment) && !previous_enrollment.is_shop?
-        if self.effective_on > previous_enrollment.effective_on && previous_enrollment.may_terminate_coverage?
-          previous_enrollment.terminate_coverage!(effective_on - 1.day)
-        else
-          previous_enrollment.cancel_coverage! if previous_enrollment.may_cancel_coverage?
-        end
-      end
-    end
-  end
-
   def terminate_coverage_with(termination_date)
     # IVL enrollments go automatically to coverage_terminated
     if termination_date >= TimeKeeper.datetime_of_record && is_shop?
@@ -914,17 +927,17 @@ class HbxEnrollment
   end
 
   def propagate_selection
-    if is_shop?
-      update_existing_shop_coverage
-    else
-      cancel_previous(product.active_year)
-    end
+    return unless [:coverage_selected, :renewing_coverage_selected].include?(aasm.to_state)
 
-    if benefit_group_assignment
-      benefit_group_assignment.select_coverage if benefit_group_assignment.may_select_coverage?
-      benefit_group_assignment.hbx_enrollment = self
-      benefit_group_assignment.save
-    end
+    Operations::ExecuteProductSelectionEffects.call(
+      Entities::ProductSelection.new(
+        {
+          :enrollment => self,
+          :product => self.product,
+          :family => self.family
+        }
+      )
+    )
   end
 
   def handle_coverage_selection
@@ -1444,7 +1457,7 @@ class HbxEnrollment
       end
 
       if !employee_role.is_under_open_enrollment?
-        raise "You may not enroll until you're eligible under an enrollment period."
+        raise "You may not enroll unless it’s open enrollment or you’re eligible for a special enrollment period."
       end
 
       employee_role.employer_profile.show_plan_year.start_on
@@ -1525,7 +1538,7 @@ class HbxEnrollment
           enrollment.effective_on = benefit_sponsorship.current_benefit_period.earliest_effective_date
           enrollment.enrollment_kind = "open_enrollment"
         else
-          raise "You may not enroll until you're eligible under an enrollment period"
+          raise "You may not enroll unless it’s open enrollment or you’re eligible for a special enrollment period."
         end
       when resident_role.present?
         enrollment.kind = "coverall"
@@ -1540,7 +1553,7 @@ class HbxEnrollment
           enrollment.effective_on = benefit_sponsorship.current_benefit_period.earliest_effective_date
           enrollment.enrollment_kind = "open_enrollment"
         else
-          raise "You may not enroll until you're eligible under an enrollment period"
+          raise "You may not enroll unless it’s open enrollment or you’re eligible for a special enrollment period."
         end
       else
         raise "either employee_role or consumer_role is required" unless resident_role.present?
@@ -1703,11 +1716,11 @@ class HbxEnrollment
       transitions from: :shopping, to: :renewing_waived
     end
 
-    event :select_coverage, :after => :record_transition do
+    event :select_coverage, :after => [:record_transition, :propagate_selection] do
       transitions from: :shopping,
-                  to: :coverage_selected, after: [:propagate_selection], :guard => :can_select_coverage?
+                  to: :coverage_selected, :guard => :can_select_coverage?
       transitions from: [:auto_renewing, :actively_renewing],
-                  to: :renewing_coverage_selected, after: [:propagate_selection], :guard => :can_select_coverage?
+                  to: :renewing_coverage_selected, :guard => :can_select_coverage?
       transitions from: :auto_renewing_contingent,
                   to: :renewing_contingent_selected, :guard => :can_select_coverage?
     end
@@ -1742,7 +1755,7 @@ class HbxEnrollment
     end
 
     event :expire_coverage, :after => :record_transition do
-      transitions from: [:shopping, :coverage_selected, :transmitted_to_carrier, :coverage_enrolled],
+      transitions from: [:shopping, :coverage_selected, :transmitted_to_carrier, :coverage_enrolled, :unverified],
                   to: :coverage_expired, :guard  => :can_be_expired?
     end
 
@@ -1876,7 +1889,7 @@ class HbxEnrollment
     if (enrollment_kind == "special_enrollment")
       return "unknown_sep" if special_enrollment_period.blank?
       qle_reason = special_enrollment_period.qualifying_life_event_kind.reason
-      return qle_reason == 'covid-19' ? "unknown_sep" : qle_reason
+      return QualifyingLifeEventKind::REASON_KINDS.include?(qle_reason) ? qle_reason : "unknown_sep"
     end
 
     return "open_enrollment" if !is_shop?
@@ -2105,6 +2118,15 @@ class HbxEnrollment
     )
   end
 
+  def cancel_ivl_enrollment
+    return if is_shop?
+
+    previous_state = self.aasm_state
+    self.update_attributes(aasm_state: 'coverage_canceled')
+    workflow_state_transitions << WorkflowStateTransition.new(from_state: previous_state,
+                                                              to_state: 'coverage_canceled')
+  end
+
   def cancel_terminated_enrollment(termination_date, edi_required)
     if effective_on == termination_date
       prevs_state = self.aasm_state
@@ -2159,6 +2181,18 @@ class HbxEnrollment
     CAN_TERMINATE_ENROLLMENTS.map(&:to_s).include?(aasm_state.to_s)
   end
 
+  def previous_enrollments(year)
+    household.hbx_enrollments.ne(id: id).by_coverage_kind(self.coverage_kind).by_year(year).show_enrollments_sans_canceled.by_kind(self.kind)
+  end
+
+  def generate_signature(previous_enrollment)
+    previous_enrollment.update_attributes(enrollment_signature: previous_enrollment.generate_hbx_signature) unless previous_enrollment.enrollment_signature.present?
+  end
+
+  def same_signatures(previous_enrollment)
+    previous_enrollment.enrollment_signature == self.enrollment_signature
+  end
+
   private
 
   def set_is_any_enrollment_member_outstanding
@@ -2172,18 +2206,6 @@ class HbxEnrollment
   # NOTE - Mongoid::Timestamps does not generate created_at time stamps.
   def check_created_at
     self.update_attribute(:created_at, TimeKeeper.datetime_of_record) unless self.created_at.present?
-  end
-
-  def previous_enrollments(year)
-    household.hbx_enrollments.ne(id: id).by_coverage_kind(self.coverage_kind).by_year(year).show_enrollments_sans_canceled.by_kind(self.kind)
-  end
-
-  def generate_signature(previous_enrollment)
-    previous_enrollment.update_attributes(enrollment_signature: previous_enrollment.generate_hbx_signature) unless previous_enrollment.enrollment_signature.present?
-  end
-
-  def same_signatures(previous_enrollment)
-    previous_enrollment.enrollment_signature == self.enrollment_signature
   end
 
   def benefit_group_assignment_valid?(coverage_effective_date)

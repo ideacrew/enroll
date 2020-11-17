@@ -10,6 +10,7 @@ class ConsumerRole
   include StateTransitionPublisher
   include Mongoid::History::Trackable
   include DocumentsVerificationStatus
+  include Config::AcaIndividualMarketHelper
 
   embedded_in :person
 
@@ -28,8 +29,6 @@ class ConsumerRole
   #ridp
   IDENTITY_VALIDATION_STATES = %w(na valid outstanding pending)
   APPLICATION_VALIDATION_STATES = %w(na valid outstanding pending)
-
-  VERIFICATION_SENSITIVE_ATTR = %w(first_name last_name ssn us_citizen naturalized_citizen eligible_immigration_status dob indian_tribe_member)
 
   US_CITIZEN_STATUS_KINDS = %W(
   us_citizen
@@ -356,6 +355,9 @@ class ConsumerRole
     Person.all_consumer_roles
   end
 
+  def active_vlp_document
+    vlp_documents.in(id: active_vlp_document_id).first
+  end
 
   def is_active?
     self.is_active
@@ -584,7 +586,7 @@ class ConsumerRole
       transitions from: :verification_outstanding, to: :fully_verified
     end
     event :fail_native_status, :after => [:record_transition, :notify_of_eligibility_change] do
-      transitions from: :verification_outstanding, to: :verification_outstanding
+      transitions from: [:verification_outstanding, :ssa_pending, :dhs_pending, :fully_verified, :sci_verified],  to: :verification_outstanding
     end
 
     event :verifications_backlog, :after => [:record_transition] do
@@ -808,7 +810,7 @@ class ConsumerRole
   end
 
   def sensitive_information_changed?(person_params)
-    person_params.select{|k,v| VERIFICATION_SENSITIVE_ATTR.include?(k) }.any?{|field,v| sensitive_information_changed(field, person_params)}
+    person_params.select{|k,v| verification_sensitive_attributes.include?(k) }.any?{|field,v| sensitive_information_changed(field, person_params)}
   end
 
   def check_for_critical_changes(family, opts)
@@ -819,7 +821,7 @@ class ConsumerRole
   def can_trigger_residency?(family, opts) # trigger for change in address
     person.age_on(TimeKeeper.date_of_record) > 18 && family.person_has_an_active_enrollment?(person) &&
     ((opts[:dc_status] &&
-      opts[:no_dc_address] == "false") || (person.is_consumer_role_active? && verification_types.by_name("DC Residency").first.validation_status == "unverified"))
+      opts[:is_homeless] == "0" && opts[:is_temporarily_out_of_state] == "0") || (person.is_consumer_role_active? && verification_types.by_name("DC Residency").first.validation_status == "unverified"))
   end
 
   def add_type_history_element(params)
@@ -827,7 +829,7 @@ class ConsumerRole
   end
 
   def can_start_residency_verification? # initial trigger check for coverage purchase
-    !person.no_dc_address && person.age_on(TimeKeeper.date_of_record) > 18
+    !(person.is_homeless || person.is_temporarily_out_of_state) && person.age_on(TimeKeeper.date_of_record) > 18
   end
 
   def invoke_residency_verification!
@@ -859,6 +861,19 @@ class ConsumerRole
   def verification_types
     person.verification_types.active.where(applied_roles: "consumer_role") if person
   end
+
+  def check_native_status(family, native_status_changed)
+    return unless native_status_changed
+    return unless family.person_has_an_active_enrollment?(person)
+
+    if person.tribal_id.present?
+      fail_indian_tribe
+      fail_native_status!
+    else
+      pass_native_status! if all_types_verified? && !fully_verified?
+    end
+  end
+
 
   #class methods
   class << self
@@ -1155,7 +1170,6 @@ class ConsumerRole
   def citizenship_immigration_processing?
     dhs_pending? || ssa_pending?
   end
-
 
   def sensitive_information_changed(field, person_params)
     if field == "dob"

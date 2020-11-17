@@ -24,13 +24,15 @@ class TaxHousehold
   field :effective_ending_on, type: Date
   field :submitted_at, type: DateTime
 
-  embeds_many :tax_household_members
+  embeds_many :tax_household_members, cascade_callbacks: true
   accepts_nested_attributes_for :tax_household_members
 
-  embeds_many :eligibility_determinations
+  embeds_many :eligibility_determinations, cascade_callbacks: true
 
   scope :tax_household_with_year, ->(year) { where( effective_starting_on: (Date.new(year)..Date.new(year).end_of_year)) }
   scope :active_tax_household, ->{ where(effective_ending_on: nil) }
+
+  # validate :validate_dates
 
   def latest_eligibility_determination
     eligibility_determinations.sort {|a, b| a.determined_at <=> b.determined_at}.last
@@ -44,11 +46,15 @@ class TaxHousehold
     latest_eligibility_determination.csr_eligibility_kind
   end
 
+  def current_csr_percent_as_integer
+    latest_eligibility_determination.csr_percent_as_integer
+  end
+
   def valid_csr_kind(hbx_enrollment)
     csr_kind = latest_eligibility_determination.csr_eligibility_kind
     shopping_family_member_ids = hbx_enrollment.hbx_enrollment_members.map(&:applicant_id)
     ia_eligible = tax_household_members.where(:applicant_id.in => shopping_family_member_ids).map(&:is_ia_eligible)
-    ia_eligible.empty? || ia_eligible.include?(false) ? "csr_100" : csr_kind
+    ia_eligible.empty? || ia_eligible.include?(false) ? 'csr_0' : csr_kind
   end
 
   def current_csr_percent
@@ -272,6 +278,12 @@ class TaxHousehold
   end
 
   private
+
+  def validate_dates
+    if effective_ending_on.present? && effective_starting_on > effective_ending_on
+      errors.add(:effective_ending_on, "can't occur before start date")
+    end
+  end
 
   def product_factory
     ::BenefitMarkets::Products::ProductFactory

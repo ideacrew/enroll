@@ -436,7 +436,7 @@ module ApplicationHelper
     carriers.each do |car|
       if Rails.env == "production"
         image = "logo/carrier/#{car.legal_name.parameterize.underscore}.jpg"
-        digest_image = "/assets/#{::Sprockets::Railtie.build_environment(Rails.application).find_asset(image).digest_path}"
+        digest_image = "/assets/#{::Sprockets::Railtie.build_environment(Rails.application).find_asset(image)&.digest_path}"
         carrier_logo_hash[car.legal_name] = digest_image
       else
         image = "/assets/logo/carrier/#{car.legal_name.parameterize.underscore}.jpg"
@@ -503,8 +503,9 @@ module ApplicationHelper
     covered = plan_year.progressbar_covered_count
     waived = plan_year.waived_count
     p_min = 0 if p_min.nil?
+    
     unless eligible.zero?
-      condition = (eligible <= 2) ? ((enrolled > (eligible - 1)) && (non_owner > 0)) : ((enrolled >= p_min) && (non_owner > 0))
+      condition = enrolled >= p_min && non_owner > 0
       condition = false if covered == 0 && waived > 0
       progress_bar_class = condition ? 'progress-bar-success' : 'progress-bar-danger'
       progress_bar_width = (enrolled * 100)/eligible
@@ -520,9 +521,9 @@ module ApplicationHelper
           concat content_tag(:small, enrolled, class: 'progress-current', style: "left: #{progress_bar_width - 2}%;")
         end
 
-        if eligible >= 2
-          eligible_text = (options[:minimum] == false) ? "#{p_min}<br>(Minimum)" : "<i class='fa fa-circle manual' data-toggle='tooltip' title='Minimum Requirement' aria-hidden='true'></i>".html_safe unless plan_year.start_on.to_date.month == 1
-          concat content_tag(:p, eligible_text.html_safe, class: 'divider-progress', data: {value: "#{p_min}"}) unless plan_year.start_on.to_date.month == 1
+        if eligible >= 2 && plan_year.employee_participation_ratio_minimum != 0
+          eligible_text = (options[:minimum] == false) ? "#{p_min}<br>(Minimum)" : "<i class='fa fa-circle manual' data-toggle='tooltip' title='Minimum Requirement' aria-hidden='true'></i>".html_safe
+          concat content_tag(:p, eligible_text.html_safe, class: 'divider-progress', data: {value: "#{p_min}"}) 
         end
 
         concat(content_tag(:div, class: 'progress-val') do
@@ -547,18 +548,12 @@ module ApplicationHelper
     end
   end
 
-  def is_plan_year_eligible_for_flexible_rules?(plan_year)
-    !plan_year.is_renewing? && flexible_contribution_model_enabled_for_period.cover?(plan_year.start_on)
-  end
-
   def calculate_participation_minimum
     if @current_plan_year.present?
       if @current_plan_year.eligible_to_enroll_count == 0
         0
-      elsif is_plan_year_eligible_for_flexible_rules?(@current_plan_year)
-        flexible_employer_participation_ratio_minimum
       else
-        (@current_plan_year.eligible_to_enroll_count * Settings.aca.shop_market.employee_participation_ratio_minimum).ceil
+        (@current_plan_year.eligible_to_enroll_count * @current_plan_year.employee_participation_ratio_minimum).ceil
       end
     end
   end
@@ -761,7 +756,13 @@ module ApplicationHelper
   end
 
   def is_new_paper_application?(current_user, app_type)
+    app_type = app_type&.downcase
     current_user.has_hbx_staff_role? && app_type == "paper"
+  end
+
+  def is_new_in_person_application?(current_user, app_type)
+    app_type = app_type&.humanize&.downcase
+    current_user.has_hbx_staff_role? && app_type == "in person"
   end
 
   def load_captcha_widget?
@@ -778,6 +779,13 @@ module ApplicationHelper
     else
       false
     end
+  end
+
+  def can_show_covid_message_on_sep_carousel?(person)
+    return false unless sep_carousel_message_enabled?
+    return false unless person.present?
+    return true if person.consumer_role.present? || person.resident_role.present?
+    person&.active_employee_roles&.any?{ |employee_role| employee_role.market_kind == 'shop'}
   end
 
   def transition_family_members_link_type row, allow
@@ -847,7 +855,7 @@ module ApplicationHelper
   end
 
   def external_application_configured?(application_name)
-    external_app = ExternalApplications::ApplicationProfile.find_by_application_name(application_name)
+    external_app = ::ExternalApplications::ApplicationProfile.find_by_application_name(application_name)
     return false unless external_app
     return false unless external_app.is_authorized_for?(current_user)
     !external_app.url.blank?
@@ -857,5 +865,20 @@ module ApplicationHelper
     current_token = WhitelistedJwt.newest
     return current_token.token if current_token
     current_user.generate_jwt(warden.config[:default_scope], nil)
+  end
+
+  def csr_percentage_options_for_select
+    EligibilityDetermination::CSR_PERCENT_VALUES.inject([]) do |csr_options, csr|
+      ui_display = csr == '-1' ? 'limited' : csr
+      csr_options << [ui_display, csr]
+    end
+  end
+
+  def show_component(url) # rubocop:disable Metrics/CyclomaticComplexity TODO: Remove this
+    if url.split('/')[2] == "consumer_role" || url.split('/')[1] == "insured" && url.split('/')[2] == "interactive_identity_verifications" || url.split('/')[1] == "financial_assistance" && url.split('/')[2] == "applications" || url.split('/')[1] == "insured" && url.split('/')[2] == "family_members" || url.include?("family_relationships")
+      false
+    else
+      true
+    end
   end
 end

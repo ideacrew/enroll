@@ -109,7 +109,7 @@ module BenefitSponsors
         benefit_application = find_model_by_id(form.id)
         model_attributes = form_params_to_attributes(form)
         benefit_application.assign_attributes(model_attributes)
-        store(form, benefit_application)
+        store(form, benefit_application, true)
       end
 
       # TODO: Test this query for benefit applications cca/dc
@@ -160,11 +160,11 @@ module BenefitSponsors
         date.to_date.to_s
       end
 
-      def store(form, benefit_application)
+      def store(form, benefit_application, update = false)
         valid_according_to_factory = benefit_application_factory.validate(benefit_application)
         if valid_according_to_factory
           benefit_sponsorship = benefit_application.benefit_sponsorship || find_benefit_sponsorship(form)
-          benefit_application.benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(benefit_application.resolve_service_areas, benefit_application.effective_period.begin)
+          benefit_application.benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(benefit_application.effective_period.begin) unless update
           # assign_rating_and_service_area(benefit_application)
         else
           map_errors_for(benefit_application, onto: form)
@@ -172,9 +172,11 @@ module BenefitSponsors
         end
 
         if save_successful = benefit_application.save
-          catalog = benefit_application.benefit_sponsor_catalog
-          catalog.benefit_application = benefit_application
-          catalog.save
+          unless update
+            catalog = benefit_application.benefit_sponsor_catalog
+            catalog.benefit_application = benefit_application
+            catalog.save
+          end
         else
           map_errors_for(benefit_application, onto: form)
           return [false, nil]

@@ -7,6 +7,10 @@ describe UsersController, dbclean: :after_each do
   let(:user_id) { "23432532423424" }
   let(:user_email) { "some_email@some_domain.com" }
 
+  after :all do
+    DatabaseCleaner.clean
+  end
+
   describe '.change_password' do
     let(:user) { build(:user, id: '1', password: 'Complex!@#$') }
     let(:original_password) { 'Complex!@#$' }
@@ -196,6 +200,13 @@ describe UsersController, dbclean: :after_each do
       it do
         expect(response.status).to equal(200)
       end
+    end
+  end
+
+  describe '#unsupportive_browser' do
+    it 'should be succesful' do
+      get :unsupported_browser
+      expect(response).to be_success
     end
   end
 

@@ -19,6 +19,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency "mongoid",                   "~> 7.0.2"
   s.add_dependency 'mongoid-autoinc',           '~> 6.0'
+  s.add_dependency 'browser',                   '2.7.0'
 
   s.add_dependency "aasm",                      "~> 4.8"
   s.add_dependency 'active_model_serializers',  '~> 0.10'
@@ -41,7 +42,8 @@ Gem::Specification.new do |s|
   s.add_dependency 'dry-initializer'
   s.add_dependency 'dry-auto_inject', '0.6.1'
   s.add_dependency 'dry-container'
-
+  s.add_dependency 'dry-struct'
+  s.add_dependency 'dry-monads'
   # s.add_development_dependency 'bundler-audit',           '~> 0.6'
   s.add_development_dependency 'capybara',                  '~> 3.12'
   s.add_development_dependency 'database_cleaner'

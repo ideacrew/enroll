@@ -60,7 +60,6 @@ module BenefitSponsors
 
     let(:current_date)                    { Date.new(this_year,3,14) }
 
-    before { TimeKeeper.set_date_of_record_unprotected!(current_date) }
     subject { BenefitSponsors::BenefitSponsorships::AcaShopBenefitSponsorshipService }
 
     # We are not moving benefit applications to ineligible status automatically if binder payment is missed
@@ -97,7 +96,7 @@ module BenefitSponsors
 
       after do
         # Does this do what we think it does?
-        TimeKeeper.set_date_of_record_unprotected!(Time.zone.today)
+        TimeKeeper.set_date_of_record_unprotected!(Date.today)
       end
 
       context 'cancel the application when under enrollment close state' do

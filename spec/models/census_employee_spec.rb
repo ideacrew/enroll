@@ -520,9 +520,13 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     let(:open_enrollment_period) {effective_period.min.prev_month..(effective_period.min - 10.days)}
     let!(:employer_profile_2) {FactoryBot.create(:benefit_sponsors_organizations_aca_shop_cca_employer_profile, :with_organization_and_site, site: organization.site)}
     let(:organization2) {employer_profile_2.organization}
-    let!(:benefit_sponsorship2) {employer_profile_2.add_benefit_sponsorship}
+    let!(:benefit_sponsorship2) do
+      sponsorship = employer_profile_2.add_benefit_sponsorship
+      sponsorship.save
+      sponsorship
+    end
     let!(:service_areas2) {benefit_sponsorship2.service_areas_on(effective_period.min)}
-    let(:benefit_sponsor_catalog2) {benefit_sponsorship2.benefit_sponsor_catalog_for(service_areas2, effective_period.min)}
+    let(:benefit_sponsor_catalog2) {benefit_sponsorship2.benefit_sponsor_catalog_for(effective_period.min)}
     let(:initial_application2) do
       BenefitSponsors::BenefitApplications::BenefitApplication.new(
         benefit_sponsor_catalog: benefit_sponsor_catalog2,
@@ -1119,6 +1123,13 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       census_employee.update_attributes(employment_terminated_on: active_benefit_package.end_on - 5.days)
       census_employee.benefit_group_assignments << BenefitGroupAssignment.new(benefit_group: active_benefit_package, start_on: active_benefit_package.benefit_application.start_on)
       expect(census_employee.is_employee_in_term_pending?).to eq true
+    end
+
+    it 'should return false if census employee has no active benefit group assignment' do
+      active_benefit_package = census_employee.active_benefit_group_assignment.benefit_package
+      census_employee.update_attributes(employment_terminated_on: active_benefit_package.end_on - 1.month)
+      census_employee.existing_cobra = 'true'
+      expect(census_employee.is_employee_in_term_pending?).to eq false
     end
   end
 
@@ -2243,6 +2254,53 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     it "should select the latest renewal benefit group assignment" do
       benefit_group_assignment_two.update_attribute(:updated_at, benefit_group_assignment_two.updated_at + 1.day)
       expect(census_employee.renewal_benefit_group_assignment).to eq benefit_group_assignment_two
+    end
+  end
+
+  context ".is_waived_under?" do
+    let(:census_employee) {CensusEmployee.new(**valid_params)}
+    let!(:benefit_group_assignment) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee)}
+
+    before do
+      family = FactoryBot.create(:family, :with_primary_family_member)
+      allow(census_employee).to receive(:family).and_return(family)
+      enrollment = FactoryBot.create(
+        :hbx_enrollment, family: family,
+                         household: family.active_household,
+                         benefit_group_assignment: census_employee.benefit_group_assignments.first,
+                         sponsored_benefit_package_id: census_employee.benefit_group_assignments.first.benefit_package.id
+      )
+      allow(benefit_group_assignment).to receive(:hbx_enrollment).and_return(enrollment)
+    end
+
+    context "for initial application" do
+
+      it "should return true when employees waive the coverage" do
+        benefit_group_assignment.hbx_enrollment.aasm_state = "inactive"
+        benefit_group_assignment.hbx_enrollment.save
+        expect(census_employee.is_waived_under?(benefit_group_assignment.benefit_application)).to be_truthy
+      end
+
+      it "should return false for employees who are enrolling" do
+        expect(census_employee.is_waived_under?(benefit_group_assignment.benefit_application)).to be_falsey
+      end
+    end
+
+    context "when active employeees has renewal benifit group" do
+
+      before do
+        benefit_group_assignment.benefit_application.update_attribute(:aasm_state, "renewing_enrolled")
+      end
+
+      it "should return false when employees who are enrolling" do
+        expect(census_employee.is_waived_under?(benefit_group_assignment.benefit_application)).to be_falsey
+      end
+
+      it "should return true for employees waive the coverage" do
+        benefit_group_assignment.hbx_enrollment.aasm_state = "renewing_waived"
+        benefit_group_assignment.hbx_enrollment.save
+        expect(census_employee.is_waived_under?(benefit_group_assignment.benefit_application)).to be_truthy
+      end
     end
   end
 

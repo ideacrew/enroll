@@ -49,7 +49,7 @@ module BenefitSponsors
       end
 
       let(:benefit_application_form) { FactoryBot.build(:benefit_sponsors_forms_benefit_application) }
-      let!(:invalid_application_form) { BenefitSponsors::Forms::BenefitApplicationForm.new}
+      let!(:invalid_application_form) { BenefitSponsors::Forms::BenefitApplicationForm.new(open_enrollment_end_on: open_enrollment_period_start_on, open_enrollment_start_on: open_enrollment_period_start_on)}
       let!(:invalid_benefit_application) { BenefitSponsors::BenefitApplications::BenefitApplication.new }
 
       let!(:organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
@@ -89,7 +89,16 @@ module BenefitSponsors
           service_obj.save(benefit_application_form)
           benefit_sponsorship.reload
           expect(benefit_sponsorship.aasm_state).to eq :applicant
+        end
+      end
 
+      context ".update" do
+        let!(:application) { benefit_application_factory.call(benefit_sponsorship, params) }
+
+        it "should not create benefit sponsor catalog on update/edit" do
+          expect(benefit_sponsorship).not_to receive(:benefit_sponsor_catalog_for)
+          service_obj = Services::BenefitApplicationService.new(benefit_application_factory)
+          service_obj.store(benefit_application_form, application, true)
         end
       end
 
@@ -228,8 +237,8 @@ module BenefitSponsors
       end
 
       context 'for admin_datatable_action' do
-        let!(:ba)   { FactoryBot.create(:benefit_sponsors_benefit_application, benefit_sponsorship: benefit_sponsorship, aasm_state: :imported) }
-        let!(:ba2)  { FactoryBot.create(:benefit_sponsors_benefit_application, benefit_sponsorship: benefit_sponsorship, aasm_state: :draft) }
+        let!(:ba)   { FactoryBot.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, aasm_state: :imported) }
+        let!(:ba2)  { FactoryBot.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, aasm_state: :draft) }
 
         before :each do
           create_ba_params.merge!({ pte_count: '0', msp_count: '0', admin_datatable_action: true })

@@ -1345,6 +1345,7 @@ class CensusEmployee < CensusMember
   def is_employee_in_term_pending?
     return false if employment_terminated_on.blank?
     return false if active_benefit_group_assignment.blank?
+    return false if is_cobra_status?
 
     effective_period = active_benefit_group_assignment.benefit_package.effective_period
     employment_terminated_on <= effective_period.max
@@ -1430,6 +1431,14 @@ class CensusEmployee < CensusMember
 
   def earliest_benefit_package_after(coverage_date)
     active_benefit_group_assignment.benefit_package.earliest_benefit_package_after(coverage_date)
+  end
+
+  def is_waived_under?(benefit_application)
+    assignment_by_application = [renewal_benefit_group_assignment, active_benefit_group_assignment].compact.detect do |assignment|
+      assignment.benefit_application && (assignment.benefit_application == benefit_application)
+    end
+    return false if assignment_by_application.blank? || assignment_by_application.hbx_enrollment.blank?
+    assignment_by_application.hbx_enrollment.is_coverage_waived?
   end
 
   def ssn=(new_ssn)

@@ -11,7 +11,7 @@ class DefinePermissions < MigrationTask
                           send_broker_agency_message: true, approve_broker: true, approve_ga: true, can_update_ssn: false, can_complete_resident_application: false,
                           can_add_sep: false, can_lock_unlock: true, can_view_username_and_email: false, can_reset_password: false, modify_admin_tabs: true,
                           view_admin_tabs: true,  view_the_configuration_tab: true, can_submit_time_travel_request: false,
-                          view_agency_staff: true, manage_agency_staff: true)
+                          view_agency_staff: true, manage_agency_staff: true, can_access_pay_now: true)
     Permission
       .find_or_initialize_by(name: 'hbx_read_only')
       .update_attributes!(modify_family: true, modify_employer: false, revert_application: false, list_enrollments: true,
@@ -21,17 +21,17 @@ class DefinePermissions < MigrationTask
       .find_or_initialize_by(name: 'hbx_csr_supervisor')
       .update_attributes!(modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
                           send_broker_agency_message: false, approve_broker: false, approve_ga: false, modify_admin_tabs: false, view_admin_tabs: false,
-                          view_the_configuration_tab: true, can_submit_time_travel_request: false)
+                          view_the_configuration_tab: true, can_submit_time_travel_request: false, can_access_pay_now: true)
     Permission
       .find_or_initialize_by(name: 'hbx_csr_tier2')
       .update_attributes!(modify_family: true, modify_employer: true, revert_application: false, list_enrollments: false,
                           send_broker_agency_message: false, approve_broker: false, approve_ga: false, modify_admin_tabs: false, view_admin_tabs: false,
-                          view_the_configuration_tab: true, can_submit_time_travel_request: false)
+                          view_the_configuration_tab: true, can_submit_time_travel_request: false, can_access_pay_now: true)
     Permission
       .find_or_initialize_by(name: 'hbx_csr_tier1')
       .update_attributes!(modify_family: true, modify_employer: false, revert_application: false, list_enrollments: false,
                           send_broker_agency_message: false, approve_broker: false, approve_ga: false, modify_admin_tabs: false, view_admin_tabs: false,
-                          view_the_configuration_tab: true, can_submit_time_travel_request: false)
+                          view_the_configuration_tab: true, can_submit_time_travel_request: false, can_access_pay_now: true)
     Permission
       .find_or_initialize_by(name: 'developer')
       .update_attributes!(modify_family: false, modify_employer: false, revert_application: false, list_enrollments: true,
@@ -43,7 +43,7 @@ class DefinePermissions < MigrationTask
                           send_broker_agency_message: true, approve_broker: true, approve_ga: true, can_update_ssn: false, can_complete_resident_application: false,
                           can_add_sep: false, can_lock_unlock: false, can_view_username_and_email: false, can_reset_password: false, modify_admin_tabs: true,
                           view_admin_tabs: true,  view_the_configuration_tab: true, can_submit_time_travel_request: false,
-                          view_agency_staff: true, manage_agency_staff: true
+                          view_agency_staff: true, manage_agency_staff: true, can_send_secure_message: true, can_manage_qles: true, can_access_pay_now: true
                         )
     Permission
       .find_or_initialize_by(name: 'super_admin')
@@ -51,7 +51,7 @@ class DefinePermissions < MigrationTask
                           send_broker_agency_message: true, approve_broker: true, approve_ga: true, can_update_ssn: false, can_complete_resident_application: false,
                           can_add_sep: false, can_lock_unlock: true, can_view_username_and_email: false, can_reset_password: false, modify_admin_tabs: true,
                           view_admin_tabs: true, can_extend_open_enrollment: true, view_the_configuration_tab: true, can_submit_time_travel_request: false,
-                          view_agency_staff: true, manage_agency_staff: true
+                          view_agency_staff: true, manage_agency_staff: true, can_send_secure_message: true, can_manage_qles: true, can_access_pay_now: true
                         )
       #puts 'Permissions Updated!'
   end
@@ -70,6 +70,7 @@ class DefinePermissions < MigrationTask
     hbx_admin_can_reset_password
     hbx_admin_can_change_fein
     hbx_admin_can_force_publish
+    hbx_admin_can_send_secure_message
     hbx_admin_can_modify_plan_year
     hbx_admin_can_extend_open_enrollment
     hbx_admin_can_create_benefit_application
@@ -82,6 +83,7 @@ class DefinePermissions < MigrationTask
     hbx_admin_can_transition_family_members
     hbx_admin_can_delete_identity_application_documents
     hbx_admin_can_access_pay_now
+    hbx_admin_can_manage_qles
   end
 
   def build_test_roles
@@ -192,6 +194,11 @@ class DefinePermissions < MigrationTask
     Permission.hbx_tier3.update_attributes(can_force_publish: true)
   end
 
+  def hbx_admin_can_send_secure_message
+    Permission.super_admin.update_attributes(can_send_secure_message: true)
+    Permission.hbx_tier3.update_attributes(can_send_secure_message: true)
+  end
+
   def hbx_admin_can_modify_plan_year
     Permission.super_admin.update_attributes(can_modify_plan_year: true)
     Permission.hbx_tier3.update_attributes(can_modify_plan_year: true)
@@ -205,6 +212,11 @@ class DefinePermissions < MigrationTask
   def hbx_admin_can_create_benefit_application
     Permission.super_admin.update_attributes(can_create_benefit_application: true)
     Permission.hbx_tier3.update_attributes(can_create_benefit_application: true)
+  end
+
+  def hbx_admin_can_manage_qles
+    Permission.super_admin.update_attributes(can_manage_qles: true)
+    Permission.hbx_tier3.update_attributes(can_manage_qles: true)
   end
 
   def grant_super_admin_access
@@ -285,6 +297,8 @@ class DefinePermissions < MigrationTask
 
   def hbx_admin_can_access_pay_now
     Permission.hbx_staff.update_attributes!(can_access_pay_now: true)
+    Permission.super_admin.update_attributes!(can_access_pay_now: true)
+    Permission.hbx_tier3.update_attributes!(can_access_pay_now: true)
     Permission.hbx_csr_supervisor.update_attributes!(can_access_pay_now: true)
     Permission.hbx_csr_tier1.update_attributes!(can_access_pay_now: true)
     Permission.hbx_csr_tier2.update_attributes!(can_access_pay_now: true)
