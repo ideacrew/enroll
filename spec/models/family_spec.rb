@@ -1155,6 +1155,8 @@ describe "#outstanding_verification_datatable scope", dbclean: :after_each do
     ivl_person_2.consumer_role.update_attributes!(aasm_state: "verification_outstanding")
     ivl_enrollment.save!
     ivl_enrollment_2.save!
+    # TODO: Thils fails when running the block starting at #min_verification_due_date_range
+    # for some reason
     # expect(Family.outstanding_verification_datatable.size).to be(1)
   end
 
@@ -1172,32 +1174,40 @@ describe "#outstanding_verification_datatable scope", dbclean: :after_each do
     let!(:ivl_person_excluded)       { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, first_name: "Jimmy", last_name: "California") }
     let!(:ivl_family_excluded)       { FactoryBot.create(:family, :with_primary_family_member, person: ivl_person_excluded, min_verification_due_date: timekeeper_date + 1.year) }
     let!(:ivl_enrollment_excluded) do
-      FactoryBot.create(:hbx_enrollment,
-                      household: ivl_family_excluded.active_household,
-                      family: ivl_family_excluded,
-                      kind: "individual",
-                      is_any_enrollment_member_outstanding: true,
-                      aasm_state: "coverage_selected")
+      FactoryBot.create(
+        :hbx_enrollment,
+        household: ivl_family_excluded.active_household,
+        family: ivl_family_excluded,
+        kind: "individual",
+        is_any_enrollment_member_outstanding: true,
+        aasm_state: "coverage_selected"
+      )
     end
 
     let(:ivl_enrollment_member) do
-      FactoryBot.create(:hbx_enrollment_member,
-                      is_subscriber: true,
-                      applicant_id: ivl_family_excluded.primary_applicant.id,
-                      hbx_enrollment: ivl_enrollment_excluded,
-                      eligibility_date: TimeKeeper.date_of_record,
-                      coverage_start_on: TimeKeeper.date_of_record)
+      FactoryBot.create(
+        :hbx_enrollment_member,
+        is_subscriber: true,
+        applicant_id: ivl_family_excluded.primary_applicant.id,
+        hbx_enrollment: ivl_enrollment_excluded,
+        eligibility_date: TimeKeeper.date_of_record,
+        coverage_start_on: TimeKeeper.date_of_record
+      )
     end
 
     before(:each) do
       ivl_enrollment_2.update_attributes!(aasm_state: "coverage_selected")
 
     end
-    it  "should only sort families by best verification date" do
+    it "should only sort families by best verification date" do
       #  Probably  make two more families here and make one of them supposed to be outside of the scope
       # make sure it returns as a mongoid collectoin if possible
       expect(family_scope.length).to eq(3)
       expect(family_scope.min_verification_due_date_range(custom_datatable_from, custom_datatable_to, family_scope).length).to eq(2)
+    end
+
+    it "should not include families outside of 95 days range" do
+      expect(family_scope.min_verification_due_date_range(custom_datatable_from, custom_datatable_to, family_scope)).to_not include(ivl_family_excluded)
     end
 
     it "should include families with nil min_verification_due_date" do
