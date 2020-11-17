@@ -1197,7 +1197,6 @@ describe "#outstanding_verification_datatable scope", dbclean: :after_each do
 
     before(:each) do
       ivl_enrollment_2.update_attributes!(aasm_state: "coverage_selected")
-
     end
     it "should only sort families by best verification date" do
       #  Probably  make two more families here and make one of them supposed to be outside of the scope

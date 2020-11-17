@@ -522,7 +522,7 @@ class Family
   #
   # @return [ Array<SpecialEnrollmentPeriod> ] The SEP eligibilities active on today's date
   def active_seps
-    special_enrollment_periods.find_all(&:is_active?)
+    special_enrollment_periods.find_all { |sep| sep.is_active? }
   end
 
   def latest_active_sep
@@ -1105,21 +1105,20 @@ class Family
     active_household.hbx_enrollments.where(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES).flat_map(&:hbx_enrollment_members).flat_map(&:family_member).flat_map(&:person).include?(person)
   end
 
+  # TODO: Conver this to an aggregate
+
   def self.min_verification_due_date_range(start_date, end_date, family_scope = self.outstanding_verification_datatable)
     timekeeper_date = TimeKeeper.date_of_record + 95.days
-    families = if timekeeper_date >= start_date.to_date && timekeeper_date <= end_date.to_date
-                 family_scope.select do |family|
-                   if family.best_verification_due_date.present?
-                     (family.best_verification_due_date >= start_date && family.best_verification_due_date <= end_date) || family.min_verification_due_date.nil?
-                   else
-                     family.min_verification_due_date.nil?
-                   end
-                 end
-               else
-                 family_scope.select do |family|
-                   family.best_verification_due_date >= start_date && family.best_verification_due_date <= end_date if family.best_verification_due_date.present?
-                 end
-               end
+    families = []
+    family_scope.each do |family|
+      if timekeeper_date >= start_date.to_date && timekeeper_date <= end_date.to_date
+        families << family if family.min_verification_due_date.nil?
+        next unless family.best_verification_due_date.present?
+        families << family if family.best_verification_due_date >= start_date && family.best_verification_due_date <= end_date
+      elsif [family.best_verification_due_date >= start_date, family.best_verification_due_date <= end_date].all?
+        families << family
+      end
+    end
     where(:_id.in => families&.map(&:id))
   end
 
