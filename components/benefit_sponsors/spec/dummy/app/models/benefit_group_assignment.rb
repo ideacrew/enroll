@@ -1,4 +1,4 @@
-class BenefitGroupAssignment
+  class BenefitGroupAssignment
   include Mongoid::Document
   include Mongoid::Timestamps
   include AASM
@@ -16,6 +16,7 @@ class BenefitGroupAssignment
 
   field :start_on, type: Date
   field :end_on, type: Date
+  field :is_active, type: Boolean
 
   field :activated_at, type: DateTime
 
@@ -317,9 +318,9 @@ class BenefitGroupAssignment
     make_active(date)
   end
 
-  def is_active
-    is_active?
-  end
+  # def is_active
+  #   is_active?
+  # end
 
   def is_active?(date = TimeKeeper.date_of_record)
     end_date = end_on || start_on.next_year.prev_day

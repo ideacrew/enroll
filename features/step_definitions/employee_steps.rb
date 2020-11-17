@@ -178,14 +178,15 @@ And(/staff role person clicks on employees link$/) do
 end
 
 And(/staff role person clicks on employee (.*?)$/) do |named_person|
+  sleep(5)
   click_link named_person
-  sleep(2)
   expect(page.current_path).to include("census_employee")
 end
 
 Then(/the user should see a dropdown for Off Plan Year benefit package$/) do
   # Selectric is weird
   Capybara.ignore_hidden_elements = false
+  sleep(5)
   expect(page).to have_text("Off Cycle Benefit Package")
   Capybara.ignore_hidden_elements = true
 end

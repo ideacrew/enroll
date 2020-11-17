@@ -235,7 +235,9 @@ And(/employee (.*) already matched with employer (.*?)(?: and (.*?))? and logged
                                      hired_on: ce.hired_on)
 
   sponsorship.benefit_applications.each do |benefit_application|
-    benefit_application.benefit_packages.each{|benefit_package| ce.add_benefit_group_assignment(benefit_package) }
+    benefit_application.benefit_packages.each do |benefit_package|
+      ce.add_benefit_group_assignment(benefit_package) unless ce.benefit_group_assignments.any?{|bga| bga.benefit_package == benefit_package}
+    end
   end
   if person_record.employee_roles.present?
     ce.update_attributes(employee_role_id: person_record.employee_roles.first.id)
@@ -368,7 +370,7 @@ end
 
 And(/^employer (.*?) with employee (.*?) is under open enrollment$/) do |legal_name, named_person|
   person = people[named_person]
-  person_record = person_record_from_census_employee(person)
+  person_record_from_census_employee(person)
   user_record_from_census_employee(person)
   # we should not fetch like this
   census_employee = CensusEmployee.first
@@ -406,14 +408,11 @@ And(/^employer (.*?) with employee (.*?) has hbx_enrollment with health product$
 end
 
 And(/^employee (.*?) of employer (.*?) most recent HBX Enrollment should be under the off cycle benefit application$/) do |named_person, _legal_name|
-  census_employee = census_employee(named_person)
   person = people[named_person]
   person_record = Person.where(first_name: person[:first_name], last_name: person[:last_name]).last
-  # TODO: This is returning nil now
-  # off_cycle_benefit_application = benefit_sponsorship.off_cycle_benefit_application
-  # TODO: Is this really the off cycle benefit application?
-  off_cycle_benefit_application = census_employee.benefit_sponsorship.current_benefit_application
-  benefit_package = off_cycle_benefit_application.benefit_packages[0]
+
+  census_employee = CensusEmployee.where(first_name: person[:first_name], last_name: person[:last_name]).last
+  off_cycle_benefit_application = census_employee.benefit_sponsorship.off_cycle_benefit_application  benefit_package = off_cycle_benefit_application.benefit_packages[0]
   sponsored_benefit = benefit_package.sponsored_benefits.first
   end_date = off_cycle_benefit_application.end_on
   off_cycle_enrollments = HbxEnrollment.by_benefit_application_and_sponsored_benefit(off_cycle_benefit_application, sponsored_benefit, end_date)
@@ -423,14 +422,14 @@ end
 
 And(/^employer (.*?) with employee (.*?) has has person and user record present$/) do |legal_name, named_person|
   person = people[named_person]
-  person_record = person_record_from_census_employee(person)
-  user_record = user_record_from_census_employee(person)
+  person_record_from_census_employee(person)
+  user_record_from_census_employee(person)
 end
 
 And(/^employer (.*?) with employee (.*?) has (.*?) hbx_enrollment with health product$/) do |legal_name, named_person, enrollment_type|
   person = people[named_person]
   person_record = person_record_from_census_employee(person)
-  user_record = user_record_from_census_employee(person)
+  user_record_from_census_employee(person)
   census_employee = CensusEmployee.where(first_name: person[:first_name], last_name: person[:last_name]).first
   attributes = {}
   attributes[:household] = person_record.families.first.households.first

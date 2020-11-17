@@ -2022,7 +2022,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
         benefit_package.renew_member_benefit(census_employee)
       end
 
-      let!(:generate_passive_renewal) do
+      let(:generate_passive_renewal) do
         enrollment.update_attributes(aasm_state: 'coverage_enrolled')
         renewal_application.benefit_packages[0].update_attributes(title: current_benefit_package.title + "(#{renewal_application.start_on.year})")
         census_employee.update!(created_at: 2.months.ago)
