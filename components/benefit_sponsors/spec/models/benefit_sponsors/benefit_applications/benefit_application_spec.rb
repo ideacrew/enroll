@@ -1502,7 +1502,7 @@ module BenefitSponsors
 
         it "should persit cancel reason to enrollment" do
           hbx_enrollment.reload
-          expect(hbx_enrollment.termination_reason).to eq "retroactive_canceled"
+          expect(hbx_enrollment.terminate_reason).to eq "retroactive_canceled"
         end
       end
 
@@ -1523,7 +1523,7 @@ module BenefitSponsors
 
         it "should not persit cancel reason to enrollment" do
           hbx_enrollment.reload
-          expect(hbx_enrollment.termination_reason).to eq nil
+          expect(hbx_enrollment.terminate_reason).to eq nil
         end
       end
     end
