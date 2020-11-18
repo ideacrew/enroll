@@ -207,14 +207,14 @@
 <!-- Residency Verification -->
 <% if notice.residency_inconsistency.any? %>
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-    content: "<strong>DC Residency:</strong> A document that shows that the following household members live in the District of Columbia:", top_margin: '5px'} %>
+    content: "<strong>ME Residency:</strong> A document that shows that the following household members live in the Maine:", top_margin: '5px'} %>
 
   <%= render partial: 'notices/shared/household_member_details', :locals => {
    rows: [notice.residency_inconsistency], top_margin: '5px', bottom_margin: '5px'} %>
 
   <%= render partial: 'notices/shared/unordered_list', locals: {
     previous: "This can include any of the following that is in the person’s name:",
-    listings: ["A copy of an active lease agreement, certified deed, or mortgage statement with DC address", "A phone or utility bill from within the past two months","DC voter registration card","A valid District of Columbia motor vehicle registration or DC DMV identification card","Cancelled checks or receipts for mortgage or rental payments on a residential property within the past 2 months","Utility bills with a DC address, and payment receipts within the past 2 months","Proof of automobile insurance showing the person’s DC residency address","A signed DC Department of Motor Vehicles proof of residency form from another District resident stating that the applicant lives at their address in the District. (available at: <a href='https://dmv.dc.gov/page/proof-dc-residency-certifications'>https://dmv.dc.gov/page/proof-dc-residency-certifications</a>)","Self-attestation of residency without paper documentation in exceptional circumstances, including homelessness and in cases of domestic violence"]} %>
+    listings: ["A copy of an active lease agreement, certified deed, or mortgage statement with ME address", "A phone or utility bill from within the past two months","ME voter registration card","A valid Maine motor vehicle registration or ME DMV identification card","Cancelled checks or receipts for mortgage or rental payments on a residential property within the past 2 months","Utility bills with a ME address, and payment receipts within the past 2 months","Proof of automobile insurance showing the person’s ME residency address","A signed ME Department of Motor Vehicles proof of residency form from another District resident stating that the applicant lives at their address in the District. (available at: <a href='https://dmv.dc.gov/page/proof-dc-residency-certifications'>https://dmv.dc.gov/page/proof-dc-residency-certifications</a>)","Self-attestation of residency without paper documentation in exceptional circumstances, including homelessness and in cases of domestic violence"]} %>
 <% end %>
 <!-- Residency Verification -->
 
