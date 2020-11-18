@@ -1454,17 +1454,6 @@ describe Family, "#check_dep_consumer_role", dbclean: :after_each do
   end
 end
 
-describe "min_verification_due_date", dbclean: :after_each do
-  let!(:today) { Date.today }
-  let!(:family) { create(:family, :with_primary_family_member, min_verification_due_date: 5.days.ago) }
-
-  context "::min_verification_due_date_range" do
-    it "returns a family in the range" do
-      expect(Family.min_verification_due_date_range(10.days.ago, today).to_a).to eq([family])
-    end
-  end
-end
-
 describe "has_valid_e_case_id" do
   let!(:family1000) { FactoryBot.create(:family, :with_primary_family_member, e_case_id: nil) }
 

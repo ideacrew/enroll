@@ -1115,7 +1115,7 @@ class Family
         families << family if family.min_verification_due_date.nil?
         next unless family.best_verification_due_date.present?
         families << family if family.best_verification_due_date >= start_date && family.best_verification_due_date <= end_date
-      elsif [family.best_verification_due_date >= start_date, family.best_verification_due_date <= end_date].all?
+      elsif family.best_verification_due_date.present? && family.best_verification_due_date >= start_date && family.best_verification_due_date <= end_date
         families << family
       end
     end
