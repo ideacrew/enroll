@@ -190,7 +190,7 @@ class Family
   scope :with_reset_verifications,              ->{ where(:_id.in => HbxEnrollment.reset_verifications.distinct(:family_id))}
   scope :vlp_fully_uploaded,                    ->{ by_enrollment_individual_market.where(vlp_documents_status: "Fully Uploaded")}
   scope :vlp_partially_uploaded,                ->{ where(vlp_documents_status: "Partially Uploaded")}
-  scope :vlp_none_uploaded,                     ->{ where(:vlp_documents_status.in => ["None",nil])}
+  scope :vlp_none_uploaded,                     ->{ where(:vlp_documents_status.in => ["None", nil])}
   # These are strings so it should sort alphabetically
   scope :documents_uploaded_ascending,          ->{ order_by(:vlp_documents_status.asc)}
   scope :documents_uploaded_descending,         ->{ order_by(:vlp_documents_status.desc)}
@@ -1107,7 +1107,9 @@ class Family
 
   # TODO: Conver this to an aggregate
 
-  def self.min_verification_due_date_range(start_date, end_date, family_scope = self.outstanding_verification_datatable)
+  # rubocop:disable Metrics/CyclomaticComplexity
+
+  def self.min_verification_due_date_range(start_date, end_date, family_scope)
     timekeeper_date = TimeKeeper.date_of_record + 95.days
     families = []
     family_scope.each do |family|
@@ -1121,6 +1123,7 @@ class Family
     end
     where(:_id.in => families&.map(&:id))
   end
+  # rubocop:enable Metrics/CyclomaticComplexity
 
   def all_persons_vlp_documents_status
     outstanding_types = []

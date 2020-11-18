@@ -11,7 +11,7 @@ Given(/^oustanding verfications users exists$/) do
     enrollment = FactoryBot.create(
       :hbx_enrollment,
       :with_enrollment_members,
-      family => family,
+      :family => family,
       :household => family.active_household,
       :aasm_state => 'coverage_selected',
       :is_any_enrollment_member_outstanding => true,
@@ -28,24 +28,31 @@ end
 Given(/^one fully uploaded person exists$/) do
   name_hash = ["Michael", "Fox"]
   @fully_verified_names = []
-  person = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, first_name: name_hash[0], last_name: name_hash[1])
-  @fully_verified_names << person.full_name
-  person.consumer_role.update_attributes!(aasm_state: "fully_verified")
-  family = FactoryBot.create(:family, :with_primary_family_member, person: person)
+  fully_uploaded_person = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, first_name: name_hash[0], last_name: name_hash[1])
+  @fully_verified_names << fully_uploaded_person.full_name
+  fully_uploaded_person.consumer_role.update_attributes!(aasm_state: "fully_verified")
+  fully_uploaded_family = FactoryBot.create(:family, :with_primary_family_member, person: fully_uploaded_person)
   issuer_profile = FactoryBot.create(:benefit_sponsors_organizations_issuer_profile)
   product = FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: 'aca_individual', issuer_profile: issuer_profile)
-  enrollment = FactoryBot.create(:hbx_enrollment, :with_enrollment_members,
-                                 :family => family,
-                                 :household => family.active_household,
-                                 :aasm_state => 'coverage_selected',
-                                 :is_any_enrollment_member_outstanding => true,
-                                 :kind => 'individual',
-                                 :product => product,
-                                 :effective_on => TimeKeeper.date_of_record.beginning_of_year)
-  FactoryBot.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, eligibility_date: (TimeKeeper.date_of_record - 2.months), hbx_enrollment: enrollment)
-  enrollment.save!
-  family.update_attributes!(vlp_documents_status: "Fully Uploaded")
-  expect(Family.vlp_fully_uploaded.last).to eq(family)
+  fully_uploaded_enrollment = FactoryBot.create(
+    :hbx_enrollment,
+    :with_enrollment_members,
+    :family => fully_uploaded_family,
+    :household => fully_uploaded_family.active_household,
+    :aasm_state => 'coverage_selected',
+    :kind => 'individual',
+    :product => product,
+    :effective_on => TimeKeeper.date_of_record.beginning_of_year
+  )
+  fully_uploaded_person_enrollment_member = FactoryBot.create(:hbx_enrollment_member, applicant_id: fully_uploaded_family.primary_applicant.id, eligibility_date: (TimeKeeper.date_of_record - 2.months), hbx_enrollment: fully_uploaded_enrollment)
+  expect(fully_uploaded_enrollment.hbx_enrollment_members).to include(fully_uploaded_person_enrollment_member)
+  fully_uploaded_person.consumer_role.update_attributes!(aasm_state: 'verification_outstanding')
+  fully_uploaded_enrollment.save!
+  expect(fully_uploaded_enrollment.is_any_enrollment_member_outstanding).to eq(true)
+  fully_uploaded_family.update_attributes!(vlp_documents_status: "Fully Uploaded")
+  expect(Family.vlp_fully_uploaded.last).to eq(fully_uploaded_family)
+  expect(Family.where(:_id.in => HbxEnrollment.individual_market.enrolled_and_renewing.by_unverified.distinct(:family_id))).to include(fully_uploaded_family)
+  expect(Family.outstanding_verification_datatable.to_a).to include(fully_uploaded_family)
 end
 
 When(/^Admin clicks Outstanding Verifications$/) do

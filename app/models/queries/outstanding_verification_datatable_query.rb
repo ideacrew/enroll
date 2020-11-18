@@ -26,10 +26,11 @@ module Queries
 
     def build_scope
       family = Family.outstanding_verification_datatable
-      person = Person
       if @custom_attributes[:documents_uploaded].present?
-        family = if @custom_attributes[:documents_uploaded] == 'vlp_fully_uploaded'
-                   Family.vlp_fully_uploaded
+        family = if @custom_attributes[:documents_uploaded] == 'all'
+                   family # Keep the full scope
+                 elsif @custom_attributes[:documents_uploaded] == 'vlp_fully_uploaded'
+                   family.vlp_fully_uploaded
                  elsif
                    family.send(@custom_attributes[:documents_uploaded])
                  end
@@ -39,9 +40,9 @@ module Queries
       end
       if @order_by.keys.first == "name"
         family = if @order_by[@order_by.keys.first] == 1
-                   Family.order_by_name_ascending(family)
+                   family.order_by_name_ascending(family)
                  else
-                   Family.order_by_name_descending(family)
+                   family.order_by_name_descending(family)
                  end
       elsif @order_by.keys.first == 'documents_uploaded'
         family = if @order_by[@order_by.keys.first] == 1
