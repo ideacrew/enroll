@@ -69,11 +69,11 @@ contact_center:
   name: "Maine Cover ME's Customer Care Center"
   alt_name: "Maine Cover ME Customer Service"
   po_box: "PO Box 97022"
-  phone_number: "1-855-532-5465"
+  phone_number: "1-800-965-7476"
   fax: "1-617-933-3099"
   alt_fax: "617-722-4033"
   tty_number: "711"
-  short_number: "(855) 532-5465"
+  short_number: "(800) 965-7476"
   tty: "771"
   alt_phone_number: "1-855-532-LINK"
   payment_phone_number: "855-532-LINK"
@@ -141,7 +141,7 @@ aca:
   state_abbreviation: "ME"
   market_kinds: ["shop", "individual", "fehb"]
 
-  hbx_abbreviation: "DC Health Benefit Exchange"
+  hbx_abbreviation: "Cover ME"
   nationwide_markets: true
   general_agency_enabled: true
   broker_carrier_appointments_enabled: true
