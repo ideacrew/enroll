@@ -26,6 +26,7 @@ module Queries
 
     def build_scope
       family = Family.outstanding_verification_datatable
+      binding.pry
       if @custom_attributes[:documents_uploaded].present?
         family = if @custom_attributes[:documents_uploaded] == 'all'
                    family # Keep the full scope

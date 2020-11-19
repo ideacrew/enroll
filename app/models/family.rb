@@ -1058,13 +1058,14 @@ class Family
     due_date = contingent_enrolled_family_members_due_dates.detect do |date|
       date > TimeKeeper.date_of_record && (date.to_date.mjd - TimeKeeper.date_of_record.mjd) >= 30
     end
-    due_date || contingent_enrolled_family_members_due_dates.last
+    due_date || contingent_enrolled_family_members_due_dates.last || (TimeKeeper.date_of_record + 95.days)
   end
 
   def contingent_enrolled_family_members_due_dates
     due_dates = []
     contingent_enrolled_active_family_members.each do |family_member|
       family_member.person.verification_types.active.each do |v_type|
+        binding.pry if v_type.validation_status == 'validation_status'
         due_dates << v_type.verif_due_date if VerificationType::DUE_DATE_STATES.include? v_type.validation_status
       end
     end

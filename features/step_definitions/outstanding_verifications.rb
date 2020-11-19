@@ -25,6 +25,50 @@ Given(/^oustanding verfications users exists$/) do
   end
 end
 
+# Must contain contingent_enrolled_active_family_members
+Given(/^user with best verification date between 8 months and 5 months ago is present$/) do
+  @person_names = []
+  person = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, first_name: "Kyle", last_name: "Dore")
+  @person_names << person.full_name
+  person.consumer_role.update_attributes!(aasm_state: "verification_outstanding")
+  family_in_range = FactoryBot.create(:family, :with_primary_family_member, person: person)
+  issuer_profile = FactoryBot.create(:benefit_sponsors_organizations_issuer_profile)
+  product = FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: 'aca_individual', issuer_profile: issuer_profile)
+  enrollment = FactoryBot.create(
+    :hbx_enrollment,
+    :with_enrollment_members,
+    :family => family_in_range,
+    :household => family_in_range.active_household,
+    :aasm_state => 'coverage_selected',
+    :is_any_enrollment_member_outstanding => true,
+    :kind => 'individual',
+    :product => product,
+    :effective_on => TimeKeeper.date_of_record.beginning_of_year
+  )
+  FactoryBot.create(:hbx_enrollment_member, applicant_id: family_in_range.primary_applicant.id, eligibility_date: (TimeKeeper.date_of_record - 2.months), hbx_enrollment: enrollment)
+  enrollment.save!
+  Family.by_enrollment_individual_market.where(:'households.hbx_enrollments.is_any_enrollment_member_outstanding' => true)
+  individual_market_transitions = person.individual_market_transitions.create!(role_type: 'consumer', reason_code: 'initial_individual_market_transition_created_using_data_migration')
+  expect(person.primary_family.enrollments.verification_needed.where(:"hbx_enrollment_members.applicant_id" => person.primary_family.family_members.last.id).first.present?).to eq(true)
+  # TODO: Doesn't work for some reason
+  # person.verification_types.last.update_attributes!(validation_status: "outstanding", inactive: false)
+  target_verification_type = person.verification_types.last.update_attributes!(validation_status: "outstanding", update_reason: "cucumber")
+  person.reload
+  expect(person.verification_types.where(validation_status: "outstanding").present?).to eq(true)
+  # TODO: This never persists the validation status into this method
+  #expect(person.primary_family.contingent_enrolled_family_members_due_dates.present?).to eq(true)
+  expect(person.is_consumer_role_active?).to eq(true)
+  # verification_types = person.verification_types.create!(applied_roles: 'consumer_role')
+end
+
+And(/^Admin searches for user with best verification date between 8 months and 5 months ago$/) do
+  fill_in 'custom_datatable_date_from', with: (TimeKeeper.date_of_record - 8.months).strftime('%m/%d/%Y').to_s
+  fill_in 'custom_datatable_date_to', with: (TimeKeeper.date_of_record - 5.months).strftime('%m/%d/%Y').to_s
+  find('#date_range_apply').click
+  sleep 5
+  binding.pry
+end
+
 Given(/^one fully uploaded person exists$/) do
   name_hash = ["Michael", "Fox"]
   @fully_verified_names = []
