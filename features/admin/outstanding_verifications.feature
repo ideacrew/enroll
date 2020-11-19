@@ -23,7 +23,8 @@ Feature: Outstanding Verifications screen
     And Admin clicks the Fully Uploaded filter and only sees fully uploaded results
 
   Scenario: User searches by verification date only shows best verification dates within specified range
-    Given user with best verification date between 8 months and 5 months ago is present
+    Given user with best verification due date 3 months from now is present
+    And other users do not have a best verification due date
     When Admin clicks Outstanding Verifications
     Then the Admin is navigated to the Outstanding Verifications screen
     And Admin searches for user with best verification date between 8 months and 5 months ago

@@ -26,7 +26,7 @@ Given(/^oustanding verfications users exists$/) do
 end
 
 # Must contain contingent_enrolled_active_family_members
-Given(/^user with best verification date between 8 months and 5 months ago is present$/) do
+Given(/^user with best verification due date 3 months from now is present$/) do
   @person_names = []
   person = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, first_name: "Kyle", last_name: "Dore")
   @person_names << person.full_name
@@ -55,18 +55,27 @@ Given(/^user with best verification date between 8 months and 5 months ago is pr
   target_verification_type = person.verification_types.last.update_attributes!(validation_status: "outstanding", update_reason: "cucumber")
   person.reload
   expect(person.verification_types.where(validation_status: "outstanding").present?).to eq(true)
+  person.verification_types.last.reload
   # TODO: This never persists the validation status into this method
-  #expect(person.primary_family.contingent_enrolled_family_members_due_dates.present?).to eq(true)
+  # expect(person.primary_family.contingent_enrolled_family_members_due_dates.present?).to eq(true)
   expect(person.is_consumer_role_active?).to eq(true)
+  expect(family_in_range.best_verification_due_date).to eq(TimeKeeper.date_of_record + 95.days)
   # verification_types = person.verification_types.create!(applied_roles: 'consumer_role')
 end
 
+And(/^other users do not have a best verification due date$/) do
+  Family.all.each do |family|
+    if family.primary_person.first_name != "Kyle" && family.primary_person.last_name != "Dore"
+      expect(family.best_verification_due_date.blank?).to eq(true)
+    end
+  end
+end
+
 And(/^Admin searches for user with best verification date between 8 months and 5 months ago$/) do
-  fill_in 'custom_datatable_date_from', with: (TimeKeeper.date_of_record - 8.months).strftime('%m/%d/%Y').to_s
-  fill_in 'custom_datatable_date_to', with: (TimeKeeper.date_of_record - 5.months).strftime('%m/%d/%Y').to_s
+  fill_in 'custom_datatable_date_from', with: ((TimeKeeper.date_of_record + 95.days) - 1.month).strftime('%Y-%m-%d').to_s
+  fill_in 'custom_datatable_date_to', with: (TimeKeeper.date_of_record + 95.days).strftime('%Y-%m-%d').to_s
   find('#date_range_apply').click
   sleep 5
-  binding.pry
 end
 
 Given(/^one fully uploaded person exists$/) do

@@ -1172,7 +1172,7 @@ describe "#outstanding_verification_datatable scope", dbclean: :after_each do
     let!(:custom_datatable_to) { timekeeper_date + 1.month }
 
     let!(:ivl_person_excluded)       { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, first_name: "Jimmy", last_name: "California") }
-    let!(:ivl_family_excluded)       { FactoryBot.create(:family, :with_primary_family_member, person: ivl_person_excluded, min_verification_due_date: timekeeper_date + 1.year) }
+    let!(:ivl_family_excluded)       { FactoryBot.create(:family, :with_primary_family_member, person: ivl_person_excluded, min_verification_due_date: timekeeper_date - 2.years) }
     let!(:ivl_enrollment_excluded) do
       FactoryBot.create(
         :hbx_enrollment,
@@ -1196,6 +1196,7 @@ describe "#outstanding_verification_datatable scope", dbclean: :after_each do
     end
 
     before(:each) do
+      allow(ivl_family_excluded).to receive(:best_verification_due_date).and_return(timekeeper_date - 2.years)
       ivl_enrollment_2.update_attributes!(aasm_state: "coverage_selected")
     end
     it "should only sort families by best verification date" do
