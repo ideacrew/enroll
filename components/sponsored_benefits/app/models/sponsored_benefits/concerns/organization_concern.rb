@@ -52,7 +52,9 @@ module SponsoredBenefits
       index({ is_active: 1 })
 
       before_save :generate_hbx_id
-      after_update :legal_name_or_fein_change_attributes,:if => :check_legal_name_or_fein_changed?
+      # Commenting out as we implemented feature to update legal name on plan design organization after updating ER legal name.
+      # This will trigger a duplicate notification. And this is the code copied over while moving engines and never got refactored.
+      # after_update :legal_name_or_fein_change_attributes,:if => :check_legal_name_or_fein_changed?
 
       def generate_hbx_id
         write_attribute(:hbx_id, SponsoredBenefits::Organizations::HbxIdGenerator.generate_organization_id) if hbx_id.blank?
