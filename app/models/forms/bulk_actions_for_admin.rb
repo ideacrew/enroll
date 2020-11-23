@@ -54,7 +54,7 @@ module Forms
     private
 
     def eligible_to_transmit(hbx)
-      return true unless hbx.is_shop? || hbx.sponsored_benefit_package.blank?
+      return true unless hbx.is_shop? || hbx.sponsored_benefit_package_id.present?
 
       benefit_package = hbx.sponsored_benefit_package
       benefit_application = benefit_package.benefit_application

@@ -88,6 +88,21 @@ describe Forms::BulkActionsForAdmin, ".cancel_enrollments" do
         hbx_enrollment.reload
         expect(hbx_enrollment.aasm_state).to eq "coverage_canceled"
       end
+
+      context "not a shop enrollment" do
+        before do
+          hbx_enrollment.update_attributes(kind: "individual", sponsored_benefit_package_id: nil)
+        end
+
+        it "should cancel enrollment and trigger cancel event" do
+          expect(subject).to receive(:notify).with("acapi.info.events.hbx_enrollment.terminated", {:reply_to => glue_event_queue_name, "hbx_enrollment_id" => hbx_enrollment.hbx_id,
+                                                                                                   "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment",
+                                                                                                   "is_trading_partner_publishable" => false})
+          subject.cancel_enrollments
+          hbx_enrollment.reload
+          expect(hbx_enrollment.aasm_state).to eq "coverage_canceled"
+        end
+      end
     end
 
     context "cancelling enrollment after quiet period ended" do
@@ -112,6 +127,21 @@ describe Forms::BulkActionsForAdmin, ".cancel_enrollments" do
         subject.cancel_enrollments
         hbx_enrollment.reload
         expect(hbx_enrollment.aasm_state).to eq "coverage_canceled"
+      end
+
+      context "not a shop enrollment" do
+        before do
+          hbx_enrollment.update_attributes(kind: "individual", sponsored_benefit_package_id: nil)
+        end
+
+        it "should cancel enrollment and trigger cancel event" do
+          expect(subject).to receive(:notify).with("acapi.info.events.hbx_enrollment.terminated", {:reply_to => glue_event_queue_name, "hbx_enrollment_id" => hbx_enrollment.hbx_id,
+                                                                                                   "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment",
+                                                                                                   "is_trading_partner_publishable" => false})
+          subject.cancel_enrollments
+          hbx_enrollment.reload
+          expect(hbx_enrollment.aasm_state).to eq "coverage_canceled"
+        end
       end
     end
 
@@ -138,6 +168,22 @@ describe Forms::BulkActionsForAdmin, ".cancel_enrollments" do
         expect(hbx_enrollment.aasm_state).to eq "coverage_terminated"
         expect(hbx_enrollment.terminated_on).to eq current_effective_date.end_of_month
       end
+
+      context "not a shop enrollment" do
+        before do
+          hbx_enrollment.update_attributes(kind: "individual", sponsored_benefit_package_id: nil)
+        end
+
+        it "should terminate enrollment and trigger terminate event" do
+          expect(subject).to receive(:notify).with("acapi.info.events.hbx_enrollment.terminated", {:reply_to => glue_event_queue_name, "hbx_enrollment_id" => hbx_enrollment.hbx_id,
+                                                                                                   "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment",
+                                                                                                   "is_trading_partner_publishable" => false})
+          subject.terminate_enrollments
+          hbx_enrollment.reload
+          expect(hbx_enrollment.aasm_state).to eq "coverage_terminated"
+          expect(hbx_enrollment.terminated_on).to eq current_effective_date.end_of_month
+        end
+      end
     end
 
     context "terminating enrollment after quiet period ended" do
@@ -162,6 +208,22 @@ describe Forms::BulkActionsForAdmin, ".cancel_enrollments" do
         hbx_enrollment.reload
         expect(hbx_enrollment.aasm_state).to eq "coverage_terminated"
         expect(hbx_enrollment.terminated_on).to eq current_effective_date.end_of_month
+      end
+
+      context "not a shop enrollment" do
+        before do
+          hbx_enrollment.update_attributes(kind: "individual", sponsored_benefit_package_id: nil)
+        end
+
+        it "should terminate enrollment and trigger terminate event" do
+          expect(subject).to receive(:notify).with("acapi.info.events.hbx_enrollment.terminated", {:reply_to => glue_event_queue_name, "hbx_enrollment_id" => hbx_enrollment.hbx_id,
+                                                                                                   "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment",
+                                                                                                   "is_trading_partner_publishable" => false})
+          subject.terminate_enrollments
+          hbx_enrollment.reload
+          expect(hbx_enrollment.aasm_state).to eq "coverage_terminated"
+          expect(hbx_enrollment.terminated_on).to eq current_effective_date.end_of_month
+        end
       end
     end
   end
