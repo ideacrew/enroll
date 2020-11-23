@@ -1510,7 +1510,7 @@ class HbxEnrollment
     end
 
     event :renew_waived, :after => :record_transition do
-      transitions from: :shopping, to: :renewing_waived
+      transitions from: :shopping, to: :renewing_waived, after: :propogate_waiver
     end
 
     event :select_coverage, :after => :record_transition do
