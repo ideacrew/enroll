@@ -447,6 +447,30 @@ RSpec.describe ApplicationHelper, :type => :helper do
       expect(helper.find_plan_name(invalid_enrollment_id)).to eq  nil
     end
   end
+
+  describe 'participation_rule', :dbclean => :after_each do
+    include_context 'setup benefit market with market catalogs and product packages'
+    include_context 'setup initial benefit application' do
+      let(:aasm_state) {:enrollment_closed}
+    end
+    include_context 'setup employees with benefits'
+    let!(:employer) {abc_profile}
+
+    context 'for 1/1 plan year' do
+      it 'should return yes' do
+        expect(helper.participation_rule(employer)).to eq '1. 2/3 Rule Met? : Yes'
+      end
+    end
+
+    context 'for non 1/1 plan year' do
+      let!(:date_range) {initial_application.effective_period}
+      let!(:initial_application_update) {initial_application.update_attributes(effective_period: date_range.min + 1.month..date_range.max + 1.month)}
+
+      it 'should return no' do
+        expect(helper.participation_rule(employer)).to eq '1. 2/3 Rule Met? : No (4 more required)'
+      end
+    end
+  end
 end
 
   describe "Enabled/Disabled IVL market" do

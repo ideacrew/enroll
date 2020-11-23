@@ -695,9 +695,14 @@ module ApplicationHelper
   end
 
   def participation_rule(employer)
+    benefit_application = employer.show_plan_year
+    start_date = benefit_application.effective_period.min
     @participation_count = employer.show_plan_year.additional_required_participants_count
 
-    if @participation_count == 0
+    if start_date.day == 1 && start_date.month == 1
+      @participation_count = 0
+      '1. 2/3 Rule Met? : Yes'
+    elsif @participation_count == 0
       "1. 2/3 Rule Met? : Yes"
     else
       "1. 2/3 Rule Met? : No (#{@participation_count} more required)"
