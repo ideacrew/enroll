@@ -465,7 +465,7 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
           allow(census_employee).to receive(:update_for_cobra).and_return false
           xhr :get, :cobra, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, cobra_date: cobra_date.to_s, :format => :js
           expect(response).to have_http_status(:success)
-          expect(flash[:error]).to eq "COBRA cannot be initiated for this employee because cobra initiation date should be after coverage termination date"
+          expect(flash[:error]).to eq "COBRA cannot be initiated for this employee with the effective date entered. Please contact #{Settings.site.short_name} at #{Settings.contact_center.phone_number} for further assistance."
         end
       end
 
