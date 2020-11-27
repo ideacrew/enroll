@@ -133,9 +133,11 @@ When (/^Employer Staff clicks documents tab$/) do
 end
 
 def enter_plan_year_info
+  renewal_rating_area
+  rating_area
   wait_for_ajax(2,2)
   find(:xpath, "//p[@class='label'][contains(., 'SELECT START ON')]", :wait => 3).click
-  find(:xpath, "//li[@data-index='1'][contains(., '#{(effective_period.min).year}')]", :wait => 3).click
+  find('.interaction-choice-control-bastartdate-1', wait: 3).click
   find('.interaction-field-control-fteemployee').click
   fill_in 'benefit_application[fte_count]', with: '3'
   fill_in 'benefit_application[pte_count]', with: '3'

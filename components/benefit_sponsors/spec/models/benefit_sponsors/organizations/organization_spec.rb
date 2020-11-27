@@ -108,6 +108,37 @@ module BenefitSponsors
 
     end
 
+    context "on legal name change or fein change" do
+      let(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+      let(:organization)   { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+      let(:employer_profile)        { organization.employer_profile }
 
+      let!(:plan_design_organization) do
+        ::SponsoredBenefits::Organizations::PlanDesignOrganization.create!(
+          sponsor_profile_id: employer_profile.id,
+          owner_profile_id: "5678",
+          legal_name: "ABC Company",
+          sic_code: "0345",
+          office_locations: [
+            ::SponsoredBenefits::Organizations::OfficeLocation.new(
+              is_primary: true,
+              address: ::SponsoredBenefits::Locations::Address.new(kind: 'home', zip: '11111')
+            )
+          ]
+        )
+      end
+
+      it "should update legal name on plan design organization" do
+        organization.update_attributes(legal_name: 'ABC Company Changed')
+        plan_design_organization.reload
+        expect(plan_design_organization.legal_name).to eq('ABC Company Changed')
+      end
+
+      it "should update fein on plan design organization" do
+        organization.update_attributes(fein: '123456789')
+        plan_design_organization.reload
+        expect(plan_design_organization.fein).to eq('123456789')
+      end
+    end
   end
 end
