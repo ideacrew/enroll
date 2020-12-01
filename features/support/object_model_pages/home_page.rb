@@ -2,54 +2,43 @@
 
 class HomePage
 
-  include RSpec::Matchers
-  include Capybara::DSL
-
-  def dc_health_link_logo
-    '//a[@class="navbar-brand pr-3 pt-3 pb-3"]/img'
+  def self.employee_portal_btn
+    '//a[contains(text(), "Employee Portal")]'
   end
 
-  def welcome_text
-    '//h1[@class="text-center heading-text mb-0 pt-5 welcome-text"]/strong'
+  def self.consumer_family_portal_btn
+    '(//a[contains(text(), "Consumer/Family Portal")])[1]'
   end
 
-  def employee_portal_btn
-    '//a[text()="Employee Portal"]'
+  def self.assisted_consumer_family_portal_btn
+    '(//a[contains(text(), "Assisted Consumer/Family Portal")])[1]'
   end
 
-  def consumer_family_portal_btn
-    '//a[text()="Consumer/Family Portal"]'
+  def self.returning_user_btn
+    '//a[contains(text(), "Returning User")]'
   end
 
-  def assisted_consumer_family_portal_btn
-    '//a[text()="Assisted Consumer/Family Portal"]'
+  def self.employer_portal_btn
+    '//a[contains(text(), "Employer Portal")]'
   end
 
-  def returning_user_btn
-    '//a[text()="Returning User"]'
+  def self.broker_agency_portal_btn
+    '//a[contains(text(), "Broker Agency Portal")]'
   end
 
-  def employer_portal_btn
-    '//a[text()="Employer Portal"]'
+  def self.general_agency_portal_btn
+    '//a[contains(text(), "General Agency Portal")]'
   end
 
-  def broker_agency_portal_btn
-    '//a[text()="Broker Agency Portal"]'
+  def self.hbx_portal_btn
+    '.hbx-portal'
   end
 
-  def general_agency_portal_btn
-    '//a[text()="General Agency Portal"]'
+  def self.broker_registration_btn
+    '.broker-registration'
   end
 
-  def hbx_portal_btn
-    '//a[text()="HBX Portal"]'
-  end
-
-  def broker_registration_btn
-    '//a[text()="Broker Registration"]'
-  end
-
-  def general_agency_registration_btn
-    '//a[text()="General Agency Registration"]'
+  def self.general_agency_registration_btn
+    '//a[contains(text(), "General Agency Registration")]'
   end
 end

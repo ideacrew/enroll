@@ -2,103 +2,100 @@
 
 class BrokerRegistration
 
-  include RSpec::Matchers
-  include Capybara::DSL
-
-  def broker_registration_form
-    '//form[@id="broker_registration_form"]'
+  def self.broker_registration_form
+    '#broker_registration_form'
   end
 
-  def broker_tab
-    '//a[@id="ui-id-1"]'
+  def self.broker_tab
+    '#ui-id-1'
   end
 
-  def first_name
-    '//input[@id="inputFirstname"]'
+  def self.first_name
+    'inputFirstname'
   end
 
-  def last_name
-    '//input[@id="inputLastname"]'
+  def self.last_name
+    'inputLastname'
   end
 
-  def broker_dob
-    '//input[@id="inputDOB"]'
+  def self.broker_dob
+    'agency[staff_roles_attributes][0][dob]'
   end
 
-  def email
-    '//input[@id="inputEmail"]'
+  def self.email
+    'inputEmail'
   end
 
-  def npn
-    '//input[@id="inputNPN"]'
+  def self.npn
+    'inputNPN'
   end
 
-  def broker_agency_inf_text
-    '//h4[@class="mb-2"]/preceding-sibling::legend'
+  def self.legal_name
+    'validationCustomLegalName'
   end
 
-  def legal_name
-    '//input[@id="validationCustomLegalName"]'
+  def self.dba
+    'validationCustomdba'
   end
 
-  def dba
-    '//input[@id="validationCustomdba"]'
+  def self.practice_area_dropdown
+    'agency_organization_profile_attributes_market_kind'
   end
 
-  def practice_area_dropdown
-    '//select[@id="agency_organization_profile_attributes_market_kind"]'
+  def self.select_languages
+    'broker_agency_language_select'
   end
 
-  def select_languages
-    '//select[@id="broker_agency_language_select"]'
+  def self.evening_hours_checkbox
+    '#agency_organization_profile_attributes_working_hours'
   end
 
-  def evening_hours_checkbox
-    '//input[@id="agency_organization_profile_attributes_working_hours"]'
+  def self.accept_new_client_checkbox
+    '#agency_organization_profile_attributes_accept_new_clients'
   end
 
-  def accept_new_client_checkbox
-    '//input[@id="agency_organization_profile_attributes_accept_new_clients"]'
+  def self.address
+    'inputAddress1'
   end
 
-  def address
-    '//input[@id="inputAddress1"]'
+  def self.kind_dropdown
+    'kindSelect'
   end
 
-  def kind_dropdown
-    '//select[@id="kindSelect"]'
+  def self.address2
+    'agency_organization_profile_attributes_office_locations_attributes_0_address_attributes_address_2'
   end
 
-  def address2
-    '//input[@id="agency_organization_profile_attributes_office_locations_attributes_0_address_attributes_address_2"]'
+  def self.city
+    'agency_organization_profile_attributes_office_locations_attributes_0_address_attributes_city'
   end
 
-  def city
-    '//input[@id="agency_organization_profile_attributes_office_locations_attributes_0_address_attributes_city"]'
+  def self.state_dropdown
+    'inputState'
   end
 
-  def state_dropdown
-    '//select[@id="inputState"]'
+  def self.zip
+    'inputZip'
   end
 
-  def zip
-    '//input[@id="inputZip"]'
+  def self.area_code
+    'inputAreacode'
   end
 
-  def area_code
-    '//input[@id="inputAreacode"]'
+  def self.number
+    'inputNumber'
   end
 
-  def number
-    '//input[@id="inputNumber"]'
+  def self.add_office_location_btn
+    '#addOfficeLocation'
   end
 
-  def add_office_location_btn
-    '//a[@id="addOfficeLocation"]'
+  def self.create_broker_agency_btn
+    '#broker-btn'
   end
 
-  def create_broker_agency_btn
-    '//input[@id="broker-btn"]'
+  def self.registration_submitted_succesful_message
+    'Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed.'
   end
 
 end

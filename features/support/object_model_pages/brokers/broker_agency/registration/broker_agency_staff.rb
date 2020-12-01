@@ -2,42 +2,36 @@
 
 class BrokerAgencyStaffRegistration
 
-  include RSpec::Matchers
-  include Capybara::DSL
-
-  def broker_agency_staff_tab
-    '//a[@id="ui-id-2"]'
+  def self.broker_agency_staff_tab
+    '#ui-id-2'
   end
 
-  def first_name
-    '(//input[@id="inputFirstname"])[2]'
+  def self.first_name
+    'staff[first_name]'
   end
 
-  def last_name
-    '(//input[@id="inputLastname"])[2]'
+  def self.last_name
+    'staff[last_name]'
   end
 
-  def dob
-    '//input[@id="inputStaffDOB"]'
+  def self.dob
+    'staff[dob]'
   end
 
-  def email
-    '(//input[@id="inputEmail"])[2]'
+  def self.email
+    'staff[email]'
   end
 
-  def select_your_broker
-    '//input[@id="staff_agency_search"]'
+  def self.select_your_broker
+    'staff_agency_search'
   end
 
-  def search_btn
-    '//a[@class="btn btn-select search"]'
+  def self.search_btn
+    '.btn-select'
   end
 
-  def submit_application_btn
-    '//button[@id="broker-staff-btn"]'
+  def self.submit_application_btn
+    '#broker-staff-btn'
   end
 
-  def no_broker_agencies_found_error_msg
-    '//span[text()=" No Broker Agencies Found "]'
-  end
 end

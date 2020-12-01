@@ -2,34 +2,27 @@
 
 class SignIn
 
-  include RSpec::Matchers
-  include Capybara::DSL
-
-  def sign_in_text
-    '//h1[text()="Sign In"]'
+  def self.username
+    'user_login'
   end
 
-  def username
-    '//input[@id="user_login"]'
+  def self.password
+    'user[password]'
   end
 
-  def password
-    '//input[@id="user_password"]'
+  def self.remember_me_checkbox
+    '#user_remember_me'
   end
 
-  def remember_me_checkbox
-    '//input[@id="user_remember_me"]'
+  def self.sign_in_btn
+    '.sign-in-btn'
   end
 
-  def sign_in_btn
-    '//input[@class="btn btn-primary sign-in-btn"]'
+  def self.forgot_your_password_btn
+    '//a[contains(text(), "Forgot your password?")]'
   end
 
-  def forgot_your_password_btn
-    '//a[text()="Forgot your password?"]'
-  end
-
-  def create_account_btn
-    '//a[text()="Create account"]'
+  def self.create_account_btn
+    '//a[contains(text(), "Create account")]'
   end
 end

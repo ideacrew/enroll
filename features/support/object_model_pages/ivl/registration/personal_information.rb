@@ -2,23 +2,20 @@
 
 class PersonalInformation
 
-  include RSpec::Matchers
-  include Capybara::DSL
-
-  def first_name
-    '//input[@id="person_first_name"]'
+  def self.first_name
+    'person[first_name]'
   end
 
-  def middle_name
-    '//input[@id="person_middle_name"]'
+  def self.middle_name
+    'person[middle_name]'
   end
 
-  def last_name
-    '//input[@id="person_last_name"]'
+  def self.last_name
+    'person[last_name]'
   end
 
-  def suffix_dropdown
-    '//div[@class="selectric"]'
+  def self.suffix_dropdown
+    'selectric-wrapper'
   end
 
   def applying_coverage_yes_radiobtn

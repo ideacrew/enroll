@@ -2,98 +2,99 @@
 
 class GeneralAgencyRegistration
 
-  include RSpec::Matchers
-  include Capybara::DSL
-
-  def general_agency_tab
-    '//a[@id="ui-id-1"]'
+  def self.general_agency_tab
+    '#ui-id-1'
   end
 
-  def first_name
-    '//input[@id="inputFirstname"]'
+  def self.general_agency_staff_tab
+    '#ui-id-2'
   end
 
-  def last_name
-    '//input[@id="inputLastname"]'
+  def self.first_name
+    'agency[staff_roles_attributes][0][first_name]'
   end
 
-  def ga_dob
-    '//input[@id="inputDOB"]'
+  def self.last_name
+    'agency[staff_roles_attributes][0][last_name]'
   end
 
-  def email
-    '//input[@id="inputEmail"]'
+  def self.dob
+    'agency[staff_roles_attributes][0][dob]'
   end
 
-  def npn
-    '//input[@id="inputNPN"]'
+  def self.email
+    'agency[staff_roles_attributes][0][email]'
   end
 
-  def legal_name
-    '//input[@id="validationCustomLegalName"]'
+  def self.npn
+    'agency[staff_roles_attributes][0][npn]'
   end
 
-  def dba
-    '//input[@id="validationCustomdba"]'
+  def self.legal_name
+    'validationCustomLegalName'
   end
 
-  def fein
-    '//input[@id="inputFein"]'
+  def self.dba
+    'validationCustomdba'
   end
 
-  def practice_area_dropdown
-    '//select[@id="agency_organization_profile_attributes_market_kind"]'
+  def self.fein
+    'agency[organization][fein]'
   end
 
-  def select_languages
-    '//select[@id="broker_agency_language_select"]'
+  def self.practice_area_dropdown
+    'agency_organization_profile_attributes_market_kind'
   end
 
-  def evening_hours_checkbox
-    '//input[@id="agency_organization_profile_attributes_working_hours"]'
+  def self.select_languages
+    'broker_agency_language_select'
   end
 
-  def accept_new_client_checkbox
-    '//input[@id="agency_organization_profile_attributes_accept_new_clients"]'
+  def self.evening_hours_checkbox
+    '#agency_organization_profile_attributes_working_hours'
   end
 
-  def address
-    '//input[@id="inputAddress1"]'
+  def self.accept_new_client_checkbox
+    '#agency_organization_profile_attributes_accept_new_clients'
   end
 
-  def kind_dropdown
-    '//select[@id="kindSelect"]'
+  def self.address
+    'agency[organization][profile_attributes][office_locations_attributes][0][address_attributes][address_1]'
   end
 
-  def address2
-    '//input[@id="agency_organization_profile_attributes_office_locations_attributes_0_address_attributes_address_2"]'
+  def self.kind_dropdown
+    '#kindSelect'
   end
 
-  def city
-    '//input[@id="agency_organization_profile_attributes_office_locations_attributes_0_address_attributes_city"]'
+  def self.address2
+    'agency_organization_profile_attributes_office_locations_attributes_0_address_attributes_address_2'
   end
 
-  def state_dropdown
-    '//select[@id="inputState"]'
+  def self.city
+    'agency_organization_profile_attributes_office_locations_attributes_0_address_attributes_city'
   end
 
-  def zip
-    '//input[@id="inputZip"]'
+  def self.state_dropdown
+    'agency[organization][profile_attributes][office_locations_attributes][0][address_attributes][state]'
   end
 
-  def area_code
-    '//input[@id="inputAreacode"]'
+  def self.zip
+    'agency[organization][profile_attributes][office_locations_attributes][0][address_attributes][zip]'
   end
 
-  def number
-    '//input[@id="inputNumber"]'
+  def self.area_code
+    'agency[organization][profile_attributes][office_locations_attributes][0][phone_attributes][area_code]'
   end
 
-  def add_office_location_btn
-    '//a[@id="addOfficeLocation"]'
+  def self.number
+    'agency[organization][profile_attributes][office_locations_attributes][0][phone_attributes][number]'
   end
 
-  def create_general_agency_btn
-    '//input[@id="general-btn"]'
+  def self.add_office_location_btn
+    '#addOfficeLocation'
+  end
+
+  def self.create_general_agency_btn
+    '#general-btn'
   end
 end

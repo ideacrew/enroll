@@ -2,46 +2,31 @@
 
 class GeneralAgencyStaffRegistration
 
-  include RSpec::Matchers
-  include Capybara::DSL
-
-  def general_agency_staff_tab
-    '//a[@id="ui-id-2"]'
+  def self.first_name
+    'staff[first_name]'
   end
 
-  def first_name
-    '(//input[@id="inputFirstname"])[2]'
+  def self.last_name
+    'staff[last_name]'
   end
 
-  def last_name
-    '(//input[@id="inputLastname"])[2]'
+  def self.dob
+    'staff[dob]'
   end
 
-  def dob
-    '//input[@id="inputStaffDOB"]'
+  def self.email
+    'staff[email]'
   end
 
-  def email
-    '(//input[@id="inputEmail"])[2]'
+  def self.select_your_general_agency
+    'staff[agency_search]'
   end
 
-  def select_your_general_agency
-    '//input[@id="staff_agency_search"]'
+  def self.search_btn
+    '.search'
   end
 
-  def search_btn
-    '//a[@class="btn btn-select search"]'
-  end
-
-  def submit_application_btn
-    '//button[@id="general-agency-staff-btn"]'
-  end
-
-  def no_general_agencies_found_error_msg
-    '//span[text()=" No General Agencies Found "]'
-  end
-
-  def select_this_general_agency_btn
-    '//a[@class="btn btn-primary select-general-agency"]'
+  def self.submit_application_btn
+    '#general-agency-staff-btn'
   end
 end
