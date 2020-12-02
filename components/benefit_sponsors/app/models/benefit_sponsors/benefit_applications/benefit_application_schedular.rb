@@ -189,7 +189,7 @@ module BenefitSponsors
             dates_map[k] = Date.strptime(v, '%Y,%m,%d')
           end
 
-        dates_map[start_on.strftime('%Y-%m-%d')] || enrollment_timetable_by_effective_date(start_on)[:binder_payment_due_date]
+        dates_map[start_on.strftime('%Y-%m-%d')] || enrollment_timetable_by_effective_date(start_on)[:binder_payment_due_on]
       end
 
       def shop_enrollment_timetable(new_effective_date)
