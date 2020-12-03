@@ -49,7 +49,7 @@ module BenefitSponsors
       end
 
       context "instantiated using .new" do
-        let(:today)               { Date.today }
+        let(:today)               { TimeKeeper.date_of_record }
         let(:effective_begin_on)  { today.next_month.beginning_of_month }
 
         let(:params) do
@@ -190,7 +190,7 @@ module BenefitSponsors
         sponsorship.save
         sponsorship
       end
-      let(:next_year)                           { Date.today.year + 1 }
+      let(:next_year)                           { TimeKeeper.date_of_record.year + 1 }
       let(:application_period_next_year)        { (Date.new(next_year,1,1))..(Date.new(next_year,12,31)) }
       let!(:issuer_profile)  { FactoryBot.create :benefit_sponsors_organizations_issuer_profile, assigned_site: site}
       let!(:benefit_market_catalog_next_year)   { FactoryBot.create(:benefit_markets_benefit_market_catalog, :with_product_packages, issuer_profile: issuer_profile, benefit_market: benefit_market, application_period: application_period_next_year) }
@@ -289,7 +289,7 @@ module BenefitSponsors
 
     describe "Transitioning a BenefitSponsorship through Initial Application Workflow States" do
       let(:benefit_sponsorship)                 { employer_profile.add_benefit_sponsorship }
-      let(:this_year)                           { Date.today.year }
+      let(:this_year)                           { TimeKeeper.date_of_record.year }
       let(:benefit_sponsor_catalog) { FactoryBot.create(:benefit_markets_benefit_sponsor_catalog, service_areas: [service_area]) }
       let(:service_area) { create_default(:benefit_markets_locations_service_area) }
       let(:benefit_application) do
@@ -302,7 +302,7 @@ module BenefitSponsors
       end
 
       context "and system date is set to today" do
-        before { TimeKeeper.set_date_of_record_unprotected!(Date.today) }
+        before { TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record) }
 
         it "benefit_sponsorship should initialize in state: :applicant" do
           expect(benefit_sponsorship.aasm_state).to eq :applicant
@@ -327,7 +327,7 @@ module BenefitSponsors
               }
 
               after {
-                TimeKeeper.set_date_of_record_unprotected!(Date.today)
+                TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
               }
 
               it "should remain in applicant state" do
@@ -341,7 +341,7 @@ module BenefitSponsors
                 }
 
                 after {
-                  TimeKeeper.set_date_of_record_unprotected!(Date.today)
+                  TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
                 }
 
                 it "benefit_sponsorship should remain in applicant state" do
@@ -367,7 +367,7 @@ module BenefitSponsors
                     }
 
                     after {
-                      TimeKeeper.set_date_of_record_unprotected!(Date.today)
+                      TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
                     }
 
                     it "benefit_sponsorship should transition to state: :active" do
@@ -670,7 +670,7 @@ module BenefitSponsors
         )
       end
 
-      let(:current_date)                    { Date.today }
+      let(:current_date)                    { TimeKeeper.date_of_record }
 
       before { TimeKeeper.set_date_of_record_unprotected!(current_date) }
 
@@ -1026,7 +1026,7 @@ module BenefitSponsors
         let(:current_date)  { Date.new(this_year, 4, 10) }
         before { TimeKeeper.set_date_of_record_unprotected!(current_date) }
 
-        after { TimeKeeper.set_date_of_record_unprotected!(Date.today) }
+        after { TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record) }
 
         context "when overlapping benefit application present with status as" do
           let(:new_effective_date)            { Date.new(this_year,4,1) }
@@ -1111,7 +1111,7 @@ module BenefitSponsors
           TimeKeeper.set_date_of_record_unprotected!(april_open_enrollment_end_on + 1.day)
         }
 
-        after { TimeKeeper.set_date_of_record_unprotected!(Date.today) }
+        after { TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record) }
 
         context "when open enrollment extended application present" do
           let(:aasm_state) { :enrollment_extended }

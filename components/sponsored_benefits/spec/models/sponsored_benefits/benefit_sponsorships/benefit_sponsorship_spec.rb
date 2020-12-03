@@ -1,5 +1,7 @@
 require 'rails_helper'
 
+# Date.today convereted to TimeKeeper.date_of_record 
+
 module SponsoredBenefits
   RSpec.describe BenefitSponsorships::BenefitSponsorship, type: :model, dbclean: :after_each do
 
@@ -60,7 +62,7 @@ module SponsoredBenefits
       let(:month_value_over)              { 13 }
       let(:enrollment_dates_reversed)     { initial_enrollment_period.end..initial_enrollment_period.begin  }
 
-      let(:first_of_next_month)           { Date.today.end_of_month + 1.day }
+      let(:first_of_next_month)           { TimeKeeper.date_of_record.end_of_month + 1.day }
       let(:enrollment_dates_as_time)      { (first_of_next_month.to_time)..(first_of_next_month + 1.year - 1.day).to_time  }
 
 

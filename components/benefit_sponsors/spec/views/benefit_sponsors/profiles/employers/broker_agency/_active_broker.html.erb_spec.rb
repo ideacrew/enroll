@@ -1,4 +1,7 @@
 require 'rails_helper'
+
+# Date.today converted to TimeKeeper.date_of_record
+
 RSpec.describe "views/benefit_sponsors/profiles/employers/broker_agency/_active_broker.html.erb", :type => :view, dbclean: :after_each do
 
   let!(:site)  { FactoryBot.create(:benefit_sponsors_site, :with_owner_exempt_organization, :cca, :with_benefit_market) }
@@ -17,7 +20,7 @@ RSpec.describe "views/benefit_sponsors/profiles/employers/broker_agency/_active_
 
   before :each do
     view.extend BenefitSponsors::Engine.routes.url_helpers
-    TimeKeeper.set_date_of_record_unprotected!(Date.today)
+    TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
     sign_in user
     assign(:employer_profile, employer_profile)
     assign(:broker_agency_account, broker_agency_account)

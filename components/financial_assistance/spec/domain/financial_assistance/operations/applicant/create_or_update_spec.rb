@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# Date.today converted to TimeKeeper.date_of_record
+
 require 'rails_helper'
 RSpec.describe FinancialAssistance::Operations::Applicant::CreateOrUpdate, dbclean: :after_each do
   let(:family_id) { BSON::ObjectId.new }
@@ -14,7 +16,7 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CreateOrUpdate, dbcle
                           :with_home_address,
                           application: application,
                           ssn: '889984400',
-                          dob: (Date.today - 10.years),
+                          dob: (TimeKeeper.date_of_record - 10.years),
                           first_name: 'james',
                           last_name: 'bond',
                           is_primary_applicant: true)
@@ -23,7 +25,7 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CreateOrUpdate, dbcle
       let(:applicant_params) do
         {:person_hbx_id=>"13cce9fe14b04209b2443330900108d8",
          :ssn=>"889984401",
-         :dob=>(Date.today - 1.years).strftime("%d/%m/%Y"),
+         :dob=>(TimeKeeper.date_of_record - 1.years).strftime("%d/%m/%Y"),
          first_name: "childfirst",
          last_name: "childlast",
          gender: "male",
@@ -82,7 +84,7 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CreateOrUpdate, dbcle
                           :with_home_address,
                           application: application,
                           ssn: '889984400',
-                          dob: (Date.today - 10.years),
+                          dob: (TimeKeeper.date_of_record - 10.years),
                           first_name: 'james',
                           last_name: 'bond',
                           :is_applying_coverage=>true,
@@ -124,7 +126,7 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CreateOrUpdate, dbcle
         appl = FactoryBot.create(:financial_assistance_applicant,
                           application: application,
                           ssn: '889984400',
-                          dob: (Date.today - 10.years),
+                          dob: (TimeKeeper.date_of_record - 10.years),
                           first_name: 'james',
                           last_name: 'bond',
                           :is_applying_coverage=>true,
@@ -153,7 +155,7 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CreateOrUpdate, dbcle
                                :citizen_status=>"us_citizen",
                                :citizenship_number=>nil,
                                :country_of_citizenship=>nil,
-                               :dob=> (Date.today - 10.years).strftime("%d/%m/%Y"),
+                               :dob=> (TimeKeeper.date_of_record - 10.years).strftime("%d/%m/%Y"),
                                :emails=>[{:address=>"example1@example.com", :kind=>"work"}],
                                :encrypted_ssn=>"wFDFw1whehQ1Udku1/79DA==\n",
                                :ethnicity=>nil,
