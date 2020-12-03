@@ -455,15 +455,19 @@ RSpec.describe ApplicationHelper, :type => :helper do
     end
     include_context 'setup employees with benefits'
     let!(:employer) {abc_profile}
+    let!(:date_range) do
+      date = initial_application.effective_period.min.beginning_of_year
+      date..date + 12.months - 1.day
+    end
 
     context 'for 1/1 plan year' do
       it 'should return yes' do
+        initial_application.update_attributes(effective_period: date_range)
         expect(helper.participation_rule(employer)).to eq '1. 2/3 Rule Met? : Yes'
       end
     end
 
     context 'for non 1/1 plan year' do
-      let!(:date_range) {initial_application.effective_period}
       let!(:initial_application_update) {initial_application.update_attributes(effective_period: date_range.min + 1.month..date_range.max + 1.month)}
 
       it 'should return no' do
