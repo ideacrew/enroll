@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Date.today converted to TimeKeeper.date_of_record
 
 FactoryBot.define do
@@ -20,13 +22,13 @@ FactoryBot.define do
     # end
 
     trait :with_owner_exempt_organization do
-      after :build do |site, evaluator|
+      after :build do |site, _evaluator|
         site.owner_organization = build(:benefit_sponsors_organizations_exempt_organization, :with_hbx_profile, site: site)
       end
     end
 
     trait :as_hbx_profile do
-      after :build do |site, evaluator|
+      after :build do |site, _evaluator|
         site.owner_organization = build(:benefit_sponsors_organizations_exempt_organization, :with_hbx_profile, site: site)
       end
     end
@@ -42,7 +44,7 @@ FactoryBot.define do
     end
 
     trait :with_benefit_market_catalog do
-      after :create do |site, evaluator|
+      after :create do |site, _evaluator|
         create(:benefit_markets_benefit_market_catalog, benefit_market: site.benefit_markets[0])
       end
     end

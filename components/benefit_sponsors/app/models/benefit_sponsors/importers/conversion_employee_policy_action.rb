@@ -46,7 +46,7 @@ module BenefitSponsors
                                                    })
         # Date.today converted to TimeKeeper.date_of_record
         non_terminated_employees = candidate_employees.reject do |ce|
-          (!ce.employment_terminated_on.blank?) && ce.employment_terminated_on <= TimeKeeper.date_of_record
+          !ce.employment_terminated_on.blank? && ce.employment_terminated_on <= TimeKeeper.date_of_record
         end
 
         @found_employee = non_terminated_employees.sort_by(&:hired_on).last

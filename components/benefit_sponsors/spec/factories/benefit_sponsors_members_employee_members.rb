@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Date.today converted to TimeKeeper.date_of_record
 
 FactoryBot.define do
