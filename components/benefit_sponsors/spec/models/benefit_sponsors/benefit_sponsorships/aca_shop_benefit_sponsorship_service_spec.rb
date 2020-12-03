@@ -96,7 +96,8 @@ module BenefitSponsors
 
       after do
         # Does this do what we think it does?
-        TimeKeeper.set_date_of_record_unprotected!(Date.today)
+        # Date.today converted to TimeKeeper.date_of_record
+        TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
       end
 
       context 'cancel the application when under enrollment close state' do

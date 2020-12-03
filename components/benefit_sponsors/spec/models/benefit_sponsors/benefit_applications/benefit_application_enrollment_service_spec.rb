@@ -13,7 +13,8 @@ module BenefitSponsors
     include_context "setup benefit market with market catalogs and product packages"
 
     before do
-      TimeKeeper.set_date_of_record_unprotected!(Date.today)
+      # Date.today converted to TimeKeeper.date_of_record
+      TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
     end
 
     describe '.renew' do
@@ -27,7 +28,7 @@ module BenefitSponsors
       end
 
       after(:each) do
-        TimeKeeper.set_date_of_record_unprotected!(Date.today)
+        TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
       end
 
       subject { BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(initial_application) }
@@ -71,7 +72,7 @@ module BenefitSponsors
         end
 
         after(:each) do
-          TimeKeeper.set_date_of_record_unprotected!(Date.today)
+          TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
         end
 
         subject { BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(initial_application) }
@@ -151,7 +152,7 @@ module BenefitSponsors
             end
 
             after(:each) do
-              TimeKeeper.set_date_of_record_unprotected!(Date.today)
+              TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
             end
 
             context 'and application in draft state' do
@@ -198,7 +199,7 @@ module BenefitSponsors
             end
 
             after(:each) do
-              TimeKeeper.set_date_of_record_unprotected!(Date.today)
+              TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
             end
 
             context 'and application in draft state' do
@@ -251,7 +252,7 @@ module BenefitSponsors
           end
 
           after(:each) do
-            TimeKeeper.set_date_of_record_unprotected!(Date.today)
+            TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
           end
 
           context 'and application in draft state' do
@@ -314,7 +315,7 @@ module BenefitSponsors
             end
 
             after(:each) do
-              TimeKeeper.set_date_of_record_unprotected!(Date.today)
+              TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
             end
 
             context 'and application in draft state' do
@@ -361,7 +362,7 @@ module BenefitSponsors
             end
 
             after(:each) do
-              TimeKeeper.set_date_of_record_unprotected!(Date.today)
+              TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
             end
 
             context 'and application in draft state' do
@@ -414,7 +415,7 @@ module BenefitSponsors
           end
 
           after(:each) do
-            TimeKeeper.set_date_of_record_unprotected!(Date.today)
+            TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
           end
 
           context 'and application in draft state' do
@@ -469,7 +470,7 @@ module BenefitSponsors
         end
 
         after(:each) do
-          TimeKeeper.set_date_of_record_unprotected!(Date.today)
+          TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
         end
 
         subject { BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(initial_application) }
@@ -504,7 +505,7 @@ module BenefitSponsors
         end
 
         after(:each) do
-          TimeKeeper.set_date_of_record_unprotected!(Date.today)
+          TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
         end
 
         subject { BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(initial_application) }
@@ -557,11 +558,11 @@ module BenefitSponsors
         end
 
         before(:each) do
-          TimeKeeper.set_date_of_record_unprotected!(Date.new(Date.today.year, 7, 24))
+          TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year, 7, 24))
         end
 
         after(:each) do
-          TimeKeeper.set_date_of_record_unprotected!(Date.today)
+          TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
         end
 
         subject { BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(initial_application) }
@@ -569,7 +570,7 @@ module BenefitSponsors
         context "open enrollment close date passed" do
           before :each do
             initial_application.benefit_sponsorship.update_attributes(aasm_state: :applicant)
-            allow(::BenefitSponsors::SponsoredBenefits::EnrollmentClosePricingDeterminationCalculator).to receive(:call).with(initial_application, Date.new(Date.today.year, 7, 24))
+            allow(::BenefitSponsors::SponsoredBenefits::EnrollmentClosePricingDeterminationCalculator).to receive(:call).with(initial_application, Date.new(TimeKeeper.date_of_record.year, 7, 24))
           end
 
           context "and the benefit_application enrollment passes eligibility policy validation" do
@@ -616,7 +617,7 @@ module BenefitSponsors
 
 
           it "invokes pricing determination calculation" do
-            expect{::BenefitSponsors::SponsoredBenefits::EnrollmentClosePricingDeterminationCalculator.call(initial_application, Date.new(Date.today.year, 7, 24))}.not_to raise_error
+            expect{::BenefitSponsors::SponsoredBenefits::EnrollmentClosePricingDeterminationCalculator.call(initial_application, Date.new(TimeKeeper.date_of_record.year, 7, 24))}.not_to raise_error
             subject.end_open_enrollment
           end
         end
@@ -646,11 +647,11 @@ module BenefitSponsors
         end
 
         before(:each) do
-          TimeKeeper.set_date_of_record_unprotected!(Date.new(Date.today.year, 7, 24))
+          TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year, 7, 24))
         end
 
         after(:each) do
-          TimeKeeper.set_date_of_record_unprotected!(Date.today)
+          TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
         end
 
         subject { BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(initial_application) }
@@ -694,7 +695,7 @@ module BenefitSponsors
         end
 
         after(:each) do
-          TimeKeeper.set_date_of_record_unprotected!(Date.today)
+          TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
         end
 
         subject { BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(initial_application) }
@@ -744,7 +745,7 @@ module BenefitSponsors
         end
 
         after(:each) do
-          TimeKeeper.set_date_of_record_unprotected!(Date.today)
+          TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
         end
 
         subject { BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(initial_application) }
@@ -902,7 +903,7 @@ module BenefitSponsors
 
     describe '.extend_open_enrollment' do
       include_context "setup initial benefit application"
-      let(:current_effective_date) { Date.new(Date.today.year, 8, 1) }
+      let(:current_effective_date) { Date.new(TimeKeeper.date_of_record.year, 8, 1) }
       let(:today) { current_effective_date - 7.days }
 
       subject { BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(initial_application) }
@@ -912,7 +913,7 @@ module BenefitSponsors
       end
 
       after(:each) do
-        TimeKeeper.set_date_of_record_unprotected!(Date.today)
+        TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
       end
 
       context 'when application is ineligible' do 

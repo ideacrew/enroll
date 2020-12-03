@@ -1,8 +1,9 @@
 FactoryBot.define do
   factory :benefit_markets_products_dental_products_dental_product, class: 'BenefitMarkets::Products::DentalProducts::DentalProduct' do
-
+    
+    # Date.today converted to TimeKeeper.date_of_record
     benefit_market_kind  { :aca_shop }
-    application_period   { Date.new(Date.today.year, 1, 1)..Date.new(Date.today.year, 12, 31) }
+    application_period   { Date.new(TimeKeeper.date_of_record.year, 1, 1)..Date.new(Date.today.year, 12, 31) }
     sequence(:hbx_id)    { |n| n + 98765 }
 
     sequence(:title)     { |n| "Dental BlueChoice Silver#{n} 2,000" }

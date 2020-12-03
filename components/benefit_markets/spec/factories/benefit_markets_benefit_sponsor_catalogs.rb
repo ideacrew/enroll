@@ -1,8 +1,8 @@
 FactoryBot.define do
   factory :benefit_markets_benefit_sponsor_catalog, class: 'BenefitMarkets::BenefitSponsorCatalog' do
-
+    # Date.today converted to TimeKeeper.date_of_record
     effective_date          {
-                                this_year = Date.today.year
+                                this_year = TimeKeeper.date_of_record.year
                                 Date.new(this_year,6,1)
                               }
     effective_period        { effective_date..(effective_date + 1.year - 1.day) }

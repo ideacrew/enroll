@@ -3,8 +3,9 @@ require 'rails_helper'
 module BenefitMarkets
   RSpec.describe BenefitSponsorCatalog, type: :model, dbclean: :after_each do
     let(:subject) { described_class.new }
-
-    let(:this_year)               { Date.today.year }
+    
+    # Date.today converted to TimeKeeper.date_of_record
+    let(:this_year)               { TimeKeeper.date_of_record.year }
     let(:application_period)      { Date.new(this_year,1,1)..Date.new(this_year,12,31) }
     let(:effective_date)          { Date.new(this_year, 6,1) }
     let(:effective_period)        { effective_date..(effective_date + 1.year - 1.day) }

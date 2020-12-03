@@ -159,7 +159,8 @@ class Invitation
 
   def self.invite_renewal_employee!(census_employee)
     if !census_employee.email_address.blank?
-      created_at_range = Date.today.all_day
+      Date.today converted to TimeKeeper.date_of_record
+      created_at_range = TimeKeeper.date_of_record.all_day
       return if self.invitation_already_sent?(
         census_employee,
         'employee_role',

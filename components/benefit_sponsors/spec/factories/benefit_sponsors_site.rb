@@ -1,3 +1,5 @@
+# Date.today converted to TimeKeeper.date_of_record
+
 FactoryBot.define do
   factory :benefit_sponsors_site, class: 'BenefitSponsors::Site' do
     byline      { "ACME Healthcare" }
@@ -8,7 +10,7 @@ FactoryBot.define do
     transient do
       kind { :aca_shop }
       site_owner_organization_legal_name { "Site Owner" }
-      application_period {Date.new(Date.today.year, 1, 1)..Date.new(Date.today.year, 12, 31)}
+      application_period {Date.new(TimeKeeper.date_of_record.year, 1, 1)..Date.new(TimeKeeper.date_of_record.year, 12, 31)}
     end
 
     # trait :with_owner_general_organization do

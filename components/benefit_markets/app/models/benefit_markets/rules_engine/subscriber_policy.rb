@@ -1,9 +1,10 @@
 module BenefitMarkets
   module RulesEngine
     class SubscriberPolicy < Policy
-
+      
+      # Date.today converted to TimeKeeper.date_of_record
       rule :is_of_age,
-        validate: lambda { |c| c.get(:person).age_on(Date.today) > 18 },
+        validate: lambda { |c| c.get(:person).age_on(TimeKeeper.date_of_record > 18 },
         failure: lambda { |c| c.add_error(:person, "must be 18 years of age") },
         requires: [:person]
 

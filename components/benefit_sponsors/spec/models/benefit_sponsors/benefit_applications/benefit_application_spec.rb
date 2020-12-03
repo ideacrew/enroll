@@ -3,6 +3,8 @@ require File.join(File.dirname(__FILE__), "..", "..", "..", "support/benefit_spo
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
+# Date.today converted to TimeKeeper.date_of_record
+
 class ApplicationHelperModStubber
   extend ::BenefitSponsors::Employers::EmployerHelper
 end
@@ -201,7 +203,7 @@ module BenefitSponsors
             benefit_application.extend_open_enrollment_period(past_date)
           end
 
-          after { TimeKeeper.set_date_of_record_unprotected!(Date.today) }
+          after { TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record) }
 
           it "should be able to transition into open enrollment" do
             expect(benefit_application.may_begin_open_enrollment?).to eq true
@@ -265,7 +267,7 @@ module BenefitSponsors
       let!(:april_sponsors)                 { FactoryBot.create_list(:benefit_sponsors_benefit_application, 2,
                                               effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)) )}
 
-      before { TimeKeeper.set_date_of_record_unprotected!(Date.today) }
+      before { TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record) }
 
 
       # it "should find applications by Effective date start" do
@@ -353,7 +355,7 @@ module BenefitSponsors
                 TimeKeeper.set_date_of_record_unprotected!(benefit_application.open_enrollment_period.min)
                 benefit_application.begin_open_enrollment!
               }
-            after { TimeKeeper.set_date_of_record_unprotected!(Date.today) }
+            after { TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record) }
 
             it "should transition to state: :enrollment_open" do
               expect(benefit_application.aasm_state).to eq :enrollment_open
@@ -702,8 +704,8 @@ module BenefitSponsors
 
       context "HbxEnrollment avalaibale for benefit application return the enrollment with the given date" do
         before do
-          enrollment = HbxEnrollment.new(effective_on: Date.today.next_month.beginning_of_month)
-          enrollment1 = HbxEnrollment.new(effective_on: Date.today.next_month.beginning_of_month + 2.months)
+          enrollment = HbxEnrollment.new(effective_on: TimeKeeper.date_of_record.next_month.beginning_of_month)
+          enrollment1 = HbxEnrollment.new(effective_on: TimeKeeper.date_of_record.next_month.beginning_of_month + 2.months)
           benefit_sponsorship.benefit_applications.first.hbx_enrollments << enrollment
           benefit_sponsorship.benefit_applications.first.hbx_enrollments << enrollment1
           benefit_sponsorship.benefit_applications.first.save
@@ -717,15 +719,15 @@ module BenefitSponsors
         end
 
         it "Should return the enrollments only with the effective date as next month start date" do
-          expect(benefit_sponsorship.benefit_applications.first.enrollments_till_given_effective_on(Date.today.next_month.beginning_of_month).count).not_to eq 0
+          expect(benefit_sponsorship.benefit_applications.first.enrollments_till_given_effective_on(TimeKeeper.date_of_record.next_month.beginning_of_month).count).not_to eq 0
         end
 
         it "should not return enrollment outside given date" do
-          expect(benefit_sponsorship.benefit_applications.first.enrollments_till_given_effective_on(Date.today.next_month.beginning_of_month).count).to eq 1
+          expect(benefit_sponsorship.benefit_applications.first.enrollments_till_given_effective_on(TimeKeeper.date_of_record.next_month.beginning_of_month).count).to eq 1
         end
 
         it "should return enrollments within the given date" do
-          expect(benefit_sponsorship.benefit_applications.first.enrollments_till_given_effective_on(Date.today.next_month.beginning_of_month + 2.months).count).to eq 2
+          expect(benefit_sponsorship.benefit_applications.first.enrollments_till_given_effective_on(TimeKeeper.date_of_record.next_month.beginning_of_month + 2.months).count).to eq 2
         end
       end
     end
