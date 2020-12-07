@@ -39,7 +39,7 @@ RSpec.describe EnrollmentPeriod::SpecialEnrollment, :type => :model do
                               is_active: true
                             )
                           }
-  let(:qle_on)         { Date.current }
+  let(:qle_on)         { TimeKeeper.date_of_record }
 
   let(:valid_params){
     {

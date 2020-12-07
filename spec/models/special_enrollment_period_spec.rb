@@ -92,7 +92,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
                                         )
                                         }
 
-  let(:qle_on)         { Date.current }
+  let(:qle_on)         { TimeKeeper.date_of_record }
 
   let(:valid_params){
     {
@@ -385,7 +385,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
       let(:shop_lost_insurance_qle_sep) { FactoryBot.create(:special_enrollment_period, family: family,
                                                             qualifying_life_event_kind_id: shop_lost_insurance_qle.id, qle_on: lapsed_qle_on_date) }
 
-      let(:reporting_date)        { Date.current }
+      let(:reporting_date)        { TimeKeeper.date_of_record }
       let(:lapsed_effective_date) { ivl_qle_sep.end_on.end_of_month + 1.day }
 
       before do

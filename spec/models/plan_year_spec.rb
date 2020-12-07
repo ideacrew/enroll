@@ -29,7 +29,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
   end
 
   before do
-    TimeKeeper.set_date_of_record_unprotected!(Date.current)
+    TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
     allow_any_instance_of(CensusEmployee).to receive(:generate_and_deliver_checkbook_url).and_return(true)
     allow_any_instance_of(PlanYear).to receive(:trigger_renewal_notice).and_return(true)
   end
@@ -1118,7 +1118,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
       context "and employer submits a valid plan year application with open enrollment start before today" do
         before do
-          TimeKeeper.set_date_of_record_unprotected!(Date.current.beginning_of_month - 1.month)
+          TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record.beginning_of_month - 1.month)
           workflow_plan_year_with_benefit_group.open_enrollment_start_on = TimeKeeper.date_of_record
           workflow_plan_year_with_benefit_group.open_enrollment_end_on = workflow_plan_year_with_benefit_group.open_enrollment_start_on + 5.days
           workflow_plan_year_with_benefit_group.start_on = TimeKeeper.date_of_record.beginning_of_month.next_month
@@ -1133,7 +1133,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
       context "and employer submits a valid plan year application with today as start open enrollment" do
         before do
-          TimeKeeper.set_date_of_record_unprotected!(Date.current.end_of_month + 1.day)
+          TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record.end_of_month + 1.day)
           workflow_plan_year_with_benefit_group.open_enrollment_start_on = TimeKeeper.date_of_record
           workflow_plan_year_with_benefit_group.open_enrollment_end_on = workflow_plan_year_with_benefit_group.open_enrollment_start_on + 5.days
           workflow_plan_year_with_benefit_group.start_on = workflow_plan_year_with_benefit_group.open_enrollment_start_on + 1.month
