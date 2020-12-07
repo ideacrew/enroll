@@ -111,7 +111,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     end
 
     after :each do
-      TimeKeeper.set_date_of_record_unprotected!(Date.today)
+      TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
     end
 
     describe ".clone_enrollment_members" do

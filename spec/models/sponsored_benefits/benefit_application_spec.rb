@@ -4,7 +4,7 @@ module SponsoredBenefits
   RSpec.describe BenefitApplications::BenefitApplication, type: :model, dbclean: :around_each do
     let(:subject) { BenefitApplications::BenefitApplication.new }
 
-    # let(:date_range) { (Date.today..1.year.from_now) }
+    # let(:date_range) { (TimeKeeper.date_of_record..1.year.from_now) }
 
     let(:effective_period_start_on) { TimeKeeper.date_of_record.end_of_month + 1.day + 1.month }
     let(:effective_period_end_on)   { effective_period_start_on + 1.year - 1.day }

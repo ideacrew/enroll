@@ -6,7 +6,7 @@ module Insured
   RSpec.describe Factories::SelfServiceFactory, type: :model, dbclean: :after_each do
 
     before :each do
-      TimeKeeper.set_date_of_record_unprotected!(Date.today)
+      TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
       DatabaseCleaner.clean
     end
 
@@ -72,8 +72,8 @@ module Insured
       let(:sep) { FactoryBot.create(:special_enrollment_period, family: family) }
       let(:sbc_document) { FactoryBot.build(:document, subject: "SBC", identifier: "urn:openhbx#123") }
       let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, title: "AAA", issuer_profile_id: "ab1233", sbc_document: sbc_document) }
-      let(:enrollment_to_cancel) { FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, product: product, effective_on: Date.today + 1.month) }
-      let(:enrollment_to_term) { FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, product: product, effective_on: Date.today - 1.month) }
+      let(:enrollment_to_cancel) { FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, product: product, effective_on: TimeKeeper.date_of_record + 1.month) }
+      let(:enrollment_to_term) { FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, product: product, effective_on: TimeKeeper.date_of_record - 1.month) }
 
       context "#term_or_cancel" do
         it "should cancel an enrollment if it is not yet effective" do
@@ -150,7 +150,7 @@ module Insured
       end
 
       after do
-        TimeKeeper.set_date_of_record_unprotected!(Date.today)
+        TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
       end
     end
     # rubocop:enable Lint/UselessAssignment
