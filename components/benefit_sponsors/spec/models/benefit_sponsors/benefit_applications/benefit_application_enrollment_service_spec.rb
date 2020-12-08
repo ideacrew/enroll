@@ -68,7 +68,7 @@ module BenefitSponsors
         end
 
         before(:each) do
-          TimeKeeper.set_date_of_record_unprotected!(Date.new(Date.todayyear, 7, 4))
+          TimeKeeper.set_date_of_record_unprotected!(Date.new(Date.today.year, 7, 4))
         end
 
         after(:each) do
