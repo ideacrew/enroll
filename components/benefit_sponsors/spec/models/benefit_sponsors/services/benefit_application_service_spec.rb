@@ -73,7 +73,7 @@ module BenefitSponsors
       let!(:benefit_application_factory) { BenefitSponsors::BenefitApplications::BenefitApplicationFactory }
 
       before do
-        TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
+        TimeKeeper.set_date_of_record_unprotected!(Date.today)
       end
 
       context "has received valid attributes" do
