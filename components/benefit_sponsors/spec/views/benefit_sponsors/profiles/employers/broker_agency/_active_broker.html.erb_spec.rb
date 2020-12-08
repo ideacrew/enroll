@@ -16,11 +16,11 @@ RSpec.describe "views/benefit_sponsors/profiles/employers/broker_agency/_active_
 
   let!(:person) { FactoryBot.create(:person) }
   let!(:date) { TimeKeeper.date_of_record - 1.day }
-  let!(:user) {   FactoryBot.create(:user, person: person) }
+  let!(:user) { FactoryBot.create(:user, person: person) }
 
   before :each do
     view.extend BenefitSponsors::Engine.routes.url_helpers
-    TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
+    TimeKeeper.set_date_of_record_unprotected!(Date.today)
     sign_in user
     assign(:employer_profile, employer_profile)
     assign(:broker_agency_account, broker_agency_account)

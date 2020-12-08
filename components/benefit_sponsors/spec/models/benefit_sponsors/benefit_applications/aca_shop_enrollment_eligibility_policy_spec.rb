@@ -7,7 +7,7 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_applicatio
 module BenefitSponsors
   RSpec.describe BenefitApplications::AcaShopEnrollmentEligibilityPolicy, type: :model, :dbclean => :after_each do
     before(:all) do
-      TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
+      TimeKeeper.set_date_of_record_unprotected!(Date.today)
     end
 
 
