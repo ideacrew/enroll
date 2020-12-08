@@ -24,7 +24,7 @@ module BenefitSponsors
       include_context "setup initial benefit application"
 
       before(:each) do
-        TimeKeeper.set_date_of_record_unprotected!(Date.new(Date.todayyear, 6, 10))
+        TimeKeeper.set_date_of_record_unprotected!(Date.new(Date.today.year, 6, 10))
       end
 
       after(:each) do
