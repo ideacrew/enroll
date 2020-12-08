@@ -651,7 +651,7 @@ describe Person, :dbclean => :after_each do
       end
 
       it "should know its age tomorrow" do
-        expect(greg.age_on(1.day.from_now.to_date)).to eq(gregs_age)
+        expect(greg.age_on(TimeKeeper.date_of_record + 1.day.to_date)).to eq(gregs_age)
       end
     end
 

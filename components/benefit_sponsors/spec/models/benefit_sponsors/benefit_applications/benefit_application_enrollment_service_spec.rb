@@ -913,7 +913,7 @@ module BenefitSponsors
       end
 
       after(:each) do
-        TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
+        TimeKeeper.set_date_of_record_unprotected!(Date.today)
       end
 
       context 'when application is ineligible' do 

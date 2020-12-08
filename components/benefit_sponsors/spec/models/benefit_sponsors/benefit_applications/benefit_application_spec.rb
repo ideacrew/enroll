@@ -203,7 +203,7 @@ module BenefitSponsors
             benefit_application.extend_open_enrollment_period(past_date)
           end
 
-          after { TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record) }
+          after { TimeKeeper.set_date_of_record_unprotected!(Date.today) }
 
           it "should be able to transition into open enrollment" do
             expect(benefit_application.may_begin_open_enrollment?).to eq true
@@ -267,7 +267,7 @@ module BenefitSponsors
       let!(:april_sponsors)                 { FactoryBot.create_list(:benefit_sponsors_benefit_application, 2,
                                               effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)) )}
 
-      before { TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record) }
+      before { TimeKeeper.set_date_of_record_unprotected!(Date.today) }
 
 
       # it "should find applications by Effective date start" do
@@ -355,7 +355,7 @@ module BenefitSponsors
                 TimeKeeper.set_date_of_record_unprotected!(benefit_application.open_enrollment_period.min)
                 benefit_application.begin_open_enrollment!
               }
-            after { TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record) }
+            after { TimeKeeper.set_date_of_record_unprotected!(Date.today) }
 
             it "should transition to state: :enrollment_open" do
               expect(benefit_application.aasm_state).to eq :enrollment_open

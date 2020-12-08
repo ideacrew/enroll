@@ -542,7 +542,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
 
       after(:all) do
         DatabaseCleaner.clean
-        TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
+        TimeKeeper.set_date_of_record_unprotected!(Date.today)
       end
     end
   end
