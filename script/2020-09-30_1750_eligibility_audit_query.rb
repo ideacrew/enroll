@@ -192,7 +192,7 @@ CSV.open("audit_ivl_determinations.csv", "w") do |csv|
     "Eligible",
     "Denial Reasons"
   ]
-  ivl_people.no_timeout.each do |pers_record|
+  ivl_people.each do |pers_record|
     person_versions = Versioning::VersionCollection.new(pers_record)
     person_versions.each do |p_v|
       begin
