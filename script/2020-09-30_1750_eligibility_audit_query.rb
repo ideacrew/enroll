@@ -1,8 +1,26 @@
 require 'delegate'
+
 AUDIT_START_DATE = Date.new(2019,10,1)
 AUDIT_END_DATE = Date.new(2020,10,1)
 STDOUT.puts "Standard caching complete."
 STDOUT.flush
+
+class EligiblityQueryCursor
+  include Enumerable
+
+  def initialize(person_ids)
+    @person_ids = person_ids
+  end
+
+  def each
+    @person_ids.each_slice(200) do |chunk|
+      Person.where("_id" => {"$in" => chunk}).no_timeout.each do |pers|
+        yield pers
+      end
+    end
+  end
+end
+
 hbx = HbxProfile.current_hbx
 bcps = hbx.benefit_sponsorship.benefit_coverage_periods
 bcp = bcps.detect { |bcp| bcp.start_on.year == 2020 }
@@ -32,7 +50,8 @@ ivl_person_ids = non_curam_ivl.map do |rec|
 end
 STDOUT.puts "Counted #{ivl_person_ids.count} people."
 STDOUT.flush
-ivl_people = Person.where("_id" => {"$in" => ivl_person_ids})
+
+ivl_people = EligiblityQueryCursor.new(ivl_person_ids)
 families_of_interest = Family.where(
   {"family_members.person_id" => {"$in" => ivl_person_ids}}
 )
