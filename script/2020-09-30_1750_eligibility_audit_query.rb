@@ -13,7 +13,7 @@ class EligiblityQueryCursor
   end
 
   def each
-    @person_ids.each_slice(200) do |chunk|
+    @person_ids.each_slice(50) do |chunk|
       Person.where("_id" => {"$in" => chunk}).no_timeout.each do |pers|
         yield pers
       end
