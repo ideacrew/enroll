@@ -46,18 +46,22 @@ module BenefitMarkets
         ]
     end
 
-    def lowest_cost_product(effective_date)
+    def lowest_cost_product(effective_date, issuer_hios_ids = nil)
       return @lowest_cost_product if defined? @lowest_cost_product
-      @lowest_cost_product = load_base_products.min_by { |product|
-          product.min_cost_for_application_period(effective_date)
-      }
+
+      load_filtered_products = issuer_hios_ids.present? ? load_base_products.select {|p| issuer_hios_ids.include?(p.hios_id.slice(0, 5))} : load_base_products
+      @lowest_cost_product = load_filtered_products.min_by do |product|
+        product.min_cost_for_application_period(effective_date)
+      end
     end
 
-    def highest_cost_product(effective_date)
+    def highest_cost_product(effective_date, issuer_hios_ids = nil)
       return @highest_cost_product if defined? @highest_cost_product
-      @highest_cost_product ||= load_base_products.max_by { |product|
+
+      load_filtered_products = issuer_hios_ids.present? ? load_base_products.select {|p| issuer_hios_ids.include?(p.hios_id.slice(0, 5))} : load_base_products
+      @highest_cost_product ||= load_filtered_products.max_by do |product|
         product.max_cost_for_application_period(effective_date)
-      }
+      end
     end
 
     def products_sorted_by_cost

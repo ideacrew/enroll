@@ -343,7 +343,8 @@ module BenefitMarkets
       kind == :dental
     end
 
-    # private
+    private
+
     # self.class.new(attrs_without_tuples)
     # def attrs_without_tuples
     #   attributes.inject({}) do |attrs, (key, val)|
@@ -359,5 +360,9 @@ module BenefitMarkets
     #     attrs
     #   end
     # end
+
+    def carrier_profile_hios_ids
+      issuer_profile&.issuer_hios_ids
+    end
   end
 end
