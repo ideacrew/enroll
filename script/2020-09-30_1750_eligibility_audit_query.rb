@@ -21,6 +21,9 @@ class EligiblityQueryCursor
   end
 end
 
+STDERR.puts "TESTING STANDARD ERROR REDIRECTION"
+STDERR.flush
+
 hbx = HbxProfile.current_hbx
 bcps = hbx.benefit_sponsorship.benefit_coverage_periods
 bcp = bcps.detect { |bcp| bcp.start_on.year == 2020 }
