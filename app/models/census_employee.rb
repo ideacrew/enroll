@@ -849,7 +849,7 @@ class CensusEmployee < CensusMember
     create_benefit_group_assignment(benefit_packages)
   end
 
-  def off_cycle_benefit_group_assignment=(benefit_package_id)
+  def off_cycle_benefit_group_assignment=(benefit_package_id = nil)
     benefit_application = benefit_sponsorship&.benefit_package_by(benefit_package_id)&.benefit_application || benefit_sponsorship&.off_cycle_benefit_application
     if benefit_application.present?
       benefit_packages = benefit_package_id.present? ? [benefit_application.benefit_packages.find(benefit_package_id)] : benefit_application.benefit_packages
