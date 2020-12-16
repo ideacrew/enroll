@@ -75,7 +75,7 @@ class UserMailer < ApplicationMailer
 
   def off_cycle_renewal_invitation_email(email, census_employee, invitation)
     mail({to: email, subject: "Enroll Now: Your Plan Open Enrollment Period has Begun"}) do |format|
-      if Settings.site.key == :dc
+      if EnrollRegistry[:enroll_app].setting(:application_name).item == 'enroll_dc'
         format.html { render "dc_off_cycle_renewal_invitation_email", :locals => { :census_employee => census_employee, :invitation => invitation }}
       else
         format.html { render "off_cycle_renewal_invitation_email", :locals => { :census_employee => census_employee, :invitation => invitation }}
