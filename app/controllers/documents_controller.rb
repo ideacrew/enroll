@@ -201,10 +201,6 @@ class DocumentsController < ApplicationController
     end
   end
 
-  def download_employer_document
-    send_file params[:path]
-  end
-
   def download_documents
     docs = Document.find(params[:ids])
     docs.each do |doc|
