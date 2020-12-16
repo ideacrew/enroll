@@ -1,4 +1,6 @@
 require 'rails_helper'
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 module BenefitMarkets
   RSpec.describe Products::ProductPackage, type: :model, dbclean: :after_each do
@@ -141,6 +143,42 @@ module BenefitMarkets
       end
     end
 
+    context 'for one carrier product package' do
+      include_context 'setup benefit market with market catalogs and product packages'
+      include_context 'setup initial benefit application'
 
+      let!(:one_issuer_product_package) {initial_application.benefit_sponsor_catalog.product_packages.select {|pp| pp.package_kind == :single_issuer}}
+      let!(:all_products) do
+        products = one_issuer_product_package.map(&:products).flatten
+        products[2].update_attributes!(hios_id: '52842DC0400016-01')
+        BenefitMarkets::Products::Product.all.where(id: products[2].id).first.update_attributes!(hios_id: '52842DC0400016-01')
+        products[3].update_attributes!(hios_id: '52842DC0400017-01')
+        BenefitMarkets::Products::Product.all.where(id: products[3].id).first.update_attributes!(hios_id: '52842DC0400016-01')
+        products
+      end
+
+      let!(:all_products_update) do
+        cost_counter = 50
+        all_products.flatten.each do |p|
+          product = BenefitMarkets::Products::Product.all.where(id: p.id).first
+          product.premium_tables.each do |pt|
+            pt.premium_tuples.delete_all
+            pt.premium_tuples.create(age: 20, cost: cost_counter)
+            pt.premium_tuples.create(age: 21, cost: cost_counter + 10)
+            pt.premium_tuples.create(age: 22, cost: cost_counter + 20)
+            pt.premium_tuples.create(age: 23, cost: cost_counter + 30)
+            pt.save!
+          end
+          cost_counter += 50
+          product.save!
+        end
+      end
+
+      it 'should return lowest_cost_product from selected carrier' do
+        result = one_issuer_product_package.first.lowest_cost_product(TimeKeeper.date_of_record, ['52842'])
+        lowest_product = all_products.select{|p| p.hios_id == '52842DC0400016-01'}.first
+        expect(result).to eq lowest_product
+      end
+    end
   end
 end
