@@ -122,7 +122,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     @orgs = Organization.search(@q).exists(employer_profile: true)
     @page_alphabets = page_alphabets(@orgs, "legal_name")
     page_no = cur_page_no(@page_alphabets.first)
-    @organizations = @orgs.where("legal_name" => /^#{page_no}/i)
+    @organizations = @orgs.where("legal_name" => /^#{Regexp.escape(page_no)}/i)
 
     @employer_profiles = @organizations.map {|o| o.employer_profile}
 
@@ -260,7 +260,7 @@ def employer_poc
     @page_alphabets = page_alphabets(@staff, "last_name")
     page_no = cur_page_no(@page_alphabets.first)
     if @q.nil?
-      @staff = @staff.where(last_name: /^#{page_no}/i)
+      @staff = @staff.where(last_name: /^#{Regexp.escape(page_no)}/i)
     else
       @staff = @staff.where(last_name: @q)
     end
@@ -275,7 +275,7 @@ def employer_poc
     @page_alphabets = page_alphabets(@staff, "last_name")
     page_no = cur_page_no(@page_alphabets.first)
     if @q.nil?
-      @staff = @staff.where(last_name: /^#{page_no}/i)
+      @staff = @staff.where(last_name: /^#{Regexp.escape(page_no)}/i)
     else
       @staff = @staff.where(last_name: @q)
     end
