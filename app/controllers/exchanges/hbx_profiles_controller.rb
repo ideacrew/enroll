@@ -122,9 +122,9 @@ class Exchanges::HbxProfilesController < ApplicationController
     @orgs = Organization.search(@q).exists(employer_profile: true)
     @page_alphabets = page_alphabets(@orgs, "legal_name")
     page_no = cur_page_no(@page_alphabets.first)
-    @organizations = @orgs.where("legal_name" => /^#{Regexp.escape(page_no)}/i)
+    @organizations = @orgs.where("legal_name" => /^#{Regexp.escape(page_no)}/i) if page_no.present?
 
-    @employer_profiles = @organizations.map {|o| o.employer_profile}
+    @employer_profiles = @organizations&.map {|o| o.employer_profile}
 
     respond_to do |format|
       format.html { render "employers/employer_profiles/index" }
