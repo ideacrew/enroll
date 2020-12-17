@@ -58,7 +58,7 @@ RSpec.describe Operations::BenefitGroupAssignments::Reinstate, :type => :model, 
 
       it 'should return error message if no benefit package is found' do
         result = subject.call({benefit_group_assignment: benefit_group_assignment, options: {benefit_package: nil}})
-        expect(result.failure).to eq('Unable to fetch benefit package')
+        expect(result.failure).to eq('Unable to fetch new benefit package')
       end
 
       it 'should return error message if overlapping bga exists' do
@@ -76,7 +76,7 @@ RSpec.describe Operations::BenefitGroupAssignments::Reinstate, :type => :model, 
 
       it 'should return error message if overlapping bga exists' do
         result = subject.call({benefit_group_assignment: benefit_group_assignment, options: {benefit_package: initial_benefit_package}})
-        expect(result.failure).to eq('Benefit group assignment cannot fall outside the plan year')
+        expect(result.failure).to eq('New benefit group assignment cannot fall outside the plan year')
       end
     end
   end
