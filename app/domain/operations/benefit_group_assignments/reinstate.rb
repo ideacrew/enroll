@@ -21,9 +21,9 @@ module Operations
         return Failure('End on must be present for the given benefit group assignment.') if benefit_group_assignment.end_on.blank?
         return Failure('Benefit Package must be present for this benefit group assignment.') if benefit_group_assignment.benefit_package_id.blank?
         return Failure('Invalid Benefit Group. End on cannot occur before the start on.') if benefit_group_assignment.end_on < benefit_group_assignment.start_on
-        return Failure("Unable to fetch benefit package") if fetch_benefit_package(benefit_group_assignment, params[:options]).blank?
+        return Failure("Unable to fetch new benefit package") if fetch_benefit_package(benefit_group_assignment, params[:options]).blank?
         return Failure('Overlapping benefit group assignments present') if overlapping_bga_exists?
-        return Failure('Benefit group assignment cannot fall outside the plan year') unless is_eligible_to_reinstate_bga?
+        return Failure('New benefit group assignment cannot fall outside the plan year') unless is_eligible_to_reinstate_bga?
 
         Success(params)
       end
