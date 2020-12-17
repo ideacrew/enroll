@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Subscribers
+  # Subscriber for off cycle employee enrollment invitations
   class OffCycleRenewalEnrollmentInvitationsSubscriber < ::Acapi::Subscription
     include Acapi::Notifiers
 
