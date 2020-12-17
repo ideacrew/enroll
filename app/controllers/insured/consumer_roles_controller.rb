@@ -17,7 +17,7 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def privacy
     set_current_person(required: false)
-    params_hash = params.permit!.to_h
+    params_hash = params[:aqhp].present? ? params.permit(:aqhp).to_h : params.permit(:uqhp).to_h
     @val = params_hash[:aqhp] || params_hash[:uqhp]
     @key = params_hash.key(@val)
     @search_path = {@key => @val}
@@ -92,7 +92,7 @@ class Insured::ConsumerRolesController < ApplicationController
             found_person = @resident_candidate.match_person
             if found_person.present? && found_person.resident_role.present?
               begin
-                @resident_role = ::Factories::EnrollmentFactory.construct_resident_role(params.permit!, actual_user)
+                @resident_role = ::Factories::EnrollmentFactory.construct_resident_role(params.require(:person).permit(person_parameters_list), actual_user)
                 if @resident_role.present?
                   @person = @resident_role.person
                   session[:person_id] = @person.id
@@ -148,7 +148,7 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def create
     begin
-      @consumer_role = ::Factories::EnrollmentFactory.construct_consumer_role(params.permit!, actual_user)
+      @consumer_role = ::Factories::EnrollmentFactory.construct_consumer_role(params.require(:person).permit(person_parameters_list), actual_user)
       if @consumer_role.present?
         @person = @consumer_role.person
       else
