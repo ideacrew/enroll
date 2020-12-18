@@ -2,9 +2,16 @@
 
 module Operations
   module BenefitGroupAssignments
+    # This class clones a benefit_group_assignment where end
+    # result is a new benefit_group_assignment. The end_on
+    # of the newly created benefit_group_assignment will be nil
+    # Also, the result benefit_group_assignment is a non-persisted object.
     class Clone
       include Dry::Monads[:result, :do]
 
+      # @param [ BenefitGroupAssignment ] benefit_group_assignment
+      # @param [ Hash ] options additional attributes for new benefit_group_assignment
+      # @return [ BenefitGroupAssignment ] benefit_group_assignment
       def call(params)
         values         = yield validate(params)
         bga_params     = yield construct_params(values)
