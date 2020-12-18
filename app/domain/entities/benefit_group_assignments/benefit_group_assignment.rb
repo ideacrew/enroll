@@ -2,6 +2,8 @@
 
 module Entities
   module BenefitGroupAssignments
+    # This class shows the list of required and optional attributes
+    # that are required to build a new BenefitGroupAssignment object
     class BenefitGroupAssignment < Dry::Struct
       transform_keys(&:to_sym)
 
