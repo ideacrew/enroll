@@ -61,7 +61,7 @@ class Exchanges::ResidentsController < ApplicationController
 
   def match
     @no_save_button = true
-    @person_params = params.require(:person).merge({user_id: current_user.id})
+    @person_params = params.require(:person).permit(person_parameters_list).merge({user_id: current_user.id})
     @resident_candidate = Forms::ResidentCandidate.new(@person_params)
     @person = @resident_candidate
     respond_to do |format|
