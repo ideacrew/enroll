@@ -2,6 +2,8 @@
 
 module Entities
   module HbxEnrollments
+    # This class shows the list of required and optional attributes
+    # that are required to build a new Enrollment object
     class HbxEnrollment < Dry::Struct
       transform_keys(&:to_sym)
 

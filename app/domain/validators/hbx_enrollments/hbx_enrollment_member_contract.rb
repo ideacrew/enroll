@@ -2,6 +2,9 @@
 
 module Validators
   module HbxEnrollments
+    # This class checks and validates the incoming params
+    # that are required to build a new enrollment member object
+    # if any of the checks or rules fail it returns a failure
     class HbxEnrollmentMemberContract < Dry::Validation::Contract
 
       params do
