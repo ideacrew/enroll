@@ -420,8 +420,13 @@ module BenefitSponsors
           enrollments = HbxEnrollment.by_benefit_package(self).where(family_id: family.id).show_enrollments_sans_canceled
           enrollments.each do |hbx_enrollment|
             if hbx_enrollment.may_cancel_coverage?
-              hbx_enrollment.cancel_coverage!
-              hbx_enrollment.notify_enrollment_cancel_or_termination_event(enrollment_notify_flag(enroll_notify)) unless hbx_enrollment.inactive?
+              hbx_enrollment.terminate_reason = "retroactive_canceled" if benefit_application.retroactive_canceled?
+              if hbx_enrollment.inactive?
+                hbx_enrollment.cancel_coverage!
+              else
+                hbx_enrollment.cancel_coverage!
+                hbx_enrollment.notify_enrollment_cancel_or_termination_event(enrollment_notify_flag(enroll_notify))
+              end
             end
           end
         end
@@ -597,7 +602,11 @@ module BenefitSponsors
 
       def sponsored_benefits=(sponsored_benefits_attrs)
         sponsored_benefits_attrs.each do |sponsored_benefit_attrs|
-          sponsored_benefit = sponsored_benefits.build
+          sponsored_benefit = if sponsored_benefit_attrs[:product_kind].present?
+                                init_sb(sponsored_benefit_attrs)
+                              else
+                                sponsored_benefits.build
+                              end
           sponsored_benefit.assign_attributes(sponsored_benefit_attrs)
         end
       end
@@ -607,6 +616,15 @@ module BenefitSponsors
       def plan_year
         warn "[Deprecated] Instead use benefit_application" unless Rails.env.test?
         benefit_application
+      end
+
+      private
+
+      def init_sb(sb_attrs)
+        sub_class_prefix = sb_attrs.delete(:product_kind).to_s.camelize
+        sb_obj = "::BenefitSponsors::SponsoredBenefits::#{sub_class_prefix}SponsoredBenefit".constantize.new
+        sb_obj.benefit_package = self
+        sb_obj
       end
     end
   end

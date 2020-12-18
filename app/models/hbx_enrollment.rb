@@ -1791,8 +1791,8 @@ class HbxEnrollment
     end
 
     event :waive_coverage, :after => :record_transition do
-      transitions from: [:shopping, :coverage_selected, :auto_renewing, :renewing_coverage_selected],
-                  to: :inactive
+      transitions from: [:shopping, :coverage_selected, :auto_renewing, :renewing_coverage_selected, :coverage_reinstated],
+                  to: :inactive, after: :propogate_waiver
     end
 
     event :begin_coverage, :after => :record_transition do
@@ -2243,6 +2243,10 @@ class HbxEnrollment
 
   def same_signatures(previous_enrollment)
     previous_enrollment.enrollment_signature == self.enrollment_signature
+  end
+
+  def is_waived?
+    workflow_state_transitions.any?{|wfst| wfst.event.match(/waive_coverage/) && wfst.to_state == 'inactive'}
   end
 
   private
