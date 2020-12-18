@@ -2,9 +2,16 @@
 
 module Operations
   module BenefitGroupAssignments
+    # This class reinstates a benefit_group_assignment where end result
+    # is a new benefit_group_assignment. The start_on of the newly
+    # created benefit_group_assignment depends on the input benefit package.
     class Reinstate
       include Dry::Monads[:result, :do]
 
+      # @param [ BenefitGroupAssignment ] benefit_group_assignment
+      # @param [ Hash ] options include new benefit package which will
+      # be assigned to new benefit group assignment
+      # @return [ BenefitGroupAssignment ] benefit_group_assignment
       def call(params)
         values           = yield validate(params)
         new_bga          = yield reinstate_benefit_group_assignment(values)
