@@ -6,18 +6,16 @@ module BenefitSponsors
       def notify_observers(args={})
         if self.class.observer_peers.any?
           self.class.observer_peers.each do |k, events|
-            begin
-              events.each do |event|
-                if args.present? && k.is_a?(args.options[:observer_klass] || BenefitSponsors::Observers::NoticeObserver)
-                  k.send event, self, args
-                elsif k.respond_to?(event) && ['EdiObserver', 'NoticeObserver'].exclude?(k.class.name.split('::').last)
-                  # TODO: REMOVE this else condition after observer pattern isolated to notice, edi observerd
-                  k.send event, self, args
-                end
+            events.each do |event|
+              if args.present? && k.is_a?(args.options[:observer_klass] || BenefitSponsors::Observers::NoticeObserver)
+                k.send event, self, args
+              elsif k.respond_to?(event) && ['EdiObserver', 'NoticeObserver'].exclude?(k.class.name.split('::').last)
+                # TODO: REMOVE this else condition after observer pattern isolated to notice, edi observerd
+                k.send event, self, args
               end
-            rescue StandardError => e
-              Rails.logger.error {"unable to trigger observer event for organization hbx_id #{self.hbx_id} due to #{e.inspect}"}
             end
+          rescue StandardError => e
+            Rails.logger.error {"unable to trigger observer event #{k.class} for organization hbx_id #{self.hbx_id} due to #{e.inspect}"}
           end
         end
       end
