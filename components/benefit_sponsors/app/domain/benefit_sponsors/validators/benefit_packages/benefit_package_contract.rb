@@ -3,6 +3,9 @@
 module BenefitSponsors
   module Validators
     module BenefitPackages
+      # This class checks and validates the incoming params
+      # that are required to build a new benefit package object object
+      # if any of the checks or rules fail it returns a failure
       class BenefitPackageContract < Dry::Validation::Contract
 
         params do
