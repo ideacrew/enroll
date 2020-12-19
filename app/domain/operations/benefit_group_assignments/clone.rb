@@ -46,7 +46,6 @@ module Operations
 
       def clone_benefit_group_assignment(bga_entity)
         new_bga = @census_employee.benefit_group_assignments.new(bga_entity.to_h)
-        new_bga.save!
         Success(new_bga)
       end
     end
