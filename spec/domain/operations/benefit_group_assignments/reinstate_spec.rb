@@ -84,15 +84,22 @@ RSpec.describe Operations::BenefitGroupAssignments::Reinstate, :type => :model, 
     before do
       benefit_group_assignment.update_attributes(end_on: initial_benefit_package.benefit_application.start_on + 3.months - 1.day)
       initial_benefit_package.benefit_application.update_attributes(effective_period: (benefit_group_assignment.end_on + 1.day)..initial_benefit_package.end_on)
-      @result = subject.call({benefit_group_assignment: benefit_group_assignment, options: {benefit_package: initial_benefit_package}})
     end
 
     it 'should create new benefit group assignment for census employee' do
-      expect(@result.success).to be_a(BenefitGroupAssignment)
+      result = subject.call({benefit_group_assignment: benefit_group_assignment, options: {benefit_package: initial_benefit_package}})
+      expect(result.success).to be_a(BenefitGroupAssignment)
     end
 
     it 'should return success object' do
-      expect(@result).to be_a(Dry::Monads::Result::Success)
+      result = subject.call({benefit_group_assignment: benefit_group_assignment, options: {benefit_package: initial_benefit_package}})
+      expect(result).to be_a(Dry::Monads::Result::Success)
+    end
+
+    it 'should create bga for census employee' do
+      expect(census_employee.benefit_group_assignments.count).to eq 1
+      subject.call({benefit_group_assignment: benefit_group_assignment, options: {benefit_package: initial_benefit_package}})
+      expect(census_employee.benefit_group_assignments.count).to eq 2
     end
   end
 end
