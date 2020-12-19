@@ -7,12 +7,10 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_applicatio
 RSpec.describe Operations::BenefitGroupAssignments::Reinstate, :type => :model, dbclean: :after_each do
   include_context "setup benefit market with market catalogs and product packages"
   include_context "setup initial benefit application"
-  include_context "setup renewal application"
 
   let(:benefit_application)    { initial_application }
   let(:employer_profile)       {  abc_profile }
   let(:initial_benefit_package) { initial_application.benefit_packages.first }
-  let(:renewal_benefit_package) { renewal_application.benefit_packages.first }
   let(:census_employee)      { FactoryBot.create(:census_employee, employer_profile: abc_profile) }
   let(:benefit_group_assignment) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: initial_benefit_package, start_on: initial_benefit_package.start_on,  census_employee: census_employee)}
 
@@ -53,10 +51,11 @@ RSpec.describe Operations::BenefitGroupAssignments::Reinstate, :type => :model, 
       let(:new_benefit_group_assignment) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: initial_benefit_package, census_employee: census_employee)}
 
       before do
-        benefit_group_assignment.update_attributes(end_on: initial_benefit_package.start_on + 3.months)
+        benefit_group_assignment.update_attributes(end_on: initial_benefit_package.start_on + 3.months - 1.day)
       end
 
       it 'should return error message if no benefit package is found' do
+        initial_application.update_attributes(effective_period: benefit_group_assignment.start_on..benefit_group_assignment.end_on)
         result = subject.call({benefit_group_assignment: benefit_group_assignment, options: {benefit_package: nil}})
         expect(result.failure).to eq('Unable to fetch new benefit package')
       end

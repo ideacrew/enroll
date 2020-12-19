@@ -63,7 +63,7 @@ module Operations
                                else
                                  title = @old_bga.benefit_package.title
                                  benefit_sponsorship = @old_bga.benefit_package.benefit_sponsorship
-                                 ba = benefit_sponsorship.benefit_applications.where(:effective_period.min => @start_on).first
+                                 ba = benefit_sponsorship.benefit_applications.detect { |application| application.effective_period.cover?(@start_on) }
                                  ba.benefit_packages.detect{|bp| bp.title == title} if ba.present?
                                end
       end
