@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-Then(/^the user will select benefit application to (.*)$/) do |_aasm_state|
-  if _aasm_state == "terminate"
+Then(/^the user will select benefit application to (.*)$/) do |aasm_state|
+  if aasm_state == "terminate"
     find(:xpath, '//input[@status="active"]').click
   else
     find(:xpath, '//input[@name="plan_year_radio"]').click
