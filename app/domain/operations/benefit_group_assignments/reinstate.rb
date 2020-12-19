@@ -37,13 +37,14 @@ module Operations
 
       def reinstate_benefit_group_assignment(values)
         clone_result = Clone.new.call({benefit_group_assignment: values[:benefit_group_assignment], options: additional_params})
-
         return clone_result if clone_result.failure?
+
+        clone_result.value!.save!
         clone_result
       end
 
       def overlapping_bga_exists?
-        @census_employee.benefit_group_assignments.where(:start_on.gte => @start_on, end_on: nil, :benefit_package_id => @new_benefit_package.id).present?
+        @census_employee.benefit_group_assignments.any? {|bga| bga.is_active?(@start_on) && bga.benefit_package_id == @new_benefit_package.id}
       end
 
       def is_eligible_to_reinstate_bga?
