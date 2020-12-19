@@ -14,9 +14,10 @@ module Operations
       # @return [ BenefitGroupAssignment ] benefit_group_assignment
       def call(params)
         values           = yield validate(params)
-        new_bga          = yield reinstate_benefit_group_assignment(values)
+        cloned_bga       = yield cloned_benefit_group_assignment(values)
+        bga              = yield persist_benefit_group_assignment(cloned_bga)
 
-        Success(new_bga)
+        Success(bga)
       end
 
       private
@@ -35,12 +36,12 @@ module Operations
         Success(params)
       end
 
-      def reinstate_benefit_group_assignment(values)
-        clone_result = Clone.new.call({benefit_group_assignment: values[:benefit_group_assignment], options: additional_params})
-        return clone_result if clone_result.failure?
+      def cloned_benefit_group_assignment(values)
+        Clone.new.call({benefit_group_assignment: values[:benefit_group_assignment], options: additional_params})
+      end
 
-        clone_result.value!.save!
-        clone_result
+      def persist_benefit_group_assignment(bga)
+        bga.save! ? Success(bga) : Failure('Unable to persist benefit group assignment')
       end
 
       def overlapping_bga_exists?
