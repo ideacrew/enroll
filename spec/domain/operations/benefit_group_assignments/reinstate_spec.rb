@@ -81,25 +81,62 @@ RSpec.describe Operations::BenefitGroupAssignments::Reinstate, :type => :model, 
   end
 
   context 'Success' do
-    before do
-      benefit_group_assignment.update_attributes(end_on: initial_benefit_package.benefit_application.start_on + 3.months - 1.day)
-      initial_benefit_package.benefit_application.update_attributes(effective_period: (benefit_group_assignment.end_on + 1.day)..initial_benefit_package.end_on)
+
+    let(:reinstated_benefit_package) { initial_benefit_package }
+
+    context 'if previous benefit group assignment is in terminated or termination pending status' do
+
+      before do
+        benefit_group_assignment.update_attributes(end_on: initial_benefit_package.benefit_application.start_on + 3.months - 1.day)
+        reinstated_benefit_package.benefit_application.update_attributes(effective_period: (benefit_group_assignment.end_on + 1.day)..reinstated_benefit_package.end_on)
+      end
+
+      it 'should create new benefit group assignment for census employee' do
+        result = subject.call({benefit_group_assignment: benefit_group_assignment, options: {benefit_package: reinstated_benefit_package}})
+        expect(result.success).to be_a(BenefitGroupAssignment)
+      end
+
+      it 'should return success object' do
+        result = subject.call({benefit_group_assignment: benefit_group_assignment, options: {benefit_package: reinstated_benefit_package}})
+        expect(result).to be_a(Dry::Monads::Result::Success)
+      end
+
+      it 'should create bga for census employee' do
+        expect(census_employee.benefit_group_assignments.count).to eq 1
+        subject.call({benefit_group_assignment: benefit_group_assignment, options: {benefit_package: reinstated_benefit_package}})
+        expect(census_employee.benefit_group_assignments.count).to eq 2
+      end
     end
 
-    it 'should create new benefit group assignment for census employee' do
-      result = subject.call({benefit_group_assignment: benefit_group_assignment, options: {benefit_package: initial_benefit_package}})
-      expect(result.success).to be_a(BenefitGroupAssignment)
+    context 'if previous benefit group assignment is canceled' do
+
+      before do
+        benefit_group_assignment.update_attributes(end_on: reinstated_benefit_package.benefit_application.start_on)
+      end
+
+      it 'should create new benefit group assignment for census employee' do
+        result = subject.call({benefit_group_assignment: benefit_group_assignment, options: {benefit_package: reinstated_benefit_package}})
+        expect(result.success).to be_a(BenefitGroupAssignment)
+      end
+
+      it 'should return success object' do
+        result = subject.call({benefit_group_assignment: benefit_group_assignment, options: {benefit_package: reinstated_benefit_package}})
+        expect(result).to be_a(Dry::Monads::Result::Success)
+      end
+
+      it 'should create bga for census employee' do
+        expect(census_employee.benefit_group_assignments.count).to eq 1
+        subject.call({benefit_group_assignment: benefit_group_assignment, options: {benefit_package: reinstated_benefit_package}})
+        expect(census_employee.benefit_group_assignments.count).to eq 2
+      end
+
+      it 'newly create bga for census employee should have the same start as benefit package start on' do
+        expect(census_employee.benefit_group_assignments.count).to eq 1
+        subject.call({benefit_group_assignment: benefit_group_assignment, options: {benefit_package: reinstated_benefit_package}})
+        new_bga = census_employee.benefit_group_assignments.by_benefit_package(reinstated_benefit_package).detect(&:is_active?)
+        expect(new_bga.end_on).to eq nil
+      end
     end
 
-    it 'should return success object' do
-      result = subject.call({benefit_group_assignment: benefit_group_assignment, options: {benefit_package: initial_benefit_package}})
-      expect(result).to be_a(Dry::Monads::Result::Success)
-    end
-
-    it 'should create bga for census employee' do
-      expect(census_employee.benefit_group_assignments.count).to eq 1
-      subject.call({benefit_group_assignment: benefit_group_assignment, options: {benefit_package: initial_benefit_package}})
-      expect(census_employee.benefit_group_assignments.count).to eq 2
-    end
   end
 end

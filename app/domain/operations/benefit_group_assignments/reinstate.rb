@@ -59,7 +59,7 @@ module Operations
       def fetch_benefit_package(bga,options)
         @old_bga = bga
         @census_employee = @old_bga.census_employee
-        @start_on = @old_bga.end_on.next_day
+        @start_on = @old_bga.canceled? ? @old_bga.start_on : @old_bga.end_on.next_day
         @new_benefit_package = if options[:benefit_package].present?
                                  options[:benefit_package]
                                else
