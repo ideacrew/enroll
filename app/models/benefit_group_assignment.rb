@@ -374,8 +374,7 @@ class BenefitGroupAssignment
 
   def is_active?(date = TimeKeeper.date_of_record)
     return false if start_on.blank? || canceled?
-
-    end_date = end_on || start_on.next_year.prev_day
+    end_date = end_on || benefit_package&.end_on
     (start_on..end_date).cover?(date)
   end
 
