@@ -42,7 +42,8 @@ module BenefitSponsors
                                                   terminated: :terminate,
                                                   termination_pending: :termination_pending,
                                                   canceled: :cancel,
-                                                  retroactive_canceled: :cancel
+                                                  retroactive_canceled: :cancel,
+                                                  reinstated: :reinstate
                                                 }
 
     VOLUNTARY_TERMINATED_PLAN_YEAR_EVENT_TAG = "benefit_coverage_period_terminated_voluntary".freeze
@@ -856,7 +857,7 @@ module BenefitSponsors
       state :retroactive_canceled,   :after_enter => :transition_benefit_package_members  # Application closed after coverage taking to effect
       state :termination_pending, :after_enter => :transition_benefit_package_members # Coverage under this application is termination pending
       state :suspended   # Coverage is no longer in effect. members may not enroll or change enrollments
-      state :reinstated # This is tmp state in between draft and active(any active state).
+      state :reinstated, :after_enter => :transition_benefit_package_members # Coverage under this application is termination pending# This is tmp state in between draft and active(any active state).
 
       after_all_transitions [:publish_state_transition, :notify_application]
 
@@ -1197,6 +1198,10 @@ module BenefitSponsors
     def parent_reinstate_application
       return unless reinstated_id
       self.class.find(reinstated_id)
+    end
+
+    def canceled?
+      [:canceled, :retroactive_canceled].include?(aasm_state)
     end
 
     private
