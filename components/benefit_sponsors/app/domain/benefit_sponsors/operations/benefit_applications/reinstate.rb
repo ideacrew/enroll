@@ -18,7 +18,7 @@ module BenefitSponsors
 
         # @param [ BenefitSponsors::BenefitApplications::BenefitApplication ] benefit_application
         # @return [ BenefitSponsors::BenefitApplications::BenefitApplication ] benefit_application
-        def call(params)
+        def call(params:)
           values               = yield validate(params)
           cloned_ba            = yield clone_benefit_application(values)
           cloned_bsc           = yield clone_benefit_sponsor_catalog(values)

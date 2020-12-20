@@ -16,6 +16,10 @@ module BenefitMarkets
         if key? && value
           if !value.is_a?(::BenefitMarkets::Entities::ProductPackage)
             if value.is_a?(Hash)
+              if value[:product_kind] == :dental
+                value[:contribution_models] = [] unless value[:contribution_models]
+                value[:assigned_contribution_model] = nil unless value[:assigned_contribution_model]
+              end
               result = BenefitMarkets::Validators::Products::ProductPackageContract.new.call(value)
               key.failure(text: "invalid product package", error: result.errors.to_h) if result&.failure?
             else
