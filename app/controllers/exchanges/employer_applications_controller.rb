@@ -61,7 +61,6 @@ module Exchanges
         application = @benefit_sponsorship.benefit_applications.find(params[:employer_application_id])
         result = EnrollRegistry[:benefit_application_reinstate]{ {params: {benefit_application: application} } }
         if result.failure?
-          binding.pry
           # TODO update messages end date
           success = {error: "#{application.benefit_sponsorship.legal_name} - #{result.failure} #{application.end_on.next_day}"}
         else
