@@ -37,6 +37,7 @@ module BenefitSponsors
       delegate :recorded_rating_area, to: :benefit_application
       delegate :benefit_sponsorship, :sponsor_profile, to: :benefit_application
       delegate :recorded_service_area_ids, to: :benefit_application
+      delegate :parent_reinstate_application, :canceled?, to: :benefit_application
       delegate :benefit_market, to: :benefit_application
       delegate :is_conversion?, to: :benefit_application
       delegate :is_renewing?,   to: :benefit_application
@@ -252,6 +253,14 @@ module BenefitSponsors
         end
       end
 
+      def reinstate_benefit_group_assignment(benefit_group_assignment)
+        ::Operations::BenefitGroupAssignments::Reinstate.new.call({benefit_group_assignment: benefit_group_assignment, options: {benefit_package: self} })
+      end
+
+      def reinstate_enrollment(hbx_enrollment)
+        ::Operations::HbxEnrollments::Reinstate.new.call({hbx_enrollment: hbx_enrollment})
+      end
+
       def renew_member_benefits
         # FIXME: There is no reason to assume that the renewal benefit package assignment
         #        will have is_active == false, I think this may always return an empty set.
@@ -413,6 +422,21 @@ module BenefitSponsors
         end
       end
 
+      def reinstate_member_benefits
+        predecessor_package =  parent_reinstate_application.benefit_packages.where(title: title).first
+        return if predecessor_package.blank?
+        end_date = predecessor_package.canceled? ? predecessor_package.start_on : predecessor_package.end_on
+        census_employees_eligible_for_reinstate(predecessor_package, end_date.next_day).each do |census_employee|
+          benefit_group_assignment = census_employee.benefit_group_assignments.where(benefit_package_id: predecessor_package.id, end_on: end_date).order_by(:'created_at'.desc).first
+          result = reinstate_benefit_group_assignment(benefit_group_assignment)
+          if census_employee.family.present? && result.success?
+            enrollments_eligible_for_reinstate(census_employee, predecessor_package).each do |hbx_enrollment|
+              reinstate_enrollment(hbx_enrollment)
+            end
+          end
+        end
+      end
+
       def cancel_member_benefits(delete_benefit_package: false, enroll_notify: false)
         deactivate_benefit_group_assignments
 
@@ -442,6 +466,14 @@ module BenefitSponsors
         transition.from_state == 'enrollment_ineligible' && transition.to_state == 'canceled'
       end
 
+      def canceled_as_active?(transition)
+        transition.from_state == 'active' && transition.to_state == 'canceled'
+      end
+
+      def term_as_active?(transition)
+        transition.from_state == 'active' &&  ['termination_pending', 'terminated' ].include?(transition.to_state)
+      end
+
       def enrollment_term_reason(term_reason)
         return term_reason if term_reason
         benefit_application.termination_kind == "nonpayment" ? "non_payment" : "voluntary_withdrawl" if benefit_application.termination_kind
@@ -463,6 +495,10 @@ module BenefitSponsors
 
       def canceled_after?(transition, cancellation_time)
         transition.to_state == 'coverage_canceled' && transition.transition_at >= cancellation_time
+      end
+
+      def termed_after?(transition, termination_time)
+        ['coverage_termination_pending','coverage_terminated'].include?(transition.to_state) && transition.transition_at >= termination_time
       end
 
       def reinstate_canceled_member_benefits
@@ -556,6 +592,22 @@ module BenefitSponsors
 
       def census_employees_eligible_for_renewal(effective_date)
         CensusEmployee.eligible_for_renewal_under_package(self, start_on, end_on, effective_date)
+      end
+
+      def census_employees_eligible_for_reinstate(package, new_package_date)
+        CensusEmployee.eligible_reinstate_for_package(package, new_package_date)
+      end
+
+      def enrollments_eligible_for_reinstate(census_employee, predecessor_package)
+        census_employee.family.hbx_enrollments.cancel_or_termed_by_benefit_package(predecessor_package).inject([]) do |enrollments, enrollment|
+          if HbxEnrollment::TERM_REASONS.include?(enrollment.terminate_reason)
+            enrollments += [enrollment]
+          else
+            application_transition = predecessor_package.benefit_application.workflow_state_transitions.detect{|transition| predecessor_package.canceled? ? canceled_as_active?(transition) : term_as_active?(transition)}
+            enrollments += [enrollment] if application_transition.present? && enrollment.workflow_state_transitions.any?{|wst| canceled_after?(wst, application_transition.transition_at) || termed_after?(wst, application_transition.transition_at) }
+          end
+          enrollments
+        end
       end
 
       def self.find(id)
