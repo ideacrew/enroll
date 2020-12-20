@@ -136,7 +136,7 @@ RSpec.describe Exchanges::EmployerApplicationsController, dbclean: :after_each d
       before :each do
         allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', can_modify_plan_year: true))
         sign_in(user)
-        initial_application.update_attributes!(:aasm_state => :retroactive_cancel)
+        initial_application.update_attributes!(:aasm_state => :retroactive_canceled)
         put :reinstate, params: { employer_application_id: initial_application.id, employer_id: benefit_sponsorship.id}
       end
 
@@ -146,7 +146,7 @@ RSpec.describe Exchanges::EmployerApplicationsController, dbclean: :after_each d
 
       it "should cancel the plan year" do
         initial_application.reload
-        expect(initial_application.aasm_state).to eq :retroactive_cancel
+        expect(initial_application.aasm_state).to eq :retroactive_canceled
         expect(flash[:notice]).to eq "#{benefit_sponsorship.organization.legal_name} - Plan Year Reinstated Successfully Effective #{initial_application.effective_period.min}"
       end
     end
