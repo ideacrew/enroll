@@ -56,6 +56,7 @@ class HbxEnrollment
   ENROLLED_AND_RENEWAL_STATUSES = ENROLLED_STATUSES + RENEWAL_STATUSES
 
   ENROLLED_RENEWAL_WAIVED_STATUSES = ENROLLED_STATUSES + RENEWAL_STATUSES + WAIVED_STATUSES
+  TERM_REASONS = %w(non_payment voluntary_withdrawl retroactive_canceled)
 
 
   WAIVER_REASONS = [
@@ -70,6 +71,7 @@ class HbxEnrollment
   CAN_TERMINATE_ENROLLMENTS = %w[coverage_termination_pending coverage_selected auto_renewing renewing_coverage_selected unverified coverage_enrolled].freeze
 
   CAN_REINSTATE_AND_UPDATE_END_DATE = %w(coverage_termination_pending coverage_terminated)
+  TERM_INITIATED_STATES = %w(coverage_termination_pending coverage_terminated coverage_canceled)
 
   ENROLLMENT_TRAIN_STOPS_STEPS = {"coverage_selected" => 1, "transmitted_to_carrier" => 2, "coverage_enrolled" => 3,
                                   "auto_renewing" => 1, "renewing_coverage_selected" => 1, "renewing_transmitted_to_carrier" => 2, "renewing_coverage_enrolled" => 3}
@@ -347,6 +349,7 @@ class HbxEnrollment
   #scope :terminated, -> { where(:aasm_state.in => TERMINATED_STATUSES, :terminated_on.gte => TimeKeeper.date_of_record.beginning_of_day) }
   scope :terminated, -> { where(:aasm_state.in => TERMINATED_STATUSES) }
   scope :canceled_and_terminated, -> { where(:aasm_state.in => (CANCELED_STATUSES + TERMINATED_STATUSES)) }
+  scope :canceled_and_waived, -> { where(:aasm_state.in => (CANCELED_STATUSES + WAIVED_STATUSES)) }
   scope :enrolled_and_waived, -> { any_of([enrolled.selector, waived.selector]).order(created_at: :desc) }
   scope :enrolled_waived_terminated_and_expired, -> { any_of([enrolled.selector, waived.selector, terminated.selector, expired.selector]).order(created_at: :desc) }
   scope :show_enrollments, -> { any_of([enrolled.selector, renewing.selector, terminated.selector, canceled.selector, waived.selector]) }
@@ -378,6 +381,16 @@ class HbxEnrollment
       :"effective_on".gte => benefit_application.effective_period.min
     )
   end
+
+  scope :cancel_or_termed_by_benefit_package,  ->(benefit_package) do
+    where(
+        :sponsored_benefit_package_id => benefit_package.id,
+        :"aasm_state".in => TERM_INITIATED_STATES,
+        :"effective_on".gte => benefit_package.start_on,
+        :terminated_on => benefit_package.canceled? ? nil : benefit_package.end_on
+    )
+  end
+
   scope :enrollments_for_monthly_report_sep_scope, lambda { |start_date, end_date, family_id|
     where(family_id: family_id).special_enrollments.individual_market.show_enrollments_sans_canceled.where(
       :"created_at" => {:"$gte" => start_date, :"$lt" => end_date}
