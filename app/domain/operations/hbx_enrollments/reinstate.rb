@@ -46,10 +46,8 @@ module Operations
       end
 
       def active_bga_exists?(params)
-        # TODO fix this
         @effective_on = fetch_effective_on(params)
-        @bga = @current_enr.census_employee.benefit_group_assignments.where(:'$or' => [{:start_on.gte => @effective_on, :end_on.lte => @effective_on},
-                                                                                       {:start_on.gte => @effective_on, end_on: nil}]).first
+        @bga = @current_enr.census_employee.benefit_group_assignments.order_by(:'created_at'.desc).detect{ |bga| bga.is_active?(@effective_on)}
       end
 
       def overlapping_enrollment_exists?
@@ -86,7 +84,7 @@ module Operations
       end
 
       def additional_params
-        attrs = {benefit_group_assignment_id: @bga.id, sponsored_benefit_package_id: @bga.benefit_package_id}
+        attrs = {benefit_group_assignment_id: @bga.id, sponsored_benefit_package_id: @bga.benefit_package_id, predecessor_enrollment_id: @current_enr.id}
         if @current_enr.is_health_enrollment?
           attrs.merge({sponsored_benefit_id: @bga.benefit_package.health_sponsored_benefit.id})
         else
