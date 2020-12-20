@@ -280,6 +280,22 @@ class CensusEmployee < CensusMember
     )
   }
 
+  scope :eligible_reinstate_for_package, ->(benefit_package, new_package_date) {
+    where(:"benefit_group_assignments" => {
+              :$elemMatch => {
+                  :benefit_package_id => benefit_package.id,
+                  :start_on => { "$gte" => benefit_package.start_on },
+                  :end_on => benefit_package.canceled? ? benefit_package.start_on: benefit_package.end_on
+              },
+          },
+          "$or" => [
+              {"employment_terminated_on" => nil},
+              {"employment_terminated_on" => {"$exists" => false}},
+              {"employment_terminated_on" => {"$gte" => new_package_date}}
+          ]
+    )
+  }
+
   scope :benefit_application_assigned,     ->(benefit_application) { where(:"benefit_group_assignments.benefit_package_id".in => benefit_application.benefit_packages.pluck(:_id)) }
   scope :benefit_application_unassigned,   ->(benefit_application) { where(:"benefit_group_assignments.benefit_package_id".nin => benefit_application.benefit_packages.pluck(:_id)) }
 
