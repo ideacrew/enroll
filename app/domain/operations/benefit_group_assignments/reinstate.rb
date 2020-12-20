@@ -23,6 +23,7 @@ module Operations
       private
 
       def validate(params)
+
         benefit_group_assignment = params[:benefit_group_assignment]
         return Failure('Missing Key.') unless benefit_group_assignment.present?
         return Failure('Not a valid BenefitGroupAssignment object.') unless benefit_group_assignment.is_a?(BenefitGroupAssignment)
@@ -45,6 +46,7 @@ module Operations
       end
 
       def overlapping_bga_exists?
+        # TODO fix this
         @census_employee.benefit_group_assignments.any? {|bga| bga.is_active?(@start_on) && bga.benefit_package_id == @new_benefit_package.id}
       end
 

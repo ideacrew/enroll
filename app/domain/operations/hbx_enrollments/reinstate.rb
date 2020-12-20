@@ -19,6 +19,10 @@ module Operations
         new_enr          = yield new_hbx_enrollment(values)
         hbx_enrollment   = yield reinstate_hbx_enrollment(new_enr)
 
+        # TODO
+        # 1. age off sceario
+        # 2. terminate enrollments for terminated employee's
+
         Success(hbx_enrollment)
       end
 
@@ -42,6 +46,7 @@ module Operations
       end
 
       def active_bga_exists?(params)
+        # TODO fix this
         @effective_on = fetch_effective_on(params)
         @bga = @current_enr.census_employee.benefit_group_assignments.where(:'$or' => [{:start_on.gte => @effective_on, :end_on.lte => @effective_on},
                                                                                        {:start_on.gte => @effective_on, end_on: nil}]).first
