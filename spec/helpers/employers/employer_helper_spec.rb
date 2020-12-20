@@ -510,8 +510,8 @@ RSpec.describe Employers::EmployerHelper, :type => :helper, dbclean: :after_each
 
         it 'For retroactive cancel benefit_application' do
           initial_application.update_attributes!(effective_period: start_on..cancel_end_on)
-          initial_application.update_attributes!(aasm_state: :retroactive_cancel)
-          expect(initial_application.aasm_state).to eq :retroactive_cancel
+          initial_application.update_attributes!(aasm_state: :retroactive_canceled)
+          expect(initial_application.aasm_state).to eq :retroactive_canceled
           expect(display_reinstate_ba).to eq true
         end
 
@@ -543,8 +543,8 @@ RSpec.describe Employers::EmployerHelper, :type => :helper, dbclean: :after_each
 
         it 'For retroactive cancel benefit_application' do
           initial_application.update_attributes!(effective_period: start_on..cancel_end_on)
-          initial_application.update_attributes!(aasm_state: :retroactive_cancel)
-          expect(initial_application.aasm_state).to eq :retroactive_cancel
+          initial_application.update_attributes!(aasm_state: :retroactive_canceled)
+          expect(initial_application.aasm_state).to eq :retroactive_canceled
           expect(display_reinstate_ba).to eq false
         end
 

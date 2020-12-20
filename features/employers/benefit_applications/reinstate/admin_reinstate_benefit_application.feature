@@ -27,5 +27,5 @@ Feature: As an admin user I should have the ability to click reinstate button on
     |    aasm_state       |
     |    terminated       |
     | termination_pending |
-    | retroactive_cancel  |
+    | retroactive_canceled  |
     |     canceled        |
