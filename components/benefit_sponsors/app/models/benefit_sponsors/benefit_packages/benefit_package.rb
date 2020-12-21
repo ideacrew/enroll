@@ -425,16 +425,15 @@ module BenefitSponsors
       end
 
       def reinstate_member_benefits
-        predecessor_package =  parent_reinstate_application.benefit_packages.where(title: title).first
+        predecessor_package = parent_reinstate_application.benefit_packages.where(title: title).first
         return if predecessor_package.blank?
-        end_date = predecessor_package.canceled? ? predecessor_package.start_on : predecessor_package.end_on
+        end_date = (predecessor_package.canceled? ? predecessor_package.start_on : predecessor_package.end_on).to_date
         census_employees_eligible_for_reinstate(predecessor_package, end_date.next_day).each do |census_employee|
-          benefit_group_assignment = census_employee.benefit_group_assignments.where(benefit_package_id: predecessor_package.id, end_on: end_date).order_by(:'created_at'.desc).first
+          benefit_group_assignment = census_employee.benefit_group_assignments.where(benefit_package_id: predecessor_package.id, end_on: end_date).order_by(:created_at.desc).first
           result = reinstate_benefit_group_assignment(benefit_group_assignment)
-          if census_employee.family.present? && result.success?
-            enrollments_eligible_for_reinstate(census_employee, predecessor_package).each do |hbx_enrollment|
-              reinstate_enrollment(hbx_enrollment)
-            end
+          next if census_employee.family.blank? || result.failure?
+          enrollments_eligible_for_reinstate(census_employee, predecessor_package).each do |hbx_enrollment|
+            reinstate_enrollment(hbx_enrollment)
           end
         end
       end
@@ -447,12 +446,9 @@ module BenefitSponsors
           enrollments.each do |hbx_enrollment|
             if hbx_enrollment.may_cancel_coverage?
               hbx_enrollment.terminate_reason = "retroactive_canceled" if benefit_application.retroactive_canceled?
-              if hbx_enrollment.inactive?
-                hbx_enrollment.cancel_coverage!
-              else
-                hbx_enrollment.cancel_coverage!
-                hbx_enrollment.notify_enrollment_cancel_or_termination_event(enrollment_notify_flag(enroll_notify))
-              end
+              wavied_coverage = hbx_enrollment.inactive?
+              hbx_enrollment.cancel_coverage!
+              hbx_enrollment.notify_enrollment_cancel_or_termination_event(enrollment_notify_flag(enroll_notify)) unless wavied_coverage
             end
           end
         end
@@ -473,7 +469,7 @@ module BenefitSponsors
       end
 
       def term_as_active?(transition)
-        transition.from_state == 'active' &&  ['termination_pending', 'terminated' ].include?(transition.to_state)
+        transition.from_state == 'active' && ['termination_pending', 'terminated'].include?(transition.to_state)
       end
 
       def enrollment_term_reason(term_reason)

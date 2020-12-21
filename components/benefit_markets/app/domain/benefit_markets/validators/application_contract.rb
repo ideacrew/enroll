@@ -13,20 +13,15 @@ module BenefitMarkets
       #   Validates a nested array of $0 params
       #   @!method rule(product_packages)
       rule(:product_packages).each do
-        if key? && value
-          if !value.is_a?(::BenefitMarkets::Entities::ProductPackage)
-            if value.is_a?(Hash)
-              if value[:product_kind] == :dental
-                value[:contribution_models] = [] unless value[:contribution_models]
-                value[:assigned_contribution_model] = nil unless value[:assigned_contribution_model]
-              end
-              result = BenefitMarkets::Validators::Products::ProductPackageContract.new.call(value)
-              key.failure(text: "invalid product package", error: result.errors.to_h) if result&.failure?
-            else
-              key.failure(text: "invalid product packages. expected a hash or product_package entity")
-            end
-          end
+        next unless key? && value
+        next if value.is_a?(::BenefitMarkets::Entities::ProductPackage)
+        key.failure(text: "invalid product packages. expected a hash or product_package entity") unless value.is_a?(Hash)
+        if value[:product_kind] == :dental
+          value[:contribution_models] = [] unless value[:contribution_models]
+          value[:assigned_contribution_model] = nil unless value[:assigned_contribution_model]
         end
+        result = BenefitMarkets::Validators::Products::ProductPackageContract.new.call(value)
+        key.failure(text: "invalid product package", error: result.errors.to_h) if result&.failure?
       end
 
       # @!macro ruleeach

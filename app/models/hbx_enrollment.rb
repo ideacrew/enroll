@@ -56,7 +56,7 @@ class HbxEnrollment
   ENROLLED_AND_RENEWAL_STATUSES = ENROLLED_STATUSES + RENEWAL_STATUSES
 
   ENROLLED_RENEWAL_WAIVED_STATUSES = ENROLLED_STATUSES + RENEWAL_STATUSES + WAIVED_STATUSES
-  TERM_REASONS = %w(non_payment voluntary_withdrawl retroactive_canceled)
+  TERM_REASONS = %w[non_payment voluntary_withdrawl retroactive_canceled].freeze
 
 
   WAIVER_REASONS = [
@@ -71,7 +71,7 @@ class HbxEnrollment
   CAN_TERMINATE_ENROLLMENTS = %w[coverage_termination_pending coverage_selected auto_renewing renewing_coverage_selected unverified coverage_enrolled].freeze
 
   CAN_REINSTATE_AND_UPDATE_END_DATE = %w(coverage_termination_pending coverage_terminated)
-  TERM_INITIATED_STATES = %w(coverage_termination_pending coverage_terminated coverage_canceled)
+  TERM_INITIATED_STATES = %w[coverage_termination_pending coverage_terminated coverage_canceled].freeze
 
   ENROLLMENT_TRAIN_STOPS_STEPS = {"coverage_selected" => 1, "transmitted_to_carrier" => 2, "coverage_enrolled" => 3,
                                   "auto_renewing" => 1, "renewing_coverage_selected" => 1, "renewing_transmitted_to_carrier" => 2, "renewing_coverage_enrolled" => 3}
@@ -382,12 +382,12 @@ class HbxEnrollment
     )
   end
 
-  scope :cancel_or_termed_by_benefit_package,  ->(benefit_package) do
+  scope :cancel_or_termed_by_benefit_package, lambda do |benefit_package|
     where(
-        :sponsored_benefit_package_id => benefit_package.id,
-        :"aasm_state".in => TERM_INITIATED_STATES,
-        :"effective_on".gte => benefit_package.start_on,
-        :terminated_on => benefit_package.canceled? ? nil : benefit_package.end_on
+      :sponsored_benefit_package_id => benefit_package.id,
+      :aasm_state.in => TERM_INITIATED_STATES,
+      :effective_on.gte => benefit_package.start_on,
+      :terminated_on => benefit_package.canceled? ? nil : benefit_package.end_on.to_date
     )
   end
 
