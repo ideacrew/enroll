@@ -45,7 +45,7 @@ module Operations
       end
 
       def overlapping_bga_exists?
-        @census_employee.benefit_group_assignments.any? {|bga| bga.is_active?(@start_on) && bga.benefit_package_id == @new_benefit_package.id}
+        @census_employee.benefit_group_assignments.by_benefit_package(@new_benefit_package).any? {|bga| bga.is_active?(@start_on)}
       end
 
       def is_eligible_to_reinstate_bga?
