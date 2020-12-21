@@ -7,6 +7,10 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_applicatio
 
 RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
 
+  before do
+    DatabaseCleaner.clean
+  end
+
   include_context "setup benefit market with market catalogs and product packages"
   include_context "setup initial benefit application"
 
