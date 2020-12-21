@@ -65,7 +65,8 @@ module Exchanges
         flash[:error] = "#{application.benefit_sponsorship.legal_name} - #{result.failure}"
       end
       redirect_to exchanges_hbx_profiles_root_path
-    rescue StandardError
+    rescue StandardError => e
+      Rails.logger.error { "#{application.benefit_sponsorship.legal_name} - #{l10n('exchange.employer_applications.unable_to_reinstate')} - #{e.backtrace}" }
       redirect_to exchanges_hbx_profiles_root_path, :flash[:error] => "#{application.benefit_sponsorship.legal_name} - #{l10n('exchange.employer_applications.unable_to_reinstate')}"
     end
 

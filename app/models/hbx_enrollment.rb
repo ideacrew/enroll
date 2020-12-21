@@ -382,14 +382,14 @@ class HbxEnrollment
     )
   end
 
-  scope :cancel_or_termed_by_benefit_package, lambda do |benefit_package|
+  scope :cancel_or_termed_by_benefit_package, lambda { |benefit_package|
     where(
       :sponsored_benefit_package_id => benefit_package.id,
       :aasm_state.in => TERM_INITIATED_STATES,
       :effective_on.gte => benefit_package.start_on,
       :terminated_on => benefit_package.canceled? ? nil : benefit_package.end_on.to_date
     )
-  end
+  }
 
   scope :enrollments_for_monthly_report_sep_scope, lambda { |start_date, end_date, family_id|
     where(family_id: family_id).special_enrollments.individual_market.show_enrollments_sans_canceled.where(

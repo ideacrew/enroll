@@ -13,6 +13,8 @@ module Operations
       include Dry::Monads[:result, :do]
 
       # @param [ HbxEnrollment ] hbx_enrollment
+      # @param [ Hash ] options include new benefit package which will
+      # be used to pull benefit group assignment
       # @return [ HbxEnrollment ] hbx_enrollment
       def call(params)
         values            = yield validate(params)
@@ -30,6 +32,7 @@ module Operations
         return Failure('Not a valid HbxEnrollment object.') unless params[:hbx_enrollment].is_a?(HbxEnrollment)
         return Failure('Not a SHOP enrollment.') unless params[:hbx_enrollment].is_shop?
         return Failure('Given HbxEnrollment is not in any of the valid states for reinstatement states.') unless valid_by_states?(params[:hbx_enrollment])
+        return Failure("Missing benefit package") if params[:options][:benefit_package].blank?
         return Failure("Active Benefit Group Assignment does not exist for the effective_on: #{@effective_on}") unless active_bga_exists?(params)
         return Failure('Overlapping coverage exists for this family in current year.') if overlapping_enrollment_exists?
 
@@ -44,15 +47,16 @@ module Operations
 
       def canceled_eligble(enrollment)
         predecessor_package = enrollment.sponsored_benefit_package
-        application_transition = predecessor_package.benefit_application.workflow_state_transitions.detect{|transition|
-          predecessor_package.canceled? ? predecessor_package.canceled_as_active?(transition) : predecessor_package.term_as_active?(transition)}
+        application_transition = predecessor_package.benefit_application.workflow_state_transitions.detect do |transition|
+          predecessor_package.canceled? ? predecessor_package.canceled_as_active?(transition) : predecessor_package.term_as_active?(transition)
+        end
         application_transition.present? &&
-            enrollment.workflow_state_transitions.any?{ |wst| predecessor_package.canceled_after?(wst, application_transition.transition_at) || predecessor_package.termed_after?(wst, application_transition.transition_at)}
+          enrollment.workflow_state_transitions.any?{ |wst| predecessor_package.canceled_after?(wst, application_transition.transition_at) || predecessor_package.termed_after?(wst, application_transition.transition_at)}
       end
 
       def active_bga_exists?(params)
         @effective_on = fetch_effective_on(params)
-        @bga = @current_enr.census_employee.benefit_group_assignments.order_by(:created_at.desc).detect{ |bga| bga.is_active?(@effective_on) }
+        @bga = @current_enr.census_employee.benefit_group_assignments.by_benefit_package(params[:options][:benefit_package]).order_by(:created_at.desc).detect{ |bga| bga.is_active?(@effective_on)}
       end
 
       def overlapping_enrollment_exists?
@@ -122,19 +126,19 @@ module Operations
 
       def update_benefit_group_assignment(hbx_enrollment)
         assignment = hbx_enrollment.census_employee.benefit_group_assignment_by_package(hbx_enrollment.sponsored_benefit_package_id, hbx_enrollment.effective_on)
-        assignment.update_attributes(hbx_enrollment_id: hbx_enrollment.id) if assignment
+        assignment&.update_attributes(hbx_enrollment_id: hbx_enrollment.id)
       end
 
       def terminate_employment_term_enrollment(hbx_enrollment)
         census_employee = hbx_enrollment.census_employee
         employment_term_date = census_employee.employment_terminated_on
-        return unless employment_term_date
-        if employment_term_date > TimeKeeper.date_of_record
-          if hbx_enrollment.may_schedule_coverage_termination?
+        return unless employment_term_date.present?
+        if employment_term_date > TimeKeeper.date_of_record && hbx_enrollment.may_schedule_coverage_termination?
           hbx_enrollment.schedule_coverage_termination!(employment_term_date.end_of_month)
         elsif hbx_enrollment.may_terminate_coverage?
           hbx_enrollment.terminate_coverage!(employment_term_date.end_of_month)
         end
+        hbx_enrollment.notify_of_coverage_start(true)
       end
 
       def reinstate_after_effects(hbx_enrollment)

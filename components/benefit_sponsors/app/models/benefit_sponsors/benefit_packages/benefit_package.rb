@@ -258,7 +258,7 @@ module BenefitSponsors
       end
 
       def reinstate_enrollment(hbx_enrollment)
-        ::Operations::HbxEnrollments::Reinstate.new.call({hbx_enrollment: hbx_enrollment})
+        ::Operations::HbxEnrollments::Reinstate.new.call({hbx_enrollment: hbx_enrollment, options: {benefit_package: self}})
       end
 
       def renew_member_benefits
@@ -431,13 +431,20 @@ module BenefitSponsors
         return if predecessor_package.blank?
         end_date = (predecessor_package.canceled? ? predecessor_package.start_on : predecessor_package.end_on).to_date
         census_employees_eligible_for_reinstate(predecessor_package, end_date.next_day).each do |census_employee|
-          benefit_group_assignment = census_employee.benefit_group_assignments.where(benefit_package_id: predecessor_package.id, end_on: end_date).order_by(:created_at.desc).first
-          result = reinstate_benefit_group_assignment(benefit_group_assignment)
-          next if census_employee.family.blank? || result.failure?
-          enrollments_eligible_for_reinstate(census_employee, predecessor_package).each do |hbx_enrollment|
-            reinstate_enrollment(hbx_enrollment)
-          end
+          reinstate_member(census_employee, predecessor_package, end_date)
         end
+      end
+
+      def reinstate_member(census_employee, predecessor_package, end_date)
+        benefit_group_assignment = census_employee.benefit_group_assignments.where(benefit_package_id: predecessor_package.id, end_on: end_date).order_by(:created_at.desc).first
+        result = reinstate_benefit_group_assignment(benefit_group_assignment)
+        raise StandardError, "assignment: #{benefit_group_assignment.id}" unless result.success?
+        enrollments_eligible_for_reinstate(census_employee, predecessor_package).each do |hbx_enrollment|
+          result = reinstate_enrollment(hbx_enrollment)
+          raise StandardError, "enrollment: #{hbx_enrollment.hbx_id}" unless result.success?
+        end
+      rescue StandardError => e
+        Rails.logger.error { "Unable to reinstate census member: #{census_employee.id} - #{e.message}" }
       end
 
       def cancel_member_benefits(delete_benefit_package: false, enroll_notify: false)
