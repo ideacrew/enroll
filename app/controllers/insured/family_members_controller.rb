@@ -2,7 +2,7 @@ class Insured::FamilyMembersController < ApplicationController
   include VlpDoc
   include ApplicationHelper
 
-  before_action :permit_dependent_person_params, only: %i[create]
+  before_action :permit_dependent_person_params, only: %i[create update]
 
   before_action :set_current_person, :set_family
   before_action :set_dependent, only: [:destroy, :show, :edit, :update]
@@ -88,7 +88,6 @@ class Insured::FamilyMembersController < ApplicationController
       end
       return
     end
-
     if @address_errors.blank? && @dependent.save && update_vlp_documents(@dependent.family_member.try(:person).try(:consumer_role), 'dependent', @dependent)
       @created = true
       respond_to do |format|
@@ -150,7 +149,7 @@ class Insured::FamilyMembersController < ApplicationController
     end
     consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
     @info_changed, @dc_status = sensitive_info_changed?(consumer_role)
-    if @address_errors.blank? && @dependent.update_attributes(params.require(:dependent)) && update_vlp_documents(consumer_role, 'dependent', @dependent)
+    if @address_errors.blank? && @dependent.update_attributes(params[:dependent]) && update_vlp_documents(consumer_role, 'dependent', @dependent)
       consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
       consumer_role.check_for_critical_changes(@dependent.family_member.family, info_changed: @info_changed, is_homeless: params[:dependent]["is_homeless"], is_temporarily_out_of_state: params[:dependent]["is_temporarily_out_of_state"], dc_status: @dc_status) if consumer_role
       consumer_role.update_attribute(:is_applying_coverage,  params[:dependent][:is_applying_coverage]) if consumer_role.present? && (!params[:dependent][:is_applying_coverage].nil?)
@@ -250,10 +249,8 @@ private
     param_indexes = clean_address_params.keys.compact
     param_indexes.each do |param_index|
       permitted_address_params = clean_address_params.require(param_index).permit(:address_1, :address_2, :city, :kind, :state, :zip)
-      permitted_address_params.to_h.each do |_key, value|
-        result = Validators::AddressContract.new.call(value)
-        errors_array << result.errors.to_h if result.failure?
-      end
+      result = Validators::AddressContract.new.call(permitted_address_params.to_h)
+      errors_array << result.errors.to_h if result.failure?
     end
     errors_array
   end
