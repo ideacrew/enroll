@@ -12,6 +12,7 @@ module Validators
         required(:start_on).filled(:date)
 
         optional(:end_on).maybe(:date)
+        optional(:activated_at).maybe(:date)
         optional(:hbx_enrollment_id).maybe(Types::Bson)
         optional(:is_active).maybe(:bool)
       end

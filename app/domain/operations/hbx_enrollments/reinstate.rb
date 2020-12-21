@@ -15,14 +15,11 @@ module Operations
       # @param [ HbxEnrollment ] hbx_enrollment
       # @return [ HbxEnrollment ] hbx_enrollment
       def call(params)
-        values           = yield validate(params)
-        new_enr          = yield new_hbx_enrollment(values)
-        hbx_enrollment   = yield reinstate_hbx_enrollment(new_enr)
-
-        # TODO
-        # 1. age off sceario
-        # 2. terminate enrollments for terminated employee's
-
+        values            = yield validate(params)
+        new_enr           = yield new_hbx_enrollment(values)
+        hbx_enrollment    = yield reinstate_hbx_enrollment(new_enr)
+        _hbx_enrollment   = yield reinstate_after_effects(hbx_enrollment)
+        # TODO: age off enrollment term
         Success(hbx_enrollment)
       end
 
@@ -41,13 +38,21 @@ module Operations
 
       def valid_by_states?(enrollment)
         aasm_state = enrollment.aasm_state
-        return true if ['coverage_terminated', 'coverage_termination_pending'].include?(aasm_state)
-        aasm_state == 'coverage_canceled' && enrollment.terminate_reason == 'retroactive_canceled'
+        reason = enrollment.terminate_reason
+        ['coverage_terminated', 'coverage_termination_pending', 'coverage_canceled'].include?(aasm_state) && HbxEnrollment::TERM_REASONS.include?(reason) || canceled_eligble(enrollment)
+      end
+
+      def canceled_eligble(enrollment)
+        predecessor_package = enrollment.sponsored_benefit_package
+        application_transition = predecessor_package.benefit_application.workflow_state_transitions.detect{|transition|
+          predecessor_package.canceled? ? predecessor_package.canceled_as_active?(transition) : predecessor_package.term_as_active?(transition)}
+        application_transition.present? &&
+            enrollment.workflow_state_transitions.any?{ |wst| predecessor_package.canceled_after?(wst, application_transition.transition_at) || predecessor_package.termed_after?(wst, application_transition.transition_at)}
       end
 
       def active_bga_exists?(params)
         @effective_on = fetch_effective_on(params)
-        @bga = @current_enr.census_employee.benefit_group_assignments.order_by(:'created_at'.desc).detect{ |bga| bga.is_active?(@effective_on)}
+        @bga = @current_enr.census_employee.benefit_group_assignments.order_by(:created_at.desc).detect{ |bga| bga.is_active?(@effective_on) }
       end
 
       def overlapping_enrollment_exists?
@@ -109,9 +114,34 @@ module Operations
         else
           return Failure('Cannot transition to state coverage_selected on event begin_coverage.') unless new_enrollment.may_begin_coverage?
           new_enrollment.begin_coverage!
+          new_enrollment.notify_of_coverage_start(true)
         end
 
         Success(new_enrollment)
+      end
+
+      def update_benefit_group_assignment(hbx_enrollment)
+        assignment = hbx_enrollment.census_employee.benefit_group_assignment_by_package(hbx_enrollment.sponsored_benefit_package_id, hbx_enrollment.effective_on)
+        assignment.update_attributes(hbx_enrollment_id: hbx_enrollment.id) if assignment
+      end
+
+      def terminate_employment_term_enrollment(hbx_enrollment)
+        census_employee = hbx_enrollment.census_employee
+        employment_term_date = census_employee.employment_terminated_on
+        return unless employment_term_date
+        if employment_term_date > TimeKeeper.date_of_record
+          if hbx_enrollment.may_schedule_coverage_termination?
+          hbx_enrollment.schedule_coverage_termination!(employment_term_date.end_of_month)
+        elsif hbx_enrollment.may_terminate_coverage?
+          hbx_enrollment.terminate_coverage!(employment_term_date.end_of_month)
+        end
+      end
+
+      def reinstate_after_effects(hbx_enrollment)
+        update_benefit_group_assignment(hbx_enrollment)
+        terminate_employment_term_enrollment(hbx_enrollment)
+
+        Success(hbx_enrollment)
       end
     end
   end
