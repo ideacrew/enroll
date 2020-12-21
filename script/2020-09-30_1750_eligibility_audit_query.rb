@@ -146,7 +146,7 @@ def fork_kids(ivl_ids)
 end
 
 def run_audit_for_batch(current_proc_index, ivl_people_ids, writer)
-  f = File.open("audit_log_#{current_proc_index}", 'w')
+  f = File.open("audit_log_#{current_proc_index}.log", 'w')
   keys_to_delete = person_family_map.keys - ivl_people_ids
   keys_to_delete.each do |k|
     person_family_map.delete(k)
@@ -257,9 +257,7 @@ end
 
 child_procs = fork_kids(ivl_person_ids)
 
-
 reader_map = Hash.new
-
 child_procs.each do |proc|
   reader_map[proc.first] = proc.last
 end
