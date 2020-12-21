@@ -132,6 +132,7 @@ module SponsoredBenefits
 
         event :publish do
           transitions from: :draft, to: :published, :guard => "can_quote_be_published?", after: :set_employer_claim_code
+          transitions from: :renewing_draft, to: :published, :guard => "can_quote_be_published?", after: :set_employer_claim_code
         end
 
         event :claim do
