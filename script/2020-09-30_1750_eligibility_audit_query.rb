@@ -152,7 +152,7 @@ def run_audit_for_batch(current_proc_index, ivl_people_ids, writer)
     person_family_map.delete(k)
   end
   begin
-    ivl_people = IvlEligibilityAudits::EligiblityQueryCursor.new(ivl_people_ids)
+    ivl_people = IvlEligibilityAudits::EligibilityQueryCursor.new(ivl_people_ids)
     CSV.open("audit_ivl_determinations_#{current_proc_index}.csv", "w") do |csv|
       csv << [
         "Family ID",

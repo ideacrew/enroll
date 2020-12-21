@@ -47,7 +47,7 @@ module IvlEligibilityAudits
     end
   end
 
-  class EligiblityQueryCursor
+  class EligibilityQueryCursor
     include Enumerable
   
     def initialize(person_ids)
