@@ -5,7 +5,7 @@ AUDIT_END_DATE = Date.new(2020,10,1)
 STDOUT.puts "Standard caching complete."
 STDOUT.flush
 
-PROC_COUNT = 3
+PROC_COUNT = 5
 
 STDERR.puts "TESTING STANDARD ERROR REDIRECTION"
 STDERR.flush
@@ -148,11 +148,12 @@ def fork_kids(ivl_ids, f_map, hb_packages)
 end
 
 def run_audit_for_batch(current_proc_index, ivl_people_ids, writer, person_family_map, health_benefit_packages)
-  f = File.open("audit_log_#{current_proc_index}.log", 'w')
   keys_to_delete = person_family_map.keys - ivl_people_ids
   keys_to_delete.each do |k|
     person_family_map.delete(k)
   end
+  GC.start
+  f = File.open("audit_log_#{current_proc_index}.log", 'w')
   begin
     ivl_people = IvlEligibilityAudits::EligibilityQueryCursor.new(ivl_people_ids)
     CSV.open("audit_ivl_determinations_#{current_proc_index}.csv", "w") do |csv|
@@ -280,6 +281,9 @@ child_procs = fork_kids(ivl_person_ids, family_map, h_packages)
 child_procs.each do |proc|
   reader_map[proc.first] = proc.last
 end
+
+family_map = nil
+GC.start
 
 pb = ProgressBar.create(
   :title => "Running records",
