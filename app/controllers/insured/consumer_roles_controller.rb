@@ -379,7 +379,9 @@ class Insured::ConsumerRolesController < ApplicationController
       :no_dc_address_reason,
       :is_applying_coverage,
       :is_homeless,
-      :is_temporarily_out_of_state
+      :is_temporarily_out_of_state,
+      :user_id,
+      :dob_check
     ]
   end
 
