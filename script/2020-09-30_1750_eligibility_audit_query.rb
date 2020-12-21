@@ -23,7 +23,7 @@ families_of_interest = Family.where(
 STDOUT.puts "Counted #{families_of_interest.count} families."
 STDOUT.flush
 
-person_family_map = IvlEligibilityAudits::AuditQueryCache.generate_family_map_for(ivl_person_ids)
+family_map = IvlEligibilityAudits::AuditQueryCache.generate_family_map_for(ivl_person_ids)
 
 # So what we need here is: family_membership * person_record * version_numbers_for_person
 person_id_count = ivl_person_ids.count
@@ -125,7 +125,7 @@ def auditable?(person_record, person_version, person_updated_at, family)
   not_authorized_by_curam?(person_version)
 end
 
-def fork_kids(ivl_ids)
+def fork_kids(ivl_ids, f_map)
   child_list = Array.new
   id_chunks = ivl_ids.in_groups(PROC_COUNT, false)
   (1..PROC_COUNT).to_a.each do |proc_index|
@@ -134,7 +134,7 @@ def fork_kids(ivl_ids)
     fork_result = Process.fork
     if fork_result.nil?
       reader.close
-      run_audit_for_batch(proc_index, child_ivl_ids, writer)
+      run_audit_for_batch(proc_index, child_ivl_ids, writer, f_map)
       writer.close
       exit 0
     else
@@ -147,7 +147,7 @@ def fork_kids(ivl_ids)
   child_list
 end
 
-def run_audit_for_batch(current_proc_index, ivl_people_ids, writer)
+def run_audit_for_batch(current_proc_index, ivl_people_ids, writer, person_family_map)
   f = File.open("audit_log_#{current_proc_index}.log", 'w')
   keys_to_delete = person_family_map.keys - ivl_people_ids
   keys_to_delete.each do |k|
@@ -273,7 +273,7 @@ end
 
 STDOUT.puts "Starting Child Processes"
 STDOUT.flush
-child_procs = fork_kids(ivl_person_ids)
+child_procs = fork_kids(ivl_person_ids, family_map)
 child_procs.each do |proc|
   reader_map[proc.first] = proc.last
 end
