@@ -139,6 +139,8 @@ def fork_kids(ivl_ids)
       exit 0
     else
       writer.close
+      STDOUT.puts "Launched child: #{proc_index}, pid: #{fork_result}"
+      STDOUT.flush
       child_list << [fork_result, reader]
     end
   end
@@ -255,19 +257,25 @@ def run_audit_for_batch(current_proc_index, ivl_people_ids, writer)
   end
 end
 
-child_procs = fork_kids(ivl_person_ids)
-
 reader_map = Hash.new
-child_procs.each do |proc|
-  reader_map[proc.first] = proc.last
-end
 
 Signal.trap("CLD") do
+  STDERR.puts "DEAD CHILD SIGNALLED"
+  STDERR.flush
   dead_child = Process.wait(-1, Process::WNOHANG)
   if !dead_child.nil?
+    STDERR.puts "Child died: #{dead_child}"
+    STDERR.flush
     reader_map[dead_child].close
     reader_map.delete(dead_child)
   end
+end
+
+STDOUT.puts "Starting Child Processes"
+STDOUT.flush
+child_procs = fork_kids(ivl_person_ids)
+child_procs.each do |proc|
+  reader_map[proc.first] = proc.last
 end
 
 pb = ProgressBar.create(
