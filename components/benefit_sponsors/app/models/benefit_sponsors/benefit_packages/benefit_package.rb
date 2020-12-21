@@ -387,6 +387,7 @@ module BenefitSponsors
           enrollments.each do |hbx_enrollment|
             if hbx_enrollment.effective_on > enrollment_term_date(term_date)
               if hbx_enrollment.may_cancel_coverage?
+                hbx_enrollment.terminate_reason = enrollment_term_reason(enroll_term_reason)
                 hbx_enrollment.cancel_coverage!(enrollment_term_date(term_date))
                 hbx_enrollment.notify_enrollment_cancel_or_termination_event(enrollment_notify_flag(enroll_notify))
               end
@@ -410,6 +411,7 @@ module BenefitSponsors
           enrollments.each do |hbx_enrollment|
             if hbx_enrollment.effective_on > enrollment_term_date(term_date)
               if hbx_enrollment.may_cancel_coverage?
+                hbx_enrollment.terminate_reason = enrollment_term_reason(enroll_term_reason)
                 hbx_enrollment.cancel_coverage!(enrollment_term_date(term_date))
                 hbx_enrollment.notify_enrollment_cancel_or_termination_event(enrollment_notify_flag(enroll_notify))
               end
