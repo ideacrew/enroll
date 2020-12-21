@@ -262,12 +262,15 @@ reader_map = Hash.new
 Signal.trap("CLD") do
   STDERR.puts "DEAD CHILD SIGNALLED"
   STDERR.flush
-  dead_child = Process.wait(-1, Process::WNOHANG)
-  if !dead_child.nil?
-    STDERR.puts "Child died: #{dead_child}"
-    STDERR.flush
-    reader_map[dead_child].close
-    reader_map.delete(dead_child)
+  child_pids = reader_map.keys.dup
+  child_pids.each do |cpid|
+    dead_child = Process.wait(cpid, Process::WNOHANG)
+    if !dead_child.nil?
+      STDERR.puts "Child died: #{dead_child}"
+      STDERR.flush
+      reader_map[dead_child].close
+      reader_map.delete(dead_child)
+    end
   end
 end
 
