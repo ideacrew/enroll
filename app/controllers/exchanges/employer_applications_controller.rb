@@ -57,19 +57,16 @@ module Exchanges
     end
 
     def reinstate
-      begin
-        application = @benefit_sponsorship.benefit_applications.find(params[:employer_application_id])
-        result = EnrollRegistry[:benefit_application_reinstate]{ {params: {benefit_application: application} } }
-        if result.failure?
-          # TODO update messages end date
-          success = {error: "#{application.benefit_sponsorship.legal_name} - #{result.failure} #{application.end_on.next_day}"}
-        else
-          failure = {success: "#{application.benefit_sponsorship.legal_name} - #{l10n('exchange.employer_applications.success_message')} #{application.end_on.next_day}"}
-        end
-      rescue => e
-        failure = {error: "An error occured when reinstating application."}
+      application = @benefit_sponsorship.benefit_applications.find(params[:employer_application_id])
+      result = EnrollRegistry[:benefit_application_reinstate]{ {params: {benefit_application: application} } }
+      if result.success?
+        flash[:notice] = "#{application.benefit_sponsorship.legal_name} - #{l10n('exchange.employer_applications.success_message')} #{(application.canceled? ? application.start_on : application.end_on.next_day).to_date}"
+      else
+        flash[:error] = "#{application.benefit_sponsorship.legal_name} - #{result.failure}"
       end
-      redirect_to exchanges_hbx_profiles_root_path, :flash => success || failure
+      redirect_to exchanges_hbx_profiles_root_path
+    rescue StandardError
+      redirect_to exchanges_hbx_profiles_root_path, :flash[:error] => "#{application.benefit_sponsorship.legal_name} - #{l10n('exchange.employer_applications.unable_to_reinstate')}"
     end
 
     private
