@@ -13,22 +13,6 @@ STDERR.flush
 health_benefit_packages = IvlEligibilityAudits::AuditQueryCache.benefit_packages_for(2020)
 puts "Health Benefit Packages located."
 STDOUT.flush
-non_curam_ivl = Person.collection.aggregate([
-  {"$project" => {
-    _id: 1,
-    created_at: 1,
-    updated_at: 1,
-    consumer_role: 1
-  }},
-  {"$match" => {
-    "consumer_role._id" => {"$ne" => nil},
-    "$or" => [
-      {"created_at" => {"$gte" => AUDIT_START_DATE}},
-      {"created_at" => {"$lt" => AUDIT_START_DATE}, "updated_at" => {"$gte" => AUDIT_START_DATE}}
-    ]
-  }},
-  {"$project" => {_id: 1}}
-])
 ivl_person_ids = IvlEligibilityAudits::AuditQueryCache.person_ids_for_audit_period_starting(AUDIT_START_DATE)
 STDOUT.puts "Counted #{ivl_person_ids.count} people."
 STDOUT.flush
