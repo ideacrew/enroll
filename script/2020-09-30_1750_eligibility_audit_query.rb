@@ -304,7 +304,8 @@ end
 child_procs.each do |cproc|
   signal_writer = cproc[1]
   signal_writer.write("START")
-  signal_writer.close
+  signal_writer.flush
+  # signal_writer.close
   STDOUT.puts "CHILD #{cproc.first} START SIGNAL SENT"
   STDOUT.flush
 end
