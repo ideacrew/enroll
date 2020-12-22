@@ -90,10 +90,6 @@ module BenefitSponsors
         active_benefit_sponsorship.off_cycle_benefit_application
       end
 
-      def reinstated_benefit_application
-        active_benefit_sponsorship.reinstated_benefit_application
-      end
-
       def future_active_reinstated_benefit_application
         active_benefit_sponsorship.future_active_reinstated_benefit_application
       end
