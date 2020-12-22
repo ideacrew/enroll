@@ -112,6 +112,17 @@ class CensusEmployee < CensusMember
     )
   }
 
+
+  scope :eligible_reinstate_for_package, lambda { |benefit_package, active_on|
+    where(:benefit_group_assignments => {:$elemMatch => {:benefit_package_id => benefit_package.id,
+                                                        :start_on => { "$gte" => benefit_package.start_on },
+                                                        :end_on => (benefit_package.canceled? ? benefit_package.start_on : benefit_package.end_on).to_date}},
+         "$or" => [{"employment_terminated_on" => nil},
+                   {"employment_terminated_on" => {"$exists" => false}},
+                   {"employment_terminated_on" => {"$gte" => active_on}}])
+  }
+
+
   scope :employees_for_benefit_application_sponsorship, ->(benefit_application) {
     new_effective_date = benefit_application.start_on
     benefit_sponsorship_id = benefit_application.benefit_sponsorship.id
@@ -324,6 +335,11 @@ class CensusEmployee < CensusMember
     if benefit_packages.present? && (renewal_benefit_group_assignment.blank? || !benefit_packages.map(&:id).include?(renewal_benefit_group_assignment.benefit_package.id))
       add_renew_benefit_group_assignment(benefit_packages)
     end
+  end
+
+  def benefit_group_assignment_by_package(package_id, start_on)
+    # benefit_group_assignments.where(benefit_package_id: package_id).order_by(:'updated_at'.desc).first
+    benefit_group_assignments.detect { |benefit_group_assignment| benefit_group_assignment.benefit_package_id == package_id && benefit_group_assignment.is_active?(start_on) }
   end
 
   def create_benefit_group_assignment(benefit_packages, off_cycle = false)
