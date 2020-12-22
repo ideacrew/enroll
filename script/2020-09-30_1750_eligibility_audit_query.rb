@@ -1,6 +1,7 @@
 require 'delegate'
 
 Caches::PlanDetails.drop_cache_to_free_ram!
+MallocTrim.trim
 
 AUDIT_START_DATE = Date.new(2019,10,1)
 AUDIT_END_DATE = Date.new(2020,10,1)
@@ -286,6 +287,7 @@ end
 
 family_map = nil
 GC.start
+MallocTrim.trim
 
 pb = ProgressBar.create(
   :title => "Running records",

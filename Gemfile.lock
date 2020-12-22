@@ -536,6 +536,7 @@ GEM
       nokogiri (>= 1.5.9)
     mail (2.7.1)
       mini_mime (>= 0.1.1)
+    malloc_trim (0.1.0)
     marcel (0.3.3)
       mimemagic (~> 0.3.2)
     maskedinput-rails (1.4.1.0)
@@ -959,6 +960,7 @@ DEPENDENCIES
   listen (>= 3.0.5, < 3.2)
   loofah (~> 2.3.1)
   mail (~> 2.7)
+  malloc_trim
   maskedinput-rails (~> 1.4)
   money-rails (~> 1.13)
   mongo (~> 2.6)
@@ -1037,4 +1039,4 @@ RUBY VERSION
    ruby 2.5.1p57
 
 BUNDLED WITH
-   2.0.1
+   2.1.4

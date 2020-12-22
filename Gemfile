@@ -223,3 +223,5 @@ end
 # gem 'therubyracer', '~> 0.12.3', platforms: :ruby
 # gem 'selenium-webdriver', '3.141.0'
 #######################################################
+
+gem 'malloc_trim'
