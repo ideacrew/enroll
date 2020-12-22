@@ -13,7 +13,7 @@ RSpec.describe Eligibility::EmployeeBenefitPackages, type: :model, dbclean: :aro
     let(:benefit_package)      { initial_application.benefit_packages.first }
     let(:census_employee)      { FactoryBot.create(:census_employee, employer_profile: abc_profile) }
 
-    context 'census employee has no benefit group assignments'do
+    context 'census employee has no benefit group assignments' do
       it 'should create new benefit group assignment' do
         expect(census_employee.benefit_group_assignments.count).to eq 0
         census_employee.create_benefit_group_assignment(initial_application.benefit_packages, false, false)
@@ -22,7 +22,7 @@ RSpec.describe Eligibility::EmployeeBenefitPackages, type: :model, dbclean: :aro
       end
     end
 
-    context 'if census employee has already a benefit group assignment which starts in future'do
+    context 'if census employee has already a benefit group assignment which starts in future' do
       let(:census_employee)      { FactoryBot.create(:census_employee, employer_profile: abc_profile) }
       let!(:benefit_group_assignment) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: benefit_package, census_employee: census_employee)}
 
@@ -44,7 +44,7 @@ RSpec.describe Eligibility::EmployeeBenefitPackages, type: :model, dbclean: :aro
       end
     end
 
-    context 'if census employee has already a future reinstated benefit group assignment which starts in future'do
+    context 'if census employee has already a future reinstated benefit group assignment which starts in future' do
       let(:census_employee)      { FactoryBot.create(:census_employee, employer_profile: abc_profile) }
       let!(:benefit_group_assignment) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: benefit_package, census_employee: census_employee)}
 
