@@ -9,8 +9,8 @@ RSpec.describe BenefitSponsors::Validators::SponsoredBenefits::ContributionLevel
   let(:is_offered)               { true }
   let(:contribution_factor)      { 0.75 }
   let(:min_contribution_factor)  { 0.5 }
-  let(:contribution_cap)         { 0.75 }
-  let(:flat_contribution_amount) { 227.07 }
+  let(:contribution_cap)         { '0.75' }
+  let(:flat_contribution_amount) { '227.07' }  #TODO: fix this
 
   let(:missing_params)   { {display_name: display_name, contribution_unit_id: contribution_unit_id, is_offered: is_offered, contribution_factor: contribution_factor, contribution_cap: contribution_cap} }
   let(:invalid_params)   { missing_params.merge({min_contribution_factor: 'one', flat_contribution_amount: '222' })}

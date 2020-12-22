@@ -853,7 +853,7 @@ module BenefitSponsors
       state :retroactive_canceled,   :after_enter => :transition_benefit_package_members  # Application closed after coverage taking to effect
       state :termination_pending, :after_enter => :transition_benefit_package_members # Coverage under this application is termination pending
       state :suspended   # Coverage is no longer in effect. members may not enroll or change enrollments
-      state :reinstated, :after_enter => :transition_benefit_package_members # Coverage under this application is termination pending# This is tmp state in between draft and active(any active state).
+      state :reinstated, :after_enter => :transition_benefit_package_members # This is tmp state in between draft and active(any active state).
 
       after_all_transitions [:publish_state_transition, :notify_application]
 
