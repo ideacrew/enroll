@@ -295,8 +295,10 @@ pb = ProgressBar.create(
 
 while !reader_map.empty?
   rs, _ws, _es = IO.select(reader_map.values, [], [], 30)
-  rs.each do |r|
-    r.read(1)
-    pb.increment
+  if !rs.nil?
+    rs.each do |r|
+      r.read(1)
+      pb.increment
+    end
   end
 end
