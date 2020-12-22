@@ -106,6 +106,12 @@ RSpec.describe Operations::BenefitGroupAssignments::Reinstate, :type => :model, 
         subject.call({benefit_group_assignment: benefit_group_assignment, options: {benefit_package: reinstated_benefit_package}})
         expect(census_employee.benefit_group_assignments.count).to eq 2
       end
+
+      it "reinstated bga start date == old bga end date + 1" do
+        reinstated_bga = subject.call({benefit_group_assignment: benefit_group_assignment, options: {benefit_package: reinstated_benefit_package}}).success
+        expect(reinstated_bga.start_on).to eq benefit_group_assignment.end_on.next_day
+        expect(reinstated_bga.activated_at).to eq TimeKeeper.datetime_of_record
+      end
     end
 
     context 'if previous benefit group assignment is canceled' do
@@ -132,9 +138,13 @@ RSpec.describe Operations::BenefitGroupAssignments::Reinstate, :type => :model, 
 
       it 'newly create bga for census employee should have the same start as benefit package start on' do
         expect(census_employee.benefit_group_assignments.count).to eq 1
-        subject.call({benefit_group_assignment: benefit_group_assignment, options: {benefit_package: reinstated_benefit_package}})
+        reinstated_bga = subject.call({benefit_group_assignment: benefit_group_assignment, options: {benefit_package: reinstated_benefit_package}}).success
         new_bga = census_employee.benefit_group_assignments.by_benefit_package(reinstated_benefit_package).detect(&:is_active?)
         expect(new_bga.end_on).to eq nil
+
+        expect(reinstated_bga.start_on).to eq benefit_group_assignment.start_on
+        expect(reinstated_bga.activated_at).to eq TimeKeeper.datetime_of_record
+
       end
     end
 
