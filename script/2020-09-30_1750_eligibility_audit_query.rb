@@ -141,11 +141,11 @@ def fork_kids(ivl_ids, f_map, hb_packages)
       reader.close
       signal_chans, _ws, _es = IO.select([signalled])
       signal_chans.each do |sc|
-        sc.read()
+        sc.read(1)
       end
       signalled.close
-      STDOUT.puts "Child #{Process.pid}: START SIGNAL RECIEVED"
-      STDOUT.flush
+      STDERR.puts "Child #{Process.pid}: START SIGNAL RECIEVED"
+      STDERR.flush
       run_audit_for_batch(proc_index, child_ivl_ids, writer, f_map, hb_packages)
       writer.close
       exit 0
@@ -303,9 +303,9 @@ end
 
 child_procs.each do |cproc|
   signal_writer = cproc[1]
-  signal_writer.write("START")
+  signal_writer.write("S")
   signal_writer.flush
-  # signal_writer.close
+  signal_writer.close
   STDOUT.puts "CHILD #{cproc.first} START SIGNAL SENT"
   STDOUT.flush
 end
