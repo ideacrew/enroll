@@ -8,7 +8,7 @@ AUDIT_END_DATE = Date.new(2020,10,1)
 STDOUT.puts "Standard caching complete."
 STDOUT.flush
 
-PROC_COUNT = 8
+PROC_COUNT = 4
 
 STDERR.puts "TESTING STANDARD ERROR REDIRECTION"
 STDERR.flush
