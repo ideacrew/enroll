@@ -472,7 +472,7 @@ module BenefitSponsors
       end
 
       def canceled_as_active?(transition)
-        transition.from_state == 'active' && transition.to_state == 'canceled'
+        transition.from_state == 'active' && ['canceled', 'retroactive_canceled'].include?(transition.to_state)
       end
 
       def term_as_active?(transition)
