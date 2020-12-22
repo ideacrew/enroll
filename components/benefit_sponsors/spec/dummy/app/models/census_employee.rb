@@ -391,6 +391,19 @@ class CensusEmployee < CensusMember
     end
   end
 
+  def future_active_reinstated_benefit_group_assignment
+    reinstated_app = benefit_sponsorship&.future_active_reinstated_benefit_application
+    return if reinstated_app.nil?
+
+    assignment = benefit_package_assignment_on(reinstated_app.start_on)
+    benefit_package_ids = reinstated_app.benefit_packages.map(&:id)
+    benefit_package_ids.include?(assignment&.benefit_package&.id) ? assignment : nil
+  end
+
+  def reinstated_benefit_group_with_future_date
+    future_active_reinstated_benefit_group_assignment.benefit_package if future_active_reinstated_benefit_group_assignment&.benefit_package&.benefit_application&.active?
+  end
+
   def published_benefit_group_assignment
     benefit_group_assignments.detect do |benefit_group_assignment|
       benefit_group_assignment.benefit_group.is_active && benefit_group_assignment.benefit_group.plan_year.employees_are_matchable?
