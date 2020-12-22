@@ -318,7 +318,7 @@ MallocTrim.trim
 
 pb = ProgressBar.create(
   :title => "Running records",
-  :total => 5000,
+  :total => ivl_person_ids.length,
   :format => "%t %a %E %c/%C %P%%",
   :throttle_rate => 5.0
 )
