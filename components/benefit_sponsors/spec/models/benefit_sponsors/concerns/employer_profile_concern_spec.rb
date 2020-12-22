@@ -170,7 +170,7 @@ module BenefitSponsors
         expect(abc_profile.future_active_reinstated_benefit_application).to eq benefit_application
       end
 
-      it 'should return nil if no reinstated enrollment present' do
+      it 'should return nil if no reinstated application present' do
         expect(abc_profile.future_active_reinstated_benefit_application).to eq nil
       end
     end
