@@ -29,7 +29,7 @@ STDOUT.flush
 family_map = IvlEligibilityAudits::AuditQueryCache.generate_family_map_for(ivl_person_ids)
 
 # So what we need here is: family_membership * person_record * version_numbers_for_person
-person_id_count = ivl_person_ids.count
+person_id_count = ivl_person_ids.length
 STDOUT.puts person_id_count.inspect
 STDOUT.puts families_of_interest.count
 STDOUT.flush
@@ -156,6 +156,7 @@ def run_audit_for_batch(current_proc_index, ivl_people_ids, writer, person_famil
     person_family_map.delete(k)
   end
   GC.start
+  MallocTrim.trim
   f = File.open("audit_log_#{current_proc_index}.log", 'w')
   begin
     ivl_people = IvlEligibilityAudits::EligibilityQueryCursor.new(ivl_people_ids)
@@ -195,60 +196,59 @@ def run_audit_for_batch(current_proc_index, ivl_people_ids, writer, person_famil
         person_versions = Versioning::VersionCollection.new(pers_record)
         person_versions.each do |p_v|
           begin
-          p_version = p_v.resolve_to_model
-          person_updated_at = p_v.timestamp
-          families = person_family_map[pers_record.id]
-          # This "pers" variable will be the version that is appended to the CSV
-          pers = p_version
-          families.each do |fam|
-            cr = pers.consumer_role
-            if cr
-              cr.person = p_version
-              begin
-                if auditable?(pers_record, p_version, person_updated_at, fam)
-                  eligible, eligibility_errors = calc_eligibility_for(cr, fam, health_benefit_packages, person_updated_at)
-                  lpd = cr.lawful_presence_determination
-                  if lpd
-                    address_fields = home_address_for(pers)
-                    mailing_address_fields = mailing_address_for(pers)
-                    csv << ([
-                      fam.id,
-                      pers.hbx_id,
-                      pers.last_name,
-                      pers.first_name,
-                      pers.full_name,
-                      pers.dob,
-                      pers.gender,
-                      person_updated_at.strftime("%Y-%m-%d %H:%M:%S.%L"),
-                      (pers_record.id == fam.primary_applicant.person_id),
-                      relationship_for(pers_record, fam, person_updated_at),
-                      lpd.citizen_status,
-                      (lpd.citizen_status.nil? ? nil : (lpd.citizen_status == "indian_tribe_member")),
-                      pers.is_incarcerated] +
-                      address_fields +
-                      mailing_address_fields +
-                      [
-                        pers.no_dc_address,
-                        pers.no_dc_address ? pers.no_dc_address_reason : "",
-                        cr.is_applying_coverage,
-                        pers.resident_role.present?,
-                        eligible,
-                        eligible ? "" : eligibility_errors
-                    ])
-                  end
-                end          
-              rescue Mongoid::Errors::DocumentNotFound => e
-                f.puts e.inspect
-                f.flush
-                puts e.inspect
+            p_version = p_v.resolve_to_model
+            person_updated_at = p_v.timestamp
+            families = person_family_map[pers_record.id]
+            # This "pers" variable will be the version that is appended to the CSV
+            pers = p_version
+            families.each do |fam|
+              cr = pers.consumer_role
+              if cr
+                cr.person = p_version
+                begin
+                  if auditable?(pers_record, p_version, person_updated_at, fam)
+                    eligible, eligibility_errors = calc_eligibility_for(cr, fam, health_benefit_packages, person_updated_at)
+                    lpd = cr.lawful_presence_determination
+                    if lpd
+                      address_fields = home_address_for(pers)
+                      mailing_address_fields = mailing_address_for(pers)
+                      csv << ([
+                        fam.id,
+                        pers.hbx_id,
+                        pers.last_name,
+                        pers.first_name,
+                        pers.full_name,
+                        pers.dob,
+                        pers.gender,
+                        person_updated_at.strftime("%Y-%m-%d %H:%M:%S.%L"),
+                        (pers_record.id == fam.primary_applicant.person_id),
+                        relationship_for(pers_record, fam, person_updated_at),
+                        lpd.citizen_status,
+                        (lpd.citizen_status.nil? ? nil : (lpd.citizen_status == "indian_tribe_member")),
+                        pers.is_incarcerated] +
+                        address_fields +
+                        mailing_address_fields +
+                        [
+                          pers.no_dc_address,
+                          pers.no_dc_address ? pers.no_dc_address_reason : "",
+                          cr.is_applying_coverage,
+                          pers.resident_role.present?,
+                          eligible,
+                          eligible ? "" : eligibility_errors
+                      ])
+                    end
+                  end          
+                rescue Mongoid::Errors::DocumentNotFound => e
+                  f.puts e.inspect
+                  f.flush
+                  puts e.inspect
+                end
               end
             end
-          end
           rescue HistoryTrackerReversalError => htre
             f.puts pers.inspect
             f.puts htre.inspect
             f.flush
-            next
           end
         end
         writer.write("+")
@@ -292,15 +292,15 @@ MallocTrim.trim
 pb = ProgressBar.create(
   :title => "Running records",
   :total => person_id_count,
-  :format => "%t %a %e |%B| %P%%"
+  :format => "%t %a %e %c/%C %P%%"
 )
 
 while !reader_map.empty?
   rs, _ws, _es = IO.select(reader_map.values, [], [], 30)
   if !rs.nil?
     rs.each do |r|
-      r.read(1)
-      pb.increment
+      values = r.read
+      pb.progress += values.length
     end
   end
 end
