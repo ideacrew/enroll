@@ -961,6 +961,55 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       end
     end
 
+    context '.eligible_reinstate_for_package' do
+      include_context 'setup initial benefit application'
+
+      let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_month - 6.months }
+      let(:aasm_state) { :active }
+      let!(:census_employee) { create(:census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile) }
+      let(:benefit_package) { initial_application.benefit_packages[0] }
+      let(:active_benefit_group_assignment) do
+        FactoryBot.create(
+          :benefit_sponsors_benefit_group_assignment,
+          benefit_group: benefit_package,
+          census_employee: census_employee,
+          start_on: benefit_package.start_on,
+          end_on: benefit_package.end_on
+        )
+      end
+
+      context 'when census employee active' do
+        it "should return active employees" do
+          expect(CensusEmployee.eligible_reinstate_for_package(benefit_package, benefit_package.start_on).count).to eq 1
+          expect(CensusEmployee.eligible_reinstate_for_package(benefit_package, benefit_package.start_on).first).to eq census_employee
+        end
+      end
+
+      context 'when census employee terminated' do
+        context 'when terminated date falls under coverage date' do
+          before do
+            census_employee.update_attributes(employment_terminated_on: benefit_package.end_on)
+          end
+
+          it "should return employee for covered date" do
+            expect(CensusEmployee.eligible_reinstate_for_package(benefit_package, benefit_package.end_on).count).to eq 1
+            expect(CensusEmployee.eligible_reinstate_for_package(benefit_package, benefit_package.end_on).first).to eq census_employee
+          end
+        end
+
+        context 'when terminated date falls outside coverage date' do
+          before do
+            census_employee.update_attributes(employment_terminated_on: benefit_package.end_on)
+          end
+
+          it "should return empty when no employee exists for covered date" do
+            expect(CensusEmployee.eligible_reinstate_for_package(benefit_package, benefit_package.end_on.next_day).count).to eq 0
+            expect(CensusEmployee.eligible_reinstate_for_package(benefit_package, benefit_package.end_on.next_day).first).to eq nil
+          end
+        end
+      end
+    end
+
     context 'by_benefit_package_and_assignment_on_or_later' do
       include_context "setup employees"
       before do
