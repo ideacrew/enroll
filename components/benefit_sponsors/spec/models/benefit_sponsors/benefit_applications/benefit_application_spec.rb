@@ -1531,5 +1531,28 @@ module BenefitSponsors
         end
       end
     end
+
+    describe ".canceled?" do
+      include_context "setup benefit market with market catalogs and product packages"
+      include_context "setup initial benefit application" do
+        let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_month }
+      end
+
+      context "when application is canceled" do
+        before do
+          initial_application.cancel!
+        end
+
+        it "should return true" do
+          expect(initial_application.canceled?).to eq true
+        end
+      end
+
+      context "when application is active" do
+        it "should return false" do
+          expect(initial_application.canceled?).to eq false
+        end
+      end
+    end
   end
 end
