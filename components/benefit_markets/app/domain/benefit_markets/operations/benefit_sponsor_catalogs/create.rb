@@ -46,7 +46,7 @@ module BenefitMarkets
         end
 
         def init_product_entity(product_param)
-          entity_class = if product_param[:kind].present?
+          entity_class = if product_param[:kind].present? && [:health, :dental].include?(product_param[:kind])
                            "BenefitMarkets::Entities::#{product_param[:kind].to_s.camelize}Product".constantize
                          else
                            ::BenefitMarkets::Entities::Product
