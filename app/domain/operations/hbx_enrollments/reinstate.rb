@@ -32,7 +32,7 @@ module Operations
         return Failure('Not a valid HbxEnrollment object.') unless params[:hbx_enrollment].is_a?(HbxEnrollment)
         return Failure('Not a SHOP enrollment.') unless params[:hbx_enrollment].is_shop?
         return Failure('Given HbxEnrollment is not in any of the valid states for reinstatement states.') unless valid_by_states?(params[:hbx_enrollment])
-        return Failure("Missing benefit package") if params[:options][:benefit_package].blank?
+        return Failure("Missing benefit package.") unless params[:options] && params[:options][:benefit_package]
         return Failure("Active Benefit Group Assignment does not exist for the effective_on: #{@effective_on}") unless active_bga_exists?(params)
         return Failure('Overlapping coverage exists for this family in current year.') if overlapping_enrollment_exists?
 
