@@ -3865,3 +3865,74 @@ describe 'calculate effective_on' do
     expect(calculated_effective_on).to eq off_cycle_application.effective_period.min
   end
 end
+
+describe '.cancel_or_termed_by_benefit_package', dbclean: :around_each do
+  include_context "setup benefit market with market catalogs and product packages"
+  include_context "setup initial benefit application"
+
+  let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_month - 6.months }
+  let(:aasm_state) { :active }
+  let(:benefit_package) { initial_application.benefit_packages[0] }
+  let(:person) { FactoryBot.create(:person, :with_employee_role, :with_family) }
+  let(:family) { person.primary_family }
+  let!(:census_employee) do
+    ce = FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package)
+    ce.update_attributes!(employee_role_id: person.employee_roles.first.id)
+    person.employee_roles.first.update_attributes(census_employee_id: ce.id)
+    ce
+  end
+  let!(:enrollment) do
+    FactoryBot.create(:hbx_enrollment, :with_enrollment_members,
+                      household: family.latest_household,
+                      coverage_kind: 'health',
+                      family: family,
+                      effective_on: benefit_package.start_on,
+                      kind: 'employer_sponsored',
+                      benefit_sponsorship_id: benefit_sponsorship.id,
+                      sponsored_benefit_package_id: current_benefit_package.id,
+                      employee_role_id: census_employee.employee_role.id,
+                      sponsored_benefit_id: current_benefit_package.sponsored_benefits[0].id,
+                      product: current_benefit_package.sponsored_benefits[0].reference_product,
+                      benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id)
+  end
+
+  context 'enrollment terminated for benefit package' do
+    before do
+      enrollment.terminate_coverage!(benefit_package.end_on)
+    end
+
+    it "should return terminated enrollment" do
+      enrollment_scope = HbxEnrollment.cancel_or_termed_by_benefit_package(benefit_package)
+      expect(enrollment_scope.count).to eq 1
+      expect(enrollment_scope.first).to eq enrollment
+      expect(enrollment_scope.first.terminated_on).to eq benefit_package.end_on
+    end
+  end
+
+  context 'future terminated enrollment for benefit package' do
+    before do
+      enrollment.schedule_coverage_termination!(benefit_package.end_on)
+    end
+
+    it "should return future terminated enrollment" do
+      enrollment_scope = HbxEnrollment.cancel_or_termed_by_benefit_package(benefit_package)
+      expect(enrollment_scope.count).to eq 1
+      expect(enrollment_scope.first).to eq enrollment
+      expect(enrollment_scope.first.terminated_on).to eq benefit_package.end_on
+    end
+  end
+
+  context 'canceled enrollment for benefit package' do
+    before do
+      initial_application.cancel!
+      enrollment.cancel_coverage!
+    end
+
+    it "should return terminated enrollment" do
+      enrollment_scope = HbxEnrollment.cancel_or_termed_by_benefit_package(benefit_package)
+      expect(enrollment_scope.count).to eq 1
+      expect(enrollment_scope.first).to eq enrollment
+      expect(enrollment_scope.first.terminated_on).to eq nil
+    end
+  end
+end
