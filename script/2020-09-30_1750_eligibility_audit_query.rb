@@ -134,17 +134,27 @@ def fork_kids(ivl_ids, f_map, hb_packages)
   (1..PROC_COUNT).to_a.each do |proc_index|
     child_ivl_ids = id_chunks[proc_index - 1]
     reader, writer = IO.pipe
+    signalled, signaller = IO.pipe
     fork_result = Process.fork
     if fork_result.nil?
+      signaller.close
       reader.close
+      signal_chans, _ws, _es = IO.select([signalled])
+      signal_chans.each do |sc|
+        sc.read()
+      end
+      signalled.close
+      STDOUT.puts "Child #{Process.pid}: START SIGNAL RECIEVED"
+      STDOUT.flush
       run_audit_for_batch(proc_index, child_ivl_ids, writer, f_map, hb_packages)
       writer.close
       exit 0
     else
       writer.close
+      signalled.close
       STDOUT.puts "Launched child: #{proc_index}, pid: #{fork_result}"
       STDOUT.flush
-      child_list << [fork_result, reader]
+      child_list << [fork_result, signaller, reader]
     end
   end
   child_list
@@ -256,6 +266,7 @@ def run_audit_for_batch(current_proc_index, ivl_people_ids, writer, person_famil
       end
     end
   ensure
+    f.puts "REACHED END OF RECORDS"
     f.flush
     f.close
   end
@@ -272,18 +283,33 @@ Signal.trap("CLD") do
     if !dead_child.nil?
       STDERR.puts "Child died: #{dead_child}"
       STDERR.flush
-      reader_map[dead_child].close
+      begin
+        reader_map[dead_child].close
+      rescue
+        STDERR.puts "Child #{dead_child} reader already closed."
+        STDERR.flush
+      end
       reader_map.delete(dead_child)
     end
   end
 end
 
-STDOUT.puts "Starting Child Processes"
+STDOUT.puts "Initializing Child Processes"
 STDOUT.flush
 child_procs = fork_kids(ivl_person_ids, family_map, h_packages)
-child_procs.each do |proc|
-  reader_map[proc.first] = proc.last
+child_procs.each do |cproc|
+  reader_map[cproc.first] = cproc.last
 end
+
+child_procs.each do |cproc|
+  signal_writer = cproc[1]
+  signal_writer.write("START")
+  signal_writer.close
+  STDOUT.puts "CHILD #{cproc.first} START SIGNAL SENT"
+  STDOUT.flush
+end
+
+child_procs
 
 family_map = nil
 GC.start
@@ -291,16 +317,29 @@ MallocTrim.trim
 
 pb = ProgressBar.create(
   :title => "Running records",
-  :total => person_id_count,
-  :format => "%t %a %e %c/%C %P%%"
+  :total => 5000,
+  :format => "%t %a %E %c/%C %P%%",
+  :throttle_rate => 5.0
 )
 
 while !reader_map.empty?
-  rs, _ws, _es = IO.select(reader_map.values, [], [], 30)
-  if !rs.nil?
-    rs.each do |r|
-      values = r.read
-      pb.progress += values.length
+  begin
+    rs, _ws, _es = IO.select(reader_map.values, [], [], 30)
+    if !rs.nil?
+      rs.each do |r|
+        values = r.read
+        pb.progress += values.length
+      end
+    end
+  rescue Errno::EBADF, IOError
+    reader_map.reject do |k,v|
+      begin
+        v.stat
+      rescue => e
+        STDERR.puts e.inspect
+        STDERR.flush
+        true
+      end
     end
   end
 end

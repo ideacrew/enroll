@@ -4,8 +4,10 @@ module IvlEligibilityAudits
 
     def self.benefit_packages_for(year)
       hbx = HbxProfile.current_hbx
+      return [] unless hbx
       bcps = hbx.benefit_sponsorship.benefit_coverage_periods
       bcp = bcps.detect { |bcp| bcp.start_on.year == year }
+      return [] unless bcp
       bcp.benefit_packages.select do |bp|
         (bp.title.include? "health_benefits")
       end
