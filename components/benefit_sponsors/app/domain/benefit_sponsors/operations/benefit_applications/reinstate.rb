@@ -35,12 +35,19 @@ module BenefitSponsors
           return Failure('Missing Key.') unless params.key?(:benefit_application)
           @current_ba = params[:benefit_application]
           return Failure('Not a valid Benefit Application object.') unless @current_ba.is_a?(BenefitSponsors::BenefitApplications::BenefitApplication)
-          valid_states_for_reinstatement = [:terminated, :termination_pending, :canceled, :retroactive_canceled]
-          return Failure("Given BenefitApplication is not in any of the #{valid_states_for_reinstatement} states.") unless valid_states_for_reinstatement.include?(@current_ba.aasm_state)
+          return Failure("Given BenefitApplication is not in any of the [:terminated, :termination_pending, :canceled, :retroactive_canceled] states.") unless valid_states_for_reinstatement
           return Failure("System date is not within the given BenefitApplication's effective period timeframe.") unless initial_ba_within_valid_timeframe?
           return Failure('Overlapping BenefitApplication exists for this Employer.') if overlapping_ba_exists?
 
           Success(params)
+        end
+
+        def valid_states_for_reinstatement
+          [:terminated, :termination_pending, :retroactive_canceled].include?(@current_ba.aasm_state) || cancel_eligble_for_reinstatement
+        end
+
+        def cancel_eligble_for_reinstatement
+          @current_ba.workflow_state_transitions.any?{|wst| wst.from_state == 'active' && ['canceled','retroactive_canceled'].include?(wst.to_state)}
         end
 
         def initial_ba_within_valid_timeframe?
@@ -65,7 +72,7 @@ module BenefitSponsors
           @parent_application = parent_ba_by_reinstate_id(@current_ba)
           case @current_ba.aasm_state
           when :terminated, :termination_pending
-            (@current_ba.effective_period.max.next_day)..(@parent_application.effective_period.min.next_year.prev_day)
+            (@current_ba.effective_period.max.next_day)..(@current_ba.benefit_sponsor_catalog.effective_period.max)
           when :canceled, :retroactive_canceled
             @current_ba.effective_period
           end
