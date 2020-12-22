@@ -290,27 +290,32 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
 
     let(:household) { FactoryBot.create(:household, family: family)}
     let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
-    let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: household, family: family, aasm_state: 'coverage_selected', sponsored_benefit_package_id: benefit_package.id) }
-    let!(:benefit_group_assignment) { FactoryBot.create(:benefit_group_assignment, benefit_package: benefit_package, census_employee: census_employee, hbx_enrollment: hbx_enrollment)}
+    let!(:benefit_group_assignment) { FactoryBot.create(:benefit_group_assignment, benefit_package: benefit_package, census_employee: census_employee)}
 
-    shared_examples_for "active, waived and terminated enrollments" do |state, status, result|
+    shared_examples_for "active, waived and terminated enrollments" do |state, status, result, match_with_package_id, match_with_assignment_id|
 
-      let!(:enrollment) { FactoryBot.create(:hbx_enrollment, household: household, family:family,
-                          benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id,
-                          aasm_state: state
-                          )}
+      let!(:enrollment) do
+        FactoryBot.create(
+          :hbx_enrollment, household: household, family: family,
+                           :benefit_group_assignment_id => match_with_assignment_id ? census_employee.active_benefit_group_assignment.id : nil,
+                           :sponsored_benefit_package_id => match_with_package_id ? census_employee.active_benefit_group_assignment.benefit_package_id : nil,
+                           :aasm_state => state
+        )
+      end
 
       it "should #{status}return the #{state} enrollments" do
-        result = (result == "enrollment") ?  [enrollment] : result
+        result = (result == "enrollment") ? [enrollment] : result
         expect(census_employee.active_benefit_group_assignment.hbx_enrollments).to eq result
       end
     end
 
-    it_behaves_like "active, waived and terminated enrollments", "coverage_canceled", "not", []
-    it_behaves_like "active, waived and terminated enrollments", "coverage_terminated", "", "enrollment"
-    it_behaves_like "active, waived and terminated enrollments", "coverage_expired", "", "enrollment"
-    it_behaves_like "active, waived and terminated enrollments", "coverage_selected", "", "enrollment"
-    it_behaves_like "active, waived and terminated enrollments", "inactive", "", "enrollment"
+    it_behaves_like "active, waived and terminated enrollments", "coverage_canceled", "not", [], true, true
+    it_behaves_like "active, waived and terminated enrollments", "coverage_terminated", "", "enrollment", true, true
+    it_behaves_like "active, waived and terminated enrollments", "coverage_expired", "", "enrollment", true, false
+    it_behaves_like "active, waived and terminated enrollments", "coverage_selected", "", "enrollment", false, true
+    it_behaves_like "active, waived and terminated enrollments", "inactive", "", "enrollment", false, true
+    it_behaves_like "active, waived and terminated enrollments", "inactive", "", [], false, false
+    it_behaves_like "active, waived and terminated enrollments", "coverage_selected", "", [], false, false
   end
 
   describe '#active_and_waived_enrollments', dbclean: :after_each do
@@ -333,7 +338,7 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
       end
 
       it "should #{status}return the #{state} enrollments" do
-        result = (result == "active_enrollment") ?  [enrollment] : result
+        result = (result == "active_enrollment") ? [enrollment] : result
         expect(census_employee.active_benefit_group_assignment.active_and_waived_enrollments).to eq result
       end
     end
@@ -351,13 +356,14 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
     let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: household, family: family, aasm_state: 'coverage_selected', sponsored_benefit_package_id: benefit_package.id) }
     let!(:benefit_group_assignment) { FactoryBot.create(:benefit_group_assignment, benefit_package: benefit_package, census_employee: census_employee, hbx_enrollment: hbx_enrollment)}
 
-    shared_examples_for "active enrollments" do |state, status, result|
+    shared_examples_for "active enrollments" do |state, status, result, match_with_package_id, match_with_assignment_id|
       let!(:enrollment) do
         FactoryBot.create(
           :hbx_enrollment,
           household: household,
           family: family,
-          benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id,
+          benefit_group_assignment_id: match_with_assignment_id ? census_employee.active_benefit_group_assignment.id : nil,
+          sponsored_benefit_package_id: match_with_package_id ? census_employee.active_benefit_group_assignment.benefit_package_id : nil,
           aasm_state: state
         )
       end
@@ -367,15 +373,16 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
       end
 
       it "should #{status}return the #{state} enrollments" do
-        result = (result == "active_enrollment") ?  [enrollment] : result
+        result = (result == "active_enrollment") ? [enrollment] : result
         expect(census_employee.active_benefit_group_assignment.active_enrollments).to eq result
       end
     end
 
-    it_behaves_like "active enrollments", "coverage_terminated", "not ", []
-    it_behaves_like "active enrollments", "coverage_expired", "not ", []
-    it_behaves_like "active enrollments", "coverage_selected", "", "active_enrollment"
-    it_behaves_like "active enrollments", "inactive", "not", []
+    it_behaves_like "active enrollments", "coverage_terminated", "not ", [], true, true
+    it_behaves_like "active enrollments", "coverage_expired", "not ", [], false, true
+    it_behaves_like "active enrollments", "coverage_selected", "", "active_enrollment", false, true
+    it_behaves_like "active enrollments", "inactive", "not", [], true, true
+    it_behaves_like "active enrollments", "coverage_selected", "", [], false, false
   end
 
   describe '.make_active' do
