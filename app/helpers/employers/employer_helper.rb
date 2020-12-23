@@ -50,7 +50,6 @@ module Employers::EmployerHelper
 
     if benefit_group_assignment
       enrollments = benefit_group_assignment.hbx_enrollments
-
       %W(health dental).each do |coverage_kind|
         enrollment = enrollments.select{ |enr| enr.coverage_kind == coverage_kind}.max_by(&:created_at)
         next unless enrollment
