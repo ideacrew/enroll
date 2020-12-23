@@ -46,7 +46,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Clone, dbclean:
         bp.sponsored_benefits.each do |spon_benefit|
           spon_benefit.update_attributes!(_type: 'BenefitSponsors::SponsoredBenefits::HealthSponsoredBenefit')
           create_pd(spon_benefit)
-          update_contribution_levels(spon_benefit)
+          update_contribution_levels(spon_benefit) if initial_application.employer_profile.is_a_fehb_profile?
         end
       end
     end
