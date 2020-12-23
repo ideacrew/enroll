@@ -84,7 +84,7 @@ module Operations
         return unless reinstate_enrollment.may_reinstate_coverage?
         reinstate_enrollment.reinstate_coverage!
         reinstate_enrollment.begin_coverage! if reinstate_enrollment.may_begin_coverage?
-        reinstate_enrollment.begin_coverage! if reinstate_enrollment.may_begin_coverage? && self.effective_on <= TimeKeeper.date_of_record
+        reinstate_enrollment.begin_coverage! if reinstate_enrollment.may_begin_coverage? && reinstate_enrollment.effective_on <= TimeKeeper.date_of_record
       end
     end
   end
