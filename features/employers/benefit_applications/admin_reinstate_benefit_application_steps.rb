@@ -43,9 +43,9 @@ When("Admin clicks on continue button for reinstating benefit_application") do
   find('.btn', text: 'CONTINUE').click
 end
 
-Then("Admin will see a Successfull message") do
+Then("Admin will see a Successful message") do
   sleep 2
-  expect(page).to have_content("Plan Year Reinstated Successfully")
+  expect(page).to have_content(/Plan Year Reinstated Successfully/)
 end
 
 And(/^initial employer ABC Widgets has updated (.*) effective period for reinstate$/) do |aasm_state|
