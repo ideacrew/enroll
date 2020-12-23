@@ -328,8 +328,7 @@ while !reader_map.empty?
     rs, _ws, _es = IO.select(reader_map.values, [], [], 30)
     if !rs.nil?
       rs.each do |r|
-        values = r.read(1)
-        if values
+        while values = r.read(1)
           pb.progress += values.length
         end
       end
