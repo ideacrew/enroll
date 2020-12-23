@@ -329,10 +329,12 @@ while !reader_map.empty?
     if !rs.nil?
       rs.each do |r|
         values = r.read(1)
-        pb.progress += values.length
+        if values
+          pb.progress += values.length
+        end
       end
     end
-  rescue Errno::EBADF, IOError
+  rescue Errno::EBADF, IOError, Errno::EPIPE
     reader_map.reject do |k,v|
       begin
         v.stat
