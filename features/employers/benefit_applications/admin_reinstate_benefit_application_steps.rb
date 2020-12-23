@@ -96,7 +96,7 @@ Given("active benefit application is a reinstated benefit application") do
   reinstated_ba.update_attributes!(effective_period: effective_period, reinstated_id: @terminated_ba.id)
 end
 
-And(/^(.*) should see reinstated indicator on benefit application$/) do |_user|
+And(/^(.*) should see a reinstated indicator on benefit application$/) do |_user|
   expect(page).to have_content('Reinstated')
 end
 
