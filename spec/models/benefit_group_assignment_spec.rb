@@ -521,6 +521,7 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
       let!(:assignment_three) do
         bga = census_employee.benefit_group_assignments.build(start_on: Date.new(2019,5,1), end_on: nil, benefit_package_id: benefit_package.id)
         bga.save(validate: false)
+        benefit_package.benefit_application.update_attributes(effective_period: Date.new(2019,5,1)..Date.new(2020,4,30))
         bga
       end
 
