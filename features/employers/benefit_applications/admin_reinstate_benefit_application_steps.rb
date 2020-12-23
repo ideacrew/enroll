@@ -59,6 +59,27 @@ And(/^initial employer ABC Widgets has updated (.*) effective period for reinsta
   end
 end
 
+And(/^initial employer ABC Widgets application (.*)$/) do |aasm_state|
+  application = employer_profile.benefit_applications.first
+  if aasm_state == 'termination_pending'
+    updated_dates = application.effective_period.min.to_date..TimeKeeper.date_of_record.last_month.end_of_month
+    application.update_attributes!(:effective_period => updated_dates, :terminated_on => TimeKeeper.date_of_record, termination_reason: 'nonpayment')
+    application.schedule_enrollment_termination!
+  elsif  aasm_state == 'terminated'
+    updated_dates = application.effective_period.min.to_date..TimeKeeper.date_of_record.next_month.end_of_month
+    application.update_attributes!(:effective_period => updated_dates, :terminated_on => TimeKeeper.date_of_record, termination_reason: 'nonpayment')
+    application.terminate_enrollment!
+  elsif ['retroactive_canceled', 'canceled'].include?(aasm_state)
+    if aasm_state == 'retroactive_canceled'
+      application.cancel!
+    else
+      application.update_attributes(aasm_state: :canceled)
+      application.workflow_state_transitions << WorkflowStateTransition.new(from_state: 'active', to_state: 'canceled', event: 'cancel!')
+    end
+  end
+end
+
+
 Given("terminated benefit application effective_period updated") do
   @terminated_ba = employer_profile.benefit_applications.first
   start_on = @terminated_ba.effective_period.min

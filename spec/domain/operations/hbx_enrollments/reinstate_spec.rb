@@ -85,7 +85,7 @@ RSpec.describe Operations::HbxEnrollments::Reinstate, :type => :model, dbclean: 
         end
 
         it 'should return enrollment in coverage_selected state' do
-          expect(@reinstated_enrollment.aasm_state).to eq 'coverage_enrolled'
+          expect(@reinstated_enrollment.aasm_state).to eq 'coverage_selected'
         end
 
         it 'should assign benefit group assignment' do
