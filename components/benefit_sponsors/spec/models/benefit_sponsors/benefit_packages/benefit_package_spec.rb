@@ -1086,7 +1086,7 @@ module BenefitSponsors
                           benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id)
       end
 
-      context 'when application terminated from active state' do
+      context 'given employee coverages got terminated after application termination' do
         before do
           period = initial_application.effective_period.min..(initial_application.end_on - 6.months).end_of_month
           initial_application.update_attributes!(termination_reason: 'nonpayment', terminated_on: period.max, effective_period: period)
@@ -1105,7 +1105,7 @@ module BenefitSponsors
           census_employee.reload
         end
 
-        context 'given employee coverages got terminated after application termination' do
+        context 'on reinstate' do
           it 'should reinstate terminated benefit group assigment' do
             reinstated_bga = census_employee.benefit_group_assignments.where(benefit_package_id: @cloned_package.id).first
             expect(reinstated_bga.start_on).to eq @cloned_package.start_on
@@ -1132,7 +1132,7 @@ module BenefitSponsors
         end
       end
 
-      context 'when application termination pending from active state' do
+      context 'given employee coverages moved to terminated pending after application terminated with future date' do
         before do
           initial_application.update_attributes(effective_period: (initial_application.start_on + 6.months..initial_application.end_on + 6.months))
           initial_application.benefit_sponsor_catalog.update_attributes(effective_date: initial_application.start_on + 6.months, effective_period: (initial_application.start_on + 6.months..initial_application.end_on + 6.months))
@@ -1154,7 +1154,7 @@ module BenefitSponsors
           census_employee.reload
         end
 
-        context 'given employee coverages moved to terminated pending after application terminated with future date' do
+        context 'on reinstate' do
 
           it 'should reinstate terminated benefit group assigment' do
             reinstated_bga = census_employee.benefit_group_assignments.where(benefit_package_id: @cloned_package.id).first
@@ -1164,7 +1164,7 @@ module BenefitSponsors
           it 'should reinstate terminated coverages' do
             reinstated_hbx = HbxEnrollment.where(sponsored_benefit_package_id: @cloned_package.id).first
             expect(reinstated_hbx.effective_on).to eq @cloned_package.start_on
-            expect(reinstated_hbx.aasm_state).to eq "coverage_enrolled"
+            expect(reinstated_hbx.aasm_state).to eq "coverage_selected"
             expect(reinstated_hbx.predecessor_enrollment_id).to eq enrollment.id
           end
 
@@ -1182,7 +1182,7 @@ module BenefitSponsors
         end
       end
 
-      context 'when application retroactive canceled from active state' do
+      context 'given employee coverages canceled after application canceled' do
         before do
           initial_application.cancel!
           effective_period = (initial_application.start_on..initial_application.end_on)
@@ -1197,7 +1197,7 @@ module BenefitSponsors
           census_employee.reload
         end
 
-        context 'given employee coverages canceled after application canceled' do
+        context 'on reinstate' do
 
           it 'should reinstate terminated benefit group assigment' do
             reinstated_bga = census_employee.benefit_group_assignments.where(benefit_package_id: @cloned_package.id).first
@@ -1225,7 +1225,7 @@ module BenefitSponsors
         end
       end
 
-      context 'when application canceled from active state' do
+      context 'given employee coverages canceled after application canceled' do #legacy cancel
         before do
           initial_application.cancel!
           initial_application.update_attributes(aasm_state: :canceled)
@@ -1242,7 +1242,7 @@ module BenefitSponsors
           census_employee.reload
         end
 
-        context 'given employee coverages canceled after application canceled' do
+        context 'on reinstate' do
 
           it 'should reinstate terminated benefit group assigment' do
             reinstated_bga = census_employee.benefit_group_assignments.where(benefit_package_id: @cloned_package.id).first
