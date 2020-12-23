@@ -52,11 +52,10 @@ module Employers::EmployerHelper
       enrollments = benefit_group_assignment.hbx_enrollments
 
       %W(health dental).each do |coverage_kind|
-        latest_enrollment = enrollments.max_by(&:created_at)
-        coverage = latest_enrollment.coverage_kind == coverage_kind ? latest_enrollment : nil
-        next unless coverage
+        enrollment = enrollments.select{ |enr| enr.coverage_kind == coverage_kind}.max_by(&:created_at)
+        next unless enrollment
 
-        enrollment_states << "#{employee_benefit_group_assignment_status(benefit_group_assignment.census_employee, coverage.aasm_state)} (#{coverage_kind})"
+        enrollment_states << "#{employee_benefit_group_assignment_status(benefit_group_assignment.census_employee, enrollment.aasm_state)} (#{coverage_kind})"
       end
       enrollment_states << '' if enrollment_states.compact.empty?
     end
