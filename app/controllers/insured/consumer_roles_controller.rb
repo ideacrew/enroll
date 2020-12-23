@@ -70,9 +70,9 @@ class Insured::ConsumerRolesController < ApplicationController
         when :service_unavailable
           format.html { render 'shared/account_lookup_service_unavailable' }
         when :too_many_matches
-          format.html { redirect_to SamlInformation.account_conflict_url }
+          format.html { redirect_to URI.parse(SamlInformation.account_conflict_url).to_s }
         when :existing_account
-          format.html { redirect_to SamlInformation.account_recovery_url }
+          format.html { redirect_to URI.parse(SamlInformation.account_recovery_url).to_s }
         else
           unless params[:persisted] == "true"
             @employee_candidate = Forms::EmployeeCandidate.new(@person_params)
