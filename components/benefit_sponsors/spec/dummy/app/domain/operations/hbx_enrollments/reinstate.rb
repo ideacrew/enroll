@@ -118,6 +118,7 @@ module Operations
         else
           return Failure('Cannot transition to state coverage_selected on event begin_coverage.') unless new_enrollment.may_begin_coverage?
           new_enrollment.begin_coverage!
+          new_enrollment.begin_coverage! if TimeKeeper.date_of_record >= new_enrollment.effective_on && new_enrollment.may_begin_coverage?
           new_enrollment.notify_of_coverage_start(true)
         end
 
