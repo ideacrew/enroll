@@ -1130,15 +1130,15 @@ class HbxEnrollment
   end
 
   def make_changes?
-    family.hbx_enrollments.by_kind(kind)&.by_employee_role(employee_role)&.enrolled_statuses&.reject { |enrollment| enrollment == self }.present?
+    family.enrollments.by_kind(kind)&.by_employee_role(employee_role)&.enrolled_statuses&.reject { |enrollment| enrollment == self }.present?
   end
 
   def is_auto_renewing_and_coverge_selected?
-    return false if aasm_state == 'auto_renewing' && family.hbx_enrollments.by_kind(kind)&.by_employee_role(employee_role)&.coverage_selected.present?
+    return false if aasm_state == 'auto_renewing' && family.enrollments.by_kind(kind)&.by_employee_role(employee_role)&.coverage_selected.present?
   end
 
   def has_enrolled_status_and_auto_renewing?
-    return true if ENROLLED_STATUSES.include?(aasm_state) && family.hbx_enrollments.by_kind(kind)&.by_employee_role(employee_role)&.auto_renewing.present?
+    return true if ENROLLED_STATUSES.include?(aasm_state) && family.enrollments.by_kind(kind)&.by_employee_role(employee_role)&.auto_renewing.present?
   end
 
   def build_plan_premium(qhp_plan: nil, elected_aptc: false, tax_household: nil, apply_aptc: nil)
