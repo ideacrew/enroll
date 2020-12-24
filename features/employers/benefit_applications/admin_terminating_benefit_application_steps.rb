@@ -84,8 +84,8 @@ Then(/^employer should see (.*) and reinstated benefit_application$/) do |aasm_s
 end
 
 Then(/^employer should see (.*) states$/) do |py_states|
-  expect(page).to have_content("#{py_states[0]}")
-  expect(page).to have_content("#{py_states[1]}")
+  expect(page).to have_content(py_states[0].to_s)
+  expect(page).to have_content(py_states[1].to_s)
 end
 
 And(/^employer should see Add Plan Year link$/) do
