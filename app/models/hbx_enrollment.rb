@@ -1107,20 +1107,26 @@ class HbxEnrollment
   #### OR EITHER
   #### HBX Enrollment is under annual open enrollment OR under new hire open enrollment
   def display_make_changes_for_shop?
-    return false unless is_shop?
-    return false unless family.is_eligible_to_enroll?
+    return false unless is_shop? || family.is_eligible_to_enroll?
     return false if coverage_terminated? || coverage_canceled?
+
     # See scenario features/employee/employee_passive_renewal_update.feature
     # enrollment_is_active_with_upcoming_auto_renewing
     # This makes sure it is not compared with enrollments for other employers
-    return true if has_enrolled_status_and_auto_renewing?
-    return false if is_auto_renewing_and_coverge_selected?
+    has_enrolled_status_and_auto_renewing?
+    is_auto_renewing_and_coverge_selected?
     # Do not display if SEP enrollment with previous enrollment for employer in enrolled status
     # Reject to exclude current enrollment
     # See scenario cucumber features/group_selection/dual_role_plan_shopping.feature
     # Scenario: Purchasing an enrollment through SEP with active enrollment should NOT cause "Make Changes" button to appear on the SEP enrollment tile
     return false if is_special_enrollment? && make_changes?
-    return true if family.enrollment_is_not_most_recent_sep_enrollment?(self) || employee_role&.can_enroll_as_new_hire? || sponsored_benefit_package&.open_enrollment_contains?(TimeKeeper.date_of_record)
+    return true if latest_sep_or_new_hire_or_oe_contains?
+  end
+
+  def latest_sep_or_new_hire_or_oe_contains?
+    family.enrollment_is_not_most_recent_sep_enrollment?(self) ||
+      employee_role&.can_enroll_as_new_hire? ||
+      sponsored_benefit_package&.open_enrollment_contains?(TimeKeeper.date_of_record)
   end
 
   def make_changes?
@@ -1128,11 +1134,11 @@ class HbxEnrollment
   end
 
   def is_auto_renewing_and_coverge_selected?
-    aasm_state == 'auto_renewing' && family.hbx_enrollments.by_kind(kind)&.by_employee_role(employee_role)&.coverage_selected.present?
+    return false if aasm_state == 'auto_renewing' && family.hbx_enrollments.by_kind(kind)&.by_employee_role(employee_role)&.coverage_selected.present?
   end
 
   def has_enrolled_status_and_auto_renewing?
-    ENROLLED_STATUSES.include?(aasm_state) && family.hbx_enrollments.by_kind(kind)&.by_employee_role(employee_role)&.auto_renewing.present?
+    return true if ENROLLED_STATUSES.include?(aasm_state) && family.hbx_enrollments.by_kind(kind)&.by_employee_role(employee_role)&.auto_renewing.present?
   end
 
   def build_plan_premium(qhp_plan: nil, elected_aptc: false, tax_household: nil, apply_aptc: nil)
