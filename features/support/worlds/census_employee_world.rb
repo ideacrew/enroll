@@ -240,7 +240,7 @@ And(/(.*) has active coverage in coverage enrolled state/) do |named_person|
   ce = CensusEmployee.where(:first_name => /#{person[:first_name]}/i, :last_name => /#{person[:last_name]}/i).first
   person_rec = Person.where(first_name: /#{person[:first_name]}/i, last_name: /#{person[:last_name]}/i).first
   benefit_package = ce.active_benefit_group_assignment.benefit_package
-  active_enrollment = FactoryBot.create(
+  active_enrollment = FactoryGirl.create(
     :hbx_enrollment,
     family: person_rec.primary_family,
     household: person_rec.primary_family.active_household,
