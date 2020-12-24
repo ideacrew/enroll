@@ -1130,7 +1130,7 @@ class HbxEnrollment
   end
 
   def make_changes?
-    family.enrollments.by_kind(kind)&.by_employee_role(employee_role)&.enrolled_statuses&.reject { |enrollment| enrollment == self }.present?
+    family.enrollments.by_kind(kind)&.by_employee_role(employee_role)&.enrolled&.reject { |enrollment| enrollment == self }.present?
   end
 
   def is_auto_renewing_and_coverge_selected?
