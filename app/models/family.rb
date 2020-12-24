@@ -241,7 +241,7 @@ class Family
   def enrollment_is_not_most_recent_sep_enrollment?(hbx_enrollment)
     coverage_kind = hbx_enrollment.coverage_kind
     target_enrollment_effective_on = hbx_enrollment.effective_on
-    most_recent_sep_enrollment_by_coverage_kind = hbx_enrollments.where(
+    most_recent_sep_enrollment_by_coverage_kind = enrollments.where(
       coverage_kind: coverage_kind,
       enrollment_kind: 'special_enrollment'
     ).last
