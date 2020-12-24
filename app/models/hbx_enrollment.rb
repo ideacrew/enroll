@@ -1114,13 +1114,25 @@ class HbxEnrollment
     # enrollment_is_active_with_upcoming_auto_renewing
     # This makes sure it is not compared with enrollments for other employers
     return true if has_enrolled_status_and_auto_renewing?
-    return false if aasm_state == 'auto_renewing' && family.hbx_enrollments.by_kind(kind)&.by_employee_role(employee_role)&.coverage_selected.present?
+    return false if is_auto_renewing_and_coverge_selected?
     # Do not display if SEP enrollment with previous enrollment for employer in enrolled status
     # Reject to exclude current enrollment
     # See scenario cucumber features/group_selection/dual_role_plan_shopping.feature
     # Scenario: Purchasing an enrollment through SEP with active enrollment should NOT cause "Make Changes" button to appear on the SEP enrollment tile
-    return false if is_special_enrollment? && family.hbx_enrollments.by_kind(kind)&.by_employee_role(employee_role)&.enrolled_statuses&.reject { |enrollment| enrollment == self }.present?
+    return false if is_special_enrollment? && make_changes?
     return true if family.enrollment_is_not_most_recent_sep_enrollment?(self) || employee_role&.can_enroll_as_new_hire? || sponsored_benefit_package&.open_enrollment_contains?(TimeKeeper.date_of_record)
+  end
+
+  def make_changes?
+    family.hbx_enrollments.by_kind(kind)&.by_employee_role(employee_role)&.enrolled_statuses&.reject { |enrollment| enrollment == self }.present?
+  end
+
+  def is_auto_renewing_and_coverge_selected?
+    aasm_state == 'auto_renewing' && family.hbx_enrollments.by_kind(kind)&.by_employee_role(employee_role)&.coverage_selected.present?
+  end
+
+  def has_enrolled_status_and_auto_renewing?
+    ENROLLED_STATUSES.include?(aasm_state) && family.hbx_enrollments.by_kind(kind)&.by_employee_role(employee_role)&.auto_renewing.present?
   end
 
   def build_plan_premium(qhp_plan: nil, elected_aptc: false, tax_household: nil, apply_aptc: nil)
