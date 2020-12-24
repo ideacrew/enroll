@@ -16,7 +16,7 @@ STDERR.flush
 h_packages = IvlEligibilityAudits::AuditQueryCache.benefit_packages_for(2020)
 puts "Health Benefit Packages located."
 STDOUT.flush
-ivl_person_ids = IvlEligibilityAudits::AuditQueryCache.person_ids_for_audit_period_starting(AUDIT_START_DATE)
+ivl_person_ids = IvlEligibilityAudits::AuditQueryCache.person_ids_for_audit_period_starting(AUDIT_START_DATE).sort
 STDOUT.puts "Counted #{ivl_person_ids.count} people."
 STDOUT.flush
 
@@ -168,6 +168,11 @@ def run_audit_for_batch(current_proc_index, ivl_people_ids, writer, person_famil
   GC.start
   MallocTrim.trim
   f = File.open("audit_log_#{current_proc_index}.log", 'w')
+  f.puts "=== RECORD LIST BEGIN ==="
+  ivl_people_ids.each do |ivl_p_id|
+    f.puts ivl_p_id.to_s
+  end
+  f.puts "=== RECORD LIST END ==="
   begin
     ivl_people = IvlEligibilityAudits::EligibilityQueryCursor.new(ivl_people_ids)
     CSV.open("audit_ivl_determinations_#{current_proc_index}.csv", "w") do |csv|
@@ -256,17 +261,20 @@ def run_audit_for_batch(current_proc_index, ivl_people_ids, writer, person_famil
               end
             end
           rescue HistoryTrackerReversalError => htre
+            f.puts "===== ERROR BEGIN ===="
             f.puts pers.inspect
             f.puts htre.inspect
+            f.puts "===== ERROR END ===="
             f.flush
           end
         end
+        f.puts "++++ PROCESSED RECORD: #{pers_record.id.to_s}"
         writer.write("+")
         person_family_map.delete(pers_record.id)
       end
     end
   ensure
-    f.puts "REACHED END OF RECORDS"
+    f.puts "===== REACHED END OF RECORDS ====="
     f.flush
     f.close
   end
