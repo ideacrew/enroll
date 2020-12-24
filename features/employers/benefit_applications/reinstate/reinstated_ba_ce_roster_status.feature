@@ -6,7 +6,6 @@ Feature: Ability for Admin to create an Reinstated benefit application and verif
     And there is an employer ABC Widgets
     And ABC Widgets employer has a staff role
     And the Reinstate feature configuration is enabled
-    And Qualifying life events are present
   
   Scenario Outline: Initial Employer is in <aasm_state>. Admin is able to create reinstated benefit application and verifies its census employee roster status
     Given initial employer ABC Widgets has active benefit application

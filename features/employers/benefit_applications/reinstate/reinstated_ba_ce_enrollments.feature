@@ -6,7 +6,6 @@ Feature: Ability for Admin to create an Reinstated benefit application and verif
     And there is an employer ABC Widgets
     And ABC Widgets employer has a staff role
     And the Reinstate feature configuration is enabled
-    And Qualifying life events are present
   
   Scenario Outline: Initial Employer is in <aasm_state>. Admin is able to create reinstated benefit application and verifies its census employee enrollments
     Given initial employer ABC Widgets has active benefit application
@@ -42,13 +41,13 @@ Feature: Ability for Admin to create an Reinstated benefit application and verif
     When staff role person clicks on employee Patrick Doe
     And census employee Patrick Doe has benefit group assignment of the <time_period> reinstated benefit application
     And census employee Patrick Doe with <aasm_state> and resinstated BA will have two enrollments
-    And on census employee profile through roster will display <count> active enrollment on it
+    And on census employee profile through roster will display one active reinstated enrollment on it
     And user logs out
 
     Examples:
-      |    aasm_state       |   date     | bp_count | es_count | time_period  | count |
-      |    terminated       | last_month |   one    |   one    |   current    |  one  |
-      | termination_pending | any_day    |   two    |   two    |   future     |  two  |
+      |    aasm_state       |   date     | bp_count | es_count | time_period  |
+      |    terminated       | last_month |   one    |   one    |   current    |
+      | termination_pending | any_day    |   two    |   two    |   future     |
 
   Scenario Outline: Initial Employer is in <aasm_state>. Admin is able to create reinstated benefit application and verifies its census employee enrollments
     Given initial employer ABC Widgets has active benefit application
@@ -74,7 +73,7 @@ Feature: Ability for Admin to create an Reinstated benefit application and verif
     When staff role person clicks on employee Patrick Doe
     And census employee Patrick Doe has benefit group assignment of the current reinstated benefit application
     And census employee Patrick Doe with <to_state> and resinstated BA will have two enrollments
-    And on census employee profile through roster will display one active reinstated enrollment on it 
+    And on census employee profile through roster will display one active reinstated enrollment on it
     And user logs out
 
     Examples:
