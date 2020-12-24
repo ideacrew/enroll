@@ -1113,7 +1113,7 @@ class HbxEnrollment
     # See scenario features/employee/employee_passive_renewal_update.feature
     # enrollment_is_active_with_upcoming_auto_renewing
     # This makes sure it is not compared with enrollments for other employers
-    return true if ENROLLED_STATUSES.include?(aasm_state) && family.hbx_enrollments.by_kind(kind)&.by_employee_role(employee_role)&.auto_renewing.present?
+    return true if has_enrolled_status_and_auto_renewing?
     return false if aasm_state == 'auto_renewing' && family.hbx_enrollments.by_kind(kind)&.by_employee_role(employee_role)&.coverage_selected.present?
     # Do not display if SEP enrollment with previous enrollment for employer in enrolled status
     # Reject to exclude current enrollment
