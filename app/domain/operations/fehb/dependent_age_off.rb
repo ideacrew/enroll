@@ -39,9 +39,8 @@ module Operations
 
       def process_fehb_dep_age_off(congressional_ers, fehb_logger, new_date)
         cut_off_age = EnrollRegistry[:aca_fehb_dependent_age_off].settings(:cut_off_age).item
-        @fehb_logger = fehb_logger
         if congressional_ers.class == HbxEnrollment
-          new_enr = new_enrollment(congressional_ers, new_date, cut_off_age)
+          new_enr = new_enrollment(congressional_ers, new_date, cut_off_age, fehb_logger)
           new_enr.present? ? new_enr : nil
         else
           congressional_ers.each do |organization|
@@ -50,9 +49,9 @@ module Operations
             benefit_application.active_and_cobra_enrolled_families.inject([]) do |_enrollments, family|
 
               HbxEnrollment.where(:sponsored_benefit_package_id.in => id_list, :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES, family_id: family.id).each do |enrollment|
-                new_enrollment(enrollment, new_date, cut_off_age)
+                new_enrollment(enrollment, new_date, cut_off_age, fehb_logger)
               end
-            rescue StandardError => e
+              rescue StandardError => e
               fehb_logger.info "Unable to process family to terminate enrollments #{family.id} for #{e.message}"
             end
           end
@@ -60,7 +59,7 @@ module Operations
         end
       end
 
-      def new_enrollment(enrollment, new_date, cut_off_age)
+      def new_enrollment(enrollment, new_date, cut_off_age, fehb_logger)
         enr_members = enrollment.hbx_enrollment_members
         covered_family_members = enr_members.map(&:family_member)
         covered_members = covered_family_members.map(&:person)
@@ -77,7 +76,7 @@ module Operations
         eligible_dependents = enr_members - age_off_enr_member
         terminate_and_reinstate_enrollment(enrollment, new_date, eligible_dependents)
       rescue StandardError => e
-        @fehb_logger.info "Unable to terminated enrollment #{enrollment.hbx_id} for #{e.message}"
+        fehb_logger.info "Unable to terminated enrollment #{enrollment.hbx_id} for #{e.message}"
       end
 
       def fetch_aged_off_people(relations, new_date, cut_off_age)
@@ -95,7 +94,7 @@ module Operations
         return unless reinstate_enrollment.may_reinstate_coverage?
         reinstate_enrollment.reinstate_coverage!
         reinstate_enrollment.begin_coverage! if reinstate_enrollment.may_begin_coverage?
-        reinstate_enrollment.begin_coverage! if reinstate_enrollment.may_begin_coverage? && TimeKeeper.date_of_record >= reinstate_enrollment.effective_on
+        reinstate_enrollment.begin_coverage! if reinstate_enrollment.may_begin_coverage? && reinstate_enrollment.effective_on <= TimeKeeper.date_of_record
         reinstate_enrollment
       end
     end
