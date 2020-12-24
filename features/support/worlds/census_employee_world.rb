@@ -242,7 +242,6 @@ And(/(.*) has active coverage in coverage enrolled state/) do |named_person|
   benefit_package = ce.active_benefit_group_assignment.benefit_package
   active_enrollment = FactoryGirl.create(
     :hbx_enrollment,
-    family: person_rec.primary_family,
     household: person_rec.primary_family.active_household,
     coverage_kind: "health",
     effective_on: TimeKeeper.date_of_record - 1.month,
