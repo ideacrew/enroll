@@ -2268,7 +2268,6 @@ class HbxEnrollment
     workflow_state_transitions.any?{|wfst| wfst.event.match(/waive_coverage/) && wfst.to_state == 'inactive'}
   end
 
-
   def dep_age_off_market_key
     product_ref_key = sponsored_benefit&.reference_product&.benefit_market_kind
     return nil unless product_ref_key

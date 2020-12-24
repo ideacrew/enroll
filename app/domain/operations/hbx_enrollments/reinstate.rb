@@ -125,6 +125,14 @@ module Operations
         Success(new_enrollment)
       end
 
+      def reinstate_after_effects(hbx_enrollment)
+        update_benefit_group_assignment(hbx_enrollment)
+        terminate_dependent_age_off(hbx_enrollment)
+        terminate_employment_term_enrollment(hbx_enrollment)
+
+        Success(hbx_enrollment)
+      end
+
       def update_benefit_group_assignment(hbx_enrollment)
         assignment = hbx_enrollment.census_employee.benefit_group_assignment_by_package(hbx_enrollment.sponsored_benefit_package_id, hbx_enrollment.effective_on)
         assignment&.update_attributes(hbx_enrollment_id: hbx_enrollment.id)
@@ -134,41 +142,39 @@ module Operations
         census_employee = hbx_enrollment.census_employee
         employment_term_date = census_employee.employment_terminated_on
         return unless employment_term_date.present?
-        if employment_term_date > TimeKeeper.date_of_record && hbx_enrollment.may_schedule_coverage_termination?
-          hbx_enrollment.schedule_coverage_termination!(employment_term_date.end_of_month)
-        elsif hbx_enrollment.may_terminate_coverage?
-          hbx_enrollment.terminate_coverage!(employment_term_date.end_of_month)
+        family = hbx_enrollment.family
+        enrollments = family.hbx_enrollments.where(sponsored_benefit_package_id: hbx_enrollment.sponsored_benefit_package_id).enrolled.shop_market
+        enrollments.each do |enrollment|
+          enrollment.term_or_cancel_enrollment(enrollment, employment_term_date)
         end
+
         hbx_enrollment.notify_of_coverage_start(true)
       end
 
-      def reinstate_after_effects(hbx_enrollment)
-        update_benefit_group_assignment(hbx_enrollment)
-        terminate_employment_term_enrollment(hbx_enrollment)
-        terminate_dependent_age_off(hbx_enrollment)
-
+      def terminate_dependent_age_off(hbx_enrollment)
+        dependent_age_off_enrollment(hbx_enrollment, reinstate_dates(hbx_enrollment))
         Success(hbx_enrollment)
       end
 
-      def terminate_dependent_age_off(new_enrollment)
-        dependent_age_off_enrollment(new_enrollment, reinstate_dates(new_enrollment))
-        Success(new_enrollment)
-      end
-
-      def reinstate_dates(new_enrollment)
-        dependent_age_off_dates = (new_enrollment.effective_on..TimeKeeper.date_of_record.beginning_of_month)
+      def reinstate_dates(hbx_enrollment)
+        census_employee = hbx_enrollment.census_employee
+        term_date = census_employee.employment_terminated_on
+        dependent_age_off_dates = (hbx_enrollment.effective_on..(term_date || TimeKeeper.date_of_record).beginning_of_month)
         dependent_age_off_dates.to_a.select {|date| date if date == date.beginning_of_month}
       end
 
-      def dependent_age_off_enrollment(new_enrollment, list_of_dates)
-        @depenent_age_off_enr = new_enrollment
+      def age_off_query(hbx_enrollment)
+        family = hbx_enrollment.family
+        benefit_package = hbx_enrollment.sponsored_benefit_package
+        family.hbx_enrollments.where(sponsored_benefit_package_id: benefit_package.id).enrolled.shop_market.all_with_multiple_enrollment_members
+      end
+
+      def dependent_age_off_enrollment(hbx_enrollment, list_of_dates)
         list_of_dates.each do |dao_date|
-          family = new_enrollment.family
-          enrollment_query = family.hbx_enrollments.where(sponsored_benefit_package_id: new_enrollment.sponsored_benefit_package_id).enrolled.shop_market.all_with_multiple_enrollment_members
-          if new_enrollment.fehb_profile.present?
-            result = fehb_reinstate_enrollment(dao_date, @depenent_age_off_enr)
-            @depenent_age_off_enr = result.nil? ? @depenent_age_off_enr : result
-          elsif new_enrollment.is_shop?
+          enrollment_query = age_off_query(hbx_enrollment)
+          if hbx_enrollment.fehb_profile.present?
+            fehb_reinstate_enrollment(dao_date, enrollment_query)
+          elsif hbx_enrollment.is_shop?
             shop_reinstate_enrollment(dao_date, enrollment_query)
           end
         end
@@ -178,7 +184,7 @@ module Operations
         shop_dao = Operations::Shop::DependentAgeOff.new
         if ::EnrollRegistry[:aca_shop_dependent_age_off].settings(:period).item == :monthly
           shop_dao.call(new_date: dao_date, enrollment_query: enrollment_query)
-        elsif dao_date.strftime("%m/%d") == Date.today.beginning_of_year.strftime("%m/%d") && ::EnrollRegistry[:aca_shop_dependent_age_off].settings(:period).item == :annual
+        elsif dao_date.strftime("%m/%d") == TimeKeeper.date_of_record.beginning_of_year.strftime("%m/%d") && ::EnrollRegistry[:aca_shop_dependent_age_off].settings(:period).item == :annual
           shop_dao.call(new_date: dao_date, enrollment_query: enrollment_query)
         end
       end
@@ -188,7 +194,7 @@ module Operations
         if ::EnrollRegistry[:aca_fehb_dependent_age_off].settings(:period).item == :monthly
           fehb_dao.call(new_date: dao_date, enrollment: enrollment)
         elsif ::EnrollRegistry[:aca_fehb_dependent_age_off].settings(:period).item == :annual
-          fehb_dao.call(new_date: dao_date, enrollment: enrollment) if dao_date.strftime("%m/%d") == Date.today.beginning_of_year.strftime("%m/%d")
+          fehb_dao.call(new_date: dao_date, enrollment: enrollment) if dao_date.strftime("%m/%d") == TimeKeeper.date_of_record.beginning_of_year.strftime("%m/%d")
         end
       end
     end

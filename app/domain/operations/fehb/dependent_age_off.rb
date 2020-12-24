@@ -39,19 +39,19 @@ module Operations
 
       def process_fehb_dep_age_off(congressional_ers, fehb_logger, new_date)
         cut_off_age = EnrollRegistry[:aca_fehb_dependent_age_off].settings(:cut_off_age).item
-        if congressional_ers.class == HbxEnrollment
-          new_enr = new_enrollment(congressional_ers, new_date, cut_off_age, fehb_logger)
-          new_enr.present? ? new_enr : nil
+        if congressional_ers.present? && congressional_ers.first.class == HbxEnrollment
+          congressional_ers.each do |enrollment|
+            new_enrollment(enrollment, new_date, cut_off_age, fehb_logger)
+          end
         else
           congressional_ers.each do |organization|
             benefit_application = organization.active_benefit_sponsorship.active_benefit_application
             id_list = benefit_application.benefit_packages.collect(&:_id).uniq
             benefit_application.active_and_cobra_enrolled_families.inject([]) do |_enrollments, family|
-
               HbxEnrollment.where(:sponsored_benefit_package_id.in => id_list, :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES, family_id: family.id).each do |enrollment|
                 new_enrollment(enrollment, new_date, cut_off_age, fehb_logger)
               end
-              rescue StandardError => e
+            rescue StandardError => e
               fehb_logger.info "Unable to process family to terminate enrollments #{family.id} for #{e.message}"
             end
           end
