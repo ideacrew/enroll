@@ -208,6 +208,7 @@ def run_audit_for_batch(current_proc_index, ivl_people_ids, writer, person_famil
         "Denial Reasons"
       ]
       ivl_people.each do |pers_record|
+        f.puts "++++ PROCESSING RECORD: #{pers_record.id.to_s}"
         person_versions = Versioning::VersionCollection.new(pers_record)
         person_versions.each do |p_v|
           begin
