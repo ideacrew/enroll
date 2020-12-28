@@ -16,7 +16,7 @@ class DocumentsController < ApplicationController
 
   def download_employer_document
     document = BenefitSponsors::Documents::EmployerAttestationDocument.find_by(identifier: params[:path])
-    document.present? ? send_file document.identifier : redirect_back(fallback_location: root_path, :flash => {error: "Document Not Found"})
+    document.present? ? (send_file document.identifier) : redirect_back(fallback_location: root_path, :flash => {error: "Document Not Found"})
   rescue StandardError => e
     redirect_back(fallback_location: root_path, :flash => {error: e.message})
   end

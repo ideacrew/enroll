@@ -9,11 +9,10 @@ class Document
 
   ACCESS_RIGHTS = %w(public pii_restricted)
 
-  RESOURCE_LIST = %w(BenefitSponsors::Organizations::AcaShopDcEmployerProfile
+  RESOURCE_LIST = %w[BenefitSponsors::Organizations::AcaShopDcEmployerProfile
                      BenefitSponsors::Organizations::FehbEmployerProfile
                      BenefitSponsors::Organizations::AcaShopCcaEmployerProfile
-                     EmployeeRole Person ConsumerRole
-                    )
+                     EmployeeRole Person ConsumerRole].freeze
 
   after_save :notify_on_save
 
