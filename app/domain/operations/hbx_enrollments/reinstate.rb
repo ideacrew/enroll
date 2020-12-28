@@ -56,6 +56,7 @@ module Operations
 
       def active_bga_exists?(params)
         @effective_on = fetch_effective_on(params)
+        @notify = params[:options].present? && params[:options][:notify] ? params[:options][:notify] : false
         @bga = @current_enr.census_employee.benefit_group_assignments.by_benefit_package(params[:options][:benefit_package]).order_by(:created_at.desc).detect{ |bga| bga.is_active?(@effective_on)}
       end
 
@@ -119,7 +120,6 @@ module Operations
           return Failure('Cannot transition to state coverage_selected on event begin_coverage.') unless new_enrollment.may_begin_coverage?
           new_enrollment.begin_coverage!
           new_enrollment.begin_coverage! if TimeKeeper.date_of_record >= new_enrollment.effective_on && new_enrollment.may_begin_coverage?
-          new_enrollment.notify_of_coverage_start(true)
         end
 
         Success(new_enrollment)
@@ -139,10 +139,15 @@ module Operations
         elsif hbx_enrollment.may_terminate_coverage?
           hbx_enrollment.terminate_coverage!(employment_term_date.end_of_month)
         end
-        hbx_enrollment.notify_of_coverage_start(true)
+        notify_trading_partner(hbx_enrollment)
+      end
+
+      def notify_trading_partner(hbx_enrollment)
+        hbx_enrollment.notify_of_coverage_start(@notify)
       end
 
       def reinstate_after_effects(hbx_enrollment)
+        notify_trading_partner(hbx_enrollment)
         update_benefit_group_assignment(hbx_enrollment)
         terminate_employment_term_enrollment(hbx_enrollment)
 
