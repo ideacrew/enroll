@@ -176,8 +176,30 @@ end
 *Relevant pull request for file access reference*:
 -[Pull Request 4102](https://github.com/dchbx/enroll/pull/4102/)
 
+###[Dynamic Render Path](https://brakemanscanner.org/docs/warning_types/dynamic_render_paths/)
 
+When a call to render uses a dynamically generated path, template name, file name, or action, there is the possibility that a user can access templates that should be restricted. The issue may be worse if those templates execute code or modify the database. Consider the following method in `app/controllers/employers/census_employees_controller.rb`:
 
+```
+  def confirm_effective_date
+    confirmation_type = params[:type]
+    render "#{confirmation_type}_effective_date"
+  end
+```
+
+In the above example, a user could theoretically render any template ending with "effective_date". We can fix this by limiting the input that can be rendered:
+
+```
+  # The CONFIRMATION_EFFECTIVE_DATE_TYPES is equal to CONFIRMATION_EFFECTIVE_DATE_TYPES = ['cobra', 'rehire', 'terminate'].freeze
+  def confirm_effective_date
+    confirmation_type = params[:type]
+    return unless CensusEmployee::CONFIRMATION_EFFECTIVE_DATE_TYPES.include?(confirmation_type)
+    render "#{confirmation_type}_effective_date"
+  end
+```
+
+*Relevant pull request for dynamic render path reeference*:
+-[Pull Request 4097](https://github.com/dchbx/enroll/pull/4097)
 
 
 ###[Remote Code Execution](https://brakemanscanner.org/docs/warning_types/remote_code_execution/)
