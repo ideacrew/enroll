@@ -2746,11 +2746,13 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
     let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
     let(:sep) {SpecialEnrollmentPeriod.new(effective_on: TimeKeeper.date_of_record, start_on: TimeKeeper.date_of_record, end_on: TimeKeeper.date_of_record + 1)}
     let!(:enrollment) do
-      FactoryGirl.create(:hbx_enrollment,
-                        household: family.active_household,
-                        coverage_kind: "health",
-                        effective_on: TimeKeeper.date_of_record.beginning_of_year,
-                        aasm_state: 'coverage_selected')
+      FactoryGirl.create(
+        :hbx_enrollment,
+        household: family.active_household,
+        coverage_kind: "health",
+        effective_on: TimeKeeper.date_of_record.beginning_of_year,
+        aasm_state: 'coverage_selected'
+      )
     end
     let(:employee_role_double) { double(id: 1) }
 
@@ -2829,11 +2831,13 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
     let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
     let(:sep) {SpecialEnrollmentPeriod.new(effective_on: TimeKeeper.date_of_record, start_on: TimeKeeper.date_of_record, end_on: TimeKeeper.date_of_record + 1)}
     let!(:enrollment) do
-      FactoryGirl.create(:hbx_enrollment,
-                        household: family.active_household,
-                        coverage_kind: "health",
-                        effective_on: TimeKeeper.date_of_record.beginning_of_year,
-                        aasm_state: 'coverage_selected')
+      FactoryGirl.create(
+        :hbx_enrollment,
+        household: family.active_household,
+        coverage_kind: "health",
+        effective_on: TimeKeeper.date_of_record.beginning_of_year,
+        aasm_state: 'coverage_selected'
+      )
     end
 
     before :each do
