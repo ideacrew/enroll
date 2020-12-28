@@ -13,6 +13,15 @@ PROC_COUNT = 10
 STDERR.puts "TESTING STANDARD ERROR REDIRECTION"
 STDERR.flush
 
+RECORDS_AT_ISSUE = [
+  "5d08667543d4ad1a5a000039"
+]
+
+RECORDS_AT_ISSUE.each do |rec_no|
+  puts "Excluding potentially corrupt record: #{rec_no}"
+end
+STDOUT.flush
+
 h_packages = IvlEligibilityAudits::AuditQueryCache.benefit_packages_for(2020)
 puts "Health Benefit Packages located."
 STDOUT.flush
@@ -128,7 +137,7 @@ def auditable?(person_record, person_version, person_updated_at, family)
   not_authorized_by_curam?(person_version)
 end
 
-def fork_kids(ivl_ids, f_map, hb_packages)
+def fork_kids(ivl_ids, f_map, hb_packages, exclusions)
   child_list = Array.new
   id_chunks = ivl_ids.in_groups(PROC_COUNT, false)
   (1..PROC_COUNT).to_a.each do |proc_index|
@@ -146,7 +155,7 @@ def fork_kids(ivl_ids, f_map, hb_packages)
       signalled.close
       STDERR.puts "Child #{Process.pid}: START SIGNAL RECIEVED"
       STDERR.flush
-      run_audit_for_batch(proc_index, child_ivl_ids, writer, f_map, hb_packages)
+      run_audit_for_batch(proc_index, child_ivl_ids, writer, f_map, hb_packages, exclusions)
       writer.close
       exit 0
     else
@@ -160,7 +169,7 @@ def fork_kids(ivl_ids, f_map, hb_packages)
   child_list
 end
 
-def run_audit_for_batch(current_proc_index, ivl_people_ids, writer, person_family_map, health_benefit_packages)
+def run_audit_for_batch(current_proc_index, ivl_people_ids, writer, person_family_map, health_benefit_packages, exclusions)
   keys_to_delete = person_family_map.keys - ivl_people_ids
   keys_to_delete.each do |k|
     person_family_map.delete(k)
@@ -174,7 +183,7 @@ def run_audit_for_batch(current_proc_index, ivl_people_ids, writer, person_famil
   end
   f.puts "=== RECORD LIST END ==="
   begin
-    ivl_people = IvlEligibilityAudits::EligibilityQueryCursor.new(ivl_people_ids)
+    ivl_people = IvlEligibilityAudits::EligibilityQueryCursor.new(ivl_people_ids, exclusions)
     CSV.open("audit_ivl_determinations_#{current_proc_index}.csv", "w") do |csv|
       csv << [
         "Family ID",
@@ -305,7 +314,7 @@ end
 
 STDOUT.puts "Initializing Child Processes"
 STDOUT.flush
-child_procs = fork_kids(ivl_person_ids, family_map, h_packages)
+child_procs = fork_kids(ivl_person_ids, family_map, h_packages, RECORDS_AT_ISSUE)
 child_procs.each do |cproc|
   reader_map[cproc.first] = cproc.last
 end

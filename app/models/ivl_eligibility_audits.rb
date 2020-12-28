@@ -52,12 +52,16 @@ module IvlEligibilityAudits
   class EligibilityQueryCursor
     include Enumerable
   
-    def initialize(person_ids)
+    def initialize(person_ids, exclusions)
       @person_ids = person_ids
+      @exclusions = exclusions
+      @query_ids = person_ids.reject do |p_id|
+        exclusions.include?(p_id.to_s)
+      end
     end
   
     def each
-      @person_ids.each_slice(50) do |chunk|
+      @query_ids.each_slice(25) do |chunk|
         Person.where("_id" => {"$in" => chunk}).no_timeout.each do |pers|
           yield pers
         end
