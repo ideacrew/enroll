@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Insured::FamilyMembersController < ApplicationController
   include VlpDoc
   include ApplicationHelper
@@ -12,7 +14,7 @@ class Insured::FamilyMembersController < ApplicationController
     set_admin_bookmark_url(insured_family_members_path)
     @type = (params[:employee_role_id].present? && params[:employee_role_id] != 'None') ? "employee" : "consumer"
 
-    if (params[:resident_role_id].present? && params[:resident_role_id])
+    if params[:resident_role_id].present? && params[:resident_role_id]
       @type = "resident"
       @resident_role = ResidentRole.find(params[:resident_role_id])
       @family.hire_broker_agency(current_user.person.broker_role.try(:id))
@@ -31,9 +33,7 @@ class Insured::FamilyMembersController < ApplicationController
 
     if params[:sep_id].present?
       @sep = @family.special_enrollment_periods.find(params[:sep_id])
-      if @sep.submitted_at.to_date != TimeKeeper.date_of_record
-        @sep = duplicate_sep(@sep)
-      end
+      @sep = duplicate_sep(@sep) if @sep.submitted_at.to_date != TimeKeeper.date_of_record
       @qle = QualifyingLifeEventKind.find(params[:qle_id])
       @change_plan = 'change_by_qle'
       @change_plan_date = @sep.qle_on
@@ -57,7 +57,6 @@ class Insured::FamilyMembersController < ApplicationController
       @prev_url_include_intractive_identity = false
       @prev_url_include_consumer_role_id = false
     end
-
   end
 
   def new
@@ -72,7 +71,7 @@ class Insured::FamilyMembersController < ApplicationController
     @dependent = ::Forms::FamilyMember.new(params[:dependent])
 
     @address_errors = validate_address_params(params)
-    if ((Family.find(@dependent.family_id)).primary_applicant.person.resident_role?)
+    if Family.find(@dependent.family_id).primary_applicant.person.resident_role?
       if @address_errors.blank? && @dependent.save
         @created = true
         respond_to do |format|
@@ -132,7 +131,7 @@ class Insured::FamilyMembersController < ApplicationController
   def update
     @address_errors = validate_address_params(params)
 
-    if (@dependent.family_member.try(:person).present? && (@dependent.family_member.try(:person).is_resident_role_active?))
+    if @dependent.family_member.try(:person).present? && @dependent.family_member.try(:person).is_resident_role_active?
       if @address_errors.blank? && @dependent.update_attributes(params.require(:dependent))
         respond_to do |format|
           format.html { render 'show_resident' }
@@ -151,8 +150,13 @@ class Insured::FamilyMembersController < ApplicationController
     @info_changed, @dc_status = sensitive_info_changed?(consumer_role)
     if @address_errors.blank? && @dependent.update_attributes(params[:dependent]) && update_vlp_documents(consumer_role, 'dependent', @dependent)
       consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
-      consumer_role.check_for_critical_changes(@dependent.family_member.family, info_changed: @info_changed, is_homeless: params[:dependent]["is_homeless"], is_temporarily_out_of_state: params[:dependent]["is_temporarily_out_of_state"], dc_status: @dc_status) if consumer_role
-      consumer_role.update_attribute(:is_applying_coverage,  params[:dependent][:is_applying_coverage]) if consumer_role.present? && (!params[:dependent][:is_applying_coverage].nil?)
+      consumer_role&.check_for_critical_changes(
+        @dependent.family_member.family,
+        info_changed: @info_changed,
+        is_homeless: params[:dependent]["is_homeless"],
+        is_temporarily_out_of_state: params[:dependent]["is_temporarily_out_of_state"],
+        dc_status: @dc_status)
+      consumer_role.update_attribute(:is_applying_coverage,  params[:dependent][:is_applying_coverage]) if consumer_role.present? && !params[:dependent][:is_applying_coverage].nil?
       respond_to do |format|
         format.html { render 'show' }
         format.js { render 'show' }
@@ -167,7 +171,6 @@ class Insured::FamilyMembersController < ApplicationController
     end
   end
 
-
   def resident_index
     set_bookmark_url
     set_admin_bookmark_url(resident_index_insured_family_members_path)
@@ -178,7 +181,7 @@ class Insured::FamilyMembersController < ApplicationController
     if params[:qle_id].present?
       qle = QualifyingLifeEventKind.find(params[:qle_id])
       special_enrollment_period = @family.special_enrollment_periods.new(effective_on_kind: params[:effective_on_kind])
-      @effective_on_date =  special_enrollment_period.selected_effective_on = Date.strptime(params[:effective_on_date], "%m/%d/%Y") if params[:effective_on_date].present?
+      @effective_on_date = special_enrollment_period.selected_effective_on = Date.strptime(params[:effective_on_date], "%m/%d/%Y") if params[:effective_on_date].present?
       special_enrollment_period.qualifying_life_event_kind = qle
       special_enrollment_period.qle_on = Date.strptime(params[:qle_date], "%m/%d/%Y")
       special_enrollment_period.qle_answer = params[:qle_reason_choice] if params[:qle_reason_choice].present?
@@ -219,7 +222,7 @@ class Insured::FamilyMembersController < ApplicationController
     end
   end
 
-private
+  private
 
   def permit_dependent_person_params
     params.require(:dependent).permit(:family_id, :same_with_primary, :addresses => {})
@@ -234,7 +237,7 @@ private
       @dependent.addresses = [Address.new(kind: 'home'), Address.new(kind: 'mailing')]
     elsif @dependent.addresses.is_a? ActionController::Parameters
       addresses = []
-      @dependent.addresses.each do |k, address|
+      @dependent.addresses.each do |_k, address|
         addresses << Address.new(address.permit!)
       end
       @dependent.addresses = addresses
