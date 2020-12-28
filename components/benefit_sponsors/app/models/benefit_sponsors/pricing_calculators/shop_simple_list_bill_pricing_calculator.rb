@@ -43,7 +43,7 @@ module BenefitSponsors
                            )
                          end
           @member_totals[member.member_id] = member_price
-          @total = BigDecimal.new((@total + member_price).to_s).round(2)
+          @total = BigDecimal((@total + member_price).to_s).round(2)
           self
         end
       end

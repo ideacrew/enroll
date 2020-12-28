@@ -43,16 +43,16 @@ module BenefitSponsors
             end
             cu = @level_map[contribution_unit.id]
             c_factor = cu.contribution_factor
-            max_contribution = BigDecimal.new((@total_price * c_factor).to_s).round(2)
+            max_contribution = BigDecimal((@total_price * c_factor).to_s).round(2)
             @total_contribution = [max_contribution, @total_price].min
             members_total_price = 0.00
             @member_ids.each do |m_id|
-              member_price = BigDecimal.new((@total_contribution / @member_total).to_s).floor(2)
-              members_total_price = BigDecimal.new((members_total_price + member_price).to_s).round(2)
+              member_price = BigDecimal((@total_contribution / @member_total).to_s).floor(2)
+              members_total_price = BigDecimal((members_total_price + member_price).to_s).round(2)
               @member_contributions[m_id] = member_price
             end
-            member_discrepency = BigDecimal.new((@total_contribution - members_total_price).to_s).round(2)
-            @member_contributions[@primary_member_id] = BigDecimal.new((@member_contributions[@primary_member_id] + member_discrepency).to_s).round(2) 
+            member_discrepency = BigDecimal((@total_contribution - members_total_price).to_s).round(2)
+            @member_contributions[@primary_member_id] = BigDecimal((@member_contributions[@primary_member_id] + member_discrepency).to_s).round(2)
           else
             @member_ids.each do |m_id|
               @member_contributions[m_id] = 0.00
