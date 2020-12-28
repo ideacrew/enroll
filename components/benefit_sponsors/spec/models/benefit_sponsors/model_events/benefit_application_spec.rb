@@ -24,11 +24,11 @@ RSpec.describe BenefitSponsors::ModelEvents::BenefitApplication, dbclean: :after
   end
   let!(:parent_reinstated_instance) do
     FactoryBot.create(
-        :benefit_sponsors_benefit_application,
-        :with_benefit_package,
-        :benefit_sponsorship => benefit_sponsorship,
-        :aasm_state => 'draft',
-        :effective_period => (start_on - 9.months)..start_on.end_of_month
+      :benefit_sponsors_benefit_application,
+      :with_benefit_package,
+      :benefit_sponsorship => benefit_sponsorship,
+      :aasm_state => 'draft',
+      :effective_period => (start_on - 9.months)..start_on.end_of_month
     )
   end
   let!(:reinstated_model_instance) do
