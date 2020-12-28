@@ -9,6 +9,12 @@ class Document
 
   ACCESS_RIGHTS = %w(public pii_restricted)
 
+  RESOURCE_LIST = %w(BenefitSponsors::Organizations::AcaShopDcEmployerProfile
+                     BenefitSponsors::Organizations::FehbEmployerProfile
+                     BenefitSponsors::Organizations::AcaShopCcaEmployerProfile
+                     EmployeeRole Person ConsumerRole
+                    )
+
   after_save :notify_on_save
 
   # Enable polymorphic associations
