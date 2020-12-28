@@ -52,7 +52,7 @@ non_dynamic_params_keys = [:family, :family_actions_id, :qle_id, :action]
 
 _Dev Tip_: If you’re unsure about params, one tip is to look at cucumbers or walk through the actions directly on an environment and observe the params.
 
-##[Denial of Service](https://brakemanscanner.org/docs/warning_types/denial_of_service/)
+###[Denial of Service](https://brakemanscanner.org/docs/warning_types/denial_of_service/)
 
 Denial of Service (DoS) is any attack which causes a service to become unavailable for legitimate clients. 
 Denial of Service can be caused by consuming large amounts of network, memory, or CPU resources.
@@ -75,7 +75,7 @@ Since there's a Regex used for user entered params which could lead a potential 
 
 Dev-tip: Always escape the Regex if it's controlled by end user. Examples to consider are params, DB values.
 
-##[Dangerous Send](https://brakemanscanner.org/docs/warning_types/dangerous_send/)
+###[Dangerous Send](https://brakemanscanner.org/docs/warning_types/dangerous_send/)
 
 Using unfiltered user data to select a Class or Method to be dynamically sent is dangerous.
 It is much safer to whitelist the desired target or method.
@@ -103,7 +103,7 @@ As part of the fix, we are white listing the status params so the attacker would
 
 Dev-tip: Never use a send method with params as it poses a threat.
 
-##[Redirect](https://brakemanscanner.org/docs/warning_types/redirect/)
+###[Redirect](https://brakemanscanner.org/docs/warning_types/redirect/)
 
 Redirects which rely on user-supplied values can be used to “spoof” websites or hide malicious links in otherwise harmless-looking URLs.
 They can also allow access to restricted areas of a site if the destination is not validated.
@@ -127,7 +127,60 @@ The fix for this issue would be to parse the url or restrict redirect from user 
 
 Dev-tip: Never use a redirect path without parsing the url or restricting the path.
 
-##[Remote Code Execution](https://brakemanscanner.org/docs/warning_types/remote_code_execution/)
+###[File Access](https://brakemanscanner.org/docs/warning_types/file_access/)
+
+File access is when user input when accessing files (local or remote) will raise a warning in Brakeman. Consider this method in `app/controllers/documents_controller.rb`:
+```
+  def download_employer_document
+    send_file params[:path]
+  end
+```
+
+The above invoking of `send_file` could allow the user to download any file on the server with the specified parameters. To fix this security risk, we need the code to limit what files can be downloaded more specifically.
+
+```
+ def download_employer_document
+    document = BenefitSponsors::Documents::EmployerAttestationDocument.find_by(identifier: params[:path])
+    send_file document.identifier
+  rescue StandardError => e
+    redirect_back(fallback_location: root_path, :flash => {error: e.message})
+  end
+
+```
+
+In the above fix, we've specified the exact path that can be accessed by the value in the params, and added a rescue to gracefully log the error so that we can make note of the attempt.
+
+
+*Relevant pull request for file access reference*:
+-[Pull Request 3791](https://github.com/dchbx/enroll/pull/3791)
+
+
+###[Denial of Service](https://brakemanscanner.org/docs/warning_types/denial_of_service/)
+
+Denial of Service (DoS) is any attack which causes a service to become unavailable for legitimate clients. Denial of Service can be caused by consuming large amounts of network, memory, or CPU resources. Consider the following method in `app/controllers/broker_agencies/broker_roles_controller.rb`:
+
+```
+def search_broker_agency
+  orgs = Organization.has_broker_agency_profile.or({legal_name: /#{params[:broker_agency_search]}/i}, {"fein" => /#{params[:broker_agency_search]}/i})
+end
+```
+
+The above query would have allowed a user to pass in any params into the search, including those which have special meanings with regards to Regex. We can fix this by using [Regex.escape](https://www.geeksforgeeks.org/ruby-regexp-escape-function/), which would prevent any characters with special Regex values from being considered.
+
+```
+def search_broker_agency
+  orgs = Organization.has_broker_agency_profile.or({legal_name: /#{Regexp.escape(params[:broker_agency_search])}/i}, {"fein" => /#{Regexp.escape(params[:broker_agency_search])}/i})
+end
+```
+
+*Relevant pull request for file access reference*:
+-[Pull Request 4102](https://github.com/dchbx/enroll/pull/4102/)
+
+
+
+
+
+###[Remote Code Execution](https://brakemanscanner.org/docs/warning_types/remote_code_execution/)
 
 Brakeman reports on several cases of remote code execution, in which a user is able to control and execute code in ways unintended by application authors.
 
