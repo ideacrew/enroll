@@ -701,7 +701,7 @@ class CensusEmployee < CensusMember
       url = Settings.checkbook_services.url
       event_kind = ApplicationEventKind.where(:event_name => 'out_of_pocker_url_notifier').first
       notice_trigger = event_kind.notice_triggers.first
-      builder = notice_trigger.notice_builder.camelize.constantize.new(self, {
+      builder = notice_class(notice_trigger.notice_builder).new(self, {
         template: notice_trigger.notice_template,
         subject: event_kind.title,
         event_name: event_kind.event_name,
@@ -719,7 +719,7 @@ class CensusEmployee < CensusMember
       url = Settings.checkbook_services.url
       event_kind = ApplicationEventKind.where(:event_name => 'out_of_pocker_url_notifier').first
       notice_trigger = event_kind.notice_triggers.first
-      builder = notice_trigger.notice_builder.camelize.constantize.new(self, {
+      builder = notice_class(notice_trigger.notice_builder).new(self, {
         template: notice_trigger.notice_template,
         subject: event_kind.title,
         event_name: event_kind.event_name,
@@ -1631,6 +1631,12 @@ class CensusEmployee < CensusMember
   end
 
   private
+
+  def notice_class(notice_type)
+    notice_class = ['ShopEmployerNotices::OutOfPocketNotice'].find { |notice| notice == notice_type.classify }
+    raise "Unable to find the notice_class" if notice_class.nil?
+    notice_type.safe_constantize
+  end
 
   def record_transition
     self.workflow_state_transitions << WorkflowStateTransition.new(
