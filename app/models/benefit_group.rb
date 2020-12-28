@@ -392,7 +392,7 @@ class BenefitGroup
       else
         pcd = PlanCostDecorator.new(plan, ce, self, rp)
       end
-      BigDecimal((acc + pcd.total_employer_contribution).to_s).round(2)
+      BigDecimal.new((acc + pcd.total_employer_contribution).to_s).round(2)
     end
   end
 
