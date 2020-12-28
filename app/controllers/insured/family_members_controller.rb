@@ -222,15 +222,11 @@ class Insured::FamilyMembersController < ApplicationController
     end
   end
 
-<<<<<<< HEAD
-private
+  private
 
   def permit_dependent_person_params
     params.require(:dependent).permit(:family_id, :same_with_primary, :addresses => {})
   end
-=======
-  private
->>>>>>> Rubocop
 
   def set_family
     @family = @person.try(:primary_family)
