@@ -258,7 +258,7 @@ module BenefitSponsors
       end
 
       def reinstate_enrollment(hbx_enrollment)
-        ::Operations::HbxEnrollments::Reinstate.new.call({hbx_enrollment: hbx_enrollment, options: {benefit_package: self}})
+        ::Operations::HbxEnrollments::Reinstate.new.call({hbx_enrollment: hbx_enrollment, options: {benefit_package: self, notify: benefit_application.is_application_trading_partner_publishable?}})
       end
 
       def renew_member_benefits

@@ -22,12 +22,22 @@ RSpec.describe BenefitSponsors::ModelEvents::BenefitApplication, dbclean: :after
       :effective_period => start_on..(start_on + 1.year) - 1.day
     )
   end
-  let!(:model_instance1) do
+  let!(:parent_reinstated_instance) do
+    FactoryBot.create(
+        :benefit_sponsors_benefit_application,
+        :with_benefit_package,
+        :benefit_sponsorship => benefit_sponsorship,
+        :aasm_state => 'draft',
+        :effective_period => (start_on - 9.months)..start_on.end_of_month
+    )
+  end
+  let!(:reinstated_model_instance) do
     FactoryBot.create(
       :benefit_sponsors_benefit_application,
       :with_benefit_package,
       :benefit_sponsorship => benefit_sponsorship,
-      :aasm_state => 'reinstated',
+      :aasm_state => 'draft',
+      reinstated_id: parent_reinstated_instance.id,
       :effective_period => (start_on - 9.months)..start_on.end_of_month
     )
   end
@@ -51,12 +61,12 @@ RSpec.describe BenefitSponsors::ModelEvents::BenefitApplication, dbclean: :after
 
   shared_examples_for "for employer plan year action reinstated" do |action, event|
     it "should create model event and should have attributes" do
-      model_instance1.class.observer_peers.keys.select{ |ob| ob.is_a? BenefitSponsors::Observers::EdiObserver }.each do |observer|
-        expect(observer).to receive(:process_application_edi_events) do |model_instance1, model_event|
+      reinstated_model_instance.class.observer_peers.keys.select{ |ob| ob.is_a? BenefitSponsors::Observers::EdiObserver }.each do |observer|
+        expect(observer).to receive(:process_application_edi_events) do |reinstated_model_instance, model_event|
           expect(model_event).to be_an_instance_of(BenefitSponsors::ModelEvents::ModelEvent)
-          expect(model_event).to have_attributes(:event_key => event.to_sym, :klass_instance => model_instance1, :options => {observer_klass: BenefitSponsors::Observers::EdiObserver})
+          expect(model_event).to have_attributes(:event_key => event.to_sym, :klass_instance => reinstated_model_instance, :options => {observer_klass: BenefitSponsors::Observers::EdiObserver})
         end
-        model_instance1.activate_enrollment! if action == "reinstated"
+        reinstated_model_instance.reinstate! if action == "reinstated"
       end
     end
   end
