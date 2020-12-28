@@ -2735,19 +2735,18 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
   end
 
   context '.display_make_changes_for_shop?' do
-    let(:user) { FactoryBot.create(:user, roles: ["hbx_staff"]) }
-    let!(:person) { FactoryBot.create(:person)}
-    let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
-    let!(:household) { FactoryBot.create(:household, family: family) }
-    let(:hbx_profile) {FactoryBot.create(:hbx_profile)}
-    let(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
+    let(:user) { FactoryGirl.create(:user, roles: ["hbx_staff"]) }
+    let!(:person) { FactoryGirl.create(:person)}
+    let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+    let!(:household) { FactoryGirl.create(:household, family: family) }
+    let(:hbx_profile) {FactoryGirl.create(:hbx_profile)}
+    let(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
     let!(:sponsored_benefit) { double }
 
     let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
     let(:sep) {SpecialEnrollmentPeriod.new(effective_on: TimeKeeper.date_of_record, start_on: TimeKeeper.date_of_record, end_on: TimeKeeper.date_of_record + 1)}
     let!(:enrollment) do
-      FactoryBot.create(:hbx_enrollment,
-                        family: family,
+      FactoryGirl.create(:hbx_enrollment,
                         household: family.active_household,
                         coverage_kind: "health",
                         effective_on: TimeKeeper.date_of_record.beginning_of_year,
@@ -2755,19 +2754,21 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
     end
     let(:employee_role_double) { double(id: 1) }
 
-    context 'for ivl' do
-      before do
-        allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
-        allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
-        allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(benefit_coverage_period)
-        allow(enrollment).to receive(:sponsored_benefit_package).and_return(sponsored_benefit)
-        allow(sponsored_benefit).to receive(:open_enrollment_contains?).with(TimeKeeper.date_of_record).and_return(true)
-        enrollment.kind = 'individual'
-        enrollment.save
-      end
+    if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
+      context 'for ivl' do
+        before do
+          allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
+          allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
+          allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(benefit_coverage_period)
+          allow(enrollment).to receive(:sponsored_benefit_package).and_return(sponsored_benefit)
+          allow(sponsored_benefit).to receive(:open_enrollment_contains?).with(TimeKeeper.date_of_record).and_return(true)
+          enrollment.kind = 'individual'
+          enrollment.save
+        end
 
-      it 'should return false' do
-        expect(enrollment.display_make_changes_for_shop?).to be_falsey
+        it 'should return false' do
+          expect(enrollment.display_make_changes_for_shop?).to be_falsey
+        end
       end
     end
 
@@ -2819,17 +2820,16 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
   end
 
   context '.display_make_changes_for_ivl?' do
-    let(:user) { FactoryBot.create(:user, roles: ["hbx_staff"]) }
-    let!(:person) { FactoryBot.create(:person)}
-    let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
-    let!(:household) { FactoryBot.create(:household, family: family) }
-    let(:hbx_profile) {FactoryBot.create(:hbx_profile)}
-    let(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
+    let(:user) { FactoryGirl.create(:user, roles: ["hbx_staff"]) }
+    let!(:person) { FactoryGirl.create(:person)}
+    let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+    let!(:household) { FactoryGirl.create(:household, family: family) }
+    let(:hbx_profile) {FactoryGirl.create(:hbx_profile)}
+    let(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
     let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
     let(:sep) {SpecialEnrollmentPeriod.new(effective_on: TimeKeeper.date_of_record, start_on: TimeKeeper.date_of_record, end_on: TimeKeeper.date_of_record + 1)}
     let!(:enrollment) do
-      FactoryBot.create(:hbx_enrollment,
-                        family: family,
+      FactoryGirl.create(:hbx_enrollment,
                         household: family.active_household,
                         coverage_kind: "health",
                         effective_on: TimeKeeper.date_of_record.beginning_of_year,
@@ -2854,31 +2854,33 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
       end
     end
 
-    context 'for ivl' do
-
-      before do
-        enrollment.kind = 'individual'
-        enrollment.save
-      end
-
-      context 'family with active sep' do
-        before do
-          allow(family).to receive(:latest_ivl_sep).and_return sep
-        end
-
-        it 'should return true' do
-          expect(enrollment.display_make_changes_for_ivl?).to be_truthy
-        end
-      end
-
-      context 'under open enrollment period' do
+    if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
+      context 'for ivl' do
 
         before do
-          allow(family).to receive(:is_under_ivl_open_enrollment?).and_return true
+          enrollment.kind = 'individual'
+          enrollment.save
         end
 
-        it 'should return true' do
-          expect(enrollment.display_make_changes_for_ivl?).to be_truthy
+        context 'family with active sep' do
+          before do
+            allow(family).to receive(:latest_ivl_sep).and_return sep
+          end
+
+          it 'should return true' do
+            expect(enrollment.display_make_changes_for_ivl?).to be_truthy
+          end
+        end
+
+        context 'under open enrollment period' do
+
+          before do
+            allow(family).to receive(:is_under_ivl_open_enrollment?).and_return true
+          end
+
+          it 'should return true' do
+            expect(enrollment.display_make_changes_for_ivl?).to be_truthy
+          end
         end
       end
     end

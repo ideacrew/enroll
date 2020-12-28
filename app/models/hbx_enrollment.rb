@@ -1138,6 +1138,7 @@ class HbxEnrollment
   end
 
   def has_enrolled_status_and_auto_renewing?
+    return false if employee_role.blank? || kind.blank?
     return true if ENROLLED_STATUSES.include?(aasm_state) && family.enrollments.by_kind(kind)&.by_employee_role(employee_role)&.auto_renewing.present?
   end
 
