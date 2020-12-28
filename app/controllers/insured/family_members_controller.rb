@@ -2,6 +2,8 @@ class Insured::FamilyMembersController < ApplicationController
   include VlpDoc
   include ApplicationHelper
 
+  before_action :permit_dependent_person_params, only: %i[create update]
+
   before_action :set_current_person, :set_family
   before_action :set_dependent, only: [:destroy, :show, :edit, :update]
 
@@ -67,10 +69,9 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   def create
-    @dependent = ::Forms::FamilyMember.new(params.require(:dependent).permit!)
+    @dependent = ::Forms::FamilyMember.new(params[:dependent])
 
-    @address_errors = validate_address_params(params.require(:dependent).permit![:same_with_primary], params.require(:dependent).permit![:addresses])
-
+    @address_errors = validate_address_params(params)
     if ((Family.find(@dependent.family_id)).primary_applicant.person.resident_role?)
       if @address_errors.blank? && @dependent.save
         @created = true
@@ -87,7 +88,6 @@ class Insured::FamilyMembersController < ApplicationController
       end
       return
     end
-
     if @address_errors.blank? && @dependent.save && update_vlp_documents(@dependent.family_member.try(:person).try(:consumer_role), 'dependent', @dependent)
       @created = true
       respond_to do |format|
@@ -130,7 +130,7 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   def update
-    @address_errors = validate_address_params(params.require(:dependent).permit![:same_with_primary], params.require(:dependent).permit![:addresses])
+    @address_errors = validate_address_params(params)
 
     if (@dependent.family_member.try(:person).present? && (@dependent.family_member.try(:person).is_resident_role_active?))
       if @address_errors.blank? && @dependent.update_attributes(params.require(:dependent))
@@ -149,7 +149,7 @@ class Insured::FamilyMembersController < ApplicationController
     end
     consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
     @info_changed, @dc_status = sensitive_info_changed?(consumer_role)
-    if @address_errors.blank? && @dependent.update_attributes(params.require(:dependent)) && update_vlp_documents(consumer_role, 'dependent', @dependent)
+    if @address_errors.blank? && @dependent.update_attributes(params[:dependent]) && update_vlp_documents(consumer_role, 'dependent', @dependent)
       consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
       consumer_role.check_for_critical_changes(@dependent.family_member.family, info_changed: @info_changed, is_homeless: params[:dependent]["is_homeless"], is_temporarily_out_of_state: params[:dependent]["is_temporarily_out_of_state"], dc_status: @dc_status) if consumer_role
       consumer_role.update_attribute(:is_applying_coverage,  params[:dependent][:is_applying_coverage]) if consumer_role.present? && (!params[:dependent][:is_applying_coverage].nil?)
@@ -220,6 +220,11 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
 private
+
+  def permit_dependent_person_params
+    params.require(:dependent).permit(:family_id, :same_with_primary, :addresses => {})
+  end
+
   def set_family
     @family = @person.try(:primary_family)
   end
@@ -236,16 +241,16 @@ private
     end
   end
 
-  def validate_address_params(same_with_primary, address_params)
-    return [] if same_with_primary == 'true'
+  def validate_address_params(params)
+    return [] if params[:dependent][:same_with_primary] == 'true'
 
     errors_array = []
-    clean_address_params = address_params.reject{|_key, value| value[:address_1].blank? && value[:city].blank? && value[:state].blank? && value[:zip].blank?}
-    clean_address_params.to_h.each do |_key, value|
-      if value.is_a?(Hash)
-        result = Validators::AddressContract.new.call(value)
-        errors_array <<  result.errors.to_h  if result.failure?
-      end
+    clean_address_params = params[:dependent][:addresses].reject{ |_key, value| value[:address_1].blank? && value[:city].blank? && value[:state].blank? && value[:zip].blank? }
+    param_indexes = clean_address_params.keys.compact
+    param_indexes.each do |param_index|
+      permitted_address_params = clean_address_params.require(param_index).permit(:address_1, :address_2, :city, :kind, :state, :zip)
+      result = Validators::AddressContract.new.call(permitted_address_params.to_h)
+      errors_array << result.errors.to_h if result.failure?
     end
     errors_array
   end
