@@ -229,13 +229,13 @@ class Insured::GroupSelectionController < ApplicationController
 
   def permitted_group_selection_params
     params.permit(
-      :change_plan, :consumer_role_id,
-      :employee_role_id, :coverage_kind, :enrollment_kind,
-      :hbx_enrollment_id, :market_kind, :person_id,
-      :controller, :action, :shop_for_plans,
+      :change_plan, :consumer_role_id, :market_kind, :qle_id,
+      :hbx_enrollment_id, :coverage_kind, :enrollment_kind,
+      :employee_role_id, :resident_role_id, :person_id,
+      :market_kind, :shop_for_plans,
+      :controller, :action, :commit,
       :effective_on_option_selected,
-      :resident_role_id,
-      :commit,
+      :is_waving, :waiver_reason,
       family_member_ids: {}
     )
   end
