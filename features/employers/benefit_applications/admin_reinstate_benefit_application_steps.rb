@@ -44,6 +44,7 @@ When("Admin clicks on continue button for reinstating benefit_application") do
 end
 
 Then("Admin will see a Successfull message") do
+  sleep 2
   expect(page).to have_content("Plan Year Reinstated Successfully")
 end
 
