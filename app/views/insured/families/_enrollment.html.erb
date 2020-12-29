@@ -24,7 +24,7 @@
         </h3>
       </div>
       <div class="col-xs-12 vertically-aligned-row mt-1">
-        <div class="enrollment-premium info vertical-align-top">
+        <div class="enrollment-premium info vertical-align-top" style="float: left;width: 70%">
           <p class="mb-0">
             <strong><%= l10n("premium") %>:</strong>
             <%= number_to_currency(current_premium(hbx_enrollment), precision: 2) %>/month
@@ -42,8 +42,8 @@
           <%= enrollment_coverage_end(hbx_enrollment) %>
         </div>
         <% else %>
-        <div class="enrollment-effective info vertical-align-top">
-          <strong style="margin-left:220px"><%= l10n("plan_start") %>:</strong>
+        <div class="enrollment-effective info vertical-align-top" style="float: left;width: 30%">
+          <strong><%= l10n("plan_start") %>:</strong>
           <%= hbx_enrollment.effective_on %>
           <% if read_only == true %>
           <br>
@@ -60,13 +60,13 @@
       </div>
       <div class="col-xs-12 vertically-aligned-row">
         <% unless hide_policy_selected_date?(hbx_enrollment) %>
-        <div class="enrollment-created-at info vertical-align-top">
+        <div class="enrollment-created-at info vertical-align-top" style="float: left;width: 70%">
           <strong><%= l10n("plan_selected") %>:</strong>
           <%= format_policy_purchase_date(hbx_enrollment) %>
           (<%= format_policy_purchase_time(hbx_enrollment) %>)
         </div>
         <% end %>
-        <div class="enrollment-type info vertical-align-top">
+        <div class="enrollment-type info vertical-align-top" style="float: left;width: 30%">
           <strong><%= l10n("plan_type") %>:</strong>
           <%= product.product_type.to_s.titleize %>
         </div>
