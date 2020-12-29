@@ -51,7 +51,7 @@ module BenefitMarkets
     end
 
     def start_on
-      effective_date
+      effective_period.min
     end
 
     # def service_areas=(service_areas)
