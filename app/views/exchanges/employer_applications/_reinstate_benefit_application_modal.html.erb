@@ -8,7 +8,9 @@
         <h4><%= l10n("exchange.employer_applications.confirmation_message")%></h4>
       </div>
       <div class="modal-footer">
-        <%= link_to l10n("exchange.employer_applications.continue"), '#', :onclick => "submitReinstateAction('#{application.id}','#{application.benefit_sponsorship.id}')", class: "btn btn-primary mtz  btn-small"%>
+        <%= link_to l10n("exchange.employer_applications.continue"), exchanges_employer_application_reinstate_path({employer_application_id: application.id, employer_id: application.benefit_sponsorship.id}), method: :put, remote: true, class: "btn btn-primary mtz  btn-small"%>
+        <!--TODO: Fix THIS-->
+        <%#= link_to l10n("exchange.employer_applications.continue"), '#', :onclick => "submitReinstateAction('#{application.id}','#{application.benefit_sponsorship.id}')", class: "btn btn-primary mtz  btn-small"%>
         <span class="btn btn-default btn-small" data-dismiss="modal"><%= l10n("exchange.employer_applications.cancel")%></span>
       </div>
     </div>
