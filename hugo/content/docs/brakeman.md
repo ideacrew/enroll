@@ -42,7 +42,6 @@ The class BulkActionsForAdmin will expect some dynamic params (beginning with tr
 The class BulkActionsForAdmin will expect some dynamic params (beginning with transition_ followed by id’s). We can use regexes to match the dynamic params: 
 ```
 dynamic_transition_params_keys = params.keys.map { |key| key.match(/transition_.*/) }.compact.map(&:to_s).map(&:to_sym)
->>>>>>> 50c509df61... brakeman fixes description
 non_dynamic_params_keys = [:family, :family_actions_id, :qle_id, :action]
 @permitted_param_keys = dynamic_transition_params_keys.push(non_dynamic_params_keys).flatten`
 ```
