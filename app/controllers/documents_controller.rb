@@ -4,6 +4,7 @@ class DocumentsController < ApplicationController
   before_action :set_verification_type
   before_action :set_person, only: [:enrollment_docs_state, :fed_hub_request, :enrollment_verification, :update_verification_type, :extend_due_date, :update_ridp_verification_type]
   before_action :add_type_history_element, only: [:update_verification_type, :fed_hub_request, :destroy]
+  before_action :cartafact_download_params, only: [:cartafact_download]
   respond_to :html, :js
 
   def download
@@ -32,7 +33,7 @@ class DocumentsController < ApplicationController
         model = "BenefitSponsors::Organizations::AcaShopCcaEmployerProfile"
       end
       model_klass = ['BenefitSponsors::Organizations::AcaShopDcEmployerProfile', 'Person', "BenefitSponsors::Organizations::AcaShopCcaEmployerProfile"].include?(model) ? model.safe_constantize : nil
-      return unless model_klass.present?
+      raise "Sorry! Invalid Request" unless model_klass
 
       model_object = model_klass.find(model_id)
       documents = model_object.send(relation.to_sym)
@@ -48,7 +49,7 @@ class DocumentsController < ApplicationController
   end
 
   def cartafact_download
-    result = ::Operations::Documents::Download.call({params: params.permit!.to_h, user: current_user})
+    result = ::Operations::Documents::Download.call({params: cartafact_download_params.to_h, user: current_user})
     if result.success?
       response_data = result.value!
       send_data response_data, get_options(params)
@@ -245,6 +246,11 @@ class DocumentsController < ApplicationController
   end
 
   private
+
+  def cartafact_download_params
+    params.permit(:user, :relation_id, :model, :model_id)
+  end
+
   def updateable?
     authorize Family, :updateable?
   end

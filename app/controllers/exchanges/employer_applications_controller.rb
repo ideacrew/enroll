@@ -58,7 +58,8 @@ module Exchanges
 
     def reinstate
       application = @benefit_sponsorship.benefit_applications.find(params[:employer_application_id])
-      result = EnrollRegistry[:benefit_application_reinstate]{ {params: {benefit_application: application} } }
+      transmit_to_carrier = params['transmit_to_carrier'] == "true" || params['transmit_to_carrier'] == true ? true : false
+      result = EnrollRegistry[:benefit_application_reinstate]{ {params: {benefit_application: application, options: {transmit_to_carrier: transmit_to_carrier} } } }
       if result.success?
         flash[:notice] = "#{application.benefit_sponsorship.legal_name} - #{l10n('exchange.employer_applications.success_message')} #{(application.canceled? ? application.start_on : application.end_on.next_day).to_date}"
       else

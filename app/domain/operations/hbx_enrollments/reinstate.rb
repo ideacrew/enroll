@@ -56,6 +56,7 @@ module Operations
 
       def active_bga_exists?(params)
         @effective_on = fetch_effective_on(params)
+        @notify = params[:options].present? && params[:options][:notify] ? params[:options][:notify] : false
         @bga = @current_enr.census_employee.benefit_group_assignments.by_benefit_package(params[:options][:benefit_package]).order_by(:created_at.desc).detect{ |bga| bga.is_active?(@effective_on)}
       end
 
@@ -119,18 +120,9 @@ module Operations
           return Failure('Cannot transition to state coverage_selected on event begin_coverage.') unless new_enrollment.may_begin_coverage?
           new_enrollment.begin_coverage!
           new_enrollment.begin_coverage! if TimeKeeper.date_of_record >= new_enrollment.effective_on && new_enrollment.may_begin_coverage?
-          new_enrollment.notify_of_coverage_start(true)
         end
 
         Success(new_enrollment)
-      end
-
-      def reinstate_after_effects(hbx_enrollment)
-        update_benefit_group_assignment(hbx_enrollment)
-        terminate_dependent_age_off(hbx_enrollment)
-        terminate_employment_term_enrollment(hbx_enrollment)
-
-        Success(hbx_enrollment)
       end
 
       def update_benefit_group_assignment(hbx_enrollment)
@@ -147,8 +139,7 @@ module Operations
         enrollments.each do |enrollment|
           enrollment.term_or_cancel_enrollment(enrollment, employment_term_date)
         end
-
-        hbx_enrollment.notify_of_coverage_start(true)
+        notify_trading_partner(hbx_enrollment)
       end
 
       def terminate_dependent_age_off(hbx_enrollment)
@@ -196,6 +187,19 @@ module Operations
         elsif ::EnrollRegistry[:aca_fehb_dependent_age_off].settings(:period).item == :annual
           fehb_dao.call(new_date: dao_date, enrollment: enrollment) if dao_date.strftime("%m/%d") == TimeKeeper.date_of_record.beginning_of_year.strftime("%m/%d")
         end
+      end
+
+      def notify_trading_partner(hbx_enrollment)
+        hbx_enrollment.notify_of_coverage_start(@notify)
+      end
+
+      def reinstate_after_effects(hbx_enrollment)
+        notify_trading_partner(hbx_enrollment)
+        update_benefit_group_assignment(hbx_enrollment)
+        terminate_dependent_age_off(hbx_enrollment)
+        terminate_employment_term_enrollment(hbx_enrollment)
+
+        Success(hbx_enrollment)
       end
     end
   end

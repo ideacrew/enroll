@@ -34,6 +34,7 @@ module BenefitSponsors
         def validate(params)
           return Failure('Missing Key.') unless params.key?(:benefit_application)
           @current_ba = params[:benefit_application]
+          @notify = params[:options].present? && params[:options][:transmit_to_carrier] ? params[:options][:transmit_to_carrier] : false
           return Failure('Not a valid Benefit Application object.') unless @current_ba.is_a?(BenefitSponsors::BenefitApplications::BenefitApplication)
           return Failure("Given BenefitApplication is not in any of the [:terminated, :termination_pending, :canceled, :retroactive_canceled] states.") unless valid_states_for_reinstatement
           return Failure("System date is not within the given BenefitApplication's effective period timeframe.") unless initial_ba_within_valid_timeframe?
@@ -96,8 +97,7 @@ module BenefitSponsors
 
         def reinstate(new_ba)
           return Failure('Cannot transition to state reinstated on event reinstate.') unless new_ba.may_reinstate?
-
-          new_ba.reinstate!
+          new_ba.reinstate!(@notify)
           return Failure('Cannot transition to state active on event activate_enrollment.') unless new_ba.may_activate_enrollment?
 
           new_ba.activate_enrollment!

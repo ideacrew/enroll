@@ -11,7 +11,7 @@ RSpec.describe Operations::HbxEnrollments::Reinstate, :type => :model, dbclean: 
 
     let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_month - 6.months }
     let(:effective_on) { current_effective_date }
-    let(:hired_on) { TimeKeeper.date_of_record.prev_year - 3.months }
+    let(:hired_on) { TimeKeeper.date_of_record - 3.months }
     let(:employee_created_at) { hired_on }
     let(:employee_updated_at) { employee_created_at }
     let(:person) {FactoryBot.create(:person, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789')}
