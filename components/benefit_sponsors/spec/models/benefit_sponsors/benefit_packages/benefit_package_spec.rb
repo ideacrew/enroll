@@ -1097,7 +1097,7 @@ module BenefitSponsors
 
           cloned_catalog.benefit_application = cloned_application
           cloned_catalog.save!
-          cloned_application.assign_attributes({reinstated_id: initial_application.id, benefit_sponsor_catalog_id: cloned_catalog.id})
+          cloned_application.assign_attributes({aasm_state: :active, reinstated_id: initial_application.id, benefit_sponsor_catalog_id: cloned_catalog.id})
           cloned_application.save!
 
           @cloned_package = cloned_application.benefit_packages[0]
@@ -1147,7 +1147,7 @@ module BenefitSponsors
           cloned_catalog = ::BenefitMarkets::Operations::BenefitSponsorCatalogs::Clone.new.call(benefit_sponsor_catalog: initial_application.benefit_sponsor_catalog).success
           cloned_catalog.benefit_application = cloned_application
           cloned_catalog.save!
-          cloned_application.assign_attributes({reinstated_id: initial_application.id, benefit_sponsor_catalog_id: cloned_catalog.id})
+          cloned_application.assign_attributes({aasm_state: :active, reinstated_id: initial_application.id, benefit_sponsor_catalog_id: cloned_catalog.id})
           cloned_application.save!
           @cloned_package = cloned_application.benefit_packages[0]
           @cloned_package.reinstate_member_benefits
@@ -1190,7 +1190,7 @@ module BenefitSponsors
           cloned_catalog = ::BenefitMarkets::Operations::BenefitSponsorCatalogs::Clone.new.call(benefit_sponsor_catalog: initial_application.benefit_sponsor_catalog).success
           cloned_catalog.benefit_application = cloned_application
           cloned_catalog.save!
-          cloned_application.assign_attributes({reinstated_id: initial_application.id, benefit_sponsor_catalog_id: cloned_catalog.id})
+          cloned_application.assign_attributes({aasm_state: :active, reinstated_id: initial_application.id, benefit_sponsor_catalog_id: cloned_catalog.id})
           cloned_application.save!
           @cloned_package = cloned_application.benefit_packages[0]
           @cloned_package.reinstate_member_benefits
@@ -1235,7 +1235,7 @@ module BenefitSponsors
           cloned_catalog = ::BenefitMarkets::Operations::BenefitSponsorCatalogs::Clone.new.call(benefit_sponsor_catalog: initial_application.benefit_sponsor_catalog).success
           cloned_catalog.benefit_application = cloned_application
           cloned_catalog.save!
-          cloned_application.assign_attributes({reinstated_id: initial_application.id, benefit_sponsor_catalog_id: cloned_catalog.id})
+          cloned_application.assign_attributes({aasm_state: :active, reinstated_id: initial_application.id, benefit_sponsor_catalog_id: cloned_catalog.id})
           cloned_application.save!
           @cloned_package = cloned_application.benefit_packages[0]
           @cloned_package.reinstate_member_benefits
