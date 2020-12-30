@@ -22,6 +22,48 @@ Since there are a specific set of keys we need to create a new message, we can c
 
 `@new_message = Message.new(params.require(:message).permit(:subject, :body, :folder, :to, :from))`
 
+# Strong Params with Nested Attributes (Arrays/Hashes)
+
+As a general rule of thumb, strong params with nested attributes [must come last](https://blog.smartlogic.io/permitting-nested-arrays-using-strong-params-in-rails/). Here's an example method from `app/controllers/exchanges/manage_sep_types_controller.rb`:
+
+```
+    def forms_qualifying_life_event_kind_form_params
+      forms_params = params.require(:forms_qualifying_life_event_kind_form).permit(
+        [
+          "_id",
+          "coverage_end_on",
+          "coverage_start_on",
+          "created_by",
+          "date_options_available",
+          "end_on",
+          "event_kind_label",
+          "is_self_attested",
+          "is_visible",
+          "market_kind",
+          "post_event_sep_in_days",
+          "pre_event_sep_in_days",
+          "published_by",
+          "qle_event_date_kind",
+          "reason",
+          "start_on",
+          "title",
+          "tool_tip",
+          "updated_by",
+          "publish",
+          "other_reason",
+          effective_on_kinds: []
+        ]
+      )
+
+      forms_params.merge!({_id: params[:id]}) if params.dig(:id)
+      forms_params
+    end
+```
+
+
+
+
+
 
 # Strong Params with Dynamic Param Keys
 
