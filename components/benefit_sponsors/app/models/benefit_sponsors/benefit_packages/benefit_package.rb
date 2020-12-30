@@ -287,7 +287,6 @@ module BenefitSponsors
 
         # family.validate_member_eligibility_policy
         if true #family.is_valid?
-
           enrollments = family.active_household.hbx_enrollments.enrolled_and_waived
           .by_benefit_sponsorship(benefit_sponsorship).by_effective_period(predecessor_application.effective_period)
 
@@ -500,11 +499,7 @@ module BenefitSponsors
 
       def activate_benefit_group_assignments
         CensusEmployee.by_benefit_package_and_assignment_on(self, start_on, false).non_terminated.inject([]) do |_dummy, ce|
-          ce.benefit_group_assignments.each do |bga|
-            if bga.benefit_package_id == self.id
-              bga.make_active
-            end
-          end
+          ce.benefit_group_assignments.where(benefit_package_id: self.id).last.make_active
         end
       end
 
