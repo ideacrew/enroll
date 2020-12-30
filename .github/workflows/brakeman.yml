@@ -22,7 +22,5 @@ jobs:
           for test_dir in `ls -1 components`; do
             cd components/$test_dir
             brakeman -i config/brakeman.ignore
-            ((result+= $?))
             cd ../..
           done
-          exit $result
