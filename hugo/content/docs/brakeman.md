@@ -24,7 +24,7 @@ Since there are a specific set of keys we need to create a new message, we can c
 
 # Strong Params with Nested Attributes (Arrays/Hashes)
 
-As a general rule of thumb, strong params with nested attributes [must come last](https://blog.smartlogic.io/permitting-nested-arrays-using-strong-params-in-rails/). Here's an example method from `app/controllers/exchanges/manage_sep_types_controller.rb`:
+As a general rule of thumb, strong params with nested attributes *[must come last](https://blog.smartlogic.io/permitting-nested-arrays-using-strong-params-in-rails/)*. Here's an example method from `app/controllers/exchanges/manage_sep_types_controller.rb`:
 
 ```
     def forms_qualifying_life_event_kind_form_params
@@ -60,14 +60,22 @@ As a general rule of thumb, strong params with nested attributes [must come last
     end
 ```
 
+The attribute effective_on_kinds is an array of stringss. You can also note that merge! is being used on the conditional that the attribute _id_ is present, and the _id_ attribute is previously permitted in the forms_params attribute.
 
+Here's another example from `app/controllers/insured/family_members_controller.rb`:
 
+```
+ def permit_dependent_person_params
+    params.require(:dependent).permit(:family_id, :same_with_primary, :addresses => {})
+  end
+```
 
+Again, addresses are embedded within the dependent model, so they are permitted as a hash.
 
 
 # Strong Params with Dynamic Param Keys
 
-Sometimes param key are dynamic, which can be a little tricker. Here are a few examples of Dynamic keys of how to safely permit dynamic params. You’ll have to research the source of the params to determine what the dynamic values are.
+Sometimes param keys are dynamic, which can be a little tricker. Here are a few examples of Dynamic keys of how to safely permit dynamic params. You’ll have to research the source of the params to determine what the dynamic values are.
 
 Here’s an example from the method transition_family_members_update in app/[Families Controller](controllers/insured/families_controller.rb):
 
