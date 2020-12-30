@@ -84,15 +84,13 @@ module VlpDoc
 
   def sensitive_info_changed?(role)
     return unless role
-    params_hash = params.permit!.to_h
-    info_changed = role.sensitive_information_changed?(params_hash[:person] || params_hash[:dependent])
+    info_changed = role.sensitive_information_changed?(params.require(:person).permit(params[:person].keys).to_h || params.require(:dependent).permit(params[:dependent].keys).to_h)
     dc_status = (role.person.is_homeless || role.person.is_temporarily_out_of_state)
     [info_changed, dc_status]
   end
 
   def native_status_changed?(role)
     return unless role
-    params_hash = params.permit!.to_h
-    role.person.send("tribal_id") != params_hash["tribal_id"]
+    role.person.send("tribal_id") != params.permit("tribal_id").to_h
   end
 end
