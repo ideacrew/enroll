@@ -293,7 +293,7 @@ class BenefitGroupAssignment
   end
 
   def make_active
-    census_employee.benefit_group_assignments.each do |benefit_group_assignment|
+    census_employee.benefit_group_assignments.inject([]) do |_dummy, benefit_group_assignment|
       if benefit_group_assignment.is_active? && benefit_group_assignment.id != self.id
         end_on = benefit_group_assignment.end_on || (start_on - 1.day)
         if is_case_old?
@@ -306,6 +306,8 @@ class BenefitGroupAssignment
     end
 
     update_attributes(is_active: true, activated_at: TimeKeeper.datetime_of_record) unless is_active?
+  rescue StandardError => e
+    Rails.logger.error{"BenefitGroupAssignment make_active: Unable to activate bga, bga_id, #{id} due to #{e.backtrace}"}
   end
 
   private
