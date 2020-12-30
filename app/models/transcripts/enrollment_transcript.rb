@@ -271,14 +271,13 @@ module Transcripts
         if matched_people.present?
           raise 'multiple person records match with enrollment primary applicant' if matched_people.size > 1
           matched_person = matched_people.first
-
-          if family =  matched_person.families.where(id: enrollment.family.id).first
-            enrollments = (@shop ? matching_shop_coverages(enrollment, family) : matching_ivl_coverages(enrollment, family))
-            exact_match = (find_exact_enrollment_matches(enrollment, enrollments.dup).first ||  enrollments.last)
-            enrollments = enrollments.select{|en| en.hbx_id != exact_match.hbx_id}
-            @enrollment = exact_match
-            @duplicate_coverages = enrollments.select{|en| HbxEnrollment::ENROLLED_STATUSES.include?(en.aasm_state)}
-          end
+          family = matched_person.families.where(id: enrollment.family.id).first
+          return if family.blank?
+          enrollments = (@shop ? matching_shop_coverages(enrollment, family) : matching_ivl_coverages(enrollment, family))
+          exact_match = (find_exact_enrollment_matches(enrollment, enrollments.dup).first || enrollments.last)
+          enrollments = enrollments.reject { |en| en.hbx_id = exact_match.hbx_id }
+          @enrollment = exact_match
+          @duplicate_coverages = enrollments.select{|en| HbxEnrollment::ENROLLED_STATUSES.include?(en.aasm_state)}
         end
       else
         enrollments = (@shop ? matching_shop_coverages(match) : matching_ivl_coverages(match)).uniq
