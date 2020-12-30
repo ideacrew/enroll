@@ -148,15 +148,21 @@ class Insured::FamilyMembersController < ApplicationController
     end
     consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
     @info_changed, @dc_status = sensitive_info_changed?(consumer_role)
-    if @address_errors.blank? && @dependent.update_attributes(params[:dependent]) && update_vlp_documents(consumer_role, 'dependent', @dependent)
+    if @address_errors.blank? && @dependent.update_attributes(params.require(:dependent).permit(params[:dependent].keys)) && update_vlp_documents(consumer_role, 'dependent', @dependent)
       consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
       consumer_role&.check_for_critical_changes(
         @dependent.family_member.family,
         info_changed: @info_changed,
         is_homeless: params[:dependent]["is_homeless"],
         is_temporarily_out_of_state: params[:dependent]["is_temporarily_out_of_state"],
-        dc_status: @dc_status)
-      consumer_role.update_attribute(:is_applying_coverage,  params[:dependent][:is_applying_coverage]) if consumer_role.present? && !params[:dependent][:is_applying_coverage].nil?
+        dc_status: @dc_status
+      )
+      if consumer_role.present? && !params[:dependent][:is_applying_coverage].nil?
+        consumer_role.update_attribute(
+          :is_applying_coverage,
+          params.require(:dependent).permit(:is_applying_coverage)[:is_applying_coverage]
+        )
+      end
       respond_to do |format|
         format.html { render 'show' }
         format.js { render 'show' }
