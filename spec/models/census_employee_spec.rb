@@ -1767,6 +1767,117 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     end
   end
 
+  context 'future_active_reinstated_benefit_group_assignment' do
+    include_context "setup initial benefit application"
+
+    let(:benefit_package)      { initial_application.benefit_packages.first }
+    let(:census_employee)      { FactoryBot.create(:census_employee, employer_profile: abc_profile) }
+    let(:start_on) { TimeKeeper.date_of_record.next_month.next_month.beginning_of_month + 1.year }
+    let(:end_on) { TimeKeeper.date_of_record.next_month.end_of_month + 1.year }
+    let(:benefit_group_assignment) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: benefit_package, census_employee: census_employee)}
+
+    before do
+      period = initial_application.effective_period.min + 1.year..(initial_application.effective_period.max + 1.year)
+      initial_application.update_attributes!(reinstated_id: BSON::ObjectId.new, aasm_state: :active, effective_period: period)
+      benefit_group_assignment.update_attributes(start_on: initial_application.effective_period.min)
+    end
+
+    it 'should return benefit group assignment which has reinstated benefit package assigned which is future' do
+      census_employee.benefit_sponsorship = abc_profile.benefit_sponsorships.first
+      census_employee.save
+      expect(census_employee.future_active_reinstated_benefit_group_assignment).to eq benefit_group_assignment
+    end
+
+    it 'should return reinstated benefit package assigned' do
+      census_employee.benefit_sponsorship = abc_profile.benefit_sponsorships.first
+      census_employee.save
+      expect(census_employee.reinstated_benefit_package).to eq benefit_package
+    end
+
+    it 'should not return benefit group assignment if no reinstated PY is present' do
+      initial_application.update_attributes!(reinstated_id: nil)
+      census_employee.benefit_sponsorship = abc_profile.benefit_sponsorships.first
+      census_employee.save
+      expect(census_employee.future_active_reinstated_benefit_group_assignment).to eq nil
+    end
+  end
+
+  context 'assign reinstated benefit group assignment to census employee' do
+    include_context "setup initial benefit application"
+
+    let(:benefit_package)      { initial_application.benefit_packages.first }
+    let(:census_employee)      { FactoryBot.create(:census_employee, employer_profile: abc_profile) }
+
+    before do
+      period = initial_application.effective_period.min + 1.year..(initial_application.effective_period.max + 1.year)
+      initial_application.update_attributes!(reinstated_id: BSON::ObjectId.new, aasm_state: :active, effective_period: period)
+    end
+
+    it 'should create benefit group assignment for census employee' do
+      census_employee.benefit_sponsorship = abc_profile.benefit_sponsorships.first
+      census_employee.save
+      census_employee.reinstated_benefit_group_assignment = benefit_package.id
+
+      expect(census_employee.benefit_group_assignments.first.start_on).to eq benefit_package.start_on
+    end
+
+    it 'should not create benefit group assignment if no reinstated PY is present' do
+      initial_application.update_attributes!(reinstated_id: nil)
+      census_employee.benefit_sponsorship = abc_profile.benefit_sponsorships.first
+      census_employee.save
+      census_employee.benefit_group_assignments = []
+      census_employee.reinstated_benefit_group_assignment = nil
+
+      expect(census_employee.benefit_group_assignments.present?).to eq false
+    end
+  end
+
+  context 'reinstated_benefit_group_enrollments' do
+    include_context "setup initial benefit application"
+
+    let(:person) { FactoryBot.create(:person) }
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+    let(:employee_role) {FactoryBot.create(:benefit_sponsors_employee_role, employer_profile: abc_profile, person: person)}
+    let(:benefit_package)      { initial_application.benefit_packages.first }
+    let(:census_employee)      { FactoryBot.create(:census_employee, employer_profile: abc_profile, employee_role_id: employee_role.id) }
+    let(:start_on) { TimeKeeper.date_of_record.next_month.next_month.beginning_of_month + 1.year }
+    let(:end_on) { TimeKeeper.date_of_record.next_month.end_of_month + 1.year }
+    let(:benefit_group_assignment) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: benefit_package, census_employee: census_employee)}
+
+    let!(:reinstated_health_enrollment) do
+      FactoryBot.create(
+        :hbx_enrollment,
+        household: family.active_household,
+        coverage_kind: "health",
+        kind: "employer_sponsored",
+        family: census_employee.employee_role.person.primary_family,
+        benefit_sponsorship_id: benefit_sponsorship.id,
+        sponsored_benefit_package_id: benefit_package.id,
+        employee_role_id: census_employee.employee_role.id,
+        benefit_group_assignment_id: benefit_group_assignment.id,
+        aasm_state: 'coverage_selected'
+      )
+    end
+
+    before do
+      period = initial_application.effective_period.min + 1.year..(initial_application.effective_period.max + 1.year)
+      initial_application.update_attributes!(reinstated_id: BSON::ObjectId.new, aasm_state: :active, effective_period: period)
+      census_employee.benefit_sponsorship = abc_profile.benefit_sponsorships.first
+      census_employee.save
+    end
+
+
+    it "should give enrollments which have future reinstated py assigned" do
+      expect(census_employee.reinstated_benefit_group_enrollments[0]).to eq reinstated_health_enrollment
+    end
+
+    it 'should return nil if employee role is not assigned to census employee' do
+      census_employee.update_attributes(employee_role_id: nil)
+      expect(census_employee.reinstated_benefit_group_enrollments).to eq nil
+    end
+
+  end
+
   context "have_valid_date_for_cobra with current_user" do
     let(:census_employee100) { FactoryBot.create(:census_employee) }
     let(:person100) { FactoryBot.create(:person, :with_hbx_staff_role) }
@@ -2728,7 +2839,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     let(:census_employee) do
       FactoryBot.create :census_employee_with_active_assignment,
                         employer_profile: employer_profile,
-                        benefit_sponsorship: organization.active_benefit_sponsorship
+                        benefit_sponsorship: organization.active_benefit_sponsorship,
+                        benefit_group: benefit_group
     end
 
     it "should return true if no employee role linked" do
