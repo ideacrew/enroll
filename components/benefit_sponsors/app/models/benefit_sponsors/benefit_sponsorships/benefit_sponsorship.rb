@@ -535,6 +535,10 @@ module BenefitSponsors
       benefit_applications.map(&:reinstated_id).include?(application&.id) ? nil : application
     end
 
+    def current_active_reinstated_benefit_application
+      benefit_applications.order_by(:created_at.desc).detect {|application| application.active? && application.reinstated_id.present? && application.effective_period.cover?(TimeKeeper.date_of_record) }
+    end
+
     def future_active_reinstated_benefit_application
       benefit_applications.order_by(:created_at.desc).detect {|application| application.active? && application.reinstated_id.present? && application.start_on > TimeKeeper.date_of_record }
     end
