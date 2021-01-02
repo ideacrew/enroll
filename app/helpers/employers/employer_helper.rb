@@ -37,6 +37,14 @@ module Employers::EmployerHelper
                                                                                   .html_safe
   end
 
+  def reinstated_enrollment_state(census_employee = nil)
+    humanize_enrollment_states(census_employee.future_active_reinstated_benefit_group_assignment)
+      .gsub("Coverage Selected", "Enrolled")
+      .gsub("Coverage Waived", "Waived").gsub("Coverage Terminated", "Terminated")
+      .gsub("Coverage Termination Pending", "Coverage Termination Pending")
+      .html_safe
+  end
+
   def humanize_enrollment_states(benefit_group_assignment)
     enrollment_states = []
 
@@ -84,16 +92,6 @@ module Employers::EmployerHelper
       state
     end
   end
-
-  def render_plan_offerings(benefit_group)
-
-    assignment_mapping.each do |bgsm_state, enrollment_statuses|
-      if enrollment_statuses.include?(enrollment_status.to_s)
-        return bgsm_state
-      end
-    end
-  end
-
 
   def invoice_formated_date(date)
     date.strftime("%m/%d/%Y")
@@ -164,13 +162,17 @@ module Employers::EmployerHelper
   end
 
   def get_benefit_packages_for_census_employee
-    initial_benefit_packages = @benefit_sponsorship.current_benefit_application&.benefit_packages unless @benefit_sponsorship.current_benefit_application&.terminated?
-    renewing_benefit_packages = @benefit_sponsorship.renewal_benefit_application.benefit_packages if @benefit_sponsorship.renewal_benefit_application.present?
+    initial_benefit_packages = @benefit_sponsorship&.current_benefit_application&.benefit_packages unless @benefit_sponsorship.current_benefit_application&.terminated?
+    renewing_benefit_packages = @benefit_sponsorship&.renewal_benefit_application&.benefit_packages if @benefit_sponsorship.renewal_benefit_application.present?
     return (initial_benefit_packages || []), (renewing_benefit_packages || [])
   end
 
   def off_cycle_benefit_packages_for_census_employee
     @benefit_sponsorship.off_cycle_benefit_application&.benefit_packages || []
+  end
+
+  def reinstated_benefit_packages_with_future_date_for_census_employee
+    @benefit_sponsorship.future_active_reinstated_benefit_application&.benefit_packages || []
   end
 
   def current_option_for_initial_benefit_package
@@ -197,6 +199,15 @@ module Employers::EmployerHelper
     application = @employer_profile.renewal_benefit_application
     return nil if application.blank?
     application.default_benefit_group || application.benefit_packages[0].id
+  end
+
+  def current_option_for_reinstated_benefit_package
+    bga = @census_employee.future_active_reinstated_benefit_group_assignment
+    return bga.benefit_package_id if bga&.benefit_package_id
+    application = @employer_profile.future_active_reinstated_benefit_application
+    return nil if application.blank?
+    return nil if application.benefit_packages.empty?
+    application.benefit_packages[0].id
   end
 
   def cobra_effective_date(census_employee)
