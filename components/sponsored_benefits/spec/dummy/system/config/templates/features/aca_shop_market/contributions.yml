@@ -226,7 +226,7 @@ registry:
         is_enabled: true
         settings:
           - key: :contribution_model_key
-            item: :fifty_percent_sponsor_fixed_percent_contribution_model
+            item: :zero_percent_sponsor_fixed_percent_contribution_model
           - key: :benefit_application_kind
             item: :renewal
           - key: :effective_period
@@ -237,6 +237,28 @@ registry:
             item: true
           - key: :renewal_criterion_key
             item: :renewal_sponsor_default
+  - namespace:
+      - :enroll_app
+      - :aca_shop_market
+      - :benefit_market_catalog
+      - :catalog_2021
+    features:
+      - key: :aca_shop_fetch_enrollment_minimum_participation_2021
+        item: BenefitMarkets::Operations::BenefitSponsorCatalogs::FetchMinimumParticipation.new
+        is_enabled: true
+        settings:
+          - key: :zero_percent_sponsor_fixed_percent_contribution_model
+            item: 0
+          - key: :fifty_percent_sponsor_fixed_percent_contribution_model
+            item: <%= 2 / 3.0 %>
+      - key: :fehb_fetch_enrollment_minimum_participation_2021
+        item: BenefitMarkets::Operations::BenefitSponsorCatalogs::FetchMinimumParticipation.new
+        is_enabled: false
+        settings:
+          - key: :zero_percent_sponsor_fixed_percent_contribution_model
+            item: 0
+          - key: :fifty_percent_sponsor_fixed_percent_contribution_model
+            item: <%= 2 / 3.0 %>
   - namespace:
       - :enroll_app
       - :aca_shop_market
@@ -292,9 +314,11 @@ registry:
         is_enabled: true
         settings:
         - key: :initial_application_period
-          item: <%= Date.new(2020,03,01)..Date.new(2020,12,31) %>
+          item: <%= Date.new(2020,03,01)..Date.new(2021,12,31) %>
+        - key: :renewal_application_period
+          item: <%= Date.new(2021,01,01)..Date.new(2021,12,31) %>
         - key: :enabled_for_renewal_applications
-          item: false
+          item: true
         - key: :employer_contribution_percent_minimum
           item: 0
         - key: :employer_family_contribution_percent_minimum
