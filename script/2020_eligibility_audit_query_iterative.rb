@@ -3,7 +3,7 @@ require 'delegate'
 Caches::PlanDetails.drop_cache_to_free_ram!
 MallocTrim.trim
 
-ITERATION_RUN = 1
+ITERATION_RUN = 2
 
 AUDIT_START_DATE = Date.new(2019,10,1)
 AUDIT_END_DATE = Date.new(2020,10,1)
