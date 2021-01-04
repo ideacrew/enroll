@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe TaxHouseholdMember, type: :model do
-  let!(:person) {FactoryBot.create(:person, :with_family, dob: Date.new(TimeKeeper.date_of_record.year, 02, 20))}
+  let!(:person) {FactoryBot.create(:person, :with_family, dob: Date.new(TimeKeeper.date_of_record.year, 01, 01))}
   let!(:household) {FactoryBot.create(:household, family: person.primary_family)}
   let!(:tax_household) {FactoryBot.create(:tax_household, household: household)}
   let!(:tax_household_member1) {tax_household.tax_household_members.build(applicant_id: person.primary_family.family_members.first.id)}
