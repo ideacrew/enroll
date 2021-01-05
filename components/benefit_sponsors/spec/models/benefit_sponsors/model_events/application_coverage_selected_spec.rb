@@ -7,11 +7,8 @@ RSpec.describe 'BenefitSponsors::ModelEvents::ApplicationCoverageSelected', :dbc
   let(:aasm_state) { "enrollment_eligible" }
   let!(:person){ FactoryGirl.create(:person, :with_family)}
   let!(:family) {person.primary_family}
-  let!(:employee_role) {
-    FactoryGirl.create(:benefit_sponsors_employee_role, person: person, employer_profile: abc_profile, census_employee_id: census_employee.id, benefit_sponsors_employer_profile_id: abc_profile.id)}
-  let!(:census_employee)  { 
-    FactoryGirl.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile)
-  }
+  let!(:employee_role) { FactoryGirl.create(:benefit_sponsors_employee_role, person: person, employer_profile: abc_profile, census_employee_id: census_employee.id, benefit_sponsors_employer_profile_id: abc_profile.id)}
+  let!(:census_employee) { FactoryGirl.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile)}
 
   let!(:model_instance) { 
     hbx_enrollment = FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, :with_product, 
@@ -21,8 +18,8 @@ RSpec.describe 'BenefitSponsors::ModelEvents::ApplicationCoverageSelected', :dbc
                         rating_area_id: initial_application.recorded_rating_area_id,
                         sponsored_benefit_id: initial_application.benefit_packages.first.health_sponsored_benefit.id,
                         sponsored_benefit_package_id: initial_application.benefit_packages.first.id,
-                        benefit_sponsorship_id: initial_application.benefit_sponsorship.id, 
-                        employee_role_id: employee_role.id) 
+                        benefit_sponsorship_id: initial_application.benefit_sponsorship.id,
+                        employee_role_id: employee_role.id)
     hbx_enrollment.benefit_sponsorship = benefit_sponsorship
     hbx_enrollment.save!
     hbx_enrollment
