@@ -1141,7 +1141,8 @@ Then(/Employee should see the correct employee contribution on plan tile/) do
 end
 
 Then(/Employee should see their current plan/) do
-  expect(page).to have_content "YOUR CURRENT #{TimeKeeper.date_of_record.year} PLAN"
+  enrollment = Person.all.first.primary_family.active_household.hbx_enrollments.where(:aasm_state.ne => "shopping").first
+  expect(page).to have_content "YOUR CURRENT #{enrollment.effective_on.year} PLAN"
 end
 
 Then("user will click on New Employee Paper Application link") do
