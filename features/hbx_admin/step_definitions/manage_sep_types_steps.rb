@@ -820,6 +820,7 @@ Given("Individual creates account and on home page") do
   step "I click on continue button on household info form"
   # TODO: Previously, it expected the none of the situations listed to just show up.
   #  Adding this here to make pass
+  sleep(2)
   if page.all('a').detect { |link| link[:id] == 'find_sep_link'}.present?
     find('#find_sep_link').click
     sleep(2)
