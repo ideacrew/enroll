@@ -201,7 +201,6 @@ class HbxEnrollment
   scope :non_terminated, -> { where(:aasm_state.ne => 'coverage_terminated') }
   scope :non_external, -> { where(:external_enrollment => false) }
   scope :non_expired_and_non_terminated,  -> { any_of([enrolled.selector, renewing.selector, waived.selector]).order(created_at: :desc) }
-  scope :by_employee_role,     ->(employee_role) { where(employee_role_id: employee_role.id) }
   scope :by_benefit_sponsorship,   ->(benefit_sponsorship) { where(:benefit_sponsorship_id => benefit_sponsorship.id) }
   scope :by_benefit_package,       ->(benefit_package) { where(:sponsored_benefit_package_id => benefit_package.id) }
   scope :by_enrollment_period,     ->(enrollment_period) { where(:effective_on.gte => enrollment_period.min, :effective_on.lte => enrollment_period.max) }
@@ -1130,16 +1129,20 @@ class HbxEnrollment
   end
 
   def make_changes?
-    family.enrollments.by_kind(kind)&.by_employee_role(employee_role)&.enrolled&.reject { |enrollment| enrollment == self }.present?
+    shop_family_enrollments.enrolled&.reject { |enrollment| enrollment == self }.present?
+  end
+
+  def shop_family_enrollments
+    family.enrollments.by_kind(kind)
   end
 
   def is_auto_renewing_and_coverge_selected?
-    return false if aasm_state == 'auto_renewing' && family.enrollments.by_kind(kind)&.by_employee_role(employee_role)&.coverage_selected.present?
+    return false if aasm_state == 'auto_renewing' && shop_family_enrollments.coverage_selected.present?
   end
 
   def has_enrolled_status_and_auto_renewing?
     return false if employee_role.blank? || kind.blank?
-    return true if ENROLLED_STATUSES.include?(aasm_state) && family.enrollments.by_kind(kind)&.by_employee_role(employee_role)&.auto_renewing.present?
+    return true if ENROLLED_STATUSES.include?(aasm_state) && shop_family_enrollments.auto_renewing.present?
   end
 
   def build_plan_premium(qhp_plan: nil, elected_aptc: false, tax_household: nil, apply_aptc: nil)
