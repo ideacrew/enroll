@@ -5,7 +5,7 @@ Feature: Qualifying life of event kind based on eligibity dates
     And the Admin is on the Main Page
     And the FAA feature configuration is enabled
 
-  Scenario: Consumer qualify for Special enrollment period based on eligibity dates
+  Scenario: Consumer can qualify for Special enrollment period based on eligibity dates
     Given Hbx Admin Creates and Publish Individual market SEP Type
     And Hbx Admin logs out
     Given Individual creates account and on home page
@@ -23,8 +23,7 @@ Feature: Qualifying life of event kind based on eligibity dates
     Then Individual should not see sucess confirmation text
     And I click on log out link
 
-  @broken
-  Scenario: Admin logged to qualify consumer for special enrollment period based on eligibity dates
+  Scenario: Admin can view consumer qualified for special enrollment period based on eligibity dates
     Given Hbx Admin Creates and Publish Individual market SEP Type
     And Hbx Admin logs out
     Given Individual creates account and on home page
@@ -48,7 +47,7 @@ Feature: Qualifying life of event kind based on eligibity dates
     Then Admin should not see sucess confirmation text
     And Admin logs out
 
-  Scenario: Employee qualify for Special enrollment period based on eligibity dates
+  Scenario: Employee can qualify for Special enrollment period based on eligibity dates
     Given Hbx Admin Creates and Publish Shop market SEP Type
     And Hbx Admin logs out
     Given a CCA site exists with a benefit market
@@ -72,7 +71,7 @@ Feature: Qualifying life of event kind based on eligibity dates
     Then Employee should not see sucess confirmation text
     And Employee logs out
 
-  Scenario: Admin logged to qualify employee for special enrollment period based on eligibity dates
+  Scenario: Admin can view employee qualified for special enrollment period based on eligibity dates
     Given Hbx Admin Creates and Publish Shop market SEP Type
     And Admin logs out
     Given Employee creates account and on home page
