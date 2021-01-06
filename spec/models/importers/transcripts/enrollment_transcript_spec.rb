@@ -290,6 +290,7 @@ RSpec.describe Importers::Transcripts::EnrollmentTranscript, type: :model, dbcle
           }
         end
 
+        let(:current_effective_date)  { (TimeKeeper.date_of_record + 1.month).beginning_of_month }
         let!(:source_enrollment_1) do
           enrollment = source_family.active_household.hbx_enrollments.build({hbx_id: '1000001', kind: 'employer_sponsored', product: source_plan, effective_on: source_effective_on, aasm_state: 'coverage_selected',
                                                                              sponsored_benefit_package_id: benefit_group_assignment.benefit_group.id, household: household,

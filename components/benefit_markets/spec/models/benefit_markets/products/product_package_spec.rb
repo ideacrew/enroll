@@ -147,6 +147,7 @@ module BenefitMarkets
       include_context 'setup benefit market with market catalogs and product packages'
       include_context 'setup initial benefit application'
 
+      let(:effective_period)          { TimeKeeper.date_of_record.beginning_of_year..(TimeKeeper.date_of_record.end_of_year) }
       let!(:one_issuer_product_package) {initial_application.benefit_sponsor_catalog.product_packages.select {|pp| pp.package_kind == :single_issuer}}
       let!(:all_products) do
         products = one_issuer_product_package.map(&:products).flatten
