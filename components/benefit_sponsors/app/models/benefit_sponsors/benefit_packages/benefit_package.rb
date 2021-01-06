@@ -501,7 +501,7 @@ module BenefitSponsors
       end
 
       def activate_benefit_group_assignments
-        CensusEmployee.by_benefit_package_and_assignment_on(self, start_on, false).non_terminated.no_timeout.inject([]) do |_dummy, ce|
+        CensusEmployee.by_benefit_package_and_assignment_on(self, start_on).non_terminated.no_timeout.inject([]) do |_dummy, ce|
           ce.benefit_group_assignments.where(benefit_package_id: self.id).last&.make_active
         end
       end
