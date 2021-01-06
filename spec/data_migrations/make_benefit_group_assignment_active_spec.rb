@@ -19,25 +19,24 @@ describe MakeBenefitGroupAssignmentActive, dbclean: :after_each do
     let(:benefit_sponsorship)       { benefit_sponsor.active_benefit_sponsorship }
     let(:employer_profile)          { benefit_sponsorship.profile }
     let!(:benefit_package)          { benefit_sponsorship.benefit_applications.first.benefit_packages.first}
-    let(:benefit_group_assignment)  { FactoryBot.build(:benefit_group_assignment, benefit_package: benefit_package, start_on: benefit_package.start_on) }
+    let!(:benefit_group_assignment)  { FactoryBot.create(:benefit_group_assignment, census_employee: census_employee, benefit_package: benefit_package, start_on: benefit_package.start_on, end_on: benefit_package.end_on) }
     let!(:census_employee) do
       FactoryBot.create(
         :census_employee,
         :with_active_assignment,
         benefit_sponsorship: benefit_sponsorship,
         employer_profile: employer_profile,
-        benefit_group: benefit_package,
-        benefit_group_assignments: [benefit_group_assignment]
+        benefit_group: benefit_package
       )
     end
 
     context 'updating benefit group assignment to active', dbclean: :after_each do
       it 'should make the benefit group assignment active' do
         ClimateControl.modify ce_id: census_employee.id do
-          expect(census_employee.benefit_group_assignments.last.activated_at).to eq(nil)
+          expect(benefit_group_assignment.activated_at).to eq(nil)
           subject.migrate
           census_employee.reload
-          expect(CensusEmployee.find(census_employee.id).benefit_group_assignments.last.activated_at.class).to eq(DateTime)
+          expect(benefit_group_assignment.reload.activated_at.class).to eq(DateTime)
         end
       end
     end
