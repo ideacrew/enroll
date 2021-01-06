@@ -36,6 +36,7 @@ describe Forms::BulkActionsForAdmin, ".cancel_enrollments" do
     include_context "setup benefit market with market catalogs and product packages"
     include_context "setup initial benefit application"
 
+    let(:effective_period) { TimeKeeper.date_of_record.beginning_of_year..(TimeKeeper.date_of_record.end_of_year) }
     let(:benefit_package)  { initial_application.benefit_packages.first }
     let(:benefit_group_assignment) {FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_package)}
     let(:employee_role) { FactoryGirl.create(:benefit_sponsors_employee_role, person: person, employer_profile: benefit_sponsorship.profile, census_employee_id: census_employee.id, benefit_sponsors_employer_profile_id: abc_profile.id) }
@@ -118,6 +119,11 @@ describe Forms::BulkActionsForAdmin, ".cancel_enrollments" do
       end
       let(:subject) { Forms::BulkActionsForAdmin.new(*cancel_arguments)}
       let!(:glue_event_queue_name) { "#{Rails.application.config.acapi.hbx_id}.#{Rails.application.config.acapi.environment_name}.q.glue.enrollment_event_batch_handler" }
+      let!(:quiet_period) { initial_application.enrollment_quiet_period.min..TimeKeeper.date_of_record.prev_day}
+
+      before :each do
+        allow_any_instance_of(BenefitSponsors::BenefitApplications::BenefitApplication).to receive(:enrollment_quiet_period).and_return(quiet_period)
+      end
 
       it "should cancel enrollment and trigger cancel event" do
         expect(subject).to receive(:notify).with("acapi.info.events.hbx_enrollment.terminated", {:reply_to => glue_event_queue_name,
@@ -199,6 +205,11 @@ describe Forms::BulkActionsForAdmin, ".cancel_enrollments" do
       end
       let(:subject) { Forms::BulkActionsForAdmin.new(*term_arguments)}
       let!(:glue_event_queue_name) { "#{Rails.application.config.acapi.hbx_id}.#{Rails.application.config.acapi.environment_name}.q.glue.enrollment_event_batch_handler" }
+      let!(:quiet_period) { initial_application.enrollment_quiet_period.min..TimeKeeper.date_of_record.prev_day}
+
+      before :each do
+        allow_any_instance_of(BenefitSponsors::BenefitApplications::BenefitApplication).to receive(:enrollment_quiet_period).and_return(quiet_period)
+      end
 
       it "should terminate enrollment and trigger terminate event" do
         expect(subject).to receive(:notify).with("acapi.info.events.hbx_enrollment.terminated", {:reply_to => glue_event_queue_name, "hbx_enrollment_id" => hbx_enrollment.hbx_id,

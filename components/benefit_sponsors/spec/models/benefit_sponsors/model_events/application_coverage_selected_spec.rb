@@ -1,57 +1,38 @@
 require 'rails_helper'
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application"
+RSpec.describe 'BenefitSponsors::ModelEvents::ApplicationCoverageSelected', :dbclean => :after_each do
+  include_context "setup benefit market with market catalogs and product packages"
+  include_context "setup initial benefit application"
+  let(:aasm_state) { "enrollment_eligible" }
+  let!(:person){ FactoryGirl.create(:person, :with_family)}
+  let!(:family) {person.primary_family}
+  let!(:employee_role) { FactoryGirl.create(:benefit_sponsors_employee_role, person: person, employer_profile: abc_profile, census_employee_id: census_employee.id, benefit_sponsors_employer_profile_id: abc_profile.id)}
+  let!(:census_employee) { FactoryGirl.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile)}
 
-RSpec.describe 'BenefitSponsors::ModelEvents::ApplicationCoverageSelected', :dbclean => :around_each do
-  let(:start_on) {  (TimeKeeper.date_of_record + 2.months).beginning_of_month }
-  let(:current_effective_date)  { TimeKeeper.date_of_record }
-
-  let(:person)       { FactoryGirl.create(:person, :with_family) }
-  let(:family)       { person.primary_family }
-  let!(:employee_role) { FactoryGirl.create(:benefit_sponsors_employee_role, person: person, employer_profile: employer_profile, census_employee_id: census_employee.id)}
-  let!(:census_employee)  { FactoryGirl.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: employer_profile, first_name: person.first_name, last_name: person.last_name ) }
-
-  let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-  let!(:organization)     { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
-  let!(:employer_profile)    { organization.employer_profile }
-  let!(:benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
-  let!(:benefit_market) { site.benefit_markets.first }
-  let!(:benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog, :with_product_packages,
-                                  benefit_market: benefit_market,
-                                  title: "SHOP Benefits for #{current_effective_date.year}",
-                                  application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year))
-                                }
-  let!(:benefit_application) {
-    application = FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, :with_benefit_package, 
-      aasm_state: "enrollment_eligible", 
-      benefit_sponsorship: benefit_sponsorship,
-      default_open_enrollment_period: (current_effective_date.beginning_of_year..current_effective_date.beginning_of_year.end_of_month)
-      )
-    application.benefit_sponsor_catalog.save!
-    application
-  }
   let!(:model_instance) { 
     hbx_enrollment = FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, :with_product, 
                         household: family.active_household, 
                         aasm_state: "shopping",
-                        effective_on: benefit_application.start_on,
-                        rating_area_id: benefit_application.recorded_rating_area_id,
-                        sponsored_benefit_id: benefit_application.benefit_packages.first.health_sponsored_benefit.id,
-                        sponsored_benefit_package_id:benefit_application.benefit_packages.first.id,
-                        benefit_sponsorship_id:benefit_application.benefit_sponsorship.id, 
-                        employee_role_id: employee_role.id) 
+                        effective_on: initial_application.start_on,
+                        rating_area_id: initial_application.recorded_rating_area_id,
+                        sponsored_benefit_id: initial_application.benefit_packages.first.health_sponsored_benefit.id,
+                        sponsored_benefit_package_id: initial_application.benefit_packages.first.id,
+                        benefit_sponsorship_id: initial_application.benefit_sponsorship.id,
+                        employee_role_id: employee_role.id)
     hbx_enrollment.benefit_sponsorship = benefit_sponsorship
     hbx_enrollment.save!
     hbx_enrollment
   }
-
-  describe "when employee plan coverage selected", dbclean: :after_each do
+  describe "when employee plan coverage selected" do
     context "ModelEvent" do
       before do
+        initial_application
         allow(model_instance).to receive(:can_select_coverage?).and_return(true)
       end
-
       it "should trigger model event" do
-        model_instance.class.observer_peers.keys.each do |observer|
-          expect(observer).to receive(:notifications_send) do |instance, model_event|
+        model_instance.class.observer_peers.keys.select{ |ob| ob.is_a? BenefitSponsors::Observers::HbxEnrollmentObserver }.each do |observer|
+          expect(observer).to receive(:notifications_send) do |_instance, model_event|
             expect(model_event).to be_an_instance_of(::BenefitSponsors::ModelEvents::ModelEvent)
             expect(model_event).to have_attributes(:event_key => :application_coverage_selected, :klass_instance => model_instance, :options => {})
           end
@@ -59,18 +40,14 @@ RSpec.describe 'BenefitSponsors::ModelEvents::ApplicationCoverageSelected', :dbc
         model_instance.select_coverage!
       end
     end
-
-    context "NoticeTrigger", dbclean: :after_each do
-      DatabaseCleaner.clean
+    context "NoticeTrigger" do
       subject { BenefitSponsors::Observers::HbxEnrollmentObserver.new }
       let(:model_event) { ::BenefitSponsors::ModelEvents::ModelEvent.new(:application_coverage_selected, model_instance, {}) }
-
       it "should trigger notice event" do
         allow(model_instance).to receive(:is_shop?).and_return(true)
         allow(model_instance).to receive(:enrollment_kind).and_return('special_enrollment')
         allow(model_instance).to receive(:census_employee).and_return(census_employee)
         allow(census_employee).to receive(:employee_role).and_return(employee_role)
-        hbx_enrollment = model_event.klass_instance
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employer.employee_mid_year_plan_change_notice_to_employer"
           expect(payload[:employer_id]).to eq model_instance.employer_profile.hbx_id.to_s
@@ -87,9 +64,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::ApplicationCoverageSelected', :dbc
       end
     end
   end
-
-  describe "NoticeBuilder", dbclean: :after_each do
-
+  describe "NoticeBuilder" do
     let(:data_elements) {
       [
         "employee_profile.notice_date",
@@ -99,7 +74,6 @@ RSpec.describe 'BenefitSponsors::ModelEvents::ApplicationCoverageSelected', :dbc
         "employee_profile.enrollment.coverage_start_on"
       ]
     }
-
     let(:recipient) { "Notifier::MergeDataModels::EmployeeProfile" }
     let!(:template)  { Notifier::Template.new(data_elements: data_elements) }
     let(:merge_model) { subject.construct_notice_object }
@@ -107,11 +81,8 @@ RSpec.describe 'BenefitSponsors::ModelEvents::ApplicationCoverageSelected', :dbc
       "event_object_kind" => "HbxEnrollment",
       "event_object_id" => model_instance.id
     } }
-
-    context "when notice event received", dbclean: :after_each do
-
+    context "when notice event received" do
       subject { Notifier::NoticeKind.new(template: template, recipient: recipient) }
-
       before do
         allow(model_instance).to receive(:is_shop?).and_return(true)
         allow(model_instance).to receive(:enrollment_kind).and_return('special_enrollment')
@@ -123,35 +94,27 @@ RSpec.describe 'BenefitSponsors::ModelEvents::ApplicationCoverageSelected', :dbc
         allow(model_instance).to receive(:can_select_coverage?).and_return(true)
         model_instance.select_coverage!
       end
-
       it "should return merge model" do
         expect(merge_model).to be_a(recipient.constantize)
       end
-
       it "should return notice date" do
         expect(merge_model.notice_date).to eq TimeKeeper.date_of_record.strftime('%m/%d/%Y')
       end
-
       it "should return employer name" do
         expect(merge_model.employer_name).to eq model_instance.employer_profile.legal_name
       end
-
       it "should return employee first_name" do
         expect(merge_model.enrollment.employee_first_name).to eq model_instance.census_employee.first_name
       end
-
       it "should return employee last_name" do
         expect(merge_model.enrollment.employee_last_name).to eq model_instance.census_employee.last_name
       end
-
       it "should return enrollment coverage_kind" do
         expect(merge_model.enrollment.coverage_start_on).to eq model_instance.effective_on.strftime('%m/%d/%Y')
       end
     end
   end
-
-  describe "NoticeBuilder", dbclean: :after_each do
-
+  describe "NoticeBuilder" do
     let(:data_elements) {
       [
         "employer_profile.notice_date",
@@ -173,35 +136,28 @@ RSpec.describe 'BenefitSponsors::ModelEvents::ApplicationCoverageSelected', :dbc
     } }
     let(:subject) { Notifier::NoticeKind.new(template: template, recipient: recipient) }
     let(:merge_model) { subject.construct_notice_object }
-
     before do
-      allow(subject).to receive(:resource).and_return(employer_profile)
+      allow(subject).to receive(:resource).and_return(abc_profile)
       allow(subject).to receive(:payload).and_return(payload)
-      allow(model_instance).to receive(:can_select_coverage?).and_return(true)
       employee_role.update_attributes(census_employee_id: census_employee.id)
+      allow(model_instance).to receive(:can_select_coverage?).and_return(true)
       model_instance.select_coverage!
     end
-
     it "should return merge model" do
       expect(merge_model).to be_a(recipient.constantize)
     end
-
     it "should return notice date" do
       expect(merge_model.notice_date).to eq TimeKeeper.date_of_record.strftime('%m/%d/%Y')
     end
-
     it "should return employer name" do
-      expect(merge_model.employer_name).to eq employer_profile.legal_name
+      expect(merge_model.employer_name).to eq abc_profile.legal_name
     end
-
     it "should return employee first_name" do
       expect(merge_model.enrollment.employee_first_name).to eq model_instance.census_employee.first_name
     end
-
     it "should return employee last_name" do
       expect(merge_model.enrollment.employee_last_name).to eq model_instance.census_employee.last_name
     end
-
     it "should return enrollment effective date " do
       expect(merge_model.enrollment.coverage_start_on).to eq model_instance.effective_on.strftime('%m/%d/%Y')
     end
