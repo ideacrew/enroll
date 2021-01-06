@@ -89,7 +89,6 @@ class Employers::EmployerProfilesController < Employers::EmployersController
           end
         end
       else
-        params.permit!
         build_organization
         @employer_profile.attributes = params[:employer_profile]
         @organization.save(validate: false)
@@ -142,8 +141,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   def update
     sanitize_employer_profile_params
-    params.permit!
-    @organization = Organization.find(params[:id])
+    @organization = Organization.find(params.permit(:id))
 
     #save duplicate office locations as json in case we need to refresh
     @organization_dup = @organization.office_locations.as_json
@@ -254,8 +252,8 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   def download_documents # Should be in ER attestations controller
     @employer_profile = EmployerProfile.find(params[:id])
     #begin
-      doc = @employer_profile.documents.find(params[:ids][0])
-    send_file doc.identifier, file_name: doc.title,content_type:doc.format
+    doc = @employer_profile.documents.find(params[:ids][0])
+    doc.present? ? (send_file doc.identifier, file_name: doc.title, content_type: doc.format) : nil
 
       #render json: { status: 200, message: 'Successfully submitted the selected employer(s) for binder paid.' }
     #rescue => e
