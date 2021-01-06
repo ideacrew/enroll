@@ -2,63 +2,59 @@
 
 class SpecialEnrollmentPeriod
 
-  include RSpec::Matchers
-  include Capybara::DSL
-
-  def covid_link
-    '//a[@class="qle-menu-item interaction-click-control-covid-19"]'
+  def self.covid_link
+    '.interaction-click-control-covid-19'
   end
 
-  def had_a_baby_link
-    '//a[@class="qle-menu-item interaction-click-control-had-a-baby"]'
+  def self.had_a_baby_link
+    '.interaction-click-control-had-a-baby'
   end
 
-  def adopted_a_child_link
-    '//a[@class="qle-menu-item interaction-click-control-adopted-a-child"]'
+  def self.adopted_a_child_link
+    '.interaction-click-control-adopted-a-child'
   end
 
-  def lost_or_will_lose_health_insurance_link
-    '//a[@class="qle-menu-item interaction-click-control-lost-or-will-soon-lose-other-health-insurance"]'
+  def self.lost_or_will_lose_health_insurance_link
+    '.interaction-click-control-lost-or-will-soon-lose-other-health-insurance'
   end
 
-  def married_link
-    '//a[@class="qle-menu-item interaction-click-control-married"]'
+  def self.married_link
+    '.interaction-click-control-married'
   end
 
-  def backward_arrow
-    '//i[@class="fa fa-angle-left left fa-2x"]'
+  def self.backward_arrow
+    'i.fa-angle-left'
   end
 
-  def forward_arrow
-    '//i[@class="fa fa-angle-right right fa-2x"]'
+  def self.forward_arrow
+    'i.fa-angle-right'
   end
 
-  def none_apply_checkbox
-    '//input[@id="no_qle_checkbox"]'
+  def self.none_apply_checkbox
+    '#no_qle_checkbox'
   end
 
-  def qle_date
-    '//input[@id="qle_date"]'
+  def self.outside_open_enrollment_close_btn
+    '.interaction-click-control-close'
   end
 
-  def continue_qle_btn
-    '//a[@id="qle_submit"]'
+  def self.outside_open_enrollment_back_to_my_account_btn
+    '.interaction-click-control-back-to-my-account'
   end
 
-  def outside_qle_close_btn
-    '//button[@class="btn btn-default interaction-click-control-close"]'
+  def self.qle_date
+    'qle_date'
   end
 
-  def outside_qle_back_to_my_acct_btn
-    '//a[@class="btn btn-primary interaction-click-control-back-to-my-account"]'
+  def self.continue_qle_btn
+    '#qle_submit'
   end
 
-  def select_effective_date_dropdown
-    '//select[@id="effective_on_kind"]'
+  def self.select_effective_date_dropdown
+    'effective_on_kind'
   end
 
-  def effective_date_continue_btn
-    '//input[@class="btn btn-primary interaction-click-control-continue"]'
+  def self.effective_date_continue_btn
+    'div.text-center input.interaction-click-control-continue'
   end
-
 end

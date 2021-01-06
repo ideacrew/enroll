@@ -3,190 +3,202 @@
 class PersonalInformation
 
   def self.first_name
-    'person[first_name]'
+    'FIRST NAME *'
   end
 
   def self.middle_name
-    'person[middle_name]'
+    'MIDDLE NAME'
   end
 
   def self.last_name
-    'person[last_name]'
+    'LAST NAME *'
   end
 
   def self.suffix_dropdown
-    'selectric-wrapper'
+    'div.selectric-labeled span.label'
   end
 
-  def applying_coverage_yes_radiobtn
-    '//label[@for="is_applying_coverage_true"]//span'
+  def self.sr_option
+    'div.selectric-open li[data-index="2"]'
   end
 
-  def applying_coverage_no_radiobtn
-    '//label[@for="is_applying_coverage_false"]//span'
+  def self.need_coverage_yes
+    'div.col-xs-2 span.yes_no_pair'
   end
 
-  def dob
-    '//input[@id="jq_datepicker_ignore_person_dob"]'
+  def self.need_coverage_no
+    'label[for="is_applying_coverage_false"] span.yes_no_pair'
   end
 
-  def social_security
-    '//input[@id="person_ssn"]'
+  def self.dob
+    'jq_datepicker_ignore_person[dob]'
   end
 
-  def i_dont_have_an_ssn_checkbox
-    '//input[@id="person_no_ssn"]'
+  def self.social_security
+    'person[ssn]'
   end
 
-  def male_radiobtn
-    '//span[text()="MALE"]'
+  def self.i_dont_have_an_ssn_checkbox
+    '.interaction-choice-control-value-person-no-ssn'
   end
 
-  def female_radiobtn
-    '//span[text()="FEMALE"]'
+  def self.male_radiobtn
+    'label[for="radio_male"] span'
   end
 
-  def continue_btn
-    '//span[text()="CONTINUE"]'
+  def self.female_radiobtn
+    'label[for="radio_female"] span'
   end
 
-  def thank_you_confirmation_message
-    '//div[@class="alert alert-success alert-dismissible"]'
+  def self.continue_btn
+    'span.no-op span.btn-lg, a.interaction-click-control-continue'
   end
 
-  def previous_link
-    '//a[@class="back interaction-click-control-previous"]'
+  def self.select_continue_message
+    'Next, we need to verify if you or you and your family are eligible to enroll in coverage through DC Health Link. Select CONTINUE.'
   end
 
-  def us_citizen_or_national_yes_radiobtn
-    '//label[@for="person_us_citizen_true"]/span'
+  def self.previous_link
+    '.interaction-click-control-previous'
   end
 
-  def us_citizen_or_national_no_radiobtn
-    '//label[@for="person_us_citizen_false"]/span'
+  def self.us_citizen_or_national_yes_radiobtn
+    'label[for="person_us_citizen_true"] span'
   end
 
-  def naturalized_citizen_yes_radiobtn
-    '//label[@for="person_naturalized_citizen_true"]/span'
+  def self.us_citizen_or_national_no_radiobtn
+    'label[for="person_us_citizen_false"] span'
   end
 
-  def naturalized_citizen_no_radiobtn
-    '//label[@for="person_naturalized_citizen_false"]/span'
+  def self.naturalized_citizen_yes_radiobtn
+    'label[for="person_naturalized_citizen_true"] span'
   end
 
-  def naturalized_citizen_select_doc_dropdown
-    '(//span[text()="Select document type"])[2]'
+  def self.naturalized_citizen_no_radiobtn
+    'label[for="person_naturalized_citizen_false"] span'
   end
 
-  def immigration_status_yes_radiobtn
-    '//label[@for="person_eligible_immigration_status_true"]/span'
+  def self.naturalized_citizen_select_doc_dropdown
+    'div#naturalization_doc_type_select span.label'
   end
 
-  def immigration_status_no_radiobtn
-    '//label[@for="person_eligible_immigration_status_false"]/span'
+  def self.immigration_status_yes_radiobtn
+    'label[for="person_eligible_immigration_status_true"] span'
   end
 
-  def immigration_status_select_doc_dropdown
-    '(//span[text()="Select document type"])[1]'
+  def self.immigration_status_no_radiobtn
+    'label[for="person_eligible_immigration_status_false"] span'
   end
 
-  def american_or_alaskan_native_yes_radiobtn
-    '//label[@for="indian_tribe_member_yes"]/span'
+  def self.immigration_status_select_doc_dropdown
+    'div#immigration_doc_type_select span'
   end
 
-  def american_or_alaskan_native_no_radiobtn
-    '//label[@for="indian_tribe_member_no"]/span'
+  def self.american_or_alaskan_native_yes_radiobtn
+    'label[for="indian_tribe_member_yes"] span'
   end
 
-  def incarcerated_yes_radiobtn
-    '//label[@for="radio_incarcerated_yes"]/span'
+  def self.american_or_alaskan_native_no_radiobtn
+    'label[for="indian_tribe_member_no"] span'
   end
 
-  def incarcerated_no_radiobtn
-    '//label[@for="radio_incarcerated_no"]/span'
+  def self.tribal_id
+    'person[tribal_id]'
   end
 
-  def no_dc_address_checkbox
-    '//input[@id="no_dc_address"]'
+  def self.incarcerated_yes_radiobtn
+    'label[for="radio_incarcerated_yes"] span'
   end
 
-  def address_line_one
-    '//input[@id="person_addresses_attributes_0_address_1"]'
+  def self.incarcerated_no_radiobtn
+    'label[for="radio_incarcerated_no"] span'
   end
 
-  def address_line_two
-    '//input[@id="person_addresses_attributes_0_address_2"]'
+  def self.address_line_one
+    'person[addresses_attributes][0][address_1]'
   end
 
-  def city
-    '//input[@id="person_addresses_attributes_0_city"]'
+  def self.address_line_two
+    'person[addresses_attributes][0][address_2]'
   end
 
-  def select_state_dropdown
-    '//span[text()="SELECT STATE *"]'
+  def self.city
+    'person[addresses_attributes][0][city]'
   end
 
-  def zip
-    '//input[@id="person_addresses_attributes_0_zip"]'
+  def self.select_state_dropdown
+    'div.home-div span.label'
   end
 
-  def add_mailing_address_btn
-    '//span[text()="Add Mailing Address"]'
+  def self.select_dc_state
+    'div.selectric-address_required li[data-index="10"]'
   end
 
-  def mailing_address_line_one
-    '//input[@id="person_addresses_attributes_1_address_1"]'
+  def self.zip
+    'person[addresses_attributes][0][zip]'
   end
 
-  def mailing_address_line_two
-    '//input[@id="person_addresses_attributes_1_address_2"]'
+  def self.living_outside_dc_checkbox
+    '#person_is_temporarily_out_of_state'
   end
 
-  def mailing_address_city
-    '//input[@id="person_addresses_attributes_1_city"]'
+  def self.homeless_dc_resident_checkbox
+    '#person_is_homeless'
   end
 
-  def mailing_address_state_dropdown
-    '//span[text()="SELECT STATE "]'
+  def self.add_mailing_address_btn
+    '.form-action'
   end
 
-  def mailing_address_zip
-    '//input[@id="person_addresses_attributes_1_zip"]'
+  def self.mailing_address_line_one
+    'person[addresses_attributes][1][address_1]'
   end
 
-  def remove_mailing_address_btn
-    '//span[text()="Remove Mailing Address"]'
+  def self.mailing_address_line_two
+    'person[addresses_attributes][1][address_2]'
   end
 
-  def home_phone
-    '//input[@id="person_phones_attributes_0_full_phone_number"]'
+  def self.mailing_address_city
+    'person[addresses_attributes][1][city]'
   end
 
-  def mobile_phone
-    '//input[@id="person_phones_attributes_1_full_phone_number"]'
+  def self.mailing_address_state_dropdown
+    'div.mailing-div span.label'
   end
 
-  def home_email_address
-    '//input[@id="person_emails_attributes_0_address"]'
+  def self.mailing_address_zip
+    'person[addresses_attributes][1][zip]'
   end
 
-  def work_email_address
-    '//input[@id="person_emails_attributes_1_address"]'
+  def self.remove_mailing_address_btn
+    '.form-action'
   end
 
-  def contact_method_dropdown
-    '//span[text()="Both electronic and paper communications"]'
+  def self.home_phone
+    'person[phones_attributes][0][full_phone_number]'
   end
 
-  def language_preference_dropdown
-    '//span[text()="English"]'
+  def self.mobile_phone
+    'person[phones_attributes][1][full_phone_number]'
   end
 
-  def help_me_sign_up_btn
-    '//div[@class="btn btn-default btn-block help-me-sign-up"]'
+  def self.personal_email_address
+    'person[emails_attributes][0][address]'
   end
 
-  def save_and_exit_link
-    '//a[@class="interaction-click-control-save---exit"]'
+  def self.work_email_address
+    'person[emails_attributes][1][address]'
+  end
+
+  def self.language_preference_dropdown
+    'div.selectric-below span.label'
+  end
+
+  def self.help_me_sign_up_btn
+    '.help-me-sign-up'
+  end
+
+  def self.save_and_exit_link
+    '.interaction-click-control-save---exit'
   end
 end

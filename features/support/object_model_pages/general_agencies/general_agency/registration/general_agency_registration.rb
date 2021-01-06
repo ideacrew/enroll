@@ -63,7 +63,7 @@ class GeneralAgencyRegistration
   end
 
   def self.kind_dropdown
-    '#kindSelect'
+    'kindSelect'
   end
 
   def self.address2

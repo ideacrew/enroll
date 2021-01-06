@@ -2,34 +2,35 @@
 
 class ChooseCoverage
 
-  include RSpec::Matchers
-  include Capybara::DSL
-
-  def consumer_checkbox
-    '//input[@id="family_member_ids_0"]'
+  def self.primary_checkbox
+    '#family_member_ids_0'
   end
 
-  def dependent_checkbox
-    '//input[@id="family_member_ids_1"]'
+  def self.dependent_1_checkbox
+    '#family_member_ids_1'
   end
 
-  def individual_benefits_radiobtn
-    '//input[@id="market_kind_individual"]//following-sibling::span'
+  def self.individual_benefits_radiobtn
+    'label[for="market_kind_individual"] span'
   end
 
-  def health_radiobtn
-    '//input[@id="coverage_kind_health"]//following-sibling::span'
+  def self.health_radiobtn
+    'label[for="coverage_kind_health"] span'
   end
 
-  def dental_radiobtn
-    '//input[@id="coverage_kind_dental"]//following-sibling::span'
+  def self.dental_radiobtn
+    'label[for="coverage_kind_dental"] span'
   end
 
-  def shop_for_new_plan_btn
-    '//input[@name="commit"]'
+  def self.shop_for_new_plan_btn
+    'input[class="btn btn-primary  btn-lg no-op  interaction-click-control-shop-for-new-plan"]'
   end
 
-  def back_to_my_acct_btn
-    '//a[@class="btn btn-default btn btn-lg interaction-click-control-back-to-my-account"]'
+  def self.back_to_my_acct_btn
+    '.interaction-click-control-back-to-my-account'
+  end
+
+  def self.continue_btn
+    '.interaction-click-control-continue'
   end
 end

@@ -2,31 +2,28 @@
 
 class AuthorizationAndConsent
 
-  include RSpec::Matchers
-  include Capybara::DSL
-
-  def i_agree_radiobtn
-    '//span[text()="I agree"]'
+  def self.i_agree_radiobtn
+    'label[for="agreement_agree"] span'
   end
 
-  def i_disagree_radiobtn
-    '//span[text()="I disagree"]'
+  def self.i_disagree_radiobtn
+    'label[for="agreement_disagree"] span'
   end
 
-  def continue_btn
-    '//a[@id="btn-continue"]'
+  def self.continue_btn
+    '#btn-continue'
   end
 
-  def previous_link
-    '//a[@class="back interaction-click-control-previous"]'
+  def self.previous_link
+    '.interaction-click-control-previous'
   end
 
-  def help_me_sign_up_btn
-    '//div[@class="btn btn-default btn-block help-me-sign-up"]'
+  def self.save_and_exit_link
+    '.interaction-click-control-save---exit'
   end
 
-  def save_and_exit_link
-    '//a[@class="interaction-click-control-save---exit"]'
+  def self.help_me_sign_up_btn
+    '.help-me-sign-up'
   end
 end
 

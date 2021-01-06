@@ -19,10 +19,10 @@ class SignIn
   end
 
   def self.forgot_your_password_btn
-    '//a[contains(text(), "Forgot your password?")]'
+    'a[href="/users/password/new"]'
   end
 
   def self.create_account_btn
-    '//a[contains(text(), "Create account")]'
+    'a[href="/users/sign_up"]'
   end
 end

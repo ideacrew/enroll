@@ -1,27 +1,20 @@
 # frozen_string_literal: true
 
-class ChoosePlan
+class ConfirmYourPlanSelection
 
-  include RSpec::Matchers
-  include Capybara::DSL
-
-  def i_agree_checkbox
-    '//input[@id="terms_check_thank_you"]'
+  def self.i_agree_checkbox
+    '#terms_check_thank_you'
   end
 
-  def first_name
-    '//input[@id="first_name_thank_you"]'
+  def self.first_name
+    'first_name_thank_you'
   end
 
-  def last_name
-    '//input[@id="last_name_thank_you"]'
+  def self.last_name
+    'last_name_thank_you'
   end
 
-  def confirm_btn
-    '//a[@id="btn-continue"]'
-  end
-
-  def previous_link
-    '//a[@class="back interaction-click-control-previous"]'
+  def self.confirm_btn
+    '#btn-continue'
   end
 end

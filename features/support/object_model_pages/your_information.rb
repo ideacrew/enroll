@@ -10,10 +10,6 @@ class YourInformation
     '.interaction-click-control-logout'
   end
 
-  def self.learn_more_about_link
-    '//a[@class="interaction-click-control-learn-more-about-how-we-will-use-your-information."]'
-  end
-
   def self.view_privacy_act_link
     '.interaction-click-control-view-privacy-act-statement'
   end

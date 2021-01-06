@@ -2,70 +2,59 @@
 
 class ChoosePlan
 
-  include RSpec::Matchers
-  include Capybara::DSL
-
-  def find_your_doctor_link
-    '//a[@class="interaction-click-control-find-your-doctor"]'
+  def self.find_your_doctor_link
+    '.interaction-click-control-find-your-doctor'
   end
 
-  def estimate_your_cost_link
-    '//a[@class="interaction-click-control-estimate-your-cost"]'
+  def self.estimate_your_cost_link
+    'interaction-click-control-estimate-your-cost'
   end
 
-  def plan_name_btn
-    '//a[@class="btn btn-default interaction-click-control-plan-name"]'
+  def self.hmo_checkbox
+    'label[for="checkbox-10"]'
   end
 
-  def premium_amount_btn
-    '//a[@class="btn btn-default interaction-click-control-premium-amount"]'
+  def self.hsa_eligible_dropdown
+    'hsa_eligibility'
   end
 
-  def deductible_btn
-    '//a[@class="btn btn-default interaction-click-control-deductible"]'
+  def self.plan_name_btn
+    '.interaction-click-control-plan-name'
   end
 
-  def carrier_btn
-    '//a[@class="btn btn-default interaction-click-control-carrier"]'
+  def self.premium_amount_btn
+    '.interaction-click-control-premium-amount'
   end
 
-  def carrier_dropdown
-    '//select[@id="carrier"]'
+  def self.deductible_btn
+    '.interaction-click-control-deductible'
   end
 
-  def hsa_eligible_dropdown
-    '//select[@id="hsa_eligibility"]'
+  def self.carrier_btn
+    '.interaction-click-control-carrier'
   end
 
-  def from_premium_amount
-    '//input[@class="plan-metal-premium-from-selection-filter form-control"]'
+  def self.apply_btn
+    '.interaction-click-control-apply'
   end
 
-  def to_premium_amount
-    '//input[@class="plan-metal-premium-to-selection-filter form-control fr"]'
+  def self.reset_btn
+    '#reset-btn'
   end
 
-  def from_deductible_amount
-    '//input[@class="plan-metal-deductible-from-selection-filter form-control"]'
+  def self.select_plan_btn
+    '.plan-select'
   end
 
-  def to_deductible_amount
-    '//input[@class="plan-metal-deductible-to-selection-filter form-control"]'
+  def self.see_details_btn
+    'div.col-xs-5 a[href^="/products/plans/summary?active_year"]'
   end
 
-  def apply_btn
-    '//a[@class="btn btn-primary apply-btn mz interaction-click-control-apply"]'
+  def self.help_me_sign_up_btn
+    '.help-me-sign-up'
   end
 
-  def reset_btn
-    '//a[@class="btn btn-default reset-btn interaction-click-control-reset"]'
-  end
-
-  def select_plan_btn
-    '(//a[@class="btn btn-default btn-right plan-select select"])[1]'
-  end
-
-  def see_details_btn
-    '(//a[@class="btn btn-default"])[1]'
+  def self.continue_btn
+    '.interaction-click-control-continue'
   end
 end

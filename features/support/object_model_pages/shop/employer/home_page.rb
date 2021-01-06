@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class HomePage
+class EmployerHomePage
 
   include RSpec::Matchers
   include Capybara::DSL

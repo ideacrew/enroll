@@ -2,38 +2,43 @@
 
 class VerifyIdentity
 
-  include RSpec::Matchers
-  include Capybara::DSL
-
-  def pick_answer_a
-    '//label[@for="interactive_verification_questions_attributes_0_response_id_a"]//span'
+  def self.pick_answer_a
+    'label[for="interactive_verification_questions_attributes_0_response_id_a"] span'
   end
 
-  def pick_answer_b
-    '//label[@for="interactive_verification_questions_attributes_0_response_id_b"]//span'
+  def self.pick_answer_b
+    'label[for="interactive_verification_questions_attributes_0_response_id_b"] span'
   end
 
-  def pick_answer_c
-    '//label[@for="interactive_verification_questions_attributes_1_response_id_c"]//span'
+  def self.pick_answer_c
+    'label[for="interactive_verification_questions_attributes_1_response_id_c"] span'
   end
 
-  def pick_answer_d
-    '//label[@for="interactive_verification_questions_attributes_1_response_id_d"]//span'
+  def self.pick_answer_d
+    'label[for="interactive_verification_questions_attributes_1_response_id_d"] span'
   end
 
-  def submit_btn
-    '//input[@name="commit"]'
+  def self.submit_btn
+    'input[value="Submit"]'
   end
 
-  def continue_application_btn
-    '//a[text()="Continue Application"]'
+  def self.continue_application_btn
+    '.interaction-click-control-continue-application'
   end
 
-  def upload_identity_btn
-    '//span[@id="upload_identity"]'
+  def self.upload_identity_docs_btn
+    '#upload_identity'
   end
 
-  def documents_faq_btn
-    '//a[@id="document-faq"]'
+  def self.upload_application_docs_btn
+    '#upload_application'
+  end
+
+  def self.select_file_to_upload_btn
+    '#select_upload_identity'
+  end
+
+  def self.documents_faq_btn
+    '.interaction-click-control-documents-faq'
   end
 end

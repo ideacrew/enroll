@@ -3,31 +3,31 @@
 class HomePage
 
   def self.employee_portal_btn
-    '//a[contains(text(), "Employee Portal")]'
+    'a[href="/insured/employee/privacy"]'
   end
 
   def self.consumer_family_portal_btn
-    '(//a[contains(text(), "Consumer/Family Portal")])[1]'
+    'a[href="/insured/consumer_role/privacy?uqhp=true"]'
   end
 
   def self.assisted_consumer_family_portal_btn
-    '(//a[contains(text(), "Assisted Consumer/Family Portal")])[1]'
+    'a[href="/insured/consumer_role/privacy?aqhp=true"]'
   end
 
   def self.returning_user_btn
-    '//a[contains(text(), "Returning User")]'
+    'a[href="/families/home"]'
   end
 
   def self.employer_portal_btn
-    '//a[contains(text(), "Employer Portal")]'
+    'a[href="/benefit_sponsors/profiles/registrations/new?profile_type=benefit_sponsor"]'
   end
 
   def self.broker_agency_portal_btn
-    '//a[contains(text(), "Broker Agency Portal")]'
+    'a[href="/benefit_sponsors/profiles/registrations/new?portal=true&profile_type=broker_agency"]'
   end
 
   def self.general_agency_portal_btn
-    '//a[contains(text(), "General Agency Portal")]'
+    'a[href="/benefit_sponsors/profiles/registrations/new?portal=true&profile_type=general_agency"]'
   end
 
   def self.hbx_portal_btn
@@ -39,6 +39,6 @@ class HomePage
   end
 
   def self.general_agency_registration_btn
-    '//a[contains(text(), "General Agency Registration")]'
+    'a[href="/benefit_sponsors/profiles/registrations/new?profile_type=general_agency"]'
   end
 end
