@@ -40,7 +40,7 @@ Then("Admin will see confirmation pop modal") do
 end
 
 When("Admin clicks on continue button for reinstating benefit_application") do
-  find('.btn', text: 'CONTINUE').click
+  click_button 'Continue'
   sleep 1
 end
 

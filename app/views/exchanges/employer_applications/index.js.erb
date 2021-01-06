@@ -325,8 +325,11 @@ function checkTermReason() {
 // You can use the actionSelected here
 function submitPlanActions() {
   if (actionSelected == 'reinstate'){
-    $("#reinstateBenefitApplication_"+ applicationId).modal('show');
-
+    $("#reinstateBenefitApplication").modal('show');
+    transmit_to_carrier =  $('#' + applicationId).find('input[id=transmit_to_carrier]').is(":checked")
+    $('input:hidden[name=transmit_to_carrier]').val(transmit_to_carrier)
+    $('input:hidden[name=employer_id]').val(employerId)
+    $('input:hidden[name=employer_application_id]').val(applicationId)
   }else{
     termKind = actionSelected == "terminate" ? $('input[name=term_actions]:checked').val() : ""
     termReason = $('#term_reason_' + applicationId).val()
