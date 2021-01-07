@@ -1,0 +1,40 @@
+PERSON_ID_RECORDS = [
+  "5d08fd82cc35a8797f00008b"
+]
+
+def find_history_tracks(client, person_id)
+  lookup_id = BSON::ObjectId.from_string(person_id)
+  collection = client[:history_tracks]
+  results = Array.new
+  collection.find(
+    "association_chain.id" => lookup_id
+  ).each do |doc|
+    results << doc
+  end
+  results
+end
+
+def find_person_document(client, person_id)
+  lookup_id = BSON::ObjectId.from_string(person_id)
+  collection = client[:people]
+  results = Array.new
+  collection.find(_id: lookup_id).each do |doc|
+    results << doc
+  end
+  results.first
+end
+
+db_client = Person.collection.client
+PERSON_ID_RECORDS.each do |id|
+  person_json_hash = find_person_document(db_client, id).as_extended_json
+  history_hash = find_history_tracks(db_client, id).map(&:as_extended_json)
+
+  File.open("#{id}.json", 'wb') do |f|
+    f.puts(
+      {
+        person: person_json_hash,
+        history: history_hash
+      }.to_json
+    )
+  end
+end
