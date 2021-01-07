@@ -506,7 +506,7 @@ class CensusEmployee < CensusMember
   def published_benefit_group_assignment
     benefit_group_assignments.select do |benefit_group_assignment|
       benefit_group_assignment.benefit_group.is_active && benefit_group_assignment.benefit_group.plan_year.employees_are_matchable?
-    end.first
+    end.last
   end
 
   def active_and_renewing_benefit_group_assignments
