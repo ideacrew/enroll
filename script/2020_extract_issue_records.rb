@@ -1,5 +1,8 @@
 PERSON_ID_RECORDS = [
-  "5d08fd82cc35a8797f00008b"
+  "5d08fd82cc35a8797f00008b",
+  "5beb73ade59c4a213f000000",
+  "5bedcd13cabc326ef100017c",
+  "5c77095de59c4a23e6000000"
 ]
 
 def find_history_tracks(client, person_id)
