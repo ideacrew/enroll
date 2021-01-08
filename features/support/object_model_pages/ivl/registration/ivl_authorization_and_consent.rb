@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-class AuthorizationAndConsent
+#insured/consumer_role/ridp_agreement
+class IvlAuthorizationAndConsent
 
   def self.i_agree_radiobtn
     'label[for="agreement_agree"] span'

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+#families/home
 class IvlHomepage
 
   def self.my_dc_health_link
@@ -25,7 +26,7 @@ class IvlHomepage
   def self.view_details_btn
     '.interaction-click-control-view-details'
   end
-  
+
   def self.shop_for_plans
     '.interaction-click-control-shop-for-plans'
   end
@@ -34,7 +35,7 @@ class IvlHomepage
     '.interaction-click-control-medicaid---tax-credits'
   end
 
-  def self.get_help_signing_up_btn
+  def self.help_signing_up_btn
     '.interaction-click-control-get-help-signing-up'
   end
 

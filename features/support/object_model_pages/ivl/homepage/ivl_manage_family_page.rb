@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+#insured/families/manage_family
 class IvlManageFamilyPage
 
   def self.add_member
@@ -61,7 +62,7 @@ class IvlManageFamilyPage
   def self.spouse
     'div.select-relation li[data-index="1"]'
   end
-  
+
   def self.child
     'div.select-relation li[data-index="3"]'
   end

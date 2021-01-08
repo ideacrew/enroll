@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-class FamilyInformation
+#insured/family_members?consumer_role_id
+class IvlFamilyInformation
 
   def self.add_new_person
     '#household_info_add_member'

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+#insured/families/inbox?tab=messages
 class IvlDocumentsPage
 
   def self.download_tax_docs_btn

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+#insured/families/verification?tab=verification
 class IvlDocumentsPage
 
   def self.docs_we_accept_btn

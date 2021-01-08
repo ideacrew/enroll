@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+#insured/consumer_role/privacy
+#insured/employee/privacy
 class YourInformation
 
   def self.help_link

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# benefit_sponsors/profiles/registrations/new?profile_type=broker_agency
 class BrokerRegistration
 
   def self.broker_registration_form

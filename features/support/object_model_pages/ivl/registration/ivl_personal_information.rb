@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
-class PersonalInformation
+#insured/consumer_role/search
+#insured/consumer_role/match
+class IvlPersonalInformation
 
   def self.first_name
     'FIRST NAME *'

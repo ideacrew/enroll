@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-class ChooseCoverage
+#insured/group_selections/new?change_plan=&consumer_role_id&person_id
+class IvlChooseCoverage
 
   def self.primary_checkbox
     '#family_member_ids_0'

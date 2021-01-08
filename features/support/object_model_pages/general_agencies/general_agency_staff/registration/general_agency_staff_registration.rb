@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+#benefit_sponsors/profiles/registrations/new?profile_type=general_agency
 class GeneralAgencyStaffRegistration
 
   def self.first_name

@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
-class SpecialEnrollmentPeriod
+class IvlSpecialEnrollmentPeriod
+
+  #insured/families/find_sep?utf8=✓&authenticity_token=OItOU%2FjoKUoah9SV5GaZw0BxNENaw05QSB1pC2TI7nZYapMobtAYTnZUdvELND75gvdUiLUW1tMlga2YL9yN%2FQ%3D%3D&waiver_reason=&is_waiving=&person_id&coverage_household_id=&enrollment_kind=&family_member_id&market_kind=individual&coverage_kind=health
 
   def self.covid_link
     '.interaction-click-control-covid-19'

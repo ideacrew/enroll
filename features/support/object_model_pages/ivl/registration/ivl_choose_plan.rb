@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-class ChoosePlan
+#insured/plan_shoppings/5ff897c796a4a17b7bf8930b?coverage_kind=health&enrollment_kind=&market_kind=individual
+class IvlChoosePlan
 
   def self.find_your_doctor_link
     '.interaction-click-control-find-your-doctor'
