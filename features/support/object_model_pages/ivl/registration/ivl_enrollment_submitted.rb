@@ -2,9 +2,9 @@
 
 #insured/plan_shoppings/5ff897c796a4a17b7bf8930b/receipt
 class IvlEnrollmentSubmitted
-    
+
   def self.how_to_pay_btn
-      'span.btn-default'
+    'span.btn-default'
   end
 
   def self.print_btn

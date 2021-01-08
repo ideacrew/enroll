@@ -2,19 +2,19 @@
 
 #insured/employee/search
 class EmployeePersonalInformation
-  
+
   def self.first_name
     'person[first_name]'
   end
-  
+
   def self.middle_name
     'person[middle_name]'
   end
-  
+
   def self.last_name
     'person[last_name]'
   end
-  
+
   def self.suffix_dropdown
     'div[id="personal_info"] span[class="label"]'
   end

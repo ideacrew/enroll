@@ -2,7 +2,7 @@
 
 #benefit_sponsors/benefit_sponsorships/5ff77ba896a4a17b76f892bb/benefit_applications/new
 class EmployerAddBenefitPackage
-      
+
   def self.select_start_on_dropdown
     'div[class="selectric-wrapper selectric-floatlabel selectric-benefit-application-start-date selectric-below"] span'
   end

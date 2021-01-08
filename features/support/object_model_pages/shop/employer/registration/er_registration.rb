@@ -2,7 +2,7 @@
 
 #benefit_sponsors/profiles/registrations/new?profile_type=benefit_sponsor
 class EmployerRegistration
-  
+
   def self.first_name
     'agency[staff_roles_attributes][0][first_name]'
   end
