@@ -9,9 +9,9 @@ def find_history_tracks(client, person_id)
   lookup_id = BSON::ObjectId.from_string(person_id)
   collection = client[:history_tracks]
   results = Array.new
-  collection.find(
-    "association_chain.id" => lookup_id
-  ).each do |doc|
+  Person.find(
+    lookup_id
+  ).history_tracks.each do |doc|
     results << doc
   end
   results
