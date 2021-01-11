@@ -4,9 +4,9 @@ module Versioning
 
     attr_reader :versions
 
-    def initialize(model_record)
+    def initialize(model_record, additional_version_at = nil)
       @record = model_record
-      @versions = build_version_list
+      @versions = build_version_list(additional_version_at)
       @min_ts = @versions.min_by(&:timestamp).timestamp
     end
 
@@ -27,9 +27,30 @@ module Versioning
 
     protected
 
-    def build_version_list
+    def optional_version_at(a_time)
+      return nil if a_time < @record.created_at
+      return RecordVersion.new(@record, :record, @record.updated_at) if @record.updated_at <= a_time
+      history_tracks = @record.filtered_history_tracks.to_a
+      return nil unless history_tracks.any?
+      remaining_hts = history_tracks.reject do |ht|
+        ht.created_at > a_time
+      end
+      last_history_track = remaining_hts.to_a.sort do |a,b|
+        @record.sort_history_tracks(a,b)
+      end.last
+      return nil unless last_history_track
+      RecordVersion.new(@record, :history_track, last_history_track)
+    end
+
+    def build_version_list(additional_version_at = nil)
       @record.reload
       version_list = [RecordVersion.new(@record, :record, @record.updated_at)]
+      if additional_version_at
+        optional_version = optional_version_at(a_time)
+        if optional_version
+          version_list = version_list + [optional_version]
+        end
+      end
       if @record.versions.any?
         legacy_versions = @record.versions.to_a.map do |rv|
           RecordVersion.new(@record, :version, rv.updated_at)
