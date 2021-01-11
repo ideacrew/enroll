@@ -1,6 +1,7 @@
 class Insured::GroupSelectionController < ApplicationController
   include Insured::GroupSelectionHelper
 
+  before_action :permit_params, only: [:create]
   before_action :initialize_common_vars, only: [:new, :create, :terminate_selection]
   # before_action :set_vars_for_market, only: [:new]
   # before_action :is_under_open_enrollment, only: [:new]
@@ -224,6 +225,10 @@ class Insured::GroupSelectionController < ApplicationController
     person = family_member.person
     incarcerated = person.is_consumer_role_active? && family_member.is_applying_coverage && person.is_incarcerated.nil? ? "incarcerated_not_answered" : family_member.person.is_incarcerated
     @fm_hash[family_member.id] = [is_ivl_coverage, rule, errors, incarcerated]
+  end
+
+  def permit_params
+    params.permit!
   end
 
   def permitted_group_selection_paramss
