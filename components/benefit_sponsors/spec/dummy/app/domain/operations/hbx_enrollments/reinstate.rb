@@ -21,7 +21,7 @@ module Operations
         new_enr           = yield new_hbx_enrollment(values)
         hbx_enrollment    = yield reinstate_hbx_enrollment(new_enr)
         _hbx_enrollment   = yield reinstate_after_effects(hbx_enrollment)
-        # TODO: age off enrollment term
+
         Success(hbx_enrollment)
       end
 
@@ -41,6 +41,7 @@ module Operations
 
       def active_bga_exists?(params)
         @effective_on = fetch_effective_on(params)
+        @notify = params[:options].present? && params[:options][:notify] ? params[:options][:notify] : true
         @bga = @current_enr.census_employee.benefit_group_assignments.by_benefit_package(params[:options][:benefit_package]).order_by(:created_at.desc).detect{ |bga| bga.is_active?(@effective_on)}
       end
 
@@ -59,12 +60,12 @@ module Operations
       def fetch_effective_on(params)
         @current_enr = params[:hbx_enrollment]
         case @current_enr.aasm_state
-        when 'coverage_terminated'
-          @current_enr.terminated_on.next_day
-        when 'coverage_termination_pending'
-          @current_enr.terminated_on.next_day
-        when 'coverage_canceled'
-          @current_enr.effective_on
+          when 'coverage_terminated'
+            @current_enr.terminated_on.next_day
+          when 'coverage_termination_pending'
+            @current_enr.terminated_on.next_day
+          when 'coverage_canceled'
+            @current_enr.effective_on
         end
       end
 
@@ -104,7 +105,6 @@ module Operations
           return Failure('Cannot transition to state coverage_selected on event begin_coverage.') unless new_enrollment.may_begin_coverage?
           new_enrollment.begin_coverage!
           new_enrollment.begin_coverage! if TimeKeeper.date_of_record >= new_enrollment.effective_on && new_enrollment.may_begin_coverage?
-          new_enrollment.notify_of_coverage_start(true)
         end
 
         Success(new_enrollment)
@@ -116,18 +116,15 @@ module Operations
       end
 
       def terminate_employment_term_enrollment(hbx_enrollment)
-        census_employee = hbx_enrollment.census_employee
-        employment_term_date = census_employee.employment_terminated_on
-        return unless employment_term_date.present?
-        if employment_term_date > TimeKeeper.date_of_record && hbx_enrollment.may_schedule_coverage_termination?
-          hbx_enrollment.schedule_coverage_termination!(employment_term_date.end_of_month)
-        elsif hbx_enrollment.may_terminate_coverage?
-          hbx_enrollment.terminate_coverage!(employment_term_date.end_of_month)
-        end
-        hbx_enrollment.notify_of_coverage_start(true)
+        ::Operations::HbxEnrollments::Terminate.new.call({hbx_enrollment: hbx_enrollment, options: {notify: @notify}})
+      end
+
+      def notify_trading_partner(hbx_enrollment)
+        hbx_enrollment.notify_of_coverage_start(@notify)
       end
 
       def reinstate_after_effects(hbx_enrollment)
+        notify_trading_partner(hbx_enrollment)
         update_benefit_group_assignment(hbx_enrollment)
         terminate_employment_term_enrollment(hbx_enrollment)
 

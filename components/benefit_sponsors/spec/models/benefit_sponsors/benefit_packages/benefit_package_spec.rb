@@ -1114,7 +1114,11 @@ module BenefitSponsors
           it 'should reinstate terminated coverages' do
             reinstated_hbx = HbxEnrollment.where(sponsored_benefit_package_id: @cloned_package.id).first
             expect(reinstated_hbx.effective_on).to eq @cloned_package.start_on
-            expect(reinstated_hbx.aasm_state).to eq "coverage_enrolled"
+            if TimeKeeper.date_of_record >= reinstated_hbx.effective_on
+              expect(reinstated_hbx.aasm_state).to eq "coverage_enrolled"
+            else
+              expect(reinstated_hbx.aasm_state).to eq "coverage_selected"
+            end
             expect(reinstated_hbx.predecessor_enrollment_id).to eq enrollment.id
           end
 
