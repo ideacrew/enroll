@@ -33,9 +33,9 @@ jobs:
           git config diff.renameLimit 800
           git fetch --no-tags --depth=1 origin master
           bundle exec rubocop-git origin/master | grep "no offenses detected"
-      - name: Rub erb-lint
+      - name: Run erb-lint
         run: |
-          bundle exec erblint $(git diff origin/master... --name-only | grep .erb)
+          bundle exec erblint $(git diff origin/master... --name-only | grep .erb) | grep "No errors were found in ERB files"
   build-assets:
     needs: [rubocop]
     runs-on: ubuntu-latest
