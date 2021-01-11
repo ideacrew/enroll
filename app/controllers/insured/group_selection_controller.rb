@@ -226,7 +226,7 @@ class Insured::GroupSelectionController < ApplicationController
     @fm_hash[family_member.id] = [is_ivl_coverage, rule, errors, incarcerated]
   end
 
-  def params
+  def permitted_group_selection_paramss
     params.permit(
       :change_plan, :consumer_role_id, :market_kind, :qle_id,
       :hbx_enrollment_id, :coverage_kind, :enrollment_kind,
