@@ -123,6 +123,7 @@ RSpec.describe Operations::HbxEnrollments::Reinstate, :type => :model, dbclean: 
         before do
           census_employee.terminate_employment(benefit_package.end_on)
           @reinstated_enrollment = subject.call({hbx_enrollment: enrollment, options: {benefit_package: new_bga.benefit_package}}).success
+          @reinstated_enrollment.reload
         end
 
         it 'should build reinstated enrollment' do
@@ -190,6 +191,7 @@ RSpec.describe Operations::HbxEnrollments::Reinstate, :type => :model, dbclean: 
 
       before do
         @reinstated_enrollment = subject.call({hbx_enrollment: enrollment, options: {benefit_package: new_bga.benefit_package}}).success
+        @reinstated_enrollment.reload
       end
 
       it 'should build reinstated enrollment' do

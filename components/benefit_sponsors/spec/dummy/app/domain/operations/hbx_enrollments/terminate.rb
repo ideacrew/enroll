@@ -32,7 +32,7 @@ module Operations
         hbx_enrollment = params[:hbx_enrollment]
         census_employee = hbx_enrollment.census_employee
         employment_term_date = census_employee.employment_terminated_on
-        return unless employment_term_date.present?
+        return Success(hbx_enrollment) unless employment_term_date.present?
         family = hbx_enrollment.family
         enrollments = family.hbx_enrollments.where(sponsored_benefit_package_id: hbx_enrollment.sponsored_benefit_package_id).enrolled.shop_market
         enrollments.each do |enrollment|
@@ -40,6 +40,8 @@ module Operations
         end
         notify = params[:options].present? && params[:options][:notify].present? ? params[:options][:notify] : true
         hbx_enrollment.notify_of_coverage_start(notify)
+
+        Success(hbx_enrollment)
       end
     end
   end
