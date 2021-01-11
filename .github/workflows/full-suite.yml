@@ -35,7 +35,7 @@ jobs:
           bundle exec rubocop-git origin/master | grep "no offenses detected"
       - name: Rub erb-lint
         run: |
-          erblint $(git diff origin/master... --name-only | grep .erb)
+          bundle exec erblint $(git diff origin/master... --name-only | grep .erb)
   build-assets:
     needs: [rubocop]
     runs-on: ubuntu-latest
