@@ -31,27 +31,12 @@ module Operations
         return Failure('Missing Key.') unless params.key?(:hbx_enrollment)
         return Failure('Not a valid HbxEnrollment object.') unless params[:hbx_enrollment].is_a?(HbxEnrollment)
         return Failure('Not a SHOP enrollment.') unless params[:hbx_enrollment].is_shop?
-        return Failure('Given HbxEnrollment is not in any of the valid states for reinstatement states.') unless valid_by_states?(params[:hbx_enrollment])
+        return Failure('Given HbxEnrollment is not in any of the valid states for reinstatement states.') unless params[:hbx_enrollment].eligible_to_reinstate?
         return Failure("Missing benefit package.") unless params[:options] && params[:options][:benefit_package]
         return Failure("Active Benefit Group Assignment does not exist for the effective_on: #{@effective_on}") unless active_bga_exists?(params)
         return Failure('Overlapping coverage exists for this family in current year.') if overlapping_enrollment_exists?
 
         Success(params)
-      end
-
-      def valid_by_states?(enrollment)
-        aasm_state = enrollment.aasm_state
-        reason = enrollment.terminate_reason
-        ['coverage_terminated', 'coverage_termination_pending', 'coverage_canceled'].include?(aasm_state) && HbxEnrollment::TERM_REASONS.include?(reason) || canceled_eligble(enrollment)
-      end
-
-      def canceled_eligble(enrollment)
-        predecessor_package = enrollment.sponsored_benefit_package
-        application_transition = predecessor_package.benefit_application.workflow_state_transitions.detect do |transition|
-          predecessor_package.canceled? ? predecessor_package.canceled_as_active?(transition) : predecessor_package.term_as_active?(transition)
-        end
-        application_transition.present? &&
-          enrollment.workflow_state_transitions.any?{ |wst| predecessor_package.canceled_after?(wst, application_transition.transition_at) || predecessor_package.termed_after?(wst, application_transition.transition_at)}
       end
 
       def active_bga_exists?(params)

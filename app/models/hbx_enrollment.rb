@@ -2263,6 +2263,28 @@ class HbxEnrollment
     workflow_state_transitions.any?{|wfst| wfst.event.match(/waive_coverage/) && wfst.to_state == 'inactive'}
   end
 
+  def canceled_after?(transition, cancellation_time)
+    transition.to_state == 'coverage_canceled' && transition.transition_at >= cancellation_time
+  end
+
+  def termed_after?(transition, termination_time)
+    ['coverage_termination_pending','coverage_terminated'].include?(transition.to_state) && transition.transition_at >= termination_time
+  end
+
+  # used to check enrollment eligible to reinstate for a application by reason & wst.
+  def eligible_to_reinstate?
+    ['coverage_terminated', 'coverage_termination_pending', 'coverage_canceled'].include?(aasm_state) && TERM_REASONS.include?(terminate_reason) || term_or_cancel_eligble_to_reinstate_by_wst?
+  end
+
+  # used to check enrollment eligible to reinstate for a application by wst
+  def term_or_cancel_eligble_to_reinstate_by_wst?
+    application_transition = sponsored_benefit_package.benefit_application.workflow_state_transitions.detect do |transition|
+      sponsored_benefit_package.canceled? ? sponsored_benefit_package.canceled_as_active?(transition) : sponsored_benefit_package.term_as_active?(transition)
+    end
+    application_transition.present? &&
+      workflow_state_transitions.any?{ |wst| canceled_after?(wst, application_transition.transition_at) || termed_after?(wst, application_transition.transition_at)}
+  end
+
   private
 
   def set_is_any_enrollment_member_outstanding
