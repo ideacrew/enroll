@@ -39,7 +39,7 @@ module Versioning
         @record.sort_history_tracks(a,b)
       end.last
       return nil unless last_history_track
-      RecordVersion.new(@record, :history_track, last_history_track)
+      RecordVersion.new(@record, :history_track, a_time)
     end
 
     def build_version_list(additional_version_at = nil)
