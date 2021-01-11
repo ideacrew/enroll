@@ -8,11 +8,13 @@ draft: false
 
 `brakeman --github-repo dchbx/enroll -o output.html -o output.txt  `
 
-### Mass Assignment
+# Mass Assignment
 
 [Mass Assignment](https://brakemanscanner.org/docs/warning_types/mass_assignment/) brakeman vulnerabilities pose a threat because a user could potentially pass through anything into our controller. They’re typically characterized by the method permit! (With bang) being called on params. The best way to mitigate this is strong params:
 
-# Strong Params
+### Strong Params
+
+Strong parameters are used to protect attributes from user input, for instance when creating a family, the user the family is associated should be not be able to be set from parameters from the user. If that were allowed someone could submit a family with someone’s user id and make a family on their behalf. That is just one example of an attribute you want to prevent the user from setting themselves.
 
 In the file _app/controllers/inboxes_controller.rb_, the following line contained all params permitted:
 
@@ -22,7 +24,7 @@ Since there are a specific set of keys we need to create a new message, we can c
 
 `@new_message = Message.new(params.require(:message).permit(:subject, :body, :folder, :to, :from))`
 
-# Strong Params with Nested Attributes (Arrays/Hashes)
+### Strong Params with Nested Attributes (Arrays/Hashes)
 
 As a general rule of thumb, strong params with nested attributes *[must come last](https://blog.smartlogic.io/permitting-nested-arrays-using-strong-params-in-rails/)*. Here's an example method from `app/controllers/exchanges/manage_sep_types_controller.rb`:
 
@@ -73,7 +75,7 @@ Here's another example from `app/controllers/insured/family_members_controller.r
 Again, addresses are embedded within the dependent model, so they are permitted as a hash.
 
 
-# Strong Params with Dynamic Param Keys
+### Strong Params with Dynamic Param Keys
 
 Sometimes param keys are dynamic, which can be a little tricker. Here are a few examples of Dynamic keys of how to safely permit dynamic params. You’ll have to research the source of the params to determine what the dynamic values are.
 
@@ -101,12 +103,12 @@ non_dynamic_params_keys = [:family, :family_actions_id, :qle_id, :action]
 
 _Dev Tip_: If you’re unsure about params, one tip is to look at cucumbers or walk through the actions directly on an environment and observe the params.
 
-### Denial of Service
+# Denial of Service
 
-###[Denial of Service](https://brakemanscanner.org/docs/warning_types/denial_of_service/) is any attack which causes a service to become unavailable for legitimate clients. 
+[Denial of Service](https://brakemanscanner.org/docs/warning_types/denial_of_service/) is any attack which causes a service to become unavailable for legitimate clients. 
 Denial of Service can be caused by consuming large amounts of network, memory, or CPU resources.
 
-# DoS for Regex
+### DoS for Regex
 
 If an attacker can control the content of a regular expression, they may be able to construct a regular expression that requires exponential time to run.
 
@@ -124,12 +126,12 @@ Since there's a Regex used for user entered params which could lead a potential 
 
 Dev-tip: Always escape the Regex if it's controlled by end user. Examples to consider are params, DB values.
 
-### Dangerous Send
+# Dangerous Send
 
 [Dangerous Send](https://brakemanscanner.org/docs/warning_types/dangerous_send/) refers to unsafely using unfiltered user data to select a Class or Method to be dynamically sent.
 It is much safer to whitelist the desired target or method.
 
-# Malicious attack Dangerous Send
+### Malicious attack Dangerous Send
 
 If an attacker tries to access the private or restricted methods in the application, he/she can get the data which they're not supposed to access or get hold of.
 
@@ -152,12 +154,12 @@ As part of the fix, we are white listing the status params so the attacker would
 
 Dev-tip: Never use a send method with params as it poses a threat.
 
-### Redirect
+# Redirect
 
 [Redirects](https://brakemanscanner.org/docs/warning_types/redirect/) which rely on user-supplied values can be used to “spoof” websites or hide malicious links in otherwise harmless-looking URLs.
 They can also allow access to restricted areas of a site if the destination is not validated.
 
-# URI Parse
+### URI Parse
 
 If an attacker wants to redirect the traffic from the application to his desired website or an malicious site, he can pass the redirect url as an param and make his attack a success.
 
@@ -176,7 +178,7 @@ The fix for this issue would be to parse the url or restrict redirect from user 
 
 Dev-tip: Never use a redirect path without parsing the url or restricting the path.
 
-### File Access
+# File Access
 
 [File Access](https://brakemanscanner.org/docs/warning_types/file_access/) is when user input when accessing files (local or remote) will raise a warning in Brakeman. Consider this method in `app/controllers/documents_controller.rb`:
 ```
@@ -204,7 +206,7 @@ In the above fix, we've specified the exact path that can be accessed by the val
 -[Pull Request 3791](https://github.com/dchbx/enroll/pull/3791)
 
 
-### Denial of Service
+# Denial of Service
 
 [Denial of Service](https://brakemanscanner.org/docs/warning_types/denial_of_service/)(DoS) is any attack which causes a service to become unavailable for legitimate clients. Denial of Service can be caused by consuming large amounts of network, memory, or CPU resources. Consider the following method in `app/controllers/broker_agencies/broker_roles_controller.rb`:
 
@@ -225,7 +227,7 @@ end
 *Relevant pull request for file access reference*:
 -[Pull Request 4102](https://github.com/dchbx/enroll/pull/4102/)
 
-### Dynamic Render Path
+# Dynamic Render Path
 
 [Dynamic Render Path](https://brakemanscanner.org/docs/warning_types/dynamic_render_paths/) is when a call to render uses a dynamically generated path, template name, file name, or action, there is the possibility that a user can access templates that should be restricted. The issue may be worse if those templates execute code or modify the database. Consider the following method in `app/controllers/employers/census_employees_controller.rb`:
 
@@ -251,7 +253,7 @@ In the above example, a user could theoretically render any template ending with
 -[Pull Request 4097](https://github.com/dchbx/enroll/pull/4097)
 
 
-### Remote Code Execution
+# Remote Code Execution
 
 Brakeman reports on several cases of [Remote Code Execution](https://brakemanscanner.org/docs/warning_types/remote_code_execution/) in which a user is able to control and execute code in ways unintended by application authors.
 
