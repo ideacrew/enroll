@@ -35,7 +35,8 @@ module Exchanges
     end
 
     def update
-      result = EnrollRegistry[:sep_types]{ {params: format_update_params(params)} }
+      formatted_params = format_update_params(params)
+      result = EnrollRegistry[:sep_types]{ {params: formatted_params} }
       respond_to do |format|
         format.html do
           if result.failure?
