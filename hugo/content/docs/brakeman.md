@@ -8,9 +8,9 @@ draft: false
 
 `brakeman --github-repo dchbx/enroll -o output.html -o output.txt  `
 
-###[Mass Assignment](https://brakemanscanner.org/docs/warning_types/mass_assignment/)
+### Mass Assignment
 
-Mass assignment brakeman vulnerabilities pose a threat because a user could potentially pass through anything into our controller. They’re typically characterized by the method permit! (With bang) being called on params. The best way to mitigate this is strong params:
+[Mass Assignment](https://brakemanscanner.org/docs/warning_types/mass_assignment/) brakeman vulnerabilities pose a threat because a user could potentially pass through anything into our controller. They’re typically characterized by the method permit! (With bang) being called on params. The best way to mitigate this is strong params:
 
 # Strong Params
 
@@ -101,12 +101,12 @@ non_dynamic_params_keys = [:family, :family_actions_id, :qle_id, :action]
 
 _Dev Tip_: If you’re unsure about params, one tip is to look at cucumbers or walk through the actions directly on an environment and observe the params.
 
-###[Denial of Service](https://brakemanscanner.org/docs/warning_types/denial_of_service/)
+### Denial of Service
 
-Denial of Service (DoS) is any attack which causes a service to become unavailable for legitimate clients. 
+###[Denial of Service](https://brakemanscanner.org/docs/warning_types/denial_of_service/) is any attack which causes a service to become unavailable for legitimate clients. 
 Denial of Service can be caused by consuming large amounts of network, memory, or CPU resources.
 
-### DoS for Regex
+# DoS for Regex
 
 If an attacker can control the content of a regular expression, they may be able to construct a regular expression that requires exponential time to run.
 
@@ -124,12 +124,12 @@ Since there's a Regex used for user entered params which could lead a potential 
 
 Dev-tip: Always escape the Regex if it's controlled by end user. Examples to consider are params, DB values.
 
-###[Dangerous Send](https://brakemanscanner.org/docs/warning_types/dangerous_send/)
+### Dangerous Send
 
-Using unfiltered user data to select a Class or Method to be dynamically sent is dangerous.
+[Dangerous Send](https://brakemanscanner.org/docs/warning_types/dangerous_send/) refers to unsafely using unfiltered user data to select a Class or Method to be dynamically sent.
 It is much safer to whitelist the desired target or method.
 
-### Malicious attack Dangerous Send
+# Malicious attack Dangerous Send
 
 If an attacker tries to access the private or restricted methods in the application, he/she can get the data which they're not supposed to access or get hold of.
 
@@ -152,12 +152,12 @@ As part of the fix, we are white listing the status params so the attacker would
 
 Dev-tip: Never use a send method with params as it poses a threat.
 
-###[Redirect](https://brakemanscanner.org/docs/warning_types/redirect/)
+### Redirect
 
-Redirects which rely on user-supplied values can be used to “spoof” websites or hide malicious links in otherwise harmless-looking URLs.
+[Redirects](https://brakemanscanner.org/docs/warning_types/redirect/) which rely on user-supplied values can be used to “spoof” websites or hide malicious links in otherwise harmless-looking URLs.
 They can also allow access to restricted areas of a site if the destination is not validated.
 
-### URI Parse
+# URI Parse
 
 If an attacker wants to redirect the traffic from the application to his desired website or an malicious site, he can pass the redirect url as an param and make his attack a success.
 
@@ -176,9 +176,9 @@ The fix for this issue would be to parse the url or restrict redirect from user 
 
 Dev-tip: Never use a redirect path without parsing the url or restricting the path.
 
-###[File Access](https://brakemanscanner.org/docs/warning_types/file_access/)
+### File Access
 
-File access is when user input when accessing files (local or remote) will raise a warning in Brakeman. Consider this method in `app/controllers/documents_controller.rb`:
+[File Access](https://brakemanscanner.org/docs/warning_types/file_access/) is when user input when accessing files (local or remote) will raise a warning in Brakeman. Consider this method in `app/controllers/documents_controller.rb`:
 ```
   def download_employer_document
     send_file params[:path]
@@ -204,9 +204,9 @@ In the above fix, we've specified the exact path that can be accessed by the val
 -[Pull Request 3791](https://github.com/dchbx/enroll/pull/3791)
 
 
-###[Denial of Service](https://brakemanscanner.org/docs/warning_types/denial_of_service/)
+### Denial of Service
 
-Denial of Service (DoS) is any attack which causes a service to become unavailable for legitimate clients. Denial of Service can be caused by consuming large amounts of network, memory, or CPU resources. Consider the following method in `app/controllers/broker_agencies/broker_roles_controller.rb`:
+[Denial of Service](https://brakemanscanner.org/docs/warning_types/denial_of_service/)(DoS) is any attack which causes a service to become unavailable for legitimate clients. Denial of Service can be caused by consuming large amounts of network, memory, or CPU resources. Consider the following method in `app/controllers/broker_agencies/broker_roles_controller.rb`:
 
 ```
 def search_broker_agency
@@ -225,9 +225,9 @@ end
 *Relevant pull request for file access reference*:
 -[Pull Request 4102](https://github.com/dchbx/enroll/pull/4102/)
 
-###[Dynamic Render Path](https://brakemanscanner.org/docs/warning_types/dynamic_render_paths/)
+### Dynamic Render Path
 
-When a call to render uses a dynamically generated path, template name, file name, or action, there is the possibility that a user can access templates that should be restricted. The issue may be worse if those templates execute code or modify the database. Consider the following method in `app/controllers/employers/census_employees_controller.rb`:
+[Dynamic Render Path](https://brakemanscanner.org/docs/warning_types/dynamic_render_paths/) is when a call to render uses a dynamically generated path, template name, file name, or action, there is the possibility that a user can access templates that should be restricted. The issue may be worse if those templates execute code or modify the database. Consider the following method in `app/controllers/employers/census_employees_controller.rb`:
 
 ```
   def confirm_effective_date
@@ -251,11 +251,11 @@ In the above example, a user could theoretically render any template ending with
 -[Pull Request 4097](https://github.com/dchbx/enroll/pull/4097)
 
 
-###[Remote Code Execution](https://brakemanscanner.org/docs/warning_types/remote_code_execution/)
+### Remote Code Execution
 
-Brakeman reports on several cases of remote code execution, in which a user is able to control and execute code in ways unintended by application authors.
+Brakeman reports on several cases of [Remote Code Execution](https://brakemanscanner.org/docs/warning_types/remote_code_execution/) in which a user is able to control and execute code in ways unintended by application authors.
 
-### Safe use of Constantize
+# Safe use of Constantize
 
 When we use unsafe reflection method constantize,eval, attacker may be able to halt the execution of a thread/the attacker would be able to access restricted information that he isn't supposed to.
 
