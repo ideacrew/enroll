@@ -31,7 +31,7 @@ jobs:
       - name: Run rubocop
         run: |
           git config diff.renameLimit 1000
-          git fetch --no-tags --depth=1 origin master
+          git fetch --no-tags origin master
           bundle exec rubocop-git origin/master | grep "no offenses detected"
       - name: Run erb-lint
         run: |
