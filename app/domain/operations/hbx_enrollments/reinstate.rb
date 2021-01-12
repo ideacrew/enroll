@@ -39,24 +39,9 @@ module Operations
         Success(params)
       end
 
-      def valid_by_states?(enrollment)
-        aasm_state = enrollment.aasm_state
-        reason = enrollment.terminate_reason
-        ['coverage_terminated', 'coverage_termination_pending', 'coverage_canceled'].include?(aasm_state) && HbxEnrollment::TERM_REASONS.include?(reason) || canceled_eligble(enrollment)
-      end
-
-      def canceled_eligble(enrollment)
-        predecessor_package = enrollment.sponsored_benefit_package
-        application_transition = predecessor_package.benefit_application.workflow_state_transitions.detect do |transition|
-          predecessor_package.canceled? ? predecessor_package.canceled_as_active?(transition) : predecessor_package.term_as_active?(transition)
-        end
-        application_transition.present? &&
-          enrollment.workflow_state_transitions.any?{ |wst| predecessor_package.canceled_after?(wst, application_transition.transition_at) || predecessor_package.termed_after?(wst, application_transition.transition_at)}
-      end
-
       def active_bga_exists?(params)
         @effective_on = fetch_effective_on(params)
-        @notify = params[:options].present? && params[:options][:notify] ? params[:options][:notify] : false
+        @notify = params[:options].present? && params[:options][:notify] ? params[:options][:notify] : true
         @bga = @current_enr.census_employee.benefit_group_assignments.by_benefit_package(params[:options][:benefit_package]).order_by(:created_at.desc).detect{ |bga| bga.is_active?(@effective_on)}
       end
 
@@ -131,15 +116,7 @@ module Operations
       end
 
       def terminate_employment_term_enrollment(hbx_enrollment)
-        census_employee = hbx_enrollment.census_employee
-        employment_term_date = census_employee.employment_terminated_on
-        return unless employment_term_date.present?
-        family = hbx_enrollment.family
-        enrollments = family.hbx_enrollments.where(sponsored_benefit_package_id: hbx_enrollment.sponsored_benefit_package_id).enrolled.shop_market
-        enrollments.each do |enrollment|
-          enrollment.term_or_cancel_enrollment(enrollment, employment_term_date)
-        end
-        notify_trading_partner(hbx_enrollment)
+        ::Operations::HbxEnrollments::Terminate.new.call({hbx_enrollment: hbx_enrollment, options: {notify: @notify}})
       end
 
       def terminate_dependent_age_off(hbx_enrollment)

@@ -68,15 +68,14 @@
             <td colspan="2">
               <input type="text" class="uidatepicker form-control date py-end-date" style="width:120px" placeholder="Select Term Date" id="date_picker_<%= application.id %>" reinstate_start_date="<%= (application.end_on.to_date.next_day).to_s if application.end_on.present?%>" onchange="validateFormat('<%= application.id %>', '<%= TimeKeeper.format_date(application.start_on) %>', '<%= TimeKeeper.format_date(application.end_on.next_day) %>')"> <span class="glyphicon glyphicon-calendar" id="calendar_icon" style="font-size:1.5em" aria-hidden="true" ></span>
             </td>
-              <div>
-                <%= render "exchanges/employer_applications/reinstate_benefit_application_modal", application: application %>
-              </div>
-              <td colspan="2">
-                <%= check_box_tag 'transmit_to_carrier', 'transmit_to_carrier', true, enabled: true  %> <%= l10n("exchange.employer_applications.transmit_to_carrier") %>
-              </td>
-              <td colspan="1">
-                <button class="btn btn-primary btn-sm plan-year-submit" onclick="submitPlanActions()"><%= l10n("exchange.employer_applications.submit") %></button>
-              </td>
+            <div>
+            </div>
+            <td colspan="2">
+              <%= check_box_tag 'transmit_to_carrier', 'transmit_to_carrier', true, enabled: true  %> <%= l10n("exchange.employer_applications.transmit_to_carrier") %>
+            </td>
+            <td colspan="1">
+              <button class="btn btn-primary btn-sm plan-year-submit" onclick="submitPlanActions()"><%= l10n("exchange.employer_applications.submit") %></button>
+            </td>
           </tr>
         <% end %>
       </tbody>
@@ -87,6 +86,7 @@
 </div>
 <div class="attestation_form"></div>
 </div>
+<%= render "exchanges/employer_applications/reinstate_benefit_application_modal" %>
 
 <script type="text/javascript" charset="utf-8">
   initializeDataTables();

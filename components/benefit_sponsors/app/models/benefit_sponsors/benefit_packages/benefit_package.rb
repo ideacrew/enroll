@@ -303,7 +303,6 @@ module BenefitSponsors
 
         # family.validate_member_eligibility_policy
         if true #family.is_valid?
-
           enrollments = family.active_household.hbx_enrollments.enrolled_and_waived
           .by_benefit_sponsorship(benefit_sponsorship).by_effective_period(predecessor_application.effective_period)
 
@@ -355,14 +354,17 @@ module BenefitSponsors
       end
 
       def effectuate_member_benefits
+        logger = Logger.new("#{Rails.root}/log/benefit_package_effectuate_member_benefits.log")
         activate_benefit_group_assignments if predecessor_application.present?
 
-        enrolled_families.no_timeout.each do |family|
+        enrolled_families.no_timeout.inject([]) do |_dummy, family|
           enrollments = HbxEnrollment.by_benefit_package(self).where(family_id: family.id).show_enrollments_sans_canceled
 
           sponsored_benefits.each do |sponsored_benefit|
             hbx_enrollment = enrollments.by_coverage_kind(sponsored_benefit.product_kind).first
-            hbx_enrollment.begin_coverage! if hbx_enrollment && hbx_enrollment.may_begin_coverage?
+            hbx_enrollment.begin_coverage!({skip_renewal_coverage_update: true}) if hbx_enrollment&.may_begin_coverage?
+          rescue StandardError => e
+            logger.info "error raised for family: #{family.id}, error: #{e.backtrace}"
           end
         end
       end
@@ -498,14 +500,6 @@ module BenefitSponsors
         benefit_application.is_application_trading_partner_publishable? ? true : false
       end
 
-      def canceled_after?(transition, cancellation_time)
-        transition.to_state == 'coverage_canceled' && transition.transition_at >= cancellation_time
-      end
-
-      def termed_after?(transition, termination_time)
-        ['coverage_termination_pending','coverage_terminated'].include?(transition.to_state) && transition.transition_at >= termination_time
-      end
-
       def reinstate_canceled_member_benefits
         activate_benefit_group_assignments unless benefit_application.is_renewing?
         application_transition = benefit_application.workflow_state_transitions.detect{|transition| canceled_as_ineligible?(transition) }
@@ -513,7 +507,7 @@ module BenefitSponsors
 
         Family.all_enrollments_by_benefit_package(self).each do |family|
           enrollments = family.active_household.hbx_enrollments.by_benefit_package(self)
-          canceled_coverages = enrollments.canceled.select{|enrollment| enrollment.workflow_state_transitions.any?{|wst| canceled_after?(wst, application_transition.transition_at) } }
+          canceled_coverages = enrollments.canceled.select{|enrollment| enrollment.workflow_state_transitions.any?{|wst| enrollment.canceled_after?(wst, application_transition.transition_at) } }
           if canceled_coverages.present?
             sponsored_benefits.each do |sponsored_benefit|
               hbx_enrollment = canceled_coverages.detect{|coverage| coverage.coverage_kind == sponsored_benefit.product_kind.to_s}
@@ -545,12 +539,8 @@ module BenefitSponsors
       end
 
       def activate_benefit_group_assignments
-        CensusEmployee.by_benefit_package_and_assignment_on(self, start_on).non_terminated.each do |ce|
-          ce.benefit_group_assignments.each do |bga|
-            if bga.benefit_package_id == self.id
-              bga.make_active
-            end
-          end
+        CensusEmployee.by_benefit_package_and_assignment_on(self, start_on).non_terminated.no_timeout.inject([]) do |_dummy, ce|
+          ce.benefit_group_assignments.where(benefit_package_id: self.id).last&.make_active
         end
       end
 
@@ -605,12 +595,7 @@ module BenefitSponsors
 
       def enrollments_eligible_for_reinstate(census_employee, predecessor_package)
         census_employee.family.hbx_enrollments.cancel_or_termed_by_benefit_package(predecessor_package).inject([]) do |enrollments, enrollment|
-          if HbxEnrollment::TERM_REASONS.include?(enrollment.terminate_reason)
-            enrollments += [enrollment]
-          else
-            application_transition = predecessor_package.benefit_application.workflow_state_transitions.detect{|transition| predecessor_package.canceled? ? canceled_as_active?(transition) : term_as_active?(transition)}
-            enrollments += [enrollment] if application_transition.present? && enrollment.workflow_state_transitions.any?{|wst| canceled_after?(wst, application_transition.transition_at) || termed_after?(wst, application_transition.transition_at) }
-          end
+          enrollments += [enrollment] if enrollment.eligible_to_reinstate?
           enrollments
         end
       end

@@ -21,7 +21,7 @@ module Operations
         new_enr           = yield new_hbx_enrollment(values)
         hbx_enrollment    = yield reinstate_hbx_enrollment(new_enr)
         _hbx_enrollment   = yield reinstate_after_effects(hbx_enrollment)
-        # TODO: age off enrollment term
+
         Success(hbx_enrollment)
       end
 
@@ -39,23 +39,9 @@ module Operations
         Success(params)
       end
 
-      def valid_by_states?(enrollment)
-        aasm_state = enrollment.aasm_state
-        reason = enrollment.terminate_reason
-        ['coverage_terminated', 'coverage_termination_pending', 'coverage_canceled'].include?(aasm_state) && HbxEnrollment::TERM_REASONS.include?(reason) || canceled_eligble(enrollment)
-      end
-
-      def canceled_eligble(enrollment)
-        predecessor_package = enrollment.sponsored_benefit_package
-        application_transition = predecessor_package.benefit_application.workflow_state_transitions.detect do |transition|
-          predecessor_package.canceled? ? predecessor_package.canceled_as_active?(transition) : predecessor_package.term_as_active?(transition)
-        end
-        application_transition.present? &&
-          enrollment.workflow_state_transitions.any?{ |wst| predecessor_package.canceled_after?(wst, application_transition.transition_at) || predecessor_package.termed_after?(wst, application_transition.transition_at)}
-      end
-
       def active_bga_exists?(params)
         @effective_on = fetch_effective_on(params)
+        @notify = params[:options].present? && params[:options][:notify] ? params[:options][:notify] : true
         @bga = @current_enr.census_employee.benefit_group_assignments.by_benefit_package(params[:options][:benefit_package]).order_by(:created_at.desc).detect{ |bga| bga.is_active?(@effective_on)}
       end
 
@@ -74,12 +60,12 @@ module Operations
       def fetch_effective_on(params)
         @current_enr = params[:hbx_enrollment]
         case @current_enr.aasm_state
-        when 'coverage_terminated'
-          @current_enr.terminated_on.next_day
-        when 'coverage_termination_pending'
-          @current_enr.terminated_on.next_day
-        when 'coverage_canceled'
-          @current_enr.effective_on
+          when 'coverage_terminated'
+            @current_enr.terminated_on.next_day
+          when 'coverage_termination_pending'
+            @current_enr.terminated_on.next_day
+          when 'coverage_canceled'
+            @current_enr.effective_on
         end
       end
 
@@ -119,7 +105,6 @@ module Operations
           return Failure('Cannot transition to state coverage_selected on event begin_coverage.') unless new_enrollment.may_begin_coverage?
           new_enrollment.begin_coverage!
           new_enrollment.begin_coverage! if TimeKeeper.date_of_record >= new_enrollment.effective_on && new_enrollment.may_begin_coverage?
-          new_enrollment.notify_of_coverage_start(true)
         end
 
         Success(new_enrollment)
@@ -131,19 +116,64 @@ module Operations
       end
 
       def terminate_employment_term_enrollment(hbx_enrollment)
+        ::Operations::HbxEnrollments::Terminate.new.call({hbx_enrollment: hbx_enrollment, options: {notify: @notify}})
+      end
+
+      def terminate_dependent_age_off(hbx_enrollment)
+        dependent_age_off_enrollment(hbx_enrollment, reinstate_dates(hbx_enrollment))
+        Success(hbx_enrollment)
+      end
+
+      def reinstate_dates(hbx_enrollment)
         census_employee = hbx_enrollment.census_employee
-        employment_term_date = census_employee.employment_terminated_on
-        return unless employment_term_date.present?
-        if employment_term_date > TimeKeeper.date_of_record && hbx_enrollment.may_schedule_coverage_termination?
-          hbx_enrollment.schedule_coverage_termination!(employment_term_date.end_of_month)
-        elsif hbx_enrollment.may_terminate_coverage?
-          hbx_enrollment.terminate_coverage!(employment_term_date.end_of_month)
+        term_date = census_employee.employment_terminated_on
+        dependent_age_off_dates = (hbx_enrollment.effective_on..(term_date || TimeKeeper.date_of_record).beginning_of_month)
+        dependent_age_off_dates.to_a.select {|date| date if date == date.beginning_of_month}
+      end
+
+      def age_off_query(hbx_enrollment)
+        family = hbx_enrollment.family
+        benefit_package = hbx_enrollment.sponsored_benefit_package
+        family.hbx_enrollments.where(sponsored_benefit_package_id: benefit_package.id).enrolled.shop_market.all_with_multiple_enrollment_members
+      end
+
+      def dependent_age_off_enrollment(hbx_enrollment, list_of_dates)
+        list_of_dates.each do |dao_date|
+          enrollment_query = age_off_query(hbx_enrollment)
+          if hbx_enrollment.fehb_profile.present?
+            fehb_reinstate_enrollment(dao_date, enrollment_query)
+          elsif hbx_enrollment.is_shop?
+            shop_reinstate_enrollment(dao_date, enrollment_query)
+          end
         end
-        hbx_enrollment.notify_of_coverage_start(true)
+      end
+
+      def shop_reinstate_enrollment(dao_date, enrollment_query)
+        shop_dao = Operations::Shop::DependentAgeOff.new
+        if ::EnrollRegistry[:aca_shop_dependent_age_off].settings(:period).item == :monthly
+          shop_dao.call(new_date: dao_date, enrollment_query: enrollment_query)
+        elsif dao_date.strftime("%m/%d") == TimeKeeper.date_of_record.beginning_of_year.strftime("%m/%d") && ::EnrollRegistry[:aca_shop_dependent_age_off].settings(:period).item == :annual
+          shop_dao.call(new_date: dao_date, enrollment_query: enrollment_query)
+        end
+      end
+
+      def fehb_reinstate_enrollment(dao_date, enrollment)
+        fehb_dao = Operations::Fehb::DependentAgeOff.new
+        if ::EnrollRegistry[:aca_fehb_dependent_age_off].settings(:period).item == :monthly
+          fehb_dao.call(new_date: dao_date, enrollment: enrollment)
+        elsif ::EnrollRegistry[:aca_fehb_dependent_age_off].settings(:period).item == :annual
+          fehb_dao.call(new_date: dao_date, enrollment: enrollment) if dao_date.strftime("%m/%d") == TimeKeeper.date_of_record.beginning_of_year.strftime("%m/%d")
+        end
+      end
+
+      def notify_trading_partner(hbx_enrollment)
+        hbx_enrollment.notify_of_coverage_start(@notify)
       end
 
       def reinstate_after_effects(hbx_enrollment)
+        notify_trading_partner(hbx_enrollment)
         update_benefit_group_assignment(hbx_enrollment)
+        terminate_dependent_age_off(hbx_enrollment)
         terminate_employment_term_enrollment(hbx_enrollment)
 
         Success(hbx_enrollment)
