@@ -5,7 +5,11 @@
 #   a completely outsized amount of cop failures for the number of files:
 # - db/seedfiles
 # - lib/tasks
-I18n/RailsI18n/DecorateString:
+I18n/RailsI18n:
+  Enabled: true
+I18n/GetText:
+  Enabled: false
+I18n/GetText/DecorateString:
   Enabled: true
 
 AllCops:
