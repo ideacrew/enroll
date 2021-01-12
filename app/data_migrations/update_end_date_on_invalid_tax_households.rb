@@ -2,6 +2,7 @@
 
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
+#Rake to update invalid taxhouseholds due to end on is before start on. updating end on to start on.
 class UpdateEndDateOnInvalidTaxHouseholds < MongoidMigrationTask
   def migrate
     Family.all_tax_households.no_timeout.each do |family|
