@@ -78,6 +78,7 @@ describe Forms::BulkActionsForAdmin, ".cancel_enrollments" do
         ]
       end
 
+      let!(:update_initial_appliation) {initial_application.update_attributes(open_enrollment_period: (initial_application.open_enrollment_period.min..TimeKeeper.date_of_record.next_day)) }
       let(:subject) { Forms::BulkActionsForAdmin.new(*cancel_arguments)}
       let!(:glue_event_queue_name) { "#{Rails.application.config.acapi.hbx_id}.#{Rails.application.config.acapi.environment_name}.q.glue.enrollment_event_batch_handler" }
 
@@ -162,6 +163,7 @@ describe Forms::BulkActionsForAdmin, ".cancel_enrollments" do
            "family_id" => family.id}
         ]
       end
+      let!(:update_initial_appliation) {initial_application.update_attributes(open_enrollment_period: (initial_application.open_enrollment_period.min..TimeKeeper.date_of_record.next_day)) }
       let(:subject) { Forms::BulkActionsForAdmin.new(*term_arguments)}
       let!(:glue_event_queue_name) { "#{Rails.application.config.acapi.hbx_id}.#{Rails.application.config.acapi.environment_name}.q.glue.enrollment_event_batch_handler" }
 
