@@ -338,7 +338,7 @@ RSpec.describe Operations::HbxEnrollments::Reinstate, :type => :model, dbclean: 
   describe 'age_off_dependents', dbclean: :after_each do
     include_context 'setup benefit market with market catalogs and product packages'
     include_context 'setup initial benefit application'
-    let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_year.next_month }
+    let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_year - 6.months  }
     let(:benefit_package) {initial_application.benefit_packages.first}
     let!(:person) {FactoryBot.create(:person, :with_employee_role)}
     let!(:family) {FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person)}
@@ -513,7 +513,7 @@ RSpec.describe Operations::HbxEnrollments::Reinstate, :type => :model, dbclean: 
 
     context 'yearly ageoff termination' do
       before do
-        period = (initial_application.effective_period.min..initial_application.end_on.prev_month)
+        period = (initial_application.effective_period.min..initial_application.start_on.end_of_year)
         initial_application.update_attributes!(termination_reason: 'nonpayment', terminated_on: period.max, effective_period: period)
         initial_application.terminate_enrollment!
         effective_period = (initial_application.effective_period.max.next_day)..(initial_application.benefit_sponsor_catalog.effective_period.max)
@@ -539,7 +539,7 @@ RSpec.describe Operations::HbxEnrollments::Reinstate, :type => :model, dbclean: 
       context 'shop market', dbclean: :after_each do
         before do
           allow(::EnrollRegistry[:aca_shop_dependent_age_off].settings[0]).to receive(:item).and_return(:annual)
-          allow(TimeKeeper).to receive(:date_of_record).and_return(TimeKeeper.date_of_record.next_year.beginning_of_year)
+          allow(TimeKeeper).to receive(:date_of_record).and_return(initial_application.benefit_sponsor_catalog.effective_date.next_year.beginning_of_year)
         end
 
         it 'should create new enrollment' do
@@ -565,7 +565,7 @@ RSpec.describe Operations::HbxEnrollments::Reinstate, :type => :model, dbclean: 
         before do
           allow(::EnrollRegistry[:aca_fehb_dependent_age_off].settings[0]).to receive(:item).and_return(:annual)
           allow_any_instance_of(HbxEnrollment).to receive(:fehb_profile).and_return(true)
-          allow(TimeKeeper).to receive(:date_of_record).and_return(TimeKeeper.date_of_record.next_year.beginning_of_year)
+          allow(TimeKeeper).to receive(:date_of_record).and_return(initial_application.benefit_sponsor_catalog.effective_date.next_year.beginning_of_year)
         end
 
         it 'should create new enrollment' do
