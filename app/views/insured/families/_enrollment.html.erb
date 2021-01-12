@@ -100,7 +100,6 @@
             <% end %>
           </div>
         <% end %>
-      </div>
       <% if hbx_enrollment.coverage_termination_pending? %>
         <div class="col-xs-12 vertically-aligned-row">
           <div class="enrollment-effective info">
@@ -163,6 +162,7 @@
           <%= render partial: "employers/census_employees/enrollment_details", locals: { enrollment:  hbx_enrollment} %>
         <% end %>
       <% end %>
+      </div>
     </div>
     <div class="panel-footer">
       <div class="vertically-aligned-row">
@@ -225,4 +225,4 @@
     var enrollmentToggleCheckbox = document.getElementById("display_all_enrollments");
     enrollmentToggleCheckbox.addEventListener('click', toggleDisplayEnrollments);
   })
- </script>
+</script>
