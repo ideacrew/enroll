@@ -46,7 +46,7 @@ module Versioning
       @record.reload
       version_list = [RecordVersion.new(@record, :record, @record.updated_at)]
       if additional_version_at
-        optional_version = optional_version_at(a_time)
+        optional_version = optional_version_at(additional_version_at)
         if optional_version
           version_list = version_list + [optional_version]
         end
