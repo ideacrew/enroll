@@ -30,7 +30,7 @@ jobs:
           bundle install
       - name: Run rubocop
         run: |
-          git config diff.renameLimit 800
+          git config diff.renameLimit 1000
           git fetch --no-tags --depth=1 origin master
           bundle exec rubocop-git origin/master | grep "no offenses detected"
       - name: Run erb-lint
