@@ -1,11 +1,10 @@
 ---
 title: "Internationalization Todo"
 date: 2021-01-13T12:12:25-05:00
-draft: false
+draft: true
 ---
 
 The following file lists represents file which require some degree of internationalization in Enroll as of 1/13/2021. 
-
 
 # Main App
 
@@ -147,6 +146,40 @@ app/views/employer_profiles/my_account/_profile_tab.html.erb
 app/views/employer_profiles/show.html.erb
 app/views/employer_profiles/show_pending.html.erb
 app/views/employer_profiles/show_profile.html.erb
+
+app/views/people/_no_match.html.haml
+app/views/people/_person_fields.html.erb
+app/views/people/_person_info_form.html.erb
+app/views/people/_search_fields.html.erb
+
+app/views/employers/plan_years/_benefit_group.html.erb
+app/views/employers/plan_years/_benefit_group_summary.html.erb
+app/views/employers/plan_years/_dental_reference_plans_options_modal.html.erb
+app/views/employers/plan_years/_employee_costs_modal.html.erb
+app/views/employers/plan_years/_form.html.erb
+app/views/employers/plan_years/_plan_options.html.erb
+app/views/employers/plan_years/_recommend_dates.html.erb
+app/views/employers/plan_years/_reference_plan_info.html.erb
+app/views/employers/plan_years/_reference_plan_summary_modal.html.erb
+app/views/employers/plan_years/_revert_modal.html.erb
+
+
+app/views/employers/plan_years/plan_selection/_offered_plan.html.erb
+app/views/employers/plan_years/plan_selection_plan_details.html.erb
+app/views/employers/plan_years/plan_selection_single_carriers.html.erb
+
+app/views/employers/premium_statements/_benefit_line_item_detail.html.erb
+app/views/employers/premium_statements/_employee_line_item.html.erb
+app/views/employers/premium_statements/_show.html.erb
+app/views/employers/premium_statements/how.html.erb
+
+app/views/exchanges/agents/_consumer_application_links.html.erb
+app/views/exchanges/agents/_employee_application_links.html.erb
+app/views/exchanges/agents/_individual_message.html.erb
+app/views/exchanges/agents/_message.html.erb
+app/views/exchanges/agents/_message_list.html.erb
+app/views/exchanges/agents/_primary_nav.html.erb
+app/views/exchanges/agents/home.html.erb
 
 # Benefit Markets
 
