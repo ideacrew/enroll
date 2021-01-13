@@ -1842,6 +1842,7 @@ class HbxEnrollment
                          :transmitted_to_carrier, :coverage_renewed, :unverified,
                          :coverage_enrolled, :renewing_waived, :inactive, :coverage_reinstated],
                   to: :coverage_canceled, after: :propogate_cancel
+      transitions from: :coverage_expired, to: :coverage_canceled, :guard => :is_ivl_by_kind?
     end
 
     event :cancel_for_non_payment, :after => :record_transition do
@@ -1850,6 +1851,7 @@ class HbxEnrollment
                          :transmitted_to_carrier, :coverage_renewed, :unverified,
                          :coverage_enrolled, :renewing_waived, :inactive],
                   to: :coverage_canceled, after: :propogate_cancel
+      transitions from: :coverage_expired, to: :coverage_canceled, :guard => :is_ivl_by_kind?
     end
 
     event :terminate_coverage, :after => :record_transition do
