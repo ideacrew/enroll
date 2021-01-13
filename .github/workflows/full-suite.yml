@@ -46,13 +46,17 @@ jobs:
           key: v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
           restore-keys: |
             v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
-      - name: bundle install
+      - name: Install project gems
+        run: gem install brakeman
+      - name: Run Brakeman
+        run: brakeman -i config/brakeman.ignore
+      - name: Run Brakeman In Components
         run: |
-          gem update --system
-          bundle config path vendor/bundle
-          bundle install
-      - name: run brakeman
-        run: bundle exec brakeman
+          for test_dir in `ls -1 components`; do
+            cd components/$test_dir
+            brakeman -i config/brakeman.ignore
+            cd ../..
+          done
   build-assets:
     needs: [rubocop, brakeman]
     runs-on: ubuntu-latest
