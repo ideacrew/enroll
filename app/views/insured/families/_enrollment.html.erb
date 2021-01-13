@@ -42,7 +42,7 @@
             </div>
             <div class="enrollment-effective info vertical-align-top">
               <strong><%= l10n("coverage_end") %>:</strong>
-              <%= enrollment_coverage_end(hbx_enrollment).to_date %>
+              <%= enrollment_coverage_end(hbx_enrollment)&.to_date %>
             </div>
           <% else %>
             <div class="col-xs-8 enrollment-premium info vertical-align-top" style="padding-left: 0">
