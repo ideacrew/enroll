@@ -29,20 +29,28 @@
           </h3>
         </div>
         <div class="col-xs-12 vertically-aligned-row mt-1">
-          <div class="col-xs-8 enrollment-premium info vertical-align-top" style="padding-left: 0">
-            <p class="mb-0">
-              <strong><%= l10n("premium") %>:</strong>
-              <%= number_to_currency(current_premium(hbx_enrollment), precision: 2) %>/month
-            </p>
-          </div>
           <% if hbx_enrollment.coverage_terminated? || hbx_enrollment.coverage_expired? || hbx_enrollment.coverage_termination_pending? %>
+            <div class="col-xs-4 enrollment-premium info vertical-align-top" style="padding-left: 0">
+              <p class="mb-0">
+                <strong><%= l10n("premium") %>:</strong>
+                <%= number_to_currency(current_premium(hbx_enrollment), precision: 2) %>/month
+              </p>
+            </div>
             <div class="col-xs-4 enrollment-effective info vertical-align-top" style="padding-left: 0">
               <strong><%= l10n("effective_date") %>:</strong>
               <%= hbx_enrollment.effective_on %>
+            </div>
+            <div class="enrollment-effective info vertical-align-top">
               <strong><%= l10n("coverage_end") %>:</strong>
-              <%= enrollment_coverage_end(hbx_enrollment) %>
+              <%= enrollment_coverage_end(hbx_enrollment)&.to_date %>
             </div>
           <% else %>
+            <div class="col-xs-8 enrollment-premium info vertical-align-top" style="padding-left: 0">
+              <p class="mb-0">
+                <strong><%= l10n("premium") %>:</strong>
+                <%= number_to_currency(current_premium(hbx_enrollment), precision: 2) %>/month
+              </p>
+            </div>
             <div class="col-xs-4 enrollment-effective info vertical-align-top" style="padding-left: 0">
               <strong><%= l10n("plan_start") %>:</strong>
               <%= hbx_enrollment.effective_on %>
