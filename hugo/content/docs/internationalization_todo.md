@@ -4,7 +4,7 @@ date: 2021-01-13T12:12:25-05:00
 draft: false
 ---
 
-The following file lists represents file which require internationalization in Enroll as of 1/13/2021. 
+The following file lists represents file which require some degree of internationalization in Enroll as of 1/13/2021. 
 
 
 # Main App
@@ -44,6 +44,109 @@ app/views/broker_agencies/quotes/panels/_dental.html.erb
 app/views/broker_agencies/quotes/panels/_my_features.html.erb
 app/views/broker_agencies/quotes/panels/_my_plans.html.erb
 
+app/views/datatables/_cancel_enrollment.html.erb
+app/views/datatables/_cancel_enrollment_result.html.erb
+app/views/datatables/_terminate_enrollment.html.erb
+app/views/datatables/_terminate_enrollment_result.html.erb
+
+app/views/devise/confirmations/new.html.erb
+app/views/devise/mailer/reset_password_instructions.html.erb
+app/views/devise/mailer/unlock_instructions.html.erb
+app/views/devise/passwords/_edit.html.erb
+app/views/devise/mailer/unlock_instructions.html.erb
+app/views/devise/passwords/create.js.erb
+app/views/devise/mailer/unlock_instructions.html.erb
+app/views/devise/passwords/edit.html.erb
+app/views/devise/mailer/unlock_instructions.html.erb
+app/views/devise/passwords/new.html.slim
+
+app/views/devise/registrations/new.html.slim
+
+app/views/devise/sessions/_session_expiration_warning.html.erb
+app/views/devise/sessions/ssession_expiration_warning.js.erb
+
+app/views/shared/_sign_in.html.erb
+
+app/views/devise/unlocks/new.html.erb
+
+app/views/documents/_new.erb
+
+app/views/employees/_form.html.erb
+
+app/views/employers/census_employees/_address_fields.html.erb
+app/views/employers/census_employees/_cobra_fields.html.erb
+app/views/employers/census_employees/dependent_fields.html.erb
+app/views/employers/census_employees/_details.html.erb
+app/views/employers/census_employees/_email_fields.html.erb
+app/views/employers/census_employees/_enrollment_details.html.erb
+app/views/employers/census_employees/_errors_if_any.html.erb
+app/views/employers/census_employees/_form.html.erb
+app/views/employers/census_employees/_initiate_cobra.html.erb
+app/views/employers/census_employees/_member_fields.html.erb
+app/views/employers/census_employees/_rehire_employee.html.erb
+app/views/employers/census_employees/_sidebar.html.erb
+app/views/employers/census_employees/_terminate_employee.html.erb
+app/views/employers/census_employees/show.html.erb
+
+app/views/employer/_broker_info_fields.html.erb
+app/views/employer/_coverage_fields.html.erb
+app/views/employer/_credentials_fields.html.erb
+app/views/employer/_eligibility_rules_fields.html.erb
+app/views/employer/_emp_contact_fields.html.erb
+app/views/employer/_emp_contributions_fields.html.erb
+app/views/employer/_form.html.erb
+app/views/employer/_name_fields.html.erb
+app/views/employer/_plan_selection_fields.html.erb
+app/views/employer/_sidebar.html.erb
+app/views/employer/_tax_fields.html.erb
+app/views/employer/_welcome_msg.html.erb
+app/views/employer/index.html.erb
+app/views/employer/show.html.erb
+
+app/views/employer_attestations/_edit.html.erb
+app/views/employer_attestations/_new.html.erb
+app/views/employer_attestations/_verify_attestation.html.erb
+app/views/employer_attestations/_verify_attestation.js.erb
+
+app/views/employer_profiles/_broker_info_fields.html.erb
+app/views/employer_profiles/_coverage_fields.html.erb
+app/views/employer_profiles/_credentials_fields.html.erb
+app/views/employer_profiles/_download_new_template.html.erb
+app/views/employer_profiles/_eligibility_rules_fields.html.erb
+app/views/employer_profiles/_emp_contact_fields.html.erb
+app/views/employer_profiles/_emp_contributions_fields.html.erb
+app/views/employer_profiles/_employer_info_form.html.erb
+app/views/employer_profiles/_employer_invoices_table.html.erb
+app/views/employer_profiles/_employer_menu.html.erb
+app/views/employer_profiles/_enrollment_report_widget.html.erb
+app/views/employer_profiles/_form.html.erb
+app/views/employer_profiles/_index.html.erb
+app/views/employer_profiles/_no_match.html.haml
+app/views/employer_profiles/_open_enrollment_ends_panel.html.erb
+app/views/employer_profiles/_plan_selection_fields.html.erb
+app/views/employer_profiles/_primary_nav.html.erb
+app/views/employer_profiles/_search_fields.html.erb
+app/views/employer_profiles/_sidebar.html.erb
+app/views/employer_profiles/_tax_fields.html.erb
+app/views/employer_profiles/bulk_employee_upload_form.html.erb
+app/views/employer_profiles/index.html.erb
+
+
+app/views/employer_profiles/my_account/_benefits.html.erb
+app/views/employer_profiles/my_account/_billing.html.erb
+app/views/employer_profiles/my_account/_broker_agency.html.erb
+app/views/employer_profiles/my_account/_census_employees.html.erb
+app/views/employer_profiles/my_account/_documents.html.erb
+app/views/employer_profiles/my_account/_employees_by_status.html.erb
+app/views/employer_profiles/my_account/_employer_welcome.html.slim
+app/views/employer_profiles/my_account/_enrollment_progress_bar.html.erb
+app/views/employer_profiles/my_account/_families.html.erb
+app/views/employer_profiles/my_account/_home_tab.html.slim
+app/views/employer_profiles/my_account/_profile_tab.html.erb
+
+app/views/employer_profiles/show.html.erb
+app/views/employer_profiles/show_pending.html.erb
+app/views/employer_profiles/show_profile.html.erb
 
 # Benefit Markets
 
