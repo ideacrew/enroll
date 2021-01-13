@@ -34,6 +34,7 @@ jobs:
           git fetch --no-tags --depth=1 origin master
           bundle exec rubocop-git origin/master | grep "no offenses detected"
   brakeman:
+    needs: [rubocop]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
