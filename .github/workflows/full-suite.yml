@@ -151,6 +151,7 @@ jobs:
           NODE_ENV=test RAILS_ENV=test ./bin/webpack
       - name: run brakeman
         run: |
+          root=`pwd -P`
           cd $root/components/${{ matrix.engine-name }}
           bundle config path ../../vendor/bundle
           bundle exec brakeman
