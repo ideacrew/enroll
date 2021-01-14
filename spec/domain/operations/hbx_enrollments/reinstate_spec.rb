@@ -334,4 +334,261 @@ RSpec.describe Operations::HbxEnrollments::Reinstate, :type => :model, dbclean: 
       end
     end
   end
+
+  describe 'age_off_dependents', dbclean: :after_each do
+    include_context 'setup benefit market with market catalogs and product packages'
+    include_context 'setup initial benefit application'
+    let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_year - 6.months  }
+    let(:benefit_package) {initial_application.benefit_packages.first}
+    let!(:person) {FactoryBot.create(:person, :with_employee_role)}
+    let!(:family) {FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person)}
+    let!(:family_member1) {family.family_members.first}
+    let!(:family_member2) {family.family_members.second}
+    let!(:family_member3) {family.family_members.last}
+    let!(:census_employee) do
+      create(:census_employee,
+             :with_active_assignment,
+             benefit_sponsorship: benefit_sponsorship,
+             benefit_sponsors_employer_profile_id: benefit_sponsorship.profile.id,
+             benefit_group: benefit_package,
+             hired_on: TimeKeeper.date_of_record.prev_year - 3.months)
+    end
+    let!(:employee_role) {FactoryBot.create(:employee_role, person: person, census_employee: census_employee, benefit_sponsors_employer_profile_id: abc_profile.id)}
+    let(:enrollment) do
+      FactoryBot.create(:hbx_enrollment,
+                        household: family.latest_household,
+                        coverage_kind: "health",
+                        family: family,
+                        kind: "employer_sponsored",
+                        effective_on: initial_application.start_on,
+                        benefit_sponsorship_id: benefit_sponsorship.id,
+                        sponsored_benefit_package_id: benefit_package.id,
+                        sponsored_benefit_id: benefit_package.sponsored_benefits[0].id,
+                        product: benefit_package.sponsored_benefits[0].reference_product,
+                        employee_role_id: employee_role.id,
+                        rating_area_id: BSON::ObjectId.new)
+    end
+    let!(:enr_mem1) { FactoryBot.create(:hbx_enrollment_member, applicant_id: family_member1.id, is_subscriber: family_member1.is_primary_applicant, hbx_enrollment: enrollment) }
+    let!(:enr_mem2) { FactoryBot.create(:hbx_enrollment_member, applicant_id: family_member2.id, is_subscriber: family_member2.is_primary_applicant, hbx_enrollment: enrollment) }
+    let!(:enr_mem3) { FactoryBot.create(:hbx_enrollment_member, applicant_id: family_member3.id, is_subscriber: family_member3.is_primary_applicant, hbx_enrollment: enrollment) }
+
+
+    context 'monthly ageoff termination' do
+      before do
+        period = (initial_application.effective_period.min..initial_application.start_on.next_month.end_of_month)
+        initial_application.update_attributes!(termination_reason: 'nonpayment', terminated_on: period.max, effective_period: period)
+        initial_application.terminate_enrollment!
+        effective_period = (initial_application.effective_period.max.next_day)..(initial_application.benefit_sponsor_catalog.effective_period.max)
+        cloned_application = ::BenefitSponsors::Operations::BenefitApplications::Clone.new.call({benefit_application: initial_application, effective_period: effective_period}).success
+        cloned_catalog = ::BenefitMarkets::Operations::BenefitSponsorCatalogs::Clone.new.call(benefit_sponsor_catalog: initial_application.benefit_sponsor_catalog).success
+
+        cloned_catalog.benefit_application = cloned_application
+        cloned_catalog.save!
+        cloned_application.assign_attributes({reinstated_id: initial_application.id, benefit_sponsor_catalog_id: cloned_catalog.id})
+        cloned_application.save!
+
+        @cloned_package = cloned_application.benefit_packages[0]
+        @cloned_package.reinstate_member_benefits
+        census_employee.reload
+
+        @cloned_package.reinstate_benefit_group_assignment(census_employee.benefit_group_assignments.first)
+        enr_mem2.person.update_attributes(dob: cloned_application.start_on - 26.years)
+        enr_mem3.person.update_attributes(dob: cloned_application.start_on.next_month - 26.years)
+        enrollment.reload
+      end
+
+      context 'shop market', dbclean: :after_each do
+        before do
+          allow(::EnrollRegistry[:aca_shop_dependent_age_off].settings[0]).to receive(:item).and_return(:monthly)
+        end
+
+        it 'should create new enrollment' do
+          family = enrollment.family
+          expect(family.hbx_enrollments.count).to eq 1
+          subject.call({hbx_enrollment: enrollment, options: {benefit_package: @cloned_package}})
+          enrollment.reload
+          expect(family.hbx_enrollments.count).to eq 4
+        end
+
+        it 'should drop dependents who are > 26 and create a new enrollment' do
+          family = enrollment.family
+          expect(family.hbx_enrollments.coverage_enrolled.count).to eq 0
+          subject.call({hbx_enrollment: enrollment, options: {benefit_package: @cloned_package}})
+          enrollment.reload
+          expect(family.hbx_enrollments.coverage_enrolled.count).to eq 1
+          expect(family.hbx_enrollments.coverage_enrolled.first.hbx_enrollment_members.count).to eq 1
+        end
+
+        context 'census employee in terminated status' do
+
+          context "before reinstatement dependent aged off 26" do
+            # 1.  should cancel reinstated enrollment.
+            # 2. should create new ageoff reinstated enrollment without ageoff dependent and
+            # 3. should terminate ageoff reinstated enrollment with employment date.
+            before do
+              allow(::EnrollRegistry[:aca_shop_dependent_age_off].settings[0]).to receive(:item).and_return(:monthly)
+              census_employee.employment_terminated_on = @cloned_package.start_on.end_of_month
+              census_employee.save(validate: false)
+              census_employee.reload
+              enr_mem2.person.update_attributes(dob: @cloned_package.start_on.prev_day - 26.years)
+              enr_mem3.person.update_attributes(dob: @cloned_package.start_on.next_month - 26.years)
+              enrollment.reload
+            end
+
+            it 'should create new enrollment' do
+              family = enrollment.family
+              expect(family.hbx_enrollments.count).to eq 1
+              subject.call({hbx_enrollment: enrollment, options: {benefit_package: @cloned_package}})
+              enrollment.reload
+              expect(family.hbx_enrollments.map(&:aasm_state)).to eq ["coverage_terminated", "coverage_canceled", "coverage_terminated"]
+              expect(family.hbx_enrollments.count).to eq 3
+            end
+
+            it "should terminate enrollment with employment termination date" do
+              family = enrollment.family
+              subject.call({hbx_enrollment: enrollment, options: {benefit_package: @cloned_package}})
+              enrollment.reload
+              expect(family.hbx_enrollments.where(terminated_on: census_employee.employment_terminated_on.end_of_month).count).to eq 1
+            end
+          end
+
+          context "after reinstatement dependent aged off 26" do
+            # 1.  should terminated reinstated enrollment when dependent age passed 26
+            # 2. should create new ageoff reinstated enrollment without ageoff dependent and
+            # 3. should terminate ageoff reinstated enrollment with employment date.
+            before do
+              allow(::EnrollRegistry[:aca_shop_dependent_age_off].settings[0]).to receive(:item).and_return(:monthly)
+              census_employee.employment_terminated_on = @cloned_package.start_on.next_month.end_of_month
+              census_employee.save(validate: false)
+              census_employee.reload
+              enr_mem2.person.update_attributes(dob: @cloned_package.start_on - 26.years)
+              enr_mem3.person.update_attributes(dob: @cloned_package.start_on.next_month - 26.years)
+              enrollment.reload
+            end
+
+            it 'should create new enrollment' do
+              family = enrollment.family
+              expect(family.hbx_enrollments.count).to eq 1
+              subject.call({hbx_enrollment: enrollment, options: {benefit_package: @cloned_package}})
+              enrollment.reload
+              expect(family.hbx_enrollments.map(&:aasm_state)).to eq ["coverage_terminated", "coverage_terminated", "coverage_terminated"]
+              expect(family.hbx_enrollments.count).to eq 3
+            end
+
+            it "should terminate enrollment with employment termination date" do
+              family = enrollment.family
+              subject.call({hbx_enrollment: enrollment, options: {benefit_package: @cloned_package}})
+              enrollment.reload
+              expect(family.hbx_enrollments.where(terminated_on: census_employee.employment_terminated_on.end_of_month).count).to eq 1
+            end
+          end
+
+        end
+      end
+
+      context 'fehb market', dbclean: :after_each do
+
+        before do
+          allow_any_instance_of(HbxEnrollment).to receive(:fehb_profile).and_return(true)
+        end
+
+        it 'should create new enrollment' do
+          family = enrollment.family
+          expect(family.hbx_enrollments.count).to eq 1
+          subject.call({hbx_enrollment: enrollment, options: {benefit_package: @cloned_package}})
+          enrollment.reload
+          expect(family.hbx_enrollments.count).to eq 4
+        end
+
+        it 'should drop dependents who are > 26 and create a new enrollment' do
+          family = enrollment.family
+          expect(family.hbx_enrollments.coverage_enrolled.count).to eq 0
+          subject.call({hbx_enrollment: enrollment, options: {benefit_package: @cloned_package}})
+          enrollment.reload
+          expect(family.hbx_enrollments.coverage_enrolled.count).to eq 1
+          expect(family.hbx_enrollments.coverage_enrolled.first.hbx_enrollment_members.count).to eq 1
+        end
+      end
+    end
+
+    context 'yearly ageoff termination' do
+      before do
+        period = (initial_application.effective_period.min..initial_application.start_on.end_of_year)
+        initial_application.update_attributes!(termination_reason: 'nonpayment', terminated_on: period.max, effective_period: period)
+        initial_application.terminate_enrollment!
+        effective_period = (initial_application.effective_period.max.next_day)..(initial_application.benefit_sponsor_catalog.effective_period.max)
+        cloned_application = ::BenefitSponsors::Operations::BenefitApplications::Clone.new.call({benefit_application: initial_application, effective_period: effective_period}).success
+        cloned_catalog = ::BenefitMarkets::Operations::BenefitSponsorCatalogs::Clone.new.call(benefit_sponsor_catalog: initial_application.benefit_sponsor_catalog).success
+
+        cloned_catalog.benefit_application = cloned_application
+        cloned_catalog.save!
+        cloned_application.assign_attributes({reinstated_id: initial_application.id, benefit_sponsor_catalog_id: cloned_catalog.id})
+        cloned_application.save!
+
+        @cloned_package = cloned_application.benefit_packages[0]
+        @cloned_package.reinstate_member_benefits
+        census_employee.reload
+
+        @cloned_package.reinstate_benefit_group_assignment(census_employee.benefit_group_assignments.first)
+        enr_mem2.person.update_attributes(dob: initial_application.end_on - 26.years)
+        enr_mem3.person.update_attributes(dob: cloned_application.start_on - 26.years)
+        enrollment.reload
+
+      end
+
+      context 'shop market', dbclean: :after_each do
+        before do
+          allow(::EnrollRegistry[:aca_shop_dependent_age_off].settings[0]).to receive(:item).and_return(:annual)
+          allow(TimeKeeper).to receive(:date_of_record).and_return(initial_application.benefit_sponsor_catalog.effective_date.next_year.beginning_of_year)
+        end
+
+        it 'should create new enrollment' do
+          family = enrollment.family
+          expect(family.hbx_enrollments.count).to eq 1
+          subject.call({hbx_enrollment: enrollment, options: {benefit_package: @cloned_package}})
+          enrollment.reload
+          expect(family.hbx_enrollments.count).to eq 3
+        end
+
+        it 'should drop dependents who are > 26 and create a new enrollment' do
+          family = enrollment.family
+          expect(family.hbx_enrollments.coverage_enrolled.count).to eq 0
+          subject.call({hbx_enrollment: enrollment, options: {benefit_package: @cloned_package}})
+          enrollment.reload
+          expect(family.hbx_enrollments.coverage_enrolled.count).to eq 1
+          expect(family.hbx_enrollments.coverage_enrolled.first.hbx_enrollment_members.count).to eq 2
+        end
+      end
+
+      context 'fehb market', dbclean: :after_each do
+
+        before do
+          allow(::EnrollRegistry[:aca_fehb_dependent_age_off].settings[0]).to receive(:item).and_return(:annual)
+          allow_any_instance_of(HbxEnrollment).to receive(:fehb_profile).and_return(true)
+          allow(TimeKeeper).to receive(:date_of_record).and_return(initial_application.benefit_sponsor_catalog.effective_date.next_year.beginning_of_year)
+        end
+
+        it 'should create new enrollment' do
+          family = enrollment.family
+          expect(family.hbx_enrollments.count).to eq 1
+          subject.call({hbx_enrollment: enrollment, options: {benefit_package: @cloned_package}})
+          enrollment.reload
+          expect(family.hbx_enrollments.count).to eq 3
+        end
+
+        it 'should drop dependents who are > 26 and create a new enrollment' do
+          family = enrollment.family
+          expect(family.hbx_enrollments.coverage_enrolled.count).to eq 0
+          subject.call({hbx_enrollment: enrollment, options: {benefit_package: @cloned_package}})
+          enrollment.reload
+          expect(family.hbx_enrollments.coverage_enrolled.count).to eq 1
+          expect(family.hbx_enrollments.coverage_enrolled.first.hbx_enrollment_members.count).to eq 2
+        end
+      end
+
+      after do
+        TimeKeeper.set_date_of_record_unprotected!(Time.zone.today)
+      end
+    end
+  end
 end
