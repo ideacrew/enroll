@@ -93,7 +93,7 @@ def find_primary_family(client, person_id)
     {
       "family_members" => {
         "$elemMatch" => {
-          "family_member_id" => primary_id,
+          "person_id" => primary_id,
           "is_primary_applicant" => true
         }
       }
