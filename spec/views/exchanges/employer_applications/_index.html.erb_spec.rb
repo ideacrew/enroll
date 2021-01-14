@@ -96,7 +96,7 @@ RSpec.describe "exchanges/employer_applications/index.html.erb", dbclean: :after
     it "should have not cancel, terminate, reinstate links" do
       expect(rendered).not_to match(/cancel/)
       expect(rendered).not_to match(/terminate/)
-      expect(rendered).not_to match(/reinstate/)
+      expect(rendered).not_to match(/Reinstate/)
     end
   end
 end

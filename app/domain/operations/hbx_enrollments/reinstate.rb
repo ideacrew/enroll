@@ -110,22 +110,27 @@ module Operations
         Success(new_enrollment)
       end
 
+      def notify_trading_partner(hbx_enrollment)
+        hbx_enrollment.notify_of_coverage_start(@notify)
+      end
+
       def update_benefit_group_assignment(hbx_enrollment)
         assignment = hbx_enrollment.census_employee.benefit_group_assignment_by_package(hbx_enrollment.sponsored_benefit_package_id, hbx_enrollment.effective_on)
         assignment&.update_attributes(hbx_enrollment_id: hbx_enrollment.id)
+      end
+
+      def terminate_dependent_age_off(hbx_enrollment)
+        ::Operations::HbxEnrollments::DependentAgeOff.new.call({hbx_enrollment: hbx_enrollment})
       end
 
       def terminate_employment_term_enrollment(hbx_enrollment)
         ::Operations::HbxEnrollments::Terminate.new.call({hbx_enrollment: hbx_enrollment, options: {notify: @notify}})
       end
 
-      def notify_trading_partner(hbx_enrollment)
-        hbx_enrollment.notify_of_coverage_start(@notify)
-      end
-
       def reinstate_after_effects(hbx_enrollment)
         notify_trading_partner(hbx_enrollment)
         update_benefit_group_assignment(hbx_enrollment)
+        terminate_dependent_age_off(hbx_enrollment)
         terminate_employment_term_enrollment(hbx_enrollment)
 
         Success(hbx_enrollment)

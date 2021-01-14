@@ -365,6 +365,7 @@ class HbxEnrollment
   scope :by_benefit_package,       -> (benefit_package) { where(:sponsored_benefit_package_id => benefit_package.id) }
   scope :by_enrollment_period,     -> (enrollment_period) { where(:effective_on.gte => enrollment_period.min, :effective_on.lte => enrollment_period.max) }
 
+  scope :all_with_multiple_enrollment_members,  ->{ exists({:'hbx_enrollment_members.1' => true})  }
   scope :by_effective_period,      ->(effective_period) { where(
                                                           :"effective_on".gte => effective_period.min,
                                                           :"effective_on".lte => effective_period.max
@@ -531,6 +532,11 @@ class HbxEnrollment
       end
     end
 
+    def terminate_dep_age_off_enrollments
+      ::EnrollRegistry[:aca_shop_dependent_age_off] { {new_date: TimeKeeper.date_of_record} }
+      ::EnrollRegistry[:aca_fehb_dependent_age_off] { {new_date: TimeKeeper.date_of_record} }
+    end
+
     def enrollments_for_display(family_id)
       HbxEnrollment.collection.aggregate(
         [
@@ -604,7 +610,7 @@ class HbxEnrollment
       #     end
       #   end
       # end
-
+      HbxEnrollment.terminate_dep_age_off_enrollments if TimeKeeper.date_of_record == TimeKeeper.date_of_record.beginning_of_month
       HbxEnrollment.terminate_scheduled_enrollments
     end
 
@@ -940,6 +946,11 @@ class HbxEnrollment
     else
       parent_enrollment.terminate_coverage_with(effective_on.prev_day)
     end
+
+    return unless sponsored_benefit_package.present?
+    benefit_application = sponsored_benefit_package.benefit_application
+    return unless benefit_application.present? && benefit_application.terminated_on.present?
+    term_or_cancel_enrollment(self, benefit_application.terminated_on, benefit_application.termination_reason)
   end
 
   def propagate_selection
@@ -984,6 +995,25 @@ class HbxEnrollment
 
     passive_renewals_under(successor_application).each{|en| en.cancel_coverage! if en.may_cancel_coverage? }
     renew_benefit(successor_benefit_package) if active_renewals_under(successor_application).blank? && successor_application.coverage_renewable? && non_inactive_transition? && non_terminated_enrollment?
+  end
+
+  def update_reinstate_coverage
+    return unless is_shop? && benefit_sponsorship.present? && sponsored_benefit_package.benefit_application.present?
+    reinstated_app = benefit_sponsorship.benefit_applications.detect{|app| app.active? && app.reinstated_id == sponsored_benefit_package.benefit_application.id}
+    return unless reinstated_app.present?
+    parent_reinstated_app = reinstated_app.parent_reinstate_application
+    return unless parent_reinstated_app.benefit_packages.map(&:id).include?(sponsored_benefit_package_id)
+    reinstated_package = reinstated_app.benefit_packages.where(title: sponsored_benefit_package.title).first
+    return unless reinstated_package.present? || self.terminated_on != parent_reinstated_app.end_on
+    reinstates = family.hbx_enrollments.where(effective_on: reinstated_app.start_on,
+                                              :sponsored_benefit_package_id.in => reinstated_app.benefit_packages.map(&:id),
+                                              kind: kind,
+                                              coverage_kind: coverage_kind,
+                                              employee_role_id: employee_role_id)
+    reinstates.each do |enrollment|
+      enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
+    end
+    ::Operations::HbxEnrollments::Reinstate.new.call({hbx_enrollment: self, options: {benefit_package: reinstated_package, notify: true}})
   end
 
   def non_inactive_transition?
@@ -1151,7 +1181,7 @@ class HbxEnrollment
 
   def benefit_sponsorship
     return @benefit_sponsorship if defined? @benefit_sponsorship
-    @benefit_sponsorship = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.find(benefit_sponsorship_id)
+    @benefit_sponsorship = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(id: benefit_sponsorship_id).first
   end
 
   def benefit_sponsorship=(benefit_sponsorship)
@@ -1782,7 +1812,7 @@ class HbxEnrollment
       transitions from: :shopping, to: :renewing_waived
     end
 
-    event :select_coverage, :after => [:record_transition, :propagate_selection] do
+    event :select_coverage, :after => [:record_transition, :propagate_selection, :update_reinstate_coverage] do
       transitions from: :shopping,
                   to: :coverage_selected, :guard => :can_select_coverage?
       transitions from: [:auto_renewing, :actively_renewing],
@@ -1806,7 +1836,7 @@ class HbxEnrollment
 
     event :waive_coverage, :after => :record_transition do
       transitions from: [:shopping, :coverage_selected, :auto_renewing, :renewing_coverage_selected, :coverage_reinstated],
-                  to: :inactive, after: :propogate_waiver
+                  to: :inactive, after: [:propogate_waiver, :update_reinstate_coverage]
     end
 
     event :begin_coverage, :after => :record_transition do
@@ -2261,6 +2291,12 @@ class HbxEnrollment
 
   def is_waived?
     workflow_state_transitions.any?{|wfst| wfst.event.match(/waive_coverage/) && wfst.to_state == 'inactive'}
+  end
+
+  def dep_age_off_market_key
+    product_ref_key = sponsored_benefit&.reference_product&.benefit_market_kind
+    return nil unless product_ref_key
+    product_ref_key == :aca_shop ? :aca_shop_dependent_age_off : :aca_fehb_dependent_age_off
   end
 
   def canceled_after?(transition, cancellation_time)
