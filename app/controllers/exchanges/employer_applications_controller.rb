@@ -6,7 +6,7 @@ module Exchanges
     include Config::AcaHelper
     include ::L10nHelper
 
-    before_action :can_modify_plan_year?, only: [:terminate, :cancel]
+    before_action :can_modify_plan_year?, only: [:terminate, :cancel, :reinstate]
     before_action :check_hbx_staff_role, except: :term_reasons
     before_action :find_benefit_sponsorship, except: :term_reasons
 
@@ -57,15 +57,18 @@ module Exchanges
     end
 
     def reinstate
-      @application = @benefit_sponsorship.benefit_applications.find(params[:employer_application_id])
-      effective_date = if [:terminated, :termination_pending].include?(@application.aasm_state)
-                         @application.effective_period.max + 1.day
-                       else
-                         @application.effective_period.min
-                       end
-
-      flash[:notice] = "#{@benefit_sponsorship.legal_name} - #{l10n('exchange.employer_applications.success_message')} #{effective_date}"
-      render :js => "window.location = #{exchanges_hbx_profiles_root_path.to_json}"
+      application = @benefit_sponsorship.benefit_applications.find(params[:employer_application_id])
+      transmit_to_carrier = params['transmit_to_carrier'] == "true" || params['transmit_to_carrier'] == true ? true : false
+      result = EnrollRegistry[:benefit_application_reinstate]{ {params: {benefit_application: application, options: {transmit_to_carrier: transmit_to_carrier} } } }
+      if result.success?
+        flash[:notice] = "#{application.benefit_sponsorship.legal_name} - #{l10n('exchange.employer_applications.success_message')} #{(application.canceled? ? application.start_on : application.end_on.next_day).to_date}"
+      else
+        flash[:error] = "#{application.benefit_sponsorship.legal_name} - #{result.failure}"
+      end
+      redirect_to exchanges_hbx_profiles_root_path
+    rescue StandardError => e
+      Rails.logger.error { "#{application.benefit_sponsorship.legal_name} - #{l10n('exchange.employer_applications.unable_to_reinstate')} - #{e.backtrace}" }
+      redirect_to exchanges_hbx_profiles_root_path, :flash[:error] => "#{application.benefit_sponsorship.legal_name} - #{l10n('exchange.employer_applications.unable_to_reinstate')}"
     end
 
     private

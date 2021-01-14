@@ -42,7 +42,8 @@ module BenefitSponsors
                                                   terminated: :terminate,
                                                   termination_pending: :termination_pending,
                                                   canceled: :cancel,
-                                                  retroactive_canceled: :cancel
+                                                  retroactive_canceled: :cancel,
+                                                  reinstated: :reinstate
                                                 }
 
     VOLUNTARY_TERMINATED_PLAN_YEAR_EVENT_TAG = "benefit_coverage_period_terminated_voluntary".freeze
@@ -286,7 +287,7 @@ module BenefitSponsors
       if benefit_sponsorship.source_kind == :mid_plan_year_conversion && predecessor.blank?
         end_on.prev_year + 1.day
       else
-        start_on
+        benefit_sponsor_catalog.start_on
       end
     end
 
@@ -495,11 +496,13 @@ module BenefitSponsors
       IMPORTED_STATES.include?(aasm_state)
     end
 
+    # rubocop:disable Style/InverseMethods
     def is_renewing?
-      required_states = (APPLICATION_APPROVED_STATES + APPLICATION_DRAFT_STATES + ENROLLING_STATES + ENROLLMENT_ELIGIBLE_STATES )
-      applications = sponsor_profile.benefit_applications.where(:"effective_period.min".gt => effective_period.min, :"aasm_state".in => required_states + [:active, :expired])
+      required_states = (APPLICATION_APPROVED_STATES + APPLICATION_DRAFT_STATES + ENROLLING_STATES + ENROLLMENT_ELIGIBLE_STATES)
+      applications = sponsor_profile.benefit_applications.where(:"effective_period.min".gt => effective_period.min, :aasm_state.in => required_states + [:active, :expired])
       predecessor.present? && (required_states + ENROLLMENT_INELIGIBLE_STATES).include?(aasm_state) && !(applications.count > 0)
     end
+    # rubocop:enable Style/InverseMethods
 
     def is_renewal_enrolling?
       predecessor.present? && (ENROLLING_STATES).include?(aasm_state)
@@ -856,7 +859,7 @@ module BenefitSponsors
       state :retroactive_canceled,   :after_enter => :transition_benefit_package_members  # Application closed after coverage taking to effect
       state :termination_pending, :after_enter => :transition_benefit_package_members # Coverage under this application is termination pending
       state :suspended   # Coverage is no longer in effect. members may not enroll or change enrollments
-      state :reinstated # This is tmp state in between draft and active(any active state).
+      state :reinstated, :after_enter => :transition_benefit_package_members # This is tmp state in between draft and active(any active state).
 
       after_all_transitions [:publish_state_transition, :notify_application]
 
@@ -1202,6 +1205,10 @@ module BenefitSponsors
     def parent_reinstate_application
       return unless reinstated_id
       self.class.find(reinstated_id)
+    end
+
+    def canceled?
+      [:canceled, :retroactive_canceled].include?(aasm_state)
     end
 
     private

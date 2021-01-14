@@ -13,11 +13,14 @@ module Operations
       include Dry::Monads[:result, :do]
 
       # @param [ HbxEnrollment ] hbx_enrollment
+      # @param [ Hash ] options include new benefit package which will
+      # be used to pull benefit group assignment
       # @return [ HbxEnrollment ] hbx_enrollment
       def call(params)
-        values           = yield validate(params)
-        new_enr          = yield new_hbx_enrollment(values)
-        hbx_enrollment   = yield reinstate_hbx_enrollment(new_enr)
+        values            = yield validate(params)
+        new_enr           = yield new_hbx_enrollment(values)
+        hbx_enrollment    = yield reinstate_hbx_enrollment(new_enr)
+        _hbx_enrollment   = yield reinstate_after_effects(hbx_enrollment)
 
         Success(hbx_enrollment)
       end
@@ -28,23 +31,18 @@ module Operations
         return Failure('Missing Key.') unless params.key?(:hbx_enrollment)
         return Failure('Not a valid HbxEnrollment object.') unless params[:hbx_enrollment].is_a?(HbxEnrollment)
         return Failure('Not a SHOP enrollment.') unless params[:hbx_enrollment].is_shop?
-        return Failure('Given HbxEnrollment is not in any of the valid states for reinstatement states.') unless valid_by_states?(params[:hbx_enrollment])
+        return Failure('Given HbxEnrollment is not in any of the valid states for reinstatement states.') unless params[:hbx_enrollment].eligible_to_reinstate?
+        return Failure("Missing benefit package.") unless params[:options] && params[:options][:benefit_package]
         return Failure("Active Benefit Group Assignment does not exist for the effective_on: #{@effective_on}") unless active_bga_exists?(params)
         return Failure('Overlapping coverage exists for this family in current year.') if overlapping_enrollment_exists?
 
         Success(params)
       end
 
-      def valid_by_states?(enrollment)
-        aasm_state = enrollment.aasm_state
-        return true if ['coverage_terminated', 'coverage_termination_pending'].include?(aasm_state)
-        aasm_state == 'coverage_canceled' && enrollment.terminate_reason == 'retroactive_canceled'
-      end
-
       def active_bga_exists?(params)
         @effective_on = fetch_effective_on(params)
-        @bga = @current_enr.census_employee.benefit_group_assignments.where(:'$or' => [{:start_on.gte => @effective_on, :end_on.lte => @effective_on},
-                                                                                       {:start_on.gte => @effective_on, end_on: nil}]).first
+        @notify = params[:options].present? && params[:options][:notify] ? params[:options][:notify] : true
+        @bga = @current_enr.census_employee.benefit_group_assignments.by_benefit_package(params[:options][:benefit_package]).order_by(:created_at.desc).detect{ |bga| bga.is_active?(@effective_on)}
       end
 
       def overlapping_enrollment_exists?
@@ -81,7 +79,7 @@ module Operations
       end
 
       def additional_params
-        attrs = {benefit_group_assignment_id: @bga.id, sponsored_benefit_package_id: @bga.benefit_package_id}
+        attrs = {benefit_group_assignment_id: @bga.id, sponsored_benefit_package_id: @bga.benefit_package_id, predecessor_enrollment_id: @current_enr.id}
         if @current_enr.is_health_enrollment?
           attrs.merge({sponsored_benefit_id: @bga.benefit_package.health_sponsored_benefit.id})
         else
@@ -106,9 +104,36 @@ module Operations
         else
           return Failure('Cannot transition to state coverage_selected on event begin_coverage.') unless new_enrollment.may_begin_coverage?
           new_enrollment.begin_coverage!
+          new_enrollment.begin_coverage! if TimeKeeper.date_of_record >= new_enrollment.effective_on && new_enrollment.may_begin_coverage?
         end
 
         Success(new_enrollment)
+      end
+
+      def notify_trading_partner(hbx_enrollment)
+        hbx_enrollment.notify_of_coverage_start(@notify)
+      end
+
+      def update_benefit_group_assignment(hbx_enrollment)
+        assignment = hbx_enrollment.census_employee.benefit_group_assignment_by_package(hbx_enrollment.sponsored_benefit_package_id, hbx_enrollment.effective_on)
+        assignment&.update_attributes(hbx_enrollment_id: hbx_enrollment.id)
+      end
+
+      def terminate_dependent_age_off(hbx_enrollment)
+        ::Operations::HbxEnrollments::DependentAgeOff.new.call({hbx_enrollment: hbx_enrollment})
+      end
+
+      def terminate_employment_term_enrollment(hbx_enrollment)
+        ::Operations::HbxEnrollments::Terminate.new.call({hbx_enrollment: hbx_enrollment, options: {notify: @notify}})
+      end
+
+      def reinstate_after_effects(hbx_enrollment)
+        notify_trading_partner(hbx_enrollment)
+        update_benefit_group_assignment(hbx_enrollment)
+        terminate_dependent_age_off(hbx_enrollment)
+        terminate_employment_term_enrollment(hbx_enrollment)
+
+        Success(hbx_enrollment)
       end
     end
   end

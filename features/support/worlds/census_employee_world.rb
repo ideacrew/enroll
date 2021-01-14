@@ -312,6 +312,14 @@ And(/^Assign benefit group assignments to (.*?) employee$/) do |legal_name|
   end
 end
 
+And(/^employee should see (.*?) enrollment$/) do |enrollment_status|
+  if enrollment_status == 'terminated'
+    expect(page).to have_content('Terminated')
+  else
+    expect(page).to have_content('Termination Pending')
+  end
+end
+
 And(/^employees for (.*?) have a selected coverage$/) do |legal_name|
 
   step "Employees for #{legal_name} have both Benefit Group Assignments Employee role"
@@ -420,7 +428,35 @@ And(/^employee (.*?) of employer (.*?) most recent HBX Enrollment should be unde
   expect(off_cycle_enrollments).to include(most_recent_enrollment)
 end
 
-And(/^employer (.*?) with employee (.*?) has has person and user record present$/) do |legal_name, named_person|
+And(/^employee (.*?) of employer (.*?) most recent HBX Enrollment should be under the future reinstated benefit application$/) do |named_person, _legal_name|
+  sleep 1
+  person = people[named_person]
+  person_record = Person.where(first_name: person[:first_name], last_name: person[:last_name]).last
+  census_employee = CensusEmployee.where(first_name: person[:first_name], last_name: person[:last_name]).last
+  reinstated_benefit_application = census_employee.benefit_sponsorship.future_active_reinstated_benefit_application
+  benefit_package = reinstated_benefit_application.benefit_packages[0]
+  sponsored_benefit = benefit_package.sponsored_benefits.first
+  end_date = reinstated_benefit_application.end_on
+  reinstated_enrollments = HbxEnrollment.by_benefit_application_and_sponsored_benefit(reinstated_benefit_application, sponsored_benefit, end_date)
+  most_recent_enrollment = person_record.primary_family.hbx_enrollments.last
+  expect(reinstated_enrollments).to include(most_recent_enrollment)
+end
+
+And(/^employee (.*?) of employer (.*?) most recent HBX Enrollment should be under the (termination pending|reinstated) benefit application$/) do |named_person, _legal_name, _aasm_state|
+  sleep 1
+  person = people[named_person]
+  person_record = Person.where(first_name: person[:first_name], last_name: person[:last_name]).last
+  census_employee = CensusEmployee.where(first_name: person[:first_name], last_name: person[:last_name]).last
+  current_benefit_application = census_employee.benefit_sponsorship.current_benefit_application
+  benefit_package = current_benefit_application.benefit_packages[0]
+  sponsored_benefit = benefit_package.sponsored_benefits.first
+  end_date = current_benefit_application.end_on
+  current_enrollments = HbxEnrollment.by_benefit_application_and_sponsored_benefit(current_benefit_application, sponsored_benefit, end_date)
+  most_recent_enrollment = person_record.primary_family.hbx_enrollments.last
+  expect(current_enrollments).to include(most_recent_enrollment)
+end
+
+And(/^employer (.*?) with employee (.*?) has has person and user record present$/) do |_legal_name, named_person|
   person = people[named_person]
   person_record_from_census_employee(person)
   user_record_from_census_employee(person)
@@ -444,4 +480,32 @@ And(/^employer (.*?) with employee (.*?) has (.*?) hbx_enrollment with health pr
   attributes[:sponsored_benefit_id] = benefit_package.sponsored_benefits.first.id
   attributes[:sponsored_benefit_package_id] = benefit_package.id
   build_enrollment(attributes, :with_health_product)
+end
+
+And(/(.*) has census employee, person record, and active coverage for employee (.*)/) do |legal_name, named_person|
+  person = people[named_person]
+  person_rec = FactoryBot.create(:person,
+                                 :with_family,
+                                 first_name: person[:first_name],
+                                 last_name: person[:last_name])
+  ce = employee_by_legal_name(legal_name, person_rec)
+  benefit_package = ce.active_benefit_group_assignment.benefit_package
+  hbx_enrollment_member = FactoryBot.build(:hbx_enrollment_member, applicant_id: person_rec.primary_family.primary_applicant.id)
+  FactoryBot.create(:hbx_enrollment,
+                    family: person_rec.primary_family,
+                    household: person_rec.primary_family.active_household,
+                    coverage_kind: "health",
+                    effective_on: benefit_package.start_on,
+                    enrollment_kind: "open_enrollment",
+                    kind: "employer_sponsored",
+                    submitted_at: benefit_package.start_on - 20.days,
+                    employee_role_id: person_rec.active_employee_roles.first.id,
+                    benefit_group_assignment_id: ce.active_benefit_group_assignment.id,
+                    benefit_sponsorship_id: ce.benefit_sponsorship.id,
+                    sponsored_benefit_package_id: benefit_package.id,
+                    sponsored_benefit_id: benefit_package.health_sponsored_benefit.id,
+                    rating_area_id: benefit_package.rating_area.id,
+                    product_id: benefit_package.health_sponsored_benefit.products(benefit_package.start_on).first.id,
+                    issuer_profile_id: benefit_package.health_sponsored_benefit.products(benefit_package.start_on).first.issuer_profile.id,
+                    hbx_enrollment_members: [hbx_enrollment_member])
 end

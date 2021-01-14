@@ -252,6 +252,64 @@ RSpec.describe Employers::EmployerHelper, :type => :helper, dbclean: :after_each
       end
     end
 
+    describe 'reinstated_benefit_packages_with_future_date' do
+      include_context "setup benefit market with market catalogs and product packages"
+      include_context "setup renewal application"
+
+      before do
+        assign(:benefit_sponsorship, benefit_sponsorship)
+      end
+
+      it 'should return reinstated benefit application benefit packages if ba is future active' do
+        renewal_application.update_attributes(reinstated_id: BSON::ObjectId.new, aasm_state: :active)
+        expect(helper.reinstated_benefit_packages_with_future_date_for_census_employee).to eq renewal_application.benefit_packages
+      end
+
+      it 'should return empty array if benefit application is reinstated and is currently active' do
+        renewal_application.update_attributes(reinstated_id: BSON::ObjectId.new, aasm_state: :active, effective_period: TimeKeeper.date_of_record.beginning_of_year..TimeKeeper.date_of_record.end_of_year)
+        expect(helper.reinstated_benefit_packages_with_future_date_for_census_employee).to eq []
+      end
+    end
+
+    describe 'current_option_for_reinstated_benefit_package' do
+      include_context "setup benefit market with market catalogs and product packages"
+      include_context "setup initial benefit application"
+
+      let(:benefit_package)      { initial_application.benefit_packages.first }
+      let(:census_employee)      { FactoryBot.create(:census_employee, employer_profile: abc_profile) }
+      let(:benefit_group_assignment) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: benefit_package, census_employee: census_employee)}
+
+
+      before do
+        assign(:census_employee, census_employee)
+        assign(:employer_profile, abc_profile)
+        period = initial_application.effective_period.min + 1.year..(initial_application.effective_period.max + 1.year)
+        initial_application.update_attributes!(reinstated_id: BSON::ObjectId.new, aasm_state: :active, effective_period: period)
+        benefit_group_assignment.update_attributes(start_on: initial_application.effective_period.min)
+      end
+
+      context 'If py is reinstated' do
+        it 'should return the benefit package id if PY is reinstated and census employee is assigned one' do
+          census_employee.benefit_sponsorship = abc_profile.benefit_sponsorships.first
+          census_employee.save
+          expect(helper.current_option_for_reinstated_benefit_package).to eq benefit_package.id
+        end
+
+        it 'should return the benefit package id from profile if census employee is not assigned one' do
+          census_employee.benefit_group_assignments = []
+          expect(helper.current_option_for_reinstated_benefit_package).to eq benefit_package.id
+        end
+      end
+
+      context 'if reinstated py is not present' do
+        it 'should return nil if reinstated PY is not present' do
+          census_employee.benefit_group_assignments = []
+          initial_application.update_attributes!(reinstated_id: nil)
+          expect(helper.current_option_for_reinstated_benefit_package).to eq nil
+        end
+      end
+    end
+
     describe " invoice date" do
       context "invoice_formated_date" do
         it "should return Month-Year format for a giving date" do
@@ -510,8 +568,8 @@ RSpec.describe Employers::EmployerHelper, :type => :helper, dbclean: :after_each
 
         it 'For retroactive cancel benefit_application' do
           initial_application.update_attributes!(effective_period: start_on..cancel_end_on)
-          initial_application.update_attributes!(aasm_state: :retroactive_cancel)
-          expect(initial_application.aasm_state).to eq :retroactive_cancel
+          initial_application.update_attributes!(aasm_state: :retroactive_canceled)
+          expect(initial_application.aasm_state).to eq :retroactive_canceled
           expect(display_reinstate_ba).to eq true
         end
 
@@ -543,8 +601,8 @@ RSpec.describe Employers::EmployerHelper, :type => :helper, dbclean: :after_each
 
         it 'For retroactive cancel benefit_application' do
           initial_application.update_attributes!(effective_period: start_on..cancel_end_on)
-          initial_application.update_attributes!(aasm_state: :retroactive_cancel)
-          expect(initial_application.aasm_state).to eq :retroactive_cancel
+          initial_application.update_attributes!(aasm_state: :retroactive_canceled)
+          expect(initial_application.aasm_state).to eq :retroactive_canceled
           expect(display_reinstate_ba).to eq false
         end
 

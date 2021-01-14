@@ -40,11 +40,13 @@ Then("Admin will see confirmation pop modal") do
 end
 
 When("Admin clicks on continue button for reinstating benefit_application") do
-  find('.btn', text: 'CONTINUE').click
+  click_button 'Continue'
+  sleep 1
 end
 
-Then("Admin will see a Successfull message") do
-  expect(page).to have_content("Plan Year Reinstated Successfully")
+Then("Admin will see a Successful message") do
+  sleep 2
+  expect(page).to have_content(/Plan Year Reinstated Successfully/)
 end
 
 And(/^initial employer ABC Widgets has updated (.*) effective period for reinstate$/) do |aasm_state|
@@ -56,6 +58,27 @@ And(/^initial employer ABC Widgets has updated (.*) effective period for reinsta
     effective_period = start_on..end_on
     cancel_ba.benefit_sponsor_catalog.update_attributes!(effective_period: effective_period)
     employer_profile.benefit_applications.first.update_attributes!(effective_period: effective_period)
+  end
+end
+
+And(/^initial employer ABC Widgets application (.*)$/) do |aasm_state|
+  application = employer_profile.benefit_applications.first
+  if aasm_state == 'termination_pending'
+    updated_dates = application.effective_period.min.to_date..TimeKeeper.date_of_record.last_month.end_of_month
+    application.update_attributes!(:effective_period => updated_dates, :terminated_on => TimeKeeper.date_of_record, termination_reason: 'nonpayment')
+    application.schedule_enrollment_termination!
+  elsif  aasm_state == 'terminated'
+    updated_dates = application.effective_period.min.to_date..TimeKeeper.date_of_record.prev_month.end_of_month
+    application.update_attributes!(:effective_period => updated_dates, :terminated_on => TimeKeeper.date_of_record, termination_reason: 'nonpayment')
+    application.terminate_enrollment!
+  elsif ['retroactive_canceled', 'canceled'].include?(aasm_state)
+    if aasm_state == 'retroactive_canceled'
+      application.cancel!
+    else
+      application.update_attributes(aasm_state: :canceled)
+      application.workflow_state_transitions << WorkflowStateTransition.new(from_state: 'active', to_state: 'canceled', event: 'cancel!')
+      application.benefit_packages.each(&:cancel_member_benefits)
+    end
   end
 end
 
@@ -75,6 +98,14 @@ Given("active benefit application is a reinstated benefit application") do
   reinstated_ba.update_attributes!(effective_period: effective_period, reinstated_id: @terminated_ba.id)
 end
 
-And("Employer see reinstated benefit application") do
+And(/^(.*) should see a reinstated indicator on benefit application$/) do |_user|
   expect(page).to have_content('Reinstated')
+end
+
+When("the Admin click on the employer ABC Widgets") do
+  find('.interaction-click-control-abc-widgets').click
+end
+
+Then("Admin lands on employer ABC Widgets profile") do
+  expect(page).to have_content('ABC Widgets')
 end
