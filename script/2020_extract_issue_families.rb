@@ -130,7 +130,7 @@ def find_history_tracks(client, person_id)
   results = Array.new
   Person.find(
     lookup_id
-  ).first.history_tracks.each do |doc|
+  ).history_tracks.each do |doc|
     results << doc
   end
   results
