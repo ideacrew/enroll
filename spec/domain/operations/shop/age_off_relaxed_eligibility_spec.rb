@@ -39,6 +39,7 @@ module Operations
         end
 
         before do
+          enrollment.update_attributes(kind: "individual")
           person.update_attributes(dob: Date.new(2021 - 26, 3, 15))
         end
 
