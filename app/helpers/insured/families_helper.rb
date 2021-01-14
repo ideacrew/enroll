@@ -120,22 +120,6 @@ module Insured::FamiliesHelper
     employee_role.employer_profile.active_broker_agency_account.writing_agent rescue false
   end
 
-  def disable_make_changes_button?(hbx_enrollment)
-    # return false if IVL
-    return false if hbx_enrollment.census_employee.blank?
-    return false if !hbx_enrollment.is_shop?
-    # Enable the button under these conditions
-      # 1) plan year under open enrollment period
-      # 2) new hire covered under enrolment period
-      # 3) qle enrolmlent period check
-    return false if hbx_enrollment.sponsored_benefit_package.open_enrollment_contains?(TimeKeeper.date_of_record)
-    return false if hbx_enrollment.employee_role.can_enroll_as_new_hire?
-    return false if hbx_enrollment.family.is_under_special_enrollment_period? && hbx_enrollment.active_during?(hbx_enrollment.family.current_sep.effective_on)
-
-    # Disable only  if non of the above conditions match
-    true
-  end
-
   def all_active_enrollment_with_aptc(family)
     family.active_household.active_hbx_enrollments_with_aptc_by_year(TimeKeeper.datetime_of_record.year)
   end
@@ -234,5 +218,53 @@ module Insured::FamiliesHelper
       second_checked = !person.consumer_role.is_applying_coverage
     end
     return first_checked, second_checked
+  end
+
+  def current_market_kind(person)
+    if person.is_consumer_role_active? || person.is_resident_role_active?
+      person.active_individual_market_role
+    else
+      "No Consumer/CoverAll Market"
+    end
+  end
+
+  def new_market_kind(person)
+    if person.is_consumer_role_active?
+      "resident"
+    elsif person.is_resident_role_active?
+      "consumer"
+    else
+      " - "
+    end
+  end
+
+  def build_consumer_role(person, family)
+    if family.primary_applicant.person == person
+      contact_method = person.resident_role&.contact_method ? person.resident_role.contact_method : "Paper and Electronic communications"
+      person.build_consumer_role({:is_applicant => true, :contact_method => contact_method})
+    else
+      person.build_consumer_role({:is_applicant => false})
+    end
+    person.save!
+  end
+
+  def build_resident_role(person, family)
+    if family.primary_applicant.person == person
+      contact_method = person.consumer_role&.contact_method ? person.consumer_role.contact_method : "Paper and Electronic communications"
+      person.build_resident_role({:is_applicant => true, :contact_method => contact_method })
+    else
+      person.build_resident_role({:is_applicant => false})
+    end
+    person.save!
+  end
+
+  def transition_reason(person)
+    if person.is_consumer_role_active?
+      @qle = QualifyingLifeEventKind.where(reason: 'eligibility_failed_or_documents_not_received_by_due_date').first
+      { @qle.title => @qle.reason }
+    elsif person.is_resident_role_active?
+      @qle = QualifyingLifeEventKind.where(reason: 'eligibility_documents_provided').first
+      { @qle.title => @qle.reason }
+    end
   end
 end

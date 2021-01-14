@@ -8,7 +8,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
   describe HbxEnrollment, dbclean: :around_each do
     include_context "setup benefit market with market catalogs and product packages"
     include_context "setup initial benefit application"
-    
+
     context "an employer defines a plan year with multiple benefit groups, adds employees to roster and assigns benefit groups" do
 
       before do
@@ -517,7 +517,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
       include_context "BradyWorkAfterAll"
 
       attr_reader :household, :coverage_household
-      
+
       before :all do
         create_brady_coverage_households
         @household = mikes_family.households.first
@@ -694,7 +694,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
         end
       end
     end
-    
+
     if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         context "ivl user switching plan from one carrier to other carrier previous hbx_enrollment aasm_sate should be cancel/terminate in DB." do
           let(:person1) {FactoryGirl.create(:person, :with_consumer_role)}
@@ -1434,7 +1434,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
       )
     }
 
-    before do 
+    before do
       employee_role.update(census_employee_id: census_employee.id)
     end
 
@@ -2032,7 +2032,7 @@ describe HbxEnrollment, type: :model, :dbclean => :after_each do
     describe "given an renewing employer just entered open enrollment", dbclean: :after_each do
       describe "with employees who have made the following plan selections previous year:
         - employee A has purchased:
-          - One health enrollment (Enrollment 1)         
+          - One health enrollment (Enrollment 1)
           - One dental enrollment (Enrollment 2)
         - employee B has purchased:
           - One health enrollment (Enrollment 3)
@@ -2062,7 +2062,7 @@ describe HbxEnrollment, type: :model, :dbclean => :after_each do
         }
 
         let!(:enrollment_2) {
-          create_enrollment(family: employee_A.person.primary_family, benefit_group_assignment: employee_A.census_employee.active_benefit_group_assignment, employee_role: employee_A, 
+          create_enrollment(family: employee_A.person.primary_family, benefit_group_assignment: employee_A.census_employee.active_benefit_group_assignment, employee_role: employee_A,
             submitted_at: current_effective_date - 10.days, coverage_kind: 'dental')
         }
 
@@ -2077,7 +2077,7 @@ describe HbxEnrollment, type: :model, :dbclean => :after_each do
         }
 
         let!(:enrollment_4) {
-          create_enrollment(family: employee_B.person.primary_family, benefit_group_assignment: employee_B.census_employee.active_benefit_group_assignment, employee_role: employee_B, 
+          create_enrollment(family: employee_B.person.primary_family, benefit_group_assignment: employee_B.census_employee.active_benefit_group_assignment, employee_role: employee_B,
             submitted_at: current_effective_date - 10.days, coverage_kind: 'dental', status: 'inactive')
         }
 
@@ -2092,7 +2092,7 @@ describe HbxEnrollment, type: :model, :dbclean => :after_each do
         }
 
         let!(:enrollment_6) {
-          create_enrollment(family: employee_C.person.primary_family, benefit_group_assignment: employee_C.census_employee.active_benefit_group_assignment, employee_role: employee_C, 
+          create_enrollment(family: employee_C.person.primary_family, benefit_group_assignment: employee_C.census_employee.active_benefit_group_assignment, employee_role: employee_C,
             submitted_at: current_effective_date - 10.days, coverage_kind: 'dental')
         }
 
@@ -2107,7 +2107,7 @@ describe HbxEnrollment, type: :model, :dbclean => :after_each do
         }
 
         let!(:enrollment_8) {
-          create_enrollment(family: employee_D.person.primary_family, benefit_group_assignment: employee_D.census_employee.active_benefit_group_assignment, employee_role: employee_D, 
+          create_enrollment(family: employee_D.person.primary_family, benefit_group_assignment: employee_D.census_employee.active_benefit_group_assignment, employee_role: employee_D,
             submitted_at: current_effective_date - 10.days, coverage_kind: 'dental', status: 'inactive')
         }
 
@@ -2116,20 +2116,20 @@ describe HbxEnrollment, type: :model, :dbclean => :after_each do
           create_person(ce, abc_profile)
         }
 
-        let(:renewal_application) { 
+        let(:renewal_application) do
           renewal_effective_date = current_effective_date.next_year
           service_areas = initial_application.benefit_sponsorship.service_areas_on(renewal_effective_date)
           benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(service_areas, renewal_effective_date)
           r_application = initial_application.renew(benefit_sponsor_catalog)
           r_application.save
           r_application
-        }
+        end
 
         let(:renewal_benefit_package) {
           renewal_application.benefit_packages[0]
         }
 
-        before do 
+        before do
           allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).and_return(100.0)
           allow_any_instance_of(BenefitSponsors::Factories::EnrollmentRenewalFactory).to receive(:has_renewal_product?).and_return(true)
           renewal_benefit_package.sponsored_benefits.each do |sponsored_benefit|
@@ -2138,7 +2138,7 @@ describe HbxEnrollment, type: :model, :dbclean => :after_each do
           renewal_application
         end
 
-        context 'renewing employee A' do 
+        context 'renewing employee A' do
 
           before do
             renewal_benefit_package.renew_member_benefit(census_employees[0])
@@ -2157,7 +2157,7 @@ describe HbxEnrollment, type: :model, :dbclean => :after_each do
           end
         end
 
-        context 'renewing employee B' do 
+        context 'renewing employee B' do
 
           before do
             renewal_benefit_package.renew_member_benefit(census_employees[1])
@@ -2193,7 +2193,7 @@ describe HbxEnrollment, type: :model, :dbclean => :after_each do
           end
         end
 
-        context 'renewing employee D' do 
+        context 'renewing employee D' do
 
           before do
             renewal_benefit_package.renew_member_benefit(census_employees[3])
@@ -2213,7 +2213,7 @@ describe HbxEnrollment, type: :model, :dbclean => :after_each do
         end
 
         context 'renewing employee E' do
-         
+
           before do
             renewal_benefit_package.renew_member_benefit(census_employees[4])
             family.reload
@@ -2554,22 +2554,26 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
     context "for Individual market" do
       let(:ivl_family)        { FactoryGirl.create(:family, :with_primary_family_member) }
 
-      let(:ivl_enrollment)    { ivl_family.active_household.hbx_enrollments.create( 
-                                  coverage_kind: "health",
-                                  effective_on: TimeKeeper.date_of_record.last_year.beginning_of_month,
-                                  enrollment_kind: "open_enrollment",
-                                  kind: "individual",
-                                  aasm_state: "coverage_terminated",
-                                  terminated_on: TimeKeeper.date_of_record.end_of_month)
-      }
+      let(:ivl_enrollment) do
+        ivl_family.active_household.hbx_enrollments.create(
+          coverage_kind: "health",
+          effective_on: TimeKeeper.date_of_record.last_year.beginning_of_month,
+          enrollment_kind: "open_enrollment",
+          kind: "individual",
+          aasm_state: "coverage_terminated",
+          terminated_on: TimeKeeper.date_of_record.end_of_month
+        )
+      end
 
-      let!(:ivl_enrollment2)    { ivl_family.active_household.hbx_enrollments.create( 
-                                    coverage_kind: "health",
-                                    enrollment_kind: "open_enrollment",
-                                    kind: "individual",
-                                    aasm_state: "coverage_selected",
-                                    effective_on: TimeKeeper.date_of_record.end_of_month + 1.day)
-      }
+      let!(:ivl_enrollment2) do
+        ivl_family.active_household.hbx_enrollments.create(
+          coverage_kind: "health",
+          enrollment_kind: "open_enrollment",
+          kind: "individual",
+          aasm_state: "coverage_selected",
+          effective_on: TimeKeeper.date_of_record.end_of_month + 1.day
+        )
+      end
 
 
       it "should return true if active enrollment exists for reinstated date " do
@@ -2725,6 +2729,162 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
 
         it "should return false when reinstated date enrollment exits with different employer " do
           expect(enrollment3.has_active_or_term_exists_for_reinstated_date?).to be_falsey
+        end
+      end
+    end
+  end
+
+  context '.display_make_changes_for_shop?' do
+    let(:user) { FactoryGirl.create(:user, roles: ["hbx_staff"]) }
+    let!(:person) { FactoryGirl.create(:person)}
+    let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+    let!(:household) { FactoryGirl.create(:household, family: family) }
+    let(:hbx_profile) {FactoryGirl.create(:hbx_profile)}
+    let(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
+    let!(:sponsored_benefit) { double }
+
+    let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
+    let(:sep) {SpecialEnrollmentPeriod.new(effective_on: TimeKeeper.date_of_record, start_on: TimeKeeper.date_of_record, end_on: TimeKeeper.date_of_record + 1)}
+    let!(:enrollment) do
+      FactoryGirl.create(
+        :hbx_enrollment,
+        household: family.active_household,
+        coverage_kind: "health",
+        effective_on: TimeKeeper.date_of_record.beginning_of_year,
+        aasm_state: 'coverage_selected'
+      )
+    end
+    let(:employee_role_double) { double(id: 1) }
+
+    if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
+      context 'for ivl' do
+        before do
+          allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
+          allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
+          allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(benefit_coverage_period)
+          allow(enrollment).to receive(:sponsored_benefit_package).and_return(sponsored_benefit)
+          allow(sponsored_benefit).to receive(:open_enrollment_contains?).with(TimeKeeper.date_of_record).and_return(true)
+          enrollment.kind = 'individual'
+          enrollment.save
+        end
+
+        it 'should return false' do
+          expect(enrollment.display_make_changes_for_shop?).to be_falsey
+        end
+      end
+    end
+
+    context 'for shop' do
+      before :each do
+        allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
+        allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
+        allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(benefit_coverage_period)
+        allow(enrollment).to receive(:sponsored_benefit_package).and_return(sponsored_benefit)
+        allow(enrollment).to receive(:employee_role).and_return(employee_role_double)
+      end
+
+      context "is_not_most_recent_sep_enrollment?" do
+        before do
+          # False for "or" statements
+          allow(enrollment.employee_role).to receive(:can_enroll_as_new_hire?).and_return(false)
+          allow(sponsored_benefit).to receive(:open_enrollment_contains?).with(TimeKeeper.date_of_record).and_return(false)
+        end
+
+        it 'should display make changes if true' do
+          allow(enrollment.family).to receive(:enrollment_is_not_most_recent_sep_enrollment?).with(enrollment).and_return(true)
+          expect(enrollment.display_make_changes_for_shop?).to eq(true)
+        end
+
+        it "should not display make changes if false" do
+          allow(enrollment.family).to receive(:enrollment_is_not_most_recent_sep_enrollment?).with(enrollment).and_return(false)
+          expect(enrollment.display_make_changes_for_shop?).to be_falsey
+        end
+      end
+
+      context "can_enroll_as_new_hire?" do
+        before do
+          # False for "or" statements
+          allow(enrollment.family).to receive(:enrollment_is_not_most_recent_sep_enrollment?).with(enrollment).and_return(false)
+          allow(sponsored_benefit).to receive(:open_enrollment_contains?).with(TimeKeeper.date_of_record).and_return(false)
+        end
+
+        it "should display make changes if true" do
+          allow(enrollment.employee_role).to receive(:can_enroll_as_new_hire?).and_return(true)
+          expect(enrollment.display_make_changes_for_shop?).to eq(true)
+        end
+
+        it "should not display make changes if false" do
+          allow(enrollment.employee_role).to receive(:can_enroll_as_new_hire?).and_return(false)
+          expect(enrollment.display_make_changes_for_shop?).to be_falsey
+        end
+      end
+    end
+  end
+
+  context '.display_make_changes_for_ivl?' do
+    let(:user) { FactoryGirl.create(:user, roles: ["hbx_staff"]) }
+    let!(:person) { FactoryGirl.create(:person)}
+    let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+    let!(:household) { FactoryGirl.create(:household, family: family) }
+    let(:hbx_profile) {FactoryGirl.create(:hbx_profile)}
+    let(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
+    let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
+    let(:sep) {SpecialEnrollmentPeriod.new(effective_on: TimeKeeper.date_of_record, start_on: TimeKeeper.date_of_record, end_on: TimeKeeper.date_of_record + 1)}
+    let!(:enrollment) do
+      FactoryGirl.create(
+        :hbx_enrollment,
+        household: family.active_household,
+        coverage_kind: "health",
+        effective_on: TimeKeeper.date_of_record.beginning_of_year,
+        aasm_state: 'coverage_selected'
+      )
+    end
+
+    before :each do
+      allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
+      allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
+      allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(benefit_coverage_period)
+    end
+
+    context 'for shop' do
+
+      before do
+        enrollment.kind = 'employer_sponsored'
+        enrollment.save
+      end
+
+      it 'should return false' do
+        expect(enrollment.display_make_changes_for_ivl?).to be_falsey
+      end
+    end
+
+    if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
+      context 'for ivl' do
+
+        before do
+          enrollment.kind = 'individual'
+          enrollment.save
+        end
+
+        context 'family with active sep' do
+          before do
+            allow(family).to receive(:latest_ivl_sep).and_return sep
+          end
+
+          it 'should return true' do
+            expect(enrollment.display_make_changes_for_ivl?).to be_truthy
+          end
+        end
+
+        context 'under open enrollment period' do
+
+          before do
+            allow(family).to receive(:is_under_ivl_open_enrollment?).and_return true
+          end
+
+          it 'should return true' do
+            expect(enrollment.display_make_changes_for_ivl?).to be_truthy
+          end
         end
       end
     end
