@@ -97,7 +97,6 @@ module BenefitSponsors
 
         def reinstate(new_ba)
           return Failure('Cannot transition to state reinstated on event reinstate.') unless new_ba.may_reinstate?
-
           new_ba.reinstate!(@notify)
           return Failure('Cannot transition to state active on event activate_enrollment.') unless new_ba.may_activate_enrollment?
 

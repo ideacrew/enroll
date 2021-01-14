@@ -2,9 +2,9 @@ module Enrollments
   module Replicator
     class Reinstatement
 
-      attr_accessor :base_enrollment, :new_effective_date, :new_aptc, :year, :duplicate_hbx, :reinstate_enrollment
+      attr_accessor :base_enrollment, :new_effective_date, :new_aptc, :year, :duplicate_hbx, :reinstate_enrollment, :eligible_dependents
 
-      def initialize(enrollment, effective_date, new_aptc=nil)
+      def initialize(enrollment, effective_date, new_aptc = nil, eligible_dependents = nil)
         @base_enrollment = enrollment
         @new_effective_date = effective_date
         @new_aptc = new_aptc
@@ -12,6 +12,7 @@ module Enrollments
         # TODO: dupliate_hbx was in the inherited code but was undefined. Need to know
         # what it is supposed to be
         @duplicate_hbx = enrollment.dup
+        @eligible_dependents = eligible_dependents
       end
 
       def benefit_application
@@ -32,13 +33,10 @@ module Enrollments
 
       def renewal_benefit_group_assignment
         assignment = census_employee.renewal_benefit_group_assignment
-        if assignment.blank?
-          if census_employee.active_benefit_group_assignment.blank?
-            census_employee.save
-          end
-          if renewal_benefit_application == census_employee.published_benefit_group_assignment.benefit_application
-            assignment = census_employee.published_benefit_group_assignment
-          end
+        if assignment.blank? && census_employee.active_benefit_group_assignment(new_effective_date).blank?
+          census_employee.save
+        elsif renewal_benefit_application == census_employee.published_benefit_group_assignment.benefit_application
+          assignment = census_employee.published_benefit_group_assignment
         end
         assignment
       end
@@ -169,7 +167,12 @@ module Enrollments
       end
 
       def clone_hbx_enrollment_members
-        base_enrollment.hbx_enrollment_members.inject([]) do |members, hbx_enrollment_member|
+        enr_members = if @eligible_dependents.present?
+                        @eligible_dependents
+                      else
+                        base_enrollment.hbx_enrollment_members
+                      end
+        enr_members.inject([]) do |members, hbx_enrollment_member|
           members << HbxEnrollmentMember.new({
                                                  applicant_id: hbx_enrollment_member.applicant_id,
                                                  eligibility_date: new_effective_date,
