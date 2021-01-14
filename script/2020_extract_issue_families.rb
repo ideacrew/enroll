@@ -152,7 +152,7 @@ end
 
 db_client = Person.collection.client
 PERSON_HBX_ID_RECORDS.each do |id|
-  family = find_primary_family(client, id)
+  family = find_primary_family(db_client, id)
 
   File.open("#{id}.json", 'wb') do |f|
     f.puts(
