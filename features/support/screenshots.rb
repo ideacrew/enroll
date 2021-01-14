@@ -1,14 +1,17 @@
 Before do |scenario|
   @count = 0
-  case scenario
-  when Cucumber::RunningTestCase::ScenarioOutlineExample
+  case scenario.class.to_s
+  when "Cucumber::RunningTestCase::TestCase"
+    @scenario_name = scenario.name.downcase.gsub(' ', '_')
+    @feature_name = scenario.location.file.downcase.partition("/").last
+  when "Cucumber::RunningTestCase::ScenarioOutlineExample"
     @scenario_name = scenario.scenario_outline.name.downcase.gsub(' ', '_')
     @feature_name = scenario.scenario_outline.feature.name.downcase.gsub(' ', '_')
-  when Cucumber::RunningTestCase::Scenario
+  when "Cucumber::RunningTestCase::Scenario"
     @scenario_name = scenario.name.downcase.gsub(' ', '_')
     @feature_name = scenario.feature.name.downcase.gsub(' ', '_')
   else
-    raise("Unhandled class, look in features/support/screenshots.rb")
+    raise("Unhandled class, for #{scenario.class.s.to_s} look in features/support/screenshots.rb")
   end
 end
 
