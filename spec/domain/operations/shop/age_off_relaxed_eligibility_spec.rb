@@ -229,6 +229,24 @@ module Operations
             end
           end
 
+          context 'effective_on falls before dob' do
+            let(:input_params) do
+              {effective_on: Date.new(2021, 1, 14),
+               family_member: primary_fm,
+               market_key: :aca_individual_dependent_age_off,
+               relationship_kind: 'child'}
+            end
+
+            before do
+              enrollment.update_attributes(kind: "individual")
+              person.update_attributes(dob: Date.new(1995, 1, 12))
+            end
+
+            it 'should return success' do
+              expect(subject.call(input_params)).to be_a(Dry::Monads::Result::Success)
+            end
+          end
+
           context 'dob falls after effective_on' do
             let(:input_params) do
               {effective_on: Date.new(2021, 1, 1),
