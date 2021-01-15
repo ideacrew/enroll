@@ -89,6 +89,7 @@ PERSON_HBX_ID_RECORDS = [
 
 def find_primary_family(client, person_id)
   primary_id = find_person_id(person_id)
+
   family = Family.where(
     {
       "family_members" => {
@@ -114,7 +115,7 @@ def find_primary_family(client, person_id)
     }
   end
 
-  {
+  family_json = {
     family_id: family.id,
     primary: {
       person: (primary.as_extended_json.reject { |k,v| k.to_s == "inbox" }),
@@ -122,6 +123,60 @@ def find_primary_family(client, person_id)
     },
     members: member_jsons
   }
+
+  File.open("#{person_id}_primary.json", 'wb') do |f|
+    f.puts(
+      family_json.to_json
+    )
+  end
+
+  other_families = Family.where(
+    {
+      "family_members" => {
+        "$elemMatch" => {
+          "person_id" => primary_id
+        }
+      }
+    }
+  )
+
+  other_families.each do |o_fam|
+    next if o_fam.id == family.id
+    other_member_jsons = o_fam.family_members.reject do |fm|
+      fm.is_primary_applicant
+    end.map do |fm|
+      person = find_person_document(client, fm.person_id)
+      history_tracks = find_history_tracks(client, fm.person_id)
+      {
+        person: (person.as_extended_json.reject { |k,v| k.to_s == "inbox" }),
+        history_tracks: history_tracks.map(&:as_extended_json)
+      }
+    end
+
+    other_primary = o_fam.family_members.detect do |fm|
+      fm.is_primary_applicant
+    end
+
+    other_primary_id = other_primary.person_id
+
+    other_primary = find_person_document(client, other_primary_id).as_extended_json
+    other_primary_history = find_history_tracks(client, other_primary_id)
+
+    other_family_json = {
+      family_id: o_fam.id,
+      primary: {
+        person: (other_primary.as_extended_json.reject { |k,v| k.to_s == "inbox" }),
+        history_tracks: other_primary_history.map(&:as_extended_json)
+      },
+      members: other_member_jsons
+    }
+
+    File.open("#{person_id}_#{o_fam.id}.json", 'wb') do |f|
+      f.puts(
+        other_family_json.to_json
+      )
+    end
+  end
 end
 
 def find_history_tracks(client, person_id)
@@ -152,11 +207,5 @@ end
 
 db_client = Person.collection.client
 PERSON_HBX_ID_RECORDS.each do |id|
-  family = find_primary_family(db_client, id)
-
-  File.open("#{id}.json", 'wb') do |f|
-    f.puts(
-      family.to_json
-    )
-  end
+  family = find_families(db_client, id)
 end
