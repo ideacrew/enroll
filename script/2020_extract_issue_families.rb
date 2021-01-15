@@ -87,7 +87,7 @@ PERSON_HBX_ID_RECORDS = [
   "20121140"
 ]
 
-def find_primary_family(client, person_id)
+def find_families(client, person_id)
   primary_id = find_person_id(person_id)
 
   family = Family.where(
