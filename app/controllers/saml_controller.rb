@@ -43,24 +43,25 @@ class SamlController < ApplicationController
         headless = User.where(email: /^#{Regexp.escape(new_email)}$/i).first
         headless.destroy if headless.present? && !headless.person.present?
         new_user = User.new(email: new_email, password: new_password, idp_verified: true, oim_id: response.name_id)
-        if new_user.valid?
-          new_user.save!
-          ::IdpAccountManager.update_navigation_flag(
-            response.name_id,
-            response.attributes['mail'],
-            ::IdpAccountManager::ENROLL_NAVIGATION_FLAG
-          )
-          sign_in(:user, new_user)
-          if relay_state.blank?
-            new_user.update_attributes!(last_portal_visited: search_insured_consumer_role_index_path)
-            redirect_to search_insured_consumer_role_index_path, flash: {notice: "Signed in Successfully."}
-          else
-            new_user.update_attributes!(last_portal_visited: relay_state)
-            redirect_to URI.parse(relay_state).to_s, flash: {notice: "Signed in Successfully."}
-          end
-        else
-          redirect_to URI.parse(SamlInformation.iam_login_url).to_s, flash: {error: "Invalid User Details."}
+
+        unless new_user.valid?
           log("ERROR: #{new_user.errors.messages}", {:severity => "error"})
+          return redirect_to URI.parse(SamlInformation.iam_login_url).to_s, flash: {error: "Invalid User Details."}
+        end
+
+        new_user.save!
+        ::IdpAccountManager.update_navigation_flag(
+          response.name_id,
+          response.attributes['mail'],
+          ::IdpAccountManager::ENROLL_NAVIGATION_FLAG
+        )
+        sign_in(:user, new_user)
+        if relay_state.blank?
+          new_user.update_attributes!(last_portal_visited: search_insured_consumer_role_index_path)
+          redirect_to search_insured_consumer_role_index_path, flash: {notice: "Signed in Successfully."}
+        else
+          new_user.update_attributes!(last_portal_visited: relay_state)
+          redirect_to URI.parse(relay_state).to_s, flash: {notice: "Signed in Successfully."}
         end
       end
     elsif !response.name_id.present?

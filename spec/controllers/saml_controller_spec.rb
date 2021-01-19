@@ -75,7 +75,7 @@ RSpec.describe SamlController do
         let(:relay_state_url) { "/employers/employer_profiles/new" }
 
         before do
-          allow(OneLogin::RubySaml::Response).to receive(:new).with(sample_xml, :allowed_clock_drift => 5.seconds).and_return( valid_saml_response )
+          allow(OneLogin::RubySaml::Response).to receive(:new).with(sample_xml, :allowed_clock_drift => 5.seconds).and_return(valid_saml_response)
         end
 
         it "should redirect to login page with error flash" do
@@ -84,7 +84,7 @@ RSpec.describe SamlController do
           expect(flash[:error]).to eq "Invalid User Details."
         end
       end
- 
+
       describe "with a new user", dbclean: :after_each do
         let(:name_id) { attributes_double['mail'] }
         let(:attributes_double) { { 'mail' => "new@user.com"} }
