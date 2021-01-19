@@ -17,15 +17,15 @@ module Effective
         }, :sortable => false, :filter => false
 
         table_column :dob, :label => 'DOB', :proc => Proc.new { |row|
-          row.dob.strftime("%d/%m/%Y") if row.dob.present?
+          row.dob.strftime("%m/%d/%Y") if row.dob.present?
         }, :sortable => false, :filter => false
 
         table_column :hired_on, :proc => Proc.new { |row|
-          row.hired_on.strftime("%d/%m/%Y") if row.hired_on.present?
+          row.hired_on.strftime("%m/%d/%Y") if row.hired_on.present?
         }, :sortable => false, :filter => false
 
         table_column :terminated_on, :proc => Proc.new { |row|
-          row.employment_terminated_on.present? ? row.employment_terminated_on.strftime("%d/%m/%Y") : "Active"
+          row.employment_terminated_on.present? ? row.employment_terminated_on.strftime("%m/%d/%Y") : "Active"
         }, :sortable => false, :filter => false, :visible => true
 
         table_column :status, :proc => Proc.new { |row|
