@@ -671,7 +671,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
 
     before do
       current_year = TimeKeeper.date_of_record.year
-      is_tax_credit_btn_enabled = TimeKeeper.date_of_record < Date.new(2021, 11, HbxProfile::IndividualEnrollmentDueDayOfMonth + 1)
+      is_tax_credit_btn_enabled = TimeKeeper.date_of_record < Date.new(current_year, 11, HbxProfile::IndividualEnrollmentDueDayOfMonth + 1)
       unless is_tax_credit_btn_enabled
         allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 10, 5))
         hbx_enrollment.update!(effective_on: TimeKeeper.date_of_record.next_month.beginning_of_month)
