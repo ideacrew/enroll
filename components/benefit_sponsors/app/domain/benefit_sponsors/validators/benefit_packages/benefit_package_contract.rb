@@ -10,7 +10,7 @@ module BenefitSponsors
 
         params do
           required(:title).filled(:string)
-          required(:description).filled(:string)
+          required(:description).maybe(:string)
           required(:probation_period_kind).filled(:symbol)
           required(:is_default).filled(:bool)
           required(:is_active).filled(:bool)
