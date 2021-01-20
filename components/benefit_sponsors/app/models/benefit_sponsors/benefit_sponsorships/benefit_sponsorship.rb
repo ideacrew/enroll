@@ -448,7 +448,7 @@ module BenefitSponsors
 
     def submitted_benefit_application(include_term_pending: true)
       # renewing_published_plan_year || active_plan_year ||
-      published_benefit_application(include_term_pending: include_term_pending) || active_imported_benefit_application
+      published_benefit_application(include_term_pending: include_term_pending) || future_active_reinstated_benefit_application || active_imported_benefit_application
     end
 
     def active_imported_benefit_application
