@@ -92,4 +92,22 @@ module EventsHelper
       simple_date_for(benefit_application.effective_period.min)
     end
   end
+
+  def order_ga_accounts_for_employer_xml(ga_accounts)
+    ga_accounts.sort do |a, b|
+      if a.start_on.to_date == b.start_on.to_date
+        if a.end_on.blank? && b.end_on.blank?
+          0
+        elsif a.end_on.blank? && !b.end_on.blank?
+          1
+        elsif !a.end_on.blank? && b.end_on.blank?
+          -1
+        else
+          a.end_on.to_date <=> b.end_on.to_date
+        end
+      else
+        a.start_on.to_date <=> b.start_on.to_date
+      end
+    end
+  end
 end
