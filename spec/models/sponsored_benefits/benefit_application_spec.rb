@@ -69,7 +69,18 @@ module SponsoredBenefits
         profile.benefit_sponsorships = [benefit_sponsorship]
         benefit_sponsorship.benefit_applications = [benefit_application]
         benefit_application.benefit_groups << benefit_group
-        plan_design_organization.save
+      end
+
+      context "MA SIC code" do
+        it "should not save without a sic code" do
+          plan_design_organization.sic_code = nil
+          expect(plan_design_organization.save).to eq(false)
+        end
+
+        it "should save with a sic code for MA" do
+          plan_design_organization.sic_code = "112233"
+          expect(plan_design_organization.save).to eq(true)
+        end
       end
 
       it "should instantiate a plan year object and must have correct values assigned" do
