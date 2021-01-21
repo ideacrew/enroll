@@ -430,7 +430,7 @@ module BenefitSponsors
         predecessor_package = parent_reinstate_application.benefit_packages.where(title: title).first
         return if predecessor_package.blank?
         end_date = (predecessor_package.canceled? ? predecessor_package.start_on : predecessor_package.end_on).to_date
-        census_employees_eligible_for_reinstate(predecessor_package, end_date.next_day).each do |census_employee|
+        census_employees_eligible_for_reinstate(predecessor_package, end_date.next_day).no_timeout.each do |census_employee|
           reinstate_member(census_employee, predecessor_package, end_date)
         end
       end
