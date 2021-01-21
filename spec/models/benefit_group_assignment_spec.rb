@@ -286,7 +286,10 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
 
   describe '#hbx_enrollments', dbclean: :after_each do
 
-    let(:household) { FactoryBot.create(:household, family: family)}
+    let!(:census_employee) { FactoryBot.create :census_employee, employer_profile: employer_profile, employee_role_id: employee_role.id }
+    let!(:employee_role) { FactoryBot.create(:employee_role, person: person, employer_profile: employer_profile)}
+    let(:person) { family.primary_person }
+    let!(:household) { FactoryBot.create(:household, family: family)}
     let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
     let!(:benefit_group_assignment) { FactoryBot.create(:benefit_group_assignment, end_on: benefit_package.end_on, benefit_package: benefit_package, census_employee: census_employee) }
 
