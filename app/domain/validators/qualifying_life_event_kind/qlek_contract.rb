@@ -3,7 +3,7 @@
 module Validators
   module QualifyingLifeEventKind
     class QlekContract < ::Dry::Validation::Contract
-      include DryL10nHelper
+      include L10nHelper
 
       params do
         required(:start_on).filled(:date)
