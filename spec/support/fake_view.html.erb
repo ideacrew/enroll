@@ -7,9 +7,8 @@
    # and when the 'display all enrollments' checkbox is selected, it will remove hidden from everything with the
    #  initially_hidden_enrollment class. %>
 <% included_in_original_enrollment_scope = @hbx_enrollments.to_a.include?(hbx_enrollment) %>
-<% initially_hidden_enrollment_css_class = included_in_original_enrollment_scope == false ? "initially_hidden_enrollment hidden" : ""%>
 
-<div class="module hbx-enrollment-panel panel panel-default <%= initially_hidden_enrollment_css_class %>">
+<div class="module hbx-enrollment-panel panel panel-default">
   <div class="panel-heading vertically-aligned-row">
     <h3 class="heading-text text-uppercase" style="font-weight:600; font-size:18px">
       <%= hbx_enrollment.coverage_year %> <%= product.kind.to_s.titleize %>
@@ -104,7 +103,6 @@
       <div class="hired-on info vertical-align-top">
         <strong><%= l10n("waiver_reason") %>:
         </strong>
-        <%= hbx_enrollment.waiver_reason %>
       </div>
       <% end %>
     </div>
@@ -213,8 +211,7 @@
 </div>
 <% end %>
 
-  <td colspan="1"><%= "N/A" %></td>
-  <td colspan="1"><%= "Untranslated STring" %></td>
+<td colspan="1"><%= "Untranslated String" %></td>
 
 
 
