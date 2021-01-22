@@ -4,7 +4,7 @@ require 'rails_helper'
 
 # The following class is can be used in RSpecs, Rake Tasks, etc. to lint different view files for untranslated strings.
 # Currently supports linting for untranslated strings WITHIN ERB tags and OUTSIDE of ERB tags
-# Class is initialized with three params:
+# Class is initialized with four params:
 # Read View Files - an array of files which have been "read" and stringified such as:
 # [File.read("view_filename"), "File.read("view_filename_2")]
 # Suggested query is to use a list of changed files from Git as an arguement such as:
@@ -12,15 +12,16 @@ require 'rails_helper'
 # Whitelisted Translation Strings - an array of whitelisted strings to ignore, best kept in YML
 # Filter Type - Denoting which query you'd like to lint the file for. Currently supported are
 # 'in_erb' and 'outside_erb'
-
+# Raise Error - Boolen for denoting if you want to raises an error (as opposesd to returning boolean). Defaults to true
 class ViewTranslationsLinter
-  attr_accessor :filter_type, :read_view_files, :whitelisted_translation_strings, :non_whitelisted_substrings
+  attr_accessor :filter_type, :non_whitelisted_substrings, :raise_error, :read_view_files, :whitelisted_translation_strings
 
-  def initialize(read_view_files = nil, whitelisted_translation_strings = nil, filter_type = nil)
+  def initialize(read_view_files = nil, whitelisted_translation_strings = nil, filter_type = nil, raise_error = true)
     @read_view_files = read_view_files
     @whitelisted_translation_strings = whitelisted_translation_strings
     @filter_type = filter_type
     @non_whitelisted_substrings = []
+    @raise_error = raise_error
   end
 
   def all_translations_present?
@@ -32,18 +33,18 @@ class ViewTranslationsLinter
   end
 
   def no_potential_untranslated_strings?(read_file)
-
     potential_substrings(read_file).each do |substring|
-      if whitelisted_translation_strings.detect { |whitelisted_substring| substring.downcase.include?(whitelisted_substring.downcase) }.blank?
-        non_whitelisted_substrings << substring
-      end
+      non_whitelisted_substring = whitelisted_translation_strings.detect { |whitelisted_substring| substring.downcase.include?(whitelisted_substring.downcase) }
+      non_whitelisted_substrings << substring if non_whitelisted_substring.blank?
     end
     return true if non_whitelisted_substrings.blank?
-    raise(untranslated_warning_message(non_whitelisted_substrings))
+    # Will return nil if non_whitelisted_substrings contains values, and thus return flse in #all_translations_present?
+    raise(untranslated_warning_message(non_whitelisted_substrings)) if raise_error == true
   end
 
   def potential_substrings(read_file)
     case filter_type
+    # Other queries for parsing files can be added here
     # when 'in_slim'
     # when 'outside_slim'
     when 'in_erb'
