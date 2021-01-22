@@ -355,7 +355,7 @@ class GroupSelectionPrevaricationAdapter
   end
 
 
-  def is_eligible_for_dental?(employee_role, change_plan, enrollment)
+  def is_eligible_for_dental?(employee_role, change_plan, enrollment, effective_date)
     if change_plan == "change_by_qle"
       family = employee_role.person.primary_family
       benefit_package = employee_role.census_employee.benefit_package_for_date(family.earliest_effective_sep.effective_on)
@@ -365,7 +365,7 @@ class GroupSelectionPrevaricationAdapter
       benefit_package.present? && benefit_package.is_offering_dental?
     else
       renewal_benefit_package = employee_role.census_employee.renewal_published_benefit_package
-      active_benefit_package  = employee_role.census_employee.active_benefit_package
+      active_benefit_package  = employee_role.census_employee.active_benefit_package(effective_date)
 
       if change_plan == 'change_plan' && enrollment.present? && enrollment.is_shop?
         enrollment.sponsored_benefit_package.is_offering_dental?
@@ -448,11 +448,11 @@ class GroupSelectionPrevaricationAdapter
     e_builder.build_new_enrollment(family_member_ids: family_member_ids, is_qle: is_qle?, shop_under_current: shop_under_current, shop_under_future: shop_under_future,  optional_effective_on: optional_effective_on)
   end
 
-  def shop_health_and_dental_relationship_benefits(employee_role, benefit_group)
+  def shop_health_and_dental_relationship_benefits(employee_role, benefit_group, effective_date)
     health_offered_relationship_benefits = health_relationship_benefits(benefit_group)
     dental_offered_relationship_benefits = nil
 
-    if is_eligible_for_dental?(employee_role, @change_plan, @hbx_enrollment)
+    if is_eligible_for_dental?(employee_role, @change_plan, @hbx_enrollment, effective_date)
       dental_offered_relationship_benefits = dental_relationship_benefits(benefit_group)
     end
 
