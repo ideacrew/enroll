@@ -11,29 +11,29 @@ RSpec.describe "Branch Files Translations Spec" do
   let(:filename_list) { `git diff --name-only origin/master HEAD | grep .html.erb`.strip.split("\n") }
   # Will read all ERB filesfrom branch  and and return an array of all of them as strings
   let(:read_view_files) { filename_list.map { |view_filename| File.read("#{Rails.root}/#{view_filename}") } }
-  # YML file containing whitelisted keys.
-  # Note: Do NOT whitelist strings without lead dev approval
-  let(:whitelisted_strings_hash) { YAML.load_file(Rails.root.to_s + "/spec/support/fixtures/whitelisted_translation_strings.yml").with_indifferent_access }
-  let(:whitelisted_translation_strings_in_erb_tags) do
-    all_whitelisted_strings = []
-    keys = whitelisted_strings_hash[:whitelisted_translation_strings_in_erb_tags].keys
+  # YML file containing approved strings.
+  # Note: Do NOT add to approved strings without lead dev approval
+  let(:approved_strings_hash) { YAML.load_file(Rails.root.to_s + "/spec/support/fixtures/approved_translation_strings.yml").with_indifferent_access }
+  let(:approved_translation_strings_in_erb_tags) do
+    all_approved_strings = []
+    keys = approved_strings_hash[:approved_translation_strings_in_erb_tags].keys
     keys.each do |key|
-      all_whitelisted_strings << whitelisted_strings_hash[:whitelisted_translation_strings_in_erb_tags][key]
+      all_approved_strings << approved_strings_hash[:approved_translation_strings_in_erb_tags][key]
     end
-    all_whitelisted_strings.flatten
+    all_approved_strings.flatten
   end
 
-  let(:whitelisted_translation_strings_outside_erb_tags) do
-    all_whitelisted_strings = []
-    keys = whitelisted_strings_hash[:whitelisted_translation_strings_outside_erb_tags].keys
+  let(:approved_translation_strings_outside_erb_tags) do
+    all_approved_strings = []
+    keys = approved_strings_hash[:approved_translation_strings_outside_erb_tags].keys
     keys.each do |key|
-      all_whitelisted_strings << whitelisted_strings_hash[:whitelisted_translation_strings_outside_erb_tags][key]
+      all_approved_strings << approved_strings_hash[:approved_translation_strings_outside_erb_tags][key]
     end
-    all_whitelisted_strings.flatten
+    all_approved_strings.flatten
   end
 
-  let(:translations_linter_in_erb) { ViewTranslationsLinter.new(read_view_files, whitelisted_translation_strings_in_erb_tags, 'in_erb') }
-  let(:translations_linter_outside_erb) { ViewTranslationsLinter.new(read_view_files, whitelisted_translation_strings_outside_erb_tags, 'outside_erb') }
+  let(:translations_linter_in_erb) { ViewTranslationsLinter.new(read_view_files, approved_translation_strings_in_erb_tags, 'in_erb') }
+  let(:translations_linter_outside_erb) { ViewTranslationsLinter.new(read_view_files, approved_translation_strings_outside_erb_tags, 'outside_erb') }
 
   it "should not contain any ERB tags containing untranslated strings" do
     expect(translations_linter_in_erb.all_translations_present?).to eq(true)

@@ -9,18 +9,18 @@ require 'rails_helper'
 # [File.read("view_filename"), "File.read("view_filename_2")]
 # Suggested query is to use a list of changed files from Git as an arguement such as:
 # `git diff --name-only origin/master HEAD | grep .html.erb`.strip.split("\n")
-# Whitelisted Translation Strings - an array of whitelisted strings to ignore, best kept in YML
+# approved Translation Strings - an array of approved strings to ignore, best kept in YML
 # Filter Type - Denoting which query you'd like to lint the file for. Currently supported are
 # 'in_erb' and 'outside_erb'
 # Raise Error - Boolen for denoting if you want to raises an error (as opposesd to returning boolean). Defaults to true
 class ViewTranslationsLinter
-  attr_accessor :filter_type, :non_whitelisted_substrings, :raise_error, :read_view_files, :whitelisted_translation_strings
+  attr_accessor :filter_type, :non_approved_substrings, :raise_error, :read_view_files, :approved_translation_strings
 
-  def initialize(read_view_files = nil, whitelisted_translation_strings = nil, filter_type = nil, raise_error = true)
+  def initialize(read_view_files = nil, approved_translation_strings = nil, filter_type = nil, raise_error = true)
     @read_view_files = read_view_files
-    @whitelisted_translation_strings = whitelisted_translation_strings
+    @approved_translation_strings = approved_translation_strings
     @filter_type = filter_type
-    @non_whitelisted_substrings = []
+    @non_approved_substrings = []
     @raise_error = raise_error
   end
 
@@ -34,12 +34,12 @@ class ViewTranslationsLinter
 
   def no_potential_untranslated_strings?(read_file)
     potential_substrings(read_file).each do |substring|
-      non_whitelisted_substring = whitelisted_translation_strings.detect { |whitelisted_substring| substring.downcase.include?(whitelisted_substring.downcase) }
-      non_whitelisted_substrings << substring if non_whitelisted_substring.blank?
+      non_approved_substring = approved_translation_strings.detect { |approved_substring| substring.downcase.include?(approved_substring.downcase) }
+      non_approved_substrings << substring if non_approved_substring.blank?
     end
-    return true if non_whitelisted_substrings.blank?
-    # Will return nil if non_whitelisted_substrings contains values, and thus return flse in #all_translations_present?
-    raise(untranslated_warning_message(non_whitelisted_substrings)) if raise_error == true
+    return true if non_approved_substrings.blank?
+    # Will return nil if non_approved_substrings contains values, and thus return flse in #all_translations_present?
+    raise(untranslated_warning_message(non_approved_substrings)) if raise_error == true
   end
 
   def potential_substrings(read_file)
@@ -50,7 +50,7 @@ class ViewTranslationsLinter
     when 'in_erb'
       # The following method will return all code between ERB tags.
       # Since this will return *all* code between ERB tags,
-      # Suggested strings to whitelist:
+      # Suggested strings to add to approved list:
       # HTML Elements and helper methods not containing text, such as "render"
       # Methods for dates or currency amounts, such as "hired_on", or "current_year"
       # Record Identifiers such as, "model_name_id"
@@ -60,11 +60,11 @@ class ViewTranslationsLinter
       # Return a string without all HTML/ERB Tags
       # Turn the string into an array, separated at each new line
       # Remove any blank strings from the array
-      # Remove any white space from left and right of array elements
-      # Remove white space to the left and right of sentences
+      # Remove any blank space from left and right of array elements
+      # Remove blank space to the left and right of sentences
       # Cut the array down to only the uniq elements
       # Remove any array elements which are all special characters (I.E. "!", ":")
-      # removes leading and ending extra whitespace, and blank strings, returning an array like:
+      # removes leading and ending extra blankspace, and blank strings, returning an array like:
       # ["list all attributes", "success"]
       #  Further reading: https://stackoverflow.com/a/54405741/5331859
       potential_substrings = ActionView::Base.full_sanitizer.sanitize(read_file).split("\n").reject!(&:blank?).map(&:strip).uniq.reject! do |substring|
@@ -74,9 +74,9 @@ class ViewTranslationsLinter
     potential_substrings
   end
 
-  def untranslated_warning_message(non_whitelisted_substrings)
-    "The following are potentially untranslated substrings. #{non_whitelisted_substrings.join(', ')}. "\
+  def untranslated_warning_message(non_approved_substrings)
+    "The following are potentially untranslated substrings. #{non_approved_substrings.join(', ')}. "\
     "Please modify your ERB and place them in translation helper tags "\
-    "with a coorelating translation or whitelist them."
+    "with a coorelating translation or add them to the approved string list."
   end
 end
