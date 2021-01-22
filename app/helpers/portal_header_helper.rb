@@ -16,7 +16,7 @@ module PortalHeaderHelper
         link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Broker".html_safe, get_broker_profile_path, class: "portal"
       elsif controller_path.include?('general_agencies')
         link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a General Agency".html_safe, benefit_sponsors.profiles_general_agencies_general_agency_profile_path(id: current_user.person.general_agency_staff_roles.first.benefit_sponsors_general_agency_profile_id), class: "portal"
-      elsif (controller == 'employer_profiles' || controller_path.include?('employers'))
+      elsif controller == 'employer_profiles' || controller_path.include?('employers')
         #current user has both broker_agency staff role and employee role but not employer_staff_roles
         if current_user.person.active_employer_staff_roles.present?
           employer_profile_path = benefit_sponsors.profiles_employers_employer_profile_path(id: current_user.person.active_employer_staff_roles.first.benefit_sponsor_employer_profile_id, :tab => 'home')
