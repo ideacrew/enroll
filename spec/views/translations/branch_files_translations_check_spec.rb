@@ -35,11 +35,11 @@ RSpec.describe "Branch Files Translations Spec" do
   let(:translations_linter_in_erb) { ViewTranslationsLinter.new(read_view_files, approved_translation_strings_in_erb_tags, 'in_erb') }
   let(:translations_linter_outside_erb) { ViewTranslationsLinter.new(read_view_files, approved_translation_strings_outside_erb_tags, 'outside_erb') }
 
-  it "should not contain any ERB tags containing untranslated strings" do
+  xit "should not contain any ERB tags containing untranslated strings" do
     expect(translations_linter_in_erb.all_translations_present?).to eq(true)
   end
 
-  it "should not contain any untranslated substrings outside of HTML tags" do
+  xit "should not contain any untranslated substrings outside of HTML tags" do
     expect(translations_linter_outside_erb.all_translations_present?).to eq(true)
   end
 end

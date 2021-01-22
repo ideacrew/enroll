@@ -15,8 +15,11 @@ RSpec.describe ViewTranslationsLinter do
     context "approved_translation_strings" do
       context "non approved string passed" do
         let(:linter_with_non_approved_string) { ViewTranslationsLinter.new(["<%= 'Non-approved String' %>"], [], 'in_erb')}
-        it "should raise error" do
-          expect{ linter_with_non_approved_string.all_translations_present? }.to raise_exception
+        it "should give puts output" do
+          $stdout = StringIO.new
+          linter_with_non_approved_string.all_translations_present?
+          $stdout.rewind
+          expect($stdout.gets.strip).to include("The following are potentially untranslated substrings.  'Non-approved String'")
         end
 
         context "raise_error set to false" do

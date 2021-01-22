@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
-
 # The following class is can be used in RSpecs, Rake Tasks, etc. to lint different view files for untranslated strings.
 # Currently supports linting for untranslated strings WITHIN ERB tags and OUTSIDE of ERB tags
 # Class is initialized with four params:
@@ -12,16 +10,16 @@ require 'rails_helper'
 # approved Translation Strings - an array of approved strings to ignore, best kept in YML
 # Filter Type - Denoting which query you'd like to lint the file for. Currently supported are
 # 'in_erb' and 'outside_erb'
-# Raise Error - Boolen for denoting if you want to raises an error (as opposesd to returning boolean). Defaults to true
+# Puts Output - Boolean for specifying if you want to return output(as oppossed to returning boolean). Defaults to true
 class ViewTranslationsLinter
-  attr_accessor :filter_type, :non_approved_substrings, :raise_error, :read_view_files, :approved_translation_strings
+  attr_accessor :filter_type, :non_approved_substrings, :puts_output, :read_view_files, :approved_translation_strings
 
-  def initialize(read_view_files = nil, approved_translation_strings = nil, filter_type = nil, raise_error = true)
+  def initialize(read_view_files = nil, approved_translation_strings = nil, filter_type = nil, puts_output = true)
     @read_view_files = read_view_files
     @approved_translation_strings = approved_translation_strings
     @filter_type = filter_type
     @non_approved_substrings = []
-    @raise_error = raise_error
+    @puts_output = puts_output
   end
 
   def all_translations_present?
@@ -38,8 +36,8 @@ class ViewTranslationsLinter
       non_approved_substrings << substring if non_approved_substring.blank?
     end
     return true if non_approved_substrings.blank?
-    # Will return nil if non_approved_substrings contains values, and thus return flse in #all_translations_present?
-    raise(untranslated_warning_message(non_approved_substrings)) if raise_error == true
+    # Will return nil if non_approved_substrings contains values, and thus return false in #all_translations_present?
+    puts(untranslated_warning_message(non_approved_substrings)) if puts_output == true
   end
 
   def potential_substrings(read_file)
@@ -68,9 +66,10 @@ class ViewTranslationsLinter
       # ["list all attributes", "success"]
       #  Further reading: https://stackoverflow.com/a/54405741/5331859
       potential_substrings = ActionView::Base.full_sanitizer.sanitize(read_file).split("\n").reject!(&:blank?).map(&:strip).uniq.reject! do |substring|
-        substring.split("").all? { |char| ('a'..'z').to_a.exclude?(char.downcase) }
+        substring.split("").all? { |char| ('a'..'z').to_a.include?(char.downcase) }
       end
     end
+    return [] if potential_substrings.blank?
     potential_substrings
   end
 
