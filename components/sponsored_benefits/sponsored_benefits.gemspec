@@ -18,7 +18,11 @@ Gem::Specification.new do |s|
 
   s.add_dependency "rails", "~> 6.0"
   s.add_dependency "slim", "~> 3.0.8"
+<<<<<<< HEAD
   # s.add_dependency "mongoid", "~> 7.2"
+=======
+  s.add_dependency "mongoid", "~> 7.2"
+>>>>>>> ruby-2.7.1 and rails-6.0 upgrade
   s.add_dependency "aasm", "~> 4.8.0"
   s.add_dependency 'devise',                    '~> 4.5'
   s.add_dependency 'config',  '~> 2.0'

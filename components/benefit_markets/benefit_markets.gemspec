@@ -19,7 +19,11 @@ Gem::Specification.new do |s|
 
   s.add_dependency "rails",                     "~> 6.0"
 
+<<<<<<< HEAD
   # s.add_dependency "mongoid",                   "~> 7.2"
+=======
+  s.add_dependency "mongoid",                   "~> 7.2"
+>>>>>>> ruby-2.7.1 and rails-6.0 upgrade
 
   s.add_dependency "aasm",                      "~> 4.8"
   s.add_dependency 'active_model_serializers',  '~> 0.10'
