@@ -3,8 +3,8 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '2.5.1'
-gem 'rails', '~> 5.2.4.3'
+ruby '2.7.1'
+gem 'rails', '~> 6.0'
 gem 'sidekiq'
 
 #######################################################
@@ -51,14 +51,14 @@ gem 'ui_helpers',         path: "components/ui_helpers"
 ## MongoDB gem dependencies
 gem 'bson',                     '~> 4.3'
 gem 'carrierwave-mongoid',      '~> 1.2',  :require => 'carrierwave/mongoid'
-gem 'mongoid',                  '~> 7.0.2'
+gem 'mongoid',                  '~> 7.2'
 gem 'mongo',                    '~> 2.6'
 gem 'mongo_session_store',      '~> 3.1'
 gem 'mongoid-autoinc',          '~> 6.0'
 gem 'mongoid-history',          '~> 0.8'
 # gem 'mongoid-versioning',       '~> 1.2.0'
 gem 'mongoid_userstamp',        '~> 0.4', :path => "./project_gems/mongoid_userstamp-0.4.0"
-gem 'mongoid_rails_migrations', '~> 1.2'
+  gem 'mongoid_rails_migrations', '~> 1.4'
 
 ## General gems
 gem 'aasm',                     '~> 4.8'
@@ -166,7 +166,7 @@ group :test do
   gem 'capybara-screenshot',          '~> 1.0.18'
   gem 'cucumber-rails',               :require => false
   gem 'fakeredis',                    '~> 0.7.0', :require => 'fakeredis/rspec'
-  gem 'mongoid-rspec',                '~> 4'
+  gem 'mongoid-rspec',                '~> 4.1'
   gem 'rspec-instafail',              '~> 1'
   gem 'rspec-benchmark'
   gem 'ruby-progressbar',             '~> 1'
