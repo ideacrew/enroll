@@ -4,7 +4,7 @@ class Insured::FamilyMembersController < ApplicationController
   include VlpDoc
   include ApplicationHelper
 
-  before_action :permit_dependent_person_params, only: %i[create update]
+  before_action :permit_dependent_person_params, only: [:create, :update]
 
   before_action :set_current_person, :set_family
   before_action :set_dependent, only: [:destroy, :show, :edit, :update]
@@ -231,7 +231,7 @@ class Insured::FamilyMembersController < ApplicationController
   private
 
   def permit_dependent_person_params
-    params.require(:dependent).permit!
+    params.permit(:dependent => {})
   end
 
   def set_family
