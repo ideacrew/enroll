@@ -63,6 +63,10 @@ PATH
       dry-validation
       language_list (~> 1)
       money-rails (~> 1.13)
+<<<<<<< HEAD
+=======
+      mongoid (~> 7.2)
+>>>>>>> ruby-2.7.1 and rails-6.0 upgrade
       pundit (~> 2.0)
       rails (~> 6.0)
       slim (~> 3.0)
@@ -78,6 +82,10 @@ PATH
       combine_pdf
       config (~> 2.0)
       money-rails (~> 1.13)
+<<<<<<< HEAD
+=======
+      mongoid (~> 7.2)
+>>>>>>> ruby-2.7.1 and rails-6.0 upgrade
       non-stupid-digest-assets
       rails (~> 6.0)
       redcarpet (~> 3.4.0)
@@ -104,7 +112,11 @@ PATH
       dry-validation (~> 1.0)
       ffi (~> 1.9)
       kaminari (~> 0.17.0)
+<<<<<<< HEAD
       money-rails (~> 1.13)
+=======
+      mongoid (~> 7.2)
+>>>>>>> ruby-2.7.1 and rails-6.0 upgrade
       pundit (~> 2.0)
       rails (~> 6.0)
       roo (~> 2.1.0)
@@ -135,6 +147,10 @@ PATH
       language_list (~> 1)
       mail
       money-rails (~> 1.13)
+<<<<<<< HEAD
+=======
+      mongoid (~> 7.2)
+>>>>>>> ruby-2.7.1 and rails-6.0 upgrade
       mongoid-autoinc (~> 6.0)
       pundit (~> 2.0)
       rails (~> 6.0)
@@ -184,9 +200,15 @@ GEM
       erubi (~> 1.4)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.1, >= 1.2.0)
+<<<<<<< HEAD
     active_model_serializers (0.10.12)
       actionpack (>= 4.1, < 6.2)
       activemodel (>= 4.1, < 6.2)
+=======
+    active_model_serializers (0.10.10)
+      actionpack (>= 4.1, < 6.1)
+      activemodel (>= 4.1, < 6.1)
+>>>>>>> ruby-2.7.1 and rails-6.0 upgrade
       case_transform (>= 0.2)
       jsonapi-renderer (>= 0.1.1.beta1, < 0.3)
     activejob (6.0.3.4)
@@ -211,7 +233,11 @@ GEM
     addressable (2.7.0)
       public_suffix (>= 2.0.2, < 5.0)
     amq-protocol (1.9.2)
+<<<<<<< HEAD
     ast (2.4.2)
+=======
+    ast (2.4.0)
+>>>>>>> ruby-2.7.1 and rails-6.0 upgrade
     axiom-types (0.1.1)
       descendants_tracker (~> 0.0.4)
       ice_nine (~> 0.11.0)
@@ -220,7 +246,11 @@ GEM
     bootsnap (1.7.2)
       msgpack (~> 1.0)
     browser (2.7.0)
+<<<<<<< HEAD
     bson (4.12.0)
+=======
+    bson (4.11.1)
+>>>>>>> ruby-2.7.1 and rails-6.0 upgrade
     builder (3.2.4)
     bunny (1.7.1)
       amq-protocol (~> 1.9.2)
@@ -252,7 +282,11 @@ GEM
     combine_pdf (1.0.21)
       ruby-rc4 (>= 0.1.5)
     concurrent-ruby (1.1.8)
+<<<<<<< HEAD
     config (2.2.3)
+=======
+    config (2.2.1)
+>>>>>>> ruby-2.7.1 and rails-6.0 upgrade
       deep_merge (~> 1.2, >= 1.2.1)
       dry-validation (~> 1.0, >= 1.0.0)
     crass (1.0.6)
@@ -344,7 +378,11 @@ GEM
       haml (>= 4.0, < 6)
       nokogiri (>= 1.6.0)
       ruby_parser (~> 3.5)
+<<<<<<< HEAD
     i18n (1.8.8)
+=======
+    i18n (1.8.7)
+>>>>>>> ruby-2.7.1 and rails-6.0 upgrade
       concurrent-ruby (~> 1.0)
     ice_nine (0.11.2)
     interactor (3.1.2)
@@ -382,6 +420,12 @@ GEM
       railties (>= 3.0)
     mongo (2.14.0)
       bson (>= 4.8.2, < 5.0.0)
+<<<<<<< HEAD
+=======
+    mongoid (7.2.0)
+      activemodel (>= 5.1, < 6.1)
+      mongo (>= 2.10.5, < 3.0.0)
+>>>>>>> ruby-2.7.1 and rails-6.0 upgrade
     mongoid-autoinc (6.0.3)
       mongoid (>= 6.0, < 8.0)
     mongoid-compatibility (0.5.1)
@@ -466,13 +510,20 @@ GEM
     roo (2.1.1)
       nokogiri (~> 1)
       rubyzip (~> 1.1, < 2.0.0)
+<<<<<<< HEAD
     rspec-core (3.10.1)
       rspec-support (~> 3.10.0)
     rspec-expectations (3.10.1)
+=======
+    rspec-core (3.9.3)
+      rspec-support (~> 3.9.3)
+    rspec-expectations (3.9.4)
+>>>>>>> ruby-2.7.1 and rails-6.0 upgrade
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.10.0)
     rspec-mocks (3.10.2)
       diff-lcs (>= 1.2.0, < 2.0)
+<<<<<<< HEAD
       rspec-support (~> 3.10.0)
     rspec-rails (4.0.2)
       actionpack (>= 4.2)
@@ -484,6 +535,20 @@ GEM
       rspec-support (~> 3.10)
     rspec-support (3.10.2)
     rubocop (0.93.1)
+=======
+      rspec-support (~> 3.9.0)
+    rspec-rails (3.9.1)
+      actionpack (>= 3.0)
+      activesupport (>= 3.0)
+      railties (>= 3.0)
+      rspec-core (~> 3.9.0)
+      rspec-expectations (~> 3.9.0)
+      rspec-mocks (~> 3.9.0)
+      rspec-support (~> 3.9.0)
+    rspec-support (3.9.4)
+    rubocop (0.80.1)
+      jaro_winkler (~> 1.5.1)
+>>>>>>> ruby-2.7.1 and rails-6.0 upgrade
       parallel (~> 1.10)
       parser (>= 2.7.1.5)
       rainbow (>= 2.2.2, < 4.0)
@@ -587,7 +652,10 @@ DEPENDENCIES
   effective_datatables!
   factory_bot_rails (~> 4)
   forgery (~> 0.7.0)
+<<<<<<< HEAD
   mongoid!
+=======
+>>>>>>> ruby-2.7.1 and rails-6.0 upgrade
   mongoid-rspec (~> 4.1)
   mongoid_rails_migrations (~> 1.4)
   notifier!

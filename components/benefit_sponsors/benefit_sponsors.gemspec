@@ -18,7 +18,11 @@ Gem::Specification.new do |s|
   s.test_files = Dir["spec/**/*"]
 
   s.add_dependency "rails",                     "~> 6.0"
+<<<<<<< HEAD
   # s.add_dependency "mongoid",                   "~> 7.2"
+=======
+  s.add_dependency "mongoid",                   "~> 7.2"
+>>>>>>> ruby-2.7.1 and rails-6.0 upgrade
   s.add_dependency 'mongoid-autoinc',           '~> 6.0'
   s.add_dependency 'browser',                   '2.7.0'
 
