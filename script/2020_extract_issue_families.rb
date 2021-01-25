@@ -36,35 +36,38 @@ def find_families(client, person_id)
       }
     ).first
 
-    primary = find_person_document(client, primary_id).as_extended_json
-    primary_history = find_history_tracks(client, primary_id)
+    if family
 
-    member_jsons = family.family_members.reject do |fm|
-      fm.is_primary_applicant
-    end.map do |fm|
-      person = find_person_document(client, fm.person_id)
-      history_tracks = find_history_tracks(client, fm.person_id)
-      {
-        person: (person.as_extended_json.reject { |k,v| k.to_s == "inbox" }),
-        history_tracks: history_tracks.map(&:as_extended_json)
+      primary = find_person_document(client, primary_id).as_extended_json
+      primary_history = find_history_tracks(client, primary_id)
+
+      member_jsons = family.family_members.reject do |fm|
+        fm.is_primary_applicant
+      end.map do |fm|
+        person = find_person_document(client, fm.person_id)
+        history_tracks = find_history_tracks(client, fm.person_id)
+        {
+          person: (person.as_extended_json.reject { |k,v| k.to_s == "inbox" }),
+          history_tracks: history_tracks.map(&:as_extended_json)
+        }
+      end
+
+      family_json = {
+        family_id: family.id,
+        primary: {
+          person: (primary.as_extended_json.reject { |k,v| k.to_s == "inbox" }),
+          history_tracks: primary_history.map(&:as_extended_json)
+        },
+        members: member_jsons
       }
+
+      File.open("#{person_id}_#{primary_id}_primary.json", 'wb') do |f|
+        f.puts(
+          family_json.to_json
+        )
+      end
+
     end
-
-    family_json = {
-      family_id: family.id,
-      primary: {
-        person: (primary.as_extended_json.reject { |k,v| k.to_s == "inbox" }),
-        history_tracks: primary_history.map(&:as_extended_json)
-      },
-      members: member_jsons
-    }
-
-    File.open("#{person_id}_#{primary_id}_primary.json", 'wb') do |f|
-      f.puts(
-        family_json.to_json
-      )
-    end
-
     other_families = Family.where(
       {
         "family_members" => {
