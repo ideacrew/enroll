@@ -1,7 +1,12 @@
 GIT
   remote: https://github.com/ideacrew/resource_registry.git
+<<<<<<< HEAD
   revision: 7b8f396afde849e584d0a749ade9ee88f1717e26
   branch: trunk
+=======
+  revision: f313d71aafd697e97b9e491410ab3f2ec5ea824c
+  branch: master
+>>>>>>> ruby-2.7.1 and rails-6.0 upgrade
   specs:
     resource_registry (0.7.0)
       bootsnap (~> 1.0)
@@ -20,6 +25,7 @@ GIT
       ox (~> 2.0)
       rack (>= 1.6.13)
 
+<<<<<<< HEAD
 GIT
   remote: https://github.com/mongodb/mongoid.git
   revision: df6b2168ee7526f0c5e26f64f38851b91a0623e8
@@ -29,6 +35,8 @@ GIT
       activemodel (>= 5.1, < 6.2)
       mongo (>= 2.10.5, < 3.0.0)
 
+=======
+>>>>>>> ruby-2.7.1 and rails-6.0 upgrade
 PATH
   remote: ../financial_assistance
   specs:
@@ -42,6 +50,10 @@ PATH
       font-awesome-rails (~> 4.7)
       haml-rails
       money-rails (~> 1.13.3)
+<<<<<<< HEAD
+=======
+      mongoid (~> 7.2)
+>>>>>>> ruby-2.7.1 and rails-6.0 upgrade
       mongoid-autoinc (~> 6.0)
       pundit (~> 2.0)
       rails (~> 6.0)
@@ -116,11 +128,18 @@ GEM
       zeitwerk (~> 2.2, >= 2.2.2)
     addressable (2.7.0)
       public_suffix (>= 2.0.2, < 5.0)
+<<<<<<< HEAD
     arel (9.0.0)
     bcrypt (3.1.16)
     bootsnap (1.7.2)
       msgpack (~> 1.0)
     bson (4.12.0)
+=======
+    bcrypt (3.1.16)
+    bootsnap (1.5.1)
+      msgpack (~> 1.0)
+    bson (4.11.1)
+>>>>>>> ruby-2.7.1 and rails-6.0 upgrade
     builder (3.2.4)
     byebug (11.1.3)
     capybara (3.35.3)
@@ -162,13 +181,22 @@ GEM
     dry-logic (1.1.0)
       concurrent-ruby (~> 1.0)
       dry-core (~> 0.5, >= 0.5)
+<<<<<<< HEAD
     dry-matcher (0.9.0)
       dry-core (~> 0.4, >= 0.4.8)
+=======
+    dry-matcher (0.8.3)
+      dry-core (>= 0.4.8)
+>>>>>>> ruby-2.7.1 and rails-6.0 upgrade
     dry-monads (1.3.5)
       concurrent-ruby (~> 1.0)
       dry-core (~> 0.4, >= 0.4.4)
       dry-equalizer
+<<<<<<< HEAD
     dry-schema (1.6.1)
+=======
+    dry-schema (1.6.0)
+>>>>>>> ruby-2.7.1 and rails-6.0 upgrade
       concurrent-ruby (~> 1.0)
       dry-configurable (~> 0.8, >= 0.8.3)
       dry-core (~> 0.5, >= 0.5)
@@ -179,7 +207,11 @@ GEM
       dry-core (~> 0.5, >= 0.5)
       dry-types (~> 1.5)
       ice_nine (~> 0.11)
+<<<<<<< HEAD
     dry-types (1.5.1)
+=======
+    dry-types (1.5.0)
+>>>>>>> ruby-2.7.1 and rails-6.0 upgrade
       concurrent-ruby (~> 1.0)
       dry-container (~> 0.3)
       dry-core (~> 0.5, >= 0.5)
@@ -192,10 +224,17 @@ GEM
       dry-equalizer (~> 0.2)
       dry-initializer (~> 3.0)
       dry-schema (~> 1.5, >= 1.5.2)
+<<<<<<< HEAD
     erubi (1.9.0)
     erubis (2.7.0)
     font-awesome-rails (4.7.0.7)
       railties (>= 3.2, < 7)
+=======
+    erubi (1.10.0)
+    erubis (2.7.0)
+    font-awesome-rails (4.7.0.6)
+      railties (>= 3.2, < 6.2)
+>>>>>>> ruby-2.7.1 and rails-6.0 upgrade
     globalid (0.4.2)
       activesupport (>= 4.2.0)
     haml (5.2.1)
@@ -225,7 +264,11 @@ GEM
     method_source (1.0.0)
     mime-types (3.3.1)
       mime-types-data (~> 3.2015)
+<<<<<<< HEAD
     mime-types-data (3.2021.0225)
+=======
+    mime-types-data (3.2020.1104)
+>>>>>>> ruby-2.7.1 and rails-6.0 upgrade
     mimemagic (0.3.5)
     mini_mime (1.0.2)
     mini_portile2 (2.5.0)
@@ -241,16 +284,29 @@ GEM
       railties (>= 3.0)
     mongo (2.14.0)
       bson (>= 4.8.2, < 5.0.0)
+<<<<<<< HEAD
     mongoid-autoinc (6.0.3)
       mongoid (>= 6.0, < 8.0)
     msgpack (1.4.2)
+=======
+    mongoid (7.2.0)
+      activemodel (>= 5.1, < 6.1)
+      mongo (>= 2.10.5, < 3.0.0)
+    mongoid-autoinc (6.0.3)
+      mongoid (>= 6.0, < 8.0)
+    msgpack (1.3.3)
+>>>>>>> ruby-2.7.1 and rails-6.0 upgrade
     nio4r (2.5.4)
     nokogiri (1.11.1)
       mini_portile2 (~> 2.5.0)
       racc (~> 1.4)
     orm_adapter (0.5.0)
     ox (2.14.1)
+<<<<<<< HEAD
     public_suffix (4.0.6)
+=======
+    public_suffix (4.0.5)
+>>>>>>> ruby-2.7.1 and rails-6.0 upgrade
     pundit (2.1.0)
       activesupport (>= 3.0.0)
     racc (1.5.2)
@@ -284,6 +340,7 @@ GEM
       rake (>= 0.8.7)
       thor (>= 0.20.3, < 2.0)
     rake (13.0.3)
+<<<<<<< HEAD
     regexp_parser (2.0.3)
     responders (3.0.1)
       actionpack (>= 5.0)
@@ -291,6 +348,15 @@ GEM
     rspec-core (3.10.1)
       rspec-support (~> 3.10.0)
     rspec-expectations (3.10.1)
+=======
+    regexp_parser (1.7.1)
+    responders (3.0.1)
+      actionpack (>= 5.0)
+      railties (>= 5.0)
+    rspec-core (3.9.2)
+      rspec-support (~> 3.9.3)
+    rspec-expectations (3.9.2)
+>>>>>>> ruby-2.7.1 and rails-6.0 upgrade
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.10.0)
     rspec-mocks (3.10.2)
@@ -300,11 +366,19 @@ GEM
       actionpack (>= 4.2)
       activesupport (>= 4.2)
       railties (>= 4.2)
+<<<<<<< HEAD
       rspec-core (~> 3.10)
       rspec-expectations (~> 3.10)
       rspec-mocks (~> 3.10)
       rspec-support (~> 3.10)
     rspec-support (3.10.2)
+=======
+      rspec-core (~> 3.9)
+      rspec-expectations (~> 3.9)
+      rspec-mocks (~> 3.9)
+      rspec-support (~> 3.9)
+    rspec-support (3.9.3)
+>>>>>>> ruby-2.7.1 and rails-6.0 upgrade
     ruby_parser (3.15.1)
       sexp_processor (~> 4.9)
     sexp_processor (4.15.2)
@@ -343,7 +417,10 @@ DEPENDENCIES
   byebug
   capybara
   financial_assistance!
+<<<<<<< HEAD
   mongoid!
+=======
+>>>>>>> ruby-2.7.1 and rails-6.0 upgrade
   resource_registry!
   rspec-rails
   sqlite3
