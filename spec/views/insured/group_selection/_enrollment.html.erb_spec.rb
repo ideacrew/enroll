@@ -44,6 +44,10 @@ RSpec.describe "insured/group_selection/_enrollment.html.erb", dbclean: :after_e
       render "insured/group_selection/enrollment", hbx_enrollment: hbx_enrollment
     end
 
+    it "should show Covered" do
+      expect(rendered).to match /Covered/
+    end
+
     it 'should have title' do
       title = "#{hbx_enrollment.coverage_year} #{product.kind.capitalize} Coverage"
       expect(rendered).to have_content(title)

@@ -277,6 +277,37 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     end
   end
 
+  context "reinstated enrollment" do
+    let!(:person) { FactoryBot.create(:person, last_name: 'John', first_name: 'Doe') }
+    let!(:family) { FactoryBot.create(:family, :with_primary_family_member, :person => person) }
+    let(:issuer_profile) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
+    let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01', issuer_profile: issuer_profile)}
+    let!(:hbx_enrollment) do
+      FactoryBot.create(
+        :hbx_enrollment,
+        created_at: (TimeKeeper.date_of_record.in_time_zone("Eastern Time (US & Canada)") - 2.days),
+        family: family,
+        household: family.households.first,
+        coverage_kind: "health",
+        kind: "individual",
+        aasm_state: 'coverage_selected',
+        product: product
+      )
+    end
+
+    before :each do
+      allow(hbx_enrollment).to receive(:is_reinstated_enrollment?).and_return(true)
+      render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
+    end
+    
+    it "should have reinstated enrollment text" do
+      expect(rendered).to have_text("Reinstated Enrollment")
+    end
+    it "should show month text" do
+      expect(rendered).to match(/month/)
+    end
+  end
+
   context "when the enrollment is coverage_selected" do
     let!(:person) { FactoryBot.create(:person, last_name: 'John', first_name: 'Doe') }
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member, :person => person) }
