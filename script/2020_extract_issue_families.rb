@@ -79,7 +79,9 @@ def find_families(client, person_id)
     )
 
     other_families.each do |o_fam|
-      next if o_fam.id == family.id
+      if family
+        next if o_fam.id == family.id
+      end
       other_member_jsons = o_fam.family_members.reject do |fm|
         fm.is_primary_applicant
       end.map do |fm|
