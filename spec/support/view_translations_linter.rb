@@ -2,7 +2,7 @@
 
 # The following class is can be used in RSpecs, Rake Tasks, etc. to lint different view files for untranslated strings.
 # Currently supports linting for untranslated strings WITHIN ERB tags and OUTSIDE of ERB tags
-# Class is initialized with four params:
+# Class is initialized with three params:
 # Read View Files - an array of files which have been "read" and stringified such as:
 # [File.read("view_filename"), "File.read("view_filename_2")]
 # Suggested query is to use a list of changed files from Git as an arguement such as:
@@ -10,16 +10,14 @@
 # approved Translation Strings - an array of approved strings to ignore, best kept in YML
 # Filter Type - Denoting which query you'd like to lint the file for. Currently supported are
 # 'in_erb' and 'outside_erb'
-# Puts Output - Boolean for specifying if you want to return output(as oppossed to returning boolean). Defaults to true
 class ViewTranslationsLinter
   attr_accessor :filter_type, :non_approved_substrings, :puts_output, :read_view_files, :approved_translation_strings
 
-  def initialize(read_view_files, approved_translation_strings, filter_type, puts_output: true)
+  def initialize(read_view_files, approved_translation_strings, filter_type)
     @read_view_files = read_view_files
     @approved_translation_strings = approved_translation_strings
     @filter_type = filter_type
     @non_approved_substrings = []
-    @puts_output = puts_output
   end
 
   def all_translations_present?
@@ -37,7 +35,7 @@ class ViewTranslationsLinter
     end
     return true if non_approved_substrings.blank?
     # Will return nil if non_approved_substrings contains values, and thus return false in #all_translations_present?
-    puts(untranslated_warning_message(non_approved_substrings)) if puts_output == true
+    puts(untranslated_warning_message(non_approved_substrings))
   end
 
   def potential_substrings(read_file)
