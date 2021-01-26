@@ -177,32 +177,3 @@ Enroll uses the [I18n tasks gem](https://github.com/glebm/i18n-tasks) to help wi
 ```
 
 The gem contains the file _spec/i18n_spec.rb_ which contains specs to check for missing or unused translation keys, as well as inconsistent interpolations or files that need normalizing.
-
-
-## Translations View Linter
-
-Enroll includes a custom class, ViewTranslationsLinter, to lint view files and assure that no strings within .erb files are left untranslated. The class is included with a rake task, which can be ran like so:
-
-```
-RAILS_ENV=production bundle exec rake view_translations_linter:lint_files view_files_list='spec/support/fake_view.html.erb'
-```
-
-The task will lint both strings *within* ERB tags, and outside of them. Example:
-```
-# Within ERB Tags
-<%= "This string would fail the check" %>
-
-# Outside ERB Tags
-<p>"This would fail the check for outside ERB tags" %>
-
-```
-
-We include an "Allow List" of approved strings in an ERB file /spec/support/fixtures/approved_translation_strings.yml for strings that should be allowed through. Please do *not* add to this YML without lead dev approval. Here are some examples of strings that shsould be added to the allow lists (mostly dealing with method calls that return numerical text, proper names, etc.):
-
-```
-  html_elements_and_helper_methods: ["l10n", "I18n", "content_for", "render", "pundit_span", "number_to_currency", "format_policy_purchase_date", "format_policy_purchase_time", "display_carrier_logo", "enrollment_coverage_end"]
-  non_word_numerical_strings: ["coverage_year", "effective_on", "coverage_terminated_on", "hired_on", "end_of_month", "start_of_month", "terminated_on", "active_year", "dob"]
-  proper_name_related_strings: ["name", "first_name", "last_name", "full_name", "title"]
-  record_identifiers: ["hbx_id", "hbx_enrollment_id", "hios_id"]
-  non_text_method_calls: ["hios_id", "product_id"]
-```
