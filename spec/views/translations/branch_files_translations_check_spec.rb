@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-require Rails.root.to_s + "/spec/support/view_translations_linter.rb"
+require "#{Rails.root}/spec/support/view_translations_linter.rb"
 
 # This will check the git diff for all .html.erb files and match all non HTML/ERB tag substrings
 # against all the translations in the database to assure translations are added to the file.
@@ -13,7 +13,7 @@ RSpec.describe "Branch Files Translations Spec" do
   let(:read_view_files) { filename_list.map { |view_filename| File.read("#{Rails.root}/#{view_filename}") } }
   # YML file containing approved strings.
   # Note: Do NOT add to approved strings without lead dev approval
-  let(:approved_strings_hash) { YAML.load_file(Rails.root.to_s + "/spec/support/fixtures/approved_translation_strings.yml").with_indifferent_access }
+  let(:approved_strings_hash) { YAML.load_file("#{Rails.root}/spec/support/fixtures/approved_translation_strings.yml").with_indifferent_access }
   let(:approved_translation_strings_in_erb_tags) do
     all_approved_strings = []
     keys = approved_strings_hash[:approved_translation_strings_in_erb_tags].keys

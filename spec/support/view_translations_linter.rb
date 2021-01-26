@@ -14,7 +14,7 @@
 class ViewTranslationsLinter
   attr_accessor :filter_type, :non_approved_substrings, :puts_output, :read_view_files, :approved_translation_strings
 
-  def initialize(read_view_files = nil, approved_translation_strings = nil, filter_type = nil, puts_output = true)
+  def initialize(read_view_files, approved_translation_strings, filter_type, puts_output: true)
     @read_view_files = read_view_files
     @approved_translation_strings = approved_translation_strings
     @filter_type = filter_type

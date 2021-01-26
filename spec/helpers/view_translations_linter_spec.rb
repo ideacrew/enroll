@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-require Rails.root.to_s + "/spec/support/view_translations_linter.rb"
+require "#{Rails.root}/spec/support/view_translations_linter.rb"
 
 RSpec.describe ViewTranslationsLinter do
   context "#all_translations_present" do
