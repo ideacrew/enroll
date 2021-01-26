@@ -43,4 +43,4 @@ Next, check the "Allow List." We include an "Allow List" of approved strings in 
 | Record Identifier                             | "hbx_id", "hbx_enrollment_id","hios_id"                                                                                                 |
 | Non Text Method Calls                         | ".hios_id",".product_id"                                                                                                                |
 
-Please *do not* add any files to the allow_list without lead dev approval.
+Please *do not* add any strings to the allow_list without lead dev approval.
