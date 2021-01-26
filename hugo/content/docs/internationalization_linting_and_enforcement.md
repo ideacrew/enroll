@@ -36,6 +36,7 @@ First, take a look at the output for the strings that didn't pass the check.
 Next, check the "Allow List." We include an "Allow List" of approved strings in an ERB file /spec/support/fixtures/approved_translation_strings.yml for strings that should be allowed through. Please do *not* add to this YML without lead dev approval. Here are the kinds of strings we allow and what exactly they allow:
 
 | String Type Description         | String List                                                                                                                                    |
+| ------------------------        | -----------
 | HTML Elements/Helper Methods    | "l10n", "I18n", "content_for", "render", "pundit_span", "number_to_currency", "format_policy_purchase_date", "format_policy_purchase_time", "display_carrier_logo", "enrollment_coverage_end"                                                                                                                                  |
 | Non-Word Numerical Strings      | "coverage_year", "effective_on", "coverage_terminated_on", "hired_on", "end_of_month", "start_of_month", "terminated_on", "active_year", "dob" |
 | Strings Related to Proper Names | "name", "first_name", "last_name", "full_name", "title"                                                                                        |
