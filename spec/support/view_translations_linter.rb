@@ -65,7 +65,7 @@ class ViewTranslationsLinter
       # removes leading and ending extra blankspace, and blank strings, returning an array like:
       # ["list all attributes", "success"]
       #  Further reading: https://stackoverflow.com/a/54405741/5331859
-      potential_substrings = ActionView::Base.full_sanitizer.sanitize(read_file).split("\n").reject!(&:blank?).map(&:strip).uniq.reject! do |substring|
+      potential_substrings = ActionView::Base.full_sanitizer.sanitize(read_file).split("\n")&.reject!(&:blank?)&.map(&:strip)&.uniq&.reject! do |substring|
         substring.split("").all? { |char| ('a'..'z').to_a.include?(char.downcase) }
       end
     end
