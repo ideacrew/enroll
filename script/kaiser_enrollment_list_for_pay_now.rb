@@ -34,4 +34,4 @@ CSV.open(logger_file_name, 'w', force_quotes: true) do |logger_csv|
       logger_csv << [enrollment.id, e.backtrace[0..5].join('\n')]
     end
   end
-end 
+end
