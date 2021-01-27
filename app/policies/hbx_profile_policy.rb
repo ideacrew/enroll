@@ -1,4 +1,6 @@
 class HbxProfilePolicy < ApplicationPolicy
+
+  # Acts as the entire Pundit Policy for app/controllers/translations_controller.rb
   def can_view_or_change_translations?
     user_hbx_staff_role&.permission&.name == "super_admin"
   end

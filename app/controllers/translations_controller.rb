@@ -1,3 +1,6 @@
+# Controller with user facing interface for creating, editing, and destroying translations
+# Currently can only be visited by super admin users
+
 class TranslationsController < ApplicationController
   before_action :translations_authorized?
   before_action :set_translation, only: [:show, :edit, :update, :destroy]
@@ -52,7 +55,8 @@ class TranslationsController < ApplicationController
   end
 
   private
-
+  
+  # Best to keep the scope of this controller down to super admins
   def translations_authorized?
     authorize(HbxProfile, :can_view_or_change_translations?)
   end
