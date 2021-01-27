@@ -1,4 +1,7 @@
 class HbxProfilePolicy < ApplicationPolicy
+  def can_view_or_change_translations?
+    user_hbx_staff_role&.permission&.name == "super_admin"
+  end
 
   def view_admin_tabs?
     role = user_hbx_staff_role
