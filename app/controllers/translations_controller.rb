@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Controller with user facing interface for creating, editing, and destroying translations
 # Currently can only be visited by super admin users
 
@@ -9,8 +11,7 @@ class TranslationsController < ApplicationController
     @translations = Translation.order('key ASC').all
   end
 
-  def show
-  end
+  def show; end
 
   def new
     @translation = Translation.new
@@ -31,8 +32,7 @@ class TranslationsController < ApplicationController
     # redirect_to translations_path, :notice => "Added translations"
   end
 
-  def edit
-  end
+  def edit; end
 
   def update
     respond_to do |format|
@@ -55,7 +55,7 @@ class TranslationsController < ApplicationController
   end
 
   private
-  
+
   # Best to keep the scope of this controller down to super admins
   def translations_authorized?
     authorize(HbxProfile, :can_view_or_change_translations?)
