@@ -112,8 +112,8 @@ module BenefitSponsors
               :ssn,
               :gender,
               :hired_on,
-              :address => [:kind, :address_1, :address_2, :city, :state, :zip],
-              :email => [:kind, :address]
+              {:address => [:kind, :address_1, :address_2, :city, :state, :zip],
+               :email => [:kind, :address]}
             ]
           ).to_h
         end

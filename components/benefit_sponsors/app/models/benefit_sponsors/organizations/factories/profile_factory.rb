@@ -7,10 +7,10 @@ module BenefitSponsors
         include ActiveModel::Validations
         include BenefitSponsors::Forms::NpnField
 
-        attr_accessor :profile_id, :profile_type, :organization, :profile, :current_user, :claimed, :pending, :coverage_record
-        attr_accessor :first_name, :last_name, :email, :dob, :npn, :fein, :legal_name, :person, :market_kind
-        attr_accessor :area_code, :number, :extension
-        attr_accessor :handler
+        attr_accessor :profile_id, :profile_type, :organization, :profile, :current_user, :claimed, :pending, :coverage_record,
+                      :first_name, :last_name, :email, :dob, :npn, :fein, :legal_name, :person, :market_kind,
+                      :area_code, :number, :extension, :handler
+
         cattr_accessor :profile_type
 
         delegate :is_employer_profile?, :is_broker_profile?, :is_general_agency_profile?, to: :class

@@ -124,9 +124,10 @@ And(/person should see (.*)'s details under pending portals/) do |legal_name|
 end
 
 And(/person should be able to click add (.*) portal/) do |role|
-  if role == 'employer'
+  case role
+  when 'employer'
     visit "/benefit_sponsors/profiles/registrations/new_employer_profile_form?person_id=#{@person.id}&profile_type=benefit_sponsor"
-  elsif role == 'poc'
+  else
     visit "/benefit_sponsors/profiles/employers/employer_staff_roles/new_staff_member?id=#{@person.id}"
   end
 end
