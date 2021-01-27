@@ -48,7 +48,11 @@
     if (!document.getElementsByClassName('badge-alt-blue').length) {
       event.preventDefault();
       event.stopImmediatePropagation();
-      alert('Recipients should not be blank')
+      if (document.getElementsByClassName('badge-danger').length) {
+        alert('Recipients is invalid. Please check red badges.')
+      } else {
+        alert('Recipients should not be blank')
+      }
       return
     }
 
