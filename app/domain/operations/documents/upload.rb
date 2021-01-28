@@ -66,7 +66,8 @@ module Operations
           'source': 'enroll_system',
           'language': 'en',
           'date_submitted': TimeKeeper.date_of_record,
-          'title': fetch_file(file_params).original_filename
+          'title': file_params[:file].original_filename,
+          'format': file_params[:file].content_type
         }
         document_body[:subjects] = subjects unless subjects.nil?
         Success({ document: document_body.to_json,
