@@ -54,8 +54,6 @@ module Operations
       end
 
       def construct_body(resource, file_params, subjects)
-        Rails.logger.error {"*** #{file_params.inspect} ***"}
-        Rails.logger.error {"*** #{fetch_file(file_params).inspect} ***"}
         document_body = {
           subjects: [{"id": resource.id.to_s, "type": resource.class.to_s}],
           'document_type': 'notice',
