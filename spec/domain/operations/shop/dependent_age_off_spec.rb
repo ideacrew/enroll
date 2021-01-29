@@ -79,12 +79,7 @@ RSpec.describe Operations::Shop::DependentAgeOff, type: :model, dbclean: :after_
   context 'valid date' do
     it 'Should process the request when configured annually' do
       result = subject.call(new_date: TimeKeeper.date_of_record.beginning_of_year)
-      process_result = if ::EnrollRegistry[:aca_shop_dependent_age_off].settings(:period).item == :annual
-                         "Successfully dropped dependents for SHOP market"
-                       else
-                         "Successfully dropped dependents for SHOP market"
-                       end
-      expect(result.success).to eq(process_result)
+      expect(result.success).to eq('Successfully dropped dependents for SHOP market')
     end
   end
   # rubocop:enable Style/IdenticalConditionalBranches
@@ -112,6 +107,8 @@ RSpec.describe Operations::Shop::DependentAgeOff, type: :model, dbclean: :after_
       expect(shop_family.active_household.hbx_enrollments.count).to eq(2)
       expect(shop_family.active_household.hbx_enrollments.to_a.first.aasm_state).to eq("coverage_canceled")
       expect(shop_family.active_household.hbx_enrollments.to_a.last.hbx_enrollment_members.count).to eq(1)
+      expect(shop_family.active_household.hbx_enrollments.last.aasm_state).to eq("coverage_enrolled")
+      expect(shop_family.active_household.hbx_enrollments.last.workflow_state_transitions.any?{|w| w.from_state == "coverage_reinstated"}).to eq false
     end
   end
 

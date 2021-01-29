@@ -37,7 +37,7 @@ module Operations
         Success(HbxEnrollment.enrolled.shop_market.all_with_multiple_enrollment_members)
       end
 
-      def process_shop_dep_age_off(enrollments, shop_logger, new_date)
+      def process_shop_dep_age_off(enrollments, shop_logger, new_date) # rubocop:disable Metrics/CyclomaticComplexity
         cut_off_age = EnrollRegistry[:aca_shop_dependent_age_off].settings(:cut_off_age).item
         enrollments.no_timeout.inject([]) do |_result, enrollment|
           next if enrollment.employer_profile&.is_fehb?
@@ -75,9 +75,10 @@ module Operations
         reinstate_enrollment = Enrollments::Replicator::Reinstatement.new(enrollment, effective_date, nil, eligible_dependents).build
         reinstate_enrollment.save!
         return unless reinstate_enrollment.may_reinstate_coverage?
-        reinstate_enrollment.reinstate_coverage!
-        reinstate_enrollment.begin_coverage! if reinstate_enrollment.may_begin_coverage?
+        reinstate_enrollment.force_select_coverage!
         reinstate_enrollment.begin_coverage! if reinstate_enrollment.may_begin_coverage? && reinstate_enrollment.effective_on <= TimeKeeper.date_of_record
+        notifier = BenefitSponsors::Services::NoticeService.new
+        notifier.deliver(recipient: reinstate_enrollment.employee_role, event_object: reinstate_enrollment, notice_event: "employee_plan_selection_confirmation_sep_new_hire")
       end
     end
   end
