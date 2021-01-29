@@ -62,7 +62,6 @@ module Operations
           'creator': Settings.site.publisher,
           'publisher': Settings.site.publisher,
           'type': 'text',
-          'format': 'application/octet-stream',
           'source': 'enroll_system',
           'language': 'en',
           'date_submitted': TimeKeeper.date_of_record,
