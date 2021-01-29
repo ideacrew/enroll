@@ -43,4 +43,3 @@ RSpec.describe Operations::GenerateSamlResponse do
     end
   end
 end
-
