@@ -1444,6 +1444,34 @@ module BenefitSponsors
       it_behaves_like "for off-cycle employer", "active", "enrollment_ineligible", nil, false
       it_behaves_like "for off-cycle employer", "active", "terminated", "draft", true
       it_behaves_like "for off-cycle employer", "active", "termination_pending", "draft", true
+
+      context "benefit application with reinstated id " do
+        let!(:application) { FactoryBot.create(:benefit_sponsors_benefit_application, aasm_state: :active, benefit_sponsorship: active_benefit_sponsorship) }
+        let!(:term_application) { FactoryBot.create(:benefit_sponsors_benefit_application, aasm_state: :terminated, benefit_sponsorship: active_benefit_sponsorship) }
+
+        before do
+          term_application.update_attributes(effective_period: Date.new(TimeKeeper.date_of_record.year, 1, 1)..Date.new(TimeKeeper.date_of_record.year, 1, 31))
+          application.update_attributes(effective_period: Date.new(TimeKeeper.date_of_record.year, 2, 1)..Date.new(TimeKeeper.date_of_record.year, 12, 31), reinstated_id: term_application.id)
+        end
+
+        it "should return nil" do
+          expect(active_benefit_sponsorship.off_cycle_benefit_application).to eq nil
+        end
+      end
+
+      context "benefit application with predecessor_id " do
+        let!(:application) { FactoryBot.create(:benefit_sponsors_benefit_application, aasm_state: :active, benefit_sponsorship: active_benefit_sponsorship) }
+        let!(:expired_application) { FactoryBot.create(:benefit_sponsors_benefit_application, aasm_state: :expired, benefit_sponsorship: active_benefit_sponsorship) }
+
+        before do
+          expired_application.update_attributes(effective_period: Date.new(TimeKeeper.date_of_record.last_year.year, 1, 1)..Date.new(TimeKeeper.date_of_record.last_year.year, 12, 31))
+          application.update_attributes(effective_period: Date.new(TimeKeeper.date_of_record.year, 1, 1)..Date.new(TimeKeeper.date_of_record.year, 12, 31), predecessor_id: expired_application.id)
+        end
+
+        it "should return nil" do
+          expect(active_benefit_sponsorship.off_cycle_benefit_application).to eq nil
+        end
+      end
     end
 
     describe '.future_active_reinstated_benefit_application', :dbclean => :after_each do

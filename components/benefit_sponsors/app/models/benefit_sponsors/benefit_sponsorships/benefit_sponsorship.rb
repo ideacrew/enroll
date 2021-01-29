@@ -531,7 +531,7 @@ module BenefitSponsors
       return nil unless termed_or_ineligible_app
 
       compare_date = termed_or_ineligible_app.enrollment_ineligible? ? termed_or_ineligible_app.start_on : termed_or_ineligible_app.end_on
-      application =  recent_bas.select { |recent_ba| recent_ba.start_on > compare_date && recent_ba.aasm_state != :canceled && recent_ba.reinstated_id.blank? }.first
+      application =  recent_bas.select { |recent_ba| recent_ba.start_on > compare_date && recent_ba.aasm_state != :canceled && recent_ba.reinstated_id.blank? && recent_ba.predecessor_id.blank? }.first
       benefit_applications.map(&:reinstated_id).include?(application&.id) ? nil : application
     end
 
@@ -567,7 +567,7 @@ module BenefitSponsors
 
     def is_potential_off_cycle_employer?
       latest_application = benefit_applications.order_by(:created_at.asc).to_a.last
-      benefit_applications.order_by(:created_at.asc).to_a.last(2).any?(&:is_termed_or_ineligible?) && (latest_application.canceled? || latest_application.is_termed_or_ineligible? || latest_application.draft?)
+      benefit_applications.order_by(:created_at.asc).any?(&:is_termed_or_ineligible?) && (latest_application.canceled? || latest_application.is_termed_or_ineligible? || latest_application.draft?)
     end
 
     def most_recent_benefit_application

@@ -212,6 +212,7 @@ module BenefitSponsors
                                                                                                 :"effective_period.min".gte => Date.new(compare_year, 1, 1),
                                                                                                 :"effective_period.min".lte => Date.new(compare_year, 12, -1)
                                                                                               )}
+    scope :order_asc,                       ->{ order_by(:created_at.asc) }
 
     scope :by_overlapping_effective_period, ->(effective_period) {
       where(
