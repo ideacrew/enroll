@@ -74,13 +74,13 @@ class ViewTranslationsLinter
       potential_substrings_no_html_tags = ActionView::Base.full_sanitizer.sanitize(stringified_view).split("\n+")
       potential_substrings_words_only = potential_substrings_no_html_tags&.reject!(&:blank?)
       return [] if potential_substrings_words_only.blank?
-      potential_substrings_words_only_stripped = potential_substrings_words_only
+      potential_substrings_words_only_stripped = potential_substrings_words_only.map(&:strip)
       return [] if potential_substrings_words_only_stripped.blank?
       potential_substrings_no_chars = potential_substrings_words_only_stripped.map(&:strip)&.uniq&.select { |element| element.length > 1 }&.map do |string|
       # Remove special characters from strings. This will also act to remove any single special character strings hanging around like "-"
         string.gsub!(/[^0-9a-z ]/i, '')
-      end.compact
-      return [] if potential_substrings_no_chars.blank?
+      end
+      return [] if potential_substrings_no_chars.compact.blank?
       # Remove any blank strings (after the gsub removed special characters) and Downcase to simplify adding to the allow list
       potential_substrings = potential_substrings_no_chars&.reject!(&:blank?)&.map(&:downcase)
     end
