@@ -54,7 +54,7 @@ class ViewTranslationsLinter
       # HTML Elements and helper methods not containing text, such as "render"
       # Methods for dates or currency amounts, such as "hired_on", or "current_year"
       # Record Identifiers such as, "model_name_id"
-      potential_substrings_between_erb_tags = stringified_view.scan(/<%=(.*)%>/).flatten
+      potential_substrings_between_erb_tags = stringified_view.scan(/<%=(.*)%>/).flatten.compact
       # Remove leading and ending whitespace and downcase
       potential_substrings = potential_substrings_between_erb_tags&.map(&:strip)&.map(&:downcase)
     when 'outside_erb'
@@ -79,7 +79,7 @@ class ViewTranslationsLinter
       potential_substrings_no_chars = potential_substrings_words_only_stripped.map(&:strip)&.uniq&.select { |element| element.length > 1 }&.map do |string|
       # Remove special characters from strings. This will also act to remove any single special character strings hanging around like "-"
         string.gsub!(/[^0-9a-z ]/i, '')
-      end
+      end.compact
       return [] if potential_substrings_no_chars.blank?
       # Remove any blank strings (after the gsub removed special characters) and Downcase to simplify adding to the allow list
       potential_substrings = potential_substrings_no_chars&.reject!(&:blank?)&.map(&:downcase)
