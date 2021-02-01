@@ -33,6 +33,7 @@ class ViewTranslationsLinter
   def unapproved_strings_in_view(stringified_view)
     non_approved_substrings = []
     potential_substrings(stringified_view).each do |substring|
+      # Use match 
       non_approved_substring = approved_translation_strings.detect { |approved_substring| approved_substring.match(substring.downcase) }
       non_approved_substrings << substring if non_approved_substring.blank?
     end

@@ -1,8 +1,5 @@
 # This will check a list of view files for any untranslated strings
-# For Ex: RAILS_ENV=production bundle exec rake view_translations_linter:lint_files view_files_list='spec/support/fake_view.html.erb'
-
-# This will check specifically the git diff and check the changed lines only.
-
+# For Ex: RAILS_ENV=production bundle exec rake view_translations_linter:lint_git_difference_changed_lines
 
 require Rails.root.to_s + "/spec/support/view_translations_linter.rb"
 
