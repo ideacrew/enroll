@@ -222,8 +222,8 @@ module BenefitSponsors
         bs
       end
       let(:year)                          { TimeKeeper.date_of_record.prev_year.year }
-      let(:effective_period)              { Date.new(year, 02, 01)..Date.new(year+1, 01,31) }
-      let(:oe_period)                     { Date.new(year, 01, 05)..Date.new(year, 01, 10) }
+      let(:effective_period)              { Date.new(year, 2, 1)..Date.new(year + 1, 1, 31) }
+      let(:oe_period)                     { Date.new(year, 1, 5)..Date.new(year, 1, 10) }
       let(:create_ba_params) do
         {
           "start_on" => effective_period.min.to_s, "end_on" => effective_period.max.to_s, "fte_count" => "11",
@@ -237,9 +237,9 @@ module BenefitSponsors
           benefit_market,
           (TimeKeeper.date_of_record.prev_year.beginning_of_year..TimeKeeper.date_of_record.prev_year.end_of_year)
         )
-          benefit_market.benefit_market_catalogs.where(
-            "application_period.min" => TimeKeeper.date_of_record.prev_year.beginning_of_year
-          ).first
+        benefit_market.benefit_market_catalogs.where(
+          "application_period.min" => TimeKeeper.date_of_record.prev_year.beginning_of_year
+        ).first
       end
 
       context 'for admin_datatable_action' do
