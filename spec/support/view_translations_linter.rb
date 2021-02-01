@@ -21,9 +21,7 @@ class ViewTranslationsLinter
     return true if stringified_view_files.blank?
     views_with_errors = {}
     stringified_view_files.each do |filename, stringified_view|
-      if unapproved_strings_in_view(stringified_view).present?
-        views_with_errors[filename] = unapproved_strings_in_view(stringified_view)
-      end
+      views_with_errors[filename] = unapproved_strings_in_view(stringified_view) if unapproved_strings_in_view(stringified_view).present?
     end
     untranslated_warning_message(views_with_errors) if views_with_errors.present?
     return false if views_with_errors.present?
@@ -33,7 +31,7 @@ class ViewTranslationsLinter
   def unapproved_strings_in_view(stringified_view)
     non_approved_substrings = []
     potential_substrings(stringified_view).each do |substring|
-      # Use match 
+      # Use match
       non_approved_substring = approved_translation_strings.detect { |approved_substring| approved_substring.match(substring.downcase) }
       non_approved_substrings << substring if non_approved_substring.blank?
     end
@@ -56,7 +54,7 @@ class ViewTranslationsLinter
       # REmove special characters
       potential_substrings_no_special_characters = potential_substrings_between_erb_tags.map { |substring| substring.gsub!(/[^0-9a-z ]/i, '') }
       # Remove leading and ending whitespace and downcase
-      potential_substrings = potential_substrings_no_special_characters.map { |substring| substring.strip }.map(&:downcase)
+      potential_substrings = potential_substrings_no_special_characters.map(&:strip).map(&:downcase)
     when 'outside_erb'
       # The following filter will take the full read HTML.erb file and:
       # Return a string without all HTML/ERB Tags
