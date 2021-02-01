@@ -40,7 +40,6 @@ class ViewTranslationsLinter
   end
 
   # rubocop:disable Metrics/CyclomaticComplexity
-  # rubocop:disable Lint/SafeNavigationChain
   # rubocop:disable Metrics/PerceivedComplexity
   def potential_substrings(stringified_view)
     potential_substrings = []
@@ -73,17 +72,21 @@ class ViewTranslationsLinter
       # ["list all attributes", "success"]
       #  Further reading: https://stackoverflow.com/a/54405741/5331859
       potential_substrings_no_html_tags = ActionView::Base.full_sanitizer.sanitize(stringified_view).split("\n+")
-      potential_substrings_words_only = potential_substrings_no_html_tags&.reject!(&:blank?).map(&:strip)&.uniq.select { |element| element.length > 1 }.map do |string|
-        # Remove special characters from strings. This will also act to remove any single special character strings hanging around like "-"
+      potential_substrings_words_only = potential_substrings_no_html_tags&.reject!(&:blank?)
+      return [] if potential_substrings_words_only.blank?
+      potential_substrings_words_only_stripped = potential_substrings_words_only
+      return [] if potential_substrings_words_only_stripped.blank?
+      potential_substrings_no_chars = potential_substrings_words_only_stripped.map(&:strip)&.uniq&.select { |element| element.length > 1 }&.map do |string|
+      # Remove special characters from strings. This will also act to remove any single special character strings hanging around like "-"
         string.gsub!(/[^0-9a-z ]/i, '')
       end
+      return [] if potential_substrings_no_chars.blank?
       # Remove any blank strings (after the gsub removed special characters) and Downcase to simplify adding to the allow list
-      potential_substrings = potential_substrings_words_only&.reject!(&:blank?)&.map(&:downcase)
+      potential_substrings = potential_substrings_no_chars&.reject!(&:blank?)&.map(&:downcase)
     end
     potential_substrings
   end
   # rubocop:enable Metrics/CyclomaticComplexity
-  # rubocop:enable Lint/SafeNavigationChain
   # rubocop:enable Metrics/PerceivedComplexity
 
   def untranslated_warning_message(views_with_errors)
