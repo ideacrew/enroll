@@ -38,7 +38,9 @@ class ViewTranslationsLinter
     non_approved_substrings
   end
 
+  # rubocop:disable Metrics/CyclomaticComplexity
   def potential_substrings(stringified_view)
+    potential_substrings = []
     case filter_type
     # Other queries for parsing files can be added here
     # when 'in_slim'
@@ -77,9 +79,9 @@ class ViewTranslationsLinter
       # Remove any blank strings (after the gsub removed special characters) and Downcase to simplify adding to the allow list
       potential_substrings = potential_substrings_words_only.reject!(&:blank?).map(&:downcase)
     end
-    return [] if potential_substrings.blank?
     potential_substrings
   end
+  # rubocop:enable Metrics/CyclomaticComplexity
 
   def untranslated_warning_message(views_with_errors)
     views_with_errors.each do |filename, unapproved_substrings|
