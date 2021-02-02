@@ -77,7 +77,7 @@ class ViewTranslationsLinter
       return [] if potential_substrings_words_only.blank?
       # Remove Git lines from beginning of string. Won't affect others
       # TODO: Noline appears for some reason, investigate it
-      potential_substrings_words_only_no_git = potential_substrings_words_only.reject do |string| 
+      potential_substrings_words_only_no_git = potential_substrings_words_only.reject do |string|
         string.match(/@@/) || string.match(/no newline/)
       end
       potential_substrings_words_only_stripped = potential_substrings_words_only_no_git.map(&:strip).select { |element| element.length > 1 }.uniq
