@@ -34,7 +34,7 @@ namespace :view_translations_linter do
     changed_files_with_linting_errors = []
     changed_filenames.each do |filename|
       changed_lines_key_values = {}
-      changed_lines_string = `git diff origin/master #{filename}`.split("@@")[-1]
+      changed_lines_string = `git diff HEAD^ HEAD  --unified=0 #{filename} | tail +6 | sed -e 's/^\+//'`
       changed_lines_key_values[filename] = changed_lines_string
       translations_linter_in_erb = ViewTranslationsLinter.new(changed_lines_key_values, approved_translation_strings_in_erb_tags, 'in_erb')
       translations_linter_outside_erb = ViewTranslationsLinter.new(changed_lines_key_values, approved_translation_strings_outside_erb_tags, 'outside_erb')
