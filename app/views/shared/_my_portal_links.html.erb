@@ -7,19 +7,37 @@
 <% portal_count = roles.select{|role|role}.count + employer_staff.count + broker_staff_roles.count + ga_staff_roles.count%>
 
 <span>
- <i class="far fa-user-circle fa-lg" aria-hidden="true"></i>&nbsp;<a href="#" class="dropdown-toggle" id="dropdownMenuLink"  data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" onclick="myFunction()" ><strong><%= user_first_name_last_name_and_suffix %></strong></a>
+ <a href="#" class="dropdown-toggle" id="dropdownMenuLink"  data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" onclick="myFunction()" ><i class="fas fa-bars"></i> <strong><%= user_first_name_last_name_and_suffix %></strong></a>
 
-  <ul class="dropdown-menu menu-list" aria-labelledby="dropdownMenuLink">
+  <ul class="dropdown-menu menu-list" aria-labelledby="dropdownMenuLink" style="min-width: 16rem;">
     <% if current_user.person.present? && ::EnrollRegistry.feature_enabled?(:manage_account_functionality) %>
+      <li style="text-align: center; padding: 10px;">
+        <i class="fas fa-question-circle fa-lg"></i>
+        <div>
+          <h4> <%= l10n("hub.hamburgermenu.title") %> </h4>
+        </div>
+        <div>
+          <p><small><%= l10n("hub.hamburgermenu.description1") %> <span style="border-bottom: 1px dotted #000;" title="<%= l10n("hub.hamburgermenu.description.tooltip") %>"><%= l10n("hub.hamburgermenu.description2") %></span><%= l10n("hub.hamburgermenu.description3") %> <strong><%= l10n("hub.home_page.title") %></strong></small></p>
+        </div>
+        <hr />
+        <%= link_to "#{l10n('hub.hamburgermenu.hub_link')}", '' %>
+        <hr />
+        <div>
+          <p><small><%= l10n("hub.hamburgermenu.currently_viewing") %></small></p>
+        </div>
+      </li>
+    <% end %>
+
+    <% if current_user.person.present? && ::EnrollRegistry.feature_enabled?(:manage_account_functionality) && false %>
       <li><%= link_to 'Manage Account', main_app.manage_account_person_path(id: current_user&.person.id), class: 'dropdown-item'%></li>
     <% end %>
 
-    <% if portal_count == 1 %>
+    <% if portal_count == 1 && false %>
       <li><%= link_to l10n(".my_insured_portal"), main_app.family_account_path(tab: 'home'), class: 'dropdown-item' if insured %> </li>
       <li><%= link_to l10n('.my_employer_portal'), benefit_sponsors.new_profiles_registration_path(:profile_type => :benefit_sponsor), class: 'dropdown-item' if employer_staff.present? %> </li>
       <li><%= link_to l10n('.my_broker_agency_portal'), benefit_sponsors.new_profiles_registration_path(:profile_type => :broker_agency), class: 'dropdown-item' if broker_staff_roles.any? %> </li>
       <li><%= link_to l10n('.my_general_agency_portal'), benefit_sponsors.profiles_general_agencies_general_agency_profile_path(ga_staff_roles.first.general_agency_profile, tab:'home'), class: 'dropdown-item' if ga_staff_roles.any? %> </li>
-    <%elsif portal_count > 1 %>
+    <%elsif portal_count > 1 && false %>
 
       <% if insured %>
         <li><%= link_to l10n('.my_insured_portal'), main_app.family_account_path(tab: 'home'), class: 'dropdown-item' %></li>
@@ -54,7 +72,7 @@
       <% end %>
     <% end %>
 
-    <li><%= link_to l10n(".help"), Settings.site.help_url, target: '_blank', class: 'dropdown-item' %></li>
-    <li><%= link_to l10n(".logout"), main_app.destroy_user_session_path, method: "delete", class: "dropdown-item" %></li>
+    <li><%#= link_to l10n(".help"), Settings.site.help_url, target: '_blank', class: 'dropdown-item' %></li>
+    <li><%#= link_to l10n(".logout"), main_app.destroy_user_session_path, method: "delete", class: "dropdown-item" %></li>
   </ul>
 </span>

@@ -2,10 +2,10 @@
   <%= render partial: 'ui-components/v1/navs/manage_account' %>
 <% end %>
 
-<div class="documents-tab" style="padding-top: 0px !important;">
-  <h2> My Hub </h2>
+<div class="documents-tab container" style="padding-top: 20px !important;">
+  <h2> <%= l10n("hub.home_page.title") %> </h2>
 
-  <p> <%= l10n("exchange.hub.add_account_description") %></p>
+  <p> <%= l10n("hub.home_page.description") %></p>
 
   <%= render partial: 'people/person_roles' %>
 </div>
