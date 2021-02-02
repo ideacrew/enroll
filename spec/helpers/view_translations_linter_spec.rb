@@ -29,6 +29,24 @@ RSpec.describe ViewTranslationsLinter do
           expect(linter_with_approved_string.all_translations_present?).to eq(true)
         end
       end
+
+      context "approved method calls from approve list YML" do
+        let(:linter_with_unapproved_method_string) do
+          ViewTranslationsLinter.new(
+            {fake_view_filename: "<%= family.primary_person.full_name %> <%= benefit_application.created_at %> <%= person.id %> <%= family.hbx_enrollments.map(&:hbx_id) %>"},
+            approved_method_call_strings,
+            'in_erb'
+          )
+        end
+        let(:approved_method_call_strings) do
+          approved_translations_hash = YAML.load_file("#{Rails.root}/spec/support/fixtures/approved_translation_strings.yml").with_indifferent_access
+          approved_translations_hash[:approved_translation_strings_in_erb_tags][:record_method_calls]
+        end
+
+        it "should return true" do
+          expect(linter_with_unapproved_method_string.all_translations_present?).to eq(true)
+        end
+      end
     end
   end
 end
