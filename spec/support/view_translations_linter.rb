@@ -77,7 +77,8 @@ class ViewTranslationsLinter
       potential_substrings_words_only_stripped = potential_substrings_words_only.map(&:strip)
       return [] if potential_substrings_words_only_stripped.blank?
       potential_substrings_no_chars = potential_substrings_words_only_stripped.map(&:strip)&.uniq&.select { |element| element.length > 1 }&.map do |string|
-      # Remove special characters from strings. This will also act to remove any single special character strings hanging around like "-"
+        # Remove special characters from strings. This will also act to remove any single special character strings hanging around like "-"
+        # But keep spaces
         string.gsub!(/[^0-9a-z ]/i, '')
       end
       return [] if potential_substrings_no_chars.compact.blank?
@@ -91,8 +92,10 @@ class ViewTranslationsLinter
 
   def untranslated_warning_message(views_with_errors)
     views_with_errors.each do |filename, unapproved_substrings|
-      puts("The following are potentially untranslated substrings missing #{filter_type.upcase} from #{filename}: #{unapproved_substrings.join(', ')}")
+      puts("The following are potentially untranslated substrings missing #{filter_type.upcase} from #{filename}:")
+      unapproved_substrings.each do |substring|
+        puts(substring.to_s)
+      end
     end
-    puts("Please modify your ERB and place them in translation helper tags with a coorelating translation or add them to the approved string list.")
   end
 end

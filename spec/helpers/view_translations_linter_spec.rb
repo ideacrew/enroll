@@ -19,7 +19,7 @@ RSpec.describe ViewTranslationsLinter do
           $stdout = StringIO.new
           linter_with_non_approved_string.all_translations_present?
           $stdout.rewind
-          expect($stdout.gets.strip).to include("The following are potentially untranslated substrings missing IN_ERB from fake_view_filename: 'non-approved string'")
+          expect($stdout.string).to eq("The following are potentially untranslated substrings missing IN_ERB from fake_view_filename:\n'non-approved string'\n")
         end
       end
 
