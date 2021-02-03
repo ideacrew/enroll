@@ -60,9 +60,7 @@ module Operations
       def fetch_effective_on(params)
         @current_enr = params[:hbx_enrollment]
         case @current_enr.aasm_state
-        when 'coverage_terminated'
-          @current_enr.terminated_on.next_day
-        when 'coverage_termination_pending'
+        when 'coverage_terminated', 'coverage_termination_pending'
           @current_enr.terminated_on.next_day
         when 'coverage_canceled'
           @current_enr.effective_on

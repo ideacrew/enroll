@@ -61,20 +61,12 @@ module Operations
 
       def shop_age_off(dao_date, enrollment_query)
         shop_dao = Operations::Shop::DependentAgeOff.new
-        if ::EnrollRegistry[:aca_shop_dependent_age_off].settings(:period).item == :monthly
-          shop_dao.call(new_date: dao_date, enrollment_query: enrollment_query)
-        elsif dao_date.strftime("%m/%d") == TimeKeeper.date_of_record.beginning_of_year.strftime("%m/%d") && ::EnrollRegistry[:aca_shop_dependent_age_off].settings(:period).item == :annual
-          shop_dao.call(new_date: dao_date, enrollment_query: enrollment_query)
-        end
+        shop_dao.call(new_date: dao_date, enrollment_query: enrollment_query)
       end
 
       def fehb_age_off(dao_date, enrollment)
         fehb_dao = Operations::Fehb::DependentAgeOff.new
-        if ::EnrollRegistry[:aca_fehb_dependent_age_off].settings(:period).item == :monthly
-          fehb_dao.call(new_date: dao_date, enrollment: enrollment)
-        elsif ::EnrollRegistry[:aca_fehb_dependent_age_off].settings(:period).item == :annual
-          fehb_dao.call(new_date: dao_date, enrollment: enrollment) if dao_date.strftime("%m/%d") == TimeKeeper.date_of_record.beginning_of_year.strftime("%m/%d")
-        end
+        fehb_dao.call(new_date: dao_date, enrollment: enrollment)
       end
     end
   end

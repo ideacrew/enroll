@@ -902,14 +902,15 @@ class CensusEmployee < CensusMember
   end
 
   def reinstated_benefit_group_assignment=(benefit_package_id = nil)
-    benefit_application = benefit_sponsorship&.benefit_package_by(benefit_package_id)&.benefit_application || benefit_sponsorship&.future_active_reinstated_benefit_application
-    if benefit_application.present?
-      benefit_packages = benefit_package_id.present? ? [benefit_application.benefit_packages.find(benefit_package_id)] : benefit_application.benefit_packages
-    end
-
+    benefit_packages = fetch_reinstated_benefit_packages(benefit_package_id)
     return unless benefit_packages.present? && (future_active_reinstated_benefit_group_assignment.blank? || !benefit_packages.map(&:id).include?(future_active_reinstated_benefit_group_assignment.benefit_package.id))
+    create_benefit_group_assignment(benefit_packages, off_cycle: false, reinstated: true)
+  end
 
-    create_benefit_group_assignment(benefit_packages, false, true)
+  def fetch_reinstated_benefit_packages(benefit_package_id)
+    benefit_application = benefit_sponsorship&.benefit_package_by(benefit_package_id)&.benefit_application || benefit_sponsorship&.future_active_reinstated_benefit_application
+    return unless benefit_application
+    benefit_package_id.present? ? [benefit_application.benefit_packages.find(benefit_package_id)] : benefit_application.benefit_packages
   end
 
   def renewal_benefit_group_assignment=(renewal_package_id)

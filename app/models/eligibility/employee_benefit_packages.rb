@@ -9,18 +9,16 @@ module Eligibility
       py = employer_profile.plan_years.published.first || employer_profile.plan_years.where(aasm_state: 'draft').first
 
       create_benefit_group_assignment(py.benefit_groups) if py.present? && active_benefit_group_assignment.blank? || active_benefit_group_assignment&.benefit_group&.plan_year != py
-
-      if py = employer_profile.plan_years.renewing.first
-        add_renew_benefit_group_assignment(py.benefit_groups) if benefit_group_assignments.where(:benefit_group_id.in => py.benefit_groups.map(&:id)).blank?
-      end
+      py = employer_profile.plan_years.renewing.first
+      return unless py
+      add_renew_benefit_group_assignment(py.benefit_groups) if benefit_group_assignments.where(:benefit_group_id.in => py.benefit_groups.map(&:id)).blank?
     end
 
     # R4 Updates
     # When switching benefit package, we are always creating a new BGA and terminating/cancelling previous BGA
     # TODO: Creating BGA for first benefit group only
 
-    def create_benefit_group_assignment(benefit_packages, off_cycle: false, reinstated = false)
-
+    def create_benefit_group_assignment(benefit_packages, off_cycle: false, reinstated: false)
       assignment = if reinstated
                      future_active_reinstated_benefit_group_assignment
                    elsif off_cycle

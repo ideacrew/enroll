@@ -39,7 +39,7 @@ module Operations
 
       def process_fehb_dep_age_off(congressional_ers, fehb_logger, new_date) # rubocop:disable Metrics/CyclomaticComplexity
         cut_off_age = EnrollRegistry[:aca_fehb_dependent_age_off].settings(:cut_off_age).item
-        if congressional_ers.present? && congressional_ers.first.class == HbxEnrollment
+        if congressional_ers.present? && congressional_ers.first.instance_of?(HbxEnrollment)
           congressional_ers.each do |enrollment|
             new_enrollment(enrollment, new_date, cut_off_age, fehb_logger)
           end

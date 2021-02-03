@@ -56,14 +56,12 @@ module BenefitMarkets
       #   Validates a nested array of $0 params
       #   @!method rule(contribution_model)
       rule(:contribution_model) do
-        if key? && value
-          unless value.is_a?(::BenefitMarkets::Entities::ContributionModel)
-            if value.is_a?(Hash)
-              result = BenefitMarkets::Validators::ContributionModels::ContributionModelContract.new.call(value)
-              key.failure(text: "invalid contribution model", error: result.errors.to_h) if result&.failure?
-            else
-              key.failure(text: "invalid contribution models. expected a hash or contribution_model entity")
-            end
+        if key? && value && !value.is_a?(::BenefitMarkets::Entities::ContributionModel)
+          if value.is_a?(Hash)
+            result = BenefitMarkets::Validators::ContributionModels::ContributionModelContract.new.call(value)
+            key.failure(text: "invalid contribution model", error: result.errors.to_h) if result&.failure?
+          else
+            key.failure(text: "invalid contribution models. expected a hash or contribution_model entity")
           end
         end
       end

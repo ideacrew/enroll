@@ -9,6 +9,7 @@ module BenefitSponsors
       class HealthSponsoredBenefitContract < SponsoredBenefitContract
 
         params do
+          # TODO: add params
         end
       end
     end

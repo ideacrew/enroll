@@ -277,10 +277,11 @@ And(/^census employee (.*?) with (.*) and resinstated BA will have two enrollmen
   enrollments_count = ce.employee_role.person.primary_family.hbx_enrollments.count
   enrollments_aasm_state = ce.employee_role.person.primary_family.hbx_enrollments.map(&:aasm_state)
   expect(enrollments_count).to eq 2
-  if aasm_state == 'termination_pending'
+  case aasm_state
+  when 'termination_pending'
     expect(enrollments_aasm_state).to eq ["coverage_termination_pending", "coverage_enrolled"]
     expect(page).to have_content "Coverage Termination Pending"
-  elsif aasm_state == 'terminated'
+  when 'terminated'
     expect(enrollments_aasm_state).to eq ["coverage_terminated", "coverage_enrolled"]
     expect(page).to have_content "Coverage Enrolled"
   else

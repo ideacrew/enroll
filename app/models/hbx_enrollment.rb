@@ -997,20 +997,30 @@ class HbxEnrollment
     renew_benefit(successor_benefit_package) if active_renewals_under(successor_application).blank? && successor_application.coverage_renewable? && non_inactive_transition? && non_terminated_enrollment?
   end
 
-  def update_reinstate_coverage
+  def reinstated_app
     return unless is_shop? && benefit_sponsorship.present? && sponsored_benefit_package.benefit_application.present?
-    reinstated_app = benefit_sponsorship.benefit_applications.detect{|app| app.active? && app.reinstated_id == sponsored_benefit_package.benefit_application.id}
+    benefit_sponsorship.benefit_applications.detect{|app| app.active? && app.reinstated_id == sponsored_benefit_package.benefit_application.id}
+  end
+
+  def update_reinstate_coverage
     return unless reinstated_app.present?
     parent_reinstated_app = reinstated_app.parent_reinstate_application
     return unless parent_reinstated_app.benefit_packages.map(&:id).include?(sponsored_benefit_package_id)
     reinstated_package = reinstated_app.benefit_packages.where(title: sponsored_benefit_package.title).first
     return unless reinstated_package.present? || self.terminated_on != parent_reinstated_app.end_on
-    reinstates = family.hbx_enrollments.where(effective_on: reinstated_app.start_on,
-                                              :sponsored_benefit_package_id.in => reinstated_app.benefit_packages.map(&:id),
-                                              kind: kind,
-                                              coverage_kind: coverage_kind,
-                                              employee_role_id: employee_role_id)
-    reinstates.each do |enrollment|
+    cancel_reinstates_and_regenerate(reinstated_app, reinstated_package)
+  end
+
+  def reinstates_for(application)
+    family.hbx_enrollments.where(effective_on: application.start_on,
+                                 :sponsored_benefit_package_id.in => application.benefit_packages.map(&:id),
+                                 kind: kind,
+                                 coverage_kind: coverage_kind,
+                                 employee_role_id: employee_role_id)
+  end
+
+  def cancel_reinstates_and_regenerate(application, reinstated_package)
+    reinstates_for(application).each do |enrollment|
       enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
     end
     ::Operations::HbxEnrollments::Reinstate.new.call({hbx_enrollment: self, options: {benefit_package: reinstated_package, notify: true}})
