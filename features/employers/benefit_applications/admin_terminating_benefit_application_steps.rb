@@ -48,7 +48,7 @@ When(/^the user enters (mid_month|any_day|last_day|last_month) and other details
   elsif termination_date == 'last_day'
     fill_in "Select Term Date", with: @new_application.end_on.to_s
   elsif termination_date == 'last_month'
-    fill_in "Select Term Date", with: TimeKeeper.date_of_record.end_of_month.last_month.strftime('%m/%d/%Y').to_s
+    fill_in "Select Term Date", with: TimeKeeper.date_of_record.prev_month.end_of_month.strftime('%m/%d/%Y').to_s
   end
   find('h1', :text => 'Employers', wait: 10).click
 end
