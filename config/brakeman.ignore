@@ -143,6 +143,26 @@
     {
       "warning_type": "Command Injection",
       "warning_code": 14,
+      "fingerprint": "22b99ad1ad0a626fa446d16408ed61f052c242d489bdd636d7b8ccdc404dd14a",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "lib/custom_linters/ada_compliance/view_ada_compliance_linter_helper.rb",
+      "line": 27,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`git diff HEAD^ HEAD  --unified=0 #{filename} | tail +6 | sed -e 's/^+//'`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ViewAdaComplianceLinterHelper",
+        "method": "changed_lines_from_file_string"
+      },
+      "user_input": "filename",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
       "fingerprint": "25d057ec5352105388bd380ee48f7a9b6ca1e039c6338130984a20ddeb93dc74",
       "check_name": "Execute",
       "message": "Possible command injection",
@@ -274,7 +294,7 @@
           "type": "controller",
           "class": "Insured::GroupSelectionController",
           "method": "edit_plan",
-          "line": 185,
+          "line": 187,
           "file": "app/controllers/insured/group_selection_controller.rb",
           "rendered": {
             "name": "insured/group_selection/edit_plan",
@@ -417,7 +437,7 @@
           "type": "controller",
           "class": "Insured::GroupSelectionController",
           "method": "edit_plan",
-          "line": 185,
+          "line": 187,
           "file": "app/controllers/insured/group_selection_controller.rb",
           "rendered": {
             "name": "insured/group_selection/edit_plan",
@@ -440,7 +460,7 @@
       "check_name": "Execute",
       "message": "Possible command injection",
       "file": "lib/custom_linters/translations/view_translations_linter_helper.rb",
-      "line": 22,
+      "line": 89,
       "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
       "code": "`git diff HEAD^ HEAD  --unified=0 #{filename} | tail +6 | sed -e 's/^+//'`",
       "render_path": null,
@@ -717,6 +737,6 @@
       "note": ""
     }
   ],
-  "updated": "2021-02-05 15:24:01 -0500",
+  "updated": "2021-02-23 18:29:02 -0500",
   "brakeman_version": "5.0.0"
 }
