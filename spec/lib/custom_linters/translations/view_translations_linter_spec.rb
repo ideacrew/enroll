@@ -4,6 +4,20 @@ require 'rails_helper'
 require "#{Rails.root}/spec/support/view_translations_linter.rb"
 
 RSpec.describe ViewTranslationsLinter do
+  let(:approved_translations_hash) { YAML.load_file("#{Rails.root}/spec/support/fixtures/approved_translation_strings.yml").with_indifferent_access }
+  let(:approved_record_call_between_erb_strings) do
+    approved_translations_hash[:approved_translation_strings_in_erb_tags][:record_method_calls]
+  end
+
+  let(:all_approved_calls_between_erb_strings) do
+    approved_translation_strings_in_erb_tags = []
+    keys = approved_translations_hash[:approved_translation_strings_in_erb_tags].keys
+    keys.each do |key|
+      approved_translation_strings_in_erb_tags << approved_translations_hash[:approved_translation_strings_in_erb_tags][key]
+    end
+    approved_translation_strings_in_erb_tags = approved_translation_strings_in_erb_tags.flatten
+  end
+
   context "#all_translations_present" do
     context "no filename list present" do
       let(:linter_no_filename_list) { ViewTranslationsLinter.new(nil, ["approved String"], 'in_erb')}
@@ -41,13 +55,9 @@ RSpec.describe ViewTranslationsLinter do
         let(:linter_with_unapproved_method_string) do
           ViewTranslationsLinter.new(
             {fake_view_filename: "<%= family.primary_person.full_name %> <%= benefit_application.created_at %> <%= person.id %> <%= family.hbx_enrollments.map(&:hbx_id) %>"},
-            approved_method_call_strings,
+            approved_record_call_between_erb_strings,
             'in_erb'
           )
-        end
-        let(:approved_method_call_strings) do
-          approved_translations_hash = YAML.load_file("#{Rails.root}/spec/support/fixtures/approved_translation_strings.yml").with_indifferent_access
-          approved_translations_hash[:approved_translation_strings_in_erb_tags][:record_method_calls]
         end
 
         it "should return true" do
@@ -56,28 +66,50 @@ RSpec.describe ViewTranslationsLinter do
       end
 
       context "full fake view" do
-        # Doesn't uses .erb filename to avoid github action
-        let(:filename_with_violations) { "spec/support/fake_view_2.html" }
-        let(:filename_with_violations_stringified) { File.read("#{Rails.root}/#{filename_with_violations}") }
-        context "outside erb" do
-          let(:linter_file_with_violations) { ViewTranslationsLinter.new({filename_with_violations.to_sym => filename_with_violations_stringified}, [], 'outside_erb') }
+        context 'erb file' do
+          # Doesn't uses .erb filename to avoid github action
+          let(:filename_with_violations) { "spec/support/fake_view_2.html" }
+          let(:filename_with_violations_stringified) { File.read("#{Rails.root}/#{filename_with_violations}") }
+          context "outside erb" do
+            let(:linter_file_with_violations) { ViewTranslationsLinter.new({filename_with_violations.to_sym => filename_with_violations_stringified}, [], 'outside_erb') }
 
-          it "should return puts message for violated strings" do
-            $stdout = StringIO.new
-            linter_file_with_violations.all_translations_present?
-            $stdout.rewind
-            result_string = "The following are potentially untranslated substrings missing OUTSIDE_ERB from spec/support/fake_view_2.html:\nSent Messages\nSubject\nRecipients\nDate Sent\nRecipient Type\n"
-            expect($stdout.string).to eq(result_string)
+            it "should return puts message for violated strings" do
+              $stdout = StringIO.new
+              linter_file_with_violations.all_translations_present?
+              $stdout.rewind
+              result_string = "The following are potentially untranslated substrings missing OUTSIDE_ERB from spec/support/fake_view_2.html:\nSent Messages\nSubject\nRecipients\nDate Sent\nRecipient Type\n"
+              expect($stdout.string).to eq(result_string)
+            end
+          end
+
+          context "inside erb" do
+            let(:linter_file_with_violations) { ViewTranslationsLinter.new({filename_with_violations.to_sym => filename_with_violations_stringified}, [], 'in_erb') }
+            it "should return puts message for violated strings" do
+              $stdout = StringIO.new
+              linter_file_with_violations.all_translations_present?
+              $stdout.rewind
+              expect($stdout.string).to include("responsible party")
+            end
           end
         end
 
-        context "inside erb" do
-          let(:linter_file_with_violations) { ViewTranslationsLinter.new({filename_with_violations.to_sym => filename_with_violations_stringified}, [], 'in_erb') }
+        context 'haml file' do
+          let(:haml_filename_with_violations) { "spec/support/fake_view_3.haml" }
+          let(:haml_filename_with_violations_stringified) { File.read("#{Rails.root}/#{haml_filename_with_violations}") }
+          let(:haml_linter_file_with_violations) do
+            ViewTranslationsLinter.new(
+              {haml_filename_with_violations.to_sym => haml_filename_with_violations_stringified},
+              all_approved_calls_between_erb_strings,
+              'in_haml_ruby_tags'
+            )
+          end
+
           it "should return puts message for violated strings" do
             $stdout = StringIO.new
-            linter_file_with_violations.all_translations_present?
+            expect(haml_linter_file_with_violations.all_translations_present?).to_not eq(true)
             $stdout.rewind
-            expect($stdout.string).to include("responsible party")
+            expect($stdout.string).to include("IN_HAML_RUBY_TAGS")
+            expect($stdout.string).to include("Here is another untranslated string")
           end
         end
       end
