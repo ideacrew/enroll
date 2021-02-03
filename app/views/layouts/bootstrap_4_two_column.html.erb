@@ -7,6 +7,7 @@
     <%= favicon_link_tag Settings.site.tab_icon, :rel => 'shortcut icon', :type => 'image/vnd.microsoft.icon' %>
 
     <title><%= content_for?(:title) ? yield(:title) : "Welcome to #{site_short_name} | #{site_short_name}" %></title>
+    <%= javascript_include_tag "application" %>
     <%= javascript_pack_tag 'application' %>
     <%= stylesheet_pack_tag 'application' %>
     <%= csrf_meta_tags %>

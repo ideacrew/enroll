@@ -32,16 +32,17 @@
               <div style="padding: 10px;">
                 <p style="border: 1px solid grey; border-radius: 50%; width: fit-content; position: relative; margin: 0 auto; padding: 5px;">or</p>
               </div>
-
-              <div class="d-flex flex-row bg-white hub-item-flex-shadow employee-card" style="border-radius: 10px; text-align: left; padding: 25px; margin-bottom: 10px; border: #b7afaf solid 1px">
-                <div class="col-2">
-                  <i class="far fa-address-card fa-3x"></i>
+              <%= link_to main_app.privacy_insured_employee_index_path(person_id: @person.id) do %>
+                <div class="d-flex flex-row bg-white hub-item-flex-shadow employee-card" style="border-radius: 10px; text-align: left; padding: 25px; margin-bottom: 10px; border: #b7afaf solid 1px">
+                  <div class="col-2">
+                    <i class="far fa-address-card fa-3x"></i>
+                  </div>
+                  <div class="col-10">
+                    <div class=""><strong style="color: #007bc4;"><%= l10n("hub.home_page.add_account.modal.employee_title") %></strong></div>
+                    <div class=""><small><%= l10n("hub.home_page.add_account.modal.employee_description") %></small></div>
+                  </div>
                 </div>
-                <div class="col-10">
-                  <div class=""><strong style="color: #007bc4;"><%= l10n("hub.home_page.add_account.modal.employee_title") %></strong></div>
-                  <div class=""><small><%= l10n("hub.home_page.add_account.modal.employee_description") %></small></div>
-                </div>
-              </div>
+              <% end %>
 
               <div style="padding: 10px;">
                 <p style="border: 1px solid grey; border-radius: 50%; width: fit-content; position: relative; margin: 0 auto; padding: 5px;">or</p>
@@ -74,19 +75,20 @@
               <p><%= l10n("hub.home_page.add_account.modal.employer_modal.description1") %> <strong>employer name</strong>. <%= l10n("hub.home_page.add_account.modal.employer_modal.description2") %> <strong><%= l10n("hub.home_page.add_account.modal.employer_modal.sub_description") %></strong> <%= l10n("hub.home_page.add_account.modal.employer_modal.description3") %></p>
 
               <div class="form-check">
-                <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="option1" checked>
-                <label class="form-check-label" for="exampleRadios1">
+                <input class="form-check-input" type="radio" name="employerRadioSelect" id="employerRadioSelect1" value="with_roster" checked>
+                <label class="form-check-label" for="employerRadioSelect1">
                   <%= l10n("hub.home_page.add_account.modal.employer_modal.roster_yes_text") %> <strong><%= l10n("hub.home_page.add_account.modal.employer_modal.roster_sub_text") %></strong>
                 </label>
               </div>
               <div class="form-check">
-                <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios2" value="option2">
-                <label class="form-check-label" for="exampleRadios2">
+                <input class="form-check-input" type="radio" name="employerRadioSelect" id="employerRadioSelect2" value="without_roster">
+                <label class="form-check-label" for="employerRadioSelect2">
                   <%= l10n("hub.home_page.add_account.modal.employer_modal.roster_no_text") %> <strong><%= l10n("hub.home_page.add_account.modal.employer_modal.roster_sub_text") %></strong>
                 </label>
               </div>
 
-              <a href="/" class="btn btn-danger">Continue</a>
+              <%= link_to 'Continue', benefit_sponsors.new_employer_profile_form_profiles_registrations_path(person_id: @person.id, profile_type: :benefit_sponsor, with_roster: true) , class: "btn btn-danger with_roster_link" %>
+              <%= link_to 'Continue', benefit_sponsors.new_employer_profile_form_profiles_registrations_path(person_id: @person.id, profile_type: :benefit_sponsor, with_roster: false) , class: "btn btn-danger without_roster_link hidden" %>
             </div>
           </div>
         </div>
@@ -105,19 +107,20 @@
               <p><%= l10n("hub.home_page.add_account.modal.ivl_modal.description") %></p>
 
               <div class="form-check">
-                <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="option1" checked>
-                <label class="form-check-label" for="exampleRadios1">
+                <input class="form-check-input" type="radio" name="ivlRadioSelect" id="ivlRadioSelect1" value="aqhp" checked>
+                <label class="form-check-label" for="ivlRadioSelect1">
                   <strong><%= l10n("hub.home_page.add_account.modal.ivl_modal.aqhp_yes_text") %> </strong><%= l10n("hub.home_page.add_account.modal.ivl_modal.aqhp_yes_text.sub_text") %>
                 </label>
               </div>
               <div class="form-check">
-                <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios2" value="option2">
-                <label class="form-check-label" for="exampleRadios2">
+                <input class="form-check-input" type="radio" name="ivlRadioSelect" id="ivlRadioSelect2" value="uqhp">
+                <label class="form-check-label" for="ivlRadioSelect2">
                   <strong><%= l10n("hub.home_page.add_account.modal.ivl_modal.aqhp_no_text") %></strong>
                 </label>
               </div>
 
-              <a href="/" class="btn btn-danger">Continue</a>
+              <%= link_to 'Continue', main_app.privacy_insured_consumer_role_index_path(aqhp: true, person_id: @person.id), class: 'btn btn-danger aqhp_link' %>
+              <%= link_to 'Continue', main_app.privacy_insured_consumer_role_index_path(uqhp: true, person_id: @person.id), class: 'btn btn-danger uqhp_link hidden' %>
             </div>
           </div>
         </div>
@@ -196,4 +199,36 @@
   .form-check {
     padding-bottom: 10px;
   }
+
+  a:hover {
+    text-decoration: none;
+    color: black;
+  }
+
+  a {
+    color: black;
+  }
 </style>
+
+
+<script type="text/javascript">
+  $('input[name ="ivlRadioSelect"]').change(function() {
+    if ($(this).val() === 'aqhp') {
+      $('.uqhp_link').addClass('hidden');
+      $('.aqhp_link').removeClass('hidden');
+    } else {
+      $('.aqhp_link').addClass('hidden');
+      $('.uqhp_link').removeClass('hidden');
+    }
+  })
+
+  $('input[name ="employerRadioSelect"]').change(function() {
+    if ($(this).val() === 'with_roster') {
+      $('.without_roster_link').addClass('hidden');
+      $('.with_roster_link').removeClass('hidden');
+    } else {
+      $('.with_roster_link').addClass('hidden');
+      $('.without_roster_link').removeClass('hidden');
+    }
+  })
+</script>

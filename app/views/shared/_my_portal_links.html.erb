@@ -9,7 +9,7 @@
 <span>
  <a href="#" class="dropdown-toggle" id="dropdownMenuLink"  data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" onclick="myFunction()" ><i class="fas fa-bars"></i> <strong><%= user_first_name_last_name_and_suffix %></strong></a>
 
-  <ul class="dropdown-menu menu-list" aria-labelledby="dropdownMenuLink" style="min-width: 16rem;">
+  <ul class="dropdown-menu hub-menu" aria-labelledby="dropdownMenuLink">
     <% if current_user.person.present? && ::EnrollRegistry.feature_enabled?(:manage_account_functionality) %>
       <li style="text-align: center; padding: 10px;">
         <i class="fas fa-question-circle fa-lg"></i>
@@ -20,7 +20,7 @@
           <p><small><%= l10n("hub.hamburgermenu.description1") %> <span style="border-bottom: 1px dotted #000;" title="<%= l10n("hub.hamburgermenu.description.tooltip") %>"><%= l10n("hub.hamburgermenu.description2") %></span><%= l10n("hub.hamburgermenu.description3") %> <strong><%= l10n("hub.home_page.title") %></strong></small></p>
         </div>
         <hr />
-        <%= link_to "#{l10n('hub.hamburgermenu.hub_link')}", '' %>
+        <%= link_to "#{l10n('hub.hamburgermenu.hub_link')}", show_roles_person_path(current_user.person) %>
         <hr />
         <div>
           <p><small><%= l10n("hub.hamburgermenu.currently_viewing") %></small></p>
@@ -76,3 +76,9 @@
     <li><%#= link_to l10n(".logout"), main_app.destroy_user_session_path, method: "delete", class: "dropdown-item" %></li>
   </ul>
 </span>
+
+<style type="text/css">
+  .hub-menu {
+    min-width: 15rem;
+  }
+</style>
