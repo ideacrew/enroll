@@ -16,7 +16,7 @@ RSpec.describe Eligibility::EmployeeBenefitPackages, type: :model, dbclean: :aro
     context 'census employee has no benefit group assignments' do
       it 'should create new benefit group assignment' do
         expect(census_employee.benefit_group_assignments.count).to eq 0
-        census_employee.create_benefit_group_assignment(initial_application.benefit_packages, false, false)
+        census_employee.create_benefit_group_assignment(initial_application.benefit_packages, off_cycle: false, reinstated: false)
         census_employee.reload
         expect(census_employee.benefit_group_assignments.count).to eq 1
       end
@@ -28,7 +28,7 @@ RSpec.describe Eligibility::EmployeeBenefitPackages, type: :model, dbclean: :aro
 
       it 'should create new benefit group assignment and end date the old one with start on date' do
         expect(census_employee.benefit_group_assignments.count).to eq 1
-        census_employee.create_benefit_group_assignment(initial_application.benefit_packages, false, false)
+        census_employee.create_benefit_group_assignment(initial_application.benefit_packages, off_cycle: false, reinstated: false)
         census_employee.reload
         expect(census_employee.benefit_group_assignments.count).to eq 2
       end
@@ -37,7 +37,7 @@ RSpec.describe Eligibility::EmployeeBenefitPackages, type: :model, dbclean: :aro
         period = initial_application.effective_period.min + 1.year..(initial_application.effective_period.max + 1.year)
         initial_application.update_attributes!(effective_period: period)
         benefit_group_assignment.update_attributes(start_on: initial_application.start_on, end_on: initial_application.end_on)
-        census_employee.create_benefit_group_assignment(initial_application.benefit_packages, false, false)
+        census_employee.create_benefit_group_assignment(initial_application.benefit_packages, off_cycle: false, reinstated: false)
         census_employee.reload
         benefit_group_assignment.reload
         expect(benefit_group_assignment.end_on).to eq benefit_package.start_on
@@ -57,7 +57,7 @@ RSpec.describe Eligibility::EmployeeBenefitPackages, type: :model, dbclean: :aro
       end
 
       it 'should end date the old bga with the benefit package start on' do
-        census_employee.create_benefit_group_assignment(initial_application.benefit_packages, false, true)
+        census_employee.create_benefit_group_assignment(initial_application.benefit_packages, off_cycle: false, reinstated: true)
         census_employee.reload
         benefit_group_assignment.reload
         expect(census_employee.benefit_group_assignments.count).to eq 2

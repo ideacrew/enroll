@@ -342,7 +342,7 @@ class CensusEmployee < CensusMember
     benefit_group_assignments.detect { |benefit_group_assignment| benefit_group_assignment.benefit_package_id == package_id && benefit_group_assignment.is_active?(start_on) }
   end
 
-  def create_benefit_group_assignment(benefit_packages, off_cycle = false, reinstated = false)
+  def create_benefit_group_assignment(benefit_packages, off_cycle: false, reinstated: false)
     assignment = if reinstated
                    future_active_reinstated_benefit_group_assignment
                  elsif off_cycle
