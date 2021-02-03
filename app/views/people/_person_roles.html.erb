@@ -139,10 +139,15 @@
             <% if active_role.kind.downcase === 'employer staff'  %>
               <div class="col-4 p-2">
                 <div class="dropdown pull-right">
-                  <button class="btn btn-default dropdown-toggle interaction-click-control-actions" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Actions
                     <span class="caret"></span>
                   </button>
+                  <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+                    <%= link_to benefit_sponsors.new_employer_profile_form_profiles_registrations_path(person_id: @person.id, profile_type: :benefit_sponsor, with_roster: true) do %>
+                      <span class="dropdown-item">Copy this info to a new account</span>
+                    <% end %>
+                  </div>
                 </div>
               </div>
             <% end %>
