@@ -28,16 +28,16 @@
       </li>
     <% end %>
 
-    <% if current_user.person.present? && ::EnrollRegistry.feature_enabled?(:manage_account_functionality) && false %>
+    <% if current_user.person.present? && ::EnrollRegistry.feature_enabled?(:manage_account_functionality) %>
       <li><%= link_to 'Manage Account', main_app.manage_account_person_path(id: current_user&.person.id), class: 'dropdown-item'%></li>
     <% end %>
 
-    <% if portal_count == 1 && false %>
+    <% if portal_count == 1 %>
       <li><%= link_to l10n(".my_insured_portal"), main_app.family_account_path(tab: 'home'), class: 'dropdown-item' if insured %> </li>
       <li><%= link_to l10n('.my_employer_portal'), benefit_sponsors.new_profiles_registration_path(:profile_type => :benefit_sponsor), class: 'dropdown-item' if employer_staff.present? %> </li>
       <li><%= link_to l10n('.my_broker_agency_portal'), benefit_sponsors.new_profiles_registration_path(:profile_type => :broker_agency), class: 'dropdown-item' if broker_staff_roles.any? %> </li>
       <li><%= link_to l10n('.my_general_agency_portal'), benefit_sponsors.profiles_general_agencies_general_agency_profile_path(ga_staff_roles.first.general_agency_profile, tab:'home'), class: 'dropdown-item' if ga_staff_roles.any? %> </li>
-    <%elsif portal_count > 1 && false %>
+    <%elsif portal_count > 1 %>
 
       <% if insured %>
         <li><%= link_to l10n('.my_insured_portal'), main_app.family_account_path(tab: 'home'), class: 'dropdown-item' %></li>
