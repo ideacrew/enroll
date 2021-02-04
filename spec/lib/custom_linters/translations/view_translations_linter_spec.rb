@@ -3,6 +3,9 @@
 require 'rails_helper'
 require "#{Rails.root}/spec/support/view_translations_linter.rb"
 
+
+awefwef
+
 RSpec.describe ViewTranslationsLinter do
   context "#all_translations_present" do
     context "no filename list present" do
