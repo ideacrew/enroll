@@ -7,7 +7,7 @@ module ViewTranslationsLinterHelper
   def branch_changed_filenames
     # Returns array of changed files ending in .html.erb and not .html.erb specs
     # TOOD: Returns nil for some reason when this is added grep -v 'spec/'  needs to be included
-    changed_filenames = `git diff --name-only origin/master HEAD | grep .html.erb`.strip.split("\n").reject { |filename| filename.match('_spec.rb').present? }
+    `git diff --name-only origin/master HEAD | grep .html.erb`.strip.split("\n").reject { |filename| filename.match('_spec.rb').present? }
   end
   
   def changed_lines_from_file_string(filename)

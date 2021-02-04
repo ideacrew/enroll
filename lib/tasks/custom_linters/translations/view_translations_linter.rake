@@ -5,15 +5,16 @@
 
 require "#{Rails.root}/lib/custom_linters/translations/view_translations_linter.rb"
 require "#{Rails.root}/lib/custom_linters/translations/view_translations_linter_helper.rb"
+include ViewTranslationsLinterHelper
 
 namespace :view_translations_linter do
   desc("Lints lines from view files changed since master")
   task :lint_git_difference_changed_lines do
-    puts("Linting the following files: #{changed_filenames}")
+    puts("Linting the following files: #{branch_changed_filenames}")
     puts("")
     puts("")
     changed_files_with_linting_errors = []
-    changed_filenames.each do |filename|
+    branch_changed_filenames.each do |filename|
       changed_lines_key_values = {}
       changed_lines_string = changed_lines_from_file_string(filename)
       changed_lines_key_values[filename] = changed_lines_string
