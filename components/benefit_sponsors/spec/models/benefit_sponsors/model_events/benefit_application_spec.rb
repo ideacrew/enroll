@@ -66,7 +66,10 @@ RSpec.describe BenefitSponsors::ModelEvents::BenefitApplication, dbclean: :after
           expect(model_event).to be_an_instance_of(BenefitSponsors::ModelEvents::ModelEvent)
           expect(model_event).to have_attributes(:event_key => event.to_sym, :klass_instance => reinstated_model_instance, :options => {observer_klass: BenefitSponsors::Observers::EdiObserver})
         end
-        reinstated_model_instance.reinstate! if action == "reinstated"
+        if action == "reinstated"
+          reinstated_model_instance.reinstate!
+          reinstated_model_instance.activate_enrollment!
+        end
       end
     end
   end
