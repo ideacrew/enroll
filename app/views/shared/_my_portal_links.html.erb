@@ -20,7 +20,7 @@
           <p><small><%= l10n("hub.hamburgermenu.description1") %> <span style="border-bottom: 1px dotted #000;" title="<%= l10n("hub.hamburgermenu.description.tooltip") %>"><%= l10n("hub.hamburgermenu.description2") %></span><%= l10n("hub.hamburgermenu.description3") %> <strong><%= l10n("hub.home_page.title") %></strong></small></p>
         </div>
         <hr />
-        <%= link_to "#{l10n('hub.hamburgermenu.hub_link')}", show_roles_person_path(current_user.person) %>
+        <%= link_to "#{l10n('hub.hamburgermenu.hub_link')}", main_app.show_roles_person_path(current_user.person) %>
         <hr />
         <div>
           <p><small><%= l10n("hub.hamburgermenu.currently_viewing") %></small></p>
@@ -72,8 +72,8 @@
       <% end %>
     <% end %>
 
-    <li><%#= link_to l10n(".help"), Settings.site.help_url, target: '_blank', class: 'dropdown-item' %></li>
-    <li><%#= link_to l10n(".logout"), main_app.destroy_user_session_path, method: "delete", class: "dropdown-item" %></li>
+    <li><%= link_to l10n(".help"), Settings.site.help_url, target: '_blank', class: 'dropdown-item' %></li>
+    <li><%= link_to l10n(".logout"), main_app.destroy_user_session_path, method: "delete", class: "dropdown-item" %></li>
   </ul>
 </span>
 
