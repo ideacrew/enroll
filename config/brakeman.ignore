@@ -1138,8 +1138,29 @@
       "user_input": null,
       "confidence": "Medium",
       "note": ""
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "lib/custom_linters/translations/view_translations_linter_helper.rb",
+      "line": 22,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`git diff HEAD^ HEAD  --unified=0 #{filename} | tail +6 | sed -e 's/^+//'`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ViewTranslationsLinterHelper",
+        "method": "changed_lines_from_file_string"
+      },
+      "user_input": "#{filename}",
+      "confidence": "Medium",
+      "note": "This is used in specs and rake tasks and does not involve any user input."
+      },
     }
   ],
-  "updated": "2021-01-27 13:24:53 -0500",
+  "updated": "2021-02-04 13:24:53 -0500",
   "brakeman_version": "5.0.0"
 }
