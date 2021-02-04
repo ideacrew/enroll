@@ -62,11 +62,11 @@ namespace :view_translations_linter do
       changed_lines_string = `git diff HEAD^ HEAD  --unified=0 #{filename} | tail +6 | sed -e 's/^\+//'`
       changed_lines_key_values[filename] = changed_lines_string
       translations_linter_haml= ViewTranslationsLinter.new(changed_lines_key_values, approved_translation_strings_in_erb_tags, 'in_haml_ruby_tags')
-      unless translations_linter_in_erb.all_translations_present?
+      unless translations_linter_haml.all_translations_present?
         changed_haml_files_with_linting_errors << filename
       end
     end
-    if changed_erb_files_with_linting_errors.present?
+    if translations_linter_haml.present?
       puts("Please modify your HAML and place them in translation helper tags with a coorelating translation or add them to the approved string list.")
       abort
     else
