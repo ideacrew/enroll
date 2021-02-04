@@ -10,7 +10,7 @@
 # 'in_erb' and 'outside_erb'
 
 class ViewTranslationsLinter
-  attr_accessor :file_format, :filter_type, :stringified_view_files, :approved_translation_strings
+  attr_accessor :filter_type, :stringified_view_files, :approved_translation_strings
 
   def initialize(stringified_view_files, approved_translation_strings, filter_type)
     @stringified_view_files = stringified_view_files

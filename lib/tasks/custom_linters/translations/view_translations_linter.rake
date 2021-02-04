@@ -10,11 +10,11 @@ include ViewTranslationsLinterHelper
 namespace :view_translations_linter do
   desc("Lints lines from view files changed since master")
   task :lint_git_difference_changed_lines do
-    puts("Linting the following files: #{branch_changed_filenames}")
+    puts("Linting the following files: #{branch_changed_filenames_erb}") if branch_changed_filenames_erb.present?
     puts("")
     puts("")
     changed_files_with_linting_errors = []
-    branch_changed_filenames.each do |filename|
+    branch_changed_filenames_erb.each do |filename|
       changed_lines_key_values = {}
       changed_lines_string = changed_lines_from_file_string(filename)
       changed_lines_key_values[filename] = changed_lines_string
@@ -34,11 +34,11 @@ namespace :view_translations_linter do
       puts("Translations linting complete. No errors present in ERB files.")
     end
     # Haml
-    puts("Linting the following haml files: #{changed_filenames_haml}") if changed_filenames_haml.present?
+    puts("Linting the following haml files: #{branch_changed_filenames_haml}") if branch_changed_filenames_haml.present?
     puts("")
     puts("")
     changed_haml_files_with_linting_errors = []
-    changed_filenames_haml.each do |filename|
+    branch_changed_filenames_haml.each do |filename|
       changed_lines_key_values = {}
       changed_lines_string = changed_lines_from_file_string(filename)
       changed_lines_key_values[filename] = changed_lines_string
