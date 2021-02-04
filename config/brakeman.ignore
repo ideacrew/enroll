@@ -1158,7 +1158,6 @@
       "user_input": "#{filename}",
       "confidence": "Medium",
       "note": "This is used in specs and rake tasks and does not involve any user input."
-      },
     }
   ],
   "updated": "2021-02-04 13:24:53 -0500",
