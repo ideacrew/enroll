@@ -1,21 +1,14 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-require "#{Rails.root}/spec/support/view_translations_linter.rb"
+require "#{Rails.root}/lib/custom_linters/translations/view_translations_linter.rb"
+require "#{Rails.root}/lib/custom_linters/translations/view_translations_linter_helper.rb"
 
 RSpec.describe ViewTranslationsLinter do
+  include ViewTranslationsLinterHelper
   let(:approved_translations_hash) { YAML.load_file("#{Rails.root}/spec/support/fixtures/approved_translation_strings.yml").with_indifferent_access }
   let(:approved_record_call_between_erb_strings) do
     approved_translations_hash[:approved_translation_strings_in_erb_tags][:record_method_calls]
-  end
-
-  let(:all_approved_calls_between_erb_strings) do
-    approved_translation_strings_in_erb_tags = []
-    keys = approved_translations_hash[:approved_translation_strings_in_erb_tags].keys
-    keys.each do |key|
-      approved_translation_strings_in_erb_tags << approved_translations_hash[:approved_translation_strings_in_erb_tags][key]
-    end
-    approved_translation_strings_in_erb_tags = approved_translation_strings_in_erb_tags.flatten
   end
 
   context "#all_translations_present" do
@@ -99,7 +92,7 @@ RSpec.describe ViewTranslationsLinter do
           let(:haml_linter_file_with_violations) do
             ViewTranslationsLinter.new(
               {haml_filename_with_violations.to_sym => haml_filename_with_violations_stringified},
-              all_approved_calls_between_erb_strings,
+              approved_translation_strings_in_erb_tags,
               'in_haml_ruby_tags'
             )
           end
