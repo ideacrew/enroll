@@ -12,6 +12,7 @@ module BenefitSponsors
 
         before_action :find_general_agency_profile, only: [:employers, :family_index]
         before_action :find_general_agency_staff, only: [:edit_staff, :update_staff]
+        before_action :set_current_portal, only: [:show]
 
         layout 'single_column'
 

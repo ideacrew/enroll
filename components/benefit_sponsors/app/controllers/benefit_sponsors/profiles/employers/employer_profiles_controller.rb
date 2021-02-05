@@ -8,7 +8,7 @@ module BenefitSponsors
         before_action :find_employer, only: [:show, :inbox, :bulk_employee_upload, :export_census_employees, :show_invoice, :coverage_reports, :download_invoice, :terminate_employee_roster_enrollments]
         before_action :load_group_enrollments, only: [:coverage_reports], if: :is_format_csv?
         before_action :check_and_download_invoice, only: [:download_invoice, :show_invoice]
-        before_action :wells_fargo_sso, only: [:show]
+        before_action :wells_fargo_sso, :set_current_portal, only: [:show]
         before_action :set_flash_by_announcement, only: :show
         layout "two_column", except: [:new]
 

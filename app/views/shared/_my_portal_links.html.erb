@@ -23,7 +23,8 @@
         <%= link_to "#{l10n('hub.hamburgermenu.hub_link')}", main_app.show_roles_person_path(current_user.person) %>
         <hr />
         <div>
-          <p><small><%= l10n("hub.hamburgermenu.currently_viewing") %></small></p>
+          <small><%= l10n("hub.hamburgermenu.currently_viewing") %></small>
+          <p><%= session[:current_portal]&.html_safe %></p>
         </div>
       </li>
     <% end %>

@@ -3,6 +3,8 @@ class PeopleController < ApplicationController
   include ErrorBubble
   include VlpDoc
 
+  before_action :set_current_portal, only: [:show_roles]
+
   layout 'bootstrap_4_two_column', :only => [:manage_account, :personal_info, :show_roles, :available_accounts]
 
   def new

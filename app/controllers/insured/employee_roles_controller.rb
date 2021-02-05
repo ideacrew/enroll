@@ -1,6 +1,7 @@
 class Insured::EmployeeRolesController < ApplicationController
   before_action :check_employee_role, only: [:new, :privacy, :welcome, :search]
   before_action :check_employee_role_permissions_edit, only: [:edit]
+  before_action :set_current_portal, only: [:edit, :privacy]
   before_action :check_employee_role_permissions_update, only: [:update]
   include ErrorBubble
   include EmployeeRoles

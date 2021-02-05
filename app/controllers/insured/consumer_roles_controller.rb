@@ -10,6 +10,7 @@ class Insured::ConsumerRolesController < ApplicationController
   before_action :individual_market_is_enabled?
   before_action :decrypt_params, only: [:create]
   before_action :set_cache_headers, only: [:edit]
+  before_action :set_current_portal, only: [:privacy, :edit]
 
   FIELDS_TO_ENCRYPT = [:ssn,:dob,:first_name,:middle_name,:last_name,:gender,:user_id].freeze
 
