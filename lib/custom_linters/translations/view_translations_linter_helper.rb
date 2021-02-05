@@ -2,10 +2,23 @@
 
 # This module defines methods related to ViewTranslationsLinter to be reused in
 # Rake files, specs, etc.
+
+require_relative 'view_translations_linter.rb'
+
 module ViewTranslationsLinterHelper
   # Approved list data
   def approved_translations_hash
     YAML.load_file("#{Rails.root}/config/translations_linter/approved_translation_strings.yml").with_indifferent_access
+  end
+
+  def translations_in_erb_tags_present?(file_location)
+    stringified_view = File.read("#{file_location}")
+    ViewTranslationsLinter.new({filename: stringified_view}, approved_translation_strings_in_erb_tags, 'in_erb').all_translations_present?
+  end
+
+  def translations_outside_erb_tags_present?(file_location)
+    stringified_view = File.read("#{file_location}")
+    ViewTranslationsLinter.new({filename: stringified_view}, approved_translation_strings_in_erb_tags, 'in_erb').all_translations_present?
   end
 
   def branch_changed_filenames_erb

@@ -34,8 +34,10 @@ class ViewTranslationsLinter
     return unless potential_substrings(stringified_view).present?
     potential_substrings(stringified_view).each do |substring|
       # Use match
-      non_approved_substring_match = approved_translation_strings.detect { |approved_string| substring.match(approved_string) }
-      non_approved_substrings << substring if non_approved_substring_match.blank?
+      # TODO: link_to can be problematic, because they might contain an allow listed string while still having an untranslated
+      # string as a title. There might need to be some logic here to detect strings if the substring has a link_to.
+      non_approved_substring_match = approved_translation_strings.select { |approved_string| substring.match(approved_string) }
+      non_approved_substrings << substring if non_approved_substring_match.empty?
     end
     non_approved_substrings
   end

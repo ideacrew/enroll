@@ -5,6 +5,7 @@ require File.expand_path("../../config/environment", __FILE__)
 require 'rspec/rails'
 require 'shoulda/matchers'
 require 'webmock/rspec'
+require "#{Rails.root}/lib/custom_linters/translations/view_translations_linter_helper.rb"
 
 WebMock.allow_net_connect!
 
@@ -71,6 +72,7 @@ RSpec.configure do |config|
   config.include FederalHolidaysHelper
   config.include Config::AcaModelConcern
   config.include L10nHelper
+  config.include ViewTranslationsLinterHelper
 
   config.infer_spec_type_from_file_location!
 
