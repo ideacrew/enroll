@@ -13,12 +13,12 @@ module ViewTranslationsLinterHelper
 
   def translations_in_erb_tags_present?(file_location)
     stringified_view = File.read("#{file_location}")
-    ViewTranslationsLinter.new({filename: stringified_view}, approved_translation_strings_in_erb_tags, 'in_erb').all_translations_present?
+    ViewTranslationsLinter.new({"#{file_location}" => stringified_view}, approved_translation_strings_in_erb_tags, 'in_erb').all_translations_present?
   end
 
   def translations_outside_erb_tags_present?(file_location)
     stringified_view = File.read("#{file_location}")
-    ViewTranslationsLinter.new({filename: stringified_view}, approved_translation_strings_in_erb_tags, 'in_erb').all_translations_present?
+    ViewTranslationsLinter.new({"#{file_location}" =>  stringified_view}, approved_translation_strings_outside_erb_tags, 'outside_erb').all_translations_present?
   end
 
   def branch_changed_filenames_erb
