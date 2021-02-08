@@ -32,21 +32,22 @@ module ViewTranslationsLinterHelper
     []
   end
 
-  def included_substring_string_outside_erb; end
-
   def approved_exact_match_strings_in_erb
     (approved_translations_hash[:approved_translation_strings_in_erb_tags][:array_counter_variables] +
      approved_translations_hash[:approved_translation_strings_in_erb_tags][:html_safe_one_liners] +
     approved_translations_hash[:approved_translation_strings_in_erb_tags][:instance_variables] +
     approved_translations_hash[:approved_translation_strings_in_erb_tags][:unique_variable_names] +
     approved_translations_hash[:approved_translation_strings_in_erb_tags][:health_product_info_methods] +
-    # Returns exact array of all path strings
+    # Returns exact array of all path strings, I.E. users_path
+    # This violates the conventions so far from not being included in the YML, so this might need some
+    # refactoring if its found to be confusing
     Rails.application.routes.named_routes.helper_names +
     approved_translations_hash[:approved_translation_strings_in_erb_tags][:exact_match_strings]).flatten
   end
 
   # Outside ERB
-
+  # TODO: Outside of the testing environment, there aren't many hard coded strings outside of ERB tags
+  # which I've come across to allow here. This will be updated in the future.
   def approved_exact_match_strings_outside_erb
     approved_translations_hash[:approved_translation_strings_outside_erb_tags][:exact_match_string_list]
   end
@@ -55,7 +56,7 @@ module ViewTranslationsLinterHelper
     []
   end
 
-  def matched_substrings_outside_erb
+  def included_substring_string_outside_erb
     []
   end
 
