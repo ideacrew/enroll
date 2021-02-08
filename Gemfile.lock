@@ -1,5 +1,12 @@
 GIT
-  remote: https://github.com/dchbx/acapi.git
+  remote: https://github.com/harshared/simple_calendar.git
+  revision: 109781178efa26c89ba51efa496bca29bc70a565
+  specs:
+    simple_calendar (2.2.5)
+      rails (>= 3.0)
+
+GIT
+  remote: https://github.com/ideacrew/acapi.git
   revision: fe6ddbb9904e0992cba01e689e1c97098e1ec9cb
   branch: amqp_proc_title
   specs:
@@ -9,20 +16,13 @@ GIT
       sneakers
 
 GIT
-  remote: https://github.com/dchbx/openhbx_cv2.git
-  revision: b8d2a141ac22c9744c17b4b53a22e9f7a843fadf
+  remote: https://github.com/ideacrew/openhbx_cv2.git
+  revision: 62100256bd69ac5258832965e5054c5959d848ac
   branch: master
   specs:
     openhbx_cv2 (0.0.1)
       activesupport (>= 3.2)
       nokogiri-happymapper (~> 0.5)
-
-GIT
-  remote: https://github.com/harshared/simple_calendar.git
-  revision: 109781178efa26c89ba51efa496bca29bc70a565
-  specs:
-    simple_calendar (2.2.5)
-      rails (>= 3.0)
 
 GIT
   remote: https://github.com/ideacrew/resource_registry.git
