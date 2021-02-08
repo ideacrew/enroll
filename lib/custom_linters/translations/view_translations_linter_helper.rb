@@ -3,7 +3,7 @@
 # This module defines methods related to ViewTranslationsLinter to be reused in
 # Rake files, specs, etc.
 
-require_relative 'view_translations_linter.rb'
+require_relative 'view_translations_linter'
 
 module ViewTranslationsLinterHelper
   # Approved list data
@@ -12,7 +12,7 @@ module ViewTranslationsLinterHelper
   end
 
   def included_substring_string_in_erb
-    ( 
+    (
       approved_translations_hash[:approved_translation_strings_in_erb_tags][:conditional_logic_methods] +
       approved_translations_hash[:approved_translation_strings_in_erb_tags][:form_instance_variables] +
       approved_translations_hash[:approved_translation_strings_in_erb_tags][:html_elements_and_helper_methods] +
@@ -21,20 +21,18 @@ module ViewTranslationsLinterHelper
       approved_translations_hash[:approved_translation_strings_in_erb_tags][:proper_name_related_strings] +
       approved_translations_hash[:approved_translation_strings_in_erb_tags][:websites] +
       approved_translations_hash[:approved_translation_strings_in_erb_tags][:record_identifiers] +
-      approved_translations_hash[:approved_translation_strings_in_erb_tags][:settings] + 
+      approved_translations_hash[:approved_translation_strings_in_erb_tags][:settings] +
       approved_translations_hash[:approved_translation_strings_in_erb_tags][:string_method_calls] +
       approved_translations_hash[:approved_translation_strings_in_erb_tags][:record_method_calls]
     ).flatten
   end
-  
+
   # In ERB
   def regex_matched_substrings_in_erb
     []
   end
 
-  def included_substring_string_outside_erb
-
-  end
+  def included_substring_string_outside_erb; end
 
   def approved_exact_match_strings_in_erb
     (approved_translations_hash[:approved_translation_strings_in_erb_tags][:array_counter_variables] +
@@ -62,13 +60,13 @@ module ViewTranslationsLinterHelper
   end
 
   def translations_in_erb_tags_present?(file_location)
-    stringified_view = File.read("#{file_location}")
-    ViewTranslationsLinter.new({"#{file_location}" => stringified_view}, approved_translation_strings_in_erb_tags, 'in_erb').all_translations_present?
+    stringified_view = File.read(file_location.to_s)
+    ViewTranslationsLinter.new({file_location.to_s => stringified_view}, approved_translation_strings_in_erb_tags, 'in_erb').all_translations_present?
   end
 
   def translations_outside_erb_tags_present?(file_location)
-    stringified_view = File.read("#{file_location}")
-    ViewTranslationsLinter.new({"#{file_location}" =>  stringified_view}, approved_translation_strings_outside_erb_tags, 'outside_erb').all_translations_present?
+    stringified_view = File.read(file_location.to_s)
+    ViewTranslationsLinter.new({file_location.to_s => stringified_view}, approved_translation_strings_outside_erb_tags, 'outside_erb').all_translations_present?
   end
 
   def branch_changed_filenames_erb

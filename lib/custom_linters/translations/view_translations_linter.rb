@@ -13,7 +13,7 @@
 
 class ViewTranslationsLinter
   attr_accessor :approved_exact_match_strings_hash, :approved_exact_match_strings, :approved_regex_match_strings,
-  :approved_substring_included_strings, :filter_type, :regex_match_strings, :stringified_view_files
+                :approved_substring_included_strings, :filter_type, :regex_match_strings, :stringified_view_files
 
   def initialize(stringified_view_files, approved_exact_match_strings_hash, filter_type)
     @stringified_view_files = stringified_view_files
