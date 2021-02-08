@@ -10,8 +10,7 @@ module BenefitSponsors
         before_action :check_and_download_invoice, only: [:download_invoice, :show_invoice]
         before_action :wells_fargo_sso, :set_current_portal, only: [:show]
         before_action :set_flash_by_announcement, only: :show
-        layout "two_column", except: [:new]
-        layout 'bootstrap_4_two_column', :only => [:new_employer_profile]
+        layout "two_column", except: [:new, :new_employer_profile]
 
         #New profile registration with existing organization and approval request submitted to employer
         def show_pending
