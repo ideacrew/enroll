@@ -23,8 +23,7 @@ module ViewTranslationsLinterHelper
       approved_translations_hash[:approved_translation_strings_in_erb_tags][:record_identifiers] +
       approved_translations_hash[:approved_translation_strings_in_erb_tags][:settings] + 
       approved_translations_hash[:approved_translation_strings_in_erb_tags][:string_method_calls] +
-      approved_translations_hash[:approved_translation_strings_in_erb_tags][:record_method_calls] +
-      Rails.application.routes.named_routes.helper_names # Returns exact array of all path strings
+      approved_translations_hash[:approved_translation_strings_in_erb_tags][:record_method_calls]
     ).flatten
   end
   
@@ -42,6 +41,9 @@ module ViewTranslationsLinterHelper
      approved_translations_hash[:approved_translation_strings_in_erb_tags][:html_safe_one_liners] +
     approved_translations_hash[:approved_translation_strings_in_erb_tags][:instance_variables] +
     approved_translations_hash[:approved_translation_strings_in_erb_tags][:unique_variable_names] +
+    approved_translations_hash[:approved_translation_strings_in_erb_tags][:health_product_info_methods] +
+    # Returns exact array of all path strings
+    Rails.application.routes.named_routes.helper_names +
     approved_translations_hash[:approved_translation_strings_in_erb_tags][:exact_match_strings]).flatten
   end
 
@@ -58,7 +60,6 @@ module ViewTranslationsLinterHelper
   def matched_substrings_outside_erb
     []
   end
-
 
   def translations_in_erb_tags_present?(file_location)
     stringified_view = File.read("#{file_location}")
