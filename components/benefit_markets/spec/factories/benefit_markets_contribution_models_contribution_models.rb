@@ -56,6 +56,9 @@ FactoryBot.define do
               default_contribution_factor: 0.0,
               minimum_contribution_factor: 0.0)
       ]
+      contribution_model.contribution_units.each do |cu|
+        cu.contribution_model = contribution_model
+      end
     end
 
     trait :for_health_single_product do
