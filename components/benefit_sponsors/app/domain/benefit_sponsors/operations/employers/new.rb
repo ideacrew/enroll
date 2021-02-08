@@ -113,6 +113,11 @@ module BenefitSponsors
           obj.staff_roles.first[:persisted?] = false
           obj.organization.profile[:office_locations_attributes] = nil
           obj.organization.profile.office_locations.first[:persisted?] = false
+          obj.organization.profile.contact_method_options = ::BenefitMarkets::CONTACT_METHODS_HASH
+          obj.organization.profile.office_locations.each do |ol|
+            ol.address.office_kind_options = BenefitSponsors::Locations::Address::OFFICE_KINDS
+          end
+          obj.organization.entity_kind_options = "BenefitSponsors::Organizations::Organization::DC_ENTITY_KINDS".constantize
           obj
         end
       end
