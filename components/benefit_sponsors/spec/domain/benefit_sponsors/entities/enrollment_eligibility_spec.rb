@@ -17,7 +17,7 @@ RSpec.describe BenefitSponsors::Entities::EnrollmentEligibility do
     let(:required_params) do
       {
         effective_date: effective_date, market_kind: market_kind, benefit_sponsorship_id: benefit_sponsorship_id,
-        benefit_application_kind: benefit_application_kind, service_areas: [service_area.as_json]
+        benefit_application_kind: benefit_application_kind, service_areas: [service_area.serializable_hash]
       }
     end
 
