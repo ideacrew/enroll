@@ -61,7 +61,7 @@ fieldset.mt-2
       = f_profile.select :contact_method, options_for_select(f_profile.object.contact_method_options, selected: f_profile.object.contact_method[1]), {}, class:'form-control'
 
       input.btn.btn-primary.pull-right.mt-2#employer_registration_form data-target="#confirm-submit" data-toggle="modal" name="btn" type="button" value="Add Portal"
-      = link_to 'Cancel', main_app.available_accounts_person_path(id: @person_id), class: 'btn btn-outline-primary pull-right mt-2 mr-2'
+      = link_to 'Cancel', main_app.show_roles_person_path(id: @person_id), class: 'btn btn-outline-primary pull-right mt-2 mr-2'
 
       input type="hidden" name="employer_id" id="employer_id"
 

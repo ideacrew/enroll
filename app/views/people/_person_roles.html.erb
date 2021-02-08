@@ -87,8 +87,8 @@
                 </label>
               </div>
 
-              <%= link_to 'Continue', benefit_sponsors.new_employer_profile_form_profiles_registrations_path(person_id: @person.id, profile_type: :benefit_sponsor, with_roster: true) , class: "btn btn-danger with_roster_link" %>
-              <%= link_to 'Continue', benefit_sponsors.new_employer_profile_form_profiles_registrations_path(person_id: @person.id, profile_type: :benefit_sponsor, with_roster: false) , class: "btn btn-danger without_roster_link hidden" %>
+              <%= link_to 'Continue', benefit_sponsors.new_employer_profile_profiles_employers_employer_profiles_path(person_id: @person.id, profile_type: :benefit_sponsor, with_roster: true) , class: "btn btn-danger with_roster_link" %>
+              <%= link_to 'Continue', benefit_sponsors.new_employer_profile_profiles_employers_employer_profiles_path(person_id: @person.id, profile_type: :benefit_sponsor, with_roster: false) , class: "btn btn-danger without_roster_link hidden" %>
             </div>
           </div>
         </div>
@@ -144,7 +144,7 @@
                     <span class="caret"></span>
                   </button>
                   <div class="dropdown-menu dropdown-menu-right actions-menu" aria-labelledby="dropdownMenuButton">
-                    <%= link_to benefit_sponsors.new_employer_profile_form_profiles_registrations_path(person_id: @person.id, profile_type: :benefit_sponsor, with_roster: true) do %>
+                    <%= link_to benefit_sponsors.new_employer_profile_profiles_employers_employer_profiles_path(person_id: @person.id, profile_type: :benefit_sponsor, with_roster: true) do %>
                       <span class="dropdown-item">Copy this info to a new account</span>
                     <% end %>
                   </div>

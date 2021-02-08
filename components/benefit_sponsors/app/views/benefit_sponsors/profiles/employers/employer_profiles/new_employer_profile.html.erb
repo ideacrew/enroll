@@ -8,7 +8,7 @@
       <%= hidden_field_tag :manage_portals, true %>
       <%= hidden_field_tag :person_id, @person_id %>
       <%= hidden_field_tag :profile_type, params[:profile_type] %>
-      <%= render partial: 'employer_profile_form', locals: {f: f} %>
+      <%= render partial: 'new_employer_profile', locals: {f: f} %>
     <% end %>
   </div>
 
