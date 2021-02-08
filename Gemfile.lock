@@ -322,10 +322,14 @@ GEM
     animate-rails (1.0.10)
       rails
 <<<<<<< HEAD
+<<<<<<< HEAD
     ast (2.4.2)
 =======
     ast (2.4.0)
 >>>>>>> ruby-2.7.1 and rails-6.0 upgrade
+=======
+    ast (2.4.2)
+>>>>>>> updated gems and changed as_json to serializable_hash
     awesome_print (1.8.0)
     aws-sdk (2.2.37)
       aws-sdk-resources (= 2.2.37)
@@ -433,10 +437,14 @@ GEM
       ruby-rc4 (>= 0.1.5)
     concurrent-ruby (1.1.8)
 <<<<<<< HEAD
+<<<<<<< HEAD
     config (2.2.3)
 =======
     config (2.2.1)
 >>>>>>> ruby-2.7.1 and rails-6.0 upgrade
+=======
+    config (2.2.3)
+>>>>>>> updated gems and changed as_json to serializable_hash
       deep_merge (~> 1.2, >= 1.2.1)
       dry-validation (~> 1.0, >= 1.0.0)
     connection_pool (2.2.3)
@@ -483,10 +491,14 @@ GEM
     curl (0.0.9)
       awesome_print (>= 0.2.1)
       unidecoder (>= 1.1.1)
+<<<<<<< HEAD
     database_cleaner-core (2.0.1)
     database_cleaner-mongoid (2.0.1)
       database_cleaner-core (~> 2.0.0)
       mongoid
+=======
+    database_cleaner (1.99.0)
+>>>>>>> updated gems and changed as_json to serializable_hash
     deep_merge (1.2.1)
     descendants_tracker (0.0.4)
       thread_safe (~> 0.3, >= 0.3.1)
@@ -679,11 +691,15 @@ GEM
     mongo (2.14.0)
       bson (>= 4.8.2, < 5.0.0)
 <<<<<<< HEAD
+<<<<<<< HEAD
     mongo_session_store (3.2.1)
       actionpack (>= 4.0)
       mongo (~> 2.0)
 =======
     mongo_session_store (3.2.0)
+=======
+    mongo_session_store (3.2.1)
+>>>>>>> updated gems and changed as_json to serializable_hash
       actionpack (>= 4.0)
       mongo (~> 2.0)
     mongoid (7.2.0)
@@ -796,10 +812,14 @@ GEM
     rails-i18n (6.0.0)
       i18n (>= 0.7, < 2)
 <<<<<<< HEAD
+<<<<<<< HEAD
       railties (>= 6.0.0, < 7)
 =======
       railties (>= 5.0, < 6)
 >>>>>>> ruby-2.7.1 and rails-6.0 upgrade
+=======
+      railties (>= 6.0.0, < 7)
+>>>>>>> updated gems and changed as_json to serializable_hash
     railties (6.0.3.4)
       actionpack (= 6.0.3.4)
       activesupport (= 6.0.3.4)
@@ -865,6 +885,7 @@ GEM
       benchmark-trend (~> 0.4)
       rspec (>= 3.0)
 <<<<<<< HEAD
+<<<<<<< HEAD
     rspec-core (3.10.1)
       rspec-support (~> 3.10.0)
     rspec-expectations (3.10.1)
@@ -873,6 +894,11 @@ GEM
       rspec-support (~> 3.9.3)
     rspec-expectations (3.9.4)
 >>>>>>> ruby-2.7.1 and rails-6.0 upgrade
+=======
+    rspec-core (3.10.1)
+      rspec-support (~> 3.10.0)
+    rspec-expectations (3.10.1)
+>>>>>>> updated gems and changed as_json to serializable_hash
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.10.0)
     rspec-instafail (1.0.0)
@@ -885,11 +911,15 @@ GEM
       activesupport (>= 4.2)
       railties (>= 4.2)
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> updated gems and changed as_json to serializable_hash
       rspec-core (~> 3.10)
       rspec-expectations (~> 3.10)
       rspec-mocks (~> 3.10)
       rspec-support (~> 3.10)
     rspec-support (3.10.2)
+<<<<<<< HEAD
 =======
       rspec-core (~> 3.9)
       rspec-expectations (~> 3.9)
@@ -897,6 +927,8 @@ GEM
       rspec-support (~> 3.9)
     rspec-support (3.9.4)
 >>>>>>> ruby-2.7.1 and rails-6.0 upgrade
+=======
+>>>>>>> updated gems and changed as_json to serializable_hash
     rspec_junit_formatter (0.4.1)
       rspec-core (>= 2, < 4, != 2.12.0)
     rubocop (1.9.1)

@@ -70,12 +70,17 @@ GEM
       tzinfo (~> 2.0)
       zeitwerk (~> 2.3)
 <<<<<<< HEAD
+<<<<<<< HEAD
     addressable (2.7.0)
       public_suffix (>= 2.0.2, < 5.0)
 =======
     addressable (2.6.0)
       public_suffix (>= 2.0.2, < 4.0)
 >>>>>>> ruby-2.7.1 and rails-6.0 upgrade
+=======
+    addressable (2.7.0)
+      public_suffix (>= 2.0.2, < 5.0)
+>>>>>>> updated gems and changed as_json to serializable_hash
     aws-sdk (2.2.37)
       aws-sdk-resources (= 2.2.37)
     aws-sdk-core (2.2.37)
@@ -85,22 +90,31 @@ GEM
     builder (3.2.4)
     concurrent-ruby (1.1.8)
 <<<<<<< HEAD
+<<<<<<< HEAD
     crack (0.4.5)
       rexml
 =======
     crack (0.4.3)
       safe_yaml (~> 1.0.0)
 >>>>>>> ruby-2.7.1 and rails-6.0 upgrade
+=======
+    crack (0.4.5)
+      rexml
+>>>>>>> updated gems and changed as_json to serializable_hash
     crass (1.0.6)
     diff-lcs (1.4.4)
     erubi (1.10.0)
     globalid (0.4.2)
       activesupport (>= 4.2.0)
 <<<<<<< HEAD
+<<<<<<< HEAD
     hashdiff (1.0.1)
 =======
     hashdiff (0.3.8)
 >>>>>>> ruby-2.7.1 and rails-6.0 upgrade
+=======
+    hashdiff (1.0.1)
+>>>>>>> updated gems and changed as_json to serializable_hash
     i18n (1.8.7)
       concurrent-ruby (~> 1.0)
     jmespath (1.4.0)
@@ -124,10 +138,14 @@ GEM
       mini_portile2 (~> 2.5.0)
       racc (~> 1.4)
 <<<<<<< HEAD
+<<<<<<< HEAD
     public_suffix (4.0.6)
 =======
     public_suffix (3.0.3)
 >>>>>>> ruby-2.7.1 and rails-6.0 upgrade
+=======
+    public_suffix (4.0.6)
+>>>>>>> updated gems and changed as_json to serializable_hash
     racc (1.5.2)
     rack (2.2.3)
     rack-test (1.1.0)
@@ -194,10 +212,14 @@ GEM
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
 <<<<<<< HEAD
+<<<<<<< HEAD
     webmock (3.11.2)
 =======
     webmock (3.5.1)
 >>>>>>> ruby-2.7.1 and rails-6.0 upgrade
+=======
+    webmock (3.11.2)
+>>>>>>> updated gems and changed as_json to serializable_hash
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)
