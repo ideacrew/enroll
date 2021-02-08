@@ -22,7 +22,7 @@ RSpec.describe BenefitMarkets::Validators::Products::ProductPackageContract do
     }
   end
 
-  let(:member_relationship_map)       { ::BenefitMarkets::ContributionModels::MemberRelationshipMap.new(_id: BSON::ObjectId.new, relationship_name: 'Employee', count: 1).as_json }
+  let(:member_relationship_map)       { ::BenefitMarkets::ContributionModels::MemberRelationshipMap.new(_id: BSON::ObjectId.new, relationship_name: 'Employee', count: 1).serializable_hash }
   let(:member_relationship_maps)      { [member_relationship_map] }
   let(:contribution_unit) do
     ::BenefitMarkets::ContributionModels::ContributionUnit.new(
@@ -33,7 +33,7 @@ RSpec.describe BenefitMarkets::Validators::Products::ProductPackageContract do
     )
   end
 
-  let(:contribution_units)            { [contribution_unit.as_json] }
+  let(:contribution_units)            { [contribution_unit.serializable_hash] }
 
   let(:contribution_model) do
     {
