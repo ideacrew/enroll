@@ -3,9 +3,9 @@ registry:
   - namespace:
       - :enroll_app
     features:
-      - key: :shop_market
+      - key: :aca_shop_market
         is_enabled: false
-      - key: :fehb
+      - key: :fehb_market
         is_enabled: false
-      - key: :individual_market
+      - key: :aca_individual_market
         is_enabled: true
