@@ -27,49 +27,27 @@ n- amespace [Array] an ordered list that supports optional taxonomy for relation
 - Here is an example Feature definition in YAML format. Note the settings effective_period value is an expression:
 ```
   - namespace:
-
     - :enroll_app
-
     - :aca_shop_market
-
     - :benefit_market_catalog
-
     - :catalog_2019
-
     - :contribution_model_criteria
-
     features:
-
       - key: :initial_sponsor_jan_default_2019
-
         item: :contribution_model_criterion
-
         is_enabled: true
-
         settings:
-
           - key: :contribution_model_key
-
             item: :zero_percent_sponsor_fixed_percent_contribution_model
-
           - key: :benefit_application_kind
-
             item: :initial
-
           - key: :effective_period
-
             item: <%= Date.new(2019,1,1)..Date.new(2019,1,31) %>
-
           - key: :order
-
             item: 1
-
           - key: :default
-
             item: false
-
           - key: :renewal_criterion_key
-
             item: :initial_sponsor_jan_default
 ```
 
