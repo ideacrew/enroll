@@ -52,10 +52,14 @@ gem 'ui_helpers',         path: "components/ui_helpers"
 gem 'bson',                     '~> 4.3'
 gem 'carrierwave-mongoid',      '~> 1.2',  :require => 'carrierwave/mongoid'
 <<<<<<< HEAD
+<<<<<<< HEAD
 gem 'mongoid',                  git: 'https://github.com/mongodb/mongoid.git', ref: 'df6b2168ee7526f0c5e26f64f38851b91a0623e8'
 =======
 gem 'mongoid',                  '~> 7.2'
 >>>>>>> ruby-2.7.1 and rails-6.0 upgrade
+=======
+gem 'mongoid',                  git: 'https://github.com/mongodb/mongoid.git', ref: 'df6b2168ee7526f0c5e26f64f38851b91a0623e8'
+>>>>>>> pointing mongoid to its github to fix a bug
 gem 'mongo',                    '~> 2.6'
 gem 'mongo_session_store',      '~> 3.1'
 gem 'mongoid-autoinc',          '~> 6.0'
