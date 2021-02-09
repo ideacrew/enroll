@@ -29,7 +29,7 @@ class TaxHousehold
 
   embeds_many :eligibility_determinations, cascade_callbacks: true
 
-  scope :tax_household_with_year, ->(year) { where( effective_starting_on: (Date.new(year)..Date.new(year).end_of_year)) }
+  scope :tax_household_with_year, ->(year) { where(effective_starting_on: Date.new(year)..Date.new(year).end_of_year) }
   scope :active_tax_household, ->{ where(effective_ending_on: nil) }
 
   validate :validate_dates
