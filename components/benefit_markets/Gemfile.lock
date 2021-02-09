@@ -20,6 +20,15 @@ GIT
       ox (~> 2.0)
       rack (>= 1.6.13)
 
+GIT
+  remote: https://github.com/mongodb/mongoid.git
+  revision: df6b2168ee7526f0c5e26f64f38851b91a0623e8
+  ref: df6b2168ee7526f0c5e26f64f38851b91a0623e8
+  specs:
+    mongoid (7.3.0.alpha)
+      activemodel (>= 5.1, < 6.2)
+      mongo (>= 2.10.5, < 3.0.0)
+
 PATH
   remote: .
   specs:
@@ -33,7 +42,6 @@ PATH
       dry-validation
       language_list (~> 1)
       money-rails (~> 1.13)
-      mongoid (~> 7.2)
       pundit (~> 2.0)
       rails (~> 6.0)
       slim (~> 3.0)
@@ -114,7 +122,7 @@ GEM
       thread_safe (~> 0.3, >= 0.3.1)
     bootsnap (1.7.2)
       msgpack (~> 1.0)
-    bson (4.11.1)
+    bson (4.12.0)
     builder (3.2.4)
     capybara (3.35.3)
       addressable
@@ -229,9 +237,6 @@ GEM
       railties (>= 3.0)
     mongo (2.14.0)
       bson (>= 4.8.2, < 5.0.0)
-    mongoid (7.2.0)
-      activemodel (>= 5.1, < 6.1)
-      mongo (>= 2.10.5, < 3.0.0)
     mongoid-compatibility (0.5.1)
       activesupport
       mongoid (>= 2.0)
@@ -374,6 +379,7 @@ DEPENDENCIES
   database_cleaner
   factory_bot_rails (~> 4)
   forgery (~> 0.7.0)
+  mongoid!
   mongoid-rspec (~> 4.1)
   mongoid_rails_migrations (~> 1.4)
   rails-controller-testing

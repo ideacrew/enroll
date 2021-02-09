@@ -3,7 +3,7 @@ module BenefitMarkets
     class MemberRelationship
       include Mongoid::Document
 
-      embedded_in :pricing_model, :inverse_of => :member_relationships
+      embedded_in :pricing_model,  class_name: "::BenefitMarkets::PricingModels::PricingModel", :inverse_of => :member_relationships
 
       field :relationship_name, type: Symbol
       field :relationship_kinds, type: Array

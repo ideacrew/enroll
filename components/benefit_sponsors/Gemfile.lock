@@ -30,6 +30,15 @@ GIT
       ox (~> 2.0)
       rack (>= 1.6.13)
 
+GIT
+  remote: https://github.com/mongodb/mongoid.git
+  revision: df6b2168ee7526f0c5e26f64f38851b91a0623e8
+  ref: df6b2168ee7526f0c5e26f64f38851b91a0623e8
+  specs:
+    mongoid (7.3.0.alpha)
+      activemodel (>= 5.1, < 6.2)
+      mongo (>= 2.10.5, < 3.0.0)
+
 PATH
   remote: ../../project_gems/effective_datatables-2.6.14
   specs:
@@ -54,7 +63,6 @@ PATH
       dry-validation
       language_list (~> 1)
       money-rails (~> 1.13)
-      mongoid (~> 7.2)
       pundit (~> 2.0)
       rails (~> 6.0)
       slim (~> 3.0)
@@ -68,9 +76,8 @@ PATH
       aasm (~> 4.8)
       ckeditor (= 4.2.4)
       combine_pdf
-      config
+      config (~> 2.0)
       money-rails (~> 1.13)
-      mongoid (~> 7.2)
       non-stupid-digest-assets
       rails (~> 6.0)
       redcarpet (~> 3.4.0)
@@ -97,7 +104,6 @@ PATH
       dry-validation (~> 1.0)
       ffi (~> 1.9)
       kaminari (~> 0.17.0)
-      mongoid (~> 7.2)
       pundit (~> 2.0)
       rails (~> 6.0)
       roo (~> 2.1.0)
@@ -128,7 +134,6 @@ PATH
       language_list (~> 1)
       mail
       money-rails (~> 1.13)
-      mongoid (~> 7.2)
       mongoid-autoinc (~> 6.0)
       pundit (~> 2.0)
       rails (~> 6.0)
@@ -214,7 +219,7 @@ GEM
     bootsnap (1.7.2)
       msgpack (~> 1.0)
     browser (2.7.0)
-    bson (4.11.1)
+    bson (4.12.0)
     builder (3.2.4)
     bunny (1.7.1)
       amq-protocol (~> 1.9.2)
@@ -378,9 +383,6 @@ GEM
       railties (>= 3.0)
     mongo (2.14.0)
       bson (>= 4.8.2, < 5.0.0)
-    mongoid (7.2.0)
-      activemodel (>= 5.1, < 6.1)
-      mongo (>= 2.10.5, < 3.0.0)
     mongoid-autoinc (6.0.3)
       mongoid (>= 6.0, < 8.0)
     mongoid-compatibility (0.5.1)
@@ -586,6 +588,7 @@ DEPENDENCIES
   effective_datatables!
   factory_bot_rails (~> 4)
   forgery (~> 0.7.0)
+  mongoid!
   mongoid-rspec (~> 4.1)
   mongoid_rails_migrations (~> 1.4)
   notifier!

@@ -4,7 +4,7 @@ module BenefitMarkets
       include Mongoid::Document
       include Mongoid::Timestamps
 
-      embedded_in :pricing_model, inverse_of: :pricing_units
+      embedded_in :pricing_model, class_name: "::BenefitMarkets::PricingModels::PricingModel", inverse_of: :pricing_units
 
       field :name, type: String
       field :display_name, type: String

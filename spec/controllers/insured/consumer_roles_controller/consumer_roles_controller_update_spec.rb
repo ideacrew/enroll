@@ -102,7 +102,9 @@ RSpec.describe Insured::ConsumerRolesController do
       subject { get :help_paying_coverage }
 
       it 'renders help_paying_coverage template' do
-        expect(subject).to render_template(:file => "#{Rails.root}/public/404.html")
+        #check 404
+        expect(subject.status).to eq(404)
+        # expect(subject).to render_template(:file => "#{Rails.root}/public/404.html")
       end
     end
   end
