@@ -78,7 +78,7 @@ class Insured::ConsumerRolesController < ApplicationController
         when :existing_account
           format.html { redirect_to URI.parse(SamlInformation.account_recovery_url).to_s }
         else
-          unless params[:persisted] == "true"
+          if params[:persisted] != "true" && ::EnrollRegistry[:aca_shop_market].enabled?
             @employee_candidate = Forms::EmployeeCandidate.new(@person_params)
 
             if @employee_candidate.valid?
