@@ -16,7 +16,11 @@ gem 'benefit_sponsors', path: '../benefit_sponsors'
 gem "effective_datatables", path: ".../../../../project_gems/effective_datatables-2.6.14"
 
 gem 'webpacker', '~> 4.0.2'
+<<<<<<< HEAD
 gem 'resource_registry',  git:  'https://github.com/ideacrew/resource_registry.git', branch: 'trunk'
+=======
+gem 'resource_registry',  git:  'https://github.com/ideacrew/resource_registry.git', branch: 'master'
+>>>>>>> pointing mongoid to its github to fix a bug
 gem 'mongoid', git: 'https://github.com/mongodb/mongoid.git', ref: 'df6b2168ee7526f0c5e26f64f38851b91a0623e8'
 
 # To use a debugger

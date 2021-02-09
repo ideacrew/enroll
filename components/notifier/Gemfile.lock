@@ -9,6 +9,7 @@ GIT
       sneakers
 
 GIT
+<<<<<<< HEAD
   remote: https://github.com/ideacrew/resource_registry.git
   revision: 7b8f396afde849e584d0a749ade9ee88f1717e26
   branch: trunk
@@ -31,6 +32,8 @@ GIT
       rack (>= 1.6.13)
 
 GIT
+=======
+>>>>>>> pointing mongoid to its github to fix a bug
   remote: https://github.com/mongodb/mongoid.git
   revision: df6b2168ee7526f0c5e26f64f38851b91a0623e8
   ref: df6b2168ee7526f0c5e26f64f38851b91a0623e8
@@ -49,9 +52,12 @@ PATH
       config (~> 2.0)
       money-rails (~> 1.13)
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
       mongoid (~> 7.2)
 >>>>>>> ruby-2.7.1 and rails-6.0 upgrade
+=======
+>>>>>>> pointing mongoid to its github to fix a bug
       non-stupid-digest-assets
       rails (~> 6.0)
       redcarpet (~> 3.4.0)
@@ -196,8 +202,11 @@ GEM
       descendants_tracker (~> 0.0.4)
       ice_nine (~> 0.11.0)
       thread_safe (~> 0.3, >= 0.3.1)
+<<<<<<< HEAD
     bootsnap (1.7.2)
       msgpack (~> 1.0)
+=======
+>>>>>>> pointing mongoid to its github to fix a bug
     bson (4.12.0)
     builder (3.2.4)
     bunny (1.7.1)
@@ -351,6 +360,7 @@ GEM
     mongo (2.14.0)
       bson (>= 4.8.2, < 5.0.0)
 <<<<<<< HEAD
+<<<<<<< HEAD
     msgpack (1.4.2)
     nio4r (2.5.7)
     nokogiri (1.11.2-x86_64-darwin)
@@ -358,6 +368,8 @@ GEM
     mongoid (7.2.0)
       activemodel (>= 5.1, < 6.1)
       mongo (>= 2.10.5, < 3.0.0)
+=======
+>>>>>>> pointing mongoid to its github to fix a bug
     nio4r (2.5.4)
     nokogiri (1.11.1)
       mini_portile2 (~> 2.5.0)
