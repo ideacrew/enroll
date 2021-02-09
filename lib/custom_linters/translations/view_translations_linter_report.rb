@@ -84,7 +84,7 @@ class ViewTranslationsLinterReport
     if filenames[0].length == views_with_all_translations.length
       puts("All ERB translations present for #{directory_name}")
     else
-      puts("For a total of #{filenames.length} ERB views in the #{directory_name} directory:")
+      puts("For a total of #{filenames[0].length} ERB views in the #{directory_name} directory:")
       puts("There are a total of #{views_missing_translations_both.length} views with translations both inside and outside erb missing.")
       puts("There are a total of #{views_missing_translations_outside_erb.length} views with translations outside erb missing.")
       puts("There are a total of #{views_missing_translations_inside_erb.length} views with translations inside erb missing.")
