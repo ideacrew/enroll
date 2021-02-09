@@ -93,7 +93,7 @@ class ViewTranslationsLinterReport
     puts("")
     puts("For a total of #{filenames[1].length} HAML views in #{directory_name} directory:") if filenames[1].present?
     if filenames[1].length == haml_views_with_translations_present.length
-      puts("All haml translations spresent for #{directory_name}.")
+      puts("All haml translations present for #{directory_name}.")
     else
       puts("There are a total of #{haml_views_missing_translations.length} haml views with missing translations.")
     end
