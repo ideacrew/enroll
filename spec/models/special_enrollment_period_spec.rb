@@ -163,7 +163,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
       it "should not raise inactive qle exception" do
         active_qle.update_attributes(is_active: false, end_on: TimeKeeper.date_of_record - 1.day)
         valid_params = sep.attributes.except("effective_on", "submitted_at", "_id").merge(family: family, qualifying_life_event_kind: active_qle, title: "tttt")
-        expect{SpecialEnrollmentPeriod.create(valid_params)}.not_to raise_error(StandardError, "Qualifying life event kind is expired")
+        expect{SpecialEnrollmentPeriod.create(valid_params)}.not_to raise_error #(StandardError, "Qualifying life event kind is expired")
       end
     end
 
