@@ -64,9 +64,12 @@ PATH
       haml-rails
       money-rails (~> 1.13.3)
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
       mongoid (~> 7.2)
 >>>>>>> ruby-2.7.1 and rails-6.0 upgrade
+=======
+>>>>>>> pointing mongoid to its github to fix a bug
       mongoid-autoinc (~> 6.0)
       pundit (~> 2.0)
       rails (~> 6.0)
@@ -208,8 +211,12 @@ GEM
     bcrypt (3.1.16)
     bootsnap (1.7.0)
       msgpack (~> 1.0)
+<<<<<<< HEAD
     bson (4.11.1)
 >>>>>>> ruby-2.7.1 and rails-6.0 upgrade
+=======
+    bson (4.12.0)
+>>>>>>> pointing mongoid to its github to fix a bug
     builder (3.2.4)
     bunny (1.7.1)
       amq-protocol (~> 1.9.2)
@@ -392,11 +399,14 @@ GEM
     mongo (2.14.0)
       bson (>= 4.8.2, < 5.0.0)
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
     mongoid (7.2.0)
       activemodel (>= 5.1, < 6.1)
       mongo (>= 2.10.5, < 3.0.0)
 >>>>>>> ruby-2.7.1 and rails-6.0 upgrade
+=======
+>>>>>>> pointing mongoid to its github to fix a bug
     mongoid-autoinc (6.0.3)
       mongoid (>= 6.0, < 8.0)
     mongoid-compatibility (0.5.1)
@@ -644,9 +654,13 @@ DEPENDENCIES
   financial_assistance!
   forgery (~> 0.7.0)
 <<<<<<< HEAD
+<<<<<<< HEAD
   mongoid!
 =======
 >>>>>>> ruby-2.7.1 and rails-6.0 upgrade
+=======
+  mongoid!
+>>>>>>> pointing mongoid to its github to fix a bug
   mongoid-rspec (~> 4.1)
   mongoid_rails_migrations (~> 1.4)
   nokogiri-happymapper

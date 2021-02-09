@@ -21,10 +21,14 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "rails",                     "~> 6.0"
 <<<<<<< HEAD
+<<<<<<< HEAD
   # spec.add_dependency "mongoid",                   "~> 7.2"
 =======
   spec.add_dependency "mongoid",                   "~> 7.2"
 >>>>>>> ruby-2.7.1 and rails-6.0 upgrade
+=======
+  # spec.add_dependency "mongoid",                   "~> 7.2"
+>>>>>>> pointing mongoid to its github to fix a bug
   spec.add_dependency 'mongoid-autoinc',           '~> 6.0'
   spec.add_dependency "aasm",                      "~> 4.8"
   spec.add_dependency 'config',                    '~> 2.0'
