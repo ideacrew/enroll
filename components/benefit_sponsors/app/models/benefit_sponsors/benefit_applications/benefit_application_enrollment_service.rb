@@ -138,14 +138,17 @@ module BenefitSponsors
     def end_open_enrollment(end_date = nil)
       if benefit_application.may_end_open_enrollment?
         benefit_application.update(open_enrollment_period: benefit_application.open_enrollment_period.min..end_date) if end_date.present?
-        benefit_application.end_open_enrollment!
 
         if business_policy_satisfied_for?(:end_open_enrollment)
-          benefit_application.approve_enrollment_eligiblity! if benefit_application.is_renewing? && benefit_application.may_approve_enrollment_eligiblity?
           calculate_pricing_determinations(benefit_application)
+          benefit_application.end_open_enrollment!
+          benefit_application.approve_enrollment_eligiblity! if benefit_application.is_renewing? && benefit_application.may_approve_enrollment_eligiblity?
+
           [true, benefit_application, business_policy.success_results]
         else
+          benefit_application.end_open_enrollment!
           benefit_application.deny_enrollment_eligiblity! if benefit_application.may_deny_enrollment_eligiblity?
+
           [false, benefit_application, business_policy.fail_results]
         end
       end
