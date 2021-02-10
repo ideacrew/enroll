@@ -61,16 +61,24 @@ RSpec.describe Operations::HbxEnrollments::Reinstate, :type => :model, dbclean: 
     end
 
     context 'when enrollment reinstated', dbclean: :around_each do
+      before do
+        period = initial_application.effective_period.min..TimeKeeper.date_of_record.end_of_month
+        initial_application.update_attributes!(termination_reason: 'nonpayment', terminated_on: period.max, effective_period: period)
+        initial_application.terminate_enrollment!
+        effective_period = (initial_application.effective_period.max.next_day)..(initial_application.benefit_sponsor_catalog.effective_period.max)
+        cloned_application = ::BenefitSponsors::Operations::BenefitApplications::Clone.new.call({benefit_application: initial_application, effective_period: effective_period}).success
+        cloned_catalog = ::BenefitMarkets::Operations::BenefitSponsorCatalogs::Clone.new.call(benefit_sponsor_catalog: initial_application.benefit_sponsor_catalog).success
+        cloned_catalog.benefit_application = cloned_application
+        cloned_catalog.save!
+        cloned_application.assign_attributes({aasm_state: :active, reinstated_id: initial_application.id, benefit_sponsor_catalog_id: cloned_catalog.id})
+        cloned_application.save!
+        @cloned_package = cloned_application.benefit_packages[0]
+        census_employee.reload
+        enrollment.reload
+      end
       let!(:new_bga) do
-        enrollment.terminate_coverage!
-        current_bga = enrollment.census_employee.benefit_group_assignments.first
-        bga_params = current_bga.serializable_hash.deep_symbolize_keys.except(:_id, :workflow_state_transitions)
-        bga_params.merge!({start_on: enrollment.terminated_on.next_month.beginning_of_month})
-        census_employee.active_benefit_group_assignment.update_attributes(end_on: enrollment.terminated_on)
-        census_employee.benefit_group_assignments << ::BenefitGroupAssignment.new(bga_params)
-        census_employee.save!
-        enrollment.census_employee.reload
-        census_employee.benefit_group_assignments.where(start_on: enrollment.terminated_on.next_day).first
+        ::Operations::BenefitGroupAssignments::Reinstate.new.call({benefit_group_assignment: census_employee.benefit_group_assignments.first, options: {benefit_package: @cloned_package} })
+        census_employee.benefit_group_assignments.where(start_on:  @cloned_package.start_on).first
       end
 
       context 'for a terminated enrollment' do
@@ -121,7 +129,7 @@ RSpec.describe Operations::HbxEnrollments::Reinstate, :type => :model, dbclean: 
 
       context 'terminated enrollment, employee future terminated ' do
         before do
-          census_employee.terminate_employment(benefit_package.end_on)
+          census_employee.terminate_employment(TimeKeeper.date_of_record.next_month.end_of_month)
           @reinstated_enrollment = subject.call({hbx_enrollment: enrollment, options: {benefit_package: new_bga.benefit_package}}).success
           @reinstated_enrollment.reload
         end
@@ -137,7 +145,7 @@ RSpec.describe Operations::HbxEnrollments::Reinstate, :type => :model, dbclean: 
         end
 
         it 'should set terminated date on enrollment' do
-          expect(@reinstated_enrollment.terminated_on).to eq benefit_package.end_on
+          expect(@reinstated_enrollment.terminated_on).to eq census_employee.employment_terminated_on
         end
 
         it 'should assign benefit group assignment' do
@@ -162,7 +170,7 @@ RSpec.describe Operations::HbxEnrollments::Reinstate, :type => :model, dbclean: 
 
       context 'for a waived enrollment' do
         before do
-          enrollment.update_attributes!(aasm_state: 'shopping', terminate_reason: 'retroactive_canceled')
+          enrollment.update_attributes!(effective_on: @cloned_package.start_on, aasm_state: 'shopping', terminate_reason: 'retroactive_canceled')
           enrollment.waive_coverage!
           enrollment.cancel_coverage!
           @result = subject.call({hbx_enrollment: enrollment, options: {benefit_package: new_bga.benefit_package}}).success
@@ -175,18 +183,26 @@ RSpec.describe Operations::HbxEnrollments::Reinstate, :type => :model, dbclean: 
     end
 
     context 'reinstating terminated enrollment, employee terminated in past', dbclean: :after_each do
-
-      let!(:new_bga) do
+      before do
+        period = initial_application.effective_period.min..(TimeKeeper.date_of_record - 2.months).end_of_month
+        initial_application.update_attributes!(termination_reason: 'nonpayment', terminated_on: period.max, effective_period: period)
+        initial_application.terminate_enrollment!
         census_employee.terminate_employment(TimeKeeper.date_of_record.last_month.end_of_month)
+
+        effective_period = (initial_application.effective_period.max.next_day)..(initial_application.benefit_sponsor_catalog.effective_period.max)
+        cloned_application = ::BenefitSponsors::Operations::BenefitApplications::Clone.new.call({benefit_application: initial_application, effective_period: effective_period}).success
+        cloned_catalog = ::BenefitMarkets::Operations::BenefitSponsorCatalogs::Clone.new.call(benefit_sponsor_catalog: initial_application.benefit_sponsor_catalog).success
+        cloned_catalog.benefit_application = cloned_application
+        cloned_catalog.save!
+        cloned_application.assign_attributes({aasm_state: :active, reinstated_id: initial_application.id, benefit_sponsor_catalog_id: cloned_catalog.id})
+        cloned_application.save!
+        @cloned_package = cloned_application.benefit_packages[0]
+        census_employee.reload
         enrollment.reload
-        current_bga = enrollment.census_employee.benefit_group_assignments.first
-        bga_params = current_bga.serializable_hash.deep_symbolize_keys.except(:_id, :workflow_state_transitions)
-        enrollment.update_attributes(terminated_on: benefit_package.start_on.next_month.end_of_month)
-        bga_params.merge!({start_on: enrollment.terminated_on.next_day})
-        census_employee.active_benefit_group_assignment.update_attributes(end_on: enrollment.terminated_on)
-        census_employee.benefit_group_assignments << ::BenefitGroupAssignment.new(bga_params)
-        enrollment.census_employee.reload
-        census_employee.benefit_group_assignments.where(start_on: enrollment.terminated_on.next_day).first
+      end
+      let!(:new_bga) do
+        ::Operations::BenefitGroupAssignments::Reinstate.new.call({benefit_group_assignment: census_employee.benefit_group_assignments.first, options: {benefit_package: @cloned_package} })
+        census_employee.benefit_group_assignments.where(start_on:  @cloned_package.start_on).first
       end
 
       before do
@@ -230,14 +246,20 @@ RSpec.describe Operations::HbxEnrollments::Reinstate, :type => :model, dbclean: 
 
     context 'when benefit group assignment not found', dbclean: :after_each do
       before do
-        enrollment.terminate_coverage!
-        new_enr = enrollment.dup
-        new_enr.assign_attributes({effective_on: enrollment.terminated_on.next_day})
-        new_enr.save!
-        enrollment.census_employee.benefit_group_assignments.by_benefit_package(enrollment.sponsored_benefit_package).update_all(end_on: enrollment.terminated_on)
-        enrollment.reload
+        period = initial_application.effective_period.min..TimeKeeper.date_of_record.end_of_month
+        initial_application.update_attributes!(termination_reason: 'nonpayment', terminated_on: period.max, effective_period: period)
+        initial_application.terminate_enrollment!
+        effective_period = (initial_application.effective_period.max.next_day)..(initial_application.benefit_sponsor_catalog.effective_period.max)
+        cloned_application = ::BenefitSponsors::Operations::BenefitApplications::Clone.new.call({benefit_application: initial_application, effective_period: effective_period}).success
+        cloned_catalog = ::BenefitMarkets::Operations::BenefitSponsorCatalogs::Clone.new.call(benefit_sponsor_catalog: initial_application.benefit_sponsor_catalog).success
+        cloned_catalog.benefit_application = cloned_application
+        cloned_catalog.save!
+        cloned_application.assign_attributes({aasm_state: :active, reinstated_id: initial_application.id, benefit_sponsor_catalog_id: cloned_catalog.id})
+        cloned_application.save!
+        @cloned_package = cloned_application.benefit_packages[0]
         census_employee.reload
-        @result = subject.call({hbx_enrollment: enrollment, options: {benefit_package: benefit_package}})
+        enrollment.reload
+        @result = subject.call({hbx_enrollment: enrollment, options: {benefit_package: @cloned_package}})
       end
 
       it 'should return a failure with a message' do
@@ -246,21 +268,30 @@ RSpec.describe Operations::HbxEnrollments::Reinstate, :type => :model, dbclean: 
     end
 
     context 'overlapping enrollment exists' do
-      let!(:new_bga) do
-        enrollment.terminate_coverage!
+      before do
+        period = initial_application.effective_period.min..TimeKeeper.date_of_record.end_of_month
+        initial_application.update_attributes!(termination_reason: 'nonpayment', terminated_on: period.max, effective_period: period)
+        initial_application.terminate_enrollment!
+        effective_period = (initial_application.effective_period.max.next_day)..(initial_application.benefit_sponsor_catalog.effective_period.max)
+        cloned_application = ::BenefitSponsors::Operations::BenefitApplications::Clone.new.call({benefit_application: initial_application, effective_period: effective_period}).success
+        cloned_catalog = ::BenefitMarkets::Operations::BenefitSponsorCatalogs::Clone.new.call(benefit_sponsor_catalog: initial_application.benefit_sponsor_catalog).success
+        cloned_catalog.benefit_application = cloned_application
+        cloned_catalog.save!
+        cloned_application.assign_attributes({aasm_state: :active, reinstated_id: initial_application.id, benefit_sponsor_catalog_id: cloned_catalog.id})
+        cloned_application.save!
+        @cloned_package = cloned_application.benefit_packages[0]
+        census_employee.reload
         enrollment.reload
-        current_bga = enrollment.census_employee.benefit_group_assignments.first
-        bga_params = current_bga.serializable_hash.deep_symbolize_keys.except(:_id, :workflow_state_transitions)
-        bga_params.merge!({start_on: enrollment.terminated_on.next_day})
-        enrollment.census_employee.benefit_group_assignments << ::BenefitGroupAssignment.new(bga_params)
-        enrollment.census_employee.save!
+      end
+
+      let!(:new_bga) do
+        ::Operations::BenefitGroupAssignments::Reinstate.new.call({benefit_group_assignment: census_employee.benefit_group_assignments.first, options: {benefit_package: @cloned_package} })
+        census_employee.benefit_group_assignments.where(start_on:  @cloned_package.start_on).first
       end
 
       before do
-        new_enr = enrollment.dup
-        new_enr.assign_attributes({effective_on: enrollment.terminated_on.next_day})
-        new_enr.save!
-        @result = subject.call({hbx_enrollment: enrollment, options: {benefit_package: benefit_package}})
+        subject.call({hbx_enrollment: enrollment, options: {benefit_package: new_bga.benefit_package}}).success
+        @result = subject.call({hbx_enrollment: enrollment, options: {benefit_package: new_bga.benefit_package}})
       end
 
       it 'should return a failure with a message' do
@@ -270,7 +301,19 @@ RSpec.describe Operations::HbxEnrollments::Reinstate, :type => :model, dbclean: 
 
     context 'when benefit package optional params missing' do
       before do
-        enrollment.terminate_coverage!
+        period = initial_application.effective_period.min..TimeKeeper.date_of_record.end_of_month
+        initial_application.update_attributes!(termination_reason: 'nonpayment', terminated_on: period.max, effective_period: period)
+        initial_application.terminate_enrollment!
+        effective_period = (initial_application.effective_period.max.next_day)..(initial_application.benefit_sponsor_catalog.effective_period.max)
+        cloned_application = ::BenefitSponsors::Operations::BenefitApplications::Clone.new.call({benefit_application: initial_application, effective_period: effective_period}).success
+        cloned_catalog = ::BenefitMarkets::Operations::BenefitSponsorCatalogs::Clone.new.call(benefit_sponsor_catalog: initial_application.benefit_sponsor_catalog).success
+        cloned_catalog.benefit_application = cloned_application
+        cloned_catalog.save!
+        cloned_application.assign_attributes({aasm_state: :active, reinstated_id: initial_application.id, benefit_sponsor_catalog_id: cloned_catalog.id})
+        cloned_application.save!
+        @cloned_package = cloned_application.benefit_packages[0]
+        census_employee.reload
+        enrollment.reload
         @result = subject.call({hbx_enrollment: enrollment})
       end
 

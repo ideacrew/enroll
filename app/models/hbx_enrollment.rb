@@ -2323,8 +2323,8 @@ class HbxEnrollment
 
   def term_or_cancel_date_valid?
     return false unless sponsored_benefit_package.present?
+    return false if effective_on.present? && effective_on < sponsored_benefit_package.start_on.to_date
     return false if terminated_on.present? && terminated_on != sponsored_benefit_package.end_on.to_date
-    return false if effective_on < sponsored_benefit_package.start_on.to_date
     true
   end
 
