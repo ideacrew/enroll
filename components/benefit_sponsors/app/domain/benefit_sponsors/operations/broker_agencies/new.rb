@@ -42,14 +42,13 @@ module BenefitSponsors
         end
 
         def construct_staff_role_params
-          staff_role_hash = { person_id: @person&.id.to_s,
-                              first_name: @person&.first_name,
-                              last_name: @person&.last_name,
-                              email: @person&.work_email_or_best,
-                              dob: @person&.dob&.strftime("%m/%d/%Y"),
-                              area_code: nil,
-                              number: nil }
-          staff_role_hash
+          { person_id: @person&.id.to_s,
+            first_name: @person&.first_name,
+            last_name: @person&.last_name,
+            email: @person&.work_email_or_best,
+            dob: @person&.dob&.strftime("%m/%d/%Y"),
+            area_code: nil,
+            number: nil }
         end
 
         def construct_organization_params

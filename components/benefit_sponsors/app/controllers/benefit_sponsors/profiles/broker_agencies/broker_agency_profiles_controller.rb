@@ -59,9 +59,6 @@ module BenefitSponsors
           end
         end
 
-        def create_broker_profile
-        end
-
         def staff_index
           authorize self
           @q = params.permit(:q)[:q]
