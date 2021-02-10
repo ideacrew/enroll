@@ -10,53 +10,68 @@
     <div class="modal fade" id="addAccount" tabindex="-1" role="dialog" aria-labelledby="addAccountLabel" aria-hidden="true">
       <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
-          <div class="modal-body" style="padding: 25px; text-align: center;">
+          <div class="modal-body">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
-            <h5 class="modal-title" id="addAccountLabel" style="color: #007bc4;"><%= l10n("hub.home_page.add_account.modal.title") %></h5>
-            <div style="padding: 10px 50px 25px 75px; text-align: left;">
+            <h5 class="modal-title label-color" id="addAccountLabel"><%= l10n("hub.home_page.add_account.modal.title") %></h5>
+            <div class='modal-options'>
               <p><%= l10n("hub.home_page.add_account.modal.description") %> <strong><%= l10n("hub.home_page.title") %></strong></p>
 
               <%# Get roles variable from controller & loop - todo %>
-              <div class="d-flex flex-row bg-white hub-item-flex-shadow ivl-card" style="border-radius: 10px; text-align: left; padding: 25px; margin-bottom: 10px; border: #b7afaf solid 1px;" data-toggle="modal" data-target="#addIvlAccount" data-dismiss="modal">
+              <div class="d-flex flex-row bg-white hub-item-flex-shadow ivl-card" data-toggle="modal" data-target="#addIvlAccount" data-dismiss="modal">
                 <div class="col-2">
                   <i class="fas fa-users fa-3x"></i>
                 </div>
                 <div class="col-10">
-                  <div class=""><strong style="color: #007bc4;"><%= l10n("hub.home_page.add_account.modal.ivl_title") %></strong></div>
-                  <div class=""><small><%= l10n("hub.home_page.add_account.modal.ivl_description") %></small></div>
+                  <div><strong  class='label-color'><%= l10n("hub.home_page.add_account.modal.ivl_title") %></strong></div>
+                  <div><small><%= l10n("hub.home_page.add_account.modal.ivl_description") %></small></div>
                 </div>
               </div>
 
               <div style="padding: 10px;">
-                <p style="border: 1px solid grey; border-radius: 50%; width: fit-content; position: relative; margin: 0 auto; padding: 5px;">or</p>
+                <p class='or-style'>or</p>
               </div>
               <%= link_to main_app.privacy_insured_employee_index_path(person_id: @person.id) do %>
-                <div class="d-flex flex-row bg-white hub-item-flex-shadow employee-card" style="border-radius: 10px; text-align: left; padding: 25px; margin-bottom: 10px; border: #b7afaf solid 1px">
+                <div class="d-flex flex-row bg-white hub-item-flex-shadow employee-card">
                   <div class="col-2">
                     <i class="far fa-address-card fa-3x"></i>
                   </div>
                   <div class="col-10">
-                    <div class=""><strong style="color: #007bc4;"><%= l10n("hub.home_page.add_account.modal.employee_title") %></strong></div>
-                    <div class=""><small><%= l10n("hub.home_page.add_account.modal.employee_description") %></small></div>
+                    <div><strong class='label-color'><%= l10n("hub.home_page.add_account.modal.employee_title") %></strong></div>
+                    <div><small><%= l10n("hub.home_page.add_account.modal.employee_description") %></small></div>
                   </div>
                 </div>
               <% end %>
 
               <div style="padding: 10px;">
-                <p style="border: 1px solid grey; border-radius: 50%; width: fit-content; position: relative; margin: 0 auto; padding: 5px;">or</p>
+                <p class='or-style'>or</p>
               </div>
 
-              <div class="d-flex flex-row bg-white hub-item-flex-shadow employer-card" style="border-radius: 10px; text-align: left; padding: 25px; margin-bottom: 10px; border: #b7afaf solid 1px" data-toggle="modal" data-target="#addEmployerAccount" data-dismiss="modal">
+              <div class="d-flex flex-row bg-white hub-item-flex-shadow employer-card" data-toggle="modal" data-target="#addEmployerAccount" data-dismiss="modal">
                 <div class="col-2">
                   <i class="fas fa-home fa-3x"></i>
                 </div>
                 <div class="col-10">
-                  <div class=""><strong style="color: #007bc4;"><%= l10n("hub.home_page.add_account.modal.employer_title") %></strong></div>
+                  <div class=""><strong class='label-color'><%= l10n("hub.home_page.add_account.modal.employer_title") %></strong></div>
                   <div class=""><small><%= l10n("hub.home_page.add_account.modal.employer_description") %></small></div>
                 </div>
               </div>
+
+              <div style="padding: 10px;">
+                <p class='or-style'>or</p>
+              </div>
+              <%= link_to benefit_sponsors.new_broker_profile_profiles_broker_agencies_broker_agency_profiles_path(person_id: @person.id, profile_type: :broker_agency) do %>
+                <div class="d-flex flex-row bg-white hub-item-flex-shadow broker-card">
+                  <div class="col-2">
+                    <i class="far fa-address-card fa-3x"></i>
+                  </div>
+                  <div class="col-10">
+                    <div class=""><strong class='label-color'><%= l10n("hub.home_page.add_account.modal.broker_title") %></strong></div>
+                    <div class=""><small><%= l10n("hub.home_page.add_account.modal.broker_description") %></small></div>
+                  </div>
+                </div>
+              <% end %>
             </div>
           </div>
         </div>
@@ -66,12 +81,12 @@
     <div class="modal fade" id="addEmployerAccount" tabindex="-1" role="dialog" aria-labelledby="addEmployerAccountLabel" aria-hidden="true">
       <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
-          <div class="modal-body" style="padding: 25px; text-align: center;">
+          <div class="modal-body">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
-            <h5 class="modal-title" id="addEmployerAccountLabel" style="color: #007bc4;"><%= l10n("hub.home_page.add_account.modal.employer_modal.title") %></h5>
-            <div style="padding: 10px 50px 25px 75px; text-align: left;">
+            <h5 class="modal-title label-color" id="addEmployerAccountLabel"><%= l10n("hub.home_page.add_account.modal.employer_modal.title") %></h5>
+            <div class='modal-options'>
               <p><%= l10n("hub.home_page.add_account.modal.employer_modal.description1") %> <strong>employer name</strong>. <%= l10n("hub.home_page.add_account.modal.employer_modal.description2") %> <strong><%= l10n("hub.home_page.add_account.modal.employer_modal.sub_description") %></strong> <%= l10n("hub.home_page.add_account.modal.employer_modal.description3") %></p>
 
               <div class="form-check">
@@ -98,12 +113,12 @@
     <div class="modal fade" id="addIvlAccount" tabindex="-1" role="dialog" aria-labelledby="addIvlAccountLabel" aria-hidden="true">
       <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
-          <div class="modal-body" style="padding: 25px; text-align: center;">
+          <div class="modal-body">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
-            <h5 class="modal-title" id="addIvlAccountLabel" style="color: #007bc4;"><%= l10n("hub.home_page.add_account.modal.ivl_modal.title") %></h5>
-            <div style="padding: 10px 50px 25px 75px; text-align: left;">
+            <h5 class="modal-title label-color" id="addIvlAccountLabel"><%= l10n("hub.home_page.add_account.modal.ivl_modal.title") %></h5>
+            <div class='modal-options'>
               <p><%= l10n("hub.home_page.add_account.modal.ivl_modal.description") %></p>
 
               <div class="form-check">
@@ -195,6 +210,11 @@
   .hub-item-flex-shadow {
     cursor: pointer;
     width: 95%;
+    border-radius: 10px;
+    text-align: left;
+    padding: 25px;
+    margin-bottom: 10px;
+    border: #b7afaf solid 1px
   }
 
   .hub-item-flex-shadow:hover {
@@ -219,6 +239,28 @@
   }
 
   .actions-menu span {
+    color: #007bc4;
+  }
+
+  .modal-options {
+    padding: 10px 50px 25px 75px;
+    text-align: left;
+  }
+
+  .modal-body {
+    padding: 25px;
+    text-align: center;
+  }
+
+  .or-style {
+    border: 1px solid grey;
+    border-radius: 50%;
+    width: fit-content;
+    position: relative;
+    margin: 0 auto; padding: 5px;
+  }
+
+  .label-color {
     color: #007bc4;
   }
 

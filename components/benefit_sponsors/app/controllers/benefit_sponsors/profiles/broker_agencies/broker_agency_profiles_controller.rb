@@ -50,6 +50,18 @@ module BenefitSponsors
           @id=params[:id]
         end
 
+        def new_broker_profile
+          authorize User, :add_roles?
+          @person_id = params[:person_id]
+          @agency = BenefitSponsors::Operations::BrokerAgencies::New.new.call({person_id: params[:person_id], profile_type: params[:profile_type], regitration_params: registration_params}).value!
+          respond_to do |format|
+            format.html
+          end
+        end
+
+        def create_broker_profile
+        end
+
         def staff_index
           authorize self
           @q = params.permit(:q)[:q]
@@ -234,6 +246,14 @@ module BenefitSponsors
         def collect_and_sort_commission_statements(sort_order='ASC')
           @statement_years = (Settings.aca.shop_market.broker_agency_profile.minimum_commission_statement_year..TimeKeeper.date_of_record.year).to_a.reverse
           @statements.sort_by!(&:date).reverse!
+        end
+
+        def registration_params
+          current_user_id = Person.find(params[:person_id]).user&.id if params[:manage_portals] && params[:person_id]
+          current_user_id ||= current_user.present? ? current_user.id : nil
+          params[:agency] ||= {}
+          params[:agency].merge!({:profile_id => params["id"], :current_user_id => current_user_id, :person_id => params["person_id"]})
+          params[:agency].permit!
         end
       end
     end
