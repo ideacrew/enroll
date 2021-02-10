@@ -382,21 +382,22 @@ module BenefitSponsors
 
       def terminate_member_benefits(term_date: nil, enroll_term_reason: nil, enroll_notify: false)
         terminate_benefit_group_assignments
+        application_term_date = enrollment_term_date(term_date)
         enrolled_and_terminated_families.each do |family|
           enrollments = family.hbx_enrollments.enrolled_waived_terminated_and_expired.by_benefit_package(self)
           enrollments.each do |hbx_enrollment|
-            if hbx_enrollment.effective_on > enrollment_term_date(term_date)
+            if hbx_enrollment.effective_on > application_term_date
               if hbx_enrollment.may_cancel_coverage?
                 hbx_enrollment.terminate_reason = enrollment_term_reason(enroll_term_reason)
-                hbx_enrollment.cancel_coverage!(enrollment_term_date(term_date))
+                hbx_enrollment.cancel_coverage!(application_term_date)
                 hbx_enrollment.notify_enrollment_cancel_or_termination_event(enrollment_notify_flag(enroll_notify))
               end
-            elsif hbx_enrollment.coverage_termination_pending? && hbx_enrollment.terminated_on.present? && (hbx_enrollment.terminated_on < enrollment_term_date(term_date))
+            elsif hbx_enrollment.coverage_termination_pending? && hbx_enrollment.terminated_on.present? && (hbx_enrollment.terminated_on < application_term_date || hbx_enrollment.terminated_on == application_term_date)
               # do nothing
             elsif hbx_enrollment.may_terminate_coverage?
-              if hbx_enrollment.terminated_on.nil? || (hbx_enrollment.terminated_on.present? && (hbx_enrollment.terminated_on > enrollment_term_date(term_date)))
-                hbx_enrollment.update_attributes!(terminated_on: enrollment_term_date(term_date), terminate_reason: enrollment_term_reason(enroll_term_reason), termination_submitted_on: enrollment_term_submitted)
-                hbx_enrollment.terminate_coverage!(enrollment_term_date(term_date))
+              if hbx_enrollment.terminated_on.nil? || (hbx_enrollment.terminated_on.present? && (hbx_enrollment.terminated_on > application_term_date))
+                hbx_enrollment.update_attributes!(terminated_on: application_term_date, terminate_reason: enrollment_term_reason(enroll_term_reason), termination_submitted_on: enrollment_term_submitted)
+                hbx_enrollment.terminate_coverage!(application_term_date)
                 hbx_enrollment.notify_enrollment_cancel_or_termination_event(enrollment_notify_flag(enroll_notify))
               end
             end
@@ -406,16 +407,17 @@ module BenefitSponsors
 
       def termination_pending_member_benefits(term_date: nil, enroll_term_reason: nil, enroll_notify: false)
         terminate_benefit_group_assignments
+        application_term_date = enrollment_term_date(term_date)
         enrolled_families.no_timeout.each do |family|
           enrollments = family.hbx_enrollments.enrolled_waived_terminated_and_expired.by_benefit_package(self)
           enrollments.each do |hbx_enrollment|
-            if hbx_enrollment.effective_on > enrollment_term_date(term_date)
+            if hbx_enrollment.effective_on > application_term_date
               if hbx_enrollment.may_cancel_coverage?
                 hbx_enrollment.terminate_reason = enrollment_term_reason(enroll_term_reason)
-                hbx_enrollment.cancel_coverage!(enrollment_term_date(term_date))
+                hbx_enrollment.cancel_coverage!(application_term_date)
                 hbx_enrollment.notify_enrollment_cancel_or_termination_event(enrollment_notify_flag(enroll_notify))
               end
-            elsif hbx_enrollment.coverage_termination_pending? && hbx_enrollment.terminated_on.present? && (hbx_enrollment.terminated_on < enrollment_term_date(term_date))
+            elsif hbx_enrollment.coverage_termination_pending? && hbx_enrollment.terminated_on.present? && (hbx_enrollment.terminated_on < application_term_date || hbx_enrollment.terminated_on == application_term_date)
               # do nothing
             elsif hbx_enrollment.may_schedule_coverage_termination?
               hbx_enrollment.update_attributes!(terminated_on: enrollment_term_date(term_date), terminate_reason: enrollment_term_reason(enroll_term_reason), termination_submitted_on: enrollment_term_submitted)

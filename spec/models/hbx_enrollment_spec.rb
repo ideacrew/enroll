@@ -4053,3 +4053,63 @@ describe '.update_reinstate_coverage', dbclean: :around_each do
     end
   end
 end
+
+describe '.eligible_to_reinstate?', dbclean: :around_each do
+  include_context "setup benefit market with market catalogs and product packages"
+  include_context "setup initial benefit application"
+
+  let(:current_effective_date) {TimeKeeper.date_of_record.beginning_of_month - 6.month}
+  let(:person) { FactoryBot.create(:person, :with_employee_role, :with_family) }
+  let(:family) { person.primary_family }
+  let!(:census_employee) do
+    ce = FactoryBot.create(:census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package)
+    ce.update_attributes!(employee_role_id: person.employee_roles.first.id)
+    person.employee_roles.first.update_attributes(census_employee_id: ce.id, benefit_sponsors_employer_profile_id: abc_profile.id)
+    ce
+  end
+  let!(:enrollment) do
+    FactoryBot.create(:hbx_enrollment, :with_enrollment_members,
+                      household: family.latest_household,
+                      coverage_kind: 'health',
+                      family: family,
+                      aasm_state: 'coverage_selected',
+                      effective_on: current_effective_date,
+                      kind: 'employer_sponsored',
+                      benefit_sponsorship_id: benefit_sponsorship.id,
+                      sponsored_benefit_package_id: current_benefit_package.id,
+                      sponsored_benefit_id: current_benefit_package.sponsored_benefits[0].id,
+                      employee_role_id: census_employee.employee_role.id,
+                      product: current_benefit_package.sponsored_benefits[0].reference_product,
+                      rating_area_id: BSON::ObjectId.new,
+                      benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id)
+  end
+
+  context 'reinstate eigible enrollment for a application' do
+    before do
+      period = initial_application.effective_period.min..TimeKeeper.date_of_record.end_of_month
+      initial_application.update_attributes!(termination_reason: 'nonpayment', terminated_on: period.max, effective_period: period)
+      initial_application.schedule_enrollment_termination!
+      enrollment.reload
+    end
+
+    it 'terminated enrollment with term date & reason matchs application' do
+      expect(enrollment.eligible_to_reinstate?).to eq true
+    end
+
+    it 'canceled enrollment with term reason matchs application' do
+      enrollment.update_attributes(aasm_state: 'coverage_canceled')
+      enrollment.reload
+      expect(enrollment.eligible_to_reinstate?).to eq true
+    end
+
+    it 'terminated enrollment with term date greater than application end date' do
+      enrollment.update_attributes(terminated_on: TimeKeeper.date_of_record.next_month.end_of_month)
+      expect(enrollment.eligible_to_reinstate?).to eq false
+    end
+
+    it 'canceled enrollment with start date before application start date' do
+      enrollment.update_attributes(effective_on: TimeKeeper.date_of_record.last_year)
+      expect(enrollment.eligible_to_reinstate?).to eq false
+    end
+  end
+end

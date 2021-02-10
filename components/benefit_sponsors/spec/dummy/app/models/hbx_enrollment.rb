@@ -309,8 +309,7 @@ class HbxEnrollment
     where(
         :sponsored_benefit_package_id => benefit_package.id,
         :aasm_state.in => TERM_INITIATED_STATES,
-        :effective_on.gte => benefit_package.start_on,
-        :terminated_on => benefit_package.canceled? ? nil : benefit_package.end_on.to_date
+        :effective_on.gte => benefit_package.start_on
     )
   }
   embeds_many :workflow_state_transitions, as: :transitional
@@ -1989,7 +1988,18 @@ class HbxEnrollment
 
   # used to check enrollment eligible to reinstate for a application by reason & wst.
   def eligible_to_reinstate?
-    ['coverage_terminated', 'coverage_termination_pending', 'coverage_canceled'].include?(aasm_state) && TERM_REASONS.include?(terminate_reason) || term_or_cancel_eligble_to_reinstate_by_wst?
+    term_or_cancel_date_valid? && (term_or_cancel_eligble_to_reinstate_by_reason? || term_or_cancel_eligble_to_reinstate_by_wst?)
+  end
+
+  def term_or_cancel_date_valid?
+    return false unless sponsored_benefit_package.present?
+    return false if terminated_on.present? && terminated_on != sponsored_benefit_package.end_on.to_date
+    return false if effective_on < sponsored_benefit_package.start_on.to_date
+    true
+  end
+
+  def term_or_cancel_eligble_to_reinstate_by_reason?
+    ['coverage_terminated', 'coverage_termination_pending', 'coverage_canceled'].include?(aasm_state) && TERM_REASONS.include?(terminate_reason)
   end
 
   # used to check enrollment eligible to reinstate for a application by wst
