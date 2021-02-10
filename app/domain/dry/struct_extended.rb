@@ -17,7 +17,7 @@ module Dry
           attr = key.type
           if array?(attr)
             values = ::Array.wrap(object.public_send(name))
-            res[name] = values.map { |value_item| serialize(value_item, attr.member) }
+            res[name] = values.map { |value_item| serialize(value_item, attr.member) if attr.respond_to?(:member) }
           elsif bool?(attr)
             value = object.public_send("#{name}?")
             res[name] = value

@@ -5,6 +5,7 @@ module BenefitSponsors
     module Profiles
       # Entity acts a top level profile class
       class BrokerAgencyProfile < Profile
+        include Dry::StructExtended
         transform_keys(&:to_sym)
 
         attribute :market_kind,                        Types::Strict::Symbol
