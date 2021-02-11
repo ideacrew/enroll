@@ -72,6 +72,21 @@
                   </div>
                 </div>
               <% end %>
+
+              <div style="padding: 10px;">
+                <p class='or-style'>or</p>
+              </div>
+              <%= link_to benefit_sponsors.new_broker_profile_profiles_broker_agencies_broker_agency_profiles_path(person_id: @person.id, profile_type: :broker_agency) do %>
+                <div class="d-flex flex-row bg-white hub-item-flex-shadow broker-card">
+                  <div class="col-2">
+                    <i class="far fa-address-card fa-3x"></i>
+                  </div>
+                  <div class="col-10">
+                    <div class=""><strong class='label-color'><%= l10n("hub.home_page.add_account.modal.ga_title") %></strong></div>
+                    <div class=""><small><%= l10n("hub.home_page.add_account.modal.ga_description") %></small></div>
+                  </div>
+                </div>
+              <% end %>
             </div>
           </div>
         </div>
