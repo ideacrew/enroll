@@ -2,6 +2,7 @@ class Insured::EmployeeRolesController < ApplicationController
   before_action :check_employee_role, only: [:new, :privacy, :welcome, :search]
   before_action :check_employee_role_permissions_edit, only: [:edit]
   before_action :check_employee_role_permissions_update, only: [:update]
+  before_action :verify_access
   include ErrorBubble
   include EmployeeRoles
 
@@ -202,6 +203,10 @@ class Insured::EmployeeRolesController < ApplicationController
   end
 
   private
+
+  def verify_access
+    ::EnrollRegistry[:aca_shop_market].enabled? ? true : not_found
+  end
 
   def check_employee_role_permissions_edit
     @employee_role = EmployeeRole.find(params.require(:id))
