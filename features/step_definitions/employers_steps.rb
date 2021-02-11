@@ -641,7 +641,7 @@ When(/^employer clicks an employee from the roster$/) do
 end
 
 Then(/^employer should see the active enrollment tile$/) do
-  expect(page).to have_content /HEALTH COVERAGE ABC WIDGETS/
+  expect(page).to have_content(/HEALTH COVERAGE ABC WIDGETS/)
 end
 
 Then /^ER should land on (.*) EE tab$/ do |val|
