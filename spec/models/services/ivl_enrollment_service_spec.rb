@@ -126,7 +126,7 @@ RSpec.describe Services::IvlEnrollmentService, type: :model, :dbclean => :after_
     let!(:future_renewing_selected_enrollment) do
       FactoryBot.create(:hbx_enrollment,
                         family: family,
-                        effective_on: Date.new(TimeKeeper.date_of_record.year + 1.year, 1, 1),
+                        effective_on: Date.new(TimeKeeper.date_of_record.next_year.year, 1, 1),
                         household: family.households.first,
                         kind: "individual",
                         is_any_enrollment_member_outstanding: true,

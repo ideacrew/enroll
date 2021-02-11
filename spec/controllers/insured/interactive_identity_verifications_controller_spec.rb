@@ -20,7 +20,8 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           {
             :formats => [:xml],
             :locals => { :individual => mock_person }
-          }).and_return(mock_template_result)
+          }
+        ).and_return(mock_template_result)
       end
 
       describe "when the initial request results in failure" do
@@ -49,9 +50,10 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           expect(controller).to receive(:render_to_string).with(
             "events/identity_verification/interactive_session_start",
             {
-              :formats => [:xml],    
+              :formats => [:xml],
               :locals => { :individual => mock_person }
-            }).and_return(mock_template_result)
+            }
+          ).and_return(mock_template_result)
           allow(mock_service).to receive(:initiate_session).with(mock_template_result).and_return(mock_service_result)
           get :new
           expect(assigns[:interactive_verification]).to eq mock_session
@@ -90,8 +92,8 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       end
 
       describe "with valid interactive_verification" do
-        let(:verification_params) { 
-          { 
+        let(:verification_params) do
+          {
             :session_id => "abcde", :transaction_id => "abcdef",
             :questions_attributes => {
               "0" => {
@@ -107,7 +109,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
               }
             }
           }
-        }
+        end
         let(:valid_verification) { true }
 
         before :each do
@@ -117,7 +119,8 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             {
               :formats => [:xml],
               :locals => { :session => mock_session }
-            }).and_return(mock_template_result)
+            }
+          ).and_return(mock_template_result)
           allow(mock_service).to receive(:respond_to_questions).with(mock_template_result).and_return(mock_service_result)
         end
 

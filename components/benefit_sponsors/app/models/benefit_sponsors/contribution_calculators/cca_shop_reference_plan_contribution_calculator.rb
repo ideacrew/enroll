@@ -29,7 +29,7 @@ module BenefitSponsors
             c_factor = contribution_factor_for(member)
             c_amount = calc_contribution_amount_for(member, c_factor)
             @member_contributions[member.member_id] = c_amount 
-            @total_contribution = BigDecimal.new((@total_contribution + c_amount).to_s).round(2)
+            @total_contribution = BigDecimal((@total_contribution + c_amount).to_s).round(2)
           else
             @member_contributions[member.member_id] = 0.00
           end
@@ -42,7 +42,7 @@ module BenefitSponsors
             0.00
           end
           ref_rate = reference_rate_for(member)
-          ref_contribution = BigDecimal.new((ref_rate * c_factor * @sic_code_factor * @group_size_factor).to_s).round(2)
+          ref_contribution = BigDecimal((ref_rate * c_factor * @sic_code_factor * @group_size_factor).to_s).round(2)
           if member_price <= ref_contribution
             member_price
           else
