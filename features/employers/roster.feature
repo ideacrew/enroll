@@ -51,3 +51,12 @@ Feature: Employer can view their employees
     Then employer should see the message Your employee was successfully added to your roster on page
     And employer logs out
 
+  Scenario: Employee with active enrollment for display on roster
+    Given benefit market catalog exists for active initial employer with health benefits
+    And employer ABC Widgets has active benefit application
+    And employees for ABC Widgets have a selected coverage
+    And employee has updated enrollment details
+    When employer clicks an employee from the roster
+    Then employer should see the active enrollment tile
+    And employer logs out
+
