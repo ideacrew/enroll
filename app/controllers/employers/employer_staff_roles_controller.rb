@@ -1,6 +1,7 @@
 class Employers::EmployerStaffRolesController < Employers::EmployersController
 
   before_action :check_access_to_employer_profile,:updateable?
+  before_action :verify_access
 
   def create
 
@@ -44,6 +45,10 @@ class Employers::EmployerStaffRolesController < Employers::EmployersController
   end
 
   private
+
+  def verify_access
+    ::EnrollRegistry[:aca_shop_market].enabled? ? true : not_found
+  end
 
   def updateable?
     authorize EmployerProfile, :updateable?
