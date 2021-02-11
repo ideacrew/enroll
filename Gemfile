@@ -119,6 +119,8 @@ gem 'webpacker',                '~> 4.0.2'
 gem 'fast_jsonapi'
 gem 'loofah', '~> 2.3.1'
 gem 'stimulus_reflex', '~> 3.3'
+gem 'bigdecimal', '1.4.2'
+
 group :doc do
   gem 'sdoc',                   '~> 1.0'
 end

@@ -553,7 +553,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       let(:family_member_ids) {{'0' => family.family_members.first.id}}
       let!(:person1) {FactoryBot.create(:person, :with_resident_role)}
       let!(:resident_role) {person.resident_role}
-      let!(:new_household) {family.households.where(:id => {'$ne ' => '#{family.households.first.id}'}).first}
+      let!(:new_household) {family.households.where(:id => {'$ne' => "#family.households.first.id}"}).first}
       let(:benefit_coverage_period) {FactoryBot.build(:benefit_coverage_period)}
       let!(:coverall_hbx_enrollment) {FactoryBot.create(:hbx_enrollment,
                                                         family: family,
