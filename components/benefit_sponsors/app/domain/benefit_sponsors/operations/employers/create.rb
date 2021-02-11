@@ -137,7 +137,7 @@ module BenefitSponsors
         def fetch_redirection_link(person_id)
           return "show_manage_protals_url@#{person_id}" if @status == 'existing' && person_id.present?
 
-          "sponsor_home_registration_url@#{@profile.id}"
+          "/benefit_sponsors/profiles/employers/employer_profiles/#{@profile.id}?tab=home"
         end
 
         def approve_employer_staff_role(person, profile)

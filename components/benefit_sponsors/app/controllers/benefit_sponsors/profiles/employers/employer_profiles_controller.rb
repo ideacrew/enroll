@@ -94,10 +94,9 @@ module BenefitSponsors
           result = EnrollRegistry[:employer_registration] { registration_params.to_h }
           if result.success?
             redirection_url, status = result.value!
-            result_url = self.send(redirection_url)
             flash[:notice] = "Your employer account has been setup successfully." if status == 'new'
             flash[:notice] = 'Thank you for submitting your request to access the employer account. Your application for access is pending'
-            redirect_to result_url
+            redirect_to redirection_url
           else
             redirect_to new_employer_profile_profiles_employers_employer_profiles_path(person_id: registration_params[:person_id], profile_type: registration_params[:profile_type])
           end

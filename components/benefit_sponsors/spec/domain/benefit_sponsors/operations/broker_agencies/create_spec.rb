@@ -17,7 +17,7 @@ RSpec.describe BenefitSponsors::Operations::BrokerAgencies::Create, dbclean: :af
             :dob => "11/11/1990",
             :email => "test@tst.com",
             :npn => "2983479237",
-            :profile_type => "broker_agency" 
+            :profile_type => "broker_agency"
           }
         },
         :organization => {
@@ -99,7 +99,7 @@ RSpec.describe BenefitSponsors::Operations::BrokerAgencies::Create, dbclean: :af
               :dob => "11/11/1990",
               :email => "test@tst.com",
               :npn => "2983479237",
-              :profile_type => "broker_agency" 
+              :profile_type => "broker_agency"
             }
           }
         end

@@ -96,12 +96,12 @@ module BenefitSponsors
           end
         end
 
-        def create_broker_role(staff_role_params, person_id)
+        def create_broker_role(_staff_role_params, _person_id)
           # Broker Role Vs Broker Agency Staff Role
-          if person_id.blank?
+          # if person_id.blank?
             #TODO: Create or match person
-            Success(true)
-          else
+            # Success(true)
+          # else
             # result = BenefitSponsors::Operations::BrokerAgencies::AddBrokerAgencyStaff.new.call(staff_role_params.merge!(profile_id: @profile.id.to_s, person_id: person_id))
             # if result.success?
             #   person = result.value![:person]
@@ -110,13 +110,13 @@ module BenefitSponsors
             # else
             #   Failure({:message => 'Unable to create Broker role'})
             # end
-          end
+          # end
           Success([true, nil])
         end
 
-        def fetch_redirection_link(person_id)
-          "broker_show_registration_url@#{@profile.id}"
-        end
+        # def fetch_redirection_link(_person_id)
+        #   "broker_show_registration_url@#{@profile.id}"
+        # end
       end
     end
   end
