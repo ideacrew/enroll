@@ -9,6 +9,7 @@ BenefitSponsors::Engine.routes.draw do
       resources :broker_agency_profiles, only: [:new, :create, :show, :index, :edit, :update] do
         collection do
           get :new_broker_profile
+          post :create_broker_profile
           get :family_index
           get :messages
           get :staff_index
@@ -47,6 +48,7 @@ BenefitSponsors::Engine.routes.draw do
       resources :general_agency_profiles, only: [:new, :create, :show, :index, :edit, :update] do
         collection do
           get :new_general_agency_profile
+          post :create_ga_profile
           get :families
           get :messages
           get :staff_index

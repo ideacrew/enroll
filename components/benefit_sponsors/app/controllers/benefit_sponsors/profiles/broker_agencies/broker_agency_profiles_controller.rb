@@ -59,6 +59,18 @@ module BenefitSponsors
           end
         end
 
+        def create_broker_profile
+          authorize User, :add_roles?
+          result = EnrollRegistry[:broker_registration] { registration_params.to_h }
+          if result.success?
+            redirection_url, status = result.value!
+            flash[:notice] = 'Thank you for submitting your request to access the broker account. Your application for access is pending'
+            redirect_to redirection_url
+          else
+            redirect_to new_broker_profile_profiles_broker_agencies_broker_agency_profiles_path(person_id: registration_params[:person_id], profile_type: registration_params[:profile_type])
+          end
+        end
+
         def staff_index
           authorize self
           @q = params.permit(:q)[:q]

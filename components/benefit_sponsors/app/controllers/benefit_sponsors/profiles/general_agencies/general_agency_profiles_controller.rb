@@ -32,6 +32,18 @@ module BenefitSponsors
           end
         end
 
+        def create_ga_profile
+          authorize User, :add_roles?
+          result = EnrollRegistry[:ga_registration] { registration_params.to_h }
+          if result.success?
+            redirection_url, status = result.value!
+            flash[:notice] = 'Thank you for submitting your request to access the general agency account. Your application for access is pending'
+            redirect_to redirection_url
+          else
+            redirect_to new_general_agency_profile_profiles_general_agencies_general_agency_profiles_path(person_id: registration_params[:person_id], profile_type: registration_params[:profile_type])
+          end
+        end
+
         def employers
           authorize self
           @datatable = Effective::Datatables::BenefitSponsorsGeneralAgencyDataTable.new({id: params[:id]})
