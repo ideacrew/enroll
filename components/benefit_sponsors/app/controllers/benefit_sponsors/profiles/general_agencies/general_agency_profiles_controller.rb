@@ -23,6 +23,15 @@ module BenefitSponsors
           @provider = current_user.person
         end
 
+        def new_general_agency_profile
+          authorize User, :add_roles?
+          @person_id = params[:person_id]
+          @agency = BenefitSponsors::Operations::GeneralAgencies::New.new.call({person_id: params[:person_id], profile_type: params[:profile_type], regitration_params: registration_params}).value!
+          respond_to do |format|
+            format.html
+          end
+        end
+
         def employers
           authorize self
           @datatable = Effective::Datatables::BenefitSponsorsGeneralAgencyDataTable.new({id: params[:id]})
@@ -130,6 +139,14 @@ module BenefitSponsors
 
         def find_general_agency_staff
           @staff = GeneralAgencyStaffRole.find(params[:id])
+        end
+
+        def registration_params
+          current_user_id = Person.find(params[:person_id]).user&.id if params[:manage_portals] && params[:person_id]
+          current_user_id ||= current_user.present? ? current_user.id : nil
+          params[:agency] ||= {}
+          params[:agency].merge!({:profile_id => params["id"], :current_user_id => current_user_id, :person_id => params["person_id"]})
+          params[:agency].permit!
         end
 
         def user_not_authorized(exception)

@@ -1,13 +1,13 @@
 .container-fluid style='padding: 50px;'
   #broker_agency_form
-      ul
-        li
-          a href="#broker_registration"  = l10n("broker")
-        li
-          a href="#broker_agency_staff"  = l10n("broker_agency_staff")
-      #broker_registration
-        = render :partial => "benefit_sponsors/profiles/registrations/broker_registration_form"
-      #broker_agency_staff
+    ul
+      li
+        a href="#broker_registration"  = l10n("broker")
+      li
+        a href="#broker_agency_staff"  = l10n("broker_agency_staff")
+    #broker_registration
+      = render :partial => "benefit_sponsors/profiles/registrations/broker_registration_form"
+    #broker_agency_staff
 
 javascript:
   validateForm();
