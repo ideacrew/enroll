@@ -272,7 +272,7 @@ class EmployeeRole
 
     benefit_group_assignments = [census_employee.renewal_benefit_group_assignment, census_employee.active_benefit_group_assignment].compact
     benefit_group_assignment  = benefit_group_assignments.detect{|bpkg| bpkg.plan_year == plan_year}
-    benefit_group_assignment.present? && benefit_group_assignment.benefit_group.is_offering_dental? ? true : false
+    benefit_group_assignment&.benefit_group&.is_offering_dental? ? true : false
   end
 
   def can_receive_paper_communication?

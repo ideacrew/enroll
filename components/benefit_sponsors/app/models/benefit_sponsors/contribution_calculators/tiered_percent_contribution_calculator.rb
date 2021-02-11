@@ -48,14 +48,14 @@ module BenefitSponsors
             end
             cu = @level_map[contribution_unit.id]
             c_factor = cu.contribution_factor
-            max_contribution = BigDecimal.new((@total_price * c_factor).to_s).round(2, BigDecimal::ROUND_HALF_DOWN)
+            max_contribution = BigDecimal((@total_price * c_factor).to_s).round(2, BigDecimal::ROUND_HALF_DOWN)
             @total_contribution = [max_contribution, @total_price].min
             distribution_remaining = @total_contribution
             members_total_price = 0.00
             @member_ids.reverse.each do |m_id|
               member_price = member_prices[m_id]
               member_discount = [distribution_remaining, member_price].min
-              distribution_remaining = BigDecimal.new((distribution_remaining - member_discount).to_s).round(2)
+              distribution_remaining = BigDecimal((distribution_remaining - member_discount).to_s).round(2)
               @member_contributions[m_id] = member_discount
             end
           else
