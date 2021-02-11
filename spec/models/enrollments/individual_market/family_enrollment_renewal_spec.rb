@@ -372,7 +372,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           expect(enr.kind).to eq subject.enrollment.kind
           renewel_enrollment = subject.assisted_enrollment(enr)
           #BigDecimal needed to round down
-          expect(renewel_enrollment.applied_aptc_amount.to_f).to eq((BigDecimal.new((renewel_enrollment.total_premium * renewel_enrollment.product.ehb).to_s).round(2, BigDecimal::ROUND_DOWN)).round(2))
+          expect(renewel_enrollment.applied_aptc_amount.to_f).to eq((BigDecimal((renewel_enrollment.total_premium * renewel_enrollment.product.ehb).to_s).round(2, BigDecimal::ROUND_DOWN)).round(2))
         end
 
         it "should append APTC values" do
