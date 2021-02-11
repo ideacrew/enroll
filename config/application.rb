@@ -1,4 +1,6 @@
-require File.expand_path('../boot', __FILE__)
+# frozen_string_literal: true
+
+require_relative 'boot'
 
 # require 'rails/all'
 require "action_controller/railtie"

@@ -75,11 +75,6 @@ RSpec.describe PlanCostDecorator, dbclean: :after_each do
       it "should have the right total premium" do
         expect(plan_cost_decorator.total_premium).to eq [55, 45, 20, 18, 13].sum
       end
-
-      it "round premium contribution of a member" do
-        allow(BigDecimal).to receive_message_chain(:new, :round, :to_f).and_return("13.65")
-        expect(plan_cost_decorator.premium_for(three)).to eq "13.65"
-      end
     end
 
     context "for dental coverage" do 
@@ -136,11 +131,6 @@ RSpec.describe PlanCostDecorator, dbclean: :after_each do
 
       it "should have the right total premium" do
         expect(plan_cost_decorator.total_premium).to eq [55, 45, 20, 18, 13, 11, 4].sum
-      end
-
-      it "round premium contribution of a member" do
-        allow(BigDecimal).to receive_message_chain(:new, :round, :to_f).and_return("13.65")
-        expect(plan_cost_decorator.premium_for(three)).to eq "13.65"
       end
     end
   end

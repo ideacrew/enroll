@@ -163,7 +163,7 @@ module BenefitSponsors
         let(:primary_price) { 106.68 }
         let(:dependent_price) { 106.66 }
 
-        let(:total_contribution) { BigDecimal.new(80.00.to_s) }
+        let(:total_contribution) { BigDecimal(80.00.to_s) }
 
         let(:family_contribution_level) do
           instance_double(
@@ -207,8 +207,8 @@ module BenefitSponsors
             family_roster_entry,
             sponsor_contribution
           )
-          member_total = calculation_result.group_enrollment.member_enrollments.inject(BigDecimal.new("0.00")) do |acc, m_en|
-            BigDecimal.new((acc + m_en.sponsor_contribution).to_s).round(2)
+          member_total = calculation_result.group_enrollment.member_enrollments.inject(BigDecimal("0.00")) do |acc, m_en|
+            BigDecimal((acc + m_en.sponsor_contribution).to_s).round(2)
           end
           expect(member_total).to eq(total_contribution)
         end
@@ -354,8 +354,8 @@ module BenefitSponsors
             family_roster_entry,
             sponsor_contribution
           )
-          member_total = calculation_result.group_enrollment.member_enrollments.inject(BigDecimal.new("0.00")) do |acc, m_en|
-            BigDecimal.new((acc + m_en.sponsor_contribution).to_s).round(2)
+          member_total = calculation_result.group_enrollment.member_enrollments.inject(BigDecimal("0.00")) do |acc, m_en|
+            BigDecimal((acc + m_en.sponsor_contribution).to_s).round(2)
           end
           expect(member_total).to eq(contribution_cap)
         end

@@ -17,8 +17,8 @@ RSpec.describe Admin::Aptc, :type => :model, dbclean: :after_each do
   let(:sample_max_aptc_2) {612.33}
   let(:sample_csr_percent_1) {87}
   let(:sample_csr_percent_2) {94}
-  let(:eligibility_determination_1) {EligibilityDetermination.new(determined_at: TimeKeeper.date_of_record.beginning_of_year, max_aptc: sample_max_aptc_1, csr_percent_as_integer: sample_csr_percent_1 )}
-  let(:eligibility_determination_2) {EligibilityDetermination.new(determined_at: TimeKeeper.date_of_record.beginning_of_year + 4.months, max_aptc: sample_max_aptc_2, csr_percent_as_integer: sample_csr_percent_2 )}
+  let(:eligibility_determination_1) {EligibilityDetermination.new(determined_at: TimeKeeper.date_of_record.beginning_of_year, max_aptc: sample_max_aptc_1, csr_percent_as_integer: sample_csr_percent_1, source: 'Admin')}
+  let(:eligibility_determination_2) {EligibilityDetermination.new(determined_at: TimeKeeper.date_of_record.beginning_of_year + 4.months, max_aptc: sample_max_aptc_2, csr_percent_as_integer: sample_csr_percent_2, source: 'Admin')}
   let(:product1) { FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01') }
   let(:product2) { FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01', ehb: 0.9939) }
 
@@ -59,7 +59,8 @@ RSpec.describe Admin::Aptc, :type => :model, dbclean: :after_each do
       allow(household).to receive(:latest_active_tax_household_with_year).and_return tax_household
       allow(eligibility_determination_1).to receive(:tax_household).and_return tax_household
       allow(eligibility_determination_2).to receive(:tax_household).and_return tax_household
-      allow(tax_household).to receive(:eligibility_determinations).and_return [eligibility_determination_1, eligibility_determination_2]
+      tax_household.eligibility_determinations << [eligibility_determination_1, eligibility_determination_2]
+      tax_household.save!
       TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year, 6, 10))
     end
 
@@ -157,7 +158,11 @@ RSpec.describe Admin::Aptc, :type => :model, dbclean: :after_each do
 
     context "when open_enrollment after Dec 31st" do
       before :each do
-        allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(future_date)
+        TimeKeeper.set_date_of_record_unprotected!(future_date)
+      end
+
+      after :each do
+        TimeKeeper.set_date_of_record_unprotected!(Date.today)
       end
 
       it "should return array without next year added as it is not under_open_enrollment" do
@@ -168,7 +173,11 @@ RSpec.describe Admin::Aptc, :type => :model, dbclean: :after_each do
 
     context "when open_enrollment on or before Dec 31st" do
       before :each do
-        allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(past_date)
+        TimeKeeper.set_date_of_record_unprotected!(past_date)
+      end
+
+      after :each do
+        TimeKeeper.set_date_of_record_unprotected!(Date.today)
       end
 
       it "should return array with next year added as it is under_open_enrollment" do
