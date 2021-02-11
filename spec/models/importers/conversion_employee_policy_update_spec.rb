@@ -111,11 +111,8 @@ describe Importers::ConversionEmployeePolicyUpdate, dbclean: :after_each do
 
           ::Importers::ConversionEmployeePolicyAction.new(record_attrs.merge(dependent1_attrs)).save
 
-          hbx_enrollment.reload
-          renewing_hbx_enrollment.reload
-
-          expect(hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, spouse]
-          expect(renewing_hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, spouse, child]
+          expect(hbx_enrollment.reload.hbx_enrollment_members.map(&:person)).to eq [person, spouse]
+          expect(renewing_hbx_enrollment.reload.hbx_enrollment_members.map(&:person)).to eq [person, spouse, child]
         end
       end
 
@@ -128,11 +125,8 @@ describe Importers::ConversionEmployeePolicyUpdate, dbclean: :after_each do
 
           ::Importers::ConversionEmployeePolicyAction.new(record_attrs.merge(dependent1_attrs)).save
 
-          hbx_enrollment.reload
-          renewing_hbx_enrollment.reload
-
-          expect(hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, spouse]
-          expect(renewing_hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, spouse]
+          expect(hbx_enrollment.reload.hbx_enrollment_members.map(&:person)).to eq [person, spouse]
+          expect(renewing_hbx_enrollment.reload.hbx_enrollment_members.map(&:person)).to eq [person, spouse]
         end
       end
     end
@@ -154,11 +148,8 @@ describe Importers::ConversionEmployeePolicyUpdate, dbclean: :after_each do
           ::Importers::ConversionEmployeePolicyAction.new(record_attrs.merge(dependent1_attrs).merge(dependent2_attrs)).save
 
           family.reload
-          hbx_enrollment.reload
-          renewing_hbx_enrollment.reload
-
-          expect(hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, spouse, child]
-          expect(renewing_hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, child]
+          expect(hbx_enrollment.reload.hbx_enrollment_members.map(&:person)).to eq [person, spouse, child]
+          expect(renewing_hbx_enrollment.reload.hbx_enrollment_members.map(&:person)).to eq [person, child]
         end
       end
 
@@ -172,11 +163,8 @@ describe Importers::ConversionEmployeePolicyUpdate, dbclean: :after_each do
           ::Importers::ConversionEmployeePolicyAction.new(record_attrs.merge(dependent1_attrs).merge(dependent2_attrs)).save
 
           family.reload
-          hbx_enrollment.reload
-          renewing_hbx_enrollment.reload
-
-          expect(hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, spouse, child]
-          expect(renewing_hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, spouse, child]
+          expect(hbx_enrollment.reload.hbx_enrollment_members.map(&:person)).to eq [person, spouse, child]
+          expect(renewing_hbx_enrollment.reload.hbx_enrollment_members.map(&:person)).to eq [person, spouse, child]
         end
       end
     end
@@ -198,11 +186,8 @@ describe Importers::ConversionEmployeePolicyUpdate, dbclean: :after_each do
           ::Importers::ConversionEmployeePolicyAction.new(record_attrs.merge(dependent1_attrs).merge(dependent3_attrs)).save
 
           family.reload
-          hbx_enrollment.reload
-          renewing_hbx_enrollment.reload
-
-          expect(hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, spouse, child1]
-          expect(renewing_hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, spouse, child]
+          expect(hbx_enrollment.reload.hbx_enrollment_members.map(&:person)).to eq [person, spouse, child1]
+          expect(renewing_hbx_enrollment.reload.hbx_enrollment_members.map(&:person)).to eq [person, spouse, child]
         end
       end
 
@@ -216,16 +201,12 @@ describe Importers::ConversionEmployeePolicyUpdate, dbclean: :after_each do
           ::Importers::ConversionEmployeePolicyAction.new(record_attrs.merge(dependent1_attrs).merge(dependent3_attrs)).save
 
           family.reload
-          hbx_enrollment.reload
-          renewing_hbx_enrollment.reload
-
-          expect(hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, spouse, child1]
-          expect(renewing_hbx_enrollment.hbx_enrollment_members.map(&:person)).to eq [person, spouse, child1]
+          expect(hbx_enrollment.reload.hbx_enrollment_members.map(&:person)).to eq [person, spouse, child1]
+          expect(renewing_hbx_enrollment.reload.hbx_enrollment_members.map(&:person)).to eq [person, spouse, child1]
 
           expect(family.find_family_member_by_person(child)).to be_nil
         end
       end
     end
-
   end
 end
