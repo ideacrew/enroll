@@ -1,9 +1,9 @@
 class Employers::PlanYearsController < ApplicationController
   include Config::AcaConcern
+  include Authenticator
   before_action :find_employer, expect: [:late_rates_check]
   before_action :generate_carriers_and_plans, only: [:create, :reference_plan_options, :update, :edit]
   before_action :updateable?, only: [:new, :edit, :create, :update, :revert, :publish, :force_publish, :make_default_benefit_group]
-  before_action :verify_access
   layout "two_column"
 
   def new
@@ -477,10 +477,6 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   private
-
-  def verify_access
-    ::EnrollRegistry[:aca_shop_market].enabled? ? true : not_found
-  end
 
   def updateable?
     authorize EmployerProfile, :updateable?
