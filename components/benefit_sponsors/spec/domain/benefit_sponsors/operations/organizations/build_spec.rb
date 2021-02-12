@@ -61,7 +61,7 @@ RSpec.describe BenefitSponsors::Operations::Organizations::Build, dbclean: :afte
       end
 
       it 'should build organization object' do
-        expect(subject.success).to be_a ::BenefitSponsors::Entities::Organizations::GeneralOrganization
+        expect(subject.success).to be_a ::BenefitSponsors::Entities::Organizations::ExemptOrganization
       end
     end
   end
