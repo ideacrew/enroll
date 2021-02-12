@@ -69,7 +69,11 @@ module BenefitSponsors
         end
 
         it "should render js template" do
+<<<<<<< HEAD
           expect(response.content_type).to eq "text/javascript"
+=======
+          expect(response.content_type).to eq "text/javascript; charset=utf-8"
+>>>>>>> WIP: fixing components specs
         end
 
         it "should be a success" do
@@ -96,7 +100,11 @@ module BenefitSponsors
         end
 
         it 'should render js template' do
+<<<<<<< HEAD
           expect(response.content_type).to eq "text/javascript"
+=======
+          expect(response.content_type).to eq "text/javascript; charset=utf-8"
+>>>>>>> WIP: fixing components specs
         end
 
 
@@ -120,7 +128,11 @@ module BenefitSponsors
         end
 
         it 'should render js template' do
+<<<<<<< HEAD
           expect(response.content_type).to eq "text/javascript"
+=======
+          expect(response.content_type).to eq "text/javascript; charset=utf-8"
+>>>>>>> WIP: fixing components specs
         end
 
         it 'should get javascript content' do

@@ -167,6 +167,7 @@ group :development, :test do
   gem 'stimulus_reflex_testing'
   gem 'yard',                   '~> 0.9.20',  require: false
   gem 'yard-mongoid',           '~> 0.1',     require: false
+  gem 'pry-byebug'
 end
 
 group :test do

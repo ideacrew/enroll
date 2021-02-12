@@ -335,13 +335,15 @@ GEM
       deep_merge (~> 1.2, >= 1.2.1)
       dry-validation (~> 1.0, >= 1.0.0)
     crass (1.0.6)
-    database_cleaner (2.0.0)
-      database_cleaner-active_record (~> 2.0.0)
-    database_cleaner-active_record (2.0.0)
-      activerecord (>= 5.a)
+    database_cleaner-core (2.0.1)
+    database_cleaner-mongoid (2.0.1)
       database_cleaner-core (~> 2.0.0)
+<<<<<<< HEAD
     database_cleaner-core (2.0.0)
 >>>>>>> updated gems and changed as_json to serializable_hash
+=======
+      mongoid
+>>>>>>> WIP: fixing components specs
     deep_merge (1.2.1)
     descendants_tracker (0.0.4)
       thread_safe (~> 0.3, >= 0.3.1)
@@ -730,7 +732,11 @@ DEPENDENCIES
   rails-controller-testing
   rails-perftest (~> 0.0.7)
   resource_registry!
+<<<<<<< HEAD
   rspec-rails (~> 4.0.2)
+=======
+  rspec-rails
+>>>>>>> WIP: fixing components specs
   rubocop-rspec (~> 1.31)
   shoulda-matchers (~> 3)
   sponsored_benefits!
