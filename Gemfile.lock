@@ -308,7 +308,6 @@ GEM
     benchmark-malloc (0.2.0)
     benchmark-perf (0.6.0)
     benchmark-trend (0.4.0)
-    bigdecimal (1.4.2)
     bindex (0.8.1)
     bootsnap (1.4.8)
       msgpack (~> 1.0)
@@ -1000,7 +999,6 @@ DEPENDENCIES
   bcrypt (~> 3.1)
   benefit_markets!
   benefit_sponsors!
-  bigdecimal (= 1.4.2)
   bootsnap (>= 1.1)
   brakeman
   browser (= 2.7.0)

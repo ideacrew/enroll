@@ -13,6 +13,8 @@ module SponsoredBenefits
       allow_any_instance_of(SponsoredBenefits::Organizations::PlanDesignOrganization).to receive(:is_renewing_employer?).and_return(false)
       plan_design_census_employee
       benefit_application
+      allow_any_instance_of(SponsoredBenefits::Services::PlanCostService).to receive(:active_census_employees).and_return([plan_design_census_employee])
+      controller.instance_variable_set(:@benefit_group, benefit_application.benefit_groups.first)
       person.broker_role.update_attributes(broker_agency_profile_id: plan_design_organization.owner_profile_id)
       sign_in user_with_broker_role
     end

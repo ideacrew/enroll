@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 module BenefitMarkets
-  RSpec.describe BenefitMarkets::BenefitMarketsController, type: :controller, dbclean: :after_each do
+  RSpec.describe BenefitMarkets::BenefitMarketsController, type: :controller, dbclean: :around_each do
     shared_context "params", :shared_context => :metadata do
       let(:valid_params) do
         {
@@ -71,7 +73,7 @@ module BenefitMarkets
 
     # let!(:site) { create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, kind: 'aca_shop') }
 
-    describe "GET new", dbclean: :after_each do
+    describe "GET new" do
       before do
         get :new, params: {:site_id => site.id}
       end
@@ -85,7 +87,7 @@ module BenefitMarkets
       end
     end
 
-    describe "POST create", dbclean: :after_each do
+    describe "POST create" do
       include_context 'params'
 
       context 'with valid params' do
@@ -108,7 +110,7 @@ module BenefitMarkets
         end
 
         it "returns error messages" do
-          expect(assigns(:benefit_market).errors.messages).to include(title: ["can't be blank"])
+          expect(assigns(:benefit_market).errors.messages.to_h).to include({:title => ["can't be blank"]})
         end
       end
 
@@ -155,7 +157,7 @@ module BenefitMarkets
         end
 
         it "returns error messages" do
-          expect(assigns(:benefit_market).errors.messages).to include(title: ["can't be blank"])
+          expect(assigns(:benefit_market).errors.messages.to_h).to include({:title => ["can't be blank"]})
         end
       end
     end

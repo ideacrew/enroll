@@ -25,7 +25,7 @@ gem 'prawn', :git => 'https://github.com/prawnpdf/prawn.git', :ref => '8028ca0cd
 gem 'simple_calendar', :git => 'https://github.com/harshared/simple_calendar.git'
 
 ## Verify Rails 5 eliminates need for this gem with MongoDB
-gem 'database_cleaner',       '~> 1.7'
+gem 'database_cleaner-mongoid'
 
 #######################################################
 
@@ -160,6 +160,7 @@ group :development, :test do
   gem 'stimulus_reflex_testing'
   gem 'yard',                   '~> 0.9.20',  require: false
   gem 'yard-mongoid',           '~> 0.1',     require: false
+  gem 'pry-byebug'
 end
 
 group :test do
