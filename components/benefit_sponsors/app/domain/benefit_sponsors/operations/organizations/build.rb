@@ -50,7 +50,7 @@ module BenefitSponsors
         def fetch_organization_type(type)
           org_type =
             case type
-            when 'benefit_sponsor', 'general_agency'
+            when 'benefit_sponsor'
               'GeneralOrganization'
             else
               'ExemptOrganization'

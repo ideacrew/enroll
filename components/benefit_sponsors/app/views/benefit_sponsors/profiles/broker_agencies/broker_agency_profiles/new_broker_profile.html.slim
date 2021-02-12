@@ -6,7 +6,7 @@
       li
         a href="#broker_agency_staff"  = l10n("broker_agency_staff")
     #broker_registration
-      = render :partial => "benefit_sponsors/profiles/registrations/broker_registration_form"
+      = render :partial => "benefit_sponsors/profiles/registrations/broker_registration_form", locals: {create_action: 'create_broker_profile'}
     #broker_agency_staff
 
 javascript:

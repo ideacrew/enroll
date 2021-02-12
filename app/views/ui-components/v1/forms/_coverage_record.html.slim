@@ -19,7 +19,7 @@
 
 .col-md-3.mb-3.optional.hidden
   label for="inputHired"  Hired On *
-  = f.date_field :hired_on, {:class => "form-control", :placeholder => "MM/DD/YYYY", id:'inputHiredOn', maxlength:10, minlength:10}
+  = f.date_field :hired_on, {:class => "form-control", :placeholder => "MM/DD/YYYY", id:'inputHiredOn'}
   .invalid-feedback
     | Please provide a Hired on date.
 hr

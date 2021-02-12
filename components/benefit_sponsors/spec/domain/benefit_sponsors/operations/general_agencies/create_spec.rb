@@ -2,14 +2,14 @@
 
 require 'rails_helper'
 
-RSpec.describe BenefitSponsors::Operations::BrokerAgencies::Create, dbclean: :after_each do
+RSpec.describe BenefitSponsors::Operations::GeneralAgencies::Create, dbclean: :after_each do
 
   describe 'Create' do
 
     let!(:site)  { FactoryBot.create(:benefit_sponsors_site, :with_owner_exempt_organization, :dc, :with_benefit_market) }
     let(:registration_params) do
       {
-        :profile_type => "broker_agency",
+        :profile_type => "general_agency",
         :staff_roles_attributes => {
           :"0" => {
             :first_name => "test",
@@ -17,13 +17,13 @@ RSpec.describe BenefitSponsors::Operations::BrokerAgencies::Create, dbclean: :af
             :dob => "11/11/1990",
             :email => "test@tst.com",
             :npn => "2983479237",
-            :profile_type => "broker_agency"
+            :profile_type => "general_agency"
           }
         },
         :organization => {
           :entity_kind => "s_corporation",
-          :legal_name => "SOME BROKER",
-          :dba => "broker",
+          :legal_name => "SOME GA",
+          :dba => "general_agency",
           :profile => {
             :market_kind => "both",
             :languages_spoken => ["", "en"],
@@ -46,9 +46,9 @@ RSpec.describe BenefitSponsors::Operations::BrokerAgencies::Create, dbclean: :af
                 }
               }
             },
-            :profile_type => "broker_agency"
+            :profile_type => "general_agency"
           },
-          :profile_type => "broker_agency"
+          :profile_type => "general_agency"
         }
       }
     end
@@ -83,14 +83,14 @@ RSpec.describe BenefitSponsors::Operations::BrokerAgencies::Create, dbclean: :af
       context 'should create new organization' do
         let(:params)  { registration_params }
 
-        it 'should create new broker agency profile and organization' do
+        it 'should create new general agency profile and organization' do
           expect(subject).to be_success
           expect(BenefitSponsors::Organizations::Organization.all.count).to eq 2
-          expect(BenefitSponsors::Organizations::Organization.broker_agency_profiles.all.count).to eq 1
+          expect(BenefitSponsors::Organizations::Organization.general_agency_profiles.all.count).to eq 1
         end
       end
 
-      context 'should create new broker agency staff role for person' do
+      context 'should create new general agency staff role for person' do
         let(:staff_roles_attributes) do
           {
             :"0" => {
@@ -99,7 +99,7 @@ RSpec.describe BenefitSponsors::Operations::BrokerAgencies::Create, dbclean: :af
               :dob => "11/11/1990",
               :email => "test@tst.com",
               :npn => "2983479237",
-              :profile_type => "broker_agency"
+              :profile_type => "general_agency"
             }
           }
         end
@@ -107,9 +107,9 @@ RSpec.describe BenefitSponsors::Operations::BrokerAgencies::Create, dbclean: :af
 
         it 'should create new open struct object with keys' do
           expect(subject).to be_success
-          expect(BenefitSponsors::Organizations::Organization.broker_agency_profiles.all.count).to eq 1
+          expect(BenefitSponsors::Organizations::Organization.general_agency_profiles.all.count).to eq 1
           person.reload
-          # expect(person.broker_agency_staff_roles.size).to eq 1
+          # expect(person.general_agency_staff_roles.size).to eq 1
         end
       end
     end
