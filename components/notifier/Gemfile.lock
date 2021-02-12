@@ -157,12 +157,10 @@ GEM
       deep_merge (~> 1.2, >= 1.2.1)
       dry-validation (~> 1.0, >= 1.0.0)
     crass (1.0.6)
-    database_cleaner (2.0.1)
-      database_cleaner-active_record (~> 2.0.0)
-    database_cleaner-active_record (2.0.0)
-      activerecord (>= 5.a)
-      database_cleaner-core (~> 2.0.0)
     database_cleaner-core (2.0.1)
+    database_cleaner-mongoid (2.0.1)
+      database_cleaner-core (~> 2.0.0)
+      mongoid
     deep_merge (1.2.1)
     descendants_tracker (0.0.4)
       thread_safe (~> 0.3, >= 0.3.1)
@@ -365,7 +363,7 @@ PLATFORMS
 DEPENDENCIES
   acapi!
   capybara
-  database_cleaner
+  database_cleaner-mongoid
   factory_bot_rails
   mongoid!
   notifier!

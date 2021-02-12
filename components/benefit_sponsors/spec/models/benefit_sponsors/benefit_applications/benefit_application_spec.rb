@@ -1346,8 +1346,7 @@ module BenefitSponsors
       include_context "setup renewal application"
 
       let!(:ineligible_application) do
-        FactoryBot.create(:benefit_sponsors_benefit_application,
-                          :with_benefit_package,
+        FactoryBot.create(:benefit_sponsors_benefit_application, :with_benefit_package,
                           :benefit_sponsorship => benefit_sponsorship,
                           :aasm_state => 'enrollment_ineligible',
                           :effective_period => (predecessor_application.effective_period.min - 1.year)..(predecessor_application.effective_period.min.prev_day))
