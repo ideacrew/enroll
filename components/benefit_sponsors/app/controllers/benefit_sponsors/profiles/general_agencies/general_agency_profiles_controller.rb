@@ -36,7 +36,7 @@ module BenefitSponsors
           authorize User, :add_roles?
           result = EnrollRegistry[:ga_registration] { registration_params.to_h }
           if result.success?
-            redirection_url, status = result.value!
+            redirection_url, _status = result.value!
             flash[:notice] = 'Thank you for submitting your request to access the general agency account. Your application for access is pending'
             redirect_to redirection_url
           else
