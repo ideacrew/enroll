@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+#authenticates if a user has access to this actions
 module Authenticator
   extend ActiveSupport::Concern
 
