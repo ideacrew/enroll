@@ -484,11 +484,11 @@ GEM
     erubi (1.10.0)
     erubis (2.7.0)
     execjs (2.7.0)
-    eye (0.8)
-      celluloid (~> 0.17.2)
+    eye (0.10.0)
+      celluloid (~> 0.17.3)
       celluloid-io (~> 0.17.0)
-      sigar (~> 0.7.3)
-      state_machine
+      kostya-sigar (~> 2.0.0)
+      state_machines
       thor
     factory_bot (4.11.1)
       activesupport (>= 3.0.0)
@@ -570,6 +570,7 @@ GEM
       kaminari-core (~> 1.0)
       mongoid
     kgio (2.11.3)
+    kostya-sigar (2.0.8)
     language_list (1.2.1)
     launchy (2.5.0)
       addressable (~> 2.7)
@@ -648,7 +649,7 @@ GEM
       net-ssh (>= 2.6.5)
     net-ssh (4.2.0)
     newrelic_rpm (5.7.0.350)
-    nio4r (2.5.4)
+    nio4r (2.5.5)
     nokogiri (1.10.10)
       mini_portile2 (~> 2.4.0)
     nokogiri-happymapper (0.8.1)
@@ -844,7 +845,6 @@ GEM
     sexp_processor (4.14.1)
     shoulda-matchers (3.1.3)
       activesupport (>= 4.0.0)
-    sigar (0.7.3)
     sigdump (0.2.4)
     simple_form (5.0.2)
       actionpack (>= 5.0)
@@ -884,7 +884,7 @@ GEM
     sshkit (1.18.2)
       net-scp (>= 1.1.2)
       net-ssh (>= 2.8.0)
-    state_machine (1.2.0)
+    state_machines (0.5.0)
     symmetric-encryption (3.9.1)
       coercible (~> 1.0)
     temple (0.8.2)
@@ -892,11 +892,11 @@ GEM
     terrapin (0.6.0)
       climate_control (>= 0.0.3, < 1.0)
     test-prof (0.11.3)
-    thor (1.0.1)
+    thor (1.1.0)
     thread (0.1.7)
     thread_safe (0.3.6)
     tilt (2.0.10)
-    timers (4.3.0)
+    timers (4.3.2)
     ttfunk (1.0.3)
     turbolinks (5.2.1)
       turbolinks-source (~> 5.2)
@@ -990,7 +990,7 @@ DEPENDENCIES
   devise-jwt (~> 0.5.9)
   effective_datatables!
   email_spec (~> 2)
-  eye (= 0.8)
+  eye (= 0.10.0)
   factory_bot_rails (~> 4.11)
   fakeredis (~> 0.7.0)
   fast_jsonapi
@@ -1090,4 +1090,4 @@ RUBY VERSION
    ruby 2.5.1p57
 
 BUNDLED WITH
-   2.1.4
+   2.2.9
