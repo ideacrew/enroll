@@ -1,6 +1,6 @@
 class Employers::EmployersController < ApplicationController
+  include Authenticator
 
-  before_action :verify_access
 
   def search
     @employers = Organization.where(employer_profile: {:$exists => true}, legal_name: /^#{Regexp.escape(params[:q])}/i)
@@ -11,11 +11,5 @@ class Employers::EmployersController < ApplicationController
 
   def redirect_to_new
     redirect_to new_employers_employer_profile_path
-  end
-
-  private
-
-  def verify_access
-    ::EnrollRegistry[:aca_shop_market].enabled? ? true : not_found
   end
 end

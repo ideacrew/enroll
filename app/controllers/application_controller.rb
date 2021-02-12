@@ -96,10 +96,6 @@ class ApplicationController < ActionController::Base
 
   private
 
-  def not_found
-    raise 'Not Found'
-  end
-
     def strong_params
       params.permit!
     end
