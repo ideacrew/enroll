@@ -235,6 +235,7 @@ GEM
       dry-validation (~> 1.0, >= 1.0.0)
     crass (1.0.6)
 <<<<<<< HEAD
+<<<<<<< HEAD
     database_cleaner-core (2.0.1)
     database_cleaner-mongoid (2.0.1)
       database_cleaner-core (~> 2.0.0)
@@ -247,6 +248,12 @@ GEM
       database_cleaner-core (~> 2.0.0)
     database_cleaner-core (2.0.0)
 >>>>>>> updated gems and changed as_json to serializable_hash
+=======
+    database_cleaner-core (2.0.1)
+    database_cleaner-mongoid (2.0.1)
+      database_cleaner-core (~> 2.0.0)
+      mongoid
+>>>>>>> WIP: fixing components specs
     deep_merge (1.2.1)
     descendants_tracker (0.0.4)
       thread_safe (~> 0.3, >= 0.3.1)

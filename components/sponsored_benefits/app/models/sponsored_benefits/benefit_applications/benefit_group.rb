@@ -4,6 +4,7 @@
 # rubocop:disable Style/FormatStringToken
 module SponsoredBenefits
   module BenefitApplications
+<<<<<<< HEAD
     #BenefitGroup for Broker quoting tool
     class BenefitGroup
       include Mongoid::Document
@@ -12,6 +13,9 @@ module SponsoredBenefits
       include Config::AcaModelConcern
       include Config::AcaHelper
 
+=======
+    class BenefitGroup < ::BenefitGroup
+>>>>>>> WIP: fixing components specs
       embedded_in :benefit_application, class_name: "SponsoredBenefits::BenefitApplications::BenefitApplication"
       delegate :effective_period, to: :benefit_application
       delegate :sic_code, to: :benefit_application
