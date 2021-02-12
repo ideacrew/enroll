@@ -1,6 +1,7 @@
 class Employers::EmployerProfilesController < Employers::EmployersController
   include ::Config::AcaConcern
   include ApplicationHelper
+  include Authenticator
   
   before_action :redirect_new_model, only: [:welcome, :index, :new, :show_profile, :edit, :generate_sic_tree, :create]
   before_action :redirect_show, only: [:show]
@@ -16,7 +17,6 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   around_action :wrap_in_benefit_group_cache, only: [:show]
   skip_before_action :verify_authenticity_token, only: [:show], if: :check_origin?
   before_action :updateable?, only: [:create, :update]
-  before_action :verify_access
   layout "two_column", except: [:new]
 
   def redirect_new_model
@@ -288,10 +288,6 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   # end
 
   private
-
-  def verify_access
-    ::EnrollRegistry[:aca_shop_market].enabled? ? true : not_found
-  end
 
   def file_path(file)
     file.tempfile.path
