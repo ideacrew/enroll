@@ -24,8 +24,12 @@ gem 'resource_registry',  git:  'https://github.com/ideacrew/resource_registry.g
 gem 'mongoid',            git: 'https://github.com/mongodb/mongoid.git', ref: 'df6b2168ee7526f0c5e26f64f38851b91a0623e8'
 =======
 gem 'resource_registry',  git:  'https://github.com/ideacrew/resource_registry.git', branch: 'master'
+<<<<<<< HEAD
 gem 'mongoid',                  git: 'https://github.com/mongodb/mongoid.git', ref: 'df6b2168ee7526f0c5e26f64f38851b91a0623e8'
 >>>>>>> pointing mongoid to its github to fix a bug
+=======
+gem 'mongoid',  git: 'https://github.com/mongodb/mongoid.git', ref: 'df6b2168ee7526f0c5e26f64f38851b91a0623e8'
+>>>>>>> WIP: fixing components specs
 
 # gem 'resource_registry',  git: '../../../resource_registry'
 

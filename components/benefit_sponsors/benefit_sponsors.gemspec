@@ -61,7 +61,11 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'mongoid_rails_migrations',  '~> 1.4'
   s.add_development_dependency "mongoid-rspec",             '~> 4.1'
   s.add_development_dependency 'rails-perftest',            '~> 0.0.7'
+<<<<<<< HEAD
   s.add_development_dependency "rspec-rails",               '~> 4.0.2'
+=======
+  s.add_development_dependency "rspec-rails"
+>>>>>>> WIP: fixing components specs
   s.add_development_dependency 'rubocop-rspec',             '~> 1.31'
   s.add_development_dependency 'shoulda-matchers',          '~> 3'
   s.add_development_dependency 'test-prof',                 '~> 0.5.0'
