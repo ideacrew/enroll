@@ -1,8 +1,8 @@
 class Employers::CensusEmployeesController < ApplicationController
+  include Authenticator
   before_action :find_employer
   before_action :find_census_employee, only: [:edit, :update, :show, :delink, :terminate, :rehire, :benefit_group, :cobra ,:cobra_reinstate, :confirm_effective_date]
   before_action :updateable?, except: [:edit, :show, :update, :benefit_group]
-  before_action :verify_access
   layout "two_column"
   def new
     @census_employee = build_census_employee
@@ -246,10 +246,6 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   private
-
-  def verify_access
-    ::EnrollRegistry[:aca_shop_market].enabled? ? true : not_found
-  end
 
   def updateable?
     authorize ::EmployerProfile, :updateable?

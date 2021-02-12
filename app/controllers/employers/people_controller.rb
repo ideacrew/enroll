@@ -1,7 +1,7 @@
 class Employers::PeopleController < ApplicationController
+  include Authenticator
 
   before_action :check_person_present, only: [:search]
-  before_action :verify_access
 
   def search
     @person = Forms::EmployeeCandidate.new
@@ -79,10 +79,6 @@ class Employers::PeopleController < ApplicationController
   end
 
   private
-
-  def verify_access
-    ::EnrollRegistry[:aca_shop_market].enabled? ? true : not_found
-  end
 
   def person_params 
     params.require(:person).permit(:first_name, :user_id) 
