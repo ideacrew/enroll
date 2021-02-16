@@ -139,8 +139,8 @@ RSpec.describe BenefitSponsors::Subscribers::ReinstateEmployeeEnrollmentSubscrib
 
     let(:validation_error) do
       double(
-          :success? => false,
-          :errors => {:benefit_package_id=>["must be provided"]}
+        :success? => false,
+        :errors => {:benefit_package_id => ["must be provided"]}
       )
     end
 

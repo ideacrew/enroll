@@ -137,7 +137,7 @@ RSpec.describe BenefitSponsors::Subscribers::BenefitPackageReinstateGroupAssignm
     let(:validation_error) do
       double(
         :success? => false,
-        :errors => {:benefit_package_id=>["must be provided"]}
+        :errors => {:benefit_package_id => ["must be provided"]}
       )
     end
 
