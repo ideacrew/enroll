@@ -1,3 +1,4 @@
+@aca_shop_market_disabled
 Feature: Edit Plan Year For Initial Employer
 
   Background: Setup site, employer, and benefit application
