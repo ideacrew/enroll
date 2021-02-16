@@ -155,7 +155,7 @@ group :development, :test do
   gem 'puma',                   '~> 3.12.4'
   gem 'rails-controller-testing'
   gem 'railroady',              '~> 1.5.3'
-  gem 'rspec-rails'
+  gem 'rspec-rails',            '~> 4.0.2'
   gem 'rspec_junit_formatter'
   gem 'stimulus_reflex_testing'
   gem 'yard',                   '~> 0.9.20',  require: false

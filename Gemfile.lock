@@ -1130,7 +1130,7 @@ DEPENDENCIES
   roo (~> 2.1)
   rspec-benchmark
   rspec-instafail (~> 1)
-  rspec-rails
+  rspec-rails (~> 4.0.2)
   rspec_junit_formatter
   rubocop
   rubocop-git
