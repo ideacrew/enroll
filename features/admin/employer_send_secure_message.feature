@@ -1,3 +1,4 @@
+@aca_shop_market_disabled
 Feature: As a Super Admin I will have the ability to see and access "Send Secure Message" action on employers tab
 
   Background: Setup site, employer, and benefit application
