@@ -93,5 +93,6 @@ RSpec.configure do |config|
     DatabaseCleaner.clean
     example.run
     DatabaseCleaner.clean
+    TimeKeeper.set_date_of_record_unprotected!(Date.current)
   end
 end
