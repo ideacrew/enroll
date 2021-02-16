@@ -136,7 +136,16 @@ RSpec.describe BenefitSponsors::Subscribers::ReinstateEmployeeEnrollmentSubscrib
         :correlation_id => correlation_id
       )
     end
+
+    let(:validation_error) do
+      double(
+          :success? => false,
+          :errors => {:benefit_package_id=>["must be provided"]}
+      )
+    end
+
     before :each do
+      allow(subscriber).to receive(:run_validations).with(headers.stringify_keys).and_return(validation_error)
       allow(subscriber).to receive(
         :notify
       ).with(
