@@ -30,7 +30,6 @@ class Insured::FamiliesController < FamiliesController
 
     # @hbx_enrollments = @hbx_enrollments.reject{ |r| !valid_display_enrollments.include? r._id }
 
-    @employee_role = @person.active_employee_roles.first
     @tab = params['tab']
     @family_members = @family.active_family_members
 
@@ -250,7 +249,14 @@ class Insured::FamiliesController < FamiliesController
   def check_employee_role
     employee_role_id = (params[:employee_id].present? && params[:employee_id].include?('employee_role')) ? params[:employee_id].gsub("employee_role_", "") : nil
 
-    @employee_role = employee_role_id.present? ? @person.active_employee_roles.detect{|e| e.id.to_s == employee_role_id} : @person.active_employee_roles.first
+    active_employee_roles = @person.active_employee_roles
+    @employee_role = if employee_role_id.present?
+                       active_employee_roles.detect {|e| e.id.to_s == employee_role_id}
+                     elsif active_employee_roles.map(&:is_under_open_enrollment?).any?
+                       active_employee_roles.select(&:is_under_open_enrollment?).first
+                     else
+                       active_employee_roles.first
+                     end
   end
 
   def build_employee_role_by_census_employee_id
