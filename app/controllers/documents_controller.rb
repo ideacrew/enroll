@@ -4,6 +4,7 @@ class DocumentsController < ApplicationController
   before_action :set_verification_type
   before_action :set_person, only: [:enrollment_docs_state, :fed_hub_request, :enrollment_verification, :update_verification_type, :extend_due_date, :update_ridp_verification_type]
   before_action :add_type_history_element, only: [:update_verification_type, :fed_hub_request, :destroy]
+  before_action :cartafact_download_params, only: [:cartafact_download]
   respond_to :html, :js
 
   def download
@@ -262,6 +263,11 @@ class DocumentsController < ApplicationController
   def authorized_to_download?(owner, documents, document_id)
     return true
     owner.user.has_hbx_staff_role? || documents.find(document_id).present?
+  end
+
+  #permitting required params for cartafact downloads
+  def cartafact_download_params
+    params.permit(:relation, :relation_id, :model, :model_id, :content_type, :disposition, :file_name, :user)
   end
 
   def update_documents_status(family_member)
