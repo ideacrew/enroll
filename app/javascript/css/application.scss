@@ -1,3 +1,4 @@
+@import 'colors';
 @import '~bootstrap/scss/bootstrap';
 @import 'main';
 @import 'variables';
@@ -6,3 +7,5 @@
 @import 'forms';
 @import 'alerts';
 @import 'custom';
+@import 'message_form';
+@import 'admin_navbar';
