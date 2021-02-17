@@ -325,6 +325,16 @@ And(/^employees for (.*?) have a selected coverage$/) do |legal_name|
                     sponsored_benefit_id: sponsored_benefit_id})
 end
 
+And(/^employee has updated enrollment details$/) do
+  bga = @census_employees[0].active_benefit_group_assignment
+  benefit_package = bga.benefit_package
+  enrollment = @census_employees[0].employee_role.person.primary_family.active_household.hbx_enrollments.first
+  enrollment.employee_role.update_attributes(census_employee_id: @census_employees[0].id)
+  bga.update_attributes(hbx_enrollment_id: enrollment.id)
+  bga.hbx_enrollment.update_attributes(product_id: benefit_package.health_sponsored_benefit.products(benefit_package.start_on).first.id,
+                                       issuer_profile_id: benefit_package.health_sponsored_benefit.products(benefit_package.start_on).first.issuer_profile.id)
+end
+
 And(/^employer (.*?) with employee (.*?) is under open enrollment$/) do |legal_name, named_person|
   person = people[named_person]
   person_record = person_record_from_census_employee(person)

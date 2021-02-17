@@ -173,6 +173,7 @@ class Employers::CensusEmployeesController < ApplicationController
 
   def show
     @family = @census_employee.employee_role.person.primary_family if @census_employee.employee_role.present?
+    @hbx_enrollments = @census_employee.enrollments_for_display
     @status = params[:status] || ''
   end
 
