@@ -44,15 +44,12 @@ RSpec.describe FamiliesController do
       expect(person2.families.first).to eq(Family.find(params[:family]))
     end
 
-<<<<<<< HEAD
     it "should redirect to exchange/profiles if family is not present and no params and person is hbx_staff" do
       sign_in(hbx_staff_user)
       expect(subject).to receive(:redirect_to).with("/exchanges/hbx_profiles")
       subject.instance_eval{set_family}
     end
 
-=======
->>>>>>> added spec
     it "should redirect to root if family is not present and no params" do
       sign_in(user_2)
       expect(subject).to receive(:redirect_to).with(root_path)
