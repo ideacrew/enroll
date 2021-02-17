@@ -99,7 +99,8 @@ module BenefitSponsors
             flash[:notice] = 'Thank you for submitting your request to access the employer account. Your application for access is pending'
             redirect_to redirection_url
           else
-            redirect_to new_employer_profile_profiles_employers_employer_profiles_path(person_id: registration_params[:person_id], profile_type: registration_params[:profile_type])
+            flash[:notice] = result.failure[:message] || "Unable to create Employer Account."
+            redirect_to benefit_sponsors.new_employer_profile_profiles_employers_employer_profiles_path(person_id: registration_params[:person_id], profile_type: registration_params[:profile_type])
           end
         end
 

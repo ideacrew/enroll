@@ -68,12 +68,11 @@ module BenefitSponsors
           result = BenefitSponsors::Operations::Employers::AddEmployerStaff.new.call(staff_member_params.merge(dob: parse_date(staff_member_params['dob'])))
           # add redirects
           if result.success?
-            redirect_to main_app.show_roles_person_path(id: staff_member_params[:person_id])
             flash[:notice] = result.value![:message]
           else
-            redirect_to new_staff_member_profiles_employers_employer_staff_roles_path(id: staff_member_params[:person_id])
             flash[:error] = result.failure[:message]
           end
+          redirect_to main_app.show_roles_person_path(id: staff_member_params[:person_id])
         end
 
         def employer_search

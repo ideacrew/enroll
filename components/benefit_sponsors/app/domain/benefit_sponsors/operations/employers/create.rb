@@ -20,7 +20,7 @@ module BenefitSponsors
                                              end
 
           _status = yield persist_organization!
-          _staff_role_status, redirection_link = yield create_employer_staff_role(sanitized_params[:staff_roles], validated_params[:person_id])
+          redirection_link = yield create_employer_staff_role(sanitized_params[:staff_roles], validated_params[:person_id])
 
           Success([redirection_link, @status])
         end
@@ -105,7 +105,7 @@ module BenefitSponsors
         end
 
         def persist_organization!
-          return unless @status == 'new'
+          return Success("There is an existing organization with the given FEIN}") unless @status == 'new'
 
           if @organization.valid?
             @organization.benefit_sponsorships.each do |benefit_sponsorship|
@@ -127,7 +127,7 @@ module BenefitSponsors
               person = result.value![:person]
               approve_employer_staff_role(person, @profile) if @status == 'new'
               redirection_link = fetch_redirection_link(person_id)
-              Success([true, redirection_link])
+              Success(redirection_link)
             else
               Failure({:message => 'Unable to Employer create staff role'})
             end
@@ -135,7 +135,7 @@ module BenefitSponsors
         end
 
         def fetch_redirection_link(person_id)
-          return "show_manage_protals_url@#{person_id}" if @status == 'existing' && person_id.present?
+          return "/people/#{person_id}/show_roles" if @status == 'existing' && person_id.present?
 
           "/benefit_sponsors/profiles/employers/employer_profiles/#{@profile.id}?tab=home"
         end
