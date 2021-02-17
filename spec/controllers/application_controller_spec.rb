@@ -68,6 +68,7 @@ RSpec.describe ApplicationController do
       allow(user).to receive(:person).and_return(person)
       allow(person).to receive(:hbx_staff_role).and_return(hbx_staff_role)
       allow(hbx_staff_role).to receive(:hbx_profile).and_return(hbx_profile)
+      EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
       sign_in(user)
       get :index
     end
@@ -83,6 +84,7 @@ RSpec.describe ApplicationController do
     it "confirms user's last portal's environment before redirecting" do
       request.session[:portal] = nil
       allow(@request).to receive(:referrer) {'http://localhost:3000/'}
+      EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
       expect(controller.send(:confirm_last_portal, @request, user)).to eq root_path
     end
   end
@@ -92,6 +94,7 @@ RSpec.describe ApplicationController do
 
     it "should get signed in flash notice" do
       allow(controller).to receive(:authentication_not_required?).and_return true
+      EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
       get :index, params: {user_token: user.authentication_token}
       expect(flash[:notice]).to eq "Signed in Successfully."
     end
