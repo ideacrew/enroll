@@ -11,6 +11,9 @@ RSpec.describe FamiliesController do
     let(:person_without_family) { FactoryBot.create(:person) }
     let(:user_2) { FactoryBot.create(:user, :person => person_without_family) }
 
+    let(:person_with_hbx_staff_role) { FactoryBot.create(:person, :with_hbx_staff_role)}
+    let(:hbx_staff_user) { FactoryBot.create(:user, :person => person_with_hbx_staff_role) }
+
     let!(:person2) {FactoryBot.create(:person)}
     let!(:family_member2) {FactoryBot.create(:family_member, family: person.primary_family, person: person2) }
 
@@ -39,6 +42,12 @@ RSpec.describe FamiliesController do
       sign_in(user)
       subject.instance_eval{set_family}
       expect(person2.families.first).to eq(Family.find(params[:family]))
+    end
+
+    it "should redirect to exchange/profiles if family is not present and no params and person is hbx_staff" do
+      sign_in(hbx_staff_user)
+      expect(subject).to receive(:redirect_to).with("/exchanges/hbx_profiles")
+      subject.instance_eval{set_family}
     end
 
     it "should redirect to root if family is not present and no params" do
