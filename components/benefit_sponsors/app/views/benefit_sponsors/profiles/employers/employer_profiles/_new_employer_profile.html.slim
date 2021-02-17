@@ -60,23 +60,10 @@ fieldset.mt-2
       h4.mt-1 Please indicate preferred method to receive notices (OPTIONAL)
       = f_profile.select :contact_method, options_for_select(f_profile.object.contact_method_options, selected: f_profile.object.contact_method[1]), {}, class:'form-control'
 
-      input.btn.btn-primary.pull-right.mt-2#employer_registration_form data-target="#confirm-submit" data-toggle="modal" name="btn" type="button" value="Add Portal"
+      = f.submit "Add Portal", class: "btn btn-primary pull-right mt-2"
       = link_to 'Cancel', main_app.show_roles_person_path(id: @person_id), class: 'btn btn-outline-primary pull-right mt-2 mr-2'
 
       input type="hidden" name="employer_id" id="employer_id"
-
-.modal#confirm-submit role="dialog" tabindex="-1"
-  .modal-dialog role="document"
-    .modal-content
-      .modal-header
-        h5.modal-title Confirm Creation of New Portal
-        button.close aria-label="Close" data-dismiss="modal" type="button" 
-          span aria-hidden="true"  &times;
-      .modal-body
-        strong New Employer Application
-      .modal-footer
-        button.btn.btn-outline-primary data-dismiss="modal" type="button"  Cancel
-        button.btn.btn-primary.add-role type="button"  Add Role
 
 javascript:
 
@@ -113,15 +100,15 @@ javascript:
         ele.classList.add("hidden");
       });
 
-      ssn.removeAttr('required');​​​​​
-      gender.removeAttr('required');​​​​​
-      hiredOn.removeAttr('required');​​​​​
-      address1.removeAttr('required');​​​​​
-      city.removeAttr('required');​​​​​
-      state.removeAttr('required');​​​​​
-      zip.removeAttr('required');​​​​​
-      kind.removeAttr('required');​​​​​
-      emailAddress.removeAttr('required');​​​​​
+      ssn.required = false;
+      gender.required = false;
+      hiredOn.required = false;
+      address1.required = false;
+      city.required = false;
+      state.required = false;
+      zip.required = false;
+      kind.required = false;
+      emailAddress.required = false;
     }
   }
 
@@ -136,21 +123,3 @@ javascript:
       $("#other-reason-textarea").val("");
     }
   });
-
-  $('#employer_registration_form').on('click', function(event) {
-    form = document.getElementsByClassName('needs-ajax-validation')[0]
-    if (form.checkValidity() === false) {
-      form.classList.add('was-validated');
-      event.stopPropagation();
-    }
-  })
-
-  $('.add-role').on('click', function(event) {
-    event.preventDefault()
-    event.stopPropagation()
-    form = document.getElementsByClassName('needs-ajax-validation')[0]
-    form.submit();
-  })
-
-
-

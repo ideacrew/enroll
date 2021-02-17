@@ -48,11 +48,6 @@ legend Personal Information
 
 javascript:
 
-  var cleave = new Cleave('#inputDOB', {
-    date: true,
-    datePattern: ['m', 'd', 'Y']
-  });
-
   function validDob(element) {
     if (element.value && element.value.length < 10) {
       swal({
@@ -61,19 +56,5 @@ javascript:
         icon: "warning"
       }),
         element.value = ''
-    }
-  }
-
-  function isApplyingCoverage(element) {
-    if (element.value === "Yes") {
-      $("#labelSsn").removeClass("hidden");
-      $("#labelGender").removeClass("hidden");
-      $("#inputSsn").removeClass("hidden");
-      $("#inputGender").removeClass("hidden");
-    } else {
-      $("#labelSsn").addClass("hidden");
-      $("#labelGender").addClass("hidden");
-      $("#inputSsn").addClass("hidden");
-      $("#inputGender").addClass("hidden");
     }
   }
