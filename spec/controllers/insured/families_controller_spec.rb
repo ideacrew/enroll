@@ -268,44 +268,61 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     end
 
     context "for both ivl and shop", dbclean: :after_each do
-      let(:employee_roles) { double }
-      let(:employee_role) { double("EmployeeRole", bookmark_url: "/families/home") }
-      let(:enrollments) { double }
-      let(:employee_role2) { FactoryGirl.create(:employee_role) }
-      let(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role2.id) }
+      include_context "setup benefit market with market catalogs and product packages"
+      include_context "setup initial benefit application"
+
+      let!(:enrollments) {double}
+      let!(:person2) {FactoryGirl.create(:person, :with_consumer_role)}
+      let!(:user2) {FactoryGirl.create(:user, person: person2)}
+      let!(:family2) {FactoryGirl.create(:family, :with_primary_family_member, person: person2)}
+      let!(:household) {family2.active_household}
+      let!(:employee_role) {FactoryGirl.create(:employee_role, person: person2, employer_profile: abc_profile, bookmark_url: "/families/home")}
+      let!(:employee_role2) {FactoryGirl.create(:employee_role, person: person2, bookmark_url: "/families/home")}
+      let!(:census_employee) {FactoryGirl.create(:census_employee, employee_role_id: employee_role2.id)}
+      let(:family_access_policy) {instance_double(FamilyPolicy, :show? => true)}
+      let(:display_hbx) do
+        FactoryGirl.create(:hbx_enrollment,
+                           household: family2.latest_household,
+                           coverage_kind: 'health',
+                           effective_on: TimeKeeper.datetime_of_record,
+                           enrollment_kind: 'open_enrollment',
+                           kind: 'individual',
+                           aasm_state: 'coverage_selected')
+      end
+
+      let(:waived_hbx) do
+        FactoryGirl.create(:hbx_enrollment,
+                           household: family2.active_household,
+                           kind: 'employer_sponsored',
+                           effective_on: TimeKeeper.date_of_record,
+                           aasm_state: 'inactive')
+      end
 
       before :each do
-        sign_in user
-        allow(person).to receive(:has_active_employee_role?).and_return(true)
-        allow(person).to receive(:employee_roles).and_return(employee_roles)
-        allow(person.employee_roles).to receive(:last).and_return(employee_role)
-        allow(person).to receive(:active_employee_roles).and_return(employee_roles)
-        allow(employee_roles).to receive(:first).and_return(employee_role)
-        allow(employee_roles).to receive(:count).and_return(1)
-        allow(person).to receive(:has_active_consumer_role?).and_return(true)
-        allow(employee_roles).to receive(:active).and_return([employee_role])
-        allow(family).to receive(:coverage_waived?).and_return(true)
+        allow(FamilyPolicy).to receive(:new).with(user2, family2).and_return(family_access_policy)
+        allow(user2).to receive(:has_employee_role?).and_return(true)
+        allow(user2).to receive(:has_consumer_role?).and_return(true)
+        allow(user2).to receive(:last_portal_visited=).and_return('test.com')
+        allow(user2).to receive(:save).and_return(true)
+        allow(user2).to receive(:person).and_return(person2)
+        allow(person2).to receive(:has_active_consumer_role?).and_return(true)
+        allow(family2).to receive(:coverage_waived?).and_return(true)
         allow(hbx_enrollments).to receive(:waived).and_return([waived_hbx])
         allow(enrollments).to receive(:non_external).and_return(enrollments)
-        allow(family).to receive(:enrollments).and_return(enrollments)
+        allow(family2).to receive(:enrollments).and_return(enrollments)
         allow(enrollments).to receive(:order).and_return([display_hbx])
-        allow(family).to receive(:enrollments_for_display).and_return([{"hbx_enrollment"=>{"_id"=>display_hbx.id}}])
-        allow(family).to receive(:check_for_consumer_role).and_return true
+        allow(family2).to receive(:check_for_consumer_role).and_return true
         allow(controller).to receive(:update_changing_hbxs).and_return(true)
         allow(employee_role).to receive(:census_employee_id).and_return census_employee.id
+        sign_in user2
       end
 
       context "with waived_hbx when display_hbx is employer_sponsored" do
-        let(:waived_hbx) { HbxEnrollment.new(kind: 'employer_sponsored', effective_on: TimeKeeper.date_of_record) }
-        let(:display_hbx) { HbxEnrollment.new(kind: 'employer_sponsored', aasm_state: 'coverage_selected', effective_on: TimeKeeper.date_of_record) }
-        let(:employee_role) { FactoryGirl.create(:employee_role) }
-        let(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id) }
         before :each do
-          allow(family).to receive(:waivers_for_display).and_return([{"hbx_enrollment"=>{"_id"=>waived_hbx.id}}])
-          allow(family).to receive(:active_family_members).and_return(family_members)
-          allow(employee_role).to receive(:census_employee_id).and_return census_employee.id
+          allow(family2).to receive(:active_family_members).and_return(family_members)
           get :home
         end
+
         it "should be a success" do
           expect(response).to have_http_status(:success)
         end
@@ -316,22 +333,18 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
         it "should assign variables" do
           expect(assigns(:qualifying_life_events)).to be_an_instance_of(Array)
-          expect(assigns(:hbx_enrollments)).to eq([display_hbx])
+          expect(assigns(:hbx_enrollments)).to eq([display_hbx, waived_hbx])
           expect(assigns(:employee_role)).to eq(employee_role)
         end
       end
 
       context "with waived_hbx when display_hbx is individual" do
-        let(:waived_hbx) { HbxEnrollment.new(kind: 'employer_sponsored', effective_on: TimeKeeper.date_of_record) }
-        let(:display_hbx) { HbxEnrollment.new(kind: 'individual', aasm_state: 'coverage_selected', effective_on: TimeKeeper.date_of_record) }
-        let(:employee_role) { FactoryGirl.create(:employee_role) }
-        let(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id) }
         before :each do
-          allow(family).to receive(:waivers_for_display).and_return([{"hbx_enrollment"=>{"_id"=>waived_hbx.id}}])
-          allow(family).to receive(:active_family_members).and_return(family_members)
+          allow(family2).to receive(:active_family_members).and_return(family_members)
           allow(employee_role).to receive(:census_employee_id).and_return census_employee.id
           get :home
         end
+
         it "should be a success" do
           expect(response).to have_http_status(:success)
         end
@@ -342,7 +355,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
         it "should assign variables" do
           expect(assigns(:qualifying_life_events)).to be_an_instance_of(Array)
-          expect(assigns(:hbx_enrollments)).to eq([display_hbx])
+          expect(assigns(:hbx_enrollments)).to eq([display_hbx, waived_hbx])
           expect(assigns(:employee_role)).to eq(employee_role)
         end
       end
