@@ -1,3 +1,4 @@
+@aca_shop_market_disabled
 Feature: User Account page
   In order for the Hbx admin to access user accounts
 
