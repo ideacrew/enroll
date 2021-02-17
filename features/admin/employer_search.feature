@@ -1,3 +1,4 @@
+@aca_shop_market_disabled
 Feature: Add search functionality for admin to search employer
   In order for the Hbx admin to search for employers through searchbox
 

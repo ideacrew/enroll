@@ -132,11 +132,13 @@ module Effective
       def nested_filter_definition
         families_tab = [
           {scope: 'all', label: 'All'},
-          {scope: 'by_enrollment_shop_market', label: 'Employer Sponsored Coverage Enrolled', subfilter: :employer_options},
           {scope: 'non_enrolled', label: 'Non Enrolled'}
         ]
         if individual_market_is_enabled?
          families_tab.insert(1, {scope: 'by_enrollment_individual_market', label: 'Individual Enrolled', subfilter: :individual_options})
+        end
+        if ::EnrollRegistry[:aca_shop_market].enabled?
+          families_tab.insert(2, {scope: 'by_enrollment_shop_market', label: 'Employer Sponsored Coverage Enrolled', subfilter: :employer_options})
         end
 
         {

@@ -1,3 +1,4 @@
+@aca_shop_market_disabled
 Feature: As an <subrole> I <case> have the ability to extend the OE
   of a given Employer with a <aasm_state> enrollment.
 

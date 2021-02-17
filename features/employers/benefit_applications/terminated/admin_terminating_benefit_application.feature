@@ -1,3 +1,4 @@
+@aca_shop_market_disabled
 Feature: As an admin user I should have the ability to terminate a given Employer with a active benefit application.
 
   Background: Setup site, employer, and benefit application
