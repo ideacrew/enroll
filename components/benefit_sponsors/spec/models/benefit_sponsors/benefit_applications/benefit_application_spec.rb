@@ -458,7 +458,28 @@ module BenefitSponsors
 
     end
 
+    describe '.is_off_cycle' do
+      let(:current_date1)                  { TimeKeeper.date_of_record.beginning_of_month.prev_month }
+      let!(:effective_period)              { (current_date1)..(current_date1.next_year.prev_day) }
+      let!(:renewal_effective_period)      { (current_date1.next_year)..(current_date1.prev_day + 2.years) }
+      let(:termination_date)               {renewal_effective_period.min + 65.days}
+      let(:offcycle_effective_period) do
+        date = termination_date.end_of_month.next_day
+        date..date.next_year.prev_day
+      end
+      let!(:initial_application) do
+        application = FactoryBot.create(:benefit_sponsors_benefit_application, aasm_state: :termination_pending, effective_period: effective_period, benefit_sponsorship: benefit_sponsorship)
+        terminated_period = effective_period.min..termination_date
+        application.update_attributes!(effective_period: terminated_period)
+        application
+      end
+      let!(:offcycle_application) do
+        FactoryBot.create(:benefit_sponsors_benefit_application, aasm_state: :draft, effective_period: offcycle_effective_period, benefit_sponsorship: benefit_sponsorship)
+      end
 
+      it { expect(initial_application.is_off_cycle?).to be_falsey }
+      it { expect(offcycle_application.is_off_cycle?).to be_truthy }
+    end
 
     ## TODO: Refactor for BenefitApplication
     # context "#to_plan_year", dbclean: :after_each do
@@ -520,6 +541,7 @@ module BenefitSponsors
         let!(:employer_profile) {benefit_sponsorship.profile}
         let!(:initial_application) { create(:benefit_sponsors_benefit_application, benefit_sponsor_catalog: benefit_sponsor_catalog, effective_period: effective_period,benefit_sponsorship: benefit_sponsorship, aasm_state: :active) }
         let(:product_package)           { initial_application.benefit_sponsor_catalog.product_packages.detect { |package| package.package_kind == package_kind } }
+
         let(:benefit_package)   do
           bp = create(:benefit_sponsors_benefit_packages_benefit_package, health_sponsored_benefit: true, product_package: product_package, benefit_application: initial_application)
           reference_product = bp.sponsored_benefits.first.reference_product
@@ -587,13 +609,12 @@ module BenefitSponsors
           end
 
           it "should create renewal benefit group assignment" do
-            expect(census_employee.active_benefit_group_assignment.benefit_application).to eq initial_application
+            #expect(census_employee.active_benefit_group_assignment.benefit_application).to eq initial_application
             expect(census_employee.renewal_benefit_group_assignment.benefit_application).to eq renewal_application
           end
 
           it "renewal benefit group assignment is_active set to false" do
-            expect(census_employee.renewal_benefit_group_assignment.is_active).to eq false
-            expect(census_employee.active_benefit_group_assignment.is_active).to eq true
+            expect(census_employee.renewal_benefit_group_assignment.activated_at).to eq nil
           end
         end
 
@@ -611,10 +632,8 @@ module BenefitSponsors
           it "should not update benefit group assignments" do
             expect(renewal_application.aasm_state).to eq :enrollment_open
 
-            expect(census_employee.renewal_benefit_group_assignment.is_active).to eq false
             expect(census_employee.renewal_benefit_group_assignment.benefit_application).to eq renewal_application
 
-            expect(census_employee.active_benefit_group_assignment.is_active).to eq true
             expect(census_employee.active_benefit_group_assignment.benefit_application).to eq initial_application
           end
         end
@@ -633,7 +652,7 @@ module BenefitSponsors
             renewal_application.activate_enrollment!
           end
 
-          it "should activate renewal benefit group assignment & set is_active to true" do
+          it "should activate renewal benefit group assignment" do
             expect(renewal_application.aasm_state).to eq :active
             renewal_bga = census_employee.benefit_group_assignments.effective_on(renewal_application.effective_period.min).first
             expect(renewal_bga.benefit_application).to eq renewal_application
@@ -706,7 +725,7 @@ module BenefitSponsors
         end
       end
 
-      context "HbxEnrollment avalaibale for benefit application return the enrollment with the given date" do
+      context "HbxEnrollment available for benefit application return the enrollment with the given date" do
         before do
           enrollment = HbxEnrollment.new(effective_on: Date.today.next_month.beginning_of_month)
           enrollment1 = HbxEnrollment.new(effective_on: Date.today.next_month.beginning_of_month + 2.months)
