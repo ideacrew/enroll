@@ -6,14 +6,15 @@
     = render partial: './ui-components/v1/forms/employer_staff_roles/employer_staff_information', locals: { f: f }
 
     .row.mt-3.employer-search
-      .input-group
-        h5.col-md-3 Select your Employer
-        input.col-md-3#example-search-input.form-control.py-2 type="search" placeholder="Legal Name/Fein/HBX ID" /
-        span.input-group-append
+      div.col-md-6
+        div
+          h5 Select your Employer
+        div style='display: flex;'
+          input.col-md-8#example-search-input.form-control.py-2 type="search" placeholder="Legal Name/Fein/HBX ID" /
           button.btn.btn-primary.search type="button" onclick="employerSearch(); return false" data-loading-text="Loading..."
-            |
-             Search
-      .result
+              |
+               Search
+      .result.col-md-12
 
       br
     .row.no-pd
