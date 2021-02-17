@@ -1,3 +1,4 @@
+@aca_shop_market_disabled
 Feature: As an admin user I should not have the ability to extend the OE
   of a given Employer with a expired enrollment.
 
