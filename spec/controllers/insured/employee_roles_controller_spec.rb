@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 if ::EnrollRegistry[:aca_shop_market].enabled?
@@ -7,10 +9,10 @@ if ::EnrollRegistry[:aca_shop_market].enabled?
       let(:person_parameters) { { :first_name => "SOMDFINKETHING", :employee_role_id => employee_role_id} }
       let(:organization_id) { "1234324234" }
       let(:benefit_group) { double(effective_on_for: effective_date) }
-      let(:census_employee) { double(:hired_on => "whatever" ) }
+      let(:census_employee) { double(:hired_on => "whatever") }
       let(:employer_profile) { double(id: "23827831278") }
       let(:effective_date) { double }
-      let(:person_id) { BSON::ObjectId::new }
+      let(:person_id) { BSON::ObjectId.new }
       let(:employee_role) { double(:id => employee_role_id, :employer_profile => employer_profile, employer_profile_id: employer_profile.id, :benefit_group => benefit_group, :census_employee => census_employee) }
       let(:person) { FactoryBot.create(:person) }
       let(:user) {FactoryBot.create(:user)}
@@ -78,10 +80,12 @@ if ::EnrollRegistry[:aca_shop_market].enabled?
       let(:person) { double("Person", full_name: "test test") }
       let(:employee_role) { double("EmployeeRole") }
       let(:employer_profile) { double("EmployerProfile") }
-      let(:broker_role) { double(
-        "BrokerRole",
-        email_address: "test@example.com"
-      ) }
+      let(:broker_role) do
+        double(
+          "BrokerRole",
+          email_address: "test@example.com"
+        )
+      end
       let(:broker_agency_account) { double("BrokerAgencyAccount", writing_agent: broker_role) }
       let(:broker_agency_accounts) { [broker_agency_account] }
       let(:employee_roles) { [employee_role] }
@@ -194,11 +198,11 @@ if ::EnrollRegistry[:aca_shop_market].enabled?
       let(:census_employee) { instance_double("CensusEmployee", :hired_on => hired_on, :is_linked? => true) }
       let(:employee_role) { instance_double("EmployeeRole", :benefit_group => benefit_group, :new_census_employee => census_employee, :person => person, :id => "212342345") }
       let(:effective_date) { double }
-      let(:employment_relationship) {
+      let(:employment_relationship) do
         instance_double("Forms::EmploymentRelationship", {
-          :census_employee => census_employee
-        } )
-      }
+                          :census_employee => census_employee
+                        })
+      end
       let(:employment_relationship_properties) { { :skllkjasdfjksd => "a3r123rvf" } }
       let(:user) { double(:idp_verified? => true, person: person) }
 
@@ -241,7 +245,7 @@ if ::EnrollRegistry[:aca_shop_market].enabled?
           allow(employment_relationship).to receive_message_chain(:census_employee,:employer_profile,:parent,:legal_name).and_return("legal_name")
           request.env["HTTP_REFERER"] = "/"
           sign_in(user)
-          post :create, params:{employment_relationship: employment_relationship_properties}
+          post :create, params: {employment_relationship: employment_relationship_properties}
         end
 
         it "should redirect" do
@@ -249,7 +253,7 @@ if ::EnrollRegistry[:aca_shop_market].enabled?
         end
 
         it "should get an alert" do
-          expect(flash[:alert]).to match /You can not enroll as another employee/
+          expect(flash[:alert]).to match(/You can not enroll as another employee/)
         end
       end
     end
@@ -291,7 +295,7 @@ if ::EnrollRegistry[:aca_shop_market].enabled?
           let(:found_census_employees) { [] }
           let(:person){ double("Person") }
           let(:consumer_role){ double("ConsumerRole", id: "test") }
-          let(:person_parameters){{"dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"000000111"}}
+          let(:person_parameters){{"dob" => "1985-10-01", "first_name" => "martin","gender" => "male","last_name" => "york","middle_name" => "","name_sfx" => "","ssn" => "000000111"}}
 
           it "renders the 'no_match' template" do
             expect(response).to have_http_status(:success)
@@ -374,7 +378,7 @@ if ::EnrollRegistry[:aca_shop_market].enabled?
       end
 
       it 'should redirect to a placeholder url' do
-        get :show, params:{id: 888}
+        get :show, params: {id: 888}
         expect(response).to redirect_to(search_insured_employee_index_path)
       end
 
@@ -382,9 +386,9 @@ if ::EnrollRegistry[:aca_shop_market].enabled?
         expect(subject).to receive(:log) do |msg, severity|
           expect(severity[:severity]).to eq('error')
           expect(msg[:user]).to eq(user.oim_id)
-          expect(msg[:url]).to match /insured\/employee\/888/
+          expect(msg[:url]).to match(%r{insured/employee/888})
         end
-        get :show, params:{id: 888}
+        get :show, params: {id: 888}
       end
     end
 
