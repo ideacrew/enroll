@@ -1,10 +1,10 @@
 GIT
-  remote: https://github.com/dchbx/acapi.git
-  revision: ed0c36ae5824466b54e5aa49f987acf34458cb38
-  branch: development
+  remote: https://github.com/ideacrew/acapi.git
+  revision: e10f9ab0a454f861916a986986daa9e055798fde
+  branch: trunk
   specs:
-    acapi (1.1.0)
-      activesupport (~> 4.2.0)
+    acapi (1.3.2)
+      activesupport (> 4.2.0)
       bunny (~> 1.7.0)
       sneakers
 
@@ -21,7 +21,7 @@ PATH
       transport_gateway
 
 PATH
-  remote: /Users/raghuram/MAHealthConnector/enroll/components/transport_gateway
+  remote: /Users/harsha/Desktop/ma-enroll/enroll/components/transport_gateway
   specs:
     transport_gateway (0.0.1)
       aws-sdk (~> 2.2.4)
