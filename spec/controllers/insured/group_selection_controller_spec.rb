@@ -259,6 +259,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         allow(person).to receive(:consumer_role).and_return(consumer_role)
         allow(person).to receive(:active_employee_roles).and_return [employee_role]
         allow(person).to receive(:has_active_employee_role?).and_return true
+        allow(hbx_profile1).to receive(:under_open_enrollment?).and_return true
         allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile1
         sign_in user
       end
@@ -698,7 +699,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     let!(:tax_household_member2) {FactoryBot.create(:tax_household_member, applicant_id: family.family_members[1].id, tax_household: tax_household)}
     let!(:eligibilty_determination) {FactoryBot.create(:eligibility_determination, max_aptc: 500.00, tax_household: tax_household, csr_eligibility_kind: 'csr_73')}
     let(:current_year) { TimeKeeper.date_of_record.year }
-    let(:effective_on) { TimeKeeper.date_of_record.beginning_of_month }
+    let(:effective_on) { TimeKeeper.date_of_record.next_month.beginning_of_month }
 
     let!(:hbx_enrollment) do
       FactoryBot.create(:hbx_enrollment,
@@ -1011,6 +1012,25 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       expect(response).to have_http_status(:redirect)
       expect(flash[:error]).not_to eq 'You must select the primary applicant to enroll in the healthcare plan'
       expect(response).not_to redirect_to(new_insured_group_selection_path(person_id: person.id, employee_role_id: employee_role.id, change_plan: '', market_kind: 'shop', enrollment_kind: ''))
+    end
+
+    context 'should block user from shopping' do
+
+      it 'when benefit application is in termination pending' do
+        initial_application.update_attributes(aasm_state: :termination_pending)
+        user = FactoryBot.create(:user, id: 190, person: FactoryBot.create(:person))
+        sign_in user
+        post :create, params: { person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids }
+        expect(flash[:error]).to eq 'Your employer is no longer offering health insurance through DC Health Link. Please contact your employer or call our Customer Care Center at 1-855-532-5465.'
+      end
+
+      it 'when benefit application is terminated' do
+        initial_application.update_attributes(aasm_state: :terminated)
+        user = FactoryBot.create(:user, id: 191, person: FactoryBot.create(:person))
+        sign_in user
+        post :create, params: { person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids }
+        expect(flash[:error]).to eq 'Your employer is no longer offering health insurance through DC Health Link. Please contact your employer.'
+      end
     end
 
     it "for cobra with invalid date" do
