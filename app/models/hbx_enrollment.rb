@@ -764,7 +764,7 @@ class HbxEnrollment
     benefit_group_assignment.end_benefit(end_date)
     benefit_group_assignment.save
   end
-  
+
   def propogate_cancel
     # SHOP: Implement if we have requirement from buiness, event need to happen after cancel in shop.
     # IVL: cancel renewals on cancelling active coverage.
