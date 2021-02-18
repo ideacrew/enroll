@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require File.join(Rails.root, "components/benefit_sponsors/spec/support/benefit_sponsors_product_spec_helpers")
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
@@ -132,7 +134,7 @@ if ::EnrollRegistry[:aca_shop_market].enabled?
       let(:subject){"Employee Attestation"}
       let(:file) { double }
       let(:temp_file) { double }
-      let(:file_path) { Rails.root+'test/JavaScript.pdf' }
+      let(:file_path) { "#{Rails.root}test/JavaScript.pdf" }
 
       before(:each) do
         @controller = Employers::EmployerProfilesController.new
@@ -159,7 +161,7 @@ if ::EnrollRegistry[:aca_shop_market].enabled?
 
       it "should delete documents" do
         sign_in(user)
-        get :delete_documents, params: {id: employer_profile.id, ids:[1]}, xhr: true
+        get :delete_documents, params: {id: employer_profile.id, ids: [1]}, xhr: true
         expect(response).to have_http_status(:success)
       end
     end
