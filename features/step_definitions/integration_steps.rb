@@ -437,6 +437,7 @@ end
 
 Given(/^(.+) has not signed up as an HBX user$/) do |actor|
   step "I use unique values"
+  sleep 5
 end
 
 When(/^.* visit the Employer portal$/) do
@@ -697,7 +698,7 @@ When(/^.+ enters? the dependent info of Patrick wife$/) do
   fill_in 'dependent[last_name]', with: 'Patrick'
   fill_in 'dependent[ssn]', with: '123445678'
   fill_in 'jq_datepicker_ignore_dependent[dob]', with: '01/15/1996'
-  find('#dependents_info_wrapper').click
+  find(:xpath, "//label[@for='radio_female']").click
   sleep 1
   find("span", :text => "choose").click
   find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Spouse')]").click
@@ -782,7 +783,7 @@ end
 
 When(/^.+ filters plans by Carrier/) do
   find('.selectric-interaction-choice-control-carrier').click
-  carrier_option = find('li.interaction-choice-control-carrier-1', wait: 5)
+  carrier_option = find('li .interaction-choice-control-carrier-1', wait: 5)
   @carrier_selected = carrier_option.text
   carrier_option.click
   find(".interaction-click-control-apply", wait: 5).click

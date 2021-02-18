@@ -87,6 +87,35 @@ module IvlAssistanceWorld
     family.active_household.save!
     family.save!
   end
+
+  def create_enrollment_for_family(family)
+    enrollment = FactoryBot.create(:hbx_enrollment, :with_enrollment_members,
+                                   :family => family,
+                                   :household => family.active_household,
+                                   :aasm_state => 'coverage_selected',
+                                   :is_any_enrollment_member_outstanding => true,
+                                   :kind => 'individual',
+                                   :product => create_cat_product,
+                                   :effective_on => TimeKeeper.date_of_record.beginning_of_year)
+    family.family_members.each do |fm|
+      FactoryBot.create(:hbx_enrollment_member, applicant_id: fm.id, eligibility_date: (TimeKeeper.date_of_record - 2.months), hbx_enrollment: enrollment)
+    end
+    enrollment.save!
+    enrollment
+  end
+
+  def create_thh_for_family
+    person = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)
+    family = FactoryBot.create(:family, :with_primary_family_member, person: person)
+    create_tax_household_and_eligibility_determination(family)
+    @enrollment = create_enrollment_for_family(family)
+  end
+
+  def enable_change_tax_credit_button
+    current_year = TimeKeeper.date_of_record.year
+    is_tax_credit_btn_enabled = TimeKeeper.date_of_record < Date.new(current_year, 11, HbxProfile::IndividualEnrollmentDueDayOfMonth + 1)
+    allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 10, 5)) unless is_tax_credit_btn_enabled
+  end
 end
 
 World(IvlAssistanceWorld)

@@ -50,7 +50,7 @@ class PeopleController < ApplicationController
       if params[:commit].downcase.include?('exit')
         # Logout of session
       else
-        redirect_to person_person_landing(@person)
+        redirect_to person_person_landing_path(@person)
       end
     else
       render new, :error => "Please complete all required fields"
@@ -199,11 +199,12 @@ class PeopleController < ApplicationController
     else
       redirect_path = family_account_path
     end
+    @person.consumer_role.update_is_applying_coverage_status(person_params[:is_applying_coverage]) if @person.is_consumer_role_active?
     @info_changed, @dc_status = sensitive_info_changed?(@person.consumer_role)
     @native_status_changed = native_status_changed?(@person.consumer_role)
     respond_to do |format|
       if @valid_vlp != false && @person.update_attributes(person_params.except(:is_applying_coverage))
-        if @person.is_consumer_role_active?
+        if @person.is_consumer_role_active? && person_params[:is_applying_coverage] == "true"
           @person.consumer_role.check_native_status(@family, native_changed: @native_status_changed)
           @person.consumer_role.check_for_critical_changes(@family, info_changed: @info_changed, is_homeless: person_params["is_homeless"], is_temporarily_out_of_state: person_params["is_temporarily_out_of_state"], dc_status: @dc_status)
         end
@@ -218,7 +219,6 @@ class PeopleController < ApplicationController
           format.json { head :no_content }
         end
       else
-        @person.addresses = @old_addresses
         if @person.is_consumer_role_active?
           bubble_consumer_role_errors_by_person(@person)
           @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@person.consumer_role)
@@ -382,11 +382,12 @@ private
       :is_temporarily_out_of_state,
       :id,
       :consumer_role,
-      :is_applying_coverage
+      :is_applying_coverage,
+      :age_off_excluded
     ]
   end
 
   def dependent_params
-    params.require(:family_member).reject{|k, v| k == "id" or k =="primary_relationship"}.permit!
+    params.require(:family_member).reject{|k, _v| ["id", "primary_relationship"].include?(k)}.permit(*person_parameters_list)
   end
 end

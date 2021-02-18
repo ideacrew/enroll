@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.version     = Notifier::VERSION
   s.authors     = ["Dan Thomas"]
   s.email       = ["dan@ideacrew.com"]
-  s.homepage    = "https://github.com/dchbx"
+  s.homepage    = "https://github.com/ideacrew"
   s.summary     = %q{An engine for generating notices by merging data with template text}
   s.description = %q{Using a class instance and reference to a pre-defined template, build a customized notice in PDF format \
                       and drop at well-known endpoint }
@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
 
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
 
-  s.add_dependency "rails", "~> 5.2.3"
+  s.add_dependency "rails", "~> 5.2.4.3"
   s.add_dependency "slim", "3.0.9"
   s.add_dependency "mongoid", "~> 7.0.2"
   s.add_dependency "virtus", "~> 1.0.5"

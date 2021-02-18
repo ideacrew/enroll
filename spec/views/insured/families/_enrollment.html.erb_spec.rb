@@ -1,8 +1,11 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe "insured/families/_enrollment.html.erb" do
   let(:person) { double(id: '31111113') }
   let(:family) { double(is_eligible_to_enroll?: true, updateable?: true, list_enrollments?: true, id: 'familyid') }
+  let(:is_eligible_to_enroll) { family.is_eligible_to_enroll? }
 
   let(:employee_role) do
     instance_double(EmployeeRole)
@@ -26,16 +29,16 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
   let(:product) do
     instance_double(
       BenefitMarkets::Products::HealthProducts::HealthProduct,
-        issuer_profile: carrier_profile,
-        title: "A Plan Name",
-        kind: plan_coverage_kind,
-        active_year: plan_active_year,
-        metal_level_kind: :gold,
-        product_type: "A plan type",
-        id: "Productid",
-        hios_id: "producthiosid",
-        health_plan_kind: :hmo,
-        sbc_document: sbc_document
+      issuer_profile: carrier_profile,
+      title: "A Plan Name",
+      kind: plan_coverage_kind,
+      active_year: plan_active_year,
+      metal_level_kind: :gold,
+      product_type: "A plan type",
+      id: "Productid",
+      hios_id: "producthiosid",
+      health_plan_kind: :hmo,
+      sbc_document: sbc_document
     )
   end
 
@@ -88,43 +91,44 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
     before :each do
       allow(hbx_enrollment).to receive(:is_reinstated_enrollment?).and_return(false)
-      allow(view).to receive(:disable_make_changes_button?).with(hbx_enrollment).and_return(true)
+      allow(hbx_enrollment).to receive(:can_make_changes?).and_return(true)
     end
 
     it "when kind is employer_sponsored" do
       allow(hbx_enrollment).to receive(:kind).and_return('employer_sponsored')
       allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
       allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(false)
-      allow(hbx_enrollment).to receive(:display_make_changes_for_ivl?).and_return(true)
+      allow(hbx_enrollment).to receive(:can_make_changes?).and_return(true)
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
+      expect(rendered).to match(/Plan Contact Info/)
       expect(rendered).to have_content(employer_legal_name)
-      expect(rendered).to have_selector('strong', text: "#{HbxProfile::ShortName}")
+      expect(rendered).to have_selector('strong', text: HbxProfile::ShortName.to_s)
       expect(rendered).to have_content(/#{hbx_enrollment.hbx_id}/)
     end
 
     it "when kind is employer_sponsored_cobra" do
       allow(hbx_enrollment).to receive(:kind).and_return('employer_sponsored_cobra')
       allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
+      allow(hbx_enrollment).to receive(:can_make_changes?).and_return(true)
       allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(true)
-      allow(hbx_enrollment).to receive(:display_make_changes_for_ivl?).and_return(true)
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
       expect(rendered).to have_content(employer_profile.legal_name)
     end
 
     if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
-    it "when kind is individual" do
-      allow(hbx_enrollment).to receive(:kind).and_return('individual')
-      allow(hbx_enrollment).to receive(:is_ivl_by_kind?)
-      allow(hbx_enrollment).to receive(:is_enrolled_by_aasm_state?)
-      allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
-      allow(hbx_enrollment).to receive(:display_make_changes_for_ivl?).and_return(true)
-      allow(hbx_enrollment).to receive(:applied_aptc_amount).and_return(100.0)
-      allow(hbx_enrollment).to receive(:is_any_enrollment_member_outstanding).and_return false
-      render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
-      expect(rendered).to have_content('Individual & Family')
-      expect(rendered).to have_selector('strong', text: "#{HbxProfile::ShortName}")
-      expect(rendered).to have_content(/#{hbx_enrollment.hbx_id}/)
-    end
+      it "when kind is individual" do
+        allow(hbx_enrollment).to receive(:kind).and_return('individual')
+        allow(hbx_enrollment).to receive(:is_ivl_by_kind?)
+        allow(hbx_enrollment).to receive(:is_enrolled_by_aasm_state?)
+        allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
+        allow(hbx_enrollment).to receive(:can_make_changes?).and_return(true)
+        allow(hbx_enrollment).to receive(:applied_aptc_amount).and_return(100.0)
+        allow(hbx_enrollment).to receive(:is_any_enrollment_member_outstanding).and_return false
+        render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
+        expect(rendered).to have_content('Individual & Family')
+        expect(rendered).to have_selector('strong', text: HbxProfile::ShortName.to_s)
+        expect(rendered).to have_content(/#{hbx_enrollment.hbx_id}/)
+      end
     end
   end
 
@@ -188,24 +192,32 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     let(:aws_env) { ENV['AWS_ENV'] || "qa" }
     let(:sbc_document) do
       Document.new({title: 'sbc_file_name', subject: "SBC",
-                      :identifier=>"urn:openhbx:terms:v1:file_storage:s3:bucket:#{Settings.site.s3_prefix}-enroll-sbc-#{aws_env}#7816ce0f-a138-42d5-89c5-25c5a3408b82"})
+                    :identifier => "urn:openhbx:terms:v1:file_storage:s3:bucket:#{Settings.site.s3_prefix}-enroll-sbc-#{aws_env}#7816ce0f-a138-42d5-89c5-25c5a3408b82"})
     end
 
     let(:employer_profile) do
       instance_double(
         BenefitSponsors::Organizations::AcaShopCcaEmployerProfile,
-        hbx_id: "3241251524", legal_name: "ACME Agency", dba: "Acme", fein: "034267010")
+        hbx_id: "3241251524", legal_name: "ACME Agency", dba: "Acme", fein: "034267010"
+      )
     end
 
     before :each do
       allow(hbx_enrollment).to receive(:is_reinstated_enrollment?).and_return(false)
       allow(hbx_enrollment).to receive(:kind).and_return('employer_sponsored')
-      allow(hbx_enrollment).to receive(:display_make_changes_for_ivl?).and_return(true)
       allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
+      allow(hbx_enrollment).to receive(:can_make_changes?).and_return(true)
       allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(false)
-      allow(view).to receive(:disable_make_changes_button?).with(hbx_enrollment).and_return(false)
       allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
+    end
+
+    context "internationalization" do
+      let(:file_location) { "app/views/insured/families/_enrollment.html.erb"}
+      it "should have all expected translations" do
+        expect(translations_in_erb_tags_present?(file_location)).to eq(true)
+        expect(translations_outside_erb_tags_present?(file_location)).to eq(true)
+      end
     end
 
     it "should open the sbc pdf" do
@@ -257,10 +269,10 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       before :each do
         allow(hbx_enrollment).to receive(:is_reinstated_enrollment?).and_return(false)
         allow(hbx_enrollment).to receive(:kind).and_return('employer_sponsored')
-        allow(hbx_enrollment).to receive(:display_make_changes_for_ivl?).and_return(true)
         allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
+        allow(hbx_enrollment).to receive(:can_make_changes?).and_return(true)
         allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(false)
-        allow(view).to receive(:disable_make_changes_button?).with(hbx_enrollment).and_return(false)
+        allow(hbx_enrollment).to receive(:can_make_changes?).and_return(false)
         allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
         allow(hbx_enrollment).to receive(:coverage_termination_pending?).and_return(true)
         render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
@@ -273,6 +285,37 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       it 'displays terminated_on when coverage_termination_pending and not future_enrollment_termination_date' do
         expect(rendered).to have_text(/#{terminated_on.strftime("%m/%d/%Y")}/)
       end
+    end
+  end
+
+  context "reinstated enrollment" do
+    let!(:person) { FactoryBot.create(:person, last_name: 'John', first_name: 'Doe') }
+    let!(:family) { FactoryBot.create(:family, :with_primary_family_member, :person => person) }
+    let(:issuer_profile) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
+    let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01', issuer_profile: issuer_profile)}
+    let!(:hbx_enrollment) do
+      FactoryBot.create(
+        :hbx_enrollment,
+        created_at: (TimeKeeper.date_of_record.in_time_zone("Eastern Time (US & Canada)") - 2.days),
+        family: family,
+        household: family.households.first,
+        coverage_kind: "health",
+        kind: "individual",
+        aasm_state: 'coverage_selected',
+        product: product
+      )
+    end
+
+    before :each do
+      allow(hbx_enrollment).to receive(:is_reinstated_enrollment?).and_return(true)
+      render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
+    end
+
+    it "should have reinstated enrollment text" do
+      expect(rendered).to have_text("Reinstated Enrollment")
+    end
+    it "should show month text" do
+      expect(rendered).to match(/month/)
     end
   end
 
@@ -295,7 +338,6 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     end
 
     before :each do
-      allow(hbx_enrollment).to receive(:display_make_changes_for_ivl?).and_return(true)
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
     end
 
@@ -311,7 +353,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
         id: "some hbx enrollment id",
         hbx_id: "some hbx enrollment hbx id",
         enroll_step: 1,
-        aasm_state: "coverage_waived",
+        aasm_state: "inactive",
         coverage_kind: "health",
         submitted_at: DateTime.now,
         waiver_reason: "because",
@@ -339,12 +381,12 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
         future_enrollment_termination_date: "",
         covered_members_first_names: [],
         :renewing_waived? => false,
-        :parent_enrollment => nil,
+        :parent_enrollment => nil
       )
     end
 
     before :each do
-      allow(view).to receive(:disable_make_changes_button?).with(waived_hbx_enrollment).and_return true
+      allow(waived_hbx_enrollment).to receive(:can_make_changes?).and_return(true)
     end
 
     context "it should render waived_coverage_widget " do

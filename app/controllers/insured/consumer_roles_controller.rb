@@ -17,7 +17,7 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def privacy
     set_current_person(required: false)
-    params_hash = params.permit!.to_h
+    params_hash = params.permit(:aqhp, :uqhp).to_h
     @val = params_hash[:aqhp] || params_hash[:uqhp]
     @key = params_hash.key(@val)
     @search_path = {@key => @val}
@@ -58,7 +58,7 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def match
     @no_save_button = true
-    @person_params = params.require(:person).merge({user_id: current_user.id}).permit!.to_h
+    @person_params = params.require(:person).permit(person_parameters_list).merge({user_id: current_user.id}).to_h
     @consumer_candidate = ::Forms::ConsumerCandidate.new(@person_params)
     @person = @consumer_candidate
     @use_person = true #only used to manupulate form data
@@ -74,9 +74,9 @@ class Insured::ConsumerRolesController < ApplicationController
         when :service_unavailable
           format.html { render 'shared/account_lookup_service_unavailable' }
         when :too_many_matches
-          format.html { redirect_to SamlInformation.account_conflict_url }
+          format.html { redirect_to URI.parse(SamlInformation.account_conflict_url).to_s }
         when :existing_account
-          format.html { redirect_to SamlInformation.account_recovery_url }
+          format.html { redirect_to URI.parse(SamlInformation.account_recovery_url).to_s }
         else
           unless params[:persisted] == "true"
             @employee_candidate = Forms::EmployeeCandidate.new(@person_params)
@@ -92,7 +92,7 @@ class Insured::ConsumerRolesController < ApplicationController
             found_person = @resident_candidate.match_person
             if found_person.present? && found_person.resident_role.present?
               begin
-                @resident_role = ::Factories::EnrollmentFactory.construct_resident_role(params.permit!, actual_user)
+                @resident_role = ::Factories::EnrollmentFactory.construct_resident_role(params.require(:person).permit(person_parameters_list), actual_user)
                 if @resident_role.present?
                   @person = @resident_role.person
                   session[:person_id] = @person.id
@@ -148,7 +148,7 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def create
     begin
-      @consumer_role = ::Factories::EnrollmentFactory.construct_consumer_role(params.permit!, actual_user)
+      @consumer_role = ::Factories::EnrollmentFactory.construct_consumer_role(params.require(:person).permit(person_parameters_list), actual_user)
       if @consumer_role.present?
         @person = @consumer_role.person
       else
@@ -223,10 +223,10 @@ class Insured::ConsumerRolesController < ApplicationController
           redirect_to upload_ridp_document_insured_consumer_role_index_path
         elsif is_new_paper_application?(current_user, session[:original_application_type]) || @person.primary_family.has_curam_or_mobile_application_type?
           @person.consumer_role.move_identity_documents_to_verified(@person.primary_family.application_type)
-          consumer_redirection_path = insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
           # rubocop:disable Metrics/BlockNesting
-          consumer_redirection_path = help_paying_coverage_insured_consumer_role_index_path if EnrollRegistry.feature_enabled?(:financial_assistance)
-          redirect_to @consumer_role.admin_bookmark_url.present? ? @consumer_role.admin_bookmark_url : consumer_redirection_path
+          consumer_redirection_path = EnrollRegistry.feature_enabled?(:financial_assistance) ? help_paying_coverage_insured_consumer_role_index_path : insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
+          redirect_path = @consumer_role.admin_bookmark_url.present? ? @consumer_role.admin_bookmark_url : consumer_redirection_path
+          redirect_to URI.parse(redirect_path).to_s
           # rubocop:enable Metrics/BlockNesting
         else
           redirect_to ridp_agreement_insured_consumer_role_index_path
@@ -379,7 +379,9 @@ class Insured::ConsumerRolesController < ApplicationController
       :no_dc_address_reason,
       :is_applying_coverage,
       :is_homeless,
-      :is_temporarily_out_of_state
+      :is_temporarily_out_of_state,
+      :user_id,
+      :dob_check
     ]
   end
 

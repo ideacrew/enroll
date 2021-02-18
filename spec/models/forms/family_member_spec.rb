@@ -221,7 +221,6 @@ describe Forms::FamilyMember, 'with no ssn' do
   let(:ssn) { nil }
   let(:dob) { "2007-06-09" }
   let(:existing_family_member_id) { double }
-  let(:relationship) { double }
   let(:existing_family_member) { nil }
   let(:existing_person) { nil }
 
@@ -241,6 +240,7 @@ describe Forms::FamilyMember, 'with no ssn' do
       :is_incarcerated => "no",
       :tribal_id => "test",
       :is_homeless => nil,
+      :relationship => "spouse",
       :is_temporarily_out_of_state => false
     }
   }
@@ -249,15 +249,25 @@ describe Forms::FamilyMember, 'with no ssn' do
     allow(Family).to receive(:find).with(family_id).and_return(family)
   end
 
-  subject { Forms::FamilyMember.new(person_properties.merge({:family_id => family_id, :relationship => relationship })) }
+  context "is applying coverage is TRUE" do
+    subject { Forms::FamilyMember.new(person_properties.merge({:family_id => family_id, :is_applying_coverage => "true"})) }
 
-
-  it 'should throw an error if ssn or no ssn values are blank' do
-    subject.validate
-    expect(subject).not_to be_valid
-    expect(subject.errors[:base].first).to match /ssn is required/
+    it 'should throw an error if ssn or no ssn values are blank' do
+      subject.validate
+      expect(subject).not_to be_valid
+      expect(subject.errors[:base].first).to eq "ssn is required"
+    end
   end
 
+  context "is applying coverage is FALSE" do
+    subject { Forms::FamilyMember.new(person_properties.merge({:family_id => family_id, :is_applying_coverage => "false"})) }
+
+    it 'should throw an error if ssn or no ssn values are blank' do
+      subject.ssn_validation
+      expect(subject).to be_valid
+      expect(subject.errors.messages.present?).to eq false
+    end
+  end
 end
 
 describe Forms::FamilyMember, "which describes a new family member, and has been saved" do
@@ -345,13 +355,13 @@ describe Forms::FamilyMember, "which describes a new family member, and has been
 
     it "should create a new person" do
       person_properties[:dob] = Date.strptime(person_properties[:dob], "%Y-%m-%d")
-      expect(Person).to receive(:new).with(person_properties.merge({:citizen_status=>nil})).and_return(new_person)
+      expect(Person).to receive(:new).with(person_properties.merge({:citizen_status => nil, :age_off_excluded => nil})).and_return(new_person)
       subject.save
     end
 
     it "should create a new family member and call save_relevant_coverage_households" do
       person_properties[:dob] = Date.strptime(person_properties[:dob], "%Y-%m-%d")
-      allow(Person).to receive(:new).with(person_properties.merge({:citizen_status=>nil})).and_return(new_person)
+      allow(Person).to receive(:new).with(person_properties.merge({:citizen_status => nil, :age_off_excluded => nil})).and_return(new_person)
       expect(family).to receive(:save_relevant_coverage_households)
       subject.save
       expect(subject.id).to eq new_family_member_id
@@ -509,7 +519,7 @@ describe Forms::FamilyMember, "which describes an existing family member" do
 
   describe "when updated" do
     it "should update the relationship of the dependent" do
-      allow(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil, :no_ssn=>"0", :is_homeless=>nil, :is_temporarily_out_of_state=>nil})).and_return(true)
+      allow(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status => nil, :no_ssn => "0", :is_homeless => nil, :is_temporarily_out_of_state => nil, :age_off_excluded => nil})).and_return(true)
       allow(subject).to receive(:assign_person_address).and_return true
       allow(person).to receive(:consumer_role).and_return FactoryBot.build(:consumer_role)
       expect(family_member).to receive(:update_relationship).with(relationship)
@@ -518,7 +528,7 @@ describe Forms::FamilyMember, "which describes an existing family member" do
 
     it "should update the attributes of the person" do
       allow(subject).to receive(:assign_person_address).and_return true
-      expect(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil, :no_ssn=>"0", :is_homeless=>nil, :is_temporarily_out_of_state=>nil}))
+      expect(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status => nil, :no_ssn => "0", :is_homeless => nil, :is_temporarily_out_of_state => nil, :age_off_excluded => nil}))
       allow(family_member).to receive(:update_relationship).with(relationship)
       allow(person).to receive(:consumer_role).and_return FactoryBot.build(:consumer_role)
       subject.update_attributes(update_attributes)
@@ -544,6 +554,50 @@ describe Forms::FamilyMember, "which describes an existing family member" do
 
     it "should set the inactive family_member as active" do
       expect(new_family_member.is_active).to eq true
+    end
+  end
+end
+
+describe "checking validations on family member object with resident role" do
+  let(:family_id) { double }
+  let(:family) { double("family", :family_members => []) }
+  let(:member_attributes) do
+    { "first_name" => "test",
+      "middle_name" => "",
+      "last_name" => "fm",
+      "dob" => "1982-11-11",
+      "ssn" => "",
+      "no_ssn" => "1",
+      "gender" => "male",
+      "relationship" => "child",
+      "tribal_id" => "",
+      "ethnicity" => ["", "", "", "", "", "", ""],
+      "is_consumer_role" => "false",
+      "is_resident_role" => "true",
+      "same_with_primary" => "true",
+      "is_homeless" => "false",
+      "is_temporarily_out_of_state" => "false",
+      "addresses" =>
+      { "0" => {"kind" => "home", "address_1" => "", "address_2" => "", "city" => "", "state" => "", "zip" => ""},
+        "1" => {"kind" => "mailing", "address_1" => "", "address_2" => "", "city" => "", "state" => "", "zip" => ""}}}
+  end
+
+  subject { Forms::FamilyMember.new(member_attributes.merge({:family_id => family_id}))}
+
+  before do
+    allow(subject.class).to receive(:individual_market_is_enabled?).and_return(true)
+    allow(subject).to receive(:family).and_return family
+  end
+
+  it "should return invalid if no answers found for required questions" do
+    expect(subject.valid?).to eq false
+  end
+
+  context "when user with resident not answered for incarceration status" do
+    subject { Forms::FamilyMember.new(member_attributes.merge({:family_id => family_id, "us_citizen" => "true", "naturalized_citizen" => "false", "indian_tribe_member" => "false"})) }
+    it "should return errors with incarceration status" do
+      subject.save
+      expect(subject.errors.full_messages).to eq ["Incarceration status is required"]
     end
   end
 end

@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.version     = BenefitMarkets::VERSION
   s.authors     = ["IdeaCrew"]
   s.email       = ["enroll_app@ideacrew.com"]
-  s.homepage    = "https://github.com/dchbx"
+  s.homepage    = "https://github.com/ideacrew"
   s.summary     = "Create and manage markets that enable benefit sponsors to access products and offer benefits to their members."
   s.description = "Create and manage markets that enable benefit sponsors to access products and offer benefits to their members."
   s.license     = "MIT"
@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
   s.test_files = Dir["spec/**/*"]
 
-  s.add_dependency "rails",                     "~> 5.2.3"
+  s.add_dependency "rails",                     "~> 5.2.4.3"
 
   s.add_dependency "mongoid",                   "~> 7.0.2"
 

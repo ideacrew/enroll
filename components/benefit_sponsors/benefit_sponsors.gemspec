@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.version     = BenefitSponsors::VERSION
   s.authors     = ["Dan Thomas"]
   s.email       = ["dan.thomas@dc.gov"]
-  s.homepage    = "https://github.com/dchbx"
+  s.homepage    = "https://github.com/ideacrew"
   s.summary     = "Summary of BenefitSponsors."
   s.description = "Description of BenefitSponsors."
   s.license     = "MIT"
@@ -17,6 +17,7 @@ Gem::Specification.new do |s|
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
   s.test_files = Dir["spec/**/*"]
 
+  s.add_dependency "rails",                     "~> 5.2.4.3"
   s.add_dependency "mongoid",                   "~> 7.0.2"
   s.add_dependency 'mongoid-autoinc',           '~> 6.0'
   s.add_dependency 'browser',                   '2.7.0'

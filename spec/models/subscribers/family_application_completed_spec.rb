@@ -79,9 +79,6 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           let(:primary) { parser.family_members.detect{ |fm| fm.id == parser.primary_family_member_id } }
           let(:ua_params) do
             {
-              addresses: [],
-              phones: [],
-              emails: [],
               person: {
                 "first_name" => primary.person.name_first.upcase,
                 "last_name" => primary.person.name_last.downcase,
@@ -91,12 +88,15 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
                 "dob" => primary.person_demographics.birth_date,
                 "ssn" => primary.person_demographics.ssn,
                 "no_ssn" => "1",
-                "gender" => primary.person_demographics.sex.split('#').last
+                "gender" => primary.person_demographics.sex.split('#').last,
+                addresses: [],
+                phones: [],
+                emails: []
               }
             }
           end
 
-          let(:consumer_role) { Factories::EnrollmentFactory.construct_consumer_role(ua_params,user) }
+          let(:consumer_role) { Factories::EnrollmentFactory.construct_consumer_role(ua_params[:person], user) }
           let(:family) { consumer_role.person.primary_family }
 
           before do
@@ -124,9 +124,6 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           let(:primary) { parser.family_members.detect{ |fm| fm.id == parser.primary_family_member_id } }
           let(:ua_params) do
             {
-              addresses: [],
-              phones: [],
-              emails: [],
               person: {
                 "first_name" => primary.person.name_first.upcase,
                 "last_name" => primary.person.name_last.downcase,
@@ -136,12 +133,15 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
                 "dob" => primary.person_demographics.birth_date,
                 "ssn" => primary.person_demographics.ssn,
                 "no_ssn" => "1",
-                "gender" => primary.person_demographics.sex.split('#').last
+                "gender" => primary.person_demographics.sex.split('#').last,
+                addresses: [],
+                phones: [],
+                emails: []
               }
             }
           end
 
-          let(:consumer_role) { Factories::EnrollmentFactory.construct_consumer_role(ua_params,user) }
+          let(:consumer_role) { Factories::EnrollmentFactory.construct_consumer_role(ua_params[:person], user) }
           let(:family) { consumer_role.person.primary_family }
 
           before do
@@ -172,9 +172,6 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         let(:person) { consumer_role.person }
         let(:ua_params) do
           {
-            addresses: [],
-            phones: [],
-            emails: [],
             person: {
               "first_name" => primary.person.name_first.upcase,
               "last_name" => primary.person.name_last.downcase,
@@ -184,12 +181,15 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
               "dob" => primary.person_demographics.birth_date,
               "ssn" => primary.person_demographics.ssn,
               "no_ssn" => "1",
-              "gender" => primary.person_demographics.sex.split('#').last
+              "gender" => primary.person_demographics.sex.split('#').last,
+              addresses: [],
+              phones: [],
+              emails: []
             }
           }
         end
 
-        let(:consumer_role) { Factories::EnrollmentFactory.construct_consumer_role(ua_params,user) }
+        let(:consumer_role) { Factories::EnrollmentFactory.construct_consumer_role(ua_params[:person], user) }
 
         let(:family_db) { Family.where(e_case_id: parser.integrated_case_id).first }
         let(:tax_household_db) { family_db.active_household.latest_active_tax_household }
@@ -265,9 +265,6 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         let(:person) { consumer_role.person }
         let(:ua_params) do
           {
-            addresses: [],
-            phones: [],
-            emails: [],
             person: {
               "first_name" => primary.person.name_first.upcase,
               "last_name" => primary.person.name_last.downcase,
@@ -277,13 +274,15 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
               "dob" => primary.person_demographics.birth_date,
               "ssn" => primary.person_demographics.ssn,
               "no_ssn" => "1",
-              "gender" => primary.person_demographics.sex.split('#').last
+              "gender" => primary.person_demographics.sex.split('#').last,
+              addresses: [],
+              phones: [],
+              emails: []
             }
           }
         end
 
-        let(:consumer_role) { Factories::EnrollmentFactory.construct_consumer_role(ua_params,user) }
-
+        let(:consumer_role) { Factories::EnrollmentFactory.construct_consumer_role(ua_params[:person], user) }
         let(:family_db) { Family.where(e_case_id: parser.integrated_case_id).first }
         let(:tax_household_db) { family_db.active_household.tax_households.first }
         let(:person_db) { family_db.primary_applicant.person }
@@ -343,9 +342,6 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         let(:person) { consumer_role.person }
         let(:ua_params) do
           {
-            addresses: [],
-            phones: [],
-            emails: [],
             person: {
               "first_name" => primary.person.name_first,
               "last_name" => primary.person.name_last,
@@ -355,12 +351,15 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
               "dob" => primary.person_demographics.birth_date,
               "ssn" => primary.person_demographics.ssn,
               "no_ssn" => "",
-              "gender" => primary.person_demographics.sex.split('#').last
+              "gender" => primary.person_demographics.sex.split('#').last,
+              addresses: [],
+              phones: [],
+              emails: []
             }
           }
         end
 
-        let(:consumer_role) { Factories::EnrollmentFactory.construct_consumer_role(ua_params,user) }
+        let(:consumer_role) { Factories::EnrollmentFactory.construct_consumer_role(ua_params[:person], user) }
 
         let(:family_db) { Family.where(e_case_id: parser.integrated_case_id).first }
         let(:tax_household_db) { family_db.active_household.tax_households.first }
@@ -448,9 +447,6 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         let(:person) { consumer_role.person }
         let(:ua_params) do
           {
-            addresses: [],
-            phones: [],
-            emails: [],
             person: {
               "first_name" => primary.person.name_first,
               "last_name" => primary.person.name_last,
@@ -460,19 +456,26 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
               "dob" => primary.person_demographics.birth_date,
               "ssn" => primary.person_demographics.ssn,
               "no_ssn" => "",
-              "gender" => primary.person_demographics.sex.split('#').last
+              "gender" => primary.person_demographics.sex.split('#').last,
+              addresses: [],
+              phones: [],
+              emails: []
             }
           }
         end
 
-        let(:consumer_role) { Factories::EnrollmentFactory.construct_consumer_role(ua_params,user) }
-
+        let(:consumer_role) { Factories::EnrollmentFactory.construct_consumer_role(ua_params[:person], user) }
+        let(:thh_year) {2015}
         let(:family_db) { Family.where(e_case_id: parser.integrated_case_id).first }
-        let(:tax_household_db) { family_db.active_household.tax_households.first }
+        let(:tax_household_db) { family_db.active_household.latest_tax_households_with_year(thh_year).first }
         let(:person_db) { family_db.primary_applicant.person }
         let(:consumer_role_db) { person_db.consumer_role }
         let(:new_dep_consumer_role_db) { family_db.dependents.first.person.consumer_role }
         let(:existing_dep_consumer_role_db) { Person.where(first_name: "Megan", last_name: "Zoo").first.consumer_role }
+
+        before do
+          person.primary_family.active_household.tax_households.new(effective_starting_on: Date.new(thh_year - 1), effective_ending_on: nil).save!
+        end
 
         it "should not log any errors" do
           person.primary_family.update_attributes!(e_case_id: "curam_landing_for#{person.id}")
@@ -482,7 +485,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
         it "updates the tax household with aptc from the payload on the primary persons family" do
           expect(tax_household_db).to be_truthy
-          expect(tax_household_db).to eq person.primary_family.active_household.latest_active_tax_household
+          expect(tax_household_db).to eq person.primary_family.active_household.latest_tax_households_with_year(tax_household_db.effective_starting_on.year).first
           expect(tax_household_db.primary_applicant.family_member.person).to eq person
           expect(tax_household_db.allocated_aptc).to eq 0
           expect(tax_household_db.is_eligibility_determined).to be_truthy

@@ -87,7 +87,12 @@ class Household
       primary_family_member = self.family_members.select{|p| primary_person == p.person}.first
       if tax_households.present?
         latest_tax_household = tax_households.where(effective_ending_on: nil).last
-        latest_tax_household&.update_attributes(effective_ending_on: verified_tax_household.start_date)
+        effective_ending_on = if latest_tax_household.present? && latest_tax_household.effective_starting_on > verified_tax_household.start_date
+                                latest_tax_household.effective_starting_on
+                              else
+                                verified_tax_household.start_date
+                              end
+        latest_tax_household&.update_attributes(effective_ending_on: effective_ending_on)
       end
       th = tax_households.build(
         allocated_aptc: verified_tax_household.allocated_aptcs.first.total_amount,
@@ -133,17 +138,17 @@ class Household
         determined_at: latest_eligibility_determination.determination_date
       )
       th.save!
+      th
     end
   end
 
-  def add_tax_household_family_member(family_member, verified_tax_household_member)
-    th = latest_active_tax_household
-    th.tax_household_members.build(
+  def add_tax_household_family_member(family_member, verified_tax_household_member, newly_created_thh)
+    newly_created_thh.tax_household_members.build(
       family_member: family_member,
       is_subscriber: false,
       is_ia_eligible: verified_tax_household_member.is_insurance_assistance_eligible
     )
-    th.save!
+    newly_created_thh.save!
   end
 
   def create_tax_households_and_members(verified_family, _primary_person, active_verified_household)
@@ -152,7 +157,12 @@ class Household
     return unless verified_tax_households.present? # && !verified_tax_households.map(&:eligibility_determinations).map(&:present?).include?(false)
     if latest_active_tax_households.present?
       latest_active_tax_households.each do |latest_tax_household|
-        latest_tax_household.update_attributes(effective_ending_on: verified_tax_households.first.start_date)
+        effective_ending_on = if latest_tax_household.effective_starting_on > verified_tax_households.first.start_date
+                                latest_tax_household.effective_starting_on
+                              else
+                                verified_tax_households.first.start_date
+                              end
+        latest_tax_household.update_attributes(effective_ending_on: effective_ending_on)
       end
     end
 
@@ -264,16 +274,7 @@ class Household
   end
 
   def latest_active_tax_household_with_year(year)
-    tax_households = self.tax_households.tax_household_with_year(year)
-    if TimeKeeper.date_of_record.year == year
-      tax_households = self.tax_households.tax_household_with_year(year).active_tax_household
-    end
-
-    if tax_households.empty?
-      nil
-    else
-      tax_households.entries.last
-    end
+    tax_households.tax_household_with_year(year).active_tax_household.order_by(:created_at.desc).first
   end
 
   def latest_tax_household_with_year(year)

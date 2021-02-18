@@ -212,11 +212,56 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
     end
 
     context "get flash notice", dbclean: :around_each do
-      it "with benefit_group_id" do
-        # TODO after setting Benefit Package Factories
-        # allow(controller).to receive(:benefit_group_id).and_return(benefit_group.id)
-        post :update, params: {id: census_employee.id, employer_profile_id: employer_profile_id, census_employee: census_employee_params}
-        # expect(flash[:notice]).to eq "Census Employee is successfully updated."
+      context "second benefit package ID is passed" do
+        let(:package_kind) { :single_issuer }
+        let(:catalog) { initial_application.benefit_sponsor_catalog }
+        let(:package) { catalog.product_packages.detect { |package| package.package_kind == package_kind } }
+
+        let!(:second_benefit_package) do
+          FactoryBot.create(
+            :benefit_sponsors_benefit_packages_benefit_package,
+            title: "Second Benefit Package",
+            benefit_application: initial_application,
+            product_package: package
+          )
+        end
+        let(:first_benefit_package) { initial_application.benefit_packages.detect { |benefit_package| benefit_package != second_benefit_package } }
+
+        before do
+          expect(initial_application.benefit_packages.count).to eq(2)
+          census_employee_update_benefit_package_params = {
+            "first_name" => census_employee.first_name,
+            "middle_name" => "",
+            "last_name" => census_employee.last_name,
+            "gender" => "male",
+            "is_business_owner" => true,
+            "hired_on" => "05/02/2019",
+            "benefit_group_assignments_attributes" => {
+              "0" => {
+                "benefit_group_id" => second_benefit_package.id,
+                "id" => ""
+              }
+            }
+          }
+          post(
+            :update,
+            params: {
+              id: census_employee.id,
+              employer_profile_id: census_employee.employer_profile.id,
+              census_employee: census_employee_update_benefit_package_params
+            }
+          )
+        end
+
+        it "display success message" do
+          expect(flash[:notice]).to eq "Census Employee is successfully updated."
+        end
+
+        it "successfully updates the active benefit group assignment to the second benefit package id" do
+          census_employee.reload
+          expect(census_employee.active_benefit_group_assignment.benefit_package).to eq(second_benefit_package)
+          expect(census_employee.active_benefit_group_assignment.benefit_package).to_not eq(first_benefit_package)
+        end
       end
 
       it "with no benefit_group_id" do
@@ -609,6 +654,30 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
       census_employee.email.update(address:'', kind:'')
       expect(census_employee.email.kind).to eq ''
       expect(census_employee.email.address).to eq ''
+    end
+  end
+
+  describe "GET confirm_effective_date", dbclean: :around_each do
+    let(:valid_confirmation_types) { CensusEmployee::CONFIRMATION_EFFECTIVE_DATE_TYPES }
+
+    before :each do
+      permission = FactoryBot.create(:permission, :hbx_staff)
+      @user.person.hbx_staff_role.permission_id = permission.id
+      @user.person.hbx_staff_role.save!
+      expect(@user.person.hbx_staff_role.present?).to eq(true)
+      sign_in @user
+    end
+
+    it "should render proper template if valid params" do
+      valid_confirmation_types.each do |confirmation_type|
+        get :confirm_effective_date, params: { id: census_employee.id, employer_profile_id: employer_profile_id, type: confirmation_type }, :format => :js, xhr: true
+        expect(response).to render_template("employers/census_employees/#{confirmation_type}_effective_date")
+      end
+    end
+
+    it "should not render a template if user passes garbage params" do
+      get :confirm_effective_date, params: { id: census_employee.id, employer_profile_id: employer_profile_id, type: 'garbage' }, :format => :js, xhr: true
+      expect(response).to_not render_template("employers/census_employees/garbage_effective_date")
     end
   end
 end

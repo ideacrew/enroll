@@ -105,12 +105,12 @@ def get_primary_person(members, subscriber)
 end
 
 #need to exlude this list from UQHP_FEL data set.
-if InitialEvents.include?(event_name) && eligibility_kind.upcase == 'UQHP'
+if InitialEvents.include?(event_name) && eligibility_kind.upcase == 'AQHP'
   @excluded_list = []
   raise 'Please provide file path to exclude individuals from notice generation' unless excluded_list_file_path.present?
 
   CSV.foreach(excluded_list_file_path, :headers => true).each do |d|
-    @excluded_list << d["subscriber_id"]
+    @excluded_list << d["hbx_id"]
   end
 end
 
@@ -118,7 +118,7 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
   csv << field_names
   @data_hash.each do |ic_number , members|
     begin
-      next if InitialEvents.include?(event_name) && eligibility_kind.upcase == 'UQHP' && members.any?{ |m| @excluded_list.include?(m["member_id"]) }
+      next if InitialEvents.include?(event_name) && eligibility_kind.upcase == 'AQHP' && members.any?{ |m| @excluded_list.include?(m["member_id"]) }
       subscriber = members.detect{ |m| m["dependent"].casecmp('NO').zero? }
       dependents = members.select{|m| m["dependent"].casecmp('YES').zero? }
       next if subscriber.nil?

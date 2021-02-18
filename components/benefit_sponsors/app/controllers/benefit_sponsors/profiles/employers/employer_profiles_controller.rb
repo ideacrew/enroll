@@ -57,7 +57,7 @@ module BenefitSponsors
             when 'brokers'
               @broker_agency_account = @employer_profile.active_broker_agency_account
             when 'families'
-              @employees = EmployeeRole.find_by_employer_profile(@employer_profile).select { |ee| CensusEmployee::EMPLOYMENT_ACTIVE_STATES.include?(ee.census_employee.aasm_state)}
+              @employees = EmployeeRole.find_by_employer_profile(@employer_profile).compact.select { |ee| CensusEmployee::EMPLOYMENT_ACTIVE_STATES.include?(ee.census_employee.aasm_state)}
             when 'inbox'
 
             else
@@ -66,7 +66,7 @@ module BenefitSponsors
 
               if @benefit_sponsorship.present?
                 @broker_agency_accounts = @benefit_sponsorship.broker_agency_accounts
-                @current_plan_year = @benefit_sponsorship.submitted_benefit_application
+                @current_plan_year = @benefit_sponsorship.submitted_benefit_application(include_term_pending: false)
               end
 
               collect_and_sort_invoices(params[:sort_order])
@@ -118,7 +118,7 @@ module BenefitSponsors
             begin
               if @roster_upload_form.save
                 flash[:notice] = "#{roaster_upload_count } records uploaded from CSV"
-                redirect_to @roster_upload_form.redirection_url
+                redirect_to URI.parse(@roster_upload_form.redirection_url).to_s
               else
                 render @roster_upload_form.redirection_url || default_url
               end
@@ -233,9 +233,26 @@ module BenefitSponsors
             renewal: true
           }) if @employer_profile.renewal_benefit_application.present?
 
+          if @employer_profile.off_cycle_benefit_application.present?
+            data_table_params.merge!(
+              {
+                off_cycle: true
+              }
+            )
+            data_table_params.merge!({current_py_terminated: true}) if @employer_profile.current_benefit_application&.terminated?
+          end
+
           data_table_params.merge!({
             is_submitted: true
           }) if @employer_profile&.renewal_benefit_application&.is_submitted?
+
+          if @employer_profile&.off_cycle_benefit_application&.is_submitted?
+            data_table_params.merge!(
+              {
+                is_off_cycle_submitted: true
+              }
+            )
+          end
 
           data_table_params
         end
@@ -293,7 +310,7 @@ module BenefitSponsors
                 sponsored_benefit = primary.sponsored_benefit
                 product = @product_info[element.group_enrollment.product[:id]]
                 next if census_employee.blank?
-                csv << [  
+                csv << [
                           census_employee.full_name,
                           census_employee.ssn,
                           census_employee.dob,

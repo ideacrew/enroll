@@ -4,7 +4,8 @@ source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby '2.5.1'
-gem 'rails', '~> 5.2.3'
+gem 'rails', '~> 5.2.4.3'
+gem 'sidekiq'
 
 #######################################################
 # FIXME
@@ -31,12 +32,12 @@ gem 'database_cleaner',       '~> 1.7'
 #######################################################
 # Local components/engines
 #######################################################
-gem 'acapi',              git: "https://github.com/dchbx/acapi.git", branch: 'master'
+gem 'acapi',              git: "https://github.com/ideacrew/acapi.git", branch: 'amqp_proc_title'
 gem "benefit_markets",    path: "components/benefit_markets"
 gem "benefit_sponsors",   path: "components/benefit_sponsors"
 gem 'financial_assistance', path: 'components/financial_assistance'
 gem "notifier",           path: "components/notifier"
-gem 'openhbx_cv2',        git:  'https://github.com/dchbx/openhbx_cv2.git', branch: 'master'
+gem 'openhbx_cv2',        git:  'https://github.com/ideacrew/openhbx_cv2.git', branch: 'master'
 gem 'resource_registry',  git:  'https://github.com/ideacrew/resource_registry.git', branch: 'master'
 # gem 'resource_registry',  git: '../resource_registry'
 
@@ -79,11 +80,12 @@ gem 'jwt', "~> 2.2.1"
 gem 'haml',                     '~> 5.0'
 gem 'httparty',                 '~> 0.16'
 gem 'i18n',                     '~> 1.5'
+gem 'i18n-tasks', '~> 0.9.33'
 gem 'interactor',               '~> 3.0'
 gem 'interactor-rails',         '~> 2.2'
 gem 'jbuilder',                 '~> 2.7'
 gem 'jquery-rails',             '~> 4.3'
-gem 'kaminari'           
+gem 'kaminari'
 gem 'kaminari-mongoid'
 gem 'kaminari-actionview'
 gem 'language_list',            '~> 1'
@@ -116,7 +118,7 @@ gem 'wkhtmltopdf-binary-edge',  '~> 0.12.3.0'
 gem 'webpacker',                '~> 4.0.2'
 gem 'fast_jsonapi'
 gem 'loofah', '~> 2.3.1'
-
+gem 'stimulus_reflex', '~> 3.3'
 group :doc do
   gem 'sdoc',                   '~> 1.0'
 end
@@ -127,19 +129,19 @@ group :development do
   gem 'rubocop',                require: false
   gem 'rubocop-rspec'
   gem 'rubocop-git'
-
-
   # Access an interactive console on exception pages or by calling 'console' anywhere in the code.
   gem 'web-console',            '>= 3'
   gem 'listen',                 '>= 3.0.5', '< 3.2'
 
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
-  gem 'spring'              
+  gem 'spring'
   gem 'spring-watcher-listen'
 end
 
 group :development, :test do
+  gem 'action-cable-testing'
   # gem 'bundler-audit',          '~> 0.6'
+  gem 'brakeman'
   gem 'capistrano',             '~> 3.1'
   gem 'capistrano-rails',       '1.4'
   gem 'climate_control',        '~> 0.2.0'
@@ -152,12 +154,9 @@ group :development, :test do
   gem 'railroady',              '~> 1.5.3'
   gem 'rspec-rails'
   gem 'rspec_junit_formatter'
+  gem 'stimulus_reflex_testing'
   gem 'yard',                   '~> 0.9.20',  require: false
   gem 'yard-mongoid',           '~> 0.1',     require: false
-
-  gem 'pry-rails'
-  gem 'pry-byebug'
-  gem 'pry-stack_explorer'
 end
 
 group :test do
@@ -180,8 +179,7 @@ group :test do
 end
 
 group :production do
-  gem 'eye',          '0.8'
+  gem 'eye',          '0.10.0'
   gem 'newrelic_rpm', '~> 5.0'
   gem 'unicorn',      '~> 4.8'
 end
-

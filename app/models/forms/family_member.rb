@@ -6,7 +6,7 @@ module Forms
 
     attr_accessor :id, :family_id, :is_consumer_role, :is_resident_role, :vlp_document_id
     attr_accessor :gender, :relationship
-    attr_accessor :addresses, :is_homeless, :is_temporarily_out_of_state, :same_with_primary, :is_applying_coverage
+    attr_accessor :addresses, :is_homeless, :is_temporarily_out_of_state, :same_with_primary, :is_applying_coverage, :age_off_excluded # rubocop:disable Style/AccessorGrouping
     attr_writer :family
     include ::Forms::PeopleNames
     include ::Forms::ConsumerFields
@@ -58,17 +58,22 @@ module Forms
         if !tribal_id.present? && @indian_tribe_member
           self.errors.add(:tribal_id, "is required when native american / alaska native is selected")
         end
-
-        if @is_incarcerated.nil?
-          self.errors.add(:base, "Incarceration status is required")
-        end
       end
+
+      return unless (@is_resident_role.to_s == "true" || @is_consumer_role.to_s == "true") && is_applying_coverage.to_s == "true" && @is_incarcerated.nil?
+      self.errors.add(:base, "Incarceration status is required")
     end
 
     def ssn_validation
+      return unless is_applying_coverage?
+      return true if is_applying_coverage == "false"
       return true unless individual_market_is_enabled?
 
       self.errors.add(:base, "ssn is required") if @ssn.blank? && @no_ssn == '0'
+    end
+
+    def is_applying_coverage?
+      is_applying_coverage.to_s == "true"
     end
 
     def dob=(val)
@@ -191,7 +196,8 @@ module Forms
         :citizen_status => @citizen_status,
         :tribal_id => tribal_id,
         :is_homeless => is_homeless,
-        :is_temporarily_out_of_state => is_temporarily_out_of_state
+        :is_temporarily_out_of_state => is_temporarily_out_of_state,
+        :age_off_excluded => age_off_excluded
       }
     end
 
@@ -247,7 +253,8 @@ module Forms
         :same_with_primary => has_same_address_with_primary.to_s,
         :is_homeless => has_same_address_with_primary ? '' : found_family_member.try(:person).try(:is_homeless),
         :is_temporarily_out_of_state => has_same_address_with_primary ? '' : found_family_member.try(:person).try(:is_temporarily_out_of_state),
-        :addresses => [home_address, mailing_address]
+        :addresses => [home_address, mailing_address],
+        :age_off_excluded => found_family_member.try(:person).try(:age_off_excluded)
       })
     end
 

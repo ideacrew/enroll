@@ -264,7 +264,7 @@ And(/(.*) should also see the reason for ineligibility/) do |named_person|
   role = named_person
 
   if role == 'employee' && person.active_employee_roles.present?
-    expect(page).to have_content "This dependent is ineligible for employer-sponsored"
+    expect(page).to have_content "Employer sponsored coverage is not available"
   else
     expect(page).to have_content "eligibility failed on family_relationships"
   end
@@ -287,6 +287,14 @@ end
 Then(/(.*) should see both dependent and primary/) do |role|
   primary = Person.all.select { |person| person.primary_family.present? }.first
   expect(page).to have_content "Coverage For:   #{primary.full_name} + 1 Dependent"
+end
+
+And(/(.*) selects high for metal level plan and metal level box appears selected/) do |_role|
+  Capybara.ignore_hidden_elements = false
+  page.all('label').detect { |input| input[:for] == 'plan-metal-level-high' }.click
+  sleep 5
+  expect(find('#plan-metal-level-high')[:disabled]).to_not eq('true')
+  Capybara.ignore_hidden_elements = true
 end
 
 Then(/(.*) should only see the dependent name/) do |role|
@@ -363,6 +371,10 @@ When(/(.*) (.*) the primary person/) do |role, checked|
   else
     find("#family_member_ids_0").set(false)
   end
+end
+
+And(/(.*) selects (.*) for coverage kind/) do |_role, coverage_kind|
+  find("##{coverage_kind}-radio-button").click
 end
 
 And(/(.*) clicked on shop for new plan/) do |role|
@@ -512,6 +524,7 @@ end
 # end
 
 When(/(.*) clicks on the make changes button/) do |_role|
+  enable_change_tax_credit_button
   click_link('Make Changes')
   wait_for_ajax
 end
@@ -651,6 +664,7 @@ And(/the metal level is (.*)/) do |metal_level|
 end
 
 Then(/the Change Tax Credit button should be available/) do
+  sleep(2)
   expect(page).to have_content("Change Tax Credit")
 end
 
