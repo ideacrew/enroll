@@ -996,6 +996,10 @@ class HbxEnrollment
     HandleCoverageSelected.call(callback_context)
   end
 
+  def update_prior_coverage
+    EnrollRegistry[:prior_plan_year_sep]{ {enrollment: self} }
+  end
+
   def update_renewal_coverage(options = nil)  # rubocop:disable Metrics/CyclomaticComplexity
     return if options.is_a?(Hash) && options[:skip_renewal_coverage_update]
     return unless is_shop?
@@ -1045,6 +1049,16 @@ class HbxEnrollment
     ::Operations::HbxEnrollments::Reinstate.new.call({hbx_enrollment: self, options: {benefit_package: reinstated_package, notify: true}})
   end
 
+
+  def enrollments_for(benefit_application)
+    HbxEnrollment.where({ :sponsored_benefit_package_id.in => benefit_application.benefit_packages.pluck(:_id),
+                          :coverage_kind => coverage_kind,
+                          :kind => kind,
+                          :aasm_state.in => HbxEnrollment::RENEWAL_STATUSES + ['renewing_waived'] + HbxEnrollment::ENROLLED_STATUSES + ['inactive'],
+                          :effective_on.gte => benefit_application.start_on
+                        })
+  end
+  
   def non_inactive_transition?
     !(aasm.from_state == :inactive && aasm.to_state == :inactive)
   end
@@ -1842,7 +1856,7 @@ class HbxEnrollment
       transitions from: :shopping, to: :renewing_waived
     end
 
-    event :select_coverage, :after => [:record_transition, :propagate_selection, :update_reinstate_coverage] do
+    event :select_coverage, :after => [:record_transition, :propagate_selection, :update_reinstate_coverage, :update_prior_coverage] do
       transitions from: :shopping,
                   to: :coverage_selected, :guard => :can_select_coverage?
       transitions from: [:auto_renewing, :actively_renewing],
