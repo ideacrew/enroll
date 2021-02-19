@@ -827,7 +827,7 @@ module BenefitSponsors
         :terminated,
         :enrollment_eligible,
         :active,
-        # :termination_pending,
+        :termination_pending,
         :expired
       ].include?(aasm_state)
     end
