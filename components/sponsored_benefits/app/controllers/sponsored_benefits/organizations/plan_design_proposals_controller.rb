@@ -86,6 +86,7 @@ module SponsoredBenefits
       @broker_agency_profile = broker_agency_profile
 
       if @benefit_group
+        raise("Wrong class") unless @benefit_group.class.to_s == 'SponsoredBenefits::BenefitApplications::BenefitGroup'
         @service = SponsoredBenefits::Services::PlanCostService.new({benefit_group: @benefit_group})
         @plan = @benefit_group.reference_plan
         @dental_plan = @benefit_group.dental_reference_plan
