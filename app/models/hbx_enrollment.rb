@@ -1913,6 +1913,8 @@ class HbxEnrollment
                          :coverage_enrolled, :renewing_waived, :inactive, :coverage_reinstated],
                   to: :coverage_canceled, after: :propogate_cancel
       transitions from: :coverage_expired, to: :coverage_canceled, :guard => :is_ivl_by_kind?, after: :propogate_cancel
+      transitions from: [:coverage_terminated, :coverage_expired], to: :coverage_canceled,
+                  guard: :prior_plan_year_coverage?
     end
 
     event :cancel_for_non_payment, :after => :record_transition do
@@ -1972,6 +1974,26 @@ class HbxEnrollment
     event :reinstate_coverage, :after => :record_transition do
       transitions from: :shopping, to: :coverage_reinstated
     end
+  end
+
+  def prior_plan_year_coverage?
+    return false unless ::EnrollRegistry.feature_enabled?(:prior_plan_year_sep)
+
+    is_shop? ? prior_year_shop_coverage? : prior_year_ivl_coverage?
+  end
+
+  def prior_year_shop_coverage?
+    application = sponsored_benefit_package.benefit_application
+    application_status = application.terminated? || application.expired?
+    enrollment_valid_for_application = (application.start_on..application.end_on).cover?(effective_on)
+    application_status && enrollment_valid_for_application
+  end
+
+  def prior_year_ivl_coverage?
+    return false if special_enrollment_period.blank?
+    prior_bcp = HbxProfile.current_hbx&.benefit_sponsorship&.previous_benefit_coverage_period
+    return false unless prior_bcp
+    prior_bcp.contains?(effective_on)
   end
 
   def termination_attributes_cleared?
