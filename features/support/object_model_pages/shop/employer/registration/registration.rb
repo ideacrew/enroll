@@ -47,19 +47,19 @@ class Registration
   end
 
   def self.address
-    'agency[organization][profile_attributes][office_locations_attributes][0][address_attributes][address_1]'
+    'agency[organization][profile][office_locations_attributes][0][address][address_1]'
   end
 
   def self.kind_office_location_dropdown
-    'agency[organization][profile_attributes][office_locations_attributes][0][address_attributes][kind]'
+    'agency[organization][profile][office_locations_attributes][0][address][kind]'
   end
 
   def self.address_two
-    'agency[organization][profile_attributes][office_locations_attributes][0][address_attributes][address_2]'
+    'agency[organization][profile][office_locations_attributes][0][address][address_2]'
   end
 
   def self.city
-    'agency_organization_profile_attributes_office_locations_attributes_0_address_attributes_city'
+    'agency_organization_profile_office_locations_attributes_0_address_city'
   end
 
   def self.state_dropdown
@@ -71,11 +71,11 @@ class Registration
   end
 
   def self.area_code_office_location
-    'agency[organization][profile_attributes][office_locations_attributes][0][phone_attributes][area_code]'
+    'agency[organization][profile][office_locations_attributes][0][phone][area_code]'
   end
 
   def self.number_office_location
-    'agency[organization][profile_attributes][office_locations_attributes][0][phone_attributes][number]'
+    'agency[organization][profile][office_locations_attributes][0][phone][number]'
   end
 
   def self.add_office_location_btn
@@ -83,7 +83,7 @@ class Registration
   end
 
   def self.contact_method_dropdown
-    'agency[organization][profile_attributes][contact_method]'
+    'agency[organization][profile][contact_method]'
   end
 
   def self.confirm_btn

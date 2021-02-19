@@ -53,16 +53,12 @@ And(/person filled all the fields in the employer information form/) do
   select "Only Electronic communications", from: Registration.contact_method_dropdown
 end
 
-And(/person clicks on add portal/) do
-  page.execute_script("document.querySelector('#employer_registration_form').click()")
+Then(/person should see the Add Office Location button/ ) do
+  expect(page).to have_text 'Add Office Location'
 end
 
-And(/person clicks on add role on pop up/) do
-  page.execute_script("document.querySelector('.add-role').click()")
-end
-
-Then(/person should see a modal confirmation popup/) do
-  page.execute_script("document.querySelector('#employer_registration_form').click()")
+And(/person clicks on ADD PORTAL/) do
+  find('#employer-profile-registration-form').click
 end
 
 Then(/person should see employer home page/) do
@@ -199,11 +195,11 @@ Then(/person should be able to visit add new consumer portal/) do
   find('#consumer-portal').click
 end
 
-And(/person with (.*) signs in and visits manage account/) do |role|
+And(/person with (.*) signs in and visits Go to My Hub Page/) do |role|
   @person ||= Person.where(first_name: role.split(/\s/)[0]).first
   user = @person.user
   login_as user
-  visit "/people/#{@person.id}/manage_account"
+  visit "/people/#{@person.id}/show_roles"
 end
 
 And(/person clicks on personal info section/) do
@@ -213,6 +209,57 @@ end
 And(/person clicks on my portals tab/) do
   click_link 'My Portals'
 end
+
+And(/person should see their (.*) information under My Hub page/) do |role|
+  case role
+  when 'Consumer', 'Employee'
+    expect(page).to have_content('My coverage')
+    #FactoryBot.create(:person, :with_consumer_role, :with_family, first_name: "Consumer", last_name: "role", user: user)
+  when 'Employer Staff', 'Employer'
+    legal_name = @person.employer_staff_roles.first.profile.legal_name
+    expect(page).to have_content(legal_name.humanize)
+  when 'Broker Staff'
+    legal_name = @person.broker_agency_staff_roles.first.broker_agency_profile.legal_name
+    expect(page).to have_content(legal_name.humanize)
+  when 'GA Staff'
+    legal_name = @person.general_agency_staff_roles.first.general_agency_profile.legal_name
+    expect(page).to have_content(legal_name.humanize)
+  end
+end
+
+And(/person should see Add Account button/) do
+  expect(page).to have_content 'Add Account'
+end
+
+And(/person clicks on Add Account/) do
+  find('.interaction-click-control-add-account').click
+end
+
+ Then(/person should see a pop up with text What Do You Want To Do?/) do
+   expect(page).to have_content 'What Do You Want To Do?'
+   expect(page).to have_content "INDIVIDUAL & FAMILY"
+   expect(page).to have_content "EMPLOYEE"
+   expect(page).to have_content "EMPLOYER"
+   expect(page).to have_content "Broker"
+   expect(page).to have_content "General Agency"
+ end
+
+ And(/person clicks on EMPLOYER text/) do
+  find('.employer-card').click
+ end
+
+ Then(/person should see a pop up with text Include the Employee Roster?/) do
+  expect(page).to have_content 'Include the Employee Roster?'
+ end
+
+ And(/person clicks the radio buttton Yes and click Continue/) do
+  find('.interaction-choice-control-value-employerradioselect1').click
+  find('.interaction-click-control-continue').click
+ end
+
+ Then(/person should be redirected to Employer Registration page/) do
+   visit "benefit_sponsors/profiles/employers/employer_profiles/new_employer_profile?person_id=#{@person.id}&profile_type=benefit_sponsor&with_roster=false"
+ end
 
 Given(/(.*) employer has (.*) as employer staff/) do |legal_name, named_person|
   employer_profile = employer_profile(legal_name)

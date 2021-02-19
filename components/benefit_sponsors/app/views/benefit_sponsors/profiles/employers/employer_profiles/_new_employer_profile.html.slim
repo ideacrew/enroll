@@ -60,7 +60,7 @@ fieldset.mt-2
       h4.mt-1 Please indicate preferred method to receive notices (OPTIONAL)
       = f_profile.select :contact_method, options_for_select(f_profile.object.contact_method_options, selected: f_profile.object.contact_method[1]), {}, class:'form-control'
 
-      = f.submit "Add Portal", class: "btn btn-primary pull-right mt-2"
+      = f.submit "Add Portal", class: "btn btn-primary pull-right mt-2", id: "employer-profile-registration-form"
       = link_to 'Cancel', main_app.show_roles_person_path(id: @person_id), class: 'btn btn-outline-primary pull-right mt-2 mr-2'
 
       input type="hidden" name="employer_id" id="employer_id"
