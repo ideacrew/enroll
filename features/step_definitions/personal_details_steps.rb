@@ -53,7 +53,7 @@ And(/person filled all the fields in the employer information form/) do
   select "Only Electronic communications", from: Registration.contact_method_dropdown
 end
 
-Then(/person should see the Add Office Location button/ ) do
+Then(/person should see the Add Office Location button/) do
   expect(page).to have_text 'Add Office Location'
 end
 
@@ -235,31 +235,31 @@ And(/person clicks on Add Account/) do
   find('.interaction-click-control-add-account').click
 end
 
- Then(/person should see a pop up with text What Do You Want To Do?/) do
-   expect(page).to have_content 'What Do You Want To Do?'
-   expect(page).to have_content "INDIVIDUAL & FAMILY"
-   expect(page).to have_content "EMPLOYEE"
-   expect(page).to have_content "EMPLOYER"
-   expect(page).to have_content "Broker"
-   expect(page).to have_content "General Agency"
- end
+Then(/person should see a pop up with text What Do You Want To Do?/) do
+  expect(page).to have_content 'What Do You Want To Do?'
+  expect(page).to have_content "INDIVIDUAL & FAMILY"
+  expect(page).to have_content "EMPLOYEE"
+  expect(page).to have_content "EMPLOYER"
+  expect(page).to have_content "Broker"
+  expect(page).to have_content "General Agency"
+end
 
- And(/person clicks on EMPLOYER text/) do
+And(/person clicks on EMPLOYER text/) do
   find('.employer-card').click
- end
+end
 
- Then(/person should see a pop up with text Include the Employee Roster?/) do
+Then(/person should see a pop up with text Include the Employee Roster?/) do
   expect(page).to have_content 'Include the Employee Roster?'
- end
+end
 
- And(/person clicks the radio buttton Yes and click Continue/) do
+And(/person clicks the radio buttton Yes and click Continue/) do
   find('.interaction-choice-control-value-employerradioselect1').click
   find('.interaction-click-control-continue').click
- end
+end
 
- Then(/person should be redirected to Employer Registration page/) do
-   visit "benefit_sponsors/profiles/employers/employer_profiles/new_employer_profile?person_id=#{@person.id}&profile_type=benefit_sponsor&with_roster=false"
- end
+Then(/person should be redirected to Employer Registration page/) do
+  visit "benefit_sponsors/profiles/employers/employer_profiles/new_employer_profile?person_id=#{@person.id}&profile_type=benefit_sponsor&with_roster=false"
+end
 
 Given(/(.*) employer has (.*) as employer staff/) do |legal_name, named_person|
   employer_profile = employer_profile(legal_name)
