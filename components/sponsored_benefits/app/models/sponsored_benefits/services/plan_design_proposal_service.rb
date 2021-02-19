@@ -71,6 +71,7 @@ module SponsoredBenefits
 
       def update_benefits(attrs={})
         self.send("reset_#{kind}_benefits")
+        binding.pry
         benefit_group.title = "Benefit Group Created for: #{plan_design_organization.legal_name} by #{plan_design_organization.broker_agency_profile.legal_name}"
         if is_dental_benefits?
           benefit_group.update_attributes({
@@ -99,6 +100,8 @@ module SponsoredBenefits
       def benefit_group(attrs={})
         return @benefit_group if defined? @benefit_group
         @benefit_group = application.benefit_groups.first || application.benefit_groups.build(attrs)
+        raise("Wrong class") unless @benefit_group.class.to_s == 'SponsoredBenefits::BenefitApplications::BenefitGroup'
+        @benefit_group
       end
 
       def application
