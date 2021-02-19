@@ -31,7 +31,7 @@ module Operations
           benefit_group_assignment.save
         end
 
-        try_to_renew = if ::EnrollRegistry.feature_enabled?(:prior_plan_year_sep) && prior_year_ivl_enrollment?(enrollment)
+        try_to_renew = if ::EnrollRegistry.feature_enabled?(:prior_plan_year_sep) && enrollment.prior_year_ivl_coverage?
                          renew_prior_py_ivl_enrollments(enrollment)
                        else
                          renew_ivl_if_is_open_enrollment(enrollment)
@@ -106,13 +106,6 @@ module Operations
 
       def fetch_bcp_gt_enr_effective_year(enrollment)
         HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.select{|bcp| bcp.start_on.year > enrollment.effective_on.year }
-      end
-
-      def prior_year_ivl_enrollment?(enrollment)
-        return false if enrollment.special_enrollment_period.blank?
-        prior_bcp = HbxProfile.current_hbx&.benefit_sponsorship&.previous_benefit_coverage_period
-        return false unless prior_bcp
-        prior_bcp.contains?(enrollment.effective_on)
       end
     end
   end
