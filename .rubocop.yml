@@ -6,6 +6,8 @@
 # - db/seedfiles
 # - lib/tasks
 AllCops:
+  # Rubocop upgrade
+  NewCops: disable
   TargetRubyVersion: 2.5
   Exclude:
     - "./bin/**/*"
@@ -199,6 +201,17 @@ Style/RedundantArgument: # (new in 1.4)
   Enabled: true
 Style/SwapValues: # (new in 1.1)
   Enabled: true
+# Rails 6 upgrade
+Lint/NumberedParameterAssignment: # (new in 1.9)
+  Enabled: false
+Lint/OrAssignmentToConstant: # (new in 1.9)
+  Enabled: false
+Lint/SymbolConversion: # (new in 1.9)
+  Enabled: false
+Lint/TripleQuotes: # (new in 1.9)
+  Enabled: false
+Style/IfWithBooleanLiteralBranches: # (new in 1.9)
+  Enabled: false
 
 require:
   - ./cops/lint/empty_rescue_clause.rb
