@@ -6,8 +6,8 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 class BulkCensusEmployeesTermination < MongoidMigrationTask
   def migrate
     files = Dir.glob(File.join(Rails.root, "bulk_terminate", "*.xlsx"))
-    employer_profile_id = ENV["employer_profile_id"]
-    all_census_employees = CensusEmployee.by_benefit_sponsor_employer_profile_id(employer_profile_id)
+    organization = BenefitSponsors::Organizations::Organization.where(fein: ENV['fein']).first
+    all_census_employees = CensusEmployee.by_benefit_sponsor_employer_profile_id(organization.employer_profile.id)
     files.each do |file_path|
       result = Roo::Spreadsheet.open(file_path)
       sheets = result.sheets
