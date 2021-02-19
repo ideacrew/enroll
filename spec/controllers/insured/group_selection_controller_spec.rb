@@ -1020,15 +1020,14 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       expect(response).not_to redirect_to(new_insured_group_selection_path(person_id: person.id, employee_role_id: employee_role.id, change_plan: '', market_kind: 'shop', enrollment_kind: ''))
     end
 
-    context 'should block user from shopping' do
+    context 'should not block user from shopping' do
 
       it 'when benefit application is in termination pending' do
         initial_application.update_attributes(aasm_state: :termination_pending)
         user = FactoryBot.create(:user, id: 190, person: FactoryBot.create(:person))
         sign_in user
         post :create, params: { person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids }
-        expect(flash[:error]).to eq "Your employer is no longer offering health insurance through #{EnrollRegistry[:enroll_app].setting(:short_name).item}." \
-        " Please contact your employer or call our Customer Care Center at #{EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item}."
+        expect(flash[:error]).to be_nil
       end
 
       it 'when benefit application is terminated' do
@@ -1036,7 +1035,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         user = FactoryBot.create(:user, id: 191, person: FactoryBot.create(:person))
         sign_in user
         post :create, params: { person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids }
-        expect(flash[:error]).to eq "Your employer is no longer offering health insurance through #{EnrollRegistry[:enroll_app].setting(:short_name).item}. Please contact your employer."
+        expect(flash[:error]).to be_nil
       end
     end
 
