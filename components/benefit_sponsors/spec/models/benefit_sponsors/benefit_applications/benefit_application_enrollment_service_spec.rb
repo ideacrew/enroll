@@ -588,6 +588,13 @@ module BenefitSponsors
               initial_application.reload
               expect(initial_application.aasm_state).to eq :enrollment_closed
             end
+
+            it 'should create final pricing determination before close of open enrollment' do
+              expect(subject).to receive(:calculate_pricing_determinations).with(initial_application).ordered
+              expect(initial_application).to receive(:end_open_enrollment!).ordered
+
+              subject.end_open_enrollment
+            end
           end
 
           context "and the benefit_application enrollment fails eligibility policy validation" do
