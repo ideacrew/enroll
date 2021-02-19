@@ -915,12 +915,12 @@ module BenefitSponsors
             timetable = subject.enrollment_timetable_by_effective_date(false, effective_date)
 
             expect(BenefitApplications::BenefitApplication.new(
-              effective_period: timetable[:effective_period],
-              open_enrollment_period: timetable[:open_enrollment_period],
-              recorded_service_areas: [service_area],
-              recorded_rating_area: rating_area,
-              recorded_sic_code: sic_code
-            )).to be_valid
+                     effective_period: timetable[:effective_period],
+                     open_enrollment_period: timetable[:open_enrollment_period],
+                     recorded_service_areas: [service_area],
+                     recorded_rating_area: rating_area,
+                     recorded_sic_code: sic_code
+                   )).to be_valid
           end
         end
       end
@@ -1618,3 +1618,4 @@ module BenefitSponsors
     end
   end
 end
+#rubocop:enable Metrics/ModuleLength
