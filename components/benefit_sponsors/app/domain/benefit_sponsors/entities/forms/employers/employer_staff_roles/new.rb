@@ -24,6 +24,7 @@ module BenefitSponsors
               attribute :is_applying_coverage,   Types::Bool.optional.meta(omittable: true)
               attribute :address,                BenefitSponsors::Entities::Address.optional.meta(omittable: true)
               attribute :email,                  BenefitSponsors::Entities::Email.optional.meta(omittable: true)
+              attribute :census_dependents,      Types::Array.of(::BenefitSponsors::Entities::Employers::EmployerStaffRoles::CoverageRecordDependent).optional.meta(omittable: true)
             end
           end
         end

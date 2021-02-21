@@ -15,6 +15,7 @@ module BenefitSponsors
           attribute :is_applying_coverage, Types::Bool
           attribute :address, BenefitSponsors::Entities::Address
           attribute :email, BenefitSponsors::Entities::Email
+          attribute :census_dependents, Types::Array.of(::BenefitSponsors::Entities::Employers::EmployerStaffRoles::CoverageRecordDependent)
         end
       end
     end
