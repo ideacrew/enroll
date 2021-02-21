@@ -44,6 +44,12 @@ registry:
         settings:
           - key: :effective_period
             item: <%= Date.new(2020,9,18)..Date.new(2021,12,31) %>
+      - key: :prior_plan_year_sep
+        is_enabled: true
+        item: Operations::UpdatePriorPlanCoverage.new
+        settings:
+          - key: :offset_months
+            item: 12
   - namespace:
       - :features
       - :enroll_app
@@ -82,9 +88,3 @@ registry:
       - key: :age_off_relaxed_eligibility
         item: Operations::AgeOffRelaxedEligibility.new
         is_enabled: true
-      - key: :prior_plan_year_sep
-        is_enabled: true
-        item: Operations::UpdatePriorPlanCoverage.new
-        settings:
-          - key: :offset_months
-            item: 12
