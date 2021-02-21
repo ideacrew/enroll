@@ -260,6 +260,12 @@ registry:
       - key: :counties_import
         is_enabled: false
         item: ""
+      - key: :prior_plan_year_sep
+        is_enabled: true
+        item: Operations::UpdatePriorPlanCoverage.new
+        settings:
+          - key: :offset_months
+            item: 12
   - namespace:
       - :features
       - :enroll_app

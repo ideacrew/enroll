@@ -1983,7 +1983,9 @@ class HbxEnrollment
   end
 
   def prior_year_shop_coverage?
-    application = sponsored_benefit_package.benefit_application
+    application = sponsored_benefit_package&.benefit_application
+    return false if application.blank?
+
     application_status = application.terminated? || application.expired?
     enrollment_valid_for_application = (application.start_on..application.end_on).cover?(effective_on)
     application_status && enrollment_valid_for_application
