@@ -17,6 +17,7 @@ And(/^.+ clicks on the Personal portal/) do
 end
 
 Then(/^.+ will see the Ageoff Exclusion checkbox$/) do
+  sleep 3
   expect(page).to have_content("Ageoff Exclusion")
 end
 
