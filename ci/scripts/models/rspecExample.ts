@@ -1,4 +1,11 @@
-export interface RspecExample {
+interface RspecReport {
+  version: string;
+  examples: RspecExample[];
+  summary: RspecSummary;
+  summary_line: string;
+}
+
+interface RspecExample {
   id: string;
   description: string;
   full_description: string;
@@ -7,4 +14,12 @@ export interface RspecExample {
   line_number: string;
   run_time: number;
   pending_message: any;
+}
+
+interface RspecSummary {
+  duration: number;
+  example_count: number;
+  failure_count: number;
+  pending_count: number;
+  errors_outside_of_examples_count: number;
 }
