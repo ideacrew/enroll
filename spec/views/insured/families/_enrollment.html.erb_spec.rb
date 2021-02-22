@@ -38,7 +38,8 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       id: "Productid",
       hios_id: "producthiosid",
       health_plan_kind: :hmo,
-      sbc_document: sbc_document
+      sbc_document: sbc_document,
+      carrier_profile: carrier_profile
     )
   end
 
@@ -185,7 +186,8 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
         id: "productid",
         hios_id: "producthiosid",
         health_plan_kind: :hmo,
-        sbc_document: sbc_document
+        sbc_document: sbc_document,
+        carrier_profile: carrier_profile
       )
     end
 
