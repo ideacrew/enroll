@@ -3,7 +3,6 @@ import { promises as fs } from 'fs';
 import {
   FileWithRuntime,
   FileWithRuntimeDictionary,
-  RspecExample,
   FileGroup,
 } from './models';
 import {
