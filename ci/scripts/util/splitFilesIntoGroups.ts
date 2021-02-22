@@ -65,7 +65,7 @@ export function splitFilesIntoGroups(
 function getGroupRunTime(filesWithRunTime: FilesWithRunTime): number {
   return Math.floor(
     filesWithRunTime.files.reduce((runtime, file) => {
-      return file ? runtime + file?.runTime : 0;
+      return file ? runtime + file.runTime : 0;
     }, 0)
   );
 }
