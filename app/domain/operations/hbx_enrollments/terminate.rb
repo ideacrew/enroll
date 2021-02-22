@@ -36,7 +36,7 @@ module Operations
         family = hbx_enrollment.family
         enrollments = family.hbx_enrollments.where(sponsored_benefit_package_id: hbx_enrollment.sponsored_benefit_package_id).enrolled.shop_market
         enrollments.each do |enrollment|
-          enrollment.term_or_cancel_enrollment(enrollment, employment_term_date)
+          enrollment.term_or_cancel_enrollment(enrollment, employment_term_date.end_of_month)
         end
         notify = params[:options].present? && params[:options][:notify].present? ? params[:options][:notify] : true
         hbx_enrollment.notify_of_coverage_start(notify)

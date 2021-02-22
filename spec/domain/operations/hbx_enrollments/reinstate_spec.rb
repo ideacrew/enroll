@@ -145,7 +145,7 @@ RSpec.describe Operations::HbxEnrollments::Reinstate, :type => :model, dbclean: 
         end
 
         it 'should set terminated date on enrollment' do
-          expect(@reinstated_enrollment.terminated_on).to eq census_employee.employment_terminated_on
+          expect(@reinstated_enrollment.terminated_on).to eq census_employee.employment_terminated_on.end_of_month
         end
 
         it 'should assign benefit group assignment' do

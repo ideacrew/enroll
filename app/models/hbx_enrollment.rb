@@ -949,7 +949,7 @@ class HbxEnrollment
     return unless sponsored_benefit_package.present?
     benefit_application = sponsored_benefit_package.benefit_application
     return unless benefit_application.present? && benefit_application.terminated_on.present?
-    term_or_cancel_enrollment(self, benefit_application.terminated_on, benefit_application.termination_reason)
+    term_or_cancel_enrollment(self, benefit_application.end_on, benefit_application.termination_reason)
   end
 
   def propagate_selection
