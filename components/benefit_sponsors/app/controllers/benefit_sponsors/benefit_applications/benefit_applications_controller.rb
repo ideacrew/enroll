@@ -5,7 +5,10 @@ module BenefitSponsors
       include Pundit
 
       def new
-        @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.for_new(params.permit(:benefit_sponsorship_id))
+        # TODO: Not sure about this, broke on the rails 6 upgrade
+        # Taken from HBX profiles controller
+        new_params = params.merge!({ admin_datatable_action: true }).permit(:benefit_sponsorship_id, :admin_datatable_action)
+        @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.for_new(new_params)
         authorize @benefit_application_form, :updateable?
       end
 
