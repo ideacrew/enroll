@@ -4,6 +4,7 @@ import {
   FileWithRuntime,
   FileWithRuntimeDictionary,
   FileGroup,
+  RspecExample,
 } from './models';
 import {
   createFilesWithRuntime,
@@ -46,7 +47,7 @@ async function createSplitConfig(): Promise<void> {
 
   try {
     await fs.writeFile(
-      `./${splitConfigPath}/rspec-split-config.json`,
+      `./${splitConfigPath}`,
       JSON.stringify(splitConfig)
     );
   } catch (e) {
