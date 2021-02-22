@@ -962,7 +962,7 @@ module BenefitSponsors
 
       # Enrollment processed stopped due to missing binder payment
       event :cancel do
-        transitions from: :active, to: :retroactive_canceled  # Enrollment cancelled after it became active
+        transitions from: :active, to: :retroactive_canceled,  :guard => :can_retroactive_cancel? # Enrollment cancelled after it became active
         transitions from: APPLICATION_DRAFT_STATES + ENROLLING_STATES + ENROLLMENT_ELIGIBLE_STATES + [:enrollment_ineligible, :active, :approved],
           to:     :canceled
       end
@@ -1217,6 +1217,10 @@ module BenefitSponsors
     end
 
     private
+
+    def can_retroactive_cancel?
+      start_on >= TimeKeeper.date_of_record
+    end
 
     def set_expiration_date
       update_attribute(:expiration_date, effective_period.min) unless expiration_date
