@@ -26,7 +26,9 @@ Feature: Create Benefit Application by admin UI
       | aasm_state | title    | event                 | message                                | action     |
       | draft      | Canceled | draft_py_effective_on | Successfully created a draft plan year | be created |
 
-
+  # TODO: This cucumber expected enrollment ineligible to say "existing plan year with overlapping coverage exists"
+  # But devs say draft plan year should be able to created for enrollment ineligible
+  # So which one is it?
   Scenario Outline: Existing <title> Application for confirm  button
     Given initial employer ABC Widgets has <aasm_state> benefit application
     And that a user with a HBX staff role with Super Admin subrole exists and is logged in
@@ -41,13 +43,13 @@ Feature: Create Benefit Application by admin UI
     And the existing applications for ABC Widgets will be <after_submit_title>
 
     Examples:
-      | title             | aasm_state        | after_submit_title | message                                             |
-      | Publish Pending   | pending           | Publish Pending    | Existing plan year with overlapping coverage exists |
-      | Enrolling         | enrollment_open   | Enrolling          | Existing plan year with overlapping coverage exists |
-      | Enrollment Closed | enrollment_closed | Enrollment Closed  | Existing plan year with overlapping coverage exists |
-      | Enrolled          | binder_paid       | Enrolled           | Existing plan year with overlapping coverage exists |
-      # | Enrollment Ineligible | enrollment_ineligible | Enrollment Ineligible             | Existing plan year with overlapping coverage exists |
-      | Active            | active            | Active             | Existing plan year with overlapping coverage exists |
+      | title                 | aasm_state            | after_submit_title                | message |
+      | Publish Pending       | pending               | Publish Pending                   | Existing plan year with overlapping coverage exists |
+      | Enrolling             | enrollment_open       | Enrolling                         | Existing plan year with overlapping coverage exists |
+      | Enrollment Closed     | enrollment_closed     | Enrollment Closed                 | Existing plan year with overlapping coverage exists |
+      | Enrolled              | binder_paid           | Enrolled                          | Existing plan year with overlapping coverage exists |
+      | Enrollment Ineligible | enrollment_ineligible | Enrollment Ineligible             | Successfully created a draft plan year              |
+      | Active                | active                | Active                            | Existing plan year with overlapping coverage exists |
 
   @flaky
   Scenario: Creating New Plan Year while application is in termination_pending aasm_state
@@ -74,7 +76,7 @@ Feature: Create Benefit Application by admin UI
     Then employer should see add plan year button
     And employer clicks Add Plan Year link
     And employer clicks OK in warning modal
-    #Then employer should see continue button disabled
+    Then employer should see continue button disabled
     And employer filled all the fields on benefit application form
     And employer clicked on continue button
     Then employer should see form for benefit package
