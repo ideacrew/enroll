@@ -300,6 +300,7 @@ And(/(.*) has active coverage and passive renewal/) do |named_person|
                                         hbx_enrollment_members: [hbx_enrollment_member])
   new_benefit_package = benefit_sponsorship.renewal_benefit_application.benefit_packages.first
   active_enrollment.renew_benefit(new_benefit_package)
+  expect(person_rec.primary_family.hbx_enrollments.count).to eq(2)
 end
 
 And(/^Employees for (.*?) have both Benefit Group Assignments Employee role$/) do |legal_name|
