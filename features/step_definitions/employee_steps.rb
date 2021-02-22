@@ -191,6 +191,10 @@ And(/^staff role person clicks on employees link$/) do
   click_link 'Employees'
 end
 
+And(/^employee staff role person clicks on employees link$/) do
+  visit benefit_sponsors.profiles_employers_employer_profile_path(employer_profile.id, :tab => 'employees')
+end
+
 And(/^staff role clicks on Actions drop down for (.*?)$/) do |_named_person|
   find('.interaction-click-control-actions').click
 end
@@ -229,6 +233,12 @@ And(/staff role person clicks on employee (.*?)$/) do |named_person|
   expect(page.current_path).to include("census_employee")
 end
 
+And(/employee staff role person clicks employee (.*?)$/) do |_named_person|
+  sleep(5)
+  visit employers_employer_profile_census_employee_path(employer_profile.id, census_employee.id,  :tab => 'employees')
+  expect(page.current_path).to include("census_employee")
+end
+
 Given(/census employee (.*?) has a past DOH$/) do |named_person|
   person = people[named_person]
   ce = CensusEmployee.where(:first_name => /#{person[:first_name]}/i, :last_name => /#{person[:last_name]}/i).first
@@ -260,6 +270,7 @@ And(/census employee (.*?) has benefit group assignment of the off cycle benefit
 end
 
 And(/census employee (.*?) has benefit group assignment of the (.*) reinstated benefit application$/) do |named_person, time_period|
+  sleep 5
   click_button 'Update Employee'
   person = people[named_person]
   ce = CensusEmployee.where(:first_name => /#{person[:first_name]}/i, :last_name => /#{person[:last_name]}/i).first

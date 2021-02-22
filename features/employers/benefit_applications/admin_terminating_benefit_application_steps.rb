@@ -67,7 +67,8 @@ And(/^employer clicks Add Plan Year link$/) do
 end
 
 Then(/^user should see termination successful message$/) do
-  expect(page).to have_content('Application terminated successfully')
+  sleep 5
+  expect(page).to have_content(/Application terminated successfully/)
 end
 
 Then(/^employer should see benefit application in termination pending state$/) do
