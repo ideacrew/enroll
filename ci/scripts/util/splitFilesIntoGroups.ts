@@ -30,6 +30,7 @@ export function splitFilesIntoGroups(
     })
   );
 
+  // The magic happens here
   for (const group of groupRunTimes) {
     console.log('Files left to process', files.length);
 
@@ -51,10 +52,6 @@ export function splitFilesIntoGroups(
       }
     }
   }
-
-  const groups: FileGroup[] = Array.from({ length: groupCount }, () => ({
-    files: [],
-  }));
 
   const a: SplitConfig = groupRunTimes.map((group) => {
     return {
