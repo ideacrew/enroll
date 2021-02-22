@@ -50,7 +50,8 @@ module BenefitSponsors
                         email: {
                           kind: email[:kind],
                           address: email[:address]
-                        }
+                        },
+                        coverage_record_dependents: params[:coverage_record_dependents]
                       }
                     })
           end

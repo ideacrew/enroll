@@ -10,7 +10,7 @@ RSpec.describe BenefitSponsors::Operations::Employers::EmployerStaffRoles::Creat
   let(:employer_profile) { employer_org.employer_profile }
   let(:ga_profile) { ga_organization.general_agency_profile }
 
-  let(:params) { {first_name: 'test', coverage_record: {is_applying_coverage: false, address: {}, email: {}}}}
+  let(:params) { {first_name: 'test', coverage_record: {is_applying_coverage: false, address: {}, email: {}, coverage_record_dependents: []}}}
 
 
   context 'failure case' do

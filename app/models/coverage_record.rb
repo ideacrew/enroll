@@ -9,9 +9,7 @@ class CoverageRecord
   embedded_in :employer_staff_role
   embeds_one :address, cascade_callbacks: true, validate: false
   embeds_one :email, cascade_callbacks: true, validate: false
-  embeds_many :census_dependents, class_name: "::CensusDependent"
-
-  accepts_nested_attributes_for :census_dependents
+  embeds_many :coverage_record_dependents, class_name: "::CensusDependent"
 
   field :encrypted_ssn, type: String
   field :dob, type: Date

@@ -31,7 +31,8 @@ RSpec.describe BenefitSponsors::Entities::Employers::EmployerStaffRoles::Coverag
         email: {
           kind: nil,
           address: nil
-        }
+        },
+        coverage_record_dependents: []
       }
     end
 

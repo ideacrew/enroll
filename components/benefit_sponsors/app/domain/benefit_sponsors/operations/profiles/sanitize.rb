@@ -42,6 +42,18 @@ module BenefitSponsors
         end
 
         def coverage_record_attributes(coverage_record_params)
+          dependents_attrs = []
+          coverage_record_params[:coverage_record_dependents]&.each_pair do |i, values|
+            dependents_attrs << {
+              first_name: values[:first_name],
+              last_name: values[:last_name],
+              middle_name: values[:middle_name],
+              ssn: values[:ssn],
+              dob: values[:dob],
+              gender: values[:gender],
+              employee_relationship: values[:employee_relationship]
+            }
+          end
           attrs = {
             is_applying_coverage: coverage_record_params[:is_applying_coverage],
             address: coverage_record_params[:address].to_h.deep_symbolize_keys!,
@@ -50,6 +62,7 @@ module BenefitSponsors
           if coverage_record_params[:is_applying_coverage] == 'true'
             attrs.merge!(ssn: coverage_record_params[:ssn],
                          gender: coverage_record_params[:gender],
+                         coverage_record_dependents: dependents_attrs,
                          hired_on: Date.strptime(coverage_record_params[:hired_on], '%Y-%m-%d'))
           end
           attrs

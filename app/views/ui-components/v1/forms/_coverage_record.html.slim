@@ -1,5 +1,5 @@
 legend Employee Information
-.row
+.row data-controller="bulk-notice"
   .col-md-3.mb-3.optional.hidden
     label for="inputSsn"  #{l10n('ssn')} *
     - ssn_present = f.object.ssn.present?
@@ -68,3 +68,11 @@ legend Employee Information
       .col-md-6.mb-3
         label for="inputAddress2" Address
         = f.text_field :address, class:"form-control mb-1",  placeholder: "Email", id: 'inputEmailAddress'
+
+  .optional.hidden
+    .col-md-12.mb-2.dependents
+      strong
+        | Dependents
+    .col-md-12.mb-2#dependent
+    .col-md-12.mb-2
+      a.btn.btn-default.btn-sm data-reflex="click->BulkNotice#add_coverage_dependent" data-key="0" Add Dependent

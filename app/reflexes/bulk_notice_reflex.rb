@@ -78,4 +78,9 @@ class BulkNoticeReflex < ApplicationReflex
       session[:bulk_notice][:audience][org_identifier] = { id: org_identifier, error: 'Not found' }
     end
   end
+
+  # todo - move this into its own reflex
+  def add_coverage_dependent
+    morph '#dependent', ApplicationController.render(partial: "ui-components/v1/forms/coverage_record_dependent", locals: {i: element.dataset[:key]})
+  end
 end

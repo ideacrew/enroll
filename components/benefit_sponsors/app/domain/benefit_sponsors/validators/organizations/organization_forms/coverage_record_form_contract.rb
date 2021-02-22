@@ -15,6 +15,7 @@ module BenefitSponsors
             required(:is_applying_coverage).filled(:bool)
             optional(:address).maybe(:hash)
             optional(:email).maybe(:hash)
+            optional(:coverage_record_dependents).maybe(:hash)
           end
 
 
