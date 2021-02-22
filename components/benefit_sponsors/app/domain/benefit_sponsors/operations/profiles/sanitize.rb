@@ -43,7 +43,7 @@ module BenefitSponsors
 
         def coverage_record_attributes(coverage_record_params)
           dependents_attrs = []
-          coverage_record_params[:coverage_record_dependents]&.each_pair do |i, values|
+          coverage_record_params[:coverage_record_dependents]&.each_pair do |_i, values|
             dependents_attrs << {
               first_name: values[:first_name],
               last_name: values[:last_name],

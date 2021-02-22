@@ -79,7 +79,7 @@ class BulkNoticeReflex < ApplicationReflex
     end
   end
 
-  # todo - move this into its own reflex
+  # Todo - move this into its own reflex
   def add_coverage_dependent
     morph '#dependent', ApplicationController.render(partial: "ui-components/v1/forms/coverage_record_dependent", locals: {i: element.dataset[:key]})
   end
