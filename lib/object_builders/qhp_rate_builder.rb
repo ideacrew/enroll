@@ -76,12 +76,13 @@ class QhpRateBuilder
       calculate_and_build_metlife_premium_tables
     else
       key = "#{@rate[:plan_id]},#{@rate[:effective_date].to_date.year}"
-      rating_area = Settings.aca.state_abbreviation.upcase == "MA" ? @rate[:rate_area_id].gsub("Rating Area ", "R-MA00") : "R-DC001"
+      rating_area = @rate[:rate_area_id].gsub("Rating Area ", "R-#{Settings.aca.state_abbreviation.upcase}00")
       @results[key] << {
         age: assign_age,
         start_on: @rate[:effective_date],
         end_on: @rate[:expiration_date],
         cost: @rate[:primary_enrollee],
+        tobacco_cost: @rate[:primary_enrollee_tobacco],
         rating_area: rating_area
       }
     end
@@ -102,9 +103,11 @@ class QhpRateBuilder
       premium_tuples = []
 
       v.each_pair do |pt_age, pt_cost|
+        cost, tobacco_cost = pt_cost.split(";")
         premium_tuples << ::BenefitMarkets::Products::PremiumTuple.new(
           age: pt_age,
-          cost: pt_cost
+          cost: cost,
+          tobacco_cost: tobacco_cost
         )
       end
 
@@ -128,14 +131,14 @@ class QhpRateBuilder
   def build_product_premium_tables
     active_year = @rate[:effective_date].to_date.year
     applicable_range = @rate[:effective_date].to_date..@rate[:expiration_date].to_date
-    rating_area = @rate[:rate_area_id].gsub("Rating Area ", "R-DC00")
+    rating_area = @rate[:rate_area_id].gsub("Rating Area ", "R-#{Settings.aca.state_abbreviation.upcase}00")
     rating_area_id = @rating_area_id_cache[[active_year, rating_area]]
-    @premium_table_cache[[@rate[:plan_id], rating_area_id, applicable_range]][assign_age] = @rate[:primary_enrollee]
+    @premium_table_cache[[@rate[:plan_id], rating_area_id, applicable_range]][assign_age] = "#{@rate[:primary_enrollee]};#{@rate[:primary_enrollee_tobacco]}"
     @results_array << "#{@rate[:plan_id]},#{active_year}"
   end
 
   def assign_age
-    case(@rate[:age_number])
+    case @rate[:age_number]
     when "0-14"
       14
     when "0-20"

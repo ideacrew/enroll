@@ -47,8 +47,9 @@ namespace :load_rate_reference do
 
       # old model
       (2..sheet.last_row).each do |i|
+        zip = "%05d" % sheet.cell(i, 1).to_s.squish.to_i
         RatingArea.find_or_create_by!(
-            zip_code: sheet.cell(i, 1),
+            zip_code: zip,
             county_name: sheet.cell(i, 2),
             zip_code_in_multiple_counties: to_boolean(sheet.cell(i, 3)),
             rating_area: sheet.cell(i, 4)
@@ -60,9 +61,10 @@ namespace :load_rate_reference do
       @result_hash = Hash.new {|results, k| results[k] = []}
 
       (2..sheet.last_row).each do |i|
+        zip = "%05d" % sheet.cell(i, 1).to_s.squish.to_i
         @result_hash[sheet.cell(i, 4)] << {
             "county_name" => sheet.cell(i, 2),
-            "zip" => sheet.cell(i, 1)
+            "zip" => zip
         }
       end
 
