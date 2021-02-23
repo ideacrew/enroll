@@ -559,5 +559,69 @@ RSpec.describe Operations::UpdatePriorPlanCoverage, type: :model, dbclean: :afte
         expect(shop_family.hbx_enrollments.map(&:aasm_state)).to match_array(["coverage_expired", "coverage_selected", "auto_renewing"])
       end
     end
+
+    context "when:
+              - employee has expired, termination_pending plan year
+              - employee has coverage no coverage in expired or termination pending py
+              - employee purchased enrollment in expired plan year using admin added sep with coverage renewal flag true
+            ",  dbclean: :after_each do
+
+      include_context "setup expired, and active benefit applications"
+      let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_year.prev_year }
+      let(:sep) do
+        sep = shop_family.special_enrollment_periods.new
+        sep.effective_on_kind = 'date_of_event'
+        sep.qualifying_life_event_kind = qle_kind
+        sep.qle_on = expired_benefit_application.start_on + 1.month
+        sep.start_on = sep.qle_on
+        sep.end_on = sep.qle_on + 30.days
+        sep.coverage_renewal_flag = true
+        sep.save
+        sep
+      end
+
+      let(:termination_pending_application) do
+        active_benefit_application.schedule_enrollment_termination!
+        active_benefit_application
+      end
+
+      let(:termination_pending_benefit_package) do
+        termination_pending_application.benefit_packages.first
+      end
+
+      let!(:enrollment) do
+        FactoryBot.create(:hbx_enrollment,
+                          household: shop_family.latest_household,
+                          family: shop_family,
+                          coverage_kind: coverage_kind,
+                          effective_on: expired_benefit_package.start_on + 1.month,
+                          special_enrollment_period_id: sep.id,
+                          kind: "employer_sponsored",
+                          benefit_sponsorship_id: benefit_sponsorship.id,
+                          sponsored_benefit_package_id: expired_benefit_package.id,
+                          sponsored_benefit_id: expired_sponsored_benefit.id,
+                          employee_role_id: employee_role.id,
+                          benefit_group_assignment: census_employee.active_benefit_group_assignment,
+                          product_id: expired_sponsored_benefit.reference_product.id,
+                          aasm_state: 'coverage_selected')
+      end
+      let(:params) {{:enrollment => enrollment}}
+
+      before do
+        census_employee.benefit_group_assignments << build(:benefit_group_assignment, benefit_group: expired_benefit_package, census_employee: census_employee, start_on: expired_benefit_application.start_on,
+                                                           end_on: expired_benefit_application.end_on)
+        census_employee.benefit_group_assignments << build(:benefit_group_assignment, benefit_group: termination_pending_benefit_package, census_employee: census_employee, start_on: termination_pending_benefit_package.start_on, end_on: termination_pending_benefit_package.end_on)
+        census_employee.save
+        census_employee
+      end
+
+      it 'should expire prior py enrollment, and should create continuous coverage enrollments for term pending py in term pending state' do
+        expect(shop_family.hbx_enrollments.count).to eq 1
+        subject.call(params)
+        shop_family.reload
+        expect(shop_family.hbx_enrollments.count).to eq 2
+        expect(shop_family.hbx_enrollments.map(&:aasm_state)).to match_array(["coverage_expired", "coverage_termination_pending"])
+      end
+    end
   end
 end
