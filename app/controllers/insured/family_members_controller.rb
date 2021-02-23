@@ -90,8 +90,7 @@ class Insured::FamilyMembersController < ApplicationController
       active_family_members_count = @family.active_family_members.count
       immediate_household_members_count = @family.active_household.immediate_family_coverage_household.coverage_household_members.count
       extended_family_members_count = @family.active_household.extended_family_coverage_household.coverage_household_members.count
-      unless active_family_members_count == immediate_household_members_count + extended_family_members_count
-        Rails.logger.info("In FamilyMembersController create action #{params}, #{@family.inspect}")
+        Rails.logger.info("In FamilyMembersController create action #{params}, #{@family.inspect}") unless active_family_members_count == immediate_household_members_count + extended_family_members_count
       end
       @created = true
       respond_to do |format|
@@ -113,8 +112,7 @@ class Insured::FamilyMembersController < ApplicationController
     active_family_members_count = @family.active_family_members.count
     immediate_household_members_count = @family.active_household.immediate_family_coverage_household.coverage_household_members.count
     extended_family_members_count = @family.active_household.extended_family_coverage_household.coverage_household_members.count
-    unless active_family_members_count == immediate_household_members_count + extended_family_members_count
-      Rails.logger.info("In FamilyMembersController create action #{params}, #{@family.inspect}")
+      Rails.logger.info("In FamilyMembersController create action #{params}, #{@family.inspect}") unless active_family_members_count == immediate_household_members_count + extended_family_members_count
     end
     respond_to do |format|
       format.html { render 'index' }
@@ -147,8 +145,7 @@ class Insured::FamilyMembersController < ApplicationController
         active_family_members_count = @family.active_family_members.count
         immediate_household_members_count = @family.active_household.immediate_family_coverage_household.coverage_household_members.count
         extended_family_members_count = @family.active_household.extended_family_coverage_household.coverage_household_members.count
-        unless active_family_members_count == immediate_household_members_count + extended_family_members_count
-          Rails.logger.info("In FamilyMembersController create action #{params}, #{@family.inspect}")
+          Rails.logger.info("In FamilyMembersController create action #{params}, #{@family.inspect}") unless active_family_members_count == immediate_household_members_count + extended_family_members_count
         end
         respond_to do |format|
           format.html { render 'show_resident' }
