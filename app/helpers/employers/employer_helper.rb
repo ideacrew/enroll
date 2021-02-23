@@ -335,7 +335,7 @@ module Employers::EmployerHelper
   end
 
   def display_reinstate_benefit_application?(application)
-    return false unless [:terminated, :termination_pending, :retroactive_canceled].include?(application.aasm_state) || (application.canceled? && check_for_canceled_wst?(application))
+    return false unless [:terminated, :termination_pending, :retroactive_canceled].include?(application.aasm_state) || (application.canceled? && application.reinstated_id.blank? && check_for_canceled_wst?(application))
     is_ben_app_within_reinstate_period?(application)
   end
 end
