@@ -79,6 +79,7 @@ module Operations
 
     def transition_enrollment(enrollment, benefit_application)
       enrollment.begin_coverage! if TimeKeeper.date_of_record >= benefit_application.start_on && enrollment.may_begin_coverage?
+      enrollment.terminate_coverage_with(benefit_application.end_on) if benefit_application.termination_pending?
       Success(enrollment)
     end
 
