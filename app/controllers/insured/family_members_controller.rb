@@ -108,10 +108,12 @@ class Insured::FamilyMembersController < ApplicationController
 
   def destroy
     @dependent.destroy!
-    active_family_members_count = @family.active_family_members.count
-    immediate_household_members_count = @family.active_household.immediate_family_coverage_household.coverage_household_members.count
-    extended_family_members_count = @family.active_household.extended_family_coverage_household.coverage_household_members.count
-    Rails.logger.info("In FamilyMembersController create action #{params}, #{@family.inspect}") unless active_family_members_count == immediate_household_members_count + extended_family_members_count
+    if @family.present?
+      active_family_members_count = @family.active_family_members&.count
+      immediate_household_members_count = @family.active_household.immediate_family_coverage_household.coverage_household_members.count
+      extended_family_members_count = @family.active_household.extended_family_coverage_household.coverage_household_members.count
+      Rails.logger.info("In FamilyMembersController create action #{params}, #{@family.inspect}") unless active_family_members_count == immediate_household_members_count + extended_family_members_count
+    end
     respond_to do |format|
       format.html { render 'index' }
       format.js { render 'destroyed' }
