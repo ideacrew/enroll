@@ -38,7 +38,7 @@ module Operations
         enrollments.each do |enrollment|
           enrollment.term_or_cancel_enrollment(enrollment, employment_term_date.end_of_month)
         end
-        notify = params[:options].present? && params[:options][:notify].present? ? params[:options][:notify] : true
+        notify = params[:options].present? && (params[:options][:notify].is_a?(Boolean) && params[:options][:notify].to_s == "false") ? params[:options][:notify] : true
         hbx_enrollment.notify_of_coverage_start(notify)
 
         Success(hbx_enrollment)
