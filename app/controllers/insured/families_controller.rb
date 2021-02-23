@@ -6,7 +6,7 @@ class Insured::FamiliesController < FamiliesController
   before_action :updateable?, only: [:delete_consumer_broker, :record_sep, :purchase, :upload_notice]
   before_action :init_qualifying_life_events, only: [:home, :manage_family, :find_sep]
   before_action :check_for_address_info, only: [:find_sep, :home]
-  before_action :check_employee_role
+  before_action :check_employee_role, :except => [:home]
   before_action :find_or_build_consumer_role, only: [:home]
   before_action :calculate_dates, only: [:check_move_reason, :check_marriage_reason, :check_insurance_reason]
 
@@ -30,7 +30,7 @@ class Insured::FamiliesController < FamiliesController
 
     # @hbx_enrollments = @hbx_enrollments.reject{ |r| !valid_display_enrollments.include? r._id }
 
-    @employee_role = @person.active_employee_roles.first
+    @employee_role = find_employee_role
     @tab = params['tab']
     @family_members = @family.active_family_members
 
@@ -375,6 +375,16 @@ class Insured::FamiliesController < FamiliesController
       @resident_role_id = @person.resident_role.id
     end
 
+  end
+
+  def find_employee_role
+    active_employee_roles = @person.active_employee_roles
+
+    if active_employee_roles.select(&:is_under_open_enrollment?).present?
+      active_employee_roles.select(&:is_under_open_enrollment?).first
+    else
+      active_employee_roles.first
+    end
   end
 
 end
