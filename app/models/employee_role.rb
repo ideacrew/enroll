@@ -260,18 +260,24 @@ class EmployeeRole
     application_states = BenefitSponsors::BenefitApplications::BenefitApplication::COVERAGE_EFFECTIVE_STATES
     active_benefit_application = employer_profile.benefit_applications.where(:aasm_state.in => application_states).last
 
-    return false if active_benefit_application.blank?
-    return true if (active_benefit_application.start_on.beginning_of_day..active_benefit_application.end_on.end_of_day).cover?(effective_date)
+    return true if active_benefit_application && (active_benefit_application.start_on.beginning_of_day..active_benefit_application.end_on.end_of_day).cover?(effective_date)
 
     offset_months = EnrollRegistry[:prior_plan_year_sep].setting(:offset_months).item
-    start_date = active_benefit_application.start_on
+    start_date = active_benefit_application&.start_on || TimeKeeper.date_of_record.beginning_of_year
     end_date = start_date - offset_months.months
 
     terminated_states = [:terminated, :expired, :termination_pending]
-    prior_ba = employer_profile.benefit_applications.future_effective_date(end_date).where(:aasm_state.in => terminated_states).max_by(&:created_at)
-    return false if prior_ba.blank?
-    return false unless (prior_ba.start_on..prior_ba.end_on).cover?(effective_date)
+    prior_bas = employer_profile.benefit_applications.effective_period_cover(end_date).where(:aasm_state.in => terminated_states)
+    benefit_application = prior_bas.detect{|ba| (ba.start_on..ba.end_on).cover?(effective_date)}
+    return false unless benefit_application
+    return false unless census_employee_eligible?(effective_date, benefit_application)
     true
+  end
+
+  def census_employee_eligible?(effective_date, benefit_application)
+    benefit_group_assignment = census_employee.benefit_package_assignment_on(benefit_application.end_on)
+    return false unless benefit_group_assignment
+    benefit_group_assignment.benefit_package.eligible_on(census_employee.hired_on) > effective_date && benefit_group_assignment.is_active?(benefit_application.end_on)
   end
 
   def coverage_effective_on(current_benefit_group: nil, qle: false)
