@@ -1,4 +1,4 @@
-<div class=" container personal-info-container no-pd">
+<div class="personal-info-container no-pd">
   <%= form_for @person, url: update_personal_info_person_path(id: @person.id), method: :put, html: { class: "personal_information_form" } do |f|%>
     <h4 class="personal-info-heading"> <%= l10n("personal")%> </h4>
     <div class="col-md-12 no-pd">
