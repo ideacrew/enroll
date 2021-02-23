@@ -7,7 +7,7 @@ module BenefitSponsors
 
         params do
           required(:product_package_kind).filled(:symbol)
-          required(:product_option_choice).filled(:string)
+          required(:product_option_choice).maybe(:string)
           required(:source_kind).filled(:symbol)
           required(:reference_product_id).filled(Types::Bson)
           required(:sponsor_contribution).filled(:hash)

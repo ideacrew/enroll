@@ -6,7 +6,7 @@ module BenefitSponsors
       transform_keys(&:to_sym)
 
       attribute :product_package_kind,        Types::Strict::Symbol
-      attribute :product_option_choice,       Types::Strict::String
+      attribute :product_option_choice,       Types::String.optional
       attribute :source_kind,                 Types::Strict::Symbol
 
       attribute :reference_product_id,        Types::Bson
