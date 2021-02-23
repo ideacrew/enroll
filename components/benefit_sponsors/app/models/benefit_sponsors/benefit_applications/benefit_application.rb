@@ -1219,7 +1219,7 @@ module BenefitSponsors
     private
 
     def can_retroactive_cancel?
-      start_on >= TimeKeeper.date_of_record
+      start_on <= TimeKeeper.date_of_record
     end
 
     def set_expiration_date
