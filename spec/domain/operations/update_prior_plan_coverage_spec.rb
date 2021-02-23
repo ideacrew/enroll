@@ -609,8 +609,9 @@ RSpec.describe Operations::UpdatePriorPlanCoverage, type: :model, dbclean: :afte
 
       before do
         census_employee.benefit_group_assignments << build(:benefit_group_assignment, benefit_group: expired_benefit_package, census_employee: census_employee, start_on: expired_benefit_application.start_on,
-                                                           end_on: expired_benefit_application.end_on)
-        census_employee.benefit_group_assignments << build(:benefit_group_assignment, benefit_group: termination_pending_benefit_package, census_employee: census_employee, start_on: termination_pending_benefit_package.start_on, end_on: termination_pending_benefit_package.end_on)
+                                                                                      end_on: expired_benefit_application.end_on)
+        census_employee.benefit_group_assignments << build(:benefit_group_assignment, benefit_group: termination_pending_benefit_package, census_employee: census_employee, start_on: termination_pending_benefit_package.start_on,
+                                                                                      end_on: termination_pending_benefit_package.end_on)
         census_employee.save
         census_employee
       end
