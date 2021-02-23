@@ -153,10 +153,18 @@ module BenefitSponsors
 
         def inbox
           @sent_box = true
-          id = params["id"]||params['profile_id']
-          @broker_agency_provider = find_broker_agency_profile(BSON::ObjectId(id))
+          if params["id"].present?
+            provider_id = params["id"]
+            @broker_agency_provider = Person.find(provider_id)
+            @broker_agency_profile = @broker_agency_provider.broker_role.broker_agency_profile
+            authorize @broker_agency_profile, :access_to_broker_agency_profile?
+          elsif params['profile_id'].present?
+            provider_id = params['profile_id']
+            @broker_agency_provider = find_broker_agency_profile(BSON::ObjectId(provider_id))
+          end
+
           @folder = (params[:folder] || 'Inbox').capitalize
-          if current_user.person._id.to_s == id
+          if current_user.person._id.to_s == provider_id
             @provider = current_user.person
           else
             @provider = @broker_agency_provider
