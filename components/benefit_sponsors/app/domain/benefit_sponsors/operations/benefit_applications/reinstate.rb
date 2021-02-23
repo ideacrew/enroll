@@ -100,7 +100,7 @@ module BenefitSponsors
           new_ba.reinstate!(@notify)
           return Failure('Cannot transition to state active on event activate_enrollment.') unless new_ba.may_activate_enrollment?
 
-          new_ba.activate_enrollment!
+          new_ba.activate_enrollment!(@notify)
           Success(new_ba)
         end
 
