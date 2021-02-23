@@ -27,7 +27,15 @@ module Entities
         end
 
         def admin_roles
-          roles.select{|role| role.kind.match(/hbx/)}
+          roles.find {|role| role.kind.match(/hbx/)}
+        end
+
+        def insured_role
+          active_roles.find {|role| ['consumer', 'resident', 'employee'].include?(role.kind)}
+        end
+
+        def active_non_insured_roles
+          active_roles.select {|role| !['consumer', 'resident', 'employee'].include?(role.kind) }
         end
       end
     end

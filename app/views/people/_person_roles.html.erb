@@ -1,3 +1,5 @@
+<% insured_role = @available_roles.insured_role %>
+<% available_active_roles = [[insured_role] + @available_roles.active_non_insured_roles].flatten.compact %>
 <div class="container no-pd">
   <div class="mt-1 no-pd">
     <%#= link_to "Add Account", available_accounts_person_path(id: @person.id), class: "btn btn-outline-primary" unless @available_roles.admin_roles.present? || @available_roles.resident_roles.present? %>
@@ -18,35 +20,37 @@
             <div class='modal-options'>
               <p><%= l10n("hub.home_page.add_account.modal.description") %> <strong><%= l10n("hub.home_page.title") %></strong></p>
 
-              <%# Get roles variable from controller & loop - todo %>
-              <div class="d-flex flex-row bg-white hub-item-flex-shadow ivl-card" data-toggle="modal" data-target="#addIvlAccount" data-dismiss="modal">
-                <div class="col-2">
-                  <i class="fas fa-users fa-3x"></i>
-                </div>
-                <div class="col-10">
-                  <div><strong  class='label-color'><%= l10n("hub.home_page.add_account.modal.ivl_title") %></strong></div>
-                  <div><small><%= l10n("hub.home_page.add_account.modal.ivl_description") %></small></div>
-                </div>
-              </div>
-
-              <div style="padding: 10px;">
-                <p class='or-style'>or</p>
-              </div>
-              <%= link_to main_app.privacy_insured_employee_index_path(person_id: @person.id) do %>
-                <div class="d-flex flex-row bg-white hub-item-flex-shadow employee-card">
+              <% if insured_role.blank? %>
+                <div class="d-flex flex-row bg-white hub-item-flex-shadow ivl-card" data-toggle="modal" data-target="#addIvlAccount" data-dismiss="modal">
                   <div class="col-2">
-                    <i class="far fa-address-card fa-3x"></i>
+                    <i class="fas fa-users fa-3x"></i>
                   </div>
                   <div class="col-10">
-                    <div><strong class='label-color'><%= l10n("hub.home_page.add_account.modal.employee_title") %></strong></div>
-                    <div><small><%= l10n("hub.home_page.add_account.modal.employee_description") %></small></div>
+                    <div><strong  class='label-color'><%= l10n("hub.home_page.add_account.modal.ivl_title") %></strong></div>
+                    <div><small><%= l10n("hub.home_page.add_account.modal.ivl_description") %></small></div>
                   </div>
                 </div>
-              <% end %>
 
-              <div style="padding: 10px;">
-                <p class='or-style'>or</p>
-              </div>
+                <div style="padding: 10px;">
+                  <p class='or-style'>or</p>
+                </div>
+
+                <%= link_to main_app.privacy_insured_employee_index_path(person_id: @person.id) do %>
+                  <div class="d-flex flex-row bg-white hub-item-flex-shadow employee-card">
+                    <div class="col-2">
+                      <i class="far fa-address-card fa-3x"></i>
+                    </div>
+                    <div class="col-10">
+                      <div><strong class='label-color'><%= l10n("hub.home_page.add_account.modal.employee_title") %></strong></div>
+                      <div><small><%= l10n("hub.home_page.add_account.modal.employee_description") %></small></div>
+                    </div>
+                  </div>
+                <% end %>
+
+                <div style="padding: 10px;">
+                  <p class='or-style'>or</p>
+                </div>
+              <% end %>
 
               <div class="d-flex flex-row bg-white hub-item-flex-shadow employer-card" data-toggle="modal" data-target="#addEmployerAccount" data-dismiss="modal">
                 <div class="col-2">
@@ -158,32 +162,30 @@
     </div>
   </div>
   <div class="mt-3">
-    <% if @available_roles.active_roles.present? %>
-      <% @available_roles.active_roles.each do |active_role| %>
-        <div class="col-12 mt-1 no-pd">
-          <div class="d-flex flex-row bg-white rounded hub-flex-shadow p-2">
-            <div class="col-8">
-              <div class="ml-25"><span class="hub-label"><strong><%= link_to active_role.name.humanize, active_role.link %></strong></span></div>
-              <div class="ml-25"><%= active_role.description.humanize %></div>
-            </div>
-            <% if active_role.kind.downcase === 'employer staff'  %>
-              <div class="col-4 p-2">
-                <div class="dropdown pull-right">
-                  <button class="btn btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Actions
-                    <span class="caret"></span>
-                  </button>
-                  <div class="dropdown-menu dropdown-menu-right actions-menu" aria-labelledby="dropdownMenuButton">
-                    <%= link_to benefit_sponsors.new_employer_profile_profiles_employers_employer_profiles_path(person_id: @person.id, profile_type: :benefit_sponsor, with_roster: true) do %>
-                      <span class="dropdown-item">Copy this info to a new account</span>
-                    <% end %>
-                  </div>
+    <% available_active_roles.each do |active_role| %>
+      <div class="col-12 mt-1 no-pd">
+        <div class="d-flex flex-row bg-white rounded hub-flex-shadow p-2">
+          <div class="col-8">
+            <div class="ml-25"><span class="hub-label"><strong><%= link_to active_role.name.humanize, active_role.link %></strong></span></div>
+            <div class="ml-25"><%= active_role.description.humanize %></div>
+          </div>
+          <% if active_role.kind.downcase === 'employer staff'  %>
+            <div class="col-4 p-2">
+              <div class="dropdown pull-right">
+                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Actions
+                  <span class="caret"></span>
+                </button>
+                <div class="dropdown-menu dropdown-menu-right actions-menu" aria-labelledby="dropdownMenuButton">
+                  <%= link_to benefit_sponsors.new_employer_profile_profiles_employers_employer_profiles_path(person_id: @person.id, profile_type: :benefit_sponsor, with_roster: true) do %>
+                    <span class="dropdown-item">Copy this info to a new account</span>
+                  <% end %>
                 </div>
               </div>
-            <% end %>
-          </div>
+            </div>
+          <% end %>
         </div>
-      <% end %>
+      </div>
     <% end %>
   </div>
 
