@@ -36,7 +36,6 @@ module BenefitSponsors
           @current_ba = params[:benefit_application]
           @notify = params[:options].present? && params[:options][:transmit_to_carrier] ? params[:options][:transmit_to_carrier] : false
           return Failure('Not a valid Benefit Application object.') unless @current_ba.is_a?(BenefitSponsors::BenefitApplications::BenefitApplication)
-          return Failure('Unable to reinstate BenefitApplication, application covered for full 12 months span.') if @current_ba.effective_period.max.next_day > @current_ba.benefit_sponsor_catalog.effective_period.max
           return Failure("Given BenefitApplication is not in any of the [:terminated, :termination_pending, :canceled, :retroactive_canceled] states.") unless valid_states_for_reinstatement
           return Failure("System date is not within the given BenefitApplication's effective period timeframe.") unless initial_ba_within_valid_timeframe?
           return Failure('Overlapping BenefitApplication exists for this Employer.') if overlapping_ba_exists?

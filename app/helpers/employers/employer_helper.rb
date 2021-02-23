@@ -331,7 +331,7 @@ module Employers::EmployerHelper
     offset_months = EnrollRegistry[:benefit_application_reinstate].setting(:offset_months).item
     start_on = application.benefit_sponsor_catalog.effective_period.min
     end_on = application.benefit_sponsor_catalog.effective_period.max + offset_months.months
-    (start_on..end_on).cover?(TimeKeeper.date_of_record)
+    (start_on..end_on).cover?(TimeKeeper.date_of_record) && application.end_on.next_day <= application.benefit_sponsor_catalog.effective_period.max
   end
 
   def display_reinstate_benefit_application?(application)
