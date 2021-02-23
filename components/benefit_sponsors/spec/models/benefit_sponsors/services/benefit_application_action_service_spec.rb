@@ -84,7 +84,7 @@ module BenefitSponsors
         end
 
         it 'should cancel reinstated application' do
-          expect(@reinstated_application.aasm_state).to eq :retroactive_canceled
+          expect(@reinstated_application.aasm_state).to eq :canceled
         end
       end
     end
