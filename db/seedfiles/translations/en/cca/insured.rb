@@ -166,7 +166,6 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.make_changes' => "<b>Make changes</b> to my coverage",
   :'en.terminate_plan' => "Terminate Plan",
   :'en.view_details' => "<b>View</b> my coverage details",
-  :'en.view_details' => "<b>View</b> my coverage details",
   :'en.make_your_first_payment' => "Make a first Payment for a new plan",
   :'en.make_payments_for_my_plan' => "Make Payments for My Plan",
   :'en.go_back' => "GO BACK",

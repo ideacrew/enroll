@@ -18,20 +18,22 @@ function runGlossary() {
     // full glossary term (e.g. Premium/ Premium Tax Credit)
     var terms = [
       {
-        "term": "View my coverage details",
+        // <b>View</b> my coverage details - full text
+        "term": "my coverage details",
         "description": "Learn more about what my plan covers."
       },
       {
-        "term": "Make changes to my coverage",
+        // <b>Make changes</b> to my coverage - full text
+        "term": "to my coverage",
         "description": "Make changes to my plan."
       },
       {
-        "term": "Make a first payment for my new plan",
+        "term": "Make a first Payment for a new plan",
         "description": "This payment will confirm your enrollment and allow you to begin your coverage. Please note it typically takes up to 3-5 business days after you sign up for you to be able to make a first payment."
       },
       // Kaiser payment definition
       {
-        "term": "Make payments for my plan",
+        "term": "Make Payments for My Plan",
         "description": "If you have already made your first premium payment for your plan, and are looking to make your monthly premium payment, you may log into your payment account here."
       },
       // Other payment definition

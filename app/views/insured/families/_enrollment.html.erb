@@ -201,7 +201,7 @@
               <span class="caret"></span>
             </button>
             <% carrier = hbx_enrollment.product.carrier_profile.legal_name %>
-            <div class="dropdown-menu dropdown-glossary run-glossary <%= carrier == "Kaiser" ? '' : 'pay-now-other' %>" role="menu" aria-labelledby="dropdownmenuButton">
+            <div class="dropdown-menu dropdown-glossary run-glossary" role="menu" aria-labelledby="dropdownmenuButton">
 
               <div class="dropdown-divider" style="border-top: 1px solid #e9ecef"></div>
               <%= link_to l10n("view_details"), summary_products_plans_path({standard_component_id: product.hios_id, hbx_enrollment_id: hbx_enrollment.id, active_year: product.active_year, source: 'account'}), {class: 'btn-link btn-block dropdown-item', style: 'padding: 6px 12px; margin: 4px 0;', remote: true} %>
