@@ -92,6 +92,19 @@ class EmployerStaffRole
                                                                        hired_on: coverage_record.hired_on,
                                                                        ssn: coverage_record.ssn,
                                                                        gender: coverage_record.gender))
+    if has_coverage?
+      coverage_record.coverage_record_dependents.each do |dependent|
+        census_employee.census_dependents.build(
+          first_name: dependent.first_name,
+          middle_name: dependent.middle_name,
+          last_name: dependent.last_name,
+          encrypted_ssn: dependent.encrypted_ssn,
+          gender: dependent.gender,
+          dob: dependent.dob,
+          employee_relationship: dependent.employee_relationship
+        )
+      end
+    end
     census_employee.save
   end
 
