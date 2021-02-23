@@ -550,7 +550,7 @@ RSpec.describe Employers::EmployerHelper, :type => :helper, dbclean: :after_each
       let(:display_reinstate_ba) {helper.display_reinstate_benefit_application?(initial_application)}
 
       context "benefit application effective period start on with in past 12 months" do
-        let(:start_on) { TimeKeeper.date_of_record.next_month.next_month.beginning_of_month - 1.year }
+        let(:start_on) { TimeKeeper.date_of_record.next_month.next_month.beginning_of_month - 11.months }
         let(:end_on) { TimeKeeper.date_of_record.next_month.end_of_month }
         let(:cancel_end_on) { TimeKeeper.date_of_record.end_of_month }
 
