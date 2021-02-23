@@ -342,6 +342,6 @@ module Employers::EmployerHelper
 
   #TODO: Temp condition until we have some resolution
   def term_eligible_for_reinstate(application)
-    [:terminated, :termination_pending].include?(application.aasm_state) && application.end_on.next_day <= application.benefit_sponsor_catalog.effective_period.max
+    [:terminated, :termination_pending].include?(application.aasm_state) && application.end_on.next_day > application.benefit_sponsor_catalog.effective_period.max
   end
 end
