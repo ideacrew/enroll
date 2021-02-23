@@ -1,5 +1,6 @@
 class Insured::GroupSelectionController < ApplicationController
   include Insured::GroupSelectionHelper
+  include Config::SiteConcern
 
   before_action :initialize_common_vars, only: [:new, :create, :terminate_selection]
   # before_action :set_vars_for_market, only: [:new]
@@ -266,25 +267,27 @@ class Insured::GroupSelectionController < ApplicationController
 
     case @market_kind
     when 'shop', 'fehb'
-      @adapter.if_employee_role_unset_but_can_be_derived(@employee_role) do |e_role|
-        @employee_role = e_role
-      end
-
-      set_change_plan
-
-      benefit_group = nil
-      benefit_group_assignment = nil
-
-      if @adapter.is_waiving?(permitted_group_selection_params)
-        if @adapter.previous_hbx_enrollment.present?
-          @adapter.build_change_shop_waiver_enrollment(@employee_role, @change_plan, permitted_group_selection_params)
-        else
-          @adapter.build_new_shop_waiver_enrollment(@employee_role)
+      if is_shop_or_fehb_market_enabled?
+        @adapter.if_employee_role_unset_but_can_be_derived(@employee_role) do |e_role|
+          @employee_role = e_role
         end
-      elsif @adapter.previous_hbx_enrollment.present?
-        @adapter.build_shop_change_enrollment(@employee_role, @change_plan, family_member_ids)
-      else
-        @adapter.build_new_shop_enrollment(@employee_role, family_member_ids)
+
+        set_change_plan
+
+        benefit_group = nil
+        benefit_group_assignment = nil
+
+        if @adapter.is_waiving?(permitted_group_selection_params)
+          if @adapter.previous_hbx_enrollment.present?
+            @adapter.build_change_shop_waiver_enrollment(@employee_role, @change_plan, permitted_group_selection_params)
+          else
+            @adapter.build_new_shop_waiver_enrollment(@employee_role)
+          end
+        elsif @adapter.previous_hbx_enrollment.present?
+          @adapter.build_shop_change_enrollment(@employee_role, @change_plan, family_member_ids)
+        else
+          @adapter.build_new_shop_enrollment(@employee_role, family_member_ids)
+        end
       end
     when 'individual'
       @adapter.coverage_household.household.new_hbx_enrollment_from(

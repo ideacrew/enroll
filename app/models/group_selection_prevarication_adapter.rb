@@ -38,15 +38,17 @@ class GroupSelectionPrevaricationAdapter
   end
 
   def check_shopping_roles(params)
-    if params[:employee_role_id].present?
-      emp_role_id = params[:employee_role_id]
+    if params[:employee_role_id].present? && (is_shop_or_fehb_market_enabled?)
+      emp_role_id = params.require(:employee_role_id)
       @employee_role = @person.employee_roles.detect { |emp_role| emp_role.id.to_s == emp_role_id.to_s }
-    elsif params[:resident_role_id].present?
+    elsif params[:resident_role_id].present? && is_individual_market_enabled?
       @resident_role = @person.resident_role
     end
   end
 
   def can_ivl_shop?(params)
+    return false unless is_individual_market_enabled?
+
     (select_market(params) == 'individual') || (@person.try(:has_active_employee_role?) && @person.try(:has_active_consumer_role?)) || @person.resident_role?
   end
 
@@ -59,7 +61,7 @@ class GroupSelectionPrevaricationAdapter
   end
 
   def if_employee_role_unset_but_can_be_derived(e_role_value)
-    return if e_role_value.present?
+    return if e_role_value.present? || !(is_shop_or_fehb_market_enabled?)
     if @person.has_active_employee_role?
       @person.active_employee_roles.first
     end
@@ -92,6 +94,7 @@ class GroupSelectionPrevaricationAdapter
   end
 
   def possible_employee_role
+    return unless is_shop_or_fehb_market_enabled?
     if @employee_role.nil? && @person.has_active_employee_role?
       @person.active_employee_roles.first
     else
@@ -100,17 +103,17 @@ class GroupSelectionPrevaricationAdapter
   end
 
   def if_employee_role
-    return nil unless possible_employee_role.present?
+    return nil unless possible_employee_role.present? && (is_shop_or_fehb_market_enabled?)
     yield possible_employee_role
   end
 
   def if_resident_role
-    return nil unless @resident_role.present?
+    return nil unless @resident_role.present? && is_individual_market_enabled?
     yield @resident_role
   end
 
   def if_consumer_role
-    return nil if @employee_role.present? || @resident_role.present?
+    return nil if (@employee_role.present? || @resident_role.present?) && !is_individual_market_enabled?
     yield person.consumer_role
   end
 
@@ -125,11 +128,11 @@ class GroupSelectionPrevaricationAdapter
 
   def set_mc_variables
     if @previous_hbx_enrollment.present? && @change_plan == "change_plan"
-      m_kind = if @previous_hbx_enrollment.employer_profile.is_a?(BenefitSponsors::Organizations::FehbEmployerProfile)
+      m_kind = if @previous_hbx_enrollment.employer_profile.is_a?(BenefitSponsors::Organizations::FehbEmployerProfile) && is_fehb_market_enabled?
                  "fehb"
-               elsif @previous_hbx_enrollment.is_shop?
+               elsif @previous_hbx_enrollment.is_shop? && is_shop_market_enabled?
                  'shop'
-               elsif %w[coverall individual].include? @previous_hbx_enrollment.kind
+               elsif %w[coverall individual].include? @previous_hbx_enrollment.kind && is_individual_market_enabled?
                  @previous_hbx_enrollment.kind
                end
       yield m_kind, @previous_hbx_enrollment.coverage_kind
@@ -138,11 +141,11 @@ class GroupSelectionPrevaricationAdapter
 
   def disable_market_kinds(params)
     if (@change_plan == 'change_by_qle' || @enrollment_kind == 'sep')
-      d_market_kind = (select_market(params) == "shop" || select_market(params) == "fehb") ? "individual" : "shop"
+      d_market_kind = (select_market(params) == "shop" || select_market(params) == "fehb") && is_shop_or_fehb_market_enabled? ? "individual" : "shop"
     else
       d_market_kind = 'individual' if (@person.consumer_role.present? || @person.resident_role.present?) && !is_under_ivl_open_enrollment?
 
-      d_market_kind = 'shop' if !@employee_role&.is_eligible_to_enroll_without_qle?
+      d_market_kind = 'shop' if !@employee_role&.is_eligible_to_enroll_without_qle? && !(is_shop_or_fehb_market_enabled?)
     end
 
     yield d_market_kind
@@ -154,6 +157,7 @@ class GroupSelectionPrevaricationAdapter
 
   def ivl_benefit
     correct_effective_on = calculate_ivl_effective_on
+    binding.pry
     if @change_plan.present? && @previous_hbx_enrollment.present? && @previous_hbx_enrollment.is_ivl_by_kind?
       HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.select{|bcp| bcp.contains?(correct_effective_on)}.first.benefit_packages.select{|bp|  bp.effective_year == correct_effective_on.year && bp.benefit_categories.include?(@previous_hbx_enrollment.coverage_kind)}.first
     else
@@ -193,6 +197,8 @@ class GroupSelectionPrevaricationAdapter
   end
 
   def if_should_generate_coverage_family_members_for_cobra(params)
+    return [] unless is_shop_or_fehb_market_enabled?
+
     if (select_market(params) == "shop" || select_market(params) == "fehb") && !(@change_plan == 'change_by_qle' || @enrollment_kind == 'sep') && possible_employee_role.present? && possible_employee_role.is_cobra_status?
       hbx_enrollment = @family.active_household.hbx_enrollments.shop_market.enrolled_and_renewing.effective_desc.detect { |hbx| hbx.may_terminate_coverage? }
       if hbx_enrollment.present?
@@ -214,6 +220,8 @@ class GroupSelectionPrevaricationAdapter
   end
 
   def can_waive?(hbx_enrollment, params)
+    return false unless is_shop_market_enabled? || is_fehb_market_enabled?
+
     if hbx_enrollment.present?
       hbx_enrollment.is_shop?
     else
@@ -234,7 +242,7 @@ class GroupSelectionPrevaricationAdapter
   end
 
   def select_benefit_group(params)
-    return unless select_market(params) == 'shop' || select_market(params) == 'fehb'
+    return unless (select_market(params) == 'shop' || select_market(params) == 'fehb') && is_shop_or_fehb_market_enabled?
 
     if possible_employee_role.present?
       assigned_benefit_package = possible_employee_role.benefit_package(qle: is_qle?, shop_under_current: shop_under_current, shop_under_future: shop_under_future)
@@ -268,13 +276,13 @@ class GroupSelectionPrevaricationAdapter
       qle = QualifyingLifeEventKind.find(params[:qle_id])
       return qle.market_kind
     end
-    if is_fehb?(person)
+    if is_fehb?(person) && is_fehb_market_enabled?
       'fehb'
-    elsif person.has_active_employee_role?
+    elsif person.has_active_employee_role? && is_shop_market_enabled?
       'shop'
-    elsif person.is_consumer_role_active?
+    elsif person.is_consumer_role_active? && is_individual_market_enabled?
       'individual'
-    elsif person.is_resident_role_active?
+    elsif person.is_resident_role_active? && is_individual_market_enabled?
       'coverall'
     else
       nil
@@ -282,7 +290,13 @@ class GroupSelectionPrevaricationAdapter
   end
 
   def create_action_market_kind(params)
-    params[:market_kind].present? ? params[:market_kind] : 'shop'
+    if params[:market_kind].present?
+      params[:market_kind]
+    elsif is_shop_market_enabled?
+      "shop"
+    elsif is_individual_market_enabled?
+      "individual"
+    end
   end
 
   # SHOP enrollment creation adapters
@@ -291,20 +305,21 @@ class GroupSelectionPrevaricationAdapter
     controller_change_plan,
     family_member_ids
   )
+    return unless is_shop_or_fehb_market_enabled?
+
     e_builder = ::EnrollmentShopping::EnrollmentBuilder.new(coverage_household, controller_employee_role, coverage_kind)
     e_builder.build_change_enrollment(previous_enrollment: previous_hbx_enrollment, is_qle: is_qle?, optional_effective_on: optional_effective_on, family_member_ids: family_member_ids)
   end
 
-  def build_new_shop_enrollment(
-    controller_employee_role,
-    family_member_ids
-  )
-    build_new_shop_enrollment_for_family_members(
-      controller_employee_role,
-      family_member_ids)
+  def build_new_shop_enrollment(controller_employee_role, family_member_ids)
+    return unless is_shop_or_fehb_market_enabled?
+
+    build_new_shop_enrollment_for_family_members(controller_employee_role, family_member_ids)
   end
 
   def build_new_shop_waiver_enrollment(controller_employee_role, params)
+    return unless is_shop_or_fehb_market_enabled?
+
     e_builder = ::EnrollmentShopping::EnrollmentBuilder.new(coverage_household, controller_employee_role, coverage_kind)
     e_builder.build_new_waiver_enrollment(is_qle: is_qle?, shop_under_current: shop_under_current, shop_under_future: shop_under_future, optional_effective_on: optional_effective_on, waiver_reason: get_waiver_reason(params))
   end
@@ -314,11 +329,14 @@ class GroupSelectionPrevaricationAdapter
     controller_change_plan,
     params
   )
+    return unless is_shop_or_fehb_market_enabled?
+
     e_builder = ::EnrollmentShopping::EnrollmentBuilder.new(coverage_household, controller_employee_role, coverage_kind)
     e_builder.build_change_waiver_enrollment(previous_enrollment: previous_hbx_enrollment, is_qle: is_qle?, optional_effective_on: optional_effective_on, waiver_reason: get_waiver_reason(params))
   end
 
   def is_waiving?(params)
+    return false unless is_shop_or_fehb_market_enabled?
     !params[:is_waiving].blank?
   end
 
@@ -327,7 +345,7 @@ class GroupSelectionPrevaricationAdapter
   end
 
   def can_shop_shop?(person)
-    person.present? && person.has_employer_benefits? # FIX ME
+    person.present? && person.has_employer_benefits? && is_shop_or_fehb_market_enabled?
   end
 
   def is_fehb?(person)
@@ -335,15 +353,39 @@ class GroupSelectionPrevaricationAdapter
   end
 
   def can_shop_individual?(person)
+    return false unless is_individual_market_enabled?
+
     person.try(:has_active_consumer_role?)
   end
 
   def can_shop_resident?(person)
+    return false unless is_shop_or_fehb_market_enabled?
+
     person.try(:has_active_resident_role?)
   end
 
   def can_shop_both_markets?(person)
     can_shop_individual?(person) && can_shop_shop?(person)
+  end
+
+  def is_shop_market_enabled?
+    EnrollRegistry.feature_enabled?(:aca_shop_market)
+  end
+
+  def is_fehb_market_enabled?
+    EnrollRegistry.feature_enabled?(:fehb_market)
+  end
+
+  def is_shop_or_fehb_market_enabled?
+    EnrollRegistry.feature_enabled?(:fehb_market) || EnrollRegistry.feature_enabled?(:aca_shop_market)
+  end
+
+  def is_individual_market_enabled?
+    EnrollRegistry.feature_enabled?(:aca_individual_market)
+  end
+
+  def is_shop_and_individual_market_enabled?
+    EnrollRegistry.feature_enabled?(:aca_shop_market) && EnrollRegistry.feature_enabled?(:aca_individual_market)
   end
 
   def no_employer_benefits_error_message(hbx_enrollment)
