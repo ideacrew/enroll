@@ -22,4 +22,24 @@ module Config::SiteConcern
   def support_for_ie_browser?
     Settings.site.support_for_ie_browser
   end
+
+  def is_shop_market_enabled?
+    EnrollRegistry.feature_enabled?(:aca_shop_market)
+  end
+
+  def is_fehb_market_enabled?
+    EnrollRegistry.feature_enabled?(:fehb_market)
+  end
+
+  def is_individual_market_enabled?
+    EnrollRegistry.feature_enabled?(:aca_individual_market)
+  end
+
+  def is_shop_and_individual_market_enabled?
+    EnrollRegistry.feature_enabled?(:aca_shop_market) && EnrollRegistry.feature_enabled?(:aca_individual_market)
+  end
+
+  def is_shop_or_fehb_market_enabled?
+    EnrollRegistry.feature_enabled?(:aca_shop_market) || EnrollRegistry.feature_enabled?(:fehb_market)
+  end
 end
