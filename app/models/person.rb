@@ -582,6 +582,10 @@ class Person
     addresses.detect { |adr| adr.kind == "home" }
   end
 
+  def zip
+    home_address.zip
+  end
+
   def mailing_address
     addresses.detect { |adr| adr.kind == "mailing" } || home_address
   end

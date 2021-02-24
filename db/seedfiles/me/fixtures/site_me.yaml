@@ -1,0 +1,15 @@
+--- !ruby/object:BenefitSponsors::Site
+__selected_fields:
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP5J+ICzHOaeVu
+  site_key: :me
+  byline: The Right Place for the Right Plan
+  short_name: Access Health
+  domain_name: hbxshop.org
+  long_name: Maine Cover ME
+  copyright_period_start: '2021'
+  site_organizations_count: 9
+  updated_at: 2018-06-04 19:15:50.700000000 Z
+  created_at: 2018-06-04 19:15:50.700000000 Z

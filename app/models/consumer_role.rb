@@ -128,6 +128,7 @@ class ConsumerRole
   delegate :ssn,    :ssn=,    to: :person, allow_nil: true
   delegate :no_ssn,    :no_ssn=,    to: :person, allow_nil: true
   delegate :dob,    :dob=,    to: :person, allow_nil: true
+  delegate :zip,    to: :person, allow_nil: true
   delegate :gender, :gender=, to: :person, allow_nil: true
   delegate :us_citizen, :us_citizen=, to: :person, allow_nil: true
 
