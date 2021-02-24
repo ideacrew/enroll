@@ -31,8 +31,8 @@ jobs:
       - name: Run rubocop
         run: |
           git config diff.renameLimit 800
-          git fetch --no-tags --depth=1 origin master
-          bundle exec rubocop-git origin/master | grep "no offenses detected"
+          git fetch --no-tags --depth=1 origin trunk
+          bundle exec rubocop-git origin/trunk | grep "no offenses detected"
   view_linter:
     runs-on: ubuntu-latest
     steps:
@@ -52,7 +52,7 @@ jobs:
           bundle install
       - name: Run View Linter
         run: |
-          git fetch --no-tags --depth=1 origin master
+          git fetch --no-tags --depth=1 origin trunk
           bundle exec rake view_translations_linter:lint_git_difference_changed_lines
   brakeman:
     needs: [rubocop, view_linter]
