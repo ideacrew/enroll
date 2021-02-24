@@ -15,6 +15,7 @@ export function runtimeDetails(files: FileWithRuntime[]): any {
 
   return {
     longestTest: longestTest.runTime,
+    longestTestName: longestTest.filePath,
     totalRuntime,
     suggestedGroupCount,
   };
