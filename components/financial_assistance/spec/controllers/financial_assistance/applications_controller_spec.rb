@@ -249,10 +249,5 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
         expect(response.body).to eq 'true'
       end
     end
-
-    # it 'should return true if the Header of the response have the success status code' do
-    #   get :check_eligibility_results_received, params: { id: application.id }
-    #   expect(response.body).to eq "true"
-    # end
   end
 end
