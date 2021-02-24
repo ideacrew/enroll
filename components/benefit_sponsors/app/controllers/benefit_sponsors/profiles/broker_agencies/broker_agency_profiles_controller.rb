@@ -164,11 +164,8 @@ module BenefitSponsors
           end
 
           @folder = (params[:folder] || 'Inbox').capitalize
-          if current_user.person._id.to_s == provider_id
-            @provider = current_user.person
-          else
-            @provider = @broker_agency_provider
-          end
+
+          @provider = (current_user.person._id.to_s == provider_id) ? current_user.person : @broker_agency_provider
         end
 
         def email_guide
