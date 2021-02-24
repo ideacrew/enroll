@@ -1288,7 +1288,7 @@ class HbxEnrollment
   end
 
   def special_enrollment_period_available?
-    shop_sep = family.earliest_effective_shop_sep
+    shop_sep = family.earliest_effective_shop_sep || family.earliest_effective_fehb_sep
     return false unless shop_sep
     sponsored_benefit_package.effective_period.cover?(shop_sep.effective_on)
   end
