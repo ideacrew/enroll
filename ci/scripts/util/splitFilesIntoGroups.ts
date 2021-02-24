@@ -10,14 +10,18 @@ export function splitFilesIntoGroups(
   files: FileWithRuntime[],
   groupCount: number
 ): SplitConfig {
-  const { longestTest, totalRuntime, suggestedGroupCount } = runtimeDetails(
-    files
-  );
+  const {
+    longestTest,
+    longestTestName,
+    totalRuntime,
+    suggestedGroupCount,
+  } = runtimeDetails(files);
 
   const bucketMaxRunTime = Math.floor(totalRuntime / groupCount);
 
   console.log({
     longestTest: inMinutes(longestTest),
+    longestTestName,
     totalRuntime: inMinutes(totalRuntime),
     bucketMaxRunTime: inMinutes(bucketMaxRunTime),
     groupCount,
