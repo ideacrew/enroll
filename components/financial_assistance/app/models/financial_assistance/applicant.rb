@@ -662,7 +662,6 @@ module FinancialAssistance
     end
 
     def foster_age_satisfied?
-      # TODO: Look into this. Seems like this is only relevant if pregnant?
       # Age greater than 18 and less than 26
       (19..25).cover? age_of_applicant
     end
