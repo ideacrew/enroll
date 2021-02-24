@@ -1622,6 +1622,12 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
         expect(white_collar_benefit_group_assignment.end_on).to eq white_collar_benefit_group_assignment.start_on
       end
 
+      it 'benefit_group_assignment end on should match benefit package effective period minimum' do
+        census_employee.create_benefit_group_assignment([blue_collar_benefit_group])
+        census_employee.reload
+        white_collar_benefit_group_assignment.reload
+        expect(white_collar_benefit_group_assignment.end_on).to eq white_collar_benefit_group.effective_period.min
+      end
     end
 
     context 'when multiple benefit group assignments with benefit group exists' do
@@ -2555,6 +2561,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
         census_employee.renewal_benefit_group_assignment = renewal_benefit_group2.id
         census_employee.save
         census_employee.reload
+        expect(previous_bga.end_on).to eq renewal_benefit_group.effective_period.min
         expect(census_employee.renewal_benefit_group_assignment).not_to eq previous_bga
       end
     end
