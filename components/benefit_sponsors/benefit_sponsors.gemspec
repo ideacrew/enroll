@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.version     = BenefitSponsors::VERSION
   s.authors     = ["Dan Thomas"]
   s.email       = ["dan.thomas@dc.gov"]
-  s.homepage    = "https://github.com/dchbx"
+  s.homepage    = "https://github.com/ideacrew"
   s.summary     = "Summary of BenefitSponsors."
   s.description = "Description of BenefitSponsors."
   s.license     = "MIT"
