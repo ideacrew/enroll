@@ -40,14 +40,16 @@
   %is_veteran= applicant.is_veteran
 %is_refugee= applicant.is_refugee
 %is_trafficking_victim= applicant.is_trafficking_victim
-- unless applicant.is_former_foster_care.nil? || !applicant.is_applying_coverage?
-  %is_former_foster_care= applicant.is_former_foster_care
-- unless applicant.age_left_foster_care.blank? || !applicant.is_applying_coverage?
-  %age_left_foster_care= applicant.age_left_foster_care
-- unless applicant.foster_care_us_state.blank? || !applicant.is_applying_coverage?
-  %foster_care_us_state= "urn:openhbx:terms:v1:us_state##{State::NAME_IDS.detect do |state| state.last==applicant.foster_care_us_state.upcase end.first.downcase.gsub(' ','_')}"
-- unless applicant.had_medicaid_during_foster_care.blank? || !applicant.is_applying_coverage?
-  %had_medicaid_during_foster_care= applicant.had_medicaid_during_foster_care
+- if applicant.is_applying_coverage
+  - if !applicant.is_former_foster_care.nil?
+    %is_former_foster_care= applicant.is_former_foster_care
+  - if applicant.is_former_foster_care
+    - if !applicant.age_left_foster_care.nil?
+      %age_left_foster_care= applicant.age_left_foster_care
+    - if !applicant.foster_care_us_state.nil?
+      %foster_care_us_state= "urn:openhbx:terms:v1:us_state##{State::NAME_IDS.detect do |state| state.last==applicant.foster_care_us_state.upcase end.first.downcase.gsub(' ','_')}"
+    - if !applicant.had_medicaid_during_foster_care.nil?
+      %had_medicaid_during_foster_care= applicant.had_medicaid_during_foster_care
 - unless applicant.is_pregnant.nil?
   %is_pregnant= applicant.is_pregnant
 - unless applicant.is_enrolled_on_medicaid.blank?
