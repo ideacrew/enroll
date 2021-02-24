@@ -27,7 +27,7 @@ module Entities
         end
 
         def admin_roles
-          roles.find {|role| role.kind.match(/hbx/)}
+          roles.select {|role| role.kind.match(/hbx/)}
         end
 
         def consumer_role
