@@ -43,7 +43,7 @@ module Entities
         end
 
         def active_non_insured_roles
-          active_roles.select {|role| !['consumer', 'resident', 'employee'].include?(role.kind) }
+          active_roles.reject {|role| ['consumer', 'resident', 'employee'].include?(role.kind) }
         end
       end
     end
