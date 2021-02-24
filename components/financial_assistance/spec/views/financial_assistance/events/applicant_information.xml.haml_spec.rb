@@ -20,10 +20,10 @@ RSpec.describe 'components/financial_assistance/app/views/financial_assistance/e
           render 'financial_assistance/events/applicant_information', applicant: applicant
         end
 
-        it {expect(rendered).not_to match /is_former_foster_care/}
-        it {expect(rendered).not_to match /age_left_foster_care/}
-        it {expect(rendered).not_to match /foster_care_us_state/}
-        it {expect(rendered).not_to match /had_medicaid_during_foster_care/}
+        it {expect(rendered).not_to match(/is_former_foster_care/)}
+        it {expect(rendered).not_to match(/age_left_foster_care/)}
+        it {expect(rendered).not_to match(/foster_care_us_state/)}
+        it {expect(rendered).not_to match(/had_medicaid_during_foster_care/)}
       end
 
       context 'applicant is not in is_former_foster_care' do
@@ -32,10 +32,10 @@ RSpec.describe 'components/financial_assistance/app/views/financial_assistance/e
           render 'financial_assistance/events/applicant_information', applicant: applicant
         end
 
-        it {expect(rendered).to match /is_former_foster_care/}
-        it {expect(rendered).not_to match /age_left_foster_care/}
-        it {expect(rendered).not_to match /foster_care_us_state/}
-        it {expect(rendered).not_to match /had_medicaid_during_foster_care/}
+        it {expect(rendered).to match(/is_former_foster_care/)}
+        it {expect(rendered).not_to match(/age_left_foster_care/)}
+        it {expect(rendered).not_to match(/foster_care_us_state/)}
+        it {expect(rendered).not_to match(/had_medicaid_during_foster_care/)}
       end
 
       context 'applicant is in is_former_foster_care' do
@@ -48,10 +48,10 @@ RSpec.describe 'components/financial_assistance/app/views/financial_assistance/e
           render 'financial_assistance/events/applicant_information', applicant: applicant
         end
 
-        it {expect(rendered).to match /is_former_foster_care/}
-        it {expect(rendered).to match /age_left_foster_care/}
-        it {expect(rendered).to match /foster_care_us_state/}
-        it {expect(rendered).to match /had_medicaid_during_foster_care/}
+        it {expect(rendered).to match(/is_former_foster_care/)}
+        it {expect(rendered).to match(/age_left_foster_care/)}
+        it {expect(rendered).to match(/foster_care_us_state/)}
+        it {expect(rendered).to match(/had_medicaid_during_foster_care/)}
       end
     end
   end
