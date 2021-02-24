@@ -54,7 +54,9 @@
     "start:angular": "ANGULAR_ADMIN_APPLICATION_URL=http://localhost:4200 bundle exec rails s",
     "hugo:dev": "cd hugo && hugo server --disableFastRender",
     "build:hugo": "cd hugo && hugo --minify",
-    "build:hugo:local": "rm -rf hugo/public && npm run build:hugo"
+    "build:hugo:local": "rm -rf hugo/public && npm run build:hugo",
+    "rspec:split-config": "ts-node ci/scripts/rspec-split ci/rspec/local-rspec-report.json ci/rspec-split-config.json",
+    "benefit-sponsors:split-config": "ts-node ci/scripts/rspec-split ci/engines/benefit-sponsors/benefit-sponsors-report.json ci/engines/benefit-sponsors/rspec-split-config.json"
   },
   "jest": {
     "testURL": "http://localhost",
