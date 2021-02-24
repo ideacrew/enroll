@@ -24,15 +24,15 @@ document.addEventListener("turbolinks:load", function() {
 
   // To hide/show the foster care related questions based on the age_of_applicant.
   function hide_show_foster_care_related_qns(age) {
+    if (age > 18 && age < 26){
+      $('#is_former_foster_care_yes').parents('.row-form-wrapper').removeClass('hide');
+    } else {
+      $('#is_former_foster_care_yes').parents('.row-form-wrapper').addClass('hide');
+      $('#foster_care_us_state, #age_left_foster_care, #had_medicaid_during_foster_care_yes').parents('.row-form-wrapper').addClass('hide');
+      $('#is_former_foster_care_yes, #is_former_foster_care_no').prop('required', false);
+      $('#had_medicaid_during_foster_care_yes, #had_medicaid_during_foster_care_no').prop('required', false);
+    }
     if ($('#is_pregnant_yes')) {
-      if (age > 18 && age < 26){
-        $('#is_former_foster_care_yes').parents('.row-form-wrapper').removeClass('hide');
-      } else {
-        $('#is_former_foster_care_yes').parents('.row-form-wrapper').addClass('hide');
-        $('#foster_care_us_state, #age_left_foster_care, #had_medicaid_during_foster_care_yes').parents('.row-form-wrapper').addClass('hide');
-        $('#is_former_foster_care_yes, #is_former_foster_care_no').prop('required', false);
-        $('#had_medicaid_during_foster_care_yes, #had_medicaid_during_foster_care_no').prop('required', false);
-      }
       if (age == 18 || age == 19){
         $('#is_student_yes').parents('.row-form-wrapper').removeClass('hide');
       } else {
@@ -283,14 +283,12 @@ $(document).ready(function(){
       $('#children_expected_count').selectric();
       $('#is_post_partum_period_yes, #applicant_pregnancy_end_on').parents('.row-form-wrapper').addClass('hide');
       $('#medicaid_pregnancy_yes').parents('.row-form-wrapper').addClass('hide');
-      $('#is_former_foster_care_yes').parents('.row-form-wrapper').removeClass('hide');
     };
   });
 
   if($('#is_pregnant_yes').is(':checked')) {
     $('#children_expected_count, #applicant_pregnancy_due_on').parents('.row-form-wrapper').removeClass('hide');
     $('#medicaid_pregnancy_yes').parents('.row-form-wrapper').addClass('hide');
-    $('#is_former_foster_care_yes').parents('.row-form-wrapper').removeClass('hide');
   } else {
     $('#children_expected_count, #applicant_pregnancy_due_on').parents('.row-form-wrapper').addClass('hide');
     $('#medicaid_pregnancy_yes').parents('.row-form-wrapper').addClass('hide');
@@ -302,11 +300,6 @@ $(document).ready(function(){
       $('#is_post_partum_period_yes, #is_post_partum_period_no').attr('checked', false);
       $('#children_expected_count, #applicant_pregnancy_due_on').parents('.row-form-wrapper').addClass('hide');
       $('#medicaid_pregnancy_yes').parents('.row-form-wrapper').addClass('hide');
-
-      $('#is_former_foster_care_yes').parents('.row-form-wrapper').addClass('hide');
-      $('#foster_care_us_state, #age_left_foster_care, #had_medicaid_during_foster_care_yes').parents('.row-form-wrapper').addClass('hide');
-      $('#is_former_foster_care_yes, #is_former_foster_care_no').prop('required', false);
-      $('#had_medicaid_during_foster_care_yes, #had_medicaid_during_foster_care_no').prop('required', false);
     };
   });
 
@@ -325,7 +318,6 @@ $(document).ready(function(){
   $("body").on("change", "#is_post_partum_period_yes", function(){
     if ($('#is_post_partum_period_yes').is(':checked')) {
       $('#medicaid_pregnancy_yes, #applicant_pregnancy_end_on').parents('.row-form-wrapper').removeClass('hide');
-      $('#is_former_foster_care_yes').parents('.row-form-wrapper').removeClass('hide');
     };
   });
 
@@ -336,7 +328,6 @@ $(document).ready(function(){
   $("body").on("change", "#is_post_partum_period_no", function(){
     if ($('#is_post_partum_period_no').is(':checked')) {
       $('#medicaid_pregnancy_yes, #applicant_pregnancy_end_on').parents('.row-form-wrapper').addClass('hide');
-      $('#is_former_foster_care_yes').parents('.row-form-wrapper').addClass('hide');
     };
   });
 
