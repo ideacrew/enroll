@@ -30,6 +30,14 @@ module Entities
           roles.find {|role| role.kind.match(/hbx/)}
         end
 
+        def consumer_role
+          active_roles.find {|role| role.kind == 'consumer'}
+        end
+
+        def employee_role
+          active_roles.find {|role| role.kind == 'employee'}
+        end
+
         def insured_role
           active_roles.find {|role| ['consumer', 'resident', 'employee'].include?(role.kind)}
         end

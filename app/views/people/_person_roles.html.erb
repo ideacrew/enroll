@@ -20,7 +20,7 @@
             <div class='modal-options'>
               <p><%= l10n("hub.home_page.add_account.modal.description") %> <strong><%= l10n("hub.home_page.title") %></strong></p>
 
-              <% if insured_role.blank? %>
+              <% if @available_roles.consumer_role.blank? %>
                 <div class="d-flex flex-row bg-white hub-item-flex-shadow ivl-card" data-toggle="modal" data-target="#addIvlAccount" data-dismiss="modal">
                   <div class="col-2">
                     <i class="fas fa-users fa-3x"></i>
@@ -34,7 +34,9 @@
                 <div style="padding: 10px;">
                   <p class='or-style'>or</p>
                 </div>
+              <% end %>
 
+              <% if @available_roles.employee_role.blank? %>
                 <%= link_to main_app.privacy_insured_employee_index_path(person_id: @person.id) do %>
                   <div class="d-flex flex-row bg-white hub-item-flex-shadow employee-card">
                     <div class="col-2">
