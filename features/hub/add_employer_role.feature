@@ -25,6 +25,7 @@ Feature: Any Person with User account should be able to add employer role
     And person should see Add Account button
     Then person clicks on Add Account
     Then person should see a pop up with text What Do You Want To Do?
+    And person should see a link to add EmployerStaff role
     And person clicks on EMPLOYER text
     Then person should see a pop up with text Include the Employee Roster?
     And person clicks the radio buttton Yes and click Continue

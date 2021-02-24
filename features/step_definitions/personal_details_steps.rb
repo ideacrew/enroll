@@ -237,11 +237,10 @@ end
 
 Then(/person should see a pop up with text What Do You Want To Do?/) do
   expect(page).to have_content 'What Do You Want To Do?'
-  expect(page).to have_content "INDIVIDUAL & FAMILY"
-  expect(page).to have_content "EMPLOYEE"
+end
+
+And(/person should see a link to add EmployerStaff role/) do
   expect(page).to have_content "EMPLOYER"
-  expect(page).to have_content "Broker"
-  expect(page).to have_content "General Agency"
 end
 
 And(/person clicks on EMPLOYER text/) do
