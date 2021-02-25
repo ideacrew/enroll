@@ -23,19 +23,19 @@ module Entities
         end
 
         def resident_roles
-          roles.select{|role| role.kind == "resident"}
+          roles.select{|role| role.kind.downcase == "resident"}
         end
 
         def admin_roles
-          roles.select {|role| role.kind.match(/hbx/)}
+          roles.select {|role| role.kind.downcase.match(/hbx/)}
         end
 
         def consumer_role
-          active_roles.find {|role| role.kind == 'consumer'}
+          active_roles.find {|role| role.kind.downcase == 'consumer'}
         end
 
         def employee_role
-          active_roles.find {|role| role.kind == 'employee'}
+          active_roles.find {|role| role.kind.downcase == 'employee'}
         end
 
         def insured_role
