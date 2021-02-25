@@ -20,10 +20,10 @@ Feature: HBX staff subroles able to see the Ageoff Exclusion checkbox
     Then the user will <action> the Ageoff Exclusion checkbox
 
     Examples:
-      | subrole            | action  |
-      | Super Admin        | see     |
-      | HBX Tier3          | see     |
-      | HBX Staff          | see     |
-      | Hbx CSR Supervisor | see     |
-      | Hbx CSR Tier1      | see     |
-      | Hbx CSR Tier2      | see     |
+      | subrole            | action |
+      | Super Admin        | see    |
+      | HBX Tier3          | see    |
+      | HBX Staff          | see    |
+      | Hbx CSR Supervisor | see    |
+      | Hbx CSR Tier1      | see    |
+      | Hbx CSR Tier2      | see    |
