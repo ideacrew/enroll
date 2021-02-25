@@ -228,7 +228,7 @@ jobs:
       - name: test engine
         env:
           RSPEC_SPLIT_CONFIGURATION_PATH: '${{ github.workspace }}/ci/engines/benefit-sponsors/rspec-split-config.json'
-          TEST_BOOSTERS_RSPEC_TEST_FILE_PATTERN: '**/*_spec.rb'
+          TEST_BOOSTERS_RSPEC_TEST_FILE_PATTERN: 'components/benefit_sponsors/**/*_spec.rb'
         run: |
           echo 
           cd components/benefit_sponsors
