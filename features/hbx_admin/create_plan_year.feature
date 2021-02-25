@@ -2,7 +2,7 @@ Feature: Create Benefit Application by admin UI
 
   Background: Setup site, employer, and benefit application
     Given a CCA site exists with a benefit market
-    Given benefit market catalog exists for draft initial employer with health benefits
+    And benefit market catalog exists for enrollment_open renewal employer with health benefits
     And there is an employer ABC Widgets
     And ABC Widgets employer has a staff role
 
@@ -26,9 +26,6 @@ Feature: Create Benefit Application by admin UI
       | aasm_state | title    | event                 | message                                | action     |
       | draft      | Canceled | draft_py_effective_on | Successfully created a draft plan year | be created |
 
-  # TODO: This cucumber expected enrollment ineligible to say "existing plan year with overlapping coverage exists"
-  # But devs say draft plan year should be able to created for enrollment ineligible
-  # So which one is it?
   Scenario Outline: Existing <title> Application for confirm  button
     Given initial employer ABC Widgets has <aasm_state> benefit application
     And that a user with a HBX staff role with Super Admin subrole exists and is logged in
@@ -48,12 +45,12 @@ Feature: Create Benefit Application by admin UI
       | Enrolling             | enrollment_open       | Enrolling                         | Existing plan year with overlapping coverage exists |
       | Enrollment Closed     | enrollment_closed     | Enrollment Closed                 | Existing plan year with overlapping coverage exists |
       | Enrolled              | binder_paid           | Enrolled                          | Existing plan year with overlapping coverage exists |
-      | Enrollment Ineligible | enrollment_ineligible | Enrollment Ineligible             | Successfully created a draft plan year              |
+      | Enrollment Ineligible | enrollment_ineligible | Enrollment Ineligible             | Existing plan year with overlapping coverage exists |
       | Active                | active                | Active                            | Existing plan year with overlapping coverage exists |
 
   @flaky
   Scenario: Creating New Plan Year while application is in termination_pending aasm_state
-    And initial employer ABC Widgets has active benefit application
+    And renewal employer ABC Widgets has active and renewal draft benefit applications
     Given that a user with a HBX staff role with HBX staff subrole exists and is logged in
     And the user is on the Employer Index of the Admin Dashboard
     When the user clicks Action for that Employer
@@ -76,7 +73,7 @@ Feature: Create Benefit Application by admin UI
     Then employer should see add plan year button
     And employer clicks Add Plan Year link
     And employer clicks OK in warning modal
-    Then employer should see continue button disabled
+    #Then employer should see continue button disabled
     And employer filled all the fields on benefit application form
     And employer clicked on continue button
     Then employer should see form for benefit package
