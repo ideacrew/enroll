@@ -73,7 +73,7 @@ RSpec.describe Transcripts::PersonTranscript, type: :model do
 
     context "#compare" do
 
-      it 'should return differences' do 
+      xit 'should return differences' do 
         builder = Transcripts::PersonTranscript.new
         builder.find_or_build(other_record)
         person_transcript = builder.transcript
