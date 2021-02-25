@@ -3,6 +3,7 @@
   
   = form_for @staff_member, as: :staff_member, :url => url_for(:controller => 'employer_staff_roles', :action => 'create_staff_member'), method: 'post', html: { class: "needs-ajax-validation s508", novalidate:true } do |f|
     div#employer_staff
+    = f.hidden_field :person_id, value: f.object.person_id
     = render partial: './ui-components/v1/forms/employer_staff_roles/employer_staff_information', locals: { f: f }
 
     .row.mt-3.employer-search

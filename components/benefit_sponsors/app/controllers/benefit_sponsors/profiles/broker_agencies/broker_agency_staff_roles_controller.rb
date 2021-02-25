@@ -76,15 +76,14 @@ module BenefitSponsors
 
         def create_staff_member
           authorize User, :add_roles?
-          staff_params = params.permit[:staff_member].to_h
+          staff_params = params.permit![:staff_member].to_h
           result = BenefitSponsors::Operations::BrokerAgencies::AddBrokerAgencyStaff.new.call(staff_member_params.merge(dob: parse_date(staff_member_params['dob'])))
           if result.success?
-            redirect_to main_app.show_roles_person_path(id: staff_params[:person_id])
             flash[:notice] = result.value![:message]
           else
-            redirect_to new_staff_member_profiles_broker_agencies_broker_agency_staff_roles_path(id: staff_params[:person_id])
             flash[:error] = result.failure[:message]
           end
+          redirect_to main_app.show_roles_person_path(id: staff_params[:person_id])
         end
 
         private

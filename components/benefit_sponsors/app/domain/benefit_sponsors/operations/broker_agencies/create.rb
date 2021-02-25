@@ -96,27 +96,40 @@ module BenefitSponsors
           end
         end
 
-        def create_broker_role(_staff_role_params, _person_id)
+        def create_broker_role(staff_role_params, person_id)
           # Broker Role Vs Broker Agency Staff Role
-          # if person_id.blank?
-            #TODO: Create or match person
-            # Success(true)
-          # else
-            # result = BenefitSponsors::Operations::BrokerAgencies::AddBrokerAgencyStaff.new.call(staff_role_params.merge!(profile_id: @profile.id.to_s, person_id: person_id))
-            # if result.success?
-            #   person = result.value![:person]
-            #   redirection_link = fetch_redirection_link(person_id)
-            #   Success([true, redirection_link])
-            # else
-            #   Failure({:message => 'Unable to create Broker role'})
-            # end
-          # end
-          Success([true, nil])
+          if person_id.blank?
+            # TODO: Create or match person
+            Success(true)
+          else
+            result = BenefitSponsors::Operations::BrokerAgencies::AddBrokerAgencyStaff.new.call(staff_role_params.merge!(profile_id: @profile.id.to_s, person_id: person_id))
+            if result.success?
+
+              person = result.value![:person]
+
+              person.broker_role = ::BrokerRole.new({
+                :provider_kind => 'broker',
+                :npn => staff_role_params[:npn],
+                :benefit_sponsors_broker_agency_profile_id => @profile.id,
+                :market_kind => staff_role_params[:market_kind]
+              })
+
+              @profile.office_locations.each do  |office_location|
+                person.phones.push(Phone.new(office_location.phone.attributes.except("_id")))
+              end
+              person.save!
+
+              redirection_link = fetch_redirection_link(person_id)
+              Success([true, redirection_link])
+            else
+              Failure({:message => 'Unable to create Broker role'})
+            end
+          end
         end
 
-        # def fetch_redirection_link(_person_id)
-        #   "broker_show_registration_url@#{@profile.id}"
-        # end
+        def fetch_redirection_link(person_id)
+          "/people/#{person_id}/show_roles"
+        end
       end
     end
   end

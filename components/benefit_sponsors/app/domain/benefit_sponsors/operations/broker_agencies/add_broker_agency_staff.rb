@@ -85,7 +85,7 @@ module BenefitSponsors
               user.roles << "broker_agency_staff"
               user.save!
             end
-            Success({:message => 'Successfully added broker staff role'})
+            Success({:message => 'Successfully added broker staff role', :person => @person})
           end
           result.to_result.failure? ? Failure({:message => 'Failed to create records, contact HBX Admin'}) : result.to_result.value!
         end
