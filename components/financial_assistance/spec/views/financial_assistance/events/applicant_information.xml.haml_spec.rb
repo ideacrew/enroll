@@ -6,10 +6,17 @@ RSpec.describe 'components/financial_assistance/app/views/financial_assistance/e
   context 'conditional data elements' do
 
     let!(:application) do
-      FactoryBot.create(:application, family_id: BSON::ObjectId.new, aasm_state: "draft",effective_date: TimeKeeper.date_of_record)
+      FactoryBot.create(:application,
+                        family_id: BSON::ObjectId.new,
+                        aasm_state: 'draft',
+                        effective_date: Date.today)
     end
     let!(:applicant) do
-      FactoryBot.create(:applicant, application: application, dob: TimeKeeper.date_of_record - 40.years, is_primary_applicant: true, family_member_id: BSON::ObjectId.new)
+      FactoryBot.create(:applicant,
+                        application: application,
+                        dob: Date.today - 40.years,
+                        is_primary_applicant: true,
+                        family_member_id: BSON::ObjectId.new)
     end
 
     context 'foster care questions' do
@@ -52,6 +59,49 @@ RSpec.describe 'components/financial_assistance/app/views/financial_assistance/e
         it {expect(rendered).to match(/age_left_foster_care/)}
         it {expect(rendered).to match(/foster_care_us_state/)}
         it {expect(rendered).to match(/had_medicaid_during_foster_care/)}
+      end
+    end
+
+    context 'student questions' do
+
+      context 'applicant not applying for coverage' do
+        before :each do
+          applicant.update_attributes!(is_applying_coverage: false)
+          render 'financial_assistance/events/applicant_information', applicant: applicant
+        end
+
+        it {expect(rendered).not_to match(/is_student/)}
+        it {expect(rendered).not_to match(/student_type/)}
+        it {expect(rendered).not_to match(/school_type/)}
+        it {expect(rendered).not_to match(/student_status_end_on/)}
+      end
+
+      context 'applicant is not a student' do
+        before :each do
+          applicant.update_attributes!(is_applying_coverage: true, is_student: false)
+          render 'financial_assistance/events/applicant_information', applicant: applicant
+        end
+
+        it {expect(rendered).to match(/is_student/)}
+        it {expect(rendered).not_to match(/student_type/)}
+        it {expect(rendered).not_to match(/school_type/)}
+        it {expect(rendered).not_to match(/student_status_end_on/)}
+      end
+
+      context 'applicant is a student' do
+        before :each do
+          applicant.update_attributes!(is_applying_coverage: true,
+                                       is_student: true,
+                                       student_kind: 'full_time',
+                                       student_school_kind: 'high_school',
+                                       student_status_end_on: Date.today.strftime('%m/%d/%Y'))
+          render 'financial_assistance/events/applicant_information', applicant: applicant
+        end
+
+        it {expect(rendered).to match(/is_student/)}
+        it {expect(rendered).to match(/student_type/)}
+        it {expect(rendered).to match(/school_type/)}
+        it {expect(rendered).to match(/student_status_end_on/)}
       end
     end
   end
