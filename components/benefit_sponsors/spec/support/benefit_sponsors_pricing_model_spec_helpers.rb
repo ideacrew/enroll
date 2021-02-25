@@ -1,5 +1,6 @@
 require File.join(File.dirname(__FILE__), "client_pricing_model_spec_helpers/dc")
 require File.join(File.dirname(__FILE__), "client_pricing_model_spec_helpers/cca")
+require File.join(File.dirname(__FILE__), "client_pricing_model_spec_helpers/me")
 
 module BenefitSponsors
   class PricingModelSpecHelpers
