@@ -1141,7 +1141,7 @@ And(/^Hbx Admin click on Employers/) do
 end
 
 And(/I click (.*) QLE events in QLE carousel$/) do |market_name|
-  click_link 'Individual'
+  click_link market_name
   sleep(2)
 end
 

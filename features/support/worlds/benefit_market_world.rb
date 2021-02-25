@@ -76,7 +76,7 @@ module BenefitMarketWorld
   end
 
   def qualifying_life_events_ivl
-    @qualifying_life_events ||= [
+    @qualifying_life_events_ivl ||= [
       :effective_on_event_date,
       :effective_on_first_of_month,
       :effective_on_fixed_first_of_next_month

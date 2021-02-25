@@ -119,4 +119,3 @@ module IvlAssistanceWorld
 end
 
 World(IvlAssistanceWorld)
- 

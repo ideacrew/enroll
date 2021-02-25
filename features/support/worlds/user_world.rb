@@ -118,7 +118,7 @@ end
 And(/^user (.*?) logs into the portal$/) do |named_person|
   person = people[named_person]
   person_rec = Person.where(first_name: person[:first_name], last_name: person[:last_name]).first
-  user = User.all.detect { |user| user.person == person_rec }
+  user = User.all.detect { |person_user| person_user.person == person_rec }
   login_as(user, scope: :user)
   visit "families/home"
 end
