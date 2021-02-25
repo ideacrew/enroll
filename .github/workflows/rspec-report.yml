@@ -1,6 +1,5 @@
 name: rspec report
 on:
-  push:
   workflow_dispatch:
 
 jobs:
@@ -28,7 +27,6 @@ jobs:
             'reports',
             'requests',
             'routing',
-            'saml',
             'script',
             'shared_contexts',
             'shared_examples',
