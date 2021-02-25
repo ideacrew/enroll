@@ -480,11 +480,27 @@ And(/(.*) has census employee, person record, and active coverage for employee (
                     hbx_enrollment_members: [hbx_enrollment_member])
 end
 
-
-And(/employee (.*) also has a consumer role and IVL enrollment$/) do |named_person|
+And(/(.*) has active individual market role and verified identity$/) do |named_person|
   person = people[named_person]
   person_rec = Person.where(first_name: person[:first_name], last_name: person[:last_name]).first
+  consumer_role = person_rec.consumer_role
+  # Active consumer role
+  person_rec.active_individual_market_role == 'consumer'
+  person_rec.save!
+  consumer_role.identity_validation = 'valid'
+  consumer_role.save!
+  expect(consumer_role.identity_verified?).to eq(true)
+end
+
+And(/(.*) has a consumer role and IVL enrollment$/) do |named_person|
+  person = people[named_person]
+  person_rec = Person.where(first_name: person[:first_name], last_name: person[:last_name]).first || FactoryBot.create(:person,
+                                 :with_family,
+                                 first_name: person[:first_name],
+                                 last_name: person[:last_name])
   consumer_role = FactoryBot.create(:consumer_role, person: person_rec)
+  # In case it gets ussed
+  consumer_role_user = FactoryBot.create(:user, :consumer, person: person_rec)
   # For verification
   consumer_role.vlp_documents << FactoryBot.build(:vlp_document)
   consumer_role.save!

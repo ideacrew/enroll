@@ -7,11 +7,11 @@ Feature: Admin plan shopping via SEP
     And there is an employer ABC Widgets
     And initial employer ABC Widgets has enrollment_open benefit application
     And there is a census employee record and employee role for Patrick Doe for employer ABC Widgets
-    And employee Patrick Doe also has a consumer role and IVL enrollment
+    And Patrick Doe has a consumer role and IVL enrollment
     Given that a user with a HBX staff role with Super Admin subrole exists and is logged in
     And Admin clicks Families tab
     Then the Admin is navigated to the Families screen
-    And I click on the name of a person of family list
+    And I click the name of Patrick Doe from family list
     And I should see the individual home page
     And I click individual QLE events in QLE carousel
     When I click the "Had a baby" in qle carousel

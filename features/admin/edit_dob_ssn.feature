@@ -10,7 +10,7 @@ Feature: Update DOB and SSN
     And there is an employer ABC Widgets
     And initial employer ABC Widgets has enrollment_open benefit application
     And there is a census employee record and employee role for Patrick Doe for employer ABC Widgets
-    And employee Patrick Doe also has a consumer role and IVL enrollment
+    And Patrick Doe has a consumer role and IVL enrollment
 
   Scenario: Admin enters invalid DOB or SSN
     Given that a user with a HBX staff role with HBX staff subrole exists and is logged in
