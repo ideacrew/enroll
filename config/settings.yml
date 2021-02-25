@@ -1,5 +1,5 @@
 site:
-  key: :me
+  key: :cca
   subdomain: "cme"
   domain_name: "cme.enroll.openhbx.org"
   site_title: "Maine Cover ME"
