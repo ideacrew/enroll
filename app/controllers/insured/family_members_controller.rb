@@ -87,6 +87,11 @@ class Insured::FamilyMembersController < ApplicationController
       return
     end
     if @address_errors.blank? && @dependent.save && update_vlp_documents(@dependent.family_member.try(:person).try(:consumer_role), 'dependent', @dependent)
+      active_family_members_count = @family.active_family_members.count
+      household = @family.active_household
+      immediate_household_members_count = household.immediate_family_coverage_household.coverage_household_members.count
+      extended_family_members_count = household.extended_family_coverage_household.coverage_household_members.count
+      Rails.logger.info("In FamilyMembersController create action #{params}, #{@family.inspect}") unless active_family_members_count == immediate_household_members_count + extended_family_members_count
       @created = true
       respond_to do |format|
         format.html { render 'show' }
@@ -104,6 +109,13 @@ class Insured::FamilyMembersController < ApplicationController
 
   def destroy
     @dependent.destroy!
+    if @family.present?
+      active_family_members_count = @family.active_family_members&.count
+      household = @family.active_household
+      immediate_household_members_count = household.immediate_family_coverage_household.coverage_household_members.count
+      extended_family_members_count = household.extended_family_coverage_household.coverage_household_members.count
+      Rails.logger.info("In FamilyMembersController Destroy action #{params}, #{@family.inspect}") unless active_family_members_count == immediate_household_members_count + extended_family_members_count
+    end
     respond_to do |format|
       format.html { render 'index' }
       format.js { render 'destroyed' }
@@ -148,6 +160,13 @@ class Insured::FamilyMembersController < ApplicationController
     consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
     @info_changed, @dc_status = sensitive_info_changed?(consumer_role)
     if @address_errors.blank? && @dependent.update_attributes(dependent_person_params[:dependent]) && update_vlp_documents(consumer_role, 'dependent', @dependent)
+      if @family.present?
+        active_family_members_count = @family.active_family_members.count
+        household = @family.active_household
+        immediate_household_members_count = household.immediate_family_coverage_household.coverage_household_members.count
+        extended_family_members_count = household.extended_family_coverage_household.coverage_household_members.count
+        Rails.logger.info("In FamilyMembersController Update action #{params}, #{@family.inspect}") unless active_family_members_count == immediate_household_members_count + extended_family_members_count
+      end
       consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
       consumer_role&.check_for_critical_changes(
         @dependent.family_member.family,
