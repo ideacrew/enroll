@@ -40,6 +40,7 @@ module BenefitSponsors
       ].freeze
 
       MA_ENTITY_KINDS = ENTITY_KINDS
+      ME_ENTITY_KINDS = ENTITY_KINDS
 
       FIELD_AND_EVENT_NAMES_MAP = {"legal_name" => "name_changed", "fein" => "fein_corrected", "dba" => "name_changed"}.freeze
 
