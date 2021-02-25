@@ -163,10 +163,16 @@ And(/^there is a census employee record and employee role for (.*?) for employer
   organization = employer(legal_name)
   person_record = Person.where(first_name: person[:first_name], last_name: person[:last_name]).first ||
                   FactoryBot.create(:person, :with_family, ssn: person[:ssn], first_name: person[:first_name], last_name: person[:last_name])
+  census_employee_rec = CensusEmployee.where(first_name: person[:first_name], last_name: person[:last_name]).first
   employer_profile = employer_profile(legal_name)
-  employer_staff_role = FactoryBot.build(:benefit_sponsor_employer_staff_role, aasm_state: 'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)
-  person_record.employee_roles <<  employer_staff_role
-  person_record.save!
+  employee_staff_role = FactoryBot.create(
+    :benefit_sponsors_employee_role,
+    person: person_record,
+    census_employee_id: census_employee_rec.id.to_s,
+    benefit_sponsors_employer_profile_id: employer_profile.id
+  )
+  expect(person_record.save!).to eq(true)
+  expect(person_record.employee_roles.count > 0).to eq(true)
 end
 
 And(/^census employee (.*?) is a (.*) employee$/) do |named_person, state|
@@ -472,4 +478,19 @@ And(/(.*) has census employee, person record, and active coverage for employee (
                     product_id: benefit_package.health_sponsored_benefit.products(benefit_package.start_on).first.id,
                     issuer_profile_id: benefit_package.health_sponsored_benefit.products(benefit_package.start_on).first.issuer_profile.id,
                     hbx_enrollment_members: [hbx_enrollment_member])
+end
+
+
+And(/employee (.*) also has a consumer role and IVL enrollment$/) do |named_person|
+  person = people[named_person]
+  person_rec = Person.where(first_name: person[:first_name], last_name: person[:last_name]).first
+  consumer_role = FactoryBot.create(:consumer_role, person: person_rec)
+  # For verification
+  consumer_role.vlp_documents << FactoryBot.build(:vlp_document)
+  consumer_role.save!
+  consumer_role.active_vlp_document_id = consumer_role.vlp_documents.last.id
+  consumer_role.save!
+  consumer_family = person_rec.primary_family
+  create_enrollment_for_family(consumer_family)
+  expect(consumer_family.hbx_enrollments.count > 0).to eq(true)
 end

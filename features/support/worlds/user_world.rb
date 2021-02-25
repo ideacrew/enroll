@@ -125,7 +125,7 @@ And(/^the user is on the Family Index of the Admin Dashboard$/) do
   find('.interaction-click-control-families').click
 end
 
-When(/^the user clicks Action for that Employer$/) do
+When(/^the user clicks Action for a person on families index page$/) do
   find('.dropdown.pull-right', text: 'Actions').click
 end
 
