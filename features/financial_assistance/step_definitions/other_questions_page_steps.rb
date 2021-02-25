@@ -177,7 +177,7 @@ Then(/^pregnancy end date question should display$/) do
 end
 
 Then(/^the is this person a student question should display$/) do
-  expect(page).to have_content('Is this person a student? *')
+  expect(page).to have_content(l10n('faa.other_ques.is_student'))
 end
 
 Given(/^the user answers yes to being a student$/) do
