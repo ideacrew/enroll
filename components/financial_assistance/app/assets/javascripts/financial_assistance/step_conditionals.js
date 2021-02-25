@@ -32,14 +32,6 @@ document.addEventListener("turbolinks:load", function() {
       $('#is_former_foster_care_yes, #is_former_foster_care_no').prop('required', false);
       $('#had_medicaid_during_foster_care_yes, #had_medicaid_during_foster_care_no').prop('required', false);
     }
-    if ($('#is_pregnant_yes')) {
-      if (age == 18 || age == 19){
-        $('#is_student_yes').parents('.row-form-wrapper').removeClass('hide');
-      } else {
-        $('#is_student_yes').parents('.row-form-wrapper').addClass('hide');
-        $('#student_kind, #applicant_student_status_end_on, #student_school_kind').parents('.row-form-wrapper').addClass('hide');
-      }
-    }
   }
 
   function hide_show_person_flling_jointly_question(){
