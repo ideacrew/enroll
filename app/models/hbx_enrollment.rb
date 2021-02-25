@@ -1977,7 +1977,7 @@ class HbxEnrollment
   end
 
   def prior_plan_year_coverage?
-    return false unless ::EnrollRegistry.feature_enabled?(:prior_plan_year_sep)
+    return false unless EnrollRegistry.feature_enabled?(:prior_plan_year_sep)
 
     is_shop? ? prior_year_shop_coverage? : prior_year_ivl_coverage?
   end

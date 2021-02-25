@@ -874,6 +874,37 @@ class CensusEmployee < CensusMember
     self.renewal_benefit_group_assignment = nil
   end
 
+  def fetch_approved_and_term_bas_for_date(effective_date = nil)
+    if ::EnrollRegistry.feature_enabled?(:prior_plan_year_sep) && prior_py_sep?(effective_date)
+      benefit_sponsorship.benefit_applications.where(:aasm_state.in => BenefitSponsors::BenefitApplications::BenefitApplication::APPPROVED_AND_TERMINATED_STATES)
+                         .select{|ba| ((ba.start_on.beginning_of_day..ba.end_on.end_of_day).cover? effective_date)}
+    else
+      benefit_sponsorship.benefit_applications.where(:aasm_state.in => BenefitSponsors::BenefitApplications::BenefitApplication::APPROVED_STATES)
+    end
+  end
+
+  def prior_py_sep?(effective_date)
+    return false if effective_date.blank?
+    application_states = BenefitSponsors::BenefitApplications::BenefitApplication::COVERAGE_EFFECTIVE_STATES
+    active_benefit_application = benefit_sponsorship.benefit_applications.where(:aasm_state.in => application_states).last
+    offset_months = EnrollRegistry[:prior_plan_year_sep].setting(:offset_months).item
+    start_date = active_benefit_application&.start_on || TimeKeeper.date_of_record.beginning_of_year
+    end_date = start_date - offset_months.months
+
+    terminated_states = [:terminated, :expired, :termination_pending]
+    term_or_expired_bas = benefit_sponsorship.benefit_applications.future_effective_date(end_date).where(:aasm_state.in => terminated_states)
+    benefit_application = term_or_expired_bas.detect{|ba| (ba.start_on..ba.end_on).cover?(effective_date)}
+    return false unless benefit_application
+    return false unless eligible_for?(effective_date, benefit_application)
+    true
+  end
+
+  def eligible_for?(effective_date, benefit_application)
+    benefit_group_assignment = benefit_package_assignment_on(benefit_application.end_on)
+    return false unless benefit_group_assignment
+    benefit_group_assignment.benefit_package.eligible_on(hired_on) <= effective_date && benefit_group_assignment.is_active?(benefit_application.end_on)
+  end
+
   def active_benefit_group_assignment=(benefit_package_id)
     benefit_application = benefit_sponsorship&.benefit_package_by(benefit_package_id)&.benefit_application || benefit_sponsorship&.current_benefit_application
 
