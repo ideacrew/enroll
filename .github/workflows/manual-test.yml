@@ -11,7 +11,7 @@ on:
         required: true
 
 jobs:
-  rspec-report:
+  run_test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

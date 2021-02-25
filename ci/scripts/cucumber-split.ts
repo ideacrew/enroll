@@ -17,7 +17,8 @@ async function createCucumberSplitConfig() {
   const [manualGroupCount] = process.argv.slice(2);
 
   if (manualGroupCount === undefined) {
-    throw new Error('Please provide the required cli arguments.');
+    console.error('Please provide the required cli arguments.');
+    process.exit(1);
   }
 
   // Parse cucumber report
