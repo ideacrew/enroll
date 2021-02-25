@@ -1,43 +1,48 @@
+# frozen_string_literal: true
+
 module SponsoredBenefits
   module Organizations
-    class PlanDesignProposals::PlansController < ApplicationController
+    module PlanDesignProposals
+      # Plans Controller, used for BQT
+      class PlansController < ApplicationController
 
-      def index
-        offering_query = ::Queries::EmployerPlanOfferings.new(plan_design_organization)
-        @plans = case selected_carrier_level
-                 when "single_carrier"
-                   offering_query.send "single_carrier_offered_#{kind}_plans", params[:carrier_id], params[:active_year]
-                 when "metal_level"
-                   offering_query.metal_level_offered_health_plans(params[:metal_level], params[:active_year])
-                 when "single_plan"
-                   offering_query.send "single_option_offered_#{kind}_plans", params[:carrier_id], params[:active_year]
-                 when "sole_source"
-                   offering_query.sole_source_offered_health_plans(params[:carrier_id], params[:active_year])
-                 end
-        @plans = @plans.select{|a| a.premium_tables.present?}
-        @search_options = ::Plan.search_options(@plans)
-        @search_option_titles = {
-                'plan_type': (Settings.aca.state_abbreviation == 'MA') ? 'HMO / PPO' : 'Plan Type',
-                'plan_hsa': 'HSA - Compatible',
-                'metal_level': 'Metal Level',
-                'plan_deductible': 'Individual deductible (in network)'
-              }
-      end
-
-      def dental_reference_plans
-        offering_query = ::Queries::EmployerPlanOfferings.new(plan_design_organization)
-        @plans = offering_query.dental_reference_plans_by_id(params[:plans_ids], params[:active_year])
-        @plans = @plans.select{|a| a.premium_tables.present?}
-        @search_options = ::Plan.search_options(@plans)
-        @search_option_titles = {
+        def index
+          offering_query = ::Queries::EmployerPlanOfferings.new(plan_design_organization)
+          @plans = case selected_carrier_level
+                   when "single_carrier"
+                     offering_query.send "single_carrier_offered_#{kind}_plans", params[:carrier_id], params[:active_year]
+                   when "metal_level"
+                     offering_query.metal_level_offered_health_plans(params[:metal_level], params[:active_year])
+                   when "single_plan"
+                     offering_query.send "single_option_offered_#{kind}_plans", params[:carrier_id], params[:active_year]
+                   when "sole_source"
+                     offering_query.sole_source_offered_health_plans(params[:carrier_id], params[:active_year])
+                   end
+          @plans = @plans.select{|a| a.premium_tables.present?}
+          @search_options = ::Plan.search_options(@plans)
+          @search_option_titles = {
             'plan_type': (Settings.aca.state_abbreviation == 'MA') ? 'HMO / PPO' : 'Plan Type',
             'plan_hsa': 'HSA - Compatible',
             'metal_level': 'Metal Level',
             'plan_deductible': 'Individual deductible (in network)'
-        }
-      end
+          }
+        end
 
-      private
+        def dental_reference_plans
+          offering_query = ::Queries::EmployerPlanOfferings.new(plan_design_organization)
+          @plans = offering_query.dental_reference_plans_by_id(params[:plans_ids], params[:active_year])
+          @plans = @plans.select{|a| a.premium_tables.present?}
+          @search_options = ::Plan.search_options(@plans)
+          @search_option_titles = {
+            'plan_type': (Settings.aca.state_abbreviation == 'MA') ? 'HMO / PPO' : 'Plan Type',
+            'plan_hsa': 'HSA - Compatible',
+            'metal_level': 'Metal Level',
+            'plan_deductible': 'Individual deductible (in network)'
+          }
+        end
+
+        private
+
         helper_method :selected_carrier_level, :plan_design_organization, :carrier_profile, :carriers_cache, :kind
 
         def selected_carrier_level
@@ -53,12 +58,16 @@ module SponsoredBenefits
         end
 
         def carriers_cache
-          @carriers_cache ||= ::CarrierProfile.all.inject({}){|carrier_hash, carrier_profile| carrier_hash[carrier_profile.id] = carrier_profile.legal_name; carrier_hash;}
+          @carriers_cache ||= ::CarrierProfile.all.inject({}) do |carrier_hash, carrier_profile|
+            carrier_hash[carrier_profile.id] = carrier_profile.legal_name
+            carrier_hash
+          end
         end
 
         def kind
           params[:kind]
         end
+      end
     end
   end
 end
