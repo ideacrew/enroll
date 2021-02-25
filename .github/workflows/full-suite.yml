@@ -116,7 +116,7 @@ jobs:
       - name: compile assets
         run: bundle exec rake assets:precompile
   engines:
-    needs: [rubocop, brakeman]
+    needs: [rubocop, view_linter]
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -181,7 +181,7 @@ jobs:
           bundle config path ../../vendor/bundle
           bundle exec rspec --fail-fast
   benefit-sponsors:
-    needs: [rubocop, brakeman]
+    needs: [rubocop, view_linter]
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -237,7 +237,7 @@ jobs:
           bundle config path ../../vendor/bundle
           rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
   rspec:
-    needs: [rubocop, brakeman]
+    needs: [rubocop, view_linter]
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -283,7 +283,7 @@ jobs:
           TEST_BOOSTERS_RSPEC_TEST_FILE_PATTERN: '{spec,components/benefit_markets,components/benefit_sponsors,components/notifier,components/sponsored_benefits,components/transport_gateway,components/transport_profiles}/**/*_spec.rb'
         run: rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
   cucumber:
-    needs: [rubocop, brakeman]
+    needs: [rubocop, view_linter]
     runs-on: ubuntu-latest
     strategy:
       matrix:
