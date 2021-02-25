@@ -73,8 +73,8 @@ RSpec.describe FinancialAssistance::DeductionsController, dbclean: :after_each, 
                              applicant_id: applicant.id,
                              deduction: {amount: "$200.00",
                                          frequency_kind: "biweekly",
-                                         start_on: Date.new(Date.today.year, 1, 1),
-                                         end_on: Date.new(Date.today.year, 12, 31),
+                                         start_on: TimeKeeper.datetime_of_record.beginning_of_year,
+                                         end_on: TimeKeeper.datetime_of_record.end_of_year,
                                          kind: "student_loan_interest"}}, format: :js
       expect(response.status).to eq(200)
     end
