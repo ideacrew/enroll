@@ -45,7 +45,8 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   #TODO: FIX me to refactor hard coded rating area
   def premium_for(member)
     (::BenefitMarkets::Products::ProductRateCache.lookup_rate(__getobj__, schedule_date, age_of(member), "R-#{Settings.aca.state_abbreviation.upcase}001") * large_family_factor(member)).round(2)
-  rescue 0
+  rescue StandardError => e
+    return 0
   end
 
   def employer_contribution_for(_member)
