@@ -18,14 +18,16 @@
 %is_medicare_eligible= applicant.is_medicare_eligible
 - unless applicant.is_physically_disabled.nil? || !applicant.is_applying_coverage?
   %is_physically_disabled= applicant.is_physically_disabled
-- unless applicant.is_student.nil? || !applicant.is_applying_coverage?
-  %is_student= applicant.is_student
-- unless applicant.student_kind.blank? || !applicant.is_applying_coverage?
-  %student_type= "urn:openhbx:terms:v1:student##{applicant.student_kind.downcase.gsub(" ","_")}"
-- unless applicant.student_school_kind.blank? || !applicant.is_applying_coverage?
-  %school_type= "urn:openhbx:terms:v1:student_school##{applicant.student_school_kind.downcase.gsub(" ","_")}"
-- if applicant.student_status_end_on.present? && applicant.is_applying_coverage?
-  %student_status_end_on= simple_date_for(Time.strptime(applicant.student_status_end_on,'%m/%d/%Y'))
+- if applicant.is_applying_coverage
+  - unless applicant.is_student.nil?
+    %is_student= applicant.is_student
+    - if applicant.is_student
+      - unless applicant.student_kind.blank?
+        %student_type= "urn:openhbx:terms:v1:student##{applicant.student_kind.downcase.gsub(" ","_")}"
+      - unless applicant.student_school_kind.blank?
+        %school_type= "urn:openhbx:terms:v1:student_school##{applicant.student_school_kind.downcase.gsub(" ","_")}"
+      - if applicant.student_status_end_on.present?
+        %student_status_end_on= simple_date_for(Time.strptime(applicant.student_status_end_on,'%m/%d/%Y'))
 - unless applicant.is_ia_eligible.nil?
   %is_ia_eligible= applicant.is_ia_eligible
 - unless applicant.is_medicaid_chip_eligible.nil?
