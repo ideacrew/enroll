@@ -39,7 +39,7 @@ module Entities
         end
 
         def insured_role
-          active_roles.find {|role| ['consumer', 'resident', 'employee'].include?(role.kind)}
+          active_roles.find {|role| ['consumer', 'resident', 'employee'].include?(role.kind.downcase)}
         end
 
         def active_non_insured_roles
