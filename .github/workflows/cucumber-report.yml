@@ -1,5 +1,6 @@
 name: cucumber report
 on:
+  push:
   workflow_dispatch:
 
 jobs:
@@ -27,9 +28,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v2
         with:
-          node-version: '10'
+          node-version: '12'
       - uses: wbari/start-mongoDB@v0.2
         with:
           mongoDBVersion: '3.6'
@@ -50,9 +51,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-node_modules-v12-${{ hashFiles('yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
+            ${{ runner.os }}-node_modules-v12-${{ hashFiles('yarn.lock') }}
       - name: Install node dependencies
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: yarn install
@@ -60,3 +61,8 @@ jobs:
         run: NODE_ENV=test RAILS_ENV=test ./bin/webpack
       - name: Run tests
         run: bundle exec cucumber features/${{ matrix.feature }} --format json --out ci/cucumber/${{ matrix.feature }}-cucumber-report.json
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.feature }}
+          path: ci/cucumber/${{ matrix.feature }}-cucumber-report.json
