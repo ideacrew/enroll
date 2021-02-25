@@ -227,7 +227,7 @@ jobs:
           NODE_ENV=test RAILS_ENV=test ./bin/webpack
       - name: test engine
         env:
-          RSPEC_SPLIT_CONFIGURATION_PATH: '../../ci/engines/benefit-sponsors/rspec-split-config.json'
+          RSPEC_SPLIT_CONFIGURATION_PATH: 'ci/engines/benefit-sponsors/rspec-split-config.json'
           TEST_BOOSTERS_RSPEC_TEST_FILE_PATTERN: '{components/benefit_sponsors}/**/*_spec.rb'
         run: |
           cd components/benefit_sponsors
