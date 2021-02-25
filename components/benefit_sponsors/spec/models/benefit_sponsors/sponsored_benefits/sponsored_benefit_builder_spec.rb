@@ -1,7 +1,7 @@
 require 'rails_helper'
 
-module BenefitSponsors
-  RSpec.describe SponsoredBenefits::SponsoredBenefitBuilder, type: :model, :dbclean => :after_each do
-    pending "add some examples to (or delete) #{__FILE__}"
+RSpec.describe BenefitSponsors::SponsoredBenefits::SponsoredBenefitBuilder, type: :model, :dbclean => :after_each do
+  it "should exist as a class" do
+    expect(BenefitSponsors::SponsoredBenefits::SponsoredBenefitBuilder.new).to be_truthy
   end
 end
