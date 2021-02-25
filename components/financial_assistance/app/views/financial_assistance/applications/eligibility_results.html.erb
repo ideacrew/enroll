@@ -34,7 +34,7 @@
         <%if eligible_applicants(params[:id], :is_ia_eligible).present?%>
           <div class="er-phi mt-20">
             <div class="er-title">
-              <h3>Your Application for Premium Reductions</h3>
+              <h3><%= l10n("faa.review_eligibility_header") %></h3>
             </div>
             <div class="border-bottom-2px"></div>
             <div class="er-medicaid-prsn">
