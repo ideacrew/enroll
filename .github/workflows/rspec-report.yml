@@ -85,7 +85,6 @@ jobs:
           [
             'benefit_markets',
             'benefit_sponsors',
-            'financial_assistance',
             'notifier',
             'sponsored_benefits',
             'transport_gateway',
