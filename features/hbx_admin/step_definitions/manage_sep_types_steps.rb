@@ -729,27 +729,50 @@ When(/(.*) click on the (.*) Sep Type$/) do |_user, _qle|
   find('.qles-panel #carousel-qles .item.active').find_all('p.no-op').last.click
 end
 
-Then(/^\w+ should (.*) input field to enter the Sep Type date$/) do |action|
+Then(/^\w+ should (.*) input field to enter the Sep Type date of event$/) do |action|
+  qle_date_input = page.all('input').detect { |input| input[:id] == 'qle_date' }
   if action == 'see'
-    expect(page).to have_content("Date of domestic partnership")
+    if qle_date_input
+      expect(qle_date_input.present?).to eq(true)
+    else
+      expect(page).to have_content("Based on the information you entered, you may be eligible to enroll now but there is limited time.")
+    end
   else
-    expect(page).not_to have_content("Date of domestic partnership")
+    expect(page).not_to have_content("Please Select Effective Date")
+    expect(qle_date_input.blank?).to eq(true)
     expect(page).to have_content("Based on the information you entered, you may be eligible for a special enrollment period. Please call us at 1-855-532-5465 to give us more information so we can see if you qualify.")
   end
 end
 
-And(/^\w+ fill in QLE date (.*) the range eligiblity date period$/) do |date|
+And(/^user visits the families home page$/) do
+  visits "families/home"
+end
+
+And(/^\w+ fill in QLE event (.*) date (.*) the range eligiblity date period$/) do |qle_title, date|
+  qlek = QualifyingLifeEventKind.find_by(title: qle_title)
   if date == 'outside'
-    fill_in "qle_date", with: (TimeKeeper.date_of_record - 3.months).strftime('%m/%d/%Y').to_s
+    fill_in "qle_date", with: (TimeKeeper.date_of_record - 7.months).strftime('%m/%d/%Y').to_s
   else
-    fill_in "qle_date", with: TimeKeeper.date_of_record.next_month.strftime('%m/%d/%Y').to_s
+    if qlek.effective_on_kinds.include?('fixed_first_of_next_month')
+      event_date = TimeKeeper.date_of_record.beginning_of_month.strftime('%m/%d/%Y').to_s
+    else
+      event_date = TimeKeeper.date_of_record.next_month.strftime('%m/%d/%Y').to_s
+    end
+    fill_in "qle_date", with: event_date
   end
+  # To close the datepicker field
+  find('body').click
 end
 
 And(/^\w+ should see QLE date filled and clicks continue$/) do
   expect(find('#qle_date').value.present?).to eq true
-  within '#qle-date-chose' do
-    find('.interaction-click-control-continue').click
+  based_on_eligibility_continue = page.all('input').detect { |input| input[:value] == 'Continue' }
+  if based_on_eligibility_continue.present?
+    based_on_eligibility_continue.click
+  else
+    within '#qle-date-chose' do
+      find('.interaction-click-control-continue').click
+    end
   end
 end
 
