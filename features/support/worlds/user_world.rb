@@ -137,6 +137,10 @@ When(/^the user clicks Action for a person on families index page$/) do
   find('.dropdown.pull-right', text: 'Actions').click
 end
 
+When(/^the user clicks Action for that Employer$/) do
+  find('.dropdown.pull-right', text: 'Actions').click
+end
+
 Then(/^the user will see the Extend Open Enrollment button$/) do
   expect(page).to have_css('.btn.btn-xs', text: 'Extend Open Enrollment')
 end
