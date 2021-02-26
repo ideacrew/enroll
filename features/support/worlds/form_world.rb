@@ -199,6 +199,6 @@ And(/^user (.*?) fills out personal information form$/) do |named_person|
   fill_in 'jq_datepicker_ignore_person[dob]', :with => person[:dob]
   fill_in 'person[ssn]', :with => person[:ssn]
   find(:xpath, '//label[@for="radio_male"]').click
-  screenshot("register")
+  # screenshot("register")
   find('.btn', text: 'CONTINUE').click
 end

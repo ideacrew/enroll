@@ -99,7 +99,7 @@ And(/^the user fills the the add member form/) do
   find(:xpath, '//label[@for="dependent_naturalized_citizen_false"]').click
   find(:xpath, '//label[@for="indian_tribe_member_no"]').click
   find(:xpath, '//label[@for="radio_incarcerated_no"]').click
-  screenshot("add_member")
+  # screenshot("add_member")
   all(:css, ".mz").last.click
   expect(page).to have_content("#{l10n('family_information')}")
 end
