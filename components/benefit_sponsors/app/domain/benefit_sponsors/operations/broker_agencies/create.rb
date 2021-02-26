@@ -100,7 +100,7 @@ module BenefitSponsors
           # Broker Role Vs Broker Agency Staff Role
           if person_id.blank?
             # TODO: Create or match person
-            Success(true)
+            Failure({:message => 'Unable to create General Agency Staff role. No Person given'})
           else
             result = BenefitSponsors::Operations::BrokerAgencies::AddBrokerAgencyStaff.new.call(staff_role_params.merge!(profile_id: @profile.id.to_s, person_id: person_id))
             if result.success?
@@ -108,11 +108,11 @@ module BenefitSponsors
               person = result.value![:person]
 
               person.broker_role = ::BrokerRole.new({
-                :provider_kind => 'broker',
-                :npn => staff_role_params[:npn],
-                :benefit_sponsors_broker_agency_profile_id => @profile.id,
-                :market_kind => staff_role_params[:market_kind]
-              })
+                                                      :provider_kind => 'broker',
+                                                      :npn => staff_role_params[:npn],
+                                                      :benefit_sponsors_broker_agency_profile_id => @profile.id,
+                                                      :market_kind => staff_role_params[:market_kind]
+                                                    })
 
               @profile.office_locations.each do  |office_location|
                 person.phones.push(Phone.new(office_location.phone.attributes.except("_id")))

@@ -92,7 +92,7 @@ class GeneralAgencyStaffRole
   end
 
   def send_invitation
-    Invitation.invite_general_agency_staff!(self)
+    Invitation.invite_general_agency_staff!(self) if person.user.blank?
   end
 
   def current_state

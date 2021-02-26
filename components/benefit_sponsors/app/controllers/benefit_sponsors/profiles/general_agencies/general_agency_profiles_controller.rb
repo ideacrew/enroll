@@ -27,6 +27,7 @@ module BenefitSponsors
           authorize User, :add_roles?
           @person_id = params[:person_id]
           @agency = BenefitSponsors::Operations::GeneralAgencies::New.new.call({person_id: params[:person_id], profile_type: params[:profile_type], regitration_params: registration_params}).value!
+          @staff_member = BenefitSponsors::Operations::GeneralAgencies::Forms::NewGeneralAgencyStaff.new.call({id: params[:person_id]}).value!
           respond_to do |format|
             format.html
           end
