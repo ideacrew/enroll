@@ -44,15 +44,13 @@ module FinancialAssistance
     def update
       if params[:applicant].present?
         @applicant.update_attributes!(permit_params(params[:applicant]))
-        redirect_to edit_application_path(@application)
       else
         @applicant = FinancialAssistance::Forms::Applicant.new(params.require(:applicant).permit(*applicant_parameters))
         @applicant.application_id = params[:application_id]
         @applicant.applicant_id = params[:id]
         @applicant.save
-
-        redirect_to edit_application_path(@application)
       end
+      redirect_to edit_application_path(@application)
     end
 
     def other_questions
