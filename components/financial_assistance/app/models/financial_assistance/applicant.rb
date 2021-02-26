@@ -558,8 +558,7 @@ module FinancialAssistance
     end
 
     def i766
-      # vlp_subject == 'I-766 (Employment Authorization Card)' && alien_number.present? && card_number.present? && expiration_date.present?
-      vlp_subject == 'I-766 (Employment Authorization Card)' && receipt_number.present? && expiration_.present?
+      vlp_subject == 'I-766 (Employment Authorization Card)' && alien_number.present? && card_number.present? && expiration_date.present?
     end
 
     def mac_read_i551
