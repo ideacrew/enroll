@@ -1,5 +1,6 @@
 name: cucumber report
 on:
+  push:
   workflow_dispatch:
 
 jobs:
@@ -59,7 +60,7 @@ jobs:
       - name: run webpack
         run: NODE_ENV=test RAILS_ENV=test ./bin/webpack
       - name: Run tests
-        run: bundle exec cucumber features/${{ matrix.feature }} --format json --out ci/cucumber/${{ matrix.feature }}-cucumber-report.json
+        run: bundle exec cucumber features/${{ matrix.feature }} --out ci/cucumber/${{ matrix.feature }}-cucumber-report.json --profile gh-report
       - name: Upload build artifact
         uses: actions/upload-artifact@v2
         with:
