@@ -48,7 +48,7 @@ And(/^all data should be presented as previously entered$/) do
     expect(find('#has_other_income_false')).to be_checked
   elsif page.has_css?('h2', text: 'Income Adjustments')
     expect(find("#has_deductions_true")).to be_checked
-    expect(find(:css, "#deduction_kind[value='alimony_paid']")).to be_checked
+    expect(find(:css, "#deduction_kind[value='moving_expenses']")).to be_checked
   elsif page.has_css?('h2', text: 'Health Coverage')
     expect(find("#has_enrolled_health_coverage_false")).to be_checked
     expect(find("#has_eligible_health_coverage_false")).to be_checked
