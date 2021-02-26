@@ -22,52 +22,13 @@ RSpec.describe FinancialAssistance::DeductionsController, dbclean: :after_each, 
                       need_help_paying_bills: false,
                       family_member_id: family_member_id)
   end
-  let(:financial_assistance_applicant_valid) do
-    {
-      "is_ssn_applied" => "false",
-      "non_ssn_apply_reason" => "we",
-      "is_pregnant" => "false",
-      "pregnancy_due_on" => "",
-      "children_expected_count" => "",
-      "is_post_partum_period" => "false",
-      "pregnancy_end_on" => "09/21/2017",
-      "is_former_foster_care" => "false",
-      "foster_care_us_state" => "",
-      "age_left_foster_care" => "",
-      "is_student" => "false",
-      "student_kind" => "",
-      "student_status_end_on" => "",
-      "student_school_kind" => "",
-      "is_self_attested_blind" => "false",
-      "has_daily_living_help" => "false",
-      "need_help_paying_bills" => "false"
-    }
-  end
-  let(:financial_assistance_applicant_invalid) do
-    {
-      "is_required_to_file_taxes" => nil,
-      "is_claimed_as_tax_dependent" => nil
-    }
-  end
-  let(:applicant_params) do
-    {
-      "is_required_to_file_taxes" => true,
-      "is_claimed_as_tax_dependent" => false,
-      "has_job_income" => "false",
-      "has_self_employment_income" => "false",
-      "has_other_income" => "false",
-      "has_deductions" => "false",
-      "has_enrolled_health_coverage" => "false",
-      "has_eligible_health_coverage" => "false"
-    }
-  end
 
   before do
     sign_in(user)
   end
 
   context "POST create" do
-    it "should create with valid params" do
+    before do
       @applicant = applicant
       post :create, params: {application_id: application.id,
                              applicant_id: applicant.id,
@@ -76,6 +37,9 @@ RSpec.describe FinancialAssistance::DeductionsController, dbclean: :after_each, 
                                          start_on: "1/1/#{TimeKeeper.datetime_of_record.year}",
                                          end_on: "12/31/#{TimeKeeper.datetime_of_record.year}",
                                          kind: "student_loan_interest"}}, format: :js
+    end
+
+    it "should create with valid params" do
       expect(response.status).to eq(200)
     end
   end
