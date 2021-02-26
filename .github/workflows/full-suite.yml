@@ -185,7 +185,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        group: [1, 2, 3, 4, 5, 6]
+        group: [1, 2, 3, 4]
     steps:
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
