@@ -90,7 +90,6 @@ jobs:
             'sponsored_benefits',
             'transport_gateway',
             'transport_profiles',
-            'ui_helpers',
           ]
     runs-on: ubuntu-latest
     steps:
