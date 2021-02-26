@@ -22,11 +22,10 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
   context 'i766' do
     context 'valid i766 document exists' do
       before do
-        applicant.update_attributes({
-          vlp_subject: 'I-766 (Employment Authorization Card)',
-          alien_number: '1234567890',
-          card_number: 'car1234567890',
-          expiration_date: Date.today})
+        applicant.update_attributes({vlp_subject: 'I-766 (Employment Authorization Card)',
+                                     alien_number: '1234567890',
+                                     card_number: 'car1234567890',
+                                     expiration_date: Date.today})
       end
 
       it 'should return true for i766' do
