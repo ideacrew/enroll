@@ -13,7 +13,7 @@ Feature: Admin plan shopping via SEP
     Then the Admin is navigated to the Families screen
     And I click the name of Patrick Doe from family list
     And I should see the individual home page
-    And I click individual QLE events in QLE carousel
+    And I click Individual QLE events in QLE carousel
     When I click the "Had a baby" in qle carousel
     And I select a past qle date
     Then I should see confirmation and continue
