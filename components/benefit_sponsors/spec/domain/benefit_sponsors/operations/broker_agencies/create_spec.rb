@@ -17,7 +17,7 @@ RSpec.describe BenefitSponsors::Operations::BrokerAgencies::Create, dbclean: :af
             :first_name => person.first_name,
             :last_name => person.last_name,
             :dob => person.dob.to_s,
-            :email => person.work_email_or_best,
+            :email => 'test@test.com',
             :npn => "2983479237",
             :profile_type => "broker_agency"
           }
