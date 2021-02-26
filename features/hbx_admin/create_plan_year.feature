@@ -47,7 +47,6 @@ Feature: Create Benefit Application by admin UI
       | Enrolled              | binder_paid           | Enrolled                          | Existing plan year with overlapping coverage exists |
       | Active                | active                | Active                            | Existing plan year with overlapping coverage exists |
 
-  @flaky
   Scenario: Creating New Plan Year while application is in termination_pending aasm_state
     And renewal employer ABC Widgets has active and renewal draft benefit applications
     Given that a user with a HBX staff role with HBX staff subrole exists and is logged in
