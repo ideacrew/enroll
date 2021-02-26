@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# This world should contain useful steps for specing out data related to the individual market
 module ConsumerWorld
   def create_or_return_named_consumer(named_person)
     person = people[named_person]
@@ -26,7 +29,6 @@ module ConsumerWorld
     person_rec = create_or_return_named_consumer(named_person)
     return person_rec if person_rec && person_rec&.primary_family&.hbx_enrollments&.individual_market&.enrolled.present?
     consumer_role = FactoryBot.create(:consumer_role, person: person_rec)
-    # In case it gets ussed
     # For verification
     consumer_role.vlp_documents << FactoryBot.build(:vlp_document)
     consumer_role.save!
