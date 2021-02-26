@@ -277,7 +277,7 @@ Then(/^\w+ should see identity verification page and clicks on submit/) do
 end
 
 Then(/\w+ should be on the Help Paying for Coverage page/) do
-  expect(page).to have_content("Help Paying for Coverage")
+  expect(page).to have_content("Your Application for Premium Reductions")
 end
 
 Then(/\w+ does not apply for assistance and clicks continue/) do
