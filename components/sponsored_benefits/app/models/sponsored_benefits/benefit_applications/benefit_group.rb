@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 # rubocop:disable Metrics/ClassLength
+# rubocop:disable Style/FormatStringToken
 module SponsoredBenefits
   module BenefitApplications
     #BenefitGroup for Broker quoting tool
@@ -97,21 +98,21 @@ module SponsoredBenefits
                 allow_blank: false,
                 inclusion: {
                   in: PLAN_OPTION_KINDS,
-                  message: "%<value> is not a valid plan option kind"
+                  message: "%{value} is not a valid plan option kind"
                 }
 
       validates :effective_on_kind,
                 allow_blank: false,
                 inclusion: {
                   in: EFFECTIVE_ON_KINDS,
-                  message: "%<value> is not a valid effective date kind"
+                  message: "%{value} is not a valid effective date kind"
                 }
 
       validates :effective_on_offset,
                 allow_blank: false,
                 inclusion: {
                   in: OFFSET_KINDS,
-                  message: "%<value> is not a valid effective date offset kind"
+                  message: "%{value} is not a valid effective date offset kind"
                 }
 
       validate :plan_integrity
@@ -895,4 +896,5 @@ module SponsoredBenefits
     end
   end
 end
+# rubocop:enable Style/FormatStringToken
 # rubocop:enable Metrics/ClassLength
