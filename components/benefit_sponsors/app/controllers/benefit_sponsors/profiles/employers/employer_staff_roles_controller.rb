@@ -65,7 +65,7 @@ module BenefitSponsors
 
         def create_staff_member
           authorize User, :add_roles?
-          result = BenefitSponsors::Operations::Employers::AddEmployerStaff.new.call(staff_member_params.merge(dob: parse_date(staff_member_params['dob'])))
+          result = EnrollRegistry[:employer_staff_registration] { staff_member_params.merge(dob: parse_date(staff_member_params['dob'])) }
           # add redirects
           if result.success?
             flash[:notice] = result.value![:message]

@@ -17,7 +17,7 @@ module BenefitSponsors
           result = if terminated_staff.present?
                      yield move_staff_to_pending(terminated_staff)
                    else
-                     broker_staff_entity = yield create_broker_staff_record
+                     broker_staff_entity = yield create_broker_staff_record(values[:npn])
                      yield persist(broker_staff_entity)
                    end
 
@@ -72,8 +72,8 @@ module BenefitSponsors
           result.to_result.failure? ? Failure({:message => 'Unable to move existing staff role from terminated to pending'}) : result.to_result.value!
         end
 
-        def create_broker_staff_record
-          BenefitSponsors::Operations::BrokerAgencies::BrokerAgencyStaffRoles::Create.new.call(profile: @profile)
+        def create_broker_staff_record(npn)
+          BenefitSponsors::Operations::BrokerAgencies::BrokerAgencyStaffRoles::Create.new.call(profile: @profile, npn: npn)
         end
 
         def persist(broker_entity)

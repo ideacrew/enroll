@@ -17,7 +17,7 @@ module BenefitSponsors
           result = if terminated_staff.present?
                      yield  move_staff_to_pending(terminated_staff)
                    else
-                     ga_staff_entity = yield create_ga_staff_record
+                     ga_staff_entity = yield create_ga_staff_record(values[:npn] || @profile&.general_agency_primary_staff&.npn)
                      yield persist(ga_staff_entity)
                    end
 
@@ -27,7 +27,7 @@ module BenefitSponsors
         private
 
         def validate_params(params)
-          result = BenefitSponsors::Validators::BrokerAgencies::BrokerAgencyStaffRoles::AddBrokerStaffRoleContract.new.call(params)
+          result = BenefitSponsors::Validators::GeneralAgencies::GeneralAgencyStaffRoles::AddGeneralAgencyStaffRoleContract.new.call(params)
           if result.success?
             Success(result.to_h)
           else
@@ -72,8 +72,8 @@ module BenefitSponsors
           result.to_result.failure? ? Failure({:message => 'Unable to move existing staff role from terminated to pending'}) : result.to_result.value!
         end
 
-        def create_ga_staff_record
-          BenefitSponsors::Operations::GeneralAgencies::GeneralAgencyStaffRoles::Create.new.call(profile: @profile)
+        def create_ga_staff_record(npn)
+          BenefitSponsors::Operations::GeneralAgencies::GeneralAgencyStaffRoles::Create.new.call(profile: @profile, npn: npn)
         end
 
         def persist(ga_entity)

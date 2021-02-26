@@ -101,7 +101,7 @@ module BenefitSponsors
             # TODO: Create or match person
             Failure({:message => 'Unable to create General Agency Staff role. No Person given'})
           else
-            result = BenefitSponsors::Operations::BrokerAgencies::AddGeneralAgencuyStaff.new.call(staff_role_params.merge!(profile_id: @profile.id.to_s, person_id: person_id))
+            result = BenefitSponsors::Operations::GeneralAgencies::AddGeneralAgencyStaff.new.call(staff_role_params.merge!(profile_id: @profile.id.to_s, person_id: person_id))
             if result.success?
 
               person = result.value![:person]

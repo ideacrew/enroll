@@ -9,10 +9,10 @@ module BenefitSponsors
         class Create
           include Dry::Monads[:result, :do, :try]
 
-          def call(profile:)
+          def call(profile:, npn: nil)
             return Failure({:message => 'Invalid profile'}) if profile.blank? || !profile.is_a?(BenefitSponsors::Organizations::BrokerAgencyProfile)
 
-            constructed_params = yield construct_params(profile)
+            constructed_params = yield construct_params(profile, npn)
             values = yield validate(constructed_params)
             broker_staff_entity = yield persist(values)
 
@@ -21,9 +21,10 @@ module BenefitSponsors
 
           private
 
-          def construct_params(profile)
+          def construct_params(profile, npn)
             Success({
                       benefit_sponsors_broker_agency_profile_id: profile.id,
+                      npn: npn,
                       aasm_state: 'broker_agency_pending'
                     })
           end

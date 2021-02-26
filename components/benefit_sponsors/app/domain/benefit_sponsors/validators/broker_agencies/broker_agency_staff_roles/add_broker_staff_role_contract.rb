@@ -14,6 +14,7 @@ module BenefitSponsors
             required(:profile_id).filled(:string)
             required(:dob).filled(:date)
             optional(:email).maybe(:string)
+            optional(:npn).maybe(:string)
           end
         end
       end

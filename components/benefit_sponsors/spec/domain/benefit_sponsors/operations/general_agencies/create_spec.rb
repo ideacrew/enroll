@@ -7,15 +7,17 @@ RSpec.describe BenefitSponsors::Operations::GeneralAgencies::Create, dbclean: :a
   describe 'Create' do
 
     let!(:site)  { FactoryBot.create(:benefit_sponsors_site, :with_owner_exempt_organization, :dc, :with_benefit_market) }
+    let(:person) { FactoryBot.create(:person) }
     let(:registration_params) do
       {
         :profile_type => "general_agency",
+        :person_id => person.id.to_s,
         :staff_roles_attributes => {
           :"0" => {
-            :first_name => "test",
-            :last_name => "test",
-            :dob => "11/11/1990",
-            :email => "test@tst.com",
+            :first_name => person.first_name,
+            :last_name => person.last_name,
+            :dob => person.dob.to_s,
+            :email => person.work_email_or_best,
             :npn => "2983479237",
             :profile_type => "general_agency"
           }

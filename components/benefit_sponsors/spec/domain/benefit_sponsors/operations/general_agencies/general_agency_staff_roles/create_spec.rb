@@ -33,7 +33,7 @@ RSpec.describe BenefitSponsors::Operations::GeneralAgencies::GeneralAgencyStaffR
     let!(:general_agency_staff_role) { FactoryBot.create(:general_agency_staff_role, npn: '123456', benefit_sponsors_general_agency_profile_id: ga_profile.id, person: person)}
     it 'should return general agency staff entity' do
       allow(ga_profile).to receive(:general_agency_primary_staff).and_return(general_agency_staff_role)
-      result = subject.call(profile: ga_profile)
+      result = subject.call(profile: ga_profile, npn: general_agency_staff_role.npn)
       expect(result.value!).to be_a BenefitSponsors::Entities::GeneralAgencies::GeneralAgencyStaffRoles::GeneralAgencyStaffRole
     end
   end
