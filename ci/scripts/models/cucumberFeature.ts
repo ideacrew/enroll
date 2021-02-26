@@ -12,6 +12,7 @@ export interface BaseElement {
   name: string;
   description: string;
   line: number;
+  steps: ElementStep[];
 }
 
 export interface BackgroundElement extends BaseElement {
@@ -24,11 +25,10 @@ export interface ScenarioElement extends BaseElement {
   id: string;
   keyword: 'Scenario';
   type: 'scenario';
-  steps: ScenarioStep[];
   after: BaseStep[];
 }
 
-export interface ScenarioStep extends BaseStep {
+export interface ElementStep extends BaseStep {
   keyword: string;
   name: string;
   line: number;

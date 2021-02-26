@@ -45,10 +45,7 @@ async function getJson() {
     './ci/cucumber/insured-cucumber-report.json',
     'utf-8'
   );
-  const integration = await fs.readFile(
-    './ci/cucumber/integration-cucumber-report.json',
-    'utf-8'
-  );
+
   const permissions = await fs.readFile(
     './ci/cucumber/permissions-cucumber-report.json',
     'utf-8'
@@ -70,7 +67,6 @@ async function getJson() {
     hbxAdmin,
     hbx,
     insured,
-    integration,
     permissions,
     planShopping,
   ];
