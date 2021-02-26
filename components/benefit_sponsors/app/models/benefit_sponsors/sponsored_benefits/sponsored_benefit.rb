@@ -137,7 +137,7 @@ module BenefitSponsors
         if product_package.package_kind == :single_issuer
           new_product_package&.products[0]&.issuer_profile_id
         elsif product_package.package_kind == :metal_level
-          product_package&.products[0].&metal_level_kind
+          product_package&.products[0]&.metal_level_kind
         else
           product_option_choice
         end

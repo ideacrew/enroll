@@ -7,6 +7,7 @@ require 'config'
 require 'dry-validation'
 require 'dry-struct'
 require 'dry-monads'
+require 'money-rails'
 
 module SponsoredBenefits
   class << self

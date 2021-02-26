@@ -47,7 +47,6 @@ Feature: Create Benefit Application by admin UI
       | Enrolling             | enrollment_open       | Enrolling                         | Existing plan year with overlapping coverage exists |
       | Enrollment Closed     | enrollment_closed     | Enrollment Closed                 | Existing plan year with overlapping coverage exists |
       | Enrolled              | binder_paid           | Enrolled                          | Existing plan year with overlapping coverage exists |
-      | Enrollment Ineligible | enrollment_ineligible | Enrollment Ineligible             | Existing plan year with overlapping coverage exists |
       | Active                | active                | Active                            | Existing plan year with overlapping coverage exists |
 
   @flaky
