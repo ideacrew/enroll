@@ -354,12 +354,10 @@
                 </div>
               <% end %>
 
-              <% if @cfl_service.displayable_field?('applicant', applicant.id, :is_student) %>
-                <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                  <div class="col-md-6">Is this person a student?</div>
-                  <div class="col-md-6"><%= human_boolean applicant.is_student %></div>
-                </div>
-              <% end %>
+              <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                <div class="col-md-6"><%= l10n('faa.other_ques.is_student') %></div>
+                <div class="col-md-6"><%= human_boolean applicant.is_student %></div>
+              </div>
 
               <!-- Case where the applicant is a student(fields: :student_kind, :student_status_end_on, :student_school_kind) -->
               <% if @cfl_service.displayable_field?('applicant', applicant.id, :student_kind) %>
