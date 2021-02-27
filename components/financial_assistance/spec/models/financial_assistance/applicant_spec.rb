@@ -83,4 +83,24 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       expect(child_applicant.relationship_kind_with_primary).to eq 'child'
     end
   end
+
+  context 'enrolled_in_medicare' do
+    context 'with enrolled medicare benefits' do
+      before do
+        applicant.update_attributes(has_enrolled_health_coverage: true)
+        applicant.benefits << FinancialAssistance::Benefit.new({title: 'Financial Benefit', kind: 'is_enrolled', insurance_kind: 'medicare', start_on: Date.today})
+        applicant.save!
+      end
+
+      it 'should return true enrolled_in_medicare?' do
+        expect(applicant.enrolled_in_medicare?).to eq(true)
+      end
+    end
+
+    context 'without any enrolled medicare benefits' do
+      it 'should return false' do
+        expect(applicant.enrolled_in_medicare?).to eq(false)
+      end
+    end
+  end
 end

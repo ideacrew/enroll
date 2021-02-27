@@ -15,7 +15,7 @@
   %had_prior_insurance= applicant.had_prior_insurance?
 - if applicant.is_applying_coverage?
   %has_state_health_benefit= applicant.has_state_health_benefit?
-%is_medicare_eligible= applicant.is_medicare_eligible
+%is_medicare_eligible= applicant.enrolled_in_medicare?
 - unless applicant.is_physically_disabled.nil? || !applicant.is_applying_coverage?
   %is_physically_disabled= applicant.is_physically_disabled
 - if applicant.is_applying_coverage
