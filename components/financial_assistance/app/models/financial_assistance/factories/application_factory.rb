@@ -32,6 +32,7 @@ module FinancialAssistance
           create_applicant(applicant, new_application)
         end
 
+        create_relationships(new_application, application)
         update_claimed_as_tax_dependent_by(new_application)
 
         new_application
@@ -147,6 +148,22 @@ module FinancialAssistance
         }
       end
 
+      def create_relationships(new_application, application)
+        application.relationships.each do |relationship|
+          new_applicant = fetch_matching_applicant(new_application, relationship.applicant)
+          new_relative = fetch_matching_applicant(new_application, relationship.relative)
+          new_application.update_or_build_relationship(new_applicant, new_relative, relationship.kind)
+          new_application.save!
+        end
+        new_application.save!
+      end
+
+      def fetch_matching_applicant(new_application, old_applicant)
+        search_params = {dob: old_applicant.dob, last_name: old_applicant.last_name, first_name: old_applicant.first_name}
+        search_params[:encrypted_ssn] = old_applicant.encrypted_ssn if old_applicant.ssn.present?
+        new_application.applicants.where(search_params).first
+      end
+
       def old_obj_klass(old_obj)
         return :benefits if old_obj.class == benefit_klass
         return :incomes if old_obj.class == income_klass
@@ -154,7 +171,7 @@ module FinancialAssistance
       end
 
       def reject_application_params
-        %w[_id created_at updated_at submitted_at workflow_state_transitions applicants]
+        %w[_id created_at updated_at submitted_at workflow_state_transitions applicants relationships]
       end
 
       def reject_applicant_params
