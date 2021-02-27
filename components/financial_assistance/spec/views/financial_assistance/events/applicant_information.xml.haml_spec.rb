@@ -104,5 +104,18 @@ RSpec.describe 'components/financial_assistance/app/views/financial_assistance/e
         it {expect(rendered).to match(/student_status_end_on/)}
       end
     end
+
+    context 'is_medicare_eligible' do
+      before do
+        applicant.update_attributes(has_enrolled_health_coverage: true)
+        applicant.benefits << FinancialAssistance::Benefit.new({title: 'Financial Benefit', kind: 'is_enrolled', insurance_kind: 'medicare', start_on: Date.today})
+        applicant.save!
+        render 'financial_assistance/events/applicant_information', applicant: applicant
+      end
+
+      it 'should include is_medicare_eligible tag with true as answer' do
+        expect(rendered).to include("<is_medicare_eligible>true</is_medicare_eligible>")
+      end
+    end
   end
 end
