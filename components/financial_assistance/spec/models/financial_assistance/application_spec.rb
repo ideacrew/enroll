@@ -644,4 +644,43 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       expect(applicant10.is_ia_eligible).to be_truthy
     end
   end
+
+  context 'relationships_complete' do
+    let!(:applicant) do
+      FactoryBot.create(:financial_assistance_applicant,
+                        application: application,
+                        family_member_id: BSON::ObjectId.new,
+                        is_primary_applicant: true)
+    end
+
+    let(:set_up_relationships) do
+      application.ensure_relationship_with_primary(applicant1, 'spouse')
+      application.ensure_relationship_with_primary(applicant2, 'child')
+      application.ensure_relationship_with_primary(applicant3, 'child')
+      application.update_or_build_relationship(applicant1, applicant2, 'parent')
+      application.update_or_build_relationship(applicant2, applicant1, 'child')
+      application.update_or_build_relationship(applicant1, applicant3, 'parent')
+      application.update_or_build_relationship(applicant3, applicant1, 'child')
+      application.build_relationship_matrix
+      application.save!
+    end
+
+    before do
+      set_up_relationships
+      @no_of_applicants = application.applicants.count
+    end
+
+    it 'should return true' do
+      expect(application.relationships_complete?).to eq(true)
+    end
+
+    it 'should create a total of 12 relationships' do
+      expect(application.relationships.count).to eq(@no_of_applicants * (@no_of_applicants - 1))
+    end
+
+    it 'should not create duplicate relationships' do
+      set_up_relationships
+      expect(application.relationships.count).to eq(@no_of_applicants * (@no_of_applicants - 1))
+    end
+  end
 end
