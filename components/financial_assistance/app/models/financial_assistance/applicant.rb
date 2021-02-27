@@ -707,6 +707,12 @@ module FinancialAssistance
       has_job_income || has_self_employment_income || has_other_income
     end
 
+    def relationship_kind_with_primary
+      rel = relationships.where(relative_id: application.primary_applicant.id).first
+      return "self" if rel.nil?
+      rel.kind
+    end
+
     def embedded_document_section_entry_complete?(embedded_document) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity TODO: Remove this
       case embedded_document
       when :income

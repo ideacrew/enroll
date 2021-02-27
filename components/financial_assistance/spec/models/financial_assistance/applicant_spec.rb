@@ -39,4 +39,48 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       end
     end
   end
+
+  context '#relationship_kind_with_primary' do
+    let!(:application) do
+      FactoryBot.create(:application,
+                               family_id: BSON::ObjectId.new,
+                               aasm_state: 'draft',
+                               effective_date: Date.today)
+    end
+
+    let!(:parent_applicant) do
+      FactoryBot.create(:applicant,
+                               application: application,
+                               dob: Date.today - 40.years,
+                               is_primary_applicant: true,
+                               family_member_id: BSON::ObjectId.new)
+    end
+
+    let!(:spouse_applicant) do
+      FactoryBot.create(:applicant,
+                        application: application,
+                        dob: Date.today - 30.years,
+                        is_primary_applicant: false,
+                        family_member_id: BSON::ObjectId.new)
+    end
+
+    let!(:child_applicant) do
+      FactoryBot.create(:applicant,
+                               application: application,
+                               dob: Date.today - 10.years,
+                               is_primary_applicant: false,
+                               family_member_id: BSON::ObjectId.new)
+    end
+
+    before do
+      application.ensure_relationship_with_primary(child_applicant, 'child')
+      application.ensure_relationship_with_primary(spouse_applicant, 'spouse')
+    end
+
+    it 'should return correct relationship kind' do
+      expect(parent_applicant.relationship_kind_with_primary).to eq 'self'
+      expect(spouse_applicant.relationship_kind_with_primary).to eq 'spouse'
+      expect(child_applicant.relationship_kind_with_primary).to eq 'child'
+    end
+  end
 end
