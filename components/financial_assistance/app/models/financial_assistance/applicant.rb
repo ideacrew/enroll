@@ -871,8 +871,8 @@ module FinancialAssistance
       records.collect{|record| record.attributes.except(:_id, :created_at, :updated_at) }
     end
 
-    def enrolled_in_medicare?
-      has_enrolled_health_coverage.present? && benefits.where(kind: 'is_enrolled', insurance_kind: 'medicare').present?
+    def enrolled_or_eligible_in_any_medicare?
+      benefits.any_medicare.present?
     end
 
     class << self
