@@ -96,7 +96,7 @@
                     <td><%= applicant.age_of_the_applicant %></td>
                     <td><%= applicant.gender.humanize %></td>
                     <% unless @all_relationships.empty? %>
-                      <td><%= applicant.relationships.find_by(applicant_id: @application.primary_applicant.id).kind.humanize %></td>
+                      <td><%= applicant.relationship_kind_with_primary.humanize %></td>
                     <% end %>
                     <td><%= applicant.format_citizen if applicant.citizen_status.present? %></td>
                     <td><%= human_boolean applicant.is_incarcerated %></td>
