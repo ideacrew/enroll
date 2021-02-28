@@ -871,6 +871,10 @@ module FinancialAssistance
       records.collect{|record| record.attributes.except(:_id, :created_at, :updated_at) }
     end
 
+    def enrolled_or_eligible_in_any_medicare?
+      benefits.any_medicare.present?
+    end
+
     class << self
       def find(id)
         return nil unless id

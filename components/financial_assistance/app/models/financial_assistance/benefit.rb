@@ -98,6 +98,8 @@ module FinancialAssistance
 
     scope :of_insurance_kind, ->(insurance_kind) { where(insurance_kind: insurance_kind) }
 
+    scope :any_medicare, -> { where(:insurance_kind.in => ['medicare', 'medicare_advantage', 'medicare_part_b']) }
+
     validates_length_of :title,
                         in: TITLE_SIZE_RANGE,
                         allow_nil: true,
