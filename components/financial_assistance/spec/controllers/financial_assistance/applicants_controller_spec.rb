@@ -12,6 +12,7 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
   let!(:hbx_profile) { FactoryBot.create(:hbx_profile,:open_enrollment_coverage_period) }
   let!(:application) { FactoryBot.create(:application, family_id: family_id, aasm_state: "draft",effective_date: TimeKeeper.date_of_record) }
   let!(:applicant) { FactoryBot.create(:applicant, application: application, dob: TimeKeeper.date_of_record - 40.years, is_primary_applicant: true, is_claimed_as_tax_dependent: false, is_self_attested_blind: false, has_daily_living_help: false,need_help_paying_bills: false, family_member_id: family_member_id) }
+
   let(:financial_assistance_applicant_valid) do
     {
       "is_ssn_applied" => "false",
@@ -54,6 +55,13 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
 
   before do
     sign_in(user)
+  end
+
+  context "PATCH update" do
+    it 'does not return errors when params are valid' do
+      patch :update, params: { application_id: application.id, id: applicant.id, financial_assistance_applicant: {first_name: "faa", last_name: "applicant", gender: "female", dob: "1980-01-01", is_applying_coverage: false}}
+      expect(applicant.errors.messages).to be_empty
+    end
   end
 
   context "GET other questions" do

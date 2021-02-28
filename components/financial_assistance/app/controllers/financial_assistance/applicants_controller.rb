@@ -46,12 +46,10 @@ module FinancialAssistance
         @applicant.update_attributes!(permit_params(params[:financial_assistance_applicant]))
         head :ok, content_type: "text/html"
       else
-        unless @applicant.update_attributes!(permit_params(params[:applicant]))
-          @applicant = FinancialAssistance::Forms::Applicant.new(params.require(:applicant).permit(*applicant_parameters))
-          @applicant.application_id = params[:application_id]
-          @applicant.applicant_id = params[:id]
-          @applicant.save
-        end
+        @applicant = FinancialAssistance::Forms::Applicant.new(params.require(:applicant).permit(*applicant_parameters))
+        @applicant.application_id = params[:application_id]
+        @applicant.applicant_id = params[:id]
+        @applicant.save
 
         redirect_to edit_application_path(@application)
       end
