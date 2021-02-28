@@ -5,7 +5,7 @@ nav
     - if display_my_broker?(@person, @employee_role)
       li
         = link_to l10n("my_broker"), main_app.brokers_insured_families_path(tab: 'broker')
-    - if any_members_with_consumer_role?(@family_members)
+    - if display_documents_tab?(@family_members, @person)
       li
         = link_to main_app.verification_insured_families_path(tab: 'verification') do
           = l10n("documents")
