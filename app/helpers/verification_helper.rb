@@ -272,6 +272,11 @@ module VerificationHelper
     raw_request.any? ? Nokogiri::XML(raw_request.first.body) : "no response record"
   end
 
+  def display_documents_tab?(family_members, person)
+    family_members ||= person&.primary_family&.family_members
+    any_members_with_consumer_role?(family_members)
+  end
+
   def any_members_with_consumer_role?(family_members)
     family_members.present? && family_members.map(&:person).any?(&:has_active_consumer_role?)
   end
