@@ -660,3 +660,27 @@ describe '#any_members_with_consumer_role?' do
     expect(helper.any_members_with_consumer_role?([third_family_member])).to eq false
   end
 end
+
+describe '#display_documents_tab?' do
+  let(:first_consumer) {FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
+  let(:resident)  { FactoryBot.create(:person, :with_resident_role, :with_active_resident_role) }
+
+  let(:family) {FactoryBot.create(:family, :with_primary_family_member, person: first_consumer)}
+  let(:resident_member) { FactoryBot.create(:family_member, person: resident, family: family, is_active: true)}
+
+  context 'from IAP engine where family_members as nil' do
+    it 'should return true if any of members in a family have consumer role' do
+      expect(helper.display_documents_tab?(nil, family.primary_person)).to eq true
+    end
+  end
+
+  context 'from EA where person can be nil' do
+    it 'should return true if any of members in a family have consumer role' do
+      expect(helper.display_documents_tab?(family.family_members, nil)).to eq true
+    end
+
+    it 'should return false if no members in a family have consumer role' do
+      expect(helper.display_documents_tab?([resident_member], nil)).to eq false
+    end
+  end
+end
