@@ -138,15 +138,16 @@
           .col-xs-6 style="padding:0;"
             p
               input#elected_aptc onchange="setMinMax(this, #{@max_aptc})" type="text" value="#{number_with_precision(@elected_aptc, precision: 2)}" style="width:100%;"
+              - pct = (@elected_aptc/@max_aptc).round(2)
         = hidden_field_tag :max_aptc, @max_aptc
         = hidden_field_tag :market_kind, @market_kind
         = hidden_field_tag :coverage_kind, @coverage_kind
         = hidden_field_tag :set_elected_aptc_url, set_elected_aptc_insured_plan_shopping_path(id: @hbx_enrollment.try(:id)) if @hbx_enrollment.present?
         form oninput=("pct.value = (elected_pct.value*100).toFixed(0)") onsubmit=("return false")
-          input max="1" min="0" name="elected_pct" step="0.05" type="range" value="0.85" style="padding:0;"
+          input max="1" min="0" name="elected_pct" step="0.05" type="range" value= "#{pct}" style="padding:0;"
           span style="font-size:12px;" 0%
           span.pull-right
-            output name="pct" style="font-size:12px;" 85
+            output name="pct" style="font-size:12px;" =(pct * 100).to_i
             | %
         h6 style="font-weight:400; margin-top:0;" = link_to l10n("how_is_this_calculated") + "?", "", data: {toggle: "modal", target: "#how_is_this_calculated"}
   - if @market_kind == 'individual' || @market_kind == 'coverall' || @sponsored_benefit.try(:product_package_kind) == :single_issuer
