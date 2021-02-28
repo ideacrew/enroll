@@ -184,7 +184,7 @@ module FinancialAssistance
 
       def relationship_validation
         return if relationship.blank?
-        primary_relations = application.relationships.where(applicant_id: application.primary_applicant.id, :kind.in =>['spouse', 'life_partner'])
+        primary_relations = application.relationships.where(applicant_id: application.primary_applicant.id, :kind.in => ['spouse', 'life_partner'])
         if applicant
           other_spouses = primary_relations.reject{ |r| r.relative_id == applicant.id }
           self.errors.add(:base, "can not have multiple spouse or life partner") unless other_spouses.empty?
