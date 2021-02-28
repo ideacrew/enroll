@@ -188,7 +188,7 @@ module FinancialAssistance
         if applicant
           other_spouses = primary_relations.reject{ |r| r.relative_id == applicant.id }
           self.errors.add(:base, "can not have multiple spouse or life partner") unless other_spouses.empty?
-        else if primary_relations.count >= 1
+        elsif primary_relations.count >= 1
           self.errors.add(:base, "can not have multiple spouse or life partner")
         end
       end
