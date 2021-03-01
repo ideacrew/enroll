@@ -260,10 +260,9 @@ end
 And(/(.*) should also see the reason for ineligibility/) do |named_person|
   person_hash = people[named_person]
   person = person_hash ? Person.where(:first_name => /#{person_hash[:first_name]}/i, :last_name => /#{person_hash[:last_name]}/i).first : ''
-  person = person.empty? ? @person : ''
-  role = named_person
+  person = person.present? ? person : @person
 
-  if role == 'employee' && person.active_employee_roles.present?
+  if person.active_employee_roles.present?
     expect(page).to have_content "Employer sponsored coverage is not available"
   else
     expect(page).to have_content "eligibility failed on family_relationships"
@@ -304,16 +303,16 @@ end
 
 Then(/(.*) should see primary person/) do |role|
   primary = Person.all.select { |person| person.primary_family.present? }.first
-  expect(page).to have_content "Coverage For:   #{primary.first_name}"
+  expect(page).to have_content("Covered: #{primary.first_name}", wait: 10)
 end
 
 Then(/(.*) should see the enrollment with make changes button/) do |role|
   if role == "employee"
-    expect(page).to have_content "#{(@current_effective_date || TimeKeeper.date_of_record).year} HEALTH COVERAGE"
+    expect(page).to have_content("#{(@current_effective_date || TimeKeeper.date_of_record).year} HEALTH COVERAGE", wait: 10)
   else
-    expect(page).to have_content "#{TimeKeeper.date_of_record.year} HEALTH COVERAGE"
+    expect(page).to have_content("#{TimeKeeper.date_of_record.year} HEALTH COVERAGE", wait: 10)
   end
-  expect(page).to have_link "Make Changes"
+  expect(page).to have_link("Make Changes", wait: 10)
 end
 
 Then(/(.*) should see the dental enrollment with make changes button/) do |role|
@@ -535,7 +534,7 @@ end
 
 Then(/(.*) should see the make changes page/) do |_role|
   wait_for_ajax
-  expect(page).to have_text('Tax credit amount')
+  expect(page).to have_content('Tax credit amount', wait: 10)
 end
 
 When(/(.*) clicks on the Cancel Plan button/) do |_role|
@@ -665,7 +664,7 @@ end
 
 Then(/the Change Tax Credit button should be available/) do
   sleep(2)
-  expect(page).to have_content("Change Tax Credit")
+  expect(page).to have_content("Change Tax Credit", wait: 10)
 end
 
 Then(/the Change Tax Credit button should NOT be available/) do
@@ -673,6 +672,7 @@ Then(/the Change Tax Credit button should NOT be available/) do
 end
 
 When(/the user clicks on the Change Tax Credit button/) do
+  expect(page).to have_content("Change Tax Credit", wait: 10)
   find("#aptc-button").click
 end
 

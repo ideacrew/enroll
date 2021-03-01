@@ -272,7 +272,7 @@ class Insured::GroupSelectionController < ApplicationController
         end
 
         set_change_plan
-        build_shop_enrollment(permitted_group_selection_params)
+        build_shop_enrollment(permitted_group_selection_params, family_member_ids, @change_plan, @employee_role)
       end
     when 'individual'
       @adapter.coverage_household.household.new_hbx_enrollment_from(
@@ -291,17 +291,19 @@ class Insured::GroupSelectionController < ApplicationController
     end
   end
 
-  def build_shop_enrollment(permitted_group_selection_params)
+  def build_shop_enrollment(permitted_group_selection_params, family_member_ids, change_plan, employee_role)
+    return unless employee_role.present?
+
     if @adapter.is_waiving?(permitted_group_selection_params)
       if @adapter.previous_hbx_enrollment.present?
-        @adapter.build_change_shop_waiver_enrollment(@employee_role, @change_plan, permitted_group_selection_params)
+        @adapter.build_change_shop_waiver_enrollment(employee_role, change_plan, permitted_group_selection_params)
       else
-        @adapter.build_new_shop_waiver_enrollment(@employee_role)
+        @adapter.build_new_shop_waiver_enrollment(employee_role)
       end
     elsif @adapter.previous_hbx_enrollment.present?
-      @adapter.build_shop_change_enrollment(@employee_role, @change_plan, family_member_ids)
+      @adapter.build_shop_change_enrollment(employee_role, change_plan, family_member_ids)
     else
-      @adapter.build_new_shop_enrollment(@employee_role, family_member_ids)
+      @adapter.build_new_shop_enrollment(employee_role, family_member_ids)
     end
   end
 
