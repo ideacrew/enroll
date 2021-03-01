@@ -120,7 +120,7 @@ module BenefitSponsors
       end
 
       def registration_params
-        current_user_id = Person.find(params[:person_id]).user&.id if params[:manage_portals] && params[:person_id]
+        current_user_id = Person.find(params[:person_id]).user&.id if params[:manage_portals].to_s == 'true' && params[:person_id].present?
         current_user_id ||= current_user.present? ? current_user.id : nil
         params[:agency] ||= {}
         agency_params = params.permit(agency: {})

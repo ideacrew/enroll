@@ -31,3 +31,6 @@ registry:
       - key: :cancel_renewals_for_term
         item: Operations::Individual::CancelRenewalEnrollment.new
         is_enabled: true
+      - key: :hub_ivl_registration
+        item: :consumer_role
+        is_enabled: true

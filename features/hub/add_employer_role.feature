@@ -27,8 +27,6 @@ Feature: Any Person with User account should be able to add employer role
     Then person should see a pop up with text What Do You Want To Do?
     And person should see a link to add EmployerStaff role
     And person clicks on EMPLOYER text
-    Then person should see a pop up with text Include the Employee Roster?
-    And person clicks the radio buttton Yes and click Continue
     Then person should be redirected to Employer Registration page
     And person filled all the fields in the employer information form
     Then person should see the Add Office Location button

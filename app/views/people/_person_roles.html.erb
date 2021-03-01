@@ -3,7 +3,7 @@
 <div class="container no-pd">
   <div class="mt-1 no-pd">
     <%#= link_to "Add Account", available_accounts_person_path(id: @person.id), class: "btn btn-outline-primary" unless @available_roles.admin_roles.present? || @available_roles.resident_roles.present? %>
-    <% unless @available_roles.admin_roles.present? || @available_roles.resident_roles.present? %>
+    <% if ::EnrollRegistry.feature_enabled?(:manage_account_functionality) && @available_roles.admin_roles.blank? %>
       <button type="button" class= "btn btn-outline-primary" data-toggle="modal" data-target="#addAccount">
         <%= l10n("hub.home_page.add_account") %>
       </button>
@@ -20,7 +20,7 @@
             <div class='modal-options'>
               <p><%= l10n("hub.home_page.add_account.modal.description") %> <strong><%= l10n("hub.home_page.title") %></strong></p>
 
-              <% if @available_roles.consumer_role.blank? %>
+              <% if ::EnrollRegistry.feature_enabled?(:hub_ivl_registration) && @available_roles.consumer_role.blank? && @available_roles.resident_roles.blank? %>
                 <div class="d-flex flex-row bg-white hub-item-flex-shadow ivl-card" data-toggle="modal" data-target="#addIvlAccount" data-dismiss="modal">
                   <div class="col-2">
                     <i class="fas fa-users fa-3x"></i>
@@ -36,7 +36,7 @@
                 </div>
               <% end %>
 
-              <% if @available_roles.employee_role.blank? %>
+              <% if ::EnrollRegistry.feature_enabled?(:employee_registration) && @available_roles.employee_role.blank? %>
                 <%= link_to main_app.privacy_insured_employee_index_path(person_id: @person.id) do %>
                   <div class="d-flex flex-row bg-white hub-item-flex-shadow employee-card">
                     <div class="col-2">
@@ -54,44 +54,53 @@
                 </div>
               <% end %>
 
-              <div class="d-flex flex-row bg-white hub-item-flex-shadow employer-card" data-toggle="modal" data-target="#addEmployerAccount" data-dismiss="modal">
-                <div class="col-2">
-                  <i class="fas fa-home fa-3x"></i>
-                </div>
-                <div class="col-10">
-                  <div class=""><strong class='label-color'><%= l10n("hub.home_page.add_account.modal.employer_title") %></strong></div>
-                  <div class=""><small><%= l10n("hub.home_page.add_account.modal.employer_description") %></small></div>
-                </div>
-              </div>
+              <% if ::EnrollRegistry.feature_enabled?(:employer_registration) %>
+                <%= link_to benefit_sponsors.new_employer_profile_profiles_employers_employer_profiles_path(person_id: @person.id, profile_type: :benefit_sponsor) do %>
+                  <div class="d-flex flex-row bg-white hub-item-flex-shadow employer-card">
+                    <div class="col-2">
+                      <i class="fas fa-home fa-3x"></i>
+                    </div>
+                    <div class="col-10">
+                      <div class=""><strong class='label-color'><%= l10n("hub.home_page.add_account.modal.employer_title") %></strong></div>
+                      <div class=""><small><%= l10n("hub.home_page.add_account.modal.employer_description") %></small></div>
+                    </div>
+                  </div>
+                <% end %>
 
-              <div style="padding: 10px;">
-                <p class='or-style'>or</p>
-              </div>
-              <%= link_to benefit_sponsors.new_broker_profile_profiles_broker_agencies_broker_agency_profiles_path(person_id: @person.id, profile_type: :broker_agency) do %>
-                <div class="d-flex flex-row bg-white hub-item-flex-shadow broker-card">
-                  <div class="col-2">
-                    <i class="far fa-address-card fa-3x"></i>
-                  </div>
-                  <div class="col-10">
-                    <div class=""><strong class='label-color'><%= l10n("hub.home_page.add_account.modal.broker_title") %></strong></div>
-                    <div class=""><small><%= l10n("hub.home_page.add_account.modal.broker_description") %></small></div>
-                  </div>
+                <div style="padding: 10px;">
+                  <p class='or-style'>or</p>
                 </div>
               <% end %>
 
-              <div style="padding: 10px;">
-                <p class='or-style'>or</p>
-              </div>
-              <%= link_to benefit_sponsors.new_general_agency_profile_profiles_general_agencies_general_agency_profiles_path(person_id: @person.id, profile_type: :general_agency) do %>
-                <div class="d-flex flex-row bg-white hub-item-flex-shadow broker-card">
-                  <div class="col-2">
-                    <i class="far fa-address-card fa-3x"></i>
+              <% if ::EnrollRegistry.feature_enabled?(:broker_registration) %>
+                <%= link_to benefit_sponsors.new_broker_profile_profiles_broker_agencies_broker_agency_profiles_path(person_id: @person.id, profile_type: :broker_agency) do %>
+                  <div class="d-flex flex-row bg-white hub-item-flex-shadow broker-card">
+                    <div class="col-2">
+                      <i class="far fa-address-card fa-3x"></i>
+                    </div>
+                    <div class="col-10">
+                      <div class=""><strong class='label-color'><%= l10n("hub.home_page.add_account.modal.broker_title") %></strong></div>
+                      <div class=""><small><%= l10n("hub.home_page.add_account.modal.broker_description") %></small></div>
+                    </div>
                   </div>
-                  <div class="col-10">
-                    <div class=""><strong class='label-color'><%= l10n("hub.home_page.add_account.modal.ga_title") %></strong></div>
-                    <div class=""><small><%= l10n("hub.home_page.add_account.modal.ga_description") %></small></div>
-                  </div>
+                <% end %>
+
+                <div style="padding: 10px;">
+                  <p class='or-style'>or</p>
                 </div>
+              <% end %>
+              <% if ::EnrollRegistry.feature_enabled?(:ga_registration) %>
+                <%= link_to benefit_sponsors.new_general_agency_profile_profiles_general_agencies_general_agency_profiles_path(person_id: @person.id, profile_type: :general_agency) do %>
+                  <div class="d-flex flex-row bg-white hub-item-flex-shadow broker-card">
+                    <div class="col-2">
+                      <i class="far fa-address-card fa-3x"></i>
+                    </div>
+                    <div class="col-10">
+                      <div class=""><strong class='label-color'><%= l10n("hub.home_page.add_account.modal.ga_title") %></strong></div>
+                      <div class=""><small><%= l10n("hub.home_page.add_account.modal.ga_description") %></small></div>
+                    </div>
+                  </div>
+                <% end %>
               <% end %>
             </div>
           </div>
@@ -179,9 +188,7 @@
                   <span class="caret"></span>
                 </button>
                 <div class="dropdown-menu dropdown-menu-right actions-menu" aria-labelledby="dropdownMenuButton">
-                  <%= link_to benefit_sponsors.new_employer_profile_profiles_employers_employer_profiles_path(person_id: @person.id, profile_type: :benefit_sponsor, with_roster: true) do %>
-                    <span class="dropdown-item">Copy this info to a new account</span>
-                  <% end %>
+                  <span class="dropdown-item" data-toggle="modal" data-target="#addEmployerAccount" data-dismiss="modal">Copy this info to a new account</span>
                 </div>
               </div>
             </div>
