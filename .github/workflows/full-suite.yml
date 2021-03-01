@@ -33,7 +33,6 @@ jobs:
           git config diff.renameLimit 800
           git fetch --no-tags --depth=1 origin trunk
           bundle exec rubocop-git origin/trunk | grep "no offenses detected"
-          bundle exec rake view_translations_linter:lint_git_difference_changed_lines
       - name: Run Translations View Linter
         run: |
           git fetch --no-tags --depth=1 origin trunk

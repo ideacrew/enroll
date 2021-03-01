@@ -86,7 +86,7 @@ module ViewTranslationsLinterHelper
   end
 
   def changed_lines_from_file_string(filename)
-    `git diff HEAD^ HEAD  --unified=0 #{filename} | tail +6 | sed -e 's/^\+//'`
+    `git diff origin/trunk --unified=0 #{filename} | tail +6 | sed -e 's/^\+//'`
   end
 
   def approved_translation_strings_in_erb_tags
