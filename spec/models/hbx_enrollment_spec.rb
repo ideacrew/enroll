@@ -2819,6 +2819,20 @@ describe '#can_make_changes?', :dbclean => :after_each do
       hbx_enrollment.update_attributes(kind: 'employer_sponsored', aasm_state: 'coverage_enrolled', sponsored_benefit_package_id: current_benefit_package.id)
       expect(hbx_enrollment.can_make_changes?).to eq true
     end
+
+    it 'should return false if enr has benefit package and oe period but in expired state' do
+      hbx_enrollment.update_attributes(kind: 'employer_sponsored', aasm_state: 'coverage_expired', sponsored_benefit_package_id: current_benefit_package.id)
+      allow(hbx_enrollment).to receive(:open_enrollment_period_available?).and_return true
+      allow(hbx_enrollment).to receive(:special_enrollment_period_available?).and_return true
+      expect(hbx_enrollment.can_make_changes?).to eq false
+    end
+
+    it 'should return false if enr has benefit package and oe period but in terminated state' do
+      hbx_enrollment.update_attributes(kind: 'employer_sponsored', aasm_state: "coverage_terminated", sponsored_benefit_package_id: current_benefit_package.id)
+      allow(hbx_enrollment).to receive(:open_enrollment_period_available?).and_return true
+      allow(hbx_enrollment).to receive(:special_enrollment_period_available?).and_return true
+      expect(hbx_enrollment.can_make_changes?).to eq false
+    end
   end
 end
 
