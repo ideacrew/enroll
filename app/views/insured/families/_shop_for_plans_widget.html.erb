@@ -8,13 +8,13 @@
   <div class="panel panel-default module" id='shop-for-plans-widget'>
     <div class="panel-body">
       <div class="row flex">
-        <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
+        <div class="col-lg-7 col-md-9 col-sm-12 col-xs-12">
           <div class='image-area'>
             <%= image_tag exchange_icon_path('shop_for_plan.png'), style: 'width: 45px;' %>
           </div>
           <strong><%= l10n("insured.shop_for_health_and_dental_plans") %></strong>
         </div>
-        <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 <%=pundit_class Family, :updateable?%>">
+        <div class="col-lg-5 col-md-3 col-sm-12 col-xs-12 <%=pundit_class Family, :updateable?%>">
           <% if !person_has_any_roles?%>
             <%= render 'no_role_navigation' %>
           <% elsif is_strictly_open_enrollment_case? %>
@@ -30,7 +30,7 @@
   </div>
 <% else %>
   <% action_path = find_sep_insured_families_path  %>
-  <% if @employee_role.try(:is_eligible_to_enroll_without_qle?) || ((@person.consumer_role.present? || @person.resident_role.present?) &&is_under_open_enrollment?) %>
+  <% if (@employee_role.try(:is_eligible_to_enroll_without_qle?) && is_shop_or_fehb_market_enabled?) || ((@person.consumer_role.present? || @person.resident_role.present?) && is_under_open_enrollment?) %>
     <% action_path = new_insured_group_selection_path %>
   <% end %>
 
@@ -83,20 +83,20 @@
 
               <% options = {shop_for_plan: 'shop_for_plan'}
                 options.merge!(person_id: @person.id) if @person.present?
-                options.merge!(employee_role_id: @employee_role.id) if @employee_role.present?
+                options.merge!(employee_role_id: @employee_role.id) if @employee_role.present? && is_shop_or_fehb_market_enabled?
                 options.merge!(change_plan: 'change_plan') if @hbx_enrollments.present?
                 options.merge!(resident_role_id: @person.resident_role.id) if @person.resident_role.present?
               %>
 
               <% if !is_under_open_enrollment? && !@employee_role.try(:is_under_open_enrollment?)  %>
                 <%#= l10n("insured.you_are_not_under_open_enrollment_period") %>
-              <% elsif @employee_role&.is_under_open_enrollment? && @employee_role&.census_employee.is_employee_in_term_pending? && @family.active_seps.blank?  %>
+              <% elsif @employee_role&.is_under_open_enrollment? && @employee_role&.census_employee.is_employee_in_term_pending? && @family.active_seps.blank? && is_shop_or_fehb_market_enabled? %>
                 <p><%= "You have been terminated by your employer" %> "<%= @employee_role.employer_profile.legal_name %>"
                   <%= "with an effective date of" %> <%= format_date @employee_role.census_employee.employment_terminated_on.end_of_month %> </p>
               <% else %>
                 <% if @employee_role.present? && @employee_role.census_employee.is_employee_in_term_pending? %>
                 <% else %>
-                  <% if @employee_role.present? && @employee_role.try(:is_under_open_enrollment?) %>
+                  <% if @employee_role.present? && @employee_role.try(:is_under_open_enrollment?)  && is_shop_or_fehb_market_enabled? %>
                     <% new_options = @employee_role&.has_multiple_shop_oe_periods? ? options.merge(shop_under_future: true) : options %>
                     <p>If you <%= link_to 'enroll today', new_insured_group_selection_path(new_options) %>, coverage will begin <%= format_date @employee_role.benefit_begin_date %>.</p>
                   <%elsif (@person.consumer_role.present? || @person.resident_role.present?) && is_under_open_enrollment? %>
@@ -105,7 +105,7 @@
                 <% end %>
               <% end %>
 
-              <% if @employee_role&.has_multiple_shop_oe_periods? %>
+              <% if @employee_role&.has_multiple_shop_oe_periods? && is_shop_or_fehb_market_enabled? %>
                 <p>If you <%= link_to 'enroll as new hire', new_insured_group_selection_path(options.merge(shop_under_current: true)) %> coverage will begin <%= format_date @employee_role.earliest_effective_on_for_new_hire_in_current_py %>.</p>
               <% end %>
 
