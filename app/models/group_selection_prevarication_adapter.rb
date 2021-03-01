@@ -39,7 +39,7 @@ class GroupSelectionPrevaricationAdapter
   end
 
   def check_shopping_roles(params)
-    if params[:employee_role_id].present? && (is_shop_or_fehb_market_enabled?)
+    if params[:employee_role_id].present? && is_shop_or_fehb_market_enabled?
       emp_role_id = params.require(:employee_role_id)
       @employee_role = @person.employee_roles.detect { |emp_role| emp_role.id.to_s == emp_role_id.to_s }
     elsif params[:resident_role_id].present? && is_individual_market_enabled?
@@ -62,7 +62,7 @@ class GroupSelectionPrevaricationAdapter
   end
 
   def if_employee_role_unset_but_can_be_derived(e_role_value)
-    return if e_role_value.present? || !(is_shop_or_fehb_market_enabled?)
+    return if e_role_value.present? || !is_shop_or_fehb_market_enabled?
     if @person.has_active_employee_role?
       @person.active_employee_roles.first
     end
@@ -104,7 +104,7 @@ class GroupSelectionPrevaricationAdapter
   end
 
   def if_employee_role
-    return nil unless possible_employee_role.present? && (is_shop_or_fehb_market_enabled?)
+    return nil unless possible_employee_role.present? && is_shop_or_fehb_market_enabled?
     yield possible_employee_role
   end
 
@@ -133,7 +133,7 @@ class GroupSelectionPrevaricationAdapter
                  "fehb"
                elsif @previous_hbx_enrollment.is_shop? && is_shop_market_enabled?
                  'shop'
-               elsif %w[coverall individual].include? @previous_hbx_enrollment.kind && is_individual_market_enabled?
+               elsif (%w[coverall individual].include? @previous_hbx_enrollment.kind) && is_individual_market_enabled?
                  @previous_hbx_enrollment.kind
                end
       yield m_kind, @previous_hbx_enrollment.coverage_kind
@@ -146,7 +146,7 @@ class GroupSelectionPrevaricationAdapter
     else
       d_market_kind = 'individual' if (@person.consumer_role.present? || @person.resident_role.present?) && !is_under_ivl_open_enrollment?
 
-      d_market_kind = 'shop' if !@employee_role&.is_eligible_to_enroll_without_qle? && !(is_shop_or_fehb_market_enabled?)
+      d_market_kind = 'shop' if !@employee_role&.is_eligible_to_enroll_without_qle? && !is_shop_or_fehb_market_enabled?
     end
 
     yield d_market_kind
