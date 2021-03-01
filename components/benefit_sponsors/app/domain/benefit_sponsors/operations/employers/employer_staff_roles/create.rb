@@ -32,7 +32,7 @@ module BenefitSponsors
                         ssn: params[:ssn],
                         gender: params[:gender],
                         dob: params[:dob].present? ? params[:dob] : nil,
-                        hired_on: params[:hired_on].present? ? params[:hired_on] : nil,
+                        hired_on: params[:hired_on].present? ? parse_date(params[:hired_on]) : nil,
                         is_applying_coverage: params[:is_applying_coverage] == "true",
                         address: {
                           kind: address[:kind],
@@ -61,12 +61,17 @@ module BenefitSponsors
             if result.success?
               Success(result.to_h)
             else
-              Failure('Unable to build Employer staff role')
+              Failure({message: 'Unable to build Employer staff role'})
             end
           end
 
           def persist(values)
             Success(BenefitSponsors::Entities::Employers::EmployerStaffRoles::EmployerStaffRole.new(values))
+          end
+
+          def parse_date(date)
+            return date if date.is_a? Date
+            Date.strptime(date, "%Y-%m-%d")
           end
         end
       end

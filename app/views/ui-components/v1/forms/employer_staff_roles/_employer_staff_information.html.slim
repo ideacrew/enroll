@@ -27,6 +27,7 @@ fieldset
       label for="inputEmail"  #{l10n('email')} *
       = f.email_field :email, placeholder: 'Email', required: 'true', id: 'inputEmail', class: 'form-control'
 
+    = f.hidden_field :profile_id, value: nil
     = f.fields_for :coverage_record, f.object.coverage_record, errors: {}, fieldset: false do |f|
       - @coverage_record_form = f
       .col-md-3.mb-3
