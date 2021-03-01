@@ -16,7 +16,7 @@ module BenefitSponsors
 
         skip_before_action :verify_authenticity_token, only: :create
 
-        layout 'single_column'
+        layout 'single_column', except: [:new_broker_profile]
 
         EMPLOYER_DT_COLUMN_TO_FIELD_MAP = {
           "2"     => "legal_name",
