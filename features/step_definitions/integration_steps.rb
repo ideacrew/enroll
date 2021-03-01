@@ -1139,3 +1139,13 @@ And(/^Hbx Admin click on Employers/) do
   find_link("Employers").visible?
   click_link("Employers")
 end
+
+And(/I click (.*) QLE events in QLE carousel$/) do |market_name|
+  click_link market_name
+  sleep(2)
+end
+
+Then(/^I should see Shop for new plan button$/) do
+  shop_for_new_plan_input = page.all('input').detect { |input| input[:value] == 'Shop for new plan' }
+  expect(shop_for_new_plan_input.present?).to eq(true)
+end
