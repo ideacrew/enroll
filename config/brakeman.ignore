@@ -274,7 +274,7 @@
           "type": "controller",
           "class": "Insured::GroupSelectionController",
           "method": "edit_plan",
-          "line": 185,
+          "line": 187,
           "file": "app/controllers/insured/group_selection_controller.rb",
           "rendered": {
             "name": "insured/group_selection/edit_plan",
@@ -417,7 +417,7 @@
           "type": "controller",
           "class": "Insured::GroupSelectionController",
           "method": "edit_plan",
-          "line": 185,
+          "line": 187,
           "file": "app/controllers/insured/group_selection_controller.rb",
           "rendered": {
             "name": "insured/group_selection/edit_plan",
@@ -637,6 +637,26 @@
       "note": ""
     },
     {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "b4c442818bf08b9687f2c3d1e15cebc050e94a1570c28f88345dab2973b21fd1",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "lib/custom_linters/translations/view_translations_linter_helper.rb",
+      "line": 89,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`git diff origin/trunk --unified=0 #{filename} | tail +6 | sed -e 's/^+//'`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ViewTranslationsLinterHelper",
+        "method": "changed_lines_from_file_string"
+      },
+      "user_input": "filename",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
       "warning_type": "SQL Injection",
       "warning_code": 0,
       "fingerprint": "c52682082343e84c51246edb8d8ad45d30470312d9763527b2c5c5b6777ea619",
@@ -717,6 +737,6 @@
       "note": ""
     }
   ],
-  "updated": "2021-02-05 15:24:01 -0500",
+  "updated": "2021-03-01 12:39:59 -0500",
   "brakeman_version": "5.0.0"
 }
