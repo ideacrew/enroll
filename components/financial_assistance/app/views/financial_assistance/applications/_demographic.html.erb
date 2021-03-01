@@ -1,0 +1,8 @@
+<div class="form-bottom-border">
+  <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
+    <%= content_tag(:div, class: "col-md-11 form-heading") do %>
+      <%= label(nil, demographic[0], class: "col-md-6") %>
+      <%= content_tag(:div, demographic[1].nil? ?  "N/A" : demographic[1]) %>
+    <% end %>
+  </div>
+</div>
