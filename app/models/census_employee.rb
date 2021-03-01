@@ -885,10 +885,9 @@ class CensusEmployee < CensusMember
 
   def prior_py_sep?(effective_date)
     return false if effective_date.blank?
-    application_states = BenefitSponsors::BenefitApplications::BenefitApplication::COVERAGE_EFFECTIVE_STATES
-    active_benefit_application = benefit_sponsorship.benefit_applications.where(:aasm_state.in => application_states).last
+
     offset_months = EnrollRegistry[:prior_plan_year_sep].setting(:offset_months).item
-    start_date = active_benefit_application&.start_on || TimeKeeper.date_of_record.beginning_of_year
+    start_date = TimeKeeper.date_of_record.beginning_of_year
     end_date = start_date - offset_months.months
 
     terminated_states = [:terminated, :expired, :termination_pending]
