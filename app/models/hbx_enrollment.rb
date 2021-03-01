@@ -1262,6 +1262,7 @@ class HbxEnrollment
   end
 
   def can_make_changes_for_shop_enrollment?
+    return false if coverage_terminated? || coverage_expired?
     return false if sponsored_benefit_package.blank?
     return true if open_enrollment_period_available?
     return true if special_enrollment_period_available?
