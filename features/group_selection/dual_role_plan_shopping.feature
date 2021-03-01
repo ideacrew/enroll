@@ -10,6 +10,7 @@ Feature: EE with consumer role plan purchase
     When Individual visits the Insured portal during open enrollment
 
   Scenario: when user purchase plan for self & having ineligible family member
+    Given the shop market configuration is enabled
     Given a matched Employee exists with consumer role
     And first ER not offers dental benefits to spouse
     Then Employee sign in to portal
@@ -34,6 +35,7 @@ Feature: EE with consumer role plan purchase
     Then employee should see primary and valid dependent
 
   Scenario: User should not see IVL "Make Changes" button for SHOP enrollments
+    Given the shop market configuration is enabled
     Given a matched Employee exists with consumer role
     And user has a dependent in child relationship with age less than 26
     And user has a dependent in spouse relationship with age greater than 26
