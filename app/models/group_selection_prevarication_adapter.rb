@@ -1,6 +1,7 @@
 class GroupSelectionPrevaricationAdapter
 
   include ActiveModel::Model
+  include Config::SiteModelConcern
 
   attr_accessor :optional_effective_on, :shop_under_current, :shop_under_future, :person, :family,
                 :coverage_household, :previous_hbx_enrollment, :change_plan, :coverage_kind, :enrollment_kind, :shop_for_plans
@@ -157,7 +158,6 @@ class GroupSelectionPrevaricationAdapter
 
   def ivl_benefit
     correct_effective_on = calculate_ivl_effective_on
-    binding.pry
     if @change_plan.present? && @previous_hbx_enrollment.present? && @previous_hbx_enrollment.is_ivl_by_kind?
       HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.select{|bcp| bcp.contains?(correct_effective_on)}.first.benefit_packages.select{|bp|  bp.effective_year == correct_effective_on.year && bp.benefit_categories.include?(@previous_hbx_enrollment.coverage_kind)}.first
     else
@@ -368,26 +368,6 @@ class GroupSelectionPrevaricationAdapter
     can_shop_individual?(person) && can_shop_shop?(person)
   end
 
-  def is_shop_market_enabled?
-    EnrollRegistry.feature_enabled?(:aca_shop_market)
-  end
-
-  def is_fehb_market_enabled?
-    EnrollRegistry.feature_enabled?(:fehb_market)
-  end
-
-  def is_shop_or_fehb_market_enabled?
-    EnrollRegistry.feature_enabled?(:fehb_market) || EnrollRegistry.feature_enabled?(:aca_shop_market)
-  end
-
-  def is_individual_market_enabled?
-    EnrollRegistry.feature_enabled?(:aca_individual_market)
-  end
-
-  def is_shop_and_individual_market_enabled?
-    EnrollRegistry.feature_enabled?(:aca_shop_market) && EnrollRegistry.feature_enabled?(:aca_individual_market)
-  end
-
   def no_employer_benefits_error_message(hbx_enrollment)
     if hbx_enrollment.sponsored_benefit_package.benefit_application.terminated?
       "Your employer is no longer offering health insurance through #{Settings.site.short_name}. Please contact your employer."
@@ -399,6 +379,8 @@ class GroupSelectionPrevaricationAdapter
   end
 
   def is_eligible_for_dental?(employee_role, change_plan, enrollment, effective_date)
+    return unless employee_role.present?
+
     renewal_benefit_package = employee_role.census_employee.renewal_published_benefit_package
     active_benefit_package  = employee_role.census_employee.active_benefit_package(effective_date)
 
@@ -416,6 +398,8 @@ class GroupSelectionPrevaricationAdapter
   end
 
   def fetch_benefit_package_for_sep(employee_role)
+    return unless employee_role.present?
+
     family = employee_role.person.primary_family
     employee_role.census_employee.benefit_package_for_date(family.earliest_effective_sep.effective_on) ||
       employee_role.benefit_package(qle: true) ||
@@ -471,6 +455,8 @@ class GroupSelectionPrevaricationAdapter
   end
 
   def select_benefit_group_from_qle_and_employee_role(qle, employee_role)
+    return unless employee_role.present?
+
     employee_role.benefit_package(qle: qle)
   end
 

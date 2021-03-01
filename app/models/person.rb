@@ -661,6 +661,7 @@ class Person
   end
 
   def active_employee_roles
+    return [] unless is_shop_or_fehb_market_enabled?
     employee_roles.select{|employee_role| employee_role.census_employee && employee_role.census_employee.is_active? }
   end
 
