@@ -5,6 +5,8 @@ module Effective
     #Family datatable with options
     class FamilyDataTable < Effective::MongoidDatatable
       include Config::AcaModelConcern
+      include Config::SiteModelConcern
+
       datatable do
         #table_column :family_hbx_id, :proc => Proc.new { |row| row.hbx_assigned_id }, :filter => false, :sql_column => "hbx_id"
         table_column :name, :label => 'Name', :proc => proc { |row| link_to row.primary_applicant.person.full_name, resume_enrollment_exchanges_agents_path(person_id: row.primary_applicant.person.id)}, :filter => false, :sortable => false
@@ -14,10 +16,12 @@ module Effective
         table_column :count, :label => 'Count', :width => '100px', :proc => proc { |row| row.active_family_members.size }, :filter => false, :sortable => false
         table_column :active_enrollments, :label => 'Active Enrollments?', :proc => proc { |row| active_admin_dt_enrollments(row).any? ? "Yes" : "No"}, :filter => false, :sortable => false
         table_column :registered?, :width => '100px', :proc => proc { |row| row.primary_applicant.person.user.present? ? "Yes" : "No"}, :filter => false, :sortable => false
-        if individual_market_is_enabled?
+        if is_individual_market_enabled?
           table_column :consumer?, :width => '100px', :proc => proc { |row| row.primary_applicant.person.consumer_role.present? ? "Yes" : "No"}, :filter => false, :sortable => false
         end
-        table_column :employee?, :width => '100px', :proc => proc { |row| row.primary_applicant.person.active_employee_roles.present? ? "Yes" : "No"}, :filter => false, :sortable => false
+        if is_shop_or_fehb_market_enabled?
+          table_column :employee?, :width => '100px', :proc => proc { |row| row.primary_applicant.person.active_employee_roles.present? ? "Yes" : "No"}, :filter => false, :sortable => false
+        end
         table_column :actions, :width => '50px', :proc => proc { |row|
           dropdown = [
            # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
