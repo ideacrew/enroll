@@ -124,6 +124,21 @@ module FinancialAssistance
       redirect_to applications_path if @application.blank?
     end
 
+    def raw_application
+      @application = FinancialAssistance::Application.where(id: params["id"]).first
+      @applicants = @application.active_applicants if @application.present?
+      @all_relationships = @application.relationships
+      @demographic_hash={}
+      @income_coverage_hash={}
+
+      @applicants.each do |applicant|
+        @demographic_hash[applicant.id] = generate_demographic_hash(applicant)
+        @income_coverage_hash[applicant.id] = generate_income_coverage_hash(applicant)
+      end
+
+      redirect_to applications_path if @application.blank?
+    end
+
     def wait_for_eligibility_response
       save_faa_bookmark(applications_path)
       set_admin_bookmark_url
@@ -236,6 +251,106 @@ module FinancialAssistance
       current_person = get_current_person
       return if current_person.consumer_role.blank?
       current_person.consumer_role.update_attribute(:bookmark_url, url) if current_person.consumer_role.identity_verified?
+    end
+
+    def generate_demographic_hash(applicant)
+      {
+        "Are you a US Citizen or US National?" => human_boolean(applicant.citizen_status),
+        "Are you a naturalized citizen?" => human_boolean(applicant.naturalized_citizen),
+        "Do you have eligible immigration status?" => human_boolean(applicant.eligible_immigration_status),
+        "Document_type" => check_citizen_immigration_status?(applicant) ? applicant.vlp_subject : 'N/A',
+        "citizenship_number" => check_citizen_immigration_status?(applicant) ? applicant.citizenship_number : 'N/A',
+        "alien_number" => check_citizen_immigration_status?(applicant) ? applicant.alien_number : 'N/A',
+        "i94_number" => check_citizen_immigration_status?(applicant) ? applicant.i94_number : 'N/A',
+        "visa_number" => check_citizen_immigration_status?(applicant) ? applicant.visa_number : 'N/A',
+        "passport_number" => check_citizen_immigration_status?(applicant) ? applicant.passport_number : 'N/A',
+        "sevis_id" => check_citizen_immigration_status?(applicant) ? applicant.sevis_id : 'N/A',
+        "naturalization_number" => check_citizen_immigration_status?(applicant) ? applicant.naturalization_number : 'N/A',
+        "receipt_number" => check_citizen_immigration_status?(applicant) ? applicant.receipt_number : 'N/A',
+        "card_number" => check_citizen_immigration_status?(applicant) ? applicant.card_number : 'N/A',
+        "country_of_citizenship" => check_citizen_immigration_status?(applicant) ? applicant.country_of_citizenship : 'N/A',
+        "vlp_description" => check_citizen_immigration_status?(applicant) ? applicant.vlp_description : 'N/A',
+        "expiration_date" => check_citizen_immigration_status?(applicant) ? applicant.expiration_date : 'N/A',
+        "issuing_country" => check_citizen_immigration_status?(applicant) ? applicant.issuing_country : 'N/A',
+        "Are you a member of an American Indian or Alaska Native Tribe?" => human_boolean(applicant.indian_tribe_member),
+        "Are you currently incarcerated?" => human_boolean(applicant.is_incarcerated),
+        "What is your race/ethnicity? (OPTIONAL - check all that apply)" => applicant.ethnicity
+      }
+    end
+
+    def check_citizen_immigration_status?(applicant)
+      applicant.naturalized_citizen.present? || applicant.eligible_immigration_status.present?
+    end
+
+    def generate_income_coverage_hash(applicant)
+      {"info" =>
+           {"TAX INFO" => {
+             "Will this Person file taxes for #{@application.assistance_year}?" => human_boolean(applicant.is_required_to_file_taxes),
+             "Will this person be claimed as a tax dependent for #{@application.assistance_year}? *" => human_boolean(applicant.is_claimed_as_tax_dependent),
+             "Will this person be filing jointly?" => human_boolean(applicant.is_joint_tax_filing),
+             "This person will be claimed as a dependent by" => applicant.claimed_as_tax_dependent_by ? @applicants.find(applicant.claimed_as_tax_dependent_by).full_name : nil
+           },
+            "INCOME" => {
+              "Does this person have income from an employer (wages, tips, bonuses, etc.) in #{@application.assistance_year}?" => human_boolean(applicant.has_job_income),
+              "jobs" => generate_employment_hash(applicant.incomes.jobs),
+              "Does this person expect to receive self-employment income in #{@application.assistance_year}? *" => human_boolean(applicant.has_self_employment_income),
+              "Does this person expect to have income from other sources in 2021?" => human_boolean(applicant.has_other_income)
+            },
+            "INCOME ADJUSTMENTS" => {
+              "Does this person expect to have adjustments to income in #{@application.assistance_year}?" => human_boolean(applicant.has_deductions)
+            },
+            "HEALTH COVERAGE" => {
+              "Is this person currently enrolled in health coverage?" => human_boolean(applicant.has_enrolled_health_coverage),
+              "Does this person currently have access to other health coverage, including through another person?" => human_boolean(applicant.has_eligible_health_coverage)
+            },
+            "OTHER QUESTIONS" => {
+              "Has this person applied for an SSN" => human_boolean(applicant.is_ssn_applied),
+              "Why doesn't this person have an SSN?" => applicant.non_ssn_apply_reason.to_s.present? ? applicant.non_ssn_apply_reason.to_s : 'N/A',
+              "Is this person pregnant?" => human_boolean(applicant.is_pregnant),
+              "Pregnancy due date?" => applicant.pregnancy_due_on.to_s.present? ? applicant.pregnancy_due_on.to_s : 'N/A',
+              "How many children is this person expecting?" => applicant.children_expected_count.present? ? applicant.children_expected_count : 'N/A',
+              "Was this person pregnant in the last 60 days?" => human_boolean(applicant.is_post_partum_period),
+              "Pregnancy end on date" => applicant.pregnancy_end_on.to_s.present? ? applicant.pregnancy_end_on.to_s : 'N/A',
+              "Was this person on Medicaid during pregnancy?" => human_boolean(applicant.is_enrolled_on_medicaid),
+              "Was this person in foster care at age 18 or older?" => human_boolean(applicant.is_former_foster_care),
+              "Where was this person in foster care?" => applicant.foster_care_us_state.present? ? applicant.foster_care_us_state : 'N/A',
+              "How old was this person when they left foster care?" => applicant.age_left_foster_care.present? ? applicant.age_left_foster_care : 'N/A',
+              "Was this person enrolled in Medicaid when they left foster care?" => human_boolean(applicant.had_medicaid_during_foster_care),
+              "Is this person a student?" => human_boolean(applicant.is_student),
+              "What is the type of student?" => applicant.student_kind.present? ? applicant.student_kind : 'N/A',
+              "Student status end on date?" => applicant.student_status_end_on.present? ? applicant.student_status_end_on : 'N/A',
+              "What type of school do you go to?" => human_boolean(applicant.student_school_kind),
+              "Is this person blind?" => human_boolean(applicant.is_self_attested_blind),
+              "Does this person need help with daily life activities, such as dressing or bathing?" => human_boolean(applicant.has_daily_living_help),
+              "Does this person need help paying for any medical bills from the last 3 months?" => human_boolean(applicant.has_daily_living_help),
+              "Does this person have a disability?" => human_boolean(applicant.is_physically_disabled)
+            }}}
+    end
+
+    def generate_employment_hash(jobs)
+      job_hash = {}
+      jobs.each do |job|
+        job_hash[job.id] = {
+          "Employer Name" => job.employer_name,
+          "EMPLOYER ADDRESSS LINE 1" => job.employer_address.address_1,
+          "EMPLOYER ADDRESSS LINE 2" => job.employer_address.address_2,
+          "CITY" => job.employer_address.city,
+          "STATE" => job.employer_address.state,
+          "ZIP" => job.employer_address.zip,
+          "EMPLOYER PHONE " => job.employer_phone.full_phone_number
+        }
+      end
+      job_hash
+    end
+
+    def human_boolean(boolean)
+      if boolean
+        'Yes'
+      elsif boolean == false
+        'No'
+      else
+        'N/A'
+      end
     end
   end
 end
