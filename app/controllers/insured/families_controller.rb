@@ -429,10 +429,10 @@ class Insured::FamiliesController < FamiliesController
       end
     elsif @person.active_employee_roles.present? || @person.consumer_role.present? || @person.resident_role.present?
       role = if @person.active_employee_roles.present? && is_shop_or_fehb_market_enabled?
-                @person.active_employee_roles.first
-              elsif is_individual_market_enabled?
-                @person.consumer_role || @person.resident_role
-              end
+               @person.active_employee_roles.first
+             elsif is_individual_market_enabled?
+               @person.consumer_role || @person.resident_role
+             end
       @qualifying_life_events += QualifyingLifeEventKind.qualifying_life_events_for(role, current_user.has_hbx_staff_role?)
     end
   end
