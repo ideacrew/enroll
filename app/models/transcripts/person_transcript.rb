@@ -31,7 +31,7 @@ module Transcripts
         @transcript[:source] = people.first
       else
         message = "Ambiguous person match: more than one person matches criteria"
-        raise Factories::Transcripts::PersonError message
+        raise(message)
       end
 
       compare_instance

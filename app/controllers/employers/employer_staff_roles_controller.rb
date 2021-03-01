@@ -1,4 +1,5 @@
 class Employers::EmployerStaffRolesController < Employers::EmployersController
+  include Authenticator
 
   before_action :check_access_to_employer_profile,:updateable?
 

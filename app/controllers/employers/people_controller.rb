@@ -1,4 +1,5 @@
 class Employers::PeopleController < ApplicationController
+  include Authenticator
 
   before_action :check_person_present, only: [:search]
 

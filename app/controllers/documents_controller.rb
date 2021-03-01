@@ -265,11 +265,6 @@ class DocumentsController < ApplicationController
     owner.user.has_hbx_staff_role? || documents.find(document_id).present?
   end
 
-  #permitting required params for cartafact downloads
-  def cartafact_download_params
-    params.permit(:relation, :relation_id, :model, :model_id, :content_type, :disposition, :file_name, :user)
-  end
-
   def update_documents_status(family_member)
     family = family_member.family
     family.update_family_document_status!
@@ -306,5 +301,10 @@ class DocumentsController < ApplicationController
   def set_min_due_date_on_family
     family = @family_member.family
     family.update_attributes(min_verification_due_date: family.min_verification_due_date_on_family)
+  end
+
+  #permitting required params for cartafact downloads
+  def cartafact_download_params
+    params.permit(:relation, :relation_id, :model, :model_id, :content_type, :disposition, :file_name, :user)
   end
 end

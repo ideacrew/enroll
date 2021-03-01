@@ -1,4 +1,7 @@
 class Employers::EmployersController < ApplicationController
+  include Authenticator
+
+
   def search
     @employers = Organization.where(employer_profile: {:$exists => true}, legal_name: /^#{Regexp.escape(params[:q])}/i)
 

@@ -315,6 +315,30 @@ Given(/^a Hbx admin with read only permissions exists$/) do
   FactoryBot.create :hbx_enrollment,family:user.primary_family, household:user.primary_family.active_household
 end
 
+Given(/^the shop market configuration is disabled$/) do
+  disable_feature :aca_shop_market
+end
+
+Given(/^the shop market configuration is enabled$/) do
+  enable_feature :aca_shop_market
+end
+
+Given(/^the fehb market configuration is disabled$/) do
+  disable_feature :fehb_market
+end
+
+Given(/^the fehb market configuration is enabled$/) do
+  enable_feature :fehb_market
+end
+
+Given(/^the individual market configuration is disabled$/) do
+  disable_feature :aca_individual_market
+end
+
+Given(/^the individual market configuration is enabled$/) do
+  enable_feature :aca_individual_market
+end
+
 When(/(^.+) enters? office location for (.+)$/) do |role, location|
   location = eval(location) if location.class == String
   RatingArea.where(zip_code: "01001").first || FactoryBot.create(:rating_area, zip_code: "01001", county_name: "Hampden", rating_area: Settings.aca.rating_areas.first)
@@ -685,10 +709,12 @@ end
 When(/^.+ enters? the dependent info of .+ daughter$/) do
   fill_in 'dependent[first_name]', with: 'Cynthia'
   fill_in 'dependent[last_name]', with: 'White'
+  fill_in 'dependent[ssn]', with: '999999999'
   date = TimeKeeper.date_of_record - 28.years
   dob = date.to_s
   fill_in 'jq_datepicker_ignore_dependent[dob]', with: dob
-  find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Child')]").click
+  first('.select-relation .selectric span.label').click
+  find('.selectric-scroll li', text: 'Child').click
   find(:xpath, "//label[@for='radio_female']").click
   find(:xpath, "//label[@for='radio_female']").click
 end
@@ -1138,4 +1164,14 @@ end
 And(/^Hbx Admin click on Employers/) do
   find_link("Employers").visible?
   click_link("Employers")
+end
+
+And(/I click (.*) QLE events in QLE carousel$/) do |market_name|
+  click_link market_name
+  sleep(2)
+end
+
+Then(/^I should see Shop for new plan button$/) do
+  shop_for_new_plan_input = page.all('input').detect { |input| input[:value] == 'Shop for new plan' }
+  expect(shop_for_new_plan_input.present?).to eq(true)
 end
