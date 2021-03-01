@@ -200,6 +200,7 @@ $(function() {
     //val() is returing empty, changed to attr('value')
     var elected_amount = parseFloat($('#max_aptc').attr('value')).toFixed(2) * parseFloat(elected_pct).toFixed(2);
     $('#elected_aptc').val(elected_amount.toFixed(2));
+    $('#elected_aptc').attr('value', elected_amount.toFixed(2));
   });
 
   $(document).on('change', 'input#elected_aptc', function(){

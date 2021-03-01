@@ -39,7 +39,7 @@ And(/the primary member has filled mandatory information required$/) do
   find(:xpath, '//*[@id="address_info"]/div/div[3]/div[2]/div/div[2]/span').click
   find('#address_info li', :text => 'DC', wait: 5).click
   fill_in "person[addresses_attributes][0][zip]", with: personal_information[:zip]
-  
+
   sleep 5
   find('.btn', text: 'CONTINUE').click
 end
@@ -69,7 +69,7 @@ When(/^the Experian returns a VERIFIED response$/) do
 end
 
 Then(/^the user will navigate to the Help Paying for Coverage page$/) do
-  expect(page).to have_content('Help Paying for Coverage')
+  expect(page).to have_content('Your Application for Premium Reductions')
 end
 
 Given(/^the user navigates to the "Household Info" page with "no" selected$/) do
@@ -93,7 +93,7 @@ And(/^the user fills the the add member form/) do
 
   find('.house .selectric span.label').click
   find(".house .selectric-items li", text: 'Spouse').click
-  
+
   find(:xpath, '//label[@for="radio_female"]').click
   find(:xpath, '//label[@for="dependent_us_citizen_true"]').click
   find(:xpath, '//label[@for="dependent_naturalized_citizen_false"]').click
@@ -109,7 +109,7 @@ And(/^the user clicks the PREVIOUS link1/) do
 end
 
 Then(/^the user navigates to Help Paying for Coverage page/) do
-  expect(page).to have_content('Help Paying for Coverage')
+  expect(page).to have_content('Your Application for Premium Reductions')
 end
 
 Given(/^the user navigates to the "Household Info" page with "yes" selected/) do
