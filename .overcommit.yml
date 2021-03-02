@@ -42,12 +42,3 @@ PreCommit:
 #
 #  IndexTags:
 #    enabled: true # Generate a tags file with `ctags` each time HEAD changes
-
-
-CommitMsg:
-  CommonCommit:
-    enabled: true
-    quiet: false
-    description: 'Checks if the commit message follows the common commit specifications'
-    required_executable: 'yarn'
-    command: ['yarn', 'run', 'commitlint']

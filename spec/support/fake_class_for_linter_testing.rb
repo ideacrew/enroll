@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# This is just a fake file for testing overcommit
 class FafkeClassForLinterTesting
   def initialize(string = nil); end
 
