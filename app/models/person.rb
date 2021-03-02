@@ -20,6 +20,8 @@ class Person
 
   # verification history tracking
   include Mongoid::History::Trackable
+  # For usage of serializable_hash. Included by default in rails 6
+  include ActiveModel::Serialization if Rails.version["5"]
 
   track_history :on => [:first_name,
                         :middle_name,

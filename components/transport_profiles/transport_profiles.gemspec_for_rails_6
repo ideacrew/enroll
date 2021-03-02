@@ -16,21 +16,8 @@ Gem::Specification.new do |s|
 
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
 
-<<<<<<< HEAD
   s.add_dependency "rails", "~> 6.0"
-<<<<<<< HEAD
-<<<<<<< HEAD
   # s.add_dependency 'mongoid', "~> 7.2"
-=======
-  s.add_dependency 'mongoid', "~> 7.2"
->>>>>>> ruby-2.7.1 and rails-6.0 upgrade
-=======
-  # s.add_dependency 'mongoid', "~> 7.2"
->>>>>>> pointing mongoid to its github to fix a bug
-=======
-  s.add_dependency "rails", "~> 5.2.4.3"
-  s.add_dependency 'mongoid', "~> 7.0.2"
->>>>>>> REFS Maintenance - Begins toggle between rails 5 and 6
   s.add_dependency 'transport_gateway'
   s.add_dependency 'symmetric-encryption', '~> 3.9.1'
   s.add_dependency 'rubyzip', '>= 1.3.0'

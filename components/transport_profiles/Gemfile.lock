@@ -8,19 +8,11 @@ GIT
       bunny (~> 1.7.0)
       sneakers
 
-GIT
-  remote: https://github.com/mongodb/mongoid.git
-  revision: df6b2168ee7526f0c5e26f64f38851b91a0623e8
-  ref: df6b2168ee7526f0c5e26f64f38851b91a0623e8
-  specs:
-    mongoid (7.3.0.alpha)
-      activemodel (>= 5.1, < 6.2)
-      mongo (>= 2.10.5, < 3.0.0)
-
 PATH
   remote: .
   specs:
     transport_profiles (0.0.1)
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
@@ -29,11 +21,16 @@ PATH
 =======
 >>>>>>> pointing mongoid to its github to fix a bug
       rails (~> 6.0)
+=======
+      mongoid (~> 7.0.2)
+      rails (~> 5.2.4.3)
+>>>>>>> REFS Maintenance - Begins toggle between rails 5 and 6
       rubyzip (>= 1.3.0)
       symmetric-encryption (~> 3.9.1)
       transport_gateway
 
 PATH
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   remote: /Users/harsha/Desktop/ideacrew/enroll/components/transport_gateway
@@ -43,70 +40,61 @@ PATH
 =======
   remote: /Users/harsha/Desktop/ideacrew/enroll/components/transport_gateway
 >>>>>>> updated gems and changed as_json to serializable_hash
+=======
+  remote: /Users/zanesandin/enroll/components/transport_gateway
+>>>>>>> REFS Maintenance - Begins toggle between rails 5 and 6
   specs:
     transport_gateway (0.0.1)
       aws-sdk (~> 2.2.4)
       net-sftp (~> 2.1, >= 2.1.2)
       net-ssh (= 4.2.0)
-      rails (~> 6.0)
+      rails (~> 5.2.4.3)
 
 GEM
   remote: https://rubygems.org/
   specs:
-    actioncable (6.0.3.4)
-      actionpack (= 6.0.3.4)
+    actioncable (5.2.4.5)
+      actionpack (= 5.2.4.5)
       nio4r (~> 2.0)
       websocket-driver (>= 0.6.1)
-    actionmailbox (6.0.3.4)
-      actionpack (= 6.0.3.4)
-      activejob (= 6.0.3.4)
-      activerecord (= 6.0.3.4)
-      activestorage (= 6.0.3.4)
-      activesupport (= 6.0.3.4)
-      mail (>= 2.7.1)
-    actionmailer (6.0.3.4)
-      actionpack (= 6.0.3.4)
-      actionview (= 6.0.3.4)
-      activejob (= 6.0.3.4)
+    actionmailer (5.2.4.5)
+      actionpack (= 5.2.4.5)
+      actionview (= 5.2.4.5)
+      activejob (= 5.2.4.5)
       mail (~> 2.5, >= 2.5.4)
       rails-dom-testing (~> 2.0)
-    actionpack (6.0.3.4)
-      actionview (= 6.0.3.4)
-      activesupport (= 6.0.3.4)
+    actionpack (5.2.4.5)
+      actionview (= 5.2.4.5)
+      activesupport (= 5.2.4.5)
       rack (~> 2.0, >= 2.0.8)
       rack-test (>= 0.6.3)
       rails-dom-testing (~> 2.0)
-      rails-html-sanitizer (~> 1.0, >= 1.2.0)
-    actiontext (6.0.3.4)
-      actionpack (= 6.0.3.4)
-      activerecord (= 6.0.3.4)
-      activestorage (= 6.0.3.4)
-      activesupport (= 6.0.3.4)
-      nokogiri (>= 1.8.5)
-    actionview (6.0.3.4)
-      activesupport (= 6.0.3.4)
+      rails-html-sanitizer (~> 1.0, >= 1.0.2)
+    actionview (5.2.4.5)
+      activesupport (= 5.2.4.5)
       builder (~> 3.1)
       erubi (~> 1.4)
       rails-dom-testing (~> 2.0)
-      rails-html-sanitizer (~> 1.1, >= 1.2.0)
-    activejob (6.0.3.4)
-      activesupport (= 6.0.3.4)
+      rails-html-sanitizer (~> 1.0, >= 1.0.3)
+    activejob (5.2.4.5)
+      activesupport (= 5.2.4.5)
       globalid (>= 0.3.6)
-    activemodel (6.0.3.4)
-      activesupport (= 6.0.3.4)
-    activerecord (6.0.3.4)
-      activemodel (= 6.0.3.4)
-      activesupport (= 6.0.3.4)
-    activestorage (6.0.3.4)
-      actionpack (= 6.0.3.4)
-      activejob (= 6.0.3.4)
-      activerecord (= 6.0.3.4)
+    activemodel (5.2.4.5)
+      activesupport (= 5.2.4.5)
+    activerecord (5.2.4.5)
+      activemodel (= 5.2.4.5)
+      activesupport (= 5.2.4.5)
+      arel (>= 9.0)
+    activestorage (5.2.4.5)
+      actionpack (= 5.2.4.5)
+      activerecord (= 5.2.4.5)
       marcel (~> 0.3.1)
-    activesupport (6.0.3.4)
+    activesupport (5.2.4.5)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 0.7, < 2)
       minitest (~> 5.1)
       tzinfo (~> 1.1)
+<<<<<<< HEAD
       zeitwerk (~> 2.2, >= 2.2.2)
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -117,10 +105,13 @@ GEM
       public_suffix (>= 2.0.2, < 4.0)
 >>>>>>> ruby-2.7.1 and rails-6.0 upgrade
 =======
+=======
+>>>>>>> REFS Maintenance - Begins toggle between rails 5 and 6
     addressable (2.7.0)
       public_suffix (>= 2.0.2, < 5.0)
 >>>>>>> updated gems and changed as_json to serializable_hash
     amq-protocol (1.9.2)
+    arel (9.0.0)
     aws-sdk (2.2.37)
       aws-sdk-resources (= 2.2.37)
     aws-sdk-core (2.2.37)
@@ -161,8 +152,12 @@ GEM
 >>>>>>> ruby-2.7.1 and rails-6.0 upgrade
 =======
     hashdiff (1.0.1)
+<<<<<<< HEAD
 >>>>>>> updated gems and changed as_json to serializable_hash
     i18n (1.8.7)
+=======
+    i18n (1.8.9)
+>>>>>>> REFS Maintenance - Begins toggle between rails 5 and 6
       concurrent-ruby (~> 1.0)
     jmespath (1.4.0)
     loofah (2.9.0)
@@ -175,10 +170,10 @@ GEM
     method_source (1.0.0)
     mimemagic (0.3.5)
     mini_mime (1.0.2)
-    mini_portile2 (2.5.0)
-    minitest (5.14.3)
+    minitest (5.14.4)
     mongo (2.14.0)
       bson (>= 4.8.2, < 5.0.0)
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
@@ -188,12 +183,16 @@ GEM
 >>>>>>> ruby-2.7.1 and rails-6.0 upgrade
 =======
 >>>>>>> pointing mongoid to its github to fix a bug
+=======
+    mongoid (7.0.12)
+      activemodel (>= 5.1, < 6.2)
+      mongo (>= 2.7.0, < 3.0.0)
+>>>>>>> REFS Maintenance - Begins toggle between rails 5 and 6
     net-sftp (2.1.2)
       net-ssh (>= 2.6.5)
     net-ssh (4.2.0)
-    nio4r (2.5.4)
-    nokogiri (1.11.1)
-      mini_portile2 (~> 2.5.0)
+    nio4r (2.5.5)
+    nokogiri (1.11.1-x86_64-darwin)
       racc (~> 1.4)
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -208,32 +207,30 @@ GEM
     rack (2.2.3)
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
-    rails (6.0.3.4)
-      actioncable (= 6.0.3.4)
-      actionmailbox (= 6.0.3.4)
-      actionmailer (= 6.0.3.4)
-      actionpack (= 6.0.3.4)
-      actiontext (= 6.0.3.4)
-      actionview (= 6.0.3.4)
-      activejob (= 6.0.3.4)
-      activemodel (= 6.0.3.4)
-      activerecord (= 6.0.3.4)
-      activestorage (= 6.0.3.4)
-      activesupport (= 6.0.3.4)
+    rails (5.2.4.5)
+      actioncable (= 5.2.4.5)
+      actionmailer (= 5.2.4.5)
+      actionpack (= 5.2.4.5)
+      actionview (= 5.2.4.5)
+      activejob (= 5.2.4.5)
+      activemodel (= 5.2.4.5)
+      activerecord (= 5.2.4.5)
+      activestorage (= 5.2.4.5)
+      activesupport (= 5.2.4.5)
       bundler (>= 1.3.0)
-      railties (= 6.0.3.4)
+      railties (= 5.2.4.5)
       sprockets-rails (>= 2.0.0)
     rails-dom-testing (2.0.3)
       activesupport (>= 4.2.0)
       nokogiri (>= 1.6)
     rails-html-sanitizer (1.3.0)
       loofah (~> 2.3)
-    railties (6.0.3.4)
-      actionpack (= 6.0.3.4)
-      activesupport (= 6.0.3.4)
+    railties (5.2.4.5)
+      actionpack (= 5.2.4.5)
+      activesupport (= 5.2.4.5)
       method_source
       rake (>= 0.8.7)
-      thor (>= 0.20.3, < 2.0)
+      thor (>= 0.19.0, < 2.0)
     rake (13.0.3)
     rexml (3.2.4)
     rspec (3.10.0)
@@ -282,21 +279,20 @@ GEM
     thread_safe (0.3.6)
     tzinfo (1.2.9)
       thread_safe (~> 0.1)
-    webmock (3.11.2)
+    webmock (3.12.0)
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)
     websocket-driver (0.7.3)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
-    zeitwerk (2.4.2)
 
 PLATFORMS
   ruby
+  x86_64-darwin-17
 
 DEPENDENCIES
   acapi!
-  mongoid!
   rspec
   rspec-rails
   shoulda-matchers
@@ -305,4 +301,4 @@ DEPENDENCIES
   webmock
 
 BUNDLED WITH
-   2.2.6
+   2.2.11
