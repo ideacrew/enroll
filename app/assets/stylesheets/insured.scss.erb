@@ -526,6 +526,17 @@
   overflow-wrap: break-word;
 }
 
+#account-detail .popover {
+  background-color: $primary-black;
+  color: $primary-white;
+  .arrow:after {
+    border-right-color: $primary-black;
+  }
+  .popover-title {
+    display: none;
+  }
+}
+
 .glossary + .popover {
   background-color: <%= EnrollRegistry[:cancel_plan_border].settings(:color).item %>;
   color: white;
@@ -561,6 +572,10 @@
       color: white;
     }
   }
+}
+
+.dropdown-glossary span.glossary {
+  border-bottom: none;
 }
 
 span.glossary {
