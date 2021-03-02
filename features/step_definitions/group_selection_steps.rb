@@ -541,6 +541,10 @@ When(/^\w+ clicks on the make changes to my coverage button/) do
   wait_for_ajax
 end
 
+Given(/^the automatic application of aptc on enrollment feature configuration is disabled$/) do
+  disable_feature :apply_aggregate_to_enrollment
+end
+
 When(/(.*) clicks on the make changes button/) do |_role|
   enable_change_tax_credit_button
   page.all('a', text: 'Make changes to my coverage').first.click

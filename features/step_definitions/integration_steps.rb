@@ -786,7 +786,7 @@ When(/^.+ filters plans by Carrier/) do
   carrier_option = find('li .interaction-choice-control-carrier-1', wait: 5)
   @carrier_selected = carrier_option.text
   carrier_option.click
-  find(".interaction-click-control-apply", wait: 5).click
+  find(".interaction-click-control-apply", match: :first, wait: 5).click
 end
 
 Then(/^.+ should see plans filtered by Carrier/) do
@@ -1138,4 +1138,14 @@ end
 And(/^Hbx Admin click on Employers/) do
   find_link("Employers").visible?
   click_link("Employers")
+end
+
+And(/I click (.*) QLE events in QLE carousel$/) do |market_name|
+  click_link market_name
+  sleep(2)
+end
+
+Then(/^I should see Shop for new plan button$/) do
+  shop_for_new_plan_input = page.all('input').detect { |input| input[:value] == 'Shop for new plan' }
+  expect(shop_for_new_plan_input.present?).to eq(true)
 end
