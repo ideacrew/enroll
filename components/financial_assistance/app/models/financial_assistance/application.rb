@@ -167,7 +167,7 @@ module FinancialAssistance
 
         direct_relationship.update(kind: relationship_kind)
       elsif predecessor.id != successor.id
-        relationships.create(applicant_id: predecessor.id, relative_id: successor.id, kind: relationship_kind) # Direct Relationship
+        update_or_build_relationship(predecessor, successor, relationship_kind) # Direct Relationship
       end
     end
 
@@ -371,8 +371,9 @@ module FinancialAssistance
 
         next unless s_ids.count > s_ids.uniq.count
         members = applicants.where(:id.in => rel.to_a.flatten)
-        members.second.relationships.create(applicant_id: members.second.id, relative_id: members.first.id, kind: 'sibling')
-        members.first.relationships.create(applicant_id: members.first.id, relative_id: members.second.id, kind: 'sibling')
+
+        update_or_build_relationship(members.first, members.second, 'sibling')
+        update_or_build_relationship(members.second, members.first, 'sibling')
         missing_relationship -= [rel] #Remove Updated Relation from list of missing relationships
       end
 
@@ -396,15 +397,15 @@ module FinancialAssistance
           if parent_rel1.present? && child_rel2.present?
             grandchild = applicants.where(id: second_rel).first
             grandparent = applicants.where(id: first_rel).first
-            grandparent.relationships.create(applicant_id: grandparent.id, relative_id: grandchild.id, kind: "grandparent")
-            grandchild.relationships.create(applicant_id: grandchild.id, relative_id: grandparent.id, kind: "grandchild")
+            update_or_build_relationship(grandparent, grandchild, 'grandparent')
+            update_or_build_relationship(grandchild, grandparent, 'grandchild')
             missing_relationship -= [rel] #Remove Updated Relation from list of missing relationships
             break
           elsif child_rel1.present? && parent_rel2.present?
             grandchild = applicants.where(id: first_rel).first
             grandparent = applicants.where(id: second_rel).first
-            grandparent.relationships.create(applicant_id: grandparent.id, relative_id: grandchild.id, kind: "grandparent")
-            grandchild.relationships.create(applicant_id: grandchild.id, relative_id: grandparent.id, kind: "grandchild")
+            update_or_build_relationship(grandparent, grandchild, 'grandparent')
+            update_or_build_relationship(grandchild, grandparent, 'grandchild')
             missing_relationship -= [rel] #Remove Updated Relation from list of missing relationships
             break
           end
@@ -423,8 +424,8 @@ module FinancialAssistance
         spouse_relation = relationships.where(applicant_id: parent_rel1.relative_id, relative_id: parent_rel2.relative_id, kind: "spouse").first
         next unless spouse_relation.present?
         members = applicants.where(:id.in => rel.to_a.flatten)
-        members.second.relationships.create(applicant_id: members.second.id, relative_id: members.first.id, kind: "sibling")
-        members.first.relationships.create(applicant_id: members.first.id, relative_id: members.second.id, kind: "sibling")
+        update_or_build_relationship(members.first, members.second, 'sibling')
+        update_or_build_relationship(members.second, members.first, 'sibling')
         missing_relationship -= [rel] #Remove Updated Relation from list of missing relationships
       end
 

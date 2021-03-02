@@ -92,7 +92,7 @@
             </div>
             <div class="col-lg-4 mt18 static-font">
               <label class="static_label label-floatlabel mt-label">ACCOUNT HOLDER</label>
-              <span class="position-full-name"> <%= @applicant.full_name %> </span>
+              <span class="position-full-name"> <%= @applicant.application.primary_applicant.full_name %> </span>
             </div>
           </div>
         <% end %>

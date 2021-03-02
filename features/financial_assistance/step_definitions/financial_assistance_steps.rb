@@ -40,6 +40,7 @@ end
 
 Then(/^they should see a new finanical assistance application$/) do
   expect(page.current_url).to match("/applications/.*/edit")
+  expect(page).to have_content("If you need to add other members to your health insurance, select 'Add New Person'. When you’re finished, select CONTINUE.")
 end
 
 Then(/^they should see each of their dependents listed$/) do
@@ -406,7 +407,7 @@ When(/^the consumer manually enters the "Help Paying for Coverage" url in the br
 end
 
 Then(/^the consumer will navigate to the Help Paying for Coverage page$/) do
-  expect(page).to have_selector('h2', text: 'Help Paying for Coverage')
+  expect(page).to have_selector('h2', text: 'Your Application for Premium Reductions')
 end
 
 Then(/^the consumer will navigate to the Family Members page$/) do

@@ -8,6 +8,8 @@ Dir.glob("db/seedfiles/translations/en/#{site_key}/*").each do |file|
   require_relative "translations/en/#{site_key}/" + File.basename(file,File.extname(file))
 end
 
+require_relative File.join(Rails.root, 'components/financial_assistance/db/seedfiles/translations/en/faa_translations')
+
 puts '*' * 80 unless Rails.env.test?
 puts '::: Generating English Translations :::'
 
@@ -38,7 +40,8 @@ def dc_translations
     CENSUS_EMPLOYEE_TRANSLATIONS,
     BROWSER_SUPPORT_TRANSLATIONS,
     MANAGE_SEP_TYPES_TRANSLATIONS,
-    ADMIN_ACTIONS_TRANSLATIONS
+    ADMIN_ACTIONS_TRANSLATIONS,
+    FaaTranslations::ASSISTANCE_TRANSLATIONS
   ].reduce({}, :merge)
 end
 
