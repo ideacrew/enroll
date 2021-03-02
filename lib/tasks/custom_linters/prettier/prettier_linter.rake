@@ -8,8 +8,7 @@ namespace :prettier do
   task :beautify_changed_files do
     filelist = `git diff --name-only --staged | grep *.rb`
     puts("No rb files to lint") if filelist.blank?
-    return if filelist.blank?
     puts("Executing RB prettier for #{filelist}") if filelist.present?
-    `bundle exec rbprettier --write #{filelist}`
+    `bundle exec rbprettier --write #{filelist}` if filelist.present?
   end
 end
