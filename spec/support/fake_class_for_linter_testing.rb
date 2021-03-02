@@ -6,6 +6,10 @@ class FafkeClassForLinterTesting
 
   end
 
+  def fake_class
+
+  end
+
   def more_random_code
     "more" + "#{string}" + 12.to_s
   end
