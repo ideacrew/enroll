@@ -7,6 +7,8 @@ module BenefitSponsors
     include ::BenefitSponsors::Concerns::Observable
     include ::BenefitSponsors::ModelEvents::BenefitApplication
     include ::BenefitSponsors::Employers::EmployerHelper
+    # For usage of serializable_hash. Included by default in rails 6
+    include ActiveModel::Serialization if Rails.version["5"]
 
     include AASM
 

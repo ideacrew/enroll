@@ -8,6 +8,8 @@ module BenefitMarkets
   class Products::ProductPackage
     include Mongoid::Document
     include Mongoid::Timestamps
+    # For usage of serializable_hash. Included by default in rails 6
+    include ActiveModel::Serialization if Rails.version["5"]
 
     # Added this module as a temporary fix for EMPLOYER FLEXIBILITY PROJECT
     module ContributionModuleAssociation
