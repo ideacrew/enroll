@@ -28,7 +28,8 @@ PreCommit:
     enabled: true
     files: git diff --name-only --staged
     glob: "*.rb"
-    run: bundle exec rbprettier --write {files}
+    command: bundle exec rbprettier --write {files}
+
   # GitSecrets:
   #   enabled: true
   #   command: ['git/hooks/git-secrets']
