@@ -27,6 +27,7 @@ Feature: Broker Agency Registration
     Then they should see a welcome message
     And Primary Broker logs out
 
+  @broken
   Scenario: When the broker is hired as a census employee and registration is complete through employee role
     Given a CCA site exists with a benefit market
     # These steps will set up:
