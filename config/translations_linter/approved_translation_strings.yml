@@ -12,7 +12,7 @@ approved_translation_strings_in_erb_tags:
   "table_empty_to_human", "token_tag", "prev_page_tag", "role && role.current_state", "gap_tag", "next_page_tag", "yield", 'rails.application.config', 'rails.root.join', "commission_statement_coverage_period", "carrier_link"]
   dynamic_css_classes: ["<%= 'active'", '<%= "active"', "'active' if count == 0", "link_text_class", "initially_hidden_enrollment_css_class", "'hidden' if @identifier",
   '"active" if', 'dc_network%>" class="dc_network"> <%= dc_network', 'nationwide%>" class="nationwide" checked> <%= nationwide',
-  "icon_class", "div_class %>", 'col_styles', "style", "top_margin", "text_class", "'active' if", "'checked' if", "choice%>", "class='criteria'", "carrier[1]"]
+  "icon_class", "div_class %>", 'col_styles', "style", "top_margin", "text_class", "'active' if", "'checked' if", "choice%>", "class='criteria'", "carrier[1]", "pay-now-other"]
   # Array counter variabless are exact match
   array_counter_variables: ["crumb", "index", "child_index", "crumbs", "crumbs.last", "ind", "index + 1", "key", "k", "i", "qr[0]", "qr[1][:buy_up]", "rows[0].size > 1 ? rows[6] : rows[5]",
   "num", "row", "row[i]", "row[i][j]", "qr", "qr[:age]", "item.", "listing.", "value.first", "rows[0]", "rows[1]", "rows[2]", "rows[3]", "rows[4]", "rows[5]", "rows[6]", "rows[7]", "row_actions_id", "cv"]
@@ -56,5 +56,6 @@ approved_translation_strings_in_erb_tags:
 approved_translation_strings_outside_erb_tags:
   exact_match_string_list: ["%&gt", "0 gt", "ID",
   'here is another bad string', "this is a problematic string, here this is another string we have to test it and see what happens",
-  "producthiosid hbxenrollmentid hbxenrollmentid activeyear productactiveyear remote true gt"
+  "producthiosid hbxenrollmentid hbxenrollmentid activeyear productactiveyear remote true gt",
+  'dropdownmenuButton', ' rolemenu arialabelledbydropdownmenuButtongt'
 ]
