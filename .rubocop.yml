@@ -5,6 +5,9 @@
 #   a completely outsized amount of cop failures for the number of files:
 # - db/seedfiles
 # - lib/tasks
+inherit_gem:
+  prettier: rubocop.yml
+
 AllCops:
   TargetRubyVersion: 2.5
   Exclude:

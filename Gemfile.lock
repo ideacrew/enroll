@@ -677,6 +677,7 @@ GEM
       hashery (~> 2.0)
       ruby-rc4
       ttfunk
+    prettier (1.5.3)
     public_suffix (4.0.3)
     puma (3.12.4)
     pundit (2.1.0)
@@ -1050,6 +1051,7 @@ DEPENDENCIES
   overcommit (~> 0.47)
   parallel_tests (~> 2.26.2)
   prawn!
+  prettier
   puma (~> 3.12.4)
   pundit (~> 2.0)
   railroady (~> 1.5.3)

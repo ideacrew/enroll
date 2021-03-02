@@ -22,6 +22,12 @@ PreCommit:
 
   RuboCop:
     enabled: true
+
+    # https://medium.com/@arefaslani/make-your-ruby-code-prettier-38ae23b54927
+    prettier:
+      files: git diff --name-only --staged
+      glob: "*.rb"
+      run: bundle exec rbprettier --write {files}
   # GitSecrets:
   #   enabled: true
   #   command: ['git/hooks/git-secrets']
