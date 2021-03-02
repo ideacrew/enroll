@@ -4,7 +4,7 @@ module SponsoredBenefits
   module Concerns::OrganizationConcern
     extend ActiveSupport::Concern
 
-    included do |base|
+    included do
       include Mongoid::Document
       include Mongoid::Timestamps
 
@@ -24,9 +24,9 @@ module SponsoredBenefits
       # Web URL
       field :home_page, type: String
 
-      field :is_active, type: base::Boolean
+      field :is_active, type: Mongoid::Boolean
 
-      field :is_fake_fein, type: base::Boolean
+      field :is_fake_fein, type: Mongoid::Boolean
 
       # User or Person ID who created/updated
       field :updated_by, type: BSON::ObjectId
