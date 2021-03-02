@@ -1,9 +1,9 @@
 namespace :import do
   task :county_zips, [:file] => :environment do |task, args|
 
-    files = Rails.env.test? ? [args[:file]] : Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{Settings.aca.state_abbreviation.downcase}/xls_templates", "SHOP_ZipCode_CY2017_FINAL.xlsx"))
+    files = Rails.env.test? ? [args[:file]] : Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{Settings.aca.state_abbreviation.downcase}/xls_templates/counties/2021", "SHOP_ZipCode_CY2021_FINAL_ME.xlsx"))
     count = 0
-    if Settings.aca.state_abbreviation.downcase == "ma"
+    if ["ma", "me"].include?(Settings.aca.state_abbreviation.downcase)
       files.each do |file|
         year = file.split("/")[-2].to_i
         puts "*"*80 unless Rails.env.test?
@@ -21,8 +21,8 @@ namespace :import do
             row_info = sheet_data.row(row_number)
             ::BenefitMarkets::Locations::CountyZip.find_or_create_by!({
               county_name: row_info[@headers["county"]].squish!,
-              zip: row_info[@headers["zip"]].squish!,
-              state: "MA"
+              zip: "%05d" % row_info[@headers["zip"]].to_s.squish.to_i,
+              state: Settings.aca.state_abbreviation
             })
             count+=1
           end

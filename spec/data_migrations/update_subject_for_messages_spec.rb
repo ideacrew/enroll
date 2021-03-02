@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require File.join(Rails.root, 'app', 'data_migrations', 'update_subject_for_messages')
 
@@ -16,7 +18,7 @@ describe UpdateSubjectForMessages, dbclean: :after_each do
     let!(:organization)         { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let!(:employer_profile)     { organization.employer_profile }
     let!(:benefit_sponsorship)  { employer_profile.add_benefit_sponsorship }
-    let (:message) {FactoryBot.build(:message, subject: 'Welcome to MA Health Link')}
+    let(:message) {FactoryBot.build(:message, subject: 'Welcome to MA Health Link')}
 
     before(:each) do
       employer_profile.inbox.post_message(message)
@@ -26,7 +28,7 @@ describe UpdateSubjectForMessages, dbclean: :after_each do
       ClimateControl.modify fein: organization.fein, incorrect_subject: 'Welcome to MA Health Link', correct_subject: 'Welcome to Access Health' do
         subject.migrate
         employer_profile.inbox.messages.first.reload
-        expect(employer_profile.inbox.messages.first.subject).to eql ('Welcome to Access Health')
+        expect(employer_profile.inbox.messages.first.subject).to eql('Welcome to Access Health')
       end
     end
   end

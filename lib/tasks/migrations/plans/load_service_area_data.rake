@@ -36,7 +36,7 @@ namespace :load_service_reference do
           ::BenefitMarkets::Locations::ServiceArea.find_or_create_by!({
              active_year: year,
              issuer_provided_code: "DCS001",
-             covered_states: ["DC"],
+             covered_states: [Settings.aca.state_abbreviation],
              county_zip_ids: [],
              issuer_profile_id: issuer_profile.id,
              issuer_hios_id: nil,
@@ -66,7 +66,7 @@ namespace :load_service_reference do
           sa = ::BenefitMarkets::Locations::ServiceArea.where(
             active_year: @year,
             issuer_provided_code: sheet.cell(i,1),
-            covered_states: ["MA"],
+            covered_states: [Settings.aca.state_abbreviation],
             issuer_profile_id: @issuer_profile_hash[issuer_hios_id],
             issuer_provided_title: sheet.cell(i,2)
           ).first
@@ -77,7 +77,7 @@ namespace :load_service_reference do
             ::BenefitMarkets::Locations::ServiceArea.create(
               active_year: @year,
               issuer_provided_code: sheet.cell(i,1),
-              covered_states: ["MA"],
+              covered_states: [Settings.aca.state_abbreviation],
               issuer_hios_id: issuer_hios_id,
               issuer_profile_id: @issuer_profile_hash[issuer_hios_id],
               issuer_provided_title: sheet.cell(i,2)

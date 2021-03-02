@@ -7,7 +7,7 @@ namespace :import do
     hbx = HbxProfile.current_hbx
 
     # Second lowest cost silver plan
-    slcs_products = BenefitMarkets::Products::Product.where(hios_id: "94506DC0390005-01")
+    slcs_products = BenefitMarkets::Products::Product.where(hios_id: "33653ME0050002-01")
     slcsp_2021 =  slcs_products.select{|a| a.active_year == 2021}.first
     # check if benefit package is present for 2021
     bc_period_2021 = hbx.benefit_sponsorship.benefit_coverage_periods.select { |bcp| bcp.start_on.year == 2021 }.first
@@ -18,10 +18,14 @@ namespace :import do
     else
       # create benefit package and benefit_coverage_period for 2021
       bc_period_2020 = hbx.benefit_sponsorship.benefit_coverage_periods.select { |bcp| bcp.start_on.year == 2020 }.first
-      bc_period_2021 = bc_period_2020.clone
+      if bc_period_2020.blank?
+        bc_period_2021 = hbx.benefit_sponsorship.benefit_coverage_periods.new
+      else
+        bc_period_2021 = bc_period_2020.clone
+      end
       bc_period_2021.title = "Individual Market Benefits 2021"
-      bc_period_2021.start_on = bc_period_2020.start_on + 1.year
-      bc_period_2021.end_on = bc_period_2020.end_on + 1.year
+      bc_period_2021.start_on = Date.new(2021,1,1)
+      bc_period_2021.end_on = Date.new(2021,12,31)
 
       # if we need to change these dates after running this rake task in test or prod environments,
       # we should write a separate script.
@@ -30,6 +34,8 @@ namespace :import do
 
       bc_period_2021.slcsp = slcsp_2021.id
       bc_period_2021.slcsp_id = slcsp_2021.id
+
+      bc_period_2021.service_market = "individual"
 
       bs = hbx.benefit_sponsorship
       bs.benefit_coverage_periods << bc_period_2021

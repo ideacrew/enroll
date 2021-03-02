@@ -28,6 +28,17 @@ class BrokerRole
     "United Health Care Mid Atlantic" => nil
   }.freeze
 
+  ME_BROKER_CARRIER_APPOINTMENTS = {
+    "Aetna Health Inc" => nil,
+    "Aetna Life Insurance Company" => nil,
+    "Carefirst Bluechoice Inc" => nil,
+    "Group Hospitalization and Medical Services Inc" => nil,
+    "Kaiser Foundation" => nil,
+    "Optimum Choice" => nil,
+    "United Health Care Insurance" => nil,
+    "United Health Care Mid Atlantic" => nil
+  }.freeze
+
   CCA_BROKER_CARRIER_APPOINTMENTS = {
     "Altus" => nil,
     "Blue Cross Blue Shield MA" => nil,

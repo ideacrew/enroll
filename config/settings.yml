@@ -326,7 +326,10 @@ aca:
   plan_match_tool: true
 
   rating_areas:
-    - R-DC001
+    - R-ME001
+    - R-ME002
+    - R-ME003
+    - R-ME004
 
 notices:
   individual_market:
