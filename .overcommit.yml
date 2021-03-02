@@ -25,6 +25,7 @@ PreCommit:
 
     # https://medium.com/@arefaslani/make-your-ruby-code-prettier-38ae23b54927
   prettier:
+    enabled: true
     files: git diff --name-only --staged
     glob: "*.rb"
     run: bundle exec rbprettier --write {files}
