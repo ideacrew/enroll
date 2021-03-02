@@ -22,6 +22,12 @@ PreCommit:
 
   RuboCop:
     enabled: true
+
+  Prettier:
+    enabled: true
+    quiet: false
+    required_executable: 'rake'
+    command: ['bundle', 'exec', 'rake', 'prettier:beautify_changed_files']
   # GitSecrets:
   #   enabled: true
   #   command: ['git/hooks/git-secrets']
