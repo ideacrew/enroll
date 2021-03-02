@@ -2,6 +2,10 @@ class FafkeClassForLinterTesting
   def initialize(string = nil)
   end
 
+  def more_random_code
+    "more" + "#{string}" + 12.to_s
+  end
+
   def test_method
     d=[30644250780,9003106878, 30636278846,66641217692,4501790980,671_24_603036,131_61973916,66_606629_920,
    30642677916,30643069058];a,s=[],$*[0]
