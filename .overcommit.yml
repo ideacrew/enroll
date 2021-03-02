@@ -23,13 +23,11 @@ PreCommit:
   RuboCop:
     enabled: true
 
-    # https://medium.com/@arefaslani/make-your-ruby-code-prettier-38ae23b54927
-  prettier:
+  Prettier:
     enabled: true
-    files: git diff --name-only --staged
-    glob: "*.rb"
-    command: bundle exec rbprettier --write {files}
-
+    quiet: false
+    required_executable: 'rake'
+    command: ['bundle', 'exec', 'rake', 'prettier:beautify_changed_files']
   # GitSecrets:
   #   enabled: true
   #   command: ['git/hooks/git-secrets']
@@ -44,3 +42,12 @@ PreCommit:
 #
 #  IndexTags:
 #    enabled: true # Generate a tags file with `ctags` each time HEAD changes
+
+
+CommitMsg:
+  CommonCommit:
+    enabled: true
+    quiet: false
+    description: 'Checks if the commit message follows the common commit specifications'
+    required_executable: 'yarn'
+    command: ['yarn', 'run', 'commitlint']
