@@ -263,30 +263,16 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def census_employee_params
-=begin
-    [:dob, :hired_on].each do |attr|
-      if params[:census_employee][attr].present?
-        params[:census_employee][attr] = DateTime.strptime(params[:census_employee][attr].to_s, '%m/%d/%Y').try(:to_date)
-      end
-    end
-
-    census_dependents_attributes = params[:census_employee][:census_dependents_attributes]
-    if census_dependents_attributes.present?
-      census_dependents_attributes.each do |id, dependent_params|
-        if census_dependents_attributes[id][:dob].present?
-          params[:census_employee][:census_dependents_attributes][id][:dob] = DateTime.strptime(dependent_params[:dob].to_s, '%m/%d/%Y').try(:to_date)
-        end
-      end
-    end
-=end
-
-    params.require(:census_employee).permit(:id,
-      :first_name, :middle_name, :last_name, :name_sfx, :dob, :ssn, :gender, :hired_on, :employment_terminated_on, :is_business_owner, :existing_cobra, :cobra_begin_date,
+    params.require(:census_employee).permit(
+      :id, :first_name, :middle_name, :last_name, :name_sfx, :dob, :ssn,
+      :gender, :hired_on, :employment_terminated_on, :is_business_owner, :existing_cobra, :cobra_begin_date,
       :address_attributes => [ :id, :kind, :address_1, :address_2, :city, :state, :zip ],
       :email_attributes => [:id, :kind, :address],
       :census_dependents_attributes => [
         :id, :first_name, :last_name, :middle_name, :name_sfx, :dob, :gender, :employee_relationship, :_destroy, :ssn
-      ]
+      ],
+      :off_cycle_benefit_group_assignments => [],
+      :benefit_group_assignments_attributes => []
     )
   end
 
