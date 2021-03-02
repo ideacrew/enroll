@@ -17,8 +17,8 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/openhbx_cv2.git
-  revision: 62100256bd69ac5258832965e5054c5959d848ac
-  branch: master
+  revision: 6567dd46112982e6a9c90001b617caf313271fc9
+  branch: trunk
   specs:
     openhbx_cv2 (0.0.1)
       activesupport (>= 3.2)
@@ -26,8 +26,8 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/resource_registry.git
-  revision: f313d71aafd697e97b9e491410ab3f2ec5ea824c
-  branch: master
+  revision: 7b8f396afde849e584d0a749ade9ee88f1717e26
+  branch: trunk
   specs:
     resource_registry (0.7.0)
       bootsnap (~> 1.0)
@@ -665,7 +665,7 @@ GEM
     overcommit (0.52.1)
       childprocess (>= 0.6.3, < 4)
       iniparse (~> 1.4)
-    ox (2.13.3)
+    ox (2.14.1)
     parallel (1.19.1)
     parallel_tests (2.26.2)
       parallel
