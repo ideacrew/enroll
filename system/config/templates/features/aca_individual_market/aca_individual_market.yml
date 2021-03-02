@@ -40,3 +40,7 @@ registry:
       - key: :apply_aggregate_to_enrollment
         item: Operations::Individual::ApplyAggregateToEnrollment.new
         is_enabled: false
+      - key: :hub_ivl_registration
+        item: :consumer_role
+        is_enabled: true
+
