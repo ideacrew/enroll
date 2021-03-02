@@ -2,6 +2,10 @@ class FafkeClassForLinterTesting
   def initialize(string = nil)
   end
 
+  def more_random_code_again
+
+  end
+
   def more_random_code
     "more" + "#{string}" + 12.to_s
   end
