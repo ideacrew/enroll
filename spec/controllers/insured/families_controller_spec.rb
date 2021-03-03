@@ -196,6 +196,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
           allow(person).to receive(:has_active_consumer_role?).and_return(true)
           allow(person).to receive(:active_employee_roles).and_return(employee_roles)
           allow(user).to receive(:has_hbx_staff_role?).and_return false
+          EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
           sign_in user
         end
 
@@ -266,6 +267,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
           allow(employee_roles.first).to receive(:employer_profile).and_return abc_profile
           allow(abc_profile).to receive(:is_a?).with(BenefitSponsors::Organizations::FehbEmployerProfile).and_return true
           allow(user).to receive(:has_hbx_staff_role?).and_return false
+          EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
           sign_in user
         end
 
@@ -286,6 +288,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
           allow(person).to receive(:active_employee_roles).and_return(employee_roles)
           allow(user).to receive(:has_hbx_staff_role?).and_return true
           allow(person).to receive(:active_employee_roles).and_return([])
+          EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
           sign_in user
         end
 
@@ -318,6 +321,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
         allow(family).to receive(:active_family_members).and_return(family_members)
         allow(family).to receive(:check_for_consumer_role).and_return nil
         allow(employee_role).to receive(:census_employee_id).and_return census_employee.id
+        EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
         sign_in user
         get :home
       end
@@ -442,6 +446,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
         before :each do
           allow(family).to receive(:active_family_members).and_return(family_members)
           allow(employee_role).to receive(:census_employee_id).and_return census_employee.id
+          EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
           get :home
         end
         it "should be a success" do
@@ -467,6 +472,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
         before :each do
           allow(family).to receive(:active_family_members).and_return(family_members)
           allow(employee_role).to receive(:census_employee_id).and_return census_employee.id
+          EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
           get :home
         end
         it "should be a success" do
