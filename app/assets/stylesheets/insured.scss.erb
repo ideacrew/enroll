@@ -574,16 +574,16 @@
   }
 }
 
-.dropdown-glossary span.glossary {
-  border-bottom: none;
-}
-
 span.glossary {
   border-bottom: 1px dashed <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
 }
 span.glossary:hover {
   cursor: pointer;
   color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
+}
+
+.dropdown-glossary span.glossary {
+  border-bottom: 1px dashed #FFF;
 }
 
 .mt-label{
