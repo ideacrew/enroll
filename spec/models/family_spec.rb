@@ -902,6 +902,10 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
     let!(:employee_role) { FactoryBot.create(:employee_role, person: person, employer_profile: abc_profile, census_employee_id: census_employee.id) }
     let!(:benefit_group_assignment) { FactoryBot.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee)}
 
+    before do
+      EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
+    end
+
     it "should be in open enrollment" do
       expect(family.is_under_open_enrollment?).to be_truthy
     end
@@ -947,6 +951,10 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
     let!(:census_employee2) { FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile, benefit_group: benefit_group2 ) }
     let!(:employee_role2) { FactoryBot.create(:employee_role, person: person, employer_profile: abc_profile, census_employee_id: census_employee2.id) }
     let!(:benefit_group_assignment2) { FactoryBot.create(:benefit_group_assignment, benefit_group: benefit_group2, census_employee: census_employee2)}
+
+    before do
+      EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
+    end
 
     it "should be in open enrollment" do
       expect(family.is_under_open_enrollment?).to be_truthy
@@ -1030,6 +1038,10 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
     let!(:employee_role) { FactoryBot.create(:employee_role, person: person, employer_profile: abc_profile, census_employee_id: census_employee.id) }
     let!(:benefit_group_assignment) { FactoryBot.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee)}
 
+    before do
+      EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
+    end
+
     it "should be in open enrollment" do
       expect(family.is_under_open_enrollment?).to be_truthy
     end
@@ -1083,6 +1095,10 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
     let!(:census_employee2) { FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile, benefit_group: benefit_group2 ) }
     let!(:employee_role2) { FactoryBot.create(:employee_role, person: person, employer_profile: abc_profile, census_employee_id: census_employee2.id) }
     let!(:benefit_group_assignment2) { FactoryBot.create(:benefit_group_assignment, benefit_group: benefit_group2, census_employee: census_employee2)}
+
+    before do
+      EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
+    end
 
     it "should be in open enrollment" do
       expect(family.is_under_open_enrollment?).to be_truthy
