@@ -540,6 +540,10 @@ Then(/^\w+ clicks on the Actions button$/) do
   page.all("#dropdownMenuButton").first.click
 end
 
+Then(/^\w+ clicks on the Actions button for active enrollment$/) do
+  page.all("#dropdownMenuButton").last.click
+end
+
 And(/^\w+ should see able to see make changes to my coverage button$/) do
   page.all('a', text: 'Make changes to my coverage').first
 end
