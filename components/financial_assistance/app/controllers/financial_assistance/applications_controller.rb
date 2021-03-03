@@ -125,6 +125,7 @@ module FinancialAssistance
     end
 
     def raw_application
+      raise NotAuthorizedError unless current_user.has_hbx_staff_role?
       @application = FinancialAssistance::Application.where(id: params['id']).first
 
       if @application.nil? || @application.is_draft?
