@@ -283,7 +283,7 @@ Then(/Employee should see \"not yet eligible\" error message/) do
 end
 
 Then(/Employee should see \"may not enroll until eligible\" error message/) do
-  screenshot("new_hire_not_eligible_exception")
+  # screenshot("new_hire_not_eligible_exception")
   find('.alert', text: "You may not enroll unless it’s open enrollment or you’re eligible for a special enrollment period.")
   visit '/families/home'
 end
@@ -292,12 +292,12 @@ When(/Employee enters Qualifying Life Event/) do
   wait_for_ajax
   find_all("#carousel-qles a", wait: 10).first.click
   expect(page).to have_content "Married"
-  screenshot("future_qle_date")
+  # screenshot("future_qle_date")
   wait_for_ajax
   fill_in "qle_date", :with => (TimeKeeper.date_of_record - 5.days).strftime("%m/%d/%Y")
   find('#qle_submit', wait: 10).click
   find('input.interaction-click-control-continue', wait: 10, visible: false).click
-  screenshot("completing SEP")
+  # screenshot("completing SEP")
 end
 
 When(/Employee clicks continue on the family members page/) do

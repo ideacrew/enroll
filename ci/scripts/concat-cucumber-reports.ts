@@ -1,54 +1,57 @@
 const { promises: fs } = require('fs');
 
 async function getJson() {
-  const admin = await fs.readFile('./ci/cucumber/admin-report.json', 'utf-8');
+  const admin = await fs.readFile(
+    './ci/cucumber/admin-cucumber-report.json',
+    'utf-8'
+  );
   const broker = await fs.readFile(
-    './ci/cucumber/brokers-report.json',
+    './ci/cucumber/brokers-cucumber-report.json',
     'utf-8'
   );
   const coverall = await fs.readFile(
-    './ci/cucumber/coverall-report.json',
+    './ci/cucumber/cover_all-cucumber-report.json',
     'utf-8'
   );
   const employee = await fs.readFile(
-    './ci/cucumber/employee-report.json',
+    './ci/cucumber/employee-cucumber-report.json',
     'utf-8'
   );
   const employers = await fs.readFile(
-    './ci/cucumber/employers-report.json',
+    './ci/cucumber/employers-cucumber-report.json',
     'utf-8'
   );
   const financialAssistance = await fs.readFile(
-    './ci/cucumber/financial-assistance-report.json',
+    './ci/cucumber/financial_assistance-cucumber-report.json',
     'utf-8'
   );
   const generalAgencies = await fs.readFile(
-    './ci/cucumber/general-agencies-report.json',
+    './ci/cucumber/general_agencies-cucumber-report.json',
     'utf-8'
   );
   const groupSelection = await fs.readFile(
-    './ci/cucumber/group-selection-report.json',
+    './ci/cucumber/group_selection-cucumber-report.json',
     'utf-8'
   );
-  const hbx = await fs.readFile('./ci/cucumber/hbx-report.json', 'utf-8');
+  const hbx = await fs.readFile(
+    './ci/cucumber/hbx-cucumber-report.json',
+    'utf-8'
+  );
   const hbxAdmin = await fs.readFile(
-    './ci/cucumber/hbx-admin-report.json',
+    './ci/cucumber/hbx_admin-cucumber-report.json',
     'utf-8'
   );
   const insured = await fs.readFile(
-    './ci/cucumber/insured-report.json',
+    './ci/cucumber/insured-cucumber-report.json',
     'utf-8'
   );
-  const integration = await fs.readFile(
-    './ci/cucumber/integration-report.json',
-    'utf-8'
-  );
+
   const permissions = await fs.readFile(
-    './ci/cucumber/permissions-report.json',
+    './ci/cucumber/permissions-cucumber-report.json',
     'utf-8'
   );
   const planShopping = await fs.readFile(
-    './ci/cucumber/plan-shopping-report.json',
+    './ci/cucumber/plan_shopping-cucumber-report.json',
     'utf-8'
   );
 
@@ -64,7 +67,6 @@ async function getJson() {
     hbxAdmin,
     hbx,
     insured,
-    integration,
     permissions,
     planShopping,
   ];
