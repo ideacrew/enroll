@@ -5,7 +5,7 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_applicatio
 require "#{BenefitSponsors::Engine.root}/spec/support/benefit_sponsors_site_spec_helpers"
 require "#{BenefitSponsors::Engine.root}/spec/support/benefit_sponsors_product_spec_helpers"
 
-RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean: :after_each do
+RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean: :after_each, :if => ::EnrollRegistry[:aca_shop_market].enabled? do
     #include_context "setup benefit market with market catalogs and product packages"
 
   before :each do

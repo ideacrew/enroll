@@ -2310,7 +2310,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
     end
   end
 
-  describe HbxEnrollment, '.build_plan_premium', type: :model, dbclean: :around_each do
+  describe HbxEnrollment, '.build_plan_premium', type: :model, dbclean: :around_each, :if => ::EnrollRegistry[:aca_shop_market].enabled? do
     include_context "setup benefit market with market catalogs and product packages"
     include_context "setup initial benefit application"
 
