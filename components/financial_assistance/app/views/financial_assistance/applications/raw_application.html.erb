@@ -1,6 +1,7 @@
 <div class="container">
   <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 row">
     <div class="col-md-9">
+      <div id="dependents_info_wrapper">
       <h2 class="darkblue">Review Your Application</h2>
       <p><b>Application ID:</b> <%= @application.hbx_id %> </p>
       <% if income_and_deductions_for_any(@application).present? %>
@@ -78,11 +79,7 @@
                 <tr class="noBorder">
                   <td><%= applicant.dob %></td>
                   <td><%= applicant.gender.humanize %></td>
-                  <% if applicant.is_primary_applicant? %>
-                      <td></td>
-                  <% else %>
-                      <td><%= applicant.relationships.find_by(relative_id: @application.primary_applicant.id).kind.humanize %></td>
-                  <% end %>
+                  <td><%= applicant.is_primary_applicant? ? 'Self' : applicant.relationships.find_by(relative_id: @application.primary_applicant.id).kind.humanize %></td>
                   <td><%= human_boolean applicant.is_applying_coverage %></td>
                 </tr>
                 </tbody>
@@ -90,14 +87,6 @@
             </table>
           </div>
           <%= render partial: "financial_assistance/applications/demographic", collection: @demographic_hash[applicant.id], as: :demographic %>
-          <div class="form-bottom-border">
-            <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
-              <%= content_tag(:div, class: "col-md-11 form-heading") do %>
-                <%= label(nil, @demographic_hash[applicant.id].keys[0], class: "col-md-6") %>
-                <%= content_tag(:div, @demographic_hash[applicant.id].values[0]) %>
-              <% end %>
-            </div>
-          </div>
           <div class="form-bottom-border">
             <%= render partial: "financial_assistance/applications/income_coverage", collection: @income_coverage_hash[applicant.id]["info"], as: :income_coverage, locals: {applicant: applicant} %>
           </div>
@@ -109,14 +98,14 @@
         <div class="col-md-12 pz">
           <% if @application.applicants.count > 1 %>
             <div class="row row-form-wrapper ptb no-buffer row-height main-heading form-bottom-border">
-              <div class="col-md-12"><span></span>
+              <div class="col-md-12" style="font-size: 20px; font-weight: bold; padding-left: 0px;"><span></span>
                 <i class="fa fa-user blue-icon"></i> <%= "Your Household" %>
               </div>
             </div>
 
             <% if @all_relationships.present? %>
               <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
-                <div class="col-md-11">FAMILY RELATIONSHIPS</div>
+                <div class="col-md-11" style="font-weight: bold;">FAMILY RELATIONSHIPS</div>
                 <div class="col-md-1">
                   <%= link_to financial_assistance.application_relationships_path(@application), id: 'edit-family-relationships-pencil' do %>
                       <i class="fa fa-pencil fa-lg"></i>
@@ -152,10 +141,43 @@
                 <% end %>
             <% end %>
           <% end %>
+
+          <!-- Your Preferences -->
+          <% unless [@application.is_requesting_voter_registration_application_in_mail, @application.years_to_renew].include?(nil) %>
+            <div class="row row-form-wrapper ptb no-buffer row-height form-heading form-top-border">
+              <div class="col-md-12" style="font-weight: bold;">YOUR PREFERENCES</div>
+            </div>
+
+            <% if @cfl_service.displayable_field?('application', @application.id, :is_requesting_voter_registration_application_in_mail) %>
+              <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                <div class="col-md-6">Would you like to register to vote in DC or update your current registration?</div>
+                <div class="col-md-6"><%= human_boolean(@application.is_requesting_voter_registration_application_in_mail) %></div>
+              </div>
+            <% end %>
+
+            <% if @cfl_service.displayable_field?('application', @application.id, :years_to_renew) %>
+              <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                <div class="col-md-6">How long would you like your eligibility for help paying for coverage to be renewed?</div>
+                <div class="col-md-6"><%= @application.years_to_renew %></div>
+              </div>
+            <% end %>
+          <% end %>
+
+          <!-- More about your Household -->
+          <% if @cfl_service.displayable_field?('application', @application.id, :parent_living_out_of_home_terms) %>
+            <div class="row row-form-wrapper ptb no-buffer row-height form-heading form-top-border">
+              <div class="col-md-12">MORE ABOUT YOUR HOUSEHOLD</div>
+            </div>
+
+            <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+              <div class="col-md-6">Does any child on this application have a parent living outside of the home?</div>
+              <div class="col-md-6"><%= human_boolean(@application.parent_living_out_of_home_terms) %></div>
+            </div>
+          <% end %>
         </div>
       </div>
-
       <div class=""> <%= link_to "View my Applications", applications_path, class: "btn btn-small btn-primary" %> </div>
+    </div>
     </div>
     <div class='col-md-3'>
       <%= render partial: 'financial_assistance/shared/right_nav', locals: {
