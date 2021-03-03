@@ -10,107 +10,53 @@
         <i class="fa fa-phone fa-3x"></i>
         <div class="carrier-numbers">
           <% case plan.issuer_profile.legal_name %>
-          <% when "Aetna" %>
+          <% when "Community Health Options" %>
             <div>
-              <strong><%=l10n("plans.aetna_brokers_and_emprs")%></strong><br/>
+              <strong><%=l10n("plans.cho")%></strong><br/>
               <%=l10n("plans.call")%>
               <strong>
-                <a href=<%=l10n("plans.aetna_href_broker_and_emprs_phone")%> ><%=l10n("plans.aetna_broker_and_emprs_phone")%></a>
+                <a href=<%=l10n("plans.cho_href_phone")%> ><%=l10n("plans.cho_phone")%></a>
               </strong><br/>
-              <%=l10n("plans.aetna_broker_and_emprs_hours")%>
+              <%=l10n("plans.cho_hours")%> <br/>
+              <%=l10n("plans.cho_contact_url")%>
               <br/>
-              <br/>
-
-              <strong><%=l10n("plans.aetna_sbe")%></strong><br/>
-              <%=l10n("plans.call")%>
-              <strong>
-                <a href=<%=l10n('plans.aetna_href_sbe_call')%> ><%=l10n("plans.aetna_sbe_call")%></a>
-              </strong><br/>
-              <%=l10n("plans.aetna_hours")%>
-              <br/>
-              <br/>
-
-              <strong><%=l10n("plans.aetna_congressional_label")%></strong><br/>
-              <%=l10n("plans.call")%>
-              <strong>
-                <a href=<%=l10n('plans.aetna_href_congresssional_call')%> ><%=l10n("plans.aetna_congresssional_call")%></a>
-              </strong><br/>
-              <%=l10n("plans.aetna_hours")%>
-              <br/>
-              <br/>
-
-              <strong><%=l10n("plans.aetna_ivl_and_family")%></strong><br/>
-              <%=l10n("plans.call")%>
-              <strong>
-                <a href=<%=l10n('plans.aetna_href_phone')%>><%=l10n("plans.aetna_phone")%></a>
-              </strong><br/>
-              <%=l10n("plans.aetna_hours")%>
               <br/>
             </div>
-          <% when "UnitedHealthcare" %>
+          <% when "Harvard Pilgrim Health Care" %>
             <div>
-              <%=l10n("plans.call")%>
-              <a href=<%=l10n('plans.uh_href_phone')%> ><%=l10n("plans.uh_phone")%></a>
-            </div>
-          <% when "Kaiser" %>
-            <div>
-              <%=l10n("plans.call")%>
-            <strong>
-              <a href=<%=l10n('plans.kaiser_href_phone')%> ><%=l10n("plans.kaiser_phone")%></a>
-            </strong>
-            <br/>
-              <%=l10n("plans.kaiser_congressional_label")%>
-            <br/>
-            </div>
-          <% when "CareFirst" %>
-              <div>
-                <%=l10n("plans.call")%>
-                <strong>
-                  <a href=<%=l10n('plans.cf_href_phone')%> ><%=l10n("plans.cf_phone")%></a>
-                </strong>
-                <br/>
-                  <%=l10n("plans.cf_congressional_label")%>
-                <br/>
-              </div>
-          <% when  "Delta Dental" %>
-            <div>
+              <strong><%=l10n("plans.hphc")%></strong><br/>
               <%=l10n("plans.call")%>
               <strong>
-                <a href=<%l10n('plans.dd_href_number1')%> ><%=l10n("plans.dd_number1")%></a>
-              </strong>
-              or
-              <strong>
-                <a href=<%=l10n('plans.dd_href_number2')%> ><%=l10n("plans.dd_number2")%></a>
-              </strong>
+                <a href=<%=l10n("plans.hphc_href_phone")%> ><%=l10n("plans.hphc_phone")%></a>
+              </strong><br/>
+              <%=l10n("plans.hphc_hours")%> <br/>
+              <br/>
               <br/>
             </div>
-          <% when "MetLife"%>
+          <% when "Renaissance Dental" %>
             <div>
+              <strong><%=l10n("plans.rnsd")%></strong><br/>
               <%=l10n("plans.call")%>
               <strong>
-                <a href=<%=l10n('plans.metlife_href_phone')%> ><%=l10n("plans.metlife_phone")%></a>
+                <a href=<%=l10n("plans.rnsd_href_phone")%> ><%=l10n("plans.rnsd_phone")%></a>
               </strong><br/>
+              <%=l10n("plans.rnsd_hours")%> <br/>
+              <%=l10n("plans.rnsd_contact_url")%>
+              <br/>
+              <br/>
             </div>
-          <% when "Dentegra" %>
+          <% when "Northeast Delta Dental" %>
             <div>
+              <strong><%=l10n("plans.nedd")%></strong><br/>
               <%=l10n("plans.call")%>
               <strong>
-                <a href=<%=l10n('plans.dentegra_href_phone')%> ><%=l10n("plans.dentegra_phone")%></a>
+                <a href=<%=l10n("plans.nedd_href_phone_1")%> ><%=l10n("plans.nedd_phone_1")%></a>
+                <a href=<%=l10n("plans.nedd_href_phone_2")%> ><%=l10n("plans.nedd_phone_2")%></a>
               </strong><br/>
-            </div>
-          <% when "Dominion National" %>
-            <div>
-              <%=l10n("plans.call")%>
-              <strong>
-                <a href=<%=l10n('plans.dominion_href_phone')%> ><%=l10n("plans.dominion_phone")%></a>
-              </strong><br/>
-            </div>
-          <% when "BEST Life" %>
-            <div><br/>
-              <%=l10n("plans.call")%>
-              <strong>
-                <a href=<%=l10n('plans.bestlife_href_phone')%> ><%=l10n("plans.bestlife_phone")%></a>
-              </strong><br/>
+              <%=l10n("plans.nedd_hours")%> <br/>
+              <%=l10n("plans.nedd_contact_url")%>
+              <br/>
+              <br/>
             </div>
           <% end %>
         </div>
