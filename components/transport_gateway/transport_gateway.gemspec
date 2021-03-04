@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.version     = TransportGateway::VERSION
   s.authors     = ["Dan Thomas"]
   s.email       = ["dan@ideacrew.com"]
-  s.homepage    = "https://github.com/dchbx"
+  s.homepage    = "https://github.com/ideacrew"
   s.summary     = %q{A gateway for receiving and forwarding messages over various protocols}
   s.description = %q{A gateway that abstracts and transmits message payloads over SMTP, SFTP, HTTP, file and other protocols}
   s.license     = "MIT"

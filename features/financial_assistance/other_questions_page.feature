@@ -66,11 +66,9 @@ Feature: Start a new Financial Assistance Application and answers questions on O
     And the was this person enrolled in medicare when they left foster care should display
 
   Scenario: Student question
-    Given the user has an age between 18 and 19 years old
     Then the is this person a student question should display
 
   Scenario: Student question - answered yes
-    Given the user has an age between 18 and 19 years old
     And the user answers yes to being a student
     Then the type of student question should display
     And student status end date question should display
