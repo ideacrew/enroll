@@ -22,6 +22,8 @@ RSpec.describe Operations::People::Roles::PersistStaff, type: :model, dbclean: :
       person_id: person.id.to_s,
       coverage_record: {
         is_applying_coverage: false,
+        has_other_coverage: false,
+        is_owner: false,
         address: {},
         email: {}
       }
@@ -54,6 +56,8 @@ RSpec.describe Operations::People::Roles::PersistStaff, type: :model, dbclean: :
         person_id: person.id.to_s,
         coverage_record: {
           is_applying_coverage: false,
+          has_other_coverage: false,
+          is_owner: false,
           address: {},
           email: {}
         }
@@ -114,6 +118,8 @@ RSpec.describe Operations::People::Roles::PersistStaff, type: :model, dbclean: :
         person_id: current_person.id.to_s,
         coverage_record: {
           is_applying_coverage: false,
+          has_other_coverage: false,
+          is_owner: false,
           address: {},
           email: {}
         }
