@@ -6,14 +6,14 @@
     <% if k == "jobs" %>
         <% v.each do |k, v| %>
             <div class="no-buffer" style="border: 1px solid #ddd;">
-              <%= render partial: "financial_assistance/applications/form_fields", collection: v, as: :form_field %>
+              <%= render partial: "financial_assistance/applications/form_fields", collection: v == true ? "Yes" : v == false ? "No" : v.nil? ? "N/A" : v, as: :form_field %>
             </div>
         <% end %>
     <% else %>
         <div class="row row-form-wrapper ptb no-buffer row-height form-content">
           <div class="col-md-6"><%= k %>
           </div>
-          <div class="col-md-6"><%= v %></div>
+          <div class="col-md-6"><%= v == true ? "Yes" : v == false ? "No" : v.nil? ? "N/A" : v %></div>
         </div>
         <% if income_coverage[0] == "HEALTH COVERAGE" &&  k.include?("enrolled")  && applicant.has_enrolled_health_coverage  %>
             <%= render partial: 'financial_assistance/applications/review_benefits', locals: {kind: 'is_enrolled', applicant: applicant} %>
