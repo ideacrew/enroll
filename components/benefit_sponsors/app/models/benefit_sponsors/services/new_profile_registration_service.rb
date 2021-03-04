@@ -5,7 +5,7 @@ module BenefitSponsors
       attr_reader :organization, :profile, :representative
       attr_accessor :profile_type, :profile_id, :factory_class
 
-      VALID_PROFILE_TYPES = %w(benefit_sponsor broker_agency general_agency).freeze
+      VALID_PROFILE_TYPES = ["benefit_sponsor", "broker_agency", "general_agency"].freeze
 
       def initialize(attrs={})
         @profile_id = attrs[:profile_id]

@@ -79,13 +79,9 @@ module BenefitSponsors
       private
 
       def profile_type
-        valid_profile_types = %w(benefit_sponsor broker_agency general_agency).freeze
+        valid_profile_types = %w[benefit_sponsor broker_agency general_agency].freeze
         profile_type_constant_name = params[:profile_type] || params[:agency][:profile_type] || @agency.profile_type
-        @agency_type = if valid_profile_types.include?(profile_type_constant_name)
-                        profile_type_constant_name
-                       else
-                        nil
-                       end
+        @agency_type = (profile_type_constant_name if valid_profile_types.include?(profile_type_constant_name))
       end
 
       def default_template
