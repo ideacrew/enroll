@@ -22,7 +22,7 @@ module BenefitSponsors
             if %w[broker_agency general_agency].include?(values[:profile_type])
               key.failure('Please enter NPN') if value.blank?
               key.failure("npn length can't be more than 10") if value.present? && value.length > 10 && rule_error?
-              key.failure("npn already taken") if Person.where("broker_role.npn" => value).any?
+              key.failure("npn already taken") if value.present? && Person.where("broker_role.npn" => value).any?
             end
           end
 
