@@ -1,3 +1,4 @@
+@aca_shop_market_disabled
 Feature: EE plan purchase
 
   Background: Setup site, employer, and benefit application

@@ -1,3 +1,4 @@
+@aca_shop_market_disabled
 Feature: HBX staff subroles able to see the Ageoff Exclusion checkbox
 
   Background: Setup site, employer, and benefit application
