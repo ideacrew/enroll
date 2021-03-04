@@ -29,6 +29,7 @@ module SepAll
     @effective_on = special_enrollment_period.effective_on
     @self_attested = qle.is_self_attested
     @date_options = qle.date_options_available
+    @market_kind = qle.market_kind
   end
 
   def calculate_rule
