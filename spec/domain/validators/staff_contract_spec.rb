@@ -18,7 +18,7 @@ RSpec.describe Validators::StaffContract, type: :model, dbclean: :after_each do
     context 'with coverage record' do
 
       it 'should success with is applying for coverage' do
-        result = subject.call(params.merge!({coverage_record: {is_applying_coverage: false, address: {}, email: {}}}))
+        result = subject.call(params.merge!({coverage_record: {is_applying_coverage: false, has_other_coverage: false, is_owner: false, address: {}, email: {}}}))
         expect(result.success?).to be_truthy
       end
     end
