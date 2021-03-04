@@ -10,7 +10,7 @@
  <a href="#" class="dropdown-toggle" id="dropdownMenuLink"  data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" onclick="myFunction()" ><i class="fas fa-bars"></i> <strong><%= user_first_name_last_name_and_suffix %></strong></a>
 
   <ul class="dropdown-menu hub-menu" aria-labelledby="dropdownMenuLink">
-    <% if current_user.person.present? && ::EnrollRegistry.feature_enabled?(:manage_account_functionality) %>
+    <% if current_user.person.present? %>
       <li style="text-align: center; padding: 10px;">
         <i class="fas fa-question-circle fa-lg"></i>
         <div>
@@ -27,10 +27,6 @@
           <p><%= session[:current_portal]&.html_safe %></p>
         </div>
       </li>
-    <% end %>
-
-    <% if current_user.person.present? && ::EnrollRegistry.feature_enabled?(:manage_account_functionality) %>
-      <li><%= link_to 'Manage Account', main_app.manage_account_person_path(id: current_user&.person.id), class: 'dropdown-item'%></li>
     <% end %>
 
     <% if portal_count == 1 %>
@@ -72,9 +68,6 @@
         <li><%= link_to profile.legal_name, ga_link, class: 'dropdown-item' %></li>
       <% end %>
     <% end %>
-
-    <li><%= link_to l10n(".help"), Settings.site.help_url, target: '_blank', class: 'dropdown-item' %></li>
-    <li><%= link_to l10n(".logout"), main_app.destroy_user_session_path, method: "delete", class: "dropdown-item" %></li>
   </ul>
 </span>
 
