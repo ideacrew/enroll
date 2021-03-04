@@ -50,6 +50,8 @@ module BenefitSponsors
                   dob: person.dob,
                   hired_on: nil,
                   is_applying_coverage: false,
+                  has_other_coverage: false,
+                  is_owner: false,
                   address: {
                     kind: 'home',
                     address_1: home_address&.kind,

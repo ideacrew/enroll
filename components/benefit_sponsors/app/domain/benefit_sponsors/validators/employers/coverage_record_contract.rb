@@ -12,6 +12,8 @@ module BenefitSponsors
           optional(:hired_on).maybe(:date)
           optional(:gender).maybe(:string)
           optional(:coverage_record_dependents).maybe(:array)
+          optional(:has_other_coverage).value(:bool)
+          optional(:is_owner).value(:bool)
           required(:is_applying_coverage).value(:bool)
           required(:address).maybe(:hash)
           required(:email).maybe(:hash)

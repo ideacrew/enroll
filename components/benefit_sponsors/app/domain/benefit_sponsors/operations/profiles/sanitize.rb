@@ -62,6 +62,8 @@ module BenefitSponsors
           if coverage_record_params[:is_applying_coverage] == 'true'
             attrs.merge!(ssn: coverage_record_params[:ssn],
                          gender: coverage_record_params[:gender],
+                         has_other_coverage: coverage_record_params[:has_other_coverage],
+                         is_owner: coverage_record_params[:is_owner],
                          coverage_record_dependents: dependents_attrs,
                          hired_on: Date.strptime(coverage_record_params[:hired_on], '%Y-%m-%d'))
           end

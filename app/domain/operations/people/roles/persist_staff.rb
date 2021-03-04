@@ -108,6 +108,8 @@ module Operations
               dob: params[:dob],
               hired_on: params[:hired_on],
               is_applying_coverage: params[:is_applying_coverage],
+              has_other_coverage: params[:has_other_coverage],
+              is_owner: params[:is_owner],
               gender: params[:gender],
               address: Address.new({kind: address[:kind],
                                     address_1: address[:kind],

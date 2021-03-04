@@ -91,6 +91,7 @@ class EmployerStaffRole
                                                                        renewal_benefit_group_assignment: renewal_benefit_group_id,
                                                                        hired_on: coverage_record.hired_on,
                                                                        ssn: coverage_record.ssn,
+                                                                       is_business_owner: coverage_record.is_owner,
                                                                        gender: coverage_record.gender))
     if has_coverage?
       coverage_record.coverage_record_dependents.each do |dependent|

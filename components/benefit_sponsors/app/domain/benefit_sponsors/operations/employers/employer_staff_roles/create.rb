@@ -34,6 +34,8 @@ module BenefitSponsors
                         dob: params[:dob].present? ? params[:dob] : nil,
                         hired_on: params[:hired_on].present? ? parse_date(params[:hired_on]) : nil,
                         is_applying_coverage: params[:is_applying_coverage] == "true",
+                        is_owner: params[:is_owner] == "true",
+                        has_other_coverage: params[:has_other_coverage] == "true",
                         address: {
                           kind: address[:kind],
                           address_1: address[:kind],
