@@ -125,7 +125,12 @@ module FinancialAssistance
     end
 
     def raw_application
-      raise NotAuthorizedError unless current_user.has_hbx_staff_role?
+      unless current_user.has_hbx_staff_role?
+        flash[:error] = 'You are not authorized to access'
+        redirect_to applications_path
+        return
+      end
+
       @application = FinancialAssistance::Application.where(id: params['id']).first
 
       if @application.nil? || @application.is_draft?
@@ -135,8 +140,8 @@ module FinancialAssistance
 
         @applicants = @application.active_applicants
         @all_relationships = @application.relationships
-        @demographic_hash={}
-        @income_coverage_hash={}
+        @demographic_hash = {}
+        @income_coverage_hash = {}
 
         @applicants.each do |applicant|
           @demographic_hash[applicant.id] = generate_demographic_hash(applicant)
@@ -321,27 +326,27 @@ module FinancialAssistance
     end
 
     def generate_other_questions_hash(applicant)
-    {
-      "Has this person applied for an SSN" => human_boolean(applicant.is_ssn_applied),
-      "Why doesn't this person have an SSN?" => applicant.non_ssn_apply_reason.to_s.present? ? applicant.non_ssn_apply_reason.to_s : 'N/A',
-      "Is this person pregnant?" => human_boolean(applicant.is_pregnant),
-      "Pregnancy due date?" => applicant.pregnancy_due_on.to_s.present? ? applicant.pregnancy_due_on.to_s : 'N/A',
-      "How many children is this person expecting?" => applicant.children_expected_count.present? ? applicant.children_expected_count : 'N/A',
-      "Was this person pregnant in the last 60 days?" => human_boolean(applicant.is_post_partum_period),
-      "Pregnancy end on date" => applicant.pregnancy_end_on.to_s.present? ? applicant.pregnancy_end_on.to_s : 'N/A',
-      "Was this person on Medicaid during pregnancy?" => human_boolean(applicant.is_enrolled_on_medicaid),
-      "Was this person in foster care at age 18 or older?" => human_boolean(applicant.is_former_foster_care),
-      "Where was this person in foster care?" => applicant.foster_care_us_state.present? ? applicant.foster_care_us_state : 'N/A',
-      "How old was this person when they left foster care?" => applicant.age_left_foster_care.present? ? applicant.age_left_foster_care : 'N/A',
-      "Was this person enrolled in Medicaid when they left foster care?" => human_boolean(applicant.had_medicaid_during_foster_care),
-      "Is this person a student?" => human_boolean(applicant.is_student),
-      "What is the type of student?" => applicant.student_kind.present? ? applicant.student_kind : 'N/A',
-      "Student status end on date?" => applicant.student_status_end_on.present? ? applicant.student_status_end_on : 'N/A',
-      "What type of school do you go to?" => human_boolean(applicant.student_school_kind),
-      "Is this person blind?" => human_boolean(applicant.is_self_attested_blind),
-      "Does this person need help with daily life activities, such as dressing or bathing?" => human_boolean(applicant.has_daily_living_help),
-      "Does this person need help paying for any medical bills from the last 3 months?" => human_boolean(applicant.has_daily_living_help),
-      "Does this person have a disability?" => human_boolean(applicant.is_physically_disabled)
+      {
+        "Has this person applied for an SSN" => human_boolean(applicant.is_ssn_applied),
+        "Why doesn't this person have an SSN?" => applicant.non_ssn_apply_reason.to_s.present? ? applicant.non_ssn_apply_reason.to_s : 'N/A',
+        "Is this person pregnant?" => human_boolean(applicant.is_pregnant),
+        "Pregnancy due date?" => applicant.pregnancy_due_on.to_s.present? ? applicant.pregnancy_due_on.to_s : 'N/A',
+        "How many children is this person expecting?" => applicant.children_expected_count.present? ? applicant.children_expected_count : 'N/A',
+        "Was this person pregnant in the last 60 days?" => human_boolean(applicant.is_post_partum_period),
+        "Pregnancy end on date" => applicant.pregnancy_end_on.to_s.present? ? applicant.pregnancy_end_on.to_s : 'N/A',
+        "Was this person on Medicaid during pregnancy?" => human_boolean(applicant.is_enrolled_on_medicaid),
+        "Was this person in foster care at age 18 or older?" => human_boolean(applicant.is_former_foster_care),
+        "Where was this person in foster care?" => applicant.foster_care_us_state.present? ? applicant.foster_care_us_state : 'N/A',
+        "How old was this person when they left foster care?" => applicant.age_left_foster_care.present? ? applicant.age_left_foster_care : 'N/A',
+        "Was this person enrolled in Medicaid when they left foster care?" => human_boolean(applicant.had_medicaid_during_foster_care),
+        "Is this person a student?" => human_boolean(applicant.is_student),
+        "What is the type of student?" => applicant.student_kind.present? ? applicant.student_kind : 'N/A',
+        "Student status end on date?" => applicant.student_status_end_on.present? ? applicant.student_status_end_on : 'N/A',
+        "What type of school do you go to?" => human_boolean(applicant.student_school_kind),
+        "Is this person blind?" => human_boolean(applicant.is_self_attested_blind),
+        "Does this person need help with daily life activities, such as dressing or bathing?" => human_boolean(applicant.has_daily_living_help),
+        "Does this person need help paying for any medical bills from the last 3 months?" => human_boolean(applicant.has_daily_living_help),
+        "Does this person have a disability?" => human_boolean(applicant.is_physically_disabled)
       }
     end
 
@@ -361,13 +366,15 @@ module FinancialAssistance
       job_hash
     end
 
-    def human_boolean(boolean)
-      if boolean
+    def human_boolean(value)
+      if value == true
         'Yes'
-      elsif boolean == false
+      elsif value == false
         'No'
-      else
+      elsif value.nil?
         'N/A'
+      else
+        value
       end
     end
   end
