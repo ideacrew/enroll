@@ -41,14 +41,15 @@ Feature: Create Benefit Application by admin UI
     And the existing applications for ABC Widgets will be <after_submit_title>
 
     Examples:
-      | title                 | aasm_state            | after_submit_title                | message |
-      | Publish Pending       | pending               | Publish Pending                   | Existing plan year with overlapping coverage exists |
-      | Enrolling             | enrollment_open       | Enrolling                         | Existing plan year with overlapping coverage exists |
-      | Enrollment Closed     | enrollment_closed     | Enrollment Closed                 | Existing plan year with overlapping coverage exists |
-      | Enrolled              | binder_paid           | Enrolled                          | Existing plan year with overlapping coverage exists |
-      | Enrollment Ineligible | enrollment_ineligible | Enrollment Ineligible             | Existing plan year with overlapping coverage exists |
-      | Active                | active                | Active                            | Existing plan year with overlapping coverage exists |
+      | title             | aasm_state        | after_submit_title | message                                             |
+      | Publish Pending   | pending           | Publish Pending    | Existing plan year with overlapping coverage exists |
+      | Enrolling         | enrollment_open   | Enrolling          | Existing plan year with overlapping coverage exists |
+      | Enrollment Closed | enrollment_closed | Enrollment Closed  | Existing plan year with overlapping coverage exists |
+      | Enrolled          | binder_paid       | Enrolled           | Existing plan year with overlapping coverage exists |
+      # | Enrollment Ineligible | enrollment_ineligible | Enrollment Ineligible             | Existing plan year with overlapping coverage exists |
+      | Active            | active            | Active             | Existing plan year with overlapping coverage exists |
 
+  @flaky
   Scenario: Creating New Plan Year while application is in termination_pending aasm_state
     And initial employer ABC Widgets has active benefit application
     Given that a user with a HBX staff role with HBX staff subrole exists and is logged in

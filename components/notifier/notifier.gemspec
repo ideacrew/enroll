@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.version     = Notifier::VERSION
   s.authors     = ["Dan Thomas"]
   s.email       = ["dan@ideacrew.com"]
-  s.homepage    = "https://github.com/dchbx"
+  s.homepage    = "https://github.com/ideacrew"
   s.summary     = %q{An engine for generating notices by merging data with template text}
   s.description = %q{Using a class instance and reference to a pre-defined template, build a customized notice in PDF format \
                       and drop at well-known endpoint }

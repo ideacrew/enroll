@@ -1,0 +1,52 @@
+name: manual test
+on:
+  workflow_dispatch:
+    inputs:
+      test_type:
+        description: 'cucumber or rspec'
+        required: true
+        default: cucumber
+      test_path:
+        description: 'a folder or file'
+        required: true
+
+jobs:
+  run_test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ruby/setup-ruby@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '10'
+      - uses: wbari/start-mongoDB@v0.2
+        with:
+          mongoDBVersion: '3.6'
+      - name: Restore project gems
+        uses: actions/cache@v2
+        with:
+          path: vendor/bundle
+          key: v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
+          restore-keys: |
+            v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
+      - name: Install project gems
+        run: |
+          gem update --system
+          bundle config path vendor/bundle
+          bundle install
+          gem install treye-semaphore_test_boosters --version '2.5.2'
+      - name: Restore Node Modules
+        id: npm-cache
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
+      - name: Install node dependencies
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: yarn install
+      - name: run webpack
+        run: NODE_ENV=test RAILS_ENV=test ./bin/webpack
+      - name: Run tests
+        run: bundle exec ${{ github.event.inputs.test_type }} ${{ github.event.inputs.test_path }}

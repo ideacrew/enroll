@@ -44,7 +44,7 @@ When(/^(.*) create a new account for employer$/) do |named_person|
   fill_in "user[oim_id]", :with => person[:email]
   fill_in "user[password]", :with => person[:password]
   fill_in "user[password_confirmation]", :with => person[:password]
-  screenshot("create_account")
+  # screenshot("create_account")
   find(".interaction-click-control-create-account").click
 end
 
@@ -94,7 +94,7 @@ Then(/^Employer should see a form to enter information about employee, address a
 
   fill_in 'census_employee[email_attributes][address]', :with => person[:email]
 
-  screenshot("create_census_employee_with_data")
+  # screenshot("create_census_employee_with_data")
   click_button "Create Employee"
 end
 
@@ -131,7 +131,7 @@ Then(/^Employer should see a form to enter information about employee, address a
 
   fill_in 'census_employee[email_attributes][address]', :with => person[:email]
 
-  screenshot("create_census_employee_with_data")
+  # screenshot("create_census_employee_with_data")
   click_button "Create Employee"
 end
 
@@ -173,7 +173,7 @@ And(/^.+ should see census employee created success message for (.*)$/) do |name
   wait_for_ajax
   person = people_for_cobra[named_person]
   expect(page).to have_content('Census Employee is successfully created.')
-  screenshot("employer_census_new_family_success_message")
+  # screenshot("employer_census_new_family_success_message")
   find_by_id('Tab:by_cobra').click
 
   expect(page).to have_content(person[:first_name])
@@ -211,7 +211,7 @@ Then(/^Jack Cobra should see the receipt page and verify employer contribution f
   expect(page).to have_content('Market: Employer Sponsored COBRA/Continuation')
   expect(page).to have_content('Your employer may charge an additional administration fee for your COBRA/Continuation coverage. If you have any questions, please direct them to the Employer.')
   expect(page).to have_content('$0.00')
-  screenshot("receipt_page_for_cobra_employee")
+  # screenshot("receipt_page_for_cobra_employee")
   find('.interaction-click-control-continue').click
 end
 
@@ -219,7 +219,7 @@ Then(/^Jack Employee should see the receipt page and verify employer contributio
   expect(page).to have_content('Enrollment Submitted')
   expect(page).to have_content('Market: Employer Sponsored')
   expect(page).not_to have_content('Your employer may charge an additional administration fee for your COBRA/Continuation coverage. If you have any questions, please direct them to the Employer.')
-  screenshot("receipt_page_for_normal_employee")
+  # screenshot("receipt_page_for_normal_employee")
   find('.interaction-click-control-continue').click
 end
 
@@ -354,7 +354,7 @@ And(/^.+ should be able to enter plan year, benefits, relationship benefits for 
   find(:xpath, "//p[@class='label'][contains(., 'SELECT START ON')]").click
   find(:xpath, "//li[@data-index='1'][contains(., '#{start}')]").click
 
-  screenshot("employer_add_plan_year")
+  # screenshot("employer_add_plan_year")
   find('.interaction-field-control-plan-year-fte-count').click
 
   fill_in "plan_year[fte_count]", :with => "35"
