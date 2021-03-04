@@ -262,7 +262,7 @@ def employer_poc
     @page_alphabets = page_alphabets(@staff, "last_name")
     page_no = cur_page_no(@page_alphabets.first)
     if @q.nil?
-      @staff = @staff.where(last_name: /^#{Regexp.escape(page_no)}/i)
+      @staff = page_no.present? ? @staff.where(last_name: /^#{Regexp.escape(page_no)}/i) : []
     else
       @staff = @staff.where(last_name: @q)
     end
