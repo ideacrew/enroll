@@ -102,7 +102,7 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
       let(:faa_expected_count_nil) do
         {
           "is_pregnant" => true,
-          "pregnancy_due_on" => (applicant.dob + 20.years).strftime("%m/%d/%Y"),
+          "pregnancy_due_on" => applicant.dob + 20.years,
           "children_expected_count" => nil
         }
       end
@@ -110,7 +110,7 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
       let(:faa_valid_params_pregenancy) do
         {
           "is_pregnant" => true,
-          "pregnancy_due_on" => (applicant.dob + 20.years).strftime("%m/%d/%Y"),
+          "pregnancy_due_on" => applicant.dob + 20.years,
           "children_expected_count" => 1
         }
       end
@@ -164,7 +164,7 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
       let(:faa_enrolled_on_medicaid_nil) do
         {
           "is_post_partum_period" => true,
-          "pregnancy_end_on" => (applicant.dob + 20.years).strftime("%m/%d/%Y"),
+          "pregnancy_end_on" => applicant.dob + 20.years,
           "is_enrolled_on_medicaid" => nil
         }
       end
@@ -172,7 +172,7 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
       let(:faa_valid_params_partum_period_params) do
         {
           "is_post_partum_period" => true,
-          "pregnancy_end_on" => (applicant.dob + 20.years).strftime("%m/%d/%Y"),
+          "pregnancy_end_on" => applicant.dob + 20.years,
           "is_enrolled_on_medicaid" => true
         }
       end
@@ -207,6 +207,12 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
     end
 
     context "age_of_applicant" do
+      let(:is_not_former_foster_care) do
+        {
+          "is_former_foster_care" => nil
+        }
+      end
+
       let(:is_invalid_former_foster_care) do
         {
           "is_former_foster_care" => true,
@@ -232,15 +238,13 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
       end
 
       before :each do
-        applicant.update_attributes(is_applying_coverage: true,
-                                    dob: TimeKeeper.date_of_record - 20.years,
-                                    is_post_partum_period: true,
-                                    pregnancy_end_on: applicant.dob + 20.years,
-                                    is_enrolled_on_medicaid: true)
+        applicant.update_attributes("is_applying_coverage" => true, dob: TimeKeeper.date_of_record - 20.years, "is_post_partum_period" => true,
+                                    "pregnancy_end_on" => applicant.dob + 20.years,
+                                    "is_enrolled_on_medicaid" => true)
       end
 
       it "should not save and redirects to other_questions_financial_assistance_application_applicant_path with invalid params", dbclean: :after_each do
-        get :save_questions, params: { application_id: application.id, id: applicant.id, applicant: {} }
+        get :save_questions, params: { application_id: application.id, id: applicant.id, applicant: is_not_former_foster_care }
         expect(response).to have_http_status(302)
         expect(response.headers['Location']).to have_content 'other_questions'
         expect(response).to redirect_to(other_questions_application_applicant_path(application, applicant))
@@ -260,7 +264,7 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
         expect(response).to redirect_to(other_questions_application_applicant_path(application, applicant))
       end
 
-      it "should save and redirects to edit_financial_assistance_application_path with valid params", dbclean: :after_each do
+      it "should save and redirects to redirects to edit_financial_assistance_application_path with valid params", dbclean: :after_each do
         get :save_questions, params: { application_id: application.id, id: applicant.id, applicant: is_valid_former_foster_care }
         expect(response).to have_http_status(302)
         expect(response.headers['Location']).to have_content 'edit'
