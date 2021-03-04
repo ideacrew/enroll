@@ -76,7 +76,7 @@ Then /^they should see the name of staff$/ do
   expect(page).to have_content("General Agency Staff")
   expect(page).to have_content(general_agency_organization.legal_name)
   expect(page).to have_content(full_name)
-  screenshot("general_agency_staff_list")
+  # screenshot("general_agency_staff_list")
 
   click_link full_name
 end

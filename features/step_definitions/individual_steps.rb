@@ -5,7 +5,7 @@ When(/^\w+ visits? the Insured portal during open enrollment$/) do
   FactoryBot.create(:qualifying_life_event_kind, market_kind: "individual")
   FactoryBot.create(:qualifying_life_event_kind, :effective_on_event_date_and_first_month, market_kind: "individual")
   BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
-  screenshot("individual_start")
+  # screenshot("individual_start")
   r_id = BenefitMarkets::Products::Product.all.where(title:  "IVL Test Plan Bronze")[1].id.to_s
   BenefitMarkets::Products::Product.all.where(title:  "IVL Test Plan Bronze")[0].update_attributes!(renewal_product_id: r_id)
 end
@@ -17,7 +17,7 @@ When(/^\w+ visits? the Insured portal outside of open enrollment$/) do
 
   visit "/"
   click_link 'Consumer/Family Portal'
-  screenshot("individual_start")
+  # screenshot("individual_start")
 end
 
 And(/Individual asks how to make an email account$/) do
@@ -33,7 +33,7 @@ Then(/Individual creates HBX account$/) do
   fill_in "user[oim_id]", :with => (@u.email :email)
   fill_in "user[password]", :with => "aA1!aA1!aA1!"
   fill_in "user[password_confirmation]", :with => "aA1!aA1!aA1!"
-  screenshot("create_account")
+  # screenshot("create_account")
   find('.create-account-btn').click
 end
 And(/^I can see the select effective date$/) do
@@ -68,7 +68,7 @@ When(/user goes to register as an individual$/) do
   fill_in 'person[ssn]', :with => (@u.ssn :ssn)
   find(:xpath, '//label[@for="radio_male"]').click
 
-  screenshot("register")
+  # screenshot("register")
   find('.btn', text: 'CONTINUE').click
 end
 
@@ -115,7 +115,7 @@ Then(/Individual should see a form to enter personal information$/) do
   expect(page).to have_css("#us_citizen", visible: false)
   expect(page).to have_css("#is_incarcerated", visible: false)
   sleep 2
-  screenshot("personal_form")
+  # screenshot("personal_form")
 end
 
 And(/^.+ selects (.*) for coverage$/) do |coverage|
@@ -270,9 +270,9 @@ Then(/^\w+ should see identity verification page and clicks on submit/) do
   expect(page).to have_content("When you're finished, select SUBMIT.")
   find(:xpath, '//label[@for="interactive_verification_questions_attributes_0_response_id_a"]', wait: 5).click
   find(:xpath, '//label[@for="interactive_verification_questions_attributes_1_response_id_c"]', wait: 5).click
-  screenshot("identify_verification")
+  # screenshot("identify_verification")
   click_button "Submit"
-  screenshot("override")
+  # screenshot("override")
   click_link "Continue Application"
 end
 
@@ -288,7 +288,7 @@ end
 Then(/\w+ should see the dependents form/) do
   #expect(page).to have_content('Add Member')
   expect(page).to have_content('Add New Person')
-  screenshot("dependents")
+  # screenshot("dependents")
 end
 
 And(/Individual clicks on add member button/) do
@@ -307,7 +307,7 @@ And(/Individual clicks on add member button/) do
   find(:xpath, '//label[@for="dependent_naturalized_citizen_false"]').click
   find(:xpath, '//label[@for="indian_tribe_member_no"]').click
   find(:xpath, '//label[@for="radio_incarcerated_no"]').click
-  screenshot("add_member")
+  # screenshot("add_member")
   all(:css, ".mz").last.click
 end
 
@@ -329,14 +329,14 @@ And(/Individual again clicks on add member button/) do
   find(:xpath, '//label[@for="radio_incarcerated_no"]').click
 
   #testing
-  screenshot("added member")
+  # screenshot("added member")
   all(:css, ".mz").last.click
   sleep 2
 end
 
 
 And(/I click on continue button on household info form/) do
-  screenshot("line 161")
+  # screenshot("line 161")
   click_link 'Continue', :wait => 10
 end
 
@@ -350,7 +350,7 @@ Then(/Individual creates a new HBX account$/) do
   fill_in "user[oim_id]", :with => "testflow@test.com"
   fill_in "user[password]", :with => "aA1!aA1!aA1!"
   fill_in "user[password_confirmation]", :with => "aA1!aA1!aA1!"
-  screenshot("create_account")
+  # screenshot("create_account")
   click_button "Create Account"
 end
 
@@ -414,7 +414,7 @@ And(/^I click on continue button on group selection page$/) do
 end
 
 And(/I select a plan on plan shopping page/) do
-   screenshot("plan_shopping")
+   # screenshot("plan_shopping")
    find_all('.plan-select')[0].click
 end
 
@@ -430,7 +430,7 @@ And(/I click on purchase button on confirmation page/) do
   find('.interaction-choice-control-value-terms-check-thank-you').click
   fill_in 'first_name_thank_you', :with => (@u.find :first_name)
   fill_in 'last_name_thank_you', :with => (@u.find :last_name)
-  screenshot("purchase")
+  # screenshot("purchase")
   click_link "Confirm"
 end
 
@@ -445,7 +445,7 @@ end
 And(/I should see the individual home page/) do
   sleep 5
   expect(page).to have_content "My #{Settings.site.short_name}"
-  screenshot("my_account")
+  # screenshot("my_account")
   # something funky about these tabs in JS
   # click_link "Documents"
   # click_link "Manage Family"
@@ -499,7 +499,7 @@ Then(/Second user creates an individual account$/) do
   @browser.text_field(class: /interaction-field-control-user-email/).set(@u.email :email2)
   @browser.text_field(class: /interaction-field-control-user-password/).set("aA1!aA1!aA1!")
   @browser.text_field(class: /interaction-field-control-user-password-confirmation/).set("aA1!aA1!aA1!")
-  screenshot("create_account")
+  # screenshot("create_account")
   scroll_then_click(@browser.input(value: "Create account"))
 end
 
@@ -528,7 +528,7 @@ Then(/Individual asks for help$/) do
   fill_in "help_first_name", with: "Sherry"
   fill_in "help_last_name", with: "Buckner"
   sleep(2)
-  screenshot("help_from_a_csr")
+  # screenshot("help_from_a_csr")
   find("#search_for_plan_shopping_help").click
   find(".interaction-click-control-×").click
 end
@@ -597,7 +597,7 @@ end
 Given(/^\w+ visits the Employee portal$/) do
   visit '/'
   click_link 'Employee Portal'
-  screenshot("start")
+  # screenshot("start")
   click_button 'Create account'
 end
 
@@ -681,7 +681,7 @@ And(/(\w+) clicks on the purchase button on the confirmation page/) do |insured|
   click_when_present(@browser.checkbox(class: /interaction-choice-control-value-terms-check-thank-you/))
   @browser.text_field(class: /interaction-field-control-first-name-thank-you/).set(person[:first_name])
   @browser.text_field(class: /interaction-field-control-last-name-thank-you/).set(person[:last_name])
-  screenshot("purchase")
+  # screenshot("purchase")
   click_when_present(@browser.a(text: /confirm/i))
 end
 
@@ -690,7 +690,7 @@ Then(/^Aptc user create consumer role account$/) do
   fill_in "user[oim_id]", :with => "aptc@dclink.com"
   fill_in "user[password]", :with => "aA1!aA1!aA1!"
   fill_in "user[password_confirmation]", :with => "aA1!aA1!aA1!"
-  screenshot("create_account")
+  # screenshot("create_account")
   click_button "Create Account"
 end
 
@@ -699,14 +699,14 @@ Then(/^Aptc user goes to register as individual/) do
   step "user goes to register as an individual"
   fill_in 'person[first_name]', :with => "Aptc"
   fill_in 'person[ssn]', :with => (@u.ssn :ssn)
-  screenshot("aptc_register")
+  # screenshot("aptc_register")
 
 end
 
 Then(/^Aptc user should see a form to enter personal information$/) do
   sleep 1
   step "Individual should see a form to enter personal information"
-  screenshot("aptc_personal")
+  # screenshot("aptc_personal")
   find('.btn', text: 'CONTINUE').click
 end
 
@@ -727,7 +727,7 @@ Then(/^Prepare taxhousehold info for aptc user$/) do
   benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
   benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(start_on)}.update_attributes!(slcsp_id: current_product.id)
   benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(future_start_on)}.update_attributes!(slcsp_id: future_product.id)
-  screenshot("aptc_householdinfo")
+  # screenshot("aptc_householdinfo")
 end
 
 Then(/^Prepare taxhousehold info for aptc user with selected eligibility$/) do
@@ -747,27 +747,27 @@ Then(/^Prepare taxhousehold info for aptc user with selected eligibility$/) do
   benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
   benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(start_on)}.update_attributes!(slcsp_id: current_product.id)
   benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(future_start_on)}.update_attributes!(slcsp_id: future_product.id)
-  screenshot("aptc_householdinfo")
+  # screenshot("aptc_householdinfo")
 end
 
 And(/Aptc user set elected amount and select plan/) do
   fill_in 'elected_aptc', with: "20"
   find_all('.plan-select')[0].click
-  screenshot("aptc_setamount")
+  # screenshot("aptc_setamount")
 end
 
 Then(/Aptc user should see aptc amount and click on confirm button on thankyou page/) do
   find('.interaction-choice-control-value-terms-check-thank-you').click
   fill_in 'first_name_thank_you', :with => (@u.find :first_name)
   fill_in 'last_name_thank_you', :with => (@u.find :last_name)
-  screenshot("aptc_purchase")
+  # screenshot("aptc_purchase")
   click_link "Confirm"
 end
 
 Then(/Aptc user should see aptc amount on receipt page/) do
   expect(page).to have_content 'Enrollment Submitted'
   expect(page).to have_content '$20.00'
-  screenshot("aptc_receipt")
+  # screenshot("aptc_receipt")
 end
 
 Then(/Aptc user should see aptc amount on individual home page/) do
@@ -775,7 +775,7 @@ Then(/Aptc user should see aptc amount on individual home page/) do
   expect(page).to have_content "My #{Settings.site.short_name}"
   expect(page).to have_content '$20.00'
   expect(page).to have_content 'APTC amount'
-  screenshot("my_account")
+  # screenshot("my_account")
 end
 
 And(/consumer has successful ridp/) do

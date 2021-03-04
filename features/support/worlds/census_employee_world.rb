@@ -175,6 +175,12 @@ And(/^there is a census employee record and employee role for (.*?) for employer
   expect(person_record.employee_roles.count > 0).to eq(true)
 end
 
+And(/^census employee (.*?) has a user record$/) do |named_person|
+  person = people[named_person]
+  person_record = Person.where(first_name: person[:first_name], last_name: person[:last_name]).first
+  FactoryBot.create(:user, person: person_record)
+end
+
 And(/^census employee (.*?) is a (.*) employee$/) do |named_person, state|
   person = people[named_person]
   census_employee.update(aasm_state: state)
