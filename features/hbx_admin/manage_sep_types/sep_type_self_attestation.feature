@@ -59,6 +59,7 @@ Feature: Admin has ability to create a new SEP Type with self attestation option
       | Admin Only       | not see |
 
   Scenario Outline: Admin will create a new Shop market SEP type by picking self attestation option for <user_attestation>
+    Given the shop market configuration is enabled
     Given Admin can navigate to the Manage SEPs screen
     And expired Qualifying life events of shop market is present
     When Admin clicks on the Create SEP Type button
