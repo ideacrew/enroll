@@ -16,6 +16,8 @@ class CoverageRecord
   field :hired_on, type: Date
   field :gender, type: String
   field :is_applying_coverage, type: Boolean, default: false
+  field :has_other_coverage, type: Boolean, default: false
+  field :is_owner, type: Boolean, default: false
 
   def ssn=(val)
     return if val.blank?
