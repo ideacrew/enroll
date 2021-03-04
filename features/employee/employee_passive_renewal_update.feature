@@ -1,3 +1,4 @@
+@aca_shop_market_disabled
 Feature: Passive renewal should be updated when EE updates his current coverage
 
   Background: Setup site, employer, and benefit application

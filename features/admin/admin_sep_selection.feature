@@ -1,5 +1,6 @@
 Feature: Admin plan shopping via SEP
   Scenario: Admin can select plan for insured multiple role user through SEP
+    Given the shop market configuration is enabled
     Given all permissions are present
     Given individual Qualifying life events are present
     Given a CCA site exists with a benefit market

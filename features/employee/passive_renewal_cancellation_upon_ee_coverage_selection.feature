@@ -1,3 +1,4 @@
+@aca_shop_market_disabled
 Feature: Employee passive renewal should be canceled when Employee selected coverage
 
   After a passive renewal if employee makes a plan selection, passive renewal should be canceled

@@ -147,6 +147,7 @@ Feature: Admin has ability to create a new SEP Type with visibility options for 
   # | Admin Only       |
 
   Scenario Outline: Admin will create a new Shop market SEP type by picking visibility option for <user_visibility>
+    Given the shop market configuration is enabled
     Given Admin can navigate to the Manage SEPs screen
     And expired Qualifying life events of shop market is present
     When Admin clicks on the Create SEP Type button
@@ -198,6 +199,7 @@ Feature: Admin has ability to create a new SEP Type with visibility options for 
       | Admin Only       | not see |
 
   Scenario Outline: Admin will create a new Shop market SEP type by picking visibility option for <user_visibility> with future date
+    Given the shop market configuration is enabled
     Given Admin can navigate to the Manage SEPs screen
     And expired Qualifying life events of shop market is present
     When Admin clicks on the Create SEP Type button

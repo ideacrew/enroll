@@ -1,3 +1,4 @@
+@aca_shop_market_disabled
 Feature: Employee of a Sole Source Employer Shopping During Open Enrollment
   Background:
     Given a CCA site exists with a benefit market

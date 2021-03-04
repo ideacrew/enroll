@@ -1,3 +1,4 @@
+@aca_shop_market_disabled
 Feature: Non-congressional EE adding non-diabled 26 years old dependent
 
   Background: Setup site, employer, and benefit application
