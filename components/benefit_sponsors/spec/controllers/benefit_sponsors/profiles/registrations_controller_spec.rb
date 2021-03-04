@@ -178,6 +178,31 @@ module BenefitSponsors
       # it_behaves_like "initialize registration form, :new, { profile_type:  "contact_center" }
       # it_behaves_like "initialize registration form", :new, { profile_type: "fedhb" }
 
+      describe "profile_type params" do
+        context "random class passed as profile_type" do
+          context "not signed in"
+            before do
+              get :new, params:{ profile_type: "Thishouldnotexistandhopefullyitwillnot", portal: true }
+            end
+
+            it "should not throw an exception" do
+              expect(response).to redirect_to('http://test.host/users/sign_in')
+              expect(assigns(:agency).portal).to eq('true')
+            end
+          end
+          context "signed in" do
+            before do
+              sign_in user
+              get :new, params:{ profile_type: "Thishouldnotexistandhopefullyitwillnot", portal: true }
+            end
+
+            it "should not throw an exception and render new template" do
+              expect(response).to render_template :new
+              expect(assigns(:agency).portal).to eq('true')
+            end
+        end
+      end
+
       describe "for new on broker_agency_portal", dbclean: :after_each do
         context "for new on broker_agency_portal click without user" do
 
