@@ -1,3 +1,4 @@
+@aca_shop_market_disabled
 Feature: Shop Employees can purchase coverage through covid QLE
   Employees can pick First of current month as coverage begin date or
   they can choose First of Next month as coverage begin date
