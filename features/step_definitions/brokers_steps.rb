@@ -19,7 +19,6 @@ When(/^Primary Broker should see the New Broker Agency form$/) do
 end
 
 When(/^.+ enters personal information$/) do
-  visit "/broker_registration"
   fill_in 'agency[staff_roles_attributes][0][first_name]', with: 'Ricky'
   fill_in 'agency[staff_roles_attributes][0][last_name]', with: 'Martin'
   fill_in 'inputDOB', with: '10/10/1984'
@@ -153,11 +152,12 @@ And(/^.+ should receive an invitation email$/) do
             else
               "Important information for accessing your new broker account through the #{Settings.site.short_name}"
             end
+  broker_email_address = Person.all.detect { |p| p.broker_role }.emails.first.address
   open_email(
-    "ricky.martin@example.com",
+    broker_email_address,
     :with_subject => subject
   )
-  expect(current_email.to).to eq(["ricky.martin@example.com"])
+  expect(current_email.to).to eq([broker_email_address])
 end
 
 When(/^.+ visits? invitation url in email$/) do
@@ -190,8 +190,9 @@ Then(/^.+ should see bank information$/) do
 end
 
 Then(/^.+ should see successful message with broker agency home page$/) do
- #expect(page).to have_content("Welcome to #{Settings.site.short_name}. Your account has been created.")
-  expect(page).to have_content("Broker Agency : #{broker_agency_profile.legal_name}")
+  expect(page).to have_content("Welcome to #{Settings.site.short_name}. Your account has been created.")
+  current_broker_legal_name = Person.all.detect { |p| p.broker_role }.broker_role.broker_agency_profile.legal_name
+  expect(page).to have_content("Broker Agency : #{current_broker_legal_name}")
 end
 
 Then(/^.+ should see no active broker$/) do

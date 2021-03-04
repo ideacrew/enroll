@@ -37,3 +37,7 @@ Then(/Primary Broker should see the registration submitted successful message/) 
   sleep 10
   expect(page).to have_content(BrokerRegistration.registration_submitted_succesful_message)
 end
+
+And(/HBX Admin clicks the Approve Broker button POM$/) do
+  find(BrokerAgencyStaffRegistration.approve_broker_btn).click
+end

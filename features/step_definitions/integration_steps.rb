@@ -318,6 +318,7 @@ end
 When(/(^.+) enters? office location for (.+)$/) do |role, location|
   location = eval(location) if location.class == String
   RatingArea.where(zip_code: "01001").first || FactoryBot.create(:rating_area, zip_code: "01001", county_name: "Hampden", rating_area: Settings.aca.rating_areas.first)
+  binding.pry
   fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][address_attributes][address_1]', :with => location[:address1]
   fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][address_attributes][address_2]', :with => location[:address2]
   fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][address_attributes][city]', :with => location[:city]
@@ -931,7 +932,9 @@ end
 
 When(/^(?:General){0}.+ clicks? on the ((?:General|Staff){0}.+) tab$/) do |tab_name|
   click_link 'HBX Portal' if page.has_link?('HBX Portal')
+  binding.pry
   find(:xpath, "//li[contains(., '#{tab_name}')]", :wait => 10).click
+  binding.pry
   wait_for_ajax
 end
 
@@ -944,7 +947,6 @@ end
 When(/^(?:General){0}.+ clicks? on the ((?:General|Staff){0}.+) option$/) do |tab_name|
   find(".interaction-click-control-#{tab_name.downcase.gsub(' ','-')}", wait: 5).click
   wait_for_ajax
-  find('#myTabContent').click
 end
 
 And(/^clicks on the person in families tab$/) do

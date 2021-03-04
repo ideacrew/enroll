@@ -16,33 +16,33 @@ Feature: Create Primary Broker and Broker Agency
     When Primary Broker visits the HBX Broker Registration form
     Given a valid ach record exists
     Given Primary Broker has not signed up as an HBX user
-    Then Primary Broker should see the New Broker Agency form
+    When a Primary Broker visits the HBX Broker Registration form POM
+    When Primary Broker enters personal information POM
     When Primary Broker enters personal information
     And Primary Broker enters broker agency information for SHOP markets
     And Primary Broker enters office location for default_office_location
     Then Primary Broker should see broker registration successful message
 
-  @broken
   Scenario: Primary Broker has not signed up on the HBX
+    Given a CCA site exists with a benefit market
     When Primary Broker visits the HBX Broker Registration form
     Given a valid ach record exists
     Given Primary Broker has not signed up as an HBX user
-    Then Primary Broker should see the New Broker Agency form
-    When Primary Broker enters personal information
-    And Primary Broker enters broker agency information for SHOP markets
-    And Primary Broker enters office location for default_office_location
-    And Primary Broker clicks on Create Broker Agency
+    When a Primary Broker visits the HBX Broker Registration form POM
+    When Primary Broker enters personal information POM
+    And Primary Broker enters broker agency information POM
     Then Primary Broker should see broker registration successful message
     Given Hbx Admin exists
     When Hbx Admin logs on to the Hbx Portal
     And I select the all security question and give the answer
     When I have submitted the security questions
+    Given user visits the Hbx Portal
     And Hbx Admin clicks on the Brokers dropdown
     And Hbx Admin clicks on the Broker Applications option
     Then Hbx Admin should see the list of broker applicants
     When Hbx Admin clicks on the current broker applicant show button
     Then Hbx Admin should see the broker application with carrier appointments
-    When Hbx Admin clicks on approve broker button
+    And HBX Admin clicks the Approve Broker button POM
     Then Hbx Admin should see the broker successfully approved message
     And Hbx Admin logs out
 
@@ -59,9 +59,10 @@ Feature: Create Primary Broker and Broker Agency
     When I visit the Employer portal
     Then Tim Wood creates an HBX account
     When Tim Wood has already provided security question responses
-    Then Tim Wood should see a successful sign up message
+    # Then Tim Wood should see a successful sign up message
     Then I should click on employer portal
-    And Tim Wood creates a new employer profile with default_office_location
+    Then all required fields have valid inputs on the Employer Registration Form
+    # And Tim Wood creates a new employer profile with default_office_location
     When Employer clicks on the Brokers tab
     Then Employer should see no active broker
     When Employer click on Browse Brokers button

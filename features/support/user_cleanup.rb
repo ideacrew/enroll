@@ -1,5 +1,5 @@
 After do
-  if User.present?
-    User.last.destroy
+  if User.all.present?
+    User.destroy_all
   end
 end
