@@ -22,13 +22,13 @@ PLAN_TRANSLATIONS = {
   'en.plans.rnsd_hours' => '8:00 am – 8:00 pm (M-F)',
   'en.plans.rnsd_contact_url' => 'www.RenaissanceBenefits.com',
 
-  'en.plans.anthm' => 'Northeast Delta Dental',
+  'en.plans.anthm' => '',
   'en.plans.anthm_phone' => '',
   'en.plans.anthm_href_phone' => '',
   'en.plans.anthm_hours' => '',
   'en.plans.anthm_contact_url' => '',
 
-  'en.plans.nedd' => '',
+  'en.plans.nedd' => 'Northeast Delta Dental',
   'en.plans.nedd_phone_1' => '1-800-832-5700',
   'en.plans.nedd_phone_2' => '1-603-223-1234',
   'en.plans.nedd_href_phone_1' => 'tel:+18008325700',
