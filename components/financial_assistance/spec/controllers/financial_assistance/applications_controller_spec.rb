@@ -211,7 +211,18 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   end
 
   context "GET raw" do
+    let(:temp_file) do
+      [{"demographics" => nil},
+       {"financial_assistance_info" => {"TAX INFO" => nil,
+                                        "INCOME" => nil,
+                                        "INCOME ADJUSTMENTS" => nil,
+                                        "HEALTH COVERAGE" => nil,
+                                        "OTHER QUESTIONS" => nil}}]
+    end
+
     before do
+      allow(File).to receive(:read).with("./components/financial_assistance/app/views/financial_assistance/applications/raw_application.yml.erb").and_return("")
+      allow(YAML).to receive(:load).with("").and_return(temp_file)
       user.update_attributes(roles: ["hbx_staff"])
     end
 

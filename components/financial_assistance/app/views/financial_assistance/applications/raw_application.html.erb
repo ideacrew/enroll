@@ -88,7 +88,7 @@
           </div>
           <%= render partial: "financial_assistance/applications/demographic", collection: @demographic_hash[applicant.id], as: :demographic %>
           <div class="form-bottom-border">
-            <%= render partial: "financial_assistance/applications/income_coverage", collection: @income_coverage_hash[applicant.id]["info"], as: :income_coverage, locals: {applicant: applicant} %>
+            <%= render partial: "financial_assistance/applications/income_coverage", collection: @income_coverage_hash[applicant.id], as: :income_coverage, locals: {applicant: applicant} %>
           </div>
         </div>
         <br>
