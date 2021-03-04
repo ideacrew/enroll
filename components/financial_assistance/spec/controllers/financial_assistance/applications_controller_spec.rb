@@ -211,6 +211,10 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   end
 
   context "GET raw" do
+    before do
+      user.update_attributes(roles: ["hbx_staff"])
+    end
+
     it "should be successful" do
       application.update_attributes(:aasm_state => "submitted")
       get :raw_application, params: { id: application.id }
@@ -223,6 +227,12 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     end
 
     it "should redirect to applications page for invalid id" do
+      get :raw_application, params: { id: FinancialAssistance::Application.new.id }
+      expect(response).to redirect_to(applications_path)
+    end
+
+    it "should redirect to applications page for non hbx_staff roles" do
+      user.update_attributes(roles: ["comsumer_role"])
       get :raw_application, params: { id: FinancialAssistance::Application.new.id }
       expect(response).to redirect_to(applications_path)
     end
