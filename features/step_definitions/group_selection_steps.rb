@@ -262,7 +262,7 @@ And(/(.*) should also see the reason for ineligibility/) do |named_person|
   person = person_hash ? Person.where(:first_name => /#{person_hash[:first_name]}/i, :last_name => /#{person_hash[:last_name]}/i).first : ''
   person = person.present? ? person : @person
 
-  if person.active_employee_roles.present?
+  if person&.active_employee_roles.present?
     expect(page).to have_content "Employer sponsored coverage is not available"
   else
     expect(page).to have_content "eligibility failed on family_relationships"
@@ -303,7 +303,7 @@ end
 
 Then(/(.*) should see primary person/) do |role|
   primary = Person.all.select { |person| person.primary_family.present? }.first
-  expect(page).to have_content("Covered: #{primary.first_name}", wait: 10)
+  expect(page).to have_content("Coverage For:   #{primary.first_name}", wait: 10)
 end
 
 Then(/(.*) should see the enrollment with make changes button/) do |role|
