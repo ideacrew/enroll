@@ -600,7 +600,7 @@ end
 
 And /^employer filled all the fields on benefit application form$/ do
   find(:xpath, "/html/body/div[3]/div/div/div[2]/form/div/div/div/div/div[3]/div/div/div[1]/div/div[2]").click
-  find('li[data-index="1"]').click
+  find('li[data-index="2"]').click
   fill_in 'benefit_application[fte_count]', with: 5
   fill_in 'benefit_application[pte_count]', with: 5
 end
@@ -621,7 +621,7 @@ Then(/^employer should see edit plan year button$/) do
 end
 
 And /^employer should see form for benefit package$/ do
-  expect(page).to have_content "Benefit Package - Set Up"
+  expect(page).to have_content("Benefit Package - Set Up", wait: 10)
 end
 
 And(/^employer filled all the fields on benefit package form for (.*) application$/) do |sponsor_type|
