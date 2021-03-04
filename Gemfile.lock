@@ -1,5 +1,12 @@
 GIT
-  remote: https://github.com/dchbx/acapi.git
+  remote: https://github.com/harshared/simple_calendar.git
+  revision: 109781178efa26c89ba51efa496bca29bc70a565
+  specs:
+    simple_calendar (2.2.5)
+      rails (>= 3.0)
+
+GIT
+  remote: https://github.com/ideacrew/acapi.git
   revision: fe6ddbb9904e0992cba01e689e1c97098e1ec9cb
   branch: amqp_proc_title
   specs:
@@ -9,25 +16,18 @@ GIT
       sneakers
 
 GIT
-  remote: https://github.com/dchbx/openhbx_cv2.git
-  revision: b8d2a141ac22c9744c17b4b53a22e9f7a843fadf
-  branch: master
+  remote: https://github.com/ideacrew/openhbx_cv2.git
+  revision: 6567dd46112982e6a9c90001b617caf313271fc9
+  branch: trunk
   specs:
     openhbx_cv2 (0.0.1)
       activesupport (>= 3.2)
       nokogiri-happymapper (~> 0.5)
 
 GIT
-  remote: https://github.com/harshared/simple_calendar.git
-  revision: 109781178efa26c89ba51efa496bca29bc70a565
-  specs:
-    simple_calendar (2.2.5)
-      rails (>= 3.0)
-
-GIT
   remote: https://github.com/ideacrew/resource_registry.git
-  revision: f313d71aafd697e97b9e491410ab3f2ec5ea824c
-  branch: master
+  revision: 7b8f396afde849e584d0a749ade9ee88f1717e26
+  branch: trunk
   specs:
     resource_registry (0.7.0)
       bootsnap (~> 1.0)
@@ -489,11 +489,11 @@ GEM
     erubi (1.10.0)
     erubis (2.7.0)
     execjs (2.7.0)
-    eye (0.8)
-      celluloid (~> 0.17.2)
+    eye (0.10.0)
+      celluloid (~> 0.17.3)
       celluloid-io (~> 0.17.0)
-      sigar (~> 0.7.3)
-      state_machine
+      kostya-sigar (~> 2.0.0)
+      state_machines
       thor
     factory_bot (4.11.1)
       activesupport (>= 3.0.0)
@@ -575,6 +575,7 @@ GEM
       kaminari-core (~> 1.0)
       mongoid
     kgio (2.11.3)
+    kostya-sigar (2.0.8)
     language_list (1.2.1)
     launchy (2.5.0)
       addressable (~> 2.7)
@@ -653,7 +654,7 @@ GEM
       net-ssh (>= 2.6.5)
     net-ssh (4.2.0)
     newrelic_rpm (5.7.0.350)
-    nio4r (2.5.4)
+    nio4r (2.5.5)
     nokogiri (1.10.10)
       mini_portile2 (~> 2.4.0)
     nokogiri-happymapper (0.8.1)
@@ -664,7 +665,7 @@ GEM
     overcommit (0.52.1)
       childprocess (>= 0.6.3, < 4)
       iniparse (~> 1.4)
-    ox (2.13.3)
+    ox (2.14.1)
     parallel (1.19.1)
     parallel_tests (2.26.2)
       parallel
@@ -854,7 +855,6 @@ GEM
       rack (~> 2.0)
       rack-protection (>= 2.0.0)
       redis (>= 4.1.0)
-    sigar (0.7.3)
     sigdump (0.2.4)
     simple_form (5.0.2)
       actionpack (>= 5.0)
@@ -894,7 +894,7 @@ GEM
     sshkit (1.18.2)
       net-scp (>= 1.1.2)
       net-ssh (>= 2.8.0)
-    state_machine (1.2.0)
+    state_machines (0.5.0)
     stimulus_reflex (3.3.0)
       cable_ready (>= 4.3.0)
       nokogiri
@@ -909,11 +909,11 @@ GEM
     terrapin (0.6.0)
       climate_control (>= 0.0.3, < 1.0)
     test-prof (0.11.3)
-    thor (1.0.1)
+    thor (1.1.0)
     thread (0.1.7)
     thread_safe (0.3.6)
     tilt (2.0.10)
-    timers (4.3.0)
+    timers (4.3.2)
     ttfunk (1.0.3)
     turbolinks (5.2.1)
       turbolinks-source (~> 5.2)
@@ -1008,7 +1008,7 @@ DEPENDENCIES
   devise-jwt (~> 0.5.9)
   effective_datatables!
   email_spec (~> 2)
-  eye (= 0.8)
+  eye (= 0.10.0)
   factory_bot_rails (~> 4.11)
   fakeredis (~> 0.7.0)
   fast_jsonapi
@@ -1111,4 +1111,4 @@ RUBY VERSION
    ruby 2.5.1p57
 
 BUNDLED WITH
-   2.1.4
+   2.2.9

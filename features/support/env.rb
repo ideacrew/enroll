@@ -10,7 +10,7 @@ require 'webdrivers'
 require 'cucumber/rails'
 require 'email_spec/cucumber'
 require 'rspec/expectations'
-require 'capybara-screenshot/cucumber'
+# require 'capybara-screenshot/cucumber'
 require 'cucumber/rspec/doubles'
 
 Dir[File.expand_path(Rails.root.to_s + "/lib/test/**/*.rb")].each { |f| load f }
@@ -69,8 +69,8 @@ end
 # See https://github.com/cucumber/cucumber-rails/blob/master/features/choose_javascript_database_strategy.feature
 Cucumber::Rails::Database.javascript_strategy = :truncation
 
-Capybara::Screenshot.webkit_options = { width: 2280, height: 1800 }
-Capybara::Screenshot.prune_strategy = :keep_last_run
+# Capybara::Screenshot.webkit_options = { width: 2280, height: 1800 }
+# Capybara::Screenshot.prune_strategy = :keep_last_run
 Webdrivers.cache_time = 86_400
 
 # Selenium::WebDriver::Chrome.path = '/opt/homebrew-cask/Caskroom/google-chrome/latest/Google Chrome.app/Contents/MacOS/Google Chrome'
@@ -78,11 +78,8 @@ Webdrivers.cache_time = 86_400
 Capybara.register_driver :selenium_chrome do |app|
   options = Selenium::WebDriver::Chrome::Options.new
   options.add_argument("headless")
-  options.add_argument("--window-size=1024,768")
-
-  if RUBY_PLATFORM =~ /darwin/
-    options.add_argument("--enable-features=NetworkService,NetworkServiceInProcess")
-  end
+  options.add_argument("--window-size=1920,1080")
+  options.add_argument("--enable-features=NetworkService,NetworkServiceInProcess")
 
   client = Selenium::WebDriver::Remote::Http::Default.new
   client.open_timeout = 120 # instead of the default 60

@@ -224,7 +224,7 @@ When("Individual with known qles visits the Insured portal outside of open enrol
   BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
   visit "/"
   click_link 'Consumer/Family Portal'
-  screenshot("individual_start")
+  # screenshot("individual_start")
 end
 
 And("Employee signed in") do

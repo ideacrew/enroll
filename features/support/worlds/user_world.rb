@@ -115,6 +115,15 @@ And(/^user with (.*?) role is (.*?)$/) do |type, locked_status|
   end
 end
 
+And(/^user (.*?) logs into the portal$/) do |named_person|
+  person = people[named_person]
+  person_rec = Person.where(first_name: person[:first_name], last_name: person[:last_name]).first
+  user = User.all.detect { |person_user| person_user.person == person_rec }
+  raise("No user present") if user.blank?
+  login_as(user, scope: :user)
+  visit "families/home"
+end
+
 And(/^the user is on the Employer Index of the Admin Dashboard$/) do
   visit exchanges_hbx_profiles_path
   find('.interaction-click-control-employers').click
@@ -123,6 +132,10 @@ end
 And(/^the user is on the Family Index of the Admin Dashboard$/) do
   visit exchanges_hbx_profiles_path
   find('.interaction-click-control-families').click
+end
+
+When(/^the user clicks Action for a person on families index page$/) do
+  find('.dropdown.pull-right', text: 'Actions').click
 end
 
 When(/^the user clicks Action for that Employer$/) do

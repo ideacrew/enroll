@@ -1,6 +1,6 @@
 Then(/^.+ should see a welcome page with successful sign in message$/) do
   Watir::Wait.until(30) { @browser.text.include?(/Signed in successfully./) }
-  screenshot("employer_portal_sign_in_welcome")
+  # screenshot("employer_portal_sign_in_welcome")
   expect(@browser.text.include?("Signed in successfully.")).to be_truthy
   @browser.a(text: /Continue/).wait_until_present
   expect(@browser.a(text: /Continue/).visible?).to be_truthy
@@ -9,7 +9,7 @@ end
 
 Then(/^.+ should see fields to search for person and employer$/) do
   Watir::Wait.until(30) { @browser.text.include?(/Personal Information/) }
-  screenshot("employer_portal_person_search")
+  # screenshot("employer_portal_person_search")
   expect(@browser.text.include?(/Personal Information/)).to be_truthy
 end
 
@@ -21,7 +21,7 @@ Then(/^.+ should see an initial fieldset to enter my name, ssn and dob$/) do
   @browser.text_field(name: "person[first_name]").click
   @browser.text_field(name: "person[ssn]").set("111000999")
   @browser.button(value: /Search Person/).wait_until_present
-  screenshot("employer_portal_person_search_criteria")
+  # screenshot("employer_portal_person_search_criteria")
   @browser.button(value: /Search Person/).fire_event("onclick")
 end
 
@@ -63,7 +63,7 @@ end
 
 And(/^My user data from existing the fieldset values are prefilled using data from my existing account$/) do
   @browser.button(value: /This is my info/).wait_until_present
-  screenshot("employer_portal_person_match_form")
+  # screenshot("employer_portal_person_match_form")
   @browser.button(value: /This is my info/).fire_event("onclick")
   @browser.text_field(name: "person[addresses_attributes][0][address_1]").wait_until_present
   @browser.text_field(name: "person[addresses_attributes][0][address_1]").set("12000 Address 1")
@@ -76,7 +76,7 @@ And(/^My user data from existing the fieldset values are prefilled using data fr
   @browser.text_field(name: "person[emails_attributes][0][address]").set("home@example.com")
   @browser.text_field(name: "person[emails_attributes][1][address]").set("work@example.com")
   @browser.text_field(name: "person[emails_attributes][1][address]").click
-  screenshot("employer_portal_person_data")
+  # screenshot("employer_portal_person_data")
   @browser.button(id: /continue-employer/).wait_until_present
   expect(@browser.button(id: /continue-employer/).visible?).to be_truthy
   @browser.button(id: /continue-employer/).click
@@ -84,15 +84,15 @@ end
 
 And(/^.+ should see a form with a fieldset for Employer information, including: legal name, DBA, fein, entity_kind, broker agency, URL, address, and phone$/) do
   @browser.button(value: /Search Employers/).wait_until_present
-  screenshot("employer_portal_employer_search_form")
+  # screenshot("employer_portal_employer_search_form")
   @employer_profile = FactoryBot.create(:employer_profile)
 
   @browser.text_field(name: "employer_profile[legal_name]").set(@employer_profile.legal_name)
   @browser.text_field(name: "employer_profile[dba]").set(@employer_profile.dba)
   @browser.text_field(name: "employer_profile[fein]").set(@employer_profile.fein)
-  screenshot("employer_portal_employer_search_criteria")
+  # screenshot("employer_portal_employer_search_criteria")
   @browser.button(value: /Search Employers/).fire_event("onclick")
-  screenshot("employer_portal_employer_contact_info")
+  # screenshot("employer_portal_employer_contact_info")
   @browser.button(value: /This is my employer/).fire_event("onclick")
   @browser.button(value: /Create/).wait_until_present
   @browser.button(value: /Create/).fire_event("onclick")
@@ -100,7 +100,7 @@ end
 
 And(/^I should see a successful creation message$/) do
   Watir::Wait.until(30) { @browser.text.include?("Employer successfully created.") }
-  screenshot("employer_create_success_message")
+  # screenshot("employer_create_success_message")
   expect(@browser.text.include?("Employer successfully created.")).to be_truthy
 end
 
@@ -118,7 +118,7 @@ end
 
 Then(/^.+ should see the employee family roster$/) do
   @browser.a(class: /interaction-click-control-add-new-employee/).wait_until_present
-  screenshot("employer_census_family")
+  # screenshot("employer_census_family")
   expect(@browser.a(class: /interaction-click-control-add-new-employee/).visible?).to be_truthy
   @browser.a(class: /interaction-click-control-add-new-employee/).click
 end
@@ -173,14 +173,14 @@ Then(/^.+ should see a form to enter information about employee, address and dep
 
   find(:xpath, "//label[@for='#{name.gsub('[', '_').gsub(']', '').gsub('first_name', 'gender_female')}']").click
 
-  screenshot("create_census_employee_with_data")
+  # screenshot("create_census_employee_with_data")
   click_button "Create Employee"
 end
 
 And(/^.+ should see employer census family created success message$/) do
   expect(find('.alert')).to have_content('successfully')
   expect(page).to have_content('John K Doe Jr')
-  screenshot("employer_census_new_family_success_message")
+  # screenshot("employer_census_new_family_success_message")
 end
 
 When(/^.+ clicks? on Edit family button for a census family$/) do
@@ -224,7 +224,7 @@ Then(/^.+ should see a form to update the contents of the census employee$/) do
   fill_in 'census_employee[first_name]', :with => "Mariah"
   find('label[for=census_employee_is_business_owner]').click
 
-  screenshot("update_census_employee_with_data")
+  # screenshot("update_census_employee_with_data")
   click_button 'Update Employee'
 end
 
@@ -358,7 +358,7 @@ end
 
 And(/^.+ should see a button to create new plan year$/) do
   sleep 1
-  screenshot("employer_plan_year")
+  # screenshot("employer_plan_year")
   #Hackity Hack need both years reference plans b/c of Plan.valid_shop_dental_plans and Plan.by_active_year(params[:start_on]).shop_market.health_coverage.by_carrier_profile(@carrier_profile).and(hios_id: /-01/)
   find('a.interaction-click-control-add-plan-year').click
 end
@@ -368,7 +368,7 @@ And(/^.+ should be able to enter plan year, benefits, relationship benefits with
   find(:xpath, "//p[@class='label'][contains(., 'SELECT START ON')]").click
   find(:xpath, "//li[@data-index='1'][contains(., '#{start}')]").click
 
-  screenshot("employer_add_plan_year")
+  # screenshot("employer_add_plan_year")
   find('.interaction-field-control-plan-year-fte-count').click
 
   if amount_of_fte == "low"
@@ -465,7 +465,7 @@ Then(/^.+ should see Publish Plan Year Modal with FTE warnings$/) do
 end
 
 Then(/^.+ clicks? on the Cancel button$/) do
-  screenshot("havent clicked cancel yet")
+  # screenshot("havent clicked cancel yet")
   find(".modal-dialog .interaction-click-control-cancel").click
 end
 

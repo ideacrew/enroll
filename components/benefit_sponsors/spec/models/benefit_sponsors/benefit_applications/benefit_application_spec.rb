@@ -38,8 +38,9 @@ module BenefitSponsors
     let(:application_period_prev_year)        { (Date.new(effective_period_start_on.prev_year.year, 1, 1))..(Date.new(effective_period_start_on.prev_year.year, 12, 31)) }
     let(:application_period_next_year)        { (Date.new(effective_period_start_on.next_year.year, 1, 1))..(Date.new(effective_period_start_on.next_year.year, 12, 31)) }
     let!(:issuer_profile)  { FactoryBot.create :benefit_sponsors_organizations_issuer_profile, assigned_site: site}
-    let!(:benefit_market_catalog_next_year)   { FactoryBot.create(:benefit_markets_benefit_market_catalog, :with_product_packages, issuer_profile: issuer_profile, benefit_market: benefit_market, application_period: application_period_next_year) }
-    let!(:benefit_market_catalog_prev_year)   { FactoryBot.create(:benefit_markets_benefit_market_catalog, :with_product_packages, issuer_profile: issuer_profile, benefit_market: benefit_market, application_period: application_period_prev_year) }
+    # Be prudent when creating these, much time added.
+    let(:benefit_market_catalog_next_year)   { FactoryBot.create(:benefit_markets_benefit_market_catalog, :with_product_packages, issuer_profile: issuer_profile, benefit_market: benefit_market, application_period: application_period_next_year) }
+    let(:benefit_market_catalog_prev_year)   { FactoryBot.create(:benefit_markets_benefit_market_catalog, :with_product_packages, issuer_profile: issuer_profile, benefit_market: benefit_market, application_period: application_period_prev_year) }
 
     let(:params) do
       {
@@ -521,6 +522,8 @@ module BenefitSponsors
 
     describe ".renew" do
       before(:each) do
+        benefit_market_catalog_next_year
+        benefit_market_catalog_prev_year
         ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
         ::BenefitMarkets::Products::ProductFactorCache.initialize_factor_cache!
       end
