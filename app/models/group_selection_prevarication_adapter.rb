@@ -359,7 +359,7 @@ class GroupSelectionPrevaricationAdapter
   end
 
   def can_shop_resident?(person)
-    return false unless is_shop_or_fehb_market_enabled?
+    return false unless is_individual_market_enabled?
 
     person.try(:has_active_resident_role?)
   end

@@ -521,8 +521,7 @@ end
 
 Then(/^.+ should see the employee search page$/) do
   wait_for_ajax(2, 2)
-  sleep(1)
-  expect(find('.interaction-field-control-person-first-name')).to be_visible
+  expect(find('.interaction-field-control-person-first-name', wait: 5)).to be_visible
   # screenshot("employer_search")
 end
 
@@ -726,10 +725,10 @@ When(/^.+ enters? the dependent info of .+ daughter$/) do
   date = TimeKeeper.date_of_record - 28.years
   dob = date.to_s
   fill_in 'jq_datepicker_ignore_dependent[dob]', with: dob
-  first('.select-relation .selectric span.label').click
+  find(:xpath, "//label[@for='radio_female']").click
+  find(:xpath, "//label[@for='radio_female']").click
+  find('.select-relation .selectric span.label').click
   find('.selectric-scroll li', text: 'Child').click
-  find(:xpath, "//label[@for='radio_female']").click
-  find(:xpath, "//label[@for='radio_female']").click
 end
 
 When(/^.+ enters? the dependent info of Patrick wife$/) do
@@ -798,7 +797,7 @@ When(/^.+ clicks? shop for plans button$/) do
 end
 
 When(/^.+ clicks Shop for new plan button$/) do
-  find('.interaction-click-control-shop-for-new-plan', wait: 5).click
+  find('.interaction-click-control-shop-for-new-plan', wait: 10).click
 end
 
 Then(/^.+ should see the list of plans$/) do
@@ -863,7 +862,7 @@ Then(/^.+ should see the coverage summary page$/) do
 end
 
 When(/^.+ clicks? on Confirm button on the coverage summary page$/) do
-  find('.interaction-click-control-confirm', wait: 5).click
+  find('.interaction-click-control-confirm', wait: 10).click
 end
 
 Then(/^.+ should see the receipt page$/) do

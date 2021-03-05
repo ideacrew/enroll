@@ -239,10 +239,10 @@ end
 And(/(.*) should see the (.*) family member (.*) and (.*)/) do |employee, type, disabled, checked|
   wait_for_ajax
   if type == "ineligible"
-    expect(first("input[type='checkbox']:disabled", wait: 5)).to be_disabled
+    expect(first("input[type='checkbox']:disabled", wait: 10)).to be_disabled
     expect(first("input[type='checkbox']:disabled")).not_to be_checked
   else
-    expect(find("#family_member_ids_0", wait: 5)).not_to be_disabled
+    expect(find("#family_member_ids_0", wait: 10)).not_to be_disabled
     expect(find("#family_member_ids_0")).to be_checked
   end
 end
@@ -302,6 +302,11 @@ Then(/(.*) should only see the dependent name/) do |role|
 end
 
 Then(/(.*) should see primary person/) do |role|
+  primary = Person.all.select { |person| person.primary_family.present? }.first
+  expect(page).to have_content("Covered: #{primary.first_name}", wait: 10)
+end
+
+Then(/(.*) should see the primary person/) do
   primary = Person.all.select { |person| person.primary_family.present? }.first
   expect(page).to have_content("Coverage For:   #{primary.first_name}", wait: 10)
 end
@@ -366,9 +371,9 @@ end
 
 When(/(.*) (.*) the primary person/) do |role, checked|
   if checked == "checks"
-    find("#family_member_ids_0").set(true)
+    find("#family_member_ids_0", wait: 5).set(true)
   else
-    find("#family_member_ids_0").set(false)
+    find("#family_member_ids_0", wait: 5).set(false)
   end
 end
 
@@ -377,7 +382,7 @@ And(/(.*) selects (.*) for coverage kind/) do |_role, coverage_kind|
 end
 
 And(/(.*) clicked on shop for new plan/) do |role|
-  find(".interaction-click-control-shop-for-new-plan").click
+  find(".interaction-click-control-shop-for-new-plan", wait: 5).click
 end
 
 And(/user did not apply coverage for child as ivl/) do
