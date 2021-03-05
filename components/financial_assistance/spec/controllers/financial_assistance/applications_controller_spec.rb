@@ -212,7 +212,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
   context "GET raw" do
     let(:temp_file) do
-      [{"demographics" => nil},
+      [{"demographics" => {} },
        {"financial_assistance_info" => {"TAX INFO" => nil,
                                         "INCOME" => nil,
                                         "INCOME ADJUSTMENTS" => nil,

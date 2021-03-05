@@ -19,6 +19,7 @@
     Are you a member of an American Indian or Alaska Native Tribe?: <%= applicant.indian_tribe_member%>
     Are you currently incarcerated?: <%= applicant.is_incarcerated%>
     What is your race/ethnicity? (OPTIONAL - check all that apply): <%= applicant.ethnicity %>
+    ADDRESSES:
 - financial_assistance_info:
     TAX INFO:
         Will this Person file taxes for <%= @application.assistance_year %>?: <%= applicant.is_required_to_file_taxes %>
@@ -49,6 +50,6 @@
         Student status end on date?:  <%=applicant.student_status_end_on.present? ? applicant.student_status_end_on : 'N/A' %>
         What type of school do you go to?:  <%= applicant.student_school_kind %>
         Is this person blind?:  <%= applicant.is_self_attested_blind %>
-        Does this person need help with daily life activities %> such as dressing or bathing?:  <%= applicant.has_daily_living_help %>
+        Does this person need help with daily life activities, such as dressing or bathing?:  <%= applicant.has_daily_living_help %>
         Does this person need help paying for any medical bills from the last 3 months?:  <%= applicant.has_daily_living_help %>
         Does this person have a disability?:  <%= applicant.is_physically_disabled %>
