@@ -875,7 +875,7 @@ class CensusEmployee < CensusMember
   end
 
   def fetch_approved_and_term_bas_for_date(effective_date = nil)
-    if ::EnrollRegistry.feature_enabled?(:prior_plan_year_sep) && prior_py_sep?(effective_date)
+    if ::EnrollRegistry.feature_enabled?(:prior_plan_year_sep) && prior_py_present_for_date?(effective_date)
       benefit_sponsorship.benefit_applications.where(:aasm_state.in => BenefitSponsors::BenefitApplications::BenefitApplication::APPPROVED_AND_TERMINATED_STATES)
                          .select{|ba| ((ba.start_on.beginning_of_day..ba.end_on.end_of_day).cover? effective_date)}
     else
@@ -883,7 +883,7 @@ class CensusEmployee < CensusMember
     end
   end
 
-  def prior_py_sep?(effective_date)
+  def prior_py_present_for_date?(effective_date)
     return false if effective_date.blank?
 
     offset_months = EnrollRegistry[:prior_plan_year_sep].setting(:offset_months).item
