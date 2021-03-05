@@ -263,6 +263,15 @@ module BenefitSponsors
       )
     }
 
+    scope :approved_and_term_benefit_applications_by_date, lambda{ |date|
+      where(
+        "$and" => [
+          {:aasm_state.in => APPPROVED_AND_TERMINATED_STATES },
+          {:"effective_period.min".lte => date, :"effective_period.max".gte => date}
+        ]
+      )
+    }
+
     scope :renewing, -> {
       where(:predecessor_id => {:$exists => true} )
     }

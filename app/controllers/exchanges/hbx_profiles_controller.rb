@@ -579,7 +579,7 @@ def employer_poc
   def view_terminated_hbx_enrollments
     @person = Person.find(params[:person_id])
     @element_to_replace_id = params[:family_actions_id]
-    @enrollments = @person.primary_family.terminated_enrollments
+    @enrollments = @person.primary_family.terminated_and_expired_enrollments
   end
 
   def reinstate_enrollment

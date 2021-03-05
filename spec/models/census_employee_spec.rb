@@ -465,7 +465,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     end
   end
 
-  describe '#prior_py_sep?' do
+  describe '#prior_py_present_for_date?' do
     include_context "setup benefit market with market catalogs and product packages"
     include_context "setup expired, and active benefit applications"
 
@@ -485,19 +485,19 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     context 'census employee has active and expired benefit applications assigned' do
       it 'should return false if effective date is in future than employee hired on date' do
         census_employee.update_attributes(hired_on: active_benefit_application.start_on + 10.days)
-        status = census_employee.prior_py_sep?(active_benefit_application.start_on)
+        status = census_employee.prior_py_present_for_date?(active_benefit_application.start_on)
         expect(status).to be_falsey
       end
 
       it 'should return false if effective date falls under active py' do
         census_employee.update_attributes(hired_on: active_benefit_application.start_on)
-        status = census_employee.prior_py_sep?(active_benefit_application.start_on)
+        status = census_employee.prior_py_present_for_date?(active_benefit_application.start_on)
         expect(status).to be_falsy
       end
 
       it 'should return true if effective date falls under expired py' do
         census_employee.update_attributes(hired_on: expired_benefit_application.start_on)
-        status = census_employee.prior_py_sep?(expired_benefit_application.start_on)
+        status = census_employee.prior_py_present_for_date?(expired_benefit_application.start_on)
         expect(status).to be_truthy
       end
     end
@@ -507,7 +507,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
         active_benefit_application.cancel!
         census_employee.reload
         census_employee.update_attributes(hired_on: active_benefit_application.start_on + 10.days)
-        status = census_employee.prior_py_sep?(active_benefit_application.start_on)
+        status = census_employee.prior_py_present_for_date?(active_benefit_application.start_on)
         expect(status).to be_falsey
       end
     end
