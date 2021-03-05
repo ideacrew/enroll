@@ -111,7 +111,7 @@ RSpec.describe BenefitSponsors::Operations::BrokerAgencies::Create, dbclean: :af
           expect(subject).to be_success
           expect(BenefitSponsors::Organizations::Organization.broker_agency_profiles.all.count).to eq 1
           person.reload
-          # expect(person.broker_agency_staff_roles.size).to eq 1
+          expect(person.broker_agency_staff_roles.size).to eq 1
         end
       end
     end
