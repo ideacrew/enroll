@@ -64,6 +64,7 @@ jobs:
         with:
           name: ${{ matrix.feature }}
           path: ci/cucumber/${{ matrix.feature }}-cucumber-report.json
+          retention-days: 1
   concat-reports:
     needs: [cucumber-report]
     runs-on: ubuntu-latest
