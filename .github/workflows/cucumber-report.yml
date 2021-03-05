@@ -1,25 +1,25 @@
 name: cucumber report
 on:
+  push:
   workflow_dispatch:
 
 jobs:
   cucumber-report:
     strategy:
       matrix:
-        feature:
-          [
-            'admin',
-            'brokers',
+        feature: [
+            # 'admin',
+            # 'brokers',
             'cover_all',
-            'employee',
-            'employers',
-            'financial_assistance',
+            # 'employee',
+            # 'employers',
+            # 'financial_assistance',
             'general_agencies',
-            'group_selection',
+            # 'group_selection',
             'hbx',
-            'hbx_admin',
-            'insured',
-            'permissions',
+            # 'hbx_admin',
+            # 'insured',
+            # 'permissions',
             'plan_shopping',
           ]
     runs-on: ubuntu-latest
@@ -64,3 +64,27 @@ jobs:
         with:
           name: ${{ matrix.feature }}
           path: ci/cucumber/${{ matrix.feature }}-cucumber-report.json
+  concat-reports:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '12'
+      - name: Restore Node Modules
+        id: npm-cache
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node_modules-v12-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node_modules-v12-${{ hashFiles('yarn.lock') }}
+      - name: Install node dependencies
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: yarn install
+      - uses: actions/download-artifact@v2
+        with:
+          path: ci/cucumber/gha-reports
+      - name: display structure of downloaded files
+        run: ls -R
+        working-directory: ci/cucumber/gha-reports

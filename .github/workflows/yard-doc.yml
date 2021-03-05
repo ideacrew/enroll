@@ -1,5 +1,8 @@
 name: yard doc generation
-on: push
+on:
+  push:
+    paths:
+      - 'hugo/**'
 
 jobs:
   docs_deployment:
