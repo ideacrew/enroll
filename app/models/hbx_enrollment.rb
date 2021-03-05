@@ -756,16 +756,6 @@ class HbxEnrollment
     write_attribute(:hbx_id, HbxIdGenerator.generate_policy_id) if hbx_id.blank?
   end
 
-  def propogate_cancel(term_date = TimeKeeper.date_of_record.end_of_month)
-    self.terminated_on ||= term_date
-    if benefit_group_assignment
-      benefit_group_assignment.end_benefit(terminated_on)
-      benefit_group_assignment.save
-    end
-    self.terminated_on = term_date
-    term_or_cancel_benefit_group_assignment
-  end
-
   def term_or_cancel_benefit_group_assignment
     return unless benefit_group_assignment && (census_employee.employee_termination_pending? || census_employee.employment_terminated?) && census_employee.coverage_terminated_on
 
@@ -773,6 +763,13 @@ class HbxEnrollment
     end_date = benefit_group_assignment.start_on > termed_date ? benefit_group_assignment.start_on : termed_date
     benefit_group_assignment.end_benefit(end_date)
     benefit_group_assignment.save
+  end
+
+  def propogate_cancel
+    # SHOP: Implement if we have requirement from buiness, event need to happen after cancel in shop.
+    # IVL: cancel renewals on cancelling active coverage.
+    return if is_shop?
+    ::EnrollRegistry[:cancel_renewals_for_term] { {hbx_enrollment: self} }
   end
 
   def propogate_terminate(term_date = TimeKeeper.date_of_record.end_of_month)
@@ -1844,7 +1841,8 @@ class HbxEnrollment
                          :renewing_transmitted_to_carrier, :renewing_coverage_enrolled, :coverage_selected,
                          :transmitted_to_carrier, :coverage_renewed, :unverified,
                          :coverage_enrolled, :renewing_waived, :inactive, :coverage_reinstated],
-                  to: :coverage_canceled
+                  to: :coverage_canceled, after: :propogate_cancel
+      transitions from: :coverage_expired, to: :coverage_canceled, :guard => :is_ivl_by_kind?, after: :propogate_cancel
     end
 
     event :cancel_for_non_payment, :after => :record_transition do
@@ -1852,7 +1850,8 @@ class HbxEnrollment
                          :renewing_transmitted_to_carrier, :renewing_coverage_enrolled, :coverage_selected,
                          :transmitted_to_carrier, :coverage_renewed, :unverified,
                          :coverage_enrolled, :renewing_waived, :inactive],
-                  to: :coverage_canceled
+                  to: :coverage_canceled, after: :propogate_cancel
+      transitions from: :coverage_expired, to: :coverage_canceled, :guard => :is_ivl_by_kind?, after: :propogate_cancel
     end
 
     event :terminate_coverage, :after => :record_transition do
