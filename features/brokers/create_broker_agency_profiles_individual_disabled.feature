@@ -23,7 +23,10 @@ Feature: Create Primary Broker and Broker Agency
     And Primary Broker enters broker agency information for SHOP markets
     And Primary Broker enters office location for default_office_location
     Then Primary Broker should see broker registration successful message
-
+  
+  @flaky
+  # The below sceario passes completely, but fails occasionally both locally and on Github
+  # Some research should be done into its purpose
   Scenario: Primary Broker has not signed up on the HBX
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for enrollment_open initial employer with health benefits
@@ -113,7 +116,7 @@ Feature: Create Primary Broker and Broker Agency
     When Broker Assisted enter the identifying info of Broker Assisted
     # Then Broker Assisted should see the matched employee record form
     When Broker Assisted accepts the matched employer
-    And Broker completes and submits the matched employee form for Broker Assisted
+    And Broker  completes and submits the matched employee form for Broker Assisted
     And I log out
 
     Then Primary Broker logs on to the Broker Agency Portal
