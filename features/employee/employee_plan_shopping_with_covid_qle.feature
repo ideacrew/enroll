@@ -1,9 +1,9 @@
-@aca_shop_market_disabled
 Feature: Shop Employees can purchase coverage through covid QLE
   Employees can pick First of current month as coverage begin date or
   they can choose First of Next month as coverage begin date
 
   Background: Setup site, employer, and benefit application
+    Given the shop market configuration is enabled
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for active initial employer with health benefits
     Given Qualifying life events are present
