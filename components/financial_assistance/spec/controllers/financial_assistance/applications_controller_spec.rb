@@ -222,7 +222,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
     before do
       allow(File).to receive(:read).with("./components/financial_assistance/app/views/financial_assistance/applications/raw_application.yml.erb").and_return("")
-      allow(YAML).to receive(:load).with("").and_return(temp_file)
+      allow(YAML).to receive(:safe_load).with("").and_return(temp_file)
       user.update_attributes(roles: ["hbx_staff"])
     end
 
