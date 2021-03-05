@@ -984,7 +984,7 @@ module FinancialAssistance
       return unless is_applying_coverage
 
       if age_of_applicant > 18 && age_of_applicant < 26
-        errors.add(:is_former_foster_care, "' Was this person in foster care at age 18 or older?' should be answered") if is_former_foster_care.blank?
+        errors.add(:is_former_foster_care, "' Was this person in foster care at age 18 or older?' should be answered") if is_former_foster_care.nil?
 
         if is_former_foster_care
           errors.add(:foster_care_us_state, "' Where was this person in foster care?' should be answered") if foster_care_us_state.blank?
