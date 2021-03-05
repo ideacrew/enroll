@@ -207,12 +207,6 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
     end
 
     context "age_of_applicant" do
-      let(:is_not_former_foster_care) do
-        {
-          "is_former_foster_care" => nil
-        }
-      end
-
       let(:is_invalid_former_foster_care) do
         {
           "is_former_foster_care" => true,
@@ -246,7 +240,7 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
       end
 
       it "should not save and redirects to other_questions_financial_assistance_application_applicant_path with invalid params", dbclean: :after_each do
-        get :save_questions, params: { application_id: application.id, id: applicant.id, applicant: is_not_former_foster_care }
+        get :save_questions, params: { application_id: application.id, id: applicant.id, applicant: {} }
         expect(response).to have_http_status(302)
         expect(response.headers['Location']).to have_content 'other_questions'
         expect(response).to redirect_to(other_questions_application_applicant_path(application, applicant))
