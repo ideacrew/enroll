@@ -51,7 +51,7 @@ Feature: Passive renewal should be updated when EE updates his current coverage
     Then Patrick Doe should see active and renewing enrollments
     When Employee should be able to see Actions dropdown
     Then Employee clicks on the Actions button for active enrollment
-    When Employee clicks on the make changes to my coverage button
+    When Employee clicks on the active enrollment make changes to my coverage button
     Then Patrick Doe should see page with SelectPlanToTerminate button
     When Patrick Doe clicks SelectPlanToTerminate button
     Then Patrick Doe selects active enrollment for termination
