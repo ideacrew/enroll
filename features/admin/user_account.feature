@@ -1,8 +1,8 @@
-@aca_shop_market_disabled
 Feature: User Account page
   In order for the Hbx admin to access user accounts
 
   Background: Setup permissions, HBX Admin, users, and organizations and employer profiles
+    Given the shop market configuration is enabled
     Given all permissions are present
     And that a user with a HBX staff role with HBX staff subrole exists and is logged in
     And that a user with a Employee Role role exists and is not logged in
