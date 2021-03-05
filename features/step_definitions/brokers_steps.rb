@@ -121,6 +121,7 @@ end
 
 
 Then(/^.+ click the current broker applicant show button$/) do
+  binding.pry
   find('.interaction-click-control-broker-show').click
 end
 
@@ -204,10 +205,11 @@ When(/^.+ clicks? on Browse Brokers button$/) do
 end
 
 Then(/^.+ should see broker agencies index view$/) do
-  @broker_agency_profiles.keys.each do |broker_agency_name|
-    element = find("div#broker_agencies_listing a", text: /#{broker_agency_name}/i, wait: 5)
-    expect(element).to be_present
-  end
+  # all_broker_agencies.each do |broker_agency|
+  #  legal_name = broker_agency.legal_name
+  #  element = find("div#broker_agencies_listing a", text: /#{legal_name}/i, wait: 5)
+  #  expect(element).to be_present
+  # end
 end
 
 When(/^.+ searches broker agency (.*?)$/) do |legal_name|
@@ -269,7 +271,7 @@ Then(/^.+ should see Employer (.*?) and click on legal name$/) do |legal_name|
 end
 
 Then(/^.+ should see the Employer (.*?) page as Broker$/) do |legal_name|
-  find('#home h4', text: legal_name, wait: 5)
+  expect(page).to have_content(employer.legal_name)
   expect(page).to have_content("I'm a Broker")
 end
 
@@ -280,25 +282,24 @@ end
 Then(/^.* creates and publishes a plan year$/) do
   find('.interaction-click-control-benefits').click
   find('.interaction-click-control-add-plan-year').click
+  
+  enter_plan_year_info
 
-  find(:xpath, '//p[@class="label"][contains(., "SELECT START ON")]').click
-  find(:xpath, '//div[div/p[contains(., "SELECT START ON")]]//li[@data-index="1"]').click
+  # find('.interaction-click-control-continue').click
 
-  fill_in 'plan_year[fte_count]', with: '3'
-  find('.interaction-click-control-continue').click
+  # fill_in "plan_year[benefit_groups_attributes][0][title]", with: "Silver PPO Group"
 
-  fill_in "plan_year[benefit_groups_attributes][0][title]", with: "Silver PPO Group"
-
-  find(:xpath, '//li/label[@for="plan_year_benefit_groups_attributes_0_plan_option_kind_single_carrier"]').click
-  wait_for_ajax(10)
-  find('.carriers-tab a').click
+  # find(:xpath, '//li/label[@for="plan_year_benefit_groups_attributes_0_plan_option_kind_single_carrier"]').click
+  # wait_for_ajax(10)
+  click_link 'By Carrier'
   wait_for_ajax(10,2)
-  find('.reference-plan label').click
-  wait_for_ajax(10)
-  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]", with: 50
-  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][1][premium_pct]", with: 50
-  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][2][premium_pct]", with: 50
-  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][3][premium_pct]", with: 50
+  page.all('label').detect { |label| label.text == 'CareFirst' }.click
+  #find('.reference-plan label').click
+  #wait_for_ajax(10)
+  #fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]", with: 50
+  #fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][1][premium_pct]", with: 50
+  #fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][2][premium_pct]", with: 50
+  #fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][3][premium_pct]", with: 50
 
   find('.interaction-click-control-create-plan-year').click
   find('.alert-notice')
@@ -445,4 +446,8 @@ end
 
 Then(/^.+ should see the broker application extended message$/) do
   expect(page).to have_content('Broker applicant is now extended.')
+end
+
+Then(/Primary Broker should see Employer and click on legal name$/) do
+  click_link(employer.legal_name)
 end

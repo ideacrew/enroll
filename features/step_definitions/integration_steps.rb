@@ -601,34 +601,14 @@ Then(/^Employee (.+) should see coverage effective date/) do |named_person|
 end
 
 When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
-
-  # Sometimes bombs due to overlapping modal
-  # TODO: fix this bombing issue
   wait_for_ajax
   page.evaluate_script("window.location.reload()")
   wait_for_ajax(3,2)
   person = people[named_person]
-  # # screenshot("before modal")
-  # # find('.interaction-click-control-click-here').click
-  # # screenshot("during modal")
-  # # find('.interaction-click-control-close').click
-  # # screenshot("after modal")
-  expect(page).to have_css('input.interaction-field-control-person-phones-attributes-0-full-phone-number')
-  wait_for_ajax(3,2)
-
-  #find("#person_addresses_attributes_0_address_1", :wait => 10).click
-  # find("#person_addresses_attributes_0_address_1").click
-  # find("#person_addresses_attributes_0_address_2").click
-  # there is a flickering failure here due to over-lapping modals
-  # find("#person_addresses_attributes_0_city").click
-  # find("#person_addresses_attributes_0_zip").click
-  find_by_id("person_phones_attributes_0_full_phone_number", wait: 10)
-  wait_for_ajax
-  phone_number = "(#{person[:home_phone][0..2]}) #{person[:home_phone][3..5]}-#{person[:home_phone][6..9]}"
-  fill_in "person[phones_attributes][0][full_phone_number]", :with => phone_number
-  # screenshot("personal_info_complete")
-  expect(page).to have_field("HOME PHONE", with: phone_number) if person[:home_phone].present?
-  expect(page).to have_selector('.selectric', text: 'Only electronic communications')
+  fill_in "person[first_name]", with: person[:first_name]
+  fill_in "person[last_name]", with: person[:last_name]
+  fill_in 'jq_datepicker_ignore_person_dob', with: person[:dob]
+  fill_in 'person[ssn]', with: person[:ssn]
   find('.interaction-click-control-continue', text: 'CONTINUE', wait: 5).click
 end
 
@@ -932,9 +912,7 @@ end
 
 When(/^(?:General){0}.+ clicks? on the ((?:General|Staff){0}.+) tab$/) do |tab_name|
   click_link 'HBX Portal' if page.has_link?('HBX Portal')
-  binding.pry
   find(:xpath, "//li[contains(., '#{tab_name}')]", :wait => 10).click
-  binding.pry
   wait_for_ajax
 end
 
