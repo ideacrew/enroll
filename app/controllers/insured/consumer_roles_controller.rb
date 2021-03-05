@@ -45,6 +45,7 @@ class Insured::ConsumerRolesController < ApplicationController
 
     if (params.permit(:build_consumer_role)[:build_consumer_role].present? && session[:person_id]) || params[:person_id]
       person = Person.find(session[:person_id] || params[:person_id])
+      @person_id = person.id.to_s
       person_params = person.attributes.extract!("first_name", "middle_name", "last_name", "gender")
       person_params[:ssn] = Person.decrypt_ssn(person.encrypted_ssn)
       person_params[:dob] = person.dob&.strftime("%Y-%m-%d")
@@ -64,6 +65,14 @@ class Insured::ConsumerRolesController < ApplicationController
     @person = @consumer_candidate
     @use_person = true #only used to manupulate form data
     respond_to do |format|
+      if params[:person_id].present?
+        matched_person_id = @consumer_candidate.match_person&.id.to_s
+        if matched_person_id == params[:person_id]
+          format.html { render 'match' }
+          return
+        end
+      end
+
       if @consumer_candidate.valid?
         idp_search_result = nil
         idp_search_result = if current_user.idp_verified?
