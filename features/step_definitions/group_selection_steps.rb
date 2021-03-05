@@ -554,6 +554,12 @@ When(/^\w+ clicks on the make changes to my coverage button/) do
   wait_for_ajax
 end
 
+When(/^\w+ clicks on the active enrollment make changes to my coverage button/) do
+  enable_change_tax_credit_button
+  page.execute_script("document.querySelectorAll('#make-changes-btn')[1].click()")
+  wait_for_ajax
+end
+
 Given(/^the automatic application of aptc on enrollment feature configuration is disabled$/) do
   disable_feature :apply_aggregate_to_enrollment
 end
