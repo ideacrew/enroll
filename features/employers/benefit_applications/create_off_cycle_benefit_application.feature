@@ -1,7 +1,7 @@
-@aca_shop_market_disabled
 Feature: Ability for employer to create an off-cycle benefit application and allow employees to plan shop
 
   Background: Setup site, employer, and benefit market catalogs
+    Given the shop market configuration is enabled
     Given a CCA site exists with a benefit market
     And benefit market catalog exists for enrollment_open renewal employer with health benefits
     And there is an employer ABC Widgets
