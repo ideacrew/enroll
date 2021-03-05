@@ -90,3 +90,11 @@ jobs:
       - name: display structure of downloaded files
         run: ls -R
         working-directory: ci/cucumber/gha-reports
+      - name: concat reports
+        run: npm run cucumber:concat-reports
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: gha-cucumber-report
+          path: ci/cucumber/gha-cucumber-report.json
+          retention-days: 30

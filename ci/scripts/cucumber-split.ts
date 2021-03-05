@@ -1,11 +1,11 @@
-const { promises: fs } = require('fs');
+import { promises as fs } from 'fs';
 
 import { FileWithRuntime, FileGroup } from './models';
 import { CucumberFeature } from './models';
 import { splitFilesIntoGroups } from './util';
 import { featureRuntime } from './util/featureRuntime';
 
-const REPORT_PATH = './ci/cucumber/local-cucumber-report.json';
+const REPORT_PATH = './ci/cucumber/gha-cucumber-report.json';
 const SPLIT_CONFIG_PATH = './ci/cucumber-split-config.json';
 
 async function createCucumberSplitConfig(): Promise<void> {

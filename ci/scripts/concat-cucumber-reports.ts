@@ -1,85 +1,30 @@
-const { promises: fs } = require('fs');
+import { CucumberFeature } from './models';
+import { promises as fs } from 'fs';
 
 async function getJson() {
-  const admin = await fs.readFile(
-    './ci/cucumber/admin-cucumber-report.json',
-    'utf-8'
-  );
-  const broker = await fs.readFile(
-    './ci/cucumber/brokers-cucumber-report.json',
-    'utf-8'
-  );
-  const coverall = await fs.readFile(
-    './ci/cucumber/cover_all-cucumber-report.json',
-    'utf-8'
-  );
-  const employee = await fs.readFile(
-    './ci/cucumber/employee-cucumber-report.json',
-    'utf-8'
-  );
-  const employers = await fs.readFile(
-    './ci/cucumber/employers-cucumber-report.json',
-    'utf-8'
-  );
-  const financialAssistance = await fs.readFile(
-    './ci/cucumber/financial_assistance-cucumber-report.json',
-    'utf-8'
-  );
-  const generalAgencies = await fs.readFile(
-    './ci/cucumber/general_agencies-cucumber-report.json',
-    'utf-8'
-  );
-  const groupSelection = await fs.readFile(
-    './ci/cucumber/group_selection-cucumber-report.json',
-    'utf-8'
-  );
-  const hbx = await fs.readFile(
-    './ci/cucumber/hbx-cucumber-report.json',
-    'utf-8'
-  );
-  const hbxAdmin = await fs.readFile(
-    './ci/cucumber/hbx_admin-cucumber-report.json',
-    'utf-8'
-  );
-  const insured = await fs.readFile(
-    './ci/cucumber/insured-cucumber-report.json',
-    'utf-8'
-  );
+  console.log('Reading gha reports');
 
-  const permissions = await fs.readFile(
-    './ci/cucumber/permissions-cucumber-report.json',
-    'utf-8'
-  );
-  const planShopping = await fs.readFile(
-    './ci/cucumber/plan_shopping-cucumber-report.json',
-    'utf-8'
-  );
+  const ghaDir: string[] = await fs.readdir('./ci/cucumber/gha-reports');
 
-  const jsonFiles = [
-    admin,
-    broker,
-    coverall,
-    employee,
-    employers,
-    financialAssistance,
-    generalAgencies,
-    groupSelection,
-    hbxAdmin,
-    hbx,
-    insured,
-    permissions,
-    planShopping,
-  ];
+  console.log(ghaDir);
 
-  const allReports = jsonFiles.reduce((allReports, report) => {
-    const parsed = JSON.parse(report);
+  const cucumberReports: CucumberFeature[][] = [];
 
-    return [...allReports, ...parsed];
-  }, []);
+  for (let index = 0; index < ghaDir.length; index++) {
+    const feature = ghaDir[index];
+    const file = await fs.readFile(
+      `./ci/cucumber/gha-reports/${feature}/${feature}-cucumber-report.json`,
+      'utf-8'
+    );
 
-  const jsonList = JSON.stringify(allReports);
+    const report = JSON.parse(file);
+    cucumberReports.push(report);
+  }
 
-  await fs.writeFile('./ci/cucumber/local-cucumber-report.json', jsonList);
+  console.log('Converting reports to JSON');
+  const jsonReport = JSON.stringify(cucumberReports.flat());
+
+  await fs.writeFile('./ci/cucumber/gha-cucumber-report.json', jsonReport);
 }
 
 getJson();
