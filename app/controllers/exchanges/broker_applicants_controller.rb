@@ -36,7 +36,7 @@ class Exchanges::BrokerApplicantsController < ApplicationController
 
   def update
     broker_role = @broker_applicant.broker_role
-    broker_role.update_attributes(reason: params.require(:person).require(:broker_role_attributes).permit(:reason)) if params.dig(:person, :broker_role_attributes, :reason).present? 
+    broker_role.update_attributes(reason: params.require(:person).require(:broker_role_attributes).permit(:reason)) if params.dig(:person, :broker_role_attributes, :reason).present?
     # TODO: This params['deny'] stuff might have to be changed to params['commit']['action_name']
     if params['deny']
       broker_role.deny!

@@ -121,7 +121,6 @@ end
 
 
 Then(/^.+ click the current broker applicant show button$/) do
-  binding.pry
   find('.interaction-click-control-broker-show').click
 end
 
@@ -153,7 +152,7 @@ And(/^.+ should receive an invitation email$/) do
             else
               "Important information for accessing your new broker account through the #{Settings.site.short_name}"
             end
-  broker_email_address = Person.all.detect { |p| p.broker_role }.emails.first.address
+  broker_email_address = Person.all.detect(&:broker_role).emails.first.address
   open_email(
     broker_email_address,
     :with_subject => subject
@@ -192,7 +191,7 @@ end
 
 Then(/^.+ should see successful message with broker agency home page$/) do
   expect(page).to have_content("Welcome to #{Settings.site.short_name}. Your account has been created.")
-  current_broker_legal_name = Person.all.detect { |p| p.broker_role }.broker_role.broker_agency_profile.legal_name
+  current_broker_legal_name = Person.all.detect(&:broker_role).broker_role.broker_agency_profile.legal_name
   expect(page).to have_content("Broker Agency : #{current_broker_legal_name}")
 end
 
@@ -282,7 +281,7 @@ end
 Then(/^.* creates and publishes a plan year$/) do
   find('.interaction-click-control-benefits').click
   find('.interaction-click-control-add-plan-year').click
-  
+
   enter_plan_year_info
 
   # find('.interaction-click-control-continue').click
