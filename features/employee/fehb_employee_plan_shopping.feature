@@ -1,4 +1,3 @@
-@aca_shop_market_disabled
 Feature: Employee with past date of hire
     In order for the New Employee to purchase insurance
     Given Employer exists with active plan year
@@ -8,6 +7,7 @@ Feature: Employee with past date of hire
     And Employee should be able to purchase Insurance
 
   Background: Setup site, employer, and benefit application
+    Given the shop market configuration is enabled
     Given a CCA site exists with a fehb benefit market
     Given benefit market catalog exists for enrollment_open initial employer with health benefits
     And there is an fehb employer Acme Inc.
