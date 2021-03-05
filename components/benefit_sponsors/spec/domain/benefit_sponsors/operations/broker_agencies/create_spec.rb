@@ -23,7 +23,7 @@ RSpec.describe BenefitSponsors::Operations::BrokerAgencies::Create, dbclean: :af
           }
         },
         :organization => {
-          :entity_kind => "s_corporation",
+          :entity_kind => :s_corporation,
           :legal_name => "SOME BROKER",
           :dba => "broker",
           :profile => {
