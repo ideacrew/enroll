@@ -266,6 +266,7 @@ class PeopleController < ApplicationController
    end
 
   def show_roles
+    session[:person_id] = params[:id]
     @person = find_person(params[:id])
     @available_roles = Operations::People::Roles::FindAll.new.call(params).value!
     render :show_roles

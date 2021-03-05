@@ -93,7 +93,7 @@ module Operations
         def fetch_consumer_details(person)
           return unless person.is_consumer_role_active?
 
-          link = person.consumer_role.bookmark_url
+          link = person.consumer_role.bookmark_url || "/families/home"
 
           role_params('My Coverage', link, "consumer", person.consumer_role.created_at.to_date, :active)
         end
