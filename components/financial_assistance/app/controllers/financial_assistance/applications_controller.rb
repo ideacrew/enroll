@@ -147,6 +147,7 @@ module FinancialAssistance
           file = File.read("./components/financial_assistance/app/views/financial_assistance/applications/raw_application.yml.erb")
           application_hash = YAML.safe_load(ERB.new(file).result(binding))
           @demographic_hash[applicant.id] = application_hash[0]["demographics"]
+          application_hash[0]["demographics"]["ADDRESSES"] = generate_address_hash(applicant)
           application_hash[1]["financial_assistance_info"]["INCOME"] = generate_income_hash(applicant)
           @income_coverage_hash[applicant.id] = application_hash[1]["financial_assistance_info"]
         end
@@ -294,6 +295,20 @@ module FinancialAssistance
         }
       end
       job_hash
+    end
+
+    def generate_address_hash(applicant)
+      addresses_hash = {}
+      applicant.addresses.each do |address|
+        addresses_hash["#{address.kind}_address"] = {
+          "ADDRESS LINE 1" => address.address_1,
+          "ADDRESS LINE 2" => address.address_2,
+          "CITY" => address.city,
+          "ZIP" => address.zip,
+          "STATE" => address.state
+        }
+      end
+      addresses_hash
     end
 
     def human_boolean(value)
