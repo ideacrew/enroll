@@ -1,9 +1,9 @@
-@aca_shop_market_disabled
 # frozen_string_literal: true
 
 Feature: Start a new Financial Assistance Application and answers questions on health coverage page
 
   Background: User logs in and visits applicant's health coverage page
+    Given the shop market configuration is enabled
     Given a consumer, with a family, exists
     And is logged in
     And the FAA feature configuration is enabled
