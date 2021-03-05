@@ -1,8 +1,8 @@
-@aca_shop_market_disabled
 Feature: As an <subrole> I <case> have the ability to extend the OE
   of a given Employer with a <aasm_state> enrollment.
 
   Scenario Outline: As an HBX Staff with <subrole> subroles I <case> be able to extend Open Enrollment for an Employer with a <aasm_state> benefit application
+    Given the shop market configuration is enabled
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for <aasm_state> initial employer with health benefits
     And there is an employer ABC Widgets

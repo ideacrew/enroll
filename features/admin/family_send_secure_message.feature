@@ -1,7 +1,7 @@
-@aca_shop_market_disabled
 Feature: As a Tier3 Admin I will have the ability to see and access "Send Secure Message" action on Families tab
 
   Background: Hbx Admin can Send Secure Message
+    Given the shop market configuration is enabled
     Given a Hbx admin with hbx_tier3 role exists
     And a consumer exists
     And a Hbx admin logs on to Portal

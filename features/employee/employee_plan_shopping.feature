@@ -1,9 +1,9 @@
-@aca_shop_market_disabled
 Feature: Employees can purchase coverage from both active and renewing plan years if they are eligible
   Employees are blocked in the middle of plan shopping if they are not eligible
   and allowing them to complete plan shopping if they are eligible
 
   Background: Setup site, employer, and benefit application
+    Given the shop market configuration is enabled
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for active renewal employer with health benefits
     Given Qualifying life events are present

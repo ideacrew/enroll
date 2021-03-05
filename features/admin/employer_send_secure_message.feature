@@ -1,7 +1,7 @@
-@aca_shop_market_disabled
 Feature: As a Super Admin I will have the ability to see and access "Send Secure Message" action on employers tab
 
   Background: Setup site, employer, and benefit application
+    Given the shop market configuration is enabled
     Given a ACA site exists with a benefit market
     And there is an employer ABC Widgets
     Given that a user with a HBX staff role with Super Admin subrole exists and is logged in

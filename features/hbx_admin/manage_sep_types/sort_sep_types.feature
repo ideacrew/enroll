@@ -1,9 +1,9 @@
-@aca_shop_market_disabled
 Feature: Admin has ability to sort SEP Types on Sort SEPs Page and save their positions in DB
   User will create an account through HBx Portal to sign as Consumer and checks the re arranged positions of SEP Type on Qle carousel
   User will create an account through HBx Portal to sign as Employee and checks the re arranged positions of SEP Type on Qle carousel
 
   Background:
+    Given the shop market configuration is enabled
     Given that a user with a HBX staff role with hbx_tier3 subrole exists
     When Hbx Admin logs on to the Hbx Portal
     Given the Admin is on the Main Page

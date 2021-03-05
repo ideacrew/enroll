@@ -1,4 +1,3 @@
-@aca_shop_market_disabled
 Feature: Employee hired during renewal period
     In order for the New Employee to purchase insurance
     Given Employer is a Renewing Employer
@@ -8,6 +7,7 @@ Feature: Employee hired during renewal period
     And Employee should be able to purchase Insurance
 
   Background: Setup site, employer, and benefit application
+    Given the shop market configuration is enabled
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for enrollment_open renewal employer with health benefits
     And there is an employer ABC Widgets

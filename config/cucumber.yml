@@ -3,3 +3,4 @@ everything: --format pretty --strict -r features
 semaphoreci: -q
 gh-report: --format json --fail-fast --strict --tags 'not @wip and not @broken and not @flaky and not @ma_only and not @aca_shop_market_disabled' -r features
 local-report: --format json --out ci/cucumber/local-cucumber-report.json --fail-fast --strict --tags 'not @wip and not @broken and not @flaky and not @ma_only and not @aca_shop_market_disabled' -r features
+

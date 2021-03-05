@@ -1,7 +1,7 @@
-@aca_shop_market_disabled
 Feature: Edit Plan Year For Renewing Employer
 
   Background: Setup site, employer, and benefit application
+    Given the shop market configuration is enabled
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for enrollment_open renewal employer with health benefits
 

@@ -1,10 +1,10 @@
-@aca_shop_market_disabled
 Feature: Broker creates a quote for a prospect employer
     In order for Brokers to create a quote to Employers
     The Broker should be able to add Employer and Employees
     And Generate a quote
 
   Background: Broker Quoting Tool
+    Given the shop market configuration is enabled
     Given a CCA site exists with a benefit market
     And the Plans exist
     And there is a Broker Agency exists for District Brokers Inc

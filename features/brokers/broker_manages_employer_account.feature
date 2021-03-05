@@ -1,9 +1,9 @@
-@aca_shop_market_disabled
 Feature: Broker Manages Employer Account
   In order to help Employer, brokers can access their employers accounts
   The Broker should be able to set up application and roster for the employer
 
   Background: Broker registration
+    Given the shop market configuration is enabled
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for draft initial employer with health benefits
     Given there is a Broker Agency exists for District Brokers Inc
