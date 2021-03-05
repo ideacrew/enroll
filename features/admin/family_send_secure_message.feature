@@ -8,6 +8,7 @@ Feature: As a Tier3 Admin I will have the ability to see and access "Send Secure
     Then Hbx Admin should see the list of primary applicants and an Action button
     When Hbx Admin clicks Action button
 
+  @flaky
   Scenario: HBX Staff with Tier3 Admin sub roles should see Send Secure Message button
     Then the user will see the Send Secure Message button
 

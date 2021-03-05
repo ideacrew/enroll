@@ -75,6 +75,14 @@ module BenefitMarketWorld
     ].map { |event_trait| FactoryBot.create(:qualifying_life_event_kind, event_trait, market_kind: "shop", post_event_sep_in_days: 90) }
   end
 
+  def qualifying_life_events_ivl
+    @qualifying_life_events_ivl ||= [
+        :effective_on_event_date,
+        :effective_on_first_of_month,
+        :effective_on_fixed_first_of_next_month
+    ].map { |event_trait| FactoryBot.create(:qualifying_life_event_kind, event_trait, market_kind: "individual", post_event_sep_in_days: 90) }
+  end
+
   def initial_application_dates(status)
     case status
     when :draft, :enrollment_open
@@ -180,6 +188,10 @@ module BenefitMarketWorld
 end
 
 World(BenefitMarketWorld)
+
+Given(/^individual Qualifying life events are present$/) do
+  qualifying_life_events_ivl
+end
 
 Given(/^Qualifying life events are present$/) do
   qualifying_life_events

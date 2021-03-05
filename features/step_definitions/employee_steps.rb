@@ -123,7 +123,7 @@ Then(/^\w+ should see the "(.*?)" at the (.*) of the (.*?) qle list$/) do |qle_e
 end
 
 And(/Employee should see today date and clicks continue/) do
-  screenshot("current_qle_date")
+  # screenshot("current_qle_date")
   expect(find('#qle_date').value).to eq TimeKeeper.date_of_record.strftime("%m/%d/%Y")
   expect(find('#qle_date')['readonly']).to eq 'true'
   expect(find('input#qle_date', style: {'pointer-events': 'none'})).to be_truthy

@@ -141,7 +141,7 @@ Then /(\w+) decides to Update Business information/ do |person|
   FactoryBot.create(:sic_code, sic_code: "0111")
   find('.interaction-click-control-update-business-info', :wait => 10).click
   wait_for_ajax(10,2)
-  screenshot('update_business_info')
+  # screenshot('update_business_info')
 end
 
 And /(.*?) fills in all mandatory fields and clicks on save$/ do |legal_name|
@@ -175,7 +175,7 @@ Given /(\w+) adds an EmployerStaffRole to (\w+)/ do |staff, new_staff|
   fill_in 'staff_first_name', with: person.first_name
   fill_in 'staff_last_name', with: person.last_name
   fill_in  'staff_dob', with: person.dob
-  screenshot('add_existing_person_as_staff')
+  # screenshot('add_existing_person_as_staff')
   find_all('.btn-primary')[0].click
   step 'Point of Contact count is 2'
 end
@@ -209,9 +209,9 @@ end
 When /(\w+) approves EmployerStaffRole for (\w+)/ do |staff1, staff2|
   staff = Person.where(first_name: staff2).first
   find('#approve_' + staff.id.to_s).click
-  screenshot('before_approval')
+  # screenshot('before_approval')
   expect(find('.alert-notice').text).to match /Role is approved/
-  screenshot('after_approval')
+  # screenshot('after_approval')
 end
 
 Then /(\w+) sees new employer page/ do |ex_staff|
@@ -227,7 +227,7 @@ end
 Then /(\w+) is notified about Employer Staff Role (.*)/ do |name, alert|
   expect(page).to have_content("Thank you for submitting your request to access the employer account. Your application for access is pending.")
   expect(page).to have_css("a", :text => /back/i)
-  screenshot('pending_person_stays_on_new_page')
+  # screenshot('pending_person_stays_on_new_page')
 end
 
 Given /Admin accesses the Employers tab of HBX portal/ do
@@ -314,5 +314,5 @@ end
 
 AfterStep do |scenario|
   sleep 1 if ENV['SCREENSHOTS'] == "true"
-  screenshot("")
+  # screenshot("")
 end

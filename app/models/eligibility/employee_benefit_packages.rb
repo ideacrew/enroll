@@ -34,7 +34,7 @@ module Eligibility
             else
               [TimeKeeper.date_of_record.prev_day, TimeKeeper.date_of_record]
             end
-          verified_end_date = assignment.benefit_package.effective_period.cover?(end_date) ? end_date : assignment.benefit_package.effective_period.max
+          verified_end_date = verified_end_date_for_benefit_group_assignment(end_date, assignment)
           assignment.end_benefit(verified_end_date)
         end
         deactive_benefit_group_assignments(benefit_packages.first)
@@ -48,6 +48,16 @@ module Eligibility
       end
     end
 
+    def verified_end_date_for_benefit_group_assignment(end_date, assignment)
+      if assignment.benefit_package.effective_period.cover?(end_date)
+        end_date
+      elsif assignment.start_on >= TimeKeeper.date_of_record
+        assignment.benefit_package.effective_period.min
+      else
+        assignment.benefit_package.effective_period.max
+      end
+    end
+
     def add_renew_benefit_group_assignment(renewal_benefit_packages)
       if renewal_benefit_packages.present?
         if renewal_benefit_group_assignment.present?
@@ -57,7 +67,8 @@ module Eligibility
             else
               [TimeKeeper.date_of_record.prev_day, TimeKeeper.date_of_record]
             end
-          renewal_benefit_group_assignment.end_benefit(end_date)
+          verified_end_date = verified_end_date_for_benefit_group_assignment(end_date, renewal_benefit_group_assignment)
+          renewal_benefit_group_assignment.end_benefit(verified_end_date)
         end
         deactive_benefit_group_assignments(renewal_benefit_packages.first)
         add_benefit_group_assignment(renewal_benefit_packages.first, new_start_on || renewal_benefit_packages.first.start_on, renewal_benefit_packages.first.end_on)

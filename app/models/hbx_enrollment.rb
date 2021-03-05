@@ -96,6 +96,7 @@ class HbxEnrollment
   # TODO need to understand these two fields
   field :elected_aptc_pct, type: Float, default: 0.0
   field :applied_aptc_amount, type: Money, default: 0.0
+  field :aggregate_aptc_amount, type: Money, default: 0.0
   field :changing, type: Boolean, default: false
 
   field :effective_on, type: Date
@@ -395,6 +396,13 @@ class HbxEnrollment
     where(family_id: family_id).special_enrollments.individual_market.show_enrollments_sans_canceled.where(
       :"created_at" => {:"$gte" => start_date, :"$lt" => end_date}
     )
+  }
+
+  scope :yearly_aggregate, lambda { |family_id, year|
+    where(:family_id => family_id,
+          :effective_on => Date.new(year)..Date.new(year).end_of_year,
+          :aasm_state.in => (ENROLLED_AND_RENEWAL_STATUSES + TERMINATED_STATUSES),
+          :"applied_aptc_amount.cents".gt => 0)
   }
   # Rewritten from family scopes
   scope :enrolled_statuses, -> { where(:"aasm_state".in => ENROLLED_STATUSES) }
@@ -760,11 +768,6 @@ class HbxEnrollment
     write_attribute(:hbx_id, HbxIdGenerator.generate_policy_id) if hbx_id.blank?
   end
 
-  def propogate_cancel(term_date = TimeKeeper.date_of_record.end_of_month)
-    self.terminated_on = term_date
-    term_or_cancel_benefit_group_assignment
-  end
-
   def term_or_cancel_benefit_group_assignment
     return unless benefit_group_assignment && (census_employee.employee_termination_pending? || census_employee.employment_terminated?) && census_employee.coverage_terminated_on
 
@@ -772,6 +775,13 @@ class HbxEnrollment
     end_date = benefit_group_assignment.start_on > termed_date ? benefit_group_assignment.start_on : termed_date
     benefit_group_assignment.end_benefit(end_date)
     benefit_group_assignment.save
+  end
+
+  def propogate_cancel
+    # SHOP: Implement if we have requirement from buiness, event need to happen after cancel in shop.
+    # IVL: cancel renewals on cancelling active coverage.
+    return if is_shop?
+    ::EnrollRegistry[:cancel_renewals_for_term] { {hbx_enrollment: self} }
   end
 
   def propogate_terminate(term_date = TimeKeeper.date_of_record.end_of_month)
@@ -1877,7 +1887,8 @@ class HbxEnrollment
                          :renewing_transmitted_to_carrier, :renewing_coverage_enrolled, :coverage_selected,
                          :transmitted_to_carrier, :coverage_renewed, :unverified,
                          :coverage_enrolled, :renewing_waived, :inactive, :coverage_reinstated],
-                  to: :coverage_canceled
+                  to: :coverage_canceled, after: :propogate_cancel
+      transitions from: :coverage_expired, to: :coverage_canceled, :guard => :is_ivl_by_kind?, after: :propogate_cancel
     end
 
     event :cancel_for_non_payment, :after => :record_transition do
@@ -1885,7 +1896,8 @@ class HbxEnrollment
                          :renewing_transmitted_to_carrier, :renewing_coverage_enrolled, :coverage_selected,
                          :transmitted_to_carrier, :coverage_renewed, :unverified,
                          :coverage_enrolled, :renewing_waived, :inactive],
-                  to: :coverage_canceled
+                  to: :coverage_canceled, after: :propogate_cancel
+      transitions from: :coverage_expired, to: :coverage_canceled, :guard => :is_ivl_by_kind?, after: :propogate_cancel
     end
 
     event :terminate_coverage, :after => :record_transition do

@@ -40,7 +40,7 @@ end
 
 Then /^they should see the new general agency form$/ do
   expect(page).to have_content('General Agency Registration')
-  screenshot("general_agency_registration")
+  # screenshot("general_agency_registration")
 end
 
 When /^they complete the new general agency form and hit the 'Submit' button$/ do
@@ -86,7 +86,7 @@ end
 
 Then /^they should see the pending general agency$/ do
   expect(page).to have_content(general_agency_organization.legal_name)
-  screenshot("general_agency_list")
+  # screenshot("general_agency_list")
 end
 
 When /^they click the link of general agency$/ do
@@ -95,7 +95,7 @@ end
 
 Then /^they should see the home of general agency$/ do
   expect(page).to have_content("General Agency : #{general_agency_organization.legal_name}")
-  screenshot("general_agency_homepage")
+  # screenshot("general_agency_homepage")
 end
 
 When /^they visit the list of staff$/ do
@@ -103,19 +103,19 @@ When /^they visit the list of staff$/ do
 end
 
 When /^they approve the general agency$/ do
-  screenshot("general_agency_staff_edit_page")
+  # screenshot("general_agency_staff_edit_page")
   click_button 'Approve'
 end
 
 Then /^they should see updated status$/ do
   expect(find('.alert')).to have_content('Staff approved successfully.')
-  screenshot("general_agency_staff_approved")
+  # screenshot("general_agency_staff_approved")
 end
 
 Then /^they should see an account creation form$/ do
   find('.create-account-btn', wait: 10)
   expect(page).to have_css('.create-account-btn')
-  screenshot("general_agency_staff_register_by_invitation")
+  # screenshot("general_agency_staff_register_by_invitation")
 end
 
 When /^they complete the account creation form and hit the 'Submit' button$/ do
@@ -128,7 +128,7 @@ end
 
 Then /^they should see a welcome message$/ do
   expect(page).to have_content("Welcome to DC Health Link. Your account has been created.")
-  screenshot("general_agency_homepage_for_staff")
+  # screenshot("general_agency_homepage_for_staff")
 end
 
 Then /^they see the General Agency homepage$/ do

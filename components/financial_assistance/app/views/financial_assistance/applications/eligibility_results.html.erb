@@ -34,11 +34,11 @@
         <%if eligible_applicants(params[:id], :is_ia_eligible).present?%>
           <div class="er-phi mt-20">
             <div class="er-title">
-              <h3>Help paying for private health insurance</h3>
+              <h3><%= l10n("faa.review_eligibility_header") %></h3>
             </div>
             <div class="border-bottom-2px"></div>
             <div class="er-medicaid-prsn">
-              <p>These people are <span>eligible for savings of <%= total_aptc_across_eligibility_determinations(params[:id])%> per month</span> called an <span class="run-glossary">advance premium tax credit</span>. This means they won't have to pay full price for health insurance.</p>
+              <p>These people are <span>eligible for monthly premium reductions of <%= number_to_currency(total_aptc_across_eligibility_determinations(params[:id])) %> per month.</span> This means they won't have to pay full price for health insurance.</p>
 
               <%eligible_applicants(params[:id], :is_ia_eligible).each do |applicant_name| %>
                 <div class="er-prsn mt-15">
@@ -47,7 +47,7 @@
                 </div>
               <%end%>
               <%  unless any_csr_ineligible_applicants?(params[:id]) %>
-                <p class="mt-10 mb-0 run-glossary">They also qualify for extra savings called cost-sharing reductions - a benefit that lowers other costs like the annual deductible and copayments. This benefit is only available if these people select a silver plan. Look for this check mark <i class="fa fa-check-square-o col-green" aria-hidden="true"></i> on plans that have this benefit.</p>
+                <p class="mt-10 mb-0 run-glossary">They also qualify for lower out-of-pocket costs - a benefit that lowers other costs like the annual deductible and copayments. This benefit is only available if these people select a silver plan. Look for this check mark <i class="fa fa-check-square-o col-green" aria-hidden="true"></i> on plans that have this benefit.</p>
               <% end %>
             </div>
             <div class="border-bottom-1px"></div>

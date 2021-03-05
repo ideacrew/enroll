@@ -154,13 +154,13 @@ And(/(.*) matches all employee roles to employers and is logged in/) do |named_p
 end
 
 Then(/Employee should see \"employer-sponsored benefits not found\" error message/) do
-  screenshot("new_hire_not_yet_eligible_exception")
+  # screenshot("new_hire_not_yet_eligible_exception")
   find('.alert', text: "Unable to find employer-sponsored benefits for enrollment year")
   visit '/families/home'
 end
 
 Then(/Employee should see \"You are attempting to purchase coverage through qle proir to your eligibility date\" error message/) do
-  screenshot("new_hire_not_yet_eligible_exception")
+  # screenshot("new_hire_not_yet_eligible_exception")
   find('.alert', text: "You are attempting to purchase coverage through Qualifying Life Event prior to your eligibility date")
   visit '/families/home'
 end
@@ -276,7 +276,7 @@ end
 
 When(/Employee select a past qle date/) do
   expect(page).to have_content "Married"
-  screenshot("past_qle_date")
+  # screenshot("past_qle_date")
   date = [renewal_effective_date - 5.days, TimeKeeper.date_of_record - 5.days].min
   fill_in "qle_date", :with => date.strftime("%m/%d/%Y")
   within '#qle-date-chose' do
@@ -286,7 +286,7 @@ end
 
 When(/Employee select a current qle date/) do
   expect(page).to have_content "Married"
-  screenshot("past_qle_date")
+  # screenshot("past_qle_date")
   fill_in "qle_date", :with => TimeKeeper.date_of_record.strftime("%m/%d/%Y")
   within '#qle-date-chose' do
     find('.interaction-click-control-continue').click
@@ -294,7 +294,7 @@ When(/Employee select a current qle date/) do
 end
 
 When(/Employee select a qle date based on expired plan year/) do
-  screenshot("past_qle_date")
+  # screenshot("past_qle_date")
   fill_in "qle_date", :with => (renewal_effective_date - 20.days).strftime("%m/%d/%Y")
   within '#qle-date-chose' do
     find('.interaction-click-control-continue').click
@@ -303,7 +303,7 @@ end
 
 Then(/Employee should see confirmation and clicks continue/) do
   expect(page).to have_content "Based on the information you entered, you may be eligible to enroll now but there is limited time"
-  screenshot("valid_qle")
+  # screenshot("valid_qle")
   click_button "Continue"
 end
 

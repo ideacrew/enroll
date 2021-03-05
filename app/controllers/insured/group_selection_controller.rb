@@ -237,6 +237,7 @@ class Insured::GroupSelectionController < ApplicationController
       :controller, :action, :commit,
       :effective_on_option_selected,
       :is_waiving, :waiver_reason,
+      :shop_under_current, :shop_under_future,
       family_member_ids: {}
     )
   end
