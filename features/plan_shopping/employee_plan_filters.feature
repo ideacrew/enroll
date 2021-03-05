@@ -1,4 +1,3 @@
-@aca_shop_market_disabled
 Feature: Employee products sorted when employee click on Plan name, Premium Amount, Deductible and Carrier.
     Given Employer exists with enrolling plan year
     Given New Employee is on Census Employee Roster
@@ -7,6 +6,7 @@ Feature: Employee products sorted when employee click on Plan name, Premium Amou
     And Employee should be able to see available products and sorting enabled
 
   Background: Setup site, employer, and benefit application
+    Given the shop market configuration is enabled
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for enrollment_open initial employer with health benefits
     And there is an employer Acme Inc.
