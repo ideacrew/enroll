@@ -113,7 +113,7 @@ Feature: Create Primary Broker and Broker Agency
     When Broker Assisted enter the identifying info of Broker Assisted
     # Then Broker Assisted should see the matched employee record form
     When Broker Assisted accepts the matched employer
-    Then Broker Assisted completes the matched employee form for Broker Assisted
+    And Broker completes and submits the matched employee form for Broker Assisted
     And I log out
 
     Then Primary Broker logs on to the Broker Agency Portal
