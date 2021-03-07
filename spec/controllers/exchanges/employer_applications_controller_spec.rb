@@ -134,6 +134,7 @@ RSpec.describe Exchanges::EmployerApplicationsController, dbclean: :after_each d
 
     context 'Success' do
       before :each do
+        EnrollRegistry[:benefit_application_reinstate].feature.stub(:is_enabled).and_return(true)
         allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', can_modify_plan_year: true))
         sign_in(user)
         initial_application.update_attributes!(:aasm_state => :retroactive_canceled)
@@ -176,6 +177,7 @@ RSpec.describe Exchanges::EmployerApplicationsController, dbclean: :after_each d
 
     context 'Failure Application Not Valid For reinstate' do
       before :each do
+        EnrollRegistry[:benefit_application_reinstate].feature.stub(:is_enabled).and_return(true)
         allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', can_modify_plan_year: true))
         sign_in(user)
         initial_application.update_attributes!(:aasm_state => :enrollment_eligible)
@@ -192,6 +194,24 @@ RSpec.describe Exchanges::EmployerApplicationsController, dbclean: :after_each d
 
       it 'should return error message' do
         expect(flash[:error]).to match("#{initial_application.benefit_sponsorship.legal_name} - Given BenefitApplication is not in any of the [:terminated, :termination_pending, :canceled, :retroactive_canceled] states.")
+      end
+    end
+
+    context 'Feature disabled' do
+      before :each do
+        EnrollRegistry[:benefit_application_reinstate].feature.stub(:is_enabled).and_return(false)
+        allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', can_modify_plan_year: true))
+        sign_in(user)
+        initial_application.update_attributes!(:aasm_state => :enrollment_eligible)
+        put :reinstate, params: { employer_application_id: initial_application.id, employer_id: benefit_sponsorship.id}
+      end
+
+      it 'should have redirect response' do
+        expect(response).to have_http_status(:redirect)
+      end
+
+      it 'should direct to profile root path' do
+        expect(response).to redirect_to(exchanges_hbx_profiles_root_path)
       end
     end
   end
