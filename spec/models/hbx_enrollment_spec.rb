@@ -4000,6 +4000,7 @@ describe '.update_reinstate_coverage', dbclean: :around_each do
       period = initial_application.effective_period.min..TimeKeeper.date_of_record.end_of_month
       initial_application.update_attributes!(termination_reason: 'nonpayment', terminated_on: period.max, effective_period: period)
       initial_application.schedule_enrollment_termination!
+      EnrollRegistry[:benefit_application_reinstate].feature.stub(:is_enabled).and_return(true)
       EnrollRegistry[:benefit_application_reinstate]{ {params: {benefit_application: initial_application, options: {transmit_to_carrier: true} } } }
       family.hbx_enrollments.map(&:reload)
       census_employee.reload
