@@ -1761,6 +1761,8 @@ class HbxEnrollment
     eligible_states = ENROLLED_AND_RENEWAL_STATUSES + CAN_REINSTATE_AND_UPDATE_END_DATE
     eligible_states << 'coverage_expired' if ::EnrollRegistry.feature_enabled?(:prior_plan_year_sep)
     application = benefit_sponsorship.benefit_applications.approved_and_term_benefit_applications_by_date(reinstate_date).first
+    return false unless application
+
     application_effective_period = application.effective_period
     HbxEnrollment.by_effective_period(application_effective_period).where({:family_id => self.family_id,
                                                                            :kind.in => %w[employer_sponsored employer_sponsored_cobra],
