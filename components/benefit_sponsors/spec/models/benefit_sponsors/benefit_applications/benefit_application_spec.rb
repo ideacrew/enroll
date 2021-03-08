@@ -13,7 +13,7 @@ end
 #create benefit app with all params
 module BenefitSponsors
   unless EnrollRegistry.feature_enabled?(:aca_shop_market) || EnrollRegistry.feature_enabled?(:fehb_market)
-    RSpec.describe BenefitApplications::BenefitApplication, type: :model, :dbclean => :after_each do
+    RSpec.describe BenefitApplications::BenefitApplication, type: :model, :dbclean => :after_each, :if => ::EnrollRegistry[:aca_shop_market].enabled? do
       let(:site) { ::BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_benefit_market }
       let(:benefit_market)          { site.benefit_markets.first }
       let(:employer_organization)   { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{site.site_key}_employer_profile".to_sym, site: site) }
