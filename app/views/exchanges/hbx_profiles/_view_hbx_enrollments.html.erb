@@ -13,7 +13,11 @@
                 <th>Market</th>
                 <th>Coverage <br/> Year</th>
                 <th>Effective <br/> Date</th>
-                <th>Termination <br/> Date</th>
+                <% if  ::EnrollRegistry.feature_enabled?(:prior_plan_year_sep) %>
+                  <th>Termination/Expiration <br/> Date</th>
+                <% else %>
+                  <th>Termination <br/> Date</th>
+                <% end %>
                 <th>Reinstate Effective<br/> Date</th>
                 <th>Transmit <br /> Carrier EDI?</th>
                 <th><%= EnrollRegistry[:enroll_app].setting(:short_name).item %><br/> ID</th>
@@ -31,11 +35,16 @@
                     <td id="enrollment_market" class="hidden"><%= enrollment.market_name %></td>
                     <td id="cobra_employee" class="hidden"><%= enrollment.is_shop? && enrollment.employee_role.is_cobra_status? %></td>
                     <td id="cobra_enrollment" class="hidden"><%= enrollment.is_shop? && enrollment.is_cobra_status? %></td>
-                    <td id="active_enroll_exists_with_reinstate_date" class="hidden"><%= enrollment.has_active_or_term_exists_for_reinstated_date? %></td>
+                    <td id="active_enroll_exists_with_reinstate_date" class="hidden"><%= enrollment.has_active_term_or_expired_exists_for_reinstated_date? %></td>
                     <td><%= enrollment.effective_on.year %></td>
                     <td><%= enrollment.effective_on %></td>
-                    <td><%= enrollment.terminated_on %></td>
-                    <td id="reinstate"><%= enrollment.terminated_on.next_day %></td>
+                    <% if enrollment.coverage_expired? %>
+                      <td><%= enrollment.effective_on.end_of_year %></td>
+                      <td id="reinstate"><%= enrollment.effective_on.end_of_year.next_day %></td>
+                    <% else %>
+                      <td><%= enrollment.terminated_on %></td>
+                      <td id="reinstate"><%= enrollment.terminated_on.next_day %></td>
+                    <% end %>
                     <td>
                       <input type="checkbox" name="edi_required" value="checked" checked />
                     </td>
