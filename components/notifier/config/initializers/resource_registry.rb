@@ -1,4 +1,4 @@
-# require Notifier::Engine.root.join('app', 'domain', 'types.rb')
+# frozen_string_literal: true
 
 NotifierRegistry = ResourceRegistry::Registry.new
 
