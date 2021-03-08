@@ -8,7 +8,7 @@ module Insured
         "BEST Life" => 'https://www.bestlife.com/exchange/payment_option.html',
         "CareFirst" => "https://member.carefirst.com/members/home.page",
         "Delta Dental" => "https://www1.deltadentalins.com/login.html",
-        "Dominion" => "https://www.dominionmembers.com/"
+        "Dominion National" => "https://www.dominionmembers.com/"
       }.freeze
 
       def show_pay_now?(source, hbx_enrollment)
