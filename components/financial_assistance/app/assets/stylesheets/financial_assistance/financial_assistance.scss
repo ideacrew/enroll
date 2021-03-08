@@ -162,7 +162,7 @@ span.span-text {
 }
 .table-border-line
 {
-  color: #C0C0C0;
+  color: #333;
 }
 
 .form-bottom-border
@@ -374,4 +374,8 @@ div#add-more-link {
 
 .mt18 {
   margin-top: 18px;
+}
+
+.label-max-width-renew{
+  max-width: 90%;
 }
