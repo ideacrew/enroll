@@ -22,4 +22,5 @@
       - if !user_signed_in?
         = link_to l10n(".broker_registration"), benefit_sponsors.new_profiles_registration_path(:profile_type => :broker_agency), class: "btn btn-outline-primary mr-2 mb-2 broker-registration"
         = link_to l10n(".general_agency_registration"), benefit_sponsors.new_profiles_registration_path(:profile_type => :general_agency), class: "btn btn-outline-primary mr-2 mb-2" if general_agency_enabled?
-    =image_tag ("CoverME_WebsiteHeader_01.jpg"), :class => "ct-cover", :id => 'ct-cover'
+    - if EnrollRegistry[:enroll_app].setting(:application_name).item == :me
+      =image_tag ("CoverME_WebsiteHeader_01.jpg"), :class => "ct-cover", :id => 'ct-cover'
