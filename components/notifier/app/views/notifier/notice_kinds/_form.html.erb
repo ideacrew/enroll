@@ -6,7 +6,7 @@
 <%= form_for notice_kind do |f| %>
   <div class="form-group col-xs-8">
     <label for="noticeDescription">Select Market</label>
-    <%= f.select(:market_kind, options_for_select(Notifier::NoticeKind::MARKET_KINDS.collect{ |market| [market.to_s.titleize, market] }, selected: notice_kind.market_kind), { :class => 'form-control'}, required: true ) %>
+    <%= f.select(:market_kind, options_for_select(Notifier::NoticeKind::MARKET_KINDS.collect{ |market| [market.to_s.titleize, market] }, selected: notice_kind.market_kind), { include_blank: false, :class => 'form-control'}) %>
   </div>
 
   <div class="form-group col-xs-8">
@@ -33,7 +33,7 @@
   <% recipients = Notifier::Services::NoticeKindService.new(notice_kind.market_kind).recipients %>
   <div class="form-group col-xs-8">
     <label for="noticeDescription">Recipient *</label>
-    <%= f.select(:recipient, options_for_select(recipients.inject([]) {|options, (k, v)| options << [k, v]}, selected: notice_kind.recipient), { :class => 'form-control'}, required: true ) %>
+    <%= f.select(:recipient, options_for_select(recipients.inject([]) {|options, (k, v)| options << [k, v]}, selected: notice_kind.recipient), {:class => 'form-control'}) %>
   </div>
  
   <div class="form-group col-xs-12">
