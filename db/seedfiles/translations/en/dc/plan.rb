@@ -23,10 +23,10 @@ PLAN_TRANSLATIONS = {
   'en.plans.rnsd_hours' => '8:00 am – 8:00 pm (M-F)',
   'en.plans.rnsd_contact_url' => 'www.RenaissanceBenefits.com',
 
-  'en.plans.anthm' => '',
-  'en.plans.anthm_phone' => '',
-  'en.plans.anthm_href_phone' => '',
-  'en.plans.anthm_hours' => '',
+  'en.plans.anthm' => 'Anthem Blue Cross and Blue Shield',
+  'en.plans.anthm_phone' => '1-855-738-6674',
+  'en.plans.anthm_href_phone' => 'tel:+18557386674',
+  'en.plans.anthm_hours' => '7:00 am – 7:00 pm (M-F)',
   'en.plans.anthm_contact_url' => '',
 
   'en.plans.nedd' => 'Northeast Delta Dental',
