@@ -31,7 +31,6 @@ module BenefitSponsors
 
     before :each do
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_shop_market).and_return(true)
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_individual_market).and_return(true)
       BenefitSponsors::Organizations::BrokerAgencyProfile::MARKET_KINDS << :shop
       Person.create_indexes
       user_with_hbx_staff_role.person.build_hbx_staff_role(hbx_profile_id: organization_with_hbx_profile.hbx_profile.id)
