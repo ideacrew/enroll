@@ -105,6 +105,11 @@ Given(/^all required questions are answered$/) do
   find('#application_report_change_terms').click
 end
 
+And(/^the user should be able to see medicaid determination question$/) do
+  expect(false).to eq(find('#medicaid_determination_yes').checked?).and eq(find('#medicaid_determination_no').checked?)
+  expect(page).to have_content("Do you want your application submitted for full medicaid determination?")
+end
+
 Given(/^the user has signed their name$/) do
   fill_in 'first_name_thank_you', with: application.primary_applicant.first_name
   fill_in 'last_name_thank_you', with: application.primary_applicant.last_name
