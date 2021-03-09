@@ -111,7 +111,7 @@ def fehb_qualifying_life_events
 end
 
 And(/^Qualifying life events of all markets are present$/) do
-  ivl_qualifying_life_events 
+  ivl_qualifying_life_events
   shop_qualifying_life_events
   fehb_qualifying_life_events
 end
