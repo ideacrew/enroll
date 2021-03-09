@@ -50,7 +50,7 @@ Feature: IVL plan purchase
     And consumer should also see the reason for ineligibility
     When consumer checks the primary person
     And consumer clicked on shop for new plan
-    Then consumer should see the primary person
+    Then consumer should see primary person of the family
 
   Scenario: when individual purchases dental plan for self & dependent and tries to filter by Low/High
     Given a consumer exists
