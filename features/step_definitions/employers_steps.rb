@@ -702,6 +702,7 @@ end
 Then("employer updates open enrollment end date to {int}") do |int|
   current_oe_date = @new_application.open_enrollment_period.max
   new_oe_date = Date.new(current_oe_date.year, current_oe_date.month, int).to_s
+  sleep 5
   fill_in 'benefit_application[open_enrollment_end_on]', :with => new_oe_date
 end
 

@@ -1,5 +1,6 @@
 Feature: Admin has ability to create a new SEP Type with visibility options for "Customer & Admin" and "Admin Only"
   Background:
+    Given both shop and fehb market configurations are enabled
     Given that a user with a HBX staff role with hbx_tier3 subrole exists
     When Hbx Admin logs on to the Hbx Portal
     Given the Admin is on the Main Page
