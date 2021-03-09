@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+#insured/employee/6047a0d815484347375e41de/edit
 class EmployeeContactInformation
 
   def self.new_address
@@ -7,17 +8,17 @@ class EmployeeContactInformation
   end
 
   def self.address_line1
-   'person[addresses_attributes][0][address_1]'
+    'person[addresses_attributes][0][address_1]'
   end
 
   def self.address2_line2
-   'person[addresses_attributes][0][address_2]'
+    'person[addresses_attributes][0][address_2]'
   end
 
   def self.city
     'person[addresses_attributes][0][city]'
   end
-  
+
   def self.state
     'person[addresses_attributes][0][state]'
   end

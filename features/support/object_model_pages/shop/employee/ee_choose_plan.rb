@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+#insured/plan_shoppings/6047a0dc15484347455e41d9?coverage_kind=health&enrollment_kind=&market_kind=shop
 class EmployeeChoosePlan
 
   def self.find_your_doctor_link
@@ -79,7 +80,7 @@ class EmployeeChoosePlan
   end
 
   def self.select_plan_btn
-    '.interaction-click-control-select-plan'  
+    '.interaction-click-control-select-plan'
   end
 
   def self.see_details_btn

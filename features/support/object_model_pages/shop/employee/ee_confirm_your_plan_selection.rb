@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+#insured/plan_shoppings/6047a0dc15484347455e41d9/thankyou?change_plan=&coverage_kind=health&enrollment_kind=&market_kind=shop&plan_id
 class EmployeeConfirmYourPlanSelection
 
   def self.previous_link
