@@ -306,7 +306,12 @@ Then(/(.*) should see primary person/) do |role|
   expect(page).to have_content("Covered: #{primary.first_name}", wait: 10)
 end
 
-Then(/(.*) should see primary person of the family/) do
+Then(/consumer should see coverage for primary person/) do
+  primary = Person.all.select { |person| person.primary_family.present? }.first
+  expect(page).to have_content("Coverage For:   #{primary.first_name}", wait: 10)
+end
+
+Then(/Resident should see coverage for primary person/) do
   primary = Person.all.select { |person| person.primary_family.present? }.first
   expect(page).to have_content("Coverage For:   #{primary.first_name}", wait: 10)
 end
