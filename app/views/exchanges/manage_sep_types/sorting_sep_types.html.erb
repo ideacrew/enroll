@@ -17,14 +17,19 @@
 			<li class="nav-item">
 				<a class="nav-link active" data-toggle="tab" href="#individual"><%= l10n("exchange.manage_sep_types.individual")%></a>
 			</li>
+      <% if is_shop_or_fehb_market_enabled? %>
+        <li class="nav-item">
+          <a class="nav-link" data-toggle="tab" href="#shop"><%= l10n("exchange.manage_sep_types.shop")%></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-toggle="tab" href="#fehb"><%= l10n("exchange.manage_sep_types.fehb")%></a>
+        </li>
+      <% end %>
+
 			<li class="nav-item">
-				<a class="nav-link" data-toggle="tab" href="#shop"><%= l10n("exchange.manage_sep_types.shop")%></a>
-			</li>
-			<li class="nav-item">
-				<a class="nav-link" data-toggle="tab" href="#fehb"><%= l10n("exchange.manage_sep_types.fehb")%></a>
-			</li>
-			<li class="nav-item">
-				<%= link_to l10n("exchange.manage_sep_types.sep_type_list"), sep_types_dt_exchanges_manage_sep_types_path, class: 'btn btn-outline-primary right-align' %>
+				<%= link_to l10n("exchange.manage_sep_types.sep_type_list"),
+                    sep_types_dt_exchanges_manage_sep_types_path,
+                    class: "btn btn-outline-primary right-align #{is_shop_or_fehb_market_enabled? ? '' : 'margin-right-15'}" %>
 			</li>
 		</ul>
 
@@ -32,9 +37,11 @@
 
 	 <!-- Tab panes -->
 		<div class="tab-content">
-          <%= render partial: 'display_by_market', locals: {market_kind: 'individual', display: 'active'} %>
-          <%= render partial: 'display_by_market', locals: {market_kind: 'shop', display: 'fade'} %>
-          <%= render partial: 'display_by_market', locals: {market_kind: 'fehb', display: 'fade'} %>
+      <%= render partial: 'display_by_market', locals: {market_kind: 'individual', display: 'active'} %>
+      <% if is_shop_or_fehb_market_enabled? %>
+        <%= render partial: 'display_by_market', locals: {market_kind: 'shop', display: 'fade'} %>
+        <%= render partial: 'display_by_market', locals: {market_kind: 'fehb', display: 'fade'} %>
+      <% end %>
 		</div>
 	</div>
 <% end %>
