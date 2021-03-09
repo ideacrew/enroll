@@ -2,6 +2,7 @@
 
 class Notifier::Services::NoticeKindService
   include Notifier::Services::TokenBuilder
+  include ::Config::SiteModelConcern
 
   attr_accessor :market_kind, :model_builder
 
@@ -17,9 +18,9 @@ class Notifier::Services::NoticeKindService
   end
 
   def service
-    if aca_individual?
+    if aca_individual? && is_individual_market_enabled?
       Notifier::Services::IndividualNoticeService.new
-    else
+    elsif is_shop_or_fehb_market_enabled?
       Notifier::Services::ShopNoticeService.new
     end
   end
