@@ -1,0 +1,23 @@
+<% unless demographic[0] == "ADDRESSES" %>
+  <div class="form-bottom-border">
+    <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
+      <%= content_tag(:div, class: "col-md-11 form-heading") do %>
+        <%= label(nil, demographic[0], class: "col-md-6") %>
+        <%= content_tag(:div, demographic[1].nil? ? "N/A" : demographic[1] == true ? "Yes" : demographic[1] == false ? "No" : demographic[1], class: "col-md-6") %>
+      <% end %>
+    </div>
+  </div>
+<% else %>
+  <% demographic[1].each do |k, v| %>
+    <div class="form-bottom-border">
+      <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
+        <%= content_tag(:div, class: "col-md-11 form-heading", style: "font-weight: 1000;") do %>
+          <%= label(nil, k, class: "col-md-6 ") %>
+        <% end %>
+      </div>
+    </div>
+    <div class="no-buffer" style="border: 1px solid #ddd;">
+      <%= render partial: "financial_assistance/applications/form_fields", collection: v, as: :form_field %>
+    </div>
+  <% end %>
+<% end %>

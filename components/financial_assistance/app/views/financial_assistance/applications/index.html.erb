@@ -43,13 +43,19 @@
             <td><%=to_est application.submitted_at%></td>
             <td></td>
             <%
-            dropdown = [
-            ['Update Application', edit_application_path(application), application.is_draft? ? 'static' : 'disabled'],
-            ['Copy to new application', copy_application_path(application), application.is_draft? ? 'disabled' : 'static'],
-            ['View Eligibility Determination', eligibility_results_application_path(application), application.is_determined? ? 'static' : 'disabled'],
-            ['Review Application', review_application_path(application), application.is_reviewable? ? 'static' : 'disabled']
-            ]
+              dropdown = [
+                ['Update Application', edit_application_path(application), application.is_draft? ? 'static' : 'disabled'],
+                ['Copy to new application', copy_application_path(application), application.is_draft? ? 'disabled' : 'static'],
+                ['View Eligibility Determination', eligibility_results_application_path(application), application.is_determined? ? 'static' : 'disabled'],
+                ['Review Application', review_application_path(application), application.is_reviewable? ? 'static' : 'disabled']
+              ]
             %>
+            <% if current_user.has_hbx_staff_role? %>
+              <% dropdown += [
+                ['Raw Application', raw_application_application_path(application), application.is_reviewable? ? 'static' : 'disabled']
+              ]
+              %>
+            <% end %>
             <td>
               <%= render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: ""}, formats: :html%>
 
