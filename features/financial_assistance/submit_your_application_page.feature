@@ -28,6 +28,7 @@ Feature: This is the final review page before submiting an application
 
   Scenario: Submit button is enabled when required checkboxes are checked and name is signed
     Given all required questions are answered
+    And the user should be able to see medicaid determination question
     And the user has signed their name
     Then the submit button will be enabled
 
