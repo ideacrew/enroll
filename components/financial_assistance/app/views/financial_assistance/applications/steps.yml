@@ -256,6 +256,34 @@
       - section:
           lines:
             - cells:
+              - gutter: 12
+                type: raw_html
+                text: <b>Do you want your application submitted for full medicaid determination?</b>
+              - gutter: 2
+                type: label_radio
+                name: row1
+                value: true
+                required: true
+                id: 'medicaid_determination_yes'
+                label: 'Yes'
+                classNames: 'span-text'
+                model: application
+                name: full_medicaid_determination
+                attribute: full_medicaid_determination
+              - gutter: 2
+                type: label_radio
+                name: row1
+                value: false
+                required: true
+                id: 'medicaid_determination_no'
+                label: 'No'
+                classNames: 'span-text'
+                model: application
+                name: full_medicaid_determination
+                attribute: full_medicaid_determination
+      - section:
+          lines:
+            - cells:
                 - gutter: 12
                   type: raw_html
                   text: "<h5><b>Electronic Signature * (enter your name)</b></h5>"
