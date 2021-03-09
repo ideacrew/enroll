@@ -7,6 +7,7 @@ module SponsoredBenefits
 
     def employers
       # This should be index action in plan design organizations controller
+      head :bad_request if is_shop_or_fehb_market_enabled?
       @datatable = klass.new(profile_id: @profile._id)
     end
 
