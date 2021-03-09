@@ -339,6 +339,11 @@ Given(/^the individual market configuration is enabled$/) do
   enable_feature :aca_individual_market
 end
 
+Given(/^both shop and fehb market configurations are enabled$/) do
+  enable_feature :aca_shop_market
+  enable_feature :fehb_market
+end
+
 When(/(^.+) enters? office location for (.+)$/) do |role, location|
   location = eval(location) if location.class == String
   RatingArea.where(zip_code: "01001").first || FactoryBot.create(:rating_area, zip_code: "01001", county_name: "Hampden", rating_area: Settings.aca.rating_areas.first)
