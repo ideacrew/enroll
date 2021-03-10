@@ -333,7 +333,8 @@ class Family
   def terminated_and_expired_enrollments
     eligible_states = %w[coverage_terminated coverage_termination_pending]
     eligible_states << 'coverage_expired' if ::EnrollRegistry.feature_enabled?(:prior_plan_year_sep)
-    hbx_enrollments.where(:aasm_state.in => eligible_states)
+    enrollments = hbx_enrollments.where(:aasm_state.in => eligible_states)
+    enrollments.reject{ |enr| enr.coverage_expired? && !enr.prior_plan_year_coverage? }
   end
 
   # @deprecated Use {primary_applicant}
