@@ -55,6 +55,7 @@ namespace :assets do
           execute("cd #{release_path} && nvm use 10 && yarn install")
           execute :rake, "assets:clobber"
           execute("cd #{release_path} && nvm use 10 && RAILS_ENV=production NODE_ENV=production bundle exec rake assets:precompile")
+          execute :rake, "seed:translations[db/seedfiles/english_translations_seed.rb]"
         end
       end
     end
