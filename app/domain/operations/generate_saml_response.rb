@@ -32,8 +32,7 @@ module Operations
     end
 
     def create_payment_transaction(hbx_enrollment)
-      payment = PaymentTransaction.build_payment_instance(hbx_enrollment)
-      payment ? Success(payment) : Failure("Issue with Payment transcation")
+      Operations::PaymentTransactions::Create.new.call({hbx_enrollment: hbx_enrollment})
     end
 
     def init_saml_generator(payment_transaction, hbx_enrollment)
