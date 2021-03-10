@@ -77,14 +77,27 @@ class QhpRateBuilder
     else
       key = "#{@rate[:plan_id]},#{@rate[:effective_date].to_date.year}"
       rating_area = @rate[:rate_area_id].gsub("Rating Area ", "R-#{Settings.aca.state_abbreviation.upcase}00")
-      @results[key] << {
-        age: assign_age,
-        start_on: @rate[:effective_date],
-        end_on: @rate[:expiration_date],
-        cost: @rate[:primary_enrollee],
-        tobacco_cost: @rate[:primary_enrollee_tobacco],
-        rating_area: rating_area
-      }
+      if assign_age.zero?
+        (14..64).each do |age|
+          @results[key] << {
+            age: age,
+            start_on: @rate[:effective_date],
+            end_on: @rate[:expiration_date],
+            cost: @rate[:primary_enrollee],
+            tobacco_cost: @rate[:primary_enrollee_tobacco],
+            rating_area: rating_area
+          }
+        end
+      else
+        @results[key] << {
+          age: assign_age,
+          start_on: @rate[:effective_date],
+          end_on: @rate[:expiration_date],
+          cost: @rate[:primary_enrollee],
+          tobacco_cost: @rate[:primary_enrollee_tobacco],
+          rating_area: rating_area
+        }
+      end
     end
   end
 
@@ -133,7 +146,13 @@ class QhpRateBuilder
     applicable_range = @rate[:effective_date].to_date..@rate[:expiration_date].to_date
     rating_area = @rate[:rate_area_id].gsub("Rating Area ", "R-#{Settings.aca.state_abbreviation.upcase}00")
     rating_area_id = @rating_area_id_cache[[active_year, rating_area]]
-    @premium_table_cache[[@rate[:plan_id], rating_area_id, applicable_range]][assign_age] = "#{@rate[:primary_enrollee]};#{@rate[:primary_enrollee_tobacco]}"
+    if assign_age.zero?
+      (14..64).each do |age|
+        @premium_table_cache[[@rate[:plan_id], rating_area_id, applicable_range]][age] = "#{@rate[:primary_enrollee]};#{@rate[:primary_enrollee_tobacco]}"
+      end
+    else
+      @premium_table_cache[[@rate[:plan_id], rating_area_id, applicable_range]][assign_age] = "#{@rate[:primary_enrollee]};#{@rate[:primary_enrollee_tobacco]}"
+    end
     @results_array << "#{@rate[:plan_id]},#{active_year}"
   end
 
