@@ -142,9 +142,13 @@ module Effective
       end
 
       def add_roles_link_type(allow)
-        feature_enabled = ::EnrollRegistry.feature_enabled?(:manage_account_functionality)
-        policy_accepted_and_allow = feature_enabled && allow
+        policy_accepted_and_allow = allow && add_roles_feature_enabled?
         policy_accepted_and_allow ? 'ajax' : 'hide'
+      end
+
+      def add_roles_feature_enabled?
+        return @enabled if defined? @enabled
+        @enabled = ::EnrollRegistry.feature_enabled?(:manage_account_functionality)
       end
 
       def force_publish_link_type(benefit_sponsorship, allow)
