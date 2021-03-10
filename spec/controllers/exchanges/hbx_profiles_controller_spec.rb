@@ -978,8 +978,8 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       get :view_terminated_hbx_enrollments, params: params, xhr: true, format: :js
       expect(response).to have_http_status(:success)
       expect(response).to render_template('view_terminated_hbx_enrollments')
-      expect(assigns(:enrollments).include?(term_hbx_enrollment)).to eq true
-      expect(assigns(:enrollments).size).to eq 2
+      expect(assigns(:enrollments).include?(expired_hbx_enrollment)).to eq true
+      expect(assigns(:enrollments).size).to eq 3
     end
   end
 
