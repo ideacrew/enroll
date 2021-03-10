@@ -12,6 +12,8 @@ module BenefitSponsors
             optional(:dob).filter(format?: %r{\d{2}/\d{2}/\d{4}}).maybe(:string)
             optional(:gender).maybe(:string)
             optional(:hired_on).maybe(:string)
+            optional(:has_other_coverage).maybe(:string)
+            optional(:is_owner).maybe(:string)
             required(:is_applying_coverage).filled(:bool)
             optional(:address).maybe(:hash)
             optional(:email).maybe(:hash)
@@ -29,7 +31,6 @@ module BenefitSponsors
 
           rule(:hired_on) do
             key.failure('Please enter hired on') if key? && values[:is_applying_coverage] == true && value.blank?
-            key.failure('Invalid Hired on') if key? && values[:is_applying_coverage] == true && !/\d{4}-\d{2}-\d{2}/.match?(value)
           end
 
           rule(:address) do

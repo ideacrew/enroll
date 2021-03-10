@@ -73,7 +73,7 @@ module BenefitSponsors
 
           def parse_date(date)
             return date if date.is_a? Date
-            Date.strptime(date, "%Y-%m-%d")
+            Date.strptime(date, '%m/%d/%Y')
           end
         end
       end

@@ -26,9 +26,10 @@ div data-controller="bulk-notice"
     .col-md-4.mb-3 style='padding-left: 0px;'
       .col-md-6.optional.hidden
         label for="inputHired"  Hired On *
-        = f.date_field :hired_on, {:class => "form-control", :placeholder => "MM/DD/YYYY", id:'inputHiredOn'}
+        = f.text_field :hired_on, placeholder:'MM/DD/YYYY', id:'inputHiredOn', class:'form-control inputHiredOn'
         .invalid-feedback
-          | Please provide a Hired on date.
+          |
+            Please provide a Hired on date.
     .col-md-4.mb-3
       .optional.hidden
         label Owner?*
@@ -98,3 +99,13 @@ div data-controller="bulk-notice"
         .col-md-12.mb-2#dependent
         .col-md-12.mb-2
           a.btn.btn-default.btn-sm data-reflex="click->BulkNotice#add_coverage_dependent" data-key="0" Add Dependent
+
+javascript:
+  $('.inputHiredOn').datepicker({
+    dateFormat:'mm/dd/yy',
+    changeYear: true,
+    changeMonth:true,
+    onSelect: function () {
+      $('.inputHiredOn').val(this.value);
+    }
+  })

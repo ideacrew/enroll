@@ -65,7 +65,7 @@ module BenefitSponsors
                          has_other_coverage: coverage_record_params[:has_other_coverage],
                          is_owner: coverage_record_params[:is_owner],
                          coverage_record_dependents: dependents_attrs,
-                         hired_on: Date.strptime(coverage_record_params[:hired_on], '%Y-%m-%d'))
+                         hired_on: Date.strptime(coverage_record_params[:hired_on], '%m/%d/%Y'))
           end
           attrs
         end
