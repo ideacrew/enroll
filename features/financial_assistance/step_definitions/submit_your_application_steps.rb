@@ -20,7 +20,7 @@ end
 Given(/^all applicants are in Info Completed state with all types of income$/) do
   until find_all('.btn', text: 'ADD INCOME & COVERAGE INFO').empty?
     find_all('.btn', text: 'ADD INCOME & COVERAGE INFO')[0].click
-    find('#is_required_to_file_taxes_no').click
+    find('#is_required_to_file_taxes_no', wait: 5).click
     find('#is_claimed_as_tax_dependent_no').click
     find(:xpath, "//input[@value='CONTINUE'][@name='commit']").click
 
@@ -106,8 +106,8 @@ Given(/^all required questions are answered$/) do
 end
 
 And(/^the user should be able to see medicaid determination question$/) do
-  expect(false).to eq(find('#medicaid_determination_yes').checked?).and eq(find('#medicaid_determination_no').checked?)
   expect(page).to have_content("Do you want your application submitted for full medicaid determination?")
+  find('#medicaid_determination_yes').click
 end
 
 Given(/^the user has signed their name$/) do
