@@ -1746,7 +1746,7 @@ class HbxEnrollment
   end
 
   def benefit_applications_for_reinstated_date?
-    reinstate_date = coverage_expired? ? sponsored_benefit_package.end_on.next_day : terminated_on.next_day
+    reinstate_date = fetch_reinstatement_date
     return true if benefit_sponsorship.benefit_applications.published_benefit_applications_by_date(reinstate_date).present?
 
     ::EnrollRegistry.feature_enabled?(:prior_plan_year_sep) ? census_employee.prior_py_present_for_date?(reinstate_date) : false
@@ -1786,6 +1786,8 @@ class HbxEnrollment
   end
 
   def notify_of_coverage_start(publish_to_carrier)
+    return if coverage_terminated? || coverage_canceled? || coverage_termination_pending? || coverage_expired?
+
     config = Rails.application.config.acapi
     notify(
         "acapi.info.events.hbx_enrollment.coverage_selected",
@@ -1824,7 +1826,7 @@ class HbxEnrollment
     return false if has_active_term_or_expired_exists_for_reinstated_date?
     reinstate_enrollment = Enrollments::Replicator::Reinstatement.new(self, fetch_reinstatement_date).build
 
-    if self.is_shop?
+    if self.is_shop? && !prior_plan_year_coverage?
       census_employee = benefit_group_assignment.census_employee
       census_employee.reinstate_employment if census_employee.can_be_reinstated?
     end
@@ -1836,6 +1838,7 @@ class HbxEnrollment
 
       #transition enrollment to expired to term state if PY is expired or terminated
       reinstate_enrollment.term_or_expire_enrollment if ::EnrollRegistry.feature_enabled?(:prior_plan_year_sep)
+      reinstate_enrollment.notify_enrollment_cancel_or_termination_event(edi)
 
       # Move reinstated enrollment to "coverage enrolled" status if coverage begins
       reinstate_enrollment.begin_coverage! if reinstate_enrollment.may_begin_coverage? && self.effective_on <= TimeKeeper.date_of_record
@@ -2048,6 +2051,11 @@ class HbxEnrollment
   def prior_year_shop_coverage?
     application = sponsored_benefit_package&.benefit_application
     return false if application.blank?
+
+    offset_months = EnrollRegistry[:prior_plan_year_sep].setting(:offset_months).item
+    start_date = TimeKeeper.date_of_record.beginning_of_year
+    end_date = start_date - offset_months.months
+    return false unless (start_date..end_date).cover?(application.start_on)
 
     application_status = application.terminated? || application.expired?
     enrollment_valid_for_application = (application.start_on..application.end_on).cover?(effective_on)
