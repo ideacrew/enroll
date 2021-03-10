@@ -42,9 +42,21 @@ class UnassistedPlanCostDecorator < SimpleDelegator
     end
   end
 
+  def rating_area
+    zip = hbx_enrollment.consumer_role.zip
+    county_id = ::BenefitMarkets::Locations::CountyZip.find_by(zip: "04210").id
+    rating_area = ::BenefitMarkets::Locations::RatingArea.where(active_year: __getobj__.active_year).detect{|a| a.county_zip_ids.include?(county_id)}
+    # rating_area.exchange_provided_code.present? ? rating_area.exchange_provided_code : __getobj__.premium_tables.first.rating_area.exchange_provided_code
+    if rating_area.exchange_provided_code == __getobj__.premium_tables.first.rating_area.exchange_provided_code
+      rating_area.exchange_provided_code
+    else
+      __getobj__.premium_tables.first.rating_area.exchange_provided_code
+    end
+  end
+
   #TODO: FIX me to refactor hard coded rating area
   def premium_for(member)
-    (::BenefitMarkets::Products::ProductRateCache.lookup_rate(__getobj__, schedule_date, age_of(member), "R-#{Settings.aca.state_abbreviation.upcase}001") * large_family_factor(member)).round(2)
+    (::BenefitMarkets::Products::ProductRateCache.lookup_rate(__getobj__, schedule_date, age_of(member), rating_area) * large_family_factor(member)).round(2)
     # FIXME
   rescue StandardError => _e
     0
