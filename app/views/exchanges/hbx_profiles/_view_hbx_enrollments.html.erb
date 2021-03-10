@@ -38,7 +38,7 @@
                     <td id="active_enroll_exists_with_reinstate_date" class="hidden"><%= enrollment.has_active_term_or_expired_exists_for_reinstated_date? %></td>
                     <td><%= enrollment.effective_on.year %></td>
                     <td><%= enrollment.effective_on %></td>
-                    <% if enrollment.coverage_expired? %>
+                    <% if enrollment.coverage_expired? && !enrollment.prior_plan_year_coverage? %>
                       <td><%= enrollment.effective_on.end_of_year %></td>
                       <td id="reinstate"><%= enrollment.effective_on.end_of_year.next_day %></td>
                     <% else %>
