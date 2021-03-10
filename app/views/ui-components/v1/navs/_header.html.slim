@@ -29,10 +29,7 @@
                 span = link_to l10n(".logout"), main_app.destroy_user_session_path, method: "delete", class: "header-text"
                 br
                 strong.users-name
-                  - if ::EnrollRegistry.feature_enabled?(:manage_account_functionality)
-                    = render partial: "shared/my_portal_links"
-                  - else
-                    = user_first_name_last_name_and_suffix
+                  = render partial: "shared/my_portal_links"
                 - unless current_user.try(:person).try(:hbx_id).nil?
                   | &nbsp;
                   | &nbsp;

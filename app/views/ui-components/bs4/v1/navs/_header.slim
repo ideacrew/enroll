@@ -29,10 +29,7 @@ nav class=("navbar navbar-expand-lg navbar-main pt-0 pb-0 #{"pre_prod_nav_color"
           = link_to "Logout", main_app.destroy_user_session_path, method: "delete", class: "header-text"
         li.list-group-item.user-actions.pt-0.pb-0
           strong
-            - if ::EnrollRegistry.feature_enabled?(:manage_account_functionality)
-              = render partial: "shared/my_portal_links"
-            - else
-              = user_first_name_last_name_and_suffix
+            = render partial: "shared/my_portal_links"
 
           - unless current_user.try(:person).try(:hbx_id).nil?
             | &nbsp;
