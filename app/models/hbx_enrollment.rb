@@ -2053,9 +2053,8 @@ class HbxEnrollment
     return false if application.blank?
 
     offset_months = EnrollRegistry[:prior_plan_year_sep].setting(:offset_months).item
-    start_date = TimeKeeper.date_of_record.beginning_of_year
-    end_date = start_date - offset_months.months
-    return false unless (start_date..end_date).cover?(application.start_on)
+    prior_date = TimeKeeper.date_of_record.beginning_of_year - offset_months.months
+    return false if application.end_on < prior_date
 
     application_status = application.terminated? || application.expired?
     enrollment_valid_for_application = (application.start_on..application.end_on).cover?(effective_on)
