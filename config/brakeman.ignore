@@ -274,7 +274,7 @@
           "type": "controller",
           "class": "Insured::GroupSelectionController",
           "method": "edit_plan",
-          "line": 185,
+          "line": 187,
           "file": "app/controllers/insured/group_selection_controller.rb",
           "rendered": {
             "name": "insured/group_selection/edit_plan",
@@ -288,6 +288,26 @@
       },
       "user_input": "params.require(:hbx_enrollment_id)",
       "confidence": "Weak",
+      "note": ""
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "3f298523d7108180062ff38434f54e061b9b662707b2d4dca5b08a40a1f0460d",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "lib/rails_version_toggler.rb",
+      "line": 31,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`cd #{Rails.root} ; mv #{target_ruby_version_file_location} #{ruby_version_name}`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "RailsVersionToggler",
+        "method": "change_ruby_version"
+      },
+      "user_input": "target_ruby_version_file_location",
+      "confidence": "Medium",
       "note": ""
     },
     {
@@ -403,6 +423,26 @@
       "note": ""
     },
     {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "606ad05a6d1cdc49fb8a1a880a9b45058270b11c496a98b3e0311f1f4b16fdea",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "lib/rails_version_toggler.rb",
+      "line": 44,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`mv  \"#{file_info.keys[0]}/Gemfile.rails_#{target_rails_version}\" #{filename}`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "RailsVersionToggler",
+        "method": "rename_and_switch_gemfiles"
+      },
+      "user_input": "file_info.keys[0]",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
       "warning_type": "Cross-Site Scripting",
       "warning_code": 2,
       "fingerprint": "610a15e39096f8ef290305891b1b39a1a8027b84ef6618aca8929993351e3152",
@@ -417,7 +457,7 @@
           "type": "controller",
           "class": "Insured::GroupSelectionController",
           "method": "edit_plan",
-          "line": 185,
+          "line": 187,
           "file": "app/controllers/insured/group_selection_controller.rb",
           "rendered": {
             "name": "insured/group_selection/edit_plan",
@@ -440,7 +480,7 @@
       "check_name": "Execute",
       "message": "Possible command injection",
       "file": "lib/custom_linters/translations/view_translations_linter_helper.rb",
-      "line": 22,
+      "line": 89,
       "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
       "code": "`git diff HEAD^ HEAD  --unified=0 #{filename} | tail +6 | sed -e 's/^+//'`",
       "render_path": null,
@@ -556,6 +596,26 @@
       "note": ""
     },
     {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "72830d1aaa467d6a36e3bbc872f6e1bdc701d8ccacfffada8eb57c0399a48ace",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "lib/rails_version_toggler.rb",
+      "line": 43,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`mv \"#{file_info.keys[0]}/Gemfile.rails_#{target_rails_version}_lock\" #{filename}`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "RailsVersionToggler",
+        "method": "rename_and_switch_gemfiles"
+      },
+      "user_input": "file_info.keys[0]",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
       "warning_type": "Mass Assignment",
       "warning_code": 70,
       "fingerprint": "8a980298a5df4d60183c689cfc1c152f4b412c6bcf03ae0ed583ecf0b7041e31",
@@ -637,6 +697,26 @@
       "note": ""
     },
     {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "8d792c0e038f19459be9a326b5b633590f98fbb8639288e6c9428f5f00194d5c",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "lib/rails_version_toggler.rb",
+      "line": 41,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`mv #{filename} \"#{file_info.keys[0]}/Gemfile.rails_#{current_rails_version}_lock\"`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "RailsVersionToggler",
+        "method": "rename_and_switch_gemfiles"
+      },
+      "user_input": "filename",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
       "warning_type": "SQL Injection",
       "warning_code": 0,
       "fingerprint": "c52682082343e84c51246edb8d8ad45d30470312d9763527b2c5c5b6777ea619",
@@ -654,6 +734,26 @@
       },
       "user_input": "sql_column",
       "confidence": "Weak",
+      "note": ""
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "c629d9587bfb00b29da4eac0dd25ccacf0b19518e4d8c3c00ac293fb9cd9cd0c",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "lib/rails_version_toggler.rb",
+      "line": 29,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`cd #{Rails.root} ; mv #{ruby_version_name} \".rails_#{current_rails_version}_ruby_version\"`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "RailsVersionToggler",
+        "method": "change_ruby_version"
+      },
+      "user_input": "ruby_version_name",
+      "confidence": "Medium",
       "note": ""
     },
     {
@@ -715,8 +815,28 @@
       "user_input": "EmployerProfile.find(params[:id]).documents.find(params[:ids][0]).identifier",
       "confidence": "Medium",
       "note": ""
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "fdd3cefbc5b3b3b325d1c921fe1c433c250c1e376a523c6176cedd1f0270a1e6",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "lib/rails_version_toggler.rb",
+      "line": 42,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`mv #{filename} \"#{file_info.keys[0]}/Gemfile.rails_#{current_rails_version}\"`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "RailsVersionToggler",
+        "method": "rename_and_switch_gemfiles"
+      },
+      "user_input": "filename",
+      "confidence": "Medium",
+      "note": ""
     }
   ],
-  "updated": "2021-02-05 15:24:01 -0500",
+  "updated": "2021-03-10 16:02:33 -0500",
   "brakeman_version": "5.0.0"
 }
