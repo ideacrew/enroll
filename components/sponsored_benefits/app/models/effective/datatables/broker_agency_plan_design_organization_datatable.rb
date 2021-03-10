@@ -80,8 +80,8 @@ module Effective
       end
 
       def add_roles_feature_enabled?
-        return @enabled if defined? @enabled
-        @enabled = ::EnrollRegistry.feature_enabled?(:manage_account_functionality)
+        return @add_roles_feature_enabled if defined? @add_roles_feature_enabled
+        @add_roles_feature_enabled = ::EnrollRegistry.feature_enabled?(:manage_account_functionality)
       end
 
       def broker_name(row)

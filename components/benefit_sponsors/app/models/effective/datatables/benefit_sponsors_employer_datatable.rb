@@ -147,8 +147,8 @@ module Effective
       end
 
       def add_roles_feature_enabled?
-        return @enabled if defined? @enabled
-        @enabled = ::EnrollRegistry.feature_enabled?(:manage_account_functionality)
+        return @add_roles_feature_enabled if defined? @add_roles_feature_enabled
+        @add_roles_feature_enabled = ::EnrollRegistry.feature_enabled?(:manage_account_functionality)
       end
 
       def force_publish_link_type(benefit_sponsorship, allow)
