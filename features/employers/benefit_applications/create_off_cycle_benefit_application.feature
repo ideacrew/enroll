@@ -64,6 +64,10 @@ Feature: Ability for employer to create an off-cycle benefit application and all
       Then Employee should see the receipt page
       Then Employee should see the "my account" page
       And employee Patrick Doe of employer ABC Widgets most recent HBX Enrollment should be under the off cycle benefit application
+<<<<<<< HEAD
+=======
+
+>>>>>>> REFS Maintenance - Adds flaky tag.
     @flaky
     Scenario: Renewal Employer is terminated. Employer is able to create off-cycle benefit application and employees are able to plan shop
       Given Qualifying life events are present
