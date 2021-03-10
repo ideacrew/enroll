@@ -77,31 +77,31 @@ module BenefitMarketWorld
 
   def qualifying_life_events_ivl
     @qualifying_life_events_ivl ||= [
-      :effective_on_event_date,
-      :effective_on_first_of_month,
-      :effective_on_fixed_first_of_next_month
+        :effective_on_event_date,
+        :effective_on_first_of_month,
+        :effective_on_fixed_first_of_next_month
     ].map { |event_trait| FactoryBot.create(:qualifying_life_event_kind, event_trait, market_kind: "individual", post_event_sep_in_days: 90) }
   end
 
-  def set_initial_application_dates(status)
+  def initial_application_dates(status)
     case status
     when :draft, :enrollment_open
-      current_effective_date (TimeKeeper.date_of_record + 2.months).beginning_of_month
+      current_effective_date((TimeKeeper.date_of_record + 2.months).beginning_of_month)
     when :enrollment_closed, :enrollment_eligible, :enrollment_extended
-      current_effective_date (TimeKeeper.date_of_record + 1.months).beginning_of_month
-    when :active, :terminated, :termination_pending, :expired
-      current_effective_date (TimeKeeper.date_of_record - 2.months).beginning_of_month
+      current_effective_date((TimeKeeper.date_of_record + 1.months).beginning_of_month)
+    when :active, :terminated, :termination_pending, :expired, :retroactive_canceled
+      current_effective_date((TimeKeeper.date_of_record - 2.months).beginning_of_month)
     end
   end
 
-  def set_renewal_application_dates(status)
+  def renewal_application_dates(status)
     case status
     when :draft, :enrollment_open
-      current_effective_date (TimeKeeper.date_of_record + 2.months).beginning_of_month.prev_year
+      current_effective_date((TimeKeeper.date_of_record + 2.months).beginning_of_month.prev_year)
     when :enrollment_closed, :enrollment_eligible, :enrollment_extended
-      current_effective_date (TimeKeeper.date_of_record + 1.months).beginning_of_month.prev_year
-    when :active, :terminated, :termination_pending, :expired
-      current_effective_date (TimeKeeper.date_of_record - 1.months).beginning_of_month.prev_year
+      current_effective_date((TimeKeeper.date_of_record + 1.months).beginning_of_month.prev_year)
+    when :active, :terminated, :termination_pending, :expired, :retroactive_canceled
+      current_effective_date((TimeKeeper.date_of_record - 1.months).beginning_of_month.prev_year)
     end
   end
 
@@ -203,7 +203,7 @@ end
 #     benefit market catalog exists for enrollment_open initial employer with health & dental benefits
 Given(/^benefit market catalog exists for (.*) initial employer with (.*) benefits$/) do |status, coverage_kinds|
   coverage_kinds = coverage_kinds.split('&').map(&:strip).map(&:to_sym)
-  set_initial_application_dates(status.to_sym)
+  initial_application_dates(status.to_sym)
   generate_initial_catalog_products_for(coverage_kinds)
   create_benefit_market_catalog_for(current_effective_date)
 end
@@ -214,7 +214,7 @@ end
 #     benefit market catalog exists for enrollment_open renewal employer with health & dental benefits
 Given(/^benefit market catalog exists for (.*) renewal employer with (.*) benefits$/) do |status, coverage_kinds|
   coverage_kinds = coverage_kinds.split('&').map(&:strip).map(&:to_sym)
-  set_renewal_application_dates(status.to_sym)
+  renewal_application_dates(status.to_sym)
   generate_renewal_catalog_products_for(coverage_kinds)
   create_benefit_market_catalog_for(current_effective_date)
   create_benefit_market_catalog_for(renewal_effective_date)
