@@ -34,12 +34,14 @@ Feature: This is the final review page before submiting an application
 
   Scenario: User does not continue when a question is unanswered
     Given a required question is not answered
+    And the user should be able to see medicaid determination question
     And the user has signed their name
     And the user clicks SUBMIT
     Then the user is on the Submit Your Application page
 
   Scenario: User continues when a question name is signed all questions are answered
     Given all required questions are answered
+    And the user should be able to see medicaid determination question
     And the user has signed their name
     And the user clicks SUBMIT
     Then the user is on the Error Submitting Application page
