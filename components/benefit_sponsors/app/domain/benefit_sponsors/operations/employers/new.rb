@@ -85,6 +85,8 @@ module BenefitSponsors
                              dob: @person&.dob&.strftime("%m/%d/%Y"),
                              hired_on: nil,
                              is_applying_coverage: false,
+                             has_other_coverage: false,
+                             is_owner: false,
                              address: build_address_for_coverage_record,
                              email: build_email_for_coverage_record)
         end

@@ -81,6 +81,8 @@ class BulkNoticeReflex < ApplicationReflex
 
   # Todo - move this into its own reflex
   def add_coverage_dependent
-    morph '#dependent', ApplicationController.render(partial: "ui-components/v1/forms/coverage_record_dependent", locals: {i: element.dataset[:key]})
+    key = element.dataset[:key].to_i
+    morph '#dependent-' + key.to_s, ApplicationController.render(partial: "ui-components/v1/forms/coverage_record_dependent", locals: {i: key})
+    morph ".add-dependent", "<a class='btn btn-default nisanth btn-sm' data-reflex='click->BulkNotice#add_coverage_dependent' data-key=#{key+1}>Add Dependent</a>"
   end
 end

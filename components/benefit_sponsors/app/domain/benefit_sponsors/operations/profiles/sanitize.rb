@@ -49,7 +49,7 @@ module BenefitSponsors
               last_name: values[:last_name],
               middle_name: values[:middle_name],
               ssn: values[:ssn],
-              dob: values[:dob],
+              dob: Date.strptime(values[:dob], '%m/%d/%Y'),
               gender: values[:gender],
               employee_relationship: values[:employee_relationship]
             }

@@ -19,7 +19,7 @@ div data-controller="bulk-notice"
       .optional.hidden
         label Does this person have other coverage?
         .form-check style='display: flex;'
-          = f.check_box :has_other_coverage, { id: 'flexCheckDefault', class: 'form-check-input' }, true, false
+          = f.check_box :has_other_coverage, {id: 'flexCheckDefault', class: 'form-check-input' }, 'true', 'false'
           label.form-check-label.ml-1 for="flexCheckDefault"
             | Yes, this person is already enrolled in COBRA/Continuation of Benefits outside of DC Health link.
   .row
@@ -34,7 +34,7 @@ div data-controller="bulk-notice"
       .optional.hidden
         label Owner?*
         .form-check style='display: flex;'
-          = f.check_box :is_owner, { id: 'flexCheckDefault', class: 'form-check-input' }, true, false
+          = f.check_box :is_owner, { id: 'flexCheckDefault', class: 'form-check-input' }, 'true', 'false'
           label.form-check-label.ml-1 for="flexCheckDefault"
             | Yes, this person is an owner of this company.
     .col-md-4.mb-3
@@ -96,9 +96,11 @@ div data-controller="bulk-notice"
         .col-md-12.mb-2.dependents
           strong
             | Dependents
-        .col-md-12.mb-2#dependent
+        .col-md-12.mb-2#dependent-0
+
         .col-md-12.mb-2
-          a.btn.btn-default.btn-sm data-reflex="click->BulkNotice#add_coverage_dependent" data-key="0" Add Dependent
+          div.add-dependent
+            a.btn.btn-default.btn-sm data-reflex="click->BulkNotice#add_coverage_dependent" data-key='0' Add Dependent
 
 javascript:
   $('.inputHiredOn').datepicker({

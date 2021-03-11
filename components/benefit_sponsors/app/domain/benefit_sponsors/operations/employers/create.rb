@@ -129,7 +129,7 @@ module BenefitSponsors
               redirection_link = fetch_redirection_link(person_id)
               Success(redirection_link)
             else
-              Failure({:message => 'Unable to Employer create staff role'})
+              Failure({:message => 'Unable to create Employer staff role'})
             end
           end
         end
