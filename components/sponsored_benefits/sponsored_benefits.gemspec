@@ -16,8 +16,9 @@ Gem::Specification.new do |s|
 
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
 
-  s.add_dependency "rails", "~> 5.2.4.3"
+  s.add_dependency "rails", "~> 6.0"
   s.add_dependency "slim", "~> 3.0.8"
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -31,6 +32,9 @@ Gem::Specification.new do |s|
 =======
   s.add_dependency "mongoid", "~> 7.0.2"
 >>>>>>> REFS Maintenance - Begins toggle between rails 5 and 6
+=======
+  # s.add_dependency "mongoid", "~> 7.2"
+>>>>>>> REFS Maintenance - Fixes gemspecs.
   s.add_dependency "aasm", "~> 4.8.0"
   s.add_dependency 'devise',                    '~> 4.5'
   s.add_dependency 'config',  '~> 2.0'
@@ -49,6 +53,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'dry-container'
   s.add_dependency 'dry-struct'
   s.add_dependency 'dry-monads'
+  s.add_dependency 'money-rails', '~> 1.13'
 
   s.test_files = Dir["spec/**/*"]
 
@@ -59,7 +64,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'factory_bot_rails',         '~> 4'
   s.add_development_dependency 'forgery',                   '~> 0.7.0'
   s.add_development_dependency 'test-prof',                 '~> 0.5.0'
-  s.add_development_dependency "mongoid-rspec",             '~> 4'
-  s.add_development_dependency 'mongoid_rails_migrations',  '~> 1.2.0'
+  s.add_development_dependency "mongoid-rspec",             '~> 4.1'
+  s.add_development_dependency 'mongoid_rails_migrations',  '~> 1.4'
   s.add_development_dependency "rspec-benchmark"
 end
