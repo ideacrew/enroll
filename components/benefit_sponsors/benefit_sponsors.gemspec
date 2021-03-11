@@ -18,6 +18,7 @@ Gem::Specification.new do |s|
   s.test_files = Dir["spec/**/*"]
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   s.add_dependency "rails",                     "~> 6.0"
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -32,6 +33,10 @@ Gem::Specification.new do |s|
   s.add_dependency "rails",                     "~> 5.2.4.3"
   s.add_dependency "mongoid",                   "~> 7.0.2"
 >>>>>>> REFS Maintenance - Begins toggle between rails 5 and 6
+=======
+  s.add_dependency "rails",                     "~> 6.0"
+  # s.add_dependency "mongoid",                   "~> 7.2"
+>>>>>>> REFS Maintenance - Saves progress.
   s.add_dependency 'mongoid-autoinc',           '~> 6.0'
   s.add_dependency 'browser',                   '2.7.0'
 
@@ -60,12 +65,13 @@ Gem::Specification.new do |s|
   s.add_dependency 'dry-monads'
   # s.add_development_dependency 'bundler-audit',           '~> 0.6'
   s.add_development_dependency 'capybara',                  '~> 3.12'
-  s.add_development_dependency 'database_cleaner-mongoid' # Compatible with rails 5
+  s.add_development_dependency 'database_cleaner-mongoid'
   s.add_development_dependency 'factory_bot_rails',         '~> 4'
   s.add_development_dependency 'forgery',                   '~> 0.7.0'
-  s.add_development_dependency 'mongoid_rails_migrations',  '~> 1.2.0'
-  s.add_development_dependency "mongoid-rspec",             '~> 4'
+  s.add_development_dependency 'mongoid_rails_migrations',  '~> 1.4'
+  s.add_development_dependency "mongoid-rspec",             '~> 4.1'
   s.add_development_dependency 'rails-perftest',            '~> 0.0.7'
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   s.add_development_dependency "rspec-rails",               '~> 4.0.2'
@@ -75,6 +81,9 @@ Gem::Specification.new do |s|
 =======
   s.add_development_dependency "rspec-rails",               '~> 3.8'
 >>>>>>> REFS Maintenance - Begins toggle between rails 5 and 6
+=======
+  s.add_development_dependency "rspec-rails",               '~> 4.0.2'
+>>>>>>> REFS Maintenance - Saves progress.
   s.add_development_dependency 'rubocop-rspec',             '~> 1.31'
   s.add_development_dependency 'shoulda-matchers',          '~> 3'
   s.add_development_dependency 'test-prof',                 '~> 0.5.0'
