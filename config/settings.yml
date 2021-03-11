@@ -86,7 +86,8 @@ contact_center:
   zip_code: "20090"
   small_business_email: "smallbusiness@coverme.gov"
   non_discrimination_email: "info@dchealthlink.com"
-
+  
+  # TODO: We need to update this. What is their customer service?
   appeals: "info@dchealthlink.com"
 
   mailing_address:
