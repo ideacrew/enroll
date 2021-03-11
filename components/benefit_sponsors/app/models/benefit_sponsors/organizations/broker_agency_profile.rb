@@ -79,9 +79,7 @@ module BenefitSponsors
       end
 
       def validate_market_kind
-        unless BenefitSponsors::Organizations::BrokerAgencyProfile::MARKET_KINDS.include?(market_kind)
-          errors.add(:profiles, "#{market_kind} is not a valid practice area")
-        end
+        errors.add(:profiles, "#{market_kind} is not a valid practice area") unless BenefitSponsors::Organizations::BrokerAgencyProfile::MARKET_KINDS.include?(market_kind)
       end
 
       def primary_broker_role
