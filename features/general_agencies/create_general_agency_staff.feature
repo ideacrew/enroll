@@ -1,6 +1,8 @@
 Feature: Assign General Agency Staff to General Agency
 
   Scenario: General Staff has not signed up on the HBX
+    Given the shop market configuration is enabled
+    Given all announcements are enabled for user to select
     Given a CCA site exists with a benefit market
     Given there is a General Agency exists for District Agency Inc
     Given all permissions are present

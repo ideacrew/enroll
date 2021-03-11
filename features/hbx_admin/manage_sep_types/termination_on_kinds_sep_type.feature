@@ -2,6 +2,8 @@ Feature: Employee while terminating active enrollment should able to see and pic
 
   Background: Setup site, employer, and benefit application
     Given both shop and fehb market configurations are enabled
+    Given all market kinds are enabled for user to select
+    Given all announcements are enabled for user to select
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for active initial employer with health benefits
     Given Qualifying life events are present

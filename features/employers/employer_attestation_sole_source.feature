@@ -2,6 +2,8 @@ Feature: Employer Profile
   In order for initial employers to submit application
   Employer Staff should upload attestation document
   Background: Setup site, employer, and benefit application
+    Given the shop market configuration is enabled
+    Given all announcements are enabled for user to select
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for draft initial employer with health benefits
     And it has an employer ABC Widgets with no attestation submitted

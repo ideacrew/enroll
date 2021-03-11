@@ -3,6 +3,7 @@ Feature: Employer terminates borker and hires new broker
   The Employer should be able to fire an existing broker and hire new broker if needed
 
   Background: Broker registration
+    Given the shop market configuration is enabled
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for draft initial employer with health benefits
     Given there is a Broker Agency exists for District Brokers Inc
