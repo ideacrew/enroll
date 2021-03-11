@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 source 'https://rubygems.org'
 
-# Declare your gem's dependencies in transport_gateway.gemspec.
+# Declare your gem's dependencies in ui_helpers.gemspec.
 # Bundler will treat runtime dependencies like base dependencies, and
 # development dependencies will be added by default to the :development group.
 gemspec
@@ -13,3 +15,9 @@ gemspec
 # To use a debugger
 # gem 'byebug', group: [:development, :test]
 
+gem 'resource_registry',  git:  'https://github.com/ideacrew/resource_registry.git', branch: 'trunk'
+gem 'financial_assistance', path: '../financial_assistance'
+
+gem 'rspec-rails'
+gem 'capybara'
+gem 'byebug'

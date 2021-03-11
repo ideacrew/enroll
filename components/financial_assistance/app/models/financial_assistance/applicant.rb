@@ -7,8 +7,6 @@ module FinancialAssistance
     include AASM
     include Ssn
     include UnsetableSparseFields
-    # For usage of serializable_hash. Included by default in rails 6
-    include ActiveModel::Serialization if Rails.version["5"]
 
     embedded_in :application, class_name: "::FinancialAssistance::Application", inverse_of: :applicants
 
