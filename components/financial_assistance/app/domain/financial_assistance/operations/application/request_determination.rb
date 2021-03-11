@@ -64,7 +64,7 @@ module FinancialAssistance
             Success(payload)
           else
             error_message = xml_schema.validate(payload_xml).map(&:message)
-            Rails.logger.info("Application #{application_id} failed vallidation due to #{error_message}")
+            log(payload, {:severity => 'critical', :error_message => "request payload application_hbx_id: #{application_id}, Error: #{error_message}"})
             Failure(error_message)
           end
         end
