@@ -18,6 +18,10 @@ module ResourceRegistryWorld
   def feature_enabled?(feature_name)
     EnrollRegistry.feature_enabled?(feature_name)
   end
+
+  def add_shop_markets_to_sep_types
+    EnrollRegistry[:sep_types].settings(:only_individual).meta.stub(:enum).and_return([{individual: "Individual"}, {shop: "SHOP"}, {fehb: "Congress"}])
+  end
 end
 
 World(ResourceRegistryWorld)
