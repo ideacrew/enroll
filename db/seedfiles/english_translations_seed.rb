@@ -1,7 +1,7 @@
 site_key = if Rails.env.test?
              'dc'
            else
-             BenefitSponsors::Site.all.first.site_key
+             Settings.site_key.to_s
            end
 
 Dir.glob("db/seedfiles/translations/en/#{site_key}/*").each do |file|
@@ -9,7 +9,7 @@ Dir.glob("db/seedfiles/translations/en/#{site_key}/*").each do |file|
 end
 
 puts '*' * 80 unless Rails.env.test?
-puts '::: Generating English Translations :::'
+puts "::: Generating English Translations for #{site_key} :::"
 
 MAIN_TRANSLATIONS = {
   :'en.shared.my_portal_links.my_insured_portal' => 'My Insured Portal',
@@ -18,7 +18,7 @@ MAIN_TRANSLATIONS = {
   :'en.shared.my_portal_links.my_employer_portal' => 'My Employer Portal'
 }.freeze
 
-def dc_translations
+def me_translations
   [
     BOOTSTRAP_EXAMPLE_TRANSLATIONS,
     BUTTON_PANEL_EXAMPLE_TRANSLATIONS,
