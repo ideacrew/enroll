@@ -47,9 +47,10 @@ module BenefitSponsors
         uniqueness: true,
         allow_blank: true
 
-      validates :market_kind,
-        inclusion: { in: Organizations::GeneralAgencyProfile::MARKET_KINDS, message: "%{value} is not a valid practice area" },
-        allow_blank: false
+      validate :validate_market_kind
+      # validates :market_kind,
+      #   inclusion: { in: Organizations::GeneralAgencyProfile::MARKET_KINDS, message: "%{value} is not a valid practice area" },
+      #   allow_blank: false
 
       after_initialize :build_nested_models
 
@@ -57,6 +58,12 @@ module BenefitSponsors
       scope :inactive,    ->{ any_in(aasm_state: ["is_rejected", "is_suspended", "is_closed"]) }
 
       def employer_clients
+      end
+
+      def validate_market_kind
+        unless BenefitSponsors::Organizations::GeneralAgencyProfile::MARKET_KINDS.include?(market_kind)
+          errors.add(:profiles, "#{market_kind} is not a valid practice area")
+        end
       end
 
       def family_clients
