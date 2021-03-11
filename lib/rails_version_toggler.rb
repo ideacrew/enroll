@@ -15,7 +15,7 @@ class RailsVersionToggler
     @target_rails_version = RAIL_VERSIONS.detect { |version| current_rails_version != version }
     @target_ruby_version_file_location = "#{Rails.root}/.rails_#{target_rails_version}_ruby_version"
     @ruby_version_name = ".ruby-version"
-    @gemfile_and_lock_files = Dir.glob("components/*").map { |component_directory| ["#{Rails.root}/#{component_directory}/Gemfile", "#{Rails.root}/#{component_directory}/Gemfile.lock"] }
+    @gemfile_and_lock_files = Dir.glob("components/*").map { |component_directory| ["#{Rails.root}/#{component_directory}/#{component_directory}.gemspec", "#{Rails.root}/#{component_directory}/Gemfile.lock"] }
   end
 
   def toggle
@@ -37,11 +37,13 @@ class RailsVersionToggler
       target_directory = file_info.keys[0]
       filenames = file_info.values.flatten
       filenames.each do |filename|
-        puts("Renaming #{filename}")
+        puts("Renaming #{target_directory} Gemfile.lock and Gemspec files.")
         `mv #{filename} "#{target_directory}/Gemfile.rails_#{current_rails_version}_lock"` if filename.include?("lock")
-        `mv #{filename} "#{target_directory}/Gemfile.rails_#{current_rails_version}"` if filename.exclude?("lock")
         `mv "#{target_directory}/Gemfile.rails_#{target_rails_version}_lock" #{filename}` if filename.include?("lock")
-        `mv  "#{target_directory}/Gemfile.rails_#{target_rails_version}" #{filename}` if filename.exclude?("lock")
+        #{ }`mv #{filename} "#{target_directory}/Gemfile.rails_#{current_rails_version}"` if filename.exclude?("lock")
+        #{ }`mv  "#{target_directory}/Gemfile.rails_#{target_rails_version}" #{filename}` if filename.exclude?("lock")
+        `mv #{filename} "#{target_directory}/#{target_directory}.gemspec_for_rails_#{current_rails_version}"` if filename.include?("gemspec")
+        `mv "#{target_directory}/#{target_directory}.gemspec_for_rails_#{target_rails_version}" #{filename}` if filename.include?("gemspec")
       end
     end
   end
