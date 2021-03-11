@@ -3,6 +3,7 @@ require_dependency "sponsored_benefits/application_controller"
 module SponsoredBenefits
   class Organizations::BrokerAgencyProfilesController < ApplicationController
     include DataTablesAdapter
+    include ::Config::SiteModelConcern
     before_action :find_profile, :general_agency_profiles, only: [:employers]
 
     def employers
