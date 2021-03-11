@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 module Queries
+  # This class queries all the person records with employer staff role for employer staff datatable
   class EmployerStaffDatatableQuery
     attr_reader :search_string, :custom_attributes
 
@@ -11,8 +14,8 @@ module Queries
       @custom_attributes = attributes
     end
 
-    def build_scope()
-      people = Person.all_employer_staff_roles.where(:'employer_staff_roles.aasm_state'=> 'is_active')
+    def build_scope
+      people = Person.all_employer_staff_roles.where(:'employer_staff_roles.aasm_state' => 'is_active')
       return people if @search_string.blank? || @search_string.length < 2
       person_scope = build_people_id_criteria(@search_string)
       return person_scope if @order_by.blank?
@@ -21,13 +24,12 @@ module Queries
 
     def build_people_id_criteria(s_string)
       clean_str = s_string.strip
-      people = Person.all_employer_staff_roles.where(:'employer_staff_roles.aasm_state'=> 'is_active')
+      people = Person.all_employer_staff_roles.where(:'employer_staff_roles.aasm_state' => 'is_active')
       if clean_str =~ /[a-z]/i
         people_ids = people.collection.aggregate([
                       {"$match" => {
                         "$text" => {"$search" => clean_str}
-                      }.merge(Person.search_hash(clean_str))
-                      },
+                      }.merge(Person.search_hash(clean_str))},
                       {"$project" => {"first_name" => 1, "last_name" => 1, "full_name" => 1}},
                       {"$sort" => {"last_name" => 1, "first_name" => 1}},
                       {"$project" => {"_id" => 1}}
