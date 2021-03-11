@@ -66,6 +66,10 @@ module BenefitSponsors
         MARKET_KINDS_OPTIONS
       end
 
+      def self.all_market_kind_options
+        ALL_MARKET_KINDS_OPTIONS
+      end
+
       def language_options
         LanguageList::COMMON_LANGUAGES
       end
