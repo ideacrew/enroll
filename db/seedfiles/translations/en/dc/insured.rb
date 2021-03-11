@@ -444,5 +444,16 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.plan_shoppings.thankyou.confirm_your_plan_selection.content' => "Please review your current plan selection. Select PREVIOUS if you want to change your plan selection. When you're satisfied with your plan, carefully review and acknowledge the Agreement below along with the Terms and Conditions. You must also provide an electronic signature at the bottom of the page. When you're finished, select CONFIRM to submit your enrollment to your insurance company. You don't have to pay today.",
   :'en.important' => "Important",
   :'en.insured.plan_shoppings.thankyou.you_must_complete_steps_to_enroll' => "You must complete these steps to enroll.",
-  :'en.insured.plan_shoppings.thankyou.additional_administration_msg' => "* Your employer may charge an additional administration fee for your COBRA/Continuation coverage. If you have any questions, please direct them to the Employer."
+  :'en.insured.plan_shoppings.thankyou.additional_administration_msg' => "* Your employer may charge an additional administration fee for your COBRA/Continuation coverage. If you have any questions, please direct them to the Employer.",
+  :'en.insured.consumer_roles.application_for_reductions' => "Your Application for Premium Reductions",
+  :'en.insured.consumer_roles.get_help' => "You can get help paying for coverage if you qualify.",
+  :'en.insured.consumer_roles.check_qualification' => "If you don’t qualify for monthly premium reductions and lower out-of-pocket costs, we’ll also check if you likely qualify for Medicaid.",
+  :'en.insured.consumer_roles.apply_for_reductions_question' => "Do you want to apply for monthly premium reductions and lower out-of-pocket costs?",
+  :'en.insured.consumer_roles.not_sure' => "Not sure?",
+  :'en.agree' => "I agree",
+  :'en.agree' => "I disagree",
+  :'en.insured.consumer_roles.verify_identity_agreement' => "<p><b>We are required by federal law to verify your identity before you continue with your application.</b>
+  If you do not want to continue with identity verification through Experian, you can apply by completing and sending us a <a href='https://dchealthlink.com/sites/default/files/v2/forms/DC_Health_Link_Application_for_Health_Coverage_201509.pdf' target='_blank;>paper application </a>
+  or going to a <a href='https://dchealthlink.com/dhsservicecenters' target='_blank'>Department of Human Services service center </a> to apply in person.</p>",
+  :'en.insured.consumer_roles.allow_experian' => "Allowing Experian to verify your identity is the fastest way to continue your application. If you change your mind, go back to the previous page."
 }.freeze
