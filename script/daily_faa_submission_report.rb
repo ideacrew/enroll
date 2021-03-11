@@ -15,10 +15,11 @@ field_names = %w[Primary HBX ID
 
 logger_field_names = %w[id Backtrace]
 
-report_file_name = "#{Rails.root}/daily_faa_submission_report_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv"
-logger_file_name = "#{Rails.root}/daily_faa_submission_report_logger_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv"
-start_time = TimeKeeper.date_of_record.prev_day.beginning_of_day
-end_time = TimeKeeper.date_of_record.prev_day.end_of_day
+date = TimeKeeper.date_of_record
+report_file_name = "#{Rails.root}/daily_faa_submission_report_#{date.strftime('%m_%d_%Y')}.csv"
+logger_file_name = "#{Rails.root}/daily_faa_submission_report_logger_#{date.strftime('%m_%d_%Y')}.csv"
+start_time = date.prev_day.beginning_of_day
+end_time = date.prev_day.end_of_day
 
 CSV.open(logger_file_name, 'w', force_quotes: true) do |logger_csv|
   logger_csv << logger_field_names
@@ -32,7 +33,7 @@ CSV.open(logger_file_name, 'w', force_quotes: true) do |logger_csv|
         aptc = applicant.is_ia_eligible?
         medicaid_eligible = applicant.is_medicaid_chip_eligible?
         non_magi_medicaid_eligible = applicant.is_non_magi_medicaid_eligible
-        report_csv << [application.primary_applicant.person_hbx_id, application.id, age, uqhp_eligble, aptc, medicaid_eligible, 
+        report_csv << [application&.primary_applicant&.person_hbx_id, application.id, age, uqhp_eligble, aptc, medicaid_eligible, 
           non_magi_medicaid_eligible, application.submitted_at]
       end
     rescue StandardError => e
