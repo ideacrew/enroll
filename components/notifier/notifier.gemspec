@@ -17,8 +17,9 @@ Gem::Specification.new do |s|
 
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
 
-  s.add_dependency "rails", "~> 5.2.4.3"
+  s.add_dependency "rails", "~> 6.0"
   s.add_dependency "slim", "3.0.9"
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -32,6 +33,9 @@ Gem::Specification.new do |s|
 =======
   s.add_dependency "mongoid", "~> 7.0.2"
 >>>>>>> REFS Maintenance - Begins toggle between rails 5 and 6
+=======
+  # s.add_dependency "mongoid", "~> 7.2"
+>>>>>>> REFS Maintenance - Gets rails 6 going again.
   s.add_dependency "virtus", "~> 1.0.5"
   s.add_dependency "redcarpet", "~> 3.4.0"
   s.add_dependency "wkhtmltopdf-binary-edge", "~> 0.12.3.0"

@@ -17,6 +17,7 @@ Gem::Specification.new do |s|
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   s.add_dependency "rails", "~> 6.0"
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -31,6 +32,10 @@ Gem::Specification.new do |s|
   s.add_dependency "rails", "~> 5.2.4.3"
   s.add_dependency 'mongoid', "~> 7.0.2"
 >>>>>>> REFS Maintenance - Begins toggle between rails 5 and 6
+=======
+  s.add_dependency "rails", "~> 6.0"
+  # s.add_dependency 'mongoid', "~> 7.2"
+>>>>>>> REFS Maintenance - Gets rails 6 going again.
   s.add_dependency 'transport_gateway'
   s.add_dependency 'symmetric-encryption', '~> 3.9.1'
   s.add_dependency 'rubyzip', '>= 1.3.0'
