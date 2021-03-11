@@ -2,6 +2,7 @@ GIT
   remote: https://github.com/ideacrew/resource_registry.git
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   revision: 7b8f396afde849e584d0a749ade9ee88f1717e26
   branch: trunk
 =======
@@ -12,6 +13,10 @@ GIT
   revision: 7b8f396afde849e584d0a749ade9ee88f1717e26
   branch: trunk
 >>>>>>> updated gems and changed as_json to serializable_hash
+=======
+  revision: f313d71aafd697e97b9e491410ab3f2ec5ea824c
+  branch: master
+>>>>>>> REFS Maintenance - Saves progress.
   specs:
     resource_registry (0.7.0)
       bootsnap (~> 1.0)
@@ -30,6 +35,15 @@ GIT
       ox (~> 2.0)
       rack (>= 1.6.13)
 
+GIT
+  remote: https://github.com/mongodb/mongoid.git
+  revision: df6b2168ee7526f0c5e26f64f38851b91a0623e8
+  ref: df6b2168ee7526f0c5e26f64f38851b91a0623e8
+  specs:
+    mongoid (7.3.0.alpha)
+      activemodel (>= 5.1, < 6.2)
+      mongo (>= 2.10.5, < 3.0.0)
+
 PATH
   remote: .
   specs:
@@ -46,6 +60,7 @@ PATH
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
       mongoid (~> 7.2)
 >>>>>>> ruby-2.7.1 and rails-6.0 upgrade
@@ -54,8 +69,10 @@ PATH
 =======
       mongoid (~> 7.0.2)
 >>>>>>> updated gems and changed as_json to serializable_hash
+=======
+>>>>>>> REFS Maintenance - Saves progress.
       pundit (~> 2.0)
-      rails (~> 5.2.4.3)
+      rails (~> 6.0)
       slim (~> 3.0)
       symmetric-encryption (~> 3.9.1)
       virtus (~> 1.0)
@@ -68,6 +85,7 @@ GEM
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     actioncable (6.1.2.1)
       actionpack (= 6.1.2.1)
       activesupport (= 6.1.2.1)
@@ -75,21 +93,37 @@ GEM
     actioncable (5.2.4.5)
       actionpack (= 5.2.4.5)
 >>>>>>> updated gems and changed as_json to serializable_hash
+=======
+    actioncable (6.1.2.1)
+      actionpack (= 6.1.2.1)
+      activesupport (= 6.1.2.1)
+>>>>>>> REFS Maintenance - Saves progress.
       nio4r (~> 2.0)
       websocket-driver (>= 0.6.1)
-    actionmailer (5.2.4.5)
-      actionpack (= 5.2.4.5)
-      actionview (= 5.2.4.5)
-      activejob (= 5.2.4.5)
+    actionmailbox (6.1.2.1)
+      actionpack (= 6.1.2.1)
+      activejob (= 6.1.2.1)
+      activerecord (= 6.1.2.1)
+      activestorage (= 6.1.2.1)
+      activesupport (= 6.1.2.1)
+      mail (>= 2.7.1)
+    actionmailer (6.1.2.1)
+      actionpack (= 6.1.2.1)
+      actionview (= 6.1.2.1)
+      activejob (= 6.1.2.1)
+      activesupport (= 6.1.2.1)
       mail (~> 2.5, >= 2.5.4)
       rails-dom-testing (~> 2.0)
-    actionpack (5.2.4.5)
-      actionview (= 5.2.4.5)
-      activesupport (= 5.2.4.5)
-      rack (~> 2.0, >= 2.0.8)
+    actionpack (6.1.2.1)
+      actionview (= 6.1.2.1)
+      activesupport (= 6.1.2.1)
+      rack (~> 2.0, >= 2.0.9)
       rack-test (>= 0.6.3)
       rails-dom-testing (~> 2.0)
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> REFS Maintenance - Saves progress.
       rails-html-sanitizer (~> 1.0, >= 1.2.0)
     actiontext (6.1.2.1)
       actionpack (= 6.1.2.1)
@@ -99,6 +133,7 @@ GEM
       nokogiri (>= 1.8.5)
     actionview (6.1.2.1)
       activesupport (= 6.1.2.1)
+<<<<<<< HEAD
 =======
     actioncable (6.0.3.4)
       actionpack (= 6.0.3.4)
@@ -149,15 +184,18 @@ GEM
     actionview (5.2.4.5)
       activesupport (= 5.2.4.5)
 >>>>>>> updated gems and changed as_json to serializable_hash
+=======
+>>>>>>> REFS Maintenance - Saves progress.
       builder (~> 3.1)
       erubi (~> 1.4)
       rails-dom-testing (~> 2.0)
-      rails-html-sanitizer (~> 1.0, >= 1.0.3)
+      rails-html-sanitizer (~> 1.1, >= 1.2.0)
     active_model_serializers (0.10.12)
       actionpack (>= 4.1, < 6.2)
       activemodel (>= 4.1, < 6.2)
       case_transform (>= 0.2)
       jsonapi-renderer (>= 0.1.1.beta1, < 0.3)
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -167,25 +205,31 @@ GEM
     activejob (5.2.4.5)
       activesupport (= 5.2.4.5)
 >>>>>>> updated gems and changed as_json to serializable_hash
+=======
+    activejob (6.1.2.1)
+      activesupport (= 6.1.2.1)
+>>>>>>> REFS Maintenance - Saves progress.
       globalid (>= 0.3.6)
-    activemodel (5.2.4.5)
-      activesupport (= 5.2.4.5)
-    activerecord (5.2.4.5)
-      activemodel (= 5.2.4.5)
-      activesupport (= 5.2.4.5)
-      arel (>= 9.0)
-    activestorage (5.2.4.5)
-      actionpack (= 5.2.4.5)
-      activerecord (= 5.2.4.5)
+    activemodel (6.1.2.1)
+      activesupport (= 6.1.2.1)
+    activerecord (6.1.2.1)
+      activemodel (= 6.1.2.1)
+      activesupport (= 6.1.2.1)
+    activestorage (6.1.2.1)
+      actionpack (= 6.1.2.1)
+      activejob (= 6.1.2.1)
+      activerecord (= 6.1.2.1)
+      activesupport (= 6.1.2.1)
       marcel (~> 0.3.1)
-    activesupport (5.2.4.5)
+      mimemagic (~> 0.3.2)
+    activesupport (6.1.2.1)
       concurrent-ruby (~> 1.0, >= 1.0.2)
-      i18n (>= 0.7, < 2)
-      minitest (~> 5.1)
-      tzinfo (~> 1.1)
+      i18n (>= 1.6, < 2)
+      minitest (>= 5.1)
+      tzinfo (~> 2.0)
+      zeitwerk (~> 2.3)
     addressable (2.7.0)
       public_suffix (>= 2.0.2, < 5.0)
-    arel (9.0.0)
     ast (2.4.2)
 =======
     activejob (6.0.3.4)
@@ -245,6 +289,7 @@ GEM
     bson (4.12.0)
 >>>>>>> pointing mongoid to its github to fix a bug
     builder (3.2.4)
+    byebug (11.1.3)
     capybara (3.35.3)
       addressable
       mini_mime (>= 0.1.3)
@@ -255,6 +300,7 @@ GEM
       xpath (~> 3.2)
     case_transform (0.2)
       activesupport
+    coderay (1.1.3)
     coercible (1.0.0)
       descendants_tracker (~> 0.0.1)
     concurrent-ruby (1.1.8)
@@ -331,7 +377,7 @@ GEM
       dry-core (~> 0.5, >= 0.5)
       dry-types (~> 1.5)
       ice_nine (~> 0.11)
-    dry-types (1.5.1)
+    dry-types (1.5.0)
       concurrent-ruby (~> 1.0)
       dry-container (~> 0.3)
       dry-core (~> 0.5, >= 0.5)
@@ -357,6 +403,7 @@ GEM
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     i18n (1.8.8)
 =======
     i18n (1.8.7)
@@ -367,6 +414,9 @@ GEM
 =======
     i18n (1.8.9)
 >>>>>>> updated gems and changed as_json to serializable_hash
+=======
+    i18n (1.8.8)
+>>>>>>> REFS Maintenance - Saves progress.
       concurrent-ruby (~> 1.0)
     ice_nine (0.11.2)
     jsonapi-renderer (0.2.2)
@@ -383,6 +433,7 @@ GEM
       mime-types-data (~> 3.2015)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     mime-types-data (3.2021.0225)
 =======
     mime-types-data (3.2020.1104)
@@ -390,20 +441,25 @@ GEM
 =======
     mime-types-data (3.2021.0225)
 >>>>>>> updated gems and changed as_json to serializable_hash
+=======
+    mime-types-data (3.2020.1104)
+>>>>>>> REFS Maintenance - Saves progress.
     mimemagic (0.3.5)
     mini_mime (1.0.2)
-    minitest (5.14.4)
+    mini_portile2 (2.5.0)
+    minitest (5.14.3)
     monetize (1.9.4)
       money (~> 6.12)
     money (6.13.8)
       i18n (>= 0.6.4, <= 2)
-    money-rails (1.14.0)
+    money-rails (1.13.4)
       activesupport (>= 3.0)
       monetize (~> 1.9.0)
       money (~> 6.13.2)
       railties (>= 3.0)
     mongo (2.14.0)
       bson (>= 4.8.2, < 5.0.0)
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -419,6 +475,8 @@ GEM
       activemodel (>= 5.1, < 6.2)
       mongo (>= 2.7.0, < 3.0.0)
 >>>>>>> updated gems and changed as_json to serializable_hash
+=======
+>>>>>>> REFS Maintenance - Saves progress.
     mongoid-compatibility (0.5.1)
       activesupport
       mongoid (>= 2.0)
@@ -429,7 +487,7 @@ GEM
       rspec-core (~> 3.3)
       rspec-expectations (~> 3.3)
       rspec-mocks (~> 3.3)
-    mongoid_rails_migrations (1.2.1)
+    mongoid_rails_migrations (1.4.0)
       activesupport (>= 4.2.0)
       bundler (>= 1.0.0)
       mongoid (>= 4.0.0)
@@ -441,17 +499,31 @@ GEM
     nio4r (2.5.5)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     nokogiri (1.11.1)
       mini_portile2 (~> 2.5.0)
 =======
     nokogiri (1.11.1-x86_64-darwin)
 >>>>>>> updated gems and changed as_json to serializable_hash
+=======
+    nokogiri (1.11.1)
+      mini_portile2 (~> 2.5.0)
+>>>>>>> REFS Maintenance - Saves progress.
       racc (~> 1.4)
     ox (2.14.1)
     parallel (1.20.1)
     parser (3.0.0.0)
       ast (~> 2.4.1)
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+    pry (0.13.1)
+      coderay (~> 1.1)
+      method_source (~> 1.0)
+    pry-byebug (3.9.0)
+      byebug (~> 11.0)
+      pry (~> 0.13.0)
+>>>>>>> REFS Maintenance - Saves progress.
     public_suffix (4.0.6)
 =======
     msgpack (1.3.3)
@@ -495,8 +567,11 @@ GEM
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> WIP: fixing components specs
+=======
+>>>>>>> REFS Maintenance - Saves progress.
     rails (6.1.2.1)
       actioncable (= 6.1.2.1)
       actionmailbox (= 6.1.2.1)
@@ -511,6 +586,7 @@ GEM
       activesupport (= 6.1.2.1)
       bundler (>= 1.15.0)
       railties (= 6.1.2.1)
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
     rails (6.0.3.4)
@@ -544,6 +620,8 @@ GEM
       bundler (>= 1.3.0)
       railties (= 5.2.4.5)
 >>>>>>> updated gems and changed as_json to serializable_hash
+=======
+>>>>>>> REFS Maintenance - Saves progress.
       sprockets-rails (>= 2.0.0)
     rails-controller-testing (1.0.5)
       actionpack (>= 5.0.1.rc1)
@@ -555,6 +633,7 @@ GEM
     rails-html-sanitizer (1.3.0)
       loofah (~> 2.3)
     rails-perftest (0.0.7)
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -588,10 +667,19 @@ GEM
       rake (>= 0.8.7)
       thor (>= 0.19.0, < 2.0)
 >>>>>>> updated gems and changed as_json to serializable_hash
+=======
+    railties (6.1.2.1)
+      actionpack (= 6.1.2.1)
+      activesupport (= 6.1.2.1)
+      method_source
+      rake (>= 0.8.7)
+      thor (~> 1.0)
+>>>>>>> REFS Maintenance - Saves progress.
     rainbow (3.0.0)
     rake (13.0.3)
-    regexp_parser (2.1.1)
+    regexp_parser (2.0.3)
     rexml (3.2.4)
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -613,15 +701,23 @@ GEM
       rspec-support (~> 3.9.3)
     rspec-expectations (3.9.4)
 >>>>>>> updated gems and changed as_json to serializable_hash
+=======
+    rspec-core (3.10.1)
+      rspec-support (~> 3.10.0)
+    rspec-expectations (3.10.1)
+>>>>>>> REFS Maintenance - Saves progress.
       diff-lcs (>= 1.2.0, < 2.0)
-      rspec-support (~> 3.9.0)
-    rspec-mocks (3.9.1)
+      rspec-support (~> 3.10.0)
+    rspec-mocks (3.10.2)
       diff-lcs (>= 1.2.0, < 2.0)
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
 >>>>>>> WIP: fixing components specs
+=======
+>>>>>>> REFS Maintenance - Saves progress.
       rspec-support (~> 3.10.0)
     rspec-rails (4.0.2)
       actionpack (>= 4.2)
@@ -632,6 +728,7 @@ GEM
       rspec-mocks (~> 3.10)
       rspec-support (~> 3.10)
     rspec-support (3.10.2)
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
       rspec-support (~> 3.9.0)
@@ -664,6 +761,8 @@ GEM
 =======
 =======
 >>>>>>> WIP: fixing components specs
+=======
+>>>>>>> REFS Maintenance - Saves progress.
     rubocop (0.93.1)
 >>>>>>> updated gems and changed as_json to serializable_hash
       parallel (~> 1.10)
@@ -702,6 +801,7 @@ GEM
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
 =======
@@ -716,6 +816,10 @@ GEM
     tzinfo (1.2.9)
       thread_safe (~> 0.1)
 >>>>>>> updated gems and changed as_json to serializable_hash
+=======
+    tzinfo (2.0.4)
+      concurrent-ruby (~> 1.0)
+>>>>>>> REFS Maintenance - Saves progress.
     unicode-display_width (1.7.0)
     virtus (1.0.5)
       axiom-types (~> 0.1)
@@ -727,9 +831,10 @@ GEM
     websocket-extensions (0.1.5)
     xpath (3.2.0)
       nokogiri (~> 1.8)
+    zeitwerk (2.4.2)
 
 PLATFORMS
-  x86_64-darwin-17
+  ruby
 
 DEPENDENCIES
   benefit_markets!
@@ -737,6 +842,7 @@ DEPENDENCIES
   database_cleaner-mongoid
   factory_bot_rails (~> 4)
   forgery (~> 0.7.0)
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -753,13 +859,19 @@ DEPENDENCIES
   mongoid-rspec (~> 4)
   mongoid_rails_migrations (~> 1.2.0)
 >>>>>>> updated gems and changed as_json to serializable_hash
+=======
+  mongoid!
+  mongoid-rspec (~> 4.1)
+  mongoid_rails_migrations (~> 1.4)
+  pry-byebug
+>>>>>>> REFS Maintenance - Saves progress.
   rails-controller-testing
   rails-perftest (~> 0.0.7)
   resource_registry!
-  rspec-rails (~> 3.8)
+  rspec-rails
   rubocop-rspec (~> 1.31)
   shoulda-matchers (~> 3)
   test-prof (~> 0.5.0)
 
 BUNDLED WITH
-   2.2.12
+   2.2.6

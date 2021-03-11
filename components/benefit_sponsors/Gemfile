@@ -17,8 +17,9 @@ gem "notifier", path: "../notifier"
 gem "benefit_markets", path: "../benefit_markets"
 gem "sponsored_benefits", path: "../sponsored_benefits"
 gem "effective_datatables", path: ".../../../../project_gems/effective_datatables-2.6.14"
-gem 'acapi', git: "https://github.com/ideacrew/acapi.git", branch: 'trunk'
+gem 'acapi', git: "https://github.com/ideacrew/acapi.git", branch: 'master'
 gem 'webpacker', '~> 4.0.2'
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 gem 'resource_registry',  git:  'https://github.com/ideacrew/resource_registry.git', branch: 'trunk'
@@ -35,6 +36,11 @@ gem 'mongoid',  git: 'https://github.com/mongodb/mongoid.git', ref: 'df6b2168ee7
 =======
 gem 'resource_registry',  git:  'https://github.com/ideacrew/resource_registry.git', branch: 'trunk'
 >>>>>>> REFS Maintenance - Begins toggle between rails 5 and 6
+=======
+gem 'resource_registry',  git:  'https://github.com/ideacrew/resource_registry.git', branch: 'master'
+gem 'mongoid',  git: 'https://github.com/mongodb/mongoid.git', ref: 'df6b2168ee7526f0c5e26f64f38851b91a0623e8'
+
+>>>>>>> REFS Maintenance - Saves progress.
 # gem 'resource_registry',  git: '../../../resource_registry'
 
 group :development, :test do
