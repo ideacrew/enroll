@@ -17,26 +17,8 @@ Gem::Specification.new do |s|
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
   s.test_files = Dir["spec/**/*"]
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-  s.add_dependency "rails",                     "~> 6.0"
-<<<<<<< HEAD
-<<<<<<< HEAD
-  # s.add_dependency "mongoid",                   "~> 7.2"
-=======
-  s.add_dependency "mongoid",                   "~> 7.2"
->>>>>>> ruby-2.7.1 and rails-6.0 upgrade
-=======
-  # s.add_dependency "mongoid",                   "~> 7.2"
->>>>>>> pointing mongoid to its github to fix a bug
-=======
-  s.add_dependency "rails",                     "~> 5.2.4.3"
-  s.add_dependency "mongoid",                   "~> 7.0.2"
->>>>>>> REFS Maintenance - Begins toggle between rails 5 and 6
-=======
   s.add_dependency "rails",                     "~> 6.0"
   # s.add_dependency "mongoid",                   "~> 7.2"
->>>>>>> REFS Maintenance - Saves progress.
   s.add_dependency 'mongoid-autoinc',           '~> 6.0'
   s.add_dependency 'browser',                   '2.7.0'
 
@@ -71,19 +53,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'mongoid_rails_migrations',  '~> 1.4'
   s.add_development_dependency "mongoid-rspec",             '~> 4.1'
   s.add_development_dependency 'rails-perftest',            '~> 0.0.7'
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
   s.add_development_dependency "rspec-rails",               '~> 4.0.2'
-=======
-  s.add_development_dependency "rspec-rails"
->>>>>>> WIP: fixing components specs
-=======
-  s.add_development_dependency "rspec-rails",               '~> 3.8'
->>>>>>> REFS Maintenance - Begins toggle between rails 5 and 6
-=======
-  s.add_development_dependency "rspec-rails",               '~> 4.0.2'
->>>>>>> REFS Maintenance - Saves progress.
   s.add_development_dependency 'rubocop-rspec',             '~> 1.31'
   s.add_development_dependency 'shoulda-matchers',          '~> 3'
   s.add_development_dependency 'test-prof',                 '~> 0.5.0'

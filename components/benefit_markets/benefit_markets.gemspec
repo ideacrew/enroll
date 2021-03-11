@@ -19,23 +19,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency "rails",                     "~> 6.0"
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
   # s.add_dependency "mongoid",                   "~> 7.2"
-=======
-  s.add_dependency "mongoid",                   "~> 7.2"
->>>>>>> ruby-2.7.1 and rails-6.0 upgrade
-=======
-  # s.add_dependency "mongoid",                   "~> 7.2"
->>>>>>> pointing mongoid to its github to fix a bug
-=======
-  s.add_dependency "mongoid",                   "~> 7.0.2"
->>>>>>> REFS Maintenance - Begins toggle between rails 5 and 6
-=======
-  # s.add_dependency "mongoid",                   "~> 7.2"
->>>>>>> Sets everything up for rails 6 to switch to 5.
 
   s.add_dependency "aasm",                      "~> 4.8"
   s.add_dependency 'active_model_serializers',  '~> 0.10'

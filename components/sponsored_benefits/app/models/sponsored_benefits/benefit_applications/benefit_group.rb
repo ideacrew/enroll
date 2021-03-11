@@ -4,11 +4,7 @@
 # rubocop:disable Style/FormatStringToken
 module SponsoredBenefits
   module BenefitApplications
-<<<<<<< HEAD
-<<<<<<< HEAD
     #BenefitGroup for Broker quoting tool
-=======
->>>>>>> fixed cucumbers and removed inheritence of sponsored_benefits benefit group from main app benefit group
     class BenefitGroup
       include Mongoid::Document
       include Mongoid::Timestamps
@@ -16,12 +12,6 @@ module SponsoredBenefits
       include Config::AcaModelConcern
       include Config::AcaHelper
 
-<<<<<<< HEAD
-=======
-    class BenefitGroup < ::BenefitGroup
->>>>>>> WIP: fixing components specs
-=======
->>>>>>> fixed cucumbers and removed inheritence of sponsored_benefits benefit group from main app benefit group
       embedded_in :benefit_application, class_name: "SponsoredBenefits::BenefitApplications::BenefitApplication"
       delegate :effective_period, to: :benefit_application
       delegate :sic_code, to: :benefit_application
@@ -31,28 +21,17 @@ module SponsoredBenefits
 
       attr_accessor :metal_level_for_elected_plan, :carrier_for_elected_plan
 
-<<<<<<< HEAD
       PLAN_OPTION_KINDS = %w[sole_source single_plan single_carrier metal_level].freeze
       EFFECTIVE_ON_KINDS = %w[date_of_hire first_of_month].freeze
       OFFSET_KINDS = [0, 1, 30, 60].freeze
       TERMINATE_ON_KINDS = %w[end_of_month].freeze
-=======
-      PLAN_OPTION_KINDS = %w(sole_source single_plan single_carrier metal_level)
-      EFFECTIVE_ON_KINDS = %w(date_of_hire first_of_month)
-      OFFSET_KINDS = [0, 1, 30, 60]
-      TERMINATE_ON_KINDS = %w(end_of_month)
->>>>>>> fixed cucumbers and removed inheritence of sponsored_benefits benefit group from main app benefit group
       PERSONAL_RELATIONSHIP_KINDS = [
         :employee,
         :spouse,
         :domestic_partner,
         :child_under_26,
         :child_26_and_over
-<<<<<<< HEAD
       ].freeze
-=======
-      ]
->>>>>>> fixed cucumbers and removed inheritence of sponsored_benefits benefit group from main app benefit group
 
       field :title, type: String, default: ""
       field :description, type: String, default: ""
@@ -109,20 +88,13 @@ module SponsoredBenefits
 
       field :carrier_for_elected_dental_plan, type: BSON::ObjectId
 
-<<<<<<< HEAD
       #TODO: add following attributes: :title,
-=======
-      attr_accessor :metal_level_for_elected_plan, :carrier_for_elected_plan, :carrier_for_elected_dental_plan
-
-      #TODO add following attributes: :title,
->>>>>>> fixed cucumbers and removed inheritence of sponsored_benefits benefit group from main app benefit group
       validates_presence_of :relationship_benefits, :effective_on_kind, :terminate_on_kind, :effective_on_offset,
                             :reference_plan_id, :plan_option_kind, :elected_plan_ids
 
       validates_uniqueness_of :title
 
       validates :plan_option_kind,
-<<<<<<< HEAD
                 allow_blank: false,
                 inclusion: {
                   in: PLAN_OPTION_KINDS,
@@ -142,27 +114,6 @@ module SponsoredBenefits
                   in: OFFSET_KINDS,
                   message: "%{value} is not a valid effective date offset kind"
                 }
-=======
-        allow_blank: false,
-        inclusion: {
-          in: PLAN_OPTION_KINDS,
-          message: "%{value} is not a valid plan option kind"
-        }
-
-      validates :effective_on_kind,
-        allow_blank: false,
-        inclusion: {
-          in: EFFECTIVE_ON_KINDS,
-          message: "%{value} is not a valid effective date kind"
-        }
-
-      validates :effective_on_offset,
-        allow_blank: false,
-        inclusion: {
-          in: OFFSET_KINDS,
-          message: "%{value} is not a valid effective date offset kind"
-        }
->>>>>>> fixed cucumbers and removed inheritence of sponsored_benefits benefit group from main app benefit group
 
       validate :plan_integrity
       validate :check_employer_contribution_for_employee
@@ -171,23 +122,14 @@ module SponsoredBenefits
       before_save :update_dependent_composite_tiers
       before_destroy :delete_benefit_group_assignments_and_enrollments
 
-<<<<<<< HEAD
       alias is_congress? is_congress
-=======
-      alias_method :is_default?, :default
-      alias_method :is_congress?, :is_congress
->>>>>>> fixed cucumbers and removed inheritence of sponsored_benefits benefit group from main app benefit group
 
       def sorted_composite_tier_contributions
         self.composite_tier_contributions.sort{|a,b| a.sort_val <=> b.sort_val}
       end
 
       def reference_plan=(new_reference_plan)
-<<<<<<< HEAD
         raise ArgumentError, "expected Plan" unless new_reference_plan.is_a? Plan
-=======
-        raise ArgumentError.new("expected Plan") unless new_reference_plan.is_a? Plan
->>>>>>> fixed cucumbers and removed inheritence of sponsored_benefits benefit group from main app benefit group
         self.reference_plan_id = new_reference_plan._id
         @reference_plan = new_reference_plan
       end
@@ -199,22 +141,13 @@ module SponsoredBenefits
       def termination_effective_on_for(new_date)
         if benefit_application.open_enrollment_period.cover?(new_date) || new_date < benefit_application.effective_period.begin
           benefit_application.effective_period.begin
-<<<<<<< HEAD
         elsif terminate_on_kind == "end_of_month"
           new_date.end_of_month
-=======
-        else
-          new_date.end_of_month if terminate_on_kind == "end_of_month"
->>>>>>> fixed cucumbers and removed inheritence of sponsored_benefits benefit group from main app benefit group
         end
       end
 
       def dental_reference_plan=(new_reference_plan)
-<<<<<<< HEAD
         raise ArgumentError, "expected Plan" unless new_reference_plan.is_a? Plan
-=======
-        raise ArgumentError.new("expected Plan") unless new_reference_plan.is_a? Plan
->>>>>>> fixed cucumbers and removed inheritence of sponsored_benefits benefit group from main app benefit group
         self.dental_reference_plan_id = new_reference_plan._id
         @dental_reference_plan = new_reference_plan
       end
@@ -244,19 +177,11 @@ module SponsoredBenefits
       def elected_plans=(new_plans)
         return unless new_plans.present?
 
-<<<<<<< HEAD
         self.elected_plan_ids = if new_plans.is_a? Array
                                   new_plans.reduce([]) { |list, plan| list << plan._id }
                                 else
                                   Array.new(1, new_plans.try(:_id))
                                 end
-=======
-        if new_plans.is_a? Array
-          self.elected_plan_ids = new_plans.reduce([]) { |list, plan| list << plan._id }
-        else
-          self.elected_plan_ids = Array.new(1, new_plans.try(:_id))
-        end
->>>>>>> fixed cucumbers and removed inheritence of sponsored_benefits benefit group from main app benefit group
 
         set_bounding_cost_plans
         @elected_plans = new_plans
@@ -280,7 +205,6 @@ module SponsoredBenefits
         @elected_dental_plans ||= ::Plan.where(:id => {"$in" => elected_dental_plan_ids}).to_a
       end
 
-<<<<<<< HEAD
       def decorated_elected_plans(member_provider, coverage_kind = "")
         max_contribution_cache = {}
         get_elected_plans = (coverage_kind == "health" ? elected_plans : elected_dental_plans)
@@ -290,17 +214,6 @@ module SponsoredBenefits
 
       def decorated_plan(plan, member_provider, ref_plan, max_contribution_cache = {})
         if self.sole_source? && !plan.dental?
-=======
-      def decorated_elected_plans(member_provider, coverage_kind="")
-        max_contribution_cache = Hash.new
-        get_elected_plans = (coverage_kind == "health" ? elected_plans : elected_dental_plans)
-        ref_plan = (coverage_kind == "health" ? reference_plan : dental_reference_plan)
-        get_elected_plans.collect(){|plan| decorated_plan(plan, member_provider, ref_plan, max_contribution_cache)}
-      end
-
-      def decorated_plan(plan, member_provider, ref_plan, max_contribution_cache = {})
-        if self.sole_source? && (!plan.dental?)
->>>>>>> fixed cucumbers and removed inheritence of sponsored_benefits benefit group from main app benefit group
           ::CompositeRatedPlanCostDecorator.new(plan, self, member_provider.composite_rating_tier, member_provider.is_cobra_status?)
         else
           ::PlanCostDecorator.new(plan, member_provider, self, ref_plan, max_contribution_cache)
@@ -315,7 +228,6 @@ module SponsoredBenefits
         CensusEmployee.find_all_by_benefit_group(self)
       end
 
-<<<<<<< HEAD
       def effective_composite_tier(census_employee)
         employer_offered_family_benefits = composite_tier_contributions.find_by(composite_rating_tier: 'family').offered?
         employer_offered_family_benefits ? census_employee.composite_rating_tier : 'employee_only'
@@ -323,15 +235,6 @@ module SponsoredBenefits
 
       def assignable_to?(census_employee)
         !(census_employee.employment_terminated_on < benefit_application.effective_period.min || census_employee.hired_on > benefit_application.effective_period.max)
-=======
-      def effective_composite_tier(ce)
-        employer_offered_family_benefits = composite_tier_contributions.find_by(composite_rating_tier: 'family').offered?
-        employer_offered_family_benefits ? ce.composite_rating_tier : 'employee_only'
-      end
-
-      def assignable_to?(census_employee)
-        return !(census_employee.employment_terminated_on < benefit_application.effective_period.min || census_employee.hired_on > benefit_application.effective_period.max)
->>>>>>> fixed cucumbers and removed inheritence of sponsored_benefits benefit group from main app benefit group
       end
 
       def employer_max_amt_in_cents=(new_employer_max_amt_in_cents)
@@ -356,11 +259,7 @@ module SponsoredBenefits
 
       def build_relationship_benefits
         self.relationship_benefits = PERSONAL_RELATIONSHIP_KINDS.map do |relationship|
-<<<<<<< HEAD
           self.relationship_benefits.build(relationship: relationship, offered: true)
-=======
-           self.relationship_benefits.build(relationship: relationship, offered: true)
->>>>>>> fixed cucumbers and removed inheritence of sponsored_benefits benefit group from main app benefit group
         end
       end
 
@@ -372,11 +271,7 @@ module SponsoredBenefits
 
       def build_dental_relationship_benefits
         self.dental_relationship_benefits = PERSONAL_RELATIONSHIP_KINDS.map do |relationship|
-<<<<<<< HEAD
           self.dental_relationship_benefits.build(relationship: relationship, offered: true)
-=======
-           self.dental_relationship_benefits.build(relationship: relationship, offered: true)
->>>>>>> fixed cucumbers and removed inheritence of sponsored_benefits benefit group from main app benefit group
         end
       end
 
@@ -386,11 +281,7 @@ module SponsoredBenefits
                                   relationship: :employee,
                                   premium_pct: employee_premium_pct,
                                   employer_max_amt: employer_max_amount,
-<<<<<<< HEAD
                                   offered: true)
-=======
-                                  offered: true),
->>>>>>> fixed cucumbers and removed inheritence of sponsored_benefits benefit group from main app benefit group
         ] + PERSONAL_RELATIONSHIP_KINDS.dup.delete_if{|kind| [:employee, :child_26_and_over].include?(kind)}.collect do |relationship|
           RelationshipBenefit.new(benefit_group: self,
                                   relationship: relationship,
@@ -402,11 +293,7 @@ module SponsoredBenefits
                                   relationship: :child_26_and_over,
                                   premium_pct: employee_premium_pct,
                                   employer_max_amt: employer_max_amount,
-<<<<<<< HEAD
                                   offered: false)
-=======
-                                  offered: false),
->>>>>>> fixed cucumbers and removed inheritence of sponsored_benefits benefit group from main app benefit group
         ]
       end
 
@@ -427,39 +314,15 @@ module SponsoredBenefits
           estimate_composite_rates
         end
         targeted_census_employees.active.collect do |ce|
-<<<<<<< HEAD
           pcd = if self.sole_source? && !plan.dental?
                   ::CompositeRatedPlanCostDecorator.new(plan, self, effective_composite_tier(ce), ce.is_cobra_status?)
                 else
                   ::PlanCostDecorator.new(plan, ce, self, reference_plan)
                 end
-=======
-          pcd = if self.sole_source? && (!plan.dental?)
-            ::CompositeRatedPlanCostDecorator.new(plan, self, effective_composite_tier(ce), ce.is_cobra_status?)
-          else
-            ::PlanCostDecorator.new(plan, ce, self, reference_plan)
-          end
->>>>>>> fixed cucumbers and removed inheritence of sponsored_benefits benefit group from main app benefit group
           pcd.total_employer_contribution
         end.sum
       end
 
-<<<<<<< HEAD
-=======
-      def monthly_employee_cost(coverage_kind=nil)
-        rp = coverage_kind == "dental" ? dental_reference_plan : reference_plan
-        return 0 if targeted_census_employees.count > 100
-        targeted_census_employees.active.collect do |ce|
-          pcd = if self.sole_source? && (!rp.dental?)
-            ::CompositeRatedPlanCostDecorator.new(rp, self, effective_composite_tier(ce), ce.is_cobra_status?)
-          else
-            ::PlanCostDecorator.new(rp, ce, self, rp)
-          end
-          pcd.total_employee_cost
-        end
-      end
-
->>>>>>> fixed cucumbers and removed inheritence of sponsored_benefits benefit group from main app benefit group
       def monthly_min_employee_cost(coverage_kind = nil)
         monthly_employee_cost(coverage_kind).min
       end
@@ -473,7 +336,6 @@ module SponsoredBenefits
         target_object.census_employees
       end
 
-<<<<<<< HEAD
       def employee_cost_for_plan(census_employee, plan = reference_plan)
         pcd = if @is_congress
                 decorated_plan(plan, census_employee)
@@ -484,20 +346,6 @@ module SponsoredBenefits
               else
                 ::PlanCostDecorator.new(plan, census_employee, self, reference_plan)
               end
-=======
-      def employee_cost_for_plan(ce, plan = reference_plan)
-        pcd = if @is_congress
-          decorated_plan(plan, ce)
-        elsif plan_option_kind == 'sole_source' && !plan.dental?
-          ::CompositeRatedPlanCostDecorator.new(plan, self, effective_composite_tier(ce), ce.is_cobra_status?)
-        else
-          if plan.dental? && dental_reference_plan.present?
-            ::PlanCostDecorator.new(plan, ce, self, dental_reference_plan)
-          else
-            ::PlanCostDecorator.new(plan, ce, self, reference_plan)
-          end
-        end
->>>>>>> fixed cucumbers and removed inheritence of sponsored_benefits benefit group from main app benefit group
         pcd.total_employee_cost
       end
 
@@ -511,15 +359,7 @@ module SponsoredBenefits
 
       def carriers_offered
         case plan_option_kind
-<<<<<<< HEAD
         when "single_plan", "sole_source", "single_carrier"
-=======
-        when "single_plan"
-          ::Plan.where(id: reference_plan_id).pluck(:carrier_profile_id)
-        when "sole_source"
-          ::Plan.where(id: reference_plan_id).pluck(:carrier_profile_id)
-        when "single_carrier"
->>>>>>> fixed cucumbers and removed inheritence of sponsored_benefits benefit group from main app benefit group
           ::Plan.where(id: reference_plan_id).pluck(:carrier_profile_id)
         when "metal_level"
           ::Plan.where(:id => {"$in" => elected_plan_ids}).pluck(:carrier_profile_id).uniq
@@ -562,13 +402,7 @@ module SponsoredBenefits
 
       # Provide the sic factor for this benefit group.
       def sic_factor_for(plan)
-<<<<<<< HEAD
         return 1.0 if use_simple_employer_calculation_model?
-=======
-        if use_simple_employer_calculation_model?
-          return 1.0
-        end
->>>>>>> fixed cucumbers and removed inheritence of sponsored_benefits benefit group from main app benefit group
         factor_carrier_id = plan.carrier_profile_id
         @scff_cache ||= Hash.new do |h, k|
           h[k] = lookup_cached_scf_for(k)
@@ -611,41 +445,23 @@ module SponsoredBenefits
       end
 
       def targeted_census_employees_participation
-<<<<<<< HEAD
         targeted_census_employees.select(&:is_included_in_participation_rate?)
-=======
-        targeted_census_employees.select{|ce| ce.is_included_in_participation_rate?}
->>>>>>> fixed cucumbers and removed inheritence of sponsored_benefits benefit group from main app benefit group
       end
 
       def participation_rate
         total_employees = targeted_census_employees.count
         return(0.0) if total_employees < 1
         waived_and_active_count = if benefit_application.estimate_group_size?
-<<<<<<< HEAD
                                     targeted_census_employees.select(&:expected_to_enroll_or_valid_waive?).length
                                   else
                                     all_active_and_waived_health_enrollments.length
                                   end
         waived_and_active_count / (total_employees * 1.0)
-=======
-                                    targeted_census_employees.select { |ce| ce.expected_to_enroll_or_valid_waive? }.length
-                                  else
-                                    all_active_and_waived_health_enrollments.length
-                                  end
-        waived_and_active_count/(total_employees * 1.0)
->>>>>>> fixed cucumbers and removed inheritence of sponsored_benefits benefit group from main app benefit group
       end
 
       # Provide the group size factor for this benefit group.
       def group_size_factor_for(plan)
-<<<<<<< HEAD
         return 1.0 if use_simple_employer_calculation_model?
-=======
-        if use_simple_employer_calculation_model?
-          return 1.0
-        end
->>>>>>> fixed cucumbers and removed inheritence of sponsored_benefits benefit group from main app benefit group
         factor_carrier_id = plan.carrier_profile_id
         @gsf_cache ||= Hash.new do |h, k|
           h[k] = lookup_cached_gsf_for(k)
@@ -678,11 +494,7 @@ module SponsoredBenefits
       # Provide the contribution factor for a given composite rating tier.
       def composite_employer_contribution_factor_for(composite_rating_tier)
         @cecf_cache ||= Hash.new do |h, k|
-<<<<<<< HEAD
           h[k] = lookup_cached_eccf_for(k)
-=======
-           h[k] = lookup_cached_eccf_for(k)
->>>>>>> fixed cucumbers and removed inheritence of sponsored_benefits benefit group from main app benefit group
         end
         @cecf_cache[composite_rating_tier]
       end
@@ -696,11 +508,7 @@ module SponsoredBenefits
       # year status
       def group_size_count
         if benefit_application.estimate_group_size?
-<<<<<<< HEAD
           targeted_census_employees.select(&:expected_to_enroll?).length
-=======
-          targeted_census_employees.select { |ce| ce.expected_to_enroll? }.length
->>>>>>> fixed cucumbers and removed inheritence of sponsored_benefits benefit group from main app benefit group
         else
           all_active_health_enrollments.length
         end
@@ -708,11 +516,7 @@ module SponsoredBenefits
 
       def composite_rating_enrollment_objects
         if benefit_application.estimate_group_size?
-<<<<<<< HEAD
           targeted_census_employees.select(&:expected_to_enroll?)
-=======
-          targeted_census_employees.select { |ce| ce.expected_to_enroll? }
->>>>>>> fixed cucumbers and removed inheritence of sponsored_benefits benefit group from main app benefit group
         else
           all_active_health_enrollments
         end
@@ -720,25 +524,13 @@ module SponsoredBenefits
 
       def all_active_and_waived_health_enrollments
         benefit_group_assignments.flat_map do |bga|
-<<<<<<< HEAD
           bga.active_and_waived_enrollments.reject(&:dental?)
-=======
-          bga.active_and_waived_enrollments.reject do |en|
-            en.dental?
-          end
->>>>>>> fixed cucumbers and removed inheritence of sponsored_benefits benefit group from main app benefit group
         end
       end
 
       def all_active_health_enrollments
         benefit_group_assignments.flat_map do |bga|
-<<<<<<< HEAD
           bga.active_enrollments.reject(&:dental?)
-=======
-          bga.active_enrollments.reject do |en|
-            en.dental?
-          end
->>>>>>> fixed cucumbers and removed inheritence of sponsored_benefits benefit group from main app benefit group
         end
       end
 
@@ -765,7 +557,6 @@ module SponsoredBenefits
       end
 
       def renewal_elected_plan_ids
-<<<<<<< HEAD
         start_on_year = start_on.next_year.year
         case plan_option_kind
         when "single_carrier"
@@ -774,27 +565,12 @@ module SponsoredBenefits
           ::Plan.by_active_year(start_on_year).shop_market.health_coverage.by_metal_level(reference_plan.metal_level).and(hios_id: /-01/).pluck(:_id)
         else
           ::Plan.where(:id.in => elected_plan_ids).pluck(:renewal_plan_id).compact
-=======
-        start_on_year = (start_on.next_year).year
-        if plan_option_kind == "single_carrier"
-          ::Plan.by_active_year(start_on_year).shop_market.health_coverage.by_carrier_profile(reference_plan.carrier_profile).and(hios_id: /-01/).pluck(:_id)
-        else
-          if plan_option_kind == "metal_level"
-            ::Plan.by_active_year(start_on_year).shop_market.health_coverage.by_metal_level(reference_plan.metal_level).and(hios_id: /-01/).pluck(:_id)
-          else
-            ::Plan.where(:id.in => elected_plan_ids).pluck(:renewal_plan_id).compact
-          end
->>>>>>> fixed cucumbers and removed inheritence of sponsored_benefits benefit group from main app benefit group
         end
       end
 
       def renewal_elected_dental_plan_ids
         return [] unless is_offering_dental?
-<<<<<<< HEAD
         start_on_year = benefit_application.effective_period.min.next_year.year
-=======
-        start_on_year = (benefit_application.effective_period.min.next_year).year
->>>>>>> fixed cucumbers and removed inheritence of sponsored_benefits benefit group from main app benefit group
         if plan_option_kind == "single_carrier"
           ::Plan.by_active_year(start_on_year).shop_market.dental_coverage.by_carrier_profile(dental_reference_plan.carrier_profile).pluck(:_id)
         else
@@ -802,23 +578,10 @@ module SponsoredBenefits
         end
       end
 
-<<<<<<< HEAD
-=======
-      def all_active_health_enrollments
-        benefit_group_assignments.flat_map do |bga|
-          bga.active_enrollments.reject do |en|
-            en.dental?
-          end
-        end
-      end
-
-      
->>>>>>> fixed cucumbers and removed inheritence of sponsored_benefits benefit group from main app benefit group
       def elected_plans_by_option_kind
         start_on = benefit_application.effective_period.min
         @profile_and_service_area_pairs = ::CarrierProfile.carrier_profile_service_area_pairs_for(employer_profile, start_on.year) if constrain_service_areas?
         case plan_option_kind
-<<<<<<< HEAD
         when "sole_source", "single_plan"
           ::Plan.where(id: reference_plan_id).first
         when "single_carrier"
@@ -847,32 +610,6 @@ module SponsoredBenefits
           plans.valid_shop_health_plans_for_service_area("carrier", carrier_for_elected_plan, start_on.year, @profile_and_service_area_pairs.select {|pair| pair.first == carrier_profile_id}).to_a
         else
           ::Plan.valid_shop_health_plans("carrier", carrier_for_elected_plan, start_on.year).to_a
-=======
-        when "sole_source"
-          ::Plan.where(id: reference_plan_id).first
-        when "single_plan"
-          ::Plan.where(id: reference_plan_id).first
-        when "single_carrier"
-          if carrier_for_elected_plan.blank?
-            @carrier_for_elected_plan = reference_plan.carrier_profile_id if reference_plan.present?
-          end
-          carrier_profile_id = reference_plan.carrier_profile_id
-
-          if constrain_service_areas?
-            plans = ::Plan.check_plan_offerings_for_single_carrier # filter by vertical choice(as there should be no bronze plans for one carrier.)
-            plans.valid_shop_health_plans_for_service_area("carrier", carrier_for_elected_plan, start_on.year, @profile_and_service_area_pairs.select {|pair| pair.first == carrier_profile_id}).to_a
-          else
-            ::Plan.valid_shop_health_plans("carrier", carrier_for_elected_plan, start_on.year).to_a
-          end
-        when "metal_level"
-          metal_level_for_elected_plan = reference_plan.metal_level if metal_level_for_elected_plan.blank?
-
-          if constrain_service_areas?
-            ::Plan.valid_shop_health_plans_for_service_area("metal_level", metal_level_for_elected_plan, start_on.year, @profile_and_service_area_pairs).to_a
-          else
-            ::Plan.valid_shop_health_plans("metal_level", metal_level_for_elected_plan, start_on.year).to_a
-          end
->>>>>>> fixed cucumbers and removed inheritence of sponsored_benefits benefit group from main app benefit group
         end
       end
 
@@ -883,27 +620,12 @@ module SponsoredBenefits
         return if start_on.yday == 1
 
         if self.sole_source?
-<<<<<<< HEAD
           check_employer_contribution_for_soule_source
-=======
-          if composite_tier_contributions.present?
-            employee_tier = composite_tier_contributions.find_by(composite_rating_tier: 'employee_only')
-            family_tier = composite_tier_contributions.find_by(composite_rating_tier: 'family')
-            if employer_contribution_percent_minimum_for_application_start_on(start_on, employer_profile.is_renewing_employer?) > (employee_tier.try(:employer_contribution_percent) || 0)
-              self.errors.add(:composite_tier_contributions, "Employer contribution for employee must be ≥ #{employer_contribution_percent_minimum_for_application_start_on(start_on, employer_profile.is_renewing_employer?)}%")
-            elsif family_tier.offered? && (family_tier.try(:employer_contribution_percent) || 0) < family_contribution_percent_minimum_for_application_start_on(start_on, employer_profile.is_renewing_employer?)
-              self.errors.add(:composite_tier_contributions, "Employer contribution for family plans must be ≥ #{family_contribution_percent_minimum_for_application_start_on(start_on, employer_profile.is_renewing_employer?)}")
-            end
-          else
-            self.errors.add(:composite_rating_tier, "Employer must set contribution percentages")
-          end
->>>>>>> fixed cucumbers and removed inheritence of sponsored_benefits benefit group from main app benefit group
         elsif relationship_benefits.present? && (relationship_benefits.find_by(relationship: "employee").try(:premium_pct) || 0) < employer_contribution_percent_minimum_for_application_start_on(start_on, employer_profile.is_renewing_employer?)
           self.errors.add(:relationship_benefits, "Employer contribution must be ≥ #{employer_contribution_percent_minimum_for_application_start_on(start_on, employer_profile.is_renewing_employer?)}% for employee")
         end
       end
 
-<<<<<<< HEAD
       def check_employer_contribution_for_soule_source
         if composite_tier_contributions.present?
           employee_tier = composite_tier_contributions.find_by(composite_rating_tier: 'employee_only')
@@ -918,18 +640,12 @@ module SponsoredBenefits
         end
       end
 
-=======
->>>>>>> fixed cucumbers and removed inheritence of sponsored_benefits benefit group from main app benefit group
       def update_dependent_composite_tiers
         family_tier = self.composite_tier_contributions.where(composite_rating_tier: 'family')
         return unless family_tier.present?
 
         contribution = family_tier.first.employer_contribution_percent
-<<<<<<< HEAD
         family_tier.first.estimated_tier_premium
-=======
-        estimated_tier_premium = family_tier.first.estimated_tier_premium
->>>>>>> fixed cucumbers and removed inheritence of sponsored_benefits benefit group from main app benefit group
         offered = family_tier.first.offered
 
         (CompositeRatingTier::NAMES - CompositeRatingTier::VISIBLE_NAMES).each do |crt|
@@ -949,12 +665,7 @@ module SponsoredBenefits
         (Rational(amount_in_cents) / Rational(100)).to_f if amount_in_cents
       end
 
-<<<<<<< HEAD
       def is_eligible_to_enroll_on?(_date_of_hire, _enrollment_date = TimeKeeper.date_of_record)
-=======
-      def is_eligible_to_enroll_on?(date_of_hire, enrollment_date = TimeKeeper.date_of_record)
-
->>>>>>> fixed cucumbers and removed inheritence of sponsored_benefits benefit group from main app benefit group
         # Length of time prior to effective date that EE may purchase plan
         Settings.aca.shop_market.earliest_enroll_prior_to_effective_on.days
 
@@ -963,16 +674,11 @@ module SponsoredBenefits
 
         # Length of time that EE may enroll following correction to Census Employee Identifying info
         Settings.aca.shop_market.latest_enroll_after_employee_roster_correction_on.days
-<<<<<<< HEAD
-=======
-
->>>>>>> fixed cucumbers and removed inheritence of sponsored_benefits benefit group from main app benefit group
       end
 
       def plan_integrity
         return if elected_plan_ids.blank?
 
-<<<<<<< HEAD
         self.errors.add(:elected_plans, "single plan must be the reference plan") if (plan_option_kind == "single_plan") && (elected_plan_ids.first != reference_plan_id)
 
         if plan_option_kind == "single_carrier"
@@ -985,30 +691,6 @@ module SponsoredBenefits
 
       def check_offered_for_employee
         self.errors.add(:relationship_benefits, "employee must be offered") if relationship_benefits.present? && (relationship_benefits.find_by(relationship: "employee").try(:offered) != true)
-=======
-        if (plan_option_kind == "single_plan") && (elected_plan_ids.first != reference_plan_id)
-          self.errors.add(:elected_plans, "single plan must be the reference plan")
-        end
-
-        if (plan_option_kind == "single_carrier")
-          if !(elected_plan_ids.include? reference_plan_id)
-            self.errors.add(:elected_plans, "single carrier must include reference plan")
-          end
-          if elected_plans.detect { |plan| plan.carrier_profile_id != reference_plan.try(:carrier_profile_id) }
-            self.errors.add(:elected_plans, "not all from the same carrier as reference plan")
-          end
-        end
-
-        if (plan_option_kind == "metal_level") && !(elected_plan_ids.include? reference_plan_id)
-          self.errors.add(:elected_plans, "not all of the same metal level as reference plan")
-        end
-      end
-
-      def check_offered_for_employee
-        if relationship_benefits.present? && (relationship_benefits.find_by(relationship: "employee").try(:offered) != true)
-          self.errors.add(:relationship_benefits, "employee must be offered")
-        end
->>>>>>> fixed cucumbers and removed inheritence of sponsored_benefits benefit group from main app benefit group
       end
 
       def targeted_census_employees
@@ -1073,7 +755,6 @@ module SponsoredBenefits
 
       def employee_cost_for_plan(ce, plan = reference_plan)
         pcd = if @is_congress
-<<<<<<< HEAD
                 decorated_plan(plan, ce)
               elsif plan_option_kind == 'sole_source' && !plan.dental?
                 ::CompositeRatedPlanCostDecorator.new(plan, self, effective_composite_tier(ce), ce.is_cobra_status?)
@@ -1082,18 +763,6 @@ module SponsoredBenefits
               else
                 ::PlanCostDecorator.new(plan, ce, self, reference_plan)
               end
-=======
-          decorated_plan(plan, ce)
-        elsif plan_option_kind == 'sole_source' && !plan.dental?
-          ::CompositeRatedPlanCostDecorator.new(plan, self, effective_composite_tier(ce), ce.is_cobra_status?)
-        else
-          if plan.dental? && dental_reference_plan.present?
-            ::PlanCostDecorator.new(plan, ce, self, dental_reference_plan)
-          else
-            ::PlanCostDecorator.new(plan, ce, self, reference_plan)
-          end
-        end
->>>>>>> fixed cucumbers and removed inheritence of sponsored_benefits benefit group from main app benefit group
         pcd.total_employee_cost
       end
 
@@ -1116,19 +785,11 @@ module SponsoredBenefits
         end
         targeted_census_employees.active.collect do |ce|
 
-<<<<<<< HEAD
           pcd = if plan_option_kind == 'sole_source' && plan.coverage_kind == "health"
                   ::CompositeRatedPlanCostDecorator.new(plan, self, effective_composite_tier(ce), ce.is_cobra_status?)
                 else
                   ::PlanCostDecorator.new(plan, ce, self, rp)
                 end
-=======
-          if plan_option_kind == 'sole_source' && plan.coverage_kind == "health"
-            pcd = ::CompositeRatedPlanCostDecorator.new(plan, self, effective_composite_tier(ce), ce.is_cobra_status?)
-          else
-            pcd = ::PlanCostDecorator.new(plan, ce, self, rp)
-          end
->>>>>>> fixed cucumbers and removed inheritence of sponsored_benefits benefit group from main app benefit group
           pcd.total_employer_contribution
         end.sum
       end
@@ -1137,19 +798,11 @@ module SponsoredBenefits
         rp = coverage_kind == "dental" ? dental_reference_plan : reference_plan
         return [0] if targeted_census_employees.count > 199
         targeted_census_employees.active.collect do |ce|
-<<<<<<< HEAD
           pcd = if self.sole_source? && !rp.dental?
                   ::CompositeRatedPlanCostDecorator.new(rp, self, effective_composite_tier(ce), ce.is_cobra_status?)
                 else
                   ::PlanCostDecorator.new(rp, ce, self, rp)
                 end
-=======
-          pcd = if self.sole_source? && (!rp.dental?)
-            ::CompositeRatedPlanCostDecorator.new(rp, self, effective_composite_tier(ce), ce.is_cobra_status?)
-          else
-            pcd = ::PlanCostDecorator.new(rp, ce, self, rp)
-          end
->>>>>>> fixed cucumbers and removed inheritence of sponsored_benefits benefit group from main app benefit group
           pcd.total_employee_cost
         end
       end
@@ -1175,7 +828,6 @@ module SponsoredBenefits
           single_carrier_pair = profile_and_service_area_pairs.select { |pair| pair.first == reference_plan.carrier_profile.id }
         end
 
-<<<<<<< HEAD
         plans = if plan_option_kind == "single_plan" || plan_option_kind == "sole_source"
                   [reference_plan]
                 elsif plan_option_kind == "single_carrier"
@@ -1190,27 +842,6 @@ module SponsoredBenefits
                 else
                   ::Plan.shop_health_by_active_year(reference_plan.active_year).by_health_metal_levels([reference_plan.metal_level])
                 end
-=======
-        if plan_option_kind == "single_plan"
-          plans = [reference_plan]
-        elsif plan_option_kind == "sole_source"
-          plans = [reference_plan]
-        else
-          if plan_option_kind == "single_carrier"
-            if offerings_constrained_to_service_areas?
-              plans = ::Plan.for_service_areas_and_carriers(single_carrier_pair, start_on.year).shop_market.check_plan_offerings_for_single_carrier.health_coverage.and(hios_id: /-01/)
-            else
-              plans = ::Plan.shop_health_by_active_year(reference_plan.active_year).by_carrier_profile(reference_plan.carrier_profile).with_enabled_metal_levels
-            end
-          else
-            if offerings_constrained_to_service_areas?
-              plans = ::Plan.for_service_areas_and_carriers(profile_and_service_area_pairs, start_on.year).shop_market.check_plan_offerings_for_metal_level.health_coverage.by_metal_level(reference_plan.metal_level).and(hios_id: /-01/).with_enabled_metal_levels
-            else
-              plans = ::Plan.shop_health_by_active_year(reference_plan.active_year).by_health_metal_levels([reference_plan.metal_level])
-            end
-          end
-        end
->>>>>>> fixed cucumbers and removed inheritence of sponsored_benefits benefit group from main app benefit group
 
         set_lowest_and_highest(plans)
       end
