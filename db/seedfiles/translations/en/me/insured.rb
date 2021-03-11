@@ -44,7 +44,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.consumer_roles.ridp_agreement.ridp_agreement_alert_msg' => "Please contact %{site_short_name} at %{contact_center_phone_number} for more info",
   :'en.insured.consumer_roles.search.enter_personal_info_msg' => "Enter your personal information. When you're finished, select CONTINUE.",
   :'en.insured.consumer_roles.search.no_ssn_tooltip' => "You should only select 'I don't have an SSN' if the person doesn't have a social security number. We use this information to verify your identity.",
-  :'en.insured.consumer_roles.search.gender_tooltip' => "Gender is a required field on the application. You can choose how to answer this question, and we don’t compare your response against any data sources. The gender you choose is included in the information we send to your insurance company, but it’s a violation of District of Columbia law to restrict access to health benefits based on gender expression or identity.",
+  :'en.insured.consumer_roles.search.gender_tooltip' => "Gender is a required field on the application. You can choose how to answer this question, and we don’t compare your response against any data sources. The gender you choose is included in the information we send to your insurance company, but it’s a violation of %{aca_state_name} law to restrict access to health benefits based on gender expression or identity.",
   :'en.insured.home_address_tooltip' => "Your home address is where you legally reside. If you prefer to receive mail at another address such as your office or a PO Box, select 'Add Mailing Address'.",
   :'en.is_not_your_employer' => "Not your employer?",
   :'en.click_here' => "Click Here",
