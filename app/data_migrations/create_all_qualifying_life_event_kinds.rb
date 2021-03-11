@@ -2,7 +2,7 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class CreateAllQualifyingLifeEventKinds < MongoidMigrationTask
   def migrate
-    puts "*"*80
+    puts "*" * 80
     puts "::: Cleaning QualifyingLifeEventKinds :::"
     QualifyingLifeEventKind.delete_all
     # Oly DC has SHOP
@@ -10,10 +10,10 @@ class CreateAllQualifyingLifeEventKinds < MongoidMigrationTask
     require File.join(Rails.root, "db", "seedfiles",'ivl_life_events_seed')
     QualifyingLifeEventKind.update_all(is_active: true, is_visible: true)
     puts("There are a total of #{QualifyingLifeEventKind.all.count} QLE Kinds created for #{Settings.site.key}")
-    %w(individual shop).each do |market_kind|
+    %w[individual shop].each do |market_kind|
       puts("There are a total of #{QualifyingLifeEventKind.by_market_kind(market_kind).count} #{market_kind} QlE Kinds.")
     end
     puts "::: QualifyingLifeEventKinds Complete :::"
-    puts "*"*80
+    puts "*" * 80
   end
 end

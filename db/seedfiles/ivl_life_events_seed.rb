@@ -12,9 +12,9 @@ QualifyingLifeEventKind.find_or_create_by(
   post_event_sep_in_days: 60,
   is_self_attested: true,
   is_visible: true,
-  date_options_available: false,
+  date_options_available: false
     # coverage_effective_date: "Date of birth, adoption, placement for adoption, placement in foster care, or marriage.  For marriage: First day of the month following plan selection (not following 15th of month rule); this applies to all members of household")
-  )
+)
 
 QualifyingLifeEventKind.find_or_create_by(
   title: "Adopted a child",
@@ -30,9 +30,9 @@ QualifyingLifeEventKind.find_or_create_by(
   post_event_sep_in_days: 60,
   is_self_attested: true,
   is_visible: true,
-  date_options_available: false,
+  date_options_available: false
     # coverage_effective_date: "Date of birth, adoption, placement for adoption, placement in foster care, or marriage.  For marriage: First day of the month following plan selection (not following 15th of month rule); this applies to all members of household")
-  )
+)
 
 QualifyingLifeEventKind.find_or_create_by(
   title: "Married",
@@ -48,9 +48,9 @@ QualifyingLifeEventKind.find_or_create_by(
   post_event_sep_in_days: 60,
   is_self_attested: true,
   is_visible: true,
-  date_options_available: false,
+  date_options_available: false
     # coverage_effective_date: "Date of birth, adoption, placement for adoption, placement in foster care, or marriage.  For marriage: First day of the month following plan selection (not following 15th of month rule); this applies to all members of household")
-  )
+)
 
 QualifyingLifeEventKind.find_or_create_by(
   title: "Entered into a legal domestic partnership",
@@ -66,10 +66,10 @@ QualifyingLifeEventKind.find_or_create_by(
   post_event_sep_in_days: 60,
   is_self_attested: true,
   is_visible: true,
-  date_options_available: false,
+  date_options_available: false
     # start_of_sep: "Date partnership entered into",
     # coverage_effective_date: "First day of the month following plan selection (not following 15th of month rule); this applies to all members of household")
-  )
+)
 
 QualifyingLifeEventKind.find_or_create_by(
   title: "Divorced or ended domestic partnership",
@@ -85,10 +85,10 @@ QualifyingLifeEventKind.find_or_create_by(
   post_event_sep_in_days: 60,
   is_self_attested: true,
   is_visible: true,
-  date_options_available: false,
+  date_options_available: false
     # start_of_sep: "Date of divorce, legal separation, partnership termination",
     # coverage_effective_date: "First day of the month following plan selection (not following 15th of month rule); this applies to all members of household")
-  )
+)
 
 QualifyingLifeEventKind.find_or_create_by(
   title: "Lost or will soon lose other health insurance ",
@@ -104,10 +104,10 @@ QualifyingLifeEventKind.find_or_create_by(
   post_event_sep_in_days: 60, # "60 days before loss of coverage and 60 days after",
   is_self_attested: true,
   is_visible: true,
-  date_options_available: false,
+  date_options_available: false
     # start_of_sep: "60 days before loss of MEC",
     # coverage_effective_date: "If before loss of coverage: First day of the month after MEC will end. If after loss of MEC: First day of the month following plan selection (not following 15th of month rule)")
-  )
+)
 
 QualifyingLifeEventKind.find_or_create_by(
   title: "Moved or moving to the #{Settings.aca.state_name}",
@@ -123,10 +123,10 @@ QualifyingLifeEventKind.find_or_create_by(
   post_event_sep_in_days: 60,
   is_self_attested: true,
   is_visible: true,
-  date_options_available: false,
+  date_options_available: false
     # start_of_sep: "Date of move    ",
     # coverage_effective_date: "Regular effective date")
-  )
+)
 
 QualifyingLifeEventKind.find_or_create_by(
   title: "Enrollment error caused by #{Settings.site.short_name}",
@@ -141,10 +141,10 @@ QualifyingLifeEventKind.find_or_create_by(
   post_event_sep_in_days: 60,
   is_self_attested: false,
   is_visible: false,
-  date_options_available: true,
+  date_options_available: true
     # start_of_sep: "Date approved by HBX",
     # coverage_effective_date: "Regular effective date")
-  )
+)
 
 QualifyingLifeEventKind.find_or_create_by(
   title: "Change in income that may impact my tax credits/cost-sharing reductions ",
@@ -160,10 +160,10 @@ QualifyingLifeEventKind.find_or_create_by(
   post_event_sep_in_days: 60,
   is_self_attested: false,
   is_visible: false,
-  date_options_available: false,
+  date_options_available: false
     # start_of_sep: "Date of eligibility redetermination (NOTE: this is not necessarily the date the customer reported the change)",
     # coverage_effective_date: "Regular effective date")
-  )
+)
 
 QualifyingLifeEventKind.find_or_create_by(
   title: "Health plan contract violation",
@@ -178,10 +178,10 @@ QualifyingLifeEventKind.find_or_create_by(
   post_event_sep_in_days: 60,
   is_self_attested: false,
   is_visible: false,
-  date_options_available: true,
+  date_options_available: true
     # start_of_sep: "Date approved by HBX",
     # coverage_effective_date: "Regular effective date")
-  )
+)
 
 QualifyingLifeEventKind.find_or_create_by(
   title: "Native American or Alaskan Native",
@@ -196,10 +196,10 @@ QualifyingLifeEventKind.find_or_create_by(
   post_event_sep_in_days: 30,
   is_self_attested: false,
   is_visible: false,
-  date_options_available: false,
+  date_options_available: false
     # start_of_sep: "Date approved by HBX",
     # coverage_effective_date: "Regular effective date")
-  )
+)
 
 QualifyingLifeEventKind.find_or_create_by(
   title: "Lost eligibility for a hardship exemption",
@@ -215,10 +215,10 @@ QualifyingLifeEventKind.find_or_create_by(
   post_event_sep_in_days: 30,
   is_self_attested: false,
   is_visible: false,
-  date_options_available: true,
+  date_options_available: true
     # start_of_sep: "30 days prior to date of ineligibility for exemption",
     # coverage_effective_date: "Regular effective date")
-  )
+)
 
 QualifyingLifeEventKind.find_or_create_by(
   title: "Beginning or ending service with AmeriCorps State and National, VISTA, or NCCC",
@@ -234,10 +234,10 @@ QualifyingLifeEventKind.find_or_create_by(
   post_event_sep_in_days: 60,
   is_self_attested: true,
   is_visible: true,
-  date_options_available: false,
+  date_options_available: false
     # start_of_sep: "Date person begins or ends service in one of the three programs",
     # coverage_effective_date: "Regular effective date")
-  )
+)
 
 QualifyingLifeEventKind.find_or_create_by(
   title: "Court order to provide coverage for someone",
@@ -253,10 +253,10 @@ QualifyingLifeEventKind.find_or_create_by(
   post_event_sep_in_days: 60,
   is_self_attested: false,
   is_visible: false,
-  date_options_available: false,
+  date_options_available: false
     # start_of_sep: "Date of the court order",
     # coverage_effective_date: "Regular effective date")
-  )
+)
 
 QualifyingLifeEventKind.find_or_create_by(
   title: "Newly eligible due to citizenship or immigration status change",
@@ -272,10 +272,10 @@ QualifyingLifeEventKind.find_or_create_by(
   post_event_sep_in_days: 60,
   is_self_attested: false,
   is_visible: false,
-  date_options_available: false,
+  date_options_available: false
     # start_of_sep: "Date change was verified (NOTE: this is not necessarily the date the customer reported the change)",
     # coverage_effective_date: "Regular effective date")
-  )
+)
 
 QualifyingLifeEventKind.find_or_create_by(
   title: "Enrollment error caused by my health insurance company",
@@ -290,10 +290,10 @@ QualifyingLifeEventKind.find_or_create_by(
   post_event_sep_in_days: 60,
   is_self_attested: false,
   is_visible: false,
-  date_options_available: false,
+  date_options_available: false
     # start_of_sep: "Date approved by HBX",
     # coverage_effective_date: "Regular effective date")
-  )
+)
 
 QualifyingLifeEventKind.find_or_create_by(
   title: "Enrollment error caused by someone providing me with enrollment assistance",
@@ -308,10 +308,10 @@ QualifyingLifeEventKind.find_or_create_by(
   post_event_sep_in_days: 60,
   is_self_attested: false,
   is_visible: false,
-  date_options_available: false,
+  date_options_available: false
     # start_of_sep: "Date approved by HBX",
     # coverage_effective_date: "Regular effective date")
-  )
+)
 
 QualifyingLifeEventKind.find_or_create_by(
   title: "Found ineligible for Medicaid after open enrollment ended",
@@ -326,10 +326,10 @@ QualifyingLifeEventKind.find_or_create_by(
   post_event_sep_in_days: 60,
   is_self_attested: false,
   is_visible: false,
-  date_options_available: true,
+  date_options_available: true
     # start_of_sep: "Date consumer received notice of Medicaid ineligibility",
     # coverage_effective_date: "Regular effective date")
-  )
+)
 
 QualifyingLifeEventKind.find_or_create_by(
   title: "Found ineligible for employer-sponsored insurance after open enrollment ended",
@@ -344,10 +344,10 @@ QualifyingLifeEventKind.find_or_create_by(
   post_event_sep_in_days: 60,
   is_self_attested: false,
   is_visible: false,
-  date_options_available: true,
+  date_options_available: true
     # start_of_sep: "Date consumer received notice of SHOP ineligibility    ",
     # coverage_effective_date: "Regular effective date")
-  )
+)
 
 QualifyingLifeEventKind.find_or_create_by(
   title: "A natural disaster prevented enrollment",
@@ -362,10 +362,10 @@ QualifyingLifeEventKind.find_or_create_by(
   post_event_sep_in_days: 60,
   is_self_attested: false,
   is_visible: false,
-  date_options_available: true,
+  date_options_available: true
     # start_of_sep: "Day of disaster (or last day of multi-day disaster)",
     # coverage_effective_date: "Regular effective date")
-  )
+)
 
 QualifyingLifeEventKind.find_or_create_by(
   title: "A medical emergency prevented enrollment",
@@ -380,10 +380,10 @@ QualifyingLifeEventKind.find_or_create_by(
   post_event_sep_in_days: 60,
   is_self_attested: false,
   is_visible: false,
-  date_options_available: true,
+  date_options_available: true
     # start_of_sep: "Date approved by HBX",
     # coverage_effective_date: "Regular effective date")
-  )
+)
 
 QualifyingLifeEventKind.find_or_create_by(
   title: "System outage prevented enrollment",
@@ -398,10 +398,10 @@ QualifyingLifeEventKind.find_or_create_by(
   post_event_sep_in_days: 60,
   is_self_attested: false,
   is_visible: false,
-  date_options_available: true,
+  date_options_available: true
     # start_of_sep: "Day of outage",
     # coverage_effective_date: "Regular effective date")
-  )
+)
 
 QualifyingLifeEventKind.find_or_create_by(
   title: "Domestic abuse",
@@ -417,10 +417,10 @@ QualifyingLifeEventKind.find_or_create_by(
   post_event_sep_in_days: 60,
   is_self_attested: false,
   is_visible: false,
-  date_options_available: true,
+  date_options_available: true
     # start_of_sep: "Date person leaves spouse or domestic partner",
     # coverage_effective_date: "Regular effective date")
-  )
+)
 
 QualifyingLifeEventKind.find_or_create_by(
   title: "Employer did not pay premiums on time",
@@ -436,10 +436,10 @@ QualifyingLifeEventKind.find_or_create_by(
   post_event_sep_in_days: 60,
   is_self_attested: false,
   is_visible: false,
-  date_options_available: true,
+  date_options_available: true
     # start_of_sep: "Based on circumstances as determined by HBX Date of loss of coverage",
     # coverage_effective_date: "As determined by HBX, with the intent of preventing gaps in health coverage")
-  )
+)
 
 QualifyingLifeEventKind.find_or_create_by(
   title: "Dependent loss of employer-sponsored insurance because employee is enrolling in Medicare ",
@@ -455,44 +455,44 @@ QualifyingLifeEventKind.find_or_create_by(
   post_event_sep_in_days: 60, # "60 days before loss of coverage and 60 days after",
   is_self_attested: true,
   is_visible: true,
-  date_options_available: false,
+  date_options_available: false
     # event_kind_label: "coverage end date",
     # start_of_sep: "60 days before loss of MEC",
     # coverage_effective_date: "If before loss of coverage: First day of the month after MEC will end. If after loss of MEC: First day of the month following plan selection (not following 15th of month rule)")
-  )
+)
 
 QualifyingLifeEventKind.find_or_create_by(
-    title: "Not eligible for marketplace coverage due to citizenship or immigration status",
-    tool_tip: " ",
-    action_kind: "transition_member",
-    market_kind: "individual",
-    ordinal_position: 120,
-    reason: "eligibility_failed_or_documents_not_received_by_due_date",
-    edi_code: " ",
-    effective_on_kinds: ["first_of_next_month", "first_of_month"],
-    pre_event_sep_in_days: 0,
-    post_event_sep_in_days: 60,
-    is_self_attested: false,
-    is_visible: false,
-    date_options_available: false,
+  title: "Not eligible for marketplace coverage due to citizenship or immigration status",
+  tool_tip: " ",
+  action_kind: "transition_member",
+  market_kind: "individual",
+  ordinal_position: 120,
+  reason: "eligibility_failed_or_documents_not_received_by_due_date",
+  edi_code: " ",
+  effective_on_kinds: ["first_of_next_month", "first_of_month"],
+  pre_event_sep_in_days: 0,
+  post_event_sep_in_days: 60,
+  is_self_attested: false,
+  is_visible: false,
+  date_options_available: false
       # start_of_sep: "Date approved by HBX",
       # coverage_effective_date: "Regular effective date")
-  )
+)
 
 QualifyingLifeEventKind.find_or_create_by(
-    title: "Provided documents proving eligibility",
-    tool_tip: " ",
-    action_kind: "transition_member",
-    market_kind: "individual",
-    ordinal_position: 120,
-    reason: "eligibility_documents_provided",
-    edi_code: " ",
-    effective_on_kinds: ["first_of_next_month", "first_of_month"],
-    pre_event_sep_in_days: 0,
-    post_event_sep_in_days: 60,
-    is_self_attested: false,
-    is_visible: false,
-    date_options_available: false,
+  title: "Provided documents proving eligibility",
+  tool_tip: " ",
+  action_kind: "transition_member",
+  market_kind: "individual",
+  ordinal_position: 120,
+  reason: "eligibility_documents_provided",
+  edi_code: " ",
+  effective_on_kinds: ["first_of_next_month", "first_of_month"],
+  pre_event_sep_in_days: 0,
+  post_event_sep_in_days: 60,
+  is_self_attested: false,
+  is_visible: false,
+  date_options_available: false
       # start_of_sep: "Date approved by HBX",
       # coverage_effective_date: "Regular effective date")
-  )
+)
