@@ -653,6 +653,7 @@ class Person
   end
 
   def has_active_employee_role?
+    return false unless is_shop_or_fehb_market_enabled?
     active_employee_roles.any?
   end
 
