@@ -19,26 +19,8 @@ Gem::Specification.new do |spec|
   spec.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
   spec.test_files = Dir["spec/**/*"]
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-  spec.add_dependency "rails",                     "~> 6.0"
-<<<<<<< HEAD
-<<<<<<< HEAD
-  # spec.add_dependency "mongoid",                   "~> 7.2"
-=======
-  spec.add_dependency "mongoid",                   "~> 7.2"
->>>>>>> ruby-2.7.1 and rails-6.0 upgrade
-=======
-  # spec.add_dependency "mongoid",                   "~> 7.2"
->>>>>>> pointing mongoid to its github to fix a bug
-=======
-  spec.add_dependency "rails",                     "~> 5.2.3"
-  spec.add_dependency "mongoid",                   "~> 7.0.2"
->>>>>>> REFS Maintenance - Begins toggle between rails 5 and 6
-=======
   spec.add_dependency "rails",                     "~> 6.0"
   # spec.add_dependency "mongoid",                   "~> 7.2"
->>>>>>> Sets everything up for rails 6 to switch to 5.
   spec.add_dependency 'mongoid-autoinc',           '~> 6.0'
   spec.add_dependency "aasm",                      "~> 4.8"
   spec.add_dependency 'config',                    '~> 2.0'

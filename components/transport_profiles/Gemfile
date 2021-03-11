@@ -4,21 +4,8 @@ source 'https://rubygems.org'
 # Bundler will treat runtime dependencies like base dependencies, and
 # development dependencies will be added by default to the :development group.
 gem "transport_gateway", path: File.expand_path("../../transport_gateway", __FILE__)
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 gem 'acapi',   git: "https://github.com/ideacrew/acapi.git", branch: 'trunk'
-=======
-gem 'acapi',   git: "https://github.com/ideacrew/acapi.git", branch: 'master'
->>>>>>> pointing mongoid to its github to fix a bug
 gem 'mongoid', git: 'https://github.com/mongodb/mongoid.git', ref: 'df6b2168ee7526f0c5e26f64f38851b91a0623e8'
-=======
-gem 'acapi', git: "https://github.com/ideacrew/acapi.git", branch: 'trunk'
->>>>>>> REFS Maintenance - Begins toggle between rails 5 and 6
-=======
-gem 'acapi',   git: "https://github.com/ideacrew/acapi.git", branch: 'master'
-gem 'mongoid', git: 'https://github.com/mongodb/mongoid.git', ref: 'df6b2168ee7526f0c5e26f64f38851b91a0623e8'
->>>>>>> Sets everything up for rails 6 to switch to 5.
 
 gemspec
 
