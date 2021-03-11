@@ -2719,6 +2719,7 @@ describe '#can_make_changes?', :dbclean => :after_each do
 
   let(:family) { FactoryBot.build(:family, :with_primary_family_member_and_dependent)}
   let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household) }
+  let(:fehb_employer) {double(BenefitSponsors::Organizations::FehbEmployerProfile.new, id: BSON::ObjectId.new)}
 
   context 'Individual can_make_changes?' do
     it 'should return true if enr is individual market and is active or renewal enrollment' do
@@ -2792,6 +2793,45 @@ describe '#can_make_changes?', :dbclean => :after_each do
       allow(hbx_enrollment).to receive(:new_hire_enrollment_period_available?).and_return false
       hbx_enrollment.update_attributes(kind: 'employer_sponsored', aasm_state: 'coverage_enrolled', sponsored_benefit_package_id: current_benefit_package.id)
       expect(hbx_enrollment.can_make_changes?). to eq false
+    end
+
+    it 'should return true if Congressional active enrollment is in open enrollment period' do
+      allow(hbx_enrollment).to receive(:fehb_profile).and_return(fehb_employer)
+      allow(hbx_enrollment).to receive(:open_enrollment_period_available?).and_return true
+      hbx_enrollment.update_attributes(kind: 'employer_sponsored', aasm_state: 'coverage_enrolled', sponsored_benefit_package_id: current_benefit_package.id)
+      expect(hbx_enrollment.can_make_changes?).to eq true
+    end
+
+    it 'should return true if Congressional active enrollment and the employee is in new hire enrollment period' do
+      allow(hbx_enrollment).to receive(:fehb_profile).and_return(fehb_employer)
+      allow(hbx_enrollment).to receive(:open_enrollment_period_available?).and_return false
+      allow(hbx_enrollment).to receive(:special_enrollment_period_available?).and_return false
+      allow(hbx_enrollment).to receive(:new_hire_enrollment_period_available?).and_return true
+      hbx_enrollment.update_attributes(kind: 'employer_sponsored', aasm_state: 'coverage_enrolled', sponsored_benefit_package_id: current_benefit_package.id)
+      expect(hbx_enrollment.can_make_changes?).to eq true
+    end
+
+    it 'should return true if Congressional active enrollment and the employee is in special enrollment period' do
+      allow(hbx_enrollment).to receive(:fehb_profile).and_return(fehb_employer)
+      allow(hbx_enrollment).to receive(:open_enrollment_period_available?).and_return false
+      allow(hbx_enrollment).to receive(:special_enrollment_period_available?).and_return true
+      allow(hbx_enrollment).to receive(:new_hire_enrollment_period_available?).and_return false
+      hbx_enrollment.update_attributes(kind: 'employer_sponsored', aasm_state: 'coverage_enrolled', sponsored_benefit_package_id: current_benefit_package.id)
+      expect(hbx_enrollment.can_make_changes?).to eq true
+    end
+
+    it 'should return false if enr has benefit package and oe period but in expired state' do
+      hbx_enrollment.update_attributes(kind: 'employer_sponsored', aasm_state: 'coverage_expired', sponsored_benefit_package_id: current_benefit_package.id)
+      allow(hbx_enrollment).to receive(:open_enrollment_period_available?).and_return true
+      allow(hbx_enrollment).to receive(:special_enrollment_period_available?).and_return true
+      expect(hbx_enrollment.can_make_changes?).to eq false
+    end
+
+    it 'should return false if enr has benefit package and oe period but in terminated state' do
+      hbx_enrollment.update_attributes(kind: 'employer_sponsored', aasm_state: "coverage_terminated", sponsored_benefit_package_id: current_benefit_package.id)
+      allow(hbx_enrollment).to receive(:open_enrollment_period_available?).and_return true
+      allow(hbx_enrollment).to receive(:special_enrollment_period_available?).and_return true
+      expect(hbx_enrollment.can_make_changes?).to eq false
     end
   end
 end
