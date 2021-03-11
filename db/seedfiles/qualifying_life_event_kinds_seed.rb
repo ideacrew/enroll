@@ -2,7 +2,7 @@ puts "*"*80
 puts "::: Cleaning QualifyingLifeEventKinds :::"
 QualifyingLifeEventKind.delete_all
 
-QualifyingLifeEventKind.create!(
+QualifyingLifeEventKind.find_or_create_by(
     title: "Had a baby",
     tool_tip: "Household adds a member due to marriage, birth, adoption, placement for adoption, or placement in foster care",
     action_kind: "add_benefit",
@@ -19,7 +19,7 @@ QualifyingLifeEventKind.create!(
     event_kind_label: 'Date of birth'
   )
 
-QualifyingLifeEventKind.create!(
+QualifyingLifeEventKind.find_or_create_by(
     title: "Adopted a child",
     action_kind: "add_benefit",
     reason: "adoption",
@@ -36,7 +36,7 @@ QualifyingLifeEventKind.create!(
     tool_tip: "Enroll or add a family member due to adoption"
   )
 
-QualifyingLifeEventKind.create!(
+QualifyingLifeEventKind.find_or_create_by(
     title: "Married",
     action_kind: "add_benefit",
     reason: "marriage",
@@ -53,9 +53,9 @@ QualifyingLifeEventKind.create!(
     tool_tip: "Enroll or add a family member because of marriage"
   )
 
-QualifyingLifeEventKind.create!(
+QualifyingLifeEventKind.find_or_create_by(
     title: "Entered into a legal domestic partnership",
-    tool_tip: "Entering a domestic partnership as permitted or recognized by the #{aca_state_name}",
+    tool_tip: "Entering a domestic partnership as permitted or recognized by the #{Settings.aca.state_name}",
     action_kind: "add_benefit",
     reason: "domestic_partnership",
     edi_code: "33-ENTERING DOMESTIC PARTNERSHIP", 
@@ -70,7 +70,7 @@ QualifyingLifeEventKind.create!(
     event_kind_label: 'Date of domestic partnership'
   )
 
-QualifyingLifeEventKind.create!(
+QualifyingLifeEventKind.find_or_create_by(
     title: "Divorced", 
     tool_tip: "Divorced, ended a domestic partnership, or legally separated",
     action_kind: "drop_member",
@@ -87,7 +87,7 @@ QualifyingLifeEventKind.create!(
     event_kind_label: "Divorce or partnership end date"
   )
 
-QualifyingLifeEventKind.create!(
+QualifyingLifeEventKind.find_or_create_by(
     title: "Losing other health insurance", 
     action_kind: "add_benefit",
     reason: "lost_access_to_mec",
@@ -104,7 +104,7 @@ QualifyingLifeEventKind.create!(
     tool_tip: "Someone in the household is losing other health insurance involuntarily",
   )
 
-QualifyingLifeEventKind.create!(
+QualifyingLifeEventKind.find_or_create_by(
     title: "A family member has died", 
     action_kind: "drop_member",
     reason: "death",
@@ -121,7 +121,7 @@ QualifyingLifeEventKind.create!(
     tool_tip: "Remove a family member due to death"
   )
 
-QualifyingLifeEventKind.create!(
+QualifyingLifeEventKind.find_or_create_by(
     title: "Child losing or lost coverage due to age", 
     action_kind: "drop_member",
     reason: "child_age_off",
@@ -138,7 +138,7 @@ QualifyingLifeEventKind.create!(
     tool_tip: "Remove a child who is no longer eligible due to turning age 26"
   )
 
-QualifyingLifeEventKind.create!(
+QualifyingLifeEventKind.find_or_create_by(
     title: "Drop coverage due to new eligibility", 
     action_kind: "drop_member",
     reason: "new_eligibility_family",
@@ -155,7 +155,7 @@ QualifyingLifeEventKind.create!(
     tool_tip: "Drop coverage for myself or family member due to new eligibility for other coverage"
   )
 
-QualifyingLifeEventKind.create!(
+QualifyingLifeEventKind.find_or_create_by(
     title: "Drop family member due to new eligibility", 
     action_kind: "drop_member",
     reason: "new_eligibility_member",
@@ -172,7 +172,7 @@ QualifyingLifeEventKind.create!(
     tool_tip: "Drop coverage for a family member due to their new eligibility for other coverage"
   )
 
-QualifyingLifeEventKind.create!(
+QualifyingLifeEventKind.find_or_create_by(
     title: "Moved or moving",
     action_kind: "administrative",
     reason: "relocate",
@@ -189,7 +189,7 @@ QualifyingLifeEventKind.create!(
     tool_tip: "Drop coverage due to a permanent move outside of my current plan's service area"
   )
 
-QualifyingLifeEventKind.create!(
+QualifyingLifeEventKind.find_or_create_by(
     title: "Exceptional circumstances", 
     action_kind: "administrative",
     reason: "exceptional_circumstances",
@@ -206,7 +206,7 @@ QualifyingLifeEventKind.create!(
     tool_tip: "Enroll due to an inadvertent or erroneous enrollment or another exceptional circumstance"
   )
 
-QualifyingLifeEventKind.create!(
+QualifyingLifeEventKind.find_or_create_by(
     title: "Health plan contract violation", 
     action_kind: "administrative",
     reason: "contract_violation",
@@ -223,7 +223,7 @@ QualifyingLifeEventKind.create!(
     tool_tip: "Enroll due to contract violation"
   )
 
-QualifyingLifeEventKind.create!(
+QualifyingLifeEventKind.find_or_create_by(
     title: "Started a new job", 
     action_kind: "add_benefit",
     reason: "new_employment",
@@ -240,7 +240,7 @@ QualifyingLifeEventKind.create!(
     tool_tip: "Enroll due to becoming newly eligibile"
   )
 
-QualifyingLifeEventKind.create!(
+QualifyingLifeEventKind.find_or_create_by(
     title: "Court order to provide coverage for someone",
     tool_tip: "",
     action_kind: "add_member",

@@ -19,6 +19,10 @@ MAIN_TRANSLATIONS = {
 }.freeze
 
 def me_translations
+  dc_translations
+end
+
+def dc_translations
   [
     BOOTSTRAP_EXAMPLE_TRANSLATIONS,
     BUTTON_PANEL_EXAMPLE_TRANSLATIONS,
