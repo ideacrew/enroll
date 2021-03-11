@@ -53,6 +53,10 @@ class Announcement
       end
     end
 
+    def audience_kinds
+      AUDIENCE_KINDS
+    end
+
     def get_announcements_by_portal(portal_path="", person=nil)
       announcements = []
 

@@ -1,6 +1,7 @@
 Feature: Create General Agency and General Agency Staff Role
 
   Scenario: A General Agency Submits Application
+    Given the shop market configuration is enabled
     Given a CCA site exists with a benefit market
     Given a general agency agent visits the DCHBX
     When they click the 'New General Agency' button
