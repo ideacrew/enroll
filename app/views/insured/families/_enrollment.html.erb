@@ -34,7 +34,7 @@
         <div class="enrollment-premium info vertical-align-top">
           <p class="mb-0">
             <strong><%= l10n("premium") %>:</strong>
-            <%= number_to_currency(current_premium(hbx_enrollment), precision: 2) %><%= l10n("month").to_s.downcase %>
+            <%= number_to_currency(current_premium(hbx_enrollment), precision: 2) %>/<%= l10n("month").to_s.downcase %>
           </p>
         </div>
         <% if hbx_enrollment.coverage_terminated? || hbx_enrollment.coverage_expired? || hbx_enrollment.coverage_termination_pending? %>
@@ -146,7 +146,7 @@
         <% if hbx_enrollment.consumer_role.present? && (hbx_enrollment.applied_aptc_amount > 0) %>
         <p>
           <label><%= l10n("APTC_amount") %>:</label>
-          <strong><%= number_to_currency(hbx_enrollment.applied_aptc_amount, precision: 2) %></strong><%= l10n("month").to_s.downcase %>
+          <strong><%= number_to_currency(hbx_enrollment.applied_aptc_amount, precision: 2) %></strong>/<%= l10n("month").to_s.downcase %>
         </p>
         <% else %>
         &nbsp;

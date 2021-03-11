@@ -5,7 +5,7 @@ And(/^the user does not see Info Needed$/) do
 end
 
 Given(/^the user is on the Review Your Application page$/) do
-  expect(page).to have_content("Review Your Application")
+  expect(page).to have_content("Review Your Application", wait: 10)
 end
 
 Then(/^the user visits the Review Your Application page$/) do

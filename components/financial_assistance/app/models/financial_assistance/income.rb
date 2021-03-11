@@ -93,13 +93,13 @@ module FinancialAssistance
 
     validates :amount, presence: true,
                        numericality: {
-                         greater_than: 0, message: "%<value> must be greater than $0"
+                         greater_than: 0, message: "%{value} must be greater than $0"
                        },
                        on: [:step_1, :submission]
 
     validates :kind, presence: true,
                      inclusion: {
-                       in: KINDS, message: "%<value> is not a valid income type"
+                       in: KINDS, message: "%{value} is not a valid income type"
                      },
                      on: [:step_1, :submission]
 
