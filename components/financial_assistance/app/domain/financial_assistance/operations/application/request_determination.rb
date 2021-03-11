@@ -20,7 +20,7 @@ module FinancialAssistance
           application    = yield find_application(application_id)
           application    = yield validate(application)
           payload_param  = yield construct_payload(application)
-          payload_value  = yield validate_payload(payload_param, application.id)
+          payload_value  = yield validate_payload(payload_param, application.hbx_id)
           payload        = yield publish(payload_value, application)
 
           Success(payload)
