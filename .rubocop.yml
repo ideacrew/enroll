@@ -148,6 +148,9 @@ Style/TernaryParentheses:
 Style/WordArray:
   Enabled: false
 
+Style/FormatStringToken:
+  Enabled: false
+
 Bundler/OrderedGems:
   Enabled: false
 
