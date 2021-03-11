@@ -923,7 +923,7 @@ def Announcement.current_msg_for_employer
 end
 
 Given(/all announcements are enabled for user to select/) do
-  Announcement::AUDIENCE_KINDS  = [].tap do |a|
+  Announcement::AUDIENCE_KINDS = [].tap do |a|
     a << 'Employer' if is_shop_or_fehb_market_enabled?
     a << 'Employee' if is_shop_or_fehb_market_enabled?
     a << ['IVL', 'Broker', 'GA', 'Web_Page']
