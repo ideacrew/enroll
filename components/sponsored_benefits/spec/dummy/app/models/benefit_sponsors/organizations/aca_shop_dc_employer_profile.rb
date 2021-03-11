@@ -3,6 +3,7 @@ module BenefitSponsors
     class AcaShopDcEmployerProfile < BenefitSponsors::Organizations::Profile
       # include BenefitSponsors::Employers::EmployerHelper
       # include BenefitSponsors::Concerns::EmployerProfileConcern
+      include ::Config::SiteModelConcern
 
       def rating_area
         # FIX this
