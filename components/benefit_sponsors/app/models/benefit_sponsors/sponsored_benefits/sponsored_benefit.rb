@@ -135,18 +135,11 @@ module BenefitSponsors
       end
 
       def new_product_option_choice(new_product_package)
-<<<<<<< HEAD
         case product_package.package_kind
         when :single_issuer
           new_product_package&.products&.first&.issuer_profile_id
         when :metal_level
           product_package&.products&.first&.metal_level_kind
-=======
-        if product_package.package_kind == :single_issuer
-          new_product_package&.products[0]&.issuer_profile_id
-        elsif product_package.package_kind == :metal_level
-          product_package&.products[0]&.metal_level_kind
->>>>>>> fixed cucumbers and removed inheritence of sponsored_benefits benefit group from main app benefit group
         else
           product_option_choice
         end

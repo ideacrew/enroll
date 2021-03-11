@@ -65,39 +65,12 @@ GEM
       mimemagic (~> 0.3.2)
     activesupport (6.1.1)
       concurrent-ruby (~> 1.0, >= 1.0.2)
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> REFS Maintenance - Saves progress.
       i18n (>= 1.6, < 2)
       minitest (>= 5.1)
       tzinfo (~> 2.0)
       zeitwerk (~> 2.3)
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     addressable (2.7.0)
       public_suffix (>= 2.0.2, < 5.0)
-=======
-    addressable (2.6.0)
-      public_suffix (>= 2.0.2, < 4.0)
->>>>>>> ruby-2.7.1 and rails-6.0 upgrade
-=======
-    addressable (2.7.0)
-      public_suffix (>= 2.0.2, < 5.0)
->>>>>>> updated gems and changed as_json to serializable_hash
-=======
-      i18n (>= 0.7, < 2)
-      minitest (~> 5.1)
-      tzinfo (~> 1.1)
-    addressable (2.6.0)
-      public_suffix (>= 2.0.2, < 4.0)
-    arel (9.0.0)
->>>>>>> REFS Maintenance - Begins toggle between rails 5 and 6
-=======
-    addressable (2.7.0)
-      public_suffix (>= 2.0.2, < 5.0)
->>>>>>> REFS Maintenance - Saves progress.
     aws-sdk (2.2.37)
       aws-sdk-resources (= 2.2.37)
     aws-sdk-core (2.2.37)
@@ -105,56 +78,16 @@ GEM
     aws-sdk-resources (2.2.37)
       aws-sdk-core (= 2.2.37)
     builder (3.2.4)
-<<<<<<< HEAD
-<<<<<<< HEAD
-    concurrent-ruby (1.1.8)
-<<<<<<< HEAD
-<<<<<<< HEAD
-    crack (0.4.5)
-      rexml
-=======
-    crack (0.4.3)
-      safe_yaml (~> 1.0.0)
->>>>>>> ruby-2.7.1 and rails-6.0 upgrade
-=======
-    crack (0.4.5)
-      rexml
->>>>>>> updated gems and changed as_json to serializable_hash
-=======
-    concurrent-ruby (1.1.7)
-    crack (0.4.3)
-      safe_yaml (~> 1.0.0)
->>>>>>> REFS Maintenance - Begins toggle between rails 5 and 6
-=======
     concurrent-ruby (1.1.8)
     crack (0.4.5)
       rexml
->>>>>>> REFS Maintenance - Saves progress.
     crass (1.0.6)
     diff-lcs (1.4.4)
     erubi (1.10.0)
     globalid (0.4.2)
       activesupport (>= 4.2.0)
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-    hashdiff (1.0.1)
-=======
-    hashdiff (0.3.8)
->>>>>>> ruby-2.7.1 and rails-6.0 upgrade
-=======
-    hashdiff (1.0.1)
->>>>>>> updated gems and changed as_json to serializable_hash
-    i18n (1.8.7)
-=======
-    hashdiff (0.3.8)
-    i18n (1.8.5)
->>>>>>> REFS Maintenance - Begins toggle between rails 5 and 6
-=======
     hashdiff (1.0.1)
     i18n (1.8.7)
->>>>>>> REFS Maintenance - Saves progress.
       concurrent-ruby (~> 1.0)
     jmespath (1.4.0)
     loofah (2.9.0)
@@ -173,33 +106,11 @@ GEM
       net-ssh (>= 2.6.5)
     net-ssh (4.2.0)
     nio4r (2.5.4)
-<<<<<<< HEAD
-<<<<<<< HEAD
-    nokogiri (1.11.1)
-      mini_portile2 (~> 2.5.0)
-      racc (~> 1.4)
-<<<<<<< HEAD
-<<<<<<< HEAD
-    public_suffix (4.0.6)
-=======
-    public_suffix (3.0.3)
->>>>>>> ruby-2.7.1 and rails-6.0 upgrade
-=======
-    public_suffix (4.0.6)
->>>>>>> updated gems and changed as_json to serializable_hash
-    racc (1.5.2)
-=======
-    nokogiri (1.10.10)
-      mini_portile2 (~> 2.4.0)
-    public_suffix (3.0.3)
->>>>>>> REFS Maintenance - Begins toggle between rails 5 and 6
-=======
     nokogiri (1.11.1)
       mini_portile2 (~> 2.5.0)
       racc (~> 1.4)
     public_suffix (4.0.6)
     racc (1.5.2)
->>>>>>> REFS Maintenance - Saves progress.
     rack (2.2.3)
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
@@ -261,33 +172,10 @@ GEM
       actionpack (>= 4.0)
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
-<<<<<<< HEAD
-<<<<<<< HEAD
-    thor (1.1.0)
-    tzinfo (2.0.4)
-      concurrent-ruby (~> 1.0)
-<<<<<<< HEAD
-<<<<<<< HEAD
-    webmock (3.11.2)
-=======
-    webmock (3.5.1)
->>>>>>> ruby-2.7.1 and rails-6.0 upgrade
-=======
-    webmock (3.11.2)
->>>>>>> updated gems and changed as_json to serializable_hash
-=======
-    thor (1.0.1)
-    thread_safe (0.3.6)
-    tzinfo (1.2.9)
-      thread_safe (~> 0.1)
-    webmock (3.5.1)
->>>>>>> REFS Maintenance - Begins toggle between rails 5 and 6
-=======
     thor (1.1.0)
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
     webmock (3.11.2)
->>>>>>> REFS Maintenance - Saves progress.
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)

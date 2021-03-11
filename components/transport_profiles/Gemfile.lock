@@ -1,7 +1,7 @@
 GIT
   remote: https://github.com/ideacrew/acapi.git
-  revision: 5c98342197a833b2c8044061dc547d17a706d82b
-  branch: master
+  revision: e10f9ab0a454f861916a986986daa9e055798fde
+  branch: trunk
   specs:
     acapi (1.3.2)
       activesupport (> 4.2.0)
@@ -21,45 +21,13 @@ PATH
   remote: .
   specs:
     transport_profiles (0.0.1)
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-      mongoid (~> 7.2)
->>>>>>> ruby-2.7.1 and rails-6.0 upgrade
-=======
->>>>>>> pointing mongoid to its github to fix a bug
       rails (~> 6.0)
-=======
-      mongoid (~> 7.0.2)
-      rails (~> 5.2.4.3)
->>>>>>> REFS Maintenance - Begins toggle between rails 5 and 6
-=======
-      rails (~> 6.0)
->>>>>>> REFS Maintenance - Saves progress.
       rubyzip (>= 1.3.0)
       symmetric-encryption (~> 3.9.1)
       transport_gateway
 
 PATH
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
   remote: /Users/harsha/Desktop/ideacrew/enroll/components/transport_gateway
-=======
-  remote: /Users/hitheshkolla/Desktop/ideacrew/enroll/components/transport_gateway
->>>>>>> ruby-2.7.1 and rails-6.0 upgrade
-=======
-  remote: /Users/harsha/Desktop/ideacrew/enroll/components/transport_gateway
->>>>>>> updated gems and changed as_json to serializable_hash
-=======
-  remote: /Users/zanesandin/enroll/components/transport_gateway
->>>>>>> REFS Maintenance - Begins toggle between rails 5 and 6
-=======
-  remote: /Users/harsha/Desktop/ideacrew/enroll/components/transport_gateway
->>>>>>> REFS Maintenance - Saves progress.
   specs:
     transport_gateway (0.0.1)
       aws-sdk (~> 2.2.4)
@@ -124,26 +92,9 @@ GEM
       i18n (>= 0.7, < 2)
       minitest (~> 5.1)
       tzinfo (~> 1.1)
-<<<<<<< HEAD
-<<<<<<< HEAD
       zeitwerk (~> 2.2, >= 2.2.2)
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-      zeitwerk (~> 2.2, >= 2.2.2)
->>>>>>> REFS Maintenance - Saves progress.
     addressable (2.7.0)
       public_suffix (>= 2.0.2, < 5.0)
-=======
-    addressable (2.5.2)
-      public_suffix (>= 2.0.2, < 4.0)
->>>>>>> ruby-2.7.1 and rails-6.0 upgrade
-=======
-=======
->>>>>>> REFS Maintenance - Begins toggle between rails 5 and 6
-    addressable (2.7.0)
-      public_suffix (>= 2.0.2, < 5.0)
->>>>>>> updated gems and changed as_json to serializable_hash
     amq-protocol (1.9.2)
     aws-sdk (2.2.37)
       aws-sdk-resources (= 2.2.37)
@@ -158,18 +109,8 @@ GEM
     coercible (1.0.0)
       descendants_tracker (~> 0.0.1)
     concurrent-ruby (1.1.8)
-<<<<<<< HEAD
-<<<<<<< HEAD
     crack (0.4.5)
       rexml
-=======
-    crack (0.4.3)
-      safe_yaml (~> 1.0.0)
->>>>>>> ruby-2.7.1 and rails-6.0 upgrade
-=======
-    crack (0.4.5)
-      rexml
->>>>>>> updated gems and changed as_json to serializable_hash
     crass (1.0.6)
     descendants_tracker (0.0.4)
       thread_safe (~> 0.3, >= 0.3.1)
@@ -177,24 +118,8 @@ GEM
     erubi (1.10.0)
     globalid (0.4.2)
       activesupport (>= 4.2.0)
-<<<<<<< HEAD
-<<<<<<< HEAD
     hashdiff (1.0.1)
-=======
-    hashdiff (0.3.8)
->>>>>>> ruby-2.7.1 and rails-6.0 upgrade
-=======
-    hashdiff (1.0.1)
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> updated gems and changed as_json to serializable_hash
     i18n (1.8.7)
-=======
-    i18n (1.8.9)
->>>>>>> REFS Maintenance - Begins toggle between rails 5 and 6
-=======
-    i18n (1.8.7)
->>>>>>> REFS Maintenance - Saves progress.
       concurrent-ruby (~> 1.0)
     jmespath (1.4.0)
     loofah (2.9.0)
@@ -211,24 +136,6 @@ GEM
     minitest (5.14.3)
     mongo (2.14.0)
       bson (>= 4.8.2, < 5.0.0)
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-    mongoid (7.2.0)
-      activemodel (>= 5.1, < 6.1)
-      mongo (>= 2.10.5, < 3.0.0)
->>>>>>> ruby-2.7.1 and rails-6.0 upgrade
-=======
->>>>>>> pointing mongoid to its github to fix a bug
-=======
-    mongoid (7.0.12)
-      activemodel (>= 5.1, < 6.2)
-      mongo (>= 2.7.0, < 3.0.0)
->>>>>>> REFS Maintenance - Begins toggle between rails 5 and 6
-=======
->>>>>>> REFS Maintenance - Saves progress.
     net-sftp (2.1.2)
       net-ssh (>= 2.6.5)
     net-ssh (4.2.0)
@@ -236,15 +143,7 @@ GEM
     nokogiri (1.11.1)
       mini_portile2 (~> 2.5.0)
       racc (~> 1.4)
-<<<<<<< HEAD
-<<<<<<< HEAD
     public_suffix (4.0.6)
-=======
-    public_suffix (3.0.3)
->>>>>>> ruby-2.7.1 and rails-6.0 upgrade
-=======
-    public_suffix (4.0.6)
->>>>>>> updated gems and changed as_json to serializable_hash
     racc (1.5.2)
     rack (2.2.3)
     rack-test (1.1.0)
