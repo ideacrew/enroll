@@ -1714,4 +1714,32 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       end
     end
   end
+
+  describe "employer_staff_datatable" do
+    let(:user) { double("User")}
+    let(:person) { double("Person")}
+    let(:hbx_staff_role) { double("hbx_staff_role")}
+    let(:hbx_profile) { double("HbxProfile", id: double("id"))}
+    let(:search_params){{"value" => ""}}
+
+    before :each do
+      allow(user).to receive(:person).and_return(person)
+      allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
+      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      allow(person).to receive(:hbx_staff_role).and_return(hbx_staff_role)
+      allow(hbx_staff_role).to receive(:hbx_profile).and_return(hbx_profile)
+      sign_in(user)
+    end
+
+    it "renders employer_staff_datatable datatable" do
+      get :employer_staff_datatable, xhr: true
+      expect(response).to have_http_status(:success)
+      expect(response).to render_template("exchanges/hbx_profiles/employer_staff_datatable.html.slim", "layouts/single_column")
+    end
+
+    it "renders employer_staff_datatable datatable payload" do
+      post :employer_staff_datatable, params: {search: search_params}, xhr: true
+      expect(response).to have_http_status(:success)
+    end
+  end
 end
