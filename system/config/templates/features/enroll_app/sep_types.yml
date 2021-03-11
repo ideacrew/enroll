@@ -76,7 +76,7 @@ registry:
               label: Market *
               content_type: :radio_select
               enum: [ { individual: "Individual" } ]
-              default: :shop
+              default: :individual
               description: ''
               is_required: true
               is_visible: true
