@@ -4,6 +4,8 @@ Feature: Employer hires borker
 
   Background: Broker registration
     Given a CCA site exists with a benefit market
+    Given the shop market configuration is enabled
+    Given all announcements are enabled for user to select
     Given benefit market catalog exists for draft initial employer with health benefits
     Given there is a Broker Agency exists for District Brokers Inc
     Given all permissions are present
