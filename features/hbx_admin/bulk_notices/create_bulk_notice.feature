@@ -1,13 +1,14 @@
 Feature: Hbx Admin Bulk Notice
 
 Background: Admin has ability to create a new Bulk Notice
+  Given the shop market configuration is enabled
   Given an HBX admin exists
   And the HBX admin is logged in
   And there is an employer ACME
 
 Scenario: Admin will create a new bulk notice
   Given Admin is on the new Bulk Notice view
-  When Admin selects Employer
+  When Admin selects Broker Agency
   And Admin fills form with ACME FEIN
   Then Admin should see ACME badge
   When Admin fills in the rest of the form
