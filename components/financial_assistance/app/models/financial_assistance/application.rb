@@ -688,6 +688,7 @@ module FinancialAssistance
 
     def send_failed_response
       unless has_eligibility_response
+        log("Timed Out: Eligibility Response Error", {:severity => 'critical', :error_message => "999 Eligibility Response Error for application_id #{_id}"}) if determination_http_status_code == 999
         message = "Timed-out waiting for eligibility determination response"
         return_status = 504
         notify("acapi.info.events.eligibility_determination.rejected",
@@ -699,22 +700,8 @@ module FinancialAssistance
                 :submitted_timestamp => TimeKeeper.date_of_record.strftime('%Y-%m-%dT%H:%M:%S')})
       end
 
-      unless has_eligibility_response && determination_http_status_code == 422 && determination_error_message == "Failed to validate Eligibility Determination response XML"
-        message = "Invalid schema eligibility determination response provided"
-        notify("acapi.info.events.eligibility_determination.rejected",
-               {:correlation_id => SecureRandom.uuid.gsub("-",""),
-                :body => { error_message: message },
-                :family_id => family_id.to_s,
-                :assistance_application_id => _id.to_s,
-                :return_status => determination_http_status_code.to_s,
-                :submitted_timestamp => TimeKeeper.date_of_record.strftime('%Y-%m-%dT%H:%M:%S'),
-                :haven_application_id => haven_app_id,
-                :haven_ic_id => haven_ic_id,
-                :primary_applicant_id => primary_applicant.person_hbx_id.to_s })
-      end
-
-      return unless has_eligibility_response && determination_http_status_code == 999
-      message = "Timed Out: Eligibility Response Error"
+      return unless has_eligibility_response && determination_http_status_code == 422 && determination_error_message == "Failed to validate Eligibility Determination response XML"
+      message = "Invalid schema eligibility determination response provided"
       notify("acapi.info.events.eligibility_determination.rejected",
              {:correlation_id => SecureRandom.uuid.gsub("-",""),
               :body => { error_message: message },
