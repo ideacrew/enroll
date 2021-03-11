@@ -1,6 +1,7 @@
 class Person
   include Mongoid::Document
   include Mongoid::Timestamps
+  include ::Config::SiteModelConcern
   # include SetCurrentUser
 
   GENDER_KINDS = %W(male female)

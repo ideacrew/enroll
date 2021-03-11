@@ -321,6 +321,8 @@ end
 
 Given(/^the shop market configuration is enabled$/) do
   enable_feature :aca_shop_market
+  load "components/benefit_sponsors/app/models/benefit_sponsors/organizations/broker_agency_profile.rb"
+  load "components/benefit_sponsors/app/models/benefit_sponsors/organizations/general_agency_profile.rb"
 end
 
 Given(/^the fehb market configuration is disabled$/) do

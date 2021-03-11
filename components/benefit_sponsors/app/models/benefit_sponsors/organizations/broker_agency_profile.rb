@@ -53,12 +53,13 @@ module BenefitSponsors
         uniqueness: true,
         allow_blank: true
 
-      validates :market_kind,
-        inclusion: { in: Organizations::BrokerAgencyProfile::MARKET_KINDS, message: "%{value} is not a valid practice area" },
-        allow_blank: false
+      # validates :market_kind,
+      #   inclusion: { in: BenefitSponsors::Organizations::BrokerAgencyProfile::MARKET_KINDS, message: "%{value} is not a valid practice area" },
+      #   allow_blank: false
 
       before_save :notify_before_save
 
+      validate :validate_market_kind
       add_observer ::BenefitSponsors::Observers::NoticeObserver.new, [:process_broker_agency_profile_events]
 
       after_initialize :build_nested_models
@@ -75,6 +76,12 @@ module BenefitSponsors
           unset("primary_broker_role_id")
         end
         @primary_broker_role = new_primary_broker_role
+      end
+
+      def validate_market_kind
+        unless BenefitSponsors::Organizations::BrokerAgencyProfile::MARKET_KINDS.include?(market_kind)
+          errors.add(:profiles, "#{market_kind} is not a valid practice area")
+        end
       end
 
       def primary_broker_role

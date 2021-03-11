@@ -8,7 +8,7 @@ Background: Admin has ability to create a new Bulk Notice
 
 Scenario: Admin will create a new bulk notice
   Given Admin is on the new Bulk Notice view
-  When Admin selects Broker Agency
+  When Admin selects Employer
   And Admin fills form with ACME FEIN
   Then Admin should see ACME badge
   When Admin fills in the rest of the form
