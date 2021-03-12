@@ -50,6 +50,7 @@ RSpec.describe PeopleController, dbclean: :after_each do
       allow_any_instance_of(VlpDoc).to receive(:sensitive_info_changed?).and_return([false, false])
       allow(person).to receive(:update_attributes).and_return(true)
       allow(person).to receive(:is_consumer_role_active?).and_return(false)
+      EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
       person_attributes[:addresses_attributes] = addresses_attributes
       person_attributes[:consumer_role_attributes] = consumer_role_attributes
 

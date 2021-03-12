@@ -8,7 +8,7 @@ RSpec.describe Validators::Families::EligibilityDeterminationContract,  dbclean:
   let(:required_params) do
     {
       family_id: family.id, assistance_year: 2020, benchmark_product_id: BSON::ObjectId.new, integrated_case_id: '200',
-      applicants: [], eligibility_determinations: []
+      applicants: [applicant_params], eligibility_determinations: [determination_params]
     }
   end
 
@@ -36,7 +36,6 @@ RSpec.describe Validators::Families::EligibilityDeterminationContract,  dbclean:
 
 
   let(:all_params) { required_params }
-
 
   context "Given invalid parameter scenarios" do
     context "with empty parameters" do

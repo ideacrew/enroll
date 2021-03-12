@@ -5,6 +5,7 @@ Feature: Broker creates a quote for a prospect employer
     And Generate a quote
 
   Background: Broker Quoting Tool
+    Given the shop market configuration is enabled
     Given a CCA site exists with a benefit market
     And the Plans exist
     And there is a Broker Agency exists for District Brokers Inc

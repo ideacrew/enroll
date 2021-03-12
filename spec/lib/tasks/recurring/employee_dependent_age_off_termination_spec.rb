@@ -61,6 +61,7 @@ describe 'recurring:employee_dependent_age_off_termination', :dbclean => :around
       person2.update_attributes(dob: TimeKeeper.date_of_record.next_month - 26.years)
       person3.update_attributes(dob: TimeKeeper.date_of_record.next_month - 25.years)
       allow(TimeKeeper).to receive(:date_of_record).and_return TimeKeeper.date_of_record.next_month.beginning_of_month
+      EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
       expect_any_instance_of(BenefitSponsors::Observers::NoticeObserver).to receive(:deliver)
       person.employee_roles.first.update_attributes(census_employee_id: census_employee.id)
       Rake::Task["recurring:dependent_age_off_termination_notification_manual"].reenable

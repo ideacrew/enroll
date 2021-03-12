@@ -4,6 +4,7 @@ Feature: Broker Manages Employee Account
   The Broker should be able to do plan shopping for employees
 
   Background: Broker registration
+    Given the shop market configuration is enabled
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for draft initial employer with health benefits
     Given there is a Broker Agency exists for District Brokers Inc

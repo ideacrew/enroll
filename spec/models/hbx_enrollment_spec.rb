@@ -2,6 +2,7 @@ require 'rails_helper'
 require 'aasm/rspec'
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
+require File.join(Rails.root, 'spec/shared_contexts/dchbx_product_selection')
 
 RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
 
@@ -1002,6 +1003,19 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
         hbx_enrollment.cancel_coverage!
         expect(hbx_enrollment.terminated_on).to eq nil
       end
+
+      it "should cancel coverage expired ivl enrollment" do
+        hbx_enrollment.update_attributes(aasm_state: 'coverage_expired', kind: 'individual')
+        expect(hbx_enrollment.may_cancel_coverage?).to eq true
+        hbx_enrollment.cancel_coverage!
+        expect(hbx_enrollment.aasm_state).to eq 'coverage_canceled'
+      end
+
+      it "should not cancel coverage expired shop enrollment" do
+        hbx_enrollment.update_attributes(aasm_state: 'coverage_expired', kind: 'employer_sponsored')
+        expect(hbx_enrollment.may_cancel_coverage?).to eq false
+        expect(hbx_enrollment.aasm_state).to eq 'coverage_expired'
+      end
     end
 
     context "cancel_for_non_payment!" do
@@ -1016,6 +1030,19 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       it "should not populate the terminated on" do
         hbx_enrollment.cancel_for_non_payment!
         expect(hbx_enrollment.terminated_on).to eq nil
+      end
+
+      it "should cancel coverage expired ivl enrollment" do
+        hbx_enrollment.update_attributes(aasm_state: 'coverage_expired', kind: 'individual')
+        expect(hbx_enrollment.may_cancel_for_non_payment?).to eq true
+        hbx_enrollment.cancel_for_non_payment!
+        expect(hbx_enrollment.aasm_state).to eq 'coverage_canceled'
+      end
+
+      it "should not cancel coverage expired shop enrollment" do
+        hbx_enrollment.update_attributes(aasm_state: 'coverage_expired', kind: 'employer_sponsored')
+        expect(hbx_enrollment.may_cancel_for_non_payment?).to eq false
+        expect(hbx_enrollment.aasm_state).to eq 'coverage_expired'
       end
     end
 
@@ -2272,7 +2299,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
     end
   end
 
-  describe HbxEnrollment, '.build_plan_premium', type: :model, dbclean: :around_each do
+  describe HbxEnrollment, '.build_plan_premium', type: :model, dbclean: :around_each, :if => ::EnrollRegistry[:aca_shop_market].enabled? do
     include_context "setup benefit market with market catalogs and product packages"
     include_context "setup initial benefit application"
 
@@ -2692,6 +2719,7 @@ describe '#can_make_changes?', :dbclean => :after_each do
 
   let(:family) { FactoryBot.build(:family, :with_primary_family_member_and_dependent)}
   let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household) }
+  let(:fehb_employer) {double(BenefitSponsors::Organizations::FehbEmployerProfile.new, id: BSON::ObjectId.new)}
 
   context 'Individual can_make_changes?' do
     it 'should return true if enr is individual market and is active or renewal enrollment' do
@@ -2765,6 +2793,45 @@ describe '#can_make_changes?', :dbclean => :after_each do
       allow(hbx_enrollment).to receive(:new_hire_enrollment_period_available?).and_return false
       hbx_enrollment.update_attributes(kind: 'employer_sponsored', aasm_state: 'coverage_enrolled', sponsored_benefit_package_id: current_benefit_package.id)
       expect(hbx_enrollment.can_make_changes?). to eq false
+    end
+
+    it 'should return true if Congressional active enrollment is in open enrollment period' do
+      allow(hbx_enrollment).to receive(:fehb_profile).and_return(fehb_employer)
+      allow(hbx_enrollment).to receive(:open_enrollment_period_available?).and_return true
+      hbx_enrollment.update_attributes(kind: 'employer_sponsored', aasm_state: 'coverage_enrolled', sponsored_benefit_package_id: current_benefit_package.id)
+      expect(hbx_enrollment.can_make_changes?).to eq true
+    end
+
+    it 'should return true if Congressional active enrollment and the employee is in new hire enrollment period' do
+      allow(hbx_enrollment).to receive(:fehb_profile).and_return(fehb_employer)
+      allow(hbx_enrollment).to receive(:open_enrollment_period_available?).and_return false
+      allow(hbx_enrollment).to receive(:special_enrollment_period_available?).and_return false
+      allow(hbx_enrollment).to receive(:new_hire_enrollment_period_available?).and_return true
+      hbx_enrollment.update_attributes(kind: 'employer_sponsored', aasm_state: 'coverage_enrolled', sponsored_benefit_package_id: current_benefit_package.id)
+      expect(hbx_enrollment.can_make_changes?).to eq true
+    end
+
+    it 'should return true if Congressional active enrollment and the employee is in special enrollment period' do
+      allow(hbx_enrollment).to receive(:fehb_profile).and_return(fehb_employer)
+      allow(hbx_enrollment).to receive(:open_enrollment_period_available?).and_return false
+      allow(hbx_enrollment).to receive(:special_enrollment_period_available?).and_return true
+      allow(hbx_enrollment).to receive(:new_hire_enrollment_period_available?).and_return false
+      hbx_enrollment.update_attributes(kind: 'employer_sponsored', aasm_state: 'coverage_enrolled', sponsored_benefit_package_id: current_benefit_package.id)
+      expect(hbx_enrollment.can_make_changes?).to eq true
+    end
+
+    it 'should return false if enr has benefit package and oe period but in expired state' do
+      hbx_enrollment.update_attributes(kind: 'employer_sponsored', aasm_state: 'coverage_expired', sponsored_benefit_package_id: current_benefit_package.id)
+      allow(hbx_enrollment).to receive(:open_enrollment_period_available?).and_return true
+      allow(hbx_enrollment).to receive(:special_enrollment_period_available?).and_return true
+      expect(hbx_enrollment.can_make_changes?).to eq false
+    end
+
+    it 'should return false if enr has benefit package and oe period but in terminated state' do
+      hbx_enrollment.update_attributes(kind: 'employer_sponsored', aasm_state: "coverage_terminated", sponsored_benefit_package_id: current_benefit_package.id)
+      allow(hbx_enrollment).to receive(:open_enrollment_period_available?).and_return true
+      allow(hbx_enrollment).to receive(:special_enrollment_period_available?).and_return true
+      expect(hbx_enrollment.can_make_changes?).to eq false
     end
   end
 end
@@ -3825,5 +3892,77 @@ describe 'calculate effective_on' do
 
   it 'effective date on CCHH page should return off_cycle_application effective date' do
     expect(calculated_effective_on).to eq off_cycle_application.effective_period.min
+  end
+end
+
+describe ".propogate_cancel" do
+  include_context 'family with previous enrollment for termination and passive renewal'
+  let(:current_year) { TimeKeeper.date_of_record.year }
+  let(:active_coverage) { expired_enrollment }
+
+  context "individual market" do
+    before do
+      family.hbx_enrollments.where(effective_on: TimeKeeper.date_of_record.next_year.beginning_of_year).first.update_attributes(aasm_state: "auto_renewing")
+      active_coverage.update_attributes(aasm_state: :coverage_selected)
+      allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 11, 1))
+    end
+
+    context "cancel_coverage" do
+      it 'should cancel renewal enrollment when canceling active enrollment' do
+        active_coverage.cancel_coverage!
+        family.reload
+        renewal_enrollment = family.hbx_enrollments.where(effective_on: TimeKeeper.date_of_record.next_year.beginning_of_year).first
+        expect(renewal_enrollment.aasm_state).to eq "coverage_canceled"
+        expect(active_coverage.aasm_state).to eq "coverage_canceled"
+      end
+
+      it 'should cancel renewal enrollment when canceling expired enrollment' do
+        active_coverage.update_attributes(aasm_state: 'coverage_expired')
+        active_coverage.reload
+        expect(active_coverage.aasm_state).to eq 'coverage_expired'
+        active_coverage.cancel_coverage!
+        family.reload
+        renewal_enrollment = family.hbx_enrollments.where(effective_on: TimeKeeper.date_of_record.next_year.beginning_of_year).first
+        expect(renewal_enrollment.aasm_state).to eq "coverage_canceled"
+        expect(active_coverage.aasm_state).to eq "coverage_canceled"
+      end
+    end
+
+    context "cancel_for_non_payment" do
+      it 'should cancel renewal enrollment when canceling active enrollment' do
+        active_coverage.cancel_for_non_payment!
+        family.reload
+        renewal_enrollment = family.hbx_enrollments.where(effective_on: TimeKeeper.date_of_record.next_year.beginning_of_year).first
+        expect(renewal_enrollment.aasm_state).to eq "coverage_canceled"
+        expect(active_coverage.aasm_state).to eq "coverage_canceled"
+      end
+
+      it 'should cancel renewal enrollment when canceling expired enrollment' do
+        active_coverage.update_attributes(aasm_state: 'coverage_expired')
+        active_coverage.reload
+        expect(active_coverage.aasm_state).to eq 'coverage_expired'
+        active_coverage.cancel_for_non_payment!
+        family.reload
+        renewal_enrollment = family.hbx_enrollments.where(effective_on: TimeKeeper.date_of_record.next_year.beginning_of_year).first
+        expect(renewal_enrollment.aasm_state).to eq "coverage_canceled"
+        expect(active_coverage.aasm_state).to eq "coverage_canceled"
+      end
+    end
+  end
+
+  context "shop market" do
+    before do
+      family.hbx_enrollments.where(effective_on: TimeKeeper.date_of_record.next_year.beginning_of_year).first.update_attributes(aasm_state: "auto_renewing")
+      active_coverage.update_attributes(aasm_state: :coverage_selected, kind: 'employer_sponsored')
+      allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 11, 1))
+      active_coverage.cancel_coverage!
+      family.reload
+    end
+
+    it 'should not cancel renewal enrollment when canceling active enrollment' do
+      renewal_enrollment = family.hbx_enrollments.where(effective_on: TimeKeeper.date_of_record.next_year.beginning_of_year).first
+      expect(renewal_enrollment.aasm_state).to eq "auto_renewing"
+      expect(active_coverage.aasm_state).to eq "coverage_canceled"
+    end
   end
 end

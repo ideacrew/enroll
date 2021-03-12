@@ -8,7 +8,7 @@
                   - gutter: 12
                     type: raw_html
                     classNames: 'small-padding-top-bottom'
-                    text: "To make it easier to determine my eligibility for help paying for coverage in future years, I agree to allow DC Health Link to use my income data, including information from tax returns, for the next five years. DC Health Link will send me a notice, let me make any changes, and I can opt out at any time. *<br>"
+                    text: "To make it easier to determine my eligibility for premium reductions in future years, I agree to allow DC Health Link to use my income data, including information from tax returns, for the next five years. DC Health Link will send me a notice, let me make any changes, and I can opt out at any time. *<br>"
             - cells:
                   - gutter: 3
                     type: label_radio
@@ -39,7 +39,7 @@
                   - gutter: 12
                     type: raw_html
                     classNames: 'small-padding-top-bottom'
-                    text: "How long would you like your eligibility for help paying for coverage to be renewed? *"
+                    text: "How long would you like your eligibility for premium reductions to be renewed? *"
                   - gutter: 12
                     type: label_radio
                     label: 5 years
@@ -84,7 +84,7 @@
                     type: label_radio
                     label: "None. I understand that this means I won't get cost savings in future years unless I change my mind and tell DC Health Link"
                     value: 0
-                    classNames: 'span-text radio-inline-override'
+                    classNames: 'span-text radio-inline-override label-max-width-renew'
                     model: application
                     name: years_to_renew
                     attribute: years_to_renew
@@ -142,7 +142,7 @@
                   - gutter: 12
                     type: raw_html
                     classNames: 'small-padding-top-bottom'
-                    text: <b>I understand that eligibility for Medicaid or private health insurance, with or without financial assistance, will be reviewed every year.</b> <br><br> This process is called renewal. DC Health Link will review eligibility by checking its records and other electronic data sources including, with my consent, information about my federal tax returns from the IRS. DC Health Link will send me a notice that includes the information it has found by checking its records and other electronic data sources, and I will be able to correct information that is wrong. If found eligible for Medicaid or private health insurance coverage, with or without financial assistance, I may also be asked to provide additional information to extend coverage for another year for myself and/or other members of my application group.
+                    text: <b>I understand that eligibility for private health insurance, with or without financial assistance, or Medicaid, will be reviewed every year.</b> <br><br> This process is called renewal. DC Health Link will review eligibility by checking its records and other electronic data sources including, with my consent, information about my federal tax returns from the IRS. DC Health Link will send me a notice that includes the information it has found by checking its records and other electronic data sources, and I will be able to correct information that is wrong. If found eligible for private health insurance, with or without financial assistance, or Medicaid, I may also be asked to provide additional information to extend coverage for another year for myself and/or other members of my application group.
             - cells:
                   - gutter: 12
                     type: checkbox

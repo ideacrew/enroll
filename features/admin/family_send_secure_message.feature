@@ -2,6 +2,7 @@
 Feature: As a Tier3 Admin I will have the ability to see and access "Send Secure Message" action on Families tab
 
   Background: Hbx Admin can Send Secure Message
+    Given the shop market configuration is enabled
     Given a Hbx admin with hbx_tier3 role exists
     And a consumer exists
     And a Hbx admin logs on to Portal
@@ -9,6 +10,7 @@ Feature: As a Tier3 Admin I will have the ability to see and access "Send Secure
     Then Hbx Admin should see the list of primary applicants and an Action button
     When Hbx Admin clicks Action button
 
+  @flaky
   Scenario: HBX Staff with Tier3 Admin sub roles should see Send Secure Message button
     Then the user will see the Send Secure Message button
 

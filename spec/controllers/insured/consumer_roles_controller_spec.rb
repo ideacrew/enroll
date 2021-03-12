@@ -358,6 +358,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         before :each do
           allow(controller).to receive(:update_vlp_documents).and_return(true)
           allow(person).to receive(:employee_roles).and_return [employee_role]
+          EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
           put :update, params: { person: person_params, id: "test" }
         end
 

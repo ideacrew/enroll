@@ -3,6 +3,7 @@ Feature: As a Super Admin I will be the only user
   that is able to see & access the "Extension of Open Enrollment" Feature.
 
   Background: Setup site, employer, and benefit application
+    Given the shop market configuration is enabled
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for enrollment_open initial employer with health benefits
     And there is an employer ABC Widgets

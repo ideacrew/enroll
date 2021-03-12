@@ -62,6 +62,8 @@ module FormWorld
     fill_in 'agency_staff_roles_attributes_0_email', :with => 'tronics@example.com'
     fill_in 'agency_staff_roles_attributes_0_area_code', :with => '202'
     phone_number1.set '5551212'
+    select 'Limited Liability Corporation', from: 'agency_organization_entity_kind' if page.all('select').detect { |select_dropdown| select_dropdown[:id] == 'agency_organization_entity_kind' }.present?
+    select 'Primary', from: 'kindSelect' if page.all('select').detect { |select_dropdown| select_dropdown[:id] == 'kindSelect' }.present?
   end
 
   def fill_in_broker_agency_registration_form
@@ -199,6 +201,12 @@ And(/^user (.*?) fills out personal information form$/) do |named_person|
   fill_in 'jq_datepicker_ignore_person[dob]', :with => person[:dob]
   fill_in 'person[ssn]', :with => person[:ssn]
   find(:xpath, '//label[@for="radio_male"]').click
-  screenshot("register")
+  # screenshot("register")
   find('.btn', text: 'CONTINUE').click
+end
+
+When(/^user clicks the confirm button$/) do
+  inputs = page.all('input')
+  confirm_button = inputs.detect { |input| input[:value] == 'Confirm' }
+  confirm_button.click
 end

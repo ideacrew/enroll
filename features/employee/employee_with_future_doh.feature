@@ -9,6 +9,7 @@ Feature: Employee with future date of hire
 
 
   Background: Setup site, employer, and benefit application
+    Given the shop market configuration is enabled
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for enrollment_open initial employer with health benefits
     Given Qualifying life events are present

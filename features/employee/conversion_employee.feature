@@ -4,6 +4,7 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
   Employee should be blocked from buying coverage under off-exchange plan year
 
   Scenario: New Hire should not get effective date before renewing plan year start date
+    Given the shop market configuration is enabled
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for enrollment_open renewal employer with health benefits
     Given Qualifying life events are present
@@ -34,6 +35,7 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
     Then Employee Patrick Doe should see their plan start date on the page
 
   Scenario: New Hire can't buy coverage before open enrollment of renewing plan year through Shop for Plans
+    Given the shop market configuration is enabled
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for enrollment_open renewal employer with health benefits
     And there is an employer ABC Widgets
@@ -51,6 +53,7 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
     Then Patrick Doe should see "You're not yet eligible under your employer-sponsored benefits" error message
 
   Scenario: New Hire can't buy coverage before open enrollment of renewing plan year through New Hire badge
+    Given the shop market configuration is enabled
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for enrollment_open renewal employer with health benefits
     And there is an employer ABC Widgets
@@ -68,6 +71,7 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
     Then Patrick Doe should see "You're not yet eligible under your employer-sponsored benefits" error message
 
   Scenario: New Hire can't buy coverage under off-exchange plan year using QLE
+    Given the shop market configuration is enabled
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for enrollment_open renewal employer with health benefits
     Given Qualifying life events are present
@@ -88,6 +92,7 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
     Then Patrick Doe should see "You're not yet eligible under your employer-sponsored benefits" error message
 
   Scenario: New Hire can buy coverage during open enrollment of renewing plan year
+    Given the shop market configuration is enabled
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for enrollment_open renewal employer with health benefits
     And there is an employer ABC Widgets
@@ -149,6 +154,7 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
   # Then Soren White should see "open enrollment not yet started" error message
 
   Scenario: Existing Employee can buy coverage during open enrollment of renewing plan year using QLE
+    Given the shop market configuration is enabled
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for enrollment_closed renewal employer with health benefits
     Given Qualifying life events are present

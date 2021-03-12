@@ -1,5 +1,6 @@
 Feature: Consumer verification process
 
+  @flaky
   Scenario: Outstanding verification
     Given Individual has not signed up as an HBX user
     Given the FAA feature configuration is enabled

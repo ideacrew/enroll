@@ -239,10 +239,10 @@ end
 And(/(.*) should see the (.*) family member (.*) and (.*)/) do |employee, type, disabled, checked|
   wait_for_ajax
   if type == "ineligible"
-    expect(first("input[type='checkbox']:disabled", wait: 5)).to be_disabled
+    expect(first("input[type='checkbox']:disabled", wait: 10)).to be_disabled
     expect(first("input[type='checkbox']:disabled")).not_to be_checked
   else
-    expect(find("#family_member_ids_0", wait: 5)).not_to be_disabled
+    expect(find("#family_member_ids_0", wait: 10)).not_to be_disabled
     expect(find("#family_member_ids_0")).to be_checked
   end
 end
@@ -262,7 +262,7 @@ And(/(.*) should also see the reason for ineligibility/) do |named_person|
   person = person_hash ? Person.where(:first_name => /#{person_hash[:first_name]}/i, :last_name => /#{person_hash[:last_name]}/i).first : ''
   person = person.present? ? person : @person
 
-  if person.active_employee_roles.present?
+  if person&.active_employee_roles.present?
     expect(page).to have_content "Employer sponsored coverage is not available"
   else
     expect(page).to have_content "eligibility failed on family_relationships"
@@ -304,6 +304,16 @@ end
 Then(/(.*) should see primary person/) do |role|
   primary = Person.all.select { |person| person.primary_family.present? }.first
   expect(page).to have_content("Covered: #{primary.first_name}", wait: 10)
+end
+
+Then(/consumer should see coverage for primary person/) do
+  primary = Person.all.select { |person| person.primary_family.present? }.first
+  expect(page).to have_content("Coverage For:   #{primary.first_name}", wait: 10)
+end
+
+Then(/Resident should see coverage for primary person/) do
+  primary = Person.all.select { |person| person.primary_family.present? }.first
+  expect(page).to have_content("Coverage For:   #{primary.first_name}", wait: 10)
 end
 
 Then(/(.*) should see the enrollment with make changes button/) do |role|
@@ -366,9 +376,9 @@ end
 
 When(/(.*) (.*) the primary person/) do |role, checked|
   if checked == "checks"
-    find("#family_member_ids_0").set(true)
+    find("#family_member_ids_0", wait: 5).set(true)
   else
-    find("#family_member_ids_0").set(false)
+    find("#family_member_ids_0", wait: 5).set(false)
   end
 end
 
@@ -377,7 +387,7 @@ And(/(.*) selects (.*) for coverage kind/) do |_role, coverage_kind|
 end
 
 And(/(.*) clicked on shop for new plan/) do |role|
-  find(".interaction-click-control-shop-for-new-plan").click
+  find(".interaction-click-control-shop-for-new-plan", wait: 5).click
 end
 
 And(/user did not apply coverage for child as ivl/) do
@@ -521,6 +531,10 @@ end
 # When(/(.*) clicks on the edit plan button/) do |_role|
 #   click_link 'Edit Plan'
 # end
+
+Given(/^the automatic application of aptc on enrollment feature configuration is disabled$/) do
+  disable_feature :apply_aggregate_to_enrollment
+end
 
 When(/(.*) clicks on the make changes button/) do |_role|
   enable_change_tax_credit_button

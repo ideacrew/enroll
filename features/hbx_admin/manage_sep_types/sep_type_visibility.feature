@@ -1,5 +1,6 @@
 Feature: Admin has ability to create a new SEP Type with visibility options for "Customer & Admin" and "Admin Only"
   Background:
+    Given both shop and fehb market configurations are enabled
     Given that a user with a HBX staff role with hbx_tier3 subrole exists
     When Hbx Admin logs on to the Hbx Portal
     Given the Admin is on the Main Page
@@ -147,6 +148,7 @@ Feature: Admin has ability to create a new SEP Type with visibility options for 
   # | Admin Only       |
 
   Scenario Outline: Admin will create a new Shop market SEP type by picking visibility option for <user_visibility>
+    Given the shop market configuration is enabled
     Given Admin can navigate to the Manage SEPs screen
     And expired Qualifying life events of shop market is present
     When Admin clicks on the Create SEP Type button
@@ -198,6 +200,7 @@ Feature: Admin has ability to create a new SEP Type with visibility options for 
       | Admin Only       | not see |
 
   Scenario Outline: Admin will create a new Shop market SEP type by picking visibility option for <user_visibility> with future date
+    Given the shop market configuration is enabled
     Given Admin can navigate to the Manage SEPs screen
     And expired Qualifying life events of shop market is present
     When Admin clicks on the Create SEP Type button

@@ -3,6 +3,7 @@ Feature: As a Super Admin I will be the only user
   that is able to see & access the "Create Plan Year" Feature.
 
   Background: Setup site, employer, and benefit application
+    Given the shop market configuration is enabled
     Given a CCA site exists with a benefit market
     And there is an employer ABC Widgets
     Given that a user with a HBX staff role with Super Admin subrole exists and is logged in

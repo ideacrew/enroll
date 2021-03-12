@@ -53,7 +53,6 @@ module FinancialAssistance
 
     DRIVER_QUESTION_ATTRIBUTES = [:has_job_income, :has_self_employment_income, :has_other_income,
                                   :has_deductions, :has_enrolled_health_coverage, :has_eligible_health_coverage].freeze
-
     #list of the documents user can provide to verify Immigration status
     VLP_DOCUMENT_KINDS = [
         "I-327 (Reentry Permit)",
@@ -269,7 +268,7 @@ module FinancialAssistance
     validate :strictly_boolean
 
     validates :tax_filer_kind,
-              inclusion: { in: TAX_FILER_KINDS, message: "%<value> is not a valid tax filer kind" },
+              inclusion: { in: TAX_FILER_KINDS, message: "%{value} is not a valid tax filer kind" },
               allow_blank: true
 
     alias is_medicare_eligible? is_medicare_eligible
@@ -559,8 +558,7 @@ module FinancialAssistance
     end
 
     def i766
-      # vlp_subject == 'I-766 (Employment Authorization Card)' && alien_number.present? && card_number.present? && expiration_date.present?
-      vlp_subject == 'I-766 (Employment Authorization Card)' && receipt_number.present? && expiration_.present?
+      vlp_subject == 'I-766 (Employment Authorization Card)' && alien_number.present? && card_number.present? && expiration_date.present?
     end
 
     def mac_read_i551
@@ -632,11 +630,18 @@ module FinancialAssistance
     end
 
     def applicant_validation_complete?
+      if is_applying_coverage
       valid?(:submission) &&
         incomes.all? {|income| income.valid? :submission} &&
         benefits.all? {|benefit| benefit.valid? :submission} &&
         deductions.all? {|deduction| deduction.valid? :submission} &&
         other_questions_complete?
+      else
+        valid?(:submission) &&
+          incomes.all? {|income| income.valid? :submission} &&
+          deductions.all? {|deduction| deduction.valid? :submission} &&
+          other_questions_complete?
+      end
     end
 
     def clean_conditional_params(model_params)
@@ -656,7 +661,6 @@ module FinancialAssistance
     end
 
     def foster_age_satisfied?
-      # TODO: Look into this. Seems like this is only relevant if pregnant?
       # Age greater than 18 and less than 26
       (19..25).cover? age_of_applicant
     end
@@ -664,7 +668,7 @@ module FinancialAssistance
     def other_questions_complete?
       questions_array = []
 
-      questions_array << is_former_foster_care  if foster_age_satisfied?
+      questions_array << is_former_foster_care  if foster_age_satisfied? && is_applying_coverage
       questions_array << is_post_partum_period  unless is_pregnant
 
       (other_questions_answers << questions_array).flatten.include?(nil) ? false : true
@@ -701,6 +705,12 @@ module FinancialAssistance
 
     def has_income?
       has_job_income || has_self_employment_income || has_other_income
+    end
+
+    def relationship_kind_with_primary
+      rel = relationships.where(relative_id: application.primary_applicant.id).first
+      return "self" if rel.nil?
+      rel.kind
     end
 
     def embedded_document_section_entry_complete?(embedded_document) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity TODO: Remove this
@@ -861,6 +871,10 @@ module FinancialAssistance
       records.collect{|record| record.attributes.except(:_id, :created_at, :updated_at) }
     end
 
+    def enrolled_or_eligible_in_any_medicare?
+      benefits.any_medicare.present?
+    end
+
     class << self
       def find(id)
         return nil unless id
@@ -879,20 +893,30 @@ module FinancialAssistance
     end
 
     def other_questions_answers
-      [:has_daily_living_help, :need_help_paying_bills, :is_ssn_applied].inject([]) do |array, question|
-        no_ssn_flag = no_ssn
+      if is_applying_coverage
+        [:has_daily_living_help, :need_help_paying_bills, :is_ssn_applied].inject([]) do |array, question|
+          no_ssn_flag = no_ssn
 
-        array << send(question) if question != :is_ssn_applied || (question == :is_ssn_applied && no_ssn_flag == '1')
-        array
+          array << send(question) if question != :is_ssn_applied || (question == :is_ssn_applied && no_ssn_flag == '1')
+          array
+        end
+      else
+        [:is_pregnant, :is_post_partum_period].collect{|question| send(question)}
       end
     end
 
     def validate_applicant_information
-      validates_presence_of :has_fixed_address, :is_claimed_as_tax_dependent, :is_living_in_state, :is_temporarily_out_of_state, :is_pregnant, :is_self_attested_blind, :has_daily_living_help, :need_help_paying_bills #, :tax_household_id
+      if is_applying_coverage
+        validates_presence_of :has_fixed_address, :is_claimed_as_tax_dependent, :is_living_in_state, :is_temporarily_out_of_state, :is_pregnant, :is_self_attested_blind, :has_daily_living_help, :need_help_paying_bills #, :tax_household_id
+      else
+        validates_presence_of :has_fixed_address, :is_claimed_as_tax_dependent, :is_living_in_state, :is_temporarily_out_of_state, :is_pregnant
+      end
     end
 
     def driver_question_responses
       DRIVER_QUESTION_ATTRIBUTES.each do |attribute|
+        next if [:has_enrolled_health_coverage, :has_eligible_health_coverage].include?(attribute) && !is_applying_coverage
+
         instance_type = attribute.to_s.gsub('has_', '')
         instance_check_method = instance_type + "_exists?"
 
@@ -939,6 +963,8 @@ module FinancialAssistance
         errors.add(:is_enrolled_on_medicaid, "' Was this person on Medicaid during pregnancy?' should be answered") if is_enrolled_on_medicaid.nil?
         errors.add(:pregnancy_end_on, "' Pregnancy End on date' should be answered") if pregnancy_end_on.blank?
       end
+
+      return unless is_applying_coverage
 
       if age_of_applicant > 18 && age_of_applicant < 26
         errors.add(:is_former_foster_care, "' Was this person in foster care at age 18 or older?' should be answered") if is_former_foster_care.nil?
