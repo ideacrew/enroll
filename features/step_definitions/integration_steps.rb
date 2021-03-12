@@ -477,7 +477,7 @@ end
 
 Then(/^(?:.+) should see a successful sign up message$/) do
   FactoryBot.create(:sic_code, sic_code: "0111")
-  expect(page).to have_content("Welcome to DC Health Link")
+  expect(page).to have_content("Welcome to #{Settings.site.short_name}")
   # screenshot("employer_sign_up_welcome")
 end
 

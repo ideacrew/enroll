@@ -17,7 +17,7 @@ class YourInformation
   end
 
   def self.welcome_sign_in_message
-    'Welcome to DC Health Link. Your account has been created.'
+    "Welcome to #{Settings.site.short_name} Your account has been created."
   end
 
   def self.continue_btn
