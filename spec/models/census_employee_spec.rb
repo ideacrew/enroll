@@ -1146,13 +1146,17 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
 
     let(:benefit_group_assignment) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee)}
 
-    it "should return true when active_benefit_group_assignment is initialized" do
+    before do
       allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
+    end
+
+    it "should return true when active_benefit_group_assignment is initialized" do
+      allow(benefit_group_assignment).to receive(:initialized?).and_return true
       expect(census_employee.newhire_enrollment_eligible?).to eq true
     end
 
     it "should return false when active_benefit_group_assignment is not initialized" do
-      allow(census_employee).to receive(:active_benefit_group_assignment).and_return nil
+      allow(benefit_group_assignment).to receive(:initialized?).and_return false
       expect(census_employee.newhire_enrollment_eligible?).to eq false
     end
   end
