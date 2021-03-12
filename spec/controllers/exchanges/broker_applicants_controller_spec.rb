@@ -246,7 +246,7 @@ RSpec.describe Exchanges::BrokerApplicantsController do
         context 'when application is pending' do
           let(:carrier_appointments_hash) do
             ca = {}
-            "BrokerRole::#{Settings.site.key.upcase}_BROKER_CARRIER_APPOINTMENTS".constantize.stringify_keys.each do |k, _v|
+            EnrollRegistry[:brokers].setting(:carrier_appointments).item.stringify_keys.each do |k, _v|
               ca[k] = "true"
             end
             ca
@@ -278,30 +278,8 @@ RSpec.describe Exchanges::BrokerApplicantsController do
 
       context 'when broker carrier appointments disabled and application is pending' do
         context 'when application is pending' do
-
-          let(:dc_hash) do
-            {
-              "Aetna Health Inc" => "true",
-              "Aetna Life Insurance Company" => "true",
-              "Carefirst Bluechoice Inc" => "true"
-            }
-          end
-          let(:ma_hash) do
-            {
-              "Boston Medical Center Health Plan" => "true",
-              "Delta" => "true",
-              "FCHP" => "true"
-            }
-          end
           let(:carrier_appointments_hash) do
-            ca = "BrokerRole::#{Settings.site.key.upcase}_BROKER_CARRIER_APPOINTMENTS".constantize.stringify_keys
-            merged_hash =
-              if Settings.site.key == :dc
-                ca.merge!(dc_hash)
-              elsif Settings.site.key == :cca
-                ca.merge!(dc_hash)
-              end
-            merged_hash
+            EnrollRegistry[:brokers].setting(:carrier_appointments).item.stringify_keys
           end
           before :each do
             person_hash = ActionController::Parameters.new({ broker_role_attributes: { training: true, carrier_appointments: carrier_appointments_hash } }).permit!
