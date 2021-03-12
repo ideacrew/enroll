@@ -27,6 +27,21 @@ GIT
       sneakers
 
 GIT
+  remote: https://github.com/ideacrew/event_source.git
+  revision: 8cd88d918802f0c29cda56e71e398d68f1b5093a
+  branch: release_0.3.0
+  specs:
+    event_source (0.3.0)
+      activesupport
+      dry-events
+      dry-initializer (~> 3.0)
+      dry-monads (~> 1.2)
+      dry-struct (~> 1.0)
+      dry-transformer
+      dry-types (~> 1.0)
+      dry-validation (~> 1.2)
+
+GIT
   remote: https://github.com/ideacrew/openhbx_cv2.git
   revision: 6567dd46112982e6a9c90001b617caf313271fc9
   branch: trunk
@@ -452,6 +467,10 @@ GEM
     dry-core (0.4.9)
       concurrent-ruby (~> 1.0)
     dry-equalizer (0.3.0)
+    dry-events (0.2.0)
+      concurrent-ruby (~> 1.0)
+      dry-core (~> 0.4)
+      dry-equalizer (~> 0.2)
     dry-inflector (0.2.0)
     dry-initializer (3.0.3)
     dry-logic (1.0.7)
@@ -477,6 +496,7 @@ GEM
       dry-equalizer (~> 0.3)
       dry-types (~> 1.3)
       ice_nine (~> 0.11)
+    dry-transformer (0.1.1)
     dry-types (1.4.0)
       concurrent-ruby (~> 1.0)
       dry-container (~> 0.3)
@@ -1021,6 +1041,7 @@ DEPENDENCIES
   devise-jwt (~> 0.5.9)
   effective_datatables!
   email_spec (~> 2)
+  event_source!
   eye (= 0.10.0)
   factory_bot_rails (~> 4.11)
   fakeredis (~> 0.7.0)

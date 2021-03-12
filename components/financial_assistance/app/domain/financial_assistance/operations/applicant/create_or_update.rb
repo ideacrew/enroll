@@ -27,12 +27,7 @@ module FinancialAssistance
         end
 
         def find_draft_application(family_id)
-          application = ::FinancialAssistance::Application.where(family_id: family_id, aasm_state: 'draft').first
-          if application
-            Success(application)
-          else
-            Failure("Application Not Found")
-          end
+          FinancialAssistance::Operations::Application::FindDraft.new.call(family_id: family_id)
         end
 
         def match_applicant(values, application)
@@ -76,6 +71,7 @@ module FinancialAssistance
                       else
                         @application.applicants.build
                       end
+
           applicant.assign_attributes(values.to_h)
 
           if applicant.save

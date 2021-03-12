@@ -24,8 +24,8 @@ module FinancialAssistance
         end
 
         def find_draft(values)
-          draft_application = ::FinancialAssistance::Application.where(family_id: values[:family_id]).first
-          draft_application ? Success(draft_application) : Failure('No matching draft application')
+          application = ::FinancialAssistance::Application.where(family_id: values[:family_id], aasm_state: 'draft').first
+          application ? Success(application) : Failure('No matching draft application')
         end
       end
     end
