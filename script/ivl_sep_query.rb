@@ -5,7 +5,7 @@ class IvlEnrollmentsPublisher
   extend Acapi::Notifiers
 
   def self.publish_action(action_name, hbx_id, action)
-    reply_to = "dc0.#{Rails.application.config.acapi.environment_name}.q.glue.enrollment_event_batch_handler"
+    reply_to = "#{Rails.application.config.acapi.hbx_id}.#{Rails.application.config.acapi.environment_name}.q.glue.enrollment_event_batch_handler"
 
     notify(
       action_name, {
