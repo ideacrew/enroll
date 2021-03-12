@@ -1,6 +1,7 @@
 Feature: HBX Admin should be able to send the broker application to pending state
 
   Background: Setup site, employer, and benefit application
+    Given the shop market configuration is enabled
     Given a CCA site exists with a benefit market
     Then user goes to the Broker Registration form
 
