@@ -111,3 +111,15 @@ javascript:
       $('.inputHiredOn').val(this.value);
     }
   })
+
+  document.addEventListener('stimulus-reflex:after', event => {
+    initializeDatepicker();
+  })
+
+  function initializeDatepicker() {
+    $('.inputDependentDob').datepicker({
+      dateFormat:'mm/dd/yy',
+      changeYear: true,
+      changeMonth:true
+    })
+  }

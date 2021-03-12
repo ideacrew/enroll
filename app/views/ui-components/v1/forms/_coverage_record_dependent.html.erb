@@ -20,7 +20,7 @@
     </div>
     <div class="col-md-3 col-sm-3 col-xs-12">
       <label for="ssn"> SSN</label>
-      <input class="form-control mb-1" placeholder="SSN" id="ssn" type="text" value="<%= @dependent&.ssn %>" name="agency[staff_roles_attributes][0][coverage_record][coverage_record_dependents][<%= i %>][ssn]">
+      <input class="form-control mb-1" placeholder="SSN" id="ssn" type="number" minlength:'9' maxlength:'9' value="<%= @dependent&.ssn %>" name="agency[staff_roles_attributes][0][coverage_record][coverage_record_dependents][<%= i %>][ssn]">
     </div>
     <div class="col-md-3 col-sm-3 col-xs-12">
       <label for="inputDependentDob"> DOB *</label>
@@ -49,11 +49,3 @@
 
 <div class="mb-2" id=<%= "dependent-#{i+1}"%>>
 </div>
-
-<script type="text/javascript">
-  $('.inputDependentDob').datepicker({
-    dateFormat:'mm/dd/yy',
-    changeYear: true,
-    changeMonth:true
-  })
-</script>
