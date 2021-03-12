@@ -381,7 +381,7 @@ And(/I click on log out link$/) do
 end
 
 And(/^.+ click on Sign In$/) do
-  expect(page).to have_content "Welcome to the District's Health Insurance Marketplace"
+  expect(page).to have_content Site.header_message
 end
 
 And(/I signed in$/) do
