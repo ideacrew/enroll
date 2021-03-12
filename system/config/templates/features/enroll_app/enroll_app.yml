@@ -84,3 +84,5 @@ registry:
       - key: :age_off_relaxed_eligibility
         item: Operations::AgeOffRelaxedEligibility.new
         is_enabled: true
+      - key: :display_cost_warning_message
+        is_enabled: false
