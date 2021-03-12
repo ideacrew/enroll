@@ -8,7 +8,7 @@
       </h4>
       <% if @application.determination_http_status_code.present? %>
         <h4 class="darkblue">
-        <%= l10n('financial_assistance.applications.report_error', email: @application.determination_http_status_code)%>
+        <%= l10n('financial_assistance.applications.report_error', determination_http_status_code: @application.determination_http_status_code)%>
         </h4>
       <% end %>
     </div>
