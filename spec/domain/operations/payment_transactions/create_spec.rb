@@ -82,6 +82,14 @@ module Operations
             expect(subject).to be_success
             expect(family.payment_transactions.count).to eq 1
           end
+
+          # Additional spec coverage for removing build method on payment transaction.
+          it 'should create payment transaction for family related to enrollment ' do
+            expect(subject).to be_success
+            expect(family.payment_transactions.first.enrollment_id).to eq hbx_enrollment.id
+            expect(family.payment_transactions.first.carrier_id).to eq issuer_profile.id
+            expect(family.payment_transactions.first.enrollment_effective_date).to eq hbx_enrollment.effective_on
+          end
         end
       end
     end
