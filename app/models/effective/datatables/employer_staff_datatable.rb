@@ -8,8 +8,8 @@ module Effective
         table_column :name, :label => 'Name', :proc => proc { |row| link_to row.full_name, show_roles_person_path(id: row.id)}, :filter => false, :sortable => true
         table_column :hbx_id, :label => 'HBX ID', :proc => proc { |row| row.hbx_id }, :filter => false, :sortable => false
         table_column :dob, :label => 'DOB', :proc => proc { |row| format_date(row.dob)}, :filter => false, :sortable => false
-        table_column :email, :label => 'EMAIL', :proc => proc { |row| email(row) }, :filter => false, :sortable => false
-        table_column :phone, :label => 'PHONE', :proc => proc { |row| phone(row)}, :filter => false, :sortable => false
+        table_column :email, :label => 'EMAIL', :proc => proc { |row| row.work_email_or_best }, :filter => false, :sortable => false
+        table_column :phone, :label => 'PHONE', :proc => proc { |row| row.work_phone_or_best}, :filter => false, :sortable => false
       end
 
       def collection
@@ -28,14 +28,6 @@ module Effective
 
       def global_search_method
         :datatable_search
-      end
-
-      def email(row)
-        row.emails.first.address if row.emails.present?
-      end
-
-      def phone(row)
-        row.phones.first.full_phone_number if row.phones.present?
       end
     end
   end
