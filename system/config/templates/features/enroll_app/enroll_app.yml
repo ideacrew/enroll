@@ -86,3 +86,5 @@ registry:
         is_enabled: true
       - key: :display_cost_warning_message
         is_enabled: false
+      - key: employee_datable_waiver_bulk_actions
+        is_enabled: false
