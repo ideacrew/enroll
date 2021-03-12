@@ -22,21 +22,21 @@
               li
                 = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {tab_name: 'dc-resident-application', link_path: main_app.begin_resident_enrollment_exchanges_residents_path(original_application_type: 'paper'), display_name: 'DC Resident Application', active_tab: "dc-resident-application", remote: false, pundit_object: ResidentRole, pundit_method: :begin_resident_enrollment?}
 
-          li.dropdown.pl-1 role="presentation"
-            a.dropdown-toggle data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" id="employers_dropdown" Employers
-            i.fas.fa-caret-down
-            ul.dropdown-menu aria-labelledby="dropdownMenu1"
-              li
-                = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {tab_name: 'employers-invoice', link_path: main_app.employer_datatable_exchanges_hbx_profiles_path, display_name: 'Employers', active_tab: "employers", remote: false, pundit_object: nil, pundit_method: nil}
-              li
-                = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {tab_name: 'employers-staff', link_path: main_app.employer_staff_datatable_exchanges_hbx_profiles_path, display_name: 'Employer Staff', active_tab: "employer_staff", remote: false, pundit_object: nil, pundit_method: nil}
         - else
           li role="presentation"
             a.dropdown-toggle data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"
             = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'families', link_path: main_app.family_index_dt_exchanges_hbx_profiles_path, display_name: 'Families', active_tab: "families", remote: true, pundit_object: nil, pundit_method: nil }
-          li role="presentation"
-            a.dropdown-toggle data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"
-            = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'employers-invoice', link_path: main_app.employer_datatable_exchanges_hbx_profiles_path, display_name: 'Employers', active_tab: "employers", remote: true, pundit_object: nil, pundit_method: nil }
+
+        li.dropdown.pl-1 role="presentation"
+          a.dropdown-toggle data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" id="employers_dropdown" Employers
+          i.fas.fa-caret-down
+          ul.dropdown-menu aria-labelledby="dropdownMenu1"
+            li
+              = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {tab_name: 'employers-invoice', link_path: main_app.employer_datatable_exchanges_hbx_profiles_path, display_name: 'Employers', active_tab: "employers", remote: false, pundit_object: nil, pundit_method: nil}
+            - if ::EnrollRegistry.feature_enabled?(:display_employer_staff_datatable)
+              li
+                = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {tab_name: 'employers-staff', link_path: main_app.employer_staff_datatable_exchanges_hbx_profiles_path, display_name: 'Employer Staff', active_tab: "employer_staff", remote: false, pundit_object: nil, pundit_method: nil}
+
         - if aca_user_accounts_enabled
           li role="presentation"
             a.dropdown-toggle data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"
