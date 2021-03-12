@@ -5,7 +5,8 @@ Feature: Ability for employer to create an off-cycle benefit application and all
     And benefit market catalog exists for enrollment_open renewal employer with health benefits
     And there is an employer ABC Widgets
     And ABC Widgets employer has a staff role
-
+    
+    @flaky
     Scenario: Initial Employer is terminated. Employer is able to create off-cycle benefit application and employees are able to plan shop
       Given Qualifying life events are present
       And initial employer ABC Widgets has active benefit application
@@ -63,7 +64,7 @@ Feature: Ability for employer to create an off-cycle benefit application and all
       Then Employee should see the receipt page
       Then Employee should see the "my account" page
       And employee Patrick Doe of employer ABC Widgets most recent HBX Enrollment should be under the off cycle benefit application
-
+    @flaky
     Scenario: Renewal Employer is terminated. Employer is able to create off-cycle benefit application and employees are able to plan shop
       Given Qualifying life events are present
       And renewal employer ABC Widgets has active and renewal enrollment_open benefit applications
