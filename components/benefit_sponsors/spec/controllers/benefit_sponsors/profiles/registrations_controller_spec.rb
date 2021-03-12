@@ -185,7 +185,7 @@ module BenefitSponsors
 
           it "should not throw an exception" do
             expect(response).to redirect_to('http://test.host/users/sign_in')
-            expect(assigns(:agency).portal).to eq('true')
+            expect(assigns(:agency).portal).to be_truthy
           end
         end
         context "signed in" do
@@ -196,7 +196,7 @@ module BenefitSponsors
 
           it "should not throw an exception and render new template" do
             expect(response).to render_template :new
-            expect(assigns(:agency).portal).to eq('true')
+            expect(assigns(:agency).portal).to be_truthy
           end
         end
       end
