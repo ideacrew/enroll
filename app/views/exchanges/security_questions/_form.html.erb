@@ -2,7 +2,7 @@
     <% if @question.errors.any? %>
         <div class="alert alert-error">
           <h4>
-            <%= "#{pluralize(@question.errors.size, "error")} prohibited this question from being saved:" %>
+            <%= "#{pluralize(@question.errors.size, "error")} #{l10n("exchange.security_questions.error_cant_save")}" %>
           </h4>
           <ul>
             <% @question.errors.full_messages.each do |msg| %>
