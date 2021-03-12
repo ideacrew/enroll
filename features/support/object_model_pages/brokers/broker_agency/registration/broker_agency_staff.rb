@@ -35,4 +35,7 @@ class BrokerAgencyStaffRegistration
     '#broker-staff-btn'
   end
 
+  def self.approve_broker_btn
+    '.interaction-click-control-broker-approve'
+  end
 end

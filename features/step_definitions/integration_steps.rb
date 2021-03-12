@@ -631,6 +631,19 @@ When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
   find('.interaction-click-control-continue', text: 'CONTINUE', wait: 5).click
 end
 
+And(/^.+ completes and submits the matched employee form for (.*)$/) do |named_person|
+  wait_for_ajax
+  page.evaluate_script("window.location.reload()")
+  wait_for_ajax(3,2)
+  person = people[named_person]
+  fill_in "person[first_name]", with: person[:first_name]
+  fill_in "person[last_name]", with: person[:last_name]
+  fill_in 'jq_datepicker_ignore_person_dob', with: person[:dob]
+  fill_in 'person[ssn]', with: person[:ssn]
+  find('.interaction-click-control-continue', text: 'CONTINUE', wait: 5).click
+
+end
+
 And(/^.+ sees the (.*) page and clicks Continue$/) do |which_page|
   # Whats the point of the below
   # expect(page).to have_content(which_page)
@@ -944,7 +957,6 @@ end
 When(/^(?:General){0}.+ clicks? on the ((?:General|Staff){0}.+) option$/) do |tab_name|
   find(".interaction-click-control-#{tab_name.downcase.gsub(' ','-')}", wait: 5).click
   wait_for_ajax
-  find('#myTabContent').click
 end
 
 And(/^clicks on the person in families tab$/) do
