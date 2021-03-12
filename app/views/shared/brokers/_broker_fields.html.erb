@@ -95,7 +95,7 @@
             <tr>
               <th class="remove-top-bdr"><%= l10n("carrier_appointments") %>:</th>
               <td class="remove-top-bdr">
-               <% all_carrier_appointments = "BrokerRole::#{Settings.site.key.upcase}_BROKER_CARRIER_APPOINTMENTS".constantize.stringify_keys %>
+               <% all_carrier_appointments = EnrollRegistry[:brokers].setting(:carrier_appointments).item.stringify_keys %>
                 <% all_carrier_appointments.each do |name,value| %>
                   <div class="col-xs-6">
                     <div class="row">
