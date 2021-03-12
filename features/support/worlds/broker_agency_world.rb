@@ -27,6 +27,10 @@ module BrokerAgencyWorld
     end
   end
 
+  def all_broker_agencies
+    Person.all.select { |p| p.broker_role.present? }.map { |person| person.broker_role.broker_agency_profile }
+  end
+
   def broker_agency_profile(legal_name = nil)
     broker_agency_organization(legal_name).broker_agency_profile if broker_agency_organization(legal_name).present?
   end

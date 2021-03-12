@@ -5,6 +5,8 @@ module BenefitSponsors
       attr_reader :organization, :profile, :representative
       attr_accessor :profile_type, :profile_id, :factory_class
 
+      VALID_PROFILE_TYPES = ["benefit_sponsor", "broker_agency", "general_agency"].freeze
+
       def initialize(attrs={})
         @profile_id = attrs[:profile_id]
         @factory_class = BenefitSponsors::Organizations::Factories::ProfileFactory
@@ -17,6 +19,7 @@ module BenefitSponsors
       end
 
       def build(attrs)
+        return {} unless VALID_PROFILE_TYPES.include?(profile_type)
         organization = factory_class.build(attrs)
         params = attributes_to_form_params(organization)
         if attrs[:person_id].present?
@@ -59,6 +62,7 @@ module BenefitSponsors
       end
 
       def find
+        return {} unless VALID_PROFILE_TYPES.include?(profile_type)
         organization = factory_class.build(profile_id: profile_id, profile_type: profile_type)
         staff_roles = factory_class.find_representatives(profile_id, profile_type)
         attributes_to_form_params(organization, staff_roles)
@@ -83,6 +87,7 @@ module BenefitSponsors
       end
 
       def form_attributes_to_params(form)
+        return {} unless VALID_PROFILE_TYPES.include?(form.profile_type) || VALID_PROFILE_TYPES.include?(profile_type)
         {
           :"current_user_id" => form.current_user_id,
           :"profile_type" => (form.profile_type || profile_type),
