@@ -15,6 +15,8 @@ RSpec.describe BenefitSponsors::Entities::Employers::EmployerStaffRoles::Coverag
         dob: nil,
         hired_on: nil,
         is_applying_coverage: false,
+        has_other_coverage: false,
+        is_owner: false,
         address: {
           kind: nil,
           address_1: nil,

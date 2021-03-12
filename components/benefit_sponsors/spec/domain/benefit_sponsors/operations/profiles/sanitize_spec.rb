@@ -29,7 +29,7 @@ RSpec.describe BenefitSponsors::Operations::Profiles::Sanitize, dbclean: :after_
                    {is_applying_coverage: 'true',
                     ssn: '139239231',
                     gender: 'Male',
-                    hired_on: '2021-01-12',
+                    hired_on: '12/01/2021',
                     address: { kind: 'home', address_1: 'home', address_2: "", city: 'dc', state: 'DC', zip: '22302' }, email: { kind: 'work', address: 'test@test.com' }}}
         },
         organization: {
