@@ -86,7 +86,6 @@ Then(/^.+ should see heading labeled personal information/) do
 end
 
 Then(/^.+ should see disabled ssn & dob fields/) do
-  binding.pry
   expect(page.find("#person_ssn")[:disabled]).to eq "true"
   expect(page.find("input[name='jq_datepicker_ignore_person[dob]'")[:disabled]).to eq "true"
 end
