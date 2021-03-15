@@ -164,6 +164,40 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
 end
 
 describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "when:
+- there is no current coverage
+- there is no prior coverage
+- there is no open enrollment
+- the selection is IVL and admin sep is added for prior coverage year with renewal flag set to false
+", dbclean: :after_each do
+
+  include_context 'family has no current year coverage and not in open enrollment and purchased coverage in prior year via admin SEP'
+
+  let(:product_selection) do
+    Entities::ProductSelection.new({:enrollment => prior_ivl_enrollment, :product => prior_product, :family => family})
+  end
+
+  subject do
+    current_product
+    product_selection
+    allow(family).to receive(:current_sep).and_return sep
+    Operations::ProductSelectionEffects::DchbxProductSelectionEffects
+  end
+
+  it "does not create a continuous enrollment for future coverage period after purchase" do
+    subject
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_sep).and_return(true)
+    subject.call(product_selection)
+    family.reload
+    enrollments = family.hbx_enrollments.sort_by(&:effective_on)
+    expect(enrollments.length).to eq 1
+    renewal_enrollment = enrollments.last
+    renewal_start_date = renewal_enrollment.effective_on
+    expect(current_benefit_coverage_period.start_on).to eq renewal_start_date
+    expect(renewal_enrollment.product_id).to eq current_product.id
+  end
+end
+
+describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "when:
 - there is current coverage
 - there is no prior coverage
 - there is no open enrollment
