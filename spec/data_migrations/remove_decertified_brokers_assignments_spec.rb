@@ -6,7 +6,7 @@ describe RemoveDecertifiedBrokersAssignments do
   let(:employer_profile) {FactoryBot.create(:employer_profile, organization: organization, general_agency_accounts:[general_agency_account])}
   let(:broker_agency_account) {FactoryBot.create(:broker_agency_account, broker_agency_profile: broker_agency_profile,employer_profile: employer_profile, writing_agent_id:broker_role.id)}
   let(:organization) {FactoryBot.create(:organization)}
-  let(:broker_agency_profile) {FactoryBot.create(:broker_agency_profile, organization: organization, aasm_state: 'active')}
+  let(:broker_agency_profile) {FactoryBot.create(:broker_agency_profile, organization: organization, aasm_state: 'active', market_kind: :shop)}
   let(:general_agency_account) { FactoryBot.create(:general_agency_account, aasm_state: 'active') }
   let!(:family) {FactoryBot.create(:family, :with_primary_family_member, broker_agency_accounts:[broker_agency_account])}
   let(:broker_role) { FactoryBot.create(:broker_role,  broker_agency_profile: broker_agency_profile, aasm_state: 'active')}
