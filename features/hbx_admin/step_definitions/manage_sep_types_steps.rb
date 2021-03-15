@@ -231,6 +231,7 @@ Then(/^Admin should see successful message after sorting$/) do
   sleep(2)
 end
 
+# Need to use these for IVL seed
 When("Individual with known qles visits the Insured portal outside of open enrollment") do
   FactoryBot.create(:hbx_profile, :no_open_enrollment_coverage_period)
   BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!

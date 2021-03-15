@@ -11,7 +11,6 @@ Feature: Insured Plan Shopping on Individual market
     When user clicks on continue button
     Then Individual logs out
 
-  @flaky
   Scenario: New insured user purchases on individual market
     Given Individual resumes enrollment
     And Individual click on Sign In
