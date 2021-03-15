@@ -190,10 +190,6 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
     family.reload
     enrollments = family.hbx_enrollments.sort_by(&:effective_on)
     expect(enrollments.length).to eq 1
-    renewal_enrollment = enrollments.last
-    renewal_start_date = renewal_enrollment.effective_on
-    expect(current_benefit_coverage_period.start_on).to eq renewal_start_date
-    expect(renewal_enrollment.product_id).to eq current_product.id
   end
 end
 
