@@ -7,13 +7,13 @@ RSpec.describe Employers::BrokerAgencyController do
 
     @broker_role =  FactoryBot.create(:broker_role, aasm_state: 'active')
     @org1 = FactoryBot.create(:broker_agency, legal_name: "agencyone")
-    @org1.broker_agency_profile.update_attributes(primary_broker_role: @broker_role)
+    @org1.broker_agency_profile.update_attributes(primary_broker_role: @broker_role, market_kind: :shop)
     @broker_role.update_attributes(broker_agency_profile_id: @org1.broker_agency_profile.id)
     @org1.broker_agency_profile.approve!
 
     @broker_role2 = FactoryBot.create(:broker_role, aasm_state: 'active')
     @org2 = FactoryBot.create(:broker_agency, legal_name: "agencytwo")
-    @org2.broker_agency_profile.update_attributes(primary_broker_role: @broker_role2)
+    @org2.broker_agency_profile.update_attributes(primary_broker_role: @broker_role2, market_kind: :shop)
     @broker_role2.update_attributes(broker_agency_profile_id: @org2.broker_agency_profile.id)
     @org2.broker_agency_profile.approve!
 

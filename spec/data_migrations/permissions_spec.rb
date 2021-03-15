@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "define_permissions")
 
-describe DefinePermissions, dbclean: :after_each do
+describe DefinePermissions, dbclean: :around_each do
   subject { DefinePermissions.new(given_task_name, double(:current_scope => nil))}
   let(:roles) {%w{hbx_staff hbx_read_only hbx_csr_supervisor hbx_tier3 hbx_csr_tier2 hbx_csr_tier1 developer super_admin} }
   describe 'create permissions' do
@@ -178,7 +178,7 @@ describe DefinePermissions, dbclean: :after_each do
       end
 
       it "update can_access_age_off_excluded to true for tier1 & tier2 roles" do
-        expect(Person.all.count).to eq(7)
+        expect(Person.all.to_a.count).to eq(7)
         expect(@hbx_staff_person.hbx_staff_role.permission.can_access_age_off_excluded).to be true
         expect(@super_admin.hbx_staff_role.permission.can_access_age_off_excluded).to be true
         expect(@hbx_tier3.hbx_staff_role.permission.can_access_age_off_excluded).to be true

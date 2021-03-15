@@ -21,6 +21,7 @@ RSpec.describe PortalHeaderHelper, :type => :helper, dbclean: :after_each do
       let!(:employee_role) { FactoryBot.build(:employee_role, person: current_user.person, employer_profile: employer_profile)}
 
       it "should have I'm an Employer link when user has active employer_staff_role" do
+        allow(current_user).to receive(:has_employer_staff_role?).and_return true
         expect(portal_display_name(controller)).to eq "<a class=\"portal\" href=\"/benefit_sponsors/profiles/employers/employer_profiles/" + emp_id.to_s + "?tab=home\"><img src=\"/images/icons/icon-business-owner.png\" /> &nbsp; I'm an Employer</a>"
       end
 
