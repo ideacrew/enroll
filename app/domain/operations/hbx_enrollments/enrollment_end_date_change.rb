@@ -65,7 +65,7 @@ module Operations
       def terminate_enrollment(params)
         return Success('Enrollment updated') if @enrollment.cancel_terminated_enrollment(@termination_date, params['edi_required'].present?)
 
-       enrollment =  if !@enrollment.coverage_expired? &&  @termination_date > @enrollment.terminated_on
+        enrollment = if !@enrollment.coverage_expired? && @termination_date > @enrollment.terminated_on
                        reinstate_enrollment
                      else
                        update_end_date
@@ -127,11 +127,9 @@ module Operations
                              :aasm_state.in => eligible_states}).any?
       end
 
-
       def end_date_after_effects(updated_enrollment, edi_required)
         updated_enrollment.notify_enrollment_cancel_or_termination_event(edi_required)
       end
-
 
       def cancel_renewal_enrollments(updated_enrollment)
         if updated_enrollment.is_shop?
@@ -141,6 +139,8 @@ module Operations
         end
       end
 
+      # rubocop:disable Metrics/CyclomaticComplexity
+      # rubocop:disable Metrics/PerceivedComplexity
       def cancel_ivl_enrollments(updated_enrollment)
         coverage_period_start = updated_enrollment.effective_on.end_of_year.next_day
         benefit_coverage_period_year = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_period_by_effective_date(coverage_period_start)&.start_on&.year
@@ -160,9 +160,12 @@ module Operations
 
       def product_matched(enr, enrollment)
         return false unless enr.product.present?
-        enr.product_id == enrollment&.product&.renewal_product&.id || enr.product.hios_base_id == enrollment&.product&.renewal_product&.hios_base_id ||
-          enr.product.issuer_profile_id == enrollment&.product&.renewal_product&.issuer_profile_id
+        return true if enr.product_id == enrollment&.product&.renewal_product&.id
+        return true if enr.product.hios_base_id == enrollment&.product&.renewal_product&.hios_base_id
+        enr.product.issuer_profile_id == enrollment&.product&.renewal_product&.issuer_profile_id
       end
+      # rubocop:enable Metrics/CyclomaticComplexity
+      # rubocop:enable Metrics/PerceivedComplexity
 
       def cancel_shop_enrollments(updated_enrollment)
         eligible_state = BenefitSponsors::BenefitApplications::BenefitApplication::SUBMITTED_STATES
@@ -181,8 +184,7 @@ module Operations
                               :coverage_kind => enrollment.coverage_kind,
                               :kind => enrollment.kind,
                               :family_id => enrollment.family_id,
-                              :effective_on => successor_application.start_on
-                            })
+                              :effective_on => successor_application.start_on})
       end
     end
   end

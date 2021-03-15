@@ -14,15 +14,15 @@ RSpec.describe ::Operations::HbxEnrollments::Find, dbclean: :after_each do
     it 'should return enrollment record' do
       result = subject.call(valid_params)
 
-      expect(result.success?). to be_truthy
-      expect(result.success). to be_a HbxEnrollment
+      expect(result.success?).to be_truthy
+      expect(result.success).to be_a HbxEnrollment
     end
 
     it 'should throw an error' do
       result = subject.call(invalid_params)
 
-      expect(result.success?). to be_falsey
-      expect(result.failure[:message]). to eq(["Enrollment not found"])
+      expect(result.success?).to be_falsey
+      expect(result.failure[:message]).to eq(["Enrollment not found"])
     end
   end
 end

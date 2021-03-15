@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 require "#{BenefitSponsors::Engine.root}/spec/support/benefit_sponsors_site_spec_helpers"
@@ -37,7 +38,7 @@ RSpec.describe ::Operations::HbxEnrollments::EnrollmentEndDateChange, dbclean: :
 
       it 'fails' do
         expect(subject).not_to be_success
-        expect(subject.failure).to eq({:message=>["Enrollment not found"]})
+        expect(subject.failure).to eq({:message => ["Enrollment not found"]})
       end
     end
   end

@@ -483,15 +483,15 @@ def employer_poc
     begin
       @row = params[:family_actions_id]
       result = Operations::HbxEnrollments::EnrollmentEndDateChange.new.call(params)
-      if result.success?
-        message = {notice: "Enrollment Updated Successfully."}
-      else
-        message = {notice: "Unable to find/update Enrollment."}
-        redirect_to exchanges_hbx_profiles_root_path, flash: message
-      end
+      message = if result.success?
+                  {notice: "Enrollment Updated Successfully."}
+                else
+                  {notice: "Unable to find/update Enrollment."}
+                end
     rescue Exception => e
       message = {error: e.to_s}
     end
+    redirect_to exchanges_hbx_profiles_root_path, flash: message
   end
 
   def broker_agency_index
