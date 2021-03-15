@@ -129,7 +129,6 @@ module BenefitSponsors
       end
     end
 
-    
     def bad_token_due_to_session_expired
       flash[:warning] = "Session expired."
       respond_to do |format|
