@@ -376,7 +376,7 @@ And(/I click on log out link$/) do
 end
 
 And(/^.+ click on Sign In$/) do
-  expect(page).to have_content Site.header_message
+  expect(page).to have_content Settings.site.header_message
 end
 
 And(/I signed in$/) do
