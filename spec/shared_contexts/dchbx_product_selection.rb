@@ -652,6 +652,29 @@ RSpec.shared_context 'family has no current year coverage and not in open enroll
   end
 end
 
+RSpec.shared_context 'family has no current year coverage and not in open enrollment and purchased coverage in prior year via admin SEP', :shared_context => :metadata do
+  include_context 'prior and current benefit coverage periods and products'
+
+  let(:consumer_role) { FactoryBot.create(:consumer_role) }
+  let(:family) do
+    FactoryBot.create(:family,
+                      :with_primary_family_member,
+                      person: consumer_role.person)
+  end
+  let(:sep) {  FactoryBot.create(:special_enrollment_period, effective_on: Date.new(prior_coverage_year, 11, 1), family: family, admin_flag: true, coverage_renewal_flag: false)}
+  let(:prior_ivl_enrollment) do
+    FactoryBot.create(:hbx_enrollment,
+                      :individual_unassisted,
+                      :with_enrollment_members,
+                      enrollment_members: family.family_members,
+                      special_enrollment_period_id: sep.id,
+                      household: family.active_household,
+                      effective_on: Date.new(prior_coverage_year, 11, 1),
+                      family: family,
+                      product: prior_product)
+  end
+end
+
 RSpec.shared_context 'family has current year coverage and not in open enrollment and purchased coverage in prior year via SEP', :shared_context => :metadata do
   include_context 'prior and current benefit coverage periods and products'
 
