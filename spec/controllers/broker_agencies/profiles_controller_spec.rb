@@ -570,6 +570,7 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
     let!(:broker_agency_account) { FactoryBot.create(:broker_agency_account, employer_profile: employer_profile, broker_agency_profile_id: broker_agency_profile.id) }
 
     before :each do
+      broker_agency_profile.update(market_kind: :shop)
       allow(BrokerAgencyProfile).to receive(:find).and_return(broker_agency_profile)
     end
 

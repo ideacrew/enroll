@@ -307,14 +307,14 @@ RSpec.describe Organization, dbclean: :after_each do
           end
         end
         context "when individual market is disabled" do
-          let(:agency_1) { FactoryBot.create(:broker_agency, :shop_only, legal_name: "SHOP Health Brokers Inc") }
-          let(:agency_2) { FactoryBot.create(:broker_agency, :shop_only, legal_name: "SHOP Health Brokers Inc 2") }
+          let(:agency_1) { FactoryBot.create(:broker_agency, legal_name: "SHOP Health Brokers Inc") }
+          let(:agency_2) { FactoryBot.create(:broker_agency, legal_name: "SHOP Health Brokers Inc 2") }
 
           before do
-            stub_const("BrokerAgencyProfile::MARKET_KINDS", %W[shop])
-            agency_1.reload
-            agency_2.reload
+            agency_1.broker_agency_profile.update(market_kind: :shop)
+            agency_2.broker_agency_profile.update(market_kind: :shop)
           end
+
           it 'should return shop market agencies' do
             expect(Organization.broker_agencies_by_market_kind(['shop', 'both']).count).to eq(2)
           end

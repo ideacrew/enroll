@@ -22,6 +22,8 @@ module PermissionsConcern
     end
 
     def has_employee_role?
+      return false unless is_shop_or_fehb_market_enabled?
+
       person && person.active_employee_roles.present?
     end
 
@@ -34,6 +36,8 @@ module PermissionsConcern
     end
 
     def has_employer_staff_role?
+      return false unless is_shop_or_fehb_market_enabled?
+
       person && person.has_active_employer_staff_role?
     end
 
