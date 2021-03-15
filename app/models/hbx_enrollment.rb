@@ -2067,6 +2067,15 @@ class HbxEnrollment
     prior_bcp.contains?(effective_on)
   end
 
+  def fetch_term_or_expiration_date
+    if is_shop?
+      (coverage_expired? && !prior_plan_year_coverage?) ? sponsored_benefit_package.end_on : terminated_on
+    else
+      benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_period_by_effective_date(effective_on)
+      (coverage_expired? && !prior_plan_year_coverage?) ? benefit_coverage_period.end_on : terminated_on
+    end
+  end
+
   def current_year_ivl_coverage?
     current_bcp = HbxProfile.current_hbx&.benefit_sponsorship&.current_benefit_coverage_period
     return false unless current_bcp
@@ -2372,6 +2381,15 @@ class HbxEnrollment
 
   def cancel_ivl_enrollment
     return if is_shop?
+
+    previous_state = self.aasm_state
+    self.update_attributes(aasm_state: 'coverage_canceled')
+    workflow_state_transitions << WorkflowStateTransition.new(from_state: previous_state,
+                                                              to_state: 'coverage_canceled')
+  end
+
+  def cancel_shop_enrollment
+    return unless is_shop?
 
     previous_state = self.aasm_state
     self.update_attributes(aasm_state: 'coverage_canceled')
