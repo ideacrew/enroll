@@ -13,7 +13,7 @@ module BenefitSponsors
     let(:active_benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
 
     let!(:broker_organization)    { FactoryBot.build(:benefit_sponsors_organizations_general_organization, site: site)}
-    let!(:broker_agency_profile1) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile, organization: broker_organization, market_kind: 'shop', legal_name: 'Legal Name1') }
+    let!(:broker_agency_profile1) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile, organization: broker_organization, legal_name: 'Legal Name1') }
     let!(:person1) { FactoryBot.create(:person) }
     let!(:broker_role1) { FactoryBot.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile1.id, person: person1) }
     let(:broker_management_form_create) { BenefitSponsors::Organizations::OrganizationForms::BrokerManagementForm.new(

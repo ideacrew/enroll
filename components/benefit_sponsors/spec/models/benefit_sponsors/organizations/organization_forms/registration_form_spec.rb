@@ -2,7 +2,7 @@ require 'rails_helper'
 
 module BenefitSponsors
 
-  RSpec.describe Organizations::OrganizationForms::RegistrationForm, type: :model, dbclean: :after_each do
+  RSpec.describe Organizations::OrganizationForms::RegistrationForm, type: :model, dbclean: :around_each do
     let(:site)  { create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, Settings.site.key) }
     let!(:benefit_market)  { benefit_market = site.benefit_markets.first
                               benefit_market.save }
@@ -85,13 +85,16 @@ module BenefitSponsors
       end
 
       before :each do
-        params["organization"]["profile_attributes"].merge!(
+        if profile_type == 'broker_agency'
+          params["organization"]["profile_attributes"].merge!(
             {
               "ach_account_number" => "1234567890",
               "ach_routing_number" => "011000015",
               "ach_routing_number_confirmation" => "011000015"
             }
-        ) if profile_type == 'broker_agency'
+          )
+          BenefitSponsors::Organizations::BrokerAgencyProfile::MARKET_KINDS << :shop
+        end
       end
 
       let!(:create_form) { BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_create params }
@@ -263,6 +266,7 @@ module BenefitSponsors
         let(:update_form) { BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_update params }
 
         before do
+          BenefitSponsors::Organizations::BrokerAgencyProfile::MARKET_KINDS << :shop
           person.broker_role = BrokerRole.new(benefit_sponsors_broker_agency_profile_id:broker_agency_profile.id,provider_kind: "broker", npn:'12345678')
           person.save!
         end
