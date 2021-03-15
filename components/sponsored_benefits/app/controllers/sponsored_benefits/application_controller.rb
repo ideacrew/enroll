@@ -2,8 +2,18 @@ module SponsoredBenefits
   class ApplicationController < ActionController::Base
     before_action :set_broker_agency_profile_from_user
 
+    rescue_from ActionController::InvalidAuthenticityToken, :with => :bad_token_due_to_session_expired
+
     private
       helper_method :active_tab
+
+      def bad_token_due_to_session_expired
+        flash[:warning] = "Session expired."
+        respond_to do |format|
+          format.html { redirect_to root_path}
+          format.js   { render text: "window.location.assign('#{root_path}');"}
+        end
+      end
 
       def active_tab
         "employers-tab"
