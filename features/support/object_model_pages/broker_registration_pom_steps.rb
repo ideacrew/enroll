@@ -22,7 +22,7 @@ And(/Primary Broker enters broker agency information POM/) do
   # maybe make this flexible
   fill_in BrokerRegistration.legal_name, with: "Broker test pom"
   fill_in BrokerRegistration.dba, with: "Broker test"
-  select "Both – Individual & Family AND Small Business Marketplaces", from: BrokerRegistration.practice_area_dropdown
+  select "Individual & Family Marketplace ONLY", from: BrokerRegistration.practice_area_dropdown
   select "English", from: BrokerRegistration.select_languages
   find(BrokerRegistration.accept_new_client_checkbox).click
   fill_in BrokerRegistration.address, with: "123 test"
