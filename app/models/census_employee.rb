@@ -973,7 +973,7 @@ class CensusEmployee < CensusMember
   end
 
   def newhire_enrollment_eligible?
-    active_benefit_group_assignment.present?
+    active_benefit_group_assignment.present? && active_benefit_group_assignment.initialized?
   end
 
   # Deprecated in Main app
