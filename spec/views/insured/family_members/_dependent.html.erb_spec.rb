@@ -12,7 +12,6 @@ describe "insured/family_members/_dependent.html.erb", dbclean: :after_each do
     sign_in user
     allow(view).to receive(:edit_insured_family_member_path).and_return "#"
     allow(dependent).to receive(:age_on).with(Date.today).and_return 10
-    EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
   end
 
   it "should have name age gender relationship for dependent" do
