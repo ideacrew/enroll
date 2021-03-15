@@ -1,5 +1,5 @@
 class Employers::EmployersController < ApplicationController
-  include Authenticator
+  include ResourceConfigurator
 
 
   def search
