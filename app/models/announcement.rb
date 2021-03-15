@@ -2,8 +2,13 @@ class Announcement
   include Mongoid::Document
   include SetCurrentUser
   include Mongoid::Timestamps
+  include ::Config::SiteModelConcern
 
-  AUDIENCE_KINDS = %w[Employer Employee IVL Broker GA Web_Page].freeze
+  AUDIENCE_KINDS = [].tap do |a|
+    a << 'Employer' if is_shop_or_fehb_market_enabled?
+    a << 'Employee' if is_shop_or_fehb_market_enabled?
+    a << ['IVL', 'Broker', 'GA', 'Web_Page']
+  end.flatten
 
   field :content, type: String
   field :start_date, type: Date
@@ -46,6 +51,10 @@ class Announcement
       define_method "current_msg_for_#{kind.downcase}".to_sym do
         Announcement.current.by_audience(kind).map(&:content)
       end
+    end
+
+    def audience_kinds
+      AUDIENCE_KINDS
     end
 
     def get_announcements_by_portal(portal_path="", person=nil)
