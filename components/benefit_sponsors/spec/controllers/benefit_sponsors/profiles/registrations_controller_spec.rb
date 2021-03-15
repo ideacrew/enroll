@@ -271,6 +271,8 @@ module BenefitSponsors
         shared_examples_for "store profile for create" do |profile_type|
 
           before :each do
+            BenefitSponsors::Organizations::BrokerAgencyProfile::MARKET_KINDS << :shop if profile_type == 'broker_agency'
+            BenefitSponsors::Organizations::GeneralAgencyProfile::MARKET_KINDS << :shop if profile_type == 'general_agency'
             site.benefit_markets.first.save!
             user = self.send("#{profile_type}_user")
             sign_in user if user
