@@ -69,7 +69,7 @@ class SpecialEnrollmentPeriod
   field :admin_flag, type:Boolean
 
   #Renew coverage flag
-  field :coverage_renewal_flag, type: Boolean, default: false
+  field :coverage_renewal_flag, type: Boolean, default: true
 
   validate :optional_effective_on_dates_within_range, :next_poss_effective_date_within_range, on: :create
 

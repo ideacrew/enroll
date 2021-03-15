@@ -86,6 +86,62 @@ RSpec.describe Operations::UpdatePriorPlanCoverage, type: :model, dbclean: :afte
 
     context "when:
              - employee has active plan year and prior expired plan year
+             - employee has no coverage in expired py and active py
+             - employee purchased enrollment in expired plan year using admin added sep with coverage renewal flag false
+             ",  dbclean: :after_each do
+
+      include_context "setup expired, and active benefit applications"
+
+      let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_year.prev_year }
+      let!(:enrollment) do
+        FactoryBot.create(:hbx_enrollment,
+                          household: shop_family.latest_household,
+                          family: shop_family,
+                          coverage_kind: coverage_kind,
+                          effective_on: expired_benefit_application.start_on + 1.month,
+                          special_enrollment_period_id: sep.id,
+                          kind: "employer_sponsored",
+                          benefit_sponsorship_id: benefit_sponsorship.id,
+                          sponsored_benefit_package_id: expired_benefit_package.id,
+                          sponsored_benefit_id: expired_sponsored_benefit.id,
+                          employee_role_id: employee_role.id,
+                          benefit_group_assignment: census_employee.active_benefit_group_assignment,
+                          product_id: expired_sponsored_benefit.reference_product.id,
+                          aasm_state: 'coverage_selected')
+      end
+
+      let(:sep) do
+        sep = shop_family.special_enrollment_periods.new
+        sep.effective_on_kind = 'date_of_event'
+        sep.qualifying_life_event_kind = qle_kind
+        sep.qle_on = expired_benefit_application.start_on + 1.month
+        sep.start_on = sep.qle_on
+        sep.end_on = sep.qle_on + 30.days
+        sep.coverage_renewal_flag = false
+        sep.save
+        sep
+      end
+
+      before do
+        census_employee.benefit_group_assignments << build(:benefit_group_assignment, benefit_group: expired_benefit_package, census_employee: census_employee, start_on: expired_benefit_package.start_on, end_on: expired_benefit_package.end_on)
+        census_employee.benefit_group_assignments << build(:benefit_group_assignment, benefit_group: active_benefit_package, census_employee: census_employee, start_on: active_benefit_package.start_on, end_on: active_benefit_package.end_on)
+        census_employee.save
+        census_employee
+      end
+
+      let(:params) {{:enrollment => enrollment}}
+
+      it 'should expire prior py enrollment and should not renew current py enrollment' do
+        expect(shop_family.hbx_enrollments.count).to eq 1
+        subject.call(params)
+        shop_family.reload
+        expect(shop_family.hbx_enrollments.count).to eq 1
+        expect(shop_family.hbx_enrollments.map(&:aasm_state)).not_to include('coverage_enrolled')
+      end
+    end
+
+    context "when:
+             - employee has active plan year and prior expired plan year
              - employee has coverage in active py and no coverage in expired py
              - employee purchased enrollment in expired plan year using admin added sep with coverage renewal flag true
             ", dbclean: :after_each do
@@ -211,7 +267,7 @@ RSpec.describe Operations::UpdatePriorPlanCoverage, type: :model, dbclean: :afte
         sep.qle_on = terminated_benefit_application.start_on + 1.month
         sep.start_on = sep.qle_on
         sep.end_on = sep.qle_on + 30.days
-        sep.coverage_renewal_flag = true
+        sep.coverage_renewal_flag = false
         sep.save
         sep
       end
