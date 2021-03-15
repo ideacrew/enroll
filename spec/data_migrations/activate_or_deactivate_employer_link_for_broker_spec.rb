@@ -12,7 +12,7 @@ describe ActivateOrDeactivateEmployerLinkForBroker, dbclean: :around_each do
   let!(:organization)                   { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
   let!(:employer_profile)               { organization.employer_profile }
   let!(:broker_organization)            { FactoryBot.build(:benefit_sponsors_organizations_general_organization, site: site)}
-  let!(:broker_agency_profile1)         { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile, organization: broker_organization, market_kind: 'shop', legal_name: 'Legal Name1') }
+  let!(:broker_agency_profile1)         { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile, organization: broker_organization, legal_name: 'Legal Name1') }
   let(:active_plan_design_organization) {
                                           SponsoredBenefits::Organizations::PlanDesignOrganization.new(
                                             owner_profile_id: broker_agency_profile1._id,
