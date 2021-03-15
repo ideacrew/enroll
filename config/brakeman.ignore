@@ -220,6 +220,26 @@
       "note": ""
     },
     {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "33b80e66223df5d4b65ab14bd953caf4ea2fc55e2047c13e4b2ee3f5b71e4362",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "lib/rails_version_toggler.rb",
+      "line": 45,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`mv #{filename} \"#{file_info.keys[0]}/#{file_info.keys[0]}.gemspec_for_rails_#{current_rails_version}\"`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "RailsVersionToggler",
+        "method": "rename_and_switch_gemfiles"
+      },
+      "user_input": "filename",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
       "warning_type": "Mass Assignment",
       "warning_code": 70,
       "fingerprint": "389b0cb3440d678dcc0de5749f494b834dd18cbe6aa05db05ed94e9e8111a1ec",
@@ -602,7 +622,7 @@
       "check_name": "Execute",
       "message": "Possible command injection",
       "file": "lib/rails_version_toggler.rb",
-      "line": 43,
+      "line": 42,
       "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
       "code": "`mv \"#{file_info.keys[0]}/Gemfile.rails_#{target_rails_version}_lock\" #{filename}`",
       "render_path": null,
@@ -779,6 +799,26 @@
     {
       "warning_type": "Command Injection",
       "warning_code": 14,
+      "fingerprint": "d41dcf98c86691b186ffde2ce7b4bd5412922f3780ac0fe1be847b78891e8b5f",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "lib/rails_version_toggler.rb",
+      "line": 46,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`mv \"#{file_info.keys[0]}/#{file_info.keys[0]}.gemspec_for_rails_#{target_rails_version}\" #{filename}`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "RailsVersionToggler",
+        "method": "rename_and_switch_gemfiles"
+      },
+      "user_input": "file_info.keys[0]",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
       "fingerprint": "d8b1f403fa74add1a58d263a2714750ac7e3da05fadc319c83af5b94078a8f33",
       "check_name": "Execute",
       "message": "Possible command injection",
@@ -837,6 +877,6 @@
       "note": ""
     }
   ],
-  "updated": "2021-03-10 16:02:33 -0500",
+  "updated": "2021-03-15 09:10:50 -0400",
   "brakeman_version": "5.0.0"
 }
