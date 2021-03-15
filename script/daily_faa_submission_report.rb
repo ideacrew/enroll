@@ -3,14 +3,14 @@
 # This script generates a report to list all the Financial Applications
 # rails runner script/daily_faa_submission_report.rb -e production
 require 'csv'
-field_names = %w[Primary HBX ID
-                 Application ID
+field_names = %w[Primary_HBX_ID
+                 Application_ID
                  Age
                  UQHP
-                 APTC/CSR
-                 Magi Medicaid
-                 Non-Magi
-                 Date/Timestamp
+                 APTC_CSR
+                 Magi_Medicaid
+                 Non_Magi
+                 Date_Timestamp
                  ]
 
 logger_field_names = %w[id Backtrace]
