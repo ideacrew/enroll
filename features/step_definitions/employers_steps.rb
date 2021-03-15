@@ -540,7 +540,7 @@ Given(/^(.*?) employer is on Employee Roster page$/) do |legal_name|
 end
 
 Then(/^employer should (.*?) bulk actions dropdown in (.*?)$/) do |action, state|
-  if action == 'not see' && EnrollRegistry.feature_enabled?(:employee_datable_waiver_bulk_actions)
+  if action == 'not see'
     expect(page).not_to have_content('Bulk Actions')
   else
     expect(page).to have_content('Bulk Actions')
