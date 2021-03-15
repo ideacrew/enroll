@@ -17,43 +17,6 @@ class BrokerRole
     "Both – Individual & Family AND Small Business Marketplaces" => "both"
   }
 
-  DC_BROKER_CARRIER_APPOINTMENTS = {
-    "Aetna Health Inc" => nil,
-    "Aetna Life Insurance Company" => nil,
-    "Carefirst Bluechoice Inc" => nil,
-    "Group Hospitalization and Medical Services Inc" => nil,
-    "Kaiser Foundation" => nil,
-    "Optimum Choice" => nil,
-    "United Health Care Insurance" => nil,
-    "United Health Care Mid Atlantic" => nil
-  }.freeze
-
-  ME_BROKER_CARRIER_APPOINTMENTS = {
-    "Aetna Health Inc" => nil,
-    "Aetna Life Insurance Company" => nil,
-    "Carefirst Bluechoice Inc" => nil,
-    "Group Hospitalization and Medical Services Inc" => nil,
-    "Kaiser Foundation" => nil,
-    "Optimum Choice" => nil,
-    "United Health Care Insurance" => nil,
-    "United Health Care Mid Atlantic" => nil
-  }.freeze
-
-  CCA_BROKER_CARRIER_APPOINTMENTS = {
-    "Altus" => nil,
-    "Blue Cross Blue Shield MA" => nil,
-    "Boston Medical Center Health Plan" => nil,
-    "Delta" => nil,
-    "FCHP" => nil,
-    "Guardian" => nil,
-    "Health New England" => nil,
-    "Harvard Pilgrim Health Care" => nil,
-    "Minuteman Health" => nil,
-    "Neighborhood Health Plan" => nil,
-    "Tufts Health Plan Direct" => nil,
-    "Tufts Health Plan Premier" => nil
-  }.freeze
-
   embedded_in :person
 
   field :aasm_state, type: String
@@ -71,7 +34,7 @@ class BrokerRole
   field :accept_new_clients, type: Boolean
   field :license, type: Boolean
   field :training, type: Boolean
-  field :carrier_appointments, type: Hash, default: "BrokerRole::#{Settings.site.key.upcase}_BROKER_CARRIER_APPOINTMENTS".constantize
+  field :carrier_appointments, type: Hash, default: EnrollRegistry[:brokers].setting(:carrier_appointments).item || {}
 
   track_history :on => [:fields],
                 :scope => :person,

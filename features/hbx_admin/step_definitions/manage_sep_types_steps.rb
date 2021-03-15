@@ -913,3 +913,23 @@ end
 And("I should see a failure message for plan shopping") do
   expect(page).to have_content("You must select at least one Eligible applicant to enroll in the healthcare plan")
 end
+
+def Announcement.current_msg_for_employee
+  Announcement.current.by_audience('Employee').map(&:content)
+end
+
+def Announcement.current_msg_for_employer
+  Announcement.current.by_audience('Employer').map(&:content)
+end
+
+Given(/all announcements are enabled for user to select/) do
+  Announcement::AUDIENCE_KINDS = [].tap do |a|
+    a << 'Employer' if is_shop_or_fehb_market_enabled?
+    a << 'Employee' if is_shop_or_fehb_market_enabled?
+    a << ['IVL', 'Broker', 'GA', 'Web_Page']
+  end.flatten
+end
+
+Given(/all market kinds are enabled for user to select/) do
+  add_shop_markets_to_sep_types
+end

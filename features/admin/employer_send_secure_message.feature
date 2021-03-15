@@ -3,6 +3,7 @@ Feature: As a Super Admin I will have the ability to see and access "Send Secure
 
   Background: Setup site, employer, and benefit application
     Given the shop market configuration is enabled
+    Given all announcements are enabled for user to select
     Given a ACA site exists with a benefit market
     And there is an employer ABC Widgets
     Given that a user with a HBX staff role with Super Admin subrole exists and is logged in

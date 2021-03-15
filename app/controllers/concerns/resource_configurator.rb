@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #authenticates if a user has access to this actions
-module Authenticator
+module ResourceConfigurator
   extend ActiveSupport::Concern
 
   included do

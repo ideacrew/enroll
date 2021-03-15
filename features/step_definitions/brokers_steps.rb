@@ -204,11 +204,10 @@ When(/^.+ clicks? on Browse Brokers button$/) do
 end
 
 Then(/^.+ should see broker agencies index view$/) do
-  # all_broker_agencies.each do |broker_agency|
-  #  legal_name = broker_agency.legal_name
-  #  element = find("div#broker_agencies_listing a", text: /#{legal_name}/i, wait: 5)
-  #  expect(element).to be_present
-  # end
+  @broker_agency_profiles.each_key do |broker_agency_name|
+    element = find("div#broker_agencies_listing a", text: /#{broker_agency_name}/i, wait: 5)
+    expect(element).to be_present
+  end
 end
 
 When(/^.+ searches broker agency (.*?)$/) do |legal_name|

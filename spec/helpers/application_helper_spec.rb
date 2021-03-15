@@ -297,16 +297,16 @@ RSpec.describe ApplicationHelper, :type => :helper do
     let(:employer_profile) {organization.employer_profile}
     let(:employee_role) { FactoryBot.create(:employee_role, person: person, employer_profile: employer_profile)}
     let!(:broker_role) { FactoryBot.create(:broker_role, aasm_state: 'active') }
-    let!(:broker_agency_profile) { FactoryBot.create(:broker_agency_profile, aasm_state: 'is_approved', primary_broker_role: broker_role, organization: organization)}
     let!(:broker_agency_account) {FactoryBot.create(:broker_agency_account,broker_agency_profile_id: broker_agency_profile.id,writing_agent_id: broker_role.id, start_on: TimeKeeper.date_of_record)}
     let!(:broker_organization)            { FactoryBot.build(:benefit_sponsors_organizations_general_organization, site: site)}
-    let!(:broker_agency_profile)         { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile, organization: broker_organization, market_kind: 'shop', legal_name: 'Legal Name1') }
+    let!(:broker_agency_profile)         { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile, organization: broker_organization, legal_name: 'Legal Name1') }
 
     context 'person with dual roles' do
       before do
         allow(person).to receive(:employee_roles).and_return([employee_role])
         allow(person).to receive(:active_employee_roles).and_return([employee_role])
         allow(person).to receive(:consumer_role).and_return([])
+        allow(person).to receive(:has_active_employee_role?).and_return(true)
         allow(employer_profile).to receive(:broker_agency_profile).and_return([broker_agency_profile])
       end
 
