@@ -5,6 +5,7 @@ Background: Admin has ability to create a new Bulk Notice
   And the HBX admin is logged in
   And there is an employer ACME
 
+@flaky
 Scenario: Admin will create a new bulk notice
   Given Admin is on the new Bulk Notice view
   When Admin selects Employer
