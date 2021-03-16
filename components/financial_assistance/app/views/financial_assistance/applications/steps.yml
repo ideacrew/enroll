@@ -127,11 +127,9 @@
                     * Your right to choose your own political party or other political choice <br><br>
 
                     <b>To file a complaint, contact:</b><br>
-                    DC Board of Elections<br>
-                    1015 Half Street, SE<br>
-                    Suite 750<br>
-                    Washington, DC 20003<br>
-                    Phone: (202) 727-2525 <br>"
+                   #{Settings.contact_center.board_of_elections_entity} <br>
+                   #{Settings.contact_center.board_of_elections_email} <br>
+                   #{Settings.contact_center.board_of_elections_phone_number}"
 - step:
     heading: Submit Your Application
     heading_text: "This is the last step. Carefully read the information below. Select 'I agree' after each statement to acknowledge your agreement. Then, enter your name to electronically sign the application. When you're finished, select SUBMIT APPLICATION."

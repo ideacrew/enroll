@@ -92,7 +92,9 @@ contact_center:
 
   # TODO: Is this right for ME? Found this on the Maine.gov
   # https://www.maine.gov/sos/cec/elec/voter-info/index.html
-  board_of_elections_entity: 
+  board_of_elections_entity: "Division of the Secretary of State's Office"
+  board_of_elections_email: "cec.elections@maine.gov"
+  board_of_elections_phone_number: "207-624-7650"
 
   appeals: "info@dchealthlink.com"
 
