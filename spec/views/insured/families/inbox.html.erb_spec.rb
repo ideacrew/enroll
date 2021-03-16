@@ -108,6 +108,12 @@ describe "insured/families/inbox.html.erb", dbclean: :after_each do
         expect(rendered).not_to match(/Download Tax Documents/i)
       end
 
+      it "should load the appropriate link for the correct tax information" do
+        render template: "insured/families/inbox.html.erb"
+        click_link "Download Tax Documents"
+        expect(rendered).to match(/Download Tax Documents/i)
+      end
+
       context "for Curam Navigation" do
 
         before :each do
