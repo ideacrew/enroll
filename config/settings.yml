@@ -62,6 +62,7 @@ site:
   publisher: "dchl"
   prod_tax_info: "https://dchealthlink.com/individuals/tax-documents"
   staging_tax_info_url: "https://staging.dchealthlink.com/individuals/tax-documents"
+  statewide_area: "DC Metro"
 
   exchange_name: "Washington DC Health Benefit Exchange"
   social_media:

@@ -661,7 +661,7 @@ module ApplicationHelper
   end
 
   def ivl_metal_network(plan)
-    (plan.nationwide ? 'nationwide' : 'dc metro') if plan.benefit_market_kind == :aca_individual
+    (plan.nationwide ? 'nationwide' : Settings.site.statewide_area) if plan.benefit_market_kind == :aca_individual
   end
 
   def ivl_hsa_status(plan_hsa_status, plan)
@@ -677,8 +677,8 @@ module ApplicationHelper
   def network_type(product)
     if product.nationwide
       'Nationwide'
-    elsif product.dc_in_network
-      'DC-Metro'
+    elsif product.in_state_network
+      Settings.site.statewide_area
     end
   end
 
