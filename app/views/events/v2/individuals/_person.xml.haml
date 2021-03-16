@@ -1,6 +1,6 @@
 %person
   %id
-    %id= "urn:openhbx:hbx:#{Settings.site.exchange_hbx_id}:resources:v1:person:hbx_id##{person.hbx_id}"
+    %id= "urn:openhbx:hbx:dc0:resources:v1:person:hbx_id##{person.hbx_id}"
   = render :partial => "events/v2/shared/person_name", :object => person
   - if person.addresses.any?
     %addresses
