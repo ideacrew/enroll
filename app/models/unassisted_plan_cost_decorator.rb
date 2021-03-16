@@ -43,7 +43,8 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   end
 
   def rating_area
-    zip = hbx_enrollment.consumer_role.zip
+    # TODO: Seems to be hardcoded for demo
+    # zip = hbx_enrollment.consumer_role.zip
     county_id = ::BenefitMarkets::Locations::CountyZip.find_by(zip: "04210").id
     rating_area = ::BenefitMarkets::Locations::RatingArea.where(active_year: __getobj__.active_year).detect{|a| a.county_zip_ids.include?(county_id)}
     # rating_area.exchange_provided_code.present? ? rating_area.exchange_provided_code : __getobj__.premium_tables.first.rating_area.exchange_provided_code

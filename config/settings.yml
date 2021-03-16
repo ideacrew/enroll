@@ -1,5 +1,5 @@
 site:
-  key: :dc
+  key: :dc # TODO: Don't forget to change this to :me at some point
   subdomain: "cme"
   domain_name: "cme.enroll.openhbx.org"
   site_title: "Maine Cover ME"
@@ -49,7 +49,7 @@ site:
   healthcare_name: "www.healthcare.gov"
   healthcare_url: "https://www.healthcare.gov/"
   irs_url: "https://www.irs.gov/"
-  exchange_hbx_id: "DC0"
+  exchange_hbx_id: "ME0"
   mail_address: "info@dchealthlink.com"
   privacy_policy: "https://dchealthlink.com/"
   late_rates_message: "Due to a delay, premiums for some coverage effective dates are not available yet. Please check again soon to see if this information has been updated. You can also contact Customer Service or your broker if you need help."
