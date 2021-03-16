@@ -7,6 +7,12 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
   end
 
   describe "A new model instance", dbclean: :after_each do
+
+    before do
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_sep).and_return(true)
+      allow(EnrollRegistry[:prior_plan_year_sep].feature).to receive(:is_enabled).and_return(false)
+    end
+
     it { is_expected.to be_mongoid_document }
     it { is_expected.to have_fields(:qualifying_life_event_kind_id).of_type(BSON::ObjectId)}
     it { is_expected.to have_field(:qle_on).of_type(Date)}
