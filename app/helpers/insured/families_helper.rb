@@ -234,7 +234,7 @@ module Insured::FamiliesHelper
 
   def tax_info_url
     if ENV['AWS_ENV'] == 'prod'
-      Settings.site.prod_tax_info_url
+      Settings.site.prod_tax_info
     else
       Settings.site.staging_tax_info_url
     end
