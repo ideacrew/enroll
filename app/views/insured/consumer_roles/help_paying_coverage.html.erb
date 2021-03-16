@@ -8,8 +8,8 @@
         <input type='hidden' name='exit_after_method' value='false' id='exit_after_method'>
         <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 bottom-pd">
           <div class="bottom-pd">
-            <h2 class="darkblue">Your Application for Premium Reductions</h2>
-            <p><b>You can get help paying for coverage if you qualify.</b><span class="run-glossary"> If you don’t qualify for monthly premium reductions and lower out-of-pocket costs, we’ll also check if you likely qualify for Medicaid.</span></p>
+            <h2 class="darkblue"><%= l10n("insured.consumer_roles.application_for_reductions")%></h2>
+            <p><b><%= l10n("insured.consumer_roles.get_help")%></b><span class="run-glossary"><%= l10n("insured.consumer_roles.check_qualification")%></span></p>
 
             <p class="memo">* = required field</p>
 
@@ -17,19 +17,19 @@
 
               <div class="row row-form-wrapper no-buffer">
                 <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 fa-text-color margin-tb-10">
-                  <span class="fa-text-color" >Do you want to apply for monthly premium reductions and lower out-of-pocket costs? *</span>
+                  <span class="fa-text-color" ><%= l10n("insured.consumer_roles.apply_for_reductions_question") %> *</span>
                 </div>
 
                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" style="margin-top: 14px">
                   <input class=" " id="radio1"  type="radio" value="true" name="is_applying_for_assistance" <%='checked' if @person&.is_applying_for_assistance %>>
-                  <label class="radio-label" for="radio1"><span>Yes</span></label>
+                  <label class="radio-label" for="radio1"><span><%= l10n("yes")%></span></label>
                 </div>
                 <div class="col-lg-2 col-md-2 col-sm-1 col-xs-1" style="margin-top: 14px">
                   <input class=" " id="radio2"  type="radio" value="false" name="is_applying_for_assistance" <%='checked'if @person&.is_applying_for_assistance == false%>>
-                  <label class="radio-label" for="radio2"><span>No</span></label>
+                  <label class="radio-label" for="radio2"><span><%= l10n("no")%></span></label>
                 </div>
                 <div class="col-md-2 not-sure-margin left-seprator">
-                  <a href="#is_applying_for_assistance" data-toggle="modal" data-target="#is_applying_for_assistance">Not sure?</a>
+                  <a href="#is_applying_for_assistance" data-toggle="modal" data-target="#is_applying_for_assistance"><%= l10n("insured.consumer_roles.not_sure")%></a>
                   <% if EnrollRegistry.feature_enabled?(:financial_assistance) %>
                     <%= render partial: 'shared/modal_support_text_household', locals: {key: "is_applying_for_assistance"} %>
                   <% end %>
