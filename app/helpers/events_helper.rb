@@ -12,7 +12,7 @@ module EventsHelper
   def vocab_relationship_map(rel)
     rel.gsub(" ", "_")
   end
-
+  
   def xml_eligibility_event_uri(eligibility_event)
     eligibility_kind = eligibility_event.eligibility_event_kind
     event_uri = case eligibility_kind

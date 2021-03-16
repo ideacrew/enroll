@@ -1,7 +1,7 @@
 %enrollee
   %member
     %id
-      %id= "urn:openhbx:hbx:dc0:resources:v1:person:hbx_id##{hbx_enrollment_member.person.hbx_id}"
+      %id= "urn:openhbx:hbx:#{Settings.site.exchange_hbx_id}:resources:v1:person:hbx_id##{hbx_enrollment_member.person.hbx_id}"
     - if subscriber.person.primary_family.present?
       %primary_family_id
         %id=subscriber.person.primary_family.hbx_assigned_id
