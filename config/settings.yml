@@ -60,6 +60,7 @@ site:
   block_ie_browser: false
   block_ie_browser_after: <%= Date.new(2020,6,1) %>
   publisher: "dchl"
+  statewide_area: "State of Maine"
 
   exchange_name: "Maine Cover ME"
   social_media:
