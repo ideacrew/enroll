@@ -90,6 +90,14 @@ module BenefitSponsors
       it_behaves_like "should find profile and return form for profile", "benefit_sponsor"
       it_behaves_like "should find profile and return form for profile", "broker_agency"
       it_behaves_like "should find profile and return form for profile", "general_agency"
+
+      it "should not throw an exception if a random class is passed as profile_type" do
+        profile_type = "Thishouldnotexistandhopefullyitwillnot"
+        params = { profile_id: "1", profile_type: profile_type }
+        service = subject.new params
+        find_hash = service.find
+        expect(find_hash[:profile_type]).to eq(nil)
+      end
     end
 
 
