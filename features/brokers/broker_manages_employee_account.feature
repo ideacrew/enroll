@@ -14,6 +14,7 @@ Feature: Broker Manages Employee Account
     And initial employer ABC Widgets has enrollment_open benefit application
     And there is a census employee record for Patrick Doe for employer ABC Widgets
 
+  @flaky
   Scenario: Broker manages employer account
     When I go to the employee account creation page
     When Patrick Doe creates an HBX account
