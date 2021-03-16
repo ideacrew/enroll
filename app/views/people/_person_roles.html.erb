@@ -108,38 +108,6 @@
       </div>
     </div>
 
-    <div class="modal fade" id="addEmployerAccount" tabindex="-1" role="dialog" aria-labelledby="addEmployerAccountLabel" aria-hidden="true">
-      <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-          <div class="modal-body">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-            <h5 class="modal-title label-color" id="addEmployerAccountLabel"><%= l10n("hub.home_page.add_account.modal.employer_modal.title") %></h5>
-            <div class='modal-options'>
-              <p><%= l10n("hub.home_page.add_account.modal.employer_modal.description1") %> <strong>employer name</strong>. <%= l10n("hub.home_page.add_account.modal.employer_modal.description2") %> <strong><%= l10n("hub.home_page.add_account.modal.employer_modal.sub_description") %></strong> <%= l10n("hub.home_page.add_account.modal.employer_modal.description3") %></p>
-
-              <div class="form-check">
-                <input class="form-check-input" type="radio" name="employerRadioSelect" id="employerRadioSelect1" value="with_roster" checked>
-                <label class="form-check-label" for="employerRadioSelect1">
-                  <%= l10n("hub.home_page.add_account.modal.employer_modal.roster_yes_text") %> <strong><%= l10n("hub.home_page.add_account.modal.employer_modal.roster_sub_text") %></strong>
-                </label>
-              </div>
-              <div class="form-check">
-                <input class="form-check-input" type="radio" name="employerRadioSelect" id="employerRadioSelect2" value="without_roster">
-                <label class="form-check-label" for="employerRadioSelect2">
-                  <%= l10n("hub.home_page.add_account.modal.employer_modal.roster_no_text") %> <strong><%= l10n("hub.home_page.add_account.modal.employer_modal.roster_sub_text") %></strong>
-                </label>
-              </div>
-
-              <%= link_to 'Continue', benefit_sponsors.new_employer_profile_profiles_employers_employer_profiles_path(person_id: @person.id, profile_type: :benefit_sponsor, with_roster: true) , class: "btn btn-danger with_roster_link" %>
-              <%= link_to 'Continue', benefit_sponsors.new_employer_profile_profiles_employers_employer_profiles_path(person_id: @person.id, profile_type: :benefit_sponsor, with_roster: false) , class: "btn btn-danger without_roster_link hidden" %>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <div class="modal fade" id="addIvlAccount" tabindex="-1" role="dialog" aria-labelledby="addIvlAccountLabel" aria-hidden="true">
       <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
@@ -189,6 +157,40 @@
                 </button>
                 <div class="dropdown-menu dropdown-menu-right actions-menu" aria-labelledby="dropdownMenuButton">
                   <span class="dropdown-item" data-toggle="modal" data-target="#addEmployerAccount" data-dismiss="modal">Copy this info to <strong>a new account</strong></span>
+                </div>
+              </div>
+            </div>
+
+            <%# binding.pry %>
+
+            <div class="modal fade" id="addEmployerAccount" tabindex="-1" role="dialog" aria-labelledby="addEmployerAccountLabel" aria-hidden="true">
+              <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                  <div class="modal-body">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h5 class="modal-title label-color" id="addEmployerAccountLabel"><%= l10n("hub.home_page.add_account.modal.employer_modal.title") %></h5>
+                    <div class='modal-options'>
+                      <p><%= l10n("hub.home_page.add_account.modal.employer_modal.description1") %> <strong>employer name</strong>. <%= l10n("hub.home_page.add_account.modal.employer_modal.description2") %> <strong><%= l10n("hub.home_page.add_account.modal.employer_modal.sub_description") %></strong> <%= l10n("hub.home_page.add_account.modal.employer_modal.description3") %></p>
+
+                      <div class="form-check">
+                        <input class="form-check-input" type="radio" name="employerRadioSelect" id="employerRadioSelect1" value="with_roster" checked>
+                        <label class="form-check-label" for="employerRadioSelect1">
+                          <%= l10n("hub.home_page.add_account.modal.employer_modal.roster_yes_text") %> <strong><%= l10n("hub.home_page.add_account.modal.employer_modal.roster_sub_text") %></strong>
+                        </label>
+                      </div>
+                      <div class="form-check">
+                        <input class="form-check-input" type="radio" name="employerRadioSelect" id="employerRadioSelect2" value="without_roster">
+                        <label class="form-check-label" for="employerRadioSelect2">
+                          <%= l10n("hub.home_page.add_account.modal.employer_modal.roster_no_text") %> <strong><%= l10n("hub.home_page.add_account.modal.employer_modal.roster_sub_text") %></strong>
+                        </label>
+                      </div>
+
+                      <%= link_to 'Continue', benefit_sponsors.new_employer_profile_profiles_employers_employer_profiles_path(person_id: @person.id, profile_id: active_role.role_id, profile_type: :benefit_sponsor, with_roster: true) , class: "btn btn-danger with_roster_link" %>
+                      <%= link_to 'Continue', benefit_sponsors.new_employer_profile_profiles_employers_employer_profiles_path(person_id: @person.id, profile_id: active_role.role_id, profile_type: :benefit_sponsor, with_roster: false) , class: "btn btn-danger without_roster_link hidden" %>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

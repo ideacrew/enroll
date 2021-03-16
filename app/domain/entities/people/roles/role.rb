@@ -14,6 +14,7 @@ module Entities
         attribute :date,        Types::Date.optional.meta(omittable: true)
         attribute :status,      Types::Symbol
         attribute :description, Types::String.optional.meta(omittable: true)
+        attribute :role_id,     Types::String.optional.meta(omittable: true)
       end
     end
   end

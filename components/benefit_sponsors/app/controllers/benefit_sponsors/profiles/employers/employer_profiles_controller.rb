@@ -83,7 +83,7 @@ module BenefitSponsors
         def new_employer_profile
           authorize User, :add_roles?
           @person_id = params[:person_id]
-          @agency = BenefitSponsors::Operations::Employers::New.new.call({person_id: params[:person_id], profile_type: params[:profile_type], regitration_params: registration_params}).value!
+          @agency = BenefitSponsors::Operations::Employers::New.new.call({person_id: params[:person_id], profile_type: params[:profile_type], regitration_params: registration_params, profile_id: params[:profile_id]}).value!
           @staff_member = BenefitSponsors::Operations::Employers::Forms::NewEmployerStaff.new.call({id: params[:person_id]}).value!
           respond_to do |format|
             format.html

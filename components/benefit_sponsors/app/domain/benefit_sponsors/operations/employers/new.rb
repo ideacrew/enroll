@@ -10,6 +10,7 @@ module BenefitSponsors
         def call(params)
           validated_params = yield validate(params)
           @person = yield find_person(validated_params[:person_id]) if validated_params[:person_id].present?
+          @profile = yield find_profile(validated_params[:profile_id]) if validated_params[:profile_id].present?
 
           employer = yield build_employer(validated_params[:profile_type])
           Success(employer)
@@ -29,6 +30,10 @@ module BenefitSponsors
 
         def find_person(id)
           ::Operations::People::Find.new.call({person_id: id})
+        end
+
+        def find_profile(id)
+          Success(::BenefitSponsors::Organizations::Profile.find(id))
         end
 
         def build_employer(profile_type)
@@ -54,13 +59,15 @@ module BenefitSponsors
         end
 
         def construct_organization_params
-          organization = BenefitSponsors::Entities::Organizations::Organization.to_hash(BenefitSponsors::Organizations::GeneralOrganization.new)
+          existing_org = @profile&.organization
+          organization = BenefitSponsors::Entities::Organizations::Organization.to_hash(BenefitSponsors::Organizations::GeneralOrganization.new({entity_kind: existing_org&.entity_kind, legal_name: existing_org&.legal_name, dba: existing_org&.dba}))
           organization.merge!(profile: construct_profile_params)
         end
 
         def construct_profile_params
-          profile = BenefitSponsors::Entities::Profiles::AcaShopDcEmployerProfile.to_hash(BenefitSponsors::Organizations::AcaShopDcEmployerProfile.new)
-          profile.merge!(office_locations: [construct_office_location])
+          profile = BenefitSponsors::Entities::Profiles::AcaShopDcEmployerProfile.to_hash(@profile || BenefitSponsors::Organizations::AcaShopDcEmployerProfile.new)
+          profile.merge!(office_locations: [construct_office_location]) if @profile.blank?
+          profile
         end
 
         def construct_office_location

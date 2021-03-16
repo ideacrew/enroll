@@ -63,14 +63,15 @@ module Operations
           Success(entity)
         end
 
-        def role_params(name, link, kind, created_at, status)
+        def role_params(attrs)
           {
-            name: name,
-            link: link,
-            kind: kind,
-            date: created_at,
-            status: status,
-            description: get_role_desc(kind.downcase)
+            name: attrs[:name],
+            link: attrs[:link],
+            kind: attrs[:kind],
+            date: attrs[:created_at],
+            status: attrs[:status],
+            description: get_role_desc(attrs[:kind].downcase),
+            role_id: attrs[:role_id]
           }
         end
 
@@ -87,7 +88,7 @@ module Operations
         def fetch_hbx_admin_details(person)
           return unless person.hbx_staff_role.present?
 
-          role_params(person.full_name, "/exchanges/hbx_profiles", person.hbx_staff_role.subrole.split('_').join(" "), person.hbx_staff_role.created_at.to_date, :active)
+          role_params({ name: person.full_name, link: "/exchanges/hbx_profiles", kind: person.hbx_staff_role.subrole.split('_').join(" "), created_at: person.hbx_staff_role.created_at.to_date, status: :active })
         end
 
         def fetch_consumer_details(person)
@@ -95,7 +96,7 @@ module Operations
 
           link = person.consumer_role.bookmark_url || "/families/home"
 
-          role_params('My Coverage', link, "consumer", person.consumer_role.created_at.to_date, :active)
+          role_params({ name: 'My Coverage', link: link, kind: "consumer", created_at: person.consumer_role.created_at.to_date, status: :active })
         end
 
         def fetch_resident_details(person)
@@ -103,14 +104,14 @@ module Operations
 
           link = person.resident_role.bookmark_url
 
-          role_params('My Coverage', link, "resident", person.resident_role.created_at.to_date, :active)
+          role_params({ name: 'My Coverage', link: link, kind: "resident", created_at: person.resident_role.created_at.to_date, status: :active })
         end
 
         def fetch_employee_details(ee_role)
           link = ee_role.is_active? ? "/families/home" : nil
           created_at = ee_role.created_at.to_date
           status = ee_role.is_active? ? :active : :inactive
-          role_params('My Coverage', link, "Employee", created_at, status)
+          role_params({ name: 'My Coverage', link: link, kind: "Employee", created_at: created_at, status: status })
         end
 
         def fetch_employer_staff_details(er_role)
@@ -118,7 +119,7 @@ module Operations
           link = er_role.fetch_redirection_link
           created_at = er_role.created_at.to_date
           name = er_role.profile.legal_name
-          role_params(name, link, "Employer Staff", created_at, status)
+          role_params({ name: name, link: link, kind: "Employer Staff", created_at: created_at, status: status, role_id: er_role.benefit_sponsor_employer_profile_id.to_s })
         end
 
         def fetch_broker_staff_details(broker_staff_role)
@@ -127,7 +128,7 @@ module Operations
           link = broker_staff_role.fetch_redirection_link
           created_at = broker_staff_role.created_at.present? ? broker_staff_role.created_at.to_date : nil
           name = profile.legal_name
-          role_params(name, link, "Broker Staff", created_at, status)
+          role_params({ name: name, link: link, kind: "Broker Staff", created_at: created_at, status: status })
         end
 
         def fetch_ga_staff_details(ga_staff_role)
@@ -136,7 +137,7 @@ module Operations
           link = ga_staff_role.fetch_redirection_link
           created_at = ga_staff_role.created_at.present? ? ga_staff_role.created_at.to_date : nil
           name = profile.legal_name
-          role_params(name, link, "GA Staff", created_at, status)
+          role_params({ name: name, link: link, kind: "GA Staff", created_at: created_at, status: status })
         end
 
         def fetch_status(aasm_state)
