@@ -18,8 +18,10 @@
           <th><%= l10n("hbx_id")%></th>
           <th><%= l10n("family")%></th>
           <th><%= l10n("registered?")%></th>
-          <th>Consumer?</th>
-          <th>Employee?</th>
+          <% if is_shop_or_fehb_market_enabled? %>
+            <th>Consumer?</th>
+            <th>Employee?</th>
+          <% end %>
         </tr>
         </thead>
         <tbody>
@@ -28,6 +30,13 @@
     </div>
 
     <script type="text/javascript" charset="utf-8">
+
+        var columnList = [{ data: 'name'}, { data: 'ssn' }, { data: 'dob' }, { data: 'hbx_id'}, { data: 'family_count'}, { data: 'registered'}]
+        var filteredColumnList = <% if is_shop_or_fehb_market_enabled? %>
+                                    columnList.push({data: 'consumer'}, {data: 'employee'})
+                                 <% else %>
+                                    columnList
+                                 <% end %>
       // datatables setup
       $(document).ready(function() {
         $('#Broker-Family-dataTable').DataTable( {
@@ -44,16 +53,7 @@
               console.log("Broker-Family-dataTable datatable")
             }
           },
-          "columns": [
-            { data: 'name'},
-            { data: 'ssn' },
-            { data: 'dob' },
-            { data: 'hbx_id'},
-            { data: 'family_count'},
-            { data: 'registered'},
-            { data: 'consumer'},
-            { data: 'employee'}
-      ],
+            "columns": filteredColumnList,
 'dom': "<'row'" +
           "<'col-sm-7 col-md-7'B><'col-sm-5 col-md-5'f>" +
         ">" +
