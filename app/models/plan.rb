@@ -308,7 +308,13 @@ class Plan
   scope :by_plan_ids, ->(plan_ids) { where(:id => {"$in" => plan_ids}) }
 
   scope :by_nationwide, ->(types) { where(:nationwide => {"$in" => types})}
+  # TODO: Refactor this to in_state_network or something similar
   scope :by_dc_network, ->(types) { where(:dc_in_network => {"$in" => types})}
+
+  # TODO: Value is hardcoded for Maine, figure out how to update this
+  def in_state_network
+    self.dc_in_network
+  end
 
   # Carriers: use class method (which may be chained)
   def self.find_by_carrier_profile(carrier_profile)
@@ -626,6 +632,7 @@ class Plan
         [ carrier_profile.legal_name, carrier_profile.abbrev, carrier_profile.id ]
         }.uniq.unshift(['any','any'])
       selectors[:plan_types] =  plans.map{|p| p.plan_type}.uniq.unshift('any')
+      # TODO: Refactor this to in_state_network oor something
       selectors[:dc_network] =  ['any', 'true', 'false']
       selectors[:nationwide] =  ['any', 'true', 'false']
       selectors

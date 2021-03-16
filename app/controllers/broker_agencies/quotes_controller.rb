@@ -675,6 +675,7 @@ private
     carrier = params[:carrier_id].nil? ? [] : params[:carrier_id]
     dental_level = params[:dental_level].nil? ? [] : params[:dental_level]
     plan_type = params[:plan_type].nil? ? [] : params[:plan_type]
+    # TODO: Refactor this to in_state_network or smoething similar
     dc_network = params[:dc_network].nil?  ? [] : params[:dc_network]
     nationwide = params[:nationwide].nil? ? [] : params[:nationwide]
     @dental_plans = @dental_plans.by_carrier_profile_for_bqt(params[:carrier_id]) unless  carrier.empty? || carrier.include?('')
