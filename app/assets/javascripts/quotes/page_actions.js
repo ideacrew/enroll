@@ -288,6 +288,7 @@ QuotePageLoad = (function() {
           toggle_plans([])
           reset_selected_plans()
       })
+      // TODO: Refactor this to change .dc_network to .in_state_network or something similar, but be careful for downstream issues
       $('.dental_carrier, .dental_metal, .dental_plan_type, .dc_network, .nationwide').on('click', function(){
 
         class_name = $(this).attr('class').split(' ')[0]
