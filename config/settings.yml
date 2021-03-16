@@ -60,6 +60,8 @@ site:
   block_ie_browser: false
   block_ie_browser_after: <%= Date.new(2020,6,1) %>
   publisher: "dchl"
+  privacy_url: "https://www.dchealthlink.com/privacy"
+  privacy_act_statement_url: "https://www.dchealthlink.com/privacy-act-statement"
 
   exchange_name: "Washington DC Health Benefit Exchange"
   social_media:
