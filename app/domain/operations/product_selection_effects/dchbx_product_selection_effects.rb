@@ -31,7 +31,7 @@ module Operations
           benefit_group_assignment.save
         end
 
-        try_to_renew = if ::EnrollRegistry.feature_enabled?(:prior_plan_year_sep) && enrollment.prior_year_ivl_coverage?
+        try_to_renew = if ::EnrollRegistry.feature_enabled?(:prior_plan_year_sep) && enrollment.special_enrollment_period.present? && enrollment.prior_year_ivl_coverage?
                          renew_prior_py_ivl_enrollments(enrollment)
                        else
                          renew_ivl_if_is_open_enrollment(enrollment)
@@ -56,7 +56,7 @@ module Operations
 
       def renew_prior_py_ivl_enrollments(enrollment)
         sep = enrollment.special_enrollment_period
-        return nil if !sep.coverage_renewal_flag && sep.admin_flag
+        return nil unless sep.coverage_renewal_flag
         return nil if enrollment.is_shop?
         @benefit_coverage_periods = fetch_bcp_gt_enr_effective_year(enrollment)
         return nil if @benefit_coverage_periods.empty?
