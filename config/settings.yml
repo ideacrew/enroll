@@ -60,6 +60,8 @@ site:
   block_ie_browser: false
   block_ie_browser_after: <%= Date.new(2020,6,1) %>
   publisher: "dchl"
+  prod_tax_info: # link for dc "https://dchealthlink.com/individuals/tax-documents"
+  staging_tax_info_url: # link for dc "https://staging.dchealthlink.com/individuals/tax-documents"
 
   exchange_name: "Maine Cover ME"
   social_media:
