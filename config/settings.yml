@@ -88,6 +88,12 @@ contact_center:
   small_business_email: "smallbusiness@coverme.gov"
   non_discrimination_email: "info@dchealthlink.com"
 
+  # Voting info
+
+  # TODO: Is this right for ME? Found this on the Maine.gov
+  # https://www.maine.gov/sos/cec/elec/voter-info/index.html
+  board_of_elections_entity: 
+
   appeals: "info@dchealthlink.com"
 
   mailing_address:
