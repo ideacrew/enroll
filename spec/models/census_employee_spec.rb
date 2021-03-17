@@ -3084,17 +3084,17 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       let!(:benefit_group_assignment_two) { BenefitGroupAssignment.on_date(census_employee, renewal_effective_date) }
       let!(:renewal_enrollment) do
         FactoryBot.create(
-            :hbx_enrollment,
-            household: census_employee.employee_role.person.primary_family.active_household,
-            coverage_kind: "health",
-            kind: "employer_sponsored",
-            effective_on: renewal_benefit_group2.start_on,
-            family: census_employee.employee_role.person.primary_family,
-            benefit_sponsorship_id: benefit_sponsorship.id,
-            sponsored_benefit_package_id: renewal_benefit_group2.id,
-            employee_role_id: census_employee.employee_role.id,
-            benefit_group_assignment_id: census_employee.renewal_benefit_group_assignment.id,
-            aasm_state: "auto_renewing"
+          :hbx_enrollment,
+          household: census_employee.employee_role.person.primary_family.active_household,
+          coverage_kind: "health",
+          kind: "employer_sponsored",
+          effective_on: renewal_benefit_group2.start_on,
+          family: census_employee.employee_role.person.primary_family,
+          benefit_sponsorship_id: benefit_sponsorship.id,
+          sponsored_benefit_package_id: renewal_benefit_group2.id,
+          employee_role_id: census_employee.employee_role.id,
+          benefit_group_assignment_id: census_employee.renewal_benefit_group_assignment.id,
+          aasm_state: "auto_renewing"
         )
       end
 
