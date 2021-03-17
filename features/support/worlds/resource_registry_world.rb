@@ -20,7 +20,7 @@ module ResourceRegistryWorld
   end
 
   def add_shop_markets_to_sep_types
-    EnrollRegistry[:sep_types].settings(:only_individual).meta.stub(:enum).and_return([{individual: "Individual"}, {shop: "SHOP"}, {fehb: "Congress"}])
+    EnrollRegistry[:sep_types].settings(:market_kind).meta.stub(:enum).and_return([{individual: "Individual"}, {shop: "SHOP"}, {fehb: "Congress"}])
   end
 end
 
