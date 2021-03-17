@@ -10,8 +10,8 @@ field_names = %w[Primary_HBX_ID
                  APTC_CSR
                  Magi_Medicaid
                  Non_Magi
-                 Date_Timestamp
                  Is_Totally_Ineligible
+                 Submitted_At
                  Full_Medicaid_Applied?
                  ]
 
@@ -32,12 +32,12 @@ CSV.open(logger_file_name, 'w', force_quotes: true) do |logger_csv|
       application.applicants.each do |applicant|
         age = applicant.age_on(end_time)
         uqhp_eligble = applicant.is_without_assistance
-        aptc = applicant.is_ia_eligible?
-        medicaid_eligible = applicant.is_medicaid_chip_eligible?
+        aptc = applicant.is_ia_eligible
+        medicaid_eligible = applicant.is_medicaid_chip_eligible
         non_magi_medicaid_eligible = applicant.is_non_magi_medicaid_eligible
         is_totally_ineligible = applicant.is_totally_ineligible
         report_csv << [application&.primary_applicant&.person_hbx_id, application.hbx_id, age, uqhp_eligble, aptc, medicaid_eligible,
-          non_magi_medicaid_eligible, application.submitted_at, is_totally_ineligible, application.full_medicaid_determination]
+          non_magi_medicaid_eligible, is_totally_ineligible, application.submitted_at, application.full_medicaid_determination]
       end
     rescue StandardError => e
       logger_csv << [application.id, e.backtrace[0..5].join('\n')]
