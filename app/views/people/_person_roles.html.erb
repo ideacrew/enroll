@@ -132,8 +132,8 @@
                 </label>
               </div>
 
-              <%= link_to 'Continue', main_app.privacy_insured_consumer_role_index_path(aqhp: true, person_id: @person.id), class: 'btn btn-danger aqhp_link' %>
-              <%= link_to 'Continue', main_app.privacy_insured_consumer_role_index_path(uqhp: true, person_id: @person.id), class: 'btn btn-danger uqhp_link hidden' %>
+              <%= link_to l10n("hub.buttons.continue"), main_app.privacy_insured_consumer_role_index_path(aqhp: true, person_id: @person.id), class: 'btn btn-danger aqhp_link' %>
+              <%= link_to l10n("hub.buttons.continue"), main_app.privacy_insured_consumer_role_index_path(uqhp: true, person_id: @person.id), class: 'btn btn-danger uqhp_link hidden' %>
             </div>
           </div>
         </div>
@@ -184,10 +184,9 @@
                           <%= l10n("hub.home_page.add_account.modal.employer_modal.roster_no_text") %> <strong><%= l10n("hub.home_page.add_account.modal.employer_modal.roster_sub_text") %></strong>
                         </label>
                       </div>
-                      <%= l10n("hub.buttons.continue") %>
 
-                      <%= link_to 'Continue', benefit_sponsors.new_employer_profile_profiles_employers_employer_profiles_path(person_id: @person.id, profile_id: active_role.role_id, profile_type: :benefit_sponsor, with_roster: true) , class: "btn btn-danger with_roster_link" %>
-                      <%= link_to 'Continue', benefit_sponsors.new_employer_profile_profiles_employers_employer_profiles_path(person_id: @person.id, profile_id: active_role.role_id, profile_type: :benefit_sponsor, with_roster: false) , class: "btn btn-danger without_roster_link hidden" %>
+                      <%= link_to l10n("hub.buttons.continue"), benefit_sponsors.new_employer_profile_profiles_employers_employer_profiles_path(person_id: @person.id, profile_id: active_role.role_id, profile_type: :benefit_sponsor, with_roster: true) , class: "btn btn-danger with_roster_link" %>
+                      <%= link_to l10n("hub.buttons.continue"), benefit_sponsors.new_employer_profile_profiles_employers_employer_profiles_path(person_id: @person.id, profile_id: active_role.role_id, profile_type: :benefit_sponsor, with_roster: false) , class: "btn btn-danger without_roster_link hidden" %>
                     </div>
                   </div>
                 </div>
