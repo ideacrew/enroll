@@ -688,6 +688,7 @@ module FinancialAssistance
 
     def send_failed_response
       unless has_eligibility_response
+        log("Timed Out: Eligibility Response Error", {:severity => 'critical', :error_message => "999 Eligibility Response Error for application_id #{_id}"}) if determination_http_status_code == 999
         message = "Timed-out waiting for eligibility determination response"
         return_status = 504
         notify("acapi.info.events.eligibility_determination.rejected",
@@ -1013,7 +1014,7 @@ module FinancialAssistance
           %w[Income MEC].collect do |type|
             VerificationType.new(type_name: type, validation_status: 'pending')
           end
-        applicant.move_to_pending!        
+        applicant.move_to_pending!
       end
     end
 
