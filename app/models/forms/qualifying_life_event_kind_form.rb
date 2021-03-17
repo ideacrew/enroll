@@ -18,7 +18,6 @@ module Forms
     attribute :is_self_attested, Types::Bool
     attribute :post_event_sep_in_days, Types::Integer
     attribute :market_kind, Types::String
-    attribute :only_individual, Types::String
     attribute :effective_on_kinds, Types::Array.of(Types::String)
     attribute :ordinal_position, Types::Integer.default(0)
     attribute :_id, Types::String.optional
