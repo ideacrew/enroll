@@ -15,6 +15,7 @@ module FinancialAssistance
     STATE_HEALTH_BENEFITS = %w[medicaid].freeze
 
     INSURANCE_KINDS = %w[
+      private_individual_and_family_coverage
       acf_refugee_medical_assistance
       americorps_health_benefits
       child_health_insurance_plan
@@ -22,7 +23,6 @@ module FinancialAssistance
       medicare
       medicare_advantage
       medicare_part_b
-      private_individual_and_family_coverage
       state_supplementary_payment
       tricare
       veterans_benefits
@@ -46,6 +46,7 @@ module FinancialAssistance
     ].freeze
 
     INSURANCE_TYPE = {
+      private_individual_and_family_coverage: 'Private individual and family coverage',
       acf_refugee_medical_assistance: 'ACF Refugee Medical Assistance',
       americorps_health_benefits: 'AmeriCorps health benefits',
       child_health_insurance_plan: "Children's Health Insurance Program",
@@ -53,7 +54,6 @@ module FinancialAssistance
       medicare: 'Medicare',
       medicare_advantage: 'Medicare Advantage',
       medicare_part_b: 'Medicare Part B',
-      private_individual_and_family_coverage: 'Private individual and family coverage',
       state_supplementary_payment: 'State Supplementary Payment',
       tricare: 'TRICARE',
       veterans_benefits: 'Veterans benefits',
