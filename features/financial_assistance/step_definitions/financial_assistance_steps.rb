@@ -40,7 +40,7 @@ end
 
 Then(/^they should see a new finanical assistance application$/) do
   expect(page.current_url).to match("/applications/.*/edit")
-  expect(page).to have_content("If you need to add other members to your health insurance, select 'Add New Person'. When you’re finished, select CONTINUE.")
+  expect(page).to have_content("If you need to get health insurance coverage for other members of your family, select 'Add New Person'. When you’re finished, select CONTINUE.")
 end
 
 Then(/^they should see each of their dependents listed$/) do
