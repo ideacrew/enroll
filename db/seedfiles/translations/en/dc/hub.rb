@@ -36,4 +36,5 @@ HUB_TRANSLATIONS = {
   :'en.hub.hamburgermenu.description.tooltip' => "Examples include, but aren't limited to: You had insurance through your Employer and now you need to get insurance through the Individual & Family marketplace. You're an administrator for your company's DC Health Link account, but also need an Employee account to sign up for helath insurance for yourself.",
   :'en.hub.hamburgermenu.hub_link' => "GO TO MY HUB",
   :'en.hub.hamburgermenu.currently_viewing' => "Currently viewing:",
+  :'en.hub.buttons.continue' => "Continue",
 }.freeze
