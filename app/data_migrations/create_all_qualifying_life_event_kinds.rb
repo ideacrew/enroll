@@ -13,8 +13,8 @@ class CreateAllQualifyingLifeEventKinds < MongoidMigrationTask
     require File.join(Rails.root, "db", "seedfiles", 'ivl_life_events_seed') if EnrollRegistry.feature_enabled?(:aca_individual_market)
     # the seed files specify is_visible
     QualifyingLifeEventKind.all.each do |qlek|
-      puts("Publishing #{qlek.title} QLEK and setting active to true.") unless existing_qles.include?(qlek._id)
-      qlek.update_attributes!(is_active: true) unless existing_qles.include?(qlek._id)
+      puts("Publishing #{qlek.title} QLEK and setting active to true and start on date.") unless existing_qles.include?(qlek._id)
+      qlek.update_attributes!(is_active: true, start_on: TimeKeeper.date_of_record) unless existing_qles.include?(qlek._id)
       qlek.publish! unless existing_qles.include?(qlek._id)
     end
     puts("There are a total of #{QualifyingLifeEventKind.all.count} QLE Kinds created for #{Settings.site.key}")
