@@ -15,6 +15,10 @@ describe CreateAllQualifyingLifeEventKinds do
 
   describe 'migrate' do
     context 'activate_benefit_group_assignment', dbclean: :after_each do
+      before do
+        FactoryBot.create(:qualifying_life_event_kind)
+      end
+
       it 'should activate_related_benefit_group_assignment' do
         subject.migrate
         expect(QualifyingLifeEventKind.all.count).to be > 1
