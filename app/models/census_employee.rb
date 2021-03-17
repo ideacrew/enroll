@@ -766,8 +766,8 @@ class CensusEmployee < CensusMember
   end
 
   def fetch_all_enrollments(employment_terminated_on)
-    term_eligible_active_enrollments = active_benefit_group_enrollments(employment_terminated_on).show_enrollments_sans_canceled.non_terminated if active_benefit_group_enrollments(employment_terminated_on).present?
-    term_eligible_renewal_enrollments = renewal_benefit_group_enrollments(employment_terminated_on).show_enrollments_sans_canceled.non_terminated if renewal_benefit_group_enrollments(employment_terminated_on).present?
+    term_eligible_active_enrollments = active_benefit_group_enrollments.show_enrollments_sans_canceled.non_terminated if active_benefit_group_enrollments.present?
+    term_eligible_renewal_enrollments = renewal_benefit_group_enrollments.show_enrollments_sans_canceled.non_terminated if renewal_benefit_group_enrollments.present?
     term_eligible_off_cycle_enrollments = off_cycle_benefit_group_enrollments.show_enrollments_sans_canceled.non_terminated if off_cycle_benefit_group_enrollments.present?
     term_eligible_reinstated_enrollments = reinstated_benefit_group_enrollments.show_enrollments_sans_canceled.non_terminated if reinstated_benefit_group_enrollments.present?
     expired_benefit_group_assignment = benefit_group_assignments.sort_by(&:created_at).select{ |bga| (bga.benefit_group.start_on..bga.benefit_group.end_on).include?(coverage_terminated_on) && bga.plan_year.aasm_state == :expired}.last
@@ -1536,25 +1536,31 @@ class CensusEmployee < CensusMember
     employment_terminated_on <= effective_period.max
   end
 
-  # Enrollments with current active and renewal benefit applications
-  def active_benefit_group_enrollments(coverage_date = TimeKeeper.date_of_record)
-    return nil if employee_role.blank?
-
-    HbxEnrollment.where(
-      {
-        :sponsored_benefit_package_id.in => [active_benefit_group(coverage_date).try(:id)].compact,
-        :employee_role_id => self.employee_role_id,
-        :aasm_state.ne => "shopping"
-      }
-    ) || []
+  def active_benefit_application
+    active_benefit_group_assignment&.benefit_package&.benefit_application
   end
 
-  def renewal_benefit_group_enrollments(coverage_date = nil)
+  def renewal_benefit_application
+    renewal_benefit_group_assignment&.benefit_package&.benefit_application
+  end
+
+  # Enrollments with current active and renewal benefit applications
+  def active_benefit_group_enrollments
+    return nil if active_benefit_application.blank?
+    enrollments_under_benefit_application(active_benefit_application)
+  end
+
+  def renewal_benefit_group_enrollments
+    return nil if renewal_benefit_application.blank?
+    enrollments_under_benefit_application(renewal_benefit_application)
+  end
+
+  def enrollments_under_benefit_application(benefit_application)
     return nil if employee_role.blank?
 
     HbxEnrollment.where(
       {
-        :sponsored_benefit_package_id.in => [renewal_published_benefit_group(coverage_date).try(:id)].compact,
+        :sponsored_benefit_package_id.in => benefit_application.benefit_packages.map(&:id).compact,
         :employee_role_id => self.employee_role_id,
         :aasm_state.ne => "shopping"
       }
