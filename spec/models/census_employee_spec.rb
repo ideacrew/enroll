@@ -3074,6 +3074,51 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
         expect(active_enrollment.aasm_state).to eq "coverage_canceled"
       end
     end
+
+    context 'when renewal and active benefit group assignments exists' do
+      include_context "setup renewal application"
+
+      let(:renewal_benefit_group) { renewal_application.benefit_packages.first}
+      let(:renewal_product_package2) { renewal_application.benefit_sponsor_catalog.product_packages.detect {|package| package.package_kind != renewal_benefit_group.plan_option_kind} }
+      let!(:renewal_benefit_group2) { create(:benefit_sponsors_benefit_packages_benefit_package, health_sponsored_benefit: true, product_package: renewal_product_package2, benefit_application: renewal_application, title: 'Benefit Package 2 Renewal')}
+      let!(:benefit_group_assignment_two) { BenefitGroupAssignment.on_date(census_employee, renewal_effective_date) }
+      let!(:renewal_enrollment) do
+        FactoryBot.create(
+          :hbx_enrollment,
+          household: census_employee.employee_role.person.primary_family.active_household,
+          coverage_kind: "health",
+          kind: "employer_sponsored",
+          effective_on: renewal_benefit_group2.start_on,
+          family: census_employee.employee_role.person.primary_family,
+          benefit_sponsorship_id: benefit_sponsorship.id,
+          sponsored_benefit_package_id: renewal_benefit_group2.id,
+          employee_role_id: census_employee.employee_role.id,
+          benefit_group_assignment_id: census_employee.renewal_benefit_group_assignment.id,
+          aasm_state: "auto_renewing"
+        )
+      end
+
+      before do
+        active_enrollment.effective_on = renewal_enrollment.effective_on.prev_year
+        active_enrollment.save
+        employment_terminated_on = (TimeKeeper.date_of_record - 1.months).end_of_month
+        census_employee.employment_terminated_on = employment_terminated_on
+        census_employee.coverage_terminated_on = employment_terminated_on
+        census_employee.aasm_state = "employment_terminated"
+        census_employee.save
+        census_employee.terminate_employee_enrollments(employment_terminated_on)
+      end
+
+      it "should terminate active enrollment" do
+        active_enrollment.reload
+        expect(active_enrollment.aasm_state).to eq "coverage_terminated"
+      end
+
+      it "should cancel renewal enrollment" do
+        renewal_enrollment.reload
+        expect(renewal_enrollment.aasm_state).to eq "coverage_canceled"
+      end
+    end
   end
 
   describe "#assign_benefit_package" do
