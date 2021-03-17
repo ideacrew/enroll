@@ -61,6 +61,8 @@ site:
   block_ie_browser_after: <%= Date.new(2020,6,1) %>
   publisher: "dchl"
   statewide_area: "State of Maine"
+  prod_tax_info: "https://dchealthlink.com/individuals/tax-documents"
+  staging_tax_info_url: "https://staging.dchealthlink.com/individuals/tax-documents"
 
   exchange_name: "Maine Cover ME"
   social_media:
@@ -89,6 +91,11 @@ contact_center:
   non_discrimination_email: "info@dchealthlink.com"
 
   appeals: "info@dchealthlink.com"
+
+  board_of_elections_entity: "DC Board of Elections"
+  board_of_eletions_address: "1015 Half Street, SE<br>Suite 750<br>Washington, DC 20003<br>"
+  board_of_elections_email: ""
+  board_of_elections_phone_number: "(202) 727-2525"
 
   mailing_address:
     name: "Cover ME"

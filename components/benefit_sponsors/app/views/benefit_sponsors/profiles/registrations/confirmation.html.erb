@@ -5,7 +5,7 @@
       </h2>
     </div>
     <div class="col-sm-12">
-      <h3>Complete the following requirements to become a Cover ME Registered Broker.</h3>
+      <h3>Complete the following requirements to become a <%= Settings.site.short_name %> Registered Broker.</h3>
     </div>
     <div class="col-sm-12 more-info">
       <div class="col-sm-1">
@@ -13,9 +13,8 @@
       </div>
       <div class="col-sm-11">
         <p><strong>Secure Carrier Appointments:</strong><br/>
-          To become a Cover ME Registered Broker, you must obtain appointments with each carrier's licensed
-          entities in D.C. for the market in which you intend to sell. This resolution was made by the DC Health Benefit
-          Exchange Authority's Producer Advisory Committee. The
+          To become a <%= Settings.site.short_name %> Registered Broker, you must obtain appointments with each carrier's licensed
+          entities in <%= Settings.contact_center.state%>. for the market in which you intend to sell. This resolution was made by the<%=Settings.site.exchange_name %> Authority's Producer Advisory Committee. The
           <a href="http://hbx.dc.gov/sites/default/files/dc/sites/Health%20Benefit%20Exchange%20Authority/publication/attachments/ProducerAdvisoryCommitteeFINALReport.pdf" target="_blank">Producer
             Advisory Committee's resolution</a> provides additional context on the requirements.
         </p>
@@ -106,11 +105,10 @@
         <i class="far fa-circle fa-2x dc-green" aria-hidden="true"></i>
       </div>
       <div class="col-sm-11">
-        <p><strong>Complete the Cover ME Broker Policy Training Course:</strong><br/>
+        <p><strong>Complete the <%= Settings.site.short_name %> Broker Policy Training Course:</strong><br/>
         <ul>
           <li>Go to the
-            <a href="https://nahu.inreachce.com/Details?resultsPage=1&sortBy=&q=dc+broker&searchType=1&groupId=154ae22b-92eb-41f0-854b-3a9cabc20c8e" target="_blank">DC
-              Health Link training</a> administered by NAHU
+            <a href="https://nahu.inreachce.com/Details?resultsPage=1&sortBy=&q=dc+broker&searchType=1&groupId=154ae22b-92eb-41f0-854b-3a9cabc20c8e" target="_blank"><%= Settings.site.short_name %> training</a> administered by NAHU
           </li>
           <li>Create a login</li>
           <li>Complete the six hour training course, policy and web components</li>
@@ -124,9 +122,9 @@
             to NAHU at (877) 880-1335 or <a href="mailto:coverme.producer@maine.gov">coverme.producer@maine.gov</a>
             <br/>
             <br/>
-            Go to dchealthlink.com and select "Register" under the "Broker" drop down menu in the upper
+            Go to <%=Settings.site.short_url%> and select "Register" under the "Broker" drop down menu in the upper
             right corner, or visit the
-            <a href="https://enroll.dchealthlink.com/broker_registration" target="_blank">Broker Registration page</a>.
+            <a href="#{Settings.site.home_url}broker_registration" target="_blank">Broker Registration page</a>.
             <br/>
             <br/>
             For Brokers who work with an agency and receive the message that the Broker Agency is
@@ -141,7 +139,7 @@
             outstanding requirements that must be satisfied before your application can be approved.
             <br/>
             <br/>
-            Upon approval of your registration, you'll receive an email from <a>noreply@openhbx.org</a>
+            Upon approval of your registration, you'll receive an email from <a>noreply@<%= Settings.site.short_url%></a>
             with important information about how to access your broker portal.
           </p>
         </div>
@@ -154,7 +152,7 @@
           <%= image_tag("new_broker_registration.jpg", class: 'photo') %>
         </div>
         <div class="col-sm-10">
-          <p>Links to appointments and Cover ME training can be found in our
+          <p>Links to appointments and <%= Settings.site.short_name %> training can be found in our
             <a href="https://dchealthlink.com/sites/default/files/v2/forms/new_broker_registration.pdf" target="_blank">Broker
               Registration Guide.</a></p>
           <%= link_to "Download", '/new_broker_registration.pdf', download: 'Broker Registration Form', class: 'btn btn-primary' %>
@@ -163,7 +161,7 @@
       <div class="col-sm-12 more-info">
         <hr>
         <strong>Need this information again?</strong>
-        <p>Search "Broker Tools" on <a href="https://dchealthlink.com/" target="_blank">dchealthlink.com</a> or enter
+        <p>Search "Broker Tools" on <a href="#{Settings.site.home_url}" target="_blank"><%= Settings.site.short_url %></a> or enter
           your name and email address below and we'll email this page to you.</p>
       </div>
       <div class="col-sm-12" id="brGuide">
