@@ -118,7 +118,7 @@ function runGlossary() {
       },
       {
         "term": "Breast and Cervical Cancer Program",
-        "description": "District of Columbia <a href='/glossary#medicaid' target='_blank'>Medicaid<\/a> may cover individuals diagnosed with breast or cervical cancers who are in need of treatment. Learn more about <a class='ext' href='http:\/\/dhcf.dc.gov\/service\/medicaid-breast-and-cervical-cancer-patients' target='_blank'>Breast and Cervical Cancer Programs in the State of Maine<\/a>."
+        "description": "Maine <a href='/glossary#medicaid' target='_blank'>Medicaid<\/a> may cover individuals diagnosed with breast or cervical cancers who are in need of treatment. Learn more about <a class='ext' href='http:\/\/dhcf.dc.gov\/service\/medicaid-breast-and-cervical-cancer-patients' target='_blank'>Breast and Cervical Cancer Programs in the State of Maine<\/a>."
       },
       {
         "term": "Broker",
@@ -189,7 +189,7 @@ function runGlossary() {
         "description": "A discount that lowers your costs for <a href='/glossary#deductible' target='_blank'>deductibles<\/a>, <a href='/glossary#coinsurance' target='_blank'>coinsurance<\/a>, <a href='/glossary#copayment' target='_blank'>copayments<\/a>, and also lowers what you have to pay to reach your <a href='/glossary#out-of-pocket_limit' target='_blank'>out-of-pocket limit<\/a>. To get these savings, you must apply for <a href='/glossary#financial_assistance' target='_blank'>financial assistance<\/a>. Maine Cover ME will help you determine if you qualify as part of the application process. Then you can enroll. Most customers must enroll in a <a href='/glossary#silver_health_plan' target='_blank'>Silver Health Plan<\/a> to receive cost-sharing reductions. <a href='/glossary#native_american' target='_blank'>Native Americans<\/a> receive additional cost-sharing reductions regardless of a plan's <a href='/glossary#metal_level' target='_blank'>metal level<\/a>."
       },
       {
-        "term": "Cover All DC",
+        "term": "Cover All ME",
         "description": "A <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> program available to District residents who don't meet eligibility requirements for Maine Cover ME (including private coverage or <a href='/glossary#medicaid' target='_blank'>Medicaid<\/a>) or for the <a href='/glossary#dC_healthcare_alliance_program' target='_blank'>DC Healthcare Alliance Program<\/a>. District residents who are not incarcerated are eligible to enroll. Learn more about <a class='ext' href='https:\/\/dchealthlink.com\/node\/2478' target='_blank'>eligibility for Cover All DC<\/a>."
       },
       {
@@ -201,7 +201,7 @@ function runGlossary() {
         "description": "The health care services you\u2019re entitled to receive based on the terms of your <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> plan. All plans available through Maine Cover ME cover <a href='/glossary#essential_health_benefits' target='_blank'>essential health benefits<\/a>. Other covered services or <a href='/glossary#excluded_services' target='_blank'>excluded services<\/a> will vary among plans. Each plan available through Maine Cover ME includes a <a href='/glossary#summary_of_benefits_and_coverage' target='_blank'>Summary of Benefits and Coverage<\/a>, but it's only a summary. You'll need to see your <a href='/glossary#plan_documents' target='_blank'>plan documents<\/a> for all benefits information. You can also call the insurance company directly if you have questions."
       },
       {
-        "term": "DC Health Benefit Exchange Authority",
+        "term": "ME Health Benefit Exchange Authority",
         "description": "An independent government authority established by the State of Maine to implement and operate Maine Cover ME - the State of Maine\u2019s health insurance marketplace. The Authority ensures access to quality, affordable health care for residents, small businesses and their employees in the State of Maine. For more information, visit the <a class='ext' href='http:\/\/hbx.dc.gov\/' target='_blank'>DCHBX website<\/a>."
       },
       {
@@ -209,16 +209,16 @@ function runGlossary() {
         "description": "the State of Maine's system for individuals, families, small businesses and their employees as well as members of Congress and their staff to access health and dental coverage through private health companies or <a href='/glossary#medicaid' target='_blank'>Medicaid<\/a>."
       },
       {
-        "term": "DC Healthcare Alliance Program",
-        "description": "A managed care health plan that provides medical assistance to District of Columbia residents who are not eligible for <a href='/glossary#medicaid' target='_blank'>Medicaid<\/a>. The Alliance serves low-income District residents who have no other <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> and are not eligible for either Medicaid or <a href='/glossary#medicare' target='_blank'>Medicare<\/a>. The program is sponsored and paid for by the State of Maine government. Learn more about <a class='ext' href='https:\/\/dchealthlink.com\/node\/2478' target='_blank'>eligibility for the DC Healthcare Alliance Program<\/a>."
+        "term": "ME Healthcare Alliance Program",
+        "description": "A managed care health plan that provides medical assistance to Maine residents who are not eligible for <a href='/glossary#medicaid' target='_blank'>Medicaid<\/a>. The Alliance serves low-income District residents who have no other <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> and are not eligible for either Medicaid or <a href='/glossary#medicare' target='_blank'>Medicare<\/a>. The program is sponsored and paid for by the State of Maine government. Learn more about <a class='ext' href='https:\/\/dchealthlink.com\/node\/2478' target='_blank'>eligibility for the DC Healthcare Alliance Program<\/a>."
       },
       {
-        "term": "DC-Metro Network",
+        "term": "Maine Network",
         "description": "A designation that indicates the plan's <a href='/glossary#network' target='_blank'>network<\/a> of doctors, specialists, other providers, facilities and suppliers that plan members can access is limited to the DC metropolitan area."
       },
       {
-        "term": "DCHBX",
-        "description": "The acronym for <a href='/glossary#dc_health_benefit_exchange_authority' target='_blank'>DC Health Benefit Exchange Authority<\/a>."
+        "term": "Maine Health Benefit Exchange Authority",
+        "description": "The acronym for <a href='/glossary#dc_health_benefit_exchange_authority' target='_blank'>Maine Health Benefit Exchange Authority<\/a>."
       },
       {
         "term": "DDS",
@@ -246,7 +246,7 @@ function runGlossary() {
       },
       {
         "term": "Department of Insurance, Securities and Banking",
-        "description": "This agency regulates financial-service businesses in the State of Maine by administering DC's insurance, securities and banking laws, rules and regulations. The agency's primary goal is to ensure residents of the State of Maine have access to a wide choice of insurance, securities and banking products and services, and that they are treated fairly by the companies and individuals that provide these services. For more information, <a class='ext' href='http:\/\/disb.dc.gov\/page\/about-disb' target='_blank'>visit the DISB website<\/a>."
+        "description": "This agency regulates financial-service businesses in the State of Maine by administering DC's insurance, securities and banking laws, rules and regulations. The agency's primary goal is to ensure residents of the State of Maine have access to a wide choice of insurance, securities and banking products and services, and that they are treated fairly by the companies and individuals that provide these services. For more information, <a class='ext' href='http:\/\/\/page\/about-disb' target='_blank'>visit the DISB website<\/a>."
       },
       {
         "term": "Dependent",
@@ -274,7 +274,7 @@ function runGlossary() {
       },
       {
         "term": "Domestic Partnership",
-        "description": "A legal classification that provides rights for two unmarried persons, 18 years old or older, living together, whether of the same gender or different genders, who are also the sole domestic partner of the other person. Domestic partnerships must be registered to gain access to rights provided by applicable laws. Learn more about <a class='ext' href='http:\/\/doh.dc.gov\/service\/domestic-partnership' target='_blank'>domestic partnerships in the State of Maine<\/a>."
+        "description": "A legal classification that provides rights for two unmarried persons, 18 years old or older, living together, whether of the same gender or different genders, who are also the sole domestic partner of the other person. Domestic partnerships must be registered to gain access to rights provided by applicable laws. Learn more about <a class='ext' href='http:\/\/\/service\/domestic-partnership' target='_blank'>domestic partnerships in the State of Maine<\/a>."
       },
       {
         "term": "Drug Formulary",
@@ -351,7 +351,7 @@ function runGlossary() {
       },
       {
         "term": "Federally Qualified Health Center",
-        "description": "Nonprofit health centers or clinics that receive federal funding to serve medically underserved areas and populations. The centers provide low cost to no cost <a href='/glossary#primary_care' target='_blank'>primary care<\/a> services on a sliding scale fee, based on your ability to pay. There are several <a class='ext' href='http:\/\/doh.dc.gov\/sites\/default\/files\/dc\/sites\/doh\/publication\/attachments\/DC_Fqhc_Site_List.pdf' target='_blank'>federally qualified health centers in the State of Maine<\/a>. "
+        "description": "Nonprofit health centers or clinics that receive federal funding to serve medically underserved areas and populations. The centers provide low cost to no cost <a href='/glossary#primary_care' target='_blank'>primary care<\/a> services on a sliding scale fee, based on your ability to pay. There are several <a class='ext' href='http:\/\/\/sites\/default\/files\/dc\/sites\/doh\/publication\/attachments\/DC_Fqhc_Site_List.pdf' target='_blank'>federally qualified health centers in the State of Maine<\/a>. "
       },
       {
         "term": "Federally Recognized Tribe",
@@ -407,7 +407,7 @@ function runGlossary() {
       },
       {
         "term": "Guardianship",
-        "description": "A person with the legal authority and obligation to make financial as well as personal care decisions on behalf of another person. In the <a class='ext' href='http:\/\/odr.dc.gov\/book\/path-community-living-resource-guide\/legal-guardianship' target='_blank'>District of Columbia, legal guardianship<\/a> for minors and \u201cincapacitated adults\u201d is implemented through the Superior Court of DC Probate Division Court. "
+        "description": "A person with the legal authority and obligation to make financial as well as personal care decisions on behalf of another person. In the <a class='ext' href='http:\/\/odr.dc.gov\/book\/path-community-living-resource-guide\/legal-guardianship' target='_blank'>Maine, legal guardianship<\/a> for minors and \u201cincapacitated adults\u201d is implemented through the Superior Court of DC Probate Division Court. "
       },
       {
         "term": "Habilitative Services",
@@ -871,7 +871,7 @@ function runGlossary() {
       },
       {
         "term": "Rate Review",
-        "description": "the State of Maine's <a href='/glossary#department_of_insurance&#44;_securities_and_banking' target='_blank'>Department of Insurance, Security & Banking<\/a> reviews <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> rates that insurance company's submit for approval to determine if rate increases or decreases will be approved or rejected. Learn more about the <a class='ext' href='http:\/\/disb.dc.gov\/service\/health-insurance-rate-review' target='_blank'>rate review process<\/a>. "
+        "description": "the State of Maine's <a href='/glossary#department_of_insurance&#44;_securities_and_banking' target='_blank'>Department of Insurance, Security & Banking<\/a> reviews <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> rates that insurance company's submit for approval to determine if rate increases or decreases will be approved or rejected. Learn more about the <a class='ext' href='http:\/\/\/service\/health-insurance-rate-review' target='_blank'>rate review process<\/a>. "
       },
       {
         "term": "RCA",
@@ -891,7 +891,7 @@ function runGlossary() {
       },
       {
         "term": "Refugee Cash Assistance Program",
-        "description": "This District's Office of Refugee Resettlement serves to transition District of Columbia Refugees from dependency on public assistance to self-sufficiency. Cash assistance is one of many services offered to refugees in the State of Maine. Learn more about <a class='ext' href='http:\/\/\/service\/refugee-assistance' target='_blank'>refugee assistance in the State of Maine<\/a>. "
+        "description": "This District's Office of Refugee Resettlement serves to transition Maine Refugees from dependency on public assistance to self-sufficiency. Cash assistance is one of many services offered to refugees in the State of Maine. Learn more about <a class='ext' href='http:\/\/\/service\/refugee-assistance' target='_blank'>refugee assistance in the State of Maine<\/a>. "
       },
       {
         "term": "Rehabilitation Services",
