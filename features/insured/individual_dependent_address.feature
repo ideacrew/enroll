@@ -9,7 +9,7 @@ Feature: Insured Plan Shopping on Individual market
     Then I should see a successful sign up message
     And the user sees Your Information page
     When the user registers as an individual
-    When the individual clicks of the Continue button on the Account Setup page
+    When the individual clicks on the Continue button of the Account Setup page
     Then user should see heading labeled personal information
     Then user should see disabled ssn & dob fields
     Then Individual should click on Individual market for plan shopping
