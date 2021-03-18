@@ -9,7 +9,7 @@ Feature: Consumer verification process
     * I should see a successful sign up message
     * the user sees Your Information page
     * the user registers as an individual
-    * the individual clicks on the Continue button
+    * the individual clicks on the Continue button of the Account Setup page
     * user should see heading labeled personal information
     * Individual should click on Individual market for plan shopping
     * the individual sees form to enter personal information

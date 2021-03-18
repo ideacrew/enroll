@@ -535,7 +535,7 @@ Then(/Individual asks for help$/) do
   find(".interaction-click-control-×").click
 end
 
-And(/^.+ clicks? on the Continue button$/i) do
+And(/^.+ clicks? on the Continue button of the Account Setup page$/i) do
   find(IvlPersonalInformation.continue_btn).click
 end
 

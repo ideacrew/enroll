@@ -7,7 +7,7 @@ Feature: UI Validations for Document Type (Required/Optional) will match V37 VLP
     Then Individual should see a successful sign up message
     And the user sees Your Information page
     When the user registers as an individual
-    When the individual clicks on the Continue button
+    When the individual clicks on the Continue button of the Account Setup page
     Then Individual logs out
 
   Scenario Outline: The ability to enter my document information for my <document type> Document and successfully validates the inputs
