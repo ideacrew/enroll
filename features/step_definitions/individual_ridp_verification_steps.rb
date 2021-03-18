@@ -222,7 +222,7 @@ And(/^HBX admin click on back to my account button$/) do
 end
 
 Then(/^HBX admin should land on home page$/) do
-  expect(page).to have_content 'My DC Health Link'
+  expect(page).to have_content Settings.site.short_name
 end
 
 And(/^I click on Continue button$/) do
