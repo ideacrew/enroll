@@ -50,8 +50,18 @@ class ApplicationController < ActionController::Base
     log(JSON.dump(error_message), {:severity => 'critical'})
   end
 
+  rescue_from ActionController::InvalidAuthenticityToken, :with => :bad_token_due_to_session_expired
+
   def access_denied
     render file: 'public/403.html', status: 403
+  end
+
+  def bad_token_due_to_session_expired
+    flash[:warning] = "Session expired."
+    respond_to do |format|
+      format.html { redirect_to root_path}
+      format.js   { render text: "window.location.assign('#{root_path}');"}
+    end
   end
 
   def user_not_authorized(exception)
