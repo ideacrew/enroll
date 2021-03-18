@@ -263,6 +263,10 @@ When(/^Individual clicks on Individual and Family link should be on verification
   expect(page).to have_content('Verify Identity')
 end
 
+When(/^the individual clicks on the Continue button of the Family Information page$/) do
+  find(IvlFamilyInformation.continue_btn).click
+end
+
 Then(/^.+ answers the questions of the Identity Verification page and clicks on submit/) do
   expect(page).to have_content IvlVerifyIdentity.verify_identity_text
   find(IvlVerifyIdentity.pick_answer_a).click

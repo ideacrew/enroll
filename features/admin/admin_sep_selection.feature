@@ -17,6 +17,6 @@ Feature: Admin plan shopping via SEP
     When I click the "Had a baby" in qle carousel
     And I select a past qle date
     Then I should see confirmation and continue
-    When user clicks on continue button
+    When the individual clicks on the Continue button of the Family Information page
     Then I should see Shop for new plan button
 
