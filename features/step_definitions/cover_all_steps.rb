@@ -20,7 +20,7 @@ Then(/^Hbx Admin should not see an New Consumer Phone Application link and New C
 end
 
 When(/^Hbx Admin clicks on DC Resident Application link$/) do
-  find_link('DC Resident Application').click
+  find_link("#{Settings.aca.state_abbreviation} Resident Application").click
 end
 
 Then(/^Hbx Admin should see DC Resident Personal Information page$/) do
