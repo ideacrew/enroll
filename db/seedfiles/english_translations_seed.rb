@@ -1,17 +1,22 @@
-site_key = if Rails.env.test?
-             'dc'
-           else
-             BenefitSponsors::Site.all.first.site_key
-           end
+# TODO: Refactor this to not rely on DC for test
+site_key = Rails.env.test? ? 'dc' : Settings.site.key.to_s
 
-Dir.glob("db/seedfiles/translations/en/#{site_key}/*").each do |file|
-  require_relative "translations/en/#{site_key}/" + File.basename(file,File.extname(file))
+translations_to_seed = []
+# All filenames should be in a pattern such as
+# broker_agencies.rb
+# with a constant like
+# BROKER_AGENCIES_TRASLATIONS
+seedfile_location = "db/seedfiles/translations/en/#{site_key}/"
+Dir.glob("#{seedfile_location}*").each do |filename|
+  puts("Requiring #{filename}")
+  require Rails.root.to_s + "/" + filename
+  # Save the constant from the file
+  str2_markerstring = ".rb"
+  translations_to_seed << "#{filename[/#{seedfile_location}(.*?)#{str2_markerstring}/m, 1]}_translations".upcase.constantize
 end
 
 require_relative File.join(Rails.root, 'components/financial_assistance/db/seedfiles/translations/en/faa_translations')
-
-puts '*' * 80 unless Rails.env.test?
-puts '::: Generating English Translations :::'
+translations_to_seed << FaaTranslations::ASSISTANCE_TRANSLATIONS unless site_key.to_s == 'cca'
 
 MAIN_TRANSLATIONS = {
   :'en.shared.my_portal_links.my_insured_portal' => 'My Insured Portal',
@@ -19,62 +24,19 @@ MAIN_TRANSLATIONS = {
   :'en.shared.my_portal_links.my_general_agency_portal' => 'My General Agency Portal',
   :'en.shared.my_portal_links.my_employer_portal' => 'My Employer Portal'
 }.freeze
+translations_to_seed << MAIN_TRANSLATIONS
 
-def dc_translations
-  [
-    BOOTSTRAP_EXAMPLE_TRANSLATIONS,
-    BUTTON_PANEL_EXAMPLE_TRANSLATIONS,
-    LAYOUT_TRANSLATIONS,
-    MAIN_TRANSLATIONS,
-    USERS_ORPHANS_TRANSLATIONS,
-    WELCOME_INDEX_TRANSLATIONS,
-    BUTTON_PANEL_EXAMPLE_TRANSLATIONS,
-    INSURED_TRANSLATIONS,
-    BROKER_AGENCIES_TRANSLATIONS,
-    EXCHANGE_TRANSLATIONS,
-    DEVISE_TRANSLATIONS,
-    EMPLOYER_TRANSLATIONS,
-    PLAN_TRANSLATIONS,
-    HBX_PROFILES_TRANSLATIONS,
-    CENSUS_EMPLOYEE_TRANSLATIONS,
-    BROWSER_SUPPORT_TRANSLATIONS,
-    MANAGE_SEP_TYPES_TRANSLATIONS,
-    ADMIN_ACTIONS_TRANSLATIONS,
-    SHARED_TRANSLATIONS,
-    FaaTranslations::ASSISTANCE_TRANSLATIONS
-  ].reduce({}, :merge)
+puts '*' * 80 unless Rails.env.test?
+puts "::: Generating English Translations for Site Key #{site_key} :::"
+
+
+translations_to_seed.each do |translations_hash|
+  translations_hash.keys.each do |key|
+    Translation.where(key: key).first_or_create.update_attributes!(value: "\"#{translations_hash[key]}\"")
+    translation = Translation.last
+    puts("Latest translation is #{translation.key} #{translation.value}")
+  end
 end
 
-def cca_translations
-  [
-    BOOTSTRAP_EXAMPLE_TRANSLATIONS,
-    BUTTON_PANEL_EXAMPLE_TRANSLATIONS,
-    LAYOUT_TRANSLATIONS,
-    MAIN_TRANSLATIONS,
-    USERS_ORPHANS_TRANSLATIONS,
-    WELCOME_INDEX_TRANSLATIONS,
-    BUTTON_PANEL_EXAMPLE_TRANSLATIONS,
-    INSURED_TRANSLATIONS,
-    BROKER_AGENCIES_TRANSLATIONS,
-    EXCHANGE_TRANSLATIONS,
-    DEVISE_TRANSLATIONS,
-    EMPLOYER_TRANSLATIONS,
-    PLAN_TRANSLATIONS,
-    HBX_PROFILES_TRANSLATIONS,
-    CENSUS_EMPLOYEE_TRANSLATIONS,
-    BROWSER_SUPPORT_TRANSLATIONS,
-    ADMIN_ACTIONS_TRANSLATIONS
-  ].reduce({}, :merge)
-end
-
-unless Rails.env.test?
-  puts 'TRANSLATIONS'
-  p send("#{site_key}_translations")
-end
-
-send("#{site_key}_translations").keys.each do |k|
-  Translation.where(key: k).first_or_create.update_attributes!(value: "\"#{send("#{site_key}_translations")[k]}\"")
-end
-
-puts '::: English Translations Complete :::'
+puts "::: English Translations for #{site_key} complete. There are a total of #{Translation.all.count} translations present. :::"
 puts '*' * 80 unless Rails.env.test?

@@ -1,4 +1,4 @@
-  BUTTON_PANEL_EXAMPLE_TRANSLATIONS = {
+  BUTTONS_PANEL_TRANSLATIONS = {
   "en.uis.bootstrap3_examples.buttons" => "Buttons",
   "en.uis.bootstrap3_examples.index.panels" => "Panels",
   "en.uis.bootstrap3_examples.index.button_classes" => "Button Classes",
