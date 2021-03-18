@@ -15,6 +15,115 @@ $(document).on("turbolinks:load ajax:success", function() {
 // TODO 1: These should be refactored into a js.erb file to pull from settings files and be client agnostic
 // TODO 2: All of these should be refactored as back end translations
 
+/* March 2020 TODO List:
+Much of the tooltips in the application live within a Javascript file called glossary.js.
+Until we do some refactoring, these links can't reference anything in settings or Resource Registry, and even if and when we do it, we'll still need the links.
+Here's the ones we need. Soome of the tooltips in the glosssary hold multiple links, so it isn't just a 1 to ratio of tooltips vs definitions sneeded
+1) Affordable Care Act
+2) Covered services
+3) Advanced Premium Tax Credit
+4) Premiums
+5) Deductibles
+6) Co paymentss
+7) Out of pocket limits
+8) Bronze, Silver, Gold, Platinum
+9) Private Health Insurance
+10) Financial Assistance
+11) Minimum Essential Coverage
+12) Houseshold
+13) Minimum Value Standards
+14) Advanced Premium Tax Credit
+15) Broker
+16) Federally Recognized Tribe
+17) Indian Health Service
+18) Service Providers
+19) In network
+20) Alaska Native
+21) Plan Documents
+22) File An Appeal
+23) Allowed limits
+24) Prescription Drugs
+25) Medicaid
+26) Medicare
+27) Children's Health Insurance Program
+28) U.S. Department of Health and Human Services
+29) Plan Types
+30) Health Insurance
+31) Exemptions (Essential Health Benefits)
+32) Primary Care
+33) Preventative Services
+34) Center for Medicare & Medicaid Services<
+35) COBRA
+36) Department of Insurance, Securities and Banking
+37) Cosmetic Surgery/Plasstic Surgery
+38) Cover All/DC Healthcare Alliance Program (if Maine has an equivalent)
+39) Summary of Benefits and Coverage
+40) Dental Plan
+41) Maine Health Exchange Authority (If Maine has one)
+42) Department of Disability Services
+43) State Child Health Insurance Program, and Medical Charities (if it exists in Maine)
+44) DHS assistance programs
+45) Department of Insurance, Securities and Banking
+46) Dependent
+47) Department of Health Care Finance
+48) Department of Human Services
+49) Disability
+50) Drug Formulary
+51) Domestic Partnership
+52) Durable Medical Equipment
+53) Employer Shared Responsibility Provision
+54) Exclusive Provider Organization
+55) Early and Periodic Screening, Diagnostic, and Treatment
+56) Health insurance Marketplace
+57) Primary Care Physician
+58) IRS Form 8965
+59) Alaskan Native
+60) Supplemental Nutrition Assistance Program
+61) Federally Qualified Health Center
+62) Federal Poverty Level
+63) Plan Participants
+64) Brand Name Drug
+65) Home and Community-Based Services
+66) High Deductible Health Plan
+67) IRS Form 1095
+68) HIPAA - Health Insurance Portability and Accountability Act
+69) Health Reimbursement Account
+70) In Patient Care
+71) Health Savings Account
+72) Immigrant Children's Program (if it exists in Maine)
+73) Cost Sharing Reductions
+74) individual shared responsibility payment
+75) IRS Form 1095-A
+76) IRS Form 1095-B
+77) CHIP
+78) eligibility for the Katie Beckett Program
+79) Special Enrollment Period
+80) Qualifying Life Event
+81) Modified Adjusted Gross Income (MAGI)
+82) Long Term Care
+83) Social Security Administration
+84) State Continuation Coverage
+85) Social Security
+86) Qualified Health Plan
+87) Allowed Amount
+88) Balance Billing
+89) Reconstructive Surgery
+90) Referral
+91) Preferred Provider Organization
+92) Pre Authorization
+93) Qualified Health Plan
+94) Department of Insurance, Security & Banking
+95) Refugee Cash Assistance Program
+96) Small Business Health Options Program
+97) Second Lowest Cost Silver Plan
+98) Small Business Credit
+99) Specialist
+100) Temporary Cash Assistance for Needy Families
+101) UCR - Usual Customary and Reasonable
+
+*/
+
+
 function runGlossary() {
   if ($('.run-glossary').length) {
     // Certain glossary terms have been rearranged to avoid a smaller word being given a popover instead of the
