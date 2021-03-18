@@ -121,6 +121,14 @@
               <div class="col-md-6"><%= human_boolean applicant.has_self_employment_income %></div>
             </div>
 
+            <% if FinancialAssistanceRegistry[:unemployment_income].enabled? %>
+              <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                <div class="col-md-6">Has this person received any Unemployment Income in 2021?
+                </div>
+                <div class="col-md-6"><%= human_boolean applicant.has_unemployment_income %></div>
+              </div>
+            <% end %>
+
             <div class="row row-form-wrapper ptb no-buffer row-height form-content">
               <div class="col-md-6">Does this person expect to have other types of income in <%= @application.assistance_year %>?
               </div>
