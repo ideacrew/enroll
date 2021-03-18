@@ -6,7 +6,7 @@ RSpec.describe Operations::CensusEmployees::Build, :type => :model, dbclean: :ar
 
   let(:census_employee)               { FactoryBot.build(:census_employee) }
 
-  let(:valid_params)   {
+  let(:valid_params)   do
     {
       first_name: census_employee.first_name,
       middle_name: census_employee.middle_name,
@@ -21,7 +21,7 @@ RSpec.describe Operations::CensusEmployees::Build, :type => :model, dbclean: :ar
       is_business_owner: false,
       benefit_sponsorship_id: census_employee.benefit_sponsorship_id
     }
-  }
+  end
 
   let(:missing_params) {valid_params.except(:first_name) }
 

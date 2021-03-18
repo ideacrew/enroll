@@ -33,7 +33,7 @@ module Operations
         census_records = profile.census_employees
 
         clone_operation = ::Operations::CensusEmployees::Clone.new
-        cloned_census_records = census_records.each do |census_record|
+        census_records.each do |census_record|
           result = clone_operation.call({census_employee: census_record, additional_attrs: { benefit_sponsors_employer_profile_id: benefit_sponsors_employer_profile_id, benefit_sponsorship_id: new_benefit_sponsorship_id }})
           if result.success?
             result.value!.save
