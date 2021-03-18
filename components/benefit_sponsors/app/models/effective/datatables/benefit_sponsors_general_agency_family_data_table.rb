@@ -1,6 +1,8 @@
 module Effective
   module Datatables
     class BenefitSponsorsGeneralAgencyFamilyDataTable < Effective::MongoidDatatable
+      include ::Config::SiteModelConcern
+
       attr_reader :person_cache
 
       datatable do
@@ -25,13 +27,15 @@ module Effective
 
         table_column :family_ct, :label => 'Family Ct', :proc => Proc.new { |row| row.active_family_members.size }, :filter => false, :sortable => false
 
-        table_column :consumer, :label => 'Consumer?', :proc => Proc.new {  |row|
-          pp = @effective_datatable.person_cache[row.primary_applicant.person_id]
-          pp.consumer_role.present?  ? "Yes" : "No"}, :filter => false, :sortable => false
+        if is_shop_or_fehb_market_enabled?
+          table_column :consumer, :label => 'Consumer?', :proc => Proc.new {  |row|
+            pp = @effective_datatable.person_cache[row.primary_applicant.person_id]
+            pp.consumer_role.present?  ? "Yes" : "No"}, :filter => false, :sortable => false
 
-        table_column :employee, :label => 'Employee?', :proc => Proc.new {  |row|
-          pp = @effective_datatable.person_cache[row.primary_applicant.person_id]
-          pp.employee_roles.present?  ? "Yes" : "No" }, :filter => false, :sortable => false
+          table_column :employee, :label => 'Employee?', :proc => Proc.new {  |row|
+            pp = @effective_datatable.person_cache[row.primary_applicant.person_id]
+            pp.employee_roles.present?  ? "Yes" : "No" }, :filter => false, :sortable => false
+        end
       end
 
       def collection
