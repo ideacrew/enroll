@@ -20,6 +20,7 @@ module BenefitSponsors
                                              end
 
           _status = yield persist_organization!
+          _copy_roster = yield clone_census_employees(params[:existing_profile_id], @profile.id, @organization.active_benefit_sponsorship.id) if params[:with_roster] == 'true'
           redirection_link = yield create_employer_staff_role(sanitized_params[:staff_roles], validated_params[:person_id])
 
           Success([redirection_link, @status])
@@ -115,6 +116,10 @@ module BenefitSponsors
           else
             Failure("Unable to save organization due to #{@organization.errors.full_messages}")
           end
+        end
+
+        def clone_census_employees(existing_profile_id, new_profile_id, benefit_sponsorship_id)
+          ::Operations::CensusEmployees::CopyRoster.new.call({existing_profile_id: existing_profile_id, new_profile_id: new_profile_id, new_benefit_sponsorship_id: benefit_sponsorship_id})
         end
 
         def create_employer_staff_role(staff_role_params, person_id)

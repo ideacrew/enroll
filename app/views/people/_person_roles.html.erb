@@ -156,12 +156,12 @@
                   <span class="caret"></span>
                 </button>
                 <div class="dropdown-menu dropdown-menu-right actions-menu" aria-labelledby="dropdownMenuButton">
-                  <span class="dropdown-item" data-toggle="modal" data-target="#addEmployerAccount" data-dismiss="modal">Copy this info to <strong>a new account</strong></span>
+                  <span class="dropdown-item" data-toggle="modal" data-target="#addEmployerAccount-<%= active_role.role_id %>" data-dismiss="modal">Copy this info to <strong>a new account</strong></span>
                 </div>
               </div>
             </div>
 
-            <div class="modal fade" id="addEmployerAccount" tabindex="-1" role="dialog" aria-labelledby="addEmployerAccountLabel" aria-hidden="true">
+            <div class="modal fade" id="addEmployerAccount-<%= active_role.role_id %>" tabindex="-1" role="dialog" aria-labelledby="addEmployerAccountLabel" aria-hidden="true">
               <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                   <div class="modal-body">

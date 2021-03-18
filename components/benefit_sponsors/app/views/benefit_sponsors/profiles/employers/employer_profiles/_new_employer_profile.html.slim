@@ -1,5 +1,7 @@
 
 = f.hidden_field :profile_type, value: params[:profile_type]
+= f.hidden_field :existing_profile_id, value: params[:profile_id]
+= f.hidden_field :with_roster, value: params[:with_roster]
 = f.fields_for :staff_roles, f.object.staff_roles, errors: {}, fieldset: false do |f|
   = render partial: './ui-components/v1/forms/portals/person_staff_role_information', locals: {f: f}
 
