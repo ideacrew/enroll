@@ -237,6 +237,7 @@ module FinancialAssistance
     field :has_job_income, type: Boolean
     field :has_self_employment_income, type: Boolean
     field :has_other_income, type: Boolean
+    field :has_unemployment_income, type: Boolean
     field :has_deductions, type: Boolean
     field :has_enrolled_health_coverage, type: Boolean
     field :has_eligible_health_coverage, type: Boolean
