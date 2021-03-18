@@ -19,8 +19,4 @@ When(/^the Admin clicks CONTINUE after uploading and verifying an Identity$/) do
   find('.v-type-confirm-button').click
   expect(page).to have_content('Identity successfully verified.')
   find('.button', text: 'CONTINUE').click
-
-  Then(/^the Admin should be on the Help Paying for Coverage page$/) do
-    expect(page).to have_content IvlFaaHelpPayingForCoverage.help_paying_coverage_text
-  end
 end
