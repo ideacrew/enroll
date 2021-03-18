@@ -1,5 +1,13 @@
 # frozen_string_literal: true
 
+Given(/^the unemployment income feature is enabled$/) do
+  skip_this_scenario unless FinancialAssistanceRegistry[:unemployment_income].enabled?
+end
+
+Then(/^they visit the other income page via the left nav$/) do
+  click_link 'Other Income'
+end
+
 Then(/^the user will navigate to the Other Income page for the corresponding applicant$/) do
   expect(page).to have_content "Other Income for"
 end
@@ -20,6 +28,22 @@ Then(/^the other income choices should show$/) do
   expect(page).to have_content "Common types of income you must report"
 end
 
+Given(/^the user answers no to having unemployment income$/) do
+  find("#has_unemployment_income_false").click
+end
+
+Then(/^the unemployment income choices should not show$/) do
+  expect(page).to_not have_content "Add Another Unemployment Income"
+end
+
+Given(/^the user answers yes to having unemployment income$/) do
+  find("#has_unemployment_income_true").click
+end
+
+Then(/^the unemployment income choices should show$/) do
+  expect(page).to have_content "Add Another Unemployment Income"
+end
+
 Given(/^the user checks a other income checkbox$/) do
   find(:css, "#other_income_kind[value='alimony_and_maintenance']").set(true)
 end
@@ -29,10 +53,16 @@ Then(/^the other income form should show$/) do
   expect(page).to have_content "HOW OFTEN *"
 end
 
+Then(/^the unemployment income form should show$/) do
+  expect(page).to have_content "Amount *"
+  expect(page).to have_content "HOW OFTEN *"
+end
+
 Given(/^the user fills out the required other income information$/) do
-  fill_in 'financial_assistance_income[amount]', with: '100'
-  fill_in 'financial_assistance_income[start_on]', with: '1/01/2018'
-  find(:xpath, '//*[@id="financial_assistance_income_frequency_kind"]/option[2]').select_option
+  fill_in 'income[amount]', with: '100'
+  fill_in 'income[start_on]', with: '1/01/2018'
+  find_all(".interaction-choice-control-income-frequency-kind")[0].click
+  find_all('.interaction-choice-control-income-frequency-kind-1')[0].click
 end
 
 Then(/^the save button should be enabled$/) do
