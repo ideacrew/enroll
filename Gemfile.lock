@@ -136,7 +136,7 @@ PATH
       aasm (~> 4.8)
       ckeditor (= 4.2.4)
       combine_pdf
-      config
+      config (~> 2.0)
       money-rails (~> 1.13)
       mongoid (~> 7.0.2)
       non-stupid-digest-assets

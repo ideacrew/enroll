@@ -7,6 +7,7 @@ module BenefitSponsors
     helper BenefitSponsors::Engine.helpers
 
     rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
+    rescue_from ActionController::InvalidAuthenticityToken, :with => :bad_token_due_to_session_expired
 
     def self.current_site
       site_key = Settings.site.key
@@ -125,6 +126,14 @@ module BenefitSponsors
         format.json { render nothing: true, status: :forbidden }
         format.html { redirect_to(session[:custom_url] || request.referrer || main_app.root_path)}
         format.js   { render nothing: true, status: :forbidden }
+      end
+    end
+
+    def bad_token_due_to_session_expired
+      flash[:warning] = "Session expired."
+      respond_to do |format|
+        format.html { redirect_to main_app.root_path}
+        format.js   { render text: "window.location.assign('#{main_app.root_path}');"}
       end
     end
   end
