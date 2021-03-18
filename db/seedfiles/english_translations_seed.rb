@@ -33,8 +33,6 @@ puts "::: Generating English Translations for Site Key #{site_key} :::"
 translations_to_seed.each do |translations_hash|
   translations_hash.keys.each do |key|
     Translation.where(key: key).first_or_create.update_attributes!(value: "\"#{translations_hash[key]}\"")
-    translation = Translation.last
-    puts("Latest translation is #{translation.key} #{translation.value}")
   end
 end
 
