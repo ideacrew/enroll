@@ -183,7 +183,7 @@ And(/should fill in valid sevis, passport expiration_date, tribe_member and inca
   choose 'radio_incarcerated_no', visible: false, allow_label_click: true
 end
 
-Then (/^Individual (.*) go to Authorization and Consent page$/) do |argument|
+Then(/^Individual (.*) go to Authorization and Consent page$/) do |argument|
   if argument == 'does'
     expect(page).to have_content('Authorization and Consent')
   else
