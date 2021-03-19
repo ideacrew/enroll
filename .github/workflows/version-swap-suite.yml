@@ -1,6 +1,5 @@
-name: Nightly Full Check with Swapped Rails Versions
+name: Nightly Rails 6 Upgrade Test
 on:
-  push:
   schedule:
     - cron: '0 0 * * *'
 
