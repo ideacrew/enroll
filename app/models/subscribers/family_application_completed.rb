@@ -128,9 +128,11 @@ module Subscribers
           relationship = verified_primary_family_member.person_relationships.select do |pr|
             pr.object_individual_id == verified_family_member.id &&
               pr.subject_individual_id == verified_primary_family_member.id
-          end.first.relationship_uri.split('#').last
+          end.first.&relationship_uri.&split('#')&.last
 
           relationship = PersonRelationship::InverseMap[relationship]
+
+          throw(:processing_issue, "Invalid relationship") unless relationship.present?
 
           if existing_person.present?
             find_or_build_consumer_role(existing_person)
