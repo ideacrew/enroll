@@ -1,5 +1,7 @@
 # TODO: Refactor this to not rely on DC for test
-site_key = Rails.env.test? ? 'dc' : Settings.site.key.to_s
+# site_key = Rails.env.test? ? 'dc' : Settings.site.key.to_s
+# TODO: Change this back. Hardcoding in just for the ME Demo
+site_key = 'me'
 
 translations_to_seed = []
 # All filenames should be in a pattern such as

@@ -374,7 +374,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.network' => "Network",
   :'en.deductible' => "Deductible",
   :'en.nationwide' => "Nationwide",
-  :'en.DC-Metro' => "DC-Metro",
+  :'en.DC-Metro' => "Maine",
   :'en.compare' => "Compare",
   :'en.select_plan' => "Select Plan",
   :'en.see_details' => "See Details",
