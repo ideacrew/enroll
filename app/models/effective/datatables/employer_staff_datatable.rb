@@ -5,7 +5,7 @@ module Effective
     # This class categorize the employer staff data fields in table columns.
     class EmployerStaffDatatable < Effective::MongoidDatatable
       datatable do
-        table_column :name, :label => 'Name', :proc => proc { |row| link_to row.full_name, show_roles_person_path(id: row.id)}, :filter => false, :sortable => true
+        table_column :name, :label => 'Name', :proc => proc { |row| link_to row.full_name, show_roles_person_path(id: row.id), data: {turbolinks: false}}, :filter => false, :sortable => false
         table_column :hbx_id, :label => 'HBX ID', :proc => proc { |row| row.hbx_id }, :filter => false, :sortable => false
         table_column :dob, :label => 'DOB', :proc => proc { |row| format_date(row.dob)}, :filter => false, :sortable => false
         table_column :email, :label => 'EMAIL', :proc => proc { |row| row.work_email_or_best }, :filter => false, :sortable => false
@@ -14,7 +14,7 @@ module Effective
 
       def collection
         return @collection if defined? @collection
-        @collection = Queries::EmployerStaffDatatableQuery.new(attributes)
+        @collection ||= Queries::EmployerStaffDatatableQuery.new(attributes)
         @collection
       end
 
