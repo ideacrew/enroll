@@ -62,7 +62,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
     broker_agency_profile = ::Forms::BrokerAgencyProfile.new(params.permit(:organization))
 
     @organization = Organization.find(params[:organization][:id])
-    @organization_dup = @organization.office_locations.serializable_hash
+    @organization_dup = @organization.office_locations.map(&:attributes).map(&:deep_stringify_keys)
 
     #clear office_locations, don't worry, we will recreate
 

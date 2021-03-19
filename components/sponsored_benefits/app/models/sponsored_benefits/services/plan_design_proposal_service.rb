@@ -72,12 +72,11 @@ module SponsoredBenefits
       def update_benefits(attrs={})
         self.send("reset_#{kind}_benefits")
         benefit_group.title = "Benefit Group Created for: #{plan_design_organization.legal_name} by #{plan_design_organization.broker_agency_profile.legal_name}"
-
         if is_dental_benefits?
           benefit_group.update_attributes({
             dental_plan_option_kind: attrs[:plan_option_kind],
             dental_reference_plan_id: attrs[:reference_plan_id],
-            dental_relationship_benefits_attributes: attrs[:relationship_benefits_attributes].as_json
+            dental_relationship_benefits_attributes: attrs[:relationship_benefits_attributes].to_h.deep_stringify_keys
           })
         else
           benefit_group.update_attributes(attrs)

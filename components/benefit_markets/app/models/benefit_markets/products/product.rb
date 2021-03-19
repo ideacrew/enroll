@@ -10,6 +10,8 @@ module BenefitMarkets
   class Products::Product
     include Mongoid::Document
     include Mongoid::Timestamps
+    # For usage of serializable_hash. Included by default in rails 6
+    include ActiveModel::Serialization if Rails.version["5"]
 
     CSR_KIND_TO_PRODUCT_VARIANT_MAP = ::EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP
     MARKET_KINDS = %w[shop individual].freeze

@@ -8,7 +8,7 @@ require 'rspec/rails'
 # Add additional requires below this line. Rails is not loaded until this point!
 require 'mongoid-rspec'
 require 'shoulda/matchers'
-require 'database_cleaner-mongoid'
+require 'database_cleaner-mongoid' # Compatible with rails 5 and 6
 require 'capybara/rails'
 require 'capybara/rspec'
 require "forgery"
@@ -70,7 +70,7 @@ RSpec.configure do |config|
   #
   # The different available types are documented in the features, such as in
   # https://relishapp.com/rspec/rspec-rails/docs
-  DatabaseCleaner[:mongoid].strategy = :deletion
+  DatabaseCleaner[:mongoid].strategy = :deletion # Compatible with rails 5 and 6
 
   config.infer_spec_type_from_file_location!
 

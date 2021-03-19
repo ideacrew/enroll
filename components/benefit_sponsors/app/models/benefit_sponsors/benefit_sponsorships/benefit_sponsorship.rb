@@ -26,6 +26,9 @@ module BenefitSponsors
     # include Config::AcaModelConcern
     # include Concerns::Observable
     include AASM
+    # For usage of serializable_hash. Included by default in rails 6
+    include ActiveModel::Serialization if Rails.version["5"]
+
 
     ACTIVE_STATES   = [:applicant, :active].freeze
     INACTIVE_STATES = [:suspended, :ineligible, :teminated].freeze

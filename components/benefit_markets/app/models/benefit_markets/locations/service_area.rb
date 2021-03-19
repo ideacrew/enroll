@@ -5,6 +5,9 @@ module BenefitMarkets
       include Mongoid::Document
       include Mongoid::Timestamps
       include ::Config::SiteModelConcern
+      # For usage of serializable_hash. Included by default in rails 6
+      include ActiveModel::Serialization if Rails.version["5"]
+
 
       field :active_year, type: Integer
       field :issuer_provided_title, type: String
