@@ -343,9 +343,11 @@ document.addEventListener("turbolinks:load", function() {
         var  incomeListEl =  $('#unemployment_income').find('.unemployment-incomes-list');
       }
       if (newIncomeForm.find('select').data('selectric')) newIncomeForm.find('select').selectric('destroy');
-      var clonedForm = newIncomeForm.clone(true, true)
-      .removeClass('hidden')
-      .appendTo(incomeListEl);
+      if (!$('.unemployment-incomes-list').children('.new-unemployment-income-form').length) {
+        var clonedForm = newIncomeForm.clone(true, true)
+        .removeClass('hidden')
+        .appendTo(incomeListEl);
+      }
       var length = incomeListEl.find(".unemployment-income").length;
       $(clonedForm).find('select').selectric();
       $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110"});
