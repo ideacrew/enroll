@@ -25,7 +25,7 @@ module Entities
       attribute :employment_terminated_on, Types::Date.optional.meta(omittable: true)
       attribute :coverage_terminated_on, Types::Date.optional.meta(omittable: true)
       attribute :is_business_owner, Types::Bool.optional.meta(omittable: true)
-      attribute :no_ssn_allowed, Types::Strict::Bool.meta(omittable: true)
+      attribute :no_ssn_allowed, Types::Strict::Bool.optional.meta(omittable: true)
       attribute :census_dependents, Types::Array.of(Entities::CensusEmployees::CensusDependent).meta(omittable: true)
       attribute :address, Entities::Address.optional.meta(omittable: true)
       attribute :email, Entities::Email.optional.meta(omittable: true)

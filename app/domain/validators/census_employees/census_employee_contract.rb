@@ -26,8 +26,8 @@ module Validators
         optional(:employee_relationship).maybe(:string)
         optional(:employer_assigned_family_id).maybe(:string)
         optional(:expected_selection).maybe(:string)
-        optional(:is_business_owner).filled(:bool)
-        optional(:no_ssn_allowed).filled(:bool)
+        optional(:is_business_owner).maybe(:bool)
+        optional(:no_ssn_allowed).maybe(:bool)
 
         optional(:census_dependents).maybe(:array)
         optional(:address).maybe(:hash)

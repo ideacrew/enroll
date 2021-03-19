@@ -38,7 +38,7 @@ module Operations
           if result.success?
             result.value!.save
           else
-            Rails.logger.error { "Unable to clone census_employee - #{result.failure.errors}" }
+            Rails.logger.error { "Unable to clone census_employee - #{result.failure.to_h}" }
           end
         end
 
