@@ -51,7 +51,7 @@
               - if general_agency_enabled?
                 li
                   = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'general-agencies', link_path: main_app.general_agency_index_exchanges_hbx_profiles_path, display_name: 'General Agencies', active_tab: 'general-agencies', remote: false, pundit_object: nil, pundit_method: nil}
-              - if external_application_configured?("admin")
+              - if external_application_configured?("admin") && EnrollRegistry.feature_enabled?(:agency_staff)
                 li
                   = link_to(ExternalApplications::ApplicationProfile.find_by_application_name("admin").url + "/agencies/agency-staff?auth_token=" + jwt_for_external_application, "aria-expanded" => "true", data: { turbolinks: false } ) do
                     span.hidden-xs
