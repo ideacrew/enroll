@@ -29,6 +29,13 @@ module Effective
       def global_search_method
         :datatable_search
       end
+
+      def nested_filter_definition
+        {
+          employer_staff: [],
+          top_scope: :employer_staff
+        }
+      end
     end
   end
 end
