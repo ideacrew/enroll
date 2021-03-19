@@ -125,14 +125,12 @@ module Subscribers
       if verified_dependents.present?
         verified_dependents.each do |verified_family_member|
           existing_person = search_person(verified_family_member)
-          relationship = verified_primary_family_member.person_relationships.select do |pr|
-            pr.object_individual_id == verified_family_member.id &&
-              pr.subject_individual_id == verified_primary_family_member.id
-          end.first.&relationship_uri.&split('#')&.last
+          relationships = verified_primary_family_member.person_relationships&.select do |pr|
+            pr.object_individual_id == verified_family_member.id && pr.subject_individual_id == verified_primary_family_member.id
+          end
 
-          relationship = PersonRelationship::InverseMap[relationship]
-
-          throw(:processing_issue, "Invalid relationship") unless relationship.present?
+          throw(:processing_issue, "Invalid relationship") unless relationships.present?
+          relationship = PersonRelationship::InverseMap[relationships.first.relationship_uri.split('#').last]
 
           if existing_person.present?
             find_or_build_consumer_role(existing_person)
