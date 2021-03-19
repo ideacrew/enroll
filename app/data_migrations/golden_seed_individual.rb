@@ -174,6 +174,14 @@ class GoldenSeedIndividual < MongoidMigrationTask
     person_rec.individual_market_transitions << ivl_market_transition
     consumer_role.identity_validation = 'valid'
     consumer_role.save!
+    # Verification types needed
+    verification_type = VerificationType.new
+    verification_type.validation_status = 'verified'
+    # TODO: This portion of code might be refactored
+    # Residency Verificationss Requests Controller will hit during sselect_coverage!
+    verification_type.type_name = "#{Settings.site.key.upcase} Residency"
+    person_rec.verification_types << verification_type
+    person_rec.save!
     raise("Not verified") unless consumer_role.identity_verified? == true
     consumer_role
   end
@@ -197,6 +205,7 @@ class GoldenSeedIndividual < MongoidMigrationTask
 
   def create_and_return_service_area_and_product
     hios_id = "77422DC0060001-03"
+    # TODO: is there a "Carrier" or "Issuer Profile" needed?
     service_area = BenefitMarkets::Locations::ServiceArea.create!(
       active_year: TimeKeeper.date_of_record.year,
       issuer_provided_title: '',
@@ -212,7 +221,7 @@ class GoldenSeedIndividual < MongoidMigrationTask
       :ehb => 1.0, :health_plan_kind => :hmo, :metal_level_kind => :bronze, :is_standard_plan => false, :rx_formulary_url => nil,
       :hsa_eligibility => false, :network_information => nil, :benefit_market_kind => :aca_individual, :hbx_id => nil,
       :title => "#{EnrollRegistry[:brokers].setting(:carrier_appointments).item.keys.sample} Advantage 5750", :issuer_profile_id => 1,
-      :hios_id => hios_id, :hios_base_id => nil, :csr_variant_id => nil,
+      :hios_base_id => nil, :csr_variant_id => nil,
       :application_period => {"min" => TimeKeeper.date_of_record.beginning_of_year, "max" => TimeKeeper.date_of_record.end_of_year},
       :service_area_id => service_area.id, :provider_directory_url => nil, :deductible => nil, :family_deductible => nil,
       :is_reference_plan_eligible => true, :issuer_assigned_id => nil, :nationwide => nil, :dc_in_network => nil, :kind => :health,
@@ -238,8 +247,6 @@ class GoldenSeedIndividual < MongoidMigrationTask
   end
 
   def generate_and_return_hbx_enrollment(consumer_role)
-    random_ivl_product = ivl_products&.sample
-    hios_id = random_ivl_product&.hios_id
     active_year = TimeKeeper.date_of_record.year.to_s
     effective_on = TimeKeeper.date_of_record
     enrollment = HbxEnrollment.new(kind: "individual", consumer_role_id: consumer_role.id)
