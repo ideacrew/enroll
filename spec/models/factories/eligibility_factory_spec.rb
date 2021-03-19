@@ -16,6 +16,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
 
   before do
     EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(false)
+    EnrollRegistry[:calculate_monthly_aggregate].feature.settings.last.stub(:item).and_return(false)
   end
 
   if Settings.site.faa_enabled
