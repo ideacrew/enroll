@@ -243,6 +243,12 @@ h1,h2,h3,h4,h5,h6 {
   color: $primary-white;
   text-decoration: none;
 }
+.btn-min:hover,
+.btn-min:focus,
+.btn-min.focus {
+  color: #487ba2;
+  transform: scale(1.1);
+}
 .btn:active,
 .btn.active {
   background-image: none;
