@@ -40,8 +40,8 @@ class RailsVersionToggler
         puts("Renaming #{target_directory} Gemfile.lock and Gemspec files.")
         `mv #{filename} "#{target_directory}/Gemfile.rails_#{current_rails_version}_lock"` if filename.include?("lock")
         `mv "#{target_directory}/Gemfile.rails_#{target_rails_version}_lock" #{filename}` if filename.include?("lock")
-        #{ }`mv #{filename} "#{target_directory}/Gemfile.rails_#{current_rails_version}"` if filename.exclude?("lock")
-        #{ }`mv  "#{target_directory}/Gemfile.rails_#{target_rails_version}" #{filename}` if filename.exclude?("lock")
+        `mv #{filename} "#{target_directory}/Gemfile.rails_#{current_rails_version}"` if filename.exclude?("lock")
+        `mv  "#{target_directory}/Gemfile.rails_#{target_rails_version}" #{filename}` if filename.exclude?("lock")
         `mv #{filename} "#{target_directory}/#{target_directory}.gemspec_for_rails_#{current_rails_version}"` if filename.include?("gemspec")
         `mv "#{target_directory}/#{target_directory}.gemspec_for_rails_#{target_rails_version}" #{filename}` if filename.include?("gemspec")
       end
