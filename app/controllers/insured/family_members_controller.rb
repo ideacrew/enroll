@@ -272,7 +272,7 @@ class Insured::FamilyMembersController < ApplicationController
     return [] if params[:dependent][:same_with_primary] == 'true'
 
     errors_array = []
-    clean_address_params = params[:dependent][:addresses].reject{ |_key, value| value[:address_1].blank? && value[:city].blank? && value[:state].blank? && value[:zip].blank? }
+    clean_address_params = params[:dependent][:addresses]&.reject{ |_key, value| value[:address_1].blank? && value[:city].blank? && value[:state].blank? && value[:zip].blank? }
     param_indexes = clean_address_params.keys.compact
     param_indexes.each do |param_index|
       permitted_address_params = clean_address_params.require(param_index).permit(:address_1, :address_2, :city, :kind, :state, :zip)

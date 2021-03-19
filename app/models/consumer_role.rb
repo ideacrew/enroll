@@ -873,8 +873,8 @@ class ConsumerRole
     if person.tribal_id.present?
       fail_indian_tribe
       fail_native_status!
-    else
-      pass_native_status! if all_types_verified? && !fully_verified?
+    elsif all_types_verified? && !fully_verified? && may_pass_native_status?
+      pass_native_status!
     end
   end
 
