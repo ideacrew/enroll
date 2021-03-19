@@ -15,7 +15,7 @@ module Queries
     end
 
     def build_scope
-      people = Person.all_employer_staff_roles.where(:'employer_staff_roles.aasm_state' => 'is_active')
+      people = Person.all_employer_staff_roles.active
       return people if @search_string.blank? || @search_string.length < 2
       person_scope = build_people_id_criteria(@search_string)
       return person_scope if @order_by.blank?
@@ -24,7 +24,7 @@ module Queries
 
     def build_people_id_criteria(s_string)
       clean_str = s_string.strip
-      people = Person.all_employer_staff_roles.where(:'employer_staff_roles.aasm_state' => 'is_active')
+      people = Person.all_employer_staff_roles.active
       if clean_str =~ /[a-z]/i
         people_ids = people.collection.aggregate([
                       {"$match" => {
