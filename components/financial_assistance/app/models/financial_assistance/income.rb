@@ -36,6 +36,7 @@ module FinancialAssistance
       supplemental_security_income
       tax_exempt_interest
       unemployment_insurance
+      unemployment_income
       wages_and_salaries
       income_from_irs
     ].freeze
@@ -84,6 +85,7 @@ module FinancialAssistance
     scope :self_employment, -> {where(kind: NET_SELF_EMPLOYMENT_INCOME_KIND)}
     scope :other, -> {where(:kind.nin => [JOB_INCOME_TYPE_KIND, NET_SELF_EMPLOYMENT_INCOME_KIND])}
     scope :of_kind, ->(kind) {where(kind: kind)}
+    scope :unemployment, ->{where(kind: 'unemployment_income')}
 
     validates_length_of :title,
                         in: TITLE_SIZE_RANGE,
