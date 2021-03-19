@@ -24,6 +24,11 @@ describe "Golden Seed Rake Tasks", dbclean: :after_each do
         subject.migrate
       end
 
+      it "should create at least one IVL health product if none exist" do
+        products = BenefitMarkets::Products::Product.all.select { |product| product.benefit_market_kind.to_sym == :aca_individual }
+        expect(products.count).to_not be(0)
+      end
+
       it "should create fully matched consumer records" do
         consumer_roles = Person.all.select { |person| person.consumer_role.present? }
         expect(consumer_roles.count).to_not be(0)

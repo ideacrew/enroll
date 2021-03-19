@@ -88,6 +88,12 @@ class GoldenSeedIndividual < MongoidMigrationTask
     )
     person.save!
     raise("Unable to save person.") unless person.save!
+    address_and_phone = generate_address_and_phone
+    person.phones << address_and_phone[:phone
+    person.addresses << address_and_phone[:address]
+    person.save!
+    raise("Unable to save addresses") if person.addresses.blank?
+    raise("Unable to save phones") if person.phones.blank?
     person
   end
 
@@ -146,17 +152,16 @@ class GoldenSeedIndividual < MongoidMigrationTask
     address = Address.new(
       kind: "primary",
       address_1: "60" + counter_number.to_s + ('a'..'z').to_a.sample + ' ' + ['Street', 'Ave', 'Drive'].sample,
-      city: "Boston",
-      state: "MA",
-      zip: "02109",
-      county: "Suffolk"
+      city: Settings.contact_center.city,
+      state: Settings.site.key.to_s.upcase,
+      zip: "02109"
     )
     phone = Phone.new(
       kind: "main",
       area_code: %w[339 351 508 617 774 781 857 978 413].sample,
       number: "55" + counter_number.to_s.split("").sample + "-999" + counter_number.to_s.split("").sample
     )
-    [address, phone]
+    {address: address, phone: phone}
   end
 
   def create_and_return_consumer_role(person_rec)
