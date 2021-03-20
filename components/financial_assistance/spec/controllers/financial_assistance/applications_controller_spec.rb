@@ -210,6 +210,45 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     end
   end
 
+  context "GET raw" do
+    let(:temp_file) do
+      [{"demographics" => {} },
+       {"financial_assistance_info" => {"TAX INFO" => nil,
+                                        "INCOME" => nil,
+                                        "INCOME ADJUSTMENTS" => nil,
+                                        "HEALTH COVERAGE" => nil,
+                                        "OTHER QUESTIONS" => nil}}]
+    end
+
+    before do
+      allow(File).to receive(:read).with("./components/financial_assistance/app/views/financial_assistance/applications/raw_application.yml.erb").and_return("")
+      allow(YAML).to receive(:safe_load).with("").and_return(temp_file)
+      user.update_attributes(roles: ["hbx_staff"])
+    end
+
+    it "should be successful" do
+      application.update_attributes(:aasm_state => "submitted")
+      get :raw_application, params: { id: application.id }
+      expect(assigns(:application)).to eq application
+    end
+
+    it "should redirect to applications page for draft application" do
+      get :raw_application, params: { id: application.id }
+      expect(response).to redirect_to(applications_path)
+    end
+
+    it "should redirect to applications page for invalid id" do
+      get :raw_application, params: { id: FinancialAssistance::Application.new.id }
+      expect(response).to redirect_to(applications_path)
+    end
+
+    it "should redirect to applications page for non hbx_staff roles" do
+      user.update_attributes(roles: ["comsumer_role"])
+      get :raw_application, params: { id: FinancialAssistance::Application.new.id }
+      expect(response).to redirect_to(applications_path)
+    end
+  end
+
   context "GET wait_for_eligibility_response" do
     it "should redirect to eligibility_response_error if doesn't find the ED on wait_for_eligibility_response page" do
       get :wait_for_eligibility_response, params: { id: application.id }
