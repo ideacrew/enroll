@@ -113,9 +113,12 @@
     </div>
 
     <div class='col-md-2'>
+      <% group_selection_url = main_app.new_insured_group_selection_path(person_id: @person.id, consumer_role_id: @person.consumer_role.id) %>
+      <% find_sep_url = main_app.find_sep_insured_families_path(consumer_role_id: @person.consumer_role.id) %>
+
       <%= render partial: 'financial_assistance/shared/right_nav', locals: {
           previous_url: applications_path,
-          next_url: main_app.find_sep_insured_families_path(consumer_role_id: @person.consumer_role.id)
+          next_url: @person.consumer_role.present? && is_under_open_enrollment? ? group_selection_url : find_sep_url
         } %>
     </div>
   </div>
