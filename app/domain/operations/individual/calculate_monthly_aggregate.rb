@@ -103,11 +103,11 @@ module Operations
       end
 
       def active_eligible_coverage_months
-        eligible_enrollments = @family.hbx_enrollments.eligible_covered_aggregate(@family.id, @effective_on.year).select{|enr| enr.product.metal_level_kind != :catastrophic}
-         (1..(@effective_on.month - 1)).inject(0) do |counter, month|
-           counter += 1 if eligible_enrollments.any?{ |enr| (enr.effective_on.beginning_of_month..calculate_termination_date(enr)).cover?(Date.new(@effective_on.year, month)) }
-           counter
-         end
+        eligible_enrollments = @family.hbx_enrollments.eligible_covered_aggregate(@family.id, @effective_on.year).reject{|enr| enr.product.metal_level_kind == :catastrophic}
+        (1..(@effective_on.month - 1)).inject(0) do |counter, month|
+          counter += 1 if eligible_enrollments.any?{ |enr| (enr.effective_on.beginning_of_month..calculate_termination_date(enr)).cover?(Date.new(@effective_on.year, month)) }
+          counter
+        end
       end
 
       #logic to calculate the monthly Aggregate
