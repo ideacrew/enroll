@@ -135,15 +135,14 @@ Given(/^all required questions are answered$/) do
   find('#application_report_change_terms').click
 end
 
-<<<<<<< Updated upstream
 And(/^the user should be able to see medicaid determination question$/) do
   expect(page).to have_content("Do you want your application submitted for full medicaid determination?")
   find('#medicaid_determination_yes').click
-=======
+end
+
 Given(/^all required questions are answered including report change terms field$/) do
   find_all("input[type='checkbox']").each {|checkbox| checkbox.set(true)}
   find('#living_outside_no').set(true)
->>>>>>> Stashed changes
 end
 
 Given(/^the user has signed their name$/) do
