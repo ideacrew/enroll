@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-
+require 'pry'
 RSpec.describe Operations::Individual::CalculateMonthlyAggregate do
 
   before do
     EnrollRegistry[:calculate_monthly_aggregate].feature.settings.last.stub(:item).and_return(false)
-    allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year, 8, 1))
+    allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 8, 1))
   end
 
   context 'for invalid params' do
@@ -21,6 +21,7 @@ RSpec.describe Operations::Individual::CalculateMonthlyAggregate do
   let!(:household) {family.active_household}
   let!(:current_date){TimeKeeper.date_of_record}
   let!(:year_start_date) {TimeKeeper.date_of_record.beginning_of_year}
+  let(:current_year) { TimeKeeper.date_of_record.year }
 
   context 'for current year effective dates' do
     let!(:tax_household) {FactoryBot.create(:tax_household, household: household, effective_starting_on: year_start_date, effective_ending_on: nil)}
@@ -208,26 +209,36 @@ RSpec.describe Operations::Individual::CalculateMonthlyAggregate do
   end
 
   context 'When eligible months are considered' do
-    context 'Family with multiple enrollment with gap in eligible coverage' do
-      let!(:tax_household) {FactoryBot.create(:tax_household, household: household, effective_starting_on: year_start_date, effective_ending_on: nil)}
-      let!(:ed) {FactoryBot.create(:eligibility_determination, max_aptc: 500.00, tax_household: tax_household)}
-      let!(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
-      let!(:hbx_enrollment) do
-        enr = FactoryBot.create(:hbx_enrollment,
-                                family: family,
-                                household: household,
-                                is_active: true,
-                                aasm_state: 'coverage_terminated',
-                                kind: 'individual',
-                                changing: false,
-                                product: product,
-                                effective_on: year_start_date,
-                                terminated_on: year_start_date.end_of_month + 2.months,
-                                applied_aptc_amount: 300.00)
-        FactoryBot.create(:hbx_enrollment_member, applicant_id: primary_fm.id, hbx_enrollment: enr)
-        enr
-      end
+    let!(:tax_household) {FactoryBot.create(:tax_household, household: household, effective_starting_on: year_start_date, effective_ending_on: nil)}
+    let!(:ed) {FactoryBot.create(:eligibility_determination, max_aptc: 500.00, tax_household: tax_household)}
+    let!(:product) do
+      FactoryBot.create(:benefit_markets_products_health_products_health_product,
+                        benefit_market_kind: :aca_individual,
+                        kind: :health,
+                        csr_variant_id: '01',
+                        metal_level_kind: :silver)
+    end
+    let!(:hbx_enrollment) do
+      enr = FactoryBot.create(:hbx_enrollment,
+                              family: family,
+                              household: household,
+                              is_active: true,
+                              aasm_state: 'coverage_terminated',
+                              kind: 'individual',
+                              changing: false,
+                              product: product,
+                              effective_on: year_start_date,
+                              terminated_on: year_start_date.end_of_month + 2.months,
+                              applied_aptc_amount: 300.00)
+      FactoryBot.create(:hbx_enrollment_member, applicant_id: primary_fm.id, hbx_enrollment: enr)
+      enr
+    end
 
+    before do
+      EnrollRegistry[:calculate_monthly_aggregate].feature.settings.last.stub(:item).and_return(true)
+    end
+
+    context 'Family with multiple enrollment with gap in eligible coverage' do
       let!(:hbx_enrollment2) do
         enr = FactoryBot.create(:hbx_enrollment,
                                 family: family,
@@ -244,13 +255,9 @@ RSpec.describe Operations::Individual::CalculateMonthlyAggregate do
         enr
       end
 
-      before do
-        EnrollRegistry[:calculate_monthly_aggregate].feature.settings.last.stub(:item).and_return(true)
-      end
-
       context 'Gap in eligible months of 4months will not be considered' do
         before do
-          input_params = {family: family, effective_on: Date.new(TimeKeeper.date_of_record.year, 11, 1), shopping_fm_ids: hbx_enrollment.hbx_enrollment_members.pluck(:applicant_id), subscriber_applicant_id: hbx_enrollment.subscriber.applicant_id}
+          input_params = {family: family, effective_on: Date.new(current_year, 11, 1), shopping_fm_ids: hbx_enrollment.hbx_enrollment_members.pluck(:applicant_id), subscriber_applicant_id: hbx_enrollment.subscriber.applicant_id}
           @result = subject.call(input_params)
         end
 
@@ -262,7 +269,7 @@ RSpec.describe Operations::Individual::CalculateMonthlyAggregate do
       context 'Gap in eligible months of 4months will not be considered and one of the enrollment is shop enrollment.' do
         before do
           hbx_enrollment.update_attributes(kind: "employer_sponsored", applied_aptc_amount: 0)
-          input_params = {family: family, effective_on: Date.new(TimeKeeper.date_of_record.year, 11, 1), shopping_fm_ids: hbx_enrollment.hbx_enrollment_members.pluck(:applicant_id), subscriber_applicant_id: hbx_enrollment.subscriber.applicant_id}
+          input_params = {family: family, effective_on: Date.new(current_year, 11, 1), shopping_fm_ids: hbx_enrollment.hbx_enrollment_members.pluck(:applicant_id), subscriber_applicant_id: hbx_enrollment.subscriber.applicant_id}
           @result = subject.call(input_params)
         end
 
@@ -276,12 +283,29 @@ RSpec.describe Operations::Individual::CalculateMonthlyAggregate do
           hbx_enrollment.update_attributes(applied_aptc_amount: 0)
           hbx_enrollment2.update_attributes(applied_aptc_amount: 0)
           product.update_attributes(metal_level_kind: 'catastrophic')
-          input_params = {family: family, effective_on: Date.new(TimeKeeper.date_of_record.year, 11, 1), shopping_fm_ids: hbx_enrollment.hbx_enrollment_members.pluck(:applicant_id), subscriber_applicant_id: hbx_enrollment.subscriber.applicant_id}
+          input_params = {family: family, effective_on: Date.new(current_year, 11, 1), shopping_fm_ids: hbx_enrollment.hbx_enrollment_members.pluck(:applicant_id), subscriber_applicant_id: hbx_enrollment.subscriber.applicant_id}
           @result = subject.call(input_params)
         end
 
         it 'should return aptc amount based on eligible months' do
           expect(@result.success).to eq(500.00)
+        end
+      end
+    end
+
+    context 'Family with single enrollment with gap in eligible coverage' do
+
+      context 'terminated_on is in future to effective_on' do
+        before do
+          input_params = { family: family,
+                           effective_on: hbx_enrollment.terminated_on.beginning_of_month,
+                           shopping_fm_ids: hbx_enrollment.hbx_enrollment_members.pluck(:applicant_id),
+                           subscriber_applicant_id: hbx_enrollment.subscriber.applicant_id }
+          @result = subject.call(input_params)
+        end
+
+        it 'should return aptc amount with respect to eligible months' do
+          expect(@result.success).to eq(540.0)
         end
       end
     end
