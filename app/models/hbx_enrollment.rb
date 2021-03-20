@@ -406,13 +406,14 @@ class HbxEnrollment
   }
 
   scope :eligible_covered_aggregate, lambda { |family_id, year|
-                           where(:family_id => family_id,
-                                 :effective_on => Date.new(year)..Date.new(year).end_of_year,
-                                 :aasm_state.in => (ENROLLED_AND_RENEWAL_STATUSES + TERMINATED_STATUSES),
-                                 :kind.nin => ["employer_sponsored", "employer_sponsored_cobra"],
-                                 :coverage_kind => "health",
-                                 :product_id.ne => nil)
-                         }
+                                       where(:family_id => family_id,
+                                             :effective_on => Date.new(year)..Date.new(year).end_of_year,
+                                             :aasm_state.in => (ENROLLED_AND_RENEWAL_STATUSES + TERMINATED_STATUSES),
+                                             :kind.nin => ["employer_sponsored", "employer_sponsored_cobra"],
+                                             :coverage_kind => "health",
+                                             :product_id.ne => nil)
+                                     }
+
   # Rewritten from family scopes
   scope :enrolled_statuses, -> { where(:"aasm_state".in => ENROLLED_STATUSES) }
   scope :by_writing_agent_id, ->(broker_id) { where(writing_agent_id: broker_id)}
