@@ -90,9 +90,7 @@ When(/^all applicants are in Info Completed state$/) do
     find("#has_self_employment_income_false", wait: 10).click
     find(:xpath, '//*[@id="btn-continue"]', wait: 10).click
 
-    if FinancialAssistanceRegistry[:unemployment_income].enabled?
-      find("#has_unemployment_income_false", wait: 10).click
-    end
+    find("#has_unemployment_income_false", wait: 10).click if FinancialAssistanceRegistry[:unemployment_income].enabled?
     find("#has_other_income_false", wait: 10).click
     find(:xpath, '//*[@id="btn-continue"]', wait: 10).click
     find("#has_deductions_false", wait: 10).click
