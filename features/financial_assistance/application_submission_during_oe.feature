@@ -15,6 +15,7 @@ Feature: Consumer landing on Group selection page during OE after continuing fro
 
   Scenario: User continues from the eligibility results page outside of OE
     Given all required questions are answered including report change terms field
+    And the user should be able to see medicaid determination question
     And the user has signed their name
     And the user clicks SUBMIT
     And the user waits for eligibility results
