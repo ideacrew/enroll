@@ -5,7 +5,8 @@ require 'rails_helper'
 RSpec.describe Operations::Individual::CalculateMonthlyAggregate do
 
   before do
-    EnrollRegistry[:calculate_monthly_aggregate].feature.settings.last.stub(:item).and_return(false)
+    @eligible_months_setting = EnrollRegistry[:calculate_monthly_aggregate].settings(:eligible_months)
+    allow(@eligible_months_setting).to receive(:item).and_return(false)
     allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 8, 1))
   end
 
@@ -197,8 +198,10 @@ RSpec.describe Operations::Individual::CalculateMonthlyAggregate do
       FactoryBot.create(:hbx_enrollment_member, applicant_id: primary_fm.id, hbx_enrollment: enr)
       enr
     end
+
     before do
-      EnrollRegistry[:calculate_monthly_aggregate].feature.settings.first.stub(:item).and_return("end_of_year")
+      termination_date_setting = EnrollRegistry[:calculate_monthly_aggregate].settings(:termination_date)
+      allow(termination_date_setting).to receive(:item).and_return('end_of_year')
       input_params = {family: family, effective_on: Date.new(prev_year_start_date.year, 11, 1), shopping_fm_ids: hbx_enrollment.hbx_enrollment_members.pluck(:applicant_id), subscriber_applicant_id: hbx_enrollment.subscriber.applicant_id}
       @result = subject.call(input_params)
     end
@@ -235,7 +238,7 @@ RSpec.describe Operations::Individual::CalculateMonthlyAggregate do
     end
 
     before do
-      EnrollRegistry[:calculate_monthly_aggregate].feature.settings.last.stub(:item).and_return(true)
+      allow(@eligible_months_setting).to receive(:item).and_return(true)
     end
 
     context 'Family with multiple enrollment with gap in eligible coverage' do
