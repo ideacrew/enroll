@@ -124,7 +124,7 @@ module IvlAssistanceWorld
     @user.save
     @person = FactoryBot.create(:person, :with_consumer_role, user: user)
     family = FactoryBot.create(:family, :with_primary_family_member, person: @person)
-    application = FactoryBot.create(:financial_assistance_application, aasm_state: 'determined', family_id: family.id)
+    _application = FactoryBot.create(:financial_assistance_application, aasm_state: 'determined', family_id: family.id)
   end
 end
 
