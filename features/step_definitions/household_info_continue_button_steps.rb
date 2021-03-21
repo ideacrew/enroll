@@ -122,6 +122,7 @@ And(/^primary applicant completes application and marks they are required to fil
   find("#has_self_employment_income_false").click
   find(:xpath, '//*[@id="btn-continue"]').click
 
+  find('#has_unemployment_income_false').click if FinancialAssistanceRegistry[:unemployment_income].enabled?
   find("#has_other_income_false").click
   find(:xpath, '//*[@id="btn-continue"]').click
   find("#has_deductions_false").click
