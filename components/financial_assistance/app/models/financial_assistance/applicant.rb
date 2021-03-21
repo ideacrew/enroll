@@ -52,7 +52,10 @@ module FinancialAssistance
     MEC_VALIDATION_STATES = %w[na valid outstanding pending].freeze
 
     DRIVER_QUESTION_ATTRIBUTES = [:has_job_income, :has_self_employment_income, :has_other_income,
-                                  :has_deductions, :has_enrolled_health_coverage, :has_eligible_health_coverage].freeze
+                                  :has_deductions, :has_enrolled_health_coverage, :has_eligible_health_coverage]
+    DRIVER_QUESTION_ATTRIBUTES += [:has_unemployment_income] if FinancialAssistanceRegistry[:unemployment_income].enabled?
+    DRIVER_QUESTION_ATTRIBUTES.freeze
+
     #list of the documents user can provide to verify Immigration status
     VLP_DOCUMENT_KINDS = [
         "I-327 (Reentry Permit)",
@@ -845,6 +848,10 @@ module FinancialAssistance
 
     def other_income_exists?
       incomes.other.present?
+    end
+
+    def unemployment_income_exists?
+      incomes.unemployment.present?
     end
 
     def deductions_exists?
