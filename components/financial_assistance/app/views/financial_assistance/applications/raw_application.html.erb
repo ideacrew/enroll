@@ -1,6 +1,7 @@
 <div class="container">
   <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 row">
-    <div class="col-md-9">
+    <div class="col-md-12">
+      <span class="view-applications-top"><%= link_to "View my Applications", applications_path, class: "btn btn-small btn-primary" %></span>
       <div id="dependents_info_wrapper">
       <h2 class="darkblue">Review Your Application</h2>
       <p><b>Application ID:</b> <%= @application.hbx_id %> </p>
@@ -95,7 +96,7 @@
       <% end %>
 
       <div class="row white-background">
-        <div class="col-md-12 pz">
+        <div class="col-md-12">
           <% if @application.applicants.count > 1 %>
             <div class="row row-form-wrapper ptb no-buffer row-height main-heading form-bottom-border">
               <div class="col-md-12" style="font-size: 20px; font-weight: bold; padding-left: 0px;"><span></span>
@@ -176,14 +177,8 @@
           <% end %>
         </div>
       </div>
-      <div class=""> <%= link_to "View my Applications", applications_path, class: "btn btn-small btn-primary" %> </div>
+        <div class="view-applications-bottom" ><%= link_to "View my Applications", applications_path, class: "btn btn-small btn-primary" %></div>
     </div>
-    </div>
-    <div class='col-md-3'>
-      <%= render partial: 'financial_assistance/shared/right_nav', locals: {
-          previous_url: applications_path,
-          next_url: main_app.find_sep_insured_families_path(consumer_role_id: @person.consumer_role.id)
-      } %>
     </div>
   </div>
 </div>
