@@ -4,7 +4,7 @@ module BenefitSponsors
 
       def initialize(employer_profile, billing_date)
         @employer_profile = employer_profile
-        @billing_date = billing_date
+        @billing_date = billing_date&.to_date
       end
 
       def execute
@@ -29,7 +29,7 @@ module BenefitSponsors
 
       def billing_report_date
         return @billing_report_date if defined? @billing_report_date
-        @billing_report_date = billing_adapter[:billing_date]
+        @billing_report_date = billing_adapter[:billing_date]&.to_date
       end
 
       def application
