@@ -199,7 +199,7 @@
             - cells:
               - gutter: 12
                 type: raw_html
-                text: <b>Does any child on this application have a parent living outside of the home?</b>
+                text: <b>Does any child on this application have a parent living outside of the home?&nbsp;*</b>
               - gutter: 2
                 type: label_radio
                 name: row1
