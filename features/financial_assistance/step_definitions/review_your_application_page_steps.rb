@@ -45,6 +45,7 @@ And(/^all data should be presented as previously entered$/) do
     expect(find("#has_job_income_true")).to be_checked
     expect(find("#has_self_employment_income_true")).to be_checked
   elsif page.has_css?('h2', text: 'Other Income')
+    expect(find('#has_unemployment_income_false')).to be_checked if FinancialAssistanceRegistry[:unemployment_income].enabled?
     expect(find('#has_other_income_false')).to be_checked
   elsif page.has_css?('h2', text: 'Income Adjustments')
     expect(find("#has_deductions_true")).to be_checked
