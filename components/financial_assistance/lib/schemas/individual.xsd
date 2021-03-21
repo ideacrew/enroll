@@ -2325,6 +2325,7 @@
 			<xs:enumeration value="urn:openhbx:terms:v1:financial_assistance_income#military"/>
 			<xs:enumeration value="urn:openhbx:terms:v1:financial_assistance_income#net_self_employment"/>
 			<xs:enumeration value="urn:openhbx:terms:v1:financial_assistance_income#other"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:financial_assistance_income#unemployment_income"/>
 			<xs:enumeration value="urn:openhbx:terms:v1:financial_assistance_income#pension_retirement_benefits"/>
 			<xs:enumeration value="urn:openhbx:terms:v1:financial_assistance_income#permanent_workers_compensation"/>
 			<xs:enumeration value="urn:openhbx:terms:v1:financial_assistance_income#prizes_and_awards"/>
