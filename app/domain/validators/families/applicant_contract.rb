@@ -68,6 +68,13 @@ module Validators
         optional(:emails).maybe(:array)
 
         optional(:relationship).maybe(:string)
+
+        before(:value_coercer) do |result|
+          result_hash = result.to_h
+          other_params = {}
+          other_params[:dob] = result_hash[:dob].to_date if result_hash[:dob].present?
+          result_hash.merge(other_params)
+        end
       end
 
       rule(:addresses).each do
