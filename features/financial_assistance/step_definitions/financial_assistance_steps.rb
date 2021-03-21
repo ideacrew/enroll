@@ -440,7 +440,7 @@ Then(/^the user should see text Full Application$/) do
 end
 
 Then(/^user clicks on Full application action$/) do
- click_link 'Full Application'
+  click_link 'Full Application'
 end
 
 Then(/^user should land on full application page and should see 2 view my applications buttons$/) do
