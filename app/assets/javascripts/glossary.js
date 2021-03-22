@@ -12,9 +12,6 @@ $(document).on("turbolinks:load ajax:success", function() {
   });
 });
 
-// TODO 1: These should be refactored into a js.erb file to pull from settings files and be client agnostic
-// TODO 2: All of these should be refactored as back end translations
-
 /* March 2020 TODO List:
 Much of the tooltips in the application live within a Javascript file called glossary.js.
 Until we do some refactoring, these links can't reference anything in settings or Resource Registry, and even if and when we do it, we'll still need the links.
@@ -120,7 +117,6 @@ Here's the ones we need. Soome of the tooltips in the glosssary hold multiple li
 99) Specialist
 100) Temporary Cash Assistance for Needy Families
 101) UCR - Usual Customary and Reasonable
-
 */
 
 
@@ -131,15 +127,15 @@ function runGlossary() {
     var terms = [
       {
         "term": "ACA",
-        "description": "The acronym for the <a href='/glossary#affordable_care_act' target='_blank'>Affordable Care Act<\/a>."
+        "description": "The acronym for the <a href='https://www.healthcare.gov/glossary/affordable-care-act/' target='_blank'>Affordable Care Act<\/a>."
       },
       {
         "term": "Accreditation",
-        "description": "All health plans available through Maine Cover ME have been reviewed by an independent, third-party organization to validate (accredit) that the plans meet quality standards required by the <a href='/glossary#affordable_care_act' target='_blank'>Affordable Care Act<\/a> and the State of Maine."
+        "description": "All health plans available through Maine Cover ME have been reviewed by an independent, third-party organization to validate (accredit) that the plans meet quality standards required by the <a href='https://www.healthcare.gov/glossary/affordable-care-act/' target='_blank'>Affordable Care Act<\/a> and the State of Maine."
       },
       {
         "term": "Actuarial Value",
-        "description": "A measurement of the average amount each plan will pay for all people enrolled in a plan (not just you) towards out-of-pocket costs for <a href='/glossary#covered_services' target='_blank'>covered services<\/a>. Since it\u2019s an average for all people, your out-of-pocket costs could be higher or lower depending on your health care usage; how other costs like your <a href='/glossary#premium' target='_blank'>premium<\/a>, <a href='/glossary#deductible' target='_blank'>deductible<\/a>, <a href='/glossary#copayment' target='_blank'>copayments<\/a>, <a href='/glossary#coinsurance' target='_blank'>coinsurance<\/a> and <a href='/glossary#out-of-pocket_limit' target='_blank'>out-of-pocket limit<\/a> are structured in your plan; and other terms of your insurance policy. <a href='/glossary#bronze_health_plan' target='_blank'>Bronze<\/a> means the plan is expected to pay 60 percent of in-network expenses for an average population of consumers, <a href='/glossary#silver_health_plan' target='_blank'>Silver<\/a> 70 percent, <a href='/glossary#gold_health_plan' target='_blank'>Gold<\/a> 80 percent and <a href='/glossary#platinum_health_plan' target='_blank'>Platinum<\/a> 90 percent."
+        "description": "A measurement of the average amount each plan will pay for all people enrolled in a plan (not just you) towards out-of-pocket costs for <a href='/glossary#covered_services' target='_blank'>covered services<\/a>. Since it\u2019s an average for all people, your out-of-pocket costs could be higher or lower depending on your health care usage; how other costs like your <a href='/glossary#premium' target='_blank'>premium<\/a>, <a href='https://www.maine.gov/pfr/insurance/glossary.html#d' target='_blank'>deductible<\/a>, <a href='/glossary#copayment' target='_blank'>copayments<\/a>, <a href='/glossary#coinsurance' target='_blank'>coinsurance<\/a> and <a href='/glossary#out-of-pocket_limit' target='_blank'>out-of-pocket limit<\/a> are structured in your plan; and other terms of your insurance policy. <a href='/glossary#bronze_health_plan' target='_blank'>Bronze<\/a> means the plan is expected to pay 60 percent of in-network expenses for an average population of consumers, <a href='/glossary#silver_health_plan' target='_blank'>Silver<\/a> 70 percent, <a href='/glossary#gold_health_plan' target='_blank'>Gold<\/a> 80 percent and <a href='/glossary#platinum_health_plan' target='_blank'>Platinum<\/a> 90 percent."
       },
       {
         "term": "Advance Premium Tax Credit",
@@ -155,7 +151,7 @@ function runGlossary() {
       },
       {
         "term": "Age",
-        "description": "Your age is used to determine monthly <a href='/glossary#premium' target='_blank'>premiums<\/a> for insurance."
+        "description": "Your age is used to determine monthly <a href='https://www.maine.gov/pfr/insurance/glossary.html#p' target='_blank'>premiums<\/a> for insurance."
       },
       {
         "term": "Aged, Blind and Disabled Program",
@@ -235,7 +231,7 @@ function runGlossary() {
       },
       {
         "term": "Bronze Health Plan",
-        "description": "Bronze Health Plans pay about 60 percent of <a href='/glossary#in-network' target='_blank'>in-network<\/a> expenses for an average population of consumers. The <a href='/glossary#premium' target='_blank'>premiums<\/a> are typically among the lowest but the <a href='/glossary#deductible' target='_blank'>deductible<\/a> and <a href='/glossary#out-of-pocket_limit' target='_blank'>out-of-pocket limit<\/a> of what you'll pay before the plan starts paying are among the highest. <a href='/glossary#metal_level' target='_blank'>Metal levels<\/a> only focus on what the plan is expected to pay, and do NOT reflect the quality of health care or <a href='/glossary#service_provider' target='_blank'>service providers<\/a> available through the <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> plan. Once you meet your in-network out-of-pocket limit for the <a href='/glossary#plan_year' target='_blank'>plan year<\/a>, plans pay 100 percent of the <a href='/glossary#allowed_amount' target='_blank'>allowed amount<\/a> for <a href='/glossary#covered_services' target='_blank'>covered services<\/a>."
+        "description": "Bronze Health Plans pay about 60 percent of <a href='/glossary#in-network' target='_blank'>in-network<\/a> expenses for an average population of consumers. The <a href='/glossary#premium' target='_blank'>premiums<\/a> are typically among the lowest but the <a href='https://www.maine.gov/pfr/insurance/glossary.html#d' target='_blank'>deductible<\/a> and <a href='/glossary#out-of-pocket_limit' target='_blank'>out-of-pocket limit<\/a> of what you'll pay before the plan starts paying are among the highest. <a href='/glossary#metal_level' target='_blank'>Metal levels<\/a> only focus on what the plan is expected to pay, and do NOT reflect the quality of health care or <a href='/glossary#service_provider' target='_blank'>service providers<\/a> available through the <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> plan. Once you meet your in-network out-of-pocket limit for the <a href='/glossary#plan_year' target='_blank'>plan year<\/a>, plans pay 100 percent of the <a href='/glossary#allowed_amount' target='_blank'>allowed amount<\/a> for <a href='/glossary#covered_services' target='_blank'>covered services<\/a>."
       },
       {
         "term": "Carrier",
@@ -243,7 +239,7 @@ function runGlossary() {
       },
       {
         "term": "Catastrophic Health Plan",
-        "description": "A health plan with low monthly <a href='/glossary#premium' target='_blank'>premiums<\/a> and high annual <a href='/glossary#deductible' target='_blank'>deductibles<\/a> designed to protect consumers from worst case situations like a serious illness or an accident. Catastrophic plans are only available to people under 30 or people with a hardship <a href='/glossary#exemption' target='_blank'>exemption<\/a>. Catastrophic plans provide <a href='/glossary#essential_health_benefits' target='_blank'>essential health benefits<\/a> and count as having coverage for tax purposes. Plans cover at least 3 <a href='/glossary#primary_care' target='_blank'>primary care<\/a> visits during the <a href='/glossary#plan_year' target='_blank'>plan year<\/a> and certain <a href='/glossary#preventive_services' target='_blank'>preventive services<\/a> at no cost. Consumers pay all other medical costs until the annual deductible is met. Then the plan pays 100 percent for <a href='/glossary#covered_services' target='_blank'>covered services<\/a> for the rest of the plan year. <a href='/glossary#advance_premium_tax_credit' target='_blank'>Advance premium tax credits<\/a> and <a href='/glossary#cost-sharing_reduction' target='_blank'>cost-sharing reductions<\/a> can\u2019t be used with this <a href='/glossary#plan_type' target='_blank'>plan type<\/a>."
+        "description": "A health plan with low monthly <a href='/glossary#premium' target='_blank'>premiums<\/a> and high annual <a href='https://www.maine.gov/pfr/insurance/glossary.html#d' target='_blank'>deductibles<\/a> designed to protect consumers from worst case situations like a serious illness or an accident. Catastrophic plans are only available to people under 30 or people with a hardship <a href='/glossary#exemption' target='_blank'>exemption<\/a>. Catastrophic plans provide <a href='/glossary#essential_health_benefits' target='_blank'>essential health benefits<\/a> and count as having coverage for tax purposes. Plans cover at least 3 <a href='/glossary#primary_care' target='_blank'>primary care<\/a> visits during the <a href='/glossary#plan_year' target='_blank'>plan year<\/a> and certain <a href='/glossary#preventive_services' target='_blank'>preventive services<\/a> at no cost. Consumers pay all other medical costs until the annual deductible is met. Then the plan pays 100 percent for <a href='/glossary#covered_services' target='_blank'>covered services<\/a> for the rest of the plan year. <a href='/glossary#advance_premium_tax_credit' target='_blank'>Advance premium tax credits<\/a> and <a href='/glossary#cost-sharing_reduction' target='_blank'>cost-sharing reductions<\/a> can\u2019t be used with this <a href='/glossary#plan_type' target='_blank'>plan type<\/a>."
       },
       {
         "term": "Center for Medicare and Medicaid Services",
@@ -271,7 +267,7 @@ function runGlossary() {
       },
       {
         "term": "Coinsurance",
-        "description": "Your share of the costs for <a href='/glossary#covered_services' target='_blank'>covered services<\/a> that you pay when you receive them. Coinsurance is calculated as a percent of the total fee. For example, if your <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> plan\u2019s <a href='/glossary#allowed_amount' target='_blank'>allowed amount<\/a> to visit your doctor is $100, a coinsurance payment of 20 percent would be $20. Some plans require that you pay up to the plan's <a href='/glossary#deductible' target='_blank'>deductible<\/a> amount before coinsurance begins. Once you reach your <a href='/glossary#out-of-pocket_limit' target='_blank'>out-of-pocket limit<\/a>, you no longer have to pay coinsurance for the rest of the <a href='/glossary#plan_year' target='_blank'>plan year<\/a>."
+        "description": "Your share of the costs for <a href='/glossary#covered_services' target='_blank'>covered services<\/a> that you pay when you receive them. Coinsurance is calculated as a percent of the total fee. For example, if your <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> plan\u2019s <a href='/glossary#allowed_amount' target='_blank'>allowed amount<\/a> to visit your doctor is $100, a coinsurance payment of 20 percent would be $20. Some plans require that you pay up to the plan's <a href='https://www.maine.gov/pfr/insurance/glossary.html#d' target='_blank'>deductible<\/a> amount before coinsurance begins. Once you reach your <a href='/glossary#out-of-pocket_limit' target='_blank'>out-of-pocket limit<\/a>, you no longer have to pay coinsurance for the rest of the <a href='/glossary#plan_year' target='_blank'>plan year<\/a>."
       },
       {
         "term": "Complaint",
@@ -279,7 +275,7 @@ function runGlossary() {
       },
       {
         "term": "Consolidated Omnibus Budget Reconciliation Act",
-        "description": "A federal law more commonly referred to as <a href='/glossary#cobra' target='_blank'>COBRA<\/a>."
+        "description": "A federal law more commonly referred to as <a href='https://www.maine.gov/pfr/insurance/glossary.html#c' target='_blank'>COBRA<\/a>."
       },
       {
         "term": "Consumers' CHECKBOOK",
@@ -295,7 +291,7 @@ function runGlossary() {
       },
       {
         "term": "Cost-Sharing Reduction",
-        "description": "A discount that lowers your costs for <a href='/glossary#deductible' target='_blank'>deductibles<\/a>, <a href='/glossary#coinsurance' target='_blank'>coinsurance<\/a>, <a href='/glossary#copayment' target='_blank'>copayments<\/a>, and also lowers what you have to pay to reach your <a href='/glossary#out-of-pocket_limit' target='_blank'>out-of-pocket limit<\/a>. To get these savings, you must apply for <a href='/glossary#financial_assistance' target='_blank'>financial assistance<\/a>. Maine Cover ME will help you determine if you qualify as part of the application process. Then you can enroll. Most customers must enroll in a <a href='/glossary#silver_health_plan' target='_blank'>Silver Health Plan<\/a> to receive cost-sharing reductions. <a href='/glossary#native_american' target='_blank'>Native Americans<\/a> receive additional cost-sharing reductions regardless of a plan's <a href='/glossary#metal_level' target='_blank'>metal level<\/a>."
+        "description": "A discount that lowers your costs for <a href='https://www.maine.gov/pfr/insurance/glossary.html#d' target='_blank'>deductibles<\/a>, <a href='/glossary#coinsurance' target='_blank'>coinsurance<\/a>, <a href='/glossary#copayment' target='_blank'>copayments<\/a>, and also lowers what you have to pay to reach your <a href='/glossary#out-of-pocket_limit' target='_blank'>out-of-pocket limit<\/a>. To get these savings, you must apply for <a href='/glossary#financial_assistance' target='_blank'>financial assistance<\/a>. Maine Cover ME will help you determine if you qualify as part of the application process. Then you can enroll. Most customers must enroll in a <a href='/glossary#silver_health_plan' target='_blank'>Silver Health Plan<\/a> to receive cost-sharing reductions. <a href='/glossary#native_american' target='_blank'>Native Americans<\/a> receive additional cost-sharing reductions regardless of a plan's <a href='/glossary#metal_level' target='_blank'>metal level<\/a>."
       },
       {
         "term": "Cover All ME",
@@ -435,7 +431,7 @@ function runGlossary() {
       },
       {
         "term": "Excluded Services",
-        "description": "Health care services that your <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> doesn't pay for or cover such as <a href='/glossary#plastic_surgery' target='_blank'>plastic surgery<\/a> for non-medical reasons. Some services also require <a href='/glossary#pre-authorization' target='_blank'>pre-authorization<\/a> from your health insurance company or a referral from your <a href='/glossary#primary_care_physician' target='_blank'>primary care physician<\/a> in order to be considered <a href='/glossary#covered_services' target='_blank'>covered services<\/a>. Excluded services don't count towards your annual <a href='/glossary#deductible' target='_blank'>deductible<\/a> or <a href='/glossary#out-of-pocket_limit' target='_blank'>out-of-pocket limit<\/a>."
+        "description": "Health care services that your <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> doesn't pay for or cover such as <a href='/glossary#plastic_surgery' target='_blank'>plastic surgery<\/a> for non-medical reasons. Some services also require <a href='/glossary#pre-authorization' target='_blank'>pre-authorization<\/a> from your health insurance company or a referral from your <a href='/glossary#primary_care_physician' target='_blank'>primary care physician<\/a> in order to be considered <a href='/glossary#covered_services' target='_blank'>covered services<\/a>. Excluded services don't count towards your annual <a href='https://www.maine.gov/pfr/insurance/glossary.html#d' target='_blank'>deductible<\/a> or <a href='/glossary#out-of-pocket_limit' target='_blank'>out-of-pocket limit<\/a>."
       },
       {
         "term": "Exclusive Provider Organization",
@@ -496,7 +492,7 @@ function runGlossary() {
       },
       {
         "term": "Gold Health Plan",
-        "description": "Gold Health Plans pay 80 percent of <a href='/glossary#in-network' target='_blank'>in-network<\/a> expenses for an average population of consumers. The <a href='/glossary#premium' target='_blank'>premiums<\/a> are typically higher but the <a href='/glossary#deductible' target='_blank'>deductible<\/a> and <a href='/glossary#out-of-pocket_limit' target='_blank'>out-of-pocket limit<\/a> of what you'll pay before the plan starts paying are lower. <a href='/glossary#metal_level' target='_blank'>Metal levels<\/a> only focus on what the plan is expected to pay, and do NOT reflect the quality of health care or <a href='/glossary#service_provider' target='_blank'>service providers<\/a> available through the <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> plan. Once you meet your in-network out-of-pocket limit for the <a href='/glossary#plan_year' target='_blank'>plan year<\/a>, plans pay 100 percent of the <a href='/glossary#allowed_amount' target='_blank'>allowed amount<\/a> for <a href='/glossary#covered_services' target='_blank'>covered services<\/a>. "
+        "description": "Gold Health Plans pay 80 percent of <a href='/glossary#in-network' target='_blank'>in-network<\/a> expenses for an average population of consumers. The <a href='/glossary#premium' target='_blank'>premiums<\/a> are typically higher but the <a href='https://www.maine.gov/pfr/insurance/glossary.html#d' target='_blank'>deductible<\/a> and <a href='/glossary#out-of-pocket_limit' target='_blank'>out-of-pocket limit<\/a> of what you'll pay before the plan starts paying are lower. <a href='/glossary#metal_level' target='_blank'>Metal levels<\/a> only focus on what the plan is expected to pay, and do NOT reflect the quality of health care or <a href='/glossary#service_provider' target='_blank'>service providers<\/a> available through the <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> plan. Once you meet your in-network out-of-pocket limit for the <a href='/glossary#plan_year' target='_blank'>plan year<\/a>, plans pay 100 percent of the <a href='/glossary#allowed_amount' target='_blank'>allowed amount<\/a> for <a href='/glossary#covered_services' target='_blank'>covered services<\/a>. "
       },
       {
         "term": "Grandfathered Plan",
@@ -569,7 +565,7 @@ function runGlossary() {
       },
       {
         "term": "Health Savings Account",
-        "description": "If you have a <a href='/glossary#high_deductible_health_plan' target='_blank'>High Deductible Health Plan<\/a>, you may be eligible for a Health Savings Account (HSA) where you (and if applicable, your employer) can deposit pre-tax dollars to pay for <a href='/glossary#qualified_medical_expenses' target='_blank'>qualified medical expenses<\/a> like your <a href='/glossary#deductible' target='_blank'>deductible<\/a>, <a href='/glossary#copayment' target='_blank'>copayments<\/a> and <a href='/glossary#coinsurance' target='_blank'>coinsurance<\/a>. There's an annual limit on contributions established by the IRS, but any funds deposited can be used in future years. If you have an HSA through your employer, the funds belong to you and can rollover into another qualifying account if you ever leave. "
+        "description": "If you have a <a href='/glossary#high_deductible_health_plan' target='_blank'>High Deductible Health Plan<\/a>, you may be eligible for a Health Savings Account (HSA) where you (and if applicable, your employer) can deposit pre-tax dollars to pay for <a href='/glossary#qualified_medical_expenses' target='_blank'>qualified medical expenses<\/a> like your <a href='https://www.maine.gov/pfr/insurance/glossary.html#d' target='_blank'>deductible<\/a>, <a href='/glossary#copayment' target='_blank'>copayments<\/a> and <a href='/glossary#coinsurance' target='_blank'>coinsurance<\/a>. There's an annual limit on contributions established by the IRS, but any funds deposited can be used in future years. If you have an HSA through your employer, the funds belong to you and can rollover into another qualifying account if you ever leave. "
       },
       {
         "term": "Health Status",
@@ -585,7 +581,7 @@ function runGlossary() {
       },
       {
         "term": "High Deductible Health Plan",
-        "description": "A feature of some health plans. HDHPs have a higher annual <a href='/glossary#deductible' target='_blank'>deductible<\/a> and typically lower monthly <a href='/glossary#premium' target='_blank'>premiums<\/a>. You pay more for health care up front before your insurance company starts to pay. With an HDHP, you're eligible to open a tax deductible <a href='/glossary#health_savings_account' target='_blank'>Health Savings Account<\/a> or <a href='/glossary#health_reimbursement_account' target='_blank'>Health Reimbursement Account<\/a> to pay for <a href='/glossary#qualified_medical_expenses' target='_blank'>qualified medical expenses<\/a> like your annual deductible, <a href='/glossary#copayment' target='_blank'>copayments<\/a> or <a href='/glossary#coinsurance' target='_blank'>coinsurance<\/a>. The IRS defines the limits for plans that qualify as HDHPs and the deductible and <a href='/glossary#out-of-pocket_limit' target='_blank'>out-of-pocket limit<\/a> may be adjusted annually for inflation. "
+        "description": "A feature of some health plans. HDHPs have a higher annual <a href='https://www.maine.gov/pfr/insurance/glossary.html#d' target='_blank'>deductible<\/a> and typically lower monthly <a href='/glossary#premium' target='_blank'>premiums<\/a>. You pay more for health care up front before your insurance company starts to pay. With an HDHP, you're eligible to open a tax deductible <a href='/glossary#health_savings_account' target='_blank'>Health Savings Account<\/a> or <a href='/glossary#health_reimbursement_account' target='_blank'>Health Reimbursement Account<\/a> to pay for <a href='/glossary#qualified_medical_expenses' target='_blank'>qualified medical expenses<\/a> like your annual deductible, <a href='/glossary#copayment' target='_blank'>copayments<\/a> or <a href='/glossary#coinsurance' target='_blank'>coinsurance<\/a>. The IRS defines the limits for plans that qualify as HDHPs and the deductible and <a href='/glossary#out-of-pocket_limit' target='_blank'>out-of-pocket limit<\/a> may be adjusted annually for inflation. "
       },
       {
         "term": "HIPAA",
@@ -713,7 +709,7 @@ function runGlossary() {
       },
       {
         "term": "Limited Cost-Sharing Plan",
-        "description": "Members of <a href='/glossary#federally_recognized_tribe' target='_blank'>federally recognized Tribes<\/a> and <a href='/glossary#alaskan_native' target='_blank'>Alaska Native<\/a> Claims Settlement Act (ANCSA) Corporation shareholders are eligible for this type of plan regardless of income or eligibility for <a href='/glossary#advance_premium_tax_credit' target='_blank'>advance premium tax credits<\/a>. With this plan, there aren\u2019t any <a href='/glossary#deductible' target='_blank'>deductibles<\/a>, <a href='/glossary#copayment' target='_blank'>copayments<\/a>, or <a href='/glossary#coinsurance' target='_blank'>coinsurance<\/a> when getting care through the <a href='/glossary#indian_health_service' target='_blank'>Indian Health Service<\/a>, Tribal Health Providers, or Urban Indian Health Providers. <a href='/glossary#plan_participants' target='_blank'>Plan participants<\/a> must have a referral from an <a href='/glossary#i\/t\/u' target='_blank'>I\/T\/U<\/a> provider to receive <a href='/glossary#covered_services' target='_blank'>covered services<\/a> from an <a href='/glossary#in-network' target='_blank'>in-network<\/a> <a href='/glossary#service_provider' target='_blank'>service provider<\/a> at no cost. "
+        "description": "Members of <a href='/glossary#federally_recognized_tribe' target='_blank'>federally recognized Tribes<\/a> and <a href='/glossary#alaskan_native' target='_blank'>Alaska Native<\/a> Claims Settlement Act (ANCSA) Corporation shareholders are eligible for this type of plan regardless of income or eligibility for <a href='/glossary#advance_premium_tax_credit' target='_blank'>advance premium tax credits<\/a>. With this plan, there aren\u2019t any <a href='https://www.maine.gov/pfr/insurance/glossary.html#d' target='_blank'>deductibles<\/a>, <a href='/glossary#copayment' target='_blank'>copayments<\/a>, or <a href='/glossary#coinsurance' target='_blank'>coinsurance<\/a> when getting care through the <a href='/glossary#indian_health_service' target='_blank'>Indian Health Service<\/a>, Tribal Health Providers, or Urban Indian Health Providers. <a href='/glossary#plan_participants' target='_blank'>Plan participants<\/a> must have a referral from an <a href='/glossary#i\/t\/u' target='_blank'>I\/T\/U<\/a> provider to receive <a href='/glossary#covered_services' target='_blank'>covered services<\/a> from an <a href='/glossary#in-network' target='_blank'>in-network<\/a> <a href='/glossary#service_provider' target='_blank'>service provider<\/a> at no cost. "
       },
       {
         "term": "Limited Enrollment Period",
@@ -809,15 +805,15 @@ function runGlossary() {
       },
       {
         "term": "Out-of-Network",
-        "description": "Some plans allow you to use out-of-network <a href='/glossary#service_provider' target='_blank'>service providers<\/a> (sometimes called \u201cnon-preferred providers\u201d or a \u201ctiered network\u201d), but you have to pay more to use them. If your plan allows you to go out-of-network, there may be an additional <a href='/glossary#deductible' target='_blank'>deductible<\/a>, <a href='/glossary#copayment' target='_blank'>copayments<\/a> and <a href='/glossary#coinsurance' target='_blank'>coinsurance<\/a> and an <a href='/glossary#out-of-pocket_limit' target='_blank'>out-of-pocket limit<\/a> that apply to any out-of-network services you use. If an out-of-network provider charges more than the <a href='/glossary#allowed_amount' target='_blank'>allowed amount<\/a> for <a href='/glossary#covered_services' target='_blank'>covered services<\/a>, you may be responsible for paying the difference (<a href='/glossary#balance_billing' target='_blank'>balance billing<\/a>). It also may not count towards your out-of-network deductible or out-of-pocket limit."
+        "description": "Some plans allow you to use out-of-network <a href='/glossary#service_provider' target='_blank'>service providers<\/a> (sometimes called \u201cnon-preferred providers\u201d or a \u201ctiered network\u201d), but you have to pay more to use them. If your plan allows you to go out-of-network, there may be an additional <a href='https://www.maine.gov/pfr/insurance/glossary.html#d' target='_blank'>deductible<\/a>, <a href='/glossary#copayment' target='_blank'>copayments<\/a> and <a href='/glossary#coinsurance' target='_blank'>coinsurance<\/a> and an <a href='/glossary#out-of-pocket_limit' target='_blank'>out-of-pocket limit<\/a> that apply to any out-of-network services you use. If an out-of-network provider charges more than the <a href='/glossary#allowed_amount' target='_blank'>allowed amount<\/a> for <a href='/glossary#covered_services' target='_blank'>covered services<\/a>, you may be responsible for paying the difference (<a href='/glossary#balance_billing' target='_blank'>balance billing<\/a>). It also may not count towards your out-of-network deductible or out-of-pocket limit."
       },
       {
         "term": "Out-of-Pocket Costs",
-        "description": "Expenses you incur for medical services that your insurance company doesn't pay including <a href='/glossary#deductible' target='_blank'>deductibles<\/a>, <a href='/glossary#copayment' target='_blank'>copayments<\/a>, <a href='/glossary#coinsurance' target='_blank'>coinsurance<\/a>, <a href='/glossary#balance_billing' target='_blank'>balance billing<\/a> along with any costs you incur for <a href='/glossary#excluded_services' target='_blank'>excluded services<\/a>."
+        "description": "Expenses you incur for medical services that your insurance company doesn't pay including <a href='https://www.maine.gov/pfr/insurance/glossary.html#d' target='_blank'>deductibles<\/a>, <a href='/glossary#copayment' target='_blank'>copayments<\/a>, <a href='/glossary#coinsurance' target='_blank'>coinsurance<\/a>, <a href='/glossary#balance_billing' target='_blank'>balance billing<\/a> along with any costs you incur for <a href='/glossary#excluded_services' target='_blank'>excluded services<\/a>."
       },
       {
         "term": "Out-of-Pocket Limit",
-        "description": "The most you'll have to pay in a <a href='/glossary#plan_year' target='_blank'>plan year<\/a> for <a href='/glossary#covered_services' target='_blank'>covered services<\/a> before your <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> company pays 100 percent. After you spend this amount on <a href='/glossary#deductible' target='_blank'>deductibles<\/a>, <a href='/glossary#copayment' target='_blank'>copayments<\/a>, and <a href='/glossary#coinsurance' target='_blank'>coinsurance<\/a>, your health insurance pays 100 percent of the <a href='/glossary#allowed_amount' target='_blank'>allowed amount<\/a> for covered services. <a href='/glossary#premium' target='_blank'>Premiums<\/a> don't count towards your out-of-pocket limit."
+        "description": "The most you'll have to pay in a <a href='/glossary#plan_year' target='_blank'>plan year<\/a> for <a href='/glossary#covered_services' target='_blank'>covered services<\/a> before your <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> company pays 100 percent. After you spend this amount on <a href='https://www.maine.gov/pfr/insurance/glossary.html#d' target='_blank'>deductibles<\/a>, <a href='/glossary#copayment' target='_blank'>copayments<\/a>, and <a href='/glossary#coinsurance' target='_blank'>coinsurance<\/a>, your health insurance pays 100 percent of the <a href='/glossary#allowed_amount' target='_blank'>allowed amount<\/a> for covered services. <a href='/glossary#premium' target='_blank'>Premiums<\/a> don't count towards your out-of-pocket limit."
       },
       {
         "term": "Out-of-Pocket Maximum",
@@ -857,7 +853,7 @@ function runGlossary() {
       },
       {
         "term": "Plan Match",
-        "description": "Maine Cover ME's health plan comparison tool powered by <a href='/glossary#consumers&#39;_checkbook' target='_blank'>Consumers' CHECKBOOK<\/a>. Plan match helps you compare and choose a plan based on the features that are most important to you. See <a class='ext' href='https:\/\/dc.checkbookhealth.org\/hie\/dc\/2017\/' target='_blank'>Plan Match for Individuals & Families<\/a> or <a class='ext' href='https:\/\/dc.checkbookhealth.org\/shop\/dc\/' target='_blank'>Plan Match for Small Businesses & Employees<\/a>. "
+        "description": "Maine Cover ME's health plan comparison tool. Plan match helps you compare and choose a plan based on the features that are most important to you. See <a class='ext' href='https://www.maine.gov/pfr/insurance/consumer/individuals_families/health/purchasing_health_insurance/shopping_health_insurance.html' target='_blank'>Plan Match for Individuals & Families<\/a>"
       },
       {
         "term": "Plan Participants",
@@ -865,7 +861,7 @@ function runGlossary() {
       },
       {
         "term": "Plan Type",
-        "description": "Plan type impacts which doctors you can see, whether or not you can use <a href='/glossary#out-of-network' target='_blank'>out-of-network<\/a> providers or providers outside of your <a href='/glossary#service_area' target='_blank'>service area<\/a>, and how much you'll pay. Plan types available through Maine Cover ME include: <a href='/glossary#health_maintenance_organization' target='_blank'>Health Maintenance Organizations<\/a>; <a href='/glossary#exclusive_provider_organization' target='_blank'>Exclusive Provider Organizations<\/a>; <a href='/glossary#preferred_provider_organization' target='_blank'>Preferred Provider Organizations<\/a>; and <a href='/glossary#point-of-service_plan' target='_blank'>Point of Service Plans<\/a>. "
+        "description": "Plan type impacts which doctors you can see, whether or not you can use <a href='/glossary#out-of-network' target='_blank'>out-of-network<\/a> providers or providers outside of your <a href='/glossary#service_area' target='_blank'>service area<\/a>, and how much you'll pay. Plan types available through Maine Cover ME include: <a href='/glossary#health_maintenance_organization' target='_blank'>Health Maintenance Organizations<\/a>; <a href='/glossary#exclusive_provider_organization' target='_blank'>Exclusive Provider Organizations<\/a>; <a href='https://www.maine.gov/pfr/insurance/glossary.html#p' target='_blank'>Preferred Provider Organizations<\/a>; and <a href='/glossary#point-of-service_plan' target='_blank'>Point of Service Plans<\/a>. "
       },
       {
         "term": "Plan Year",
@@ -877,11 +873,11 @@ function runGlossary() {
       },
       {
         "term": "Platinum Health Plan",
-        "description": "Platinum Health Plans pay 90 percent of <a href='/glossary#in-network' target='_blank'>in-network<\/a> expenses for an average population of consumers. The <a href='/glossary#premium' target='_blank'>premiums<\/a> are typically among the highest, but the <a href='/glossary#out-of-pocket_limit' target='_blank'>out-of-pocket limit<\/a> of what you'll pay before the plan starts paying is usually the lowest and the plan may not have a <a href='/glossary#deductible' target='_blank'>deductible<\/a> at all. <a href='/glossary#metal_level' target='_blank'>Metal levels<\/a> only focus on what the plan is expected to pay, and do NOT reflect the quality of health care or <a href='/glossary#service_provider' target='_blank'>service providers<\/a> available through the health insurance plan. Once you meet your in-network out-of-pocket limit for the <a href='/glossary#plan_year' target='_blank'>plan year<\/a>, plans pay 100 percent of the <a href='/glossary#allowed_amount' target='_blank'>allowed amount<\/a> for <a href='/glossary#covered_services' target='_blank'>covered services<\/a>. "
+        "description": "Platinum Health Plans pay 90 percent of <a href='/glossary#in-network' target='_blank'>in-network<\/a> expenses for an average population of consumers. The <a href='/glossary#premium' target='_blank'>premiums<\/a> are typically among the highest, but the <a href='/glossary#out-of-pocket_limit' target='_blank'>out-of-pocket limit<\/a> of what you'll pay before the plan starts paying is usually the lowest and the plan may not have a <a href='https://www.maine.gov/pfr/insurance/glossary.html#d' target='_blank'>deductible<\/a> at all. <a href='/glossary#metal_level' target='_blank'>Metal levels<\/a> only focus on what the plan is expected to pay, and do NOT reflect the quality of health care or <a href='/glossary#service_provider' target='_blank'>service providers<\/a> available through the health insurance plan. Once you meet your in-network out-of-pocket limit for the <a href='/glossary#plan_year' target='_blank'>plan year<\/a>, plans pay 100 percent of the <a href='/glossary#allowed_amount' target='_blank'>allowed amount<\/a> for <a href='/glossary#covered_services' target='_blank'>covered services<\/a>. "
       },
       {
         "term": "Point-of-Service Plan",
-        "description": "A type of health plan that's a combination of a <a href='/glossary#health_maintenance_organization' target='_blank'>Health Maintenance Organization<\/a> and a <a href='/glossary#preferred_provider_organization' target='_blank'>Preferred Provider Organization Plan<\/a>. Typically, it has a network that functions like a HMO \u2013 you pick a <a href='/glossary#primary_care_physician' target='_blank'>primary care physician<\/a>, who manages and coordinates your care <a href='/glossary#in-network' target='_blank'>in-network<\/a>. Similar to a PPO, you can use an <a href='/glossary#out-of-network' target='_blank'>out-of-network<\/a> <a href='/glossary#service_provider' target='_blank'>service provider<\/a> with a <a href='/glossary#referral' target='_blank'>referral<\/a>."
+        "description": "A type of health plan that's a combination of a <a href='/glossary#health_maintenance_organization' target='_blank'>Health Maintenance Organization<\/a> and a <a href='https://www.maine.gov/pfr/insurance/glossary.html#p' target='_blank'>Preferred Provider Organization Plan<\/a>. Typically, it has a network that functions like a HMO \u2013 you pick a <a href='/glossary#primary_care_physician' target='_blank'>primary care physician<\/a>, who manages and coordinates your care <a href='/glossary#in-network' target='_blank'>in-network<\/a>. Similar to a PPO, you can use an <a href='/glossary#out-of-network' target='_blank'>out-of-network<\/a> <a href='/glossary#service_provider' target='_blank'>service provider<\/a> with a <a href='/glossary#referral' target='_blank'>referral<\/a>."
       },
       {
         "term": "POS",
@@ -893,7 +889,7 @@ function runGlossary() {
       },
       {
         "term": "PPO",
-        "description": "The acronym for <a href='/glossary#preferred_provider_organization' target='_blank'>Preferred Provider Organization<\/a> \u2013 a <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> <a href='/glossary#plan_type' target='_blank'>plan type<\/a>."
+        "description": "The acronym for <a href='https://www.maine.gov/pfr/insurance/glossary.html#p' target='_blank'>Preferred Provider Organization<\/a> \u2013 a <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> <a href='/glossary#plan_type' target='_blank'>plan type<\/a>."
       },
       {
         "term": "Pre-Authorization",
@@ -901,7 +897,7 @@ function runGlossary() {
       },
       {
         "term": "Pre-Existing Condition",
-        "description": "A health problem you had before your health coverage begins. Under the <a href='/glossary#affordable_care_act' target='_blank'>Affordable Care Act<\/a>, health insurance companies can\u2019t refuse to cover you or charge you more just because you have a pre-existing condition."
+        "description": "A <a href='https://www.maine.gov/pfr/insurance/glossary.html#p' target='_blank'> pre-existing condition<\/a> health problem you had before your health coverage begins. Under the Affordable Care Act, health insurance companies can\u2019t refuse to cover you or charge you more just because you have a pre-existing condition."
       },
       {
         "term": "Preferred Broker",
@@ -927,15 +923,15 @@ function runGlossary() {
       },
       {
         "term": "Prescription Drug Coverage",
-        "description": "All plans available through Maine Cover ME include prescription drug coverage, but that doesn't mean that all plans cover your prescriptions. When you use Maine Cover ME's <a href='/glossary#plan_match' target='_blank'>Plan Match<\/a> tool, you'll have the opportunity to enter the names of your <a href='/glossary#prescription_drugs' target='_blank'>prescription drugs<\/a> and see which plans provide coverage. You should also check the insurance company's <a href='/glossary#formulary' target='_blank'>formulary<\/a>."
+        "description": "All plans available through Maine Cover ME include prescription drug coverage, but that doesn't mean that all plans cover your prescriptions. When you use Maine Cover ME's <a href='https://www.maine.gov/pfr/insurance/consumer/individuals_families/health/purchasing_health_insurance/shopping_health_insurance.html' target='_blank'>Plan Match<\/a> tool, you'll have the opportunity to enter the names of your <a href='/glossary#prescription_drugs' target='_blank'>prescription drugs<\/a> and see which plans provide coverage. You should also check the insurance company's <a href='/glossary#formulary' target='_blank'>formulary<\/a>."
       },
       {
         "term": "Prescription Drugs",
-        "description": "A medication that legally requires your doctor to write an authorization for you to use it before a pharmacy can sell it to you. Most <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> plans cover some prescription drug costs. If you take medications that require a prescription from your doctor, you'll want to make sure that the health plan you choose covers your specific medications by checking Maine Cover ME's <a href='/glossary#plan_match' target='_blank'>Plan Match<\/a> tool and the insurance company's <a href='/glossary#formulary' target='_blank'>formulary<\/a>."
+        "description": "A medication that legally requires your doctor to write an authorization for you to use it before a pharmacy can sell it to you. Most <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> plans cover some prescription drug costs. If you take medications that require a prescription from your doctor, you'll want to make sure that the health plan you choose covers your specific medications by checking Maine Cover ME's <a href='https://www.maine.gov/pfr/insurance/consumer/individuals_families/health/purchasing_health_insurance/shopping_health_insurance.html' target='_blank'>Plan Match<\/a> tool and the insurance company's <a href='/glossary#formulary' target='_blank'>formulary<\/a>."
       },
       {
         "term": "Preventive Services",
-        "description": "Health care to prevent or detect illness or other health problems at an early stage, when treatment is likely to work best. All health plans available through Maine Cover ME include certain preventive services at no cost to you. When you use Maine Cover ME's <a href='/glossary#plan_match' target='_blank'>Plan Match<\/a> tool, you'll find information on preventive services included in your plan when you select the 'Plan Details' page."
+        "description": "Health care to prevent or detect illness or other health problems at an early stage, when treatment is likely to work best. All health plans available through Maine Cover ME include certain preventive services at no cost to you. When you use Maine Cover ME's <a href='https://www.maine.gov/pfr/insurance/consumer/individuals_families/health/purchasing_health_insurance/shopping_health_insurance.html' target='_blank'>Plan Match<\/a> tool, you'll find information on preventive services included in your plan when you select the 'Plan Details' page."
       },
       // Rearranged so RegExp searches for larger terms first
       {
@@ -972,7 +968,7 @@ function runGlossary() {
       },
       {
         "term": "Qualified Medical Expenses",
-        "description": "The same types of services and products that generally can be deducted as medical expenses on your federal tax return. <a href='/glossary#deductible' target='_blank'>Deductibles<\/a>, <a href='/glossary#copayment' target='_blank'>copayments<\/a>, <a href='/glossary#coinsurance' target='_blank'>coinsurance<\/a> and <a href='/glossary#prescription_drugs' target='_blank'>prescription drugs<\/a> are examples. "
+        "description": "The same types of services and products that generally can be deducted as medical expenses on your federal tax return. <a href='https://www.maine.gov/pfr/insurance/glossary.html#d' target='_blank'>Deductibles<\/a>, <a href='/glossary#copayment' target='_blank'>copayments<\/a>, <a href='/glossary#coinsurance' target='_blank'>coinsurance<\/a> and <a href='/glossary#prescription_drugs' target='_blank'>prescription drugs<\/a> are examples. "
       },
       {
         "term": "Qualifying Life Event",
@@ -1106,7 +1102,7 @@ function runGlossary() {
       },
       {
         "term": "Summary of Benefits and Coverage",
-        "description": "All plans available through Maine Cover ME include a short, plain language PDF document that provides an overview of <a href='/glossary#covered_services' target='_blank'>covered services<\/a>, <a href='/glossary#excluded_services' target='_blank'>excluded services<\/a>, a short glossary of terms, <a href='/glossary#deductible' target='_blank'>deductibles<\/a>, <a href='/glossary#copayment' target='_blank'>copayments<\/a> and <a href='/glossary#coinsurance' target='_blank'>coinsurance<\/a> for <a href='/glossary#in-network' target='_blank'>in-network<\/a> and <a href='/glossary#out-of-network' target='_blank'>out-of-network<\/a> services. The SBC is standardized so that you can make an apples-to-apples comparison among plans, and includes what the plan will pay in two common medical situations. You can find the SBC on the 'Plan Details' page when using Maine Cover ME's <a href='/glossary#plan_match' target='_blank'>Plan Match<\/a> tool. "
+        "description": "All plans available through Maine Cover ME include a short, plain language PDF document that provides an overview of <a href='/glossary#covered_services' target='_blank'>covered services<\/a>, <a href='/glossary#excluded_services' target='_blank'>excluded services<\/a>, a short glossary of terms, <a href='https://www.maine.gov/pfr/insurance/glossary.html#d' target='_blank'>deductibles<\/a>, <a href='/glossary#copayment' target='_blank'>copayments<\/a> and <a href='/glossary#coinsurance' target='_blank'>coinsurance<\/a> for <a href='/glossary#in-network' target='_blank'>in-network<\/a> and <a href='/glossary#out-of-network' target='_blank'>out-of-network<\/a> services. The SBC is standardized so that you can make an apples-to-apples comparison among plans, and includes what the plan will pay in two common medical situations. You can find the SBC on the 'Plan Details' page when using Maine Cover ME's <a href='https://www.maine.gov/pfr/insurance/consumer/individuals_families/health/purchasing_health_insurance/shopping_health_insurance.html' target='_blank'>Plan Match<\/a> tool. "
       },
       {
         "term": "Supplemental Nutrition Assistance Program",
@@ -1182,11 +1178,11 @@ function runGlossary() {
       },
       {
         "term": "Yearly Cost Estimate for Health Coverage",
-        "description": "A feature of Maine Cover ME's <a href='/glossary#plan_match' target='_blank'>Plan Match<\/a> tool that shows the estimated amount you might pay in a given year for <a href='/glossary#premium' target='_blank'>premiums<\/a>, <a href='/glossary#deductible' target='_blank'>deductibles<\/a>, <a href='/glossary#copayment' target='_blank'>copayments<\/a> and <a href='/glossary#coinsurance' target='_blank'>coinsurance<\/a> based on the number of people covered, your <a href='/glossary#health_status' target='_blank'>health status<\/a> and any expected medical procedures. "
+        "description": "A feature of Maine Cover ME's <a href='/glossary#plan_match' target='_blank'>Plan Match<\/a> tool that shows the estimated amount you might pay in a given year for <a href='/glossary#premium' target='_blank'>premiums<\/a>, <a href='https://www.maine.gov/pfr/insurance/glossary.html#d' target='_blank'>deductibles<\/a>, <a href='/glossary#copayment' target='_blank'>copayments<\/a> and <a href='/glossary#coinsurance' target='_blank'>coinsurance<\/a> based on the number of people covered, your <a href='/glossary#health_status' target='_blank'>health status<\/a> and any expected medical procedures. "
       },
       {
         "term": "Zero Cost Sharing Plan",
-        "description": "<a href='/glossary#federally_recognized_tribe' target='_blank'>Federally recognized Tribes<\/a> and <a href='/glossary#alaskan_native' target='_blank'>Alaska Native<\/a> Claims Settlement Act (ANCSA) Corporation shareholders whose income is at or below 300 percent of the <a href='/glossary#federal_poverty_level' target='_blank'>federal poverty level<\/a> are eligible for a zero cost sharing plan. With this plan, there are no <a href='/glossary#copayment' target='_blank'>copayments<\/a>, <a href='/glossary#deductible' target='_blank'>deductibles<\/a> or <a href='/glossary#coinsurance' target='_blank'>coinsurance<\/a> when care is received from Indian health care providers, which include health programs operated by the <a href='/glossary#indian_health_service' target='_blank'>Indian Health Service<\/a>, tribes and tribal organizations, and urban Indian organizations. This is also true when receiving <a href='/glossary#essential_health_benefits' target='_blank'>essential health benefits<\/a> through a Maine Cover ME plan, and you won't need a <a href='/glossary#referral' target='_blank'>referral<\/a> from an Indian health care provider to receive these benefits. Zero cost sharing is available for any <a href='/glossary#metal_level' target='_blank'>metal level<\/a> plan."
+        "description": "<a href='/glossary#federally_recognized_tribe' target='_blank'>Federally recognized Tribes<\/a> and <a href='/glossary#alaskan_native' target='_blank'>Alaska Native<\/a> Claims Settlement Act (ANCSA) Corporation shareholders whose income is at or below 300 percent of the <a href='/glossary#federal_poverty_level' target='_blank'>federal poverty level<\/a> are eligible for a zero cost sharing plan. With this plan, there are no <a href='/glossary#copayment' target='_blank'>copayments<\/a>, <a href='https://www.maine.gov/pfr/insurance/glossary.html#d' target='_blank'>deductibles<\/a> or <a href='/glossary#coinsurance' target='_blank'>coinsurance<\/a> when care is received from Indian health care providers, which include health programs operated by the <a href='/glossary#indian_health_service' target='_blank'>Indian Health Service<\/a>, tribes and tribal organizations, and urban Indian organizations. This is also true when receiving <a href='/glossary#essential_health_benefits' target='_blank'>essential health benefits<\/a> through a Maine Cover ME plan, and you won't need a <a href='/glossary#referral' target='_blank'>referral<\/a> from an Indian health care provider to receive these benefits. Zero cost sharing is available for any <a href='/glossary#metal_level' target='_blank'>metal level<\/a> plan."
       }
     ]
 
