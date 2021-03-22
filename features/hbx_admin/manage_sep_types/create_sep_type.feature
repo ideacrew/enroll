@@ -57,7 +57,7 @@ Feature: Admin has ability to create a new SEP Type
     Examples:
       | market_kind | action |
       | individual  | cannot |
-      | shop        | can    |
+      | shop        | cannot |
       | fehb        | can    |
 
 
@@ -85,10 +85,7 @@ Feature: Admin has ability to create a new SEP Type
 
     Examples:
       | market_kind | action       |
-      | shop        | selected     |
-      | fehb        | selected     |
-      | shop        | not selected |
-      | fehb        | not selected |
+      | individual  | selected     |
 
   @flaky
   Scenario: Admin should see failure when creating SEP type with past start date
