@@ -134,7 +134,7 @@ document.addEventListener("turbolinks:load", function() {
           //$(self).prop('checked', false);
 
           $('#unemployment_income').find('.unemployment-incomes-list > .unemployment-income').each(function(i, unemployment_income) {
-            var url = $(unemployment_income).attr('id').replace('income_', 'incomes/');
+            var url = $(unemployment_income).attr('id').replace('income_', '');
             $(unemployment_income).remove();
             $.ajax({
               type: 'DELETE',
