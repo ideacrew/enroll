@@ -61,7 +61,6 @@ module FinancialAssistance
       farming_and_fishing: 'Farming or fishing',
       foreign: 'Foreign income',
       other: 'Other taxable income',
-      unemployment_income: 'Unemployment income',
       prizes_and_awards: 'Prizes and awards',
       scholorship_payments: 'Taxable scholarship payments'
     }.freeze
