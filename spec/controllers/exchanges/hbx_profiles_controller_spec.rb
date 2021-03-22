@@ -1732,14 +1732,18 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     end
 
     it "renders employer_staff_datatable datatable" do
-      get :employer_staff_datatable, xhr: true
-      expect(response).to have_http_status(:success)
-      expect(response).to render_template("exchanges/hbx_profiles/employer_staff_datatable.html.slim", "layouts/single_column")
+      if ::EnrollRegistry.feature_enabled?(:display_employer_staff_datatable)
+        get :employer_staff_datatable, xhr: true
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template("exchanges/hbx_profiles/employer_staff_datatable.html.slim", "layouts/single_column")
+      end
     end
 
     it "renders employer_staff_datatable datatable payload" do
-      post :employer_staff_datatable, params: {search: search_params}, xhr: true
-      expect(response).to have_http_status(:success)
+      if ::EnrollRegistry.feature_enabled?(:display_employer_staff_datatable)
+        post :employer_staff_datatable, params: {search: search_params}, xhr: true
+        expect(response).to have_http_status(:success)
+      end
     end
   end
 end
