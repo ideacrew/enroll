@@ -23,7 +23,7 @@ class CreateAllQualifyingLifeEventKinds < MongoidMigrationTask
     end
     puts "::: QualifyingLifeEventKinds Complete :::"
     puts "*" * 80
-    generate_qlek_csv
+    # generate_qlek_csv
   end
 
   # Only used for creaeting a report of all Qualifying Life Event Kinds for a given client
