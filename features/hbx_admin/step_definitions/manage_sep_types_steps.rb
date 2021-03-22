@@ -745,7 +745,7 @@ Then(/^\w+ should (.*) input field to enter the Sep Type date$/) do |action|
     expect(page).to have_content("Date of domestic partnership")
   else
     expect(page).not_to have_content("Date of domestic partnership")
-    expect(page).to have_content("Based on the information you entered, you may be eligible for a special enrollment period. Please call us at 1-855-532-5465 to give us more information so we can see if you qualify.")
+    expect(page).to have_content("Based on the information you entered, you may be eligible for a special enrollment period. Please call us at 1-800-965-7476 to give us more information so we can see if you qualify.")
   end
 end
 
