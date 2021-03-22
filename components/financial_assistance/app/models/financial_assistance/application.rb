@@ -1013,7 +1013,7 @@ module FinancialAssistance
           %w[Income MEC].collect do |type|
             VerificationType.new(type_name: type, validation_status: 'pending')
           end
-        applicant.move_to_pending!        
+        applicant.move_to_pending!
       end
     end
 
