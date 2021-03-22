@@ -8,7 +8,7 @@ Feature: Phone and Paper Enrollment options exist
     When Hbx Admin click Families dropdown
 
   Scenario: Phone and Phone Enrollment
-    Then I see the DC Resident Application link
+    Then I see the ME Resident Application link
     Then I see the New Consumer Application link
 
   Scenario: Disabling Paper link

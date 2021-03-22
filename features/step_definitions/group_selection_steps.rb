@@ -713,6 +713,8 @@ Then(/the user should see a message that their Tax Credits were updated/) do
 end
 
 Then(/the user should see that applied tax credit has been set accordingly/) do
+  fill_in("aptc_applied_total", with: "25.0")
+  page.execute_script('$(document.elementFromPoint(50, 350)).click();')
   expect(page).to have_content("25")
 end
 
