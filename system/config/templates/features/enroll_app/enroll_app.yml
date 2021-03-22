@@ -52,7 +52,7 @@ registry:
         is_enabled: true
       - key: :display_employer_staff_datatable
         item: "employer_staff_datatable"
-        is_enabled: true
+        is_enabled: false
   - namespace:
       - :features
       - :enroll_app
