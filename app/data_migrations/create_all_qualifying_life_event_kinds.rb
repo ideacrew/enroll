@@ -30,7 +30,7 @@ class CreateAllQualifyingLifeEventKinds < MongoidMigrationTask
   # Only used for creaeting a report of all Qualifying Life Event Kinds for a given client
   # Do not uncomment or run if not on environment
   def generate_qlek_csv
-    return unless Rails.env.development?
+    # return unless Rails.env.development?
     puts("Beginning Qualifying Life Event Kind report")
     field_names = [
       "event_kind_label", "action_kind", "title", "effective_on_kinds", "reason", "edi_code",
