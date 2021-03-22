@@ -1,0 +1,8 @@
+= render "ui-components/v1/navs/primary_nav.html.slim"
+.container
+  h1.heading-text Employer Staff
+
+  = raw render_datatable(@datatable)
+
+  javascript:
+    initializeDataTables();

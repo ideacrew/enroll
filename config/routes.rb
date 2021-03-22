@@ -135,6 +135,7 @@ Rails.application.routes.draw do
         post :employer_poc_datatable
         get :employer_invoice
         get :employer_datatable
+        get :employer_staff_datatable
         post :employer_invoice_datatable
         post :generate_invoice
         post :disable_ssn_requirement

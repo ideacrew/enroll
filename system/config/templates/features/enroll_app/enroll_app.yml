@@ -50,6 +50,9 @@ registry:
       - key: :edit_personal_info_functionality
         item: "edit_personal_info"
         is_enabled: true
+      - key: :display_employer_staff_datatable
+        item: "employer_staff_datatable"
+        is_enabled: true
   - namespace:
       - :features
       - :enroll_app
