@@ -29,6 +29,16 @@ Given(/^all applicants fill all pages except other questions$/) do
     click_button('Save')
     find(:xpath, '//*[@id="btn-continue"]').click
 
+    if FinancialAssistanceRegistry[:unemployment_income].enabled?
+      find('#has_unemployment_income_true').click
+      sleep 1
+      fill_in 'income[amount]', with: '100'
+      fill_in 'income[start_on]', with: '1/1/2018'
+      find(".new-unemployment-income-form .interaction-choice-control-income-frequency-kind").click
+      find(".new-unemployment-income-form li.interaction-choice-control-income-frequency-kind-7").click
+      click_button('Save')
+    end
+
     find('#has_other_income_true').click
     sleep 1
     find(:css, "#other_income_kind[value='interest']").set(true)

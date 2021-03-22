@@ -43,6 +43,7 @@ module FinancialAssistance
 
     JOB_INCOME_TYPE_KIND = 'wages_and_salaries'
     NET_SELF_EMPLOYMENT_INCOME_KIND = 'net_self_employment'
+    UNEMPLOYMENT_INCOME_KIND = 'unemployment_income'
     FREQUENCY_KINDS = %w[biweekly daily half_yearly monthly quarterly weekly yearly].freeze
 
     OTHER_INCOME_TYPE_KIND = {
@@ -83,7 +84,7 @@ module FinancialAssistance
 
     scope :jobs, -> {where(kind: JOB_INCOME_TYPE_KIND)}
     scope :self_employment, -> {where(kind: NET_SELF_EMPLOYMENT_INCOME_KIND)}
-    scope :other, -> {where(:kind.nin => [JOB_INCOME_TYPE_KIND, NET_SELF_EMPLOYMENT_INCOME_KIND])}
+    scope :other, -> {where(:kind.nin => [JOB_INCOME_TYPE_KIND, NET_SELF_EMPLOYMENT_INCOME_KIND, UNEMPLOYMENT_INCOME_KIND])}
     scope :of_kind, ->(kind) {where(kind: kind)}
     scope :unemployment, ->{where(kind: 'unemployment_income')}
 

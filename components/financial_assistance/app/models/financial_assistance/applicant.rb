@@ -52,7 +52,10 @@ module FinancialAssistance
     MEC_VALIDATION_STATES = %w[na valid outstanding pending].freeze
 
     DRIVER_QUESTION_ATTRIBUTES = [:has_job_income, :has_self_employment_income, :has_other_income,
-                                  :has_deductions, :has_enrolled_health_coverage, :has_eligible_health_coverage].freeze
+                                  :has_deductions, :has_enrolled_health_coverage, :has_eligible_health_coverage]
+    DRIVER_QUESTION_ATTRIBUTES += [:has_unemployment_income] if FinancialAssistanceRegistry[:unemployment_income].enabled?
+    DRIVER_QUESTION_ATTRIBUTES.freeze
+
     #list of the documents user can provide to verify Immigration status
     VLP_DOCUMENT_KINDS = [
         "I-327 (Reentry Permit)",
@@ -671,6 +674,7 @@ module FinancialAssistance
 
       questions_array << is_former_foster_care  if foster_age_satisfied? && is_applying_coverage
       questions_array << is_post_partum_period  unless is_pregnant
+      questions_array << has_unemployment_income if FinancialAssistanceRegistry[:unemployment_income].enabled?
 
       (other_questions_answers << questions_array).flatten.include?(nil) ? false : true
     end
@@ -723,8 +727,13 @@ module FinancialAssistance
         return incomes.jobs.blank? && incomes.self_employment.present? if !has_job_income && has_self_employment_income
         incomes.jobs.blank? && incomes.self_employment.blank?
       when :other_income
+        if FinancialAssistanceRegistry[:unemployment_income].enabled?
+          return false if has_unemployment_income.nil?
+          return incomes.unemployment.present? if has_unemployment_income
+        end
         return false if has_other_income.nil?
         return incomes.other.present? if has_other_income
+        return incomes.other.blank? || incomes.unemployment.blank? if FinancialAssistanceRegistry[:unemployment_income].enabled?
         incomes.other.blank?
       when :income_adjustment
         return false if has_deductions.nil?
@@ -839,6 +848,10 @@ module FinancialAssistance
 
     def other_income_exists?
       incomes.other.present?
+    end
+
+    def unemployment_income_exists?
+      incomes.unemployment.present?
     end
 
     def deductions_exists?

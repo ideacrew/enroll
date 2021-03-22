@@ -7,7 +7,7 @@ Given(/^the user is on FAA Household Info: Family Members page$/) do
     ivl_product = FactoryBot.create(:benefit_markets_products_health_products_health_product, :ivl_product, application_period: (bcp.start_on..bcp.end_on))
     bcp.update_attributes!(slcsp_id: ivl_product.id)
   end
-  
+
   visit help_paying_coverage_insured_consumer_role_index_path
   find('button.interaction-click-control-continue')
   choose('radio1', allow_label_click: true)
@@ -75,6 +75,16 @@ Given(/^all applicants are in Info Completed state with all types of income$/) d
     fill_in 'income[start_on]', with: '01/01/2018'
     click_button('Save')
     find(:xpath, '//*[@id="btn-continue"]').click
+
+    if FinancialAssistanceRegistry[:unemployment_income].enabled?
+      find('#has_unemployment_income_true').click
+      sleep 1
+      fill_in 'income[amount]', with: '100'
+      fill_in 'income[start_on]', with: '1/1/2018'
+      find(".new-unemployment-income-form .interaction-choice-control-income-frequency-kind").click
+      find(".new-unemployment-income-form li.interaction-choice-control-income-frequency-kind-7").click
+      click_button('Save')
+    end
 
     find('#has_other_income_true').click
     sleep 1
