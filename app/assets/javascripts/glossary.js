@@ -227,7 +227,7 @@ function runGlossary() {
       },
       {
         "term": "Broker",
-        "description": "Brokers are licensed under District law to sell <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> through Maine Cover ME to individuals, families, small businesses and their employees. Brokers have been trained by Maine Cover ME, can recommend plans or <a href='/glossary#plan_type' target='_blank'>plan types<\/a>, and perform activities on behalf of their clients as part of their professional licensing and training. There is no cost to use a Broker."
+        "description": "Brokers are licensed under Maine law to sell <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> through Maine Cover ME to individuals, families, small businesses and their employees. Brokers have been trained by Maine Cover ME, can recommend plans or <a href='/glossary#plan_type' target='_blank'>plan types<\/a>, and perform activities on behalf of their clients as part of their professional licensing and training. There is no cost to use a Broker."
       },
       {
         "term": "Bronze Health Plan",
@@ -295,7 +295,7 @@ function runGlossary() {
       },
       {
         "term": "Cover All ME",
-        "description": "A <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> program available to District residents who don't meet eligibility requirements for Maine Cover ME (including private coverage or <a href='/glossary#medicaid' target='_blank'>Medicaid<\/a>) or for the <a href='/glossary#dC_healthcare_alliance_program' target='_blank'>DC Healthcare Alliance Program<\/a>. District residents who are not incarcerated are eligible to enroll. Learn more about <a class='ext' href='https:\/\/dchealthlink.com\/node\/2478' target='_blank'>eligibility for Cover All DC<\/a>."
+        "description": "A <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> program available to Maine residents who don't meet eligibility requirements for Maine Cover ME (including private coverage or <a href='/glossary#medicaid' target='_blank'>Medicaid<\/a>) or for the <a href='/glossary#dC_healthcare_alliance_program' target='_blank'>DC Healthcare Alliance Program<\/a>. Maine residents who are not incarcerated are eligible to enroll. Learn more about <a class='ext' href='https:\/\/dchealthlink.com\/node\/2478' target='_blank'>eligibility for Cover All DC<\/a>."
       },
       {
         "term": "Coverage",
@@ -315,7 +315,7 @@ function runGlossary() {
       },
       {
         "term": "ME Healthcare Alliance Program",
-        "description": "A managed care health plan that provides medical assistance to Maine residents who are not eligible for <a href='/glossary#medicaid' target='_blank'>Medicaid<\/a>. The Alliance serves low-income District residents who have no other <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> and are not eligible for either Medicaid or <a href='/glossary#medicare' target='_blank'>Medicare<\/a>. The program is sponsored and paid for by the State of Maine government. Learn more about <a class='ext' href='https:\/\/dchealthlink.com\/node\/2478' target='_blank'>eligibility for the DC Healthcare Alliance Program<\/a>."
+        "description": "A managed care health plan that provides medical assistance to Maine residents who are not eligible for <a href='/glossary#medicaid' target='_blank'>Medicaid<\/a>. The Alliance serves low-income Maine residents who have no other <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> and are not eligible for either Medicaid or <a href='/glossary#medicare' target='_blank'>Medicare<\/a>. The program is sponsored and paid for by the State of Maine government. Learn more about <a class='ext' href='https:\/\/dchealthlink.com\/node\/2478' target='_blank'>eligibility for the DC Healthcare Alliance Program<\/a>."
       },
       {
         "term": "Maine Network",
@@ -339,11 +339,11 @@ function runGlossary() {
       },
       {
         "term": "Department of Disability Services",
-        "description": "Provides District residents with information, oversight and coordination of services for people with disabilities and those who support them, such as service providers and employers. Learn more about <a class='ext' href='http:\/\/dds.dc.gov\/page\/dds-services' target='_blank'>DDS assistance programs<\/a>."
+        "description": "Provides Maine residents with information, oversight and coordination of services for people with disabilities and those who support them, such as service providers and employers. Learn more about <a class='ext' href='http:\/\/dds.dc.gov\/page\/dds-services' target='_blank'>DDS assistance programs<\/a>."
       },
       {
         "term": "Department of Health Care Finance",
-        "description": "the State of Maine's state <a href='/glossary#medicaid' target='_blank'>Medicaid<\/a> agency charged with improving health outcomes for District residents by providing access to comprehensive, cost-effective and quality healthcare services. DHCF also administers insurance programs for immigrant children, the State Child Health Insurance Program, and Medical Charities (a locally funded program). Learn more about <a class='ext' href='http:\/\/dhcf.dc.gov' target='_blank'>DHCF assistance programs<\/a>."
+        "description": "the State of Maine's state <a href='/glossary#medicaid' target='_blank'>Medicaid<\/a> agency charged with improving health outcomes for Maine residents by providing access to comprehensive, cost-effective and quality healthcare services. DHCF also administers insurance programs for immigrant children, the State Child Health Insurance Program, and Medical Charities (a locally funded program). Learn more about <a class='ext' href='http:\/\/dhcf.dc.gov' target='_blank'>DHCF assistance programs<\/a>."
       },
       {
         "term": "Department of Human Services",
@@ -573,7 +573,7 @@ function runGlossary() {
       },
       {
         "term": "Healthcare.gov",
-        "description": "The website for the federally-facilitated <a href='/glossary#health_insurance_marketplace' target='_blank'>health insurance marketplace<\/a> used by many states to help meet the provisions of the <a href='/glossary#affordable_care_act' target='_blank'>Affordable Care Act<\/a>. the State of Maine operates its own health insurance marketplace accessible through <a class='ext' href='http:\/\/www.dchealthlink.com\/' target='_blank'>Maine Cover ME<\/a>; however, District residents who need an <a href='/glossary#exemption' target='_blank'>exemption<\/a> from having <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> apply for it through <a class='ext' href='https:\/\/www.healthcare.gov\/' target='_blank'>healthcare.gov<\/a>"
+        "description": "The website for the federally-facilitated <a href='/glossary#health_insurance_marketplace' target='_blank'>health insurance marketplace<\/a> used by many states to help meet the provisions of the <a href='/glossary#affordable_care_act' target='_blank'>Affordable Care Act<\/a>. the State of Maine operates its own health insurance marketplace accessible through <a class='ext' href='http:\/\/www.dchealthlink.com\/' target='_blank'>Maine Cover ME<\/a>; however, Maine residents who need an <a href='/glossary#exemption' target='_blank'>exemption<\/a> from having <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> apply for it through <a class='ext' href='https:\/\/www.healthcare.gov\/' target='_blank'>healthcare.gov<\/a>"
       },
       {
         "term": "HHS",
@@ -717,7 +717,7 @@ function runGlossary() {
       },
       {
         "term": "Long-Term Care",
-        "description": "Medical and non-medical services provided to people who are unable to perform basic activities most people do every day without assistance, such as walking, dressing or bathing.  Long-term care insurance is typically purchased as a stand-alone plan. <a href='/glossary#medicare' target='_blank'>Medicare<\/a> and most <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> plans don\u2019t pay for long-term care. the State of Maine does offer some <a class='ext' href='http:\/\/dhcf.dc.gov\/service\/types-long-term-care-services' target='_blank'>long-term care programs for eligible District residents<\/a>. "
+        "description": "Medical and non-medical services provided to people who are unable to perform basic activities most people do every day without assistance, such as walking, dressing or bathing.  Long-term care insurance is typically purchased as a stand-alone plan. <a href='/glossary#medicare' target='_blank'>Medicare<\/a> and most <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> plans don\u2019t pay for long-term care. the State of Maine does offer some <a class='ext' href='' target='_blank'>long-term care programs for eligible Maine residents<\/a>. "
       },
       {
         "term": "MAGI",
@@ -729,7 +729,7 @@ function runGlossary() {
       },
       {
         "term": "Medicaid",
-        "description": "Medicaid is a joint federal-state health program that provides health care coverage to low-income and disabled adults, children and families. To be eligible for DC Medicaid, you must be a District resident and must meet non-financial and financial eligibility requirements. Medicaid covers many services, including doctor visits, hospital care, <a href='/glossary#prescription_drugs' target='_blank'>prescription drugs<\/a>, mental health services, transportation and many other services at little or no cost to the individual. Currently, 1 out of every 3 District residents receives quality health care coverage through the Medicaid program. <a class='ext' href='https:\/\/dchealthlink.com\/individuals\/medicaid' target='_blank'>Learn more about DC Medicaid<\/a>. "
+        "description": "Medicaid is a joint federal-state health program that provides health care coverage to low-income and disabled adults, children and families. To be eligible for Maine Medicaid, you must be a Maine resident and must meet non-financial and financial eligibility requirements. Medicaid covers many services, including doctor visits, hospital care, <a href='/glossary#prescription_drugs' target='_blank'>prescription drugs<\/a>, mental health services, transportation and many other services at little or no cost to the individual. Currently, 1 out of every 3 Maine residents receives quality health care coverage through the Medicaid program. <a class='ext' href='' target='_blank'>Learn more about Maine Medicaid<\/a>. "
       },
       {
         "term": "Medical Coverage",
@@ -901,7 +901,7 @@ function runGlossary() {
       },
       {
         "term": "Preferred Broker",
-        "description": "Preferred Brokers are trusted partners of Maine Cover ME that complete additional training to expand their expertise, and have committed to meet responsive service requirements. Preferred Brokers are licensed under District law to sell <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> through Maine Cover ME to individuals, families, small businesses and their employees. They can recommend plans or <a href='/glossary#plan_type' target='_blank'>plan types<\/a>, and perform activities on behalf of their clients as part of their professional licensing and training. There is no cost to use a Preferred Broker."
+        "description": "Preferred Brokers are trusted partners of Maine Cover ME that complete additional training to expand their expertise, and have committed to meet responsive service requirements. Preferred Brokers are licensed under Maine law to sell <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> through Maine Cover ME to individuals, families, small businesses and their employees. They can recommend plans or <a href='/glossary#plan_type' target='_blank'>plan types<\/a>, and perform activities on behalf of their clients as part of their professional licensing and training. There is no cost to use a Preferred Broker."
       },
       // Rearranged so RegExp searches for larger terms first
       {
@@ -972,7 +972,7 @@ function runGlossary() {
       },
       {
         "term": "Qualifying Life Event",
-        "description": "If you have a life change, such as but not limited to getting married, having a baby or losing your employer-sponsored insurance, you may be able to get <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> coverage outside of the annual <a href='/glossary#open_enrollment' target='_blank'>open enrollment<\/a> period, or make changes to your plan during the year. This is called <a href='/glossary#special_enrollment_period' target='_blank'>special enrollment<\/a>. The deadlines for reporting the life change to Maine Cover ME and enrolling through special enrollment are different in the Individual & Family and Small Business marketplaces. See <a class='ext' href='https:\/\/dchealthlink.com\/individuals\/life-changes' target='_blank'>Individual & Family life changes and deadlines<\/a> or <a class='ext' href='https:\/\/dchealthlink.com\/sites\/default\/files\/v2\/forms\/Qualifying_Life_Events_QLEs_Enrolling_in_a_New_Plan.pdf' target='_blank'>employer-sponsored insurance life changes and deadlines<\/a> for more information. "
+        "description": "If you have a life change, such as but not limited to getting married, having a baby or losing your employer-sponsored insurance, you may be able to get <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> coverage outside of the annual <a href='/glossary#open_enrollment' target='_blank'>open enrollment<\/a> period, or make changes to your plan during the year. This is called <a href='/glossary#special_enrollment_period' target='_blank'>special enrollment<\/a>. The deadlines for reporting the life change to Maine Cover ME and enrolling through special enrollment are different in the Individual & Family and Small Business marketplaces. See <a class='ext' href='' target='_blank'>Individual & Family life changes and deadlines<\/a> or <a class='ext' href='https:\/\/dchealthlink.com\/sites\/default\/files\/v2\/forms\/Qualifying_Life_Events_QLEs_Enrolling_in_a_New_Plan.pdf' target='_blank'>employer-sponsored insurance life changes and deadlines<\/a> for more information. "
       },
       {
         "term": "Rate Review",
@@ -996,7 +996,7 @@ function runGlossary() {
       },
       {
         "term": "Refugee Cash Assistance Program",
-        "description": "This District's Office of Refugee Resettlement serves to transition Maine Refugees from dependency on public assistance to self-sufficiency. Cash assistance is one of many services offered to refugees in the State of Maine. Learn more about <a class='ext' href='http:\/\/\/service\/refugee-assistance' target='_blank'>refugee assistance in the State of Maine<\/a>. "
+        "description": "This Maine's Office of Refugee Resettlement serves to transition Maine Refugees from dependency on public assistance to self-sufficiency. Cash assistance is one of many services offered to refugees in the State of Maine. Learn more about <a class='ext' href='http:\/\/\/service\/refugee-assistance' target='_blank'>refugee assistance in the State of Maine<\/a>. "
       },
       {
         "term": "Rehabilitation Services",
@@ -1138,7 +1138,7 @@ function runGlossary() {
       },
       {
         "term": "Temporary Cash Assistance for Needy Families",
-        "description": "Provides cash assistance to needy families with dependent children when available resources do not fully address the family's needs and while preparing program participants for independence through work. Learn more about <a class='ext' href='http:\/\/\/service\/temporary-cash-assistance-needy-families-tanf' target='_blank'>financial and technical eligibility requirements<\/a> for District residents."
+        "description": "Provides cash assistance to needy families with dependent children when available resources do not fully address the family's needs and while preparing program participants for independence through work. Learn more about <a class='ext' href='http:\/\/\/service\/temporary-cash-assistance-needy-families-tanf' target='_blank'>financial and technical eligibility requirements<\/a> for Maine residents."
       },
       {
         "term": "TTY",
