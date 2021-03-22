@@ -9,7 +9,7 @@ class CreateAllQualifyingLifeEventKinds < MongoidMigrationTask
     puts "::: Beginnning Creation of QualifyingLifeEventKinds :::"
     existing_qles = []
     QualifyingLifeEventKind.pluck(:_id).each { |qlek_id| existing_qles << qlek_id }
-    require File.join(Rails.root, "db", "seedfiles", 'qualifying_life_event_kinds_seed') #if EnrollRegistry.feature_enabled?(:aca_shop_market)
+    require File.join(Rails.root, "db", "seedfiles", 'qualifying_life_event_kinds_seed') if EnrollRegistry.feature_enabled?(:aca_shop_market)
     require File.join(Rails.root, "db", "seedfiles", 'ivl_life_events_seed') if EnrollRegistry.feature_enabled?(:aca_individual_market)
     # the seed files specify is_visible
     QualifyingLifeEventKind.all.each do |qlek|
