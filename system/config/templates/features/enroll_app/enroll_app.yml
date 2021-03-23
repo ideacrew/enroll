@@ -175,6 +175,8 @@ registry:
           item: "https://dchealthlink.com/sites/default/files/v2/forms/new_broker_registration.pdf"
         - key: :state_dmv_link
           item: "https://dmv.dc.gov/page/proof-dc-residency-certifications"
+        - key: :health_benefit_exchange_authority_phone_number
+          item: '(202) 715-7576'
       - key: :agency_staff
         item: :agency_staff
         is_enabled: true
