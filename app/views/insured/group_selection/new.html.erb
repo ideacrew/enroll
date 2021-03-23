@@ -59,10 +59,10 @@
                     <div class="modal-content">
                       <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title" id="myModalLabel">Some people are eligible for Cover ME</h4>
+                        <h4 class="modal-title" id="myModalLabel">Some people are eligible for <%= site_short_name %></h4>
                       </div>
                       <div class="modal-body">
-                        This group includes people who are eligible to enroll in a plan through Cover ME. If you choose to enroll these people in a plan through Cover All CT, they will:
+                        This group includes people who are eligible to enroll in a plan through <%= site_short_name %>. If you choose to enroll these people in a plan through Cover All <%= site_key.upcase %>, they will:
                         <ul>
                           <li>
                             not get a Form 1095-A at tax time.
@@ -71,7 +71,7 @@
                             not qualify for cost savings like the advance premium tax credit.
                           </li>
                         </ul>
-                        <strong>You can enroll these people in the same plan through Cover ME separately.</strong>
+                        <strong>You can enroll these people in the same plan through  <%= site_short_name %> separately.</strong>
                       </div>
                       <div class="modal-footer">
                         <button type="button" class="btn btn-default modal-cancel-button" data-dismiss="modal">close</button>
