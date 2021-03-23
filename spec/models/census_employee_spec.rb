@@ -2728,9 +2728,9 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     context '.update_for_cobra' do
       it 'should generate cobra enrollment if cobra begin date falls in prior py' do
         census_employee.stub(:have_valid_date_for_cobra?).and_return true
-        expect(HbxEnrollment.all.count).to eq 2
+        expect(HbxEnrollment.all.count).to eq 1
         expect(census_employee.update_for_cobra(terminated_benefit_package.end_on - 1.month)).to eq true
-        expect(HbxEnrollment.all.count).to eq 3
+        expect(HbxEnrollment.all.count).to eq 2
       end
     end
   end
