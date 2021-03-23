@@ -139,11 +139,11 @@ function runGlossary() {
       },
       {
         "term": "Advance Premium Tax Credit",
-        "description": "The federal government offers a tax credit to help pay for private <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> for individuals and families within certain income limits who also meet certain other requirements. The tax credit can either be automatically applied towards your insurance <a href='/glossary#premium' target='_blank'>premiums<\/a> to lower your monthly payment, or you can claim it when you file your federal tax return. You must apply for <a href='/glossary#financial_assistance' target='_blank'>financial assistance<\/a> to confirm eligibility and to receive the tax credit."
+        "description": "The federal government offers a tax credit to help pay for private <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> for individuals and families within certain income limits who also meet certain other requirements. The tax credit can either be automatically applied towards your insurance <a href='/glossary#premium' target='_blank'>premiums<\/a> to lower your monthly payment, or you can claim it when you file your federal tax return. You must apply for <a href='/glossary#financial_assistance' target='_blank'>financial assistance<\/a> to confirm eligibility and to receive the tax credit."
       },
       {
         "term": "Affordable Care Act",
-        "description": "The name used to refer to the federal health laws that require most Americans to have <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> that provides <a href='/glossary#minimum_essential_coverage' target='_blank'>Minimum Essential Coverage<\/a>. The name refers to two distinct pieces of legislation \u2014 the Patient Protection and Affordable Care Act (P.L. 111-148) and the Health Care and Education Reconciliation Act of 2010 (P.L. 111-152)."
+        "description": "The name used to refer to the federal health laws that require most Americans to have <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> that provides <a href='/glossary#minimum_essential_coverage' target='_blank'>Minimum Essential Coverage<\/a>. The name refers to two distinct pieces of legislation \u2014 the Patient Protection and Affordable Care Act (P.L. 111-148) and the Health Care and Education Reconciliation Act of 2010 (P.L. 111-152)."
       },
       {
         "term": "Affordable Coverage",
@@ -167,7 +167,7 @@ function runGlossary() {
       },
       {
         "term": "Allowed Amount",
-        "description": "The maximum amount your <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> company will pay service providers for <a href='/glossary#covered_services' target='_blank'>covered services<\/a>. Sometimes this is called an eligible expense, a payment allowance or negotiated rate. <a href='/glossary#service_provider' target='_blank'>Service providers<\/a> that are <a href='/glossary#in-network' target='_blank'>in-network<\/a> with your insurance company have generally agreed to accept the allowed amount for covered services."
+        "description": "The maximum amount your <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> company will pay service providers for <a href='/glossary#covered_services' target='_blank'>covered services<\/a>. Sometimes this is called an eligible expense, a payment allowance or negotiated rate. <a href='/glossary#service_provider' target='_blank'>Service providers<\/a> that are <a href='/glossary#in-network' target='_blank'>in-network<\/a> with your insurance company have generally agreed to accept the allowed amount for covered services."
       },
       {
         "term": "Ambulatory Patient Services",
@@ -223,15 +223,15 @@ function runGlossary() {
       },
       {
         "term": "Breast and Cervical Cancer Program",
-        "description": "Maine <a href='/glossary#medicaid' target='_blank'>Medicaid<\/a> may cover individuals diagnosed with breast or cervical cancers who are in need of treatment. Learn more about <a class='ext' href='http:\/\/dhcf.dc.gov\/service\/medicaid-breast-and-cervical-cancer-patients' target='_blank'>Breast and Cervical Cancer Programs in the State of Maine<\/a>."
+        "description": "Maine <a href='https://www.maine.gov/dhhs/ofi/programs-services/health-care-assistance' target='_blank'>Medicaid<\/a> may cover individuals diagnosed with breast or cervical cancers who are in need of treatment. Learn more about <a class='ext' href='http:\/\/dhcf.dc.gov\/service\/medicaid-breast-and-cervical-cancer-patients' target='_blank'>Breast and Cervical Cancer Programs in the State of Maine<\/a>."
       },
       {
         "term": "Broker",
-        "description": "Brokers are licensed under Maine law to sell <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> through Maine Cover ME to individuals, families, small businesses and their employees. Brokers have been trained by Maine Cover ME, can recommend plans or <a href='/glossary#plan_type' target='_blank'>plan types<\/a>, and perform activities on behalf of their clients as part of their professional licensing and training. There is no cost to use a Broker."
+        "description": "Brokers are licensed under Maine law to sell <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> through Maine Cover ME to individuals, families, small businesses and their employees. Brokers have been trained by Maine Cover ME, can recommend plans or <a href='/glossary#plan_type' target='_blank'>plan types<\/a>, and perform activities on behalf of their clients as part of their professional licensing and training. There is no cost to use a Broker."
       },
       {
         "term": "Bronze Health Plan",
-        "description": "Bronze Health Plans pay about 60 percent of <a href='/glossary#in-network' target='_blank'>in-network<\/a> expenses for an average population of consumers. The <a href='/glossary#premium' target='_blank'>premiums<\/a> are typically among the lowest but the <a href='https://www.maine.gov/pfr/insurance/glossary.html#d' target='_blank'>deductible<\/a> and <a href='/glossary#out-of-pocket_limit' target='_blank'>out-of-pocket limit<\/a> of what you'll pay before the plan starts paying are among the highest. <a href='/glossary#metal_level' target='_blank'>Metal levels<\/a> only focus on what the plan is expected to pay, and do NOT reflect the quality of health care or <a href='/glossary#service_provider' target='_blank'>service providers<\/a> available through the <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> plan. Once you meet your in-network out-of-pocket limit for the <a href='/glossary#plan_year' target='_blank'>plan year<\/a>, plans pay 100 percent of the <a href='/glossary#allowed_amount' target='_blank'>allowed amount<\/a> for <a href='/glossary#covered_services' target='_blank'>covered services<\/a>."
+        "description": "Bronze Health Plans pay about 60 percent of <a href='/glossary#in-network' target='_blank'>in-network<\/a> expenses for an average population of consumers. The <a href='/glossary#premium' target='_blank'>premiums<\/a> are typically among the lowest but the <a href='https://www.maine.gov/pfr/insurance/glossary.html#d' target='_blank'>deductible<\/a> and <a href='/glossary#out-of-pocket_limit' target='_blank'>out-of-pocket limit<\/a> of what you'll pay before the plan starts paying are among the highest. <a href='/glossary#metal_level' target='_blank'>Metal levels<\/a> only focus on what the plan is expected to pay, and do NOT reflect the quality of health care or <a href='/glossary#service_provider' target='_blank'>service providers<\/a> available through the <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> plan. Once you meet your in-network out-of-pocket limit for the <a href='/glossary#plan_year' target='_blank'>plan year<\/a>, plans pay 100 percent of the <a href='/glossary#allowed_amount' target='_blank'>allowed amount<\/a> for <a href='/glossary#covered_services' target='_blank'>covered services<\/a>."
       },
       {
         "term": "Carrier",
@@ -243,11 +243,11 @@ function runGlossary() {
       },
       {
         "term": "Center for Medicare and Medicaid Services",
-        "description": "An operating division of the <a href='/glossary#us_department_of_health_and_human_services' target='_blank'>U.S. Department of Health and Human Services<\/a> that administers <a href='/glossary#medicare' target='_blank'>Medicare<\/a>, <a href='/glossary#medicaid' target='_blank'>Medicaid<\/a>, the <a href='/glossary#children&#39;s_health_insurance_program' target='_blank'>Children's Health Insurance Program<\/a>, and parts of the <a href='/glossary#affordable_care_act' target='_blank'>Affordable Care Act<\/a>."
+        "description": "An operating division of the <a href='/glossary#us_department_of_health_and_human_services' target='_blank'>U.S. Department of Health and Human Services<\/a> that administers <a href='https://www.medicare.gov/' target='_blank'>Medicare<\/a>, <a href='https://www.maine.gov/dhhs/ofi/programs-services/health-care-assistance' target='_blank'>Medicaid<\/a>, the <a href='/glossary#children&#39;s_health_insurance_program' target='_blank'>Children's Health Insurance Program<\/a>, and parts of the <a href='/glossary#affordable_care_act' target='_blank'>Affordable Care Act<\/a>."
       },
       {
         "term": "Children\u2019s Health Insurance Program",
-        "description": "An insurance program that provides no cost or low cost health coverage to children in families that earn too much money to qualify for Medicaid but not enough to buy private health insurance. In the State of Maine, you can apply for CHIP coverage any time of the year through the <a href='/glossary#medicaid' target='_blank'>Medicaid<\/a> program."
+        "description": "An insurance program that provides no cost or low cost health coverage to children in families that earn too much money to qualify for Medicaid but not enough to buy private health insurance. In the State of Maine, you can apply for CHIP coverage any time of the year through the <a href='https://www.maine.gov/dhhs/ofi/programs-services/health-care-assistance' target='_blank'>Medicaid<\/a> program."
       },
       {
         "term": "CHIP",
@@ -267,7 +267,7 @@ function runGlossary() {
       },
       {
         "term": "Coinsurance",
-        "description": "Your share of the costs for <a href='/glossary#covered_services' target='_blank'>covered services<\/a> that you pay when you receive them. Coinsurance is calculated as a percent of the total fee. For example, if your <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> plan\u2019s <a href='/glossary#allowed_amount' target='_blank'>allowed amount<\/a> to visit your doctor is $100, a coinsurance payment of 20 percent would be $20. Some plans require that you pay up to the plan's <a href='https://www.maine.gov/pfr/insurance/glossary.html#d' target='_blank'>deductible<\/a> amount before coinsurance begins. Once you reach your <a href='/glossary#out-of-pocket_limit' target='_blank'>out-of-pocket limit<\/a>, you no longer have to pay coinsurance for the rest of the <a href='/glossary#plan_year' target='_blank'>plan year<\/a>."
+        "description": "Your share of the costs for <a href='/glossary#covered_services' target='_blank'>covered services<\/a> that you pay when you receive them. Coinsurance is calculated as a percent of the total fee. For example, if your <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> plan\u2019s <a href='/glossary#allowed_amount' target='_blank'>allowed amount<\/a> to visit your doctor is $100, a coinsurance payment of 20 percent would be $20. Some plans require that you pay up to the plan's <a href='https://www.maine.gov/pfr/insurance/glossary.html#d' target='_blank'>deductible<\/a> amount before coinsurance begins. Once you reach your <a href='/glossary#out-of-pocket_limit' target='_blank'>out-of-pocket limit<\/a>, you no longer have to pay coinsurance for the rest of the <a href='/glossary#plan_year' target='_blank'>plan year<\/a>."
       },
       {
         "term": "Complaint",
@@ -295,15 +295,15 @@ function runGlossary() {
       },
       {
         "term": "Cover All ME",
-        "description": "A <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> program available to Maine residents who don't meet eligibility requirements for Maine Cover ME (including private coverage or <a href='/glossary#medicaid' target='_blank'>Medicaid<\/a>) or for the <a href='/glossary#dC_healthcare_alliance_program' target='_blank'>DC Healthcare Alliance Program<\/a>. Maine residents who are not incarcerated are eligible to enroll. Learn more about <a class='ext' href='https:\/\/dchealthlink.com\/node\/2478' target='_blank'>eligibility for Cover All DC<\/a>."
+        "description": "A <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> program available to Maine residents who don't meet eligibility requirements for Maine Cover ME (including private coverage or <a href='https://www.maine.gov/dhhs/ofi/programs-services/health-care-assistance' target='_blank'>Medicaid<\/a>) or for the <a href='/glossary#dC_healthcare_alliance_program' target='_blank'>DC Healthcare Alliance Program<\/a>. Maine residents who are not incarcerated are eligible to enroll. Learn more about <a class='ext' href='https:\/\/dchealthlink.com\/node\/2478' target='_blank'>eligibility for Cover All DC<\/a>."
       },
       {
         "term": "Coverage",
-        "description": "Another word for <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a>, <a href='/glossary#medicaid' target='_blank'>Medicaid<\/a> or a <a href='/glossary#dental_plan' target='_blank'>dental plan<\/a>."
+        "description": "Another word for <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a>, <a href='https://www.maine.gov/dhhs/ofi/programs-services/health-care-assistance' target='_blank'>Medicaid<\/a> or a <a href='/glossary#dental_plan' target='_blank'>dental plan<\/a>."
       },
       {
         "term": "Covered Services",
-        "description": "The health care services you\u2019re entitled to receive based on the terms of your <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> plan. All plans available through Maine Cover ME cover <a href='/glossary#essential_health_benefits' target='_blank'>essential health benefits<\/a>. Other covered services or <a href='/glossary#excluded_services' target='_blank'>excluded services<\/a> will vary among plans. Each plan available through Maine Cover ME includes a <a href='/glossary#summary_of_benefits_and_coverage' target='_blank'>Summary of Benefits and Coverage<\/a>, but it's only a summary. You'll need to see your <a href='/glossary#plan_documents' target='_blank'>plan documents<\/a> for all benefits information. You can also call the insurance company directly if you have questions."
+        "description": "The health care services you\u2019re entitled to receive based on the terms of your <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> plan. All plans available through Maine Cover ME cover <a href='/glossary#essential_health_benefits' target='_blank'>essential health benefits<\/a>. Other covered services or <a href='/glossary#excluded_services' target='_blank'>excluded services<\/a> will vary among plans. Each plan available through Maine Cover ME includes a <a href='/glossary#summary_of_benefits_and_coverage' target='_blank'>Summary of Benefits and Coverage<\/a>, but it's only a summary. You'll need to see your <a href='/glossary#plan_documents' target='_blank'>plan documents<\/a> for all benefits information. You can also call the insurance company directly if you have questions."
       },
       {
         "term": "ME Health Benefit Exchange Authority",
@@ -311,11 +311,11 @@ function runGlossary() {
       },
       {
         "term": "Maine Cover ME",
-        "description": "the State of Maine's system for individuals, families, small businesses and their employees as well as members of Congress and their staff to access health and dental coverage through private health companies or <a href='/glossary#medicaid' target='_blank'>Medicaid<\/a>."
+        "description": "the State of Maine's system for individuals, families, small businesses and their employees as well as members of Congress and their staff to access health and dental coverage through private health companies or <a href='https://www.maine.gov/dhhs/ofi/programs-services/health-care-assistance' target='_blank'>Medicaid<\/a>."
       },
       {
         "term": "ME Healthcare Alliance Program",
-        "description": "A managed care health plan that provides medical assistance to Maine residents who are not eligible for <a href='/glossary#medicaid' target='_blank'>Medicaid<\/a>. The Alliance serves low-income Maine residents who have no other <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> and are not eligible for either Medicaid or <a href='/glossary#medicare' target='_blank'>Medicare<\/a>. The program is sponsored and paid for by the State of Maine government. Learn more about <a class='ext' href='https:\/\/dchealthlink.com\/node\/2478' target='_blank'>eligibility for the DC Healthcare Alliance Program<\/a>."
+        "description": "A managed care health plan that provides medical assistance to Maine residents who are not eligible for <a href='https://www.maine.gov/dhhs/ofi/programs-services/health-care-assistance' target='_blank'>Medicaid<\/a>. The Alliance serves low-income Maine residents who have no other <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> and are not eligible for either Medicaid or <a href='https://www.medicare.gov/' target='_blank'>Medicare<\/a>. The program is sponsored and paid for by the State of Maine government. Learn more about <a class='ext' href='https:\/\/dchealthlink.com\/node\/2478' target='_blank'>eligibility for the DC Healthcare Alliance Program<\/a>."
       },
       {
         "term": "Maine Network",
@@ -335,7 +335,7 @@ function runGlossary() {
       },
       {
         "term": "Dental Plan",
-        "description": "<a href='/glossary#health_insurance' target='_blank'>Health insurance<\/a> for routine, or preventive dental services such as teeth cleaning, fillings or x-rays. Dental coverage is considered an <a href='/glossary#essential_health_benefits' target='_blank'>essential health benefit<\/a> for children 18 years old or younger, and must be o\ufb00ered either as part of a health plan or as a stand-alone plan. Dental coverage is considered optional for adults and children under the <a href='/glossary#affordable_care_act' target='_blank'>Affordable Care Act<\/a>, and you aren't required to buy it. You can purchase a dental plan through Maine Cover ME without purchasing private health coverage."
+        "description": "<a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>Health insurance<\/a> for routine, or preventive dental services such as teeth cleaning, fillings or x-rays. Dental coverage is considered an <a href='/glossary#essential_health_benefits' target='_blank'>essential health benefit<\/a> for children 18 years old or younger, and must be o\ufb00ered either as part of a health plan or as a stand-alone plan. Dental coverage is considered optional for adults and children under the <a href='/glossary#affordable_care_act' target='_blank'>Affordable Care Act<\/a>, and you aren't required to buy it. You can purchase a dental plan through Maine Cover ME without purchasing private health coverage."
       },
       {
         "term": "Department of Disability Services",
@@ -343,11 +343,11 @@ function runGlossary() {
       },
       {
         "term": "Department of Health Care Finance",
-        "description": "the State of Maine's state <a href='/glossary#medicaid' target='_blank'>Medicaid<\/a> agency charged with improving health outcomes for Maine residents by providing access to comprehensive, cost-effective and quality healthcare services. DHCF also administers insurance programs for immigrant children, the State Child Health Insurance Program, and Medical Charities (a locally funded program). Learn more about <a class='ext' href='http:\/\/dhcf.dc.gov' target='_blank'>DHCF assistance programs<\/a>."
+        "description": "the State of Maine's state <a href='https://www.maine.gov/dhhs/ofi/programs-services/health-care-assistance' target='_blank'>Medicaid<\/a> agency charged with improving health outcomes for Maine residents by providing access to comprehensive, cost-effective and quality healthcare services. DHCF also administers insurance programs for immigrant children, the State Child Health Insurance Program, and Medical Charities (a locally funded program). Learn more about <a class='ext' href='http:\/\/dhcf.dc.gov' target='_blank'>DHCF assistance programs<\/a>."
       },
       {
         "term": "Department of Human Services",
-        "description": "This agency, in collaboration with the community, provides financial assistance and helps low-income individuals and families maximize their potential for economic security and self-sufficiency. Learn more about <a class='ext' href='http:\/\/\/' target='_blank'>DHS assistance programs<\/a>."
+        "description": "This agency, in collaboration with the community, provides financial assistance and helps low-income individuals and families maximize their potential for economic security and self-sufficiency. Learn more about <a class='ext' href='https://www.maine.gov/dhhs/programs-services/human-services target='_blank'>DHS assistance programs<\/a>."
       },
       {
         "term": "Department of Insurance, Securities and Banking",
@@ -363,7 +363,7 @@ function runGlossary() {
       },
       {
         "term": "DHS",
-        "description": "The acronym for the State of Maine\u2019s <a href='/glossary#department_of_human_services' target='_blank'>Department of Human Services<\/a>."
+        "description": "The acronym for the State of Maine\u2019s <a href='https://www.maine.gov/dhhs/programs-services/human-services' target='_blank'>Department of Human Services<\/a>."
       },
       {
         "term": "Disability",
@@ -391,7 +391,7 @@ function runGlossary() {
       },
       {
         "term": "Early and Periodic Screening, Diagnostic, and Treatment Services",
-        "description": "An umbrella term used to describe a comprehensive and preventive set of health care services for children under the age of 21 who are enrolled in <a href='/glossary#medicaid' target='_blank'>Medicaid<\/a>."
+        "description": "An umbrella term used to describe a comprehensive and preventive set of health care services for children under the age of 21 who are enrolled in <a href='https://www.maine.gov/dhhs/ofi/programs-services/health-care-assistance' target='_blank'>Medicaid<\/a>."
       },
       {
         "term": "ECN",
@@ -407,7 +407,7 @@ function runGlossary() {
       },
       {
         "term": "Employer Shared Responsibility Provision",
-        "description": "The <a href='/glossary#affordable_care_act' target='_blank'>Affordable Care Act<\/a> requires employers with 50 or more <a href='/glossary#full-time_equivalent_employee' target='_blank'>full-time equivalent employees<\/a> to offer <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> to their employees (and their <a href='/glossary#tax_dependent' target='_blank'>tax dependents<\/a>) that provides, <a href='/glossary#minimum_value' target='_blank'>minimum value<\/a> and is considered <a href='/glossary#affordable_coverage' target='_blank'>affordable coverage<\/a> or pay a penalty (called the employer shared responsibility payment). <a class='ext' href='https:\/\/www.irs.gov\/affordable-care-act\/employers\/questions-and-answers-on-employer-shared-responsibility-provisions-under-the-affordable-care-act' target='_blank'>Learn more about the provision<\/a>."
+        "description": "The <a href='/glossary#affordable_care_act' target='_blank'>Affordable Care Act<\/a> requires employers with 50 or more <a href='/glossary#full-time_equivalent_employee' target='_blank'>full-time equivalent employees<\/a> to offer <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> to their employees (and their <a href='/glossary#tax_dependent' target='_blank'>tax dependents<\/a>) that provides, <a href='/glossary#minimum_value' target='_blank'>minimum value<\/a> and is considered <a href='/glossary#affordable_coverage' target='_blank'>affordable coverage<\/a> or pay a penalty (called the employer shared responsibility payment). <a class='ext' href='https:\/\/www.irs.gov\/affordable-care-act\/employers\/questions-and-answers-on-employer-shared-responsibility-provisions-under-the-affordable-care-act' target='_blank'>Learn more about the provision<\/a>."
       },
       {
         "term": "Employer-Sponsored Health Insurance",
@@ -415,7 +415,7 @@ function runGlossary() {
       },
       {
         "term": "EPO",
-        "description": "The acronym for <a href='/glossary#exclusive_provider_organization' target='_blank'>Exclusive Provider Organization<\/a>, a type of <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> plan."
+        "description": "The acronym for <a href='/glossary#exclusive_provider_organization' target='_blank'>Exclusive Provider Organization<\/a>, a type of <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> plan."
       },
       {
         "term": "EPSDT",
@@ -423,32 +423,32 @@ function runGlossary() {
       },
       {
         "term": "Essential Health Benefits",
-        "description": "All <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> plans available through Maine Cover ME are required by federal law to include what are called essential health benefits. These include: <a href='/glossary#ambulatory_patient_services' target='_blank'>ambulatory patient services<\/a>; emergency services; hospitalization; maternity and newborn care; mental health and substance use disorder services including behavioral health treatment; <a href='/glossary#prescription_drugs' target='_blank'>prescription drugs<\/a>; rehabilitation services and <a href='/glossary#habilitative_services' target='_blank'>habilitative services<\/a> and devices; laboratory services; <a href='/glossary#preventive_services' target='_blank'>preventive services<\/a> and chronic disease management; and pediatric services, including dental and vision care for children. This doesn\u2019t mean that all plans are the same. Some plans may o\ufb00er a higher level of service or additional services beyond the minimum required, or exclude other optional services that may be important to you. It\u2019s important to understand these di\ufb00erences when comparing and choosing a plan to meet your needs and budget."
+        "description": "All <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> plans available through Maine Cover ME are required by federal law to include what are called essential health benefits. These include: <a href='/glossary#ambulatory_patient_services' target='_blank'>ambulatory patient services<\/a>; emergency services; hospitalization; maternity and newborn care; mental health and substance use disorder services including behavioral health treatment; <a href='/glossary#prescription_drugs' target='_blank'>prescription drugs<\/a>; rehabilitation services and <a href='/glossary#habilitative_services' target='_blank'>habilitative services<\/a> and devices; laboratory services; <a href='/glossary#preventive_services' target='_blank'>preventive services<\/a> and chronic disease management; and pediatric services, including dental and vision care for children. This doesn\u2019t mean that all plans are the same. Some plans may o\ufb00er a higher level of service or additional services beyond the minimum required, or exclude other optional services that may be important to you. It\u2019s important to understand these di\ufb00erences when comparing and choosing a plan to meet your needs and budget."
       },
       {
         "term": "Exchange",
-        "description": "Another word for a <a href='/glossary#health_insurance_marketplace' target='_blank'>Health Insurance Marketplace<\/a>."
+        "description": "Another word for a <a href='https://www.maine.gov/dhhs/programs-services/health-insurance_marketplace' target='_blank'>Health Insurance Marketplace<\/a>."
       },
       {
         "term": "Excluded Services",
-        "description": "Health care services that your <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> doesn't pay for or cover such as <a href='/glossary#plastic_surgery' target='_blank'>plastic surgery<\/a> for non-medical reasons. Some services also require <a href='/glossary#pre-authorization' target='_blank'>pre-authorization<\/a> from your health insurance company or a referral from your <a href='/glossary#primary_care_physician' target='_blank'>primary care physician<\/a> in order to be considered <a href='/glossary#covered_services' target='_blank'>covered services<\/a>. Excluded services don't count towards your annual <a href='https://www.maine.gov/pfr/insurance/glossary.html#d' target='_blank'>deductible<\/a> or <a href='/glossary#out-of-pocket_limit' target='_blank'>out-of-pocket limit<\/a>."
+        "description": "Health care services that your <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> doesn't pay for or cover such as <a href='/glossary#plastic_surgery' target='_blank'>plastic surgery<\/a> for non-medical reasons. Some services also require <a href='/glossary#pre-authorization' target='_blank'>pre-authorization<\/a> from your health insurance company or a referral from your <a href='/glossary#primary_care_physician' target='_blank'>primary care physician<\/a> in order to be considered <a href='/glossary#covered_services' target='_blank'>covered services<\/a>. Excluded services don't count towards your annual <a href='https://www.maine.gov/pfr/insurance/glossary.html#d' target='_blank'>deductible<\/a> or <a href='/glossary#out-of-pocket_limit' target='_blank'>out-of-pocket limit<\/a>."
       },
       {
         "term": "Exclusive Provider Organization",
-        "description": "A type of <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> plan where you can only use <a href='/glossary#in-network' target='_blank'>in-network<\/a> doctors, hospitals, specialists and other <a href='/glossary#service_provider' target='_blank'>service providers<\/a> except in an emergency."
+        "description": "A type of <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> plan where you can only use <a href='/glossary#in-network' target='_blank'>in-network<\/a> doctors, hospitals, specialists and other <a href='/glossary#service_provider' target='_blank'>service providers<\/a> except in an emergency."
       },
       // Rearranged so RegExp searches for larger terms first
       {
         "term": "Exemption Certificate Number",
-        "description": "If you qualify for an <a href='/glossary#exemption' target='_blank'>exemption<\/a>, you'll receive an exemption certificate number (ECN), a unique identification number that you'll need when you file your federal tax return. This number is used to complete <a href='/glossary#irs_form_8965' target='_blank'>IRS Form 8965<\/a> for the year or time period when you didn't have <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a>. If more than one person in your household qualifies for an exemption, each person will be assigned their own ECN."
+        "description": "If you qualify for an <a href='/glossary#exemption' target='_blank'>exemption<\/a>, you'll receive an exemption certificate number (ECN), a unique identification number that you'll need when you file your federal tax return. This number is used to complete <a href='/glossary#irs_form_8965' target='_blank'>IRS Form 8965<\/a> for the year or time period when you didn't have <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a>. If more than one person in your household qualifies for an exemption, each person will be assigned their own ECN."
       },
       {
         "term": "Exemption",
-        "description": "If you don't want to or forgot to buy <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a>, or don't believe you can afford it, you must get a formal exemption or you may have to pay a penalty when you file your taxes (the <a href='/glossary#individual_shared_responsibility_payment' target='_blank'>Individual Shared Responsibility Payment<\/a>). Some exemptions can be claimed when you file your tax return, but others must be granted in advance by the <a href='/glossary#us_department_of_health_and_human_services' target='_blank'>U.S. Department of Health and Human Services<\/a>. If you're not required to file a federal tax return because your gross income is below the filing threshold, you automatically have an exemption and don't need to do anything. <a class='ext' href='https:\/\/www.irs.gov\/affordable-care-act\/individuals-and-families\/aca-individual-shared-responsibility-provision-exemptions' target='_blank'>See exemptions and who grants them<\/a> to find out whether you need to <a class='ext' href='https:\/\/www.healthcare.gov\/health-coverage-exemptions\/forms-how-to-apply\/' target='_blank'>apply for an exemption<\/a> in advance. Exemptions are claimed on <a href='/glossary#irs_form_8965' target='_blank'>IRS Form 8965<\/a> when you file your taxes."
+        "description": "If you don't want to or forgot to buy <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a>, or don't believe you can afford it, you must get a formal exemption or you may have to pay a penalty when you file your taxes (the <a href='/glossary#individual_shared_responsibility_payment' target='_blank'>Individual Shared Responsibility Payment<\/a>). Some exemptions can be claimed when you file your tax return, but others must be granted in advance by the <a href='/glossary#us_department_of_health_and_human_services' target='_blank'>U.S. Department of Health and Human Services<\/a>. If you're not required to file a federal tax return because your gross income is below the filing threshold, you automatically have an exemption and don't need to do anything. <a class='ext' href='https:\/\/www.irs.gov\/affordable-care-act\/individuals-and-families\/aca-individual-shared-responsibility-provision-exemptions' target='_blank'>See exemptions and who grants them<\/a> to find out whether you need to <a class='ext' href='https:\/\/www.healthcare.gov\/health-coverage-exemptions\/forms-how-to-apply\/' target='_blank'>apply for an exemption<\/a> in advance. Exemptions are claimed on <a href='/glossary#irs_form_8965' target='_blank'>IRS Form 8965<\/a> when you file your taxes."
       },
       {
         "term": "Family",
-        "description": "You, your spouse, and other <a href='/glossary#tax_dependent' target='_blank'>tax dependents<\/a> as defined by the IRS. Eligibility for <a href='/glossary#medicaid' target='_blank'>Medicaid<\/a>, help paying for <a href='/glossary#private_health_insurance' target='_blank'>private health insurance<\/a> and other <a href='/glossary#financial_assistance' target='_blank'>financial assistance<\/a> programs is based on the income of all <a href='/glossary#household' target='_blank'>household<\/a> members even if all members don't need coverage."
+        "description": "You, your spouse, and other <a href='/glossary#tax_dependent' target='_blank'>tax dependents<\/a> as defined by the IRS. Eligibility for <a href='https://www.maine.gov/dhhs/ofi/programs-services/health-care-assistance' target='_blank'>Medicaid<\/a>, help paying for <a href='/glossary#private_health_insurance' target='_blank'>private health insurance<\/a> and other <a href='/glossary#financial_assistance' target='_blank'>financial assistance<\/a> programs is based on the income of all <a href='/glossary#household' target='_blank'>household<\/a> members even if all members don't need coverage."
       },
       {
         "term": "Federal Poverty Level",
@@ -464,7 +464,7 @@ function runGlossary() {
       },
       {
         "term": "Financial Assistance",
-        "description": "An umbrella terms used by Maine Cover ME to describe <a href='/glossary#medicaid' target='_blank'>Medicaid<\/a>, and federal programs that help you pay for <a href='/glossary#private_health_insurance' target='_blank'>private health insurance<\/a> like <a href='/glossary#advance_premium_tax_credit' target='_blank'>advance premium tax credits<\/a> and <a href='/glossary#cost-sharing_reduction' target='_blank'>cost-sharing reductions<\/a>. In the State of Maine, there are many other financial assistance programs for health care and other services. You can learn more about these programs from the State of Maine's <a href='/glossary#department_of_health_care_finance' target='_blank'>Department of Health Care Finance<\/a> and the <a href='/glossary#department_of_human_services' target='_blank'>Department of Human Services<\/a>."
+        "description": "An umbrella terms used by Maine Cover ME to describe <a href='https://www.maine.gov/dhhs/ofi/programs-services/health-care-assistance' target='_blank'>Medicaid<\/a>, and federal programs that help you pay for <a href='/glossary#private_health_insurance' target='_blank'>private health insurance<\/a> like <a href='/glossary#advance_premium_tax_credit' target='_blank'>advance premium tax credits<\/a> and <a href='/glossary#cost-sharing_reduction' target='_blank'>cost-sharing reductions<\/a>. In the State of Maine, there are many other financial assistance programs for health care and other services. You can learn more about these programs from the State of Maine's <a href='/glossary#department_of_health_care_finance' target='_blank'>Department of Health Care Finance<\/a> and the <a href='https://www.maine.gov/dhhs/programs-services/human-services' target='_blank'>Department of Human Services<\/a>."
       },
       {
         "term": "Food Stamps",
@@ -472,7 +472,7 @@ function runGlossary() {
       },
       {
         "term": "Formulary",
-        "description": "A list of <a href='/glossary#prescription_drugs' target='_blank'>prescription drugs<\/a> that are covered by your <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> plan. Formularies often divide drugs into 'tiers' or categories, which determine your share of the costs. Prescription drugs are considered an <a href='/glossary#essential_health_benefits' target='_blank'>essential health benefit<\/a> under the <a href='/glossary#affordable_care_act' target='_blank'>Affordable Care Act<\/a>. "
+        "description": "A list of <a href='/glossary#prescription_drugs' target='_blank'>prescription drugs<\/a> that are covered by your <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> plan. Formularies often divide drugs into 'tiers' or categories, which determine your share of the costs. Prescription drugs are considered an <a href='/glossary#essential_health_benefits' target='_blank'>essential health benefit<\/a> under the <a href='/glossary#affordable_care_act' target='_blank'>Affordable Care Act<\/a>. "
       },
       {
         "term": "FPL",
@@ -484,7 +484,7 @@ function runGlossary() {
       },
       {
         "term": "Full-time Equivalent Employee",
-        "description": "Small businesses must have at least 1 full-time equivalent employee to purchase <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> through Maine Cover ME\u2019s Small Business Marketplace. All employees (not including owners, partners or family members) who work on average, at least 30 hours a week are considered full-time employees. Part-time employees can count towards calculating the number of full-time equivalent employees. For example, 2 part-time employees who each work 15 hours a week - half the hours of a full-time employee - equal 1 full-time equivalent employee. (2x.50=1)"
+        "description": "Small businesses must have at least 1 full-time equivalent employee to purchase <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> through Maine Cover ME\u2019s Small Business Marketplace. All employees (not including owners, partners or family members) who work on average, at least 30 hours a week are considered full-time employees. Part-time employees can count towards calculating the number of full-time equivalent employees. For example, 2 part-time employees who each work 15 hours a week - half the hours of a full-time employee - equal 1 full-time equivalent employee. (2x.50=1)"
       },
       {
         "term": "Generic Drugs",
@@ -492,7 +492,7 @@ function runGlossary() {
       },
       {
         "term": "Gold Health Plan",
-        "description": "Gold Health Plans pay 80 percent of <a href='/glossary#in-network' target='_blank'>in-network<\/a> expenses for an average population of consumers. The <a href='/glossary#premium' target='_blank'>premiums<\/a> are typically higher but the <a href='https://www.maine.gov/pfr/insurance/glossary.html#d' target='_blank'>deductible<\/a> and <a href='/glossary#out-of-pocket_limit' target='_blank'>out-of-pocket limit<\/a> of what you'll pay before the plan starts paying are lower. <a href='/glossary#metal_level' target='_blank'>Metal levels<\/a> only focus on what the plan is expected to pay, and do NOT reflect the quality of health care or <a href='/glossary#service_provider' target='_blank'>service providers<\/a> available through the <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> plan. Once you meet your in-network out-of-pocket limit for the <a href='/glossary#plan_year' target='_blank'>plan year<\/a>, plans pay 100 percent of the <a href='/glossary#allowed_amount' target='_blank'>allowed amount<\/a> for <a href='/glossary#covered_services' target='_blank'>covered services<\/a>. "
+        "description": "Gold Health Plans pay 80 percent of <a href='/glossary#in-network' target='_blank'>in-network<\/a> expenses for an average population of consumers. The <a href='/glossary#premium' target='_blank'>premiums<\/a> are typically higher but the <a href='https://www.maine.gov/pfr/insurance/glossary.html#d' target='_blank'>deductible<\/a> and <a href='/glossary#out-of-pocket_limit' target='_blank'>out-of-pocket limit<\/a> of what you'll pay before the plan starts paying are lower. <a href='/glossary#metal_level' target='_blank'>Metal levels<\/a> only focus on what the plan is expected to pay, and do NOT reflect the quality of health care or <a href='/glossary#service_provider' target='_blank'>service providers<\/a> available through the <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> plan. Once you meet your in-network out-of-pocket limit for the <a href='/glossary#plan_year' target='_blank'>plan year<\/a>, plans pay 100 percent of the <a href='/glossary#allowed_amount' target='_blank'>allowed amount<\/a> for <a href='/glossary#covered_services' target='_blank'>covered services<\/a>. "
       },
       {
         "term": "Grandfathered Plan",
@@ -520,7 +520,7 @@ function runGlossary() {
       },
       {
         "term": "Hardship Exemption",
-        "description": "One kind of exemption from the health care law\u2019s requirement that most Americans have <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> or pay a penalty. See the definition of <a href='/glossary#exemption' target='_blank'>exemption<\/a> for more information."
+        "description": "One kind of exemption from the health care law\u2019s requirement that most Americans have <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> or pay a penalty. See the definition of <a href='/glossary#exemption' target='_blank'>exemption<\/a> for more information."
       },
       {
         "term": "HCBS",
@@ -541,7 +541,7 @@ function runGlossary() {
       },
       {
         "term": "Health Insurance Marketplace",
-        "description": "A state-based or federally-facilitated exchange where individuals, families, small businesses and their employees can get quality, affordable <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a>. the State of Maine's health insurance marketplace is available at <a class='ext' href='http:\/\/www.dchealthlink.com\/' target='_blank'>dchealthlink.com<\/a>. "
+        "description": "A state-based or federally-facilitated exchange where individuals, families, small businesses and their employees can get quality, affordable <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a>. the State of Maine's health insurance marketplace is available at <a class='ext' href='http:\/\/www.dchealthlink.com\/' target='_blank'>dchealthlink.com<\/a>. "
       },
       {
         "term": "Health Insurance",
@@ -549,7 +549,7 @@ function runGlossary() {
       },
       {
         "term": "Health Insurance Plan",
-        "description": "Another name for <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a>."
+        "description": "Another name for <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a>."
       },
       {
         "term": "Health Insurance Portability and Accountability Act",
@@ -561,7 +561,7 @@ function runGlossary() {
       },
       {
         "term": "Health Reimbursement Account",
-        "description": "An optional, <a href='/glossary#employer-sponsored_health_insurance' target='_blank'>employer-sponsored<\/a> benefit funded by the employer that reimburses <a href='/glossary#plan_participants' target='_blank'>plan participants<\/a> for <a href='/glossary#qualified_medical_expenses' target='_blank'>qualified medical expenses<\/a> up to a fixed amount. The reimbursements are tax free, and any unused funds can be rolled over for use in future years. These types of accounts are not <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a>."
+        "description": "An optional, <a href='/glossary#employer-sponsored_health_insurance' target='_blank'>employer-sponsored<\/a> benefit funded by the employer that reimburses <a href='/glossary#plan_participants' target='_blank'>plan participants<\/a> for <a href='/glossary#qualified_medical_expenses' target='_blank'>qualified medical expenses<\/a> up to a fixed amount. The reimbursements are tax free, and any unused funds can be rolled over for use in future years. These types of accounts are not <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a>."
       },
       {
         "term": "Health Savings Account",
@@ -569,11 +569,11 @@ function runGlossary() {
       },
       {
         "term": "Health Status",
-        "description": "Medical conditions and health history. Under the <a href='/glossary#affordable_care_act' target='_blank'>Affordable Care Act<\/a>, your health status has no impact on your ability to get <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> or the cost of it. In the State of Maine, smoking also doesn't factor into the cost of your health insurance, and <a href='/glossary#premium' target='_blank'>premiums<\/a> are based solely on your age."
+        "description": "Medical conditions and health history. Under the <a href='/glossary#affordable_care_act' target='_blank'>Affordable Care Act<\/a>, your health status has no impact on your ability to get <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> or the cost of it. In the State of Maine, smoking also doesn't factor into the cost of your health insurance, and <a href='/glossary#premium' target='_blank'>premiums<\/a> are based solely on your age."
       },
       {
         "term": "Healthcare.gov",
-        "description": "The website for the federally-facilitated <a href='/glossary#health_insurance_marketplace' target='_blank'>health insurance marketplace<\/a> used by many states to help meet the provisions of the <a href='/glossary#affordable_care_act' target='_blank'>Affordable Care Act<\/a>. the State of Maine operates its own health insurance marketplace accessible through <a class='ext' href='http:\/\/www.dchealthlink.com\/' target='_blank'>Maine Cover ME<\/a>; however, Maine residents who need an <a href='/glossary#exemption' target='_blank'>exemption<\/a> from having <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> apply for it through <a class='ext' href='https:\/\/www.healthcare.gov\/' target='_blank'>healthcare.gov<\/a>"
+        "description": "The website for the federally-facilitated <a href='https://www.maine.gov/dhhs/programs-services/health-insurance_marketplace' target='_blank'>health insurance marketplace<\/a> used by many states to help meet the provisions of the <a href='/glossary#affordable_care_act' target='_blank'>Affordable Care Act<\/a>. the State of Maine operates its own health insurance marketplace accessible through <a class='ext' href='http:\/\/www.dchealthlink.com\/' target='_blank'>Maine Cover ME<\/a>; however, Maine residents who need an <a href='/glossary#exemption' target='_blank'>exemption<\/a> from having <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> apply for it through <a class='ext' href='https:\/\/www.healthcare.gov\/' target='_blank'>healthcare.gov<\/a>"
       },
       {
         "term": "HHS",
@@ -585,11 +585,11 @@ function runGlossary() {
       },
       {
         "term": "HIPAA",
-        "description": "The acronym for a federal law known as the <a href='/glossary#health_insurance_portability_and_accountability_act' target='_blank'>Health Insurance Portability and Accountability Act<\/a>."
+        "description": "The acronym for a federal law known as the <a href='https://www.maine.gov/dhhs/programs-services/health-insurance_portability_and_accountability_act' target='_blank'>Health Insurance Portability and Accountability Act<\/a>."
       },
       {
         "term": "HMO",
-        "description": "The acronym for <a href='/glossary#health_maintenance_organization' target='_blank'>Health Maintenance Organization<\/a> \u2013 a type of <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> plan."
+        "description": "The acronym for <a href='/glossary#health_maintenance_organization' target='_blank'>Health Maintenance Organization<\/a> \u2013 a type of <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> plan."
       },
       {
         "term": "Home and Community-Based Services",
@@ -597,7 +597,7 @@ function runGlossary() {
       },
       {
         "term": "Home Health Care",
-        "description": "Health services you receive at home, such as but not limited to: skilled nursing, physical therapy, occupational therapy, or medical supplies and equipment. These services are typically prescribed by your doctor and provided by a home health agency approved by your <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> company."
+        "description": "Health services you receive at home, such as but not limited to: skilled nursing, physical therapy, occupational therapy, or medical supplies and equipment. These services are typically prescribed by your doctor and provided by a home health agency approved by your <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> company."
       },
       {
         "term": "Hospice Services",
@@ -613,7 +613,7 @@ function runGlossary() {
       },
       {
         "term": "Household",
-        "description": "You, your spouse, and other <a href='/glossary#tax_dependent' target='_blank'>tax dependents<\/a> as defined by the IRS. Eligibility for <a href='/glossary#medicaid' target='_blank'>Medicaid<\/a>, help paying for <a href='/glossary#private_health_insurance' target='_blank'>private health insurance<\/a> and other <a href='/glossary#financial_assistance' target='_blank'>financial assistance<\/a> programs is based on the income of all household members even if all members don't need <a href='/glossary#coverage' target='_blank'>coverage<\/a>. "
+        "description": "You, your spouse, and other <a href='/glossary#tax_dependent' target='_blank'>tax dependents<\/a> as defined by the IRS. Eligibility for <a href='https://www.maine.gov/dhhs/ofi/programs-services/health-care-assistance' target='_blank'>Medicaid<\/a>, help paying for <a href='/glossary#private_health_insurance' target='_blank'>private health insurance<\/a> and other <a href='/glossary#financial_assistance' target='_blank'>financial assistance<\/a> programs is based on the income of all household members even if all members don't need <a href='/glossary#coverage' target='_blank'>coverage<\/a>. "
       },
       {
         "term": "HRA",
@@ -637,7 +637,7 @@ function runGlossary() {
       },
       {
         "term": "Immigrant Children's Program",
-        "description": "A health coverage program available to children under the age of 21 who aren't eligible for <a href='/glossary#medicaid' target='_blank'>Medicaid<\/a> due to citizenship or immigration status. Learn more about <a class='ext' href='http:\/\/dhcf.dc.gov\/service\/immigrant-childrens-program' target='_blank'>the State of Maine's Immigrant Children's Program<\/a>."
+        "description": "A health coverage program available to children under the age of 21 who aren't eligible for <a href='https://www.maine.gov/dhhs/ofi/programs-services/health-care-assistance' target='_blank'>Medicaid<\/a> due to citizenship or immigration status. Learn more about <a class='ext' href='http:\/\/dhcf.dc.gov\/service\/immigrant-childrens-program' target='_blank'>the State of Maine's Immigrant Children's Program<\/a>."
       },
       {
         "term": "Indian Health Service",
@@ -649,15 +649,15 @@ function runGlossary() {
       },
       {
         "term": "Individual Shared Responsibility Payment",
-        "description": "If you don't have <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> that provides <a href='/glossary#minimum_essential_coverage' target='_blank'>minimum essential coverage<\/a>, or you don't qualify for an <a href='/glossary#exemption' target='_blank'>exemption<\/a>, you may have to pay a penalty when you file your federal tax return. This is called the individual shared responsibility payment. The penalty will never be higher than the national average <a href='/glossary#premium' target='_blank'>premium<\/a> for a <a href='/glossary#bronze_health_plan' target='_blank'>bronze health plan<\/a> (the least expensive type of comprehensive plan). <a class='ext' href='https:\/\/dchealthlink.com\/go-without-insurance' target='_blank'>Learn more about the penalty<\/a>. "
+        "description": "If you don't have <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> that provides <a href='/glossary#minimum_essential_coverage' target='_blank'>minimum essential coverage<\/a>, or you don't qualify for an <a href='/glossary#exemption' target='_blank'>exemption<\/a>, you may have to pay a penalty when you file your federal tax return. This is called the individual shared responsibility payment. The penalty will never be higher than the national average <a href='/glossary#premium' target='_blank'>premium<\/a> for a <a href='/glossary#bronze_health_plan' target='_blank'>bronze health plan<\/a> (the least expensive type of comprehensive plan). <a class='ext' href='https:\/\/dchealthlink.com\/go-without-insurance' target='_blank'>Learn more about the penalty<\/a>. "
       },
       {
         "term": "Individual Shared Responsibility Provision",
-        "description": "The <a href='/glossary#affordable_care_act' target='_blank'>Affordable Care Act<\/a> requires most people to either have <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> that provides <a href='/glossary#minimum_essential_coverage' target='_blank'>minimum essential coverage<\/a>, get an <a href='/glossary#exemption' target='_blank'>exemption<\/a>, or pay a penalty which is called the <a href='/glossary#individual_shared_responsibility_payment' target='_blank'>individual shared responsibility payment<\/a>."
+        "description": "The <a href='/glossary#affordable_care_act' target='_blank'>Affordable Care Act<\/a> requires most people to either have <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> that provides <a href='/glossary#minimum_essential_coverage' target='_blank'>minimum essential coverage<\/a>, get an <a href='/glossary#exemption' target='_blank'>exemption<\/a>, or pay a penalty which is called the <a href='/glossary#individual_shared_responsibility_payment' target='_blank'>individual shared responsibility payment<\/a>."
       },
       {
         "term": "In-Network",
-        "description": "The <a href='/glossary#service_provider' target='_blank'>service providers<\/a> and suppliers your <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> company has contracted with to provide health care services. Some health insurance plans will only let you use in-network (sometimes called \u201cpreferred\u201d) service providers, and only cover <a href='/glossary#out-of-network' target='_blank'>out-of-network<\/a> providers on a limited basis. It also costs less to use in-network service providers. If you have a doctor or other service provider that you want to keep using, make sure they are in-network for the health insurance plan you choose."
+        "description": "The <a href='/glossary#service_provider' target='_blank'>service providers<\/a> and suppliers your <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> company has contracted with to provide health care services. Some health insurance plans will only let you use in-network (sometimes called \u201cpreferred\u201d) service providers, and only cover <a href='/glossary#out-of-network' target='_blank'>out-of-network<\/a> providers on a limited basis. It also costs less to use in-network service providers. If you have a doctor or other service provider that you want to keep using, make sure they are in-network for the health insurance plan you choose."
       },
       {
         "term": "Inpatient Care",
@@ -669,11 +669,11 @@ function runGlossary() {
       },
       {
         "term": "IRS Form 1095-A",
-        "description": "A federal tax form, also called the Health Insurance Marketplace Statement, that shows how long you had individual (or family) <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> through a health insurance marketplace during the tax year. If you received an <a href='/glossary#advance_premium_tax_credit' target='_blank'>advance premium tax credit<\/a> to help pay for your insurance, Form 1095-A will also show how much premium assistance you received each month. If you received <a href='/glossary#premium' target='_blank'>premium<\/a> assistance, you\u2019ll need the information on Form 1095-A to complete the Premium Tax Credit <a href='/glossary#irs_form_8962' target='_blank'>IRS Form 8962<\/a>. Maine Cover ME will mail your Form 1095-A at the end of January. You can also <a class='ext' href='https:\/\/dchealthlink.com\/individuals\/tax-info' target='_blank'>Download Form 1095-A<\/a> in early February."
+        "description": "A federal tax form, also called the Health Insurance Marketplace Statement, that shows how long you had individual (or family) <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> through a health insurance marketplace during the tax year. If you received an <a href='/glossary#advance_premium_tax_credit' target='_blank'>advance premium tax credit<\/a> to help pay for your insurance, Form 1095-A will also show how much premium assistance you received each month. If you received <a href='/glossary#premium' target='_blank'>premium<\/a> assistance, you\u2019ll need the information on Form 1095-A to complete the Premium Tax Credit <a href='/glossary#irs_form_8962' target='_blank'>IRS Form 8962<\/a>. Maine Cover ME will mail your Form 1095-A at the end of January. You can also <a class='ext' href='https:\/\/dchealthlink.com\/individuals\/tax-info' target='_blank'>Download Form 1095-A<\/a> in early February."
       },
       {
         "term": "IRS Form 1095-B",
-        "description": "A federal tax form sent to the IRS and to taxpayers who either had <a href='/glossary#medicaid' target='_blank'>Medicaid<\/a>, <a href='/glossary#chip' target='_blank'>CHIP<\/a> or <a href='/glossary#employer-sponsored_health_insurance' target='_blank'>employer-sponsored coverage<\/a>. Medicaid and CHIP beneficiaries in the State of Maine receive the form from Maine Cover ME by the end of January. Employees receive the form directly from their insurance company. The form shows how long you had <a href='/glossary#minimum_essential_coverage' target='_blank'>minimum essential coverage<\/a> during the tax year."
+        "description": "A federal tax form sent to the IRS and to taxpayers who either had <a href='https://www.maine.gov/dhhs/ofi/programs-services/health-care-assistance' target='_blank'>Medicaid<\/a>, <a href='/glossary#chip' target='_blank'>CHIP<\/a> or <a href='/glossary#employer-sponsored_health_insurance' target='_blank'>employer-sponsored coverage<\/a>. Medicaid and CHIP beneficiaries in the State of Maine receive the form from Maine Cover ME by the end of January. Employees receive the form directly from their insurance company. The form shows how long you had <a href='/glossary#minimum_essential_coverage' target='_blank'>minimum essential coverage<\/a> during the tax year."
       },
       {
         "term": "IRS Form 8962",
@@ -689,7 +689,7 @@ function runGlossary() {
       },
       {
         "term": "Katie Beckett Program",
-        "description": "An eligibility pathway for the State of Maine\u2019s <a href='/glossary#medicaid' target='_blank'>Medicaid<\/a> Program for certain children who have long-term disabilities or complex medical needs and live at home. Also known as the Tax Equity Fiscal Responsibility Act (TEFRA). Learn more about <a class='ext' href='http:\/\/dhcf.dc.gov\/service\/tax-equity-and-fiscal-responsibility-act-tefrakatie-beckett' target='_blank'>eligibility for the Katie Beckett Program<\/a>."
+        "description": "An eligibility pathway for the State of Maine\u2019s <a href='https://www.maine.gov/dhhs/ofi/programs-services/health-care-assistance' target='_blank'>Medicaid<\/a> Program for certain children who have long-term disabilities or complex medical needs and live at home. Also known as the Tax Equity Fiscal Responsibility Act (TEFRA). Learn more about <a class='ext' href='http:\/\/dhcf.dc.gov\/service\/tax-equity-and-fiscal-responsibility-act-tefrakatie-beckett' target='_blank'>eligibility for the Katie Beckett Program<\/a>."
       },
       {
         "term": "Large Group Health Plan",
@@ -697,15 +697,15 @@ function runGlossary() {
       },
       {
         "term": "Life Changes",
-        "description": "Also called a <a href='/glossary#qualifying_life_event' target='_blank'>Qualifying Life Event<\/a>, certain life changes may make you eligible to enroll in <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> coverage outside of the annual <a href='/glossary#open_enrollment' target='_blank'>open enrollment<\/a> period in what's called a <a href='/glossary#special_enrollment_period' target='_blank'>special enrollment period<\/a>, or make changes to your plan during the year."
+        "description": "Also called a <a href='/glossary#qualifying_life_event' target='_blank'>Qualifying Life Event<\/a>, certain life changes may make you eligible to enroll in <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> coverage outside of the annual <a href='/glossary#open_enrollment' target='_blank'>open enrollment<\/a> period in what's called a <a href='/glossary#special_enrollment_period' target='_blank'>special enrollment period<\/a>, or make changes to your plan during the year."
       },
       {
         "term": "Life Event",
-        "description": "Also called a <a href='/glossary#qualifying_life_event' target='_blank'>Qualifying Life Event<\/a>, certain life events may make you eligible to enroll in <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> coverage outside of the annual <a href='/glossary#open_enrollment' target='_blank'>open enrollment<\/a> period in what's called a <a href='/glossary#special_enrollment_period' target='_blank'>special enrollment period<\/a>, or make changes to your plan during the year."
+        "description": "Also called a <a href='/glossary#qualifying_life_event' target='_blank'>Qualifying Life Event<\/a>, certain life events may make you eligible to enroll in <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> coverage outside of the annual <a href='/glossary#open_enrollment' target='_blank'>open enrollment<\/a> period in what's called a <a href='/glossary#special_enrollment_period' target='_blank'>special enrollment period<\/a>, or make changes to your plan during the year."
       },
       {
         "term": "Lifetime Limit",
-        "description": "The most your insurance company will pay for benefits in your lifetime, how many times you can receive a service in your lifetime, or how much your insurance company will spend on a particular service in your lifetime. Under the <a href='/glossary#affordable_care_act' target='_blank'>Affordable Care Act<\/a>, most health plans (including all plans available through <a href='/glossary#health_insurance_marketplace' target='_blank'>health insurance marketplaces<\/a>) don\u2019t have lifetime limits."
+        "description": "The most your insurance company will pay for benefits in your lifetime, how many times you can receive a service in your lifetime, or how much your insurance company will spend on a particular service in your lifetime. Under the <a href='/glossary#affordable_care_act' target='_blank'>Affordable Care Act<\/a>, most health plans (including all plans available through <a href='https://www.maine.gov/dhhs/programs-services/health-insurance_marketplace' target='_blank'>health insurance marketplaces<\/a>) don\u2019t have lifetime limits."
       },
       {
         "term": "Limited Cost-Sharing Plan",
@@ -717,7 +717,7 @@ function runGlossary() {
       },
       {
         "term": "Long-Term Care",
-        "description": "Medical and non-medical services provided to people who are unable to perform basic activities most people do every day without assistance, such as walking, dressing or bathing.  Long-term care insurance is typically purchased as a stand-alone plan. <a href='/glossary#medicare' target='_blank'>Medicare<\/a> and most <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> plans don\u2019t pay for long-term care. the State of Maine does offer some <a class='ext' href='' target='_blank'>long-term care programs for eligible Maine residents<\/a>. "
+        "description": "Medical and non-medical services provided to people who are unable to perform basic activities most people do every day without assistance, such as walking, dressing or bathing.  Long-term care insurance is typically purchased as a stand-alone plan. <a href='https://www.medicare.gov/' target='_blank'>Medicare<\/a> and most <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> plans don\u2019t pay for long-term care. the State of Maine does offer some <a class='ext' href='' target='_blank'>long-term care programs for eligible Maine residents<\/a>. "
       },
       {
         "term": "MAGI",
@@ -733,11 +733,11 @@ function runGlossary() {
       },
       {
         "term": "Medical Coverage",
-        "description": "<a href='/glossary#health_insurance' target='_blank'>Health Insurance<\/a>"
+        "description": "<a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>Health Insurance<\/a>"
       },
       {
         "term": "Medical Loss Ratio",
-        "description": "Federal law requires <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> companies to use at least 80 percent of <a href='/glossary#premium' target='_blank'>premium<\/a> dollars for health care expenses (85 percent for large group health plans). If an insurance company spends less, they must pay a rebate to employers or consumers. Rebates are based on the insurance company's health care spending across all health plans in the state. Employers are required to share the rebates with their employees based on the percentage of premiums paid. "
+        "description": "Federal law requires <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> companies to use at least 80 percent of <a href='/glossary#premium' target='_blank'>premium<\/a> dollars for health care expenses (85 percent for large group health plans). If an insurance company spends less, they must pay a rebate to employers or consumers. Rebates are based on the insurance company's health care spending across all health plans in the state. Employers are required to share the rebates with their employees based on the percentage of premiums paid. "
       },
       {
         "term": "Medically Necessary",
@@ -745,11 +745,11 @@ function runGlossary() {
       },
       {
         "term": "Medicare",
-        "description": "A federal <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> program for people who are 65 or older, certain younger people with disabilities, and people with end-stage renal disease (permanent kidney failure requiring dialysis or a transplant, sometimes called ESRD). The program helps with the cost of health care, but it doesn't cover all medical expenses or the cost of most <a href='/glossary#long-term_care' target='_blank'>long-term care<\/a>.  The program is administered through the <a href='/glossary#social_security_administration' target='_blank'>Social Security Administration<\/a>, not through Maine Cover ME. Learn more about <a class='ext' href='https:\/\/www.ssa.gov\/medicare\/' target='_blank'>when and how to apply for Medicare<\/a>. "
+        "description": "A federal <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> program for people who are 65 or older, certain younger people with disabilities, and people with end-stage renal disease (permanent kidney failure requiring dialysis or a transplant, sometimes called ESRD). The program helps with the cost of health care, but it doesn't cover all medical expenses or the cost of most <a href='/glossary#long-term_care' target='_blank'>long-term care<\/a>.  The program is administered through the <a href='/glossary#social_security_administration' target='_blank'>Social Security Administration<\/a>, not through Maine Cover ME. Learn more about <a class='ext' href='https:\/\/www.ssa.gov\/medicare\/' target='_blank'>when and how to apply for Medicare<\/a>. "
       },
       {
         "term": "Metal Level",
-        "description": "Plans are assigned metal levels to indicate how generous they are in paying expenses. Metal levels only focus on what the plan is expected to pay, and do NOT reflect the quality of health care or <a href='/glossary#service_provider' target='_blank'>service providers<\/a> available through the <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> plan. <a href='/glossary#bronze_health_plan' target='_blank'>Bronze Health Plans<\/a> pay 60 percent of medical expenses for the average population of consumers, <a href='/glossary#silver_health_plan' target='_blank'>Silver Health Plans<\/a> 70 percent, <a href='/glossary#gold_health_plan' target='_blank'>Gold Health Plans<\/a> 80 percent, and <a href='/glossary#platinum_health_plan' target='_blank'>Platinum Health Plans<\/a> 90 percent. Bronze and Silver plans generally have lower <a href='/glossary#premium' target='_blank'>premiums<\/a>, but you pay more when you get <a href='/glossary#covered_services' target='_blank'>covered services<\/a>. Gold and Platinum plans generally have higher premiums, but you pay less when you get covered services. "
+        "description": "Plans are assigned metal levels to indicate how generous they are in paying expenses. Metal levels only focus on what the plan is expected to pay, and do NOT reflect the quality of health care or <a href='/glossary#service_provider' target='_blank'>service providers<\/a> available through the <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> plan. <a href='/glossary#bronze_health_plan' target='_blank'>Bronze Health Plans<\/a> pay 60 percent of medical expenses for the average population of consumers, <a href='/glossary#silver_health_plan' target='_blank'>Silver Health Plans<\/a> 70 percent, <a href='/glossary#gold_health_plan' target='_blank'>Gold Health Plans<\/a> 80 percent, and <a href='/glossary#platinum_health_plan' target='_blank'>Platinum Health Plans<\/a> 90 percent. Bronze and Silver plans generally have lower <a href='/glossary#premium' target='_blank'>premiums<\/a>, but you pay more when you get <a href='/glossary#covered_services' target='_blank'>covered services<\/a>. Gold and Platinum plans generally have higher premiums, but you pay less when you get covered services. "
       },
       {
         "term": "Mini Cobra",
@@ -757,7 +757,7 @@ function runGlossary() {
       },
       {
         "term": "Minimum Essential Coverage",
-        "description": "Health coverage that meets the requirement of the <a href='/glossary#affordable_care_act' target='_blank'>Affordable Care Act<\/a> that most Americans have health insurance and certain other standards. All private health plans available through Maine Cover ME meet or exceed this standard. <a href='/glossary#medicaid' target='_blank'>Medicaid<\/a> and <a href='/glossary#medicare' target='_blank'>Medicare<\/a> also qualify. If you get your medical coverage outside of Maine Cover ME or through another government program, <a class='ext' href='https:\/\/www.irs.gov\/affordable-care-act\/individuals-and-families\/aca-individual-shared-responsibility-provision-minimum-essential-coverage' target='_blank'>find out what kind of health coverage qualifies as minimum essential coverage<\/a>."
+        "description": "Health coverage that meets the requirement of the <a href='/glossary#affordable_care_act' target='_blank'>Affordable Care Act<\/a> that most Americans have health insurance and certain other standards. All private health plans available through Maine Cover ME meet or exceed this standard. <a href='https://www.maine.gov/dhhs/ofi/programs-services/health-care-assistance' target='_blank'>Medicaid (Maine Care)<\/a> and <a href='https://www.medicare.gov/' target='_blank'>Medicare<\/a> also qualify. If you get your medical coverage outside of Maine Cover ME or through another government program, <a class='ext' href='https:\/\/www.irs.gov\/affordable-care-act\/individuals-and-families\/aca-individual-shared-responsibility-provision-minimum-essential-coverage' target='_blank'>find out what kind of health coverage qualifies as minimum essential coverage<\/a>."
       },
       {
         "term": "Minimum Value",
@@ -765,7 +765,7 @@ function runGlossary() {
       },
       {
         "term": "Modified Adjusted Gross Income",
-        "description": "The way your income is calculated to see whether or not you qualify for <a href='/glossary#medicaid' target='_blank'>Medicaid<\/a> or an <a href='/glossary#advance_premium_tax_credit' target='_blank'>advance premium tax credit<\/a>. MAGI is your <a href='/glossary#household' target='_blank'>household's<\/a> Adjusted Gross Income (as calculated when you file your taxes) plus any non-taxable <a href='/glossary#social_security' target='_blank'>Social Security<\/a> benefits, tax-exempt interest, and foreign income."
+        "description": "The way your income is calculated to see whether or not you qualify for <a href='https://www.maine.gov/dhhs/ofi/programs-services/health-care-assistance' target='_blank'>Medicaid<\/a> or an <a href='/glossary#advance_premium_tax_credit' target='_blank'>advance premium tax credit<\/a>. MAGI is your <a href='/glossary#household' target='_blank'>household's<\/a> Adjusted Gross Income (as calculated when you file your taxes) plus any non-taxable <a href='/glossary#social_security' target='_blank'>Social Security<\/a> benefits, tax-exempt interest, and foreign income."
       },
       {
         "term": "Nationwide Network",
@@ -785,7 +785,7 @@ function runGlossary() {
       },
       {
         "term": "Network",
-        "description": "Doctors, specialists, other <a href='/glossary#service_provider' target='_blank'>service providers<\/a>, facilities and suppliers that a <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> company contracts with to provide health care services to plan members."
+        "description": "Doctors, specialists, other <a href='/glossary#service_provider' target='_blank'>service providers<\/a>, facilities and suppliers that a <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> company contracts with to provide health care services to plan members."
       },
       {
         "term": "Non-Preferred Provider",
@@ -793,7 +793,7 @@ function runGlossary() {
       },
       {
         "term": "Notice",
-        "description": "Once you sign up for <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a>, from time to time, you may receive important information about your health insurance in the mail or an alert by email that a new notice is available when you login to your Maine Cover ME account. Notices are time sensitive and may impact your health insurance, so it\u2019s important that you read them and take action, if required. "
+        "description": "Once you sign up for <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a>, from time to time, you may receive important information about your health insurance in the mail or an alert by email that a new notice is available when you login to your Maine Cover ME account. Notices are time sensitive and may impact your health insurance, so it\u2019s important that you read them and take action, if required. "
       },
       {
         "term": "Obamacare",
@@ -801,7 +801,7 @@ function runGlossary() {
       },
       {
         "term": "Open Enrollment",
-        "description": "A limited period of time every year when people can enroll in a <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> plan for the next plan year. For individuals and families, the annual open enrollment season is every fall and usually lasts 3 months. If your employer offers health insurance, the open enrollment time will be shorter and at a different time, so you should check with your employer on when you can enroll. You can apply for and enroll in <a href='/glossary#medicaid' target='_blank'>Medicaid<\/a> any time of the year."
+        "description": "A limited period of time every year when people can enroll in a <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> plan for the next plan year. For individuals and families, the annual open enrollment season is every fall and usually lasts 3 months. If your employer offers health insurance, the open enrollment time will be shorter and at a different time, so you should check with your employer on when you can enroll. You can apply for and enroll in <a href='https://www.maine.gov/dhhs/ofi/programs-services/health-care-assistance' target='_blank'>Medicaid<\/a> any time of the year."
       },
       {
         "term": "Out-of-Network",
@@ -813,7 +813,7 @@ function runGlossary() {
       },
       {
         "term": "Out-of-Pocket Limit",
-        "description": "The most you'll have to pay in a <a href='/glossary#plan_year' target='_blank'>plan year<\/a> for <a href='/glossary#covered_services' target='_blank'>covered services<\/a> before your <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> company pays 100 percent. After you spend this amount on <a href='https://www.maine.gov/pfr/insurance/glossary.html#d' target='_blank'>deductibles<\/a>, <a href='/glossary#copayment' target='_blank'>copayments<\/a>, and <a href='/glossary#coinsurance' target='_blank'>coinsurance<\/a>, your health insurance pays 100 percent of the <a href='/glossary#allowed_amount' target='_blank'>allowed amount<\/a> for covered services. <a href='/glossary#premium' target='_blank'>Premiums<\/a> don't count towards your out-of-pocket limit."
+        "description": "The most you'll have to pay in a <a href='/glossary#plan_year' target='_blank'>plan year<\/a> for <a href='/glossary#covered_services' target='_blank'>covered services<\/a> before your <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> company pays 100 percent. After you spend this amount on <a href='https://www.maine.gov/pfr/insurance/glossary.html#d' target='_blank'>deductibles<\/a>, <a href='/glossary#copayment' target='_blank'>copayments<\/a>, and <a href='/glossary#coinsurance' target='_blank'>coinsurance<\/a>, your health insurance pays 100 percent of the <a href='/glossary#allowed_amount' target='_blank'>allowed amount<\/a> for covered services. <a href='/glossary#premium' target='_blank'>Premiums<\/a> don't count towards your out-of-pocket limit."
       },
       {
         "term": "Out-of-Pocket Maximum",
@@ -869,7 +869,7 @@ function runGlossary() {
       },
       {
         "term": "Plastic Surgery",
-        "description": "An elective medical procedure to improve your appearance that usually isn't covered by <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> such as a face lift or rhinoplasty. There are some exceptions for surgeries that are considered <a href='/glossary#medically_necessary' target='_blank'>medically necessary<\/a> or classified as <a href='/glossary#reconstructive_surgery' target='_blank'>reconstructive surgery<\/a>."
+        "description": "An elective medical procedure to improve your appearance that usually isn't covered by <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> such as a face lift or rhinoplasty. There are some exceptions for surgeries that are considered <a href='/glossary#medically_necessary' target='_blank'>medically necessary<\/a> or classified as <a href='/glossary#reconstructive_surgery' target='_blank'>reconstructive surgery<\/a>."
       },
       {
         "term": "Platinum Health Plan",
@@ -881,7 +881,7 @@ function runGlossary() {
       },
       {
         "term": "POS",
-        "description": "The acronym for <a href='/glossary#point-of-service_plan' target='_blank'>Point-of-Service Plan<\/a> \u2013 a <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> <a href='/glossary#plan_type' target='_blank'>plan type<\/a>."
+        "description": "The acronym for <a href='/glossary#point-of-service_plan' target='_blank'>Point-of-Service Plan<\/a> \u2013 a <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> <a href='/glossary#plan_type' target='_blank'>plan type<\/a>."
       },
       {
         "term": "PPACA",
@@ -889,7 +889,7 @@ function runGlossary() {
       },
       {
         "term": "PPO",
-        "description": "The acronym for <a href='https://www.maine.gov/pfr/insurance/glossary.html#p' target='_blank'>Preferred Provider Organization<\/a> \u2013 a <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> <a href='/glossary#plan_type' target='_blank'>plan type<\/a>."
+        "description": "The acronym for <a href='https://www.maine.gov/pfr/insurance/glossary.html#p' target='_blank'>Preferred Provider Organization<\/a> \u2013 a <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> <a href='/glossary#plan_type' target='_blank'>plan type<\/a>."
       },
       {
         "term": "Pre-Authorization",
@@ -901,7 +901,7 @@ function runGlossary() {
       },
       {
         "term": "Preferred Broker",
-        "description": "Preferred Brokers are trusted partners of Maine Cover ME that complete additional training to expand their expertise, and have committed to meet responsive service requirements. Preferred Brokers are licensed under Maine law to sell <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> through Maine Cover ME to individuals, families, small businesses and their employees. They can recommend plans or <a href='/glossary#plan_type' target='_blank'>plan types<\/a>, and perform activities on behalf of their clients as part of their professional licensing and training. There is no cost to use a Preferred Broker."
+        "description": "Preferred Brokers are trusted partners of Maine Cover ME that complete additional training to expand their expertise, and have committed to meet responsive service requirements. Preferred Brokers are licensed under Maine law to sell <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> through Maine Cover ME to individuals, families, small businesses and their employees. They can recommend plans or <a href='/glossary#plan_type' target='_blank'>plan types<\/a>, and perform activities on behalf of their clients as part of their professional licensing and training. There is no cost to use a Preferred Broker."
       },
       // Rearranged so RegExp searches for larger terms first
       {
@@ -919,7 +919,7 @@ function runGlossary() {
       },
       {
         "term": "Premium",
-        "description": "The amount you must pay to have a <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> contract or plan. You and\/or your employer pay it monthly. Premium costs are calculated based on your age, not on your <a href='/glossary#health_status' target='_blank'>health status<\/a>. "
+        "description": "The amount you must pay to have a <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> contract or plan. You and\/or your employer pay it monthly. Premium costs are calculated based on your age, not on your <a href='/glossary#health_status' target='_blank'>health status<\/a>. "
       },
       {
         "term": "Prescription Drug Coverage",
@@ -927,7 +927,7 @@ function runGlossary() {
       },
       {
         "term": "Prescription Drugs",
-        "description": "A medication that legally requires your doctor to write an authorization for you to use it before a pharmacy can sell it to you. Most <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> plans cover some prescription drug costs. If you take medications that require a prescription from your doctor, you'll want to make sure that the health plan you choose covers your specific medications by checking Maine Cover ME's <a href='https://www.maine.gov/pfr/insurance/consumer/individuals_families/health/purchasing_health_insurance/shopping_health_insurance.html' target='_blank'>Plan Match<\/a> tool and the insurance company's <a href='/glossary#formulary' target='_blank'>formulary<\/a>."
+        "description": "A medication that legally requires your doctor to write an authorization for you to use it before a pharmacy can sell it to you. Most <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> plans cover some prescription drug costs. If you take medications that require a prescription from your doctor, you'll want to make sure that the health plan you choose covers your specific medications by checking Maine Cover ME's <a href='https://www.maine.gov/pfr/insurance/consumer/individuals_families/health/purchasing_health_insurance/shopping_health_insurance.html' target='_blank'>Plan Match<\/a> tool and the insurance company's <a href='/glossary#formulary' target='_blank'>formulary<\/a>."
       },
       {
         "term": "Preventive Services",
@@ -952,7 +952,7 @@ function runGlossary() {
       },
       {
         "term": "Private Health Insurance",
-        "description": "<a href='/glossary#health_insurance' target='_blank'>Health insurance<\/a> offered by an employer, purchased through an insurance company or through a health insurance marketplace like the private plans available through Maine Cover ME. "
+        "description": "<a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>Health insurance<\/a> offered by an employer, purchased through an insurance company or through a health insurance marketplace like the private plans available through Maine Cover ME. "
       },
       {
         "term": "QHP",
@@ -964,7 +964,7 @@ function runGlossary() {
       },
       {
         "term": "Qualified Health Plan",
-        "description": "A plan purchased through a <a href='/glossary#health_insurance_marketplace' target='_blank'>health insurance marketplace<\/a>, such as the <a href='/glossary#private_health_insurance' target='_blank'>private plans<\/a> available through Maine Cover ME."
+        "description": "A plan purchased through a <a href='https://www.maine.gov/dhhs/programs-services/health-insurance_marketplace' target='_blank'>health insurance marketplace<\/a>, such as the <a href='/glossary#private_health_insurance' target='_blank'>private plans<\/a> available through Maine Cover ME."
       },
       {
         "term": "Qualified Medical Expenses",
@@ -972,11 +972,11 @@ function runGlossary() {
       },
       {
         "term": "Qualifying Life Event",
-        "description": "If you have a life change, such as but not limited to getting married, having a baby or losing your employer-sponsored insurance, you may be able to get <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> coverage outside of the annual <a href='/glossary#open_enrollment' target='_blank'>open enrollment<\/a> period, or make changes to your plan during the year. This is called <a href='/glossary#special_enrollment_period' target='_blank'>special enrollment<\/a>. The deadlines for reporting the life change to Maine Cover ME and enrolling through special enrollment are different in the Individual & Family and Small Business marketplaces. See <a class='ext' href='' target='_blank'>Individual & Family life changes and deadlines<\/a> or <a class='ext' href='https:\/\/dchealthlink.com\/sites\/default\/files\/v2\/forms\/Qualifying_Life_Events_QLEs_Enrolling_in_a_New_Plan.pdf' target='_blank'>employer-sponsored insurance life changes and deadlines<\/a> for more information. "
+        "description": "If you have a life change, such as but not limited to getting married, having a baby or losing your employer-sponsored insurance, you may be able to get <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> coverage outside of the annual <a href='/glossary#open_enrollment' target='_blank'>open enrollment<\/a> period, or make changes to your plan during the year. This is called <a href='/glossary#special_enrollment_period' target='_blank'>special enrollment<\/a>. The deadlines for reporting the life change to Maine Cover ME and enrolling through special enrollment are different in the Individual & Family and Small Business marketplaces. See <a class='ext' href='' target='_blank'>Individual & Family life changes and deadlines<\/a> or <a class='ext' href='https:\/\/dchealthlink.com\/sites\/default\/files\/v2\/forms\/Qualifying_Life_Events_QLEs_Enrolling_in_a_New_Plan.pdf' target='_blank'>employer-sponsored insurance life changes and deadlines<\/a> for more information. "
       },
       {
         "term": "Rate Review",
-        "description": "the State of Maine's <a href='/glossary#department_of_insurance&#44;_securities_and_banking' target='_blank'>Department of Insurance, Security & Banking<\/a> reviews <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> rates that insurance company's submit for approval to determine if rate increases or decreases will be approved or rejected. Learn more about the <a class='ext' href='http:\/\/\/service\/health-insurance-rate-review' target='_blank'>rate review process<\/a>. "
+        "description": "the State of Maine's <a href='/glossary#department_of_insurance&#44;_securities_and_banking' target='_blank'>Department of Insurance, Security & Banking<\/a> reviews <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> rates that insurance company's submit for approval to determine if rate increases or decreases will be approved or rejected. Learn more about the <a class='ext' href='http:\/\/\/service\/health-insurance-rate-review' target='_blank'>rate review process<\/a>. "
       },
       {
         "term": "RCA",
@@ -1024,11 +1024,11 @@ function runGlossary() {
       },
       {
         "term": "Silver Health Plan",
-        "description": "Silver Health Plans pay 70 percent of <a href='/glossary#in-network' target='_blank'>in-network<\/a> expenses for an average population of consumers. The <a href='/glossary#premium' target='_blank'>premiums<\/a> are typically lower, but the <a href='/glossary#out-of-pocket_limit' target='_blank'>out-of-pocket limit<\/a> of what you'll pay before the plan starts paying is higher. If you qualify for <a href='/glossary#cost-sharing_reduction' target='_blank'>cost-sharing reductions<\/a> and choose a silver plan, you'll have very low out-of-pocket expenses. <a href='/glossary#metal_level' target='_blank'>Metal levels<\/a> only focus on what the plan is expected to pay, and do NOT reflect the quality of health care or <a href='/glossary#service_provider' target='_blank'>service providers<\/a> available through the <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> plan. Once you meet your in-network out-of-pocket limit for the <a href='/glossary#plan_year' target='_blank'>plan year<\/a>, plans pay 100 percent of the <a href='/glossary#allowed_amount' target='_blank'>allowed amount<\/a> for <a href='/glossary#covered_services' target='_blank'>covered services<\/a>. "
+        "description": "Silver Health Plans pay 70 percent of <a href='/glossary#in-network' target='_blank'>in-network<\/a> expenses for an average population of consumers. The <a href='/glossary#premium' target='_blank'>premiums<\/a> are typically lower, but the <a href='/glossary#out-of-pocket_limit' target='_blank'>out-of-pocket limit<\/a> of what you'll pay before the plan starts paying is higher. If you qualify for <a href='/glossary#cost-sharing_reduction' target='_blank'>cost-sharing reductions<\/a> and choose a silver plan, you'll have very low out-of-pocket expenses. <a href='/glossary#metal_level' target='_blank'>Metal levels<\/a> only focus on what the plan is expected to pay, and do NOT reflect the quality of health care or <a href='/glossary#service_provider' target='_blank'>service providers<\/a> available through the <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> plan. Once you meet your in-network out-of-pocket limit for the <a href='/glossary#plan_year' target='_blank'>plan year<\/a>, plans pay 100 percent of the <a href='/glossary#allowed_amount' target='_blank'>allowed amount<\/a> for <a href='/glossary#covered_services' target='_blank'>covered services<\/a>. "
       },
       {
         "term": "Silver Plan",
-        "description": "Silver Health Plans pay 70 percent of <a href='/glossary#in-network' target='_blank'>in-network<\/a> expenses for an average population of consumers. The <a href='/glossary#premium' target='_blank'>premiums<\/a> are typically lower, but the <a href='/glossary#out-of-pocket_limit' target='_blank'>out-of-pocket limit<\/a> of what you'll pay before the plan starts paying is higher. If you qualify for <a href='/glossary#cost-sharing_reduction' target='_blank'>cost-sharing reductions<\/a> and choose a silver plan, you'll have very low out-of-pocket expenses. <a href='/glossary#metal_level' target='_blank'>Metal levels<\/a> only focus on what the plan is expected to pay, and do NOT reflect the quality of health care or <a href='/glossary#service_provider' target='_blank'>service providers<\/a> available through the <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> plan. Once you meet your in-network out-of-pocket limit for the <a href='/glossary#plan_year' target='_blank'>plan year<\/a>, plans pay 100 percent of the <a href='/glossary#allowed_amount' target='_blank'>allowed amount<\/a> for <a href='/glossary#covered_services' target='_blank'>covered services<\/a>. "
+        "description": "Silver Health Plans pay 70 percent of <a href='/glossary#in-network' target='_blank'>in-network<\/a> expenses for an average population of consumers. The <a href='/glossary#premium' target='_blank'>premiums<\/a> are typically lower, but the <a href='/glossary#out-of-pocket_limit' target='_blank'>out-of-pocket limit<\/a> of what you'll pay before the plan starts paying is higher. If you qualify for <a href='/glossary#cost-sharing_reduction' target='_blank'>cost-sharing reductions<\/a> and choose a silver plan, you'll have very low out-of-pocket expenses. <a href='/glossary#metal_level' target='_blank'>Metal levels<\/a> only focus on what the plan is expected to pay, and do NOT reflect the quality of health care or <a href='/glossary#service_provider' target='_blank'>service providers<\/a> available through the <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> plan. Once you meet your in-network out-of-pocket limit for the <a href='/glossary#plan_year' target='_blank'>plan year<\/a>, plans pay 100 percent of the <a href='/glossary#allowed_amount' target='_blank'>allowed amount<\/a> for <a href='/glossary#covered_services' target='_blank'>covered services<\/a>. "
       },
       {
         "term": "SLCSP",
@@ -1037,11 +1037,11 @@ function runGlossary() {
       // Rearranged so RegExp searches for larger terms first
       {
         "term": "Small Business Health Options Program",
-        "description": "The name used to describe the federal and state <a href='/glossary#health_insurance_marketplace' target='_blank'>health insurance marketplaces<\/a> for small businesses. "
+        "description": "The name used to describe the federal and state <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance marketplaces<\/a> for small businesses. "
       },
       {
         "term": "Small Business Tax Credit",
-        "description": "Small businesses that have fewer than 25 <a href='/glossary#full-time_equivalent_employee' target='_blank'>full-time equivalent employees<\/a>, pay an average wage of less than $50,000 a year, and pay at least half of employee <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> <a href='/glossary#premium' target='_blank'>premiums<\/a> are eligible for a federal tax credit when they purchase health insurance through Maine Cover ME. Use the <a class='ext' href='https:\/\/dchealthlink.com\/smallbusiness\/tax-credit-calculator' target='_blank'>small business tax credit calculator<\/a> to learn more and estimate your credit."
+        "description": "Small businesses that have fewer than 25 <a href='/glossary#full-time_equivalent_employee' target='_blank'>full-time equivalent employees<\/a>, pay an average wage of less than $50,000 a year, and pay at least half of employee <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> <a href='/glossary#premium' target='_blank'>premiums<\/a> are eligible for a federal tax credit when they purchase health insurance through Maine Cover ME. Use the <a class='ext' href='https:\/\/dchealthlink.com\/smallbusiness\/tax-credit-calculator' target='_blank'>small business tax credit calculator<\/a> to learn more and estimate your credit."
       },
       {
         "term": "Small Business",
@@ -1049,7 +1049,7 @@ function runGlossary() {
       },
       {
         "term": "SNAP",
-        "description": "The acronym for <a href='/glossary#supplemental_nutrition_assistance_program' target='_blank'>Supplemental Nutrition Assistance Program<\/a>."
+        "description": "The acronym for <a href='https://www.maine.gov/dhhs/programs-services/food-nutrition' target='_blank'>Supplemental Nutrition Assistance Program<\/a>."
       },
       // Rearranged so RegExp searches for larger terms first
       {
@@ -1062,7 +1062,7 @@ function runGlossary() {
       },
       {
         "term": "Special Enrollment Period",
-        "description": "Outside the <a href='/glossary#open_enrollment' target='_blank'>open enrollment<\/a> season, you can enroll in a <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> plan only if you qualify for a <a href='/glossary#special_enrollment_period' target='_blank'>special enrollment<\/a>. You qualify if you have certain <a href='/glossary#qualifying_life_event' target='_blank'>qualifying life events<\/a>, like moving to the State of Maine, getting married, having a baby, losing other health coverage and other circumstances. "
+        "description": "Outside the <a href='/glossary#open_enrollment' target='_blank'>open enrollment<\/a> season, you can enroll in a <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> plan only if you qualify for a <a href='/glossary#special_enrollment_period' target='_blank'>special enrollment<\/a>. You qualify if you have certain <a href='/glossary#qualifying_life_event' target='_blank'>qualifying life events<\/a>, like moving to the State of Maine, getting married, having a baby, losing other health coverage and other circumstances. "
       },
       {
         "term": "Specialist",
@@ -1106,7 +1106,7 @@ function runGlossary() {
       },
       {
         "term": "Supplemental Nutrition Assistance Program",
-        "description": "The name for the federal food stamp program. the State of Maines\u2019 SNAP program helps low-income residents and families buy the food they need for good health. Learn more about <a class='ext' href='http:\/\/\/service\/supplemental-nutrition-assistance-snap' target='_blank'>how to apply for SNAP<\/a>. "
+        "description": "The name for the federal food stamp program. the State of Maines\u2019 SNAP program helps low-income residents and families buy the food they need for good health. Learn more about <a class='ext' href='https://www.maine.gov/dhhs/programs-services/food-nutrition' target='_blank'>how to apply for SNAP<\/a>. "
       },
       {
         "term": "Supplemental Security Income",
@@ -1166,11 +1166,11 @@ function runGlossary() {
       },
       {
         "term": "Waiver of Coverage",
-        "description": "Applies only to <a href='/glossary#employer-sponsored_health_insurance' target='_blank'>employer-sponsored health plans<\/a>. Employees have the option of waiving medical coverage offered by their employer. Employees who waive coverage don\u2019t count towards the minimum participation requirements to create a health benefits program through Maine Cover ME. Employees who believe they may qualify for <a href='/glossary#medicaid' target='_blank'>Medicaid<\/a> or help paying for coverage in the <a href='/glossary#individual_&_family_health_insurance' target='_blank'>Individual & Family marketplace<\/a> should apply for <a href='/glossary#financial_assistance' target='_blank'>financial assistance<\/a> before waiving coverage offered by an employer."
+        "description": "Applies only to <a href='/glossary#employer-sponsored_health_insurance' target='_blank'>employer-sponsored health plans<\/a>. Employees have the option of waiving medical coverage offered by their employer. Employees who waive coverage don\u2019t count towards the minimum participation requirements to create a health benefits program through Maine Cover ME. Employees who believe they may qualify for <a href='https://www.maine.gov/dhhs/ofi/programs-services/health-care-assistance' target='_blank'>Medicaid<\/a> or help paying for coverage in the <a href='/glossary#individual_&_family_health_insurance' target='_blank'>Individual & Family marketplace<\/a> should apply for <a href='/glossary#financial_assistance' target='_blank'>financial assistance<\/a> before waiving coverage offered by an employer."
       },
       {
         "term": "Well-Baby\/Well-Child Care",
-        "description": "All <a href='/glossary#health_insurance' target='_blank'>health insurance<\/a> plans available through Maine Cover ME are required by federal law to include certain <a href='/glossary#preventive_services' target='_blank'>preventive services<\/a> for children under the age of 18 at no cost to you if you use an <a href='/glossary#in-network' target='_blank'>in-network<\/a> <a href='/glossary#service_provider' target='_blank'>service provider<\/a>. This includes well-baby\/well-child visits to a doctor or nurse to make sure your child is healthy and developing normally, standard tests and assessments and recommended immunizations. The number of visits covered depends on your child's age, and does not include visits when your child is sick or injured. Check with your insurance company to understand what's covered and to get the most out of your benefits. "
+        "description": "All <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> plans available through Maine Cover ME are required by federal law to include certain <a href='/glossary#preventive_services' target='_blank'>preventive services<\/a> for children under the age of 18 at no cost to you if you use an <a href='/glossary#in-network' target='_blank'>in-network<\/a> <a href='/glossary#service_provider' target='_blank'>service provider<\/a>. This includes well-baby\/well-child visits to a doctor or nurse to make sure your child is healthy and developing normally, standard tests and assessments and recommended immunizations. The number of visits covered depends on your child's age, and does not include visits when your child is sick or injured. Check with your insurance company to understand what's covered and to get the most out of your benefits. "
       },
       {
         "term": "Wellness Program",
