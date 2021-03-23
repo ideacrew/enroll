@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 module Insured::FamiliesHelper
 
@@ -265,7 +266,7 @@ module Insured::FamiliesHelper
     if person.is_consumer_role_active? || person.is_resident_role_active?
       person.active_individual_market_role
     else
-      # TODO Refactor this as a translation if possible
+      # TODO: Refactor this as a translation if possible
       "No Consumer/CoverAll Market"
     end
   end
