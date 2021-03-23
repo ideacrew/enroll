@@ -99,7 +99,7 @@
         </a>
       </li>
 
-      <li class="list-box step-tabs <%= li_nav_classes_for(:household_info) %> global-nav indent-w no-hover">
+      <li class="list-box step-tabs <%= li_nav_classes_for(:household_info) %> global-nav indent-w no-hover-disable">
         <% if @application.present? && @application.is_draft?  %>
           <a href="<%= financial_assistance.edit_application_path(@application) %>"><%= l10n('family_info') %></a>
         <% else %>
