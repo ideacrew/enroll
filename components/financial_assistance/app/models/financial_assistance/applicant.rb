@@ -676,6 +676,7 @@ module FinancialAssistance
       questions_array << is_former_foster_care  if foster_age_satisfied? && is_applying_coverage
       questions_array << is_post_partum_period  unless is_pregnant
       questions_array << has_unemployment_income if FinancialAssistanceRegistry[:unemployment_income].enabled?
+      questions_array << pregnancy_due_on << children_expected_count if is_pregnant
 
       (other_questions_answers << questions_array).flatten.include?(nil) ? false : true
     end
