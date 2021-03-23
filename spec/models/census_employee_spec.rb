@@ -2658,6 +2658,72 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     end
   end
 
+  context 'Prior cobra enrollments' do
+    include_context 'setup terminated and active benefit applications'
+    let(:census_employee) { create(:census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile) }
+    let(:coverage_kind)     { :health }
+    let(:person)          { FactoryBot.create(:person) }
+    let(:shop_family)     { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+    let(:employee_role)   { FactoryBot.create(:employee_role, benefit_sponsors_employer_profile_id: abc_profile.id, hired_on: hired_on, person: person, census_employee: census_employee) }
+    let(:hired_on)        { terminated_benefit_application.start_on - 10.days }
+
+    let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_year.prev_year }
+    let!(:terminated_enrollment) do
+      FactoryBot.create(:hbx_enrollment,
+                        household: shop_family.latest_household,
+                        family: shop_family,
+                        coverage_kind: coverage_kind,
+                        effective_on: terminated_benefit_package.start_on,
+                        terminated_on: terminated_benefit_package.end_on - 2.months,
+                        kind: "employer_sponsored",
+                        benefit_sponsorship_id: benefit_sponsorship.id,
+                        sponsored_benefit_package_id: terminated_benefit_package.id,
+                        sponsored_benefit_id: terminated_sponsored_benefit.id,
+                        employee_role_id: employee_role.id,
+                        benefit_group_assignment: census_employee.active_benefit_group_assignment,
+                        product_id: terminated_sponsored_benefit.reference_product.id,
+                        aasm_state: 'coverage_terminated')
+    end
+    before do
+      census_employee.employee_role_id = employee_role.id
+      census_employee.benefit_group_assignments << build(:benefit_group_assignment, benefit_group: active_benefit_package, census_employee: census_employee, start_on: active_benefit_package.start_on, end_on: active_benefit_package.end_on)
+      census_employee.benefit_group_assignments << build(:benefit_group_assignment, benefit_group: terminated_benefit_package, census_employee: census_employee, start_on: terminated_benefit_application.start_on,
+                                                                                    end_on: terminated_benefit_application.end_on)
+      census_employee.save
+      census_employee
+    end
+
+    context '.prior_benefit_group_cobra_eligible_enrollments' do
+      it 'should return terminated enrollment if cobra coverage date falls in terminated py' do
+        expect(census_employee.prior_benefit_group_enrollments_for_date(terminated_benefit_package.end_on - 1.month).size).to eq 1
+      end
+
+      it 'should not return any enrollments  if cobra coverage date does not falls in terminated py' do
+        expect(census_employee.prior_benefit_group_enrollments_for_date(terminated_benefit_package.end_on + 1.month).size).to eq 0
+      end
+    end
+
+    context '.prior_benefit_group_cobra_eligible_enrollments' do
+      it 'should return terminated enrollment if cobra coverage date falls in terminated py' do
+        expect(census_employee.prior_benefit_group_enrollments_for_date(terminated_benefit_package.end_on - 1.month).size).to eq 1
+      end
+
+      it 'should not return any enrollments  if cobra coverage date does not falls in terminated py' do
+        expect(census_employee.prior_benefit_group_enrollments_for_date(terminated_benefit_package.end_on + 1.month).size).to eq 0
+      end
+    end
+
+    context '.cobra_eligible_enrollments' do
+      it 'should return terminated enrollment if cobra coverage date falls in terminated py' do
+        expect(census_employee.prior_benefit_group_enrollments_for_date(terminated_benefit_package.end_on - 1.month).size).to eq 1
+      end
+
+      it 'should not return any enrollments  if cobra coverage date does not falls in terminated py' do
+        expect(census_employee.prior_benefit_group_enrollments_for_date(terminated_benefit_package.end_on + 1.month).size).to eq 0
+      end
+    end
+  end
+
   context '.past_enrollments' do
     include_context "setup renewal application"
 
