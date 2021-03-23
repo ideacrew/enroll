@@ -5,6 +5,11 @@ module Config
   # Site wide helpers
   # TODO: Everything in this with Settings.site should be configured into ResourceRegistry files eventually
   module SiteHelper
+
+    def health_bnefit_exchange_authority_phone_number
+      EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number).item
+    end
+
     def site_redirect_on_timeout_route
       Settings.site.curam_enabled? ? SamlInformation.iam_login_url : new_user_session_path
     end
