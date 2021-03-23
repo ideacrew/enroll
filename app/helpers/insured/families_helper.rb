@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Insured::FamiliesHelper
 
   def display_change_tax_credits_button?(hbx_enrollment)
@@ -216,6 +218,7 @@ module Insured::FamiliesHelper
     else
       # Take straight to the Plan Shopping - Add Members Flow. No date choices.
       # Use turbolinks: false, to avoid calling controller action twice.
+      # TODO: Refactor Shop For Planss as a translation at some point
       link_to link_title.presence || 'Shop for Plans', insured_family_members_path(sep_id: sep.id, qle_id: qle.id), class: 'btn btn-default', data: {turbolinks: false}
     end
   end
@@ -234,9 +237,9 @@ module Insured::FamiliesHelper
 
   def tax_info_url
     if ENV['AWS_ENV'] == 'prod'
-      Settings.site.prod_tax_info
+      EnrollRegistry[:enroll_app].setting(:prod_tax_info).item
     else
-      Settings.site.staging_tax_info_url
+      EnrollRegistry[:enroll_app].setting(:staging_tax_info_url).item
     end
   end
 
@@ -263,6 +266,7 @@ module Insured::FamiliesHelper
     if person.is_consumer_role_active? || person.is_resident_role_active?
       person.active_individual_market_role
     else
+      # TODO: Refactor this as a translation if possible
       "No Consumer/CoverAll Market"
     end
   end
