@@ -1651,6 +1651,17 @@ class CensusEmployee < CensusMember
     ) || []
   end
 
+  def prior_benefit_group_enrollments_for_date(coverage_date)
+    return nil if employee_role.blank?
+    HbxEnrollment.where(
+      {
+        :sponsored_benefit_package_id.in => [benefit_package_for_date(coverage_date).try(:id)].compact,
+        :employee_role_id => self.employee_role_id,
+        :aasm_state.ne => "shopping"
+      }
+    ) || []
+  end
+
   def expired_benefit_group_enrollments(expired_benefit_group)
     return nil if employee_role.blank?
     HbxEnrollment.where({
@@ -1692,9 +1703,17 @@ class CensusEmployee < CensusMember
     [eligible_enrollments.by_health.first, eligible_enrollments.by_dental.first].compact
   end
 
+  def prior_benefit_group_cobra_eligible_enrollments
+    enrollments = prior_benefit_group_enrollments_for_date(cobra_begin_date)
+    return [] if enrollments.blank?
+    eligible_enrollments = enrollments.non_cobra.enrollments_for_cobra
+    [eligible_enrollments.by_health.first, eligible_enrollments.by_dental.first].compact
+  end
+
   def cobra_eligible_enrollments
     (active_benefit_group_cobra_eligible_enrollments + off_cycle_benefit_group_cobra_eligible_enrollments +
-      reinstated_benefit_group_cobra_eligible_enrollments + renewal_benefit_group_cobra_eligible_enrollments).flatten
+      reinstated_benefit_group_cobra_eligible_enrollments + renewal_benefit_group_cobra_eligible_enrollments +
+      prior_benefit_group_cobra_eligible_enrollments).flatten
   end
 
   # Retrieves the last updated benefit_group_assignment with a given +package_id+ & +start_on+
