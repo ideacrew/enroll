@@ -36,13 +36,13 @@ registry:
           - key: :domain_name
             item: dchealthlink.com
           - key: :site_title
-            item: "DC's Online Health Insurance Marketplace"
+            item: "Maine Cover ME"
           - key: :home_url
-            item: https://www.dchealthlink.com/"
+            item: "https://cme.enroll.openhbx.org/"
           - key: :home_business_url
-            item: https://www.dchealthlink.com/smallbusiness/overview"
+            item: "https://www.accesshealthct.com/AHCT/LandingPageCTHIX"
           - key: :help_url
-            item: "https://www.dchealthlink.com/help"
+            item: "https://www.coverme.gov/help/"
           - key: :main_web_address_url
             item: "https://www.dchealthlink.com/"
           - key: :invoice_bill_url
@@ -60,13 +60,13 @@ registry:
           - key: :health_care_website_url
             item: "https://www.healthcare.gov"
           - key: :short_name
-            item: "DC Health Link"
+            item: "Maine Cover ME"
           - key: :byline
-            item: "Welcome to the District's Health Insurance Marketplace"
+            item: "Maine's Official Health Insurance Marketplace"
           - key: :long_name
             item: "District of Columbia Health Link"
           - key: :header_message
-            item: "Welcome to the District's Health Insurance Marketplace"
+            item: "Maine's Official Health Insurance Marketplace"
           - key: :logo_file_name
             item: "logo.png"
           - key: :make_their_premium_payments_online
@@ -120,7 +120,7 @@ registry:
           - key: :irs_url
             item: "https://www.irs.gov/"
           - key: :exchange_hbx_id
-            item: "DC0"
+            item: "ME0"
           - key: :mail_address
             item: "info@dchealthlink.com"
           - key: :privacy_policy
@@ -148,7 +148,7 @@ registry:
           - key: :statewide_area
             item: "DC Metro"
           - key: :exchange_name
-            item: "Washington DC Health Benefit Exchange"
+            item: "Maine Cover ME"
           - key: :social_media
             item: #<Config::Options facebook_url="">}
       - key: :pay_now_functionality
