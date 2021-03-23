@@ -809,7 +809,7 @@ function runGlossary() {
       },
       {
         "term": "Out-of-Pocket Costs",
-        "description": "Expenses you incur for medical services that your insurance company doesn't pay including <a href='https://www.maine.gov/pfr/insurance/glossary.html#d' target='_blank'>deductibles<\/a>, <a href='/glossary#copayment' target='_blank'>copayments<\/a>, <a href='/glossary#coinsurance' target='_blank'>coinsurance<\/a>, <a href='/glossary#balance_billing' target='_blank'>balance billing<\/a> along with any costs you incur for <a href='/glossary#excluded_services' target='_blank'>excluded services<\/a>."
+        "description": "Expenses you incur for medical services that your insurance company doesn't pay including <a href='https://www.maine.gov/pfr/insurance/glossary.html#d' target='_blank'>deductibles<\/a>, <a href='https://www.maine.gov/pfr/insurance/consumer/consumer_guides/pdf/consumer_guide_small_business_health_ins.pdf' target='_blank'>copayments<\/a>, <a href='https://www.maine.gov/pfr/insurance/consumer/consumer_guides/pdf/consumer_guide_small_business_health_ins.pdf' target='_blank'>coinsurance<\/a>, <a href='https://www.maine.gov/pfr/insurance/consumer/consumer_guides/pdf/consumer_guide_small_business_health_ins.pdf' target='_blank'>balance billing<\/a> along with any costs you incur for <a href='https://www.maine.gov/pfr/insurance/consumer/consumer_guides/pdf/consumer_guide_small_business_health_ins.pdf' target='_blank'>excluded services<\/a>."
       },
       {
         "term": "Out-of-Pocket Limit",
