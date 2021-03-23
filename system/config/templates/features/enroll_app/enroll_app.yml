@@ -142,15 +142,16 @@ registry:
           - key: :publisher
             item: "dchl"
           - key: :prod_tax_info
-            item: ""
+            item: "https://www.maine.gov/revenue/tax-return-forms/individual-income-tax-2020"
           - key: :staging_tax_info_url
-            item: ""
+            item: "https://www.maine.gov/revenue/tax-return-forms/individual-income-tax-2020"
           - key: :statewide_area
             item: "State of Maine"
           - key: :exchange_name
             item: "Maine Cover ME"
           - key: :social_media
             item: #<Config::Options facebook_url="">}
+
       - key: :pay_now_functionality
         item: "kaiser_enabled"
         is_enabled: true
