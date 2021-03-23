@@ -31,6 +31,8 @@ registry:
             item: "https://www.dchealthlink.com/submit-docs"
           - key: :site_key
             item: :dc
+          - key: :state_abbreviation
+            item: "DC"
           - key: :subdomain
             item: "dchbx"
           - key: :domain_name
