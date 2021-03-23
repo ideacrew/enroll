@@ -61,7 +61,7 @@ module Factories
       clone_enrollment.hbx_enrollment_members = clone_enrollment_members
 
       clone_enrollment.select_coverage
-      clone_enrollment.begin_coverage if TimeKeeper.date_of_record >= effective_on && !enrollment.external_enrollment && enrollment.may_begin_coverage?
+      clone_enrollment.begin_coverage if TimeKeeper.date_of_record >= effective_on && !enrollment.external_enrollment && clone_enrollment.may_begin_coverage?
 
       clone_enrollment.generate_hbx_signature
       clone_enrollment
