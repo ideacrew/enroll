@@ -54,7 +54,10 @@ module Config
     end
 
     def site_brokers_agreement_path
-      link_to "#{Settings.aca.state_name} #{Settings.site.short_name} Broker Agreement", Settings.site.terms_and_conditions_url
+      link_to(
+        "#{Settings.aca.state_name} #{EnrollRegistry[:enroll_app].setting(:short_name).item} Broker Agreement",
+        EnrollRegistry[:enroll_app].setting(:terms_and_conditions_url).item
+      )
     end
 
     def site_home_link
@@ -94,7 +97,7 @@ module Config
     end
 
     def site_short_name
-      Settings.site.short_name
+      EnrollRegistry[:enroll_app].setting(:short_name).item
     end
 
     def site_registration_path(resource_name, params)
