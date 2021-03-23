@@ -170,7 +170,7 @@ module Notifier
     end
 
     def voter_application
-      join_pdfs [notice_path, Rails.root.join(EnrollRegistry[:notice_engine].settings(:voter_application).item)] if ['projected_eligibility_notice'].include?(event_name)
+      join_pdfs [notice_path, Rails.root.join(NotifierRegistry[:notice_engine].settings(:voter_application).item)] if ['projected_eligibility_notice'].include?(event_name)
     end
 
     def ivl_blank_page
@@ -190,7 +190,7 @@ module Notifier
     end
 
     def ivl_taglines
-      join_pdfs [notice_path, Rails.root.join(EnrollRegistry[:notice_engine].settings(:ivl_taglines).item)]
+      join_pdfs [notice_path, Rails.root.join(NotifierRegistry[:notice_engine].settings(:ivl_taglines).item)]
     end
 
     def attach_blank_page(template_path = nil)
