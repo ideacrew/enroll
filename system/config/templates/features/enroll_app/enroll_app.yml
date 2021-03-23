@@ -24,7 +24,7 @@ registry:
           - key: :help_url
             item: "https://www.dchealthlink.com/help"
           - key: :business_resource_center_url
-            item: "https://dchealthlink.com/smallbusiness/"
+            item: "https://dchealthxlink.com/smallbusiness/"
           - key: :nondiscrimination_notice_url
             item: "https://www.dchealthlink.com/nondiscrimination"
           - key: :submit_docs_url
@@ -34,13 +34,13 @@ registry:
           - key: :subdomain
             item: "dchbx"
           - key: :domain_name
-            item: dchealthlink.com
+            item: "dchealthlink.com"
           - key: :site_title
             item: "DC's Online Health Insurance Marketplace"
           - key: :home_url
-            item: https://www.dchealthlink.com/"
+            item: "https://www.dchealthlink.com/"
           - key: :home_business_url
-            item: https://www.dchealthlink.com/smallbusiness/overview"
+            item: "https://www.dchealthlink.com/smallbusiness/overview"
           - key: :help_url
             item: "https://www.dchealthlink.com/help"
           - key: :main_web_address_url
