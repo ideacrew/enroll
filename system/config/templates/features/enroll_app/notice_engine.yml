@@ -1,0 +1,12 @@
+---
+registry:
+  - namespace:
+      - :enroll_app
+    features:
+      - key: :notice_engine
+        is_enabled: true
+        settings:
+          - key: :ivl_taglines
+            item: "lib/pdf_templates/taglines.pdf"
+          - key: :voter_application
+            item: "lib/pdf_templates/voter_application.pdf"
