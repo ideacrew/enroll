@@ -71,7 +71,7 @@ module UIHelpers
                        @model.first_name
                      end
 
-        heading_text.sub! '<family-member-name-placeholder>', first_name.titleize # rubocop:disable Style/NestedTernaryOperator TODO: Remove this
+        heading_text.sub! '<family-member-name-placeholder>', first_name.capitalize # rubocop:disable Style/NestedTernaryOperator TODO: Remove this
       else
         heading_text
       end
