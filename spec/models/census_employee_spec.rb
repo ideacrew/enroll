@@ -2680,12 +2680,14 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
                         sponsored_benefit_package_id: terminated_benefit_package.id,
                         sponsored_benefit_id: terminated_sponsored_benefit.id,
                         employee_role_id: employee_role.id,
-                        benefit_group_assignment: census_employee.active_benefit_group_assignment,
+                        benefit_group_assignment: census_employee.benefit_group_assignment_for_date(terminated_benefit_package.start_on),
                         product_id: terminated_sponsored_benefit.reference_product.id,
                         aasm_state: 'coverage_terminated')
     end
     before do
       census_employee.employee_role_id = employee_role.id
+      census_employee.aasm_state = 'employment_terminated'
+      census_employee.coverage_terminated_on = terminated_benefit_package.end_on - 2.months
       census_employee.benefit_group_assignments << build(:benefit_group_assignment, benefit_group: active_benefit_package, census_employee: census_employee, start_on: active_benefit_package.start_on, end_on: active_benefit_package.end_on)
       census_employee.benefit_group_assignments << build(:benefit_group_assignment, benefit_group: terminated_benefit_package, census_employee: census_employee, start_on: terminated_benefit_application.start_on,
                                                                                     end_on: terminated_benefit_application.end_on)
@@ -2720,6 +2722,15 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
 
       it 'should not return any enrollments  if cobra coverage date does not falls in terminated py' do
         expect(census_employee.prior_benefit_group_enrollments_for_date(terminated_benefit_package.end_on + 1.month).size).to eq 0
+      end
+    end
+
+    context '.update_for_cobra' do
+      it 'should generate cobra enrollment if cobra begin date falls in prior py' do
+        census_employee.stub(:have_valid_date_for_cobra?).and_return true
+        expect(HbxEnrollment.all.count).to eq 2
+        expect(census_employee.update_for_cobra(terminated_benefit_package.end_on - 1.month)).to eq true
+        expect(HbxEnrollment.all.count).to eq 3
       end
     end
   end
