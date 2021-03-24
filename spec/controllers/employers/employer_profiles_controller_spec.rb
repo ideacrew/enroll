@@ -145,7 +145,7 @@ if ::EnrollRegistry[:aca_shop_market].enabled?
         allow(@controller).to receive(:file_name).and_return("sample-filename")
         #allow(@controller).to receive(:file_content_type).and_return("application/pdf")
       end
-      
+
       # TODO: Do noot merge until this is figured out
       context "upload document", dbclean: :after_each do
         xit "redirects to document list page" do
