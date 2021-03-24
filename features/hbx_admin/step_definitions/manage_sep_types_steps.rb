@@ -357,9 +357,13 @@ And(/Admin selects (.*) market radio button$/) do |market_kind|
   if market_kind == 'individual' && is_individual_market_enabled?
     find(:xpath, '//input[@value="individual"]', :wait => 2).click
   elsif market_kind == 'shop' && is_shop_market_enabled?
-    find(:xpath, '//input[@value="shop"]', :wait => 2).click
+    if Settings.site.site_title == 'DC Healthcare'
+      find(:xpath, '//input[@value="shop"]', :wait => 2).click
+    end
   elsif is_fehb_market_enabled?
-    find(:xpath, '//input[@value="fehb"]', :wait => 2).click
+    if Settings.site.site_title == 'DC Healthcare'
+      find(:xpath, '//input[@value="fehb"]', :wait => 2).click
+    end
   end
 end
 
