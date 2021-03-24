@@ -1,5 +1,5 @@
 <% if offers_nationwide_plans? %>
-  <%= plan.nationwide ? "Nationwide" : "DC-Metro" %>
+  <%= plan.nationwide ? "Nationwide" : statewide_area %>
 <% else %>
   <% if plan.network_information.present? %>
     <span>
