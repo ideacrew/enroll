@@ -344,6 +344,7 @@ end
 Given(/^both shop and fehb market configurations are enabled$/) do
   enable_feature :aca_shop_market
   enable_feature :fehb_market
+  add_shop_markets_to_sep_types
 end
 
 When(/(^.+) enters? office location for (.+)$/) do |role, location|
