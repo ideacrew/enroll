@@ -159,6 +159,8 @@ registry:
             item: "https://dmv.dc.gov/page/proof-dc-residency-certifications"
           - key: :health_benefit_exchange_authority_phone_number
             item: '(202) 715-7576'
+          - key: :contact_center_email_address
+            item: "info@dchealthlink.com"
       - key: :pay_now_functionality
         item: "kaiser_enabled"
         is_enabled: true
