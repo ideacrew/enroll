@@ -9,7 +9,7 @@ module Config
       EnrollRegistry[:enroll_app].setting(:state_abbreviation).item
     end
 
-    def health_bnefit_exchange_authority_phone_number
+    def health_benefit_exchange_authority_phone_number
       EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number).item
     end
 
