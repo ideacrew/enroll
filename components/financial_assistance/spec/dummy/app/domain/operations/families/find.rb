@@ -5,6 +5,7 @@ require 'dry/monads/do'
 
 module Operations
   module Families
+    # this class finds the family
     class Find
       send(:include, Dry::Monads[:result, :do])
 
@@ -18,7 +19,7 @@ module Operations
       private
 
       def validate(id)
-        if id&.is_a?(BSON::ObjectId)
+        if id.is_a?(BSON::ObjectId)
           Success(id)
         else
           Failure('family_id is expected in BSON format')

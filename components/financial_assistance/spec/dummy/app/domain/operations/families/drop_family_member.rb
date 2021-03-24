@@ -5,6 +5,7 @@ require 'dry/monads/do'
 
 module Operations
   module Families
+    # this class invokes when user tries to delete applicant
     class DropFamilyMember
       send(:include, Dry::Monads[:result, :do])
 
