@@ -161,6 +161,8 @@ registry:
         settings:
         - key: :carriers
           item: 'Kaiser'
+        - key: :carriers_long_name
+          item: 'Kaiser Permanante'
       - key: :broker_agency
         item: "broker_agency"
         is_enabled: true
