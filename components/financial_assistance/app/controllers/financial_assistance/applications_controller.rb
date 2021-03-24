@@ -231,12 +231,14 @@ module FinancialAssistance
     end
 
     def generate_income_hash(applicant)
-      {
+      income_hash = {
         "Does this person have income from an employer (wages, tips, bonuses, etc.) in #{@application.assistance_year}?" => human_boolean(applicant.has_job_income),
         "jobs" => generate_employment_hash(applicant.incomes.jobs),
-        "Does this person expect to receive self-employment income in #{@application.assistance_year}? *" => human_boolean(applicant.has_self_employment_income),
-        "Does this person expect to have income from other sources in 2021?" => human_boolean(applicant.has_other_income)
+        "Does this person expect to receive self-employment income in #{@application.assistance_year}? *" => human_boolean(applicant.has_self_employment_income)
       }
+      income_hash.merge!("Has this person received any Unemployment Income in 2021?" => human_boolean(applicant.has_unemployment_income)) if FinancialAssistanceRegistry[:unemployment_income].enabled?
+      income_hash.merge!("Does this person expect to have income from other sources in 2021?" => human_boolean(applicant.has_other_income))
+      income_hash
     end
 
     def generate_employment_hash(jobs)
