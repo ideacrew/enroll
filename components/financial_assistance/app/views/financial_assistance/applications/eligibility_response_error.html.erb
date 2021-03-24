@@ -3,18 +3,18 @@
     <div class="">
       <p class="alert alert-error hide"></p>
       <h2 class="darkblue">
-        <%= i18n(
+        <%= l10n(
           "financial_assistance.applications.response_error",
           site_short_name: site_short_name,
           contact_center_phone_number: health_benefit_exchange_authority_phone_number,
           contact_center_email_address: contact_center_email_address
         )%></h2>
       <h4 class="darkblue">
-        <%= i18n("financial_assistance.applications.cant_determine_eligibility")%>
+        <%= l10n("financial_assistance.applications.cant_determine_eligibility")%>
       </h4>
       <% if @application.determination_http_status_code.present? %>
         <h4 class="darkblue">
-        <%= i18n('financial_assistance.applications.report_error', determination_http_status_code: @application.determination_http_status_code)%>
+        <%= l10n('financial_assistance.applications.report_error', determination_http_status_code: @application.determination_http_status_code)%>
         </h4>
       <% end %>
     </div>
