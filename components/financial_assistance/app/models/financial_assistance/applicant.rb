@@ -1060,7 +1060,7 @@ module FinancialAssistance
         end
       end
 
-      Operations::Families::DropMember.new.call(params: {family_id: application.family_id, family_member_id: family_member_id}) if is_active_changed? && is_active == false
+      Operations::Families::DropMember.new.call(params: {applicant_params: self.attributes_for_export, family_id: application.family_id, family_member_id: family_member_id}) if is_active_changed? && is_active == false
     rescue StandardError => e
       e.message
     end

@@ -10,9 +10,9 @@ module FinancialAssistance
         send(:include, Dry::Monads[:result, :do])
 
         def call(params:)
-          values = yield validate(params)
+          values = yield validate(params[:applicant_params])
           applicant_params = yield build(values)
-          result = yield drop_family_member(applicant_params)
+          result = yield drop_family_member(applicant_params.to_h.merge(family_id: params[:family_id]))
 
           Success(result)
         end
