@@ -729,7 +729,7 @@ function runGlossary() {
       },
       {
         "term": "Medicaid",
-        "description": "Medicaid is a joint federal-state health program that provides health care coverage to low-income and disabled adults, children and families. To be eligible for Maine Medicaid, you must be a Maine resident and must meet non-financial and financial eligibility requirements. Medicaid covers many services, including doctor visits, hospital care, <a href='/glossary#prescription_drugs' target='_blank'>prescription drugs<\/a>, mental health services, transportation and many other services at little or no cost to the individual. Currently, 1 out of every 3 Maine residents receives quality health care coverage through the Medicaid program. <a class='ext' href='' target='_blank'>Learn more about Maine Medicaid<\/a>. "
+        "description": "Medicaid is a joint federal-state health program that provides health care coverage to low-income and disabled adults, children and families. To be eligible for Maine Medicaid, you must be a Maine resident and must meet non-financial and financial eligibility requirements. Medicaid covers many services, including doctor visits, hospital care, <a href='https://www.healthcare.gov/using-marketplace-coverage/prescription-medications/' target='_blank'>prescription drugs<\/a>, mental health services, transportation and many other services at little or no cost to the individual. Currently, 1 out of every 3 Maine residents receives quality health care coverage through the Medicaid program. <a class='ext' href='https://www.maine.gov/pfr/insurance/glossary.html#mainecare' target='_blank'>Learn more about Maine Medicaid<\/a>. "
       },
       {
         "term": "Medical Coverage",
@@ -737,7 +737,7 @@ function runGlossary() {
       },
       {
         "term": "Medical Loss Ratio",
-        "description": "Federal law requires <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> companies to use at least 80 percent of <a href='https://www.maine.gov/pfr/insurance/glossary.html#p' target='_blank'>premium<\/a> dollars for health care expenses (85 percent for large group health plans). If an insurance company spends less, they must pay a rebate to employers or consumers. Rebates are based on the insurance company's health care spending across all health plans in the state. Employers are required to share the rebates with their employees based on the percentage of premiums paid. "
+        "description": "Federal law requires <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> companies to use at least 80 percent of <a href='https://www.maine.gov/pfr/insurance/glossary.html#premium' target='_blank'>premium<\/a> dollars for health care expenses (85 percent for large group health plans). If an insurance company spends less, they must pay a rebate to employers or consumers. Rebates are based on the insurance company's health care spending across all health plans in the state. Employers are required to share the rebates with their employees based on the percentage of premiums paid. "
       },
       {
         "term": "Medically Necessary",
@@ -919,7 +919,7 @@ function runGlossary() {
       },
       {
         "term": "Premium",
-        "description": "The amount you must pay to have a <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> contract or plan. You and\/or your employer pay it monthly. Premium costs are calculated based on your age, not on your <a href='/glossary#health_status' target='_blank'>health status<\/a>. "
+        "description": "The amount you must pay to have a <a href='https://www.maine.gov/dhhs/programs-services/health-insurance' target='_blank'>health insurance<\/a> contract or plan. You and\/or your employer pay it monthly. Premium costs are calculated based on your age, not on your <a href='https://www.maine.gov/pfr/insurance/glossary.html#preexistingcondition' target='_blank'>health status<\/a>. "
       },
       {
         "term": "Prescription Drug Coverage",
