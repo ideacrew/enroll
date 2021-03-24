@@ -144,9 +144,8 @@ RSpec.describe ApplicationHelper, :type => :helper do
       expect(network_type(nationwide_product)).to eq 'Nationwide'
     end
 
-    it 'should display State of Maine if product if statewide_area setting is set to State of Maine' do
-      allow(Settings.site).to receive(:statewide_area).and_return("State of Maine")
-      expect(network_type(dcmetro_product)).to eq "State of Maine"
+    it "should display the statewide area according to the enroll registry" do
+      expect(network_type(dcmetro_product)).to eq ::EnrollRegistry[:enroll_app].setting(:statewide_area).item
     end
 
     it 'should display empty if metal level if its a 2016 plan' do
