@@ -5,6 +5,22 @@ module Config
   # Site wide helpers
   # TODO: Everything in this with Settings.site should be configured into ResourceRegistry files eventually
   module SiteHelper
+    def statewide_area
+      EnrollRegistry[:enroll_app].setting(:statewide_area).item
+    end
+
+    def site_state_abbreviation
+      EnrollRegistry[:enroll_app].setting(:state_abbreviation).item
+    end
+
+    def health_benefit_exchange_authority_phone_number
+      EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number).item
+    end
+
+    def contact_center_email_address
+      EnrollRegistry[:enroll_app].setting(:contact_center_email_address).item
+    end
+
     def site_redirect_on_timeout_route
       Settings.site.curam_enabled? ? SamlInformation.iam_login_url : new_user_session_path
     end
@@ -101,27 +117,27 @@ module Config
     end
 
     def site_registration_path(resource_name, params)
-      if EnrollRegistry[:enroll_app].setting(:registration_path).present? && ENV['AWS_ENV'] == 'prod'
-        EnrollRegistry[:enroll_app].setting(:registration_path)
+      if EnrollRegistry[:enroll_app].setting(:registration_path).item.present? && ENV['AWS_ENV'] == 'prod'
+        EnrollRegistry[:enroll_app].setting(:registration_path).item
       else
         new_registration_path(resource_name, :invitation_id => params[:invitation_id])
       end
     end
 
     def site_long_name
-      EnrollRegistry[:enroll_app].setting(:long_name)
+      EnrollRegistry[:enroll_app].setting(:long_name).item
     end
 
     def site_broker_quoting_enabled?
-      EnrollRegistry[:enroll_app].setting(:broker_quoting_enabled)
+      EnrollRegistry[:enroll_app].setting(:broker_quoting_enabled).item
     end
 
     def site_main_web_address
-      EnrollRegistry[:enroll_app].setting(:main_web_address)
+      EnrollRegistry[:enroll_app].setting(:main_web_address).item
     end
 
     def site_main_web_address_url
-      EnrollRegistry[:enroll_app].setting(:main_web_address_url)
+      EnrollRegistry[:enroll_app].setting(:main_web_address_url).item
     end
 
     def site_main_web_link
@@ -129,7 +145,7 @@ module Config
     end
 
     def site_make_their_premium_payments_online
-      EnrollRegistry[:enroll_app].setting(:make_their_premium_payments_online)
+      EnrollRegistry[:enroll_app].setting(:make_their_premium_payments_online).item
     end
 
     def link_to_make_their_premium_payments_online
@@ -137,11 +153,11 @@ module Config
     end
 
     def health_care_website
-      EnrollRegistry[:enroll_app].setting(:health_care_website)
+      EnrollRegistry[:enroll_app].setting(:health_care_website).item
     end
 
     def health_care_website_url
-      EnrollRegistry[:enroll_app].setting(:health_care_website_url)
+      EnrollRegistry[:enroll_app].setting(:health_care_website_url).item
     end
 
     def ivl_login_url
@@ -149,7 +165,7 @@ module Config
     end
 
     def site_uses_default_devise_path?
-      EnrollRegistry[:enroll_app].setting(:use_default_devise_path)
+      EnrollRegistry[:enroll_app].setting(:use_default_devise_path).item
     end
 
     def find_your_doctor_url
@@ -173,7 +189,7 @@ module Config
     end
 
     def site_employer_application_deadline_link
-      EnrollRegistry[:enroll_app].setting(:employer_application_deadline_link)
+      EnrollRegistry[:enroll_app].setting(:employer_application_deadline_link).item
     end
 
     def site_initial_earliest_start_prior_to_effective_on
@@ -185,7 +201,7 @@ module Config
     end
 
     def site_guidance_for_business_owners_url
-      EnrollRegistry[:enroll_app].setting(:guidance_for_business_owners_url)
+      EnrollRegistry[:enroll_app].setting(:guidance_for_business_owners_url).item
     end
 
     def site_non_discrimination_complaint_url
@@ -193,27 +209,27 @@ module Config
     end
 
     def site_document_verification_checklist_url
-      EnrollRegistry[:enroll_app].setting(:document_verification_checklist_url)
+      EnrollRegistry[:enroll_app].setting(:document_verification_checklist_url).item
     end
 
     def site_invoice_bill_url
-      EnrollRegistry[:enroll_app].setting(:invoice_bill_url)
+      EnrollRegistry[:enroll_app].setting(:invoice_bill_url).item
     end
 
     def site_user_sign_in_url
-      EnrollRegistry[:enroll_app].setting(:user_sign_in_url)
+      EnrollRegistry[:enroll_app].setting(:user_sign_in_url).item
     end
 
     def mail_address
-      EnrollRegistry[:enroll_app].setting(:mail_address)
+      EnrollRegistry[:enroll_app].setting(:mail_address).item
     end
 
     def certification_url
-      EnrollRegistry[:enroll_app].setting(:certification_url)
+      EnrollRegistry[:enroll_app].setting(:certification_url).item
     end
 
     def site_title
-      EnrollRegistry[:enroll_app].setting(:site_title)
+      EnrollRegistry[:enroll_app].setting(:site_title).item
     end
 
     def fte_max_count

@@ -17,7 +17,7 @@ class CreateAllQualifyingLifeEventKinds < MongoidMigrationTask
       qlek.update_attributes!(is_active: true, start_on: TimeKeeper.date_of_record) unless existing_qles.include?(qlek._id)
       qlek.publish! unless existing_qles.include?(qlek._id)
     end
-    puts("There are a total of #{QualifyingLifeEventKind.all.count} QLE Kinds created for #{Settings.site.key}")
+    puts("There are a total of #{QualifyingLifeEventKind.all.count} QLE Kinds created for #{EnrollRegistry[:enroll_app].setting(:site_key).item}")
     %w[individual shop].each do |market_kind|
       puts("There are a total of #{QualifyingLifeEventKind.by_market_kind(market_kind).count} #{market_kind} QlE Kinds.")
     end
