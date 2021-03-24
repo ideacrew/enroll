@@ -17,6 +17,10 @@ module Config
       EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number).item
     end
 
+    def contact_center_email_address
+      EnrollRegistry[:enroll_app].setting(:contact_center_email_address).item
+    end
+
     def site_redirect_on_timeout_route
       Settings.site.curam_enabled? ? SamlInformation.iam_login_url : new_user_session_path
     end

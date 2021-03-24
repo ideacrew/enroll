@@ -155,6 +155,10 @@ registry:
             item:
           - key: :state_long_title
             item: "the District of Columbia"
+          - key: :state_dmv_link
+            item: "https://dmv.dc.gov/page/proof-dc-residency-certifications"
+          - key: :health_benefit_exchange_authority_phone_number
+            item: '(202) 715-7576'
       - key: :pay_now_functionality
         item: "kaiser_enabled"
         is_enabled: true
@@ -179,10 +183,6 @@ registry:
           item: "https://nahu.inreachce.com/Details?resultsPage=1&sortBy=&q=dc+broker&searchType=1&groupId=154ae22b-92eb-41f0-854b-3a9cabc20c8e"
         - key: :broker_registration_guide_pdf_link
           item: "https://dchealthlink.com/sites/default/files/v2/forms/new_broker_registration.pdf"
-        - key: :state_dmv_link
-          item: "https://dmv.dc.gov/page/proof-dc-residency-certifications"
-        - key: :health_benefit_exchange_authority_phone_number
-          item: '(202) 715-7576'
       - key: :agency_staff
         item: :agency_staff
         is_enabled: true
