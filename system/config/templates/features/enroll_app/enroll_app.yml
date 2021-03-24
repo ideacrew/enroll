@@ -163,6 +163,8 @@ registry:
           item: 'Kaiser'
         - key: :carriers_long_name
           item: 'Kaiser Permanante'
+        - key: :carriers_registration_website
+          item: "https://healthy.kaiserpermanente.org/new-members/#register-to-kp-org"
       - key: :broker_agency
         item: "broker_agency"
         is_enabled: true
