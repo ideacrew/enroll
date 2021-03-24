@@ -162,7 +162,7 @@ module Notifier
     end
 
     def ivl_non_discrimination
-      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'ivl_non_discrimination.pdf')]
+      join_pdfs [notice_path, Rails.root.join(NotifierRegistry[:notice_engine].settings(:ivl_non_discrimination).item)]
     end
 
     def ivl_attach_envelope
