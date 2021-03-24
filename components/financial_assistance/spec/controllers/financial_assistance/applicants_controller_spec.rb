@@ -123,6 +123,48 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
     end
   end
 
+  context "DELETE destroy" do
+    let(:dependent1) { FactoryBot.create(:person) }
+    let(:family_member_dependent) { FactoryBot.build(:family_member, person: dependent1, family: family)}
+    let!(:applicant2) do
+      FactoryBot.create(:applicant,
+                        first_name: "James", last_name: "Bond", gender: "male", dob: Date.new(1993, 3, 8),
+                        is_incarcerated: false, citizen_status: "US citizen", is_consumer_role: true,
+                        is_applying_coverage: false, ssn: "444444444", indian_tribe_member: false,
+                        application: application,
+                        is_primary_applicant: true, is_claimed_as_tax_dependent: false, is_self_attested_blind: false,
+                        has_daily_living_help: false,need_help_paying_bills: false,
+                        family_member_id: family_member_dependent.id)
+    end
+
+    before do
+      family.family_members << family_member_dependent
+      family.save
+      relation = PersonRelationship.new(relative: family.family_members.last.person, kind: "child")
+      person.person_relationships << relation
+      person.save
+    end
+
+    it "should redirect to edit application path" do
+      delete :destroy, params: { application_id: application.id, id: applicant.id }
+      expect(response).to redirect_to(edit_application_path(application))
+    end
+
+    it "should destroy the applicant" do
+      expect(applicant2.is_active).to eq true
+      delete :destroy, params: { application_id: application.id, id: applicant2.id }
+      applicant2.reload
+      expect(applicant2.is_active).to eq false
+    end
+
+    it "should destroy the dependent" do
+      expect(family.family_members.active.count).to eq 2
+      delete :destroy, params: { application_id: application.id, id: applicant2.id }
+      family.reload
+      expect(family.family_members.active.count).to eq 1
+    end
+  end
+
   context "GET age of applicant" do
     it "should return age of applicant", dbclean: :after_each do
       get :age_of_applicant, params: { application_id: application.id, applicant_id: applicant.id }
