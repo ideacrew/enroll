@@ -247,6 +247,16 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       get :raw_application, params: { id: FinancialAssistance::Application.new.id }
       expect(response).to redirect_to(applications_path)
     end
+
+    context "generate income hash" do
+      it "should include unemployment income if feature enabled" do
+        skip "skipped: unemployment income feature not enabled" unless FinancialAssistanceRegistry[:unemployment_income].enabled?
+
+        application.update_attributes(:aasm_state => "submitted")
+        get :raw_application, params: { id: application.id }
+        expect(assigns(:income_coverage_hash)[applicant.id]["INCOME"]).to have_key("Has this person received any Unemployment Income in 2021?")
+      end
+    end
   end
 
   context "GET wait_for_eligibility_response" do
