@@ -7,6 +7,6 @@ registry:
         is_enabled: true
         settings:
           - key: :ivl_taglines
-            item: "lib/pdf_templates/taglines.pdf"
+            item: "lib/pdf_templates/maine_taglines.pdf"
           - key: :voter_application
-            item: "lib/pdf_templates/voter_application.pdf"
+            item: "lib/pdf_templates/maine_voter_application.pdf"

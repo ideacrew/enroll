@@ -171,15 +171,15 @@ registry:
         is_enabled: true
         settings:
         - key: :broker_registration_guide_pdf
-          item: "/new_broker_registration.pdf"
+          item: "/me_broker_registration_temp.pdf"
         - key: :producer_advisory_committee
-          item: "http://hbx.dc.gov/sites/default/files/dc/sites/Health%20Benefit%20Exchange%20Authority/publication/attachments/ProducerAdvisoryCommitteeFINALReport.pdf"
+          item: "https://www.cms.gov/CCIIO/Programs-and-Initiatives/Health-Insurance-Marketplaces/Plan-Year-2021-Registration-and-Training"
         - key: :broker_license_lookup
-          item: "https://sbs.naic.org/solar-external-lookup/"
+          item: "https://www.coverme.gov/help/"
         - key: :healthlink_training
-          item: "https://nahu.inreachce.com/Details?resultsPage=1&sortBy=&q=dc+broker&searchType=1&groupId=154ae22b-92eb-41f0-854b-3a9cabc20c8e"
+          item: "https://www.cms.gov/CCIIO/Programs-and-Initiatives/Health-Insurance-Marketplaces/Plan-Year-2021-Registration-and-Training"
         - key: :broker_registration_guide_pdf_link
-          item: "https://dchealthlink.com/sites/default/files/v2/forms/new_broker_registration.pdf"
+          item: "https://www.cms.gov/CCIIO/Programs-and-Initiatives/Health-Insurance-Marketplaces/Plan-Year-2021-Registration-and-Training"
         - key: :state_dmv_link
           item: "https://dmv.dc.gov/page/proof-dc-residency-certifications"
         - key: :health_benefit_exchange_authority_phone_number
