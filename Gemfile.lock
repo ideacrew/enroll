@@ -1031,6 +1031,7 @@ DEPENDENCIES
   loofah (~> 2.3.1)
   mail (~> 2.7)
   maskedinput-rails (~> 1.4)
+  mimemagic (= 0.3.6)
   money-rails (~> 1.13)
   mongo (~> 2.6)
   mongo_session_store (~> 3.1)
