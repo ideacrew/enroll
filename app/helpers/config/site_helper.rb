@@ -287,6 +287,18 @@ module Config
     def site_tufts_premier_link
       link_to site_tufts_url, site_tufts_url
     end
+
+    def broker_course_administering_organization_number
+      EnrollRegistry[:enroll_app].setting(:broker_course_administering_organization_number).item
+    end
+
+    def broker_course_administering_organization
+      EnrollRegistry[:enroll_app].setting(:broker_course_administering_organization).item
+    end
+
+    def broker_course_administering_organization_link
+      EnrollRegistry[:enroll_app].setting(:broker_course_administering_organization_link).item
+    end
   end
 end
 # rubocop:enable Metrics/ModuleLength
