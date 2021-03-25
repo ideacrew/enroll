@@ -46,11 +46,9 @@ module FinancialAssistance
           @current_step = @current_step.next_step if @current_step.next_step.present?
           @model.update_attributes!(workflow: { current_step: @current_step.to_i })
           if params[:commit] == "Submit Application"
-            dummy_data_5_year_bar(@application)
             @application.submit! if @application.complete?
             publish_result = FinancialAssistance::Operations::Application::RequestDetermination.new.call(application_id: @application.id)
             if publish_result.success?
-              #dummy_data_for_demo(params) if @application.complete? && @application.is_submitted? #For_Populating_dummy_ED_for_DEMO #temporary
               redirect_to wait_for_eligibility_response_application_path(@application)
             else
               @application.unsubmit!
@@ -70,15 +68,6 @@ module FinancialAssistance
       end
       # rubocop:enable Metrics/BlockNesting
     end
-
-
-    #checklist
-    # - data to enroll
-    ##  -
-
-    # - data to faa
-    ## - if app in draft , update applicants
-    ## - if application not in draft , create new draft application from existing app and create/update respective applicants
 
     def copy
       service = FinancialAssistance::Services::ApplicationService.new(application_id: params[:id])
@@ -213,37 +202,6 @@ module FinancialAssistance
         @assistance_status = true
         @message = nil
       end
-    end
-
-    # TODO: Remove dummy data before prod
-    def dummy_data_for_demo(_params)
-      #Dummy_ED
-      coverage_year = FinancialAssistanceRegistry[:application_year].item.call.value!
-      @model.update_attributes!(aasm_state: "determined", assistance_year: coverage_year, determination_http_status_code: 200)
-
-      @model.eligibility_determinations.each do |ed|
-        ed.update_attributes(max_aptc: 200.00,
-                             csr_percent_as_integer: 73,
-                             is_eligibility_determined: true,
-                             effective_starting_on: Date.new(coverage_year, 0o1, 0o1),
-                             determined_at: TimeKeeper.datetime_of_record - 30.days,
-                             source: "Faa")
-        ed.applicants.first.update_attributes!(is_medicaid_chip_eligible: false, is_ia_eligible: false, is_without_assistance: true) if ed.applicants.count > 0
-        ed.applicants.second.update_attributes!(is_medicaid_chip_eligible: false, is_ia_eligible: true, is_without_assistance: false) if ed.applicants.count > 1
-        ed.applicants.third.update_attributes!(is_medicaid_chip_eligible: true, is_ia_eligible: false, is_without_assistance: false) if ed.applicants.count > 2
-
-        #Update the Income and MEC verifications to Outstanding
-        @model.applicants.each do |applicant|
-          applicant.update_attributes!(:assisted_income_validation => "outstanding", :assisted_mec_validation => "outstanding", aasm_state: "verification_outstanding")
-          applicant.verification_types.each { |verification| verification.update_attributes!(validation_status: "outstanding") }
-        end
-      end
-    end
-
-    # TODO: Remove dummy stuff before prod
-    def dummy_data_5_year_bar(application)
-      return unless application.primary_applicant.present? && ["bar5"].include?(application.primary_applicant&.last_name&.downcase)
-      application.active_applicants.each { |applicant| applicant.update_attributes!(is_subject_to_five_year_bar: true, is_five_year_bar_met: false)}
     end
 
     def build_error_messages(model)
