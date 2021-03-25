@@ -19,7 +19,7 @@
     <% if FinancialAssistanceRegistry[:unemployment_income].enabled? %>
       <div class="row row-form-wrapper radio-align no-buffer fa-align-elements">
         <div class='col-md-6 labelforcoverage'>
-          <span class="fa-text-color">Has this person received any <b>Unemployment Income</b> in 2021?</span>
+          <span class="fa-text-color">Has this person received any <b>Unemployment Income</b> in 2021? *</span>
         </div>
         <div class='col-md-6 mt11'>
           <div class='col-md-3 no-padding'>
@@ -82,6 +82,8 @@
       <div class="instruction-row row row-form-wrapper no-buffer row-height">
         <div class="col-md-12 lightgray">
           <span> Check any boxes that apply to this person and enter details when requested. </span>
+          <br><br>
+          <p><b>Note:</b> For income this person currently receives, do not enter an end date into the ‘To’ field. Only enter an end date if the income ended.</p>
         </div>
       </div>
       <br>
