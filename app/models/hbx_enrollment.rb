@@ -968,8 +968,12 @@ class HbxEnrollment
 
     return unless sponsored_benefit_package.present?
     benefit_application = sponsored_benefit_package.benefit_application
-    return unless benefit_application.present? && benefit_application.terminated_on.present?
-    term_or_cancel_enrollment(self, benefit_application.end_on, benefit_application.termination_reason)
+
+    if benefit_application.present? && benefit_application.terminated_on.present?
+      term_or_cancel_enrollment(self, benefit_application.end_on, benefit_application.termination_reason)
+    elsif benefit_application.expired?
+      expire_coverage!
+    end
   end
 
   def propagate_selection
@@ -2195,6 +2199,11 @@ class HbxEnrollment
   def is_ivl_by_kind?
     (Kinds - ["employer_sponsored", "employer_sponsored_cobra"]).include?(kind)
   end
+
+  def is_employer_sponsored_coverage?
+    kind.to_s == 'employer_sponsored'
+  end
+
 
   def is_enrolled_by_aasm_state?
     ENROLLED_STATUSES.include?(aasm_state)

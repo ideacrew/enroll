@@ -17,7 +17,7 @@ module Operations
     # @param opts [@enrollment] the invocation options
     def call(opts)
       enrollment = opts[:enrollment]
-      return nil unless enrollment.is_shop?
+      return unless enrollment.is_employer_sponsored_coverage?
       term_or_expired_enrollment = yield transition_current_enrollment(enrollment)
       result = update_prior_plan_coverage(term_or_expired_enrollment)
 
@@ -32,7 +32,7 @@ module Operations
       if enrollment_benefit_application.terminated?
         enrollment.term_or_cancel_enrollment(enrollment, enrollment_benefit_application.end_on, enrollment_benefit_application.termination_reason)
       elsif enrollment_benefit_application.expired?
-        enrollment.expire_coverage!
+        enrollment.expire_coverage! if enrollment.may_expire_coverage?
       end
       Success(enrollment)
     end
