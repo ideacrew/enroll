@@ -285,6 +285,7 @@ module FinancialAssistance
 
     # Responsible for updating family member  when applicant is created/updated
     after_update :propagate_applicant
+    before_destroy :propagate_destroy
 
     def generate_hbx_id
       write_attribute(:person_hbx_id, FinancialAssistance::HbxIdGenerator.generate_member_id) if person_hbx_id.blank?
@@ -1059,8 +1060,14 @@ module FinancialAssistance
           update_attributes!(family_member_id: response_family_member_id) if family_member_id.nil?
         end
       end
+    rescue StandardError => e
+      e.message
+    end
 
-      Operations::Families::DropMember.new.call(params: {applicant_params: self.attributes_for_export, family_id: application.family_id, family_member_id: family_member_id}) if is_active_changed? && is_active == false
+    def propagate_destroy
+      ::Operations::Families::DropFamilyMember.new.call(application.family_id, person_hbx_id)
+
+      Success('A successful call was made to enroll to drop a family member')
     rescue StandardError => e
       e.message
     end

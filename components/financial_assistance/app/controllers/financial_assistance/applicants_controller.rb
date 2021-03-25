@@ -132,7 +132,7 @@ module FinancialAssistance
     end
 
     def destroy
-      flash[:error] = build_error_messages(@model) unless @applicant.update_attributes(is_active: false)
+      @applicant.destroy!
       redirect_to edit_application_path(@application)
     end
 
