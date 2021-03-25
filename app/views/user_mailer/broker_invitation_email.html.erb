@@ -3,15 +3,15 @@
     <% if Settings.site.key == :dc %>
       <%= person_name %>,
       <br />
-      <div>Thank you for registering as a broker through <%= Settings.site.short_name %>.</div>
-      <div>Please visit <%= link_to "#{Settings.site.short_name}", claim_invitation_url(invitation) %> to create your broker account and manage your clients.</div>
+      <div>Thank you for registering as a broker through <%= site_short_name %>.</div>
+      <div>Please visit <%= link_to "#{site_short_name}", claim_invitation_url(invitation) %> to create your broker account and manage your clients.</div>
     <% else %>
       <div>
         Dear <%= person_name %>,
       </div>
       <br />
       <div>
-        Congratulations-- we've reviewed your application and you are now approved as a certified broker through the Access Health for Business.
+        Congratulations-- we've reviewed your application and you are now approved as a certified broker through <%= site_short_name %> for Business.
       </div>
       <div>
         <p><strong>Next Steps:</strong></p>
@@ -24,7 +24,7 @@
       </div>
       <div>
         <p>
-          <strong>2.</strong> After you've set up your new username and password, log in to your new Access Health for Business broker account through <a href="<%= site_user_sign_in_url %>">our website</a>.
+          <strong>2.</strong> After you've set up your new username and password, log in to your new <%= site_short_name %> for Business broker account through <a href="<%= site_user_sign_in_url %>">our website</a>.
         </p>
       </div>
 

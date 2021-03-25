@@ -52,7 +52,7 @@
     </tr>
     <tr>
       <td style="padding:3px 10px; font-size:8px;" align="center">Questions?
-        Call Cover ME at <%= notice.is_a?(Notifier::NoticeKind) ? Settings.contact_center.short_number : notice.hbe.phone%>, or go to www.dchealthlink.com.
+        Call <%= site_short_name %> at <%= notice.is_a?(Notifier::NoticeKind) ?  contact_center_short_phone_number : notice.hbe.phone %>, or go to <%= site_policies_url %>.
       </td>
     </tr>
   </table>

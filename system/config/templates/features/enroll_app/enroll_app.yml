@@ -104,7 +104,11 @@ registry:
           - key: :certification_url
             item: ""
           - key: :registration_path
-            item: ""
+            item: "https://www.dchealthlink.com/smallbusiness"
+          - key: :broker_registration_path
+            item: "https://enroll.dchealthlink.com/broker_registration"
+          - key: :broker_registration_guide
+            item: "https://dchealthlink.com/sites/default/files/v2/forms/new_broker_registration.pdf"
           - key: :home_forms_url
             item: ""
           - key: :forms_name
@@ -125,6 +129,12 @@ registry:
             item: "ME0"
           - key: :mail_address
             item: ""
+          - key: :no_reply_email
+            item: "noreply@coverme.gov"
+          - key: :mail_address
+            item: "info@coverme.gov"
+          - key: :producer_email_address
+            item: 'mehl.producer@coverme.gov'
           - key: :privacy_policy
             item: ""
           - key: :late_rates_message
@@ -160,8 +170,22 @@ registry:
             item: "https://www.maine.gov/sos/bmv/"
           - key: :health_benefit_exchange_authority_phone_number
             item: '(202) 715-7576'
+          - key: :contact_center_name
+            item: "DC Health Link's Customer Care Center"
+          - key: :contact_center_po_box
+            item: "PO Box 97022"
+          - key: :contact_center_state_and_city
+            item: "Washington, DC"
+          - key: :contact_center_zip_code
+            item: "20026"
           - key: :contact_center_email_address
             item: "smallbusiness@coverme.gov"
+          - key: :contact_center_short_number
+            item: "(855) 532-5465"
+          - key: :producer_advisory_committee_url
+            item: "http://hbx.dc.gov/sites/default/files/dc/sites/Health%20Benefit%20Exchange%20Authority/publication/attachments/ProducerAdvisoryCommitteeFINALReport.pdf"
+          - key: :mailer_logo_file_name
+            item: "coverme.jpg"
       - key: :pay_now_functionality
         item: "kaiser_enabled"
         is_enabled: true

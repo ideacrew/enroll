@@ -69,6 +69,7 @@ site:
     facebook_url: ""
 
 contact_center:
+  state_and_city: "Boston, ME"
   name: "Maine Cover ME's Customer Care Center"
   alt_name: "Maine Cover ME Customer Service"
   po_box: "PO Box 97022"

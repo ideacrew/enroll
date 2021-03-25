@@ -7,7 +7,7 @@
 <table class="total_table" border="0">
   <tbody>
   <tr>
-    <td><h3>YOUR INSURANCE THROUGH COVER ALL CT HAS CHANGED TO Cover ME</h3></td>
+    <td><h3>YOUR INSURANCE THROUGH COVER ALL <%= site_state_abbreviation.upcase %> HAS CHANGED TO <%= site_short_name.upcase %></h3></td>
   </tr>
   </tbody>
 </table>
@@ -21,10 +21,10 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-    content: "We're sending you this letter because enrollment for the private insurance you or someone in your household has through Cover All DC will now be moved to Cover ME. This letter tells you who this impacts, why the change occurred, what's different and what to do next. "} %>
+    content: "We're sending you this letter because enrollment for the private insurance you or someone in your household has through Cover All #{site_state_abbreviation} will now be moved to #{site_short_name}. This letter tells you who this impacts, why the change occurred, what's different and what to do next. "} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
-    contents: ["The people listed below still have the same insurance plan they enrolled in through Cover All DC. The enrollment has moved from Cover All DC to Cover ME."],
+    contents: ["The people listed below still have the same insurance plan they enrolled in through Cover All #{site_state_abbreviation}. The enrollment has moved from Cover All #{site_state_abbreviation} to #{site_short_name}."],
     heading: "Who's Impacted", sub_heading: '', top_margin: '10px', bottom_margin: '5px'} %>
 
 <% notice.individuals.each do |member| %>
@@ -34,23 +34,23 @@
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-    content: "If someone else in your household has private insurance through Cover All DC, and their name is not listed above, they're still enrolled through Cover All DC."} %>
+    content: "If someone else in your household has private insurance through Cover All #{site_state_abbreviation}, and their name is not listed above, they're still enrolled through Cover All #{site_state_abbreviation}."} %>
 
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
-    contents: ["Based on the documents you submitted to Cover ME, the people listed are eligible to enroll in a plan through Cover ME."],
+    contents: ["Based on the documents you submitted to #{site_short_name}, the people listed are eligible to enroll in a plan through #{site_short_name}."],
     heading: "Why this Change Occurred", sub_heading: '', top_margin: '5px', bottom_margin: '5px'} %>
 
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
     contents: [""],
-    heading: "What's Different About Cover ME Plans", sub_heading: '', top_margin: '5px', bottom_margin: '5px'} %>
+    heading: "What's Different About #{site_short_name} Plans", sub_heading: '', top_margin: '5px', bottom_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-    content: "The plan you're enrolled in through Cover ME is the same plan the people listed enrolled in through Cover All DC. It offers the same covered services."} %>
+    content: "The plan you're enrolled in through #{site_short_name} is the same plan the people listed enrolled in through Cover All #{site_state_abbreviation}. It offers the same covered services."} %>
 <%= render partial: 'notices/shared/unordered_list', locals: {
     previous: "Some things are different:",
-    listings: ["<strong>Your premium may be higher.</strong> While the people listed will still have the same plan, we have to re-start the plan. If any of the people listed had a birthday since the start of the plan they enrolled in through Cover All CT, the premium may increase to reflect the age change.", "<strong>You may be eligible for help paying for coverage</strong> The people listed can apply for tax credits and other savings that lower the costs of paying for private health insurance, along with Medicaid at <a href='https://www.dchealthlink.com'>dchealthlink.com</a>.", "<strong> You'll now get a Form 1095-A</strong> at tax time for those listed."]} %>
+    listings: ["<strong>Your premium may be higher.</strong> While the people listed will still have the same plan, we have to re-start the plan. If any of the people listed had a birthday since the start of the plan they enrolled in through Cover All #{site_state_abbreviation}, the premium may increase to reflect the age change.", "<strong>You may be eligible for help paying for coverage</strong> The people listed can apply for tax credits and other savings that lower the costs of paying for private health insurance, along with Medicaid at <a href='#{site_policies_url}'>#{site_policies_url}</a>.", "<strong> You'll now get a Form 1095-A</strong> at tax time for those listed."]} %>
 
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
@@ -62,10 +62,10 @@
     listing: " 	If the people listed like the plan they have, they don't need to do anything right now. Just keep paying the monthly premiums on time."} %>
 
 <%= render partial: 'notices/shared/custom_listing', :locals => {
-    listing: "The people listed are eligible to change plans, but there's limited time. Login to your account at <a href='https://www.dchealthlink.com'>dchealthlink.com</a> to sign up for a new plan before #{(TimeKeeper.date_of_record + 60.days).strftime("%B %d, %Y")}. You may also want to apply for help paying for coverage to see if the people listed are eligible for Medicaid, or tax credits and other savings that lower the costs of paying for private health insurance."} %>
+    listing: "The people listed are eligible to change plans, but there's limited time. Login to your account at <a href='#{site_policies_url}'>#{site_policies_url}</a> to sign up for a new plan before #{(TimeKeeper.date_of_record + 60.days).strftime("%B %d, %Y")}. You may also want to apply for help paying for coverage to see if the people listed are eligible for Medicaid, or tax credits and other savings that lower the costs of paying for private health insurance."} %>
 
 <%= render partial: 'notices/shared/custom_listing', :locals => {
-    listing: "Get expert help choosing a new plan (at no cost to you) from a Cover ME registered Broker. Go to <a href='https://www.dchealthlink.com/find-expert'>dchealthlink.com/find-expert</a> to search for a Broker near you. You can also call Cover ME if you have questions or need help."} %>
+    listing: "Get expert help choosing a new plan (at no cost to you) from a #{site_short_name} registered Broker. Go to <a href='#{site_policies_url}/find-expert'>#{site_policies_url}/find-expert</a> to search for a Broker near you. You can also call #{site_short_name} if you have questions or need help."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
     contents: ["If you do not agree with the results, or think we made a mistake, you have the right to request an appeal. You can learn more about your rights, and how to request an appeal in the insert included with this letter."],
