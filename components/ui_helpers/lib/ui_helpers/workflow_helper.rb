@@ -86,6 +86,14 @@ module UIHelpers
       end
     end
 
+    def translation_placeholder_text(text)
+      if text.include? '<medicaid-question-translation-placeholder>'
+        text.sub! '<medicaid-question-translation-placeholder>', state_abbreviation_text(l10n("faa.medicaid_question"))
+      else
+        text
+      end
+    end
+
     # set YAML text placeholders
     def set_text_placeholders(text) # rubocop:disable Naming/AccessorMethodName
       return "" if text.nil?

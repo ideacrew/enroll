@@ -189,7 +189,7 @@
             <div class="col-md-6"><%= human_boolean applicant.is_former_foster_care %></div>
           </div>
           <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-            <div class="col-md-6">Do you want us to submit this application to the <%= aca_state_abbreviation %> Department of Human Services (DHS) to do a full review of your application for Medicaid eligibility?</div>
+            <div class="col-md-6"><%= state_abbreviation_text(l10n("faa.medicaid_question")) %></div>
             <div class="col-md-6"><%= human_boolean @application.full_medicaid_determination %></div>
           </div>
         </div>
