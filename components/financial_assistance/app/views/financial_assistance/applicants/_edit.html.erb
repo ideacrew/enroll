@@ -25,8 +25,8 @@
           <div class="modal-dialog" style="width: 500px;">
             <div class="modal-content">
               <div class="modal-body">
-                Are you sure you want to remove this applicant?
-                <strong><br />This cannot be undone.</strong>
+                <%= l10n('faa.edit.delete_applicant') %>
+                <strong><br /><%= l10n('faa.edit.remove_warning') %></strong>
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-primary btn-confirmation" onclick='confirmDestoyApplicant(event, "<%=application_applicant_path(@application, @applicant)%>"); return false;'>Confirm</button>
