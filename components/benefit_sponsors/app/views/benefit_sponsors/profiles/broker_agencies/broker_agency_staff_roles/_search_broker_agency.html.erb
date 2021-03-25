@@ -1,4 +1,4 @@
-<% if @broker_agency_profiles.present?  %>
+<% if @broker_agency_profiles&.primary_broker_role.present?  %>
   <br />
   <div class='table-responsive col-12'>
     <table style='width: 100%; border-collapse: collapse; border: 1px solid #d5d5d5' class="broker-staff">

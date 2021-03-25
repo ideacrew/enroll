@@ -349,7 +349,7 @@ def employer_poc
 
   def family_index_dt
     @selector = params[:scopes][:selector] if params[:scopes].present?
-    @datatable = Effective::Datatables::FamilyDataTable.new(params[:scopes].to_h)
+    @datatable = Effective::Datatables::FamilyDataTable.new(permitted_params_family_index_dt.to_h)
     respond_to do |format|
       format.html { render "/exchanges/hbx_profiles/family_index_datatable" }
     end
