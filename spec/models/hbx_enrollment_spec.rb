@@ -2500,7 +2500,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
                           family: family,
                           coverage_kind: coverage_kind,
                           effective_on: expired_benefit_application.start_on + 1.month,
-                          terminated_on:  expired_benefit_application.end_on - 3.months,
+                          terminated_on: expired_benefit_application.end_on - 3.months,
                           kind: "employer_sponsored_cobra",
                           benefit_sponsorship_id: benefit_sponsorship.id,
                           sponsored_benefit_package_id: expired_benefit_package.id,
