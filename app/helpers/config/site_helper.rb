@@ -17,6 +17,10 @@ module Config
       EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number).item
     end
 
+    def site_producer_email_address
+      EnrollRegistry[:enroll_app].setting(:producer_email_address).item
+    end
+
     def contact_center_email_address
       EnrollRegistry[:enroll_app].setting(:contact_center_email_address).item
     end
@@ -116,6 +120,18 @@ module Config
       EnrollRegistry[:enroll_app].setting(:short_name).item
     end
 
+    def site_producer_advisory_committee_url
+      EnrollRegistry[:enroll_app].setting(:producer_advisory_committee_url).item
+    end
+
+    def site_broker_registration_url
+      EnrollRegistry[:enroll_app].setting(:broker_registration_path).item
+    end
+
+    def broker_registration_guide
+      EnrollRegistry[:enroll_app].setting(:broker_registration_guide).item
+    end
+
     def site_registration_path(resource_name, params)
       if EnrollRegistry[:enroll_app].setting(:registration_path).item.present? && ENV['AWS_ENV'] == 'prod'
         EnrollRegistry[:enroll_app].setting(:registration_path).item
@@ -186,6 +202,10 @@ module Config
 
     def mail_non_discrimination_email
       mail_to non_discrimination_email, non_discrimination_email
+    end
+
+    def site_noreply_email_address
+      EnrollRegistry[:enroll_app].setting(:no_reply_email).item
     end
 
     def site_employer_application_deadline_link
