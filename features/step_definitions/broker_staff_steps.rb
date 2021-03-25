@@ -40,7 +40,7 @@ When(/^the Broker clicks on the approve button$/) do
 end
 
 Then(/^Broker should see the staff successfully approved message$/) do
-  expect(page).to have_content('Role approved successfully')
+  expect(page).to have_content('Role approved successfully', wait: 10)
 end
 
 Then(/^Broker Staff should receive an invitation email from his Employer$/) do
