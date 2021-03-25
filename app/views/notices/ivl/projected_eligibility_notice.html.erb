@@ -70,7 +70,7 @@
   <% notice.uqhp_individuals.each do |member| %>
     <%= render partial: 'notices/shared/table_for_ivlr_notices', locals: {
                                rows: [['Household Member:', "#{member.first_name} #{member.last_name}  Age: #{member.age}"],
-                                  ['DC Resident:', "#{member.residency_verified}"],
+                                  ["#{site_state_abbreviation} Resident:", "#{member.residency_verified}"],
                                   ['Citizenship/Lawful Presence:', "#{member.citizen_status}"],
                                   ['Incarcerated:',"#{member.incarcerated}"]],
       col_styles: ['width: 50%;', 'width: 50%; text-align: left;'], table_width: '100%'} %>
