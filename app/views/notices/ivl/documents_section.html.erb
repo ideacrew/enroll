@@ -1,9 +1,9 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td colspan="2" align="right"><a href= "#{Settings.site.home_url}"
+      <td colspan="2" align="right"><a href= "<%= site_home_url %>"
                                        target= "_blank">
-        <%= image_tag "#{Rails.root}/app/assets/images/#{Settings.site.mailer_logo_file_name}", style: "height: auto; vertical-align: top;", width: "100"  %>
+        <%= image_tag "#{Rails.root}/app/assets/images/#{site_mailer_logo_file_name}", style: "height: auto; vertical-align: top;", width: "100"  %>
       </a></td>
     </tr>
   </tbody>
@@ -15,7 +15,7 @@
       <td><h1><b>ACTION NEEDED</b></h1></td>
     </tr>
     <tr>
-      <td style="font-size: 22px; margin-top: -15px">Submit Documents to <%= Settings.site.short_name %>
+      <td style="font-size: 22px; margin-top: -15px">Submit Documents to <%= site_short_name %>
       <hr style="height: 0px;  border-color: black; border-bottom: 0px; border-width: 1px 0 0 0;">
       </td>
     </tr>
@@ -23,14 +23,14 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-  content: "<strong>Why am I being asked to submit documents to #{Settings.site.short_name}?</strong>", top_margin: '5px'} %>
+  content: "<strong>Why am I being asked to submit documents to #{site_short_name}?</strong>", top_margin: '5px'} %>
 
 <% if notice.aqhp_enrollments.present? %>
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-   content: "We need documents from you to verify what you told us on your application. We’re required by federal law to be sure that people who enroll in health insurance through #{Settings.site.short_name} are eligible. We’re also required to be sure that people who receive help paying for insurance are eligible for the help they’re receiving.", top_margin: '5px'} %>
+   content: "We need documents from you to verify what you told us on your application. We’re required by federal law to be sure that people who enroll in health insurance through #{site_short_name} are eligible. We’re also required to be sure that people who receive help paying for insurance are eligible for the help they’re receiving.", top_margin: '5px'} %>
 <% else %>
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-   content: "We need documents from you to verify what you told us on your application. We’re required by federal law to be sure that people who enroll in health insurance through #{Settings.site.short_name} are eligible.", top_margin: '5px'} %>
+   content: "We need documents from you to verify what you told us on your application. We’re required by federal law to be sure that people who enroll in health insurance through #{site_short_name} are eligible.", top_margin: '5px'} %>
 <% end %>
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
  content: "<strong>When is the deadline to submit documents?</strong>", top_margin: '8px'} %>
@@ -42,7 +42,7 @@
       content: "The first deadline is #{notice.due_date.strftime("%B %d, %Y")}. Different people may have different deadlines. You should submit all your documents as soon as possible. If you do not return the documents by the deadline, you could lose your insurance or cost savings.", top_margin: '5px', bottom_margin: '5px'} %>
 <% end %>
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
- content: "<strong>How can I submit documents to #{Settings.site.short_name}?</strong>", top_margin: '5px'} %>
+ content: "<strong>How can I submit documents to #{site_short_name}?</strong>", top_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
  content: "There are 3 ways for you to submit the documents we need to make a final decision on your eligibility:", top_margin: '5px', bottom_margin: '5px'} %>
@@ -64,14 +64,14 @@
       Login to your account at <a href= <%= Settings.site.home_url %> > <%= notice.hbe.short_url %></a>. You can upload scanned copies of the documents directly to your account.
     </td>
     <td>
-      <p><%= Settings.site.short_name%></p>
+      <p><%= site_short_name%></p>
       <p style="margin-top: -10px;">Exchange Contact Center</p>
-      <p style="margin-top: -10px;">PO Box 44018</p>
-      <p style="margin-top: -10px;">Washington, DC 20026</p>
-      <p><i>Be sure to write your <%= Settings.site.short_name%> ID (<%= notice.primary_identifier %>) on each of the documents.</i></p>
+      <p style="margin-top: -10px;"><%= site_po_box %></p>
+      <p style="margin-top: -10px;"><%= contact_center_state_and_city %>, <%= contact_center_zip_code %></p>
+      <p><i>Be sure to write your <%= site_short_name%> ID (<%= notice.primary_identifier %>) on each of the documents.</i></p>
     </td>
     <td>
-      Bring the document(s) to any Economic Security Administration Office for help. You can call <%= Settings.site.short_name%> at <%= notice.hbe.phone %> to find a location near you.
+      Bring the document(s) to any Economic Security Administration Office for help. You can call <%= site_short_name %> at <%= notice.hbe.phone %> to find a location near you.
     </td>
   </tr>
 </table>
@@ -80,7 +80,7 @@
  content: "<strong>What if I have questions?</strong>", top_margin: '8px'} %>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
- content: "Call #{Settings.site.short_name} at #{notice.hbe.phone}.", top_margin: '5px', bottom_margin: '5px'} %>
+ content: "Call #{site_short_name} at #{notice.hbe.phone}.", top_margin: '5px', bottom_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
  content: "<strong>Which documents do I need to submit?</strong>", top_margin: '5px'} %>
@@ -207,14 +207,14 @@
 <!-- Residency Verification -->
 <% if notice.residency_inconsistency.any? %>
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-    content: "<strong>DC Residency:</strong> A document that shows that the following household members live in the District of Columbia:", top_margin: '5px'} %>
+    content: "<strong>"{site_state_abbreviation}" Residency:</strong> A document that shows that the following household members live in #{site_state_long_title}:", top_margin: '5px'} %>
 
   <%= render partial: 'notices/shared/household_member_details', :locals => {
    rows: [notice.residency_inconsistency], top_margin: '5px', bottom_margin: '5px'} %>
 
   <%= render partial: 'notices/shared/unordered_list', locals: {
     previous: "This can include any of the following that is in the person’s name:",
-    listings: ["A copy of an active lease agreement, certified deed, or mortgage statement with DC address", "A phone or utility bill from within the past two months","DC voter registration card","A valid District of Columbia motor vehicle registration or DC DMV identification card","Cancelled checks or receipts for mortgage or rental payments on a residential property within the past 2 months","Utility bills with a DC address, and payment receipts within the past 2 months","Proof of automobile insurance showing the person’s DC residency address","A signed DC Department of Motor Vehicles proof of residency form from another District resident stating that the applicant lives at their address in the District. (available at: <a href='https://dmv.dc.gov/page/proof-dc-residency-certifications'>https://dmv.dc.gov/page/proof-dc-residency-certifications</a>)","Self-attestation of residency without paper documentation in exceptional circumstances, including homelessness and in cases of domestic violence"]} %>
+    listings: ["A copy of an active lease agreement, certified deed, or mortgage statement with "{site_state_abbreviation}" address", "A phone or utility bill from within the past two months",""{site_state_abbreviation}" voter registration card","A valid District of Columbia motor vehicle registration or "{site_state_abbreviation}" DMV identification card","Cancelled checks or receipts for mortgage or rental payments on a residential property within the past 2 months","Utility bills with a "{site_state_abbreviation}" address, and payment receipts within the past 2 months","Proof of automobile insurance showing the person’s "{site_state_abbreviation}" residency address","A signed "{site_state_abbreviation}" Department of Motor Vehicles proof of residency form from another #{site_state_abbreviation} resident stating that the applicant lives at their address in the District. (available at: <a href='https://dmv."{site_state_abbreviation}".gov/page/proof-"{site_state_abbreviation}"-residency-certifications'>https://dmv."{site_state_abbreviation}".gov/page/proof-"{site_state_abbreviation}"-residency-certifications</a>)","Self-attestation of residency without paper documentation in exceptional circumstances, including homelessness and in cases of domestic violence"]} %>
 <% end %>
 <!-- Residency Verification -->
 
