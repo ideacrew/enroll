@@ -109,7 +109,7 @@
         <p><strong>Complete the <%= site_short_name %> Broker Policy Training Course:</strong><br/>
         <ul>
           <li>Go to the
-            <a href="https://nahu.inreachce.com/Details?resultsPage=1&sortBy=&q=dc+broker&searchType=1&groupId=154ae22b-92eb-41f0-854b-3a9cabc20c8e" target="_blank"><%= site_short_name %> training</a> administered by NAHU
+            <a href="<%= broker_course_administering_organization_link %>" target="_blank"><%= site_short_name %> training</a> administered by <%= broker_course_administering_organization %>
           </li>
           <li>Create a login</li>
           <li>Complete the six hour training course, policy and web components</li>
@@ -120,7 +120,7 @@
           See More</a>
         <div class="collapse" id="collapseTraining">
           <p>If you any questions about the training or experience any technical difficulties, please reach out
-            to NAHU at (877) 880-1335 or <a href="mailto:<%= site_producer_email_address %>"><%= site_producer_email_address %>/a>
+            to %= broker_course_administering_organization %> at <%= broker_course_administering_organization_number %> or <a href="mailto:<%= site_producer_email_address %>"><%= site_producer_email_address %>/a>
             <br/>
             <br/>
             Go to <%= site_policies_url %> and select "Register" under the "Broker" drop down menu in the upper
