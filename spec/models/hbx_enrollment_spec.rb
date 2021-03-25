@@ -2488,6 +2488,46 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       end
     end
 
+    context "should expire if benefit application is in expired state" do
+      include_context "setup benefit market with market catalogs and product packages"
+      include_context "setup expired, and active benefit applications"
+
+      let(:coverage_kind) {'health'}
+      let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
+      let(:expired_shop_enrollment) do
+        FactoryBot.create(:hbx_enrollment,
+                          household: family.latest_household,
+                          family: family,
+                          coverage_kind: coverage_kind,
+                          effective_on: expired_benefit_application.start_on + 1.month,
+                          terminated_on:  expired_benefit_application.end_on - 3.months,
+                          kind: "employer_sponsored_cobra",
+                          benefit_sponsorship_id: benefit_sponsorship.id,
+                          sponsored_benefit_package_id: expired_benefit_package.id,
+                          sponsored_benefit_id: expired_sponsored_benefit.id,
+                          aasm_state: 'coverage_terminated')
+      end
+
+      let!(:new_shop_enrollment) do
+        FactoryBot.create(:hbx_enrollment,
+                          household: family.latest_household,
+                          family: family,
+                          coverage_kind: 'health',
+                          predecessor_enrollment_id: expired_shop_enrollment.id.to_s,
+                          effective_on: expired_shop_enrollment.terminated_on + 1.day,
+                          kind: "employer_sponsored_cobra",
+                          benefit_sponsorship_id: benefit_sponsorship.id,
+                          sponsored_benefit_package_id: expired_benefit_package.id,
+                          sponsored_benefit_id: expired_sponsored_benefit.id,
+                          aasm_state: 'coverage_selected')
+      end
+
+      it 'should cancel the previous enrollment if the effective_on date of the previous and the current are the same.' do
+        new_shop_enrollment.update_existing_shop_coverage
+        expect(new_shop_enrollment.reload.aasm_state).to eq 'coverage_expired'
+      end
+    end
+
     context "Cancel / Terminate Previous Enrollments for IVL" do
       attr_reader :enrollment, :household, :coverage_household
 
