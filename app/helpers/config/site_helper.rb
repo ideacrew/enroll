@@ -18,7 +18,7 @@ module Config
     end
 
     def site_privacy_act_statement
-      EnrollRegistry[:enroll_app].ssetting(:privacy_act_statement).item
+      EnrollRegistry[:enroll_app].setting(:privacy_act_statement).item
     end
 
     def site_po_box
