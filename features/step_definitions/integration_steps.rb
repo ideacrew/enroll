@@ -344,6 +344,7 @@ end
 Given(/^both shop and fehb market configurations are enabled$/) do
   enable_feature :aca_shop_market
   enable_feature :fehb_market
+  add_shop_markets_to_sep_types
 end
 
 When(/(^.+) enters? office location for (.+)$/) do |role, location|
@@ -750,8 +751,11 @@ When(/^.+ enters? the dependent info of Patrick wife$/) do
   find(:xpath, "//label[@for='radio_female']").click
   fill_in 'dependent[addresses][0][address_1]', with: '123 STREET'
   fill_in 'dependent[addresses][0][city]', with: 'WASHINGTON'
-  find(:xpath, "//span[@class='label'][contains(., 'SELECT STATE')]").click
-  find(:xpath, "//li[@data-index='24'][contains(., 'MA')]").click
+  #find(:xpath, "//span[@class='label'][contains(., 'SELECT STATE')]").click
+  #find(".house .selectric-hide-select li", text: 'ME').click
+  find("#address_info span.label").click
+  find("#address_info .selectric-items li", text: 'ME').click
+  #find(:xpath, "//div[@class='selectric-hide-select']/ul/li[contains(., 'ME')]").click
   fill_in 'dependent[addresses][0][zip]', with: '01001'
 end
 
@@ -941,7 +945,7 @@ Then(/^.+ should see the appropriate (.*?) template text$/) do |market_name|
     expect(page).to have_content("Your Enrollment Confirmation")
     expect(page).to have_content('plan offered by your employer.')
     expect(page).to have_content('Your employer contributes')
-    expect(page).to have_content('Thank you for enrolling in coverage through Cover ME')
+    expect(page).to have_content('Thank you for enrolling in coverage through Maine Cover ME')
     # In the email signature
     [Settings.site.short_name, Settings.contact_center.short_number, Settings.contact_center.tty].each do |email_signature_line|
       expect(page).to have_content(email_signature_line)

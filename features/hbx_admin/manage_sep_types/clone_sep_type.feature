@@ -35,7 +35,7 @@ Feature: Admin has ability to Clone the Active/InActive SEP Type
       | market_kind | term_action |
       | individual  | cannot      |
       | shop        | can         |
-      | fehb        | can         |
+      | fehb        | cannot      |
 
   Scenario Outline: Admin can clone an InActive <market_kind> market SEP type
     Given Admin can navigate to the Manage SEPs screen
@@ -63,7 +63,7 @@ Feature: Admin has ability to Clone the Active/InActive SEP Type
     Examples:
       | market_kind | term_action |
       | individual  | cannot      |
-      | shop        | can         |
+      | shop        | cannot      |
       | fehb        | can         |
 
   Scenario Outline: Admin can see clone action button for Active SEP type

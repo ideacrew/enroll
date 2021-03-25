@@ -4,7 +4,6 @@ Feature: Admin has ability to update a Draft SEP Type
     Given that a user with a HBX staff role with hbx_tier3 subrole exists
     When Hbx Admin logs on to the Hbx Portal
     Given the Admin is on the Main Page
-    And Qualifying life events of all markets are present
     And the Admin will see the Manage SEPs under admin dropdown
     And Admin can click Manage SEPs link
 
@@ -37,7 +36,7 @@ Feature: Admin has ability to update a Draft SEP Type
     Examples:
       | market_kind | action |
       | individual  | cannot |
-      | shop        | can    |
+      | shop        | cannot |
       | fehb        | can    |
 
   Scenario Outline: Admin should able to Create and Publish new SEP Type with Active SEP Type reason

@@ -38,7 +38,7 @@ Feature: Admin has ability to update a Draft SEP Type
     Examples:
       | market_kind | action |
       | individual  | cannot |
-      | shop        | can    |
+      | shop        | cannot |
       | fehb        | can    |
 
   Scenario Outline: Admin will see a failure reason while updating <market_kind> SEP type
