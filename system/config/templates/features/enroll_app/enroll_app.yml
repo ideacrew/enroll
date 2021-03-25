@@ -169,6 +169,8 @@ registry:
             item: '(202) 715-7576'
           - key: :contact_center_email_address
             item: "info@dchealthlink.com"
+          - key: :contact_center_short_number
+            item: "(855) 532-5465"
           - key: :producer_advisory_committee_url
             item: "http://hbx.dc.gov/sites/default/files/dc/sites/Health%20Benefit%20Exchange%20Authority/publication/attachments/ProducerAdvisoryCommitteeFINALReport.pdf"
       - key: :pay_now_functionality
