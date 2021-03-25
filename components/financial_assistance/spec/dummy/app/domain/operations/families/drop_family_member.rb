@@ -5,14 +5,13 @@ require 'dry/monads/do'
 
 module Operations
   module Families
-    # this class invokes when user tries to delete applicant
     class DropFamilyMember
       send(:include, Dry::Monads[:result, :do])
 
       #family id and family member id
-      def call(params:)
-        family = yield get_family(params[:family_id])
-        family_member = yield validate(family, params[:family_member_id])
+      def call(family_id, person_hbx_id)
+        family = yield get_family(family_id)
+        family_member = yield validate(family, person_hbx_id)
         result = yield drop_member(family, family_member)
 
         Success(result)
@@ -24,8 +23,8 @@ module Operations
         Operations::Families::Find.new.call(id: family_id)
       end
 
-      def validate(family, family_member_id)
-        family_member = family.family_members.detect{|fm| fm.id.to_s == family_member_id.to_s}
+      def validate(family, person_hbx_id)
+        family_member = family.family_members.detect{|fm| fm.hbx_id == person_hbx_id}
 
         if family_member.present?
           Success(family_member)
