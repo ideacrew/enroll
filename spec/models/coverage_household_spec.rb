@@ -23,14 +23,20 @@ describe CoverageHousehold, type: :model do
   context "valid_coverage_household_members" do
     let(:person) {FactoryBot.create(:person)}
     let(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
-    let(:family_member) {FactoryBot.create(:family_member, family: family, is_active: true)}
+    let(:family_member) {FactoryBot.create(:family_member, family: family)}
     let(:coverage_household) { family.latest_household.coverage_households.first }
     let(:coverage_household_member1) { CoverageHouseholdMember.new(:family_member_id => family_member.id) }
     let(:coverage_household_member2) { CoverageHouseholdMember.new(:family_member_id => nil) }
+    let(:coverage_household_member3) { CoverageHouseholdMember.new(:family_member_id => family_member.id) }
 
     before do
-      coverage_household.coverage_household_members << [coverage_household_member1, coverage_household_member2]
+      coverage_household.coverage_household_members << [coverage_household_member1, coverage_household_member2, coverage_household_member3]
       coverage_household.save
+    end
+
+    it "should not include inactive valid_coverage_household_members " do
+      family_member.update_attributes(is_active: false)
+      expect(coverage_household.valid_coverage_household_members).not_to include(coverage_household_member3)
     end
 
     it "should include valid_coverage_household_members " do
