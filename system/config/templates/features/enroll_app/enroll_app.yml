@@ -105,6 +105,10 @@ registry:
             item: "https://www.dchealthlink.com/brokers/overview"
           - key: :registration_path
             item: "https://www.dchealthlink.com/smallbusiness"
+          - key: :broker_registration_path
+            item: "https://enroll.dchealthlink.com/broker_registration"
+          - key: :broker_registration_guide
+            item: "https://dchealthlink.com/sites/default/files/v2/forms/new_broker_registration.pdf"
           - key: :home_forms_url
             item: "https://dchealthlink.com/forms"
           - key: :forms_name
@@ -123,8 +127,12 @@ registry:
             item: "https://www.irs.gov/"
           - key: :exchange_hbx_id
             item: "DC0"
+          - key: :no_reply_email
+            item: "noreply@dchealthlink.com"
           - key: :mail_address
             item: "info@dchealthlink.com"
+          - key: :producer_email_address
+            item: 'dchl.producer@dc.gov'
           - key: :privacy_policy
             item: "https://dchealthlink.com/"
           - key: :late_rates_message
@@ -161,6 +169,8 @@ registry:
             item: '(202) 715-7576'
           - key: :contact_center_email_address
             item: "info@dchealthlink.com"
+          - key: :producer_advisory_committee_url
+            item: "http://hbx.dc.gov/sites/default/files/dc/sites/Health%20Benefit%20Exchange%20Authority/publication/attachments/ProducerAdvisoryCommitteeFINALReport.pdf"
       - key: :pay_now_functionality
         item: "kaiser_enabled"
         is_enabled: true
