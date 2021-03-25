@@ -186,6 +186,10 @@ registry:
             item: "http://hbx.dc.gov/sites/default/files/dc/sites/Health%20Benefit%20Exchange%20Authority/publication/attachments/ProducerAdvisoryCommitteeFINALReport.pdf"
           - key: :mailer_logo_file_name
             item: "coverme.jpg"
+          - key: :broker_course_administering_organization
+            item: "NAHU"
+          - key: :broker_course_administering_organization_link
+            item: 'https://nahu.inreachce.com/Details?resultsPage=1&sortBy=&q=dc+broker&searchType=1&groupId=154ae22b-92eb-41f0-854b-3a9cabc20c8e'
       - key: :pay_now_functionality
         item: "kaiser_enabled"
         is_enabled: true
