@@ -13,12 +13,32 @@ module Config
       EnrollRegistry[:enroll_app].setting(:state_abbreviation).item
     end
 
+    def site_po_box
+      EnrollRegistry[:enroll_app].setting(:site_po_box).item
+    end
+
+    def site_state_long_title
+      EnrollRegistry[:enroll_app].setting(:state_long_title).item
+    end
+
+    def contact_center_state_and_city
+      EnrollRegistry[:enroll_app].setting(:contact_center_state_and_city).item
+    end
+
+    def contact_center_zip_code
+      EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item
+    end
+
     def contact_center_short_phone_number
       EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item
     end
 
     def health_benefit_exchange_authority_phone_number
       EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number).item
+    end
+
+    def site_mailer_logo_file_name
+      EnrollRegistry[:enroll_app].setting(:mailer_logo_file_name).item
     end
 
     def site_producer_email_address
