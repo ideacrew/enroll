@@ -1065,7 +1065,8 @@ module FinancialAssistance
     end
 
     def propagate_destroy
-      ::Operations::Families::DropFamilyMember.new.call(application.family_id, person_hbx_id)
+      delete_params = {:family_id => application.family_id, :person_hbx_id => person_hbx_id}
+      ::Operations::Families::DropFamilyMember.new.call(delete_params)
 
       Success('A successful call was made to enroll to drop a family member')
     rescue StandardError => e

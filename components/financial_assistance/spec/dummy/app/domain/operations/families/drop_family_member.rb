@@ -8,10 +8,10 @@ module Operations
     class DropFamilyMember
       send(:include, Dry::Monads[:result, :do])
 
-      #family id and family member id
-      def call(family_id, person_hbx_id)
-        family = yield get_family(family_id)
-        family_member = yield validate(family, person_hbx_id)
+      #family id and person hbx_id
+      def call(params)
+        family = yield get_family(params)
+        family_member = yield validate(family, params)
         result = yield drop_member(family, family_member)
 
         Success(result)
@@ -19,12 +19,12 @@ module Operations
 
       private
 
-      def get_family(family_id)
-        Operations::Families::Find.new.call(id: family_id)
+      def get_family(params)
+        Operations::Families::Find.new.call(id: params[:family_id])
       end
 
-      def validate(family, person_hbx_id)
-        family_member = family.family_members.detect{|fm| fm.hbx_id == person_hbx_id}
+      def validate(family, params)
+        family_member = family.family_members.detect{|fm| fm.hbx_id == params[:person_hbx_id]}
 
         if family_member.present?
           Success(family_member)
