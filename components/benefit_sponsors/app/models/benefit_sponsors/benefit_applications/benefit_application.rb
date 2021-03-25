@@ -62,15 +62,15 @@ module BenefitSponsors
       [
         "Company went out of business/bankrupt",
         "Customer Service did not solve problem/poor experience",
-        "Connector website too difficult to use/navigate",
-        "Health Connector does not offer desired product",
+        "#{EnrollRegistry[:enroll_app].setting(:short_name).item} website too difficult to use/navigate",
+        "#{EnrollRegistry[:enroll_app].setting(:short_name).item} does not offer desired product",
         "Group is now > 50 lives",
         "Group no longer has employees",
         "Went to carrier directly",
         "Went to an association directly",
-        "Added/changed broker that does not work with Health Connector",
+        "Added/changed broker that does not work with #{EnrollRegistry[:enroll_app].setting(:short_name).item}",
         "Company is no longer offering insurance",
-        "Company moved out of Massachusetts",
+        "Company moved out of #{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item}",
         "Other"
       ].freeze
 
