@@ -16,12 +16,9 @@ RSpec.describe ::Operations::Families::DropFamilyMember, dbclean: :after_each do
 
   describe 'drop family member' do
     context 'with valid arguments' do
-      let(:params) do
-        {family_id: family.id, family_member_id: family_member2.id}
-      end
 
       before do
-        @result = subject.call(params: params)
+        @result = subject.call(family.id, family_member2.hbx_id)
       end
 
       it 'should return success object' do
@@ -34,12 +31,9 @@ RSpec.describe ::Operations::Families::DropFamilyMember, dbclean: :after_each do
     end
 
     context 'with invalid arguments' do
-      let(:params) do
-        {family_id: family.id, family_member_id: 'family_member2_id'}
-      end
 
       before do
-        @result = subject.call(params: params)
+        @result = subject.call(family.id, 'family_member2.id')
       end
 
       it 'should return failure object' do
