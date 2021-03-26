@@ -254,7 +254,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
         application.update_attributes(:aasm_state => "submitted")
         get :raw_application, params: { id: application.id }
-        expect(assigns(:income_coverage_hash)[applicant.id]["INCOME"]).to have_key("Has this person received any Unemployment Income in 2021?")
+        expect(assigns(:income_coverage_hash)[applicant.id]["INCOME"]).to have_key("Did this person receive unemployment income at any point in ? *")
       end
     end
   end

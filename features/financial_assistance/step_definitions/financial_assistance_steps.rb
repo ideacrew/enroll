@@ -450,3 +450,13 @@ end
 And(/^user should see Medicaid eligibility question$/) do
   expect(page).to have_content("Medicaid eligibility")
 end
+
+And(/^the user should click on the destroy applicant icon$/) do
+  find_all('.close-2')[2].click
+  find('.fa-times').click
+end
+
+Then(/^the user should see the popup for the remove applicant confirmation$/) do
+  popup_text = "Are you sure you want to remove this applicant?"
+  expect(page).to have_content(popup_text)
+end

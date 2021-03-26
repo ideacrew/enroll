@@ -19,7 +19,7 @@
     <% if FinancialAssistanceRegistry[:unemployment_income].enabled? %>
       <div class="row row-form-wrapper radio-align no-buffer fa-align-elements">
         <div class='col-md-6 labelforcoverage'>
-          <span class="fa-text-color">Has this person received any <b>Unemployment Income</b> in 2021? *</span>
+          <span class="fa-text-color">Did this person receive <b>Unemployment Income</b> at any point in <%= @application.assistance_year %>? *</span>
         </div>
         <div class='col-md-6 mt11'>
           <div class='col-md-3 no-padding'>

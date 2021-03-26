@@ -83,6 +83,7 @@ module FinancialAssistance
     field :determination_http_status_code, type: Integer
     field :determination_error_message, type: String
     field :has_eligibility_response, type: Boolean, default: false
+    field :eligibility_request_payload, type: String
     field :eligibility_response_payload, type: String
     field :full_medicaid_determination, type: Boolean
     field :workflow, type: Hash, default: { }
@@ -688,6 +689,7 @@ module FinancialAssistance
 
     def send_failed_response
       unless has_eligibility_response
+        log("Timed Out: Eligibility Response Error", {:severity => 'critical', :error_message => "999 Eligibility Response Error for application_id #{_id}"}) if determination_http_status_code == 999
         message = "Timed-out waiting for eligibility determination response"
         return_status = 504
         notify("acapi.info.events.eligibility_determination.rejected",
