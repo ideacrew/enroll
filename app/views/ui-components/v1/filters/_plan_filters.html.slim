@@ -2,7 +2,7 @@
   .checkbox-filter-wrapper-uc
 
     h4 = find_my_doctor
-    - if aca_state_abbreviation != "MA"
+    - if is_shop_market_enabled?
       - if @market_kind == "individual" && @coverage_kind == "health"
         h4 = link_to l10n("estimate_your_cost"), "", data: {toggle: "modal", target: "#plan_match_redirection"}
       - if @market_kind == "individual" && @coverage_kind == "dental" && @hbx_enrollment.effective_on.year == Settings.checkbook_services.current_year

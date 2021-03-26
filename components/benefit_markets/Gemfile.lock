@@ -200,7 +200,8 @@ GEM
     mime-types (3.3.1)
       mime-types-data (~> 3.2015)
     mime-types-data (3.2021.0225)
-    mimemagic (0.3.6)
+    mimemagic (0.3.8)
+      nokogiri (~> 1)
     mini_mime (1.0.2)
     mini_portile2 (2.4.0)
     minitest (5.14.2)
@@ -364,4 +365,4 @@ DEPENDENCIES
   test-prof (~> 0.5.0)
 
 BUNDLED WITH
-   2.0.1
+   2.2.9

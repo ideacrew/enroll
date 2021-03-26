@@ -1,4 +1,4 @@
-default: --format pretty --fail-fast --order random --strict --tags 'not @wip and not @broken and not @flaky and not @ma_only and not @aca_shop_market_disabled' -r features --profile semaphoreci
+default: --format pretty --fail-fast --strict --tags 'not @wip and not @broken and not @flaky and not @ma_only and not @aca_shop_market_disabled' -r features --profile semaphoreci
 everything: --format pretty --strict -r features
 semaphoreci: -q
 gh-report: --format json --out ci/cucumber/gh-cucumber-report.json --fail-fast --strict --tags 'not @wip and not @broken and not @flaky and not @ma_only and not @aca_shop_market_disabled' -r features

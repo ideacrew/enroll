@@ -63,7 +63,6 @@ site:
   statewide_area: "State of Maine"
   prod_tax_info: "" # TODO: Need this for Maine. This is for download tax documents #tax_info_url method in families_helper.rb
   staging_tax_info_url: "" # TODO: Need this for Maine. This is for download tax documents #tax_info_url method in families_helper.rb
-
   exchange_name: "Maine Cover ME"
   social_media:
     facebook_url: ""
@@ -100,6 +99,11 @@ contact_center:
   board_of_eletions_address: ""
   board_of_elections_email: "cec.elections@maine.gov"
   board_of_elections_phone_number: "207-624-7650"
+
+  board_of_elections_entity: "DC Board of Elections"
+  board_of_eletions_address: "1015 Half Street, SE<br>Suite 750<br>Washington, DC 20003<br>"
+  board_of_elections_email: ""
+  board_of_elections_phone_number: "(202) 727-2525"
 
   mailing_address:
     name: "Cover ME"

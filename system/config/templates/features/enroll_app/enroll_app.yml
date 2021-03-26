@@ -154,20 +154,19 @@ registry:
           - key: :publisher
             item: "dchl"
           - key: :prod_tax_info
-            item: "https://www.maine.gov/revenue/tax-return-forms/individual-income-tax-2020"
+            item: "https://dchealthlink.com/individuals/tax-documents"
           - key: :staging_tax_info_url
-            item: "https://www.maine.gov/revenue/tax-return-forms/individual-income-tax-2020"
+            item: "https://staging.dchealthlink.com/individuals/tax-documents"
           - key: :statewide_area
-            item: "State of Maine"
+            item: "DC Metro"
           - key: :exchange_name
-            item: "Maine Cover ME"
+            item: "Washington DC Health Benefit Exchange"
           - key: :social_media
-            item: #<Config::Options facebook_url="">}
             item:
           - key: :state_long_title
-            item: "the state of Maine"
+            item: "the District of Columbia"
           - key: :state_dmv_link
-            item: "https://www.maine.gov/sos/bmv/"
+            item: "https://dmv.dc.gov/page/proof-dc-residency-certifications"
           - key: :health_benefit_exchange_authority_phone_number
             item: '(202) 715-7576'
           - key: :contact_center_name
@@ -190,6 +189,10 @@ registry:
             item: "NAHU"
           - key: :broker_course_administering_organization_link
             item: 'https://nahu.inreachce.com/Details?resultsPage=1&sortBy=&q=dc+broker&searchType=1&groupId=154ae22b-92eb-41f0-854b-3a9cabc20c8e'
+          - key: :privacy_url
+            item: "https://www.dchealthlink.com/privacy"
+          - key: :privacy_act_statement
+            item: ""https://www.dchealthlink.com/privacy-act-statement""
       - key: :pay_now_functionality
         item: "kaiser_enabled"
         is_enabled: true

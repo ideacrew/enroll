@@ -13,6 +13,14 @@ module Config
       EnrollRegistry[:enroll_app].setting(:state_abbreviation).item
     end
 
+    def site_privacy_url
+      EnrollRegistry[:enroll_app].setting(:privacy_url).item
+    end
+
+    def site_privacy_act_statement
+      EnrollRegistry[:enroll_app].setting(:privacy_act_statement).item
+    end
+
     def site_po_box
       EnrollRegistry[:enroll_app].setting(:site_po_box).item
     end

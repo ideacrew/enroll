@@ -267,7 +267,7 @@ module BenefitSponsors
       end
 
       @pdf.move_down 72
-      @pdf.text_box "Please review the billing summary. This is a consolidated bill for all your benefits through the Maine #{site_short_name}. Please pay the Total Amount Due.", :at => [address_x, @pdf.cursor]
+      @pdf.text_box "Please review the billing summary. This is a consolidated bill for all your benefits through #{site_short_name}. Please pay the Total Amount Due.", :at => [address_x, @pdf.cursor]
       @pdf.move_down 48
       @pdf.text_box "Payment Options", :at => [address_x, @pdf.cursor], :style => :bold
       @pdf.move_down 24
@@ -283,7 +283,7 @@ module BenefitSponsors
       @pdf.move_down lineheight_y
       @pdf.text_box "#{contact_center_city}, #{contact_center_state} #{contact_center_postal_code}", :at => [240, @pdf.cursor]
       @pdf.move_down 24
-      @pdf.text_box "\u2022 Call the Maine #{site_short_name} Customer Service at 888-813-9220 (TTY #{contact_center_tty_number})", :at => [address_x, @pdf.cursor]
+      @pdf.text_box "\u2022 Call #{site_short_name} Customer Service at 888-813-9220 (TTY #{contact_center_tty_number})", :at => [address_x, @pdf.cursor]
       @pdf.move_down 24
 
       @pdf.text_box "PLEASE DETACH HERE AND RETURN THE BOTTOM PORTION WITH YOUR PAYMENT", :at => [address_x, @pdf.cursor], :align => :center, :style => :bold

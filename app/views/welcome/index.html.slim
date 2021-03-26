@@ -23,3 +23,4 @@
         = link_to l10n(".general_agency_registration"), benefit_sponsors.new_profiles_registration_path(:profile_type => :general_agency), class: "btn btn-outline-primary mr-2 mb-2" if general_agency_enabled?
     - if EnrollRegistry[:enroll_app].setting(:site_key).item == :me
       =image_tag ("CoverME_WebsiteHeader_01.jpg"), :class => "ct-cover", :id => 'ct-cover'
+
