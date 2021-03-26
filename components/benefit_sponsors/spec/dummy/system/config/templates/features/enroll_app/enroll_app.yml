@@ -31,6 +31,8 @@ registry:
             item: "https://www.dchealthlink.com/submit-docs"
           - key: :site_key
             item: :dc
+          - key: :state_abbreviation
+            item: "DC"
           - key: :subdomain
             item: "dchbx"
           - key: :domain_name
@@ -103,6 +105,10 @@ registry:
             item: "https://www.dchealthlink.com/brokers/overview"
           - key: :registration_path
             item: "https://www.dchealthlink.com/smallbusiness"
+          - key: :broker_registration_path
+            item: "https://enroll.dchealthlink.com/broker_registration"
+          - key: :broker_registration_guide
+            item: "https://dchealthlink.com/sites/default/files/v2/forms/new_broker_registration.pdf"
           - key: :home_forms_url
             item: "https://dchealthlink.com/forms"
           - key: :forms_name
@@ -121,8 +127,12 @@ registry:
             item: "https://www.irs.gov/"
           - key: :exchange_hbx_id
             item: "DC0"
+          - key: :no_reply_email
+            item: "noreply@dchealthlink.com"
           - key: :mail_address
             item: "info@dchealthlink.com"
+          - key: :producer_email_address
+            item: 'dchl.producer@dc.gov'
           - key: :privacy_policy
             item: "https://dchealthlink.com/"
           - key: :late_rates_message
@@ -153,30 +163,62 @@ registry:
             item:
           - key: :state_long_title
             item: "the District of Columbia"
-      - key: :pay_now_functionality
-        item: "kaiser_enabled"
-        is_enabled: true
-        settings:
-          - key: :carriers
-            item: 'Kaiser'
-      - key: :broker_agency
-        item: "broker_agency"
-        is_enabled: true
-        settings:
-          - key: :broker_registration_guide_pdf
-            item: "/new_broker_registration.pdf"
-          - key: :producer_advisory_committee
-            item: "http://hbx.dc.gov/sites/default/files/dc/sites/Health%20Benefit%20Exchange%20Authority/publication/attachments/ProducerAdvisoryCommitteeFINALReport.pdf"
-          - key: :broker_license_lookup
-            item: "https://sbs.naic.org/solar-external-lookup/"
-          - key: :healthlink_training
-            item: "https://nahu.inreachce.com/Details?resultsPage=1&sortBy=&q=dc+broker&searchType=1&groupId=154ae22b-92eb-41f0-854b-3a9cabc20c8e"
-          - key: :broker_registration_guide_pdf_link
-            item: "https://dchealthlink.com/sites/default/files/v2/forms/new_broker_registration.pdf"
           - key: :state_dmv_link
             item: "https://dmv.dc.gov/page/proof-dc-residency-certifications"
           - key: :health_benefit_exchange_authority_phone_number
             item: '(202) 715-7576'
+          - key: :contact_center_name
+            item: "DC Health Link's Customer Care Center"
+          - key: :contact_center_po_box
+            item: "PO Box 97022"
+          - key: :contact_center_state_and_city
+            item: "Washington, DC"
+          - key: :contact_center_zip_code
+            item: "20026"
+          - key: :contact_center_email_address
+            item: "info@dchealthlink.com"
+          - key: :contact_center_short_number
+            item: "(855) 532-5465"
+          - key: :producer_advisory_committee_url
+            item: "http://hbx.dc.gov/sites/default/files/dc/sites/Health%20Benefit%20Exchange%20Authority/publication/attachments/ProducerAdvisoryCommitteeFINALReport.pdf"
+          - key: :mailer_logo_file_name
+            item: "dchealthlink.jpg"
+          - key: :broker_course_administering_organization_number
+            item: '(877) 880-1335'
+          - key: :broker_course_administering_organization
+            item: "NAHU"
+          - key: :broker_course_administering_organization_link
+            item: 'https://nahu.inreachce.com/Details?resultsPage=1&sortBy=&q=dc+broker&searchType=1&groupId=154ae22b-92eb-41f0-854b-3a9cabc20c8e'
+          - key: :privacy_url
+            item: "https://www.dchealthlink.com/privacy"
+          - key: :privacy_act_statement
+            item: "https://www.dchealthlink.com/privacy-act-statement"
+          - key: :site_broker_attestation_link
+            item: "https://hbx.dc.gov/page/dc-health-link-broker-attestations"
+      - key: :pay_now_functionality
+        item: "kaiser_enabled"
+        is_enabled: true
+        settings:
+        - key: :carriers
+          item: 'Kaiser'
+        - key: :carriers_long_name
+          item: 'Kaiser Permanante'
+        - key: :carriers_registration_website
+          item: "https://healthy.kaiserpermanente.org/new-members/#register-to-kp-org"
+      - key: :broker_agency
+        item: "broker_agency"
+        is_enabled: true
+        settings:
+        - key: :broker_registration_guide_pdf
+          item: "/new_broker_registration.pdf"
+        - key: :producer_advisory_committee
+          item: "http://hbx.dc.gov/sites/default/files/dc/sites/Health%20Benefit%20Exchange%20Authority/publication/attachments/ProducerAdvisoryCommitteeFINALReport.pdf"
+        - key: :broker_license_lookup
+          item: "https://sbs.naic.org/solar-external-lookup/"
+        - key: :healthlink_training
+          item: "https://nahu.inreachce.com/Details?resultsPage=1&sortBy=&q=dc+broker&searchType=1&groupId=154ae22b-92eb-41f0-854b-3a9cabc20c8e"
+        - key: :broker_registration_guide_pdf_link
+          item: "https://dchealthlink.com/sites/default/files/v2/forms/new_broker_registration.pdf"
       - key: :agency_staff
         item: :agency_staff
         is_enabled: true
