@@ -11,7 +11,7 @@ FROM ruby:2.5-alpine3.12 AS ruby_base
 WORKDIR /app
 
 COPY --from=node_base /app/node_modules ./node_modules
-RUN apk add --update nodejs yarn
+RUN apk add --update nodejs yarn git
 
 RUN gem install bundler:2.2.9
 # Component dependency files
@@ -41,7 +41,7 @@ COPY ./project_gems/mongoid_userstamp-0.4.0/lib/mongoid/userstamp/version.rb ./p
 # Application dependency files
 COPY ./Gemfile* ./
 
-RUN bundle install
+# RUN bundle install
 
 
 
