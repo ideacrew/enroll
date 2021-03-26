@@ -10,6 +10,8 @@ module FaaTranslations
     "en.faa.other_ques.disability_question" => "Does this person have a disability? *",
     "en.faa.review_eligibility_header" => "Your Application for Premium Reductions",
     'en.faa.other_ques.is_student' => 'Is this person a student? *',
-    "en.faa.medicaid_question" => "Do you want us to submit this application to the <state-abbreviation-placeholder> Department of Human Services (DHS) to do a full review of your application for Medicaid eligibility?"
+    "en.faa.medicaid_question" => "Do you want us to submit this application to the <state-abbreviation-placeholder> Department of Human Services (DHS) to do a full review of your application for Medicaid eligibility?",
+    'en.faa.edit.delete_applicant' => 'Are you sure you want to remove this applicant?',
+    'en.faa.edit.remove_warning' => 'This cannot be undone.'
   }.freeze
 end
