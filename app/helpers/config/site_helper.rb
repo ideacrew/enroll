@@ -240,6 +240,10 @@ module Config
       EnrollRegistry[:enroll_app].setting(:no_reply_email).item
     end
 
+    def site_broker_attestation_link
+      EnrollRegistry[:enroll_app].setting(:site_broker_attestation_link).item
+    end
+
     def site_employer_application_deadline_link
       EnrollRegistry[:enroll_app].setting(:employer_application_deadline_link).item
     end
