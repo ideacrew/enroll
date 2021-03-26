@@ -552,7 +552,7 @@ if EnrollRegistry.feature_enabled?(:sep_types)
         end
       end
 
-      context 'shop and congreses disabled?' do
+      context 'shop and congress disabled?' do
         before do
           EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(false)
           EnrollRegistry[:fehb_market].feature.stub(:is_enabled).and_return(false)
