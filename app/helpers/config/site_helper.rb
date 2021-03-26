@@ -160,7 +160,7 @@ module Config
       EnrollRegistry[:enroll_app].setting(:broker_registration_path).item
     end
 
-    def broker_registration_guide
+    def site_broker_registration_guide
       EnrollRegistry[:enroll_app].setting(:broker_registration_guide).item
     end
 
