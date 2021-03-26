@@ -7,12 +7,12 @@
         <h4 class="modal-title">Approve This Employee?</h4>
       </div>
       <div class="modal-body">
-        <p>By authorizing this employee to access your book of business on DC Health Link,
+        <p>By authorizing this employee to access your book of business on <%= site_short_name %>,
           <strong>
             you are attesting that your employee has completed the applicable privacy training and that you will ensure that your employee will comply with all applicable privacy and security policies,
           </strong>
            including annual employee training as indicated on the
-           <a href="https://hbx.dc.gov/page/dc-health-link-broker-attestations" target="_blank">DC Health Link Broker Attestation.</a>
+           <a href="<%= site_broker_attestation_link %>" target="_blank"> <%= site_short_name %> Broker Attestation.</a>
         </p>
       </div>
       <div class="modal-footer">
