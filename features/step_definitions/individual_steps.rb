@@ -430,6 +430,14 @@ And(/^I click confirm on the plan selection page for (.*)$/) do |named_person|
   click_link "Confirm"
 end
 
+And(/^I click confirm on the plan selection page for (.*)$/) do |named_person|
+  find('.interaction-choice-control-value-terms-check-thank-you').click
+  person = people[named_person]
+  fill_in 'first_name_thank_you', :with => (person[:first_name])
+  fill_in 'last_name_thank_you', :with => (person[:last_name])
+  click_link "Confirm"
+end
+
 And(/I select a non silver plan on plan shopping page/) do
   find(IvlChoosePlan.select_plan_btn)[0].click
   screenshot("aptc_setamount")
