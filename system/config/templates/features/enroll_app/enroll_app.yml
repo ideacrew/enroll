@@ -192,7 +192,9 @@ registry:
           - key: :privacy_url
             item: "https://www.dchealthlink.com/privacy"
           - key: :privacy_act_statement
-            item: ""https://www.dchealthlink.com/privacy-act-statement""
+            item: "https://www.dchealthlink.com/privacy-act-statement"
+          - key: :site_broker_attestation_link
+            item: "https://hbx.dc.gov/page/dc-health-link-broker-attestations"
       - key: :pay_now_functionality
         item: "kaiser_enabled"
         is_enabled: true
