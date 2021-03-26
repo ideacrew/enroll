@@ -1,1 +1,86 @@
-FROM node:alpine
+FROM node:12.21.0-alpine3.12 AS node_base
+
+WORKDIR /app
+
+COPY package.json package.json
+COPY yarn.lock yarn.lock
+RUN yarn
+
+FROM ruby:2.5-alpine3.12 AS ruby_base
+
+WORKDIR /app
+
+COPY --from=node_base /app/node_modules ./node_modules
+RUN apk add --update nodejs yarn
+
+RUN gem install bundler:2.2.9
+# Component dependency files
+COPY ./components/benefit_markets/*.gemspec ./components/benefit_markets/Gemfile* ./components/benefit_markets/
+COPY ./components/benefit_sponsors/*.gemspec ./components/benefit_sponsors/Gemfile* ./components/benefit_sponsors/
+COPY ./components/financial_assistance/*.gemspec ./components/financial_assistance/Gemfile* ./components/financial_assistance/
+COPY ./components/notifier/*.gemspec ./components/notifier/Gemfile* ./components/notifier/
+COPY ./components/sponsored_benefits/*.gemspec ./components/sponsored_benefits/Gemfile* ./components/sponsored_benefits/
+COPY ./components/transport_gateway/*.gemspec ./components/transport_gateway/Gemfile* ./components/transport_gateway/
+COPY ./components/transport_profiles/*.gemspec ./components/transport_profiles/Gemfile* ./components/transport_profiles/
+COPY ./components/ui_helpers/*.gemspec ./components/ui_helpers/Gemfile* ./components/ui_helpers/
+COPY ./project_gems/effective_datatables-2.6.14/*.gemspec ./project_gems/effective_datatables-2.6.14/Gemfile* ./project_gems/effective_datatables-2.6.14/
+COPY ./project_gems/mongoid_userstamp-0.4.0/mongoid_userstamp.gemspec ./project_gems/mongoid_userstamp-0.4.0/Gemfile* ./project_gems/mongoid_userstamp-0.4.0/
+
+# Version files for components and datatables
+COPY ./components/benefit_markets/lib/benefit_markets/version.rb ./components/benefit_markets/lib/benefit_markets/version.rb 
+COPY ./components/benefit_sponsors/lib/benefit_sponsors/version.rb ./components/benefit_sponsors/lib/benefit_sponsors/version.rb 
+COPY ./components/financial_assistance/lib/financial_assistance/version.rb ./components/financial_assistance/lib/financial_assistance/version.rb
+COPY ./components/notifier/lib/notifier/version.rb ./components/notifier/lib/notifier/version.rb 
+COPY ./components/sponsored_benefits/lib/sponsored_benefits/version.rb ./components/sponsored_benefits/lib/sponsored_benefits/version.rb
+COPY ./components/transport_gateway/lib/transport_gateway/version.rb ./components/transport_gateway/lib/transport_gateway/version.rb
+COPY ./components/transport_profiles/lib/transport_profiles/version.rb ./components/transport_profiles/lib/transport_profiles/version.rb
+COPY ./components/ui_helpers/lib/ui_helpers/version.rb ./components/ui_helpers/lib/ui_helpers/version.rb
+COPY ./project_gems/effective_datatables-2.6.14/lib/effective_datatables/version.rb ./project_gems/effective_datatables-2.6.14/lib/effective_datatables/version.rb
+COPY ./project_gems/mongoid_userstamp-0.4.0/lib/mongoid/userstamp/version.rb ./project_gems/mongoid_userstamp-0.4.0/lib/mongoid/userstamp/version.rb
+
+# Application dependency files
+COPY ./Gemfile* ./
+
+RUN bundle install
+
+
+
+
+# ARG YARN_VERSION
+# # Install required packages/libraries
+# RUN apt-get update && \
+#   apt-get -yq dist-upgrade && \
+#   apt-get install -y git gcc openssl libyaml-dev libyaml-cpp-dev libyaml-cpp0.5v5 libffi-dev libffi6 libreadline-dev \ 
+#   zlibc libgdbm-dev libncurses-dev autoconf fontconfig unzip zip sshpass bzip2 libxrender1 libxext6 \ 
+#   build-essential nodejs yarn=$YARN_VERSION-1 && \
+#   apt-get autoremove -y 
+
+# # Configure bundler and PATH, install bundler version
+# ENV LANG=C.UTF-8 \
+#   GEM_HOME=/bundle \
+#   BUNDLE_JOBS=4 \
+#   BUNDLE_RETRY=3
+# ENV BUNDLE_PATH $GEM_HOME
+# ENV BUNDLE_APP_CONFIG=$BUNDLE_PATH \
+#   BUNDLE_BIN=$BUNDLE_PATH/bin
+# ENV PATH /enroll/bin:$BUNDLE_BIN:$PATH
+
+# ARG BUNDLER_VERSION_OVERRIDE
+# ENV BUNDLER_VERSION=$BUNDLER_VERSION_OVERRIDE
+# RUN gem update --system && gem install bundler:$BUNDLER_VERSION
+
+# # Configure app home directory
+# ENV HOME /enroll
+# RUN mkdir -p $HOME
+# WORKDIR $HOME
+
+# # Setting env up
+# ENV RAILS_ENV='development'
+# ENV NODE_ENV='development'
+
+# # Adding gems
+# COPY Gemfile Gemfile
+# COPY Gemfile.lock Gemfile.lock
+# COPY . $HOME
+# RUN bundle install && \
+#   yarn install --check-files 
