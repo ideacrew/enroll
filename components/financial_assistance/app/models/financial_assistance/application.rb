@@ -688,14 +688,14 @@ module FinancialAssistance
 
     def send_failed_response
       unless has_eligibility_response
-        log("Timed Out: Eligibility Response Error", {:severity => 'critical', :error_message => "999 Eligibility Response Error for application_id #{_id}"}) if determination_http_status_code == 999
+        log("Timed Out: Eligibility Response Error", {:severity => 'critical', :error_message => "999 Eligibility Response Error for application_id #{hbx_id}"}) if determination_http_status_code == 999
         message = "Timed-out waiting for eligibility determination response"
         return_status = 504
         notify("acapi.info.events.eligibility_determination.rejected",
                {:correlation_id => SecureRandom.uuid.gsub("-",""),
                 :body => { error_message: message },
                 :family_id => family_id.to_s,
-                :assistance_application_id => _id.to_s,
+                :assistance_application_id => hbx_id.to_s,
                 :return_status => return_status.to_s,
                 :submitted_timestamp => TimeKeeper.date_of_record.strftime('%Y-%m-%dT%H:%M:%S')})
       end
@@ -706,7 +706,7 @@ module FinancialAssistance
              {:correlation_id => SecureRandom.uuid.gsub("-",""),
               :body => { error_message: message },
               :family_id => family_id.to_s,
-              :assistance_application_id => _id.to_s,
+              :assistance_application_id => hbx_id.to_s,
               :return_status => determination_http_status_code.to_s,
               :submitted_timestamp => TimeKeeper.date_of_record.strftime('%Y-%m-%dT%H:%M:%S'),
               :haven_application_id => haven_app_id,
