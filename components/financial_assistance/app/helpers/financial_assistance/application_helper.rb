@@ -15,7 +15,7 @@ module FinancialAssistance
       application = FinancialAssistance::Application.find(application_id)
       full_names = application.active_applicants.where(eligibility_flag => true).map(&:full_name)
       # capitalize each name of full name individually, as titleize will cause spacing issues if multiple capital letters already in applicant name
-      full_names.map{ |full_name| full_name.split.map(&:capitalize).join(" ") }
+      full_names.map{ |full_name| capitalize_full_name(full_name) }
     end
     def any_csr_ineligible_applicants?(application_id)
       application = FinancialAssistance::Application.find(application_id)
@@ -239,6 +239,10 @@ module FinancialAssistance
       else
         'N/A'
       end
+    end
+
+    def capitalize_full_name(full_name)
+      full_name.split.map(&:capitalize).join(" ")
     end
   end
 end
