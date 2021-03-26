@@ -98,7 +98,6 @@ end
 
 And(/^a SEP is submitted$/) do
   click_button AddSepAction.submit_button
-
 end
 
 Then(/^confirmation popup is visible$/) do
