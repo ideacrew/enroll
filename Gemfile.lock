@@ -6,6 +6,17 @@ GIT
       rails (>= 3.0)
 
 GIT
+  remote: https://github.com/ideacrew/aca_entities.git
+  revision: fac6a521df3bd596377ae59efed5278a0fd13af7
+  branch: trunk
+  specs:
+    aca_entities (0.1.0)
+      dry-monads (~> 1.2)
+      dry-struct (~> 1.0)
+      dry-types (~> 1.0)
+      dry-validation (~> 1.2)
+
+GIT
   remote: https://github.com/ideacrew/acapi.git
   revision: fe6ddbb9904e0992cba01e689e1c97098e1ec9cb
   branch: amqp_proc_title
@@ -595,7 +606,8 @@ GEM
     mime-types (3.3.1)
       mime-types-data (~> 3.2015)
     mime-types-data (3.2020.0512)
-    mimemagic (0.3.6)
+    mimemagic (0.3.8)
+      nokogiri (~> 1)
     mini_magick (4.10.1)
     mini_mime (1.0.2)
     mini_portile2 (2.4.0)
@@ -977,6 +989,7 @@ PLATFORMS
 
 DEPENDENCIES
   aasm (~> 4.8)
+  aca_entities!
   acapi!
   action-cable-testing
   action_mailer_cache_delivery (~> 0.3)
