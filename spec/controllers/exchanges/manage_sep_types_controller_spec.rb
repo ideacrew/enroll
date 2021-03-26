@@ -552,6 +552,21 @@ if EnrollRegistry.feature_enabled?(:sep_types)
         end
       end
 
+      context 'shop and congress disabled?' do
+        before do
+          EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(false)
+          EnrollRegistry[:fehb_market].feature.stub(:is_enabled).and_return(false)
+          sign_in(current_user)
+          get :sorting_sep_types
+        end
+
+        it 'should have response body when shop is enabled' do
+          expect(response.body).to match(/Individual/i)
+          expect(response.body).to_not match(/Shop/i)
+          expect(response.body).to_not match(/Congress/i)
+        end
+      end
+
       context 'updateable?' do
         before do
           person.hbx_staff_role.permission.update_attributes!(can_manage_qles: false)
