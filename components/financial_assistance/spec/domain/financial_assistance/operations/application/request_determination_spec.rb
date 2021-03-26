@@ -86,6 +86,8 @@ RSpec.describe FinancialAssistance::Operations::Application::RequestDeterminatio
     it 'should return success' do
       result = subject.call(application_id: application.id)
       expect(result).to be_a(Dry::Monads::Result::Success)
+      application.reload
+      expect(application.eligibility_request_payload).not_to eq nil
 
       doc = Nokogiri::XML(result.success)
       doc.xpath("//xmlns:is_coverage_applicant").each do |element|
@@ -112,6 +114,8 @@ RSpec.describe FinancialAssistance::Operations::Application::RequestDeterminatio
     it 'should return success with skipped elements' do
       result = subject.call(application_id: application.id)
       expect(result).to be_a(Dry::Monads::Result::Success)
+      application.reload
+      expect(application.eligibility_request_payload).not_to eq nil
 
       doc = Nokogiri::XML(result.success)
       doc.xpath("//xmlns:assistance_tax_household_member").each do |element|
