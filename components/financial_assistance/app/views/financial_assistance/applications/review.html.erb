@@ -188,6 +188,10 @@
             <div class="col-md-6">Has this person ever been in foster care?</div>
             <div class="col-md-6"><%= human_boolean applicant.is_former_foster_care %></div>
           </div>
+          <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+            <div class="col-md-6"><%= state_abbreviation_text(l10n("faa.medicaid_question")) %></div>
+            <div class="col-md-6"><%= human_boolean @application.full_medicaid_determination %></div>
+          </div>
         </div>
         <br>
       <% end %>

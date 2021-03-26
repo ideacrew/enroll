@@ -258,7 +258,7 @@
             - cells:
               - gutter: 12
                 type: raw_html
-                text: <b>Do you want your application submitted for full medicaid determination?</b>
+                text: <b><medicaid-question-translation-placeholder></b>
               - gutter: 2
                 type: label_radio
                 name: row1
