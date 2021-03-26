@@ -35,7 +35,6 @@ module FinancialAssistance
       social_security_benefit
       supplemental_security_income
       tax_exempt_interest
-      unemployment_insurance
       unemployment_income
       wages_and_salaries
       income_from_irs
@@ -53,7 +52,6 @@ module FinancialAssistance
       interest: 'Interest',
       pension_retirement_benefits: 'Pension or retirement',
       rental_and_royalty: 'Rent and royalties',
-      unemployment_insurance: 'Unemployment',
       social_security_benefit: 'Social Security',
       american_indian_and_alaskan_native: "American Indian/Alaska Native income",
       employer_funded_disability: 'Employer-funded disability payments',

@@ -1751,7 +1751,6 @@
 			<xs:enumeration value="urn:openhbx:terms:v1:income#social_security_retirement"/>
 			<xs:enumeration value="urn:openhbx:terms:v1:income#supplemental_security_income"/>
 			<xs:enumeration value="urn:openhbx:terms:v1:income#tax_exempt_interest"/>
-			<xs:enumeration value="urn:openhbx:terms:v1:income#unemployment_insurance"/>
 			<xs:enumeration value="urn:openhbx:terms:v1:income#wages_and_salaries"/>
 			<xs:enumeration value="urn:openhbx:terms:v1:income#income_from_irs"/>
 			<xs:enumeration value="urn:openhbx:terms:v1:income#title_monthly"/>
@@ -2334,7 +2333,6 @@
 			<xs:enumeration value="urn:openhbx:terms:v1:financial_assistance_income#social_security_benefit"/>
 			<xs:enumeration value="urn:openhbx:terms:v1:financial_assistance_income#supplemental_security_income"/>
 			<xs:enumeration value="urn:openhbx:terms:v1:financial_assistance_income#tax_exempt_interest"/>
-			<xs:enumeration value="urn:openhbx:terms:v1:financial_assistance_income#unemployment_insurance"/>
 			<xs:enumeration value="urn:openhbx:terms:v1:financial_assistance_income#wages_and_salaries"/>
 			<xs:enumeration value="urn:openhbx:terms:v1:financial_assistance_income#income_from_irs"/>
 		</xs:restriction>
