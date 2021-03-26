@@ -422,6 +422,14 @@ And(/I select a plan on plan shopping page/) do
    find_all('.plan-select')[0].click
 end
 
+And(/^I click confirm on the plan selection page for (.*)$/) do |named_person|
+  find('.interaction-choice-control-value-terms-check-thank-you').click
+  person = people[named_person]
+  fill_in 'first_name_thank_you', :with => (person[:first_name])
+  fill_in 'last_name_thank_you', :with => (person[:last_name])
+  click_link "Confirm"
+end
+
 And(/I select a non silver plan on plan shopping page/) do
   find(:xpath, '//*[@id="ivl_plans"]/div[1]/div/div[5]/div[3]/a[1]').click
 end

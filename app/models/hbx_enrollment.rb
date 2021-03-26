@@ -514,7 +514,7 @@ class HbxEnrollment
     enrollments = family.active_household.hbx_enrollments.where(
       {:coverage_kind => coverage_kind,
        :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES + ['auto_renewing', 'renewing_coverage_selected']),
-       :effective_on.gte => new_effective_on,
+       :effective_on => { "$gte" => new_effective_on, "$lte" => new_effective_on.end_of_year },
        :kind => kind}
     )
     return true if enrollments.empty?
