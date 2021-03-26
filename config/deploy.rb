@@ -1,7 +1,7 @@
 # config valid only for current version of Capistrano
 lock '~> 3.11.0'
 
-set :application, 'enroll'
+set :application, 'trunk'
 set :repo_url, 'https://github.com/ideacrew/enroll.git'
 
 # Default branch is :master
