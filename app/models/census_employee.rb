@@ -207,7 +207,7 @@ class CensusEmployee < CensusMember
     )
     enrolled_ce_ids = ces_with_hbx_enrollments.select do |ce|
       if [ce.active_benefit_group_assignment, ce.active_benefit_group_assignment&.hbx_enrollment_id].all?
-        HbxEnrollment::WAIVED_STATUSES.include?(ce.active_benefit_group_assignment.hbx_enrollment.aasm_state)
+        HbxEnrollment::WAIVED_STATUSES.include?(ce.active_benefit_group_assignment.hbx_enrollment&.aasm_state)
       elsif ce.employee_role
         HbxEnrollment.where(employee_role_id: ce.employee_role.id, :aasm_state.in => HbxEnrollment::WAIVED_STATUSES).present?
       end
@@ -973,7 +973,7 @@ class CensusEmployee < CensusMember
   end
 
   def newhire_enrollment_eligible?
-    active_benefit_group_assignment.present?
+    active_benefit_group_assignment.present? && active_benefit_group_assignment.initialized?
   end
 
   # Deprecated in Main app

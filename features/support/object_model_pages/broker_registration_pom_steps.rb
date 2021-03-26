@@ -18,9 +18,11 @@ When(/Primary Broker enters personal information POM/) do
 end
 
 And(/Primary Broker enters broker agency information POM/) do
+  # There are a few market kinds
+  # maybe make this flexible
   fill_in BrokerRegistration.legal_name, with: "Broker test pom"
   fill_in BrokerRegistration.dba, with: "Broker test"
-  select "Individual & Family Marketplace ONLY", from: BrokerRegistration.practice_area_dropdown
+  select "Both – Individual & Family AND Small Business Marketplaces", from: BrokerRegistration.practice_area_dropdown
   select "English", from: BrokerRegistration.select_languages
   find(BrokerRegistration.accept_new_client_checkbox).click
   fill_in BrokerRegistration.address, with: "123 test"
@@ -36,4 +38,8 @@ end
 Then(/Primary Broker should see the registration submitted successful message/) do
   sleep 10
   expect(page).to have_content(BrokerRegistration.registration_submitted_succesful_message)
+end
+
+And(/HBX Admin clicks the Approve Broker button POM$/) do
+  find(BrokerAgencyStaffRegistration.approve_broker_btn).click
 end

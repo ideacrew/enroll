@@ -268,7 +268,7 @@ module FinancialAssistance
     validate :strictly_boolean
 
     validates :tax_filer_kind,
-              inclusion: { in: TAX_FILER_KINDS, message: "%<value> is not a valid tax filer kind" },
+              inclusion: { in: TAX_FILER_KINDS, message: "%{value} is not a valid tax filer kind" },
               allow_blank: true
 
     alias is_medicare_eligible? is_medicare_eligible
