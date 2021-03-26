@@ -192,7 +192,7 @@ registry:
           - key: :privacy_url
             item: "https://www.dchealthlink.com/privacy"
           - key: :privacy_act_statement
-            item: ""https://www.dchealthlink.com/privacy-act-statement""
+            item: "https://www.dchealthlink.com/privacy-act-statement"
       - key: :pay_now_functionality
         item: "kaiser_enabled"
         is_enabled: true
@@ -269,5 +269,5 @@ registry:
         is_enabled: true
       - key: :display_cost_warning_message
         is_enabled: false
-      - key: employee_datable_waiver_bulk_actions
+      - key: :employee_datable_waiver_bulk_actions
         is_enabled: false
