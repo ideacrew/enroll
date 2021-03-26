@@ -158,25 +158,25 @@ registry:
           - key: :staging_tax_info_url
             item: "https://staging.dchealthlink.com/individuals/tax-documents"
           - key: :statewide_area
-            item: "DC Metro"
+            item: "Maine"
           - key: :exchange_name
-            item: "Washington DC Health Benefit Exchange"
+            item: "Cover ME Health Benefit Exchange"
           - key: :social_media
             item:
           - key: :state_long_title
-            item: "the District of Columbia"
+            item: "the state of Maine"
           - key: :state_dmv_link
-            item: "https://dmv.dc.gov/page/proof-dc-residency-certifications"
+            item: "https://www.maine.gov/sos/bmv/"
           - key: :health_benefit_exchange_authority_phone_number
-            item: '(202) 715-7576'
+            item: '1-800-965-7476'
           - key: :contact_center_name
-            item: "DC Health Link's Customer Care Center"
+            item: "Maine Cover ME's Customer Care Center"
           - key: :contact_center_po_box
             item: "PO Box 97022"
           - key: :contact_center_state_and_city
-            item: "Washington, DC"
+            item: "Augusta, ME"
           - key: :contact_center_zip_code
-            item: "20026"
+            item: "04330"
           - key: :contact_center_email_address
             item: "smallbusiness@coverme.gov"
           - key: :contact_center_short_number
