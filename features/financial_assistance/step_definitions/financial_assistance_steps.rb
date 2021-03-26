@@ -446,3 +446,7 @@ end
 Then(/^user should land on full application page and should see 2 view my applications buttons$/) do
   expect(page).to have_css('.interaction-click-control-view-my-applications', count: 2)
 end
+
+And(/^user should see Medicaid eligibility question$/) do
+  expect(page).to have_content("Medicaid eligibility")
+end

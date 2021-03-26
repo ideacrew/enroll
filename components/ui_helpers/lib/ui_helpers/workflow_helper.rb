@@ -77,6 +77,23 @@ module UIHelpers
       end
     end
 
+    # Edit state abbreviation placeholder
+    def state_abbreviation_text(text)
+      if text.include? '<state-abbreviation-placeholder>'
+        text.sub! '<state-abbreviation-placeholder>', aca_state_abbreviation
+      else
+        text
+      end
+    end
+
+    def translation_placeholder_text(text)
+      if text.include? '<medicaid-question-translation-placeholder>'
+        text.sub! '<medicaid-question-translation-placeholder>', state_abbreviation_text(l10n("faa.medicaid_question"))
+      else
+        text
+      end
+    end
+
     # set YAML text placeholders
     def set_text_placeholders(text) # rubocop:disable Naming/AccessorMethodName
       return "" if text.nil?

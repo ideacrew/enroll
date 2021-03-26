@@ -35,3 +35,4 @@ Feature: My Financial Assistance Applications page that visit the Review Applica
     And the “Review Application” link will be actionable
     And clicks the “Review Application” link
     Then the user will navigate to the Review Application page
+    Then user should see Medicaid eligibility question
