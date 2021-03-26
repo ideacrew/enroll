@@ -70,7 +70,7 @@ module BenefitSponsors
         "Went to an association directly",
         "Added/changed broker that does not work with #{EnrollRegistry[:enroll_app].setting(:short_name).item}",
         "Company is no longer offering insurance",
-        "Company moved out of #{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item}",
+        "Company moved out of #{EnrollRegistry[:enroll_app].setting(:statewide_area).item}",
         "Other"
       ].freeze
 
