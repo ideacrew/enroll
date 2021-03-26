@@ -153,11 +153,26 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
       expect(application.active_applicants.where(id: applicant2.id).first).to be_nil
     end
 
+    it "should not destroy the primary applicant" do
+      expect(applicant.is_primary_applicant).to eq true
+      delete :destroy, params: { application_id: application.id, id: applicant.id }
+      application.reload
+      expect(application.active_applicants.where(id: applicant.id).first).to eq applicant
+    end
+
     it "should destroy the dependent" do
       expect(family.family_members.active.count).to eq 2
       delete :destroy, params: { application_id: application.id, id: applicant2.id }
       family.reload
       expect(family.family_members.active.count).to eq 1
+    end
+
+    it "should destroy the primary dependent" do
+      expect(applicant.is_primary_applicant).to eq true
+      expect(family.family_members.active.count).to eq 2
+      delete :destroy, params: { application_id: application.id, id: applicant.id }
+      family.reload
+      expect(family.family_members.active.count).to eq 2
     end
   end
 
