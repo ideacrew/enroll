@@ -129,18 +129,18 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
                         family_member_id: BSON::ObjectId.new)
     end
 
-    context 'other questions filled out with blind attestiation' do      
+    context 'other questions filled out with blind attestiation' do
       it 'should return true' do
         expect(applicant.other_questions_complete?).to eq(true)
       end
     end
 
-    context 'other questions not filled out with blind attestiation' do  
-      
+    context 'other questions not filled out with blind attestiation' do
+
       before do
         applicant.is_self_attested_blind = nil
       end
-      
+
       it 'should return false' do
         expect(applicant.other_questions_complete?).to eq(false)
       end
