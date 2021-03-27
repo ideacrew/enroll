@@ -1,12 +1,13 @@
 require 'active_support/concern'
 
+  # SSN
   module Ssn
     extend ActiveSupport::Concern
 
     included do
       
       validates :ssn,
-        length: { minimum: 9, maximum: 9, message: "SSN must be 9 digits" },
+        length: { minimum: 9, maximum: 9, message: "must have 9 digits" },
         allow_blank: true,
         numericality: true
 
