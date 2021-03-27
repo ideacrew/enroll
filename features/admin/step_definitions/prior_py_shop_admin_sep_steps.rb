@@ -1,18 +1,20 @@
-Then(/.+ see enrollments generated in prior year and current year for (.*)/)do |named_person|
+# frozen_string_literal: true
+
+Then(/.+ see enrollments generated in prior year and current year for (.*)/) do |named_person|
   person = people[named_person]
   person_record = Person.where(first_name: person[:first_name], last_name: person[:last_name]).last
   family = person_record.primary_family
   expect(family.hbx_enrollments.count).to eq 2
 end
 
-Then(/.+ see enrollments generated only in prior year for (.*)/)do |named_person|
+Then(/.+ see enrollments generated only in prior year for (.*)/) do |named_person|
   person = people[named_person]
   person_record = Person.where(first_name: person[:first_name], last_name: person[:last_name]).last
   family = person_record.primary_family
   expect(family.hbx_enrollments.count).to eq 1
 end
 
-Then(/.+ see enrollments generated only in terminated py for (.*)/)do |named_person|
+Then(/.+ see enrollments generated only in terminated py for (.*)/) do |named_person|
   person = people[named_person]
   person_record = Person.where(first_name: person[:first_name], last_name: person[:last_name]).last
   family = person_record.primary_family
@@ -21,7 +23,7 @@ Then(/.+ see enrollments generated only in terminated py for (.*)/)do |named_per
   expect(effective_on_states).to match_array(["coverage_terminated", "coverage_terminated"])
 end
 
-Then(/.+ enrollments generated expired, active and renewing py for (.*)/)do |named_person|
+Then(/.+ enrollments generated expired, active and renewing py for (.*)/) do |named_person|
   person = people[named_person]
   person_record = Person.where(first_name: person[:first_name], last_name: person[:last_name]).last
   family = person_record.primary_family
@@ -30,7 +32,7 @@ Then(/.+ enrollments generated expired, active and renewing py for (.*)/)do |nam
   expect(effective_on_states).to match_array(["coverage_expired", "coverage_enrolled", "auto_renewing"])
 end
 
-Then(/.+ see enrollments generated in prior and current year, with active one canceled for (.*)/)do |named_person|
+Then(/.+ see enrollments generated in prior and current year, with active one canceled for (.*)/) do |named_person|
   person = people[named_person]
   person_record = Person.where(first_name: person[:first_name], last_name: person[:last_name]).last
   family = person_record.primary_family
@@ -39,7 +41,7 @@ Then(/.+ see enrollments generated in prior and current year, with active one ca
   expect(effective_on_states).to match_array(["coverage_canceled", "coverage_expired", "coverage_enrolled"])
 end
 
-Then(/.+ see enrollments generated in expired and active py, with existing active enr canceled and expired enr terminated for (.*)/)do |named_person|
+Then(/.+ see enrollments generated in expired and active py, with existing active enr canceled and expired enr terminated for (.*)/) do |named_person|
   person = people[named_person]
   person_record = Person.where(first_name: person[:first_name], last_name: person[:last_name]).last
   family = person_record.primary_family
@@ -48,7 +50,7 @@ Then(/.+ see enrollments generated in expired and active py, with existing activ
   expect(effective_on_states).to match_array(["coverage_canceled", "coverage_enrolled", "coverage_expired", "coverage_terminated"])
 end
 
-Then(/.+ see enrollments generated expired, active and renewing py with existing active enr canceled and expired enr terminated for (.*)/)do |named_person|
+Then(/.+ see enrollments generated expired, active and renewing py with existing active enr canceled and expired enr terminated for (.*)/) do |named_person|
   person = people[named_person]
   person_record = Person.where(first_name: person[:first_name], last_name: person[:last_name]).last
   family = person_record.primary_family
@@ -57,7 +59,7 @@ Then(/.+ see enrollments generated expired, active and renewing py with existing
   expect(effective_on_states).to match_array(["coverage_canceled", "coverage_terminated", "coverage_expired", "coverage_enrolled", "auto_renewing"])
 end
 
-Then(/.+ see enrollments generated expired, active and renewing py with existing active and renewal enr canceled and expired enr terminated for (.*)/)do |named_person|
+Then(/.+ see enrollments generated expired, active and renewing py with existing active and renewal enr canceled and expired enr terminated for (.*)/) do |named_person|
   person = people[named_person]
   person_record = Person.where(first_name: person[:first_name], last_name: person[:last_name]).last
   family = person_record.primary_family
@@ -66,7 +68,7 @@ Then(/.+ see enrollments generated expired, active and renewing py with existing
   expect(effective_on_states).to match_array(["coverage_canceled", "coverage_terminated", "coverage_canceled", "coverage_expired", "coverage_enrolled", "auto_renewing"])
 end
 
-Then(/.+ see enrollments generated only in expired py with existing expired enr terminated for (.*)/)do |named_person|
+Then(/.+ see enrollments generated only in expired py with existing expired enr terminated for (.*)/) do |named_person|
   person = people[named_person]
   person_record = Person.where(first_name: person[:first_name], last_name: person[:last_name]).last
   family = person_record.primary_family
@@ -75,7 +77,7 @@ Then(/.+ see enrollments generated only in expired py with existing expired enr 
   expect(effective_on_states).to match_array(["coverage_enrolled", "coverage_expired", "coverage_terminated"])
 end
 
-And(/employee (.*) has employer sponsored enrollment in active py/)do |named_person|
+And(/employee (.*) has employer sponsored enrollment in active py/) do |named_person|
   person = people[named_person]
   person_record = Person.where(first_name: person[:first_name], last_name: person[:last_name]).last
   employee_role = person_record.active_employee_roles.first
@@ -84,7 +86,7 @@ And(/employee (.*) has employer sponsored enrollment in active py/)do |named_per
   create_health_enrollment_for_employee(employee_role, benefit_package, sponsored_benefit, 'coverage_enrolled')
 end
 
-And(/employee (.*) has employer sponsored enrollment in expired, active and renewal py/)do |named_person|
+And(/employee (.*) has employer sponsored enrollment in expired, active and renewal py/) do |named_person|
   person = people[named_person]
   person_record = Person.where(first_name: person[:first_name], last_name: person[:last_name]).last
   employee_role = person_record.active_employee_roles.first
@@ -99,7 +101,7 @@ And(/employee (.*) has employer sponsored enrollment in expired, active and rene
   create_health_enrollment_for_employee(employee_role, renewal_benefit_package, renewal_sponsored_benefit, 'auto_renewing')
 end
 
-And(/employee (.*) has employer sponsored enrollment in active and expired py/)do |named_person|
+And(/employee (.*) has employer sponsored enrollment in active and expired py/) do |named_person|
   person = people[named_person]
   person_record = Person.where(first_name: person[:first_name], last_name: person[:last_name]).last
   employee_role = person_record.active_employee_roles.first
@@ -111,7 +113,7 @@ And(/employee (.*) has employer sponsored enrollment in active and expired py/)d
   create_health_enrollment_for_employee(employee_role, expired_benefit_package, expired_sponsored_benefit, 'coverage_expired')
 end
 
-And(/employee (.*) has employer sponsored enrollment in terminated py/)do |named_person|
+And(/employee (.*) has employer sponsored enrollment in terminated py/) do |named_person|
   person = people[named_person]
   person_record = Person.where(first_name: person[:first_name], last_name: person[:last_name]).last
   employee_role = person_record.active_employee_roles.first
