@@ -692,6 +692,8 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
                         is_applying_coverage: true,
                         is_primary_applicant: true,
                         is_pregnant: false,
+                        has_unemployment_income: false,
+                        is_physically_disabled: false,
                         is_post_partum_period: false,
                         is_self_attested_blind: true,
                         has_daily_living_help: true,
