@@ -300,7 +300,7 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
     subject.call(product_selection)
     family.reload
     enrollments = family.hbx_enrollments.sort_by(&:effective_on)
-    expect(enrollments.length).to eq 5
+    expect(enrollments.length).to eq 6
     expect(enrollments.pluck(:aasm_state)).to include('auto_renewing')
     renewal_enrollment = enrollments.select{|enr| enr.aasm_state == 'auto_renewing'}.last
     renewal_start_date = renewal_enrollment.effective_on
