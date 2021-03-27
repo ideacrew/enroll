@@ -247,7 +247,7 @@ module FinancialAssistance
 
     field :workflow, type: Hash, default: { }
 
-    embeds_many :verification_types, class_name: "::FinancialAssistance::VerificationType"#, cascade_callbacks: true, validate: true
+    embeds_many :verification_types, class_name: "::FinancialAssistance::VerificationType" #, cascade_callbacks: true, validate: true
     embeds_many :incomes,     class_name: "::FinancialAssistance::Income"
     embeds_many :deductions,  class_name: "::FinancialAssistance::Deduction"
     embeds_many :benefits,    class_name: "::FinancialAssistance::Benefit"
@@ -279,6 +279,7 @@ module FinancialAssistance
     alias is_joint_tax_filing? is_joint_tax_filing
 
     attr_accessor :relationship
+
     # attr_writer :us_citizen, :naturalized_citizen, :indian_tribe_member, :eligible_immigration_status
 
     before_save :generate_hbx_id
@@ -338,9 +339,7 @@ module FinancialAssistance
     end
 
     def self.encrypt_ssn(val)
-      if val.blank?
-        return nil
-      end
+      return nil if val.blank?
       ssn_val = val.to_s.gsub(/\D/, '')
       SymmetricEncryption.encrypt(ssn_val)
     end
@@ -599,7 +598,6 @@ module FinancialAssistance
       person.is_tobacco_user || "unknown"
     end
 
-
     def eligibility_determination=(eg)
       self.eligibility_determination_id = eg.id
     end
@@ -636,11 +634,11 @@ module FinancialAssistance
 
     def applicant_validation_complete?
       if is_applying_coverage
-      valid?(:submission) &&
-        incomes.all? {|income| income.valid? :submission} &&
-        benefits.all? {|benefit| benefit.valid? :submission} &&
-        deductions.all? {|deduction| deduction.valid? :submission} &&
-        other_questions_complete?
+        valid?(:submission) &&
+          incomes.all? {|income| income.valid? :submission} &&
+          benefits.all? {|benefit| benefit.valid? :submission} &&
+          deductions.all? {|deduction| deduction.valid? :submission} &&
+          other_questions_complete?
       else
         valid?(:submission) &&
           incomes.all? {|income| income.valid? :submission} &&
@@ -759,9 +757,10 @@ module FinancialAssistance
     end
 
     def admin_verification_action(action, v_type, update_reason)
-      if action == "verify"
+      case action
+      when "verify"
         update_verification_type(v_type, update_reason)
-      elsif action == "return_for_deficiency"
+      when "return_for_deficiency"
         return_doc_for_deficiency(v_type, update_reason)
       end
     end
@@ -870,11 +869,11 @@ module FinancialAssistance
 
     def attributes_for_export
       applicant_params = attributes.transform_keys(&:to_sym).slice(:family_member_id,:person_hbx_id,:name_pfx,:first_name,:middle_name,:last_name,:name_sfx,
-                                          :gender,:is_incarcerated,:is_disabled,:ethnicity,:race,:tribal_id,:language_code,:no_dc_address,:is_homeless,
-                                          :is_temporarily_out_of_state,:no_ssn,:citizen_status,:is_consumer_role,:vlp_document_id,:is_applying_coverage,
-                                          :vlp_subject,:alien_number,:i94_number,:visa_number,:passport_number,:sevis_id,:naturalization_number,
-                                          :receipt_number,:citizenship_number,:card_number,:country_of_citizenship, :issuing_country,:status,
-                                          :indian_tribe_member, :same_with_primary,:vlp_description)
+                                                                   :gender,:is_incarcerated,:is_disabled,:ethnicity,:race,:tribal_id,:language_code,:no_dc_address,:is_homeless,
+                                                                   :is_temporarily_out_of_state,:no_ssn,:citizen_status,:is_consumer_role,:vlp_document_id,:is_applying_coverage,
+                                                                   :vlp_subject,:alien_number,:i94_number,:visa_number,:passport_number,:sevis_id,:naturalization_number,
+                                                                   :receipt_number,:citizenship_number,:card_number,:country_of_citizenship, :issuing_country,:status,
+                                                                   :indian_tribe_member, :same_with_primary,:vlp_description)
       applicant_params.merge!({dob: dob.strftime('%d/%m/%Y'), ssn: ssn, relationship: relation_with_primary})
       applicant_params.merge!(expiration_date: expiration_date.strftime('%d/%m/%Y')) if expiration_date.present?
       applicant_params[:addresses] = construct_association_fields(addresses)
@@ -934,7 +933,7 @@ module FinancialAssistance
         next if [:has_enrolled_health_coverage, :has_eligible_health_coverage].include?(attribute) && !is_applying_coverage
 
         instance_type = attribute.to_s.gsub('has_', '')
-        instance_check_method = instance_type + "_exists?"
+        instance_check_method = "#{instance_type}_exists?"
 
         # Add error to attribute that has a nil value.
         errors.add(attribute, "#{attribute.to_s.titleize} can not be a nil") if send(attribute).nil?
@@ -964,44 +963,7 @@ module FinancialAssistance
     end
 
     def presence_of_attr_other_qns # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity TODO: Remove this
-      return true
-      if is_pregnant
-        errors.add(:pregnancy_due_on, "' Pregnancy Due date' should be answered if you are pregnant") if pregnancy_due_on.blank?
-        errors.add(:children_expected_count, "' How many children is this person expecting?' should be answered") if children_expected_count.blank?
-      # Nil or "" means unanswered, true/or false boolean will be passed through
-      elsif is_post_partum_period.nil? || is_post_partum_period == ""
-        # Even if they aren't pregnant, still need to ask if they were pregnant within the last 60 days
-        errors.add(:is_post_partum_period, "' Was this person pregnant in the last 60 days?' should be answered")
-      end
-      # If they're in post partum period, they need to tell us if they were on medicaid and when the pregnancy ended
-      if is_post_partum_period.present?
-        # Enrolled on medicaid must check if nil
-        errors.add(:is_enrolled_on_medicaid, "' Was this person on Medicaid during pregnancy?' should be answered") if is_enrolled_on_medicaid.nil?
-        errors.add(:pregnancy_end_on, "' Pregnancy End on date' should be answered") if pregnancy_end_on.blank?
-      end
-
-      return unless is_applying_coverage
-
-      if age_of_applicant > 18 && age_of_applicant < 26
-        errors.add(:is_former_foster_care, "' Was this person in foster care at age 18 or older?' should be answered") if is_former_foster_care.nil?
-
-        if is_former_foster_care
-          errors.add(:foster_care_us_state, "' Where was this person in foster care?' should be answered") if foster_care_us_state.blank?
-          errors.add(:age_left_foster_care, "' How old was this person when they left foster care?' should be answered") if age_left_foster_care.nil?
-        end
-      end
-
-      if is_student
-        errors.add(:student_kind, "' What is the type of student?' should be answered") if student_kind.blank?
-        errors.add(:student_status_end_on, "' Student status end on date?'  should be answered") if student_status_end_on.blank?
-        errors.add(:student_school_kind, "' What type of school do you go to?' should be answered") if student_school_kind.blank?
-      end
-
-      errors.add(:is_student, "' Is this person a student?' should be answered") if age_of_applicant.between?(18,19) && is_student.nil?
-      # TODO: Decide if these validations should be ended?
-      # errors.add(:claimed_as_tax_dependent_by, "' This person will be claimed as a dependent by' can't be blank") if is_claimed_as_tax_dependent && claimed_as_tax_dependent_by.nil?
-
-      # errors.add(:is_required_to_file_taxes, "' is_required_to_file_taxes can't be blank") if is_required_to_file_taxes.nil?
+      true
     end
 
     def age_of_applicant
