@@ -4,13 +4,13 @@
 module ConsumerWorld
   def create_or_return_named_consumer(named_person)
     person = people[named_person]
-    person_rec = Person.where(first_name: person[:first_name], last_name: person[:last_name]).first || FactoryBot.create(:person,
+    @person_rec = Person.where(first_name: person[:first_name], last_name: person[:last_name]).first || FactoryBot.create(:person,
                                                                                                                          :with_family,
                                                                                                                          first_name: person[:first_name],
                                                                                                                          last_name: person[:last_name])
-    FactoryBot.create(:consumer_role, person: person_rec) unless person_rec.consumer_role.present?
-    FactoryBot.create(:user, :consumer, person: person_rec) unless User.all.detect { |person_user| person_user.person == person_rec }
-    person_rec
+    FactoryBot.create(:consumer_role, person: @person_rec) unless @person_rec.consumer_role.present?
+    FactoryBot.create(:user, :consumer, person: @person_rec) unless User.all.detect { |person_user| person_user.person == @person_rec }
+    @person_rec
   end
 
   def consumer_with_verified_identity(named_person)

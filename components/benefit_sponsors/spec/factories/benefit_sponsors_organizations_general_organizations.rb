@@ -88,7 +88,7 @@ FactoryBot.define do
       end
     end
 
-    
+
     trait :with_aca_shop_dc_employer_profile_expired_application do
       with_aca_shop_dc_employer_profile
       after :build do |organization, _evaluator|
