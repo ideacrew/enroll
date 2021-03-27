@@ -173,7 +173,7 @@ When(/^they answer yes to was this person pregnant in the last (\d+) days questi
 end
 
 Then(/^pregnancy end date question should display$/) do
-  expect(page).to have_content('Pregnancy end on date')
+  expect(page).to have_content('Pregnancy end date')
 end
 
 Then(/^the is this person a student question should display$/) do
