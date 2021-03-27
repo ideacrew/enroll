@@ -677,6 +677,7 @@ module FinancialAssistance
       questions_array << is_post_partum_period  unless is_pregnant
       questions_array << has_unemployment_income if FinancialAssistanceRegistry[:unemployment_income].enabled?
       questions_array << pregnancy_due_on << children_expected_count if is_pregnant
+      questions_array << pregnancy_end_on << is_enrolled_on_medicaid if is_post_partum_period
 
       (other_questions_answers << questions_array).flatten.include?(nil) ? false : true
     end
