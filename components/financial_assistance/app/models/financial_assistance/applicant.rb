@@ -670,7 +670,7 @@ module FinancialAssistance
 
       questions_array << is_former_foster_care  if foster_age_satisfied? && is_applying_coverage
       questions_array << is_post_partum_period  unless is_pregnant
-
+      
       (other_questions_answers << questions_array).flatten.include?(nil) ? false : true
     end
 
@@ -894,7 +894,7 @@ module FinancialAssistance
 
     def other_questions_answers
       if is_applying_coverage
-        [:has_daily_living_help, :need_help_paying_bills, :is_ssn_applied].inject([]) do |array, question|
+        [:is_self_attested_blind, :has_daily_living_help, :need_help_paying_bills, :is_ssn_applied].inject([]) do |array, question|
           no_ssn_flag = no_ssn
 
           array << send(question) if question != :is_ssn_applied || (question == :is_ssn_applied && no_ssn_flag == '1')

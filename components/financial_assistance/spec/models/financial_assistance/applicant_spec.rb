@@ -104,5 +104,48 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         expect(applicant.enrolled_or_eligible_in_any_medicare?).to eq(false)
       end
     end
+
+    context 'other questions not filled out with blind attestiation' do
+      it 'should return false' do
+        expect(applicant.other_questions_complete?).to eq(false)
+      end
+    end
+
   end
+
+  context 'other questions' do
+    let!(:applicant) do
+      FactoryBot.create(:applicant,
+                        application: application,
+                        dob: Date.today - 40.years,
+                        is_applying_coverage: true,
+                        is_primary_applicant: true,
+                        is_pregnant: false,
+                        is_post_partum_period: false,
+                        is_self_attested_blind: true,
+                        has_daily_living_help: true,
+                        need_help_paying_bills: true,
+                        is_ssn_applied: true,
+                        family_member_id: BSON::ObjectId.new)
+    end
+
+    context 'other questions filled out with blind attestiation' do      
+      it 'should return true' do
+        expect(applicant.other_questions_complete?).to eq(true)
+      end
+    end
+
+    context 'other questions not filled out with blind attestiation' do  
+      
+      before do
+        applicant.is_self_attested_blind = nil
+      end
+      
+      it 'should return false' do
+        expect(applicant.other_questions_complete?).to eq(false)
+      end
+    end
+
+  end
+
 end
