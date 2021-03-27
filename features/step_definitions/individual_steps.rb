@@ -85,6 +85,11 @@ Then(/^.+ should see heading labeled personal information/) do
   expect(page).to have_css("#gender-tooltip")
 end
 
+Then(/^.+ should see disabled ssn & dob fields/) do
+  expect(page.find("#person_ssn")[:disabled]).to eq "true"
+  expect(page.find("input[name='jq_datepicker_ignore_person[dob]'")[:disabled]).to eq "true"
+end
+
 Then(/Individual should click on Individual market for plan shopping/) do
   wait_for_ajax
   expect(page).to have_button("CONTINUE", visible: false)
