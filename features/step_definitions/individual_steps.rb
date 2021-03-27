@@ -447,7 +447,7 @@ And(/I click on purchase button on confirmation page/) do
   click_link "Confirm"
 end
 
-And(/the individual clicks on the Continue button to go to the Individual home page/) do
+And(/^.+ clicks on the Continue button to go to the Individual home page/) do
   if page.has_link?('CONTINUE')
     click_link "CONTINUE"
   else

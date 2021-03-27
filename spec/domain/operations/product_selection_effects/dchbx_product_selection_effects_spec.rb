@@ -152,6 +152,7 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
   it "does creates a continuous enrollment for future coverage period after purchase" do
     subject
     allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_sep).and_return(true)
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
     subject.call(product_selection)
     family.reload
     enrollments = family.hbx_enrollments.sort_by(&:effective_on)
@@ -186,6 +187,7 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
   it "does not create a continuous enrollment for future coverage period after purchase" do
     subject
     allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_sep).and_return(true)
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
     subject.call(product_selection)
     family.reload
     enrollments = family.hbx_enrollments.sort_by(&:effective_on)
@@ -218,6 +220,7 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
   it 'the current coverage gets canceled and new enrollment gets generated for current coverage year' do
     subject
     allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_sep).and_return(true)
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
     subject.call(product_selection)
     family.reload
     enrollments = family.hbx_enrollments.sort_by(&:effective_on)
@@ -257,6 +260,7 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
     subject
     prior_ivl_enrollment.generate_hbx_signature
     allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_sep).and_return(true)
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
     subject.call(product_selection)
     family.reload
     enrollments = family.hbx_enrollments.sort_by(&:effective_on)
@@ -300,7 +304,7 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
     subject.call(product_selection)
     family.reload
     enrollments = family.hbx_enrollments.sort_by(&:effective_on)
-    expect(enrollments.length).to eq 5
+    expect(enrollments.length).to eq 6
     expect(enrollments.pluck(:aasm_state)).to include('auto_renewing')
     renewal_enrollment = enrollments.select{|enr| enr.aasm_state == 'auto_renewing'}.last
     renewal_start_date = renewal_enrollment.effective_on

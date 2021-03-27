@@ -19,6 +19,8 @@ Feature: IVL consumer or Admin adding a SEP which falls in prior plan year,
     When a SEP is added with a prior year effective date
     And Coverage renewal flag is unchecked
     And a SEP is submitted
+    Then confirmation popup is visible
+    When Admin clicks confirm on popup
     Then I see a SEP success message for Patrick Doe
     When I click the name of Patrick Doe from family list
     And I click on Shop For Plans banner button
@@ -26,7 +28,7 @@ Feature: IVL consumer or Admin adding a SEP which falls in prior plan year,
     And I should not see any plan which premium is 0
     And I select a plan on plan shopping page
     And I click confirm on the plan selection page for Patrick Doe
-    And I click on continue button to go to the individual home page
+    And I clicks on the Continue button to go to the Individual home page
     Then I see enrollments generated in prior year and current year
 
 
@@ -41,6 +43,8 @@ Feature: IVL consumer or Admin adding a SEP which falls in prior plan year,
     When a SEP is added with a prior year effective date
     And Coverage renewal flag is checked
     And a SEP is submitted
+    Then confirmation popup is visible
+    When Admin clicks confirm on popup
     Then I see a SEP success message for Patrick Doe
     When I click the name of Patrick Doe from family list
     And I click on Shop For Plans banner button
@@ -48,7 +52,7 @@ Feature: IVL consumer or Admin adding a SEP which falls in prior plan year,
     And I should not see any plan which premium is 0
     And I select a plan on plan shopping page
     And I click confirm on the plan selection page for Patrick Doe
-    And I click on continue button to go to the individual home page
+    And I clicks on the Continue button to go to the Individual home page
     Then I see enrollment generated only in prior year
 
   Scenario: Hbx Admin adding IVL sep in prior plan year for consumer with active
@@ -62,6 +66,8 @@ Feature: IVL consumer or Admin adding a SEP which falls in prior plan year,
     When a SEP is added with a prior year effective date
     And Coverage renewal flag is unchecked
     And a SEP is submitted
+    Then confirmation popup is visible
+    When Admin clicks confirm on popup
     Then I see a SEP success message for Patrick Doe
     When I click the name of Patrick Doe from family list
     And I click on Shop For Plans banner button
@@ -69,7 +75,7 @@ Feature: IVL consumer or Admin adding a SEP which falls in prior plan year,
     And I should not see any plan which premium is 0
     And I select a plan on plan shopping page
     And I click confirm on the plan selection page for Patrick Doe
-    And I click on continue button to go to the individual home page
+    And I clicks on the Continue button to go to the Individual home page
     Then I see enrollments generated in prior and current year, with active one canceled
 
   Scenario: Hbx Admin adding IVL sep in prior plan year for consumer with prior year
@@ -83,6 +89,8 @@ Feature: IVL consumer or Admin adding a SEP which falls in prior plan year,
     When a SEP is added with a prior year effective date
     And Coverage renewal flag is unchecked
     And a SEP is submitted
+    Then confirmation popup is visible
+    When Admin clicks confirm on popup
     Then I see a SEP success message for Patrick Doe
     When I click the name of Patrick Doe from family list
     And I click on Shop For Plans banner button
@@ -90,7 +98,7 @@ Feature: IVL consumer or Admin adding a SEP which falls in prior plan year,
     And I should not see any plan which premium is 0
     And I select a plan on plan shopping page
     And I click confirm on the plan selection page for Patrick Doe
-    And I click on continue button to go to the individual home page
+    And I clicks on the Continue button to go to the Individual home page
     Then I see enrollments generated in prior and current year, with active enr canceled and expired enr terminated
 
   Scenario: Hbx Admin adding IVL sep in prior plan year for consumer with no
@@ -104,6 +112,8 @@ Feature: IVL consumer or Admin adding a SEP which falls in prior plan year,
     When a SEP is added with a prior year effective date
     And Coverage renewal flag is unchecked
     And a SEP is submitted
+    Then confirmation popup is visible
+    When Admin clicks confirm on popup
     Then I see a SEP success message for Patrick Doe
     When I click the name of Patrick Doe from family list
     And I click on Shop For Plans banner button
@@ -111,7 +121,7 @@ Feature: IVL consumer or Admin adding a SEP which falls in prior plan year,
     And I should not see any plan which premium is 0
     And I select a plan on plan shopping page
     And I click confirm on the plan selection page for Patrick Doe
-    And I click on continue button to go to the individual home page
+    And I clicks on the Continue button to go to the Individual home page
     Then I see enrollments generated in prior, active and renewal plan years
 
 
@@ -126,6 +136,8 @@ Feature: IVL consumer or Admin adding a SEP which falls in prior plan year,
     When a SEP is added with a prior year effective date
     And Coverage renewal flag is unchecked
     And a SEP is submitted
+    Then confirmation popup is visible
+    When Admin clicks confirm on popup
     Then I see a SEP success message for Patrick Doe
     When I click the name of Patrick Doe from family list
     And I click on Shop For Plans banner button
@@ -133,5 +145,5 @@ Feature: IVL consumer or Admin adding a SEP which falls in prior plan year,
     And I should not see any plan which premium is 0
     And I select a plan on plan shopping page
     And I click confirm on the plan selection page for Patrick Doe
-    And I click on continue button to go to the individual home page
+    And I clicks on the Continue button to go to the Individual home page
     Then I see enrollments generated in prior, active and renewal plan years with renewal enrollments canceled
