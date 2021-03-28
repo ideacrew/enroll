@@ -6,6 +6,7 @@ RSpec.describe "insured/families/find_sep.html.erb", :dbclean => :around_each do
   let(:resident_role) { FactoryBot.create(:resident_role) }
 
   before do
+    allow(view).to receive(:is_under_open_enrollment?).and_return(false)
     qle1 = FactoryBot.create(:qualifying_life_event_kind, market_kind: 'individual')
     qle2 = FactoryBot.create(:qualifying_life_event_kind, market_kind: 'individual', title: 'I had a baby')
     sign_in current_user
