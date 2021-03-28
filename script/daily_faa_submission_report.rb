@@ -15,7 +15,7 @@ field_names = %w[Primary_HBX_ID
                  Full_Medicaid_Applied?
                  Blind
                  Disabled
-                 Help With Daily Living
+                 Help_With_Daily_Living
                  ]
 
 logger_field_names = %w[id Backtrace]
