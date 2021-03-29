@@ -66,7 +66,7 @@ module Config
     end
 
     def site_key
-      EnrollRegistry[:enroll_app].setting(:site_key).item
+      EnrollRegistry[:enroll_app].settings(:site_key).item
     end
 
     def site_domain_name

@@ -170,7 +170,7 @@ module BenefitSponsors
       end
 
       def is_dc_sponsor_profile?
-        is_sponsor_profile? && site_key == :dc
+        is_sponsor_profile? && EnrollRegistry[:enroll_app].settings(:site_key).item == :dc
       end
 
       def site

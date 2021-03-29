@@ -83,7 +83,7 @@ if (ENV["type"] != "fixtures") && missing_plan_dumps
   puts "*"*80
   puts "Loading carriers"
   require File.join(File.dirname(__FILE__),'seedfiles', "carriers_seed_#{Settings.aca.state_abbreviation.downcase}")
-  if Settings.site.key == :dc
+  if [:dc, :me].include?(EnrollRegistry[:enroll_app].settings(:site_key).item)
     ra_glob_pattern = File.join(Rails.root, "db/seedfiles/#{Settings.aca.state_abbreviation.downcase}/issuer_profiles_seed.rb")
     load ra_glob_pattern
     __send__("load_#{Settings.aca.state_abbreviation.downcase}_issuer_profile_seed")
@@ -150,7 +150,7 @@ if (ENV["type"] != "fixtures") && missing_plan_dumps
   puts "*"*80
   puts "Loading QLE kinds."
   require File.join(File.dirname(__FILE__),'seedfiles', 'qualifying_life_event_kinds_seed')
-  require File.join(File.dirname(__FILE__),'seedfiles', 'ivl_life_events_seed')   if Settings.site.key == :dc
+  require File.join(File.dirname(__FILE__),'seedfiles', 'ivl_life_events_seed') if is_individual_market_enabled?
   system "bundle exec rake update_seed:qualifying_life_event"
   puts "::: complete :::"
 

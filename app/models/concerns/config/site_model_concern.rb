@@ -13,7 +13,7 @@ module Config::SiteModelConcern
 
   class_methods do
     def site_short_name
-      Settings.site.short_name
+      EnrollRegistry[:enroll_app].settings(:site_key).item
     end
 
     def site_key
