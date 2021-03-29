@@ -40,8 +40,8 @@ gem 'financial_assistance', path: 'components/financial_assistance'
 gem "notifier",           path: "components/notifier"
 gem 'openhbx_cv2',        git:  'https://github.com/ideacrew/openhbx_cv2.git', branch: 'trunk'
 gem 'resource_registry',  git:  'https://github.com/ideacrew/resource_registry.git', branch: 'trunk'
+gem 'resque-bus',         git: "https://github.com/ideacrew/resque-bus.git"
 gem 'event_source',       git: "https://github.com/ideacrew/event_source.git", branch: "release_0.3.0"
-# gem 'event_source',       path: "../../HBX/event_source"
 # gem 'resource_registry',  git: '../resource_registry'
 
 gem "sponsored_benefits", path: "components/sponsored_benefits"
@@ -122,6 +122,10 @@ gem 'webpacker',                '~> 4.0.2'
 gem 'fast_jsonapi'
 gem 'loofah', '~> 2.3.1'
 gem 'stimulus_reflex', '~> 3.3'
+# gem 'queue-bus', path: "vendor/plugins/queue-bus"
+# gem 'resque-bus', path: "vendor/plugins/resque-bus"
+# gem 'event_source',       path: "vendor/plugins/event_source"
+
 group :doc do
   gem 'sdoc',                   '~> 1.0'
 end
@@ -160,6 +164,7 @@ group :development, :test do
   gem 'stimulus_reflex_testing'
   gem 'yard',                   '~> 0.9.20',  require: false
   gem 'yard-mongoid',           '~> 0.1',     require: false
+  gem 'pry-byebug'
 end
 
 group :test do
