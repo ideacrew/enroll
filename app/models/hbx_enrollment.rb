@@ -1039,7 +1039,6 @@ class HbxEnrollment
     ::Operations::HbxEnrollments::Reinstate.new.call({hbx_enrollment: self, options: {benefit_package: reinstated_package, notify: true}})
   end
 
-
   def enrollments_for(benefit_application)
     HbxEnrollment.where({ :sponsored_benefit_package_id.in => benefit_application.benefit_packages.pluck(:_id),
                           :coverage_kind => coverage_kind,
@@ -1047,7 +1046,7 @@ class HbxEnrollment
                           :aasm_state.in => HbxEnrollment::RENEWAL_STATUSES + ['renewing_waived'] + HbxEnrollment::ENROLLED_STATUSES + ['inactive'],
                           :effective_on.gte => benefit_application.start_on })
   end
-  
+
   def non_inactive_transition?
     !(aasm.from_state == :inactive && aasm.to_state == :inactive)
   end
