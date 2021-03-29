@@ -767,7 +767,7 @@ Then(/^\w+ should (.*) sucess confirmation text$/) do |action|
   if action == 'see'
     expect(page).to have_content "Based on the information you entered, you may be eligible to enroll now but there is limited time"
   else
-    expect(page).to have_content "The date you submitted does not qualify for special enrollment.\nPlease double check the date or contact #{Settings.site.short_name}'s Customer Care Center: 1-855-532-5465.\n\nShop for health and dental plans"
+    expect(page).to have_content "The date you submitted does not qualify for special enrollment.\nPlease double check the date or contact #{Settings.site.short_name}'s Customer Care Center: #{Settings.contact_center.phone_number}.\n\nShop for health and dental plans"
   end
 end
 

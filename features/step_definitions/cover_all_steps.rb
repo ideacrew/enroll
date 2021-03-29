@@ -7,7 +7,7 @@ Then(/^Hbx Admin should not see an New DC Resident Application link$/) do
 end
 
 Then(/^Hbx Admin should see a DC Resident Application link disabled$/) do
-  find_link('DC Resident Application')[:class].include?("blocking") == false
+  find_link( "#{Settings.aca.state_abbreviation} Resident Application")[:class].include?("blocking") == false
 end
 
 When(/^Hbx Admin clicks on New DC Resident Application link$/) do

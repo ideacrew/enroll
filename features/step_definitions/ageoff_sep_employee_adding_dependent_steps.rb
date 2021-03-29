@@ -41,7 +41,7 @@ When(/^.+ enters? the info of his dependent wife$/) do
   fill_in 'dependent[addresses][0][address_1]', with: '123 STREET'
   fill_in 'dependent[addresses][0][city]', with: 'WASHINGTON'
   find(:xpath, "//span[@class='label'][contains(., 'SELECT STATE')]").click
-  find(:xpath, "//li[@data-index='24'][contains(., 'MA')]").click
+  find(:xpath, "//li[@data-index='24'][contains(., Settings.site.state_abbreviation)]").click
   fill_in 'dependent[addresses][0][zip]', with: '01001'
 end
 
