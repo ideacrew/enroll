@@ -1518,7 +1518,7 @@ module BenefitSponsors
       end
     end
 
-   RSpec.describe 'aasm_state#cancel', type: :model, :dbclean => :after_each, :if => ::EnrollRegistry[:aca_shop_market].enabled? do
+    RSpec.describe 'aasm_state#cancel', type: :model, :dbclean => :after_each, :if => ::EnrollRegistry[:aca_shop_market].enabled? do
       include_context "setup benefit market with market catalogs and product packages"
       include_context "setup initial benefit application" do
         let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_month }
