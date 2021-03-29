@@ -56,6 +56,7 @@
                   type: 'dropdown'
                   name: ''
                   values:
+                    - private_individual_and_family_coverage
                     - acf_refugee_medical_assistance
                     - americorps_health_benefits
                     - child_health_insurance_plan
@@ -63,7 +64,6 @@
                     - medicare
                     - medicare_advantage
                     - medicare_part_b
-                    - private_individual_and_family_coverage
                     - state_supplementary_payment
                     - tricare
                     - veterans_benefits

@@ -77,3 +77,5 @@ Feature: Employer can view their employees
     When employer selects Patrick Doe employee on Employee Roster
     Then employer should see enrollment tile
     Then employer clicks logout
+
+

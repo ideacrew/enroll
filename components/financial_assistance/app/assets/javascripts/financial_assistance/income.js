@@ -34,7 +34,7 @@ function currentlyEditing() {
 
 document.addEventListener("turbolinks:load", function() {
   var faWindow = $('.incomes');
-  if ($('.incomes-list, .other-incomes-list').length) {
+  if ($('.incomes-list, .other-incomes-list, .unemployment-incomes').length) {
     $(faWindow).bind('beforeunload', function(e) {
       if (!currentlyEditing() || $('#unsavedIncomeChangesWarning:visible').length)
         return undefined;
@@ -73,7 +73,7 @@ document.addEventListener("turbolinks:load", function() {
     });
 
     /* Saving Responses to Other Income Driver Questions */
-    $('#has_other_income_true, #has_other_income_false').on('change', function(e) {
+    $('#has_other_income_true, #has_other_income_false, #has_unemployment_income_true, #has_unemployment_income_false').on('change', function(e) {
       var attributes = {};
       attributes[$(this).attr('name')] = $(this).val();
       $.ajax({
@@ -106,6 +106,36 @@ document.addEventListener("turbolinks:load", function() {
           $('#job_income').find('.incomes-list > .income').each(function(i, job_income) {
             var url = $(job_income).attr('id').replace('income_', 'incomes/');
             $(job_income).remove();
+            $.ajax({
+              type: 'DELETE',
+              url: url
+            });
+          });
+        });
+      }
+    });
+
+    /* DELETING all Job Incomes on selcting 'no' on Driver Question */
+    $('#has_unemployment_income_false').on('change', function(e) {
+      var self = this;
+      //$('#DestroyExistingJobIncomesWarning').modal('show');
+      if ($('.unemployment-incomes-list:not(.other-incomes-list) .unemployment-income').length) {
+        e.preventDefault();
+        // prompt to delete all these dedcutions
+        $("#destroyAllUnemploymentIncomes").modal();
+
+        $("#destroyAllUnemploymentIncomes .modal-cancel-button").click(function(e) {
+          $("#destroyAllUnemploymentIncomes").modal('hide');
+          $('#has_unemployment_income_true').prop('checked', true).trigger('change');
+        });
+
+        $("#destroyAllUnemploymentIncomes .modal-continue-button").click(function(e) {
+          $("#destroyAllUnemploymentIncomes").modal('hide');
+          //$(self).prop('checked', false);
+
+          $('#unemployment_income').find('.unemployment-incomes-list > .unemployment-income').each(function(i, unemployment_income) {
+            var url = $(unemployment_income).attr('id').replace('income_', '');
+            $(unemployment_income).remove();
             $.ajax({
               type: 'DELETE',
               url: url
@@ -227,6 +257,19 @@ document.addEventListener("turbolinks:load", function() {
       /* TODO: Handle unchecking boxes if there are no more incomes of that kind */
     });
 
+    $(document).on('click','a.unemployment-income-cancel', function(e) {
+      e.preventDefault();
+
+      if ($(this).parents('.new-unemployment-income-form').length) {
+        $(this).parents('.new-unemployment-income-form').addClass('hidden');
+      } else {
+        var incomeEl = $(this).parents('.income');
+      }
+      stopEditingIncome();
+
+      /* TODO: Handle unchecking boxes if there are no more incomes of that kind */
+    });
+
     /* new job incomes */
     $('a.new-income').click(function(e) {
         e.preventDefault();
@@ -254,6 +297,24 @@ document.addEventListener("turbolinks:load", function() {
         clonedForm.find('.interaction-click-control-save').addClass("disabled");
     });
 
+    /* new unemployment incomes */
+    $('a.new-unemployment-income').click(function(e) {
+        e.preventDefault();
+        startEditingIncome($(this).parents('.unemployment-income').attr('id'));
+        var form = $(this).parents();
+        var  newIncomeForm = $(this).parents('#unemployment_income').children('.new-unemployment-income-form')
+        var  incomeListEl =  $(this).parents('#unemployment_income').find('.unemployment-incomes-list');
+
+        if (newIncomeForm.find('select').data('selectric')) newIncomeForm.find('select').selectric('destroy');
+        var clonedForm = newIncomeForm.clone(true, true)
+            .removeClass('hidden')
+            .appendTo(incomeListEl);
+        var length = incomeListEl.find(".unemployment-income").length;
+        $(clonedForm).find('select').selectric();
+        $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110"});
+        clonedForm.find('.interaction-click-control-save').addClass("disabled");
+    });
+
     $('#has_job_income_true').click(function(e) {
       startEditingIncome($(this).parents('.income').attr('id'));
       if ($('#job_income').children('.new-income-form').length) {
@@ -268,6 +329,26 @@ document.addEventListener("turbolinks:load", function() {
       .removeClass('hidden')
       .appendTo(incomeListEl);
       var length = incomeListEl.find(".income").length;
+      $(clonedForm).find('select').selectric();
+      $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110"});
+    });
+
+    $('#has_unemployment_income_true').click(function(e) {
+      startEditingIncome($(this).parents('.income').attr('id'));
+      if ($('#unemployment_income').children('.new-unemployment-income-form').length) {
+        var  newIncomeForm = $('#unemployment_income').children('.new-unemployment-income-form')
+      }
+
+      if ($('#unemployment_income').find('.unemployment-incomes-list').length) {
+        var  incomeListEl =  $('#unemployment_income').find('.unemployment-incomes-list');
+      }
+      if (newIncomeForm.find('select').data('selectric')) newIncomeForm.find('select').selectric('destroy');
+      if (!$('.unemployment-incomes-list').children('.new-unemployment-income-form').length) {
+        var clonedForm = newIncomeForm.clone(true, true)
+        .removeClass('hidden')
+        .appendTo(incomeListEl);
+      }
+      var length = incomeListEl.find(".unemployment-income").length;
       $(clonedForm).find('select').selectric();
       $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110"});
     });
@@ -293,6 +374,7 @@ document.addEventListener("turbolinks:load", function() {
     if (!$("#has_job_income_true").is(':checked')) $("#job_income").addClass('hidden');
     if (!$("#has_self_employment_income_true").is(':checked')) $("#self_employed_incomes").addClass('hidden');
     if (!$("#has_other_income_true").is(':checked')) $(".other_income_kinds").addClass('hidden');
+    if (!$("#has_unemployment_income_true").is(':checked')) $("#unemployment_income").addClass('hidden');
 
     $("body").on("change", "#has_job_income_true", function(){
       if ($('#has_job_income_true').is(':checked')) {
@@ -307,6 +389,22 @@ document.addEventListener("turbolinks:load", function() {
         $("#job_income").addClass('hidden');
       } else{
         $("#job_income").removeClass('hidden');
+      }
+    });
+
+    $("body").on("change", "#has_unemployment_income_true", function(){
+      if ($('#has_unemployment_income_true').is(':checked')) {
+        $("#unemployment_income").removeClass('hidden');
+      } else{
+        $("#unemployment_income").addClass('hidden');
+      }
+    });
+
+    $("body").on("change", "#has_unemployment_income_false", function(){
+      if ($('#has_unemployment_income_false').is(':checked')) {
+        $("#unemployment_income").addClass('hidden');
+      } else{
+        $("#unemployment_income").removeClass('hidden');
       }
     });
 
@@ -487,6 +585,62 @@ $(document).on('turbolinks:load', function () {
       }
       $(this).parents('.new-other-income-form').remove();
       $(this).parents('.edit-other-income-form').remove();
+    }
+  });
+
+  /* edit existing unemployment income */
+  $('.unemployment-incomes-list').on('click', 'a.unemployment-income-edit:not(.disabled)', function(e) {
+    e.preventDefault();
+    var unemploymentIncomeEl = $(this).parents('.unemployment-income');
+    unemploymentIncomeEl.find('.unemployment-income-show').addClass('hidden');
+    unemploymentIncomeEl.find('.edit-unemployment-income-form').removeClass('hidden');
+    startEditingIncome($(this).parents('.unemployment-income-kind').attr('id'));
+
+    $(unemploymentIncomeEl).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110"});
+  });
+
+  /* destroy existing unemployment income */
+  $('.unemployment-incomes-list').on('click', 'a.unemployment-income-delete:not(.disabled)', function(e) {
+    var self = this;
+    e.preventDefault();
+    $("#destroyUnemploymentIncome").modal();
+
+    $("#destroyUnemploymentIncome .modal-cancel-button").click(function(e) {
+      $("#destroyUnemploymentIncome").modal('hide');
+    });
+
+    $("#destroyUnemploymentIncome .modal-continue-button").click(function(e) {
+      $("#destroyUnemploymentIncome").modal('hide');
+      $(self).parents('.unemployment-income').remove();
+      $("a.interaction-click-control-add-more").addClass('hide');
+
+      var url = $(self).parents('.unemployment-income').attr('id').replace('financial_assistance_income_', '');
+      console.log(url);
+      $.ajax({
+        type: 'DELETE',
+        url: url,
+        dataType: 'script',
+      })
+    });
+  });
+
+  /* cancel unemployment income edits */
+  $('.unemployment-incomes-list').on('click', 'a.unemployment-income-cancel', function(e) {
+    e.preventDefault();
+    stopEditingIncome();
+
+    var unemploymentIncomeEl = $(this).parents('.unemployment-income');
+    if (unemploymentIncomeEl.length) {
+      $(this).closest('.unemployment-income-kind').find('a#add_new_unemployment_income_kind').removeClass("hidden");
+      unemploymentIncomeEl.find('.unemployment-income-show').removeClass('hidden');
+      unemploymentIncomeEl.find('.edit-unemployment-income-form').addClass('hidden');
+    } else {
+      if (!$(this).parents('.unemployment-incomes-list > div.unemployment-income').length) {
+        $(this).parents('.unemployment-income-kind').find('input[type="checkbox"]').prop('checked', false);
+        $(this).closest('.unemployment-income-kind').find('a#add_new_unemployment_income_kind').addClass("hidden");
+      }
+      $(this).parents('.new-unemployment-income-form').remove();
+      $(this).parents('.edit-unemployment-income-form').remove();
     }
   });
 // disable save button logic

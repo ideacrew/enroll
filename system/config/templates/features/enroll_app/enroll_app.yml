@@ -24,11 +24,11 @@ registry:
           - key: :help_url
             item: "https://www.coverme.gov/help/"
           - key: :business_resource_center_url
-            item: "https://dchealthxlink.com/smallbusiness/"
+            item: ""
           - key: :nondiscrimination_notice_url
-            item: "https://www.dchealthlink.com/nondiscrimination"
+            item: ""
           - key: :submit_docs_url
-            item: "https://www.dchealthlink.com/submit-docs"
+            item: ""
           - key: :site_key
             item: :me
           - key: :state_abbreviation
@@ -46,9 +46,9 @@ registry:
           - key: :help_url
             item: "https://www.coverme.gov/help/"
           - key: :main_web_address_url
-            item: "https://www.dchealthlink.com/"
+            item: "https://www.coverme.gov"
           - key: :invoice_bill_url
-            item: "https://www.e-billexpress.com/ebpp/DCHEALTHPAY/"
+            item: ""
           - key: :payment_pdf_url
             item: "pdf/employers_paying_your_premiums_online.pdf"
           - key: :user_sign_in_url
@@ -57,6 +57,10 @@ registry:
             item: "https://www.accesshealthct.com/AHCT/LandingPageCTHIX"
           - key: :main_web_address
             item: "https://www.accesshealthct.com/AHCT/LandingPageCTHIX"
+          - key: :website_name
+            item: "https://www.coverme.gov"
+          - key: :main_web_address
+            item: "https://www.coverme.gov"
           - key: :health_care_website
             item: "www.healthcare.gov"
           - key: :health_care_website_url
@@ -69,14 +73,16 @@ registry:
             item: "Maine Cover ME"
           - key: :header_message
             item: "Maine's Official Health Insurance Marketplace"
+          - key: :byline
+            item: "Welcome to Maine's Health Insurance Marketplace"
+          - key: :long_name
+            item: "Maine Cover ME"
           - key: :logo_file_name
             item: "logo.png"
           - key: :make_their_premium_payments_online
-            item: "https://www.e-billexpress.com/ebpp/DCHEALTHPAY/"
+            item: ""
           - key: :tab_icon
             item: "favicon.ico"
-          - key: :mailer_logo_file_name
-            item: "dchealthlink.jpg"
           - key: :employer_application_deadline_link
             item: ""
           - key: :s3_prefix
@@ -103,18 +109,29 @@ registry:
             item: ""
           - key: :certification_url
             item: ""
+          - key: :document_verification_checklist_url
+            item: "https://www.mahealthconnector.org/business/business-resource-center/employer-verification-checklist"
+          - key: :terms_and_conditions_url
+            item: "https://www.dchealthlink.com/terms"
+          - key: :certification_url
+            item: ""
           - key: :registration_path
             item: "https://www.dchealthlink.com/smallbusiness"
           - key: :broker_registration_path
-            item: "https://enroll.dchealthlink.com/broker_registration"
+            item: ""
           - key: :broker_registration_guide
-            item: "https://dchealthlink.com/sites/default/files/v2/forms/new_broker_registration.pdf"
+            item: ""
           - key: :home_forms_url
             item: ""
           - key: :forms_name
             item: ""
+          - key: :forms
+            item: ""
+            item: "https://dchealthlink.com/forms"
+          - key: :forms_name
+            item: ""
           - key: :short_url
-            item: "dchealthlink.com"
+            item: ""
           - key: :forms
             item: ""
           - key: :website_url
@@ -137,6 +154,14 @@ registry:
             item: 'mehl.producer@coverme.gov'
           - key: :privacy_policy
             item: ""
+          - key: :no_reply_email
+            item: "noreply@coverme.gov"
+          - key: :mail_address
+            item: "info@dchealthlink.com"
+          - key: :producer_email_address
+            item: ''
+          - key: :privacy_policy
+            item: ""
           - key: :late_rates_message
             item: "Due to a delay, premiums for some coverage effective dates are not available yet. Please check again soon to see if this information has been updated. You can also contact Customer Service or your broker if you need help."
           - key: :faa_enabled
@@ -154,9 +179,9 @@ registry:
           - key: :publisher
             item: "dchl"
           - key: :prod_tax_info
-            item: "https://dchealthlink.com/individuals/tax-documents"
+            item: ""
           - key: :staging_tax_info_url
-            item: "https://staging.dchealthlink.com/individuals/tax-documents"
+            item: ""
           - key: :statewide_area
             item: "Maine"
           - key: :exchange_name
@@ -179,6 +204,25 @@ registry:
             item: "04330"
           - key: :contact_center_email_address
             item: "smallbusiness@coverme.gov"
+            item: "DC-Metro"
+          - key: :exchange_name
+            item: "Washington DC Health Benefit Exchange"
+          - key: :social_media
+            item: ''
+          - key: :state_dmv_link
+            item: "https://www.maine.gov/sos/bmv/"
+          - key: :health_benefit_exchange_authority_phone_number
+            item: "1-800-965-7476"
+          - key: :contact_center_name
+            item: "Cover ME's Customer Care Center"
+          - key: :contact_center_po_box
+            item: "PO Box 97022"
+          - key: :contact_center_state_and_city
+            item: "Maine"
+          - key: :contact_center_zip_code
+            item: "20026"
+          - key: :contact_center_email_address
+            item: "info@dchealthlink.com"
           - key: :contact_center_short_number
             item: "(855) 532-5465"
           - key: :producer_advisory_committee_url
@@ -224,6 +268,18 @@ registry:
       - key: :agency_staff
         item: :agency_staff
         is_enabled: false
+          item: "/new_broker_registration.pdf"
+        - key: :producer_advisory_committee
+          item: "http://hbx.dc.gov/sites/default/files/dc/sites/Health%20Benefit%20Exchange%20Authority/publication/attachments/ProducerAdvisoryCommitteeFINALReport.pdf"
+        - key: :broker_license_lookup
+          item: "https://sbs.naic.org/solar-external-lookup/"
+        - key: :healthlink_training
+          item: "https://nahu.inreachce.com/Details?resultsPage=1&sortBy=&q=dc+broker&searchType=1&groupId=154ae22b-92eb-41f0-854b-3a9cabc20c8e"
+        - key: :broker_registration_guide_pdf_link
+          item: "https://dchealthlink.com/sites/default/files/v2/forms/new_broker_registration.pdf"
+      - key: :agency_staff
+        item: :agency_staff
+        is_enabled: true
       - key: :send_secure_message_family
         item: :send_secure_message
         is_enabled: true
@@ -273,5 +329,6 @@ registry:
         is_enabled: true
       - key: :display_cost_warning_message
         is_enabled: false
-      - key: :employee_datable_waiver_bulk_actions
+
+      - key: employee_datable_waiver_bulk_actions
         is_enabled: false

@@ -83,8 +83,9 @@ module FinancialAssistance
     field :determination_http_status_code, type: Integer
     field :determination_error_message, type: String
     field :has_eligibility_response, type: Boolean, default: false
+    field :eligibility_request_payload, type: String
     field :eligibility_response_payload, type: String
-
+    field :full_medicaid_determination, type: Boolean
     field :workflow, type: Hash, default: { }
 
     embeds_many :eligibility_determinations, inverse_of: :application, class_name: '::FinancialAssistance::EligibilityDetermination'

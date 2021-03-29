@@ -20,7 +20,7 @@ module FinancialAssistance
           application    = yield find_application(application_id)
           application    = yield validate(application)
           payload_param  = yield construct_payload(application)
-          payload_value  = yield validate_payload(payload_param, application.hbx_id)
+          payload_value  = yield validate_payload(payload_param, application)
           payload        = yield publish(payload_value, application)
 
           Success(payload)
@@ -51,7 +51,7 @@ module FinancialAssistance
           Success(payload)
         end
 
-        def validate_payload(payload, application_id)
+        def validate_payload(payload, application)
           payload_xml = Nokogiri::XML.parse(payload)
           schema_path = if payload_xml.xpath("//xmlns:is_coverage_applicant").collect(&:text).include?('false')
                           FAA_FLEXIBLE_SCHEMA_FILE_PATH
@@ -61,10 +61,11 @@ module FinancialAssistance
 
           xml_schema = Nokogiri::XML::Schema(File.open(schema_path))
           if xml_schema.valid?(payload_xml)
+            application.update_attributes(eligibility_request_payload: payload)
             Success(payload)
           else
             error_message = xml_schema.validate(payload_xml).map(&:message)
-            log(payload, {:severity => 'critical', :error_message => "request payload application_hbx_id: #{application_id}, Error: #{error_message}"})
+            log(payload, {:severity => 'critical', :error_message => "request payload application_hbx_id: #{application&.hbx_id}, Error: #{error_message}"})
             Failure(error_message)
           end
         end

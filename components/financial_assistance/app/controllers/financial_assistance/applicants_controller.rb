@@ -131,6 +131,11 @@ module FinancialAssistance
       # @country = vlp_docs.detect{|doc| doc.subject == vlp_doc_subject }.try(:country_of_citizenship) if vlp_docs
     end
 
+    def destroy
+      @applicant.destroy! unless @applicant.is_primary_applicant
+      redirect_to edit_application_path(@application)
+    end
+
     private
 
     def format_date_params(model_params)

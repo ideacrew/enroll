@@ -7,7 +7,7 @@ Given(/^the user is on FAA Household Info: Family Members page$/) do
     ivl_product = FactoryBot.create(:benefit_markets_products_health_products_health_product, :ivl_product, application_period: (bcp.start_on..bcp.end_on))
     bcp.update_attributes!(slcsp_id: ivl_product.id)
   end
-  
+
   visit help_paying_coverage_insured_consumer_role_index_path
   find('button.interaction-click-control-continue')
   choose('radio1', allow_label_click: true)
@@ -17,10 +17,40 @@ Given(/^the user is on FAA Household Info: Family Members page$/) do
   find('a.interaction-click-control-continue').click
 end
 
+And(/^the user visits the portal outside OE$/) do
+  hbx_profile = FactoryBot.create(:hbx_profile, :no_open_enrollment_coverage_period)
+  hbx_profile.benefit_sponsorship.benefit_coverage_periods.each do |bcp|
+    ivl_product = FactoryBot.create(:benefit_markets_products_health_products_health_product, :ivl_product, application_period: (bcp.start_on..bcp.end_on))
+    bcp.update_attributes!(slcsp_id: ivl_product.id)
+  end
+end
+
+And(/^the user visits the portal during OE$/) do
+  hbx_profile = FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)
+  hbx_profile.benefit_sponsorship.benefit_coverage_periods.each do |bcp|
+    ivl_product = FactoryBot.create(:benefit_markets_products_health_products_health_product, :ivl_product, application_period: (bcp.start_on..bcp.end_on))
+    bcp.update_attributes!(slcsp_id: ivl_product.id)
+  end
+end
+
+And(/^the user is on the FAA Household Info page$/) do
+  login_as consumer, scope: :user
+  visit help_paying_coverage_insured_consumer_role_index_path
+  find('button.interaction-click-control-continue')
+  choose('radio1', allow_label_click: true)
+  find('button.interaction-click-control-continue').click
+
+  person = Person.all.last
+  person.user.update_attributes(identity_response_code: "acc", identity_final_decision_code: "acc")
+  # should be on checklist page now
+  find('a.interaction-click-control-continue').click
+
+end
+
 Given(/^all applicants are in Info Completed state with all types of income$/) do
   until find_all('.btn', text: 'ADD INCOME & COVERAGE INFO').empty?
     find_all('.btn', text: 'ADD INCOME & COVERAGE INFO')[0].click
-    find('#is_required_to_file_taxes_no').click
+    find('#is_required_to_file_taxes_no', wait: 5).click
     find('#is_claimed_as_tax_dependent_no').click
     find(:xpath, "//input[@value='CONTINUE'][@name='commit']").click
 
@@ -45,6 +75,16 @@ Given(/^all applicants are in Info Completed state with all types of income$/) d
     fill_in 'income[start_on]', with: '01/01/2018'
     click_button('Save')
     find(:xpath, '//*[@id="btn-continue"]').click
+
+    if FinancialAssistanceRegistry[:unemployment_income].enabled?
+      find('#has_unemployment_income_true').click
+      sleep 1
+      fill_in 'income[amount]', with: '100'
+      fill_in 'income[start_on]', with: '1/1/2018'
+      find(".new-unemployment-income-form .interaction-choice-control-income-frequency-kind").click
+      find(".new-unemployment-income-form li.interaction-choice-control-income-frequency-kind-7").click
+      click_button('Save')
+    end
 
     find('#has_other_income_true').click
     sleep 1
@@ -105,6 +145,16 @@ Given(/^all required questions are answered$/) do
   find('#application_report_change_terms').click
 end
 
+And(/^the user should be able to see medicaid determination question$/) do
+  expect(page).to have_content("full review of your application for Medicaid eligibility?")
+  find('#medicaid_determination_yes').click
+end
+
+Given(/^all required questions are answered including report change terms field$/) do
+  find_all("input[type='checkbox']").each {|checkbox| checkbox.set(true)}
+  find('#living_outside_no').set(true)
+end
+
 Given(/^the user has signed their name$/) do
   fill_in 'first_name_thank_you', with: application.primary_applicant.first_name
   fill_in 'last_name_thank_you', with: application.primary_applicant.last_name
@@ -118,6 +168,22 @@ Then(/^the user is on the Error Submitting Application page$/) do
   expect(page).to have_content('Error Submitting Application')
 end
 
+Then(/^the user is on the Eligibility Response page$/) do
+  expect(page).to have_content('Eligibility Response Error')
+end
+
 Given(/^the user clicks SUBMIT$/) do
   find('.interaction-click-control-submit-application').click
+end
+
+And(/^the user waits for eligibility results$/) do
+  sleep 20
+end
+
+Then(/^the user should land on sep page$/) do
+  expect(page).to have_content('Special Enrollment Period')
+end
+
+Then(/^the user should land on Coverage Household page$/) do
+  expect(page).to have_content('Choose Coverage for your Household')
 end

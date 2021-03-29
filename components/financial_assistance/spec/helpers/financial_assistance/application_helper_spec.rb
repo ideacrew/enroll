@@ -13,6 +13,15 @@ RSpec.describe ::FinancialAssistance::ApplicationHelper, :type => :helper, dbcle
                       last_name: 'Test10')
   end
 
+  let!(:applicant2) do
+    FactoryBot.create(:financial_assistance_applicant,
+                      application: application,
+                      eligibility_determination_id: ed.id,
+                      is_ia_eligible: true,
+                      first_name: 'TEst2',
+                      last_name: 'Test10')
+  end
+
   describe 'total_aptc_across_eligibility_determinations' do
     before do
       @result = helper.total_aptc_across_eligibility_determinations(application.id)
@@ -30,6 +39,10 @@ RSpec.describe ::FinancialAssistance::ApplicationHelper, :type => :helper, dbcle
 
     it 'should return array of names of the applicants' do
       expect(@result).to include('Test Test10')
+    end
+
+    it 'should not return a split name if multiple capital letters exist' do
+      expect(@result).to include('Test2 Test10')
     end
   end
 

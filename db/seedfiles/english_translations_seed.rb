@@ -2,6 +2,7 @@
 # site_key = Rails.env.test? ? 'dc' : Settings.site.key.to_s
 # TODO: Change this back. Hardcoding in just for the ME Demo
 site_key = 'me'
+# site_key = Rails.env.test? ? 'dc' : Settings.site.key.to_s
 
 translations_to_seed = []
 # All filenames should be in a pattern such as

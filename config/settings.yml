@@ -64,13 +64,19 @@ site:
   prod_tax_info: "" # TODO: Need this for Maine. This is for download tax documents #tax_info_url method in families_helper.rb
   staging_tax_info_url: "" # TODO: Need this for Maine. This is for download tax documents #tax_info_url method in families_helper.rb
   exchange_name: "Maine Cover ME"
+  prod_tax_info: ""
+  staging_tax_info_url: ""
+  statewide_area: "DC Metro"
+
+  exchange_name: "Washington DC Health Benefit Exchange"
   social_media:
     facebook_url: ""
 
 contact_center:
-  state_and_city: "Boston, ME"
+  state_and_city: "Augusta, ME"
   name: "Maine Cover ME's Customer Care Center"
   alt_name: "Maine Cover ME Customer Service"
+  state_and_city: "Washington, DC"
   po_box: "PO Box 97022"
   phone_number: "1-800-965-7476"
   fax: "1-617-933-3099"
@@ -84,13 +90,13 @@ contact_center:
   ivl_phone_number: "1-877-623-6765"
   email_address: "smallbusiness@coverme.gov"
   po_box: "PO Box 97022"
-  city: "Washington"
-  state: "DC"
-  zip_code: "20090"
+  city: "Augusta"
+  state: "ME"
+  zip_code: "04330"
   small_business_email: "smallbusiness@coverme.gov"
-  non_discrimination_email: "info@dchealthlink.com"
+  non_discrimination_email: "info@coverme.gov"
 
-  appeals: "info@dchealthlink.com"
+  appeals: "info@coverme.gov"
   
   # Voting Info for FA Engine Steps
   # TOOD: This needs to be updated. These are pulled of Maine government website.
@@ -99,16 +105,6 @@ contact_center:
   board_of_eletions_address: ""
   board_of_elections_email: "cec.elections@maine.gov"
   board_of_elections_phone_number: "207-624-7650"
-
-  board_of_elections_entity: "DC Board of Elections"
-  board_of_eletions_address: "1015 Half Street, SE<br>Suite 750<br>Washington, DC 20003<br>"
-  board_of_elections_email: ""
-  board_of_elections_phone_number: "(202) 727-2525"
-
-  board_of_elections_entity: "DC Board of Elections"
-  board_of_eletions_address: "1015 Half Street, SE<br>Suite 750<br>Washington, DC 20003<br>"
-  board_of_elections_email: ""
-  board_of_elections_phone_number: "(202) 727-2525"
 
   mailing_address:
     name: "Cover ME"
@@ -202,7 +198,7 @@ aca:
 
     open_enrollment:
       start_on: <%= Date.new(2020,11,1) %>
-      end_on: <%= Date.new(2021,2,5) %>
+      end_on: <%= Date.new(2021,10,31) %>
     dc_resident_application: true
     transition_family_members_link: true
       # dc_resident_application: true
