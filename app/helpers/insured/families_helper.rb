@@ -121,7 +121,7 @@ module Insured::FamiliesHelper
     end
 
     qle_title_html = "<u>#{qle.title}</u>".html_safe if qle.reason == 'covid-19'
-    
+
     link_to qle_title_html || qle.title, "javascript:void(0)", options
   end
 
@@ -150,8 +150,7 @@ module Insured::FamiliesHelper
 
   def newhire_enrollment_eligible?(employee_role)
     return false if employee_role.blank? || employee_role.census_employee.blank?
-
-    employee_role.census_employee.newhire_enrollment_eligible? && employee_role.can_select_coverage?
+    employee_role.can_enroll_as_new_hire?
   end
 
   def all_active_enrollment_with_aptc(family)
