@@ -121,8 +121,16 @@
               <div class="col-md-6"><%= human_boolean applicant.has_self_employment_income %></div>
             </div>
 
+            <% if FinancialAssistanceRegistry[:unemployment_income].enabled? %>
+              <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                <div class="col-md-6">Did this person receive unemployment income at any point in <%= @application.assistance_year %>? *
+                </div>
+                <div class="col-md-6"><%= human_boolean applicant.has_unemployment_income %></div>
+              </div>
+            <% end %>
+
             <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-              <div class="col-md-6">Does this person expect to have other types of income in <%= @application.assistance_year %>?
+              <div class="col-md-6">Does this person expect to have other types of income in <%= @application.assistance_year %>? *
               </div>
               <div class="col-md-6"><%= human_boolean applicant.has_other_income %></div>
             </div>
@@ -179,6 +187,10 @@
           <div class="row row-form-wrapper ptb no-buffer row-height form-content">
             <div class="col-md-6">Has this person ever been in foster care?</div>
             <div class="col-md-6"><%= human_boolean applicant.is_former_foster_care %></div>
+          </div>
+          <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+            <div class="col-md-6"><%= state_abbreviation_text(l10n("faa.medicaid_question")) %></div>
+            <div class="col-md-6"><%= human_boolean @application.full_medicaid_determination %></div>
           </div>
         </div>
         <br>

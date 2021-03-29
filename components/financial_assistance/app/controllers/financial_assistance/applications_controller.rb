@@ -10,7 +10,7 @@ module FinancialAssistance
     require 'securerandom'
 
     before_action :check_eligibility, only: [:create, :get_help_paying_coverage_response, :copy]
-    before_action :init_cfl_service, only: :review_and_submit
+    before_action :init_cfl_service, only: [:review_and_submit, :raw_application]
 
     layout "financial_assistance_nav", only: %i[edit step review_and_submit eligibility_response_error application_publish_error]
 
@@ -113,6 +113,36 @@ module FinancialAssistance
       redirect_to applications_path if @application.blank?
     end
 
+    def raw_application
+      unless current_user.has_hbx_staff_role?
+        flash[:error] = 'You are not authorized to access'
+        redirect_to applications_path
+        return
+      end
+
+      @application = FinancialAssistance::Application.where(id: params['id']).first
+
+      if @application.nil? || @application.is_draft?
+        redirect_to applications_path
+      else
+        redirect_to applications_path unless @application.family_id == get_current_person.financial_assistance_identifier
+
+        @applicants = @application.active_applicants
+        @all_relationships = @application.relationships
+        @demographic_hash = {}
+        @income_coverage_hash = {}
+
+        @applicants.each do |applicant|
+          file = File.read("./components/financial_assistance/app/views/financial_assistance/applications/raw_application.yml.erb")
+          application_hash = YAML.safe_load(ERB.new(file).result(binding))
+          @demographic_hash[applicant.id] = application_hash[0]["demographics"]
+          application_hash[0]["demographics"]["ADDRESSES"] = generate_address_hash(applicant)
+          application_hash[1]["financial_assistance_info"]["INCOME"] = generate_income_hash(applicant)
+          @income_coverage_hash[applicant.id] = application_hash[1]["financial_assistance_info"]
+        end
+      end
+    end
+
     def wait_for_eligibility_response
       save_faa_bookmark(applications_path)
       set_admin_bookmark_url
@@ -149,7 +179,7 @@ module FinancialAssistance
     end
 
     def checklist_pdf
-      send_file(FinancialAssistance::Engine.root.join('db','documents', 'ivl_checklist.pdf').to_s, :disposition => "inline", :type => "application/pdf")
+      send_file(FinancialAssistance::Engine.root.join('db','documents', 'IVL_Application_Checklist_Final_02172021.pdf').to_s, :disposition => "inline", :type => "application/pdf")
     end
 
     private
@@ -194,6 +224,63 @@ module FinancialAssistance
       current_person = get_current_person
       return if current_person.consumer_role.blank?
       current_person.consumer_role.update_attribute(:bookmark_url, url) if current_person.consumer_role.identity_verified?
+    end
+
+    def check_citizen_immigration_status?(applicant)
+      applicant.naturalized_citizen.present? || applicant.eligible_immigration_status.present?
+    end
+
+    def generate_income_hash(applicant)
+      income_hash = {
+        "Does this person have income from an employer (wages, tips, bonuses, etc.) in #{@application.assistance_year}?" => human_boolean(applicant.has_job_income),
+        "jobs" => generate_employment_hash(applicant.incomes.jobs),
+        "Does this person expect to receive self-employment income in #{@application.assistance_year}? *" => human_boolean(applicant.has_self_employment_income)
+      }
+      income_hash.merge!("Did this person receive unemployment income at any point in #{@application.assistance_year}? *" => human_boolean(applicant.has_unemployment_income)) if FinancialAssistanceRegistry[:unemployment_income].enabled?
+      income_hash.merge!("Does this person expect to have income from other sources in #{@application.assistance_year}? *" => human_boolean(applicant.has_other_income))
+      income_hash
+    end
+
+    def generate_employment_hash(jobs)
+      job_hash = {}
+      jobs.each do |job|
+        job_hash[job.id] = {
+          "Employer Name" => job.employer_name,
+          "EMPLOYER ADDRESSS LINE 1" => job.employer_address.address_1,
+          "EMPLOYER ADDRESSS LINE 2" => job.employer_address.address_2,
+          "CITY" => job.employer_address.city,
+          "STATE" => job.employer_address.state,
+          "ZIP" => job.employer_address.zip,
+          "EMPLOYER PHONE " => job.employer_phone.full_phone_number
+        }
+      end
+      job_hash
+    end
+
+    def generate_address_hash(applicant)
+      addresses_hash = {}
+      applicant.addresses.each do |address|
+        addresses_hash["#{address.kind}_address"] = {
+          "ADDRESS LINE 1" => address.address_1,
+          "ADDRESS LINE 2" => address.address_2,
+          "CITY" => address.city,
+          "ZIP" => address.zip,
+          "STATE" => address.state
+        }
+      end
+      addresses_hash
+    end
+
+    def human_boolean(value)
+      if value == true
+        'Yes'
+      elsif value == false
+        'No'
+      elsif value.nil?
+        'N/A'
+      else
+        value
+      end
     end
   end
 end

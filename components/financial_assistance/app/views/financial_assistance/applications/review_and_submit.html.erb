@@ -70,7 +70,7 @@
           <div class="col-md-12 pz">
             <div class="row row-form-wrapper ptb no-buffer row-height main-heading form-bottom-border">
               <div class="col-md-11"><span></span>
-                <i class="fa fa-user blue-icon"></i> <%= applicant.full_name %>
+                <i class="fa fa-user blue-icon"></i> <%= capitalize_full_name(applicant.full_name) %>
               </div>
               <div class="col-md-1">
                 <!-- <a><span class="fa fa-pencil fa-lg" aria-hidden="true"></span></a> -->
@@ -209,8 +209,16 @@
                   <div class="col-md-6"><%= human_boolean applicant.has_self_employment_income %></div>
                 </div>
 
+                <% if FinancialAssistanceRegistry[:unemployment_income].enabled? %>
+                  <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                    <div class="col-md-6">Did this person receive unemployment income at any point in <%= @application.assistance_year %>? *
+                    </div>
+                    <div class="col-md-6"><%= human_boolean applicant.has_unemployment_income %></div>
+                  </div>
+                <% end %>
+
                 <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                  <div class="col-md-6">Does this person expect to have other types of income in <%= @application.assistance_year %>?
+                  <div class="col-md-6">Does this person expect to have other types of income in <%= @application.assistance_year %>? *
                   </div>
                   <div class="col-md-6"><%= human_boolean applicant.has_other_income %></div>
                 </div>

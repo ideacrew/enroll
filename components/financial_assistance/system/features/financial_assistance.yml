@@ -55,7 +55,11 @@ registry:
             item: 0.80
           - key: :carrier_name
             item: "Carrier Name"
+  - namespace:
+    - :other_income
+    features:
+      - key: :unemployment_income
+        is_enabled: true
 
   # TODO eligibility engine connectivity(HAVEN) settings
   # TODO mec service connectivity settings
-
