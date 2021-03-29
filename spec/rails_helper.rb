@@ -53,7 +53,12 @@ RSpec.configure do |config|
   # The different available types are documented in the features, such as in
   # https://relishapp.com/rspec/rspec-rails/docs
   load Rails.root + "db/seedfiles/english_translations_seed.rb"
-  DatabaseCleaner[:mongoid].strategy = :deletion, {:except => %w[translations]}
+  database_strategy = if Rails.version["5."]
+                        :truncation
+                      else
+                        :deletion
+                      end
+  DatabaseCleaner[:mongoid].strategy = database_strategy, {:except => %w[translations]}
 
   config.after(:example, :dbclean => :after_each) do
     DatabaseCleaner.clean
