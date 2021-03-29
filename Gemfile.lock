@@ -1,209 +1,20 @@
-<<<<<<< HEAD
-# frozen_string_literal: true
-
-source 'https://rubygems.org'
-git_source(:github) { |repo| "https://github.com/#{repo}.git" }
-
-ruby '2.5.1'
-gem 'rails', '~> 5.2.4.3'
-gem 'sidekiq'
-
-#######################################################
-# FIXME
-#######################################################
-
-# Update to use features from new version
-gem 'effective_datatables', path: './project_gems/effective_datatables-2.6.14'
-# gem 'jquery-datatables-rails', '3.4.0'config/initializers/effective_datatables.rb
-
-# Verify this gem git reference is necessary.  Otherwise point it to release level
-gem 'prawn', :git => 'https://github.com/prawnpdf/prawn.git', :ref => '8028ca0cd2'
-
-## Fix this dependency -- bring into project
-# gem 'recurring_select', :git => 'https://github.com/brianweiner/recurring_select'
-
-## Fix this dependency -- bring into project
-gem 'simple_calendar', :git => 'https://github.com/harshared/simple_calendar.git'
-
-## Verify Rails 5 eliminates need for this gem with MongoDB
-gem 'database_cleaner',       '~> 1.7'
-
-#######################################################
-
-#######################################################
-# Local components/engines
-#######################################################
-gem 'acapi',              git: "https://github.com/ideacrew/acapi.git", branch: 'amqp_proc_title'
-gem 'aca_entities',       git: 'https://github.com/ideacrew/aca_entities.git', branch: 'trunk'
-gem "benefit_markets",    path: "components/benefit_markets"
-gem "benefit_sponsors",   path: "components/benefit_sponsors"
-gem 'financial_assistance', path: 'components/financial_assistance'
-gem "notifier",           path: "components/notifier"
-gem 'openhbx_cv2',        git:  'https://github.com/ideacrew/openhbx_cv2.git', branch: 'trunk'
-gem 'resource_registry',  git:  'https://github.com/ideacrew/resource_registry.git', branch: 'trunk'
-# gem 'resource_registry',  git: '../resource_registry'
-
-gem "sponsored_benefits", path: "components/sponsored_benefits"
-gem "transport_gateway",  path: "components/transport_gateway"
-gem "transport_profiles", path: "components/transport_profiles"
-gem 'ui_helpers',         path: "components/ui_helpers"
-#######################################################
-
-## MongoDB gem dependencies
-gem 'bson',                     '~> 4.3'
-gem 'carrierwave-mongoid',      '~> 1.2',  :require => 'carrierwave/mongoid'
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-gem 'mongoid',                  git: 'https://github.com/mongodb/mongoid.git', ref: 'df6b2168ee7526f0c5e26f64f38851b91a0623e8'
-=======
-gem 'mongoid',                  '~> 7.2'
->>>>>>> ruby-2.7.1 and rails-6.0 upgrade
-=======
-gem 'mongoid',                  git: 'https://github.com/mongodb/mongoid.git', ref: 'df6b2168ee7526f0c5e26f64f38851b91a0623e8'
->>>>>>> pointing mongoid to its github to fix a bug
-=======
-gem 'mongoid',                  '~> 7.0.2'
->>>>>>> REFS Maintenance - Begins toggle between rails 5 and 6
-gem 'mongo',                    '~> 2.6'
-gem 'mongo_session_store',      '~> 3.1'
-gem 'mongoid-autoinc',          '~> 6.0'
-gem 'mongoid-history',          '~> 0.8'
-# gem 'mongoid-versioning',       '~> 1.2.0'
-gem 'mongoid_userstamp',        '~> 0.4', :path => "./project_gems/mongoid_userstamp-0.4.0"
-gem 'mongoid_rails_migrations', '~> 1.2'
-
-## General gems
-gem 'aasm',                     '~> 4.8'
-gem 'addressable',              '~> 2.3'
-gem 'animate-rails',            '~> 1.0.10'
-gem 'recurring_select'
-
-gem 'aws-sdk',                  '~> 2.2.4'
-gem 'bcrypt',                   '~> 3.1'
-gem 'bootsnap',                 '>= 1.1', require: false
-gem 'browser',                  '2.7.0'
-gem 'ckeditor',                 '~> 4.2.4'
-gem 'coffee-rails',             '~> 4.2.2'
-gem 'combine_pdf',              '~> 1.0'
-gem 'config',                   '~> 2.0'
-gem 'curl',                     '~> 0.0.9'
-gem 'devise',                   '~> 4.5'
-gem 'devise-jwt', "~> 0.5.9"
-gem 'jwt', "~> 2.2.1"
-gem 'haml',                     '~> 5.0'
-gem 'httparty',                 '~> 0.16'
-gem 'i18n',                     '~> 1.5'
-gem 'i18n-tasks', '~> 0.9.33'
-gem 'interactor',               '~> 3.0'
-gem 'interactor-rails',         '~> 2.2'
-gem 'jbuilder',                 '~> 2.7'
-gem 'jquery-rails',             '~> 4.3'
-gem 'kaminari'
-gem 'kaminari-mongoid'
-gem 'kaminari-actionview'
-gem 'language_list',            '~> 1'
-gem 'mail',                     '~> 2.7'
-gem 'maskedinput-rails',        '~> 1.4'
-gem 'money-rails',              '~> 1.13'
-gem 'net-ssh',                  '= 4.2.0'
-gem 'nokogiri',                 '~> 1.10.8'
-gem 'nokogiri-happymapper',     '~> 0.8.0', :require => 'happymapper'
-gem 'non-stupid-digest-assets'
-gem 'pundit',                   '~> 2.0'
-gem "recaptcha",                '~> 4.13', require: 'recaptcha/rails'
-gem 'redcarpet',                '~> 3.4'
-gem 'redis',                    '~> 4.0'
-gem 'redis-rails',              '~> 5.0.2'
-gem 'resque',                   '~> 2.0'
-gem 'roo',                      '~> 2.1'
-gem 'rubyzip', '>= 1.3.0'
-gem 'ruby-saml',                '~> 1.3'
-gem 'sassc',                    '~> 1.12'
-gem 'sass-rails',               '~> 5'
-gem 'slim',                     '~> 3.0'
-gem 'slim-rails',               '~> 3.2'
-gem 'symmetric-encryption',     '~> 3.9.1'
-gem 'turbolinks',               '~> 5'
-gem 'uglifier',                 '>= 4'
-gem 'virtus',                   '~> 1.0'
-gem 'wicked_pdf',               '~> 1.1.0'
-gem 'wkhtmltopdf-binary-edge',  '~> 0.12.3.0'
-gem 'webpacker',                '~> 4.0.2'
-gem 'fast_jsonapi'
-gem 'loofah', '~> 2.3.1'
-gem 'stimulus_reflex', '~> 3.3'
-group :doc do
-  gem 'sdoc',                   '~> 1.0'
-end
-
-group :development do
-  gem "certified",              '~> 1'
-  gem 'overcommit',             '~> 0.47'
-  gem 'rubocop',                require: false
-  gem 'rubocop-rspec'
-  gem 'rubocop-git'
-  # Access an interactive console on exception pages or by calling 'console' anywhere in the code.
-  gem 'web-console',            '>= 3'
-  gem 'listen',                 '>= 3.0.5', '< 3.2'
-
-  # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
-  gem 'spring'
-  gem 'spring-watcher-listen'
-end
-
-group :development, :test do
-  gem 'action-cable-testing'
-  # gem 'bundler-audit',          '~> 0.6'
-  gem 'brakeman'
-  gem 'capistrano',             '~> 3.1'
-  gem 'capistrano-rails',       '1.4'
-  gem 'climate_control',        '~> 0.2.0'
-  gem 'email_spec',             '~> 2'
-  gem 'factory_bot_rails',      '~> 4.11'
-  gem 'forgery',                '~> 0.7.0'
-  gem 'parallel_tests',         '~> 2.26.2'
-  gem 'puma',                   '~> 3.12.4'
-  gem 'rails-controller-testing'
-  gem 'railroady',              '~> 1.5.3'
-  gem 'rspec-rails'
-  gem 'rspec_junit_formatter'
-  gem 'stimulus_reflex_testing'
-  gem 'yard',                   '~> 0.9.20',  require: false
-  gem 'yard-mongoid',           '~> 0.1',     require: false
-end
-
-group :test do
-  gem 'action_mailer_cache_delivery', '~> 0.3'
-  gem 'capybara',                     '~> 3.12'
-  gem 'capybara-screenshot',          '~> 1.0.18'
-  gem 'cucumber-rails',               :require => false
-  gem 'fakeredis',                    '~> 0.7.0', :require => 'fakeredis/rspec'
-  gem 'mongoid-rspec',                '~> 4'
-  gem 'rspec-instafail',              '~> 1'
-  gem 'rspec-benchmark'
-  gem 'ruby-progressbar',             '~> 1'
-  gem 'shoulda-matchers',             '~> 3'
-  gem 'simplecov',                    '~> 0.14',  :require => false
-  gem 'test-prof'
-  gem 'warden',                       '~> 1.2.7'
-  gem 'watir',                        '~> 6.10.3'
-  gem 'webdrivers', '~> 3.0'
-  gem 'webmock',                      '~> 3.0.1'
-end
-
-group :production do
-  gem 'eye',          '0.10.0'
-  gem 'newrelic_rpm', '~> 5.0'
-  gem 'unicorn',      '~> 4.8'
-end
-=======
 GIT
   remote: https://github.com/harshared/simple_calendar.git
   revision: 109781178efa26c89ba51efa496bca29bc70a565
   specs:
     simple_calendar (2.2.5)
       rails (>= 3.0)
+
+GIT
+  remote: https://github.com/ideacrew/aca_entities.git
+  revision: fac6a521df3bd596377ae59efed5278a0fd13af7
+  branch: trunk
+  specs:
+    aca_entities (0.1.0)
+      dry-monads (~> 1.2)
+      dry-struct (~> 1.0)
+      dry-types (~> 1.0)
+      dry-validation (~> 1.2)
 
 GIT
   remote: https://github.com/ideacrew/acapi.git
@@ -336,7 +147,7 @@ PATH
       aasm (~> 4.8)
       ckeditor (= 4.2.4)
       combine_pdf
-      config
+      config (~> 2.0)
       money-rails (~> 1.13)
       mongoid (~> 7.0.2)
       non-stupid-digest-assets
@@ -365,11 +176,7 @@ PATH
       dry-validation (~> 1.0)
       ffi (~> 1.9)
       kaminari (~> 0.17.0)
-<<<<<<< HEAD
       mongoid (~> 7.0.2)
-=======
-      money-rails (~> 1.13)
->>>>>>> 2090207f7b... fixed cucumbers and removed inheritence of sponsored_benefits benefit group from main app benefit group
       pundit (~> 2.0)
       rails (~> 5.2.4.3)
       roo (~> 2.1.0)
@@ -429,25 +236,25 @@ GEM
       actioncable (>= 5.0)
     action_mailer_cache_delivery (0.3.7)
       actionmailer (>= 3.0)
-    actioncable (5.2.4.5)
-      actionpack (= 5.2.4.5)
+    actioncable (5.2.4.4)
+      actionpack (= 5.2.4.4)
       nio4r (~> 2.0)
       websocket-driver (>= 0.6.1)
-    actionmailer (5.2.4.5)
-      actionpack (= 5.2.4.5)
-      actionview (= 5.2.4.5)
-      activejob (= 5.2.4.5)
+    actionmailer (5.2.4.4)
+      actionpack (= 5.2.4.4)
+      actionview (= 5.2.4.4)
+      activejob (= 5.2.4.4)
       mail (~> 2.5, >= 2.5.4)
       rails-dom-testing (~> 2.0)
-    actionpack (5.2.4.5)
-      actionview (= 5.2.4.5)
-      activesupport (= 5.2.4.5)
+    actionpack (5.2.4.4)
+      actionview (= 5.2.4.4)
+      activesupport (= 5.2.4.4)
       rack (~> 2.0, >= 2.0.8)
       rack-test (>= 0.6.3)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.0, >= 1.0.2)
-    actionview (5.2.4.5)
-      activesupport (= 5.2.4.5)
+    actionview (5.2.4.4)
+      activesupport (= 5.2.4.4)
       builder (~> 3.1)
       erubi (~> 1.4)
       rails-dom-testing (~> 2.0)
@@ -457,20 +264,20 @@ GEM
       activemodel (>= 4.1, < 6.2)
       case_transform (>= 0.2)
       jsonapi-renderer (>= 0.1.1.beta1, < 0.3)
-    activejob (5.2.4.5)
-      activesupport (= 5.2.4.5)
+    activejob (5.2.4.4)
+      activesupport (= 5.2.4.4)
       globalid (>= 0.3.6)
-    activemodel (5.2.4.5)
-      activesupport (= 5.2.4.5)
-    activerecord (5.2.4.5)
-      activemodel (= 5.2.4.5)
-      activesupport (= 5.2.4.5)
+    activemodel (5.2.4.4)
+      activesupport (= 5.2.4.4)
+    activerecord (5.2.4.4)
+      activemodel (= 5.2.4.4)
+      activesupport (= 5.2.4.4)
       arel (>= 9.0)
-    activestorage (5.2.4.5)
-      actionpack (= 5.2.4.5)
-      activerecord (= 5.2.4.5)
+    activestorage (5.2.4.4)
+      actionpack (= 5.2.4.4)
+      activerecord (= 5.2.4.4)
       marcel (~> 0.3.1)
-    activesupport (5.2.4.5)
+    activesupport (5.2.4.4)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 0.7, < 2)
       minitest (~> 5.1)
@@ -478,13 +285,13 @@ GEM
     addressable (2.7.0)
       public_suffix (>= 2.0.2, < 5.0)
     afm (0.2.2)
-    airbrussh (1.4.0)
+    airbrussh (1.3.1)
       sshkit (>= 1.6.1, != 1.7.0)
     amq-protocol (1.9.2)
     animate-rails (1.0.10)
       rails
     arel (9.0.0)
-    ast (2.4.2)
+    ast (2.4.1)
     awesome_print (1.8.0)
     aws-sdk (2.2.37)
       aws-sdk-resources (= 2.2.37)
@@ -496,24 +303,23 @@ GEM
       descendants_tracker (~> 0.0.4)
       ice_nine (~> 0.11.0)
       thread_safe (~> 0.3, >= 0.3.1)
-    bcrypt (3.1.16)
+    backports (3.17.0)
+    bcrypt (3.1.13)
     benchmark-malloc (0.2.0)
     benchmark-perf (0.6.0)
     benchmark-trend (0.4.0)
     bindex (0.8.1)
-    bootsnap (1.7.2)
+    bootsnap (1.4.8)
       msgpack (~> 1.0)
     brakeman (5.0.0)
     browser (2.7.0)
-    bson (4.12.0)
+    bson (4.10.0)
     builder (3.2.4)
     bunny (1.7.1)
       amq-protocol (~> 1.9.2)
-    cable_ready (4.5.0)
+    cable_ready (4.3.0)
       rails (>= 5.2)
-      thread-local (>= 1.1.0)
-    capistrano (3.16.0)
-    capistrano (3.15.0)
+    capistrano (3.11.0)
       airbrussh (>= 1.0.0)
       i18n
       rake (>= 10.0.0)
@@ -523,25 +329,24 @@ GEM
     capistrano-rails (1.4.0)
       capistrano (~> 3.1)
       capistrano-bundler (~> 1.1)
-    capybara (3.35.3)
+    capybara (3.31.0)
       addressable
       mini_mime (>= 0.1.3)
       nokogiri (~> 1.8)
       rack (>= 1.6.0)
       rack-test (>= 0.6.3)
-      regexp_parser (>= 1.5, < 3.0)
+      regexp_parser (~> 1.5)
       xpath (~> 3.2)
-    capybara-screenshot (1.0.25)
+    capybara-screenshot (1.0.24)
       capybara (>= 1.0, < 4)
       launchy
-    carrierwave (2.2.0)
+    carrierwave (2.1.0)
       activemodel (>= 5.0.0)
       activesupport (>= 5.0.0)
       addressable (~> 2.6)
       image_processing (~> 1.1)
       mimemagic (>= 0.3.0)
       mini_mime (>= 0.1.3)
-      ssrf_filter (~> 1.0)
     carrierwave-mongoid (1.3.0)
       carrierwave (>= 0.8, < 3)
       mongoid (>= 3.0, < 8.0)
@@ -586,61 +391,46 @@ GEM
       coffee-script-source
       execjs
     coffee-script-source (1.12.2)
-    combine_pdf (1.0.21)
+    combine_pdf (1.0.16)
       ruby-rc4 (>= 0.1.5)
-    concurrent-ruby (1.1.8)
-    config (2.2.3)
+    concurrent-ruby (1.1.7)
+    config (2.2.1)
       deep_merge (~> 1.2, >= 1.2.1)
       dry-validation (~> 1.0, >= 1.0.0)
     connection_pool (2.2.3)
-    crack (0.4.5)
-      rexml
+    crack (0.4.3)
+      safe_yaml (~> 1.0.0)
     crass (1.0.6)
-    cucumber (5.3.0)
-      builder (~> 3.2, >= 3.2.4)
-      cucumber-core (~> 8.0, >= 8.0.1)
-      cucumber-create-meta (~> 2.0, >= 2.0.2)
-      cucumber-cucumber-expressions (~> 10.3, >= 10.3.0)
-      cucumber-gherkin (~> 15.0, >= 15.0.2)
-      cucumber-html-formatter (~> 9.0, >= 9.0.0)
-      cucumber-messages (~> 13.1, >= 13.1.0)
-      cucumber-wire (~> 4.0, >= 4.0.1)
-      diff-lcs (~> 1.4, >= 1.4.4)
-      multi_test (~> 0.1, >= 0.1.2)
-      sys-uname (~> 1.2, >= 1.2.1)
-    cucumber-core (8.0.1)
-      cucumber-gherkin (~> 15.0, >= 15.0.2)
-      cucumber-messages (~> 13.0, >= 13.0.1)
-      cucumber-tag-expressions (~> 2.0, >= 2.0.4)
-    cucumber-create-meta (2.0.4)
-      cucumber-messages (~> 13.1, >= 13.1.0)
-      sys-uname (~> 1.2, >= 1.2.1)
-    cucumber-cucumber-expressions (10.3.0)
-    cucumber-gherkin (15.0.2)
-      cucumber-messages (~> 13.0, >= 13.0.1)
-    cucumber-html-formatter (9.0.0)
-      cucumber-messages (~> 13.0, >= 13.0.1)
-    cucumber-messages (13.2.1)
-      protobuf-cucumber (~> 3.10, >= 3.10.8)
-    cucumber-rails (2.2.0)
-      capybara (>= 2.18, < 4)
-      cucumber (>= 3.0.2, < 6)
-      mime-types (~> 3.2)
+    cucumber (3.1.2)
+      builder (>= 2.1.2)
+      cucumber-core (~> 3.2.0)
+      cucumber-expressions (~> 6.0.1)
+      cucumber-wire (~> 0.0.1)
+      diff-lcs (~> 1.3)
+      gherkin (~> 5.1.0)
+      multi_json (>= 1.7.5, < 2.0)
+      multi_test (>= 0.1.2)
+    cucumber-core (3.2.1)
+      backports (>= 3.8.0)
+      cucumber-tag_expressions (~> 1.1.0)
+      gherkin (~> 5.0)
+    cucumber-expressions (6.0.1)
+    cucumber-rails (1.8.0)
+      capybara (>= 2.12, < 4)
+      cucumber (>= 3.0.2, < 4)
+      mime-types (>= 2.0, < 4)
       nokogiri (~> 1.8)
-      rails (>= 5.0, < 7)
-    cucumber-tag-expressions (2.0.4)
-    cucumber-wire (4.0.1)
-      cucumber-core (~> 8.0, >= 8.0.1)
-      cucumber-cucumber-expressions (~> 10.3, >= 10.3.0)
-      cucumber-messages (~> 13.0, >= 13.0.1)
+      railties (>= 4.2, < 7)
+    cucumber-tag_expressions (1.1.1)
+    cucumber-wire (0.0.1)
     curl (0.0.9)
       awesome_print (>= 0.2.1)
       unidecoder (>= 1.1.1)
-    database_cleaner (1.99.0)
+    database_cleaner (1.8.3)
     deep_merge (1.2.1)
     descendants_tracker (0.0.4)
       thread_safe (~> 0.3, >= 0.3.1)
-    devise (4.7.3)
+    devise (4.7.1)
       bcrypt (~> 3.0)
       orm_adapter (~> 0.1)
       railties (>= 4.1.0)
@@ -650,7 +440,7 @@ GEM
       devise (~> 4.0)
       warden-jwt_auth (~> 0.3.6)
     diff-lcs (1.4.4)
-    docile (1.3.5)
+    docile (1.3.2)
     dry-auto_inject (0.6.1)
       dry-container (>= 0.3.4)
     dry-configurable (0.9.0)
@@ -659,44 +449,48 @@ GEM
     dry-container (0.7.2)
       concurrent-ruby (~> 1.0)
       dry-configurable (~> 0.1, >= 0.1.3)
-    dry-core (0.5.0)
+    dry-core (0.4.9)
       concurrent-ruby (~> 1.0)
     dry-equalizer (0.3.0)
     dry-inflector (0.2.0)
-    dry-initializer (3.0.4)
-    dry-logic (1.1.0)
+    dry-initializer (3.0.3)
+    dry-logic (1.0.7)
       concurrent-ruby (~> 1.0)
-      dry-core (~> 0.5, >= 0.5)
+      dry-core (~> 0.2)
+      dry-equalizer (~> 0.2)
     dry-matcher (0.8.3)
       dry-core (>= 0.4.8)
     dry-monads (1.3.5)
       concurrent-ruby (~> 1.0)
       dry-core (~> 0.4, >= 0.4.4)
       dry-equalizer
-    dry-schema (1.6.1)
+    dry-schema (1.5.4)
       concurrent-ruby (~> 1.0)
       dry-configurable (~> 0.8, >= 0.8.3)
-      dry-core (~> 0.5, >= 0.5)
+      dry-core (~> 0.4)
+      dry-equalizer (~> 0.2)
       dry-initializer (~> 3.0)
       dry-logic (~> 1.0)
-      dry-types (~> 1.5)
-    dry-struct (1.4.0)
-      dry-core (~> 0.5, >= 0.5)
-      dry-types (~> 1.5)
+      dry-types (~> 1.4)
+    dry-struct (1.3.0)
+      dry-core (~> 0.4, >= 0.4.4)
+      dry-equalizer (~> 0.3)
+      dry-types (~> 1.3)
       ice_nine (~> 0.11)
-    dry-types (1.5.1)
+    dry-types (1.4.0)
       concurrent-ruby (~> 1.0)
       dry-container (~> 0.3)
-      dry-core (~> 0.5, >= 0.5)
+      dry-core (~> 0.4, >= 0.4.4)
+      dry-equalizer (~> 0.3)
       dry-inflector (~> 0.1, >= 0.1.2)
       dry-logic (~> 1.0, >= 1.0.2)
-    dry-validation (1.6.0)
+    dry-validation (1.5.5)
       concurrent-ruby (~> 1.0)
       dry-container (~> 0.7, >= 0.7.1)
       dry-core (~> 0.4)
       dry-equalizer (~> 0.2)
       dry-initializer (~> 3.0)
-      dry-schema (~> 1.5, >= 1.5.2)
+      dry-schema (~> 1.5)
     easy_diff (1.0.0)
     email_spec (2.2.0)
       htmlentities (~> 4.3.3)
@@ -722,12 +516,13 @@ GEM
     fast_jsonapi (1.5)
       activesupport (>= 4.2)
     ffi (1.9.25)
-    font-awesome-rails (4.7.0.7)
-      railties (>= 3.2, < 7)
+    font-awesome-rails (4.7.0.5)
+      railties (>= 3.2, < 6.1)
     forgery (0.7.0)
+    gherkin (5.1.0)
     globalid (0.4.2)
       activesupport (>= 4.2.0)
-    haml (5.2.1)
+    haml (5.1.2)
       temple (>= 0.8.0)
       tilt
     haml-rails (2.0.1)
@@ -745,10 +540,10 @@ GEM
       nokogiri (>= 1.6.0)
       ruby_parser (~> 3.5)
     htmlentities (4.3.4)
-    httparty (0.18.1)
+    httparty (0.18.0)
       mime-types (~> 3.0)
       multi_xml (>= 0.5.2)
-    i18n (1.8.9)
+    i18n (1.8.7)
       concurrent-ruby (~> 1.0)
     i18n-tasks (0.9.33)
       activesupport (>= 4.0.2)
@@ -762,7 +557,7 @@ GEM
       terminal-table (>= 1.5.1)
     ice_cube (0.16.3)
     ice_nine (0.11.2)
-    image_processing (1.12.1)
+    image_processing (1.10.3)
       mini_magick (>= 4.9.5, < 5)
       ruby-vips (>= 2.0.17, < 3)
     iniparse (1.5.0)
@@ -770,16 +565,16 @@ GEM
     interactor-rails (2.2.1)
       interactor (~> 3.0)
       rails (>= 4.2)
-    jbuilder (2.11.2)
+    jbuilder (2.10.0)
       activesupport (>= 5.0.0)
     jmespath (1.4.0)
-    jquery-rails (4.4.0)
+    jquery-rails (4.3.5)
       rails-dom-testing (>= 1, < 3)
       railties (>= 4.2.0)
       thor (>= 0.14, < 2.0)
-    json (2.5.1)
+    json (2.3.0)
     jsonapi-renderer (0.2.2)
-    jwt (2.2.2)
+    jwt (2.2.1)
     kaminari (0.17.0)
       actionpack (>= 3.0.0)
       activesupport (>= 3.0.0)
@@ -808,32 +603,32 @@ GEM
       mimemagic (~> 0.3.2)
     maskedinput-rails (1.4.1.0)
     method_source (1.0.0)
-    middleware (0.1.0)
     mime-types (3.3.1)
       mime-types-data (~> 3.2015)
-    mime-types-data (3.2021.0225)
-    mimemagic (0.3.5)
-    mini_magick (4.11.0)
+    mime-types-data (3.2020.0512)
+    mimemagic (0.3.8)
+      nokogiri (~> 1)
+    mini_magick (4.10.1)
     mini_mime (1.0.2)
     mini_portile2 (2.4.0)
-    minitest (5.14.4)
+    minitest (5.14.2)
     monetize (1.9.4)
       money (~> 6.12)
-    money (6.13.8)
+    money (6.13.7)
       i18n (>= 0.6.4, <= 2)
-    money-rails (1.13.4)
+    money-rails (1.13.3)
       activesupport (>= 3.0)
       monetize (~> 1.9.0)
       money (~> 6.13.2)
       railties (>= 3.0)
-    mongo (2.14.0)
-      bson (>= 4.8.2, < 5.0.0)
-    mongo_session_store (3.2.1)
+    mongo (2.8.0)
+      bson (>= 4.4.2, < 5.0.0)
+    mongo_session_store (3.2.0)
       actionpack (>= 4.0)
       mongo (~> 2.0)
-    mongoid (7.0.12)
-      activemodel (>= 5.1, < 6.2)
-      mongo (>= 2.7.0, < 3.0.0)
+    mongoid (7.0.2)
+      activemodel (>= 5.1, < 6.0.0)
+      mongo (>= 2.5.1, < 3.0.0)
     mongoid-autoinc (6.0.3)
       mongoid (>= 6.0, < 8.0)
     mongoid-compatibility (0.5.1)
@@ -842,33 +637,31 @@ GEM
     mongoid-grid_fs (2.4.0)
       mime-types (>= 1.0, < 4.0)
       mongoid (>= 3.0, < 8.0)
-    mongoid-history (0.8.3)
+    mongoid-history (0.8.1)
       activesupport
       easy_diff
       mongoid (>= 3.0)
       mongoid-compatibility (>= 0.5.1)
-    mongoid-rspec (4.1.0)
+    mongoid-rspec (4.0.1)
       activesupport (>= 3.0.0)
       mongoid (>= 3.1)
       mongoid-compatibility (>= 0.5.1)
-      rspec-core (~> 3.3)
-      rspec-expectations (~> 3.3)
-      rspec-mocks (~> 3.3)
-    mongoid_rails_migrations (1.4.0)
+      rspec (~> 3.3)
+    mongoid_rails_migrations (1.2.1)
       activesupport (>= 4.2.0)
       bundler (>= 1.0.0)
       mongoid (>= 4.0.0)
       rails (>= 4.2.0)
       railties (>= 4.2.0)
     mono_logger (1.1.0)
-    msgpack (1.4.2)
-    multi_json (1.15.0)
+    msgpack (1.3.3)
+    multi_json (1.14.1)
     multi_test (0.1.2)
     multi_xml (0.6.0)
     mustermann (1.1.1)
       ruby2_keywords (~> 0.0.1)
-    net-scp (3.0.0)
-      net-ssh (>= 2.6.5, < 7.0.0)
+    net-scp (2.0.0)
+      net-ssh (>= 2.6.5, < 6.0.0)
     net-sftp (2.1.2)
       net-ssh (>= 2.6.5)
     net-ssh (4.2.0)
@@ -881,11 +674,11 @@ GEM
     non-stupid-digest-assets (1.0.9)
       sprockets (>= 2.0)
     orm_adapter (0.5.0)
-    overcommit (0.57.0)
-      childprocess (>= 0.6.3, < 5)
+    overcommit (0.52.1)
+      childprocess (>= 0.6.3, < 4)
       iniparse (~> 1.4)
     ox (2.14.1)
-    parallel (1.20.1)
+    parallel (1.19.1)
     parallel_tests (2.26.2)
       parallel
     parser (3.0.0.0)
@@ -896,40 +689,35 @@ GEM
       hashery (~> 2.0)
       ruby-rc4
       ttfunk
-    protobuf-cucumber (3.10.8)
-      activesupport (>= 3.2)
-      middleware
-      thor
-      thread_safe
-    public_suffix (4.0.6)
-    puma (3.12.6)
+    public_suffix (4.0.3)
+    puma (3.12.4)
     pundit (2.1.0)
       activesupport (>= 3.0.0)
     rack (2.2.3)
-    rack-protection (2.1.0)
+    rack-protection (2.0.8.1)
       rack
     rack-proxy (0.6.5)
       rack
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
     railroady (1.5.3)
-    rails (5.2.4.5)
-      actioncable (= 5.2.4.5)
-      actionmailer (= 5.2.4.5)
-      actionpack (= 5.2.4.5)
-      actionview (= 5.2.4.5)
-      activejob (= 5.2.4.5)
-      activemodel (= 5.2.4.5)
-      activerecord (= 5.2.4.5)
-      activestorage (= 5.2.4.5)
-      activesupport (= 5.2.4.5)
+    rails (5.2.4.4)
+      actioncable (= 5.2.4.4)
+      actionmailer (= 5.2.4.4)
+      actionpack (= 5.2.4.4)
+      actionview (= 5.2.4.4)
+      activejob (= 5.2.4.4)
+      activemodel (= 5.2.4.4)
+      activerecord (= 5.2.4.4)
+      activestorage (= 5.2.4.4)
+      activesupport (= 5.2.4.4)
       bundler (>= 1.3.0)
-      railties (= 5.2.4.5)
+      railties (= 5.2.4.4)
       sprockets-rails (>= 2.0.0)
-    rails-controller-testing (1.0.5)
-      actionpack (>= 5.0.1.rc1)
-      actionview (>= 5.0.1.rc1)
-      activesupport (>= 5.0.1.rc1)
+    rails-controller-testing (1.0.4)
+      actionpack (>= 5.0.1.x)
+      actionview (>= 5.0.1.x)
+      activesupport (>= 5.0.1.x)
     rails-dom-testing (2.0.3)
       activesupport (>= 4.2.0)
       nokogiri (>= 1.6)
@@ -938,29 +726,29 @@ GEM
     rails-i18n (5.1.3)
       i18n (>= 0.7, < 2)
       railties (>= 5.0, < 6)
-    railties (5.2.4.5)
-      actionpack (= 5.2.4.5)
-      activesupport (= 5.2.4.5)
+    railties (5.2.4.4)
+      actionpack (= 5.2.4.4)
+      activesupport (= 5.2.4.4)
       method_source
       rake (>= 0.8.7)
       thor (>= 0.19.0, < 2.0)
     rainbow (3.0.0)
     raindrops (0.19.1)
     rake (13.0.3)
-    rb-fsevent (0.10.4)
+    rb-fsevent (0.10.3)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
-    rdoc (6.3.0)
+    rdoc (6.2.1)
     recaptcha (4.14.0)
       json
-    recurring_select (3.0.0)
+    recurring_select (2.1.0)
       coffee-rails (>= 3.1)
       ice_cube (>= 0.11)
       jquery-rails (>= 3.0)
-      rails (>= 5.2)
+      rails (>= 3.2)
       sass-rails (>= 4.0)
     redcarpet (3.4.0)
-    redis (4.2.5)
+    redis (4.1.3)
     redis-actionpack (5.2.0)
       actionpack (>= 5, < 7)
       redis-rack (>= 2.1.0, < 3)
@@ -968,19 +756,19 @@ GEM
     redis-activesupport (5.2.0)
       activesupport (>= 3, < 7)
       redis-store (>= 1.3, < 2)
-    redis-namespace (1.8.1)
+    redis-namespace (1.7.0)
       redis (>= 3.0.4)
-    redis-rack (2.1.3)
+    redis-rack (2.1.2)
       rack (>= 2.0.8, < 3)
       redis-store (>= 1.2, < 2)
     redis-rails (5.0.2)
       redis-actionpack (>= 5.0, < 6)
       redis-activesupport (>= 5.0, < 6)
       redis-store (>= 1.2, < 2)
-    redis-store (1.9.0)
+    redis-store (1.8.2)
       redis (>= 4, < 5)
-    regexp_parser (2.1.1)
-    responders (3.0.1)
+    regexp_parser (1.8.2)
+    responders (3.0.0)
       actionpack (>= 5.0)
       railties (>= 5.0)
     resque (2.0.0)
@@ -993,37 +781,37 @@ GEM
     roo (2.1.1)
       nokogiri (~> 1)
       rubyzip (~> 1.1, < 2.0.0)
-    rspec (3.10.0)
-      rspec-core (~> 3.10.0)
-      rspec-expectations (~> 3.10.0)
-      rspec-mocks (~> 3.10.0)
+    rspec (3.9.0)
+      rspec-core (~> 3.9.0)
+      rspec-expectations (~> 3.9.0)
+      rspec-mocks (~> 3.9.0)
     rspec-benchmark (0.6.0)
       benchmark-malloc (~> 0.2)
       benchmark-perf (~> 0.6)
       benchmark-trend (~> 0.4)
       rspec (>= 3.0)
-    rspec-core (3.10.1)
-      rspec-support (~> 3.10.0)
-    rspec-expectations (3.10.1)
+    rspec-core (3.9.2)
+      rspec-support (~> 3.9.3)
+    rspec-expectations (3.9.2)
       diff-lcs (>= 1.2.0, < 2.0)
-      rspec-support (~> 3.10.0)
+      rspec-support (~> 3.9.0)
     rspec-instafail (1.0.0)
       rspec
-    rspec-mocks (3.10.2)
+    rspec-mocks (3.9.1)
       diff-lcs (>= 1.2.0, < 2.0)
-      rspec-support (~> 3.10.0)
-    rspec-rails (4.0.2)
+      rspec-support (~> 3.9.0)
+    rspec-rails (4.0.1)
       actionpack (>= 4.2)
       activesupport (>= 4.2)
       railties (>= 4.2)
-      rspec-core (~> 3.10)
-      rspec-expectations (~> 3.10)
-      rspec-mocks (~> 3.10)
-      rspec-support (~> 3.10)
-    rspec-support (3.10.2)
+      rspec-core (~> 3.9)
+      rspec-expectations (~> 3.9)
+      rspec-mocks (~> 3.9)
+      rspec-support (~> 3.9)
+    rspec-support (3.9.3)
     rspec_junit_formatter (0.4.1)
       rspec-core (>= 2, < 4, != 2.12.0)
-    rubocop (1.11.0)
+    rubocop (1.8.0)
       parallel (~> 1.10)
       parser (>= 3.0.0.0)
       rainbow (>= 2.2.2, < 4.0)
@@ -1032,25 +820,24 @@ GEM
       rubocop-ast (>= 1.2.0, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 1.4.0, < 3.0)
-    rubocop-ast (1.4.1)
+    rubocop-ast (1.4.0)
       parser (>= 2.7.1.5)
     rubocop-git (0.1.3)
       rubocop (>= 0.24.1)
-    rubocop-rspec (2.2.0)
-      rubocop (~> 1.0)
-      rubocop-ast (>= 1.1.0)
-    ruby-progressbar (1.11.0)
+    rubocop-rspec (1.38.1)
+      rubocop (>= 0.68.1)
+    ruby-progressbar (1.10.1)
     ruby-rc4 (0.1.5)
-    ruby-saml (1.12.0)
-      nokogiri (>= 1.10.5)
-      rexml
+    ruby-saml (1.11.0)
+      nokogiri (>= 1.5.10)
     ruby-vips (2.0.17)
       ffi (~> 1.9)
-    ruby2_keywords (0.0.4)
+    ruby2_keywords (0.0.2)
     ruby_dep (1.5.0)
-    ruby_parser (3.15.1)
+    ruby_parser (3.14.2)
       sexp_processor (~> 4.9)
     rubyzip (1.3.0)
+    safe_yaml (1.0.5)
     sass (3.7.4)
       sass-listen (~> 4.0.0)
     sass-listen (4.0.0)
@@ -1072,27 +859,26 @@ GEM
       rubyzip (>= 1.2.2)
     serverengine (1.5.11)
       sigdump (~> 0.2.2)
-    sexp_processor (4.15.2)
+    sexp_processor (4.14.1)
     shoulda-matchers (3.1.3)
       activesupport (>= 4.0.0)
-    sidekiq (6.1.3)
+    sidekiq (6.0.7)
       connection_pool (>= 2.2.2)
       rack (~> 2.0)
-      redis (>= 4.2.0)
+      rack-protection (>= 2.0.0)
+      redis (>= 4.1.0)
     sigdump (0.2.4)
-    simple_form (5.1.0)
-      actionpack (>= 5.2)
-      activemodel (>= 5.2)
-    simplecov (0.21.2)
+    simple_form (5.0.2)
+      actionpack (>= 5.0)
+      activemodel (>= 5.0)
+    simplecov (0.18.5)
       docile (~> 1.1)
       simplecov-html (~> 0.11)
-      simplecov_json_formatter (~> 0.1)
-    simplecov-html (0.12.3)
-    simplecov_json_formatter (0.1.2)
-    sinatra (2.1.0)
+    simplecov-html (0.12.2)
+    sinatra (2.0.8.1)
       mustermann (~> 1.0)
-      rack (~> 2.2)
-      rack-protection (= 2.1.0)
+      rack (~> 2.0)
+      rack-protection (= 2.0.8.1)
       tilt (~> 2.0)
     slim (3.0.9)
       temple (>= 0.7.6, < 0.9)
@@ -1106,7 +892,7 @@ GEM
       serverengine (~> 1.5.5)
       thor
       thread (~> 0.1.7)
-    spring (2.1.1)
+    spring (1.7.2)
     spring-watcher-listen (2.0.1)
       listen (>= 2.7, < 4.0)
       spring (>= 1.2, < 3.0)
@@ -1117,35 +903,29 @@ GEM
       actionpack (>= 4.0)
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
-    sshkit (1.21.2)
+    sshkit (1.18.2)
       net-scp (>= 1.1.2)
       net-ssh (>= 2.8.0)
-    ssrf_filter (1.0.7)
     state_machines (0.5.0)
-    stimulus_reflex (3.4.1)
-      cable_ready (>= 4.5)
+    stimulus_reflex (3.3.0)
+      cable_ready (>= 4.3.0)
       nokogiri
       rack
       rails (>= 5.2)
       redis
-    stimulus_reflex_testing (0.3.0)
-      stimulus_reflex (>= 3.3.0)
+    stimulus_reflex_testing (0.1.0)
     symmetric-encryption (3.9.1)
       coercible (~> 1.0)
-    sys-uname (1.2.2)
-      ffi (~> 1.1)
     temple (0.8.2)
-    terminal-table (3.0.0)
-      unicode-display_width (~> 1.1, >= 1.1.1)
+    terminal-table (1.6.0)
     terrapin (0.6.0)
       climate_control (>= 0.0.3, < 1.0)
-    test-prof (1.0.2)
+    test-prof (0.11.3)
     thor (1.1.0)
     thread (0.1.7)
-    thread-local (1.1.0)
     thread_safe (0.3.6)
     tilt (2.0.10)
-    timers (4.3.3)
+    timers (4.3.2)
     ttfunk (1.0.3)
     turbolinks (5.2.1)
       turbolinks-source (~> 5.2)
@@ -1154,7 +934,7 @@ GEM
       thread_safe (~> 0.1)
     uglifier (4.2.0)
       execjs (>= 0.3.0, < 3)
-    unicode-display_width (1.7.0)
+    unicode-display_width (2.0.0)
     unicorn (4.9.0)
       kgio (~> 2.6)
       rack
@@ -1167,8 +947,8 @@ GEM
       coercible (~> 1.0)
       descendants_tracker (~> 0.0, >= 0.0.3)
       equalizer (~> 0.0, >= 0.0.9)
-    warden (1.2.9)
-      rack (>= 2.0.9)
+    warden (1.2.8)
+      rack (>= 2.0.6)
     warden-jwt_auth (0.3.6)
       dry-auto_inject (~> 0.6)
       dry-configurable (~> 0.8)
@@ -1200,15 +980,16 @@ GEM
     wkhtmltopdf-binary-edge (0.12.3.0)
     xpath (3.2.0)
       nokogiri (~> 1.8)
-    yard (0.9.26)
+    yard (0.9.24)
     yard-mongoid (0.1.0)
       yard (>= 0.8.4)
 
 PLATFORMS
-  x86_64-darwin-17
+  ruby
 
 DEPENDENCIES
   aasm (~> 4.8)
+  aca_entities!
   acapi!
   action-cable-testing
   action_mailer_cache_delivery (~> 0.3)
@@ -1343,5 +1124,4 @@ RUBY VERSION
    ruby 2.5.1p57
 
 BUNDLED WITH
-   2.2.12
->>>>>>> Sets everything up for rails 6 to switch to 5.
+   2.2.9
