@@ -71,9 +71,26 @@ module UIHelpers
                        @model.first_name
                      end
 
-        heading_text.sub! '<family-member-name-placeholder>', first_name.titleize # rubocop:disable Style/NestedTernaryOperator TODO: Remove this
+        heading_text.sub! '<family-member-name-placeholder>', first_name.capitalize # rubocop:disable Style/NestedTernaryOperator TODO: Remove this
       else
         heading_text
+      end
+    end
+
+    # Edit state abbreviation placeholder
+    def state_abbreviation_text(text)
+      if text.include? '<state-abbreviation-placeholder>'
+        text.sub! '<state-abbreviation-placeholder>', aca_state_abbreviation
+      else
+        text
+      end
+    end
+
+    def translation_placeholder_text(text)
+      if text.include? '<medicaid-question-translation-placeholder>'
+        text.sub! '<medicaid-question-translation-placeholder>', state_abbreviation_text(l10n("faa.medicaid_question"))
+      else
+        text
       end
     end
 

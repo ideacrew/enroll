@@ -199,7 +199,7 @@
             - cells:
               - gutter: 12
                 type: raw_html
-                text: <b>Does any child on this application have a parent living outside of the home?</b>
+                text: <b>Does any child on this application have a parent living outside of the home?&nbsp;*</b>
               - gutter: 2
                 type: label_radio
                 name: row1
@@ -253,6 +253,34 @@
                   model: application
                   name: submission_terms
                   attribute: submission_terms
+      - section:
+          lines:
+            - cells:
+              - gutter: 12
+                type: raw_html
+                text: <b><medicaid-question-translation-placeholder></b>
+              - gutter: 2
+                type: label_radio
+                name: row1
+                value: true
+                required: true
+                id: 'medicaid_determination_yes'
+                label: 'Yes'
+                classNames: 'span-text'
+                model: application
+                name: full_medicaid_determination
+                attribute: full_medicaid_determination
+              - gutter: 2
+                type: label_radio
+                name: row1
+                value: false
+                required: true
+                id: 'medicaid_determination_no'
+                label: 'No'
+                classNames: 'span-text'
+                model: application
+                name: full_medicaid_determination
+                attribute: full_medicaid_determination
       - section:
           lines:
             - cells:

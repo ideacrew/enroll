@@ -310,6 +310,59 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
     end
   end
 
+  context "DELETE destroy" do
+    let(:dependent1) { FactoryBot.create(:person) }
+    let(:family_member_dependent) { FactoryBot.build(:family_member, person: dependent1, family: family)}
+    let!(:applicant2) do
+      FactoryBot.create(:applicant,
+                        first_name: "James", last_name: "Bond", gender: "male", dob: Date.new(1993, 3, 8),
+                        person_hbx_id: dependent1.hbx_id,
+                        application: application,
+                        family_member_id: family_member_dependent.id)
+    end
+
+    before do
+      family.family_members << family_member_dependent
+      family.save
+      relation = PersonRelationship.new(relative: family.family_members.last.person, kind: "child")
+      person.person_relationships << relation
+      person.save
+    end
+
+    it "should redirect to edit application path" do
+      delete :destroy, params: { application_id: application.id, id: applicant.id }
+      expect(response).to redirect_to(edit_application_path(application))
+    end
+
+    it "should destroy the applicant" do
+      delete :destroy, params: { application_id: application.id, id: applicant2.id }
+      application.reload
+      expect(application.active_applicants.where(id: applicant2.id).first).to be_nil
+    end
+
+    it "should not destroy the primary applicant" do
+      expect(applicant.is_primary_applicant).to eq true
+      delete :destroy, params: { application_id: application.id, id: applicant.id }
+      application.reload
+      expect(application.active_applicants.where(id: applicant.id).first).to eq applicant
+    end
+
+    it "should destroy the dependent" do
+      expect(family.family_members.active.count).to eq 2
+      delete :destroy, params: { application_id: application.id, id: applicant2.id }
+      family.reload
+      expect(family.family_members.active.count).to eq 1
+    end
+
+    it "should destroy the primary dependent" do
+      expect(applicant.is_primary_applicant).to eq true
+      expect(family.family_members.active.count).to eq 2
+      delete :destroy, params: { application_id: application.id, id: applicant.id }
+      family.reload
+      expect(family.family_members.active.count).to eq 2
+    end
+  end
+
   context "GET age of applicant" do
     it "should return age of applicant", dbclean: :after_each do
       get :age_of_applicant, params: { application_id: application.id, applicant_id: applicant.id }

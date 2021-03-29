@@ -14,6 +14,27 @@
           </div>
           <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
               <%= f.select :name_sfx, [ 'Jr.', 'Sr.', 'II', 'III', 'IV', 'V' ], :include_blank => 'NONE', class: "floatlabel form-control", autocomplete: :off %>
+              <div class="text-right">
+                <% unless @applicant.is_primary_applicant? %>
+                  <%= button_tag ('<i class="fa fa-times"></i>'.html_safe), id: "delete_applicant_button", class: "close" %>
+                <% end %>
+              </div>
+          </div>
+
+        </div>
+
+        <div class="modal" id="destroyApplicant" role="dialog">
+          <div class="modal-dialog" style="width: 500px;">
+            <div class="modal-content">
+              <div class="modal-body">
+                <%= l10n('faa.edit.delete_applicant') %>
+                <strong><br /><%= l10n('faa.edit.remove_warning') %></strong>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-primary btn-confirmation" onclick='confirmDestoyApplicant(event, "<%=application_applicant_path(@application, @applicant)%>"); return false;'>Confirm</button>
+                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancel</button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -157,4 +178,33 @@
 <%= render 'users/security_question_responses/edit_modal', action: 'replace', method: 'POST', edit_mode: true %>
 <script>
   Freebies.floatlabels();
+
+  $(document).on('click', '#delete_applicant_button', function(e) {
+    // debugger;
+    e.preventDefault();
+    $("#destroyApplicant").modal();
+
+    $("#destroyApplicant .modal-cancel-button").click(function(e) {
+      $("#destroyApplicant").modal('hide');
+    });
+    //
+    $(".btn-confirmation").removeAttr('disabled');
+  });
+
+  function confirmDestoyApplicant(event, url){
+    $(".btn-confirmation").attr('disabled', 'disabled');
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    //
+    $('.modal-backdrop').removeClass('modal-backdrop');
+    $('.modal-open').removeClass('modal-open');
+
+    $.ajax({
+      url: url,
+      type: "DELETE",
+      dataType: 'script',
+      contentType: false,
+      processData: false,
+    });
+  }
 </script>

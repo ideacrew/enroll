@@ -833,3 +833,20 @@ end
 Then("I should see a new renewing enrollment title on home page") do
   expect(page).to have_content "Auto Renewing"
 end
+
+When(/^Incarcerated field is nil for the consumer$/) do
+  user.person.update_attributes(is_incarcerated: nil)
+end
+
+Then(/^the consumer should see a message with incarcerated error$/) do
+  expect(page).to have_content(/Incarceration question must be answered/)
+end
+
+When(/^DOB is nil for the consumer$/) do
+  user.person.update_attributes(dob: nil)
+  user.person.save(validate: false)
+end
+
+Then(/^the consumer should see a message with dob error$/) do
+  expect(page).to have_content(/dob - must be filled/)
+end

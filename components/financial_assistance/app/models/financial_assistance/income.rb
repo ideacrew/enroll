@@ -35,13 +35,14 @@ module FinancialAssistance
       social_security_benefit
       supplemental_security_income
       tax_exempt_interest
-      unemployment_insurance
+      unemployment_income
       wages_and_salaries
       income_from_irs
     ].freeze
 
     JOB_INCOME_TYPE_KIND = 'wages_and_salaries'
     NET_SELF_EMPLOYMENT_INCOME_KIND = 'net_self_employment'
+    UNEMPLOYMENT_INCOME_KIND = 'unemployment_income'
     FREQUENCY_KINDS = %w[biweekly daily half_yearly monthly quarterly weekly yearly].freeze
 
     OTHER_INCOME_TYPE_KIND = {
@@ -51,7 +52,6 @@ module FinancialAssistance
       interest: 'Interest',
       pension_retirement_benefits: 'Pension or retirement',
       rental_and_royalty: 'Rent and royalties',
-      unemployment_insurance: 'Unemployment',
       social_security_benefit: 'Social Security',
       american_indian_and_alaskan_native: "American Indian/Alaska Native income",
       employer_funded_disability: 'Employer-funded disability payments',
@@ -82,8 +82,9 @@ module FinancialAssistance
 
     scope :jobs, -> {where(kind: JOB_INCOME_TYPE_KIND)}
     scope :self_employment, -> {where(kind: NET_SELF_EMPLOYMENT_INCOME_KIND)}
-    scope :other, -> {where(:kind.nin => [JOB_INCOME_TYPE_KIND, NET_SELF_EMPLOYMENT_INCOME_KIND])}
+    scope :other, -> {where(:kind.nin => [JOB_INCOME_TYPE_KIND, NET_SELF_EMPLOYMENT_INCOME_KIND, UNEMPLOYMENT_INCOME_KIND])}
     scope :of_kind, ->(kind) {where(kind: kind)}
+    scope :unemployment, ->{where(kind: 'unemployment_income')}
 
     validates_length_of :title,
                         in: TITLE_SIZE_RANGE,
