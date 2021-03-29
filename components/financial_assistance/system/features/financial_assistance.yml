@@ -56,12 +56,11 @@ registry:
           - key: :carrier_name
             item: "Carrier Name"
   - namespace:
-<<<<<<< HEAD
     - :other_income
     features:
       - key: :unemployment_income
         is_enabled: true
-=======
+  - namespace:
     - :documents
     features:
       - key: financial_assistance_documents
@@ -69,7 +68,6 @@ registry:
         settings:
           - key: :ivl_application_checklist
             item: 'db/documents/ivl_checklist.pdf'
->>>>>>> faa pdf update
 
   # TODO eligibility engine connectivity(HAVEN) settings
   # TODO mec service connectivity settings
