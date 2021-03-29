@@ -134,7 +134,7 @@ module BenefitSponsors
       end
 
       def is_site_dc?
-        Settings.site.key == :dc
+        EnrollRegistry[:enroll_app].settings(:site_key).item == :dc
       end
 
       def dc_broker_profile?
