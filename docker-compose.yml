@@ -11,6 +11,11 @@ services:
       - '3000:3000'
     environment:
       RAILS_ENV: development
+      DB_HOST: db
+    entrypoint: ./entrypoints/docker-entrypoint.sh
+    volumes:
+      - .:/app
+      - /app/node_modules
 
   db:
     image: mongo:4.2

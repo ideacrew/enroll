@@ -75,6 +75,8 @@ RUN bundle install
 
 COPY . ./
 
+RUN rails dev:cache
+
 # ENTRYPOINT [ "./entrypoints/docker-entrypoint.sh" ]
 
 # ARG YARN_VERSION
