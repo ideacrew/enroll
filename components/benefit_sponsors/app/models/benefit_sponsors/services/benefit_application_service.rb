@@ -57,8 +57,6 @@ module BenefitSponsors
       end
 
       def create_or_cancel_draft_ba(form, model_attributes)
-        # TODO: Rails 6 upgrade - why aree you even able to gete here if a benefit application is "ineligible"?
-        # Should it skip if ineligible?
         if form.admin_datatable_action && !can_create_draft_ba? || has_overlap_application?(model_attributes)
           form.errors.add(:base, 'Existing plan year with overlapping coverage exists')
           [false, nil]
