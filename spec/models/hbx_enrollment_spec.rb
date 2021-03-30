@@ -3400,7 +3400,7 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
 
     end
 
-    context "for SHOP market" do
+    context "for SHOP market", dbclean: :after_each do
 
       include_context "setup benefit market with market catalogs and product packages"
       include_context "setup initial benefit application"
@@ -3471,7 +3471,7 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
           before do
             effective_period = current_benefit_package.start_on.last_year..(current_benefit_package.end_on - 1.month).last_year
             current_benefit_package.benefit_application.update_attributes(aasm_state: :terminated, effective_period: effective_period)
-            census_employee.active_benefit_group_assignment.update_attributes(start_on: current_benefit_package.benefit_application.start_on, end_on: current_benefit_package.benefit_application.end_on)
+            census_employee.benefit_group_assignments.first.update_attributes(start_on: current_benefit_package.benefit_application.start_on, end_on: current_benefit_package.benefit_application.end_on)
             census_employee.update_attributes(hired_on: current_benefit_package.benefit_application.start_on - 3.months)
             enrollment.update_attributes(aasm_state: 'coverage_terminated', terminated_on: current_benefit_package.benefit_application.end_on - 1.month)
             enrollment.reload
@@ -3486,7 +3486,7 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
           before do
             effective_period = current_benefit_package.start_on.years_ago(2)..(current_benefit_package.end_on - 1.month).years_ago(2)
             current_benefit_package.benefit_application.update_attributes(aasm_state: :terminated, effective_period: effective_period)
-            census_employee.active_benefit_group_assignment.update_attributes(start_on: current_benefit_package.benefit_application.start_on, end_on: current_benefit_package.benefit_application.end_on)
+            census_employee.benefit_group_assignments.first.update_attributes(start_on: current_benefit_package.benefit_application.start_on, end_on: current_benefit_package.benefit_application.end_on)
             census_employee.update_attributes(hired_on: current_benefit_package.benefit_application.start_on - 3.months)
             enrollment.update_attributes(aasm_state: 'coverage_terminated', terminated_on: current_benefit_package.benefit_application.end_on - 1.month)
             enrollment.reload
