@@ -59,8 +59,9 @@ class ApplicationController < ActionController::Base
   def bad_token_due_to_session_expired
     flash[:warning] = "Session expired."
     respond_to do |format|
-      format.html { redirect_to root_path}
-      format.js   { render text: "window.location.assign('#{root_path}');"}
+      format.html { redirect_to root_path }
+      format.js   { render text: "window.location.assign('#{root_path}');" }
+      format.json { redirect_to root_path }
     end
   end
 
