@@ -91,9 +91,7 @@ module Forms
       if existing_inactive_family_member
         self.id = existing_inactive_family_member.id
         existing_inactive_family_member.reactivate!(self.relationship)
-        existing_inactive_family_member.save!
-        family.save!
-        return true
+        return true if family.save && existing_inactive_family_member.save
       end
       existing_person = Person.match_existing_person(self)
       if existing_person
@@ -104,10 +102,8 @@ module Forms
           family_member.build_resident_role(family_member)
         end
         assign_person_address(existing_person)
-        family_member.save!
-        family.save!
         self.id = family_member.id
-        return true
+        return true if family_member.save && family.save
       end
       person = Person.new(extract_person_params)
       return false unless try_create_person(person)
@@ -119,9 +115,8 @@ module Forms
       end
       assign_person_address(person)
       family.save_relevant_coverage_households
-      family.save!
       self.id = family_member.id
-      true
+      return true if family.save
     end
 
     def try_create_person(person)
