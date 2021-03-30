@@ -14,7 +14,7 @@ module EmployeeWorld
                                    sponsored_benefit_package_id: benefit_package.id,
                                    sponsored_benefit_id: sponsored_benefit.id,
                                    employee_role_id: employee_role.id,
-                                   benefit_group_assignment: employee_role.census_employee.active_benefit_group_assignment,
+                                   benefit_group_assignment: employee_role.census_employee.benefit_package_assignment_on(benefit_package.start_on),
                                    product_id: sponsored_benefit.reference_product.id,
                                    aasm_state: state)
 
