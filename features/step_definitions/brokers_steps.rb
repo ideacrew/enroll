@@ -110,10 +110,12 @@ And(/^.+ clicks? on Create Broker Agency$/) do
 end
 
 Then(/^.+ should see broker registration successful message$/) do
-  if [:dc, :me].include?(EnrollRegistry[:enroll_app].settings(:site_key).item)
-    expect(page).to have_content('Complete the following requirements to become a DC Health Link Registered Broker')
-  end
+  expect(page).to have_content('Complete the following requirements to become a DC Health Link Registered Broker') if is_dc_or_me_site?
   expect(page).to have_content('Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed.')
+end
+
+def is_dc_or_me_site?
+  [:dc, :me].include?(EnrollRegistry[:enroll_app].settings(:site_key).item)
 end
 
 And(/^.+ should see the list of broker applicants$/) do
