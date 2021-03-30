@@ -207,7 +207,7 @@
 <!-- Residency Verification -->
 <% if notice.residency_inconsistency.any? %>
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-    content: "<strong>"{site_state_abbreviation}" Residency:</strong> A document that shows that the following household members live in #{site_state_long_title}:", top_margin: '5px'} %>
+    content: "<strong>#{site_state_abbreviation} Residency:</strong> A document that shows that the following household members live in #{site_state_long_title}:", top_margin: '5px'} %>
   <%= render partial: 'notices/shared/household_member_details', :locals => {
    rows: [notice.residency_inconsistency], top_margin: '5px', bottom_margin: '5px'} %>
 
