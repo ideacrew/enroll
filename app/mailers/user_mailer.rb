@@ -4,9 +4,11 @@ class UserMailer < ApplicationMailer
   add_template_helper Config::AcaHelper
   add_template_helper Config::SiteHelper
   add_template_helper Config::ContactCenterHelper
+  add_template_helper ::L10nHelper
   include Config::AcaHelper
   include Config::SiteHelper
   include Config::ContactCenterHelper
+  include ::L10nHelper
 
   def welcome(user)
     if user.email.present?
