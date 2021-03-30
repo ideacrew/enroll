@@ -156,7 +156,7 @@ registry:
           - key: :staging_tax_info_url
             item: "https://staging.dchealthlink.com/individuals/tax-documents"
           - key: :statewide_area
-            item: "DC Metro"
+            item: "DC-Metro"
           - key: :exchange_name
             item: "Washington DC Health Benefit Exchange"
           - key: :social_media
@@ -195,6 +195,8 @@ registry:
             item: "https://www.dchealthlink.com/privacy-act-statement"
           - key: :site_broker_attestation_link
             item: "https://hbx.dc.gov/page/dc-health-link-broker-attestations"
+          - key: :rating_areas
+            item: "single"
       - key: :pay_now_functionality
         item: "kaiser_enabled"
         is_enabled: true
