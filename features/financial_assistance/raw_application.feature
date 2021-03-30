@@ -24,4 +24,5 @@ Feature: Cost Savings Raw Application
     And the user should see text Full Application
     When user clicks on Full application action
     Then user should land on full application page and should see 2 view my applications buttons
+    Then user should see 2 print buttons
     And user should see Medicaid eligibility question
