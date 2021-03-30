@@ -217,6 +217,8 @@ class ConsumerRole
   #list of the collections we want to track under consumer role model
   COLLECTIONS_TO_TRACK = %w- Person consumer_role vlp_documents lawful_presence_determination hbx_enrollments -
 
+  delegate :addresses, to: :person, allow_nil: true
+
   def ivl_coverage_selected
     if unverified?
       coverage_purchased!(verification_attr)
@@ -349,6 +351,10 @@ class ConsumerRole
 
   def billing_address
     addresses.detect { |adr| adr.kind == "billing" } || home_address
+  end
+
+  def rating_address
+    (addresses.detect { |adr| adr.kind == "home" }) || (addresses.detect { |adr| adr.kind == "mailing" })
   end
 
   def self.find(consumer_role_id)

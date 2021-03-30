@@ -43,12 +43,11 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   end
 
   def rating_area
-    # TODO: Seems to be hardcoded for demo
-    # zip = hbx_enrollment.consumer_role.zip
-    county_id = ::BenefitMarkets::Locations::CountyZip.find_by(zip: "04210").id
-    rating_area = ::BenefitMarkets::Locations::RatingArea.where(active_year: __getobj__.active_year).detect{|a| a.county_zip_ids.include?(county_id)}
+    used_address = hbx_enrollment.consumer_role.rating_address
+    rating_area = ::BenefitMarkets::Locations::RatingArea.rating_area_for(used_address, during: schedule_date)
+    #  .where(active_year: __getobj__.active_year).detect{|a| a.county_zip_ids.include?(county_id)}
     # rating_area.exchange_provided_code.present? ? rating_area.exchange_provided_code : __getobj__.premium_tables.first.rating_area.exchange_provided_code
-    if rating_area.exchange_provided_code == __getobj__.premium_tables.first.rating_area.exchange_provided_code
+    if rating_area
       rating_area.exchange_provided_code
     else
       __getobj__.premium_tables.first.rating_area.exchange_provided_code
@@ -59,7 +58,9 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   def premium_for(member)
     (::BenefitMarkets::Products::ProductRateCache.lookup_rate(__getobj__, schedule_date, age_of(member), rating_area) * large_family_factor(member)).round(2)
     # FIXME
-  rescue StandardError => _e
+  rescue StandardError => e
+    STDERR.puts e.inspect
+    STDERR.puts e.backtrace
     0
   end
 
