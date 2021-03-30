@@ -3,9 +3,7 @@
 class UnassistedPlanCostDecorator < SimpleDelegator
   include FloatHelper
 
-  attr_reader :hbx_enrollment
-  attr_reader :elected_aptc
-  attr_reader :tax_household
+  attr_reader :hbx_enrollment, :elected_aptc, :tax_household
 
   def initialize(plan, hbx_enrollment, elected_aptc = 0, tax_household = nil)
     super(plan)
@@ -59,8 +57,8 @@ class UnassistedPlanCostDecorator < SimpleDelegator
     (::BenefitMarkets::Products::ProductRateCache.lookup_rate(__getobj__, schedule_date, age_of(member), rating_area) * large_family_factor(member)).round(2)
     # FIXME
   rescue StandardError => e
-    STDERR.puts e.inspect
-    STDERR.puts e.backtrace
+    warn e.inspect
+    warn e.backtrace
     0
   end
 
