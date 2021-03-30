@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 module BenefitSponsors
-  RSpec.describe Profiles::Employers::EmployerProfilesController, type: :controller, dbclean: :after_each do
+  RSpec.describe Profiles::Employers::EmployerProfilesController, type: :controller, dbclean: :around_each do
 
     routes { BenefitSponsors::Engine.routes }
     let!(:security_question)  { FactoryBot.create_default :security_question }
