@@ -16,6 +16,6 @@ module FaaTranslations
     'en.faa.edit.delete_applicant' => 'Are you sure you want to remove this applicant?',
     'en.faa.edit.remove_warning' => 'This cannot be undone.',
     'en.faa.incomes.job_income_note' => "Note: For job income this person currently receives, do not enter an end date into the ‘To’ field. Only enter an end date if the job income ended.",
-    'en.faa.cost_savings.start_new_application' => 'Are you sure you want to start a brand new application?',
+    'en.faa.cost_savings.start_new_application' => 'Are you sure you want to start a brand new application?'
   }.freeze
 end
