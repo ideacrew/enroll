@@ -479,7 +479,7 @@ end
 
 Then(/^(?:.+) should see a successful sign up message$/) do
   FactoryBot.create(:sic_code, sic_code: "0111")
-  expect(page).to have_content("Welcome to #{Settings.site.short_name}")
+  expect(page).to have_content("Welcome to #{EnrollRegistry[:enroll_app].setting(:short_name).item}")
   # screenshot("employer_sign_up_welcome")
 end
 
@@ -512,8 +512,8 @@ When (/^(.*) logs? out$/) do |someone|
   click_link "Logout"
   visit "/"
   find('.container.welcome', wait: 5) do |element|
-    element.find('.heading-text', text: /Welcome to #{Settings.site.short_name}/i)
-    element.find('.sub-text', text: /#{Settings.site.byline}/i)
+    element.find('.heading-text', text: /Welcome to #{EnrollRegistry[:enroll_app].setting(:short_name).item}/i)
+    element.find('.sub-text', text: /#{EnrollRegistry[:enroll_app].setting(:byline).item}/i)
   end
 end
 
@@ -881,7 +881,7 @@ end
 
 Then(/^.+ should see the "my account" page$/) do
   find('.my-account-page', wait: 10)
-  expect(page).to have_content("My #{Settings.site.short_name}")
+  expect(page).to have_content("My #{EnrollRegistry[:enroll_app].setting(:short_name).item}")
   # screenshot("my_account")
 end
 
@@ -943,7 +943,7 @@ Then(/^.+ should see the appropriate (.*?) template text$/) do |market_name|
     expect(page).to have_content('Your employer contributes')
     expect(page).to have_content('Thank you for enrolling in coverage through Cover ME')
     # In the email signature
-    [Settings.site.short_name, Settings.contact_center.short_number, Settings.contact_center.tty].each do |email_signature_line|
+    [EnrollRegistry[:enroll_app].setting(:short_name).item, Settings.contact_center.short_number, Settings.contact_center.tty].each do |email_signature_line|
       expect(page).to have_content(email_signature_line)
     end
   end
