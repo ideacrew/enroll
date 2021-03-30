@@ -1,4 +1,8 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
+
+# updating site key to required site
 class UpdateSiteKey < MongoidMigrationTask
   def migrate
     site_key = ENV['new_site_key']&.to_sym
@@ -7,7 +11,7 @@ class UpdateSiteKey < MongoidMigrationTask
     else
       puts "No site key provided" unless Rails.env.test?
     end
-  rescue Exception => e
+  rescue StandardError => e
     puts e.message
   end
 end
