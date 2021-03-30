@@ -11,6 +11,9 @@ class Address
   KINDS = %W(home work mailing)
   OFFICE_KINDS = %W(primary mailing branch)
 
+  # Quadrants
+  QUADRANTS = %W(N NORTH S SOUTH E EAST W WEST NE NORTHEAST NW NORTHWEST SE SOUTHEAST SW SOUTHWEST)
+
   # The type of address
   field :kind, type: String
 
@@ -39,6 +42,12 @@ class Address
   # The name of the country where this address is located
   field :country_name, type: String, default: ""
 
+  # The name of the quadrant where this address is located
+  field :quadrant, type: String, default: ""
+
+  # The name of the quadrant where this address is located
+  field :quadrant, type: String, default: ""
+
   track_history :on => [:fields],
                 :scope => :person,
                 :modifier_field => :modifier,
@@ -59,6 +68,12 @@ class Address
         :with => /\A\d{5}(-\d{4})?\z/,
         :message => "should be in the form: 12345 or 12345-1234"
       }
+
+  before_save :detect_quadrant
+
+  def detect_quadrant
+    QUADRANTS.map { |word| "ADDRESS".scan /\b#{word}\b/ }.flatten
+  end
 
   # @note Add support for GIS location
   def location
