@@ -173,6 +173,10 @@ registry:
             item: "PO Box 97022"
           - key: :contact_center_state_and_city
             item: "Washington, DC"
+          - key: :contact_center_city
+            item: "Washington"
+          - key: :contact_center_county
+            item: 'Washington'
           - key: :contact_center_zip_code
             item: "20026"
           - key: :contact_center_email_address
