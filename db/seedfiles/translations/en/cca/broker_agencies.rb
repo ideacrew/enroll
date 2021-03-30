@@ -219,6 +219,6 @@ BROKER_AGENCIES_TRANSLATIONS = {
   "en.broker_agencies.broker_invitation.another_email" => "You should expect to receive another email from us about your next steps within 7-10 business days.",
   "en.broker_agencies.broker_invitation.broker_portal_access" => "If you meet all of our requirements for certified brokers, your next email will include information on how to access the broker portal, including creating a username and password.",
   "en.broker_agencies.broker_invitation.broker_steps" => "If you do not appear to meet all of our requirements, we will let you know which steps you will need to take before you can become a %{site_short_name}-certified broker.",
-  "en.broker_agencies.broker_invitation.broker_questions" => "If you have questions, please visit the <a href="%{certification_url}">broker certification section of our website</a>, or call us at %{contact_center_phone_number} (TTY: %{contact_center_tty_number}).",
+  "en.broker_agencies.broker_invitation.broker_questions" => "If you have questions, please visit the <a href='%{certification_url}'>broker certification section of our website</a>, or call us at %{contact_center_phone_number} (TTY: %{contact_center_tty_number}).",
   "en.broker_agencies.broker_invitation.thank_you_footer" => "Thank you,"
 }
