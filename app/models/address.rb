@@ -16,6 +16,9 @@ class Address
   # Quadrants
   QUADRANTS = %w[N NORTH S SOUTH E EAST W WEST NE NORTHEAST NW NORTHWEST SE SOUTHEAST SW SOUTHWEST].freeze
 
+  # Quadrants
+  QUADRANTS = %W(N NORTH S SOUTH E EAST W WEST NE NORTHEAST NW NORTHWEST SE SOUTHEAST SW SOUTHWEST)
+
   # The type of address
   field :kind, type: String
 
@@ -80,6 +83,12 @@ class Address
 
   def quadrant_check
     errors.add(:quadrant, "not present") if Settings.aca.validate_quadrant && Settings.aca.quadrant_state_inclusion.include?(self.state) && Settings.aca.quadrant_zip_codes_exclusions.exclude?(self.zip) && self.quadrant.blank?
+  end
+
+  before_save :detect_quadrant
+
+  def detect_quadrant
+    QUADRANTS.map { |word| "ADDRESS".scan /\b#{word}\b/ }.flatten
   end
 
   # @note Add support for GIS location
