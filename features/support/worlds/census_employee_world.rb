@@ -231,7 +231,7 @@ And(/employee (.*) should see renewing benefit application start date as effecti
   find('#group-selection-form', wait: 5, text: renewal_application.start_on.strftime('%m/%d/%Y'))
 end
 
-And(/employee (.*) already matched with employer (.*?)(?: and (.*?))? and logged into employee portal/) do |named_person, legal_name, legal_name2|
+And(/employee (.*) already matched with employer (.*?)(?: and (.*?))? and (.*?) into employee portal/) do |named_person, legal_name, legal_name2, status|
   person = people[named_person]
   sponsorship = employer(legal_name).benefit_sponsorships.first
   profile = sponsorship.profile
@@ -271,8 +271,10 @@ And(/employee (.*) already matched with employer (.*?)(?: and (.*?))? and logged
     employee_role = FactoryBot.create(:employee_role, person: person_record, benefit_sponsors_employer_profile_id: profile2.id, census_employee_id: ce1.id)
     ce1.update_attributes(employee_role_id: employee_role.id)
   end
-  login_as user
-  visit "/families/home"
+  if status == 'logged'
+    login_as user
+    visit "/families/home"
+  end
 end
 
 And(/(.*) has active coverage and passive renewal/) do |named_person|

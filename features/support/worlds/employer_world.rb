@@ -100,6 +100,13 @@ And(/^(.*?) employer terminates employees$/) do |legal_name|
   end
 end
 
+And(/^(.*?) employer terminates employees with termination date in terminated plan year$/) do |_legal_name|
+  termination_date = @prior_application.present? ? @prior_application.end_on - 1.month : TimeKeeper.date_of_record - 1.day
+  @census_employees.each do |employee|
+    employee.terminate_employment(termination_date)
+  end
+end
+
 And(/^(.*?) is logged in and on the home page$/) do |legal_name|
   organization = @organization[legal_name]
   employer_profile = organization.employer_profile

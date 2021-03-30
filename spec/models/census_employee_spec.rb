@@ -2687,6 +2687,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     before do
       census_employee.employee_role_id = employee_role.id
       census_employee.aasm_state = 'employment_terminated'
+      census_employee.employment_terminated_on = terminated_benefit_package.end_on - 2.months
       census_employee.coverage_terminated_on = terminated_benefit_package.end_on - 2.months
       census_employee.benefit_group_assignments << build(:benefit_group_assignment, benefit_group: active_benefit_package, census_employee: census_employee, start_on: active_benefit_package.start_on, end_on: active_benefit_package.end_on)
       census_employee.benefit_group_assignments << build(:benefit_group_assignment, benefit_group: terminated_benefit_package, census_employee: census_employee, start_on: terminated_benefit_application.start_on,

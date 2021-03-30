@@ -1099,3 +1099,7 @@ end
 And(/^employer should see census employee status as (.*?)$/) do |status|
   expect(page).to have_content status
 end
+
+And(/^employee should have cobra sponsored enrollments generated$/) do
+  expect(HbxEnrollment.all.pluck(:kind).include?('employer_sponsored_cobra')).to eq true
+end

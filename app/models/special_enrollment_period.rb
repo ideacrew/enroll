@@ -68,6 +68,9 @@ class SpecialEnrollmentPeriod
   # ADMIN FLAG
   field :admin_flag, type:Boolean
 
+  # USER ID
+  field :user_id, type: BSON::ObjectId
+
   #Renew coverage flag
   field :coverage_renewal_flag, type: Boolean, default: EnrollRegistry.feature_enabled?(:prior_plan_year_sep) ? true : false
 
@@ -86,7 +89,7 @@ class SpecialEnrollmentPeriod
   scope :fehb_market,         ->{ where(:qualifying_life_event_kind_id.in => QualifyingLifeEventKind.fehb_market_events.map(&:id) + QualifyingLifeEventKind.fehb_market_non_self_attested_events.map(&:id) ) }
   scope :individual_market,   ->{ where(:qualifying_life_event_kind_id.in => QualifyingLifeEventKind.individual_market_events.map(&:id) + QualifyingLifeEventKind.individual_market_non_self_attested_events.map(&:id)) }
 
-  after_initialize :set_submitted_at
+  after_initialize :set_submitted_at, :set_user_id
 
   add_observer ::BenefitSponsors::Observers::NoticeObserver.new, [:process_special_enrollment_events]
 
@@ -239,6 +242,10 @@ private
 
   def set_submitted_at
     self.submitted_at ||= TimeKeeper.datetime_of_record
+  end
+
+  def set_user_id
+    self.user_id = SAVEUSER[:current_user_id]
   end
 
   def set_date_period
