@@ -123,7 +123,7 @@ And(/^the .+ is navigated to Application checklist page/) do
 end
 
 And(/^the .+ should see a modal popup/) do
-  expect(page).to have_content("#{l10n('faa.cost_savings.start_new_application')}")
+  expect(page).to have_content(l10n('faa.cost_savings.start_new_application').to_s)
 end
 
 And(/^the .+ clicks on 'Start New Application' on modal popup/) do
