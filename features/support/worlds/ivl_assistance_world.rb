@@ -117,14 +117,14 @@ module IvlAssistanceWorld
     allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 10, 5)) unless is_tax_credit_btn_enabled
   end
 
-  def create_family_and_determined_aa_application
+  def create_family_faa_application(state)
     @user = FactoryBot.create(:user)
     @user.identity_response_code = 'acc'
     @user.identity_final_decision_code = "acc"
     @user.save
     @person = FactoryBot.create(:person, :with_consumer_role, user: user)
     family = FactoryBot.create(:family, :with_primary_family_member, person: @person)
-    _application = FactoryBot.create(:financial_assistance_application, aasm_state: 'determined', family_id: family.id)
+    _application = FactoryBot.create(:financial_assistance_application, aasm_state: state, family_id: family.id)
   end
 end
 

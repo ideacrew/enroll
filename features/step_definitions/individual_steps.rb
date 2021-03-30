@@ -811,7 +811,7 @@ And(/consumer clicked on "Married" qle/) do
   click_link "Married"
 end
 
-When("consumer visits home page") do
+When(/.+ visits home page/) do
   visit "/families/home"
 end
 

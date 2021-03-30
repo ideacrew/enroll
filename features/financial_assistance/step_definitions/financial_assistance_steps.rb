@@ -34,7 +34,7 @@ When(/^selects yes they would like help paying for coverage$/) do
   find('a.interaction-click-control-continue').click
 end
 
-When(/^they click 'Start New Application' button$/) do
+When(/^.+ click 'Start New Application' button$/) do
   click_button 'Start new application'
 end
 
@@ -414,21 +414,21 @@ Then(/^the consumer will navigate to the Family Members page$/) do
   expect(page).to have_selector('h2', text: "#{l10n('family_information')}")
 end
 
-Then(/^a family with financial application in determined state exists$/) do
-  create_family_and_determined_aa_application
+Then(/^a family with financial application in (.*) state exists$/) do |state|
+  create_family_faa_application(state)
 end
 
-Then(/^the user with hbx admin role is logged in$/) do
-  @user.roles << 'hbx_staff'
+Then(/^the user with (.*) role is logged in$/) do |role|
+  @user.roles << role
   login_as @user
 end
 
-When("admin visits home page") do
-  visit "/families/home"
+And(/^the .+ clicks on Cost Savings link$/) do
+  find_link('Cost Savings').click
 end
 
-And(/^the user clicks on Cost Savings link$/) do
-  find_link('Cost Savings').click
+And(/^.+ should see 'Start New Application' button$/) do
+  expect(page).to have_css('.interaction-click-control-start-new-application')
 end
 
 When(/^the user clicks on Action dropdown$/) do
