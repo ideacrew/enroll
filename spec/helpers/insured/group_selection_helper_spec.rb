@@ -354,10 +354,11 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
         let(:family)       { person.primary_family }
         let(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile_expired_application, site: site) }
         let(:expired_application) { organization.employer_profile.benefit_applications.expired.first }
+        let(:benefit_sponsorship) { organization.benefit_sponsorships.first }
         let(:profile) { organization.employer_profile }
         let(:expired_benefit_package) { expired_application.benefit_packages.first }
-        let!(:census_employee)  { FactoryBot.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: profile, active_benefit_group_assignment: expired_benefit_package.id) }
-        let(:employee_role)     { FactoryBot.create(:benefit_sponsors_employee_role, employer_profile: profile, person: person, census_employee_id: census_employee.id, benefit_sponsors_employer_profile_id: profile.id) }
+        let!(:census_employee)  { FactoryBot.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: organization.employer_profile, active_benefit_group_assignment: expired_benefit_package.id.to_s) }
+        let(:employee_role)     { FactoryBot.create(:benefit_sponsors_employee_role, employer_profile: organization.employer_profile, person: person, census_employee_id: census_employee.id, benefit_sponsors_employer_profile_id: profile.id) }
 
         let(:qle_kind) { FactoryBot.create(:qualifying_life_event_kind, :effective_on_event_date) }
 
