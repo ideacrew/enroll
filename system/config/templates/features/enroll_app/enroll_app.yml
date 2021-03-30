@@ -66,7 +66,7 @@ registry:
           - key: :health_care_website_url
             item: "https://www.healthcare.gov"
           - key: :short_name
-            item: "Maine Cover ME"
+            item: "Cover ME"
           - key: :byline
             item: "Maine's Official Health Insurance Marketplace"
           - key: :long_name
