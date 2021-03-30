@@ -51,7 +51,7 @@ gem 'ui_helpers',         path: "components/ui_helpers"
 ## MongoDB gem dependencies
 gem 'bson',                     '~> 4.3'
 gem 'carrierwave-mongoid',      '~> 1.2',  :require => 'carrierwave/mongoid'
-gem 'mongoid',                  '~> 7.2'
+gem 'mongoid',                  git: 'https://github.com/mongodb/mongoid.git', ref: 'df6b2168ee7526f0c5e26f64f38851b91a0623e8'
 gem 'mongo',                    '~> 2.6'
 gem 'mongo_session_store',      '~> 3.1'
 gem 'mongoid-autoinc',          '~> 6.0'
@@ -71,7 +71,7 @@ gem 'bcrypt',                   '~> 3.1'
 gem 'bootsnap',                 '>= 1.1', require: false
 gem 'browser',                  '2.7.0'
 gem 'ckeditor',                 '~> 4.2.4'
-gem 'coffee-rails',             '~> 4.2.2'
+gem 'coffee-rails',             '~> 5.0'
 gem 'combine_pdf',              '~> 1.0'
 gem 'config',                   '~> 2.0'
 gem 'curl',                     '~> 0.0.9'

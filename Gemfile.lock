@@ -58,6 +58,15 @@ GIT
       rack (>= 1.6.13)
 
 GIT
+  remote: https://github.com/mongodb/mongoid.git
+  revision: df6b2168ee7526f0c5e26f64f38851b91a0623e8
+  ref: df6b2168ee7526f0c5e26f64f38851b91a0623e8
+  specs:
+    mongoid (7.3.0.alpha)
+      activemodel (>= 5.1, < 6.2)
+      mongo (>= 2.10.5, < 3.0.0)
+
+GIT
   remote: https://github.com/prawnpdf/prawn.git
   revision: 8028ca0cd2aae8c72df9fc4bf16388948423bcb2
   ref: 8028ca0cd2
@@ -81,7 +90,6 @@ PATH
       dry-validation
       language_list (~> 1)
       money-rails (~> 1.13)
-      mongoid (~> 7.2)
       pundit (~> 2.0)
       rails (~> 6.0)
       slim (~> 3.0)
@@ -110,7 +118,6 @@ PATH
       language_list (~> 1)
       mail
       money-rails (~> 1.13)
-      mongoid (~> 7.2)
       mongoid-autoinc (~> 6.0)
       pundit (~> 2.0)
       rails (~> 6.0)
@@ -133,7 +140,6 @@ PATH
       font-awesome-rails (~> 4.7)
       haml-rails
       money-rails (~> 1.13.3)
-      mongoid (~> 7.2)
       mongoid-autoinc (~> 6.0)
       pundit (~> 2.0)
       rails (~> 6.0)
@@ -149,7 +155,6 @@ PATH
       combine_pdf
       config (~> 2.0)
       money-rails (~> 1.13)
-      mongoid (~> 7.2)
       non-stupid-digest-assets
       rails (~> 6.0)
       redcarpet (~> 3.4.0)
@@ -176,7 +181,6 @@ PATH
       dry-validation (~> 1.0)
       ffi (~> 1.9)
       kaminari (~> 0.17.0)
-      mongoid (~> 7.2)
       pundit (~> 2.0)
       rails (~> 6.0)
       roo (~> 2.1.0)
@@ -198,7 +202,6 @@ PATH
   remote: components/transport_profiles
   specs:
     transport_profiles (0.0.1)
-      mongoid (~> 7.2)
       rails (~> 6.0)
       rubyzip (>= 1.3.0)
       symmetric-encryption (~> 3.9.1)
@@ -325,7 +328,7 @@ GEM
       msgpack (~> 1.0)
     brakeman (5.0.0)
     browser (2.7.0)
-    bson (4.11.1)
+    bson (4.12.0)
     builder (3.2.4)
     bunny (1.7.1)
       amq-protocol (~> 1.9.2)
@@ -396,9 +399,9 @@ GEM
       terrapin (= 0.6.0)
     coercible (1.0.0)
       descendants_tracker (~> 0.0.1)
-    coffee-rails (4.2.2)
+    coffee-rails (5.0.0)
       coffee-script (>= 2.2.0)
-      railties (>= 4.0.0)
+      railties (>= 5.2.0)
     coffee-script (2.4.1)
       coffee-script-source
       execjs
@@ -649,9 +652,6 @@ GEM
     mongo_session_store (3.2.1)
       actionpack (>= 4.0)
       mongo (~> 2.0)
-    mongoid (7.2.0)
-      activemodel (>= 5.1, < 6.1)
-      mongo (>= 2.10.5, < 3.0.0)
     mongoid-autoinc (6.0.3)
       mongoid (>= 6.0, < 8.0)
     mongoid-compatibility (0.5.1)
@@ -1049,7 +1049,7 @@ DEPENDENCIES
   certified (~> 1)
   ckeditor (~> 4.2.4)
   climate_control (~> 0.2.0)
-  coffee-rails (~> 4.2.2)
+  coffee-rails (~> 5.0)
   combine_pdf (~> 1.0)
   config (~> 2.0)
   cucumber-rails
@@ -1085,7 +1085,7 @@ DEPENDENCIES
   money-rails (~> 1.13)
   mongo (~> 2.6)
   mongo_session_store (~> 3.1)
-  mongoid (~> 7.2)
+  mongoid!
   mongoid-autoinc (~> 6.0)
   mongoid-history (~> 0.8)
   mongoid-rspec (~> 4.1)
