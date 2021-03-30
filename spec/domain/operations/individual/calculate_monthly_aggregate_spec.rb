@@ -150,6 +150,18 @@ RSpec.describe Operations::Individual::CalculateMonthlyAggregate do
       it 'should return monthly aggregate amount' do
         expect(@result.success).to eq(860.00)
       end
+
+      context 'When one of the enrollment as effective date greater then effective date' do
+        before do
+          hbx_enrollment2.update_attributes(effective_on: effective_on + 1.month)
+          input_params = {family: family, effective_on: effective_on, shopping_fm_ids: hbx_enrollment.hbx_enrollment_members.pluck(:applicant_id), subscriber_applicant_id: hbx_enrollment.subscriber.applicant_id}
+          @result = subject.call(input_params)
+        end
+
+        it 'should not consider second enrollment when calculating consumed amount' do
+          expect(@result.success).to eq(900.00)
+        end
+      end
     end
   end
 
@@ -292,6 +304,19 @@ RSpec.describe Operations::Individual::CalculateMonthlyAggregate do
           expect(@result.success).to eq(800.00)
         end
       end
+
+      context 'Gap in eligible months of 4months will not be considered and one of the enrollment with effective date greater then effective on.' do
+        before do
+          hbx_enrollment2.update_attributes(effective_on: Date.new(current_year, 12, 1))
+          input_params = {family: family, effective_on: Date.new(current_year, 11, 1), shopping_fm_ids: hbx_enrollment.hbx_enrollment_members.pluck(:applicant_id), subscriber_applicant_id: hbx_enrollment.subscriber.applicant_id}
+          @result = subject.call(input_params)
+        end
+
+        it 'should return aptc amount based on eligible months' do
+          expect(@result.success).to eq(800.00)
+        end
+      end
+
 
       context 'Gap in eligible months of 4months will not be considered and one of the enrollment is catastrophic enrollment.' do
         before do
