@@ -72,6 +72,7 @@ module BenefitSponsors
 
       def lookup_package_products(coverage_date)
         return [reference_product] if product_package_kind == :single_product
+
         BenefitMarkets::Products::Product.by_coverage_date(product_package.products_for_plan_option_choice(product_option_choice).by_service_areas(recorded_service_area_ids), coverage_date)
       end
 
@@ -133,10 +134,21 @@ module BenefitSponsors
         end
       end
 
+      def new_product_option_choice(new_product_package)
+        case product_package.package_kind
+        when :single_issuer
+          new_product_package&.products&.first&.issuer_profile_id
+        when :metal_level
+          product_package&.products&.first&.metal_level_kind
+        else
+          product_option_choice
+        end
+      end
+
       def attributes_for_renewal(new_benefit_package, new_product_package)
         {
           product_package_kind: product_package_kind,
-          product_option_choice: product_option_choice,
+          product_option_choice: new_product_option_choice(new_product_package),
           reference_product: reference_product.renewal_product,
           sponsor_contribution: sponsor_contribution.renew(new_product_package),
           benefit_package: new_benefit_package

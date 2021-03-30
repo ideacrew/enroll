@@ -116,7 +116,7 @@ module BenefitMarkets
       )
     }
 =end
-    scope :by_metal_level_kind,         ->(metal_level){ where(metal_level_kind: /#{metal_level}/i) }
+    scope :by_metal_level_kind,         ->(metal_level){ where(metal_level_kind: metal_level&.to_sym) }
     scope :by_state,                    ->(state) {where(
       :"issuer_profile_id".in => BenefitSponsors::Organizations::Organization.issuer_profiles.where(:"profiles.issuer_state" => state).map(&:issuer_profile).map(&:id)
     )}

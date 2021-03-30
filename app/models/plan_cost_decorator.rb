@@ -119,7 +119,7 @@ class PlanCostDecorator < SimpleDelegator
     relationship_benefit = relationship_benefit_for(member)
     if relationship_benefit && relationship_benefit.offered? && benefit_group
       value = rate_lookup(__getobj__, plan_year_start_on, age_of(member), member, benefit_group)
-      BigDecimal.new("#{value}").round(2).to_f
+      BigDecimal(value.to_s).round(2).to_f
     else
       0.00
     end

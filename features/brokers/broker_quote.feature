@@ -1,7 +1,7 @@
 Feature: Broker creates a quote for a prospect employer
-    In order for Brokers to create a quote to Employers
-    The Broker should be able to add Employer and Employees
-    And Generate a quote
+  In order for Brokers to create a quote to Employers
+  The Broker should be able to add Employer and Employees
+  And Generate a quote
 
   Background: Broker Quoting Tool
     Given a CCA site exists with a benefit market
@@ -56,14 +56,12 @@ Feature: Broker creates a quote for a prospect employer
     And Primary Broker should see successful message of published quote
     And Primary Broker logs out
 
-
     Examples:
       | contribution_pct |
       | 0                |
       | 50               |
       | 100              |
 
-  @flaky
   Scenario Outline: Broker should be able to create a quote with flexible rules for an existing employer
     Given there is an employer Netflix
     And employer Netflix hired broker Max Planck from District Brokers Inc

@@ -236,7 +236,7 @@ module BenefitSponsors
       where(
         "$and" => [
           {:aasm_state.in => PUBLISHED_STATES },
-          {"$exists" => {:predecessor_id => true} }
+          {:predecessor_id => {"$exists": true}}
         ]
       )
     }
@@ -272,7 +272,7 @@ module BenefitSponsors
       where(
         "$or" => [
           {:aasm_state.in => APPROVED_STATES },
-          {"$exists" => {:predecessor_id => true} }
+          {:predecessor_id => {"$exists": true}}
         ]
       )
     }

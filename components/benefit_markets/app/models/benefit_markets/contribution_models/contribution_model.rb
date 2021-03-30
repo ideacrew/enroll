@@ -37,7 +37,7 @@ module BenefitMarkets
 
       index({"key" => 1})
 
-      scope :options_for_select,  ->{ unscoped.distinct(:key).as_json } #.reduce([]) { |list, cm| list << [cm.title, cm.key] } }
+      scope :options_for_select,  ->{ unscoped.distinct(:key).serializable_hash } #.reduce([]) { |list, cm| list << [cm.title, cm.key] } }
 
       def contribution_calculator
         @contribution_calculator ||= contribution_calculator_kind.constantize.new
