@@ -119,7 +119,7 @@ module Insured
       if benefit_application.present? && benefit_application.is_renewing?
         renewal_enrollment(enrollments, employee_role, coverage_kind)
       elsif benefit_application&.active?
-        active_enrollment(enrollments, employee_role, coverage_kind)
+        active_enrollment(family, enrollments, employee_role, coverage_kind)
       elsif benefit_application&.expired? || benefit_application&.terminated?
         previous_py_enrollment(enrollments, employee_role, coverage_kind, effective_on)
       end
