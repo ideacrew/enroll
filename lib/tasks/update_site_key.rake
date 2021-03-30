@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "app", "data_migrations", "update_site_key")
 
 # This rake task is to update the site key
