@@ -211,5 +211,6 @@ BROKER_AGENCIES_TRANSLATIONS = {
 	"en.reason" => "Reason",
 	"en.broker_carrier_appointments_enabled_note" => "Note: Carrier appointments for broker are not necessary for participation in %{site_long_name}.",
 	"en.write_here" => "Write here",
-	"en.broker_agencies.profiles.npn_taken_error" => "NPN has already been claimed by another broker. Please contact HBX-Customer Service - Call (855) 532-5465."
+	"en.broker_agencies.profiles.npn_taken_error" => "NPN has already been claimed by another broker. Please contact HBX-Customer Service - Call (855) 532-5465.",
+  "en.new_prospect_employer" => "Fill in the information below to create an employer record for this prospect.  You only need to provide a legal name, SIC, Zip and County at this point, however any information you do not enter here will need to be populated later, or by the employer prior to claiming a quote.<br /><br />Once you have created the Prospective Employer record, you can create and manage quotes for this prospect from your Employers page."
 }
