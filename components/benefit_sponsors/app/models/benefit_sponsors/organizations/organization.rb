@@ -332,6 +332,10 @@ module BenefitSponsors
         benefit_sponsorships.where(:'effective_being_on' => {'$ne' => nil})
       end
 
+      def entity_kinds
+        ::EnrollRegistry[:enroll_app].setting(:site_organization_entity_kinds)&.item&.map(&:to_sym) || ENTITY_KINDS
+      end
+
       class << self
 
         def entity_kinds
