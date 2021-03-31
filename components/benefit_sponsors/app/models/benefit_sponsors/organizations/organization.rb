@@ -19,6 +19,8 @@ module BenefitSponsors
         :household_employer,
       ]
 
+      FEHB_ENTITIES = [:governmental_employer, :foreign_embassy_or_consulate].freeze
+
       EXEMPT_ENTITY_KINDS = [
         :governmental_employer,
         :foreign_embassy_or_consulate,
@@ -333,13 +335,13 @@ module BenefitSponsors
       end
 
       def entity_kinds
-        ::EnrollRegistry[:enroll_app].setting(:site_organization_entity_kinds)&.item&.map(&:to_sym) || ENTITY_KINDS
+        EnrollRegistry.feature_enabled?(:fehb_market) ? ENTITY_KINDS + FEHB_ENTITIES : ENTITY_KINDS
       end
 
       class << self
 
         def entity_kinds
-          ::EnrollRegistry[:enroll_app].setting(:site_organization_entity_kinds)&.item&.map(&:to_sym) || ENTITY_KINDS
+          EnrollRegistry.feature_enabled?(:fehb_market) ? ENTITY_KINDS + FEHB_ENTITIES : ENTITY_KINDS
         end
 
         def default_search_order
