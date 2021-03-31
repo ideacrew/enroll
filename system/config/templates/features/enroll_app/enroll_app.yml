@@ -211,22 +211,6 @@ registry:
           item: 'Kaiser Permanante'
         - key: :carriers_registration_website
           item: "https://healthy.kaiserpermanente.org/new-members/#register-to-kp-org"
-      - key: :broker_agency
-        item: "broker_agency"
-        is_enabled: true
-        settings:
-        - key: :broker_registration_guide_pdf
-          item: "/new_broker_registration.pdf"
-        - key: :producer_advisory_committee
-          item: "http://hbx.dc.gov/sites/default/files/dc/sites/Health%20Benefit%20Exchange%20Authority/publication/attachments/ProducerAdvisoryCommitteeFINALReport.pdf"
-        - key: :broker_license_lookup
-          item: "https://sbs.naic.org/solar-external-lookup/"
-        - key: :healthlink_training
-          item: "https://nahu.inreachce.com/Details?resultsPage=1&sortBy=&q=dc+broker&searchType=1&groupId=154ae22b-92eb-41f0-854b-3a9cabc20c8e"
-        - key: :broker_registration_guide_pdf_link
-          item: "https://dchealthlink.com/sites/default/files/v2/forms/new_broker_registration.pdf"
-        - key: :redirect_to_requirements_page_after_confirmation # Refactor of Redmine Ticket 42456
-          item: true
       - key: :agency_staff
         item: :agency_staff
         is_enabled: true
