@@ -25,20 +25,6 @@ module BenefitSponsors
         :health_insurance_exchange,
       ]
 
-      DC_ENTITY_KINDS = [
-        :tax_exempt_organization,
-        :c_corporation,
-        :s_corporation,
-        :partnership,
-        :limited_liability_corporation,
-        :limited_liability_partnership,
-        :household_employer,
-        :governmental_employer,
-        :foreign_embassy_or_consulate
-      ].freeze
-
-      MA_ENTITY_KINDS = ENTITY_KINDS
-
       FIELD_AND_EVENT_NAMES_MAP = {"legal_name" => "name_changed", "fein" => "fein_corrected", "dba" => "name_changed"}.freeze
 
       field :hbx_id, type: String
@@ -271,11 +257,7 @@ module BenefitSponsors
       end
 
       def entity_kinds
-        if aca_state_abbreviation == "DC"
-          DC_ENTITY_KINDS
-        else
-          ENTITY_KINDS
-        end
+        ::EnrollRegistry[:enroll_app].setting(:site_organization_entity_kinds)&.item || ENTITY_KINDS
       end
 
       def profile_types
