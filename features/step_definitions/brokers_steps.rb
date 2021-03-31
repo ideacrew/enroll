@@ -116,7 +116,6 @@ end
 
 def is_dc_or_me_site?
   EnrollRegistry.feature_enabled?(:broker_approval_period)
-  # [:dc, :me].include?(EnrollRegistry[:enroll_app].settings(:site_key).item)
 end
 
 And(/^.+ should see the list of broker applicants$/) do
