@@ -173,6 +173,10 @@ registry:
             item: "PO Box 97022"
           - key: :contact_center_state_and_city
             item: "Washington, DC"
+          - key: :contact_center_city
+            item: "Washington"
+          - key: :contact_center_county
+            item: 'Washington'
           - key: :contact_center_zip_code
             item: "20026"
           - key: :contact_center_email_address
@@ -221,6 +225,8 @@ registry:
           item: "https://nahu.inreachce.com/Details?resultsPage=1&sortBy=&q=dc+broker&searchType=1&groupId=154ae22b-92eb-41f0-854b-3a9cabc20c8e"
         - key: :broker_registration_guide_pdf_link
           item: "https://dchealthlink.com/sites/default/files/v2/forms/new_broker_registration.pdf"
+        - key: :redirect_to_requirements_page_after_confirmation # Refactor of Redmine Ticket 42456
+          item: true
       - key: :agency_staff
         item: :agency_staff
         is_enabled: true
@@ -233,6 +239,9 @@ registry:
         settings:
           - key: :effective_period
             item: <%= Date.new(2020,9,18)..Date.new(2021,3,31) %>
+      - key: :special_cover_header_filename
+        is_enabled: true
+        item: "CoverME_WebsiteHeader_01.jpg"
   - namespace:
       - :features
       - :enroll_app
