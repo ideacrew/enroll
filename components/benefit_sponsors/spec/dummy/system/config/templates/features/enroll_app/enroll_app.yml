@@ -202,17 +202,7 @@ registry:
           - key: :rating_areas
             item: "single"
           - key: :site_organization_entity_kinds
-            item: [
-              :tax_exempt_organization,
-              :c_corporation,
-              :s_corporation,
-              :partnership,
-              :limited_liability_corporation,
-              :limited_liability_partnership,
-              :household_employer,
-              :governmental_employer,
-              :foreign_embassy_or_consulate
-            ]
+            item: ["tax_exempt_organization", "c_corporation", "s_corporation", "partnership", "limited_liability_corporation", "limited_liability_partnership", "household_employer", "governmental_employer", "foreign_embassy_or_consulate"]
       - key: :pay_now_functionality
         item: "kaiser_enabled"
         is_enabled: true
