@@ -41,7 +41,7 @@ Gem::Specification.new do |s|
 
   s.test_files = Dir["spec/**/*"]
 
-  s.add_development_dependency "rspec-rails"
+  s.add_development_dependency "rspec-rails",               '~> 4.0.2'
   s.add_development_dependency 'shoulda-matchers',          '~> 3'
   s.add_development_dependency 'database_cleaner-mongoid'
   s.add_development_dependency 'capybara',                  '~> 3.12'

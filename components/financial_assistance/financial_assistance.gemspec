@@ -42,7 +42,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'mongoid_rails_migrations',  '~> 1.4'
   spec.add_development_dependency "mongoid-rspec",             '~> 4.1'
   spec.add_development_dependency 'rails-perftest',            '~> 0.0.7'
-  spec.add_development_dependency "rspec-rails"
+  spec.add_development_dependency "rspec-rails",               '~> 4.0.2'
   spec.add_development_dependency 'rubocop-rspec',             '~> 1.31'
   spec.add_development_dependency 'shoulda-matchers',          '~> 3'
   spec.add_development_dependency 'test-prof',                 '~> 0.5.0'

@@ -32,7 +32,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'config', '~> 2.0'
   s.add_dependency 'money-rails', '~> 1.13'
 
-  s.add_development_dependency 'rspec-rails'
+  s.add_development_dependency 'rspec-rails', '~> 4.0.2'
   s.add_development_dependency 'shoulda-matchers'
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'database_cleaner-mongoid'
