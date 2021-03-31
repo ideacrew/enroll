@@ -300,6 +300,10 @@ module Config
       link_to site_tufts_url, site_tufts_url
     end
 
+    def site_exchange_name
+      EnrollRegistry[:enroll_app].setting(:exchange_name).item
+    end
+
     def broker_course_administering_organization_number
       EnrollRegistry[:enroll_app].setting(:broker_course_administering_organization_number).item
     end
