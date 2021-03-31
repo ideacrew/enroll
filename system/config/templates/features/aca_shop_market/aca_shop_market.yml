@@ -16,5 +16,8 @@ registry:
            - key: :offset_months
              item: 0
       - key: :employer_profile_class
-        item: BenefitSponsors::Organizations::AcaShopDcEmployerProfile
+        item: :employer_profile_class
         is_enabled: true
+        settings:
+          - key: :class_name
+            item: "BenefitSponsors::Organizations::AcaShopDcEmployerProfile"
