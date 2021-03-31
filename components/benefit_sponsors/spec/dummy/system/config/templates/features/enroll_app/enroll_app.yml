@@ -239,9 +239,12 @@ registry:
         settings:
           - key: :effective_period
             item: <%= Date.new(2020,9,18)..Date.new(2021,3,31) %>
-      - key: :special_cover_header_filename
+      - key: :special_cover_header
+        item: "special_cover_header"
         is_enabled: true
-        item: "CoverME_WebsiteHeader_01.jpg"
+        settings: 
+          - key: :filename
+            item: "CoverME_WebsiteHeader_01.jpg"
   - namespace:
       - :features
       - :enroll_app
