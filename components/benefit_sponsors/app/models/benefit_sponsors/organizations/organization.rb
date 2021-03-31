@@ -257,7 +257,7 @@ module BenefitSponsors
       end
 
       def entity_kinds
-        ::EnrollRegistry[:enroll_app].setting(:site_organization_entity_kinds)&.item || ENTITY_KINDS
+        ::EnrollRegistry[:enroll_app].setting(:site_organization_entity_kinds)&.item&.map(&:to_sym) || ENTITY_KINDS
       end
 
       def profile_types
