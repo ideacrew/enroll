@@ -21,3 +21,12 @@ registry:
         settings:
           - key: :class_name
             item: "BenefitSponsors::Organizations::AcaShopDcEmployerProfile"
+      - key: :disable_benefit_application_date_message
+        item: :disable_benefit_application_date_message
+        is_enabled: true
+      - key: :coverage_should_start_in
+        item: :coverage_should_start_in
+        is_enabled: true
+        settings:
+          - key: :time_from_now
+            item: "In the next 90 days"
