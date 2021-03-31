@@ -1,40 +1,38 @@
 <html>
   <body>
-    <% if Settings.site.key == :dc %>
+    <% if EnrollRegistry.feature_enabled?(:broker_invitation) %>
       <%= person_name %>,
       <br />
-      <div>Thank you for registering as a broker through <%= site_short_name %>.</div>
-      <div>Please visit <%= link_to "#{site_short_name}", claim_invitation_url(invitation) %> to create your broker account and manage your clients.</div>
+      <div><%= l10n("broker_agencies.broker_invitation.thank_you_registering") %></div>
+      <div><%= l10n("broker_agencies.broker_invitation.create_broker_acc", url: claim_invitation_url(invitation), site_short_name: site_short_name) %></div>
     <% else %>
       <div>
-        Dear <%= person_name %>,
+        <%= l10n("broker_agencies.broker_invitation.person_name") %>
       </div>
       <br />
       <div>
-        Congratulations-- we've reviewed your application and you are now approved as a certified broker through <%= site_short_name %> for Business.
+        <%= l10n("en.broker_agencies.broker_invitation.approved_broker") %>
       </div>
       <div>
-        <p><strong>Next Steps:</strong></p>
+        <p><strong><%= l10n("broker_agencies.broker_invitation.next_steps") %></strong></p>
       </div>
       <div>
         <p>
-          <strong>1.</strong> Click on this personalized link to set up your new broker account: <%= link_to "#{site_short_name}", claim_invitation_url(id: invitation.id.to_s) %><br />
-          <strong>Important:</strong> You must use this link to set up your account. If you don't use your personalized link when creating your account, the account won't be connected to your existing broker profile.
+          <%= l10n("broker_agencies.broker_invitation.create_new_acc") %>
         </p>
       </div>
       <div>
         <p>
-          <strong>2.</strong> After you've set up your new username and password, log in to your new <%= site_short_name %> for Business broker account through <a href="<%= site_user_sign_in_url %>">our website</a>.
+          <%= l10n("broker_agencies.broker_invitation.login_to_broker") %>
         </p>
       </div>
 
       <div>
-        <p>If you have questions or need help, please call us at <%= contact_center_phone_number %> (TTY: <%=contact_center_tty_number %>).</p>
+        <%= l10n("broker_agencies.broker_invitation.call_for_help") %>
       </div>
 
       <div>
-        <p> Thank you, </p>
-        <p> <%= site_title %> </p>
+        <%= l10n("broker_agencies.broker_invitation.site_foote") %>
       </div>
     <% end %>
   </body>

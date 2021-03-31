@@ -21,26 +21,13 @@ module BenefitSponsors
         :household_employer
       ].freeze
 
+      FEHB_ENTITIES = [:governmental_employer, :foreign_embassy_or_consulate].freeze
+
       EXEMPT_ENTITY_KINDS = [
         :governmental_employer,
         :foreign_embassy_or_consulate,
         :health_insurance_exchange
       ].freeze
-
-      DC_ENTITY_KINDS = [
-        :tax_exempt_organization,
-        :c_corporation,
-        :s_corporation,
-        :partnership,
-        :limited_liability_corporation,
-        :limited_liability_partnership,
-        :household_employer,
-        :governmental_employer,
-        :foreign_embassy_or_consulate
-      ].freeze
-
-      MA_ENTITY_KINDS = ENTITY_KINDS
-      ME_ENTITY_KINDS = ENTITY_KINDS
 
       FIELD_AND_EVENT_NAMES_MAP = {"legal_name" => "name_changed", "fein" => "fein_corrected", "dba" => "name_changed"}.freeze
 
@@ -279,14 +266,6 @@ module BenefitSponsors
         benefit_sponsorships.find(ids)
       end
 
-      def entity_kinds
-        if aca_state_abbreviation == "MA"
-          ENTITY_KINDS
-        else
-          DC_ENTITY_KINDS
-        end
-      end
-
       def profile_types
         result = []
         result << 'employer' if is_employer_profile?
@@ -363,7 +342,15 @@ module BenefitSponsors
         benefit_sponsorships.where(:effective_being_on => {'$ne' => nil})
       end
 
+      def entity_kinds
+        EnrollRegistry.feature_enabled?(:fehb_market) ? ENTITY_KINDS + FEHB_ENTITIES : ENTITY_KINDS
+      end
+
       class << self
+
+        def entity_kinds
+          EnrollRegistry.feature_enabled?(:fehb_market) ? ENTITY_KINDS + FEHB_ENTITIES : ENTITY_KINDS
+        end
 
         def default_search_order
           [[:legal_name, 1]]

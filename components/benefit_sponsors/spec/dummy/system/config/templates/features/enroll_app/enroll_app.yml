@@ -218,6 +218,8 @@ registry:
             item: ""
           - key: :site_broker_attestation_link
             item: ""
+          - key: :rating_areas
+            item: "single"
       - key: :pay_now_functionality
         item: "kaiser_enabled"
         is_enabled: true
@@ -228,20 +230,6 @@ registry:
           item: 'Kaiser Permanante'
         - key: :carriers_registration_website
           item: "https://healthy.kaiserpermanente.org/new-members/#register-to-kp-org"
-      - key: :broker_agency
-        item: "broker_agency"
-        is_enabled: true
-        settings:
-        - key: :broker_registration_guide_pdf
-          item: "/new_broker_registration.pdf"
-        - key: :producer_advisory_committee
-          item: ""
-        - key: :broker_license_lookup
-          item: "https://sbs.naic.org/solar-external-lookup/"
-        - key: :healthlink_training
-          item: "https://nahu.inreachce.com/Details?resultsPage=1&sortBy=&q=dc+broker&searchType=1&groupId=154ae22b-92eb-41f0-854b-3a9cabc20c8e"
-        - key: :broker_registration_guide_pdf_link
-          item: ""
       - key: :agency_staff
         item: :agency_staff
         is_enabled: true
@@ -254,6 +242,12 @@ registry:
         settings:
           - key: :effective_period
             item: <%= Date.new(2020,9,18)..Date.new(2021,3,31) %>
+      - key: :special_cover_header
+        item: "special_cover_header"
+        is_enabled: false
+        settings: 
+          - key: :filename
+            item: "CoverME_WebsiteHeader_01.jpg"
   - namespace:
       - :features
       - :enroll_app

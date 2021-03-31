@@ -148,7 +148,11 @@ RSpec.shared_context "set up broker agency profile for BQT, by using configurati
   end
 
   def site_key
-    Settings.site.key
+    EnrollRegistry[:enroll_app].settings(:site_key).item
+  end
+
+  def is_shop_market_enabled?
+    EnrollRegistry.feature_enabled?(:aca_shop_market)
   end
 
   def is_shop_market_enabled?
