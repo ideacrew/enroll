@@ -160,7 +160,7 @@ registry:
           - key: :exchange_name
             item: "Washington DC Health Benefit Exchange"
           - key: :social_media
-            item:
+            item: ''
           - key: :state_long_title
             item: "the District of Columbia"
           - key: :state_dmv_link
