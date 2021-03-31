@@ -80,9 +80,9 @@ end
 Then(/^employer should see (.*) and reinstated benefit_application$/) do |aasm_state|
   expect(page).to have_content("Active")
   if aasm_state == "terminated"
-    expect(page).to have_content("Terminated")
+    expect(page).to have_content("Terminated", wait: 10)
   else
-    expect(page).to have_content("Termination Pending")
+    expect(page).to have_content("Termination Pending", wait: 10)
   end
 end
 
