@@ -114,7 +114,7 @@ module Parsers::Xml::Cv::Importers
         hbx_id: hbx_id,
         legal_name: employer.try(:name)
       )
-      profile_class = EnrollRegistry[:employer_profile_class]
+      profile_class = EnrollRegistry[:employer_profile_class].setting(:class_name)&.item&.constantize
       EmployeeRole.new(
         employer_profile: profile_class.new(organization: org)
       )
