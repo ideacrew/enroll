@@ -17,7 +17,8 @@ registry:
             item: "https://nahu.inreachce.com/Details?resultsPage=1&sortBy=&q=dc+broker&searchType=1&groupId=154ae22b-92eb-41f0-854b-3a9cabc20c8e"
           - key: :broker_registration_guide_pdf_link
             item: "https://dchealthlink.com/sites/default/files/v2/forms/new_broker_registration.pdf"
-
+          - key: :redirect_to_requirements_page_after_confirmation # Refactor of Redmine Ticket 42456
+            item: true
   - namespace:
       - :broker_agencies
       - :broker_agency
@@ -27,4 +28,7 @@ registry:
         is_enabled: true
       - key: :broker_invitation
         ite,: :broker_invitation
-        is_enabled: trues
+        is_enabled: true
+      - key: :redirect_to_requirements_page_after_confirmation
+        item: :redirect_to_requirements_page_after_confirmation
+        is_enabled: true
