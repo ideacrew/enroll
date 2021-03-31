@@ -115,7 +115,8 @@ Then(/^.+ should see broker registration successful message$/) do
 end
 
 def is_dc_or_me_site?
-  [:dc, :me].include?(EnrollRegistry[:enroll_app].settings(:site_key).item)
+  EnrollRegistry.feature_enabled?(:broker_approval_period)
+  # [:dc, :me].include?(EnrollRegistry[:enroll_app].settings(:site_key).item)
 end
 
 And(/^.+ should see the list of broker applicants$/) do
@@ -149,7 +150,7 @@ When(/^(.*?) go[es]+ to the brokers tab$/) do |legal_name|
 end
 
 And(/^.+ should receive an invitation email$/) do
-  subject = if [:dc, :me].include?(EnrollRegistry[:enroll_app].settings(:site_key).item)
+  subject = if EnrollRegistry.feature_enabled?(:broker_approval_period)
               "Invitation to create your Broker account on #{Settings.site.short_name}"
             else
               "Important information for accessing your new broker account through the #{Settings.site.short_name}"
