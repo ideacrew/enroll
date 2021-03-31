@@ -55,24 +55,22 @@ end
 if (ENV["type"] != "fixtures") && missing_plan_dumps
   puts "Running full seed"
 
-  if Settings.site.key == :cca
-    system "bundle exec rake import:county_zips"
-  end
+  system "bundle exec rake import:county_zips" if EnrollRegistry[:site_database_seed].setting(:seed_county_zips)&.item
 
-  if Settings.aca.employer_has_sic_field
+  if EnrollRegistry[:site_database_seed].setting(:seed_sic_codes)&.item
     system "bundle exec rake load_sic_code:update_sic_codes"
     puts "::: complete :::"
   end
 
   puts "*"*80
   puts "Loading Site seed"
-  glob_pattern = File.join(Rails.root, "db/seedfiles/#{Settings.aca.state_abbreviation.downcase}/site_seed.rb")
+  glob_pattern = File.join(Rails.root, "db/seedfiles/#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.downcase}/site_seed.rb")
   load glob_pattern
-  __send__("load_#{Settings.aca.state_abbreviation.downcase}_site_seed")
+  __send__("load_#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.downcase}_site_seed")
   puts "Loading benefit market seed"
-  bm_glob_pattern = File.join(Rails.root, "db/seedfiles/#{Settings.aca.state_abbreviation.downcase}/benefit_markets_seed.rb")
+  bm_glob_pattern = File.join(Rails.root, "db/seedfiles/#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.downcase}/benefit_markets_seed.rb")
   load bm_glob_pattern
-  __send__("load_#{Settings.aca.state_abbreviation.downcase}_benefit_markets_seed")
+  __send__("load_#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.downcase}_benefit_markets_seed")
   puts "complete"
 
   puts "*"*80
@@ -82,11 +80,11 @@ if (ENV["type"] != "fixtures") && missing_plan_dumps
 
   puts "*"*80
   puts "Loading carriers"
-  require File.join(File.dirname(__FILE__),'seedfiles', "carriers_seed_#{Settings.aca.state_abbreviation.downcase}")
-  if [:dc, :me].include?(EnrollRegistry[:enroll_app].settings(:site_key).item)
-    ra_glob_pattern = File.join(Rails.root, "db/seedfiles/#{Settings.aca.state_abbreviation.downcase}/issuer_profiles_seed.rb")
+  require File.join(File.dirname(__FILE__),'seedfiles', "carriers_seed_#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.downcase}")
+  if EnrollRegistry[:site_database_seed].setting(:seed_issuer_profiles)&.item
+    ra_glob_pattern = File.join(Rails.root, "db/seedfiles/#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.downcase}/issuer_profiles_seed.rb")
     load ra_glob_pattern
-    __send__("load_#{Settings.aca.state_abbreviation.downcase}_issuer_profile_seed")
+    __send__("load_#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.downcase}_issuer_profile_seed")
   else
     system "bundle exec rake migrations:load_issuer_profiles"
   end
@@ -231,7 +229,7 @@ if Settings.aca.security_questions
   puts "*"*80
 end
 
-if Settings.site.key.to_s == "cca" && (ENV["type"] == "fixtures")
+if EnrollRegistry[:site_database_seed].setting(:seed_sic_codes)&.item && (ENV["type"] == "fixtures")
   require File.join(File.dirname(__FILE__), 'seedfiles', 'sic_codes_seed')
 
   puts "*"*80
