@@ -256,10 +256,6 @@ module BenefitSponsors
         benefit_sponsorships.find(ids)
       end
 
-      def entity_kinds
-        ::EnrollRegistry[:enroll_app].setting(:site_organization_entity_kinds)&.item&.map(&:to_sym) || ENTITY_KINDS
-      end
-
       def profile_types
         result = []
         result << 'employer' if is_employer_profile?
@@ -337,6 +333,10 @@ module BenefitSponsors
       end
 
       class << self
+
+        def entity_kinds
+          ::EnrollRegistry[:enroll_app].setting(:site_organization_entity_kinds)&.item&.map(&:to_sym) || ENTITY_KINDS
+        end
 
         def default_search_order
           [[:legal_name, 1]]

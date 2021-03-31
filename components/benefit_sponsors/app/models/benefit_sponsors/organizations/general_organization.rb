@@ -12,7 +12,7 @@ module BenefitSponsors
       validates_presence_of :legal_name
 
       validates :entity_kind,
-                inclusion: { in: "BenefitSponsors::Organizations::GeneralOrganization::#{Settings.site.key.upcase}_ENTITY_KINDS".constantize, message: "%{value} is not a valid business entity kind" },
+                inclusion: { in: ::BenefitSponsors::Organizations::Organization.entity_kinds, message: "%{value} is not a valid business entity kind" },
                 allow_blank: false
 
       validates :fein,
