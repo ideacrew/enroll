@@ -203,6 +203,16 @@ registry:
             item: "single"
           - key: :site_organization_entity_kinds
             item: ["tax_exempt_organization", "c_corporation", "s_corporation", "partnership", "limited_liability_corporation", "limited_liability_partnership", "household_employer", "governmental_employer", "foreign_embassy_or_consulate"]
+      - key: :site_database_seed
+        item: :site_database_seed
+        is_enabled: true
+        settings:
+          - key: :seed_issuer_profiles
+            item: true
+          - key: :seed_county_zips
+            item: false
+          - key: :seed_sic_codes
+            item: false
       - key: :pay_now_functionality
         item: "kaiser_enabled"
         is_enabled: true
