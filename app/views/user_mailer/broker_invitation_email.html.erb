@@ -1,6 +1,6 @@
 <html>
   <body>
-    <% if [:dc, :me].include?(EnrollRegistry[:enroll_app].settings(:site_key).item) %>
+    <% if EnrollRegistry.feature_enabled?(:broker_invitation) %>
       <%= person_name %>,
       <br />
       <div><%= l10n("broker_agencies.broker_invitation.thank_you_registering") %></div>

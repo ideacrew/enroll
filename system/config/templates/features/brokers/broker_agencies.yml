@@ -25,3 +25,6 @@ registry:
       - key: :broker_approval_period
         item: :broker_approval_period
         is_enabled: true
+      - key: :broker_invitation
+        ite,: :broker_invitation
+        is_enabled: trues
