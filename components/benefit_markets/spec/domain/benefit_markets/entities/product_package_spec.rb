@@ -46,7 +46,7 @@ RSpec.describe BenefitMarkets::Entities::ProductPackage do
       {
         title: 'title', creator: 'creator', publisher: 'publisher', format: 'file_format', tags: [{}], description: nil, date: nil,
         language: 'language', type: 'type', source: 'source', subject: 'subject', identifier: 'identifier', contributor: nil,
-        relation: nil, coverage: nil, rights: nil, tags: nil, size: nil
+        relation: nil, coverage: nil, rights: nil, size: nil
       }
     end
 

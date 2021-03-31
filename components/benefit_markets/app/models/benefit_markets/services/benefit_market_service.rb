@@ -88,10 +88,10 @@ module BenefitMarkets
               renewal_application_configuration: renewal_application_configuration
             )
         elsif form.kind == "aca_individual"
-          initial_application_configuration = BenefitMarkets::Factories::AcaIndividualInitialApplicationConfiguration.call form.aca_individual_configuration.initial_application_configuration.attributes
-          configuration = BenefitMarkets::Factories::AcaIndividualConfiguration.call form.aca_individual_configuration.attributes.merge(
+          initial_application_configuration = BenefitMarkets::Factories::AcaIndividualInitialApplicationConfiguration.call(form.aca_individual_configuration.initial_application_configuration.attributes)
+          configuration = BenefitMarkets::Factories::AcaIndividualConfiguration.call(form.aca_individual_configuration.attributes.merge(
               initial_application_configuration: initial_application_configuration
-            )
+            ))
         end
 
         benefit_market = BenefitMarkets::Factories::BenefitMarket.call description: form.description,
@@ -127,26 +127,26 @@ module BenefitMarkets
       def map_errors_for(benefit_market, onto:)
         case benefit_market.kind
         when :aca_shop
-          benefit_market.configuration.errors.each do |att, err|
-            onto.aca_shop_configuration.errors.add(att, err)
+          benefit_market.configuration.errors.each do |error|
+            onto.aca_shop_configuration.errors.add(error.attribute, error.message)
           end
-          benefit_market.configuration.initial_application_configuration.errors.each do |att, err|
-            onto.aca_shop_configuration.initial_application_configuration.errors.add(att, err)
+          benefit_market.configuration.initial_application_configuration.errors.each do |error|
+            onto.aca_shop_configuration.initial_application_configuration.errors.add(error.attribute, error.message)
           end
-          benefit_market.configuration.renewal_application_configuration.errors.each do |att, err|
-            onto.aca_shop_configuration.renewal_application_configuration.errors.add(att, err)
+          benefit_market.configuration.renewal_application_configuration.errors.each do |error|
+            onto.aca_shop_configuration.renewal_application_configuration.errors.add(error.attribute, error.message)
           end
         when :aca_individual
-          benefit_market.configuration.errors.each do |att, err|
-            onto.aca_individual_configuration.errors.add(att, err)
+          benefit_market.configuration.errors.each do |error|
+            onto.aca_individual_configuration.errors.add(error.attribute, error.message)
           end
-          benefit_market.configuration.initial_application_configuration.errors.each do |att, err|
-            onto.aca_individual_configuration.initial_application_configuration.errors.add(att, err)
+          benefit_market.configuration.initial_application_configuration.errors.each do |error|
+            onto.aca_individual_configuration.initial_application_configuration.errors.add(error.attribute, error.message)
           end
         end
 
-        benefit_market.errors.each do |att, err|
-          onto.errors.add(att, err)
+        benefit_market.errors.each do |error|
+          onto.errors.add(error.attribute, error.message)
         end
       end
     end
