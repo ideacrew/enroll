@@ -128,7 +128,7 @@ module BenefitSponsors
           member.dob = old_dob
           member.validate
           expect(member).to be_invalid
-          expect(member.errors[:dob].first).to match(/date of birth cannot be more than 110 years ago/)
+          expect(member.errors[:dob].first[:message]).to match(/date of birth cannot be more than 110 years ago/)
         end
       end
 
