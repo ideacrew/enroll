@@ -13,6 +13,10 @@ module Config
       EnrollRegistry[:enroll_app].setting(:state_abbreviation).item
     end
 
+    def site_short_url
+      EnrollRegistry[:enroll_app].setting(:short_url).item
+    end
+
     def site_privacy_url
       EnrollRegistry[:enroll_app].setting(:privacy_url).item
     end
@@ -174,6 +178,10 @@ module Config
 
     def site_long_name
       EnrollRegistry[:enroll_app].setting(:long_name).item
+    end
+
+    def site_exchange_name
+      EnrollRegistry[:enroll_app].setting(:exchange_name).item
     end
 
     def site_broker_quoting_enabled?
