@@ -5,6 +5,8 @@
 			<% object.errors.each do |attr, msg| %>
 				<% if attr == :base %>
 					<li><%= "#{msg}" %></li>
+				<% elsif attr == :phones # TODO. Find a better way to bubble up errors from child. This is TEMP tech debg %>
+					<li><%= "Phone number must have 10 digits" %></li>
 				<% else %>
 					<li><%= "#{attr.to_s.titleize} #{msg}" %></li>
 				<% end %>
