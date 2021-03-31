@@ -136,7 +136,7 @@ module BenefitSponsors
       end
 
       def redirect_to_requirements_after_confirmation?
-        is_broker_profile? && EnrollRegistry[:broker_agency].settings(:redirect_to_requirements_page_after_confirmation).item
+        is_broker_profile? && EnrollRegistry.feature_enabled?(:redirect_to_requirements_page_after_confirmation)
       end
 
       def user_not_authorized(exception)
