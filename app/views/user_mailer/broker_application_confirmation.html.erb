@@ -4,7 +4,7 @@
       Dear <%= person.full_name.titleize %>,
     </div>
     <br />
-    <% if [:dc, :me].include?(EnrollRegistry[:enroll_app].settings(:site_key).item) %>
+    <% if EnrollRegistry.feature_enabled?(:broker_approval_period) %>
       <div>Thank you for submitting your broker application to <%= site_short_name %>. Please allow 7-10 business days for <%= site_short_name %> to review your application.</div>
       <br />
       <div><%= l10n("broker_agencies.broker_application_confirm.outstanding_reqs") %></div>
