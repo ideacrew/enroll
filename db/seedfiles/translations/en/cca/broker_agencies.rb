@@ -205,7 +205,7 @@ BROKER_AGENCIES_TRANSLATIONS = {
   "en.broker_carrier_appointments_enabled_note" => "Note: Carrier appointments for broker are not necessary for participation in %{site_long_name}.",
   "en.write_here" => "Write here",
   "en.broker_agencies.profiles.select_plan" => "Select the plan you wish to quote for all enrollees.",
-  "en.broker_agencies.profiles.npn_taken_error" => "NPN has already been claimed by another broker. Please contact Access Health for Business Customer Service at 1-888-813-9220",
+  "en.broker_agencies.profiles.npn_taken_error" => "NPN has already been claimed by another broker. Please contact Health Connector for Business Customer Service at 1-888-813-9220",
   "en.broker_agencies.profiles.detailed_roster_information" => "To create a quote for a new, prospective group, please <a href='%{upload_employee_roster}' onclick='return false;' data-remote='true'><i class='fa fa-file-text-o' aria-hidden='true'></i>upload an employee roster</a>. To create a quote for an existing group, use the roster below and update it as needed to reflect the plan enrollees.",
   "en.broker_agencies.profiles.to_compare_plans" => "To compare plans before making your selection, use the checkboxes next to the plan names. You can select up to 3 plans to compare at one time. When comparing costs, note that the maximum monthly cost for employers is based on:",
   "en.broker_agencies.broker_invitation.person_name" => "Dear %{person_name},",
@@ -220,5 +220,7 @@ BROKER_AGENCIES_TRANSLATIONS = {
   "en.broker_agencies.broker_invitation.broker_portal_access" => "If you meet all of our requirements for certified brokers, your next email will include information on how to access the broker portal, including creating a username and password.",
   "en.broker_agencies.broker_invitation.broker_steps" => "If you do not appear to meet all of our requirements, we will let you know which steps you will need to take before you can become a %{site_short_name}-certified broker.",
   "en.broker_agencies.broker_invitation.broker_questions" => "If you have questions, please visit the <a href='%{certification_url}'>broker certification section of our website</a>, or call us at %{contact_center_phone_number} (TTY: %{contact_center_tty_number}).",
-  "en.broker_agencies.broker_invitation.thank_you_footer" => "Thank you,"
+  "en.broker_agencies.broker_invitation.thank_you_footer" => "Thank you,",
+  "en.new_prospect_employer" => "Fill in the information below to create an employer record for this prospect.  You only need to provide a legal name, SIC, Zip and County at this point, however any information you do not enter here will need to be populated later, or by the employer prior to claiming a quote.<br /><br />Once you have created the Prospective Employer record, you can create and manage quotes for this prospect from your Employers page."
+
 }
