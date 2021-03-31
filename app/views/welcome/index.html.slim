@@ -1,7 +1,7 @@
 .container.welcome.pt-1
   h1.text-center.heading-text.mb-0.pt-5.welcome-text
     strong
-      = l10n('.welcome_to_site_name', short_name: Settings.site.short_name)
+      = l10n('.welcome_to_site_name', short_name: site_short_name)
   h3.text-center.mt-1.sub-text
     = l10n('.welcome_to_site_sub_header')
   br
@@ -21,5 +21,5 @@
       - if !user_signed_in?
         = link_to l10n(".broker_registration"), benefit_sponsors.new_profiles_registration_path(:profile_type => :broker_agency), class: "btn btn-outline-primary mr-2 mb-2 broker-registration"
         = link_to l10n(".general_agency_registration"), benefit_sponsors.new_profiles_registration_path(:profile_type => :general_agency), class: "btn btn-outline-primary mr-2 mb-2" if general_agency_enabled?
-    - if EnrollRegistry[:enroll_app].setting(:site_key).item == :me
-      =image_tag ("CoverME_WebsiteHeader_01.jpg"), :class => "ct-cover", :id => 'ct-cover'
+    - if ::EnrollRegistry.feature_enabled?(:special_cover_header)
+      = image_tag (EnrollRegistry[:special_cover_header].setting(:filename).item), :class => "ct-cover", :id => 'ct-cover'
