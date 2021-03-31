@@ -311,6 +311,10 @@ module Config
     def broker_course_administering_organization_link
       EnrollRegistry[:enroll_app].setting(:broker_course_administering_organization_link).item
     end
+
+    def site_special_cover_header_filename
+      EnrollRegistry[:enroll_app].setting(:special_cover_header_filename).item
+    end
   end
 end
 # rubocop:enable Metrics/ModuleLength
