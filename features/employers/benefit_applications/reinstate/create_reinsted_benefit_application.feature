@@ -23,7 +23,7 @@ Scenario: Initial Employer is in termination pending. Admin is able to create re
     When the user clicks Actions for current benefit application
     When the user clicks Actions for that benefit application
     Then the user will see Terminate button
-    When the user enters any_day and other details for voluntary termination
+    When the user enters last_month and other details for voluntary termination
     When user clicks submit button
     Then user should see termination successful message
     And update rating area
@@ -37,11 +37,11 @@ Scenario: Initial Employer is in termination pending. Admin is able to create re
     And staff role person logged in
     When ABC Widgets is logged in and on the home page
     And employee staff role person clicked on benefits tab
-    Then employer should see termination pending and reinstated benefit_application
+    Then employer should see terminated and reinstated benefit_application
     And employee staff role person clicks on employees link
     And employee staff role person clicks employee Patrick Doe
     Then the user should see a dropdown for Reinstated Plan Year benefit package
-    And census employee Patrick Doe has benefit group assignment of the future reinstated benefit application
+    And census employee Patrick Doe has benefit group assignment of the current reinstated benefit application
     And I click on log out link
     And employee Patrick Doe already matched with employer ABC Widgets and logged into employee portal
     When Employee click the "Losing other health insurance" in qle carousel
@@ -54,7 +54,7 @@ Scenario: Initial Employer is in termination pending. Admin is able to create re
     When Employee selects a plan on the plan shopping page
     When Employee clicks on Confirm button on the coverage summary page
     Then Employee clicks back to my account button
-    And employee Patrick Doe of employer ABC Widgets most recent HBX Enrollment should be under the future reinstated benefit application
+    And employee Patrick Doe of employer ABC Widgets most recent HBX Enrollment should be under the current reinstated benefit application
 #TODO - Blocking based on ticket https://devops.dchbx.org/redmine/issues/92712 - uncomment when the code is reverted
 #    When Employee click the "Had a baby" in qle carousel
 #    And Employee select a past qle date
