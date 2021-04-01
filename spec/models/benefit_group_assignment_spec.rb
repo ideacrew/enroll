@@ -552,6 +552,19 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
         expect(BenefitGroupAssignment.on_date(census_employee, Date.new(2018, 10, 10))).to eq assignment_two
       end
     end
+
+    context 'past end_on benefit group assignment' do
+      let!(:assignment_one) do
+        start_date = TimeKeeper.date_of_record.beginning_of_month - 1.month
+        bga = census_employee.benefit_group_assignments.build(start_on: start_date, end_on: start_date.end_of_month, benefit_package_id: benefit_package.id)
+        bga.save(validate: false)
+        bga
+      end
+
+      it 'should return benefit group assignment with past date' do
+        expect(BenefitGroupAssignment.on_date(census_employee, TimeKeeper.date_of_record)).to eq assignment_one
+      end
+    end
   end
 
 end
