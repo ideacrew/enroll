@@ -241,6 +241,9 @@ registry:
         settings: 
           - key: :filename
             item: "CoverME_WebsiteHeader_01.jpg"
+      - key: :tobacco_cost
+        item: :tobacco_cost
+        is_enabled: false
   - namespace:
       - :features
       - :enroll_app
