@@ -22,7 +22,7 @@
       padding:0;
       mso-line-height-rule:exactly
       font-size:10px;
-      color:#487ba2;
+      color: <%= EnrollRegistry[:ivl_notice_footer].settings(:color).item %>;
       font-family: "Open Sans", sans-serif;
       margin-top: 14px;
     }
@@ -46,7 +46,8 @@
   <% if notice.is_a?(Notifier::NoticeKind) %>
     <br />
   <% end %>
-  <table class="footer-section" style="color: #487ba2;" width="100%" border="0">
+
+  <table class="footer-section" style="color: <%= EnrollRegistry[:ivl_notice_footer].settings(:color).item %>;" width="100%" border="0">
     <tr>
       <td align="center">_____________________________________________________________________________________________________________________</td>
     </tr>
