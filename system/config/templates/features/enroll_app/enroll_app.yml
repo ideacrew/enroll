@@ -218,7 +218,7 @@ registry:
             item: "single"
           - key: :favicon_tab_icon
             item: 'image/vnd.microsoft.icon'
-          - key: eligibile_immigration_statuses_url
+          - key: :eligibile_immigration_statuses_url
             item: ""
           - key: :assistance_estimate_url
             item: ''
