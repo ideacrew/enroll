@@ -341,7 +341,7 @@ GEM
     cable_ready (4.3.0)
       rails (>= 5.2)
       thread-local (>= 1.1.0)
-    capistrano (3.15.0)
+    capistrano (3.16.0)
       airbrussh (>= 1.0.0)
       i18n
       rake (>= 10.0.0)
@@ -579,7 +579,7 @@ GEM
     httparty (0.18.1)
       mime-types (~> 3.0)
       multi_xml (>= 0.5.2)
-    i18n (1.8.8)
+    i18n (1.8.10)
       concurrent-ruby (~> 1.0)
     i18n-tasks (0.9.33)
       activesupport (>= 4.0.2)
@@ -1059,7 +1059,7 @@ DEPENDENCIES
   brakeman
   browser (= 2.7.0)
   bson (~> 4.3)
-  capistrano (~> 3.1)
+  capistrano (~> 3.15)
   capistrano-rails (= 1.4)
   capybara (~> 3.12)
   capybara-screenshot (~> 1.0.18)
