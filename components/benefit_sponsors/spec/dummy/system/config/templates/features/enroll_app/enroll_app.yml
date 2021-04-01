@@ -244,10 +244,13 @@ registry:
             item: <%= Date.new(2020,9,18)..Date.new(2021,3,31) %>
       - key: :special_cover_header
         item: "special_cover_header"
-        is_enabled: false
+        is_enabled: true
         settings: 
           - key: :filename
             item: "CoverME_WebsiteHeader_01.jpg"
+      - key: :tobacco_cost
+        item: :tobacco_cost
+        is_enabled: true
   - namespace:
       - :features
       - :enroll_app

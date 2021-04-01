@@ -1,6 +1,3 @@
-# frozen_string_literal: true
-
-# This model is used for storing age, cost, tobacco cost for a plan/product.
 module BenefitMarkets
   class Products::PremiumTuple
     include Mongoid::Document
@@ -9,9 +6,9 @@ module BenefitMarkets
     embedded_in :premium_table,
                 class_name: "BenefitMarkets::Products::PremiumTable"
 
-    field :age,           type: Integer
-    field :cost,          type: Float
-    field :tobacco_cost,  type: Float
+    field :age,   type: Integer
+    field :cost,  type: Float
+    field :tobacco_cost, type: Float if ::EnrollRegistry.feature_enabled?(:tobacco_cost)
 
     validates_presence_of :age, :cost
 
