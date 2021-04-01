@@ -1,5 +1,5 @@
 <% if offers_nationwide_plans? %>
-  <% if qhps.map(&:plan).map(&:nationwide).compact.uniq.include?(true) %>
+  <% if qhps.compact.map(&:plan).compact.map(&:nationwide).compact.uniq.include?(true) %>
     <tr>
       <th></th>
       <% qhps.each do |qhp|%>
