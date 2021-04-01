@@ -28,7 +28,7 @@ class DeleteInvoiceWithFein < MongoidMigrationTask
 
   def delete_initial_employer_invoice_notice(orgs)
     orgs.each do |org|
-      documents = org.employer_profile.documents.select{|document| document.title == "Your_Invoice_Is_Now_Available_In_Your_Dc_Health_Link_Account" }
+      documents = org.employer_profile.documents.select{|document| document.title == "Your_Invoice_Is_Now_Available_In_Your_#{EnrollRegistry[:enroll_app].setting(:short_name).item.parameterize.underscore}_Account" }
       next if documents.blank?
 
       documents.map(&:destroy)
@@ -37,7 +37,7 @@ class DeleteInvoiceWithFein < MongoidMigrationTask
 
   def delete_message_from_inbox(orgs)
     orgs.each do |org|
-      messages = org.employer_profile.inbox.messages.select{|message| message.subject == "Your Invoice is Now Available in your Cover ME Account" }
+      messages = org.employer_profile.inbox.messages.select{|message| message.subject == "Your Invoice is Now Available in your #{EnrollRegistry[:enroll_app].setting(:short_name).item} Account" }
       next if messages.blank?
 
       messages.map(&:destroy)
