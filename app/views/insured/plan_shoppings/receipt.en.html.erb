@@ -294,7 +294,7 @@
       <div class="modal-footer">
         <form action=<%= @kp_pay_now_url %> method="post" target="_blank" id="pay_now_form">
           <input type="hidden" name="SAMLResponse" value="response" id="sp"/>
-          <input type="hidden" name="RelayState" value=<%= @kp_relay_state %>/> 
+          <input type="hidden" name="RelayState" value=<%= @kp_relay_state %>/>
           <button type="submit" class="btn btn-primary pull-right sp interaction-click-control-print-purchase-confirmation" id="pay-now" value="<%= @enrollment.hbx_id %>">
             Leave <%= site_short_name %>
           </button>
