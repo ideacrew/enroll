@@ -208,6 +208,19 @@
             </div>
           </div>
         <% elsif @person.has_active_employee_role? %>
+          <br>
+          <div class="row row-form-wrapper no-buffer">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 form-group form-group-lg">
+              <strong>Home address</strong><br>
+              <%= f.check_box :same_with_primary, {}, "true", "false" %>
+              <label for="dependent_same_with_primary">This person <strong>lives with primary subsciber</strong></label>
+            </div>
+          </div>
+          <div class="row row-form-wrapper no-buffer">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 form-group form-group-lg">
+              <i class="fa fa-info-circle"></i> The home address is where this person legally reside. If they want to receive mail at another address such as an office or a PO Box, Select 'Add Mailing Address'
+            </div>
+          </div>
           <%= f.hidden_field :same_with_primary, value: 'false' %>
           <%= render 'shared/address_fields_for_dependent', f: f %>
         <% end %>
