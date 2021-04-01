@@ -52,7 +52,7 @@ $(function () {
     $('#qle-details .error-info').addClass('hidden');
     $('#qle-details #qle-date-chose').removeClass('hidden');
     $("#qle_date").val("");
-    var errorNotice = "Based on the information you entered, you may be eligible for a special enrollment period. Please call us at <%= Settings.contact_center.phone_number %> to give us more information so we can see if you qualify.";
+    var errorNotice = "Based on the information you entered, you may be eligible for a special enrollment period. Please call us at <%= health_benefit_exchange_authority_phone_number %> to give us more information so we can see if you qualify.";
     $("#qle-details .error-text").html(errorNotice);
   }
 
@@ -95,13 +95,13 @@ $(function () {
   $(document).on('click', 'a.qle-menu-item', function() {
     init_qle_message();
     $('#qle_flow_info #qle-menu').hide();
-
+    
     if($(this).data('reason') == 'covid-19'){
       $('.qle-details-title').html("<u>"+$(this).data('title')+"</u>");
     } else {
       $('.qle-details-title').html($(this).data('title'));
     }
-
+    
     $('.qle-label').html($(this).data('label'));
     $('#change_plan').val($(this).data('title'));
     $('#qle_id').val($(this).data('id'));
@@ -199,7 +199,7 @@ $(function () {
       get_qle_date();
     } else {
       $('#qle_reason').hide();
-      var errorNoticeAction = "Based on the information you have provided, you are not eligible for this special enrollment period. If you have questions or would like to provide additional information, please contact Cover ME customer service at (855) 532-5465.";
+      var errorNoticeAction = "Based on the information you have provided, you are not eligible for this special enrollment period. If you have questions or would like to provide additional information, please contact <%= site_short_name %> customer service at <%= health_benefit_exchange_authority_phone_number %>.";
       $("#qle-details .error-text").html(errorNoticeAction);
       $('#qle-details .error-info').removeClass('hidden');
     }
