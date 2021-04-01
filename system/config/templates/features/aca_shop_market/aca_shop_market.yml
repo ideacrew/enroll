@@ -30,3 +30,9 @@ registry:
         settings:
           - key: :time_from_now
             item: "In the next 90 days"
+      - key: :census_employee_roster
+        item: :census_employee_roster
+        is_enabled: true
+        settings:
+          - key: :roster_upload_file_name
+            item: "Health Connector - Employee Census Template.xlsx"

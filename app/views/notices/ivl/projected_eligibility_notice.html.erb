@@ -65,7 +65,7 @@
 
 <% if notice.notification_type == "projected_eligibility_notice_1"%>
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-   content: "Each year, the federal government requires us to confirm that you still qualify to get coverage through DC Health Link. Please review your household information. If it’s correct, you don’t need to do anything right now. If this information needs to be updated for #{notice.coverage_year}, or if you need to add or remove someone, please let us know by October 15, #{notice.coverage_year.to_i - 1 }. To make updates, login to your account at <a href=#{site_home_url}>#{notice.hbe.short_url}</a> or call us at #{notice.hbe.phone}."} %>
+   content: "Each year, the federal government requires us to confirm that you still qualify to get coverage through #{site_short_name}. Please review your household information. If it’s correct, you don’t need to do anything right now. If this information needs to be updated for #{notice.coverage_year}, or if you need to add or remove someone, please let us know by October 15, #{notice.coverage_year.to_i - 1 }. To make updates, login to your account at <a href=#{site_home_url}>#{notice.hbe.short_url}</a> or call us at #{notice.hbe.phone}."} %>
 
   <% notice.uqhp_individuals.each do |member| %>
     <%= render partial: 'notices/shared/table_for_ivlr_notices', locals: {
@@ -79,7 +79,7 @@
 
 <% if notice.notification_type == "projected_eligibility_notice_2"%>
   <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
-   contents: ["Each year, the federal government requires us to confirm that you still qualify to get coverage through DC Health Link. We also need to verify any cost savings you may qualify for in #{notice.coverage_year}.","Please review your household information. If it’s correct, you don’t need to do anything right now. If this information needs to be updated for #{notice.coverage_year}, or if you need to add or remove someone, please let us know by October 15, #{notice.coverage_year.to_i - 1 }. To make updates, login to your account at <a href=#{site_home_url}>#{notice.hbe.short_url}</a> or call us at #{notice.hbe.phone}."], heading: '', sub_heading: '', bottom_margin: '5px'} %>
+   contents: ["Each year, the federal government requires us to confirm that you still qualify to get coverage through #{site_short_name}. We also need to verify any cost savings you may qualify for in #{notice.coverage_year}.","Please review your household information. If it’s correct, you don’t need to do anything right now. If this information needs to be updated for #{notice.coverage_year}, or if you need to add or remove someone, please let us know by October 15, #{notice.coverage_year.to_i - 1 }. To make updates, login to your account at <a href=#{site_home_url}>#{notice.hbe.short_url}</a> or call us at #{notice.hbe.phone}."], heading: '', sub_heading: '', bottom_margin: '5px'} %>
   <% notice.individuals.each do |member| %>
     <%= render partial: 'notices/shared/table_for_ivlr_notices', locals: {
                                rows: [['Household Member:', "#{member.first_name.titleize} #{member.last_name.titleize}  Age: #{member.age}"],
