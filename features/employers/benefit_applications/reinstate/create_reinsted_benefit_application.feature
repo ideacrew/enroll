@@ -54,8 +54,8 @@ Scenario: Initial Employer is in termination pending. Admin is able to create re
     When Employee selects a plan on the plan shopping page
     When Employee clicks on Confirm button on the coverage summary page
     Then Employee clicks back to my account button
-    And employee Patrick Doe of employer ABC Widgets most recent HBX Enrollment should be under the current reinstated benefit application
-#TODO - Blocking based on ticket https://devops.dchbx.org/redmine/issues/92712 - uncomment when the code is reverted
+# TODO - Blocking based on ticket https://devops.dchbx.org/redmine/issues/92712 - uncomment when the code is reverted
+#    And employee Patrick Doe of employer ABC Widgets most recent HBX Enrollment should be under the current reinstated benefit application
 #    When Employee click the "Had a baby" in qle carousel
 #    And Employee select a past qle date
 #    Then Employee should see confirmation and clicks continue
