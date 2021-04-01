@@ -44,7 +44,7 @@ Scenario: Initial Employer is in termination pending. Admin is able to create re
     And census employee Patrick Doe has benefit group assignment of the future reinstated benefit application
     And I click on log out link
     And employee Patrick Doe already matched with employer ABC Widgets and logged into employee portal
-    When Employee click the "Married" in qle carousel
+    When Employee click the "Losing other health insurance" in qle carousel
     And Employee select a current qle date
     Then Employee should see confirmation and clicks continue
     Then Employee should see family members page and clicks continue
