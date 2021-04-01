@@ -8,6 +8,7 @@ module BenefitMarkets
 
     field :age,   type: Integer
     field :cost,  type: Float
+    field :tobacco_cost, type: Float if ::EnrollRegistry.feature_enabled?(:tobacco_cost)
 
     validates_presence_of :age, :cost
 
