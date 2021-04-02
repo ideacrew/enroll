@@ -84,9 +84,10 @@ class QhpRateBuilder
             start_on: @rate[:effective_date],
             end_on: @rate[:expiration_date],
             cost: @rate[:primary_enrollee],
-            tobacco_cost: @rate[:primary_enrollee_tobacco],
             rating_area: rating_area
           }
+          @results[key].merge(tobacco_cost: @rate[:primary_enrollee_tobacco]) if ::EnrollRegistry.feature_enabled?(:tobacco_cost)
+          @results[key]
         end
       else
         @results[key] << {
@@ -94,9 +95,10 @@ class QhpRateBuilder
           start_on: @rate[:effective_date],
           end_on: @rate[:expiration_date],
           cost: @rate[:primary_enrollee],
-          tobacco_cost: @rate[:primary_enrollee_tobacco],
           rating_area: rating_area
         }
+        @results[key].merge(tobacco_cost: @rate[:primary_enrollee_tobacco]) if ::EnrollRegistry.feature_enabled?(:tobacco_cost)
+        @results[key]
       end
     end
   end
@@ -117,11 +119,9 @@ class QhpRateBuilder
 
       v.each_pair do |pt_age, pt_cost|
         cost, tobacco_cost = pt_cost.split(";")
-        premium_tuples << ::BenefitMarkets::Products::PremiumTuple.new(
-          age: pt_age,
-          cost: cost,
-          tobacco_cost: tobacco_cost
-        )
+        premium_tuples_params = {age: pt_age, cost: cost}
+        premium_tuples_params.merge(tobacco_cost: tobacco_cost) if ::EnrollRegistry.feature_enabled?(:tobacco_cost)
+        premium_tuples << ::BenefitMarkets::Products::PremiumTuple.new(premium_tuples_params)
       end
 
       premium_tables << ::BenefitMarkets::Products::PremiumTable.new(

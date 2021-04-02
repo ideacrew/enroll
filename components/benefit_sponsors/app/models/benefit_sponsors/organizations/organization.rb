@@ -347,10 +347,6 @@ module BenefitSponsors
         EnrollRegistry.feature_enabled?(:fehb_market) ? ENTITY_KINDS + FEHB_ENTITIES : ENTITY_KINDS
       end
 
-      def entity_kinds
-        EnrollRegistry.feature_enabled?(:fehb_market) ? ENTITY_KINDS + FEHB_ENTITIES : ENTITY_KINDS
-      end
-
       class << self
 
         def entity_kinds
