@@ -42,7 +42,7 @@ Scenario: Can continue from tax info page when form filled
 Scenario: Confirmation pop-up functionality
   When the user clicks the BACK TO ALL HOUSEHOLD MEMBERS link
   Then a modal should show asking the user are you sure you want to leave this page
-
+@flaky
 Scenario: Can choose primary applicant claiming dependent from dropdown
   Given a plan year, with premium tables, exists
   When the user navigates to the Tax Info page for a given applicant
