@@ -61,6 +61,7 @@ registry:
             item: "https://www.coverme.gov"
           - key: :main_web_address
             item: "https://www.coverme.gov"
+          - key: :short_name
             item: "Cover ME"
           - key: :byline
             item: "Maine's Official Health Insurance Marketplace"
@@ -257,9 +258,6 @@ registry:
         settings:
           - key: :effective_period
             item: <%= Date.new(2020,9,18)..Date.new(2021,12,31) %>
-      - key: :special_cover_header
-        item: "special_cover_header"
-        is_enabled: true
       - key: :special_cover_header
         item: :special_cover_header
         is_enabled: true

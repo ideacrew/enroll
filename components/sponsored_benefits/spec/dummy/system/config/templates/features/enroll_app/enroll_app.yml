@@ -229,11 +229,7 @@ registry:
           item: true
       - key: :agency_staff
         item: :agency_staff
-<<<<<<< HEAD
         is_enabled: false
-=======
-        is_enabled: true
->>>>>>> origin/disable_shop_base
       - key: :send_secure_message_family
         item: :send_secure_message
         is_enabled: true
@@ -245,21 +241,13 @@ registry:
             item: <%= Date.new(2020,9,18)..Date.new(2021,3,31) %>
       - key: :special_cover_header
         item: "special_cover_header"
-<<<<<<< HEAD
         is_enabled: true
-=======
-        is_enabled: false
->>>>>>> origin/disable_shop_base
         settings: 
           - key: :filename
             item: "CoverME_WebsiteHeader_01.jpg"
       - key: :tobacco_cost
         item: :tobacco_cost
-<<<<<<< HEAD
         is_enabled: true
-=======
-        is_enabled: false
->>>>>>> origin/disable_shop_base
   - namespace:
       - :features
       - :enroll_app

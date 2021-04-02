@@ -14,9 +14,8 @@ registry:
           is_visible: true
         settings:
           - key: :application_name
-            item: "enroll_dc"
+            item: "enroll_me"
           - key: :copyright_period_start
-<<<<<<< HEAD
             item: ""
           - key: :policies_url
             item: ""
@@ -67,7 +66,6 @@ registry:
           - key: :health_care_website_url
             item: "https://www.healthcare.gov"
           - key: :short_name
-<<<<<<< HEAD
             item: "Maine Cover ME"
           - key: :byline
             item: "Maine's Official Health Insurance Marketplace"
@@ -102,7 +100,6 @@ registry:
           - key: :sign_in_routes
             item: ["/families/home"]
           - key: :shop_find_your_doctor_url
-<<<<<<< HEAD
             item: ""
           - key: :document_verification_checklist_url
             item: ""
