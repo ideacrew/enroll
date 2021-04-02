@@ -361,7 +361,7 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
         let(:benefit_sponsorship) { organization.benefit_sponsorships.first }
         let(:profile) { organization.employer_profile }
         let(:expired_benefit_package) { expired_application.benefit_packages.first }
-        let!(:census_employee)  { FactoryBot.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: organization.employer_profile, active_benefit_group_assignment: expired_benefit_package.id.to_s) }
+        let!(:census_employee)  { FactoryBot.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: organization.employer_profile) }
         let(:employee_role)     { FactoryBot.create(:benefit_sponsors_employee_role, employer_profile: organization.employer_profile, person: person, census_employee_id: census_employee.id, benefit_sponsors_employer_profile_id: profile.id) }
 
         let(:qle_kind) { FactoryBot.create(:qualifying_life_event_kind, :effective_on_event_date) }
@@ -390,6 +390,7 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
         end
 
         before do
+          census_employee.benefit_group_assignments << build(:benefit_group_assignment, benefit_group: expired_benefit_package, census_employee: census_employee, start_on: expired_benefit_package.start_on, end_on: expired_benefit_package.end_on)
           allow(employee_role).to receive(:census_employee).and_return census_employee
         end
 
