@@ -117,7 +117,7 @@ Given(/^all applicants are in Info Completed state with all types of income$/) d
     find('#has_daily_living_no').click
     find('#need_help_paying_bills_no').click
     find('#radio_physically_disabled_no').click
-    choose('is_veteran_or_active_military_no')
+    # choose('is_veteran_or_active_military_no')
     find('[name=commit]').click
   end
 end
