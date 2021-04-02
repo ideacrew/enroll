@@ -116,7 +116,7 @@ module Operations
         latest_max_aptc = @family.active_household.latest_active_tax_household_with_year(@effective_on.year)&.latest_eligibility_determination&.max_aptc&.to_f
         return Success(0.00) unless latest_max_aptc
         eligile_month_setting = EnrollRegistry[:calculate_monthly_aggregate].settings(:eligible_months).item
-        eligible_months = eligile_month_setting ? (pct_of_effective_month + number_of_remaining_full_months + active_eligible_coverage_months) : 12
+        eligible_months = eligile_month_setting ? (1 + number_of_remaining_full_months + active_eligible_coverage_months) : 12
         available_annual_aggregate = (latest_max_aptc * eligible_months) - consumed_aptc.to_f
         monthly_max = calculated_new_monthly_aggregate(available_annual_aggregate)
         Success(monthly_max)
