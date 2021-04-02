@@ -43,11 +43,7 @@ registry:
         is_enabled: true
         settings:
           - key: :effective_period
-<<<<<<< HEAD
             item: <%= Date.new(2020,9,18)..Date.new(2021,12,31) %>
-=======
-            item: <%= Date.new(2020,9,18)..Date.new(2021,3,31) %>
->>>>>>> 57a6211344 (refs proj#200 fix more specs and change rr settings for prior py)
       - key: :prior_plan_year_sep
         is_enabled: true
         item: Operations::UpdatePriorPlanCoverage.new
