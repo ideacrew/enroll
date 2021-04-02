@@ -36,3 +36,6 @@ registry:
         settings:
           - key: :roster_upload_file_name
             item: "Health Connector - Employee Census Template.xlsx"
+      - key: :sic_codes
+        item: :sic_codes
+        is_enabled: false
