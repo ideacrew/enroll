@@ -745,7 +745,9 @@ Then(/^\w+ should (.*) input field to enter the Sep Type date$/) do |action|
     expect(page).to have_content("Date of domestic partnership")
   else
     expect(page).not_to have_content("Date of domestic partnership")
-    expect(page).to have_content("Based on the information you entered, you may be eligible for a special enrollment period. Please call us at 1-855-532-5465 to give us more information so we can see if you qualify.")
+
+    expect(page).to have_content("Based on the information you entered, you may be eligible for a special enrollment period. " \
+      "Please call us at #{EnrollRegistry[:enroll_app].setting(:contact_center_short_number)&.item} to give us more information so we can see if you qualify.")
   end
 end
 
@@ -768,7 +770,8 @@ Then(/^\w+ should (.*) sucess confirmation text$/) do |action|
   if action == 'see'
     expect(page).to have_content "Based on the information you entered, you may be eligible to enroll now but there is limited time"
   else
-    expect(page).to have_content "The date you submitted does not qualify for special enrollment.\nPlease double check the date or contact #{Settings.site.short_name}'s Customer Care Center: 1-855-532-5465.\n\nShop for health and dental plans"
+    expect(page).to have_content "The date you submitted does not qualify for special enrollment.\n" \
+    "Please double check the date or contact #{Settings.site.short_name}'s Customer Care Center: #{EnrollRegistry[:enroll_app].setting(:contact_center_short_number)&.item} .\n\nShop for health and dental plans"
   end
 end
 
