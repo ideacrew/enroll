@@ -98,6 +98,15 @@ end
 
 And(/^a SEP is submitted$/) do
   click_button AddSepAction.submit_button
+
+end
+
+Then(/^confirmation popup is visible$/) do
+  expect(page).to have_content(AddSepAction.confirmation_text)
+end
+
+Then(/^Admin clicks confirm on popup$/) do
+  find(AddSepAction.popup_confirmation).click
 end
 
 Then(/^confirmation popup is visible$/) do
