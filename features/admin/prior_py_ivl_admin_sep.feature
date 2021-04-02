@@ -19,6 +19,8 @@ Feature: IVL consumer or Admin adding a SEP which falls in prior plan year,
     When a SEP is added with a prior year effective date
     And Coverage renewal flag is unchecked
     And a SEP is submitted
+    Then confirmation popup is visible
+    When Admin clicks confirm on popup
     Then I see a SEP success message for Patrick Doe
     When I click the name of Patrick Doe from family list
     And I click on Shop For Plans banner button
@@ -41,6 +43,8 @@ Feature: IVL consumer or Admin adding a SEP which falls in prior plan year,
     When a SEP is added with a prior year effective date
     And Coverage renewal flag is checked
     And a SEP is submitted
+    Then confirmation popup is visible
+    When Admin clicks confirm on popup
     Then I see a SEP success message for Patrick Doe
     When I click the name of Patrick Doe from family list
     And I click on Shop For Plans banner button
@@ -62,6 +66,8 @@ Feature: IVL consumer or Admin adding a SEP which falls in prior plan year,
     When a SEP is added with a prior year effective date
     And Coverage renewal flag is unchecked
     And a SEP is submitted
+    Then confirmation popup is visible
+    When Admin clicks confirm on popup
     Then I see a SEP success message for Patrick Doe
     When I click the name of Patrick Doe from family list
     And I click on Shop For Plans banner button
@@ -83,6 +89,8 @@ Feature: IVL consumer or Admin adding a SEP which falls in prior plan year,
     When a SEP is added with a prior year effective date
     And Coverage renewal flag is unchecked
     And a SEP is submitted
+    Then confirmation popup is visible
+    When Admin clicks confirm on popup
     Then I see a SEP success message for Patrick Doe
     When I click the name of Patrick Doe from family list
     And I click on Shop For Plans banner button
@@ -104,6 +112,8 @@ Feature: IVL consumer or Admin adding a SEP which falls in prior plan year,
     When a SEP is added with a prior year effective date
     And Coverage renewal flag is unchecked
     And a SEP is submitted
+    Then confirmation popup is visible
+    When Admin clicks confirm on popup
     Then I see a SEP success message for Patrick Doe
     When I click the name of Patrick Doe from family list
     And I click on Shop For Plans banner button
@@ -126,6 +136,8 @@ Feature: IVL consumer or Admin adding a SEP which falls in prior plan year,
     When a SEP is added with a prior year effective date
     And Coverage renewal flag is unchecked
     And a SEP is submitted
+    Then confirmation popup is visible
+    When Admin clicks confirm on popup
     Then I see a SEP success message for Patrick Doe
     When I click the name of Patrick Doe from family list
     And I click on Shop For Plans banner button

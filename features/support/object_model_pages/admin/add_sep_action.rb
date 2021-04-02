@@ -62,4 +62,12 @@ class AddSepAction
   def self.submit_button
     'Submit'
   end
+
+  def self.confirmation_text
+    'Are you sure you want to add SEP to prior plan year?'
+  end
+
+  def self.popup_confirmation
+    '.btn-confirmation'
+  end
 end
