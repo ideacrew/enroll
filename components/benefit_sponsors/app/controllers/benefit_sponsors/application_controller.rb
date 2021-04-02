@@ -10,7 +10,7 @@ module BenefitSponsors
     rescue_from ActionController::InvalidAuthenticityToken, :with => :bad_token_due_to_session_expired
 
     def self.current_site
-      site_key = Settings.site.key
+      site_key = EnrollRegistry[:enroll_app].settings(:site_key).item
       BenefitSponsors::Site.by_site_key(site_key).first
     end
 
