@@ -35,4 +35,4 @@ registry:
         is_enabled: true
         settings:
           - key: :roster_upload_file_name
-            item: "Health Connector - Employee Census Template.xlsx"
+            item: ""

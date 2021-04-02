@@ -69,5 +69,3 @@ registry:
         settings:
           - key: :ivl_application_checklist
             item: 'db/documents/ivl_checklist_me.pdf'
-  # TODO eligibility engine connectivity(HAVEN) settings
-  # TODO mec service connectivity settings

@@ -214,6 +214,22 @@ registry:
       - key: :agency_staff
         item: :agency_staff
         is_enabled: false
+      - key: :broker_agency
+        item: "broker_agency"
+        is_enabled: true
+        settings:
+        - key: :broker_registration_guide_pdf
+          item: "/new_broker_registration.pdf"
+        - key: :producer_advisory_committee
+          item: ""
+        - key: :broker_license_lookup
+          item: "https://sbs.naic.org/solar-external-lookup/"
+        - key: :healthlink_training
+          item: "https://nahu.inreachce.com/Details?resultsPage=1&sortBy=&q=dc+broker&searchType=1&groupId=154ae22b-92eb-41f0-854b-3a9cabc20c8e"
+        - key: :broker_registration_guide_pdf_link
+          item: ""
+        - key: :redirect_to_requirements_page_after_confirmation # Refactor of Redmine Ticket 42456
+          item: true
       - key: :send_secure_message_family
         item: :send_secure_message
         is_enabled: true
@@ -225,7 +241,7 @@ registry:
             item: <%= Date.new(2020,9,18)..Date.new(2021,3,31) %>
       - key: :special_cover_header
         item: "special_cover_header"
-        is_enabled: false
+        is_enabled: true
         settings: 
           - key: :filename
             item: "CoverME_WebsiteHeader_01.jpg"

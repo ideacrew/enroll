@@ -55,9 +55,5 @@ module Config::SiteModelConcern
     def is_individual_market_enabled?
       EnrollRegistry.feature_enabled?(:aca_individual_market)
     end
-
-    def is_shop_and_individual_market_enabled?
-      EnrollRegistry.feature_enabled?(:aca_shop_market) && EnrollRegistry.feature_enabled?(:aca_individual_market)
-    end
   end
 end

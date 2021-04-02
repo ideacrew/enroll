@@ -61,11 +61,6 @@ registry:
             item: "https://www.coverme.gov"
           - key: :main_web_address
             item: "https://www.coverme.gov"
-          - key: :health_care_website
-            item: "www.healthcare.gov"
-          - key: :health_care_website_url
-            item: "https://www.healthcare.gov"
-          - key: :short_name
             item: "Cover ME"
           - key: :byline
             item: "Maine's Official Health Insurance Marketplace"
@@ -214,6 +209,8 @@ registry:
             item: ""
           - key: :site_broker_attestation_link
             item: ""
+          - key: :site_broker_attestation_link
+            item: ""
           - key: :rating_areas
             item: "single"
           - key: :favicon_tab_icon
@@ -222,6 +219,12 @@ registry:
             item: ""
           - key: :assistance_estimate_url
             item: ''
+          - key: :header_logo
+            item: "logo.png"
+          - key: :eligibile_immigration_statuses_url
+            item: ""
+          - key: :assistance_estimate_url
+            item: ""
       - key: :site_database_seed
         item: :site_database_seed
         is_enabled: true
@@ -253,9 +256,12 @@ registry:
         is_enabled: true
         settings:
           - key: :effective_period
-            item: <%= Date.new(2020,9,18)..Date.new(2021,3,31) %>
+            item: <%= Date.new(2020,9,18)..Date.new(2021,12,31) %>
       - key: :special_cover_header
         item: "special_cover_header"
+        is_enabled: true
+      - key: :special_cover_header
+        item: :special_cover_header
         is_enabled: true
         settings: 
           - key: :filename
