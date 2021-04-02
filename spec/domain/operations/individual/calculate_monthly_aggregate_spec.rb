@@ -281,6 +281,18 @@ RSpec.describe Operations::Individual::CalculateMonthlyAggregate do
         end
       end
 
+      context 'Gap in eligible months of 4months will not be considered and effective date is middle of month.' do
+        before do
+          hbx_enrollment.update_attributes(terminated_on: TimeKeeper.date_of_record - 1.day)
+          input_params = {family: family, effective_on: Date.new(current_year, 11, 10), shopping_fm_ids: hbx_enrollment.hbx_enrollment_members.pluck(:applicant_id), subscriber_applicant_id: hbx_enrollment.subscriber.applicant_id}
+          @result = subject.call(input_params)
+        end
+
+        it 'should return aptc amount based on eligible months' do
+          expect(@result.success).to eq(1711.76)
+        end
+      end
+
       context 'Gap in eligible months of 4months will not be considered and one of the enrollment is shop enrollment.' do
         before do
           hbx_enrollment.update_attributes(kind: "employer_sponsored", applied_aptc_amount: 0)
