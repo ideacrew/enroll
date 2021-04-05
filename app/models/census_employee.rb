@@ -1604,8 +1604,8 @@ class CensusEmployee < CensusMember
 
   # Picking latest health & dental enrollments
   def active_benefit_group_cobra_eligible_enrollments
-    return [] if active_benefit_group_enrollments.blank?
-    eligible_enrollments = active_benefit_group_enrollments.non_cobra.enrollments_for_cobra
+    return [] if active_benefit_group_enrollments(employment_terminated_on).blank?
+    eligible_enrollments = active_benefit_group_enrollments(employment_terminated_on).non_cobra.enrollments_for_cobra
     [eligible_enrollments.by_health.first, eligible_enrollments.by_dental.first].compact
   end
 
