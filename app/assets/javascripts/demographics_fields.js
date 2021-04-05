@@ -203,7 +203,7 @@ var PersonValidations = (function(window, undefined) {
     hidden_requireds = $('[required]').not(":visible");
     $('[required]').not(":visible").removeProp('required');
     this_obj.closest('div').find('button[type="submit"]').trigger('click');
-    this_obj.closest('div').find('button[type="submit"]').attr('disabled','disabled');
+    this_obj.closest('div').find('.dependent-disable').attr('disabled','disabled');
   }
 
   function restoreRequiredAttributes(e) {
