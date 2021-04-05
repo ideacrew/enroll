@@ -47,12 +47,19 @@
         <% end %>
       </div>-->
 
-      <div style="<%= style %>" class="row row-form-wrapper no-buffer address-row <%= div_class %>">
-        <div class="col-xs-12 form-group form-group-lg">
-          <div><strong>Enter your home address</strong></div>
-          <div>Your home address is where you legally reside. If you want to receive mail at another address such as your office or a PO Box, Select 'Add Mailing Address'</div>
+        <div style="<%= style %>" class="row row-form-wrapper no-buffer address-row <%= div_class %>">
+          <div class="col-xs-12 form-group form-group-lg">
+            <% if kind == 'home' %>
+              <div><strong>Enter your home address</strong></div>
+              <i class="fa fa-info-circle"></i> Your home address is where you legally reside. If you want to receive mail at another address such as your office or a PO Box, Select 'Add Mailing Address'
+            <% elsif kind == 'mailing' %>
+              <br>
+              <strong>Enter a mailing address</strong><br>
+              <i class="fa fa-info-circle"></i> This is the <strong>address where you want to have your mail delivered.</strong> It may be the same or different from your home address.
+            <% end %>
+          </div>
         </div>
-      </div>
+
 
       <div class="row row-form-wrapper no-buffer address-row <%= div_class %>">
         <div class="col-xs-12 form-group form-group-lg no-pd">
