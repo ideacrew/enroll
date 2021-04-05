@@ -10,7 +10,7 @@ module BenefitSponsors
     let!(:rating_area) { create_default(:benefit_markets_locations_rating_area) }
     let(:agency_class) { BenefitSponsors::Organizations::OrganizationForms::RegistrationForm }
     # let!(:site)  { FactoryBot.create(:benefit_sponsors_site, :with_owner_exempt_organization, :dc, :with_benefit_market) }
-    let!(:site) { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :dc) }
+    let!(:site) { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, site_key: ::EnrollRegistry[:enroll_app].settings(:site_key).item) }
     let(:person) { FactoryBot.create(:person) }
     let(:edit_user) { FactoryBot.create(:user, :person => person)}
     let(:user) { FactoryBot.create(:user) }
