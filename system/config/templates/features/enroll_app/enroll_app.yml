@@ -148,12 +148,6 @@ registry:
             item: 'mehl.producer@coverme.gov'
           - key: :privacy_policy
             item: ""
-          - key: :late_rates_message
-            item: "Due to a delay, premiums for some coverage effective dates are not available yet. Please check again soon to see if this information has been updated. You can also contact Customer Service or your broker if you need help."
-          - key: :faa_enabled
-            item: false
-          - key: :ivl_responsibility_url
-            item: ""
           - key: :curam_enabled?
             item: true
           - key: :support_for_ie_browser
@@ -228,6 +222,12 @@ registry:
             item: ""
           - key: :geographic_rating_area_model
             item: "county"
+          - key: :header_logo
+            item: "logo.png"
+          - key: :eligibile_immigration_statuses_url
+            item: "https://dchealthlink.com/sites/default/files/v2/forms/Eligible%20Immigration%20Status%20List_0.pdf"
+          - key: :assistance_estimate_url
+            item: "https://dc.checkbookhealth.org/hie/dc/2021/index.cfm?page"
       - key: :site_database_seed
         item: :site_database_seed
         is_enabled: true

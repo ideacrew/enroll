@@ -6,6 +6,6 @@ registry:
       - key: :aca_shop_market
         is_enabled: false
       - key: :fehb_market
-        is_enabled: false
+        is_enabled: true
       - key: :aca_individual_market
         is_enabled: true

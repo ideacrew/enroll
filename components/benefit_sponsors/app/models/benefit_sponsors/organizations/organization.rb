@@ -23,7 +23,6 @@ module BenefitSponsors
 
       FEHB_ENTITIES = [:governmental_employer, :foreign_embassy_or_consulate].freeze
 
-
       EXEMPT_ENTITY_KINDS = [
         :governmental_employer,
         :foreign_embassy_or_consulate,
@@ -341,6 +340,10 @@ module BenefitSponsors
 
       def benefit_sponsorships_with_benefit_application
         benefit_sponsorships.where(:effective_being_on => {'$ne' => nil})
+      end
+
+      def entity_kinds
+        EnrollRegistry.feature_enabled?(:fehb_market) ? ENTITY_KINDS + FEHB_ENTITIES : ENTITY_KINDS
       end
 
       def entity_kinds
