@@ -419,7 +419,7 @@ Then(/broker (.*?) should receive application (.*?) notification$/) do |broker_n
     when 'approval'
       "Invitation to create your Broker account on #{site_short_name}"
     when 'extended'
-      "Action Needed - Complete Broker Training for #{site_short_name}for Business"
+      "Action Needed - Complete Broker Training for #{site_short_name} for Business"
     end
   open_email(
     broker_email_address,
