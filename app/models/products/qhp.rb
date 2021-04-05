@@ -166,10 +166,10 @@ class Products::Qhp
         csv_ary << ["Carrier", "Plan Name", "Your Cost", "Provider NetWork", "Plan Benefits"] + visit_types
         qhps.each do |qhp|
           arry1 = [
-            qhp.plan.carrier_profile.organization.legal_name,
-            qhp.plan.name,
+            qhp&.plan&.carrier_profile&.organization&.legal_name,
+            qhp&.plan&.name,
             "$#{qhp[:total_employee_cost].round(2)} / month",
-            qhp.plan.nationwide ? "Nationwide" : qhp.plan.service_area_id,
+            qhp&.plan&.nationwide ? "Nationwide" : qhp&.plan&.service_area_id,
             "Co-Pay"
           ]
           arry2 = [
