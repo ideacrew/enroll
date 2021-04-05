@@ -702,7 +702,7 @@ GEM
     net-sftp (2.1.2)
       net-ssh (>= 2.6.5)
     net-ssh (4.2.0)
-    newrelic_rpm (5.7.0.350)
+    newrelic_rpm (6.15.0)
     nio4r (2.5.5)
     nokogiri (1.10.10)
       mini_portile2 (~> 2.4.0)
@@ -1110,7 +1110,7 @@ DEPENDENCIES
   mongoid_rails_migrations (~> 1.4)
   mongoid_userstamp (~> 0.4)!
   net-ssh (= 4.2.0)
-  newrelic_rpm (~> 5.0)
+  newrelic_rpm
   nokogiri (~> 1.10.8)
   nokogiri-happymapper (~> 0.8.0)
   non-stupid-digest-assets
