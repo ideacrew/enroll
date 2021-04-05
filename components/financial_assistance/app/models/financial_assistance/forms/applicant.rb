@@ -57,7 +57,7 @@ module FinancialAssistance
 
         validate_citizen_status
         self.errors.add(:base, "native american / alaska native status is required") if @indian_tribe_member.nil?
-        self.errors.add(:tribal_id, "is required when native american / alaska native is selected") if !tribal_id.present? && @indian_tribe_member
+        self.errors.add(:base, "If you selected that you're a member of an American Indian or Alaska Native Tribe, you must enter your Tribal ID") if !tribal_id.present? && @indian_tribe_member
         self.errors.add(:base, "Incarceration status is required") if @is_incarcerated.nil?
       end
 
