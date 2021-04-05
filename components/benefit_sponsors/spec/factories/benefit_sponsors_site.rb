@@ -55,6 +55,10 @@ FactoryBot.define do
       end
     end
 
+    trait :me do
+      site_key { :me }
+
+    end
 
     trait :dc do
       site_key { :dc }
