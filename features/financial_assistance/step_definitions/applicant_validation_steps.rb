@@ -6,7 +6,7 @@ And(/^at least a household members exist$/) do
   fill_in 'applicant[first_name]', :with => 'johnson'
   fill_in 'applicant[last_name]', :with => 'smith'
   fill_in 'jq_datepicker_ignore_applicant[dob]', :with => '10/10/1984'
-  click_outside_datepicker("#{l10n('family_information')}")
+  click_outside_datepicker(l10n('family_information'))
   fill_in 'applicant[ssn]', :with => '123456543'
   find("span", :text => "choose").click
   find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Spouse')]").click
