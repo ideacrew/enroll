@@ -352,8 +352,8 @@ Then(/^.+ goes to the Consumer page$/) do
 end
 
 Then(/^Primary Broker should see (.*?) account$/) do |name|
-  find('.family_members h2', text: "#{l10n('family_information')}", wait: 5)
-  find('.family_members span', text: name, wait: 5)
+  expect(page).to have_content(name)
+  expect(page).to have_content("Manage Family")
 end
 
 # Then(/^.+ is on the consumer home page$/) do
@@ -419,7 +419,7 @@ Then(/broker (.*?) should receive application (.*?) notification$/) do |broker_n
     when 'approval'
       "Invitation to create your Broker account on #{site_short_name}"
     when 'extended'
-      'Action Needed - Complete Broker Training for DC Health Link for Business'
+      "Action Needed - Complete Broker Training for #{site_short_name}for Business"
     end
   open_email(
     broker_email_address,
