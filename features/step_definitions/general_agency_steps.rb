@@ -122,36 +122,34 @@ When(/^CareFirst Broker should see the New Broker Agency form$/) do
 end
 
 When(/^.+ enters personal information for ga flow$/) do
-  fill_in 'organization[first_name]', with: 'Broker'
-  fill_in 'organization[last_name]', with: 'Martin'
-  fill_in 'jq_datepicker_ignore_organization[dob]', with: '05/07/1977'
-  find('.interaction-field-control-person-email').click
-  fill_in 'organization[email]', with: 'broker.martin@example.com'
-  fill_in 'organization[npn]', with: '761111111'
+  fill_in GeneralAgencyRegistration.first_name, with: 'Broker'
+  fill_in GeneralAgencyRegistration.last_name, with: 'Martin'
+  fill_in GeneralAgencyRegistration.dob, with: '05/07/1977'
+  # find('.interaction-field-control-person-email').click
+  fill_in GeneralAgencyRegistration.email, with: 'broker.martin@example.com'
+  fill_in GeneralAgencyRegistration.npn, with: '761111111'
 end
 
 And(/^.+ enters broker agency information for ga flow$/) do
-  fill_in 'organization[legal_name]', with: "CareFirst Inc"
-  fill_in 'organization[dba]', with: "CareFirst Inc"
+  fill_in GeneralAgencyRegistration.legal_name, with: "CareFirst Inc"
+  fill_in GeneralAgencyRegistration.dba, with: "CareFirst Inc"
   # Auto-Generates FEIN
   # fill_in 'organization[fein]', with: "890222111"
-
-  find(:xpath, "//p[@class='label'][contains(., 'Select Practice Area')]").click
-  find(:xpath, "//li[contains(., 'Both – Individual & Family AND Small Business Marketplaces')]").click
-
-  find(:xpath, "//label[input[@name='organization[accept_new_clients]']]").click
-  find(:xpath, "//label[input[@name='organization[working_hours]']]").click
+  select "Both - Individual & Family AND Small Business Marketplaces", from: GeneralAgencyRegistration.practice_area_dropdown
+  find(GeneralAgencyRegistration.accept_new_client_checkbox).click
+  find(GeneralAgencyRegistration.evening_hours_checkbox).click
 end
 
 When(/^.+ registers with valid information for ga flow$/) do
   fill_in "user[oim_id]", with: "broker.martin@example.com"
   fill_in "user[password]", with: "aA1!aA1!aA1!"
   fill_in "user[password_confirmation]", with: "aA1!aA1!aA1!"
-  click_button 'Create account'
+  create_account_input = page.all('input').detect { |input| input[:value] == 'Create Account' }
+  create_account_input.click
 end
 
 Then(/^.+ should receive an invitation email for ga flow$/) do
-  open_email("broker.martin@example.com", :with_subject => " Congratulations! You’re Broker Application for #{Settings.site.short_name} for Business has been Approved!")
+  open_email("broker.martin@example.com", :with_subject => "Invitation to create your Broker account on #{Settings.site.short_name}")
   expect(current_email.to).to eq(["broker.martin@example.com"])
 end
 
