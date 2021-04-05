@@ -7,14 +7,14 @@
     <% if EnrollRegistry.feature_enabled?(:broker_approval_period) %>
       <div>Thank you for submitting your broker application to <%= site_short_name %>. Please allow 7-10 business days for <%= site_short_name %> to review your application.</div>
       <br />
-      <div><%= l10n("broker_agencies.broker_application_confirm.outstanding_reqs") %></div>
+      <div><%= l10n("broker_agencies.broker_application_confirm.outstanding_reqs", {site_noreply_email_address: site_noreply_email_address}) %></div>
       <br />
-      <div> <%= l10n("broker_agencies.broker_application_confirm.broker_reqs") %>
+      <div> <%= l10n("broker_agencies.broker_application_confirm.broker_reqs", {site_short_name: site_short_name}) %>
       </div>
       <br />
-      <div><%= l10n("broker_agencies.broker_application_confirm.more_info") %><a/></div>
+      <div><%= l10n("broker_agencies.broker_application_confirm.more_info", {site_broker_registration_guide: site_broker_registration_guide}) %><a/></div>
       <br />
-      <div><%= l10n("broker_agencies.broker_application_confirm.any_questions") %></div>
+      <div><%= l10n("broker_agencies.broker_application_confirm.any_questions", {site_short_name: site_short_name, site_producer_email_address: site_producer_email_address}) %></div>
     <% else %>
       <div>
         <%= l10n("broker_agencies.broker_invitation.broker_app_submission") %>
