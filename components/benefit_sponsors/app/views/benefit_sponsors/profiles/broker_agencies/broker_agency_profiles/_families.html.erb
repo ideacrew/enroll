@@ -5,6 +5,8 @@
   <h3 class="title-inline"><%= l10n("families")%></h3>
 </div>
 
+<%= hidden_field_tag :market_enabled_check, :value => is_shop_or_fehb_market_enabled? ? "true" : "false" , id: "market_enabled_check" %>
+
 <div class="container">
   <div id="families">
 
@@ -31,12 +33,15 @@
 
     <script type="text/javascript" charset="utf-8">
 
-        var columnList = [{ data: 'name'}, { data: 'ssn' }, { data: 'dob' }, { data: 'hbx_id'}, { data: 'family_count'}, { data: 'registered'}]
-        var filteredColumnList = <% if is_shop_or_fehb_market_enabled? %>
-                                    columnList.push({data: 'consumer'}, {data: 'employee'})
-                                 <% else %>
-                                    columnList
-                                 <% end %>
+        var columnList = [{ data: 'name'}, { data: 'ssn' }, { data: 'dob' }, { data: 'hbx_id'}, { data: 'family_count'}, { data: 'registered'}];
+        var market_enabled = document.getElementById("market_enabled_check").value;
+        if (market_enabled == 'true') {
+          columnList.push({data: 'consumer'}, {data: 'employee'})
+          var filteredColumnList = columnList
+        } else {
+          var filteredColumnList = columnList
+        }
+
       // datatables setup
       $(document).ready(function() {
         $('#Broker-Family-dataTable').DataTable( {
