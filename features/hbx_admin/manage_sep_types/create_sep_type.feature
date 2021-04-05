@@ -57,7 +57,7 @@ Feature: Admin has ability to create a new SEP Type
     Examples:
       | market_kind | action |
       | individual  | cannot |
-      | shop        | cannot |
+      | shop        | can    |
       | fehb        | can    |
 
 
@@ -85,6 +85,10 @@ Feature: Admin has ability to create a new SEP Type
 
     Examples:
       | market_kind | action       |
+      | shop        | selected     |
+      | fehb        | selected     |
+      | shop        | not selected |
+      | fehb        | not selected |
       | individual  | selected     |
 
   @flaky
