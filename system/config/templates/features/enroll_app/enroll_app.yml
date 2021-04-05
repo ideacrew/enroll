@@ -226,6 +226,8 @@ registry:
             item: ""
           - key: :assistance_estimate_url
             item: ""
+          - key: :geographic_rating_area_model
+            item: "county"
       - key: :site_database_seed
         item: :site_database_seed
         is_enabled: true
