@@ -17,7 +17,7 @@ class Address
   QUADRANTS = %w[N NORTH S SOUTH E EAST W WEST NE NORTHEAST NW NORTHWEST SE SOUTHEAST SW SOUTHWEST].freeze
 
   # Quadrants
-  QUADRANTS = %W(N NORTH S SOUTH E EAST W WEST NE NORTHEAST NW NORTHWEST SE SOUTHEAST SW SOUTHWEST)
+  QUADRANTS = %w[N NORTH S SOUTH E EAST W WEST NE NORTHEAST NW NORTHWEST SE SOUTHEAST SW SOUTHWEST].freeze
 
   # The type of address
   field :kind, type: String
@@ -88,7 +88,7 @@ class Address
   before_save :detect_quadrant
 
   def detect_quadrant
-    QUADRANTS.map { |word| "ADDRESS".scan /\b#{word}\b/ }.flatten
+    QUADRANTS.map { |word| "ADDRESS".scan(/\b#{word}\b/) }.flatten
   end
 
   # @note Add support for GIS location
