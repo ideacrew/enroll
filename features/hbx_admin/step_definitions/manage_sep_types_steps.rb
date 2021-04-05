@@ -353,10 +353,9 @@ And("Admin fills Create SEP Type form with Tool Tip") do
 end
 
 And(/Admin selects (.*) market radio button$/) do |market_kind|
-  sleep(2)
-  if market_kind == 'individual' && is_individual_market_enabled?
+  if market_kind == 'individual'
     find(:xpath, '//input[@value="individual"]', :wait => 2).click
-  elsif market_kind == 'shop' && is_shop_market_enabled?
+  elsif market_kind == 'shop'
     find(:xpath, '//input[@value="shop"]', :wait => 2).click
   elsif is_fehb_market_enabled?
     find(:xpath, '//input[@value="fehb"]', :wait => 2).click
@@ -523,11 +522,11 @@ Then("Admin should see newly created SEP Type title on Datatable") do
 end
 
 Then(/Admin should see newly created SEP Type with Active SEP Type title for (.*) on Datatable$/) do |market_kind|
-  if market_kind == 'individual' && is_individual_market_enabled?
+  if market_kind == 'individual'
     expect(page).to have_content('Had a baby')
-  elsif market_kind == 'shop' && is_shop_market_enabled?
+  elsif market_kind == 'shop'
     expect(page).to have_content('Married')
-  elsif is_fehb_market_enabled?
+  elsif market_kind == 'fehb'
     expect(page).to have_content('Adopted a child')
   end
 end
@@ -537,13 +536,13 @@ Then("Admin navigates to SEP Type Details page") do
 end
 
 Then(/Admin clicks on Active SEP Type title for (.*) on Datatable$/) do |market_kind|
-  if market_kind == 'individual' && is_individual_market_enabled?
+  if market_kind == 'individual'
     expect(page).to have_content('Had a baby')
     find_link('Had a baby').click
-  elsif market_kind == 'shop' && is_shop_market_enabled?
+  elsif market_kind == 'shop'
     expect(page).to have_content('Married')
     find_link('Married').click
-  elsif is_fehb_market_enabled?
+  elsif market_kind == 'fehb'
     expect(page).to have_content('Adopted a child')
     find_link('Adopted a child').click
   end
@@ -745,7 +744,6 @@ Then(/^\w+ should (.*) input field to enter the Sep Type date$/) do |action|
     expect(page).to have_content("Date of domestic partnership")
   else
     expect(page).not_to have_content("Date of domestic partnership")
-
     expect(page).to have_content("Based on the information you entered, you may be eligible for a special enrollment period.")
     expect(page).to have_content("Please call us at #{EnrollRegistry[:enroll_app].setting(:contact_center_short_number)&.item} to give us more information so we can see if you qualify.")
   end

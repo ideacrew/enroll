@@ -25,6 +25,7 @@
         value="$<%= @self_term_or_cancel_form[:default_tax_credit_value] %>" placeholder="APTC Applied" class="form-control" size="8px">
         <h5><strong>Your new premium:</strong></h5>
         <div id="current_total_premium" class='hidden'>
+        <% binding.pry %>
           <% if [locals[:hbx_enrollment].total_premium, locals[:available_aptc], locals[:hbx_enrollment].elected_aptc_pct].all? %>
             <%= float_fix(locals[:hbx_enrollment].total_premium - (locals[:available_aptc] * locals[:hbx_enrollment].elected_aptc_pct)) %>
           <% end %>

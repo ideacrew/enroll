@@ -27,5 +27,3 @@ Feature: When Admin visits SEP Details page
     Examples:
       | market_kind |
       | individual  |
-      | shop        |
-      | fehb        |

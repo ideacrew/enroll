@@ -37,7 +37,7 @@ Feature: Admin has ability to update a Draft SEP Type
     Examples:
       | market_kind | action |
       | individual  | cannot |
-      | shop        | can    |
+      | shop        | cannot |
       | fehb        | can    |
 
   Scenario Outline: Admin should able to Create and Publish new SEP Type with Active SEP Type reason

@@ -68,7 +68,7 @@ Then(/(.*) sign in to portal/) do |per_name|
 end
 
 And(/Employee should see a button to enroll in ivl market/) do
-  expect(page).to have_content "Enroll in health or dental coverage on the District of Columbia's individual market"
+  expect(page).to have_content "Enroll in health or dental coverage on the #{Settings.aca.state_name}'s individual market"
   expect(page).to have_link "Enroll"
 end
 
