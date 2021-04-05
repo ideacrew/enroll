@@ -117,13 +117,23 @@ Given(/^the user navigates to the "Household Info" page with "yes" selected/) do
   create_plan
   find('.btn', text: 'CONTINUE').click
 end
-And(/^the user is navigated to Application checklist page/) do
+
+And(/^the .+ is navigated to Application checklist page/) do
   expect(page).to have_content('Application Checklist')
+end
+
+And(/^the .+ should see a modal popup/) do
+  expect(page).to have_content(l10n('faa.cost_savings.start_new_application').to_s)
+end
+
+And(/^the .+ clicks on 'Start New Application' on modal popup/) do
+  click_button 'Start new application'
 end
 
 When(/^the user clicks on CONTINUE button/) do
   find('.btn', text: 'CONTINUE').click
 end
+
 Then(/^the user will navigate to FAA Household Info: Family Members page/) do
   expect(page).to have_content("#{l10n('family_information')}")
 end
