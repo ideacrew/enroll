@@ -100,7 +100,7 @@ And(/^employer (.*?) is listed under the account for broker (.*?)$/) do |employe
   dt_query = nil
   query = BenefitSponsors::Queries::BrokerFamiliesQuery.new(dt_query, broker_agency_prof.id, broker_agency_prof.market_kind)
   census_employee_names = employer.employer_profile.census_employees.map(&:full_name)
-  query_family_primary_person_names = query.filtered_scope.map { |query_family| query_family&.primary_person.full_name }
+  query_family_primary_person_names = query.filtered_scope.map { |query_family| query_family&.primary_person&.full_name }
   census_employee_names.each { |ce_name| expect(query_family_primary_person_names).to include(ce_name) }
 end
 
