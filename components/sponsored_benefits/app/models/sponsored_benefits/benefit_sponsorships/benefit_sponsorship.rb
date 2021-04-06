@@ -110,7 +110,7 @@ module SponsoredBenefits
       end
 
       def rating_area
-        benefit_sponsorable.rating_area if Settings.aca.state_abbreviation != "DC"
+        benefit_sponsorable.rating_area if EnrollRegistry.feature_enabled?(:rating_area)
       end
 
       class << self
