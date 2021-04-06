@@ -1,4 +1,3 @@
-@aca_shop_market_disabled
 # frozen_string_literal: true
 
 Feature: Start a new Financial Assistance Application and answers questions on health coverage page

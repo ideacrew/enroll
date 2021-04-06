@@ -1,4 +1,3 @@
-@aca_shop_market_disabled
 Feature: Census Employee COBRA functionality
   Background: Setup site, employer, and benefit application
     Given the shop market configuration is enabled

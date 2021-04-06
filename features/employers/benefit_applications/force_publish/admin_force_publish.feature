@@ -1,4 +1,3 @@
-@aca_shop_market_disabled
 Feature: As an admin user I should have the ability to extend the OE
   of a given Employer with an extended enrollment.
 

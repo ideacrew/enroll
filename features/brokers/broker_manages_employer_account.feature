@@ -1,4 +1,3 @@
-@aca_shop_market_disabled
 Feature: Broker Manages Employer Account
   In order to help Employer, brokers can access their employers accounts
   The Broker should be able to set up application and roster for the employer

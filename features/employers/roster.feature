@@ -1,4 +1,3 @@
-@aca_shop_market_disabled
 Feature: Employer can view their employees
 
   Background: Setup site, employer, and benefit application

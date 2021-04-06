@@ -1,4 +1,3 @@
-@aca_shop_market_disabled
 Feature: Employee termination and Re-hire functionality
 
   Background: Setup site, employer, and benefit application

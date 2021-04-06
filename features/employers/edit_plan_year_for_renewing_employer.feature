@@ -1,4 +1,3 @@
-@aca_shop_market_disabled
 Feature: Edit Plan Year For Renewing Employer
 
   Background: Setup site, employer, and benefit application

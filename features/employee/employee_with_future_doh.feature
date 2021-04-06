@@ -1,4 +1,3 @@
-@aca_shop_market_disabled
 Feature: Employee with future date of hire
   In order for the New Employee to purchase insurance
   Given Employer exists with active plan year

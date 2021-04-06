@@ -1,4 +1,3 @@
-@aca_shop_market_disabled
 Feature: Create Benefit Application by admin UI
 
   Background: Setup site, employer, and benefit application
