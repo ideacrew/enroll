@@ -67,7 +67,7 @@ registry:
         is_enabled: true
         settings:
           - key: :color
-            item: '#5C5C5Cs'
+            item: '#5C5C5C'
       - key: primary_light_gray
         is_enabled: true
         settings:
@@ -108,3 +108,13 @@ registry:
         settings:
           - key: :color
             item: '#d9534f'
+      - key: :my_portal_links
+        is_enabled: true
+        settings:
+          - key: :color
+            item: '#d7d7d7'
+      - key: :background_color
+        is_enabled: true
+        settings:
+          - key: :color
+            item: '#333'
