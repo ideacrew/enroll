@@ -86,7 +86,7 @@ module SponsoredBenefits
 
       def ensure_profile
         if @profile.blank?
-          @profile = "SponsoredBenefits::Organizations::AcaShopDcEmployerProfile".constantize.new
+          @profile = "SponsoredBenefits::Organizations::AcaShop#{Settings.aca.state_key.capitalize}EmployerProfile".constantize.new
           sponsorship = @profile.benefit_sponsorships.first
           sponsorship.benefit_applications.build
         end
@@ -115,7 +115,7 @@ module SponsoredBenefits
         if @proposal.persisted?
           @proposal.assign_attributes(title: @title)
         else
-          profile = "SponsoredBenefits::Organizations::AcaShopDcEmployerProfile".constantize.new
+          profile = "SponsoredBenefits::Organizations::AcaShop#{EnrollRegistry[:enroll_app].setting(:site_key)&.item.capitalize}EmployerProfile".constantize.new
           profile.sic_code = @sic_code if @sic_code
           @proposal = @plan_design_organization.plan_design_proposals.build({title: @title, profile: profile})
         end
