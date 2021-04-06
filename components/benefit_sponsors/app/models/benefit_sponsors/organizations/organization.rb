@@ -378,10 +378,10 @@ module BenefitSponsors
         def broker_agencies_with_matching_agency_or_broker(search_params, value = nil)
           if search_params[:q].present?
             orgs2 = approved_broker_agencies.broker_agencies_by_market_kind(['both', 'shop', 'individual']).where({
-                                                                                                      :"profiles._id" => {
-                                                                                                        "$in" => Person.agencies_with_matching_broker(search_params[:q])
-                                                                                                      }
-                                                                                                    })
+                                                                                                                    :"profiles._id" => {
+                                                                                                                      "$in" => Person.agencies_with_matching_broker(search_params[:q])
+                                                                                                                    }
+                                                                                                                  })
 
             brokers = Person.brokers_matching_search_criteria(search_params[:q])
             if brokers.any?
