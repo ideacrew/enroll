@@ -6,7 +6,7 @@ FactoryBot.define do
     organization            { build(:benefit_sponsors_organizations_exempt_organization) }
 
     after(:build) do |profile, evaluator|
-      profile.office_locations << build(:benefit_sponsors_locations_office_location, :with_connecticut_address, :primary)
+      profile.office_locations << build(:benefit_sponsors_locations_office_location, :with_massachusetts_address, :primary)
     end
 
     transient do

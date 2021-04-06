@@ -8,7 +8,7 @@ FactoryBot.define do
       address { FactoryBot.build(:benefit_sponsors_locations_address, kind: "primary") }
     end
 
-    trait :with_connecticut_address do
+    trait :with_massachusetts_address do
       is_primary { true }
       address { FactoryBot.build(:benefit_sponsors_locations_address, :cca_shop_baseline) }
     end
