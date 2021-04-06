@@ -93,15 +93,15 @@ class TaxHousehold
     @benefit_sponsorship ||= HbxProfile.current_hbx.benefit_sponsorship
     #current_benefit_coverage_period = benefit_sponsorship.current_benefit_period
     #slcsp = current_benefit_coverage_period.second_lowest_cost_silver_plan
-    benefit_coverage_period = @benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(effective_starting_on)}
+    benefit_coverage_period = @benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(tax_household.effective_starting_on)}
     slcsp = benefit_coverage_period.second_lowest_cost_silver_plan
 
     # Look up premiums for each aptc_member
     benchmark_member_cost_hash = {}
-    aptc_members.each do |member|
+    tax_household.aptc_members.each do |member|
       #TODO use which date to calculate premiums by slcp
-      product = product_factory.new({product_id: slcsp.id})
-      premium = product.cost_for(effective_starting_on, member.age_on_effective_date)
+      product = ::BenefitMarkets::Products::ProductFactory.new({product_id: slcsp.id})
+      premium = product.cost_for(tax_household.effective_starting_on, member.age_on_effective_date)
       benchmark_member_cost_hash[member.applicant_id.to_s] = premium
     end
 

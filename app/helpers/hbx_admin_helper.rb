@@ -17,10 +17,11 @@ module HbxAdminHelper
     hbx = HbxEnrollment.find(hbx_id)
 
     effective_on = ::Insured::Factories::SelfServiceFactory.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), hbx.effective_on).to_date
-    max_aptc = hbx.family.active_household.tax_households.tax_household_with_year(hbx.effective_on.year).last.monthly_max_aptc(hbx, effective_on)
+    tax_household = hbx.family.active_household.latest_active_tax_household_with_year(hbx.effective_on.year)
+    max_aptc = tax_household.monthly_max_aptc(hbx, effective_on)
 
     hbx_enrollment_members = hbx.hbx_enrollment_members
-    aptc_ratio_by_member = hbx.family.active_household.latest_active_tax_household.aptc_ratio_by_member
+    aptc_ratio_by_member = tax_household.aptc_ratio_by_member
     hbx_enrollment_members.each do |hem|
       max_aptc_for_enrollment += (aptc_ratio_by_member[hem.applicant_id.to_s].to_f * max_aptc.to_f)
     end
