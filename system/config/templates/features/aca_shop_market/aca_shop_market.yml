@@ -39,6 +39,9 @@ registry:
       - key: :sic_codes
         item: :sic_codes
         is_enabled: false
+      - key: :county_zips
+        item: :county_zips
+        is_enabled: false
       - key: :general_agency
         item: :general_agency
         is_enabled: true

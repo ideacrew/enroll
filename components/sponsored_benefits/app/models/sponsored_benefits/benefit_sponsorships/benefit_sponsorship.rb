@@ -106,11 +106,11 @@ module SponsoredBenefits
       end
 
       def sic_code
-        benefit_sponsorable.sic_code if Settings.aca.state_abbreviation == "MA"
+        benefit_sponsorable.sic_code if EnrollRegistry.feature_enabled?(:sic_codes)
       end
 
       def rating_area
-        benefit_sponsorable.rating_area if Settings.aca.state_abbreviation == "MA"
+        benefit_sponsorable.rating_area if EnrollRegistry.feature_enabled?(:rating_area)
       end
 
       class << self
