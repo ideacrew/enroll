@@ -9,7 +9,7 @@ module HbxAdminHelper
     enb_percent = (ehb*100).round(2)
   end
   
-  def max_aptc_that_can_be_applied_for_this_enrollment(hbx_id, max_aptc_for_household)
+  def max_aptc_that_can_be_applied_for_this_enrollment(hbx_id)
     #1 Get all members in the enrollment
     #2 Get APTC ratio for each of these members
     #3 Max APTC for Enrollment => Sum all (ratio * max_aptc) for each members
