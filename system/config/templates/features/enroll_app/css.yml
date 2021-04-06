@@ -13,3 +13,33 @@ registry:
         settings:
           - key: :color
             item: '#333333'
+      - key: :cancel_plan_border
+        is_enabled: true
+        settings:
+          - key: :color
+            item: '#003260'
+      - key: :dark_blue
+        is_enable: true
+        settings:
+          - key: :color
+            item: '#007bc4'
+      - key: :dark-gray
+        is_enabled: true
+        settings:
+          - key: :color
+            item: '#706f6d'
+      - key: :gray
+        is_enabled: true
+        settings:
+          - key: :color
+            item: '#b7b7b7'
+      - key: :orange
+        is_enabled: true
+        settings:
+          - key: color
+            item: '#e72b2d'
+      - key: :href_blue
+        is_enabled: true
+        settings:
+          - key: color
+            item: '#337ab7'
