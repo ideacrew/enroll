@@ -55,9 +55,9 @@ end
 if (ENV["type"] != "fixtures") && missing_plan_dumps
   puts "Running full seed"
 
-  system "bundle exec rake import:county_zips" if EnrollRegistry[:site_database_seed].setting(:seed_county_zips)&.item
+  system "bundle exec rake import:county_zips" if EnrollRegistry.feature_enabled?(:county_zips)
 
-  if EnrollRegistry[:site_database_seed].setting(:seed_sic_codes)&.item
+  if EnrollRegistry.feature_enabled?(:sic_codes)
     system "bundle exec rake load_sic_code:update_sic_codes"
     puts "::: complete :::"
   end
