@@ -1,8 +1,0 @@
---- !ruby/object:Translation
-__selected_fields: 
-attributes: !ruby/hash:BSON::Document
-  _id: !ruby/object:BSON::ObjectId
-    raw_data: !binary |-
-      WkerVqyn1EZzAAA1
-  key: en.uis.bootstrap3_examples.index.toggle_Popover_content
-  value: '"And here''s some amazing content. It''s very engaging. Right?"'
