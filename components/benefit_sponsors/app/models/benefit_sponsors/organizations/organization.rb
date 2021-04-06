@@ -369,15 +369,15 @@ module BenefitSponsors
         def search_agencies_by_criteria(search_params)
           query_params = build_query_params(search_params)
           if query_params.any?
-            approved_broker_agencies.broker_agencies_by_market_kind(['both', 'shop']).where({ "$and" => build_query_params(search_params) })
+            approved_broker_agencies.broker_agencies_by_market_kind(['both', 'shop', 'individual']).where({ "$and" => build_query_params(search_params) })
           else
-            approved_broker_agencies.broker_agencies_by_market_kind(['both', 'shop'])
+            approved_broker_agencies.broker_agencies_by_market_kind(['both', 'shop', 'individual'])
           end
         end
 
         def broker_agencies_with_matching_agency_or_broker(search_params, value = nil)
           if search_params[:q].present?
-            orgs2 = approved_broker_agencies.broker_agencies_by_market_kind(['both', 'shop']).where({
+            orgs2 = approved_broker_agencies.broker_agencies_by_market_kind(['both', 'shop', 'individual']).where({
                                                                                                       :"profiles._id" => {
                                                                                                         "$in" => Person.agencies_with_matching_broker(search_params[:q])
                                                                                                       }
