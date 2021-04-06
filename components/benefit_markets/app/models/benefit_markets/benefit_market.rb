@@ -10,7 +10,7 @@ module BenefitMarkets
 
     field :site_urn,    type: String
     field :kind,        type: Symbol #, default: :aca_individual  # => :aca_shop
-    field :title,       type: String, default: "" # => Cover ME SHOP Market
+    field :title,       type: String, default: "" # => DC Health Link SHOP Market
     field :description, type: String, default: ""
 
     belongs_to  :site, class_name: "::BenefitSponsors::Site", inverse_of: nil, optional: true
