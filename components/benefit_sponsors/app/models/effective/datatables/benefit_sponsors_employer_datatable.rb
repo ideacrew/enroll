@@ -26,7 +26,7 @@ module Effective
           @employer_profile.try(:active_broker_agency_legal_name).try(:titleize) #if row.employer_profile.broker_agency_profile.present?
         }, :filter => false
 
-        if aca_state_abbreviation != 'MA'
+        if EnrollRegistry.feature_enabled?(:general_agency)
           table_column :general_agency, :label => 'General Agency', :proc => proc {
             @employer_profile.try(:active_ga_legal_name).try(:titleize)
           }, :filter => false
@@ -35,8 +35,9 @@ module Effective
             boolean_to_glyph(row.is_conversion?)
           }, :filter => {include_blank: false, :as => :select, :collection => [['All', :all], ['Yes', :conversion], ['No', :self_serve]], :selected => 'all'}
         end
-
-        if aca_state_abbreviation == 'MA'
+        
+        # TODO: Should be enabled for MA, not for DC
+        if EnrollRegistry.feature_enabled?(:employer_datatable_source_kinds)
           table_column :source_kind, :proc => proc {|row|
             row.source_kind.to_s.humanize
           }, :filter => {include_blank: false, :as => :select, :collection => SOURCE_KINDS, :selected => 'all'}
