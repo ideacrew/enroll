@@ -214,6 +214,8 @@
         <div id="remove_confirm" class="hidden"></div>
       </div>
 
+      <%= render partial: 'shared/address_change_confirmation_modal' %>
+
       <div class="clearfix"></div>
       <div id="add_info_buttons_<%= dependent.id %>" style="padding-top: 20px;">
 
@@ -249,5 +251,38 @@
         $("#is_applying_coverage_value_dep_1").text(text);
       });
     });
+
+
+    $(document).on('click', '#confirm-member', function(e) {
+      $(".btn-confirmation").removeAttr('disabled');
+
+      if (!$("input#dependent_same_with_primary").is(":checked")) {
+        $('#addressChangeConfirmation').modal('show');
+      }
+      else {
+       e.preventDefault();
+      }
+    });
+
+    function confirmChange(event){
+      $(".btn-confirmation").attr('disabled', 'disabled');
+
+      event.preventDefault();
+      event.stopImmediatePropagation();
+
+      $('.modal-backdrop').removeClass('modal-backdrop');
+      $('.modal-open').removeClass('modal-open');
+
+      var formData = new FormData($('#new_dependent')[0]);
+
+      $.ajax({
+        url: '/insured/families/manage_family?tab=family',
+        type: "POST",
+        data : formData,
+        contentType: false,
+        processData: false,
+      });
+    }
+
   </script>
 </li>
