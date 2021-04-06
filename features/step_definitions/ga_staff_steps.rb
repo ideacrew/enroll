@@ -43,7 +43,7 @@ When(/^the primary staff clicks on the approve button$/) do
 end
 
 Then(/^the primary staff should see an approval popup$/) do
-  expect(find('.modal-body')).to have_content("By authorizing this employee to access your book of business on Cover ME")
+  expect(find('.modal-body')).to have_content("By authorizing this employee to access your book of business on #{site_short_name}")
 end
 
 Then(/^the primary staff clicks on continue and approve button$/) do
