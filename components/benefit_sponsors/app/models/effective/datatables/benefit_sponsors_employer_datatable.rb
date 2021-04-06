@@ -35,7 +35,7 @@ module Effective
             boolean_to_glyph(row.is_conversion?)
           }, :filter => {include_blank: false, :as => :select, :collection => [['All', :all], ['Yes', :conversion], ['No', :self_serve]], :selected => 'all'}
         end
-        
+
         # TODO: Should be enabled for MA, not for DC
         if EnrollRegistry.feature_enabled?(:employer_datatable_source_kinds)
           table_column :source_kind, :proc => proc {|row|
