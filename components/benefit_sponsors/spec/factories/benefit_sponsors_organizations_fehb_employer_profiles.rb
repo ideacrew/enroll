@@ -12,7 +12,7 @@ FactoryBot.define do
     end
 
     after(:build) do |profile, evaluator|
-      profile.office_locations << build_list(:benefit_sponsors_locations_office_location, evaluator.office_locations_count, :with_connecticut_address)
+      profile.office_locations << build_list(:benefit_sponsors_locations_office_location, evaluator.office_locations_count, :with_massachusetts_address)
     end
 
     trait :with_benefit_sponsorship do

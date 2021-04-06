@@ -6,5 +6,5 @@ module BenefitSponsors
     const_name = Settings.site.key.upcase
     mod = const_get("BenefitSponsors::ClientSiteSpecHelpers::#{const_name}")
     extend mod
-  end
+end
 end

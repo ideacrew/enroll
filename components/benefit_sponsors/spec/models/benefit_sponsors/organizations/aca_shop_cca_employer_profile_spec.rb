@@ -13,7 +13,7 @@ module BenefitSponsors
     let(:entity_kind)         { :s_corporation }
 
     let(:configuration)       { BenefitMarkets::Configurations::Configuration.new }
-    let(:benefit_market)      { ::BenefitMarkets::BenefitMarket.new(:kind => :aca_shop, title: "CT Access Health SHOP", site_urn: "site_urn", description: "description") }
+    let(:benefit_market)      { ::BenefitMarkets::BenefitMarket.new(:kind => :aca_shop, title: "MA Health Connector SHOP", site_urn: "site_urn", description: "description") }
     let(:benefit_sponsorship) { BenefitSponsors::BenefitSponsorships::BenefitSponsorship.new }
 
     let(:site) { ::BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_benefit_market }
@@ -94,8 +94,8 @@ module BenefitSponsors
 
     context "A BenefitSponsorship association", dbclean: :after_each do
       let(:site)                { BenefitSponsors::Site.new(site_key: :cca) }
-      let(:benefit_market)      { ::BenefitMarkets::BenefitMarket.new(:kind => :aca_shop, title: "CT Access Health SHOP") }
-      let(:legal_name)          { "CT Access Health" }
+      let(:benefit_market)      { ::BenefitMarkets::BenefitMarket.new(:kind => :aca_shop, title: "MA Health Connector SHOP") }
+      let(:legal_name)          { "MA Health Connector" }
       let(:organization)        { BenefitSponsors::Organizations::GeneralOrganization.new(
                                       site: site,
                                       hbx_id: hbx_id,

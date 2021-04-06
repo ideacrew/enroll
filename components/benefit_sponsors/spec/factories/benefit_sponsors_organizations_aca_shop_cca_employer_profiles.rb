@@ -18,7 +18,7 @@ FactoryBot.define do
     # end
 
     after(:build) do |profile, evaluator|
-      profile.office_locations = [build(:benefit_sponsors_locations_office_location, :with_connecticut_address)]
+      profile.office_locations = [build(:benefit_sponsors_locations_office_location, :with_massachusetts_address)]
     end
 
     trait :with_organization_and_site do
@@ -41,7 +41,7 @@ FactoryBot.define do
 
     trait :with_secondary_offices do
       after(:build) do |profile, evaluator|
-        profile.office_locations << build_list(:benefit_sponsors_locations_office_location, evaluator.secondary_office_locations_count, :with_connecticut_address)
+        profile.office_locations << build_list(:benefit_sponsors_locations_office_location, evaluator.secondary_office_locations_count, :with_massachusetts_address)
       end
     end
   end
