@@ -40,7 +40,7 @@
   }
 
   .dt-buttons > div > button.btn-default{
-    color: #007bc4 !important;
+    color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %> !important;
   }
 
   .form-control{
@@ -57,12 +57,12 @@
 
   .pagination > li > a{
     background: #ffffff !important;
-    color: #337ab7 !important
+    color: <%= EnrollRegistry[:href_blue].settings(:color).item %> !important
   }
 
   .pagination > .active > a{
     background-color: $brand-primary !important;
-    border-color: #337ab7 !important;
+    border-color: <%= EnrollRegistry[:href_blue].settings(:color).item %> !important;
     color: #ffffff !important;
   }
 
@@ -71,19 +71,19 @@
   }
 
   .pagination > .disabled > a{
-    color: #777 !important;
+    color: <%= EnrollRegistry[:border_right].settings(:color).item %> !important;
   }
 
   .dataTables_info{
     font-size: 14px;
-    color: #333;
+    color: <%= EnrollRegistry[:background_color].settings(:color).item %>;
     text-align: right !important;
   }
 
   .dataTables_length {
     padding: 0.675 !important;
     font-size: 14px;
-    color: #333;
+    color: <%= EnrollRegistry[:background_color].settings(:color).item %>;
     margin-bottom: 4px !important;
     label{
       display: inline;

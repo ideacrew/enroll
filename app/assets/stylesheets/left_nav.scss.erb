@@ -148,7 +148,7 @@
 
 .nav > li.no-hover > a:hover, .nav > li.no-hover > a:focus {
   text-decoration: none;
-  background-color: #007BC4 !important;
+  background-color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %> !important;
 }
 
 .nav > li.no-hover-disable > a:hover, .nav > li.no-hover-disable > a:focus {
@@ -158,7 +158,7 @@
 
 .nav > li.activer.no-hover-disable > a:hover, .nav > li.activer.no-hover-disable > a:focus {
   text-decoration: none;
-  background-color: #007BC4 !important;
+  background-color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>4 !important;
 }
 .mr-top {
   margin-top: 0px !important;
@@ -206,12 +206,12 @@
 }
 
 .activer {
-  background: #007BC4;
+  background: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
   color: white;
   font-weight: 600;
 }
 .activer > a {
-  background: #007BC4;
+  background: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
   font-weight: 600;
 }
 
