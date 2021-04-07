@@ -42,7 +42,7 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency "rspec-rails"
   s.add_development_dependency 'shoulda-matchers',          '~> 3'
-  s.add_development_dependency 'database_cleaner'
+  s.add_development_dependency 'database_cleaner-mongoid'
   s.add_development_dependency 'capybara',                  '~> 3.12'
   s.add_development_dependency 'factory_bot_rails',         '~> 4'
   s.add_development_dependency 'forgery',                   '~> 0.7.0'

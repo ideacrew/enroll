@@ -6,7 +6,7 @@ module Factories
   # enrollments that are generated during plan shopping.
   class IvlPlanShoppingEligibilityFactory
     include IvlEligibilityFactory
-
+    # rubocop:disable Lint/MissingSuper
     def initialize(enrollment, effective_on, selected_aptc = nil, product_ids = [])
       raise "Given enrollment object is not a valid enrollment." unless enrollment.is_a?(::HbxEnrollment)
 
@@ -15,5 +15,6 @@ module Factories
       @effective_on = effective_on
       set_applicable_aptc_attrs(selected_aptc, product_ids) if product_ids.present? && selected_aptc
     end
+    # rubocop:enable Lint/MissingSuper
   end
 end

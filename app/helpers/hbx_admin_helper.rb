@@ -31,13 +31,13 @@ module HbxAdminHelper
     end
   end
 
-  def aptc_csr_data_type(year=TimeKeeper.date_of_record.year, month)
+  def aptc_csr_data_type(month, year = TimeKeeper.date_of_record.year)
     last_of_month = Admin::Aptc::last_of_month_converter(month, year)
     todays_date = TimeKeeper.date_of_record
     if last_of_month < todays_date
-      td_style = 'past-aptc-csr-data'
+      'past-aptc-csr-data'
     else
-      td_style="current-aptc-csr-data"
+      "current-aptc-csr-data"
     end
   end
 

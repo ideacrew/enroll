@@ -124,13 +124,14 @@ class PlanSelection
     coverage_year_start = hbx_enrollment.effective_on.beginning_of_year
 
     family.active_household.hbx_enrollments.where(
-      {:_id.ne => hbx_enrollment.id,
-       :kind => hbx_enrollment.kind,
-       :coverage_kind => hbx_enrollment.coverage_kind,
-       :effective_on.gte => coverage_year_start}
-    ).or(
-      {:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES},
-      {:aasm_state.in => HbxEnrollment::TERMINATED_STATUSES, :terminated_on.gte => hbx_enrollment.effective_on.prev_day}
+      :_id.ne => hbx_enrollment.id,
+      :kind => hbx_enrollment.kind,
+      :coverage_kind => hbx_enrollment.coverage_kind,
+      :effective_on.gte => coverage_year_start,
+      "$or" => [
+        {"aasm_state" => { "$in" => HbxEnrollment::ENROLLED_STATUSES }},
+        {"aasm_state" => { "$in" => HbxEnrollment::TERMINATED_STATUSES}, :terminated_on.gte => hbx_enrollment.effective_on.prev_day}
+      ]
     ).order('effective_on DESC')
   end
 

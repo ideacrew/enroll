@@ -8,12 +8,15 @@ module SponsoredBenefits
     OFFICE_KINDS = ["phone main"]
     
     included do
+      include Mongoid::Document
+      include Mongoid::Timestamps
+
       field :kind, type: String, default: ""
       field :country_code, type: String, default: ""
       field :area_code, type: String, default: ""
       field :number, type: String, default: ""
       field :extension, type: String, default: ""
-      field :primary, type: Boolean
+      field :primary, type: Mongoid::Boolean
       field :full_phone_number, type: String, default: ""
 
       before_validation :save_phone_components

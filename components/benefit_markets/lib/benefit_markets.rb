@@ -5,7 +5,7 @@ require "mongoid"
 require "aasm"
 require 'config'
 require "slim"
-require 'dry-types'
+# require 'dry-types'
 require 'dry-validation'
 require 'dry-struct'
 require 'dry-monads'

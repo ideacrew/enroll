@@ -5,8 +5,10 @@ FactoryBot.define do
     legal_name  { "Turner Agency, Inc" }
     dba         { "Turner Brokers" }
 
-    sequence :sic_code do |n|
-      Settings.aca.state_abbreviation == "DC" ? nil : "765#{n}"
+    if Settings.aca.state_abbreviation != "DC" 
+      sequence :sic_code do |n|
+        "765#{n}"
+      end
     end
 
     sequence :sponsor_profile_id do |n|

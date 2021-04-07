@@ -10,6 +10,8 @@ module BenefitMarkets
   class Products::Product
     include Mongoid::Document
     include Mongoid::Timestamps
+    # For usage of serializable_hash. Included by default in rails 6
+    include ActiveModel::Serialization if Rails.version["5"]
 
     CSR_KIND_TO_PRODUCT_VARIANT_MAP = ::EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP
     MARKET_KINDS = %w[shop individual].freeze
@@ -116,7 +118,7 @@ module BenefitMarkets
       )
     }
 =end
-    scope :by_metal_level_kind,         ->(metal_level){ where(metal_level_kind: /#{metal_level}/i) }
+    scope :by_metal_level_kind,         ->(metal_level){ where(metal_level_kind: metal_level&.to_sym) }
     scope :by_state,                    ->(state) {where(
       :"issuer_profile_id".in => BenefitSponsors::Organizations::Organization.issuer_profiles.where(:"profiles.issuer_state" => state).map(&:issuer_profile).map(&:id)
     )}

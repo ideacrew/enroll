@@ -39,7 +39,7 @@ Gem::Specification.new do |s|
 
   # s.add_development_dependency 'bundler-audit',             '~> 0.6'
   s.add_development_dependency 'capybara',                  '~> 3.12'
-  s.add_development_dependency 'database_cleaner'
+  s.add_development_dependency 'database_cleaner-mongoid'
   s.add_development_dependency 'factory_bot_rails',         '~> 4'
   s.add_development_dependency 'forgery',                   '~> 0.7.0'
   s.add_development_dependency 'mongoid_rails_migrations',  '~> 1.2.0'

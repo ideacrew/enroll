@@ -3,6 +3,8 @@ module BenefitMarkets
     class ContributionModel
       include Mongoid::Document
       include Mongoid::Timestamps
+      # For usage of serializable_hash. Included by default in rails 6
+      include ActiveModel::Serialization if Rails.version["5"]
 
       field :title, type: String
       field :key,   type: Symbol
@@ -37,7 +39,7 @@ module BenefitMarkets
 
       index({"key" => 1})
 
-      scope :options_for_select,  ->{ unscoped.distinct(:key).as_json } #.reduce([]) { |list, cm| list << [cm.title, cm.key] } }
+      scope :options_for_select,  ->{ unscoped.distinct(:key).serializable_hash } #.reduce([]) { |list, cm| list << [cm.title, cm.key] } }
 
       def contribution_calculator
         @contribution_calculator ||= contribution_calculator_kind.constantize.new

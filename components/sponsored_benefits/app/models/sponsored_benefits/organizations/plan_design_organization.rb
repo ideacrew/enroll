@@ -35,7 +35,7 @@ module SponsoredBenefits
       field :past_sponsor_profile_id,type: BSON::ObjectId
       field :past_sponsor_profile_class_name,type: String
 
-      field :has_active_broker_relationship, type: Boolean, default: false
+      field :has_active_broker_relationship, type: Mongoid::Boolean, default: false
 
       embeds_many :plan_design_proposals, class_name: "SponsoredBenefits::Organizations::PlanDesignProposal", cascade_callbacks: true
       embeds_many :general_agency_accounts, class_name: "SponsoredBenefits::Accounts::GeneralAgencyAccount", cascade_callbacks: true

@@ -3,10 +3,11 @@ require "sponsored_benefits/engine"
 require "mongoid"
 require "aasm"
 require 'config'
-require 'dry-types'
+# require 'dry-types'
 require 'dry-validation'
 require 'dry-struct'
 require 'dry-monads'
+require 'money-rails'
 
 module SponsoredBenefits
   class << self

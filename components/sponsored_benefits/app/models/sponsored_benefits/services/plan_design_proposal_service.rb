@@ -76,7 +76,7 @@ module SponsoredBenefits
           benefit_group.update_attributes({
             dental_plan_option_kind: attrs[:plan_option_kind],
             dental_reference_plan_id: attrs[:reference_plan_id],
-            dental_relationship_benefits_attributes: attrs[:relationship_benefits_attributes].as_json
+            dental_relationship_benefits_attributes: attrs[:relationship_benefits_attributes].to_h.deep_stringify_keys
           })
         else
           benefit_group.update_attributes(attrs)
@@ -99,6 +99,7 @@ module SponsoredBenefits
       def benefit_group(attrs={})
         return @benefit_group if defined? @benefit_group
         @benefit_group = application.benefit_groups.first || application.benefit_groups.build(attrs)
+        @benefit_group
       end
 
       def application

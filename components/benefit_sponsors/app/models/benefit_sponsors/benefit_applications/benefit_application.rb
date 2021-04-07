@@ -7,6 +7,8 @@ module BenefitSponsors
     include ::BenefitSponsors::Concerns::Observable
     include ::BenefitSponsors::ModelEvents::BenefitApplication
     include ::BenefitSponsors::Employers::EmployerHelper
+    # For usage of serializable_hash. Included by default in rails 6
+    include ActiveModel::Serialization if Rails.version["5"]
 
     include AASM
 
@@ -236,7 +238,7 @@ module BenefitSponsors
       where(
         "$and" => [
           {:aasm_state.in => PUBLISHED_STATES },
-          {"$exists" => {:predecessor_id => true} }
+          {:predecessor_id => {"$exists": true}}
         ]
       )
     }
@@ -272,7 +274,7 @@ module BenefitSponsors
       where(
         "$or" => [
           {:aasm_state.in => APPROVED_STATES },
-          {"$exists" => {:predecessor_id => true} }
+          {:predecessor_id => {"$exists": true}}
         ]
       )
     }
