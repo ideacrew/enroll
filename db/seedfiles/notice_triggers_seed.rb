@@ -113,7 +113,7 @@ if Settings.aca.market_kinds.include? 'individual'
 
     {
       hbx_id: 'IVL_PRE_1',
-      title: 'Update your information at Cover ME by October 15',
+      title: 'Update your information at EnrollRegistry[:enroll_app].setting(:short_name).item by October 15',
       description: 'Notice to be sent out to individuals with UQHP(Unassisted)',
       resource_name: 'consumer_role',
       event_name: 'projected_eligibility_notice_1',
@@ -135,7 +135,7 @@ if Settings.aca.market_kinds.include? 'individual'
 
     {
       hbx_id: 'IVL_PRE_2',
-      title: 'Update your information at Cover ME by October 15',
+      title: 'Update your information at EnrollRegistry[:enroll_app].setting(:short_name).item by October 15',
       description: 'Notice to be sent out to individuals with AQHP(Assisted)',
       resource_name: 'consumer_role',
       event_name: 'projected_eligibility_notice_2',
@@ -306,7 +306,7 @@ if Settings.aca.market_kinds.include? 'individual'
     {
       hbx_id: 'IVL_ELA',
       title: 'ACTION REQUIRED - HEALTH COVERAGE ELIGIBILITY',
-      description: 'Notice will be sent to all the individuals eligible for coverage through Cover ME',
+      description: 'Notice will be sent to all the individuals eligible for coverage through EnrollRegistry[:enroll_app].setting(:short_name).item',
       resource_name: 'consumer_role',
       event_name: 'eligibility_notice',
       notice_triggers: [
@@ -326,7 +326,7 @@ if Settings.aca.market_kinds.include? 'individual'
     },
     {
       hbx_id: 'IVL_NEL',
-      title: 'IMPORTANT NOTICE - INELIGIBLE FOR COVERAGE THROUGH Cover ME',
+      title: 'IMPORTANT NOTICE - INELIGIBLE FOR COVERAGE THROUGH EnrollRegistry[:enroll_app].setting(:short_name).item',
       description: 'Notice will be sent to the household if everyone in the household is ineligible',
       resource_name: 'consumer_role',
       event_name: 'ineligibility_notice',
@@ -411,7 +411,7 @@ if Settings.aca.market_kinds.include? 'individual'
 
     {
       hbx_id: 'IVL_CDC',
-      title: 'Your Insurance through Cover ME Has Changed to Cover All DC',
+      title: 'Your Insurance through EnrollRegistry[:enroll_app].setting(:short_name).item Has Changed to Cover All DC',
       description: 'This is an Transition Notice and is sent for people who are moved to Coverall DC',
       resource_name: 'consumer_role',
       event_name: 'ivl_to_coverall_transition_notice',
@@ -433,8 +433,8 @@ if Settings.aca.market_kinds.include? 'individual'
 
     {
       hbx_id: 'IVL_DCH',
-      title: 'Your Insurance through Cover All DC Has Changed to Cover ME',
-      description: 'This is an Transition Notice and is sent for people who are moved to Cover ME',
+      title: 'Your Insurance through Cover All DC Has Changed to EnrollRegistry[:enroll_app].setting(:short_name).item',
+      description: 'This is an Transition Notice and is sent for people who are moved to EnrollRegistry[:enroll_app].setting(:short_name).item',
       resource_name: 'consumer_role',
       event_name: 'coverall_to_ivl_transition_notice',
       notice_triggers: [
