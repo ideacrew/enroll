@@ -1,20 +1,20 @@
 .btn-outline-primary {
-  @include button-outline-variant(#647f3a, #647f3a, lighten($white, 5%), $dc-alt-blue);
+  @include button-outline-variant($alt-blue, $alt-blue, lighten($white, 5%), $alt-blue);
   font-weight: 600;
   text-transform: capitalize;
 }
 
 .btn-primary {
-  @include button-variant($dc-red, $dc-red, darken($dc-red, 10%), $dc-red);
+  @include button-variant($red, $red, darken($red, 10%), $red);
   text-transform: uppercase;
   font-weight: 600;
-  border-color: $dc-dark-red;
+  border-color: $dark-red;
   border-bottom-width: medium;
 }
 
 .heading-text {
   font-weight: 400;
-  color: #487ba2;
+  color: $dark-blue;
 }
 
 .invalid-feedback {
@@ -22,26 +22,26 @@
 }
 
 .login-options {
-  border-left: solid 1px $dc-alt-gray;
+  border-left: solid 1px $alt-gray;
   min-height: 72px;
 }
 
 .navbar-main {
   background-color: $white;
-  border-bottom: solid 3px $dc-alt-blue;
+  border-bottom: solid 3px $alt-blue;
   .navbar-brand {
-    border-right: solid 1px $dc-alt-gray;
+    border-right: solid 1px $alt-gray;
     img {
       max-height: 40px;
     }
   }
   .portal {
     font-weight: 600;
-    color: $dc-dark-gray !important;
+    color: $dark-gray !important;
     font-size: 18px;
   }
   .header-text {
-    color: $dc-alt-gray-2;
+    color: $alt-gray-2;
     font-size: 14px;
     text-transform: uppercase;
     font-weight: 600;
@@ -50,23 +50,23 @@
     border: none;
   }
   .fa-phone {
-    color: $dc-alt-blue;
+    color: $alt-blue;
   }
   .cc-number {
-    color: $dc-dark-gray;
+    color: $dark-gray;
   }
 }
 
 .sub-text {
   font-weight: 200;
-  color: $dc-dark-blue;
+  color: $dark-blue;
 }
 
 // This is for conditional styles used only in
 // preprod environment
 .pre_prod_nav_color {
   color: white !important;
-  background-color: #3d5d6f !important;
+  background-color: #003260 !important;
 
    .call-customer-service {
     color: white !important;
