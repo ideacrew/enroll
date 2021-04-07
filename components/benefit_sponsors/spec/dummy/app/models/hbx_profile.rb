@@ -123,14 +123,17 @@ class HbxProfile
   ## Application-level caching
 
   ## HBX general settings
-  StateName = "District of Columbia"
-  StateAbbreviation = "DC"
-  CallCenterName = "DC Health Link's Customer Care Center"
-  CallCenterPhoneNumber = "1-855-532-5465"
-  ShortName = "DC Health Link"
+  # TODO: Try and deprecate this as a future date and just refer any references of these constants to
+  # Resource Registry directly
+  StateName = EnrollRegistry[:enroll_app].setting(:state_name).item
+  StateAbbreviation = EnrollRegistry[:enroll_app].setting(:state_abbreviation).item
+  CallCenterName = EnrollRegistry[:enroll_app].setting(:contact_center_name).item
+  CallCenterPhoneNumber =  EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item
+  ShortName = EnrollRegistry[:enroll_app].setting(:short_name).item
 
   # IndividualEnrollmentDueDayOfMonth = 15
   # Temporary change for Dec 2015 extension
+  # TODO: Figure out if this is/should be something in ReseourceRegistry
   IndividualEnrollmentDueDayOfMonth = 19
 
   #New Rule There is no 14 days rule for termination
