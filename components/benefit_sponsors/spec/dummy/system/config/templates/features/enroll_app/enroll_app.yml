@@ -182,6 +182,8 @@ registry:
             item: "Maine"
           - key: :exchange_name
             item: "Cover ME Health Benefit Exchange"
+          - key: :state_name
+            item: "Maine"
           - key: :state_long_title
             item: "the state of Maine"
           - key: :state_dmv_link
