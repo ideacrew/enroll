@@ -3,12 +3,18 @@
 require 'rails_helper'
 
 RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
-  let!(:default_plan)            { double("Product", id: "default_plan_id", kind: "health") }
-  let!(:dental_plan)             { double('Product', id: 'dental_plan_id', kind: :dental) }
+  let(:exchange_provided_code) { 1 }
+  let(:rating_area) { double(exchange_provided_code: exchange_provided_code) }
+  let(:premium_table) { double(rating_area: rating_area) }
+  let(:premium_tables) { [premium_table] }
+  let!(:default_plan)            { double("Product", id: "default_plan_id", kind: "health", premium_tables: premium_tables) }
+  let!(:dental_plan)             { double('Product', id: 'dental_plan_id', kind: :dental, premium_tables: premium_tables) }
   let(:plan_cost_decorator)     { UnassistedPlanCostDecorator.new(plan, member_provider) }
   context "rating a large family" do
     let(:plan)            {default_plan}
-    let!(:member_provider) {double("member_provider", effective_on: 10.days.ago, hbx_enrollment_members: [father, mother, one, two, three, four, five])}
+    let(:consumer_role) { ConsumerRole.new }
+    let(:rating_address) { FactoryBot.build(:address) }
+    let!(:member_provider) {double("member_provider", effective_on: 10.days.ago, hbx_enrollment_members: [father, mother, one, two, three, four, five], consumer_role: consumer_role)}
     let!(:father)          {double("father", dob: 55.years.ago, age_on_effective_date: 55, employee_relationship: "self")}
     let!(:mother)          {double("mother", dob: 45.years.ago, age_on_effective_date: 45, employee_relationship: "spouse")}
     let!(:one)             {double("one", dob: 20.years.ago, age_on_effective_date: 20, employee_relationship: "child")}
@@ -23,6 +29,7 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
     end
 
     before do
+      allow(consumer_role).to receive(:rating_address).and_return(rating_address)
       allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) {|_id, _start, age| age * 1.0}
     end
 
