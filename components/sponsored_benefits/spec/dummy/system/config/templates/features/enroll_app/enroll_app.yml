@@ -292,5 +292,5 @@ registry:
         is_enabled: false
      - key: :automatic_quote_validation # This needs refactoring, see employer_profile_builder.rb
         is_enabled: false
-      - key: :validate_effective_date_employer
+     - key: :validate_effective_date_employer
         is_enabled: false # Should return true for MA, see employer_profile_builder.rb
