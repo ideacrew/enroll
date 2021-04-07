@@ -105,10 +105,11 @@ module Operations
 
       def active_eligible_coverage_months
         eligible_enrollments = @family.hbx_enrollments.eligible_covered_aggregate(@family.id, @effective_on.year).reject{|enr| enr.product.metal_level_kind == :catastrophic}
-        (1..(@effective_on.month - 1)).inject(0) do |counter, month|
-          counter += 1 if eligible_enrollments.any?{ |enr| (enr.effective_on.beginning_of_month..calculate_termination_date(enr)).cover?(Date.new(@effective_on.year, month)) }
-          counter
+        counter = (1..(@effective_on.month - 1)).inject(0) do |countr, month|
+          countr += 1 if eligible_enrollments.any?{ |enr| (enr.effective_on.beginning_of_month..calculate_termination_date(enr)).cover?(Date.new(@effective_on.year, month)) }
+          countr
         end
+        counter += round_down_float_two_decimals((@effective_on.day - 1).to_f/@effective_on.end_of_month.day.to_f) if @effective_on.day != 1
       end
 
       #logic to calculate the monthly Aggregate
@@ -116,7 +117,7 @@ module Operations
         latest_max_aptc = @family.active_household.latest_active_tax_household_with_year(@effective_on.year)&.latest_eligibility_determination&.max_aptc&.to_f
         return Success(0.00) unless latest_max_aptc
         eligile_month_setting = EnrollRegistry[:calculate_monthly_aggregate].settings(:eligible_months).item
-        eligible_months = eligile_month_setting ? (1 + number_of_remaining_full_months + active_eligible_coverage_months) : 12
+        eligible_months = eligile_month_setting ? ( pct_of_effective_month + number_of_remaining_full_months + active_eligible_coverage_months) : 12
         available_annual_aggregate = (latest_max_aptc * eligible_months) - consumed_aptc.to_f
         monthly_max = calculated_new_monthly_aggregate(available_annual_aggregate)
         Success(monthly_max)
