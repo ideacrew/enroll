@@ -118,3 +118,8 @@ registry:
         settings:
           - key: :color
             item: '#333'
+      - key: :border_right
+        is_enabled: true
+        settings:
+          - key: :color
+            item: '#777'
