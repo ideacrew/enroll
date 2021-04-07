@@ -574,7 +574,7 @@ module BenefitSponsors
         contribution_model: ::BenefitSponsors::ContributionModelSpecHelpers.list_bill_contribution_model
       }
     end
-
+    
     def metal_level_health_product_package_from_product_props(product_props_list, effective_period)
       selected_products = product_props_list.select do |p_props|
         p_props[:product_package_kinds].include?(:metal_level) && (p_props[:kind] == :health)
@@ -623,18 +623,18 @@ module BenefitSponsors
       benefit_market_catalog_props = {
         "_id": benefit_market_catalog_id,
         application_interval_kind: :monthly,
-        probation_period_kinds: [
-          "first_of_month_before_15th",
+        probation_period_kinds: [ 
+          "first_of_month_before_15th", 
           "date_of_hire",
-          "first_of_month",
-          "first_of_month_after_30_days",
+          "first_of_month", 
+          "first_of_month_after_30_days", 
           "first_of_month_after_60_days"
         ],
         application_period: {
           min: effective_period.min,
           max: effective_period.max
         },
-        title: "CT Access Health SHOP Benefit Catalog",
+        title: "MA Health Connector SHOP Benefit Catalog",
         benefit_market_id: benefit_market._id,
         product_packages: [
          sole_source_health_product_package_from_product_props(product_list, effective_period),
@@ -676,18 +676,18 @@ module BenefitSponsors
       renewal_benefit_market_catalog_props = {
         "_id": renewal_benefit_market_catalog_id,
         application_interval_kind: :monthly,
-        probation_period_kinds: [
-          "first_of_month_before_15th",
+        probation_period_kinds: [ 
+          "first_of_month_before_15th", 
           "date_of_hire",
-          "first_of_month",
-          "first_of_month_after_30_days",
+          "first_of_month", 
+          "first_of_month_after_30_days", 
           "first_of_month_after_60_days"
         ],
         application_period: {
           min: renewal_effective_period.min,
           max: renewal_effective_period.max
         },
-        title: "CT Access Health SHOP Benefit Catalog",
+        title: "MA Health Connector SHOP Benefit Catalog",
         benefit_market_id: benefit_market._id,
         product_packages: [
          sole_source_health_product_package_from_product_props(renewal_product_list, renewal_effective_period),
@@ -723,18 +723,18 @@ module BenefitSponsors
       benefit_market_catalog_props = {
         "_id": benefit_market_catalog_id,
         application_interval_kind: :monthly,
-        probation_period_kinds: [
-          "first_of_month_before_15th",
+        probation_period_kinds: [ 
+          "first_of_month_before_15th", 
           "date_of_hire",
-          "first_of_month",
-          "first_of_month_after_30_days",
+          "first_of_month", 
+          "first_of_month_after_30_days", 
           "first_of_month_after_60_days"
         ],
         application_period: {
           min: effective_period.min,
           max: effective_period.max
         },
-        title: "CT Access Health SHOP Benefit Catalog",
+        title: "MA Health Connector SHOP Benefit Catalog",
         benefit_market_id: benefit_market._id,
         product_packages: [
          sole_source_health_product_package_from_product_props(product_list, effective_period),
@@ -778,18 +778,18 @@ module BenefitSponsors
       renewal_benefit_market_catalog_props = {
         "_id": renewal_benefit_market_catalog_id,
         application_interval_kind: :monthly,
-        probation_period_kinds: [
-          "first_of_month_before_15th",
+        probation_period_kinds: [ 
+          "first_of_month_before_15th", 
           "date_of_hire",
-          "first_of_month",
-          "first_of_month_after_30_days",
+          "first_of_month", 
+          "first_of_month_after_30_days", 
           "first_of_month_after_60_days"
         ],
         application_period: {
           min: renewal_effective_period.min,
           max: renewal_effective_period.max
         },
-        title: "CT Access Health SHOP Benefit Catalog",
+        title: "MA Health Connector SHOP Benefit Catalog",
         benefit_market_id: benefit_market._id,
         product_packages: [
          sole_source_health_product_package_from_product_props(renewal_product_list, renewal_effective_period),
@@ -825,18 +825,18 @@ module BenefitSponsors
       benefit_market_catalog_props = {
         "_id": benefit_market_catalog_id,
         application_interval_kind: :monthly,
-        probation_period_kinds: [
-          "first_of_month_before_15th",
+        probation_period_kinds: [ 
+          "first_of_month_before_15th", 
           "date_of_hire",
-          "first_of_month",
-          "first_of_month_after_30_days",
+          "first_of_month", 
+          "first_of_month_after_30_days", 
           "first_of_month_after_60_days"
         ],
         application_period: {
           min: effective_period.min,
           max: effective_period.max
         },
-        title: "CT Access Health SHOP Benefit Catalog",
+        title: "MA Health Connector SHOP Benefit Catalog",
         benefit_market_id: benefit_market._id,
         product_packages: [
          sole_source_health_product_package_from_product_props(product_list, effective_period),
@@ -876,18 +876,18 @@ module BenefitSponsors
       previous_benefit_market_catalog_props = {
         "_id": previous_benefit_market_catalog_id,
         application_interval_kind: :monthly,
-        probation_period_kinds: [
-          "first_of_month_before_15th",
+        probation_period_kinds: [ 
+          "first_of_month_before_15th", 
           "date_of_hire",
-          "first_of_month",
-          "first_of_month_after_30_days",
+          "first_of_month", 
+          "first_of_month_after_30_days", 
           "first_of_month_after_60_days"
         ],
         application_period: {
           min: previous_effective_period.min,
           max: previous_effective_period.max
         },
-        title: "CT Access Health SHOP Benefit Catalog",
+        title: "MA Health Connector SHOP Benefit Catalog",
         benefit_market_id: benefit_market._id,
         product_packages: [
          sole_source_health_product_package_from_product_props(previous_product_list, previous_effective_period),

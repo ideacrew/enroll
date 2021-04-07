@@ -92,9 +92,9 @@ module BenefitSponsors
         _id: site_id,
         site_key: :cca,
         byline: "The Right Place for the Right Plan",
-        short_name: "Access Health",
+        short_name: "Health Connector",
         domain_name: "hbxshop.org",
-        long_name: "Maine Cover ME",
+        long_name: "Massachusetts Health Connector",
         copyright_period_start: '2018'
       }
       org_props = {
@@ -103,7 +103,7 @@ module BenefitSponsors
         dba: "CCA",
         fein: '123123456',
         hbx_id: '210005',
-        legal_name: "Access Health",
+        legal_name: "Health Connector",
         site_id: site_id,
         profiles: [{
           _id: profile_id,
