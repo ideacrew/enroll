@@ -53,6 +53,7 @@ namespace :load_service_reference do
     total = 0
     begin
       file = args[:file]
+      abort if file.blank?
       @year = file.split("/")[-2].to_i
 
       xlsx = Roo::Spreadsheet.open(file)
@@ -153,9 +154,9 @@ namespace :load_service_reference do
 
         if serves_entire_state
           csa = CarrierServiceArea.find_or_create_by(
-                  active_year: @year,
-                  issuer_hios_id: hios_id
-                ).tap do |csa|
+                active_year: @year,
+                issuer_hios_id: hios_id
+          ).tap do |csa|
             csa.update_attributes!(
               service_area_id: sheet.cell(i,1),
               service_area_name: sheet.cell(i,2),
@@ -166,7 +167,8 @@ namespace :load_service_reference do
               service_area_zipcode: nil,
               partial_county_justification: nil
             )
-            count = count + 1
+          end
+          count = count + 1
         elsif serves_partial_county
           county_name, state_code, county_code = extract_county_name_state_and_county_codes(sheet.cell(i,4))
           extracted_zip_codes(sheet.cell(i,6)).each do |zip|
@@ -174,18 +176,18 @@ namespace :load_service_reference do
                 active_year: @year,
                 issuer_hios_id: hios_id
               ).tap do |csa|
-              csa.update_attributes!(
-                service_area_id: sheet.cell(i,1),
-                service_area_name: sheet.cell(i,2),
-                serves_entire_state: false,
-                county_name: county_name,
-                county_code: county_code,
-                state_code: state_code,
-                service_area_zipcode: zip,
-                partial_county_justification: sheet.cell(i,7)
+                csa.update_attributes!(
+                  service_area_id: sheet.cell(i,1),
+                  service_area_name: sheet.cell(i,2),
+                  serves_entire_state: false,
+                  county_name: county_name,
+                  county_code: county_code,
+                  state_code: state_code,
+                  service_area_zipcode: zip,
+                  partial_county_justification: sheet.cell(i,7)
               )
-              count = count + 1
             end
+            count = count + 1
           end
         else
           county_name, state_code, county_code = extract_county_name_state_and_county_codes(sheet.cell(i,4))
@@ -194,18 +196,18 @@ namespace :load_service_reference do
                 active_year: @year,
                 issuer_hios_id: hios_id
               ).tap do |csa|
-              csa.update_attributes!(
-                service_area_id: sheet.cell(i,1),
-                service_area_name: sheet.cell(i,2),
-                serves_entire_state: false,
-                county_name: county_name,
-                county_code: county_code,
-                state_code: state_code,
-                service_area_zipcode: zip,
-                partial_county_justification: nil
+                csa.update_attributes!(
+                  service_area_id: sheet.cell(i,1),
+                  service_area_name: sheet.cell(i,2),
+                  serves_entire_state: false,
+                  county_name: county_name,
+                  county_code: county_code,
+                  state_code: state_code,
+                  service_area_zipcode: zip,
+                  partial_county_justification: nil
               )
-              count = count + 1
             end
+            count = count + 1
           end
         end
       end
