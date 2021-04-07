@@ -18,7 +18,7 @@ module BenefitSponsors
 
       # after_update :notify_observers
 
-      REFERRED_KINDS = ['Radio', 'Sign on bus, subway, gas station, etc.', 'Online advertisement, such as on Google or Pandora', 'Billboard', 'Video on a website', 'Social media, such as Facebook', 'Online search (for example, searching through Google for places to get insurance)', 'Insurance broker', 'Health insurance company/carrier', 'Hospital or community health center', 'Health insurance Assister or Navigator', 'State or Government Agency (Main Streets or Small Business Administration) ', 'Employer Association', 'Chamber of Commerce', 'Friend or family member', 'Access Health sponsored event', 'New England Benefits Association (NEBA)', 'Greater Boston Chamber of Commerce', 'Television', 'Newspaper', 'Other']
+      REFERRED_KINDS = ['Radio', 'Sign on bus, subway, gas station, etc.', 'Online advertisement, such as on Google or Pandora', 'Billboard', 'Video on a website', 'Social media, such as Facebook', 'Online search (for example, searching through Google for places to get insurance)', 'Insurance broker', 'Health insurance company/carrier', 'Hospital or community health center', 'Health insurance Assister or Navigator', 'State or Government Agency (Main Streets or Small Business Administration) ', 'Employer Association', 'Chamber of Commerce', 'Friend or family member', 'Health Connector sponsored event', 'New England Benefits Association (NEBA)', 'Greater Boston Chamber of Commerce', 'Television', 'Newspaper', 'Other']
 
       # TODO: Temporary fix until we move employer_attestation to benefit_sponsorship
       # def is_attestation_eligible?
