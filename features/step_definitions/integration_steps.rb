@@ -347,11 +347,11 @@ Given(/^both shop and fehb market configurations are enabled$/) do
   enable_feature :fehb_market
 end
 
-Given(/^send secure message to employer is enabled$/ ) do
+Given(/^send secure message to employer is enabled$/) do
   enable_feature :send_secure_message_employer
 end
 
-Given(/^send secure message to employer is disabled$/ ) do
+Given(/^send secure message to employer is disabled$/) do
   disable_feature :send_secure_message_employer
 end
 
