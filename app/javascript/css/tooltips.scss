@@ -1,6 +1,6 @@
 
   .tooltip > .tooltip-inner {
-    background-color: $dc-dark-blue;
+    background-color: $dark-blue;
     color: $white;
   }
 
@@ -12,7 +12,7 @@
   }
 
   .tooltip.bs-tooltip-right .arrow:before {
-    border-right-color: $dc-dark-blue;
+    border-right-color: $dark-blue;
   }
 
   .pwHelper {
@@ -23,6 +23,6 @@
       color: #bef470;
     }
     .fa-times {
-      color: $dc-red;
+      color: $red;
     }
   }
