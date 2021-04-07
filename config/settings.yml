@@ -118,7 +118,7 @@ contact_center:
   board_of_elections_phone_number: "(202) 727-2525"
 
   mailing_address:
-    name: "Cover ME"
+    name: "Maine Cover ME"
     address_1: "PO Box 97022"
     address_2:
     city: "Washington"
@@ -126,7 +126,7 @@ contact_center:
     zip_code: "20090"
 
   appeal_center:
-    name: "Cover ME"
+    name: "Maine Cover ME"
     address_1: "PO Box 97022"
     address_2:
     city: "Washington"
@@ -169,7 +169,7 @@ aca:
   state_abbreviation: "ME"
   market_kinds: ["shop", "individual", "fehb"]
 
-  hbx_abbreviation: "Cover ME"
+  hbx_abbreviation: "Maine Cover ME"
   nationwide_markets: true
   general_agency_enabled: true
   broker_carrier_appointments_enabled: true

@@ -347,6 +347,14 @@ Given(/^both shop and fehb market configurations are enabled$/) do
   enable_feature :fehb_market
 end
 
+Given(/^send secure message to employer is enabled$/ ) do
+  enable_feature :send_secure_message_employer
+end
+
+Given(/^send secure message to employer is disabled$/ ) do
+  disable_feature :send_secure_message_employer
+end
+
 When(/(^.+) enters? office location for (.+)$/) do |role, location|
   location = eval(location) if location.class == String
   RatingArea.where(zip_code: "01001").first || FactoryBot.create(:rating_area, zip_code: "01001", county_name: "Hampden", rating_area: Settings.aca.rating_areas.first)
@@ -751,8 +759,11 @@ When(/^.+ enters? the dependent info of Patrick wife$/) do
   find(:xpath, "//label[@for='radio_female']").click
   fill_in 'dependent[addresses][0][address_1]', with: '123 STREET'
   fill_in 'dependent[addresses][0][city]', with: 'WASHINGTON'
-  find(:xpath, "//span[@class='label'][contains(., 'SELECT STATE')]").click
-  find(:xpath, "//li[@data-index='24'][contains(., 'MA')]").click
+  # sfind(:xpath, "//span[@class='label'][contains(., 'SELECT STATE')]").click
+  find("#address_info span.label").click
+  find("#address_info .selectric-items li", text: 'ME').click
+  # find(:xpath, "//div[@class='selectric-items']/ul/li[contains(text(), 'ME')]").click
+  # find(:xpath, "//li[@data-index='24'][contains(., 'ME')]").click
   fill_in 'dependent[addresses][0][zip]', with: '01001'
 end
 

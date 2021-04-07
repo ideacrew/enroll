@@ -62,7 +62,7 @@ registry:
           - key: :main_web_address
             item: "https://www.coverme.gov"
           - key: :short_name
-            item: "Cover ME"
+            item: "Maine Cover ME"
           - key: :byline
             item: "Maine's Official Health Insurance Marketplace"
           - key: :long_name
