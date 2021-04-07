@@ -56,9 +56,9 @@ Then(/^the Admin has the ability to use the following filters for documents prov
   expect(page).to have_xpath('//*[@id="Tab:all"]', text: 'All')
 end
 
-Then(/^the Admin is directed to that user's My Cover ME page$/) do
+Then(/^the Admin is directed to that user's My DC Health Link page$/) do
   page.find(:xpath, "//table[contains(@class, 'effective-datatable')]/tbody/tr/td[1]/a").click
-  expect(page).to have_content("My Cover ME")
+  expect(page).to have_content("My DC Health Link")
   expect(page).to have_content("#{@person_name}")
 end
 
