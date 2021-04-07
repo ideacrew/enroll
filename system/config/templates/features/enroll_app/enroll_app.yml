@@ -201,7 +201,7 @@ registry:
           - key: :broker_course_administering_organization_link
             item: 'https://nahu.inreachce.com/Details?resultsPage=1&sortBy=&q=dc+broker&searchType=1&groupId=154ae22b-92eb-41f0-854b-3a9cabc20c8e'
           - key: :privacy_url
-            item: "https://www.dchealthlink.com/privacy"
+            item: https://www.coverme.gov"
           - key: :privacy_act_statement
             item: ""
           - key: :site_broker_attestation_link
