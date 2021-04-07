@@ -109,9 +109,7 @@ class Insured::GroupSelectionController < ApplicationController
     if @adapter.keep_existing_plan?(permitted_group_selection_params) && @adapter.previous_hbx_enrollment.present?
       sep = @hbx_enrollment.earlier_effective_sep_by_market_kind
 
-      if sep.present?
-        hbx_enrollment.special_enrollment_period_id = sep.id
-      end
+      hbx_enrollment.special_enrollment_period_id = sep.id if sep.present?
 
       hbx_enrollment.product = @hbx_enrollment.product
     end
@@ -152,12 +150,12 @@ class Insured::GroupSelectionController < ApplicationController
     else
       raise "You must select the primary applicant to enroll in the healthcare plan"
     end
-  rescue Exception => error
-    flash[:error] = error.message
-    logger.error "#{error.message}\n#{error.backtrace.join("\n")}"
+  rescue StandardError => e
+    flash[:error] = e.message
+    logger.error "#{e.message}\n#{e.backtrace.join("\n")}"
     employee_role_id = @employee_role.id if @employee_role
     consumer_role_id = @consumer_role.id if @consumer_role
-    return redirect_to new_insured_group_selection_path(person_id: @person.id, employee_role_id: employee_role_id, change_plan: @change_plan, market_kind: @market_kind, consumer_role_id: consumer_role_id, enrollment_kind: @enrollment_kind)
+    redirect_to new_insured_group_selection_path(person_id: @person.id, employee_role_id: employee_role_id, change_plan: @change_plan, market_kind: @market_kind, consumer_role_id: consumer_role_id, enrollment_kind: @enrollment_kind)
   end
 
   def terminate_selection
@@ -211,7 +209,7 @@ class Insured::GroupSelectionController < ApplicationController
   private
 
   def family_member_eligibility_check(family_member)
-    return unless (@adapter.can_shop_individual?(@person) || @adapter.can_shop_resident?(@person))
+    return unless @adapter.can_shop_individual?(@person) || @adapter.can_shop_resident?(@person)
 
     role = if family_member.person.is_consumer_role_active?
              family_member.person.consumer_role
@@ -254,7 +252,6 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   def build_hbx_enrollment(family_member_ids)
-
     @adapter.if_previous_enrollment_was_special_enrollment do
       @change_plan = 'change_by_qle'
     end
@@ -279,14 +276,16 @@ class Insured::GroupSelectionController < ApplicationController
         resident_role: @adapter.person.resident_role,
         coverage_household: @adapter.coverage_household,
         qle: @adapter.is_qle?,
-        opt_effective_on: @adapter.optional_effective_on)
+        opt_effective_on: @adapter.optional_effective_on
+      )
     when 'coverall'
       @adapter.coverage_household.household.new_hbx_enrollment_from(
         consumer_role: @person.consumer_role,
         resident_role: @person.resident_role,
         coverage_household: @adapter.coverage_household,
         qle: @adapter.is_qle?,
-        opt_effective_on: @adapter.optional_effective_on)
+        opt_effective_on: @adapter.optional_effective_on
+      )
     end
   end
 
