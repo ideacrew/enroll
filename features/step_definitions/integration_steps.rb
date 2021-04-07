@@ -355,6 +355,7 @@ Given(/^send secure message to employer is disabled$/) do
   disable_feature :send_secure_message_employer
 end
 
+# rubocop:disable Security/Eval
 When(/(^.+) enters? office location for (.+)$/) do |role, location|
   location = eval(location) if location.instance_of?(String)
   RatingArea.where(zip_code: "01001").first || FactoryBot.create(:rating_area, zip_code: "01001", county_name: "Hampden", rating_area: Settings.aca.rating_areas.first)
@@ -389,6 +390,7 @@ When(/^.+ updates office location from (.+) to (.+)$/) do |old_add, new_add|
 
   fill_in 'organization[office_locations_attributes][0][address_attributes][zip]', :with => new_add[:zip]
 end
+# rubocop:enable Security/Eval
 
 When(/^(.+) creates? a new employer profile with (.+)$/) do |named_person, primary_location|
   employer = people[named_person]
