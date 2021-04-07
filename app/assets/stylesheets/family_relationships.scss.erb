@@ -48,7 +48,7 @@
 }
 .icn-out {
   -webkit-text-stroke-width: 1px;
-  -webkit-text-stroke-color: #487ba2;
+  -webkit-text-stroke-color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
   color: transparent;
 }
 .relation {
@@ -97,5 +97,5 @@
 
 
 .fa, .knowmore h4 {
-  color: #487ba2;
+  color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
 }

@@ -452,9 +452,9 @@
 										font-size: 12px;
 										color: #b7b7b7;
 										&:hover {
-											color: #487ba2;
+											color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
 											* {
-												color: #487ba2;
+												color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
 											}
 										}
 									}
@@ -527,12 +527,12 @@
 }
 
 .run-glossary .popover {
-  background-color: #3d5d6f;
+  background-color: <%= EnrollRegistry[:cancel_plan_border].settings(:color).item %>;
   color: white;
   max-width: 350px;
   .arrow { display: none; }
   .popover-title {
-    background-color: #3d5d6f;
+    background-color: <%= EnrollRegistry[:cancel_plan_border].settings(:color).item %>;
     border-bottom: none;
     color: white;
     font-weight: bold;
@@ -564,11 +564,11 @@
 }
 
 span.glossary {
-  border-bottom: 1px dashed #487ba2;
+  border-bottom: 1px dashed <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
 }
 span.glossary:hover {
   cursor: pointer;
-  color: #487ba2;
+  color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
 }
 
 .mt-label{
