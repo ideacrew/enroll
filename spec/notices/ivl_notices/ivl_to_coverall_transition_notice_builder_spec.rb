@@ -24,7 +24,7 @@ RSpec.describe IvlNotices::IvlToCoverallTransitionNoticeBuilder, dbclean: :after
              :notice_builder => 'IvlNotices::IvlToCoverallTransitionNoticeBuilder',
              :event_name => 'ivl_to_coverall_transition_notice',
              :mpi_indicator => 'IVL_CDC',
-             :title => "Your Insurance through Cover ME Has Changed to Cover All DC"
+             :title => "Your Insurance through #{EnrollRegistry[:enroll_app].setting(:short_name).item} Has Changed to Cover All DC"
            })
   end
   let(:valid_params) do
