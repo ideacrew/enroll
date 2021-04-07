@@ -347,6 +347,14 @@ Given(/^both shop and fehb market configurations are enabled$/) do
   enable_feature :fehb_market
 end
 
+Given(/^send secure message to employer is enabled$/ ) do
+  enable_feature :send_secure_message_employer
+end
+
+Given(/^send secure message to employer is disabled$/ ) do
+  disable_feature :send_secure_message_employer
+end
+
 When(/(^.+) enters? office location for (.+)$/) do |role, location|
   location = eval(location) if location.class == String
   RatingArea.where(zip_code: "01001").first || FactoryBot.create(:rating_area, zip_code: "01001", county_name: "Hampden", rating_area: Settings.aca.rating_areas.first)
