@@ -3,23 +3,29 @@ require 'rails_helper'
 RSpec.describe IvlNotices::CoverallToIvlTransitionNoticeBuilder, dbclean: :after_each do
   let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
   let(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person, e_case_id: "family_test#1000")}
-  let!(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, family: family, created_at: (TimeKeeper.date_of_record.in_time_zone("Eastern Time (US & Canada)") - 2.days), household: family.households.first, kind: "individual", is_any_enrollment_member_outstanding: true)}
-  let!(:hbx_enrollment_member) {FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: hbx_enrollment, applicant_id: family.family_members.first.id, is_subscriber: true, eligibility_date: TimeKeeper.date_of_record.prev_month )}
-  let(:application_event){ double("ApplicationEventKind",{
-      :name =>'Coverall to IVL Transition Notice',
-      :notice_template => 'notices/ivl/coverall_to_ivl_notice',
-      :notice_builder => 'IvlNotices::CoverallToIvlTransitionNoticeBuilder',
-      :event_name => 'coverall_to_ivl_transition_notice',
-      :mpi_indicator => 'IVL_DCH',
-      :title => "Your Insurance through Cover All DC Has Changed to DC Health Link"})
-  }
-  let(:valid_params) {{
+  let!(:hbx_enrollment) do
+    FactoryBot.create(:hbx_enrollment, family: family, created_at: (TimeKeeper.date_of_record.in_time_zone("Eastern Time (US & Canada)") - 2.days), household: family.households.first, kind: "individual", is_any_enrollment_member_outstanding: true)
+  end
+  let!(:hbx_enrollment_member) {FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: hbx_enrollment, applicant_id: family.family_members.first.id, is_subscriber: true, eligibility_date: TimeKeeper.date_of_record.prev_month)}
+  let(:application_event) do
+    double("ApplicationEventKind",{
+             :name => 'Coverall to IVL Transition Notice',
+             :notice_template => 'notices/ivl/coverall_to_ivl_notice',
+             :notice_builder => 'IvlNotices::CoverallToIvlTransitionNoticeBuilder',
+             :event_name => 'coverall_to_ivl_transition_notice',
+             :mpi_indicator => 'IVL_DCH',
+             :title => "Your Insurance through Cover All DC Has Changed to DC HealthLink"
+           })
+  end
+  let(:valid_params) do
+    {
       :subject => application_event.title,
       :mpi_indicator => application_event.mpi_indicator,
       :event_name => application_event.event_name,
       :template => application_event.notice_template,
       :options => {family: family.id.to_s, result: {people: [person.id.to_s]}}
-  }}
+  }
+  end
 
   describe "New" do
     before do
