@@ -1,15 +1,14 @@
 @import "variables";
-@import url('https://fonts.googleapis.com/css?family=Roboto+Slab:300,400,700');
 /* Layout Specifics */
 html {
   height: 100%;
 }
 * {
-    font-family: 'Roboto Slab', sans-serif;
+    font-family: 'Open Sans', sans-serif;
 }
 
 body {
-    background-color: #f2f2f2 !important;
+    background-color: #f2f2f2;
     min-height: 100%;
     position: relative;
     padding-bottom: 70px;
@@ -34,7 +33,7 @@ h1, h2, h3, h4, h5, h6
 
 .navbar-white {
     background-color: #fff;
-    border-bottom: 3px solid #487ba2;
+    border-bottom: 3px solid <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
     min-height: 73px;
 }
 
@@ -68,7 +67,7 @@ ul.brd-left li:first-child {
 }
 
 a {
-    color: #487ba2;
+    color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
     transition: all 0.3s ease 0s;
 }
 .full {
@@ -155,7 +154,7 @@ a {
 .navbar-toggle {margin-top: 18px; margin-bottom: 18px;}
 
 .social.aktif{
-  background-color: #487ba2;
+  background-color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
 }
 .social.border{
   border-left: 1px solid #bbbbbb;
@@ -369,7 +368,7 @@ a.btn.add{
 }
 .welcome ul.status li a{
   font-size: 14px;
-  color : #487ba2;
+  color : <%= EnrollRegistry[:ivl_notice_footer].settings(:color).item %>;
 }
 .welcome ul.status li{
   font-size: 12px !important;
@@ -1422,14 +1421,14 @@ a.close-1, a.close-2{
     &.form-action {
       margin: 8px 0 20px;
       display: inline-block;
-      color: #487ba2;
+      color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
       font-size: 14px;
       font-weight: bold;
       border-radius: 4px;
       border: solid 1px #b2b2b2;
       background-color: transparent;
       &:hover {
-        border: solid 1px #487ba2;
+        border: solid 1px <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
         background-color: #ffffff;
       }
     }
@@ -2410,7 +2409,7 @@ ul.navbar-nav.top-menu li {
 }
 
 #profile-content .panel .info-wrapper h3 {
-    color: #487ba2;
+    color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
     font-weight: bold;
     margin-top: 0;
     text-transform: uppercase;
@@ -3136,7 +3135,7 @@ p.success-text {
 ul.pagination {
     padding: 0px 5px;
     border-radius: 2px;
-    background:#3d5d6f;
+    background:<%= EnrollRegistry[:cancel_plan_border].settings(:color).item %>;
 }
 .pagination>li:last-child>a, .pagination>li:last-child>span, .pagination>li:first-child>a, .pagination>li:first-child>span{
     border-radius: 0px;
@@ -3444,8 +3443,8 @@ table.table-wrapper a.btn {
 .search-wp .input-group span.input-group-btn button {
     color: #000;
     border-radius: 0px;
-    background: #487ba2;
-    border-color: #487ba2;
+    background: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
+    border-color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
     color: #ffffff;
 }
 .title-dropdown .form-control {
@@ -3608,7 +3607,7 @@ table.table tr.gray-row {background-color: ivory;}
 /* Footer */
 
 .form-wrapper h3 {
-    color: #3d5d6f;
+    color: <%= EnrollRegistry[:cancel_plan_border].settings(:color).item %>;
     font-size: 18px;
     font-weight: 300;
     margin-bottom: 15px;
@@ -3647,12 +3646,12 @@ span.circle-progress {
 ul.progress-wrapper li.complete {
     padding: 5px 0px;
     list-style: none;
-    /*border-left: 2px solid #487ba2;*/
+    /*border-left: 2px solid #007bc4;*/
     padding-left: 35px;
-    color: #487ba2;
+    color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
 }
 ul.progress-wrapper li.complete span.circle-progress {
-    background-color: #487ba2;
+    background-color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
     border: none;
     width: 14px;
     left: 9px;
@@ -3661,14 +3660,14 @@ ul.progress-wrapper li.complete span.circle-progress {
 ul.progress-wrapper li.active {
     padding: 5px 0px;
     list-style: none;
-    /*border-left: 2px solid #487ba2;*/
+    /*border-left: 2px solid #007bc4;*/
     padding-left: 35px;
     font-weight: bold;
-    color: #487ba2;
+    color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
 }
 ul.progress-wrapper li.active span.circle-progress {
     background-color: #ffffff;
-    border: 2px solid #487ba2;
+    border: 2px solid <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
     width: 14px;
     left: 9px;
     height: 14px;
@@ -3683,7 +3682,7 @@ ul.progress-wrapper li.active span.circle-progress {
     margin-top: 5px;
 }
 ul.progress-wrapper li.complete .vertical-line-progress {
-    background-color: #487ba2;
+    background-color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
 }
 ul.progress-wrapper li.active .vertical-line-progress {
     background-color: #cacaca;
@@ -3819,7 +3818,7 @@ ul.list-right-section li a img {
 
 
 .my-account-page h1{
-    color: #3d5d6f;
+    color: <%= EnrollRegistry[:cancel_plan_border].settings(:color).item %>;
     font-size: 36px;
     margin-bottom: 10px;
     margin-top: 0;
@@ -3834,13 +3833,13 @@ ul.list-right-section li a img {
   margin-bottom: 0;
 }
 .row-form-wrapper.active {
-  box-shadow: 0px 0px 0px 3px #487ba2 inset;
+  box-shadow: 0px 0px 0px 3px <%= EnrollRegistry[:qle_carousel].settings(:color).item %> inset;
   z-index: 1;
   position: relative;
 }
 .row-form-wrapper.active::before {
     border-bottom: 8px solid transparent;
-    border-right: 8px solid #487ba2;
+    border-right: 8px solid <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
     border-top: 8px solid transparent;
     content: "";
     height: 0;
@@ -3985,7 +3984,7 @@ h3.text-blue {
     font-weight: 500;
 }
 .text-blue {
-    color: #487ba2;
+    color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
     font-weight: 300;
 }
 #select_plan_wrapper .panel ul.list-comp li {
@@ -4094,7 +4093,7 @@ span.badge.message-badge {
     padding: 15px;
 }
 .plan-year-wrapper .dropdown button span.glyphicon {
-    color: #487ba2;
+    color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
     font-size: 13px;
     padding-left: 10px;
 }
@@ -4220,7 +4219,7 @@ table.table.table-message-wrapper tr th.vtop {
   display: none;
 }
 .agency-selected {
-  border: 1px solid #487ba2;
+  border: 1px solid <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
 }
 .list-group a.sidebar-employer-field {
   color: #fff;
@@ -4306,7 +4305,7 @@ span.text_style {color: #616161 !important;}
 }
 
 .btn-select {
-    background-color: #487ba2;
+    background-color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
     border-color: #004872;
     color: #fff;
 }
@@ -4477,7 +4476,7 @@ span.text_style {color: #616161 !important;}
   vertical-align: middle;
 }
 .ct-1 h2 {
-    color: #3d5d6f;
+    color: <%= EnrollRegistry[:cancel_plan_border].settings(:color).item %>;
     font-weight: 100;
     margin-top: 0;
     line-height: 100%;
@@ -4618,7 +4617,7 @@ table.table.table-no-sytle td {
 }
 
 .carousel-control .fa {
-  color:#3d5d6f;
+  color:<%= EnrollRegistry[:cancel_plan_border].settings(:color).item %>;
   position: absolute;
   top: 35%;
   z-index: 5;
@@ -4717,7 +4716,7 @@ position: absolute;
   margin-right: 20px;
 }
 #shop-for-plans-widget .btn, .employer-panel .btn {
-  color: #487ba2;
+  color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
   font-weight: 600;
 }
 

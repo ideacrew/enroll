@@ -17,22 +17,11 @@
  *= require_self
  */
 
-
- .ct-cover, #ct-cover {
-   display: block;
-   max-width:100%;
-   max-height:100%;
-   margin-top:30px;
-   margin-left:auto;
-   margin-right:auto;
-   border: 1px solid #487ba2;
- }
-
- .content {
-   .container {
-     margin-top: 20px !important;
-   }
- }
+.content {
+  .container {
+    margin-top: 20px !important;
+  }
+}
 
 .module {
   .flex {
@@ -190,7 +179,7 @@ img {
        li {
          padding: 0;
          .dark-grey {
-           color: #005e81;
+           color: <%= EnrollRegistry[:primary_black].settings(:color).item %>;
            font-weight: 400;
            font-size: 12px;
            position: relative;
@@ -217,11 +206,11 @@ img {
  }
 .consumer_roles {
   .fa {
-    color: #487ba2;
+    color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
   }
 }
 .fa-question-circle {
-    color: #487ba2;
+    color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
 }
 
 
