@@ -140,10 +140,6 @@ module SponsoredBenefits
         msg_box.save
       end
 
-      def dc?
-        Settings.aca.state_abbreviation != "MA"
-      end
-
       protected
 
       # rubocop:disable Metrics/ParameterLists
