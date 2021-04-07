@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 And(/^admin has navigated into the NEW CONSUMER APPLICATION$/) do
   visit exchanges_hbx_profiles_root_path
   find('.interaction-click-control-families', wait: 10).click
