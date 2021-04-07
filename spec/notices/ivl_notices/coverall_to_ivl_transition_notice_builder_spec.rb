@@ -24,7 +24,7 @@ RSpec.describe IvlNotices::CoverallToIvlTransitionNoticeBuilder, dbclean: :after
       :event_name => application_event.event_name,
       :template => application_event.notice_template,
       :options => {family: family.id.to_s, result: {people: [person.id.to_s]}}
-  }
+    }
   end
 
   describe "New" do
@@ -71,17 +71,17 @@ RSpec.describe IvlNotices::CoverallToIvlTransitionNoticeBuilder, dbclean: :after
 
     it "should have caps DC in the title" do
       title = @cdc_ivl_notice.notice_filename
-      expect(title).to match (/DC/)
+      expect(title).to match(/DC/)
     end
 
     it "should not have Dc in the title" do
       title = @cdc_ivl_notice.notice_filename
-      expect(title).not_to match (/Dc/)
+      expect(title).not_to match(/Dc/)
     end
 
     it "should match with the given title" do
       title = @cdc_ivl_notice.notice_filename
-      expect(title).to match (/YourInsuranceThroughCoverAllDCHasChangedToDCHealthLink/)
+      expect(title).to match(/YourInsuranceThroughCoverAllDCHasChangedToDCHealthLink/)
     end
   end
 
