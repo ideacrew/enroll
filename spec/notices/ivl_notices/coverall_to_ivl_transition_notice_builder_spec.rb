@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 require 'rails_helper'
 
 RSpec.describe IvlNotices::CoverallToIvlTransitionNoticeBuilder, dbclean: :after_each do
@@ -16,7 +14,7 @@ RSpec.describe IvlNotices::CoverallToIvlTransitionNoticeBuilder, dbclean: :after
              :notice_builder => 'IvlNotices::CoverallToIvlTransitionNoticeBuilder',
              :event_name => 'coverall_to_ivl_transition_notice',
              :mpi_indicator => 'IVL_DCH',
-             :title => "Your Insurance through Cover All DC Has Changed to Cover ME"
+             :title => "Your Insurance through Cover All DC Has Changed to DC HealthLink"
            })
   end
   let(:valid_params) do
