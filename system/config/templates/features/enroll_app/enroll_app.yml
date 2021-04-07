@@ -161,6 +161,8 @@ registry:
             item: "Washington DC Health Benefit Exchange"
           - key: :social_media
             item: ''
+          - key: :state_name
+            item: "District of Columbia"
           - key: :state_long_title
             item: "the District of Columbia"
           - key: :state_dmv_link
