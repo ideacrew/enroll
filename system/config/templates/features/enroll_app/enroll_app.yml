@@ -249,6 +249,9 @@ registry:
       - key: :tobacco_cost
         item: :tobacco_cost
         is_enabled: false
+      - key: :counties_import
+        is_enabled: false
+        item: ""
   - namespace:
       - :features
       - :enroll_app
