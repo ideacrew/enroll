@@ -1,5 +1,5 @@
 --- !ruby/object:BenefitMarkets::BenefitMarketCatalog
-__selected_fields:
+__selected_fields: 
 attributes: !ruby/hash:BSON::Document
   _id: !ruby/object:BSON::ObjectId
     raw_data: !binary |-
@@ -10,7 +10,7 @@ attributes: !ruby/hash:BSON::Document
   - :first_of_month
   - :first_of_month_after_30_days
   - :first_of_month_after_60_days
-  title: CT Access Health SHOP Benefit Catalog
+  title: MA Health Connector SHOP Benefit Catalog
   description: ''
   application_interval_kind: :monthly
   application_period: !ruby/hash:BSON::Document
@@ -54,10 +54,10 @@ attributes: !ruby/hash:BSON::Document
       health_plan_kind: :hmo
       metal_level_kind: :bronze
       is_standard_plan: false
-      rx_formulary_url:
+      rx_formulary_url: 
       hsa_eligibility: false
       benefit_market_kind: :aca_shop
-      hbx_id:
+      hbx_id: 
       title: Select Care Bronze Deductible 3000
       issuer_profile_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -71,11 +71,11 @@ attributes: !ruby/hash:BSON::Document
       service_area_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
           WxWP9Z+ICzHOaiuJ
-      provider_directory_url:
+      provider_directory_url: 
       deductible: "$3,000"
       family_deductible: "$3000 per person | $6000 per group"
       is_reference_plan_eligible: true
-      issuer_assigned_id:
+      issuer_assigned_id: 
       renewal_product_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
           Wx2L9+bro5CtEzsC
@@ -528,10 +528,10 @@ attributes: !ruby/hash:BSON::Document
       health_plan_kind: :hmo
       metal_level_kind: :bronze
       is_standard_plan: false
-      rx_formulary_url:
+      rx_formulary_url: 
       hsa_eligibility: false
       benefit_market_kind: :aca_shop
-      hbx_id:
+      hbx_id: 
       title: Select Care Bronze Deductible 3000
       issuer_profile_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -545,11 +545,11 @@ attributes: !ruby/hash:BSON::Document
       service_area_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
           WxWP9Z+ICzHOaiuJ
-      provider_directory_url:
+      provider_directory_url: 
       deductible: "$3,000"
       family_deductible: "$3000 per person | $6000 per group"
       is_reference_plan_eligible: true
-      issuer_assigned_id:
+      issuer_assigned_id: 
       renewal_product_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
           Wx2L9+bro5CtEzsC
@@ -1003,7 +1003,7 @@ attributes: !ruby/hash:BSON::Document
       rx_formulary_url: http://www.bmchp.org/pharmacy
       hsa_eligibility: false
       benefit_market_kind: :aca_shop
-      hbx_id:
+      hbx_id: 
       title: BMC HealthNet Plan - Platinum
       issuer_profile_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -1343,7 +1343,7 @@ attributes: !ruby/hash:BSON::Document
       rx_formulary_url: http://www.bmchp.org/pharmacy
       hsa_eligibility: false
       benefit_market_kind: :aca_shop
-      hbx_id:
+      hbx_id: 
       title: BMC HealthNet Plan Bronze
       issuer_profile_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -1683,7 +1683,7 @@ attributes: !ruby/hash:BSON::Document
       rx_formulary_url: http://www.bmchp.org/pharmacy
       hsa_eligibility: false
       benefit_market_kind: :aca_shop
-      hbx_id:
+      hbx_id: 
       title: BMC HealthNet Plan Silver A
       issuer_profile_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -2023,7 +2023,7 @@ attributes: !ruby/hash:BSON::Document
       rx_formulary_url: http://www.bmchp.org/pharmacy
       hsa_eligibility: false
       benefit_market_kind: :aca_shop
-      hbx_id:
+      hbx_id: 
       title: BMC HealthNet Plan Silver B
       issuer_profile_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -2363,7 +2363,7 @@ attributes: !ruby/hash:BSON::Document
       rx_formulary_url: http://www.bmchp.org/pharmacy
       hsa_eligibility: false
       benefit_market_kind: :aca_shop
-      hbx_id:
+      hbx_id: 
       title: BMC HealthPlan Gold
       issuer_profile_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -2703,7 +2703,7 @@ attributes: !ruby/hash:BSON::Document
       rx_formulary_url: http://www.fchp.org/members/Pharmacy/online-drug-formulary.aspx
       hsa_eligibility: false
       benefit_market_kind: :aca_shop
-      hbx_id:
+      hbx_id: 
       title: Community Care Silver Coinsurance 35%
       issuer_profile_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -2850,7 +2850,7 @@ attributes: !ruby/hash:BSON::Document
       rx_formulary_url: http://www.fchp.org/members/Pharmacy/online-drug-formulary.aspx
       hsa_eligibility: false
       benefit_market_kind: :aca_shop
-      hbx_id:
+      hbx_id: 
       title: Direct Care Bronze Connector
       issuer_profile_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -3197,7 +3197,7 @@ attributes: !ruby/hash:BSON::Document
       rx_formulary_url: http://www.fchp.org/members/Pharmacy/online-drug-formulary.aspx
       hsa_eligibility: false
       benefit_market_kind: :aca_shop
-      hbx_id:
+      hbx_id: 
       title: Direct Care Deductible Hybrid 2000
       issuer_profile_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -3544,7 +3544,7 @@ attributes: !ruby/hash:BSON::Document
       rx_formulary_url: http://www.fchp.org/members/Pharmacy/online-drug-formulary.aspx
       hsa_eligibility: false
       benefit_market_kind: :aca_shop
-      hbx_id:
+      hbx_id: 
       title: Direct Care Gold Connector B
       issuer_profile_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -3891,7 +3891,7 @@ attributes: !ruby/hash:BSON::Document
       rx_formulary_url: http://www.fchp.org/members/Pharmacy/online-drug-formulary.aspx
       hsa_eligibility: false
       benefit_market_kind: :aca_shop
-      hbx_id:
+      hbx_id: 
       title: Direct Care Platinum Connector
       issuer_profile_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -4238,7 +4238,7 @@ attributes: !ruby/hash:BSON::Document
       rx_formulary_url: http://www.fchp.org/members/Pharmacy/online-drug-formulary.aspx
       hsa_eligibility: false
       benefit_market_kind: :aca_shop
-      hbx_id:
+      hbx_id: 
       title: Direct Care Silver Connector
       issuer_profile_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -4585,7 +4585,7 @@ attributes: !ruby/hash:BSON::Document
       rx_formulary_url: http://www.hnedirect.com/FormularyLookup/Default.aspx
       hsa_eligibility: false
       benefit_market_kind: :aca_shop
-      hbx_id:
+      hbx_id: 
       title: HNE Essential 2000
       issuer_profile_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -4765,7 +4765,7 @@ attributes: !ruby/hash:BSON::Document
       rx_formulary_url: http://www.hnedirect.com/FormularyLookup/Default.aspx
       hsa_eligibility: false
       benefit_market_kind: :aca_shop
-      hbx_id:
+      hbx_id: 
       title: HNE Gold A
       issuer_profile_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -4945,7 +4945,7 @@ attributes: !ruby/hash:BSON::Document
       rx_formulary_url: http://www.hnedirect.com/FormularyLookup/Default.aspx
       hsa_eligibility: false
       benefit_market_kind: :aca_shop
-      hbx_id:
+      hbx_id: 
       title: HNE Gold B
       issuer_profile_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -5125,7 +5125,7 @@ attributes: !ruby/hash:BSON::Document
       rx_formulary_url: http://www.hnedirect.com/FormularyLookup/Default.aspx
       hsa_eligibility: false
       benefit_market_kind: :aca_shop
-      hbx_id:
+      hbx_id: 
       title: HNE Platinum A
       issuer_profile_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -5305,7 +5305,7 @@ attributes: !ruby/hash:BSON::Document
       rx_formulary_url: http://www.hnedirect.com/FormularyLookup/Default.aspx
       hsa_eligibility: false
       benefit_market_kind: :aca_shop
-      hbx_id:
+      hbx_id: 
       title: HNE Silver A
       issuer_profile_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -5485,7 +5485,7 @@ attributes: !ruby/hash:BSON::Document
       rx_formulary_url: http://www.hnedirect.com/FormularyLookup/Default.aspx
       hsa_eligibility: false
       benefit_market_kind: :aca_shop
-      hbx_id:
+      hbx_id: 
       title: HNE Wise Max HDHP
       issuer_profile_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -5665,7 +5665,7 @@ attributes: !ruby/hash:BSON::Document
       rx_formulary_url: https://www.harvardpilgrim.org/2018Value3T
       hsa_eligibility: false
       benefit_market_kind: :aca_shop
-      hbx_id:
+      hbx_id: 
       title: 'Non-Standard: Best Buy HMO 2000'
       issuer_profile_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -5778,7 +5778,7 @@ attributes: !ruby/hash:BSON::Document
       rx_formulary_url: https://www.harvardpilgrim.org/2018Value3T
       hsa_eligibility: false
       benefit_market_kind: :aca_shop
-      hbx_id:
+      hbx_id: 
       title: 'Non-Standard: Core Coverage HMO 1750'
       issuer_profile_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -5891,7 +5891,7 @@ attributes: !ruby/hash:BSON::Document
       rx_formulary_url: https://fm.formularynavigator.com/MemberPages/pdf/4TFormulary_11417_Brand%20Reference%20Drug_3299.pdf
       hsa_eligibility: false
       benefit_market_kind: :aca_shop
-      hbx_id:
+      hbx_id: 
       title: 'Non-Standard: NHP Prime HMO 2000/4000 30/50 35% FlexRx 4-Tier'
       issuer_profile_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -6004,7 +6004,7 @@ attributes: !ruby/hash:BSON::Document
       rx_formulary_url: https://fm.formularynavigator.com/MemberPages/pdf/4TFormulary_11417_Brand%20Reference%20Drug_3299.pdf
       hsa_eligibility: false
       benefit_market_kind: :aca_shop
-      hbx_id:
+      hbx_id: 
       title: 'Non-Standard: NHP Prime HMO 500/1000 20/35 30% FlexRx 4-Tier'
       issuer_profile_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -6117,7 +6117,7 @@ attributes: !ruby/hash:BSON::Document
       rx_formulary_url: http://www.tuftshealthplan.com/connector
       hsa_eligibility: false
       benefit_market_kind: :aca_shop
-      hbx_id:
+      hbx_id: 
       title: 'Non-Standard: Tufts Health Direct Gold 500 with Coinsurance'
       issuer_profile_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -6230,7 +6230,7 @@ attributes: !ruby/hash:BSON::Document
       rx_formulary_url: http://www.tuftshealthplan.com/connector
       hsa_eligibility: false
       benefit_market_kind: :aca_shop
-      hbx_id:
+      hbx_id: 
       title: 'Non-Standard: Tufts Health Direct Silver 2200 with Coinsurance'
       issuer_profile_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -6343,7 +6343,7 @@ attributes: !ruby/hash:BSON::Document
       rx_formulary_url: http://www.fchp.org/members/Pharmacy/online-drug-formulary.aspx
       hsa_eligibility: false
       benefit_market_kind: :aca_shop
-      hbx_id:
+      hbx_id: 
       title: Select Care Bronze Connector
       issuer_profile_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -6684,7 +6684,7 @@ attributes: !ruby/hash:BSON::Document
       rx_formulary_url: http://www.fchp.org/members/Pharmacy/online-drug-formulary.aspx
       hsa_eligibility: false
       benefit_market_kind: :aca_shop
-      hbx_id:
+      hbx_id: 
       title: Select Care Gold Connector B
       issuer_profile_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -7025,7 +7025,7 @@ attributes: !ruby/hash:BSON::Document
       rx_formulary_url: http://www.fchp.org/members/Pharmacy/online-drug-formulary.aspx
       hsa_eligibility: false
       benefit_market_kind: :aca_shop
-      hbx_id:
+      hbx_id: 
       title: Select Care Platinum Connector
       issuer_profile_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -7366,7 +7366,7 @@ attributes: !ruby/hash:BSON::Document
       rx_formulary_url: http://www.fchp.org/members/Pharmacy/online-drug-formulary.aspx
       hsa_eligibility: false
       benefit_market_kind: :aca_shop
-      hbx_id:
+      hbx_id: 
       title: Select Care Silver Coinsurance 35%
       issuer_profile_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -7707,7 +7707,7 @@ attributes: !ruby/hash:BSON::Document
       rx_formulary_url: http://www.fchp.org/members/Pharmacy/online-drug-formulary.aspx
       hsa_eligibility: false
       benefit_market_kind: :aca_shop
-      hbx_id:
+      hbx_id: 
       title: Select Care Silver Connector
       issuer_profile_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -8048,7 +8048,7 @@ attributes: !ruby/hash:BSON::Document
       rx_formulary_url: https://www.harvardpilgrim.org/2018Value3T
       hsa_eligibility: false
       benefit_market_kind: :aca_shop
-      hbx_id:
+      hbx_id: 
       title: Standard Bronze
       issuer_profile_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -8161,7 +8161,7 @@ attributes: !ruby/hash:BSON::Document
       rx_formulary_url: http://www.bluecrossma.com/medications
       hsa_eligibility: false
       benefit_market_kind: :aca_shop
-      hbx_id:
+      hbx_id: 
       title: 'Standard Bronze: HMO Blue Basic Deductible'
       issuer_profile_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -8274,7 +8274,7 @@ attributes: !ruby/hash:BSON::Document
       rx_formulary_url: https://fm.formularynavigator.com/MemberPages/pdf/4TFormulary_11417_Brand%20Reference%20Drug_3299.pdf
       hsa_eligibility: false
       benefit_market_kind: :aca_shop
-      hbx_id:
+      hbx_id: 
       title: 'Standard Bronze: NHP Prime HMO 3000/6000 25/40 FlexRx 4-Tier'
       issuer_profile_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -8387,7 +8387,7 @@ attributes: !ruby/hash:BSON::Document
       rx_formulary_url: http://www.tuftshealthplan.com/connector
       hsa_eligibility: false
       benefit_market_kind: :aca_shop
-      hbx_id:
+      hbx_id: 
       title: 'Standard Bronze: Tufts Health Direct Bronze'
       issuer_profile_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -8500,7 +8500,7 @@ attributes: !ruby/hash:BSON::Document
       rx_formulary_url: https://www.harvardpilgrim.org/2018Value3T
       hsa_eligibility: false
       benefit_market_kind: :aca_shop
-      hbx_id:
+      hbx_id: 
       title: Standard Gold
       issuer_profile_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -8613,7 +8613,7 @@ attributes: !ruby/hash:BSON::Document
       rx_formulary_url: http://www.bluecrossma.com/medications
       hsa_eligibility: false
       benefit_market_kind: :aca_shop
-      hbx_id:
+      hbx_id: 
       title: 'Standard Gold: HMO Blue $1,000 Deductible'
       issuer_profile_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -8726,7 +8726,7 @@ attributes: !ruby/hash:BSON::Document
       rx_formulary_url: https://fm.formularynavigator.com/MemberPages/pdf/4TFormulary_11417_Brand%20Reference%20Drug_3299.pdf
       hsa_eligibility: false
       benefit_market_kind: :aca_shop
-      hbx_id:
+      hbx_id: 
       title: 'Standard Gold: NHP Prime HMO 1000/2000 30/45 FlexRx 4-Tier'
       issuer_profile_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -8839,7 +8839,7 @@ attributes: !ruby/hash:BSON::Document
       rx_formulary_url: http://www.tuftshealthplan.com/connector
       hsa_eligibility: false
       benefit_market_kind: :aca_shop
-      hbx_id:
+      hbx_id: 
       title: 'Standard Gold: Tufts Health Direct Gold 1000'
       issuer_profile_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -8952,7 +8952,7 @@ attributes: !ruby/hash:BSON::Document
       rx_formulary_url: https://www.harvardpilgrim.org/2018Value3T
       hsa_eligibility: false
       benefit_market_kind: :aca_shop
-      hbx_id:
+      hbx_id: 
       title: Standard Platinum
       issuer_profile_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -9065,7 +9065,7 @@ attributes: !ruby/hash:BSON::Document
       rx_formulary_url: http://www.bluecrossma.com/medications
       hsa_eligibility: false
       benefit_market_kind: :aca_shop
-      hbx_id:
+      hbx_id: 
       title: 'Standard Platinum: HMO Blue Premium'
       issuer_profile_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -9178,7 +9178,7 @@ attributes: !ruby/hash:BSON::Document
       rx_formulary_url: https://fm.formularynavigator.com/MemberPages/pdf/4TFormulary_11417_Brand%20Reference%20Drug_3299.pdf
       hsa_eligibility: false
       benefit_market_kind: :aca_shop
-      hbx_id:
+      hbx_id: 
       title: 'Standard Platinum: NHP Prime HMO 25/40 FlexRx 4-Tier'
       issuer_profile_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -9291,7 +9291,7 @@ attributes: !ruby/hash:BSON::Document
       rx_formulary_url: http://www.tuftshealthplan.com/connector
       hsa_eligibility: false
       benefit_market_kind: :aca_shop
-      hbx_id:
+      hbx_id: 
       title: 'Standard Platinum: Tufts Health Direct Platinum'
       issuer_profile_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -9404,7 +9404,7 @@ attributes: !ruby/hash:BSON::Document
       rx_formulary_url: https://www.harvardpilgrim.org/2018Value3T
       hsa_eligibility: false
       benefit_market_kind: :aca_shop
-      hbx_id:
+      hbx_id: 
       title: Standard Silver
       issuer_profile_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -9517,7 +9517,7 @@ attributes: !ruby/hash:BSON::Document
       rx_formulary_url: http://www.bluecrossma.com/medications
       hsa_eligibility: false
       benefit_market_kind: :aca_shop
-      hbx_id:
+      hbx_id: 
       title: 'Standard Silver: Access Blue Basic'
       issuer_profile_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -9630,7 +9630,7 @@ attributes: !ruby/hash:BSON::Document
       rx_formulary_url: https://fm.formularynavigator.com/MemberPages/pdf/4TFormulary_11417_Brand%20Reference%20Drug_3299.pdf
       hsa_eligibility: false
       benefit_market_kind: :aca_shop
-      hbx_id:
+      hbx_id: 
       title: 'Standard Silver: NHP Prime HMO 2000/4000 30/50 FlexRx 4-Tier'
       issuer_profile_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -9743,7 +9743,7 @@ attributes: !ruby/hash:BSON::Document
       rx_formulary_url: http://www.tuftshealthplan.com/connector
       hsa_eligibility: false
       benefit_market_kind: :aca_shop
-      hbx_id:
+      hbx_id: 
       title: 'Standard Silver: Tufts Health Direct Silver 2000'
       issuer_profile_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -9855,10 +9855,10 @@ attributes: !ruby/hash:BSON::Document
       health_plan_kind: :hmo
       metal_level_kind: :bronze
       is_standard_plan: false
-      rx_formulary_url:
+      rx_formulary_url: 
       hsa_eligibility: false
       benefit_market_kind: :aca_shop
-      hbx_id:
+      hbx_id: 
       title: Select Care Bronze Deductible 3000
       issuer_profile_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -9872,11 +9872,11 @@ attributes: !ruby/hash:BSON::Document
       service_area_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
           WxWP9Z+ICzHOaiuJ
-      provider_directory_url:
+      provider_directory_url: 
       deductible: "$3,000"
       family_deductible: "$3000 per person | $6000 per group"
       is_reference_plan_eligible: true
-      issuer_assigned_id:
+      issuer_assigned_id: 
       renewal_product_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
           Wx2L9+bro5CtEzsC
