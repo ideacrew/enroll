@@ -305,7 +305,7 @@ class Insured::GroupSelectionController < ApplicationController
   def initialize_common_vars
     @adapter = GroupSelectionPrevaricationAdapter.initialize_for_common_vars(permitted_group_selection_params)
     @person = @adapter.person
-    @family = @adapter.family&
+    @family = @adapter.family
     @coverage_household = @adapter.coverage_household
     @hbx_enrollment = @adapter.previous_hbx_enrollment
     @change_plan = @adapter.change_plan
