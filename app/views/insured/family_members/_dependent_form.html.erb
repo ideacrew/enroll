@@ -231,12 +231,13 @@
           <%= l10n("confirm_member") %>
         <% end %>
 
-        <span class="btn btn-primary btn-br pull-right mz" onclick="PersonValidations.manageRequiredValidations($(this));">
+        <span id='confirm-dependent' class="btn btn-primary btn-br pull-right mz">
           <%= l10n("confirm_member") %>
         </span>
       </div>
     <% end %>
   </div>
+  <!-- onclick="PersonValidations.manageRequiredValidations($(this));" -->
 
   <script>
     $(document).ready(function() {
@@ -253,35 +254,27 @@
     });
 
 
-    $(document).on('click', '#confirm-member', function(e) {
+    $(document).on('click', '#confirm-dependent', function(e) {
       $(".btn-confirmation").removeAttr('disabled');
 
-      if (!$("input#dependent_same_with_primary").is(":checked")) {
+      var form = $('#new_dependent')[0] || $('#edit_dependent')[0];
+
+      if ( form.checkValidity() && !$("input#dependent_same_with_primary").is(":checked")) {
         $('#addressChangeConfirmation').modal('show');
       }
       else {
-       e.preventDefault();
+       PersonValidations.manageRequiredValidations($('#confirm-dependent'));
       }
+
     });
 
     function confirmChange(event){
       $(".btn-confirmation").attr('disabled', 'disabled');
-
-      event.preventDefault();
-      event.stopImmediatePropagation();
-
       $('.modal-backdrop').removeClass('modal-backdrop');
       $('.modal-open').removeClass('modal-open');
 
-      var formData = new FormData($('#new_dependent')[0]);
-
-      $.ajax({
-        url: '/insured/families/manage_family?tab=family',
-        type: "POST",
-        data : formData,
-        contentType: false,
-        processData: false,
-      });
+      PersonValidations.manageRequiredValidations($('#confirm-dependent'));
+      $('#addressChangeConfirmation').modal('hide');
     }
 
   </script>
