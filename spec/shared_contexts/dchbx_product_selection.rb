@@ -638,7 +638,7 @@ RSpec.shared_context 'family has no current year coverage and not in open enroll
                       :with_primary_family_member,
                       person: consumer_role.person)
   end
-  let(:sep) {  FactoryBot.create(:special_enrollment_period, effective_on: Date.new(prior_coverage_year, 11, 1), family: family)}
+  let(:sep) {  FactoryBot.create(:special_enrollment_period, effective_on: Date.new(prior_coverage_year, 11, 1), family: family, coverage_renewal_flag: true)}
   let(:prior_ivl_enrollment) do
     FactoryBot.create(:hbx_enrollment,
                       :individual_unassisted,
@@ -684,7 +684,7 @@ RSpec.shared_context 'family has current year coverage and not in open enrollmen
                       :with_primary_family_member,
                       person: consumer_role.person)
   end
-  let(:sep) {  FactoryBot.create(:special_enrollment_period, effective_on: Date.new(prior_coverage_year, 11, 1), family: family)}
+  let(:sep) {  FactoryBot.create(:special_enrollment_period, effective_on: Date.new(prior_coverage_year, 11, 1), family: family, coverage_renewal_flag: true)}
 
   let(:current_ivl_enrollment) do
     FactoryBot.create(:hbx_enrollment,
@@ -719,7 +719,7 @@ RSpec.shared_context 'family has current year and prior year coverage and not in
                       :with_primary_family_member,
                       person: consumer_role.person)
   end
-  let(:sep) {  FactoryBot.create(:special_enrollment_period, effective_on: Date.new(prior_coverage_year, 11, 1), family: family)}
+  let(:sep) {  FactoryBot.create(:special_enrollment_period, effective_on: Date.new(prior_coverage_year, 11, 1), family: family, coverage_renewal_flag: true)}
 
   let(:current_ivl_enrollment) do
     FactoryBot.create(:hbx_enrollment,
@@ -815,7 +815,7 @@ RSpec.shared_context 'family has prior, current and renewal year coverage and in
                       :with_primary_family_member,
                       person: consumer_role.person)
   end
-  let(:sep) {  FactoryBot.create(:special_enrollment_period, effective_on: Date.new(prior_coverage_year, 11, 1), family: family)}
+  let(:sep) {  FactoryBot.create(:special_enrollment_period, effective_on: Date.new(prior_coverage_year, 11, 1), family: family, coverage_renewal_flag: true)}
 
   let(:current_ivl_enrollment) do
     FactoryBot.create(:hbx_enrollment,

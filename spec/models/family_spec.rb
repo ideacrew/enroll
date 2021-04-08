@@ -1854,6 +1854,12 @@ end
 
 describe "terminated_and_expired_enrollments", dbclean: :after_each do
   let!(:person) { FactoryBot.create(:person)}
+  let!(:coverage_year) { Date.today.year - 1}
+  let!(:hbx_profile) do
+    FactoryBot.create(:hbx_profile,
+                      :no_open_enrollment_coverage_period,
+                      coverage_year: coverage_year)
+  end
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
   let!(:household) { FactoryBot.create(:household, family: family) }
   let!(:termination_pending_enrollment) do
@@ -1861,6 +1867,7 @@ describe "terminated_and_expired_enrollments", dbclean: :after_each do
                       family: family,
                       household: family.active_household,
                       coverage_kind: "health",
+                      kind: 'individual',
                       aasm_state: 'coverage_termination_pending')
   end
 
@@ -1869,6 +1876,7 @@ describe "terminated_and_expired_enrollments", dbclean: :after_each do
                       family: family,
                       household: family.active_household,
                       coverage_kind: "health",
+                      kind: 'individual',
                       aasm_state: 'coverage_terminated')
   end
 
@@ -1877,6 +1885,8 @@ describe "terminated_and_expired_enrollments", dbclean: :after_each do
                       family: family,
                       household: family.active_household,
                       coverage_kind: "health",
+                      kind: 'individual',
+                      effective_on: TimeKeeper.date_of_record.prev_year.beginning_of_year,
                       aasm_state: 'coverage_expired')
   end
 

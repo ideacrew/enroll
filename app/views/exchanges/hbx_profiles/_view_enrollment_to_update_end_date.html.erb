@@ -90,7 +90,7 @@
                   <td id="enrollment_effective_on"><%= hbx.effective_on %></td>
                   <% term_or_expire_date = hbx.fetch_term_or_expiration_date %>
                   <td><%= term_or_expire_date %></td>
-                  <% if ::EnrollRegistry.feature_enabled?(:prior_plan_year_sep) && (hbx.prior_year_shop_coverage? || hbx.prior_year_ivl_coverage?) %>
+                  <% if hbx.prior_plan_year_coverage? || hbx.active_plan_year_coverage? %>
                     <% max_date = hbx.is_shop? ? hbx.sponsored_benefit_package.end_on : hbx.effective_on.end_of_year %>
                     <td><%= text_field_tag "new_termination_date", nil, readonly: true, disabled: true, value:  term_or_expire_date, id: "termination-date-picker_#{hbx.id}", class: "form-control date-field date-picker", "data-date-min" =>  hbx.effective_on, "data-date-max" => max_date  %></td>
                   <% else %>

@@ -1291,6 +1291,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
   end
 
   describe "POST update_enrollment_terminated_on_date", :dbclean => :around_each do
+    render_views
     let(:user) { FactoryBot.create(:user, roles: ["hbx_staff"]) }
     let!(:person) { FactoryBot.create(:person)}
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
@@ -1368,7 +1369,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
         it "should render template " do
           post :update_enrollment_terminated_on_date, params: {enrollment_id: enrollment.id.to_s, family_actions_id: family.id, new_termination_date: TimeKeeper.date_of_record.to_s}, format: :js, xhr: true
           expect(response).to have_http_status(:success)
-          expect(response).to render_template("update_enrollment_termianted_on_date")
+          expect(response).to render_template("update_enrollment_terminated_on_date")
           expect(response.body).to have_content(/Enrollment Updated Successfully/i)
         end
 

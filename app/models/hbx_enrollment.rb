@@ -1800,7 +1800,7 @@ class HbxEnrollment
     )
   end
 
-  def term_or_expire_enrollment
+  def term_or_expire_enrollment(term_date=nil)
     if is_shop?
       enrollment_benefit_application = sponsored_benefit_package.benefit_application
       if enrollment_benefit_application.terminated? || enrollment_benefit_application.termination_pending?
@@ -1808,8 +1808,8 @@ class HbxEnrollment
       elsif enrollment_benefit_application.expired?
         expire_coverage!
       end
-    elsif !current_year_ivl_coverage?
-      expire_coverage!
+    else
+      current_year_ivl_coverage? ? terminate_coverage!(term_date) : expire_coverage!
     end
   end
 
@@ -2043,9 +2043,11 @@ class HbxEnrollment
   end
 
   def prior_plan_year_coverage?
-    return false unless EnrollRegistry.feature_enabled?(:prior_plan_year_sep)
-
     is_shop? ? prior_year_shop_coverage? : prior_year_ivl_coverage?
+  end
+
+  def active_plan_year_coverage?
+    is_shop? ? active_py_shop_coverage? : current_year_ivl_coverage?
   end
 
   def prior_year_shop_coverage?
@@ -2067,12 +2069,20 @@ class HbxEnrollment
     prior_bcp.contains?(effective_on)
   end
 
+  def active_py_shop_coverage?
+    application = sponsored_benefit_package&.benefit_application
+    return false unless application.present?
+    return false unless application.active?
+
+    (application.start_on..application.end_on).cover?(effective_on)
+  end
+
   def fetch_term_or_expiration_date
     if is_shop?
-      (coverage_expired? && !prior_plan_year_coverage?) ? sponsored_benefit_package.end_on : terminated_on
+      coverage_expired? ? sponsored_benefit_package.end_on : terminated_on
     else
       benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_period_by_effective_date(effective_on)
-      (coverage_expired? && !prior_plan_year_coverage?) ? benefit_coverage_period.end_on : terminated_on
+      coverage_expired? ? benefit_coverage_period.end_on : terminated_on
     end
   end
 

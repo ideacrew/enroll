@@ -15,7 +15,7 @@ module Operations
       # @param [ NewTerminationDate ] termination_date to update the enrollment
       # @param [ EdiRequired ] edi_required to send the enrollment change to EDI
       # @return [ Success ] :ok
-      def call(params)
+      def call(params:)
         validated_params = yield validate(params)
         @enrollment = yield fetch_enrollment(params["enrollment_id"])
         _status = yield check_enrollment_eligibility(validated_params['new_termination_date'])
@@ -41,7 +41,7 @@ module Operations
       def check_enrollment_eligibility(termination_date)
         @termination_date = Date.strptime(termination_date, "%m/%d/%Y")
         eligible_states = %w[coverage_terminated coverage_termination_pending]
-        eligible_states << 'coverage_expired' if EnrollRegistry.feature_enabled?(:prior_plan_year_sep)
+        eligible_states << 'coverage_expired' if EnrollRegistry[:change_end_date].settings(:expired_enrollments).item
 
         return Failure('Enrollment not in valid state') unless eligible_states.include?(@enrollment.aasm_state)
 
@@ -52,9 +52,9 @@ module Operations
       end
 
       def termination_date_check_fails?
-        prior_py_enr = @enrollment.prior_plan_year_coverage?
+        prior_or_current_py_enr = @enrollment.prior_plan_year_coverage? || @enrollment.active_plan_year_coverage?
 
-        if prior_py_enr
+        if prior_or_current_py_enr
           term_or_expiration_date = @enrollment.is_shop? ? @enrollment.sponsored_benefit_package.end_on : @enrollment.effective_on.end_of_year
           @termination_date > term_or_expiration_date
         else
@@ -82,7 +82,7 @@ module Operations
           reinstate_enrollment.begin_coverage! if reinstate_enrollment.may_begin_coverage?
 
           #transition enrollment to term state if PY terminated
-          reinstate_enrollment.term_or_expire_enrollment if ::EnrollRegistry.feature_enabled?(:prior_plan_year_sep)
+          reinstate_enrollment.term_or_expire_enrollment(@termination_date)
         end
         reinstate_enrollment
       end
@@ -100,14 +100,14 @@ module Operations
       end
 
       def check_if_overlapping_coverage_exists?
-        return false unless @enrollment.prior_plan_year_coverage?
+        return false unless @enrollment.prior_plan_year_coverage? || @enrollment.active_plan_year_coverage?
 
         @enrollment.is_shop? ? check_for_overlapping_shop_enrollments : check_for_overlapping_ivl_enrollments
       end
 
       def check_for_overlapping_shop_enrollments
         eligible_states = HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES + HbxEnrollment::CAN_REINSTATE_AND_UPDATE_END_DATE
-        eligible_states << 'coverage_expired' if ::EnrollRegistry.feature_enabled?(:prior_plan_year_sep)
+        eligible_states << 'coverage_expired' if EnrollRegistry[:change_end_date].settings(:expired_enrollments).item
         HbxEnrollment.where({:family_id => @enrollment.family_id,
                              :kind.in => %w[employer_sponsored employer_sponsored_cobra],
                              :effective_on => { "$gte" => @enrollment.terminated_on, "$lte" => @termination_date },
@@ -118,7 +118,7 @@ module Operations
 
       def check_for_overlapping_ivl_enrollments
         eligible_states = HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES + HbxEnrollment::CAN_REINSTATE_AND_UPDATE_END_DATE
-        eligible_states << 'coverage_expired' if ::EnrollRegistry.feature_enabled?(:prior_plan_year_sep)
+        eligible_states << 'coverage_expired' if EnrollRegistry[:change_end_date].settings(:expired_enrollments).item
         HbxEnrollment.where({:family_id => @enrollment.family_id,
                              :kind.in => %w[individual coverall],
                              :effective_on => { "$gte" => @enrollment.terminated_on, "$lte" => @termination_date },
