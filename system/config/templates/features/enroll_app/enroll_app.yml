@@ -42,7 +42,7 @@ registry:
           - key: :home_url
             item: "https://cme.enroll.openhbx.org/"
           - key: :home_business_url
-            item: "https://www.accesshealthct.com/AHCT/LandingPageCTHIX"
+            item: "https://www.coverme.gov"
           - key: :help_url
             item: "https://www.coverme.gov/help/"
           - key: :main_web_address_url
