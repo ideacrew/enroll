@@ -182,8 +182,6 @@ registry:
             item: "04330"
           - key: :contact_center_email_address
             item: "smallbusiness@coverme.gov"
-          - key: :social_media
-            item: ''
           - key: :health_benefit_exchange_authority_phone_number
             item: "1-800-965-7476"
           - key: :contact_center_name
