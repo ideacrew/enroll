@@ -60,7 +60,6 @@ document.addEventListener("turbolinks:load", function() {
 
     /* Saving Responses to  Job Income & Self Employment Driver Questions */
     $('#has_job_income_true, #has_job_income_false, #has_self_employment_income_true, #has_self_employment_income_false').on('change', function(e) {
-
       var attributes = {};
       attributes[$(this).attr('name')] = $(this).val();
       $.ajax({
@@ -240,6 +239,18 @@ document.addEventListener("turbolinks:load", function() {
       $(this).parents('.new-income-form').addClass("hidden");
       incomeEl.find('.income-edit-form').addClass('hidden');
       incomeEl.find('.display-income').removeClass('hidden');
+
+      var incomeType = this.closest('.incomes-list').parentNode.id
+      if (incomeType == 'job_income') {
+        if (document.querySelectorAll('.incomes-list:not(.self-employed-incomes-list) .income').length == 0) {
+          document.getElementById('has_job_income_false').click();
+        }
+      } else if (incomeType == 'self_employed_incomes') {
+        if (document.querySelectorAll('.self-employed-incomes-list .income').length == 0) {
+          document.getElementById('has_self_employment_income_false').click();
+        }
+      }
+
       stopEditingIncome();
       /* TODO: Handle unchecking boxes if there are no more incomes of that kind */
     });
@@ -265,6 +276,11 @@ document.addEventListener("turbolinks:load", function() {
       } else {
         var incomeEl = $(this).parents('.income');
       }
+
+      if (document.querySelectorAll('.unemployment-incomes-list:not(.other-incomes-list) .unemployment-income').length == 0) {
+        document.getElementById('has_unemployment_income_false').click();
+      }
+
       stopEditingIncome();
 
       /* TODO: Handle unchecking boxes if there are no more incomes of that kind */
