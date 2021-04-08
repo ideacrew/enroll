@@ -118,6 +118,8 @@
         <div id="remove_confirm" class="hidden"></div>
       </div>
 
+      <%= render partial: 'shared/address_change_confirmation_modal' %>
+
       <div class="clearfix"></div>
       <div id="add_info_buttons_<%= dependent.id %>" style="padding-top: 20px;">
 
@@ -131,7 +133,7 @@
 
         <%= f.button(id: 'confirm-member', 'data-disable-with' => l10n("please_wait"), class: "btn btn-primary btn-br pull-right mz hidden", onclick: "$('#btn-continue').removeClass('disabled');") do %>    <%= l10n("confirm_member") %><% end %>
 
-        <span class="btn btn-primary btn-br pull-right mz" onclick="PersonValidations.manageRequiredValidations($(this));">
+        <span id='confirm-dependent' class="btn btn-primary btn-br pull-right mz">
           <%= l10n("confirm_member") %>
         </span>
       </div>
@@ -146,5 +148,28 @@
         $("#address_info .address_required").removeAttr('required');
       };
     });
+
+    $(document).on('click', '#confirm-dependent', function(e) {
+      $(".btn-confirmation").removeAttr('disabled');
+
+      var form = $('#new_dependent')[0] || $('#edit_dependent')[0];
+
+      if ( form.checkValidity() && !$("input#dependent_same_with_primary").is(":checked")) {
+        $('#addressChangeConfirmation').modal('show');
+      }
+      else {
+       PersonValidations.manageRequiredValidations($('#confirm-dependent'));
+      }
+
+    });
+
+    function confirmChange(event){
+      $(".btn-confirmation").attr('disabled', 'disabled');
+      $('.modal-backdrop').removeClass('modal-backdrop');
+      $('.modal-open').removeClass('modal-open');
+
+      PersonValidations.manageRequiredValidations($('#confirm-dependent'));
+      $('#addressChangeConfirmation').modal('hide');
+    }
   </script>
 </li>
