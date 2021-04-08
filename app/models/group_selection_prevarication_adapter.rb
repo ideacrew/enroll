@@ -9,7 +9,7 @@ class GroupSelectionPrevaricationAdapter
     person_id = params[:person_id]
     person = Person.find(person_id)
     family = person.primary_family
-    coverage_household = family.active_household.immediate_family_coverage_household
+    coverage_household = family&.active_household.immediate_family_coverage_household
     change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     shop_under_current = params[:shop_under_current] == "true"
     shop_under_future = params[:shop_under_future] == "true"
