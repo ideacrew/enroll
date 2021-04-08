@@ -64,6 +64,7 @@ Feature: Start a new Financial Assistance Application and fills out Other Income
     Given the user answers yes to having unemployment income
     When the user cancels the form
     And the other income form should not show
+    And NO should be selected again for unemployment income
 
   Scenario: Unemployment Not Sure popup shows correct text
     When the user clicks the Not sure link next to the unemployment income question
