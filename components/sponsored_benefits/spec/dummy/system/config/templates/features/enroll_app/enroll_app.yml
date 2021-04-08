@@ -287,10 +287,14 @@ registry:
         item: Operations::AgeOffRelaxedEligibility.new
         is_enabled: true
       - key: :display_cost_warning_message
+        item: :display_cost_warning_message
         is_enabled: false
-      - key: employee_datable_waiver_bulk_actions
+      - key: :employee_datable_waiver_bulk_actions
+        item: :employee_datable_waiver_bulk_actions
         is_enabled: false
-     - key: :automatic_quote_validation # This needs refactoring, see employer_profile_builder.rb
-        is_enabled: false
-     - key: :validate_effective_date_employer
       - key: :automatic_quote_validation # This needs refactoring, see employer_profile_builder.rb
+        item: :automatic_quote_validation
+        is_enabled: false
+      - key: :validate_effective_date_employer
+        item: :validate_effective_date_employer
+        is_enabled: false

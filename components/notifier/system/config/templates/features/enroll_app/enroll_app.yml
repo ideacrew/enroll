@@ -233,9 +233,6 @@ registry:
           item: "https://dchealthlink.com/sites/default/files/v2/forms/new_broker_registration.pdf"
         - key: :redirect_to_requirements_page_after_confirmation # Refactor of Redmine Ticket 42456
           item: true
-      - key: :agency_staff
-        item: :agency_staff
-        is_enabled: true
       - key: :send_secure_message_family
         item: :send_secure_message
         is_enabled: true

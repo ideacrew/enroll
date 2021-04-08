@@ -315,6 +315,14 @@ Given(/^a Hbx admin with read only permissions exists$/) do
   FactoryBot.create :hbx_enrollment,family: user.primary_family, household: user.primary_family.active_household
 end
 
+Given(/^the fehb market configuration is disabled$/) do
+  disable_feature :fehb_market
+end
+
+Given(/^the fehb market configuration is enabled$/) do
+  enable_feature :fehb_market
+end
+
 Given(/^the shop market configuration is disabled$/) do
   disable_feature :aca_shop_market
 end
@@ -334,28 +342,6 @@ Given(/^the fehb market configuration is enabled$/) do
   enable_feature :fehb_market
 end
 
-<<<<<<< HEAD
-=======
-Given(/^the shop market configuration is disabled$/) do
-  disable_feature :aca_shop_market
-end
-
-Given(/^the shop market configuration is enabled$/) do
-  enable_feature :aca_shop_market
-  enable_feature :agency_staff
-  load "components/benefit_sponsors/app/models/benefit_sponsors/organizations/broker_agency_profile.rb"
-  load "components/benefit_sponsors/app/models/benefit_sponsors/organizations/general_agency_profile.rb"
-end
-
-Given(/^the fehb market configuration is disabled$/) do
-  disable_feature :fehb_market
-end
-
-Given(/^the fehb market configuration is enabled$/) do
-  enable_feature :fehb_market
-end
-
->>>>>>> origin/disable_shop_base
 Given(/^the individual market configuration is disabled$/) do
   disable_feature :aca_individual_market
 end
@@ -377,11 +363,8 @@ Given(/^send secure message to employer is disabled$/) do
   disable_feature :send_secure_message_employer
 end
 
-<<<<<<< HEAD
 # rubocop:disable Security/Eval
 
-=======
->>>>>>> origin/disable_shop_base
 When(/(^.+) enters? office location for (.+)$/) do |role, location|
   location = eval(location) if location.instance_of?(String)
   RatingArea.where(zip_code: "01001").first || FactoryBot.create(:rating_area, zip_code: "01001", county_name: "Hampden", rating_area: Settings.aca.rating_areas.first)
