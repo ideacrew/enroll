@@ -82,6 +82,10 @@ When(/^the user cancels the form$/) do
   find(".interaction-click-control-cancel").click
 end
 
+And(/^NO should be selected again for (.*) income$/) do |income_type|
+  expect(find("#has_#{income_type}_income_false")).to be_checked
+end
+
 Then(/^the other income checkbox should be unchecked$/) do
   expect(find(:css, "#other_income_kind[value='alimony_and_maintenance']")).not_to be_checked
 
