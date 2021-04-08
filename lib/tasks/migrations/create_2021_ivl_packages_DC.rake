@@ -1,6 +1,6 @@
 namespace :import do
   desc "Create 2021 benefit coverage period and packages with products"
-  task :create_2020_ivl_packages_DC  => :environment do
+  task :create_2021_ivl_packages_DC  => :environment do
     puts "::: Creating 2021 IVL packages :::" unless Rails.env.test?
 
     # BenefitPackages - HBX 2021
