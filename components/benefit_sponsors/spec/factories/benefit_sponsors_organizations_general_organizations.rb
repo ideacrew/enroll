@@ -13,7 +13,14 @@ FactoryBot.define do
 
     trait :with_site do
       after :build do |organization, evaluator|
-        organization.site = BenefitSponsors::Site.by_site_key(Settings.site.key).first || create(:benefit_sponsors_site, :as_hbx_profile, Settings.site.key)
+        organization.site = BenefitSponsors::Site.by_site_key(EnrollRegistry[:enroll_app].setting(:site_key).item).first ||
+        create(:benefit_sponsors_site, :as_hbx_profile, EnrollRegistry[:enroll_app].setting(:site_key).item)
+      end
+    end
+
+    trait :with_aca_shop_me_employer_profile do
+      after :build do |organization, evaluator|
+        build(:benefit_sponsors_organizations_aca_shop_me_employer_profile, organization: organization)
       end
     end
 

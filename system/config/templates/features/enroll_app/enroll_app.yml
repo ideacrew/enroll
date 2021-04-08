@@ -14,7 +14,7 @@ registry:
           is_visible: true
         settings:
           - key: :application_name
-            item: "enroll_dc"
+            item: "enroll_me"
           - key: :copyright_period_start
             item: ""
           - key: :policies_url
@@ -62,7 +62,7 @@ registry:
           - key: :main_web_address
             item: "https://www.coverme.gov"
           - key: :state_name
-            item: :Maine
+            item: "Maine"
           - key: :short_name
             item: "Maine Cover ME"
           - key: :byline
