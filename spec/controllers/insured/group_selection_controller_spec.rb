@@ -5,10 +5,11 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_applicatio
 require "#{BenefitSponsors::Engine.root}/spec/support/benefit_sponsors_site_spec_helpers"
 require "#{BenefitSponsors::Engine.root}/spec/support/benefit_sponsors_product_spec_helpers"
 
-RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean: :after_each, :if => ::EnrollRegistry[:aca_shop_market].enabled? do
+RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean: :after_each do
     #include_context "setup benefit market with market catalogs and product packages"
 
   before :each do
+    EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
     EnrollRegistry[:apply_aggregate_to_enrollment].feature.stub(:is_enabled).and_return(false)
   end
 
@@ -1026,7 +1027,8 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         user = FactoryBot.create(:user, id: 190, person: FactoryBot.create(:person))
         sign_in user
         post :create, params: { person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids }
-        expect(flash[:error]).to eq 'Your employer is no longer offering health insurance through DC Health Link. Please contact your employer or call our Customer Care Center at 1-855-532-5465.'
+        expect(flash[:error]).to eq "Your employer is no longer offering health insurance through #{EnrollRegistry[:enroll_app].setting(:short_name).item}." \
+        " Please contact your employer or call our Customer Care Center at #{EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number).item}."
       end
 
       it 'when benefit application is terminated' do
@@ -1034,7 +1036,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         user = FactoryBot.create(:user, id: 191, person: FactoryBot.create(:person))
         sign_in user
         post :create, params: { person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids }
-        expect(flash[:error]).to eq 'Your employer is no longer offering health insurance through DC Health Link. Please contact your employer.'
+        expect(flash[:error]).to eq "Your employer is no longer offering health insurance through #{EnrollRegistry[:enroll_app].setting(:short_name).item}. Please contact your employer."
       end
     end
 
