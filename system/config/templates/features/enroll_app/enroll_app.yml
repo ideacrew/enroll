@@ -52,15 +52,17 @@ registry:
           - key: :payment_pdf_url
             item: "pdf/employers_paying_your_premiums_online.pdf"
           - key: :user_sign_in_url
-            item: "https://www.accesshealthct.com/AHCT/LandingPageCTHIX"
+            item: "https://www.coverme.gov"
           - key: :website_name
-            item: "https://www.accesshealthct.com/AHCT/LandingPageCTHIX"
+            item: https://www.coverme.gov"
           - key: :main_web_address
-            item: "https://www.accesshealthct.com/AHCT/LandingPageCTHIX"
+            item: "https://www.coverme.gov"
           - key: :website_name
             item: "https://www.coverme.gov"
           - key: :main_web_address
             item: "https://www.coverme.gov"
+          - key: :state_name
+            item: :Maine
           - key: :short_name
             item: "Maine Cover ME"
           - key: :byline
@@ -157,7 +159,7 @@ registry:
           - key: :block_ie_browser_after
             item: Mon, 01 Jun 2020
           - key: :publisher
-            item: "dchl"
+            item: "mehl"
           - key: :prod_tax_info
             item: "https://www.maine.gov/revenue/tax-return-forms/individual-income-tax-2020"
           - key: :staging_tax_info_url
@@ -168,8 +170,6 @@ registry:
             item: "Cover ME Health Benefit Exchange"
           - key: :social_media
             item: ''
-          - key: :state_name
-            item: "Maine"
           - key: :state_long_title
             item: "the state of Maine"
           - key: :state_dmv_link
@@ -182,6 +182,8 @@ registry:
             item: "04330"
           - key: :contact_center_email_address
             item: "smallbusiness@coverme.gov"
+          - key: :social_media
+            item: ''
           - key: :health_benefit_exchange_authority_phone_number
             item: "1-800-965-7476"
           - key: :contact_center_name
@@ -199,7 +201,7 @@ registry:
           - key: :broker_course_administering_organization_link
             item: 'https://nahu.inreachce.com/Details?resultsPage=1&sortBy=&q=dc+broker&searchType=1&groupId=154ae22b-92eb-41f0-854b-3a9cabc20c8e'
           - key: :privacy_url
-            item: https://www.coverme.gov"
+            item: ""
           - key: :privacy_act_statement
             item: ""
           - key: :site_broker_attestation_link
@@ -221,12 +223,9 @@ registry:
           - key: :assistance_estimate_url
             item: ""
           - key: :geographic_rating_area_model
+            item: "county"
           - key: :header_logo
             item: "logo.png"
-          - key: :eligibile_immigration_statuses_url
-            item: ""
-          - key: :assistance_estimate_url
-            item: ""
       - key: :rating_area
         item: :rating_area
         is_enabled: false
@@ -270,10 +269,6 @@ registry:
       - key: :counties_import
         is_enabled: true
         item: "SHOP_ZipCode_CY2021_FINAL_ME.xlsx"
-        is_enabled: false
-      - key: :counties_import
-        is_enabled: false
-        item: ""
   - namespace:
       - :features
       - :enroll_app
@@ -313,14 +308,10 @@ registry:
         item: Operations::AgeOffRelaxedEligibility.new
         is_enabled: true
       - key: :display_cost_warning_message
-        item: :display_cost_warning_message
         is_enabled: false
-      - key: :employee_datable_waiver_bulk_actions
-        item: :employee_datable_waiver_bulk_actions
+      - key: employee_datable_waiver_bulk_actions
         is_enabled: false
       - key: :automatic_quote_validation # This needs refactoring, see employer_profile_builder.rb
-        item: :automatic_quote_validation
         is_enabled: false
       - key: :validate_effective_date_employer
-        item: :validate_effective_date_employer
         is_enabled: false # Should return true for MA, see employer_profile_builder.rb
