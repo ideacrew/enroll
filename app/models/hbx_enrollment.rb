@@ -1800,7 +1800,7 @@ class HbxEnrollment
     )
   end
 
-  def term_or_expire_enrollment(term_date=nil)
+  def term_or_expire_enrollment(term_date = nil)
     if is_shop?
       enrollment_benefit_application = sponsored_benefit_package.benefit_application
       if enrollment_benefit_application.terminated? || enrollment_benefit_application.termination_pending?
