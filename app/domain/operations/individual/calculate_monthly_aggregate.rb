@@ -109,7 +109,9 @@ module Operations
           countr += 1 if eligible_enrollments.any?{ |enr| (enr.effective_on.beginning_of_month..calculate_termination_date(enr)).cover?(Date.new(@effective_on.year, month)) }
           countr
         end
-        counter += round_down_float_two_decimals((@effective_on.day - 1) / @effective_on.end_of_month.day.to_f) if @effective_on.day != 1
+        if @effective_on.day != 1 && eligible_enrollments.any?{ |enr| (enr.effective_on.beginning_of_month..calculate_termination_date(enr)).cover?(Date.new(@effective_on.year, @effective_on.month)) }
+          counter += round_down_float_two_decimals((@effective_on.day - 1) / @effective_on.end_of_month.day.to_f)
+        end
         counter
       end
 
