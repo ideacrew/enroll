@@ -300,3 +300,5 @@ registry:
         is_enabled: true
       - key: :validate_effective_date_employer
         is_enabled: false # Should return true for MA, see employer_profile_builder.rb
+      - key: :hmo_ppo_plan_type # Should be true for MA
+        is_enabled: false
