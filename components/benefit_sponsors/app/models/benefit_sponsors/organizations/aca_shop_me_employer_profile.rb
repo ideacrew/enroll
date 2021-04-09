@@ -8,12 +8,12 @@ module BenefitSponsors
       include BenefitSponsors::Concerns::EmployerProfileConcern
       include BenefitSponsors::Concerns::Observable
 
-      field :sic_code,            type: String
+      field :sic_code,            type: String if ::EnrollRegistry.feature_enabled?(:sic_codes)
       field :referred_by,         type: String
       field :referred_reason,     type: String
 
       # TODO: use SIC code validation
-      validates_presence_of :sic_code
+      validates_presence_of :sic_code if ::EnrollRegistry.feature_enabled?(:sic_codes)
 
       embeds_one :employer_attestation, class_name: '::EmployerAttestation'
 
