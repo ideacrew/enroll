@@ -109,7 +109,7 @@ Then(/Individual should see a form to enter personal information$/) do
   find(:xpath, '//*[@id="address_info"]/div/div[3]/div[2]/div/div[2]/span').click
   first('li', :text => 'DC', wait: 5).click
   fill_in "person[addresses_attributes][0][zip]", :with => "20002"
-  expect(page).to have_css("#home_address_tooltip")
+  # expect(page).to have_css("#home_address_tooltip")
   expect(page).to have_content("Enter your personal information and answer the following questions")
   expect(page).to have_content("Is this person a US citizen or US national")
   expect(page).to have_content("Is this person a naturalized citizen")
