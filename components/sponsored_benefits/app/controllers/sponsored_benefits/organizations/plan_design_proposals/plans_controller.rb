@@ -54,7 +54,10 @@ module SponsoredBenefits
       end
 
       def carriers_cache
-        @carriers_cache ||= ::CarrierProfile.all.inject({}){|carrier_hash, carrier_profile| carrier_hash[carrier_profile.id] = carrier_profile.legal_name; carrier_hash; }
+        @carriers_cache ||= ::CarrierProfile.all.inject({}) do |carrier_hash, carrier_profile|
+          carrier_hash[carrier_profile.id] = carrier_profile.legal_name
+          carrier_hash
+        end
       end
 
       def kind
