@@ -5,7 +5,7 @@
   <h3 class="title-inline"><%= l10n("families")%></h3>
 </div>
 
-<%= hidden_field_tag :market_enabled_check, :value => is_shop_or_fehb_market_enabled? %>
+<%= hidden_field_tag :market_enabled_check, is_shop_or_fehb_market_enabled? %>
 
 <div class="container">
   <div id="families">
