@@ -370,11 +370,8 @@ Given(/^send secure message to employer is disabled$/) do
   disable_feature :send_secure_message_employer
 end
 
-<<<<<<< HEAD
 # rubocop:disable Security/Eval
 
-=======
->>>>>>> origin/disable_shop_base
 When(/(^.+) enters? office location for (.+)$/) do |role, location|
   location = eval(location) if location.instance_of?(String)
   RatingArea.where(zip_code: "01001").first || FactoryBot.create(:rating_area, zip_code: "01001", county_name: "Hampden", rating_area: Settings.aca.rating_areas.first)
