@@ -269,6 +269,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         sign_in user
       end
 
+      # TODO: Not sure why this is failing
       xit 'should disable shop market if employee role is not under open enrollment' do
         allow(employee_role).to receive(:is_eligible_to_enroll_without_qle?).and_return(false)
         get :new, params: { person_id: person.id, employee_role_id: employee_role.id, change_plan: 'change_plan', shop_for_plans: 'shop_for_plans' }
