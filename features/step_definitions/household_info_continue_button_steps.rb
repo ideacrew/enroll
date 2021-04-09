@@ -103,6 +103,7 @@ When(/^all applicants are in Info Completed state$/) do
     find("#is_pregnant_no", wait: 10).click
     find("#is_post_partum_period_no", wait: 10).click
     find("#is_self_attested_blind_no", wait: 10).click
+    find("#is_student_no", wait: 10).click
     find("#has_daily_living_no", wait: 10).click
     find("#need_help_paying_bills_no", wait: 10).click
     find("#radio_physically_disabled_no", wait: 10).click
