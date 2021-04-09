@@ -3,6 +3,11 @@ registry:
   - namespace:
       - :css_components
     features:
+      - key: :selectric_hover
+        is_enabled: true
+        settings:
+          - key: :color
+            item: '#007bc4'
       - key: :qle_carousel
         is_enabled: true
         settings:
