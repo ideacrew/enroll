@@ -697,6 +697,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
                         is_post_partum_period: false,
                         is_self_attested_blind: true,
                         has_daily_living_help: true,
+                        is_student: true,
                         need_help_paying_bills: true,
                         is_ssn_applied: true,
                         family_member_id: BSON::ObjectId.new)
