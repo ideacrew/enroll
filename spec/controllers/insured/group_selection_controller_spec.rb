@@ -1027,11 +1027,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         sign_in user
         post :create, params: { person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids }
         expect(flash[:error]).to eq "Your employer is no longer offering health insurance through #{EnrollRegistry[:enroll_app].setting(:short_name).item}." \
-<<<<<<< HEAD
-        " Please contact your employer or call our Customer Care Center at #{EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number).item}."
-=======
         " Please contact your employer or call our Customer Care Center at #{EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item}."
->>>>>>> origin/disable_shop_base
       end
 
       it 'when benefit application is terminated' do
