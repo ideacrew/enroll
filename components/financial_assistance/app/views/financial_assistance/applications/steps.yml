@@ -8,7 +8,7 @@
                   - gutter: 12
                     type: raw_html
                     classNames: 'small-padding-top-bottom'
-                    text: "To make it easier to determine my eligibility for premium reductions in future years, I agree to allow DC Health Link to use my income data, including information from tax returns, for the next five years. DC Health Link will send me a notice, let me make any changes, and I can opt out at any time. *<br>"
+                    text: "To make it easier to determine my eligibility for premium reductions in future years, I agree to allow #{Settings.site.short_name} to use my income data, including information from tax returns, for the next five years. #{Settings.site.short_name} will send me a notice, let me make any changes, and I can opt out at any time. *<br>"
             - cells:
                   - gutter: 3
                     type: label_radio
@@ -34,7 +34,7 @@
                   - gutter: 12
                     type: raw_html
                     classNames: 'small-padding-top-bottom'
-                    text: "When it’s time to renew or change coverage, I authorize DC Health Link to automatically check my federal income tax returns for the sole purpose of redetermining my eligibility."
+                    text: "When it’s time to renew or change coverage, I authorize #{Settings.site.short_name} to automatically check my federal income tax returns for the sole purpose of redetermining my eligibility."
             - cells:
                   - gutter: 12
                     type: raw_html
@@ -82,7 +82,7 @@
                     attribute: years_to_renew
                   - gutter: 12
                     type: label_radio
-                    label: "None. I understand that this means I won't get cost savings in future years unless I change my mind and tell DC Health Link"
+                    label: "None. I understand that this means I won't get cost savings in future years unless I change my mind and tell #{Settings.site.short_name}"
                     value: 0
                     classNames: 'span-text radio-inline-override label-max-width-renew'
                     model: application
@@ -96,7 +96,7 @@
                   - gutter: 8
                     type: raw_html
                     classNames: 'small-padding-top-bottom'
-                    text: "Would you like to register to vote in DC or update your current registration? * (A form will be mailed to you)"
+                    text: "Would you like to register to vote in #{Settings.aca.state_abbreviation} or update your current registration? * (A form will be mailed to you)"
                   - gutter: 2
                     type: label_radio
                     id: 'mailed_yes'
@@ -127,11 +127,12 @@
                     * Your right to choose your own political party or other political choice <br><br>
 
                     <b>To file a complaint, contact:</b><br>
-                    DC Board of Elections<br>
-                    1015 Half Street, SE<br>
-                    Suite 750<br>
-                    Washington, DC 20003<br>
-                    Phone: (202) 727-2525 <br>"
+                   #{Settings.contact_center.board_of_elections_entity} <br>
+                   #{Settings.contact_center.board_of_elections_address} <br>
+                   #{Settings.contact_center.board_of_elections_email} <br>
+                   Phone: #{Settings.contact_center.board_of_elections_phone_number}"
+
+
 - step:
     heading: Submit Your Application
     heading_text: "This is the last step. Carefully read the information below. Select 'I agree' after each statement to acknowledge your agreement. Then, enter your name to electronically sign the application. When you're finished, select SUBMIT APPLICATION."
@@ -142,7 +143,7 @@
                   - gutter: 12
                     type: raw_html
                     classNames: 'small-padding-top-bottom'
-                    text: <b>I understand that eligibility for private health insurance, with or without financial assistance, or Medicaid, will be reviewed every year.</b> <br><br> This process is called renewal. DC Health Link will review eligibility by checking its records and other electronic data sources including, with my consent, information about my federal tax returns from the IRS. DC Health Link will send me a notice that includes the information it has found by checking its records and other electronic data sources, and I will be able to correct information that is wrong. If found eligible for private health insurance, with or without financial assistance, or Medicaid, I may also be asked to provide additional information to extend coverage for another year for myself and/or other members of my application group.
+                    text: <b>I understand that eligibility for private health insurance, with or without financial assistance, or Medicaid, will be reviewed every year.</b> <br><br> This process is called renewal. #{Settings.site.short_name} will review eligibility by checking its records and other electronic data sources including, with my consent, information about my federal tax returns from the IRS. #{Settings.site.short_name} will send me a notice that includes the information it has found by checking its records and other electronic data sources, and I will be able to correct information that is wrong. If found eligible for private health insurance, with or without financial assistance, or Medicaid, I may also be asked to provide additional information to extend coverage for another year for myself and/or other members of my application group.
             - cells:
                   - gutter: 12
                     type: checkbox
@@ -160,7 +161,7 @@
                   type: raw_html
                   classNames: span-text
                   text: <b> I understand that I must report any changes that might affect my eligibility or the eligibility of a household member for health insurance. </b> <br> <br>
-                        I can report changes by going online and logging into "My Account", by calling DC Health Link's Contact Center toll free at (855) 532-5465 TTY&#58; 711,
+                        I can report changes by going online and logging into "My Account", by calling "#{Settings.site.short_name}"'s Contact Center toll free at "#{Settings.contact_center.phone_number}" TTY&#58; 711,
                         or by submitting information via mail or in-person at one of the Department of Human Services service centers. <br> <br>
 
                         I'm the person whose name appears in the signature line below. I understand that I'm submitting an application for health insurance and that

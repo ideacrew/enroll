@@ -16,3 +16,5 @@ registry:
         settings:
           - key: :aceds_curam
             item: false
+          - key: :ivl_application_checklist
+            item: 'IVL_Application_Checklist_Final_02172021.pdf'

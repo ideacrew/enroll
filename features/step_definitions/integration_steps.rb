@@ -315,6 +315,46 @@ Given(/^a Hbx admin with read only permissions exists$/) do
   FactoryBot.create :hbx_enrollment,family:user.primary_family, household:user.primary_family.active_household
 end
 
+Given(/^the shop market configuration is disabled$/) do
+  disable_feature :aca_shop_market
+end
+
+Given(/^the shop market configuration is enabled$/) do
+  enable_feature :aca_shop_market
+  enable_feature :agency_staff
+  load "components/benefit_sponsors/app/models/benefit_sponsors/organizations/broker_agency_profile.rb"
+  load "components/benefit_sponsors/app/models/benefit_sponsors/organizations/general_agency_profile.rb"
+end
+
+Given(/^the fehb market configuration is disabled$/) do
+  disable_feature :fehb_market
+end
+
+Given(/^the fehb market configuration is enabled$/) do
+  enable_feature :fehb_market
+end
+
+Given(/^the individual market configuration is disabled$/) do
+  disable_feature :aca_individual_market
+end
+
+Given(/^the individual market configuration is enabled$/) do
+  enable_feature :aca_individual_market
+end
+
+Given(/^both shop and fehb market configurations are enabled$/) do
+  enable_feature :aca_shop_market
+  enable_feature :fehb_market
+end
+
+Given(/^send secure message to employer is enabled$/) do
+  enable_feature :send_secure_message_employer
+end
+
+Given(/^send secure message to employer is disabled$/) do
+  disable_feature :send_secure_message_employer
+end
+
 When(/(^.+) enters? office location for (.+)$/) do |role, location|
   location = eval(location) if location.class == String
   RatingArea.where(zip_code: "01001").first || FactoryBot.create(:rating_area, zip_code: "01001", county_name: "Hampden", rating_area: Settings.aca.rating_areas.first)
@@ -448,7 +488,7 @@ end
 
 Then(/^(?:.+) should see a successful sign up message$/) do
   FactoryBot.create(:sic_code, sic_code: "0111")
-  expect(page).to have_content("Welcome to DC Health Link")
+  expect(page).to have_content("Welcome to #{EnrollRegistry[:enroll_app].setting(:short_name).item}")
   # screenshot("employer_sign_up_welcome")
 end
 
@@ -481,8 +521,8 @@ When (/^(.*) logs? out$/) do |someone|
   click_link "Logout"
   visit "/"
   find('.container.welcome', wait: 5) do |element|
-    element.find('.heading-text', text: /Welcome to #{Settings.site.short_name}/i)
-    element.find('.sub-text', text: /#{Settings.site.byline}/i)
+    element.find('.heading-text', text: /Welcome to #{EnrollRegistry[:enroll_app].setting(:short_name).item}/i)
+    element.find('.sub-text', text: /#{EnrollRegistry[:enroll_app].setting(:byline).item}/i)
   end
 end
 
@@ -497,8 +537,7 @@ end
 
 Then(/^.+ should see the employee search page$/) do
   wait_for_ajax(2, 2)
-  sleep(1)
-  expect(find('.interaction-field-control-person-first-name')).to be_visible
+  expect(find('.interaction-field-control-person-first-name', wait: 5)).to be_visible
   # screenshot("employer_search")
 end
 
@@ -698,12 +737,14 @@ end
 When(/^.+ enters? the dependent info of .+ daughter$/) do
   fill_in 'dependent[first_name]', with: 'Cynthia'
   fill_in 'dependent[last_name]', with: 'White'
+  fill_in 'dependent[ssn]', with: '999999999'
   date = TimeKeeper.date_of_record - 28.years
   dob = date.to_s
   fill_in 'jq_datepicker_ignore_dependent[dob]', with: dob
-  find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Child')]").click
   find(:xpath, "//label[@for='radio_female']").click
   find(:xpath, "//label[@for='radio_female']").click
+  find('.select-relation .selectric span.label').click
+  find('.selectric-scroll li', text: 'Child').click
 end
 
 When(/^.+ enters? the dependent info of Patrick wife$/) do
@@ -772,7 +813,7 @@ When(/^.+ clicks? shop for plans button$/) do
 end
 
 When(/^.+ clicks Shop for new plan button$/) do
-  find('.interaction-click-control-shop-for-new-plan', wait: 5).click
+  find('.interaction-click-control-shop-for-new-plan', wait: 10).click
 end
 
 Then(/^.+ should see the list of plans$/) do
@@ -837,7 +878,7 @@ Then(/^.+ should see the coverage summary page$/) do
 end
 
 When(/^.+ clicks? on Confirm button on the coverage summary page$/) do
-  find('.interaction-click-control-confirm', wait: 5).click
+  find('.interaction-click-control-confirm', wait: 10).click
 end
 
 Then(/^.+ should see the receipt page$/) do
@@ -849,7 +890,7 @@ end
 
 Then(/^.+ should see the "my account" page$/) do
   find('.my-account-page', wait: 10)
-  expect(page).to have_content("My #{Settings.site.short_name}")
+  expect(page).to have_content("My #{EnrollRegistry[:enroll_app].setting(:short_name).item}")
   # screenshot("my_account")
 end
 
@@ -909,9 +950,9 @@ Then(/^.+ should see the appropriate (.*?) template text$/) do |market_name|
     expect(page).to have_content("Your Enrollment Confirmation")
     expect(page).to have_content('plan offered by your employer.')
     expect(page).to have_content('Your employer contributes')
-    expect(page).to have_content('Thank you for enrolling in coverage through DC Health Link')
+    expect(page).to have_content("Thank you for enrolling in coverage through #{EnrollRegistry[:enroll_app].setting(:short_name).item}")
     # In the email signature
-    [Settings.site.short_name, Settings.contact_center.short_number, Settings.contact_center.tty].each do |email_signature_line|
+    [EnrollRegistry[:enroll_app].setting(:short_name).item, Settings.contact_center.short_number, Settings.contact_center.tty].each do |email_signature_line|
       expect(page).to have_content(email_signature_line)
     end
   end

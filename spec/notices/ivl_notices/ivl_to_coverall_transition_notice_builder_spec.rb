@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe IvlNotices::IvlToCoverallTransitionNoticeBuilder, dbclean: :after_each do
@@ -14,22 +16,26 @@ RSpec.describe IvlNotices::IvlToCoverallTransitionNoticeBuilder, dbclean: :after
   end
   let(:issuer_profile) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
   let!(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01', issuer_profile: issuer_profile)}
-  let!(:hbx_enrollment_member) {FactoryBot.create(:hbx_enrollment_member,hbx_enrollment: hbx_enrollment, applicant_id: family.family_members.first.id, is_subscriber: true, eligibility_date: TimeKeeper.date_of_record.prev_month )}
-  let(:application_event){ double("ApplicationEventKind",{
-      :name =>'Ivl to Coverall Transition Notice',
-      :notice_template => 'notices/ivl/ivl_to_coverall_notice',
-      :notice_builder => 'IvlNotices::IvlToCoverallTransitionNoticeBuilder',
-      :event_name => 'ivl_to_coverall_transition_notice',
-      :mpi_indicator => 'IVL_CDC',
-      :title => "Your Insurance through DC Health Link Has Changed to Cover All DC"})
-  }
-  let(:valid_params) {{
+  let!(:hbx_enrollment_member) {FactoryBot.create(:hbx_enrollment_member,hbx_enrollment: hbx_enrollment, applicant_id: family.family_members.first.id, is_subscriber: true, eligibility_date: TimeKeeper.date_of_record.prev_month)}
+  let(:application_event) do
+    double("ApplicationEventKind",{
+             :name => 'Ivl to Coverall Transition Notice',
+             :notice_template => 'notices/ivl/ivl_to_coverall_notice',
+             :notice_builder => 'IvlNotices::IvlToCoverallTransitionNoticeBuilder',
+             :event_name => 'ivl_to_coverall_transition_notice',
+             :mpi_indicator => 'IVL_CDC',
+             :title => "Your Insurance through #{EnrollRegistry[:enroll_app].setting(:short_name).item} Has Changed to Cover All DC"
+           })
+  end
+  let(:valid_params) do
+    {
       :subject => application_event.title,
       :mpi_indicator => application_event.mpi_indicator,
       :event_name => application_event.event_name,
       :template => application_event.notice_template,
       :options => {family: family.id.to_s, result: {people: [person.id.to_s]}}
-  }}
+    }
+  end
 
   describe "New" do
     before do
@@ -94,17 +100,17 @@ RSpec.describe IvlNotices::IvlToCoverallTransitionNoticeBuilder, dbclean: :after
 
     it "should have caps DC in the title" do
       title = @ivl_cdc_notice.notice_filename
-      expect(title).to match (/DC/)
+      expect(title).to match(/DC/)
     end
 
     it "should not have Dc in the title" do
       title = @ivl_cdc_notice.notice_filename
-      expect(title).not_to match (/Dc/)
+      expect(title).not_to match(/Dc/)
     end
 
     it "should not have Dc in the title" do
       title = @ivl_cdc_notice.notice_filename
-      expect(title).to match (/YourInsuranceThroughDCHealthLinkHasChangedToCoverAllDC/)
+      expect(title).to match(/YourInsuranceThroughDCHealthLinkHasChangedToCoverAllDC/)
     end
   end
 

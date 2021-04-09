@@ -1,4 +1,5 @@
 class Employers::CensusEmployeesController < ApplicationController
+  include ResourceConfigurator
   before_action :find_employer
   before_action :find_census_employee, only: [:edit, :update, :show, :delink, :terminate, :rehire, :benefit_group, :cobra ,:cobra_reinstate, :confirm_effective_date]
   before_action :updateable?, except: [:edit, :show, :update, :benefit_group]

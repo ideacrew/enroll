@@ -60,6 +60,14 @@ registry:
     features:
       - key: :unemployment_income
         is_enabled: true
+  - namespace:
+    - :documents
+    features:
+      - key: financial_assistance_documents
+        is_enabled: true
+        settings:
+          - key: :ivl_application_checklist
+            item: 'db/documents/ivl_checklist.pdf'
 
   # TODO eligibility engine connectivity(HAVEN) settings
   # TODO mec service connectivity settings

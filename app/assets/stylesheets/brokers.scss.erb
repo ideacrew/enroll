@@ -67,7 +67,7 @@ input[type=number]::-webkit-outer-spin-button {
       color: $primary-green;
       font-weight: bold;
       span {
-        color: #333;
+        color: <%= EnrollRegistry[:background_color].settings(:color).item %>;
         font-weight: normal;
       }
     }
@@ -209,7 +209,7 @@ input[type=number]::-webkit-outer-spin-button {
         color: $primary-green;
         font-weight: bold;
         span {
-          color: #333;
+          color: <%= EnrollRegistry[:background_color].settings(:color).item %>;
           font-weight: normal;
         }
       }
@@ -368,11 +368,11 @@ input[type=number]::-webkit-outer-spin-button {
      }
 
     .quote_detail_plan_header {
-      background: linear-gradient(#777, #444);
+      background: linear-gradient(<%= EnrollRegistry[:background_color].settings(:color).item %>, #444);
       border-left: 1px solid #555;
-      border-right: 1px solid #777;
+      border-right: 1px solid <%= EnrollRegistry[:border_right].settings(:color).item %>;
       border-top: 1px solid #555;
-      border-bottom: 1px solid #333;
+      border-bottom: 1px solid <%= EnrollRegistry[:background_color].settings(:color).item %>;
       box-shadow: inset 0 1px 0 #999;
       color: #fff;
       font-weight: bold;
@@ -411,7 +411,7 @@ input[type=number]::-webkit-outer-spin-button {
   padding-left:20px;
   padding-right:20px;
   
-  .dc-green {
+  .green {
     color:$primary-green;
   }
   .photo {

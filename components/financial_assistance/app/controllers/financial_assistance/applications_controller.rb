@@ -31,7 +31,8 @@ module FinancialAssistance
       load_support_texts
     end
 
-    def step # rubocop:disable Metrics/CyclomaticComplexity
+    # rubocop:disable Metrics/AbcSize
+    def step
       save_faa_bookmark(request.original_url.gsub(%r{/step.*}, "/step/#{@current_step.to_i}"))
       set_admin_bookmark_url
       flash[:error] = nil
@@ -68,6 +69,7 @@ module FinancialAssistance
       end
       # rubocop:enable Metrics/BlockNesting
     end
+    # rubocop:enable Metrics/AbcSize
 
     def copy
       service = FinancialAssistance::Services::ApplicationService.new(application_id: params[:id])
@@ -75,8 +77,7 @@ module FinancialAssistance
       redirect_to edit_application_path(@application)
     end
 
-    def help_paying_coverage
-    end
+    def help_paying_coverage; end
 
     def render_message
       @message = params["message"]
@@ -179,7 +180,9 @@ module FinancialAssistance
     end
 
     def checklist_pdf
-      send_file(FinancialAssistance::Engine.root.join('db','documents', 'IVL_Application_Checklist_Final_02172021.pdf').to_s, :disposition => "inline", :type => "application/pdf")
+      send_file(
+        FinancialAssistance::Engine.root.join(FinancialAssistanceRegistry[:financial_assistance_documents].settings(:ivl_application_checklist).to_s), :disposition => "inline", :type => "application/pdf"
+      )
     end
 
     private

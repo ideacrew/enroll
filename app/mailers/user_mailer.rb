@@ -4,9 +4,11 @@ class UserMailer < ApplicationMailer
   add_template_helper Config::AcaHelper
   add_template_helper Config::SiteHelper
   add_template_helper Config::ContactCenterHelper
+  add_template_helper ::L10nHelper
   include Config::AcaHelper
   include Config::SiteHelper
   include Config::ContactCenterHelper
+  include ::L10nHelper
 
   def welcome(user)
     if user.email.present?
@@ -153,7 +155,7 @@ class UserMailer < ApplicationMailer
   def generic_notice_alert_to_ba_and_ga(first_name, email, employer_name)
     return if email.blank?
 
-    message = mail({to: email, subject: "You have a new message from DC Health Link", from: 'no-reply@individual.dchealthlink.com'}) do |format|
+    mail({to: email, subject: "You have a new message from #{site_short_name}", from: "no-reply@individual.#{site_domain_name}"}) do |format|
       format.html {render "generic_notice_alert_to_broker_and_ga", locals: {first_name: first_name, employer_name: employer_name}}
     end
   end

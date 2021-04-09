@@ -1,6 +1,8 @@
 module Effective
   module Datatables
     class UserAccountDatatable < Effective::MongoidDatatable
+      include Config::SiteModelConcern
+
       datatable do
         table_column :name, :label => 'USERNAME', :proc => Proc.new { |row| row.oim_id }, :filter => false, :sortable => true
         table_column :ssn, :label => 'SSN', :proc => Proc.new { |row| truncate(number_to_obscured_ssn(row.person.ssn)) if row.person.present? }, :filter => false, :sortable => false
@@ -51,23 +53,21 @@ module Effective
       end
 
       def nested_filter_definition
-        filters = {
-            lock_unlock:
-                [
-                    {scope:'locked', label: 'Locked'},
-                    {scope:'unlocked', label: 'Unlocked'},
-                ],
-            users:
-                [
-                    {scope:'all', label: 'All', subfilter: :lock_unlock},
-                    {scope:'all_employee_roles', label: 'Employee', subfilter: :lock_unlock},
-                    {scope:'all_employer_staff_roles', label: 'Employer', subfilter: :lock_unlock},
-                    {scope:'all_broker_roles', label: 'Broker', subfilter: :lock_unlock},
-                    {scope: 'all_consumer_roles', label: 'Consumer', subfilter: :lock_unlock}
-                ],
-            top_scope: :users
+        {
+          lock_unlock:
+              [
+                {scope: 'locked', label: 'Locked'},
+                {scope: 'unlocked', label: 'Unlocked'}
+              ],
+          users:
+              [{scope: 'all', label: 'All', subfilter: :lock_unlock}].tap do |a|
+                a << {scope: 'all_employee_roles', label: 'Employee', subfilter: :lock_unlock} if is_shop_or_fehb_market_enabled?
+                a << {scope: 'all_employer_staff_roles', label: 'Employer', subfilter: :lock_unlock} if is_shop_or_fehb_market_enabled?
+                a << {scope: 'all_broker_roles', label: 'Broker', subfilter: :lock_unlock}
+                a << {scope: 'all_consumer_roles', label: 'Consumer', subfilter: :lock_unlock}
+              end,
+          top_scope: :users
         }
-
       end
     end
   end

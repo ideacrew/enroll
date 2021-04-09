@@ -37,14 +37,14 @@ end
 Then(/^Admin (.*) navigate to the Manage SEPs screen$/) do |action|
   if action == 'can'
     expect(page).to have_xpath('//*[@id="Tab:all"]', text: 'All')
-    expect(page).to have_xpath('//*[@id="Tab:ivl_qles"]', text: 'Individual')
-    expect(page).to have_xpath('//*[@id="Tab:shop_qles"]', text: 'Shop')
-    expect(page).to have_xpath('//*[@id="Tab:fehb_qles"]', text: 'Congress')
+    expect(page).to have_xpath('//*[@id="Tab:ivl_qles"]', text: 'Individual') if is_individual_market_enabled?
+    expect(page).to have_xpath('//*[@id="Tab:shop_qles"]', text: 'Shop') if is_shop_market_enabled?
+    expect(page).to have_xpath('//*[@id="Tab:fehb_qles"]', text: 'Congress') if is_fehb_market_enabled?
   else
     expect(page).not_to have_xpath('//*[@id="Tab:all"]', text: 'All')
-    expect(page).not_to have_xpath('//*[@id="Tab:ivl_qles"]', text: 'Individual')
-    expect(page).not_to have_xpath('//*[@id="Tab:shop_qles"]', text: 'Shop')
-    expect(page).not_to have_xpath('//*[@id="Tab:fehb_qles"]', text: 'Congress')
+    expect(page).not_to have_xpath('//*[@id="Tab:ivl_qles"]', text: 'Individual') if is_individual_market_enabled?
+    expect(page).not_to have_xpath('//*[@id="Tab:shop_qles"]', text: 'Shop') if is_shop_market_enabled?
+    expect(page).not_to have_xpath('//*[@id="Tab:fehb_qles"]', text: 'Congress') if is_fehb_market_enabled?
   end
 end
 
@@ -68,6 +68,18 @@ end
 
 def sep_type_end_on
   TimeKeeper.date_of_record.next_year
+end
+
+def is_shop_market_enabled?
+  EnrollRegistry.feature_enabled?(:aca_shop_market)
+end
+
+def is_fehb_market_enabled?
+  EnrollRegistry.feature_enabled?(:fehb_market)
+end
+
+def is_individual_market_enabled?
+  EnrollRegistry.feature_enabled?(:aca_individual_market)
 end
 
 def ivl_qualifying_life_events
@@ -109,39 +121,39 @@ When("Admin clicks on the Sort SEPs button") do
 end
 
 Then("Admin should see three tabs Individual, Shop and Congress markets") do
-  expect(page).to have_content('Individual')
-  expect(page).to have_content('Shop')
-  expect(page).to have_content('Congress')
+  expect(page).to have_content('Individual') if is_individual_market_enabled?
+  expect(page).to have_content('Shop') if is_shop_market_enabled?
+  expect(page).to have_content('Congress') if is_fehb_market_enabled?
 end
 
 When(/^Admin clicks on (.*) tab$/) do |market_kind|
-  if market_kind == 'individual'
+  if market_kind == 'individual' && is_individual_market_enabled?
     find(:xpath, '//div[2]/div[2]/ul/li[1]/a').click
-  elsif market_kind == 'shop'
+  elsif market_kind == 'shop' && is_shop_market_enabled?
     find(:xpath, '//div[2]/div[2]/ul/li[2]/a').click
-  else
+  elsif is_fehb_market_enabled?
     find(:xpath, '//div[2]/div[2]/ul/li[3]/a').click
   end
 end
 
 Then(/(.*) should see listed (.*) market SEP Types$/) do |_user, market_kind|
-  if market_kind == 'individual'
+  if market_kind == 'individual' && is_individual_market_enabled?
     step "Admin should see listed Active individual market SEP Types on datatable"
-  elsif market_kind == 'shop'
+  elsif market_kind == 'shop' && is_shop_market_enabled?
     step "Admin should see listed Active shop market SEP Types on datatable"
-  else
+  elsif is_fehb_market_enabled?
     step "Admin should see listed Active fehb market SEP Types on datatable"
   end
 end
 
 Then(/Admin should see listed Active (.*) market SEP Types on datatable$/) do |market_kind|
-  if market_kind == 'individual'
+  if market_kind == 'individual' && is_individual_market_enabled?
     expect(page).to have_content('Had a baby')
     expect(page).to have_content('Married')
-  elsif market_kind == 'shop'
+  elsif market_kind == 'shop' && is_shop_market_enabled?
     expect(page).to have_content('Covid-19')
     expect(page).to have_content('Married')
-  else
+  elsif is_fehb_market_enabled?
     expect(page).to have_content('Losing other health insurance')
     expect(page).to have_content('Adopted a child')
   end
@@ -244,11 +256,11 @@ Given(/(.*) Qualifying life events of (.*) market is present$/) do |state, marke
   reasons = QualifyingLifeEventKind.non_draft.pluck(:reason).uniq
   Types.send(:remove_const, "QLEKREASONS")
   Types.const_set("QLEKREASONS", Types::Coercible::String.enum(*reasons))
-  if market_kind == "individual"
+  if market_kind == "individual" && is_individual_market_enabled?
     qlek.update_attributes(effective_on_kinds: ['date_of_event'])
-  elsif market_kind == 'shop'
+  elsif market_kind == 'shop' && is_shop_market_enabled?
     qlek.update_attributes(effective_on_kinds: ['first_of_this_month'])
-  else
+  elsif is_fehb_market_enabled?
     qlek.update_attributes(effective_on_kinds: ['fixed_first_of_next_month'])
   end
 end
@@ -296,11 +308,11 @@ When("Admin should see Reason field filled with reason") do
 end
 
 When(/Admin should see (.*) market radio button selected$/) do |market_kind|
-  if market_kind == 'individual'
+  if market_kind == 'individual' && is_individual_market_enabled?
     expect(find(:xpath, '//input[@value="individual"]').value.present?).to eq true
-  elsif market_kind == 'shop'
+  elsif market_kind == 'shop' && is_shop_market_enabled?
     expect(find(:xpath, '//input[@value="shop"]').value.present?).to eq true
-  else
+  elsif is_fehb_market_enabled?
     expect(find(:xpath, '//input[@value="fehb"]').value.present?).to eq true
   end
 end
@@ -314,11 +326,11 @@ When("Admin should see Post Event Sep In Days field filled with days") do
 end
 
 When(/Admin should see effective on kinds checked based on (.*)$/) do |market_kind|
-  if market_kind == 'individual'
+  if market_kind == 'individual' && is_individual_market_enabled?
     expect(find("input[type='checkbox'][name='forms_qualifying_life_event_kind_form[effective_on_kinds][]'][value='date_of_event']")).to be_checked
-  elsif market_kind == 'shop'
+  elsif market_kind == 'shop' && is_shop_market_enabled?
     expect(find("input[type='checkbox'][name='forms_qualifying_life_event_kind_form[effective_on_kinds][]'][value='first_of_this_month']")).to be_checked
-  else
+  elsif is_fehb_market_enabled?
     expect(find("input[type='checkbox'][name='forms_qualifying_life_event_kind_form[effective_on_kinds][]'][value='fixed_first_of_next_month']")).to be_checked
   end
 end
@@ -342,11 +354,11 @@ end
 
 And(/Admin selects (.*) market radio button$/) do |market_kind|
   sleep(2)
-  if market_kind == 'individual'
+  if market_kind == 'individual' && is_individual_market_enabled?
     find(:xpath, '//input[@value="individual"]', :wait => 2).click
-  elsif market_kind == 'shop'
+  elsif market_kind == 'shop' && is_shop_market_enabled?
     find(:xpath, '//input[@value="shop"]', :wait => 2).click
-  else
+  elsif is_fehb_market_enabled?
     find(:xpath, '//input[@value="fehb"]', :wait => 2).click
   end
 end
@@ -358,22 +370,22 @@ end
 
 And(/Admin fills active reason for (.*) SEP type form$/) do |market_kind|
   sleep(2)
-  if market_kind == 'individual'
+  if market_kind == 'individual' && is_individual_market_enabled?
     find("option[value='birth']").click
-  elsif market_kind == 'shop'
+  elsif market_kind == 'shop' && is_shop_market_enabled?
     find("option[value='marriage']").click
-  else
+  elsif is_fehb_market_enabled?
     find("option[value='adoption']").click
   end
 end
 
 And(/Admin fills active title for (.*) SEP type form$/) do |market_kind|
   sleep(2)
-  if market_kind == 'individual'
+  if market_kind == 'individual' && is_individual_market_enabled?
     fill_in "SEP Name *", with: "Had a baby"
-  elsif market_kind == 'shop'
+  elsif market_kind == 'shop' && is_shop_market_enabled?
     fill_in "SEP Name *", with: "Married"
-  else
+  elsif is_fehb_market_enabled?
     fill_in "SEP Name *", with: "Adopted a child"
   end
 end
@@ -453,13 +465,13 @@ end
 
 When(/Admin clicks (.*) filter on SEP Types datatable$/) do |market_kind|
   divs = page.all('div')
-  if market_kind == 'individual'
+  if market_kind == 'individual' && is_individual_market_enabled?
     ivl_filter = divs.detect { |div| div.text == 'Individual' && div[:id] == 'Tab:ivl_qles' }
     ivl_filter.click
-  elsif market_kind == 'shop'
+  elsif market_kind == 'shop' && is_shop_market_enabled?
     shop_filter = divs.detect { |div| div.text == 'Shop' && div[:id] == 'Tab:shop_qles' }
     shop_filter.click
-  else
+  elsif is_fehb_market_enabled?
     fehb_filter = divs.detect { |div| div.text == 'Congress' && div[:id] == 'Tab:fehb_qles' }
     fehb_filter.click
   end
@@ -468,37 +480,37 @@ end
 And(/Admin clicks on (.*) filter of (.*) market filter$/) do |state, market_kind|
   if state == 'Draft'
     filter_divs = page.all('div')
-    if market_kind == 'individual'
+    if market_kind == 'individual' && is_individual_market_enabled?
       ivl_draft_filter = filter_divs.detect { |div| div.text == 'Draft' && div[:id] == 'Tab:ivl_qles-ivl_draft_qles' }
       ivl_draft_filter.click
-    elsif market_kind == 'shop'
+    elsif market_kind == 'shop' && is_shop_market_enabled?
       shop_draft_filter = filter_divs.detect { |div| div.text == 'Draft' && div[:id] == 'Tab:shop_qles-shop_draft_qles' }
       shop_draft_filter.click
-    else
+    elsif is_fehb_market_enabled?
       fehb_draft_filter = filter_divs.detect { |div| div.text == 'Draft' && div[:id] == 'Tab:fehb_qles-fehb_draft_qles' }
       fehb_draft_filter.click
     end
   elsif state == 'Active'
     filter_divs = page.all('div')
-    if market_kind == 'individual'
+    if market_kind == 'individual' && is_individual_market_enabled?
       ivl_active_filter = filter_divs.detect { |div| div.text == 'Active' && div[:id] == 'Tab:ivl_qles-ivl_active_qles' }
       ivl_active_filter.click
-    elsif market_kind == 'shop'
+    elsif market_kind == 'shop' && is_shop_market_enabled?
       shop_active_filter = filter_divs.detect { |div| div.text == 'Active' && div[:id] == 'Tab:shop_qles-shop_active_qles' }
       shop_active_filter.click
-    else
+    elsif is_fehb_market_enabled?
       fehb_active_filter = filter_divs.detect { |div| div.text == 'Active' && div[:id] == 'Tab:fehb_qles-fehb_active_qles' }
       fehb_active_filter.click
     end
   elsif state == 'Inactive'
     filter_divs = page.all('div')
-    if market_kind == 'individual'
+    if market_kind == 'individual' && is_individual_market_enabled?
       ivl_active_filter = filter_divs.detect { |div| div.text == 'Inactive' && div[:id] == 'Tab:ivl_qles-ivl_inactive_qles' }
       ivl_active_filter.click
-    elsif market_kind == 'shop'
+    elsif market_kind == 'shop' && is_shop_market_enabled?
       shop_active_filter = filter_divs.detect { |div| div.text == 'Inactive' && div[:id] == 'Tab:shop_qles-shop_inactive_qles' }
       shop_active_filter.click
-    else
+    elsif is_fehb_market_enabled?
       fehb_active_filter = filter_divs.detect { |div| div.text == 'Inactive' && div[:id] == 'Tab:fehb_qles-fehb_inactive_qles' }
       fehb_active_filter.click
     end
@@ -511,11 +523,11 @@ Then("Admin should see newly created SEP Type title on Datatable") do
 end
 
 Then(/Admin should see newly created SEP Type with Active SEP Type title for (.*) on Datatable$/) do |market_kind|
-  if market_kind == 'individual'
+  if market_kind == 'individual' && is_individual_market_enabled?
     expect(page).to have_content('Had a baby')
-  elsif market_kind == 'shop'
+  elsif market_kind == 'shop' && is_shop_market_enabled?
     expect(page).to have_content('Married')
-  else
+  elsif is_fehb_market_enabled?
     expect(page).to have_content('Adopted a child')
   end
 end
@@ -525,13 +537,13 @@ Then("Admin navigates to SEP Type Details page") do
 end
 
 Then(/Admin clicks on Active SEP Type title for (.*) on Datatable$/) do |market_kind|
-  if market_kind == 'individual'
+  if market_kind == 'individual' && is_individual_market_enabled?
     expect(page).to have_content('Had a baby')
     find_link('Had a baby').click
-  elsif market_kind == 'shop'
+  elsif market_kind == 'shop' && is_shop_market_enabled?
     expect(page).to have_content('Married')
     find_link('Married').click
-  else
+  elsif is_fehb_market_enabled?
     expect(page).to have_content('Adopted a child')
     find_link('Adopted a child').click
   end
@@ -554,11 +566,11 @@ When("Admin should see Reason field disabled") do
 end
 
 When(/Admin should see (.*) market radio button disabled$/) do |market_kind|
-  if market_kind == 'individual'
+  if market_kind == 'individual' && is_individual_market_enabled?
     expect(find(:xpath, '//input[@value="individual"]').disabled?).to eq true
-  elsif market_kind == 'shop'
+  elsif market_kind == 'shop' && is_shop_market_enabled?
     expect(find(:xpath, '//input[@value="shop"]').disabled?).to eq true
-  else
+  elsif is_fehb_market_enabled?
     expect(find(:xpath, '//input[@value="fehb"]').disabled?).to eq true
   end
 end
@@ -572,11 +584,11 @@ When("Admin should see Post Event Sep In Days field disabled") do
 end
 
 When(/Admin should see effective on kinds disabled for (.*)$/) do |market_kind|
-  if market_kind == 'individual'
+  if market_kind == 'individual' && is_individual_market_enabled?
     expect(find("input[type='checkbox'][name='forms_qualifying_life_event_kind_form[effective_on_kinds][]'][value='date_of_event']").disabled?).to eq true
-  elsif market_kind == 'shop'
+  elsif market_kind == 'shop' && is_shop_market_enabled?
     expect(find("input[type='checkbox'][name='forms_qualifying_life_event_kind_form[effective_on_kinds][]'][value='first_of_this_month']").disabled?).to eq true
-  else
+  elsif is_fehb_market_enabled?
     expect(find("input[type='checkbox'][name='forms_qualifying_life_event_kind_form[effective_on_kinds][]'][value='fixed_first_of_next_month']").disabled?).to eq true
   end
 end
@@ -653,11 +665,10 @@ Then("Admin should see Expire dropdown button") do
 end
 
 Then(/Admin (.*) see Clone button$/) do |action|
-  sleep 2
   if action == 'cannot'
-    expect(page).not_to have_content('Clone')
+    expect(page).not_to have_content('Clone', wait: 5)
   else
-    expect(page).to have_content('Clone')
+    expect(page).to have_content('Clone', wait: 5)
   end
 end
 
@@ -734,7 +745,9 @@ Then(/^\w+ should (.*) input field to enter the Sep Type date$/) do |action|
     expect(page).to have_content("Date of domestic partnership")
   else
     expect(page).not_to have_content("Date of domestic partnership")
-    expect(page).to have_content("Based on the information you entered, you may be eligible for a special enrollment period. Please call us at 1-855-532-5465 to give us more information so we can see if you qualify.")
+
+    expect(page).to have_content("Based on the information you entered, you may be eligible for a special enrollment period.")
+    expect(page).to have_content("Please call us at #{EnrollRegistry[:enroll_app].setting(:contact_center_short_number)&.item} to give us more information so we can see if you qualify.")
   end
 end
 
@@ -757,7 +770,11 @@ Then(/^\w+ should (.*) sucess confirmation text$/) do |action|
   if action == 'see'
     expect(page).to have_content "Based on the information you entered, you may be eligible to enroll now but there is limited time"
   else
-    expect(page).to have_content "The date you submitted does not qualify for special enrollment.\nPlease double check the date or contact DC Health Link's Customer Care Center: 1-855-532-5465.\n\nShop for health and dental plans"
+    message = "The date you submitted does not qualify for special enrollment."
+    message_1 = "Please double check the date or contact #{site_short_name}'s Customer Care Center: #{EnrollRegistry[:enroll_app].setting(:contact_center_short_number)&.item}."
+    expect(page).to have_content(message)
+    expect(page).to have_content(message_1)
+    expect(page).to have_content("Shop for health and dental plans")
   end
 end
 
@@ -901,4 +918,24 @@ end
 
 And("I should see a failure message for plan shopping") do
   expect(page).to have_content("You must select at least one Eligible applicant to enroll in the healthcare plan")
+end
+
+def Announcement.current_msg_for_employee
+  Announcement.current.by_audience('Employee').map(&:content)
+end
+
+def Announcement.current_msg_for_employer
+  Announcement.current.by_audience('Employer').map(&:content)
+end
+
+Given(/all announcements are enabled for user to select/) do
+  Announcement::AUDIENCE_KINDS = [].tap do |a|
+    a << 'Employer' if is_shop_or_fehb_market_enabled?
+    a << 'Employee' if is_shop_or_fehb_market_enabled?
+    a << ['IVL', 'Broker', 'GA', 'Web_Page']
+  end.flatten
+end
+
+Given(/all market kinds are enabled for user to select/) do
+  add_shop_markets_to_sep_types
 end

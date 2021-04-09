@@ -14,6 +14,10 @@ RSpec.describe User, :type => :model, dbclean: :after_each do
     }
   end
 
+  def is_shop_or_fehb_market_enabled?
+    EnrollRegistry.feature_enabled?(:aca_shop_market) || EnrollRegistry.feature_enabled?(:fehb_market)
+  end
+
   describe 'user' do
     context "when all params are valid" do
       let(:params){valid_params}
@@ -180,7 +184,7 @@ RSpec.describe User, :type => :model, dbclean: :after_each do
         allow(user).to receive(:person).and_return(person)
         #Deprecated. DO NOT USE.  Migrate to person.active_employee_roles.present?
         #expect(user.has_employee_role?).to be_truthy
-        expect(user.has_employer_staff_role?).to be_truthy
+        expect(user.has_employer_staff_role?).to be_truthy if is_shop_or_fehb_market_enabled?
         expect(user.has_broker_role?).to be_truthy
         expect(user.has_hbx_staff_role?).to be_truthy
       end
@@ -225,8 +229,17 @@ RSpec.describe User, :type => :model, dbclean: :after_each do
     let(:person) { FactoryBot.create(:person) }
     let(:user) { FactoryBot.create(:user, person: person) }
 
+    def Announcement.current_msg_for_employee
+      Announcement.current.by_audience('Employee').map(&:content)
+    end
+
+    def Announcement.current_msg_for_employer
+      Announcement.current.by_audience('Employer').map(&:content)
+    end
+
     before :each do
-      Announcement::AUDIENCE_KINDS.each do |kind|
+      Announcement::AUDIENCE_KINDS << ['Employer', 'Employee'] unless is_shop_or_fehb_market_enabled?
+      Announcement::AUDIENCE_KINDS.flatten.each do |kind|
         FactoryBot.create(:announcement, content: "msg for #{kind}", audiences: [kind])
       end
     end
@@ -414,7 +427,7 @@ RSpec.describe User, :type => :model, dbclean: :after_each do
       end
 
       it "should return true when employer staff" do
-        allow(person).to receive(:has_active_employer_staff_role?).and_return true
+        allow(user).to receive(:has_employer_staff_role?).and_return true
         expect(user.can_change_broker?).to eq true
       end
 

@@ -110,10 +110,12 @@ And(/^.+ clicks? on Create Broker Agency$/) do
 end
 
 Then(/^.+ should see broker registration successful message$/) do
-  if Settings.site.key == :dc
-    expect(page).to have_content('Complete the following requirements to become a DC Health Link Registered Broker')
-  end
+  expect(page).to have_content("Complete the following requirements to become a #{EnrollRegistry[:enroll_app].setting(:short_name).item} Registered Broker") if broker_approval_period_enabled?
   expect(page).to have_content('Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed.')
+end
+
+def broker_approval_period_enabled?
+  EnrollRegistry.feature_enabled?(:broker_approval_period)
 end
 
 And(/^.+ should see the list of broker applicants$/) do
@@ -147,7 +149,7 @@ When(/^(.*?) go[es]+ to the brokers tab$/) do |legal_name|
 end
 
 And(/^.+ should receive an invitation email$/) do
-  subject = if Settings.site.key == :dc
+  subject = if EnrollRegistry.feature_enabled?(:broker_approval_period)
               "Invitation to create your Broker account on #{Settings.site.short_name}"
             else
               "Important information for accessing your new broker account through the #{Settings.site.short_name}"
@@ -204,11 +206,10 @@ When(/^.+ clicks? on Browse Brokers button$/) do
 end
 
 Then(/^.+ should see broker agencies index view$/) do
-  # all_broker_agencies.each do |broker_agency|
-  #  legal_name = broker_agency.legal_name
-  #  element = find("div#broker_agencies_listing a", text: /#{legal_name}/i, wait: 5)
-  #  expect(element).to be_present
-  # end
+  @broker_agency_profiles.each_key do |broker_agency_name|
+    element = find("div#broker_agencies_listing a", text: /#{broker_agency_name}/i, wait: 5)
+    expect(element).to be_present
+  end
 end
 
 When(/^.+ searches broker agency (.*?)$/) do |legal_name|
@@ -351,8 +352,8 @@ Then(/^.+ goes to the Consumer page$/) do
 end
 
 Then(/^Primary Broker should see (.*?) account$/) do |name|
-  find('.family_members h2', text: "#{l10n('family_information')}", wait: 5)
-  find('.family_members span', text: name, wait: 5)
+  expect(page).to have_content(name)
+  expect(page).to have_content("Manage Family")
 end
 
 # Then(/^.+ is on the consumer home page$/) do
@@ -418,7 +419,7 @@ Then(/broker (.*?) should receive application (.*?) notification$/) do |broker_n
     when 'approval'
       "Invitation to create your Broker account on #{site_short_name}"
     when 'extended'
-      'Action Needed - Complete Broker Training for DC Health Link for Business'
+      "Action Needed - Complete Broker Training for #{site_short_name} for Business"
     end
   open_email(
     broker_email_address,
