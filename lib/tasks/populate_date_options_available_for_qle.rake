@@ -4,7 +4,7 @@ namespace :qle do
   desc "Populate date_options_available"
   task populate_date_options_available: :environment do
     # QLE with Date options 
-    qles_titles = [  "Enrollment error caused by DC Health Link",
+    qles_titles = [  "Enrollment error caused by #{EnrollRegistry[:enroll_app].setting(:short_name).item}",
               "Enrollment error caused by my health insurance company",
               "Enrollment error caused by someone providing me with enrollment assistance",
               "Health plan contract violation",
