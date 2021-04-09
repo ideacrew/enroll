@@ -22,6 +22,7 @@ module HbxAdminHelper
 
     hbx_enrollment_members = hbx.hbx_enrollment_members
     aptc_ratio_by_member = tax_household.aptc_ratio_by_member
+    return max_aptc if EnrollRegistry[:calculate_monthly_aggregate].feature.is_enabled
     hbx_enrollment_members.each do |hem|
       max_aptc_for_enrollment += (aptc_ratio_by_member[hem.applicant_id.to_s].to_f * max_aptc.to_f)
     end
