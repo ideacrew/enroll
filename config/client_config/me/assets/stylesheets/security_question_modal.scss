@@ -1,0 +1,39 @@
+#securityQuestionModal {
+  .modal-dialog {
+    width: 70%;
+    margin-left: 10%
+  }
+  .modal-content {
+    width: 80%;
+    padding: 5%;
+  }
+  .selectric-wrapper {
+    padding: 1% 2%;
+    padding-left: 10%;
+    width: 83%;
+    .label {
+      font-size: 14px;
+    }
+  }
+  .input-wrapper {
+    input {
+      width: inherit;
+    }
+    width: 100%;
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+}
+
+#securityChallengeModal {
+  .modal-questions-container {
+    h5 {
+      padding: 2%;
+      font-weight: 600;
+    }
+    input {
+      padding: 2%;
+      width: 80%;
+    }
+  }
+}
