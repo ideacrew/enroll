@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 # This class is used to swap the applicaiton wide configuration between different clients (I.E. DC to Maine)
-# "#{Rails.root}/config/client_configuration/#{ENV['state_abbreviation']/templates/**.yml"
-# with the version to toggles' ruby versions and Gemfiles/Gemfile.lock files named .rails_6_ruby_version and Gemfile_rails_6 and Gemfile.rails_6_lock
 class ClientConfigurationToggler < MongoidMigrationTask
   def system_config_target_folder
     "#{Rails.root}/system/"
