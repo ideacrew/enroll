@@ -1808,8 +1808,10 @@ class HbxEnrollment
       elsif enrollment_benefit_application.expired?
         expire_coverage!
       end
-    else
-      current_year_ivl_coverage? ? terminate_coverage!(term_date) : expire_coverage!
+    elsif current_year_ivl_coverage? && term_date.present?
+      terminate_coverage!(term_date)
+    elsif  prior_year_ivl_coverage?
+      expire_coverage!
     end
   end
 
