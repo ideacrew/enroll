@@ -146,8 +146,8 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CreateOrUpdate, dbcle
         appl
       end
 
-      let!(:applicant_params){{:addresses=>[{:address_1=>'1112 Awesome Street', :address_2=>'#112', :address_3=>'', :city=>'Washington', :country_name=>'', :kind=>'home', :state=>'DC', :zip=>'20001', county: ''},
-                                             {:address_1=>'1111 Awesome Street', :address_2=>'#111', :address_3=>'', :city=>'Washington', :country_name=>'', :kind=>'work', :state=>'DC', :zip=>'20001', county: ''}],
+      let!(:applicant_params){{:addresses=>[{:address_1=>'1112 Awesome Street', :address_2=>'#112', :address_3=>'', :city=>'Washington', :country_name=>'', :kind=>'home', :quadrant=>"", :state=>'DC', :zip=>'20001', county: ''},
+                                             {:address_1=>'1111 Awesome Street', :address_2=>'#111', :address_3=>'', :city=>'Washington', :country_name=>'', :kind=>'work', :quadrant=>"", :state=>'DC', :zip=>'20001', county: ''}],
                                :alien_number=>nil,
                                :card_number=>nil,
                                :citizen_status=>"us_citizen",
