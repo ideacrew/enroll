@@ -55,7 +55,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerFired', :dbclean => :after_e
         end
 
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
-          expect(event_name).to eq "acapi.info.events.employer.broker_fired_confirmation_to_employer"
+          expect(event_name).to eq "acapi.info.events.benefit_sponsors/organizations/aca_shop_me_employer_profile.broker_fired_confirmation_to_employer"
           expect(payload[:event_object_kind]).to eq 'BenefitSponsors::Accounts::BrokerAgencyAccount'
           expect(payload[:event_object_id]).to eq model_instance.id.to_s
         end
