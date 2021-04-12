@@ -10,7 +10,7 @@ require 'rails_helper'
 RSpec.describe ::Operations::HbxEnrollments::EnrollmentEndDateChange, dbclean: :after_each do
 
   subject do
-    described_class.new.call(params)
+    described_class.new.call(params: params)
   end
 
   context 'Invalid params' do
