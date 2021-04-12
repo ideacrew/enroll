@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each do
 
-<<<<<<< HEAD
+
   before do
     DatabaseCleaner.clean
   end
@@ -14,9 +14,6 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
       allow(EnrollRegistry[:prior_plan_year_sep].feature).to receive(:is_enabled).and_return(false)
     end
 
-=======
-  describe "A new model instance", dbclean: :after_each do
->>>>>>> 3e07ebc201 (refs #proj 200 add a can renew coverage check box for add sep admin action)
     it { is_expected.to be_mongoid_document }
     it { is_expected.to have_fields(:qualifying_life_event_kind_id).of_type(BSON::ObjectId)}
     it { is_expected.to have_field(:qle_on).of_type(Date)}
