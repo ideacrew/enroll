@@ -239,6 +239,7 @@ $(function() {
   });
 
   $(document).on('click', '.all-filters-row .reset-btn', function(){
+    resetAptc();
     $("#filter-sidebar input[type='checkbox']").attr("checked", false);
     $("#filter-sidebar input[type='text'].plan-metal-premium-from-selection-filter").val("0");
     $("#filter-sidebar input[type='text'].plan-metal-premium-to-selection-filter").val($('#max_total_employee_cost').val());
@@ -248,6 +249,15 @@ $(function() {
     $("#filter-sidebar select.plan-hsa-eligibility-selection-filter").prop('selectedIndex', 0).selectric('refresh');
 		applyPlanFilters();
   });
+
+  function resetAptc() {
+    if ($('.aptc').length > 0){
+      let element = document.querySelector('#elected_aptc');
+      let original_aptc = element.dataset.elected;
+      element.value = original_aptc;
+      element.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+  }
 
   $(document).on('click', '#sort_by a', function(){
     applyPlanSort($(this).data('sort-by'));
