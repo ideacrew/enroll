@@ -304,7 +304,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.female' =>"Female",
   :'en.this_person_is_name' => "This Person Is %{name}'s",
   :'en.live_with_primary_subscriber' => "Lives with primary subscriber",
-  :'en.dependent_lives_with_primary_subscriber' => "This person <strong>lives with primary subsciber</strong>",
+  :'en.dependent_lives_with_primary_subscriber' => "This person <strong>lives with primary subscriber</strong>",
   :'en.confirm_member' => "Confirm Member",
   :'en.household_info' => "Household Info",
   :'en.family_info' => "Family Info",
