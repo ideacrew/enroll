@@ -781,6 +781,7 @@ When(/^.+ enters? the dependent info of Patrick wife$/) do
   find("span", :text => "choose").click
   find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Spouse')]").click
   find(:xpath, "//label[@for='radio_female']").click
+  find(:xpath, '//label[@for="dependent_same_with_primary"]').click
   fill_in 'dependent[addresses][0][address_1]', with: '123 STREET'
   fill_in 'dependent[addresses][0][city]', with: 'WASHINGTON'
   find(:xpath, "//span[@class='label'][contains(., 'SELECT STATE')]").click
@@ -790,6 +791,7 @@ end
 
 When(/^.+ clicks? confirm member$/) do
   all(:css, ".mz").last.click
+  find_all('.btn-confirmation', wait: 5)[0].click
   expect(page).to have_link('Add New Person')
 end
 
