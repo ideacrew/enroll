@@ -770,6 +770,14 @@ Then(/the individual sees the new APTC tool UI changes/) do
   screenshot("aptc_setamount")
 end
 
+Then(/the individual clicks the Reset button/) do
+  find_all(IvlChoosePlan.reset_btn).first.click
+end
+
+Then(/the individual should see the original applied APTC amount/) do
+  expect(find(IvlChoosePlan.aptc_monthly_amount_id).value).to eq('68.00')
+end
+
 And(/the individual selects a silver plan on Plan Shopping page/) do
   find_all(IvlChoosePlan.select_plan_btn)[1].click
 end
