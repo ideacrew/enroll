@@ -163,6 +163,11 @@ class SpecialEnrollmentPeriod
     is_shop? || is_fehb?
   end
 
+  def user_email
+    user = User.where(id: user_id).first
+    user&.email
+  end
+
   def duration_in_days
     return nil if start_on.blank? || end_on.blank?
     end_on - start_on
