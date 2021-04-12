@@ -23,6 +23,9 @@ Feature: Insured Plan Shopping on Individual Assisted market
     And the individual is in the Plan Selection page
     Then the individual sees the new APTC tool UI changes
     When the individual sets APTC amount
+    And the individual clicks the Reset button
+    Then the individual should see the original applied APTC amount
+    Then the individual sets APTC amount
     And the individual selects a silver plan on Plan Shopping page
     Then the individual should see the elected APTC amount and click on the Confirm button of the Thank You page
     And the individual should see the APTC amount on the Receipt page
@@ -48,4 +51,4 @@ Feature: Insured Plan Shopping on Individual Assisted market
     And the individual clicks the Continue button of the Group Selection page
     When the individual sets APTC amount
     And the individual selects a non silver plan on Plan Shopping page
-    Then the individual should see the modal pop up for eligibility 
+    Then the individual should see the modal pop up for eligibility

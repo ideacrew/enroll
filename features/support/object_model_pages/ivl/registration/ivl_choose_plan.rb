@@ -27,6 +27,10 @@ class IvlChoosePlan
     'elected_aptc'
   end
 
+  def self.aptc_monthly_amount_id
+    '#elected_aptc'
+  end
+
   def self.aptc_tool_how_is_this_calculated_text
     'How Is This Calculated?'
   end
