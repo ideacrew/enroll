@@ -391,6 +391,7 @@ class Insured::ConsumerRolesController < ApplicationController
       :is_applying_coverage,
       :is_homeless,
       :is_temporarily_out_of_state,
+      :is_moving_to_state,
       :user_id,
       :dob_check
     ]
