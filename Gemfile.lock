@@ -1043,8 +1043,8 @@ PLATFORMS
   x86_64-darwin-19
 
 DEPENDENCIES
-  aca_entities!
   aasm (~> 4.8)
+  aca_entities!
   acapi!
   action-cable-testing
   action_mailer_cache_delivery (~> 0.3)

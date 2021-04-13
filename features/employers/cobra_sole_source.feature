@@ -41,7 +41,7 @@ Scenario: Employer terminates and Initiate COBRA to enrolled employee
     When EnterPrise Limited employer clicks on Initiate COBRA button
     Then employer should see the Initiate cobra success flash notice
     And employer clicks on all employees
-    And employer should see census employee status as Cobra linked
+    And employer should see census employee status as Cobra Enrolled
 
   Scenario: Employer tries to initiate COBRA with COBRA begin date before termination date
     Given staff role person logged in
