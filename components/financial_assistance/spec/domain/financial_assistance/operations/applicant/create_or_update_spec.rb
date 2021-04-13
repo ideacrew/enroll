@@ -193,6 +193,7 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CreateOrUpdate, dbcle
          :vlp_description => nil,
          :relationship => "self",
          :ssn => "889984400"}
+      end
 
       before :each do
         @result = subject.call(params: compare(applicant_params), family_id: family_id)
