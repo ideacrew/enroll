@@ -1,5 +1,5 @@
 # TODO: Refactor this to not rely on DC for test
-site_key = Rails.env.test? ? 'dc' : EnrollRegistry[:enroll_app].settings(:site_key).item
+site_key = EnrollRegistry[:enroll_app].settings(:site_key).item
 
 translations_to_seed = []
 # All filenames should be in a pattern such as
