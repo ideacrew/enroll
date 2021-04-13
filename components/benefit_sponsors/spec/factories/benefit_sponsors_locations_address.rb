@@ -14,9 +14,18 @@ FactoryBot.define do
       kind      { 'work' }
       address_1 { '27 Reo Road' }
       city      { 'Maynard' }
-      state     { Settings.aca.state_abbreviation }
+      state     { EnrollRegistry[:enroll_app].setting(:state_abbreviation).item }
       zip       { '20024' }
       county    { 'Middlesex' }
+    end
+
+    trait :maine_address do
+      kind      { 'work' }
+      address_1 { '210 State St' }
+      city      { 'Augusta' }
+      state     { EnrollRegistry[:enroll_app].setting(:state_abbreviation).item }
+      zip       { '04330' }
+      county    { 'Kennebec' }
     end
 
     trait :work_kind do
