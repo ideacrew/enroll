@@ -8,7 +8,6 @@ class VerificationType
   LOCATION_RESIDENCY = EnrollRegistry[:enroll_app].setting(:state_residency).item
   ALL_VERIFICATION_TYPES = [LOCATION_RESIDENCY, "Social Security Number", "American Indian Status", "Citizenship", "Immigration status"].freeze
   NON_CITIZEN_IMMIGRATION_TYPES = [LOCATION_RESIDENCY, "Social Security Number", "American Indian Status"].freeze
-
   VALIDATION_STATES = %w[na unverified pending review outstanding verified attested expired curam].freeze
   OUTSTANDING_STATES = %w[outstanding].freeze
   DUE_DATE_STATES = %w[review outstanding].freeze
@@ -47,6 +46,16 @@ class VerificationType
     end
   end
 
+<<<<<<< HEAD
+=======
+  # TODO: Temporary until we figure out the downstreams of refatoring this
+  def localize_residency
+    return type_name unless type_name == 'DC Residency'
+    state_abbreviation = EnrollRegistry[:enroll_app].setting(:state_abbreviation).item
+    "#{state_abbreviation} Residency"
+  end
+
+>>>>>>> 97df31a508... REFS - Maintenance - Refactors verification to not hardcode dc residency.
   def type_unverified?
     !type_verified?
   end
