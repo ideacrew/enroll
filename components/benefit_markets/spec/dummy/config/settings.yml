@@ -19,10 +19,10 @@ site:
   main_web_address: "www.DCHealthLink.com"
   health_care_website: "www.healthcare.gov"
   health_care_website_url: "https://www.healthcare.gov"
-  short_name: "DC Health Link"
-  byline: "Welcome to the District's Health Insurance Marketplace"
+  short_name: "Maine Cover ME"
+  byline: "Welcome to the Maine's Health Insurance Marketplace"
   long_name: "District of Columbia Health Link"
-  header_message: "Welcome to the District's Health Insurance Marketplace"
+  header_message: "Welcome to the Maine's Health Insurance Marketplace"
   logo_file_name: "logo.png"
   make_their_premium_payments_online: "https://www.e-billexpress.com/ebpp/DCHEALTHPAY/"
   tab_icon: 'favicon.ico'
@@ -61,8 +61,8 @@ site:
     facebook_url: ""
 
 contact_center:
-  name: "DC Health Link's Customer Care Center"
-  alt_name: "DC Health Link Customer Service"
+  name: "Cover ME's Customer Care Center"
+  alt_name: "Cover ME Customer Service"
   po_box: "PO Box 97022"
   phone_number: "1-855-532-5465"
   fax: "1-617-933-3099"
@@ -85,7 +85,7 @@ contact_center:
   appeals: "info@dchealthlink.com"
 
   mailing_address:
-    name: "DC Health Link"
+    name: "Cover ME"
     address_1: "PO Box 97022"
     address_2:
     city: "Washington"
@@ -93,7 +93,7 @@ contact_center:
     zip_code: "20090"
 
   appeal_center:
-    name: "DC Health Link"
+    name: "Cover ME"
     address_1: "PO Box 97022"
     address_2:
     city: "Washington"
@@ -384,16 +384,16 @@ aptc_errors:
 #   ShopPlanYearPublishedDueDayOfMonth = ShopOpenEnrollmentBeginDueDayOfMonth
 
 style:
-  primary_orange: '#333333'
-  brand_primary: '#007bc4'
-  primary_color:  '#007bc4'
-  primary_notification: '#333333'
+  primary_orange: '#487ba2'
+  brand_primary: '#487ba2'
+  primary_color:  '#487ba2'
+  primary_notification: '#487ba2'
   primary_panel: '#69A30D'
   primary_button: '#e72b2d'
   primary_button_color: '#286090'
   primary_button_disabled: '#337ab7'
   primary_button_border_disabled: '#2e6da4'
-  alternate_header_color: '#333333'
-  primary_icon_color: '#333333'
-  qle_header_color: '#333333'
+  alternate_header_color: '#487ba2'
+  primary_icon_color: '#487ba2'
+  qle_header_color: '#487ba2'
   primary_header_font: "'Open Sans', serif"

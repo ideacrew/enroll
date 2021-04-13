@@ -4,7 +4,7 @@ require 'rails_helper'
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
-RSpec.describe BenefitSponsors::Operations::BenefitApplications::Build, dbclean: :after_each do
+RSpec.describe BenefitSponsors::Operations::BenefitApplications::Build, dbclean: :after_each, :if => ::EnrollRegistry[:aca_shop_market].enabled? do
   before do
     DatabaseCleaner.clean
   end
