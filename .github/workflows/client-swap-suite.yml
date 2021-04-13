@@ -30,7 +30,7 @@ jobs:
           bundle install
       - name: Ru Client Swap Suite
         run: |
-          RAILS_ENV=production bundle exec rake migrations:client_configuration_toggler client='me'
+          bundle exec rake migrations:client_configuration_toggler client='me'
   build-assets:
     needs: [swap_clients]
     runs-on: ubuntu-latest
