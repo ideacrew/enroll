@@ -21,7 +21,7 @@ module Employers::PremiumStatementHelper
       end
     end
 
-    12.times do |i|
+    6.times do |i|
       billing_date = upcoming_billing_date - i.months
       if !earliest_effective_plan_date.nil? && billing_date < earliest_effective_plan_date.beginning_of_month
         break

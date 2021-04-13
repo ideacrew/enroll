@@ -255,7 +255,7 @@
 
           h3 {
             font-weight: bold;
-            color: #487ba2;
+            color: #333333;
             font-size: 18px;
             margin: 0;
           }
@@ -459,7 +459,7 @@
 
           }
           td {
-            color: #487ba2;
+            color: #333333;
             font-size: 12px;
             word-wrap: break-word;
             vertical-align: top;
@@ -748,7 +748,7 @@
             border-bottom-right-radius: 0px;
             z-index: 100;
 
-            color: #487ba2;
+            color: #333333;
             &:hover {
               background-color: #ffffff;
             }
@@ -761,7 +761,7 @@
             margin-right: 10px;
             padding: 10px;
             background-color: $primary-blue;
-            border-bottom: solid 3px #3d5d6f;
+            border-bottom: solid 3px #003260;
             border-radius: 6px;
             width: 100%;
             height: 100%;
@@ -769,7 +769,7 @@
             margin-bottom: 0;
             text-transform: uppercase;
             &:hover {
-              background-color: #3d5d6f;
+              background-color: #003260;
               cursor: pointer;
             }
             i {
@@ -923,7 +923,7 @@
           background-color: transparent;
           .panel-heading {
             padding: 0 0 5px 0;
-            color: #487ba2;
+            color: #333333;
             background-color: transparent;
             h3 {
               font-size: 12px;
@@ -936,7 +936,7 @@
             line-height: 110%;
             span {
               font-size: 12px;
-              color: #487ba2;
+              color: #333333;
               text-transform: uppercase;
             }
             .plan-label {
@@ -1319,7 +1319,7 @@
       text-align: center;
       padding-bottom: 50px;
       h2 {
-        color: #3d5d6f;
+        color: #003260;
         font-weight: 300;
         padding-top: 30px;
       }
