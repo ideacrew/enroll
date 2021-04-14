@@ -1,4 +1,5 @@
-# TODO: Need to figure out if this require is correct.
+# frozen_string_literal: true
+
 require File.expand_path(File.join(File.dirname(__FILE__), "../../../components/benefit_sponsors/spec/support/benefit_sponsors_site_spec_helpers"))
 
 module SiteWorld
