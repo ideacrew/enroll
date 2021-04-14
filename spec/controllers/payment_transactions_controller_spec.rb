@@ -3,7 +3,8 @@ require 'rails_helper'
 RSpec.describe PaymentTransactionsController, :type => :controller do
   let(:user){ FactoryBot.create(:user, :consumer) }
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member_and_dependent) }
-  let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
+  let!(:issuer_profile) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile)}
+  let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01', issuer_profile: issuer_profile)}
   let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, aasm_state: 'shopping', product: product) }
   let(:build_saml_repsonse) {double}
   let(:encode_saml_response) {double}
