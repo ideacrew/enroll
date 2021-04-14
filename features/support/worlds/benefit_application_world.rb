@@ -176,6 +176,7 @@ And(/^renewal employer (.*) has (.*) and renewal (.*) benefit applications$/) do
   earlier_application = create_application(new_application_status: earlier_application_status.to_sym)
   rating_area(earlier_application.start_on.next_year.year)
   @renewal_application = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(earlier_application).renew_application[1]
+  # TODO: This is the eline where its failing
   @renewal_application.update_attributes!(aasm_state: new_application_status.to_sym)
 
   # Following code will create renewal application but its assigning the wrong contribution to the product_packages and hence cukes will fail
