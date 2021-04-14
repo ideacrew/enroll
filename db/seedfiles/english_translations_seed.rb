@@ -1,4 +1,5 @@
-# TODO: Refactor this to not rely on DC for test
+# frozen_string_literal: true
+
 site_key = EnrollRegistry[:enroll_app].settings(:site_key).item
 
 translations_to_seed = []
