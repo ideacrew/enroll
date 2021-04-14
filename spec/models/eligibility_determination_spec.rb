@@ -64,6 +64,42 @@ RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
     end
   end
 
+  context 'for after create' do
+    let(:product1) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01', metal_level_kind: :silver)}
+    let(:hbx_with_aptc_1) do
+      enr = FactoryBot.create(:hbx_enrollment,
+                              product: product1,
+                              family: family,
+                              household: household,
+                              is_active: true,
+                              aasm_state: 'coverage_selected',
+                              changing: false,
+                              effective_on: start_on,
+                              kind: "individual",
+                              applied_aptc_amount: 100,
+                              elected_aptc_pct: 0.7)
+      FactoryBot.create(:hbx_enrollment_member, applicant_id: family_member.id, hbx_enrollment: enr)
+      enr
+    end
+    let!(:hbx_enrollments) {[hbx_with_aptc_1]}
+    before do
+      EnrollRegistry[:apply_aggregate_to_enrollment].feature.stub(:is_enabled).and_return(true)
+      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) {|_id, _start, age| age * 1.0}
+    end
+
+    it 'should invoke aggregate operation only once' do
+      ed = FactoryBot.create(:eligibility_determination, tax_household: tax_household)
+      expect(ed.persisted?).to be_truthy
+      expect(ed.send(:apply_aptc_aggregate)).to be_success
+    end
+
+    it 'should not invoke aggregate operation when eligibility determination is not persisted' do
+      ed = FactoryBot.build(:eligibility_determination, tax_household: tax_household)
+      expect(ed.persisted?).to be_falsey
+      expect(::Operations::Individual::ApplyAggregateToEnrollment).not_to receive(:new)
+    end
+  end
+
   context "a new instance" do
     context "with no arguments" do
       let(:params) {{}}
