@@ -1,0 +1,16 @@
+FROM rabbitmq:3.8-management
+
+WORKDIR /
+
+COPY .docker/rabbitmq.conf /tmp/
+COPY .docker/hbx_rabbit_definitions.json /tmp/
+
+RUN chown rabbitmq:rabbitmq /tmp/rabbitmq.conf /tmp/hbx_rabbit_definitions.json
+
+CMD cp /tmp/rabbitmq.conf /etc/rabbitmq/ && \
+sed -r "s/HBX_ID/$HBX_ID/g" /tmp/hbx_rabbit_definitions.json > /etc/rabbitmq/hbx_rabbit_definitions.json && \
+sed -i -r "s/ENV_NAME/$ENV_NAME/g" /etc/rabbitmq/hbx_rabbit_definitions.json && \
+chown rabbitmq:rabbitmq /tmp/rabbitmq.conf /tmp/hbx_rabbit_definitions.json && \
+rabbitmq-plugins enable rabbitmq_management && \
+rabbitmq-server 
+
