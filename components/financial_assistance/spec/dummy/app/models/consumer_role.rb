@@ -1,7 +1,3 @@
-# frozen_string_literal: true
-
-# rubocop:disable all
-
 class ConsumerRole
   RESIDENCY_VERIFICATION_REQUEST_EVENT_NAME = "local.enroll.residency.verification_request"
 
@@ -11,6 +7,10 @@ class ConsumerRole
   include Acapi::Notifiers
   include AASM
   include Mongoid::Attributes::Dynamic
+  include StateTransitionPublisher
+  include Mongoid::History::Trackable
+  include DocumentsVerificationStatus
+  include Config::AcaIndividualMarketHelper
 
   embedded_in :person
 
@@ -52,18 +52,6 @@ class ConsumerRole
       naturalized_citizen
       indian_tribe_member
   ].freeze
-
-  CITIZEN_KINDS = {
-    us_citizen: "US citizen",
-    naturalized_citizen: "Naturalized citizen",
-    alien_lawfully_present: "Alien lawfully present",
-    lawful_permanent_resident: "Lawful permanent resident",
-    undocumented_immigrant: "Undocumented immigrant",
-    not_lawfully_present_in_us: "Not lawfully present in US",
-    non_native_not_lawfully_present_in_us: "Non-native not lawfully present in US",
-    ssn_pass_citizenship_fails_with_SSA: "SSN pass citizenship fails with SSA",
-    non_native_citizen: "Non-native citizen"
-  }.freeze
 
   # FiveYearBarApplicabilityIndicator ??
   field :five_year_bar, type: Boolean, default: false
@@ -140,6 +128,7 @@ class ConsumerRole
   delegate :ssn,    :ssn=,    to: :person, allow_nil: true
   delegate :no_ssn,    :no_ssn=,    to: :person, allow_nil: true
   delegate :dob,    :dob=,    to: :person, allow_nil: true
+  delegate :zip,    to: :person, allow_nil: true
   delegate :gender, :gender=, to: :person, allow_nil: true
   delegate :us_citizen, :us_citizen=, to: :person, allow_nil: true
 
@@ -196,13 +185,39 @@ class ConsumerRole
 
   before_validation :ensure_validation_states, on: [:create, :update]
 
+  track_history :modifier_field_optional => true,
+                :on => [:five_year_bar,
+                        :aasm_state,
+                        :marital_status,
+                        :ssn_validation,
+                        :native_validation,
+                        :is_state_resident,
+                        :local_residency_validation,
+                        :ssn_update_reason,
+                        :lawful_presence_update_reason,
+                        :native_update_reason,
+                        :residency_update_reason,
+                        :is_applying_coverage,
+                        :ssn_rejected,
+                        :native_rejected,
+                        :lawful_presence_rejected,
+                        :residency_rejected],
+                :scope => :person,
+                :modifier_field => :modifier,
+                :version_field => :tracking_version,
+                :track_create => true,    # track document creation, default is false
+                :track_update => true,    # track document updates, default is true
+                :track_destroy => true
+
   # used to track history verification actions can be used on any top node model to build history of changes.
   # in this case consumer role taken as top node model instead of family member bz all verification functionality tied to consumer role model
   # might be encapsulated into new verification model further with verification code refactoring
-  embeds_many :history_action_trackers, as: :history_trackable, class_name: "::HistoryActionTracker"
+  embeds_many :history_action_trackers, as: :history_trackable
 
   #list of the collections we want to track under consumer role model
   COLLECTIONS_TO_TRACK = %w[Person consumer_role vlp_documents lawful_presence_determination hbx_enrollments].freeze
+
+  delegate :addresses, to: :person, allow_nil: true
 
   def ivl_coverage_selected
     coverage_purchased!(verification_attr) if unverified?
@@ -210,6 +225,10 @@ class ConsumerRole
 
   def ssn_or_no_ssn
     errors.add(:base, 'Provide SSN or check No SSN') unless ssn.present? || no_ssn == '1'
+  end
+
+  def update_is_applying_coverage_status(is_applying_coverage)
+    update_attribute(:is_applying_coverage, is_applying_coverage) if is_applying_coverage == "false"
   end
 
   def start_residency_verification_process
@@ -330,6 +349,10 @@ class ConsumerRole
     addresses.detect { |adr| adr.kind == "billing" } || home_address
   end
 
+  def rating_address
+    (addresses.detect { |adr| adr.kind == "home" }) || (addresses.detect { |adr| adr.kind == "mailing" })
+  end
+
   def self.find(consumer_role_id)
     consumer_role_id = BSON::ObjectId.from_string(consumer_role_id) if consumer_role_id.is_a? String
     @person_find = Person.where("consumer_role._id" => consumer_role_id).first.consumer_role unless consumer_role_id.blank?
@@ -337,6 +360,10 @@ class ConsumerRole
 
   def self.all
     Person.all_consumer_roles
+  end
+
+  def active_vlp_document
+    vlp_documents.in(id: active_vlp_document_id).first
   end
 
   def is_active?
@@ -402,7 +429,9 @@ class ConsumerRole
   end
 
   def has_i94?
-    vlp_documents.any?{|doc| doc.i94_number.present? && (doc.subject == "I-94 (Arrival/Departure Record)" || (doc.subject == "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport" && doc.passport_number.present? && doc.expiration_date.present?))}
+    vlp_documents.any? do |doc|
+      doc.i94_number.present? && (doc.subject == "I-94 (Arrival/Departure Record)" || (doc.subject == "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport" && doc.passport_number.present? && doc.expiration_date.present?))
+    end
   end
 
   def has_i20?
@@ -606,12 +635,10 @@ class ConsumerRole
   def verify_ivl_by_admin(*args)
     if sci_verified?
       pass_residency!
+    elsif person.ssn || is_native?
+      self.ssn_valid_citizenship_valid! verification_attr(args.first)
     else
-      if person.ssn || is_native?
-        self.ssn_valid_citizenship_valid! verification_attr(args.first)
-      else
-        self.pass_dhs! verification_attr(args.first)
-      end
+      self.pass_dhs! verification_attr(args.first)
     end
   end
 
@@ -663,13 +690,13 @@ class ConsumerRole
   def ensure_verification_types
     if person
       live_types = []
-      live_types << 'DC Residency'
+      live_types << VerificationType::LOCATION_RESIDENCY
       live_types << 'Social Security Number' if ssn
       live_types << 'American Indian Status' unless tribal_id.nil? || tribal_id.empty?
       if us_citizen
         live_types << 'Citizenship'
-      else
-        live_types << 'Immigration status' unless us_citizen.nil?
+      elsif !us_citizen.nil?
+        live_types << 'Immigration status'
       end
       inactive = verification_types.map(&:type_name) - live_types
       new_types = live_types - verification_types.active.map(&:type_name)
@@ -744,7 +771,7 @@ class ConsumerRole
 
   def latest_active_tax_household_with_year(year, family)
     family.latest_household.latest_active_tax_household_with_year(year)
-  rescue StandardError => e
+  rescue StandardError
     log("#4287 person_id: #{person.try(:id)}", {:severity => 'error'})
     nil
   end
@@ -798,18 +825,20 @@ class ConsumerRole
     trigger_residency! if can_trigger_residency?(family, opts)
   end
 
-  def can_trigger_residency?(family, opts) # trigger for change in address
+# trigger for change in address
+  def can_trigger_residency?(family, opts)
     person.age_on(TimeKeeper.date_of_record) > 18 && family.person_has_an_active_enrollment?(person) &&
       ((opts[:dc_status] &&
-        opts[:no_dc_address] == "false") || (person.is_consumer_role_active? && verification_types.by_name("DC Residency").first.validation_status == "unverified"))
+        opts[:is_homeless] == "0" && opts[:is_temporarily_out_of_state] == "0") || (person.is_consumer_role_active? && verification_types.by_name(VerificationType::LOCATION_RESIDENCY).first.validation_status == "unverified"))
   end
 
   def add_type_history_element(params)
     verification_type_history_elements << VerificationTypeHistoryElement.new(params)
   end
 
-  def can_start_residency_verification? # initial trigger check for coverage purchase
-    !person.no_dc_address && person.age_on(TimeKeeper.date_of_record) > 18
+# initial trigger check for coverage purchase
+  def can_start_residency_verification?
+    !(person.is_homeless || person.is_temporarily_out_of_state) && person.age_on(TimeKeeper.date_of_record) > 18
   end
 
   def invoke_residency_verification!
@@ -839,13 +868,13 @@ class ConsumerRole
 
   def check_native_status(family, native_status_changed)
     return unless native_status_changed
-    return unless family.person_has_an_active_enrollment?(person)
+    return unless family&.person_has_an_active_enrollment?(person)
 
     if person.tribal_id.present?
       fail_indian_tribe
       fail_native_status!
-    else
-      pass_native_status! if all_types_verified? && !fully_verified?
+    elsif all_types_verified? && !fully_verified? && may_pass_native_status?
+      pass_native_status!
     end
   end
 
@@ -866,7 +895,7 @@ class ConsumerRole
 
   def create_initial_market_transition
     return unless person.individual_market_transitions.where(role_type: "consumer").first.nil?
-    transition = ::IndividualMarketTransition.new
+    transition = IndividualMarketTransition.new
     transition.role_type = "consumer"
     transition.submitted_at = TimeKeeper.datetime_of_record
     transition.reason_code = "generating_consumer_role"
@@ -878,13 +907,14 @@ class ConsumerRole
   def mark_residency_denied(*_args)
     update_attributes(:residency_determined_at => DateTime.now,
                       :is_state_resident => false)
-    verification_types.by_name("DC Residency").first&.fail_type
+    type = verification_types.by_name(VerificationType::LOCATION_RESIDENCY).first
+    verification_types.by_name(VerificationType::LOCATION_RESIDENCY).first.fail_type if type && type.validation_status != 'review'
   end
 
   def mark_residency_pending(*_args)
     update_attributes(:residency_determined_at => DateTime.now,
                       :is_state_resident => nil)
-    verification_types.by_name("DC Residency").first&.pending_type
+    verification_types.by_name(VerificationType::LOCATION_RESIDENCY).first.pending_type if verification_types&.by_name(VerificationType::LOCATION_RESIDENCY).present?
   end
 
   def mark_residency_authorized(*args)
@@ -892,9 +922,9 @@ class ConsumerRole
                       :is_state_resident => true)
 
     if args&.first&.self_attest_residency
-      verification_types.by_name('DC Residency').first.attest_type
+      verification_types.by_name(VerificationType::LOCATION_RESIDENCY).first.attest_type
     else
-      verification_types.by_name('DC Residency').first.pass_type
+      verification_types.by_name(VerificationType::LOCATION_RESIDENCY).first.pass_type
     end
   end
 
@@ -928,7 +958,7 @@ class ConsumerRole
   end
 
   def residency_pending?
-    (local_residency_validation == "pending" || is_state_resident.nil?) && verification_types.by_name("DC Residency").first.validation_status != "attested"
+    (local_residency_validation == "pending" || is_state_resident.nil?) && verification_types.by_name(VerificationType::LOCATION_RESIDENCY).first.validation_status != "attested"
   end
 
   def residency_denied?
@@ -963,13 +993,11 @@ class ConsumerRole
     case v_type
     when "Social Security Number"
       update_attributes(:ssn_rejected => false)
-    when "Citizenship"
-      update_attributes(:lawful_presence_rejected => false)
-    when "Immigration status"
+    when "Citizenship" || "Immigration status"
       update_attributes(:lawful_presence_rejected => false)
     when "American Indian Status"
       update_attributes(:native_rejected => false)
-    when "DC Residency"
+    when VerificationType::LOCATION_RESIDENCY #rubocop insists on this indentation on lines with this variable only
       update_attributes(:residency_rejected => false)
     end
   end
@@ -992,16 +1020,16 @@ class ConsumerRole
   end
 
   def pass_ssn(*_args)
-    verification_types.by_name("Social Security Number").first&.pass_type
+    verification_types&.by_name("Social Security Number")&.first&.pass_type
   end
 
   def fail_ssn(*_args)
-    verification_types.by_name("Social Security Number").first&.fail_type
+    verification_types&.by_name("Social Security Number")&.first&.fail_type
   end
 
   def move_types_to_pending(*_args)
     verification_types.each do |type|
-      type.pending_type unless (type.type_name == "DC Residency") || (type.type_name == "American Indian Status")
+      type.pending_type unless (type.type_name == VerificationType::LOCATION_RESIDENCY) || (type.type_name == "American Indian Status")
     end
   end
 
@@ -1016,11 +1044,11 @@ class ConsumerRole
 
   def fail_lawful_presence(*args)
     lawful_presence_determination.deny!(*args)
-    verification_types.reject{|type| VerificationType::NON_CITIZEN_IMMIGRATION_TYPES.include? type.type_name }.each{ |type| type.fail_type }
+    verification_types.reject{|type| VerificationType::NON_CITIZEN_IMMIGRATION_TYPES.include? type.type_name }.each{ |type| type.fail_type unless type.validation_status == 'review' }
   end
 
   def revert_ssn
-    verification_types.by_name("Social Security Number").first&.pending_type
+    verification_types&.by_name("Social Security Number")&.first&.pending_type
   end
 
   def move_to_expired
@@ -1028,22 +1056,22 @@ class ConsumerRole
   end
 
   def revert_native
-    verification_types.by_name("American Indian Status").first&.pending_type
+    verification_types&.by_name("American Indian Status")&.first&.pending_type
   end
 
   def fail_indian_tribe
-    verification_types.by_name("American Indian Status").first&.fail_type
+    verification_types&.by_name("American Indian Status")&.first&.fail_type
   end
 
   def revert_lawful_presence(*args)
     self.lawful_presence_determination.revert!(*args)
     verification_types.each do |v_type|
-      v_type.pending_type unless VerificationType::NON_CITIZEN_IMMIGRATION_TYPES.include? v_type.type_name
+      v_type.pending_type unless VerificationType::NON_CITIZEN_IMMIGRATION_TYPES.include?(v_type.type_name)
     end
   end
 
   def update_all_verification_types(*args)
-    authority = args.first && args.first[:authority] ? args.first[:authority] : lawful_presence_determination.try(:vlp_authority)
+    authority = (args.first && args.first[:authority]) ? args.first[:authority] : lawful_presence_determination.try(:vlp_authority)
     verification_types.each do |v_type|
       update_verification_type(v_type, "fully verified by curam", authority)
     end
@@ -1070,7 +1098,7 @@ class ConsumerRole
   def return_doc_for_deficiency(v_type, update_reason, *authority)
     message = "#{v_type.type_name} was rejected."
     v_type.update_attributes(:validation_status => "outstanding", :update_reason => update_reason, :rejected => true)
-    if  v_type.type_name == "DC Residency"
+    if  v_type.type_name == VerificationType::LOCATION_RESIDENCY
       mark_residency_denied
     elsif ["Citizenship", "Immigration status"].include? v_type.type_name
       lawful_presence_determination.deny!(verification_attr(authority.first))
@@ -1106,7 +1134,7 @@ class ConsumerRole
     status = authority.first == "curam" ? "curam" : "verified"
     message = "#{v_type.type_name} successfully verified."
     self.verification_types.find(v_type).update_attributes(:validation_status => status, :update_reason => update_reason)
-    if v_type.type_name == "DC Residency"
+    if v_type.type_name == VerificationType::LOCATION_RESIDENCY
       update_attributes(:is_state_resident => true, :residency_determined_at => TimeKeeper.datetime_of_record)
     elsif ["Citizenship", "Immigration status"].include? v_type.type_name
       lawful_presence_determination.authorize!(verification_attr(authority.first))
@@ -1116,7 +1144,7 @@ class ConsumerRole
         return message
       end
     end
-    all_types_verified? && !fully_verified? ? verify_ivl_by_admin(authority.first) : message
+    (all_types_verified? && !fully_verified?) ? verify_ivl_by_admin(authority.first) : message
   end
 
   def redetermine_verification!(verification_attr)
@@ -1132,8 +1160,8 @@ class ConsumerRole
   def ensure_native_validation
     if tribal_id.nil? || tribal_id.empty?
       self.native_validation = "na"
-    else
-      self.native_validation = "outstanding" if native_validation == "na"
+    elsif native_validation == "na"
+      self.native_validation = "outstanding"
     end
   end
 
@@ -1160,7 +1188,7 @@ class ConsumerRole
                     to_state: aasm.to_state,
                     event: aasm.current_event,
                     user_id: SAVEUSER[:current_user_id] }
-    wfst_params.merge!({ reason: 'Self Attest DC Residency' }) if args&.first&.is_a?(OpenStruct) && args&.first&.self_attest_residency
+    wfst_params.merge!({ reason: "Self Attest #{VerificationType::LOCATION_RESIDENCY} Residency" }) if args&.first.is_a?(OpenStruct) && args&.first&.self_attest_residency
     workflow_state_transitions << WorkflowStateTransition.new(wfst_params)
   end
 
@@ -1169,7 +1197,5 @@ class ConsumerRole
     OpenStruct.new({:determined_at => Time.now,
                     :vlp_authority => authority})
   end
+
 end
-
-# rubocop:enable all
-
