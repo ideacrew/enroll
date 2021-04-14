@@ -47,6 +47,7 @@ class VerificationType
   end
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
   # TODO: Temporary until we figure out the downstreams of refatoring this
   def localize_residency
@@ -56,6 +57,8 @@ class VerificationType
   end
 
 >>>>>>> 97df31a508... REFS - Maintenance - Refactors verification to not hardcode dc residency.
+=======
+>>>>>>> f16d40a238... REFS Maintenance - Refactors residency as enroll registry.
   def type_unverified?
     !type_verified?
   end
