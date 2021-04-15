@@ -201,6 +201,12 @@ registry:
             item: "https://hbx.dc.gov/page/dc-health-link-broker-attestations"
           - key: :rating_areas
             item: "single"
+      - key: :service_area
+        item: :service_area
+        is_enabled: true
+        settings:
+          - key: :service_area_model
+            item: 'single'
       - key: :pay_now_functionality
         item: "kaiser_enabled"
         is_enabled: true
