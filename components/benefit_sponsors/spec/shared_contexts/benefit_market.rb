@@ -1,12 +1,10 @@
 require File.join(File.dirname(__FILE__), "..", "support/benefit_sponsors_site_spec_helpers")
 require File.join(File.dirname(__FILE__), "..", "support/benefit_sponsors_product_spec_helpers")
-require File.join(File.dirname(__FILE__), "client_site_spec_helpers/#{EnrollRegistry[:enroll_app].setting(:site_key).item.downcase}.rb")
-
 
 RSpec.shared_context "setup benefit market with market catalogs and product packages", :shared_context => :metadata do
 
   let(:site) do
-    "::BenefitSponsors::SiteSpecHelpers::#{EnrollRegistry[:enroll_app].setting(:site_key).item.upcase}".constantize.create_site_with_hbx_profile_and_empty_benefit_market
+    BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_empty_benefit_market
   end
 
   let(:benefit_market)          { site.benefit_markets.first }
