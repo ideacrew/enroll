@@ -30,7 +30,7 @@ registry:
           - key: :submit_docs_url
             item: "https://www.dchealthlink.com/submit-docs"
           - key: :geographic_rating_area_model
-            item: "county"
+            item: "single"
           - key: :site_key
             item: :dc
           - key: :state_abbreviation
