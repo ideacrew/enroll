@@ -1,5 +1,5 @@
 site:
-  key: :dc
+  key: :me
   subdomain: "dchbx"
   domain_name: "dchealthlink.com"
   site_title: "DC's Online Health Insurance Marketplace"
