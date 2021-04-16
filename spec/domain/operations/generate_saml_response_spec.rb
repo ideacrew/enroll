@@ -14,8 +14,9 @@ RSpec.describe Operations::GenerateSamlResponse do
   let(:build_saml_repsonse) {double}
   let(:encode_saml_response) {double}
   let(:connection) {double}
+  let(:source) {"Plan Shopping"}
   let(:params) do
-    {:enrollment_id => hbx_enrollment.hbx_id }
+    {:enrollment_id => hbx_enrollment.hbx_id, :source => source }
   end
 
   before do
@@ -28,12 +29,21 @@ RSpec.describe Operations::GenerateSamlResponse do
     described_class.new.call(params)
   end
 
-  describe "Not passing params to call the operation" do
+  describe "Not passing enrollment params to call the operation" do
     let(:params) { { } }
 
     it "fails" do
       expect(subject).not_to be_success
       expect(subject.failure).to eq "Given input is not a valid enrollment id"
+    end
+  end
+
+  describe "Not passing source params to call the operation" do
+    let(:params) { { :enrollment_id => hbx_enrollment.hbx_id, :source => nil} }
+
+    it "fails" do
+      expect(subject).not_to be_success
+      expect(subject.failure).to eq "Given input is not a valid source kind"
     end
   end
 

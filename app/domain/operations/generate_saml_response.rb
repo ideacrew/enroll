@@ -11,7 +11,7 @@ module Operations
     def call(params)
       values               = yield validate(params)
       hbx_enrollment       = yield enrollment(values)
-      payment_transaction  = yield create_payment_transaction(hbx_enrollment)
+      payment_transaction  = yield create_payment_transaction(hbx_enrollment, values)
       saml_object          = yield init_saml_generator(payment_transaction, hbx_enrollment)
       saml_response        = yield build_saml_response(saml_object)
       result               = yield encode_saml_reponse(saml_object, saml_response)
@@ -23,6 +23,7 @@ module Operations
 
     def validate(params)
       return Failure("Given input is not a valid enrollment id") unless params[:enrollment_id].is_a?(String)
+      return Failure("Given input is not a valid source kind") unless params[:source].is_a?(String)
       Success(params)
     end
 
@@ -31,8 +32,8 @@ module Operations
       enrollment ? Success(enrollment) : Failure("Enrollment Not Found")
     end
 
-    def create_payment_transaction(hbx_enrollment)
-      Operations::PaymentTransactions::Create.new.call({hbx_enrollment: hbx_enrollment})
+    def create_payment_transaction(hbx_enrollment, values)
+      Operations::PaymentTransactions::Create.new.call({hbx_enrollment: hbx_enrollment, source: values[:source]})
     end
 
     def init_saml_generator(payment_transaction, hbx_enrollment)
