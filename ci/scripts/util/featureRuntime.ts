@@ -17,7 +17,7 @@ export const featureRuntime = (feature: CucumberFeature): FileWithRuntime => {
   const scenarioRuntime = calculateScenarioRuntime(scenarioElements);
 
   return {
-    filePath: feature.uri,
+    filePath: uri,
     runTime: (backgroundRuntime + scenarioRuntime) / 1_000_000,
   };
 };
