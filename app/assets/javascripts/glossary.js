@@ -28,7 +28,7 @@ function runGlossary() {
         "description": "Make changes to my plan."
       },
       {
-        "term": "Make a first Payment for a new plan",
+        "term": "Make a first Payment",
         "description": "This payment will confirm your enrollment and allow you to begin your coverage. Please note it typically takes up to 3-5 business days after you sign up for you to be able to make a first payment."
       },
       // Kaiser payment definition
@@ -1121,7 +1121,7 @@ function runGlossary() {
           var newElement   = "";
           $(matchingEl).html().toString().split(popoverRegex).forEach(function(text){
             // in the case of the pay now actions dropdown, if kaiser enrollment use kaiser definition, if any other use other definition
-            if (term = "Make Payments for My Plan") {
+            if (term == "Make Payments for My Plan") {
               if ($(matchingEl).hasClass('pay-now-other')) {
                 description = "Go to your insurance company's payment portal to make a new payment or manage your existing payments.";
               }
