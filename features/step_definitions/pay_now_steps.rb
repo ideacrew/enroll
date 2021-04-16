@@ -216,3 +216,7 @@ And(/^creates a consumer with SEP$/) do
   FactoryBot.create(:qualifying_life_event_kind, :effective_on_event_date_and_first_month, market_kind: "individual")
   sleep 2
 end
+
+Then(/consumer should the the First Payment button/) do
+  expect(page).to have_content('Make a first Payment')
+end
