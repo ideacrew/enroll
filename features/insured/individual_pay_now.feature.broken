@@ -40,3 +40,17 @@ Feature: User should be able to pay for plan
       | role          |
       | consumer role |
       | resident role |
+
+  Scenario: User can see pay now button for Kaiser enrollment
+    Given the FAA feature configuration is disabled
+    And that a person exists in EA
+    And the person has an active consumer role
+    And the person goes plan shopping in the individual for a new plan
+    When the person enrolls in a Kaiser plan
+    And I click on purchase confirm button for matched person
+    And tries to purchase with a break in coverage
+    Then I click on purchase confirm button for matched person
+    When consumer visits home page
+    When consumer should be able to see Actions dropdown
+    Then consumer clicks on the Actions button
+    Then consumer should the the First Payment button
