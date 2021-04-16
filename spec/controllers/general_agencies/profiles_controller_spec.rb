@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'rails_helper'
 
 RSpec.describe GeneralAgencies::ProfilesController, dbclean: :after_each do
@@ -44,9 +45,9 @@ RSpec.describe GeneralAgencies::ProfilesController, dbclean: :after_each do
     let(:user) { FactoryBot.create(:user, person: person, roles: ["general_agency_staff"]) }
     let(:person) { FactoryBot.create(:person, :with_general_agency_staff_role) }
     let(:general_agency_staff) { person.general_agency_staff_roles.last }
-    let(:org) { GeneralAgencyProfile.find( person.general_agency_staff_roles.first.general_agency_profile_id).organization}
+    let(:org) { GeneralAgencyProfile.find(person.general_agency_staff_roles.first.general_agency_profile_id).organization}
     let(:general_agency_staff_role) { person.general_agency_staff_roles.first }
-    let(:general_agency_profile){ GeneralAgencyProfile.find( person.general_agency_staff_roles.first.general_agency_profile_id) }
+    let(:general_agency_profile){ GeneralAgencyProfile.find(person.general_agency_staff_roles.first.general_agency_profile_id) }
     before :each do
       sign_in user
       allow(controller).to receive(:sanitize_agency_profile_params).and_return(true)
@@ -55,17 +56,25 @@ RSpec.describe GeneralAgencies::ProfilesController, dbclean: :after_each do
 
     it "should update person main phone" do
       general_agency_profile.primary_staff.person.phones[0].update_attributes(kind: "work")
-      post :update, params:{id: general_agency_profile.id, organization: {id: org.id, first_name: "updated name", last_name: "updates", office_locations_attributes: {"0"=>
-                                                                                                                                                               {"address_attributes"=>{"kind"=>"primary", "address_1"=>"234 nfgjkhghf", "address_2"=>"", "city"=>"jfhgdfhgjgdf", "state"=>"DC", "zip"=>"35645"},
-                                                                                                                                                                "phone_attributes"=>{"kind"=>"phone main", "area_code"=>"564", "number"=>"111-1111", "extension"=>"111"}}}}}
+      post :update, params: {id: general_agency_profile.id, organization: {id: org.id, first_name: "updated name", last_name: "updates", office_locations_attributes: {"0" =>
+                                                                                                                                                               {"address_attributes" => {"kind" => "primary", "address_1" => "234 Main NE", "address_2" => "", "city" => "Washington", "state" => "DC", "zip" => "35645"},
+                                                                                                                                                                "phone_attributes" => {"kind" => "phone main", "area_code" => "564", "number" => "111-1111",
+                                                                                                                                                                                       "extension" => "111"}}}}}
       general_agency_profile.primary_staff.person.reload
       expect(general_agency_profile.primary_staff.person.phones[0].extension).to eq "111"
     end
 
     it "should update person record" do
-      post :update, params:{id: general_agency_profile.id, organization: {id: org.id, first_name: "updated name", last_name: "updates", office_locations_attributes: {"0"=>
-                                                                                                                                                               {"address_attributes"=>{"kind"=>"primary", "address_1"=>"234 nfgjkhghf", "address_2"=>"", "city"=>"jfhgdfhgjgdf", "state"=>"DC", "zip"=>"35645"},
-                                                                                                                                                                "phone_attributes"=>{"kind"=>"phone main", "area_code"=>"564", "number"=>"111-1111", "extension"=>"111"}}}}}
+      post :update, params: {
+        id: general_agency_profile.id,
+        organization: {id: org.id,
+                       first_name: "updated name",
+                       last_name: "updates",
+                       office_locations_attributes: {"0" =>
+                                                                                                                                                               {"address_attributes" => {"kind" => "primary", "address_1" => "234 Main NE", "address_2" => "", "city" => "Washington", "state" => "DC", "zip" => "35645"},
+                                                                                                                                                                "phone_attributes" => {"kind" => "phone main", "area_code" => "564", "number" => "111-1111",
+                                                                                                                                                                                       "extension" => "111"}}}}
+      }
       general_agency_profile.primary_staff.person.reload
       expect(general_agency_profile.primary_staff.person.first_name).to eq "updated name"
     end
@@ -87,14 +96,14 @@ RSpec.describe GeneralAgencies::ProfilesController, dbclean: :after_each do
 
   describe "GET search_general_agency" do
     it "should returns http success" do
-      get :search_general_agency, params:{general_agency_search: 'general_agency'}, xhr: true, format: :js
+      get :search_general_agency, params: {general_agency_search: 'general_agency'}, xhr: true, format: :js
       expect(response).to have_http_status(:success)
     end
 
     it "should get general_agency_profile" do
       Organization.delete_all
       ga = FactoryBot.create(:general_agency_profile)
-      get :search_general_agency, params:{general_agency_search: ga.legal_name}, xhr: true, format: :js
+      get :search_general_agency, params: {general_agency_search: ga.legal_name}, xhr: true, format: :js
       expect(assigns[:general_agency_profiles]).to eq [ga]
     end
   end
@@ -104,7 +113,7 @@ RSpec.describe GeneralAgencies::ProfilesController, dbclean: :after_each do
       FactoryBot.create(:announcement, content: "msg for GA", audiences: ['GA'])
       allow(user).to receive(:has_general_agency_staff_role?).and_return true
       sign_in(user)
-      get :show, params:{id: general_agency_profile.id}
+      get :show, params: {id: general_agency_profile.id}
     end
 
     it "returns http success" do
@@ -131,7 +140,7 @@ RSpec.describe GeneralAgencies::ProfilesController, dbclean: :after_each do
   describe "GET employers" do
     before(:each) do
       sign_in(user)
-      get :employers, params:{id: general_agency_profile.id}, xhr: true
+      get :employers, params: {id: general_agency_profile.id}, xhr: true
     end
 
     it "returns http success" do
@@ -156,11 +165,11 @@ RSpec.describe GeneralAgencies::ProfilesController, dbclean: :after_each do
     end
 
     context "without page params" do
-      let(:person2) { FactoryBot.create(:person , :last_name => "smith11") } # last name has to be in small case
-      let(:family2) { FactoryBot.create(:family, :with_primary_family_member , :person => person2  ) }
+      let(:person2) { FactoryBot.create(:person, :last_name => "smith11") } # last name has to be in small case
+      let(:family2) { FactoryBot.create(:family, :with_primary_family_member, :person => person2) }
       before(:each) do
         allow(general_agency_profile).to receive(:families).and_return [family,family2]
-        get :families, params:{id: general_agency_profile.id}, xhr: true
+        get :families, params: {id: general_agency_profile.id}, xhr: true
       end
 
       it "returns http success" do
@@ -209,7 +218,7 @@ RSpec.describe GeneralAgencies::ProfilesController, dbclean: :after_each do
   describe "GET staffs" do
     before(:each) do
       sign_in(user)
-      get :staffs, params:{id: general_agency_profile.id}, xhr: true
+      get :staffs, params: {id: general_agency_profile.id}, xhr: true
     end
 
     it "returns http success" do
@@ -228,7 +237,7 @@ RSpec.describe GeneralAgencies::ProfilesController, dbclean: :after_each do
   describe "GET edit_staff" do
     before(:each) do
       sign_in(user)
-      get :edit_staff, params:{id: general_agency_staff.id}, xhr: true
+      get :edit_staff, params: {id: general_agency_staff.id}, xhr: true
     end
 
     it "returns http success" do
@@ -244,8 +253,8 @@ RSpec.describe GeneralAgencies::ProfilesController, dbclean: :after_each do
     before(:each) do
       FactoryBot.create(:hbx_profile) if HbxProfile.count == 0
       sign_in(user)
-      general_agency_staff.unset(:benefit_sponsors_general_agency_profile_id) # ToDo - Move/remove these old specs
-      post :update_staff, params:{id: general_agency_staff.id, approve: 'true'}
+      general_agency_staff.unset(:benefit_sponsors_general_agency_profile_id) # TODO: - Move/remove these old specs
+      post :update_staff, params: {id: general_agency_staff.id, approve: 'true'}
     end
 
     it "should redirect" do
@@ -284,7 +293,7 @@ RSpec.describe GeneralAgencies::ProfilesController, dbclean: :after_each do
   describe "GET agency_messages" do
     before(:each) do
       sign_in(user)
-      get :agency_messages, params:{id: general_agency_profile.id}, xhr: true
+      get :agency_messages, params: {id: general_agency_profile.id}, xhr: true
     end
 
     it "returns http success" do
@@ -299,7 +308,7 @@ RSpec.describe GeneralAgencies::ProfilesController, dbclean: :after_each do
   describe "GET inbox" do
     before(:each) do
       sign_in(user)
-      get :inbox, params:{id: general_agency_profile.id}, xhr: true
+      get :inbox, params: {id: general_agency_profile.id}, xhr: true
     end
 
     it "returns http success" do
@@ -325,7 +334,7 @@ RSpec.describe GeneralAgencies::ProfilesController, dbclean: :after_each do
     end
 
     it "should redirect" do
-      post :create, params:{organization: {first_name: 'test'}}
+      post :create, params: {organization: {first_name: 'test'}}
       expect(response).to have_http_status(:redirect)
     end
   end
