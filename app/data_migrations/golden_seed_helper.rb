@@ -72,7 +72,7 @@ module GoldenSeedHelper
     ol = org.office_locations.build
     address = ol.build_address(
       kind: "mailing",
-      address_1: "Main St",
+      address_1: "Main St NE",
       city: EnrollRegistry[:enroll_app].setting(:contact_center_city).item,
       state: state_abbreviation,
       zip: EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item
