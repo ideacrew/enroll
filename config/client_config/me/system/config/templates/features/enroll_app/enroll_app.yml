@@ -78,7 +78,7 @@ registry:
           - key: :make_their_premium_payments_online
             item: ""
           - key: :tab_icon
-            item: "favicon.ico"
+            item: "favicon_me.ico"
           - key: :employer_application_deadline_link
             item: ""
           - key: :s3_prefix
@@ -176,6 +176,10 @@ registry:
             item: "https://www.maine.gov/sos/bmv/"
           - key: :contact_center_po_box
             item: "PO Box 97022"
+          - key: :contact_center_city
+            item: "Augusta"
+          - key: :contact_center_county
+            item: "Kennebec"
           - key: :contact_center_state_and_city
             item: "Augusta, ME"
           - key: :contact_center_zip_code
@@ -229,6 +233,12 @@ registry:
       - key: :rating_area
         item: :rating_area
         is_enabled: false
+      - key: :service_area
+        item: :service_area
+        is_enabled: true
+        settings:
+          - key: :service_area_model
+            item: 'single'
       - key: :site_database_seed
         item: :site_database_seed
         is_enabled: true
