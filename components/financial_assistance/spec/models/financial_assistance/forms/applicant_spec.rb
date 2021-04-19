@@ -109,7 +109,7 @@ RSpec.describe ::FinancialAssistance::Forms::Applicant, type: :model, dbclean: :
       end
 
       let(:input_applicant) {spouse_applicant2}
-      let(:relationship) {'child'}
+      let(:relationship) {'spouse'}
 
       it 'should add error when checked for validation errors' do
         expect(@applicant_form.errors.full_messages).to include('can not have multiple spouse or life partner')

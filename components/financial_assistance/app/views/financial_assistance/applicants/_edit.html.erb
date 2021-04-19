@@ -46,6 +46,7 @@
         </div>
 
         <div class="row row-form-wrapper no-buffer">
+          <% readonly_status = @applicant.is_primary_applicant? %>
           <div class="col-md-3 col-sm-3 col-xs-12 no-pd">
             <% readonly_status = @applicant.is_primary_applicant? %>
             <div class="form-group form-group-lg">
