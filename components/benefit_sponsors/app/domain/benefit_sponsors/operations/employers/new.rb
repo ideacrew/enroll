@@ -126,7 +126,7 @@ module BenefitSponsors
           obj.organization.profile.office_locations.each do |ol|
             ol.address.office_kind_options = BenefitSponsors::Locations::Address::OFFICE_KINDS
           end
-          obj.organization.entity_kind_options = "BenefitSponsors::Organizations::Organization::DC_ENTITY_KINDS".constantize
+          obj.organization.entity_kind_options = "BenefitSponsors::Organizations::Organization::ENTITY_KINDS".constantize
           obj
         end
       end
