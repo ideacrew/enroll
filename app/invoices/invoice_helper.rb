@@ -2,7 +2,7 @@
 module InvoiceHelper
 # module Prawn::Graphics
 
-  def default_options 
+  def default_options
     {
       :width => 250
     }
@@ -15,7 +15,7 @@ module InvoiceHelper
   end
 
   def build_pdf
-    enrollment_summary = @hbx_enrollments.inject({}) do |hash,enrollment| 
+    enrollment_summary = @hbx_enrollments.inject({}) do |hash,enrollment|
       if hash.include?(enrollment.plan.name)
          hash[enrollment.plan.name]["employee_count"] += 1
          hash[enrollment.plan.name]["dependents_count"] += enrollment.humanized_dependent_summary
@@ -84,40 +84,40 @@ module InvoiceHelper
     end
 
     @pdf.start_new_page
-    
+
     @pdf.move_down initialmove_y
 
     @pdf.image logopath, :width => 150
-    @pdf.move_down 12    
+    @pdf.move_down 12
 
     @pdf.text_box "#{DateTime.now.next_month.strftime("%m/%Y")} Group Coverage Bill", :at => [address_x, @pdf.cursor], :align => :center, :style => :bold
 
     @pdf.move_down 48
 
-    invoice_services_data = [ 
+    invoice_services_data = [
       ["Insurance Carrier Plan", "Covered Subscribers", "Covered Dependents", "New Charges"]
     ]
-    enrollment_summary.each do |name,plan_summary| 
+    enrollment_summary.each do |name,plan_summary|
       invoice_services_data << ["#{name}", "#{plan_summary['employee_count']}", "#{plan_summary['dependents_count']}", "$#{currency_format(plan_summary['total_premium'])}"]
     end
     invoice_services_data << ["New charges total", "", "", "$#{currency_format(@hbx_enrollments.map(&:total_premium).sum)}"]
     dchbx_table_item_list(invoice_services_data)
 
-    enrollment_summary.each do |name, summary| 
-      carrier_plan_services_data = [ 
+    enrollment_summary.each do |name, summary|
+      carrier_plan_services_data = [
         ["Last Name","First Name", "No. of Enrolled (1=EE only)", "Coverage Month", "Employer Cost", "Employee Cost", "Premium"]
       ]
       @pdf.start_new_page
 
       @pdf.move_down initialmove_y
-      
+
       @pdf.image logopath, :width => 150
 
       @pdf.move_down lineheight_y
       @pdf.text_box "Carrier Plan Summary", :align => :center, :style => :bold, :at => [address_x, @pdf.cursor]
 
       @pdf.move_down 24
-    
+
       plan_header_data = [
         ["Insurance Carrier Plan","" ,"#{name}"]
       ]
@@ -158,7 +158,7 @@ module InvoiceHelper
 
     @pdf
   end
-  
+
   def mm2pt(mm)
     return mm * (72 / 25.4)
   end
@@ -184,7 +184,7 @@ module InvoiceHelper
   end
 
   def stroke_dashed_horizontal_line(position=25,options={})
-    @pdf.stroke do 
+    @pdf.stroke do
       @pdf.move_down 20
       @pdf.dash(5, space: 2, phase: 0)
       @pdf.horizontal_rule
@@ -274,7 +274,7 @@ module InvoiceHelper
     end
 
     @pdf.move_down 72
-    @pdf.text_box "Please review the billing summary. This is a consolidated bill for all your benefits through the Massachusetts #{site_short_name}. Please pay the Total Amount Due.", :at => [address_x, @pdf.cursor]
+    @pdf.text_box "Please review the billing summary. This is a consolidated bill for all your benefits through the #{site_short_name}. Please pay the Total Amount Due.", :at => [address_x, @pdf.cursor]
     @pdf.move_down 48
     @pdf.text_box "Payment Options", :at => [address_x, @pdf.cursor], :style => :bold
     @pdf.move_down 24
@@ -290,7 +290,7 @@ module InvoiceHelper
     @pdf.move_down lineheight_y
     @pdf.text_box "#{contact_center_city}, #{contact_center_state} #{contact_center_postal_code}", :at => [240, @pdf.cursor]
     @pdf.move_down 24
-    @pdf.text_box "\u2022 Call the Massachusetts #{site_short_name} Customer Service at 888-813-9220 (TTY #{contact_center_tty_number})", :at => [address_x, @pdf.cursor]
+    @pdf.text_box "\u2022 Call the #{site_short_name} Customer Service at 888-813-9220 (TTY #{contact_center_tty_number})", :at => [address_x, @pdf.cursor]
     @pdf.move_down 24
 
     @pdf.text_box "PLEASE DETACH HERE AND RETURN THE BOTTOM PORTION WITH YOUR PAYMENT", :at => [address_x, @pdf.cursor], :align => :center, :style => :bold

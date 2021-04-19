@@ -36,6 +36,8 @@ module BenefitMarkets
       end
 
       def self.service_areas_for(address, during: TimeKeeper.date_of_record)
+        # DC is a special case, it has no specific county
+        # This may need to be upated for other special jurisdictions in the future.
         if site_key == :dc
           self.where(
             "active_year" => during.year

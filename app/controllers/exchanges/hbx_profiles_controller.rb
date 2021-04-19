@@ -273,7 +273,7 @@ def employer_poc
     @page_alphabets = page_alphabets(@staff, "last_name")
     page_no = cur_page_no(@page_alphabets.first)
     if @q.nil?
-      @staff = @staff.where(last_name: /^#{Regexp.escape(page_no)}/i)
+      @staff = page_no.present? ? @staff.where(last_name: /^#{Regexp.escape(page_no)}/i) : []
     else
       @staff = @staff.where(last_name: @q)
     end
@@ -360,7 +360,7 @@ def employer_poc
 
   def family_index_dt
     @selector = params[:scopes][:selector] if params[:scopes].present?
-    @datatable = Effective::Datatables::FamilyDataTable.new(params[:scopes].to_h)
+    @datatable = Effective::Datatables::FamilyDataTable.new(permitted_params_family_index_dt.to_h)
     respond_to do |format|
       format.html { render "/exchanges/hbx_profiles/family_index_datatable" }
     end

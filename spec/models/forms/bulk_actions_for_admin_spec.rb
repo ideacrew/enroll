@@ -80,6 +80,11 @@ describe Forms::BulkActionsForAdmin do
       let(:subject) { Forms::BulkActionsForAdmin.new(*cancel_arguments)}
       let!(:glue_event_queue_name) { "#{Rails.application.config.acapi.hbx_id}.#{Rails.application.config.acapi.environment_name}.q.glue.enrollment_event_batch_handler" }
 
+      before do
+        allow(Settings).to receive_message_chain("aca.shop_market.initial_application.quiet_period.month_offset").and_return(0)
+        allow(Settings).to receive_message_chain("aca.shop_market.initial_application.quiet_period.mday").and_return((initial_application.open_enrollment_end_on + 2.days).day)
+      end
+
       it "should cancel enrollment and not trigger cancel event" do
         expect(subject).not_to receive(:notify).with("acapi.info.events.hbx_enrollment.terminated", {:reply_to => glue_event_queue_name, "hbx_enrollment_id" => hbx_enrollment.hbx_id,
                                                                                                      "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment",
@@ -158,6 +163,11 @@ describe Forms::BulkActionsForAdmin do
       end
       let(:subject) { Forms::BulkActionsForAdmin.new(*term_arguments)}
       let!(:glue_event_queue_name) { "#{Rails.application.config.acapi.hbx_id}.#{Rails.application.config.acapi.environment_name}.q.glue.enrollment_event_batch_handler" }
+
+      before do
+        allow(Settings).to receive_message_chain("aca.shop_market.initial_application.quiet_period.month_offset").and_return(0)
+        allow(Settings).to receive_message_chain("aca.shop_market.initial_application.quiet_period.mday").and_return((initial_application.open_enrollment_end_on + 2.days).day)
+      end
 
       it "should terminate enrollment and not trigger terminate event" do
         expect(subject).not_to receive(:notify).with("acapi.info.events.hbx_enrollment.terminated", {:reply_to => glue_event_queue_name, "hbx_enrollment_id" => hbx_enrollment.hbx_id,

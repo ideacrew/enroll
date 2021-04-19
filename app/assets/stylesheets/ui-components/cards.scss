@@ -13,7 +13,7 @@
   border: none !important;
 }
 .broker-icon {
-  color:$mhc-dark-blue;
+  color:$dark-blue;
 }
 .offered {
   color:$primary-green;
@@ -148,7 +148,7 @@
       font-weight: 700;
       line-height: (8em / 14);
       text-align: center;
-      color:$mhc-orange;
+      color:$orange;
     }
 
     #benefit_application_latest_submitted_on_month, #binder_payment_deadline_month {
@@ -168,33 +168,33 @@
 
 #metal-level-select {
   .fa-circle {
-    color:$mhc-light-gray;
+    color:$light-gray;
   }
   .fa-dot-circle {
     color:$primary-green;
   }
   #plan, #level, #carrier, #yourPlans, #sponsorContributions {
-    border:1px solid $mhc-light-gray;
+    border:1px solid $light-gray;
   }
   .nav-tabs {
     border-bottom:none;
   }
   .nav-tabs > li > a {
-    background-color:$mhc-dark-blue;
+    background-color:$dark-blue;
     border-radius: 6px;
     font-weight: bold;
     font-size: 18px;
     padding: 10px;
     color:$primary-white;
     text-transform: uppercase;
-    border:1px solid $mhc-light-gray;
+    border:1px solid $light-gray;
   }
   .nav-tabs > li > a  {
-    border:1px solid $mhc-light-gray;
+    border:1px solid $light-gray;
   }
   .nav-tabs > li > a:hover {
-    background-color:$mhc-dark-blue;
-    color:$mhc-orange;
+    background-color:$dark-blue;
+    color:$orange;
     border-bottom: solid 3px $primary-botton-border-bottom;
   }
   .nav-tabs > li > a.active {
@@ -233,11 +233,11 @@
       border-bottom:1px solid $primary-dark-gray;
     }
     .col-xs-12:hover {
-      border-bottom:1px solid $mhc-dark-blue;
+      border-bottom:1px solid $dark-blue;
     }
     .col-xs-12:hover .rp-view-summary {
       display:block;
-      color:$mhc-blue;
+      color:$blue;
       font-size:12px;
       font-weight:bold;
     }
@@ -273,7 +273,7 @@
 
   /* When the checkbox is checked, add a blue background */
   input:checked ~ .checkmark {
-      background-color: $mhc-dark-blue;
+      background-color: $dark-blue;
   }
 
   /* Create the checkmark/indicator (hidden when not checked) */
@@ -303,19 +303,19 @@
 }
 
 #sponsorContributions {
-  border:1px solid $mhc-light-gray;
+  border:1px solid $light-gray;
   background-color:$primary-white;
   height:330px;
   p {
     width:190px;
     font-size: 14px;
-    color:$mhc-heading-gray;
+    color:$heading-gray;
   }
   .offered-heading {
     border-bottom: solid 1px #d5d5d5;
     padding: 15px 0 15px;
     font-size: 14px;
-    color:$mhc-heading-gray;
+    color:$heading-gray;
   }
   .ac-row {
     padding: 15px 0;
@@ -324,7 +324,7 @@
     color:$primary-green;
   }
   hr {
-    border-top:1px solid $mhc-light-gray;
+    border-top:1px solid $light-gray;
     height:2px;
   }
   .sc-label {
@@ -382,7 +382,7 @@
       width: 25px;
       height: 25px;
       border-radius: 50%;
-      background: $mhc-dark-blue;
+      background: $dark-blue;
       cursor: pointer;
   }
 
@@ -390,7 +390,7 @@
       width: 25px;
       height: 25px;
       border-radius: 50%;
-      background: $mhc-dark-blue;
+      background: $dark-blue;
       cursor: pointer;
   }
 
@@ -432,7 +432,7 @@
 
   /* When the checkbox is checked, add a blue background */
   .sc-container input:checked ~ .checkmark {
-      background-color: $mhc-dark-blue;
+      background-color: $dark-blue;
   }
 
   /* Create the checkmark/indicator (hidden when not checked) */
@@ -490,7 +490,7 @@
     h3 {
       font-size: 12px;
       margin-bottom: 0;
-      color:$mhc-orange;
+      color:$orange;
       font-weight: 300;
       line-height: 1.6em;
     }
@@ -507,7 +507,7 @@
     font-weight: 600;
     text-transform: uppercase;
     font-size:18px;
-    color:$mhc-orange;
+    color:$orange;
   }
 }
 
@@ -516,7 +516,7 @@
     font-weight: 600;
     text-transform: uppercase;
     font-size:18px;
-    color:$mhc-orange;
+    color:$orange;
   }
 }
 
@@ -524,7 +524,7 @@
   .panel-heading {
     background-color:transparent;
     font-size: 16px;
-    color:$mhc-dark-blue;
+    color:$dark-blue;
   }
 }
 
@@ -566,7 +566,7 @@
 
   /* When the radio button is checked, add a blue background */
   .container input:checked ~ .checkmark {
-    background-color: $mhc-dark-blue;
+    background-color: $dark-blue;
   }
 
   /* Create the indicator (the dot/circle - hidden when not checked) */
@@ -604,7 +604,7 @@
     margin-bottom: 12px;
     cursor: pointer;
     font-size: 16px;
-    color:$mhc-orange;
+    color:$orange;
     font-weight: bold;
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -637,7 +637,7 @@
 
   /* When the radio button is checked, add a blue background */
   .container input:checked ~ .checkmark {
-    background-color: $mhc-dark-blue;
+    background-color: $dark-blue;
   }
 
   /* Create the indicator (the dot/circle - hidden when not checked) */
@@ -663,14 +663,14 @@
   }
 }
 .default-orange {
-  color:$mhc-orange;
+  color:$orange;
 }
 .open-enr-date-line-height {
   line-height:1.1em;
 }
 
 .agency-selected {
-  border: 2px solid $mhc-href;
+  border: 2px solid $href;
 }
 
 .broker-staff {

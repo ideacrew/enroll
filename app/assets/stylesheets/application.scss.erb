@@ -179,7 +179,7 @@ img {
        li {
          padding: 0;
          .dark-grey {
-           color: #5C5C5C;
+           color: <%= EnrollRegistry[:primary_black].settings(:color).item %>;
            font-weight: 400;
            font-size: 12px;
            position: relative;
@@ -206,11 +206,11 @@ img {
  }
 .consumer_roles {
   .fa {
-    color: #007bc4;
+    color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
   }
 }
 .fa-question-circle {
-    color: #007bc4;
+    color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
 }
 
 

@@ -2,6 +2,8 @@ Feature: EE with consumer role plan purchase
 
   # TODO: revisit code for background scenarios
   Background: Setup permissions, HBX Admin, users, and organizations and employer profiles
+    Given the shop market configuration is enabled
+    Given all announcements are enabled for user to select
     Given a consumer role person with family
     Given an employer with initial application
     Given all products with issuer profile

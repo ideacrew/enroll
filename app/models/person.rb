@@ -582,6 +582,10 @@ class Person
     addresses.detect { |adr| adr.kind == "home" }
   end
 
+  def zip
+    home_address.zip
+  end
+
   def mailing_address
     addresses.detect { |adr| adr.kind == "mailing" } || home_address
   end
@@ -653,6 +657,7 @@ class Person
   end
 
   def has_active_employee_role?
+    return false unless is_shop_or_fehb_market_enabled?
     active_employee_roles.any?
   end
 
@@ -661,6 +666,7 @@ class Person
   end
 
   def active_employee_roles
+    return [] unless is_shop_or_fehb_market_enabled?
     employee_roles.select{|employee_role| employee_role.census_employee && employee_role.census_employee.is_active? }
   end
 

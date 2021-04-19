@@ -1,7 +1,7 @@
 Feature: Insured Plan Shopping on Individual market
   Background:
     Given the FAA feature configuration is enabled
-
+  @flaky
   Scenario: New insured user purchases on individual market
     Given Individual has not signed up as an HBX user
     When Individual visits the Insured portal during open enrollment
@@ -11,6 +11,7 @@ Feature: Insured Plan Shopping on Individual market
     When user goes to register as an individual
     When user clicks on continue button
     Then user should see heading labeled personal information
+    Then user should see disabled ssn & dob fields
     Then Individual should click on Individual market for plan shopping
     Then Individual should see a form to enter personal information
     When Individual clicks on Save and Exit

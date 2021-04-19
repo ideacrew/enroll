@@ -15,6 +15,7 @@ module FinancialAssistance
     STATE_HEALTH_BENEFITS = %w[medicaid].freeze
 
     INSURANCE_KINDS = %w[
+      private_individual_and_family_coverage
       acf_refugee_medical_assistance
       americorps_health_benefits
       child_health_insurance_plan
@@ -22,7 +23,6 @@ module FinancialAssistance
       medicare
       medicare_advantage
       medicare_part_b
-      private_individual_and_family_coverage
       state_supplementary_payment
       tricare
       veterans_benefits
@@ -46,6 +46,7 @@ module FinancialAssistance
     ].freeze
 
     INSURANCE_TYPE = {
+      private_individual_and_family_coverage: "#{Settings.site.short_name} Individual & Family coverage",
       acf_refugee_medical_assistance: 'ACF Refugee Medical Assistance',
       americorps_health_benefits: 'AmeriCorps health benefits',
       child_health_insurance_plan: "Children's Health Insurance Program",
@@ -53,7 +54,6 @@ module FinancialAssistance
       medicare: 'Medicare',
       medicare_advantage: 'Medicare Advantage',
       medicare_part_b: 'Medicare Part B',
-      private_individual_and_family_coverage: 'Private individual and family coverage',
       state_supplementary_payment: 'State Supplementary Payment',
       tricare: 'TRICARE',
       veterans_benefits: 'Veterans benefits',
@@ -65,7 +65,7 @@ module FinancialAssistance
       self_funded_student_health_coverage: 'Self-funded student health coverage',
       foreign_government_health_coverage: 'Foreign government health coverage',
       private_health_insurance_plan: 'Private health insurance plan',
-      coverage_obtained_through_another_exchange: 'Coverage obtained through another exchange',
+      coverage_obtained_through_another_exchange: "Coverage obtained through a non-#{Settings.site.short_name} marketplace",
       coverage_under_the_state_health_benefits_risk_pool: 'Coverage under the state health benefits risk pool',
       veterans_administration_health_benefits: 'Veterans Administration health benefits',
       peace_corps_health_benefits: 'Peace Corps health benefits'

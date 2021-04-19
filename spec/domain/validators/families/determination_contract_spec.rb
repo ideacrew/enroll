@@ -25,6 +25,14 @@ RSpec.describe Validators::Families::DeterminationContract,  dbclean: :after_eac
       end
     end
 
+    context "with all required and optional parameters and invalid date format" do
+      it "should pass validation" do
+        all_params[:determined_at] = all_params[:determined_at].to_time
+        result = subject.call(all_params)
+        expect(result.success?).to be_truthy
+      end
+    end
+
   end
 
   context "Given valid parameters" do

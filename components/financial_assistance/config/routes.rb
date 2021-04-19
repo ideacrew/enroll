@@ -14,6 +14,7 @@ FinancialAssistance::Engine.routes.draw do
     get 'uqhp_flow', on: :collection, action: 'uqhp_flow', as: 'uqhp_flow'
     get :review_and_submit, on: :member
     get :review, on: :member
+    get :raw_application, on: :member
     get :eligibility_results, on: :member
     get :wait_for_eligibility_response, on: :member
     get :check_eligibility_results_received, on: :member
@@ -34,6 +35,7 @@ FinancialAssistance::Engine.routes.draw do
       get 'save_questions', on: :member, action: 'save_questions', as: 'save_questions'
       get :immigration_document_options, on: :collection
       post :update, on: :member
+      delete :destroy, on: :member
 
       resources :incomes do
         get 'other', on: :collection

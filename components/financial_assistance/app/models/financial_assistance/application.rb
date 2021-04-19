@@ -83,8 +83,9 @@ module FinancialAssistance
     field :determination_http_status_code, type: Integer
     field :determination_error_message, type: String
     field :has_eligibility_response, type: Boolean, default: false
+    field :eligibility_request_payload, type: String
     field :eligibility_response_payload, type: String
-
+    field :full_medicaid_determination, type: Boolean
     field :workflow, type: Hash, default: { }
 
     embeds_many :eligibility_determinations, inverse_of: :application, class_name: '::FinancialAssistance::EligibilityDetermination'
@@ -188,8 +189,7 @@ module FinancialAssistance
           matrix[yi][xi] = find_existing_relationship(id_map[yi], id_map[xi])
         end
       end
-      matrix = apply_rules_and_update_relationships(matrix)
-      matrix
+      apply_rules_and_update_relationships(matrix)
     end
 
     #update method as validate payload
@@ -292,16 +292,16 @@ module FinancialAssistance
       last_name_regex = /^#{verified_family_member.person.name_last}$/i
       first_name_regex = /^#{verified_family_member.person.name_first}$/i
 
-      if !ssn.blank?
-        applicants.where({
-                           :encrypted_ssn => FinancialAssistance::Applicant.encrypt_ssn(ssn),
-                           :dob => dob
-                         }).first
-      else
+      if ssn.blank?
         applicants.where({
                            :dob => dob,
                            :last_name => last_name_regex,
                            :first_name => first_name_regex
+                         }).first
+      else
+        applicants.where({
+                           :encrypted_ssn => FinancialAssistance::Applicant.encrypt_ssn(ssn),
+                           :dob => dob
                          }).first
       end
     end
@@ -338,7 +338,6 @@ module FinancialAssistance
     def update_response_attributes(attrs)
       update_attributes(attrs)
     end
-
 
     def add_eligibility_determination(message)
       update_response_attributes(message)

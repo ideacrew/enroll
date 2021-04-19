@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 Given(/^Admin is on the new Bulk Notice view$/) do
+  load 'app/models/admin/bulk_notice.rb'
   visit new_exchanges_bulk_notice_path
 end
 

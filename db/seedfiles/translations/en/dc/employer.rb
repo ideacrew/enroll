@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 EMPLOYER_TRANSLATIONS = {
   :"en.employer_profiles.profiles.select_this_employer" => "Select this Employer",
   :"en.employer_profiles.profiles.no_employer_found" => "No Employer found",
@@ -6,6 +8,7 @@ EMPLOYER_TRANSLATIONS = {
   :'en.employers.plan_years.co_pay' => "CO-PAY",
   :'en.employers.plan_years.coinsurance' => "COINSURANCE",
   :'en.employers.plan_years.more_details' => "More Details",
+  :'en.employers.plan_years.reinstated' => "Reinstated",
   :'en.employers.plan_years.benefits_title' => "Benefits - Coverage You Offer",
   :'en.employers.plan_years.benefits_title_with_draft_py' => "Benefits - Coverage You Offer",
   :'en.employers.plan_years.benefits_without_plan' => "It's time to create a benefits package. Select 'Add Plan Year' to create your first one. Most employers only create one benefits package but you'll have the opportunity to create more than one if you want to offer different benefits to different groups of employees.",

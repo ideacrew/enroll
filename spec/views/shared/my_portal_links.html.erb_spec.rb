@@ -9,6 +9,10 @@ describe "shared/_my_portal_links.html.haml", dbclean: :after_each do
     let(:user) { FactoryBot.create(:user, person: person, roles: ["employee"]) }
     let(:person) { FactoryBot.create(:person, :with_employee_role)}
 
+    before do
+      EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
+    end
+
     it "should have one portal link" do
       all_census_ee = FactoryBot.create(:census_employee)
       all_er_profile = all_census_ee.employer_profile
@@ -31,6 +35,10 @@ describe "shared/_my_portal_links.html.haml", dbclean: :after_each do
     let(:person) { FactoryBot.create(:person, :with_employee_role, :with_employer_staff_role)}
     let!(:employee_role) { FactoryBot.create(:employee_role, person: person)}
     let(:census_employee) {FactoryBot.create(:benefit_sponsors_census_employee, employer_profile: employer_profile, employee_role_id: employee_role.id)}
+
+    before do
+      EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
+    end
 
     it "should have one portal links and popover" do
       allow(employer_profile).to receive(:active_benefit_sponsorship).and_return(benefit_sponsorship)
@@ -56,6 +64,10 @@ describe "shared/_my_portal_links.html.haml", dbclean: :after_each do
     let(:person) { FactoryBot.create(:person, :with_employee_role, employer_staff_roles:[active_employer_staff_role]) }
     let!(:employee_role) { FactoryBot.create(:employee_role, person: person)}
     let(:benefit_sponsorship)    { BenefitSponsors::BenefitSponsorships::BenefitSponsorship.new(profile: employer_profile) }
+
+    before do
+      EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
+    end
 
     it "should have one portal links and popover" do
       allow(employer_profile).to receive(:active_benefit_sponsorship).and_return(benefit_sponsorship)

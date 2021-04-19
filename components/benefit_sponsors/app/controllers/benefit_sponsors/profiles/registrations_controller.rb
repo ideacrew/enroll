@@ -32,12 +32,13 @@ module BenefitSponsors
               person = current_person
               create_sso_account(current_user, current_person, 15, "employer") do
               end
-              flash[:notice] = "Your employer account has been setup successfully." if params[:manage_portals]
-            elsif is_general_agency_profile? || dc_broker_profile?
+            elsif is_general_agency_profile? || redirect_to_requirements_after_confirmation?
               flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
             end
-            redirect_to result_url unless dc_broker_profile?
-            render 'confirmation', :layout => 'single_column' if dc_broker_profile?
+            redirect_to result_url unless redirect_to_requirements_after_confirmation?
+            # The "confirmation" page is a special view the broker will be redirected to informing them of the necessary requirements to become a broker on the site
+            # It is not enabled by default
+            render 'confirmation', :layout => 'single_column' if redirect_to_requirements_after_confirmation?
             return
           end
         rescue Exception => e
@@ -82,7 +83,7 @@ module BenefitSponsors
 
       def profile_type
         valid_profile_types = %w[benefit_sponsor broker_agency general_agency].freeze
-        profile_type_constant_name = params[:profile_type] || params[:agency][:profile_type] || @agency.profile_type
+        profile_type_constant_name = params[:profile_type] || params.dig(:agency, :profile_type) || @agency.profile_type
         @profile_type = (profile_type_constant_name if valid_profile_types.include?(profile_type_constant_name))
       end
 
@@ -152,12 +153,8 @@ module BenefitSponsors
         current_user.person
       end
 
-      def is_site_dc?
-        Settings.site.key == :dc
-      end
-
-      def dc_broker_profile?
-        is_broker_profile? && is_site_dc?
+      def redirect_to_requirements_after_confirmation?
+        is_broker_profile? && EnrollRegistry.feature_enabled?(:redirect_to_requirements_page_after_confirmation)
       end
 
       def user_not_authorized(exception)

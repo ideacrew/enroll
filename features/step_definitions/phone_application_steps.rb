@@ -15,7 +15,7 @@ And(/^the Admin is on the Personal Info page for the family$/) do
   find(:xpath, '//label[@for="radio_male"]', wait: 10).click
   find('.btn', text: 'CONTINUE', wait: 10).click
 
-  expect(page).to have_content('Next, we need to verify if you or you and your family are eligible to enroll in coverage through DC Health Link. Select CONTINUE.')
+  expect(page).to have_content("Next, we need to verify if you or you and your family are eligible to enroll in coverage through #{Settings.site.short_name}. Select CONTINUE.")
   find('.interaction-click-control-continue', wait: 10).click
 end
 
@@ -28,7 +28,9 @@ And(/^the Admin selects the Phone application option$/) do
 end
 
 Given(/^all other mandatory fields on the page have been populated$/) do
-  step 'person selects all mandatory radio option for us citizen'
+  find(:xpath, '//label[@for="person_us_citizen_true"]', wait: 10).click
+  find(:xpath, '//label[@for="person_naturalized_citizen_false"]', wait: 10).click
+  find(:xpath, '//label[@for="indian_tribe_member_no"]', wait: 10).click
   find(:xpath, '//label[@for="radio_incarcerated_no"]', wait: 10).click
   fill_in "person_addresses_attributes_0_address_1", with: "123 Main St"
   fill_in "person_addresses_attributes_0_address_2", with: "apt 1005"

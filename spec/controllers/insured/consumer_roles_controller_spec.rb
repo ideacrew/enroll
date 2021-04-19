@@ -167,13 +167,14 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           end
         end
 
-        context "when match employer", dbclean: :after_each do
+        context "when match employer with shop_market enabled", dbclean: :after_each do
           before :each do
             allow(mock_consumer_candidate).to receive(:valid?).and_return(true)
             allow(mock_employee_candidate).to receive(:valid?).and_return(true)
             allow(mock_employee_candidate).to receive(:match_census_employees).and_return([])
             #allow(mock_resident_candidate).to receive(:dob).and_return()
             allow(Factories::EmploymentRelationshipFactory).to receive(:build).and_return(true)
+            EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
             post :match, params: { :person => person_parameters }
           end
 
@@ -181,6 +182,23 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             expect(response).to have_http_status(:success)
             expect(response).to render_template('insured/employee_roles/match')
             expect(assigns[:employee_candidate]).to eq mock_employee_candidate
+          end
+        end
+
+        context "when match employer with shop_market disabled", dbclean: :after_each do
+          before :each do
+            allow(mock_consumer_candidate).to receive(:valid?).and_return(true)
+            allow(mock_employee_candidate).to receive(:valid?).and_return(true)
+            allow(mock_employee_candidate).to receive(:match_census_employees).and_return([])
+            #allow(mock_resident_candidate).to receive(:dob).and_return()
+            allow(Factories::EmploymentRelationshipFactory).to receive(:build).and_return(true)
+            EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(false)
+            post :match, params: { :person => person_parameters }
+          end
+
+          it "render employee role match template" do
+            expect(response).to have_http_status(:success)
+            expect(response).not_to render_template('insured/employee_roles/match')
           end
         end
       end
@@ -359,6 +377,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         before :each do
           allow(controller).to receive(:update_vlp_documents).and_return(true)
           allow(person).to receive(:employee_roles).and_return [employee_role]
+          EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
           put :update, params: { person: person_params, id: "test" }
         end
 

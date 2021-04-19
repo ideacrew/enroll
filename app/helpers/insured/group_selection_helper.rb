@@ -2,11 +2,11 @@ module Insured
   module GroupSelectionHelper
 
     def can_shop_individual?(person)
-      person.present? && person.is_consumer_role_active?
+      EnrollRegistry.feature_enabled?(:aca_individual_market) && person.present? && person.is_consumer_role_active?
     end
 
     def can_shop_shop?(person)
-      person.present? && person.has_employer_benefits?
+      EnrollRegistry.feature_enabled?(:aca_shop_market) && person.present? && person.has_employer_benefits?
     end
 
     def can_shop_both_markets?(person)
@@ -15,6 +15,10 @@ module Insured
 
     def can_shop_resident?(person)
       person.present? && person.is_resident_role_active?
+    end
+
+    def is_shop_or_fehb_market_enabled?
+      EnrollRegistry.feature_enabled?(:fehb_market) || EnrollRegistry.feature_enabled?(:aca_shop_market)
     end
 
     def can_shop_individual_or_resident?(person)
@@ -105,6 +109,8 @@ module Insured
     end
 
     def insure_hbx_enrollment_for_shop_qle_flow
+      return unless is_shop_or_fehb_market_enabled?
+
       @hbx_enrollment = selected_enrollment(@family, @employee_role, @coverage_kind) if (@market_kind == 'shop' || @market_kind == 'fehb') && (@change_plan == 'change_by_qle' || @enrollment_kind == 'sep') && @hbx_enrollment.blank?
     end
 
@@ -117,7 +123,7 @@ module Insured
       if benefit_application.present? && benefit_application.is_renewing?
         renewal_enrollment(enrollments, employee_role, coverage_kind)
       else
-        active_enrollment(enrollments, employee_role, coverage_kind)
+        active_enrollment(family, enrollments, employee_role, coverage_kind)
       end
     end
 
@@ -131,10 +137,11 @@ module Insured
       ).first
     end
 
-    def active_enrollment(enrollments, employee_role, coverage_kind)
+    def active_enrollment(family, enrollments, employee_role, coverage_kind)
+      coverage_date = family&.current_sep&.effective_on
       enrollments.where(
         {
-          :sponsored_benefit_package_id => employee_role.census_employee.active_benefit_package.try(:id),
+          :sponsored_benefit_package_id => employee_role.census_employee.active_benefit_package(coverage_date).try(:id),
           :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES,
           :coverage_kind => coverage_kind
         }

@@ -1,5 +1,6 @@
 class Insured::GroupSelectionController < ApplicationController
   include Insured::GroupSelectionHelper
+  include Config::SiteConcern
 
   before_action :initialize_common_vars, only: [:new, :create, :terminate_selection]
   # before_action :set_vars_for_market, only: [:new]
@@ -75,9 +76,7 @@ class Insured::GroupSelectionController < ApplicationController
     return redirect_to purchase_insured_families_path(change_plan: @change_plan, terminate: 'terminate') if params[:commit] == "Terminate Plan"
     if (@market_kind == 'shop' || @market_kind == 'fehb') && @employee_role.census_employee.present?
       new_hire_enrollment_period = @employee_role.census_employee.new_hire_enrollment_period
-      if new_hire_enrollment_period.begin > TimeKeeper.date_of_record
-        raise "You're not yet eligible under your employer-sponsored benefits. Please return on #{new_hire_enrollment_period.begin.strftime("%m/%d/%Y")} to enroll for coverage."
-      end
+      raise "You're not yet eligible under your employer-sponsored benefits. Please return on #{new_hire_enrollment_period.begin.strftime('%m/%d/%Y')} to enroll for coverage." if new_hire_enrollment_period.begin.to_date > TimeKeeper.date_of_record
     end
 
     unless @adapter.is_waiving?(permitted_group_selection_params)
@@ -110,9 +109,7 @@ class Insured::GroupSelectionController < ApplicationController
     if @adapter.keep_existing_plan?(permitted_group_selection_params) && @adapter.previous_hbx_enrollment.present?
       sep = @hbx_enrollment.earlier_effective_sep_by_market_kind
 
-      if sep.present?
-        hbx_enrollment.special_enrollment_period_id = sep.id
-      end
+      hbx_enrollment.special_enrollment_period_id = sep.id if sep.present?
 
       hbx_enrollment.product = @hbx_enrollment.product
     end
@@ -153,12 +150,12 @@ class Insured::GroupSelectionController < ApplicationController
     else
       raise "You must select the primary applicant to enroll in the healthcare plan"
     end
-  rescue Exception => error
-    flash[:error] = error.message
-    logger.error "#{error.message}\n#{error.backtrace.join("\n")}"
+  rescue StandardError => e
+    flash[:error] = e.message
+    logger.error "#{e.message}\n#{e.backtrace.join("\n")}"
     employee_role_id = @employee_role.id if @employee_role
     consumer_role_id = @consumer_role.id if @consumer_role
-    return redirect_to new_insured_group_selection_path(person_id: @person.id, employee_role_id: employee_role_id, change_plan: @change_plan, market_kind: @market_kind, consumer_role_id: consumer_role_id, enrollment_kind: @enrollment_kind)
+    redirect_to new_insured_group_selection_path(person_id: @person.id, employee_role_id: employee_role_id, change_plan: @change_plan, market_kind: @market_kind, consumer_role_id: consumer_role_id, enrollment_kind: @enrollment_kind)
   end
 
   def terminate_selection
@@ -212,7 +209,7 @@ class Insured::GroupSelectionController < ApplicationController
   private
 
   def family_member_eligibility_check(family_member)
-    return unless (@adapter.can_shop_individual?(@person) || @adapter.can_shop_resident?(@person))
+    return unless @adapter.can_shop_individual?(@person) || @adapter.can_shop_resident?(@person)
 
     role = if family_member.person.is_consumer_role_active?
              family_member.person.consumer_role
@@ -255,7 +252,6 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   def build_hbx_enrollment(family_member_ids)
-
     @adapter.if_previous_enrollment_was_special_enrollment do
       @change_plan = 'change_by_qle'
     end
@@ -266,25 +262,13 @@ class Insured::GroupSelectionController < ApplicationController
 
     case @market_kind
     when 'shop', 'fehb'
-      @adapter.if_employee_role_unset_but_can_be_derived(@employee_role) do |e_role|
-        @employee_role = e_role
-      end
-
-      set_change_plan
-
-      benefit_group = nil
-      benefit_group_assignment = nil
-
-      if @adapter.is_waiving?(permitted_group_selection_params)
-        if @adapter.previous_hbx_enrollment.present?
-          @adapter.build_change_shop_waiver_enrollment(@employee_role, @change_plan, permitted_group_selection_params)
-        else
-          @adapter.build_new_shop_waiver_enrollment(@employee_role)
+      if is_shop_or_fehb_market_enabled?
+        @adapter.if_employee_role_unset_but_can_be_derived(@employee_role) do |e_role|
+          @employee_role = e_role
         end
-      elsif @adapter.previous_hbx_enrollment.present?
-        @adapter.build_shop_change_enrollment(@employee_role, @change_plan, family_member_ids)
-      else
-        @adapter.build_new_shop_enrollment(@employee_role, family_member_ids)
+
+        set_change_plan
+        build_shop_enrollment(permitted_group_selection_params, family_member_ids, @change_plan, @employee_role)
       end
     when 'individual'
       @adapter.coverage_household.household.new_hbx_enrollment_from(
@@ -292,17 +276,34 @@ class Insured::GroupSelectionController < ApplicationController
         resident_role: @adapter.person.resident_role,
         coverage_household: @adapter.coverage_household,
         qle: @adapter.is_qle?,
-        opt_effective_on: @adapter.optional_effective_on)
+        opt_effective_on: @adapter.optional_effective_on
+      )
     when 'coverall'
       @adapter.coverage_household.household.new_hbx_enrollment_from(
         consumer_role: @person.consumer_role,
         resident_role: @person.resident_role,
         coverage_household: @adapter.coverage_household,
         qle: @adapter.is_qle?,
-        opt_effective_on: @adapter.optional_effective_on)
+        opt_effective_on: @adapter.optional_effective_on
+      )
     end
   end
 
+  def build_shop_enrollment(permitted_group_selection_params, family_member_ids, change_plan, employee_role)
+    return unless employee_role.present?
+
+    if @adapter.is_waiving?(permitted_group_selection_params)
+      if @adapter.previous_hbx_enrollment.present?
+        @adapter.build_change_shop_waiver_enrollment(employee_role, change_plan, permitted_group_selection_params)
+      else
+        @adapter.build_new_shop_waiver_enrollment(employee_role)
+      end
+    elsif @adapter.previous_hbx_enrollment.present?
+      @adapter.build_shop_change_enrollment(employee_role, change_plan, family_member_ids)
+    else
+      @adapter.build_new_shop_enrollment(employee_role, family_member_ids)
+    end
+  end
 
   def initialize_common_vars
     @adapter = GroupSelectionPrevaricationAdapter.initialize_for_common_vars(permitted_group_selection_params)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'date'
 module BenefitSponsors
   module Organizations
@@ -17,8 +19,8 @@ module BenefitSponsors
 
         def self.call(attributes)
           factory_obj = new(attributes.merge({
-            handler: initialize_handler(attributes[:profile_type])
-          }))
+                                               handler: initialize_handler(attributes[:profile_type])
+                                             }))
           factory_obj.current_user = current_user(attributes[:current_user_id])
           factory_obj.profile_id.present? ? update!(factory_obj, attributes) : persist!(factory_obj, attributes)
         end
@@ -26,16 +28,16 @@ module BenefitSponsors
         def self.update!(factory_obj, attributes)
           organization = factory_obj.get_organization
           organization.assign_attributes(sanitize_organization_params_for_update(attributes[:organization]))
-          organization.update_benefit_sponsorship(organization.employer_profile) if (is_employer_profile? && address_changed?(organization.employer_profile))
+          organization.update_benefit_sponsorship(organization.employer_profile) if is_employer_profile? && address_changed?(organization.employer_profile)
           factory_obj.update_representative(attributes[:staff_roles_attributes][0]) if attributes[:staff_roles_attributes].present?
           updated = if organization.valid?
-            organization.save!
-            update_plan_design_organization(organization)
-          else
-            factory_obj.errors.add(:organization, organization.errors.full_messages)
-            false
-          end
-          return factory_obj
+                      organization.save!
+                      update_plan_design_organization(organization)
+                    else
+                      factory_obj.errors.add(:organization, organization.errors.full_messages)
+                      false
+                    end
+          factory_obj
         end
 
         def self.update_plan_design_organization(organization)
@@ -60,8 +62,8 @@ module BenefitSponsors
 
         def self.build(attrs)
           new(attrs.merge({
-            handler: initialize_handler(attrs[:profile_type])
-          })).build_organization
+                            handler: initialize_handler(attrs[:profile_type])
+                          })).build_organization
         end
 
         def self.initialize_handler(type)
@@ -143,7 +145,7 @@ module BenefitSponsors
             errors.add(:organization, organization.errors.full_messages)
             return false
           end
-          return true
+          true
         end
 
         def persist_representative!
@@ -191,29 +193,29 @@ module BenefitSponsors
 
         def build_person
           Person.new({
-            :first_name => first_name.strip,
-            :last_name => last_name.strip,
-            :dob => dob
-          })
+                       :first_name => first_name.strip,
+                       :last_name => last_name.strip,
+                       :dob => dob
+                     })
         end
 
         def organization_attributes(attrs = {})
           attrs.except(:profiles_attributes).merge({
-            site: site,
-            fein: (fein.present? ? fein.strip : nil),
-            legal_name: (legal_name.present? ? legal_name.strip : nil)
-          })
+                                                     site: site,
+                                                     fein: (fein.present? ? fein.strip : nil),
+                                                     legal_name: (legal_name.present? ? legal_name.strip : nil)
+                                                   })
         end
 
-        def profile_attributes(attrs={})
+        def profile_attributes(attrs = {})
           attrs[:profiles_attributes][0] if attrs[:profiles_attributes].present?
         end
 
-        def staff_role_attributes(attrs={})
+        def staff_role_attributes(attrs = {})
           attrs.present? ? attrs[0] : attrs
         end
 
-        def self.sanitize_organization_params_for_update(attrs={})
+        def self.sanitize_organization_params_for_update(attrs = {})
           attrs[:profiles_attributes][0].except!(:referred_by, :referred_reason)
           attrs
         end
@@ -228,11 +230,9 @@ module BenefitSponsors
 
           if matched_people.count == 1
             mp = matched_people.first
-            if is_employer_profile? && mp.user.present?
-              if mp.user.id.to_s != current_user.id.to_s
-                errors.add(:staff_role, "a person matching the provided personal information has already been claimed by another user.  Please contact HBX.")
-                return false
-              end
+            if is_employer_profile? && mp.user.present? && (mp.user.id.to_s != current_user.id.to_s)
+              errors.add(:staff_role, "a person matching the provided personal information has already been claimed by another user.  Please contact HBX.")
+              return false
             end
             self.person = mp
           else
@@ -252,17 +252,17 @@ module BenefitSponsors
             errors.add(:organization, "has already been created for this Agency type")
             return true
           end
-          return false
+          false
         end
 
         def issuer_requesting_sponsor_benefits?(organization)
           if organization.present? && organization.is_an_issuer_profile?
             errors.add(:organization, "Issuer cannot sponsor benefits")
-            return true
+            true
           end
         end
 
-        def redirection_url(is_pending=nil, is_saved=nil)
+        def redirection_url(_is_pending = nil, is_saved = nil)
           handler.is_saved = is_saved
           handler.factory = self
           handler.redirection_url
@@ -290,7 +290,7 @@ module BenefitSponsors
             if employer_ids.include? profile.id
               pending = false
             else
-              pending = organization && Person.staff_for_employer(profile).detect{|person|person.user_id}
+              pending = organization && Person.staff_for_employer(profile).detect(&:user_id)
               role_state = pending ? 'is_applicant' : 'is_active'
               attrs = {
                 person: person,
@@ -335,37 +335,35 @@ module BenefitSponsors
           def fetch_organization(attributes)
             if organization.present?
               factory.claimed = is_employer_profile_claimed?
-              unless factory.claimed
-                if organization.employer_profile.blank?
-                  organization.profiles << build_profile(attributes)
-                  factory.profile.add_benefit_sponsorship
-                end
+              if !factory.claimed && organization.employer_profile.blank?
+                organization.profiles << build_profile(attributes)
+                factory.profile.add_benefit_sponsorship
               end
               organization
             end
           end
 
-          def build_profile(attrs={})
+          def build_profile(attrs = {})
             build_sponsor_profile_class.new(attrs)
           end
 
           def build_sponsor_profile_class
-            # TODO - Use Configuration settings
-            site_key = BenefitSponsors::ApplicationController::current_site.site_key
-            return Organizations::AcaShopDcEmployerProfile if site_key == :dc
+            # TODO: - Use Configuration settings
+            site_key = BenefitSponsors::ApplicationController.current_site.site_key
             return Organizations::AcaShopCcaEmployerProfile if site_key == :cca
+            Organizations::AcaShopDcEmployerProfile
           end
 
           def find_representatives
             Person.where(:employer_staff_roles => {
-              '$elemMatch' => {
-                :benefit_sponsor_employer_profile_id => BSON::ObjectId(profile_id),
-                :aasm_state.ne => :is_closed
-              }
-            })
+                           '$elemMatch' => {
+                             :benefit_sponsor_employer_profile_id => BSON::ObjectId(profile_id),
+                             :aasm_state.ne => :is_closed
+                           }
+                         })
           end
 
-          def update_representative(attributes)
+          def update_representative(_attributes)
             nil # Representative Info not updatable for benefit sponsor
           end
 
@@ -374,11 +372,7 @@ module BenefitSponsors
           end
 
           def is_employer_profile_claimed?
-            if organization.employer_profile.present?
-              if (Person.where({"employer_staff_roles.benefit_sponsor_employer_profile_id" => organization.employer_profile._id}).any?)
-                return true
-              end
-            end
+            return true if organization.employer_profile.present? && Person.where({"employer_staff_roles.benefit_sponsor_employer_profile_id" => organization.employer_profile._id}).any?
           end
 
           def redirection_url
@@ -399,10 +393,10 @@ module BenefitSponsors
           def persist_representative!
             profile = organization.general_agency_profile
             person.general_agency_staff_roles << ::GeneralAgencyStaffRole.new({
-              :npn => factory.npn,
-              :benefit_sponsors_general_agency_profile_id => profile.id,
-              :is_primary => true
-            })
+                                                                                :npn => factory.npn,
+                                                                                :benefit_sponsors_general_agency_profile_id => profile.id,
+                                                                                :is_primary => true
+                                                                              })
             profile.office_locations.each do |office_location|
               person.phones.push(Phone.new(office_location.phone.attributes.except("_id")))
             end
@@ -416,17 +410,17 @@ module BenefitSponsors
             end
           end
 
-          def build_profile(attrs={})
+          def build_profile(attrs = {})
             Organizations::GeneralAgencyProfile.new(attrs)
           end
 
           def find_representatives
-            Person.where(:"general_agency_staff_roles" => {
-              '$elemMatch' => {
-                :benefit_sponsors_general_agency_profile_id => BSON::ObjectId(profile_id),
-                :is_primary => true
-              }
-            })
+            Person.where(:general_agency_staff_roles => {
+                           '$elemMatch' => {
+                             :benefit_sponsors_general_agency_profile_id => BSON::ObjectId(profile_id),
+                             :is_primary => true
+                           }
+                         })
           end
 
           def update_representative(attributes)
@@ -452,11 +446,11 @@ module BenefitSponsors
           def persist_representative!
             profile = organization.broker_agency_profile
             person.broker_role = ::BrokerRole.new({
-              :provider_kind => 'broker',
-              :npn => factory.npn,
-              :benefit_sponsors_broker_agency_profile_id => profile.id,
-              :market_kind => factory.market_kind
-            })
+                                                    :provider_kind => 'broker',
+                                                    :npn => factory.npn,
+                                                    :benefit_sponsors_broker_agency_profile_id => profile.id,
+                                                    :market_kind => factory.market_kind
+                                                  })
 
             profile.office_locations.each do  |office_location|
               person.phones.push(Phone.new(office_location.phone.attributes.except("_id")))
@@ -473,7 +467,7 @@ module BenefitSponsors
             end
           end
 
-          def build_profile(attrs={})
+          def build_profile(attrs = {})
             Organizations::BrokerAgencyProfile.new(attrs)
           end
 
@@ -507,7 +501,7 @@ module BenefitSponsors
 
         def site
           return @site if defined? @site
-          @site = BenefitSponsors::ApplicationController::current_site
+          @site = BenefitSponsors::ApplicationController.current_site
         end
 
         def site_key
@@ -532,19 +526,18 @@ module BenefitSponsors
         end
 
         def self.current_user(user_id)
-          if user_id.present?
-            User.find(user_id)
-          end
+          User.find(user_id) if user_id.present?
         end
 
         def self.get_profile_type(profile_id)
           organization = new({profile_id: profile_id}).get_organization
           type = organization.profiles.where(id: profile_id).first.class.to_s
-          if type.match(/EmployerProfile/)
+          case type
+          when /EmployerProfile/
             "benefit_sponsor"
-          elsif type.match(/BrokerAgencyProfile/)
+          when /BrokerAgencyProfile/
             "broker_agency"
-          elsif type.match(/GeneralAgencyProfile/)
+          when /GeneralAgencyProfile/
             "general_agency"
           end
         end
@@ -570,7 +563,7 @@ module BenefitSponsors
               first_name: regex_for(first_name),
               last_name: regex_for(last_name),
               dob: dob
-              )
+            )
           else
             Person.where(
               first_name: regex_for(first_name),
@@ -593,13 +586,11 @@ module BenefitSponsors
         end
 
         def npn_already_taken?(npn)
-          if is_broker_profile?
-            if Person.where("broker_role.npn" => npn).any?
-              errors.add(:organization, l10n("broker_agencies.profiles.npn_taken_error"))
-              return true
-            end
+          if is_broker_profile? && Person.where("broker_role.npn" => npn).any?
+            errors.add(:organization, l10n("broker_agencies.profiles.npn_taken_error"))
+            return true
           end
-          return false
+          false
         end
 
         def valid_office_location_kinds?
@@ -617,7 +608,7 @@ module BenefitSponsors
               return false
             end
           end
-          return true
+          true
         end
       end
     end

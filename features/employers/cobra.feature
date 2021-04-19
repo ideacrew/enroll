@@ -1,5 +1,7 @@
 Feature: Census Employee COBRA functionality
   Background: Setup site, employer, and benefit application
+    Given the shop market configuration is enabled
+    Given all announcements are enabled for user to select
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for active initial employer with health benefits
     And there is an employer EnterPrise Limited
@@ -21,7 +23,7 @@ Feature: Census Employee COBRA functionality
     Then employer should see the Initiate cobra success flash notice
     And employer clicks on all employees
     And employer should see census employee status as Cobra eligible
-
+@flaky
   Scenario: Employer terminates and Initiate COBRA to enrolled employee
     Given staff role person logged in
     And initial employer EnterPrise Limited has active benefit application

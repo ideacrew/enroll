@@ -45,10 +45,10 @@ module Operations
                  :is_homeless, :is_temporarily_out_of_state].inject({}) do |att_hash, attribute|
                   att_hash[attribute] = person.send(attribute)
                   att_hash
-                end
+        end
         attrs.merge!(person_hbx_id: person.hbx_id,
                      ssn: person.ssn,
-                     dob: person.dob.strftime("%d/%m/%Y"),
+                     dob: person.dob.present? ? person.dob.strftime("%d/%m/%Y") : nil,
                      is_applying_coverage: person.consumer_role.is_applying_coverage,
                      citizen_status: person.citizen_status,
                      is_consumer_role: true,

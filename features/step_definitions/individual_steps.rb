@@ -85,6 +85,11 @@ Then(/^.+ should see heading labeled personal information/) do
   expect(page).to have_css("#gender-tooltip")
 end
 
+Then(/^.+ should see disabled ssn & dob fields/) do
+  expect(page.find("#person_ssn")[:disabled]).to eq "true"
+  expect(page.find("input[name='jq_datepicker_ignore_person[dob]'")[:disabled]).to eq "true"
+end
+
 Then(/Individual should click on Individual market for plan shopping/) do
   wait_for_ajax
   expect(page).to have_button("CONTINUE", visible: false)
@@ -377,7 +382,7 @@ And(/I click on log out link$/) do
 end
 
 And(/^.+ click on Sign In$/) do
-  expect(page).to have_content "Welcome to the District's Health Insurance Marketplace"
+  expect(page).to have_content Settings.site.header_message
 end
 
 And(/I signed in$/) do
@@ -828,4 +833,21 @@ end
 
 Then("I should see a new renewing enrollment title on home page") do
   expect(page).to have_content "Auto Renewing"
+end
+
+When(/^Incarcerated field is nil for the consumer$/) do
+  user.person.update_attributes(is_incarcerated: nil)
+end
+
+Then(/^the consumer should see a message with incarcerated error$/) do
+  expect(page).to have_content(/Incarceration question must be answered/)
+end
+
+When(/^DOB is nil for the consumer$/) do
+  user.person.update_attributes(dob: nil)
+  user.person.save(validate: false)
+end
+
+Then(/^the consumer should see a message with dob error$/) do
+  expect(page).to have_content(/dob - must be filled/)
 end

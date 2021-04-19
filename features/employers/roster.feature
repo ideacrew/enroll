@@ -1,6 +1,8 @@
 Feature: Employer can view their employees
 
   Background: Setup site, employer, and benefit application
+    Given the shop market configuration is enabled
+    Given all announcements are enabled for user to select
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for enrollment_open renewal employer with health benefits
     Given Qualifying life events are present
@@ -74,3 +76,5 @@ Feature: Employer can view their employees
     When employer selects Patrick Doe employee on Employee Roster
     Then employer should see enrollment tile
     Then employer clicks logout
+
+

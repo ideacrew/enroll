@@ -36,3 +36,21 @@ Feature: Cost Savings
     Given the FAA feature configuration is enabled
     When the consumer manually enters the "Cost Savings" url in the browser search bar
     Then the consumer will navigate to the Cost Savings page
+
+  Scenario: FAA Feature Is Enabled - Consumer has nil fields for Incarcerated status
+    Given the FAA feature configuration is enabled
+    Given consumer visits home page
+    When the consumer clicks the Cost Savings link
+    Then the consumer will navigate to the Cost Savings page
+    When Incarcerated field is nil for the consumer
+    Then they click 'Start New Application' button
+    Then the consumer should see a message with incarcerated error
+
+  Scenario: FAA Feature Is Enabled - Consumer has nil value for DOB
+    Given the FAA feature configuration is enabled
+    Given consumer visits home page
+    When the consumer clicks the Cost Savings link
+    Then the consumer will navigate to the Cost Savings page
+    When DOB is nil for the consumer
+    Then they click 'Start New Application' button
+    Then the consumer should see a message with dob error

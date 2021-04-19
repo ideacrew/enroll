@@ -1,6 +1,8 @@
 Feature: Admin need permission to see Manage SEPs link and active SEP Types on Datable
 
   Scenario Outline: HBX Staff with <subrole> subroles should <action> Manage SEPs button
+    Given both shop and fehb market configurations are enabled
+    Given all market kinds are enabled for user to select
     Given that a user with a HBX staff role with <subrole> subrole exists
     When Hbx Admin logs on to the Hbx Portal
     Given the Admin is on the Main Page
@@ -19,6 +21,7 @@ Feature: Admin need permission to see Manage SEPs link and active SEP Types on D
       | developer     | not see | cannot    |
 
   Scenario Outline: Admin should able to see Active <market_kind> market SEP Types on datatable
+    Given both shop and fehb market configurations are enabled
     Given that a user with a HBX staff role with hbx_tier3 subrole exists
     When Hbx Admin logs on to the Hbx Portal
     Given the Admin is on the Main Page

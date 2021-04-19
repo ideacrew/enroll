@@ -102,6 +102,20 @@ And(/^the broker (.*?) is primary broker for (.*?)$/) do |broker_name, broker_ag
   assign_broker_to_broker_agency(broker_name, broker_agency_name)
 end
 
+And(/^employer (.*?) is listed under the account for broker (.*?)$/) do |employer_name, broker_agency_name|
+  employer = BenefitSponsors::Organizations::Organization.all.detect { |org| org.legal_name == employer_name }
+  sponsorship = employer.employer_profile.benefit_sponsorships.last
+  broker_agency = BenefitSponsors::Organizations::Organization.all.detect { |org| org.legal_name == broker_agency_name }
+  broker_agency_prof = broker_agency.broker_agency_profile
+  broker_agency_under_sponsorships = sponsorship.broker_agency_accounts.detect { |broker_agency_account| broker_agency_account.broker_agency_profile == broker_agency_prof }
+  raise("No broker agency under sponsorship") if broker_agency_under_sponsorships.blank?
+  dt_query = nil
+  query = BenefitSponsors::Queries::BrokerFamiliesQuery.new(dt_query, broker_agency_prof.id, broker_agency_prof.market_kind)
+  census_employee_names = employer.employer_profile.census_employees.map(&:full_name)
+  query_family_primary_person_names = query.filtered_scope.map { |query_family| query_family&.primary_person&.full_name }
+  census_employee_names.each { |ce_name| expect(query_family_primary_person_names).to include(ce_name) }
+end
+
 And(/^employer (.*?) hired broker (.*?) from (.*?)$/) do |employer_name, broker_name, broker_agency_name|
   plan_design_organization(employer_name, broker_agency_name)
   assign_broker_agency_account(broker_name, broker_agency_name)

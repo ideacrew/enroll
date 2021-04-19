@@ -144,8 +144,8 @@ RSpec.describe ApplicationHelper, :type => :helper do
       expect(network_type(nationwide_product)).to eq 'Nationwide'
     end
 
-    it 'should display DC-Metro if product is DC-Metro' do
-      expect(network_type(dcmetro_product)).to eq 'DC-Metro'
+    it "should display the statewide area according to the enroll registry" do
+      expect(network_type(dcmetro_product)).to eq ::EnrollRegistry[:enroll_app].setting(:statewide_area).item
     end
 
     it 'should display empty if metal level if its a 2016 plan' do
@@ -297,16 +297,16 @@ RSpec.describe ApplicationHelper, :type => :helper do
     let(:employer_profile) {organization.employer_profile}
     let(:employee_role) { FactoryBot.create(:employee_role, person: person, employer_profile: employer_profile)}
     let!(:broker_role) { FactoryBot.create(:broker_role, aasm_state: 'active') }
-    let!(:broker_agency_profile) { FactoryBot.create(:broker_agency_profile, aasm_state: 'is_approved', primary_broker_role: broker_role, organization: organization)}
     let!(:broker_agency_account) {FactoryBot.create(:broker_agency_account,broker_agency_profile_id: broker_agency_profile.id,writing_agent_id: broker_role.id, start_on: TimeKeeper.date_of_record)}
     let!(:broker_organization)            { FactoryBot.build(:benefit_sponsors_organizations_general_organization, site: site)}
-    let!(:broker_agency_profile)         { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile, organization: broker_organization, market_kind: 'shop', legal_name: 'Legal Name1') }
+    let!(:broker_agency_profile)         { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile, organization: broker_organization, legal_name: 'Legal Name1') }
 
     context 'person with dual roles' do
       before do
         allow(person).to receive(:employee_roles).and_return([employee_role])
         allow(person).to receive(:active_employee_roles).and_return([employee_role])
         allow(person).to receive(:consumer_role).and_return([])
+        allow(person).to receive(:has_active_employee_role?).and_return(true)
         allow(employer_profile).to receive(:broker_agency_profile).and_return([broker_agency_profile])
       end
 
@@ -793,6 +793,7 @@ describe "Enabled/Disabled IVL market" do
     it_behaves_like 'float_fix', 102.1699999999, 102.17
     it_behaves_like 'float_fix', 866.0799999996, 866.08
     it_behaves_like 'float_fix', (2.76 + 2.43), 5.19
+    it_behaves_like 'float_fix', (0.57 * 100), 57
   end
 
   describe 'round_down_float_two_decimals' do

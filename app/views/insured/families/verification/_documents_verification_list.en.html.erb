@@ -1,20 +1,22 @@
+<% state_abbreviation = site_key.upcase %>
+
 <div>
 <h4><b>SSN:</b></h4>
 <ul>
   <li>Social Security Card</li>
 </ul>
 
-<h4><b>DC Residency:</b></h4>
-<p>Documents you can use to verify DC residency include:</p>
+<h4><b><%= state_abbreviation %> Residency:</b></h4>
+<p>Documents you can use to verify <%= state_abbreviation %> residency include:</p>
 <ul>
-  <li>A copy of an active lease agreement, certified deed, or mortgage statement with DC address</li>
+  <li>A copy of an active lease agreement, certified deed, or mortgage statement with <%= state_abbreviation %> address</li>
   <li>A phone or utility bill from within the past two months</li>
-  <li>DC voter registration card</li>
-  <li>A valid District of Columbia motor vehicle registration or DC DMV identification card</li>
+  <li><%= state_abbreviation %> voter registration card</li>
+  <li>A valid District of Columbia motor vehicle registration or <%= state_abbreviation %> DMV identification card</li>
   <li>Cancelled checks or receipts for mortgage or rental payments on a residential property within the past 2 months</li>
-  <li>Utility bills with a DC address, and payment receipts within the past 2 months</li>
-  <li>Proof of automobile insurance showing the person’s DC residency address</li>
-  <li>A signed DC Department of Motor Vehicles proof of residency form from another District resident stating that the applicant lives at their address in the District. (available at: <a href= "https://dmv.dc.gov/page/proof-dc-residency-certifications", target= "_blank">https://dmv.dc.gov/page/proof-dc-residency-certifications</a>)</li>
+  <li>Utility bills with a <%= state_abbreviation %> address, and payment receipts within the past 2 months</li>
+  <li>Proof of automobile insurance showing the person’s <%= state_abbreviation %> residency address</li>
+  <li>A signed <%= state_abbreviation %> Department of Motor Vehicles proof of residency form from another District resident stating that the applicant lives at their address in the District. (available at: <a href="<%= EnrollRegistry[:enroll_app].setting(:site_key).item %>" target= "_blank"><%= EnrollRegistry[:enroll_app].setting(:site_key).item %></a>)</li>
   <li>Self-attestation of residency without paper documentation in exceptional circumstances, including homelessness and in cases of domestic violence</li>
 </ul>
 
@@ -36,7 +38,7 @@
 </ul>
 <h5>Secondary documentation: (Must Present One (1) of the following, along with ID):</h5>
 <ul>
-  <li>A U.S. birth certificate showing birth in one of the 50 states, DC, Guam, American Samoa, Swain’s Island, Puerto Rico, the Virgin Islands, or the Commonwealth of the Northern Mariana
+  <li>A U.S. birth certificate showing birth in one of the 50 states, <%= state_abbreviation %>, Guam, American Samoa, Swain’s Island, Puerto Rico, the Virgin Islands, or the Commonwealth of the Northern Mariana
     Islands. If born in the Puerto Rico, the Virgin Islands, or CNMI prior to the time these areas became part of the U.S., the individual will satisfy the citizenship requirement if he or she is a
     collectively naturalized citizen.
   </li>

@@ -76,10 +76,6 @@ module Effective
         "benefit_sponsors.profiles_employers_employer_profile_path(row.sponsor_profile_id, tab: 'home')"
       end
 
-      def dc?
-        aca_state_abbreviation == "DC"
-      end
-
       def on_general_agency_portal?
         attributes[:is_general_agency?]
       end

@@ -88,7 +88,7 @@ class Insured::ConsumerRolesController < ApplicationController
         when :existing_account
           format.html { redirect_to URI.parse(SamlInformation.account_recovery_url).to_s }
         else
-          unless params[:persisted] == "true"
+          if params[:persisted] != "true" && ::EnrollRegistry[:aca_shop_market].enabled?
             @employee_candidate = Forms::EmployeeCandidate.new(@person_params)
 
             if @employee_candidate.valid?
@@ -312,7 +312,7 @@ class Insured::ConsumerRolesController < ApplicationController
         if result.success?
           redirect_to financial_assistance.application_checklist_application_path(id: result.success)
         else
-          flash[:error] = result.errors
+          flash[:error] = get_error_messages(result)
           redirect_back fallback_location: '/'
         end
       rescue StandardError => e
@@ -326,6 +326,17 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   private
+
+  def get_error_messages(result)
+    message_array = []
+    messages = result.failure.messages
+    messages.each do |message|
+      message.meta[:error].each do |key, value|
+        message_array << "#{key} - #{value[0]}"
+      end
+    end
+    message_array
+  end
 
   def decrypt_params
     return unless SymmetricEncryption.encrypted?(params[:person][:first_name]) #temporary fix, need better handling of encryption.

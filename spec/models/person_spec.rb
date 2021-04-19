@@ -226,7 +226,7 @@ describe Person, :dbclean => :after_each do
         it "should fail validation" do
           person = Person.new(**params)
           person.valid?
-          expect(person.errors[:ssn]).to eq ["SSN must be 9 digits"]
+          expect(person.errors[:ssn]).to eq ["must have 9 digits"]
         end
       end
 
@@ -314,6 +314,7 @@ describe Person, :dbclean => :after_each do
           allow(employee_roles).to receive(:census_employee).and_return(census_employee)
           allow(census_employee).to receive(:is_active?).and_return(true)
           allow(employee_roles).to receive(:benefit_group).and_return(benefit_group)
+          EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
         end
 
         it "should return true" do
@@ -370,6 +371,7 @@ describe Person, :dbclean => :after_each do
         before do
           allow(employee_roles).to receive(:census_employee).and_return(census_employee)
           allow(census_employee).to receive(:is_active?).and_return(true)
+          EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
         end
 
         it "should return true" do
@@ -1252,6 +1254,7 @@ describe Person, :dbclean => :after_each do
         person.employee_roles.create!(FactoryBot.create(:employee_role, person: person,
               census_employee_id: census_employee.id).attributes)
         person.active_employee_roles.each { |employee_role| employee_role.census_employee.update_attribute(:aasm_state, 'eligible') }
+        EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
       end
 
       it "should return true if person has active employee role for given census_employee" do
