@@ -1,8 +1,7 @@
-# frozen_string_literal: true
-
 require File.expand_path(File.join(File.dirname(__FILE__), "../../../components/benefit_sponsors/spec/support/benefit_sponsors_site_spec_helpers"))
 
 module SiteWorld
+
   def site(*traits)
     attributes = traits.extract_options!
     if attributes.empty?
@@ -24,7 +23,7 @@ end
 
 World(SiteWorld)
 
-Given(/^a (.*?) site exists with a benefit market$/) do |_key|
+Given(/^a (.*?) site exists with a benefit market$/) do |key|
   site
   make_all_permissions
   generate_sic_codes
