@@ -247,10 +247,10 @@ registry:
         is_enabled: false
       - key: :edit_personal_info_functionality
         item: "edit_personal_info"
-        is_enabled: true
+        is_enabled: false
       - key: :display_employer_staff_datatable
         item: "employer_staff_datatable"
-        is_enabled: true
+        is_enabled: false
       - key: :special_cover_header
         item: :special_cover_header
         is_enabled: false

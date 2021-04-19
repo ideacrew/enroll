@@ -517,7 +517,9 @@ Then(/^(?:.+) should be logged on as an unlinked employee$/) do
 end
 
 When (/^(.*) logs? out$/) do |someone|
-  find('#dropdownMenuLink').click
+  if ::EnrollRegistry.feature_enabled?(:manage_account_functionality)
+    find('#dropdownMenuLink').click
+  end
   find_link('Logout', wait: 5)
   click_link "Logout"
   visit "/"
