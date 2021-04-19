@@ -214,6 +214,12 @@ registry:
       - key: :rating_area
         item: :rating_area
         is_enabled: false
+      - key: :service_area
+        item: :service_area
+        is_enabled: true
+        settings:
+          - key: :service_area_model
+            item: 'single'
       - key: :site_database_seed
         item: :site_database_seed
         is_enabled: true
