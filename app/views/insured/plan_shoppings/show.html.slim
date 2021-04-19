@@ -94,11 +94,21 @@ javascript:
   // because will try to render on plan_filters.html.slim even on individual market
   var selectedPlans = document.getElementsByClassName("myfilteredPlans");
   function resetAllFilters() {
+    resetAptc()
     clearAll()
     clearSelections()
     resetComparePlan()
     total_plans = $('#plans .plan-row').length
     $("#plans-count").text(total_plans);
+  }
+
+  function resetAptc() {
+    if ($('.aptc').length > 0){
+      let element = document.querySelector('#elected_aptc');
+      let original_aptc = element.dataset.elected;
+      element.value = original_aptc;
+      element.dispatchEvent(new Event('change', { bubbles: true }));
+    }
   }
 
   function clearSelections() {
@@ -131,7 +141,7 @@ javascript:
     })();
 
     var coverageKind = "#{@hbx_enrollment.coverage_kind}";
-    
+
     // Allow filtering from high to low
     if (coverageKind == "dental") {
       $(".plan-metal-level-selection-filter").filter(
@@ -264,7 +274,7 @@ javascript:
         })
         return resultsData;
     }
-    
+
     function filterByCarrier(carrier, dataArray) {
         var resultsData = [];
         dataArray.forEach(function (enrollment) {
@@ -274,7 +284,7 @@ javascript:
         })
         return resultsData;
     }
-  
+
     function filterByHSA(selectedHSA, dataArray) {
         var resultsData = [];
         var hsa = Boolean;
@@ -398,7 +408,7 @@ javascript:
         filtered = true;
         resultsArray = filterByDeductibleAmountRange(selections, resultsArray)
       }
-      
+
       // Removes duplicates from results array
       filteredArray = removeDuplicates(resultsArray)
       if (filteredArray.length == 0 && !filtered) {
@@ -442,7 +452,7 @@ javascript:
         if (result.product.dc_in_network) {
           network = 'DC-Metro';
         }
- 
+
         if (result.product.nationwide) {
           network = 'Nationwide';
         }

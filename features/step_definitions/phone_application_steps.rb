@@ -103,3 +103,7 @@ end
 Then(/^the Admin can navigate to the next page and finish the application$/) do
   expect(page).to have_content(l10n('family_information').to_s)
 end
+
+And(/^the Admin should be on the Help Paying for Coverage page$/) do
+  expect(page).to have_content IvlFaaHelpPayingForCoverage.your_application_for_premium_reductions_text
+end

@@ -3,6 +3,7 @@ require "rails_helper"
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 RSpec.describe HbxAdminHelper, :type => :helper do
   let(:family)    { FactoryBot.create(:family, :with_primary_family_member) }
+  let!(:primary_fm) {family.primary_applicant}
   let(:household) { FactoryBot.create(:household, family: family)}
   let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
   let(:product) do
@@ -17,39 +18,48 @@ RSpec.describe HbxAdminHelper, :type => :helper do
   end
 
   let(:hbx) do
-    FactoryBot.create(:hbx_enrollment,
+    enr = FactoryBot.create(:hbx_enrollment,
                       family: family,
                       household: household,
                       product: product,
                       is_active: true,
                       aasm_state: 'coverage_selected',
+                      kind: 'individual',
                       changing: false,
                       effective_on: (TimeKeeper.date_of_record.beginning_of_month - 40.days),
                       applied_aptc_amount: 100)
+    FactoryBot.create(:hbx_enrollment_member, applicant_id: primary_fm.id, hbx_enrollment: enr)
+    enr
   end
 
   let(:hbx_inactive) do
-    FactoryBot.create(:hbx_enrollment,
+    enr = FactoryBot.create(:hbx_enrollment,
                       family: family,
                       household: household,
                       product: product,
                       is_active: false,
                       aasm_state: 'coverage_terminated',
+                      kind: 'individual',
                       changing: false,
                       effective_on: (TimeKeeper.date_of_record.beginning_of_month - 40.days),
                       applied_aptc_amount: 100)
+    FactoryBot.create(:hbx_enrollment_member, applicant_id: primary_fm.id, hbx_enrollment: enr)
+    enr
   end
 
   let(:hbx_without_aptc) do
-    FactoryBot.create(:hbx_enrollment,
+    enr = FactoryBot.create(:hbx_enrollment,
                       family: family,
                       household: household,
                       product: product,
                       is_active: true,
                       aasm_state: 'coverage_selected',
+                      kind: 'individual',
                       changing: false,
                       effective_on: (TimeKeeper.date_of_record.beginning_of_month - 40.days),
                       applied_aptc_amount: 0)
+    FactoryBot.create(:hbx_enrollment_member, applicant_id: primary_fm.id, hbx_enrollment: enr)
+    enr
   end
 
   context "APTC Enrollments:" do
@@ -101,6 +111,26 @@ RSpec.describe HbxAdminHelper, :type => :helper do
 
     it "should return no" do
       expect(helper.active_eligibility?(family)).to eq 'No'
+    end
+  end
+
+  context "#max_aptc_that_can_be_applied_for_this_enrollment?" do
+    let!(:hbx_profile) {FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)}
+    let!(:benefit_sponsorship) {double("benefit sponsorship", earliest_effective_date: TimeKeeper.date_of_record.beginning_of_year)}
+    let!(:current_hbx) {double("current hbx", benefit_sponsorship: benefit_sponsorship, under_open_enrollment?: true)}
+    let!(:tax_household) { FactoryBot.create(:tax_household, household: family.active_household) }
+    let!(:tax_household_member) { tax_household.tax_household_members.create!(is_ia_eligible: true, applicant_id: family.family_members[0].id) }
+    let!(:ed) {FactoryBot.create(:eligibility_determination, max_aptc: 500.00, tax_household: tax_household)}
+    let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product) }
+    let!(:tax_household11) { FactoryBot.create(:tax_household, household: family.active_household) }
+
+    before do
+      hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}.update_attributes!(slcsp_id: product.id)
+    end
+
+    it "should not return zero" do
+      tax_household.update_attributes!(effective_ending_on: nil)
+      expect(helper.max_aptc_that_can_be_applied_for_this_enrollment(hbx.id)).not_to eq 0
     end
   end
 end
