@@ -46,7 +46,7 @@ registry:
             item: <%= Date.new(2020,9,18)..Date.new(2021,3,31) %>
       - key: :manage_account_functionality
         item: "manage_account"
-        is_enabled: true
+        is_enabled: false
       - key: :edit_personal_info_functionality
         item: "edit_personal_info"
         is_enabled: true
