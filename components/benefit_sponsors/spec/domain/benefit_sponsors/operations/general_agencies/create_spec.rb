@@ -27,7 +27,7 @@ RSpec.describe BenefitSponsors::Operations::GeneralAgencies::Create, dbclean: :a
           :legal_name => "SOME GA",
           :dba => "general_agency",
           :profile => {
-            :market_kind => "both",
+            :market_kind => "individual",
             :languages_spoken => ["", "en"],
             :working_hours => "1",
             :accept_new_clients => "1",
