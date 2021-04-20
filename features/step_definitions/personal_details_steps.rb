@@ -199,6 +199,7 @@ And(/person with (.*) signs in and visits Go to My Hub Page/) do |role|
   @person ||= Person.where(first_name: role.split(/\s/)[0]).first
   user = @person.user
   login_as user
+  EnrollRegistry[:manage_account_functionality].feature.stub(:is_enabled).and_return(true)
   visit "/people/#{@person.id}/show_roles"
 end
 
