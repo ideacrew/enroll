@@ -261,11 +261,17 @@ registry:
         is_enabled: false
         item: ""
       - key: :prior_plan_year_sep
-        is_enabled: true
+        is_enabled: false
         item: Operations::UpdatePriorPlanCoverage.new
         settings:
           - key: :offset_months
             item: 12
+      - key: :change_end_date
+        is_enabled: true
+        item: Operations::HbxEnrollments::EnrollmentEndDateChange.new
+        settings:
+          - key: :expired_enrollments
+            item: true
   - namespace:
       - :features
       - :enroll_app
