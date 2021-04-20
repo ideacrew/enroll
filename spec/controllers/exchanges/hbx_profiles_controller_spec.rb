@@ -952,6 +952,37 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     end
   end
 
+  describe 'GET view_terminated_hbx_enrollments' do
+    let!(:person) { FactoryBot.create(:person)}
+    let(:user) { FactoryBot.create(:user, person: person, roles: ["hbx_staff"]) }
+    let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+    let!(:household) { FactoryBot.create(:household, family: family) }
+    let!(:term_hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, aasm_state: 'coverage_terminated') }
+    let!(:term_pending_hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, aasm_state: 'coverage_termination_pending') }
+    let!(:expired_hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, aasm_state: 'coverage_expired') }
+    let(:params) do
+      { person_id: person.id,
+        family_actions_id: "family_actions_#{person.primary_family.id}",
+        format: 'js' }
+    end
+
+    before do
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(false)
+      allow(EnrollRegistry[:prior_plan_year_sep].feature).to receive(:is_enabled).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_sep).and_return(true)
+      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      sign_in(user)
+    end
+
+    it "should render the view_terminated_hbx_enrollments partial" do
+      get :view_terminated_hbx_enrollments, params: params, xhr: true, format: :js
+      expect(response).to have_http_status(:success)
+      expect(response).to render_template('view_terminated_hbx_enrollments')
+      expect(assigns(:enrollments).include?(expired_hbx_enrollment)).to eq true
+      expect(assigns(:enrollments).size).to eq 3
+    end
+  end
+
   describe "POST reinstate_enrollment", :dbclean => :around_each do
     render_views
     let(:user) { FactoryBot.create(:user, roles: ["hbx_staff"]) }

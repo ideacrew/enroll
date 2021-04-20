@@ -330,6 +330,12 @@ class Family
     hbx_enrollments.where(:aasm_state.in=> ["coverage_terminated", "coverage_termination_pending"])
   end
 
+  def terminated_and_expired_enrollments
+    eligible_states = %w[coverage_terminated coverage_termination_pending]
+    eligible_states << 'coverage_expired' if ::EnrollRegistry.feature_enabled?(:prior_plan_year_sep)
+    hbx_enrollments.where(:aasm_state.in => eligible_states)
+  end
+
   # @deprecated Use {primary_applicant}
   alias_method :primary_family_member, :primary_applicant
 

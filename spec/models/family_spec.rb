@@ -1852,6 +1852,47 @@ describe "terminated_enrollments", dbclean: :after_each do
   end
 end
 
+describe "terminated_and_expired_enrollments", dbclean: :after_each do
+  let!(:person) { FactoryBot.create(:person)}
+  let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+  let!(:household) { FactoryBot.create(:household, family: family) }
+  let!(:termination_pending_enrollment) do
+    FactoryBot.create(:hbx_enrollment,
+                      family: family,
+                      household: family.active_household,
+                      coverage_kind: "health",
+                      aasm_state: 'coverage_termination_pending')
+  end
+
+  let!(:terminated_enrollment) do
+    FactoryBot.create(:hbx_enrollment,
+                      family: family,
+                      household: family.active_household,
+                      coverage_kind: "health",
+                      aasm_state: 'coverage_terminated')
+  end
+
+  let!(:expired_enrollment) do
+    FactoryBot.create(:hbx_enrollment,
+                      family: family,
+                      household: family.active_household,
+                      coverage_kind: "health",
+                      aasm_state: 'coverage_expired')
+  end
+
+  before do
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(false)
+    allow(EnrollRegistry[:prior_plan_year_sep].feature).to receive(:is_enabled).and_return(true)
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_sep).and_return(true)
+  end
+
+
+  it "should include termination and termination pending, and expired enrollments" do
+    expect(family.terminated_and_expired_enrollments.count).to eq 3
+    expect(family.terminated_and_expired_enrollments.map(&:aasm_state)).to eq ["coverage_termination_pending", "coverage_terminated", "coverage_expired"]
+  end
+end
+
 describe "#currently_enrolled_products", dbclean: :after_each do
   let!(:person) { FactoryBot.create(:person)}
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
