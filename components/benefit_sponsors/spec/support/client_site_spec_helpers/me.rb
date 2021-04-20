@@ -27,9 +27,9 @@ module BenefitSponsors
         b_market_props = {
           _id: b_market_id,
           title: "ACA SHOP",
-          description: "DCHBX Shop Market",
+          description: "#{EnrollRegistry[:enroll_app].setting(:site_key).item}HBX Shop Market",
           kind: :aca_shop,
-          site_urn: "dc",
+          site_urn: EnrollRegistry[:enroll_app].setting(:site_key).item.to_s,
           site_id: site_id,
           configuration: {
             _id: config_id,
@@ -97,25 +97,25 @@ module BenefitSponsors
           _id: site_id,
           site_key: :me,
           byline: "The Right Place for the Right Plan",
-          short_name: "Health Connector",
+          short_name: EnrollRegistry[:enroll_app].setting(:short_name).item,
           domain_name: "hbxshop.org",
-          long_name: "Massachusetts Health Connector",
-          copyright_period_start: '2018'
+          long_name: EnrollRegistry[:enroll_app].setting(:long_name).item,
+          copyright_period_start: TimeKeeper.date_of_record.year.to_s
         }
         org_props = {
           _id: org_id,
           _type: "BenefitSponsors::Organizations::ExemptOrganization",
-          dba: "DCHBX",
+          dba: EnrollRegistry[:enroll_app].setting(:s3_prefix).item,
           fein: '123123456',
           hbx_id: '210005',
-          legal_name: "Health Connector",
+          legal_name: EnrollRegistry[:enroll_app].setting(:short_name).item,
           site_id: site_id,
           profiles: [{
             _id: profile_id,
             contact_method: :paper_and_electronic,
             _type: "BenefitSponsors::Organizations::HbxProfile",
-            cms_id: "DC0",
-            us_state_abbreviation: "DC",
+            cms_id: EnrollRegistry[:enroll_app].setting(:exchange_hbx_id).item.to_s,
+            us_state_abbreviation: EnrollRegistry[:enroll_app].setting(:site_key).item.to_s,
             is_benefit_sponsorship_eligible: true,
             office_locations: [{
               _id: office_location_id,
@@ -124,9 +124,9 @@ module BenefitSponsors
                 _id: address_id,
                 address_1: "1225 I St, NW",
                 kind: "work",
-                city: "Washington",
-                state: "DC",
-                zip: '20002'
+                city: EnrollRegistry[:enroll_app].setting(:contact_center_city).item.to_s,
+                state: EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.to_s,
+                zip: EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item.to_s
               },
               phone: {
                 _id: phone_id,
