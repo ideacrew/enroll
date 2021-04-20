@@ -2,7 +2,7 @@
 
 #Has fields related to broker registration portal page under my hub account
 #benefit_sponsors/profiles/broker_agencies/broker_agency_profiles/new_broker_profile?person_id=605c8c7a7d267570738288a8&profile_type=broker_agency
-class BrokerRegistration
+class BrokerHubRegistration
 
   def self.broker_tab
     '#ui-id-1'
