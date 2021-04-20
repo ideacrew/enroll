@@ -8,6 +8,10 @@ class YourInformation
     '.interaction-click-control-help'
   end
 
+  def self.your_information_text
+    'Your Information'
+  end
+
   def self.logout_link
     '.interaction-click-control-logout'
   end
@@ -17,7 +21,7 @@ class YourInformation
   end
 
   def self.welcome_sign_in_message
-    'Welcome to DC Health Link. Your account has been created.'
+    "Welcome to #{Settings.site.short_name} Your account has been created."
   end
 
   def self.continue_btn

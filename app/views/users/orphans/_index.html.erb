@@ -17,7 +17,9 @@
         <ol>
           <li><%= l10n('.incomplete_screen_process_list') %></li>
           <li><%= l10n('.fail_screen_process_list') %></li>
-          <li><%= l10n('.mismatched_customer_list') %></li>
+          <% if is_shop_or_fehb_market_enabled? %>
+            <li><%= l10n('.mismatched_customer_list') %></li>
+          <% end %>
           <li><%= l10n('.without_screen_process_list') %></li>
           <li><%= l10n('.enroll_app_error_list') %></li>
         </ol>

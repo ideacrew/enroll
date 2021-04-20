@@ -583,6 +583,26 @@ module ApplicationHelper
     HbxProfile.current_hbx.try(:benefit_sponsorship).try(:earliest_effective_date)
   end
 
+  def is_shop_market_enabled?
+    EnrollRegistry.feature_enabled?(:aca_shop_market)
+  end
+
+  def is_fehb_market_enabled?
+    EnrollRegistry.feature_enabled?(:fehb_market)
+  end
+
+  def is_individual_market_enabled?
+    EnrollRegistry.feature_enabled?(:aca_individual_market)
+  end
+
+  def is_shop_and_individual_market_enabled?
+    EnrollRegistry.feature_enabled?(:aca_shop_market) && EnrollRegistry.feature_enabled?(:aca_individual_market)
+  end
+
+  def is_shop_or_fehb_market_enabled?
+    EnrollRegistry.feature_enabled?(:aca_shop_market) || EnrollRegistry.feature_enabled?(:fehb_market)
+  end
+
   def parse_ethnicity(value)
     return "" unless value.present?
     value = value.select{|a| a.present? }  if value.present?
@@ -641,7 +661,7 @@ module ApplicationHelper
   end
 
   def ivl_metal_network(plan)
-    (plan.nationwide ? 'nationwide' : 'dc metro') if plan.benefit_market_kind == :aca_individual
+    (plan.nationwide ? 'nationwide' : EnrollRegistry[:enroll_app].setting(:statewide_area).item) if plan.benefit_market_kind == :aca_individual
   end
 
   def ivl_hsa_status(plan_hsa_status, plan)
@@ -657,8 +677,8 @@ module ApplicationHelper
   def network_type(product)
     if product.nationwide
       'Nationwide'
-    elsif product.dc_in_network
-      'DC-Metro'
+    elsif product.in_state_network
+      EnrollRegistry[:enroll_app].setting(:statewide_area).item
     end
   end
 

@@ -988,8 +988,8 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  aasm (~> 4.8)
   aca_entities!
+  aasm (~> 4.8)
   acapi!
   action-cable-testing
   action_mailer_cache_delivery (~> 0.3)

@@ -1164,6 +1164,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     end
 
     it "should return false when match person which has active employee role for current census employee" do
+      EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
       census_employee.update_attributes(benefit_sponsors_employer_profile_id: employer_profile.id)
       person.employee_roles.create!(ssn: census_employee.ssn,
                                     benefit_sponsors_employer_profile_id: census_employee.employer_profile.id,

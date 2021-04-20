@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :benefit_sponsors_organizations_broker_agency_profile, class: 'BenefitSponsors::Organizations::BrokerAgencyProfile' do
 
-    market_kind { :shop }
+    market_kind { is_shop_market_enabled? ? :shop : :individual }
     corporate_npn { "0989898981" }
     ach_routing_number { '123456789' }
     ach_account_number { '9999999999999999' }

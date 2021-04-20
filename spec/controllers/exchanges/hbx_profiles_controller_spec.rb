@@ -818,6 +818,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     before do
       allow(employee_role.census_employee).to receive(:employer_profile).and_return(abc_profile)
       allow(person).to receive(:employee_roles).and_return([employee_role])
+      EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
     end
 
     it "should render back to edit_enrollment if there is a validation error on save" do

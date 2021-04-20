@@ -1,5 +1,5 @@
 #uic-primary-nav {
-  background:$mhc-dark-blue;
+  background:$dark-blue;
 
   ul {
     padding: 20px 0;
@@ -37,7 +37,7 @@
     text-decoration:none;
     cursor:pointer;
     transition: all 0.3s ease 0s;
-    color:$mhc-orange;
+    color:$orange;
   }
 
   a:visited {
@@ -58,7 +58,7 @@
   }
 
   ul.dropdown-menu li a:hover {
-    color:$mhc-orange;
+    color:$orange;
     transition: all 0.3s ease 0s;
   }
 

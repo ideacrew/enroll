@@ -180,8 +180,8 @@ end
 Then(/(.*) should see active enrollment with their spouse/) do |named_person|
   sleep 1 #wait for e-mail nonsense
   enrollment = page.all('.hbx-enrollment-panel').detect{|e| e.find('.panel-heading .text-right').text == 'Coverage Selected' }
-
-  expect(enrollment.find('.family-members')).to have_content 'Cynthia'
+  sleep 2
+  expect(enrollment.find('.family-members')).to have_content('Cynthia', wait: 10)
   sleep 5
 end
 

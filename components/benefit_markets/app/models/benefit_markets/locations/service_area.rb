@@ -36,7 +36,9 @@ module BenefitMarkets
       end
 
       def self.service_areas_for(address, during: TimeKeeper.date_of_record)
-        if site_key == :dc
+        # DC is a special case, it has no specific county
+        # This may need to be upated for other special jurisdictions in the future.
+        if EnrollRegistry[:service_area].settings(:service_area_model).item == 'single'
           self.where(
             "active_year" => during.year
           )
@@ -50,7 +52,6 @@ module BenefitMarkets
             :zip => zip_code,
             :state => state_abbrev
           ).map(&:id).uniq
-
           self.where(
             "active_year" => during.year,
             "$or" => [

@@ -1,5 +1,8 @@
  Feature: SHOP Qualifying life of event kind based on eligibity dates
   Background:
+    Given both shop and fehb market configurations are enabled
+    Given all market kinds are enabled for user to select
+    Given all announcements are enabled for user to select
     Given that a user with a HBX staff role with hbx_tier3 subrole exists
     And Hbx Admin logs on to the Hbx Portal
     And the Admin is on the Main Page

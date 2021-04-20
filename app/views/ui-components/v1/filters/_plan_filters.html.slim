@@ -2,7 +2,7 @@
   .checkbox-filter-wrapper-uc
 
     h4 = find_my_doctor
-    - if aca_state_abbreviation == "DC"
+    - if is_shop_market_enabled?
       - if @market_kind == "individual" && @coverage_kind == "health"
         h4 = link_to l10n("estimate_your_cost"), "", data: {toggle: "modal", target: "#plan_match_redirection"}
       - if @market_kind == "individual" && @coverage_kind == "dental" && @hbx_enrollment.effective_on.year == Settings.checkbook_services.current_year
@@ -137,7 +137,7 @@
             p.text-left style="line-height:16px; font-size:12px;" = l10n('apply_monthly')
           .col-xs-6 style="padding:0;"
             p
-              input#elected_aptc onchange="setMinMax(this, #{@max_aptc})" type="text" value="#{number_with_precision(@elected_aptc, precision: 2)}" style="width:100%;"
+              input#elected_aptc onchange="setMinMax(this, #{@max_aptc})" type="text" value="#{number_with_precision(@elected_aptc, precision: 2)}" style="width:100%;" data-elected="#{number_with_precision(@elected_aptc, precision: 2)}"
               - pct = @max_aptc > 0 ? (@elected_aptc/@max_aptc).round(2) : 0
         = hidden_field_tag :max_aptc, @max_aptc
         = hidden_field_tag :market_kind, @market_kind

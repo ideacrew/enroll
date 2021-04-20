@@ -2,9 +2,18 @@ FactoryBot.define do
   factory :benefit_markets_locations_rating_area, class: 'BenefitMarkets::Locations::RatingArea' do
 
     active_year { TimeKeeper.date_of_record.year }
-    exchange_provided_code { "R-DC001" }
+    exchange_provided_code { "R-#{::EnrollRegistry[:enroll_app].setting(:state_abbreviation).item}001" }
     # These should never occur at the same time
-    covered_states { [Settings.aca.state_abbreviation] }
-    county_zip_ids { [create(:benefit_markets_locations_county_zip, county_name: 'Middlesex', zip: '20024', state: Settings.aca.state_abbreviation).id] }
+    covered_states { [::EnrollRegistry[:enroll_app].setting(:state_abbreviation)&.item] }
+    county_zip_ids do
+      [
+        create(
+          :benefit_markets_locations_county_zip,
+          county_name: ::EnrollRegistry[:enroll_app].setting(:contact_center_county)&.item || 'Middlesex',
+          zip: ::EnrollRegistry[:enroll_app].setting(:contact_center_zip_code)&.item || '20024',
+          state: ::EnrollRegistry[:enroll_app].setting(:state_abbreviation).item
+        ).id
+      ]
+    end
   end
 end
