@@ -299,7 +299,8 @@ describe Forms::FamilyMember, "which describes a new family member, and has been
       :tribal_id => "test",
       :is_homeless => nil,
       :is_temporarily_out_of_state => false,
-      :is_moving_to_state => false
+      :is_moving_to_state => false,
+      :tobacco_use => nil
     }
   }
 
@@ -475,24 +476,15 @@ describe Forms::FamilyMember, "which describes an existing family member" do
       :ethnicity => ["ethnicity"],
       :language_code => "english",
       :is_incarcerated => "no",
-      tribal_id: "test"
+      :tribal_id => "test"
     }
   }
-  let(:person) { double(:errors => double(:has_key? => false), home_address: nil) }
-  let(:family_member) do
-    instance_double(
-      ::FamilyMember,
-      person_properties.merge(
-        {
-          :family => family,
-          :family_id => family_id,
-          :person => person,
-          :primary_relationship => relationship,
-          :save => true
-        }
-      )
-    )
-  end
+
+  let(:person) { double(:errors => double(:has_key? => false), home_address: nil, tobacco_use: nil) }
+  let(:family_member) { instance_double(::FamilyMember,
+                                        person_properties.merge({
+                                        :family => family,
+                                        :family_id => family_id, :person => person, :primary_relationship => relationship, :save! => true, :save => true})) }
 
   let(:update_attributes) { person_properties.merge(:family_id => family_id, :relationship => relationship, :dob => dob) }
 
@@ -532,7 +524,7 @@ describe Forms::FamilyMember, "which describes an existing family member" do
     it "should update the relationship of the dependent" do
       allow(person).to receive(:update_attributes).with(person_properties.merge(
                                                           {:citizen_status => nil, :no_ssn => "0", :is_homeless => nil, :is_temporarily_out_of_state => nil,
-                                                           :is_moving_to_state => nil, :age_off_excluded => nil}
+                                                           :is_moving_to_state => nil, :age_off_excluded => nil, :tobacco_use => nil}
                                                         )).and_return(true)
       allow(subject).to receive(:assign_person_address).and_return true
       allow(person).to receive(:consumer_role).and_return FactoryBot.build(:consumer_role)
@@ -542,7 +534,7 @@ describe Forms::FamilyMember, "which describes an existing family member" do
 
     it "should update the attributes of the person" do
       allow(subject).to receive(:assign_person_address).and_return true
-      expect(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status => nil, :no_ssn => "0", :is_homeless => nil, :is_temporarily_out_of_state => nil, :is_moving_to_state => nil, :age_off_excluded => nil}))
+      expect(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status => nil, :no_ssn => "0", :is_homeless => nil, :is_temporarily_out_of_state => nil, :is_moving_to_state => nil, :age_off_excluded => nil, :tobacco_use => nil}))
       allow(family_member).to receive(:update_relationship).with(relationship)
       allow(person).to receive(:consumer_role).and_return FactoryBot.build(:consumer_role)
       subject.update_attributes(update_attributes)
