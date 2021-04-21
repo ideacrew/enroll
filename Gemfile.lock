@@ -7,14 +7,16 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: fac6a521df3bd596377ae59efed5278a0fd13af7
-  branch: trunk
+  revision: 246be11ae485fb80a8179c952a5083d187c1e74d
+  branch: pivotal_aca_176866304
   specs:
-    aca_entities (0.1.0)
+    aca_entities (0.2.0)
       dry-monads (~> 1.2)
       dry-struct (~> 1.0)
+      dry-transformer (~> 0.1.1)
       dry-types (~> 1.0)
       dry-validation (~> 1.2)
+      oj (~> 3.11)
 
 GIT
   remote: https://github.com/ideacrew/acapi.git
@@ -477,6 +479,7 @@ GEM
       dry-equalizer (~> 0.3)
       dry-types (~> 1.3)
       ice_nine (~> 0.11)
+    dry-transformer (0.1.1)
     dry-types (1.4.0)
       concurrent-ruby (~> 1.0)
       dry-container (~> 0.3)
@@ -673,6 +676,7 @@ GEM
       nokogiri (~> 1.5)
     non-stupid-digest-assets (1.0.9)
       sprockets (>= 2.0)
+    oj (3.11.5)
     orm_adapter (0.5.0)
     overcommit (0.52.1)
       childprocess (>= 0.6.3, < 4)
@@ -988,8 +992,8 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  aca_entities!
   aasm (~> 4.8)
+  aca_entities!
   acapi!
   action-cable-testing
   action_mailer_cache_delivery (~> 0.3)
@@ -1124,4 +1128,4 @@ RUBY VERSION
    ruby 2.5.1p57
 
 BUNDLED WITH
-   2.2.9
+   2.2.11
