@@ -219,7 +219,7 @@ class HbxEnrollmentSponsorEnrollmentCoverageReportCalculator
     contribution_model = p_package.contribution_model
     p_calculator = pricing_model.pricing_calculator
     c_calculator = contribution_model.contribution_calculator
-    if hbx_enrollment_id_list.count < 1
+    if hbx_enrollment_id_list.any? == false
       return
     end
     group_mapper = HbxEnrollmentRosterMapper.new(hbx_enrollment_id_list, sponsored_benefit)
