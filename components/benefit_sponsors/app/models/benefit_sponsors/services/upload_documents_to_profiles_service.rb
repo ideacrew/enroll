@@ -13,7 +13,7 @@ module BenefitSponsors
         broker = org.broker_agency_profile.primary_broker_role
         docs = org.broker_agency_profile.documents.where("date" => statement_date)
         matching_documents = docs.select {|d| d.title.match(::Regexp.new("^#{broker.npn}_\\d{1,}_#{date_string}_COMMISSION"))} if broker
-        return true if (matching_documents && matching_documents.count > 0)
+        return true if (matching_documents && matching_documents.any?)
       end
 
       def by_commission_statement_filename(file_path)
@@ -69,7 +69,7 @@ module BenefitSponsors
       def invoice_exist?(invoice_date,org)
         docs = org.employer_profile.invoices.select{|doc| doc.date == invoice_date }
         matching_documents = docs.select {|d| d.title.match(::Regexp.new("^#{org.hbx_id}"))}
-        return true if matching_documents.count > 0
+        return true if matching_documents.any?
       end
 
       def by_invoice_filename(file_path)

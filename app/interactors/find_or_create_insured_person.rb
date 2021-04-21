@@ -63,7 +63,7 @@ class FindOrCreateInsuredPerson
     if user.present?
       user.roles << context.role_type unless user.roles.include?(context.role_type)
       user.save
-      unless person.emails.count > 0
+      unless person.emails.any?
         if user.email.present?
           person.emails.build(kind: "home", address: user.email)
           person.save

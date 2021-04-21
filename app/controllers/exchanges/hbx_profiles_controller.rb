@@ -296,7 +296,7 @@ def employer_poc
     if params[:type]
       cac_flag = params[:type] == 'CAC'
       match = CsrRole.find_by_name(params[:firstname], params[:lastname], cac_flag)
-      if match.count > 0
+      if match.any?
         agent = match.first
         role = cac_flag ? 'Certified Applicant Counselor' : 'Customer Service Representative'
       end

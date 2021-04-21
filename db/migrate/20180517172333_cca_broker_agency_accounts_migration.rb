@@ -89,7 +89,7 @@ class CcaBrokerAgencyAccountsMigration < Mongoid::Migration
 
             benefit_sponsorships_for_accs = bss_with_date.where(:'effective_begin_on'.lte => hire_on).and(:'effective_end_on'.gte => hire_on)
 
-            if benefit_sponsorships_for_accs.count > 0
+            if benefit_sponsorships_for_accs.any?
               # pick benefitsponsorship , hire date of broker should be between effective begin on and effective end on
               bs = benefit_sponsorships_for_accs.order_by(:'effective_begin_on'.desc).first
             elsif bss_with_date.where(:'effective_begin_on'.lte => hire_on).count

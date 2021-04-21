@@ -171,7 +171,7 @@ class BrokerAgencies::QuotesController < ApplicationController
       notice_message = "Successfully saved quote/employee roster."
       scrollTo = 0
     elsif params[:commit] == "Save"
-      new_family = @quote.quote_households.count > 0 ? '' : true
+      new_family = @quote.quote_households.any? ? '' : true
     end
     if (params[:quote][:employer_type] == 'prospect' && @quote.employer_type != 'prospect') || (params[:quote][:employer_type] == 'client' && @quote.employer_profile_id != params[:employer_profile_id])
       @quote.quote_households if @quote.quote_households.present?

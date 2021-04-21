@@ -75,7 +75,7 @@ module HbxImport
 
     def found_employer_organization_count
       employers.reduce(0) do |count, employer|
-        if Organization.where("fein" => employer.fein).count > 0
+        if Organization.where("fein" => employer.fein).any?
           count + 1
         else
           count

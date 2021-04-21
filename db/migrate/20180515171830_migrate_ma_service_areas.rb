@@ -67,7 +67,7 @@ class MigrateMaServiceAreas < Mongoid::Migration
             issuer_provided_code: rec["_id"]["issuer_provided_code"],
             issuer_profile_id: new_carrier_profile_map[old_carrier_profile_map[rec["_id"]["issuer_hios_id"]]]
           )
-          next if existing_state_wide_areas.count > 0
+          next if existing_state_wide_areas.any?
           location_ids = rec['locations'].map do |loc_record|
             county_zip = ::BenefitMarkets::Locations::CountyZip.where({
              zip: loc_record['zip'],

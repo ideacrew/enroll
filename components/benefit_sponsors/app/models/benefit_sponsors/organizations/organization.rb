@@ -327,9 +327,9 @@ module BenefitSponsors
         bs_without_date = benefit_sponsorships_without_benefit_application
         bs_having_start_date = benefit_sponsorships_with_benefit_application
 
-        if bs_without_date.count > 0
+        if bs_without_date.any?
           bs_without_date.first
-        elsif bs_having_start_date.count > 0
+        elsif bs_having_start_date.any?
           bs_having_start_date.order_by(&:effective_being_on.desc).first
         end
       end

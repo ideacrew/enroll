@@ -91,7 +91,7 @@ namespace :load_service_reference do
             # issuer_hios_id: issuer_hios_id,
             # covered_states: nil
           )
-          if existing_state_wide_areas.count > 0 && existing_state_wide_areas.first.covered_states.present? && existing_state_wide_areas.first.covered_states.include?("MA")
+          if existing_state_wide_areas.any? && existing_state_wide_areas.first.covered_states.present? && existing_state_wide_areas.first.covered_states.include?("MA")
             v = existing_state_wide_areas.first
             v.issuer_hios_id = issuer_hios_id
             v.save
@@ -108,7 +108,7 @@ namespace :load_service_reference do
 
             location_ids = records.map(&:_id).uniq.compact
 
-            if existing_state_wide_areas.count > 0
+            if existing_state_wide_areas.any?
               v = existing_state_wide_areas.first
               v.county_zip_ids << location_ids
               v.county_zip_ids = v.county_zip_ids.flatten.uniq
