@@ -62,6 +62,7 @@ namespace :assets do
   end
 end
 after "deploy:updated", "assets:refresh"
+after "bundle exec rake migrations:client_configuration_toggler client='#{ENV['client']}'" if ENV['client'].present?
 
 namespace :deploy do
   desc 'Restart application'
