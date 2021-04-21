@@ -4,10 +4,10 @@ FactoryBot.define do
     kind { 'home' }
     sequence(:address_1, 1111) { |n| "#{n} Awesome Street" }
     sequence(:address_2, 111) { |n| "##{n}" }
-    city { 'Washington' }
-    state { Settings.aca.state_abbreviation }
-    zip { '01001' }
-    county { 'Hampden' }
+    city { EnrollRegistry[:enroll_app].setting(:contact_center_city).item }
+    state { EnrollRegistry[:enroll_app].setting(:state_abbreviation).item }
+    zip { EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item  }
+    county { EnrollRegistry[:enroll_app].setting(:contact_center_county).item  }
 
     trait :work_kind do
       kind { 'work' }
