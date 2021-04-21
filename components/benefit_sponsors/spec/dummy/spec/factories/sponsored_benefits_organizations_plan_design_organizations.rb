@@ -6,7 +6,7 @@ FactoryBot.define do
     dba         { "Turner Brokers" }
 
     sequence :sic_code do |n|
-      Settings.aca.state_abbreviation == "DC" ? nil : "765#{n}"
+      ::EnrollRegistry.feature_enabled?(:sic_codes) ? nil : "765#{n}"
     end
 
     sequence :sponsor_profile_id do |n|
