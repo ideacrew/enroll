@@ -14,7 +14,7 @@ module MongoI18n
     end
 
     def [](key, options=nil)
-      if doc = collection.where(:key=> key.to_s) and doc.count > 0
+      if doc = collection.where(:key=> key.to_s) and doc.any?
         doc.first.value.try(:to_s)
       end
     end
