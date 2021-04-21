@@ -2,6 +2,7 @@
 
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 
+
 require "rails_helper"
 
 module Operations
@@ -28,7 +29,7 @@ module Operations
 
       describe 'given invalid params' do
         context 'given params as nil' do
-          let(:params) {{hbx_enrollment: nil}}
+          let(:params) {{hbx_enrollment: nil, source: "test"}}
           let(:error_message) {'Is not a hbx enrollment object'}
 
           it 'fails' do
@@ -38,7 +39,7 @@ module Operations
         end
 
         context 'given enrollment without effective on' do
-          let(:params) {{hbx_enrollment: hbx_enrollment}}
+          let(:params) {{hbx_enrollment: hbx_enrollment, source: "test"}}
           let(:error_message) {{:enrollment_effective_date => ["must be a date"]}}
 
           before :each do
@@ -52,7 +53,7 @@ module Operations
         end
 
         context 'given enrollment without product' do
-          let(:params) {{hbx_enrollment: hbx_enrollment}}
+          let(:params) {{hbx_enrollment: hbx_enrollment, source: "test"}}
           let(:error_message) {{:carrier_id => ["must be a string"]}}
 
           before :each do
@@ -65,10 +66,24 @@ module Operations
             expect(subject.failure).to eq error_message
           end
         end
+
+        context 'given enrollment without effective on' do
+          let(:params) {{hbx_enrollment: hbx_enrollment, source: 123}}
+          let(:error_message) {"Is not a source object"}
+
+          before :each do
+            hbx_enrollment.unset(:effective_on)
+          end
+
+          it 'fails' do
+            expect(subject).not_to be_success
+            expect(subject.failure).to eq error_message
+          end
+        end
       end
 
       describe 'Given valid params' do
-        let(:params) {{hbx_enrollment: hbx_enrollment}}
+        let(:params) {{hbx_enrollment: hbx_enrollment, source: "test"}}
 
         context 'Operation should result in success' do
           it 'should create a payment transaction instance for family' do

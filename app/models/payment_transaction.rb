@@ -11,6 +11,7 @@ class PaymentTransaction
   field :status, type: String
   field :body, type: String
   field :submitted_at, type: DateTime
+  field :source, type: String
 
   before_save :generate_payment_transaction_id, :set_submitted_at
 

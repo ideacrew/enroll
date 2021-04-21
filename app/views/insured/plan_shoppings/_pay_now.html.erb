@@ -5,6 +5,7 @@
     <button class="btn btn-primary disabled">Pay Now</button>
   <% end %>
 <% end %>
+<%= hidden_field_tag :source, source %>
 
 <%= render "shared/pay_now_modal", hbx_enrollment: hbx_enrollment %>
 
@@ -14,7 +15,7 @@ $("#pay-now").on('click', function (e) {
     $.ajax({
         type: "GET",
         url: "/payment_transactions/generate_saml_response",
-        data: {enrollment_id: $("#pay-now").val()},
+        data: {enrollment_id: $("#pay-now").val(), source: $("#source").val()},
         success: function (response) {
           if (response["error"] != null){
             alert("We're sorry, but something went wrong. You can try again, or pay once you receive your invoice.")}

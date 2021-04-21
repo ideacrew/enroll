@@ -13,7 +13,7 @@ module Insured
 
       def show_pay_now?(source, hbx_enrollment)
         return false unless EnrollRegistry[:pay_now_functionality].feature.is_enabled
-        if source == "Plan Shopping"
+        if source == "plan_shopping"
           can_pay_now?(hbx_enrollment) && !pay_now_button_timed_out?(hbx_enrollment) ? true : false
         else
           can_pay_now?(hbx_enrollment) && past_or_on_effective_on?(hbx_enrollment) ? true : false
