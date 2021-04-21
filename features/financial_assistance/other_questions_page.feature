@@ -25,7 +25,7 @@ Feature: Start a new Financial Assistance Application and answers questions on O
     And the user enters a pregnancy due date of one month from today
     And how many children question should display
     And the user answers two for how many children
-    And the user fills out the rest of the other questions form and submits it
+    And the user fills out the rest of the other questions form and submits it 
     Then the user should see text that the info is complete
 
   Scenario: Pregnancy response within 60 days Yes with information filled and submitted

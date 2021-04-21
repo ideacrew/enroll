@@ -675,11 +675,9 @@ module FinancialAssistance
 
       questions_array << is_former_foster_care  if foster_age_satisfied? && is_applying_coverage
       questions_array << is_post_partum_period  unless is_pregnant
-      questions_array << has_unemployment_income if FinancialAssistanceRegistry[:unemployment_income].enabled?
       questions_array << is_physically_disabled
       questions_array << pregnancy_due_on << children_expected_count if is_pregnant
       questions_array << pregnancy_end_on << is_enrolled_on_medicaid if is_post_partum_period
-
       (other_questions_answers << questions_array).flatten.include?(nil) ? false : true
     end
 
@@ -966,11 +964,7 @@ module FinancialAssistance
     end
 
     def presence_of_attr_other_qns # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity TODO: Remove this
-      if is_pregnant
-        errors.add(:pregnancy_due_on, "' Pregnancy Due date' should be answered if you are pregnant") if pregnancy_due_on.blank?
-        errors.add(:children_expected_count, "' How many children is this person expecting?' should be answered") if children_expected_count.blank?
-      # Nil or "" means unanswered, true/or false boolean will be passed through
-      elsif is_post_partum_period.nil? || is_post_partum_period == ""
+      if !is_pregnant && (is_post_partum_period.nil? || is_post_partum_period == "")
         # Even if they aren't pregnant, still need to ask if they were pregnant within the last 60 days
         errors.add(:is_post_partum_period, "' Was this person pregnant in the last 60 days?' should be answered")
       end
