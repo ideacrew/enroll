@@ -43,8 +43,8 @@ module BenefitSponsors
       def build_nested_models
         return if inbox.present?
         build_inbox
-        # welcome_subject = "Welcome to #{EnrollRegistry[:enroll_app].setting(:short_name).item}"
-        # welcome_body = "#{EnrollRegistry[:enroll_app].setting(:short_name).item} is the #{Settings.aca.state_name}'s online marketplace where benefit sponsors may select and offer products that meet their member's needs and budget."
+        welcome_subject = "Welcome to #{EnrollRegistry[:enroll_app].setting(:short_name).item}"
+        welcome_body = "#{EnrollRegistry[:enroll_app].setting(:short_name).item} is the #{Settings.aca.state_name}'s online marketplace where benefit sponsors may select and offer products that meet their member's needs and budget."
         # unless inbox.messages.where(body: welcome_body).present?
         #  inbox.messages.new(subject: welcome_subject, body: welcome_body, from: EnrollRegistry[:enroll_app].setting(:short_name).item, created_at: Time.now.utc)
         # end
