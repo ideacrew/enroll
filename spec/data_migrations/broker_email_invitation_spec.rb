@@ -23,7 +23,7 @@ describe BrokerEmailInvitation, dbclean: :after_each do
       let(:registered_broker_role) {FactoryBot.create(:broker_role, npn: "2323334", aasm_state:"active")}
 
       it "count of the invitation email for the broker role should increase" do
-      expect(Invitation.where(:source_id => registered_broker_role.id)any? ).to eq false
+        expect(Invitation.where(:source_id => registered_broker_role.id).any?).to eq false
       subject.migrate
       expect(Invitation.where(:source_id => registered_broker_role.id).count ).to eq 1
       end

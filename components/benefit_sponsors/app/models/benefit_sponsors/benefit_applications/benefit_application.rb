@@ -505,7 +505,7 @@ module BenefitSponsors
     def is_renewing?
       required_states = (APPLICATION_APPROVED_STATES + APPLICATION_DRAFT_STATES + ENROLLING_STATES + ENROLLMENT_ELIGIBLE_STATES)
       applications = sponsor_profile.benefit_applications.where(:"effective_period.min".gt => effective_period.min, :aasm_state.in => required_states + [:active, :expired])
-      predecessor.present? && (required_states + ENROLLMENT_INELIGIBLE_STATES).include?(aasm_state) && !(applications.any?) && reinstated_id.blank?
+      predecessor.present? && (required_states + ENROLLMENT_INELIGIBLE_STATES).include?(aasm_state) && !applications.any? && reinstated_id.blank?
     end
     # rubocop:enable Style/InverseMethods
 
