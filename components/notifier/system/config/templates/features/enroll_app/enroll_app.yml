@@ -233,7 +233,7 @@ registry:
         is_enabled: false
         settings:
           - key: :areas
-            item: ["R-DC001"]
+            item: ["R-ME001", "R-ME002", "R-ME003", "R-ME004"]
       - key: :service_area
         item: :service_area
         is_enabled: true
