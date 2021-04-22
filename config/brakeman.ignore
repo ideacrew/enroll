@@ -737,6 +737,26 @@
       "note": ""
     },
     {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "cd6894cae7988763b05d81ee9348df6b72d3f4b900c4db77c473c27b077d1424",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "lib/store_registry_config.rb",
+      "line": 18,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`cp -r #{Rails.root}/system #{@target_config_folder}`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "StoreRegistryConfig",
+        "method": "copy_current_system_configuration_to_storage"
+      },
+      "user_input": "@target_config_folder",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
       "warning_type": "Mass Assignment",
       "warning_code": 70,
       "fingerprint": "d092830cba35fa51bb209b41e985e5925bbbb6a3a6b60cc531203a8770391ac3",
@@ -817,6 +837,6 @@
       "note": ""
     }
   ],
-  "updated": "2021-04-26 11:43:43 -0400",
+  "updated": "2021-04-28 15:51:09 -0400",
   "brakeman_version": "5.0.0"
 }

@@ -178,9 +178,9 @@ registry:
           - key: :contact_center_city
             item: "Washington"
           - key: :contact_center_county
-            item: 'Washington'
+            item: 'District of Columbia'
           - key: :contact_center_zip_code
-            item: "20026"
+            item: "20024" # For DC loading rating areas, the zip uses this zip code 20024 
           - key: :contact_center_email_address
             item: "info@dchealthlink.com"
           - key: :contact_center_short_number
@@ -214,6 +214,12 @@ registry:
       - key: :rating_area
         item: :rating_area
         is_enabled: false
+      - key: :service_area
+        item: :service_area
+        is_enabled: true
+        settings:
+          - key: :service_area_model
+            item: 'single'
       - key: :site_database_seed
         item: :site_database_seed
         is_enabled: true
