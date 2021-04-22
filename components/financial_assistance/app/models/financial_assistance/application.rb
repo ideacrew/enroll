@@ -695,6 +695,7 @@ module FinancialAssistance
                 :body => { error_message: message },
                 :family_id => family_id.to_s,
                 :assistance_application_id => hbx_id.to_s,
+                primary_applicant_person_hbx_id: primary_applicant.person_hbx_id,
                 :return_status => return_status.to_s,
                 :submitted_timestamp => TimeKeeper.date_of_record.strftime('%Y-%m-%dT%H:%M:%S')})
       end
@@ -706,11 +707,11 @@ module FinancialAssistance
               :body => { error_message: message },
               :family_id => family_id.to_s,
               :assistance_application_id => hbx_id.to_s,
+              primary_applicant_person_hbx_id: primary_applicant.person_hbx_id,
               :return_status => determination_http_status_code.to_s,
               :submitted_timestamp => TimeKeeper.date_of_record.strftime('%Y-%m-%dT%H:%M:%S'),
               :haven_application_id => haven_app_id,
-              :haven_ic_id => haven_ic_id,
-              :primary_applicant_id => primary_applicant.person_hbx_id.to_s })
+              :haven_ic_id => haven_ic_id })
     end
 
     def ready_for_attestation?
