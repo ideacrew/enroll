@@ -38,7 +38,6 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerFirstRemainderToPub
     context "2 days prior to soft dead line" do
       subject { BenefitSponsors::Observers::NoticeObserver.new }
       let(:model_event) { BenefitSponsors::ModelEvents::ModelEvent.new(:initial_employer_first_reminder_to_publish_plan_year, model_instance, {}) }
-      
       # TODO: This fails on me_trunk for some reason
       xit "should trigger notice event" do
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
