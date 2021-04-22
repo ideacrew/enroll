@@ -13,7 +13,7 @@ module BenefitSponsors
         broker = org.broker_agency_profile.primary_broker_role
         docs = org.broker_agency_profile.documents.where("date" => statement_date)
         matching_documents = docs.select {|d| d.title.match(::Regexp.new("^#{broker.npn}_\\d{1,}_#{date_string}_COMMISSION"))} if broker
-        return true if matching_documents.any?
+        return true if matching_documents.&any?
       end
 
       def by_commission_statement_filename(file_path)
