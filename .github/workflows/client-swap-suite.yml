@@ -1,5 +1,6 @@
-name: Nighty Client Swap Test.
+name: Nighty Stored Client Tests
 on:
+  push:
   schedule:
     - cron: '0 0 * * *'
 
@@ -10,8 +11,11 @@ env:
   CUCUMBER_SPLIT_CONFIGURATION_PATH: 'ci/cucumber-split-config.json'
 
 jobs:
-  swap_clients:
+  test_client:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        client-name: ['me']
     steps:
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
@@ -30,9 +34,9 @@ jobs:
           bundle install
       - name: Run Client Swap Suite
         run: |
-          bundle exec rake migrations:client_configuration_toggler client='me'
+          bundle exec rake configuration:client_configuration_toggler client='${{ matrix.client-name }}'
   build-assets:
-    needs: [swap_clients]
+    needs: [test_client]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -71,7 +75,7 @@ jobs:
       - name: compile assets
         run: bundle exec rake assets:precompile
   engines:
-    needs: [swap_clients]
+    needs: [test_client]
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -136,7 +140,7 @@ jobs:
           bundle config path ../../vendor/bundle
           bundle exec rspec --fail-fast
   benefit-sponsors:
-    needs: [swap_clients]
+    needs: [test_client]
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -190,7 +194,7 @@ jobs:
           bundle config path ../../vendor/bundle
           rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
   rspec:
-    needs: [swap_clients]
+    needs: [test_client]
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -233,7 +237,7 @@ jobs:
       - name: Run tests
         run: rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
   cucumber:
-    needs: [swap_clients]
+    needs: [test_client]
     runs-on: ubuntu-latest
     strategy:
       matrix:

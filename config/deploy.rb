@@ -56,6 +56,10 @@ namespace :assets do
           execute :rake, "assets:clobber"
           execute("cd #{release_path} && nvm use 10 && RAILS_ENV=production NODE_ENV=production bundle exec rake assets:precompile")
           execute :rake, "seed:translations[db/seedfiles/english_translations_seed.rb]"
+          puts("Switching to #{env['client']} configuration.") unless ENV['client'].nil?
+          execute :rake, "configuration:client_configuration_toggler client='#{ENV['client']}'" unless ENV['client'].nil?
+          puts("No client configuration present, using current committed configuration.") if ENV['client'].nil?
+          puts("Here is the environmental configuration for client: #{ENV.inspect}")
         end
       end
     end
