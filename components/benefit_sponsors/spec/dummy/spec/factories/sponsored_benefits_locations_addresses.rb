@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 FactoryBot.define do
   factory :sponsored_benefits_locations_address, class: 'SponsoredBenefits::Locations::Address' do
 
@@ -8,8 +6,8 @@ FactoryBot.define do
     sequence(:address_2, 111) { |n| "##{n}" }
     city { EnrollRegistry[:enroll_app].setting(:contact_center_city).item }
     state { EnrollRegistry[:enroll_app].setting(:state_abbreviation).item }
-    zip { EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item }
-    county { EnrollRegistry[:enroll_app].setting(:contact_center_county).item }
+    zip { EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item  }
+    county { EnrollRegistry[:enroll_app].setting(:contact_center_county).item  }
 
     trait :work_kind do
       kind { 'work' }
@@ -20,7 +18,7 @@ FactoryBot.define do
     end
 
     trait :without_kind do
-      kind {  ' ' }
+      kind { ' ' }
     end
 
     trait :without_address_1 do
@@ -38,5 +36,8 @@ FactoryBot.define do
     trait :without_zip do
       zip { ' ' }
     end
+
+    factory :sponsored_benefits_locations_address_invalid_address, traits: [:without_kind, :without_address_1,
+     :without_city, :without_state, :without_zip]
   end
 end
