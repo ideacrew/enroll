@@ -15,7 +15,7 @@ module BenefitSponsors
       end
 
       def sic_code
-        # Fix this
+        # FIX THIS
       end
 
       # def census_employees
@@ -26,7 +26,7 @@ module BenefitSponsors
 
       def site
         return @site if defined? @site
-        @site = BenefitSponsors::Site.by_site_key(:dc).first
+        @site = BenefitSponsors::Site.by_site_key(EnrollRegistry[:enroll_app].setting(:site_key).item).first
       end
 
       def initialize_profile
@@ -41,10 +41,10 @@ module BenefitSponsors
       def build_nested_models
         return if inbox.present?
         build_inbox
-        welcome_subject = "Welcome to #{Settings.site.short_name}"
-        welcome_body = "#{Settings.site.short_name} is the #{Settings.aca.state_name}'s online marketplace where benefit sponsors may select and offer products that meet their member's needs and budget."
+        welcome_subject = "Welcome to #{EnrollRegistry[:enroll_app].setting(:short_name).item}"
+        welcome_body = "#{EnrollRegistry[:enroll_app].setting(:short_name).item} is the #{Settings.aca.state_name}'s online marketplace where benefit sponsors may select and offer products that meet their member's needs and budget."
         unless inbox.messages.where(body: welcome_body).present?
-          inbox.messages.new(subject: welcome_subject, body: welcome_body, from: Settings.site.short_name, created_at: Time.now.utc)
+          inbox.messages.new(subject: welcome_subject, body: welcome_body, from: EnrollRegistry[:enroll_app].setting(:short_name).item, created_at: Time.now.utc)
         end
       end
     end

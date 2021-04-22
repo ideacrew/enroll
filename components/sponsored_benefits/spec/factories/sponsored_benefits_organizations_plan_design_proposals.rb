@@ -3,11 +3,7 @@ FactoryBot.define do
     
     trait :with_profile do
       after(:create) do |proposal, evaluator|
-        if Settings.aca.state_abbreviation == "DC" # toDo
-          create(:shop_dc_employer_profile, plan_design_proposal: proposal)
-        else
-          create(:shop_cca_employer_profile, plan_design_proposal: proposal)
-        end
+        create("shop_#{EnrollRegistry[:enroll_app].setting(:site_key).item}_employer_profile".to_sym, plan_design_proposal: proposal)
       end
     end
   end

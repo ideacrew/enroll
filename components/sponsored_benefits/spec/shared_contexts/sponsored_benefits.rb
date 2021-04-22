@@ -93,10 +93,10 @@ RSpec.shared_context "set up broker agency profile for BQT, by using configurati
   let!(:rating_area) { FactoryBot.create(:benefit_markets_locations_rating_area, active_year: current_effective_date.year) }
 
   def health_plan
-    if Settings.aca.state_abbreviation == "DC"
-      FactoryBot.create(:plan, :with_premium_tables, coverage_kind: "health", active_year: current_effective_date.year)
-    else
+    if EnrollRegistry.feature_enabled?(:rating_area)
       FactoryBot.create(:plan, :with_premium_tables, :with_rating_factors, coverage_kind: "health", active_year: current_effective_date.year)
+    else
+      FactoryBot.create(:plan, :with_premium_tables, coverage_kind: "health", active_year: current_effective_date.year)
     end
   end
 
@@ -112,10 +112,10 @@ RSpec.shared_context "set up broker agency profile for BQT, by using configurati
   end
 
   def dental_plan
-    if Settings.aca.state_abbreviation == "DC"
-      FactoryBot.create(:plan, :with_premium_tables, coverage_kind: "dental", active_year: current_effective_date.year)
-    else
+    if EnrollRegistry.feature_enabled?(:rating_area)
       FactoryBot.create(:plan, :with_premium_tables, :with_rating_factors, coverage_kind: "dental", active_year: current_effective_date.year)
+    else
+      FactoryBot.create(:plan, :with_premium_tables, coverage_kind: "dental", active_year: current_effective_date.year)
     end
   end
 
@@ -132,8 +132,16 @@ RSpec.shared_context "set up broker agency profile for BQT, by using configurati
 
   def service_area
     return @service_area if defined? @service_area
-    @service_area = FactoryBot.create(:benefit_markets_locations_service_area,
-      county_zip_ids: [FactoryBot.create(:benefit_markets_locations_county_zip, county_name: 'Middlesex', zip: '01754', state: 'MA').id],
+    @service_area = FactoryBot.create(
+      :benefit_markets_locations_service_area,
+      county_zip_ids: [
+        FactoryBot.create(
+          :benefit_markets_locations_county_zip,
+          county_name: EnrollRegistry[:enroll_app].setting(:contact_center_county).item,
+          zip: EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item,
+          state: EnrollRegistry[:enroll_app].setting(:state_abbreviation).item
+        ).id
+      ],
       active_year: current_effective_date.year
     )
   end
