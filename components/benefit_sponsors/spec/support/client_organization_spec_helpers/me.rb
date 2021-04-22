@@ -50,9 +50,9 @@ module BenefitSponsors
             kind: "primary",
             address_1: "27 Reo Road",
             address_2: "Apt 1111",
-            zip: "20024",
-            city: "Washington",
-            state: "DC"
+            city: EnrollRegistry[:enroll_app].setting(:contact_center_city).item.to_s,
+            state: EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.to_s,
+            zip: EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item.to_s
           },
           phone: {
             _id: phone_id,
