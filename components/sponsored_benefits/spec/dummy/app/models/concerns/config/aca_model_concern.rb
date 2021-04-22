@@ -1,3 +1,7 @@
+# frozen_string_literal: true
+
+# rubocop:disable Style/ClassVars
+
 module Config::AcaModelConcern
   extend ActiveSupport::Concern
 
@@ -168,3 +172,6 @@ module Config::AcaModelConcern
     end
   end
 end
+
+# rubocop:enable Style/ClassVars
+
