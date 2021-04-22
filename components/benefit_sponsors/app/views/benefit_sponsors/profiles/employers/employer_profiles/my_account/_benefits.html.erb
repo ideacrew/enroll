@@ -61,7 +61,7 @@
                 <i class="fa fa-users"></i>
                 <% end %>
               </span>
-              <%= benefit_application.start_on.to_date.year %>
+             <%= fetch_benefit_application_start_year(benefit_application) %>
               Plan Year (<%= benefit_application_summarized_state(benefit_application) %>)
               <% if benefit_application.reinstated_id? %>
                 (<%= l10n("employers.plan_years.reinstated") %>)

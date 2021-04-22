@@ -512,6 +512,23 @@ RSpec.describe ApplicationHelper, :type => :helper do
     end
   end
 
+  describe '#fetch_benefit_application_start_year' do
+    include_context "setup benefit market with market catalogs and product packages"
+    include_context "setup initial benefit application"
+    let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_month - 6.months}
+    before do
+      period = initial_application.effective_period.min..TimeKeeper.date_of_record.end_of_month
+      initial_application.update_attributes!(termination_reason: 'nonpayment', terminated_on: period.max, effective_period: period)
+      initial_application.terminate_enrollment!
+      EnrollRegistry[:benefit_application_reinstate].feature.stub(:is_enabled).and_return(true)
+      EnrollRegistry[:benefit_application_reinstate]{ {params: {benefit_application: initial_application, options: {transmit_to_carrier: true} } } }
+      @reinstated_application = benefit_sponsorship.benefit_applications.detect{|app| app.reinstated_id.present?}
+    end
+    it 'should return parent application start year if application is reinstated' do
+      expect(helper.fetch_benefit_application_start_year(@reinstated_application)).to eq initial_application.start_on.year
+    end
+  end
+
 
   describe 'shopping_group_premium' do
     it 'should return cost without session' do

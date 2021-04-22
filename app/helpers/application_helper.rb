@@ -848,6 +848,10 @@ module ApplicationHelper
     return summary_text.strip
   end
 
+  def fetch_benefit_application_start_year(benefit_application)
+    benefit_application.reinstated_id.present? ? benefit_application.parent_reinstate_application.start_on.to_date.year : benefit_application.start_on.to_date.year
+  end
+
   def json_for_plan_shopping_member_groups(member_groups)
     member_groups.map do |member_group|
       member_group_hash = JSON.parse(member_group.group_enrollment.to_json)
