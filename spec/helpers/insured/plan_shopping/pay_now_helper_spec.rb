@@ -8,7 +8,7 @@ RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
   let(:individual_plans) { FactoryBot.create_list(:plan, 5, :with_premium_tables, market: 'individual') }
 
   describe "Carrier with payment options" do
-    let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
+    let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, :kaiser_profile) }
     let(:product) do
       FactoryBot.create(:benefit_markets_products_health_products_health_product,
                         title: 'IVL Test Plan Silver',
@@ -34,6 +34,7 @@ RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
         end
 
         before :each do
+          assign(:issuer_name, issuer_profile.legal_name)
           assign(:enrollment, hbx_enrollment)
         end
         it "returns #{market.in?(['individual', 'coverall'])} for #{market} + Kaiser" do
@@ -45,7 +46,7 @@ RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
   end
 
   describe "Carrier with NO payment options" do
-    let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
+    let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, :kaiser_profile) }
     let(:product) do
       FactoryBot.create(:benefit_markets_products_health_products_health_product,
                         title: 'IVL Test Plan Silver',
@@ -67,6 +68,7 @@ RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
                         kind: 'individual')
     end
     before :each do
+      assign(:issuer_name, issuer_profile.legal_name)
       assign(:enrollment, hbx_enrollment)
     end
     it "returns false for not Kaiser" do
@@ -75,7 +77,7 @@ RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
   end
 
   describe "Check family has Kaiser enrollments or not" do
-    let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, legal_name: 'Kaiser') }
+    let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, :kaiser_profile) }
     let(:product) do
       FactoryBot.create(:benefit_markets_products_health_products_health_product,
                         title: 'IVL Test Plan Silver',
@@ -293,7 +295,7 @@ RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
   end
 
   describe 'Pay Now button should be available only for limited time on enrollment tile' do
-    let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, legal_name: 'Kaiser') }
+    let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, :kaiser_profile) }
     let(:product) do
       FactoryBot.create(:benefit_markets_products_health_products_health_product,
                         title: 'IVL Test Plan Silver',
@@ -332,6 +334,7 @@ RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
         to_state: "coverage_selected"
       )
       hbx_enrollment.update_attributes(effective_on: TimeKeeper.date_of_record + 1.day)
+      assign(:issuer_name, issuer_profile.legal_name)
       assign(:enrollment, hbx_enrollment)
     end
 

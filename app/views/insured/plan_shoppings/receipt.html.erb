@@ -13,7 +13,7 @@
           <% if @enrollment.employee_role.present? %>
           <% else %>
             <% if show_pay_now? %>
-              <p><strong>Important:</strong> You must pay your first month’s premium directly to <%= EnrollRegistry[:pay_now_functionality].setting(:carriers_long_name).item %>
+              <p><strong>Important:</strong> You must pay your first month’s premium directly to <%= EnrollRegistry["#{@issuer_name}_pay_now".to_sym].setting(:carriers_long_name).item %>
                 to activate your coverage. Select PAY NOW to make your first premium payment online. To learn about
                 other payment options, select ‘How to Pay’.</p>
             <% else %>
@@ -80,23 +80,23 @@
                 <ol>
                   <li>
                     <% if show_pay_now? %>
-                      You must pay your first month’s premium directly to <%= EnrollRegistry[:pay_now_functionality].setting(:carriers_long_name).item %> to activate your
+                      You must pay your first month’s premium directly to <%= EnrollRegistry["#{@issuer_name}_pay_now".to_sym].setting(:carriers_long_name).item %> to activate your
                       coverage. <%= site_short_name %> does not collect premium payments.<br/><br/>
                       There are two ways to pay your first month’s premium and activate your coverage:
                       <br/>
                       <br/>
                       <ul style="padding-left: 18px;list-style-type: disc;/* padding-left: 18px; */">
                         <li>
-                          <strong>Select PAY NOW to make your first premium payment directly to <%= EnrollRegistry[:pay_now_functionality].setting(:carriers_long_name).item %>. </strong>
+                          <strong>Select PAY NOW to make your first premium payment directly to <%= EnrollRegistry["#{@issuer_name}_pay_now".to_sym].setting(:carriers_long_name).item %>. </strong>
                         </li>
                         <li>
                           <strong>Pay when you receive your invoice. </strong>We sent your enrollment information to
-                          <%= EnrollRegistry[:pay_now_functionality].setting(:carriers_long_name).item %> electronically. They will send you an invoice. If you don’t receive an
-                          invoice within 2 weeks, call <%= EnrollRegistry[:pay_now_functionality].setting(:carriers_long_name).item %> at (844) 524-7370 to make your payment.
+                          <%= EnrollRegistry["#{@issuer_name}_pay_now".to_sym].setting(:carriers_long_name).item %> electronically. They will send you an invoice. If you don’t receive an
+                          invoice within 2 weeks, call <%= EnrollRegistry["#{@issuer_name}_pay_now".to_sym].setting(:carriers_long_name).item %> at (844) 524-7370 to make your payment.
                         </li>
                       </ul>
                       <br/>
-                      Once your coverage is activated,<%= EnrollRegistry[:pay_now_functionality].setting(:carriers_long_name).item %> will send you your insurance cards and
+                      Once your coverage is activated,<%= EnrollRegistry["#{@issuer_name}_pay_now".to_sym].setting(:carriers_long_name).item %> will send you your insurance cards and
                       member number. You can start using your benefits on the day your coverage begins.
                     <% else %>
                         <strong>Make your first premium payment directly to <%= @plan.carrier_profile.legal_name %>.</strong> Your enrollment information was electronically submitted
@@ -263,12 +263,12 @@
       <div class="modal-body">
         <p>
           You are leaving the <%= Settings.site.short_name %> website and entering a privately-owned website created,
-          operated and maintained by <%= EnrollRegistry[:pay_now_functionality].setting(:carriers_long_name).item %>.<br/>
+          operated and maintained by <%= EnrollRegistry["#{@issuer_name}_pay_now".to_sym].setting(:carriers_long_name).item %>.<br/>
         <ul>
           <li>This link is provided for your convenience to allow you to pay your first month’s insurance premium now.
             It’s only available to make your first payment.
           </li>
-          <li>The information that <%= EnrollRegistry[:pay_now_functionality].setting(:carriers_long_name).item %> collects and maintains as a result of your visit to its website is
+          <li>The information that <%= EnrollRegistry["#{@issuer_name}_pay_now".to_sym].setting(:carriers_long_name).item %> collects and maintains as a result of your visit to its website is
             different from the information that <%= site_short_name %> collects and maintains.
           </li>
           <li><%= site_short_name %> cannot help you with any information regarding this website, including your username or
@@ -278,11 +278,11 @@
         </ul>
         By linking to this private business, <%= site_short_name %> is not endorsing its products, services, or privacy or
         security policies. We recommend you review the business's information collection policy or terms and conditions
-        to fully understand what information is collected by <%= EnrollRegistry[:pay_now_functionality].setting(:carriers_long_name).item %>.
+        to fully understand what information is collected by <%= EnrollRegistry["#{@issuer_name}_pay_now".to_sym].setting(:carriers_long_name).item %>.
         </p>
       </div>
       <div class="modal-footer">
-        <%= link_to "LEAVE #{site_short_name.upcase}", EnrollRegistry[:pay_now_functionality].setting(:carriers_registration_website).item, {type: "button", class: "btn btn-default pull-left", id: "payment-redirect-kp", target: "_blank"} %>
+        <%= link_to "LEAVE #{site_short_name.upcase}", EnrollRegistry["#{@issuer_name}_pay_now".to_sym].setting(:carriers_registration_website).item, {type: "button", class: "btn btn-default pull-left", id: "payment-redirect-kp", target: "_blank"} %>
         <button type="button" class="btn btn-default" data-dismiss="modal">GO BACK</button>
       </div>
     </div><!-- /.modal-content -->
