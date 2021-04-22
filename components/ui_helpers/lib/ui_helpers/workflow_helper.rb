@@ -87,11 +87,15 @@ module UIHelpers
     end
 
     def translation_placeholder_text(text)
-      if text.include? '<medicaid-question-translation-placeholder>'
-        text.sub! '<medicaid-question-translation-placeholder>', state_abbreviation_text(l10n("faa.medicaid_question"))
-      else
-        text
-      end
+      text.gsub! '<board_of_elections_address-placeholder>', Settings.contact_center.board_of_elections_address
+      text.gsub! '<board_of_elections_email-placeholder>', Settings.contact_center.board_of_elections_email
+      text.gsub! '<board_of_elections_entity-placeholder>', Settings.contact_center.board_of_elections_entity
+      text.gsub! '<board_of_elections_phone_number-placeholder>', Settings.contact_center.board_of_elections_phone_number
+      text.gsub! '<contact-center-phone_number-placeholder>', Settings.contact_center.phone_number
+      text.gsub! '<medicaid-question-translation-placeholder>', state_abbreviation_text(l10n("faa.medicaid_question"))
+      text.gsub! '<short-name-placeholder>', Settings.site.short_name
+      text.gsub! '<state-abbreviation-placeholder>', aca_state_abbreviation
+      text
     end
 
     # set YAML text placeholders
