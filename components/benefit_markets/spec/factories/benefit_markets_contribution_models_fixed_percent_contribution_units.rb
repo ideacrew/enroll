@@ -7,13 +7,13 @@ FactoryBot.define do
 
     trait :with_member_relationship_maps do
       member_relationship_maps {
-      	[ 
-      		build(:benefit_markets_contribution_models_member_relationship_map,
+        [
+          build(:benefit_markets_contribution_models_member_relationship_map,
             relationship_name: name,
             operator: member_relationship_operator,
             contribution_unit: self,
             count: 1)
-      	]
+        ]
       }
     end
   end

@@ -11,7 +11,7 @@ RSpec.describe BenefitSponsors::Validators::EnrollmentEligibilityContract do
   let(:service_area)               { FactoryBot.create(:benefit_markets_locations_service_area) }
 
   let(:missing_params)             { {market_kind: market_kind, effective_date: effective_date, benefit_sponsorship_id: benefit_sponsorship_id  } }
-  let(:invalid_params)             { missing_params.merge({service_areas: service_area.as_json, benefit_application_kind: 'initial' })}
+  let(:invalid_params)             { missing_params.merge({service_areas: service_area.serializable_hash, benefit_application_kind: 'initial' })}
   let(:error_message1)             { {:service_areas => ["is missing"], :benefit_application_kind => ["is missing"]} }
   let(:error_message2)             { {:service_areas => ["must be an array"]} }
 
@@ -29,7 +29,7 @@ RSpec.describe BenefitSponsors::Validators::EnrollmentEligibilityContract do
 
   context "Given valid required parameters" do
     context "with all/required params" do
-      let(:all_params) { missing_params.merge({benefit_application_kind: benefit_application_kind, service_areas: [service_area.as_json] }) }
+      let(:all_params) { missing_params.merge({benefit_application_kind: benefit_application_kind, service_areas: [service_area.serializable_hash] }) }
 
       it "should pass validation" do
         expect(subject.call(all_params).success?).to be_truthy

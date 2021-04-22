@@ -624,6 +624,7 @@ module BenefitSponsors
               end
 
               it "should not send duplicate invitations, even with time travel activated" do
+                census_employee.renewal_benefit_group_assignment.benefit_application
                 renewal_application.send_employee_renewal_invites
                 expect(::Invitation.count).to eq(2)
                 renewal_application.send_employee_renewal_invites

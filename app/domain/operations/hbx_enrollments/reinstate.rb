@@ -41,7 +41,7 @@ module Operations
 
       def active_bga_exists?(params)
         @effective_on = fetch_effective_on(params)
-        @notify = params[:options].present? && (params[:options][:notify].is_a?(Boolean) && params[:options][:notify].to_s == "false") ? params[:options][:notify] : true
+        @notify = params[:options].present? && (params[:options][:notify].is_a?(Mongoid::Boolean) && params[:options][:notify].to_s == "false") ? params[:options][:notify] : true
         @bga = @current_enr.census_employee.benefit_group_assignments.by_benefit_package(params[:options][:benefit_package]).order_by(:created_at.desc).detect{ |bga| bga.is_active?(@effective_on)}
       end
 

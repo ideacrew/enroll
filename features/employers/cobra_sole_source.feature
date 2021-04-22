@@ -8,8 +8,9 @@ Feature: COBRA basic
     And there is an employer EnterPrise Limited
     And EnterPrise Limited employer has a staff role
     And there are 2 employees for EnterPrise Limited
-@flaky
-Scenario: Employer terminates and Initiate COBRA to Unlinked employee
+
+  @flaky
+  Scenario: Employer terminates and Initiate COBRA to Unlinked employee
     Given staff role person logged in
     And EnterPrise Limited employer terminates employees
     And EnterPrise Limited employer visit the Employee Roster
@@ -24,8 +25,9 @@ Scenario: Employer terminates and Initiate COBRA to Unlinked employee
     Then employer should see the Initiate cobra success flash notice
     And employer clicks on all employees
     And employer should see census employee status as Cobra eligible
-@flaky
-Scenario: Employer terminates and Initiate COBRA to enrolled employee
+
+  @flaky
+  Scenario: Employer terminates and Initiate COBRA to enrolled employee
     Given staff role person logged in
     And initial employer EnterPrise Limited has active benefit application
     And employees for EnterPrise Limited have a selected coverage
@@ -42,6 +44,7 @@ Scenario: Employer terminates and Initiate COBRA to enrolled employee
     Then employer should see the Initiate cobra success flash notice
     And employer clicks on all employees
     And employer should see census employee status as Cobra Enrolled
+
   @flaky
   Scenario: Employer tries to initiate COBRA with COBRA begin date before termination date
     Given staff role person logged in

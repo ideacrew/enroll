@@ -1,5 +1,6 @@
 require 'rails_helper'
-RSpec.describe "/hbx_profiles/_edit_force_publish", :dbclean => :around_each do
+
+RSpec.describe "hbx_profiles/_edit_force_publish", :dbclean => :around_each do
   let(:site) do
     FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca)
   end
@@ -33,6 +34,7 @@ RSpec.describe "/hbx_profiles/_edit_force_publish", :dbclean => :around_each do
     it "Should match header text Publish Application" do
       expect(rendered).to match(/Publish Application/)
     end
+
     it "Should match text " do
       expect(rendered).to match(/Application Type/)
       expect(rendered).to match(/Effective Date/)
@@ -42,5 +44,4 @@ RSpec.describe "/hbx_profiles/_edit_force_publish", :dbclean => :around_each do
       expect(rendered).to match(/Last Updated At/)
     end
   end
-
 end

@@ -58,8 +58,11 @@ module SponsoredBenefits
 
     before do
       allow(plan_design_organization).to receive(:is_renewing_employer?).and_return false
-      allow_any_instance_of(SponsoredBenefits::Organizations::PlanDesignOrganization).to receive(:is_renewing_employer?).and_return(false)
+      plan_design_proposal
       benefit_application
+      allow_any_instance_of(SponsoredBenefits::Organizations::PlanDesignOrganization).to receive(:is_renewing_employer?).and_return(false)
+      allow_any_instance_of(SponsoredBenefits::Services::PlanCostService).to receive(:active_census_employees).and_return([plan_design_census_employee])
+      allow_any_instance_of(SponsoredBenefits::Organizations::PlanDesignProposal).to receive(:active_benefit_group).and_return(benefit_application.benefit_groups.first)
       allow(subject).to receive(:current_person).and_return(current_person)
       allow(subject).to receive(:active_user).and_return(active_user)
       allow(current_person).to receive(:broker_role).and_return(broker_role)

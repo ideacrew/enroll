@@ -44,9 +44,9 @@ module BenefitSponsors
                              @rating_area
                            )
                          end
-          member_value = BigDecimal.new((member_price * @group_size_factor * @sic_code_factor).to_s).round(2)
+          member_value = BigDecimal((member_price * @group_size_factor * @sic_code_factor).to_s).round(2)
           @member_totals[member.member_id] = member_value
-          @total = BigDecimal.new((@total + member_value).to_s).round(2)
+          @total = BigDecimal((@total + member_value).to_s).round(2)
           self
         end
       end

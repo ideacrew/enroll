@@ -40,7 +40,7 @@ Feature: Census Employee COBRA functionality
     When EnterPrise Limited employer clicks on Initiate COBRA button
     Then employer should see the Initiate cobra success flash notice
     And employer clicks on all employees
-    And employer should see census employee status as Cobra Enrolled
+    And employer should see census employee status as Cobra linked
 
   Scenario: Employer terminates and Initiate COBRA to linked employee
     Given staff role person logged in

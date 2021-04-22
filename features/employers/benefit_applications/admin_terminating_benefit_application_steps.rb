@@ -69,18 +69,20 @@ end
 Then(/^user should see termination successful message$/) do
   sleep 5
   expect(page).to have_content(/Application terminated successfully/)
+  expect(page).to have_content('Application terminated successfully', wait: 5)
 end
 
 Then(/^employer should see benefit application in termination pending state$/) do
-  expect(page).to have_content("Termination Pending")
+  sleep(5)
+  expect(page).to have_content("Termination Pending", wait: 10)
 end
 
 Then(/^employer should see (.*) and reinstated benefit_application$/) do |aasm_state|
   expect(page).to have_content("Active")
   if aasm_state == "terminated"
-    expect(page).to have_content("Terminated")
+    expect(page).to have_content("Terminated", wait: 10)
   else
-    expect(page).to have_content("Termination Pending")
+    expect(page).to have_content("Termination Pending", wait: 10)
   end
 end
 

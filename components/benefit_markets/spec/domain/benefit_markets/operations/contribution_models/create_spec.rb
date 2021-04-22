@@ -30,8 +30,8 @@ RSpec.describe BenefitMarkets::Operations::ContributionModels::Create, dbclean: 
     )
   end
 
-  let(:contribution_units)                    { [contribution_unit.as_json] }
-  let(:member_relationships)                  { [member_relationship.as_json] }
+  let(:contribution_units)                    { [contribution_unit.serializable_hash] }
+  let(:member_relationships)                  { [member_relationship.serializable_hash] }
 
   let(:params) do
     {

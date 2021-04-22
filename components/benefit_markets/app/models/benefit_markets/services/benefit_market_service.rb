@@ -88,10 +88,10 @@ module BenefitMarkets
               renewal_application_configuration: renewal_application_configuration
             )
         elsif form.kind == "aca_individual"
-          initial_application_configuration = BenefitMarkets::Factories::AcaIndividualInitialApplicationConfiguration.call form.aca_individual_configuration.initial_application_configuration.attributes
-          configuration = BenefitMarkets::Factories::AcaIndividualConfiguration.call form.aca_individual_configuration.attributes.merge(
+          initial_application_configuration = BenefitMarkets::Factories::AcaIndividualInitialApplicationConfiguration.call(form.aca_individual_configuration.initial_application_configuration.attributes)
+          configuration = BenefitMarkets::Factories::AcaIndividualConfiguration.call(form.aca_individual_configuration.attributes.merge(
               initial_application_configuration: initial_application_configuration
-            )
+            ))
         end
 
         benefit_market = BenefitMarkets::Factories::BenefitMarket.call description: form.description,

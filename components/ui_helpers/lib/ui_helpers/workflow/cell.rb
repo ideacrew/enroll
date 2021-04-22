@@ -7,7 +7,7 @@ module UIHelpers
 
       def initialize(attributes)
         @gutter = attributes['gutter']
-        @text = attributes['text']
+        @text = attributes['text'].present? ? ERB.new(attributes['text']).result : attributes['text']
         @type = attributes['type']
         @values = attributes['values']
         @options = attributes['options'] || {}

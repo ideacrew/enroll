@@ -230,12 +230,12 @@ registry:
         item: "kaiser_enabled"
         is_enabled: true
         settings:
-        - key: :carriers
-          item: 'Kaiser'
-        - key: :carriers_long_name
-          item: 'Kaiser Permanante'
-        - key: :carriers_registration_website
-          item: "https://healthy.kaiserpermanente.org/new-members/#register-to-kp-org"
+          - key: :carriers
+            item: 'Kaiser'
+          - key: :carriers_long_name
+            item: 'Kaiser Permanante'
+          - key: :carriers_registration_website
+            item: "https://healthy.kaiserpermanente.org/new-members/#register-to-kp-org"
       - key: :agency_staff
         item: :agency_staff
         is_enabled: true

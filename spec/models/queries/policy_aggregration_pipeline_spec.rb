@@ -121,25 +121,25 @@ describe Queries::PolicyAggregationPipeline, "Policy Queries", dbclean: :around_
 
     it '.exclude_employers_by_hbx_ids' do
       expect(subject.pipeline.count).to be 1
-      value = subject.exclude_employers_by_hbx_ids(hbx_id_list)
+      subject.exclude_employers_by_hbx_ids(hbx_id_list)
       expect(subject.pipeline.count).to be 2
     end
 
     it '.filter_to_active' do
       expect(subject.pipeline.count).to be 1
-      value = subject.filter_to_active
+      subject.filter_to_active
       expect(subject.pipeline.count).to be 2
       expect(subject.evaluate.map{|a| a['hbx_id']}).to eq good_enrollment_hbx_ids
     end
 
     it '.with_effective_date' do
-      value = subject.with_effective_date(effective_on)
-      expect(subject.evaluate.map{|a| a['hbx_id']}).to eq good_enrollment_hbx_ids
+      subject.with_effective_date(effective_on)
+      expect(subject.evaluate.map{ |a| a['hbx_id']}).to eq good_enrollment_hbx_ids
     end
 
     it '.filter_to_shop' do
-      value = subject.filter_to_shop
-      expect(subject.evaluate.map{|a| a['hbx_id']}).to eq good_enrollment_hbx_ids
+      subject.filter_to_shop
+      expect(subject.evaluate.map{ |a| a['hbx_id']}).to eq good_enrollment_hbx_ids
     end
 
     it '.list_of_hbx_ids' do

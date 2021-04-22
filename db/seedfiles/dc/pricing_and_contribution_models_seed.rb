@@ -23,6 +23,12 @@ def load_dc_shop_contribution_models_seed
     yaml_str = File.read(f_name)
     data = YAML.load(yaml_str)
     data.new_record = true
+    data.contribution_units.each do |cu|
+      cu.contribution_model = data
+      cu.member_relationship_maps.each do |member_relationship_map|
+        member_relationship_map.contribution_unit = cu
+      end
+    end
     data.save!
   end
 end
