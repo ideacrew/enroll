@@ -142,8 +142,8 @@ module BenefitMarkets
     def unique_application_period_range
       return false unless application_period.present? && benefit_market.present?
 
-      begin_date_covered  = self.class.by_application_date(application_period.min).where(:id.ne => id, :benefit_market_id=>benefit_market.id).any?
-      end_date_covered    = self.class.by_application_date(application_period.max).where(:id.ne => id, :benefit_market_id=>benefit_market.id).any?
+      begin_date_covered  = self.class.by_application_date(application_period.min).where(:id.ne => id, :benefit_market_id => benefit_market.id).any?
+      end_date_covered    = self.class.by_application_date(application_period.max).where(:id.ne => id, :benefit_market_id => benefit_market.id).any?
 
       if begin_date_covered || end_date_covered
         errors.add(:application_period, "already exists for dates: #{application_period}")
