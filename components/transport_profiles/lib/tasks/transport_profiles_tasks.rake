@@ -59,7 +59,7 @@ namespace :transport_profiles do
     end
     endpoint_references.keys.sort.each do |k|
       endpoint_results = ::TransportProfiles::WellKnownEndpoint.find_by_endpoint_key(k)
-      if endpoint_results.none?
+      if endpoint_results.any? == false
         puts "Missing Endpoint: #{k}"
         puts "  Referenced by:" 
         endpoint_references[k].uniq.each do |ref|
