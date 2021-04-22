@@ -219,9 +219,7 @@ class HbxEnrollmentSponsorEnrollmentCoverageReportCalculator
     contribution_model = p_package.contribution_model
     p_calculator = pricing_model.pricing_calculator
     c_calculator = contribution_model.contribution_calculator
-    if hbx_enrollment_id_list.any? == false
-      return
-    end
+    hbx_enrollment_id_list.none? return
     group_mapper = HbxEnrollmentRosterMapper.new(hbx_enrollment_id_list, sponsored_benefit)
     group_mapper.each do |ce_roster|
       price_group = p_calculator.calculate_price_for(pricing_model, ce_roster, sponsor_contribution)
