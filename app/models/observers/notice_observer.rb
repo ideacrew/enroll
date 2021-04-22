@@ -300,7 +300,8 @@ module Observers
     end
 
     def trigger_zero_employees_on_roster_notice(plan_year)
-      (plan_year.benefit_groups.none?{|bg| bg.is_congress?} && plan_year.employer_profile.census_employees.active.none?) ? deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "zero_employees_on_roster_notice")
+      return unless plan_year.benefit_groups.none?(&:is_congress?) && plan_year.employer_profile.census_employees.active.none?
+      deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "zero_employees_on_roster_notice")
     end
 
     def organizations_for_low_enrollment_notice(current_date)
