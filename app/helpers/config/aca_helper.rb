@@ -244,7 +244,7 @@ module Config::AcaHelper
   end
 
   def market_rating_areas
-    @market_rating_areas ||= Settings.aca.rating_areas
+    @market_rating_areas ||= EnrollRegistry[:rating_area].setting(:areas).item
   end
 
   def multiple_market_rating_areas?
