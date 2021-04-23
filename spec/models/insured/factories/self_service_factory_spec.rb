@@ -11,6 +11,7 @@ module Insured
       EnrollRegistry[:apply_aggregate_to_enrollment].feature.stub(:is_enabled).and_return(false)
     end
 
+    let(:site_key) { EnrollRegistry[:enroll_app].setting(:site_key).item.upcase }
     let!(:person) {FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
     let!(:family) {FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person)}
     let(:sep) {FactoryBot.create(:special_enrollment_period, family: family)}
@@ -29,9 +30,9 @@ module Insured
         @product.update_attributes(ehb: 0.9844)
         enrollment.update_attributes(product: @product)
         hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.update_attributes!(slcsp_id: @product.id)}
-        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 59, 'R-DC001').and_return(814.85)
-        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 60, 'R-DC001').and_return(846.72)
-        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 61, 'R-DC001').and_return(879.8)
+        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 59, "R-#{site_key}001").and_return(814.85)
+        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 60, "R-#{site_key}001").and_return(846.72)
+        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 61, "R-#{site_key}001").and_return(879.8)
         person.update_attributes!(dob: (enrollment.effective_on - 61.years))
         family.family_members.detect { |fm| !fm.is_primary_applicant }.person.update_attributes!(dob: (enrollment.effective_on - 59.years))
       end
@@ -108,9 +109,9 @@ module Insured
         @product.save!
         enrollment.update_attributes(product: @product, effective_on: TimeKeeper.date_of_record)
         hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.update_attributes!(slcsp_id: @product.id)}
-        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 59, 'R-DC001').and_return(614.85)
-        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 60, 'R-DC001').and_return(646.72)
-        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 61, 'R-DC001').and_return(679.8)
+        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 59, "R-#{site_key}001").and_return(614.85)
+        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 60, "R-#{site_key}001").and_return(646.72)
+        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 61, "R-#{site_key}001").and_return(679.8)
         person.update_attributes!(dob: (enrollment.effective_on - 61.years))
         family.family_members[1].person.update_attributes!(dob: (enrollment.effective_on - 59.years))
       end
@@ -139,7 +140,7 @@ module Insured
         @product.save!
         enrollment.update_attributes(product: @product, effective_on: effective_on, aasm_state: "auto_renewing")
         hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.update_attributes!(slcsp_id: @product.id)}
-        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, effective_on, person.age_on(Date.today), 'R-DC001').and_return(679.8)
+        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, effective_on, person.age_on(Date.today), "R-#{site_key}001").and_return(679.8)
       end
 
       it 'should return the updated enrollment' do
@@ -174,9 +175,9 @@ module Insured
         @product.save!
         enrollment.update_attributes(product: @product, effective_on: TimeKeeper.date_of_record, applied_aptc_amount: applied_aptc_amount)
         hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.update_attributes!(slcsp_id: @product.id)}
-        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 59, 'R-DC001').and_return(614.85)
-        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 60, 'R-DC001').and_return(646.72)
-        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 61, 'R-DC001').and_return(679.8)
+        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 59, "R-#{site_key}001").and_return(614.85)
+        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 60, "R-#{site_key}001").and_return(646.72)
+        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 61, "R-#{site_key}001").and_return(679.8)
         person.update_attributes!(dob: (enrollment.effective_on - 61.years))
         family.family_members[1].person.update_attributes!(dob: (enrollment.effective_on - 59.years))
       end
