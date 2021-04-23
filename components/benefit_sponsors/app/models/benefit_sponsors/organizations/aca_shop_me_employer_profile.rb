@@ -2,61 +2,34 @@
 
 module BenefitSponsors
   module Organizations
-    #ACA SHOP ME Employer Profile
     class AcaShopMeEmployerProfile < BenefitSponsors::Organizations::Profile
-      # include Concerns::AcaRatingAreaConfigConcern
+      # include BenefitSponsors::Employers::EmployerHelper
       include BenefitSponsors::Concerns::EmployerProfileConcern
       include BenefitSponsors::Concerns::Observable
-
-      field :sic_code,            type: String if ::EnrollRegistry.feature_enabled?(:sic_codes)
-      field :referred_by,         type: String
-      field :referred_reason,     type: String
-
-      # TODO: use SIC code validation
-      validates_presence_of :sic_code if ::EnrollRegistry.feature_enabled?(:sic_codes)
-
-      embeds_one :employer_attestation, class_name: '::EmployerAttestation'
 
       add_observer BenefitSponsors::Observers::EmployerProfileObserver.new, [:update]
       add_observer BenefitSponsors::Observers::NoticeObserver.new, [:process_employer_profile_events]
 
       after_update :notify_observers
 
-      REFERRED_KINDS = [
-        'Radio',
-        'Sign on bus, subway, gas station, etc.',
-        'Online advertisement, such as on Google or Pandora',
-        'Billboard',
-        'Video on a website',
-        'Social media, such as Facebook',
-        'Online search (for example, searching through Google for places to get insurance)',
-        'Insurance broker',
-        'Health insurance company/carrier',
-        'Hospital or community health center',
-        'Health insurance Assister or Navigator',
-        'State or Government Agency (Main Streets or Small Business Administration)',
-        'Employer Association',
-        'Chamber of Commerce',
-        'Friend or family member',
-        'Access Health sponsored event',
-        'New England Benefits Association (NEBA)',
-        'Greater Boston Chamber of Commerce',
-        'Television',
-        'Newspaper',
-        'Other'
-      ].freeze
-
-      # TODO: Temporary fix until we move employer_attestation to benefit_sponsorship
-      def is_attestation_eligible?
-        return true unless enforce_employer_attestation?
-        employer_attestation.present? && employer_attestation.is_eligible?
+      def rating_area
+        # FIX this
       end
 
-      def referred_options
-        REFERRED_KINDS
+      def sic_code
+        # FIX THIS
       end
+
+      # def census_employees
+      #   CensusEmployee.find_by_employer_profile(self)
+      # end
 
       private
+
+      def site
+        return @site if defined? @site
+        @site = BenefitSponsors::Site.by_site_key(EnrollRegistry[:enroll_app].setting(:site_key).item).first
+      end
 
       def initialize_profile
         if is_benefit_sponsorship_eligible.blank?
@@ -70,12 +43,12 @@ module BenefitSponsors
       def build_nested_models
         return if inbox.present?
         build_inbox
-        #TODO: After migration uncomment the lines below to get Welcome message for Initial Inbox creation
-        # welcome_subject = "Welcome to #{Settings.site.short_name}"
-        # welcome_body = "#{Settings.site.short_name} is the #{Settings.aca.state_name}'s online marketplace where benefit sponsors may select and offer products that meet their member's needs and budget."
-        # inbox.messages.new(subject: welcome_subject, body: welcome_body)
+        # welcome_subject = "Welcome to #{EnrollRegistry[:enroll_app].setting(:short_name).item}"
+        # welcome_body = "#{EnrollRegistry[:enroll_app].setting(:short_name).item} is the #{Settings.aca.state_name}'s online marketplace where benefit sponsors may select and offer products that meet their member's needs and budget."
+        # unless inbox.messages.where(body: welcome_body).present?
+        #  inbox.messages.new(subject: welcome_subject, body: welcome_body, from: EnrollRegistry[:enroll_app].setting(:short_name).item, created_at: Time.now.utc)
+        # end
       end
-
     end
   end
 end
