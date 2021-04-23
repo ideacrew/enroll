@@ -9,6 +9,10 @@ Given(/^the user answers no to having income adjustments$/) do
   find(:css, '#has_deductions_false').click
 end
 
+And(/^the user answers clicks continue and remove$/) do
+  find(:css, '.modal-continue-button').click
+end
+
 Then(/^the income adjustments choices should not show$/) do
   expect(page).to_not have_content 'Income adjustments you must report'
 end
