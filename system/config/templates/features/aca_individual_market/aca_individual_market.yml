@@ -42,3 +42,17 @@ registry:
       - key: :apply_aggregate_to_enrollment
         item: Operations::Individual::ApplyAggregateToEnrollment.new
         is_enabled: true
+  - namespace:
+    - :pay_now_feature
+    features:
+      - key: :Kaiser_pay_now
+        is_enabled: true
+        settings:
+          - key: :plan_shopping
+            item: true
+          - key: :enrollment_tile
+            item: true
+          - key: :carriers_long_name
+            item: 'Kaiser Permanante'
+          - key: :carriers_registration_website
+            item: "https://healthy.kaiserpermanente.org/new-members/#register-to-kp-org"

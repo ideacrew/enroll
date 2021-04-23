@@ -72,6 +72,7 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
   let(:member_group) {double(group_enrollment:group_enrollment)}
 
   before :each do
+    assign(:issuer_name, "Kaiser")
     assign :enrollment, enrollment
     assign :member_group, member_group
     @plan = plan_cost_decorator
