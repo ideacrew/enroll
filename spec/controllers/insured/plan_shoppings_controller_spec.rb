@@ -17,16 +17,12 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
   let(:reference_plan) {double("Product")}
   let(:member_enrollment) {BenefitSponsors::Enrollments::MemberEnrollment.new(member_id:hbx_enrollment_member.id, product_price:BigDecimal(100),sponsor_contribution:BigDecimal(100))}
   let(:group_enrollment) {BenefitSponsors::Enrollments::GroupEnrollment.new(product: product, member_enrollments:[member_enrollment], product_cost_total:'')}
-  let(:hbx_enrollment){ FactoryBot.create(:hbx_enrollment, :with_product, sponsored_benefit_package_id: benefit_group_assignment.benefit_group.id,
-                                           family: household.family,
-                                           household: household,
-                                           hbx_enrollment_members: [hbx_enrollment_member],
-                                           coverage_kind: "health",
-                                           product: product,
-                                           external_enrollment: false,
-                                           sponsored_benefit_id: sponsored_benefit.id,
-                                           rating_area_id: rating_area.id)
-  }
+  let(:hbx_enrollment) do
+    FactoryBot.create(:hbx_enrollment, :with_product,
+                      sponsored_benefit_package_id: benefit_group_assignment.benefit_group.id, family: household.family, household: household,
+                      hbx_enrollment_members: [hbx_enrollment_member], coverage_kind: "health", product: product, external_enrollment: false, sponsored_benefit_id: sponsored_benefit.id,
+                      rating_area_id: rating_area.id)
+  end
   let(:benefit_group) { current_benefit_package }
   let(:usermailer) {double("UserMailer")}
   let!(:census_employee) { FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile, benefit_group: current_benefit_package ) }
