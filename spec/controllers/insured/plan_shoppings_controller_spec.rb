@@ -12,7 +12,8 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
   let(:family_members){ family.family_members.where(is_primary_applicant: false).to_a }
   let(:household){ family.active_household }
   let(:hbx_enrollment_member){ FactoryBot.build(:hbx_enrollment_member, is_subscriber:true,  applicant_id: family.family_members.first.id, coverage_start_on: (TimeKeeper.date_of_record).beginning_of_month, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month) }
-  let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product) }
+  let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, :kaiser_profile) }
+  let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, issuer_profile: issuer_profile) }
   let(:reference_plan) {double("Product")}
   let(:member_enrollment) {BenefitSponsors::Enrollments::MemberEnrollment.new(member_id:hbx_enrollment_member.id, product_price:BigDecimal(100),sponsor_contribution:BigDecimal(100))}
   let(:group_enrollment) {BenefitSponsors::Enrollments::GroupEnrollment.new(product: product, member_enrollments:[member_enrollment], product_cost_total:'')}
@@ -21,6 +22,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
                                            household: household,
                                            hbx_enrollment_members: [hbx_enrollment_member],
                                            coverage_kind: "health",
+                                           product: product,
                                            external_enrollment: false,
                                            sponsored_benefit_id: sponsored_benefit.id,
                                            rating_area_id: rating_area.id)
