@@ -109,8 +109,9 @@ module Notifier
           end
 
           context 'Notices for Employer' do
+            let(:site_key) { EnrollRegistry[:enroll_app].setting(:site_key).item.capitalize }
 
-            let(:resource) { BenefitSponsors::Organizations::AcaShopDcEmployerProfile.new }
+            let(:resource) { "BenefitSponsors::Organizations::AcaShop#{site_key}EmployerProfile".constantize.new }
 
             if ::Settings.notices.shop.store_paper_notice
               it 'should store paper notices for Employer with paper contact method' do

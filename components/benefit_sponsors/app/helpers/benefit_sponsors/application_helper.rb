@@ -124,14 +124,14 @@ module BenefitSponsors
       broker_agency_mailbox = inbox_profiles_broker_agencies_broker_agency_profile_path(id: provider.id.to_s, folder: folder)
       return broker_agency_mailbox if provider.try(:broker_role)
       case (provider.model_name.name.split('::').last)
-        when "AcaShopDcEmployerProfile"
-          inbox_profiles_employers_employer_profile_path(id: provider.id.to_s, folder: folder)
-        when "HbxProfile"
-          #TODO fix it for HBX profile
-        when "BrokerAgencyProfile"
-          inbox_profiles_broker_agencies_broker_agency_profile_path(id: provider.id.to_s, folder: folder)
-        when "GeneralAgencyProfile"
-          inbox_profiles_general_agencies_general_agency_profile_path(id: provider.id.to_s, folder: folder)
+      when "AcaShop#{EnrollRegistry[:enroll_app].setting(:site_key).item.capitalize}EmployerProfile"
+        inbox_profiles_employers_employer_profile_path(id: provider.id.to_s, folder: folder)
+      when "HbxProfile"
+      # TODO: fix it for HBX profile
+      when "BrokerAgencyProfile"
+        inbox_profiles_broker_agencies_broker_agency_profile_path(id: provider.id.to_s, folder: folder)
+      when "GeneralAgencyProfile"
+        inbox_profiles_general_agencies_general_agency_profile_path(id: provider.id.to_s, folder: folder)
       end
     end
 

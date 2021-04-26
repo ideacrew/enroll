@@ -64,7 +64,7 @@ module BenefitSponsors
         {
           _id: ep_id,
           is_benefit_sponsorship_eligible: true,
-          _type: "BenefitSponsors::Organizations::AcaShopDcEmployerProfile",
+          _type: "BenefitSponsors::Organizations::AcaShopMeEmployerProfile",
           contact_method: :paper_and_electronic,
           documents: [],
           inbox: {

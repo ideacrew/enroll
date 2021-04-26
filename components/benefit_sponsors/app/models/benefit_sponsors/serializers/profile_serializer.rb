@@ -30,23 +30,27 @@ module BenefitSponsors
       end
 
       def is_cca_employer_profile?
-        object.kind_of?(BenefitSponsors::Organizations::AcaShopCcaEmployerProfile)
+        object.is_a?(BenefitSponsors::Organizations::AcaShopCcaEmployerProfile)
       end
 
       def is_dc_employer_profile?
-        object.kind_of?(BenefitSponsors::Organizations::AcaShopDcEmployerProfile)
+        object.is_a?(BenefitSponsors::Organizations::AcaShopDcEmployerProfile)
+      end
+
+      def is_committed_client_employer_profile?
+        object.is_a?("BenefitSponsors::Organizations::AcaShop#{EnrollRegistry[:enroll_app].setting(:site_key).item.capitalize.capitalize}EmployerProfile".constantize)
       end
 
       def is_employer_profile?
-        is_cca_employer_profile? || is_dc_employer_profile?
+        is_cca_employer_profile? || is_dc_employer_profile? || is_committed_client_employer_profile?
       end
 
       def is_broker_profile?
-        object.kind_of?(BenefitSponsors::Organizations::BrokerAgencyProfile)
+        object.is_a?(BenefitSponsors::Organizations::BrokerAgencyProfile)
       end
 
       def is_general_agency_profile?
-        object.kind_of?(BenefitSponsors::Organizations::GeneralAgencyProfile)
+        object.is_a?(BenefitSponsors::Organizations::GeneralAgencyProfile)
       end
 
       def is_broker_or_general_agency?
