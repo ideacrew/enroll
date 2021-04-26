@@ -1,6 +1,7 @@
 Feature: When Admin visits SEP Details page
   Background:
     Given both shop and fehb market configurations are enabled
+    Given all market kinds are enabled for user to select
     Given that a user with a HBX staff role with hbx_tier3 subrole exists
     When Hbx Admin logs on to the Hbx Portal
     Given the Admin is on the Main Page

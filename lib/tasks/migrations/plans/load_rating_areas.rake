@@ -70,26 +70,22 @@ namespace :load_rate_reference do
 
         location_ids = locations.map do |loc_record|
           zip_code = loc_record['zip'].to_s.gsub('.0','')
-          county_zip = ::BenefitMarkets::Locations::CountyZip.where({
-                                                                      zip: zip_code,
-                                                                      county_name: loc_record['county_name']
-                                                                    }).first
+          county_zip = ::BenefitMarkets::Locations::CountyZip.where({zip: zip_code,
+                                                                     county_name: loc_record['county_name']}).first
           county_zip._id
         end
 
-        ra = ::BenefitMarkets::Locations::RatingArea.where({
-                                                       active_year: file_year,
-                                                       exchange_provided_code: rating_area_id,
-                                                     }).first
+        ra = ::BenefitMarkets::Locations::RatingArea.where({active_year: file_year,
+                                                            exchange_provided_code: rating_area_id}).first
+
+
         if ra.present?
           ra.county_zip_ids = location_ids
           ra.save
         else
-          ra = ::BenefitMarkets::Locations::RatingArea.create({
-                                                       active_year: file_year,
-                                                       exchange_provided_code: rating_area_id,
-                                                       county_zip_ids: location_ids
-                                                     })
+          ra = ::BenefitMarkets::Locations::RatingArea.create({active_year: file_year,
+                                                               exchange_provided_code: rating_area_id,
+                                                               county_zip_ids: location_ids})
         end
       end
         # end of new model

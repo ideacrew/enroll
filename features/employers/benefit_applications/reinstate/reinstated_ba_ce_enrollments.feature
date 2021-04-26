@@ -2,6 +2,7 @@ Feature: Ability for Admin to create an Reinstated benefit application and verif
 
   Background: Setup site, employer, and benefit market catalogs
     Given a CCA site exists with a benefit market
+    Given the shop market configuration is enabled
     And benefit market catalog exists for active initial employer with health benefits
     And there is an employer ABC Widgets
     And ABC Widgets employer has a staff role

@@ -142,7 +142,7 @@ module BenefitSponsors
         state_service_area_props = {
           "_id": state_service_area_id,
           active_year: effective_period.min.year,
-          issuer_provided_code: "DCS002",
+          issuer_provided_code: "MES002",
           issuer_provided_title: "Dental Only Issuer State Service Area",
           issuer_profile_id: issuer_profile_id,
           covered_states: [Settings.aca.state_abbreviation]
@@ -203,7 +203,7 @@ module BenefitSponsors
         state_service_area_props = {
           "_id": state_service_area_id,
           active_year: effective_period.min.year,
-          issuer_provided_code: "DCS002",
+          issuer_provided_code: "MES002",
           issuer_provided_title: "Health and Dental Issuer State Service Area",
           issuer_profile_id: issuer_profile_id,
           covered_states: [Settings.aca.state_abbreviation]
@@ -277,7 +277,7 @@ module BenefitSponsors
         state_service_area_props = {
           "_id": state_service_area_id,
           active_year: effective_period.min.year,
-          issuer_provided_code: "DCS002",
+          issuer_provided_code: "MES002",
           issuer_provided_title: "Health Only Issuer State Service Area",
           issuer_profile_id: issuer_profile_id,
           covered_states: [Settings.aca.state_abbreviation]
@@ -345,7 +345,7 @@ module BenefitSponsors
         rating_area_props = {
           "_id": rating_area_id,
           active_year: effective_period.min.year,
-          exchange_provided_code: "R-DC001",
+          exchange_provided_code: "R-ME001",
           covered_states: [Settings.aca.state_abbreviation]
         }
         BenefitMarkets::Locations::RatingArea.collection.insert_one(rating_area_props)
