@@ -9,7 +9,7 @@ FactoryBot.define do
       [
         create(
           :benefit_markets_locations_county_zip,
-          county_name: ::EnrollRegistry[:enroll_app].setting(:contact_center_county)&.item || 'Middlesex',
+          county_name: ::EnrollRegistry[:enroll_app].setting(:contact_center_county)&.item,
           zip: ::EnrollRegistry[:enroll_app].setting(:contact_center_zip_code)&.item || '20024',
           state: ::EnrollRegistry[:enroll_app].setting(:state_abbreviation).item
         ).id
