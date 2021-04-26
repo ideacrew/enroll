@@ -102,7 +102,6 @@ module SponsoredBenefits
     let!(:relationship_benefit) { benefit_group.relationship_benefits.first }
 
     before do
-      EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
       allow(subject).to receive(:current_person).and_return(current_person)
       allow(subject).to receive(:active_user).and_return(active_user)
       allow(current_person).to receive(:broker_role).and_return(broker_role)
