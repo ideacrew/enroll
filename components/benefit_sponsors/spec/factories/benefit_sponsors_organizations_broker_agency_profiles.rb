@@ -30,7 +30,7 @@ FactoryBot.define do
       broker_role = profile.primary_broker_role
       if broker_role.present? && broker_role.benefit_sponsors_broker_agency_profile_id.blank?
         broker_role.benefit_sponsors_broker_agency_profile_id = profile.id
-        broker_role.save && profile.save
+        broker_role.save! && profile.save!
       end
     end
   end
