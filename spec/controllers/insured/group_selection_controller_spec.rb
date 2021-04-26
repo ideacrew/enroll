@@ -501,8 +501,9 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         @enrollment.update_attributes(product: @product, consumer_role_id: person.consumer_role.id)
         @enrollment.save!
         hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.update_attributes!(slcsp_id: @product.id)}
-        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, @enrollment.effective_on, 59, 'R-DC001').and_return(814.85)
-        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, @enrollment.effective_on, 61, 'R-DC001').and_return(879.8)
+        area = EnrollRegistry[:rating_area].settings(:areas).item.first
+        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, @enrollment.effective_on, 59, area).and_return(814.85)
+        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, @enrollment.effective_on, 61, area).and_return(879.8)
       end
 
       it 'return http success and render' do
@@ -1028,7 +1029,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         sign_in user
         post :create, params: { person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids }
         expect(flash[:error]).to eq "Your employer is no longer offering health insurance through #{EnrollRegistry[:enroll_app].setting(:short_name).item}." \
-        " Please contact your employer or call our Customer Care Center at #{EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item}."
+        " Please contact your employer or call our Customer Care Center at #{EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number).item}."
       end
 
       it 'when benefit application is terminated' do

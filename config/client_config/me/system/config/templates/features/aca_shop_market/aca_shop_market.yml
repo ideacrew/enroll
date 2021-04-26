@@ -20,7 +20,7 @@ registry:
         is_enabled: true
         settings:
           - key: :class_name
-            item: "BenefitSponsors::Organizations::AcaShopDcEmployerProfile"
+            item: "BenefitSponsors::Organizations::AcaShopMeEmployerProfile"
       - key: :disable_benefit_application_date_message
         item: :disable_benefit_application_date_message
         is_enabled: true
@@ -47,4 +47,7 @@ registry:
         is_enabled: true
       - key: :employer_datatable_source_kinds
         item: :employer_datatable_source_kinds
+        is_enabled: false
+      - key: :employer_attestation
+        item: :employer_attestation
         is_enabled: false

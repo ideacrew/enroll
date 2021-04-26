@@ -3,7 +3,9 @@ require File.join(File.dirname(__FILE__), "..", "support/benefit_sponsors_produc
 
 RSpec.shared_context "setup benefit market with market catalogs and product packages", :shared_context => :metadata do
 
-  let(:site)                    { ::BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_empty_benefit_market }
+  let(:site) do
+    BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_empty_benefit_market
+  end
 
   let(:benefit_market)          { site.benefit_markets.first }
   let!(:current_benefit_market_catalog) do

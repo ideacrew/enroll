@@ -713,7 +713,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     let(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, site: site)}
     let(:employer_profile) {organization.employer_profile}
 
-    let(:profile_valid_params) {{resource_id: employer_profile.id, subject: 'test', body: 'test', actions_id: '1234', resource_name: employer_profile.class.to_s}}
+    let(:profile_valid_params) {{resource_id: person.id, subject: 'test', body: 'test', actions_id: '1234', resource_name: person.class.to_s}}
     let(:person_valid_params) {{resource_id: person.id, subject: 'test', body: 'test', actions_id: '1234', resource_name: person.class.to_s}}
 
     let(:invalid_params) {{resource_id: employer_profile.id, subject: '', body: '', actions_id: '1234', resource_name: employer_profile.class.to_s}}

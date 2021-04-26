@@ -315,6 +315,14 @@ Given(/^a Hbx admin with read only permissions exists$/) do
   FactoryBot.create :hbx_enrollment,family:user.primary_family, household:user.primary_family.active_household
 end
 
+Given(/^Employer Attestation feature is enabled/) do
+  enable_feature :employer_attestation
+end
+
+Given(/^Employer Attestation feature is disabled/) do
+  disable_feature :employer_attestation
+end
+
 Given(/^the shop market configuration is disabled$/) do
   disable_feature :aca_shop_market
 end

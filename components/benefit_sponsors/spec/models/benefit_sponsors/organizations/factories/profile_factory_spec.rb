@@ -165,13 +165,15 @@ module BenefitSponsors
           profile_factory_class.call(valid_employer_params)
         end
 
+        let(:site_key) { EnrollRegistry[:enroll_app].setting(:site_key).item }
+
         it 'should create general organization with given fein' do
           expect(profile_factory.organization.class).to eq BenefitSponsors::Organizations::GeneralOrganization
           expect(profile_factory.organization.fein).to eq fein
         end
 
         it 'should create benefit sponsor profile' do
-          expect(profile_factory.profile.class).to eq "BenefitSponsors::Organizations::AcaShop#{Settings.site.key.capitalize}EmployerProfile".constantize
+          expect(profile_factory.profile.class).to eq "BenefitSponsors::Organizations::AcaShop#{site_key.capitalize}EmployerProfile".constantize
         end
 
         it 'should create person with given data' do

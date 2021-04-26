@@ -827,7 +827,7 @@ module ApplicationHelper
   end
 
   def exchange_icon_path(icon)
-    site_key = Settings.site.key
+    site_key = EnrollRegistry[:enroll_app].setting(:site_key).item
       "icons/#{site_key}-#{icon}"
   end
 

@@ -220,7 +220,7 @@ RSpec.describe Exchanges::BrokerApplicantsController do
         before :each do
           broker_role.update_attributes({ broker_agency_profile_id: @broker_agency_profile.id })
           broker_role.approve!
-          put :update, params:{id: broker_role.person.id, update: true, person: { broker_role_attributes: { training: true , carrier_appointments: {"Aetna Health Inc"=>"true", "United Health Care Insurance"=>"true"}} }} , format: :js
+          put :update, params: {id: broker_role.person.id, update: true, person: { broker_role_attributes: { training: true, carrier_appointments: EnrollRegistry[:brokers].settings(:carrier_appointments).item }}}, format: :js
           broker_role.reload
         end
 
@@ -229,12 +229,7 @@ RSpec.describe Exchanges::BrokerApplicantsController do
           expect(broker_role.aasm_state).to eq 'active'
           expect(response).to have_http_status(:redirect)
           expect(response).to redirect_to('/exchanges/hbx_profiles')
-          #only really testing that the params go through.
-          if aca_state_abbreviation == "DC"
-            expect(broker_role.carrier_appointments).to eq({"Aetna Health Inc" => "true", "United Health Care Insurance" => "true"})
-          else
-            expect(broker_role.carrier_appointments).to eq({"Aetna Health Inc"=>"true", "Altus" => nil, "Blue Cross Blue Shield MA" => nil, "Boston Medical Center Health Plan" => nil, "Delta" => nil, "FCHP" => nil, "Guardian" => nil, "Harvard Pilgrim Health Care" => nil, "Health New England" => nil, "Minuteman Health" => nil, "Neighborhood Health Plan" => nil, "Tufts Health Plan Direct" => nil, "Tufts Health Plan Premier" => nil, "United Health Care Insurance" => "true"})
-          end
+          expect(broker_role.carrier_appointments.symbolize_keys).to eq(EnrollRegistry[:brokers].settings(:carrier_appointments).item)
         end
 
         it "should have training as true in broker role attributes" do

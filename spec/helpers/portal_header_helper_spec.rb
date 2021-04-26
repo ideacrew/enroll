@@ -50,7 +50,7 @@ RSpec.describe PortalHeaderHelper, :type => :helper, dbclean: :after_each do
 
         it "should have I'm an Employee link when user switches to Employee account" do
           allow(controller).to receive(:controller_path).and_return("insured")
-          expect(portal_display_name(controller)).to eq "<a class=\"portal\" href=\"/families/home\"><img src=\"/images/icons/dc-icon-individual.png\" /> &nbsp; I'm an Employee</a>"
+          expect(portal_display_name(controller)).to eq "<a class=\"portal\" href=\"/families/home\"><img src=\"/images/icons/#{EnrollRegistry[:enroll_app].settings(:site_key).item}-icon-individual.png\" /> &nbsp; I'm an Employee</a>"
         end
       end
     end
