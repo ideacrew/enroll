@@ -1,6 +1,13 @@
 # frozen_string_literal: true
 
 # rubocop:disable Style/ClassVars
+EnrollRegistry = ResourceRegistry::Registry.new
+EnrollRegistry.configure do |config|
+  config.name       = :enroll
+  config.created_at = DateTime.now
+  config.load_path  = Rails.root.join('system', 'config', 'templates', 'features').to_s
+end
+
 
 module Config::AcaModelConcern
   extend ActiveSupport::Concern
@@ -42,6 +49,7 @@ module Config::AcaModelConcern
     delegate :enabled_metal_levels, to: :class
     delegate :offerings_constrained_to_service_areas?, to: :class
   end
+
 
   class_methods do
     def aca_shop_market_cobra_enrollment_period_in_months
@@ -199,4 +207,3 @@ module Config::AcaModelConcern
 end
 
 # rubocop:enable Style/ClassVars
-
