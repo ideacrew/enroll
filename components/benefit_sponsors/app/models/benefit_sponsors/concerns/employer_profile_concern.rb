@@ -382,7 +382,7 @@ module BenefitSponsors
         def invoice_exist?(invoice_date,org)
           docs = org.employer_profile.documents.where("date" => invoice_date)
           matching_documents = docs.select {|d| d.title.match(::Regexp.new("^#{org.hbx_id}"))}
-          return true if matching_documents.count > 0
+          return true if matching_documents.any?
         end
 
         def upload_invoice(file_path,file_name)
