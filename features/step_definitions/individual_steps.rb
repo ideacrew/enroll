@@ -95,19 +95,6 @@ Then(/Individual should click on Individual market for plan shopping/) do
   find('.btn', text: 'CONTINUE').click
 end
 
-<<<<<<< HEAD
-Then(/the individual sees form to enter personal information$/) do
-  find(IvlPersonalInformation.us_citizen_or_national_yes_radiobtn).click
-  find(IvlPersonalInformation.naturalized_citizen_no_radiobtn).click
-  find(IvlPersonalInformation.american_or_alaskan_native_no_radiobtn).click
-  find(IvlPersonalInformation.incarcerated_no_radiobtn).click
-  fill_in IvlPersonalInformation.address_line_one, :with => "4900 USAA BLVD"
-  fill_in IvlPersonalInformation.address_line_two, :with => "212"
-  fill_in IvlPersonalInformation.city, :with => "Washington"
-  find(IvlPersonalInformation.select_state_dropdown).click
-  first(IvlPersonalInformation.select_dc_state).click
-  fill_in IvlPersonalInformation.zip, :with => "20002"
-=======
 Then(/Individual should see a form to enter personal information$/) do
   click_and_wait_on_stylized_radio('//label[@for="person_us_citizen_true"]', "person_us_citizen_true", "person[us_citizen]", "true")
   click_and_wait_on_stylized_radio('//label[@for="person_naturalized_citizen_false"]', "person_naturalized_citizen_false", "person[naturalized_citizen]", "false")
@@ -116,7 +103,7 @@ Then(/Individual should see a form to enter personal information$/) do
 
   fill_in "person_addresses_attributes_0_address_1", :with => "4900 USAA BLVD"
   fill_in "person_addresses_attributes_0_address_2", :with => "212"
-  fill_in "person_addresses_attributes_0_city", :with=> "Washington"
+  fill_in "person_addresses_attributes_0_city", :with => "Washington"
   #find('.interaction-choice-control-state-id', text: 'SELECT STATE *').click
   find(:xpath, '//*[@id="address_info"]/div/div[3]/div[2]/div/div[2]/span').click
   first('li', :text => 'DC', wait: 5).click
@@ -131,7 +118,6 @@ Then(/Individual should see a form to enter personal information$/) do
   expect(page).to have_content("If Hispanic/Latino/a, ethnicity (OPTIONAL - check all that apply.)")
   expect(page).to have_css("#us_citizen", visible: false)
   expect(page).to have_css("#is_incarcerated", visible: false)
->>>>>>> da3e1e67cc (fixes specs and cucumber failures)
   sleep 2
   # screenshot("personal_form")
 end
@@ -265,7 +251,7 @@ Then(/Individual resumes enrollment/) do
   click_link 'Consumer/Family Portal'
 end
 
-Then (/Individual sees previously saved address/) do
+Then(/Individual sees previously saved address/) do
   expect(page).to have_field('ADDRESS LINE 1 *', with: '4900 USAA BLVD', wait: 10)
   find('.btn', text: 'CONTINUE').click
 end
