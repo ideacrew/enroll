@@ -43,6 +43,19 @@ module Config::AcaModelConcern
     delegate :offerings_constrained_to_service_areas?, to: :class
   end
 
+  # frozen_string_literal: true
+
+  require Rails.root.join('app', 'domain', 'types.rb')
+
+  EnrollRegistry = ResourceRegistry::Registry.new
+
+  EnrollRegistry.configure do |config|
+    config.name       = :enroll
+    config.created_at = DateTime.now
+    config.load_path  = Rails.root.join('system', 'config', 'templates', 'features').to_s
+  end
+
+
   class_methods do
     def aca_shop_market_cobra_enrollment_period_in_months
       @@aca_shop_market_cobra_enrollment_period_in_months ||= Settings.aca.shop_market.cobra_enrollment_period.months
