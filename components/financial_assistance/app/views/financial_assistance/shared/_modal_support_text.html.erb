@@ -8,7 +8,7 @@
         </button>
       </div>
       <div class="modal-body">
-        <%= raw @support_texts[key] unless @support_texts.blank? %>
+        <%= l10n("support_texts.#{key}") unless l10n("support_texts.#{key}") %>
       </div>
     </div>
   </div>
