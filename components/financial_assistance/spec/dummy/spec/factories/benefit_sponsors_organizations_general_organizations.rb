@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 FactoryBot.define do
   factory :benefit_sponsors_organizations_general_organization, class: 'BenefitSponsors::Organizations::GeneralOrganization' do
     legal_name  { "ACME Widgets, Inc." }
@@ -15,7 +13,14 @@ FactoryBot.define do
 
     trait :with_site do
       after :build do |organization, _evaluator|
-        organization.site = BenefitSponsors::Site.by_site_key(Settings.site.key).first || create(:benefit_sponsors_site, :as_hbx_profile, Settings.site.key)
+        organization.site = BenefitSponsors::Site.by_site_key(EnrollRegistry[:enroll_app].setting(:site_key).item).first ||
+                            create(:benefit_sponsors_site, :as_hbx_profile, EnrollRegistry[:enroll_app].setting(:site_key).item)
+      end
+    end
+
+    trait :with_aca_shop_me_employer_profile do
+      after :build do |organization, _evaluator|
+        build(:benefit_sponsors_organizations_aca_shop_me_employer_profile, organization: organization)
       end
     end
 
