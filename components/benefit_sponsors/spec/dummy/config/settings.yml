@@ -1,5 +1,5 @@
 site:
-  key: :dc # TODO: Don't forget to change this to :me at some point
+  key: :me
   subdomain: "cme"
   domain_name: "cme.enroll.openhbx.org"
   site_title: "Maine Cover ME"
