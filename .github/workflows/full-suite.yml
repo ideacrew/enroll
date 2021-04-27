@@ -277,6 +277,10 @@ jobs:
         run: yarn install
       - name: run webpack
         run: NODE_ENV=test RAILS_ENV=test ./bin/webpack
+      - name: run translations
+        run: |
+          bundle exec rake seed:translations[./db/seedfiles/english_translations_seed.rb]
+          RAILS_ENV=test bundle exec rake seed:translations[./db/seedfiles/english_translations_seed.rb]
       - name: Run tests
         env:
           RSPEC_SPLIT_CONFIGURATION_PATH: 'ci/rspec-split-config.json'
