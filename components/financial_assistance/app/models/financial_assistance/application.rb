@@ -26,6 +26,7 @@ module FinancialAssistance
 
     SUBMITTED_STATUS  = %w[submitted verifying_income].freeze
     REVIEWABLE_STATUSES = %w[submitted determination_response_error determined].freeze
+    CLOSED_STATUSES = %w[cancelled retired terminated].freeze
 
     STATES_FOR_VERIFICATIONS = %w[submitted determination_response_error determined].freeze
 
@@ -119,6 +120,7 @@ module FinancialAssistance
 
     scope :submitted, ->{ any_in(aasm_state: SUBMITTED_STATUS) }
     scope :determined, ->{ any_in(aasm_state: "determined") }
+    scope :closed, ->{ any_in(aasm_state: CLOSED_STATUSES) }
     scope :by_hbx_id, ->(hbx_id) { where(hbx_id: hbx_id) }
     scope :for_verifications, -> { where(:aasm_state.in => STATES_FOR_VERIFICATIONS)}
     scope :by_year, ->(year) { where(:assistance_year => year) }
@@ -738,6 +740,10 @@ module FinancialAssistance
       REVIEWABLE_STATUSES.include?(aasm_state)
     end
 
+    def is_closed?
+      CLOSED_STATUSES.include?(aasm_state)
+    end
+
     def incomplete_applicants?
       active_applicants.each do |applicant|
         return true unless applicant.applicant_validation_complete?
@@ -944,7 +950,7 @@ module FinancialAssistance
     end
 
     def verification_update_for_applicants
-      return unless aasm_state == "determined"
+      return unless aasm_state == "determined" || is_closed?
       if has_atleast_one_medicaid_applicant?
         update_verifications_of_applicants("external_source")
       elsif has_all_uqhp_applicants?
