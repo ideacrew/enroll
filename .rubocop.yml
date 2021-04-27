@@ -205,6 +205,7 @@ Style/SwapValues: # (new in 1.1)
 
 require:
   - ./cops/lint/empty_rescue_clause.rb
+  - ./cops/lint/count_cop.rb
 # Deprecated
 # Style/TrailingBlankLines:
 #   Enabled: false
