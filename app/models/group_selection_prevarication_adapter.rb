@@ -370,9 +370,10 @@ class GroupSelectionPrevaricationAdapter
 
   def no_employer_benefits_error_message(hbx_enrollment)
     if hbx_enrollment.sponsored_benefit_package.benefit_application.terminated?
-      "Your employer is no longer offering health insurance through #{Settings.site.short_name}. Please contact your employer."
+      "Your employer is no longer offering health insurance through #{EnrollRegistry[:enroll_app].setting(:short_name).item}. Please contact your employer."
     elsif hbx_enrollment.sponsored_benefit_package.benefit_application.termination_pending?
-      "Your employer is no longer offering health insurance through #{Settings.site.short_name}. Please contact your employer or call our Customer Care Center at #{Settings.contact_center.phone_number}."
+      "Your employer is no longer offering health insurance through #{EnrollRegistry[:enroll_app].setting(:short_name).item}."\
+      " Please contact your employer or call our Customer Care Center at #{EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number).item}."
     else
       "Unable to find employer-sponsored benefits for enrollment year #{hbx_enrollment.effective_on.year}"
     end
