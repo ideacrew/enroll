@@ -52,7 +52,7 @@ $(function () {
     $('#qle-details .error-info').addClass('hidden');
     $('#qle-details #qle-date-chose').removeClass('hidden');
     $("#qle_date").val("");
-    var errorNotice = "Based on the information you entered, you may be eligible for a special enrollment period. Please call us at <%= EnrollRegistry[:enroll_app].setting(:contact_center_short_number)&.item %> to give us more information so we can see if you qualify.";
+    var errorNotice = "Based on the information you entered, you may be eligible for a special enrollment period. Please call us at <%= EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number)&.item %> to give us more information so we can see if you qualify.";
     $("#qle-details .error-text").html(errorNotice);
   }
 
