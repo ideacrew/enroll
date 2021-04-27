@@ -60,6 +60,7 @@
             <div class="er-success bg-success">
               <div><i class="fa fa-info-circle fa-lg text-success" aria-hidden="true"></i></div>
               <div class="text-success">
+<<<<<<< HEAD
                 <% if EnrollRegistry[:apply_aggregate_to_enrollment].feature.is_enabled %>
                   <span>
                     <%= l10n("faa.next_step_with_aggregate_1") %>
@@ -68,6 +69,15 @@
                 <% else %>
                   <span><%= l10n("faa.next_step_without_aggregate") %></span>
                 <% end %>
+=======
+                <span>
+                  <b>NEXT STEP:</b>
+                  <ul>
+                    <li>If you’re already enrolled in DC Health Link’s Individual & Family plan, <b>we’ve automatically changed your premium. You don’t have to do anything else.</b></li>
+                    <li>If you’re not enrolled or need to make changes to your plan, select CONTINUE to pick a health insurance plan or change who is covered by your plan.</li>
+                  </ul>
+                </span>
+>>>>>>> Change NEXT STEP text on eligibility results page
               </div>
             </div>
           </div>
