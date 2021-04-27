@@ -25,7 +25,7 @@ module ErrorBubble
         person.errors.add(k, v)
       end
       if person.consumer_role.errors.has_key?(:vlp_documents)
-        person.consumer_role.vlp_documents.select{|v| v.errors.count > 0}.each do |vlp|
+        person.consumer_role.vlp_documents.select{|v| v.errors.any?}.each do |vlp|
           vlp.errors.each do |k, v|
             person.errors.add("#{vlp.subject}: #{k}", v)
           end

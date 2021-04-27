@@ -181,7 +181,7 @@ module FinancialAssistance
 
     def checklist_pdf
       send_file(
-        FinancialAssistance::Engine.root.join(FinancialAssistanceRegistry[:financial_assistance_documents].settings(:ivl_application_checklist).to_s), :disposition => "inline", :type => "application/pdf"
+        FinancialAssistance::Engine.root.join(FinancialAssistanceRegistry[:financial_assistance_documents].settings(:ivl_application_checklist).item.to_s), :disposition => "inline", :type => "application/pdf"
       )
     end
 
