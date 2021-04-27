@@ -59,7 +59,7 @@ describe IvlEnrollmentEligibilityReport, dbclean: :after_each do
       end
 
       it 'should match with the Residency Status' do
-        expect(@file_content[1][5]).to eq('YES')
+        expect(@file_content[1][5]).to eq('NO')
       end
 
       it 'should match with the Incarcerated Status' do
