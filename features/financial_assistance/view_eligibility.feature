@@ -2,7 +2,7 @@ Feature: A dedicated page that visit the eligibility determination page
 
   Background: Submit Your Application page
     Given the FAA feature configuration is enabled
-    
+
 	Scenario: View Elibility link will be disabled in draft state
 		Given that a user with a family has a Financial Assistance application in the "draft" state
 		And the user navigates to the "Help Paying For Coverage" portal
@@ -20,6 +20,18 @@ Feature: A dedicated page that visit the eligibility determination page
 		And the user navigates to the "Help Paying For Coverage" portal
 		When the user clicks the "Action" dropdown corresponding to the "determination_response_error" application
 		Then the "View Eligibility Determination" link will be disabled
+
+  Scenario: View Elibility link will be disabled in cancelled state
+		Given that a user with a family has a Financial Assistance application in the "cancelled" state
+		And the user navigates to the "Help Paying For Coverage" portal
+		When the user clicks the "Action" dropdown corresponding to the "cancelled" application
+		Then the "View Eligibility Determination" link will be disabled
+
+  Scenario: View Eligibility Determination link will be actionable in the "terminated" state
+		Given that a user with a family has a Financial Assistance application in the "terminated" state
+		And the user navigates to the "Help Paying For Coverage" portal
+		When clicks the "Action" dropdown corresponding to the "terminated" application
+		Then the "View Eligibility Determination" link will be actionable
 
 	Scenario: View Eligibility Determination link will be actionable in the "determined" state
 		Given that a user with a family has a Financial Assistance application in the "determined" state
