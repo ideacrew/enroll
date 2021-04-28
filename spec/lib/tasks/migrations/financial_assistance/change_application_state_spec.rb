@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 Rake.application.rake_require "tasks/migrations/financial_assistance/change_application_state"
 Rake::Task.define_task(:environment)
