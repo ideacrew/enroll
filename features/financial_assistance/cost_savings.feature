@@ -57,17 +57,16 @@ Feature: Cost Savings
 
   Scenario: FAA Feature Is Enabled - Consumer has a terminated application
     Given the FAA feature configuration is enabled
-    Given consumer visits home page
+    When that a family has a Financial Assistance application in the terminated state
+    Then consumer visits home page
     When the consumer clicks the Cost Savings link
     Then the consumer will navigate to the Cost Savings page
-    When consumer has a terminated application
     Then Start New Application button should be enabled
 
   Scenario: FAA Feature Is Enabled - Consumer has a cancelled application
     Given the FAA feature configuration is enabled
-    Given consumer visits home page
+    When that a family has a Financial Assistance application in the cancelled state
+    Then consumer visits home page
     When the consumer clicks the Cost Savings link
     Then the consumer will navigate to the Cost Savings page
-    When DOB is nil for the consumer
-    When consumer has a cancelled application
     Then Start New Application button should be enabled
