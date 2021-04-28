@@ -110,7 +110,7 @@ RSpec.describe IvlNotices::IvlToCoverallTransitionNoticeBuilder, dbclean: :after
 
     it "should not have Dc in the title" do
       title = @ivl_cdc_notice.notice_filename
-      expect(title).to match(/YourInsuranceThroughDCHealthLinkHasChangedToCoverAllDC/)
+      expect(title).to match(/YourInsuranceThrough#{EnrollRegistry[:enroll_app].setting(:site_title).item.delete(' ')}HasChangedToCoverAllDC/i)
     end
   end
 

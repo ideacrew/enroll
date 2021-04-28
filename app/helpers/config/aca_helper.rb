@@ -248,7 +248,7 @@ module Config::AcaHelper
   end
 
   def multiple_market_rating_areas?
-    @multiple_market_rating_areas ||= Settings.aca.rating_areas.many?
+    @multiple_market_rating_areas ||= EnrollRegistry[:rating_area].settings(:areas).item.many?
   end
 
   def use_simple_employer_calculation_model?

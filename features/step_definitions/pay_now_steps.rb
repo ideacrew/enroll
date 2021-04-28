@@ -31,7 +31,7 @@ Given(/^Hbx Admin creates a consumer application$/) do
   fill_in "person_ssn", with: '212-31-3131'
   find(:xpath, '//label[@for="radio_male"]', wait: 10).click
   find('.btn', text: 'CONTINUE', wait: 10).click
-  expect(page).to have_content('Next, we need to verify if you or you and your family are eligible to enroll in coverage through DC Health Link. Select CONTINUE.')
+  expect(page).to have_content("Next, we need to verify if you or you and your family are eligible to enroll in coverage through #{site_short_name} Select CONTINUE.")
   find('.interaction-click-control-continue', wait: 10).click
   find('span.label', text: 'choose *', wait: 10).click
   find("li", :text => "Paper").click
@@ -168,7 +168,7 @@ And(/^creates a consumer with SEP$/) do
   fill_in "person_ssn", with: '212-31-3131'
   find(:xpath, '//label[@for="radio_male"]', wait: 10).click
   find('.btn', text: 'CONTINUE', wait: 10).click
-  expect(page).to have_content('Next, we need to verify if you or you and your family are eligible to enroll in coverage through DC Health Link. Select CONTINUE.')
+  expect(page).to have_content("Next, we need to verify if you or you and your family are eligible to enroll in coverage through #{site_short_name}. Select CONTINUE.")
   find('.interaction-click-control-continue', wait: 10).click
   find('span.label', text: 'choose *', wait: 10).click
   find("li", :text => "Paper").click
@@ -178,6 +178,7 @@ And(/^creates a consumer with SEP$/) do
   find(:xpath, '//label[@for="radio_incarcerated_no"]', wait: 10).click
   fill_in "person_addresses_attributes_0_address_1", with: "123 Main St"
   fill_in "person_addresses_attributes_0_address_2", with: "apt 1005"
+  # May have to refactor this for the specific state
   fill_in "person_addresses_attributes_0_city", with: "Washington"
   find(:xpath, "//span[@class='label'][contains(., 'SELECT STATE')]", wait: 10).click
   find(:xpath, '//*[@id="address_info"]/div/div[3]/div[2]/div/div[3]/div/ul/li[10]', wait: 10).click
