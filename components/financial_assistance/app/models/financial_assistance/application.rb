@@ -25,8 +25,8 @@ module FinancialAssistance
     MOTIVATION_KINDS  = %w[insurance_affordability].freeze
 
     SUBMITTED_STATUS  = %w[submitted verifying_income].freeze
-    REVIEWABLE_STATUSES = %w[submitted determination_response_error determined].freeze
-    CLOSED_STATUSES = %w[cancelled retired terminated].freeze
+    REVIEWABLE_STATUSES = %w[submitted determination_response_error determined terminated].freeze
+    CLOSED_STATUSES = %w[cancelled terminated].freeze
 
     STATES_FOR_VERIFICATIONS = %w[submitted determination_response_error determined].freeze
 
@@ -526,6 +526,16 @@ module FinancialAssistance
         transitions from: :submitted, to: :determined
       end
 
+      event :terminate, :after => :record_transition do
+        transitions from: [:submitted, :determined, :determination_response_error],
+                    to: :terminated
+      end
+
+      event :cancel, :after => :record_transition do
+        transitions from: [:draft],
+                    to: :cancelled
+      end
+
     end
 
     # def applicant
@@ -734,6 +744,10 @@ module FinancialAssistance
 
     def is_determined?
       self.aasm_state == "determined"
+    end
+
+    def is_terminated?
+      self.aasm_state == "terminated"
     end
 
     def is_reviewable?
