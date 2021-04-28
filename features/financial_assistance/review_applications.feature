@@ -10,6 +10,12 @@ Feature: My Financial Assistance Applications page that visit the Review Applica
     When the user clicks the “Action” dropdown corresponding to the draft application
     Then the "Review Application" link will be disabled
 
+  Scenario: Review Application link will be disabled in cancelled state
+    Given that a family has a Financial Assistance application in the cancelled state
+    And the user navigates to the “Help Paying For Coverage” portal
+    When the user clicks the “Action” dropdown corresponding to the cancelled application
+    Then the "Review Application" link will be disabled
+
   Scenario: Review Application link will be enabled in submitted state
     Given that a family has a Financial Assistance application in the submitted state
     And the user navigates to the “Help Paying For Coverage” portal
@@ -26,6 +32,12 @@ Feature: My Financial Assistance Applications page that visit the Review Applica
     Given that a family has a Financial Assistance application in the determined state
     And the user navigates to the “Help Paying For Coverage” portal
     When the user clicks the “Action” dropdown corresponding to the determined application
+    Then the “Review Application” link will be actionable
+
+  Scenario: Review Application link will be enabled in terminated state
+    Given that a family has a Financial Assistance application in the terminated state
+    And the user navigates to the “Help Paying For Coverage” portal
+    When the user clicks the “Action” dropdown corresponding to the terminated application
     Then the “Review Application” link will be actionable
 
   Scenario: Review Application link will be enabled in submitted state
