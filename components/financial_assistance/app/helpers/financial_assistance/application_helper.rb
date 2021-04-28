@@ -244,5 +244,9 @@ module FinancialAssistance
     def capitalize_full_name(full_name)
       full_name.split.map(&:capitalize).join(" ")
     end
+
+    def all_applications_closed?(applications)
+      applications.count == applications.closed.count
+    end
   end
 end
