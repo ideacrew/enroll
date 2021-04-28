@@ -20,7 +20,7 @@ Feature: Functionality for the Family Relationships page
     And all the relationships have been entered
     When the user clicks CONTINUE
     Then the user will navigate to the Review & Submit page
-
+  @flaky
   Scenario: Continue button enabled when all relationships are entered
     Given that the user is on the FAA Family Relationships page
     And there is a nil value for at least one relationship
