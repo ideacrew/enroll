@@ -9,6 +9,7 @@ require File.join(File.dirname(__FILE__), "client_site_spec_helpers/me")
 module BenefitSponsors
   class SiteSpecHelpers
     const_name = EnrollRegistry[:enroll_app].setting(:site_key).item.upcase
+    puts("Generating benefit sponsors site for #{const_name}")
     mod = const_get("BenefitSponsors::ClientSiteSpecHelpers::#{const_name}")
     extend mod
   end
