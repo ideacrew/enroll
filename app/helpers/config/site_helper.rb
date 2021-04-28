@@ -26,7 +26,7 @@ module Config
     end
 
     def site_po_box
-      EnrollRegistry[:enroll_app].setting(:site_po_box).item
+      EnrollRegistry[:enroll_app].setting(:contact_center_po_box).item
     end
 
     def site_state_long_title

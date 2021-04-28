@@ -58,7 +58,7 @@ module Subscribers
       rescue
         throw(:processing_issue, "Failure to update tax household")
       end
-      update_vlp_for_consumer_role(primary_person.consumer_role, verified_primary_family_member)
+      update_vlp_for_consumer_role(primary_person.consumer_role, verified_primary_family_member) if primary_person&.consumer_role.present?
       begin
         new_dependents.each do |p|
           new_family_member = family.relate_new_member(p[0], p[1])
