@@ -1,5 +1,5 @@
 Feature: When a benefit application gets reinstated the newly created benefit application span will have a reinstated indicator on it.
-
+  @flaky
   Scenario Outline: when Admin goes to employer portal should see a reinstated text for reinstated benefit application
     Given both shop and fehb market configurations are enabled
     Given the Reinstate feature configuration is enabled
