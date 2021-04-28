@@ -144,9 +144,11 @@ RSpec.describe SponsoredBenefits::Organizations::PlanDesignProposalsController, 
       get :claim, params: { employer_profile_id: organization.employer_profile.id, claim_code: published_plan_design_proposal.claim_code}
     end
 
-    it 'should claim the code successfully' do
-      sponsor_profile_benefit_sponsorship.organization.reload
-      expect(sponsor_profile_benefit_sponsorship.reload.benefit_applications.count).to eq 1
+    if EnrollRegistry[:enroll_app].setting(:broker_quoting_enabled).item
+      it 'should claim the code successfully' do
+        sponsor_profile_benefit_sponsorship.organization.reload
+        expect(sponsor_profile_benefit_sponsorship.reload.benefit_applications.count).to eq 1
+      end
     end
 
     it 'should show success flash message' do

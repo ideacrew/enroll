@@ -10,6 +10,7 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
   let!(:default_plan)            { double("Product", id: "default_plan_id", kind: "health", premium_tables: premium_tables) }
   let!(:dental_plan)             { double('Product', id: 'dental_plan_id', kind: :dental, premium_tables: premium_tables) }
   let(:plan_cost_decorator)     { UnassistedPlanCostDecorator.new(plan, member_provider) }
+  let(:area) { EnrollRegistry[:rating_area].settings(:areas).item.first }
   context "rating a large family" do
     let(:plan)            {default_plan}
     let(:consumer_role) { ConsumerRole.new }
@@ -111,9 +112,9 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
       hbx_enrollment10.update_attributes(product: @product)
       hbx_profile.benefit_sponsorship.benefit_coverage_periods.each{|bcp| bcp.update_attributes!(slcsp_id: @product.id)}
 
-      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, hbx_enrollment10.effective_on, 59, 'R-DC001').and_return(814.85)
-      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, hbx_enrollment10.effective_on, 60, 'R-DC001').and_return(846.72)
-      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, hbx_enrollment10.effective_on, 61, 'R-DC001').and_return(879.8)
+      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, hbx_enrollment10.effective_on, 59, area).and_return(814.85)
+      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, hbx_enrollment10.effective_on, 60, area).and_return(846.72)
+      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, hbx_enrollment10.effective_on, 61, area).and_return(879.8)
     end
 
     context 'for valid arguments' do
@@ -268,9 +269,9 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
       hbx_enrollment10.update_attributes(product: @product)
       hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.update_attributes!(slcsp_id: @product.id)}
 
-      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, hbx_enrollment10.effective_on, 59, 'R-DC001').and_return(814.85)
-      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, hbx_enrollment10.effective_on, 60, 'R-DC001').and_return(846.72)
-      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, hbx_enrollment10.effective_on, 61, 'R-DC001').and_return(879.8)
+      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, hbx_enrollment10.effective_on, 59, area).and_return(814.85)
+      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, hbx_enrollment10.effective_on, 60, area).and_return(846.72)
+      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, hbx_enrollment10.effective_on, 61, area).and_return(879.8)
       person.update_attributes!(dob: (hbx_enrollment10.effective_on - 61.years))
       person2.update_attributes!(dob: (hbx_enrollment10.effective_on - 59.years))
       @upcd_1 = UnassistedPlanCostDecorator.new(@product, hbx_enrollment10, 1700.00, tax_household10)

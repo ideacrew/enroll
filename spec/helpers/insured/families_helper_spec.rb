@@ -416,7 +416,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
     context "production environment" do
       it "should redirect from production environment" do
         ClimateControl.modify(AWS_ENV: 'prod') do
-          expect(helper.tax_info_url).to eq "https://dchealthlink.com/individuals/tax-documents"
+          expect(helper.tax_info_url).to eq EnrollRegistry[:enroll_app].setting(:prod_tax_info).item
         end
       end
     end
@@ -424,7 +424,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
     context "non-production environment" do
       it "should redirect from test environment" do
         ClimateControl.modify(AWS_ENV: 'preprod') do
-          expect(helper.tax_info_url).to eq "https://staging.dchealthlink.com/individuals/tax-documents"
+          expect(helper.tax_info_url).to eq EnrollRegistry[:enroll_app].setting(:staging_tax_info_url).item
         end
       end
     end
