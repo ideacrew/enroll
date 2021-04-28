@@ -1,6 +1,7 @@
 Feature: Admin reinstating benefit application and terminating census employee with past and future date
 
   Background: Setup site, employer, and benefit market catalogs
+    Given both shop and fehb market configurations are enabled
     Given a CCA site exists with a benefit market
     And benefit market catalog exists for active initial employer with health benefits
     And there is an employer ABC Widgets
