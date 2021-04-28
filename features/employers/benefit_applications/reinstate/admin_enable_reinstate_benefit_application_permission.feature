@@ -1,6 +1,7 @@
 Feature: As an admin user I should have the ability to <action> reinstate button on Employer datatable with reinstate feature <feature_switch> with resource registry
 
   Scenario Outline: Setup site, employer, and benefit application
+    Given both shop and fehb market configurations are enabled
     Given the Reinstate feature configuration is <feature_switch>
     And a CCA site exists with a benefit market
     And benefit market catalog exists for <aasm_state> initial employer with health benefits
