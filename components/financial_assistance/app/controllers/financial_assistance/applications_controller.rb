@@ -28,7 +28,6 @@ module FinancialAssistance
 
       @application = ::FinancialAssistance::Application.find_by(id: params[:id], family_id: get_current_person.financial_assistance_identifier)
 
-      load_support_texts
     end
 
     # rubocop:disable Metrics/AbcSize

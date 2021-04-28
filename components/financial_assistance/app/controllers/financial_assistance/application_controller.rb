@@ -10,24 +10,11 @@ module FinancialAssistance
 
     layout "layouts/financial_assistance"
 
-    def load_support_texts
-      file_path = lookup_context.find_template("financial_assistance/shared/support_text.yml").identifier
-      raw_support_text = YAML.safe_load(File.read(file_path)).with_indifferent_access
-      @support_texts = support_text_placeholders raw_support_text
-    end
-
     private
 
     def verify_financial_assistance_enabled
       return render(file: 'public/404.html', status: 404) unless ::EnrollRegistry.feature_enabled?(:financial_assistance)
       true
-    end
-
-    def support_text_placeholders(raw_support_text)
-      return [] if @application.nil?
-      raw_support_text.update(raw_support_text).each do |_key, value|
-        value.gsub! '<application-applicable-year>', @application.assistance_year.to_s if value.include? '<application-applicable-year>'
-      end
     end
   end
 end
