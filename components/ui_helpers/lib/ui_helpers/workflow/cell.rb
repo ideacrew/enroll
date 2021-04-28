@@ -26,7 +26,6 @@ module UIHelpers
         @for = attributes['for']
         @id = attributes['id']
         @prompt = attributes['prompt']
-        @support_text_key = attributes['support_text_key']
         @class_names = attributes['classNames'] || ''
       end
 

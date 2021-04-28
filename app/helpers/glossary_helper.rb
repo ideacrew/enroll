@@ -7,7 +7,5 @@ module GlossaryHelper
     else
       l10n("support_texts.#{key}")
     end
-    # @support_texts ||= {}
-    # @support_texts[key] ||= ERB.new(YAML.load_file("app/views/shared/support_text_household.yml")[key]).result
   end
 end
