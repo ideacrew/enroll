@@ -7,7 +7,7 @@ Feature: Ability for Admin to create an Reinstated benefit application and verif
     And there is an employer ABC Widgets
     And ABC Widgets employer has a staff role
     And the Reinstate feature configuration is enabled
-  
+  @flaky
   Scenario Outline: Initial Employer is in <aasm_state>. Admin is able to create reinstated benefit application and verifies its census employee enrollments
     Given initial employer ABC Widgets has active benefit application
     And there is a census employee record and employee role for Patrick Doe for employer ABC Widgets
@@ -50,6 +50,7 @@ Feature: Ability for Admin to create an Reinstated benefit application and verif
       |    terminated       | last_month |   one    |   one    |   current    |
       | termination_pending | any_day    |   two    |   two    |   future     |
 
+  @flaky
   Scenario Outline: Initial Employer is in <aasm_state>. Admin is able to create reinstated benefit application and verifies its census employee enrollments
     Given initial employer ABC Widgets has active benefit application
     And there is a census employee record and employee role for Patrick Doe for employer ABC Widgets
