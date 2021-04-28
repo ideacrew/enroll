@@ -7,7 +7,7 @@ module BenefitSponsors
 
     let!(:rating_area)                  { FactoryBot.create_default :benefit_markets_locations_rating_area }
     let!(:service_area)                 { FactoryBot.create_default :benefit_markets_locations_service_area }
-    let(:site)                          { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+    let(:site)                          { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, EnrollRegistry[:enroll_app].setting(:site_key).item.to_sym) }
     let(:organization)                  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let(:employer_profile)              { organization.employer_profile }
     let(:active_benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }

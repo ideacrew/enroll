@@ -9,6 +9,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::OutOfPocketNotice', dbclean: :afte
   include_context 'setup initial benefit application'
 
   let(:notice_event) { 'out_of_pocket_url_notifier' }
+  let(:site_key) { EnrollRegistry[:enroll_app].setting(:site_key).item }
 
   describe "NoticeTrigger" do
 
@@ -17,7 +18,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::OutOfPocketNotice', dbclean: :afte
     it "should trigger model event" do
       expect(subject).to receive(:notify) do |event_name, payload|
         expect(event_name).to eq "acapi.info.events.employer.out_of_pocket_url_notifier"
-        expect(payload[:event_object_kind]).to eq "BenefitSponsors::Organizations::AcaShop#{Settings.site.key.capitalize}EmployerProfile"
+        expect(payload[:event_object_kind]).to eq "BenefitSponsors::Organizations::AcaShop#{site_key.capitalize}EmployerProfile"
         expect(payload[:event_object_id]).to eq abc_profile.id.to_s
       end
       subject.deliver(recipient: abc_profile, event_object: abc_profile, notice_event: notice_event, notice_params: {})
@@ -44,7 +45,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::OutOfPocketNotice', dbclean: :afte
 
     let(:payload) do
       {
-        "event_object_kind" => "BenefitSponsors::Organizations::AcaShop#{Settings.site.key.capitalize}EmployerProfile",
+        "event_object_kind" => "BenefitSponsors::Organizations::AcaShop#{site_key.capitalize}EmployerProfile",
         "event_object_id" => abc_profile.id.to_s
       }
     end

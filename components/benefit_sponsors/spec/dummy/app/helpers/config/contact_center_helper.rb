@@ -28,7 +28,7 @@ module Config::ContactCenterHelper
   end
 
   def contact_center_phone_number
-    Settings.contact_center.phone_number
+    EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number)&.item
   end
 
   def contact_center_ivl_phone_number
