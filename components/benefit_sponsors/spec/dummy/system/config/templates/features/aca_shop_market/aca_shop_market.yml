@@ -50,6 +50,4 @@ registry:
         is_enabled: false
       - key: :employer_attestation
         item: :employer_attestation
-        is_enabled: false      - key: :employer_attestation
-        item: :employer_attestation
         is_enabled: false
