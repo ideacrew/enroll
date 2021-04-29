@@ -294,7 +294,6 @@ module Forms
       return false unless try_update_person(family_member.person)
       if attr["is_consumer_role"] == "true"
         family_member.family.build_consumer_role(family_member, attr["vlp_document_id"])
-        return false unless assign_person_address(family_member.person)
       elsif attr["is_resident_role"] == "true"
         family_member.family.build_resident_role(family_member)
       end
