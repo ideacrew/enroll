@@ -262,13 +262,10 @@ class GoldenSeedSHOP < MongoidMigrationTask
     first_name = FFaker::Name.send("first_name_#{gender}")
     last_name = primary_person.last_name
     family = primary_person.primary_family
-    case personal_relationship_kind
-    when 'child'
-      dependent_person = create_and_return_person(first_name, last_name, gender, 'child')
-    when 'domestic_partner'
-      dependent_person = create_and_return_person(first_name, last_name, gender, 'adult')
-    when 'spouse'
-      dependent_person = create_and_return_person(first_name, last_name, gender, 'adult')
+    dependent_person = if personal_relationship_kind == 'child'
+      create_and_return_person(first_name, last_name, gender, 'child')
+    elsif ['domestic_partner', 'spouse'].include?(personal_relationship_kind)
+      create_and_return_person(first_name, last_name, gender, 'adult')
     end
     fm = FamilyMember.new(
       family: family,
@@ -348,7 +345,7 @@ class GoldenSeedSHOP < MongoidMigrationTask
       benefit_application.reload
       benefit_application.benefit_packages.last
     else
-      raise("Unable to create benefit package. " + benefit_package.errors.messages.to_s)
+      raise("Unable to create benefit package. #{benefit_package.errors.messages}")
     end
   end
 
@@ -374,10 +371,10 @@ class GoldenSeedSHOP < MongoidMigrationTask
     #raise("No reference product present.") if reference_product.nil?
     issuer_profile = BenefitSponsors::Organizations::IssuerProfile.find_by_issuer_name(carrier_name.to_s)
     raise("No issuer profile present for #{carrier_name}. Please load plans with LoadIssuerProfiles rake task") if issuer_profile.blank?
-    puts("Generating benefit package with issuer profile name " + carrier_name.to_s)
+    puts("Generating benefit package with issuer profile name #{carrier_name}")
     {
       benefit_application_id: benefit_application.id.to_s,
-      title: "Benefit Package for Employer " + benefit_application.benefit_sponsorship.organization.legal_name,
+      title: "Benefit Package for Employer #{benefit_application.benefit_sponsorship.organization.legal_name}",
       description: "New Model Benefit Package",
       probation_period_kind: ::BenefitMarkets::PROBATION_PERIOD_KINDS.sample,
       sponsored_benefits_attributes: {

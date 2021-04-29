@@ -130,12 +130,9 @@ module GoldenSeedHelper
     first_name = FFaker::Name.send("first_name_#{gender}")
     last_name = primary_person.last_name
     family = primary_person.primary_family
-    case personal_relationship_kind
-    when 'child'
+    if personal_relationship_kind == 'child'
       dependent_person = create_and_return_person(first_name, last_name, gender, 'child')
-    when 'domestic_partner'
-      dependent_person = create_and_return_person(first_name, last_name, gender, 'adult')
-    when 'spouse'
+    elsif personal_relationship_kind == 'domestic_partner' || personal_relationship_kind == 'spouose'
       dependent_person = create_and_return_person(first_name, last_name, gender, 'adult')
     end
     fm = FamilyMember.new(
@@ -162,7 +159,7 @@ module GoldenSeedHelper
     phone = Phone.new(
       kind: "main",
       area_code: %w[339 351 508 617 774 781 857 978 413].sample,
-      number: "55#{counter_number.to_s.split("").sample}-999 #{counter_number.to_s.split("").sample}"
+      number: "#{area_code}-999 #{counter_number * 4}"
     )
     {address: address, phone: phone}
   end
