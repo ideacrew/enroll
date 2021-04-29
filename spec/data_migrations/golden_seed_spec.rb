@@ -24,6 +24,13 @@ describe "Golden Seed Rake Tasks", dbclean: :after_each do
         subject.migrate
       end
 
+      it "will not create new hbx profile and benefit sponsorship if they are already present" do
+        expect(HbxProfile.all.count).to eq(1)
+        subject.migrate
+        expect(HbxProfile.all.count).to eq(1)
+        expect(HbxProfile.all.map(&:benefit_sponsorship).count).to eq(1)
+      end
+
       it "should create at least one IVL health product if none exist" do
         products = BenefitMarkets::Products::Product.all.select { |product| product.benefit_market_kind.to_sym == :aca_individual }
         expect(products.count).to_not be(0)
