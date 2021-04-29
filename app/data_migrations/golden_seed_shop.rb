@@ -290,23 +290,6 @@ class GoldenSeedSHOP < MongoidMigrationTask
     }
   end
 
-  def generate_address_and_phone(counter_number)
-    address = Address.new(
-      kind: "primary",
-      address_1: "60#{counter_number} #{('a'..'z').to_a.sample} #{['Street', 'Ave', 'Drive'].sample}",
-      city: EnrollRegistry[:enroll_app].setting(:contact_center_city).item,
-      state: EnrollRegistry[:enroll_app].setting(:state_abbreviation).item,
-      zip: EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item,
-      county: EnrollRegistry[:enroll_app].setting(:contact_center_county).item
-    )
-    phone = Phone.new(
-      kind: "main",
-      area_code: %w[339 351 508 617 774 781 857 978 413].sample,
-      number: "55#{counter_number}-999 #{contact_center * 4}"
-    )
-    [address, phone]
-  end
-
   def generate_office_location(address_and_phone)
     OfficeLocation.new(
       is_primary: true,

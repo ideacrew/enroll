@@ -151,6 +151,21 @@ module GoldenSeedHelper
     }
   end
 
+  # TODO: Double check these for numbers for SHOP
+  def matching_phone_numbers
+    @matching_phone_numbers = Person.all.flat_map(&:phones).flat_map(&:number).flatten
+  end
+
+  def generate_unique_phone_number
+    new_person_phone_number = "#{Random.new.rand(100...999)} #{Random.new.rand(1000...9999)}"
+    # rubocop:disable Style/WhileUntilModifier
+    until matching_phone_numbers.exclude?(new_person_phone_number)
+      new_person_phone_number = "#{Random.new.rand(100...999)} #{Random.new.rand(1000...9999)}"
+    end
+    # rubocop:enable Style/WhileUntilModifier
+    new_person_phone_number
+  end
+
   def generate_address_and_phone
     address = Address.new(
       kind: "primary",
@@ -159,12 +174,13 @@ module GoldenSeedHelper
       state: EnrollRegistry[:enroll_app].setting(:state_abbreviation).item,
       zip: EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item
     )
-    phone = Phone.new(
+    area_code = %w[339 351 508 617 774 781 857 978 413].sample
+    new_person_phone = Phone.new(
       kind: "main",
-      area_code: %w[339 351 508 617 774 781 857 978 413].sample,
-      number: "#{area_code}-999 #{counter_number * 4}"
+      area_code: area_code,
+      number: generate_unique_phone_number
     )
-    {address: address, phone: phone}
+    {address: address, phone: new_person_phone}
   end
 
   def create_and_return_consumer_role(person_rec)
