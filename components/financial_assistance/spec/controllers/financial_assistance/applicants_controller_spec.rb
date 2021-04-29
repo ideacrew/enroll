@@ -115,11 +115,11 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
         }
       end
 
-      it "should save given answers and redirect to edit_financial_assistance_application_applicant_path with incomplete pregnancy responses", dbclean: :after_each do
+      it "should save given answers and redirect to other_questions_application_applicant_path with incomplete pregnancy responses", dbclean: :after_each do
         get :save_questions, params: { application_id: application.id, id: applicant.id, applicant: faa_invalid_params_pregenancy }
         expect(response).to have_http_status(302)
-        expect(response.headers['Location']).to have_content 'edit'
-        expect(response).to redirect_to(edit_application_path(application))
+        expect(response.headers['Location']).to have_content 'other_questions'
+        expect(response).to redirect_to(other_questions_application_applicant_path(application, applicant))
       end
 
       it "should save and redirects to redirects to edit_financial_assistance_application_path with valid pregnancy responses", dbclean: :after_each do
