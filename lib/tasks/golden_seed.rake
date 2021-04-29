@@ -26,9 +26,9 @@ require File.join(Rails.root, "app", "data_migrations", "golden_seed_individual"
 namespace :migrations do
   desc "Generates consumers, families, and enrollments for them from existing carriers and plans. Can be run on any environment without affecting existing data. Uses existing carriers/plans."
   GoldenSeedIndividual.define_task :golden_seed_individual => :environment
-  desc "Generates Employers, Employees, and Dependents from existing carriers and plans. Can be run on any environment without affecting existing data. Uses existing carriers/plans."
-  GoldenSeedSHOP.define_task :golden_seed_shop => :environment
+  # desc "Generates Employers, Employees, and Dependents from existing carriers and plans. Can be run on any environment without affecting existing data. Uses existing carriers/plans."
+  # GoldenSeedSHOP.define_task :golden_seed_shop => :environment
 
-  desc "Updates effective on periods for employer benefit applications from employer list a specific dump. Can be enhanced to ingest employer legal name list."
-  GoldenSeedUpdateBenefitApplicationDates.define_task :golden_seed_update_benefit_application_dates => :environment
+  # desc "Updates effective on periods for employer benefit applications from employer list a specific dump. Can be enhanced to ingest employer legal name list."
+  # GoldenSeedUpdateBenefitApplicationDates.define_task :golden_seed_update_benefit_application_dates => :environment
 end

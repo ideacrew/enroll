@@ -11,28 +11,40 @@ module GoldenSeedHelper
     date_range = TimeKeeper.date_of_record.beginning_of_year..TimeKeeper.date_of_record.end_of_year
     ::BenefitMarkets::Products::Product.aca_individual_market.by_application_period(date_range)
   end
+
+  def current_hbx_profile
+    HbxProfile.all.last
+  end
+
+  def current_hbx_benefit_sponsorship
+    current_hbx_profile&.benefit_sponsorship
+  end
   
   # TODO: Refactor this
   def create_and_return_ivl_hbx_profile_and_sponsorship
+    puts("HBX Profile and Benefit Sponsorship already present.") if current_hbx_profile && current_hbx_benefit_sponsorship
+    return if current_hbx_profile && current_hbx_benefit_sponsorship
+    state_abbreviation = EnrollRegistry[:enroll_app].setting(:state_abbreviation).item
     org = Organization.new(
       hbx_id: "200000031",
-      legal_name: Settings.site.short_name,
-      dba: "DHCL", fein: "123123456"
+      legal_name: "#{state_abbreviation} organization",
+      dba: "#{state_abbreviation}CL",
+      fein: "123123456"
     )
     ol = org.office_locations.build
     address = ol.build_address(
       kind: "mailing",
       address_1: "Main St",
-      city: "Portland",
-      state: Settings.site.key.to_s,
-      zip: "04178"
+      city: EnrollRegistry[:enroll_app].setting(:contact_center_city).item,
+      state: state_abbreviation,
+      zip: EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item
     )
     address.save!
     ol.save!
     org.save!
     hbx = org.build_hbx_profile(
-      cms_id: "ME0",
-      us_state_abbreviation: Settings.site.key.to_s
+      cms_id: "#{state_abbreviation}0",
+      us_state_abbreviation: state_abbreviation
     )
     hbx.save!
     benefit_sponsorship = hbx.build_benefit_sponsorship
@@ -143,9 +155,9 @@ module GoldenSeedHelper
     address = Address.new(
       kind: "primary",
       address_1: "60" + counter_number.to_s + ('a'..'z').to_a.sample + ' ' + ['Street', 'Ave', 'Drive'].sample,
-      city: Settings.contact_center.city,
-      state: Settings.site.key.to_s.upcase,
-      zip: "02109"
+      city: EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item,
+      state: EnrollRegistry[:enroll_app].setting(:state_abbreviation).item,
+      zip: EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item
     )
     phone = Phone.new(
       kind: "main",
@@ -174,8 +186,9 @@ module GoldenSeedHelper
     verification_type = VerificationType.new
     verification_type.validation_status = 'verified'
     # TODO: This portion of code might be refactored
-    # Residency Verificationss Requests Controller will hit during sselect_coverage!
-    verification_type.type_name = "#{Settings.site.key.upcase} Residency"
+    # Residency Verificationss Requests Controller will hit during select_coverage!
+    state_abbreviation = EnrollRegistry[:enroll_app].setting(:state_abbreviation).item
+    verification_type.type_name = "#{state_abbreviation} Residency"
     person_rec.verification_types << verification_type
     person_rec.save!
     raise("Not verified") unless consumer_role.identity_verified? == true
