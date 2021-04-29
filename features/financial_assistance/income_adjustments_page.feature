@@ -31,6 +31,18 @@ Feature: Start a new Financial Assistance Application and fills out Income Adjus
     And the user saves the income adjustments information
     Then the income adjustment should be saved on the page
 
+  Scenario: Existing adjustments are deleted when user selects "No" to income adjustments driver question
+    Given the user answers yes to having income adjustments
+    And the user checks a income adjustments checkbox
+    And the user fills out the required income adjustments information
+    Then the save button should be enabled
+    And the user saves the income adjustments information
+    Then the income adjustment should be saved on the page
+    And the user answers no to having income adjustments
+    And the user answers clicks continue and remove
+    And the user answers yes to having income adjustments
+    Then the income adjustment form should not show
+
   Scenario: Cancel button functionality
     Given the user answers yes to having income adjustments
     And the user checks a income adjustments checkbox
