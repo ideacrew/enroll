@@ -131,8 +131,6 @@ class GoldenSeedSHOP < MongoidMigrationTask
           ]
         }
       }
-    else
-      # Dental
     end
   end
 
@@ -153,7 +151,7 @@ class GoldenSeedSHOP < MongoidMigrationTask
           benefit_sponsorship = create_or_return_benefit_sponsorship(employer)
           benefit_application = create_and_return_benefit_application(benefit_sponsorship)
           benefit_package_params = create_benefit_package_params(benefit_sponsorship, benefit_application, carrier_name)
-          benefit_package = create_and_return_benefit_package(benefit_package_params, benefit_application)
+          create_and_return_benefit_package(benefit_package_params, benefit_application)
           employee_records = generate_and_return_employee_records(employer)
           family_structure.each do |relationship_kind|
             unless relationship_kind == "employee"
@@ -243,7 +241,7 @@ class GoldenSeedSHOP < MongoidMigrationTask
   def generate_and_return_employee_records(employer)
     genders = ['male', 'female']
     gender = genders.sample
-    first_name = FFaker::Name.send("first_name_" + gender)
+    first_name = FFaker::Name.send("first_name_#{gender}")
     last_name = FFaker::Name.last_name
     primary_person = create_and_return_person(first_name, last_name, gender)
     family = create_and_return_family(primary_person)
@@ -261,7 +259,7 @@ class GoldenSeedSHOP < MongoidMigrationTask
   def generate_and_return_dependent_records(primary_person, personal_relationship_kind, _carrier_name)
     genders = ['male', 'female']
     gender = genders.sample
-    first_name = FFaker::Name.send("first_name_" + gender)
+    first_name = FFaker::Name.send("first_name_#{gender}")
     last_name = primary_person.last_name
     family = primary_person.primary_family
     case personal_relationship_kind

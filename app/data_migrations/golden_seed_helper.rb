@@ -5,7 +5,7 @@ module GoldenSeedHelper
   def site
     @site = BenefitSponsors::Site.all.first
   end
-  
+
   # Only get up to date IVL products
   def ivl_products
     date_range = TimeKeeper.date_of_record.beginning_of_year..TimeKeeper.date_of_record.end_of_year
@@ -19,7 +19,7 @@ module GoldenSeedHelper
   def current_hbx_benefit_sponsorship
     current_hbx_profile&.benefit_sponsorship
   end
-  
+
   # TODO: Refactor this
   def create_and_return_ivl_hbx_profile_and_sponsorship
     puts("HBX Profile and Benefit Sponsorship already present.") if current_hbx_profile && current_hbx_benefit_sponsorship
@@ -114,7 +114,7 @@ module GoldenSeedHelper
 
   def create_and_return_user(person)
     providers = ["gmail", "yahoo", "hotmail"]
-    email = person.first_name + person.last_name + "@#{providers.sample}.com"
+    email = "#{person.first_name}#{person.last_name}@#{providers.sample}.com"
     user = User.new
     user.email = email
     user.oim_id = email
@@ -127,7 +127,7 @@ module GoldenSeedHelper
   def generate_and_return_dependent_records(primary_person, personal_relationship_kind, _carrier_name)
     genders = ['male', 'female']
     gender = genders.sample
-    first_name = FFaker::Name.send("first_name_" + gender)
+    first_name = FFaker::Name.send("first_name_#{gender}")
     last_name = primary_person.last_name
     family = primary_person.primary_family
     case personal_relationship_kind
@@ -154,7 +154,7 @@ module GoldenSeedHelper
   def generate_address_and_phone
     address = Address.new(
       kind: "primary",
-      address_1: "60" + counter_number.to_s + ('a'..'z').to_a.sample + ' ' + ['Street', 'Ave', 'Drive'].sample,
+      address_1: "60#{counter_number} #{('a'..'z').to_a.sample} #{['Street', 'Ave', 'Drive'].sample}",
       city: EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item,
       state: EnrollRegistry[:enroll_app].setting(:state_abbreviation).item,
       zip: EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item
@@ -162,7 +162,7 @@ module GoldenSeedHelper
     phone = Phone.new(
       kind: "main",
       area_code: %w[339 351 508 617 774 781 857 978 413].sample,
-      number: "55" + counter_number.to_s.split("").sample + "-999" + counter_number.to_s.split("").sample
+      number: "55#{counter_number.to_s.split("").sample}-999 #{counter_number.to_s.split("").sample}"
     )
     {address: address, phone: phone}
   end
@@ -198,7 +198,7 @@ module GoldenSeedHelper
   def create_and_return_matched_consumer_record
     genders = ['male', 'female']
     gender = genders.sample
-    first_name = FFaker::Name.send("first_name_" + gender)
+    first_name = FFaker::Name.send("first_name_#{gender}")
     last_name = FFaker::Name.last_name
     primary_person = create_and_return_person(first_name, last_name, gender)
     family = create_and_return_family(primary_person)
@@ -256,7 +256,6 @@ module GoldenSeedHelper
   end
 
   def generate_and_return_hbx_enrollment(consumer_role)
-    active_year = TimeKeeper.date_of_record.year.to_s
     effective_on = TimeKeeper.date_of_record
     enrollment = HbxEnrollment.new(kind: "individual", consumer_role_id: consumer_role.id)
     enrollment.effective_on = effective_on
@@ -277,5 +276,4 @@ module GoldenSeedHelper
     enrollment.update_attributes!(aasm_state: 'coverage_selected')
     puts("#{enrollment.aasm_state} HBX Enrollment created for #{consumer_role.person.full_name}") if enrollment.save!
   end
-
 end
