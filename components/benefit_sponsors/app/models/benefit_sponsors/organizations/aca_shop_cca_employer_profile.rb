@@ -14,6 +14,7 @@ module BenefitSponsors
       # TODO: use SIC code validation
       validates_presence_of :sic_code
 
+      # TODO: This needs to be refactored
       embeds_one :employer_attestation, class_name: '::EmployerAttestation'
 
       add_observer BenefitSponsors::Observers::EmployerProfileObserver.new, [:update]

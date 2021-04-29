@@ -5,8 +5,9 @@ RSpec.describe 'BenefitSponsors::ModelEvents::GenerateInitialEmployerInvoice', d
   let(:model_event) { "generate_initial_employer_invoice" }
   let(:notice_event) { "generate_initial_employer_invoice" }
   let(:start_on) { TimeKeeper.date_of_record.next_month.beginning_of_month}
-  let!(:site) { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key) }
-  let!(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site) }
+  let(:site_key) { EnrollRegistry[:enroll_app].setting(:site_key).item.downcase }
+  let!(:site) { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, site_key) }
+  let!(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{site_key}_employer_profile".to_sym, site: site) }
   let!(:model_instance)    { organization.employer_profile }
   let!(:benefit_sponsorship)    { model_instance.add_benefit_sponsorship }
   let!(:benefit_application) { FactoryBot.create(:benefit_sponsors_benefit_application,

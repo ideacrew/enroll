@@ -32,11 +32,11 @@ module Config::ContactCenterHelper
   end
 
   def contact_center_phone_number
-    Settings.contact_center.phone_number
+    EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number)&.item
   end
 
   def contact_center_short_number
-    Settings.contact_center.short_number
+    EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number)&.item
   end
 
   def contact_center_ivl_phone_number
@@ -52,7 +52,7 @@ module Config::ContactCenterHelper
   end
 
   def contact_center_name
-    Settings.contact_center.name
+    EnrollRegistry[:enroll_app].setting(:contact_center_name).item
   end
 
   def contact_center_mailing_address_name

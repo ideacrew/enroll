@@ -514,6 +514,26 @@
       "note": ""
     },
     {
+      "warning_type": "Remote Code Execution",
+      "warning_code": 24,
+      "fingerprint": "65fcfed30f4a5e04a15736f27beec09010b3ffedd31ea672a34ef1eb1721b917",
+      "check_name": "UnsafeReflection",
+      "message": "Unsafe reflection method `safe_constantize` called with parameter value",
+      "file": "app/controllers/documents_controller.rb",
+      "line": 35,
+      "link": "https://brakemanscanner.org/docs/warning_types/remote_code_execution/",
+      "code": "(params[:model].camelize or \"BenefitSponsors::Organizations::AcaShopCcaEmployerProfile\").safe_constantize",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "DocumentsController",
+        "method": "authorized_download"
+      },
+      "user_input": "params[:model].camelize",
+      "confidence": "High",
+      "note": ""
+    },
+    {
       "warning_type": "Cross-Site Scripting",
       "warning_code": 2,
       "fingerprint": "6c26117cb8a16470d6e0cf73d4e2183c08714a1346985e7f9d7632dec54d26ee",
@@ -528,7 +548,7 @@
           "type": "controller",
           "class": "Exchanges::HbxProfilesController",
           "method": "view_enrollment_to_update_end_date",
-          "line": 479,
+          "line": 480,
           "file": "app/controllers/exchanges/hbx_profiles_controller.rb",
           "rendered": {
             "name": "exchanges/hbx_profiles/view_enrollment_to_update_end_date",
@@ -797,6 +817,6 @@
       "note": ""
     }
   ],
-  "updated": "2021-04-13 15:31:15 -0400",
+  "updated": "2021-04-26 11:43:43 -0400",
   "brakeman_version": "5.0.0"
 }

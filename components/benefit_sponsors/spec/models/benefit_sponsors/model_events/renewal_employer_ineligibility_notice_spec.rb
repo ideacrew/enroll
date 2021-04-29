@@ -5,8 +5,9 @@ RSpec.describe 'BenefitSponsors::ModelEvents::RenewalEmployerIneligibilityNotice
   let(:model_event) { "application_denied" }
   let(:notice_event) { "renewal_employer_ineligibility_notice" }
   let(:start_on) { TimeKeeper.date_of_record.next_month.beginning_of_month}
-  let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key) }
-  let!(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site) }
+  let(:site_key) { EnrollRegistry[:enroll_app].setting(:site_key).item }
+  let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, site_key) }
+  let!(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{site_key}_employer_profile".to_sym, site: site) }
   let!(:employer_profile)    { organization.employer_profile }
   let!(:benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
   let!(:model_instance) { FactoryBot.create(:benefit_sponsors_benefit_application,
