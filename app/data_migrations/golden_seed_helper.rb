@@ -5,14 +5,20 @@ module GoldenSeedHelper
   def site
     @site = BenefitSponsors::Site.all.first
   end
-
+  
+  # Only get up to date IVL products
   def ivl_products
-    BenefitMarkets::Products::Product.all.select { |product| product.benefit_market_kind.to_sym == :aca_individual }
+    date_range = TimeKeeper.date_of_record.beginning_of_year..TimeKeeper.date_of_record.end_of_year
+    ::BenefitMarkets::Products::Product.aca_individual_market.by_application_period(date_range)
   end
   
   # TODO: Refactor this
   def create_and_return_ivl_hbx_profile_and_sponsorship
-    org = Organization.new(hbx_id: "200000031", legal_name: Settings.site.short_name, dba: "DHCL", fein: "123123456")
+    org = Organization.new(
+      hbx_id: "200000031",
+      legal_name: Settings.site.short_name,
+      dba: "DHCL", fein: "123123456"
+    )
     ol = org.office_locations.build
     address = ol.build_address(
       kind: "mailing",
@@ -21,9 +27,9 @@ module GoldenSeedHelper
       state: Settings.site.key.to_s,
       zip: "04178"
     )
-    address.save
-    ol.save
-    org.save
+    address.save!
+    ol.save!
+    org.save!
     hbx = org.build_hbx_profile(
       cms_id: "ME0",
       us_state_abbreviation: Settings.site.key.to_s
@@ -241,6 +247,8 @@ module GoldenSeedHelper
     effective_on = TimeKeeper.date_of_record
     enrollment = HbxEnrollment.new(kind: "individual", consumer_role_id: consumer_role.id)
     enrollment.effective_on = effective_on
+    # A new product will be created for this rake task if there are none present. Otherwise, a random one will
+    # be selected
     enrollment.product = ivl_products.sample
     enrollment.family = consumer_role.person.primary_family
     family_members = consumer_role.person.primary_family.active_family_members.select { |fm| Family::IMMEDIATE_FAMILY.include? fm.primary_relationship }
@@ -253,7 +261,7 @@ module GoldenSeedHelper
     consumer_role.person.primary_family.active_household.save!
     enrollment.select_coverage! if enrollment.save!
     # IT comes off as "unverified" after this. Why?
-    enrollment.update_attributes!(aasm_state: 'coverage_slected')
+    enrollment.update_attributes!(aasm_state: 'coverage_selected')
     puts("#{enrollment.aasm_state} HBX Enrollment created for #{consumer_role.person.full_name}") if enrollment.save!
   end
 
