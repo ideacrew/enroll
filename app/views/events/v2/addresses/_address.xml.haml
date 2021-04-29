@@ -9,6 +9,8 @@
   %location_city_name= address.city
   - if !address.county.blank?
     %location_county_name= address.county
+  - if EnrollRegistry[:enroll_app].setting(:county_fips_code_enabled).item
+    %location_county_code = address.fetch_county_fips_code
   %location_state= "urn:openhbx:terms:v1:us_state##{State::NAME_IDS.detect do |state| state.last==address.state end.first.downcase.gsub(' ','_')}"
   %location_state_code= address.state
   %postal_code= address.zip_without_extension
