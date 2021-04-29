@@ -2,6 +2,12 @@
 
 require File.join(Rails.root, 'lib/mongoid_migration_task')
 
+# This class will:
+# 1) Create employers and all the benefit sponsorships, applications, packages, etc. to create enrollments.
+# Will use an existing random SHOP product OR a create a new one
+# 2) Create fully matched employee records and dependents. Their names will appear in the rake output.
+# 3) Create an HbxEnrollment for each of those employees.
+
 class GoldenSeedSHOP < MongoidMigrationTask
   def site
     @site = BenefitSponsors::Site.all.first
@@ -56,7 +62,10 @@ class GoldenSeedSHOP < MongoidMigrationTask
   #### SOURCE DATA METHODS
   # TODO: Replace these with a source csv, with ruby friendly parameterized rows organized like so:
   # Health:
-  # Health Carrier Name  Plan Name ER Name No: of EE with dependents Dob of EE/dependents  SIC Code  Zip Code  EE Only Spouse/Domestic partner Children  ER monthly cost - EA  Rate Calculator Premiums  EE Plan Confirmation page - EA  EE Rate Calculator Premiums Difference amount
+  # Health Carrier Name  Plan Name ER Name No: of EE with dependents Dob of EE/dependents
+  # SIC Code  Zip Code  EE Only Spouse/Domestic partner Children
+  # ER monthly cost - EA  Rate Calculator Premiums  EE Plan Confirmation page -
+  # EA  EE Rate Calculator Premiums Difference amount
   # Dental:
   # Dental Carrier Name  Plan Name ER Monthly cost - EA  Rate Calculator Premiums  EE Plan Confirmation page - EA  EE Rate Calculator Premiums Difference amount Status  Comments
   ### STRUCTURE OF HASH:
@@ -64,74 +73,72 @@ class GoldenSeedSHOP < MongoidMigrationTask
   ##### Plan Name
   ###### Family
   ####### 'employee' == employee, other strings == relationships to employee
-  def carriers_plans_and_employee_dependent_count(kind)
-    if kind == 'health'
-      @health_carriers_plans_and_employee_dependent_count = {
-        :'Tufts Health Premier' => {
-          :'Tufts Health Premier Standard High Bronze: Premier Bronze Saver 3500' => [
-            ['employee'],
-            ['employee']
-          ],
-          :'STANDARD HIGH GOLD: PREMIER GOLD 1000' => [
-            ['employee'],
-            ['employee', 'domestic_partner', 'child']
-          ]
-        },
-        :'BMC HealthNet Plan' => {
-          :'NON-STANDARD SILVER: BMC HEALTHNET PLAN SILVER B' => [
-            ['employee'],
-            ['employee', 'spouse', 'child']
-          ]
-        },
-        :'AllWays Health Partners' => {
-          :'NON-STANDARD GOLD: COMPLETE HMO 2000 30%' => [
-            ['employee', 'child', 'child'],
-            ['employee', 'child', 'child', 'child']
-          ]
-        },
-        :'Blue Cross Blue Shield MA' => {
-          :'STANDARD HIGH BRONZE: HMO BLUE BASIC DEDUCTIBLE' => [
-            ['employee'],
-            ['employee', 'domestic_partner', 'child']
-          ],
-          :'STANDARD HIGH SILVER: HMO BLUE BASIC' => [
-            ['employee'],
-            ['employee', 'child', 'child', 'child', 'child'],
-            ['employee', 'spouse'],
-            ['employee', 'domestic_partner']
-          ]
-        },
-        :'Tufts Health Direct' => {
-          :'NON-STANDARD BRONZE: TUFTS HEALTH DIRECT BRONZE 3550 WITH COINSURANCE' => [
-            ['employee'],
-            ['employee', 'child', 'child', 'child', 'child'],
-            ['employee', 'spouse'],
-            ['employee', 'domestic_partner']
-          ]
-        },
-        :UnitedHealthcare => {
-          :'STANDARD LOW GOLD: UHC NAVIGATE GOLD 2000' => [['employee'], ['employee']]
-        },
-        :'Harvard Pilgrim Health Care' => {
-          :'STANDARD LOW GOLD - FLEX' => [
-            ['employee'],
-            ['employee', 'spouse', 'child']
-          ]
-        },
-        :'Fallon Health' => {
-          :'NON-STANDARD GOLD: SELECT CARE DEDUCTIBLE 2000 HYBRID' => [
-            ['employee', 'child', 'child'],
-            ['employee', 'child', 'child', 'child']
-          ]
-        },
-        :'Health New England' => {
-          :'STANDARD HIGH SILVER: HNE SILVER A' => [
-            ['employee'],
-            ['employee', 'domestic_partner', 'child']
-          ]
-        }
+  def carriers_plans_and_employee_dependent_count
+    @health_carriers_plans_and_employee_dependent_count = {
+      :'Tufts Health Premier' => {
+        :'Tufts Health Premier Standard High Bronze: Premier Bronze Saver 3500' => [
+          ['employee'],
+          ['employee']
+        ],
+        :'STANDARD HIGH GOLD: PREMIER GOLD 1000' => [
+          ['employee'],
+          ['employee', 'domestic_partner', 'child']
+        ]
+      },
+      :'BMC HealthNet Plan' => {
+        :'NON-STANDARD SILVER: BMC HEALTHNET PLAN SILVER B' => [
+          ['employee'],
+          ['employee', 'spouse', 'child']
+        ]
+      },
+      :'AllWays Health Partners' => {
+        :'NON-STANDARD GOLD: COMPLETE HMO 2000 30%' => [
+          ['employee', 'child', 'child'],
+          ['employee', 'child', 'child', 'child']
+        ]
+      },
+      :'Blue Cross Blue Shield MA' => {
+        :'STANDARD HIGH BRONZE: HMO BLUE BASIC DEDUCTIBLE' => [
+          ['employee'],
+          ['employee', 'domestic_partner', 'child']
+        ],
+        :'STANDARD HIGH SILVER: HMO BLUE BASIC' => [
+          ['employee'],
+          ['employee', 'child', 'child', 'child', 'child'],
+          ['employee', 'spouse'],
+          ['employee', 'domestic_partner']
+        ]
+      },
+      :'Tufts Health Direct' => {
+        :'NON-STANDARD BRONZE: TUFTS HEALTH DIRECT BRONZE 3550 WITH COINSURANCE' => [
+          ['employee'],
+          ['employee', 'child', 'child', 'child', 'child'],
+          ['employee', 'spouse'],
+          ['employee', 'domestic_partner']
+        ]
+      },
+      :UnitedHealthcare => {
+        :'STANDARD LOW GOLD: UHC NAVIGATE GOLD 2000' => [['employee'], ['employee']]
+      },
+      :'Harvard Pilgrim Health Care' => {
+        :'STANDARD LOW GOLD - FLEX' => [
+          ['employee'],
+          ['employee', 'spouse', 'child']
+        ]
+      },
+      :'Fallon Health' => {
+        :'NON-STANDARD GOLD: SELECT CARE DEDUCTIBLE 2000 HYBRID' => [
+          ['employee', 'child', 'child'],
+          ['employee', 'child', 'child', 'child']
+        ]
+      },
+      :'Health New England' => {
+        :'STANDARD HIGH SILVER: HNE SILVER A' => [
+          ['employee'],
+          ['employee', 'domestic_partner', 'child']
+        ]
       }
-    end
+    }
   end
 
   def migrate
@@ -263,10 +270,10 @@ class GoldenSeedSHOP < MongoidMigrationTask
     last_name = primary_person.last_name
     family = primary_person.primary_family
     dependent_person = if personal_relationship_kind == 'child'
-      create_and_return_person(first_name, last_name, gender, 'child')
-    elsif ['domestic_partner', 'spouse'].include?(personal_relationship_kind)
-      create_and_return_person(first_name, last_name, gender, 'adult')
-    end
+                         create_and_return_person(first_name, last_name, gender, 'child')
+                       elsif ['domestic_partner', 'spouse'].include?(personal_relationship_kind)
+                         create_and_return_person(first_name, last_name, gender, 'adult')
+                      end
     fm = FamilyMember.new(
       family: family,
       person_id: dependent_person.id,
@@ -283,16 +290,16 @@ class GoldenSeedSHOP < MongoidMigrationTask
   def generate_address_and_phone(counter_number)
     address = Address.new(
       kind: "primary",
-      address_1: "60" + counter_number.to_s + ('a'..'z').to_a.sample + ' ' + ['Street', 'Ave', 'Drive'].sample,
-      city: "Boston",
-      state: "MA",
-      zip: "02109",
-      county: "Suffolk"
+      address_1: "60#{counter_number} #{('a'..'z').to_a.sample} #{['Street', 'Ave', 'Drive'].sample}",
+      city: EnrollRegistry[:enroll_app].setting(:contact_center_city).item,
+      state: EnrollRegistry[:enroll_app].setting(:state_abbreviation).item,
+      zip: EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item,
+      county: EnrollRegistry[:enroll_app].setting(:contact_center_county).item
     )
     phone = Phone.new(
       kind: "main",
       area_code: %w[339 351 508 617 774 781 857 978 413].sample,
-      number: "55" + counter_number.to_s.split("").sample + "-999" + counter_number.to_s.split("").sample
+      number: "55#{counter_number}-999 #{contact_center * 4}"
     )
     [address, phone]
   end
@@ -317,11 +324,11 @@ class GoldenSeedSHOP < MongoidMigrationTask
 
   # TODO: Figure out if we can user faker gem?
   def create_and_return_new_employer(counter_number, employer_profile)
-    company_name = "Golden Seed" + ' ' + counter_number.to_s
+    company_name = "Golden Seed #{counter_number}"
     employer = BenefitSponsors::Organizations::GeneralOrganization.new(
       site: site,
       legal_name: company_name,
-      dba: company_name + " " + ["Inc.", "LLC"].sample,
+      dba: "#{company_name} #{["Inc.", "LLC"].sample}",
       fein: generate_and_return_unique_fein_or_ssn('fein'),
       profiles: [employer_profile],
       entity_kind: :c_corporation
@@ -341,12 +348,9 @@ class GoldenSeedSHOP < MongoidMigrationTask
 
   def create_and_return_benefit_package(create_benefit_package_params, benefit_application)
     benefit_package = ::BenefitSponsors::Forms::BenefitPackageForm.for_create(create_benefit_package_params)
-    if benefit_package.persist
-      benefit_application.reload
-      benefit_application.benefit_packages.last
-    else
-      raise("Unable to create benefit package. #{benefit_package.errors.messages}")
-    end
+    raise("Unable to create benefit package. #{benefit_package.errors.messages}") unless benefit_package.persist
+    benefit_application.reload
+    benefit_application.benefit_packages.last
   end
 
   def create_benefit_package_params(benefit_sponsorship, benefit_application, carrier_name)
@@ -356,16 +360,15 @@ class GoldenSeedSHOP < MongoidMigrationTask
     benefit_application.save!
     benefit_application.benefit_sponsor_catalog.save!
     # Need to add packages here?
-    p_package = benefit_application.benefit_sponsor_catalog.product_packages.detect { |p_package| (p_package.package_kind == :single_product) && (p_package.product_kind == :health) }
+    p_package = benefit_application.benefit_sponsor_catalog.product_packages.detect { |p_pckg| (p_pckg.package_kind == :single_product) && (p_pckg.product_kind == :health) }
     # raise("No product packages present.") if benefit_application.benefit_sponsor_catalog.product_packages.blank?
     if p_package.products.present?
       reference_product = p_package.products.first
     else
       date = TimeKeeper.date_of_record
-      product_form = BenefitMarkets::Forms::ProductForm.for_new(date)
+      BenefitMarkets::Forms::ProductForm.for_new(date)
       # TODO: Figure out how to convert product for minto a product if that is how it works?
       # Note: This is becuause users running this as a fresh seed locally won't have products
-      # binding.pry
       raise("No products present for package.")
     end
     #raise("No reference product present.") if reference_product.nil?
@@ -414,12 +417,8 @@ class GoldenSeedSHOP < MongoidMigrationTask
   end
 
   def create_or_return_benefit_sponsorship(employer)
-    if employer.employer_profile.benefit_sponsorships.present?
-      employer.benefit_sponsorships.last
-    else
-      employer.employer_profile.add_benefit_sponsorship.save!
-      employer.benefit_sponsorships.last
-    end
+    employer.employer_profile.add_benefit_sponsorship.save! if employer.employer_profile.benefit_sponsorships.blank?
+    employer.benefit_sponsorships.last
   end
 
   def generate_and_return_hbx_enrollment(primary_family, aasm_state: nil); end

@@ -130,9 +130,10 @@ module GoldenSeedHelper
     first_name = FFaker::Name.send("first_name_#{gender}")
     last_name = primary_person.last_name
     family = primary_person.primary_family
-    if personal_relationship_kind == 'child'
+    case personal_relationship_kind
+    when 'child'
       dependent_person = create_and_return_person(first_name, last_name, gender, 'child')
-    elsif personal_relationship_kind == 'domestic_partner' || personal_relationship_kind == 'spouose'
+    when 'domestic_partner' || 'spouse'
       dependent_person = create_and_return_person(first_name, last_name, gender, 'adult')
     end
     fm = FamilyMember.new(

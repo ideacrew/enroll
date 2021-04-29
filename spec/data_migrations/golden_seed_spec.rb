@@ -306,9 +306,9 @@ describe "Golden Seed Rake Tasks", dbclean: :after_each do
           expect(subject.get_benefit_applications_of_sponsorships.last.open_enrollment_end_on.to_date.to_s).to eq("12/20/2019")
         end
 
-        xit "should modify recalculate the appropriate prices" do
+        # xit "should modify recalculate the appropriate prices" do
 
-        end
+        # end
       end
     end
   end
