@@ -95,17 +95,29 @@ Then(/Individual should click on Individual market for plan shopping/) do
   find('.btn', text: 'CONTINUE').click
 end
 
-Then(/the individual sees form to enter personal information$/) do
-  find(IvlPersonalInformation.us_citizen_or_national_yes_radiobtn).click
-  find(IvlPersonalInformation.naturalized_citizen_no_radiobtn).click
-  find(IvlPersonalInformation.american_or_alaskan_native_no_radiobtn).click
-  find(IvlPersonalInformation.incarcerated_no_radiobtn).click
-  fill_in IvlPersonalInformation.address_line_one, :with => "4900 USAA BLVD"
-  fill_in IvlPersonalInformation.address_line_two, :with => "212"
-  fill_in IvlPersonalInformation.city, :with => "Washington"
-  find(IvlPersonalInformation.select_state_dropdown).click
-  first(IvlPersonalInformation.select_dc_state).click
-  fill_in IvlPersonalInformation.zip, :with => "20002"
+Then(/Individual should see a form to enter personal information$/) do
+  click_and_wait_on_stylized_radio('//label[@for="person_us_citizen_true"]', "person_us_citizen_true", "person[us_citizen]", "true")
+  click_and_wait_on_stylized_radio('//label[@for="person_naturalized_citizen_false"]', "person_naturalized_citizen_false", "person[naturalized_citizen]", "false")
+  click_and_wait_on_stylized_radio('//label[@for="indian_tribe_member_no"]', "indian_tribe_member_no", "person[indian_tribe_member]", "false")
+  click_and_wait_on_stylized_radio('//label[@for="radio_incarcerated_no"]', "radio_incarcerated_no", "person[is_incarcerated]", "false")
+
+  fill_in "person_addresses_attributes_0_address_1", :with => "4900 USAA BLVD"
+  fill_in "person_addresses_attributes_0_address_2", :with => "212"
+  fill_in "person_addresses_attributes_0_city", :with => "Washington"
+  #find('.interaction-choice-control-state-id', text: 'SELECT STATE *').click
+  find(:xpath, '//*[@id="address_info"]/div/div[3]/div[2]/div/div[2]/span').click
+  first('li', :text => 'DC', wait: 5).click
+  fill_in "person[addresses_attributes][0][zip]", :with => "20002"
+  # expect(page).to have_css("#home_address_tooltip")
+  expect(page).to have_content("Enter your personal information and answer the following questions")
+  expect(page).to have_content("Is this person a US citizen or US national")
+  expect(page).to have_content("Is this person a naturalized citizen")
+  expect(page).to have_content("Is this person a member of an American Indian")
+  expect(page).to have_content("Is this person currently incarcerated")
+  expect(page).to have_content("What is your race/ethnicity? (OPTIONAL - check all that apply)")
+  expect(page).to have_content("If Hispanic/Latino/a, ethnicity (OPTIONAL - check all that apply.)")
+  expect(page).to have_css("#us_citizen", visible: false)
+  expect(page).to have_css("#is_incarcerated", visible: false)
   sleep 2
   # screenshot("personal_form")
 end
@@ -239,7 +251,7 @@ Then(/Individual resumes enrollment/) do
   click_link 'Consumer/Family Portal'
 end
 
-Then (/Individual sees previously saved address/) do
+Then(/Individual sees previously saved address/) do
   expect(page).to have_field('ADDRESS LINE 1 *', with: '4900 USAA BLVD', wait: 10)
   find('.btn', text: 'CONTINUE').click
 end
