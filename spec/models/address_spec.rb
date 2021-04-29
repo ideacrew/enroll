@@ -169,7 +169,7 @@ describe '#fetch_county_fips_code' do
   let!(:us_county) { BenefitMarkets::Locations::UsCounty.create({ state_postal_code: 'ME',  county_fips_code: '23003', county_name: 'Aroostook'}) }
 
   context 'fips code for county exists' do
-    let(:address) {
+    let(:address) do
       Address.new(
         address_1: "An address line 1",
         address_2: "An address line 2",
@@ -178,7 +178,7 @@ describe '#fetch_county_fips_code' do
         county: 'Aroostook',
         zip: "21222"
       )
-    }
+    end
 
     it ' should return county fips code' do
       expect(address.fetch_county_fips_code).to eq '23003'
@@ -186,7 +186,7 @@ describe '#fetch_county_fips_code' do
   end
 
   context 'fips code for county does not exists' do
-    let(:address) {
+    let(:address) do
       Address.new(
         address_1: "An address line 1",
         address_2: "An address line 2",
@@ -195,7 +195,7 @@ describe '#fetch_county_fips_code' do
         county: 'test',
         zip: "21222"
       )
-    }
+    end
 
     it ' should return nil' do
       expect(address.fetch_county_fips_code).to eq nil
