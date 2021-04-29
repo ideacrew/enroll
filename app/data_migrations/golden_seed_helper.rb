@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 # This module contains helpers for generating idea to be shared between the different Golden Seed Helper files
+
+# rubocop:disable Metrics/ModuleLength
 module GoldenSeedHelper
   def site
     @site = BenefitSponsors::Site.all.first
@@ -275,3 +277,5 @@ module GoldenSeedHelper
     puts("#{enrollment.aasm_state} HBX Enrollment created for #{consumer_role.person.full_name}") if enrollment.save!
   end
 end
+
+# rubocop:enable Metrics/ModuleLength

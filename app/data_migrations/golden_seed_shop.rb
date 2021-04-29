@@ -8,6 +8,7 @@ require File.join(Rails.root, 'lib/mongoid_migration_task')
 # 2) Create fully matched employee records and dependents. Their names will appear in the rake output.
 # 3) Create an HbxEnrollment for each of those employees.
 
+# rubocop:disable Metrics/ClassLength
 class GoldenSeedSHOP < MongoidMigrationTask
   def site
     @site = BenefitSponsors::Site.all.first
@@ -73,6 +74,7 @@ class GoldenSeedSHOP < MongoidMigrationTask
   ##### Plan Name
   ###### Family
   ####### 'employee' == employee, other strings == relationships to employee
+  # rubocop:disable Metrics/MethodLength
   def carriers_plans_and_employee_dependent_count
     @health_carriers_plans_and_employee_dependent_count = {
       :'Tufts Health Premier' => {
@@ -140,6 +142,7 @@ class GoldenSeedSHOP < MongoidMigrationTask
       }
     }
   end
+  # rubocop:enable Metrics/MethodLength
 
   def migrate
     puts('Executing Golden Seed SHOP migration.')
@@ -273,7 +276,7 @@ class GoldenSeedSHOP < MongoidMigrationTask
                          create_and_return_person(first_name, last_name, gender, 'child')
                        elsif ['domestic_partner', 'spouse'].include?(personal_relationship_kind)
                          create_and_return_person(first_name, last_name, gender, 'adult')
-                      end
+                       end
     fm = FamilyMember.new(
       family: family,
       person_id: dependent_person.id,
@@ -328,7 +331,7 @@ class GoldenSeedSHOP < MongoidMigrationTask
     employer = BenefitSponsors::Organizations::GeneralOrganization.new(
       site: site,
       legal_name: company_name,
-      dba: "#{company_name} #{["Inc.", "LLC"].sample}",
+      dba: "#{company_name} #{['Inc.', 'LLC'].sample}",
       fein: generate_and_return_unique_fein_or_ssn('fein'),
       profiles: [employer_profile],
       entity_kind: :c_corporation
@@ -423,3 +426,5 @@ class GoldenSeedSHOP < MongoidMigrationTask
 
   def generate_and_return_hbx_enrollment(primary_family, aasm_state: nil); end
 end
+
+# rubocop:enable Metrics/ClassLength
