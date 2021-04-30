@@ -75,7 +75,7 @@ class Address
   validate :quadrant_check
 
   def detect_quadrant
-    self.quadrant = QUADRANTS.map { |word| self.address_1.scan(/\b#{word}\b/) }.flatten.first if Settings.aca.extract_quadrant
+    self.quadrant = QUADRANTS.map { |word| self.address_1&.scan(/\b#{word}\b/) }.flatten.first if Settings.aca.extract_quadrant
   end
 
   def quadrant_check
