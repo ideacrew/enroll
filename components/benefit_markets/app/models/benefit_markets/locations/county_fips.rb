@@ -2,7 +2,7 @@
 
 module BenefitMarkets
   module Locations
-    class UsCounty
+    class CountyFips
       include Mongoid::Document
       include Mongoid::Timestamps
 

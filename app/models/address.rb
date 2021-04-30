@@ -112,7 +112,7 @@ class Address
   end
 
   def fetch_county_fips_code
-    us_county = BenefitMarkets::Locations::UsCounty.where(state_postal_code: state, county_name: county).first
+    us_county = BenefitMarkets::Locations::CountyFips.where(state_postal_code: state, county_name: county).first
     us_county ? us_county.county_fips_code : nil
   end
 
