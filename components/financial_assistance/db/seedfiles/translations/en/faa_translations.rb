@@ -35,7 +35,7 @@ module FaaTranslations
     "en.faa.do_not_agree" => "If you do not agree with this determination, you have the right to appeal. <a href=''>Find out more about the appeal process</a> or <a href=''>get assistance</a> by contacting us directly.",
     "en.faa.your_application_reference" => "Your application reference number is ",
     "en.faa.next_step_without_aggregate" => "<b>NEXT STEP:</b> Pick a health insurance plan.",
-    "en.faa.next_step_with_aggregate_1" => "<b>NEXT STEP:</b><ul><li>If you’re already enrolled in DC Health Link’s Individual & Family plan, <b>we’ve automatically changed your premium. You don’t have to do anything else.</b></li>",
-    "en.faa.next_step_with_aggregate_2" => "<li>If you’re not enrolled or need to make changes to your plan, select CONTINUE to pick a health insurance plan or change who is covered by your plan.</li></ul>"
+    "en.faa.next_step_with_aggregate_1" => "<b>NEXT STEP:</b><ul><li><b>If you’re already enrolled in DC Health Link’s Individual & Family plan</b>, we’ve automatically changed your premium. You don’t have to do anything else.</li>",
+    "en.faa.next_step_with_aggregate_2" => "<br><li><b>If you’re not enrolled or need to make changes to your plan</b>, select CONTINUE to pick a health insurance plan or change who is covered by your plan.</li></ul>"
   }.freeze
 end
