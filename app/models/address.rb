@@ -69,10 +69,15 @@ class Address
         :message => "should be in the form: 12345 or 12345-1234"
       }
 
-  before_save :detect_quadrant
+  before_validation :detect_quadrant
+  validate :quadrant_check
 
   def detect_quadrant
-    QUADRANTS.map { |word| "ADDRESS".scan(/\b#{word}\b/) }.flatten
+    self.quadrant = QUADRANTS.map { |word| self.address_1&.scan(/\b#{word}\b/) }.flatten.first if Settings.aca.extract_quadrant
+  end
+
+  def quadrant_check
+    errors.add(:quadrant, "not present") if Settings.aca.validate_quadrant && Settings.aca.quadrant_zip_codes_exclusions.exclude?(self.zip) && self.quadrant.blank?
   end
 
   # @note Add support for GIS location

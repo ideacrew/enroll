@@ -162,6 +162,8 @@ aca:
   minimum_primary_contribution_percentage: 50
   minimum_family_contribution_percentage: 30
   address_query_county: false
+  validate_quadrant: false
+  quadrant_zip_codes_exclusions: ["20515"]
   broker_routing_information: false
   recaptcha_enabled: false
   security_questions: false
