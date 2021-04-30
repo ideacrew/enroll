@@ -138,7 +138,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
           expect(rendered).to have_content('Individual & Family')
           expect(rendered).to have_selector('strong', text: HbxProfile::ShortName.to_s)
           expect(rendered).to have_content(/#{hbx_enrollment.hbx_id}/)
-          expect(rendered).to have_content('Make Payments For My Plan')
+          expect(rendered).to have_content('Make Payments')
         end
 
       end
