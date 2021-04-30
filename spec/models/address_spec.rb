@@ -166,7 +166,7 @@ describe '#home?' do
 end
 
 describe '#fetch_county_fips_code' do
-  let!(:us_county) { BenefitMarkets::Locations::UsCounty.create({ state_postal_code: 'ME',  county_fips_code: '23003', county_name: 'Aroostook'}) }
+  let!(:us_county) { BenefitMarkets::Locations::CountyFips.create({ state_postal_code: 'ME',  county_fips_code: '23003', county_name: 'Aroostook'}) }
 
   context 'fips code for county exists' do
     let(:address) do
