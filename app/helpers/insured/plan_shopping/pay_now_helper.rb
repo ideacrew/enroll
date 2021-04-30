@@ -59,7 +59,7 @@ module Insured
       end
 
       def past_or_on_effective_on?(hbx_enrollment)
-        return true if hbx_enrollment.effective_on >= TimeKeeper.date_of_record
+        return true if hbx_enrollment.effective_on > TimeKeeper.date_of_record
       end
 
       def has_break_in_coverage_enrollments?(hbx_enrollment)
