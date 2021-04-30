@@ -250,8 +250,8 @@ describe Forms::BrokerCandidate do
         let(:other_attributes) { {
           :addresses_attributes => {"0" => {
             kind: 'home',
-            address_1: 'street',
-            city: 'NewYork',
+            address_1: 'street NE',
+            city: 'Washington',
             state: 'DC',
             zip: '12345'
           }}
@@ -269,8 +269,8 @@ describe Forms::BrokerCandidate do
           person = Person.where(first_name: subject.first_name, last_name: subject.last_name, dob: subject.dob).first
 
           expect(person).to be_truthy
-          expect(person.addresses.last.address_1).to eq 'street'
-          expect(person.addresses.last.city).to eq 'NewYork'
+          expect(person.addresses.last.address_1).to eq 'street NE'
+          expect(person.addresses.last.city).to eq 'Washington'
           expect(person.addresses.last.state).to eq 'DC'
           expect(person.addresses.last.zip).to eq '12345'
         end
