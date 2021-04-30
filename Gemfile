@@ -6,7 +6,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 ruby '2.5.1'
 gem 'rails', '~> 5.2.4.3'
 gem 'sidekiq'
-
+gem 'ffaker'
 #######################################################
 # FIXME
 #######################################################
