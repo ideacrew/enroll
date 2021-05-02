@@ -28,7 +28,7 @@ jobs:
       #   run: bundle exec yard doc && mv ./doc ./hugo/static/yard
       - run: snap info hugo
       - run: sudo snap install hugo --channel=extended
-      - run: cd hugo && hugo --minify
+      - run: cd hugo && hugo --minify -v
       - uses: jakejarvis/s3-sync-action@master
         env:
           AWS_S3_BUCKET: ${{ secrets.YARD_S3_BUCKET }}
