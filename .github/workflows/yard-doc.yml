@@ -12,8 +12,7 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: '12.x'
-      - run: yarn install
-      - run: yarn add --save-dev postcss-cli autoprefixer
+      - run: yarn add --global postcss-cli autoprefixer
       - uses: ruby/setup-ruby@v1
       - uses: actions/cache@v2
         with:
