@@ -15,7 +15,7 @@ jobs:
       - name: Install global packages
         run: |
           yarn install
-          npm install -g postcss postcss-cli autoprefixer
+          npm install -g postcss-cli autoprefixer
       - uses: ruby/setup-ruby@v1
       - uses: actions/cache@v2
         with:
@@ -29,7 +29,8 @@ jobs:
           bundle install
       - name: Run yard
         run: bundle exec yard doc && mv ./doc ./hugo/static/yard
-      - run: sudo snap install hugo --channel=extended
+      - run: snap info hugo
+      - run: sudo snap install hugo --channel=0.81.0/extended
       - run: cd hugo && hugo --minify
       - uses: jakejarvis/s3-sync-action@master
         env:
