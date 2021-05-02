@@ -167,7 +167,7 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.terminate_plan' => "Terminate Plan",
   :'en.view_details' => "<b>View</b> my coverage details",
   :'en.make_your_first_payment' => "Make a first Payment for a new plan",
-  :'en.make_payments_for_my_plan' => "Make Payments for My Plan",
+  :'en.make_payments_for_my_plan' => "<b>Make Payments<b> for My Plan",
   :'en.go_back' => "GO BACK",
   :'en.leave_dc_health_link' => "Leave DC Health LINK",
   :'en.insured.primary_applicant' => "Primary Applicant",
