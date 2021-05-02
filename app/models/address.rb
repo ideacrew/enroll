@@ -77,6 +77,7 @@ class Address
   end
 
   def quadrant_check
+    puts self.address_1
     errors.add(:quadrant, "not present") if Settings.aca.validate_quadrant && Settings.aca.quadrant_zip_codes_exclusions.exclude?(self.zip) && self.quadrant.blank?
   end
 
