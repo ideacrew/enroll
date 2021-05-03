@@ -38,9 +38,9 @@ class ClientConfigurationToggler < MongoidMigrationTask
   def copy_current_configuration_to_engines
     Dir.glob("components/*").each do |engine_folder_name|
       puts("Copying current configuration to #{engine_folder_name} system root folder.")
-      `cp -r system #{Rails.root}/#{engine_folder_name}/system`
+      `cp -r system #{Rails.root}/#{engine_folder_name}/`
       puts("Copying current configuration to #{engine_folder_name} spec dummy app")
-      `cp -r system #{Rails.root}/#{engine_folder_name}/spec/dummy/system`
+      `cp -r system #{Rails.root}/#{engine_folder_name}/spec/dummy/`
     end
   end
 
@@ -56,9 +56,15 @@ class ClientConfigurationToggler < MongoidMigrationTask
   end
 
   def migrate
-    puts("Initializing client configuration toggle. System configuration will be moved from #{old_configured_state_abbreviation} to #{target_client_state_abbreviation}")
     @old_configured_state_abbreviation = old_configured_state_abbreviation
     @target_client_state_abbreviation = target_client_state_abbreviation
+    if old_configured_state_abbreviation == target_client_state_abbreviation
+      abort(
+        "Application already configured to #{old_configured_state_abbreviation}."\
+        " No client toggle will be performed."
+      )
+    end
+    puts("Initializing client configuration toggle. System configuration will be moved from #{old_configured_state_abbreviation} to #{target_client_state_abbreviation}")
     copy_target_configuration_to_system_folder
     copy_current_configuration_to_engines
     copy_app_assets_and_straggler_files
