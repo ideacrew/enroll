@@ -123,6 +123,26 @@
     {
       "warning_type": "Command Injection",
       "warning_code": 14,
+      "fingerprint": "0d6e4d3e256f0c6ef196baa5ed9e68712d4bdffb7c9886ca5c7bae3e2687d624",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "lib/client_configuration_toggler.rb",
+      "line": 64,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`git checkout #{filename_in_config_directory.sub(\"#{old_config_folder}/\", \"\")}`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ClientConfigurationToggler",
+        "method": "checkout_straggler_files"
+      },
+      "user_input": "filename_in_config_directory.sub(\"#{old_config_folder}/\", \"\")",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
       "fingerprint": "132c37aeaaedb5c65a6e90b1ab75386acec6e2264bbcb81a0c5f780acd2e232f",
       "check_name": "Execute",
       "message": "Possible command injection",
@@ -636,6 +656,26 @@
       "note": ""
     },
     {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "77379f53e5e37a72155c2a4f0462b37b1d046c19ba0a8ac1f22c3f8d68a8162c",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "lib/client_configuration_toggler.rb",
+      "line": 41,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`cp -r system #{Rails.root}/#{engine_folder_name}/`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ClientConfigurationToggler",
+        "method": "copy_current_configuration_to_engines"
+      },
+      "user_input": "engine_folder_name",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
       "warning_type": "Mass Assignment",
       "warning_code": 70,
       "fingerprint": "8a980298a5df4d60183c689cfc1c152f4b412c6bcf03ae0ed583ecf0b7041e31",
@@ -713,6 +753,26 @@
         "method": "download_employer_document"
       },
       "user_input": "BenefitSponsors::Documents::EmployerAttestationDocument.find_by(:identifier => params[:path]).identifier",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "8ebecce18ccfce198e0e5392f43cfe262c80691e1eb3fae619da130dee133b9f",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "lib/client_configuration_toggler.rb",
+      "line": 43,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`cp -r system #{Rails.root}/#{engine_folder_name}/spec/dummy/`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ClientConfigurationToggler",
+        "method": "copy_current_configuration_to_engines"
+      },
+      "user_input": "engine_folder_name",
       "confidence": "Medium",
       "note": ""
     },
@@ -837,6 +897,6 @@
       "note": ""
     }
   ],
-  "updated": "2021-04-28 15:51:09 -0400",
+  "updated": "2021-05-03 11:35:26 -0400",
   "brakeman_version": "5.0.0"
 }
