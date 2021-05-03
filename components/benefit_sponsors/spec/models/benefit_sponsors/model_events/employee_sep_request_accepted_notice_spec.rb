@@ -2,8 +2,8 @@ require 'rails_helper'
 
 RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeSepRequestAccepted', :dbclean => :after_each, :if => ::EnrollRegistry[:aca_shop_market].enabled? do
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month - 2.months }
-  let!(:site) { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key) }
-  let!(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site) }
+  let!(:site) { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, EnrollRegistry[:enroll_app].setting(:site_key).item) }
+  let!(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{EnrollRegistry[:enroll_app].setting(:site_key).item}_employer_profile".to_sym, site: site) }
   let!(:employer_profile)    { organization.employer_profile }
   let!(:benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
   let!(:benefit_application) { FactoryBot.create(:benefit_sponsors_benefit_application,
@@ -44,6 +44,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeSepRequestAccepted', :dbcl
         allow(model_instance).to receive(:family).and_return(family)
         allow(family).to receive(:primary_applicant).and_return(fm)
         allow(fm).to receive(:person).and_return(person)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_shop_market).and_return(true)
       end
 
@@ -67,6 +68,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeSepRequestAccepted', :dbcl
         allow(family).to receive(:primary_applicant).and_return(fm)
         allow(fm).to receive(:person).and_return(person)
         allow(person).to receive(:has_multiple_active_employers?).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_shop_market).and_return(true)
       end
 
