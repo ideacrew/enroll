@@ -14,7 +14,7 @@
     .invalid-feedback
       |
         Please provide a valid number.
-  - unless Settings.site.key.to_s == "dc"
+  - unless EnrollRegistry[:enroll_app].setting(:site_key).item.to_s == "dc"
     .col-md-2.mb-3
       label for="inputExtension" Extension
       = f.text_field :extension, id:'inputExtension', class:'form-control', maxlength:'10'

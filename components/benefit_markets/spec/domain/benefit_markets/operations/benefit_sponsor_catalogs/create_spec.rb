@@ -4,7 +4,12 @@ require "rails_helper"
 
 RSpec.describe BenefitMarkets::Operations::BenefitSponsorCatalogs::Create, dbclean: :after_each do
 
-  let!(:site)                   { FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key) }
+  let!(:site) do
+    FactoryBot.create(
+      :benefit_sponsors_site, :with_benefit_market,
+      :as_hbx_profile, EnrollRegistry[:enroll_app].setting(:site_key).item
+    )
+  end
   let(:benefit_market)          { site.benefit_markets.first }
   let(:service_area)            { create_default(:benefit_markets_locations_service_area) }
   let(:effective_date)          { TimeKeeper.date_of_record.next_month.beginning_of_month }

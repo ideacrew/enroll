@@ -37,7 +37,7 @@ module BenefitMarkets
 
         def fetch_pricing_unit_kind(kind)
           pricing_unit_type =
-            if kind == :single_product && Settings.site.key == :cca
+            if kind == :single_product && EnrollRegistry[:enroll_app].setting(:site_key).item == :cca
               'TieredPricingUnit'
             else
               'RelationshipPricingUnit'
