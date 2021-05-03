@@ -14,10 +14,9 @@ module Config::AcaConcern
   end
 
   def individual_market_is_enabled?
-    unless EnrollRegistry.feature_enabled?(:aca_individual_market)
-     flash[:error] = "This Exchange does not support an individual marketplace"
-     redirect_to root_path
-    end
+    return if EnrollRegistry.feature_enabled?(:aca_individual_market)
+    flash[:error] = "This Exchange does not support an individual marketplace"
+    redirect_to root_path
   end
 
   def fehb_market_is_enabled?
@@ -25,13 +24,12 @@ module Config::AcaConcern
   end
 
   def general_agency_is_enabled?
-     EnrollRegistry.feature_enabled?(:general_agency)
+    EnrollRegistry.feature_enabled?(:general_agency)
   end
 
   def redirect_unless_general_agency_is_enabled?
-    unless EnrollRegistry.feature_enabled?(:general_agency)
-      flash[:error] = "General Agencies are not supported by this Exchange"
-      redirect_to broker_agencies_profile_path(@broker_agency_profile)
-    end
+    return if EnrollRegistry.feature_enabled?(:general_agency)
+    flash[:error] = "General Agencies are not supported by this Exchange"
+    redirect_to broker_agencies_profile_path(@broker_agency_profile)
   end
 end
