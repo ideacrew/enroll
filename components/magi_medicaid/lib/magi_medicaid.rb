@@ -13,6 +13,7 @@ require 'haml-rails'
 require 'money-rails'
 # require Iap::Engine.root.join('app/domain/magi_medicaid/types')
 
+# magi medicaid lib module
 module MagiMedicaid
   # Your code goes here...
 end

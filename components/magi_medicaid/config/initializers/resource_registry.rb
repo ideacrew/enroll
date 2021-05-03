@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # require FinancialAssistance::Engine.root.join('app', 'domain', 'types.rb')
 
 MagiMedicaidRegistry = ResourceRegistry::Registry.new
