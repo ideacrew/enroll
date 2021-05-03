@@ -214,6 +214,9 @@ registry:
       - key: :rating_area
         item: :rating_area
         is_enabled: false
+        settings:
+          - key: :areas
+            item: ["R-DC001"]
       - key: :service_area
         item: :service_area
         is_enabled: true
