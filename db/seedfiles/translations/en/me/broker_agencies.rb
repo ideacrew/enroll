@@ -9,6 +9,7 @@ BROKER_AGENCIES_TRANSLATIONS = {
 	"en.npn" => "NPN",
 	"en.legal_name"=> "Legal Name",
 	"en.fein" => "FEIN",
+	"en.name_fein" => "Name/FEIN",
 	"en.primary_broker_name" => "Primary Broker Name",
 	"en.broker_agencies.broker_roles.select_this_broker_agency" => "select this broker agency",
 	"en.broker_registration"=> "Broker Registration",
@@ -220,5 +221,5 @@ BROKER_AGENCIES_TRANSLATIONS = {
 	"en.broker_agencies.broker_application_confirm.broker_reqs" => "Brokers need to fulfill the following requirements as detailed in the broker registration guide: <ul><li>%{site_short_name} Broker training course (worth 4 C.E. credits)</li><li>Carrier Requirements: Appointments by all health insurance carrier licensed entity for the market in which you intend to sell</li><li>DC resident or non-resident health insurance producer license that is active and in good standing</li></ul>",
 	"en.broker_agencies.broker_application_confirm.more_info" => "More information about these requirements is included in the <a href='%{site_broker_registration_guide}'> Broker Registration Guide </a>",
 	"en.broker_agencies.broker_application_confirm.any_questions" => "Please reach out to %{site_short_name} at %{site_producer_email_address} with any questions.",
-  "en.new_prospect_employer" => "Fill in the information below to create an employer record for this prospect.  You only need to provide a legal name, SIC, Zip and County at this point, however any information you do not enter here will need to be populated later, or by the employer prior to claiming a quote.<br /><br />Once you have created the Prospective Employer record, you can create and manage quotes for this prospect from your Employers page."
-}
+  "en.new_prospect_employer" => "Fill in the information below to create an employer record for this prospect. You only need to provide a legal name, SIC, Zip and County at this point, however any information you do not enter here will need to be populated later, or by the employer prior to claiming a quote.<br /><br />Once you have created the Prospective Employer record, you can create and manage quotes for this prospect from your Employers page."
+}.freeze

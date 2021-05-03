@@ -11,7 +11,7 @@ module ResourceConfigurator
   private
 
   def verify_access
-    ::EnrollRegistry[:aca_shop_market].enabled? ? true : not_found
+    ::EnrollRegistry[:aca_shop_market].enabled? ? true : 'not_found'
   end
 
   def not_found
