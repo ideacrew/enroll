@@ -8,7 +8,7 @@ Feature: Ability for Admin to create an Reinstated benefit application and allow
     And ABC Widgets employer has a staff role
     And the Reinstate feature configuration is enabled
     And Qualifying life events are present
-
+@flaky
 Scenario: Initial Employer is in termination pending. Admin is able to create reinstated benefit application
           and employees are able to plan shop in both active and future reinstated applications
 
@@ -68,7 +68,7 @@ Scenario: Initial Employer is in termination pending. Admin is able to create re
 #    When Employee clicks on Confirm button on the coverage summary page
 #    Then Employee clicks back to my account button
 #    And employee Patrick Doe of employer ABC Widgets most recent HBX Enrollment should be under the termination pending benefit application
-
+  @flaky
   Scenario Outline: Admin is able to create reinstated benefit application and employees are able to plan shop in the new reinstaed PY
     Given initial employer ABC Widgets has active benefit application
     And there is a census employee record and employee role for Patrick Doe for employer ABC Widgets
