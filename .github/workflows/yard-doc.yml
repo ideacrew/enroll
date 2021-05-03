@@ -1,10 +1,10 @@
 name: yard doc generation
 on:
   push:
-    branches:
-      - trunk
     paths:
       - "hugo/**"
+    branches:
+      - trunk
 
 jobs:
   docs_deployment:
