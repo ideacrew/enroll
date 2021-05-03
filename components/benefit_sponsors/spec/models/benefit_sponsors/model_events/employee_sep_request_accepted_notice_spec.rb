@@ -44,7 +44,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeSepRequestAccepted', :dbcl
         allow(model_instance).to receive(:family).and_return(family)
         allow(family).to receive(:primary_applicant).and_return(fm)
         allow(fm).to receive(:person).and_return(person)
-        EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_shop_market).and_return(true)
       end
 
       it "should trigger notice event" do
@@ -67,7 +67,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeSepRequestAccepted', :dbcl
         allow(family).to receive(:primary_applicant).and_return(fm)
         allow(fm).to receive(:person).and_return(person)
         allow(person).to receive(:has_multiple_active_employers?).and_return(true)
-        EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_shop_market).and_return(true)
       end
 
       it "should trigger notice event" do
