@@ -1,10 +1,6 @@
 name: yard doc generation
 on:
   push:
-    paths:
-      - "hugo/**"
-    branches:
-      - trunk
 
 jobs:
   docs_deployment:
@@ -17,23 +13,20 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: '12'
-      - name: Install global packages
-        run: |
-          yarn install
-          npm install -g postcss postcss-cli autoprefixer
-      - uses: ruby/setup-ruby@v1
-      - uses: actions/cache@v2
-        with:
-          path: vendor/bundle
-          key: v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
-          restore-keys: |
-            v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
-      - name: Install project gems
-        run: |
-          bundle config path vendor/bundle
-          bundle install
-      - name: Run yard
-        run: bundle exec yard doc && mv ./doc ./hugo/static/yard
+      - run: cd hugo && npm ci    
+      # - uses: ruby/setup-ruby@v1
+      # - uses: actions/cache@v2
+      #   with:
+      #     path: vendor/bundle
+      #     key: v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
+      #     restore-keys: |
+      #       v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
+      # - name: Install project gems
+      #   run: |
+      #     bundle config path vendor/bundle
+      #     bundle install
+      # - name: Run yard
+      #   run: bundle exec yard doc && mv ./doc ./hugo/static/yard
       - run: sudo snap install hugo --channel=extended
       - run: cd hugo && hugo --minify
       - uses: jakejarvis/s3-sync-action@master
