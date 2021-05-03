@@ -323,7 +323,7 @@ RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
                         household: household,
                         product: product,
                         effective_on: TimeKeeper.date_of_record.beginning_of_year,
-                        kind: 'individual')
+                        kind: 'employer_sponsored')
     end
 
     before :each do
@@ -342,6 +342,12 @@ RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
     it 'should return true if current date is equal to enrollment effective date' do
       allow(TimeKeeper).to receive(:date_of_record).and_return(hbx_enrollment.effective_on)
       expect(helper.show_pay_now?("Enrollment Tile", hbx_enrollment)).to eq true
+    end
+
+    it 'should return false if enrollment kind is employer sponsored' do
+      allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
+      allow(TimeKeeper).to receive(:date_of_record).and_return(hbx_enrollment1.effective_on)
+      expect(helper.show_pay_now?("Enrollment Tile", hbx_enrollment1)).to eq false
     end
   end
 end
