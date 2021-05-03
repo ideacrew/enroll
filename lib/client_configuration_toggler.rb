@@ -55,6 +55,16 @@ class ClientConfigurationToggler < MongoidMigrationTask
     end
   end
 
+  def checkout_straggler_files
+    straggler_files = Dir.glob("#{old_config_folder}/**/*").select { |e| File.file? e }
+    straggler_files.reject { |file| file.include?('system') }.each do |filename_in_config_directory|
+      # Cut off the filename parts with config namespace
+      puts("Checking out old config app assets and other straggler files.")
+      filename_without_root = filename_in_config_directory.sub("#{old_config_folder}/", '')
+      `git checkout #{filename_without_root}`
+    end
+  end
+
   def migrate
     @old_configured_state_abbreviation = old_configured_state_abbreviation
     @target_client_state_abbreviation = target_client_state_abbreviation
@@ -68,6 +78,7 @@ class ClientConfigurationToggler < MongoidMigrationTask
     copy_target_configuration_to_system_folder
     copy_current_configuration_to_engines
     copy_app_assets_and_straggler_files
+    checkout_straggler_files
     puts("Client configuration toggle complete system complete. enroll_app.yml file is now set to:")
     result = `cat system/config/templates/features/enroll_app/enroll_app.yml`
     puts(result[0..800])
