@@ -517,9 +517,9 @@ RSpec.describe VerificationHelper, :type => :helper do
     it_behaves_like "admin actions dropdown list", "Citizenship", "verified","verification_outstanding", ["Verify", "Reject", "View History", "Call HUB", "Extend"]
     it_behaves_like "admin actions dropdown list", "Citizenship", "in review","unverified", ["Verify", "Reject", "View History", "Extend"]
     it_behaves_like "admin actions dropdown list", "Citizenship", "outstanding","verification_outstanding", ["Verify", "View History", "Call HUB", "Extend"]
-    it_behaves_like "admin actions dropdown list", "DC Residency", "attested", "unverified",["Verify", "Reject", "View History", "Extend"]
-    it_behaves_like "admin actions dropdown list", "DC Residency", "outstanding", "verification_outstanding",["Verify", "View History", "Call HUB", "Extend"]
-    it_behaves_like "admin actions dropdown list", "DC Residency", "in review","verification_outstanding", ["Verify", "Reject", "View History", "Call HUB", "Extend"]
+    it_behaves_like "admin actions dropdown list", VerificationType::LOCATION_RESIDENCY, "attested", "unverified",["Verify", "Reject", "View History", "Extend"]
+    it_behaves_like "admin actions dropdown list", VerificationType::LOCATION_RESIDENCY, "outstanding", "verification_outstanding",["Verify", "View History", "Call HUB", "Extend"]
+    it_behaves_like "admin actions dropdown list", VerificationType::LOCATION_RESIDENCY, "in review","verification_outstanding", ["Verify", "Reject", "View History", "Call HUB", "Extend"]
   end
 
   describe "#request response details" do
@@ -594,11 +594,11 @@ RSpec.describe VerificationHelper, :type => :helper do
       end
     end
 
-    it_behaves_like "request response details", "DC Residency", "local_residency_request", "residency_verification_request"
+    it_behaves_like "request response details", VerificationType::LOCATION_RESIDENCY, "local_residency_request", "residency_verification_request"
     it_behaves_like "request response details", "Social Security Number", "ssa_request", "ssa_verification_request"
     it_behaves_like "request response details", "Citizenship", "ssa_request", "ssa_verification_request"
     it_behaves_like "request response details", "Immigration status", "vlp_request", "lawful_presence_request"
-    it_behaves_like "request response details", "DC Residency", "local_residency_response", "residency_verification_response"
+    it_behaves_like "request response details", VerificationType::LOCATION_RESIDENCY, "local_residency_response", "residency_verification_response"
     it_behaves_like "request response details", "Social Security Number", "ssa_response", "ssa_verification_response"
     it_behaves_like "request response details", "Citizenship", "ssa_response", "ssa_verification_response"
     it_behaves_like "request response details", "Immigration status", "vlp_response", "lawful_presence_response"
