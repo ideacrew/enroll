@@ -920,7 +920,7 @@ class ConsumerRole
   def mark_residency_pending(*args)
     update_attributes(:residency_determined_at => DateTime.now,
                       :is_state_resident => nil)
-    verification_types.by_name(VerificationType::LOCATION_RESIDENCY).first.pending_type
+    verification_types.by_name(VerificationType::LOCATION_RESIDENCY).first.pending_type if verification_types&.by_name(VerificationType::LOCATION_RESIDENCY).present?
   end
 
   def mark_residency_authorized(*args)
