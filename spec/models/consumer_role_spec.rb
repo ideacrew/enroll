@@ -620,12 +620,12 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
           context 'fails residency when verification type is already in review' do
             before do
-              verification_types.by_name("DC Residency").first.update_attributes(validation_status: 'review')
+              verification_types.by_name(VerificationType::LOCATION_RESIDENCY).first.update_attributes(validation_status: 'review')
               consumer.is_state_resident = true
               consumer.fail_residency! verification_attr
             end
             it 'should remain in review' do
-              expect(verification_types.by_name("DC Residency").first.validation_status).to eq 'review'
+              expect(verification_types.by_name(VerificationType::LOCATION_RESIDENCY).first.validation_status).to eq 'review'
             end
           end
         end
@@ -707,27 +707,27 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       end
 
       context "SSN + Citizen" do
-        it_behaves_like "collecting verification types for person", ["DC Residency", "Social Security Number", "Citizenship"], 3, "2222222222", true, nil, 25
+        it_behaves_like "collecting verification types for person", [VerificationType::LOCATION_RESIDENCY, "Social Security Number", "Citizenship"], 3, "2222222222", true, nil, 25
       end
 
       context "SSN + Immigrant" do
-        it_behaves_like "collecting verification types for person", ["DC Residency", "Social Security Number", "Immigration status"], 3, "2222222222", false, nil, 20
+        it_behaves_like "collecting verification types for person", [VerificationType::LOCATION_RESIDENCY, "Social Security Number", "Immigration status"], 3, "2222222222", false, nil, 20
       end
 
       context "SSN + Native Citizen" do
-        it_behaves_like "collecting verification types for person", ["DC Residency", "Social Security Number", "Citizenship", "American Indian Status"], 4, "2222222222", true, "native", 20
+        it_behaves_like "collecting verification types for person", [VerificationType::LOCATION_RESIDENCY, "Social Security Number", "Citizenship", "American Indian Status"], 4, "2222222222", true, "native", 20
       end
 
       context "Citizen with NO SSN" do
-        it_behaves_like "collecting verification types for person", ["DC Residency", "Citizenship"], 2, nil, true, nil, 20
+        it_behaves_like "collecting verification types for person", [VerificationType::LOCATION_RESIDENCY, "Citizenship"], 2, nil, true, nil, 20
       end
 
       context "Immigrant with NO SSN" do
-        it_behaves_like "collecting verification types for person", ["DC Residency", "Immigration status"], 2, nil, false, nil, 20
+        it_behaves_like "collecting verification types for person", [VerificationType::LOCATION_RESIDENCY, "Immigration status"], 2, nil, false, nil, 20
       end
 
       context "Native Citizen with NO SSN" do
-        it_behaves_like "collecting verification types for person", ["DC Residency", "Citizenship", "American Indian Status"], 3, nil, true, "native", 20
+        it_behaves_like "collecting verification types for person", [VerificationType::LOCATION_RESIDENCY, "Citizenship", "American Indian Status"], 3, nil, true, "native", 20
       end
     end
 
@@ -787,10 +787,10 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     it "should move Citizenship verification type to pending state" do
       consumer.lawful_presence_determination.authorize!(verification_attr)
       consumer.revert_lawful_presence(verification_attr)
-      expect(consumer.lawful_presence_determination.aasm_state). to eq "verification_pending"
-      expect(consumer.verification_types.by_name("DC Residency").first.validation_status). to eq "unverified"
-      expect(consumer.verification_types.by_name("Social Security Number").first.validation_status). to eq "unverified"
-      expect(consumer.verification_types.by_name("Citizenship").first.validation_status). to eq "pending"
+      expect(consumer.lawful_presence_determination.aasm_state).to eq "verification_pending"
+      expect(consumer.verification_types.by_name(VerificationType::LOCATION_RESIDENCY).first.validation_status).to eq "unverified"
+      expect(consumer.verification_types.by_name("Social Security Number").first.validation_status).to eq "unverified"
+      expect(consumer.verification_types.by_name("Citizenship").first.validation_status).to eq "pending"
     end
   end
 
