@@ -771,7 +771,7 @@ Then(/^\w+ should (.*) sucess confirmation text$/) do |action|
     expect(page).to have_content "Based on the information you entered, you may be eligible to enroll now but there is limited time"
   else
     message = "The date you submitted does not qualify for special enrollment."
-    message_1 = "Please double check the date or contact #{site_short_name}'s Customer Care Center: #{EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number)&.item}."
+    message_1 = "Please double check the date or contact #{EnrollRegistry[:enroll_app].setting(:contact_center_name).item}: #{EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number)&.item}."
     expect(page).to have_content(message)
     expect(page).to have_content(message_1)
     expect(page).to have_content("Shop for health and dental plans")
