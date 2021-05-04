@@ -1,19 +1,21 @@
+# frozen_string_literal: true
+
 # Simple Role Syntax
 # ==================
 # Supports bulk-adding hosts to roles, the primary server in each group
 # is considered to be the first unless any hosts have the primary
 # property set.  Don't declare `role :all`, it's a meta role.
 
-role :app, %w[nginx@172.30.2.10]
-role :web, %w[nginx@172.30.2.10]
-role :db, %w[nginx@172.30.2.10]
+role :app, %w[nginx@172.30.2.20]
+role :web, %w[nginx@172.30.2.20]
+role :db, %w[nginx@172.30.2.20]
 
 # Extended Server Syntax
 # ======================
 # This can be used to drop a more detailed server definition into the
 # server list. The second argument is a, or duck-types, Hash and is
 # used to set extended properties on the server.
-set :branch, "me_demo"
+set :branch, "me_trunk"
 
 # Custom SSH Options
 # ==================
