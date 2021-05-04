@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
   let(:user) { instance_double("User", :primary_family => test_family, :person => person) }
@@ -14,7 +16,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
   let(:census_employee) { FactoryBot.create(:census_employee) }
 
   before do
-    employer_profile.plan_years << published_plan_year
+    # employer_profile.plan_years << published_plan_year
     employer_profile.save
   end
 
@@ -495,5 +497,100 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
         expect(assigns(:address_errors)).to eq address_errors
       end
     end
+  end
+
+  describe "PUT update, for a SHOP market dependent with an existing person details" do
+
+    include_context "setup benefit market with market catalogs and product packages"
+    include_context "setup initial benefit application"
+
+    let(:husband) { FactoryBot.create(:person, :with_family, :with_consumer_role, first_name: 'Stefan') }
+    let!(:h_family) { husband.primary_family }
+    let(:wife) {FactoryBot.create(:person, :with_family, first_name: 'Natascha')}
+    let!(:w_family) { wife.primary_family }
+    let(:child) {FactoryBot.create(:person, first_name: 'Daniel')}
+    let(:child2) {FactoryBot.create(:person, first_name: 'Aiden')}
+
+    let!(:husbands_family) do
+      husband.person_relationships << PersonRelationship.new(relative_id: husband.id, kind: 'self')
+      husband.person_relationships << PersonRelationship.new(relative_id: wife.id, kind: 'spouse')
+      husband.person_relationships << PersonRelationship.new(relative_id: child.id, kind: 'child')
+      husband.person_relationships << PersonRelationship.new(relative_id: child2.id, kind: 'child')
+      husband.save
+
+      h_family.add_family_member(wife)
+      h_family.add_family_member(child)
+      h_family.add_family_member(child2)
+      h_family.save
+      h_family
+    end
+
+    let!(:wife_family) do
+      wife.person_relationships << PersonRelationship.new(relative_id: wife.id, kind: 'self')
+      wife.person_relationships << PersonRelationship.new(relative_id: child.id, kind: 'child')
+      wife.person_relationships << PersonRelationship.new(relative_id: husband.id, kind: 'spouse')
+      wife.save
+
+      w_family.add_family_member(child)
+      w_family.add_family_member(husband)
+      w_family.save
+      w_family.active_household.immediate_family_coverage_household.coverage_household_members << w_family.active_household.coverage_households.last.coverage_household_members
+      w_family.active_household.coverage_households.last.coverage_household_members.delete_all
+      w_family
+    end
+
+    let(:employee_role) { FactoryBot.create(:employee_role, employer_profile: abc_profile) }
+    let(:census_employee) { FactoryBot.create(:census_employee, employee_role_id: employee_role.id, employer_profile: abc_profile) }
+
+    let(:dependent_id) { wife_family.family_members.last.id.to_s }
+    let(:user) { instance_double("User", :primary_family => wife_family, :person => wife) }
+
+    let(:dependent) { Forms::FamilyMember.new(dependent_update_properties.merge({:family_id => wife_family.id, :is_applying_coverage => "false"})) }
+
+    let(:valid_addresses_attributes) do
+      {"0" => {"kind" => "home", "address_1" => "address1_a", "address_2" => "", "city" => "city1", "state" => "DC", "zip" => "22211"},
+       "1" => {"kind" => "mailing", "address_1" => "address1_b", "address_2" => "", "city" => "city1", "state" => "DC", "zip" => "22211" } }
+    end
+
+    let(:family_member) { wife_family.family_members.last }
+
+    let(:dependent_controller_parameters) do
+      ActionController::Parameters.new(dependent_update_properties).permit!
+    end
+
+    let(:dependent_update_properties) do
+      { "addresses" => valid_addresses_attributes, "id" => dependent_id, "first_name" => child2.first_name, "last_name" => child2.last_name, "dob" => child2.dob.strftime("%Y-%m-%d"), "ssn" => child2.ssn, "relationship" => 'child', "same_with_primary" => "true" }
+    end
+
+    before(:each) do
+      wife_family.primary_family_member.person = wife
+      wife_family.save
+      allow(wife).to receive(:employee_roles).and_return([employee_role])
+      allow(employee_role).to receive(:census_employee_id).and_return census_employee.id
+      sign_in(user)
+      allow(FamilyMember).to receive(:find).and_return(family_member)
+      allow(controller).to receive(:update_vlp_documents).and_return(true)
+      allow_any_instance_of(VlpDoc).to receive(:sensitive_info_changed?).and_return([false, false])
+    end
+
+    it "should render the show template" do
+      expect(wife_family.active_household.immediate_family_coverage_household.coverage_household_members.size).to eq(3)
+      puts "--------------"
+      wife_family.households.first.coverage_households.each do |ch|
+        puts ch.coverage_household_members.map { |chm|
+          chm.family_member.full_name
+        }.join(',')
+      end
+      puts "--------------"
+      put :update, params: {id: dependent_id, dependent: dependent_update_properties}
+      wife_family.reload
+      wife_family.households.first.coverage_households.each do |ch|
+        puts ch.coverage_household_members.map { |chm|
+          chm.family_member.full_name
+        }.join(',')
+      end
+      expect(wife_family.active_household.immediate_family_coverage_household.coverage_household_members.size).to eq(3)
+    end
+
   end
 end
