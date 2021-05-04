@@ -1,12 +1,13 @@
+# frozen_string_literal: true
+
 class VerificationType
   include Mongoid::Document
   include Mongoid::Timestamps
 
   embedded_in :person
 
-  LOCATION_RESIDENCY = EnrollRegistry[:enroll_app].setting(:state_residency).item
-  ALL_VERIFICATION_TYPES = [LOCATION_RESIDENCY, "Social Security Number", "American Indian Status", "Citizenship", "Immigration status"].freeze
-  NON_CITIZEN_IMMIGRATION_TYPES = [LOCATION_RESIDENCY, "Social Security Number", "American Indian Status"].freeze
+  ALL_VERIFICATION_TYPES = ["DC Residency", "Social Security Number", "American Indian Status", "Citizenship", "Immigration status"].freeze
+  NON_CITIZEN_IMMIGRATION_TYPES = ["DC Residency", "Social Security Number", "American Indian Status"].freeze
 
   VALIDATION_STATES = %w[na unverified pending review outstanding verified attested expired curam].freeze
   OUTSTANDING_STATES = %w[outstanding].freeze
@@ -25,16 +26,15 @@ class VerificationType
   scope :active, -> { where(:inactive.ne => true) }
   scope :by_name, ->(type_name) { where(:type_name => type_name) }
 
-  # embeds_many :external_service_responses  -> needs datamigration
   embeds_many :type_history_elements, class_name: "::FinancialAssistance::TypeHistoryElement"
 
 
   embeds_many :vlp_documents, as: :documentable do
-
     def uploaded
       @target.select{|document| document.identifier }
     end
   end
+
 
   def type_unverified?
     !type_verified?
@@ -72,9 +72,9 @@ class VerificationType
     update_attributes(:validation_status => "curam")
   end
 
-  # This self_attestion status is only used for state Residency
+  # This self_attestion status is only used for DC Residency
   def attest_type
-    update_attributes({validation_status: 'attested', update_reason: "Self Attest #{LOCATION_RESIDENCY}"})
+    update_attributes({validation_status: 'attested', update_reason: 'Self Attest DC Residency'})
   end
 
   def pass_type

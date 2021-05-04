@@ -20,11 +20,11 @@ module Config::ContactCenterConcern
     end
 
     def contact_center_short_number
-      @contact_center_short_number ||= EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item
+      @contact_center_short_number ||= Settings.contact_center.short_number
     end
 
     def contact_center_tty_number
-      @contact_center_tty_number ||= EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item
+      @contact_center_tty_number ||= Settings.contact_center.tty_number
     end
   end
 end
