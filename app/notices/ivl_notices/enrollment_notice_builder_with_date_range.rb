@@ -157,7 +157,7 @@ class IvlNotices::EnrollmentNoticeBuilderWithDateRange < IvlNotice
   end
 
   def residency_outstanding?(person)
-    person.consumer_role.types_include_to_notices.include?('DC Residency')
+    person.consumer_role.types_include_to_notices.include?(VerificationType::LOCATION_RESIDENCY)
   end
 
   def append_unverified_individuals(people)

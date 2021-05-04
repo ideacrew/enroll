@@ -694,7 +694,7 @@ class ConsumerRole
   def ensure_verification_types
     if person
       live_types = []
-      live_types << 'DC Residency'
+      live_types << VerificationType::LOCATION_RESIDENCY
       live_types << 'Social Security Number' if ssn
       live_types << 'American Indian Status' if !(tribal_id.nil? || tribal_id.empty?)
       if us_citizen
@@ -913,14 +913,14 @@ class ConsumerRole
   def mark_residency_denied(*args)
     update_attributes(:residency_determined_at => DateTime.now,
                       :is_state_resident => false)
-    type = verification_types.by_name("DC Residency").first
-    verification_types.by_name("DC Residency").first.fail_type if type && type.validation_status != 'review'
+    type = verification_types.by_name(VerificationType::LOCATION_RESIDENCY).first
+    verification_types.by_name(VerificationType::LOCATION_RESIDENCY).first.fail_type if type && type.validation_status != 'review'
   end
 
   def mark_residency_pending(*args)
     update_attributes(:residency_determined_at => DateTime.now,
                       :is_state_resident => nil)
-    verification_types.by_name("DC Residency").first.pending_type if verification_types.by_name("DC Residency").first
+    verification_types.by_name(VerificationType::LOCATION_RESIDENCY).first.pending_type
   end
 
   def mark_residency_authorized(*args)
@@ -928,9 +928,9 @@ class ConsumerRole
                       :is_state_resident => true)
 
     if args&.first&.self_attest_residency
-      verification_types.by_name('DC Residency').first.attest_type
+      verification_types.by_name(VerificationType::LOCATION_RESIDENCY).first.attest_type
     else
-      verification_types.by_name('DC Residency').first.pass_type
+      verification_types.by_name(VerificationType::LOCATION_RESIDENCY).first.pass_type
     end
   end
 
@@ -964,7 +964,7 @@ class ConsumerRole
   end
 
   def residency_pending?
-    (local_residency_validation == "pending" || is_state_resident.nil?) && verification_types.by_name("DC Residency").first.validation_status != "attested"
+    (local_residency_validation == "pending" || is_state_resident.nil?) && verification_types.by_name(VerificationType::LOCATION_RESIDENCY).first.validation_status != "attested"
   end
 
   def residency_denied?
@@ -1005,7 +1005,7 @@ class ConsumerRole
         update_attributes(:lawful_presence_rejected => false)
       when "American Indian Status"
         update_attributes(:native_rejected => false)
-      when "DC Residency"
+    when VerificationType::LOCATION_RESIDENCY #rubocop insists on this indentation on lines with this variable only
         update_attributes(:residency_rejected => false)
     end
   end
@@ -1038,12 +1038,11 @@ class ConsumerRole
 
   def move_types_to_pending(*args)
     verification_types.each do |type|
-      type.pending_type unless (type.type_name == "DC Residency") || (type.type_name == "American Indian Status")
+      type.pending_type unless (type.type_name == VerificationType::LOCATION_RESIDENCY) || (type.type_name == "American Indian Status")
     end
   end
 
   def pass_lawful_presence(*args)
-    return if lawful_presence_authorized?
     lawful_presence_determination.authorize!(*args)
     verification_types.reject{|type| VerificationType::NON_CITIZEN_IMMIGRATION_TYPES.include? type.type_name }.each{ |type| type.pass_type }
   end
@@ -1108,7 +1107,7 @@ class ConsumerRole
   def return_doc_for_deficiency(v_type, update_reason, *authority)
     message = "#{v_type.type_name} was rejected."
     v_type.update_attributes(:validation_status => "outstanding", :update_reason => update_reason, :rejected => true)
-    if  v_type.type_name == "DC Residency"
+    if  v_type.type_name == VerificationType::LOCATION_RESIDENCY
       mark_residency_denied
     elsif ["Citizenship", "Immigration status"].include? v_type.type_name
       lawful_presence_determination.deny!(verification_attr(authority.first))
@@ -1144,7 +1143,7 @@ class ConsumerRole
     status = authority.first == "curam" ? "curam" : "verified"
     message = "#{v_type.type_name} successfully verified."
     self.verification_types.find(v_type).update_attributes(:validation_status => status, :update_reason => update_reason)
-    if v_type.type_name == "DC Residency"
+    if v_type.type_name == VerificationType::LOCATION_RESIDENCY
       update_attributes(:is_state_resident => true, :residency_determined_at => TimeKeeper.datetime_of_record)
     elsif ["Citizenship", "Immigration status"].include? v_type.type_name
       lawful_presence_determination.authorize!(verification_attr(authority.first))

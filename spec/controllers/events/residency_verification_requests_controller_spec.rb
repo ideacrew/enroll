@@ -7,6 +7,7 @@ describe Events::ResidencyVerificationRequestsController do
     let(:rendered_template) { double }
     let(:mock_end_time) { (mock_now + 24.hours).to_i }
     let(:mock_now) { Time.mktime(2015,5,21,12,29,39) }
+    let(:state_residency) { EnrollRegistry[:enroll_app].setting(:state_residency).item }
 
     before do
       person.consumer_role.verification_type_history_elements.delete_all
@@ -35,12 +36,12 @@ describe Events::ResidencyVerificationRequestsController do
     end
 
     it "stores verification history element with proper verification type" do
-      expect(person.verification_types.active.where(type_name: "DC Residency").first.type_history_elements.first.action).to eq "Local Hub Request"
+      expect(person.verification_types.active.where(type_name: state_residency).first.type_history_elements.first.action).to eq "Local Hub Request"
     end
 
     it "stores reference to event_request document" do
       expect(person.consumer_role.local_residency_requests.first.id).to eq BSON::ObjectId.from_string(
-        person.verification_types.active.where(type_name: "DC Residency").first.type_history_elements.first.event_request_record_id
+        person.verification_types.active.where(type_name: state_residency).first.type_history_elements.first.event_request_record_id
       )
     end
   end

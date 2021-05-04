@@ -29,6 +29,8 @@ registry:
             item: ""
           - key: :submit_docs_url
             item: ""
+          - key: :state_residency
+            item: "ME Residency"
           - key: :site_key
             item: :me
           - key: :state_abbreviation
