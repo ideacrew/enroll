@@ -11,7 +11,9 @@ module Events
       event_payload = render_to_string "events/residency/verification_request", :formats => ["xml"], :locals => { :individual => individual }
       event_request_record = EventRequest.new({requested_at: Time.now, body: event_payload})
       individual.consumer_role.local_residency_requests << event_request_record
-      individual.verification_types.by_name("DC Residency").first.add_type_history_element(action: "Local Hub Request",
+      # TODO: This needs to be refactored elsewhere, but it will not fail in DC if we add this
+      state_abbreviation = EnrollRegistry[:enroll_app].setting(:state_abbreviation).item
+      individual.verification_types.by_name("#{state_abbreviation} Residency").first.add_type_history_element(action: "Local Hub Request",
                                                                                            modifier: "Enroll App",
                                                                                            update_reason: "Hub request",
                                                                                            event_request_record_id: event_request_record.id)
