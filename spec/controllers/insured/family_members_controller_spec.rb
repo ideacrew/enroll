@@ -505,35 +505,35 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
     include_context "setup initial benefit application"
 
     let(:husband) { FactoryBot.create(:person, :with_family, :with_consumer_role, first_name: 'Stefan') }
-    let!(:h_family) { husband.primary_family }
+    let(:h_family) { husband.primary_family }
     let(:wife) {FactoryBot.create(:person, :with_family, first_name: 'Natascha')}
-    let!(:w_family) { wife.primary_family }
+    let(:w_family) { wife.primary_family }
     let(:child) {FactoryBot.create(:person, first_name: 'Daniel')}
     let(:child2) {FactoryBot.create(:person, first_name: 'Aiden')}
 
     let!(:husbands_family) do
-      husband.person_relationships << PersonRelationship.new(relative_id: husband.id, kind: 'self')
-      husband.person_relationships << PersonRelationship.new(relative_id: wife.id, kind: 'spouse')
-      husband.person_relationships << PersonRelationship.new(relative_id: child.id, kind: 'child')
-      husband.person_relationships << PersonRelationship.new(relative_id: child2.id, kind: 'child')
-      husband.save
+      husband.person_relationships.create!(relative_id: husband.id, kind: 'self')
+      husband.person_relationships.create!(relative_id: wife.id, kind: 'spouse')
+      husband.person_relationships.create!(relative_id: child.id, kind: 'child')
+      husband.person_relationships.create!(relative_id: child2.id, kind: 'child')
+      husband.save!
 
       h_family.add_family_member(wife)
       h_family.add_family_member(child)
       h_family.add_family_member(child2)
-      h_family.save
+      h_family.save!
       h_family
     end
 
     let!(:wife_family) do
-      wife.person_relationships << PersonRelationship.new(relative_id: wife.id, kind: 'self')
-      wife.person_relationships << PersonRelationship.new(relative_id: child.id, kind: 'child')
-      wife.person_relationships << PersonRelationship.new(relative_id: husband.id, kind: 'spouse')
+      wife.person_relationships.create!(relative_id: wife.id, kind: 'self')
+      wife.person_relationships.create!(relative_id: child.id, kind: 'child')
+      wife.person_relationships.create!(relative_id: husband.id, kind: 'spouse')
       wife.save
 
       w_family.add_family_member(child)
       w_family.add_family_member(husband)
-      w_family.save
+      w_family.save!
       w_family.active_household.immediate_family_coverage_household.coverage_household_members << w_family.active_household.coverage_households.last.coverage_household_members
       w_family.active_household.coverage_households.last.coverage_household_members.delete_all
       w_family
@@ -563,6 +563,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
     end
 
     before(:each) do
+      dependent.save
       wife_family.primary_family_member.person = wife
       wife_family.save
       allow(wife).to receive(:employee_roles).and_return([employee_role])
