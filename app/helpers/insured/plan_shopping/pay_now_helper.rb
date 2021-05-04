@@ -17,7 +17,7 @@ module Insured
         if source == "Plan Shopping"
           can_pay_now?(hbx_enrollment) && !pay_now_button_timed_out?(hbx_enrollment) ? true : false
         else
-          can_pay_now?(hbx_enrollment) && past_or_on_effective_on?(hbx_enrollment) ? true : false
+          can_pay_now?(hbx_enrollment) && past_effective_on?(hbx_enrollment) ? true : false
         end
       end
 
@@ -58,8 +58,8 @@ module Insured
         covered_time.transition_at + 15.minutes <= Time.now
       end
 
-      def past_or_on_effective_on?(hbx_enrollment)
-        return true if hbx_enrollment.effective_on >= TimeKeeper.date_of_record
+      def past_effective_on?(hbx_enrollment)
+        return true if hbx_enrollment.effective_on > TimeKeeper.date_of_record
       end
 
       def has_break_in_coverage_enrollments?(hbx_enrollment)
