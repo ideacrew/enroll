@@ -548,6 +548,10 @@ And(/^\w+ should see able to see make changes to my coverage button$/) do
   page.all('a', text: 'Make changes to my coverage').first
 end
 
+Then(/^\w+ should not see able to see make changes for my new plan$/) do
+  expect(page).not_to have_content("Make a first payment for my new plan")
+end
+
 When(/^\w+ clicks on the make changes to my coverage button/) do
   enable_change_tax_credit_button
   page.execute_script("document.querySelector('#make-changes-btn').click()")
