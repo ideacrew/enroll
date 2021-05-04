@@ -1,6 +1,6 @@
 Mongoid::Migration.say_with_time("Load MA Benefit Market Catalogs") do
 
-  site = BenefitSponsors::Site.where(site_key: "#{SEnrollRegistry[:enroll_app].setting(:subdomain).item}").first
+  site = BenefitSponsors::Site.where(site_key: EnrollRegistry[:enroll_app].setting(:subdomain).item).first
 
   benefit_market = BenefitMarkets::BenefitMarket.where(:site_urn => EnrollRegistry[:enroll_app].setting(:site_key).item, kind: :aca_shop).first
 
