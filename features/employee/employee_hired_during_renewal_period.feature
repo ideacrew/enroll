@@ -35,6 +35,7 @@ Feature: Employee hired during renewal period
     And Patrick Doe should see passive renewal
     When Employee should be able to see Actions dropdown
     Then Employee clicks on the Actions button
+    Then Employee should not see able to see make changes for my new plan
     When Employee clicks on the make changes to my coverage button
     Then Employee should see the group selection page
     When Employee clicks continue on the group selection page
