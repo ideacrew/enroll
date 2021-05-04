@@ -5,7 +5,7 @@ module FinancialAssistance
     include ::UIHelpers::WorkflowController
 
     before_action :find, :find_application, :except => [:age_of_applicant] #except the ajax requests
-    before_action :load_support_texts, only: [:other_questions, :step, :new, :edit]
+    before_action only: [:other_questions, :step, :new, :edit]
 
     def new
       @applicant = FinancialAssistance::Forms::Applicant.new(:application_id => params.require(:application_id))
@@ -25,7 +25,6 @@ module FinancialAssistance
         if success
           format.js { render js: "window.location = '#{edit_application_path(@application)}'"}
         else
-          load_support_texts
           format.js { render 'new' }
         end
       end

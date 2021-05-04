@@ -12,7 +12,7 @@ module UIHelpers
 
       before_action :find_or_create, only: :step
       before_action :load_steps, only: :step
-      before_action :load_support_texts, only: :step
+      before_action only: :step
       before_action :current_step, only: :step
     end
 
@@ -32,12 +32,6 @@ module UIHelpers
     def load_steps
       filename = lookup_context.find_template("#{controller_path}/steps.yml").identifier
       @steps = Workflow::Steps.new YAML.load_file(filename)
-    end
-
-    def load_support_texts
-      file_path = lookup_context.find_template("financial_assistance/shared/support_text.yml").identifier
-      raw_support_text = YAML.safe_load(File.read(file_path)).with_indifferent_access
-      @support_texts = support_text_placeholders raw_support_text
     end
 
     def current_step

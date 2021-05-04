@@ -6,7 +6,7 @@ module FinancialAssistance
     include NavigationHelper
 
     before_action :find_application_and_applicant
-    before_action :load_support_texts, only: [:index, :other]
+    before_action only: [:index, :other]
 
     layout "financial_assistance_nav", only: [:index, :other, :new, :step]
 
