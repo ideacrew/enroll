@@ -29,8 +29,6 @@ registry:
             item: ""
           - key: :submit_docs_url
             item: ""
-          - key: :state_residency
-            item: "ME Residency"
           - key: :site_key
             item: :me
           - key: :state_abbreviation
@@ -84,7 +82,7 @@ registry:
           - key: :employer_application_deadline_link
             item: ""
           - key: :s3_prefix
-            item: "cme"
+            item: "mehbx"
           - key: :broker_quoting_enabled
             item: false
           - key: :broker_claim_quoting_enabled
@@ -196,8 +194,6 @@ registry:
             item: "Cover ME's Customer Care Center"
           - key: :contact_center_short_number
             item: "(855) 532-5465"
-          - key: :contact_center_tty_number # Need to figure out what this should be for Maine
-            item: "711"
           - key: :producer_advisory_committee_url
             item: ""
           - key: :mailer_logo_file_name
@@ -232,16 +228,6 @@ registry:
             item: ""
           - key: :geographic_rating_area_model
             item: "county"
-          - key: :dental_plan_years_available
-            item: [""]
-          - key: :sole_source_carriers_available
-            item: ['']
-          - key: :metal_level_carriers_available
-            item: ['']
-          - key: :single_carriers_available
-            item: ['']
-          - key: :plan_year_tooltip
-            item: ""
       - key: :rating_area
         item: :rating_area
         is_enabled: false
@@ -253,7 +239,7 @@ registry:
         is_enabled: true
         settings:
           - key: :service_area_model
-            item: 'county'
+            item: 'single'
       - key: :site_database_seed
         item: :site_database_seed
         is_enabled: true
@@ -290,7 +276,7 @@ registry:
             item: "CoverME_WebsiteHeader_01.jpg"
       - key: :tobacco_cost
         item: :tobacco_cost
-        is_enabled: false
+        is_enabled: true
       - key: :counties_import
         is_enabled: true
         item: "SHOP_ZipCode_CY2021_FINAL_ME.xlsx"
@@ -342,11 +328,3 @@ registry:
         is_enabled: false # Should return true for MA, see employer_profile_builder.rb
       - key: :hmo_ppo_plan_type # Should be true for MA
         is_enabled: false
-      - key: :dental_market
-        is_enabled: true
-      - key: :qle_within_sixty_days
-        item: :qle_within_sixty_days
-        is_enabled: true
-        settings:
-          - key: :days
-            item: 60
