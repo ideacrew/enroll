@@ -559,7 +559,10 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
     end
 
     let(:dependent_update_properties) do
-      { "addresses" => valid_addresses_attributes, "id" => dependent_id, "first_name" => child2.first_name, "last_name" => child2.last_name, "dob" => child2.dob.strftime("%Y-%m-%d"), "ssn" => child2.ssn, "relationship" => 'child', "same_with_primary" => "true" }
+      {
+        "addresses" => valid_addresses_attributes, "id" => dependent_id, "first_name" => child2.first_name, "last_name" => child2.last_name,
+        "dob" => child2.dob.strftime("%Y-%m-%d"), "ssn" => child2.ssn, "relationship" => 'child', "same_with_primary" => "true"
+      }
     end
 
     before(:each) do
