@@ -14,17 +14,17 @@ RSpec.describe Operations::CallFedHub, type: :model, dbclean: :after_each do
     end
   end
 
-  context 'DC Residency' do
-    let(:dc_type) { FactoryBot.build(:verification_type, type_name: 'DC Residency') }
+  context 'Local Residency' do
+    let(:local_type) { FactoryBot.build(:verification_type, type_name: EnrollRegistry[:enroll_app].setting(:state_residency).item) }
 
     before :each do
-      person.verification_types = [dc_type]
+      person.verification_types = [local_type]
       person.consumer_role.update_attributes!(aasm_state: 'verification_outstanding')
       person.consumer_role.save!
     end
 
-    it 'should success for DC Residency' do
-      result = subject.call(person_id: person.id, verification_type: dc_type.type_name)
+    it 'should success for local Residency' do
+      result = subject.call(person_id: person.id, verification_type: local_type.type_name)
       expect(result.success).to eq([:success, "Request was sent to Local Residency."])
     end
   end
