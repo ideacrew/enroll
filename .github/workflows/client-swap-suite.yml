@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        client-name: ['me']
+        client-name: ['me', 'dc']
     steps:
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
