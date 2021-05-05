@@ -1188,7 +1188,7 @@ class ConsumerRole
                     to_state: aasm.to_state,
                     event: aasm.current_event,
                     user_id: SAVEUSER[:current_user_id] }
-    wfst_params.merge!({ reason: "Self Attest #{VerificationType::LOCATION_RESIDENCY} Residency" }) if args&.first.is_a?(OpenStruct) && args&.first&.self_attest_residency
+    wfst_params.merge!({ reason: "Self Attest #{VerificationType::LOCATION_RESIDENCY}" }) if args&.first.is_a?(OpenStruct) && args&.first&.self_attest_residency
     workflow_state_transitions << WorkflowStateTransition.new(wfst_params)
   end
 
