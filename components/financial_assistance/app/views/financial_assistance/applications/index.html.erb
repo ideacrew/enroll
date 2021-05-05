@@ -19,6 +19,7 @@
           <%= hidden_field_tag :is_applying_for_assistance, true %>
           <%= submit_tag "Start new application", onclick: "StartNewAppModal()", class: "btn btn-primary pull-right"%>
         <% end %>
+        <% end %>
         <%= raw "&nbsp;" * 10%>
       </div>
       <%if @applications.present?%>
