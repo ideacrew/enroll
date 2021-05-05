@@ -69,3 +69,6 @@ registry:
       - key: :employer_datatable_source_kinds
         item: :employer_datatable_source_kinds
         is_enabled: false
+      - key: :employer_attestation
+        item: :employer_attestation
+        is_enabled: false
