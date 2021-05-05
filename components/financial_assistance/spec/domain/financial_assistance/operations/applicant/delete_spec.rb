@@ -75,7 +75,7 @@ RSpec.describe FinancialAssistance::Operations::Applicant::Delete, dbclean: :aft
                      "county" => "Hampden",
                      "country_name" => "",
                      "kind" => "home",
-                     "address_1" => "1111 Awesome Street",
+                     "address_1" => "1111 Awesome Street NE",
                      "city" => "Washington",
                      "state" => "DC",
                      "zip" => "01001"}],
