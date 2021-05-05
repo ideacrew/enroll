@@ -9,7 +9,8 @@ class ConsumerRole
   include Mongoid::Attributes::Dynamic
 
   embedded_in :person
-
+  # Just added here to simplify engine
+  LOCATION_RESIDENCY = EnrollRegistry[:enroll_app].setting(:state_residency).item
   VLP_AUTHORITY_KINDS = %w[ssa dhs hbx curam].freeze
   NATURALIZED_CITIZEN_STATUS = "naturalized_citizen"
   INDIAN_TRIBE_MEMBER_STATUS = "indian_tribe_member"
@@ -658,7 +659,7 @@ class ConsumerRole
   def ensure_verification_types
     if person
       live_types = []
-      live_types << VerificationType::LOCATION_RESIDENCY
+      live_types << LOCATION_RESIDENCY
       live_types << 'Social Security Number' if ssn
       live_types << 'American Indian Status' unless tribal_id.nil? || tribal_id.empty?
       if us_citizen
@@ -797,7 +798,7 @@ class ConsumerRole
   def can_trigger_residency?(family, opts)
     person.age_on(TimeKeeper.date_of_record) > 18 && family.person_has_an_active_enrollment?(person) &&
       ((opts[:dc_status] &&
-        opts[:is_homeless] == "0" && opts[:is_temporarily_out_of_state] == "0") || (person.is_consumer_role_active? && verification_types.by_name(VerificationType::LOCATION_RESIDENCY).first.validation_status == "unverified"))
+        opts[:is_homeless] == "0" && opts[:is_temporarily_out_of_state] == "0") || (person.is_consumer_role_active? && verification_types.by_name(LOCATION_RESIDENCY).first.validation_status == "unverified"))
   end
 
   def add_type_history_element(params)
@@ -831,7 +832,7 @@ class ConsumerRole
   end
 
   def verification_types
-    person.verification_types.active.where(applied_roles: "consumer_role") if person
+    person&.verification_types&.active&.where(applied_roles: "consumer_role")
   end
 
   def check_native_status(family, native_status_changed)
@@ -875,14 +876,14 @@ class ConsumerRole
   def mark_residency_denied(*_args)
     update_attributes(:residency_determined_at => DateTime.now,
                       :is_state_resident => false)
-    type = verification_types.by_name(VerificationType::LOCATION_RESIDENCY).first
-    verification_types.by_name(VerificationType::LOCATION_RESIDENCY).first.fail_type if type && type.validation_status != 'review'
+    type = verification_types.by_name(LOCATION_RESIDENCY).first
+    verification_types.by_name(LOCATION_RESIDENCY).first.fail_type if type && type.validation_status != 'review'
   end
 
   def mark_residency_pending(*_args)
     update_attributes(:residency_determined_at => DateTime.now,
                       :is_state_resident => nil)
-    verification_types.by_name(VerificationType::LOCATION_RESIDENCY).first.pending_type if verification_types&.by_name(VerificationType::LOCATION_RESIDENCY).present?
+    verification_types.by_name(LOCATION_RESIDENCY).first.pending_type if verification_types&.by_name(LOCATION_RESIDENCY).present?
   end
 
   def mark_residency_authorized(*args)
@@ -890,9 +891,9 @@ class ConsumerRole
                       :is_state_resident => true)
 
     if args&.first&.self_attest_residency
-      verification_types.by_name(VerificationType::LOCATION_RESIDENCY).first.attest_type
+      verification_types.by_name(LOCATION_RESIDENCY).first.attest_type
     else
-      verification_types.by_name(VerificationType::LOCATION_RESIDENCY).first.pass_type
+      verification_types.by_name(LOCATION_RESIDENCY).first.pass_type
     end
   end
 
@@ -926,7 +927,7 @@ class ConsumerRole
   end
 
   def residency_pending?
-    (local_residency_validation == "pending" || is_state_resident.nil?) && verification_types.by_name(VerificationType::LOCATION_RESIDENCY).first.validation_status != "attested"
+    (local_residency_validation == "pending" || is_state_resident.nil?) && verification_types.by_name(LOCATION_RESIDENCY).first.validation_status != "attested"
   end
 
   def residency_denied?
@@ -965,7 +966,7 @@ class ConsumerRole
       update_attributes(:lawful_presence_rejected => false)
     when "American Indian Status"
       update_attributes(:native_rejected => false)
-    when VerificationType::LOCATION_RESIDENCY #rubocop insists on this indentation on lines with this variable only
+    when LOCATION_RESIDENCY #rubocop insists on this indentation on lines with this variable only
       update_attributes(:residency_rejected => false)
     end
   end
@@ -997,7 +998,7 @@ class ConsumerRole
 
   def move_types_to_pending(*_args)
     verification_types.each do |type|
-      type.pending_type unless (type.type_name == VerificationType::LOCATION_RESIDENCY) || (type.type_name == "American Indian Status")
+      type.pending_type unless (type.type_name == LOCATION_RESIDENCY) || (type.type_name == "American Indian Status")
     end
   end
 
@@ -1066,7 +1067,7 @@ class ConsumerRole
   def return_doc_for_deficiency(v_type, update_reason, *authority)
     message = "#{v_type.type_name} was rejected."
     v_type.update_attributes(:validation_status => "outstanding", :update_reason => update_reason, :rejected => true)
-    if  v_type.type_name == VerificationType::LOCATION_RESIDENCY
+    if  v_type.type_name == LOCATION_RESIDENCY
       mark_residency_denied
     elsif ["Citizenship", "Immigration status"].include? v_type.type_name
       lawful_presence_determination.deny!(verification_attr(authority.first))
@@ -1102,7 +1103,7 @@ class ConsumerRole
     status = authority.first == "curam" ? "curam" : "verified"
     message = "#{v_type.type_name} successfully verified."
     self.verification_types.find(v_type).update_attributes(:validation_status => status, :update_reason => update_reason)
-    if v_type.type_name == VerificationType::LOCATION_RESIDENCY
+    if v_type.type_name == LOCATION_RESIDENCY
       update_attributes(:is_state_resident => true, :residency_determined_at => TimeKeeper.datetime_of_record)
     elsif ["Citizenship", "Immigration status"].include? v_type.type_name
       lawful_presence_determination.authorize!(verification_attr(authority.first))
@@ -1156,7 +1157,7 @@ class ConsumerRole
                     to_state: aasm.to_state,
                     event: aasm.current_event,
                     user_id: SAVEUSER[:current_user_id] }
-    wfst_params.merge!({ reason: "Self Attest #{VerificationType::LOCATION_RESIDENCY} Residency" }) if args&.first.is_a?(OpenStruct) && args&.first&.self_attest_residency
+    wfst_params.merge!({ reason: "Self Attest #{LOCATION_RESIDENCY} Residency" }) if args&.first.is_a?(OpenStruct) && args&.first&.self_attest_residency
     workflow_state_transitions << WorkflowStateTransition.new(wfst_params)
   end
 
