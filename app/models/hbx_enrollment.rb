@@ -1243,7 +1243,7 @@ class HbxEnrollment
 
   def rating_area
     return @rating_area if defined? @rating_area
-    @rating_area = ::BenefitMarkets::Locations::RatingArea.find(self.rating_area_id)
+    @rating_area = ::BenefitMarkets::Locations::RatingArea.where(id: self.rating_area_id).first
   end
 
   def rating_area=(rating_area)
