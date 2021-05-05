@@ -181,11 +181,10 @@ jobs:
           bundle config path ../../vendor/bundle
           bundle exec rspec --fail-fast
   benefit-sponsors:
-    needs: [rubocop, view_linter]
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        group: [1, 2, 3, 4]
+        group: [1, 2]
     steps:
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1

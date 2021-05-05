@@ -251,6 +251,15 @@ registry:
         settings:
           - key: :effective_period
             item: <%= Date.new(2020,9,18)..Date.new(2021,12,31) %>
+      - key: :manage_account_functionality
+        item: "manage_account"
+        is_enabled: false
+      - key: :edit_personal_info_functionality
+        item: "edit_personal_info"
+        is_enabled: false
+      - key: :display_employer_staff_datatable
+        item: "employer_staff_datatable"
+        is_enabled: false
       - key: :special_cover_header
         item: :special_cover_header
         is_enabled: false

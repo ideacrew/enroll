@@ -41,7 +41,7 @@ module UserWorld
   #    @users_by_role_name[role_name] ||= FactoryBot.create(:user, roles: [role_name])
   #  end
   # end
-  
+
   # perhaps should be an array for suroles
   # example
   # if @admin_roles[subrole]
@@ -127,6 +127,8 @@ end
 And(/^the user is on the Employer Index of the Admin Dashboard$/) do
   visit exchanges_hbx_profiles_path
   find('.interaction-click-control-employers').click
+  find_link('Employers').click
+  wait_for_ajax
 end
 
 And(/^the user is on the Family Index of the Admin Dashboard$/) do

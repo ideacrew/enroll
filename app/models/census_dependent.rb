@@ -6,6 +6,7 @@ class CensusDependent < CensusMember
 
 
   embedded_in :census_employee
+  embedded_in :coverage_record
 
   validates :employee_relationship,
             presence: true,

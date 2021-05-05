@@ -1,0 +1,55 @@
+.general_agency-staff-registration-container
+  h1.mb-4.heading-text#loaded = l10n("general_agency_staff")
+
+  = form_for @staff_member, as: :staff_member, url: { :controller => 'general_agency_staff_roles', action: "create_staff_member" }, remote: true, html: { class: "needs-ajax-validation s508", id: 'broker_staff_registration_form', novalidate: true } do |f|
+    div#broker_staff
+    = f.hidden_field :person_id, value: f.object.person_id
+    = render partial: './ui-components/bs4/v1/forms/broker_ga_staff_information', locals: { f: f }
+    .row.mt-3.general-agency-search
+      div.col-md-6
+        div
+          h5 = l10n("select_your_general_agency")
+        div style='display: flex;'
+          input.col-md-3#general-agency-search-input.form-control.py-2 type="search" placeholder="General Agency Name/NPN" style="margin: 3px 0;"
+          span.input-group-append
+            button.btn.btn-primary.search type="button" onclick="generalAgencySearch(); return false" data-loading-text="Loading..."
+              |
+                #{l10n("search")}
+      .result.col-md-12
+
+    .row.no-pd
+      .col-md-9.col-sm-9.col-xs-12
+        .row.no-buffer
+          .form-group-lg
+            br
+            button.btn.btn-primary[type="submit" disabled='disabled' id= 'general-agency-staff-btn' data={disable_with: "Please wait..."}]
+              = l10n("submit_application")
+
+javascript:
+  validateAjaxForm();
+
+  function generalAgencySearch() {
+    var general_agency_search = document.getElementById('general-agency-search-input').value
+    document.getElementById('general-agency-staff-btn').disabled = true;
+    if (general_agency_search != undefined) {
+      $.ajax({
+        url: '/benefit_sponsors/profiles/general_agencies/general_agency_staff_roles/search_general_agency.js',
+        type: "GET",
+        data: {'q': general_agency_search, "general_agency_registration_page": true}
+      });
+    }
+    ;
+  }
+
+  function selectGeneralAgency(element) {
+    var result = document.querySelectorAll('.result');
+    result.forEach(function (result) {
+      var element = result.querySelectorAll('.select-ga')
+      element.forEach(function (ele) {
+        ele.classList.remove("agency-selected");
+      })
+    });
+    document.getElementById('staff_member_profile_id').value = element.dataset.general_agency_profile_id;
+    element.closest(".select-ga").classList.add('agency-selected')
+    document.getElementById('general-agency-staff-btn').disabled = false;
+  }

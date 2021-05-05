@@ -41,8 +41,10 @@ module Effective
            ["<div class='#{pundit_class(Family, :can_update_ssn?)}'> Edit DOB / SSN </div>".html_safe, edit_dob_ssn_path(id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id}"), 'ajax'],
            ['View Username and Email', get_user_info_exchanges_hbx_profiles_path(person_id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id}"),
             (individual_market_is_enabled? && pundit_allow(Family, :can_view_username_and_email?)) ? 'ajax' : 'disabled'],
+           ['Show/Add Roles', main_app.show_roles_person_path(id: row.primary_applicant.person.id), add_roles_link_type(pundit_allow(HbxProfile, :can_add_role?))],
+           ['Edit Personal Info', main_app.personal_info_person_path(id: row.primary_applicant.person.id), edit_personal_info_link_type(pundit_allow(HbxProfile, :can_edit_personal_info?))],
            ['Collapse Form', hide_form_exchanges_hbx_profiles_path(family_id: row.id, person_id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id}"),'ajax']
-           ]
+          ]
 
           if ::EnrollRegistry.feature_enabled?(:send_secure_message_family)
             dropdown.insert(8, ['Send Secure Message', new_secure_message_exchanges_hbx_profiles_path(person_id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id}"),
@@ -97,6 +99,18 @@ module Effective
 
       def add_sep_link_type(allow)
         allow ? 'ajax' : 'disabled'
+      end
+
+      def add_roles_link_type(allow)
+        feature_enabled = ::EnrollRegistry.feature_enabled?(:manage_account_functionality)
+        policy_accepted_and_allow = feature_enabled && allow
+        policy_accepted_and_allow ? 'static' : 'hide'
+      end
+
+      def edit_personal_info_link_type(allow)
+        feature_enabled = ::EnrollRegistry.feature_enabled?(:edit_personal_info_functionality)
+        policy_accepted_and_allow = feature_enabled && allow
+        policy_accepted_and_allow ? 'static' : 'hide'
       end
 
       def active_admin_dt_enrollments(row)

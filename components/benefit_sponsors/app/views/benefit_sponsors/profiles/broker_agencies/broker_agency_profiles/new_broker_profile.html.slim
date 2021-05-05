@@ -1,0 +1,16 @@
+.container-fluid
+  #broker_agency_form
+    ul
+      li
+        a href="#broker_registration"  = l10n("broker")
+      li
+        a href="#broker_agency_staff"  = l10n("broker_agency_staff")
+    #broker_registration
+      = render :partial => "benefit_sponsors/profiles/registrations/broker_registration_form", locals: {create_action: 'create_broker_profile', manage_portals: true}
+    #broker_agency_staff
+      = render partial: 'benefit_sponsors/profiles/broker_agencies/broker_agency_staff_roles/new_staff_member'
+
+javascript:
+  validateForm();
+
+  $("#broker_agency_form").tabs({});

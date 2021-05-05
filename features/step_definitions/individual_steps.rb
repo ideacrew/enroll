@@ -373,6 +373,7 @@ Then(/I should land on home page$/) do
 end
 
 And(/I click on log out link$/) do
+  find('#dropdownMenuLink').click if ::EnrollRegistry.feature_enabled?(:manage_account_functionality)
   find('.interaction-click-control-logout').click
 end
 

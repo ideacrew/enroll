@@ -1,0 +1,125 @@
+legend Employee Information
+p Since this person is an Employee of this company, we'll also need their information. Select 'Add Dependent' if applicable.
+div data-controller="bulk-notice"
+  .row
+    .col-md-4.mb-3 style='padding-left: 0px;'
+      .col-md-6.optional.hidden
+        label for="inputSsn"  #{l10n('ssn')} *
+        - ssn_present = f.object.ssn.present?
+        = f.text_field :ssn, class: "form-control",  value: f.object.ssn, readonly: ssn_present, placeholder: 'SSN *', id: 'inputSsn', minlength: '9',maxlength:'9', onkeypress:'return isNumberKey(event)'
+        .invalid-feedback
+          | Please enter SSN.
+
+      .col-md-6.optional.hidden
+        label for="inputGender"  #{l10n('gender')} *
+        = f.select :gender, options_for_select(['Male', 'Female'], selected: f.object.gender), {}, class: "form-control", id: 'inputGender'
+        .invalid-feedback
+          | Please select an gender option.
+    .col-md-4.mb-3
+      .optional.hidden
+        label Does this person have other coverage?
+        .form-check style='display: flex;'
+          = f.check_box :has_other_coverage, {id: 'flexCheckDefault', class: 'form-check-input' }, 'true', 'false'
+          label.form-check-label.ml-1 for="flexCheckDefault"
+            | Yes, this person is already enrolled in COBRA/Continuation of Benefits outside of DC Health link.
+  .row
+    .col-md-4.mb-3 style='padding-left: 0px;'
+      .col-md-6.optional.hidden
+        label for="inputHired"  Hired On *
+        = f.text_field :hired_on, placeholder:'MM/DD/YYYY', id:'inputHiredOn', class:'form-control inputHiredOn'
+        .invalid-feedback
+          |
+            Please provide a Hired on date.
+    .col-md-4.mb-3
+      .optional.hidden
+        label Owner?*
+        .form-check style='display: flex;'
+          = f.check_box :is_owner, { id: 'flexCheckDefault', class: 'form-check-input' }, 'true', 'false'
+          label.form-check-label.ml-1 for="flexCheckDefault"
+            | Yes, this person is an owner of this company.
+    .col-md-4.mb-3
+      .optional.hidden
+        label Benefit package*
+        strong You'll need to assign this Employee to a Benefit Package once you create this account.
+  .row style='padding: 15px;'
+    = f.fields_for :address, f.object.address, errors: {}, fieldset: false do |f|
+      = f.hidden_field :kind, value: 'home'
+      .optional.hidden.mx-0[data-controller='zip-check']
+        strong Home Address
+        .row
+          .col-md-4.mb-3
+            label for="inputAddress1" Address 1
+            = f.text_field :address_1, class:"form-control mb-1",  placeholder: "123 Main St", id:'inputAddress1'
+            .invalid-feedback
+              | Please provide a valid address.
+          .col-md-4.mb-3
+            label for="inputAddress2" Address 2
+            = f.text_field :address_2, class:"form-control mb-1",  placeholder: "Address 2", id: 'inputAddress2'
+
+        .row
+          .col-md-4.mb-3
+            label for="inputCity" City
+            = f.text_field :city, class: "form-control mb-1", placeholder: 'CITY', id: 'inputCity'
+            .invalid-feedback
+              | Please provide a valid city.
+          .col-md-4.mb-3
+            .col-md-6 style='padding-left: 2px'
+              label for="inputState" State
+              = f.select(:state, options_for_select(State::NAME_IDS.map(&:last).sort_by {|c| c }, selected: f.object.try(:state)), {include_blank: "SELECT STATE"}, class:'form-control mb-1', id:'inputState')
+              .invalid-feedback
+                | Please select a state.
+            .col-md-6
+              label for="inputZip" Zip
+              = f.text_field :zip, id:'inputZip', class:'form-control mb-1', minlength:'5', maxlength:'5'
+              .invalid-feedback
+                | Please provide a valid zipcode.
+
+        - if (aca_address_query_county && @agency.profile_type != "broker_agency" && @agency.profile_type != "general_agency")
+          .col-md-3.mb-3
+            label for="inputCounty" County
+            = f.select :county, options_for_select([]), {include_blank: "SELECT COUNTY"}, class:'form-control mb-1', id:'inputCounty', data: { options: BenefitMarkets::Locations::CountyZip.all.map(&:county_name).uniq }
+            .invalid-feedback
+              | Please provide a valid county.
+
+    = f.fields_for :email, f.object.email, errors: {}, fieldset: false do |f|
+      .optional.hidden.mx-0
+        .row
+          .col-md-4.mb-3
+            label for="inputAddress1" Contact Preferences
+            = f.select(:kind, options_for_select(Email::KINDS, selected: f.object.try(:kind)), {include_blank: "Select Contact Type"}, class:'form-control mb-1', id:'inputKind')
+            .invalid-feedback
+              | Please select a valid kind.
+          .col-md-4.mb-3
+            = f.text_field :address, class:"form-control mb-1 mt-3",  placeholder: "Email", id: 'inputEmailAddress'
+    .row
+      .optional.hidden
+        .col-md-12.mb-2.dependents
+          strong
+            | Dependents
+        .col-md-12.mb-2#dependent-0
+
+        .col-md-12.mb-2
+          div.add-dependent
+            a.btn.btn-default.btn-sm data-reflex="click->BulkNotice#add_coverage_dependent" data-key='0' Add Dependent
+
+javascript:
+  $('.inputHiredOn').datepicker({
+    dateFormat:'mm/dd/yy',
+    changeYear: true,
+    changeMonth:true,
+    onSelect: function () {
+      $('.inputHiredOn').val(this.value);
+    }
+  })
+
+  document.addEventListener('stimulus-reflex:after', event => {
+    initializeDatepicker();
+  })
+
+  function initializeDatepicker() {
+    $('.inputDependentDob').datepicker({
+      dateFormat:'mm/dd/yy',
+      changeYear: true,
+      changeMonth:true
+    })
+  }

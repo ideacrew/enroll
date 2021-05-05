@@ -86,6 +86,25 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
     end
 
+    describe '#match', dbclean: :after_each do
+
+      let(:person) { FactoryBot.create(:person, :with_ssn, user_id: user.id) }
+      let(:user) { FactoryBot.create(:user)}
+      let(:person_parameters){{dob: person.dob.to_s('-'), first_name: person.first_name, gender: person.gender, last_name: person.last_name, ssn: person.ssn}}
+
+      before :each do
+        sign_in(user)
+      end
+
+      context 'given person id' do
+
+        it "should render match template" do
+          post :match, params: { person_id: person.id, person: person_parameters}
+          expect(response).to render_template('match')
+        end
+      end
+    end
+
     describe "POST match", dbclean: :after_each do
       let(:person_parameters) { { :first_name => "SOMDFINKETHING" } }
       let(:mock_consumer_candidate) { instance_double("Forms::ConsumerCandidate", :valid? => validation_result, ssn: "333224444", dob: Date.new(1975, 8, 15), :first_name => "fname", :last_name => "lname") }

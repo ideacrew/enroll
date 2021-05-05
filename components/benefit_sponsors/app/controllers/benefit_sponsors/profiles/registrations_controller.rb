@@ -8,7 +8,7 @@ module BenefitSponsors
 
       rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
-      layout 'two_column', :only => :edit
+      layout :resolve_layout
 
       def new
         @agency = BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_new(profile_type: profile_type, portal: params[:portal])
@@ -45,7 +45,8 @@ module BenefitSponsors
           flash[:error] = e.message
         end
         params[:profile_type] = profile_type
-        render default_template, :flash => { :error => @agency.errors.full_messages }
+        flash[:error] = @agency.errors.full_messages if flash[:error].blank?
+        render default_template, layout: layout_on_render
       end
 
       def edit
@@ -86,7 +87,22 @@ module BenefitSponsors
         @profile_type = (profile_type_constant_name if valid_profile_types.include?(profile_type_constant_name))
       end
 
+      def resolve_layout
+        case action_name
+        when "new_employer_profile_form"
+          "bootstrap_4_two_column"
+        when "edit"
+          "two_column"
+        end
+      end
+
+      def layout_on_render
+        return 'bootstrap_4_two_column' if params[:manage_portals]
+        'two_column'
+      end
+
       def default_template
+        return :new_employer_profile_form if params[:manage_portals]
         :new
       end
 
@@ -107,9 +123,11 @@ module BenefitSponsors
       end
 
       def registration_params
-        current_user_id = current_user.present? ? current_user.id : nil
+        current_user_id = Person.find(params[:person_id]).user&.id if params[:manage_portals].to_s == 'true' && params[:person_id].present?
+        current_user_id ||= current_user.present? ? current_user.id : nil
+        params[:agency] ||= {}
         agency_params = params.permit(agency: {})
-        agency_params[:agency].merge!({:profile_id => params["id"], :current_user_id => current_user_id})
+        agency_params[:agency].merge!({:profile_id => params["id"], :current_user_id => current_user_id, :person_id => params["person_id"]})
       end
 
       def organization_params

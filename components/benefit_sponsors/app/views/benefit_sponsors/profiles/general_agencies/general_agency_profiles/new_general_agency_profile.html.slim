@@ -1,0 +1,16 @@
+.container-fluid
+  #general_agency_form
+    ul
+      li
+        a href="#general_agency_registration"  = l10n("general_agency")
+      li
+        a href="#general_agency_staff"  = l10n("general_agency_staff")
+    #general_agency_registration
+      = render :partial => "benefit_sponsors/profiles/registrations/general_agency_registration_form", locals: {create_action: 'create_ga_profile', manage_portals: true}
+    #general_agency_staff
+      = render partial: 'benefit_sponsors/profiles/general_agencies/general_agency_staff_roles/new_staff_member'
+
+javascript:
+  validateForm();
+
+  $("#general_agency_form").tabs({});

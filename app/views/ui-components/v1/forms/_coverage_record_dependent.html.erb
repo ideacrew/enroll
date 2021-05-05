@@ -1,0 +1,51 @@
+<div class="dependent-<%= i %>">
+  <div class="row row-form-wrapper no-buffer" style="padding: 15px;">
+    <div class="col-md-12 col-sm-12 col-xs-12" style="padding-top: 5px; padding-bottom: 20px">
+      <%= hidden_field_tag :_destroy %>
+      <%= link_to '#', :class => "remove_fields close-2" do %>
+      <%= image_tag("delete.png") %>
+      <% end %>
+    </div>
+    <div class="col-md-3 col-sm-3 col-xs-12">
+      <label for="firstName"> First Name *</label>
+      <input class="form-control mb-1" placeholder="First name" id="firstName" type="text" value="<%= @dependent&.first_name %>" name="agency[staff_roles_attributes][0][coverage_record][coverage_record_dependents][<%= i %>][first_name]">
+    </div>
+    <div class="col-md-3 col-sm-3 col-xs-12">
+      <label for="middleName"> Middle Name *</label>
+      <input class="form-control mb-1" placeholder="Middle name" id="middleName" type="text" value="<%= @dependent&.middle_name %>" name="agency[staff_roles_attributes][0][coverage_record][coverage_record_dependents][<%= i %>][middle_name]">
+    </div>
+    <div class="col-md-3 col-sm-3 col-xs-12">
+      <label for="lastName"> Last Name *</label>
+      <input class="form-control mb-1" placeholder="Last name" id="lastName" type="text" value="<%= @dependent&.last_name %>" name="agency[staff_roles_attributes][0][coverage_record][coverage_record_dependents][<%= i %>][last_name]">
+    </div>
+    <div class="col-md-3 col-sm-3 col-xs-12">
+      <label for="ssn"> SSN</label>
+      <input class="form-control mb-1" placeholder="SSN" id="ssn" type="number" minlength:'9' maxlength:'9' value="<%= @dependent&.ssn %>" name="agency[staff_roles_attributes][0][coverage_record][coverage_record_dependents][<%= i %>][ssn]">
+    </div>
+    <div class="col-md-3 col-sm-3 col-xs-12">
+      <label for="inputDependentDob"> DOB *</label>
+      <input class="form-control mb-1 inputDependentDob" placeholder="MM/DD/YYYY" id="inputDependentDob" type="text" value="<%= @dependent&.dob %>" name="agency[staff_roles_attributes][0][coverage_record][coverage_record_dependents][<%= i %>][dob]">
+    </div>
+
+    <div class="col-md-3 mb-3 form-group">
+      <label for="inputGender"> Gender *</label>
+      <select class="form-control" id="inputGender" value="<%= @dependent&.gender %>" name="agency[staff_roles_attributes][0][coverage_record][coverage_record_dependents][<%= i %>][gender]">
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+      </select>
+    </div>
+
+    <div class="col-md-3 mb-3 form-group">
+      <% relationships = [["Spouse", 'spouse'], ["Domestic partner", "domestic_partner"], ["Child", "child_under_26"]] %>
+      <label for="inputGender"> Relationship *</label>
+      <select class="form-control" id="inputGender" name="agency[staff_roles_attributes][0][coverage_record][coverage_record_dependents][<%= i %>][employee_relationship]">
+        <% relationships.each do |relationship| %>
+          <option value=<%= relationship[1] %>><%= relationship[0] %></option>
+        <% end %>
+      </select>
+    </div>
+  </div>
+</div>
+
+<div class="mb-2" id=<%= "dependent-#{i+1}"%>>
+</div>
