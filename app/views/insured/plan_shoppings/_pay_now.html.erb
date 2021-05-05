@@ -1,0 +1,33 @@
+<% if show_pay_now?(source, hbx_enrollment) %>
+  <% if can_access_pay_now_button %>
+    <button class="btn btn-primary" data-toggle="modal" data-target="#payNowModal" data-enrollment="<%= hbx_enrollment.hbx_id %>">Pay Now</button>
+  <% else %>
+    <button class="btn btn-primary disabled">Pay Now</button>
+  <% end %>
+<% end %>
+
+<%= render "shared/pay_now_modal", hbx_enrollment: hbx_enrollment %>
+
+<script>
+$("#pay-now").on('click', function (e) {
+    e.preventDefault();
+    $.ajax({
+        type: "GET",
+        url: "/payment_transactions/generate_saml_response",
+        data: {enrollment_id: $("#pay-now").val()},
+        success: function (response) {
+          if (response["error"] != null){
+            alert("We're sorry, but something went wrong. You can try again, or pay once you receive your invoice.")}
+          else if (response["status"] == 404){
+            alert("We're sorry, but something went wrong. You can try again, or pay once you receive your invoice.")}
+          else{
+            document.getElementById("sp").value = response["SAMLResponse"];
+            $("#pay_now_form").submit();
+          }
+        },
+        error: function (response) {
+            // error handling
+        }
+    });
+  });
+</script>

@@ -532,13 +532,45 @@ end
 #   click_link 'Edit Plan'
 # end
 
+When(/^\w+ should be able to see Actions dropdown$/) do
+  page.all("#dropdownMenuButton").count > 0
+end
+
+Then(/^\w+ clicks on the Actions button$/) do
+  page.all("#dropdownMenuButton").first.click
+end
+
+Then(/^\w+ clicks on the Actions button for active enrollment$/) do
+  page.all("#dropdownMenuButton").last.click
+end
+
+And(/^\w+ should see able to see make changes to my coverage button$/) do
+  page.all('a', text: 'Make changes to my coverage').first
+end
+
+Then(/^\w+ should not see able to see make changes for my new plan$/) do
+  expect(page).not_to have_content("Make a first payment for my new plan")
+end
+
+When(/^\w+ clicks on the make changes to my coverage button/) do
+  enable_change_tax_credit_button
+  page.execute_script("document.querySelector('#make-changes-btn').click()")
+  wait_for_ajax
+end
+
+When(/^\w+ clicks on the active enrollment make changes to my coverage button/) do
+  enable_change_tax_credit_button
+  page.execute_script("document.querySelectorAll('#make-changes-btn')[1].click()")
+  wait_for_ajax
+end
+
 Given(/^the automatic application of aptc on enrollment feature configuration is disabled$/) do
   disable_feature :apply_aggregate_to_enrollment
 end
 
 When(/(.*) clicks on the make changes button/) do |_role|
   enable_change_tax_credit_button
-  click_link('Make Changes')
+  page.all('a', text: 'Make changes to my coverage').first.click
   wait_for_ajax
 end
 
