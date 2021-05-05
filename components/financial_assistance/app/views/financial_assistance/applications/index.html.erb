@@ -11,6 +11,11 @@
       </h4>
       <div class="">
         <%= form_tag(main_app.help_paying_coverage_response_insured_consumer_role_index_path, method: :get, id: 'start_new_app') do %>
+        <%if @applications.present? && !all_applications_closed?(@applications) %>
+          <span class="tool-tip" data-toggle="tooltip" data-placement="top" title="You already have an application in progress.">
+            <%= submit_tag "Start new application", class: "btn btn-primary pull-right", disabled: true %>
+          </span>
+        <%else%>
           <%= hidden_field_tag :is_applying_for_assistance, true %>
           <%= submit_tag "Start new application", onclick: "StartNewAppModal()", class: "btn btn-primary pull-right"%>
         <% end %>
@@ -32,7 +37,7 @@
           <% @applications.each do |application| %>
           <tr>
             <td><%=application.hbx_id%></td>
-            <td><%=application.aasm_state%></td>
+            <td><%= application.aasm_state == 'terminated' ? 'closed' : application.aasm_state %></td>
             <td><%=to_est application.created_at%></td>
             <td><%=to_est application.submitted_at%></td>
             <td></td>
@@ -40,7 +45,7 @@
               dropdown = [
                 ['Update Application', edit_application_path(application), application.is_draft? ? 'static' : 'disabled'],
                 ['Copy to new application', copy_application_path(application), application.is_draft? ? 'disabled' : 'static'],
-                ['View Eligibility Determination', eligibility_results_application_path(application), application.is_determined? ? 'static' : 'disabled'],
+                ['View Eligibility Determination', eligibility_results_application_path(application), (application.is_determined? || application.is_terminated?) ? 'static' : 'disabled'],
                 ['Review Application', review_application_path(application), application.is_reviewable? ? 'static' : 'disabled']
               ]
             %>

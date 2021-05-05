@@ -25,7 +25,8 @@ module FinancialAssistance
     MOTIVATION_KINDS  = %w[insurance_affordability].freeze
 
     SUBMITTED_STATUS  = %w[submitted verifying_income].freeze
-    REVIEWABLE_STATUSES = %w[submitted determination_response_error determined].freeze
+    REVIEWABLE_STATUSES = %w[submitted determination_response_error determined terminated].freeze
+    CLOSED_STATUSES = %w[cancelled terminated].freeze
 
     STATES_FOR_VERIFICATIONS = %w[submitted determination_response_error determined].freeze
 
@@ -119,6 +120,7 @@ module FinancialAssistance
 
     scope :submitted, ->{ any_in(aasm_state: SUBMITTED_STATUS) }
     scope :determined, ->{ any_in(aasm_state: "determined") }
+    scope :closed, ->{ any_in(aasm_state: CLOSED_STATUSES) }
     scope :by_hbx_id, ->(hbx_id) { where(hbx_id: hbx_id) }
     scope :for_verifications, -> { where(:aasm_state.in => STATES_FOR_VERIFICATIONS)}
     scope :by_year, ->(year) { where(:assistance_year => year) }
@@ -524,6 +526,16 @@ module FinancialAssistance
         transitions from: :submitted, to: :determined
       end
 
+      event :terminate, :after => :record_transition do
+        transitions from: [:submitted, :determined, :determination_response_error],
+                    to: :terminated
+      end
+
+      event :cancel, :after => :record_transition do
+        transitions from: [:draft],
+                    to: :cancelled
+      end
+
     end
 
     # def applicant
@@ -739,8 +751,16 @@ module FinancialAssistance
       self.aasm_state == "determined"
     end
 
+    def is_terminated?
+      self.aasm_state == "terminated"
+    end
+
     def is_reviewable?
       REVIEWABLE_STATUSES.include?(aasm_state)
+    end
+
+    def is_closed?
+      CLOSED_STATUSES.include?(aasm_state)
     end
 
     def incomplete_applicants?
@@ -949,7 +969,7 @@ module FinancialAssistance
     end
 
     def verification_update_for_applicants
-      return unless aasm_state == "determined"
+      return unless aasm_state == "determined" || is_closed?
       if has_atleast_one_medicaid_applicant?
         update_verifications_of_applicants("external_source")
       elsif has_all_uqhp_applicants?
