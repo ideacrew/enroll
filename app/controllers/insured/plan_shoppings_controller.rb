@@ -397,6 +397,9 @@ class Insured::PlanShoppingsController < ApplicationController
         @plans = @benefit_group.decorated_elected_plans(@hbx_enrollment, @coverage_kind)
       else
         @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind, @market_kind)
+        used_address = @hbx_enrollment.consumer_role.rating_address
+        rating_area = ::BenefitMarkets::Locations::RatingArea.rating_area_for(used_address, during: @hbx_enrollment.effective_on)
+        @plans = @plans.select { |plan|  plan.premium_tables.map(&:rating_area_id).map(&:to_s).include?(rating_area.id.to_s)  }
       end
 
       build_same_plan_premiums
