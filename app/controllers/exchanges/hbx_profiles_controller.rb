@@ -241,6 +241,17 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
   end
 
+  def employer_staff_datatable
+    @datatable = Effective::Datatables::EmployerStaffDatatable.new
+    if ::EnrollRegistry.feature_enabled?(:display_employer_staff_datatable)
+      respond_to do |format|
+        format.html { render '/exchanges/hbx_profiles/employer_staff_datatable.html.slim' }
+      end
+    else
+      redirect_to exchanges_hbx_profiles_root_path
+    end
+  end
+
 def employer_poc
 
     # Dynamic Filter values for upcoming 30, 60, 90 days renewals

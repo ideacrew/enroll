@@ -135,6 +135,7 @@ Rails.application.routes.draw do
         post :employer_poc_datatable
         get :employer_invoice
         get :employer_datatable
+        get :employer_staff_datatable
         post :employer_invoice_datatable
         post :generate_invoice
         post :disable_ssn_requirement
@@ -614,8 +615,19 @@ Rails.application.routes.draw do
 
     member do
       get 'get_member'
+      get 'manage_account'
+      get 'personal_info'
+      get 'show_roles'
+      get 'available_accounts'
+      put 'update_personal_info'
     end
 
+  end
+
+  resources :accounts do
+    member do
+      get 'available_accounts'
+    end
   end
 
   match 'families/home', to: 'insured/families#home', via: [:get], as: "family_account"

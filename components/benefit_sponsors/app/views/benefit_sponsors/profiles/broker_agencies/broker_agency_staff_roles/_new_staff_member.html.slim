@@ -1,0 +1,55 @@
+.broker-agency-staff-registration-container
+  h1.mb-4.heading-text#loaded = l10n("broker_staff")
+
+  = form_for @staff_member, as: :staff_member, url: { :controller => 'broker_agency_staff_roles', action: "create_staff_member" }, remote: true, html: { class: "needs-ajax-validation s508", id: 'broker_staff_registration_form', novalidate: true } do |f|
+    div#broker_staff
+    = f.hidden_field :person_id, value: f.object.person_id
+    = render partial: './ui-components/bs4/v1/forms/broker_ga_staff_information', locals: { f: f }
+    .row.mt-3.broker-agency-search
+      div.col-md-6
+        div
+          h5 = l10n("broker_agencies.select_your_broker")
+        div style='display: flex;'
+          input.col-md-3#broker-search-input.form-control.py-2 type="search" placeholder="Agency/Broker Name,NPN" style="margin: 3px 0;"
+          span.input-group-append
+            button.btn.btn-primary.search type="button" onclick="brokerSearch(); return false" data-loading-text="Loading..."
+              |
+                #{l10n("search")}
+      .result.col-md-12
+
+    .row.no-pd
+      .col-md-9.col-sm-9.col-xs-12
+        .row.no-buffer
+          .form-group-lg
+            br
+            button.btn.btn-primary[type="submit" disabled='disabled' id= 'broker-staff-btn' data={disable_with: "Please wait..."}]
+              = l10n("submit_application")
+
+javascript:
+  validateAjaxForm();
+
+  function brokerSearch() {
+    var broker_agency_search = document.getElementById('broker-search-input').value
+    document.getElementById('broker-staff-btn').disabled = true;
+    if (broker_agency_search != undefined) {
+      $.ajax({
+        url: '/benefit_sponsors/profiles/broker_agencies/broker_agency_staff_roles/search_broker_agency.js',
+        type: "GET",
+        data: {'q': broker_agency_search, "broker_registration_page": true}
+      });
+    }
+    ;
+  }
+
+  function selectBrokereAgency(element) {
+    var result = document.querySelectorAll('.result');
+    result.forEach(function (result) {
+      var element = result.querySelectorAll('.select-broker')
+      element.forEach(function (ele) {
+        ele.classList.remove("agency-selected");
+      })
+    });
+    document.getElementById('staff_member_profile_id').value = element.dataset.broker_agency_profile_id;
+    element.closest(".select-broker").classList.add('agency-selected')
+    document.getElementById('broker-staff-btn').disabled = false;
+  }

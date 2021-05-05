@@ -40,6 +40,19 @@ Given(/^all other mandatory fields on the page have been populated$/) do
   fill_in "person[addresses_attributes][0][zip]", with: "35465"
 end
 
+And(/^person selects all mandatory radio option for us citizen$/) do
+  find(:xpath, '//label[@for="person_us_citizen_true"]', wait: 10).click
+  find(:xpath, '//label[@for="person_naturalized_citizen_false"]', wait: 10).click
+  find(:xpath, '//label[@for="indian_tribe_member_no"]', wait: 10).click
+end
+
+And('person goes to the next pages') do
+  step "Admin clicks CONTINUE button"
+  step "Individual agrees to the privacy agreeement"
+  step "Individual should see identity verification page and clicks on submit"
+  step "I click on continue button on household info form"
+end
+
 When(/^Admin clicks CONTINUE button$/) do
   find('.btn', text: 'CONTINUE', wait: 10).click
 end

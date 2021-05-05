@@ -130,5 +130,5 @@ Then(/^a user should see a result with (.*) user email and not (.*) user email$/
 end
 
 Then(/^Hbx Admin click on User Accounts$/) do
-  find(:xpath, '//*[@id="myTab"]/li[6]/a').click
+  find(:xpath, '//*[@id="myTab"]/li[5]/a').click
 end

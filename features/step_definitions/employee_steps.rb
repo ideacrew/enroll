@@ -2,13 +2,13 @@
 
 Given("a matched Employee exists with only employee role") do
   FactoryBot.create(:user)
-  person = FactoryBot.create(:person, :with_employee_role, :with_family, first_name: "Employee", last_name: "E", user: user)
+  person = FactoryBot.create(:person, :with_employee_role, :with_family, :with_ssn, first_name: "Employee", last_name: "E", user: user)
   site = FactoryBot.build(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key)
   benefit_sponsor = FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile_initial_application, site: site)
   benefit_sponsorship = benefit_sponsor.active_benefit_sponsorship
   employer_profile = benefit_sponsorship.profile
   benefit_package = benefit_sponsorship.benefit_applications.first.benefit_packages.first
-  bga = FactoryBot.build :benefit_group_assignment, benefit_package: benefit_package
+  bga = FactoryBot.build :benefit_group_assignment, benefit_package: benefit_package, created_at: TimeKeeper.date_of_record
   @employee_role = person.employee_roles[0]
   ce = FactoryBot.build(:census_employee,
                         first_name: person.first_name,

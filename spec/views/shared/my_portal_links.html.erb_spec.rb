@@ -1,6 +1,9 @@
 require 'rails_helper'
 
 describe "shared/_my_portal_links.html.haml", dbclean: :after_each do
+  before :each do
+    EnrollRegistry[:manage_account_functionality].feature.stub(:is_enabled).and_return(false)
+  end
 
   context "with employee role" do
     let(:user) { FactoryBot.create(:user, person: person, roles: ["employee"]) }
