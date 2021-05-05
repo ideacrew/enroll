@@ -41,7 +41,7 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   end
 
   def rating_area
-    @rating_area_code ||= begin
+    @rating_area ||= begin
       used_address = hbx_enrollment.consumer_role.rating_address
       rating_area = ::BenefitMarkets::Locations::RatingArea.rating_area_for(used_address, during: schedule_date)
       #  .where(active_year: __getobj__.active_year).detect{|a| a.county_zip_ids.include?(county_id)}
