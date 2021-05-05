@@ -74,11 +74,11 @@ registry:
           - key: :byline
             item: "Welcome to Maine's Health Insurance Marketplace"
           - key: :logo_file_name
-            item: "logo.png"
+            item: "logo_me.svg"
           - key: :make_their_premium_payments_online
             item: ""
           - key: :tab_icon
-            item: "favicon_me.ico"
+            item: "favicon.ico"
           - key: :employer_application_deadline_link
             item: ""
           - key: :s3_prefix
@@ -221,18 +221,19 @@ registry:
           - key: :assistance_estimate_url
             item: ''
           - key: :header_logo
-            item: "logo.png"
+            item: "logo_me.svg"
           - key: :eligibile_immigration_statuses_url
             item: ""
           - key: :assistance_estimate_url
             item: ""
           - key: :geographic_rating_area_model
             item: "county"
-          - key: :header_logo
-            item: "logo.png"
       - key: :rating_area
         item: :rating_area
         is_enabled: false
+        settings:
+          - key: :areas
+            item: ["R-ME001", "R-ME002", "R-ME003", "R-ME004"]
       - key: :service_area
         item: :service_area
         is_enabled: true

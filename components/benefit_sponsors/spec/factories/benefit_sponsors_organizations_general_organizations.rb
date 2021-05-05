@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :benefit_sponsors_organizations_general_organization, class: 'BenefitSponsors::Organizations::GeneralOrganization' do
     legal_name  { "ACME Widgets, Inc." }
@@ -48,6 +50,19 @@ FactoryBot.define do
       end
     end
 
+    trait :with_aca_shop_dc_employer_profile_no_attestation do
+      after :build do |organization, _evaluator|
+        build(:benefit_sponsors_organizations_aca_shop_dc_employer_profile, organization: organization)
+      end
+    end
+
+    # Its right here
+    trait :with_aca_shop_me_employer_profile_no_attestation do
+      after :build do |organization, _evaluator|
+        build(:benefit_sponsors_organizations_aca_shop_me_employer_profile, organization: organization)
+      end
+    end
+
     trait :with_aca_shop_dc_employer_profile_initial_application do
       with_aca_shop_dc_employer_profile
       after :build do |organization, _evaluator|
@@ -57,6 +72,21 @@ FactoryBot.define do
                                                    profile: organization.employer_profile)]
       end
     end
+
+    trait :with_aca_shop_me_employer_profile_initial_application do
+      with_aca_shop_me_employer_profile
+      after :build do |organization, _evaluator|
+        organization.benefit_sponsorships = [
+          build(
+            :benefit_sponsors_benefit_sponsorship,
+            :with_benefit_market,
+            :with_initial_benefit_application,
+            profile: organization.employer_profile
+          )
+        ]
+      end
+    end
+
 
     trait :with_aca_shop_cca_employer_profile_initial_application do
       with_aca_shop_cca_employer_profile

@@ -40,7 +40,7 @@ end
 
 Then(/^they should see a new finanical assistance application$/) do
   expect(page.current_url).to match("/applications/.*/edit")
-  expect(page).to have_content("If you need to add other members to your health insurance, select 'Add New Person'. When you’re finished, select CONTINUE.")
+  expect(page).to have_content(l10n('insured.family_members.index.continue_to_get_insurance'))
 end
 
 Then(/^they should see each of their dependents listed$/) do
@@ -445,6 +445,10 @@ end
 
 Then(/^user should land on full application page and should see 2 view my applications buttons$/) do
   expect(page).to have_css('.interaction-click-control-view-my-applications', count: 2)
+end
+
+Then(/^user should see 2 print buttons$/) do
+  expect(page).to have_css('.interaction-click-control-print', count: 2)
 end
 
 And(/^user should see Medicaid eligibility question$/) do

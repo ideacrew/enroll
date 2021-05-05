@@ -116,7 +116,7 @@ module SponsoredBenefits
           @proposal.assign_attributes(title: @title)
         else
           profile = "SponsoredBenefits::Organizations::AcaShop#{EnrollRegistry[:enroll_app].setting(:site_key)&.item&.capitalize}EmployerProfile".constantize.new
-          profile.sic_code = @sic_code if @sic_code
+          profile.sic_code = @sic_code if EnrollRegistry.feature_enabled?(:sic_codes) && @sic_code
           @proposal = @plan_design_organization.plan_design_proposals.build({title: @title, profile: profile})
         end
 

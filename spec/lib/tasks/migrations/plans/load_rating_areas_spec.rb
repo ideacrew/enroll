@@ -9,18 +9,20 @@ describe 'load_rate_reference:update_rating_areas' do
     Rake.application.rake_require "tasks/migrations/plans/load_rating_areas"
     Rake::Task.define_task(:environment)
 
-    if Settings.aca.state_abbreviation.downcase == 'ma'
+    if EnrollRegistry[:enroll_app].settings(:rating_areas).item == 'single'
+      create(:benefit_markets_locations_county_zip, county_name: EnrollRegistry[:enroll_app].setting(:contact_center_county).item)
+    else
       glob_pattern = File.join(Rails.root, "db/seedfiles/cca/locations_seed.rb")
       load glob_pattern
       load_cca_locations_county_zips_seed
-    else
-      create(:benefit_markets_locations_county_zip, county_name: Settings.aca.state_name)
     end
   end
 
   let :run_rake_task do
     Rake::Task["load_rate_reference:update_rating_areas"].reenable
-    Rake.application.invoke_task("load_rate_reference:update_rating_areas[#{Rails.root}/spec/test_data/plan_data/rating_areas/#{Settings.aca.state_abbreviation.downcase}/2019/SHOP_ZipCode_CY2019_FINAL.xlsx]")
+    Rake.application.invoke_task(
+      "load_rate_reference:update_rating_areas[#{Rails.root}/spec/test_data/plan_data/rating_areas/#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.downcase}/2019/SHOP_ZipCode_CY2019_FINAL.xlsx]"
+    )
   end
 
   describe "test rake task" do

@@ -248,6 +248,17 @@ Then(/^the military veteran question should display$/) do
   expect(page).to have_content('Are you an honorably discharged veteran or active duty member of the military?')
 end
 
+Given(/^user does not have eligible immigration status$/) do
+  consumer.person.consumer_role.update_attributes(citizen_status: false)
+  application.applicants.each do |applicant|
+    applicant.update_attributes(eligible_immigration_status: false)
+  end
+end
+
+Then(/^the military veteran question should NOT display$/) do
+  expect(page).to have_content('Are you an honorably discharged veteran or active duty member of the military?')
+end
+
 Given(/^user answers no to the military veteran question$/) do
   choose('is_veteran_or_active_military_no')
 end

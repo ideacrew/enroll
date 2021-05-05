@@ -3,10 +3,10 @@
 namespace :load_rate_reference do
 
   task :run_all_rating_areas => :environment do
-    if Settings.site.key.to_s == "dc"
+    if EnrollRegistry[:enroll_app].settings(:rating_areas).item == 'single'
       Rake::Task['load_rate_reference:dc_rating_areas'].invoke
     else
-      files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{Settings.aca.state_abbreviation.downcase}/xls_templates/rating_areas", "**", "*.xlsx"))
+      files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.downcasse}/xls_templates/rating_areas", "**", "*.xlsx"))
 
       puts "*"*80 unless Rails.env.test?
       files.each do |file|
@@ -23,7 +23,7 @@ namespace :load_rate_reference do
   # will only create if the rating areas are not present.
   desc "rating areas"
   task :dc_rating_areas, [:active_year] => :environment do |t, args|
-    if Settings.site.key.to_s == "dc"
+    if EnrollRegistry[:enroll_app].settings(:rating_areas).item == 'single'
       years = args[:active_year].present? ? [args[:active_year].to_i] : (2014..2021)
       years.each do |year|
         puts "Creating DC Rating areas for #{year}" unless Rails.env.test?
@@ -47,7 +47,7 @@ namespace :load_rate_reference do
 
       # old model
       (2..sheet.last_row).each do |i|
-        RatingArea.find_or_create_by!(
+        ra = RatingArea.find_or_create_by!(
             zip_code: sheet.cell(i, 1),
             county_name: sheet.cell(i, 2),
             zip_code_in_multiple_counties: to_boolean(sheet.cell(i, 3)),
@@ -70,26 +70,22 @@ namespace :load_rate_reference do
 
         location_ids = locations.map do |loc_record|
           zip_code = loc_record['zip'].to_s.gsub('.0','')
-          county_zip = ::BenefitMarkets::Locations::CountyZip.where({
-                                                                      zip: zip_code,
-                                                                      county_name: loc_record['county_name']
-                                                                    }).first
+          county_zip = ::BenefitMarkets::Locations::CountyZip.where({zip: zip_code,
+                                                                     county_name: loc_record['county_name']}).first
           county_zip._id
         end
 
-        ra = ::BenefitMarkets::Locations::RatingArea.where({
-                                                       active_year: file_year,
-                                                       exchange_provided_code: rating_area_id,
-                                                     }).first
+        ra = ::BenefitMarkets::Locations::RatingArea.where({active_year: file_year,
+                                                            exchange_provided_code: rating_area_id}).first
+
+
         if ra.present?
           ra.county_zip_ids = location_ids
           ra.save
         else
-          ::BenefitMarkets::Locations::RatingArea.create({
-                                                       active_year: file_year,
-                                                       exchange_provided_code: rating_area_id,
-                                                       county_zip_ids: location_ids
-                                                     })
+          ra = ::BenefitMarkets::Locations::RatingArea.create({active_year: file_year,
+                                                               exchange_provided_code: rating_area_id,
+                                                               county_zip_ids: location_ids})
         end
       end
         # end of new model

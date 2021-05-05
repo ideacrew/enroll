@@ -388,7 +388,7 @@ class Plan
   end
 
   def minimum_age
-    if premium_tables.count > 0
+    if premium_tables.any?
       premium_tables.min(:age)
     else
       read_attribute(:minimum_age)

@@ -1,4 +1,5 @@
-# TODO: Refactor this to not rely on DC for test
+# frozen_string_literal: true
+
 site_key = EnrollRegistry[:enroll_app].settings(:site_key).item
 
 translations_to_seed = []
@@ -17,6 +18,7 @@ end
 
 require_relative File.join(Rails.root, 'components/financial_assistance/db/seedfiles/translations/en/faa_translations')
 translations_to_seed << FaaTranslations::ASSISTANCE_TRANSLATIONS unless site_key.to_s == 'cca'
+translations_to_seed << FaaTranslations::ELIGIBILITY_TRANSLATIONS unless site_key.to_s == 'cca'
 
 MAIN_TRANSLATIONS = {
   :'en.shared.my_portal_links.my_insured_portal' => 'My Insured Portal',

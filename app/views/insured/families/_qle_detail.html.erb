@@ -60,7 +60,7 @@
               <h3 class="qle-details-title darkblue"><%= l10n("insured.change_tax_credits_or_cost_sharing_reductions") %></h3>
               <div class="alert alert-danger" role="alert">
                 <p class="error-text">
-                  <%= l10n("insured.qle_detail.error_text", contact_center_phone_number: contact_center_phone_number) %>
+                  <%= l10n("insured.qle_detail.error_text", contact_center_phone_number: EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number)&.item) %>
                 </p>
               </div>
               <br/>

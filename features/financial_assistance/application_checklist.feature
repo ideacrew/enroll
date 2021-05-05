@@ -17,6 +17,11 @@ Feature: A dedicated page that gives the user prior notice that that application
     When the user clicks the PREVIOUS link
     Then the user will navigate to the Help Paying for Coverage page
 
+  Scenario: User clicks the application checklist link.
+    Given that the user is on the Application Checklist page
+    When the user clicks the application checklist link
+    Then the user will navigate to the Application Checklist
+
   Scenario: User clicks Save & Exit
     Given that the user is on the Application Checklist page
     When the user clicks the SAVE & EXIT link

@@ -7,9 +7,15 @@ module EmployerWorld
   #
   # If no legal_name is specified but an employer has already been created this method
   # defaults to the first employer created
+
+  def site_key
+    EnrollRegistry[:enroll_app].setting(:site_key).item
+  end
+
   def employer(legal_name=nil, *traits)
     attributes = traits.extract_options!
-    traits.push("with_aca_shop_#{Settings.site.key}_employer_profile".to_sym) unless traits.include? :with_aca_shop_cca_employer_profile_no_attestation
+    # TODO: Need to look into if we need to refactor out the cca reference there
+    traits.push("with_aca_shop_#{site_key.downcase}_employer_profile".to_sym) unless traits.include? :with_aca_shop_cca_employer_profile_no_attestation
     @organization ||= {}
 
     # puts "running for legal_name: #{legal_name}"
@@ -39,7 +45,7 @@ module EmployerWorld
   def registering_employer
     @registering_organization ||= FactoryBot.build(
       :benefit_sponsors_organizations_general_organization,
-      "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym,
+      "with_aca_shop_#{site_key.downcase}_employer_profile".to_sym,
       site: site
     )
   end
@@ -67,7 +73,7 @@ And(/^there is an fehb employer (.*?)$/) do |legal_name|
 end
 
 And(/^it has an employer (.*?) with no attestation submitted$/) do |legal_name|
-  employer legal_name, :with_aca_shop_cca_employer_profile_no_attestation, legal_name: legal_name, dba: legal_name
+  employer legal_name, "with_aca_shop_#{site_key.downcase}_employer_profile_no_attestation".to_sym, legal_name: legal_name, dba: legal_name
   benefit_sponsorship(employer(legal_name))
 end
 
@@ -135,7 +141,7 @@ Given(/all products with issuer profile/) do
 end
 
 Given(/an employer with initial application/) do
-  @sponsorship = employer(nil, :with_aca_shop_dc_employer_profile_initial_application).benefit_sponsorships.first
+  @sponsorship = employer(nil, "with_aca_shop_#{site_key}_employer_profile_initial_application".to_sym).benefit_sponsorships.first
   @profile = @sponsorship.profile
 end
 

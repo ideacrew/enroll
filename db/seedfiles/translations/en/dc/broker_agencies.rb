@@ -36,6 +36,7 @@ BROKER_AGENCIES_TRANSLATIONS = {
 	"en.assign_history" => "Assign History",
 	"en.start_on" => "start on",
 	"en.end_on" => "end on",
+	"en.broker_agencies.profiles.office_locations" => "Office Locations",
 	"en.broker_agencies.profiles.broker_agency_contacts" => "Broker Agency Contacts",
 	"en.broker_agencies.profiles.primary_broker_role_info" => "Primary Broker Role Info (npn / provider kind / active)",
 	"en.broker_agencies.profiles.no_broker_agency_contacts_found" => "No Broker Agency Contacts found.",

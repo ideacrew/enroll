@@ -123,6 +123,26 @@
     {
       "warning_type": "Command Injection",
       "warning_code": 14,
+      "fingerprint": "0d6e4d3e256f0c6ef196baa5ed9e68712d4bdffb7c9886ca5c7bae3e2687d624",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "lib/client_configuration_toggler.rb",
+      "line": 64,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`git checkout #{filename_in_config_directory.sub(\"#{old_config_folder}/\", \"\")}`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ClientConfigurationToggler",
+        "method": "checkout_straggler_files"
+      },
+      "user_input": "filename_in_config_directory.sub(\"#{old_config_folder}/\", \"\")",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
       "fingerprint": "132c37aeaaedb5c65a6e90b1ab75386acec6e2264bbcb81a0c5f780acd2e232f",
       "check_name": "Execute",
       "message": "Possible command injection",
@@ -514,6 +534,26 @@
       "note": ""
     },
     {
+      "warning_type": "Remote Code Execution",
+      "warning_code": 24,
+      "fingerprint": "65fcfed30f4a5e04a15736f27beec09010b3ffedd31ea672a34ef1eb1721b917",
+      "check_name": "UnsafeReflection",
+      "message": "Unsafe reflection method `safe_constantize` called with parameter value",
+      "file": "app/controllers/documents_controller.rb",
+      "line": 35,
+      "link": "https://brakemanscanner.org/docs/warning_types/remote_code_execution/",
+      "code": "(params[:model].camelize or \"BenefitSponsors::Organizations::AcaShopCcaEmployerProfile\").safe_constantize",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "DocumentsController",
+        "method": "authorized_download"
+      },
+      "user_input": "params[:model].camelize",
+      "confidence": "High",
+      "note": ""
+    },
+    {
       "warning_type": "Cross-Site Scripting",
       "warning_code": 2,
       "fingerprint": "6c26117cb8a16470d6e0cf73d4e2183c08714a1346985e7f9d7632dec54d26ee",
@@ -528,7 +568,7 @@
           "type": "controller",
           "class": "Exchanges::HbxProfilesController",
           "method": "view_enrollment_to_update_end_date",
-          "line": 479,
+          "line": 480,
           "file": "app/controllers/exchanges/hbx_profiles_controller.rb",
           "rendered": {
             "name": "exchanges/hbx_profiles/view_enrollment_to_update_end_date",
@@ -616,6 +656,26 @@
       "note": ""
     },
     {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "77379f53e5e37a72155c2a4f0462b37b1d046c19ba0a8ac1f22c3f8d68a8162c",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "lib/client_configuration_toggler.rb",
+      "line": 41,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`cp -r system #{Rails.root}/#{engine_folder_name}/`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ClientConfigurationToggler",
+        "method": "copy_current_configuration_to_engines"
+      },
+      "user_input": "engine_folder_name",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
       "warning_type": "Mass Assignment",
       "warning_code": 70,
       "fingerprint": "8a980298a5df4d60183c689cfc1c152f4b412c6bcf03ae0ed583ecf0b7041e31",
@@ -697,6 +757,26 @@
       "note": ""
     },
     {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "8ebecce18ccfce198e0e5392f43cfe262c80691e1eb3fae619da130dee133b9f",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "lib/client_configuration_toggler.rb",
+      "line": 43,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`cp -r system #{Rails.root}/#{engine_folder_name}/spec/dummy/`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ClientConfigurationToggler",
+        "method": "copy_current_configuration_to_engines"
+      },
+      "user_input": "engine_folder_name",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
       "warning_type": "SQL Injection",
       "warning_code": 0,
       "fingerprint": "c52682082343e84c51246edb8d8ad45d30470312d9763527b2c5c5b6777ea619",
@@ -714,6 +794,26 @@
       },
       "user_input": "sql_column",
       "confidence": "Weak",
+      "note": ""
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "cd6894cae7988763b05d81ee9348df6b72d3f4b900c4db77c473c27b077d1424",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "lib/store_registry_config.rb",
+      "line": 18,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`cp -r #{Rails.root}/system #{@target_config_folder}`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "StoreRegistryConfig",
+        "method": "copy_current_system_configuration_to_storage"
+      },
+      "user_input": "@target_config_folder",
+      "confidence": "Medium",
       "note": ""
     },
     {
@@ -797,6 +897,6 @@
       "note": ""
     }
   ],
-  "updated": "2021-04-13 15:31:15 -0400",
+  "updated": "2021-05-03 11:35:26 -0400",
   "brakeman_version": "5.0.0"
 }

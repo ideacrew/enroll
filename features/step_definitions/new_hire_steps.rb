@@ -131,7 +131,7 @@ Then(/(.*) should see \"my account\" page with enrollment/) do |named_person|
   enrollment = find_all('.hbx-enrollment-panel', wait: 10)
   qle  = sep_enr ? true : false
   wait_for_condition_until(5) do
-    enrollment_selection_badges.count > 0
+    enrollment_selection_badges.any?
   end
   expect(enrollment_selection_badges.any? { |n| n.find_all('.enrollment-effective', text: expected_effective_on(qle: qle).strftime("%m/%d/%Y")).any? }).to be_truthy
 

@@ -349,9 +349,8 @@ module BenefitSponsors
 
           def build_sponsor_profile_class
             # TODO: - Use Configuration settings
-            site_key = BenefitSponsors::ApplicationController.current_site.site_key
-            return Organizations::AcaShopCcaEmployerProfile if site_key == :cca
-            Organizations::AcaShopDcEmployerProfile
+            site_key = EnrollRegistry[:enroll_app].setting(:site_key).item.capitalize.capitalize
+            "BenefitSponsors::Organizations::AcaShop#{site_key}EmployerProfile".constantize
           end
 
           def find_representatives
