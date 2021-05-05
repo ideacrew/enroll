@@ -11,7 +11,7 @@ module Operations
     def call(params)
       values               = yield validate(params)
       hbx_enrollment       = yield enrollment(values)
-      payment_transaction  = yield create_payment_transaction(hbx_enrollment)
+      payment_transaction  = yield create_payment_transaction(hbx_enrollment, values[:source])
       saml_object          = yield init_saml_generator(payment_transaction, hbx_enrollment)
       saml_response        = yield build_saml_response(saml_object)
       result               = yield encode_saml_reponse(saml_object, saml_response)
@@ -31,8 +31,8 @@ module Operations
       enrollment ? Success(enrollment) : Failure("Enrollment Not Found")
     end
 
-    def create_payment_transaction(hbx_enrollment)
-      payment = PaymentTransaction.build_payment_instance(hbx_enrollment)
+    def create_payment_transaction(hbx_enrollment, source)
+      payment = PaymentTransaction.build_payment_instance(hbx_enrollment, source)
       payment ? Success(payment) : Failure("Issue with Payment transcation")
     end
 

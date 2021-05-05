@@ -11,6 +11,7 @@ class PaymentTransaction
   field :status, type: String
   field :body, type: String
   field :submitted_at, type: DateTime
+  field :source, type: String
 
   before_save :generate_payment_transaction_id, :set_submitted_at
 
@@ -22,16 +23,17 @@ class PaymentTransaction
     self.submitted_at ||= TimeKeeper.datetime_of_record
   end
 
-  def update_enrollment_details(enrollment)
+  def update_enrollment_details(enrollment, source)
     self.enrollment_id = enrollment.id
+    self.source = source
     self.carrier_id =  enrollment.product.issuer_profile_id
     self.enrollment_effective_date = enrollment.effective_on
     self.save!
   end
 
-  def self.build_payment_instance(enrollment)
+  def self.build_payment_instance(enrollment, source)
     payment = enrollment.family.payment_transactions.build
-    payment.update_enrollment_details(enrollment)
+    payment.update_enrollment_details(enrollment, source)
     payment.family.save!
     payment
   end

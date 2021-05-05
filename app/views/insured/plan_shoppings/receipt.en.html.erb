@@ -51,7 +51,7 @@
         <% else %>
           <span class="btn btn-default" data-target="#how_to_pay" data-toggle="modal">How to Pay</span>
         <% end %>
-        <%= render partial: "insured/plan_shoppings/pay_now", locals: { source: "Plan Shopping", hbx_enrollment: @enrollment }%>
+        <%= render partial: "insured/plan_shoppings/pay_now", locals: { hbx_enrollment: @enrollment, source: "plan_shopping" }%>
         <%= link_to 'Print', '#', id: 'btnPrint', class: "btn btn-default interaction-click-control-print-purchase-confirmation" %>
       </div>
 
