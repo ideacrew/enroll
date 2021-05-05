@@ -350,7 +350,9 @@ class ConsumerRole
   end
 
   def rating_address
-    (addresses.detect { |adr| adr.kind == "home" }) || (addresses.detect { |adr| adr.kind == "mailing" })
+    @rating_address ||= begin
+      (addresses.detect { |adr| adr.kind == "home" }) || (addresses.detect { |adr| adr.kind == "mailing" })
+    end
   end
 
   def self.find(consumer_role_id)
