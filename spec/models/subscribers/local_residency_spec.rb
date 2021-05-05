@@ -69,7 +69,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           end
 
           it 'should add reason to newly created workflow_state_transition' do
-            expect(@consumer_role.workflow_state_transitions.last.reason).to eq('Self Attest DC Residency')
+            expect(@consumer_role.workflow_state_transitions.last.reason).to eq("Self Attest #{EnrollRegistry[:enroll_app].setting(:state_residency).item}")
           end
         else
           it 'should update consumer role state to outstanding' do
