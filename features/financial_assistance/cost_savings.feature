@@ -43,7 +43,7 @@ Feature: Cost Savings
     When the consumer clicks the Cost Savings link
     Then the consumer will navigate to the Cost Savings page
     When Incarcerated field is nil for the consumer
-    When consumer click 'Start New Application' button
+    When they click 'Start New Application' button
     Then the consumer should see a message with incarcerated error
 
   Scenario: FAA Feature Is Enabled - Consumer has nil value for DOB
