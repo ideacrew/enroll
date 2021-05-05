@@ -29,8 +29,7 @@ module FaaTranslations
     "en.faa.silver_plan_checkmark" => "This benefit is only available if these people select a silver plan. Look for this check mark ",
     "en.faa.qualify_for_lower_costs_2" => " on plans that have this benefit.",
     "en.faa.does_not_qualify" => "Does not qualify",
-    "en.faa.likely_does_not_qualify" =>
-    "These people <span> likely don't qualify for <span class='run-glossary' data-tooltip-data='#{l10n('glossary.medicaid')} '>Medicaid</span>, </span> and don't qualify for private health insurance through DC Health Link:",
+    "en.faa.likely_does_not_qualify" => "These people <span> likely don't qualify for <span data-toggle='tooltip'>%{medicaid_def}</span>, </span> and don't qualify for private health insurance through DC Health Link:",
     "en.faa.private_health_insurance" => "Private health insurance",
     "en.faa.qualified_to_enroll" => "These people <span> qualify to enroll </span> in a private health insurance plan:",
     "en.faa.do_not_agree" => "If you do not agree with this determination, you have the right to appeal. <a href=''>Find out more about the appeal process</a> or <a href=''>get assistance</a> by contacting us directly.",
