@@ -1703,6 +1703,7 @@ class HbxEnrollment
             "You may not enroll unless it’s open enrollment or you’re eligible for a special enrollment period."
           )
         end
+        enrollment.rating_area_id = ::BenefitMarkets::Locations::RatingArea.rating_area_for(consumer_role.rating_address, during: enrollment.effective_on)&.id
       when resident_role.present?
         enrollment.kind = "coverall"
         enrollment.resident_role = resident_role
