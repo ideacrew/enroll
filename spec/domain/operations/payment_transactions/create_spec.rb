@@ -5,7 +5,6 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "rails_helper"
 
 module Operations
-  # payment transaction namespace
   module PaymentTransactions
     RSpec.describe Create,  dbclean: :after_each do
       include_context "setup benefit market with market catalogs and product packages"
@@ -17,13 +16,18 @@ module Operations
       let!(:person)          { FactoryBot.create(:person, :with_consumer_role) }
       let!(:family)          { FactoryBot.create(:family, :with_primary_family_member, person: person) }
       let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile)}
-      let!(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, issuer_profile: issuer_profile) }
+
+      let!(:product) do
+        FactoryBot.create(:benefit_markets_products_health_products_health_product,
+                            benefit_market_kind: :aca_individual,
+                            issuer_profile: issuer_profile)
+      end
 
       let!(:hbx_enrollment)  do
         FactoryBot.create(:hbx_enrollment, :individual_unassisted,
-                          household: family.active_household,
-                          family: family,
-                          product: product)
+                            household: family.active_household,
+                            family: family,
+                            product: product)
       end
 
       describe 'given invalid params' do
@@ -39,7 +43,7 @@ module Operations
 
         context 'given enrollment without effective on' do
           let(:params) {{hbx_enrollment: hbx_enrollment}}
-          let(:error_message) {{:enrollment_effective_date => ["must be a date"]}}
+          let(:error_message) {{:enrollment_effective_date=>["must be a date"]}}
 
           before :each do
             hbx_enrollment.unset(:effective_on)
@@ -53,7 +57,7 @@ module Operations
 
         context 'given enrollment without product' do
           let(:params) {{hbx_enrollment: hbx_enrollment}}
-          let(:error_message) {{:carrier_id => ["must be a string"]}}
+          let(:error_message) {{:carrier_id=>["must be a string"]}}
 
           before :each do
             hbx_enrollment.product = nil
