@@ -562,7 +562,7 @@ class Person
     if existing_relationship
       existing_relationship.update_attributes(:kind => relationship)
     elsif id != person.id
-      self.person_relationships << PersonRelationship.new({
+      self.person_relationships.build({
         :kind => relationship,
         :relative_id => person.id
       })
