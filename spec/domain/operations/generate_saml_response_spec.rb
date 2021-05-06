@@ -14,7 +14,7 @@ RSpec.describe Operations::GenerateSamlResponse do
   let(:encode_saml_response) {double}
   let(:connection) {double}
   let(:params) do
-    {:enrollment_id => hbx_enrollment.hbx_id }
+    { :enrollment_id => hbx_enrollment.hbx_id, :source => source }
   end
 
   before do
