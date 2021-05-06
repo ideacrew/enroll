@@ -20,7 +20,7 @@ describe "Client Config Storage Enforcement" do
 
   let(:stored_settings_yml_keys) do
     all_keys = []
-    current_committed_config_stored_settings_yml_loaded.keys.each do |key|
+    current_committed_config_stored_settings_yml_loaded.each_key do |key|
       all_keys << current_committed_config_stored_settings_yml_loaded[key].keys if current_committed_config_stored_settings_yml_loaded[key].respond_to?(:keys)
     end
     all_keys.flatten
@@ -33,7 +33,7 @@ describe "Client Config Storage Enforcement" do
 
   let!(:current_committed_settings_yml_loaded_keys) do
     all_keys = []
-    current_committed_settings_yml_loaded.keys.each do |key|
+    current_committed_settings_yml_loaded.each_key do |key|
       all_keys << current_committed_settings_yml_loaded[key].keys if current_committed_settings_yml_loaded[key].respond_to?(:keys)
     end
     all_keys.flatten
