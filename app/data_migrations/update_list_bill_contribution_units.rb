@@ -5,7 +5,7 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 class UpdateListBillContributionUnits < MongoidMigrationTask
   
   def migrate
-    contribution_model = BenefitMarkets::ContributionModels::ContributionModel.by_title("#{Settings.site.key.to_s.upcase} Shop Simple List Bill Contribution Model")
+    contribution_model = BenefitMarkets::ContributionModels::ContributionModel.by_title("#{EnrollRegistry[:enroll_app].setting(:site_key).item.upcase} Shop Simple List Bill Contribution Model")
     contribution_model.contribution_units.each do |contribution_unit|
       if contribution_unit.name == 'employee'
         contribution_unit.default_contribution_factor = 0.5

@@ -177,9 +177,11 @@ class Insured::FamiliesController < FamiliesController
 
     benefit_application = employee_role.employer_profile.active_benefit_application
     reporting_deadline = @qle_date > today ? today : @qle_date + 30.days
-    if Settings.site.key == :cca
+    # TODO: Figure out how to refactor this with ResourceRegistry
+    case EnrollRegistry[:enroll_app].setting(:site_key).item
+    when :cca
       trigger_notice_observer(employee_role, benefit_application, 'employee_notice_for_sep_denial', qle_title: @qle.title, qle_reporting_deadline: reporting_deadline.strftime("%m/%d/%Y"), qle_event_on: @qle_event_date.strftime("%m/%d/%Y"))
-    elsif Settings.site.key == :dc
+    when :dc
       event_name = @person.has_multiple_active_employers? ? 'sep_denial_notice_for_ee_active_on_multiple_rosters' : 'sep_denial_notice_for_ee_active_on_single_roster'
       trigger_notice_observer(employee_role, benefit_application, event_name, qle_title: @qle.title, qle_reporting_deadline: reporting_deadline.strftime("%m/%d/%Y"), qle_event_on: @qle_event_date.strftime("%m/%d/%Y"))
     end
