@@ -192,7 +192,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     let(:aws_env) { ENV['AWS_ENV'] || "qa" }
     let(:sbc_document) do
       Document.new({title: 'sbc_file_name', subject: "SBC",
-                    :identifier => "urn:openhbx:terms:v1:file_storage:s3:bucket:#{Settings.site.s3_prefix}-enroll-sbc-#{aws_env}#7816ce0f-a138-42d5-89c5-25c5a3408b82"})
+                    :identifier => "urn:openhbx:terms:v1:file_storage:s3:bucket:#{EnrollRegistry[:enroll_app].setting(:s3_prefix).item}-enroll-sbc-#{aws_env}#7816ce0f-a138-42d5-89c5-25c5a3408b82"})
     end
 
     let(:employer_profile) do
@@ -221,7 +221,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     end
 
     it "should open the sbc pdf" do
-      expect(rendered).to have_selector("a[href='#{"/document/download/#{Settings.site.s3_prefix}-enroll-sbc-#{aws_env}/7816ce0f-a138-42d5-89c5-25c5a3408b82?content_type=application/pdf&filename=APlanName.pdf&disposition=inline"}']")
+      expect(rendered).to have_selector("a[href='#{"/document/download/#{EnrollRegistry[:enroll_app].setting(:s3_prefix).item}-enroll-sbc-#{aws_env}/7816ce0f-a138-42d5-89c5-25c5a3408b82?content_type=application/pdf&filename=APlanName.pdf&disposition=inline"}']")
     end
 
     it "should display the title" do
