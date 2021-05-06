@@ -11,7 +11,7 @@
       </h4>
       <div class="">
         <%= form_tag(main_app.help_paying_coverage_response_insured_consumer_role_index_path, method: :get) do %>
-        <%if @applications.present? && !all_applications_closed?(@applications) %>
+        <%if @applications.present? %>
           <span class="tool-tip" data-toggle="tooltip" data-placement="top" title="You already have an application in progress.">
             <%= submit_tag "Start new application", class: "btn btn-primary pull-right", disabled: true %>
           </span>
