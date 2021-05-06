@@ -35,13 +35,14 @@ class UserMailer < ApplicationMailer
   end
 
   #Email will sent to census employees as soon as they are added to the roster
+  # TODO: Refactor this as feature with ResourceRegistry
   def send_employee_open_enrollment_invitation(email, census_employee, invitation)
     # TODO - Move logic to model
     benefit_applications = census_employee.benefit_sponsorship.benefit_applications.published.select{|ba| ba.effective_period.cover?(census_employee.earliest_effective_date)}
     if email.present? && benefit_applications.any?{|ba| ba.is_submitted?}
       if (census_employee.hired_on > TimeKeeper.date_of_record)
         mail({to: email, subject: "You Have Been Invited to Sign Up for Employer-Sponsored Coverage through the #{site_short_name}"}) do |format|
-          if Settings.site.key == :dc
+          if EnrollRegistry[:enroll_app].setting(:site_key).item
             format.html { render "dc_invite_future_employee_for_open_enrollment", :locals => { :census_employee => census_employee, :invitation => invitation }}
           else
             format.html { render "invite_future_employee_for_open_enrollment", :locals => { :census_employee => census_employee, :invitation => invitation }}
@@ -49,7 +50,7 @@ class UserMailer < ApplicationMailer
         end
       else
         mail({to: email, subject: "Enroll Now: Your Plan Open Enrollment Period has Begun"}) do |format|
-          if Settings.site.key == :dc
+          if EnrollRegistry[:enroll_app].setting(:site_key).item
             format.html { render "dc_invite_initial_employee_for_open_enrollment", :locals => { :census_employee => census_employee, :invitation => invitation }}
           else
             format.html { render "invite_initial_employee_for_open_enrollment", :locals => { :census_employee => census_employee, :invitation => invitation }}
@@ -75,9 +76,10 @@ class UserMailer < ApplicationMailer
     end
   end
 
+  # TODO: Figure out how to refactor this with ResourceRegistry
   def initial_employee_invitation_email(email, census_employee, invitation)
     mail({to: email, subject: "Enroll Now: Your Plan Open Enrollment Period has Begun"}) do |format|
-      if Settings.site.key == :dc
+      if EnrollRegistry[:enroll_app].setting(:site_key).item == :dc
         format.html { render "dc_initial_employee_invitation_email", :locals => { :census_employee => census_employee, :invitation => invitation }}
       else
         format.html { render "initial_employee_invitation_email", :locals => { :census_employee => census_employee, :invitation => invitation }}

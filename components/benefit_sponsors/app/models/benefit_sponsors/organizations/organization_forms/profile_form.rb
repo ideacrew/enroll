@@ -69,8 +69,9 @@ module BenefitSponsors
         is_employer_profile? && is_site_cca?
       end
 
+      # TODO: Figure out how to refactor this with ResourceRegistry
       def is_site_cca?
-        Settings.site.key == :cca
+        EnrollRegistry[:enroll_app].setting(:site_key).item == :cca
       end
 
       def is_referred_by_other?
