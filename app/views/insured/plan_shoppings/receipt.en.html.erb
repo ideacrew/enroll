@@ -12,7 +12,7 @@
           <p>Please print this page for your records. A copy of this confirmation has also been emailed to you.</p>
           <% if @enrollment.employee_role.present? %>
           <% else %>
-            <% if show_pay_now?("Plan Shopping", @enrollment) %>
+            <% if show_pay_now?("plan_shopping", @enrollment) %>
               <p><strong>Important:</strong> You must pay your first month’s premium directly to <%= EnrollRegistry[:pay_now_functionality].setting(:carriers_long_name).item %>
                 to activate your coverage. Select PAY NOW to make your first premium payment online. To learn about
                 other payment options, select ‘How to Pay’.</p>
@@ -71,7 +71,7 @@
               <br/>
               <ol>
                 <li>
-                  <% if show_pay_now?("Plan Shopping", @enrollment) %>
+                  <% if show_pay_now?("plan_shopping", @enrollment) %>
                     You must pay your first month’s premium directly to <%= EnrollRegistry[:pay_now_functionality].setting(:carriers_long_name).item %> to activate your
                     coverage. <%= site_short_name %> does not collect premium payments.<br/><br/>
                     There are two ways to pay your first month’s premium and activate your coverage:
@@ -140,7 +140,7 @@
                   </div>
 
                   <% elsif @plan.issuer_profile.legal_name == "Kaiser" %>
-                  <% unless show_pay_now?("Plan Shopping", @enrollment) %>
+                  <% unless show_pay_now?("plan_shopping", @enrollment) %>
                     <div>
                       Call: <strong>1-844-524-7370</strong>
                       <!-- comment out congressional phone numbers
@@ -159,7 +159,7 @@
 
                 <br/>
                 <br/>
-                <% unless show_pay_now?("Plan Shopping", @enrollment) %>
+                <% unless show_pay_now?("plan_shopping", @enrollment) %>
                   <li>
                     <strong>Start using your benefits.</strong> Once <%= @plan.issuer_profile.legal_name %> receives your first payment, they can provide the information you'll need to start using your benefits (such as member number). They'll also mail your insurance cards to you.<br/>
                   </li>
