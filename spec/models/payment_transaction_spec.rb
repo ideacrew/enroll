@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe PaymentTransaction, :type => :model, dbclean: :after_each do
@@ -20,7 +22,7 @@ RSpec.describe PaymentTransaction, :type => :model, dbclean: :after_each do
 
   context 'build_payment_instance' do
     subject { PaymentTransaction.build_payment_instance(hbx_enrollment, source) }
-''
+
     it 'should build payment transaction with enrollment effective date' do
       expect(subject.enrollment_effective_date).to eq hbx_enrollment.effective_on
     end

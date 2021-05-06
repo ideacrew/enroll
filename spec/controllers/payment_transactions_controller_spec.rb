@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe PaymentTransactionsController, :type => :controller do
@@ -20,7 +22,6 @@ RSpec.describe PaymentTransactionsController, :type => :controller do
 
     it 'should generate saml response' do
       get :generate_saml_response, params: { :enrollment_id => hbx_enrollment.hbx_id, :source => source }
-
       expect(response).to have_http_status(:success)
     end
 
