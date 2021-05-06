@@ -327,5 +327,5 @@ registry:
         is_enabled: false # Should return true for MA, see employer_profile_builder.rb
       - key: :hmo_ppo_plan_type # Should be true for MA
         is_enabled: false
-      - key: :dental_market_enabled
+      - key: :dental_market
         is_enabled: true
