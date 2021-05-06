@@ -441,10 +441,10 @@ RSpec.describe ApplicationHelper, :type => :helper do
 
   describe "get_key_and_bucket" do
     it "should return array with key and bucket" do
-      uri = "urn:openhbx:terms:v1:file_storage:s3:bucket:#{Settings.site.s3_prefix}-sbc#f21369fc-ae6c-4fa5-a299-370a555dc401"
+      uri = "urn:openhbx:terms:v1:file_storage:s3:bucket:#{EnrollRegistry[:enroll_app].setting(:s3_prefix).item}-sbc#f21369fc-ae6c-4fa5-a299-370a555dc401"
       key, bucket = get_key_and_bucket(uri)
       expect(key).to eq("f21369fc-ae6c-4fa5-a299-370a555dc401")
-      expect(bucket).to eq("#{Settings.site.s3_prefix}-sbc")
+      expect(bucket).to eq("#{EnrollRegistry[:enroll_app].setting(:s3_prefix).item}-sbc")
     end
   end
 
@@ -551,7 +551,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
     let(:aws_env) { ENV['AWS_ENV'] || "qa" }
     it "should return bucket name with system name prepended and environment name appended" do
       bucket_name = "sample-bucket"
-      expect(env_bucket_name(bucket_name)).to eq("#{Settings.site.s3_prefix}-enroll-#{bucket_name}-#{aws_env}")
+      expect(env_bucket_name(bucket_name)).to eq("#{EnrollRegistry[:enroll_app].setting(:s3_prefix).item}-enroll-#{bucket_name}-#{aws_env}")
     end
   end
 
