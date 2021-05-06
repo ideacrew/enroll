@@ -337,11 +337,14 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
   end
 
   describe "DELETE destroy" do
+    # let(:family) { double(Family, active_family_members: [])}
+
     let(:dependent) { double }
     let(:dependent_id) { "234dlfjadsklfj" }
 
     before :each do
       sign_in(user)
+      # subject.instance_variable_set(:@family, family)
     end
 
     it "should destroy the dependent" do

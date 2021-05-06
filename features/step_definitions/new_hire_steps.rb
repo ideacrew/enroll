@@ -131,7 +131,7 @@ Then(/(.*) should see \"my account\" page with enrollment/) do |named_person|
   enrollment = find_all('.hbx-enrollment-panel', wait: 10)
   qle  = sep_enr ? true : false
   wait_for_condition_until(5) do
-    enrollment_selection_badges.count > 0
+    enrollment_selection_badges.any?
   end
   expect(enrollment_selection_badges.any? { |n| n.find_all('.enrollment-effective', text: expected_effective_on(qle: qle).strftime("%m/%d/%Y")).any? }).to be_truthy
 
@@ -180,8 +180,8 @@ end
 Then(/(.*) should see active enrollment with their spouse/) do |named_person|
   sleep 1 #wait for e-mail nonsense
   enrollment = page.all('.hbx-enrollment-panel').detect{|e| e.find('.panel-heading .text-right').text == 'Coverage Selected' }
-
-  expect(enrollment.find('.family-members')).to have_content 'Cynthia'
+  sleep 2
+  expect(enrollment.find('.family-members')).to have_content('Cynthia', wait: 10)
   sleep 5
 end
 
@@ -283,7 +283,7 @@ Then(/Employee should see \"not yet eligible\" error message/) do
 end
 
 Then(/Employee should see \"may not enroll until eligible\" error message/) do
-  screenshot("new_hire_not_eligible_exception")
+  # screenshot("new_hire_not_eligible_exception")
   find('.alert', text: "You may not enroll unless it’s open enrollment or you’re eligible for a special enrollment period.")
   visit '/families/home'
 end
@@ -292,12 +292,12 @@ When(/Employee enters Qualifying Life Event/) do
   wait_for_ajax
   find_all("#carousel-qles a", wait: 10).first.click
   expect(page).to have_content "Married"
-  screenshot("future_qle_date")
+  # screenshot("future_qle_date")
   wait_for_ajax
   fill_in "qle_date", :with => (TimeKeeper.date_of_record - 5.days).strftime("%m/%d/%Y")
   find('#qle_submit', wait: 10).click
   find('input.interaction-click-control-continue', wait: 10, visible: false).click
-  screenshot("completing SEP")
+  # screenshot("completing SEP")
 end
 
 When(/Employee clicks continue on the family members page/) do

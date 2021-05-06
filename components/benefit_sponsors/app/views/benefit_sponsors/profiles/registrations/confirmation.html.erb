@@ -5,7 +5,7 @@
       </h2>
     </div>
     <div class="col-sm-12">
-      <h3>Complete the following requirements to become a DC Health Link Registered Broker.</h3>
+      <h3>Complete the following requirements to become a <%= site_short_name %> Registered Broker.</h3>
     </div>
     <div class="col-sm-12 more-info">
       <div class="col-sm-1">
@@ -13,11 +13,9 @@
       </div>
       <div class="col-sm-11">
         <p><strong>Secure Carrier Appointments:</strong><br/>
-          To become a DC Health Link Registered Broker, you must obtain appointments with each carrier's licensed
-          entities in D.C. for the market in which you intend to sell. This resolution was made by the DC Health Benefit
-          Exchange Authority's Producer Advisory Committee. The
-          <a href="http://hbx.dc.gov/sites/default/files/dc/sites/Health%20Benefit%20Exchange%20Authority/publication/attachments/ProducerAdvisoryCommitteeFINALReport.pdf" target="_blank">Producer
-            Advisory Committee's resolution</a> provides additional context on the requirements.
+          To become a <%= site_short_name %> Registered Broker, you must obtain appointments with each carrier's licensed
+          entities in <%= site_state_long_title %>. for the market in which you intend to sell. This resolution was made by the <%= site_exchange_name %> Authority's Producer Advisory Committee. The
+          <%= link_to "Producer Advisory Committee's resolution", EnrollRegistry[:broker_agency].settings(:producer_advisory_committee).item, target:"_blank" %> provides additional context on the requirements.
         </p>
         <br/>
         <a role="button" data-toggle="collapse" href="#collapseAppointments" aria-expanded="false" aria-controls="collapseAppointments" id="sm-p1" onclick="seeMore(this)"><i class="fa fa-chevron-down" aria-hidden="true"></i>
@@ -84,8 +82,8 @@
           </ul>
           <p>To verify your carrier appointments:</p>
           <ul>
-            <li>Go to the National Association of Insurance Commissioners'
-              <a href="https://sbs.naic.org/solar-external-lookup/" target="_blank">License Lookup Directory</a></li>
+            <li>Go to the National Association of Insurance Commissioners
+              <%= link_to "License Lookup Directory",  EnrollRegistry[:broker_agency].settings(:broker_license_lookup).item, target:"_blank" %></li>
             <li>Enter your first and last name</li>
             <li>Select Submit</li>
             <li>Select your name in the search results</li>
@@ -106,11 +104,10 @@
         <i class="far fa-circle fa-2x dc-green" aria-hidden="true"></i>
       </div>
       <div class="col-sm-11">
-        <p><strong>Complete the DC Health Link Broker Policy Training Course:</strong><br/>
+        <p><strong>Complete the <%= site_short_name %> Broker Policy Training Course:</strong><br/>
         <ul>
           <li>Go to the
-            <a href="https://nahu.inreachce.com/Details?resultsPage=1&sortBy=&q=dc+broker&searchType=1&groupId=154ae22b-92eb-41f0-854b-3a9cabc20c8e" target="_blank">DC
-              Health Link training</a> administered by NAHU
+            <%= link_to "#{site_short_name} training", EnrollRegistry[:broker_agency].settings(:healthlink_training).item, target:"_blank" %> administered by NAHU
           </li>
           <li>Create a login</li>
           <li>Complete the six hour training course, policy and web components</li>
@@ -121,12 +118,12 @@
           See More</a>
         <div class="collapse" id="collapseTraining">
           <p>If you any questions about the training or experience any technical difficulties, please reach out
-            to NAHU at (877) 880-1335 or <a href="mailto:dchl.producer@dc.gov">dchl.producer@dc.gov</a>
+            to <%= broker_course_administering_organization %> at <%= broker_course_administering_organization_number %> or <a href="<%= site_producer_email_address %>"><%= site_producer_email_address %></a>
             <br/>
             <br/>
-            Go to dchealthlink.com and select "Register" under the "Broker" drop down menu in the upper
+            Go to <%= site_short_url %> and select "Register" under the "Broker" drop down menu in the upper
             right corner, or visit the
-            <a href="https://enroll.dchealthlink.com/broker_registration" target="_blank">Broker Registration page</a>.
+            <a href="<%= main_app.broker_registration_url%>" target="_blank">Broker Registration page</a>.
             <br/>
             <br/>
             For Brokers who work with an agency and receive the message that the Broker Agency is
@@ -141,7 +138,7 @@
             outstanding requirements that must be satisfied before your application can be approved.
             <br/>
             <br/>
-            Upon approval of your registration, you'll receive an email from <a>noreply@dchealthlink.com</a>
+            Upon approval of your registration, you'll receive an email from <a>noreply@<%= main_app.root_url %></a>
             with important information about how to access your broker portal.
           </p>
         </div>
@@ -154,16 +151,15 @@
           <%= image_tag("new_broker_registration.jpg", class: 'photo') %>
         </div>
         <div class="col-sm-10">
-          <p>Links to appointments and DC Health Link training can be found in our
-            <a href="https://dchealthlink.com/sites/default/files/v2/forms/new_broker_registration.pdf" target="_blank">Broker
-              Registration Guide.</a></p>
-          <%= link_to "Download", '/new_broker_registration.pdf', download: 'Broker Registration Form', class: 'btn btn-primary' %>
+          <p>Links to appointments and <%= site_short_name %> training can be found in our
+            <%= link_to "Broker Registration Guide", EnrollRegistry[:broker_agency].settings(:broker_registration_guide_pdf_link).item, target:"_blank" %></p>
+          <%= link_to "Download", EnrollRegistry[:broker_agency].settings(:broker_registration_guide_pdf).item, download: 'Broker Registration Form', class: 'btn btn-primary' %>
         </div>
       </div>
       <div class="col-sm-12 more-info">
         <hr>
         <strong>Need this information again?</strong>
-        <p>Search "Broker Tools" on <a href="https://dchealthlink.com/" target="_blank">dchealthlink.com</a> or enter
+        <p>Search "Broker Tools" on <a href="<%= main_app.root_url %>" target="_blank"><%= main_app.root_url %></a> or enter
           your name and email address below and we'll email this page to you.</p>
       </div>
       <div class="col-sm-12" id="brGuide">

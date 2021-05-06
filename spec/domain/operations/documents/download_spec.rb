@@ -10,9 +10,10 @@ module Operations
         described_class.new.call(params)
       end
 
+      let(:site_key)         { EnrollRegistry[:enroll_app].setting(:site_key).item }
       let(:user)             { FactoryBot.create(:user) }
-      let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key) }
-      let(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site)}
+      let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, site_key) }
+      let(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{site_key}_employer_profile".to_sym, site: site)}
       let(:employer_profile) {organization.employer_profile}
 
       before do
@@ -51,8 +52,9 @@ module Operations
       end
 
       describe 'pass params with invalid resource' do
-        let(:params) {{params: {:model => employer_profile.class.to_s, :model_id => organization.id.to_s, :relation => "documents", :relation_id => employer_profile.documents.first.id.to_s}, user: user}}
-        let(:error_message) {{ :message => ["Profile not found"]}}
+        let(:person) { FactoryBot.create(:person)}
+        let(:params) {{params: {:model => person.class.to_s, :model_id => organization.id.to_s, :relation => "documents", :relation_id => '263788267364'}, user: user}}
+        let(:error_message) {{ :message => ["Person not found"]}}
 
         it 'fails' do
           expect(subject).not_to be_success

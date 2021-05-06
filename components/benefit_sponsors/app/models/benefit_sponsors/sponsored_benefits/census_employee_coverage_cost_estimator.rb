@@ -101,7 +101,7 @@ module BenefitSponsors
         roster_eligibility_optimizer = RosterEligibilityOptimizer.new(contribution_model)
         price = 0.00
         contribution = 0.00
-        if employees_enrolling.count < 1
+        if employees_enrolling.none?
           if p_determination_builder && build_new_pricing_determination
             create_fake_pricing_determination(sponsored_benefit, sponsor_contribution, pricing_model, contribution_model, p_determination_builder)
             return [sponsor_contribution, price, contribution]

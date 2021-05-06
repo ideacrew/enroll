@@ -21,19 +21,19 @@
     %has_document_I20= applicant.has_i20?
     %has_document_DS2019= applicant.has_ds2019?
     - if applicant.i551
-      %document_I551_receipt_number= applicant.receipt_number
+      %document_I551_receipt_number= applicant.card_number
     - if applicant.i766
       %document_I766
-      = render :partial => 'financial_assistance/events/lawful_presence/receipt_document', locals: {receipt_number: applicant.receipt_number, expiration_date: applicant.expiration_date}
+        = render :partial => 'financial_assistance/events/lawful_presence/receipt_document', locals: {receipt_number: applicant.card_number, expiration_date: applicant.expiration_date}
     - if applicant.mac_read_i551
       %document_mac_read_I551
-      = render :partial => 'financial_assistance/events/lawful_presence/passport_information', locals: {issuing_country: applicant.issuing_country, passport_number: applicant.passport_numbr, expiration_date: applicant.expiration_date}
+        = render :partial => 'financial_assistance/events/lawful_presence/passport_information', locals: {issuing_country: applicant.issuing_country, passport_number: applicant.passport_number, expiration_date: applicant.expiration_date}
     - if applicant.foreign_passport_i94
       %document_foreign_passport_I94
-      = render :partial => 'financial_assistance/events/lawful_presence/passport_information', locals: {issuing_country: applicant.issuing_country, passport_number: applicant.passport_numbr, expiration_date: applicant.expiration_date}
+        = render :partial => 'financial_assistance/events/lawful_presence/passport_information', locals: {issuing_country: applicant.issuing_country, passport_number: applicant.passport_number, expiration_date: applicant.expiration_date}
     - if applicant.foreign_passport
       %document_foreign_passport
-      = render :partial => 'financial_assistance/events/lawful_presence/passport_information', locals: {issuing_country: applicant.issuing_country, passport_number: applicant.passport_numbr, expiration_date: applicant.expiration_date}
+        = render :partial => 'financial_assistance/events/lawful_presence/passport_information', locals: {issuing_country: applicant.issuing_country, passport_number: applicant.passport_number, expiration_date: applicant.expiration_date}
     - if applicant.case1
       %other_case_1_document_description= applicant.alien_number
     - if applicant.case2

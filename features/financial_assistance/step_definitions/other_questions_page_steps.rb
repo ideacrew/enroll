@@ -29,6 +29,16 @@ Given(/^all applicants fill all pages except other questions$/) do
     click_button('Save')
     find(:xpath, '//*[@id="btn-continue"]').click
 
+    if FinancialAssistanceRegistry[:unemployment_income].enabled?
+      find('#has_unemployment_income_true').click
+      sleep 1
+      fill_in 'income[amount]', with: '100'
+      fill_in 'income[start_on]', with: '1/1/2018'
+      find(".new-unemployment-income-form .interaction-choice-control-income-frequency-kind").click
+      find(".new-unemployment-income-form li.interaction-choice-control-income-frequency-kind-7").click
+      click_button('Save')
+    end
+
     find('#has_other_income_true').click
     sleep 1
     find(:css, "#other_income_kind[value='interest']").set(true)
@@ -173,11 +183,11 @@ When(/^they answer yes to was this person pregnant in the last (\d+) days questi
 end
 
 Then(/^pregnancy end date question should display$/) do
-  expect(page).to have_content('Pregnancy end on date')
+  expect(page).to have_content('Pregnancy end date')
 end
 
 Then(/^the is this person a student question should display$/) do
-  expect(page).to have_content('Is this person a student? *')
+  expect(page).to have_content(l10n('faa.other_ques.is_student'))
 end
 
 Given(/^the user answers yes to being a student$/) do
@@ -235,6 +245,17 @@ Then(/^the did you move to the US question should display$/) do
 end
 
 Then(/^the military veteran question should display$/) do
+  expect(page).to have_content('Are you an honorably discharged veteran or active duty member of the military?')
+end
+
+Given(/^user does not have eligible immigration status$/) do
+  consumer.person.consumer_role.update_attributes(citizen_status: false)
+  application.applicants.each do |applicant|
+    applicant.update_attributes(eligible_immigration_status: false)
+  end
+end
+
+Then(/^the military veteran question should NOT display$/) do
   expect(page).to have_content('Are you an honorably discharged veteran or active duty member of the military?')
 end
 

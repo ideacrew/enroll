@@ -583,6 +583,26 @@ module ApplicationHelper
     HbxProfile.current_hbx.try(:benefit_sponsorship).try(:earliest_effective_date)
   end
 
+  def is_shop_market_enabled?
+    EnrollRegistry.feature_enabled?(:aca_shop_market)
+  end
+
+  def is_fehb_market_enabled?
+    EnrollRegistry.feature_enabled?(:fehb_market)
+  end
+
+  def is_individual_market_enabled?
+    EnrollRegistry.feature_enabled?(:aca_individual_market)
+  end
+
+  def is_shop_and_individual_market_enabled?
+    EnrollRegistry.feature_enabled?(:aca_shop_market) && EnrollRegistry.feature_enabled?(:aca_individual_market)
+  end
+
+  def is_shop_or_fehb_market_enabled?
+    EnrollRegistry.feature_enabled?(:aca_shop_market) || EnrollRegistry.feature_enabled?(:fehb_market)
+  end
+
   def parse_ethnicity(value)
     return "" unless value.present?
     value = value.select{|a| a.present? }  if value.present?
@@ -641,7 +661,7 @@ module ApplicationHelper
   end
 
   def ivl_metal_network(plan)
-    (plan.nationwide ? 'nationwide' : 'dc metro') if plan.benefit_market_kind == :aca_individual
+    (plan.nationwide ? 'nationwide' : EnrollRegistry[:enroll_app].setting(:statewide_area).item) if plan.benefit_market_kind == :aca_individual
   end
 
   def ivl_hsa_status(plan_hsa_status, plan)
@@ -657,8 +677,8 @@ module ApplicationHelper
   def network_type(product)
     if product.nationwide
       'Nationwide'
-    elsif product.dc_in_network
-      'DC-Metro'
+    elsif product.in_state_network
+      EnrollRegistry[:enroll_app].setting(:statewide_area).item
     end
   end
 
@@ -690,7 +710,7 @@ module ApplicationHelper
   end
 
   def find_plan_name(hbx_id)
-    HbxEnrollment.where(id: hbx_id).first.try(:plan).try(:name)
+    HbxEnrollment.where(id: hbx_id).first.try(:product).try(:name)
   end
 
   def has_new_hire_enrollment_period?(census_employee)
@@ -807,7 +827,7 @@ module ApplicationHelper
   end
 
   def exchange_icon_path(icon)
-    site_key = Settings.site.key
+    site_key = EnrollRegistry[:enroll_app].setting(:site_key).item
       "icons/#{site_key}-#{icon}"
   end
 
@@ -822,7 +842,7 @@ module ApplicationHelper
       :pending => :publish_pending
     }
 
-    renewing = benefit_application.predecessor_id.present? && [:active, :terminated, :termination_pending].exclude?(benefit_application.aasm_state) ? "Renewing" : ""
+    renewing = benefit_application.predecessor_id.present? && benefit_application.reinstated_id.blank? && [:active, :terminated, :termination_pending].exclude?(benefit_application.aasm_state) ? "Renewing" : ""
     summary_text = aasm_map[benefit_application.aasm_state] || benefit_application.aasm_state
     summary_text = "#{renewing} #{summary_text.to_s.humanize.titleize}"
     return summary_text.strip
@@ -880,5 +900,10 @@ module ApplicationHelper
     else
       true
     end
+  end
+
+  def display_my_broker?(person, employee_role)
+    employee_role ||= person.active_employee_roles.first
+    (person.has_active_employee_role? && employee_role.employer_profile.broker_agency_profile.present?) || (person.has_active_consumer_role? && person.primary_family.current_broker_agency.present?)
   end
 end

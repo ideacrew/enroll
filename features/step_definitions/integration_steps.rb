@@ -315,6 +315,54 @@ Given(/^a Hbx admin with read only permissions exists$/) do
   FactoryBot.create :hbx_enrollment,family:user.primary_family, household:user.primary_family.active_household
 end
 
+Given(/^Employer Attestation feature is enabled/) do
+  enable_feature :employer_attestation
+end
+
+Given(/^Employer Attestation feature is disabled/) do
+  disable_feature :employer_attestation
+end
+
+Given(/^the shop market configuration is disabled$/) do
+  disable_feature :aca_shop_market
+end
+
+Given(/^the shop market configuration is enabled$/) do
+  enable_feature :aca_shop_market
+  enable_feature :agency_staff
+  load "components/benefit_sponsors/app/models/benefit_sponsors/organizations/broker_agency_profile.rb"
+  load "components/benefit_sponsors/app/models/benefit_sponsors/organizations/general_agency_profile.rb"
+end
+
+Given(/^the fehb market configuration is disabled$/) do
+  disable_feature :fehb_market
+end
+
+Given(/^the fehb market configuration is enabled$/) do
+  enable_feature :fehb_market
+end
+
+Given(/^the individual market configuration is disabled$/) do
+  disable_feature :aca_individual_market
+end
+
+Given(/^the individual market configuration is enabled$/) do
+  enable_feature :aca_individual_market
+end
+
+Given(/^both shop and fehb market configurations are enabled$/) do
+  enable_feature :aca_shop_market
+  enable_feature :fehb_market
+end
+
+Given(/^send secure message to employer is enabled$/) do
+  enable_feature :send_secure_message_employer
+end
+
+Given(/^send secure message to employer is disabled$/) do
+  disable_feature :send_secure_message_employer
+end
+
 When(/(^.+) enters? office location for (.+)$/) do |role, location|
   location = eval(location) if location.class == String
   RatingArea.where(zip_code: "01001").first || FactoryBot.create(:rating_area, zip_code: "01001", county_name: "Hampden", rating_area: Settings.aca.rating_areas.first)
@@ -410,7 +458,7 @@ end
 
 Then(/^.+ creates (.+) as a roster employee$/) do |named_person|
   person = people[named_person]
-  screenshot("create_census_employee")
+  # screenshot("create_census_employee")
   fill_in 'census_employee[first_name]', :with => person[:first_name]
   fill_in 'census_employee[last_name]', :with => person[:last_name]
   fill_in 'jq_datepicker_ignore_census_employee[dob]', :with => person[:dob]
@@ -431,7 +479,7 @@ Then(/^.+ creates (.+) as a roster employee$/) do |named_person|
   find(:xpath, '//div[div/span[contains(., "SELECT KIND")]]//li[contains(., "home")]').click
 
   fill_in 'census_employee[email_attributes][address]', with: 'broker.assist@dc.gov'
-  screenshot("broker_create_census_employee_with_data")
+  # screenshot("broker_create_census_employee_with_data")
   find('.interaction-click-control-create-employee').click
 end
 
@@ -443,20 +491,20 @@ end
 When(/^.* visit the Employer portal$/) do
   visit "/"
   page.click_link 'Employer Portal'
-  screenshot("employer_start")
+  # screenshot("employer_start")
 end
 
 Then(/^(?:.+) should see a successful sign up message$/) do
   FactoryBot.create(:sic_code, sic_code: "0111")
-  expect(page).to have_content("Welcome to DC Health Link")
-  screenshot("employer_sign_up_welcome")
+  expect(page).to have_content("Welcome to #{EnrollRegistry[:enroll_app].setting(:short_name).item}")
+  # screenshot("employer_sign_up_welcome")
 end
 
 Then(/^(?:.+) should click on employer portal$/) do
   visit "/"
-  screenshot("start")
+  # screenshot("start")
   page.click_link 'Employer Portal'
-  screenshot("employee_portal")
+  # screenshot("employee_portal")
 end
 
 When(/^(?:.+) go(?:es)? to the employee account creation page$/) do
@@ -470,9 +518,9 @@ And(/^employee visits the Employee Portal page$/) do
 end
 
 Then(/^(?:.+) should be logged on as an unlinked employee$/) do
-  screenshot("logged_in_welcome")
+  # screenshot("logged_in_welcome")
   @browser.a(href: /consumer\/employee\/search/).wait_until_present
-  screenshot("logged_in_welcome")
+  # screenshot("logged_in_welcome")
   expect(@browser.a(href: /consumer.employee.search/).visible?).to be_truthy
 end
 
@@ -481,8 +529,8 @@ When (/^(.*) logs? out$/) do |someone|
   click_link "Logout"
   visit "/"
   find('.container.welcome', wait: 5) do |element|
-    element.find('.heading-text', text: /Welcome to #{Settings.site.short_name}/i)
-    element.find('.sub-text', text: /#{Settings.site.byline}/i)
+    element.find('.heading-text', text: /Welcome to #{EnrollRegistry[:enroll_app].setting(:short_name).item}/i)
+    element.find('.sub-text', text: /#{EnrollRegistry[:enroll_app].setting(:byline).item}/i)
   end
 end
 
@@ -497,9 +545,8 @@ end
 
 Then(/^.+ should see the employee search page$/) do
   wait_for_ajax(2, 2)
-  sleep(1)
-  expect(find('.interaction-field-control-person-first-name')).to be_visible
-  screenshot("employer_search")
+  expect(find('.interaction-field-control-person-first-name', wait: 5)).to be_visible
+  # screenshot("employer_search")
 end
 
 Given(/^(.*) visits the employee portal$/) do |named_person|
@@ -511,7 +558,7 @@ Then(/^.+ should see the employee privacy text$/) do
 end
 
 When(/^(.*) creates an HBX account$/) do |named_person|
-  screenshot("start")
+  # screenshot("start")
 
   person = people[named_person]
   fill_in "user[oim_id]", :with => person[:email]
@@ -546,7 +593,7 @@ When(/^.+ enters? the identifying info of (.*)$/) do |named_person|
   fill_in 'person[ssn]', :with => person_ssn
   find(:xpath, '//label[@for="radio_male"]').click
 
-  screenshot("information_entered")
+  # screenshot("information_entered")
   find('.interaction-click-control-continue').click
 end
 
@@ -563,7 +610,7 @@ end
 
 Then(/^Employee should see the matched employee record form$/) do
   expect(page).to have_content(employer.legal_name)
-  screenshot("employer_search_results")
+  # screenshot("employer_search_results")
 end
 
 Then(/^Employee should see the shop market place workflow as default$/) do
@@ -585,11 +632,11 @@ end
 # TODO: needs to be merged
 Then(/^.+ should see the matching employee record form$/) do
   expect(page).to have_content('Turner Agency')
-  screenshot("employer_search_results")
+  # screenshot("employer_search_results")
 end
 
 When(/^.+ accepts? the matched employer$/) do
-  screenshot("update_personal_info")
+  # screenshot("update_personal_info")
   find_by_id('btn-continue').click
 end
 
@@ -607,11 +654,11 @@ When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
   page.evaluate_script("window.location.reload()")
   wait_for_ajax(3,2)
   person = people[named_person]
-  # screenshot("before modal")
+  # # screenshot("before modal")
   # # find('.interaction-click-control-click-here').click
-  # screenshot("during modal")
+  # # screenshot("during modal")
   # # find('.interaction-click-control-close').click
-  # screenshot("after modal")
+  # # screenshot("after modal")
   expect(page).to have_css('input.interaction-field-control-person-phones-attributes-0-full-phone-number')
   wait_for_ajax(3,2)
 
@@ -625,10 +672,23 @@ When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
   wait_for_ajax
   phone_number = "(#{person[:home_phone][0..2]}) #{person[:home_phone][3..5]}-#{person[:home_phone][6..9]}"
   fill_in "person[phones_attributes][0][full_phone_number]", :with => phone_number
-  screenshot("personal_info_complete")
+  # screenshot("personal_info_complete")
   expect(page).to have_field("HOME PHONE", with: phone_number) if person[:home_phone].present?
   expect(page).to have_selector('.selectric', text: 'Only electronic communications')
   find('.interaction-click-control-continue', text: 'CONTINUE', wait: 5).click
+end
+
+And(/^.+ completes and submits the matched employee form for (.*)$/) do |named_person|
+  wait_for_ajax
+  page.evaluate_script("window.location.reload()")
+  wait_for_ajax(3,2)
+  person = people[named_person]
+  fill_in "person[first_name]", with: person[:first_name]
+  fill_in "person[last_name]", with: person[:last_name]
+  fill_in 'jq_datepicker_ignore_person_dob', with: person[:dob]
+  fill_in 'person[ssn]', with: person[:ssn]
+  find('.interaction-click-control-continue', text: 'CONTINUE', wait: 5).click
+
 end
 
 And(/^.+ sees the (.*) page and clicks Continue$/) do |which_page|
@@ -652,7 +712,7 @@ end
 
 Then(/^.+ should see the dependents page$/) do
   expect(page).to have_content('Add New Person')
-  screenshot("dependents_page")
+  # screenshot("dependents_page")
 end
 
 When(/^.+ clicks? edit on baby Soren$/) do
@@ -685,12 +745,14 @@ end
 When(/^.+ enters? the dependent info of .+ daughter$/) do
   fill_in 'dependent[first_name]', with: 'Cynthia'
   fill_in 'dependent[last_name]', with: 'White'
+  fill_in 'dependent[ssn]', with: '999999999'
   date = TimeKeeper.date_of_record - 28.years
   dob = date.to_s
   fill_in 'jq_datepicker_ignore_dependent[dob]', with: dob
-  find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Child')]").click
   find(:xpath, "//label[@for='radio_female']").click
   find(:xpath, "//label[@for='radio_female']").click
+  find('.select-relation .selectric span.label').click
+  find('.selectric-scroll li', text: 'Child').click
 end
 
 When(/^.+ enters? the dependent info of Patrick wife$/) do
@@ -716,7 +778,7 @@ When(/^.+ clicks? confirm member$/) do
 end
 
 When(/^.+ clicks? continue on the dependents page$/) do
-  screenshot("group_selection")
+  # screenshot("group_selection")
   find('#btn-continue').click
 end
 
@@ -735,7 +797,7 @@ end
 
 Then(/^.+ should see the plan shopping welcome page$/) do
   expect(page).to have_content('Choose Plan')
-  screenshot("plan_shopping_welcome")
+  # screenshot("plan_shopping_welcome")
 end
 
 Then(/^.+ should see the plan shopping page with no dependent$/) do
@@ -759,13 +821,13 @@ When(/^.+ clicks? shop for plans button$/) do
 end
 
 When(/^.+ clicks Shop for new plan button$/) do
-  find('.interaction-click-control-shop-for-new-plan', wait: 5).click
+  find('.interaction-click-control-shop-for-new-plan', wait: 10).click
 end
 
 Then(/^.+ should see the list of plans$/) do
   find('#planContainer', wait: 10)
   expect(page).to have_link('Select')
-  screenshot("plan_shopping")
+  # screenshot("plan_shopping")
 end
 
 And(/^.+ should see the Metal Level filter$/) do
@@ -786,7 +848,7 @@ When(/^.+ filters plans by Carrier/) do
   carrier_option = find('li .interaction-choice-control-carrier-1', wait: 5)
   @carrier_selected = carrier_option.text
   carrier_option.click
-  find(".interaction-click-control-apply", wait: 5).click
+  find(".interaction-click-control-apply", match: :first, wait: 5).click
 end
 
 Then(/^.+ should see plans filtered by Carrier/) do
@@ -820,24 +882,24 @@ end
 
 Then(/^.+ should see the coverage summary page$/) do
   expect(page).to have_content('Confirm Your Plan Selection')
-  screenshot("summary_page")
+  # screenshot("summary_page")
 end
 
 When(/^.+ clicks? on Confirm button on the coverage summary page$/) do
-  find('.interaction-click-control-confirm', wait: 5).click
+  find('.interaction-click-control-confirm', wait: 10).click
 end
 
 Then(/^.+ should see the receipt page$/) do
   find('h1.darkblue', wait: 10)
   expect(page).to have_content('Enrollment Submitted')
-  screenshot("receipt_page")
+  # screenshot("receipt_page")
   find('.interaction-click-control-continue').click
 end
 
 Then(/^.+ should see the "my account" page$/) do
   find('.my-account-page', wait: 10)
-  expect(page).to have_content("My #{Settings.site.short_name}")
-  screenshot("my_account")
+  expect(page).to have_content("My #{EnrollRegistry[:enroll_app].setting(:short_name).item}")
+  # screenshot("my_account")
 end
 
 Then(/^.+ should see the "Your Enrollment History" section/) do
@@ -896,9 +958,9 @@ Then(/^.+ should see the appropriate (.*?) template text$/) do |market_name|
     expect(page).to have_content("Your Enrollment Confirmation")
     expect(page).to have_content('plan offered by your employer.')
     expect(page).to have_content('Your employer contributes')
-    expect(page).to have_content('Thank you for enrolling in coverage through DC Health Link')
+    expect(page).to have_content("Thank you for enrolling in coverage through #{EnrollRegistry[:enroll_app].setting(:short_name).item}")
     # In the email signature
-    [Settings.site.short_name, Settings.contact_center.short_number, Settings.contact_center.tty].each do |email_signature_line|
+    [EnrollRegistry[:enroll_app].setting(:short_name).item, Settings.contact_center.short_number, Settings.contact_center.tty].each do |email_signature_line|
       expect(page).to have_content(email_signature_line)
     end
   end
@@ -944,7 +1006,6 @@ end
 When(/^(?:General){0}.+ clicks? on the ((?:General|Staff){0}.+) option$/) do |tab_name|
   find(".interaction-click-control-#{tab_name.downcase.gsub(' ','-')}", wait: 5).click
   wait_for_ajax
-  find('#myTabContent').click
 end
 
 And(/^clicks on the person in families tab$/) do
@@ -974,26 +1035,26 @@ end
 
 When(/^I click on continue on qle confirmation page$/) do
   expect(page).to have_content "Enrollment Submitted"
-  screenshot("qle_confirm")
+  # screenshot("qle_confirm")
   click_link "GO TO MY ACCOUNT"
 end
 
 
 When(/^I select a future qle date$/) do
   expect(page).to have_content "Married"
-  screenshot("future_qle_date")
+  # screenshot("future_qle_date")
   fill_in "qle_date", :with => (TimeKeeper.date_of_record + 5.days).strftime("%m/%d/%Y")
   click_link "CONTINUE"
 end
 
 Then(/^I should see not qualify message$/) do
   expect(page).to have_content "The date you submitted does not qualify for special enrollment"
-  screenshot("not_qualify")
+  # screenshot("not_qualify")
 end
 
 When(/^I select a past qle date$/) do
   expect(page).to have_content "Married"
-  screenshot("past_qle_date")
+  # screenshot("past_qle_date")
   fill_in "qle_date", :with => (TimeKeeper.date_of_record - 5.days).strftime("%m/%d/%Y")
   click_link((TimeKeeper.date_of_record - 5.days).day)
   within '#qle-date-chose' do
@@ -1003,7 +1064,7 @@ end
 
 Then(/^I should see confirmation and continue$/) do
   expect(page).to have_content "Based on the information you entered, you may be eligible to enroll now but there is limited time"
-  screenshot("valid_qle")
+  # screenshot("valid_qle")
   click_button "Continue"
 end
 
@@ -1138,4 +1199,14 @@ end
 And(/^Hbx Admin click on Employers/) do
   find_link("Employers").visible?
   click_link("Employers")
+end
+
+And(/I click (.*) QLE events in QLE carousel$/) do |market_name|
+  click_link market_name
+  sleep(2)
+end
+
+Then(/^I should see Shop for new plan button$/) do
+  shop_for_new_plan_input = page.all('input').detect { |input| input[:value] == 'Shop for new plan' }
+  expect(shop_for_new_plan_input.present?).to eq(true)
 end

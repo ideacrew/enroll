@@ -90,12 +90,12 @@ end
 
 Then(/^the user will navigate to the Eligibility Determination page and will not find CSR text present$/) do
   expect(page).to have_content('Eligibility Results')
-  expect(page).not_to have_content('These people are eligible for savings of')
+  expect(page).not_to have_content('These people are eligible for monthly premium reductions of')
   expect(page).not_to have_content('They also qualify for extra savings called')
 end
 
 Then(/^the user will navigate to the Eligibility Determination page and will find CSR text present$/) do
   expect(page).to have_content('Eligibility Results')
-  expect(page).to have_content('These people are eligible for savings of')
-  expect(page).to have_content('They also qualify for extra savings called')
+  expect(page).to have_content('These people are eligible for monthly premium reductions of')
+  expect(page).to have_content('They also qualify for lower out-of-pocket costs')
 end

@@ -3,9 +3,7 @@
 class UnassistedPlanCostDecorator < SimpleDelegator
   include FloatHelper
 
-  attr_reader :hbx_enrollment
-  attr_reader :elected_aptc
-  attr_reader :tax_household
+  attr_reader :hbx_enrollment, :elected_aptc, :tax_household
 
   def initialize(plan, hbx_enrollment, elected_aptc = 0, tax_household = nil)
     super(plan)
@@ -42,9 +40,26 @@ class UnassistedPlanCostDecorator < SimpleDelegator
     end
   end
 
+  def rating_area
+    used_address = hbx_enrollment.consumer_role.rating_address
+    rating_area = ::BenefitMarkets::Locations::RatingArea.rating_area_for(used_address, during: schedule_date)
+    #  .where(active_year: __getobj__.active_year).detect{|a| a.county_zip_ids.include?(county_id)}
+    # rating_area.exchange_provided_code.present? ? rating_area.exchange_provided_code : __getobj__.premium_tables.first.rating_area.exchange_provided_code
+    if rating_area
+      rating_area.exchange_provided_code
+    else
+      __getobj__.premium_tables.first.rating_area.exchange_provided_code
+    end
+  end
+
   #TODO: FIX me to refactor hard coded rating area
   def premium_for(member)
-    (::BenefitMarkets::Products::ProductRateCache.lookup_rate(__getobj__, schedule_date, age_of(member), "R-DC001") * large_family_factor(member)).round(2)
+    (::BenefitMarkets::Products::ProductRateCache.lookup_rate(__getobj__, schedule_date, age_of(member), rating_area) * large_family_factor(member)).round(2)
+    # FIXME
+  rescue StandardError => e
+    warn e.inspect
+    warn e.backtrace
+    0
   end
 
   def employer_contribution_for(_member)
@@ -52,12 +67,12 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   end
 
   def all_members_aptc_for_saved_enrs
-    serv_obj = ::Services::ApplicableAptcService.new(@hbx_enrollment.id, @elected_aptc, [__getobj__.id.to_s])
+    serv_obj = ::Services::ApplicableAptcService.new(@hbx_enrollment.id, @hbx_enrollment.effective_on, @elected_aptc, [__getobj__.id.to_s])
     serv_obj.aptc_per_member[__getobj__.id.to_s]
   end
 
   def all_members_aptc_for_unsaved_enrs
-    fac_obj = ::Factories::IvlPlanShoppingEligibilityFactory.new(@hbx_enrollment, @elected_aptc, [__getobj__.id.to_s])
+    fac_obj = ::Factories::IvlPlanShoppingEligibilityFactory.new(@hbx_enrollment, @hbx_enrollment.effective_on, @elected_aptc, [__getobj__.id.to_s])
     fac_obj.fetch_aptc_per_member[__getobj__.id.to_s]
   end
 
@@ -123,10 +138,10 @@ class UnassistedPlanCostDecorator < SimpleDelegator
     return false if elected_aptc <= 0
 
     if @hbx_enrollment.persisted?
-      serv_obj = ::Services::ApplicableAptcService.new(hbx_enrollment.id, elected_aptc, [__getobj__.id.to_s])
+      serv_obj = ::Services::ApplicableAptcService.new(hbx_enrollment.id, hbx_enrollment.effective_on, elected_aptc, [__getobj__.id.to_s])
       member_hash = serv_obj.elected_aptc_per_member
     else
-      fac_obj = ::Factories::IvlPlanShoppingEligibilityFactory.new(@hbx_enrollment, elected_aptc, [__getobj__.id.to_s])
+      fac_obj = ::Factories::IvlPlanShoppingEligibilityFactory.new(@hbx_enrollment, @hbx_enrollment.effective_on, elected_aptc, [__getobj__.id.to_s])
       member_hash = fac_obj.fetch_elected_aptc_per_member
     end
 

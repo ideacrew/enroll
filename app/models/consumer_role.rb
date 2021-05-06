@@ -128,6 +128,7 @@ class ConsumerRole
   delegate :ssn,    :ssn=,    to: :person, allow_nil: true
   delegate :no_ssn,    :no_ssn=,    to: :person, allow_nil: true
   delegate :dob,    :dob=,    to: :person, allow_nil: true
+  delegate :zip,    to: :person, allow_nil: true
   delegate :gender, :gender=, to: :person, allow_nil: true
   delegate :us_citizen, :us_citizen=, to: :person, allow_nil: true
 
@@ -215,6 +216,8 @@ class ConsumerRole
 
   #list of the collections we want to track under consumer role model
   COLLECTIONS_TO_TRACK = %w- Person consumer_role vlp_documents lawful_presence_determination hbx_enrollments -
+
+  delegate :addresses, to: :person, allow_nil: true
 
   def ivl_coverage_selected
     if unverified?
@@ -348,6 +351,10 @@ class ConsumerRole
 
   def billing_address
     addresses.detect { |adr| adr.kind == "billing" } || home_address
+  end
+
+  def rating_address
+    (addresses.detect { |adr| adr.kind == "home" }) || (addresses.detect { |adr| adr.kind == "mailing" })
   end
 
   def self.find(consumer_role_id)
@@ -873,8 +880,8 @@ class ConsumerRole
     if person.tribal_id.present?
       fail_indian_tribe
       fail_native_status!
-    else
-      pass_native_status! if all_types_verified? && !fully_verified?
+    elsif all_types_verified? && !fully_verified? && may_pass_native_status?
+      pass_native_status!
     end
   end
 
@@ -1036,6 +1043,7 @@ class ConsumerRole
   end
 
   def pass_lawful_presence(*args)
+    return if lawful_presence_authorized?
     lawful_presence_determination.authorize!(*args)
     verification_types.reject{|type| VerificationType::NON_CITIZEN_IMMIGRATION_TYPES.include? type.type_name }.each{ |type| type.pass_type }
   end

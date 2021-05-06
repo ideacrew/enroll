@@ -8,7 +8,7 @@ Then(/Individual fills demographic details/) do
   find(:xpath, "//span[@class='label'][contains(., 'SELECT STATE')]").click
   find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'DC')]").click
   fill_in "person[addresses_attributes][0][zip]", :with => "20002"
-  screenshot("personal_form")
+  # screenshot("personal_form")
 end
 
 Then(/(.*) selects i327 document and fills required details (.*)$/) do |text, correct_or_incorrect|

@@ -1,6 +1,7 @@
 class Person
   include Mongoid::Document
   include Mongoid::Timestamps
+  include ::Config::SiteModelConcern
   # include SetCurrentUser
 
   GENDER_KINDS = %W(male female)
@@ -114,6 +115,7 @@ class Person
   end
 
   def has_active_employee_role?
+    return false unless is_shop_or_fehb_market_enabled?
     active_employee_roles.any?
   end
 

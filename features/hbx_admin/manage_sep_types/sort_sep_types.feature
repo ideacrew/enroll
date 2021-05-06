@@ -3,6 +3,9 @@ Feature: Admin has ability to sort SEP Types on Sort SEPs Page and save their po
   User will create an account through HBx Portal to sign as Employee and checks the re arranged positions of SEP Type on Qle carousel
 
   Background:
+    Given both shop and fehb market configurations are enabled
+    Given all market kinds are enabled for user to select
+    Given all announcements are enabled for user to select
     Given that a user with a HBX staff role with hbx_tier3 subrole exists
     When Hbx Admin logs on to the Hbx Portal
     Given the Admin is on the Main Page

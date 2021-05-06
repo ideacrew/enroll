@@ -3,10 +3,12 @@ require_dependency "sponsored_benefits/application_controller"
 module SponsoredBenefits
   class Organizations::BrokerAgencyProfilesController < ApplicationController
     include DataTablesAdapter
+    include ::Config::SiteModelConcern
     before_action :find_profile, :general_agency_profiles, only: [:employers]
 
     def employers
       # This should be index action in plan design organizations controller
+      head :bad_request unless is_shop_or_fehb_market_enabled?
       @datatable = klass.new(profile_id: @profile._id)
     end
 
@@ -14,7 +16,7 @@ module SponsoredBenefits
 
     def find_profile
       @profile = BenefitSponsors::Organizations::BrokerAgencyProfile.find(params[:id]) || BenefitSponsors::Organizations::GeneralAgencyProfile.find(params[:id])
-      @provider = provider
+      @provider = provider if @profile
     end
 
     def general_agency_profiles

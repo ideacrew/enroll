@@ -41,7 +41,7 @@ When(/^user registers as an individual$/) do
   fill_in "person_ssn", with: '212-31-3131'
   find(:xpath, '//label[@for="radio_male"]').click
   find(:xpath, '//label[@for="is_applying_coverage_true"]').click
-  screenshot("register")
+  # screenshot("register")
   find('.btn', text: 'CONTINUE').click
 end
 

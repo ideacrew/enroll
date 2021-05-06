@@ -58,6 +58,7 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
       before do
         allow(person).to receive(:has_active_employee_role?).and_return(true)
         allow(person).to receive(:has_employer_benefits?).and_return(true)
+        EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
       end
 
       it "should have active employee role and benefit group" do
@@ -86,6 +87,7 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
         allow(person).to receive(:has_active_employee_role?).and_return(true)
         allow(person).to receive(:has_employer_benefits?).and_return(true)
         allow(person).to receive(:is_consumer_role_active?).and_return(true)
+        EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
 
       end
       it "should have both active consumer and employee role" do
@@ -185,6 +187,7 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
       allow(person).to receive(:is_consumer_role_active?).and_return(true)
       allow(person).to receive(:has_employer_benefits?).and_return(true)
       allow(person).to receive(:is_resident_role_active?).and_return(true)
+      EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
 
       expect(helper.view_market_places(person)).to eq(['shop', 'individual', 'coverall'])
     end
@@ -192,6 +195,7 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
     it "should return shop & individual if can_shop_both_markets? return true" do
       allow(person).to receive(:is_consumer_role_active?).and_return(true)
       allow(person).to receive(:has_employer_benefits?).and_return(true)
+      EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
       expect(helper.view_market_places(person)).to eq BenefitMarkets::Products::Product::MARKET_KINDS
       expect(helper.view_market_places(person)).to eq ["shop", "individual"]
     end

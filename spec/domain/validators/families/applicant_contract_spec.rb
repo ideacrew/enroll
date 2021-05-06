@@ -42,6 +42,14 @@ RSpec.describe Validators::Families::ApplicantContract,  dbclean: :after_each do
       it { expect(subject.call(optional_params).success?).to be_falsey }
       it { expect(subject.call(optional_params).error?(required_params.first[0])).to be_truthy }
     end
+
+    context "with all required and optional parameters and invalid date format" do
+      it "should pass validation" do
+        all_params[:dob] = all_params[:dob].to_time
+        result = subject.call(all_params)
+        expect(result.success?).to be_truthy
+      end
+    end
   end
 
   context "Given valid parameters" do

@@ -20,7 +20,7 @@ module Validators
         end
       end
 
-      rule(:applicants).each do  |key, value|
+      rule(:applicants).each do
         if key? && value
           if value.is_a?(Hash)
             result = Validators::Families::ApplicantContract.new.call(value)
@@ -31,7 +31,7 @@ module Validators
         end
       end
 
-      rule(:eligibility_determinations).each do  |key, value|
+      rule(:eligibility_determinations).each do
         if key? && value
           if value.is_a?(Hash)
             result = Validators::Families::DeterminationContract.new.call(value)

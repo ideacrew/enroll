@@ -2,7 +2,7 @@ require 'rails_helper'
 Rake.application.rake_require "tasks/update_hbx_enrollment"
 Rake::Task.define_task(:environment)
 
-RSpec.describe 'Update HBX Enrollments carrier profile id from plan', :type => :task, dbclean: :after_each do
+RSpec.describe 'Update HBX Enrollments carrier profile id from plan', :type => :task, dbclean: :around_each do
   let!(:families) { FactoryBot.create_list(:family, 10, :with_primary_family_member) }
   let!(:hbx_enrollments) do
     Family.all.each do |family|

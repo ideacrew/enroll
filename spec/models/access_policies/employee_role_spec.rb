@@ -49,7 +49,7 @@ describe AccessPolicies::EmployeeRole, :dbclean => :after_each do
 
     before do
       broker_role.save
-      broker_agency_account = BrokerAgencyAccount.create(employer_profile: person.employee_roles.first.employer_profile, start_on: TimeKeeper.date_of_record, broker_agency_profile_id: broker_agency_profile.id, writing_agent_id: broker_role.id )
+      BrokerAgencyAccount.create(employer_profile: person.employee_roles.first.employer_profile, start_on: TimeKeeper.date_of_record, broker_agency_profile_id: broker_agency_profile.id, writing_agent_id: broker_role.id)
     end
 
     context "who doesn't match employer_profile_id" do
@@ -76,7 +76,7 @@ describe AccessPolicies::EmployeeRole, :dbclean => :after_each do
 
     before do
       broker_agency_staff_role.save
-      broker_agency_account = BrokerAgencyAccount.create(employer_profile: person.employee_roles.first.employer_profile, start_on: TimeKeeper.date_of_record, broker_agency_profile_id: broker_agency_profile.id)
+      BrokerAgencyAccount.create(employer_profile: person.employee_roles.first.employer_profile, start_on: TimeKeeper.date_of_record, broker_agency_profile_id: broker_agency_profile.id)
     end
 
     context "who doesn't match employer_profile_id" do
@@ -105,7 +105,8 @@ describe AccessPolicies::EmployeeRole, :dbclean => :after_each do
     before do
       general_agency_staff_role.unset(:benefit_sponsors_general_agency_profile_id) # ToDo - Move/remove these old specs
       general_agency_staff_role.save
-      general_agency_account = GeneralAgencyAccount.create(employer_profile: person.employee_roles.first.employer_profile, start_on: TimeKeeper.date_of_record, general_agency_profile_id: general_agency_profile.id)
+      GeneralAgencyAccount.create(employer_profile: person.employee_roles.first.employer_profile, start_on: TimeKeeper.date_of_record, general_agency_profile_id: general_agency_profile.id)
+      general_agency_profile.update(market_kind: :shop)
     end
 
     context "who doesn't match employer_profile_id" do

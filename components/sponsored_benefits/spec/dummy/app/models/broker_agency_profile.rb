@@ -2,6 +2,7 @@ class BrokerAgencyProfile
 
   include Mongoid::Document
   include Mongoid::Timestamps
+  include Config::SiteModelConcern
 
   embedded_in :organization
 

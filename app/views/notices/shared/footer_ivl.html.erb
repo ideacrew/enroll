@@ -22,7 +22,7 @@
       padding:0;
       mso-line-height-rule:exactly
       font-size:10px;
-      color:#333333;
+      color: <%= EnrollRegistry[:ivl_notice_footer].settings(:color).item %>;
       font-family: "Open Sans", sans-serif;
       margin-top: 14px;
     }
@@ -46,13 +46,13 @@
   <% if notice.is_a?(Notifier::NoticeKind) %>
     <br />
   <% end %>
-  <table class="footer-section" style="color: #333333;" width="100%" border="0">
+  <table class="footer-section" style="color: <%= EnrollRegistry[:ivl_notice_footer].settings(:color).item %>;" width="100%" border="0">
     <tr>
       <td align="center">_____________________________________________________________________________________________________________________</td>
     </tr>
     <tr>
       <td style="padding:3px 10px; font-size:8px;" align="center">Questions?
-        Call DC Health Link at <%= notice.is_a?(Notifier::NoticeKind) ? Settings.contact_center.short_number : notice.hbe.phone%>, or go to www.dchealthlink.com.
+        Call <%= site_short_name %> at <%= notice.is_a?(Notifier::NoticeKind) ?  contact_center_short_phone_number : notice.hbe.phone %>, or go to <%= site_policies_url %>.
       </td>
     </tr>
   </table>

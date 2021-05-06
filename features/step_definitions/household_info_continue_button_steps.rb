@@ -56,12 +56,14 @@ Given(/^at least one other household members exist$/) do
   find('#new_applicant > div.house.col-md-12.col-sm-12.col-xs-12.no-pd > div:nth-child(5) > div.col-md-5.mt18 > label.static_label.label-floatlabel.mt-label').click
   find("span", :text => "choose").click
   find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Spouse')]").click
+
   choose('applicant_us_citizen_true', allow_label_click: true)
   choose('applicant_naturalized_citizen_false', allow_label_click: true)
   choose('indian_tribe_member_no', allow_label_click: true)
   choose('radio_incarcerated_no', allow_label_click: true)
 
-  find(:xpath, '//label[@for="is_applying_coverage_false"]').click
+  find(:xpath, '//label[@for="is_applying_coverage_true"]').click
+
   find(".btn", text: "CONFIRM MEMBER").click
 
   sleep 2
@@ -88,6 +90,7 @@ When(/^all applicants are in Info Completed state$/) do
     find("#has_self_employment_income_false", wait: 10).click
     find(:xpath, '//*[@id="btn-continue"]', wait: 10).click
 
+    find("#has_unemployment_income_false", wait: 10).click if FinancialAssistanceRegistry[:unemployment_income].enabled?
     find("#has_other_income_false", wait: 10).click
     find(:xpath, '//*[@id="btn-continue"]', wait: 10).click
     find("#has_deductions_false", wait: 10).click
@@ -103,7 +106,6 @@ When(/^all applicants are in Info Completed state$/) do
     find("#has_daily_living_no", wait: 10).click
     find("#need_help_paying_bills_no", wait: 10).click
     find("#radio_physically_disabled_no", wait: 10).click
-    choose('is_veteran_or_active_military_no')
     find('[name=commit]', wait: 10).click
   end
 end
@@ -119,6 +121,7 @@ And(/^primary applicant completes application and marks they are required to fil
   find("#has_self_employment_income_false").click
   find(:xpath, '//*[@id="btn-continue"]').click
 
+  find('#has_unemployment_income_false').click if FinancialAssistanceRegistry[:unemployment_income].enabled?
   find("#has_other_income_false").click
   find(:xpath, '//*[@id="btn-continue"]').click
   find("#has_deductions_false").click
@@ -134,7 +137,6 @@ And(/^primary applicant completes application and marks they are required to fil
   find("#has_daily_living_no").click
   find("#need_help_paying_bills_no").click
   find("#radio_physically_disabled_no").click
-  choose('is_veteran_or_active_military_no')
   find('[name=commit]').click
 end
 

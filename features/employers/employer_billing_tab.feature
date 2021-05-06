@@ -1,6 +1,8 @@
 Feature: Employer should be able to view payment details
 
   Background: Setup site, employer
+    Given the shop market configuration is enabled
+    Given all announcements are enabled for user to select
     Given a DC site exists with a benefit market
     Given benefit market catalog exists for enrollment_open initial employer with health benefits
     And an employer ABC Widgets exists with statements and premium payments

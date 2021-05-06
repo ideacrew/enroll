@@ -1,8 +1,8 @@
 # config valid only for current version of Capistrano
 lock '~> 3.11.0'
 
-set :application, 'enroll'
-set :repo_url, 'https://github.com/dchbx/enroll.git'
+set :application, 'trunk'
+set :repo_url, 'https://github.com/ideacrew/enroll.git'
 
 # Default branch is :master
 # ask :branch, proc { `git rev-parse --abbrev-ref HEAD`.chomp }.call
@@ -55,6 +55,11 @@ namespace :assets do
           execute("cd #{release_path} && nvm use 10 && yarn install")
           execute :rake, "assets:clobber"
           execute("cd #{release_path} && nvm use 10 && RAILS_ENV=production NODE_ENV=production bundle exec rake assets:precompile")
+          execute :rake, "seed:translations[db/seedfiles/english_translations_seed.rb]"
+          client_variabe = ENV['CLIENT'].downcase || ENV['client'].downcase
+          puts("Switching to #{client_variabe} configuration.") unless client_variabe.nil?
+          execute :rake, "configuration:client_configuration_toggler client='#{client_variabe}'" unless client_variabe.nil?
+          puts("No client configuration present, using current committed configuration.") if client_variabe.nil?
         end
       end
     end

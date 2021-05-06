@@ -1,55 +1,37 @@
 import { promises as fs } from 'fs';
+import { runtimeDictionary } from './concat-rspec-reports';
 
 import {
   FileWithRuntime,
   FileWithRuntimeDictionary,
-  RspecExample,
   FileGroup,
 } from './models';
-import {
-  createFilesWithRuntime,
-  splitFilesIntoGroups,
-  createFileDictionary,
-} from './util';
+import { createFilesWithRuntime, splitFilesIntoGroups } from './util';
 
 async function createSplitConfig(): Promise<void> {
   // Read cli arguments
-  const [reportPath, splitConfigPath, manualGroupCount] = process.argv.slice(2);
+  const [splitConfigPath, manualGroupCount] = process.argv.slice(2);
 
-  if (
-    reportPath === undefined ||
-    splitConfigPath === undefined ||
-    manualGroupCount === undefined
-  ) {
+  if (splitConfigPath === undefined || manualGroupCount === undefined) {
     console.error('Missing cli arguments');
     process.exit(1);
   }
 
-  // Read in rspec report
-  const rspecReport = await fs.readFile(`./${reportPath}`, 'utf-8');
-
-  // Convert string to workable object
-  const examples: RspecExample[] = JSON.parse(rspecReport).examples;
-
   // Create a dictionary of
-  const filesByRuntime: FileWithRuntimeDictionary = createFileDictionary(
-    examples
-  );
+  const filesByRuntime: FileWithRuntimeDictionary = await runtimeDictionary();
 
   const arrayOfSlowFiles: FileWithRuntime[] = createFilesWithRuntime(
     filesByRuntime
   );
 
+  console.log('Creating split config');
   const splitConfig: FileGroup[] = splitFilesIntoGroups(
     arrayOfSlowFiles,
     +manualGroupCount
   );
 
   try {
-    await fs.writeFile(
-      `./${splitConfigPath}/rspec-split-config.json`,
-      JSON.stringify(splitConfig)
-    );
+    await fs.writeFile(`./${splitConfigPath}`, JSON.stringify(splitConfig));
   } catch (e) {
     console.error(e);
   }

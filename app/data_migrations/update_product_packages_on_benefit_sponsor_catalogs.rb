@@ -11,7 +11,7 @@ class UpdateProductPackagesOnBenefitSponsorCatalogs < MongoidMigrationTask
     total_count = fetch_benefit_sponsorships.count
     puts "Total Benefit Sponsorships count #{total_count}" unless Rails.env.test?
 
-    market_catalog = BenefitSponsors::Site.all.where(site_key: :dc).first.benefit_market_for(:aca_shop).benefit_market_catalog_for(Date.new(2020,1,1))
+    market_catalog = BenefitSponsors::Site.all.where(site_key: EnrollRegistry[:enroll_app].settings(:site_key).item).first.benefit_market_for(:aca_shop).benefit_market_catalog_for(Date.new(2020,1,1))
 
     while offset <= total_count
       fetch_benefit_sponsorships.offset(offset).limit(batch_size).no_timeout.each do |bs|

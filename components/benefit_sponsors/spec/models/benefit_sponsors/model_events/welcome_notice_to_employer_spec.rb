@@ -2,8 +2,9 @@ require 'rails_helper'
 
 RSpec.describe 'BenefitSponsors::ModelEvents::WelcomeNoticeToEmployer', dbclean: :around_each  do
   let(:notice_event)  { "welcome_notice_to_employer" }
-  let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key) }
-  let!(:model_instance)     { FactoryBot.build(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site) }
+  let(:site_key)     { EnrollRegistry[:enroll_app].setting(:site_key).item }
+  let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, site_key) }
+  let!(:model_instance)     { FactoryBot.build(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{site_key}_employer_profile".to_sym, site: site) }
   let(:employer_profile)    { model_instance.employer_profile }
   let(:person){ create :person}
 
@@ -27,7 +28,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::WelcomeNoticeToEmployer', dbclean:
       it "should trigger notice event" do
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employer.welcome_notice_to_employer"
-          expect(payload[:event_object_kind]).to eq "BenefitSponsors::Organizations::AcaShop#{Settings.site.key.capitalize}EmployerProfile"
+          expect(payload[:event_object_kind]).to eq "BenefitSponsors::Organizations::AcaShop#{site_key.capitalize}EmployerProfile"
           expect(payload[:event_object_id]).to eq employer_profile.id.to_s
         end
         subject.process_organization_events(model_instance, model_event)

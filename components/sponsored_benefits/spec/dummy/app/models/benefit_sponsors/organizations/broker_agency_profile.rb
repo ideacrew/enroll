@@ -4,6 +4,7 @@ module BenefitSponsors
       # include SetCurrentUser
       # include AASM
       include ::Config::AcaModelConcern
+      include ::Config::SiteModelConcern
 
       MARKET_KINDS = individual_market_is_enabled? ? [:individual, :shop, :both] : [:shop]
 

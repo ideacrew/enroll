@@ -129,17 +129,17 @@ describe Queries::PolicyAggregationPipeline, "Policy Queries", dbclean: :around_
       expect(subject.pipeline.count).to be 1
       value = subject.filter_to_active
       expect(subject.pipeline.count).to be 2
-    expect(subject.evaluate.map{|a|a['hbx_id']}).to eq good_enrollment_hbx_ids
+      expect(subject.evaluate.map{|a| a['hbx_id']}).to eq good_enrollment_hbx_ids
     end
 
     it '.with_effective_date' do
       value = subject.with_effective_date(effective_on)
-    expect(subject.evaluate.map{|a|a['hbx_id']}).to eq good_enrollment_hbx_ids
+      expect(subject.evaluate.map{|a| a['hbx_id']}).to eq good_enrollment_hbx_ids
     end
 
     it '.filter_to_shop' do
       value = subject.filter_to_shop
-    expect(subject.evaluate.map{|a|a['hbx_id']}).to eq good_enrollment_hbx_ids
+      expect(subject.evaluate.map{|a| a['hbx_id']}).to eq good_enrollment_hbx_ids
     end
 
     it '.list_of_hbx_ids' do
@@ -148,12 +148,12 @@ describe Queries::PolicyAggregationPipeline, "Policy Queries", dbclean: :around_
 
     it '.filter_to_shopping_completed' do
       subject.filter_to_shopping_completed
-      expect(subject.evaluate.map{|a|a['hbx_id']}).to eq good_enrollment_hbx_ids
+      expect(subject.evaluate.map{|a| a['hbx_id']}).to eq good_enrollment_hbx_ids
     end
 
     it '.eliminate_family_duplicates' do
-      expect(good_enrollment_hbx_ids).to include subject.eliminate_family_duplicates.evaluate.map{|a|a['hbx_id']}.first
-      expect(bad_enrollment_hbx_ids).to_not include subject.eliminate_family_duplicates.evaluate.map{|a|a['hbx_id']}.first
+      expect(good_enrollment_hbx_ids).to include subject.eliminate_family_duplicates.evaluate.map{|a| a['hbx_id']}.first
+      expect(bad_enrollment_hbx_ids).to_not include subject.eliminate_family_duplicates.evaluate.map{|a| a['hbx_id']}.first
     end
 
   end

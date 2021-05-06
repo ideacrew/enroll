@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.version     = Notifier::VERSION
   s.authors     = ["Dan Thomas"]
   s.email       = ["dan@ideacrew.com"]
-  s.homepage    = "https://github.com/dchbx"
+  s.homepage    = "https://github.com/ideacrew"
   s.summary     = %q{An engine for generating notices by merging data with template text}
   s.description = %q{Using a class instance and reference to a pre-defined template, build a customized notice in PDF format \
                       and drop at well-known endpoint }
@@ -29,7 +29,7 @@ Gem::Specification.new do |s|
   s.add_dependency "non-stupid-digest-assets"
   s.add_dependency "roo", "~> 2.1.0"
   s.add_dependency 'aasm', '~> 4.8'
-  s.add_dependency 'config'
+  s.add_dependency 'config', '~> 2.0'
   s.add_dependency 'money-rails', '~> 1.13'
 
   s.add_development_dependency 'rspec-rails'

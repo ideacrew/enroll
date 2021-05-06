@@ -39,6 +39,7 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
       "is_claimed_as_tax_dependent" => nil
     }
   end
+
   let(:applicant_params) do
     {
       "is_required_to_file_taxes" => true,
@@ -74,11 +75,197 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
     # TODO: This is run under the save context of :other_qns which runs the method presence_of_attr_other_qns and does not validate the is_required_to_file_taxes or
     # is_claimed_as_tax_dependent, which are passed as nil here as "invalid params."
     # Should they be added to the presence_of_attr_other_qns method?
-    xit "should not save and redirects to other_questions_financial_assistance_application_applicant_path", dbclean: :after_each do
+    it "should not save and redirects to other_questions_financial_assistance_application_applicant_path", dbclean: :after_each do
       get :save_questions, params: { application_id: application.id, id: applicant.id, applicant: financial_assistance_applicant_invalid }
       expect(response).to have_http_status(302)
       expect(response.headers['Location']).to have_content 'other_questions'
       expect(response).to redirect_to(other_questions_application_applicant_path(application, applicant))
+    end
+
+    context "Pregnancy questions validation" do
+      let(:faa_invalid_params_pregenancy) do
+        {
+          "is_pregnant" => true,
+          "pregnancy_due_on" => nil,
+          "children_expected_count" => nil
+        }
+      end
+
+      let(:faa_without_due_date) do
+        {
+          "is_pregnant" => true,
+          "pregnancy_due_on" => nil,
+          "children_expected_count" => 1
+        }
+      end
+
+      let(:faa_expected_count_nil) do
+        {
+          "is_pregnant" => true,
+          "pregnancy_due_on" => (applicant.dob + 20.years).strftime("%m/%d/%Y"),
+          "children_expected_count" => nil
+        }
+      end
+
+      let(:faa_valid_params_pregenancy) do
+        {
+          "is_pregnant" => true,
+          "pregnancy_due_on" => (applicant.dob + 20.years).strftime("%m/%d/%Y"),
+          "children_expected_count" => 1
+        }
+      end
+
+      it "should not save and redirects to other_questions_financial_assistance_application_applicant_path with invalid params", dbclean: :after_each do
+        get :save_questions, params: { application_id: application.id, id: applicant.id, applicant: faa_invalid_params_pregenancy }
+        expect(response).to have_http_status(302)
+        expect(response.headers['Location']).to have_content 'other_questions'
+        expect(response).to redirect_to(other_questions_application_applicant_path(application, applicant))
+      end
+
+      it "should not save and redirects to other_questions_financial_assistance_application_applicant_path with due date nill", dbclean: :after_each do
+        get :save_questions, params: { application_id: application.id, id: applicant.id, applicant: faa_without_due_date }
+        expect(response).to have_http_status(302)
+        expect(response.headers['Location']).to have_content 'other_questions'
+        expect(response).to redirect_to(other_questions_application_applicant_path(application, applicant))
+      end
+
+      it "should not save and redirects to other_questions_financial_assistance_application_applicant_path with children_expected_count nill", dbclean: :after_each do
+        get :save_questions, params: { application_id: application.id, id: applicant.id, applicant: faa_expected_count_nil }
+        expect(response).to have_http_status(302)
+        expect(response.headers['Location']).to have_content 'other_questions'
+        expect(response).to redirect_to(other_questions_application_applicant_path(application, applicant))
+      end
+
+      it "should save and redirects to redirects to edit_financial_assistance_application_path with valid pregnancy responses", dbclean: :after_each do
+        get :save_questions, params: { application_id: application.id, id: applicant.id, applicant: faa_valid_params_pregenancy }
+        expect(response).to have_http_status(302)
+        expect(response.headers['Location']).to have_content 'edit'
+        expect(response).to redirect_to(edit_application_path(application))
+      end
+    end
+
+    context "is_post_partum_period" do
+      let(:faa_invalid_post_partum_period_params) do
+        {
+          "is_post_partum_period" => true,
+          "is_enrolled_on_medicaid" => nil,
+          "pregnancy_end_on" => nil
+        }
+      end
+
+      let(:faa_without_preg_end_date) do
+        {
+          "is_post_partum_period" => true,
+          "pregnancy_end_on" => nil,
+          "is_enrolled_on_medicaid" => true
+        }
+      end
+
+      let(:faa_enrolled_on_medicaid_nil) do
+        {
+          "is_post_partum_period" => true,
+          "pregnancy_end_on" => (applicant.dob + 20.years).strftime("%m/%d/%Y"),
+          "is_enrolled_on_medicaid" => nil
+        }
+      end
+
+      let(:faa_valid_params_partum_period_params) do
+        {
+          "is_post_partum_period" => true,
+          "pregnancy_end_on" => (applicant.dob + 20.years).strftime("%m/%d/%Y"),
+          "is_enrolled_on_medicaid" => true
+        }
+      end
+
+      it "should not save and redirects to other_questions_financial_assistance_application_applicant_path with invalid params", dbclean: :after_each do
+        get :save_questions, params: { application_id: application.id, id: applicant.id, applicant: faa_invalid_post_partum_period_params }
+        expect(response).to have_http_status(302)
+        expect(response.headers['Location']).to have_content 'other_questions'
+        expect(response).to redirect_to(other_questions_application_applicant_path(application, applicant))
+      end
+
+      it "should not save and redirects to other_questions_financial_assistance_application_applicant_path with end date nill", dbclean: :after_each do
+        get :save_questions, params: { application_id: application.id, id: applicant.id, applicant: faa_without_preg_end_date }
+        expect(response).to have_http_status(302)
+        expect(response.headers['Location']).to have_content 'other_questions'
+        expect(response).to redirect_to(other_questions_application_applicant_path(application, applicant))
+      end
+
+      it "should save and redirects to redirects to edit_financial_assistance_application_path with enrolled_on_medicaid nill", dbclean: :after_each do
+        get :save_questions, params: { application_id: application.id, id: applicant.id, applicant: faa_enrolled_on_medicaid_nil }
+        expect(response).to have_http_status(302)
+        expect(response.headers['Location']).to have_content 'edit'
+        expect(response).to redirect_to(edit_application_path(application))
+      end
+
+      it "should save and redirects to redirects to edit_financial_assistance_application_path with valid params", dbclean: :after_each do
+        get :save_questions, params: { application_id: application.id, id: applicant.id, applicant: faa_valid_params_partum_period_params }
+        expect(response).to have_http_status(302)
+        expect(response.headers['Location']).to have_content 'edit'
+        expect(response).to redirect_to(edit_application_path(application))
+      end
+    end
+
+    context "age_of_applicant" do
+      let(:is_invalid_former_foster_care) do
+        {
+          "is_former_foster_care" => true,
+          "foster_care_us_state" => nil,
+          "age_left_foster_care" => nil
+        }
+      end
+
+      let(:is_invalid_former_foster_care1) do
+        {
+          "is_former_foster_care" => true,
+          "foster_care_us_state" => "DC",
+          "age_left_foster_care" => nil
+        }
+      end
+
+      let(:is_valid_former_foster_care) do
+        {
+          "is_former_foster_care" => true,
+          "foster_care_us_state" => "DC",
+          "age_left_foster_care" => 1
+        }
+      end
+
+      before :each do
+        applicant.update_attributes(is_applying_coverage: true,
+                                    dob: TimeKeeper.date_of_record - 20.years,
+                                    is_post_partum_period: true,
+                                    pregnancy_end_on: applicant.dob + 20.years,
+                                    is_enrolled_on_medicaid: true)
+      end
+
+      it "should not save and redirects to other_questions_financial_assistance_application_applicant_path with invalid params", dbclean: :after_each do
+        get :save_questions, params: { application_id: application.id, id: applicant.id, applicant: {} }
+        expect(response).to have_http_status(302)
+        expect(response.headers['Location']).to have_content 'other_questions'
+        expect(response).to redirect_to(other_questions_application_applicant_path(application, applicant))
+      end
+
+      it "should not save and redirects to other_questions_financial_assistance_application_applicant_path with foster_care_us_state nill", dbclean: :after_each do
+        get :save_questions, params: { application_id: application.id, id: applicant.id, applicant: is_invalid_former_foster_care }
+        expect(response).to have_http_status(302)
+        expect(response.headers['Location']).to have_content 'other_questions'
+        expect(response).to redirect_to(other_questions_application_applicant_path(application, applicant))
+      end
+
+      it "should not save and redirects to other_questions_financial_assistance_application_applicant_path with age_left_foster_care nill", dbclean: :after_each do
+        get :save_questions, params: { application_id: application.id, id: applicant.id, applicant: is_invalid_former_foster_care1 }
+        expect(response).to have_http_status(302)
+        expect(response.headers['Location']).to have_content 'other_questions'
+        expect(response).to redirect_to(other_questions_application_applicant_path(application, applicant))
+      end
+
+      it "should save and redirects to edit_financial_assistance_application_path with valid params", dbclean: :after_each do
+        get :save_questions, params: { application_id: application.id, id: applicant.id, applicant: is_valid_former_foster_care }
+        expect(response).to have_http_status(302)
+        expect(response.headers['Location']).to have_content 'edit'
+        expect(response).to redirect_to(edit_application_path(application))
+      end
     end
   end
 
@@ -120,6 +307,59 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
     it "should render step if model is not saved" do
       post :step, params: { application_id: application.id, id: applicant.id }
       expect(response).to render_template 'workflow/step'
+    end
+  end
+
+  context "DELETE destroy" do
+    let(:dependent1) { FactoryBot.create(:person) }
+    let(:family_member_dependent) { FactoryBot.build(:family_member, person: dependent1, family: family)}
+    let!(:applicant2) do
+      FactoryBot.create(:applicant,
+                        first_name: "James", last_name: "Bond", gender: "male", dob: Date.new(1993, 3, 8),
+                        person_hbx_id: dependent1.hbx_id,
+                        application: application,
+                        family_member_id: family_member_dependent.id)
+    end
+
+    before do
+      family.family_members << family_member_dependent
+      family.save
+      relation = PersonRelationship.new(relative: family.family_members.last.person, kind: "child")
+      person.person_relationships << relation
+      person.save
+    end
+
+    it "should redirect to edit application path" do
+      delete :destroy, params: { application_id: application.id, id: applicant.id }
+      expect(response).to redirect_to(edit_application_path(application))
+    end
+
+    it "should destroy the applicant" do
+      delete :destroy, params: { application_id: application.id, id: applicant2.id }
+      application.reload
+      expect(application.active_applicants.where(id: applicant2.id).first).to be_nil
+    end
+
+    it "should not destroy the primary applicant" do
+      expect(applicant.is_primary_applicant).to eq true
+      delete :destroy, params: { application_id: application.id, id: applicant.id }
+      application.reload
+      expect(application.active_applicants.where(id: applicant.id).first).to eq applicant
+    end
+
+    it "should destroy the dependent" do
+      expect(family.family_members.active.count).to eq 2
+      delete :destroy, params: { application_id: application.id, id: applicant2.id }
+      family.reload
+      expect(family.family_members.active.count).to eq 1
+    end
+
+    it "should destroy the primary dependent" do
+      expect(applicant.is_primary_applicant).to eq true
+      expect(family.family_members.active.count).to eq 2
+      delete :destroy, params: { application_id: application.id, id: applicant.id }
+      family.reload
+      expect(family.family_members.active.count).to eq 2
     end
   end
 

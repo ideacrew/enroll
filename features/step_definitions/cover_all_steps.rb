@@ -1,5 +1,5 @@
 Then(/^Hbx Admin should see an DC Resident Application link$/) do
-  find_link('DC Resident Application').visible?
+  find_link("#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item} Resident Application").visible?
 end
 
 Then(/^Hbx Admin should not see an New DC Resident Application link$/) do
@@ -7,7 +7,7 @@ Then(/^Hbx Admin should not see an New DC Resident Application link$/) do
 end
 
 Then(/^Hbx Admin should see a DC Resident Application link disabled$/) do
-  find_link('DC Resident Application')[:class].include?("blocking") == false
+  find_link("#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item} Resident Application")[:class].include?("blocking") == false
 end
 
 When(/^Hbx Admin clicks on New DC Resident Application link$/) do
@@ -20,7 +20,7 @@ Then(/^Hbx Admin should not see an New Consumer Phone Application link and New C
 end
 
 When(/^Hbx Admin clicks on DC Resident Application link$/) do
-  find_link('DC Resident Application').click
+  find_link("#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item} Resident Application").click
 end
 
 Then(/^Hbx Admin should see DC Resident Personal Information page$/) do
@@ -74,7 +74,7 @@ end
 
 When(/Hbx Admin select a past qle date/) do
   expect(page).to have_content "Married"
-  screenshot("past_qle_date")
+  # screenshot("past_qle_date")
   fill_in "qle_date", :with => (TimeKeeper.date_of_record - 5.days).strftime("%m/%d/%Y")
   find('h1').click
   within '#qle-date-chose' do
@@ -93,7 +93,7 @@ end
 
 Then(/HBX Admin should see the summary page of plan selection/) do
   expect(page).to have_content('Confirm Your Plan Selection')
-  screenshot("summary_page")
+  # screenshot("summary_page")
 end
 
 When(/HBX Admin clicks on Confirm button on the summary page of plan selection/) do
@@ -105,7 +105,7 @@ end
 
 Then(/HBX Admin should see the enrollment receipt page/) do
   expect(page).to have_content('Enrollment Submitted')
-  screenshot("receipt_page")
+  # screenshot("receipt_page")
 end
 
 When(/HBX Admin clicks go to my account button/) do
@@ -118,7 +118,7 @@ end
 
 Then(/HBX Admin should see the home page with text coverage selected/) do
   expect(page).to have_content('Coverage Selected')
-  screenshot("home_page")
+  # screenshot("home_page")
 end
 
 Then(/^HBX Admin should see broker assister search box$/) do

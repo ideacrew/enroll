@@ -27,7 +27,7 @@ And(/the primary member has filled mandatory information required$/) do
   find(:xpath, '//label[@for="radio_male"]').click
   find(:xpath, '//label[@for="is_applying_coverage_true"]').click
   find('.btn', text: 'CONTINUE').click
-  expect(page).to have_content('Next, we need to verify if you or you and your family are eligible to enroll in coverage through DC Health Link. Select CONTINUE.')
+  expect(page).to have_content("Next, we need to verify if you or you and your family are eligible to enroll in coverage through #{Settings.site.short_name}. Select CONTINUE.")
   find('.btn', text: 'CONTINUE').click
   click_and_wait_on_stylized_radio('//label[@for="person_us_citizen_true"]', "person_us_citizen_true", "person[us_citizen]", "true")
   click_and_wait_on_stylized_radio('//label[@for="person_naturalized_citizen_false"]', "person_naturalized_citizen_false", "person[naturalized_citizen]", "false")
@@ -39,7 +39,7 @@ And(/the primary member has filled mandatory information required$/) do
   find(:xpath, '//*[@id="address_info"]/div/div[3]/div[2]/div/div[2]/span').click
   find('#address_info li', :text => 'DC', wait: 5).click
   fill_in "person[addresses_attributes][0][zip]", with: personal_information[:zip]
-  
+
   sleep 5
   find('.btn', text: 'CONTINUE').click
 end
@@ -69,7 +69,7 @@ When(/^the Experian returns a VERIFIED response$/) do
 end
 
 Then(/^the user will navigate to the Help Paying for Coverage page$/) do
-  expect(page).to have_content('Help Paying for Coverage')
+  expect(page).to have_content('Your Application for Premium Reductions')
 end
 
 Given(/^the user navigates to the "Household Info" page with "no" selected$/) do
@@ -93,13 +93,13 @@ And(/^the user fills the the add member form/) do
 
   find('.house .selectric span.label').click
   find(".house .selectric-items li", text: 'Spouse').click
-  
+
   find(:xpath, '//label[@for="radio_female"]').click
   find(:xpath, '//label[@for="dependent_us_citizen_true"]').click
   find(:xpath, '//label[@for="dependent_naturalized_citizen_false"]').click
   find(:xpath, '//label[@for="indian_tribe_member_no"]').click
   find(:xpath, '//label[@for="radio_incarcerated_no"]').click
-  screenshot("add_member")
+  # screenshot("add_member")
   all(:css, ".mz").last.click
   expect(page).to have_content("#{l10n('family_information')}")
 end
@@ -109,7 +109,7 @@ And(/^the user clicks the PREVIOUS link1/) do
 end
 
 Then(/^the user navigates to Help Paying for Coverage page/) do
-  expect(page).to have_content('Help Paying for Coverage')
+  expect(page).to have_content('Your Application for Premium Reductions')
 end
 
 Given(/^the user navigates to the "Household Info" page with "yes" selected/) do

@@ -35,7 +35,13 @@ Then(/^the Admin is navigated to the Families screen$/) do
 end
 
 And 'I click on the name of a person of family list' do
-  find('a', :text => /First*/i).click
+  person = HbxEnrollment.first.family.primary_person
+  first_enrolled_primary_person_name = person.full_name
+  find('a', :text => first_enrolled_primary_person_name).click
+end
+
+And(/I click the name of (.*) from family list/) do |named_person|
+  find('a', :text => named_person).click
 end
 
 Then(/^the Admin is navigated to the Outstanding Verifications screen$/) do

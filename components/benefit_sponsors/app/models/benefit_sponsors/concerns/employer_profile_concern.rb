@@ -90,6 +90,14 @@ module BenefitSponsors
         active_benefit_sponsorship.off_cycle_benefit_application
       end
 
+      def reinstated_benefit_application
+        active_benefit_sponsorship.reinstated_benefit_application
+      end
+
+      def future_active_reinstated_benefit_application
+        active_benefit_sponsorship.future_active_reinstated_benefit_application
+      end
+
       def renewal_benefit_application
         active_benefit_sponsorship.renewal_benefit_application
       end
@@ -374,7 +382,7 @@ module BenefitSponsors
         def invoice_exist?(invoice_date,org)
           docs = org.employer_profile.documents.where("date" => invoice_date)
           matching_documents = docs.select {|d| d.title.match(::Regexp.new("^#{org.hbx_id}"))}
-          return true if matching_documents.count > 0
+          return true if matching_documents.any?
         end
 
         def upload_invoice(file_path,file_name)

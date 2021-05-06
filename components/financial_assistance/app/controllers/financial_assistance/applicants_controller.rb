@@ -131,6 +131,11 @@ module FinancialAssistance
       # @country = vlp_docs.detect{|doc| doc.subject == vlp_doc_subject }.try(:country_of_citizenship) if vlp_docs
     end
 
+    def destroy
+      @applicant.destroy! unless @applicant.is_primary_applicant
+      redirect_to edit_application_path(@application)
+    end
+
     private
 
     def format_date_params(model_params)
@@ -148,7 +153,11 @@ module FinancialAssistance
     end
 
     def find_application
-      @application = FinancialAssistance::Application.find_by(id: params[:application_id], family_id: get_current_person.financial_assistance_identifier)
+      @application = if current_user.try(:person).try(:agent?) && !session[:person_id].present?
+                       FinancialAssistance::Application.find_by(id: params[:application_id])
+                     else
+                       FinancialAssistance::Application.find_by(id: params[:application_id], family_id: get_current_person.financial_assistance_identifier)
+                     end
     end
 
     def find

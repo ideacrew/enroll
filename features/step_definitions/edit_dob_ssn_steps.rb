@@ -53,7 +53,7 @@ end
 
 Then(/^Hbx Admin should see the edit form being rendered again with a validation error message$/) do
   expect(page).to have_content(/Edit DOB \/ SSN/i)
-  expect(page).to have_content(/SSN must be 9 digits/i)
+  expect(page).to have_content(/must have 9 digits/i)
 end
 
 When(/^Hbx Admin enters a valid DOB and SSN and clicks on update$/) do

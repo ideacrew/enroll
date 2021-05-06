@@ -24,7 +24,8 @@ module BenefitSponsors
       EMPLOYER_EDI_EVENTS_ON_SAVE = [
         :benefit_coverage_period_terminated_nonpayment,
         :benefit_coverage_period_terminated_voluntary,
-        :benefit_coverage_renewal_carrier_dropped
+        :benefit_coverage_renewal_carrier_dropped,
+        :benefit_coverage_period_reinstated
       ].freeze
 
       DATE_CHANGE_EVENTS = [
@@ -69,8 +70,8 @@ module BenefitSponsors
             is_benefit_coverage_period_terminated_nonpayment = true if termination_kind.to_s == "nonpayment"
           end
 
-          is_benefit_coverage_renewal_carrier_dropped = true if is_transition_matching?(to: :canceled, from: [:enrollment_eligible, :active, :binder_paid], event: :cancel)
-
+          is_benefit_coverage_renewal_carrier_dropped = true if is_transition_matching?(to: [:canceled, :retroactive_canceled], from: [:enrollment_eligible, :active, :binder_paid], event: :cancel)
+          is_benefit_coverage_period_reinstated = true if is_transition_matching?(to: :active, from: :reinstated, event: :activate_enrollment)
           if is_transition_matching?(to: :approved, from: [:draft, :imported] + BenefitSponsors::BenefitApplications::BenefitApplication::APPLICATION_EXCEPTION_STATES, event: :auto_approve_application)
             is_renewal_application_autosubmitted = true
           end
@@ -138,9 +139,8 @@ module BenefitSponsors
           #initial employers misses binder payment deadline
           scheduler = BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
           binder_next_day = scheduler.calculate_open_enrollment_date(false, TimeKeeper.date_of_record.next_month.beginning_of_month)[:binder_payment_due_date].next_day
-          if  Settings.site.key == :dc && new_date.day == Settings.aca.shop_market.initial_application.non_binder_paid_notice_day_of_month
-            is_initial_employer_no_binder_payment_received = true
-          elsif Settings.site.key == :cca && new_date.day == binder_next_day
+
+          if (Settings.site.key == :cca && new_date.day == binder_next_day) || ([:dc, :me].include?(Settings.site.key) && new_date.day == Settings.aca.shop_market.initial_application.non_binder_paid_notice_day_of_month)
             is_initial_employer_no_binder_payment_received = true
           end
 

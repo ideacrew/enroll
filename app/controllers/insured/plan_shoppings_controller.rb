@@ -191,7 +191,8 @@ class Insured::PlanShoppingsController < ApplicationController
 
     if shopping_tax_household.present? && @hbx_enrollment.coverage_kind == 'health' && @hbx_enrollment.kind == 'individual'
       @tax_household = shopping_tax_household
-      @max_aptc = @tax_household.total_aptc_available_amount_for_enrollment(@hbx_enrollment)
+      @max_aptc = @tax_household.total_aptc_available_amount_for_enrollment(@hbx_enrollment, @hbx_enrollment.effective_on)
+      @hbx_enrollment.update_attributes(aggregate_aptc_amount: @max_aptc)
       session[:max_aptc] = @max_aptc
       @elected_aptc = session[:elected_aptc] = @max_aptc * 0.85
     else
@@ -253,14 +254,6 @@ class Insured::PlanShoppingsController < ApplicationController
     @member_groups = sort_member_groups(sponsored_cost_calculator.groups_for_products(products))
     @products = @member_groups.map(&:group_enrollment).map(&:product)
     extract_from_shop_products
-
-    if @hbx_enrollment.is_shop?
-      Rails.logger.info("In Plan Shoppings controller
-                         hbx_enrollment=#{@hbx_enrollment.inspect}
-                         rate_schedule_date=#{@hbx_enrollment.sponsored_benefit.rate_schedule_date}
-                         member_group=#{@member_groups.first.inspect}
-                         products=#{@products.map(&:active_year).uniq} *************************************")
-    end
 
     if plan_match_dc
       is_congress_employee = @hbx_enrollment.fehb_profile ? true : false

@@ -83,8 +83,9 @@ module FinancialAssistance
     field :determination_http_status_code, type: Integer
     field :determination_error_message, type: String
     field :has_eligibility_response, type: Boolean, default: false
+    field :eligibility_request_payload, type: String
     field :eligibility_response_payload, type: String
-
+    field :full_medicaid_determination, type: Boolean
     field :workflow, type: Hash, default: { }
 
     embeds_many :eligibility_determinations, inverse_of: :application, class_name: '::FinancialAssistance::EligibilityDetermination'
@@ -167,7 +168,7 @@ module FinancialAssistance
 
         direct_relationship.update(kind: relationship_kind)
       elsif predecessor.id != successor.id
-        relationships.create(applicant_id: predecessor.id, relative_id: successor.id, kind: relationship_kind) # Direct Relationship
+        update_or_build_relationship(predecessor, successor, relationship_kind) # Direct Relationship
       end
     end
 
@@ -188,8 +189,7 @@ module FinancialAssistance
           matrix[yi][xi] = find_existing_relationship(id_map[yi], id_map[xi])
         end
       end
-      matrix = apply_rules_and_update_relationships(matrix)
-      matrix
+      apply_rules_and_update_relationships(matrix)
     end
 
     #update method as validate payload
@@ -292,16 +292,16 @@ module FinancialAssistance
       last_name_regex = /^#{verified_family_member.person.name_last}$/i
       first_name_regex = /^#{verified_family_member.person.name_first}$/i
 
-      if !ssn.blank?
-        applicants.where({
-                           :encrypted_ssn => FinancialAssistance::Applicant.encrypt_ssn(ssn),
-                           :dob => dob
-                         }).first
-      else
+      if ssn.blank?
         applicants.where({
                            :dob => dob,
                            :last_name => last_name_regex,
                            :first_name => first_name_regex
+                         }).first
+      else
+        applicants.where({
+                           :encrypted_ssn => FinancialAssistance::Applicant.encrypt_ssn(ssn),
+                           :dob => dob
                          }).first
       end
     end
@@ -339,7 +339,6 @@ module FinancialAssistance
       update_attributes(attrs)
     end
 
-
     def add_eligibility_determination(message)
       update_response_attributes(message)
       ed_updated = update_application_and_applicant_attributes(message[:eligibility_response_payload])
@@ -371,8 +370,9 @@ module FinancialAssistance
 
         next unless s_ids.count > s_ids.uniq.count
         members = applicants.where(:id.in => rel.to_a.flatten)
-        members.second.relationships.create(applicant_id: members.second.id, relative_id: members.first.id, kind: 'sibling')
-        members.first.relationships.create(applicant_id: members.first.id, relative_id: members.second.id, kind: 'sibling')
+
+        update_or_build_relationship(members.first, members.second, 'sibling')
+        update_or_build_relationship(members.second, members.first, 'sibling')
         missing_relationship -= [rel] #Remove Updated Relation from list of missing relationships
       end
 
@@ -396,15 +396,15 @@ module FinancialAssistance
           if parent_rel1.present? && child_rel2.present?
             grandchild = applicants.where(id: second_rel).first
             grandparent = applicants.where(id: first_rel).first
-            grandparent.relationships.create(applicant_id: grandparent.id, relative_id: grandchild.id, kind: "grandparent")
-            grandchild.relationships.create(applicant_id: grandchild.id, relative_id: grandparent.id, kind: "grandchild")
+            update_or_build_relationship(grandparent, grandchild, 'grandparent')
+            update_or_build_relationship(grandchild, grandparent, 'grandchild')
             missing_relationship -= [rel] #Remove Updated Relation from list of missing relationships
             break
           elsif child_rel1.present? && parent_rel2.present?
             grandchild = applicants.where(id: first_rel).first
             grandparent = applicants.where(id: second_rel).first
-            grandparent.relationships.create(applicant_id: grandparent.id, relative_id: grandchild.id, kind: "grandparent")
-            grandchild.relationships.create(applicant_id: grandchild.id, relative_id: grandparent.id, kind: "grandchild")
+            update_or_build_relationship(grandparent, grandchild, 'grandparent')
+            update_or_build_relationship(grandchild, grandparent, 'grandchild')
             missing_relationship -= [rel] #Remove Updated Relation from list of missing relationships
             break
           end
@@ -423,8 +423,8 @@ module FinancialAssistance
         spouse_relation = relationships.where(applicant_id: parent_rel1.relative_id, relative_id: parent_rel2.relative_id, kind: "spouse").first
         next unless spouse_relation.present?
         members = applicants.where(:id.in => rel.to_a.flatten)
-        members.second.relationships.create(applicant_id: members.second.id, relative_id: members.first.id, kind: "sibling")
-        members.first.relationships.create(applicant_id: members.first.id, relative_id: members.second.id, kind: "sibling")
+        update_or_build_relationship(members.first, members.second, 'sibling')
+        update_or_build_relationship(members.second, members.first, 'sibling')
         missing_relationship -= [rel] #Remove Updated Relation from list of missing relationships
       end
 
@@ -687,6 +687,7 @@ module FinancialAssistance
 
     def send_failed_response
       unless has_eligibility_response
+        log("Timed Out: Eligibility Response Error", {:severity => 'critical', :error_message => "999 Eligibility Response Error for application_id #{_id}"}) if determination_http_status_code == 999
         message = "Timed-out waiting for eligibility determination response"
         return_status = 504
         notify("acapi.info.events.eligibility_determination.rejected",
@@ -1012,7 +1013,7 @@ module FinancialAssistance
           %w[Income MEC].collect do |type|
             VerificationType.new(type_name: type, validation_status: 'pending')
           end
-        applicant.move_to_pending!        
+        applicant.move_to_pending!
       end
     end
 

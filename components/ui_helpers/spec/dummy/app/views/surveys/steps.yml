@@ -9,7 +9,7 @@
                   type: input
                   name: first_name
                   placeholder: FIRST NAME *
-                  classNames: 
+                  classNames:
                   required: true
                 - gutter: 3
                   type: input
@@ -293,7 +293,7 @@
                   required: true
                 - gutter: 6
                   type: input
-                  name: mobile_phone 
+                  name: mobile_phone
                   placeholder: MOBILE PHONE
                   required: true
             - cells:
@@ -371,7 +371,7 @@
             - cells:
                 - gutter: 3
                   type: checkbox
-                  label: White 
+                  label: White
                   classNames: 'span-text'
                 - gutter: 3
                   type: checkbox
@@ -387,7 +387,7 @@
                   classNames: 'span-text'
                 - gutter: 3
                   type: checkbox
-                  label: Black or African American 
+                  label: Black or African American
                   classNames: 'span-text'
                 - gutter: 3
                   type: checkbox
@@ -399,11 +399,11 @@
                   classNames: 'span-text'
                 - gutter: 3
                   type: checkbox
-                  label: American Indian or Alaskan 
+                  label: American Indian or Alaskan
                   classNames: 'span-text'
                 - gutter: 3
                   type: checkbox
-                  label: Asian Indian 
+                  label: Asian Indian
                   classNames: 'span-text'
                 - gutter: 3
                   type: checkbox
@@ -419,7 +419,7 @@
                   classNames: 'span-text'
                 - gutter: 3
                   type: checkbox
-                  label: chinese 
+                  label: chinese
                   classNames: 'span-text'
                 - gutter: 3
                   type: checkbox
@@ -427,7 +427,7 @@
                   classNames: 'span-text'
                 - gutter: 3
                   type: checkbox
-                  label: Other Asian 
+                  label: Other Asian
                   classNames: 'span-text'
             - cells:
                 - gutter: 12
@@ -436,7 +436,7 @@
                   classNames: 'span-text'
                 - gutter: 4
                   type: checkbox
-                  label: Mexican 
+                  label: Mexican
                   classNames: 'span-text'
                 - gutter: 4
                   type: checkbox
@@ -579,7 +579,7 @@
       - section:
           heading: Confirm Plan and Sign Up
           heading_text: Please review and acknowledge the Agreement below along with the Terms and Conditions.
-                        You must also provide an electronic signature at the bottom of the page. When you're finished, 
+                        You must also provide an electronic signature at the bottom of the page. When you're finished,
                         select SIGN UP FOR THIS PLAN to submit your enrollment to the insurance company.
                         You don't have to pay today.
                         Important You must complete these steps to enroll.
@@ -601,7 +601,7 @@
                         information that I provided will be used to decide eligibility for each member of my application group. <br> <br>
 
                         I've reviewd the information in this application, and I attest under penalty of perjury, that it's accurate and complete to the best of my knowledge,
-                        I understand if Im not truthful, there may be a penalty, including retroactive termination of my coverage and a obligation to repy all medical claims 
+                        I understand if Im not truthful, there may be a penalty, including retroactive termination of my coverage and a obligation to repy all medical claims
                         previouslt covered by the health insurance
             - cells:
                 - gutter: 12
@@ -622,7 +622,7 @@
 
                         I know that some plan benefits have limitations or maximums. <br><br>
 
-                        I Know that some personal information may be collected from other sources such as District of Columbia or federal databases that can verify information I 
+                        I Know that some personal information may be collected from other sources such as District of Columbia or federal databases that can verify information I
                         provided. <br>
 
                         All of the information I provided on this application is true and complete to the best of my knowledge. <br> <br>
@@ -667,7 +667,7 @@
       - section:
           heading: Confirm Plan and Sign Up
           heading_text: Please review and acknowledge the Agreement below along with the Terms and Conditions.
-                        You must also provide an electronic signature at the bottom of the page. When you're finished, 
+                        You must also provide an electronic signature at the bottom of the page. When you're finished,
                         select SIGN UP FOR THIS PLAN to submit your enrollment to the insurance company.
                         You don't have to pay today.
                         Important You must complete these steps to enroll.
@@ -701,7 +701,7 @@
                   label: I agree with the Terms and Conditions described here *
                   classNames: 'span-text'
       - section:
-          lines:  
+          lines:
             - cells:
                 - gutter: 4
                   type: text
@@ -994,7 +994,7 @@
                   required: true
                   values:
                     - HOW OFTEN
-                    - ONE 
+                    - ONE
                     - TWO
                 - gutter: 3
                   type: input
@@ -1024,7 +1024,7 @@
                 - gutter: 6
                   type: input
                   name: employer_address_line_1
-                  placeholder: EMP ADD LINE 1 
+                  placeholder: EMP ADD LINE 1
                   classNames:
                   required: true
                 - gutter: 6
@@ -1086,7 +1086,7 @@
                   required: true
                   values:
                     - HOW OFTEN
-                    - ONE 
+                    - ONE
                     - TWO
                 - gutter: 3
                   type: input
@@ -1190,7 +1190,7 @@
             - cells:
                 - gutter: 12
                   type: checkbox
-                  label: Alimoney Received 
+                  label: Alimoney Received
                   classNames: 'span-text'
             - cells:
                 - gutter: 3
@@ -1207,7 +1207,7 @@
                   required: true
                   values:
                     - HOW OFTEN
-                    - ONE 
+                    - ONE
                     - TWO
                 - gutter: 3
                   type: input
@@ -1242,7 +1242,7 @@
                   required: true
                   values:
                     - HOW OFTEN
-                    - ONE 
+                    - ONE
                     - TWO
                 - gutter: 3
                   type: input
@@ -1284,12 +1284,12 @@
             - cells:
                 - gutter: 12
                   type: checkbox
-                  label: Dividends on insurance policies 
+                  label: Dividends on insurance policies
                   classNames: 'span-text'
             - cells:
                 - gutter: 12
                   type: checkbox
-                  label: Gambling winnings, including awards, prizes, jackpots, and contest winnings 
+                  label: Gambling winnings, including awards, prizes, jackpots, and contest winnings
                   classNames: 'span-text'
             - cells:
                 - gutter: 12
@@ -1324,7 +1324,7 @@
             - cells:
                 - gutter: 12
                   type: checkbox
-                  label: Taxable distributions form a health savings account (HSA) or an Archer MSA 
+                  label: Taxable distributions form a health savings account (HSA) or an Archer MSA
                   classNames: 'span-text'
             - cells:
                 - gutter: 12
@@ -1533,12 +1533,12 @@
             - cells:
                 - gutter: 12
                   type: checkbox
-                  label: Continuation coverage from a former employer(COBRA) 
+                  label: Continuation coverage from a former employer(COBRA)
                   classNames: 'span-text'
             - cells:
                 - gutter: 12
                   type: checkbox
-                  label: Coverage purchased on the individual market 
+                  label: Coverage purchased on the individual market
                   classNames: 'span-text'
             - cells:
                 - gutter: 12
@@ -1763,7 +1763,7 @@
                   required: true
                   values:
                     - Monthly
-                    - ONE 
+                    - ONE
                     - TWO
                 - gutter: 3
                   type: input
@@ -1810,7 +1810,7 @@
             - cells:
                 - gutter: 12
                   type: checkbox
-                  label: Moving expenses 
+                  label: Moving expenses
                   classNames: 'span-text'
             - cells:
                 - gutter: 12
@@ -1825,7 +1825,7 @@
             - cells:
                 - gutter: 12
                   type: checkbox
-                  label: Self-employed SEP, SIMPLE and qualified plans 
+                  label: Self-employed SEP, SIMPLE and qualified plans
                   classNames: 'span-text'
             - cells:
                 - gutter: 12
@@ -1847,7 +1847,7 @@
                   - gutter: 12
                     type: raw_html
                     classNames: 'small-padding-top-bottom'
-                    text: <b> I understand that eligibility for Medicaid or private health insurance, with or without financial assistance, will be reviewed every year. </b> <br> This process is called renewal. DC Health Link will review eligibility by checking its records and other electronic data sources including, with my consent, information about my federal tax returns from the IRS. DC Health Link will send me a notice that includes the information it has found by checking its records and other electronic data sources, and I will be able to correct information that is wrong.I may also be asked to provide additional information, if found eligible, Medicaid or private health insurance coverage, with or without financial assistance, will be extended for another year for myself and/or members of my application group, child support, veterans payments, or supplemental security income( SSI).
+                    text: <b> I understand that eligibility for private health insurance, with or without financial assistance, or Medicaid, will be reviewed every year. </b> <br> This process is called renewal. DC Health Link will review eligibility by checking its records and other electronic data sources including, with my consent, information about my federal tax returns from the IRS. DC Health Link will send me a notice that includes the information it has found by checking its records and other electronic data sources, and I will be able to correct information that is wrong.I may also be asked to provide additional information, if found eligible, private health insurance, with or without financial assistance, or Medicaid, will be extended for another year for myself and/or members of my application group, child support, veterans payments, or supplemental security income( SSI).
               - cells:
                   - gutter: 12
                     type: checkbox
@@ -1999,7 +1999,7 @@
                   type: input
                   name: first_name
                   placeholder: First Name *
-                  classNames: 
+                  classNames:
                   required: true
                 - gutter: 4
                   type: input

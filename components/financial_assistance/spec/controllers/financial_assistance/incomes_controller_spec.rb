@@ -19,6 +19,7 @@ RSpec.describe FinancialAssistance::IncomesController, dbclean: :after_each, typ
   end
   let!(:valid_job_income_params){ {"kind" => "wages_and_salaries", "employer_name" => "sfd", "amount" => "50001", "frequency_kind" => "quarterly", "start_on" => "11/08/2017", "end_on" => "11/08/2018", "employer_address" => {"kind" => "work", "address_1" => "2nd Main St", "address_2" => "sfdsf", "city" => "Washington", "state" => "DC", "zip" => "35467"}, "employer_phone" => {"kind" => "work", "full_phone_number" => "(301)-848-8053"}} }
   let!(:valid_self_employed_income_params){ {"kind" => "net_self_employment", "amount" => "23", "frequency_kind" => "monthly", "start_on" => "11/01/2017", "end_on" => "11/23/2017"} }
+  let!(:valid_unemployment_income_params){ {"kind" => "unemployment_income", "amount" => "45", "frequency_kind" => "biweekly", "start_on" => "11/01/2017", "end_on" => "11/30/2017"}}
   let!(:valid_other_income_params){ {"kind" => "alimony_and_maintenance", "amount" => "45", "frequency_kind" => "biweekly", "start_on" => "11/01/2017", "end_on" => "11/30/2017"}}
   let!(:valid_income_params){ {"kind" => "capital_gains", "amount" => "34.8", "frequency_kind" => "monthly", "start_on" => "09/04/2017", "end_on" => "09/24/2017", "employer_name" => ""} }
   let!(:invalid_income_params){  {"kind" => "ppp", "amount" => "45.3", "frequency_kind" => "monthly", "start_on" => "09/04/2017", "end_on" => "09/24/2017", "employer_name" => ""} }
@@ -107,6 +108,22 @@ RSpec.describe FinancialAssistance::IncomesController, dbclean: :after_each, typ
     it "should able to save an self employed income instance with the 'to' field blank " do
       post :create, params: { application_id: application.id, applicant_id: applicant.id, financial_assistance_income: valid_self_employed_income_params }, format: :js
       valid_self_employed_income_params["end_on"] = nil
+      expect(applicant.incomes.count).to eq 1
+    end
+  end
+
+  context "create unemployment income" do
+    it "should create an unemployment income instance" do
+      skip "skipped: unemployment income feature not enabled" unless FinancialAssistanceRegistry[:unemployment_income].enabled?
+
+      post :create, params: { application_id: application.id, applicant_id: applicant.id, financial_assistance_income: valid_unemployment_income_params }, format: :js
+      expect(applicant.incomes.count).to eq 1
+    end
+    it "should able to save an unemployment income instance with the 'to' field blank " do
+      skip "skipped: unemployment income feature not enabled" unless FinancialAssistanceRegistry[:unemployment_income].enabled?
+
+      post :create, params: { application_id: application.id, applicant_id: applicant.id, financial_assistance_income: valid_unemployment_income_params }, format: :js
+      valid_unemployment_income_params["end_on"] = nil
       expect(applicant.incomes.count).to eq 1
     end
   end

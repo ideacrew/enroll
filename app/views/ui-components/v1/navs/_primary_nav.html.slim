@@ -20,11 +20,12 @@
               li
                 = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {tab_name: 'identity_verification', link_path: main_app.identity_verification_exchanges_hbx_profiles_path, display_name: 'Identity Verification', active_tab: "identity_verification", remote: false, pundit_object: HbxProfile, pundit_method: :access_identity_verification_sub_tab?}
               li
-                = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {tab_name: 'dc-resident-application', link_path: main_app.begin_resident_enrollment_exchanges_residents_path(original_application_type: 'paper'), display_name: 'DC Resident Application', active_tab: "dc-resident-application", remote: false, pundit_object: ResidentRole, pundit_method: :begin_resident_enrollment?}
+                = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {tab_name: 'dc-resident-application', link_path: main_app.begin_resident_enrollment_exchanges_residents_path(original_application_type: 'paper'), display_name: "#{EnrollRegistry[:enroll_app].settings(:site_key).item.upcase} Resident Application", active_tab: "dc-resident-application", remote: false, pundit_object: ResidentRole, pundit_method: :begin_resident_enrollment?}
 
-          li role="presentation"
-            a.dropdown-toggle data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"
-              = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {tab_name: 'employers-invoice', link_path: main_app.employer_datatable_exchanges_hbx_profiles_path, display_name: 'Employers', active_tab: "employers-invoice", remote: false, pundit_object: nil, pundit_method: nil}
+          - if ::EnrollRegistry[:aca_shop_market].enabled?
+            li role="presentation"
+              a.dropdown-toggle data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"
+                = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {tab_name: 'employers-invoice', link_path: main_app.employer_datatable_exchanges_hbx_profiles_path, display_name: 'Employers', active_tab: "employers-invoice", remote: false, pundit_object: nil, pundit_method: nil}
         - else
           li role="presentation"
             a.dropdown-toggle data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"
@@ -50,7 +51,7 @@
               - if general_agency_enabled?
                 li
                   = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'general-agencies', link_path: main_app.general_agency_index_exchanges_hbx_profiles_path, display_name: 'General Agencies', active_tab: 'general-agencies', remote: false, pundit_object: nil, pundit_method: nil}
-              - if external_application_configured?("admin")
+              - if external_application_configured?("admin") && EnrollRegistry.feature_enabled?(:agency_staff)
                 li
                   = link_to(ExternalApplications::ApplicationProfile.find_by_application_name("admin").url + "/agencies/agency-staff?auth_token=" + jwt_for_external_application, "aria-expanded" => "true", data: { turbolinks: false } ) do
                     span.hidden-xs

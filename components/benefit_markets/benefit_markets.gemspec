@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.version     = BenefitMarkets::VERSION
   s.authors     = ["IdeaCrew"]
   s.email       = ["enroll_app@ideacrew.com"]
-  s.homepage    = "https://github.com/dchbx"
+  s.homepage    = "https://github.com/ideacrew"
   s.summary     = "Create and manage markets that enable benefit sponsors to access products and offer benefits to their members."
   s.description = "Create and manage markets that enable benefit sponsors to access products and offer benefits to their members."
   s.license     = "MIT"

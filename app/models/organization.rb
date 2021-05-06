@@ -211,7 +211,7 @@ class Organization
   def self.generate_fein
     loop do
       random_fein = (["00"] + 7.times.map{rand(10)} ).join
-      break random_fein unless Organization.where(:fein => random_fein).count > 0
+      break random_fein unless Organization.where(:fein => random_fein).any?
     end
   end
 
@@ -516,13 +516,13 @@ class Organization
   def self.invoice_exist?(invoice_date,org)
     docs = org.invoices.select{|doc| doc.date == invoice_date }
     matching_documents = docs.select {|d| d.title.match(::Regexp.new("^#{org.hbx_id}"))}
-    return true if matching_documents.count > 0
+    return true if matching_documents.any?
   end
 
   def self.commission_statement_exist?(statement_date,org)
     docs =org.documents.where("date" => statement_date)
     matching_documents = docs.select {|d| d.title.match(::Regexp.new("^#{org.hbx_id}_\\d{6,8}_COMMISSION"))}
-    return true if matching_documents.count > 0
+    return true if matching_documents.any?
   end
 
   # Expects file_path string with file_name format /hbx_id_mmddyyyy_commission_NUM-NUM_R.pdf

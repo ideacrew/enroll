@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.version     = TransportProfiles::VERSION
   s.authors     = ["Trey Evans"]
   s.email       = ["lewis.r.evans@gmail.com"]
-  s.homepage    = "https://github.com/dchbx"
+  s.homepage    = "https://github.com/ideacrew"
   s.summary     = "Transport gateway credentials and providers"
   s.description = "Transport gateway credentials and providers"
   s.license     = "MIT"

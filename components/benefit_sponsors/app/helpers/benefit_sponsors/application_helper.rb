@@ -102,7 +102,8 @@ module BenefitSponsors
     end
 
     def add_plan_year_button_business_rule(benefit_sponsorship, benefit_applications)
-      canceled_rule_check = benefit_applications.active.present? && benefit_applications.canceled.select{ |ba| ba.start_on > benefit_applications.active.first.end_on }.present?
+      latest_application = benefit_applications.active.present? && benefit_applications.future_effective_date(benefit_applications.active.first.end_on.next_day).order_asc.last
+      canceled_rule_check = latest_application.present? && latest_application.canceled?
       ineligible_rule_check = benefit_applications.enrollment_ineligible.effective_date_begin_on
       published_and_ineligible_apps = benefit_applications.published + benefit_applications.enrollment_ineligible + benefit_applications.pending
       ((published_and_ineligible_apps - ineligible_rule_check).blank? || canceled_rule_check || benefit_sponsorship.is_potential_off_cycle_employer?)
@@ -123,14 +124,14 @@ module BenefitSponsors
       broker_agency_mailbox = inbox_profiles_broker_agencies_broker_agency_profile_path(id: provider.id.to_s, folder: folder)
       return broker_agency_mailbox if provider.try(:broker_role)
       case (provider.model_name.name.split('::').last)
-        when "AcaShopDcEmployerProfile"
-          inbox_profiles_employers_employer_profile_path(id: provider.id.to_s, folder: folder)
-        when "HbxProfile"
-          #TODO fix it for HBX profile
-        when "BrokerAgencyProfile"
-          inbox_profiles_broker_agencies_broker_agency_profile_path(id: provider.id.to_s, folder: folder)
-        when "GeneralAgencyProfile"
-          inbox_profiles_general_agencies_general_agency_profile_path(id: provider.id.to_s, folder: folder)
+      when "AcaShop#{EnrollRegistry[:enroll_app].setting(:site_key).item.capitalize}EmployerProfile"
+        inbox_profiles_employers_employer_profile_path(id: provider.id.to_s, folder: folder)
+      when "HbxProfile"
+      # TODO: fix it for HBX profile
+      when "BrokerAgencyProfile"
+        inbox_profiles_broker_agencies_broker_agency_profile_path(id: provider.id.to_s, folder: folder)
+      when "GeneralAgencyProfile"
+        inbox_profiles_general_agencies_general_agency_profile_path(id: provider.id.to_s, folder: folder)
       end
     end
 

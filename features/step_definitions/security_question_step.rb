@@ -135,7 +135,7 @@ end
 
 When(/I have submitted the security questions$/) do
   if aca_security_questions
-    screenshot("group_selection")
+    # screenshot("group_selection")
     sleep 1
     find('.interaction-click-control-save-responses').click
   end

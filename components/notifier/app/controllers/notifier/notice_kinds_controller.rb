@@ -1,5 +1,6 @@
 module Notifier
   class NoticeKindsController < Notifier::ApplicationController
+    include ::Config::SiteConcern
 
     before_action :check_hbx_staff_role
     
@@ -155,7 +156,13 @@ module Notifier
     end
 
     def builder_param
-      params['builder'].present? ? params['builder'] : 'Notifier::MergeDataModels::EmployerProfile'
+      if params['builder'].present?
+        params['builder']
+      elsif is_shop_or_fehb_market_enabled?
+        'Notifier::MergeDataModels::EmployerProfile'
+      elsif is_individual_market_enabled?
+        'Notifier::MergeDataModels::ConsumerRole'
+      end
     end
   end
 end

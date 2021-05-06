@@ -58,7 +58,7 @@ module Subscribers
       rescue
         throw(:processing_issue, "Failure to update tax household")
       end
-      update_vlp_for_consumer_role(primary_person.consumer_role, verified_primary_family_member)
+      update_vlp_for_consumer_role(primary_person.consumer_role, verified_primary_family_member) if primary_person&.consumer_role.present?
       begin
         new_dependents.each do |p|
           new_family_member = family.relate_new_member(p[0], p[1])
@@ -83,7 +83,8 @@ module Subscribers
       family.save!
     end
 
-    def update_vlp_for_consumer_role(consumer_role, verified_primary_family_member )
+    def update_vlp_for_consumer_role(consumer_role, verified_primary_family_member)
+      return if consumer_role.fully_verified?
       begin
         verified_verifications = verified_primary_family_member.verifications
         consumer_role.import!(authority:"curam")
@@ -125,12 +126,12 @@ module Subscribers
       if verified_dependents.present?
         verified_dependents.each do |verified_family_member|
           existing_person = search_person(verified_family_member)
-          relationship = verified_primary_family_member.person_relationships.select do |pr|
-            pr.object_individual_id == verified_family_member.id &&
-              pr.subject_individual_id == verified_primary_family_member.id
-          end.first.relationship_uri.split('#').last
+          relationships = verified_primary_family_member.person_relationships&.select do |pr|
+            pr.object_individual_id == verified_family_member.id && pr.subject_individual_id == verified_primary_family_member.id
+          end
 
-          relationship = PersonRelationship::InverseMap[relationship]
+          throw(:processing_issue, "Invalid relationship") unless relationships.present?
+          relationship = PersonRelationship::InverseMap[relationships.first.relationship_uri.split('#').last]
 
           if existing_person.present?
             find_or_build_consumer_role(existing_person)

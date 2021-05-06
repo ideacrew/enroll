@@ -15,6 +15,7 @@ Feature: This gives the user access to application level navigation for applican
     When the user clicks CONTINUE
     Then the user is on the Submit Your Application page
 
+  @broken
   Scenario: User selects "I DISAGREE"
     Given the user selects I DISAGREE
     Then the "How long would you like your eligibility for help paying for coverage to be renewed? *" question displays

@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
   spec.version     = FinancialAssistance::VERSION
   spec.authors     = ["Dan Thomas"]
   spec.email       = ["dan.thomas@dc.gov"]
-  spec.homepage    = "https://github.com/dchbx"
+  spec.homepage    = "https://github.com/ideacrew"
   spec.summary     = "Summary of FinancialAssistance."
   spec.description = "Description of FinancialAssistance."
   spec.license     = "MIT"

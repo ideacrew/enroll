@@ -8,8 +8,8 @@ module BenefitSponsors
         def initialize(user, record)
           super
           @service = BenefitSponsors::Services::NewProfileRegistrationService.new(
-            profile_id: record.organization.profile.id,
-            profile_type: record.profile_type
+            profile_id: record&.organization&.profile&.id,
+            profile_type: record&.profile_type
           )
         end
 

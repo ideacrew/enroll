@@ -34,4 +34,8 @@ class IvlChooseCoverage
   def self.continue_btn
     '.interaction-click-control-continue'
   end
+
+  def self.choose_coverage_for_your_household_text
+    'Choose Coverage for your Household'
+  end
 end

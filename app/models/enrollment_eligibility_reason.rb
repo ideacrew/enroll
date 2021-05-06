@@ -30,7 +30,8 @@ class EnrollmentEligibilityReason
     end
 
     def benefit_sponsors
-      sponsor_classes = ["BenefitSponsors::Organizations::AcaShop#{Settings.site.key.capitalize}EmployerProfile".constantize]
+      site_key = EnrollRegistry[:enroll_app].setting(:site_key).item.capitalize
+      sponsor_classes = ["BenefitSponsors::Organizations::AcaShop#{site_key}EmployerProfile".constantize]
       sponsor_classes << "BenefitSponsors::Organizations::FehbEmployerProfile".constantize if fehb_market_is_enabled?
       sponsor_classes
     end

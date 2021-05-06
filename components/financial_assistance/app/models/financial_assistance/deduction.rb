@@ -58,13 +58,13 @@ module FinancialAssistance
                         on: [:step_1, :submission]
 
     validates :amount,          presence: true,
-                                numericality: { greater_than: 0, message: "%<value> must be greater than $0" },
+                                numericality: { greater_than: 0, message: "%{value} must be greater than $0" },
                                 on: [:step_1, :submission]
     validates :kind,            presence: true,
-                                inclusion: { in: KINDS, message: "%<value> is not a valid deduction type" },
+                                inclusion: { in: KINDS, message: "%{value} is not a valid deduction type" },
                                 on: [:step_1, :submission]
     validates :frequency_kind,  presence: true,
-                                inclusion: { in: FREQUENCY_KINDS, message: "%<value> is not a valid frequency" },
+                                inclusion: { in: FREQUENCY_KINDS, message: "%{value} is not a valid frequency" },
                                 on: [:step_1, :submission]
     validates :start_on,        presence: true, on: [:step_1, :submission]
 
@@ -92,7 +92,7 @@ module FinancialAssistance
 
     def start_on_must_precede_end_on
       return unless start_on.present? && end_on.present?
-      errors.add(:end_on, " End On date can't occur before Start On Date") if end_on < start_on
+      errors.add(:end_on, "End On date can't occur before Start On Date") if end_on < start_on
     end
   end
 end

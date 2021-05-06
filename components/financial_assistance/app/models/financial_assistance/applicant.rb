@@ -52,7 +52,9 @@ module FinancialAssistance
     MEC_VALIDATION_STATES = %w[na valid outstanding pending].freeze
 
     DRIVER_QUESTION_ATTRIBUTES = [:has_job_income, :has_self_employment_income, :has_other_income,
-                                  :has_deductions, :has_enrolled_health_coverage, :has_eligible_health_coverage].freeze
+                                  :has_deductions, :has_enrolled_health_coverage, :has_eligible_health_coverage]
+    DRIVER_QUESTION_ATTRIBUTES += [:has_unemployment_income] if FinancialAssistanceRegistry[:unemployment_income].enabled?
+    DRIVER_QUESTION_ATTRIBUTES.freeze
 
     #list of the documents user can provide to verify Immigration status
     VLP_DOCUMENT_KINDS = [
@@ -238,6 +240,7 @@ module FinancialAssistance
     field :has_job_income, type: Boolean
     field :has_self_employment_income, type: Boolean
     field :has_other_income, type: Boolean
+    field :has_unemployment_income, type: Boolean
     field :has_deductions, type: Boolean
     field :has_enrolled_health_coverage, type: Boolean
     field :has_eligible_health_coverage, type: Boolean
@@ -269,7 +272,7 @@ module FinancialAssistance
     validate :strictly_boolean
 
     validates :tax_filer_kind,
-              inclusion: { in: TAX_FILER_KINDS, message: "%<value> is not a valid tax filer kind" },
+              inclusion: { in: TAX_FILER_KINDS, message: "%{value} is not a valid tax filer kind" },
               allow_blank: true
 
     alias is_medicare_eligible? is_medicare_eligible
@@ -282,6 +285,7 @@ module FinancialAssistance
 
     # Responsible for updating family member  when applicant is created/updated
     after_update :propagate_applicant
+    before_destroy :propagate_destroy
 
     def generate_hbx_id
       write_attribute(:person_hbx_id, FinancialAssistance::HbxIdGenerator.generate_member_id) if person_hbx_id.blank?
@@ -559,8 +563,7 @@ module FinancialAssistance
     end
 
     def i766
-      # vlp_subject == 'I-766 (Employment Authorization Card)' && alien_number.present? && card_number.present? && expiration_date.present?
-      vlp_subject == 'I-766 (Employment Authorization Card)' && receipt_number.present? && expiration_.present?
+      vlp_subject == 'I-766 (Employment Authorization Card)' && alien_number.present? && card_number.present? && expiration_date.present?
     end
 
     def mac_read_i551
@@ -632,11 +635,18 @@ module FinancialAssistance
     end
 
     def applicant_validation_complete?
+      if is_applying_coverage
       valid?(:submission) &&
         incomes.all? {|income| income.valid? :submission} &&
         benefits.all? {|benefit| benefit.valid? :submission} &&
         deductions.all? {|deduction| deduction.valid? :submission} &&
         other_questions_complete?
+      else
+        valid?(:submission) &&
+          incomes.all? {|income| income.valid? :submission} &&
+          deductions.all? {|deduction| deduction.valid? :submission} &&
+          other_questions_complete?
+      end
     end
 
     def clean_conditional_params(model_params)
@@ -656,7 +666,6 @@ module FinancialAssistance
     end
 
     def foster_age_satisfied?
-      # TODO: Look into this. Seems like this is only relevant if pregnant?
       # Age greater than 18 and less than 26
       (19..25).cover? age_of_applicant
     end
@@ -664,8 +673,12 @@ module FinancialAssistance
     def other_questions_complete?
       questions_array = []
 
-      questions_array << is_former_foster_care  if foster_age_satisfied?
+      questions_array << is_former_foster_care  if foster_age_satisfied? && is_applying_coverage
       questions_array << is_post_partum_period  unless is_pregnant
+      questions_array << has_unemployment_income if FinancialAssistanceRegistry[:unemployment_income].enabled?
+      questions_array << is_physically_disabled
+      questions_array << pregnancy_due_on << children_expected_count if is_pregnant
+      questions_array << pregnancy_end_on << is_enrolled_on_medicaid if is_post_partum_period
 
       (other_questions_answers << questions_array).flatten.include?(nil) ? false : true
     end
@@ -703,6 +716,12 @@ module FinancialAssistance
       has_job_income || has_self_employment_income || has_other_income
     end
 
+    def relationship_kind_with_primary
+      rel = relationships.where(relative_id: application.primary_applicant.id).first
+      return "self" if rel.nil?
+      rel.kind
+    end
+
     def embedded_document_section_entry_complete?(embedded_document) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity TODO: Remove this
       case embedded_document
       when :income
@@ -712,8 +731,13 @@ module FinancialAssistance
         return incomes.jobs.blank? && incomes.self_employment.present? if !has_job_income && has_self_employment_income
         incomes.jobs.blank? && incomes.self_employment.blank?
       when :other_income
+        if FinancialAssistanceRegistry[:unemployment_income].enabled?
+          return false if has_unemployment_income.nil?
+          return incomes.unemployment.present? if has_unemployment_income
+        end
         return false if has_other_income.nil?
         return incomes.other.present? if has_other_income
+        return incomes.other.blank? || incomes.unemployment.blank? if FinancialAssistanceRegistry[:unemployment_income].enabled?
         incomes.other.blank?
       when :income_adjustment
         return false if has_deductions.nil?
@@ -721,9 +745,9 @@ module FinancialAssistance
         deductions.blank?
       when :health_coverage
         return false if has_enrolled_health_coverage.nil? || has_eligible_health_coverage.nil?
-        return benefits.enrolled.present? && benefits.eligible.present? if has_enrolled_health_coverage && has_eligible_health_coverage
-        return benefits.enrolled.present? && benefits.eligible.blank? if has_enrolled_health_coverage && !has_eligible_health_coverage
-        return benefits.enrolled.blank? && benefits.eligible.present? if !has_enrolled_health_coverage && has_eligible_health_coverage
+        return benefits.enrolled.present? && benefits.eligible.present? && benefits.all? {|benefit| benefit.valid? :submission} if has_enrolled_health_coverage && has_eligible_health_coverage
+        return benefits.enrolled.present? && benefits.enrolled.all? {|benefit| benefit.valid? :submission} && benefits.eligible.blank? if has_enrolled_health_coverage && !has_eligible_health_coverage
+        return benefits.enrolled.blank? && benefits.eligible.present? && benefits.eligible.all? {|benefit| benefit.valid? :submission}  if !has_enrolled_health_coverage && has_eligible_health_coverage
         benefits.enrolled.blank? && benefits.eligible.blank?
       end
     end
@@ -830,6 +854,10 @@ module FinancialAssistance
       incomes.other.present?
     end
 
+    def unemployment_income_exists?
+      incomes.unemployment.present?
+    end
+
     def deductions_exists?
       deductions.present?
     end
@@ -861,6 +889,10 @@ module FinancialAssistance
       records.collect{|record| record.attributes.except(:_id, :created_at, :updated_at) }
     end
 
+    def enrolled_or_eligible_in_any_medicare?
+      benefits.any_medicare.present?
+    end
+
     class << self
       def find(id)
         return nil unless id
@@ -879,20 +911,30 @@ module FinancialAssistance
     end
 
     def other_questions_answers
-      [:has_daily_living_help, :need_help_paying_bills, :is_ssn_applied].inject([]) do |array, question|
-        no_ssn_flag = no_ssn
+      if is_applying_coverage
+        [:is_self_attested_blind, :has_daily_living_help, :need_help_paying_bills, :is_ssn_applied].inject([]) do |array, question|
+          no_ssn_flag = no_ssn
 
-        array << send(question) if question != :is_ssn_applied || (question == :is_ssn_applied && no_ssn_flag == '1')
-        array
+          array << send(question) if question != :is_ssn_applied || (question == :is_ssn_applied && no_ssn_flag == '1')
+          array
+        end
+      else
+        [:is_pregnant, :is_post_partum_period].collect{|question| send(question)}
       end
     end
 
     def validate_applicant_information
-      validates_presence_of :has_fixed_address, :is_claimed_as_tax_dependent, :is_living_in_state, :is_temporarily_out_of_state, :is_pregnant, :is_self_attested_blind, :has_daily_living_help, :need_help_paying_bills #, :tax_household_id
+      if is_applying_coverage
+        validates_presence_of :has_fixed_address, :is_claimed_as_tax_dependent, :is_living_in_state, :is_temporarily_out_of_state, :is_pregnant, :is_self_attested_blind, :has_daily_living_help, :need_help_paying_bills #, :tax_household_id
+      else
+        validates_presence_of :has_fixed_address, :is_claimed_as_tax_dependent, :is_living_in_state, :is_temporarily_out_of_state, :is_pregnant
+      end
     end
 
     def driver_question_responses
       DRIVER_QUESTION_ATTRIBUTES.each do |attribute|
+        next if [:has_enrolled_health_coverage, :has_eligible_health_coverage].include?(attribute) && !is_applying_coverage
+
         instance_type = attribute.to_s.gsub('has_', '')
         instance_check_method = instance_type + "_exists?"
 
@@ -924,7 +966,6 @@ module FinancialAssistance
     end
 
     def presence_of_attr_other_qns # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity TODO: Remove this
-      return true
       if is_pregnant
         errors.add(:pregnancy_due_on, "' Pregnancy Due date' should be answered if you are pregnant") if pregnancy_due_on.blank?
         errors.add(:children_expected_count, "' How many children is this person expecting?' should be answered") if children_expected_count.blank?
@@ -939,6 +980,8 @@ module FinancialAssistance
         errors.add(:is_enrolled_on_medicaid, "' Was this person on Medicaid during pregnancy?' should be answered") if is_enrolled_on_medicaid.nil?
         errors.add(:pregnancy_end_on, "' Pregnancy End on date' should be answered") if pregnancy_end_on.blank?
       end
+
+      return unless is_applying_coverage
 
       if age_of_applicant > 18 && age_of_applicant < 26
         errors.add(:is_former_foster_care, "' Was this person in foster care at age 18 or older?' should be answered") if is_former_foster_care.nil?
@@ -1019,8 +1062,15 @@ module FinancialAssistance
           update_attributes!(family_member_id: response_family_member_id) if family_member_id.nil?
         end
       end
+    rescue StandardError => e
+      e.message
+    end
 
-      Operations::Families::DropMember.new.call(params: {family_id: application.family_id, family_member_id: family_member_id}) if is_active_changed? && is_active == false
+    def propagate_destroy
+      delete_params = {:family_id => application.family_id, :person_hbx_id => person_hbx_id}
+      ::Operations::Families::DropFamilyMember.new.call(delete_params)
+
+      Success('A successful call was made to enroll to drop a family member')
     rescue StandardError => e
       e.message
     end

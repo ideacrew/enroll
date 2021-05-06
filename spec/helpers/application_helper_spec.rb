@@ -144,8 +144,8 @@ RSpec.describe ApplicationHelper, :type => :helper do
       expect(network_type(nationwide_product)).to eq 'Nationwide'
     end
 
-    it 'should display DC-Metro if product is DC-Metro' do
-      expect(network_type(dcmetro_product)).to eq 'DC-Metro'
+    it "should display the statewide area according to the enroll registry" do
+      expect(network_type(dcmetro_product)).to eq ::EnrollRegistry[:enroll_app].setting(:statewide_area).item
     end
 
     it 'should display empty if metal level if its a 2016 plan' do
@@ -285,6 +285,45 @@ RSpec.describe ApplicationHelper, :type => :helper do
       it "should return extended" do
         assign(:status, "extended")
         expect(helper.date_col_name_for_broker_roaster).to eq 'Extended Date'
+      end
+    end
+  end
+
+  describe "display_my_broker?" do
+    let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+    let(:person) { FactoryBot.create(:person, :with_consumer_role)}
+    let(:site) {FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :cca, :as_hbx_profile)}
+    let(:organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile_initial_application, site: site)}
+    let(:employer_profile) {organization.employer_profile}
+    let(:employee_role) { FactoryBot.create(:employee_role, person: person, employer_profile: employer_profile)}
+    let!(:broker_role) { FactoryBot.create(:broker_role, aasm_state: 'active') }
+    let!(:broker_agency_account) {FactoryBot.create(:broker_agency_account,broker_agency_profile_id: broker_agency_profile.id,writing_agent_id: broker_role.id, start_on: TimeKeeper.date_of_record)}
+    let!(:broker_organization)            { FactoryBot.build(:benefit_sponsors_organizations_general_organization, site: site)}
+    let!(:broker_agency_profile)         { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile, organization: broker_organization, legal_name: 'Legal Name1') }
+
+    context 'person with dual roles' do
+      before do
+        allow(person).to receive(:employee_roles).and_return([employee_role])
+        allow(person).to receive(:active_employee_roles).and_return([employee_role])
+        allow(person).to receive(:consumer_role).and_return([])
+        allow(person).to receive(:has_active_employee_role?).and_return(true)
+        allow(employer_profile).to receive(:broker_agency_profile).and_return([broker_agency_profile])
+      end
+
+      it "should return true if person has employee & broker roles" do
+        expect(helper.display_my_broker?(person, employee_role)).to eq true
+      end
+    end
+
+    context 'person with consumer role only' do
+      before do
+        allow(person).to receive(:employee_roles).and_return([])
+        allow(person).to receive(:active_employee_roles).and_return([])
+        allow_any_instance_of(Family).to receive(:current_broker_agency).and_return(broker_agency_account)
+      end
+
+      it "should return true if person has consumer role & broker agency linked" do
+        expect(helper.display_my_broker?(person, employee_role)).to eq true
       end
     end
   end
@@ -584,32 +623,34 @@ RSpec.describe ApplicationHelper, :type => :helper do
 
   describe "find_plan_name", dbclean: :after_each do
     let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
-    let(:shop_enrollment) { FactoryBot.create(:hbx_enrollment,
-                                        household: family.active_household,
-                                        family:family,
-                                        kind: "employer_sponsored",
-                                        submitted_at: TimeKeeper.datetime_of_record - 3.days,
-                                        created_at: TimeKeeper.datetime_of_record - 3.days
-                                )}
-    let(:ivl_enrollment)    { FactoryBot.create(:hbx_enrollment,
-                                        household: family.latest_household,
-                                        family:family,
-                                        coverage_kind: "health",
-                                        effective_on: TimeKeeper.datetime_of_record - 10.days,
-                                        enrollment_kind: "open_enrollment",
-                                        kind: "individual",
-                                        submitted_at: TimeKeeper.datetime_of_record - 20.days
-                            )}
+    let(:shop_enrollment) do
+      FactoryBot.create(:hbx_enrollment, :with_product,
+                        household: family.active_household,
+                        family: family,
+                        kind: "employer_sponsored",
+                        submitted_at: TimeKeeper.datetime_of_record - 3.days,
+                        created_at: TimeKeeper.datetime_of_record - 3.days)
+    end
+    let(:ivl_enrollment)    do
+      FactoryBot.create(:hbx_enrollment, :with_product,
+                        household: family.latest_household,
+                        family: family,
+                        coverage_kind: "health",
+                        effective_on: TimeKeeper.datetime_of_record - 10.days,
+                        enrollment_kind: "open_enrollment",
+                        kind: "individual",
+                        submitted_at: TimeKeeper.datetime_of_record - 20.days)
+    end
     let(:valid_shop_enrollment_id)  { shop_enrollment.id }
     let(:valid_ivl_enrollment_id)   { ivl_enrollment.id }
     let(:invalid_enrollment_id)     {  }
 
     it "should return the plan name given a valid SHOP enrollment ID" do
-      expect(helper.find_plan_name(valid_shop_enrollment_id)).to eq shop_enrollment.plan.name
+      expect(helper.find_plan_name(valid_shop_enrollment_id)).to eq shop_enrollment.product.name
     end
 
     it "should return the plan name given a valid INDIVIDUAL enrollment ID" do
-      expect(helper.find_plan_name(valid_ivl_enrollment_id)).to eq  ivl_enrollment.plan.name
+      expect(helper.find_plan_name(valid_ivl_enrollment_id)).to eq  ivl_enrollment.product.name
     end
 
     it "should return nil given an invalid enrollment ID" do
@@ -754,6 +795,7 @@ describe "Enabled/Disabled IVL market" do
     it_behaves_like 'float_fix', 102.1699999999, 102.17
     it_behaves_like 'float_fix', 866.0799999996, 866.08
     it_behaves_like 'float_fix', (2.76 + 2.43), 5.19
+    it_behaves_like 'float_fix', (0.57 * 100), 57
   end
 
   describe 'round_down_float_two_decimals' do

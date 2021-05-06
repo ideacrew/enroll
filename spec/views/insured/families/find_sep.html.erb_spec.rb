@@ -6,6 +6,7 @@ RSpec.describe "insured/families/find_sep.html.erb", :dbclean => :around_each do
   let(:resident_role) { FactoryBot.create(:resident_role) }
 
   before do
+    allow(view).to receive(:is_under_open_enrollment?).and_return(false)
     qle1 = FactoryBot.create(:qualifying_life_event_kind, market_kind: 'individual')
     qle2 = FactoryBot.create(:qualifying_life_event_kind, market_kind: 'individual', title: 'I had a baby')
     sign_in current_user
@@ -46,8 +47,8 @@ RSpec.describe "insured/families/find_sep.html.erb", :dbclean => :around_each do
 
   it "should have outside open enrollment modal" do
     expect(rendered).to have_selector('div.modal#outside-open-enrollment')
-    expect(rendered).to match /Open enrollment starts on/
-    expect(rendered).to match /To enroll before open enrollment, you must qualify for a special enrollment period. If none of the circumstances listed apply to you, you will not be able to enroll until/
+    expect(rendered).to match(/Open enrollment starts on/)
+    expect(rendered).to match(/To enroll before open enrollment, you must qualify for a special enrollment period. If none of the circumstances listed apply to you, you will not be able to enroll until/)
     expect(rendered).to have_selector("a[href='/families/home']", text: 'Back To My Account')
   end
 end

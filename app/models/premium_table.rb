@@ -8,6 +8,7 @@ class PremiumTable
   field :start_on, type: Date
   field :end_on, type: Date
   field :cost, type: Float
+  field :tobacco_cost, type: Float # if ::EnrollRegistry.feature_enabled?(:tobacco_cost)
   field :rating_area, type: String
 
   validates_presence_of :age, :start_on, :end_on, :cost

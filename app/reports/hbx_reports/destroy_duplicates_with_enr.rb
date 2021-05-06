@@ -21,7 +21,7 @@
 #               end
 #             end
 
-#             if family.enrollments.count > 0
+#             if family.enrollments.any?
 #               family_members_ids.each do |dup_fam_mem|
 #                 member_to_stay = dup_fam_mem.shift
 #                 family.enrollments.each do |enrollment|

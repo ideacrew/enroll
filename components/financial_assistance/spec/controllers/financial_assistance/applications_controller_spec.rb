@@ -210,6 +210,55 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     end
   end
 
+  context "GET raw" do
+    let(:temp_file) do
+      [{"demographics" => {} },
+       {"financial_assistance_info" => {"TAX INFO" => nil,
+                                        "INCOME" => nil,
+                                        "INCOME ADJUSTMENTS" => nil,
+                                        "HEALTH COVERAGE" => nil,
+                                        "OTHER QUESTIONS" => nil}}]
+    end
+
+    before do
+      allow(File).to receive(:read).with("./components/financial_assistance/app/views/financial_assistance/applications/raw_application.yml.erb").and_return("")
+      allow(YAML).to receive(:safe_load).with("").and_return(temp_file)
+      user.update_attributes(roles: ["hbx_staff"])
+    end
+
+    it "should be successful" do
+      application.update_attributes(:aasm_state => "submitted")
+      get :raw_application, params: { id: application.id }
+      expect(assigns(:application)).to eq application
+    end
+
+    it "should redirect to applications page for draft application" do
+      get :raw_application, params: { id: application.id }
+      expect(response).to redirect_to(applications_path)
+    end
+
+    it "should redirect to applications page for invalid id" do
+      get :raw_application, params: { id: FinancialAssistance::Application.new.id }
+      expect(response).to redirect_to(applications_path)
+    end
+
+    it "should redirect to applications page for non hbx_staff roles" do
+      user.update_attributes(roles: ["comsumer_role"])
+      get :raw_application, params: { id: FinancialAssistance::Application.new.id }
+      expect(response).to redirect_to(applications_path)
+    end
+
+    context "generate income hash" do
+      it "should include unemployment income if feature enabled" do
+        skip "skipped: unemployment income feature not enabled" unless FinancialAssistanceRegistry[:unemployment_income].enabled?
+
+        application.update_attributes(:aasm_state => "submitted")
+        get :raw_application, params: { id: application.id }
+        expect(assigns(:income_coverage_hash)[applicant.id]["INCOME"]).to have_key("Did this person receive unemployment income at any point in ? *")
+      end
+    end
+  end
+
   context "GET wait_for_eligibility_response" do
     it "should redirect to eligibility_response_error if doesn't find the ED on wait_for_eligibility_response page" do
       get :wait_for_eligibility_response, params: { id: application.id }
@@ -234,15 +283,20 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   end
 
   context "check eligibility results received" do
-    it "should return true if the Header of the response doesn't has the success status code" do
+    it "should return false if the Header of the response doesn't have the success status code" do
       get :check_eligibility_results_received, params: { id: application.id }
       expect(response.body).to eq "false"
     end
 
-    it 'should return true if the Header of the response has the success status code' do
-      application.update_attributes(determination_http_status_code: 200)
-      get :check_eligibility_results_received, params: { id: application.id }
-      expect(response.body).to eq "true"
+    context 'with success status code and determined application' do
+      before do
+        application.update_attributes(determination_http_status_code: 200, aasm_state: 'determined')
+        get :check_eligibility_results_received, params: { id: application.id }
+      end
+
+      it 'should return true for response body' do
+        expect(response.body).to eq 'true'
+      end
     end
   end
 end

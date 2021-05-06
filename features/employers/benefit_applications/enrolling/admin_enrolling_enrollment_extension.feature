@@ -2,6 +2,7 @@ Feature: As an admin user I should have the ability to extend the OE
   of a given Employer before open enrollment has closed.
 
   Background: Setup site, employer, and enrolling/renewing benefit application
+    Given the shop market configuration is enabled
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for enrollment_open initial employer with health benefits
     And there is an employer ABC Widgets

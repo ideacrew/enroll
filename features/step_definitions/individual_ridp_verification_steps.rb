@@ -150,7 +150,7 @@ end
 And(/^that the consumer has answered the Experian Identity Proofing questions$/) do
   find(:xpath, '//label[@for="interactive_verification_questions_attributes_0_response_id_a"]').click
   find(:xpath, '//label[@for="interactive_verification_questions_attributes_1_response_id_c"]').click
-  screenshot("identify_verification")
+  # screenshot("identify_verification")
   click_button "Submit"
 end
 
@@ -199,7 +199,7 @@ end
 
 Then(/^HBX admin should see the dependents form$/) do
   expect(page).to have_content('Add Member')
-  screenshot("dependents")
+  # screenshot("dependents")
 end
 
 And(/^HBX admin click on continue button on household info form$/) do
@@ -222,7 +222,7 @@ And(/^HBX admin click on back to my account button$/) do
 end
 
 Then(/^HBX admin should land on home page$/) do
-  expect(page).to have_content 'My DC Health Link'
+  expect(page).to have_content Settings.site.short_name
 end
 
 And(/^I click on Continue button$/) do

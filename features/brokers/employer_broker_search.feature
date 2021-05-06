@@ -4,6 +4,8 @@ Feature: Employer terminates borker and hires new broker
 
   Background: Broker registration
     Given a CCA site exists with a benefit market
+    Given the shop market configuration is enabled
+    Given all announcements are enabled for user to select
     Given benefit market catalog exists for draft initial employer with health benefits
     Given there is a Broker Agency exists for District Brokers Inc
     And the broker Max Planck is primary broker for District Brokers Inc

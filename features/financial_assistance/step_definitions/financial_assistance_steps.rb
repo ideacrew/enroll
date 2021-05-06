@@ -40,6 +40,7 @@ end
 
 Then(/^they should see a new finanical assistance application$/) do
   expect(page.current_url).to match("/applications/.*/edit")
+  expect(page).to have_content(l10n('insured.family_members.index.continue_to_get_insurance'))
 end
 
 Then(/^they should see each of their dependents listed$/) do
@@ -406,9 +407,60 @@ When(/^the consumer manually enters the "Help Paying for Coverage" url in the br
 end
 
 Then(/^the consumer will navigate to the Help Paying for Coverage page$/) do
-  expect(page).to have_selector('h2', text: 'Help Paying for Coverage')
+  expect(page).to have_selector('h2', text: 'Your Application for Premium Reductions')
 end
 
 Then(/^the consumer will navigate to the Family Members page$/) do
   expect(page).to have_selector('h2', text: "#{l10n('family_information')}")
+end
+
+Then(/^a family with financial application in determined state exists$/) do
+  create_family_and_determined_aa_application
+end
+
+Then(/^the user with hbx admin role is logged in$/) do
+  @user.roles << 'hbx_staff'
+  login_as @user
+end
+
+When("admin visits home page") do
+  visit "/families/home"
+end
+
+And(/^the user clicks on Cost Savings link$/) do
+  find_link('Cost Savings').click
+end
+
+When(/^the user clicks on Action dropdown$/) do
+  find('.interaction-click-control-actions').click
+end
+
+Then(/^the user should see text Full Application$/) do
+  expect(page).to have_content('Full Application')
+end
+
+Then(/^user clicks on Full application action$/) do
+  click_link 'Full Application'
+end
+
+Then(/^user should land on full application page and should see 2 view my applications buttons$/) do
+  expect(page).to have_css('.interaction-click-control-view-my-applications', count: 2)
+end
+
+Then(/^user should see 2 print buttons$/) do
+  expect(page).to have_css('.interaction-click-control-print', count: 2)
+end
+
+And(/^user should see Medicaid eligibility question$/) do
+  expect(page).to have_content("Medicaid eligibility")
+end
+
+And(/^the user should click on the destroy applicant icon$/) do
+  find_all('.close-2')[2].click
+  find('.fa-times').click
+end
+
+Then(/^the user should see the popup for the remove applicant confirmation$/) do
+  popup_text = "Are you sure you want to remove this applicant?"
+  expect(page).to have_content(popup_text)
 end

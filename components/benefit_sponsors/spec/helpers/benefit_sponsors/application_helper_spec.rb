@@ -24,7 +24,7 @@ RSpec.describe BenefitSponsors::ApplicationHelper, type: :helper, dbclean: :afte
     context 'when there is an error then', dbclean: :after_each do
       let(:site) { FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key) }
       let(:broker_organization) { FactoryBot.build(:benefit_sponsors_organizations_general_organization, site: site) }
-      let(:broker_agency_profile) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile, organization: broker_organization, market_kind: 'shop', legal_name: 'Legal Name1') }
+      let(:broker_agency_profile) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile, organization: broker_organization, legal_name: 'Legal Name1') }
 
       it "has the correct number of unread messages" do
         expect(profile_unread_messages_count(broker_agency_profile)).to eq(0)
@@ -43,6 +43,7 @@ RSpec.describe BenefitSponsors::ApplicationHelper, type: :helper, dbclean: :afte
     let!(:effective_period)              { (TimeKeeper.date_of_record.beginning_of_month)..(TimeKeeper.date_of_record.beginning_of_month.next_year.prev_day) }
     let!(:new_effective_period)          { (TimeKeeper.date_of_record.beginning_of_month.next_year)..(TimeKeeper.date_of_record.beginning_of_month.prev_day + 2.years) }
     let!(:predecessor_application)       { FactoryBot.create(:benefit_sponsors_benefit_application, aasm_state: :active, effective_period: effective_period, benefit_sponsorship: active_benefit_sponsorship) }
+    let!(:canceled_renewal_application)  { FactoryBot.create(:benefit_sponsors_benefit_application, aasm_state: :canceled, effective_period: new_effective_period, benefit_sponsorship: active_benefit_sponsorship) }
     let!(:renewal_application)           { FactoryBot.create(:benefit_sponsors_benefit_application, aasm_state: :active, effective_period: new_effective_period, benefit_sponsorship: active_benefit_sponsorship) }
 
     context 'should return false when an active PY no canceled PY' do
@@ -61,6 +62,13 @@ RSpec.describe BenefitSponsors::ApplicationHelper, type: :helper, dbclean: :afte
     context 'should return false when a published PY' do
       before do
         renewal_application.update_attributes(:aasm_state => :enrollment_open)
+      end
+      it {expect(add_plan_year_button_business_rule(active_benefit_sponsorship, employer_profile.benefit_applications)).to eq false}
+    end
+
+    context 'should return false when more than one renewal application exists and one renewal is canceled and last renewal application is eligible ' do
+      before do
+        renewal_application.update_attributes(:aasm_state => :enrollment_eligible)
       end
       it {expect(add_plan_year_button_business_rule(active_benefit_sponsorship, employer_profile.benefit_applications)).to eq false}
     end

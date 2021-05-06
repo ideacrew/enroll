@@ -16,7 +16,7 @@
   }
 }
 .er-medicaid-prsn p, .er-summary p {
-  color: #909090;
+  color: #333;
 }
 .er-prsn i, .er-prsn h4 {
   display: inline-block;
@@ -51,11 +51,11 @@
   color: #3c763d;
 }
 .er-success {
+  font-size: 15px;
   padding: 10px 30px 13px;
 }
 .er-success div {
   display: table-cell;
-  vertical-align: middle;
 }
 .er-success .text-success span {
   width: 415px;

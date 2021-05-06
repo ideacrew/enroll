@@ -1,5 +1,5 @@
 <!-- APTC APPLIED PER ENROLLMENT -->
-<%max_for_hbx = max_aptc_that_can_be_applied_for_this_enrollment(hbx_id, @max_aptc)%>
+<%max_for_hbx = max_aptc_that_can_be_applied_for_this_enrollment(hbx_id)%>
 <div class = "module enrollment-header" align = "right">
   <table>
    <head>
@@ -26,7 +26,7 @@
       <th></th>
       <td style="text-align:center"><%=ehb_percent_for_enrollment(hbx_id)%>%</th>
       <th></th>
-      <td style="text-align:center"><%= '%.2f' %  max_aptc_that_can_be_applied_for_this_enrollment(hbx_id, @max_aptc)%></td>
+      <td style="text-align:center"><%= '%.2f' %  max_aptc_that_can_be_applied_for_this_enrollment(hbx_id)%></td>
       <th></th>
       <th>Applied APTC &nbsp;&nbsp;</th>
 

@@ -39,10 +39,10 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerNoBinderPaymentRece
           expect(model_event).to be_an_instance_of(BenefitSponsors::ModelEvents::ModelEvent)
         end
       end
-      if Settings.site.key == :dc
-        BenefitSponsors::BenefitApplications::BenefitApplication.date_change_event(dc_date_mock_object)
-      elsif Settings.site.key == :cca
+      if EnrollRegistry[:enroll_app].setting(:site_key).item == :cca
         BenefitSponsors::BenefitApplications::BenefitApplication.date_change_event(cca_date_mock_object)
+      else
+        BenefitSponsors::BenefitApplications::BenefitApplication.date_change_event(dc_date_mock_object)
       end
     end
   end
@@ -97,10 +97,10 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerNoBinderPaymentRece
     before do
       allow(subject).to receive(:resource).and_return(employee_role)
       allow(subject).to receive(:payload).and_return(payload)
-      if Settings.site.key == :dc
-        BenefitSponsors::BenefitApplications::BenefitApplication.date_change_event(dc_date_mock_object)
-      elsif Settings.site.key == :cca
+      if EnrollRegistry[:enroll_app].setting(:site_key).item == :cca
         BenefitSponsors::BenefitApplications::BenefitApplication.date_change_event(cca_date_mock_object)
+      else
+        BenefitSponsors::BenefitApplications::BenefitApplication.date_change_event(dc_date_mock_object)
       end
     end
 
@@ -155,10 +155,10 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerNoBinderPaymentRece
     before do
       allow(subject).to receive(:resource).and_return(employer_profile)
       allow(subject).to receive(:payload).and_return(payload)
-      if Settings.site.key == :dc
-        BenefitSponsors::BenefitApplications::BenefitApplication.date_change_event(dc_date_mock_object)
-      elsif Settings.site.key == :cca
+      if EnrollRegistry[:enroll_app].setting(:site_key).item == :cca
         BenefitSponsors::BenefitApplications::BenefitApplication.date_change_event(cca_date_mock_object)
+      else
+        BenefitSponsors::BenefitApplications::BenefitApplication.date_change_event(dc_date_mock_object)
       end
     end
 

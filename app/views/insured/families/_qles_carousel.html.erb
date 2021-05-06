@@ -1,16 +1,17 @@
 <% if @multiroles %>
     <div class="module market-selection">
       <div class="btn-group btn-group-justified">
-        <div class="btn-group">
-          <span type="button" class="btn btn-primary<% if @manually_picked_role == 'shop_market_events' %> active <% end %>">
-            <% if controller.action_name == "find_sep" %>
-              <%= link_to l10n(".employee"), find_sep_insured_families_path(shop_for_plan: "shop_for_plan", market: "shop_market_events") %>
-            <% else %>
-              <%= link_to l10n(".employee"), family_account_path(tab: 'home', market: "shop_market_events") %>
-            <% end %>
-          </span>
-        </div>
-
+        <% if is_shop_or_fehb_market_enabled?%>
+          <div class="btn-group">
+            <span type="button" class="btn btn-primary<% if @manually_picked_role == 'shop_market_events' %> active <% end %>">
+              <% if controller.action_name == "find_sep" %>
+                <%= link_to l10n(".employee"), find_sep_insured_families_path(shop_for_plan: "shop_for_plan", market: "shop_market_events") %>
+              <% else %>
+                <%= link_to l10n(".employee"), family_account_path(tab: 'home', market: "shop_market_events") %>
+              <% end %>
+            </span>
+          </div>
+        <% end %>
         <% if individual_market_is_enabled?%>
           <div class="btn-group">
             <span type="button" class="btn btn-primary<% if @manually_picked_role == 'individual_market_events' %> active <% end %>">
@@ -51,10 +52,11 @@
     </ol>
 
     <!-- Controls -->
-    <a class="left carousel-control" href="#carousel-qles" role="button" data-slide="prev" style='background-image: none;color:#007bc4;'>
+    <% color = EnrollRegistry[:qle_carousel].settings(:color).item %>
+    <a class="left carousel-control" href="#carousel-qles" role="button" data-slide="prev" style="background-image: none;color:<%= color %>">
       <i class="fa fa-angle-left left fa-2x" aria-hidden="true"></i>
     </a>
-    <a class="right carousel-control" href="#carousel-qles" role="button" data-slide="next" style='background-image: none;color:#007bc4;'>
+    <a class="right carousel-control" href="#carousel-qles" role="button" data-slide="next" style="background-image: none;color:<%= color %>">
       <i class="fa fa-angle-right right fa-2x" aria-hidden="true"></i>
     </a>
   <% end %>

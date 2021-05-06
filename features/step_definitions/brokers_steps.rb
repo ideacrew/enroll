@@ -19,7 +19,6 @@ When(/^Primary Broker should see the New Broker Agency form$/) do
 end
 
 When(/^.+ enters personal information$/) do
-  visit "/broker_registration"
   fill_in 'agency[staff_roles_attributes][0][first_name]', with: 'Ricky'
   fill_in 'agency[staff_roles_attributes][0][last_name]', with: 'Martin'
   fill_in 'inputDOB', with: '10/10/1984'
@@ -111,10 +110,12 @@ And(/^.+ clicks? on Create Broker Agency$/) do
 end
 
 Then(/^.+ should see broker registration successful message$/) do
-  if Settings.site.key == :dc
-    expect(page).to have_content('Complete the following requirements to become a DC Health Link Registered Broker')
-  end
+  expect(page).to have_content("Complete the following requirements to become a #{EnrollRegistry[:enroll_app].setting(:short_name).item} Registered Broker") if broker_approval_period_enabled?
   expect(page).to have_content('Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed.')
+end
+
+def broker_approval_period_enabled?
+  EnrollRegistry.feature_enabled?(:broker_approval_period)
 end
 
 And(/^.+ should see the list of broker applicants$/) do
@@ -148,16 +149,17 @@ When(/^(.*?) go[es]+ to the brokers tab$/) do |legal_name|
 end
 
 And(/^.+ should receive an invitation email$/) do
-  subject = if Settings.site.key == :dc
+  subject = if EnrollRegistry.feature_enabled?(:broker_approval_period)
               "Invitation to create your Broker account on #{Settings.site.short_name}"
             else
               "Important information for accessing your new broker account through the #{Settings.site.short_name}"
             end
+  broker_email_address = Person.all.detect(&:broker_role).emails.first.address
   open_email(
-    "ricky.martin@example.com",
+    broker_email_address,
     :with_subject => subject
   )
-  expect(current_email.to).to eq(["ricky.martin@example.com"])
+  expect(current_email.to).to eq([broker_email_address])
 end
 
 When(/^.+ visits? invitation url in email$/) do
@@ -190,8 +192,9 @@ Then(/^.+ should see bank information$/) do
 end
 
 Then(/^.+ should see successful message with broker agency home page$/) do
- #expect(page).to have_content("Welcome to #{Settings.site.short_name}. Your account has been created.")
-  expect(page).to have_content("Broker Agency : #{broker_agency_profile.legal_name}")
+  expect(page).to have_content("Welcome to #{Settings.site.short_name}. Your account has been created.")
+  current_broker_legal_name = Person.all.detect(&:broker_role).broker_role.broker_agency_profile.legal_name
+  expect(page).to have_content("Broker Agency : #{current_broker_legal_name}")
 end
 
 Then(/^.+ should see no active broker$/) do
@@ -203,7 +206,7 @@ When(/^.+ clicks? on Browse Brokers button$/) do
 end
 
 Then(/^.+ should see broker agencies index view$/) do
-  @broker_agency_profiles.keys.each do |broker_agency_name|
+  @broker_agency_profiles.each_key do |broker_agency_name|
     element = find("div#broker_agencies_listing a", text: /#{broker_agency_name}/i, wait: 5)
     expect(element).to be_present
   end
@@ -268,7 +271,7 @@ Then(/^.+ should see Employer (.*?) and click on legal name$/) do |legal_name|
 end
 
 Then(/^.+ should see the Employer (.*?) page as Broker$/) do |legal_name|
-  find('#home h4', text: legal_name, wait: 5)
+  expect(page).to have_content(employer.legal_name)
   expect(page).to have_content("I'm a Broker")
 end
 
@@ -280,24 +283,23 @@ Then(/^.* creates and publishes a plan year$/) do
   find('.interaction-click-control-benefits').click
   find('.interaction-click-control-add-plan-year').click
 
-  find(:xpath, '//p[@class="label"][contains(., "SELECT START ON")]').click
-  find(:xpath, '//div[div/p[contains(., "SELECT START ON")]]//li[@data-index="1"]').click
+  enter_plan_year_info
 
-  fill_in 'plan_year[fte_count]', with: '3'
-  find('.interaction-click-control-continue').click
+  # find('.interaction-click-control-continue').click
 
-  fill_in "plan_year[benefit_groups_attributes][0][title]", with: "Silver PPO Group"
+  # fill_in "plan_year[benefit_groups_attributes][0][title]", with: "Silver PPO Group"
 
-  find(:xpath, '//li/label[@for="plan_year_benefit_groups_attributes_0_plan_option_kind_single_carrier"]').click
-  wait_for_ajax(10)
-  find('.carriers-tab a').click
+  # find(:xpath, '//li/label[@for="plan_year_benefit_groups_attributes_0_plan_option_kind_single_carrier"]').click
+  # wait_for_ajax(10)
+  click_link 'By Carrier'
   wait_for_ajax(10,2)
-  find('.reference-plan label').click
-  wait_for_ajax(10)
-  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]", with: 50
-  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][1][premium_pct]", with: 50
-  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][2][premium_pct]", with: 50
-  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][3][premium_pct]", with: 50
+  page.all('label').detect { |label| label.text == 'CareFirst' }.click
+  #find('.reference-plan label').click
+  #wait_for_ajax(10)
+  #fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]", with: 50
+  #fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][1][premium_pct]", with: 50
+  #fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][2][premium_pct]", with: 50
+  #fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][3][premium_pct]", with: 50
 
   find('.interaction-click-control-create-plan-year').click
   find('.alert-notice')
@@ -335,7 +337,7 @@ Then(/^.+ sees employer census family created$/) do
 end
 
 # Then(/^(?:Employee){0}+ should see the matched employee record form$/) do
-#   screenshot("broker_employer_search_results")
+#   # screenshot("broker_employer_search_results")
 #   expect(page).to have_content('Legal LLC')
 # end
 
@@ -350,8 +352,8 @@ Then(/^.+ goes to the Consumer page$/) do
 end
 
 Then(/^Primary Broker should see (.*?) account$/) do |name|
-  find('.family_members h2', text: "#{l10n('family_information')}", wait: 5)
-  find('.family_members span', text: name, wait: 5)
+  expect(page).to have_content(name)
+  expect(page).to have_content("Manage Family")
 end
 
 # Then(/^.+ is on the consumer home page$/) do
@@ -417,7 +419,7 @@ Then(/broker (.*?) should receive application (.*?) notification$/) do |broker_n
     when 'approval'
       "Invitation to create your Broker account on #{site_short_name}"
     when 'extended'
-      'Action Needed - Complete Broker Training for DC Health Link for Business'
+      "Action Needed - Complete Broker Training for #{site_short_name} for Business"
     end
   open_email(
     broker_email_address,
@@ -444,4 +446,8 @@ end
 
 Then(/^.+ should see the broker application extended message$/) do
   expect(page).to have_content('Broker applicant is now extended.')
+end
+
+Then(/Primary Broker should see Employer and click on legal name$/) do
+  click_link(employer.legal_name)
 end

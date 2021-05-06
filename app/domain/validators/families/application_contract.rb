@@ -21,7 +21,7 @@ module Validators
         end
       end
 
-      rule(:applicants).each do  |key, value|
+      rule(:applicants).each do
         if key? && value
           if value.is_a?(Hash)
             result = ::FinancialAssistance::Validators::ApplicantContract.new.call(value)

@@ -171,6 +171,8 @@ When(/^the user clicks the Not sure link next to the (.*) income question$/) do 
     popup_link = links.detect { |link| link[:href].include?("#has_job_income") unless link[:href].blank? }
   when 'self employment'
     popup_link = links.detect { |link| link[:href].include?("#has_self_employment_income") unless link[:href].blank? }
+  when 'unemployment'
+    popup_link = links.detect { |link| link[:href].include?("#has_unemployment_income") unless link[:href].blank? }
   end
   popup_link.click
   sleep 2
@@ -190,6 +192,8 @@ Then(/^the user should see the popup for the (.*) income question$/) do |income_
   when 'self employment'
     popup_text = "Select 'yes' if this person owns a business or receives a federal form 1099 from any employer. " \
     "We need to know about any income this person receives as an independent contractor or from a business they own."
+  when 'unemployment'
+    popup_text = "Select ‘yes’ if this person received one or more types of unemployment income"
   end
   expect(page).to have_content(popup_text)
 end
@@ -202,4 +206,3 @@ And(/^there will be a checkmark next to the completed Job Income page link$/) do
   checkmark = page.all('span').detect { |span| span[:class] == "fa fa-check applicant-check" }
   expect(checkmark.present?).to eq(true)
 end
-
