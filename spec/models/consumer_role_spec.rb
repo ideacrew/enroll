@@ -460,9 +460,9 @@ context 'Verification process and notices' do
           consumer.aasm_state = "ssa_pending"
           consumer.ssn_invalid! verification_attr
         end
-        # TODO: This is broken during DC resridency refactor. don't merge yet.
-        xit 'should remain in review' do
-          expect(verification_types.by_name("Social Security Number").first.validation_status).to eq("review")
+
+        it 'should remain in review' do
+          expect(verification_types.all.by_name("Social Security Number").detect { |vt| vt.validation_status == "review" }.present?).to eq(true)
         end
       end
 
