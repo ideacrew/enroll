@@ -720,7 +720,7 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
       h_family
     end
 
-    let(:census_employee_dependent_params) {
+    let(:census_employee_dependent_params) do
       {
         "first_name" => husband.first_name,
         "middle_name" => "",
@@ -742,7 +742,7 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
           }
         ]
       }
-    }
+    end
 
     before do
       allow(@hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
