@@ -22,4 +22,18 @@ class PaymentTransaction
   def set_submitted_at
     self.submitted_at ||= TimeKeeper.datetime_of_record
   end
+
+  def update_enrollment_details(enrollment)
+    self.enrollment_id = enrollment.id
+    self.carrier_id =  enrollment.product.issuer_profile_id
+    self.enrollment_effective_date = enrollment.effective_on
+    self.save!
+  end
+
+  def self.build_payment_instance(enrollment)
+    payment = enrollment.family.payment_transactions.build
+    payment.update_enrollment_details(enrollment)
+    payment.family.save!
+    payment
+  end
 end
