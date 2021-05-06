@@ -2,13 +2,11 @@
 
 require 'dry/monads'
 require 'dry/monads/do'
-require 'aca_entities/contracts/financial/payment_transactions/payment_transaction_contract'
-require 'aca_entities/financial/payment_transactions/payment_transaction'
+require 'aca_entities/contracts/payment_transaction_contract'
+require 'aca_entities/payment_transaction'
 
 module Operations
-  # module for payment transaction operations
   module PaymentTransactions
-    # Creates a payment transaction for a family when given a valid enrollment.
     class Create
       include Config::SiteConcern
       send(:include, Dry::Monads[:result, :do])
@@ -38,12 +36,12 @@ module Operations
       end
 
       def validate_transaction_payload(params)
-        result = ::AcaEntities::Contracts::Financial::PaymentTransactions::PaymentTransactionContract.new.call(params)
+        result = ::AcaEntities::Contracts::PaymentTransactionContract.new.call(params)
         result.success? ? Success(result.to_h) : Failure(result.errors.to_h)
       end
 
       def create_transaction_entity(params)
-        transaction = ::AcaEntities::Financial::PaymentTransactions::PaymentTransaction.new(params)
+        transaction = ::AcaEntities::PaymentTransaction.new(params)
         Success(transaction)
       end
 
