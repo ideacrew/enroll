@@ -56,8 +56,8 @@ namespace :sbc do
       next if (row[1].include? "-") && (!row[1].include? "-01")
       plan_find_regex = Regexp.compile("^" + row[1].to_s.split("-").first)
       Plan.where(hios_id: plan_find_regex, active_year: row[2]).each do |plan|
-        bucket_name = "#{Settings.site.s3_prefix}-enroll-sbc-#{aws_env}"
-        uri = "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}##{row[3]}"
+        bucket_name = "#{EnrollRegistry[:enroll_app].setting(:s3_prefix).item}-enroll-sbc-#{aws_env}"
+        uri = "urn:openhbx:terms:v1:file_storage:s3:bucket:#{EnrollRegistry[:enroll_app].setting(:s3_prefix).item}##{row[3]}"
         plan.sbc_document = Document.new({title: row[4], subject: "SBC", format: 'application/pdf', identifier: uri})
         plan.sbc_document.save!
         plan.save!
@@ -68,8 +68,8 @@ namespace :sbc do
       next unless row[1].include? "-"
       plan = Plan.where(hios_id: row[1], active_year: row[2]).first
       next if plan.nil?
-      bucket_name = "#{Settings.site.s3_prefix}-enroll-sbc-#{aws_env}"
-      uri = "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}##{row[3]}"
+      bucket_name = "#{EnrollRegistry[:enroll_app].setting(:s3_prefix).item}-enroll-sbc-#{aws_env}"
+      uri = "urn:openhbx:terms:v1:file_storage:s3:bucket:#{EnrollRegistry[:enroll_app].setting(:s3_prefix).item}##{row[3]}"
       plan.sbc_document = Document.new({title: row[4], subject: "SBC", format: 'application/pdf', identifier: uri})
       plan.sbc_document.save!
       plan.save!
