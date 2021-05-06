@@ -42,7 +42,7 @@ namespace :reports do
     @citizenship_doc_type = @ssn_doc_type = @ami_doc_type = @immigration_doc_type = @residency_doc_type = 'N'
     family_member.person.consumer_role.outstanding_verification_types.each do |v_type|
       case v_type
-        when 'DC Residency'
+        when VerificationType::LOCATION_RESIDENCY
           @residency_doc_type = 'Y'
         when 'Citizenship'
           @citizenship_doc_type = 'Y'
