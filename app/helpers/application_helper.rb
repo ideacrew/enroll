@@ -645,7 +645,8 @@ module ApplicationHelper
 
   def env_bucket_name(bucket_name)
     aws_env = ENV['AWS_ENV'] || "qa"
-    "dchbx-enroll-#{bucket_name}-#{aws_env}"
+    subdomain = EnrollRegistry[:enroll_app].setting(:subdomain).item
+    "#{subdomain}-enroll-#{bucket_name}-#{aws_env}"
   end
 
   def display_dental_metal_level(plan)
