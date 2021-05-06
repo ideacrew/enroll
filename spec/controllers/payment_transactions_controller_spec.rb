@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe PaymentTransactionsController, :type => :controller do
@@ -19,17 +21,17 @@ RSpec.describe PaymentTransactionsController, :type => :controller do
     end
 
     it 'should generate saml response' do
-      get :generate_saml_response, params: {:enrollment_id => hbx_enrollment.hbx_id}
+      get :generate_saml_response, params: { :enrollment_id => hbx_enrollment.hbx_id, :source => source }
       expect(response).to have_http_status(:success)
     end
 
     it 'should build payment transacations for a family' do
-      get :generate_saml_response, params: {:enrollment_id => hbx_enrollment.hbx_id}
+      get :generate_saml_response, params: { :enrollment_id => hbx_enrollment.hbx_id, :source => source }
       expect(family.payment_transactions.count).to eq 1
     end
 
     it 'should build payment transaction with enrollment effective date and carrier id' do
-      get :generate_saml_response, params: {:enrollment_id => hbx_enrollment.hbx_id}
+      get :generate_saml_response, params: { :enrollment_id => hbx_enrollment.hbx_id, :source => source }
       expect(family.payment_transactions.first.enrollment_effective_date).to eq hbx_enrollment.effective_on
       expect(family.payment_transactions.first.carrier_id).to eq hbx_enrollment.product.issuer_profile_id
     end
