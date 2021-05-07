@@ -90,15 +90,13 @@ jobs:
           gem update --system --quiet --silent
           bundle config path vendor/bundle
           bundle install
+          bundle exec rake configuration:client_configuration_toggler client='${{ matrix.client-name }}'
           echo switching to ${{ matrix.engine-name }}
           cd components/${{ matrix.engine-name }}
           bundle config path ../../vendor/bundle
           echo testing caching
           echo installing ${{ matrix.engine-name }} dependencies
           bundle install
-      - name: Run Client Swap Suite
-        run: |
-          bundle exec rake configuration:client_configuration_toggler client='${{ matrix.client-name }}'
       - name: Restore Node Modules
         id: npm-cache
         uses: actions/cache@v2
@@ -150,13 +148,11 @@ jobs:
           gem update --system --quiet --silent
           bundle config path vendor/bundle
           bundle install
+          bundle exec rake configuration:client_configuration_toggler client='${{ matrix.client-name }}'
           cd components/benefit_sponsors
           bundle config path ../../vendor/bundle
           bundle install
           gem install treye-semaphore_test_boosters --version '2.5.2'
-      - name: Run Client Swap Suite
-        run: |
-          bundle exec rake configuration:client_configuration_toggler client='${{ matrix.client-name }}'
       - name: Restore Node Modules
         id: npm-cache
         uses: actions/cache@v2
