@@ -34,13 +34,16 @@ class ClientConfigurationToggler < MongoidMigrationTask
     `rm -rf #{Rails.root}/system` if Dir.exist?("#{Rails.root}/system")
     `cp -r #{target_config_folder}/system #{Rails.root}`
   end
-
+  
+  # TODO: We will continue switching the Settings.yml until it is fully deprecated
   def copy_current_configuration_to_engines
     Dir.glob("components/*").each do |engine_folder_name|
-      puts("Copying current configuration to #{engine_folder_name} system root folder.")
+      puts("Copying current ResourceRegistry configuration and Settings.yml to #{engine_folder_name} system root folder.")
       `cp -r system #{Rails.root}/#{engine_folder_name}/`
-      puts("Copying current configuration to #{engine_folder_name} spec dummy app")
+      `cp -r config/settings.yml #{Rails.root}/#{engine_folder_name}/settings.yml`
+      puts("Copying current ResourceRegistry configuration and Settings.yml to #{engine_folder_name} spec dummy app")
       `cp -r system #{Rails.root}/#{engine_folder_name}/spec/dummy/`
+      `cp -r config/settings.yml #{Rails.root}/#{engine_folder_name}/spec/dummy/settings.yml`
     end
   end
 
