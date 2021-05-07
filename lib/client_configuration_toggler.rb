@@ -52,7 +52,7 @@ class ClientConfigurationToggler < MongoidMigrationTask
     target_configuration_files = Dir.glob("#{target_config_folder}/**/*").select { |e| File.file? e }
     target_configuration_files.reject { |file| file.include?('system') }.each do |filename_in_config_directory|
       # Cut off the filename parts with config namespace
-      puts("Swapping app assets and other straggler files.")
+      puts("Swapping Settings.yml, app assets and other straggler files.")
       actual_filename_in_enroll = filename_in_config_directory.sub("#{target_config_folder}/", '')
       `cp -r #{filename_in_config_directory} #{actual_filename_in_enroll}`
     end
@@ -60,7 +60,8 @@ class ClientConfigurationToggler < MongoidMigrationTask
 
   def checkout_straggler_files
     straggler_files = Dir.glob("#{old_config_folder}/**/*").select { |e| File.file? e }
-    straggler_files.reject { |file| file.include?('system') }.each do |filename_in_config_directory|
+    # TODO: Deprecate settings and move this eventually
+    straggler_files.reject { |file| file.include?('system') || file.include?('settings') }.each do |filename_in_config_directory|
       # Cut off the filename parts with config namespace
       puts("Checking out old config app assets and other straggler files.")
       filename_without_root = filename_in_config_directory.sub("#{old_config_folder}/", '')
@@ -76,7 +77,9 @@ class ClientConfigurationToggler < MongoidMigrationTask
     copy_app_assets_and_straggler_files
     checkout_straggler_files
     puts("Client configuration toggle complete system complete. enroll_app.yml file is now set to:")
-    result = `cat system/config/templates/features/enroll_app/enroll_app.yml`
-    puts(result[0..800])
+    resource_registry_result = `cat system/config/templates/features/enroll_app/enroll_app.yml`
+    puts(resource_registry_result[0..800])
+    settings_yml_result = `cat config/settings.yml`
+    puts(settings_yml_result[0..400])
   end
 end
