@@ -8,14 +8,13 @@ RSpec.describe Operations::GenerateSamlResponse do
   let!(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
   let!(:household) {family.active_household}
   let!(:primary_fm) {family.primary_applicant}
-  let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile)}
-  let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01', issuer_profile: issuer_profile)}
+  let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
   let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, aasm_state: 'shopping', product: product) }
   let(:build_saml_repsonse) {double}
   let(:encode_saml_response) {double}
   let(:connection) {double}
   let(:params) do
-    {:enrollment_id => hbx_enrollment.hbx_id }
+    { :enrollment_id => hbx_enrollment.hbx_id, :source => source }
   end
 
   before do
