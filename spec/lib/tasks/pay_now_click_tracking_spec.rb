@@ -8,7 +8,7 @@ describe 'Pay Now Click Tracking Report', :dbclean => :after_each do
   context 'paynow:click_tracking start_date="Month/Day/Year" end_date="Month/Day/Year"' do
 
     let(:start_date) { "01/01/2021" }
-    let(:end_date) { "01/03/2021" }
+    let(:end_date) { "03/01/2021" }
     let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
     let(:payment_transaction1) { FactoryBot.create(:payment_transaction, family: family) }
     let(:payment_transaction2) { FactoryBot.create(:payment_transaction, family: family, source: 'enrollment_tile') }
