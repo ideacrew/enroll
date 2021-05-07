@@ -2,6 +2,7 @@ Feature: When a benefit application gets reinstated the newly created benefit ap
 
   Scenario Outline: when Admin goes to employer portal should see a reinstated text for reinstated benefit application
     Given the Reinstate feature configuration is enabled
+    Given the shop market configuration is enabled
     And a CCA site exists with a benefit market
     And benefit market catalog exists for <from_state> initial employer with health benefits
     And there is an employer ABC Widgets
