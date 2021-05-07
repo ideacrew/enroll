@@ -5,7 +5,7 @@ $(document).ready(function() {
     $.ajax({
         type: "GET",
         url: "/payment_transactions/generate_saml_response",
-        data: {enrollment_id: $("#pay-now").val(), $("#source").val()},
+        data: {enrollment_id: $("#pay-now").val(), source: $("#source").val()},
         success: function (response) {
           if (response["error"] != null){
             alert("We're sorry, but something went wrong. You can try again, or pay once you receive your invoice.")}
