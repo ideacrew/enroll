@@ -126,7 +126,7 @@ end
 
 And(/^the user is on the Employer Index of the Admin Dashboard$/) do
   visit exchanges_hbx_profiles_path
-  find('.interaction-click-control-employers', wait: 10).click
+  find('.interaction-click-control-employers').click
 end
 
 And(/^the user is on the Family Index of the Admin Dashboard$/) do
