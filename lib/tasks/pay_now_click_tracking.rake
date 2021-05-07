@@ -1,6 +1,6 @@
 # Run the following rake task: RAILS_ENV=production bundle exec rake paynow:click_tracking[start_date,end_date]
-# # date_format: RAILS_ENV=production bundle exec rake paynow:click_tracking[%d/%m/%Y,%d/%m/%Y]
-# # example: RAILS_ENV=production bundle exec rake paynow:click_tracking["01/01/2021","01/04/2021"]
+# # date_format: RAILS_ENV=production bundle exec rake paynow:click_tracking[%m/%d/%Y,%m/%d/%Y]
+# # example: RAILS_ENV=production bundle exec rake paynow:click_tracking["01/01/2021","04/01/2021"]
 require 'csv'
 namespace :paynow do
   desc 'Track date and feature location of outgoing clicks on the pay now links'
@@ -17,8 +17,8 @@ namespace :paynow do
     locations = ['plan_shopping', 'enrollment_tile']
     location_count = {}
 
-    start_date = Date.strptime(args['start_date'],'%d/%m/%Y').to_date
-    end_date   = Date.strptime(args['end_date'],'%d/%m/%Y').to_date
+    start_date = Date.strptime(args['start_date'],'%m/%d/%Y').to_date
+    end_date   = Date.strptime(args['end_date'],'%m/%d/%Y').to_date
 
     if start_date > end_date
       puts "Exception: Start Date can not be after End Date."
