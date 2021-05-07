@@ -196,6 +196,8 @@ registry:
             item: "Cover ME's Customer Care Center"
           - key: :contact_center_short_number
             item: "(855) 532-5465"
+          - key: :contact_center_tty_number # Need to figure out what this should be for Maine
+            item: "711"
           - key: :producer_advisory_committee_url
             item: ""
           - key: :mailer_logo_file_name
