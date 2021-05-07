@@ -3,6 +3,7 @@
     <div class="col-md-12">
       <span class="view-applications-top"><%= link_to "View my Applications", applications_path, class: "btn btn-small btn-primary" %></span>
       <div id="dependents_info_wrapper">
+      <button onClick="window.print()" class="btn-default btn interaction-click-control-print" > Print </button>
       <h2 class="darkblue">Review Your Application</h2>
       <p><b>Application ID:</b> <%= @application.hbx_id %> </p>
       <% if income_and_deductions_for_any(@application).present? %>
@@ -184,6 +185,7 @@
       </div>
         <div class="view-applications-bottom" ><%= link_to "View my Applications", applications_path, class: "btn btn-small btn-primary" %></div>
     </div>
+    <button onClick="window.print()" class="btn-default btn interaction-click-control-print" > Print </button>
     </div>
   </div>
 </div>
