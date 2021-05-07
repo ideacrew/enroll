@@ -40,19 +40,19 @@ class ClientConfigurationToggler < MongoidMigrationTask
     Dir.glob("components/*").each do |engine_folder_name|
       puts("Copying current ResourceRegistry configuration and Settings.yml to #{engine_folder_name} system root folder.")
       `cp -r system #{Rails.root}/#{engine_folder_name}/`
-      `cp -r config/settings.yml #{Rails.root}/#{engine_folder_name}/settings.yml`
+      `cp -r config/settings.yml #{Rails.root}/#{engine_folder_name}/config/settings.yml`
       puts("Copying current ResourceRegistry configuration and Settings.yml to #{engine_folder_name} spec dummy app")
       `cp -r system #{Rails.root}/#{engine_folder_name}/spec/dummy/`
-      `cp -r config/settings.yml #{Rails.root}/#{engine_folder_name}/spec/dummy/settings.yml`
+      `cp -r config/settings.yml #{Rails.root}/#{engine_folder_name}/spec/dummy/config/settings.yml`
     end
   end
 
   def copy_app_assets_and_straggler_files
     # Need to make this only return files
     target_configuration_files = Dir.glob("#{target_config_folder}/**/*").select { |e| File.file? e }
-    target_configuration_files.reject { |file| file.include?('system') }.each do |filename_in_config_directory|
+    target_configuration_files.reject { |file| file.include?('system') || file.include?('settings') }.each do |filename_in_config_directory|
       # Cut off the filename parts with config namespace
-      puts("Swapping Settings.yml, app assets and other straggler files.")
+      puts("Swapping app assets and other straggler files.")
       actual_filename_in_enroll = filename_in_config_directory.sub("#{target_config_folder}/", '')
       `cp -r #{filename_in_config_directory} #{actual_filename_in_enroll}`
     end
