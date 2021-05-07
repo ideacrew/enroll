@@ -36,8 +36,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerAgencyHiredConfirmation', db
     end
 
     context "NoticeTrigger" do
-      # TODO: This is failing on me_trunk for some ereaeson
-      xit "should trigger notice event" do
+      it "should trigger notice event" do
 
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.broker.broker_hired_notice_to_broker"
