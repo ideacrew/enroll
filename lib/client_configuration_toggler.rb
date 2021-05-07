@@ -85,6 +85,7 @@ class ClientConfigurationToggler < MongoidMigrationTask
     puts("Client configuration toggle complete system complete. enroll_app.yml file is now set to:")
     resource_registry_result = `cat system/config/templates/features/enroll_app/enroll_app.yml`
     puts(resource_registry_result[0..800])
+    puts("Settings yml now set to:")
     settings_yml_result = `cat config/settings.yml`
     puts(settings_yml_result[0..400])
   end
