@@ -68,7 +68,7 @@ jobs:
             'transport_profiles',
             'financial_assistance',
           ]
-          client-name: ['me']
+        client-name: ['me']
     steps:
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
