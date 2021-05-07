@@ -127,7 +127,7 @@
       "check_name": "Execute",
       "message": "Possible command injection",
       "file": "lib/client_configuration_toggler.rb",
-      "line": 64,
+      "line": 68,
       "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
       "code": "`git checkout #{filename_in_config_directory.sub(\"#{old_config_folder}/\", \"\")}`",
       "render_path": null,
@@ -445,11 +445,31 @@
     {
       "warning_type": "Command Injection",
       "warning_code": 14,
+      "fingerprint": "52c196492aca987de56a518ca31878406d5c8f6080dafdf920a208b717694cab",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "lib/client_configuration_toggler.rb",
+      "line": 46,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`cp -r config/settings.yml #{Rails.root}/#{engine_folder_name}/spec/dummy/config/settings.yml`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ClientConfigurationToggler",
+        "method": "copy_current_configuration_to_engines"
+      },
+      "user_input": "engine_folder_name",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
       "fingerprint": "552c3f77ff5d9e92a4efe636c41cb51596c1387ff9f57ba4e19b553f874d6706",
       "check_name": "Execute",
       "message": "Possible command injection",
       "file": "lib/client_configuration_toggler.rb",
-      "line": 54,
+      "line": 57,
       "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
       "code": "`cp -r #{filename_in_config_directory} #{filename_in_config_directory.sub(\"#{target_config_folder}/\", \"\")}`",
       "render_path": null,
@@ -662,7 +682,7 @@
       "check_name": "Execute",
       "message": "Possible command injection",
       "file": "lib/client_configuration_toggler.rb",
-      "line": 41,
+      "line": 42,
       "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
       "code": "`cp -r system #{Rails.root}/#{engine_folder_name}/`",
       "render_path": null,
@@ -763,9 +783,29 @@
       "check_name": "Execute",
       "message": "Possible command injection",
       "file": "lib/client_configuration_toggler.rb",
-      "line": 43,
+      "line": 45,
       "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
       "code": "`cp -r system #{Rails.root}/#{engine_folder_name}/spec/dummy/`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ClientConfigurationToggler",
+        "method": "copy_current_configuration_to_engines"
+      },
+      "user_input": "engine_folder_name",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "903aeb226ba113fd0ed06904529782374ad92b37155437ba5ae9f837a828eddc",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "lib/client_configuration_toggler.rb",
+      "line": 43,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`cp -r config/settings.yml #{Rails.root}/#{engine_folder_name}/config/settings.yml`",
       "render_path": null,
       "location": {
         "type": "method",
@@ -897,6 +937,6 @@
       "note": ""
     }
   ],
-  "updated": "2021-05-03 11:35:26 -0400",
+  "updated": "2021-05-07 13:09:02 -0400",
   "brakeman_version": "5.0.0"
 }
