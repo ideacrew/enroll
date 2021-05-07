@@ -33,6 +33,12 @@ class ClientConfigurationToggler < MongoidMigrationTask
     raise("No configuration files present in target directory.") if target_configuration_files.blank?
     `rm -rf #{Rails.root}/system` if Dir.exist?("#{Rails.root}/system")
     `cp -r #{target_config_folder}/system #{Rails.root}`
+    if File.exist?("#{target_config_folder}/config/settings.yml")
+      puts("Settings.yml present for target configuration, setting it as current settings.")
+    else
+      puts("No settings.yml file present for target configuration")
+    end
+    `cp -r #{target_config_folder}/config/settings.yml config/settings.yml`
   end
 
   # TODO: We will continue switching the Settings.yml until it is fully deprecated
