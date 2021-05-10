@@ -1,6 +1,5 @@
 name: Nighty Stored Client Tests
 on:
-  pull_request:
   schedule:
     - cron: '0 0 * * *'
 
