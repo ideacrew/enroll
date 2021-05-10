@@ -4,6 +4,20 @@
 
 # rubocop:disable Metrics/ModuleLength
 module GoldenSeedHelper
+  def ivl_testbed_scenario_csv
+    filename = "#{Rails.root}/ivl_testbed_scenarios_*.csv"
+    ivl_testbed_templates = Dir.glob(filename)
+    return nil unless ivl_testbed_templates.present?
+    @ivl_testbed_scenario_csv ||= ivl_testbed_templates.first
+  end
+
+  # Used for boolean type values in the spreadsheet that might be
+  # N/A, N, No, etc.
+  # will return "true" on "yes" type values
+  def truthy_value?(value)
+    [nil, "n/a", "n", "no", "false", false].exclude?(value.downcase)
+  end
+
   def site
     @site = BenefitSponsors::Site.all.first
   end
@@ -64,11 +78,13 @@ module GoldenSeedHelper
     EnrollRegistry[:brokers].setting(:carrier_appointments).item.symbolized_keys.keys || []
   end
 
-  def generate_random_birthday(person_type)
-    case person_type
-    when 'adult'
+  def generate_random_birthday(attributes)
+    if attributes[:age]
+      birth_year = (TimeKeeper.date_of_record.year - attributes[:age].to_i)
+      birthday = FFaker::Time.between(Date.new(birth_year, 1, 1), Date.new(birth_year, 12, 30))
+    elsif attributes[:person_type] == 'adult'
       birthday = FFaker::Time.between(Date.new(1950, 0o1, 0o1), Date.new(2000, 0o1, 0o1))
-    when 'child'
+    elsif attributes[:person_type] == 'child'
       birthday = FFaker::Time.between(Date.new(2005, 0o1, 0o1), Date.new(2020, 0o1, 0o1))
     end
     Date.strptime(birthday.to_s, "%m/%d/%Y")
@@ -82,14 +98,15 @@ module GoldenSeedHelper
     data_array << return_value
     return_value
   end
-
-  def create_and_return_person(first_name, last_name, gender, person_type = 'adult')
+  
+  # TODO: Consider homelessness and other things from CSV. 
+  def create_and_return_person(attributes)
     person = Person.new(
-      first_name: first_name,
-      last_name: last_name,
-      gender: gender,
-      ssn: generate_and_return_unique_ssn,
-      dob: generate_random_birthday(person_type)
+      first_name: attributes[:first_name],
+      last_name: attributes[:last_name],
+      gender: attributes[:gender].downcase || Person::GENDER_KINDS.sample,
+      ssn: attributes[:citizen_status].present? ? generate_and_return_unique_ssn : nil,
+      dob: generate_random_birthday(attributes)
     )
     person.save!
     raise("Unable to save person.") unless person.save!
@@ -101,29 +118,38 @@ module GoldenSeedHelper
     raise("Unable to save phones") if person.phones.blank?
     person
   end
-
-  def create_and_return_family(primary_person)
+  
+  # TODO: Need to figure out the primary applicant thing on spreadsheet
+  def create_and_return_family(attributes)
     family = Family.new
-    family.person_id = primary_person.id
+    family.person_id = attributes[:primary_person_record].id
     fm = family.family_members.build(
-      person_id: primary_person.id,
-      is_primary_applicant: true
+      person_id: attributes[:primary_person_record].id,
+      is_primary_applicant: true # truthy_value?(attributes[:is_primary_applicant?])
     )
     fm.save!
     family.save!
     family
   end
 
-  def create_and_return_user(person)
+  def create_and_return_user(attributes = nil)
     providers = ["gmail", "yahoo", "hotmail"]
-    email = "#{person.first_name}#{person.last_name}#{@counter_number}@#{providers.sample}.com"
+    email = if attributes.dig(:email) && attributes.dig(:email) .include?(".com")
+              attributes["email"]
+            elsif attributes.dig(:email)
+              "#{attributes["email"]}#{@counter_number}@#{providers.sample}.com"
+            else
+              "#{attributes[:primary_person_record][:first_name]}"\
+              "#{attributes[:primary_person_record][:last_name]}"\
+              "#{@counter_number}@#{providers.sample}.com"
+            end
     user = User.new
     user.email = email
     user.oim_id = email
     user.password = "P@ssw0rd!"
-    user.person = person
+    user.person = attributes[:primary_person_record]
     user_saved = user.save
-    puts("Unable to generate user for #{person.full_name}, email already taken.") unless user_saved && Rails.env.test?
+    puts("Unable to generate user for #{attributes[:primary_person_record].full_name}, email already taken.") unless user_saved && Rails.env.test?
     user
   end
 
@@ -184,9 +210,9 @@ module GoldenSeedHelper
     {address: address, phone: new_person_phone}
   end
 
-  def create_and_return_consumer_role(person_rec)
-    consumer_role = person_rec.build_consumer_role
-    consumer_role.is_applicant = true
+  def create_and_return_consumer_role(attributes)
+    consumer_role = attributes[:primary_person_record].build_consumer_role
+    consumer_role.is_applicant = truthy_value?(attributes[:is_primary_applicant?])
     consumer_role.save!
     raise("Unable to save consumer role") unless consumer_role.persisted?
     # Active consumer role
@@ -196,7 +222,7 @@ module GoldenSeedHelper
       effective_starting_on: consumer_role.created_at.to_date,
       submitted_at: ::TimeKeeper.datetime_of_record
     )
-    person_rec.individual_market_transitions << ivl_market_transition
+    attributes[:primary_person_record].individual_market_transitions << ivl_market_transition
     consumer_role.identity_validation = 'valid'
     consumer_role.save!
     # Verification types needed
@@ -206,27 +232,21 @@ module GoldenSeedHelper
     # Residency Verificationss Requests Controller will hit during select_coverage!
     state_abbreviation = EnrollRegistry[:enroll_app].setting(:state_abbreviation).item
     verification_type.type_name = "#{state_abbreviation} Residency"
-    person_rec.verification_types << verification_type
-    person_rec.save!
+    attributes[:primary_person_record].verification_types << verification_type
+    attributes[:primary_person_record].save!
     raise("Not verified") unless consumer_role.identity_verified? == true
+    attributes[:consumer_role] = consumer_role
     consumer_role
   end
 
-  def create_and_return_matched_consumer_record
-    genders = ['male', 'female']
-    gender = genders.sample
-    first_name = FFaker::Name.send("first_name_#{gender}")
-    last_name = FFaker::Name.last_name
-    primary_person = create_and_return_person(first_name, last_name, gender)
-    family = create_and_return_family(primary_person)
-    user = create_and_return_user(primary_person)
-    consumer_role = create_and_return_consumer_role(primary_person)
-    {
-      family: family,
-      primary_person: primary_person,
-      user: user,
-      consumer_role: consumer_role
-    }
+  def create_and_return_matched_consumer_record(attributes = nil)
+    attributes["first_name"] = FFaker::Name.send("first_name_#{attributes[:gender].downcase}")
+    attributes["last_name"] = FFaker::Name.last_name
+    attributes[:primary_person_record] = create_and_return_person(attributes)
+    attributes[:family_record] = create_and_return_family(attributes)
+    attributes[:user_record] = create_and_return_user(attributes)
+    attributes[:consumer_role_record] = create_and_return_consumer_role(attributes)
+    attributes
   end
 
   def create_and_return_service_area_and_product
@@ -296,3 +316,5 @@ module GoldenSeedHelper
 end
 
 # rubocop:enable Metrics/ModuleLength
+
+# case_name,person_number,username,age,gender,applying_for_coveage,citizen_status,doc_type,native_american,incarcerated, residency_type,is_primary_applicant?,relationship_to_primary,help_paying_for_coverage,tax_filing_status,claimed_by,type, amount, frequency,from,to,type,amount,frequency,from,to,type,amount,frequency,from,to,type,amount,frequency,from,to,type, eligible_or_enrolled,from,to,in_waiting_period,minimum_value,who_can_be_covered,amount,frequency,pregnant, pregnant_last_60_days,due_date,expected,former_foster_care,had_medicaid,state,no_ssn_due_to_religious_objection, age_when_left,blind,has_disability,needs_adl_help,additional_family_relationships,program,aptc_amount,csr,program, aptc_amount,csr,app_ref_number,environment,pass_or_fail

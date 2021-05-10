@@ -22,31 +22,56 @@ class GoldenSeedIndividual < MongoidMigrationTask
 
   attr_accessor :counter_number, :consumer_people_and_users
 
+  def migrate_with_csv
+    ivl_csv = File.read(ivl_testbed_scenario_csv)
+    puts("CSV #{ivl_testbed_scenario_csv} present for IVL Golden Seed, using CSV for seed.") unless Rails.env.test?
+    CSV.parse(ivl_csv, :headers => true).each do |consumer_attributes|
+      # For primaries and dependents
+      consumer_attributes = consumer_attributes.to_h.with_indifferent_access
+      if consumer_attributes[:age] > 18 &&
+        consumer = create_and_return_matched_consumer_record(consumer_attributes)
+        consumer_people_and_users[consumer[:primary_person_record].full_name] = consumer[:user_record]
+        generate_and_return_hbx_enrollment(consumer[:consumer_role_record])
+        # ['domestic_partner', 'child'].each do |personal_relationship_kind|
+        #  generate_and_return_dependent_records(consumer[:primary_person], personal_relationship_kind)
+        #end
+        @counter_number += 1
+      else
+        # For dependents and the like
+
+      end
+    end
+  end
+
   def migrate
     puts('Executing Golden Seed IVL migration migration.') unless Rails.env.test?
     puts("Site present, using existing site.") if site.present? && !Rails.env.test?
     ::BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_empty_benefit_market if site.blank?
-    # What to do here? They don't seem to create products but they do in the cucumbers for shopping?
+    ## What to do here? They don't seem to create products but they do in the cucumbers for shopping?
     puts("IVL products present in database, will use existing ones to create HbxEnrollments.") if ivl_products.present? && !Rails.env.test?
     create_and_return_service_area_and_product if ivl_products.blank?
     create_and_return_ivl_hbx_profile_and_sponsorship
     @counter_number = 0
     @consumer_people_and_users = {}
-    5.times do
-      consumer = create_and_return_matched_consumer_record
-      consumer_people_and_users[consumer[:primary_person].full_name] = consumer[:user]
-      generate_and_return_hbx_enrollment(consumer[:consumer_role])
-      ['domestic_partner', 'child'].each do |personal_relationship_kind|
-        generate_and_return_dependent_records(consumer[:primary_person], personal_relationship_kind)
+    if ivl_testbed_scenario_csv
+      migrate_with_csv
+    else
+      5.times do
+       consumer = create_and_return_matched_consumer_record
+        consumer_people_and_users[consumer[:primary_person].full_name] = consumer[:user]
+        generate_and_return_hbx_enrollment(consumer[:consumer_role])
+        ['domestic_partner', 'child'].each do |personal_relationship_kind|
+          generate_and_return_dependent_records(consumer[:primary_person], personal_relationship_kind)
+        end
+        @counter_number += 1
       end
-      @counter_number += 1
     end
-    puts("Site present for: #{BenefitSponsors::Site.all.map(&:site_key)}") if BenefitSponsors::Site.present? && !Rails.env.test?
+    #puts("Site present for: #{BenefitSponsors::Site.all.map(&:site_key)}") if BenefitSponsors::Site.present? && !Rails.env.test?
     puts("Golden Seed IVL migration complete. All consumer roles are:") unless Rails.env.test?
     consumer_people_and_users.each do |person_full_name, user_record|
       puts(person_full_name.to_s) unless Rails.env.test?
       puts("With user #{user_record.email}") if user_record && !Rails.env.test?
-    end
+     end
   end
 end
 
