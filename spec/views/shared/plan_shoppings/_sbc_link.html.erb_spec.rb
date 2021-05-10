@@ -4,7 +4,9 @@ RSpec.describe "shared/plan_shoppings/_sbc_link.html.erb" do
 
   let(:aws_env) { ENV['AWS_ENV'] || "qa" }
   let(:mock_carrier_profile) { instance_double("CarrierProfile", :dba => "a carrier name", :legal_name => "name") }
-  let(:mock_plan) { double("Plan",
+  let(:mock_plan) do
+    double(
+      "Plan",
       :name => "A Plan Name",
       :carrier_profile_id => "a carrier profile id",
       :carrier_profile => mock_carrier_profile,
@@ -19,16 +21,27 @@ RSpec.describe "shared/plan_shoppings/_sbc_link.html.erb" do
       :coverage_kind => 'health',
       :id => "1234234234",
       :sbc_file => "THE SBC FILE.PDF",
-      :sbc_document => Document.new({title: 'sbc_file_name', subject: "SBC",
-                                     :identifier=>"urn:openhbx:terms:v1:file_storage:s3:bucket:#{Settings.site.s3_prefix}-enroll-sbc-#{aws_env}#7816ce0f-a138-42d5-89c5-25c5a3408b82"})
-      ) }
+      :sbc_document => Document.new(
+        {
+          title: 'sbc_file_name',
+          subject: "SBC",
+          :identifier => "urn:openhbx:terms:v1:file_storage:s3:bucket:#{EnrollRegistry[:enroll_app].setting(:s3_prefix).item}"\
+          "-enroll-sbc-#{aws_env}#7816ce0f-a138-42d5-89c5-25c5a3408b82"
+        }
+      )
+    )
+  end
 
   before :each do
     render partial: "shared/plan_shoppings/sbc_link", locals: {plan: mock_plan}
   end
 
   it "should have the sbc link" do
-    expect(rendered).to have_selector("a[href='#{"/document/download/#{Settings.site.s3_prefix}-enroll-sbc-#{aws_env}/7816ce0f-a138-42d5-89c5-25c5a3408b82?content_type=application/pdf&filename=APlanName.pdf&disposition=inline"}']")
+    expect(rendered).to have_selector(
+      "a[href='#{"/document/download/#{EnrollRegistry[:enroll_app].setting(:s3_prefix).item}"\
+      "-enroll-sbc-#{aws_env}/7816ce0f-a138-42d5-89c5-25c5a3408b82?content_type=application/"\
+      'pdf&filename=APlanName.pdf&disposition=inline'}']"
+    )
   end
 
   context "with dental coverage_kind" do
@@ -38,7 +51,7 @@ RSpec.describe "shared/plan_shoppings/_sbc_link.html.erb" do
     end
 
     it "should have the sbc link with dental text" do
-      expect(rendered).to have_selector('a', text:'Plan Summary')
+      expect(rendered).to have_selector('a', text: 'Plan Summary')
     end
 
   end

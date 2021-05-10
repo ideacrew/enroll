@@ -120,7 +120,7 @@ class IvlNotices::IvlToCoverallTransitionNoticeBuilder < IvlNotice
           notice.dhs_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, past_due_text: "PAST DUE", age: person.age_on(TimeKeeper.date_of_record) })
         when "American Indian Status"
           notice.american_indian_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, past_due_text: "PAST DUE", age: person.age_on(TimeKeeper.date_of_record) })
-        when "DC Residency"
+        when EnrollRegistry[:enroll_app].setting(:state_residency).item
           notice.residency_inconsistency << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, past_due_text: "PAST DUE", age: person.age_on(TimeKeeper.date_of_record) })
         end
       end

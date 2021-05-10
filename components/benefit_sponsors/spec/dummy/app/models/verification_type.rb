@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class VerificationType
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -7,7 +8,6 @@ class VerificationType
   LOCATION_RESIDENCY = EnrollRegistry[:enroll_app].setting(:state_residency).item
   ALL_VERIFICATION_TYPES = [LOCATION_RESIDENCY, "Social Security Number", "American Indian Status", "Citizenship", "Immigration status"].freeze
   NON_CITIZEN_IMMIGRATION_TYPES = [LOCATION_RESIDENCY, "Social Security Number", "American Indian Status"].freeze
-
   VALIDATION_STATES = %w[na unverified pending review outstanding verified attested expired curam].freeze
   OUTSTANDING_STATES = %w[outstanding].freeze
   DUE_DATE_STATES = %w[review outstanding].freeze
@@ -24,10 +24,6 @@ class VerificationType
   field :inactive, type: Boolean #use this field (assign true) only if type was present but for some reason if is not applicable anymore
   scope :active, -> { where(:inactive.ne => true) }
   scope :by_name, ->(type_name) { where(:type_name => type_name) }
-
-  # embeds_many :external_service_responses  -> needs datamigration
-  embeds_many :type_history_elements, class_name: "::FinancialAssistance::TypeHistoryElement"
-
 
   embeds_many :vlp_documents, as: :documentable do
 
@@ -61,7 +57,7 @@ class VerificationType
   end
 
   def add_type_history_element(params)
-    type_history_elements << ::FinancialAssistance::TypeHistoryElement.new(params)
+    type_history_elements << TypeHistoryElement.new(params)
   end
 
   def verif_due_date

@@ -194,6 +194,8 @@ registry:
             item: "Cover ME's Customer Care Center"
           - key: :contact_center_short_number
             item: "(855) 532-5465"
+          - key: :contact_center_tty_number # TODO: We need to get this updated for ME
+            item: "711"
           - key: :producer_advisory_committee_url
             item: ""
           - key: :mailer_logo_file_name
@@ -228,6 +230,16 @@ registry:
             item: ""
           - key: :geographic_rating_area_model
             item: "county"
+          - key: :dental_plan_years_available
+            item: [""]
+          - key: :sole_source_carriers_available
+            item: ['2017','2018', '2019']
+          - key: :metal_level_carriers_available
+            item: ['2018', '2019']
+          - key: :single_carriers_available
+            item: ['2018', '2019']
+          - key: :plan_year_tooltip
+            item: "Employer premium contribution for Employee Only Health Plans must be at least"
       - key: :rating_area
         item: :rating_area
         is_enabled: false
@@ -328,3 +340,5 @@ registry:
         is_enabled: false # Should return true for MA, see employer_profile_builder.rb
       - key: :hmo_ppo_plan_type # Should be true for MA
         is_enabled: false
+      - key: :dental_market
+        is_enabled: true
