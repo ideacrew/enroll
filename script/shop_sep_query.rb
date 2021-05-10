@@ -1,4 +1,4 @@
-start_time = Time.now - 30.minutes
+start_time = Time.now - 17.minutes
 end_time = Time.now
 
 class ShopEnrollmentsPublisher
