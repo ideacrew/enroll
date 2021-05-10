@@ -319,7 +319,7 @@ GEM
       amq-protocol (~> 1.9.2)
     cable_ready (4.3.0)
       rails (>= 5.2)
-    capistrano (3.11.0)
+    capistrano (3.14.1)
       airbrussh (>= 1.0.0)
       i18n
       rake (>= 10.0.0)
