@@ -23,7 +23,6 @@ class PaymentTransaction
     self.submitted_at ||= TimeKeeper.datetime_of_record
   end
 
-
   def update_enrollment_details(enrollment, source)
     self.enrollment_id = enrollment.id
     self.source = source
