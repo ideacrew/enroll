@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Config::SiteModelConcern
   extend ActiveSupport::Concern
 
@@ -13,11 +15,11 @@ module Config::SiteModelConcern
 
   class_methods do
     def site_short_name
-      Settings.site.short_name
+      EnrollRegistry[:enroll_app].setting(:short_name).item
     end
 
     def site_key
-      EnrollRegistry[:enroll_app].settings(:site_key).item
+      EnrollRegistry[:enroll_app].setting(:site_key).item
     end
 
     def is_shop_market_enabled?
