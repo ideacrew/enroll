@@ -1131,7 +1131,7 @@ function runGlossary() {
 
           $(matchingEl).html().toString().split(popoverRegex).forEach(function(text){
             // in the case of the pay now actions dropdown, if kaiser enrollment use kaiser definition, if any other use other definition
-            if (term.termRegex == "<b>Make Payments</b> for My Plan") {
+            if (termRegex == "<b>Make Payments</b> for My Plan") {
               if ($(matchingEl).find('a.pay-now-other').length != 0) {
                 description = "Go to your insurance company's payment portal to make a new payment or manage your existing payments.";
               }
