@@ -20,26 +20,34 @@ require File.join(Rails.root, 'app/data_migrations/golden_seed_helper')
 class GoldenSeedIndividual < MongoidMigrationTask
   include GoldenSeedHelper
 
-  attr_accessor :counter_number, :consumer_people_and_users
+  attr_accessor :case_numbers, :counter_number, :consumer_people_and_users
 
   def migrate_with_csv
+    # From the CSV
+    @case_numbers = {}
+    @counter_number = 0
     ivl_csv = File.read(ivl_testbed_scenario_csv)
     puts("CSV #{ivl_testbed_scenario_csv} present for IVL Golden Seed, using CSV for seed.") unless Rails.env.test?
-    CSV.parse(ivl_csv, :headers => true).each do |consumer_attributes|
+    CSV.parse(ivl_csv, :headers => true).each do |person_attributes|
       # For primaries and dependents
-      consumer_attributes = consumer_attributes.to_h.with_indifferent_access
-      if consumer_attributes[:age] > 18 &&
-        consumer = create_and_return_matched_consumer_record(consumer_attributes)
+      person_attributes = person_attributes.to_h.with_indifferent_access
+      # This means that there is a family started with this case
+      primary_person_for_family = case_numbers[person_attributes["case_name"]]&.detect do |person_hash|
+        person_hash[:family_record].primary_applicant.present?
+      end
+      if case_numbers[person_attributes["case_name"]] && primary_person_for_family.present?
+        dependent = generate_and_return_dependent_record(
+          primary_person_for_family[:primary_person_record],
+          person_attributes
+        )
+        case_numbers[person_attributes["case_name"]] << dependent
+      else
+        consumer = create_and_return_matched_consumer_record(person_attributes)
         consumer_people_and_users[consumer[:primary_person_record].full_name] = consumer[:user_record]
         generate_and_return_hbx_enrollment(consumer[:consumer_role_record])
-        # ['domestic_partner', 'child'].each do |personal_relationship_kind|
-        #  generate_and_return_dependent_records(consumer[:primary_person], personal_relationship_kind)
-        #end
-        @counter_number += 1
-      else
-        # For dependents and the like
-
+        case_numbers[person_attributes["case_name"]] = [consumer]
       end
+      @counter_number += 1
     end
   end
 
@@ -51,27 +59,31 @@ class GoldenSeedIndividual < MongoidMigrationTask
     puts("IVL products present in database, will use existing ones to create HbxEnrollments.") if ivl_products.present? && !Rails.env.test?
     create_and_return_service_area_and_product if ivl_products.blank?
     create_and_return_ivl_hbx_profile_and_sponsorship
-    @counter_number = 0
     @consumer_people_and_users = {}
     if ivl_testbed_scenario_csv
       migrate_with_csv
-    else
-      5.times do
-       consumer = create_and_return_matched_consumer_record
-        consumer_people_and_users[consumer[:primary_person].full_name] = consumer[:user]
-        generate_and_return_hbx_enrollment(consumer[:consumer_role])
-        ['domestic_partner', 'child'].each do |personal_relationship_kind|
-          generate_and_return_dependent_records(consumer[:primary_person], personal_relationship_kind)
-        end
-        @counter_number += 1
-      end
+    # else
+      # 5.times do
+       # consumer = create_and_return_matched_consumer_record
+        # consumer_people_and_users[consumer[:primary_person].full_name] = consumer[:user]
+        # generate_and_return_hbx_enrollment(consumer[:consumer_role])
+        # ['domestic_partner', 'child'].each do |personal_relationship_kind|
+        #  generate_and_return_dependent_records(consumer[:primary_person], personal_relationship_kind)
+        # end
+        # @counter_number += 1
+      # end
     end
     #puts("Site present for: #{BenefitSponsors::Site.all.map(&:site_key)}") if BenefitSponsors::Site.present? && !Rails.env.test?
     puts("Golden Seed IVL migration complete. All consumer roles are:") unless Rails.env.test?
     consumer_people_and_users.each do |person_full_name, user_record|
       puts(person_full_name.to_s) unless Rails.env.test?
+      if user_record.person.primary_family.family_members.count > 1
+        puts("With dependents:")
+        dependent_names = user_record.person.primary_family.family_members.reject(&:is_primary_applicant?)
+        dependent_names.each { |family_member| puts(family_member&.person&.full_name) }
+      end
       puts("With user #{user_record.email}") if user_record && !Rails.env.test?
-     end
+    end
   end
 end
 
