@@ -1,4 +1,4 @@
-start_time = Time.now - 17.minutes
+start_time = Time.now - 30.minutes
 end_time = Time.now
 
 class ShopEnrollmentsPublisher
@@ -77,8 +77,8 @@ def can_publish_enrollment?(enrollment, transition_at)
   benefit_application = sb.benefit_package.benefit_application
   if is_valid_benefit_application?(benefit_application)
     return false if gate_quiet_period(benefit_application, transition_at)
-    return true  if term_states.include?(enrollment.aasm_state) # new hire enrollment check not needed for terminated enrollments
     return false if enrollment.new_hire_enrollment_for_shop? && (enrollment.effective_on <= (Time.now - 2.months))
+    return true  if term_states.include?(enrollment.aasm_state)
     return true
   else
     return false
