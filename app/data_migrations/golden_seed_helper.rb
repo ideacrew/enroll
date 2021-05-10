@@ -98,8 +98,8 @@ module GoldenSeedHelper
     data_array << return_value
     return_value
   end
-  
-  # TODO: Consider homelessness and other things from CSV. 
+
+  # TODO: Consider homelessness and other things from CSV.
   def create_and_return_person(attributes)
     person = Person.new(
       first_name: attributes[:first_name],
@@ -118,14 +118,14 @@ module GoldenSeedHelper
     raise("Unable to save phones") if person.phones.blank?
     person
   end
-  
+
   # TODO: Need to figure out the primary applicant thing on spreadsheet
   def create_and_return_family(attributes)
     family = Family.new
     family.person_id = attributes[:primary_person_record].id
     fm = family.family_members.build(
       person_id: attributes[:primary_person_record].id,
-      is_primary_applicant: true # truthy_value?(attributes[:is_primary_applicant?])
+      is_primary_applicant: attributes[:relationship_to_primary].downcase == 'self'
     )
     fm.save!
     family.save!
@@ -134,10 +134,10 @@ module GoldenSeedHelper
 
   def create_and_return_user(attributes = nil)
     providers = ["gmail", "yahoo", "hotmail"]
-    email = if attributes.dig(:email) && attributes.dig(:email) .include?(".com")
+    email = if attributes[:email]&.include?(".com")
               attributes["email"]
-            elsif attributes.dig(:email)
-              "#{attributes["email"]}#{@counter_number}@#{providers.sample}.com"
+            elsif attributes[:email]
+              "#{attributes['email']}#{@counter_number}@#{providers.sample}.com"
             else
               "#{attributes[:primary_person_record][:first_name]}"\
               "#{attributes[:primary_person_record][:last_name]}"\
@@ -153,29 +153,27 @@ module GoldenSeedHelper
     user
   end
 
-  def generate_and_return_dependent_records(primary_person, personal_relationship_kind)
-    genders = ['male', 'female']
-    gender = genders.sample
-    first_name = FFaker::Name.send("first_name_#{gender}")
-    last_name = primary_person.last_name
-    family = primary_person.primary_family
-    case personal_relationship_kind
-    when 'child'
-      dependent_person = create_and_return_person(first_name, last_name, gender, 'child')
-    when 'domestic_partner' || 'spouse'
-      dependent_person = create_and_return_person(first_name, last_name, gender, 'adult')
-    end
+  def generate_and_return_dependent_record(primary_person, dependent_attributes)
+    gender = dependent_attributes[:gender].downcase || Person::GENDER_KINDS.sample
+    dependent_attributes[:first_name] = FFaker::Name.send("first_name_#{gender}")
+    dependent_attributes[:last_name] = primary_person.last_name
+    dependent_attributes[:family_record] = primary_person.primary_family
+
+    dependent_attributes[:dependent_person_record] = create_and_return_person(dependent_attributes)
+
     fm = FamilyMember.new(
-      family: family,
-      person_id: dependent_person.id,
+      family: dependent_attributes[:family_record],
+      person_id: dependent_attributes[:dependent_person_record].id,
       is_primary_applicant: false
     )
     fm.save!
-    primary_person.person_relationships.create!(kind: personal_relationship_kind, relative_id: dependent_person.id)
-    {
-      dependent_person: dependent_person,
-      dependent_family_member: fm
-    }
+    dependent_attributes[:family_member_record] = fm
+    relationship_to_primary = dependent_attributes[:relationship_to_primary].downcase.parameterize
+    primary_person.person_relationships.create!(
+      kind: relationship_to_primary,
+      relative_id: dependent_attributes[:dependent_person_record].id
+    )
+    dependent_attributes
   end
 
   # TODO: Double check these for numbers for SHOP
@@ -316,5 +314,3 @@ module GoldenSeedHelper
 end
 
 # rubocop:enable Metrics/ModuleLength
-
-# case_name,person_number,username,age,gender,applying_for_coveage,citizen_status,doc_type,native_american,incarcerated, residency_type,is_primary_applicant?,relationship_to_primary,help_paying_for_coverage,tax_filing_status,claimed_by,type, amount, frequency,from,to,type,amount,frequency,from,to,type,amount,frequency,from,to,type,amount,frequency,from,to,type, eligible_or_enrolled,from,to,in_waiting_period,minimum_value,who_can_be_covered,amount,frequency,pregnant, pregnant_last_60_days,due_date,expected,former_foster_care,had_medicaid,state,no_ssn_due_to_religious_objection, age_when_left,blind,has_disability,needs_adl_help,additional_family_relationships,program,aptc_amount,csr,program, aptc_amount,csr,app_ref_number,environment,pass_or_fail
