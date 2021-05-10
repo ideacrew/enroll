@@ -22,8 +22,7 @@ class PaymentTransaction
   def set_submitted_at
     self.submitted_at ||= TimeKeeper.datetime_of_record
   end
-<<<<<<< HEAD
-=======
+
 
   def update_enrollment_details(enrollment, source)
     self.enrollment_id = enrollment.id
@@ -39,5 +38,4 @@ class PaymentTransaction
     payment.family.save!
     payment
   end
->>>>>>> origin/paynow_v2
 end
