@@ -3,11 +3,11 @@
 require File.join(Rails.root, 'lib/mongoid_migration_task')
 require File.join(Rails.root, 'app/data_migrations/golden_seed_helper')
 
-# This class will:
+# This class will, with either a specific spreadsheet or independently:
 # 1) Create a site with HBX/profile and empty benefit market if the site is blank.
 #    It should work for any client (DC, ME, MA), because the ::BenefitSponsors::SiteSpecHelpers files have
 #    been refactored to accommodate those.
-# 2) Create fully matched consumer records. Their names will appear in the rake output.
+# 2) Create fully matched consumer records and dependents. Their names will appear in the rake output.
 # 3) Create an HbxEnrollment for each of those consumers, with an existing random IVL product OR a create a new one
 # Notes:
 # A) After running this rake task, you should be able to log in to the environment as a super admin, go to the HbxAdmin
@@ -23,9 +23,6 @@ class GoldenSeedIndividual < MongoidMigrationTask
   attr_accessor :case_numbers, :counter_number, :consumer_people_and_users
 
   def migrate_with_csv
-    # From the CSV
-    @case_numbers = {}
-    @counter_number = 0
     ivl_csv = File.read(ivl_testbed_scenario_csv)
     puts("CSV #{ivl_testbed_scenario_csv} present for IVL Golden Seed, using CSV for seed.") unless Rails.env.test?
     CSV.parse(ivl_csv, :headers => true).each do |person_attributes|
@@ -52,6 +49,8 @@ class GoldenSeedIndividual < MongoidMigrationTask
   end
 
   def migrate
+    @case_numbers = {}
+    @counter_number = 0
     puts('Executing Golden Seed IVL migration migration.') unless Rails.env.test?
     puts("Site present, using existing site.") if site.present? && !Rails.env.test?
     ::BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_empty_benefit_market if site.blank?
@@ -62,16 +61,21 @@ class GoldenSeedIndividual < MongoidMigrationTask
     @consumer_people_and_users = {}
     if ivl_testbed_scenario_csv
       migrate_with_csv
-    # else
-      # 5.times do
-       # consumer = create_and_return_matched_consumer_record
-        # consumer_people_and_users[consumer[:primary_person].full_name] = consumer[:user]
-        # generate_and_return_hbx_enrollment(consumer[:consumer_role])
-        # ['domestic_partner', 'child'].each do |personal_relationship_kind|
-        #  generate_and_return_dependent_records(consumer[:primary_person], personal_relationship_kind)
-        # end
-        # @counter_number += 1
-      # end
+    else
+      5.times do
+        consumer_attributes = {
+          relationship_to_primary: 'self',
+          is_primary_applicant?: true
+        }
+        consumer = create_and_return_matched_consumer_record(consumer_attributes)
+        consumer_people_and_users[consumer[:primary_person_record].full_name] = consumer[:user_record]
+        generate_and_return_hbx_enrollment(consumer[:consumer_role_record])
+        ['spouse', 'child'].each do |relationship_to_primary|
+          dependent_attributes = {relationship_to_primary: relationship_to_primary}
+          generate_and_return_dependent_record(consumer[:primary_person_record], dependent_attributes)
+        end
+        @counter_number += 1
+      end
     end
     #puts("Site present for: #{BenefitSponsors::Site.all.map(&:site_key)}") if BenefitSponsors::Site.present? && !Rails.env.test?
     puts("Golden Seed IVL migration complete. All consumer roles are:") unless Rails.env.test?
@@ -90,6 +94,3 @@ end
 # rubocop:enable Metrics/PerceivedComplexity
 # rubocop:enable Metrics/AbcSize
 # rubocop:enable Metrics/CyclomaticComplexity
-
-
-
