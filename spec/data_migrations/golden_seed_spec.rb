@@ -16,7 +16,7 @@ describe "Golden Seed Rake Tasks", dbclean: :after_each do
         expect(subject.name).to eql given_task_name
       end
     end
-    context "with csv input" do
+    context "with csv input", dbclean: :after_each do
       describe "requirements" do
         before :each do
           subject.migrate
@@ -56,7 +56,7 @@ describe "Golden Seed Rake Tasks", dbclean: :after_each do
         end
       end
     end
-    context "without csv input" do
+    context "without csv input", dbclean: :after_each do
       describe "requirements" do
         before :each do
           allow(subject).to receive(:ivl_testbed_scenario_csv).and_return(nil)
