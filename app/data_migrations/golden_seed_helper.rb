@@ -125,6 +125,8 @@ module GoldenSeedHelper
       # person.phones << address_and_phone[:phone]
       # person.addresses << address_and_phone[:address]
     end
+    # Set no one to incarcerated for now
+    person.is_incarcerated = false
     person.save!
     person
   end
