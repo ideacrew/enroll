@@ -58,4 +58,20 @@ class IvlHomepage
   def self.aptc_amount_text
     'APTC amount'
   end
+
+  def self.actions_dropdwon
+    '#dropdownMenuButton'
+  end
+
+  def self.view_my_coverage_btn
+    '.interaction-click-control-view-my-coverage-details'
+  end
+
+  def self.make_changes_btn
+    '.interaction-click-control-make-changes-to-my-coverage'
+  end
+
+  def self.make_payments_btn
+    '.interaction-click-control-make-payments-for-my-plan'
+  end
 end
