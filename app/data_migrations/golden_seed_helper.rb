@@ -125,6 +125,9 @@ module GoldenSeedHelper
     end
     # Set no one to incarcerated for now
     person.is_incarcerated = false
+    # Most are set to Y in spreadsheet
+    applying_for_assistance = attributes[:help_paying_for_coverage] || true
+    person.is_applying_for_assistance = truthy_value?(applying_for_assistance)
     person.save!
     person
   end
