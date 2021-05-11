@@ -16,8 +16,8 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     let(:sample_max_aptc_2) {612.33}
     let(:sample_csr_percent_1) {87}
     let(:sample_csr_percent_2) {94}
-    let(:eligibility_determination_1) {EligibilityDetermination.new(determined_at: TimeKeeper.date_of_record.beginning_of_year, max_aptc: sample_max_aptc_1, csr_percent_as_integer: sample_csr_percent_1 )}
-    let(:eligibility_determination_2) {EligibilityDetermination.new(determined_at: TimeKeeper.date_of_record.beginning_of_year + 4.months, max_aptc: sample_max_aptc_2, csr_percent_as_integer: sample_csr_percent_2 )}
+    let(:eligibility_determination_1) {EligibilityDetermination.new(determined_at: TimeKeeper.date_of_record.beginning_of_year, max_aptc: sample_max_aptc_1, csr_percent_as_integer: sample_csr_percent_1)}
+    let(:eligibility_determination_2) {EligibilityDetermination.new(determined_at: TimeKeeper.date_of_record.beginning_of_year + 4.months, max_aptc: sample_max_aptc_2, csr_percent_as_integer: sample_csr_percent_2)}
     let(:product1) { FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01') }
     let(:product2) { FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01', ehb: 0.9939) }
 
@@ -47,8 +47,8 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
                         applied_aptc_amount: 210)
     end
     let!(:hbx_enrollments) {[hbx_with_aptc_1, hbx_with_aptc_2]}
-    let(:hbx_enrollment_member_1){ FactoryBot.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month, applied_aptc_amount: 70)}
-    let(:hbx_enrollment_member_2){ FactoryBot.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month, applied_aptc_amount: 30)}
+    let(:hbx_enrollment_member_1){ FactoryBot.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: TimeKeeper.date_of_record.beginning_of_month, applied_aptc_amount: 70)}
+    let(:hbx_enrollment_member_2){ FactoryBot.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: TimeKeeper.date_of_record.beginning_of_month, applied_aptc_amount: 30)}
     let(:year) {TimeKeeper.date_of_record.year}
 
     context "household_level aptc_csr data" do
@@ -68,11 +68,15 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
       # MAX APTC
       context "build max_aptc values" do
-        let(:expected_hash_without_param_case)  { {"Jan"=>"511.78", "Feb"=>"511.78", "Mar"=>"511.78", "Apr"=>"511.78", "May"=>"612.33", "Jun"=>"612.33",
-                                                   "Jul"=>"612.33", "Aug"=>"612.33", "Sep"=>"612.33", "Oct"=>"612.33", "Nov"=>"612.33", "Dec"=>"612.33" } }
+        let(:expected_hash_without_param_case)  do
+          {"Jan" => "511.78", "Feb" => "511.78", "Mar" => "511.78", "Apr" => "511.78", "May" => "612.33", "Jun" => "612.33",
+           "Jul" => "612.33", "Aug" => "612.33", "Sep" => "612.33", "Oct" => "612.33", "Nov" => "612.33", "Dec" => "612.33" }
+        end
 
-        let(:expected_hash_with_param_case)     { {"Jan"=>"511.78", "Feb"=>"511.78", "Mar"=>"511.78", "Apr"=>"511.78", "May"=>"612.33", "Jun"=>"666.00",
-                                                   "Jul"=>"666.00", "Aug"=>"666.00", "Sep"=>"666.00", "Oct"=>"666.00", "Nov"=>"666.00", "Dec"=>"666.00"} }
+        let(:expected_hash_with_param_case)     do
+          {"Jan" => "511.78", "Feb" => "511.78", "Mar" => "511.78", "Apr" => "511.78", "May" => "612.33", "Jun" => "666.00",
+           "Jul" => "666.00", "Aug" => "666.00", "Sep" => "666.00", "Oct" => "666.00", "Nov" => "666.00", "Dec" => "666.00"}
+        end
 
         it "should return a hash that reflects max_aptc change on a montly basis based on the determined_at date of eligibility determinations - without max_aptc param" do
           expect(Admin::Aptc.build_max_aptc_values(year, family, nil)).to eq expected_hash_without_param_case
@@ -87,8 +91,8 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       # CSR PERCENT AS INTEGER
       context "build csr_percentage values" do
 
-        let(:expected_hash_without_param_case)  { {"Jan"=>87, "Feb"=>87, "Mar"=>87, "Apr"=>87, "May"=>94, "Jun"=>94, "Jul"=>94, "Aug"=>94, "Sep"=>94, "Oct"=>94, "Nov"=>94, "Dec"=>94} }
-        let(:expected_hash_with_param_case)     { {"Jan"=>87, "Feb"=>87, "Mar"=>87, "Apr"=>87, "May"=>94, "Jun"=>100, "Jul"=>100, "Aug"=>100, "Sep"=>100, "Oct"=>100, "Nov"=>100, "Dec"=>100} }
+        let(:expected_hash_without_param_case)  { {"Jan" => 87, "Feb" => 87, "Mar" => 87, "Apr" => 87, "May" => 94, "Jun" => 94, "Jul" => 94, "Aug" => 94, "Sep" => 94, "Oct" => 94, "Nov" => 94, "Dec" => 94} }
+        let(:expected_hash_with_param_case)     { {"Jan" => 87, "Feb" => 87, "Mar" => 87, "Apr" => 87, "May" => 94, "Jun" => 100, "Jul" => 100, "Aug" => 100, "Sep" => 100, "Oct" => 100, "Nov" => 100, "Dec" => 100} }
 
         it "should return a hash that reflects csr_percent change on a montly basis based on the determined_at date of eligibility determinations - without csr_percent param" do
           expect(Admin::Aptc.build_csr_percentage_values(year, family, nil)).to eq expected_hash_without_param_case
@@ -101,7 +105,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
       # REDETERMINE ELIGIBILITY
       context "redetermine_eligibility_with_updated_values" do
-        let(:params) { {"max_aptc"=>"27.00", "csr_percentage"=>"73", "commit"=>"Update"} }
+        let(:params) { {"max_aptc" => "27.00", "csr_percentage" => "73", "commit" => "Update"} }
 
         it "should save a new determination when the Max APTC / CSR is updated" do
           expect(Admin::Aptc.redetermine_eligibility_with_updated_values(family, params, [], year)).to eq true
@@ -111,14 +115,15 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
     # UPDATE APPLIED APTC  TO AN ENROLLMENT!
     context "update_aptc_applied_for_enrollments" do
-      let(:params) {  {
-                        "person" => { "person_id"=>family.primary_applicant.person.id, "family_id" => family.id, "current_year" => TimeKeeper.date_of_record.year},
-                        "max_aptc" => "100.00",
-                        "csr_percentage" => "0",
-                        "applied_pct_#{hbx_with_aptc_2.id}" => "0.85",
-                        "aptc_applied_#{hbx_with_aptc_2.id}" => "85.00"
-                      }
-                    }
+      let(:params) do
+        {
+          "person" => { "person_id" => family.primary_applicant.person.id, "family_id" => family.id, "current_year" => TimeKeeper.date_of_record.year},
+          "max_aptc" => "100.00",
+          "csr_percentage" => "0",
+          "applied_pct_#{hbx_with_aptc_2.id}" => "0.85",
+          "aptc_applied_#{hbx_with_aptc_2.id}" => "85.00"
+        }
+      end
 
       it "should create a new enrollment with a new hbx_id" do
         allow(family).to receive(:active_household).and_return household
@@ -131,7 +136,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         expect(last_enrollment.hbx_id).to_not eq family.active_household.hbx_enrollments.last.id
       end
 
-      it  "should create a new enrollment and should apply ehb aptc to enrollment" do
+      it "should create a new enrollment and should apply ehb aptc to enrollment" do
         allow(family).to receive(:active_household).and_return household
         allow(household).to receive(:latest_active_tax_household_with_year).and_return tax_household
         allow(tax_household).to receive(:latest_eligibility_determination).and_return eligibility_determination_1
@@ -147,7 +152,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
     context "years_with_tax_household", dbclean: :after_each do
       let(:past_date) { Date.new(oe_start_year, 10, 10) }
-      let(:future_date) { Date.new(oe_start_year + 1 , 10, 10) }
+      let(:future_date) { Date.new(oe_start_year + 1, 10, 10) }
       let!(:family10) { FactoryBot.create(:family, :with_primary_family_member) }
       let!(:tax_household10) { FactoryBot.create(:tax_household, household: family10.households.first, effective_starting_on: past_date, effective_ending_on: nil) }
       let!(:hbx_profile) { FactoryBot.create(:hbx_profile, :single_open_enrollment_coverage_period) }
@@ -160,7 +165,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         end
 
         it "should return array without next year added as it is not under_open_enrollment" do
-          tax_household10.update_attributes!(effective_starting_on: future_date )
+          tax_household10.update_attributes!(effective_starting_on: future_date)
           expect(Admin::Aptc.years_with_tax_household(family10)).to eq [future_date.year]
         end
       end
@@ -172,7 +177,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
         it "should return array with next year added as it is under_open_enrollment" do
           allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx_under_open_enrollment)
-          expect(Admin::Aptc.years_with_tax_household(family10)).to eq [past_date.year, past_date.year + 1 ]
+          expect(Admin::Aptc.years_with_tax_household(family10)).to eq [past_date.year, past_date.year + 1]
         end
 
         it "should return array without next year added as it is not under_open_enrollment" do
@@ -215,10 +220,10 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         silver_product.update_attributes(metal_level_kind: 'silver')
         benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods[0]
         benefit_coverage_period.update_attributes(
-            start_on: effective_on.beginning_of_year,
-            end_on: effective_on.end_of_year,
-            open_enrollment_start_on: Date.new(effective_on.prev_year.year, 11, 1),
-            open_enrollment_end_on: Date.new(effective_on.year, 1, 31)
+          start_on: effective_on.beginning_of_year,
+          end_on: effective_on.end_of_year,
+          open_enrollment_start_on: Date.new(effective_on.prev_year.year, 11, 1),
+          open_enrollment_end_on: Date.new(effective_on.year, 1, 31)
         )
         benefit_coverage_period.second_lowest_cost_silver_plan = silver_product
         benefit_coverage_period.save!
