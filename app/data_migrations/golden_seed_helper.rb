@@ -111,11 +111,21 @@ module GoldenSeedHelper
     person.save!
     raise("Unable to save person.") unless person.save!
     address_and_phone = generate_address_and_phone
-    person.phones << address_and_phone[:phone]
-    person.addresses << address_and_phone[:address]
+    # Set residency type
+    case attributes[:residency_type]
+    when 'Not DC resident'
+      person.no_dc_address = true
+    when 'DC home address'
+      person.phones << address_and_phone[:phone]
+      person.addresses << address_and_phone[:address]
+    when 'Temporarily absent'
+      person.is_temporarily_out_of_state = true
+    # else
+      # Let's just make it a DC resident
+      # person.phones << address_and_phone[:phone]
+      # person.addresses << address_and_phone[:address]
+    end
     person.save!
-    raise("Unable to save addresses") if person.addresses.blank?
-    raise("Unable to save phones") if person.phones.blank?
     person
   end
 
