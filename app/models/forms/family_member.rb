@@ -298,8 +298,7 @@ module Forms
         family_member.family.build_resident_role(family_member)
       end
       family_member.update_relationship(relationship)
-      family_member.save!
-      true
+      family_member.save
     end
 
     def age_on(date)
