@@ -22,6 +22,11 @@ describe "Golden Seed Rake Tasks", dbclean: :after_each do
           subject.migrate
         end
 
+        it "sets some people temporarily absent and no dc address type" do
+          expect(Person.all.detect(&:no_dc_address).present?).to eq(true)
+          expect(Person.all.detect(&:is_temporarily_out_of_state).present?).to eq(true)
+        end
+
         it "will not create new hbx profile and benefit sponsorship if they are already present" do
           expect(HbxProfile.all.count).to eq(1)
           subject.migrate
