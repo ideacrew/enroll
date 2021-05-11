@@ -78,9 +78,9 @@ class GoldenSeedIndividual < MongoidMigrationTask
     consumer_people_and_users.each do |person_full_name, user_record|
       puts(person_full_name.to_s) unless Rails.env.test?
       if user_record.person.primary_family.family_members.count > 1
-        puts("With dependents:")
+        puts("With dependents:") unless Rails.env.test?
         dependent_names = user_record.person.primary_family.family_members.reject(&:is_primary_applicant?)
-        dependent_names.each { |family_member| puts(family_member&.person&.full_name) }
+        dependent_names.each { |family_member| puts(family_member&.person&.full_name) unless Rails.env.test? }
       end
       puts("With user #{user_record.email}") if user_record && !Rails.env.test?
     end
