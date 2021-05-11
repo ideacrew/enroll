@@ -481,7 +481,7 @@ describe Forms::FamilyMember, "which describes an existing family member" do
   let(:family_member) { instance_double(::FamilyMember,
                                         person_properties.merge({
                                         :family => family,
-                                        :family_id => family_id, :person => person, :primary_relationship => relationship, :save! => true})) }
+                                        :family_id => family_id, :person => person, :primary_relationship => relationship, :save => true})) }
 
   let(:update_attributes) { person_properties.merge(:family_id => family_id, :relationship => relationship, :dob => dob) }
 
