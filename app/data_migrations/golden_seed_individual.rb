@@ -34,7 +34,7 @@ class GoldenSeedIndividual < MongoidMigrationTask
       primary_family_for_current_case = case_collection[person_attributes["case_name"]]&.dig(:family_record)
       fa_enabled_and_required_for_case = EnrollRegistry.feature_enabled?(:financial_assistance) && person_attributes[:help_paying_for_coverage]
       if fa_enabled_and_required_for_case
-        application = create_and_return_fa_application(person_attributes)
+        application = create_and_return_fa_application
         case_included_in_keys = case_collection.keys.include?(person_attributes["case_name"])
         case_collection[person_attributes["case_name"]] = {} if case_included_in_keys.blank?
         case_collection[person_attributes["case_name"]][:fa_application] = application
