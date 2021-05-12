@@ -44,4 +44,18 @@ RSpec.describe 'events/hbx_enrollment/_policy.xml.haml', dbclean: :after_each do
       expect(rendered).to have_selector('responsible_party person_surname', :text => primary_person.last_name)
     end
   end
+
+  context 'enrollment with rating area' do
+    let!(:benefit_markets_location_rating_area) { FactoryBot.create_default(:benefit_markets_locations_rating_area) }
+
+    before do
+      hbx_enrollment.update_attributes(rating_area_id: benefit_markets_location_rating_area.id)
+      render :partial => "events/hbx_enrollment/policy", :locals => {hbx_enrollment: hbx_enrollment}
+      @doc = Nokogiri::XML(rendered)
+    end
+    it 'should generate a rating area id in policy cv' do
+      expect(rendered).to include('<rating_area>')
+      expect(@doc.xpath("//rating_area").text).to eq benefit_markets_location_rating_area.exchange_provided_code
+    end
+  end
 end
