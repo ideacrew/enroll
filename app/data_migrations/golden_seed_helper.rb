@@ -119,6 +119,7 @@ module GoldenSeedHelper
     address_and_phone = generate_address_and_phone
     # Set residency type
     case case_info_hash[:person_attributes][:residency_type]
+    # TODO: Fix this hardcoded for DC
     when 'Not DC resident'
       person.no_dc_address = true
     when 'Temporarily absent'
