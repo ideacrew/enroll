@@ -34,6 +34,12 @@ describe "Golden Seed Rake Tasks", dbclean: :after_each do
             it "should create financial assistance applicants" do
               expect(FinancialAssistance::Application.all.map(&:applicants).flatten.count).to be > 0
             end
+
+            it "should create incomes" do
+              expect(
+                FinancialAssistance::Application.all.map(&:applicants).flatten.map(&:incomes).flatten.count
+              ).to be > 0
+            end
           end
         end
 
