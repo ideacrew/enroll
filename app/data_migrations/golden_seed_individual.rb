@@ -2,6 +2,8 @@
 
 require File.join(Rails.root, 'lib/mongoid_migration_task')
 require File.join(Rails.root, 'app/data_migrations/golden_seed_helper')
+require File.join(Rails.root, 'app/data_migrations/golden_seed_financial_assistance_helper')
+
 
 # This class will, with either a specific spreadsheet or independently:
 # 1) Create a site with HBX/profile and empty benefit market if the site is blank.
@@ -19,37 +21,61 @@ require File.join(Rails.root, 'app/data_migrations/golden_seed_helper')
 # rubocop:disable Metrics/PerceivedComplexity
 class GoldenSeedIndividual < MongoidMigrationTask
   include GoldenSeedHelper
+  include GoldenSeedFinancialAssistanceHelper
 
-  attr_accessor :case_numbers, :counter_number, :consumer_people_and_users
+  attr_accessor :case_collection, :counter_number, :consumer_people_and_users
 
   def migrate_with_csv
     ivl_csv = File.read(ivl_testbed_scenario_csv)
     puts("CSV #{ivl_testbed_scenario_csv} present for IVL Golden Seed, using CSV for seed.") unless Rails.env.test?
     CSV.parse(ivl_csv, :headers => true).each do |person_attributes|
-      # For primaries and dependents
       person_attributes = person_attributes.to_h.with_indifferent_access
-      # This means that there is a family started with this case
-      primary_person_for_family = case_numbers[person_attributes["case_name"]]&.detect do |person_hash|
-        person_hash[:family_record].primary_applicant.present?
+      primary_family_for_current_case = case_collection[person_attributes["case_name"]]&.dig(:family_record)
+      fa_enabled_and_required_for_case = EnrollRegistry.feature_enabled?(:financial_assistance) && person_attributes[:help_paying_for_coverage]
+      if fa_enabled_and_required_for_case
+        application = create_and_return_fa_application(person_attributes)
+        case_included_in_keys = case_collection.keys.include?(person_attributes["case_name"])
+        case_collection[person_attributes["case_name"]] = {} if case_included_in_keys.blank?
+        case_collection[person_attributes["case_name"]][:fa_application] = application
+        case_collection[person_attributes["case_name"]][:fa_applicants] = []
       end
-      if case_numbers[person_attributes["case_name"]] && primary_person_for_family.present?
-        dependent = generate_and_return_dependent_record(
-          primary_person_for_family[:primary_person_record],
-          person_attributes
-        )
-        case_numbers[person_attributes["case_name"]] << dependent
+      case_collection[person_attributes["case_name"]][:person_attributes] = person_attributes
+      if case_collection[person_attributes["case_name"]] && primary_family_for_current_case.present?
+        dependent_record = generate_and_return_dependent_record(case_collection[person_attributes["case_name"]])
+        if case_collection[person_attributes["case_name"]][:dependents].is_a?(Array) && case_collection[person_attributes["case_name"]][:dependents].length > 0
+          case_collection[person_attributes["case_name"]][:dependents] << dependent_record
+          case_collection[person_attributes["case_name"]][:person_attributes][:current_target_person] = dependent_record
+        else
+          case_collection[person_attributes["case_name"]][:dependents] = []
+          case_collection[person_attributes["case_name"]][:dependents] << dependent_record
+          case_collection[person_attributes["case_name"]][:person_attributes][:current_target_person] = dependent_record
+        end
+        if fa_enabled_and_required_for_case
+          applicant_record = create_and_return_fa_applicant(case_collection[person_attributes["case_name"]])
+          case_collection[person_attributes["case_name"]][:fa_applicants] << applicant_record
+        end
       else
-        consumer = create_and_return_matched_consumer_record(person_attributes)
-        consumer_people_and_users[consumer[:primary_person_record].full_name] = consumer[:user_record]
-        generate_and_return_hbx_enrollment(consumer[:consumer_role_record])
-        case_numbers[person_attributes["case_name"]] = [consumer]
+        case_collection[person_attributes["case_name"]] = create_and_return_matched_consumer_and_hash(
+          case_collection[person_attributes["case_name"]]
+        )
+        consumer_people_and_users[
+          case_collection[person_attributes["case_name"]][:primary_person_record].full_name
+        ] = case_collection[person_attributes["case_name"]][:user_record]
+        generate_and_return_hbx_enrollment(
+          case_collection[person_attributes["case_name"]][:consumer_role_record]
+        )
+        case_collection[person_attributes["case_name"]][:person_attributes][:current_target_person] = case_collection[person_attributes["case_name"]][:primary_person_record]
+        if fa_enabled_and_required_for_case
+          applicant = create_and_return_fa_applicant(case_collection[person_attributes["case_name"]])
+          case_collection[person_attributes["case_name"]][:fa_applicants] << applicant
+        end
       end
       @counter_number += 1
     end
   end
 
   def migrate
-    @case_numbers = {}
+    @case_collection = {}
     @counter_number = 0
     puts('Executing Golden Seed IVL migration migration.') unless Rails.env.test?
     puts("Site present, using existing site.") if site.present? && !Rails.env.test?
