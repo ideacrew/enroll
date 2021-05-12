@@ -34,7 +34,7 @@ describe MigrateVerificationTypes, dbclean: :after_each do
   describe "dynamic types migration to model" do
     it_behaves_like "verification types migrations", "4", "343555664", "454334556", true, 'Citizenship', 'Immigration status', "vlp_doc"
     it_behaves_like "verification types migrations", "4", "343555664", "454334556", true, 'Social Security Number', 'Immigration status'
-    it_behaves_like "verification types migrations", "4", "343555664", "454334556", true, 'DC Residency', 'Immigration status'
+    it_behaves_like "verification types migrations", "4", "343555664", "454334556", true, EnrollRegistry[:enroll_app].setting(:state_residency).item, 'Immigration status'
     it_behaves_like "verification types migrations", "4", "343555664", "454334556", true, 'American Indian Status', 'Immigration status'
     it_behaves_like "verification types migrations", "3", "343555664", nil, true, 'Citizenship', 'American Indian Status', "vlp_doc"
     it_behaves_like "verification types migrations", "2", nil, nil, true, 'Citizenship', 'Social Security Number', "vlp_doc"

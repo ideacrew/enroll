@@ -233,7 +233,7 @@ $(document).on('turbolinks:load', function () {
   //warn user before exiting to gmail, ymail, or aol
 
   $('.email-alert').on('click', function() {
-    if ( !confirm("You are leaving the <%= Settings.site.short_name %> web site and entering a privately owned web site created, operated and maintained by a private business. The information that this private business collects and maintains as a result of your visit to its web site is different from the information that the <%= Settings.site.short_name %> collects and maintains. <%= Settings.site.short_name %> does not share information with this private company. <%= Settings.site.short_name %> cannot help you with any information regarding this website, including your username or password, or other technical issues. By linking to this private business, the <%= Settings.site.short_name %> is not endorsing its products, services, or privacy or security policies. We recommend you review the business's information collection policy or terms and conditions to fully understand what information is collected by this private business.") )
+    if ( !confirm("You are leaving the <%= EnrollRegistry[:enroll_app].setting(:short_name).item %> web site and entering a privately owned web site created, operated and maintained by a private business. The information that this private business collects and maintains as a result of your visit to its web site is different from the information that the <%= EnrollRegistry[:enroll_app].setting(:short_name).item %> collects and maintains. <%= EnrollRegistry[:enroll_app].setting(:short_name).item %> does not share information with this private company. <%= EnrollRegistry[:enroll_app].setting(:short_name).item %> cannot help you with any information regarding this website, including your username or password, or other technical issues. By linking to this private business, the <%= EnrollRegistry[:enroll_app].setting(:short_name).item %> is not endorsing its products, services, or privacy or security policies. We recommend you review the business's information collection policy or terms and conditions to fully understand what information is collected by this private business.") )
     { return false; }
   })
 
@@ -737,7 +737,7 @@ $(document).on('change', "#plan_year_start_on", function() {
   // assign fake location_id that will be overridden by js
   var location_id = $('.benefit-group-fields:last').attr('id');
   var active_year = $(this).val().substr(0,4);
-  if($.inArray(active_year, <%= Settings.aca.dental_plan_years_available %>) !== -1){
+  if($.inArray(active_year, <%= EnrollRegistry[:enroll_app].setting(:dental_plan_years_available).item %>) !== -1){
     $(".show-dental-plans").show();
   }else{
     $(".show-dental-plans").hide();

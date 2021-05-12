@@ -33,21 +33,30 @@ class ClientConfigurationToggler < MongoidMigrationTask
     raise("No configuration files present in target directory.") if target_configuration_files.blank?
     `rm -rf #{Rails.root}/system` if Dir.exist?("#{Rails.root}/system")
     `cp -r #{target_config_folder}/system #{Rails.root}`
+    if File.exist?("#{target_config_folder}/config/settings.yml")
+      puts("Settings.yml present for target configuration, setting it as current settings.")
+    else
+      puts("No settings.yml file present for target configuration")
+    end
+    `cp -r #{target_config_folder}/config/settings.yml config/settings.yml`
   end
 
+  # TODO: We will continue switching the Settings.yml until it is fully deprecated
   def copy_current_configuration_to_engines
     Dir.glob("components/*").each do |engine_folder_name|
-      puts("Copying current configuration to #{engine_folder_name} system root folder.")
+      puts("Copying current ResourceRegistry configuration and Settings.yml to #{engine_folder_name} system root folder.")
       `cp -r system #{Rails.root}/#{engine_folder_name}/`
-      puts("Copying current configuration to #{engine_folder_name} spec dummy app")
+      `cp -r config/settings.yml #{Rails.root}/#{engine_folder_name}/config/settings.yml`
+      puts("Copying current ResourceRegistry configuration and Settings.yml to #{engine_folder_name} spec dummy app")
       `cp -r system #{Rails.root}/#{engine_folder_name}/spec/dummy/`
+      `cp -r config/settings.yml #{Rails.root}/#{engine_folder_name}/spec/dummy/config/settings.yml`
     end
   end
 
   def copy_app_assets_and_straggler_files
     # Need to make this only return files
     target_configuration_files = Dir.glob("#{target_config_folder}/**/*").select { |e| File.file? e }
-    target_configuration_files.reject { |file| file.include?('system') }.each do |filename_in_config_directory|
+    target_configuration_files.reject { |file| file.include?('system') || file.include?('settings') }.each do |filename_in_config_directory|
       # Cut off the filename parts with config namespace
       puts("Swapping app assets and other straggler files.")
       actual_filename_in_enroll = filename_in_config_directory.sub("#{target_config_folder}/", '')
@@ -57,7 +66,8 @@ class ClientConfigurationToggler < MongoidMigrationTask
 
   def checkout_straggler_files
     straggler_files = Dir.glob("#{old_config_folder}/**/*").select { |e| File.file? e }
-    straggler_files.reject { |file| file.include?('system') }.each do |filename_in_config_directory|
+    # TODO: Deprecate settings and move this eventually
+    straggler_files.reject { |file| file.include?('system') || file.include?('settings') }.each do |filename_in_config_directory|
       # Cut off the filename parts with config namespace
       puts("Checking out old config app assets and other straggler files.")
       filename_without_root = filename_in_config_directory.sub("#{old_config_folder}/", '')
@@ -73,7 +83,10 @@ class ClientConfigurationToggler < MongoidMigrationTask
     copy_app_assets_and_straggler_files
     checkout_straggler_files
     puts("Client configuration toggle complete system complete. enroll_app.yml file is now set to:")
-    result = `cat system/config/templates/features/enroll_app/enroll_app.yml`
-    puts(result[0..800])
+    resource_registry_result = `cat system/config/templates/features/enroll_app/enroll_app.yml`
+    puts(resource_registry_result[0..800])
+    puts("Settings yml now set to:")
+    settings_yml_result = `cat config/settings.yml`
+    puts(settings_yml_result[0..400])
   end
 end

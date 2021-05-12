@@ -1,10 +1,6 @@
 RSpec.describe SponsoredBenefits::Services::PlanCostService, type: :model, dbclean: :after_each do
   let!(:rating_area) do
-    if Settings.aca.state_abbreviation == "DC"
-      nil
-    else
-      FactoryBot.create(:rating_area, zip_code: ofice_location.address.zip, county_name: ofice_location.address.county)
-    end
+    FactoryBot.create(:rating_area, zip_code: ofice_location.address.zip, county_name: ofice_location.address.county) if EnrollRegistry.feature_enabled?(:rating_area)
   end
 
   let(:plan_design_organization) do
@@ -69,24 +65,24 @@ RSpec.describe SponsoredBenefits::Services::PlanCostService, type: :model, dbcle
   end
 
   let!(:broker_agency_profile) do
-    if Settings.aca.state_abbreviation == "DC" # toDo
-      FactoryBot.create(:broker_agency_profile)
-    else
+    if EnrollRegistry.feature_enabled?(:rating_area)
       FactoryBot.create(:benefit_sponsors_organizations_general_organization,
         :with_site,
         :with_broker_agency_profile
       ).profiles.first
+    else
+      FactoryBot.create(:broker_agency_profile)
     end
   end
 
   let!(:sponsor_profile) do
-    if Settings.aca.state_abbreviation == "DC" # toDo
-      FactoryBot.create(:employer_profile)
-    else
+    if EnrollRegistry.feature_enabled?(:rating_area)
       FactoryBot.create(:benefit_sponsors_organizations_general_organization,
         :with_site,
         :with_aca_shop_cca_employer_profile
       ).profiles.first
+    else
+      FactoryBot.create(:employer_profile)
     end
   end
 
@@ -94,11 +90,7 @@ RSpec.describe SponsoredBenefits::Services::PlanCostService, type: :model, dbcle
   let(:subject) { SponsoredBenefits::Services::PlanCostService.new(benefit_group: benefit_group)}
 
   it "should have multiple_rating_areas instance variable" do
-    if Settings.aca.state_abbreviation == "DC"
-      expect(subject.instance_variable_get("@multiple_rating_areas")).to eq false
-    else
-      expect(subject.instance_variable_get("@multiple_rating_areas")).to eq true
-    end
+    expect(subject.instance_variable_get("@multiple_rating_areas")).to eq EnrollRegistry[:rating_area].settings(:areas).item.many?
   end
 
   context "#monthly_employer_contribution_amount" do

@@ -35,12 +35,12 @@ describe Events::ResidencyVerificationRequestsController do
     end
 
     it "stores verification history element with proper verification type" do
-      expect(person.verification_types.active.where(type_name: "DC Residency").first.type_history_elements.first.action).to eq "Local Hub Request"
+      expect(person.verification_types.active.where(type_name: VerificationType::LOCATION_RESIDENCY).first.type_history_elements.first.action).to eq "Local Hub Request"
     end
 
     it "stores reference to event_request document" do
       expect(person.consumer_role.local_residency_requests.first.id).to eq BSON::ObjectId.from_string(
-        person.verification_types.active.where(type_name: "DC Residency").first.type_history_elements.first.event_request_record_id
+        person.verification_types.active.where(type_name: VerificationType::LOCATION_RESIDENCY).first.type_history_elements.first.event_request_record_id
       )
     end
   end
