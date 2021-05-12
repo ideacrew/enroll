@@ -2,6 +2,7 @@ require 'rails_helper'
 
 RSpec.describe VerificationType, :type => :model, dbclean: :after_each do
   let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+  let(:local_residency) { EnrollRegistry[:enroll_app].setting(:state_residency).item }
 
   describe "verification_types creation" do
     it "creates types for person" do
@@ -20,9 +21,9 @@ RSpec.describe VerificationType, :type => :model, dbclean: :after_each do
         expect(person.consumer_role.verification_types.by_name("Social Security Number").first).not_to be nil
       end
     end
-    context "DC Residency" do
-      it "builds DC Residency type" do
-        expect(person.consumer_role.verification_types.by_name("DC Residency").first).not_to be nil
+    context "local Residency" do
+      it "builds local Residency type" do
+        expect(person.consumer_role.verification_types.by_name(local_residency).first).not_to be nil
       end
     end
     context "American Indian Status" do
@@ -57,7 +58,7 @@ RSpec.describe VerificationType, :type => :model, dbclean: :after_each do
 
     context 'DC Residency' do
       before do
-        @residency_verification_type = person.verification_types.by_name('DC Residency').first
+        @residency_verification_type = person.verification_types.by_name(local_residency).first
         @residency_verification_type.attest_type
         @history_track = @residency_verification_type.history_tracks.last
       end
@@ -67,7 +68,7 @@ RSpec.describe VerificationType, :type => :model, dbclean: :after_each do
       end
 
       it 'should update reason for verification type' do
-        expect(@residency_verification_type.update_reason).to eq('Self Attest DC Residency')
+        expect(@residency_verification_type.update_reason).to eq("Self Attest #{local_residency}")
       end
 
       it 'should add update_reason to history tracks' do
@@ -75,7 +76,7 @@ RSpec.describe VerificationType, :type => :model, dbclean: :after_each do
       end
 
       it 'should have update_reason as expected in history tracks' do
-        expect(@history_track.modified['update_reason']).to eq('Self Attest DC Residency')
+        expect(@history_track.modified['update_reason']).to eq("Self Attest #{local_residency}")
       end
     end
   end

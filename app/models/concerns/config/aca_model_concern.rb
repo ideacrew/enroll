@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 # rubocop:disable Style/ClassVars
-EnrollRegistry = ResourceRegistry::Registry.new
-
 module Config::AcaModelConcern
   extend ActiveSupport::Concern
 

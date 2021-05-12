@@ -5,15 +5,17 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
   let(:person) {FactoryBot.create(:person)}
   let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
   let(:active_household) {family.active_household}
-  let(:hbx_enrollment_member){ FactoryBot.build(:hbx_enrollment_member, is_subscriber:true, applicant_id: family.family_members.first.id, coverage_start_on: TimeKeeper.date_of_record, eligibility_date: TimeKeeper.date_of_record) }
-  let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment,household: active_household, family: family, hbx_enrollment_members:[hbx_enrollment_member])}
-  let(:member_enrollment) {BenefitSponsors::Enrollments::MemberEnrollment.new(member_id:hbx_enrollment_member.id, product_price:BigDecimal(100),sponsor_contribution:BigDecimal(100))}
-  let(:group_enrollment) {BenefitSponsors::Enrollments::GroupEnrollment.new(product: mock_product, member_enrollments:[member_enrollment])}
-  let(:member_group) {double(group_enrollment:group_enrollment)}
+  let(:hbx_enrollment_member){ FactoryBot.build(:hbx_enrollment_member, is_subscriber: true, applicant_id: family.family_members.first.id, coverage_start_on: TimeKeeper.date_of_record, eligibility_date: TimeKeeper.date_of_record) }
+  let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment,household: active_household, family: family, hbx_enrollment_members: [hbx_enrollment_member])}
+  let(:member_enrollment) {BenefitSponsors::Enrollments::MemberEnrollment.new(member_id: hbx_enrollment_member.id, product_price: BigDecimal(100),sponsor_contribution: BigDecimal(100))}
+  let(:group_enrollment) {BenefitSponsors::Enrollments::GroupEnrollment.new(product: mock_product, member_enrollments: [member_enrollment])}
+  let(:member_group) {double(group_enrollment: group_enrollment)}
 
   let(:mock_issuer_profile) { double("IssuerProfile", :dba => "a carrier name", :legal_name => "name") }
 
-  let(:mock_product) { double("Product",
+  let(:mock_product) do
+    double(
+      "Product",
       :active_year => 2018,
       :title => "A Plan Name",
       :carrier_profile_id => "a carrier profile id",
@@ -36,9 +38,16 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
       :sbc_file => "THE SBC FILE.PDF",
       :is_standard_plan => true,
       :can_use_aptc? => true,
-      :sbc_document => Document.new({title: 'sbc_file_name', subject: "SBC",
-                                     :identifier=>"urn:openhbx:terms:v1:file_storage:s3:bucket:#{Settings.site.s3_prefix}-enroll-sbc-#{aws_env}#7816ce0f-a138-42d5-89c5-25c5a3408b82"})
-      ) }
+      :sbc_document => Document.new(
+        {
+          title: 'sbc_file_name',
+          subject: "SBC",
+          :identifier => "urn:openhbx:terms:v1:file_storage:s3:bucket:#{EnrollRegistry[:enroll_app].setting(:s3_prefix).item}"\
+          "-enroll-sbc-#{aws_env}#7816ce0f-a138-42d5-89c5-25c5a3408b82"
+        }
+      )
+    )
+  end
   let(:mock_qhp_cost_share_variance) { instance_double(Products::QhpCostShareVariance, :qhp_service_visits => []) }
 
   before :each do
@@ -82,7 +91,11 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
     end
 
     it "should have a link to download the sbc pdf" do
-      expect(rendered).to have_selector("a[href='#{"/document/download/#{Settings.site.s3_prefix}-enroll-sbc-qa/7816ce0f-a138-42d5-89c5-25c5a3408b82?content_type=application/pdf&filename=APlanName.pdf&disposition=inline"}']")
+      expect(rendered).to have_selector(
+        "a[href='#{"/document/download/#{EnrollRegistry[:enroll_app].setting(:s3_prefix).item}"\
+        '-enroll-sbc-qa/7816ce0f-a138-42d5-89c5-25c5a3408b82?content_type=application/pdf&filename'\
+        '=APlanName.pdf&disposition=inline'}']"
+      )
     end
 
     it "should have a label 'Summary of Benefits and Coverage (SBC)'" do

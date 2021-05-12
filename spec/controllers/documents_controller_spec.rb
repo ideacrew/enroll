@@ -10,14 +10,14 @@ RSpec.describe DocumentsController, :type => :controller do
   let(:family)  {FactoryBot.create(:family, :with_primary_family_member)}
   let(:hbx_enrollment) { FactoryBot.build(:hbx_enrollment) }
   let(:ssn_type) { FactoryBot.build(:verification_type, type_name: 'Social Security Number') }
-  let(:dc_type) { FactoryBot.build(:verification_type, type_name: 'DC Residency') }
+  let(:local_type) { FactoryBot.build(:verification_type, type_name: EnrollRegistry[:enroll_app].setting(:state_residency).item) }
   let(:citizenship_type) { FactoryBot.build(:verification_type, type_name: 'Citizenship') }
   let(:immigration_type) { FactoryBot.build(:verification_type, type_name: 'Immigration status') }
   let(:native_type) { FactoryBot.build(:verification_type, type_name: "American Indian Status") }
 
   before :each do
     sign_in user
-    person.verification_types = [ssn_type, dc_type, citizenship_type, native_type, immigration_type]
+    person.verification_types = [ssn_type, local_type, citizenship_type, native_type, immigration_type]
   end
 
   describe "destroy" do
@@ -70,7 +70,7 @@ RSpec.describe DocumentsController, :type => :controller do
     context 'Call Hub for Residency verification' do
       it 'should redirect if verification type is Residency' do
         person.consumer_role.update_attributes(aasm_state: 'verification_outstanding')
-        post :fed_hub_request, params: { verification_type: dc_type.id, person_id: person.id, id: document.id }
+        post :fed_hub_request, params: { verification_type: local_type.id, person_id: person.id, id: document.id }
         expect(flash[:success]).to eq('Request was sent to Local Residency.')
       end
     end

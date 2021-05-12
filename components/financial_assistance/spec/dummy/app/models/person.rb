@@ -122,7 +122,7 @@ class Person
   embeds_many :phones, cascade_callbacks: true, validate: true
   embeds_many :emails, cascade_callbacks: true, validate: true
   embeds_many :documents, as: :documentable
-  embeds_many :verification_types, cascade_callbacks: true, validate: true
+  embeds_many :verification_types, cascade_callbacks: true, validate: true, class_name: "::VerificationType"
 
   attr_accessor :effective_date
 
@@ -503,7 +503,7 @@ class Person
   end
 
   def add_new_verification_type(new_type)
-    default_status = new_type == "DC Residency" && (consumer_role || resident_role) && age_on(TimeKeeper.date_of_record) < 18 ? "attested" : "unverified"
+    default_status = new_type == ConsumerRole::LOCATION_RESIDENCY && (consumer_role || resident_role) && age_on(TimeKeeper.date_of_record) < 18 ? "attested" : "unverified"
     if verification_types.map(&:type_name).include? new_type
       verification_type_by_name(new_type).update_attributes(:inactive => false)
     else

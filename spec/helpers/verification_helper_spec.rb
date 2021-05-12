@@ -20,65 +20,6 @@ RSpec.describe VerificationHelper, :type => :helper do
     end
   end
 
-  # describe "#verification_type_status" do
-  #   let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :vlp_authority => "hbx" })}
-  #   let(:types) { ["DC Residency", "Social Security Number", "Citizenship", "Immigration status", "American Indian Status"] }
-  #   shared_examples_for "verification type status" do |current_state, verification_type, uploaded_doc, status, curam, admin, dob|
-  #     before do
-  #       uploaded_doc ? person.consumer_role.vlp_documents << FactoryBot.build(:vlp_document, :verification_type => verification_type) : person.consumer_role.vlp_documents = []
-  #       person.consumer_role.revert!(verification_attr) unless current_state
-  #       person.consumer_role.tribal_id = "444444444" if verification_type == "American Indian Status"
-  #       person.dob = dob || Date.new(1991,11,10)
-  #       if curam
-  #         person.consumer_role.import!(verification_attr) if current_state == "valid"
-  #         person.consumer_role.vlp_authority = "curam"
-  #       else
-  #         if current_state == "valid"
-  #           person.consumer_role.update_attributes(:ssn_validation => "valid",
-  #                                                  :native_validation => "valid")
-  #           person.consumer_role.mark_residency_authorized
-  #           person.consumer_role.lawful_presence_determination.authorize!(verification_attr)
-  #         else
-  #           person.consumer_role.ssn_validation = "outstanding"
-  #           person.consumer_role.native_validation = "outstanding"
-  #           person.consumer_role.mark_residency_denied
-  #           person.consumer_role.lawful_presence_determination.deny!(verification_attr)
-  #         end
-  #       end
-  #     end
-  #     it "returns #{status} status for #{verification_type} #{uploaded_doc ? 'with uploaded doc' : 'without uploaded docs'}" do
-  #       expect(helper.verification_type_status(verification_type, person, admin)).to eq status
-  #     end
-  #   end
-  #
-  #   context "consumer role" do
-  #     it_behaves_like "verification type status", "outstanding", "Social Security Number", false, "outstanding", false, false
-  #     it_behaves_like "verification type status", "valid", "Social Security Number", false, "verified", false, false
-  #     it_behaves_like "verification type status", "outstanding", "Social Security Number", true, "in review", false, false
-  #     it_behaves_like "verification type status", "outstanding", "American Indian Status", false, "outstanding", false, false
-  #     it_behaves_like "verification type status", "valid", "American Indian Status", false, "verified", false, false
-  #     it_behaves_like "verification type status", "outstanding", "American Indian Status", true, "in review", false, false
-  #     it_behaves_like "verification type status", "outstanding", "Citizenship", false, "outstanding", false, false
-  #     it_behaves_like "verification type status", "valid", "Citizenship", false, "verified", false, false
-  #     it_behaves_like "verification type status", "outstanding", "Citizenship", true, "in review", false, false
-  #     it_behaves_like "verification type status", "outstanding", "Immigration status", false, "outstanding", false, false
-  #     it_behaves_like "verification type status", "valid", "Immigration status", false, "verified", false, false
-  #     it_behaves_like "verification type status", "outstanding", "Immigration status", true, "in review", false, false
-  #     it_behaves_like "verification type status", "valid", "Immigration status", true, "verified", false, false
-  #     it_behaves_like "verification type status", "outstanding", "DC Residency", true, "in review", false, false
-  #     it_behaves_like "verification type status", "valid", "DC Residency", true, "attested", false, false, Date.new(2005,11,10)
-  #     it_behaves_like "verification type status", "valid", "DC Residency", true, "verified", false, false
-  #     it_behaves_like "verification type status", "valid", "Citizenship", true, "verified", false, false, Date.new(2005,11,10)
-  #   end
-  #
-  #   context "admin role" do
-  #     it_behaves_like "verification type status", "valid", "Immigration status", true, "External Source", "curam", "admin"
-  #     it_behaves_like "verification type status", "valid", "Social Security Number", false, "verified", false, "admin"
-  #     it_behaves_like "verification type status", "valid", "Citizenbship", true, "External Source", "curam", "admin"
-  #     it_behaves_like "verification type status", "outstanding", "American Indian Status", false, "outstanding", "curam", "admin"
-  #   end
-  # end
-
   describe '#ridp_type_status' do
     let(:types) { ['Identity', 'Application'] }
     shared_examples_for 'ridp type status' do |current_state, ridp_type, uploaded_doc, status|
@@ -517,9 +458,9 @@ RSpec.describe VerificationHelper, :type => :helper do
     it_behaves_like "admin actions dropdown list", "Citizenship", "verified","verification_outstanding", ["Verify", "Reject", "View History", "Call HUB", "Extend"]
     it_behaves_like "admin actions dropdown list", "Citizenship", "in review","unverified", ["Verify", "Reject", "View History", "Extend"]
     it_behaves_like "admin actions dropdown list", "Citizenship", "outstanding","verification_outstanding", ["Verify", "View History", "Call HUB", "Extend"]
-    it_behaves_like "admin actions dropdown list", "DC Residency", "attested", "unverified",["Verify", "Reject", "View History", "Extend"]
-    it_behaves_like "admin actions dropdown list", "DC Residency", "outstanding", "verification_outstanding",["Verify", "View History", "Call HUB", "Extend"]
-    it_behaves_like "admin actions dropdown list", "DC Residency", "in review","verification_outstanding", ["Verify", "Reject", "View History", "Call HUB", "Extend"]
+    it_behaves_like "admin actions dropdown list", EnrollRegistry[:enroll_app].setting(:state_residency).item, "attested", "unverified",["Verify", "Reject", "View History", "Extend"]
+    it_behaves_like "admin actions dropdown list", EnrollRegistry[:enroll_app].setting(:state_residency).item, "outstanding", "verification_outstanding",["Verify", "View History", "Call HUB", "Extend"]
+    it_behaves_like "admin actions dropdown list", EnrollRegistry[:enroll_app].setting(:state_residency).item, "in review","verification_outstanding", ["Verify", "Reject", "View History", "Call HUB", "Extend"]
   end
 
   describe "#request response details" do
@@ -594,11 +535,11 @@ RSpec.describe VerificationHelper, :type => :helper do
       end
     end
 
-    it_behaves_like "request response details", "DC Residency", "local_residency_request", "residency_verification_request"
+    it_behaves_like "request response details", EnrollRegistry[:enroll_app].setting(:state_residency).item, "local_residency_request", "residency_verification_request"
     it_behaves_like "request response details", "Social Security Number", "ssa_request", "ssa_verification_request"
     it_behaves_like "request response details", "Citizenship", "ssa_request", "ssa_verification_request"
     it_behaves_like "request response details", "Immigration status", "vlp_request", "lawful_presence_request"
-    it_behaves_like "request response details", "DC Residency", "local_residency_response", "residency_verification_response"
+    it_behaves_like "request response details", EnrollRegistry[:enroll_app].setting(:state_residency).item, "local_residency_response", "residency_verification_response"
     it_behaves_like "request response details", "Social Security Number", "ssa_response", "ssa_verification_response"
     it_behaves_like "request response details", "Citizenship", "ssa_response", "ssa_verification_response"
     it_behaves_like "request response details", "Immigration status", "vlp_response", "lawful_presence_response"
