@@ -673,10 +673,10 @@ module FinancialAssistance
     def other_questions_complete?
       questions_array = []
 
-      questions_array << is_former_foster_care  if foster_age_satisfied? && is_applying_coverage
-      questions_array << is_post_partum_period  unless is_pregnant
+      questions_array << is_former_foster_care if foster_age_satisfied? && is_applying_coverage
+      questions_array << is_post_partum_period unless is_pregnant
       questions_array << has_unemployment_income if FinancialAssistanceRegistry[:unemployment_income].enabled?
-      questions_array << is_physically_disabled
+      questions_array << is_physically_disabled if is_applying_coverage
       questions_array << pregnancy_due_on << children_expected_count if is_pregnant
       questions_array << pregnancy_end_on << is_enrolled_on_medicaid if is_post_partum_period
 
