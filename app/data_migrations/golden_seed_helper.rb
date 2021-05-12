@@ -100,10 +100,9 @@ module GoldenSeedHelper
     return_value
   end
 
-  def create_and_return_person(case_info_hash = {}, dependent = false)
-    # [:consumer_attributes][:primary_person_record]
+  def create_and_return_person(case_info_hash = {}, dependent = nil)
     gender = case_info_hash[:person_attributes][:gender]&.downcase || Person::GENDER_KINDS.sample
-    last_name = if dependent == true
+    last_name = if dependent
                   case_info_hash[:primary_person_record].last_name
                 else
                   case_info_hash[:person_attributes][:last_name] || FFaker::Name.last_name
