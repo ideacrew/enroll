@@ -74,6 +74,30 @@ class GoldenSeedIndividual < MongoidMigrationTask
     end
   end
 
+  def migrate_without_csv
+    5.times do
+      consumer_attributes = {
+        person_attributes: {
+          relationship_to_primary: 'self',
+          is_primary_applicant?: true
+        }
+      }
+      consumer_hash = create_and_return_matched_consumer_and_hash(consumer_attributes)
+      consumer_people_and_users[consumer[:primary_person_record].full_name] = consumer[:user_record]
+      generate_and_return_hbx_enrollment(consumer[:consumer_role_record])
+      ['spouse', 'child'].each do |relationship_to_primary|
+        dependent_attributes = {
+          primary_person_record: consumer_hash[:primary_person_record],
+          person_attributes: {
+            relationship_to_primary: relationship_to_primary
+          }
+        }
+        generate_and_return_dependent_record(dependent_attributes)
+      end
+      @counter_number += 1
+    end
+  end
+
   def migrate
     @case_collection = {}
     @counter_number = 0
@@ -88,22 +112,9 @@ class GoldenSeedIndividual < MongoidMigrationTask
     if ivl_testbed_scenario_csv
       migrate_with_csv
     else
-      5.times do
-        consumer_attributes = {
-          relationship_to_primary: 'self',
-          is_primary_applicant?: true
-        }
-        consumer = create_and_return_matched_consumer_record(consumer_attributes)
-        consumer_people_and_users[consumer[:primary_person_record].full_name] = consumer[:user_record]
-        generate_and_return_hbx_enrollment(consumer[:consumer_role_record])
-        ['spouse', 'child'].each do |relationship_to_primary|
-          dependent_attributes = {relationship_to_primary: relationship_to_primary}
-          generate_and_return_dependent_record(consumer[:primary_person_record], dependent_attributes)
-        end
-        @counter_number += 1
-      end
+      migrate_without_csv
     end
-    #puts("Site present for: #{BenefitSponsors::Site.all.map(&:site_key)}") if BenefitSponsors::Site.present? && !Rails.env.test?
+    puts("Site present for: #{BenefitSponsors::Site.all.map(&:site_key)}") if BenefitSponsors::Site.present? && !Rails.env.test?
     puts("Golden Seed IVL migration complete. All consumer roles are:") unless Rails.env.test?
     consumer_people_and_users.each do |person_full_name, user_record|
       puts(person_full_name.to_s) unless Rails.env.test?
