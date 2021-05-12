@@ -19,6 +19,7 @@ require File.join(Rails.root, 'app/data_migrations/golden_seed_financial_assista
 # rubocop:disable Metrics/AbcSize
 # rubocop:disable Metrics/CyclomaticComplexity
 # rubocop:disable Metrics/PerceivedComplexity
+# TODO: Need to find a solution like having multiple CSV's for the value of "NO DC Address"
 class GoldenSeedIndividual < MongoidMigrationTask
   include GoldenSeedHelper
   include GoldenSeedFinancialAssistanceHelper
@@ -60,7 +61,7 @@ class GoldenSeedIndividual < MongoidMigrationTask
         )
         case_collection[person_attributes["case_name"]][:person_attributes][:current_target_person] = case_collection[person_attributes["case_name"]][:primary_person_record]
         if fa_enabled_and_required_for_case
-          applicant_record = create_and_return_fa_applicant(case_collection[person_attributes["case_name"]])
+          applicant_record = create_and_return_fa_applicant(case_collection[person_attributes["case_name"]], true)
           case_collection[person_attributes["case_name"]][:target_fa_applicant] = applicant_record
           add_applicant_income(case_collection[person_attributes["case_name"]])
         end
