@@ -79,11 +79,11 @@ module GoldenSeedHelper
     EnrollRegistry[:brokers].setting(:carrier_appointments).item.symbolized_keys.keys || []
   end
 
-  def generate_random_birthday(attributes = {})
-    if attributes[:age]
-      birth_year = (TimeKeeper.date_of_record.year - attributes[:age].to_i)
+  def generate_random_birthday(case_info_hash = {})
+    if case_info_hash[:person_attributes][:age]
+      birth_year = (TimeKeeper.date_of_record.year - case_info_hash[:person_attributes][:age].to_i)
       birthday = FFaker::Time.between(Date.new(birth_year, 1, 1), Date.new(birth_year, 12, 30))
-    elsif attributes[:person_type] == 'child'
+    elsif case_info_hash[:person_attributes][:relationship_to_primary].downcase == 'child'
       birthday = FFaker::Time.between(Date.new(2005, 0o1, 0o1), Date.new(2020, 0o1, 0o1))
     else # attributes[:person_type] == 'adult'
       birthday = FFaker::Time.between(Date.new(1950, 0o1, 0o1), Date.new(2000, 0o1, 0o1))
@@ -100,20 +100,26 @@ module GoldenSeedHelper
     return_value
   end
 
-  def create_and_return_person(attributes = {})
-    gender = attributes[:gender]&.downcase || Person::GENDER_KINDS.sample
+  def create_and_return_person(case_info_hash = {}, dependent = false)
+    # [:consumer_attributes][:primary_person_record]
+    gender = case_info_hash[:person_attributes][:gender]&.downcase || Person::GENDER_KINDS.sample
+    last_name = if dependent == true
+                  case_info_hash[:primary_person_record].last_name
+                else
+                  case_info_hash[:person_attributes][:last_name] || FFaker::Name.last_name
+                end
     person = Person.new(
-      first_name: attributes[:first_name] || FFaker::Name.send("first_name_#{gender}"),
-      last_name: attributes[:last_name] || FFaker::Name.last_name,
+      first_name: case_info_hash[:person_attributes][:first_name] || FFaker::Name.send("first_name_#{gender}"),
+      last_name: last_name,
       gender: gender,
       ssn: generate_and_return_unique_ssn,
-      dob: generate_random_birthday(attributes)
+      dob: generate_random_birthday(case_info_hash)
     )
     person.save!
     raise("Unable to save person.") unless person.save!
     address_and_phone = generate_address_and_phone
     # Set residency type
-    case attributes[:residency_type]
+    case case_info_hash[:person_attributes][:residency_type]
     when 'Not DC resident'
       person.no_dc_address = true
     when 'Temporarily absent'
@@ -126,72 +132,66 @@ module GoldenSeedHelper
     # Set no one to incarcerated for now
     person.is_incarcerated = false
     # Most are set to Y in spreadsheet
-    applying_for_assistance = attributes[:help_paying_for_coverage] || true
+    applying_for_assistance = case_info_hash[:person_attributes][:help_paying_for_coverage] || true
     person.is_applying_for_assistance = truthy_value?(applying_for_assistance)
     person.save!
     person
   end
 
   # TODO: Need to figure out the primary applicant thing on spreadsheet
-  def create_and_return_family(attributes = {})
+  def create_and_return_family(case_info_hash = {})
     family = Family.new
-    family.person_id = attributes[:primary_person_record].id
+    family.person_id = case_info_hash[:primary_person_record].id
     fm = family.family_members.build(
-      person_id: attributes[:primary_person_record].id,
-      is_primary_applicant: attributes[:relationship_to_primary].downcase == 'self'
+      person_id: case_info_hash[:primary_person_record].id,
+      is_primary_applicant: case_info_hash[:person_attributes][:relationship_to_primary].downcase == 'self'
     )
     fm.save!
     family.save!
     family
   end
 
-  def create_and_return_user(attributes = {})
+  def create_and_return_user(case_info_hash = {})
     providers = ["gmail", "yahoo", "hotmail"]
-    email = if attributes[:email]&.include?(".com")
+    email = if case_info_hash[:person_attributes][:email]&.include?(".com")
               attributes["email"]
-            elsif attributes[:email]
-              "#{attributes[:email]}#{@counter_number}@#{providers.sample}.com"
+            elsif case_info_hash[:person_attributes][:email]
+              "#{case_info_hash[:person_attributes][:email]}#{@counter_number}@#{providers.sample}.com"
             else
-              "#{attributes[:primary_person_record][:first_name]}"\
-              "#{attributes[:primary_person_record][:last_name]}"\
+              "#{case_info_hash[:primary_person_record][:first_name]}"\
+              "#{case_info_hash[:primary_person_record][:last_name]}"\
               "#{@counter_number}@#{providers.sample}.com"
             end
     user = User.new
     user.email = email
     user.oim_id = email
     user.password = "P@ssw0rd!"
-    user.person = attributes[:primary_person_record]
+    user.person = case_info_hash[:primary_person_record]
     user_saved = user.save
     5.times do
       break if user_saved == true
       user.email = FFaker::Internet.email
       user_saved = user.save
     end
-    puts("Unable to generate user for #{attributes[:primary_person_record].full_name}, email already taken.") unless user_saved == true
+    puts("Unable to generate user for #{case_info_hash[:primary_person_record].full_name}, email already taken.") unless user_saved == true
     user
   end
 
-  def generate_and_return_dependent_record(primary_person, dependent_attributes = {})
-    gender = dependent_attributes[:gender]&.downcase || Person::GENDER_KINDS.sample
-    dependent_attributes[:first_name] = FFaker::Name.send("first_name_#{gender}")
-    dependent_attributes[:last_name] = primary_person.last_name
-    dependent_attributes[:family_record] = primary_person.primary_family
-
-    dependent_attributes[:dependent_person_record] = create_and_return_person(dependent_attributes)
+  def generate_and_return_dependent_record(case_info_hash)
+    dependent_person = create_and_return_person(case_info_hash, true)
 
     fm = FamilyMember.new(
-      family: dependent_attributes[:family_record],
-      person_id: dependent_attributes[:dependent_person_record].id,
+      family: case_info_hash[:family_record],
+      person_id: dependent_person.id,
       is_primary_applicant: false
     )
     fm.save!
-    dependent_attributes[:family_member_record] = fm
-    relationship_to_primary = dependent_attributes[:relationship_to_primary].downcase.parameterize
-    primary_person.person_relationships.create!(
+    relationship_to_primary = case_info_hash[:person_attributes][:relationship_to_primary].downcase.parameterize
+    case_info_hash[:primary_person_record].person_relationships.create!(
       kind: relationship_to_primary,
-      relative_id: dependent_attributes[:dependent_person_record].id
+      relative_id: dependent_person.id
     )
-    dependent_attributes
+    dependent_person
   end
 
   # TODO: Double check these for numbers for SHOP
@@ -226,9 +226,9 @@ module GoldenSeedHelper
     {address: address, phone: new_person_phone}
   end
 
-  def create_and_return_consumer_role(attributes = {})
-    consumer_role = attributes[:primary_person_record].build_consumer_role
-    consumer_role.is_applicant = truthy_value?(attributes[:is_primary_applicant?])
+  def create_and_return_consumer_role(case_info_hash = {})
+    consumer_role = case_info_hash[:primary_person_record].build_consumer_role
+    consumer_role.is_applicant = truthy_value?(case_info_hash[:person_attributes][:is_primary_applicant?])
     consumer_role.save!
     raise("Unable to save consumer role") unless consumer_role.persisted?
     # Active consumer role
@@ -238,7 +238,7 @@ module GoldenSeedHelper
       effective_starting_on: consumer_role.created_at.to_date,
       submitted_at: ::TimeKeeper.datetime_of_record
     )
-    attributes[:primary_person_record].individual_market_transitions << ivl_market_transition
+    case_info_hash[:primary_person_record].individual_market_transitions << ivl_market_transition
     consumer_role.identity_validation = 'valid'
     consumer_role.save!
     # Verification types needed
@@ -248,22 +248,22 @@ module GoldenSeedHelper
     # Residency Verificationss Requests Controller will hit during select_coverage!
     state_abbreviation = EnrollRegistry[:enroll_app].setting(:state_abbreviation).item
     verification_type.type_name = "#{state_abbreviation} Residency"
-    attributes[:primary_person_record].verification_types << verification_type
-    attributes[:primary_person_record].save!
+    case_info_hash[:primary_person_record].verification_types << verification_type
+    case_info_hash[:primary_person_record].save!
     raise("Not verified") unless consumer_role.identity_verified? == true
-    attributes[:consumer_role] = consumer_role
+    case_info_hash[:consumer_role] = consumer_role
     consumer_role
   end
 
-  def create_and_return_matched_consumer_record(attributes = {})
-    gender = attributes[:gender]&.downcase || Person::GENDER_KINDS.sample
-    attributes["first_name"] = FFaker::Name.send("first_name_#{gender}")
-    attributes["last_name"] = FFaker::Name.last_name
-    attributes[:primary_person_record] = create_and_return_person(attributes)
-    attributes[:family_record] = create_and_return_family(attributes)
-    attributes[:user_record] = create_and_return_user(attributes)
-    attributes[:consumer_role_record] = create_and_return_consumer_role(attributes)
-    attributes
+  def create_and_return_matched_consumer_and_hash(case_info_hash = {})
+    gender = case_info_hash[:person_attributes][:gender]&.downcase || Person::GENDER_KINDS.sample
+    case_info_hash[:person_attributes]["first_name"] = FFaker::Name.send("first_name_#{gender}")
+    case_info_hash[:person_attributes]["last_name"] = FFaker::Name.last_name
+    case_info_hash[:primary_person_record] = create_and_return_person(case_info_hash)
+    case_info_hash[:family_record] = create_and_return_family(case_info_hash)
+    case_info_hash[:user_record] = create_and_return_user(case_info_hash)
+    case_info_hash[:consumer_role_record] = create_and_return_consumer_role(case_info_hash)
+    case_info_hash
   end
 
   def create_and_return_service_area_and_product
@@ -313,8 +313,8 @@ module GoldenSeedHelper
     effective_on = TimeKeeper.date_of_record
     enrollment = HbxEnrollment.new(kind: "individual", consumer_role_id: consumer_role.id)
     enrollment.effective_on = effective_on
-    # A new product will be created for this rake task if there are none present. Otherwise, a random one will
-    # be selected
+    # A new product will be created for this rake task if there are none present.
+    # Otherwise, a random one will be selected
     enrollment.product = ivl_products.sample
     enrollment.family = consumer_role.person.primary_family
     family_members = consumer_role.person.primary_family.active_family_members.select { |fm| Family::IMMEDIATE_FAMILY.include? fm.primary_relationship }

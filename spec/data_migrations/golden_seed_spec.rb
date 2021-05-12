@@ -21,7 +21,23 @@ describe "Golden Seed Rake Tasks", dbclean: :after_each do
     ivl_testbed_templates = Dir.glob(filename)
     if ivl_testbed_templates.present?
       context "with csv input", dbclean: :after_each do
-        describe "requirements" do
+        context "financial assistance" do
+          before :each do
+            EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(true)
+            subject.migrate
+          end
+          context "requirements" do
+            it "should create financial assistance applications" do
+              expect(FinancialAssistance::Application.all.count).to be > 0
+            end
+
+            it "should create financial assistance applicants" do
+              expect(FinancialAssistance::Application.all.map(&:applicants).flatten.count).to be > 0
+            end
+          end
+        end
+
+        context "requirements" do
           before :each do
             subject.migrate
           end
