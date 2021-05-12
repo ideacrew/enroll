@@ -42,14 +42,9 @@ class GoldenSeedIndividual < MongoidMigrationTask
       case_collection[person_attributes["case_name"]][:person_attributes] = person_attributes
       if case_collection[person_attributes["case_name"]] && primary_family_for_current_case.present?
         dependent_record = generate_and_return_dependent_record(case_collection[person_attributes["case_name"]])
-        if case_collection[person_attributes["case_name"]][:dependents].is_a?(Array) && case_collection[person_attributes["case_name"]][:dependents].length > 0
-          case_collection[person_attributes["case_name"]][:dependents] << dependent_record
-          case_collection[person_attributes["case_name"]][:person_attributes][:current_target_person] = dependent_record
-        else
-          case_collection[person_attributes["case_name"]][:dependents] = []
-          case_collection[person_attributes["case_name"]][:dependents] << dependent_record
-          case_collection[person_attributes["case_name"]][:person_attributes][:current_target_person] = dependent_record
-        end
+        case_collection[person_attributes["case_name"]][:dependents] = [] if case_collection[person_attributes["case_name"]][:dependents].blank?
+        case_collection[person_attributes["case_name"]][:dependents] << dependent_record
+        case_collection[person_attributes["case_name"]][:person_attributes][:current_target_person] = dependent_record
         if fa_enabled_and_required_for_case
           applicant_record = create_and_return_fa_applicant(case_collection[person_attributes["case_name"]])
           case_collection[person_attributes["case_name"]][:fa_applicants] << applicant_record
@@ -58,9 +53,7 @@ class GoldenSeedIndividual < MongoidMigrationTask
         case_collection[person_attributes["case_name"]] = create_and_return_matched_consumer_and_hash(
           case_collection[person_attributes["case_name"]]
         )
-        consumer_people_and_users[
-          case_collection[person_attributes["case_name"]][:primary_person_record].full_name
-        ] = case_collection[person_attributes["case_name"]][:user_record]
+        consumer_people_and_users[case_collection[person_attributes["case_name"]][:primary_person_record].full_name] = case_collection[person_attributes["case_name"]][:user_record]
         generate_and_return_hbx_enrollment(
           case_collection[person_attributes["case_name"]][:consumer_role_record]
         )
@@ -83,11 +76,12 @@ class GoldenSeedIndividual < MongoidMigrationTask
         }
       }
       consumer_hash = create_and_return_matched_consumer_and_hash(consumer_attributes)
-      consumer_people_and_users[consumer[:primary_person_record].full_name] = consumer[:user_record]
-      generate_and_return_hbx_enrollment(consumer[:consumer_role_record])
+      consumer_people_and_users[consumer_hash[:primary_person_record].full_name] = consumer_hash[:user_record]
+      generate_and_return_hbx_enrollment(consumer_hash[:consumer_role_record])
       ['spouse', 'child'].each do |relationship_to_primary|
         dependent_attributes = {
           primary_person_record: consumer_hash[:primary_person_record],
+          family_record: consumer_hash[:family_record],
           person_attributes: {
             relationship_to_primary: relationship_to_primary
           }
