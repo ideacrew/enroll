@@ -47,7 +47,8 @@ class GoldenSeedIndividual < MongoidMigrationTask
         case_collection[person_attributes["case_name"]][:person_attributes][:current_target_person] = dependent_record
         if fa_enabled_and_required_for_case
           applicant_record = create_and_return_fa_applicant(case_collection[person_attributes["case_name"]])
-          case_collection[person_attributes["case_name"]][:fa_applicants] << applicant_record
+          case_collection[person_attributes["case_name"]][:target_fa_applicant] = applicant_record
+          add_applicant_income(case_collection[person_attributes["case_name"]])
         end
       else
         case_collection[person_attributes["case_name"]] = create_and_return_matched_consumer_and_hash(
@@ -59,8 +60,9 @@ class GoldenSeedIndividual < MongoidMigrationTask
         )
         case_collection[person_attributes["case_name"]][:person_attributes][:current_target_person] = case_collection[person_attributes["case_name"]][:primary_person_record]
         if fa_enabled_and_required_for_case
-          applicant = create_and_return_fa_applicant(case_collection[person_attributes["case_name"]])
-          case_collection[person_attributes["case_name"]][:fa_applicants] << applicant
+          applicant_record = create_and_return_fa_applicant(case_collection[person_attributes["case_name"]])
+          case_collection[person_attributes["case_name"]][:target_fa_applicant] = applicant_record
+          add_applicant_income(case_collection[person_attributes["case_name"]])
         end
       end
       @counter_number += 1
