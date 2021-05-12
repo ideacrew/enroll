@@ -2,12 +2,13 @@
 
 # Helper for creating Financial Assistance engine related data from CSV file
 module GoldenSeedFinancialAssistanceHelper
-  def create_and_return_fa_application(_completed_person_attributes = {})
+  def create_and_return_fa_application
     application = FinancialAssistance::Application.new
     application.save!
     application
   end
 
+  # TODO: NEED TO DO MEDICAID AND OTHER STUFF
   def create_and_return_fa_applicant(case_info_hash, is_primary_applicant = nil)
     applicant = case_info_hash[:fa_application].applicants.build
     target_person = case_info_hash[:person_attributes][:current_target_person]
@@ -29,6 +30,7 @@ module GoldenSeedFinancialAssistanceHelper
     applicant
   end
 
+  # TODO: NEED TO DO MEDICAID AND OTHER STUFF
   def add_applicant_income(case_info_hash)
     return nil if case_info_hash[:person_attributes][:tax_filing_status] == 'non_filer' || case_info_hash[:person_attributes][:frequency].downcase == 'n/a'
     income = case_info_hash[:target_fa_applicant].incomes.build
