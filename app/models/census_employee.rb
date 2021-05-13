@@ -1545,9 +1545,9 @@ class CensusEmployee < CensusMember
   end
 
   # Enrollments with current active and renewal benefit applications
-  def active_benefit_group_enrollments
+  def active_benefit_group_enrollments(employment_terminated_on = nil)
     return nil if active_benefit_application.blank?
-    enrollments_under_benefit_application(active_benefit_application)
+    enrollments_under_benefit_application(active_benefit_application, employment_terminated_on)
   end
 
   def renewal_benefit_group_enrollments
@@ -1555,16 +1555,16 @@ class CensusEmployee < CensusMember
     enrollments_under_benefit_application(renewal_benefit_application)
   end
 
-  def enrollments_under_benefit_application(benefit_application)
+  def enrollments_under_benefit_application(benefit_application, employment_terminated_on = nil)
     return nil if employee_role.blank?
-
-    HbxEnrollment.where(
-      {
+    attributes = {
         :sponsored_benefit_package_id.in => benefit_application.benefit_packages.map(&:id).compact,
         :employee_role_id => self.employee_role_id,
         :aasm_state.ne => "shopping"
       }
-    ) || []
+    attributes.merge(terminated_on: employment_terminated_on) if employment_terminated_on.present?
+
+    HbxEnrollment.where(attributes) || []
   end
 
   def off_cycle_benefit_group_enrollments
