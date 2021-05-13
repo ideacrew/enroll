@@ -2,8 +2,10 @@
 
 # Helper for creating Financial Assistance engine related data from CSV file
 module GoldenSeedFinancialAssistanceHelper
-  def create_and_return_fa_application
+  def create_and_return_fa_application(case_info_hash = nil)
     application = FinancialAssistance::Application.new
+    application.family_id = case_info_hash[:family_record].id
+    application.is_joint_tax_filing = case_info_hash[:person_attributes][:tax_filing_status].downcase == 'joint'
     application.save!
     application
   end
@@ -28,6 +30,20 @@ module GoldenSeedFinancialAssistanceHelper
     applicant.is_living_in_state = case_info_hash[:person_attributes][:current_target_person].send(:is_dc_resident?)
     applicant.save!
     applicant
+  end
+
+  def create_and_return_fa_relationships(case_array = nil)
+    applicant = case_array[1][:target_fa_applicant]
+    return if applicant.is_primary_applicant
+    application = case_array[1][:fa_application]
+    primary_applicant = application.applicants.detect(&:is_primary_applicant)
+    relationship = application.relationships.build(
+      applicant_id: primary_applicant.id,
+      relative_id: applicant.id,
+      kind: case_array[1][:person_attributes][:relationship_to_primary].downcase
+    )
+    relationship.save!
+    relationship
   end
 
   # TODO: NEED TO DO MEDICAID AND OTHER STUFF
