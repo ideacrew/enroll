@@ -63,7 +63,7 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   end
 
   def tobacco_use_for(member)
-    member.tobacco_use
+    member.tobacco_use || 'NA'
   end
 
   def all_members_aptc_for_saved_enrs
