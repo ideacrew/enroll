@@ -84,7 +84,5 @@ module MagiMedicaid
     field :has_enrolled_health_coverage, type: Boolean
     field :has_eligible_health_coverage, type: Boolean
 
-    field :workflow, type: Hash, default: { }
-
   end
 end
