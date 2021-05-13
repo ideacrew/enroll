@@ -12,7 +12,6 @@ sed -i -r "s/ENV_NAME/$ENV_NAME/g" /etc/rabbitmq/hbx_rabbit_definitions.json && 
 sed -r "s|RABBITMQ_URL|$RABBITMQ_URL|g" /tmp/advanced.config > /etc/rabbitmq/advanced.config && \
 sed -i -r "s/HBX_ID/$HBX_ID/g" /etc/rabbitmq/advanced.config && \
 sed -i -r "s/ENV_NAME/$ENV_NAME/g" /etc/rabbitmq/advanced.config && \
-echo "[rabbitmq_management,rabbmitmq_shovel,rabbitmq_shovel_management]." > /etc/rabbitmq/enabled_plugins && \
-chown rabbitmq:rabbitmq /etc/rabbitmq/rabbitmq.conf /etc/rabbitmq/hbx_rabbit_definitions.json /etc/rabbitmq/advanced.config /etc/rabbitmq/enabled_plugins && \
+chown rabbitmq:rabbitmq /etc/rabbitmq/rabbitmq.conf /etc/rabbitmq/hbx_rabbit_definitions.json /etc/rabbitmq/advanced.config && \
 rabbitmq-server 
 
