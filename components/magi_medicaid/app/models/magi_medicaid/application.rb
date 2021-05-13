@@ -5,9 +5,6 @@ module MagiMedicaid
 
     include Mongoid::Document
     include Mongoid::Timestamps
-    include AASM
-    include Acapi::Notifiers
-    require 'securerandom'
 
     # TODO: Need enterprise ID assignment call for Assisted Application
     field :hbx_id, type: String

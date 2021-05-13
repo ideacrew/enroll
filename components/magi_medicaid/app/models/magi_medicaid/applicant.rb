@@ -4,9 +4,6 @@ module MagiMedicaid
   class Applicant
     include Mongoid::Document
     include Mongoid::Timestamps
-    include AASM
-    include Ssn
-    include UnsetableSparseFields
 
     embedded_in :application, class_name: "::MagiMedicaid::Application", inverse_of: :applicants
 
