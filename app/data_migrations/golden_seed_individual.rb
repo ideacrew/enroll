@@ -33,13 +33,8 @@ class GoldenSeedIndividual < MongoidMigrationTask
       person_attributes = person_attributes.to_h.with_indifferent_access
       primary_family_for_current_case = case_collection[person_attributes["case_name"]]&.dig(:family_record)
       fa_enabled_and_required_for_case = EnrollRegistry.feature_enabled?(:financial_assistance) && person_attributes[:help_paying_for_coverage]
-      if fa_enabled_and_required_for_case
-        application = create_and_return_fa_application
-        case_included_in_keys = case_collection.keys.include?(person_attributes["case_name"])
-        case_collection[person_attributes["case_name"]] = {} if case_included_in_keys.blank?
-        case_collection[person_attributes["case_name"]][:fa_application] = application
-        case_collection[person_attributes["case_name"]][:fa_applicants] = []
-      end
+      case_included_in_keys = case_collection.keys.include?(person_attributes["case_name"])
+      case_collection[person_attributes["case_name"]] = {} if case_included_in_keys.blank?
       case_collection[person_attributes["case_name"]][:person_attributes] = person_attributes
       if case_collection[person_attributes["case_name"]] && primary_family_for_current_case.present?
         dependent_record = generate_and_return_dependent_record(case_collection[person_attributes["case_name"]])
@@ -61,12 +56,27 @@ class GoldenSeedIndividual < MongoidMigrationTask
         )
         case_collection[person_attributes["case_name"]][:person_attributes][:current_target_person] = case_collection[person_attributes["case_name"]][:primary_person_record]
         if fa_enabled_and_required_for_case
+          application = create_and_return_fa_application(case_collection[person_attributes["case_name"]])
+          case_collection[person_attributes["case_name"]][:fa_application] = application
           applicant_record = create_and_return_fa_applicant(case_collection[person_attributes["case_name"]], true)
           case_collection[person_attributes["case_name"]][:target_fa_applicant] = applicant_record
           add_applicant_income(case_collection[person_attributes["case_name"]])
         end
       end
       @counter_number += 1
+    end
+    if EnrollRegistry.feature_enabled?(:financial_assistance)
+      puts(
+        "Family and Financial Assistance set up complete."\
+        " Creating relationships and then submitting all FA applications"
+      ) unless Rails.env.test?
+      case_collection.each do |case_array|
+        if case_array[1][:fa_application]
+          create_and_return_fa_relationships(case_array)
+          puts("Submitting financial assistance application.") unless Rails.env.test?
+          case_array[1][:fa_application].submit!
+        end
+      end
     end
   end
 
