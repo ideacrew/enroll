@@ -1,22 +1,7 @@
-PATH
-  remote: .
-  specs:
-    magi_medicaid (0.1.0)
-      aasm (~> 4.8)
-      config (~> 2.0)
-      dry-monads
-      dry-types
-      dry-validation
-      font-awesome-rails (~> 4.7)
-      money-rails (~> 1.13.3)
-      mongoid (~> 7.0.2)
-      mongoid-autoinc (~> 6.0)
-      rails (~> 5.2.3)
-      slim (~> 3.0)
-      symmetric-encryption (~> 3.9.1)
-
-PATH
-  remote: /Users/haridhar/ideacrew/resource_registry
+GIT
+  remote: https://github.com/ideacrew/resource_registry.git
+  revision: 7b8f396afde849e584d0a749ade9ee88f1717e26
+  branch: trunk
   specs:
     resource_registry (0.7.0)
       bootsnap (~> 1.0)
@@ -34,6 +19,23 @@ PATH
       nokogiri (>= 1.9.1)
       ox (~> 2.0)
       rack (>= 1.6.13)
+
+PATH
+  remote: .
+  specs:
+    magi_medicaid (0.1.0)
+      aasm (~> 4.8)
+      config (~> 2.0)
+      dry-monads
+      dry-types
+      dry-validation
+      font-awesome-rails (~> 4.7)
+      money-rails (~> 1.13.3)
+      mongoid (~> 7.0.2)
+      mongoid-autoinc (~> 6.0)
+      rails (~> 5.2.3)
+      slim (~> 3.0)
+      symmetric-encryption (~> 3.9.1)
 
 GEM
   remote: https://rubygems.org/
@@ -85,7 +87,7 @@ GEM
       public_suffix (>= 2.0.2, < 5.0)
     arel (9.0.0)
     ast (2.4.2)
-    bootsnap (1.7.4)
+    bootsnap (1.7.5)
       msgpack (~> 1.0)
     bson (4.12.0)
     builder (3.2.4)

@@ -16,4 +16,4 @@ gemspec
 # To use a debugger
 # gem 'byebug', group: [:development, :test]
 
-gem 'resource_registry',  path:  '/Users/haridhar/ideacrew/resource_registry/'
+gem 'resource_registry',  git:  'https://github.com/ideacrew/resource_registry.git', branch: 'trunk'
