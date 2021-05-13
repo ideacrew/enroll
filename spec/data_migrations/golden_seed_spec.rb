@@ -28,7 +28,7 @@ describe "Golden Seed Rake Tasks", dbclean: :after_each do
           end
           context "requirements" do
             it "should create financial assistance applications" do
-              expect(FinancialAssistance::Application.all.count).to be > 0
+              expect(FinancialAssistance::Application.where(:"family_id".ne => nil, aasm_state: "submitted").count).to be > 0
             end
 
             it "should create financial assistance applicants" do
@@ -39,6 +39,10 @@ describe "Golden Seed Rake Tasks", dbclean: :after_each do
               expect(
                 FinancialAssistance::Application.all.map(&:applicants).flatten.map(&:incomes).flatten.count
               ).to be > 0
+            end
+
+            it "should create person records with financial_assistance_identifier attributes" do
+              expect(Person.all.select { |person| person.financial_assistance_identifier.present? }).to_not eq(nil)
             end
           end
         end
