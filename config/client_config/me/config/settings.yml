@@ -184,6 +184,7 @@ aca:
   minimum_primary_contribution_percentage: 50
   minimum_family_contribution_percentage: 30
   address_query_county: false
+  display_county: true
   broker_routing_information: false
   recaptcha_enabled: false
   security_questions: false
