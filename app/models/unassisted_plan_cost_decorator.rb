@@ -56,8 +56,12 @@ class UnassistedPlanCostDecorator < SimpleDelegator
 
   #TODO: FIX me to refactor hard coded rating area
   def premium_for(member)
-    (::BenefitMarkets::Products::ProductRateCache.lookup_rate(__getobj__, schedule_date, age_of(member), "R-DC001") * large_family_factor(member)).round(2)
-    # FIXME
+    (::BenefitMarkets::Products::ProductRateCache.lookup_rate(
+      __getobj__,
+      schedule_date,
+      age_of(member),
+      EnrollRegistry[:rating_area].settings(:areas).item.first
+    ) * large_family_factor(member)).round(2)
   rescue StandardError => e
     warn e.inspect
     warn e.backtrace
