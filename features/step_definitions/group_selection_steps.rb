@@ -270,13 +270,12 @@ And(/(.*) should also see the reason for ineligibility/) do |named_person|
 end
 
 And(/(.*) should see the dental radio button/) do |role|
-  expect(page).to have_content "Dental"
+  expect(page).to have_css EmployeeChooseCoverage.dental_radio_btn
 end
 
 And(/(.*) switched to dental benefits/) do |role|
-  # choose("coverage_kind_dental")
   wait_for_ajax
-  find(:xpath, '//*[@id="dental-radio-button"]/label').click
+  find(EmployeeChooseCoverage.dental_radio_btn).click
 end
 
 Then(/the primary person checkbox should be in unchecked status/) do
@@ -443,14 +442,15 @@ When(/employee switched to (.*) employer/) do |employer|
 end
 
 When(/employee clicked on shop for plans/) do
-  find(".interaction-click-control-shop-for-plans", :wait => 10).click
+  find(EmployeeHomepage.shop_for_plans_btn, :wait => 10).click
 end
 
 When(/employee switched for (.*) benefits/) do |market_kind|
   if market_kind == "individual"
-    find(:label, 'Individual Benefits').click
+    find(EmployeeChooseCoverage.individual_benefits_radiobtn).click
   else
-    find(:xpath, '//*[@id="market_kinds"]/div/div[1]/label').click
+    find(EmployeeChooseCoverage.employer_sponsored_benefits_radio_btn).click
+  sleep 5
   end
 end
 
@@ -467,7 +467,7 @@ And(/(.*) should not see the dental radio button/) do |role|
 end
 
 And(/(.*) clicked on continue for plan shopping$/) do |_user|
-  find(".interaction-click-control-continue").click
+  find(EmployeeChooseCoverage.continue_btn).click
 end
 
 When(/employee clicked on make changes of health enrollment from first employer/) do
@@ -533,15 +533,15 @@ end
 # end
 
 When(/^\w+ should be able to see Actions dropdown$/) do
-  page.all("#dropdownMenuButton").count > 0
+  page.all(EmployeeHomepage.actions_dropdown).count > 0
 end
 
 Then(/^\w+ clicks on the Actions button$/) do
-  page.all("#dropdownMenuButton").first.click
+  page.all(EmployeeHomepage.actions_dropdown).first.click
 end
 
 Then(/^\w+ clicks on the Actions button for active enrollment$/) do
-  page.all("#dropdownMenuButton").last.click
+  page.all(EmployeeHomepage.actions_dropdown).last.click
 end
 
 And(/^\w+ should see able to see make changes to my coverage button$/) do
