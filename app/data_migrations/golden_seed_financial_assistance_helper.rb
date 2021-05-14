@@ -32,18 +32,25 @@ module GoldenSeedFinancialAssistanceHelper
     applicant
   end
 
-  def create_and_return_fa_relationships(case_array = nil)
-    applicant = case_array[1][:target_fa_applicant]
-    return if applicant.is_primary_applicant
+  def create_fa_relationships(case_array = nil)
     application = case_array[1][:fa_application]
     primary_applicant = application.applicants.detect(&:is_primary_applicant)
-    relationship = application.relationships.build(
-      applicant_id: primary_applicant.id,
-      relative_id: applicant.id,
-      kind: case_array[1][:person_attributes][:relationship_to_primary].downcase
-    )
-    relationship.save!
-    relationship
+    applicants = case_array[1][:fa_applicants].reject { |applicant| applicant == primary_applicant }
+    return if applicants.blank?
+    applicants.each do |applicant|
+      relationship_to_primary = applicant[:relationship_to_primary].downcase
+      application.relationships.create!(
+        applicant_id: applicant[:applicant_record].id,
+        relative_id: primary_applicant.id,
+        kind: relationship_to_primary
+      )
+      application.relationships.create!(
+        applicant_id: primary_applicant.id,
+        relative_id: applicant[:applicant_record].id,
+        kind: FinancialAssistance::Relationship::INVERSE_MAP[relationship_to_primary]
+      )
+      binding.irb
+    end
   end
 
   # TODO: NEED TO DO MEDICAID AND OTHER STUFF
