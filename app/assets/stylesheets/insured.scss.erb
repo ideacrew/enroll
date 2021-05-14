@@ -529,17 +529,20 @@
 .glossary-tooltips {
   text-decoration-line: underline;
   text-decoration-style: dashed;
-  text-decoration-color: #007bc4;
+  text-decoration-color: #003260;
   max-width: 350px;
 }
 
 .glossary-tooltips + .tooltip {
-  background: <%= EnrollRegistry[:cancel_plan_border].settings(:color).item %>;
+  background: #003260;
   color: white;
+  font-size: 14px;
+  font-family: 'open sans', sans-serif;
+  padding: 8px 14px 15px 14px;
   max-width: 350px;
   .arrow { display: none; }
   .tooltip {
-    background-color: <%= EnrollRegistry[:cancel_plan_border].settings(:color).item %>;
+    background-color: #003260;
     border-bottom: none;
     color: white;
     font-weight: bold;
@@ -562,7 +565,7 @@
     padding: 3px 8px;
     color: #fff;
     text-align: initial;
-    background-color: <%= EnrollRegistry[:cancel_plan_border].settings(:color).item %>;
+    background-color: #003260;
     border-radius: 4px;
 }
 
