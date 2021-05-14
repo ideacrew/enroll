@@ -3,6 +3,7 @@
 RSpec.shared_context "setup families enrollments", :shared_context => :metadata do
 
   let!(:hbx_profile) {FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)}
+  let!(:rating_area) { FactoryBot.create(:benefit_markets_locations_rating_area) }
   let!(:renewal_calender_date) {HbxProfile.current_hbx.benefit_sponsorship.renewal_benefit_coverage_period.start_on}
   let!(:renewal_calender_year) {renewal_calender_date.year}
 
@@ -14,6 +15,8 @@ RSpec.shared_context "setup families enrollments", :shared_context => :metadata 
                       family: family_unassisted,
                       household: family_unassisted.active_household,
                       enrollment_members: [family_unassisted.family_members.first],
+                      rating_area_id: rating_area.id,
+                      consumer_role_id: family_unassisted.primary_family_member.person.consumer_role.id,
                       product: active_individual_health_product, effective_on: current_calender_date)
   end
   let!(:renewal_enrollment_unassisted) do
@@ -21,6 +24,8 @@ RSpec.shared_context "setup families enrollments", :shared_context => :metadata 
                       family: family_unassisted,
                       aasm_state: "renewing_coverage_selected",
                       household: family_unassisted.active_household,
+                      rating_area_id: rating_area.id,
+                      consumer_role_id: family_unassisted.primary_family_member.person.consumer_role.id,
                       enrollment_members: [family_unassisted.family_members.first],
                       product: active_individual_health_product, effective_on: current_calender_date)
   end
@@ -41,6 +46,7 @@ RSpec.shared_context "setup families enrollments", :shared_context => :metadata 
     FactoryBot.create(:hbx_enrollment, :individual_assisted, :with_enrollment_members,
                       applied_aptc_amount: 110,
                       family: family_assisted,
+                      rating_area_id: rating_area.id,
                       consumer_role_id: family_assisted.primary_family_member.person.consumer_role.id,
                       household: family_assisted.active_household,
                       enrollment_members: [family_assisted.family_members.first],
