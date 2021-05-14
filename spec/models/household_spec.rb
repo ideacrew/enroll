@@ -22,7 +22,8 @@ describe Household, "given a coverage household with a dependent", :dbclean => :
 
   context "new_hbx_enrollment_from" do
     let(:consumer_role) {FactoryBot.create(:consumer_role)}
-    let(:person) { double(primary_family: family)}
+    let(address) { FactoryBot.build(:address) }
+    let(:person) { double(primary_family: family, addresses: [address])}
     let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
     let!(:hbx_profile) { FactoryBot.create(:hbx_profile) }
     let(:benefit_package) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first }
