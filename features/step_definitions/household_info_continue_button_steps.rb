@@ -71,6 +71,15 @@ Given(/^at least one other household members exist$/) do
   application.update!(aasm_state: "draft")
 end
 
+Given(/^a new household member is not applying$/) do
+  click_link "Add New Person"
+  find(:xpath, '//label[@for="is_applying_coverage_false"]').click
+end
+
+Then(/^the no ssn warning will appear$/) do
+  expect(page).to have_content("providing your SSN can be helpful")
+end
+
 Then(/^Family Relationships left section WILL display$/) do
   sleep 2
   expect(page).to have_content('Family Relationships')
