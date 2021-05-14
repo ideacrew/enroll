@@ -7,7 +7,7 @@ require Rails.root.join('lib', 'tasks', 'hbx_import', 'qhp', 'parsers', 'plan_be
 describe "qhp builder" do
 
   before :all do
-    @service_area_id = "#{Settings.site.key.upcase}S001"
+    @service_area_id = "DCS001"
     bcbs_issuer_profile = FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, issuer_hios_ids: ["42690"])
 
     FactoryBot.create(:benefit_markets_locations_service_area, issuer_provided_code: @service_area_id, active_year: 2019, issuer_profile_id: bcbs_issuer_profile.id, issuer_hios_id: "42690")
@@ -16,8 +16,16 @@ describe "qhp builder" do
   end
 
   context "new model having product without qhp" do
+    let(:setting) { double }
+
     before :all do
       @product = FactoryBot.create(:benefit_markets_products_health_products_health_product, hios_id: "42690MA1234502-01", hios_base_id: "42690MA1234502", csr_variant_id: "01", application_period: Date.new(2019, 1, 1)..Date.new(2019, 12, 31))
+    end
+
+    before :each do
+      allow(EnrollRegistry).to receive(:[]).with(:enroll_app).and_return(setting)
+      allow(setting).to receive(:setting).with(:state_abbreviation).and_return(double(item: 'DC'))
+      allow(setting).to receive(:setting).with(:geographic_rating_area_model).and_return(double(item: 'single'))
     end
 
     it "should have 1 existing product" do
