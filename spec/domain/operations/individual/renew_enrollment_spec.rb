@@ -35,11 +35,15 @@ RSpec.describe Operations::Individual::RenewEnrollment, type: :model, dbclean: :
                       renewal_product_id: renewal_product.id)
   end
 
+  let!(:rating_area) { FactoryBot.create(:benefit_markets_locations_rating_area) }
+  let!(:renewal_rating_area) { FactoryBot.create(:benefit_markets_locations_rating_area, active_year: TimeKeeper.date_of_record.year + 1) }
+
   let!(:enrollment) do
     FactoryBot.create(:hbx_enrollment,
                       product_id: product.id,
                       kind: 'individual',
                       family: family,
+                      rating_area_id: rating_area.id,
                       consumer_role_id: family.primary_person.consumer_role.id)
   end
 
