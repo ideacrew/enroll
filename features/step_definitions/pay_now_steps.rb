@@ -88,31 +88,30 @@ end
 
 When(/^the person enrolls in a Kaiser plan$/) do
   # screenshot("line 161")
-  click_link 'Continue', :wait => 10
-  click_link "Married"
+  find(IvlFaaFamilyInformation.continue_btn).click
+  find(IvlSpecialEnrollmentPeriod.married_link).click
   expect(page).to have_content "Married"
   # screenshot("past_qle_date")
-  fill_in "qle_date", :with => (TimeKeeper.date_of_record - 5.days).strftime("%m/%d/%Y")
-  find('h1').click
+  fill_in IvlSpecialEnrollmentPeriod.qle_date, :with => (TimeKeeper.date_of_record - 5.days).strftime("%m/%d/%Y")
   within '#qle-date-chose' do
-    click_link "CONTINUE"
+    find(IvlSpecialEnrollmentPeriod.continue_qle_btn).click
   end
   expect(page).to have_content "Based on the information you entered, you may be eligible to enroll now but there is limited time"
   # screenshot("valid_qle")
-  click_button "Continue"
+  find(IvlSpecialEnrollmentPeriod.effective_date_continue_btn).click
   expect(page).to have_content "Choose Coverage for your Household"
-  click_button "CONTINUE"
+  find(IvlChooseCoverage.continue_btn).click
   # screenshot("plan_shopping")
-  find_all('.plan-select')[0].click
+  find_all(IvlChoosePlan.select_plan_btn)[0].click
 end
 
 And(/^I click on purchase confirm button for matched person$/) do
   sleep 4
-  find('.interaction-choice-control-value-terms-check-thank-you').click
-  fill_in 'first_name_thank_you', with: "John"
-  fill_in 'last_name_thank_you', with: "Smith"
+  find(IvlConfirmYourPlanSelection.i_agree_checkbox).click
+  fill_in IvlConfirmYourPlanSelection.first_name, with: "John"
+  fill_in IvlConfirmYourPlanSelection.last_name, with: "Smith"
   # screenshot("purchase")
-  click_link "Confirm"
+  find(IvlConfirmYourPlanSelection.confirm_btn).click
 end
 
 And(/^tries to purchase with a break in coverage$/) do
@@ -129,14 +128,14 @@ And(/^tries to purchase with a break in coverage$/) do
 end
 
 Then(/^I should click on pay now button$/) do
-  find('.interaction-click-control-pay-now').click
+  find(IvlEnrollmentSubmitted.pay_now_btn).click
 end
 
 Then(/^I should see( not)? pay now button$/) do |visible|
   if visible.blank?
-    expect(page).to have_css('.interaction-click-control-pay-now')
+    expect(page).to have_css(IvlEnrollmentSubmitted.pay_now_btn)
   else
-    expect(page).not_to have_css('.interaction-click-control-pay-now')
+    expect(page).not_to have_css(IvlEnrollmentSubmitted.pay_now_btn)
   end
 end
 
@@ -163,39 +162,38 @@ end
 
 And(/^creates a consumer with SEP$/) do
   visit exchanges_hbx_profiles_root_path
-  find('.interaction-click-control-families', wait: 10).click
-  page.find('.interaction-click-control-new-consumer-application', wait: 10).click
+  find(AdminHomepage.families_dropown, wait: 10).click
+  page.find(AdminHomepage.new_consumer_app_btn, wait: 10).click
   visit begin_consumer_enrollment_exchanges_agents_path
-  fill_in "person_first_name", with: "John"
-  fill_in "person_last_name", with: "Smith"
-  fill_in "jq_datepicker_ignore_person_dob", with: "11/11/1991"
-  fill_in "person_ssn", with: '212-31-3131'
-  find(:xpath, '//label[@for="radio_male"]', wait: 10).click
-  find('.btn', text: 'CONTINUE', wait: 10).click
+  fill_in IvlPersonalInformation.first_name, with: "John"
+  fill_in IvlPersonalInformation.last_name, with: "Smith"
+  fill_in IvlPersonalInformation.dob, with: "11/11/1991"
+  fill_in IvlPersonalInformation.ssn, with: '212-31-3131'
+  find(IvlPersonalInformation.male_radiobtn, wait: 5).click
+  find(IvlPersonalInformation.continue_btn).click
   expect(page).to have_content("Next, we need to verify if you or you and your family are eligible to enroll in coverage through #{site_short_name}. Select CONTINUE.")
-  find('.interaction-click-control-continue', wait: 10).click
-  find('span.label', text: 'choose *', wait: 10).click
+  find(IvlPersonalInformation.continue_btn, wait: 5).click
+  find(IvlPersonalInformation.application_type_dropdown, wait: 5).click
   find("li", :text => "Paper").click
-  find(:xpath, '//label[@for="person_us_citizen_true"]', wait: 10).click
-  find(:xpath, '//label[@for="person_naturalized_citizen_false"]', wait: 10).click
-  find(:xpath, '//label[@for="indian_tribe_member_no"]', wait: 10).click
-  find(:xpath, '//label[@for="radio_incarcerated_no"]', wait: 10).click
-  fill_in "person_addresses_attributes_0_address_1", with: "123 Main St"
-  fill_in "person_addresses_attributes_0_address_2", with: "apt 1005"
-  # May have to refactor this for the specific state
-  fill_in "person_addresses_attributes_0_city", with: "Washington"
-  find(:xpath, "//span[@class='label'][contains(., 'SELECT STATE')]", wait: 10).click
-  find(:xpath, '//*[@id="address_info"]/div/div[3]/div[2]/div/div[3]/div/ul/li[10]', wait: 10).click
-  fill_in "person[addresses_attributes][0][zip]", with: "35465"
-  find('.btn', text: 'CONTINUE', wait: 10).click
+  find(IvlPersonalInformation.us_citizen_or_national_yes_radiobtn, wait: 5).click
+  find(IvlPersonalInformation.naturalized_citizen_no_radiobtn, wait: 5).click
+  find(IvlPersonalInformation.american_or_alaskan_native_no_radiobtn, wait: 5).click
+  find(IvlPersonalInformation.incarcerated_no_radiobtn, wait: 5).click
+  fill_in IvlPersonalInformation.address_line_one, with: "123 Main St"
+  fill_in IvlPersonalInformation.address_line_two, with: "apt 1005"
+  fill_in IvlPersonalInformation.city, with: "Washington"
+  find(IvlPersonalInformation.select_state_dropdown, wait: 5).click
+  find(IvlPersonalInformation.select_dc_state, wait: 5).click
+  fill_in IvlPersonalInformation.zip, with: "35465"
+  find(IvlPersonalInformation.continue_btn).click
   visit '/insured/consumer_role/upload_ridp_document'
   visit '/insured/consumer_role/upload_ridp_document'
   doc_id = "urn:openhbx:terms:v1:file_storage:s3:bucket:'id-verification'{#sample-key}"
   file_path = File.dirname(__FILE__)
   allow_any_instance_of(Insured::RidpDocumentsController).to receive(:file_path).and_return(file_path)
   allow(Aws::S3Storage).to receive(:save).with(file_path, 'id-verification').and_return(doc_id)
-  find('#upload_application').click
-  within '#upload_application' do
+  find(IvlVerifyIdentity.upload_application_docs_btn).click
+  within IvlVerifyIdentity.upload_application_docs_btn do
     attach_file("file[]", "#{Rails.root}/lib/pdf_templates/blank.pdf", visible: false)
   end
   wait_for_ajax(2)
@@ -203,18 +201,17 @@ And(/^creates a consumer with SEP$/) do
   expect(page).to have_content('In Review')
   sleep 2
   within('#Application') do
-    find('.label', :text => 'Action').click
-    find('li', :text => 'Verify').click
+    find(IvlVerifyIdentity.application_actions_dropdown).click
+    find(IvlVerifyIdentity.application_verify_btn).click
   end
-  find('.verification-update-reason').click
+  find(IvlVerifyIdentity.select_reason_dropdown).click
   find('li', :text => 'Document in EnrollApp').click
   find('.v-type-confirm-button').click
   expect(page).to have_content('Application successfully verified.')
-  click_link "Continue"
+  find(IvlVerifyIdentity.continue_btn).click
   FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)
   FactoryBot.create(:qualifying_life_event_kind, market_kind: "individual")
   FactoryBot.create(:qualifying_life_event_kind, :effective_on_event_date_and_first_month, market_kind: "individual")
-  sleep 2
 end
 
 Then(/consumer should the the First Payment button/) do

@@ -35,7 +35,7 @@ Feature: Passive renewal should be updated when EE updates his current coverage
     When Employee enters the dependent info of Patrick wife
     When Employee clicks confirm member
     Then Employee should see 1 dependents
-    When Employee clicks continue on group selection page for dependents
+    When Employee clicks continue on group selection page
     When Employee clicks Shop for new plan button
     Then Patrick Doe should see the list of plans
     When Patrick Doe selects a plan on the plan shopping page

@@ -32,7 +32,7 @@ Feature: Non-congressional EE adding non-diabled 26 years old dependent
     And employee enters the info of his dependent wife
     And employee clicks confirm member
     Then employee should see 1 dependent
-    When employee clicks continue on group selection page for dependents
+    When employee clicks continue on group selection page
     And employee clicks Shop for new plan button
     And employee sees the list of plans
     And employee selects a plan on the plan shopping page
