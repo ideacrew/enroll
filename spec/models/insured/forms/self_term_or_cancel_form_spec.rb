@@ -57,7 +57,8 @@ module Insured
       let!(:person) {FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
       let!(:family) {FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person)}
       let(:sep) {FactoryBot.create(:special_enrollment_period, family: family)}
-      let!(:enrollment) {FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, product: @product, consumer_role_id: person.consumer_role.id)}
+      let(:rating_area) { FactoryBot.create(:benefit_markets_locations_rating_area) }
+      let!(:enrollment) {FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, product: @product, consumer_role_id: person.consumer_role.id, rating_area_id: rating_area.id)}
       let!(:hbx_enrollment_member1) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, is_subscriber: true, eligibility_date: (TimeKeeper.date_of_record - 1.day), hbx_enrollment: enrollment)}
       let!(:hbx_enrollment_member2) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members[1].id, eligibility_date: (TimeKeeper.date_of_record - 1.day), hbx_enrollment: enrollment)}
       let!(:hbx_profile) {FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)}
@@ -81,8 +82,8 @@ module Insured
         enrollment.update_attributes(product: @product, applied_aptc_amount: applied_aptc_amount)
         hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.update_attributes!(slcsp_id: @product.id)}
         site_key = EnrollRegistry[:enroll_app].setting(:site_key).item.upcase
-        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, hbx_enrollment_member_2_age, "R-#{site_key}001").and_return(814.85)
-        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, primary_person_age, "R-#{site_key}001").and_return(879.8)
+        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, hbx_enrollment_member_2_age, "R-#{site_key}001", 'NA').and_return(814.85)
+        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, primary_person_age, "R-#{site_key}001", 'NA').and_return(879.8)
       end
 
       it 'should create a valid form for the view' do
