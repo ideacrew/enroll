@@ -38,7 +38,7 @@ Feature: Employee hired during renewal period
     Then Employee should not see able to see make changes for my new plan
     When Employee clicks on the make changes to my coverage button
     Then Employee should see the group selection page
-    When Employee clicks continue on the group selection page
+    When Employee clicks shop for new plan on the group selection page
     Then Employee should see the list of plans
     And I should not see any plan which premium is 0
     When Employee selects a plan on the plan shopping page

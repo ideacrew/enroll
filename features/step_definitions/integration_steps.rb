@@ -450,12 +450,12 @@ When(/^(.*) logs on to the (.*)?/) do |named_person, portal|
   # portal_uri = find('a', text: portal, wait: 5)["href"]#find("a.#{portal_class}")["href"]
 
   visit "/users/sign_in"
-  fill_in "user[login]", :with => person[:email]
+  fill_in SignIn.username, :with => person[:email]
   find('#user_login').set(person[:email])
-  fill_in "user[password]", :with => person[:password]
+  fill_in SignIn.password, :with => person[:password]
   #TODO this fixes the random login fails b/c of empty params on email
-  fill_in "user[login]", :with => person[:email] unless find(:xpath, '//*[@id="user_login"]').value == person[:email]
-  find('.sign-in-btn').click
+  fill_in SignIn.username, :with => person[:email] unless find(:xpath, '//*[@id="user_login"]').value == person[:email]
+  find(SignIn.sign_in_btn).click
 
   # visit portal_uri
   # Adding sleep seems to help prevent the AuthenticityToken error
@@ -659,7 +659,7 @@ end
 Then(/^Employee (.+) should see coverage effective date/) do |named_person|
   census_employee = CensusEmployee.where(:first_name => /#{people[named_person][:first_name]}/i, :last_name => /#{people[named_person][:last_name]}/i).first
   find('p', text: census_employee.benefit_sponsorship.legal_name, wait: 10)
-  find('.coverage_effective_date', text: census_employee.earliest_eligible_date.strftime("%m/%d/%Y"))
+  find(EmployeeConfirmYourPlanSelection.coverage_effective_date, text: census_employee.earliest_eligible_date.strftime("%m/%d/%Y"))
 end
 
 When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
@@ -751,7 +751,7 @@ Then(/^.+ should see ([^"]*) dependents*$/) do |n|
 end
 
 When(/^.+ clicks? Add Member$/) do
-  click_link 'Add New Person'
+  find(EmployeeFamilyInformation.add_new_person).click
 end
 
 Then(/^.+ should see the new dependent form$/) do
@@ -772,25 +772,23 @@ When(/^.+ enters? the dependent info of .+ daughter$/) do
 end
 
 When(/^.+ enters? the dependent info of Patrick wife$/) do
-  fill_in 'dependent[first_name]', with: 'Cynthia'
-  fill_in 'dependent[last_name]', with: 'Patrick'
-  fill_in 'dependent[ssn]', with: '123445678'
-  fill_in 'jq_datepicker_ignore_dependent[dob]', with: '01/15/1996'
-  find(:xpath, "//label[@for='radio_female']").click
+  fill_in EmployeeFamilyInformation.dependent_first_name, with: 'Cynthia'
+  fill_in EmployeeFamilyInformation.dependent_last_name, with: 'Patrick'
+  fill_in EmployeeFamilyInformation.dependent_ssn, with: '123445678'
+  fill_in EmployeeFamilyInformation.dependent_dob, with: '01/15/1996'
+  find(EmployeeFamilyInformation.dependent_female_radiobtn).click
   sleep 1
-  find("span", :text => "choose").click
-  find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Spouse')]").click
-  find(:xpath, "//label[@for='radio_female']").click
-  fill_in 'dependent[addresses][0][address_1]', with: '123 STREET'
-  fill_in 'dependent[addresses][0][city]', with: 'WASHINGTON'
-  find(:xpath, "//span[@class='label'][contains(., 'SELECT STATE')]").click
-  find(:xpath, "//li[@data-index='24'][contains(., 'MA')]").click
-  fill_in 'dependent[addresses][0][zip]', with: '01001'
+  find_all(EmployeeFamilyInformation.dependent_relationship_dropdown)[0].click
+  find(EmployeeFamilyInformation.spouse).click
+  fill_in EmployeeFamilyInformation.dependent_address_line_one, with: '123 STREET'
+  fill_in EmployeeFamilyInformation.dependent_city, with: 'WASHINGTON'
+  find(EmployeeFamilyInformation.dependent_select_state_dropdown).click
+  find(EmployeeFamilyInformation.dependent_select_dc_state).click
+  fill_in EmployeeFamilyInformation.dependent_zip, with: '01001'
 end
 
 When(/^.+ clicks? confirm member$/) do
-  all(:css, ".mz").last.click
-  expect(page).to have_link('Add New Person')
+  find(EmployeeFamilyInformation.confirm_member_btn).click
 end
 
 When(/^.+ clicks? continue on the dependents page$/) do
@@ -799,7 +797,7 @@ When(/^.+ clicks? continue on the dependents page$/) do
 end
 
 Then(/^.+ should see the group selection page$/) do
-  find('#group-selection-form', :wait => 10)
+  find(EmployeeChooseCoverage.group_selection_page, :wait => 10)
   expect(page).to have_css('form')
 end
 
@@ -837,7 +835,7 @@ When(/^.+ clicks? shop for plans button$/) do
 end
 
 When(/^.+ clicks Shop for new plan button$/) do
-  find('.interaction-click-control-shop-for-new-plan', wait: 10).click
+  find(EmployeeChooseCoverage.shop_for_new_plan_btn, wait: 10).click
 end
 
 Then(/^.+ should see the list of plans$/) do
@@ -893,7 +891,7 @@ Then(/(.*?) should see (.*?) page with (.*?) plan year start as coverage effecti
 end
 
 When(/^.+ selects? a plan on the plan shopping page$/) do
-  find_all('.interaction-click-control-select-plan', wait: 5)[0].click
+  find_all(EmployeeChoosePlan.select_plan_btn, wait: 5)[0].click
 end
 
 Then(/^.+ should see the coverage summary page$/) do
@@ -902,7 +900,7 @@ Then(/^.+ should see the coverage summary page$/) do
 end
 
 When(/^.+ clicks? on Confirm button on the coverage summary page$/) do
-  find('.interaction-click-control-confirm', wait: 10).click
+  find(EmployeeConfirmYourPlanSelection.confirm_btn, wait: 10).click
 end
 
 Then(/^.+ should see the receipt page$/) do

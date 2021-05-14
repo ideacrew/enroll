@@ -22,7 +22,7 @@ Feature: Employee while terminating active enrollment should able to see and pic
     And Employee select "first_of_this_month" for "covid-19" sep effective on kind and clicks continue
     Then Employee should see family members page and clicks continue
     Then Employee should see the group selection page with "first_of_this_month" effective date
-    When Employee clicks continue on the group selection page
+    When Employee clicks continue on group selection page
     Then Employee should see the list of plans
     And Patrick Doe should see the plans from the active plan year
     When Patrick Doe selects a plan on the plan shopping page
@@ -53,7 +53,7 @@ Feature: Employee while terminating active enrollment should able to see and pic
     And Employee select "first_of_this_month" for "covid-19" sep effective on kind and clicks continue
     Then Employee should see family members page and clicks continue
     Then Employee should see the group selection page with "first_of_this_month" effective date
-    When Employee clicks continue on the group selection page
+    When Employee clicks continue on group selection page
     Then Employee should see the list of plans
     And Patrick Doe should see the plans from the active plan year
     When Patrick Doe selects a plan on the plan shopping page
