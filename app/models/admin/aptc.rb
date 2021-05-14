@@ -220,7 +220,7 @@ class Admin::Aptc < ApplicationController
       if member_ids.present?
         aptc_members = family.active_household.latest_active_tax_household.tax_household_members.select {|m| member_ids.include?(m.person.id.to_s) }
       else
-        aptc_members = family.active_household.latest_active_tax_household.aptc_members
+        aptc_members = family.active_household.latest_active_tax_household.aptc_members.select{|m| m.applicant_id.present?}
       end
       cost = aptc_members.map do |member|
         product = ::BenefitMarkets::Products::ProductFactory.new({product_id: slcsp.id})

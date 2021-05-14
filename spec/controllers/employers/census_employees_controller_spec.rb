@@ -701,5 +701,61 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
       expect(response).to_not render_template("employers/census_employees/garbage_effective_date")
     end
   end
-end
 
+  describe "POST create, for existing person and new dependent" do
+    let(:benefit_group) { double(id: "5453a544791e4bcd33000121") }
+
+    let(:husband) { FactoryBot.create(:person, :with_family, :with_consumer_role, first_name: 'Stefan') }
+    let(:h_family) { husband.primary_family }
+    let(:wife) {FactoryBot.create(:person, :with_family, first_name: 'Natascha')}
+    let(:w_family) { wife.primary_family }
+
+    let!(:husbands_family) do
+      husband.person_relationships.create!(relative_id: husband.id, kind: 'self')
+      husband.person_relationships.create!(relative_id: wife.id, kind: 'spouse')
+      husband.save!
+
+      h_family.add_family_member(wife)
+      h_family.save!
+      h_family
+    end
+
+    let(:census_employee_dependent_params) do
+      {
+        "first_name" => husband.first_name,
+        "middle_name" => "",
+        "last_name" => husband.last_name,
+        "gender" => husband.gender,
+        "dob" => husband.dob.strftime("%Y-%m-%d"),
+        "is_business_owner" => true,
+        "hired_on" => TimeKeeper.date_of_record,
+        "ssn" => husband.ssn,
+        "employer_profile" => employer_profile,
+        "census_dependents_attributes" => [
+          {
+            "first_name" => "test",
+            "last_name" => "dependent",
+            "dob" => "05/02/2020",
+            "gender" => "male",
+            "employee_relationship" => "child_under_26",
+            "ssn" => "123-45-1234"
+          }
+        ]
+      }
+    end
+
+    before do
+      allow(@hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
+      sign_in @user
+      EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
+    end
+
+    it "should be redirect when valid" do
+      expect(husbands_family.active_household.immediate_family_coverage_household.coverage_household_members.size).to eq(2)
+      post :create, params: {employer_profile_id: employer_profile_id, census_employee: census_employee_dependent_params}
+      husbands_family.reload
+      expect(husbands_family.active_household.immediate_family_coverage_household.coverage_household_members.size).to eq(3)
+    end
+  end
+
+end
