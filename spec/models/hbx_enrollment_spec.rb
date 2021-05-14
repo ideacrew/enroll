@@ -593,7 +593,8 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
 
       let(:benefit_package) {BenefitPackage.new}
       let(:consumer_role) {FactoryBot.create(:consumer_role)}
-      let(:person) {double(primary_family: family)}
+      let(:address) {FactoryBot.build(:address)}
+      let(:person) {double(primary_family: family, addresses: [address])}
       let(:family) {@household.family}
       let(:sep) {SpecialEnrollmentPeriod.new(effective_on: TimeKeeper.date_of_record)}
       let(:hbx_profile) {double}
