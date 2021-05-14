@@ -285,7 +285,7 @@ When(/Employee select a current qle date/) do
   # screenshot("past_qle_date")
   fill_in "qle_date", :with => TimeKeeper.date_of_record.strftime("%m/%d/%Y")
   within '#qle-date-chose' do
-    find('.interaction-click-control-continue').click
+    find(EmployeeHomepage.qle_continue_btn).click
   end
 end
 
