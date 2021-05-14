@@ -142,7 +142,7 @@ registry:
           - key: :faa_enabled
             item: false
           - key: :county_fips_code_enabled
-            item: true
+            item: false
           - key: :ivl_responsibility_url
             item: "https://dchealthlink.com/individual-responsibility-requirement"
           - key: :curam_enabled?
