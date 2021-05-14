@@ -14,6 +14,7 @@ RSpec.describe Operations::Individual::ApplyAggregateToEnrollment, dbclean: :aft
   # let(:benefit_coverage_period) {double(contains?: true, second_lowest_cost_silver_plan: plan)}
   let!(:hbx_profile) {FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)}
   let!(:person) {FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
+  let(:consumer_role) { person.consumer_role }
   let!(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
   let!(:primary_fm) {family.primary_applicant}
   let!(:household) {family.active_household}
@@ -28,6 +29,7 @@ RSpec.describe Operations::Individual::ApplyAggregateToEnrollment, dbclean: :aft
   let(:sample_csr_percent_1) {87}
   let!(:eligibility_determination) {FactoryBot.create(:eligibility_determination, tax_household: tax_household, max_aptc: sample_max_aptc_1, csr_percent_as_integer: sample_csr_percent_1)}
   let(:product1) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01', metal_level_kind: :silver)}
+  let(:rating_area) { FactoryBot.create(:benefit_markets_locations_rating_area) }
   let(:hbx_with_aptc_1) do
     enr = FactoryBot.create(:hbx_enrollment,
                             product: product1,
@@ -39,6 +41,8 @@ RSpec.describe Operations::Individual::ApplyAggregateToEnrollment, dbclean: :aft
                             effective_on: start_on,
                             kind: "individual",
                             applied_aptc_amount: 100,
+                            rating_area_id: rating_area.id,
+                            consumer_role_id: consumer_role.id,
                             elected_aptc_pct: 0.7)
     FactoryBot.create(:hbx_enrollment_member, applicant_id: family_member1.id, hbx_enrollment: enr)
     enr
