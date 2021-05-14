@@ -31,6 +31,14 @@ describe "Golden Seed Rake Tasks", dbclean: :after_each do
               expect(FinancialAssistance::Application.where(:"family_id".ne => nil, aasm_state: "submitted").count).to be > 0
             end
 
+            it "should create all relationships for financial assistance applications" do
+              FinancialAssistance::Application.all.each do |fa_app|
+                family = Family.where(id: fa_app.family_id).first
+                puts("Financial App complete for #{family.primary_person}") if family.present?
+                expect(fa_app.complete?).to eq(true)
+              end
+            end
+
             it "should create financial assistance applicants" do
               expect(FinancialAssistance::Application.all.map(&:applicants).flatten.count).to be > 0
             end
