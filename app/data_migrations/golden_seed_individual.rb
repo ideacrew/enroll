@@ -44,6 +44,8 @@ class GoldenSeedIndividual < MongoidMigrationTask
         if fa_enabled_and_required_for_case
           applicant_record = create_and_return_fa_applicant(case_collection[person_attributes["case_name"]])
           case_collection[person_attributes["case_name"]][:target_fa_applicant] = applicant_record
+          case_collection[person_attributes["case_name"]][:fa_applicants] = [] unless case_collection[person_attributes["case_name"]][:applicants].is_a?(Array)
+          case_collection[person_attributes["case_name"]][:fa_applicants] << {applicant_record: applicant_record, relationship_to_primary: person_attributes[:relationship_to_primary]}
           add_applicant_income(case_collection[person_attributes["case_name"]])
         end
       else
@@ -60,6 +62,8 @@ class GoldenSeedIndividual < MongoidMigrationTask
           case_collection[person_attributes["case_name"]][:fa_application] = application
           applicant_record = create_and_return_fa_applicant(case_collection[person_attributes["case_name"]], true)
           case_collection[person_attributes["case_name"]][:target_fa_applicant] = applicant_record
+          case_collection[person_attributes["case_name"]][:fa_applicants] = [] unless case_collection[person_attributes["case_name"]][:applicants].is_a?(Array)
+          case_collection[person_attributes["case_name"]][:fa_applicants] << {applicant_record: applicant_record, relationship_to_primary: person_attributes[:relationship_to_primary]}
           add_applicant_income(case_collection[person_attributes["case_name"]])
         end
       end
@@ -72,7 +76,7 @@ class GoldenSeedIndividual < MongoidMigrationTask
       ) unless Rails.env.test?
       case_collection.each do |case_array|
         if case_array[1][:fa_application]
-          create_and_return_fa_relationships(case_array)
+          create_fa_relationships(case_array)
           puts("Submitting financial assistance application.") unless Rails.env.test?
           case_array[1][:fa_application].submit!
         end
