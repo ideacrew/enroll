@@ -36,6 +36,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     renewal_enrollment.consumer_role_id = @enrollment.consumer_role_id
     renewal_enrollment.resident_role_id = @enrollment.resident_role_id
     renewal_enrollment.effective_on = renewal_coverage_start
+    renewal_enrollment.rating_area_id = ::BenefitMarkets::Locations::RatingArea.rating_area_for(@enrollment.consumer_role.rating_address, during: renewal_coverage_start)&.id
     renewal_enrollment.coverage_kind = @enrollment.coverage_kind
     renewal_enrollment.enrollment_kind = "open_enrollment"
     renewal_enrollment.kind = @enrollment.kind
