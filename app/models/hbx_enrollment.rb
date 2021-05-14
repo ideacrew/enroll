@@ -794,6 +794,13 @@ class HbxEnrollment
     ::EnrollRegistry[:cancel_renewals_for_term] { {hbx_enrollment: self} }
   end
 
+  def propogate_cancel
+    # SHOP: Implement if we have requirement from buiness, event need to happen after cancel in shop.
+    # IVL: cancel renewals on cancelling active coverage.
+    return if is_shop?
+    ::EnrollRegistry[:cancel_renewals_for_term] { {hbx_enrollment: self} }
+  end
+
   def propogate_terminate(term_date = TimeKeeper.date_of_record.end_of_month)
     if terminated_on.present? && term_date < terminated_on
       self.terminated_on = term_date
