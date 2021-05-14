@@ -24,7 +24,7 @@ document.addEventListener("turbolinks:load", function() {
 
   // To hide/show the foster care related questions based on the age_of_applicant.
   function hide_show_foster_care_related_qns(age) {
-    if (age > 18 && age < 26){
+    if (age >= 18 && age < 26){
       $('#is_former_foster_care_yes').parents('.row-form-wrapper').removeClass('hide');
     } else {
       $('#is_former_foster_care_yes').parents('.row-form-wrapper').addClass('hide');
