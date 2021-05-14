@@ -207,17 +207,37 @@ module BenefitMarkets
         )
       }
 
+      let(:setting) { double }
+
       after(:each) do
         service_area.destroy
       end
 
-      it "will return service_area based on exchange when given an address not in that state" do
-        service_area
-        service_areas = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address_outside_state)
-        if Settings.site.key == :cca
-          expect(service_areas.to_a).not_to include(service_area)
-        else
+      context 'single service area' do
+
+        before :each do
+          allow(EnrollRegistry).to receive(:[]).with(:service_area).and_return(setting)
+          allow(setting).to receive(:settings).with(:service_area_model).and_return(double(item: 'single'))
+        end
+
+        it "will return service_area based on exchange when given an address not in that state" do
+          service_area
+          service_areas = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address_outside_state)
           expect(service_areas.to_a).to include(service_area)
+        end
+      end
+
+      context 'county service area' do
+
+        before :each do
+          allow(EnrollRegistry).to receive(:[]).with(:service_area).and_return(setting)
+          allow(setting).to receive(:settings).with(:service_area_model).and_return(double(item: 'county'))
+        end
+
+        it "will return service_area based on exchange when given an address not in that state" do
+          service_area
+          service_areas = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address_outside_state)
+          expect(service_areas.to_a).not_to include(service_area)
         end
       end
 

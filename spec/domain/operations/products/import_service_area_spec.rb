@@ -44,8 +44,8 @@ RSpec.describe ::Operations::Products::ImportServiceArea, dbclean: :after_each d
       end
 
       it 'should not create service area if there is an existing one' do
-        FactoryBot.create(:benefit_markets_locations_service_area, issuer_provided_code: "#{Settings.aca.state_abbreviation}S001",
-                                                                   issuer_profile_id: issuer_profile.id, issuer_provided_title: issuer_profile.legal_name, county_zip_ids: [], covered_states: [Settings.aca.state_abbreviation])
+        FactoryBot.create(:benefit_markets_locations_service_area, issuer_provided_code: "DCS001",
+                                                                   issuer_profile_id: issuer_profile.id, issuer_provided_title: issuer_profile.legal_name, county_zip_ids: [], covered_states: ['DC'])
         subject.call(params)
         expect(::BenefitMarkets::Locations::ServiceArea.all.count).to eq 1
       end
