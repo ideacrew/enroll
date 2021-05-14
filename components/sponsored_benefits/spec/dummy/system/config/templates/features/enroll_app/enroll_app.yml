@@ -242,6 +242,8 @@ registry:
             item: ['']
           - key: :plan_year_tooltip
             item: ""
+          - key: :send_rating_area_to_edi
+            item: true
       - key: :rating_area
         item: :rating_area
         is_enabled: false
