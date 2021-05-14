@@ -238,7 +238,7 @@ var PersonValidations = (function(window, undefined) {
       return true;
     }
     if ($('#naturalized_citizen_container').is(':visible') && $('input[name="person[naturalized_citizen]"]').not(":checked").length == 2) {
-      alert('Please provide an answer for question: Is this person a naturalized citizen?');
+      alert('Please provide an answer for question: Is this person a naturalized or derived citizen?');
       PersonValidations.restoreRequiredAttributes(e);
     }
   }
