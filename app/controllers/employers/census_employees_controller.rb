@@ -170,7 +170,7 @@ class Employers::CensusEmployeesController < ApplicationController
       if @census_employee.update_for_cobra(@cobra_date, current_user)
         flash[:notice] = "Successfully update Census Employee."
       else
-        flash[:error] = "COBRA cannot be initiated for this employee with the effective date entered. Please contact #{site_short_name} at #{contact_center_phone_number} for further assistance."
+        flash[:error] = "COBRA cannot be initiated for this employee with the effective date entered. Please contact #{site_short_name} at #{EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item} for further assistance."
       end
     else
       flash[:error] = "Please enter cobra date."

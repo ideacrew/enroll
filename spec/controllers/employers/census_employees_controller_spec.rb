@@ -539,7 +539,7 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
           expect(response).to have_http_status(:success)
           expect(flash[:error]).to eq(
             "COBRA cannot be initiated for this employee with the effective date entered."\
-            " Please contact #{EnrollRegistry[:enroll_app].setting(:short_name).item} at #{EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number)&.item} "\
+            " Please contact #{EnrollRegistry[:enroll_app].setting(:short_name).item} at #{EnrollRegistry[:enroll_app].setting(:contact_center_short_number)&.item} "\
             "for further assistance."
           )
         end
