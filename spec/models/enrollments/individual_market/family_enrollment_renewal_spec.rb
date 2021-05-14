@@ -55,6 +55,8 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     let(:child2_dob) { current_date.next_month - 20.years }
     let(:child3_dob) { current_benefit_coverage_period.start_on + 2.months - 25.years}
 
+    let(:rating_area) { FactoryBot.create(:benefit_markets_locations_rating_area) }
+
     let!(:enrollment) do
       FactoryBot.create(:hbx_enrollment,
                         :with_enrollment_members,
@@ -65,6 +67,8 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
                         effective_on: current_benefit_coverage_period.start_on,
                         kind: "individual",
                         product_id: current_product.id,
+                        rating_area_id: rating_area.id,
+                        consumer_role_id: family.primary_person.consumer_role.id,
                         aasm_state: 'coverage_selected')
     end
 
@@ -75,6 +79,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
                         enrollment_members: coverall_enrollment_members,
                         household: coverall_family.active_household,
                         coverage_kind: coverage_kind,
+                        rating_area_id: rating_area.id,
                         resident_role_id: coverall_family.primary_person.resident_role.id,
                         effective_on: current_benefit_coverage_period.start_on,
                         kind: "coverall",
