@@ -728,7 +728,7 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
         "gender" => husband.gender,
         "dob" => husband.dob.strftime("%Y-%m-%d"),
         "is_business_owner" => true,
-        "hired_on" => TimeKeeper.date_of_record,
+        "hired_on" => TimeKeeper.date_of_record.strftime("%Y-%m-%d"),
         "ssn" => husband.ssn,
         "employer_profile" => employer_profile,
         "census_dependents_attributes" => [
@@ -754,6 +754,7 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
       expect(husbands_family.active_household.immediate_family_coverage_household.coverage_household_members.size).to eq(2)
       post :create, params: {employer_profile_id: employer_profile_id, census_employee: census_employee_dependent_params}
       husbands_family.reload
+      expect(flash[:notice]).to eq("Census Employee is successfully created.")
       expect(husbands_family.active_household.immediate_family_coverage_household.coverage_household_members.size).to eq(3)
     end
   end
