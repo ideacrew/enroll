@@ -141,7 +141,8 @@ module Enrollments
         # TODO: undefined local variable or method `year' for #<Enrollments::Replicator::Reinstatement:0x00007fca4bcb2970>
         {
           product_id: base_enrollment.product_id,
-          consumer_role_id: base_enrollment.consumer_role_id
+          consumer_role_id: base_enrollment.consumer_role_id,
+          rating_area_id: ::BenefitMarkets::Locations::RatingArea.rating_area_for(base_enrollment.consumer_role.rating_address, during: new_effective_date)&.id
         }
       end
 
