@@ -707,6 +707,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     let!(:eligibilty_determination) {FactoryBot.create(:eligibility_determination, max_aptc: 500.00, tax_household: tax_household, csr_eligibility_kind: 'csr_73')}
     let(:current_year) { TimeKeeper.date_of_record.year }
     let(:effective_on) { TimeKeeper.date_of_record.next_month.beginning_of_month }
+    let(:rating_area) { FactoryBot.create(:benefit_markets_locations_rating_area) }
 
     let!(:hbx_enrollment) do
       FactoryBot.create(:hbx_enrollment,
@@ -717,6 +718,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
                         enrollment_kind: 'open_enrollment',
                         kind: 'individual',
                         consumer_role: person.consumer_role,
+                        rating_area_id: rating_area.id,
                         product: product34)
     end
 
