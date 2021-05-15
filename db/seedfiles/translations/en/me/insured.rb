@@ -447,5 +447,6 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.plan_shoppings.thankyou.confirm_your_plan_selection.content' => "Please review your current plan selection. Select PREVIOUS if you want to change your plan selection. When you're satisfied with your plan, carefully review and acknowledge the Agreement below along with the Terms and Conditions. You must also provide an electronic signature at the bottom of the page. When you're finished, select CONFIRM to submit your enrollment to your insurance company. You don't have to pay today.",
   :'en.important' => "Important",
   :'en.insured.plan_shoppings.thankyou.you_must_complete_steps_to_enroll' => "You must complete these steps to enroll.",
-  :'en.insured.plan_shoppings.thankyou.additional_administration_msg' => "* Your employer may charge an additional administration fee for your COBRA/Continuation coverage. If you have any questions, please direct them to the Employer."
+  :'en.insured.plan_shoppings.thankyou.additional_administration_msg' => "* Your employer may charge an additional administration fee for your COBRA/Continuation coverage. If you have any questions, please direct them to the Employer.",
+  :'en.insured.review_information' => "I have reviewed the information in this application and I attest, under penalty of perjury, that it is accurate and complete to the best of my knowledge. I understand that if I’m not truthful, there may be a penalty."
 }.freeze
