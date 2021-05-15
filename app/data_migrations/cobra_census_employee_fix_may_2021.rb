@@ -7,7 +7,6 @@ class CobraCensusEmployeeFixMay2021 < MongoidMigrationTask
   def migrate
     file_name = ENV['file_name'].to_s
     CSV.foreach("#{Rails.root}/#{file_name}", headers: true) do |row|
-      binding.pry
       employee_data = row.to_h.with_indifferent_access
       person = Person.where(hbx_id: employee_data['employee_hbx_id']).first
       if person.present?
@@ -16,10 +15,18 @@ class CobraCensusEmployeeFixMay2021 < MongoidMigrationTask
           census_employee = employee_role.census_employee
           cobra_date = Date.strptime(employee_data[:cobra_start_date], "%m/%d/%Y")
           begin
-            census_employee.update_for_cobra(cobra_date, nil)
-            puts("Sucessfully created Cobra enrollment for person with hbx_id: #{employee_data['employee_hbx_id']}")
+            if census_employee.may_elect_cobra?
+              census_employee.update_for_cobra(cobra_date, nil)
+              puts("Sucessfully created Cobra enrollment for person with hbx_id: #{employee_data['employee_hbx_id']}")
+            elsif census_employee.aasm_state == "cobra_linked" && !(ActiveModel::Type::Boolean.new.cast(employee_data[:enrollments_present?]))
+              census_employee.build_hbx_enrollment_for_cobra
+              census_employee.save!
+              puts("Sucessfully created Cobra enrollment for person with hbx_id: #{employee_data['employee_hbx_id']}")
+            else
+              puts("Enrollment not generated for person #{employee_data['employee_hbx_id']} -- census_employee aasm_state: #{census_employee.aasm state}")
+            end
           rescue StandardError => e
-            e.message
+            puts("Enrollment not generated for person #{employee_data['employee_hbx_id']} due to #{e.message}")
           end
         else
           puts("No employee role record found for #{employee_data['employee_hbx_id']}")
