@@ -106,6 +106,7 @@ And(/(.*) also has a health enrollment with primary person covered/) do |role|
     else
       'individual'
     end
+  rating_area = FactoryBot.create(:benefit_markets_locations_rating_area)
   enrollment =
     FactoryBot.create(
       :hbx_enrollment,
@@ -116,6 +117,7 @@ And(/(.*) also has a health enrollment with primary person covered/) do |role|
       effective_on: TimeKeeper.date_of_record,
       enrollment_kind: "special_enrollment",
       special_enrollment_period_id: sep.id,
+      rating_area_id: rating_area.id,
       consumer_role_id: (consumer_role.id if consumer_role.present?),
       employee_role_id: (@employee_role.id if @employee_role.present?),
       benefit_group_id: (@benefit_group.id if @benefit_group.present?)
@@ -156,6 +158,7 @@ And(/(.*) also has a dental enrollment with primary person covered/) do |role|
            end
          end
   product = FactoryBot.create(:benefit_markets_products_dental_products_dental_product, :with_issuer_profile, dental_level: 'low', dental_plan_kind: 'ppo')
+  rating_area = FactoryBot.create(:benefit_markets_locations_rating_area)
   enrollment = FactoryBot.create(:hbx_enrollment, product: product,
                                                   household: family.active_household,
                                                   family: family,
@@ -163,6 +166,7 @@ And(/(.*) also has a dental enrollment with primary person covered/) do |role|
                                                   effective_on: TimeKeeper.date_of_record,
                                                   enrollment_kind: "special_enrollment",
                                                   special_enrollment_period_id: sep.id,
+                                                  rating_area_id: rating_area.id,
                                                   employee_role_id: (@employee_role.id if @employee_role.present?),
                                                   benefit_group_id: (@benefit_group.id if @benefit_group.present?))
   enrollment.hbx_enrollment_members << HbxEnrollmentMember.new(applicant_id: family.primary_applicant.id,
