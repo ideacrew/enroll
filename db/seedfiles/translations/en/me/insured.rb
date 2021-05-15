@@ -312,6 +312,15 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.family_information' => "Family Information",
   :'en.insured.homeless_dc' => "I'm a homeless ME resident.",
   :'en.insured.temp_outside_dc' => "I'm living outside of ME and plan to return, or am moving to ME but don’t have a ME address yet.",
+  :'en.insured.moving_to_dc' => "I'm moving to ME",
+  :'en.insured.dependent_moving_to_dc' => "This person is moving to ME",
+  :'en.insured.moving_to_dc_extension' => "in the next 60 days, but don't have a ME address yet",
+  :'en.insured.outside_dc' => "I'm living outside ME",
+  :'en.insured.dependent_outside_dc' => "This person is living outside of ME",
+  :'en.insured.outside_dc_extension' => "and plan to return",
+  :'en.insured.dc_homeless' => "I'm a ME resident experiencing homelessness",
+  :'en.insured.dependent_dc_homeless' => "This person is ME resident who is experiencing homeless",
+  :'en.insured.dc_homeless_extension' => ", or have no permanent home address",
   :'en.insured.family_members.index.continue_to_get_insurance' => "If you need to get health insurance coverage for other members of your family, select 'Add New Person'. When you’re finished, select CONTINUE.",
   :'en.insured.family_members.index.add_member_info_html' => "<span class='bold'>Here's your chance to add family members to your plan.</span><br>Add family members by clicking the 'Add Member' button. If you don't need to add more members, or when you are done adding members, click continue.",
   :'en.insured.family_members.duplicate_error_message' => "Cannot %{action} the duplicate members as they are present on enrollments/tax households. Please call customer service at %{contact_center_phone_number}.",
@@ -447,5 +456,11 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.plan_shoppings.thankyou.confirm_your_plan_selection.content' => "Please review your current plan selection. Select PREVIOUS if you want to change your plan selection. When you're satisfied with your plan, carefully review and acknowledge the Agreement below along with the Terms and Conditions. You must also provide an electronic signature at the bottom of the page. When you're finished, select CONFIRM to submit your enrollment to your insurance company. You don't have to pay today.",
   :'en.important' => "Important",
   :'en.insured.plan_shoppings.thankyou.you_must_complete_steps_to_enroll' => "You must complete these steps to enroll.",
-  :'en.insured.plan_shoppings.thankyou.additional_administration_msg' => "* Your employer may charge an additional administration fee for your COBRA/Continuation coverage. If you have any questions, please direct them to the Employer."
+  :'en.insured.plan_shoppings.thankyou.additional_administration_msg' => "* Your employer may charge an additional administration fee for your COBRA/Continuation coverage. If you have any questions, please direct them to the Employer.",
+  :'en.insured.primary_home_address_info' => "<strong>Your home address is where you legally reside.</strong> If you prefer to receive mail at another address such as your office or a PO Box, select 'Add Mailing Address'.",
+  :'en.insured.primary_mailing_address_info' => "This is the <strong>address where you want to have your mail delivered.</strong> It may be the same or different from your home address.",
+  :'en.insured.dependent_home_address_info' => "<strong>The home address is where this person legally resides.</strong> If they want to receive mail at another address such as an office or a PO Box, Select 'Add Mailing Address'",
+  :'en.insured.dependent_mailing_address_info' => "This is the <strong>address where this person wants to have their mail delivered.</strong> It may be the same or different from their home address.",
+  :'en.insured.enter_home_address' => "Enter your home address",
+  :'en.insured.enter_mailing_address' => "Enter a mailing address"
 }.freeze
