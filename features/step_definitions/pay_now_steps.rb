@@ -181,8 +181,8 @@ And(/^creates a consumer with SEP$/) do
   # May have to refactor this for the specific state
   fill_in "person_addresses_attributes_0_city", with: "Washington"
   find(:xpath, "//span[@class='label'][contains(., 'SELECT STATE')]", wait: 10).click
-  find(:xpath, '//*[@id="address_info"]/div/div[3]/div[2]/div/div[3]/div/ul/li[10]', wait: 10).click
-  fill_in "person[addresses_attributes][0][zip]", with: "35465"
+  find(:xpath, "//li[contains(., '#{Settings.contact_center.state}')]").click
+  fill_in "person[addresses_attributes][0][zip]", with: Settings.contact_center.zip_code
   find('.btn', text: 'CONTINUE', wait: 10).click
   visit '/insured/consumer_role/upload_ridp_document'
   visit '/insured/consumer_role/upload_ridp_document'
