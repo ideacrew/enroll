@@ -96,6 +96,7 @@ module UIHelpers
       text.gsub! '<medicaid-question-translation-placeholder>', state_abbreviation_text(l10n("faa.medicaid_question"))
       text.gsub! '<short-name-placeholder>', Settings.site.short_name
       text.gsub! '<state-abbreviation-placeholder>', aca_state_abbreviation
+      text.gsub! '<reviewed-information>', l10n('insured.review_information')
       text
     end
 
