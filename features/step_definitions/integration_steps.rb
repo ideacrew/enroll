@@ -287,8 +287,9 @@ Given(/^a Hbx admin with read and write permissions exists$/) do
   person = people['Hbx Admin']
   hbx_profile = FactoryBot.create :hbx_profile
   user = FactoryBot.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
+  rating_area = FactoryBot.create(:benefit_markets_locations_rating_area)
   FactoryBot.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
-  FactoryBot.create :hbx_enrollment,family: user.primary_family, household: user.primary_family.active_household
+  FactoryBot.create :hbx_enrollment,family: user.primary_family, household: user.primary_family.active_household, rating_area_id: rating_area.id
 end
 
 Given(/^a Hbx admin with super admin access exists$/) do
@@ -301,8 +302,9 @@ Given(/^a Hbx admin with super admin access exists$/) do
   person = people['Hbx Admin']
   hbx_profile = FactoryBot.create :hbx_profile, :no_open_enrollment_coverage_period
   user = FactoryBot.create :user, :with_family, :with_hbx_staff_role, email: person[:email], password: person[:password], password_confirmation: person[:password]
+  rating_area = FactoryBot.create(:benefit_markets_locations_rating_area)
   FactoryBot.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
-  FactoryBot.create :hbx_enrollment,family:user.primary_family, household:user.primary_family.active_household
+  FactoryBot.create :hbx_enrollment, family: user.primary_family, household: user.primary_family.active_household, rating_area_id: rating_area.id
 end
 
 Given(/^a Hbx admin with tier 3 access exists$/) do
@@ -314,8 +316,9 @@ Given(/^a Hbx admin with tier 3 access exists$/) do
   person = people['Hbx Admin']
   hbx_profile = FactoryBot.create :hbx_profile, :no_open_enrollment_coverage_period
   user = FactoryBot.create :user, :with_family, :with_hbx_staff_role, email: person[:email], password: person[:password], password_confirmation: person[:password]
+  rating_area = FactoryBot.create(:benefit_markets_locations_rating_area)
   FactoryBot.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
-  FactoryBot.create :hbx_enrollment,family: user.primary_family, household: user.primary_family.active_household
+  FactoryBot.create :hbx_enrollment,family: user.primary_family, household: user.primary_family.active_household, rating_area_id: rating_area.id
 end
 
 Given(/^a Hbx admin with read only permissions exists$/) do
@@ -326,8 +329,9 @@ Given(/^a Hbx admin with read only permissions exists$/) do
   person = people['Hbx Admin']
   hbx_profile = FactoryBot.create :hbx_profile
   user = FactoryBot.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
+  rating_area = FactoryBot.create(:benefit_markets_locations_rating_area)
   FactoryBot.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
-  FactoryBot.create :hbx_enrollment,family:user.primary_family, household:user.primary_family.active_household
+  FactoryBot.create :hbx_enrollment, family: user.primary_family, household: user.primary_family.active_household, rating_area_id: rating_area.id
 end
 
 Given(/^Employer Attestation feature is enabled/) do
