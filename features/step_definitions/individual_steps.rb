@@ -104,8 +104,8 @@ Then(/the individual sees form to enter personal information$/) do
   fill_in IvlPersonalInformation.address_line_two, :with => "212"
   fill_in IvlPersonalInformation.city, :with => "Washington"
   find(IvlPersonalInformation.select_state_dropdown).click
-  first(IvlPersonalInformation.select_dc_state).click
-  fill_in IvlPersonalInformation.zip, :with => "20002"
+  find(:xpath, "//li[contains(., '#{Settings.contact_center.state}')]").click
+  fill_in IvlPersonalInformation.zip, :with => EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item
   sleep 2
   # screenshot("personal_form")
 end
