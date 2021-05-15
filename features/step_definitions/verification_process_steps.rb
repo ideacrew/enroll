@@ -75,6 +75,7 @@ end
 
 Given(/^consumer has outstanding verification and unverified enrollments$/) do
   family = user.person.primary_family
+  rating_area = FactoryBot.create(:benefit_markets_locations_rating_area)
   enr = FactoryBot.create(:hbx_enrollment,
                            family: family,
                            household: family.active_household,
@@ -83,6 +84,7 @@ Given(/^consumer has outstanding verification and unverified enrollments$/) do
                            enrollment_kind: "open_enrollment",
                            kind: "individual",
                            submitted_at: TimeKeeper.date_of_record - 2.months,
+                           rating_area_id: rating_area.id,
                            special_verification_period: TimeKeeper.date_of_record - 20.days)
   enr.hbx_enrollment_members << HbxEnrollmentMember.new(applicant_id: family.active_family_members[0].id,
                                                         eligibility_date: TimeKeeper.date_of_record - 2.months,
