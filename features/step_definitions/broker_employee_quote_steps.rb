@@ -51,8 +51,9 @@ And(/^Primary Broker creates new Prospect Employer with default_office_location$
   find(:xpath, "//select[@name='organization[entity_kind]']/option[@value='c_corporation']")
   fill_in 'organization[office_locations_attributes][0][address_attributes][address_1]', :with => "1818"
   fill_in 'organization[office_locations_attributes][0][address_attributes][address_2]', :with => "exp st"
-  fill_in 'organization[office_locations_attributes][0][address_attributes][city]', :with => "Washington"
-  fill_in 'organization[office_locations_attributes][0][address_attributes][zip]', :with => "20002"
+  fill_in 'organization[office_locations_attributes][0][address_attributes][city]', :with => EnrollRegistry[:enroll_app].setting(:contact_center_city).item
+  fill_in 'organization[office_locations_attributes][0][address_attributes][zip]', :with => EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item
+  select EnrollRegistry[:enroll_app].setting(:state_abbreviation).item, from: "organization_office_locations_attributes_0_address_attributes_state"
   fill_in 'organization[office_locations_attributes][0][phone_attributes][area_code]', :with => "202"
   fill_in 'organization[office_locations_attributes][0][phone_attributes][number]', :with => "5551212"
   fill_in 'organization[office_locations_attributes][0][phone_attributes][extension]', :with => "22332"
