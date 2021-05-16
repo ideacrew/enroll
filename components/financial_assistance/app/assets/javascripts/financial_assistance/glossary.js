@@ -70,6 +70,10 @@ function runGlossary() {
         "description": "American Indians, members of <a href='https://dchealthlink.com/glossary#federally_recognized_tribe' target='_blank'>federally recognized Tribes<\/a>, <a href='https://dchealthlink.com/glossary#alaskan_native' target='_blank'>Alaska Native<\/a> Claims Settlement Act (ANCSA) corporation shareholders, and those eligible for services from the <a href='https://dchealthlink.com/glossary#indian_health_service' target='_blank'>Indian Health Service<\/a>, Tribal Program, or Urban Indian Health Program are eligible for enhanced savings, benefits and protections through DC Health Link. Apply for <a href='https://dchealthlink.com/glossary#financial_assistance' target='_blank'>financial assistance<\/a> prior to choosing a health plan to determine eligibility and the savings, benefits and protections available."
       },
       {
+        "term": "Alimony received",
+        "description": "Alimony received is the money this person gets from a spouse they no longer live with, or a former spouse, if paid to them as part of a divorce agreement, separation agreement, or court order. Only enter alimony received if the agreement or court order was finalized before January 1, 2019."
+      },
+      {
         "term": "Annual Limit",
         "description": "Some <a href='https://dchealthlink.com/glossary#covered_services' target='_blank'>covered services<\/a> in your health plan may have a cost limit on what your insurance company will pay annually for certain benefits or the number of visits for a particular service. If you reach the annual limit, you\u2019ll have to pay for any additional services or visits that apply to the limit. You can find information on annual limits in your <a href='https://dchealthlink.com/glossary#plan_documents' target='_blank'>plan documents<\/a>."
       },
