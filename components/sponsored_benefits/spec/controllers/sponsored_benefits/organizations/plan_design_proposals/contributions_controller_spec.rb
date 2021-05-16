@@ -115,10 +115,6 @@ module SponsoredBenefits
       allow(current_person).to receive(:broker_role).and_return(broker_role)
       allow(broker_role).to receive(:broker_agency_profile_id).and_return(broker_agency_profile.id)
       allow(broker_role).to receive(:benefit_sponsors_broker_agency_profile_id).and_return(broker_agency_profile.id)
-      allow(EnrollRegistry).to receive(:[]).with(:rating_area).and_return(setting)
-      allow(EnrollRegistry).to receive(:[]).with(:service_area).and_return(setting)
-      allow(setting).to receive(:settings).with(:areas).and_return(double(item: ["R-DC001"]))
-      allow(setting).to receive(:settings).with(:service_area_model).and_return(double(item: 'single'))
     end
 
     it 'finished in under 10 seconds' do
