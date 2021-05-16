@@ -9,6 +9,7 @@ translations_to_seed = []
 # BROKER_AGENCIES_TRANSLATIONS
 seedfile_locations = ["db/seedfiles/translations/en/#{site_key}/"]
 seedfile_locations += ["components/financial_assistance/db/seedfiles/translations/en/#{site_key}/"] if EnrollRegistry.feature_enabled?(:financial_assistance)
+
 seedfile_locations.each do |seedfile_location|
   Dir.glob("#{seedfile_location}*").each do |filename|
     puts("Requiring #{filename}")
