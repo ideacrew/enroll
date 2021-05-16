@@ -336,7 +336,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
   end
 
   describe '.set_assistance_year' do
-    let(:family_id)       { BSON::ObjectId.new }      
+    let(:family_id)       { BSON::ObjectId.new }
     let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family_id) }
     it 'updates assistance year' do
       application.send(:set_assistance_year)
@@ -616,7 +616,8 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       FactoryBot.create(:person, :with_consumer_role, hbx_id: '20944967', last_name: 'Test', first_name: 'Domtest34', ssn: '243108282', dob: Date.new(1984, 3, 8))
     end
 
-    let(:family10_id) { BSON::ObjectId.new }
+    let(:family_10) { FactoryBot.create(:family, :with_primary_family_member, person: person10) }
+    let(:family10_id) { family_10.id }
     let(:family_member10_id) { BSON::ObjectId.new }
     let!(:application10) { FactoryBot.create(:financial_assistance_application, family_id: family10_id, hbx_id: '5979ec3cd7c2dc47ce000000', aasm_state: 'submitted') }
     let!(:ed) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application10, csr_percent_as_integer: nil, max_aptc: 0.0) }
@@ -715,7 +716,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       end
 
       it 'should return false' do
-        expect(applicant.other_questions_complete?).to eq(false)
+        expect(applicant.other_questions_complete?).to eq(true)
       end
     end
 
