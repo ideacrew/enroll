@@ -54,10 +54,6 @@ function runGlossary() {
         "description": "Another word for a <a href='https://dchealthlink.com/glossary#broker' target='_blank'>Broker<\/a>."
       },
       {
-        "term": "Alaska Native",
-        "description": "Alaska Native Claims Settlement Act (ANCSA) corporation shareholders, members of <a href='https://dchealthlink.com/glossary#federally_recognized_tribe' target='_blank'>federally recognized Tribes<\/a>, or those eligible for services from the <a href='https://dchealthlink.com/glossary#indian_health_service' target='_blank'>Indian Health Service<\/a>, Tribal Program, or Urban Indian Health Program, are eligible for enhanced savings, benefits and protections through DC Health Link. Apply for <a href='https://dchealthlink.com/glossary#financial_assistance' target='_blank'>financial assistance<\/a> prior to enrolling in a health plan to determine eligibility for the savings, benefits and protections available."
-      },
-      {
         "term": "Allowed Amount",
         "description": "The maximum amount your <a href='https://dchealthlink.com/glossary#health_insurance' target='_blank'>health insurance<\/a> company will pay service providers for <a href='https://dchealthlink.com/glossary#covered_services' target='_blank'>covered services<\/a>. Sometimes this is called an eligible expense, a payment allowance or negotiated rate. <a href='https://dchealthlink.com/glossary#service_provider' target='_blank'>Service providers<\/a> that are <a href='https://dchealthlink.com/glossary#in-network' target='_blank'>in-network<\/a> with your insurance company have generally agreed to accept the allowed amount for covered services."
       },
@@ -66,8 +62,8 @@ function runGlossary() {
         "description": "Care you get without being admitted to a hospital. Examples include but aren't limited to: <a href='https://dchealthlink.com/glossary#outpatient_care' target='_blank'>outpatient care<\/a>, <a href='https://dchealthlink.com/glossary#home_health_care' target='_blank'>home health care<\/a>, care in an emergency room and pre-admission testing."
       },
       {
-        "term": "American Indian",
-        "description": "American Indians, members of <a href='https://dchealthlink.com/glossary#federally_recognized_tribe' target='_blank'>federally recognized Tribes<\/a>, <a href='https://dchealthlink.com/glossary#alaskan_native' target='_blank'>Alaska Native<\/a> Claims Settlement Act (ANCSA) corporation shareholders, and those eligible for services from the <a href='https://dchealthlink.com/glossary#indian_health_service' target='_blank'>Indian Health Service<\/a>, Tribal Program, or Urban Indian Health Program are eligible for enhanced savings, benefits and protections through DC Health Link. Apply for <a href='https://dchealthlink.com/glossary#financial_assistance' target='_blank'>financial assistance<\/a> prior to choosing a health plan to determine eligibility and the savings, benefits and protections available."
+        "term": "American Indian/Alaska Native",
+        "description": "American Indian/Alaska Native income includes any income you receive from per capita payments from the tribe that come from natural resources, usage rights, leases or royalties; payments from natural resources, farming, ranching, fishing, leases, or royalties from land designated as Indian land by the Development of Interior (including reservations and former reservations); or money from selling things that have cultural significance."
       },
       {
         "term": "Alimony received",
