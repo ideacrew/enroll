@@ -6,14 +6,16 @@ translations_to_seed = []
 # All filenames should be in a pattern such as
 # broker_agencies.rb
 # with a constant like
-# BROKER_AGENCIES_TRASLATIONS
-seedfile_location = "db/seedfiles/translations/en/#{site_key}/"
-Dir.glob("#{seedfile_location}*").each do |filename|
-  puts("Requiring #{filename}")
-  require Rails.root.to_s + "/" + filename
-  # Save the constant from the file
-  str2_markerstring = ".rb"
-  translations_to_seed << "#{filename[/#{seedfile_location}(.*?)#{str2_markerstring}/m, 1]}_translations".upcase.constantize
+# BROKER_AGENCIES_TRANSLATIONS
+seedfile_locations = ["db/seedfiles/translations/en/#{site_key}/", "components/financial_assistance/db/seedfiles/translations/en/#{site_key}/"]
+seedfile_locations.each do |seedfile_location|
+  Dir.glob("#{seedfile_location}*").each do |filename|
+    puts("Requiring #{filename}")
+    require Rails.root.to_s + "/" + filename
+    # Save the constant from the file
+    str2_markerstring = ".rb"
+    translations_to_seed << "#{filename[/#{seedfile_location}(.*?)#{str2_markerstring}/m, 1]}_translations".upcase.constantize
+  end
 end
 if EnrollRegistry.feature_enabled?(:financial_assistance)
   require_relative File.join(Rails.root, 'components/financial_assistance/db/seedfiles/translations/en/faa_translations')

@@ -1,8 +1,11 @@
 # frozen_string_literal: true
 # Run it with this: bundle exec rake app:seed:load_faa_translations
 
+# site_key = ::EnrollRegistry[:enroll_app].settings(:site_key).item
+site_key = Settings.site.key
+
 require 'rake'
-require_relative '../../db/seedfiles/translations/en/faa_translations'
+require_relative "../../db/seedfiles/translations/en/#{site_key}/financial_assistance"
 
 namespace :seed do
   desc "load translations from faa engine translations file"
@@ -11,8 +14,8 @@ namespace :seed do
     # en =  YAML::load(File.read(File.open("db/seedfiles/translations/en/faa_translations.rb",'r')))
     puts "Loading en FAA translation...."
 
-    ::FaaTranslations::ASSISTANCE_TRANSLATIONS.each_key do |key|
-      value = ::FaaTranslations::ASSISTANCE_TRANSLATIONS[key]
+    ::FINANCIAL_ASSISTANCE_TRANSLATIONS.each_key do |key|
+      value = ::FINANCIAL_ASSISTANCE_TRANSLATIONS[key]
       Translation.where(key: key).first_or_create.update_attributes!(value: "\"#{value}\"")
     end
     puts "Loaded #{Translation.all.count} translations."
