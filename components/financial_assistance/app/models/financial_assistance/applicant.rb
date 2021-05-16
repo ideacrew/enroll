@@ -912,7 +912,7 @@ module FinancialAssistance
 
     def other_questions_answers
       if is_applying_coverage
-        [:is_self_attested_blind, :has_daily_living_help, :need_help_paying_bills, :is_ssn_applied].inject([]) do |array, question|
+        [:is_ssn_applied].inject([]) do |array, question|
           no_ssn_flag = no_ssn
 
           array << send(question) if question != :is_ssn_applied || (question == :is_ssn_applied && no_ssn_flag == '1')
@@ -924,11 +924,7 @@ module FinancialAssistance
     end
 
     def validate_applicant_information
-      if is_applying_coverage
-        validates_presence_of :has_fixed_address, :is_claimed_as_tax_dependent, :is_living_in_state, :is_temporarily_out_of_state, :is_pregnant, :is_self_attested_blind, :has_daily_living_help, :need_help_paying_bills #, :tax_household_id
-      else
-        validates_presence_of :has_fixed_address, :is_claimed_as_tax_dependent, :is_living_in_state, :is_temporarily_out_of_state, :is_pregnant
-      end
+      validates_presence_of :has_fixed_address, :is_claimed_as_tax_dependent, :is_living_in_state, :is_temporarily_out_of_state, :is_pregnant
     end
 
     def driver_question_responses
