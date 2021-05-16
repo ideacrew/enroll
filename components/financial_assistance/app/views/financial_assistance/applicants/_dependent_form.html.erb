@@ -146,7 +146,10 @@
                 </div>
             <div class="col-md-5 mt18">
               <div class="select-positioning ml-label"> <label>is</label> </div>
-              <label class="static_label label-floatlabel mt-label">RELATIONSHIP</label>
+              <label class="static_label label-floatlabel mt-label">RELATIONSHIP |
+                <a href="#relationship" data-toggle="modal" data-target="#relationship">Not sure?</a>
+              </label>
+              <%= render partial: 'shared/modal_support_text_household', locals: {key: "relationship"} %>
               <div class="select-relation rs_selection">
                 <%= f.select :relationship, faa_relationship_options(f.object, request.referer), :class => "floatlabel form-control", :prompt => 'choose' %>
               </div>
