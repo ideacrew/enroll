@@ -62,7 +62,7 @@ function runGlossary() {
         "description": "Care you get without being admitted to a hospital. Examples include but aren't limited to: <a href='https://dchealthlink.com/glossary#outpatient_care' target='_blank'>outpatient care<\/a>, <a href='https://dchealthlink.com/glossary#home_health_care' target='_blank'>home health care<\/a>, care in an emergency room and pre-admission testing."
       },
       {
-        "term": "American Indian/Alaska Native",
+        "term": "American Indian/Alaska Native income",
         "description": "American Indian/Alaska Native income includes any income you receive from per capita payments from the tribe that come from natural resources, usage rights, leases or royalties; payments from natural resources, farming, ranching, fishing, leases, or royalties from land designated as Indian land by the Development of Interior (including reservations and former reservations); or money from selling things that have cultural significance."
       },
       {
