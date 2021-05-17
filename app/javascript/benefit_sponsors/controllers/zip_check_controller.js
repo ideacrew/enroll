@@ -17,7 +17,6 @@ export default class extends Controller {
         'X-CSRF-Token': document.querySelector("meta[name=csrf-token]").content
       }
     }).then((response) => {
-
       if (response.data.length >= 1) {
         this.countySelectTarget.removeAttribute('disabled')
         this.countySelectTarget.options.length = 0;
@@ -45,7 +44,9 @@ export default class extends Controller {
         event.target.setCustomValidity("Zipcode outside of MA")
       }
       if (this.countySelectTarget.parentElement.className == 'selectric-hide-select') {
-        $(this.countySelectTarget).selectric('refresh')
+        if( $.isFunction( $.fn.selectric ) ) {
+          $(this.countySelectTarget).selectric('refresh')
+        }
       }
     })
   }
