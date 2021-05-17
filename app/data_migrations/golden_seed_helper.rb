@@ -16,7 +16,7 @@ module GoldenSeedHelper
   # will return "true" on "yes" type values
   def truthy_value?(value)
     value = value.downcase unless value.is_a?(TrueClass) || value.is_a?(FalseClass)
-    [nil, "n/a", "n", "no", "false", false].exclude?(value)
+    [nil, "n/a", "n", "no", "false", "none", false].exclude?(value)
   end
 
   def site
