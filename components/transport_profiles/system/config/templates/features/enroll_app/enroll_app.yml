@@ -250,7 +250,6 @@ registry:
             item: ['']
           - key: :plan_year_tooltip
             item: ""
-
           - key: :send_rating_area_for_ivl_policy_to_edi
             item: true
       - key: :rating_area
