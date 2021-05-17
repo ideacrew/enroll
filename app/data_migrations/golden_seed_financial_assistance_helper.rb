@@ -56,8 +56,9 @@ module GoldenSeedFinancialAssistanceHelper
   end
 
   def add_applicant_income(case_info_hash)
-    return nil if case_info_hash[:person_attributes][:tax_filing_status] == 'non_filer' ||
-    case_info_hash[:person_attributes][:income_frequency_kind].downcase == 'n/a'
+    return nil if case_info_hash[:person_attributes][:tax_filing_status].nil? ||
+                  case_info_hash[:person_attributes][:tax_filing_status] == 'non_filer' ||
+                  case_info_hash[:person_attributes][:income_frequency_kind].downcase == 'n/a'
     income = case_info_hash[:target_fa_applicant].incomes.build
     income.amount = case_info_hash[:person_attributes][:income_amount]
     income.frequency_kind = case_info_hash[:person_attributes][:income_frequency_kind].downcase
@@ -67,7 +68,9 @@ module GoldenSeedFinancialAssistanceHelper
   end
 
   def add_applicant_deductions(case_info_hash)
-    applicant.deductions.build(
+    return unless truthy_value?(case_info_hash[:person_attributes][:deduction_type])
+    applicant = case_info_hash[:fa_applicants].last
+    applicant.deductions.create!(
       amount: "",
       kind: "",
       frequency_kind: "",
@@ -76,33 +79,55 @@ module GoldenSeedFinancialAssistanceHelper
     )
   end
 
-  def add_applicant_benefits(case_info_hash)
-    binding.irb
-
+  def add_applicant_benefits(_case_info_hash)
+    nil
   end
 
   def add_applicant_addresses(case_info_hash)
-    binding.irb
-
+    current_or_primary_person = case_info_hash[:user_record].person || case_info_hash[:primary_person_record]
+    applicant = case_info_hash[:fa_applicants]&.last[:applicant_record]
+    puts("No person record present.") if current_or_primary_person.blank?
+    puts("No applicant present") if applicant.blank?
+    current_or_primary_person.addresses.each do |address|
+      applicant_address = applicant.addresses.build(
+        kind: "home",
+        address_1: address.address_1,
+        address_2: address.address_2,
+        address_3: address.address_3,
+        county: address.county,
+        state: address.state,
+        city: address.city,
+        zip: address.zip
+      )
+      applicant_address.save!
+    end
   end
 
   def add_applicant_phones(case_info_hash)
-    binding.irb
-
+    current_or_primary_person = case_info_hash[:user_record].person || case_info_hash[:primary_person_record]
+    applicant = case_info_hash[:fa_applicants]&.last[:applicant_record]
+    puts("No person record present.") if current_or_primary_person.blank?
+    puts("No applicant present") if applicant.blank?
+    current_or_primary_person.phones.each do |phone|
+      applicant_phone = applicant.phones.build(
+        kind: 'home',
+        area_code: phone.area_code,
+        number: phone.number,
+        full_phone_number: phone.full_phone_number
+      )
+      applicant_phone.save!
+    end
   end
 
   def add_applicant_emails(case_info_hash)
-    binding.irb
-
+    # binding.irb
   end
 
   def add_applicant_income_response(case_info_hash)
-    binding.irb
-
+    # binding.irb
   end
 
   def add_applicant_mec_response(case_info_hash)
-    binding.irb
-
+    # binding.irb
   end
 end
