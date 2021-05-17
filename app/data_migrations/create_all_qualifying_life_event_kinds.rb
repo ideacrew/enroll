@@ -53,7 +53,3 @@ class CreateAllQualifyingLifeEventKinds < MongoidMigrationTask
   end
 end
 
-# sarah_qleks = QualifyingLifeEventKind.where(published_by: '60633a0cfec111338d4d50a1').all
-# sarah_qleks.map do |qlek|
-  # qlek.attributes.except(["_id",  "updated_by", "created_by", "published_by", "is_active", "updated_at", "created_at", "workflow_state_transitions"])
-# end
