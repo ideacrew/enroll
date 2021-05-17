@@ -19,6 +19,7 @@ require File.join(Rails.root, 'app/data_migrations/golden_seed_financial_assista
 # rubocop:disable Metrics/AbcSize
 # rubocop:disable Metrics/CyclomaticComplexity
 # rubocop:disable Metrics/PerceivedComplexity
+# rubocop:disable Metrics/MethodLength
 # TODO: Need to find a solution like having multiple CSV's for the value of "NO DC Address"
 class GoldenSeedIndividual < MongoidMigrationTask
   include GoldenSeedHelper
@@ -77,19 +78,18 @@ class GoldenSeedIndividual < MongoidMigrationTask
       end
       @counter_number += 1
     end
-    if EnrollRegistry.feature_enabled?(:financial_assistance)
-      unless Rails.env.test?
-        puts(
-          "Family and Financial Assistance set up complete."\
-          " Creating relationships and then submitting all FA applications"
-        )
-      end
-      case_collection.each do |case_array|
-        next unless case_array[1][:fa_application]
-        create_fa_relationships(case_array)
-        puts("Submitting financial assistance application.") unless Rails.env.test?
-        case_array[1][:fa_application].submit!
-      end
+    return unless EnrollRegistry.feature_enabled?(:financial_assistance)
+    unless Rails.env.test?
+      puts(
+        "Family and Financial Assistance set up complete."\
+        " Creating relationships and then submitting all FA applications"
+      )
+    end
+    case_collection.each do |case_array|
+      next unless case_array[1][:fa_application]
+      create_fa_relationships(case_array)
+      puts("Submitting financial assistance application.") unless Rails.env.test?
+      case_array[1][:fa_application].submit!
     end
   end
 
@@ -151,3 +151,5 @@ end
 # rubocop:enable Metrics/PerceivedComplexity
 # rubocop:enable Metrics/AbcSize
 # rubocop:enable Metrics/CyclomaticComplexity
+# rubocop:enable Metrics/MethodLength
+
