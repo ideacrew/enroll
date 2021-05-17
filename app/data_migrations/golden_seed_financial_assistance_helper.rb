@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/ModuleLength
+
 # Helper for creating Financial Assistance engine related data from CSV file
 module GoldenSeedFinancialAssistanceHelper
   def create_and_return_fa_application(case_info_hash = nil)
@@ -85,7 +87,7 @@ module GoldenSeedFinancialAssistanceHelper
 
   def add_applicant_addresses(case_info_hash)
     current_or_primary_person = case_info_hash[:user_record].person || case_info_hash[:primary_person_record]
-    applicant = case_info_hash[:fa_applicants]&.last[:applicant_record]
+    applicant = case_info_hash[:fa_applicants].last[:applicant_record]
     puts("No person record present.") if current_or_primary_person.blank?
     puts("No applicant present") if applicant.blank?
     current_or_primary_person.addresses.each do |address|
@@ -105,7 +107,7 @@ module GoldenSeedFinancialAssistanceHelper
 
   def add_applicant_phones(case_info_hash)
     current_or_primary_person = case_info_hash[:user_record].person || case_info_hash[:primary_person_record]
-    applicant = case_info_hash[:fa_applicants]&.last[:applicant_record]
+    applicant = case_info_hash[:fa_applicants].last[:applicant_record]
     puts("No person record present.") if current_or_primary_person.blank?
     puts("No applicant present") if applicant.blank?
     current_or_primary_person.phones.each do |phone|
@@ -131,3 +133,6 @@ module GoldenSeedFinancialAssistanceHelper
     # binding.irb
   end
 end
+
+# rubocop:enable Metrics/ModuleLength
+
