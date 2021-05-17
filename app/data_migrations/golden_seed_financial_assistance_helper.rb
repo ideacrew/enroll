@@ -7,7 +7,7 @@ module GoldenSeedFinancialAssistanceHelper
   def create_and_return_fa_application(case_info_hash = nil)
     application = FinancialAssistance::Application.new
     application.family_id = case_info_hash[:family_record].id
-    application.is_joint_tax_filing = case_info_hash[:person_attributes][:tax_filing_status].downcase == 'joint'
+    application.is_joint_tax_filing = case_info_hash[:person_attributes]["tax_filing_status"].downcase == 'joint'
     application.save!
     application
   end
@@ -23,9 +23,11 @@ module GoldenSeedFinancialAssistanceHelper
     applicant.gender = target_person.gender
     applicant.dob = target_person.dob
     applicant.is_consumer_role = target_person.consumer_role.present?
-    applicant.is_joint_tax_filing = case_info_hash[:person_attributes][:tax_filing_status].downcase == 'joint'
-    applicant.is_required_to_file_taxes = ["non_filer", "dependent"].exclude?(case_info_hash[:person_attributes][:tax_filing_status].downcase)
-    applicant.tax_filer_kind = case_info_hash[:person_attributes][:tax_filing_status].downcase
+    applicant.is_joint_tax_filing = case_info_hash[:person_attributes]["tax_filing_status"].downcase == 'joint'
+    applicant.is_required_to_file_taxes = ["non_filer", "dependent"].exclude?(
+      case_info_hash[:person_attributes]["tax_filing_status"].downcase
+    )
+    applicant.tax_filer_kind = case_info_hash[:person_attributes]["tax_filing_status"].downcase
     applicant.claimed_as_tax_dependent_by = case_info_hash[:fa_application].applicants.all.detect(&:is_primary_applicant)&.id
     # TODO: Need to refactor this once dc resident is refactored
     applicant.has_fixed_address = case_info_hash[:person_attributes][:current_target_person].send(:is_homeless?)
@@ -56,19 +58,19 @@ module GoldenSeedFinancialAssistanceHelper
   end
 
   def add_applicant_income(case_info_hash)
-    return if case_info_hash[:person_attributes][:tax_filing_status].nil? ||
-              case_info_hash[:person_attributes][:tax_filing_status] == 'non_filer' ||
-              !truthy_value?(case_info_hash.dig(:person_attributes, :income_frequency_kind))
+    return if case_info_hash[:person_attributes]["tax_filing_status"].nil? ||
+              case_info_hash[:person_attributes]["tax_filing_status"] == 'non_filer' ||
+              !truthy_value?(case_info_hash[:person_attributes]['income_frequency_kind'])
     income = case_info_hash[:target_fa_applicant].incomes.build
-    income.amount = case_info_hash[:person_attributes][:income_amount]
-    income.frequency_kind = case_info_hash[:person_attributes][:income_frequency_kind].downcase
-    income.start_on = case_info_hash[:person_attributes][:income_from]
+    income.amount = case_info_hash[:person_attributes]['income_amount']
+    income.frequency_kind = case_info_hash[:person_attributes]['income_frequency_kind'].downcase
+    income.start_on = case_info_hash[:person_attributes]['income_from']
     income.save!
     income
   end
 
   def add_applicant_deductions(case_info_hash)
-    return unless truthy_value?(case_info_hash[:person_attributes][:deduction_type])
+    return unless truthy_value?(case_info_hash[:person_attributes]['deduction_type'])
     applicant = case_info_hash[:fa_applicants].last
     applicant.deductions.create!(
       amount: "",

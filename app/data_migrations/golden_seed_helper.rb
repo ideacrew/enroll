@@ -80,10 +80,10 @@ module GoldenSeedHelper
   end
 
   def generate_random_birthday(case_info_hash = {})
-    if case_info_hash[:person_attributes][:age]
-      birth_year = (TimeKeeper.date_of_record.year - case_info_hash[:person_attributes][:age].to_i)
+    if case_info_hash[:person_attributes]['age']
+      birth_year = (TimeKeeper.date_of_record.year - case_info_hash[:person_attributes]['age'].to_i)
       birthday = FFaker::Time.between(Date.new(birth_year, 1, 1), Date.new(birth_year, 12, 30))
-    elsif case_info_hash[:person_attributes][:relationship_to_primary].downcase == 'child'
+    elsif case_info_hash[:person_attributes]['relationship_to_primary'].downcase == 'child'
       birthday = FFaker::Time.between(Date.new(2005, 0o1, 0o1), Date.new(2020, 0o1, 0o1))
     else # attributes[:person_type] == 'adult'
       birthday = FFaker::Time.between(Date.new(1950, 0o1, 0o1), Date.new(2000, 0o1, 0o1))
@@ -101,14 +101,14 @@ module GoldenSeedHelper
   end
 
   def create_and_return_person(case_info_hash = {}, dependent = nil)
-    gender = case_info_hash[:person_attributes][:gender]&.downcase || Person::GENDER_KINDS.sample
+    gender = case_info_hash[:person_attributes]['gender']&.downcase || Person::GENDER_KINDS.sample
     last_name = if dependent
                   case_info_hash[:primary_person_record].last_name
                 else
-                  case_info_hash[:person_attributes][:last_name] || FFaker::Name.last_name
+                  case_info_hash[:person_attributes]['last_name'] || FFaker::Name.last_name
                 end
     person = Person.new(
-      first_name: case_info_hash[:person_attributes][:first_name] || FFaker::Name.send("first_name_#{gender}"),
+      first_name: case_info_hash[:person_attributes]['first_name'] || FFaker::Name.send("first_name_#{gender}"),
       last_name: last_name,
       gender: gender,
       ssn: generate_and_return_unique_ssn,
@@ -118,7 +118,7 @@ module GoldenSeedHelper
     raise("Unable to save person.") unless person.save!
     address_and_phone = generate_address_and_phone
     # Set residency type
-    case case_info_hash[:person_attributes][:residency_type]
+    case case_info_hash[:person_attributes]['residency_type']
     # TODO: Fix this hardcoded for DC
     when 'Not DC resident'
       person.no_dc_address = true
@@ -132,7 +132,7 @@ module GoldenSeedHelper
     # Set no one to incarcerated for now
     person.is_incarcerated = false
     # Most are set to Y in spreadsheet
-    applying_for_assistance = case_info_hash[:person_attributes][:help_paying_for_coverage] || true
+    applying_for_assistance = case_info_hash[:person_attributes]['help_paying_for_coverage'] || true
     person.is_applying_for_assistance = truthy_value?(applying_for_assistance)
     person.save!
     person
@@ -144,7 +144,7 @@ module GoldenSeedHelper
     family.person_id = case_info_hash[:primary_person_record].id
     fm = family.family_members.build(
       person_id: case_info_hash[:primary_person_record].id,
-      is_primary_applicant: case_info_hash[:person_attributes][:relationship_to_primary].downcase == 'self'
+      is_primary_applicant: case_info_hash[:person_attributes]['relationship_to_primary'].downcase == 'self'
     )
     fm.save!
     family.save!
@@ -153,13 +153,13 @@ module GoldenSeedHelper
 
   def create_and_return_user(case_info_hash = {})
     providers = ["gmail", "yahoo", "hotmail"]
-    email = if case_info_hash[:person_attributes][:email]&.include?(".com")
+    email = if case_info_hash[:person_attributes]['email']&.include?(".com")
               attributes["email"]
-            elsif case_info_hash[:person_attributes][:email]
-              "#{case_info_hash[:person_attributes][:email]}#{@counter_number}@#{providers.sample}.com"
+            elsif case_info_hash[:person_attributes]['email']
+              "#{case_info_hash[:person_attributes]['email']}#{@counter_number}@#{providers.sample}.com"
             else
-              "#{case_info_hash[:primary_person_record][:first_name]}"\
-              "#{case_info_hash[:primary_person_record][:last_name]}"\
+              "#{case_info_hash[:primary_person_record]['first_name']}"\
+              "#{case_info_hash[:primary_person_record]['last_name']}"\
               "#{@counter_number}@#{providers.sample}.com"
             end
     user = User.new
@@ -186,7 +186,7 @@ module GoldenSeedHelper
       is_primary_applicant: false
     )
     fm.save!
-    relationship_to_primary = case_info_hash[:person_attributes][:relationship_to_primary].downcase.parameterize
+    relationship_to_primary = case_info_hash[:person_attributes]['relationship_to_primary'].downcase.parameterize
     case_info_hash[:primary_person_record].person_relationships.create!(
       kind: relationship_to_primary,
       relative_id: dependent_person.id
@@ -309,7 +309,9 @@ module GoldenSeedHelper
     {service_area: service_area, product: product}
   end
 
-  def generate_and_return_hbx_enrollment(consumer_role)
+  # rubocop:disable Metrics/AbcSize
+  def generate_and_return_hbx_enrollment(case_info_hash)
+    consumer_role = case_info_hash[:consumer_role_record]
     effective_on = TimeKeeper.date_of_record
     enrollment = HbxEnrollment.new(kind: "individual", consumer_role_id: consumer_role.id)
     enrollment.effective_on = effective_on
@@ -323,6 +325,8 @@ module GoldenSeedHelper
                                     eligibility_date: enrollment.effective_on, coverage_start_on: enrollment.effective_on)
       enrollment.hbx_enrollment_members << hem
     end
+    aptc_present = truthy_value?(case_info_hash[:person_attributes]['aptc_amount'])
+    enrollment.applied_aptc_amount = case_info_hash[:person_attributes]['aptc_amount'].gsub("$", '').strip if aptc_present
     consumer_role.person.primary_family.active_household.hbx_enrollments << enrollment
     consumer_role.person.primary_family.active_household.save!
     enrollment.select_coverage! if enrollment.save!
@@ -330,6 +334,7 @@ module GoldenSeedHelper
     enrollment.update_attributes!(aasm_state: 'coverage_selected')
     puts("#{enrollment.aasm_state} HBX Enrollment created for #{consumer_role.person.full_name}") unless Rails.env.test?
   end
+  # rubocop:enable Metrics/AbcSize
 end
 
 # rubocop:enable Metrics/ModuleLength

@@ -31,9 +31,10 @@ class GoldenSeedIndividual < MongoidMigrationTask
     ivl_csv = File.read(ivl_testbed_scenario_csv)
     puts("CSV #{ivl_testbed_scenario_csv} present for IVL Golden Seed, using CSV for seed.") unless Rails.env.test?
     CSV.parse(ivl_csv, :headers => true).each do |person_attributes|
-      person_attributes = person_attributes.to_h.with_indifferent_access
+      # person_attributes = person_attributes.to_h.with_indifferent_access
       primary_family_for_current_case = case_collection[person_attributes["case_name"]]&.dig(:family_record)
-      fa_enabled_and_required_for_case = EnrollRegistry.feature_enabled?(:financial_assistance) && person_attributes[:help_paying_for_coverage]
+      fa_enabled_and_required_for_case = EnrollRegistry.feature_enabled?(:financial_assistance) &&
+                                         person_attributes['help_paying_for_coverage']
       case_included_in_keys = case_collection.keys.include?(person_attributes["case_name"])
       case_collection[person_attributes["case_name"]] = {} if case_included_in_keys.blank?
       case_collection[person_attributes["case_name"]][:person_attributes] = person_attributes
@@ -46,7 +47,7 @@ class GoldenSeedIndividual < MongoidMigrationTask
           applicant_record = create_and_return_fa_applicant(case_collection[person_attributes["case_name"]])
           case_collection[person_attributes["case_name"]][:target_fa_applicant] = applicant_record
           case_collection[person_attributes["case_name"]][:fa_applicants] = [] unless case_collection[person_attributes["case_name"]][:applicants].is_a?(Array)
-          case_collection[person_attributes["case_name"]][:fa_applicants] << {applicant_record: applicant_record, relationship_to_primary: person_attributes[:relationship_to_primary]}
+          case_collection[person_attributes["case_name"]][:fa_applicants] << {applicant_record: applicant_record, relationship_to_primary: person_attributes['relationship_to_primary']}
           case_info_hash = case_collection[person_attributes["case_name"]]
           add_applicant_income(case_info_hash)
           add_applicant_deductions(case_info_hash)
@@ -62,9 +63,7 @@ class GoldenSeedIndividual < MongoidMigrationTask
           case_collection[person_attributes["case_name"]]
         )
         consumer_people_and_users[case_collection[person_attributes["case_name"]][:primary_person_record].full_name] = case_collection[person_attributes["case_name"]][:user_record]
-        generate_and_return_hbx_enrollment(
-          case_collection[person_attributes["case_name"]][:consumer_role_record]
-        )
+        generate_and_return_hbx_enrollment(case_collection[person_attributes["case_name"]])
         case_collection[person_attributes["case_name"]][:person_attributes][:current_target_person] = case_collection[person_attributes["case_name"]][:primary_person_record]
         if fa_enabled_and_required_for_case
           application = create_and_return_fa_application(case_collection[person_attributes["case_name"]])
@@ -72,7 +71,7 @@ class GoldenSeedIndividual < MongoidMigrationTask
           applicant_record = create_and_return_fa_applicant(case_collection[person_attributes["case_name"]], true)
           case_collection[person_attributes["case_name"]][:target_fa_applicant] = applicant_record
           case_collection[person_attributes["case_name"]][:fa_applicants] = [] unless case_collection[person_attributes["case_name"]][:applicants].is_a?(Array)
-          case_collection[person_attributes["case_name"]][:fa_applicants] << {applicant_record: applicant_record, relationship_to_primary: person_attributes[:relationship_to_primary]}
+          case_collection[person_attributes["case_name"]][:fa_applicants] << {applicant_record: applicant_record, relationship_to_primary: person_attributes['relationship_to_primary']}
           add_applicant_income(case_collection[person_attributes["case_name"]])
         end
       end
@@ -139,6 +138,7 @@ class GoldenSeedIndividual < MongoidMigrationTask
     consumer_people_and_users.each do |person_full_name, user_record|
       puts(person_full_name.to_s) unless Rails.env.test?
       if user_record.person.primary_family.family_members.count > 1
+        puts("With enrollment with APTC present.") if user_record.person.primary_family.hbx_enrollments.detect { |enrollment| enrollment.applied_aptc_amount.present? }
         puts("With dependents:") unless Rails.env.test?
         dependent_names = user_record.person.primary_family.family_members.reject(&:is_primary_applicant?)
         dependent_names.each { |family_member| puts(family_member&.person&.full_name) unless Rails.env.test? }
