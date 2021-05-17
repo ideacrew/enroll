@@ -120,15 +120,23 @@ module GoldenSeedFinancialAssistanceHelper
   end
 
   def add_applicant_emails(case_info_hash)
-    # binding.irb
+    email = case_info_hash[:user_record].email || case_info_hash[:primary_person_record].emails.first.address
+    applicant = case_info_hash[:fa_applicants].last[:applicant_record]
+    puts("No email address present.") if email.blank?
+    puts("No applicant present") if applicant.blank?
+    applicant.emails.build(address: email, kind: 'home').save!
   end
 
   def add_applicant_income_response(case_info_hash)
-    # binding.irb
+    applicant = case_info_hash[:fa_applicants].last[:applicant_record]
+    applicant.valid_income_response
+    applicant.build_income_response.save!
   end
 
   def add_applicant_mec_response(case_info_hash)
-    # binding.irb
+    applicant = case_info_hash[:fa_applicants].last[:applicant_record]
+    applicant.valid_mec_response
+    applicant.build_mec_response.save!
   end
 end
 
