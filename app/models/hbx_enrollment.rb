@@ -1053,7 +1053,7 @@ class HbxEnrollment
     HbxEnrollment.where({ :sponsored_benefit_package_id.in => benefit_application.benefit_packages.pluck(:_id),
                           :coverage_kind => coverage_kind,
                           :kind => kind,
-                          :aasm_state.in => HbxEnrollment::RENEWAL_STATUSES + ['renewing_waived'] + HbxEnrollment::ENROLLED_STATUSES + ['inactive'],
+                          :aasm_state.in => HbxEnrollment::RENEWAL_STATUSES + ['renewing_waived'] + HbxEnrollment::ENROLLED_STATUSES + ['inactive', 'coverage_terminated'],
                           :effective_on.gte => benefit_application.start_on })
   end
 

@@ -70,7 +70,7 @@ module HbxAdminHelper
     if market == 'individual'
       !ivl_prior_coverage_period&.contains?(effective_date)
     else
-      person.active_employee_roles.none?{|e| e.census_employee.active_benefit_package.benefit_application.effective_period.cover?(effective_date)}
+      person.active_employee_roles.none?{|e| e.census_employee&.active_benefit_package&.benefit_application&.effective_period&.cover?(effective_date)}
     end
   end
 end

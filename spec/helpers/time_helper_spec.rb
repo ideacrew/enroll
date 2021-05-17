@@ -138,21 +138,29 @@ RSpec.describe TimeHelper, :type => :helper, dbclean: :after_each do
 
       context 'when py is expired' do
         before do
+          start_date = TimeKeeper.date_of_record.beginning_of_month - 12.months
+          end_date = start_date + 12.months - 1.day
+          effective_period = start_date..end_date
+          initial_application.update_attributes(effective_period: effective_period)
           initial_application.expire!
           census_employee.reload
         end
-        it "not returns maximum range when py is expired" do
-          expect(helper.sep_optional_date(family, 'max', nil, TimeKeeper.date_of_record - 5.days)).to eq(initial_application.end_on)
+        it "returns maximum range when py is expired" do
+          expect(helper.sep_optional_date(family, 'max', nil, TimeKeeper.date_of_record.beginning_of_month - 5.days)).to eq(initial_application.end_on)
         end
       end
 
       context 'when py is terminated' do
         before do
+          start_date = TimeKeeper.date_of_record.beginning_of_month - 12.months
+          end_date = start_date + 12.months - 1.day
+          effective_period = start_date..end_date
+          initial_application.update_attributes(effective_period: effective_period)
           initial_application.terminate_enrollment!
           census_employee.reload
         end
-        it "not returns maximum range when py is expired" do
-          expect(helper.sep_optional_date(family, 'max', nil, TimeKeeper.date_of_record - 5.days)).to eq(initial_application.end_on)
+        it "returns maximum range when py is terminated" do
+          expect(helper.sep_optional_date(family, 'max', nil, TimeKeeper.date_of_record.beginning_of_month - 5.days)).to eq(initial_application.end_on)
         end
       end
     end

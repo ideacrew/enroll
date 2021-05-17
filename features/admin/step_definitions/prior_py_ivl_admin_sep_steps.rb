@@ -112,3 +112,7 @@ end
 And(/^I see a SEP success message for (.*)$/) do |named_person|
   expect(page).to have_content("SEP Added for #{named_person}")
 end
+
+And(/^I see a SEP error message for (.*)$/) do |_named_person|
+  expect(page).to have_content("SEP not saved. (Error: Next poss effective date out of range.)")
+end

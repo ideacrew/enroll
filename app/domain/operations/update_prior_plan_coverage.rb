@@ -57,7 +57,7 @@ module Operations
         assignment = fetch_benefit_group_assignment(ba, census_employee)
         next if assignment.blank?
         next if is_employee_in_term_pending?(@enrollment, assignment)
-        renewal_enrollment = @enrollment.renew_benefit(assignment.benefit_package)
+        renewal_enrollment = renew_benefit(@enrollment, assignment.benefit_package)
         next if renewal_enrollment.blank?
         result = transition_enrollment(renewal_enrollment, ba)
         @enrollment = result.success
@@ -65,6 +65,14 @@ module Operations
         Rails.logger.error { "Error renewing coverage for employee #{enrollment.census_employee.full_name}'s due to #{e.backtrace}" }
       end
       @enrollment
+    end
+
+    def renew_benefit(enrollment, benefit_package)
+      if benefit_package.benefit_application.reinstated_id.present?
+        benefit_package.enrollment_reinstate(enrollment)
+      else
+        enrollment.renew_benefit(benefit_package)
+      end
     end
 
     def fetch_benefit_group_assignment(benefit_application, census_employee)
@@ -79,7 +87,7 @@ module Operations
 
     def transition_enrollment(enrollment, benefit_application)
       enrollment.begin_coverage! if TimeKeeper.date_of_record >= benefit_application.start_on && enrollment.may_begin_coverage?
-      enrollment.terminate_coverage_with(benefit_application.end_on) if benefit_application.termination_pending?
+      enrollment.terminate_coverage_with(benefit_application.end_on) if benefit_application.termination_pending? || benefit_application.terminated?
       Success(enrollment)
     end
 

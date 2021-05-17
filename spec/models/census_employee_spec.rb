@@ -513,6 +513,91 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     end
   end
 
+  describe '#fetch_prior_year_application' do
+    include_context "setup benefit market with market catalogs and product packages"
+
+    context 'Only Termination application exist' do
+      include_context "setup initial benefit application"
+
+      let(:census_employee) { create(:census_employee, benefit_sponsorship: benefit_sponsorship, benefit_sponsors_employer_profile_id: benefit_sponsorship.profile.id) }
+      let(:person) { FactoryBot.create(:person) }
+      let(:hired_on)        { initial_application.start_on - 10.days }
+
+      before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_sep).and_return(true)
+        termination_date = (initial_application.start_on + 4.months) - 1.day
+        effective_period = initial_application.start_on..termination_date
+        initial_application.update_attributes(aasm_state: :terminated, terminated_on: termination_date, effective_period: effective_period)
+        benefit_package = initial_application.benefit_packages[0]
+        census_employee.benefit_group_assignments << build(:benefit_group_assignment, benefit_group: benefit_package, census_employee: census_employee, start_on: benefit_package.start_on, end_on: benefit_package.end_on)
+        census_employee.reload
+      end
+
+      context 'with application end date within last 12 months' do
+        let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_month.prev_year }
+
+        it 'should return latest terminated application within last 12 months' do
+          expect(census_employee.fetch_prior_year_application).to eq initial_application
+        end
+      end
+
+      context 'with application end date not within last 12 months' do
+        let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_year.prev_year }
+
+        it 'should return latest terminated application within last 12 months' do
+          expect(census_employee.fetch_prior_year_application).to eq nil
+        end
+      end
+    end
+
+    context 'reinstated application exists' do
+      include_context "setup expired, and active benefit applications"
+
+      let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_year.prev_year }
+
+      let(:census_employee) { create(:census_employee, benefit_sponsorship: benefit_sponsorship, benefit_sponsors_employer_profile_id: benefit_sponsorship.profile.id) }
+      let(:person) { FactoryBot.create(:person) }
+      let(:hired_on)        { plan_year.start_on - 10.days }
+
+      before do
+        census_employee.benefit_group_assignments << build(:benefit_group_assignment, benefit_group: expired_benefit_package, census_employee: census_employee, start_on: expired_benefit_package.start_on, end_on: expired_benefit_package.end_on)
+        census_employee.benefit_group_assignments << build(:benefit_group_assignment, benefit_group: active_benefit_package, census_employee: census_employee, start_on: active_benefit_package.start_on, end_on: active_benefit_package.end_on)
+        period = active_benefit_application.effective_period.min..TimeKeeper.date_of_record.end_of_month
+        active_benefit_application.update_attributes!(termination_reason: 'nonpayment', terminated_on: period.max, effective_period: period)
+        active_benefit_application.schedule_enrollment_termination!
+        EnrollRegistry[:benefit_application_reinstate].feature.stub(:is_enabled).and_return(true)
+        EnrollRegistry[:benefit_application_reinstate]{ {params: {benefit_application: active_benefit_application, options: {transmit_to_carrier: true} } } }
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_sep).and_return(true)
+        census_employee.reload
+      end
+
+      it 'should return prior year expired application' do
+        expect(census_employee.fetch_prior_year_application).to eq expired_benefit_application
+      end
+    end
+
+    context 'active application exists' do
+      include_context "setup expired, and active benefit applications"
+
+      let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_year.prev_year }
+
+      let(:census_employee) { create(:census_employee, benefit_sponsorship: benefit_sponsorship, benefit_sponsors_employer_profile_id: benefit_sponsorship.profile.id) }
+      let(:person) { FactoryBot.create(:person) }
+      let(:hired_on)        { plan_year.start_on - 10.days }
+
+      before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_sep).and_return(true)
+        census_employee.benefit_group_assignments << build(:benefit_group_assignment, benefit_group: expired_benefit_package, census_employee: census_employee, start_on: expired_benefit_package.start_on, end_on: expired_benefit_package.end_on)
+        census_employee.benefit_group_assignments << build(:benefit_group_assignment, benefit_group: active_benefit_package, census_employee: census_employee, start_on: active_benefit_package.start_on, end_on: active_benefit_package.end_on)
+        census_employee.reload
+      end
+
+      it 'should return prior year expired application' do
+        expect(census_employee.fetch_prior_year_application).to eq expired_benefit_application
+      end
+    end
+  end
+
   describe '#eligible_for?' do
     include_context "setup benefit market with market catalogs and product packages"
     include_context "setup expired, and active benefit applications"

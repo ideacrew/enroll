@@ -646,6 +646,10 @@ class CensusEmployee < CensusMember
     benefit_package_ids.include?(assignment&.benefit_package&.id) ? assignment : nil
   end
 
+  def most_recent_terminated_benefit_application
+    benefit_sponsorship.most_recent_terminated_benefit_application
+  end
+
   # DEPRECATE IF POSSIBLE
   def published_benefit_group_assignment
     assignments = benefit_group_assignments.select do |benefit_group_assignment|
@@ -885,16 +889,12 @@ class CensusEmployee < CensusMember
 
   def prior_py_sep?(effective_date)
     return false if effective_date.blank?
+    prior_py = fetch_prior_year_application
+    return false unless prior_py.present?
 
-    offset_months = EnrollRegistry[:prior_plan_year_sep].setting(:offset_months).item
-    start_date = TimeKeeper.date_of_record.beginning_of_year
-    end_date = start_date - offset_months.months
-
-    terminated_states = [:terminated, :expired, :termination_pending]
-    term_or_expired_bas = benefit_sponsorship.benefit_applications.future_effective_date(end_date).where(:aasm_state.in => terminated_states)
-    benefit_application = term_or_expired_bas.detect{|ba| (ba.start_on..ba.end_on).cover?(effective_date)}
+    benefit_application = (prior_py.start_on..prior_py.end_on).cover?(effective_date)
     return false unless benefit_application
-    return false unless eligible_for?(effective_date, benefit_application)
+    return false unless eligible_for?(effective_date, prior_py)
     true
   end
 
@@ -902,6 +902,36 @@ class CensusEmployee < CensusMember
     benefit_group_assignment = benefit_package_assignment_on(benefit_application.end_on)
     return false unless benefit_group_assignment
     benefit_group_assignment.benefit_package.eligible_on(hired_on) <= effective_date && benefit_group_assignment.is_active?(benefit_application.end_on)
+  end
+
+  def fetch_prior_year_application
+    active_application = benefit_sponsorship.active_benefit_application
+    if active_application.present?
+      fetch_prior_py_for_active_application(active_application)
+    else
+      fetch_prior_py_terminated_group
+    end
+  end
+
+  def fetch_prior_py_for_active_application(active_application)
+    terminated_states = [:terminated, :expired]
+    start_date = if active_application.reinstated_id.present?
+                   active_application.benefit_sponsor_catalog.effective_period.min
+                 else
+                   active_application.effective_period.min
+                 end
+    benefit_sponsorship.benefit_applications.where(:"effective_period.max" => start_date - 1.day, :aasm_state.in => terminated_states).max_by(&:created_at)
+  end
+
+  def fetch_prior_py_terminated_group
+    terminated_states = [:terminated, :expired]
+    offset_months = EnrollRegistry[:prior_plan_year_sep].setting(:offset_months).item
+    start_date = TimeKeeper.date_of_record.beginning_of_month - offset_months.months
+    end_date = start_date + offset_months.months - 1.day
+    term_application = benefit_sponsorship.benefit_applications.where(:aasm_state.in => terminated_states).max_by(&:created_at)
+    return nil unless term_application
+
+    (start_date..end_date).cover?(term_application.effective_period.max) ? term_application : nil
   end
 
   def active_benefit_group_assignment=(benefit_package_id)
