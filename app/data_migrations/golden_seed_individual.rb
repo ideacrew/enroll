@@ -78,16 +78,17 @@ class GoldenSeedIndividual < MongoidMigrationTask
       @counter_number += 1
     end
     if EnrollRegistry.feature_enabled?(:financial_assistance)
-      puts(
-        "Family and Financial Assistance set up complete."\
-        " Creating relationships and then submitting all FA applications"
-      ) unless Rails.env.test?
+      unless Rails.env.test?
+        puts(
+          "Family and Financial Assistance set up complete."\
+          " Creating relationships and then submitting all FA applications"
+        )
+      end
       case_collection.each do |case_array|
-        if case_array[1][:fa_application]
-          create_fa_relationships(case_array)
-          puts("Submitting financial assistance application.") unless Rails.env.test?
-          case_array[1][:fa_application].submit!
-        end
+        next unless case_array[1][:fa_application]
+        create_fa_relationships(case_array)
+        puts("Submitting financial assistance application.") unless Rails.env.test?
+        case_array[1][:fa_application].submit!
       end
     end
   end
