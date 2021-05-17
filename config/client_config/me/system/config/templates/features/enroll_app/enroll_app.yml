@@ -242,7 +242,11 @@ registry:
             item: ['']
           - key: :plan_year_tooltip
             item: ""
+<<<<<<< HEAD
           - key: :county_fips_code_enabled
+=======
+          - key: :send_rating_area_for_ivl_policy_to_edi
+>>>>>>> origin/me-rating-area-tobacco-xml-changes
             item: true
       - key: :rating_area
         item: :rating_area
