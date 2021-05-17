@@ -1061,23 +1061,22 @@ class CensusEmployee < CensusMember
       ]
 
       CSV.generate(headers: true) do |csv|
-        csv << (["#{Settings.site.long_name} Employee Census Template"] +  6.times.collect{ "" } + [Date.new(2016,10,26)] + 5.times.collect{ "" } + ["1.1"])
-        csv << %w(employer_assigned_family_id employee_relationship last_name first_name  middle_name name_sfx  email ssn dob gender  hire_date termination_date  is_business_owner benefit_group plan_year kind  address_1 address_2 city  state zip)
+        csv << (["#{Settings.site.long_name} Employee Census Template"] + 6.times.collect{ "" } + [] + 5.times.collect{ "" } + [])
+        csv << %w[employer_assigned_family_id employee_relationship last_name first_name middle_name name_sfx email ssn dob gender hire_date termination_date is_business_owner benefit_group plan_year kind address_1 address_2 city state zip]
         csv << columns
         census_employees_query_criteria(employer_profile_id).each do |rec|
           is_active = rec["benefit_group_assignments"].present? ? rec["benefit_group_assignments"].any?{|bga| (bga["start_on"]..bga["end_on"]).cover?(TimeKeeper.date_of_record)} : false
           csv << insert_census_data(rec, is_active)
 
-          if rec["census_dependents"].present?
-            rec["census_dependents"].each do |dependent|
-              csv << insert_census_data(dependent, is_active)
-            end
+          next unless rec["census_dependents"].present?
+          rec["census_dependents"].each do |dependent|
+            csv << insert_census_data(dependent, is_active)
           end
         end
       end
     end
 
-    def insert_census_data(rec, is_active)
+    def insert_census_data(rec, _is_active)
       values = [
         rec["employer_assigned_family_id"],
         relationship_mapping[rec["employee_relationship"]],
@@ -1091,33 +1090,35 @@ class CensusEmployee < CensusMember
         rec["gender"]
       ]
 
-      if is_active
-        if rec["hired_on"].present?
-          values += [
-            rec["hired_on"].present? ? rec["hired_on"].strftime("%m/%d/%Y") : "",
-            rec["employment_terminated_on"].present? ? rec["employment_terminated_on"].strftime("%m/%d/%Y") : "",
-            rec["is_business_owner"] ? "yes" : "no"
-          ]
-        else
-          values += ["", "", "no"]
-        end
-
-        values += 2.times.collect{ "" }
-        if rec["address"].present?
-          array = []
-          array.push(rec["address"]["kind"])
-          array.push(rec["address"]["address_1"])
-          array.push(rec["address"]["address_2"].to_s)
-          array.push(rec["address"]["city"])
-          array.push(rec["address"]["state"])
-          array.push(rec["address"]["zip"])
-          values += array
-        else
-          values += 6.times.collect{ "" }
-        end
-      end
-
+      # if is_active #is not optional anymore
+      values += if rec["hired_on"].present?
+                  [
+                      rec["hired_on"].present? ? rec["hired_on"].strftime("%m/%d/%Y") : "",
+                      rec["employment_terminated_on"].present? ? rec["employment_terminated_on"].strftime("%m/%d/%Y") : "",
+                      rec["is_business_owner"] ? "yes" : "no"
+                    ]
+                else
+                  ["", "", "no"]
+                end
+      values += 2.times.collect{ "" }
+      values += insert_census_employees_address(rec)
       values
+      # end
+    end
+
+    def insert_census_employees_address(rec)
+      if rec["address"].present?
+        array = []
+        array.push(rec["address"]["kind"])
+        array.push(rec["address"]["address_1"])
+        array.push(rec["address"]["address_2"].to_s)
+        array.push(rec["address"]["city"])
+        array.push(rec["address"]["state"])
+        array.push(rec["address"]["zip"])
+        array
+      else
+        6.times.collect{ "" }
+      end
     end
 
     def relationship_mapping
