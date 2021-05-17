@@ -39,28 +39,70 @@ module GoldenSeedFinancialAssistanceHelper
     return if applicants.blank?
     applicants.each do |applicant|
       relationship_to_primary = applicant[:relationship_to_primary].downcase
+      next if relationship_to_primary == 'self'
       application.relationships.create!(
         applicant_id: applicant[:applicant_record].id,
         relative_id: primary_applicant.id,
-        kind: relationship_to_primary
+        kind: FinancialAssistance::Relationship::INVERSE_MAP[relationship_to_primary]
       )
       application.relationships.create!(
         applicant_id: primary_applicant.id,
         relative_id: applicant[:applicant_record].id,
-        kind: FinancialAssistance::Relationship::INVERSE_MAP[relationship_to_primary]
+        kind: relationship_to_primary
       )
-      binding.irb
     end
+    application.reload
+    application.complete? ? puts("application complete") : puts("application incomplete")
   end
 
-  # TODO: NEED TO DO MEDICAID AND OTHER STUFF
   def add_applicant_income(case_info_hash)
-    return nil if case_info_hash[:person_attributes][:tax_filing_status] == 'non_filer' || case_info_hash[:person_attributes][:frequency].downcase == 'n/a'
+    return nil if case_info_hash[:person_attributes][:tax_filing_status] == 'non_filer' ||
+    case_info_hash[:person_attributes][:income_frequency_kind].downcase == 'n/a'
     income = case_info_hash[:target_fa_applicant].incomes.build
-    income.amount = case_info_hash[:person_attributes][:amount]
-    income.frequency_kind = case_info_hash[:person_attributes][:frequency].downcase
-    income.start_on = case_info_hash[:person_attributes][:from]
+    income.amount = case_info_hash[:person_attributes][:income_amount]
+    income.frequency_kind = case_info_hash[:person_attributes][:income_frequency_kind].downcase
+    income.start_on = case_info_hash[:person_attributes][:income_from]
     income.save!
     income
+  end
+
+  def add_applicant_deductions(case_info_hash)
+    applicant.deductions.build(
+      amount: "",
+      kind: "",
+      frequency_kind: "",
+      start_on_must_precede_end_on: "",
+      start_on: ""
+    )
+  end
+
+  def add_applicant_benefits(case_info_hash)
+    binding.irb
+
+  end
+
+  def add_applicant_addresses(case_info_hash)
+    binding.irb
+
+  end
+
+  def add_applicant_phones(case_info_hash)
+    binding.irb
+
+  end
+
+  def add_applicant_emails(case_info_hash)
+    binding.irb
+
+  end
+
+  def add_applicant_income_response(case_info_hash)
+    binding.irb
+
+  end
+
+  def add_applicant_mec_response(case_info_hash)
+    binding.irb
+
   end
 end

@@ -46,7 +46,15 @@ class GoldenSeedIndividual < MongoidMigrationTask
           case_collection[person_attributes["case_name"]][:target_fa_applicant] = applicant_record
           case_collection[person_attributes["case_name"]][:fa_applicants] = [] unless case_collection[person_attributes["case_name"]][:applicants].is_a?(Array)
           case_collection[person_attributes["case_name"]][:fa_applicants] << {applicant_record: applicant_record, relationship_to_primary: person_attributes[:relationship_to_primary]}
-          add_applicant_income(case_collection[person_attributes["case_name"]])
+          case_info_hash = case_collection[person_attributes["case_name"]]
+          add_applicant_income(case_info_hash)
+          add_applicant_deductions(case_info_hash)
+          add_applicant_benefits(case_info_hash)
+          add_applicant_addresses(case_info_hash)
+          add_applicant_phones(case_info_hash)
+          add_applicant_emails(case_info_hash)
+          add_applicant_income_response(case_info_hash)
+          add_applicant_mec_response(case_info_hash)
         end
       else
         case_collection[person_attributes["case_name"]] = create_and_return_matched_consumer_and_hash(
