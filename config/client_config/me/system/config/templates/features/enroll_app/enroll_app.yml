@@ -242,6 +242,8 @@ registry:
             item: ['']
           - key: :plan_year_tooltip
             item: ""
+          - key: :county_fips_code_enabled
+            item: true
       - key: :rating_area
         item: :rating_area
         is_enabled: false
