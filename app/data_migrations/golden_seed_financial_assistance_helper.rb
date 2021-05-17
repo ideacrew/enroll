@@ -53,14 +53,12 @@ module GoldenSeedFinancialAssistanceHelper
         kind: relationship_to_primary
       )
     end
-    application.reload
-    application.complete? ? puts("application complete") : puts("application incomplete")
   end
 
   def add_applicant_income(case_info_hash)
-    return nil if case_info_hash[:person_attributes][:tax_filing_status].nil? ||
-                  case_info_hash[:person_attributes][:tax_filing_status] == 'non_filer' ||
-                  case_info_hash[:person_attributes][:income_frequency_kind].downcase == 'n/a'
+    return if case_info_hash[:person_attributes][:tax_filing_status].nil? ||
+              case_info_hash[:person_attributes][:tax_filing_status] == 'non_filer' ||
+              !truthy_value?(case_info_hash.dig(:person_attributes, :income_frequency_kind))
     income = case_info_hash[:target_fa_applicant].incomes.build
     income.amount = case_info_hash[:person_attributes][:income_amount]
     income.frequency_kind = case_info_hash[:person_attributes][:income_frequency_kind].downcase
