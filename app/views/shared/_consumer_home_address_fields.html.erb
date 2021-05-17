@@ -97,7 +97,7 @@
             <% @counties = BenefitMarkets::Locations::CountyZip.where(zip: address.object.try(:zip)).pluck(:county_name).uniq %>
             <% @empty_message = address.object.try(:zip).nil? ? 'Please provide a zip code' : "Zip code outside supported area" %>
             <% @counties = [@empty_message] if @counties.empty? %>
-            <%= address.select(:county, options_for_select(@counties, selected: (address.object.try(:county) || @counties.first)),{},class:'form-control form-group-lg', data: { target: 'zip-check.countySelect', options: BenefitMarkets::Locations::CountyZip.all.map(&:county_name).uniq })%>
+            <%= address.select(:county, options_for_select(@counties, selected: (address.object.try(:county) || @counties.first)),{},class:'form-control form-group-lg county-input', data: { target: 'zip-check.countySelect', options: BenefitMarkets::Locations::CountyZip.all.map(&:county_name).uniq })%>
           </div>
         <% end %>
       </div>
@@ -161,8 +161,8 @@
 <% end %>
 
 <script type="text/javascript">
-  $(function() {
-    $('select').selectric('destroy');
-  });
+  $(document).on('ready page:load turbolinks:load', function () {
+    $('select.county-input').selectric('destroy');
+  })
 </script>
 
