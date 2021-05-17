@@ -49,6 +49,10 @@ describe "Golden Seed Rake Tasks", dbclean: :after_each do
               ).to be > 0
             end
 
+            it "should create hbx enrollments with applied_aptc_amount" do
+              expect(HbxEnrollment.where(:applied_aptc_amount.ne => nil).count).to be > 0
+            end
+
             it "should create person records with financial_assistance_identifier attributes" do
               expect(Person.all.select { |person| person.financial_assistance_identifier.present? }).to_not eq(nil)
             end
