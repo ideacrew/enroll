@@ -19,6 +19,9 @@ class HbxEnrollmentMember
   field :coverage_start_on, type: Date
   field :coverage_end_on, type: Date
 
+  # Allowed values are 'Y', 'N', or nil for 'NA'
+  field :tobacco_use, type: String
+
   validates_presence_of :applicant_id, :is_subscriber, :eligibility_date,# :premium_amount,
     :coverage_start_on
 
@@ -86,9 +89,13 @@ class HbxEnrollmentMember
   end
 
   def self.new_from(coverage_household_member:)
+    is_tobacco_user = coverage_household_member&.family_member&.person&.is_tobacco_user
+    tobacco_use = is_tobacco_user == 'unknown' ? 'NA' : is_tobacco_user
+
     new(
       applicant_id: coverage_household_member.family_member_id,
-      is_subscriber: coverage_household_member.is_subscriber
+      is_subscriber: coverage_household_member.is_subscriber,
+      tobacco_use: tobacco_use
     )
   end
 
@@ -110,6 +117,10 @@ class HbxEnrollmentMember
       return false unless coverage_relationship_check(dental_relationship_benefits, family_member, hbx_enrollment.benefit_group.effective_on_for(hbx_enrollment.employee_role.hired_on))
     end
     true
+  end
+
+  def tobacco_use_value
+    tobacco_use.blank? ? "NA" : tobacco_use
   end
 
   private
