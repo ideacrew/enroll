@@ -105,6 +105,14 @@ module BenefitApplicationWorld
     service.terminate_application
   end
 
+  def reinstate_application(application)
+    terminate_application(application, application.end_on - 4.months)
+    application.reload
+    EnrollRegistry[:benefit_application_reinstate].feature.stub(:is_enabled).and_return(true)
+    EnrollRegistry[:benefit_application_reinstate]{ {params: {benefit_application: application, options: {transmit_to_carrier: true} } } }
+    application.benefit_sponsorship.benefit_applications.detect{|app| app.reinstated_id.present?}
+  end
+
   def initial_application
     @new_application
   end
@@ -193,9 +201,10 @@ And(/^employer (.*) has (.*) and (.*) benefit applications$/) do |legal_name, ea
   @prior_application = create_application(new_application_status: earlier_application_status.to_sym, effective_date: effective_date,
                                           recorded_rating_area: @rating_area, recorded_service_area: @service_area)
 
-
+  state = new_application_status == 'reinstated_active' ? 'active' : new_application_status
   @active_application = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(@prior_application).renew_application[1]
-  @active_application.update_attributes!(aasm_state: new_application_status.to_sym)
+  @active_application.update_attributes!(aasm_state: state.to_sym)
+  @active_application = reinstate_application(@active_application) if new_application_status == 'reinstated_active'
   @prior_application.update_attributes!(aasm_state: :active) if earlier_application_status == 'terminated'
   terminate_application(@prior_application, @prior_application.end_on - 3.months) if earlier_application_status == 'terminated'
 end

@@ -50,6 +50,15 @@ Then(/.+ see enrollments generated in expired and active py, with existing activ
   expect(effective_on_states).to match_array(["coverage_canceled", "coverage_enrolled", "coverage_expired", "coverage_terminated"])
 end
 
+Then(/.+ see enrollments generated in expired and active reinstated py, with existing active enr canceled and expired enr terminated for (.*)/) do |named_person|
+  person = people[named_person]
+  person_record = Person.where(first_name: person[:first_name], last_name: person[:last_name]).last
+  family = person_record.primary_family
+  expect(family.hbx_enrollments.count).to eq 5
+  effective_on_states = family.hbx_enrollments.map(&:aasm_state)
+  expect(effective_on_states).to match_array(["coverage_canceled", "coverage_terminated", "coverage_expired", "coverage_termination_pending", "coverage_selected"])
+end
+
 Then(/.+ see enrollments generated expired, active and renewing py with existing active enr canceled and expired enr terminated for (.*)/) do |named_person|
   person = people[named_person]
   person_record = Person.where(first_name: person[:first_name], last_name: person[:last_name]).last
@@ -84,6 +93,16 @@ And(/employee (.*) has employer sponsored enrollment in active py/) do |named_pe
   benefit_package = @active_application.benefit_packages.first
   sponsored_benefit = benefit_package.sponsored_benefit_for('health')
   create_health_enrollment_for_employee(employee_role, benefit_package, sponsored_benefit, 'coverage_enrolled')
+end
+
+And(/^employer (.*) has (.*) benefit application$/) do |legal_name, application_status|
+  @employer_profile = employer_profile(legal_name)
+  effective_date = TimeKeeper.date_of_record.beginning_of_month.prev_year
+  @prior_application = create_application(new_application_status: application_status.to_sym, effective_date: effective_date,
+                                          recorded_rating_area: @rating_area, recorded_service_area: @service_area)
+
+  @prior_application.update_attributes!(aasm_state: :active) if application_status == 'terminated'
+  terminate_application(@prior_application, (@prior_application.end_on - 3.months).end_of_month) if application_status == 'terminated'
 end
 
 And(/employee (.*) has employer sponsored enrollment in expired, active and renewal py/) do |named_person|
