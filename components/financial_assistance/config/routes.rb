@@ -31,6 +31,7 @@ FinancialAssistance::Engine.routes.draw do
       get 'step/:step', on: :member, action: 'step', as: 'go_to_step'
       get :age_of_applicant
       get :primary_applicant_has_spouse
+      get :applicant_is_eligible_for_joint_filing
       get 'other_questions', on: :member, action: 'other_questions', as: 'other_questions'
       get 'save_questions', on: :member, action: 'save_questions', as: 'save_questions'
       get :immigration_document_options, on: :collection
