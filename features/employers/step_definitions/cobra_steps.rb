@@ -427,3 +427,8 @@ And(/employer selects Add New Employee button on employee roster/) do
   find('.interaction-click-control-add-new-employee').click
   wait_for_ajax(3,2)
 end
+
+And(/census employee has a Cobra Enrollment present/) do
+  cobra_enrollment_count = @census_employees.first.active_benefit_group_enrollments.non_cobra.enrollments_for_cobra.count
+  expect(cobra_enrollment_count).to be > 0
+end
