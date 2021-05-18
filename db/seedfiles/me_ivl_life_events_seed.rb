@@ -526,6 +526,27 @@ QualifyingLifeEventKind.find_or_create_by(
   )
 end
 
+# TODO: First of next month plan selectiono
+QualifyingLifeEventKind.find_or_create_by(
+  title: "Change in eligibility for cost-sharing reductions"
+).tap do |qlek|
+  qlek.update_attributes(
+  tool_tip: "A marketplace enrollee is found newly eligible or ineligible for cost-sharing reductions",
+  event_kind_label: "Today's date",
+  action_kind: "transition_member",
+  market_kind: "individual",
+  ordinal_position: 120,
+  reason: "csr_eligibility_change",
+  edi_code: "",
+  effective_on_kinds: ["first_of_next_month"],
+  pre_event_sep_in_days: 0,
+  post_event_sep_in_days: 60,
+  is_self_attested: false,
+  is_visible: true,
+  date_options_available: false
+  )
+end
+
 
 puts "::: IVL QualifyingLifeEventKinds Complete :::"
 puts "*" * 80
