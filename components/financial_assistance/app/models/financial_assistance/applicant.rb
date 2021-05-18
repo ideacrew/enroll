@@ -891,6 +891,10 @@ module FinancialAssistance
       benefits.any_medicare.present?
     end
 
+    def display_student_question?
+      age_of_applicant > 17 && age_of_applicant < 23
+    end
+
     class << self
       def find(id)
         return nil unless id
