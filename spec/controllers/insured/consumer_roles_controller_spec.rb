@@ -459,9 +459,9 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         allow(controller).to receive(:update_vlp_documents).and_return(true)
         allow(controller).to receive(:is_new_paper_application?).and_return false
         put :update, params: {person: person_params, id: "test"}
-        expect(consumer_role.identity_validation). to eq 'valid'
-        expect(consumer_role.identity_validation). to eq 'valid'
-        expect(consumer_role.identity_update_reason). to eq 'Verified from Curam'
+        expect(consumer_role.identity_validation).to eq 'valid'
+        expect(consumer_role.identity_validation).to eq 'valid'
+        expect(consumer_role.identity_update_reason).to eq 'Verified from Curam'
         expect(response).to have_http_status(:redirect)
         routes { FinancialAssistance::Engine.routes }
         expect(response).to redirect_to '/insured/consumer_role/help_paying_coverage'
@@ -473,9 +473,9 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         allow(controller).to receive(:update_vlp_documents).and_return(true)
         allow(controller).to receive(:is_new_paper_application?).and_return false
         put :update, params: {person: person_params, id: "test"}
-        expect(consumer_role.identity_validation). to eq 'valid'
-        expect(consumer_role.identity_validation). to eq 'valid'
-        expect(consumer_role.identity_update_reason). to eq 'Verified from Curam'
+        expect(consumer_role.identity_validation).to eq 'valid'
+        expect(consumer_role.identity_validation).to eq 'valid'
+        expect(consumer_role.identity_update_reason).to eq 'Verified from Curam'
         expect(response).to have_http_status(:redirect)
         expect(response).to redirect_to(insured_family_members_path(consumer_role_id: consumer_role.id))
       end
@@ -495,9 +495,9 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         allow(controller).to receive(:update_vlp_documents).and_return(true)
         allow(controller).to receive(:is_new_paper_application?).and_return false
         put :update, params: {person: person_params, id: "test"}
-        expect(consumer_role.identity_validation). to eq 'valid'
-        expect(consumer_role.identity_validation). to eq 'valid'
-        expect(consumer_role.identity_update_reason). to eq 'Verified from Mobile'
+        expect(consumer_role.identity_validation).to eq 'valid'
+        expect(consumer_role.identity_validation).to eq 'valid'
+        expect(consumer_role.identity_update_reason).to eq 'Verified from Mobile'
         expect(response).to have_http_status(:redirect)
         routes { FinancialAssistance::Engine.routes }
         expect(response).to redirect_to '/insured/consumer_role/help_paying_coverage'
