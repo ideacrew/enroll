@@ -112,7 +112,7 @@ QualifyingLifeEventKind.find_or_create_by(
     market_kind: "individual",
     event_kind_label: "Date of move",
     ordinal_position: 60,
-    reason: "relocate",
+    reason: "moved",
     edi_code: "43-CHANGE OF LOCATION",
     effective_on_kinds: ["first_of_next_month"],
     pre_event_sep_in_days: 60,
@@ -131,7 +131,7 @@ QualifyingLifeEventKind.find_or_create_by(
     action_kind: "add_member",
     market_kind: "individual",
     ordinal_position: 70,
-    reason: "enrollment_error_or_misconduct_hbx",
+    reason: "enrollment_error_hbx",
     edi_code: " ",
     effective_on_kinds: ["first_of_next_month", "first_of_month"],
     pre_event_sep_in_days: 0,
@@ -170,7 +170,7 @@ QualifyingLifeEventKind.find_or_create_by(
     market_kind: "individual",
     event_kind_label: "Today's date",
     ordinal_position: 100,
-    reason: "qualified_native_american",
+    reason: "native_american",
     edi_code: " ",
     effective_on_kinds: ["first_of_month"],
     pre_event_sep_in_days: 0,
@@ -183,14 +183,14 @@ end
 
 
 QualifyingLifeEventKind.find_or_create_by(
-  title: "Beginning or ending AmeriCorps service").tap do |qlek|
+  title: "Starting or ending AmeriCorps service").tap do |qlek|
   qlek.update_attributes(
   tool_tip: "Someone is beginning or ending service with AmeriCorps State and National, VISTA, or NCCC",
   action_kind: "add_member",
   market_kind: "individual",
   event_kind_label: "Date service begins or ends",
   ordinal_position: 100,
-  reason: "exceptional_circumstances_civic_service",
+  reason: "americorps",
   edi_code: " ",
   effective_on_kinds: ["first_of_next_month"],
   pre_event_sep_in_days: 0,
@@ -230,7 +230,7 @@ QualifyingLifeEventKind.find_or_create_by(
   market_kind: "individual",
   event_kind_label: "Date of status change",
   ordinal_position: 100,
-  reason: "eligibility_change_immigration_status",
+  reason: "citizenship_immigration_change",
   edi_code: " ",
   effective_on_kinds: ["first_of_month"],
   pre_event_sep_in_days: 0,
@@ -258,27 +258,6 @@ QualifyingLifeEventKind.find_or_create_by(
   is_self_attested: false,
   is_visible: false,
   date_options_available: false
-  )
-end
-
-QualifyingLifeEventKind.find_or_create_by(
-  title: "Enrollment error caused by my health insurance company"
-).tap do |qlek|
-  qlek.update_attributes(
-  tool_tip: "You are not enrolled or are enrolled in the wrong plan because of an error made by your insurance company",
-  action_kind: "add_member",
-  market_kind: "individual",
-  ordinal_position: 100,
-  reason: "enrollment_error_or_misconduct_issuer",
-  edi_code: " ",
-  effective_on_kinds: ["first_of_next_month", "first_of_month"],
-  pre_event_sep_in_days: 0,
-  post_event_sep_in_days: 60,
-  is_self_attested: false,
-  is_visible: false,
-  date_options_available: false
-    # start_of_sep: "Date approved by HBX",
-    # coverage_effective_date: "Regular effective date")
   )
 end
 
