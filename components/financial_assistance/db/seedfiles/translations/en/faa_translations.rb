@@ -21,7 +21,9 @@ module FaaTranslations
     "en.faa.we_have_your_results" => "We have your results",
     "en.faa.medicaid" => "Medicaid",
     "en.faa.eligible_for_medicaid" => "These people <span>appear to be eligible</span> for Medicaid",
-    "en.faa.dhs_decision" => "<span>PLEASE NOTE: The DC Department of Human Services (DHS) will make a final decision on whether those listed qualify for <span class='glossary-tooltips' tabindex='0' data-trigger='focus' data-title= 'Medicaid' data-placement='bottom' data-toggle='tooltip' data-html='true' title='<%= l10n('glossary.medicaid') %>'> Medicaid.</span>.</span>",
+    "en.faa.dhs_decision" =>
+      "<span>PLEASE NOTE: The DC Department of Human Services (DHS) will make a final decision on whether those listed qualify for"\
+      " <span class='glossary-tooltips' tabindex='0' data-trigger='focus' data-title= 'Medicaid' data-placement='bottom' data-toggle='tooltip' data-html='true' title='<%= l10n('glossary.medicaid') %>'> Medicaid.</span>.</span>",
     "en.faa.dhs_contact" => "They will send you a letter, and may ask you to provide documents. If you haven’t heard from DHS within 45 days, you may want to ask for an update by calling us at (855) 532-5465.",
     "en.faa.premium_reductions_1" => "These people are <span>eligible for monthly premium reductions of",
     "en.faa.premium_reductions_2" => "per month.</span> This means they won't have to pay full price for health insurance.",

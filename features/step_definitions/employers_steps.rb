@@ -1082,18 +1082,12 @@ end
 
 
 And(/^employer should see default cobra start date$/) do
-  terminated_on = @census_employees.first.employment_terminated_on.next_month.beginning_of_month.to_s
+  terminated_on = @census_employees.first.suggested_cobra_effective_date.to_s
   expect(find('input.text-center.date-picker').value).to eq terminated_on
 end
 
-And(/^employer sets cobra start date to two months after termination date$/) do
-  date = @census_employees.first.employment_terminated_on + 2.months
-  page.execute_script("$('.datepicker').val(#{date.to_s})")
-end
-
-And(/^employer sets cobra start date to two months before termination date$/) do
-  date = @census_employees.first.employment_terminated_on - 2.months
-  find('input.text-center.date-picker').set date
+And(/^employer accepts the suggested cobra date$/) do
+  # Nothing to do here, suggeste date is hardcoded
 end
 
 When(/^EnterPrise Limited employer clicks on Initiate COBRA button$/) do
