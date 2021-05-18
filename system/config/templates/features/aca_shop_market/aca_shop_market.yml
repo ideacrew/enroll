@@ -50,9 +50,3 @@ registry:
       - key: :employer_attestation
         item: :employer_attestation
         is_enabled: false
-      - key: :cobra_enrollment_period
-        item: :cobra_enrollment_period
-        is_enabled: true
-        settings:
-          - key: :months
-            item: 6
