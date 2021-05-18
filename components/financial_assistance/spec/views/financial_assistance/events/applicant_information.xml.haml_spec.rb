@@ -117,5 +117,77 @@ RSpec.describe 'components/financial_assistance/app/views/financial_assistance/e
         expect(rendered).to include("<is_medicare_eligible>true</is_medicare_eligible>")
       end
     end
+
+    context 'is_self_attested_blind' do
+      context 'with tag' do
+        before do
+          applicant.update_attributes(is_self_attested_blind: false, is_applying_coverage: true)
+          render 'financial_assistance/events/applicant_information', applicant: applicant
+        end
+
+        it 'should include is_self_attested_blind tag' do
+          expect(rendered).to include("<is_self_attested_blind>false</is_self_attested_blind>")
+        end
+      end
+
+      context 'without tag' do
+        before do
+          applicant.update_attributes(is_self_attested_blind: nil)
+          render 'financial_assistance/events/applicant_information', applicant: applicant
+        end
+
+        it 'should not include is_self_attested_blind tag' do
+          expect(rendered).not_to include("<is_self_attested_blind>")
+        end
+      end
+    end
+
+    context 'has_daily_living_help' do
+      context 'with tag' do
+        before do
+          applicant.update_attributes(has_daily_living_help: false, is_applying_coverage: true)
+          render 'financial_assistance/events/applicant_information', applicant: applicant
+        end
+
+        it 'should include has_daily_living_help tag' do
+          expect(rendered).to include("<has_daily_living_help>false</has_daily_living_help>")
+        end
+      end
+
+      context 'without tag' do
+        before do
+          applicant.update_attributes(has_daily_living_help: nil)
+          render 'financial_assistance/events/applicant_information', applicant: applicant
+        end
+
+        it 'should not include has_daily_living_help tag' do
+          expect(rendered).not_to include("<has_daily_living_help>")
+        end
+      end
+    end
+
+    context 'has_bill_pay_3_month_help' do
+      context 'with tag' do
+        before do
+          applicant.update_attributes(need_help_paying_bills: false, is_applying_coverage: true)
+          render 'financial_assistance/events/applicant_information', applicant: applicant
+        end
+
+        it 'should include has_bill_pay_3_month_help tag' do
+          expect(rendered).to include("<has_bill_pay_3_month_help>false</has_bill_pay_3_month_help>")
+        end
+      end
+
+      context 'without tag' do
+        before do
+          applicant.update_attributes(need_help_paying_bills: nil)
+          render 'financial_assistance/events/applicant_information', applicant: applicant
+        end
+
+        it 'should not include has_bill_pay_3_month_help tag' do
+          expect(rendered).not_to include("<has_bill_pay_3_month_help>")
+        end
+      end
+    end
   end
 end
