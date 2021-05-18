@@ -17,7 +17,7 @@ Feature: Non-congressional EE adding non-diabled 26 years old dependent
     And employee Patrick Doe already matched with employer AB Widgets and logged into employee portal
     And Patrick Doe has active coverage and passive renewal
     When employee clicks "Shop for Plans" on my account page
-    And employee clicks continue on the group selection page
+    And employee clicks continue on group selection page
     And employee sees the list of plans
     And employee selects a plan on the plan shopping page
     And employee clicks on Confirm button on the coverage summary page

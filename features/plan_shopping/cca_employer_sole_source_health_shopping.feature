@@ -18,6 +18,6 @@ Feature: Employee of a Sole Source Employer Shopping During Open Enrollment
   Scenario: Plan Browsing During Open Enrollment
     When Patrick Doe clicks "Shop for Plans" on my account page
     Then Employee should see the group selection page
-    When Employee clicks continue on the group selection page
+    When Employee clicks continue on group selection page
     Then Employee should see the list of plans
     And I should see the waive coverage button

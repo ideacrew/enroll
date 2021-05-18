@@ -68,10 +68,10 @@ end
 
 Then(/Employee tries to complete purchase of another plan/) do
   step "I can click Shop for Plans button"
-  step "Employee clicks continue on the group selection page"
+  step "Employee clicks continue on group selection page"
   step "Employee should see the list of plans"
   step "Employee selects a plan on the plan shopping page"
-  step "Employee should see coverage summary page with employer name and plan details"
+  step "Employee should see coverqge summary page with employer name and plan details"
   step "Employee clicks on Confirm button on the coverage summary page"
   step "Employee should see receipt page with employer name and plan details"
   step "Employee clicks on Continue button on receipt page"
