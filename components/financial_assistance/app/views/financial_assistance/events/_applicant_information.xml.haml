@@ -34,7 +34,7 @@
   %is_medicaid_chip_eligible= applicant.is_medicaid_chip_eligible
 - unless applicant.is_magi_medicaid.nil?
   %is_magi_medicaid= applicant.is_magi_medicaid
-- if applicant.is_applying_coverage?
+- if applicant.is_applying_coverage? && !applicant.is_self_attested_blind.nil?
   %is_self_attested_blind= applicant.is_self_attested_blind
 %is_self_attested_disabled= applicant.is_self_attested_disabled
 %is_self_attested_long_term_care= applicant.is_self_attested_long_term_care
@@ -74,8 +74,10 @@
 - if applicant.non_ssn_apply_reason.present?
   %non_ssn_apply_reason= applicant.non_ssn_apply_reason
 - if applicant.is_applying_coverage?
-  %has_daily_living_help= applicant.has_daily_living_help
-  %has_bill_pay_3_month_help= applicant.need_help_paying_bills
+  - unless applicant.has_daily_living_help.nil?
+    %has_daily_living_help= applicant.has_daily_living_help
+  - unless applicant.need_help_paying_bills.nil?
+    %has_bill_pay_3_month_help= applicant.need_help_paying_bills
 - unless applicant.is_resident_post_092296.nil?
   %is_resident_post_092296= applicant.is_resident_post_092296
 - unless applicant.is_vets_spouse_or_child.nil? || !applicant.is_applying_coverage?
