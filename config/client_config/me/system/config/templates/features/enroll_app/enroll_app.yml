@@ -252,6 +252,8 @@ registry:
             item: ""
           - key: :send_rating_area_for_ivl_policy_to_edi
             item: true
+          - key: :county_fips_code_enabled
+            item: true
       - key: :rating_area
         item: :rating_area
         is_enabled: false
