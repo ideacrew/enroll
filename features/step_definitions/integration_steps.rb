@@ -795,7 +795,7 @@ end
 
 When(/^.+ clicks? confirm member$/) do
   all(:css, ".mz").last.click
-  find_all('.btn-confirmation', wait: 5)[0].click
+  # find_all('.btn-confirmation', wait: 5)[0].click
   expect(page).to have_link('Add New Person')
 end
 
