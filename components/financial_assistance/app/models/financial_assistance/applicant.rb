@@ -894,7 +894,7 @@ module FinancialAssistance
     end
 
     def display_student_question?
-      age_of_applicant > 18 && age_of_applicant < 22
+      age_of_applicant > 17 && age_of_applicant < 23
     end
 
     class << self
