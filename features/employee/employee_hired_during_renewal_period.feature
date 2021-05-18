@@ -24,7 +24,7 @@ Feature: Employee hired during renewal period
     And employee Patrick Doe already matched with employer ABC Widgets and logged into employee portal
     When Employee clicks "Shop for Plans" on my account page
     Then Employee should see the group selection page
-    When Employee clicks continue on the group selection page
+    When Employee clicks continue on group selection page
     Then Employee should see the list of plans
     And I should not see any plan which premium is 0
     When Employee selects a plan on the plan shopping page
