@@ -113,6 +113,21 @@ module FinancialAssistance
       render :plain => applicant.age_of_the_applicant.to_s
     end
 
+    def applicant_is_eligible_for_joint_filing
+      applicant_id = params[:applicant_id]
+      applicant = FinancialAssistance::Applicant.find(applicant_id)
+
+      # applicant is primary and spouse exists?
+      return primary_applicant_has_spouse if applicant.is_primary_applicant
+      # applicant is spouse of primary?
+      applicant_is_spouse_of_primary(applicant)
+    end
+
+    def applicant_is_spouse_of_primary(applicant)
+      has_spouse_relationship = applicant.relationships.where(kind: 'spouse', relative_id: @application.primary_applicant.id).count > 0
+      render :plain => has_spouse_relationship.to_s
+    end
+
     def primary_applicant_has_spouse
       has_spouse =  @application.primary_applicant.relationships.where(kind: 'spouse').present? ? 'true' : 'false'
       render :plain => has_spouse.to_s
