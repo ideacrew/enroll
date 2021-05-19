@@ -24,7 +24,11 @@ module Validators
       rule(:applicants).each do
         if key? && value
           if value.is_a?(Hash)
-            result = ::FinancialAssistance::Validators::ApplicantContract.new.call(value)
+            result =  if EnrollRegistry.feature_enabled?(:magi_medicaid)
+                        ::MagiMedicaid::ApplicantContract.new.call(value)
+                      else
+                        ::FinancialAssistance::Validators::ApplicantContract.new.call(value)
+                      end
             key.failure(text: "invalid applicant", error: result.errors.to_h) if result&.failure?
           else
             key.failure(text: "invalid applicant. Expected a hash.")

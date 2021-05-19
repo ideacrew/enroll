@@ -8,16 +8,19 @@ module MagiMedicaid
     embedded_in :application, class_name: "::MagiMedicaid::Application", inverse_of: :applicants
 
 
-    embeds_one :name, class_name: "::MagiMedicaid::Name"
+    embeds_one :name, class_name: "::MagiMedicaid::PersonName"
     embeds_one :identity_information, class_name: "::MagiMedicaid::IdentityInformation"
     embeds_one :demographic, class_name: "::MagiMedicaid::Demographic"
     embeds_one :attestation, class_name: "::MagiMedicaid::Attestation"
     embeds_one :native_american_information, class_name: "::MagiMedicaid::NativeAmericanInformation"
     embeds_one :citizenship_immigration_status_information, class_name: "::MagiMedicaid::CitizenshipImmigrationStatusInformation"
-    embeds_one :ivl_document, class_name: "::MagiMedicaid::VlpDocument"
+    embeds_one :vlp_document, class_name: "::MagiMedicaid::VlpDocument"
     embeds_one :student, class_name: "::MagiMedicaid::Student"
     embeds_one :foster_care, class_name: "::MagiMedicaid::FosterCare"
     embeds_one :pregnancy_information, class_name: "::MagiMedicaid::PregnancyInformation"
+    embeds_many :addresses, class_name: "::MagiMedicaid::Locations::Address", cascade_callbacks: true, validate: true
+    embeds_many :phones, class_name: "::MagiMedicaid::Locations::Phone", cascade_callbacks: true, validate: true
+    embeds_many :emails, class_name: "::MagiMedicaid::Locations::Email", cascade_callbacks: true, validate: true
 
     field :is_primary_applicant, type: Boolean, default: false
 
@@ -38,6 +41,7 @@ module MagiMedicaid
 
     field :person_hbx_id, type: String
     field :family_member_id, type: BSON::ObjectId
+    field :is_consumer_role, type: Boolean
 
     field :has_fixed_address, type: Boolean, default: true
     field :is_living_in_state, type: Boolean, default: false

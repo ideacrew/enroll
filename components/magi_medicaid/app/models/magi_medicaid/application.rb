@@ -35,6 +35,7 @@ module MagiMedicaid
     field :is_requesting_voter_registration_application_in_mail, type: Boolean
 
     field :us_state, type: String
+    field :benchmark_product_id, type: BSON::ObjectId
 
     field :medicaid_terms, type: Boolean
     field :medicaid_insurance_collection_terms, type: Boolean

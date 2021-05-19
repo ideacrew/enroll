@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MagiMedicaid
-  class Name
+  class PersonName
     include Mongoid::Document
     include Mongoid::Timestamps
 
