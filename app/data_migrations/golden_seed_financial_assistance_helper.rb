@@ -76,6 +76,7 @@ module GoldenSeedFinancialAssistanceHelper
     income.amount = case_info_hash[:person_attributes]['income_amount']
     income.frequency_kind = case_info_hash[:person_attributes]['income_frequency_kind'].downcase
     income.start_on = case_info_hash[:person_attributes]['income_from']
+    income.kind = case_info_hash[:person_attributes]["income_type"]
     income.save!
     if case_info_hash[:person_attributes]["income_type"].downcase == 'job'
       employer_address = income.build_employer_address
@@ -97,6 +98,7 @@ module GoldenSeedFinancialAssistanceHelper
       employer_phone.primary = true
       employer_phone.kind = 'work'
       employer_phone.save!
+      income.save!
     end
     income
   end
