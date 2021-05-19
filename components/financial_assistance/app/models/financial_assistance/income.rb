@@ -12,8 +12,7 @@ module FinancialAssistance
     embeds_one :employer_phone, class_name: 'FinancialAssistance::Locations::Phone', cascade_callbacks: true
 
     TITLE_SIZE_RANGE = (3..30).freeze
-    # TODO: Scholarship is misspelled here as "scholorship_payments"
-    # also change it in golden seed and golden seed csv if needed
+
     KINDS = %w[
       alimony_and_maintenance
       american_indian_and_alaskan_native
@@ -32,7 +31,7 @@ module FinancialAssistance
       permanent_workers_compensation
       prizes_and_awards
       rental_and_royalty
-      scholorship_payments
+      scholarship_payments
       social_security_benefit
       supplemental_security_income
       tax_exempt_interest
