@@ -37,10 +37,3 @@ class CobraCensusEmployeeFixMay2021 < MongoidMigrationTask
     end
   end
 end
-
-
-
-
-
-
-
