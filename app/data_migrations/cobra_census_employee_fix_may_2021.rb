@@ -18,7 +18,7 @@ class CobraCensusEmployeeFixMay2021 < MongoidMigrationTask
             if census_employee.may_elect_cobra?
               census_employee.update_for_cobra(cobra_date, nil)
               puts("Sucessfully created Cobra enrollment for person with hbx_id: #{employee_data['employee_hbx_id']}")
-            elsif census_employee.aasm_state == "cobra_linked" && !(ActiveModel::Type::Boolean.new.cast(employee_data[:enrollments_present?]))
+            elsif ["cobra_linked", "cobra_eligible", "rehired"].include?(census_employee.aasm_state) && !(ActiveModel::Type::Boolean.new.cast(employee_data[:enrollments_present?]))
               census_employee.build_hbx_enrollment_for_cobra
               census_employee.save!
               puts("Sucessfully created Cobra enrollment for person with hbx_id: #{employee_data['employee_hbx_id']}")
@@ -38,16 +38,6 @@ class CobraCensusEmployeeFixMay2021 < MongoidMigrationTask
   end
 end
 
- hbx_ids = ['20081537', '20123739', '20003458', '19817282', '20066760', '19843745', '2512643', '20111622']
-
- hbx_ids.each do |hbx_id|
-  person = Person.by_hbx_id(hbx_id)
-  e_roles = person.employee_roles
-  puts e_roles.count
-  e_roles.each do |role|
-    puts "#{role.census_employee.employer_profile.fei} - #{role.census_employee.aasm_state} -  #{role.census_employee&.employment_terminated_on} - #{role.census_employee&.coverage_terminated_on}"
-  end
- end
 
 
 
