@@ -9,7 +9,8 @@ require 'aca_entities/ffe/transformers/mcr_to/family'
 class MigrateFamily < Mongoid::Migration
   def self.up
     ::AcaEntities::Ffe::Transformers::McrTo::Family.call(file_path, { transform_mode: :batch }) do |payload|
-      family_hash = Operations::Ffe::TransformApplication.new.call(payload)
+      family_hash = Operations::Ffe::TransformApplication.new.call(payload).success.to_h.deep_stringify_keys!
+
       build_family(family_hash)
       build_iap(family_hash['magi_medicaid_applications'].first.merge!("family_id": @family.id, benchmark_product_id: BSON::ObjectId.new, years_to_renew: 5))
     end
@@ -37,7 +38,6 @@ class MigrateFamily < Mongoid::Migration
   end
 
   def self.create_member(family_member_hash)
-    this
     person_params = sanitize_person_params(family_member_hash)
     person_result = create_or_update_person(person_params)
 
@@ -203,7 +203,7 @@ class MigrateFamily < Mongoid::Migration
       "last_name": person_hash['person_name']['last_name'],
       "full_name": person_hash['person_name']['full_name'],
       "ssn": person_hash['person_demographics']['ssn'],
-      "no_ssn": person_hash['person_demographics']['no_ssn'],
+      "no_ssn": "0", #person_hash['person_demographics']['no_ssn'], update in aca entities contracts to receive as string
       "gender": person_hash['person_demographics']['gender'],
       "dob": person_hash['person_demographics']['dob'],
       "date_of_death": person_hash['person_demographics']['date_of_death'],

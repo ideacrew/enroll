@@ -18,7 +18,7 @@
         },
         "person_demographics": {
           "ssn": "276728793",
-          "no_ssn": true,
+          "no_ssn": false,
           "gender": "male",
           "dob": "1963-01-01",
           "date_of_death": "2021-05-07",
@@ -130,7 +130,7 @@
         },
         "person_demographics": {
           "ssn": "276729990",
-          "no_ssn": true,
+          "no_ssn": false,
           "gender": "female",
           "dob": "1967-01-01",
           "date_of_death": "2021-05-07",
@@ -242,7 +242,7 @@
         },
         "person_demographics": {
           "ssn": "276740252",
-          "no_ssn": true,
+          "no_ssn": false,
           "gender": "male",
           "dob": "2008-01-01",
           "date_of_death": "2021-05-07",
