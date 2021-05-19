@@ -17,6 +17,7 @@ module GoldenSeedFinancialAssistanceHelper
     applicant = case_info_hash[:fa_application].applicants.build
     target_person = case_info_hash[:person_attributes][:current_target_person]
     applicant.is_primary_applicant = is_primary_applicant
+    applicant.is_claimed_as_tax_dependent = truthy_value?(case_info_hash[:person_attributes]["claimed_by"])
     applicant.first_name = target_person.first_name
     applicant.middle_name = target_person.middle_name
     applicant.last_name = target_person.last_name
