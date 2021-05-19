@@ -212,7 +212,7 @@ module GoldenSeedHelper
   def generate_address_and_phone
     address = Address.new(
       kind: "primary",
-      address_1: "60#{counter_number} #{('a'..'z').to_a.sample} #{['Street', 'Ave', 'Drive'].sample}",
+      address_1: "60#{counter_number} #{FFaker::AddressUS.street_name}",
       city: EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item,
       state: EnrollRegistry[:enroll_app].setting(:state_abbreviation).item,
       zip: EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item
@@ -220,7 +220,7 @@ module GoldenSeedHelper
     area_code = %w[339 351 508 617 774 781 857 978 413].sample
     new_person_phone = Phone.new(
       kind: "main",
-      area_code: area_code,
+      area_code: FFaker::PhoneNumber.area_code,
       number: generate_unique_phone_number
     )
     {address: address, phone: new_person_phone}
