@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/ModuleLength
+require File.join(Rails.root, 'app/data_migrations/golden_seed_helper')
 
+# rubocop:disable Metrics/ModuleLength
 # Helper for creating Financial Assistance engine related data from CSV file
 module GoldenSeedFinancialAssistanceHelper
   def create_and_return_fa_application(case_info_hash = nil)
@@ -70,10 +71,31 @@ module GoldenSeedFinancialAssistanceHelper
               case_info_hash[:person_attributes]["tax_filing_status"] == 'non_filer' ||
               !truthy_value?(case_info_hash[:person_attributes]['income_frequency_kind'])
     income = case_info_hash[:target_fa_applicant].incomes.build
+    income.employer_name = FFaker::Company.name if case_info_hash[:person_attributes]["income_type"].downcase == 'job'
     income.amount = case_info_hash[:person_attributes]['income_amount']
     income.frequency_kind = case_info_hash[:person_attributes]['income_frequency_kind'].downcase
     income.start_on = case_info_hash[:person_attributes]['income_from']
     income.save!
+    if case_info_hash[:person_attributes]["income_type"].downcase == 'job'
+      employer_address = income.build_employer_address
+      employer_address.kind = 'work'
+      employer_address.address_1 = FFaker::AddressUS.street_name
+      employer_address.county
+      employer_address.state = FFaker::AddressUS.state_abbr
+      employer_address.city FFaker::AddressUS.city
+      employer_address.county = %w(Washington Burlington Kennebec Arlington Washington Jefferson Franklin).sample
+      employer_address.save!
+      employer_phone = employer_address.build_employer_phone
+      employer_phone.country_code = '1'
+      area_code = FFaker::PhoneNumber.area_code 
+      employer_phone.area_code = area_code
+      phone_number = generate_unique_phone_number
+      employer_phone.number = phone_number
+      employer_phone.full_phone_number = area_code + phone_number
+      employer_phone.primary = true
+      employer_phone.kind = 'work'
+      employer_phone.save! 
+    end
     income
   end
 
