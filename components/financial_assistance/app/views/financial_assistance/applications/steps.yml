@@ -167,7 +167,7 @@
                         I'm the person whose name appears in the signature line below. I understand that I'm submitting an application for health insurance and that
                         information that I provided will be used to decide eligibility for each member of my application group. <br> <br>
 
-                        I have reviewed the information in this application and I attest, under penalty of perjury, that it is accurate and complete to the best of my knowledge. I understand that if I’m not truthful, there may be a penalty, including retroactive termination of my coverage and an obligation to repay all medical claims previous covered by the health insurance"
+                        <reviewed-information>
             - cells:
                 - gutter: 12
                   type: checkbox
