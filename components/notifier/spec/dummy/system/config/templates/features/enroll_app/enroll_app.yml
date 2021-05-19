@@ -107,6 +107,12 @@ registry:
             item: ""
           - key: :certification_url
             item: ""
+          - key: :document_verification_checklist_url
+            item: ""
+          - key: :terms_and_conditions_url
+            item: ""
+          - key: :certification_url
+            item: ""
           - key: :registration_path
             item: ""
           - key: :broker_registration_path
@@ -354,4 +360,3 @@ registry:
         settings:
           - key: :days
             item: 60
-        is_enabled: true
