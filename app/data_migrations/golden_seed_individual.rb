@@ -99,10 +99,10 @@ class GoldenSeedIndividual < MongoidMigrationTask
           relationship_to_primary: 'self',
           is_primary_applicant?: true
         }
-      }
+      }.with_indifferent_access
       consumer_hash = create_and_return_matched_consumer_and_hash(consumer_attributes)
       consumer_people_and_users[consumer_hash[:primary_person_record].full_name] = consumer_hash[:user_record]
-      generate_and_return_hbx_enrollment(consumer_hash[:consumer_role_record])
+      generate_and_return_hbx_enrollment(consumer_hash)
       ['spouse', 'child'].each do |relationship_to_primary|
         dependent_attributes = {
           primary_person_record: consumer_hash[:primary_person_record],
@@ -110,7 +110,7 @@ class GoldenSeedIndividual < MongoidMigrationTask
           person_attributes: {
             relationship_to_primary: relationship_to_primary
           }
-        }
+        }.with_indifferent_access
         generate_and_return_dependent_record(dependent_attributes)
       end
       @counter_number += 1
