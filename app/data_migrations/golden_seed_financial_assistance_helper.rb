@@ -3,6 +3,7 @@
 require File.join(Rails.root, 'app/data_migrations/golden_seed_helper')
 
 # rubocop:disable Metrics/ModuleLength
+# rubocop:disable Metrics/AbcSize
 # Helper for creating Financial Assistance engine related data from CSV file
 module GoldenSeedFinancialAssistanceHelper
   def create_and_return_fa_application(case_info_hash = nil)
@@ -84,7 +85,7 @@ module GoldenSeedFinancialAssistanceHelper
       employer_address.state = FFaker::AddressUS.state_abbr
       employer_address.city = FFaker::AddressUS.city
       employer_address.zip = FFaker::AddressUS.zip_code
-      employer_address.county = %w(Washington Burlington Kennebec Arlington Washington Jefferson Franklin).sample
+      employer_address.county = %w[Washington Burlington Kennebec Arlington Washington Jefferson Franklin].sample
       employer_address.save!
       employer_phone = income.build_employer_phone
       employer_phone.country_code = '1'
@@ -95,7 +96,7 @@ module GoldenSeedFinancialAssistanceHelper
       employer_phone.full_phone_number = "#{area_code}#{phone_number}"
       employer_phone.primary = true
       employer_phone.kind = 'work'
-      employer_phone.save! 
+      employer_phone.save!
     end
     income
   end
@@ -174,4 +175,6 @@ module GoldenSeedFinancialAssistanceHelper
 end
 
 # rubocop:enable Metrics/ModuleLength
+# rubocop:enable Metrics/AbcSize
+
 
