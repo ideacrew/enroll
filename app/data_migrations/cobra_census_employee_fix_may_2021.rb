@@ -37,3 +37,20 @@ class CobraCensusEmployeeFixMay2021 < MongoidMigrationTask
     end
   end
 end
+
+ hbx_ids = ['20081537', '20123739', '20003458', '19817282', '20066760', '19843745', '2512643', '20111622']
+
+ hbx_ids.each do |hbx_id|
+  person = Person.by_hbx_id(hbx_id)
+  e_roles = person.employee_roles
+  puts e_roles.count
+  e_roles.each do |role|
+    puts "#{role.census_employee.employer_profile.fei} - #{role.census_employee.aasm_state} -  #{role.census_employee&.employment_terminated_on} - #{role.census_employee&.coverage_terminated_on}"
+  end
+ end
+
+
+
+
+
+
