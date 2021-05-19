@@ -31,7 +31,7 @@ RSpec.describe "app/views/events/shared/_enrollee.xml.haml", dbclean: :after_eac
       @doc = Nokogiri::XML(rendered)
     end
     it "should include is_tobacco_user" do
-      expect(@doc.xpath("//person_health//is_tobacco_user").text).to eq hbx_enrollment_member.tobacco_use
+      expect(@doc.xpath("//person_health//is_tobacco_user").text).to eq hbx_enrollment_member.tobacco_use_value_for_edi
     end
   end
 end
