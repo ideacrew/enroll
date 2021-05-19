@@ -11,7 +11,7 @@ class MigrateFamily < Mongoid::Migration
     ::AcaEntities::Ffe::Transformers::McrTo::Family.call(file_path, { transform_mode: :batch }) do |payload|
       family_hash = Operations::Ffe::TransformApplication.new.call(payload).success.to_h.deep_stringify_keys!
 
-      build_family(family_hash)
+      build_family(family_hash.merge!(ext_app_id:  payload[:insuranceApplicationIdentifier])) # remove this after fixing ext_app_id in aca entities
       build_iap(family_hash['magi_medicaid_applications'].first.merge!("family_id": @family.id, benchmark_product_id: BSON::ObjectId.new, years_to_renew: 5))
     end
   end
@@ -60,7 +60,9 @@ class MigrateFamily < Mongoid::Migration
     return unless applicant_params[:is_consumer_role]
 
     # assign_citizen_status
-    Operations::People::CreateOrUpdateConsumerRole.new.call(params: { applicant_params: applicant_params, family_member: family_member })
+    params = applicant_params.except("lawful_presence_determination")
+    merge_params = params.merge("citizen_status": applicant_params["lawful_presence_determination"]["citizen_status"])
+    Operations::People::CreateOrUpdateConsumerRole.new.call(params: { applicant_params: merge_params, family_member: family_member })
   end
 
   def self.create_or_update_family_member(person, family, family_member_hash)
