@@ -17,7 +17,8 @@ QualifyingLifeEventKind.find_or_create_by(
     post_event_sep_in_days: 60,
     is_self_attested: true,
     is_visible: true,
-    date_options_available: false
+    date_options_available: false,
+    ordinal_position: 1
   )
 end
 
@@ -42,14 +43,14 @@ QualifyingLifeEventKind.find_or_create_by(
 end
 
 QualifyingLifeEventKind.find_or_create_by(
-  title: "Got Married"
+  title: "Got married"
 ).tap do |qlek|
   qlek.update_attributes(
     tool_tip: "Someone in the household got married",
     action_kind: "add_member",
     market_kind: "individual",
     event_kind_label: "Date of marriage",
-    ordinal_position: 30,
+    ordinal_position: 5,
     reason: "marriage",
     edi_code: "32-MARRIAGE",
     effective_on_kinds: ["first_of_next_month"],
@@ -57,7 +58,7 @@ QualifyingLifeEventKind.find_or_create_by(
     post_event_sep_in_days: 60,
     is_self_attested: true,
     is_visible: true,
-    date_options_available: false
+    date_options_available: false,
   )
 end
 
@@ -69,7 +70,7 @@ QualifyingLifeEventKind.find_or_create_by(
     action_kind: "drop_member",
     market_kind: "individual",
     event_kind_label: "Date of divorce or legal seperation",
-    ordinal_position: 45,
+    ordinal_position: 6,
     reason: "divorce",
     edi_code: "01-DIVORCE",
     effective_on_kinds: ["first_of_next_month"],
@@ -89,7 +90,7 @@ QualifyingLifeEventKind.find_or_create_by(
     action_kind: "add_benefit",
     event_kind_label: "Coverage end date",
     market_kind: "individual",
-    ordinal_position: 50,
+    ordinal_position: 3,
     reason: "lost_access_to_mec",
     edi_code: "33-LOST ACCESS TO MEC",
     effective_on_kinds: ["first_of_next_month"],
@@ -98,8 +99,6 @@ QualifyingLifeEventKind.find_or_create_by(
     is_self_attested: true,
     is_visible: true,
     date_options_available: false
-    # start_of_sep: "60 days before loss of MEC",
-    # coverage_effective_date: "If before loss of coverage: First day of the month after MEC will end. If after loss of MEC: First day of the month following plan selection (not following 15th of month rule)")
   )
 end
 
@@ -111,7 +110,7 @@ QualifyingLifeEventKind.find_or_create_by(
     action_kind: "add_benefit",
     market_kind: "individual",
     event_kind_label: "Date of move",
-    ordinal_position: 60,
+    ordinal_position: 4,
     reason: "moved",
     edi_code: "43-CHANGE OF LOCATION",
     effective_on_kinds: ["first_of_next_month"],
@@ -124,13 +123,13 @@ QualifyingLifeEventKind.find_or_create_by(
 end
 
 QualifyingLifeEventKind.find_or_create_by(
-  title: "Enrollment error caused by Cover ME"
+  title: "Enrollment error by Cover ME"
 ).tap do |qlek|
   qlek.update_attributes(
     tool_tip: "Someone is not enrolled or enrolled in the wrong plan due to an error by Cover ME",
     action_kind: "add_member",
     market_kind: "individual",
-    ordinal_position: 70,
+    ordinal_position: 23,
     reason: "enrollment_error_hbx",
     edi_code: " ",
     effective_on_kinds: ["first_of_next_month", "first_of_month"],
@@ -149,7 +148,7 @@ QualifyingLifeEventKind.find_or_create_by(
     tool_tip: " ",
     action_kind: "add_member",
     market_kind: "individual",
-    ordinal_position: 90,
+    ordinal_position: 25,
     reason: "contract_violation",
     edi_code: "33-CONTRACT VIOLATION",
     effective_on_kinds: ["first_of_month"],
@@ -169,7 +168,7 @@ QualifyingLifeEventKind.find_or_create_by(
     action_kind: "add_member",
     market_kind: "individual",
     event_kind_label: "Today's date",
-    ordinal_position: 100,
+    ordinal_position: 8,
     reason: "native_american",
     edi_code: " ",
     effective_on_kinds: ["first_of_month"],
@@ -189,7 +188,7 @@ QualifyingLifeEventKind.find_or_create_by(
   action_kind: "add_member",
   market_kind: "individual",
   event_kind_label: "Date service begins or ends",
-  ordinal_position: 100,
+  ordinal_position: 16,
   reason: "americorps",
   edi_code: " ",
   effective_on_kinds: ["first_of_next_month"],
@@ -198,8 +197,6 @@ QualifyingLifeEventKind.find_or_create_by(
   is_self_attested: false,
   is_visible: true,
   date_options_available: false
-    # start_of_sep: "Date person begins or ends service in one of the three programs",
-    # coverage_effective_date: "Regular effective date")
   )
 end
 
@@ -210,7 +207,7 @@ QualifyingLifeEventKind.find_or_create_by(
   action_kind: "add_member",
   market_kind: "individual",
   event_kind_label: "Date that court orders that coverage starts",
-  ordinal_position: 100,
+  ordinal_position: 18,
   reason: "court_order",
   edi_code: " ",
   effective_on_kinds: ["date_of_event"],
@@ -229,7 +226,7 @@ QualifyingLifeEventKind.find_or_create_by(
   action_kind: "add_benefit",
   market_kind: "individual",
   event_kind_label: "Date of status change",
-  ordinal_position: 100,
+  ordinal_position: 10,
   reason: "citizenship_immigration_change",
   edi_code: " ",
   effective_on_kinds: ["first_of_month"],
@@ -249,7 +246,7 @@ QualifyingLifeEventKind.find_or_create_by(
   action_kind: "add_benefit",
   market_kind: "individual",
   event_kind_label: "Release date",
-  ordinal_position: 100,
+  ordinal_position: 15,
   reason: "incarceration_release",
   edi_code: " ",
   effective_on_kinds: ["first_of_next_month"],
@@ -267,7 +264,7 @@ QualifyingLifeEventKind.find_or_create_by(
   tool_tip: "Someone is not enrolled or enrolled in the wrong plan due to an error by a broker or enrollment assister",
   action_kind: "add_member",
   market_kind: "individual",
-  ordinal_position: 100,
+  ordinal_position: 22,
   reason: "enrollment_error_assister_broker",
   edi_code: " ",
   effective_on_kinds: ["first_of_next_month", "first_of_month"],
@@ -285,7 +282,7 @@ QualifyingLifeEventKind.find_or_create_by(
     tool_tip: "Someone did not enroll in individual or family coverage because employer was applying to provide coverage, and found out after open enrollment that employer coverage was denied",
     action_kind: "add_member",
     market_kind: "individual",
-    ordinal_position: 100,
+    ordinal_position: 20,
     reason: "eligibility_change_employer_ineligible",
     edi_code: " ",
     effective_on_kinds: ["first_of_next_month"],
@@ -306,7 +303,7 @@ QualifyingLifeEventKind.find_or_create_by(
   action_kind: "add_member",
   market_kind: "individual",
   event_kind_label: "Date you left the household",
-  ordinal_position: 100,
+  ordinal_position: 26,
   reason: "domestic_abuse",
   edi_code: " ",
   effective_on_kinds: ["first_of_next_month"],
@@ -326,7 +323,7 @@ QualifyingLifeEventKind.find_or_create_by(
   action_kind: "add_member",
   market_kind: "individual",
   event_kind_label: "Date of notice of plan termination",
-  ordinal_position: 100,
+  ordinal_position: 21,
   reason: "employer_unpaid_premium",
   edi_code: " ",
   effective_on_kinds: ["first_of_next_month"],
@@ -348,7 +345,7 @@ QualifyingLifeEventKind.find_or_create_by(
   tool_tip: " ",
   action_kind: "transition_member",
   market_kind: "individual",
-  ordinal_position: 120,
+  ordinal_position: 28,
   reason: "eligibility_documents",
   edi_code: " ",
   effective_on_kinds: ["first_of_next_month", "first_of_month"],
@@ -368,7 +365,7 @@ QualifyingLifeEventKind.find_or_create_by(
   event_kind_label: "Date provider confirmed pregnancy",
   action_kind: "transition_member",
   market_kind: "individual",
-  ordinal_position: 120,
+  ordinal_position: 9,
   reason: "pregnancy",
   edi_code: "",
   effective_on_kinds: ["first_of_next_month", "first_of_month"],
@@ -389,7 +386,7 @@ QualifyingLifeEventKind.find_or_create_by(
   event_kind_label: "Date provider confirmed pregnancy",
   action_kind: "transition_member",
   market_kind: "individual",
-  ordinal_position: 120,
+  ordinal_position: 11,
   reason: "new_hra_plan_year",
   edi_code: "",
   effective_on_kinds: ["first_of_next_month"],
@@ -410,7 +407,7 @@ QualifyingLifeEventKind.find_or_create_by(
   event_kind_label: "Date provider confirmed pregnancy",
   action_kind: "transition_member",
   market_kind: "individual",
-  ordinal_position: 120,
+  ordinal_position: 12,
   reason: "hra_midyear",
   edi_code: "",
   effective_on_kinds: ["first_of_next_month"],
@@ -431,7 +428,7 @@ QualifyingLifeEventKind.find_or_create_by(
   event_kind_label: "Date of event",
   action_kind: "transition_member",
   market_kind: "individual",
-  ordinal_position: 120,
+  ordinal_position: 27,
   reason: "exceptional_circumstance",
   edi_code: "",
   effective_on_kinds: ["first_of_next_month"],
@@ -452,7 +449,7 @@ QualifyingLifeEventKind.find_or_create_by(
   event_kind_label: "Date error was discoovered",
   action_kind: "transition_member",
   market_kind: "individual",
-  ordinal_position: 120,
+  ordinal_position: 24,
   reason: "enrollment_error_carrier",
   edi_code: "",
   effective_on_kinds: ["first_of_next_month"],
@@ -473,7 +470,7 @@ QualifyingLifeEventKind.find_or_create_by(
   event_kind_label: "Date error was discoovered",
   action_kind: "transition_member",
   market_kind: "individual",
-  ordinal_position: 120,
+  ordinal_position: 13,
   reason: "income_change",
   edi_code: "",
   effective_on_kinds: ["first_of_next_month"],
@@ -494,7 +491,7 @@ QualifyingLifeEventKind.find_or_create_by(
   event_kind_label: "Date of denial",
   action_kind: "transition_member",
   market_kind: "individual",
-  ordinal_position: 120,
+  ordinal_position: 19,
   reason: "medicaid_ineligible",
   edi_code: "",
   effective_on_kinds: ["first_of_next_month"],
@@ -514,7 +511,7 @@ QualifyingLifeEventKind.find_or_create_by(
   event_kind_label: "Date of death",
   action_kind: "transition_member",
   market_kind: "individual",
-  ordinal_position: 120,
+  ordinal_position: 7,
   reason: "medicaid_ineligible",
   edi_code: "",
   effective_on_kinds: ["first_of_next_month"],
@@ -526,7 +523,6 @@ QualifyingLifeEventKind.find_or_create_by(
   )
 end
 
-# TODO: First of next month plan selectiono
 QualifyingLifeEventKind.find_or_create_by(
   title: "Change in eligibility for cost-sharing reductions"
 ).tap do |qlek|
@@ -535,7 +531,7 @@ QualifyingLifeEventKind.find_or_create_by(
   event_kind_label: "Today's date",
   action_kind: "transition_member",
   market_kind: "individual",
-  ordinal_position: 120,
+  ordinal_position: 14,
   reason: "csr_eligibility_change",
   edi_code: "",
   effective_on_kinds: ["first_of_next_month"],
@@ -547,6 +543,26 @@ QualifyingLifeEventKind.find_or_create_by(
   )
 end
 
+
+QualifyingLifeEventKind.find_or_create_by(
+  title: "Covid-19"
+).tap do |qlek|
+  qlek.update_attributes(
+    tool_tip: "Someone is uninsured and needs coverage due to the Covid-19 pandemic",
+    event_kind_label: "Today's date",
+    action_kind: "transition_member",
+    market_kind: "individual",
+    effective_on_kinds: ["first_of_this_month", "fixed_first_of_next_month"],
+    reason: "covid",
+    edi_code: nil,
+    pre_event_sep_in_days: 0,
+    is_self_attested: true,
+    date_options_available: false,
+    post_event_sep_in_days: 60,
+    ordinal_position: 29,
+    is_visible: true
+  )
+end
 
 puts "::: IVL QualifyingLifeEventKinds Complete :::"
 puts "*" * 80
