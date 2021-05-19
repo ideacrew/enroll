@@ -82,16 +82,17 @@ module GoldenSeedFinancialAssistanceHelper
       employer_address.address_1 = FFaker::AddressUS.street_name
       employer_address.county
       employer_address.state = FFaker::AddressUS.state_abbr
-      employer_address.city FFaker::AddressUS.city
+      employer_address.city = FFaker::AddressUS.city
+      employer_address.zip = FFaker::AddressUS.zip_code
       employer_address.county = %w(Washington Burlington Kennebec Arlington Washington Jefferson Franklin).sample
       employer_address.save!
-      employer_phone = employer_address.build_employer_phone
+      employer_phone = income.build_employer_phone
       employer_phone.country_code = '1'
-      area_code = FFaker::PhoneNumber.area_code 
+      area_code = FFaker::PhoneNumber.area_code.to_s
       employer_phone.area_code = area_code
-      phone_number = generate_unique_phone_number
+      phone_number = generate_unique_phone_number.to_s
       employer_phone.number = phone_number
-      employer_phone.full_phone_number = area_code + phone_number
+      employer_phone.full_phone_number = "#{area_code}#{phone_number}"
       employer_phone.primary = true
       employer_phone.kind = 'work'
       employer_phone.save! 
