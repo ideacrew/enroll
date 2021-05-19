@@ -53,6 +53,15 @@ describe "Golden Seed Rake Tasks", dbclean: :after_each do
               ).to be > 0
             end
 
+            it "should create job incomes with employer names, address, and phone number" do
+              random_job_income = FinancialAssistance::Application.all.map(&:applicants).flatten.map(&:incomes).flatten.detect do |income|
+                income.employer_name.present?
+              end
+              expect(random_job_income.present?).to eq(true)
+              expect(random_job_income.employer_phone).to_not be_nil
+              expect(random_job_income.employer_address).to_not be_nil
+            end
+
             it "should create hbx enrollments with applied_aptc_amount" do
               expect(HbxEnrollment.where(:applied_aptc_amount.ne => nil).count).to be > 0
             end
