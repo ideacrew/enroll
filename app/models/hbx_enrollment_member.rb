@@ -72,6 +72,17 @@ class HbxEnrollmentMember
     @age_on_effective_date = age
   end
 
+  def tobacco_use_value_for_edi
+    case tobacco_use
+    when 'Y'
+      'true'
+    when 'N'
+      'false'
+    else
+      'unknown'
+    end
+  end
+
   def calculate_age(calculation_date,dob)
     age = calculation_date.year - dob.year
 
