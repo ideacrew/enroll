@@ -73,6 +73,7 @@ class Address
 
   before_validation :detect_quadrant
   validate :quadrant_check
+  before_save :update_washington_city
 
   def detect_quadrant
     self.quadrant = QUADRANTS.map { |word| self.address_1&.upcase&.scan(/\b#{word}\b/) }.flatten.first if Settings.aca.validate_quadrant
@@ -85,6 +86,10 @@ class Address
   # @note Add support for GIS location
   def location
     nil #todo
+  end
+
+  def update_washington_city
+    self.city = 'Washington' if state == 'DC'
   end
 
   def office_is_primary_location?

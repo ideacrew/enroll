@@ -52,6 +52,12 @@ module FinancialAssistance
                   :message => 'should be in the form: 12345 or 12345-1234'
                 }
 
+      before_save :update_washington_city
+
+      def update_washington_city
+        self.city = 'Washington' if state == 'DC'
+      end
+
       def office_is_primary_location?
         kind == 'primary'
       end
