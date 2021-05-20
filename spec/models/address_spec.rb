@@ -82,6 +82,18 @@ describe Address, "with proper validations" do
     end
   end
 
+  context "with DC state" do
+    let(:person) { FactoryBot.create(:person) }
+    let(:new_address) { Address.new(address_params.merge!({state: 'DC'})) }
+
+    it "should save city as Washington on save" do
+      expect(new_address.city).to eq 'Irvine'
+      person.addresses << new_address
+      person.save
+      expect(new_address.city).to eq 'Washington'
+    end
+  end
+
   context "embedded in another object", type: :model do
     it { should validate_presence_of :address_1 }
     it { should validate_presence_of :city }
@@ -187,7 +199,7 @@ describe '#matches_addresses?' do
        zip: "21222"
      )
   }
-  
+
   context 'addresses are the same' do
     let(:second_address) { address.clone }
     it 'returns true' do
