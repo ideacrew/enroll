@@ -40,8 +40,19 @@ module GoldenSeedFinancialAssistanceHelper
     applicant.tax_filer_kind = case_info_hash[:person_attributes]["tax_filing_status"].downcase
     applicant.claimed_as_tax_dependent_by = case_info_hash[:fa_application].applicants.all.detect(&:is_primary_applicant)&.id
     # TODO: Need to refactor this once dc resident is refactored
-    applicant.has_fixed_address = case_info_hash[:person_attributes][:current_target_person].send(:is_homeless?)
-    applicant.is_living_in_state = case_info_hash[:person_attributes][:current_target_person].send(:is_dc_resident?)
+    applicant.has_fixed_address = target_person&.is_homeless?
+    applicant.is_living_in_state = target_person&.is_dc_resident?
+    applicant.is_temporarily_out_of_state = target_person&.is_temporarily_out_of_state
+    applicant.is_consumer_role = target_person&.consumer_role.present?
+    applicant.is_tobacco_user = false
+    applicant.is_incarcerated = false
+    applicant.is_disabled = false
+    applicant.is_physically_disabled = false
+    applicant.is_physically_disabled = false
+    applicant.indian_tribe_member = false
+    # TODO: We can enhance this later
+    applicant.is_pregnant = false
+    applicant.is_post_partum_period = false
     applicant.save!
     applicant
   end
