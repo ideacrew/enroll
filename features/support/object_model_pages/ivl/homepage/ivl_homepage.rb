@@ -19,8 +19,12 @@ class IvlHomepage
     '.interaction-click-control-manage-family'
   end
 
+  def self.actions_dropdown
+    '#dropdownMenuButton'
+  end
+
   def self.make_changes_btn
-    '.interaction-click-control-make-changes'
+    '.interaction-click-control-make-changes, .interaction-click-control-make-changes-to-my-coverage'
   end
 
   def self.view_details_btn
@@ -65,10 +69,6 @@ class IvlHomepage
 
   def self.view_my_coverage_btn
     '.interaction-click-control-view-my-coverage-details'
-  end
-
-  def self.make_changes_btn
-    '.interaction-click-control-make-changes-to-my-coverage'
   end
 
   def self.make_payments_btn
