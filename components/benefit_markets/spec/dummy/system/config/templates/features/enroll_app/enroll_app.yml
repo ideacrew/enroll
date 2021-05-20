@@ -157,7 +157,7 @@ registry:
           - key: :faa_enabled
             item: false
           - key: :county_fips_code_enabled
-            item: false
+            item: true
           - key: :ivl_responsibility_url
             item: "https://dchealthlink.com/individual-responsibility-requirement"
           - key: :curam_enabled?
@@ -354,3 +354,9 @@ registry:
         is_enabled: false
       - key: :dental_market
         is_enabled: true
+      - key: :qle_within_sixty_days
+        item: :qle_within_sixty_days
+        is_enabled: true
+        settings:
+          - key: :days
+            item: 60
