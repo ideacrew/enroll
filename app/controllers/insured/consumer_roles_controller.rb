@@ -281,7 +281,7 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   def help_paying_coverage
-    if EnrollRegistry.feature_enabled?(:financial_assistance)
+    if EnrollRegistry.feature_enabled?(:financial_assistance) || EnrollRegistry.feature_enabled?(:magi_medicaid)
       set_current_person
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
@@ -298,7 +298,7 @@ class Insured::ConsumerRolesController < ApplicationController
       redirect_to help_paying_coverage_insured_consumer_role_index_path
     elsif params["is_applying_for_assistance"] == "true"
       begin
-        result = Operations::FinancialAssistance::Apply.new.call(family_id: @person.primary_family.id)
+        result = assistance_class.new.call(family_id: @person.primary_family.id)
         if result.success?
           redirect_to financial_assistance.application_checklist_application_path(id: result.success)
         else
@@ -316,6 +316,14 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   private
+
+  def assistance_class
+    if EnrollRegistry.feature_enabled?(:magi_medicaid)
+      Operations::MagiMedicaid::Apply
+    else
+      Operations::FinancialAssistance::Apply
+    end
+  end
 
   def get_error_messages(result)
     message_array = []

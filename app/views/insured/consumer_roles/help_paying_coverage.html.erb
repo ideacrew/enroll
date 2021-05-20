@@ -30,7 +30,7 @@
                 </div>
                 <div class="col-md-2 not-sure-margin left-seprator">
                   <a href="#is_applying_for_assistance" data-toggle="modal" data-target="#is_applying_for_assistance">Not sure?</a>
-                  <% if EnrollRegistry.feature_enabled?(:financial_assistance) %>
+                  <% if EnrollRegistry.feature_enabled?(:financial_assistance) ||  EnrollRegistry.feature_enabled?(:magi_medicaid)%>
                     <%= render partial: 'shared/modal_support_text_household', locals: {key: "is_applying_for_assistance"} %>
                   <% end %>
                 </div>
