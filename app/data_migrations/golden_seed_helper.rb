@@ -240,6 +240,10 @@ module GoldenSeedHelper
     )
     case_info_hash[:primary_person_record].individual_market_transitions << ivl_market_transition
     consumer_role.identity_validation = 'valid'
+    # TODO: Figure out if this needs to be changed
+    consumer_role.us_citizen = true
+    consumer_role.citizen_status = "us_citizen"
+    consumer_role.citizenship_result = "us_citizen"
     consumer_role.save!
     # Verification types needed
     verification_type = VerificationType.new
