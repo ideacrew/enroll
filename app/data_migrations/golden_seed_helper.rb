@@ -116,16 +116,19 @@ module GoldenSeedHelper
     )
     person.save!
     raise("Unable to save person.") unless person.save!
-    address_and_phone = generate_address_and_phone
     # Set residency type
     case case_info_hash[:person_attributes]['residency_type']
     # TODO: Fix this hardcoded for DC
     when 'Not DC resident'
       person.no_dc_address = true
     when 'Temporarily absent'
+      address_and_phone = generate_address_and_phone(true)
+      person.phones << address_and_phone[:phone]
+      person.addresses << address_and_phone[:address]
       person.is_temporarily_out_of_state = true
     else # DC home address'
       # Let's just make it a DC resident
+      address_and_phone = generate_address_and_phone
       person.phones << address_and_phone[:phone]
       person.addresses << address_and_phone[:address]
     end
@@ -162,11 +165,16 @@ module GoldenSeedHelper
               "#{case_info_hash[:primary_person_record]['last_name']}"\
               "#{@counter_number}@#{providers.sample}.com"
             end
+    person_record = case_info_hash[:primary_person_record]
+    person_record_email = person_record.emails.build
+    person_record_email.address = email
+    person_record_email.kind = "home"
+    person_record_email.save!
     user = User.new
     user.email = email
     user.oim_id = email
     user.password = "P@ssw0rd!"
-    user.person = case_info_hash[:primary_person_record]
+    user.person = person_record
     user_saved = user.save
     5.times do
       break if user_saved == true
@@ -209,13 +217,16 @@ module GoldenSeedHelper
     new_person_phone_number
   end
 
-  def generate_address_and_phone
+  def generate_address_and_phone(out_of_state_resident = nil)
+    city = out_of_state_resident.blank? ? EnrollRegistry[:enroll_app].setting(:contact_center_city).item : FFaker::AddressUS.city
+    state = out_of_state_resident.blank? ? EnrollRegistry[:enroll_app].setting(:state_abbreviation).item : FFaker::AddressUS.state_abbr
+    zip = out_of_state_resident.blank? ? EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item : FFaker::AddressUS.zip_code
     address = Address.new(
       kind: "primary",
       address_1: "60#{counter_number} #{FFaker::AddressUS.street_name}",
-      city: EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item,
-      state: EnrollRegistry[:enroll_app].setting(:state_abbreviation).item,
-      zip: EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item
+      city: city,
+      state: state,
+      zip: zip
     )
     area_code = %w[339 351 508 617 774 781 857 978 413].sample
     new_person_phone = Phone.new(
