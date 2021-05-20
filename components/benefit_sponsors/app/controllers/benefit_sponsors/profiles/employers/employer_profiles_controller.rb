@@ -102,6 +102,8 @@ module BenefitSponsors
         end
 
         def show_invoice
+          return unless @invoice.present?
+
           options = {}
           options[:filename] = @invoice.title
           options[:type] = 'application/pdf'
@@ -156,6 +158,8 @@ module BenefitSponsors
         end
 
         def download_invoice
+          return unless @invoice.present?
+
           options={}
           options[:content_type] = @invoice.type
           options[:filename] = @invoice.title
@@ -209,7 +213,7 @@ module BenefitSponsors
         end
 
         def check_and_download_invoice
-          @invoice = @employer_profile.documents.find(params[:invoice_id])
+          @invoice = @employer_profile.documents.find(params[:invoice_id]) if params[:invoice_id]
         end
 
         def collect_and_sort_invoices(sort_order='ASC')
