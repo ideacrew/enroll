@@ -34,6 +34,10 @@ When(/^selects yes they would like help paying for coverage$/) do
   find('a.interaction-click-control-continue').click
 end
 
+Then(/^the 'Start New Application' button should be disabled$/) do
+  expect(page).to have_button('Start new application', disabled: true)
+end
+
 When(/^they click 'Start New Application' button$/) do
   click_button 'Start new application'
 end
