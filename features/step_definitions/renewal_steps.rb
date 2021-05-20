@@ -22,7 +22,7 @@ Then(/(.*) should see active and renewing enrollments/) do |named_person|
 end
 
 # For new updates
-When(/(.*) clicks continue on group selection page/) do
+When(/.+ clicks continue on group selection page/) do
   if find_all(EmployeeChooseCoverage.continue_btn).any?
     find(EmployeeChooseCoverage.continue_btn, wait: 10).click
   else
