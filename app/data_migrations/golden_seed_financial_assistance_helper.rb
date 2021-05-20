@@ -25,9 +25,9 @@ module GoldenSeedFinancialAssistanceHelper
     applicant.last_name = target_person.last_name
     applicant.gender = target_person.gender
     applicant.dob = target_person.dob
-    applicant.has_job_income = case_info_hash[:person_attributes]["income_type"].downcase == 'job' || false
-    applicant.has_self_employment_income = case_info_hash[:person_attributes]["income_type"].downcase == 'self-employment' || false
-    applicant.has_other_income = case_info_hash[:person_attributes]["income_type"].downcase == 'other' || false
+    applicant.has_job_income = case_info_hash[:person_attributes]["income_type"]&.downcase == 'job' || false
+    applicant.has_self_employment_income = case_info_hash[:person_attributes]["income_type"]&.downcase == 'self-employment' || false
+    applicant.has_other_income = case_info_hash[:person_attributes]["income_type"]&.downcase == 'other' || false
     applicant.has_unemployment_income = false
     applicant.has_deductions = false
     applicant.has_enrolled_health_coverage = false
