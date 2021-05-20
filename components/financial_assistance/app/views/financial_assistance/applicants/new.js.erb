@@ -28,7 +28,7 @@ $('.remove-new-employee-dependent').each(function(idx, ele) {
     return false;
   });
 });
-$('select').selectric();
+$('select').not('.no-selectric').selectric();
 applyJQDatePickers();
 isApplyingCoverage("applicant");
 applyFaaListeners();
