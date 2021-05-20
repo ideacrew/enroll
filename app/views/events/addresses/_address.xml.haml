@@ -6,6 +6,8 @@
   - unless address.address_3.blank?
     %address_line_3= address.address_3
   %location_city_name= address.city
+  - if EnrollRegistry[:enroll_app].setting(:county_fips_code_enabled).item && address.fetch_county_fips_code.present?
+    %location_county_code= address.fetch_county_fips_code
   %location_state_code= address.state
   %postal_code= address.zip_without_extension
   - unless address.zip_extension.blank?
