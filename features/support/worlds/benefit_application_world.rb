@@ -197,7 +197,8 @@ end
 
 And(/^employer (.*) has (.*) and (.*) benefit applications$/) do |legal_name, earlier_application_status, new_application_status|
   @employer_profile = employer_profile(legal_name)
-  effective_date = TimeKeeper.date_of_record.beginning_of_year.prev_year
+  status = legal_name == 'EnterPrise Limited'
+  effective_date = status ? TimeKeeper.date_of_record.beginning_of_month.prev_year : TimeKeeper.date_of_record.beginning_of_year.prev_year
   @prior_application = create_application(new_application_status: earlier_application_status.to_sym, effective_date: effective_date,
                                           recorded_rating_area: @rating_area, recorded_service_area: @service_area)
 
@@ -206,7 +207,8 @@ And(/^employer (.*) has (.*) and (.*) benefit applications$/) do |legal_name, ea
   @active_application.update_attributes!(aasm_state: state.to_sym)
   @active_application = reinstate_application(@active_application) if new_application_status == 'reinstated_active'
   @prior_application.update_attributes!(aasm_state: :active) if earlier_application_status == 'terminated'
-  terminate_application(@prior_application, @prior_application.end_on - 3.months) if earlier_application_status == 'terminated'
+  term_date = status ? @prior_application.end_on : @prior_application.end_on - 3.months
+  terminate_application(@prior_application, term_date) if earlier_application_status == 'terminated'
 end
 
 And(/^employer (.*) has (.*) and (.*) and renewal (.*) py's$/) do |legal_name, earlier_application_status, new_application_status, renewal_application_status|
