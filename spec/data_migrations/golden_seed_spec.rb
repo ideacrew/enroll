@@ -69,6 +69,14 @@ describe "Golden Seed Rake Tasks", dbclean: :after_each do
             it "should create person records with financial_assistance_identifier attributes" do
               expect(Person.all.select { |person| person.financial_assistance_identifier.present? }).to_not eq(nil)
             end
+
+            it "should create non configued state addresses for people temporarily out of state" do
+              temp_out_of_state_person_address = Person.where(is_temporarily_out_of_state: true).all.sample
+
+              temp_out_of_state_address = temp_out_of_state_person_address.addresses.last
+              configured_state = EnrollRegistry[:enroll_app].setting(:state_abbreviation).item
+              expect(temp_out_of_state_address.state).to_not eq(configured_state)
+            end
           end
         end
 
