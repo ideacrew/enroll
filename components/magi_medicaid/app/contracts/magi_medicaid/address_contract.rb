@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module MagiMedicaid
+  # Address attributes validation contract
   class AddressContract < Dry::Validation::Contract
 
 

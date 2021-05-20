@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module MagiMedicaid
+  # Citizen attributes validation contract.
   class CitizenshipImmigrationStatusInformationContract < Dry::Validation::Contract
 
     params do

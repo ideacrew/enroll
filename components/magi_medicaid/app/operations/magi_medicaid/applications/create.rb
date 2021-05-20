@@ -5,6 +5,7 @@ require 'dry/monads/do'
 
 module MagiMedicaid
   module Applications
+    # Operation to create application in magi medicaid.
     class Create
       send(:include, Dry::Monads[:result, :do])
 

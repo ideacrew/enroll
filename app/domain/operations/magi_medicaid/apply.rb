@@ -25,7 +25,7 @@ module Operations
       private
 
       def validate(params)
-        if params[:family_id]&.is_a?(BSON::ObjectId)
+        if params[:family_id].is_a?(BSON::ObjectId)
           Success(params[:family_id])
         else
           Failure('family_id is expected in BSON format')
@@ -55,7 +55,7 @@ module Operations
         application_attrs = {family_id: family.id,
                              assistance_year: family.application_applicable_year,
                              benchmark_product_id: family.benchmark_product_id,
-                             is_ridp_verified: family&.primary_person&.consumer_role&.identity_verified?} #todo add relationship attr for application.
+                             is_ridp_verified: family&.primary_person&.consumer_role&.identity_verified?} #TODO: add relationship attr for application.
 
         application_attrs.merge!({applicants: applicants_attributes(family)})
         application_attrs

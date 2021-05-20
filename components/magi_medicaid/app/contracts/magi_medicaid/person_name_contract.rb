@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module MagiMedicaid
+  # name attribute validation contract.
   class PersonNameContract < Dry::Validation::Contract
 
 

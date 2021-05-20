@@ -2,6 +2,7 @@
 
 module MagiMedicaid
   module Locations
+    # Email object
     class Email
       include Mongoid::Document
       include Mongoid::Timestamps

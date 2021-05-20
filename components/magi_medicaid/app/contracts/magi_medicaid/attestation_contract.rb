@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module MagiMedicaid
+  # Attestation validation contract
   class AttestationContract < Dry::Validation::Contract
 
     params do

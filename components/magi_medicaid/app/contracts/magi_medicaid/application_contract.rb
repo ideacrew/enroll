@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module MagiMedicaid
+  # Application attributes validaiton contract.
   class ApplicationContract < Dry::Validation::Contract
 
     params do
@@ -16,9 +17,7 @@ module MagiMedicaid
     end
 
     rule(:years_to_renew, :renewal_consent_through_year, :is_renewal_authorized) do
-      if values[:is_renewal_authorized]
-        key.failure('at least one must be provided') unless values[:years_to_renew] || values[:renewal_consent_through_year]
-      end
+      key.failure('at least one must be provided') if values[:is_renewal_authorized] && (!values[:years_to_renew] || !values[:renewal_consent_through_year])
     end
 
     rule(:applicants).each do  |key, value|

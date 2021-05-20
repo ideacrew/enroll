@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module MagiMedicaid
+  # Demographic attributes validation contract.
   class DemographicContract < Dry::Validation::Contract
 
     params do

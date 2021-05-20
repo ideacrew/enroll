@@ -2,6 +2,7 @@
 
 module MagiMedicaid
   module Locations
+    # Address model for magi medicaid engine.
     class Address
       include Mongoid::Document
       include Mongoid::Timestamps
@@ -44,10 +45,8 @@ module MagiMedicaid
 
       validates :zip,
                 allow_blank: false,
-                format: {
-                    :with => /\A\d{5}(-\d{4})?\z/,
-                    :message => 'should be in the form: 12345 or 12345-1234'
-                }
+                format: {:with => /\A\d{5}(-\d{4})?\z/,
+                         :message => 'should be in the form: 12345 or 12345-1234'}
 
       def office_is_primary_location?
         kind == 'primary'
@@ -86,7 +85,7 @@ module MagiMedicaid
       #
       # @return [ String ] the full address
       def to_s
-        city_delim = city.present? ? city + ',' : city
+        city_delim = city.present? ? "#{city} + ','" : city
         line3 = [city_delim, state, zip].reject(&:nil? || empty?).join(' ')
         [address_1, address_2, line3].reject(&:nil? || empty?).join('<br/>').html_safe
       end
@@ -102,7 +101,7 @@ module MagiMedicaid
       #
       # @return [ String ] the full address
       def full_address
-        city_delim = city.present? ? city + ',' : city
+        city_delim = city.present? ? "#{city} + ','" : city
         [address_1, address_2, city_delim, state, zip].reject(&:nil? || empty?).join(' ')
       end
 

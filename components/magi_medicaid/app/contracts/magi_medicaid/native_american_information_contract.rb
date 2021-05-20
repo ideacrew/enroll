@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module MagiMedicaid
+  # Native American validation contract.
   class NativeAmericanInformationContract < Dry::Validation::Contract
 
     params do

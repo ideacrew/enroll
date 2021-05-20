@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module MagiMedicaid
+  # Phone attributes validation contract.
   class PhoneContract < Dry::Validation::Contract
 
     params do

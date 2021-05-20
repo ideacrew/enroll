@@ -2,6 +2,7 @@
 
 module MagiMedicaid
   module Locations
+    # Phone object
     class Phone
       include Mongoid::Document
       include Mongoid::Timestamps

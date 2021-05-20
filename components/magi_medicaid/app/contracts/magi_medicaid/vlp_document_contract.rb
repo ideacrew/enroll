@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module MagiMedicaid
+  # Vlp document validation contract.
   class VlpDocumentContract < Dry::Validation::Contract
 
     params do

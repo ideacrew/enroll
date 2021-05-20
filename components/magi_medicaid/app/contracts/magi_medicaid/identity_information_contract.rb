@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module MagiMedicaid
+  # Identity info validation contract.
   class IdentityInformationContract < Dry::Validation::Contract
 
     params do
@@ -9,9 +10,7 @@ module MagiMedicaid
     end
 
     rule(:encrypted_ssn, :no_ssn) do
-      if values[:encrypted_ssn].blank? && values[:no_ssn] == '0'
-        key.failure(text: "ssn is missing")
-      end
+      key.failure(text: "ssn is missing") if values[:encrypted_ssn].blank? && values[:no_ssn] == '0'
     end
   end
 end

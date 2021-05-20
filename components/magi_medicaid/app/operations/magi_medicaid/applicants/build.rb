@@ -5,6 +5,7 @@ require 'dry/monads/do'
 
 module MagiMedicaid
   module Applicants
+    # Operations to build applicants in magi medicaid.
     class Build
       send(:include, Dry::Monads[:result, :do])
 
