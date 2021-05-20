@@ -88,24 +88,26 @@ module SponsoredBenefits
     end
 
     let!(:broker_agency_profile) do
-      if EnrollRegistry[:service_area].settings(:service_area_model).item == 'single'
+      # if EnrollRegistry[:service_area].settings(:service_area_model).item == 'single'
         FactoryBot.create(:broker_agency_profile)
-      else
-        FactoryBot.create(:benefit_sponsors_organizations_general_organization,
-                          :with_site, :with_broker_agency_profile).profiles.first
-      end
+      # else
+      #   FactoryBot.create(:benefit_sponsors_organizations_general_organization,
+      #                     :with_site, :with_broker_agency_profile).profiles.first
+      # end
     end
 
     let!(:sponsor_profile) do
-      if EnrollRegistry[:service_area].settings(:service_area_model).item == 'single'
+      # if EnrollRegistry[:service_area].settings(:service_area_model).item == 'single'
         FactoryBot.create(:employer_profile)
-      else
-        FactoryBot.create(:benefit_sponsors_organizations_general_organization,
-                          :with_site, :with_aca_shop_cca_employer_profile).profiles.first
-      end
+      # else
+      #   FactoryBot.create(:benefit_sponsors_organizations_general_organization,
+      #                     :with_site, :with_aca_shop_cca_employer_profile).profiles.first
+      # end
     end
 
     let!(:relationship_benefit) { benefit_group.relationship_benefits.first }
+
+    let(:setting) { double }
 
     before do
       allow(subject).to receive(:current_person).and_return(current_person)

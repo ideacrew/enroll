@@ -43,6 +43,7 @@ class ResidentRole
   after_create :create_initial_market_transition
 
   alias_method :is_incarcerated?,   :is_incarcerated
+  delegate :addresses, to: :person, allow_nil: true
 
   track_history :on => [:fields],
                 :scope => :person,
@@ -173,4 +174,7 @@ class ResidentRole
     is_state_resident?
   end
 
+  def rating_address
+    (addresses.detect { |adr| adr.kind == "home" }) || (addresses.detect { |adr| adr.kind == "mailing" })
+  end
 end
