@@ -487,7 +487,7 @@ describe Forms::FamilyMember, "which describes an existing family member" do
                                                               :family_id => family_id,
                                                               :person => person,
                                                               :primary_relationship => relationship,
-                                                              :save! => true}))
+                                                              :save => true}))
   end
 
   let(:update_attributes) { person_properties.merge(:family_id => family_id, :relationship => relationship, :dob => dob) }
