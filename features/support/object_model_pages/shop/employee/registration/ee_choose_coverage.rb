@@ -55,4 +55,3 @@ class EmployeeChooseCoverage
     '.interaction-click-control-continue'
   end
 end
-  
