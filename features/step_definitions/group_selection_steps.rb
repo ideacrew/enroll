@@ -450,7 +450,6 @@ When(/employee switched for (.*) benefits/) do |market_kind|
     find(EmployeeChooseCoverage.individual_benefits_radiobtn).click
   else
     find(EmployeeChooseCoverage.employer_sponsored_benefits_radio_btn).click
-  sleep 5
   end
 end
 
