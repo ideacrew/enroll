@@ -31,17 +31,6 @@ describe "Golden Seed Rake Tasks", dbclean: :after_each do
             it "should create financial assistance applications" do
               expect(FinancialAssistance::Application.all.count).to be > 0
             end
-            xit "should create completed financial assistance applications" do
-              expect(FinancialAssistance::Application.where(:family_id.ne => nil, aasm_state: "submitted").count).to be > 0
-            end
-
-            xit "should create all relationships for financial assistance applications" do
-              FinancialAssistance::Application.all.each do |fa_app|
-                family = Family.where(id: fa_app.family_id).first
-                puts("Financial App complete for #{family.primary_person}") if family.present?
-                expect(fa_app.complete?).to eq(true)
-              end
-            end
 
             it "should create financial assistance applicants" do
               expect(FinancialAssistance::Application.all.map(&:applicants).flatten.count).to be > 0
@@ -51,6 +40,13 @@ describe "Golden Seed Rake Tasks", dbclean: :after_each do
               expect(
                 FinancialAssistance::Application.all.map(&:applicants).flatten.map(&:incomes).flatten.count
               ).to be > 0
+            end
+
+            it "should create other incomes with specific kinds for applicants with other income selected" do
+              other_income_applicant = FinancialAssistance::Application.all.map(&:applicants).flatten.detect do |applicant|
+                applicant.has_other_income == true
+              end
+              expect(other_income_applicant.incomes.present?).to eq(true)
             end
 
             it "should create job incomes with employer names, address, and phone number" do
