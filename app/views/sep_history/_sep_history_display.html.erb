@@ -18,7 +18,7 @@
     </div>
     <div id="viewSepPanel_<%= f.id.to_s %>" class="panel-collapse collapse" aria-expanded="false">
       <div class="panel-body">
-        <div class="row">
+        <div class="row mt-1">
           <div class="col-md-6">
             <div class="col-md-6 font-weight-bold"><%= l10n("hbx_profiles.sep_effective_date_rule") %></div>
             <div class="col-md-6">
@@ -40,7 +40,7 @@
             <div class="col-md-6"><%= f.qle_on %></div>
           </div>
         </div>
-        <div class="row">
+        <div class="row mt-1">
           <div class="col-md-6">
             <div class="col-md-6 font-weight-bold"><%= l10n("hbx_profiles.sep_creator") %></div>
             <div class="col-md-6"><%= f.user_email.present? ? f.user_email : 'N/A' %></div>
@@ -56,7 +56,7 @@
             </div>
           </div>
         </div>
-        <div class="row">
+        <div class="row mt-1">
           <div class="col-md-6">
             <div class="col-md-6 font-weight-bold"><%= l10n("hbx_profiles.sep_creation_date") %></div>
             <div class="col-md-6"><%= f.created_at.to_s(:db)  %></div>
@@ -65,7 +65,19 @@
             <div class="col-md-6 font-weight-bold"><%= l10n("hbx_profiles.sep_optional_dates") %></div>
             <div class="col-md-6">
               <% if f.optional_effective_on.length > 0 %>
-                <%=f.optional_effective_on.join(", ") %>
+                <%= f.optional_effective_on.join(", ") %>
+              <% else %>
+                N/A
+              <% end %>
+            </div>
+          </div>
+        </div>
+        <div class="row mt-1">
+          <div class="col-md-12">
+            <div class="col-md-2 font-weight-bold">Admin Comment</div>
+            <div class="col-md-10">
+              <% if f.comments.present? %>
+                <%= f.comments.first.content %>
               <% else %>
                 N/A
               <% end %>
