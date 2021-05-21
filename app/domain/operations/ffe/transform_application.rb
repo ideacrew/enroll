@@ -3,7 +3,7 @@
 require 'dry/monads'
 require 'dry/monads/do'
 # require 'aca_entities'
-require 'aca_entities/operations/families/process_mcr_application'
+require 'aca_entities/ffe/operations/process_mcr_application'
 require 'aca_entities/ffe/operations/mcr_to/family'
 
 module Operations
@@ -33,9 +33,15 @@ module Operations
       end
 
       def transform(app_payload)
-        try do
-          AcaEntities::Operations::Families::ProcessMcrApplication.new(source_hash: app_payload, worker: :single).call
-        end.to_result
+        result = AcaEntities::Ffe::Operations::ProcessMcrApplication.new(source_hash: app_payload, worker: :single).call
+
+        if result.success?
+          result
+        elsif result.failure.class.instance_of?(Dry::Validation::Result)
+          Failure(errors: result.failure.errors(full: true).to_h)
+        else
+          Failure(errors: result.failure)
+        end
       end
 
       def validate(family_params)

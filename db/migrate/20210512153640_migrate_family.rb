@@ -1,23 +1,41 @@
 # frozen_string_literal: true
 
 require 'aca_entities'
-require 'aca_entities/operations/families/process_mcr_application'
+require 'aca_entities/ffe/operations/process_mcr_application'
 require 'aca_entities/ffe/transformers/mcr_to/family'
 
 # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
 # migrate MCR data to enroll
 class MigrateFamily < Mongoid::Migration
   def self.up
-    ::AcaEntities::Ffe::Transformers::McrTo::Family.call(file_path, { transform_mode: :batch }) do |payload|
-      family_hash = Operations::Ffe::TransformApplication.new.call(payload).success.to_h.deep_stringify_keys!
+    ::AcaEntities::Ffe::Transformers::McrTo::Family.call(file_path, {transform_mode: :batch}) do |payload|
 
-      build_family(family_hash.merge!(ext_app_id:  payload[:insuranceApplicationIdentifier])) # remove this after fixing ext_app_id in aca entities
+      transform_payload = Operations::Ffe::TransformApplication.new.call(payload)
+
+      if transform_payload.success?
+        family_hash = transform_payload.success.to_h.deep_stringify_keys!
+      else
+        puts "app_identifier: #{payload[:insuranceApplicationIdentifier]} | #{transform_payload.failure}"
+        next
+      end
+
+      if family_hash.empty?
+        puts "app_identifier: #{payload[:insuranceApplicationIdentifier]} | family_hash: #{family_hash.empty?}"
+        next
+      end
+
+      build_family(family_hash.merge!(ext_app_id: payload[:insuranceApplicationIdentifier])) # remove this after fixing ext_app_id in aca entities
       build_iap(family_hash['magi_medicaid_applications'].first.merge!("family_id": @family.id, benchmark_product_id: BSON::ObjectId.new, years_to_renew: 5))
+      print "."
+    rescue StandardError => e
+      puts "E: #{payload[:insuranceApplicationIdentifier]}, f: @family.hbx_id  error: #{e.message.split('.').first}"
+
     end
   end
 
   def self.file_path
-    "spec/test_data/transform_example_payloads/application.json"
+    "spec/test_data/transform_example_payloads/mcr_applications.json" if Rails.env == 'development'
+    "spec/test_data/transform_example_payloads/application.json" if Rails.env == 'test'
   end
 
   def self.build_iap(iap_hash)

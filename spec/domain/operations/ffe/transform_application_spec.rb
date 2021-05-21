@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'aca_entities'
-require 'aca_entities/operations/families/process_mcr_application'
+require 'aca_entities/ffe/operations/process_mcr_application'
 require 'aca_entities/ffe/transformers/mcr_to/family'
 
 RSpec.describe Operations::Ffe::TransformApplication, type: :model, dbclean: :after_each do
