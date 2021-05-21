@@ -66,6 +66,13 @@ describe "Golden Seed Rake Tasks", dbclean: :after_each do
               expect(Person.all.select { |person| person.financial_assistance_identifier.present? }).to_not eq(nil)
             end
 
+            it "should set applicant records for pregnancy/post partum" do
+              applicants = FinancialAssistance::Application.all.map(&:applicants).flatten
+              expect(
+                applicants.detect { |applicant| applicant.is_pregnant && applicant.is_post_partum_period }.present?
+              ).to_not eq(nil)
+            end
+
             it "should create non configued state addresses for people temporarily out of state" do
               temp_out_of_state_person_address = Person.where(is_temporarily_out_of_state: true).all.sample
 
