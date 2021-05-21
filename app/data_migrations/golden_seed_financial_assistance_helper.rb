@@ -53,6 +53,7 @@ module GoldenSeedFinancialAssistanceHelper
     # TODO: We can enhance this later
     applicant.is_pregnant = truthy_value?(case_info_hash[:person_attributes]['pregnant'])
     applicant.is_post_partum_period = truthy_value?(case_info_hash[:person_attributes]['pregnant_last_60_days'])
+    applicant.pregnancy_due_on = TimeKeeper.date_of_record + 2.months if truthy_value?(case_info_hash[:person_attributes]['pregnant'])
     applicant.save!
     applicant
   end
