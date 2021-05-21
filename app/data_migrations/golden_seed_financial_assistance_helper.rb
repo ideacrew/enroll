@@ -39,6 +39,8 @@ module GoldenSeedFinancialAssistanceHelper
     )
     applicant.tax_filer_kind = case_info_hash[:person_attributes]["tax_filing_status"].downcase
     applicant.claimed_as_tax_dependent_by = case_info_hash[:fa_application].applicants.all.detect(&:is_primary_applicant)&.id
+    applicant.is_applying_coverage = truthy_value?(case_info_hash[:person_attributes]['applying_for_coverage'])
+    # applicant.
     # TODO: Need to refactor this once dc resident is refactored
     applicant.has_fixed_address = target_person&.is_homeless?
     applicant.is_living_in_state = target_person&.is_dc_resident?
@@ -54,6 +56,10 @@ module GoldenSeedFinancialAssistanceHelper
     applicant.is_pregnant = truthy_value?(case_info_hash[:person_attributes]['pregnant'])
     applicant.is_post_partum_period = truthy_value?(case_info_hash[:person_attributes]['pregnant_last_60_days'])
     applicant.pregnancy_due_on = TimeKeeper.date_of_record + 2.months if truthy_value?(case_info_hash[:person_attributes]['pregnant'])
+    # TODO: Figure out if we want pregnant examples on medicaid
+    # This is during pregnancy btw
+    applicant.is_enrolled_on_medicaid = false if truthy_value?(case_info_hash[:person_attributes]['pregnant'])
+    applicant.is_former_foster_care = false if applicant.age_of_applicant > 18 && applicant.age_of_applicant < 26
     applicant.save!
     applicant
   end
@@ -82,11 +88,11 @@ module GoldenSeedFinancialAssistanceHelper
   def add_applicant_income(case_info_hash)
     return if case_info_hash[:person_attributes]["tax_filing_status"].nil? ||
               case_info_hash[:person_attributes]["tax_filing_status"] == 'non_filer' ||
-              !truthy_value?(case_info_hash[:person_attributes]['income_frequency_kind'])
+              !truthy_value?(case_info_hash[:person_attributes]['income_frequency'])
     income = case_info_hash[:target_fa_applicant].incomes.build
     income.employer_name = FFaker::Company.name if case_info_hash[:person_attributes]["income_type"].downcase == 'job'
     income.amount = case_info_hash[:person_attributes]['income_amount']
-    income.frequency_kind = case_info_hash[:person_attributes]['income_frequency_kind'].downcase
+    income.frequency_kind = case_info_hash[:person_attributes]['income_frequency'].downcase
     income.start_on = case_info_hash[:person_attributes]['income_from']
     income.kind = case_info_hash[:person_attributes]["income_type"]
     income.save!

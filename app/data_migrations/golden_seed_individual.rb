@@ -31,7 +31,7 @@ class GoldenSeedIndividual < MongoidMigrationTask
     ivl_csv = File.read(ivl_testbed_scenario_csv)
     puts("CSV #{ivl_testbed_scenario_csv} present for IVL Golden Seed, using CSV for seed.") unless Rails.env.test?
     CSV.parse(ivl_csv, :headers => true).each do |person_attributes|
-      puts("Running for #{person_attributes['case_name']}")
+      puts("Running for #{person_attributes['case_name']}") unless Rails.env.test?
 
       # person_attributes = person_attributes.to_h.with_indifferent_access
       primary_family_for_current_case = case_collection[person_attributes["case_name"]]&.dig(:family_record)
@@ -153,7 +153,7 @@ class GoldenSeedIndividual < MongoidMigrationTask
       #  applicant.is_post_partum_period == true &&
       #  applicant.pregnancy_due_on.present?
       # end
-      pregnant_applicant_primary_family_member = 
+      # pregnant_applicant_primary_family_member = 
       puts("With user #{user_record.email}") if user_record && !Rails.env.test?
     end
   end
