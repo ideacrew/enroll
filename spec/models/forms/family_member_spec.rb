@@ -480,7 +480,7 @@ describe Forms::FamilyMember, "which describes an existing family member" do
       :is_incarcerated => "no",
       :tribal_id => "test"
     }
-  }
+  end
   let(:person) { double(:errors => double(:has_key? => false), home_address: nil, tobacco_use: nil) }
 
   let(:family_member) do
