@@ -22,6 +22,7 @@ describe "Golden Seed Rake Tasks", dbclean: :after_each do
     if ivl_testbed_templates.present?
       context "with csv input", dbclean: :after_each do
         context "financial assistance" do
+          let!(:applicants) { FinancialAssistance::Application.all.map(&:applicants).flatten }
           before :each do
             EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(true)
             subject.migrate
@@ -33,24 +34,22 @@ describe "Golden Seed Rake Tasks", dbclean: :after_each do
             end
 
             it "should create financial assistance applicants" do
-              expect(FinancialAssistance::Application.all.map(&:applicants).flatten.count).to be > 0
+              expect(applicants).to be > 0
             end
 
             it "should create incomes" do
-              expect(
-                FinancialAssistance::Application.all.map(&:applicants).flatten.map(&:incomes).flatten.count
-              ).to be > 0
+              expect(applicants.map(&:incomes).flatten.count).to be > 0
             end
 
             it "should create other incomes with specific kinds for applicants with other income selected" do
-              other_income_applicant = FinancialAssistance::Application.all.map(&:applicants).flatten.detect do |applicant|
+              other_income_applicant = applicants.detect do |applicant|
                 applicant.has_other_income == true
               end
               expect(other_income_applicant.incomes.present?).to eq(true)
             end
 
             it "should create job incomes with employer names, address, and phone number" do
-              random_job_income = FinancialAssistance::Application.all.map(&:applicants).flatten.map(&:incomes).flatten.detect do |income|
+              random_job_income = applicants.map(&:incomes).flatten.detect do |income|
                 income.employer_name.present?
               end
               expect(random_job_income.present?).to eq(true)
@@ -67,7 +66,6 @@ describe "Golden Seed Rake Tasks", dbclean: :after_each do
             end
 
             it "should set applicant records for pregnancy/post partum" do
-              applicants = FinancialAssistance::Application.all.map(&:applicants).flatten
               expect(
                 applicants.detect do |applicant|
                   applicant.is_pregnant == true &&
@@ -77,9 +75,12 @@ describe "Golden Seed Rake Tasks", dbclean: :after_each do
               ).to eq(true)
             end
 
+            it "should have applicant coverage questions answered" do
+              expect(applicants.detect { |applicant| applicant.is_applying_coverage.present? }.present?).to eq(true)
+            end
+
             it "should create non configued state addresses for people temporarily out of state" do
               temp_out_of_state_person_address = Person.where(is_temporarily_out_of_state: true).all.sample
-
               temp_out_of_state_address = temp_out_of_state_person_address.addresses.last
               configured_state = EnrollRegistry[:enroll_app].setting(:state_abbreviation).item
               expect(temp_out_of_state_address.state).to_not eq(configured_state)
