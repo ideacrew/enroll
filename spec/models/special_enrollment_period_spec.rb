@@ -27,6 +27,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
     it { is_expected.to have_field(:admin_flag).of_type(Mongoid::Boolean)}
     it { is_expected.to have_field(:optional_effective_on).of_type(Array).with_default_value_of([]) }
     it { is_expected.to have_field(:coverage_renewal_flag).of_type(Mongoid::Boolean) }
+    it { is_expected.to have_field(:user_id).of_type(BSON::ObjectId) }
   end
 
   let(:family)        { FactoryBot.create(:family, :with_primary_family_member) }
