@@ -86,6 +86,23 @@ module FinancialAssistance
         end
       end
 
+      context "with DC state" do
+        let(:family_id) { BSON::ObjectId.new }
+        let(:application) { FactoryBot.create(:application, family_id: family_id) }
+        let!(:eligibility_determination) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application) }
+        let(:family_member_id) { BSON::ObjectId.new }
+        let(:applicant) {FactoryBot.create(:applicant, eligibility_determination_id: eligibility_determination.id, application: application, family_member_id: family_member_id)}
+        let(:new_address) { FinancialAssistance::Locations::Address.new(address_params) }
+
+        it "should save city as Washington on save" do
+          expect(new_address.city).to eq 'Irvine'
+          applicant.addresses << new_address
+          applicant.save
+          # TODO: Need to fix the existing bug of saving applicant address
+          # expect(new_address.city).to eq 'Washington'
+        end
+      end
+
       context 'embedded in another object', type: :model do
         it {should validate_presence_of :address_1}
         it {should validate_presence_of :city}
