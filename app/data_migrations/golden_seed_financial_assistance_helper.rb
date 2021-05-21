@@ -47,12 +47,12 @@ module GoldenSeedFinancialAssistanceHelper
     applicant.is_tobacco_user = false
     applicant.is_incarcerated = false
     applicant.is_disabled = false
-    applicant.is_physically_disabled = false
+
     applicant.is_physically_disabled = false
     applicant.indian_tribe_member = false
     # TODO: We can enhance this later
-    applicant.is_pregnant = false
-    applicant.is_post_partum_period = false
+    applicant.is_pregnant = truthy_value?(case_info_hash[:person_attributes]['pregnant'])
+    applicant.is_post_partum_period = truthy_value?(case_info_hash[:person_attributes]['pregnant_last_60_days'])
     applicant.save!
     applicant
   end
