@@ -1005,7 +1005,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
     end
 
     context "cancel_coverage!" do
-      let(:family) {FactoryBot.create(:family, :with_primary_family_member)}
+      let(:family) {FactoryBot.build_stubbed(:family, :with_primary_family_member)}
       let(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, household: family.active_household, family: family, aasm_state: "inactive")}
 
       it "should cancel the enrollment" do
@@ -1030,6 +1030,63 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
         expect(hbx_enrollment.may_cancel_coverage?).to eq false
         expect(hbx_enrollment.aasm_state).to eq 'coverage_expired'
       end
+
+      context 'when ivl enrollment is terminated and effective on falls in prior coverage period' do
+        let(:prior_coverage_year) { Date.today.year - 1}
+        let(:sep) {  FactoryBot.create(:special_enrollment_period, effective_on: Date.new(prior_coverage_year, 11, 1), family: family)}
+        let!(:prior_hbx_profile) do
+          FactoryBot.create(:hbx_profile,
+                            :no_open_enrollment_coverage_period,
+                            coverage_year: prior_coverage_year)
+        end
+        let(:hbx_enrollment) do
+          FactoryBot.create(:hbx_enrollment,
+                            special_enrollment_period_id: sep.id,
+                            aasm_state: 'coverage_expired',
+                            kind: 'individual',
+                            effective_on: sep.effective_on,
+                            household: family.active_household,
+                            family: family)
+        end
+
+        before do
+          allow(::EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_ivl_sep).and_return(true)
+          allow(::EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
+        end
+
+        it "should cancel the enrollment" do
+          hbx_enrollment.cancel_coverage!
+          expect(hbx_enrollment.aasm_state).to eq "coverage_canceled"
+        end
+      end
+
+      context 'when ivl enrollment is expired and effective on falls in prior coverage period' do
+        let(:prior_coverage_year) { Date.today.year - 1}
+        let(:sep) {  FactoryBot.create(:special_enrollment_period, effective_on: Date.new(prior_coverage_year, 11, 1), family: family)}
+        let!(:prior_hbx_profile) do
+          FactoryBot.create(:hbx_profile, :no_open_enrollment_coverage_period, coverage_year: prior_coverage_year)
+        end
+        let(:hbx_enrollment) do
+          FactoryBot.create(:hbx_enrollment,
+                            special_enrollment_period_id: sep.id,
+                            aasm_state: 'coverage_expired',
+                            kind: 'individual',
+                            effective_on: sep.effective_on,
+                            household: family.active_household,
+                            family: family)
+        end
+
+        before do
+          allow(::EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_ivl_sep).and_return(true)
+          allow(::EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
+        end
+
+        it "should cancel the enrollment" do
+          hbx_enrollment.cancel_coverage!
+          expect(hbx_enrollment.aasm_state).to eq "coverage_canceled"
+        end
+      end
+    end
     end
 
     context "cancel_for_non_payment!" do

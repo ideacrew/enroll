@@ -29,6 +29,7 @@ module SepAll
     @effective_on = special_enrollment_period.effective_on
     @self_attested = qle.is_self_attested
     @date_options = qle.date_options_available
+    @market_kind = qle.market_kind
   end
 
   def calculate_rule
@@ -177,6 +178,7 @@ module SepAll
     special_enrollment_period.optional_effective_on = date_arr if date_arr.length > 0
     special_enrollment_period.market_kind = qle.market_kind == "individual" ? "ivl" : qle.market_kind
     special_enrollment_period.admin_flag = true
+    special_enrollment_period.coverage_renewal_flag = sep_params[:coverage_renewal_flag].present? ? sep_params[:coverage_renewal_flag] : true
     
     if special_enrollment_period.save
       @message_for_partial = "SEP Added for #{@name}"
