@@ -954,6 +954,15 @@ When("Patrick Doe clicked on Shop For Plans button") do
   find(".interaction-click-control-continue").click
 end
 
+When("I click on Shop For Plans banner button") do
+  find_link('Shop for Plans').click
+  find(".interaction-click-control-continue").click
+end
+
+When("I click Shop for new plan button on CHH page") do
+  find(".interaction-click-control-shop-for-new-plan").click
+end
+
 Then(/^.+ should see Termination on kinds dropdown$/) do
   sleep 2
   find("span", :text => "Choose").click
