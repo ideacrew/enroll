@@ -68,6 +68,9 @@ class SpecialEnrollmentPeriod
   # ADMIN FLAG
   field :admin_flag, type:Boolean
 
+  #Renew coverage flag
+  field :coverage_renewal_flag, type: Boolean
+
   validate :optional_effective_on_dates_within_range, :next_poss_effective_date_within_range, on: :create
 
   validates :csl_num,
@@ -84,6 +87,7 @@ class SpecialEnrollmentPeriod
   scope :individual_market,   ->{ where(:qualifying_life_event_kind_id.in => QualifyingLifeEventKind.individual_market_events.map(&:id) + QualifyingLifeEventKind.individual_market_non_self_attested_events.map(&:id)) }
 
   after_initialize :set_submitted_at
+  before_save :set_coverage_renewal_flag
 
   add_observer ::BenefitSponsors::Observers::NoticeObserver.new, [:process_special_enrollment_events]
 
@@ -236,6 +240,13 @@ private
 
   def set_submitted_at
     self.submitted_at ||= TimeKeeper.datetime_of_record
+  end
+
+  def set_coverage_renewal_flag
+    prior_py_ivl_sep = EnrollRegistry.feature_enabled?(:prior_plan_year_ivl_sep)
+    return if (coverage_renewal_flag == false || prior_py_ivl_sep == false)
+
+    self.assign_attributes({coverage_renewal_flag: prior_py_ivl_sep})
   end
 
   def set_date_period
