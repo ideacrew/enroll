@@ -244,7 +244,7 @@ private
 
   def set_coverage_renewal_flag
     prior_py_ivl_sep = EnrollRegistry.feature_enabled?(:prior_plan_year_ivl_sep)
-    return if (coverage_renewal_flag == false || prior_py_ivl_sep == false)
+    return if coverage_renewal_flag == false || prior_py_ivl_sep == false
 
     self.assign_attributes({coverage_renewal_flag: prior_py_ivl_sep})
   end
