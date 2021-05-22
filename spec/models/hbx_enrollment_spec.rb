@@ -1086,7 +1086,6 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
         end
       end
     end
-    end
 
     context "cancel_for_non_payment!" do
       let(:family) {FactoryBot.create(:family, :with_primary_family_member)}
