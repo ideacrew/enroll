@@ -525,7 +525,7 @@ class HbxEnrollment
     enrollments = family.active_household.hbx_enrollments.where(
       {:coverage_kind => coverage_kind,
        :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES + ['auto_renewing', 'renewing_coverage_selected']),
-       :effective_on.gte => new_effective_on,
+       :effective_on => { "$gte" => new_effective_on, "$lte" => new_effective_on.end_of_year },
        :kind => kind}
     )
     return true if enrollments.empty?
@@ -1947,6 +1947,8 @@ class HbxEnrollment
                          :coverage_enrolled, :renewing_waived, :inactive, :coverage_reinstated],
                   to: :coverage_canceled, after: :propogate_cancel
       transitions from: :coverage_expired, to: :coverage_canceled, :guard => :is_ivl_by_kind?, after: :propogate_cancel
+      transitions from: [:coverage_terminated, :coverage_expired], to: :coverage_canceled,
+                  guard: :prior_plan_year_coverage?
     end
 
     event :cancel_for_non_payment, :after => :record_transition do
@@ -2015,6 +2017,20 @@ class HbxEnrollment
 
   def can_be_expired?
     benefit_group.blank? || (benefit_group.present? && benefit_group.end_on <= TimeKeeper.date_of_record)
+  end
+
+  def prior_plan_year_coverage?
+    return false if is_shop?
+
+    prior_year_ivl_coverage?
+  end
+
+  def prior_year_ivl_coverage?
+    return false unless EnrollRegistry.feature_enabled?(:prior_plan_year_ivl_sep)
+    return false if special_enrollment_period.blank?
+    prior_bcp = HbxProfile.current_hbx&.benefit_sponsorship&.previous_benefit_coverage_period
+    return false unless prior_bcp
+    prior_bcp.contains?(effective_on)
   end
 
   def can_select_coverage?(qle: false)
