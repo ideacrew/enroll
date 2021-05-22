@@ -42,3 +42,5 @@ registry:
       - key: :apply_aggregate_to_enrollment
         item: Operations::Individual::ApplyAggregateToEnrollment.new
         is_enabled: true
+      - key: :prior_plan_year_ivl_sep
+        is_enabled: :true
