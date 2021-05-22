@@ -45,6 +45,6 @@ HBX_PROFILES_TRANSLATIONS = {
 	"en.hbx_profiles.sep_creator" => "SEP Creator",
 	"en.hbx_profiles.sep_next_possible_start_date" => "Next Possible Start Date",
 	"en.hbx_profiles.sep_creation_date" => "Creation Date",
-	"en.hbx_profiles.sep_optional_dates" => "Option Dates"
-
+	"en.hbx_profiles.sep_optional_dates" => "Option Dates",
+  "en.hbx_profiles.sep_admin_comment" => "Admin Comment"
 }
