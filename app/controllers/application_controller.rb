@@ -93,11 +93,7 @@ class ApplicationController < ActionController::Base
       IdpAccountManager.create_account(user.email, user.oim_id, stashed_user_password, personish, account_role, timeout)
       session[:person_id] = personish.id
       session.delete("stashed_password")
-      if user.switch_to_idp!
-        flash[:notice] = "Successfully switched to IDP."
-      else
-        flash[:error] = "Unable to switch to IDP."
-      end
+      flash[:error] = "Unable to switch to IDP." unless user.switch_to_idp!
     end
     #TODO TREY KEVIN JIM CSR HAS NO SSO_ACCOUNT
     session[:person_id] = personish.id if current_user.try(:person).try(:agent?)

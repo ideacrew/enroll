@@ -8,6 +8,7 @@ module BenefitSponsors
 
     rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
     rescue_from ActionController::InvalidAuthenticityToken, :with => :bad_token_due_to_session_expired
+    rescue_from SwitchToIdpException, with: :user_not_authorized
 
     def self.current_site
       site_key = EnrollRegistry[:enroll_app].settings(:site_key).item
@@ -86,10 +87,10 @@ module BenefitSponsors
         IdpAccountManager.create_account(user.email, user.oim_id, stashed_user_password, personish, account_role, timeout)
         session[:person_id] = personish.id
         session.delete("stashed_password")
-        user.switch_to_idp!
+        flash[:error] = "Unable to switch to IDP." unless user.switch_to_idp!
       end
       #TODO TREY KEVIN JIM CSR HAS NO SSO_ACCOUNT
-      session[:person_id] = personish.id if user.person && user.person.agent?
+      session[:person_id] = personish.id if current_user.try(:person).try(:agent?)
       yield
     end
 
