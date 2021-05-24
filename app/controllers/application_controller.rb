@@ -1,3 +1,7 @@
+# frozen_string_literal: true
+
+require "#{Rails.root}/app/models/custom_exceptions/switch_to_idp_exception"
+
 class ApplicationController < ActionController::Base
   include Pundit
   include Config::SiteConcern
@@ -50,6 +54,8 @@ class ApplicationController < ActionController::Base
     log(JSON.dump(error_message), {:severity => 'critical'})
   end
 
+  rescue_from SwitchToIdpException, with: :user_not_authorized
+
   rescue_from ActionController::InvalidAuthenticityToken, :with => :bad_token_due_to_session_expired
 
   def access_denied
@@ -87,7 +93,11 @@ class ApplicationController < ActionController::Base
       IdpAccountManager.create_account(user.email, user.oim_id, stashed_user_password, personish, account_role, timeout)
       session[:person_id] = personish.id
       session.delete("stashed_password")
-      user.switch_to_idp!
+      if user.switch_to_idp!
+        flash[:notice] = "Successfully switched to IDP."
+      else
+        flash[:error] = "Unable to switch to IDP."
+      end
     end
     #TODO TREY KEVIN JIM CSR HAS NO SSO_ACCOUNT
     session[:person_id] = personish.id if current_user.try(:person).try(:agent?)

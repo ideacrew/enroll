@@ -19,6 +19,16 @@ RSpec.describe User, :type => :model, dbclean: :after_each do
   end
 
   describe 'user' do
+    context "when some params are invalid" do
+      context "#switch_to_idp" do
+        let(:idp_test_user) { FactoryBot.create(:user) }
+        it "should throw an exception if user is not valid" do
+          # Invalid email param to make user invalid
+          idp_test_user.email = "user"
+          expect{ idp_test_user.switch_to_idp! }.to raise_error(SwitchToIdpException, "Unable to switch to IDP")
+        end
+      end
+    end
     context "when all params are valid" do
       let(:params){valid_params}
       it "should not have errors on create" do
