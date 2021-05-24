@@ -18,7 +18,7 @@ class CobraCensusEmployeeFixMay2021 < MongoidMigrationTask
             if census_employee.may_elect_cobra?
               census_employee.update_for_cobra(cobra_date, nil)
               puts("Sucessfully created Cobra enrollment for person with hbx_id: #{employee_data['employee_hbx_id']}")
-            elsif census_employee.aasm_state == "cobra_linked" && !(ActiveModel::Type::Boolean.new.cast(employee_data[:enrollments_present?]))
+            elsif ["cobra_linked", "cobra_eligible", "rehired"].include?(census_employee.aasm_state) && !ActiveModel::Type::Boolean.new.cast(employee_data[:enrollments_present?])
               census_employee.build_hbx_enrollment_for_cobra
               census_employee.save!
               puts("Sucessfully created Cobra enrollment for person with hbx_id: #{employee_data['employee_hbx_id']}")
