@@ -170,6 +170,18 @@
                 <div class="col-md-6"><%= l10n("faa.indian_health_service") %> *</div>
                 <div class="col-md-6"><%= human_boolean applicant.health_service_through_referral %></div>
               </div>
+
+            <% if EnrollRegistry[:maine_iap_healthcare_driver_questions].feature.is_enabled && applicant.eligible_immigration_status %>
+              <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                <div class="col-md-6"><%= l10n("faa.mainecare_cubcare_ineligible") %> <%= TimeKeeper.date_of_record.year - 5 %>? *</div>
+                <div class="col-md-6"><%= human_boolean applicant.mainecare_cubcare_ineligible %></div>
+              </div>
+              <% if applicant.mainecare_cubcare_ineligible %>
+                <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                  <div class="col-md-6"><%= l10n("faa.immigration_status_changed") %>? *</div>
+                  <div class="col-md-6"><%= human_boolean applicant.immigration_status_changed %></div>
+                </div>
+              <% end %>
             <% end %>
 
             <% if FinancialAssistanceRegistry.feature_enabled?(:has_medicare_cubcare_eligible) %>
