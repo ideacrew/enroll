@@ -57,3 +57,5 @@ def check_and_run
   [not_run: {count: not_run.count, rs: not_run},
    removed_household: {count: removed_households.count, rs: removed_households}]
 end
+
+check_and_run
