@@ -60,7 +60,7 @@ module GoldenSeedFinancialAssistanceHelper
     # TODO: Figure out if we want pregnant examples on medicaid
     # This is during pregnancy btw
     applicant.is_enrolled_on_medicaid = false if truthy_value?(case_info_hash[:person_attributes]['pregnant'])
-    applicant.is_former_foster_care = false if applicant.age_of_applicant > 18 && applicant.age_of_applicant < 26
+    applicant.is_former_foster_care = false if applicant.age_of_the_applicant > 18 && applicant.age_of_the_applicant < 26
     applicant.save!
     applicant
   end

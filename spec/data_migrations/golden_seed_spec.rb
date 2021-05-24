@@ -22,7 +22,7 @@ describe "Golden Seed Rake Tasks", dbclean: :after_each do
     if ivl_testbed_templates.present?
       context "with csv input", dbclean: :after_each do
         context "financial assistance" do
-          let!(:applicants) { FinancialAssistance::Application.all.map(&:applicants).flatten }
+          let(:applicants) { FinancialAssistance::Application.all.map(&:applicants).flatten }
           before :each do
             EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(true)
             subject.migrate
@@ -39,6 +39,10 @@ describe "Golden Seed Rake Tasks", dbclean: :after_each do
 
             it "should create incomes" do
               expect(applicants.map(&:incomes).flatten.count).to be > 0
+            end
+
+            it "should set a kind for all incomes" do
+              expect(applicants.map(&:incomes).flatten.select { |income| income.kind.blank? }.blank?).to eq(true)
             end
 
             it "should create other incomes with specific kinds for applicants with other income selected" do
