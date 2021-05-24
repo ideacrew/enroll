@@ -146,14 +146,14 @@ class GoldenSeedIndividual < MongoidMigrationTask
         dependent_names.each { |family_member| puts(family_member&.person&.full_name) unless Rails.env.test? }
       end
       # TODO: Refactor this to do lesss applicants, maybe only from this run
-      # Maybe set it to a variable right when its created 
+      # Maybe set it to a variable right when its created
       # applicants = FinancialAssistance::Application.all.map(&:applicants).flatten
       # applicant_with_pregnancy = applicants.detect do |applicant|
       #  applicant.is_pregnant == true &&
       #  applicant.is_post_partum_period == true &&
       #  applicant.pregnancy_due_on.present?
       # end
-      # pregnant_applicant_primary_family_member = 
+      # pregnant_applicant_primary_family_member =
       puts("With user #{user_record.email}") if user_record && !Rails.env.test?
     end
   end
