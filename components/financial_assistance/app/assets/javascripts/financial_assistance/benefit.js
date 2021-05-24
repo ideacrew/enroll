@@ -256,8 +256,27 @@ document.addEventListener("turbolinks:load", function() {
       }
     });
 
+    /* Condtional Display immigration status changed question */
+    if (!$("#mainecare_cubcare_ineligible_true").is(':checked')) $("#immigration-status-changed-driver").addClass('hide');
+
+    $("body").on("change", "#mainecare_cubcare_ineligible_true", function(){
+      if ($('#mainecare_cubcare_ineligible_true').is(':checked')) {
+        $("#immigration-status-changed-driver").removeClass('hide');
+      } else{
+        $("#immigration-status-changed-driver").addClass('hide');
+      }
+    });
+
+    $("body").on("change", "#mainecare_cubcare_ineligible_false", function(){
+      if ($('#mainecare_cubcare_ineligible_false').is(':checked')) {
+        $("#immigration-status-changed-driver").addClass('hide');
+      } else{
+        $("#immigration-status-changed-driver").removeClass('hide');
+      }
+    });
+
     /* Saving Responses to Income  Driver Questions */
-    $('#has_enrolled_health_coverage_false, #has_eligible_health_coverage_false, #has_enrolled_health_coverage_true, #has_eligible_health_coverage_true, #health_service_through_referral_true, #health_service_through_referral_false').on('change', function(e) {
+    $('#has_enrolled_health_coverage_false, #has_eligible_health_coverage_false, #has_enrolled_health_coverage_true, #has_eligible_health_coverage_true, #mainecare_cubcare_ineligible_true, #mainecare_cubcare_ineligible_false, #immigration_status_changed_true, #immigration_status_changed_false, #health_service_through_referral_true, #health_service_through_referral_false').on('change', function(e) {
       var attributes = {};
       attributes[$(this).attr('name')] = $(this).val();
       $.ajax({
