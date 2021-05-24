@@ -9,7 +9,9 @@
         <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 bottom-pd">
           <div class="bottom-pd">
             <h2 class="darkblue">Your Application for Premium Reductions</h2>
-            <p><b>You can get help paying for coverage if you qualify.</b><span> If you don’t qualify for monthly <span class="glossary-tooltips" tabindex="0" data-trigger='focus' data-toggle='tooltip' data-placement='auto top' data-html='true' title="<%= l10n("glossary.Premium") %>"> premium</span> reductions and lower <span class="glossary-tooltips" tabindex="0" data-trigger='focus' data-title= 'out_of_pocket_costs' data-placement='auto top' data-toggle='tooltip' data-html='true' title="<%= l10n("glossary.Out_of_Pocket_Costs") %>"> out-of-pocket costs</span>, we’ll also check if you likely qualify for <span class="glossary-tooltips" tabindex="0" data-trigger='focus' data-title= 'Medicaid' data-placement='auto top' data-toggle='tooltip' data-html='true' title="<%= l10n("glossary.medicaid") %>"> Medicaid.</span></p>
+            <p><b>You can get help paying for coverage if you qualify.</b><span> If you don’t qualify for monthly <%= render partial:"shared/glossary", locals: {key: "Premium", title: "Premium", term: "premium" } %> reductions and lower
+            <%= render partial:"shared/glossary", locals: {key: "Out_of_Pocket_Costs", title: "Out-of-pocket Costs", term: " out-of-pocket costs" } %>, we’ll also check if you likely qualify for
+            <%= render partial:"shared/glossary", locals: {key: "medicaid", title: "Medicaid", term: " Medicaid" } %></p>
 
             <p class="memo">* = required field</p>
 

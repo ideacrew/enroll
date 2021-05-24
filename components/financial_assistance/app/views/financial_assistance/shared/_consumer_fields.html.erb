@@ -82,7 +82,7 @@
   <div class="row row-form-wrapper no-buffer" id='indian_tribe_area'>
     <div class="row no-buffer">
       <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-      <label>Is this person a member of an <span class="glossary-tooltips" tabindex="0" data-trigger='focus' data-toggle='tooltip' data-placement='auto top' data-html='true' title="<%= l10n("glossary.american_indian") %>">American Indian</span> or <span class="glossary-tooltips" tabindex="0" data-trigger='focus' data-toggle='tooltip' data-placement='auto top' data-html='true' title="<%= l10n("glossary.alaska_native") %>">Alaska Native</span> Tribe? *</label>
+      <label>Is this person a member of an <%= render partial:"shared/glossary", locals: {key: "american_indian", title: "American Indian", term: "American Indian" } %> or <%= render partial:"shared/glossary", locals: {key: "alaska_native", title: "Alaska Native", term: "Alaska Native" } %> Tribe? *</label>
       </div>
       <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 form-group form-group-lg no-pd border_bottom_zero">
         <div class="radio">

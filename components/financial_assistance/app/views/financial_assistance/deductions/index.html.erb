@@ -62,7 +62,7 @@
             </div>
 
             <div class="col-md-9 no-pd <%= deduction_kind %>">
-              <span class="glossary-tooltips" tabindex="0" data-trigger='focus' data-toggle='tooltip' data-placement='auto top' data-html='true' title='<%= l10n('glossary.#{deduction_kind.to_sym}')%>'> <%= FinancialAssistance::Benefit::INSURANCE_TYPE[deduction_kind.to_sym]%></span>
+              <%= render partial:"shared/glossary", locals: {key: "#{deduction_kind.to_sym}", title: "#{FinancialAssistance::Benefit::INSURANCE_TYPE[deduction_kind.to_sym}", term: "#{FinancialAssistance::Benefit::INSURANCE_TYPE[deduction_kind.to_sym}" } %>
             </div>
           </div>
 

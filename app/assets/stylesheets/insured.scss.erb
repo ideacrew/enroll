@@ -526,24 +526,13 @@
   overflow-wrap: break-word;
 }
 
-.glossary-tooltips {
-  text-decoration-line: underline;
-  text-decoration-style: dashed;
-  text-decoration-color: #003260;
-  max-width: 350px;
-}
-
-.glossary-tooltips + .tooltip {
-  background: #003260;
+.glossary + .popover {
+  background-color: <%= EnrollRegistry[:cancel_plan_border].settings(:color).item %>;
   color: white;
-  font-size: 14px;
-  font-family: 'open sans', sans-serif;
-  padding: 8px 14px 15px 14px;
   max-width: 350px;
-  opacity: 1;
   .arrow { display: none; }
-  .tooltip {
-    background-color: #003260;
+  .popover-title {
+    background-color: <%= EnrollRegistry[:cancel_plan_border].settings(:color).item %>;
     border-bottom: none;
     color: white;
     font-weight: bold;
@@ -555,18 +544,11 @@
       width: 16px;
       margin-top: 3px;
       opacity: 1;
+      &:hover {
+        opacity: .5;
+      }
     }
   }
-
-  .tooltip-inner {
-    max-width: 350px;
-    padding: 3px 8px;
-    color: #fff;
-    text-align: initial;
-    background-color: #003260;
-    border-radius: 4px;
-}
-
   .popover-content {
     padding: 8px 14px 15px 14px;
     text-align: left;
