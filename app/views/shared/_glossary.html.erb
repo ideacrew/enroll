@@ -6,7 +6,7 @@
       data-fallbackPlacement="flip" 
       data-html="true" 
       data-content="<%= l10n("glossary.#{key}") %>" 
-      data-title='<%= title %>'>
+      data-title='<%= title || term %>'>
   <button data-dismiss='modal'
           type='button' 
           class='close' 

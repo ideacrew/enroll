@@ -62,7 +62,7 @@
             </div>
 
             <div class="col-md-9 no-pd <%= deduction_kind %>">
-              <%= render partial:"shared/glossary", locals: {key: "#{deduction_kind.to_sym}", title: "#{FinancialAssistance::Benefit::INSURANCE_TYPE[deduction_kind.to_sym]}", term: "#{FinancialAssistance::Benefit::INSURANCE_TYPE[deduction_kind.to_sym]}" } %>
+              <%= render partial:"shared/glossary", locals: {key: deduction_kind, term: FinancialAssistance::Benefit::INSURANCE_TYPE[deduction_kind.to_sym] } %>
             </div>
           </div>
 
