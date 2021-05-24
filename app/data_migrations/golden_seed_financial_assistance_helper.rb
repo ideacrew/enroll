@@ -15,6 +15,7 @@ module GoldenSeedFinancialAssistanceHelper
   end
 
   # TODO: NEED TO DO MEDICAID AND OTHER STUFF
+  # rubocop:disable Metrics/CyclomaticComplexity
   def create_and_return_fa_applicant(case_info_hash, is_primary_applicant = nil)
     applicant = case_info_hash[:fa_application].applicants.build
     target_person = case_info_hash[:person_attributes][:current_target_person]
@@ -63,6 +64,7 @@ module GoldenSeedFinancialAssistanceHelper
     applicant.save!
     applicant
   end
+  # rubocop:enable Metrics/CyclomaticComplexity
 
   def create_fa_relationships(case_array = nil)
     application = case_array[1][:fa_application]
