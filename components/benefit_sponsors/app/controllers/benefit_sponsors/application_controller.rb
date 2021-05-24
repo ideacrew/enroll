@@ -1,3 +1,5 @@
+require "#{Rails.root}/app/models/custom_exceptions/switch_to_idp_exception"
+
 module BenefitSponsors
   class ApplicationController < ActionController::Base
     protect_from_forgery with: :exception
