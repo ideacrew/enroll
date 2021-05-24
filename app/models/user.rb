@@ -39,20 +39,13 @@ class User
   end
 
   def switch_to_idp!
-    # new_password = self.class.generate_valid_password
-    # self.password = new_password
-    # self.password_confirmation = new_password
+    # Note - Exception originally added here
+    # https://github.com/ideacrew/enroll/commit/f1217e3425a3f1840ac7f79d9f64dfb0605759cf
+    # Removing 5/2021 to prevent exception from being thrown.
+    # Exception was thrown on consumer_role, perhaps the exception here only considers
+    # user and not nested models like consumer role.
     self.idp_verified = true
-    begin
-      self.save!
-    rescue => e
-      message = "#{e.message}; "
-      message = message + "user: #{self}, "
-      message = message + "errors.full_messages: #{self.errors.full_messages}, "
-      message = message + "stacktrace: #{e.backtrace}"
-      log(message, {:severity => "error"})
-      raise e
-    end
+    self.save
   end
 
   field :hints, type: Boolean, default: true
