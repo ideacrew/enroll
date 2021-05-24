@@ -32,6 +32,8 @@
     HEALTH COVERAGE:
         Is this person currently enrolled in health coverage?: <%= applicant.has_enrolled_health_coverage %>
         Does this person currently have access to other health coverage, including through another person?: <%=applicant.has_eligible_health_coverage %>
+        Was this person found not eligible for MaineCare (Medicaid) or CubCare (Children's Health Insurance Program) based on their immigration status since <%= @application.assistance_year - 5 %>?: <%= applicant.mainecare_cubcare_ineligible %>
+        Has this person’s immigration status changed since they were not found eligible for MaineCare (Medicaid) or CubCare (Children’s Health Insurance Program)?: <%= applicant.immigration_status_changed %>
     OTHER QUESTIONS:
         Has this person applied for an SSN:  <%= applicant.is_ssn_applied %>
         Why doesn't this person have an SSN?:  <%=applicant.non_ssn_apply_reason.to_s.present? ? applicant.non_ssn_apply_reason.to_s : 'N/A' %>
