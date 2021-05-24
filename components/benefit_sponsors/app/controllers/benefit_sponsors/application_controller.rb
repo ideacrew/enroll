@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "#{Rails.root}/app/models/custom_exceptions/switch_to_idp_exception"
 
 module BenefitSponsors
