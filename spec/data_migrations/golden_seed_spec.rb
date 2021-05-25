@@ -34,7 +34,7 @@ describe "Golden Seed Rake Tasks", dbclean: :after_each do
             end
 
             it "should create financial assistance applicants" do
-              expect(applicants).to be > 0
+              expect(applicants.count).to be > 0
             end
 
             it "should create incomes" do
@@ -42,7 +42,7 @@ describe "Golden Seed Rake Tasks", dbclean: :after_each do
             end
 
             it "should set a kind for all incomes" do
-              expect(applicants.map(&:incomes).flatten.select { |income| income.kind.blank? }.blank?).to eq(true)
+              expect(applicants.map(&:incomes).flatten.detect { |income| income.kind.blank? }.blank?).to eq(true)
             end
 
             it "should create other incomes with specific kinds for applicants with other income selected" do
@@ -81,6 +81,10 @@ describe "Golden Seed Rake Tasks", dbclean: :after_each do
 
             it "should have applicant coverage questions answered" do
               expect(applicants.detect { |applicant| applicant.is_applying_coverage.present? }.present?).to eq(true)
+            end
+
+            it "should create addresses for person records" do
+              expect(Person.all.flat_map(&:addresses).length).to be > 0
             end
 
             it "should create non configued state addresses for people temporarily out of state" do
