@@ -54,7 +54,7 @@ class ApplicationController < ActionController::Base
     log(JSON.dump(error_message), {:severity => 'critical'})
   end
 
-  rescue_from SwitchToIdpException, with: :user_not_authorized
+  rescue_from SwitchToIdpException, with: :root_path
 
   rescue_from ActionController::InvalidAuthenticityToken, :with => :bad_token_due_to_session_expired
 
