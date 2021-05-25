@@ -61,6 +61,12 @@ module GoldenSeedFinancialAssistanceHelper
     # This is during pregnancy btw
     applicant.is_enrolled_on_medicaid = false if truthy_value?(case_info_hash[:person_attributes]['pregnant'])
     applicant.is_former_foster_care = false if applicant.age_of_the_applicant > 18 && applicant.age_of_the_applicant < 26
+    # Other questions
+    applicant.is_student = false
+    applicant.is_self_attested_blind = false
+    applicant.is_self_attested_disabled = false
+    applicant.has_daily_living_help = false
+    applicant.need_help_paying_bills = false
     applicant.save!
     applicant
   end
