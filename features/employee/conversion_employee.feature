@@ -48,7 +48,7 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
 
     When Employee clicks "Shop for Plans" on my account page
     Then Employee should see the group selection page
-    When Employee clicks continue on the group selection page
+    When Employee clicks continue on group selection page
 
     Then Patrick Doe should see "You're not yet eligible under your employer-sponsored benefits" error message
 
@@ -87,7 +87,7 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
     Then Employee should see confirmation and clicks continue
     Then Employee should see family members page and clicks continue
     Then Employee should see the group selection page
-    When Employee clicks continue on the group selection page
+    When Employee clicks continue on group selection page
 
     Then Patrick Doe should see "You're not yet eligible under your employer-sponsored benefits" error message
 
@@ -105,7 +105,7 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
 
 
     When Employee clicks on New Hire Badge
-    When Employee clicks continue on the group selection page
+    When Employee clicks continue on group selection page
     Then Employee should see the list of plans
     # And I should not see any plan which premium is 0
     When Employee selects a plan on the plan shopping page
@@ -169,7 +169,7 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
     Then Employee should see confirmation and clicks continue
     Then Employee should see family members page and clicks continue
     Then Employee should see the group selection page
-    When Employee clicks continue on the group selection page
+    When Employee clicks continue on group selection page
 
     Then Employee should see the list of plans
     When Employee selects a plan on the plan shopping page

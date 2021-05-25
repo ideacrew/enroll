@@ -59,8 +59,8 @@ end
 
 Given(/^a Hbx admin logs on to Portal$/) do
   visit "/users/sign_in"
-  fill_in "user[login]", :with => @u1.oim_id
-  fill_in "user[password]", :with => @u1.password
-  find('.sign-in-btn').click
+  fill_in SignIn.username, :with => @u1.oim_id
+  fill_in SignIn.password, :with => @u1.password
+  find(SignIn.sign_in_btn).click
   visit exchanges_hbx_profiles_root_path
 end

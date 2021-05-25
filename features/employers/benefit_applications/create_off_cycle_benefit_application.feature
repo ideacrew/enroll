@@ -58,7 +58,7 @@ Feature: Ability for employer to create an off-cycle benefit application and all
       And employee Patrick Doe already matched with employer ABC Widgets and logged into employee portal
       When Patrick Doe clicks "Shop for Plans" on my account page
       Then Employee should see the group selection page
-      When Employee clicks continue on the group selection page
+      When Employee clicks continue on group selection page
       Then Employee should see the list of plans
       When Employee selects a plan on the plan shopping page
       When Employee clicks on Confirm button on the coverage summary page
@@ -116,7 +116,7 @@ Feature: Ability for employer to create an off-cycle benefit application and all
       And employee Patrick Doe already matched with employer ABC Widgets and logged into employee portal
       When Patrick Doe clicks "Shop for Plans" on my account page
       Then Employee should see the group selection page
-      When Employee clicks continue on the group selection page
+      When Employee clicks continue on group selection page
       Then Employee should see the list of plans
       When Employee selects a plan on the plan shopping page
       When Employee clicks on Confirm button on the coverage summary page

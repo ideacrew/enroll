@@ -21,7 +21,7 @@ Background: Setup site, employer, and benefit application
     And employee Patrick Doe has earliest eligible date under current active plan year
     Then Employee should see the group selection page
     And employee Patrick Doe should see renewing benefit application start date as effective date
-    When Employee clicks continue on the group selection page
+    When Employee clicks continue on group selection page
     Then Employee should see the list of plans
     When Patrick Doe selects a plan on the plan shopping page
     Then Patrick Doe should see coverage summary page with renewing benefit application start date as effective date

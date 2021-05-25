@@ -21,7 +21,7 @@ Feature: Employees can purchase coverage from both active and renewing plan year
     Then Employee should see confirmation and clicks continue
     Then Employee should see family members page and clicks continue
     Then Employee should see the group selection page
-    When Employee clicks continue on the group selection page
+    When Employee clicks continue on group selection page
     Then Employee should see the list of plans
     And Patrick Doe should see the plans from the expired plan year
     When Employee selects a plan on the plan shopping page
@@ -40,7 +40,7 @@ Feature: Employees can purchase coverage from both active and renewing plan year
     Then Employee should see confirmation and clicks continue
     Then Employee should see family members page and clicks continue
     Then Employee should see the group selection page
-    When Employee clicks continue on the group selection page
+    When Employee clicks continue on group selection page
     Then Employee should see the list of plans
     And Patrick Doe should see the plans from the active plan year
     When Employee selects a plan on the plan shopping page
@@ -72,7 +72,7 @@ Feature: Employees can purchase coverage from both active and renewing plan year
     Then Employee should see confirmation and clicks continue
     Then Employee should see family members page and clicks continue
     Then Employee should see the group selection page
-    When Employee clicks continue on the group selection page
+    When Employee clicks continue on group selection page
     Then Employee should see the list of plans
     And Patrick Doe should see the plans from the expired plan year
     When Employee selects a plan on the plan shopping page
@@ -95,7 +95,7 @@ Feature: Employees can purchase coverage from both active and renewing plan year
     Then Employee should see confirmation and clicks continue
     Then Employee should see family members page and clicks continue
     Then Employee should see the group selection page
-    When Employee clicks continue on the group selection page
+    When Employee clicks continue on group selection page
     Then Employee should see the list of plans
     Then Employee should see their current plan
     Then Employee should see the correct employee contribution on plan tile
