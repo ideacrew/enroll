@@ -220,8 +220,6 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
 
   end
 
-<<<<<<< HEAD
-=======
     context "PUT update" do
       let(:addresses_attributes) do
         {"0" => {"kind" => "home", "address_1" => "address1_a NE", "address_2" => "", "city" => "city1", "state" => "DC", "zip" => "22211", "id" => person.addresses[0].id.to_s},
@@ -235,7 +233,6 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
       let(:person){ FactoryBot.create(:person, :with_family) }
       let(:census_employee){FactoryBot.build(:census_employee)}
       let(:employee_role){FactoryBot.build(:employee_role, :census_employee => census_employee)}
->>>>>>> 20104f19f1 (more spec update)
 
   context "POST create with failed construct_employee_role", dbclean: :after_each do
     let(:person_params) do
@@ -328,10 +325,6 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
         put :update, params: { person: person_params, id: "test" }
       end
 
-<<<<<<< HEAD
-      it "should not empty the person's addresses on update" do
-        expect(person.addresses).not_to eq []
-=======
       context 'Address attributes' do
         let(:valid_addresses_attributes) do
           {"0" => {"kind" => "home", "address_1" => "address1_a NE", "address_2" => "", "city" => "city1", "state" => "DC", "zip" => "22211"},
@@ -358,7 +351,6 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
           expect(response).to have_http_status(:redirect)
           expect(response).to redirect_to(ridp_agreement_insured_consumer_role_index_path)
         end
->>>>>>> 20104f19f1 (more spec update)
       end
 
       it "should update addresses" do
