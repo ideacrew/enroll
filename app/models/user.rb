@@ -43,8 +43,7 @@ class User
     begin
       self.save!
     rescue => e
-      message += "SwitchToIdpException: "
-      message += "#{e.message}; "
+      message = "SwitchToIdpException: #{e.message}; "
       message += "user_id: #{self.id}, "
       message += "person_hbx_id: #{self.person.hbx_id}, " if self.person.present?
       message += "errors.full_messages: #{self.errors.full_messages}, "
