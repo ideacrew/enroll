@@ -892,8 +892,8 @@ class CensusEmployee < CensusMember
     prior_py = fetch_prior_year_application
     return false unless prior_py.present?
 
-    benefit_application = (prior_py.start_on..prior_py.end_on).cover?(effective_date)
-    return false unless benefit_application
+    status = (prior_py.benefit_sponsor_catalog.effective_period).cover?(effective_date)
+    return false unless status
     return false unless eligible_for?(effective_date, prior_py)
     true
   end

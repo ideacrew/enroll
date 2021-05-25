@@ -171,6 +171,33 @@ Feature: SHOP employee or Admin adding a SEP which falls in prior plan year,
     When I click continue on enrollment submitted page
     Then I see enrollments generated in expired and active reinstated py, with existing active enr canceled and expired enr terminated for Patrick Doe
 
+  Scenario: Hbx Admin adding SHOP sep in prior reinstated expired plan year for employee with active
+            coverage and expired coverage and renewal flag is unchecked
+
+    Given there exists Patrick Doe employee for employer ABC Widgets
+    And employer ABC Widgets has reinstated_expired and active benefit applications
+    And employee Patrick Doe has past hired on date
+    And employee Patrick Doe already matched with employer ABC Widgets and logged into employee portal
+    And employee Patrick Doe has employer sponsored enrollment in active and expired py
+    And Employee logs out
+    When that a user with a HBX staff role with Super Admin subrole exists and is logged in
+    And Admin clicks Families tab
+    Then the Admin is navigated to the Families screen
+    When a SHOP SEP is added with a prior year effective date
+    And Coverage renewal flag is unchecked
+    And a SEP is submitted
+    Then confirmation popup is visible
+    When Admin clicks confirm on popup
+    Then I see a SEP success message for Patrick Doe
+    When I click the name of Patrick Doe from family list
+    And I click on Shop For Plans banner button
+    And I click Shop for new plan button on CHH page
+    When I selects a plan on the plan shopping page
+    When I clicks on Confirm button on the coverage summary page
+    Then I should see the enrollment submitted
+    When I click continue on enrollment submitted page
+    Then I see enrollments generated in reinstated expired and active py, with existing active enr canceled and reinstated expired enr for Patrick Doe
+
   Scenario: Hbx Admin adding SHOP sep in prior plan year for employee with no
             prior or active coverage and renewal flag is unchecked and
             employer having terminated and active py. Gap in coverage exists

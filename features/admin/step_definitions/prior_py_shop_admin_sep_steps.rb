@@ -59,6 +59,15 @@ Then(/.+ see enrollments generated in expired and active reinstated py, with exi
   expect(effective_on_states).to match_array(["coverage_canceled", "coverage_terminated", "coverage_expired", "coverage_termination_pending", "coverage_selected"])
 end
 
+Then(/.+ see enrollments generated in reinstated expired and active py, with existing active enr canceled and reinstated expired enr for (.*)/) do |named_person|
+  person = people[named_person]
+  person_record = Person.where(first_name: person[:first_name], last_name: person[:last_name]).last
+  family = person_record.primary_family
+  expect(family.hbx_enrollments.count).to eq 4
+  effective_on_states = family.hbx_enrollments.map(&:aasm_state)
+  expect(effective_on_states).to match_array(["coverage_canceled", "coverage_canceled", "coverage_expired", "coverage_enrolled"])
+end
+
 Then(/.+ see enrollments generated expired, active and renewing py with existing active enr canceled and expired enr terminated for (.*)/) do |named_person|
   person = people[named_person]
   person_record = Person.where(first_name: person[:first_name], last_name: person[:last_name]).last
@@ -149,7 +158,7 @@ When(/^a SHOP SEP is added with a prior year effective date$/) do
   scroll_to(element, align: :bottom)
   find(AddSepAction.select_sep_reason_dropdown).click
   find(AddSepAction.select_sep_reason, text: AddSepAction.sep_reason_text).click
-  fill_in AddSepAction.sep_event_date, :with => (@prior_application.end_on - 4.months).beginning_of_month
+  fill_in AddSepAction.sep_event_date, :with => (@prior_application.end_on - 6.months).beginning_of_month
   find(AddSepAction.sep_title).click
   find(AddSepAction.select_sep_options_dropdown).click
   find(AddSepAction.select_sep_option_kind, text: AddSepAction.sep_option_kind_text).click
