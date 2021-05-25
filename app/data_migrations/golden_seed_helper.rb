@@ -100,6 +100,8 @@ module GoldenSeedHelper
     return_value
   end
 
+  # rubocop:disable Metrics/AbcSize
+  # rubocop:disable Metrics/CyclomaticComplexity
   def create_and_return_person(case_info_hash = {}, dependent = nil)
     gender = case_info_hash[:person_attributes]['gender']&.downcase || Person::GENDER_KINDS.sample
     last_name = if dependent
@@ -117,20 +119,36 @@ module GoldenSeedHelper
     person.save!
     raise("Unable to save person.") unless person.save!
     # Set residency type
-    case case_info_hash[:person_attributes]['residency_type']
-    # TODO: Fix this hardcoded for DC
-    when 'Not DC resident'
-      person.no_dc_address = true
-    when 'Temporarily absent'
-      address_and_phone = generate_address_and_phone(true)
-      person.phones << address_and_phone[:phone]
-      person.addresses << address_and_phone[:address]
-      person.is_temporarily_out_of_state = true
-    else # DC home address'
-      # Let's just make it a DC resident
-      address_and_phone = generate_address_and_phone
-      person.phones << address_and_phone[:phone]
-      person.addresses << address_and_phone[:address]
+    # "Same as primary" refers to having the same address as the primary
+    if dependent && truthy_value?(case_info_hash[:person_attributes]['same_as_primary'])
+      primary_person_adddress = case_info_hash[:primary_person_record].addresses.first
+      primary_person_phone = case_info_hash[:primary_person_record].phones.first
+      primary_address_and_phone = {
+        primary_person_adddress: primary_person_adddress,
+        primary_person_phone: primary_person_phone
+      }
+      address_and_phone = generate_address_and_phone(primary_address_and_phone)
+      person.is_temporarily_out_of_state = case_info_hash[:primary_person_record].is_temporarily_out_of_state
+      person.no_dc_address = case_info_hash[:primary_person_record].no_dc_address
+    end
+    unless dependent && truthy_value?(case_info_hash[:person_attributes]['same_as_primary']) && address_and_phone
+      case case_info_hash[:person_attributes]['residency_type']
+      # TODO: Fix this hardcoded for DC
+      when 'Not DC resident'
+        address_and_phone = generate_address_and_phone({out_of_state_resident: true})
+        person.no_dc_address = true
+        person.addresses << address_and_phone[:address]
+      when 'Temporarily absent'
+        address_and_phone = generate_address_and_phone({out_of_state_resident: true})
+        person.phones << address_and_phone[:phone]
+        person.addresses << address_and_phone[:address]
+        person.is_temporarily_out_of_state = true
+      else # DC home address'
+        # Let's just make it a DC resident
+        address_and_phone = generate_address_and_phone
+        person.phones << address_and_phone[:phone]
+        person.addresses << address_and_phone[:address]
+      end
     end
     # Set no one to incarcerated for now
     person.is_incarcerated = false
@@ -140,6 +158,8 @@ module GoldenSeedHelper
     person.save!
     person
   end
+  # rubocop:enable Metrics/AbcSize
+  # rubocop:enable Metrics/CyclomaticComplexity
 
   # TODO: Need to figure out the primary applicant thing on spreadsheet
   def create_and_return_family(case_info_hash = {})
@@ -217,24 +237,38 @@ module GoldenSeedHelper
     new_person_phone_number
   end
 
-  def generate_address_and_phone(out_of_state_resident = nil)
-    city = out_of_state_resident.blank? ? EnrollRegistry[:enroll_app].setting(:contact_center_city).item : FFaker::AddressUS.city
-    state = out_of_state_resident.blank? ? EnrollRegistry[:enroll_app].setting(:state_abbreviation).item : FFaker::AddressUS.state_abbr
-    zip = out_of_state_resident.blank? ? EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item : FFaker::AddressUS.zip_code
+  def generate_address_and_phone(specified_attributes = {})
+    primary_address = specified_attributes[:primary_person_address]
+    primary_phone = specified_attributes[:primary_person_phone]
+    address_1 = primary_address.present? ? primary_address.address_1 : "60#{counter_number} #{FFaker::AddressUS.street_name}"
+    if primary_address.present?
+      city = primary_address.city
+      state = primary_address.state
+      zip = primary_address.zip
+    elsif specified_attributes[:out_of_state_resident].blank?
+      city = EnrollRegistry[:enroll_app].setting(:contact_center_city).item
+      state = EnrollRegistry[:enroll_app].setting(:state_abbreviation).item
+      zip = EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item
+    else
+      city = FFaker::AddressUS.city
+      state = FFaker::AddressUS.state_abbr
+      zip = FFaker::AddressUS.zip_code
+    end
     address = Address.new(
       kind: "primary",
-      address_1: "60#{counter_number} #{FFaker::AddressUS.street_name}",
+      address_1: address_1,
       city: city,
       state: state,
       zip: zip
     )
-    area_code = %w[339 351 508 617 774 781 857 978 413].sample
-    new_person_phone = Phone.new(
+    area_code = primary_phone.present? ? primary_phone.area_code : FFaker::PhoneNumber.area_code
+    phone_number = primary_phone.present? ? primary_phone.number : generate_unique_phone_number
+    person_phone = Phone.new(
       kind: "main",
-      area_code: FFaker::PhoneNumber.area_code,
-      number: generate_unique_phone_number
+      area_code: area_code,
+      number: phone_number
     )
-    {address: address, phone: new_person_phone}
+    {address: address, phone: person_phone}
   end
 
   def create_and_return_consumer_role(case_info_hash = {})
