@@ -26,9 +26,8 @@ module FaaTranslations
     "en.faa.dhs_contact" => "They will send you a letter, and may ask you to provide documents. If you haven’t heard from DHS within 45 days, you may want to ask for an update by calling us at (855) 532-5465.",
     "en.faa.premium_reductions_1" => "These people are <span>eligible for monthly premium reductions of",
     "en.faa.premium_reductions_2" => "per month.</span> This means they won't have to pay full price for health insurance.",
-    "en.faa.qualify_for_lower_costs_1" => "They also qualify for lower <%= render partial:'shared/glossary', locals: {key: 'Out_of_Pocket_Costs', title: 'Out-of-Pocket Costs', term: 'out-of-pocket costs' } %>"\
-        "- a benefit that lowers other costs like the annual deductible and copayments. ",
-    "en.faa.silver_plan_checkmark" => "This benefit is only available if these people select a silver plan. Look for this check mark ",
+    "en.faa.qualify_for_lower_costs_1" => "They also qualify for lower ",
+    "en.faa.silver_plan_checkmark" => "- a benefit that lowers other costs like the annual deductible and copayments. This benefit is only available if these people select a silver plan. Look for this check mark ",
     "en.faa.qualify_for_lower_costs_2" => " on plans that have this benefit.",
     "en.faa.does_not_qualify" => "Does not qualify",
     "en.faa.likely_does_not_qualify" => "These people <span> likely don't qualify for <%= render partial:'shared/glossary', locals: {key: 'medicaid', title: 'Medicaid', term: 'Medicaid' } %>,"\
