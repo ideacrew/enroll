@@ -1,0 +1,25 @@
+---
+registry:
+  - namespace:
+    - :general
+    features:
+      - key: :us_state
+        is_enabled: true
+        settings:
+          - key: :abbreviation
+            item: 'DC'
+          - key: :name
+            item: 'District of Columbia'
+  - namespace:
+    - :other_income
+    features:
+      - key: :unemployment_income
+        is_enabled: true
+  - namespace:
+    - :documents
+    features:
+      - key: magi_medicaid_documents
+        is_enabled: true
+        settings:
+          - key: :ivl_application_checklist
+            item: 'db/documents/ivl_checklist.pdf'

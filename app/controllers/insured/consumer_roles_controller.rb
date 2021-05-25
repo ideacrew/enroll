@@ -300,7 +300,7 @@ class Insured::ConsumerRolesController < ApplicationController
       begin
         result = assistance_class.new.call(family_id: @person.primary_family.id)
         if result.success?
-          redirect_to financial_assistance.application_checklist_application_path(id: result.success)
+          redirect_to magi_medicaid.application_checklist_application_path(id: result.success)
         else
           flash[:error] = get_error_messages(result)
           redirect_back fallback_location: '/'
