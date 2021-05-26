@@ -144,7 +144,7 @@ describe "Golden Seed Rake Tasks", dbclean: :after_all do
         end
       end
     end
-    context "without csv input" do
+    context "without csv input", dbclean: :after_each do
       describe "requirements" do
         let(:people) { Person.all }
         before :each do
