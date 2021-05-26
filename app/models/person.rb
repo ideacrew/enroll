@@ -713,6 +713,7 @@ class Person
     is_temporarily_out_of_state
   end
 
+  # TODO: Need to refactor DC resident attribute
   def is_dc_resident?
     return true if is_homeless? || is_temporarily_out_of_state?
 

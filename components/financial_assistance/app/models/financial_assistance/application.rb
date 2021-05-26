@@ -942,7 +942,6 @@ module FinancialAssistance
 
     def is_application_valid?
       application_attributes_validity = self.valid?(:submission) ? true : false
-
       if relationships_complete?
         relationships_validity = true
       else
