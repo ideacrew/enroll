@@ -39,4 +39,9 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.next_step_with_aggregate_2" => "<br><li><b>If you’re not enrolled or need to make changes to your plan</b>, select CONTINUE to pick a health insurance plan or change who is covered by your plan.</li></ul>",
   "en.faa.indian_health_service" => "Has this person ever gotten a health service from the Indian Health Service, a tribal health program, or urban Indian health program or through a referral from one of these programs?",
   "en.faa.indian_health_service_eligible" => "Is this person eligible to get health services from the Indian Health Service, a tribal health program, or an urban Indian health program or through referral from one of these programs?"
+  "en.faa.mainecare_not_eligible" => "Was this person found not eligible for MaineCare (Medicaid) or CubCare (Children's Health Insurance Program) within the last 90 days? *",
+  "en.faa.medicaid_cubcare_end_date" => "When was this person denied MaineCare (Medicaid) or CubCare (Children's Health Insurance Program)? *",
+  "en.faa.change_eligibility_status" => "Did this person have MaineCare (Medicaid) or CubCare (Children's Health Insurance Program) that will end soon or that recently ended because of a change in eligibility? *",
+  "en.faa.household_income_changed" => "Has this person's household income or household size changed since they were told their coverage was ending? * ",
+  "en.faa.person_medicaid_last_day" => "What's the last day of this person’s Medicaid or CHIP coverage? *"
 }.freeze

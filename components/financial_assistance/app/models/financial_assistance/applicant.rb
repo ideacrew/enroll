@@ -249,6 +249,12 @@ module FinancialAssistance
     field :health_service_through_referral, type: Boolean
     field :health_service_eligible, type: Boolean
 
+    field :is_medicaid_cubcare_eligible, type: Boolean
+    field :medicaid_cubcare_due_on, type: Date
+    field :has_eligibility_changed, type: Boolean
+    field :has_household_income_changed, type: Boolean
+    field :person_coverage_end_on, type: Date
+
     field :workflow, type: Hash, default: { }
 
     embeds_many :verification_types, class_name: "::FinancialAssistance::VerificationType"#, cascade_callbacks: true, validate: true
