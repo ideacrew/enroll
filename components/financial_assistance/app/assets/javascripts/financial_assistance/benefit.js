@@ -284,6 +284,13 @@ document.addEventListener("turbolinks:load", function() {
       }
     });
 
+    $("body").on("change", "#has_household_income_changed_false", function(){
+      if ($('#has_household_income_changed_false').is(':checked')) {
+        $("#medicaid-chip-coverage-last-day").addClass('hide');
+      } else{
+        $("#medicaid-chip-coverage-last-day").removeClass('hide');
+      }
+    });
 
     $("body").on("change", "#has_enrolled_health_coverage_true", function(){
       if ($('#has_enrolled_health_coverage_true').is(':checked')) {
