@@ -33,8 +33,10 @@ class Insured::FamilyMembersController < ApplicationController
     @change_plan_date = params[:qle_date].present? ? params[:qle_date] : ''
 
     if params[:sep_id].present?
-      @sep = @family.special_enrollment_periods.find(params[:sep_id])
-      @sep = duplicate_sep(@sep) if @sep.submitted_at.to_date != TimeKeeper.date_of_record
+      @sep = @family.special_enrollment_periods.where(_id: params[:sep_id]).first
+      # duplicate_sep will handle the possibility of the sep not existing anymore
+      Rails.logger.error { "Unable to find SEP #{params[:sep_id]} for family #{@family.id}" if @sep.blank?
+      @sep = duplicate_sep(@sep) if @sep.submitted_at.to_date != TimeKeeper.date_of_record || @sep.blank?
       @qle = QualifyingLifeEventKind.find(params[:qle_id])
       @change_plan = 'change_by_qle'
       @change_plan_date = @sep.qle_on
