@@ -144,38 +144,38 @@ describe "Golden Seed Rake Tasks", dbclean: :after_all do
         end
       end
     end
-    context "without csv input", dbclean: :after_each do
+    context "without csv input" do
       describe "requirements" do
         let(:people) { Person.all }
-        before :each do
-          allow(subject).to receive(:ivl_testbed_scenario_csv).and_return(nil)
-          subject.migrate
+        before do
+          Rails.application.load_tasks
+          allow_any_instance_of(GoldenSeedIndividual).to receive(:ivl_testbed_scenario_csv).and_return(nil)
         end
         it "will not create new hbx profile and benefit sponsorship if they are already present" do
-          expect(HbxProfile.all.count).to eq(1)
-          subject.migrate
-          expect(HbxProfile.all.count).to eq(1)
+          Rake::Task['migrations:golden_seed_individual'].invoke
+          hbx_profile_count = HbxProfile.all.count
+          Rake::Task['migrations:golden_seed_individual'].invoke
+          expect(hbx_profile_count == HbxProfile.all.count).to eq(true)
           expect(HbxProfile.all.map(&:benefit_sponsorship).count).to eq(1)
         end
 
         it "should create at least one IVL health product if none exist" do
+          Rake::Task['migrations:golden_seed_individual'].invoke
           products = BenefitMarkets::Products::Product.all.select { |product| product.benefit_market_kind.to_sym == :aca_individual }
           expect(products.count).to_not be(0)
         end
 
-        it "should create fully matched consumer records" do
+        it "should create fully matched consumer records with users" do
+          Rake::Task['migrations:golden_seed_individual'].invoke
           consumer_roles = people.select { |person| person.consumer_role.present? }
           expect(consumer_roles.count).to_not be(0)
-        end
-
-        it "should create users for consumers" do
-          consumer_roles = people.select { |person| person.consumer_role.present? }
           consumer_person_ids = consumer_roles.map(&:_id)
           consumer_users = User.all.select { |user| consumer_person_ids.include?(user.person_id) }
           expect(consumer_users.length).to be > 1
         end
 
         it "should create active enrollments" do
+          Rake::Task['migrations:golden_seed_individual'].invoke
           expect(HbxEnrollment.enrolled.count).to be > 1
         end
       end
