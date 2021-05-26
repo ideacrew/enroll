@@ -64,7 +64,6 @@
     <div class='benefit-kinds', id='eligible-benefit-kinds'>
       <%= render partial: 'financial_assistance/benefits/insurance_kinds', locals: { insurance_kinds: FinancialAssistance::Benefit::INSURANCE_KINDS, kind: "is_eligible", text: "What type of coverage does this person have access to?"} %>
     </div>
-
     <br>
 
     <!--health_service_through_referral driver question-->
@@ -108,9 +107,86 @@
       <% end %>
       <br />
     <% end %>
+        <!--is medicaid/cubcare driver question-->
+    <div class="driver-question row row-form-wrapper radio-align no-buffer row-height fa-align-elements">
+      <div class="col-md-6 labelforcoverage">
+        <span class="fa-text-color">l10n("faa.mainecare_cubcare_ineligible") </span>
+      </div>
+      <div class="col-md-6 mt11">
+        <div class="col-md-3 no-padding">
+          <%= radio_button_tag("is_medicaid_cubcare_eligible", true, @applicant.is_medicaid_cubcare_eligible?, class: "radio-yml" ) %>
+          <label class="radio-yml" for="is_medicaid_cubcare_eligible_yes">Yes</label>
+        </div>
+        <div class="col-md-3 no-padding">
+          <%= radio_button_tag("is_medicaid_cubcare_eligible", false, @applicant.is_medicaid_cubcare_eligible == false, class: "radio-yml" ) %>
+          <label class="radio-yml" for="is_medicaid_cubcare_eligible_no">No</label>
+        </div>
+        <div class="col-md-6 left-seprator">
+          <a href="#is_medicaid_cubcare_eligible" data-toggle="modal" data-target="#is_medicaid_cubcare_eligible" class="interaction-click-control-not-sure?">Not sure?</a>
+          <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "is_medicaid_cubcare_eligible"} %>
+        </div>
+      </div>
+    </div>
+    <br />
+
+    <div class="driver-question row row-form-wrapper radio-align no-buffer row-height fa-align-elements" id='denied-medicaid'>
+      <div class="col-md-6 labelforcoverage">
+        <span class="fa-text-color">l10n("faa.medicaid_cubcare_end_date")</span>
+      </div>
+    </div>
+    <br />
+
+    <div class="driver-question row row-form-wrapper radio-align no-buffer row-height fa-align-elements" id="eligibility-change-question">
+      <div class="col-md-6 labelforcoverage">
+        <span class="fa-text-color">l10n("faa.change_eligibility_status")</span>
+      </div>
+      <div class="col-md-6 mt11">
+        <div class="col-md-3 no-padding">
+          <%= radio_button_tag("has_eligibility_changed", true, @applicant.has_eligibility_changed?, class: "radio-yml" ) %>
+          <label class="radio-yml" for="has_eligibility_changed_yes">Yes</label>
+        </div>
+        <div class="col-md-3 no-padding">
+          <%= radio_button_tag("has_eligibility_changed", false, @applicant.has_eligibility_changed == false, class: "radio-yml" ) %>
+          <label class="radio-yml" for="has_eligibility_changed_no">No</label>
+        </div>
+        <div class="col-md-6 left-seprator">
+          <a href="#has_eligibility_changed" data-toggle="modal" data-target="#has_eligibility_changed" class="interaction-click-control-not-sure?">Not sure?</a>
+          <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_eligibility_changed"} %>
+        </div>
+      </div>
+    </div>
+    <br />
+
+    <div class="driver-question row row-form-wrapper radio-align no-buffer row-height fa-align-elements" id="household-income-size-changed">
+      <div class="col-md-6 labelforcoverage">
+        <span class="fa-text-color">l10n("faa.household_income_changed")</span>
+      </div>
+      <div class="col-md-6 mt11">
+        <div class="col-md-3 no-padding">
+          <%= radio_button_tag("has_household_income_changed", true, @applicant.has_household_income_changed?, class: "radio-yml" ) %>
+          <label class="radio-yml" for="has_household_income_changed_yes">Yes</label>
+        </div>
+        <div class="col-md-3 no-padding">
+          <%= radio_button_tag("has_household_income_changed", false, @applicant.has_household_income_changed == false, class: "radio-yml" ) %>
+          <label class="radio-yml" for="has_household_income_changed_no">No</label>
+        </div>
+        <div class="col-md-6 left-seprator">
+          <a href="#has_household_income_changed" data-toggle="modal" data-target="#has_household_income_changed" class="interaction-click-control-not-sure?">Not sure?</a>
+          <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_household_income_changed"} %>
+        </div>
+      </div>
+    </div>
+    <br />
+
+    <div class="driver-question row row-form-wrapper radio-align no-buffer row-height fa-align-elements" id="medicaid-chip-coverage-last-day">
+      <div class="col-md-6 labelforcoverage">
+        <span class="fa-text-color">l10n("faa.person_medicaid_last_day") </span>
+      </div>
+    </div>
+    <br />
 
     <div class="col-md-4 col-sm-4 col-xs-4">
-    <%#= link_to "Add Health Coverage", new_application_applicant_benefit_path(@application, @applicant), class: "btn btn-default center-block" %>
+      <%#= link_to "Add Health Coverage", new_application_applicant_benefit_path(@application, @applicant), class: "btn btn-default center-block" %>
     </div>
 
     <div class="row">
@@ -134,7 +210,7 @@
         <div class="modal-body">
           Are you sure you want to remove everything you have entered <strong>for this Benefit?
           <br />
-           This cannot be undone.</strong>
+          This cannot be undone.</strong>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default modal-cancel-button">DON'T REMOVE</button>

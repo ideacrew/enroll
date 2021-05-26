@@ -219,10 +219,71 @@ document.addEventListener("turbolinks:load", function() {
       }
     });
 
-    /* Condtional Display Enrolled Benefit Questions */
+    /* Conditional Display Enrolled Benefit Questions */
     if (!$("#has_enrolled_health_coverage_true").is(':checked')) $("#enrolled-benefit-kinds").addClass('hide');
-    /* Condtional Display Eligible Benefit Questions */
+    /* Conditional Display Eligible Benefit Questions */
     if (!$("#has_eligible_health_coverage_true").is(':checked')) $("#eligible-benefit-kinds").addClass('hide');
+
+    /* Conditional Display denied medicaid Question */
+    if (!$("#is_medicaid_cubcare_eligible_true").is(':checked')) $("#denied-medicaid").addClass('hide');
+
+    /* Conditional Display eligibility changed Question */
+    if (!$("#is_medicaid_cubcare_eligible_false").is(':checked')) $("#eligibility-change-question").addClass('hide');
+
+    /* Conditional Display household income or size changed Question */
+    if (!$("#has_eligibility_changed_true").is(':checked')) $("#household-income-size-changed").addClass('hide');
+
+    /* Conditional Display medicaid chip coverage last day Question */
+    if (!$("#has_household_income_changed_true").is(':checked')) $("#medicaid-chip-coverage-last-day").addClass('hide');
+
+
+    $("body").on("change", "#is_medicaid_cubcare_eligible_true", function(){
+      if ($('#is_medicaid_cubcare_eligible_true').is(':checked')) {
+        $("#denied-medicaid").removeClass('hide');
+        $("#eligibility-change-question").addClass('hide');
+        $("#household-income-size-changed").addClass('hide');
+      } else{
+        $("#denied-medicaid").addClass('hide');
+        $("#eligibility-change-question").removeClass('hide');
+      }
+    });
+
+    $("body").on("change", "#is_medicaid_cubcare_eligible_false", function(){
+      if ($('#is_medicaid_cubcare_eligible_false').is(':checked')) {
+        $("#eligibility-change-question").removeClass('hide');
+        $("#denied-medicaid").addClass('hide');
+      } else{
+        $("#eligibility-change-question").addClass('hide');
+        $("#denied-medicaid").removeClass('hide');
+      }
+    });
+
+    $("body").on("change", "#has_eligibility_changed_true", function(){
+      if ($('#has_eligibility_changed_true').is(':checked')) {
+        $("#household-income-size-changed").removeClass('hide');
+      } else{
+        $("#household-income-size-changed").addClass('hide');
+      }
+    });
+
+    $("body").on("change", "#has_eligibility_changed_false", function(){
+      if ($('#has_eligibility_changed_false').is(':checked')) {
+        $("#household-income-size-changed").addClass('hide');
+        $("#medicaid-chip-coverage-last-day").addClass('hide');
+      } else{
+        $("#household-income-size-changed").removeClass('hide');
+        $("#medicaid-chip-coverage-last-day").removeClass('hide');
+      }
+    });
+
+    $("body").on("change", "#has_household_income_changed_true", function(){
+      if ($('#has_household_income_changed_true').is(':checked')) {
+        $("#medicaid-chip-coverage-last-day").removeClass('hide');
+      } else{
+        $("#medicaid-chip-coverage-last-day").addClass('hide');
+      }
+    });
+
 
     $("body").on("change", "#has_enrolled_health_coverage_true", function(){
       if ($('#has_enrolled_health_coverage_true').is(':checked')) {
