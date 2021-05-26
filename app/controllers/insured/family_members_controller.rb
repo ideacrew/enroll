@@ -32,7 +32,7 @@ class Insured::FamilyMembersController < ApplicationController
     @change_plan = params[:change_plan].present? ? 'change_by_qle' : ''
     @change_plan_date = params[:qle_date].present? ? params[:qle_date] : ''
 
-    if params[:sep_id].present? && @family.special_enrollment_periods.where(_id: params[:sep_id]).first.preesnt?
+    if params[:sep_id].present? && @family.special_enrollment_periods.where(_id: params[:sep_id]).first.present?
       @sep = @family.special_enrollment_periods.find(params[:sep_id])
       @sep = duplicate_sep(@sep) if @sep.submitted_at.to_date != TimeKeeper.date_of_record
       @sep = duplicate_sep(@sep) if @sep.submitted_at.to_date != TimeKeeper.date_of_record
@@ -66,7 +66,7 @@ class Insured::FamilyMembersController < ApplicationController
     message[:user_id] = current_user.id if current_user
     message[:person_id] = params[:person_id] if params[:person_id]
     message[:url] = request.original_url
-    log(message, :severity => 'error')
+    Rails.logger.error(message)
   end
 
   def new
