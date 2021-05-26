@@ -1,12 +1,13 @@
 # frozen_string_literal: true
 
 require "rails_helper"
+require 'rake'
 
 require File.join(Rails.root, "app", "data_migrations", "golden_seed_individual")
 require File.join(Rails.root, "components", "benefit_sponsors", "spec", "support", "benefit_sponsors_site_spec_helpers")
 require File.join(Rails.root, "app", "data_migrations", "load_issuer_profiles")
 
-describe "Golden Seed Rake Tasks", dbclean: :after_each do
+describe "Golden Seed Rake Tasks", dbclean: :after_all do
   describe "Generate Consumers and Families for Individual Market" do
     let(:given_task_name) { "golden_seed_individual" }
     subject { GoldenSeedIndividual.new(given_task_name, double(:current_scope => nil)) }
@@ -20,49 +21,46 @@ describe "Golden Seed Rake Tasks", dbclean: :after_each do
     filename = "#{Rails.root}/ivl_testbed_scenarios_*.csv"
     ivl_testbed_templates = Dir.glob(filename)
     if ivl_testbed_templates.present?
-      context "with csv input", dbclean: :after_each do
+      context "with csv input" do
         context "financial assistance" do
-          let(:applicants) { FinancialAssistance::Application.all.map(&:applicants).flatten }
-          before :each do
-            EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(true)
-            subject.migrate
+          before :all do
+            Rails.application.load_tasks
+            Rake::Task['migrations:golden_seed_individual'].invoke
           end
           context "requirements" do
-
+            let(:fa_applications) { FinancialAssistance::Application.all }
+            let(:fa_applicants) { fa_applications.flat_map(&:applicants) }
+            let(:fa_incomes) { fa_applicants.flat_map(&:incomes) }
             it "should create financial assistance applications" do
-              expect(FinancialAssistance::Application.all.count).to be > 0
+              expect(fa_applications.count).to be > 0
             end
 
             it "should create financial assistance applicants" do
-              expect(applicants.count).to be > 0
+              expect(fa_applicants.flatten.count).to be > 0
             end
 
             it "should create incomes" do
-              expect(applicants.map(&:incomes).flatten.count).to be > 0
+              expect(fa_incomes.flatten.count).to be > 0
             end
 
             it "should set a kind for all incomes" do
-              expect(applicants.map(&:incomes).flatten.detect { |income| income.kind.blank? }.blank?).to eq(true)
+              expect(fa_incomes.flatten.detect { |income| income.kind.blank? }.blank?).to eq(true)
             end
 
             it "should create other incomes with specific kinds for applicants with other income selected" do
-              other_income_applicant = applicants.detect do |applicant|
+              other_income_applicant = fa_applicants.detect do |applicant|
                 applicant.has_other_income == true
               end
               expect(other_income_applicant.incomes.present?).to eq(true)
             end
 
             it "should create job incomes with employer names, address, and phone number" do
-              random_job_income = applicants.map(&:incomes).flatten.detect do |income|
+              random_job_income = fa_incomes.detect do |income|
                 income.employer_name.present?
               end
               expect(random_job_income.present?).to eq(true)
               expect(random_job_income.employer_phone).to_not be_nil
               expect(random_job_income.employer_address).to_not be_nil
-            end
-
-            it "should create hbx enrollments with applied_aptc_amount" do
-              expect(HbxEnrollment.where(:applied_aptc_amount.ne => nil).count).to be > 0
             end
 
             it "should create person records with financial_assistance_identifier attributes" do
@@ -71,7 +69,7 @@ describe "Golden Seed Rake Tasks", dbclean: :after_each do
 
             it "should set applicant records for pregnancy/post partum" do
               expect(
-                applicants.detect do |applicant|
+                fa_applicants.detect do |applicant|
                   applicant.is_pregnant == true &&
                   applicant.is_post_partum_period == true &&
                   applicant.pregnancy_due_on.present?
@@ -80,11 +78,11 @@ describe "Golden Seed Rake Tasks", dbclean: :after_each do
             end
 
             it "should have applicant coverage questions answered" do
-              expect(applicants.detect { |applicant| applicant.is_applying_coverage.present? }.present?).to eq(true)
+              expect(fa_applicants.detect { |applicant| applicant.is_applying_coverage.present? }.present?).to eq(true)
             end
 
             it "should create addresses for person records" do
-              expect(Person.all.flat_map(&:addresses).length).to be > 0
+              expect(Person.all.detect { |person| person.addresses.present? }).to_not be_nil
             end
 
             it "should create non configued state addresses for people temporarily out of state" do
@@ -97,17 +95,23 @@ describe "Golden Seed Rake Tasks", dbclean: :after_each do
         end
 
         context "requirements" do
-          before :each do
-            subject.migrate
+          let(:people) { Person.all }
+          before :all do
+            Rails.application.load_tasks
+            Rake::Task['migrations:golden_seed_individual'].invoke
+          end
+
+          it "should create hbx enrollments with applied_aptc_amount" do
+            expect(HbxEnrollment.where(:applied_aptc_amount.ne => nil).count).to be > 0
           end
 
           it "should set some to is_applying_for_assistance" do
-            expect(Person.all.detect(&:is_applying_for_assistance).present?).to eq(true)
+            expect(Person.where(:is_applying_for_assistance.ne => nil).present?).to_not be_nil
           end
 
           it "sets some people temporarily absent and no dc address type" do
-            expect(Person.all.detect(&:no_dc_address).present?).to eq(true)
-            expect(Person.all.detect(&:is_temporarily_out_of_state).present?).to eq(true)
+            expect(people.detect(&:no_dc_address).present?).to eq(true)
+            expect(people.detect(&:is_temporarily_out_of_state).present?).to eq(true)
           end
 
           it "will not create new hbx profile and benefit sponsorship if they are already present" do
@@ -123,12 +127,12 @@ describe "Golden Seed Rake Tasks", dbclean: :after_each do
           end
 
           it "should create fully matched consumer records" do
-            consumer_roles = Person.all.select { |person| person.consumer_role.present? }
+            consumer_roles = people.select { |person| person.consumer_role.present? }
             expect(consumer_roles.count).to_not be(0)
           end
 
           it "should create users for consumers" do
-            consumer_roles = Person.all.select { |person| person.consumer_role.present? }
+            consumer_roles = people.select { |person| person.consumer_role.present? }
             consumer_person_ids = consumer_roles.map(&:_id)
             consumer_users = User.all.select { |user| consumer_person_ids.include?(user.person_id) }
             expect(consumer_users.length).to be > 1
@@ -140,8 +144,9 @@ describe "Golden Seed Rake Tasks", dbclean: :after_each do
         end
       end
     end
-    context "without csv input", dbclean: :after_each do
+    context "without csv input" do
       describe "requirements" do
+        let(:people) { Person.all }
         before :each do
           allow(subject).to receive(:ivl_testbed_scenario_csv).and_return(nil)
           subject.migrate
@@ -159,12 +164,12 @@ describe "Golden Seed Rake Tasks", dbclean: :after_each do
         end
 
         it "should create fully matched consumer records" do
-          consumer_roles = Person.all.select { |person| person.consumer_role.present? }
+          consumer_roles = people.select { |person| person.consumer_role.present? }
           expect(consumer_roles.count).to_not be(0)
         end
 
         it "should create users for consumers" do
-          consumer_roles = Person.all.select { |person| person.consumer_role.present? }
+          consumer_roles = people.select { |person| person.consumer_role.present? }
           consumer_person_ids = consumer_roles.map(&:_id)
           consumer_users = User.all.select { |user| consumer_person_ids.include?(user.person_id) }
           expect(consumer_users.length).to be > 1
