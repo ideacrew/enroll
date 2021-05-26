@@ -67,6 +67,10 @@ module GoldenSeedFinancialAssistanceHelper
     applicant.is_self_attested_disabled = false
     applicant.has_daily_living_help = false
     applicant.need_help_paying_bills = false
+    # Health coverage
+    # TODO: Not sure how to interpret CSV
+    # applicant.has_enrolled_health_coverage = truthy_value?(case_info_hash[:person_attributes]['health_program1'])
+    # applicant.has_eligible_health_coverage = truthy_value?(case_info_hash[:person_attributes]['health_program1'])
     applicant.save!
     applicant
   end
