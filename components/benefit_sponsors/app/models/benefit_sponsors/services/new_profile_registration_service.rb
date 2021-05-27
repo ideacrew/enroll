@@ -243,15 +243,20 @@ module BenefitSponsors
 
       def is_broker_for_employer?(user, form)
         person = user.person
-        staff_roles = person.broker_agency_staff_roles
-        return false unless person.broker_role || person.broker_agency_staff_roles.present?
         profile = load_profile
-        if person.broker_role.present?
-          profile.broker_agency_accounts.any? {|acc| acc.writing_agent_id == person.broker_role.id}
-        elsif staff_roles.present?
-          broker_profiles = staff_roles.map(&:benefit_sponsors_broker_agency_profile_id)
-          profile.broker_agency_accounts.any? {|acc|  broker_profiles.include?(acc.benefit_sponsors_broker_agency_profile_id)}
-        end
+        broker_role_for_employer?(person, profile) || broker_staff_for_employer?(person, profile)
+      end
+
+      def broker_role_for_employer?(person, profile)
+        return false unless person.broker_role.present?
+        profile.broker_agency_accounts.any? {|acc| acc.writing_agent_id == person.broker_role.id}
+      end
+
+      def broker_staff_for_employer?(person, profile)
+        staff_roles = person.broker_agency_staff_roles
+        return false unless staff_roles.present?
+        broker_profiles = staff_roles.map(&:benefit_sponsors_broker_agency_profile_id)
+        profile.broker_agency_accounts.any? {|acc|  broker_profiles.include?(acc.benefit_sponsors_broker_agency_profile_id)}
       end
 
       def is_general_agency_staff_for_employer?(user, form)
