@@ -344,3 +344,9 @@ registry:
         is_enabled: false
       - key: :dental_market
         is_enabled: true
+      - key: :qle_within_sixty_days
+        item: :qle_within_sixty_days
+        is_enabled: true
+        settings:
+          - key: :days
+            item: 60
