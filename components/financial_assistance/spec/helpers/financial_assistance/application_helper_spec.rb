@@ -59,7 +59,7 @@ RSpec.describe ::FinancialAssistance::ApplicationHelper, :type => :helper, dbcle
   describe 'applicant_currently_enrolled' do
     context 'text for non hra setting is turned on' do
       before do
-        FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled).stub(:item).and_return(true)
+        allow(FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled)).to receive(:item).and_return(true)
         @result = helper.applicant_currently_enrolled
       end
 
@@ -70,8 +70,8 @@ RSpec.describe ::FinancialAssistance::ApplicationHelper, :type => :helper, dbcle
 
     context 'text for hra setting is turned on' do
       before do
-        FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled).stub(:item).and_return(false)
-        FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled_with_hra).stub(:item).and_return(true)
+        allow(FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled)).to receive(:item).and_return(false)
+        allow(FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled_with_hra)).to receive(:item).and_return(true)
         @result = helper.applicant_currently_enrolled
       end
 
@@ -82,8 +82,8 @@ RSpec.describe ::FinancialAssistance::ApplicationHelper, :type => :helper, dbcle
 
     context 'When both the settings are turned off' do
       before do
-        FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled).stub(:item).and_return(false)
-        FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled_with_hra).stub(:item).and_return(false)
+        allow(FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled)).to receive(:item).and_return(false)
+        allow(FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled_with_hra)).to receive(:item).and_return(false)
         @result = helper.applicant_currently_enrolled
       end
 
@@ -96,7 +96,7 @@ RSpec.describe ::FinancialAssistance::ApplicationHelper, :type => :helper, dbcle
   describe 'applicant_currently_enrolled_key' do
     context 'text for non hra setting is turned on' do
       before do
-        FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled).stub(:item).and_return(true)
+        allow(FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled)).to receive(:item).and_return(true)
         @result = helper.applicant_currently_enrolled_key
       end
 
@@ -107,8 +107,8 @@ RSpec.describe ::FinancialAssistance::ApplicationHelper, :type => :helper, dbcle
 
     context 'text for hra setting is turned on' do
       before do
-        FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled).stub(:item).and_return(false)
-        FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled_with_hra).stub(:item).and_return(true)
+        allow(FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled)).to receive(:item).and_return(false)
+        allow(FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled_with_hra)).to receive(:item).and_return(true)
         @result = helper.applicant_currently_enrolled_key
       end
 
@@ -119,8 +119,8 @@ RSpec.describe ::FinancialAssistance::ApplicationHelper, :type => :helper, dbcle
 
     context 'When both the settings are turned off' do
       before do
-        FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled).stub(:item).and_return(false)
-        FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled_with_hra).stub(:item).and_return(false)
+        allow(FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled)).to receive(:item).and_return(false)
+        allow(FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled_with_hra)).to receive(:item).and_return(false)
         @result = helper.applicant_currently_enrolled_key
       end
 
@@ -133,7 +133,7 @@ RSpec.describe ::FinancialAssistance::ApplicationHelper, :type => :helper, dbcle
   describe 'applicant_eligibly_enrolled' do
     context 'text for non hra setting is turned on' do
       before do
-        FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible).stub(:item).and_return(true)
+        allow(FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible)).to receive(:item).and_return(true)
         @result = helper.applicant_eligibly_enrolled
       end
 
@@ -144,8 +144,8 @@ RSpec.describe ::FinancialAssistance::ApplicationHelper, :type => :helper, dbcle
 
     context 'text for hra setting is turned on' do
       before do
-        FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible).stub(:item).and_return(false)
-        FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible_with_hra).stub(:item).and_return(true)
+        allow(FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible)).to receive(:item).and_return(false)
+        allow(FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible_with_hra)).to receive(:item).and_return(true)
         @result = helper.applicant_eligibly_enrolled
       end
 
@@ -156,8 +156,8 @@ RSpec.describe ::FinancialAssistance::ApplicationHelper, :type => :helper, dbcle
 
     context 'When both the settings are turned off' do
       before do
-        FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible).stub(:item).and_return(false)
-        FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible_with_hra).stub(:item).and_return(false)
+        allow(FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible)).to receive(:item).and_return(false)
+        allow(FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible_with_hra)).to receive(:item).and_return(false)
         @result = helper.applicant_eligibly_enrolled
       end
 
@@ -170,7 +170,7 @@ RSpec.describe ::FinancialAssistance::ApplicationHelper, :type => :helper, dbcle
   describe 'applicant_eligibly_enrolled_key' do
     context 'text for non hra setting is turned on' do
       before do
-        FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible).stub(:item).and_return(true)
+        allow(FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible)).to receive(:item).and_return(true)
         @result = helper.applicant_eligibly_enrolled_key
       end
 
@@ -181,8 +181,8 @@ RSpec.describe ::FinancialAssistance::ApplicationHelper, :type => :helper, dbcle
 
     context 'text for hra setting is turned on' do
       before do
-        FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible).stub(:item).and_return(false)
-        FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible_with_hra).stub(:item).and_return(true)
+        allow(FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible)).to receive(:item).and_return(false)
+        allow(FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible_with_hra)).to receive(:item).and_return(true)
         @result = helper.applicant_eligibly_enrolled_key
       end
 
@@ -193,8 +193,8 @@ RSpec.describe ::FinancialAssistance::ApplicationHelper, :type => :helper, dbcle
 
     context 'When both the settings are turned off' do
       before do
-        FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible).stub(:item).and_return(false)
-        FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible_with_hra).stub(:item).and_return(false)
+        allow(FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible)).to receive(:item).and_return(false)
+        allow(FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible_with_hra)).to receive(:item).and_return(false)
         @result = helper.applicant_eligibly_enrolled_key
       end
 
