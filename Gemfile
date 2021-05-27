@@ -7,6 +7,8 @@ ruby '2.5.1'
 gem 'rails', '~> 5.2.4.3'
 gem 'sidekiq'
 gem 'ffaker'
+gem 'rswag-api'
+gem 'rswag-ui'
 #######################################################
 # FIXME
 #######################################################
@@ -140,6 +142,8 @@ group :development do
 end
 
 group :development, :test do
+  gem "rspec-rails"
+  gem "rswag-specs"
   gem 'action-cable-testing'
   # gem 'bundler-audit',          '~> 0.6'
   gem 'brakeman'
