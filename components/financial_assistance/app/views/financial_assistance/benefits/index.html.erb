@@ -15,7 +15,7 @@
     <!--is enrolled driver question-->
     <div class="driver-question row row-form-wrapper radio-align no-buffer fa-align-elements">
       <div class="col-md-6 labelforcoverage">
-        <span class="fa-text-color">Is this person currently enrolled in health coverage? *</span>
+        <span class="fa-text-color"><%= applicant_currently_enrolled%></span>
       </div>
       <div class="col-md-6 mt11">
         <div class="col-md-3 no-padding">
@@ -27,8 +27,8 @@
           <label class="radio-yml" for="enrolled_in_health_coverage_no">No</label>
         </div>
         <div class="col-md-6 left-seprator">
-            <a href="#has_enrolled_health_coverage" data-toggle="modal" data-target="#has_enrolled_health_coverage" class="interaction-click-control-not-sure?">Not sure?</a>
-            <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_enrolled_health_coverage"} %>
+          <a href="#<%=applicant_currently_enrolled_key%>" data-toggle="modal" data-target="#<%=applicant_currently_enrolled_key%>" class="interaction-click-control-not-sure?">Not sure?</a>
+          <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: applicant_currently_enrolled_key} %>
         </div>
       </div>
     </div>
@@ -42,7 +42,7 @@
     <!--is eligible driver question-->
     <div class="driver-question row row-form-wrapper radio-align no-buffer row-height fa-align-elements">
       <div class="col-md-6 labelforcoverage">
-        <span class="fa-text-color">Does this person currently have access to other health coverage that they are not enrolled in, including coverage they could get through another person? *</span>
+        <span class="fa-text-color"><%= applicant_eligibly_enrolled%></span>
       </div>
       <div class="col-md-6 mt11">
         <div class="col-md-3 no-padding">
@@ -54,8 +54,8 @@
           <label class="radio-yml" for="ieligible_for_health_coverage_no">No</label>
         </div>
         <div class="col-md-6 left-seprator">
-           <a href="#has_eligible_health_coverage" data-toggle="modal" data-target="#has_eligible_health_coverage" class="interaction-click-control-not-sure?">Not sure?</a>
-           <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_eligible_health_coverage"} %>
+           <a href="#<%= applicant_eligibly_enrolled_key%>" data-toggle="modal" data-target="#<%= applicant_eligibly_enrolled_key%>" class="interaction-click-control-not-sure?">Not sure?</a>
+           <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: applicant_eligibly_enrolled_key} %>
         </div>
       </div>
     </div>
