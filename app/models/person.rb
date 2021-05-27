@@ -150,7 +150,9 @@ class Person
   embeds_many :documents, as: :documentable
   embeds_many :verification_types, cascade_callbacks: true, validate: true
 
-  attr_accessor :effective_date, :skip_notify_callbacks, :is_consumer_role, :is_resident_role
+  attr_accessor :effective_date
+
+  attr_accessor :effective_date
 
   accepts_nested_attributes_for :consumer_role, :resident_role, :broker_role, :hbx_staff_role,
     :person_relationships, :employee_roles, :phones, :employer_staff_roles
@@ -309,8 +311,8 @@ class Person
 
   validate :consumer_fields_validations
 
-  after_create :notify_created, unless: :skip_notify_callbacks
-  after_update :notify_updated, unless: :skip_notify_callbacks
+  after_create :notify_created
+  after_update :notify_updated
   after_update :person_create_or_update_handler
 
   def self.api_staff_roles
@@ -711,7 +713,6 @@ class Person
     is_temporarily_out_of_state
   end
 
-  # TODO: Need to refactor DC resident attribute
   def is_dc_resident?
     return true if is_homeless? || is_temporarily_out_of_state?
 
@@ -1112,6 +1113,9 @@ class Person
   # FIXME
   # TODO: Move this out of here
   attr_writer :us_citizen, :naturalized_citizen, :indian_tribe_member, :eligible_immigration_status
+
+  attr_accessor :is_consumer_role
+  attr_accessor :is_resident_role
 
   before_save :assign_citizen_status_from_consumer_role
 
