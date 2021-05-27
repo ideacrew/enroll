@@ -89,8 +89,9 @@ class GoldenSeedIndividual < MongoidMigrationTask
     case_collection.each do |case_array|
       next unless case_array[1][:fa_application]
       create_fa_relationships(case_array)
-      puts("Submitting financial assistance application.") unless Rails.env.test?
-      case_array[1][:fa_application].submit!
+      # TODO: We will submit later
+      # puts("Submitting financial assistance application.") unless Rails.env.test?
+      # case_array[1][:fa_application].submit!
     end
   end
 

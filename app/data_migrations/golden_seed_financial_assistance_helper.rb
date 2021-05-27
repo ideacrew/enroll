@@ -133,21 +133,21 @@ module GoldenSeedFinancialAssistanceHelper
     income
   end
 
-  def add_applicant_deductions(case_info_hash)
-    return unless truthy_value?(case_info_hash[:person_attributes]['deduction_type'])
-    applicant = case_info_hash[:fa_applicants].last
-    applicant.deductions.create!(
-      amount: "",
-      kind: "",
-      frequency_kind: "",
-      start_on_must_precede_end_on: "",
-      start_on: ""
-    )
-  end
+  # def add_applicant_deductions(case_info_hash)
+  #  return unless truthy_value?(case_info_hash[:person_attributes]['deduction_type'])
+  #  applicant = case_info_hash[:fa_applicants].last
+  #  applicant.deductions.create!(
+  #    amount: "",
+  #    kind: "",
+  #    frequency_kind: "",
+  #    start_on_must_precede_end_on: "",
+  #    start_on: ""
+  #  )
+  # end
 
-  def add_applicant_benefits(_case_info_hash)
-    nil
-  end
+  # def add_applicant_benefits(_case_info_hash)
+  #  nil
+  # end
 
   def add_applicant_addresses(case_info_hash)
     current_or_primary_person = case_info_hash[:user_record].person || case_info_hash[:primary_person_record]
