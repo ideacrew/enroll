@@ -44,6 +44,6 @@ eligible_immigration_status: "<b>Does this person have an eligible immigration s
 is_incarcerated: "<b>Are you currently incarcerated? </b> <br> <br> Select 'yes' if any of the following situations apply: <br> <ul> <li> You're serving a term in prison or jail </li> <li> You're currently staying in a halfway house </li> </ul> <br> Select 'no' if: <ul> <li> You're on probation, parole, or home confinement </li> <li> You're being held in jail or prison, but haven't been convicted of a crime <br> (in other words, charges are pending)"
 
 # Maine Conditional Care Questions
-is_medicaid_cubcare_eligible: ""
+has_eligible_medicaid_cubcare: ""
 has_eligibility_changed: ""
 has_household_income_changed: ""

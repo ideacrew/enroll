@@ -114,16 +114,16 @@
         </div>
         <div class="col-md-6 mt11">
           <div class="col-md-3 no-padding">
-            <%= radio_button_tag("is_medicaid_cubcare_eligible", true, @applicant.is_medicaid_cubcare_eligible?, class: "radio-yml" ) %>
-            <label class="radio-yml" for="is_medicaid_cubcare_eligible_yes">Yes</label>
+            <%= radio_button_tag("has_eligible_medicaid_cubcare", true, @applicant.has_eligible_medicaid_cubcare?, class: "radio-yml" ) %>
+            <label class="radio-yml" for="has_eligible_medicaid_cubcare_yes">Yes</label>
           </div>
           <div class="col-md-3 no-padding">
-            <%= radio_button_tag("is_medicaid_cubcare_eligible", false, @applicant.is_medicaid_cubcare_eligible == false, class: "radio-yml" ) %>
-            <label class="radio-yml" for="is_medicaid_cubcare_eligible_no">No</label>
+            <%= radio_button_tag("has_eligible_medicaid_cubcare", false, @applicant.has_eligible_medicaid_cubcare == false, class: "radio-yml" ) %>
+            <label class="radio-yml" for="has_eligible_medicaid_cubcare_no">No</label>
           </div>
           <div class="col-md-6 left-seprator">
-            <a href="#is_medicaid_cubcare_eligible" data-toggle="modal" data-target="#is_medicaid_cubcare_eligible" class="interaction-click-control-not-sure?">Not sure?</a>
-            <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "is_medicaid_cubcare_eligible"} %>
+            <a href="#has_eligible_medicaid_cubcare" data-toggle="modal" data-target="#has_eligible_medicaid_cubcare" class="interaction-click-control-not-sure?">Not sure?</a>
+            <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_eligible_medicaid_cubcare"} %>
           </div>
         </div>
       </div>
