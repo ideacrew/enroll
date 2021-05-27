@@ -16,7 +16,7 @@
     <div class="row row-form-wrapper radio-align fa-text-color lightgray no-buffer row-height">
       <div class="col-md-10 benefits-check">
         <%=check_box_tag "insurance_kind", insurance_kind, @applicant.benefits.where(kind: kind).of_insurance_kind(insurance_kind).present?, class: "benefit-checkbox" %> &nbsp
-        <span class="run-glossary"> <%= FinancialAssistance::Benefit::INSURANCE_TYPE[insurance_kind.to_sym] %> </span>
+        <%= render partial:'shared/glossary', locals: {key: insurance_kind, term: FinancialAssistance::Benefit::INSURANCE_TYPE[insurance_kind.to_sym] } %>
       </div>
     </div>
 
