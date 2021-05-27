@@ -102,7 +102,11 @@ module GoldenSeedHelper
 
   # rubocop:disable Metrics/AbcSize
   # rubocop:disable Metrics/CyclomaticComplexity
+  # rubocop:disable Metrics/MethodLength
   def create_and_return_person(case_info_hash = {}, dependent = nil)
+    Person.skip_callback(:create, :after, :notify_created)
+    Person.skip_callback(:update, :after, :notify_updated)
+
     gender = case_info_hash[:person_attributes]['gender']&.downcase || Person::GENDER_KINDS.sample
     last_name = if dependent
                   case_info_hash[:primary_person_record].last_name
@@ -117,7 +121,7 @@ module GoldenSeedHelper
       dob: generate_random_birthday(case_info_hash)
     )
     person.save!
-    raise("Unable to save person.") unless person.save!
+    raise("Unable to save person.") unless person.save
     # Set residency type
     # "Same as primary" refers to having the same address as the primary
     if dependent && truthy_value?(case_info_hash[:person_attributes]['same_as_primary'])
@@ -155,11 +159,15 @@ module GoldenSeedHelper
     # Most are set to Y in spreadsheet
     applying_for_assistance = case_info_hash[:person_attributes]['help_paying_for_coverage'] || true
     person.is_applying_for_assistance = truthy_value?(applying_for_assistance)
+    # To avoid timeouts not do notify callbacks
     person.save!
+    Person.set_callback(:create, :after, :notify_created)
+    Person.set_callback(:update, :after, :notify_updated)
     person
   end
   # rubocop:enable Metrics/AbcSize
   # rubocop:enable Metrics/CyclomaticComplexity
+  # rubocop:enable Metrics/MethodLength
 
   # TODO: Need to figure out the primary applicant thing on spreadsheet
   def create_and_return_family(case_info_hash = {})

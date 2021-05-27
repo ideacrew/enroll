@@ -52,8 +52,6 @@ class GoldenSeedIndividual < MongoidMigrationTask
           case_collection[person_attributes["case_name"]][:fa_applicants] << {applicant_record: applicant_record, relationship_to_primary: person_attributes['relationship_to_primary']}
           case_info_hash = case_collection[person_attributes["case_name"]]
           add_applicant_income(case_info_hash)
-          add_applicant_deductions(case_info_hash)
-          add_applicant_benefits(case_info_hash)
           add_applicant_addresses(case_info_hash)
           add_applicant_phones(case_info_hash)
           add_applicant_emails(case_info_hash)
@@ -89,8 +87,9 @@ class GoldenSeedIndividual < MongoidMigrationTask
     case_collection.each do |case_array|
       next unless case_array[1][:fa_application]
       create_fa_relationships(case_array)
-      puts("Submitting financial assistance application.") unless Rails.env.test?
-      case_array[1][:fa_application].submit!
+      # TODO: We will submit later
+      # puts("Submitting financial assistance application.") unless Rails.env.test?
+      # case_array[1][:fa_application].submit!
     end
   end
 
