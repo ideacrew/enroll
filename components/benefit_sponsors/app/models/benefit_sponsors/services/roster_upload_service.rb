@@ -357,8 +357,8 @@ module BenefitSponsors
   end
 end
 
-class ImportErrorValue < RuntimeError
+class ImportErrorValue < Exception;
 end
 
-class ImportErrorDate < RuntimeError
+class ImportErrorDate < Exception;
 end
