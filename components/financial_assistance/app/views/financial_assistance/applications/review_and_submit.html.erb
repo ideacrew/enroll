@@ -285,34 +285,36 @@
 
               <% end %>
 
-              <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                <div class="col-md-6">l10n("faa.mainecare_cubcare_ineligible")
+              <% if EnrollRegistry[:mainecare_healthcare_questions].feature.is_enabled %>
+                <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                  <div class="col-md-6">l10n("faa.mainecare_cubcare_ineligible")
+                  </div>
+                  <div class="col-md-6"><%= human_boolean applicant.is_medicaid_cubcare_eligible %></div>
                 </div>
-                <div class="col-md-6"><%= human_boolean applicant.is_medicaid_cubcare_eligible %></div>
-              </div>
 
-              <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                <div class="col-md-6">l10n("faa.medicaid_cubcare_end_date")
+                <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                  <div class="col-md-6">l10n("faa.medicaid_cubcare_end_date")
+                  </div>
+                  <div class="col-md-6"><%= applicant.medicaid_cubcare_due_on.to_s %></div>
                 </div>
-                <div class="col-md-6"><%= applicant.medicaid_cubcare_due_on.to_s %></div>
-              </div>
 
-              <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                <div class="col-md-6">l10n("faa.change_eligibility_status")
+                <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                  <div class="col-md-6">l10n("faa.change_eligibility_status")
+                  </div>
+                  <div class="col-md-6"><%= human_boolean applicant.has_eligibility_changed %></div>
                 </div>
-                <div class="col-md-6"><%= human_boolean applicant.has_eligibility_changed %></div>
-              </div>
 
-              <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                <div class="col-md-6">l10n("faa.household_income_changed")
+                <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                  <div class="col-md-6">l10n("faa.household_income_changed")
+                  </div>
+                  <div class="col-md-6"><%= human_boolean applicant.has_household_income_changed %></div>
                 </div>
-                <div class="col-md-6"><%= human_boolean applicant.has_household_income_changed %></div>
-              </div>
 
-              <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                <div class="col-md-6">l10n("faa.person_medicaid_last_day")</div>
-                <div class="col-md-6"><%= applicant.person_coverage_end_on.to_s %></div>
-              </div>
+                <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                  <div class="col-md-6">l10n("faa.person_medicaid_last_day")</div>
+                  <div class="col-md-6"><%= applicant.person_coverage_end_on.to_s %></div>
+                </div>
+              <% end %>
             </div>
 
             <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
