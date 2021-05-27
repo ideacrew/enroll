@@ -116,8 +116,10 @@ module GoldenSeedHelper
       ssn: generate_and_return_unique_ssn,
       dob: generate_random_birthday(case_info_hash)
     )
+    # To avoid timeouts not do notify callbacks
+    person.skip_notify_callbacks = true
     person.save!
-    raise("Unable to save person.") unless person.save!
+    raise("Unable to save person.") unless person.save
     # Set residency type
     # "Same as primary" refers to having the same address as the primary
     if dependent && truthy_value?(case_info_hash[:person_attributes]['same_as_primary'])
@@ -155,6 +157,8 @@ module GoldenSeedHelper
     # Most are set to Y in spreadsheet
     applying_for_assistance = case_info_hash[:person_attributes]['help_paying_for_coverage'] || true
     person.is_applying_for_assistance = truthy_value?(applying_for_assistance)
+    # To avoid timeouts not do notify callbacks
+    person.skip_notify_callbacks = true
     person.save!
     person
   end
