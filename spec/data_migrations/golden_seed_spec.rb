@@ -86,8 +86,7 @@ describe "Golden Seed Rake Tasks", dbclean: :after_all do
             end
 
             it "should create non configued state addresses for people temporarily out of state" do
-              temp_out_of_state_person_address = Person.where(is_temporarily_out_of_state: true).all.sample
-              temp_out_of_state_address = temp_out_of_state_person_address.addresses.last
+              temp_out_of_state_address = Person.where(is_temporarily_out_of_state: true).all.flat_map(&:addresses).sample
               configured_state = EnrollRegistry[:enroll_app].setting(:state_abbreviation).item
               expect(temp_out_of_state_address.state).to_not eq(configured_state)
             end
