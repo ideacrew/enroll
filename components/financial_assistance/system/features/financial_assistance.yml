@@ -68,6 +68,22 @@ registry:
         settings:
           - key: :ivl_application_checklist
             item: 'db/documents/ivl_checklist.pdf'
-
+  - namespace:
+    - :questions
+    features:
+    - key: :has_enrolled_health_coverage
+      is_enabled: true
+      settings:
+        - key: :currently_enrolled
+          item: false
+        - key: :currently_enrolled_with_hra
+          item: true
+    - key: :has_eligible_health_coverage
+      is_enabled: true
+      settings:
+        - key: :currently_eligible
+          item: false
+        - key: :currently_eligible_with_hra
+          item: true
   # TODO eligibility engine connectivity(HAVEN) settings
   # TODO mec service connectivity settings
