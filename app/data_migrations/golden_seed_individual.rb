@@ -52,8 +52,6 @@ class GoldenSeedIndividual < MongoidMigrationTask
           case_collection[person_attributes["case_name"]][:fa_applicants] << {applicant_record: applicant_record, relationship_to_primary: person_attributes['relationship_to_primary']}
           case_info_hash = case_collection[person_attributes["case_name"]]
           add_applicant_income(case_info_hash)
-          add_applicant_deductions(case_info_hash)
-          add_applicant_benefits(case_info_hash)
           add_applicant_addresses(case_info_hash)
           add_applicant_phones(case_info_hash)
           add_applicant_emails(case_info_hash)
