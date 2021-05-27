@@ -108,7 +108,6 @@
       <br />
     <% end %>
         <!--is medicaid/cubcare driver question-->
-    <% if EnrollRegistry[:mainecare_healthcare_questions].feature.is_enabled %>
       <div class="driver-question row row-form-wrapper radio-align no-buffer row-height fa-align-elements">
         <div class="col-md-6 labelforcoverage">
           <span class="fa-text-color">l10n("faa.mainecare_cubcare_ineligible") </span>
@@ -187,7 +186,6 @@
         </div>
       </div>
       <br />
-    <% end %>
 
     <div class="col-md-4 col-sm-4 col-xs-4">
       <%#= link_to "Add Health Coverage", new_application_applicant_benefit_path(@application, @applicant), class: "btn btn-default center-block" %>
