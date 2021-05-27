@@ -168,7 +168,7 @@ class SpecialEnrollmentPeriod
   end
 
   def user
-    user = User.where(id: user_id).first
+    User.where(id: user_id).first
   end
 
   def duration_in_days
