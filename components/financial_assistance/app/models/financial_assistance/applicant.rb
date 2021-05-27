@@ -52,7 +52,7 @@ module FinancialAssistance
     MEC_VALIDATION_STATES = %w[na valid outstanding pending].freeze
 
     DRIVER_QUESTION_ATTRIBUTES = [:has_job_income, :has_self_employment_income, :has_other_income,
-                                  :has_deductions, :has_enrolled_health_coverage, :has_eligible_health_coverage]
+                                  :has_deductions, :has_enrolled_health_coverage, :has_eligible_health_coverage, :has_eligible_medicaid_cubcare]
     DRIVER_QUESTION_ATTRIBUTES += [:has_unemployment_income] if FinancialAssistanceRegistry[:unemployment_income].enabled?
     DRIVER_QUESTION_ATTRIBUTES.freeze
 
@@ -245,11 +245,15 @@ module FinancialAssistance
     field :has_enrolled_health_coverage, type: Boolean
     field :has_eligible_health_coverage, type: Boolean
 
+<<<<<<< HEAD
     # if member of tribe
     field :health_service_through_referral, type: Boolean
     field :health_service_eligible, type: Boolean
 
     field :is_medicaid_cubcare_eligible, type: Boolean
+=======
+    field :has_eligible_medicaid_cubcare, type: Boolean
+>>>>>>> latest driver question changes
     field :medicaid_cubcare_due_on, type: Date
     field :has_eligibility_changed, type: Boolean
     field :has_household_income_changed, type: Boolean
@@ -758,7 +762,12 @@ module FinancialAssistance
         return benefits.enrolled.present? && benefits.eligible.present? && benefits.all? {|benefit| benefit.valid? :submission} if has_enrolled_health_coverage && has_eligible_health_coverage
         return benefits.enrolled.present? && benefits.enrolled.all? {|benefit| benefit.valid? :submission} && benefits.eligible.blank? if has_enrolled_health_coverage && !has_eligible_health_coverage
         return benefits.enrolled.blank? && benefits.eligible.present? && benefits.eligible.all? {|benefit| benefit.valid? :submission}  if !has_enrolled_health_coverage && has_eligible_health_coverage
-        benefits.enrolled.blank? && benefits.eligible.blank?
+
+        return benefits.enrolled.blank? && benefits.eligible.present? && benefits.eligible_med_cub.present? && benefits.all? {|benefit| benefit.valid? :submission}  if has_enrolled_health_coverage && has_eligible_health_coverage && has_eligible_medicaid_cubcare
+        return benefits.enrolled.blank? && benefits.eligible.present? && benefits.eligible_med_cub.present? && benefits.eligible_med_cub_eligible.all? {|benefit| benefit.valid? :submission}  if !has_enrolled_health_coverage && has_eligible_health_coverage && has_eligible_medicaid_cubcare
+        return benefits.enrolled.present? && benefits.eligible.blank? && benefits.eligible_med_cub.present? && benefits.enrolled_med_cub_eligible.all? {|benefit| benefit.valid? :submission}  if has_enrolled_health_coverage && !has_eligible_health_coverage && has_eligible_medicaid_cubcare
+        return benefits.enrolled.present? && benefits.eligible.present? && benefits.eligible_med_cub.blank? && benefits.eligible_med_cub.all? {|benefit| benefit.valid? :submission}  if has_enrolled_health_coverage && has_eligible_health_coverage && !has_eligible_medicaid_cubcare
+        benefits.enrolled.blank? && benefits.eligible.blank? && benefits.eligible_med_cub.blank?
       end
     end
 
@@ -880,6 +889,14 @@ module FinancialAssistance
       benefits.eligible.present?
     end
 
+    def medicaid_cubcare_eligible_exists?
+      benefits.enrolled.present?
+    end
+
+    def eligible_medicaid_cubcare_exists?
+      benefits.eligible_med_cub.present?
+    end
+
     def attributes_for_export
       applicant_params = attributes.transform_keys(&:to_sym).slice(:family_member_id,:person_hbx_id,:name_pfx,:first_name,:middle_name,:last_name,:name_sfx,
                                           :gender,:is_incarcerated,:is_disabled,:ethnicity,:race,:tribal_id,:language_code,:no_dc_address,:is_homeless,
@@ -943,7 +960,7 @@ module FinancialAssistance
 
     def driver_question_responses
       DRIVER_QUESTION_ATTRIBUTES.each do |attribute|
-        next if [:has_enrolled_health_coverage, :has_eligible_health_coverage].include?(attribute) && !is_applying_coverage
+        next if [:has_enrolled_health_coverage, :has_eligible_health_coverage, :has_eligible_medicaid_cubcare].include?(attribute) && !is_applying_coverage
 
         instance_type = attribute.to_s.gsub('has_', '')
         instance_check_method = instance_type + "_exists?"
