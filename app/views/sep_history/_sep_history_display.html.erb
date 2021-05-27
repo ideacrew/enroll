@@ -1,4 +1,4 @@
-<% @family.special_enrollment_periods.to_a.reverse_each do |f| %>
+<% @family.special_enrollment_periods.sort_by(&:created_at).reverse_each do |f| %>
   <div class="add-default-class-<%= f.id.to_s %>">
     <div class="panel-heading sep-heading-<%= f.id.to_s %>" role="tab">
       <div class="row">
@@ -43,7 +43,7 @@
         <div class="row mt-1">
           <div class="col-md-6">
             <div class="col-md-6 font-weight-bold"><%= l10n("hbx_profiles.sep_creator") %></div>
-            <div class="col-md-6"><%= f.user_email.present? ? f.user_email : 'N/A' %></div>
+            <div class="col-md-6"><%= f.user.present? ? f.user&.person&.full_name : 'N/A' %></div>
           </div>
           <div class="col-md-6">
             <div class="col-md-6 font-weight-bold"><%= l10n("hbx_profiles.sep_next_possible_start_date") %></div>
@@ -73,11 +73,21 @@
           </div>
         </div>
         <div class="row mt-1">
-          <div class="col-md-12">
-            <div class="col-md-2 font-weight-bold"><%= l10n("hbx_profiles.sep_admin_comment") %></div>
-            <div class="col-md-10">
+          <div class="col-md-6">
+            <div class="col-md-6 font-weight-bold"><%= l10n("hbx_profiles.sep_admin_comment") %></div>
+            <div class="col-md-6">
               <% if f.comments.present? %>
                 <%= f.comments.first.content %>
+              <% else %>
+                N/A
+              <% end %>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="col-md-6 font-weight-bold"><%= l10n("hbx_profiles.csl_number") %></div>
+            <div class="col-md-6">
+              <% if f.csl_num.present? %>
+                <%= f.csl_num %>
               <% else %>
                 N/A
               <% end %>
