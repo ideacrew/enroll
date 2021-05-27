@@ -89,7 +89,7 @@ class SpecialEnrollmentPeriod
   scope :fehb_market,         ->{ where(:qualifying_life_event_kind_id.in => QualifyingLifeEventKind.fehb_market_events.map(&:id) + QualifyingLifeEventKind.fehb_market_non_self_attested_events.map(&:id) ) }
   scope :individual_market,   ->{ where(:qualifying_life_event_kind_id.in => QualifyingLifeEventKind.individual_market_events.map(&:id) + QualifyingLifeEventKind.individual_market_non_self_attested_events.map(&:id)) }
 
-  before_save :set_coverage_renewal_flag
+  before_save :set_coverage_renewal_flag, :set_user_id
 
   after_initialize :set_submitted_at, :set_user_id
 
@@ -167,9 +167,8 @@ class SpecialEnrollmentPeriod
     is_shop? || is_fehb?
   end
 
-  def user_email
+  def user
     user = User.where(id: user_id).first
-    user&.email
   end
 
   def duration_in_days
@@ -259,7 +258,7 @@ private
   end
 
   def set_user_id
-    self.user_id = SAVEUSER[:current_user_id]
+    self.assign_attributes({user_id: SAVEUSER[:current_user_id]})
   end
 
   def set_date_period
