@@ -20,3 +20,5 @@ registry:
             item: 'IVL_Application_Checklist_Final_02172021.pdf'
       - key: :indian_health_service_question
         is_enabled: false
+      - key: :mainecare_healthcare_questions
+        is_enabled: false
