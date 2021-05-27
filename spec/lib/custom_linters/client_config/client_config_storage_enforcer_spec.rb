@@ -32,7 +32,7 @@ describe "Client Config Storage Enforcement" do
   end
 
   let(:non_stored_client_system_folders) do
-    non_stored_client_locations.select { |folder| folder + "/system" }
+    non_stored_client_locations.select { |folder| "#{folder}/system" }
   end
 
   it "should not show any file differences between committed client and stored client" do
@@ -53,9 +53,9 @@ describe "Client Config Storage Enforcement" do
       stored_client_registry.configure do |config|
         config.name       = "#{client_abbreviation}_enroll".to_sym
         config.created_at = DateTime.now
-        config.load_path  = folder_location + "/system"
+        config.load_path  = "#{folder_location}/system"
       end
-      EnrollRegistry.keys.each do |currently_registered_key|
+      EnrollRegistry.each_key do |currently_registered_key|
         missing_keys << currently_registered_key unless stored_client_registry.keys.include?(currently_registered_key)
       end
       error_message = "Stored config for #{client_abbreviation} does not contain the following keys: #{missing_keys}."\
