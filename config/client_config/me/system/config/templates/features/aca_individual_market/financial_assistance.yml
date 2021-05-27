@@ -65,3 +65,5 @@ registry:
         is_enabled: true
       - key: :has_dependent_with_coverage
         is_enabled: true
+      - key: :mainecare_healthcare_questions
+        is_enabled: true
