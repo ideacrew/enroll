@@ -49,7 +49,7 @@ class User
       message += "errors.full_messages: #{self.errors.full_messages}, "
       message += "stacktrace: #{e.backtrace}"
       log(message, {:severity => "error"})
-      raise SwitchToIdpException
+      raise e
     end
   end
 
