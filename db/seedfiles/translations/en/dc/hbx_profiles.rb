@@ -35,7 +35,7 @@ HBX_PROFILES_TRANSLATIONS = {
 	"en.financial_assistance.applications.cant_determine_eligibility" => "We’re sorry, but we can’t determine your eligibility right now. Please call %{site_short_name} at %{contact_center_phone_number} or email %{contact_center_email_address} to report this issue.",
 	"en.financial_assistance.applications.report_error" => "Report the error code %{determination_http_status_code} to help us fix the problem as soon as possible.",
 	"en.financial_assistance.applications.response_error" => "Eligibility Response Error",
-	"en.hbx_profiles.coverage_renewal_flag" => "Can Renew Coverage",
+	"en.hbx_profiles.coverage_renewal_flag" => "Renew Coverage",
   "en.hbx_profiles.sep_history_for" => "SEP History for %{name}",
 	"en.hbx_profiles.sep_reason" => "SEP Reason",
 	"en.hbx_profiles.sep_start_date" => "SEP Start Date",
@@ -46,5 +46,6 @@ HBX_PROFILES_TRANSLATIONS = {
 	"en.hbx_profiles.sep_next_possible_start_date" => "Next Possible Start Date",
 	"en.hbx_profiles.sep_creation_date" => "Creation Date",
 	"en.hbx_profiles.sep_optional_dates" => "Option Dates",
-  "en.hbx_profiles.sep_admin_comment" => "Admin Comment"
+  "en.hbx_profiles.sep_admin_comment" => "Admin Comment",
+	"en.hbx_profiles.csl_number" => "CSL Number"
 }
