@@ -57,6 +57,8 @@ registry:
         is_enabled: true
       - key: :indian_health_service_question
         is_enabled: false
+      - key: :mainecare_healthcare_questions
+        is_enabled: true
 # TODO eligibility engine connectivity(HAVEN) settings
 # TODO mec service connectivity settings
 
