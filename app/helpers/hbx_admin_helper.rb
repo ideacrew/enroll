@@ -67,9 +67,9 @@ module HbxAdminHelper
 
   def prior_py_sep?(family, effective_date, market)
     person = family.primary_person
-    ivl_prior_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
+    ivl_prior_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.previous_benefit_coverage_period
     if market == 'individual'
-      !ivl_prior_coverage_period&.contains?(effective_date)
+      ivl_prior_coverage_period&.contains?(effective_date)
     else
       person.active_employee_roles.none?{|e| e.census_employee&.active_benefit_package&.benefit_application&.effective_period&.cover?(effective_date)}
     end
