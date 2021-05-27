@@ -294,7 +294,7 @@
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">
                 <div class="col-md-6">l10n("faa.medicaid_cubcare_end_date")
                 </div>
-                <div class="col-md-6"><%= human_boolean applicant.medicaid_cubcare_due_on.to_s %></div>
+                <div class="col-md-6"><%= applicant.medicaid_cubcare_due_on.to_s %></div>
               </div>
 
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">
@@ -311,7 +311,7 @@
 
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">
                 <div class="col-md-6">l10n("faa.person_medicaid_last_day")</div>
-                <div class="col-md-6"><%= human_boolean applicant.person_coverage_end_on %></div>
+                <div class="col-md-6"><%= applicant.person_coverage_end_on.to_s %></div>
               </div>
             </div>
 
