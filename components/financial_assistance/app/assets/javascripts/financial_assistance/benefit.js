@@ -236,6 +236,8 @@ document.addEventListener("turbolinks:load", function() {
     /* Conditional Display on dependent income  Question */
     if (!$("#has_dependent_with_coverage_true").is(':checked')) $("#denied-job-end-on").addClass('hide');
 
+    if (!$("#has_household_income_changed_false").is(':checked')) $("#medicaid-chip-coverage-last-day").removeClass('hide');
+
 
     $("body").on("change", "#has_eligible_medicaid_cubcare_true", function(){
       if ($('#has_eligible_medicaid_cubcare_true').is(':checked')) {
