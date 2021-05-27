@@ -312,6 +312,26 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
 end
 
 RSpec.describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, type: :model do
+  let(:current_year) { TimeKeeper.date_of_record.year }
+
+  before do
+    allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 11, 1))
+  end
+
+  include_context 'family with one member and one enrollment and one renewal enrollment'
+
+  before do
+    enrollment.update_attributes(effective_on: Date.new(current_year - 3))
+    product_selection = Entities::ProductSelection.new({:enrollment => enrollment, :product => enrollment.product, :family => family})
+    @result = subject.call(product_selection)
+  end
+
+  it 'should not create a renewal enrollment' do
+    expect(family.hbx_enrollments.count).to eq(2)
+  end
+end
+
+RSpec.describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, type: :model do
   before { DatabaseCleaner.clean }
 
   context 'Prospective' do
