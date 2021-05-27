@@ -225,10 +225,10 @@ document.addEventListener("turbolinks:load", function() {
     if (!$("#has_eligible_health_coverage_true").is(':checked')) $("#eligible-benefit-kinds").addClass('hide');
 
     /* Conditional Display denied medicaid Question */
-    if (!$("#is_medicaid_cubcare_eligible_true").is(':checked')) $("#denied-medicaid").addClass('hide');
+    if (!$("#has_eligible_medicaid_cubcare_true").is(':checked')) $("#denied-medicaid").addClass('hide');
 
     /* Conditional Display eligibility changed Question */
-    if (!$("#is_medicaid_cubcare_eligible_false").is(':checked')) $("#eligibility-change-question").addClass('hide');
+    if (!$("#has_eligible_medicaid_cubcare_false").is(':checked')) $("#eligibility-change-question").addClass('hide');
 
     /* Conditional Display household income or size changed Question */
     if (!$("#has_eligibility_changed_true").is(':checked')) $("#household-income-size-changed").addClass('hide');
@@ -241,8 +241,8 @@ document.addEventListener("turbolinks:load", function() {
     if (!$("#has_household_income_changed_false").is(':checked')) $("#medicaid-chip-coverage-last-day").removeClass('hide');
 
 
-    $("body").on("change", "#is_medicaid_cubcare_eligible_true", function(){
-      if ($('#is_medicaid_cubcare_eligible_true').is(':checked')) {
+    $("body").on("change", "#has_eligible_medicaid_cubcare_true", function(){
+      if ($('#has_eligible_medicaid_cubcare_true').is(':checked')) {
         $("#denied-medicaid").removeClass('hide');
         $("#eligibility-change-question").addClass('hide');
         $("#household-income-size-changed").addClass('hide');
@@ -253,8 +253,8 @@ document.addEventListener("turbolinks:load", function() {
       }
     });
 
-    $("body").on("change", "#is_medicaid_cubcare_eligible_false", function(){
-      if ($('#is_medicaid_cubcare_eligible_false').is(':checked')) {
+    $("body").on("change", "#has_eligible_medicaid_cubcare_false", function(){
+      if ($('#has_eligible_medicaid_cubcare_false').is(':checked')) {
         $("#eligibility-change-question").removeClass('hide');
         $("#denied-medicaid").addClass('hide');
       } else{
