@@ -83,6 +83,13 @@ Given(/^the user has an eligible immigration status$/) do
   end
 end
 
+Given(/^the user is a member of an indian tribe$/) do
+  consumer.person.consumer_role.update_attributes(indian_tribe_member: true)
+  application.applicants.each do |applicant|
+    applicant.update_attributes(indian_tribe_member: true)
+  end
+end
+
 Given(/^the user has an age between (\d+) and (\d+) years old$/) do |_arg1, _arg2|
   dob = TimeKeeper.date_of_record - 19.years
   consumer.person.update_attributes(dob: dob)
