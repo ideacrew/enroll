@@ -10,11 +10,16 @@
             </div>
         <% end %>
     <% else %>
-        <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-          <div class="col-md-6"><%= k %>
+        <% includes_maine_question = k.include?(l10n("faa.mainecare_cubcare_ineligible")) || k.include?(l10n("faa.immigration_status_changed")) %>
+        <% includes_indian_health_coverage = k.include?(l10n("faa.indian_health_service")) && EnrollRegistry[:indian_health_service_question].feature.is_enabled %>
+        <% should_show_driver_question = (!includes_maine_question && !includes_indian_health_coverage) || (includes_indian_health_coverage && applicant.indian_tribe_member) || (includes_maine_question && EnrollRegistry[:maine_iap_healthcare_driver_questions].feature.is_enabled) %>
+        <% if should_show_driver_question %>
+          <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+            <div class="col-md-6"><%= k %>
+            </div>
+            <div class="col-md-6"><%= v == true ? "Yes" : v == false ? "No" : v.nil? ? "N/A" : v %></div>
           </div>
-          <div class="col-md-6"><%= v == true ? "Yes" : v == false ? "No" : v.nil? ? "N/A" : v %></div>
-        </div>
+        <% end %>
         <% if income_coverage[0] == "HEALTH COVERAGE" &&  k.include?("enrolled")  && applicant.has_enrolled_health_coverage  %>
             <%= render partial: 'financial_assistance/applications/review_benefits', locals: {kind: 'is_enrolled', applicant: applicant} %>
         <% elsif income_coverage[0]== "HEALTH COVERAGE" && applicant.has_eligible_health_coverage%>
