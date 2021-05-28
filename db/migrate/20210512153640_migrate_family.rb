@@ -9,13 +9,12 @@ require 'aca_entities/ffe/transformers/mcr_to/family'
 class MigrateFamily < Mongoid::Migration
   def self.up
     ::AcaEntities::Ffe::Transformers::McrTo::Family.call(file_path, {transform_mode: :batch}) do |payload|
-
       transform_payload = Operations::Ffe::TransformApplication.new.call(payload)
 
       if transform_payload.success?
         family_hash = transform_payload.success.to_h.deep_stringify_keys!
       else
-        puts "app_identifier: #{payload[:insuranceApplicationIdentifier]} | #{transform_payload.failure}"
+        puts "app_identifier: #{payload[:insuranceApplicationIdentifier]} | failed: #{transform_payload.failure}"
         next
       end
 
@@ -29,13 +28,16 @@ class MigrateFamily < Mongoid::Migration
       print "."
     rescue StandardError => e
       puts "E: #{payload[:insuranceApplicationIdentifier]}, f: @family.hbx_id  error: #{e.message.split('.').first}"
-
     end
   end
 
   def self.file_path
-    "spec/test_data/transform_example_payloads/mcr_applications.json" if Rails.env == 'development'
-    "spec/test_data/transform_example_payloads/application.json" if Rails.env == 'test'
+    case Rails.env
+    when 'development'
+      "spec/test_data/transform_example_payloads/mcr_applications.json"
+    when 'test'
+      "spec/test_data/transform_example_payloads/application.json"
+    end
   end
 
   def self.build_iap(iap_hash)
@@ -95,7 +97,7 @@ class MigrateFamily < Mongoid::Migration
     family_member = family.add_family_member(person, fm_attr)
     family_member.save!
 
-    create_or_update_relationship(person, family, family_member_hash['person']['person_relationships'])
+    create_or_update_relationship(person, family, family_member_hash['person']['person_relationships'][0]['kind'])
     family.save!
     family_member
   end

@@ -13,7 +13,7 @@
   "creatingSystemRole": "DIRECT_ENROLLMENT",
   "applicationSubmissionDateTime": "2019-03-07T16:08:51+00:00",
   "creationOriginType": "DIRECT_ENROLLMENT",
-  "applicationCraeationDateTime": "2019-03-07T16:08:48+00:00",
+  "applicationCreationDateTime": "2019-03-07T16:08:48+00:00",
   "insuranceApplicationType": "EDE",
   "submissionOriginType": "DIRECT_ENROLLMENT",
   "lastConsumerSubmissionDateTime": "2019-03-07T16:08:51+00:00",
@@ -71,64 +71,80 @@
     },
     "household": {
       "familyRelationships": [
-        [
-          "1437478148886635679",
-          "SELF",
-          "1437478148886635679",
-          {
-            "resideTogetherIndicator": true,
-            "caretakerRelativeIndicator": true
-          }
-        ],
-        [
-          "1437478148886635679",
-          "SPOUSE",
-          "1437478148886635680",
-          {
-            "resideTogetherIndicator": true,
-            "caretakerRelativeIndicator": true
-          }
-        ],
-        [
-          "1437478148886635679",
-          "PARENT",
-          "1437478148886635681",
-          {
-            "resideTogetherIndicator": true,
-            "caretakerRelativeIndicator": true
-          }
-        ],
-        [
-          "1437478148886635680",
-          "PARENT",
-          "1437478148886635681",
-          {
-            "resideTogetherIndicator": true,
-            "caretakerRelativeIndicator": true
-          }
-        ]
+        {
+          "no_key": [
+            "1437478148886635679",
+            "SELF",
+            "1437478148886635679",
+            {
+              "resideTogetherIndicator": true,
+              "caretakerRelativeIndicator": true
+            }
+          ]
+        },
+        {
+          "no_key": [
+            "1437478148886635679",
+            "SPOUSE",
+            "1437478148886635680",
+            {
+              "resideTogetherIndicator": true,
+              "caretakerRelativeIndicator": true
+            }
+          ]
+        },
+        {
+          "no_key": [
+            "1437478148886635679",
+            "PARENT",
+            "1437478148886635681",
+            {
+              "resideTogetherIndicator": true,
+              "caretakerRelativeIndicator": true
+            }
+          ]
+        },
+        {
+          "no_key": [
+            "1437478148886635680",
+            "PARENT",
+            "1437478148886635681",
+            {
+              "resideTogetherIndicator": true,
+              "caretakerRelativeIndicator": true
+            }
+          ]
+        }
       ],
       "taxRelationships": [
-        [
-          "1437478148886635679",
-          "TAX_FILER",
-          "1437478148886635679"
-        ],
-        [
-          "1437478148886635680",
-          "TAX_FILER",
-          "1437478148886635681"
-        ],
-        [
-          "1437478148886635680",
-          "TAX_FILER",
-          "1437478148886635680"
-        ],
-        [
-          "1437478148886635679",
-          "TAX_FILER",
-          "1437478148886635681"
-        ]
+        {
+          "no_key": [
+            "1437478148886635679",
+            "TAX_FILER",
+            "1437478148886635679"
+          ]
+        },
+        {
+          "no_key": [
+            "1437478148886635680",
+            "TAX_FILER",
+            "1437478148886635681"
+          ]
+        },
+        {
+          "no_key": [
+            "1437478148886635680",
+            "TAX_FILER",
+            "1437478148886635680"
+          ]
+        },
+        {
+          "no_key": [
+            "1437478148886635679",
+            "TAX_FILER",
+            "1437478148886635681"
+          ]
+        }
       ]
     },
     "members": {
@@ -904,10 +920,6 @@
       }
     },
     "variableDeterminations": [
-      {
-        "creationDateTime": "2019-06-01T04:44:34+00:00",
-        "coverageState": "NV"
-      },
       {
         "creationDateTime": "2019-06-01T04:44:34+00:00",
         "coverageState": "NV"
