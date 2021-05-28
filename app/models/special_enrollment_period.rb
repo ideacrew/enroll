@@ -91,7 +91,7 @@ class SpecialEnrollmentPeriod
 
   before_save :set_coverage_renewal_flag, :set_user_id
 
-  after_initialize :set_submitted_at, :set_user_id
+  after_initialize :set_submitted_at
 
   add_observer ::BenefitSponsors::Observers::NoticeObserver.new, [:process_special_enrollment_events]
 
