@@ -137,6 +137,8 @@ PATH
       mongoid-autoinc (~> 6.0)
       pundit (~> 2.0)
       rails (~> 5.2.3)
+      rswag-api
+      rswag-ui
       slim (~> 3.0)
       symmetric-encryption (~> 3.9.1)
 
