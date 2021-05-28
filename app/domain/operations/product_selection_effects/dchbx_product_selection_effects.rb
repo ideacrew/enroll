@@ -110,12 +110,6 @@ module Operations
       def fetch_bcp_gt_enr_effective_year(enrollment)
         HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.select{|bcp| bcp.start_on.year > enrollment.effective_on.year }
       end
-
-      def prior_year_ivl_enrollment?(enrollment)
-        return false if enrollment.special_enrollment_period.blank?
-        prior_bcp = HbxProfile.current_hbx.benefit_sponsorship.previous_benefit_coverage_period
-        prior_bcp.contains?(enrollment.effective_on)
-      end
     end
   end
 end
