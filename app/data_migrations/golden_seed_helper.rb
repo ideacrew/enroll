@@ -203,10 +203,13 @@ module GoldenSeedHelper
     user.oim_id = email
     user.password = "P@ssw0rd!"
     user.person = person_record
+    user.person.consumer_role.skip_residency_verification = true if user.person.consumer_role
     user_saved = user.save
     5.times do
       break if user_saved == true
       user.email = FFaker::Internet.email
+      bindinbg.irb
+      user.person.consumer_role.skip_residency_verification = true if user.person.consumer_role
       user_saved = user.save
     end
     puts("Unable to generate user for #{case_info_hash[:primary_person_record].full_name}, email already taken.") unless user_saved == true
@@ -281,14 +284,15 @@ module GoldenSeedHelper
 
   def create_and_return_consumer_role(case_info_hash = {})
     consumer_role = case_info_hash[:primary_person_record].build_consumer_role
+    # attr_accessssor to skip certain validations
+    consumer_role.skip_residency_verification = true
     consumer_role.is_applicant = truthy_value?(case_info_hash[:person_attributes][:is_primary_applicant?])
-    consumer_role.save!
-    raise("Unable to save consumer role") unless consumer_role.persisted?
+
     # Active consumer role
     ivl_market_transition = IndividualMarketTransition.new(
       role_type: 'consumer',
       reason_code: 'initial_individual_market_transition_created_using_data_migration',
-      effective_starting_on: consumer_role.created_at.to_date,
+      effective_starting_on: ::TimeKeeper.datetime_of_record,
       submitted_at: ::TimeKeeper.datetime_of_record
     )
     case_info_hash[:primary_person_record].individual_market_transitions << ivl_market_transition
@@ -297,7 +301,10 @@ module GoldenSeedHelper
     consumer_role.us_citizen = true
     consumer_role.citizen_status = "us_citizen"
     consumer_role.citizenship_result = "us_citizen"
+    consumer_role.skip_residency_verification = true
     consumer_role.save!
+    # attr_accessssor to skip certain validations
+    consumer_role.skip_residency_verification = true
     # Verification types needed
     verification_type = VerificationType.new
     verification_type.validation_status = 'verified'
@@ -369,6 +376,8 @@ module GoldenSeedHelper
   # rubocop:disable Metrics/AbcSize
   def generate_and_return_hbx_enrollment(case_info_hash)
     consumer_role = case_info_hash[:consumer_role_record]
+    # attr_accessssor to skip certain validations
+    consumer_role.skip_residency_verification = true
     effective_on = TimeKeeper.date_of_record
     enrollment = HbxEnrollment.new(kind: "individual", consumer_role_id: consumer_role.id)
     enrollment.effective_on = effective_on
@@ -384,9 +393,14 @@ module GoldenSeedHelper
     end
     aptc_present = truthy_value?(case_info_hash[:person_attributes]['aptc_amount'])
     enrollment.applied_aptc_amount = case_info_hash[:person_attributes]['aptc_amount'].gsub("$", '').strip if aptc_present
+    # attr_accessssor to skip certain validations
+    consumer_role.skip_residency_verification = true
     consumer_role.person.primary_family.active_household.hbx_enrollments << enrollment
     consumer_role.person.primary_family.active_household.save!
-    enrollment.select_coverage! if enrollment.save!
+    # attr_accessssor to skip certain validations
+    consumer_role.skip_residency_verification = true
+    enrollment.save!
+    consumer_role.skip_residency_verification = true
     # IT comes off as "unverified" after this. Why?
     enrollment.update_attributes!(aasm_state: 'coverage_selected')
     puts("#{enrollment.aasm_state} HBX Enrollment created for #{consumer_role.person.full_name}") unless Rails.env.test?
