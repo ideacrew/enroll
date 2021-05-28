@@ -104,8 +104,6 @@ module GoldenSeedHelper
   # rubocop:disable Metrics/CyclomaticComplexity
   # rubocop:disable Metrics/MethodLength
   def create_and_return_person(case_info_hash = {}, dependent = nil)
-    Person.skip_callback(:create, :after, :notify_created)
-    Person.skip_callback(:update, :after, :notify_updated)
     gender = case_info_hash[:person_attributes]['gender']&.downcase || Person::GENDER_KINDS.sample
     last_name = if dependent
                   case_info_hash[:primary_person_record].last_name
@@ -160,8 +158,6 @@ module GoldenSeedHelper
     person.is_applying_for_assistance = truthy_value?(applying_for_assistance)
     # To avoid timeouts not do notify callbacks
     person.save!
-    Person.set_callback(:create, :after, :notify_created)
-    Person.set_callback(:update, :after, :notify_updated)
     person
   end
   # rubocop:enable Metrics/AbcSize
@@ -183,8 +179,6 @@ module GoldenSeedHelper
 
   # rubocop:disable Metrics/AbcSize
   def create_and_return_user(case_info_hash = {})
-    Person.skip_callback(:create, :after, :notify_created)
-    Person.skip_callback(:update, :after, :notify_updated)
     providers = ["gmail", "yahoo", "hotmail"]
     email = if case_info_hash[:person_attributes]['email']&.include?(".com")
               attributes["email"]
@@ -215,16 +209,12 @@ module GoldenSeedHelper
       user_saved = user.save
     end
     puts("Unable to generate user for #{case_info_hash[:primary_person_record].full_name}, email already taken.") unless user_saved == true
-    Person.set_callback(:create, :after, :notify_created)
-    Person.set_callback(:update, :after, :notify_updated)
     user
   end
   # rubocop:enable Metrics/AbcSize
 
   def generate_and_return_dependent_record(case_info_hash)
     dependent_person = create_and_return_person(case_info_hash, true)
-    PersonRelationship.skip_callback(:save, :after, :notify_updated)
-
     fm = FamilyMember.new(
       family: case_info_hash[:family_record],
       person_id: dependent_person.id,
@@ -236,7 +226,6 @@ module GoldenSeedHelper
       kind: relationship_to_primary,
       relative_id: dependent_person.id
     )
-    PersonRelationship.set_callback(:save, :after, :notify_updated)
     dependent_person
   end
 
@@ -290,8 +279,6 @@ module GoldenSeedHelper
   end
 
   def create_and_return_consumer_role(case_info_hash = {})
-    Person.skip_callback(:create, :after, :notify_created)
-    Person.skip_callback(:update, :after, :notify_updated)
     consumer_role = case_info_hash[:primary_person_record].build_consumer_role
     # attr_accessssor to skip certain validations
     consumer_role.skip_residency_verification = true
@@ -325,8 +312,6 @@ module GoldenSeedHelper
     case_info_hash[:primary_person_record].save!
     raise("Not verified") unless consumer_role.identity_verified? == true
     case_info_hash[:consumer_role] = consumer_role
-    Person.set_callback(:create, :after, :notify_created)
-    Person.set_callback(:update, :after, :notify_updated)
     consumer_role
   end
 
@@ -386,8 +371,6 @@ module GoldenSeedHelper
 
   # rubocop:disable Metrics/AbcSize
   def generate_and_return_hbx_enrollment(case_info_hash)
-    Person.skip_callback(:create, :after, :notify_created)
-    Person.skip_callback(:update, :after, :notify_updated)
     consumer_role = case_info_hash[:consumer_role_record]
     # attr_accessssor to skip certain validations
     consumer_role.skip_residency_verification = true
@@ -416,8 +399,6 @@ module GoldenSeedHelper
     consumer_role.skip_residency_verification = true
     # IT comes off as "unverified" after this. Why?
     enrollment.update_attributes!(aasm_state: 'coverage_selected')
-    Person.set_callback(:create, :after, :notify_created)
-    Person.set_callback(:update, :after, :notify_updated)
     puts("#{enrollment.aasm_state} HBX Enrollment created for #{consumer_role.person.full_name}") unless Rails.env.test?
   end
   # rubocop:enable Metrics/AbcSize

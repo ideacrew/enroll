@@ -135,11 +135,21 @@ class GoldenSeedIndividual < MongoidMigrationTask
     create_and_return_service_area_and_product if ivl_products.blank?
     create_and_return_ivl_hbx_profile_and_sponsorship
     @consumer_people_and_users = {}
+    Person.skip_callback(:create, :after, :notify_created)
+    Person.skip_callback(:update, :after, :notify_updated)
+    PersonRelationship.skip_callback(:save, :after, :notify_updated)
+    HbxEnrollment.skip_callback(:save, :after, :notify_on_save)
+    FinancialAssistance::Relationship.skip_callback(:create, :after, :propagate_applicant) if EnrollRegistry.feature_enabled?(:financial_assistance)
     if ivl_testbed_scenario_csv
       migrate_with_csv
     else
       migrate_without_csv
     end
+    Person.set_callback(:create, :after, :notify_created)
+    Person.set_callback(:update, :after, :notify_updated)
+    PersonRelationship.set_callback(:save, :after, :notify_updated)
+    HbxEnrollment.set_callback(:save, :after, :notify_on_save)
+    FinancialAssistance::Relationship.set_callback(:create, :after, :propagate_applicant) if EnrollRegistry.feature_enabled?(:financial_assistance)
     puts("Site present for: #{BenefitSponsors::Site.all.map(&:site_key)}") if BenefitSponsors::Site.present? && !Rails.env.test?
     puts("Golden Seed IVL migration complete. All consumer roles are:") unless Rails.env.test?
     consumer_people_and_users.each do |person_full_name, user_record|
