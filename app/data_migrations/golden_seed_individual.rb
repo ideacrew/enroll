@@ -25,7 +25,7 @@ class GoldenSeedIndividual < MongoidMigrationTask
   include GoldenSeedHelper
   include GoldenSeedFinancialAssistanceHelper
 
-  attr_accessor :case_collection, :counter_number, :consumer_people_and_users
+  attr_accessor :case_collection, :counter_number, :consumer_people_and_users, :original_person_hbx_ids, :original_enrollment_hbx_ids
 
   def migrate_with_csv
     ivl_csv = File.read(ivl_testbed_scenario_csv)
@@ -82,6 +82,8 @@ class GoldenSeedIndividual < MongoidMigrationTask
       end
       @counter_number += 1
     end
+    update_person_hbx_ids
+    update_enrollment_hbx_ids
     return unless EnrollRegistry.feature_enabled?(:financial_assistance)
     unless Rails.env.test?
       puts(
@@ -127,6 +129,8 @@ class GoldenSeedIndividual < MongoidMigrationTask
   def migrate
     @case_collection = {}
     @counter_number = 0
+    @original_enrollment_hbx_ids = []
+    @original_person_hbx_ids = []
     puts('Executing Golden Seed IVL migration migration.') unless Rails.env.test?
     puts("Site present, using existing site.") if site.present? && !Rails.env.test?
     ::BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_empty_benefit_market if site.blank?
