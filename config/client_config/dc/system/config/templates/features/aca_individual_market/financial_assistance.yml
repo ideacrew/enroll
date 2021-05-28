@@ -12,6 +12,10 @@ registry:
         is_enabled: true
         item: :ivl_application_checklist
         settings:
+          - key: :aceds_curam
+            item: false
+          - key: :ivl_application_checklist
+            item: 'IVL_Application_Checklist_Final_02172021.pdf'
           - key: :file_location
             item: 'db/documents/ivl_checklist.pdf'
       - key: :enrollment_dates
@@ -55,6 +59,8 @@ registry:
       - key: :unemployment_income
         item: :unemployment_income
         is_enabled: true
+      - key: :indian_health_service_question
+        is_enabled: false
 
     # TODO eligibility engine connectivity(HAVEN) settings
     # TODO mec service connectivity settings

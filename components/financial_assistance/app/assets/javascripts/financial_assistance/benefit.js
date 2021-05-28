@@ -257,7 +257,7 @@ document.addEventListener("turbolinks:load", function() {
     });
 
     /* Saving Responses to Income  Driver Questions */
-    $('#has_enrolled_health_coverage_false, #has_eligible_health_coverage_false, #has_enrolled_health_coverage_true, #has_eligible_health_coverage_true').on('change', function(e) {
+    $('#has_enrolled_health_coverage_false, #has_eligible_health_coverage_false, #has_enrolled_health_coverage_true, #has_eligible_health_coverage_true, #health_service_through_referral_true, #health_service_through_referral_false').on('change', function(e) {
       var attributes = {};
       attributes[$(this).attr('name')] = $(this).val();
       $.ajax({
@@ -302,6 +302,5 @@ document.addEventListener("turbolinks:load", function() {
             (key >= 96 && key <= 105) );
 
     });
-    
-});
 
+});

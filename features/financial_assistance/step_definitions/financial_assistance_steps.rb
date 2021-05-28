@@ -378,6 +378,10 @@ Given(/^the FAA feature configuration is enabled$/) do
   enable_feature :financial_assistance
 end
 
+Given(/^Indian Health Service Question feature is enabled$/) do
+  enable_feature :indian_health_service_question
+end
+
 Then(/^the consumer will not see the Cost Savings link$/) do
   expect(page).to have_no_link('Cost Savings')
 end
