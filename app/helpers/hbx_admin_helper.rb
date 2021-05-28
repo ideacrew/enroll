@@ -67,8 +67,8 @@ module HbxAdminHelper
 
   def prior_py_sep?(effective_date, market)
     ivl_prior_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.previous_benefit_coverage_period
-    if market == 'individual'
-      ivl_prior_coverage_period&.contains?(effective_date)
-    end
+    return unless market == 'individual'
+
+    ivl_prior_coverage_period&.contains?(effective_date)
   end
 end
