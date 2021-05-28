@@ -245,6 +245,9 @@ module FinancialAssistance
     field :has_enrolled_health_coverage, type: Boolean
     field :has_eligible_health_coverage, type: Boolean
 
+    # if member of tribe
+    field :health_service_through_referral, type: Boolean
+
     field :workflow, type: Hash, default: { }
 
     embeds_many :verification_types, class_name: "::FinancialAssistance::VerificationType"#, cascade_callbacks: true, validate: true
@@ -744,6 +747,9 @@ module FinancialAssistance
         return deductions.present? if has_deductions
         deductions.blank?
       when :health_coverage
+        if EnrollRegistry[:indian_health_service_question].feature.is_enabled
+          return false if indian_tribe_member && health_service_through_referral.nil?
+        end
         return false if has_enrolled_health_coverage.nil? || has_eligible_health_coverage.nil?
         return benefits.enrolled.present? && benefits.eligible.present? && benefits.all? {|benefit| benefit.valid? :submission} if has_enrolled_health_coverage && has_eligible_health_coverage
         return benefits.enrolled.present? && benefits.enrolled.all? {|benefit| benefit.valid? :submission} && benefits.eligible.blank? if has_enrolled_health_coverage && !has_eligible_health_coverage

@@ -159,6 +159,13 @@
               </div>
               <div class="col-md-6"><%= human_boolean applicant.has_eligible_health_coverage %></div>
             </div>
+
+            <% if EnrollRegistry[:indian_health_service_question].feature.is_enabled && applicant.indian_tribe_member %>
+              <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                <div class="col-md-6"><%= l10n("faa.indian_health_service") %> *</div>
+                <div class="col-md-6"><%= human_boolean applicant.health_service_through_referral %></div>
+              </div>
+            <% end %>
           </div>
 
           <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
