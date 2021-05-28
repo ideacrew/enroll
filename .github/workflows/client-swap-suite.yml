@@ -1,4 +1,4 @@
-name: Nighty Stored Client Tests
+name: Nightly Stored Client Tests
 on:
   schedule:
     - cron: '0 0 * * *'
