@@ -158,6 +158,7 @@ module GoldenSeedHelper
     person.is_applying_for_assistance = truthy_value?(applying_for_assistance)
     # To avoid timeouts not do notify callbacks
     person.save!
+    puts("Person record creation complete.") unless Rails.env.test?
     person
   end
   # rubocop:enable Metrics/AbcSize
@@ -319,9 +320,13 @@ module GoldenSeedHelper
     gender = case_info_hash[:person_attributes][:gender]&.downcase || Person::GENDER_KINDS.sample
     case_info_hash[:person_attributes]["first_name"] = FFaker::Name.send("first_name_#{gender}")
     case_info_hash[:person_attributes]["last_name"] = FFaker::Name.last_name
+    puts("Beginning to create person record.") unless Rails.env.test?
     case_info_hash[:primary_person_record] = create_and_return_person(case_info_hash)
+    puts("Beginning to create family recoord.") unless Rails.env.test?
     case_info_hash[:family_record] = create_and_return_family(case_info_hash)
+    puts("Beginning to create user record.") unless Rails.env.test?
     case_info_hash[:user_record] = create_and_return_user(case_info_hash)
+    puts("Beginning to create consumer roole record.") unless Rails.env.test?
     case_info_hash[:consumer_role_record] = create_and_return_consumer_role(case_info_hash)
     case_info_hash
   end

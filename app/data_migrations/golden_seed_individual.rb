@@ -61,7 +61,7 @@ class GoldenSeedIndividual < MongoidMigrationTask
           add_applicant_mec_response(case_info_hash)
         end
       else
-        puts("Beginning to create consumer role record for #{person_attributes['case_name']}") unless Rails.env.test?
+        puts("Beginning to create records for consumer role record for #{person_attributes['case_name']}") unless Rails.env.test?
         case_collection[person_attributes["case_name"]] = create_and_return_matched_consumer_and_hash(
           case_collection[person_attributes["case_name"]]
         )
@@ -137,6 +137,7 @@ class GoldenSeedIndividual < MongoidMigrationTask
     @consumer_people_and_users = {}
     Person.skip_callback(:create, :after, :notify_created)
     Person.skip_callback(:update, :after, :notify_updated)
+    Person.skip_callback(:update, :after, :person_create_or_update_handler)
     PersonRelationship.skip_callback(:save, :after, :notify_updated)
     HbxEnrollment.skip_callback(:save, :after, :notify_on_save)
     FinancialAssistance::Relationship.skip_callback(:create, :after, :propagate_applicant) if EnrollRegistry.feature_enabled?(:financial_assistance)
@@ -147,6 +148,7 @@ class GoldenSeedIndividual < MongoidMigrationTask
     end
     Person.set_callback(:create, :after, :notify_created)
     Person.set_callback(:update, :after, :notify_updated)
+    Person.set_callback(:update, :after, :person_create_or_update_handler)
     PersonRelationship.set_callback(:save, :after, :notify_updated)
     HbxEnrollment.set_callback(:save, :after, :notify_on_save)
     FinancialAssistance::Relationship.set_callback(:create, :after, :propagate_applicant) if EnrollRegistry.feature_enabled?(:financial_assistance)
