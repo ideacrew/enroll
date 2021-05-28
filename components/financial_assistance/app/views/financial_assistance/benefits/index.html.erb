@@ -65,6 +65,32 @@
       <%= render partial: 'financial_assistance/benefits/insurance_kinds', locals: { insurance_kinds: FinancialAssistance::Benefit::INSURANCE_KINDS, kind: "is_eligible", text: "What type of coverage does this person have access to?"} %>
     </div>
 
+    <br>
+
+    <!--health_service_through_referral driver question-->
+    <% if EnrollRegistry[:indian_health_service_question].feature.is_enabled %>
+      <% if @applicant.indian_tribe_member %>
+        <div class="driver-question row row-form-wrapper radio-align no-buffer row-height fa-align-elements">
+          <div class="col-md-6 labelforcoverage">
+            <span class="fa-text-color"><%= l10n("faa.indian_health_service") %> *</span>
+          </div>
+          <div class="col-md-6 mt11">
+            <div class="col-md-3 no-padding">
+              <%= radio_button_tag("health_service_through_referral", true, @applicant.health_service_through_referral, class: "radio-yml" ) %>
+              <label class="radio-yml" for="health_service_through_referral_yes">Yes</label>
+            </div>
+            <div class="col-md-3 no-padding">
+              <%= radio_button_tag("health_service_through_referral", false, @applicant.health_service_through_referral == false, class: "radio-yml" ) %>
+              <label class="radio-yml" for="health_service_through_referral_no">No</label>
+            </div>
+            <div class="col-md-6">
+            </div>
+          </div>
+        </div>
+      <% end %>
+      <br />
+    <% end %>
+
     <div class="col-md-4 col-sm-4 col-xs-4">
     <%#= link_to "Add Health Coverage", new_application_applicant_benefit_path(@application, @applicant), class: "btn btn-default center-block" %>
     </div>
