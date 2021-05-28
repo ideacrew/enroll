@@ -121,6 +121,7 @@ module GoldenSeedHelper
   # rubocop:disable Metrics/AbcSize
   # rubocop:disable Metrics/CyclomaticComplexity
   # rubocop:disable Metrics/MethodLength
+  # rubocop:disable Metrics/PerceivedComplexity
   def create_and_return_person(case_info_hash = {}, dependent = nil)
     gender = case_info_hash[:person_attributes]['gender']&.downcase || Person::GENDER_KINDS.sample
     last_name = if dependent
@@ -184,6 +185,7 @@ module GoldenSeedHelper
   # rubocop:enable Metrics/AbcSize
   # rubocop:enable Metrics/CyclomaticComplexity
   # rubocop:enable Metrics/MethodLength
+  # rubocop:enable Metrics/PerceivedComplexity
 
   # TODO: Need to figure out the primary applicant thing on spreadsheet
   def create_and_return_family(case_info_hash = {})
