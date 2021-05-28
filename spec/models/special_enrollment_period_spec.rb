@@ -459,9 +459,11 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
     let(:current_user) { FactoryBot.create(:user) }
     let(:qle_on_date)  { TimeKeeper.date_of_record.beginning_of_month }
 
-    let(:sep) { family.special_enrollment_periods.build(qualifying_life_event_kind: ivl_qle, qle_on: qle_on_date,
-                                                        start_on: qle_on_date - 1.month, end_on: qle_on_date + 1.month,
-                                                        effective_on_kind: "date_of_event") }
+    let(:sep) do
+      family.special_enrollment_periods.build(qualifying_life_event_kind: ivl_qle, qle_on: qle_on_date,
+                                              start_on: qle_on_date - 1.month, end_on: qle_on_date + 1.month,
+                                              effective_on_kind: "date_of_event")
+    end
 
     before do
       SAVEUSER[:current_user_id] = current_user.try(:id)
