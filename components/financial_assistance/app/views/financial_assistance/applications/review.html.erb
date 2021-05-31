@@ -172,9 +172,9 @@
               </div>
             <% end %>
 
-            <% if EnrollRegistry[:mainecare_healthcare_questions].feature.is_enabled %>
+            <% if FinancialAssistanceRegistry.feature_enabled?(:has_medicare_cubcare_eligible) %>
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                  <div class="col-md-6">l10n("faa.mainecare_cubcare_ineligible")
+                  <div class="col-md-6">l10n("faa.mainecare_not_eligible")
                   </div>
                   <div class="col-md-6"><%= human_boolean applicant.has_eligible_medicaid_cubcare %></div>
                 </div>
@@ -202,6 +202,7 @@
                   <div class="col-md-6"><%= applicant.person_coverage_end_on.to_s %></div>
                 </div>
               </div>
+            <% end %>
           </div>
 
           <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
