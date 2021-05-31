@@ -85,5 +85,7 @@ registry:
           item: false
         - key: :currently_eligible_with_hra
           item: true
+    - key: :has_medicare_cubcare_eligible
+      is_enabled: true
   # TODO eligibility engine connectivity(HAVEN) settings
   # TODO mec service connectivity settings
