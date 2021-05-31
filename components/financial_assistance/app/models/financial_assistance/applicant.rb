@@ -246,15 +246,13 @@ module FinancialAssistance
     field :has_enrolled_health_coverage, type: Boolean
     field :has_eligible_health_coverage, type: Boolean
 
-<<<<<<< HEAD
     # if member of tribe
     field :health_service_through_referral, type: Boolean
     field :health_service_eligible, type: Boolean
 
     field :is_medicaid_cubcare_eligible, type: Boolean
-=======
+
     field :has_eligible_medicaid_cubcare, type: Boolean
->>>>>>> latest driver question changes
     field :medicaid_cubcare_due_on, type: Date
     field :has_eligibility_changed, type: Boolean
     field :has_household_income_changed, type: Boolean
@@ -765,14 +763,26 @@ module FinancialAssistance
         return benefits.enrolled.present? && benefits.eligible.present? && benefits.all? {|benefit| benefit.valid? :submission} if has_enrolled_health_coverage && has_eligible_health_coverage
         return benefits.enrolled.present? && benefits.enrolled.all? {|benefit| benefit.valid? :submission} && benefits.eligible.blank? if has_enrolled_health_coverage && !has_eligible_health_coverage
         return benefits.enrolled.blank? && benefits.eligible.present? && benefits.eligible.all? {|benefit| benefit.valid? :submission}  if !has_enrolled_health_coverage && has_eligible_health_coverage
-
-        return benefits.enrolled.blank? && benefits.eligible.present? && benefits.eligible_med_cub.present? && benefits.all? {|benefit| benefit.valid? :submission}  if has_enrolled_health_coverage && has_eligible_health_coverage && has_eligible_medicaid_cubcare
-        return benefits.enrolled.blank? && benefits.eligible.present? && benefits.eligible_med_cub.present? && benefits.eligible_med_cub_eligible.all? {|benefit| benefit.valid? :submission}  if !has_enrolled_health_coverage && has_eligible_health_coverage && has_eligible_medicaid_cubcare
-        return benefits.enrolled.present? && benefits.eligible.blank? && benefits.eligible_med_cub.present? && benefits.enrolled_med_cub_eligible.all? {|benefit| benefit.valid? :submission}  if has_enrolled_health_coverage && !has_eligible_health_coverage && has_eligible_medicaid_cubcare
-        return benefits.enrolled.present? && benefits.eligible.present? && benefits.eligible_med_cub.blank? && benefits.eligible_med_cub.all? {|benefit| benefit.valid? :submission}  if has_enrolled_health_coverage && has_eligible_health_coverage && !has_eligible_medicaid_cubcare
-        benefits.enrolled.blank? && benefits.eligible.blank? && benefits.eligible_med_cub.blank?
+        benefits.enrolled.blank? && benefits.eligible.blank?
+        return medicare_eligible_qns if FinancialAssistanceRegistry.feature_enabled?(:has_medicare_cubcare_eligible)
       end
     end
+
+    # rubocop:disable Metrics/CyclomaticComplexity
+    # rubocop:disable Metrics/PerceivedComplexity
+    def medicare_eligible_qns
+      return false if has_eligible_medicaid_cubcare.nil?
+      return false if has_eligible_medicaid_cubcare.present? && medicaid_cubcare_due_on.blank?
+      return true if has_eligible_medicaid_cubcare.present? && medicaid_cubcare_due_on.blank?
+      return false if has_eligible_medicaid_cubcare == false && has_eligibility_changed.nil?
+      return true if has_eligible_medicaid_cubcare == false && has_eligibility_changed == false
+      return false if has_eligible_medicaid_cubcare == false && has_eligibility_changed.present? && has_household_income_changed.nil
+      return true if  has_eligible_medicaid_cubcare == false && has_eligibility_changed.present? && has_household_income_changed == false
+      return false if has_eligible_medicaid_cubcare == false && has_eligibility_changed.present? && has_household_income_changed.present? && person_coverage_end_on.blank?
+      return true if has_eligible_medicaid_cubcare == false && has_eligibility_changed.present? && has_household_income_changed.present? && person_coverage_end_on.present?
+    end
+    # rubocop:enable Metrics/CyclomaticComplexity
+    # rubocop:enable Metrics/PerceivedComplexity
 
     def assisted_income_verified?
       assisted_income_validation == "valid"
@@ -890,14 +900,6 @@ module FinancialAssistance
 
     def eligible_health_coverage_exists?
       benefits.eligible.present?
-    end
-
-    def medicaid_cubcare_eligible_exists?
-      benefits.enrolled.present?
-    end
-
-    def eligible_medicaid_cubcare_exists?
-      benefits.eligible_med_cub.present?
     end
 
     def attributes_for_export
