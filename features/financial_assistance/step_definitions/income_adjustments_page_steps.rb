@@ -24,6 +24,9 @@ end
 
 Then(/^the income adjustments choices should show$/) do
   expect(page).to have_content 'Income adjustments you must report'
+  FinancialAssistance::Deduction::KINDS.each do |deduction_kind|
+    expect(page).to have_content(FinancialAssistance::Deduction::DEDUCTION_TYPE[deduction_kind.to_sym])
+  end
 end
 
 Given(/^the user checks a income adjustments checkbox$/) do
