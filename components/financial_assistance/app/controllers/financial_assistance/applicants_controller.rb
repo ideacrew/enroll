@@ -161,8 +161,6 @@ module FinancialAssistance
 
       model_params["person_coverage_end_on"] = Date.strptime(model_params["person_coverage_end_on"].to_s, "%m/%d/%Y") if model_params["person_coverage_end_on"].present?
       model_params["medicaid_cubcare_due_on"] = Date.strptime(model_params["medicaid_cubcare_due_on"].to_s, "%m/%d/%Y") if model_params["medicaid_cubcare_due_on"].present?
-      model_params["has_eligibility_changed"] = nil if model_params["has_eligibility_changed"].blank?
-      model_params["has_household_income_changed"] = nil if model_params["has_household_income_changed"].blank?
     end
 
     def build_error_messages(model)
