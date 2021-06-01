@@ -8,7 +8,7 @@ Feature: COBRA basic
     And there is an employer EnterPrise Limited
     And EnterPrise Limited employer has a staff role
     And there are 2 employees for EnterPrise Limited
-@flaky
+
 Scenario: Employer terminates and Initiate COBRA to Unlinked employee
     Given staff role person logged in
     And EnterPrise Limited employer terminates employees
@@ -19,12 +19,12 @@ Scenario: Employer terminates and Initiate COBRA to Unlinked employee
     When employer clicks on Initiate cobra button
     Then employer should see Enter effective date for Initiate cobra Action
     And employer should see default cobra start date
-    And employer sets cobra start date to two months after termination date
+    And employer accepts the suggested cobra date
     When EnterPrise Limited employer clicks on Initiate COBRA button
     Then employer should see the Initiate cobra success flash notice
     And employer clicks on all employees
     And employer should see census employee status as Cobra eligible
-@flaky
+  
 Scenario: Employer terminates and Initiate COBRA to enrolled employee
     Given staff role person logged in
     And initial employer EnterPrise Limited has active benefit application
@@ -37,12 +37,12 @@ Scenario: Employer terminates and Initiate COBRA to enrolled employee
     When employer clicks on Initiate cobra button
     Then employer should see Enter effective date for Initiate cobra Action
     And employer should see default cobra start date
-    And employer sets cobra start date to two months after termination date
+    And employer accepts the suggested cobra date
     When EnterPrise Limited employer clicks on Initiate COBRA button
     Then employer should see the Initiate cobra success flash notice
     And employer clicks on all employees
     And employer should see census employee status as Cobra Enrolled
-  @flaky
+  
   Scenario: Employer tries to initiate COBRA with COBRA begin date before termination date
     Given staff role person logged in
     And initial employer EnterPrise Limited has active benefit application
@@ -55,6 +55,7 @@ Scenario: Employer terminates and Initiate COBRA to enrolled employee
     When employer clicks on Initiate cobra button
     Then employer should see Enter effective date for Initiate cobra Action
     And employer should see default cobra start date
-    And employer sets cobra start date to two months before termination date
+    And employer accepts the suggested cobra date
     When EnterPrise Limited employer clicks on Initiate COBRA button
     Then employer should see the Initiate cobra error flash notice
+  

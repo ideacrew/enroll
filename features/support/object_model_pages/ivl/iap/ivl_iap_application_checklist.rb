@@ -1,6 +1,6 @@
+# frozen_string_literal: true
 
 #application_checklist
-
 class IvlIapApplicationChecklist
 
   def self.application_checklist_text
@@ -19,20 +19,15 @@ class IvlIapApplicationChecklist
      '.interaction-click-control-previous'
   end
 
-
   def self.save_and_exit_link
      '.interaction-click-control-save---exit'
   end
 
-   def self.help_me_sign_up_btn
-     'div[class="btn btn-default btn-block help-me-sign-up"]'
-   end
+  def self.help_me_sign_up_btn
+    'div[class="btn btn-default btn-block help-me-sign-up"]'
+  end
 
-   def self.log_out_btn
-     'a[class="header-text interaction-click-control-logout"]'
-   end
-
-
-   
-
+  def self.log_out_btn
+    'a[class="header-text interaction-click-control-logout"]'
+  end
 end
