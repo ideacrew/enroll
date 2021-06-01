@@ -315,7 +315,7 @@ RSpec.describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects
     allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 11, 1))
   end
 
-  include_context 'family with one member and one enrollment and one renewal enrollment'
+  include_context 'family with one member and one enrollment'
 
   before do
     enrollment.update_attributes(effective_on: Date.new(current_year - 3))
@@ -324,7 +324,7 @@ RSpec.describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects
   end
 
   it 'should not create a renewal enrollment' do
-    expect(family.hbx_enrollments.count).to eq(2)
+    expect(family.hbx_enrollments.count).to eq(1)
   end
 end
 
