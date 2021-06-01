@@ -52,9 +52,8 @@ module FinancialAssistance
     MEC_VALIDATION_STATES = %w[na valid outstanding pending].freeze
 
     DRIVER_QUESTION_ATTRIBUTES = [:has_job_income, :has_self_employment_income, :has_other_income,
-                                  :has_deductions, :has_enrolled_health_coverage, :has_eligible_health_coverage, :has_eligible_medicaid_cubcare]
-    DRIVER_QUESTION_ATTRIBUTES += [:has_unemployment_income] if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income)
-
+                                  :has_deductions, :has_enrolled_health_coverage, :has_eligible_health_coverage]
+    DRIVER_QUESTION_ATTRIBUTES += [:has_unemployment_income] if FinancialAssistanceRegistry[:unemployment_income].enabled?
     DRIVER_QUESTION_ATTRIBUTES.freeze
 
     #list of the documents user can provide to verify Immigration status
@@ -970,7 +969,7 @@ module FinancialAssistance
 
     def driver_question_responses
       DRIVER_QUESTION_ATTRIBUTES.each do |attribute|
-        next if [:has_enrolled_health_coverage, :has_eligible_health_coverage, :has_eligible_medicaid_cubcare].include?(attribute) && !is_applying_coverage
+        next if [:has_enrolled_health_coverage, :has_eligible_health_coverage].include?(attribute) && !is_applying_coverage
 
         instance_type = attribute.to_s.gsub('has_', '')
         instance_check_method = instance_type + "_exists?"

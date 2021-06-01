@@ -236,8 +236,6 @@ document.addEventListener("turbolinks:load", function() {
     /* Conditional Display on dependent income  Question */
     if (!$("#has_dependent_with_coverage_true").is(':checked')) $("#denied-job-end-on").addClass('hide');
 
-    if (!$("#has_household_income_changed_false").is(':checked')) $("#medicaid-chip-coverage-last-day").removeClass('hide');
-
 
     $("body").on("change", "#has_eligible_medicaid_cubcare_true", function(){
       if ($('#has_eligible_medicaid_cubcare_true').is(':checked')) {
@@ -245,6 +243,9 @@ document.addEventListener("turbolinks:load", function() {
         $("#eligibility-change-question").addClass('hide');
         $("#household-income-size-changed").addClass('hide');
         $("#medicaid-chip-coverage-last-day").addClass('hide');
+       //  $("#has_eligibility_changed_true, #has_eligibility_changed_false,  #has_household_income_changed_true, #has_household_income_changed_false").each(function(i, ele) {
+       //   $(ele).removeAttr("checked");
+       // });
       } else{
         $("#denied-medicaid").addClass('hide');
         $("#eligibility-change-question").removeClass('hide');
@@ -403,6 +404,21 @@ document.addEventListener("turbolinks:load", function() {
       $("#has_dependent_with_coverage_true, #has_dependent_with_coverage_false, #dependent_job_end_on").each(function(i, ele) {
          attributes[$(this).attr('name')] = " ";
           $(this).val("");
+       });
+
+      $.ajax({
+        type: 'POST',
+        url: window.location.pathname.replace('/benefits', ''),
+        data: { financial_assistance_applicant: attributes },
+        success: function(response){
+        }
+      })
+    });
+
+    $('#has_eligible_medicaid_cubcare_true').on('change', function(e) {
+      var attributes = {};
+      $("#has_eligibility_changed_true, #has_eligibility_changed_false, #has_household_income_changed_true, #has_household_income_changed_false, #person_coverage_end_on").each(function(i, ele) {
+         attributes[$(this).attr('name')] = " ";
        });
 
       $.ajax({
