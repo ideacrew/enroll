@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Operations
   module Products
     # This class is to fetch lowest cost silver plan.
@@ -13,10 +15,8 @@ module Operations
         values            = yield validate(params)
         member_premiums   = yield fetch_member_premiums(values[:family], values[:effective_date])
         lcsp_info        = yield fetch_lcsp_info(member_premiums, values[:family_member_id])
-        rating_area       = yield find_rating_area(values[:effective_date], address)
-        service_areas     = yield find_service_areas(values[:effective_date], address)
-        products          = yield fetch_silver_products(values[:effective_date], rating_area, service_areas)
-        reference_product = yield find_low_cost_reference_product(products, values[:effective_date], rating_area)
+
+        Success(lcsp_info)
       end
 
       private
@@ -39,8 +39,8 @@ module Operations
             lcsp_info = member_premiums[:family_member_id][0]
           end
         else
-          lcsp_info = member_premiums.collect do |family_member_id, premiums|
-            { family_member_id => premiums[0] }
+          lcsp_info = member_premiums.collect do |fm_id, premiums|
+            { fm_id => premiums[0] }
           end
         end
 

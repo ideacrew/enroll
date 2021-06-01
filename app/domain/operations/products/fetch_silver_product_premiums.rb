@@ -17,7 +17,7 @@ module Operations
         products          = yield fetch_products(query)
         product_premiums  = yield fetch_product_premiums(products, values[:family], values[:effective_date], rating_area.id)
 
-        Success(products)
+        Success(product_premiums)
       end
 
       private
@@ -31,7 +31,7 @@ module Operations
       def find_address(family)
         consumer_role = family&.primary_person&.consumer_role
 
-        if consumer_role
+        if consumer_role&.rating_address
           Success(consumer_role.rating_address)
         else
           Failure("No primary consumer role found for the given family: #{family.id}")
@@ -50,25 +50,25 @@ module Operations
 
       def find_service_areas(effective_date, address)
         service_areas = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address, during: effective_date)
-        
+
         if service_areas.present?
           Success(service_areas)
         else
           Failure("Service Areas not found for effective_date: #{effective_date}, county: #{address.county}, zip: #{address.zip}")
-        end        
+        end
       end
 
       def query_criteria(rating_area_id, service_area_ids, effective_date)
         Success({
-          :'metal_level_kind' => :silver,
-          :'premium_tables.rating_area_id' => rating_area_id,
-          :'service_area_id'.in => service_area_ids,
-          :'application_period.min'.lte => effective_date,
-          :'application_period.max'.gte => effective_date,
-        })
+                  :metal_level_kind => :silver,
+                  :'premium_tables.rating_area_id' => rating_area_id,
+                  :service_area_id.in => service_area_ids,
+                  :'application_period.min'.lte => effective_date,
+                  :'application_period.max'.gte => effective_date
+                })
       end
 
-      def fetch_products(values, query_criteria)
+      def fetch_products(query_criteria)
         products = BenefitMarkets::Products::Product.where(query_criteria)
         if products.present?
           Success(products)
@@ -84,10 +84,10 @@ module Operations
 
           member_result[family_member.id.to_s] = products.inject([]) do |result, product|
             premium_table = product.premium_tables.where({
-              :'rating_area_id' => rating_area_id,
-              :'effective_period.min'.lte => effective_date,
-              :'effective_period.max'.gte => effective_date,
-            }).first
+                                                           :rating_area_id => rating_area_id,
+                                                           :'effective_period.min'.lte => effective_date,
+                                                           :'effective_period.max'.gte => effective_date
+                                                         }).first
 
             tuple = premium_table.premium_tuples.where(age: age).first
             result << { cost: tuple.cost, product_id: product.id } if tuple.present?
