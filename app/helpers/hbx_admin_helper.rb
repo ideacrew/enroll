@@ -18,8 +18,9 @@ module HbxAdminHelper
 
     effective_on = ::Insured::Factories::SelfServiceFactory.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), hbx.effective_on).to_date
     tax_household = hbx.family.active_household.latest_active_tax_household_with_year(hbx.effective_on.year)
-    max_aptc = tax_household.monthly_max_aptc(hbx, effective_on)
+    return 0 unless tax_household.present?
 
+    max_aptc = tax_household.monthly_max_aptc(hbx, effective_on)
     hbx_enrollment_members = hbx.hbx_enrollment_members
     aptc_ratio_by_member = tax_household.aptc_ratio_by_member
     return max_aptc if EnrollRegistry[:calculate_monthly_aggregate].feature.is_enabled

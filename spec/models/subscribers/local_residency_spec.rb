@@ -77,7 +77,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           end
 
           it 'should store dc residency type status to outstanding' do
-            expect(person.verification_type_by_name('DC Residency').validation_status).to eq('outstanding')
+            expect(person.verification_type_by_name(EnrollRegistry[:enroll_app].setting(:state_residency).item).validation_status).to eq('outstanding')
           end
 
           it 'should store the response payload' do
