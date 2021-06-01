@@ -18,10 +18,7 @@ registry:
             item: false
           - key: :ivl_application_checklist
             item: 'IVL_Application_Checklist_Final_02172021.pdf'
-<<<<<<< HEAD
       - key: :indian_health_service_question
         is_enabled: false
-      - key: :mainecare_healthcare_questions
-        is_enabled: true
-=======
->>>>>>> little tweaks
+      - key: :has_medicare_cubcare_eligible
+        is_enabled: false
