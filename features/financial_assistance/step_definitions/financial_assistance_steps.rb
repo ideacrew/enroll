@@ -62,6 +62,7 @@ When(/^they click ADD INCOME & COVERAGE INFO for an applicant$/) do
 end
 
 Then(/^they should be taken to the applicant's Tax Info page$/) do
+  sleep 5
   expect(page).to have_content("Tax Info for #{consumer.person.first_name}")
 end
 

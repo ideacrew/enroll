@@ -28,7 +28,7 @@ registry:
           - key: :nondiscrimination_notice_url
             item: ""
           - key: :submit_docs_url
-            item: "https://www.dchealthlink.com/submit-docs"
+            item: ""
           - key: :state_residency
             item: "ME Residency"
           - key: :site_key
