@@ -10,7 +10,11 @@ module Employers::EmployerHelper
       return 'Account Linked'
     elsif employee_state == 'eligible'
       return 'No Account Linked'
-    elsif employee_state == "cobra_linked" && census_employee.has_cobra_hbx_enrollment?
+    elsif employee_state == "cobra_linked" &&
+      (
+        census_employee.has_cobra_hbx_enrollment? ||
+        census_employee.active_benefit_group_enrollments.present? && census_employee.cobra_begin_date.present?
+      )
       return "Cobra Enrolled"
     else
       return employee_state.humanize
