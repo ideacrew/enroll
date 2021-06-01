@@ -9,6 +9,8 @@ registry:
       - key: :send_secure_message_employer
         item: :send_secure_message
         is_enabled: true
+      - key: :verify_quiet_period_after_application_effectuated
+        is_enabled: false
       - key: :benefit_application_reinstate
         item: BenefitSponsors::Operations::BenefitApplications::Reinstate.new
         is_enabled: false
@@ -51,3 +53,9 @@ registry:
       - key: :employer_attestation
         item: :employer_attestation
         is_enabled: false
+      - key: :cobra_enrollment_period
+        item: :cobra_enrollment_period
+        is_enabled: true
+        settings:
+          - key: :months
+            item: 6
