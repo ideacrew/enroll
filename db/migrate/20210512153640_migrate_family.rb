@@ -98,6 +98,10 @@ class MigrateFamily < Mongoid::Migration
     family_member.save!
 
     create_or_update_relationship(person, family, family_member_hash['person']['person_relationships'][0]['kind'])
+
+    active_household = family.active_household
+    active_household.add_household_coverage_member(family_member)
+
     family.save!
     family_member
   end
@@ -111,7 +115,7 @@ class MigrateFamily < Mongoid::Migration
     exiting_relationship = primary_person.person_relationships.detect { |rel| rel.relative_id.to_s == person.id.to_s }
     return if exiting_relationship && exiting_relationship.kind == relationship_kind
 
-    primary_person.ensure_relationship_with(person, relationship_kind)
+    primary_person.ensure_relationship_with(person, PersonRelationship::InverseMap[relationship_kind])
   end
 
   def self.sanitize_applicant_params(iap_hash)
