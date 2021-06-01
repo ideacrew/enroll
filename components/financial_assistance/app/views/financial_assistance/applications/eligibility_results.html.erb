@@ -11,7 +11,7 @@
               <h3><%= l10n("faa.medicaid") %></h3>
             </div>
             <div class="border-bottom-2px"></div>
-            <div class="er-medicaid-prsn run-glossary">
+            <div class="er-medicaid-prsn">
               <p><%= l10n("faa.eligible_for_medicaid") %>:</p>
 
               <%eligible_applicants(params[:id], :is_medicaid_chip_eligible).each do |applicant_name| %>
@@ -48,8 +48,9 @@
                 </div>
               <%end%>
               <%  unless any_csr_ineligible_applicants?(params[:id]) %>
-                <p class="mt-10 mb-0 run-glossary">
+                <p class="mt-10 mb-0">
                   <%= l10n("faa.qualify_for_lower_costs_1") %>
+                  <%= render partial:'shared/glossary', locals: {key: 'Out_of_Pocket_Costs', title: 'Out-of-Pocket Costs', term: 'out-of-pocket costs' } %>
                   <%= l10n("faa.silver_plan_checkmark") %>
                   <i class="fa fa-check-square-o col-green" aria-hidden="true"></i>
                   <%= l10n("faa.qualify_for_lower_costs_2") %>

@@ -173,5 +173,12 @@ RSpec.describe Operations::People::CreateOrUpdate, type: :model, dbclean: :after
     it 'should update work email address' do
       expect(@result.success.work_email.address).to eq(applicant10.emails.first.address)
     end
+
+    it 'should update person address' do
+      expect(@result.success.home_address.address_1).to eq(applicant10.addresses.first.address_1)
+      expect(@result.success.home_address.city).to eq(applicant10.addresses.first.city)
+      expect(@result.success.home_address.zip).to eq(applicant10.addresses.first.zip)
+      expect(@result.success.home_address.state).to eq(applicant10.addresses.first.state)
+    end
   end
 end

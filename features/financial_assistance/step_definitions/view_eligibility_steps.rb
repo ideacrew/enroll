@@ -97,5 +97,6 @@ end
 Then(/^the user will navigate to the Eligibility Determination page and will find CSR text present$/) do
   expect(page).to have_content('Eligibility Results')
   expect(page).to have_content('These people are eligible for monthly premium reductions of')
-  expect(page).to have_content('They also qualify for lower out-of-pocket costs')
+  expect(page).to have_content('They also qualify for lower')
+  expect(page).to have_content('out-of-pocket costs')
 end
