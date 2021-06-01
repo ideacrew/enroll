@@ -42,7 +42,6 @@ module FinancialAssistance
     KINDS = %w[
       is_eligible
       is_enrolled
-      is_eligible_medicaid_cubcare
     ].freeze
 
     INSURANCE_TYPE = {
@@ -95,10 +94,6 @@ module FinancialAssistance
 
     scope :eligible, -> { where(kind: 'is_eligible')}
     scope :enrolled, -> { where(kind: 'is_enrolled')}
-    scope :eligible_med_cub, -> { where(kind: 'is_eligible_medicaid_cubcare')}
-    scope :eligible_med_cub_eligible, -> { where(:kind.in => ['is_eligible', 'is_eligible_medicaid_cubcare'])}
-    scope :enrolled_med_cub_eligible, -> { where(:kind.in => ['is_enrolled', 'is_eligible_medicaid_cubcare'])}
-    scope :eligible_med_cub, -> { where(:kind.in => ['is_eligible', 'is_enrolled'])}
     scope :of_insurance_kind, ->(insurance_kind) { where(insurance_kind: insurance_kind) }
 
     scope :any_medicare, -> { where(:insurance_kind.in => ['medicare', 'medicare_advantage', 'medicare_part_b']) }
