@@ -287,7 +287,7 @@
 
               <% if FinancialAssistanceRegistry.feature_enabled?(:has_medicare_cubcare_eligible) %>
                 <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                  <div class="col-md-6">l10n("faa.mainecare_cubcare_ineligible")
+                  <div class="col-md-6">l10n("faa.medicaid_not_eligible")
                   </div>
                   <div class="col-md-6"><%= human_boolean applicant.has_eligible_medicaid_cubcare %></div>
                 </div>
