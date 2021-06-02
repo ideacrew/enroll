@@ -18,7 +18,6 @@ registry:
             item: 'DC'
           - key: :name
             item: 'District of Columbia'
-<<<<<<< HEAD
       - key: :consumer_validations
         is_enabled: true
   - namespace:
@@ -26,8 +25,6 @@ registry:
     features:
       - key: :non_magi_referral_display
         is_enabled: true
-=======
->>>>>>> Change location of fa medicaid chip config
   - namespace:
     - :enrollment_dates
     features:
