@@ -107,7 +107,7 @@
     <% end %>
 
     <!--mainecare_cubcare_ineligible driver question-->
-    <% if EnrollRegistry[:medicaid_chip_driver_questions].feature.is_enabled %>
+    <% if FinancialAssistanceRegistry[:medicaid_chip_driver_questions].enabled? %>
       <% if @applicant.eligible_immigration_status %>
         <div class="driver-question row row-form-wrapper radio-align no-buffer row-height fa-align-elements">
           <div class="col-md-6 labelforcoverage">

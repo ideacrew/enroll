@@ -383,7 +383,7 @@ Given(/^Indian Health Service Question feature is enabled$/) do
 end
 
 Given(/^MaineCare questions feature is enabled$/) do
-  enable_feature :medicaid_chip_driver_questions
+  enable_fa_feature :medicaid_chip_driver_questions
 end
 
 Then(/^the consumer will not see the Cost Savings link$/) do
