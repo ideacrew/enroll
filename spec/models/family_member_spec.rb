@@ -1,4 +1,5 @@
 require 'rails_helper'
+require "#{BenefitSponsors::Engine.root}/spec/support/benefit_sponsors_site_spec_helpers.rb"
 
 describe FamilyMember, dbclean: :after_each do
   subject { FamilyMember.new(:is_primary_applicant => nil, :is_coverage_applicant => nil) }
@@ -205,18 +206,34 @@ describe FamilyMember, "given a relationship to update", dbclean: :after_each do
 end
 
 describe FamilyMember, "aptc_benchmark_amount", dbclean: :after_each do
+  let(:site) do
+    BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_empty_benefit_market
+  end
   let(:person) { FactoryBot.create(:person, :with_consumer_role, dob: TimeKeeper.date_of_record - 46.years)}
   let(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person, e_case_id: "family_test#1000")}
   let(:enrollment) {FactoryBot.create(:hbx_enrollment, family: family, product: product, effective_on: TimeKeeper.date_of_record)}
-  let!(:hbx_profile) { FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period) }
-  let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product) }
-  before do
-    hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(enrollment.effective_on)}.update_attributes!(slcsp_id: product.id)
+  let!(:rating_area)         { FactoryBot.create_default :benefit_markets_locations_rating_area }
+  let!(:service_area)        { FactoryBot.create_default :benefit_markets_locations_service_area }
+
+  let(:application_period) { TimeKeeper.date_of_record.beginning_of_year..TimeKeeper.date_of_record.end_of_year }
+  let!(:product) do
+    FactoryBot.create(
+      :benefit_markets_products_health_products_health_product,
+      :with_issuer_profile,
+      benefit_market_kind: :aca_individual,
+      kind: :health,
+      assigned_site: site,
+      service_area: service_area,
+      csr_variant_id: '01',
+      premium_tables: [premium_table],
+      metal_level_kind: 'silver',
+      application_period: application_period
+    )
   end
+  let(:premium_table) { build(:benefit_markets_products_premium_table, effective_period: application_period, rating_area: rating_area) }
 
   it 'should return valid benchmark value' do
-    family_member = FamilyMember.new(:person => person)
-    expect(family_member.aptc_benchmark_amount(enrollment)).to eq 198.86
+    expect(family.family_members[0].aptc_benchmark_amount(enrollment)).to eq 198.86
   end
 end
 
