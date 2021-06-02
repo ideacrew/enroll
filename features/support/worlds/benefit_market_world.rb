@@ -220,3 +220,17 @@ Given(/^benefit market catalog exists for (.*) renewal employer with (.*) benefi
   create_benefit_market_catalog_for(current_effective_date)
   create_benefit_market_catalog_for(renewal_effective_date)
 end
+
+Given(/^benefit market catalog exists for existing employer$/) do
+  current_effective_date = TimeKeeper.date_of_record.beginning_of_year.prev_year
+  benefit_market = site.benefit_markets.first
+  ::BenefitSponsors::ProductSpecHelpers.construct_benefit_market_catalog_with_renewal_and_previous_catalog(
+    @site,
+    benefit_market,
+    (TimeKeeper.date_of_record.beginning_of_year..TimeKeeper.date_of_record.end_of_year)
+  )
+  @benefit_market_catalog = benefit_market.benefit_market_catalogs.where("application_period.min" => current_effective_date.beginning_of_year).first
+  @rating_area = ::BenefitMarkets::Locations::RatingArea.where(:active_year => @benefit_market_catalog.application_period.min.year).first
+  @service_area = ::BenefitMarkets::Locations::ServiceArea.where(:active_year => @benefit_market_catalog.application_period.min.year).first
+  reset_product_cache
+end

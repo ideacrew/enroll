@@ -293,17 +293,17 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
     it "should return nil with SHOP SEP and next_poss_effective_date present" do
       # since module method invokes in class
       allow_any_instance_of(Family).to receive(:has_primary_active_employee?).and_return(true)
-      allow_any_instance_of(SpecialEnrollmentPeriod).to receive(:sep_optional_date).with(ivl_qle_sep.family, "min", "shop").and_return(min_date)
-      allow_any_instance_of(SpecialEnrollmentPeriod).to receive(:sep_optional_date).with(ivl_qle_sep.family, "max", "shop").and_return(max_date)
+      allow_any_instance_of(SpecialEnrollmentPeriod).to receive(:sep_optional_date).with(ivl_qle_sep.family, "min", "shop", TimeKeeper.date_of_record).and_return(min_date)
+      allow_any_instance_of(SpecialEnrollmentPeriod).to receive(:sep_optional_date).with(ivl_qle_sep.family, "max", "shop", TimeKeeper.date_of_record).and_return(max_date)
       shop_qle_sep.update_attributes(next_poss_effective_date: TimeKeeper.date_of_record)
       expect(shop_qle_sep.send(:next_poss_effective_date_within_range)).to eq nil
     end
 
-    it "should not throw out of range error message" do
+    it "should throw out of range error message" do
       # since module method invokes in class
       allow_any_instance_of(Family).to receive(:has_primary_active_employee?).and_return(true)
-      allow_any_instance_of(SpecialEnrollmentPeriod).to receive(:sep_optional_date).with(ivl_qle_sep.family, "min", "shop").and_return(min_date)
-      allow_any_instance_of(SpecialEnrollmentPeriod).to receive(:sep_optional_date).with(ivl_qle_sep.family, "max", "shop").and_return(max_date)
+      allow_any_instance_of(SpecialEnrollmentPeriod).to receive(:sep_optional_date).with(ivl_qle_sep.family, "min", "shop", past_date).and_return(min_date)
+      allow_any_instance_of(SpecialEnrollmentPeriod).to receive(:sep_optional_date).with(ivl_qle_sep.family, "max", "shop", past_date).and_return(max_date)
       expect(shop_qle_sep_past_effective_on.valid?).to eq false
       expect(shop_qle_sep_past_effective_on.errors.full_messages).to include "Next poss effective date out of range."
     end
@@ -742,7 +742,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
 
     it "should add error messages to the instance" do
       family100.special_enrollment_periods << special_enrollment_period100
-      expect(family100.special_enrollment_periods[0].errors.messages).to eq({:next_poss_effective_date=>["No active plan years present"]})
+      expect(family100.special_enrollment_periods[0].errors.messages).to eq({:next_poss_effective_date => ["No eligible plan years present"]})
     end
   end
 
@@ -766,7 +766,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
 
     it "should add error messages to the instance" do
       family100.special_enrollment_periods << special_enrollment_period100
-      expect(family100.special_enrollment_periods[0].errors.messages). to eq({:optional_effective_on=>["No active plan years present"]})
+      expect(family100.special_enrollment_periods[0].errors.messages). to eq({:next_poss_effective_date => ["No eligible plan years present"], :optional_effective_on => ["No eligible plan years present"]})
     end
   end
 

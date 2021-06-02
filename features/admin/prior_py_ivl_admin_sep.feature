@@ -6,7 +6,7 @@ Feature: IVL consumer or Admin adding a SEP which falls in prior plan year,
   Background: Setup IVL coverage periods, products and IVL consumer
     Given all permissions are present
     And the Prior PY IVL feature configuration is enabled
-    And Admin seps are present
+    And Admin IVL seps are present
 
   Scenario: Hbx Admin adding IVL sep in prior plan year for consumer with no
   prior or active coverage and renewal flag is checked
