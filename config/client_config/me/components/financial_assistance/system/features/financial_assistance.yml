@@ -15,9 +15,9 @@ registry:
         is_enabled: true
         settings:
           - key: :abbreviation
-            item: 'DC'
+            item: 'ME'
           - key: :name
-            item: 'District of Columbia'
+            item: 'Maine'
   - namespace:
     - :enrollment_dates
     features:
@@ -86,7 +86,7 @@ registry:
         - key: :currently_eligible_with_hra
           item: true
     - key: :medicaid_chip_driver_questions
-      is_enabled: false
+      is_enabled: true
       settings:
         - key: :medicaid_chip
           item: "MaineCare (Medicaid)"
