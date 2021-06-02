@@ -581,6 +581,11 @@ module BenefitSponsors
         benefit_applications.order_by(:updated_at.desc).non_imported.where(:id.ne => non_off_cycle_or_future_reinstated).first
     end
 
+    def most_recent_terminated_benefit_application
+      terminated_states = [:expired, :terminated] # proj 200 Include terminated state when business confirms
+      benefit_applications.order(updated_at: :desc).where(:aasm_state.in => terminated_states).first
+    end
+
     def renewing_submitted_benefit_application # TODO -recheck
       benefit_applications.order_by(:"created_at".desc).detect {|application| application.is_renewal_enrolling? }
     end
