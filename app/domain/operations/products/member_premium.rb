@@ -2,7 +2,7 @@ module Operations
   module Products
     # This class is to load county zip combinations.
     class MemberPremium
-      include Dry::Transaction::Operation
+      include Dry::Monads[:result, :do]
 
       def call(hra_object)
         tenant = Tenants::Tenant.find_by_key(hra_object.tenant)
