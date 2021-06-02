@@ -16,8 +16,11 @@ Given(/(.*) has a consumer role with prior expired active and renewal enrollment
   create_prior_active_and_renewal_ivl_enrollment_for_family(family)
 end
 
-Given(/^Admin seps are present$/) do
+Given(/^Admin IVL seps are present$/) do
   FactoryBot.create(:qualifying_life_event_kind, :medical_emergency, is_self_attested: false, market_kind: "individual", post_event_sep_in_days: 60)
+end
+
+Given(/^Admin SHOP seps are present$/) do
   FactoryBot.create(:qualifying_life_event_kind, :medical_emergency, is_self_attested: false, market_kind: "shop", post_event_sep_in_days: 60)
 end
 

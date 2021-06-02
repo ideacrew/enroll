@@ -259,6 +259,18 @@ Then(/(.*) should see the receipt page with qle effective date as effective date
   end
 end
 
+Then(/.+ should see the enrollment submitted/) do
+  expect(page).to have_content('Enrollment Submitted')
+end
+
+When(/.+ click continue on enrollment submitted page/) do
+  if page.has_link?('CONTINUE')
+    click_link "CONTINUE"
+  else
+    click_link "GO TO MY ACCOUNT"
+  end
+end
+
 Then(/(.*) should see the receipt page with renewing plan year start date as effective date/) do |named_person|
   expect(page).to have_content('Enrollment Submitted')
   step "#{named_person} should get plan year start date as coverage effective date"
