@@ -214,6 +214,9 @@ class ConsumerRole
   # might be encapsulated into new verification model further with verification code refactoring
   embeds_many :history_action_trackers, as: :history_trackable
 
+  # For use when generating consumers during rake tasks
+  attr_accessor :skip_residency_verification
+
   #list of the collections we want to track under consumer role model
   COLLECTIONS_TO_TRACK = %w- Person consumer_role vlp_documents lawful_presence_determination hbx_enrollments -
 
@@ -234,6 +237,7 @@ class ConsumerRole
   end
 
   def start_residency_verification_process
+    return if skip_residency_verification
     notify(RESIDENCY_VERIFICATION_REQUEST_EVENT_NAME, {:person => self.person})
   end
 
@@ -627,7 +631,8 @@ class ConsumerRole
   end
 
   def invoke_verification!(*args)
-    if person.ssn || is_native?
+    return if skip_residency_verification == true
+    if person.ssn.present? || is_native?
       invoke_ssa
     else
       invoke_dhs
@@ -635,14 +640,13 @@ class ConsumerRole
   end
 
   def verify_ivl_by_admin(*args)
+    return if skip_residency_verification == true
     if sci_verified?
       pass_residency!
+    elsif person.ssn.present? || is_native?
+      self.ssn_valid_citizenship_valid! verification_attr(args.first)
     else
-      if person.ssn || is_native?
-        self.ssn_valid_citizenship_valid! verification_attr(args.first)
-      else
-        self.pass_dhs! verification_attr(args.first)
-      end
+      self.pass_dhs! verification_attr(args.first)
     end
   end
 
