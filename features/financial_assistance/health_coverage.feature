@@ -78,6 +78,12 @@ Feature: Start a new Financial Assistance Application and answers questions on h
     When the user clicks the BACK TO ALL HOUSEHOLD MEMBERS link
     Then a modal should show asking the user are you sure you want to leave this page
 
+  Scenario: Indian Health Service Eligible Question feature is enabled
+    Given Indian Health Service Question feature is enabled
+    And the user is a member of an indian tribe
+    And they visit the Health Coverage page via the left nav (also confirm they are on the Health Coverage page)
+    Then they should see the Indian Healthcare Eligible question
+
   Scenario: Indian Health Service Question feature is enabled
     Given Indian Health Service Question feature is enabled
     And the user is a member of an indian tribe
