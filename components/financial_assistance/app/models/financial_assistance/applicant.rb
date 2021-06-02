@@ -248,6 +248,8 @@ module FinancialAssistance
     # if eligible immigration status
     field :medicaid_chip_ineligible, type: Boolean
     field :immigration_status_changed, type: Boolean
+    # if member of tribe
+    field :health_service_through_referral, type: Boolean
 
     field :workflow, type: Hash, default: { }
 
