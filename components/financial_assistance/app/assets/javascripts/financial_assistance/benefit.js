@@ -224,6 +224,24 @@ document.addEventListener("turbolinks:load", function() {
     /* Condtional Display Eligible Benefit Questions */
     if (!$("#has_eligible_health_coverage_true").is(':checked')) $("#eligible-benefit-kinds").addClass('hide');
 
+    if (!$("#has_dependent_with_coverage_true").is(':checked')) $("#denied-job-end-on").addClass('hide');
+
+    $("body").on("change", "#has_dependent_with_coverage_true", function(){
+      if ($('#has_dependent_with_coverage_true').is(':checked')) {
+        $("#denied-job-end-on").removeClass('hide');
+      } else{
+        $("#denied-job-end-on").addClass('hide');
+      }
+    });
+
+    $("body").on("change", "#has_dependent_with_coverage_false", function(){
+      if ($('#has_dependent_with_coverage_false').is(':checked')) {
+        $("#denied-job-end-on").addClass('hide');
+      } else{
+        $("#denied-job-end-on").removeClass('hide');
+      }
+    });
+
     $("body").on("change", "#has_enrolled_health_coverage_true", function(){
       if ($('#has_enrolled_health_coverage_true').is(':checked')) {
         $("#enrolled-benefit-kinds").removeClass('hide');
@@ -257,7 +275,7 @@ document.addEventListener("turbolinks:load", function() {
     });
 
     /* Saving Responses to Income  Driver Questions */
-    $('#has_enrolled_health_coverage_false, #has_eligible_health_coverage_false, #has_enrolled_health_coverage_true, #has_eligible_health_coverage_true').on('change', function(e) {
+    $('#has_enrolled_health_coverage_false, #has_eligible_health_coverage_false, #has_enrolled_health_coverage_true, #has_eligible_health_coverage_true, #has_dependent_with_coverage_true, #has_dependent_with_coverage_false, #dependent_job_end_on').on('change', function(e) {
       var attributes = {};
       attributes[$(this).attr('name')] = $(this).val();
       $.ajax({
@@ -268,7 +286,24 @@ document.addEventListener("turbolinks:load", function() {
         }
       })
     });
+
+      $('#has_dependent_with_coverage_true').on('change', function(e) {
+      var attributes = {};
+      $("#has_dependent_with_coverage_false, #has_dependent_with_coverage_false, #dependent_job_end_on").each(function(i, ele) {
+         attributes[$(this).attr('name')] = " ";
+       });
+
+      $.ajax({
+        type: 'POST',
+        url: window.location.pathname.replace('/benefits', ''),
+        data: { financial_assistance_applicant: attributes },
+        success: function(response){
+        }
+      })
+    });
   }
+
+
     $('body').on('keyup keydown keypress', '#benefit_employer_phone_full_phone_number', function (e) {
         $(this).mask('(000) 000-0000');
         return (key == 8 ||

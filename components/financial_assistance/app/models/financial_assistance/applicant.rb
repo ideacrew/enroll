@@ -245,6 +245,9 @@ module FinancialAssistance
     field :has_enrolled_health_coverage, type: Boolean
     field :has_eligible_health_coverage, type: Boolean
 
+    field :has_dependent_with_coverage, type: Boolean
+    field :dependent_job_end_on
+
     field :workflow, type: Hash, default: { }
 
     embeds_many :verification_types, class_name: "::FinancialAssistance::VerificationType"#, cascade_callbacks: true, validate: true
@@ -747,7 +750,15 @@ module FinancialAssistance
         return benefits.enrolled.present? && benefits.enrolled.all? {|benefit| benefit.valid? :submission} && benefits.eligible.blank? if has_enrolled_health_coverage && !has_eligible_health_coverage
         return benefits.enrolled.blank? && benefits.eligible.present? && benefits.eligible.all? {|benefit| benefit.valid? :submission}  if !has_enrolled_health_coverage && has_eligible_health_coverage
         benefits.enrolled.blank? && benefits.eligible.blank?
+        return dependent_coverage_questions if FinancialAssistanceRegistry.feature_enabled?(:has_dependent_with_coverage)
       end
+    end
+
+    def dependent_coverage_questions
+      return false if has_dependent_with_coverage.nil?
+      return true if has_dependent_with_coverage == false
+      return true if has_dependent_with_coverage && dependent_job_end_on.present?
+      return false if has_dependent_with_coverage.present? && dependent_job_end_on.blank?
     end
 
     def assisted_income_verified?

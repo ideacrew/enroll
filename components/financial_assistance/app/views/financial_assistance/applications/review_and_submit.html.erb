@@ -270,7 +270,21 @@
               <% if applicant.has_eligible_health_coverage %>
                 <%= render partial: 'financial_assistance/applications/review_benefits', locals: {kind: 'is_eligible', applicant: applicant} %>
               <% end %>
+
+               <% if applicant.age_on(TimeKeeper.date_of_record) && FinancialAssistanceRegistry.feature_enabled?(:has_dependent_with_coverage) %>
+                <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                  <div class="col-md-6">l10n("faa.has_dependent_with_coverage")
+                  </div>
+                  <div class="col-md-6"><%= human_boolean applicant.has_dependent_with_coverage %></div>
+                </div>
+
+                <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                  <div class="col-md-6">l10n("faa.dependent_job_end_on")
+                  </div>
+                  <div class="col-md-6"><%= applicant.dependent_job_end_on.to_s %></div>
+                </div>
               <% end %>
+            <% end %>
             </div>
 
             <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
