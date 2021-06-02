@@ -20,11 +20,11 @@
       <div class="col-md-6 mt11">
         <div class="col-md-3 no-padding">
           <%= radio_button_tag("has_enrolled_health_coverage", true, @applicant.has_enrolled_health_coverage?, class: "radio-yml" ) %>
-          <label class="radio-yml" for="enrolled_in_health_coverage_yes">Yes</label>
+          <label class="radio-yml" for="enrolled_in_health_coverage_yes"><%=l10n("yes")%></label>
         </div>
         <div class="col-md-3 no-padding">
           <%= radio_button_tag("has_enrolled_health_coverage", false, @applicant.has_enrolled_health_coverage == false, class: "radio-yml" ) %>
-          <label class="radio-yml" for="enrolled_in_health_coverage_no">No</label>
+          <label class="radio-yml" for="enrolled_in_health_coverage_no"><%=l10n("no")%></label>
         </div>
         <div class="col-md-6 left-seprator">
           <a href="#<%=applicant_currently_enrolled_key%>" data-toggle="modal" data-target="#<%=applicant_currently_enrolled_key%>" class="interaction-click-control-not-sure?">Not sure?</a>
@@ -47,11 +47,11 @@
       <div class="col-md-6 mt11">
         <div class="col-md-3 no-padding">
           <%= radio_button_tag("has_eligible_health_coverage", true, @applicant.has_eligible_health_coverage?, class: "radio-yml" ) %>
-          <label class="radio-yml" for="eligible_for_health_coverage_yes">Yes</label>
+          <label class="radio-yml" for="eligible_for_health_coverage_yes"><%=l10n("yes")%></label>
         </div>
         <div class="col-md-3 no-padding">
           <%= radio_button_tag("has_eligible_health_coverage", false, @applicant.has_eligible_health_coverage == false, class: "radio-yml" ) %>
-          <label class="radio-yml" for="ieligible_for_health_coverage_no">No</label>
+          <label class="radio-yml" for="ieligible_for_health_coverage_no"><%=l10n("no")%></label>
         </div>
         <div class="col-md-6 left-seprator">
            <a href="#<%= applicant_eligibly_enrolled_key%>" data-toggle="modal" data-target="#<%= applicant_eligibly_enrolled_key%>" class="interaction-click-control-not-sure?">Not sure?</a>
@@ -77,11 +77,11 @@
           <div class="col-md-6 mt11">
             <div class="col-md-3 no-padding">
               <%= radio_button_tag("health_service_through_referral", true, @applicant.health_service_through_referral, class: "radio-yml" ) %>
-              <label class="radio-yml" for="health_service_through_referral_yes">Yes</label>
+              <label class="radio-yml" for="health_service_through_referral_yes"><%=l10n("yes")%></label>
             </div>
             <div class="col-md-3 no-padding">
               <%= radio_button_tag("health_service_through_referral", false, @applicant.health_service_through_referral == false, class: "radio-yml" ) %>
-              <label class="radio-yml" for="health_service_through_referral_no">No</label>
+              <label class="radio-yml" for="health_service_through_referral_no"><%=l10n("no")%></label>
             </div>
             <div class="col-md-6">
             </div>
