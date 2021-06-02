@@ -32,6 +32,8 @@
     HEALTH COVERAGE:
         Is this person currently enrolled in health coverage or getting help paying for health coverage through a Health Reimbursement Arrangement?: <%= applicant.has_enrolled_health_coverage %>
         Does this person currently have access to health coverage or a Health Reimbursement arrangement that they are not enrolled in (including through another person, like a spouse or parent)?: <%=applicant.has_eligible_health_coverage %>
+        Did this person have coverage through a job (for example, a parent’s job) that ended in the last 3 months?* : <%= applicant.has_dependent_with_coverage %>
+        What was the last day this person had coverage through the job?*: <%= applicant.dependent_job_end_on.to_s.present? ? applicant.dependent_job_end_on.to_s : 'N/A' %>
     OTHER QUESTIONS:
         Has this person applied for an SSN:  <%= applicant.is_ssn_applied %>
         Why doesn't this person have an SSN?:  <%=applicant.non_ssn_apply_reason.to_s.present? ? applicant.non_ssn_apply_reason.to_s : 'N/A' %>
