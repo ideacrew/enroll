@@ -85,7 +85,10 @@ registry:
           item: false
         - key: :currently_eligible_with_hra
           item: true
-    - key: :has_medicare_cubcare_eligible
-      is_enabled: true
+    - key: :medicaid_chip_driver_questions
+      is_enabled: false
+      settings:
+        - key: :medicaid_chip
+          item: "MaineCare (Medicaid)"
   # TODO eligibility engine connectivity(HAVEN) settings
   # TODO mec service connectivity settings
