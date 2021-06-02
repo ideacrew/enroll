@@ -451,15 +451,19 @@ module BenefitSponsors
         end
 
         enrollments_eligible_for_reinstate(census_employee, predecessor_package).each do |hbx_enrollment|
-          if Rails.env.production?
-            trigger_reinstate_enrollment_event(hbx_enrollment)
-          else
-            result = reinstate_enrollment(hbx_enrollment)
-            raise StandardError, "enrollment: #{hbx_enrollment.hbx_id}" unless result.success?
-          end
+          enrollment_reinstate(hbx_enrollment)
         end
       rescue StandardError => e
         Rails.logger.error { "Unable to reinstate census member: #{census_employee.id} - #{e.message}" }
+      end
+
+      def enrollment_reinstate(hbx_enrollment)
+        if Rails.env.production?
+          trigger_reinstate_enrollment_event(hbx_enrollment)
+        else
+          result = reinstate_enrollment(hbx_enrollment)
+          raise StandardError, "enrollment: #{hbx_enrollment.hbx_id}" unless result.success?
+        end
       end
 
       def trigger_reinstate_assignment_event(census_employee, benefit_group_assignment)
