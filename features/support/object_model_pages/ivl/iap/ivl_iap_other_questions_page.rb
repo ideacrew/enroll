@@ -47,6 +47,26 @@ class IvlIapOtherQuestions
     'applicant[student_status_end_on]'
   end
 
+  def self.type_of_student_dropdown
+    'div[class="col-md-3"] div[class="selectric"]'
+  end
+
+  def self.select_part_time
+    'li[data-index="5"]'
+  end
+
+  def self.select_full_time
+    'li[data-index="2"]'
+  end
+
+  def self.type_of_school_dropdown
+    'div[class="col-md-3"] div[class="selectric"]'
+  end
+
+  def self.select_graduate_school
+    'li[data-index="2"]'
+  end
+
   def self.person_blind_no_radiobtn
     'is_self_attested_blind_no'
   end

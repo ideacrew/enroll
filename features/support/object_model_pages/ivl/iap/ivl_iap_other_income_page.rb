@@ -60,7 +60,7 @@ class IvlIapOtherIncomePage
   end
 
   def self.has_other_income_yes_radiobtn
-    '#has_other_income_true'
+    'has_other_income_true'
   end
 
   def self.has_other_income_no_radiobtn

@@ -102,6 +102,10 @@ class IvlIapJobIncomeInformationPage
   def self.self_employee_income_from
     'income[start_on]'
   end
+
+  def self.self_employee_income_to
+    'income[end_on]'
+  end
   
   def self.self_employee_select_yearly
     'li[class="interaction-choice-control-income-frequency-kind-15 last interaction-choice-control-income-frequency-kind-7 interaction-choice-control-income-employer-address-state-7"]'
