@@ -11,6 +11,10 @@ class IvlIapHelpPayingForCoverage
     'label[for="radio2"] span'
   end
 
+  def self.not_sure_is_applying_for_assistance
+    'a[href="#is_applying_for_assistance"]'
+  end
+
   def self.continue_btn
     '#btn-continue'
   end

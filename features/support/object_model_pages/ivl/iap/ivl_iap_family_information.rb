@@ -236,7 +236,15 @@ class IvlIapFamilyInformation
   end
 
   def self.city
-    'applicant[addresses_attributes][0][city]'
+    'applicant_addresses_attributes_0_city'
+  end
+
+  def self.state_dropdown
+    'div[class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd"] div[class="selectric"] span[class="label"]'
+  end
+
+  def self.select_va
+    'li[data-index="51"]'
   end
 
   def self.zip
@@ -253,6 +261,18 @@ class IvlIapFamilyInformation
 
   def self.living_outside_dc_checkbox
     '#applicant_is_temporarily_out_of_state'
+  end
+  
+  def self.applicant_is_temporarily_out_of_state_checkbox
+    '#applicant_is_temporarily_out_of_state'
+  end
+
+  def self.applicant_is_homeless_checkbox
+    '#applicant_is_homeless'
+  end
+
+  def self.add_mailing_address
+    'span[class="form-action btn btn-default"]'
   end
 
   def self.confirm_member_btn
