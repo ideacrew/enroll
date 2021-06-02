@@ -33,10 +33,10 @@ module Operations
 
       def fetch_slcsp_info(member_premiums, family_member_id)
         if family_member_id.present?
-          if member_premiums[family_member_id].blank?
+          if member_premiums[family_member_id.to_s].blank?
             return Failure('Could Not find any member premiums for the given data')
           else
-            slcsp_info = member_premiums[:family_member_id][1]
+            slcsp_info = member_premiums[family_member_id.to_s][0]
           end
         else
           slcsp_info = member_premiums.collect do |fm_id, premiums|
