@@ -215,11 +215,10 @@ private
   def next_poss_effective_date_within_range
     return if next_poss_effective_date.blank?
     return true unless is_shop_or_fehb? && family.has_primary_active_employee?
-
-    min_date = sep_optional_date family, 'min', qualifying_life_event_kind.market_kind
-    max_date = sep_optional_date family, 'max', qualifying_life_event_kind.market_kind
+    min_date = sep_optional_date family, 'min', qualifying_life_event_kind.market_kind, next_poss_effective_date
+    max_date = sep_optional_date family, 'max', qualifying_life_event_kind.market_kind, next_poss_effective_date
     if !(min_date || max_date)
-      errors.add(:next_poss_effective_date, "No active plan years present") if !(errors.messages.values.flatten.include?("No active plan years present"))
+      errors.add(:next_poss_effective_date, "No eligible plan years present") unless errors.messages.values.flatten.include?("No eligible plan years present")
     elsif !next_poss_effective_date.between?(min_date, max_date)
       errors.add(:next_poss_effective_date, "out of range.")
     end
@@ -230,10 +229,10 @@ private
 
     optional_effective_on.each_with_index do |date_option, index|
       date_option = Date.strptime(date_option, "%m/%d/%Y")
-      min_date = sep_optional_date family, 'min', qualifying_life_event_kind.market_kind
-      max_date = sep_optional_date family, 'max', qualifying_life_event_kind.market_kind
+      min_date = sep_optional_date family, 'min', qualifying_life_event_kind.market_kind, date_option
+      max_date = sep_optional_date family, 'max', qualifying_life_event_kind.market_kind, date_option
       if !(min_date || max_date)
-        errors.add(:optional_effective_on, "No active plan years present") if !(errors.messages.values.flatten.include?("No active plan years present"))
+        errors.add(:optional_effective_on, "No eligible plan years present") unless errors.messages.values.flatten.include?("No eligible plan years present")
       elsif !date_option.between?(min_date, max_date)
         errors.add(:optional_effective_on, "Date #{index+1} option out of range.")
       end
@@ -252,10 +251,15 @@ private
   end
 
   def set_coverage_renewal_flag
-    prior_py_ivl_sep = EnrollRegistry.feature_enabled?(:prior_plan_year_ivl_sep) && admin_flag.blank? && prior_py_sep?(effective_on, qualifying_life_event_kind&.market_kind)
-    return if coverage_renewal_flag == false || prior_py_ivl_sep == false
+    prior_py_ivl_sep = EnrollRegistry.feature_enabled?(:prior_plan_year_ivl_sep) && qualifying_life_event_kind&.individual?
+    prior_py_shop_sep = EnrollRegistry.feature_enabled?(:prior_plan_year_shop_sep) && qualifying_life_event_kind&.shop_market?
+    return if coverage_renewal_flag == false
 
-    self.assign_attributes({coverage_renewal_flag: prior_py_ivl_sep})
+    if prior_py_ivl_sep
+      self.assign_attributes({coverage_renewal_flag: prior_py_ivl_sep})
+    elsif prior_py_shop_sep
+      self.assign_attributes({coverage_renewal_flag: prior_py_shop_sep})
+    end
   end
 
   def set_user_id
