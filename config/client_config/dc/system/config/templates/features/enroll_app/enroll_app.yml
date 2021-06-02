@@ -227,11 +227,14 @@ registry:
             item: ['2018', '2019']
           - key: :plan_year_tooltip
             item: "Employer premium contribution for Employee Only Health Plans must be at least"
+<<<<<<< HEAD
           - key: :medicaid_agency_phone
             item: "(855) 532-5465"
       - key: :data_seeds_ui
         item: :data_seed_ui
         is_enabled: true
+=======
+>>>>>>> Change location of fa medicaid chip config
       - key: :rating_area
         item: :rating_area
         is_enabled: false
@@ -340,12 +343,9 @@ registry:
         settings:
           - key: :days
             item: 60
-<<<<<<< HEAD
       - key: :immigration_status_checkbox
         is_enabled: false
       - key: :gender_to_sex
         is_enabled: false
       - key: :mainecare_cubcare_glossary
         is_enabled: false
-=======
->>>>>>> Add client config settings for dc and committed
