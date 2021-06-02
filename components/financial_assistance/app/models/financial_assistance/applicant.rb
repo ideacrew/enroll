@@ -246,7 +246,7 @@ module FinancialAssistance
     field :has_eligible_health_coverage, type: Boolean
 
     # if eligible immigration status
-    field :mainecare_cubcare_ineligible, type: Boolean
+    field :medicaid_chip_ineligible, type: Boolean
     field :immigration_status_changed, type: Boolean
     # if member of tribe
     field :health_service_through_referral, type: Boolean
@@ -760,10 +760,16 @@ module FinancialAssistance
         deductions.blank?
       when :health_coverage
         return false if indian_tribe_member && health_service_through_referral.nil? && EnrollRegistry[:indian_health_service_question].feature.is_enabled
+<<<<<<< HEAD
         return false if indian_tribe_member && health_service_eligible.nil? && EnrollRegistry[:indian_health_service_question].feature.is_enabled
         if EnrollRegistry[:maine_iap_healthcare_driver_questions].feature.is_enabled
           return false if eligible_immigration_status && mainecare_cubcare_ineligible.nil?
           return false if eligible_immigration_status && mainecare_cubcare_ineligible && immigration_status_changed.nil?
+=======
+        if EnrollRegistry[:medicaid_chip_driver_questions].feature.is_enabled
+          return false if eligible_immigration_status && medicaid_chip_ineligible.nil?
+          return false if eligible_immigration_status && medicaid_chip_ineligible && immigration_status_changed.nil?
+>>>>>>> Update to mainecare config
         end
         return false if has_enrolled_health_coverage.nil? || has_eligible_health_coverage.nil?
         return benefits.enrolled.present? && benefits.eligible.present? && benefits.all? {|benefit| benefit.valid? :submission} if has_enrolled_health_coverage && has_eligible_health_coverage
