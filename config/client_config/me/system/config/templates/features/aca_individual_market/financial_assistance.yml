@@ -18,3 +18,5 @@ registry:
             item: false
           - key: :ivl_application_checklist
             item: 'IVL_Application_Checklist_Final_02172021.pdf'
+      - key: :has_dependent_with_coverage
+        is_enabled: true
