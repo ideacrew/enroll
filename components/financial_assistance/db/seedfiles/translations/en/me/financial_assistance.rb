@@ -44,6 +44,6 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.change_eligibility_status" => "Did this person have MaineCare (Medicaid) or CubCare (Children's Health Insurance Program) that will end soon or that recently ended because of a change in eligibility? *",
   "en.faa.household_income_changed" => "Has this person's household income or household size changed since they were told their coverage was ending? * ",
   "en.faa.person_medicaid_last_day" => "What's the last day of this person’s Medicaid or CHIP coverage? *",
-  "en.faa.mainecare_cubcare_ineligible" => "Was this person found not eligible for MaineCare (Medicaid) or CubCare (Children's Health Insurance Program) based on their immigration status since",
+  "en.faa.medicaid_chip_ineligible" => "Was this person found not eligible for MaineCare (Medicaid) or CubCare (Children's Health Insurance Program) based on their immigration status since",
   "en.faa.immigration_status_changed" => "Has this person’s immigration status changed since they were not found eligible for MaineCare (Medicaid) or CubCare (Children’s Health Insurance Program)"
 }.freeze

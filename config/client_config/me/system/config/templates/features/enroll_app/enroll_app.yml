@@ -242,6 +242,8 @@ registry:
             item: ['']
           - key: :plan_year_tooltip
             item: ""
+          - key: :medicaid_chip
+            item: :MaineCare (Medicaid)
       - key: :data_seeds_ui
         item: :data_seed_ui
         is_enabled: true
@@ -288,7 +290,7 @@ registry:
       - key: :special_cover_header
         item: :special_cover_header
         is_enabled: true
-        settings: 
+        settings:
           - key: :filename
             item: "CoverME_WebsiteHeader_01.jpg"
       - key: :tobacco_cost
