@@ -246,7 +246,7 @@ module FinancialAssistance
     field :has_eligible_health_coverage, type: Boolean
 
     field :has_dependent_with_coverage, type: Boolean
-    field :dependent_job_end_on
+    field :dependent_job_end_on, type: Date
 
     field :workflow, type: Hash, default: { }
 

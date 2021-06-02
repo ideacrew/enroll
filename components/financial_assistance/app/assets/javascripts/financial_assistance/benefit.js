@@ -289,7 +289,7 @@ document.addEventListener("turbolinks:load", function() {
 
       $('#has_dependent_with_coverage_true').on('change', function(e) {
       var attributes = {};
-      $("#has_dependent_with_coverage_false, #has_dependent_with_coverage_false, #dependent_job_end_on").each(function(i, ele) {
+      $("#has_dependent_with_coverage_true, #has_dependent_with_coverage_false, #dependent_job_end_on").each(function(i, ele) {
          attributes[$(this).attr('name')] = " ";
        });
 
