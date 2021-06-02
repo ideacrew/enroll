@@ -340,9 +340,12 @@ registry:
         settings:
           - key: :days
             item: 60
+<<<<<<< HEAD
       - key: :immigration_status_checkbox
         is_enabled: false
       - key: :gender_to_sex
         is_enabled: false
       - key: :mainecare_cubcare_glossary
         is_enabled: false
+=======
+>>>>>>> Add client config settings for dc and committed
