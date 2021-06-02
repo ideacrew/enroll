@@ -83,3 +83,7 @@ end
 Then(/^the health coverage form should not show$/) do
   expect(page).to_not have_content '02/01/2018'
 end
+
+Then(/they should see the Indian Healthcare question/) do
+  expect(page).to have_content l10n("faa.indian_health_service")
+end
