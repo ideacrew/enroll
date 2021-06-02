@@ -101,26 +101,28 @@
               <label class="radio-yml" for="health_service_through_referral_no"><%=l10n("no")%></label>
             </div>
             <div class="col-md-6">
+          </div>
+        </div>
+      <% end %>
+    <% end %>
 
     <!--mainecare_cubcare_ineligible driver question-->
-    <% if EnrollRegistry[:maine_iap_healthcare_driver_questions].feature.is_enabled %>
+    <% if EnrollRegistry[:medicaid_chip_driver_questions].feature.is_enabled %>
       <% if @applicant.eligible_immigration_status %>
         <div class="driver-question row row-form-wrapper radio-align no-buffer row-height fa-align-elements">
           <div class="col-md-6 labelforcoverage">
-            <span class="fa-text-color"> <%= l10n("faa.mainecare_cubcare_ineligible") %> <%= TimeKeeper.date_of_record.year - 5 %>? *</span>
+            <span class="fa-text-color"> <%= l10n("faa.medicaid_chip_ineligible") %> <%= TimeKeeper.date_of_record.year - 5 %>? *</span>
           </div>
           <div class="col-md-6 mt11">
             <div class="col-md-3 no-padding">
-              <%= radio_button_tag("mainecare_cubcare_ineligible", true, @applicant.mainecare_cubcare_ineligible, class: "radio-yml" ) %>
-              <label class="radio-yml" for="mainecare_cubcare_ineligible_yes">Yes</label>
+              <%= radio_button_tag("medicaid_chip_ineligible", true, @applicant.medicaid_chip_ineligible, class: "radio-yml" ) %>
+              <label class="radio-yml" for="medicaid_chip_ineligible_yes">Yes</label>
             </div>
             <div class="col-md-3 no-padding">
-              <%= radio_button_tag("mainecare_cubcare_ineligible", false, @applicant.mainecare_cubcare_ineligible == false, class: "radio-yml" ) %>
-              <label class="radio-yml" for="mainecare_cubcare_ineligible_no">No</label>
+              <%= radio_button_tag("medicaid_chip_ineligible", false, @applicant.medicaid_chip_ineligible == false, class: "radio-yml" ) %>
+              <label class="radio-yml" for="medicaid_chip_ineligible_no">No</label>
             </div>
-            <div class="col-md-6 left-seprator">
-               <a href="#mainecare_cubcare_ineligible" data-toggle="modal" data-target="#mainecare_cubcare_ineligible" class="interaction-click-control-not-sure?">Not sure?</a>
-               <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "mainecare_cubcare_ineligible"} %>
+            <div class="col-md-6">
             </div>
           </div>
         </div>
@@ -138,9 +140,7 @@
               <%= radio_button_tag("immigration_status_changed", false, @applicant.immigration_status_changed == false, class: "radio-yml" ) %>
               <label class="radio-yml" for="immigration_status_changed_no">No</label>
             </div>
-            <div class="col-md-6 left-seprator">
-               <a href="#immigration_status_changed" data-toggle="modal" data-target="#immigration_status_changed" class="interaction-click-control-not-sure?">Not sure?</a>
-               <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "immigration_status_changed"} %>
+            <div class="col-md-6">
             </div>
           </div>
         </div>
