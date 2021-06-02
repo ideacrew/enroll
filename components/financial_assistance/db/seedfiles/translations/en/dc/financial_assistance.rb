@@ -34,5 +34,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.your_application_reference" => "Your application reference number is ",
   "en.faa.next_step_without_aggregate" => "<b>NEXT STEP:</b> Pick a health insurance plan.",
   "en.faa.next_step_with_aggregate_1" => "<b>NEXT STEP:</b><ul><li><b>If you’re already enrolled in DC Health Link’s Individual & Family plan</b>, we’ve automatically changed your premium. You don’t have to do anything else.</li>",
-  "en.faa.next_step_with_aggregate_2" => "<br><li><b>If you’re not enrolled or need to make changes to your plan</b>, select CONTINUE to pick a health insurance plan or change who is covered by your plan.</li></ul>"
+  "en.faa.next_step_with_aggregate_2" => "<br><li><b>If you’re not enrolled or need to make changes to your plan</b>, select CONTINUE to pick a health insurance plan or change who is covered by your plan.</li></ul>",
+  "en.faa.has_dependent_with_coverage" => "Did this person have coverage through a job (for example, a parent’s job) that ended in the last 3 months?*",
+  "en.faa.dependent_job_end_on" => "What was the last day this person had coverage through the job?*"
 }.freeze
