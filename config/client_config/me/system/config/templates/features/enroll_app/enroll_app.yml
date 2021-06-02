@@ -242,8 +242,6 @@ registry:
             item: ['']
           - key: :plan_year_tooltip
             item: ""
-          - key: :medicaid_chip
-            item: :MaineCare (Medicaid)
       - key: :rating_area
         item: :rating_area
         is_enabled: false
