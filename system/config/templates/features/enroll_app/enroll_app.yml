@@ -227,8 +227,6 @@ registry:
             item: ['2018', '2019']
           - key: :plan_year_tooltip
             item: "Employer premium contribution for Employee Only Health Plans must be at least"
-          - key: :medicaid_chip
-            item: :MaineCare (Medicaid)
       - key: :data_seeds_ui
         item: :data_seed_ui
         is_enabled: true
