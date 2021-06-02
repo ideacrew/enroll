@@ -90,6 +90,7 @@ end
 
 Then(/they should see the Indian Healthcare question/) do
   expect(page).to have_content l10n("faa.indian_health_service")
+end
 
 Then(/they should see the MaineCare ineligible question/) do
   expect(page).to have_content l10n("faa.medicaid_chip_ineligible")
