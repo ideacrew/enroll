@@ -35,7 +35,6 @@ module TimeHelper
 
   def sep_optional_date(family, min_or_max, market_kind = nil, effective_date = nil)
     person = family.primary_applicant.person
-    return if effective_date.blank?
 
     return nil unless has_employee_role?(person, market_kind)
     benefit_applications = person.active_employee_roles.map{|ee| ee.census_employee.fetch_approved_and_term_bas_for_date(effective_date)}.flatten.compact
