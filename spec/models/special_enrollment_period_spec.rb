@@ -766,7 +766,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
 
     it "should add error messages to the instance" do
       family100.special_enrollment_periods << special_enrollment_period100
-      expect(family100.special_enrollment_periods[0].errors.messages).to eq({:next_poss_effective_date => ["No eligible plan years present"], :optional_effective_on => ["No eligible plan years present"]})
+      expect(family100.special_enrollment_periods[0].errors.messages).to eq({:optional_effective_on => ["No eligible plan years present"]})
     end
   end
 
