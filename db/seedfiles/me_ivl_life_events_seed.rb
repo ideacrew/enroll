@@ -12,7 +12,7 @@ QualifyingLifeEventKind.find_or_create_by(
     reason: "birth",
     edi_code: "02-BIRTH",
     ordinal_position: 10,
-    effective_on_kinds: ["date_of_event", "fixed_first_of_next_month"],
+    effective_on_kinds: ["date_of_event"],
     pre_event_sep_in_days: 0,
     post_event_sep_in_days: 60,
     is_self_attested: true,
@@ -33,7 +33,7 @@ QualifyingLifeEventKind.find_or_create_by(
     ordinal_position: 20,
     reason: "adoption",
     edi_code: "05-ADOPTION",
-    effective_on_kinds: ["date_of_event", "fixed_first_of_next_month"],
+    effective_on_kinds: ["date_of_event"],
     pre_event_sep_in_days: 0,
     post_event_sep_in_days: 60,
     is_self_attested: true,
@@ -123,10 +123,10 @@ QualifyingLifeEventKind.find_or_create_by(
 end
 
 QualifyingLifeEventKind.find_or_create_by(
-  title: "Enrollment error by Cover ME"
+  title: "Enrollment error by CoverME”"
 ).tap do |qlek|
   qlek.update_attributes(
-    tool_tip: "Someone is not enrolled or enrolled in the wrong plan due to an error by Cover ME",
+    tool_tip: "Someone is not enrolled or enrolled in the wrong plan due to an error by CoverME",
     action_kind: "add_member",
     market_kind: "individual",
     ordinal_position: 23,
@@ -214,7 +214,7 @@ QualifyingLifeEventKind.find_or_create_by(
   pre_event_sep_in_days: 0,
   post_event_sep_in_days: 60,
   is_self_attested: false,
-  is_visible: false,
+  is_visible: true,
   date_options_available: false
   )
 end
@@ -276,23 +276,24 @@ QualifyingLifeEventKind.find_or_create_by(
   )
 end
 
-QualifyingLifeEventKind.find_or_create_by(
-  title: "Found ineligible for employer-sponsored insurance after open enrollment ended").tap do |qlek|
-  qlek.update_attributes(
-    tool_tip: "Someone did not enroll in individual or family coverage because employer was applying to provide coverage, and found out after open enrollment that employer coverage was denied",
-    action_kind: "add_member",
-    market_kind: "individual",
-    ordinal_position: 20,
-    reason: "eligibility_change_employer_ineligible",
-    edi_code: " ",
-    effective_on_kinds: ["first_of_next_month"],
-    pre_event_sep_in_days: 0,
-    post_event_sep_in_days: 60,
-    is_self_attested: false,
-    is_visible: false,
-    date_options_available: true
-  )
-end
+# Expired as of June 2021
+# QualifyingLifeEventKind.find_or_create_by(
+#  title: "Found ineligible for employer-sponsored insurance after open enrollment ended").tap do |qlek|
+#  qlek.update_attributes(
+#    tool_tip: "Someone did not enroll in individual or family coverage because employer was applying to provide coverage, and found out after open enrollment that employer coverage was denied",
+#    action_kind: "add_member",
+#    market_kind: "individual",
+#    ordinal_position: 20,
+#    reason: "eligibility_change_employer_ineligible",
+#    edi_code: " ",
+#    effective_on_kinds: ["first_of_next_month"],
+#    pre_event_sep_in_days: 0,
+#    post_event_sep_in_days: 60,
+#    is_self_attested: false,
+#    is_visible: false,
+#    date_options_available: true
+#  )
+# end
 
 # TODO: FIgure out what first of next month plan selection is
 QualifyingLifeEventKind.find_or_create_by(
@@ -421,7 +422,7 @@ end
 
 # TODO: Says first_of_next_month plan selection need to figure that out
 QualifyingLifeEventKind.find_or_create_by(
-  title: "Exceptional circumstance"
+  title: "Exceptional circumstances"
 ).tap do |qlek|
   qlek.update_attributes(
   tool_tip: "An exceptional circumstance prevented someone from enrolling during open enrollment or a special enrollment period",
@@ -543,24 +544,57 @@ QualifyingLifeEventKind.find_or_create_by(
   )
 end
 
+# COVID 19: Expired as of June 2021
+# QualifyingLifeEventKind.find_or_create_by(
+#  title: "Covid-19"
+#).tap do |qlek|
+#  qlek.update_attributes(
+#    tool_tip: "Someone is uninsured and needs coverage due to the Covid-19 pandemic",
+#    event_kind_label: "Today's date",
+#    action_kind: "transition_member",
+#    market_kind: "individual",
+#    effective_on_kinds: ["first_of_this_month", "fixed_first_of_next_month"],
+#    reason: "covid",
+#    edi_code: nil,
+#    pre_event_sep_in_days: 0,
+#    is_self_attested: true,
+#    date_options_available: false,
+#    post_event_sep_in_days: 60,
+#    ordinal_position: 29,
+#    is_visible: true
+#  )
+#end
 
-QualifyingLifeEventKind.find_or_create_by(
-  title: "Covid-19"
-).tap do |qlek|
+QualifyingLifeEventKind.find_or_create_by(title: "COBRA subsidy expiring").tap do |qlek|
   qlek.update_attributes(
-    tool_tip: "Someone is uninsured and needs coverage due to the Covid-19 pandemic",
-    event_kind_label: "Today's date",
-    action_kind: "transition_member",
+    event_kind_label: "Last day of subsidized premiums",
+    title: "COBRA subsidy expiring",
+    effective_on_kinds: ["first_of_next_month_plan_selection"],
+    reason: "cobra_subsidy_expiring",
     market_kind: "individual",
-    effective_on_kinds: ["first_of_this_month", "fixed_first_of_next_month"],
-    reason: "covid",
-    edi_code: nil,
-    pre_event_sep_in_days: 0,
+    tool_tip: "Government or employer subsidies for someone's COBRA premiums are ending",
+    pre_event_sep_in_days: 60,
     is_self_attested: true,
     date_options_available: false,
     post_event_sep_in_days: 60,
-    ordinal_position: 29,
-    is_visible: true
+    ordinal_position: 26,
+    is_active: true,qle_event_date_kind: :qle_on,
+    coverage_effective_on: nil,
+    end_on: nil,
+    is_visible: true,
+    termination_on_kinds: []
+  )
+end
+
+QualifyingLifeEventKind.find_or_create_by(title: "Late notice of qualifying event").tap do |qlek|
+  qlek.update_attributes(
+    event_kind_label: "Date of notice",
+    action_kind: nil,
+    title: "Late notice of qualifying event",
+    effective_on_kinds: ["first_of_next_month_plan_selection"],
+    reason: "late_notice",
+    market_kind: "individual",
+    tool_tip: "Someone didn't find out about a qualifying event (for example, that other coverage was ending) until after it was too late to enroll", pre_event_sep_in_days: 0, is_self_attested: false, date_options_available: true, post_event_sep_in_days: 60, ordinal_position: 27, aasm_state: :active, is_active: true, event_on: nil, qle_event_date_kind: :qle_on, coverage_effective_on: nil, start_on: 2021-06-02 00:00:00 UTC, end_on: nil, is_visible: true, termination_on_kinds: [], coverage_start_on: nil, coverage_end_on: nil, updated_by: nil
   )
 end
 
