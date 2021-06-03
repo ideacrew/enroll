@@ -40,6 +40,8 @@
         What's the last day of this person’s Medicaid or CHIP coverage?*: <%=applicant.person_coverage_end_on.to_s.present? ? applicant.person_coverage_end_on.to_s : 'N/A' %>
         Was this person found not eligible for <%= FinancialAssistanceRegistry[:medicaid_chip_driver_questions].setting(:medicaid_chip).item %> or CubCare (Children's Health Insurance Program) based on their immigration status since <%= @application.assistance_year - 5 %>?: <%= applicant.medicaid_chip_ineligible %>
         Has this person’s immigration status changed since they were not found eligible for <%= FinancialAssistanceRegistry[:medicaid_chip_driver_questions].setting(:medicaid_chip).item %> or CubCare (Children’s Health Insurance Program)?: <%= applicant.immigration_status_changed %>
+        Did this person have coverage through a job (for example, a parent’s job) that ended in the last 3 months?* : <%= applicant.has_dependent_with_coverage %>
+        What was the last day this person had coverage through the job?*: <%= applicant.dependent_job_end_on.to_s.present? ? applicant.dependent_job_end_on.to_s : 'N/A' %>
     OTHER QUESTIONS:
         Has this person applied for an SSN:  <%= applicant.is_ssn_applied %>
         Why doesn't this person have an SSN?:  <%=applicant.non_ssn_apply_reason.to_s.present? ? applicant.non_ssn_apply_reason.to_s : 'N/A' %>
