@@ -355,6 +355,7 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
     end
 
     context 'it should return terminated or expired enrollment if effective on falls under expired or terminated PY' do
+      let(:site) { FactoryBot.create(:benefit_sponsors_site,  :with_benefit_market, :dc, :as_hbx_profile) }
       let(:person)       { FactoryBot.create(:person, :with_family) }
       let(:family)       { person.primary_family }
       let(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile_expired_application, site: site) }
@@ -367,11 +368,13 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
 
       let(:qle_kind) { FactoryBot.create(:qualifying_life_event_kind, :effective_on_event_date) }
 
-      let(:sep) do
+      let!(:sep) do
         sep = family.special_enrollment_periods.new
         sep.effective_on_kind = 'date_of_event'
         sep.qualifying_life_event_kind = qle_kind
         sep.qle_on = expired_application.start_on + 10.days
+        sep.start_on = expired_application.start_on
+        sep.end_on = expired_application.end_on + 20.days
         sep.save
         sep
       end
