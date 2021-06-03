@@ -353,6 +353,8 @@ registry:
         is_enabled: true
       - key: :display_county
         is_enabled: true
+      - key: :validate_quadrant
+        is_enabled: true
       - key: :qle_within_sixty_days
         item: :qle_within_sixty_days
         is_enabled: true

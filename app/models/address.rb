@@ -78,11 +78,11 @@ class Address
   validate :quadrant_check
 
   def detect_quadrant
-    self.quadrant = QUADRANTS.map { |word| self.address_1&.upcase&.scan(/\b#{word}\b/) }.flatten.first if Settings.aca.validate_quadrant
+    self.quadrant = QUADRANTS.map { |word| self.address_1&.upcase&.scan(/\b#{word}\b/) }.flatten.first if EnrollRegistry.feature_enabled?(:validate_quadrant)
   end
 
   def quadrant_check
-    errors.add(:quadrant, "not present") if Settings.aca.validate_quadrant && Settings.aca.quadrant_state_inclusion.include?(self.state) && Settings.aca.quadrant_zip_codes_exclusions.exclude?(self.zip) && self.quadrant.blank?
+    errors.add(:quadrant, "not present") if EnrollRegistry.feature_enabled?(:validate_quadrant) && Settings.aca.quadrant_state_inclusion.include?(self.state) && Settings.aca.quadrant_zip_codes_exclusions.exclude?(self.zip) && self.quadrant.blank?
   end
 
   # @note Add support for GIS location
