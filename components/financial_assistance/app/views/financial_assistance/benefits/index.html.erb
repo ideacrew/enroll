@@ -117,11 +117,11 @@
         <div class="col-md-6 mt11">
           <div class="col-md-3 no-padding">
             <%= radio_button_tag("has_eligible_medicaid_cubcare", true, @applicant.has_eligible_medicaid_cubcare?, class: "radio-yml" ) %>
-            <label class="radio-yml" for="has_eligible_medicaid_cubcare_yes">Yes</label>
+            <label class="radio-yml" for="has_eligible_medicaid_cubcare_yes"><%=l10n("yes")%></label>
           </div>
           <div class="col-md-3 no-padding">
             <%= radio_button_tag("has_eligible_medicaid_cubcare", false, @applicant.has_eligible_medicaid_cubcare == false, class: "radio-yml" ) %>
-            <label class="radio-yml" for="has_eligible_medicaid_cubcare_no">No</label>
+            <label class="radio-yml" for="has_eligible_medicaid_cubcare_no"><%=l10n("no")%></label>
           </div>
           <div class="col-md-6 left-seprator">
             <a href="#has_eligible_medicaid_cubcare" data-toggle="modal" data-target="#has_eligible_medicaid_cubcare" class="interaction-click-control-not-sure?">Not sure?</a>
@@ -146,11 +146,11 @@
         <div class="col-md-6 mt11">
           <div class="col-md-3 no-padding">
             <%= radio_button_tag("has_eligibility_changed", true, @applicant.has_eligibility_changed == true, class: "radio-yml" ) %>
-            <label class="radio-yml" for="has_eligibility_changed_yes">Yes</label>
+            <label class="radio-yml" for="has_eligibility_changed_yes"><%=l10n("yes")%></label>
           </div>
           <div class="col-md-3 no-padding">
             <%= radio_button_tag("has_eligibility_changed", false, @applicant.has_eligibility_changed == false, class: "radio-yml" ) %>
-            <label class="radio-yml" for="has_eligibility_changed_no">No</label>
+            <label class="radio-yml" for="has_eligibility_changed_no"><%=l10n("no")%></label>
           </div>
           <div class="col-md-6 left-seprator">
             <a href="#has_eligibility_changed" data-toggle="modal" data-target="#has_eligibility_changed" class="interaction-click-control-not-sure?">Not sure?</a>
@@ -167,11 +167,11 @@
         <div class="col-md-6 mt11">
           <div class="col-md-3 no-padding">
             <%= radio_button_tag("has_household_income_changed", true, @applicant.has_household_income_changed?, class: "radio-yml" ) %>
-            <label class="radio-yml" for="has_household_income_changed_yes">Yes</label>
+            <label class="radio-yml" for="has_household_income_changed_yes"><%=l10n("yes")%></label>
           </div>
           <div class="col-md-3 no-padding">
             <%= radio_button_tag("has_household_income_changed", false, @applicant.has_household_income_changed == false, class: "radio-yml" ) %>
-            <label class="radio-yml" for="has_household_income_changed_no">No</label>
+            <label class="radio-yml" for="has_household_income_changed_no"><%=l10n("no")%></label>
           </div>
           <div class="col-md-6 left-seprator">
             <a href="#has_household_income_changed" data-toggle="modal" data-target="#has_household_income_changed" class="interaction-click-control-not-sure?">Not sure?</a>
