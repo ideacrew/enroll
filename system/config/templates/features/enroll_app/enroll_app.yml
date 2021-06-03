@@ -230,6 +230,8 @@ registry:
             item: "county"
           - key: :assistance_estimate_url
             item: "https://dc.checkbookhealth.org/hie/dc/2021/index.cfm?page"
+          - key: :benchmark_product_model
+            item: :health_only
           - key: :dental_plan_years_available
             item: [""]
           - key: :sole_source_carriers_available
