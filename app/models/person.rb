@@ -596,6 +596,10 @@ class Person
     addresses.any? { |adr| adr.kind == "mailing" }
   end
 
+  def rating_address
+    home_address || mailing_address
+  end
+
   def home_email
     emails.detect { |adr| adr.kind == "home" }
   end
