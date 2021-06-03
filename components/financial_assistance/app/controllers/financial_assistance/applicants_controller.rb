@@ -43,6 +43,7 @@ module FinancialAssistance
 
     def update
       if params[:financial_assistance_applicant].present?
+        format_date_params params[:financial_assistance_applicant]
         @applicant.update_attributes!(permit_params(params[:financial_assistance_applicant]))
         head :ok, content_type: "text/html"
       else
@@ -157,6 +158,12 @@ module FinancialAssistance
       model_params["pregnancy_due_on"] = Date.strptime(model_params["pregnancy_due_on"].to_s, "%m/%d/%Y") if model_params["pregnancy_due_on"].present?
       model_params["pregnancy_end_on"] = Date.strptime(model_params["pregnancy_end_on"].to_s, "%m/%d/%Y") if model_params["pregnancy_end_on"].present?
       model_params["student_status_end_on"] = Date.strptime(model_params["student_status_end_on"].to_s, "%m/%d/%Y") if model_params["student_status_end_on"].present?
+
+      model_params["person_coverage_end_on"] = Date.strptime(model_params["person_coverage_end_on"].to_s, "%m/%d/%Y") if model_params["person_coverage_end_on"].present?
+      model_params["medicaid_cubcare_due_on"] = Date.strptime(model_params["medicaid_cubcare_due_on"].to_s, "%m/%d/%Y") if model_params["medicaid_cubcare_due_on"].present?
+      model_params["medicaid_cubcare_due_on"] = nil if model_params["medicaid_cubcare_due_on"].blank?
+      model_params["has_eligibility_changed"] = nil if model_params.key?("has_eligibility_changed") && model_params["has_eligibility_changed"].blank? && !model_params["has_eligibility_changed"].nil?
+      model_params["has_household_income_changed"] = nil if model_params.key?("has_household_income_changed") && model_params["has_household_income_changed"].blank? && !model_params["has_household_income_changed"].nil?
     end
 
     def build_error_messages(model)

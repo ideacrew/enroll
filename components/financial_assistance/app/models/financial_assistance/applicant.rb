@@ -249,6 +249,14 @@ module FinancialAssistance
     field :health_service_through_referral, type: Boolean
     field :health_service_eligible, type: Boolean
 
+    field :is_medicaid_cubcare_eligible, type: Boolean
+
+    field :has_eligible_medicaid_cubcare, type: Boolean
+    field :medicaid_cubcare_due_on, type: Date
+    field :has_eligibility_changed, type: Boolean
+    field :has_household_income_changed, type: Boolean
+    field :person_coverage_end_on, type: Date
+
     field :workflow, type: Hash, default: { }
 
     embeds_many :verification_types, class_name: "::FinancialAssistance::VerificationType"#, cascade_callbacks: true, validate: true
@@ -753,8 +761,25 @@ module FinancialAssistance
         return benefits.enrolled.present? && benefits.enrolled.all? {|benefit| benefit.valid? :submission} && benefits.eligible.blank? if has_enrolled_health_coverage && !has_eligible_health_coverage
         return benefits.enrolled.blank? && benefits.eligible.present? && benefits.eligible.all? {|benefit| benefit.valid? :submission}  if !has_enrolled_health_coverage && has_eligible_health_coverage
         benefits.enrolled.blank? && benefits.eligible.blank?
+        return medicare_eligible_qns if FinancialAssistanceRegistry.feature_enabled?(:has_medicare_cubcare_eligible)
       end
     end
+
+    # rubocop:disable Metrics/CyclomaticComplexity
+    # rubocop:disable Metrics/PerceivedComplexity
+    def medicare_eligible_qns
+      return false if has_eligible_medicaid_cubcare.nil?
+      return false if has_eligible_medicaid_cubcare.present? && medicaid_cubcare_due_on.blank?
+      return true if has_eligible_medicaid_cubcare.present? && medicaid_cubcare_due_on.present?
+      return false if has_eligible_medicaid_cubcare == false && has_eligibility_changed.nil?
+      return true if has_eligible_medicaid_cubcare == false && has_eligibility_changed == false
+      return false if has_eligible_medicaid_cubcare == false && has_eligibility_changed.present? && has_household_income_changed.nil?
+      return true if  has_eligible_medicaid_cubcare == false && has_eligibility_changed.present? && has_household_income_changed == false
+      return false if has_eligible_medicaid_cubcare == false && has_eligibility_changed.present? && has_household_income_changed.present? && person_coverage_end_on.blank?
+      return true if has_eligible_medicaid_cubcare == false && has_eligibility_changed.present? && has_household_income_changed.present? && person_coverage_end_on.present?
+    end
+    # rubocop:enable Metrics/CyclomaticComplexity
+    # rubocop:enable Metrics/PerceivedComplexity
 
     def assisted_income_verified?
       assisted_income_validation == "valid"
