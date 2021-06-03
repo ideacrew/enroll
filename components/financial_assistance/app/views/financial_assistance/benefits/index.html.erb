@@ -101,6 +101,46 @@
               <label class="radio-yml" for="health_service_through_referral_no"><%=l10n("no")%></label>
             </div>
             <div class="col-md-6">
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+
+    <!--mainecare_cubcare_ineligible driver question-->
+    <% if FinancialAssistanceRegistry[:medicaid_chip_driver_questions].enabled? %>
+      <% if @applicant.eligible_immigration_status %>
+        <div class="driver-question row row-form-wrapper radio-align no-buffer row-height fa-align-elements">
+          <div class="col-md-6 labelforcoverage">
+            <span class="fa-text-color"> <%= l10n("faa.medicaid_chip_ineligible") %> <%= TimeKeeper.date_of_record.year - 5 %>? *</span>
+          </div>
+          <div class="col-md-6 mt11">
+            <div class="col-md-3 no-padding">
+              <%= radio_button_tag("medicaid_chip_ineligible", true, @applicant.medicaid_chip_ineligible, class: "radio-yml" ) %>
+              <label class="radio-yml" for="medicaid_chip_ineligible_yes">Yes</label>
+            </div>
+            <div class="col-md-3 no-padding">
+              <%= radio_button_tag("medicaid_chip_ineligible", false, @applicant.medicaid_chip_ineligible == false, class: "radio-yml" ) %>
+              <label class="radio-yml" for="medicaid_chip_ineligible_no">No</label>
+            </div>
+            <div class="col-md-6">
+            </div>
+          </div>
+        </div>
+
+        <div id="immigration-status-changed-driver" class="driver-question row row-form-wrapper radio-align no-buffer row-height fa-align-elements">
+          <div class="col-md-6 labelforcoverage">
+            <span class="fa-text-color"> <%= l10n("faa.immigration_status_changed") %>? *</span>
+          </div>
+          <div class="col-md-6 mt11">
+            <div class="col-md-3 no-padding">
+              <%= radio_button_tag("immigration_status_changed", true, @applicant.immigration_status_changed, class: "radio-yml" ) %>
+              <label class="radio-yml" for="immigration_status_changed_yes">Yes</label>
+            </div>
+            <div class="col-md-3 no-padding">
+              <%= radio_button_tag("immigration_status_changed", false, @applicant.immigration_status_changed == false, class: "radio-yml" ) %>
+              <label class="radio-yml" for="immigration_status_changed_no">No</label>
+            </div>
+            <div class="col-md-6">
             </div>
           </div>
         </div>

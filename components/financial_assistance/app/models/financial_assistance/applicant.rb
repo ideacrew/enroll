@@ -245,6 +245,9 @@ module FinancialAssistance
     field :has_enrolled_health_coverage, type: Boolean
     field :has_eligible_health_coverage, type: Boolean
 
+    # if eligible immigration status
+    field :medicaid_chip_ineligible, type: Boolean
+    field :immigration_status_changed, type: Boolean
     # if member of tribe
     field :health_service_through_referral, type: Boolean
     field :health_service_eligible, type: Boolean
@@ -755,7 +758,10 @@ module FinancialAssistance
         deductions.blank?
       when :health_coverage
         return false if indian_tribe_member && health_service_through_referral.nil? && EnrollRegistry[:indian_health_service_question].feature.is_enabled
-        return false if indian_tribe_member && health_service_eligible.nil? && EnrollRegistry[:indian_health_service_question].feature.is_enabled
+        if FinancialAssistanceRegistry[:medicaid_chip_driver_questions].enabled?
+          return false if eligible_immigration_status && medicaid_chip_ineligible.nil?
+          return false if eligible_immigration_status && medicaid_chip_ineligible && immigration_status_changed.nil?
+        end
         return false if has_enrolled_health_coverage.nil? || has_eligible_health_coverage.nil?
         return benefits.enrolled.present? && benefits.eligible.present? && benefits.all? {|benefit| benefit.valid? :submission} if has_enrolled_health_coverage && has_eligible_health_coverage
         return benefits.enrolled.present? && benefits.enrolled.all? {|benefit| benefit.valid? :submission} && benefits.eligible.blank? if has_enrolled_health_coverage && !has_eligible_health_coverage
