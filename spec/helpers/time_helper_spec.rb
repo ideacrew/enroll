@@ -114,7 +114,7 @@ RSpec.describe TimeHelper, :type => :helper, dbclean: :after_each do
       end
     end
 
-    context '#prior_plan_year_sep feature turned on' do
+    context '#prior_plan_year_shop_sep feature turned on' do
       let!(:employee_role)   { FactoryBot.create(:employee_role, benefit_sponsors_employer_profile_id: abc_profile.id, hired_on: hired_on, person: person, census_employee: census_employee) }
 
       let(:census_employee) { create(:census_employee, benefit_sponsorship: benefit_sponsorship, benefit_sponsors_employer_profile_id: benefit_sponsorship.profile.id) }
@@ -122,7 +122,7 @@ RSpec.describe TimeHelper, :type => :helper, dbclean: :after_each do
       let(:hired_on)        { plan_year.start_on - 10.days }
 
       before do
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_sep).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_shop_sep).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
         census_employee.benefit_group_assignments << build(:benefit_group_assignment, benefit_group: current_benefit_package, census_employee: census_employee, start_on: initial_application.start_on, end_on: initial_application.end_on)
         census_employee.link_employee_role!
@@ -149,30 +149,30 @@ RSpec.describe TimeHelper, :type => :helper, dbclean: :after_each do
           expect(helper.sep_optional_date(family, 'max', nil, TimeKeeper.date_of_record.beginning_of_month - 5.days)).to eq(initial_application.end_on)
         end
       end
-
-      context 'when py is terminated' do
-        before do
-          start_date = TimeKeeper.date_of_record.beginning_of_month - 12.months
-          end_date = start_date + 12.months - 1.day
-          effective_period = start_date..end_date
-          initial_application.update_attributes(effective_period: effective_period)
-          initial_application.terminate_enrollment!
-          census_employee.reload
-        end
-        it "returns maximum range when py is terminated" do
-          expect(helper.sep_optional_date(family, 'max', nil, TimeKeeper.date_of_record.beginning_of_month - 5.days)).to eq(initial_application.end_on)
-        end
-      end
+      # TODO: Enable this when terminated state is included for prior py shopping(proj 200)
+      # context 'when py is terminated' do
+      #   before do
+      #     start_date = TimeKeeper.date_of_record.beginning_of_month - 12.months
+      #     end_date = start_date + 12.months - 1.day
+      #     effective_period = start_date..end_date
+      #     initial_application.update_attributes(effective_period: effective_period)
+      #     initial_application.terminate_enrollment!
+      #     census_employee.reload
+      #   end
+      #   it "returns maximum range when py is terminated" do
+      #     expect(helper.sep_optional_date(family, 'max', nil, TimeKeeper.date_of_record.beginning_of_month - 5.days)).to eq(initial_application.end_on)
+      #   end
+      # end
     end
 
-    context '#prior_plan_year_sep feature turned off' do
+    context '#prior_plan_year_shop_sep feature turned off' do
       let!(:employee_role)   { FactoryBot.create(:employee_role, benefit_sponsors_employer_profile_id: abc_profile.id, hired_on: hired_on, person: person, census_employee: census_employee) }
 
       let(:census_employee) { create(:census_employee, benefit_sponsorship: benefit_sponsorship, benefit_sponsors_employer_profile_id: benefit_sponsorship.profile.id) }
       let(:person) { FactoryBot.create(:person) }
       let(:hired_on)        { plan_year.start_on - 10.days }
       before do
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_sep).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_shop_sep).and_return(false)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
         census_employee.benefit_group_assignments << build(:benefit_group_assignment, benefit_group: current_benefit_package, census_employee: census_employee, start_on: initial_application.start_on, end_on: initial_application.end_on)
         census_employee.link_employee_role!
@@ -279,4 +279,3 @@ RSpec.describe TimeHelper, :type => :helper, dbclean: :after_each do
     end
   end
 end
-
