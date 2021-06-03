@@ -59,5 +59,7 @@ registry:
         is_enabled: false
       - key: :has_medicare_cubcare_eligible
         is_enabled: false
+      - key: :has_dependent_with_coverage
+        is_enabled: false
 # TODO eligibility engine connectivity(HAVEN) settings
 # TODO mec service connectivity settings

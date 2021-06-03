@@ -232,6 +232,37 @@
       <br />
     <% end %>
 
+    <% if @applicant.age_on(TimeKeeper.date_of_record) < 19 && FinancialAssistanceRegistry.feature_enabled?(:has_dependent_with_coverage) %>
+      <div class="driver-question row row-form-wrapper radio-align no-buffer row-height fa-align-elements">
+        <div class="col-md-6 labelforcoverage">
+          <span class="fa-text-color">l10n("faa.has_dependent_with_coverage") </span>
+        </div>
+        <div class="col-md-6 mt11">
+          <div class="col-md-3 no-padding">
+            <%= radio_button_tag("has_dependent_with_coverage", true, @applicant.has_dependent_with_coverage?, class: "radio-yml" ) %>
+            <label class="radio-yml" for="has_dependent_with_coverage_yes"><%=l10n("yes")%></label>
+          </div>
+          <div class="col-md-3 no-padding">
+            <%= radio_button_tag("has_dependent_with_coverage", false, @applicant.has_dependent_with_coverage == false, class: "radio-yml" ) %>
+            <label class="radio-yml" for="has_dependent_with_coverage_no"><%=l10n("no")%></label>
+          </div>
+          <div class="col-md-6 left-seprator">
+            <a href="#has_dependent_with_coverage" data-toggle="modal" data-target="#has_dependent_with_coverage" class="interaction-click-control-not-sure?">Not sure?</a>
+            <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_dependent_with_coverage"} %>
+          </div>
+        </div>
+      </div>
+      <br />
+
+      <div class="driver-question row row-form-wrapper radio-align no-buffer row-height fa-align-elements" id='denied-job-end-on'>
+        <div class="col-md-10 labelforcoverage">
+          <span class="fa-text-color">l10n("faa.dependent_job_end_on")</span>
+          <%= text_field_tag("dependent_job_end_on", @applicant.dependent_job_end_on, class: "jq-datepicker", placeholder: 'Select End Date', style: 'margin-left: 50px;') %>
+        </div>
+      </div>
+    <% end %>
+    <br />
+
     <div class="col-md-4 col-sm-4 col-xs-4">
       <%#= link_to "Add Health Coverage", new_application_applicant_benefit_path(@application, @applicant), class: "btn btn-default center-block" %>
     </div>

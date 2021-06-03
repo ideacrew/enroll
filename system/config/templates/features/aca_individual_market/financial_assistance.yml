@@ -59,5 +59,7 @@ registry:
         is_enabled: false
       - key: :mainecare_healthcare_questions
         is_enabled: true
+      - key: :has_dependent_with_coverage
+        is_enabled: false
 # TODO eligibility engine connectivity(HAVEN) settings
 # TODO mec service connectivity settings
