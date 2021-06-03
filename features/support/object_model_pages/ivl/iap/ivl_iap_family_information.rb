@@ -90,7 +90,7 @@ class IvlIapFamilyInformation
   def self.immigration_status_no_radiobtn
     'label[for="applicant_eligible_immigration_status_false"] span'
   end
-  
+
   def self.not_sure_immigration_status_link
     'a[href="#eligible_immigration_status"]'
   end
@@ -101,7 +101,7 @@ class IvlIapFamilyInformation
 
   def self.naturalized_citizen_yes_radiobtn
     'label[for="applicant_naturalized_citizen_true"] span'
-  end 
+  end
 
   def self.naturalized_citizen_no_radiobtn
     'label[for="applicant_naturalized_citizen_false"] span'
@@ -162,7 +162,7 @@ class IvlIapFamilyInformation
   def self.japanese_checkbox
     '#applicant_ethnicity_japanese'
   end
-  
+
   def self.korean_checkbox
     '#applicant_ethnicity_korean'
   end
@@ -262,7 +262,7 @@ class IvlIapFamilyInformation
   def self.living_outside_dc_checkbox
     '#applicant_is_temporarily_out_of_state'
   end
-  
+
   def self.applicant_is_temporarily_out_of_state_checkbox
     '#applicant_is_temporarily_out_of_state'
   end
