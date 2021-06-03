@@ -214,7 +214,9 @@ registry:
           - key: :eligibile_immigration_statuses_url
             item: "https://dchealthlink.com/sites/default/files/v2/forms/Eligible%20Immigration%20Status%20List_0.pdf"
           - key: :geographic_rating_area_model
-            item: 'county'
+            item: 'single'
+          - key: :benchmark_product_model
+            item: :health_only
           - key: :assistance_estimate_url
             item: "https://dc.checkbookhealth.org/hie/dc/2021/index.cfm?page"
           - key: :dental_plan_years_available
