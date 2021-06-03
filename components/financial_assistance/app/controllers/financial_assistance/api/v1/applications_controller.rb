@@ -15,6 +15,8 @@ module FinancialAssistance::Api::V1
 
       def index
         @applications = ::FinancialAssistance::Application.where(family_id: get_current_person.financial_assistance_identifier)
+
+        render json: @applications
       end
     end
   end
