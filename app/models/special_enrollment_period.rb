@@ -68,6 +68,12 @@ class SpecialEnrollmentPeriod
   # ADMIN FLAG
   field :admin_flag, type:Boolean
 
+  # USER ID
+  field :user_id, type: BSON::ObjectId
+
+  #Renew coverage flag
+  field :coverage_renewal_flag, type: Boolean, default: EnrollRegistry.feature_enabled?(:prior_plan_year_sep) ? true : false
+
   validate :optional_effective_on_dates_within_range, :next_poss_effective_date_within_range, on: :create
 
   validates :csl_num,
@@ -83,7 +89,7 @@ class SpecialEnrollmentPeriod
   scope :fehb_market,         ->{ where(:qualifying_life_event_kind_id.in => QualifyingLifeEventKind.fehb_market_events.map(&:id) + QualifyingLifeEventKind.fehb_market_non_self_attested_events.map(&:id) ) }
   scope :individual_market,   ->{ where(:qualifying_life_event_kind_id.in => QualifyingLifeEventKind.individual_market_events.map(&:id) + QualifyingLifeEventKind.individual_market_non_self_attested_events.map(&:id)) }
 
-  after_initialize :set_submitted_at
+  after_initialize :set_submitted_at, :set_user_id
 
   add_observer ::BenefitSponsors::Observers::NoticeObserver.new, [:process_special_enrollment_events]
 
@@ -159,6 +165,11 @@ class SpecialEnrollmentPeriod
     is_shop? || is_fehb?
   end
 
+  def user_email
+    user = User.where(id: user_id).first
+    user&.email
+  end
+
   def duration_in_days
     return nil if start_on.blank? || end_on.blank?
     end_on - start_on
@@ -203,10 +214,10 @@ private
     return if next_poss_effective_date.blank?
     return true unless is_shop_or_fehb? && family.has_primary_active_employee?
 
-    min_date = sep_optional_date family, 'min', qualifying_life_event_kind.market_kind
-    max_date = sep_optional_date family, 'max', qualifying_life_event_kind.market_kind
+    min_date = sep_optional_date family, 'min', qualifying_life_event_kind.market_kind, next_poss_effective_date
+    max_date = sep_optional_date family, 'max', qualifying_life_event_kind.market_kind, next_poss_effective_date
     if !(min_date || max_date)
-      errors.add(:next_poss_effective_date, "No active plan years present") if !(errors.messages.values.flatten.include?("No active plan years present"))
+      errors.add(:next_poss_effective_date, "No eligible plan years present") unless errors.messages.values.flatten.include?("No eligibile plan years present")
     elsif !next_poss_effective_date.between?(min_date, max_date)
       errors.add(:next_poss_effective_date, "out of range.")
     end
@@ -217,10 +228,10 @@ private
 
     optional_effective_on.each_with_index do |date_option, index|
       date_option = Date.strptime(date_option, "%m/%d/%Y")
-      min_date = sep_optional_date family, 'min', qualifying_life_event_kind.market_kind
-      max_date = sep_optional_date family, 'max', qualifying_life_event_kind.market_kind
+      min_date = sep_optional_date family, 'min', qualifying_life_event_kind.market_kind, date_option
+      max_date = sep_optional_date family, 'max', qualifying_life_event_kind.market_kind, date_option
       if !(min_date || max_date)
-        errors.add(:optional_effective_on, "No active plan years present") if !(errors.messages.values.flatten.include?("No active plan years present"))
+        errors.add(:optional_effective_on, "No eligible plan years present") unless errors.messages.values.flatten.include?("No eligibile plan years present")
       elsif !date_option.between?(min_date, max_date)
         errors.add(:optional_effective_on, "Date #{index+1} option out of range.")
       end
@@ -236,6 +247,10 @@ private
 
   def set_submitted_at
     self.submitted_at ||= TimeKeeper.datetime_of_record
+  end
+
+  def set_user_id
+    self.user_id = SAVEUSER[:current_user_id]
   end
 
   def set_date_period
