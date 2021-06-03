@@ -200,27 +200,27 @@ class IvlIapFamilyInformation
   end
 
   def self.mexican_checkbox
-    '#person_ethnicity_mexican'
+    '#applicant_ethnicity_mexican'
   end
 
   def self.mexican_american_checkbox
-    '#person_ethnicity_mexican_american'
+    '#applicant_ethnicity_mexican_american'
   end
 
   def self.chicano_or_chicanoa_checkbox
-    '#person_ethnicity_chicanoa'
+    '##applicant_ethnicity_chicanoa'
   end
 
   def self.puerto_rican_checkbox
-    '#person_ethnicity_puerto_rican'
+    '#applicant_ethnicity_puerto_rican'
   end
 
   def self.cuban_checkbox
-    '#person_ethnicity_cuban'
+    '#applicant_ethnicity_cuban'
   end
 
   def self.hispanic_or_latino_other_checkbox
-    'div.col-md-4.col-xs-6 input#person_ethnicity_other'
+    '#applicant_ethnicity_other'
   end
 
   def self.lives_with_prim_subs_checkbox
@@ -239,10 +239,6 @@ class IvlIapFamilyInformation
     'applicant_addresses_attributes_0_city'
   end
 
-  def self.state_dropdown
-    'div[class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd"] div[class="selectric"] span[class="label"]'
-  end
-
   def self.select_va
     'li[data-index="51"]'
   end
@@ -257,10 +253,6 @@ class IvlIapFamilyInformation
 
   def self.select_va_state
     'li[data-index="51"]'
-  end
-
-  def self.living_outside_dc_checkbox
-    '#applicant_is_temporarily_out_of_state'
   end
 
   def self.applicant_is_temporarily_out_of_state_checkbox
