@@ -5,8 +5,9 @@ RSpec.describe 'applications', type: :request do
   path '/api/v1/applications' do
     
     get 'edit an application' do
+      tags Users
       produces 'application/json'
-      parameter name: :id, in: path, type: string 
+      parameter name: :id, :in => :path, :type => :string 
 
         response '200' 'edit made' do
           schema type: :object,
@@ -23,4 +24,3 @@ RSpec.describe 'applications', type: :request do
       end
     end
   end
-end

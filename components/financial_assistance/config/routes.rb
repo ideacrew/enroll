@@ -60,7 +60,7 @@ FinancialAssistance::Engine.routes.draw do
 
   namespace :api do
 
-    resources :v1 do
+    namespace :v1 do
       resources :applications do
         get :copy, on: :member
         put :step, on: :member
