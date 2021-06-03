@@ -219,10 +219,76 @@ document.addEventListener("turbolinks:load", function() {
       }
     });
 
-    /* Condtional Display Enrolled Benefit Questions */
+    /* Conditional Display Enrolled Benefit Questions */
     if (!$("#has_enrolled_health_coverage_true").is(':checked')) $("#enrolled-benefit-kinds").addClass('hide');
-    /* Condtional Display Eligible Benefit Questions */
+    /* Conditional Display Eligible Benefit Questions */
     if (!$("#has_eligible_health_coverage_true").is(':checked')) $("#eligible-benefit-kinds").addClass('hide');
+
+    /* Conditional Display denied medicaid Question */
+    if (!$("#has_eligible_medicaid_cubcare_true").is(':checked')) $("#denied-medicaid").addClass('hide');
+
+    /* Conditional Display eligibility changed Question */
+    if (!$("#has_eligible_medicaid_cubcare_false").is(':checked')) $("#eligibility-change-question").addClass('hide');
+
+    /* Conditional Display household income or size changed Question */
+    if (!$("#has_eligibility_changed_true").is(':checked')) $("#household-income-size-changed").addClass('hide');
+
+
+    $("body").on("change", "#has_eligible_medicaid_cubcare_true", function(){
+      if ($('#has_eligible_medicaid_cubcare_true').is(':checked')) {
+        $("#denied-medicaid").removeClass('hide');
+        $("#eligibility-change-question").addClass('hide');
+        $("#household-income-size-changed").addClass('hide');
+        $("#medicaid-chip-coverage-last-day").addClass('hide');
+      } else{
+        $("#denied-medicaid").addClass('hide');
+        $("#eligibility-change-question").removeClass('hide');
+      }
+    });
+
+    $("body").on("change", "#has_eligible_medicaid_cubcare_false", function(){
+      if ($('#has_eligible_medicaid_cubcare_false').is(':checked')) {
+        $("#eligibility-change-question").removeClass('hide');
+        $("#denied-medicaid").addClass('hide');
+      } else{
+        $("#eligibility-change-question").addClass('hide');
+        $("#denied-medicaid").removeClass('hide');
+      }
+    });
+
+    $("body").on("change", "#has_eligibility_changed_true", function(){
+      if ($('#has_eligibility_changed_true').is(':checked')) {
+        $("#household-income-size-changed").removeClass('hide');
+      } else{
+        $("#household-income-size-changed").addClass('hide');
+      }
+    });
+
+    $("body").on("change", "#has_eligibility_changed_false", function(){
+      if ($('#has_eligibility_changed_false').is(':checked')) {
+        $("#household-income-size-changed").addClass('hide');
+        $("#medicaid-chip-coverage-last-day").addClass('hide');
+      } else{
+        $("#household-income-size-changed").removeClass('hide');
+        $("#medicaid-chip-coverage-last-day").removeClass('hide');
+      }
+    });
+
+    $("body").on("change", "#has_household_income_changed_true", function(){
+      if ($('#has_household_income_changed_true').is(':checked')) {
+        $("#medicaid-chip-coverage-last-day").removeClass('hide');
+      } else{
+        $("#medicaid-chip-coverage-last-day").addClass('hide');
+      }
+    });
+
+    $("body").on("change", "#has_household_income_changed_false", function(){
+      if ($('#has_household_income_changed_false').is(':checked')) {
+        $("#medicaid-chip-coverage-last-day").addClass('hide');
+      } else{
+        $("#medicaid-chip-coverage-last-day").removeClass('hide');
+      }
+    });
 
     $("body").on("change", "#has_enrolled_health_coverage_true", function(){
       if ($('#has_enrolled_health_coverage_true').is(':checked')) {
@@ -257,7 +323,7 @@ document.addEventListener("turbolinks:load", function() {
     });
 
     /* Saving Responses to Income  Driver Questions */
-    $('#has_enrolled_health_coverage_false, #has_eligible_health_coverage_false, #has_enrolled_health_coverage_true, #has_eligible_health_coverage_true, #health_service_through_referral_true, #health_service_through_referral_false, #health_service_eligible_true, #health_service_eligible_false').on('change', function(e) {
+    $('#has_enrolled_health_coverage_false, #has_eligible_health_coverage_false,#has_enrolled_health_coverage_true, #has_eligible_health_coverage_true, #health_service_through_referral_true, #health_service_through_referral_false, #health_service_eligible_true, #health_service_eligible_false, #has_eligible_medicaid_cubcare_true, #has_eligible_medicaid_cubcare_false, #has_eligibility_changed_true, #has_eligibility_changed_false, #has_household_income_changed_true, #has_household_income_changed_false, #person_coverage_end_on, #medicaid_cubcare_due_on').on('change', function(e) {
       var attributes = {};
       attributes[$(this).attr('name')] = $(this).val();
       $.ajax({
@@ -268,7 +334,42 @@ document.addEventListener("turbolinks:load", function() {
         }
       })
     });
+
+    $('#has_eligible_medicaid_cubcare_true').on('change', function(e) {
+      var attributes = {};
+      $("#has_eligibility_changed_true, #has_eligibility_changed_false, #has_household_income_changed_true, #has_household_income_changed_false, #person_coverage_end_on").each(function(i, ele) {
+         attributes[$(this).attr('name')] = " ";
+       });
+
+      $("#person_coverage_end_on").val();
+      $.ajax({
+        type: 'POST',
+        url: window.location.pathname.replace('/benefits', ''),
+        data: { financial_assistance_applicant: attributes },
+        success: function(response){
+        }
+      })
+    });
+
+    $('#has_eligible_medicaid_cubcare_false').on('change', function(e) {
+      var attributes = {};
+      $("#medicaid_cubcare_due_on").each(function(i, ele) {
+         attributes[$(this).attr('name')] = " ";
+         $(this).val("");
+       });
+
+
+      $.ajax({
+        type: 'POST',
+        url: window.location.pathname.replace('/benefits', ''),
+        data: { financial_assistance_applicant: attributes },
+        success: function(Responsesponse){
+        }
+      })
+    });
   }
+
+
     $('body').on('keyup keydown keypress', '#benefit_employer_phone_full_phone_number', function (e) {
         $(this).mask('(000) 000-0000');
         return (key == 8 ||

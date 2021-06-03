@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-
 module FinancialAssistance
   class Benefit
     include Mongoid::Document
@@ -95,7 +94,6 @@ module FinancialAssistance
 
     scope :eligible, -> { where(kind: 'is_eligible')}
     scope :enrolled, -> { where(kind: 'is_enrolled')}
-
     scope :of_insurance_kind, ->(insurance_kind) { where(insurance_kind: insurance_kind) }
 
     scope :any_medicare, -> { where(:insurance_kind.in => ['medicare', 'medicare_advantage', 'medicare_part_b']) }
@@ -119,7 +117,6 @@ module FinancialAssistance
                                  message: '%{value} is not a valid benefit insurance kind type'
                                },
                                on: [:step_1, :submission]
-
 
     validate :presence_of_esi_details_if_esi,
              :presence_of_dates_if_enrolled,
