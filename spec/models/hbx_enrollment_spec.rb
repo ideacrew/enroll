@@ -1051,6 +1051,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
 
         before do
           allow(::EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_ivl_sep).and_return(true)
+          allow(::EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_shop_sep).and_return(true)
           allow(::EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
         end
 
@@ -1078,6 +1079,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
 
         before do
           allow(::EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_ivl_sep).and_return(true)
+          allow(::EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_shop_sep).and_return(true)
           allow(::EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
         end
 
