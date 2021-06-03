@@ -145,7 +145,7 @@
         </div>
         <div class="col-md-6 mt11">
           <div class="col-md-3 no-padding">
-            <%= radio_button_tag("has_eligibility_changed", true, @applicant.has_eligibility_changed?, class: "radio-yml" ) %>
+            <%= radio_button_tag("has_eligibility_changed", true, @applicant.has_eligibility_changed == true, class: "radio-yml" ) %>
             <label class="radio-yml" for="has_eligibility_changed_yes">Yes</label>
           </div>
           <div class="col-md-3 no-padding">
@@ -181,7 +181,9 @@
       </div>
       <br />
 
-      <div class="driver-question row row-form-wrapper radio-align no-buffer row-height fa-align-elements" id="medicaid-chip-coverage-last-day">
+
+      <% status = @applicant.has_household_income_changed == true ? "test" : "hide" %>
+      <div class="driver-question row row-form-wrapper radio-align no-buffer row-height fa-align-elements <%= status %>" id="medicaid-chip-coverage-last-day">
         <div class="col-md-10 labelforcoverage">
           <span class="fa-text-color">l10n("faa.person_medicaid_last_day") </span>
           <%= text_field_tag("person_coverage_end_on", @applicant.person_coverage_end_on ,class: "jq-datepicker", placeholder: 'Select End Date', style: 'margin-left: 50px;') %>
