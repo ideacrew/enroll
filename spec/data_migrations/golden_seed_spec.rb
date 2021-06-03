@@ -12,7 +12,7 @@ describe "Golden Seed Rake Tasks", dbclean: :after_all do
   before do
     DatabaseCleaner.clean
   end
-  
+
   describe "Generate Consumers and Families for Individual Market" do
     let(:given_task_name) { "golden_seed_individual" }
     subject { GoldenSeedIndividual.new(given_task_name, double(:current_scope => nil)) }
