@@ -243,9 +243,6 @@ document.addEventListener("turbolinks:load", function() {
         $("#eligibility-change-question").addClass('hide');
         $("#household-income-size-changed").addClass('hide');
         $("#medicaid-chip-coverage-last-day").addClass('hide');
-       //  $("#has_eligibility_changed_true, #has_eligibility_changed_false,  #has_household_income_changed_true, #has_household_income_changed_false").each(function(i, ele) {
-       //   $(ele).removeAttr("checked");
-       // });
       } else{
         $("#denied-medicaid").addClass('hide');
         $("#eligibility-change-question").removeClass('hide');
@@ -421,11 +418,29 @@ document.addEventListener("turbolinks:load", function() {
          attributes[$(this).attr('name')] = " ";
        });
 
+      $("#person_coverage_end_on").val();
       $.ajax({
         type: 'POST',
         url: window.location.pathname.replace('/benefits', ''),
         data: { financial_assistance_applicant: attributes },
         success: function(response){
+        }
+      })
+    });
+
+    $('#has_eligible_medicaid_cubcare_false').on('change', function(e) {
+      var attributes = {};
+      $("#medicaid_cubcare_due_on").each(function(i, ele) {
+         attributes[$(this).attr('name')] = " ";
+         $(this).val("");
+       });
+
+
+      $.ajax({
+        type: 'POST',
+        url: window.location.pathname.replace('/benefits', ''),
+        data: { financial_assistance_applicant: attributes },
+        success: function(Responsesponse){
         }
       })
     });
