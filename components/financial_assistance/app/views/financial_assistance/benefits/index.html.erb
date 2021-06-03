@@ -182,7 +182,7 @@
       <br />
 
 
-      <% status = @applicant.has_household_income_changed == true ? "test" : "hide" %>
+      <% status = @applicant.has_household_income_changed == true ? "" : "hide" %>
       <div class="driver-question row row-form-wrapper radio-align no-buffer row-height fa-align-elements <%= status %>" id="medicaid-chip-coverage-last-day">
         <div class="col-md-10 labelforcoverage">
           <span class="fa-text-color">l10n("faa.person_medicaid_last_day") </span>
