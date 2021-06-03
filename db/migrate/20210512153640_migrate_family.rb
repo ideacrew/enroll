@@ -122,6 +122,10 @@ class MigrateFamily < Mongoid::Migration
     applicants_hash = iap_hash['applicants']
     sanitize_params = []
     applicants_hash.each do |applicant_hash|
+      person_tracking_number = applicant_hash['person_hbx_id'].split(':')[1]
+      member_identifier = applicant_hash['person_hbx_id'].split(':')[0]
+      Person.where(ext_app_id: member_identifier).first.update_attributes(ext_app_id: person_tracking_number) # revisit the code
+
       sanitize_params << {
         "family_member_id": BSON::ObjectId.new,
         "first_name": applicant_hash['name']['first_name'],
@@ -160,7 +164,7 @@ class MigrateFamily < Mongoid::Migration
         "vlp_document": applicant_hash['vlp_document'],
 
         "person_hbx_id": nil, #default
-        "ext_app_id": applicant_hash['person_hbx_id'],
+        "ext_app_id": person_tracking_number,
         "is_required_to_file_taxes": applicant_hash['is_required_to_file_taxes'],
         "tax_filer_kind": applicant_hash['tax_filer_kind'],
         "is_joint_tax_filing": applicant_hash['is_joint_tax_filing'],
