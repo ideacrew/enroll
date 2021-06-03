@@ -444,6 +444,22 @@ document.addEventListener("turbolinks:load", function() {
         }
       })
     });
+
+    $('#has_dependent_with_coverage_true').on('change', function(e) {
+      var attributes = {};
+      $("#has_dependent_with_coverage_true, #has_dependent_with_coverage_false, #dependent_job_end_on").each(function(i, ele) {
+         attributes[$(this).attr('name')] = " ";
+          $(this).val("");
+       });
+
+      $.ajax({
+        type: 'POST',
+        url: window.location.pathname.replace('/benefits', ''),
+        data: { financial_assistance_applicant: attributes },
+        success: function(response){
+        }
+      })
+    });
   }
 
 

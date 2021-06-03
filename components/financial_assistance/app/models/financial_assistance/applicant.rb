@@ -761,7 +761,6 @@ module FinancialAssistance
         return benefits.enrolled.present? && benefits.enrolled.all? {|benefit| benefit.valid? :submission} && benefits.eligible.blank? if has_enrolled_health_coverage && !has_eligible_health_coverage
         return benefits.enrolled.blank? && benefits.eligible.present? && benefits.eligible.all? {|benefit| benefit.valid? :submission}  if !has_enrolled_health_coverage && has_eligible_health_coverage
         benefits.enrolled.blank? && benefits.eligible.blank?
-        return medicare_eligible_qns if FinancialAssistanceRegistry.feature_enabled?(:has_medicare_cubcare_eligible)
       end
     end
 
