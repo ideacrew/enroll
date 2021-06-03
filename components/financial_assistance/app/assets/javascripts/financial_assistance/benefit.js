@@ -233,11 +233,6 @@ document.addEventListener("turbolinks:load", function() {
     /* Conditional Display household income or size changed Question */
     if (!$("#has_eligibility_changed_true").is(':checked')) $("#household-income-size-changed").addClass('hide');
 
-    if (!$("#has_eligibility_changed_false").is(':checked')) $("#medicaid-chip-coverage-last-day").addClass('hide');
-
-    /* Conditional Display medicaid chip coverage last day Question */
-    if (!$("#has_household_income_changed_true").is(':checked')) $("#medicaid-chip-coverage-last-day").addClass('hide');
-
 
     $("body").on("change", "#has_eligible_medicaid_cubcare_true", function(){
       if ($('#has_eligible_medicaid_cubcare_true').is(':checked')) {
@@ -245,9 +240,6 @@ document.addEventListener("turbolinks:load", function() {
         $("#eligibility-change-question").addClass('hide');
         $("#household-income-size-changed").addClass('hide');
         $("#medicaid-chip-coverage-last-day").addClass('hide');
-       //  $("#has_eligibility_changed_true, #has_eligibility_changed_false,  #has_household_income_changed_true, #has_household_income_changed_false").each(function(i, ele) {
-       //   $(ele).removeAttr("checked");
-       // });
       } else{
         $("#denied-medicaid").addClass('hide');
         $("#eligibility-change-question").removeClass('hide');
@@ -331,7 +323,7 @@ document.addEventListener("turbolinks:load", function() {
     });
 
     /* Saving Responses to Income  Driver Questions */
-    $('#has_enrolled_health_coverage_false, #has_eligible_health_coverage_false,#has_enrolled_health_coverage_true, #has_eligible_health_coverage_true, #health_service_through_referral_true, #health_service_through_referral_false, #health_service_eligible_true, #health_service_eligible_false, #is_medicaid_cubcare_eligible_true, #is_medicaid_cubcare_eligible_false, #has_eligibility_changed_true, #has_eligibility_changed_false, #has_household_income_changed_true, #has_household_income_changed_false, #medicaid_cubcare_due_on, #person_coverage_end_on').on('change', function(e) {
+    $('#has_enrolled_health_coverage_false, #has_eligible_health_coverage_false,#has_enrolled_health_coverage_true, #has_eligible_health_coverage_true, #health_service_through_referral_true, #health_service_through_referral_false, #health_service_eligible_true, #health_service_eligible_false, #has_eligible_medicaid_cubcare_true, #has_eligible_medicaid_cubcare_false, #has_eligibility_changed_true, #has_eligibility_changed_false, #has_household_income_changed_true, #has_household_income_changed_false, #person_coverage_end_on, #medicaid_cubcare_due_on').on('change', function(e) {
       var attributes = {};
       attributes[$(this).attr('name')] = $(this).val();
       $.ajax({
@@ -349,11 +341,29 @@ document.addEventListener("turbolinks:load", function() {
          attributes[$(this).attr('name')] = " ";
        });
 
+      $("#person_coverage_end_on").val();
       $.ajax({
         type: 'POST',
         url: window.location.pathname.replace('/benefits', ''),
         data: { financial_assistance_applicant: attributes },
         success: function(response){
+        }
+      })
+    });
+
+    $('#has_eligible_medicaid_cubcare_false').on('change', function(e) {
+      var attributes = {};
+      $("#medicaid_cubcare_due_on").each(function(i, ele) {
+         attributes[$(this).attr('name')] = " ";
+         $(this).val("");
+       });
+
+
+      $.ajax({
+        type: 'POST',
+        url: window.location.pathname.replace('/benefits', ''),
+        data: { financial_assistance_applicant: attributes },
+        success: function(Responsesponse){
         }
       })
     });
