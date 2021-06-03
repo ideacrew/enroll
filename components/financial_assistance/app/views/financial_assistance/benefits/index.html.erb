@@ -77,11 +77,11 @@
           <div class="col-md-6 mt11">
             <div class="col-md-3 no-padding">
               <%= radio_button_tag("health_service_eligible", true, @applicant.health_service_eligible, class: "radio-yml" ) %>
-              <label class="radio-yml" for="health_service_eligible_yes">Yes</label>
+              <label class="radio-yml" for="health_service_eligible_yes"><%=l10n("yes")%></label>
             </div>
             <div class="col-md-3 no-padding">
               <%= radio_button_tag("health_service_eligible", false, @applicant.health_service_eligible == false, class: "radio-yml" ) %>
-              <label class="radio-yml" for="health_service_eligible_no">No</label>
+              <label class="radio-yml" for="health_service_eligible_no"><%=l10n("no")%></label>
             </div>
             <div class="col-md-6">
             </div>
