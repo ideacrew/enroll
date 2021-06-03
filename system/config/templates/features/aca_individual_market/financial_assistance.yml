@@ -19,4 +19,4 @@ registry:
           - key: :ivl_application_checklist
             item: 'IVL_Application_Checklist_Final_02172021.pdf'
       - key: :indian_health_service_question
-        is_enabled: false
+        is_enabled: true
