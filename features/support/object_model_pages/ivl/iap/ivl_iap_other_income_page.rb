@@ -2,7 +2,7 @@
 
 #financial_assistance/applications/consumer_role_id/applicants/consumer_role_id/incomes/other
 class IvlIapOtherIncomePage
-  
+
   def self.has_unemployment_income_yes_radiobtn
     '#has_unemployment_income_true'
   end
@@ -22,7 +22,7 @@ class IvlIapOtherIncomePage
   def self.how_often_dropdown
     'div[class="selectric interaction-choice-control-income-frequency-kind"] span'
   end
-  
+
   def self.select_bi_weekly
     'li[class="interaction-choice-control-income-frequency-kind-1"]'
   end
@@ -50,7 +50,7 @@ class IvlIapOtherIncomePage
   def self.unemployment_save_btn
     'input[class="btn btn-danger  interaction-click-control-save"]'
   end
-  
+
   def self.unemployment_edit_btn
     'a[class="unemployment-income-edit edit-pr"]'
   end
@@ -129,7 +129,7 @@ class IvlIapOtherIncomePage
 
   def self.capital_gains_select_monthly
     'li[class="interaction-choice-control-income-frequency-kind-20 interaction-choice-control-income-frequency-kind-4"]'
-  end 
+  end
 
   def self.dividends_checkbox
     'input[class="other-income-checkbox-dividend interaction-choice-control-value-other-income-kind"]'
@@ -170,7 +170,7 @@ class IvlIapOtherIncomePage
   def self.pension_retirement_select_bi_weekly
     'li[class="interaction-choice-control-income-frequency-kind-41 interaction-choice-control-income-frequency-kind-1"]'
   end
-  
+
   def self.pension_retirement_select_monthly
     'li[class="interaction-choice-control-income-frequency-kind-44 interaction-choice-control-income-frequency-kind-4"]'
   end
@@ -238,7 +238,7 @@ class IvlIapOtherIncomePage
   def self.employer_funded_disability_select_monthly
     'li[class="interaction-choice-control-income-frequency-kind-76 interaction-choice-control-income-frequency-kind-4"]'
   end
-  
+
   def self.employer_funded_disability_select_yearly
     'li[class="interaction-choice-control-income-frequency-kind-79 last interaction-choice-control-income-frequency-kind-7"]'
   end
@@ -254,11 +254,11 @@ class IvlIapOtherIncomePage
   def self.estate_trust_select_monthly
     'li[class="interaction-choice-control-income-frequency-kind-84 interaction-choice-control-income-frequency-kind-4"]'
   end
-  
+
   def self.estate_trust_select_yearly
     'li[class="interaction-choice-control-income-frequency-kind-87 last interaction-choice-control-income-frequency-kind-7"]'
   end
-  
+
   def self.farming_or_fishing_checkbox
     'input[class="other-income-checkbox-farming_and_fishing interaction-choice-control-value-other-income-kind"]'
   end

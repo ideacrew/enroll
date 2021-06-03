@@ -2,7 +2,7 @@
 
 #financial_assistance/applications/consumer_role_id/applicants/consumer_role_id/deductions
 class IvlIapIncomeAdjustmentsPage
-  
+
   def self.income_adjustments_yes_radiobtn
     'has_deductions_true'
   end
@@ -22,7 +22,7 @@ class IvlIapIncomeAdjustmentsPage
   def self.save_and_exit_link
     'a[class="interaction-click-control-save---exit"]'
   end
-  
+
   def self.alimony_paid_checkbox
     'input[class="deduction-checkbox-alimony_paid interaction-choice-control-value-deduction-kind"]'
   end
@@ -42,11 +42,11 @@ class IvlIapIncomeAdjustmentsPage
   def self.alimony_select_monthly
     'li[class="interaction-choice-control-deduction-frequency-kind-4"]'
   end
-  
+
   def self.from
     'deduction[start_on]'
   end
-  
+
   def self.calendar
     '#ui-datepicker-div'
   end
@@ -74,7 +74,7 @@ class IvlIapIncomeAdjustmentsPage
   def self.domestic_production_activities_checkbox
     'input[class="deduction-checkbox-domestic_production_activities interaction-choice-control-value-deduction-kind"]'
   end
-  
+
   def self.domestic_production_select_bi_weekly
     'li[class="interaction-choice-control-deduction-frequency-kind-17 interaction-choice-control-deduction-frequency-kind-1"]'
   end
@@ -187,14 +187,14 @@ class IvlIapIncomeAdjustmentsPage
     'li[class="interaction-choice-control-deduction-frequency-kind-89 interaction-choice-control-deduction-frequency-kind-1"]'
   end
 
-  def self.reservists_performing_artists_and_fee_basis_government_official_expenses_select_monthly 
+  def self.reservists_performing_artists_and_fee_basis_government_official_expenses_select_monthly
     'li[class="interaction-choice-control-deduction-frequency-kind-92 interaction-choice-control-deduction-frequency-kind-4"]'
   end
 
   def self.tuition_and_fees_checkbox
     'input[class="deduction-checkbox-tuition_and_fees interaction-choice-control-value-deduction-kind"]'
   end
-  
+
   def self.tuition_and_fees_select_bi_weekly
     'li[class="interaction-choice-control-deduction-frequency-kind-97 interaction-choice-control-deduction-frequency-kind-1"]'
   end

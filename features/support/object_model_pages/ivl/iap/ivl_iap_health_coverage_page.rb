@@ -2,7 +2,7 @@
 
 #financial_assistance/applications/consumer_role_id/applicants/consumer_role_id/benefits
 class IvlIapHealthCoveragePage
-  
+
   def self.has_enrolled_health_coverage_yes_radiobtn
     'has_enrolled_health_coverage_true'
   end
@@ -30,7 +30,7 @@ class IvlIapHealthCoveragePage
   def self.to
     'benefit[end_on]'
   end
-  
+
   def self.cancel_btn
     'a[class="btn btn-default benefit-cancel interaction-click-control-cancel"]'
   end

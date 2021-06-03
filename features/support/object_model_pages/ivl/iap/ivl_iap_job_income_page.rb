@@ -106,7 +106,7 @@ class IvlIapJobIncomeInformationPage
   def self.self_employee_income_to
     'income[end_on]'
   end
-  
+
   def self.self_employee_select_yearly
     'li[class="interaction-choice-control-income-frequency-kind-15 last interaction-choice-control-income-frequency-kind-7 interaction-choice-control-income-employer-address-state-7"]'
   end
@@ -114,7 +114,7 @@ class IvlIapJobIncomeInformationPage
   def self.not_sure_has_self_employment_income_link
     'a[href="#has_self_employment_income"]'
   end
-  
+
   def self.self_employee_cancel_btn
     'a[class="btn btn-default income-cancel interaction-click-control-cancel"]'
   end

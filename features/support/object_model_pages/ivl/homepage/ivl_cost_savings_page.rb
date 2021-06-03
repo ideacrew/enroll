@@ -4,11 +4,11 @@
 class IvlCostSavings
 
   def self.actions_dropdown
-        'button[id="dropdown_for_"]'
+    'button[id="dropdown_for_"]'
   end
 
   def self.select_copy_to_new_application
-        'a[class="btn btn-xs interaction-click-control-copy-to-new-application"]'
+    'a[class="btn btn-xs interaction-click-control-copy-to-new-application"]'
   end
 
   def self.select_review_application

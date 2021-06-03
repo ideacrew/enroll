@@ -1087,7 +1087,7 @@ And(/^employer should see default cobra start date$/) do
 end
 
 And(/^employer sets cobra start date to two months before termination date$/) do
-    find('.text-center.date-picker').fill_in with: 2.months.ago.strftime('%m/%d/%Y')
+  find('.text-center.date-picker').fill_in with: 2.months.ago.strftime('%m/%d/%Y')
 end
 
 And(/^employer accepts the suggested cobra date$/) do

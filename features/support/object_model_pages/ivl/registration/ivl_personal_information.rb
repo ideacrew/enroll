@@ -97,7 +97,7 @@ class IvlPersonalInformation
   end
 
   def self.select_permanent_resident_card
-  'div[id="immigration_doc_type_select"] li[data-index="2"]'
+    'div[id="immigration_doc_type_select"] li[data-index="2"]'
   end
 
   def self.alien_number

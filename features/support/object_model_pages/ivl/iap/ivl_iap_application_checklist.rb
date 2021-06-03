@@ -4,23 +4,23 @@
 class IvlIapApplicationChecklist
 
   def self.application_checklist_text
-      'div.col-lg-9 .darkblue'
+    'div.col-lg-9 .darkblue'
   end
 
   def self.view_complete_application_checklist
-     'a.interaction-click-control-view-the-complete-application-checklist'
+    'a.interaction-click-control-view-the-complete-application-checklist'
   end
 
   def self.continue_btn
-     '#btn-continue'
+    '#btn-continue'
   end
 
   def self.previous_link
-     '.interaction-click-control-previous'
+    '.interaction-click-control-previous'
   end
 
   def self.save_and_exit_link
-     '.interaction-click-control-save---exit'
+    '.interaction-click-control-save---exit'
   end
 
   def self.help_me_sign_up_btn

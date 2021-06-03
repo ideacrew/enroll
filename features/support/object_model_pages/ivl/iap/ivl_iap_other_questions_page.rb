@@ -6,7 +6,7 @@ class IvlIapOtherQuestions
   def self.is_pregnant_no_radiobtn
     'is_pregnant_no'
   end
-  
+
   def self.is_post_partum_period_no_radiobtn
     'is_post_partum_period_no'
   end
@@ -28,11 +28,11 @@ class IvlIapOtherQuestions
   end
 
   def self.children_expecting_dropdown
-    'div[class="selectric interaction-choice-control-children-expected-count interaction-choice-control-foster-care-us-state interaction-choice-control-age-left-foster-care interaction-choice-control-student-kind interaction-choice-control-student-school-kind"]'
+    '.selectric-interaction-choice-control-children-expected-count'
   end
 
   def self.select_one
-    'li[class="interaction-choice-control-children-expected-count-1 interaction-choice-control-foster-care-us-state-1 interaction-choice-control-age-left-foster-care-1 interaction-choice-control-student-kind-1 interaction-choice-control-student-school-kind-1"]'
+    'li[data-index="1"]'
   end
 
   def self.is_student_no_radiobtn
@@ -110,7 +110,7 @@ class IvlIapOtherQuestions
   def self.physically_disabled_yes_radiobtn
     'input[id="radio_physically_disabled_yes"]'
   end
-  
+
   def self.not_sure_physically_disabled_link
     'a[data-target="#is_physically_disabled"]'
   end

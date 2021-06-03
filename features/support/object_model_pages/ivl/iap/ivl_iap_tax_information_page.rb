@@ -2,7 +2,7 @@
 
 #financial_assistance/applications/consumer_role_id/applicants/consumer_role_id/step/1
 class IvlIapTaxInformationPage
-  
+
   def self.file_taxes_yes_radiobtn
     'is_required_to_file_taxes_yes'
   end
