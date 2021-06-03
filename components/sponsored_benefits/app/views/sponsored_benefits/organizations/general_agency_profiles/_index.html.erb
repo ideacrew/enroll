@@ -5,7 +5,7 @@
       <label><strong> Select General Agency: </strong></label>
     </div>
     <div class="col col-sm-4 mt-1">
-      <%= select_tag "general_agency_profile_id", options_for_select(@form.service.agencies.collect {|agency| [agency.legal_name, agency.id]}), prompt: "Select General Agency", required: true %>
+      <%= select_tag "general_agency_profile_id", options_for_select(@form.service.agencies.collect {|agency| [agency.legal_name, agency.id] if ["is_approved"].include?(agency.aasm_state)}.compact), prompt: "Select General Agency", required: true %>
     </div>
     <div class="col col-sm-6">
       <%= submit_tag "Submit", class: "btn btn-default" %>
