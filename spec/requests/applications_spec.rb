@@ -9,16 +9,19 @@ RSpec.describe 'applications', type: :request do
       produces 'application/json'
       parameter name: :id, :in => :path, :type => :string 
 
-        response '200' 'edit made' do
+        response '200' 'index' do
           schema type: :object,
             properties: {
-              id: { type: :string },
-              title: { type: :string },
-              content: { type: :string }
+              family_id: { type: :string }
             },
-            required: [ 'id', 'title', 'content' ]
+            required: [ 'family_id' ]
 
-          let(:id) { Applications.edit(title: 'foo', content: 'bar').id }
+          let(:family_id) { Applications.index(family_id: 'family id') }
+          run_test!
+        end
+
+        response '404', 'user not found' do
+          let(:family_id) { 'invalid' }
           run_test!
         end
       end
