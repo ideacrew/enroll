@@ -159,7 +159,8 @@ class MigrateFamily < Mongoid::Migration
         "is_consent_applicant": applicant_hash['is_consent_applicant'],
         "vlp_document": applicant_hash['vlp_document'],
 
-        "person_hbx_id": applicant_hash['person_hbx_id'],
+        "person_hbx_id": nil, #default
+        "ext_app_id": applicant_hash['person_hbx_id'],
         "is_required_to_file_taxes": applicant_hash['is_required_to_file_taxes'],
         "tax_filer_kind": applicant_hash['tax_filer_kind'],
         "is_joint_tax_filing": applicant_hash['is_joint_tax_filing'],
@@ -225,6 +226,7 @@ class MigrateFamily < Mongoid::Migration
   def self.sanitize_person_params(family_member_hash)
     person_hash = family_member_hash['person']
     {
+      "ext_app_id": person_hash['hbx_id'],
       "first_name": person_hash['person_name']['first_name'],
       "last_name": person_hash['person_name']['last_name'],
       "full_name": person_hash['person_name']['full_name'],
