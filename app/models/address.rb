@@ -82,7 +82,11 @@ class Address
   end
 
   def quadrant_check
-    errors.add(:quadrant, "not present") if EnrollRegistry.feature_enabled?(:validate_quadrant) && Settings.aca.quadrant_state_inclusion.include?(self.state) && Settings.aca.quadrant_zip_codes_exclusions.exclude?(self.zip) && self.quadrant.blank?
+    return unless EnrollRegistry.feature_enabled?(:validate_quadrant)
+    return unless EnrollRegistry[:validate_quadrant].settings(:inclusions).item.include?(self.state)
+    return unless EnrollRegistry[:validate_quadrant].settings(:exclusions).item.exclude?(self.zip)
+    return unless self.quadrant.blank?
+    errors.add(:quadrant, "not present")
   end
 
   # @note Add support for GIS location

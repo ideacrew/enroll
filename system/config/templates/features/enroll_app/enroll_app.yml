@@ -354,7 +354,13 @@ registry:
       - key: :display_county
         is_enabled: true
       - key: :validate_quadrant
+        item: :validate_quadrant
         is_enabled: true
+        settings:
+          - key: :exclusions
+            item: ["20515"]
+          - key: :inclusions
+            item: ["DC"]
       - key: :qle_within_sixty_days
         item: :qle_within_sixty_days
         is_enabled: true
