@@ -236,7 +236,7 @@ module FinancialAssistance
     field :is_resident_post_092296, type: Boolean
     field :is_vets_spouse_or_child, type: Boolean
 
-    field :net_annual_income, type: Money, default: 0.00
+    field :net_annual_income, type: Money
     # Driver QNs.
     field :has_job_income, type: Boolean
     field :has_self_employment_income, type: Boolean
