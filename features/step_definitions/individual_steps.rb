@@ -278,12 +278,12 @@ Then(/^.+ answers the questions of the Identity Verification page and clicks on 
 end
 
 Then(/^.+ is on the Help Paying for Coverage page/) do
-  expect(page).to have_content IvlFaaHelpPayingForCoverage.your_application_for_premium_reductions_text
+  expect(page).to have_content IvlIapHelpPayingForCoverage.your_application_for_premium_reductions_text
 end
 
 Then(/^.+ does not apply for assistance and clicks continue/) do
-  find(IvlFaaHelpPayingForCoverage.no_radiobtn).click
-  find(IvlFaaHelpPayingForCoverage.continue_btn).click
+  find(IvlIapHelpPayingForCoverage.no_radiobtn).click
+  find(IvlIapHelpPayingForCoverage.continue_btn).click
 end
 
 Then(/\w+ should see the dependents form/) do
@@ -338,7 +338,7 @@ end
 
 And(/^.+ clicks on the Continue button of the Household Info page/) do
   screenshot("line 161")
-  find(IvlFaaFamilyInformation.continue_btn).click
+  find(IvlIapFamilyInformation.continue_btn).click
 end
 
 Then(/consumer clicked on Go To My Account/) do
