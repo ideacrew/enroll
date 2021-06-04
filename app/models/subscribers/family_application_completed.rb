@@ -27,7 +27,7 @@ module Subscribers
       verified_family.parse(xml)
       verified_primary_family_member = verified_family.family_members.detect{ |fm| fm.id == verified_family.primary_family_member_id }
       verified_dependents = verified_family.family_members.reject{ |fm| fm.id == verified_family.primary_family_member_id }
-      primary_person = search_person(verified_primary_family_member)
+      primary_person = verified_primary_family_member.present? ? search_person(verified_primary_family_member) : nil
       throw(:processing_issue, "ERROR: Failed to find primary person in xml") unless primary_person.present?
       family = primary_person.primary_family
       throw(:processing_issue, "ERROR: Failed to find primary family for users person in xml") unless family.present?
