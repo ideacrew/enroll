@@ -70,5 +70,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.question.health_reimbursement_arrangement" => "Health Reimbursement Arrangement",
   "en.faa.question.retiree_health_benefits" => "Retiree Health Benefits",
   "en.faa.question.other_full_benefit_coverage" => "Other full benefit coverage",
-  "en.faa.question.other_limited_benefit_coverage" => "Other limited benefit coverage"
+  "en.faa.question.other_limited_benefit_coverage" => "Other limited benefit coverage",
+  "en.faa.has_dependent_with_coverage" => "Did this person have coverage through a job (for example, a parent’s job) that ended in the last 3 months?*",
+  "en.faa.dependent_job_end_on" => "What was the last day this person had coverage through the job?*"
 }.freeze
