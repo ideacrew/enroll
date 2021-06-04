@@ -6,14 +6,19 @@ require 'dry/monads/do'
 module FinancialAssistance
   module Operations
     module Applicant
+      #This class calculated net annual income for a applicant
+      # Net Annual Income = Total Incomes - Total Deductions
       class CalculateAndPersistNetAnnualIncome
         include Dry::Monads[:result, :do]
 
+        # @param [applicant object] input
+        #
+        # @return [applicant]
         def call(params)
-          applicant    = yield validate(params)
+          applicant = yield validate(params)
           total_annual_income = yield calculate_total_annual_income(applicant)
-          total_deductions  = yield calculate_total_deductions_income(applicant)
-          total_net_income   = yield calculate_net_income(total_annual_income, total_deductions)
+          total_deductions = yield calculate_total_deductions_income(applicant)
+          total_net_income = yield calculate_net_income(total_annual_income, total_deductions)
           result = yield persist(applicant, total_net_income)
 
           Success(result)
@@ -32,7 +37,7 @@ module FinancialAssistance
         def calculate_total_annual_income(applicant)
           return Success(BigDecimal('0')) unless applicant.incomes
 
-          total_income =  applicant.incomes.inject(0) do |total, income|
+          total_income = applicant.incomes.inject(0) do |total, income|
             total + annual_employee_cost(income.frequency_kind, income.amount)
           end
           Success(total_income)
@@ -56,8 +61,6 @@ module FinancialAssistance
           Success(applicant)
         end
 
-
-        # rubocop:disable Metrics/CyclomaticComplexity
         def annual_employee_cost(employee_cost_frequency, employee_cost)
           return BigDecimal('0') if employee_cost_frequency.blank? || employee_cost.blank?
           case employee_cost_frequency
@@ -71,7 +74,6 @@ module FinancialAssistance
           else BigDecimal('0')
           end
         end
-        # rubocop:enable Metrics/CyclomaticComplexity
       end
     end
   end
