@@ -22,3 +22,5 @@ registry:
         is_enabled: true
       - key: :has_medicare_cubcare_eligible
         is_enabled: true
+      - key: :has_dependent_with_coverage
+        is_enabled: true

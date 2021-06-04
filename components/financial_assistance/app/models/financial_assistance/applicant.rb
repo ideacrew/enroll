@@ -245,6 +245,9 @@ module FinancialAssistance
     field :has_enrolled_health_coverage, type: Boolean
     field :has_eligible_health_coverage, type: Boolean
 
+    # if eligible immigration status
+    field :medicaid_chip_ineligible, type: Boolean
+    field :immigration_status_changed, type: Boolean
     # if member of tribe
     field :health_service_through_referral, type: Boolean
     field :health_service_eligible, type: Boolean
@@ -256,6 +259,9 @@ module FinancialAssistance
     field :has_eligibility_changed, type: Boolean
     field :has_household_income_changed, type: Boolean
     field :person_coverage_end_on, type: Date
+
+    field :has_dependent_with_coverage, type: Boolean
+    field :dependent_job_end_on, type: Date
 
     field :workflow, type: Hash, default: { }
 
@@ -755,14 +761,26 @@ module FinancialAssistance
         deductions.blank?
       when :health_coverage
         return false if indian_tribe_member && health_service_through_referral.nil? && EnrollRegistry[:indian_health_service_question].feature.is_enabled
+        if FinancialAssistanceRegistry[:medicaid_chip_driver_questions].enabled?
+          return false if eligible_immigration_status && medicaid_chip_ineligible.nil?
+          return false if eligible_immigration_status && medicaid_chip_ineligible && immigration_status_changed.nil?
+        end
         return false if indian_tribe_member && health_service_eligible.nil? && EnrollRegistry[:indian_health_service_question].feature.is_enabled
+        return medicare_eligible_qns if FinancialAssistanceRegistry.feature_enabled?(:has_medicare_cubcare_eligible)
+        return dependent_coverage_questions if FinancialAssistanceRegistry.feature_enabled?(:has_dependent_with_coverage)
         return false if has_enrolled_health_coverage.nil? || has_eligible_health_coverage.nil?
         return benefits.enrolled.present? && benefits.eligible.present? && benefits.all? {|benefit| benefit.valid? :submission} if has_enrolled_health_coverage && has_eligible_health_coverage
         return benefits.enrolled.present? && benefits.enrolled.all? {|benefit| benefit.valid? :submission} && benefits.eligible.blank? if has_enrolled_health_coverage && !has_eligible_health_coverage
         return benefits.enrolled.blank? && benefits.eligible.present? && benefits.eligible.all? {|benefit| benefit.valid? :submission}  if !has_enrolled_health_coverage && has_eligible_health_coverage
         benefits.enrolled.blank? && benefits.eligible.blank?
-        return medicare_eligible_qns if FinancialAssistanceRegistry.feature_enabled?(:has_medicare_cubcare_eligible)
       end
+    end
+
+    def dependent_coverage_questions
+      return false if has_dependent_with_coverage.nil?
+      return true if has_dependent_with_coverage == false
+      return true if has_dependent_with_coverage && dependent_job_end_on.present?
+      return false if has_dependent_with_coverage.present? && dependent_job_end_on.blank?
     end
 
     # rubocop:disable Metrics/CyclomaticComplexity

@@ -91,3 +91,15 @@ end
 Then(/they should see the Indian Healthcare question/) do
   expect(page).to have_content l10n("faa.indian_health_service")
 end
+
+Then(/they should see the MaineCare ineligible question/) do
+  expect(page).to have_content l10n("faa.medicaid_chip_ineligible")
+end
+
+Then(/they clicks yes for MaineCare ineligible/) do
+  find('#medicaid_chip_ineligible_true').click
+end
+
+Then(/they should see the immigration status question/) do
+  expect(page).to have_content l10n("faa.immigration_status_changed")
+end
