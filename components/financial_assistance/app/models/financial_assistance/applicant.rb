@@ -769,7 +769,7 @@ module FinancialAssistance
         end
         return false if indian_tribe_member && health_service_eligible.nil? && EnrollRegistry[:indian_health_service_question].feature.is_enabled
         return medicare_eligible_qns if FinancialAssistanceRegistry.feature_enabled?(:has_medicare_cubcare_eligible)
-        return dependent_coverage_questions if age_of_applicant < 19 && FinancialAssistanceRegistry.feature_enabled?(:has_dependent_with_coverage)
+        return dependent_coverage_questions if FinancialAssistanceRegistry.feature_enabled?(:has_dependent_with_coverage)
         return false if has_enrolled_health_coverage.nil? || has_eligible_health_coverage.nil?
         return benefits.enrolled.present? && benefits.eligible.present? && benefits.all? {|benefit| benefit.valid? :submission} if has_enrolled_health_coverage && has_eligible_health_coverage
         return benefits.enrolled.present? && benefits.enrolled.all? {|benefit| benefit.valid? :submission} && benefits.eligible.blank? if has_enrolled_health_coverage && !has_eligible_health_coverage
