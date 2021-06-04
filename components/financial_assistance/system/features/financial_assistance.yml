@@ -88,7 +88,7 @@ registry:
     - key: :has_medicare_cubcare_eligible
       is_enabled: true
     - key: :medicaid_chip_driver_questions
-      is_enabled: false
+      is_enabled: true
       settings:
         - key: :medicaid_chip
           item: "MaineCare (Medicaid)"
