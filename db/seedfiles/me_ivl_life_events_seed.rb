@@ -579,8 +579,6 @@ QualifyingLifeEventKind.find_or_create_by(title: "COBRA subsidy expiring").tap d
     post_event_sep_in_days: 60,
     ordinal_position: 26,
     is_active: true,qle_event_date_kind: :qle_on,
-    coverage_effective_on: nil,
-    end_on: nil,
     is_visible: true,
     termination_on_kinds: []
   )
@@ -594,7 +592,16 @@ QualifyingLifeEventKind.find_or_create_by(title: "Late notice of qualifying even
     effective_on_kinds: ["first_of_next_month_plan_selection"],
     reason: "late_notice",
     market_kind: "individual",
-    tool_tip: "Someone didn't find out about a qualifying event (for example, that other coverage was ending) until after it was too late to enroll", pre_event_sep_in_days: 0, is_self_attested: false, date_options_available: true, post_event_sep_in_days: 60, ordinal_position: 27, aasm_state: :active, is_active: true, event_on: nil, qle_event_date_kind: :qle_on, coverage_effective_on: nil, start_on: 2021-06-02 00:00:00 UTC, end_on: nil, is_visible: true, termination_on_kinds: [], coverage_start_on: nil, coverage_end_on: nil, updated_by: nil
+    tool_tip: "Someone didn't find out about a qualifying event (for example, that other coverage was ending) until after it was too late to enroll",
+    pre_event_sep_in_days: 0,
+    is_self_attested: false,
+    date_options_available: true,
+    post_event_sep_in_days: 60,
+    ordinal_position: 27,
+    is_active: true,
+    qle_event_date_kind: :qle_on,
+    is_visible: true,
+    termination_on_kinds: [],
   )
 end
 
