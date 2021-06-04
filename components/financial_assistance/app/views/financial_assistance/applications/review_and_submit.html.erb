@@ -314,7 +314,6 @@
                 </div>
               <% end %>
 
-<<<<<<< HEAD
               <% if FinancialAssistanceRegistry[:medicaid_chip_driver_questions].enabled? && applicant.eligible_immigration_status %>
                 <div class="row row-form-wrapper ptb no-buffer row-height form-content">
                   <div class="col-md-6"><%= l10n("faa.medicaid_chip_ineligible") %> <%= TimeKeeper.date_of_record.year - 5 %>? *</div>
@@ -332,7 +331,7 @@
                 <div class="row row-form-wrapper ptb no-buffer row-height form-content">
                   <div class="col-md-6">l10n("faa.has_dependent_with_coverage")
                   </div>
-                  <div class="col-md-6"><%= human_boolean(applicant.is_claimed_as_tax_dependent) %></div>
+                  <div class="col-md-6"><%= human_boolean(applicant.has_dependent_with_coverage) %></div>
                 </div>
 
                 <div class="row row-form-wrapper ptb no-buffer row-height form-content">
