@@ -66,7 +66,7 @@ Given(/^the user fills out the required other income information$/) do
 end
 
 Then(/^the save button should be enabled$/) do
-  expect(find(:css, '.interaction-click-control-save')[:class].include?('disabled')).to eq(false) if FinancialAssistanceRegistry.feature_enabled?(:acf_refugee_medical_assistance)
+  expect(find(:css, '.interaction-click-control-save')[:class].include?('disabled')).to eq(false)
 end
 
 Then(/^the user saves the other income information$/) do
@@ -79,11 +79,7 @@ Then(/^the other income information should be saved on the page$/) do
 end
 
 When(/^the user cancels the form$/) do
-  if FinancialAssistanceRegistry.feature_enabled?(:acf_refugee_medical_assistance)
-    find(".interaction-click-control-cancel").click
-  else
-    expect(page).not_to have_css(".interaction-click-control-cancel")
-  end
+  find(".interaction-click-control-cancel").click
 end
 
 And(/^NO should be selected again for (.*) income$/) do |income_type|
