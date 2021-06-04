@@ -780,6 +780,12 @@ module FinancialAssistance
       applicants.where(:is_active => true)
     end
 
+    def calculate_total_net_income_for_applicants
+      active_applicants.each do |applicant|
+        FinancialAssistance::Operations::Applicant::CalculateAndPersistNetAnnualIncome.new.call({applicant: applicant})
+      end
+    end
+
     def non_primary_applicants
       active_applicants.reject{|applicant| applicant == primary_applicant}
     end
