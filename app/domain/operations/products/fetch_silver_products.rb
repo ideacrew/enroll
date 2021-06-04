@@ -13,7 +13,7 @@ module Operations
         rating_area       = yield find_rating_area(values[:effective_date], values[:address])
         service_areas     = yield find_service_areas(values[:effective_date], values[:address])
         query             = yield query_criteria(rating_area.id, service_areas.map(&:id), values[:effective_date])
-        products          = yield fetch_products(query, values[:address], values)
+        products          = yield fetch_products(query, values)
         payload           = yield construct_payload(products, rating_area.id)
 
         Success(payload)
@@ -57,12 +57,12 @@ module Operations
                 })
       end
 
-      def fetch_products(query_criteria, address, values)
+      def fetch_products(query_criteria, values)
         products = BenefitMarkets::Products::Product.where(query_criteria)
         if products.present?
           Success(products)
         else
-          Failure("Could Not find any Products for the given criteria - effective_date: #{values[:effective_date]}, county: #{address.county}, zip: #{address.zip}")
+          Failure("Could Not find any Products for the given criteria - effective_date: #{values[:effective_date]}, county: #{values[:address].county}, zip: #{values[:address].zip}")
         end
       end
 
