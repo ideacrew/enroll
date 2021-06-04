@@ -37,6 +37,10 @@ module FinancialAssistance
       coverage_under_the_state_health_benefits_risk_pool
       veterans_administration_health_benefits
       peace_corps_health_benefits
+      health_reimbursement_arrangement
+      retiree_health_benefits
+      other_full_benefit_coverage
+      other_limited_benefit_coverage
       ].freeze
 
     KINDS = %w[
@@ -67,7 +71,11 @@ module FinancialAssistance
       coverage_obtained_through_another_exchange: "Coverage obtained through a non-#{Settings.site.short_name} marketplace",
       coverage_under_the_state_health_benefits_risk_pool: 'Coverage under the state health benefits risk pool',
       veterans_administration_health_benefits: 'Veterans Administration health benefits',
-      peace_corps_health_benefits: 'Peace Corps health benefits'
+      peace_corps_health_benefits: 'Peace Corps health benefits',
+      health_reimbursement_arrangement: 'Health Reimbursement Arrangement',
+      retiree_health_benefits: 'Retiree Health Benefits',
+      other_full_benefit_coverage: 'Other full benefit coverage',
+      other_limited_benefit_coverage: 'Other limited benefit coverage'
     }.freeze
 
     ESI_COVERED_KINDS = %w[self self_and_spouse family].freeze
@@ -147,6 +155,45 @@ module FinancialAssistance
         applicants = applications.first.applicants.where('benefits._id' => bson_id)
         applicants.size == 1 ? applicants.first.benefits.find(bson_id) : nil
       end
+
+      # rubocop:disable Metrics/CyclomaticComplexity
+      # rubocop:disable Metrics/PerceivedComplexity
+      # rubocop:disable Metrics/AbcSize
+      def valid_insurance_kinds
+        i_kinds = []
+        i_kinds << "private_individual_and_family_coverage" if FinancialAssistanceRegistry.feature_enabled?(:private_individual_and_family_coverage)
+        i_kinds << "acf_refugee_medical_assistance" if FinancialAssistanceRegistry.feature_enabled?(:acf_refugee_medical_assistance)
+        i_kinds << "americorps_health_benefits" if FinancialAssistanceRegistry.feature_enabled?(:americorps_health_benefits)
+        i_kinds << "child_health_insurance_plan" if FinancialAssistanceRegistry.feature_enabled?(:child_health_insurance_plan)
+        i_kinds << "medicaid" if FinancialAssistanceRegistry.feature_enabled?(:medicaid)
+        i_kinds << "medicare" if FinancialAssistanceRegistry.feature_enabled?(:medicare)
+        i_kinds << "medicare_advantage" if FinancialAssistanceRegistry.feature_enabled?(:medicare_advantage)
+        i_kinds << "medicare_part_b" if FinancialAssistanceRegistry.feature_enabled?(:medicare_part_b)
+        i_kinds << "state_supplementary_payment" if FinancialAssistanceRegistry.feature_enabled?(:state_supplementary_payment)
+        i_kinds << "tricare" if FinancialAssistanceRegistry.feature_enabled?(:tricare)
+        i_kinds << "veterans_benefits" if FinancialAssistanceRegistry.feature_enabled?(:veterans_benefits)
+        i_kinds << "naf_health_benefit_program" if FinancialAssistanceRegistry.feature_enabled?(:naf_health_benefit_program)
+        i_kinds << "health_care_for_peace_corp_volunteers" if FinancialAssistanceRegistry.feature_enabled?(:health_care_for_peace_corp_volunteers)
+        i_kinds << "department_of_defense_non_appropriated_health_benefits" if FinancialAssistanceRegistry.feature_enabled?(:department_of_defense_non_appropriated_health_benefits)
+        i_kinds << "cobra" if FinancialAssistanceRegistry.feature_enabled?(:cobra_benefit_fa)
+        i_kinds << "employer_sponsored_insurance" if FinancialAssistanceRegistry.feature_enabled?(:employer_sponsored_insurance)
+        i_kinds << "self_funded_student_health_coverage" if FinancialAssistanceRegistry.feature_enabled?(:self_funded_student_health_coverage)
+        i_kinds << "foreign_government_health_coverage" if FinancialAssistanceRegistry.feature_enabled?(:foreign_government_health_coverage)
+        i_kinds << "private_health_insurance_plan" if FinancialAssistanceRegistry.feature_enabled?(:private_health_insurance_plan)
+        i_kinds << "coverage_obtained_through_another_exchange" if FinancialAssistanceRegistry.feature_enabled?(:coverage_obtained_through_another_exchange)
+        i_kinds << "coverage_under_the_state_health_benefits_risk_pool" if FinancialAssistanceRegistry.feature_enabled?(:coverage_under_the_state_health_benefits_risk_pool)
+        i_kinds << "veterans_administration_health_benefits" if FinancialAssistanceRegistry.feature_enabled?(:veterans_administration_health_benefits)
+        i_kinds << "peace_corps_health_benefits" if FinancialAssistanceRegistry.feature_enabled?(:peace_corps_health_benefits)
+        i_kinds << "health_reimbursement_arrangement" if FinancialAssistanceRegistry.feature_enabled?(:health_reimbursement_arrangement)
+        i_kinds << "retiree_health_benefits" if FinancialAssistanceRegistry.feature_enabled?(:retiree_health_benefits)
+        i_kinds << "other_full_benefit_coverage" if FinancialAssistanceRegistry.feature_enabled?(:other_full_benefit_coverage)
+        i_kinds << "other_limited_benefit_coverage" if FinancialAssistanceRegistry.feature_enabled?(:other_limited_benefit_coverage)
+
+        i_kinds
+      end
+      # rubocop:enable Metrics/CyclomaticComplexity
+      # rubocop:enable Metrics/PerceivedComplexity
+      # rubocop:enable Metrics/AbcSize
     end
 
     private
