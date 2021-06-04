@@ -41,6 +41,8 @@ Then(/^the other health coverage choices should show$/) do
 end
 
 Given(/^the user checks a health coverage checkbox$/) do
+  skip_this_scenario unless ::FinancialAssistanceRegistry.feature_enabled?(:acf_refugee_medical_assistance)
+
   find(:css, "#insurance_kind[value='acf_refugee_medical_assistance']").set(true)
 end
 
@@ -73,7 +75,7 @@ Then(/^the user saves the health coverage information$/) do
 end
 
 Then(/^the health coverage should be saved on the page$/) do
-  expect(page).to have_content '02/01/2018'
+  expect(page).to have_content '02/01/2018' if FinancialAssistanceRegistry.feature_enabled?(:acf_refugee_medical_assistance)
 end
 
 Then(/^the health coverage checkbox should be unchecked$/) do
