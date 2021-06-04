@@ -25,7 +25,7 @@ class GoldenSeedIndividual < MongoidMigrationTask
   include GoldenSeedHelper
   include GoldenSeedFinancialAssistanceHelper
 
-  attr_accessor :case_collection, :counter_number, :consumer_people_and_users
+  attr_accessor :case_collection, :counter_number, :consumer_people_and_users, :original_person_hbx_ids, :original_enrollment_hbx_ids
 
   def migrate_with_csv
     ivl_csv = File.read(ivl_testbed_scenario_csv)
@@ -41,11 +41,13 @@ class GoldenSeedIndividual < MongoidMigrationTask
       case_collection[person_attributes["case_name"]] = {} if case_included_in_keys.blank?
       case_collection[person_attributes["case_name"]][:person_attributes] = person_attributes
       if case_collection[person_attributes["case_name"]] && primary_family_for_current_case.present?
+        puts("Beginning to create dependent record for #{person_attributes['case_name']}") unless Rails.env.test?
         dependent_record = generate_and_return_dependent_record(case_collection[person_attributes["case_name"]])
         case_collection[person_attributes["case_name"]][:dependents] = [] if case_collection[person_attributes["case_name"]][:dependents].blank?
         case_collection[person_attributes["case_name"]][:dependents] << dependent_record
         case_collection[person_attributes["case_name"]][:person_attributes][:current_target_person] = dependent_record
         if fa_enabled_and_required_for_case
+          puts("Beginning to create FA Applicant record for #{person_attributes['case_name']}") unless Rails.env.test?
           applicant_record = create_and_return_fa_applicant(case_collection[person_attributes["case_name"]])
           case_collection[person_attributes["case_name"]][:target_fa_applicant] = applicant_record
           case_collection[person_attributes["case_name"]][:fa_applicants] = [] unless case_collection[person_attributes["case_name"]][:applicants].is_a?(Array)
@@ -59,13 +61,16 @@ class GoldenSeedIndividual < MongoidMigrationTask
           add_applicant_mec_response(case_info_hash)
         end
       else
+        puts("Beginning to create records for consumer role record for #{person_attributes['case_name']}") unless Rails.env.test?
         case_collection[person_attributes["case_name"]] = create_and_return_matched_consumer_and_hash(
           case_collection[person_attributes["case_name"]]
         )
         consumer_people_and_users[case_collection[person_attributes["case_name"]][:primary_person_record].full_name] = case_collection[person_attributes["case_name"]][:user_record]
+        puts("Beginning to create HBX Enrollment record for #{person_attributes['case_name']}") unless Rails.env.test?
         generate_and_return_hbx_enrollment(case_collection[person_attributes["case_name"]])
         case_collection[person_attributes["case_name"]][:person_attributes][:current_target_person] = case_collection[person_attributes["case_name"]][:primary_person_record]
         if fa_enabled_and_required_for_case
+          puts("Beginning to create Financial Assisstance application record for #{person_attributes['case_name']}") unless Rails.env.test?
           application = create_and_return_fa_application(case_collection[person_attributes["case_name"]])
           case_collection[person_attributes["case_name"]][:fa_application] = application
           applicant_record = create_and_return_fa_applicant(case_collection[person_attributes["case_name"]], true)
@@ -77,6 +82,8 @@ class GoldenSeedIndividual < MongoidMigrationTask
       end
       @counter_number += 1
     end
+    update_person_hbx_ids
+    update_enrollment_hbx_ids
     return unless EnrollRegistry.feature_enabled?(:financial_assistance)
     unless Rails.env.test?
       puts(
@@ -86,6 +93,7 @@ class GoldenSeedIndividual < MongoidMigrationTask
     end
     case_collection.each do |case_array|
       next unless case_array[1][:fa_application]
+      puts("Beginning to create FA relationships records") unless Rails.env.test?
       create_fa_relationships(case_array)
       # TODO: We will submit later
       # puts("Submitting financial assistance application.") unless Rails.env.test?
@@ -121,6 +129,8 @@ class GoldenSeedIndividual < MongoidMigrationTask
   def migrate
     @case_collection = {}
     @counter_number = 0
+    @original_enrollment_hbx_ids = []
+    @original_person_hbx_ids = []
     puts('Executing Golden Seed IVL migration migration.') unless Rails.env.test?
     puts("Site present, using existing site.") if site.present? && !Rails.env.test?
     ::BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_empty_benefit_market if site.blank?
@@ -129,11 +139,23 @@ class GoldenSeedIndividual < MongoidMigrationTask
     create_and_return_service_area_and_product if ivl_products.blank?
     create_and_return_ivl_hbx_profile_and_sponsorship
     @consumer_people_and_users = {}
+    Person.skip_callback(:create, :after, :notify_created)
+    Person.skip_callback(:update, :after, :notify_updated)
+    Person.skip_callback(:update, :after, :person_create_or_update_handler)
+    PersonRelationship.skip_callback(:save, :after, :notify_updated)
+    HbxEnrollment.skip_callback(:save, :after, :notify_on_save)
+    FinancialAssistance::Relationship.skip_callback(:create, :after, :propagate_applicant) if EnrollRegistry.feature_enabled?(:financial_assistance)
     if ivl_testbed_scenario_csv
       migrate_with_csv
     else
       migrate_without_csv
     end
+    Person.set_callback(:create, :after, :notify_created)
+    Person.set_callback(:update, :after, :notify_updated)
+    Person.set_callback(:update, :after, :person_create_or_update_handler)
+    PersonRelationship.set_callback(:save, :after, :notify_updated)
+    HbxEnrollment.set_callback(:save, :after, :notify_on_save)
+    FinancialAssistance::Relationship.set_callback(:create, :after, :propagate_applicant) if EnrollRegistry.feature_enabled?(:financial_assistance)
     puts("Site present for: #{BenefitSponsors::Site.all.map(&:site_key)}") if BenefitSponsors::Site.present? && !Rails.env.test?
     puts("Golden Seed IVL migration complete. All consumer roles are:") unless Rails.env.test?
     consumer_people_and_users.each do |person_full_name, user_record|

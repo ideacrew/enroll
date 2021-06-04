@@ -23,6 +23,24 @@ module GoldenSeedHelper
     @site = BenefitSponsors::Site.all.first
   end
 
+  def update_person_hbx_ids
+    @original_person_hbx_ids.each do |original_hbx_id|
+      puts("Updating original hbx id #{original_hbx_id}")
+      person_record = Person.find_by(hbx_id: original_hbx_id)
+      person_record.update_attributes!(hbx_id: HbxIdGenerator.generate_member_id)
+      puts("Person record now updated too #{person_record.hbx_id} from #{original_hbx_id}")
+    end
+  end
+
+  def update_enrollment_hbx_ids
+    @original_enrollment_hbx_ids.each do |original_hbx_id|
+      puts("Updating original enrollment hbx id #{original_hbx_id}")
+      enrollment_record = HbxEnrollment.find_by(hbx_id: original_hbx_id)
+      enrollment_record.update_attributes!(hbx_id: HbxIdGenerator.generate_policy_id)
+      puts("Enrollment record now updated too #{enrollment_record.hbx_id} from #{original_hbx_id}")
+    end
+  end
+
   # Only get up to date IVL products
   def ivl_products
     date_range = TimeKeeper.date_of_record.beginning_of_year..TimeKeeper.date_of_record.end_of_year
@@ -103,10 +121,8 @@ module GoldenSeedHelper
   # rubocop:disable Metrics/AbcSize
   # rubocop:disable Metrics/CyclomaticComplexity
   # rubocop:disable Metrics/MethodLength
+  # rubocop:disable Metrics/PerceivedComplexity
   def create_and_return_person(case_info_hash = {}, dependent = nil)
-    Person.skip_callback(:create, :after, :notify_created)
-    Person.skip_callback(:update, :after, :notify_updated)
-
     gender = case_info_hash[:person_attributes]['gender']&.downcase || Person::GENDER_KINDS.sample
     last_name = if dependent
                   case_info_hash[:primary_person_record].last_name
@@ -118,8 +134,10 @@ module GoldenSeedHelper
       last_name: last_name,
       gender: gender,
       ssn: generate_and_return_unique_ssn,
-      dob: generate_random_birthday(case_info_hash)
+      dob: generate_random_birthday(case_info_hash),
+      hbx_id: SecureRandom.hex # To avoid external hbx id calls
     )
+    @original_person_hbx_ids << person.hbx_id
     person.save!
     raise("Unable to save person.") unless person.save
     # Set residency type
@@ -161,13 +179,13 @@ module GoldenSeedHelper
     person.is_applying_for_assistance = truthy_value?(applying_for_assistance)
     # To avoid timeouts not do notify callbacks
     person.save!
-    Person.set_callback(:create, :after, :notify_created)
-    Person.set_callback(:update, :after, :notify_updated)
+    puts("Person record creation complete.") unless Rails.env.test?
     person
   end
   # rubocop:enable Metrics/AbcSize
   # rubocop:enable Metrics/CyclomaticComplexity
   # rubocop:enable Metrics/MethodLength
+  # rubocop:enable Metrics/PerceivedComplexity
 
   # TODO: Need to figure out the primary applicant thing on spreadsheet
   def create_and_return_family(case_info_hash = {})
@@ -182,6 +200,7 @@ module GoldenSeedHelper
     family
   end
 
+  # rubocop:disable Metrics/AbcSize
   def create_and_return_user(case_info_hash = {})
     providers = ["gmail", "yahoo", "hotmail"]
     email = if case_info_hash[:person_attributes]['email']&.include?(".com")
@@ -203,19 +222,22 @@ module GoldenSeedHelper
     user.oim_id = email
     user.password = "P@ssw0rd!"
     user.person = person_record
+
+    user.person.consumer_role.skip_residency_verification = true if user.person.consumer_role
     user_saved = user.save
     5.times do
       break if user_saved == true
       user.email = FFaker::Internet.email
+      user.person.consumer_role.skip_residency_verification = true if user.person.consumer_role
       user_saved = user.save
     end
     puts("Unable to generate user for #{case_info_hash[:primary_person_record].full_name}, email already taken.") unless user_saved == true
     user
   end
+  # rubocop:enable Metrics/AbcSize
 
   def generate_and_return_dependent_record(case_info_hash)
     dependent_person = create_and_return_person(case_info_hash, true)
-
     fm = FamilyMember.new(
       family: case_info_hash[:family_record],
       person_id: dependent_person.id,
@@ -281,14 +303,15 @@ module GoldenSeedHelper
 
   def create_and_return_consumer_role(case_info_hash = {})
     consumer_role = case_info_hash[:primary_person_record].build_consumer_role
+    # attr_accessssor to skip certain validations
+    consumer_role.skip_residency_verification = true
     consumer_role.is_applicant = truthy_value?(case_info_hash[:person_attributes][:is_primary_applicant?])
-    consumer_role.save!
-    raise("Unable to save consumer role") unless consumer_role.persisted?
+
     # Active consumer role
     ivl_market_transition = IndividualMarketTransition.new(
       role_type: 'consumer',
       reason_code: 'initial_individual_market_transition_created_using_data_migration',
-      effective_starting_on: consumer_role.created_at.to_date,
+      effective_starting_on: ::TimeKeeper.datetime_of_record,
       submitted_at: ::TimeKeeper.datetime_of_record
     )
     case_info_hash[:primary_person_record].individual_market_transitions << ivl_market_transition
@@ -297,7 +320,10 @@ module GoldenSeedHelper
     consumer_role.us_citizen = true
     consumer_role.citizen_status = "us_citizen"
     consumer_role.citizenship_result = "us_citizen"
+    consumer_role.skip_residency_verification = true
     consumer_role.save!
+    # attr_accessssor to skip certain validations
+    consumer_role.skip_residency_verification = true
     # Verification types needed
     verification_type = VerificationType.new
     verification_type.validation_status = 'verified'
@@ -316,9 +342,13 @@ module GoldenSeedHelper
     gender = case_info_hash[:person_attributes][:gender]&.downcase || Person::GENDER_KINDS.sample
     case_info_hash[:person_attributes]["first_name"] = FFaker::Name.send("first_name_#{gender}")
     case_info_hash[:person_attributes]["last_name"] = FFaker::Name.last_name
+    puts("Beginning to create person record.") unless Rails.env.test?
     case_info_hash[:primary_person_record] = create_and_return_person(case_info_hash)
+    puts("Beginning to create family recoord.") unless Rails.env.test?
     case_info_hash[:family_record] = create_and_return_family(case_info_hash)
+    puts("Beginning to create user record.") unless Rails.env.test?
     case_info_hash[:user_record] = create_and_return_user(case_info_hash)
+    puts("Beginning to create consumer roole record.") unless Rails.env.test?
     case_info_hash[:consumer_role_record] = create_and_return_consumer_role(case_info_hash)
     case_info_hash
   end
@@ -369,8 +399,12 @@ module GoldenSeedHelper
   # rubocop:disable Metrics/AbcSize
   def generate_and_return_hbx_enrollment(case_info_hash)
     consumer_role = case_info_hash[:consumer_role_record]
+    # attr_accessssor to skip certain validations
+    consumer_role.skip_residency_verification = true
     effective_on = TimeKeeper.date_of_record
     enrollment = HbxEnrollment.new(kind: "individual", consumer_role_id: consumer_role.id)
+    enrollment.hbx_id = SecureRandom.hex # To avoid external hbx id calls
+    @original_enrollment_hbx_ids << enrollment.hbx_id
     enrollment.effective_on = effective_on
     # A new product will be created for this rake task if there are none present.
     # Otherwise, a random one will be selected
@@ -384,9 +418,14 @@ module GoldenSeedHelper
     end
     aptc_present = truthy_value?(case_info_hash[:person_attributes]['aptc_amount'])
     enrollment.applied_aptc_amount = case_info_hash[:person_attributes]['aptc_amount'].gsub("$", '').strip if aptc_present
+    # attr_accessssor to skip certain validations
+    consumer_role.skip_residency_verification = true
     consumer_role.person.primary_family.active_household.hbx_enrollments << enrollment
     consumer_role.person.primary_family.active_household.save!
-    enrollment.select_coverage! if enrollment.save!
+    # attr_accessssor to skip certain validations
+    consumer_role.skip_residency_verification = true
+    enrollment.save!
+    consumer_role.skip_residency_verification = true
     # IT comes off as "unverified" after this. Why?
     enrollment.update_attributes!(aasm_state: 'coverage_selected')
     puts("#{enrollment.aasm_state} HBX Enrollment created for #{consumer_role.person.full_name}") unless Rails.env.test?
