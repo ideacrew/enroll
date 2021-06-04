@@ -41,11 +41,9 @@ Then(/^the other health coverage choices should show$/) do
 end
 
 Given(/^the user checks a health coverage checkbox$/) do
-  if FinancialAssistanceRegistry.feature_enabled?(:acf_refugee_medical_assistance)
-    find(:css, "#insurance_kind[value='acf_refugee_medical_assistance']").set(true)
-  else
-    expect(page).not_to have_css("#insurance_kind[value='acf_refugee_medical_assistance']")
-  end
+  skip_this_scenario unless ::FinancialAssistanceRegistry.feature_enabled?(:acf_refugee_medical_assistance)
+
+  find(:css, "#insurance_kind[value='acf_refugee_medical_assistance']").set(true)
 end
 
 And(/^the user checks a employer sponsored health coverage checkbox$/) do
@@ -61,27 +59,19 @@ Then(/^the user should be see proper text in the modal popup$/) do
 end
 
 Then(/^the health coverage form should show$/) do
-  if FinancialAssistanceRegistry.feature_enabled?(:acf_refugee_medical_assistance)
-    expect(page).to have_xpath("//*[@id='acf_refugee_medical_assistance']/div[2]/div")
-  else
-    expect(page).not_to have_xpath("//*[@id='acf_refugee_medical_assistance']/div[2]/div")
-  end
+  expect(page).to have_xpath("//*[@id='acf_refugee_medical_assistance']/div[2]/div")
 end
 
 Then(/^the other health coverage form should show$/) do
-  if FinancialAssistanceRegistry.feature_enabled?(:acf_refugee_medical_assistance)
-    expect(page).to have_xpath("//*[@id='acf_refugee_medical_assistance']/div[2]")
-  else
-    expect(page).not_to have_xpath("//*[@id='acf_refugee_medical_assistance']/div[2]")
-  end
+  expect(page).to have_xpath("//*[@id='acf_refugee_medical_assistance']/div[2]")
 end
 
 Given(/^the user fills out the required health coverage information$/) do
-  fill_in 'benefit[start_on]', with: "02/01/2018" if FinancialAssistanceRegistry.feature_enabled?(:acf_refugee_medical_assistance)
+  fill_in 'benefit[start_on]', with: "02/01/2018"
 end
 
 Then(/^the user saves the health coverage information$/) do
-  click_button 'Save' if FinancialAssistanceRegistry.feature_enabled?(:acf_refugee_medical_assistance)
+  click_button 'Save'
 end
 
 Then(/^the health coverage should be saved on the page$/) do
@@ -89,11 +79,7 @@ Then(/^the health coverage should be saved on the page$/) do
 end
 
 Then(/^the health coverage checkbox should be unchecked$/) do
-  if FinancialAssistanceRegistry.feature_enabled?(:acf_refugee_medical_assistance)
-    expect(find(:css, "#insurance_kind[value='acf_refugee_medical_assistance']")).not_to be_checked
-  else
-    expect(page).not_to have_css("#insurance_kind[value='acf_refugee_medical_assistance']")
-  end
+  expect(find(:css, "#insurance_kind[value='acf_refugee_medical_assistance']")).not_to be_checked
 end
 
 Then(/^the health coverage form should not show$/) do
