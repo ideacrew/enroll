@@ -103,6 +103,7 @@ module FinancialAssistance
       set_admin_bookmark_url
       @application = ::FinancialAssistance::Application.find_by(id: params[:id], family_id: get_current_person.financial_assistance_identifier)
       @all_relationships = @application.relationships
+      @application.calculate_total_net_income_for_applicants
       @applicants = @application.active_applicants if @application.present?
       redirect_to applications_path if @application.blank?
     end

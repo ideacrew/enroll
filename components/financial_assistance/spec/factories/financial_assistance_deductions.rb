@@ -2,7 +2,6 @@
 
 FactoryBot.define do
   factory :financial_assistance_deduction, class: '::FinancialAssistance::Deduction' do
-    association :applicant
     title { 'Test' }
     amount { 10 }
     frequency_kind { 'monthly' }
