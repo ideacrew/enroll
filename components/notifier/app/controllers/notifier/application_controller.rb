@@ -11,7 +11,7 @@ module Notifier
       flash[:warning] = "Session expired."
       respond_to do |format|
         format.html { redirect_to main_app.root_path }
-        format.js   { render text: "window.location.assign('#{main_app.root_path}');" }
+        format.js   { render plain: "window.location.assign('#{root_path}');" }
         format.json { redirect_to main_app.root_path }
       end
     end
