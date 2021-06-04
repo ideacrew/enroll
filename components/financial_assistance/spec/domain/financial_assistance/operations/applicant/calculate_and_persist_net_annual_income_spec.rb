@@ -30,6 +30,7 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CalculateAndPersistNe
       result = subject.call(params)
       expect(result).not_to be_success
       expect(result.failure).to eq "Invalid applicant"
+      expect(applicant.net_annual_income).to eq nil
     end
   end
 
@@ -40,6 +41,7 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CalculateAndPersistNe
       result = subject.call(params)
       expect(result).not_to be_success
       expect(result.failure).to eq "Invalid applicant"
+      expect(applicant.net_annual_income).to eq nil
     end
   end
 
