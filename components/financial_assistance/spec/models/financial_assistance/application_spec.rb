@@ -685,6 +685,72 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     end
   end
 
+  context '#calculate_total_net_income_for_applicants' do
+    let(:family_id)    { BSON::ObjectId.new }
+    let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family_id, aasm_state: "draft") }
+    let(:applicant) do
+      FactoryBot.create(:financial_assistance_applicant,
+                        application: application,
+                        ssn: '889984400',
+                        dob: Date.new(1993,12,9),
+                        first_name: 'james',
+                        last_name: 'bond')
+    end
+
+    let(:income) do
+      FactoryBot.build(:financial_assistance_income, amount: 200, frequency_kind: "biweekly")
+    end
+
+    let(:deduction) do
+      FactoryBot.build(:financial_assistance_deduction, amount: 100, frequency_kind: "biweekly")
+    end
+
+    context "application does not have any active applicants" do
+      before do
+        applicant.update_attributes(is_active: false)
+      end
+
+      it 'should not update net annual income for applicant' do
+        application.calculate_total_net_income_for_applicants
+        expect(applicant.net_annual_income).to eq nil
+      end
+    end
+
+    context "No incomes and only deductions" do
+      before do
+        applicant.deductions << deduction
+      end
+
+      it 'should calculate and persist net annual income on applicant' do
+        application.calculate_total_net_income_for_applicants
+        expect(applicant.net_annual_income.to_f).to eq -2600.00
+      end
+    end
+
+    context "No deductions and only incomes" do
+      before do
+        applicant.incomes << income
+      end
+
+      it 'should calculate and persist net annual income on applicant' do
+        application.calculate_total_net_income_for_applicants
+        expect(applicant.net_annual_income.to_f).to eq 5200.00
+      end
+    end
+
+    context "Both deductions and incomes" do
+      before do
+        applicant.incomes << income
+        applicant.deductions << deduction
+      end
+
+      it 'should calculate and persist net annual income on applicant' do
+        application.calculate_total_net_income_for_applicants
+        expect(applicant.net_annual_income.to_f).to eq 2600.00
+      end
+    end
+  end
+
   context 'other questions' do
     let!(:applicant) do
       FactoryBot.create(:applicant,
