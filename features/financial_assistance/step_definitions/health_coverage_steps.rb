@@ -46,6 +46,12 @@ Given(/^the user checks a health coverage checkbox$/) do
   find(:css, "#insurance_kind[value='acf_refugee_medical_assistance']").set(true)
 end
 
+Given(/^the user checks a hra checkbox$/) do
+  skip_this_scenario unless ::FinancialAssistanceRegistry.feature_enabled?(:health_reimbursement_arrangement)
+
+  find(:css, "#insurance_kind[value='health_reimbursement_arrangement']").set(true)
+end
+
 And(/^the user checks a employer sponsored health coverage checkbox$/) do
   find(:css, "#insurance_kind[value='employer_sponsored_insurance']").set(true)
 end
@@ -68,6 +74,24 @@ end
 
 Given(/^the user fills out the required health coverage information$/) do
   fill_in 'benefit[start_on]', with: "02/01/2018"
+end
+
+And(/^the user fills out the required hra form$/) do
+  fill_in 'benefit_employer_name', with: "Test Employer"
+  fill_in 'benefit_employer_address_address_1', with: "Address line1"
+  fill_in 'benefit_employer_address_city', with: "Test"
+  page.find('.selectric-interaction-choice-control-benefit-employer-address-state').click
+  page.all('li').detect { |li| li.text == "DC" }.click
+  fill_in 'benefit_employer_address_zip', with: "28102"
+  fill_in 'benefit_employer_phone_full_phone_number', with: "2810229201"
+  fill_in 'benefit_employer_id', with: "382918294"
+  page.find('.selectric-interaction-choice-control-benefit-esi-covered').click
+  page.all('li').detect { |li| li.text == "Individual coverage HRA" }.click
+  fill_in 'benefit_employer_id', with: "382918294"
+  fill_in 'benefit[start_on]', with: "02/01/2018"
+  fill_in 'benefit_employee_cost', with: "2000"
+  page.find('.selectric-interaction-choice-control-benefit-employee-cost-frequency').click
+  page.all('li').detect { |li| li.text == "Weekly" }.click
 end
 
 Then(/^the user saves the health coverage information$/) do
