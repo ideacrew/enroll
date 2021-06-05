@@ -193,7 +193,7 @@ RSpec.describe TaxHousehold, type: :model do
     context 'when family members unchecked' do
       let(:total_benchmark_amount) { 60 }
       before do
-        allow(tax_household).to receive(:unwanted_family_members).and_return [member_ids.first.to_s]
+        allow(tax_household).to receive(:unwanted_family_members).and_return [family.active_family_members[0]]
         allow(tax_household).to receive(:total_benchmark_amount).and_return total_benchmark_amount
         allow(tax_household).to receive(:is_all_non_aptc?).and_return false
         allow(tax_household).to receive(:find_aptc_family_members).and_return true
@@ -224,6 +224,21 @@ RSpec.describe TaxHousehold, type: :model do
       it 'should return monthly aggregate amount' do
         expect(@result).to eq(294)
       end
+    end
+  end
+
+  context '#find_aptc_tax_household_members' do
+    let!(:person) {FactoryBot.create(:person, :with_family)}
+    let!(:family) {person.primary_family}
+    let!(:family_member1) {FactoryBot.create(:family_member, family: person.primary_family)}
+    let!(:family_member2) {FactoryBot.create(:family_member, family: person.primary_family)}
+    let!(:tax_household) {FactoryBot.create(:tax_household, household: family.active_household, created_at: TimeKeeper.date_of_record - 5.months)}
+    let!(:tax_household_member1) {tax_household.tax_household_members.create!(is_ia_eligible: true, applicant_id: person.primary_family.family_members[0].id)}
+    let!(:tax_household_member2) {tax_household.tax_household_members.create!(is_ia_eligible: true, applicant_id: family_member1.id)}
+    let!(:tax_household_member3) {tax_household.tax_household_members.create!(is_ia_eligible: false, is_medicaid_chip_eligible: true, applicant_id: family_member2.id)}
+
+    it 'should return eligible tax household members' do
+      expect(tax_household.find_aptc_tax_household_members([family_member1, family_member2])).to eq([tax_household_member2])
     end
   end
 

@@ -93,25 +93,6 @@ class FamilyMember
     # TODO parent.households.coverage_households.where()
   end
 
-  def benchmark_product_details_for(effective_date)
-    result = Operations::Products::FetchSlcsp.new.call(family: family, family_member_id: self.id, effective_date: effective_date)
-    if result.success?
-      result.success
-    else
-      raise result.failure
-    end
-  end
-
-  def aptc_benchmark_amount(enrollment)
-    date = enrollment.effective_on
-    slcsp_id = benchmark_product_details_for(date)[:product_id]
-    benchmark_product = BenefitMarkets::Products::Product.find(slcsp_id)
-    ehb = benchmark_product.ehb
-    product = product_factory.new({product_id: slcsp_id})
-    cost = product.cost_for(date, person.age_on(date))
-    round_down_float_two_decimals(cost * ehb)
-  end
-
   def broker=(new_broker)
     return unless new_broker.is_a? BrokerRole
     self.broker_role_id = new_broker._id

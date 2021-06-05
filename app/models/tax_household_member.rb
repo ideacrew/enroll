@@ -84,6 +84,25 @@ class TaxHouseholdMember
     @person = family_member.person
   end
 
+  def benchmark_product_details_for(effective_date)
+    result = Operations::Products::DetermineSlcspForTaxHouseholdMember.new.call(effective_date: effective_date, tax_household_member: self)
+    if result.success?
+      result.success
+    else
+      raise result.failure
+    end
+  end
+
+  def aptc_benchmark_amount(enrollment)
+    date = enrollment.effective_on
+    slcsp_id = benchmark_product_details_for(date)[:product_id]
+    benchmark_product = BenefitMarkets::Products::Product.find(slcsp_id)
+    ehb = benchmark_product.ehb
+    product = ::BenefitMarkets::Products::ProductFactory.new({product_id: slcsp_id})
+    cost = product.cost_for(date, person.age_on(date))
+    round_down_float_two_decimals(cost * ehb)
+  end
+
   def age_on_effective_date
     return @age_on_effective_date unless @age_on_effective_date.blank?
     dob = person.dob
