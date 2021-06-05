@@ -97,3 +97,11 @@ Feature: Start a new Financial Assistance Application and answers questions on h
     Then they should see the MaineCare ineligible question
     Then they clicks yes for MaineCare ineligible
     Then they should see the immigration status question
+
+  Scenario: User enters hra information (currently have coverage)
+    Given the user answers yes to currently having health coverage
+    And the user checks a hra checkbox
+    And the user fills out the required hra form
+    Then the save button should be enabled
+    And the user saves the health coverage information
+    Then the health coverage should be saved on the page
