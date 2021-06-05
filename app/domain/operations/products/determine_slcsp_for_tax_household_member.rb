@@ -78,7 +78,7 @@ module Operations
         if silver_products.success?
           silver_products
         else
-          Failure("unable to fetch silver_products for give effective_date: #{effective_date},  county: #{adress.county}, zip: #{county.zip}")
+          Failure("unable to fetch silver_products for give effective_date: #{effective_date},  county: #{address.county}, zip: #{county.zip}")
         end
       end
 
