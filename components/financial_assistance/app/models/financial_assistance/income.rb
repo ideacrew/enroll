@@ -45,6 +45,8 @@ module FinancialAssistance
     UNEMPLOYMENT_INCOME_KIND = 'unemployment_income'
     FREQUENCY_KINDS = %w[biweekly daily half_yearly monthly quarterly weekly yearly].freeze
 
+    NEGATIVE_AMOUNT_INCOME_TYPE_KINDS = %w(net_self_employment capital_gains farming_and_fishing)
+
     OTHER_INCOME_TYPE_KIND = {
       alimony_and_maintenance: 'Alimony received',
       capital_gains: 'Capital gains',
@@ -96,7 +98,7 @@ module FinancialAssistance
                        numericality: {
                          greater_than: 0, message: "%{value} must be greater than $0"
                        },
-                       on: [:step_1, :submission]
+              on: [:step_1, :submission], unless: :negative_income_accepted?
 
     validates :kind, presence: true,
                      inclusion: {
@@ -125,6 +127,10 @@ module FinancialAssistance
         && end_on == other.end_on \
         && is_projected == other.is_projected \
         && submitted_at == other.submitted_at
+    end
+
+    def negative_income_accepted?
+      NEGATIVE_AMOUNT_INCOME_TYPE_KINDS.include?(kind)
     end
 
     def <=>(other)
