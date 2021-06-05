@@ -145,6 +145,10 @@ class TaxHousehold
     end
   end
 
+  def find_aptc_tax_household_members(family_members)
+    tax_household_members.where(:applicant_id.in => family_members.pluck(:id), is_ia_eligible: true)
+  end
+
   # to get family members from given enrollment
   def find_enrolling_fms hbx_enrollment
     hbx_enrollment.hbx_enrollment_members.map(&:family_member)
@@ -170,8 +174,8 @@ class TaxHousehold
       sum + (member_aptc_hash[member.id.to_s] || 0)
     end
     family_members = unwanted_family_members(hbx_enrollment)
-    unchecked_aptc_fms = find_aptc_family_members(family_members)
-    deduction_amount = total_benchmark_amount(unchecked_aptc_fms, hbx_enrollment) if unchecked_aptc_fms
+    unchecked_aptc_thhms = find_aptc_tax_household_members(family_members)
+    deduction_amount = total_benchmark_amount(unchecked_aptc_thhms, hbx_enrollment) if unchecked_aptc_thhms
     total = total - deduction_amount
     (total < 0.00) ? 0.00 : float_fix(total)
   end
@@ -191,10 +195,10 @@ class TaxHousehold
     float_fix(monthly_max_aggregate)
   end
 
-  def total_benchmark_amount(family_members, hbx_enrollment)
+  def total_benchmark_amount(tax_household_members, hbx_enrollment)
     total_sum = 0
-    family_members.each do |family_member|
-      total_sum += family_member.aptc_benchmark_amount(hbx_enrollment)
+    tax_household_members.each do |tax_household_member|
+      total_sum += tax_household_member.aptc_benchmark_amount(hbx_enrollment)
     end
     total_sum
   end
