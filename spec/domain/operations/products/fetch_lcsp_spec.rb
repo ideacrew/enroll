@@ -35,23 +35,36 @@ RSpec.describe ::Operations::Products::FetchLcsp, dbclean: :after_each do
       }
     end
 
+    let!(:product) do
+      FactoryBot.create(
+        :benefit_markets_products_health_products_health_product,
+        :with_issuer_profile,
+        benefit_market_kind: :aca_individual,
+        kind: :health,
+        csr_variant_id: '01',
+        metal_level_kind: 'silver',
+        application_period: effective_date.beginning_of_year..effective_date.end_of_year
+      )
+    end
+
+    let(:silver_products) do
+      BenefitMarkets::Products::Product.where(id: product.id)
+    end
+
     let(:silver_product_premiums) do
       {
         family_member_id => [
-          { :cost => 200.0, :product_id => BSON::ObjectId.new },
-          { :cost => 300.0, :product_id => BSON::ObjectId.new },
-          { :cost => 400.0, :product_id => BSON::ObjectId.new }
+          { :cost => 300.0, :product_id => BSON::ObjectId.new }
         ]
       }
     end
 
     let!(:list_products) { FactoryBot.create_list(:benefit_markets_products_health_products_health_product, 5, :silver) }
 
-    let(:products) { ::BenefitMarkets::Products::Product.all }
     let(:products_payload) do
       {
         rating_area_id: BSON::ObjectId.new,
-        products: products
+        products: silver_products
       }
     end
 
@@ -59,7 +72,6 @@ RSpec.describe ::Operations::Products::FetchLcsp, dbclean: :after_each do
       allow(Operations::Products::FetchSilverProducts).to receive(:new).and_return double(call: ::Dry::Monads::Result::Success.new(products_payload))
       allow(Operations::Products::FetchSilverProductPremiums).to receive(:new).and_return double(call: ::Dry::Monads::Result::Success.new(silver_product_premiums))
     end
-
 
     it 'should return success' do
       result = subject.call(params)
@@ -74,7 +86,7 @@ RSpec.describe ::Operations::Products::FetchLcsp, dbclean: :after_each do
 
     it 'should return premium & product id of lowest plan' do
       values = subject.call(params).value![[rating_address.id.to_s]][:health_only][family_member_id]
-      expect(values[:cost]).to eq 200.0
+      expect(values[:cost]).to eq 300.0
       expect(values[:product_id]).not_to eq nil
     end
   end
