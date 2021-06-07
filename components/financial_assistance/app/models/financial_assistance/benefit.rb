@@ -84,6 +84,7 @@ module FinancialAssistance
     field :esi_covered, type: String
     field :kind, type: String
     field :insurance_kind, type: String
+    field :hra_type, type: String
 
     field :is_employer_sponsored, type: Boolean
     field :is_esi_waiting_period, type: Boolean
