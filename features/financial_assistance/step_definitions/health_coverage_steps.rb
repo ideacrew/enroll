@@ -85,7 +85,7 @@ And(/^the user fills out the required hra form$/) do
   fill_in 'benefit_employer_address_zip', with: "28102"
   fill_in 'benefit_employer_phone_full_phone_number', with: "2810229201"
   fill_in 'benefit_employer_id', with: "382918294"
-  page.find('.selectric-interaction-choice-control-benefit-esi-covered').click
+  page.find('.selectric-interaction-choice-control-benefit-hra-type').click
   page.all('li').detect { |li| li.text == "Individual coverage HRA" }.click
   fill_in 'benefit_employer_id', with: "382918294"
   fill_in 'benefit[start_on]', with: "02/01/2018"
