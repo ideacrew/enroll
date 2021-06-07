@@ -10,7 +10,7 @@ RSpec.describe L10nHelper, :type => :helper do
   end
 
   it "should handle non existent translations gracefully" do
-    expect(helper.l10n('Pizza')).to eq("Translation Missing for Pizza")
+    expect(helper.l10n('Pizza')).to eq("Pizza")
   end
 
   it "should handle non string translation keys gracefully" do
@@ -27,7 +27,7 @@ RSpec.describe L10nHelper, :type => :helper do
     end
     context "non exiting translations" do
       it "should handle everything passed" do
-        expect(l10n('fake_translation', fake_key: "Fake")).to eq("Translation Missing for fake_translation")
+        expect(l10n('fake_translation', fake_key: "Fake")).to eq("Fake Translation")
       end
     end
   end
