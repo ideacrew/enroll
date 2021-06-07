@@ -21,6 +21,9 @@ RSpec.configure do |config|
         title: 'API V1',
         version: 'v1'
       },
+      components: {
+        schemas: { }
+      },
       paths: {},
       servers: [
         {
@@ -41,3 +44,6 @@ RSpec.configure do |config|
   # Defaults to json. Accepts ':json' and ':yaml'.
   config.swagger_format = :yaml
 end
+
+# Load other schema definitions like: components/financial_assistance/spec/schemas/api_schemas.rb
+Dir[Rails.root.join("components/financial_assistance/spec/schemas/*.rb")].each { |f| require f }
