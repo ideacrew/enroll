@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe ::Operations::Products::FetchSilverProductPremiums, dbclean: :after_each do
+RSpec.describe ::Operations::Products::FetchSilverProducts, dbclean: :after_each do
 
   it 'should be a container-ready operation' do
     expect(subject.respond_to?(:call)).to be_truthy
@@ -24,32 +24,17 @@ RSpec.describe ::Operations::Products::FetchSilverProductPremiums, dbclean: :aft
 
     let(:person) { FactoryBot.create(:person, :with_consumer_role) }
     let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+    let(:rating_address) { person.consumer_role.rating_address }
 
-    let!(:products) { FactoryBot.create_list(:benefit_markets_products_health_products_health_product, 1, :silver) }
-    let(:premium_table) { products.first.premium_tables.first }
-    let(:rating_area_id) { premium_table.rating_area_id }
-
+    let!(:products) { FactoryBot.create_list(:benefit_markets_products_health_products_health_product, 5, :silver) }
     let(:effective_date) { TimeKeeper.date_of_record }
 
     let(:params) do
       {
-        products: products,
-        family: family,
-        effective_date: effective_date,
-        rating_area_id: rating_area_id
+        address: rating_address,
+        effective_date: effective_date
       }
     end
-
-    # context 'when no address found' do
-    #   before :each do
-    #     person.addresses.destroy_all
-    #   end
-
-    #   it 'should return failure' do
-    #     result = subject.call(params)
-    #     expect(result.failure?).to eq true
-    #   end
-    # end
 
     context 'when address, rating area, service area exists' do
 
