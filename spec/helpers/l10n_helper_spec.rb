@@ -2,6 +2,7 @@
 
 require "rails_helper"
 
+# Enroll Translations load by default before RSpec
 RSpec.describe L10nHelper, :type => :helper do
   # All translations are configured to load before every rspec
   it "should translate existing translations" do
@@ -9,11 +10,25 @@ RSpec.describe L10nHelper, :type => :helper do
   end
 
   it "should handle non existent translations gracefully" do
-    expect(helper.l10n('pizza')).to eq("Pizza")
+    expect(helper.l10n('Pizza')).to eq("Translation Missing for Pizza")
   end
 
   it "should handle non string translation keys gracefully" do
     expect(helper.l10n({:formats => {:default => "%m/%d/%Y"}})).to eq('Translation Missing')
+  end
 
+  context "interpolated keys" do
+    context "existing translations" do
+      it "should handle key with string passed" do
+        expect(
+          l10n('devise.login_history.admin.history_for_user', email: "fakeemail@gmail.com")
+        ).to eq("Login history for fakeemail@gmail.com")
+      end
+    end
+    context "non exiting translations" do
+      it "should handle everything passed" do
+        expect(l10n('fake_translation', fake_key: "Fake")).to eq("Translation Missing for fake_translation")
+      end
+    end
   end
 end
