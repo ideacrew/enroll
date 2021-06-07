@@ -126,8 +126,8 @@
     <% if insurance_kind == 'health_reimbursement_arrangement'%>
       <div class="row row-form-wrapper no-buffer row-height">
         <div class="col-md-5 fa-select select-box">
-          <%= f.label :esi_covered, 'Type of HRA', class: "label-color" %>
-          <%= f.select :esi_covered, options_for_select({"Individual coverage HRA" => "Individual coverage HRA", "Qualified Small Employer HRA" => "Qualified Small Employer HRA"}, selected: benefit.esi_covered), {prompt: 'Choose' }, {:required => true} %>
+          <%= f.label :hra_type, 'Type of HRA', class: "label-color" %>
+          <%= f.select :hra_type, options_for_select({"Individual coverage HRA" => "Individual coverage HRA", "Qualified Small Employer HRA" => "Qualified Small Employer HRA"}, selected: benefit.hra_type), {prompt: 'Choose' }, {:required => true} %>
         </div>
         <div class="col-md-6">
           <div class="col-md-6">
