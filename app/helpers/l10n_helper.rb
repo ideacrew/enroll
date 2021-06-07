@@ -13,7 +13,7 @@ module L10nHelper
         default: titleized_key
       ).html_safe
     else
-      t(translation_key, default: titleized_key)
+      t(translation_key, default: titleized_key).html_safe
     end
   end
 end
