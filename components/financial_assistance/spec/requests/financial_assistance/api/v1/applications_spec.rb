@@ -5,6 +5,7 @@ RSpec.describe 'applications', type: :request do
 
   let(:person) { FactoryBot.create(:person, :with_consumer_role)}
   let!(:user) { FactoryBot.create(:user, :person => person) }
+  let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
 
   before(:each) do
     sign_in user
@@ -16,19 +17,20 @@ RSpec.describe 'applications', type: :request do
       produces 'application/json'
 
       response '200', 'index' do
-        schema type: :array,
-          items: {
-            type: :object,
-            properties: {
-              id: { type: :string },
-              zoo_id: { type: :string }
-            }
-          }
+        schema  type: 'array',
+                items: {
+                  '$ref' => '#/components/schemas/application'
+                }
 
-        let(:family_id) { BSON::ObjectId.new }
-        let(:application) { FactoryBot.create :financial_assistance_application, :with_applicants, family_id: family_id, aasm_state: 'determined' }
+        let!(:application) { FactoryBot.create :financial_assistance_application, :with_applicants, family_id: family.id, aasm_state: 'determined' }
 
         run_test!
+
+        it 'should output for troubleshooting' do
+          get '/financial_assistance/api/v1/applications'
+          pp JSON.parse(response.body)
+          expect(response.body).to_not be_nil
+        end
       end
     end
   end
