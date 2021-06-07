@@ -25,6 +25,7 @@ RSpec.describe ::Operations::Products::FetchLcsp, dbclean: :after_each do
     let(:person) { FactoryBot.create(:person, :with_consumer_role) }
     let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
     let(:family_member_id) { family.family_members.first.id.to_s }
+    let(:rating_address) { person.consumer_role.rating_address }
 
     let(:effective_date) { TimeKeeper.date_of_record }
     let(:params) do
@@ -44,7 +45,18 @@ RSpec.describe ::Operations::Products::FetchLcsp, dbclean: :after_each do
       }
     end
 
+    let!(:list_products) { FactoryBot.create_list(:benefit_markets_products_health_products_health_product, 5, :silver) }
+
+    let(:products) { ::BenefitMarkets::Products::Product.all }
+    let(:products_payload) do
+      {
+        rating_area_id: BSON::ObjectId.new,
+        products: products
+      }
+    end
+
     before :each do
+      allow(Operations::Products::FetchSilverProducts).to receive(:new).and_return double(call: ::Dry::Monads::Result::Success.new(products_payload))
       allow(Operations::Products::FetchSilverProductPremiums).to receive(:new).and_return double(call: ::Dry::Monads::Result::Success.new(silver_product_premiums))
     end
 
@@ -55,12 +67,13 @@ RSpec.describe ::Operations::Products::FetchLcsp, dbclean: :after_each do
     end
 
     it 'should return an array of lcsp for the given family' do
-      result = subject.call(params)
-      expect(result.value!.is_a?(Array)).to eq true
+      value = subject.call(params).value!
+      expect(value.is_a?(Hash)).to eq true
+      expect(value[[rating_address.id.to_s]].keys.include?(:health_only)).to eq true
     end
 
     it 'should return premium & product id of lowest plan' do
-      values = subject.call(params).value!.collect {|p| p[family_member_id]}[0]
+      values = subject.call(params).value![[rating_address.id.to_s]][:health_only][family_member_id]
       expect(values[:cost]).to eq 200.0
       expect(values[:product_id]).not_to eq nil
     end
