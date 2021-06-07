@@ -180,7 +180,9 @@ class Employers::CensusEmployeesController < ApplicationController
   def confirm_effective_date
     confirmation_type = params[:type]
     return unless CensusEmployee::CONFIRMATION_EFFECTIVE_DATE_TYPES.include?(confirmation_type)
-    render "#{confirmation_type}_effective_date"
+    respond_to do |format|
+      format.js { render "#{confirmation_type}_effective_date"}
+    end
   end
 
   def cobra_reinstate
