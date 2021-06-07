@@ -33,6 +33,8 @@ registry:
             item: :dc
           - key: :state_abbreviation
             item: "DC"
+          - key: :state_residency
+            item: "DC Residency"
           - key: :subdomain
             item: "dchbx"
           - key: :domain_name
@@ -185,6 +187,8 @@ registry:
             item: "info@dchealthlink.com"
           - key: :contact_center_short_number
             item: "1-855-532-5465"
+          - key: :contact_center_tty_number
+            item: "711"
           - key: :producer_advisory_committee_url
             item: "http://hbx.dc.gov/sites/default/files/dc/sites/Health%20Benefit%20Exchange%20Authority/publication/attachments/ProducerAdvisoryCommitteeFINALReport.pdf"
           - key: :mailer_logo_file_name
@@ -209,8 +213,23 @@ registry:
             item: "logo.png"
           - key: :eligibile_immigration_statuses_url
             item: "https://dchealthlink.com/sites/default/files/v2/forms/Eligible%20Immigration%20Status%20List_0.pdf"
+          - key: :geographic_rating_area_model
+            item: 'county'
           - key: :assistance_estimate_url
             item: "https://dc.checkbookhealth.org/hie/dc/2021/index.cfm?page"
+          - key: :dental_plan_years_available
+            item: [""]
+          - key: :sole_source_carriers_available
+            item: ['2017','2018', '2019']
+          - key: :metal_level_carriers_available
+            item: ['2018', '2019']
+          - key: :single_carriers_available
+            item: ['2018', '2019']
+          - key: :plan_year_tooltip
+            item: "Employer premium contribution for Employee Only Health Plans must be at least"
+      - key: :data_seeds_ui
+        item: :data_seed_ui
+        is_enabled: true
       - key: :rating_area
         item: :rating_area
         is_enabled: false
