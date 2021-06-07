@@ -51,11 +51,8 @@ module Operations
       def fetch_silver_products(addresses, effective_date)
         rating_silver_products = addresses.inject({}) do |result, address_combinations|
           silver_products = Operations::Products::FetchSilverProducts.new.call({address: address_combinations.first, effective_date: effective_date})
-          if silver_products.success?
-            result[address_combinations.map {|add| add.id.to_s }] = silver_products.value!
-          else
-            return Failure("unable to fetch silver_products for - #{address_combinations}")
-          end
+          return Failure("unable to fetch silver_products for - #{address_combinations}") if silver_products.failure?
+          result[address_combinations.map {|add| add.id.to_s }] = silver_products.value!
           result
         end
         Success(rating_silver_products)
@@ -72,21 +69,15 @@ module Operations
           health_products = payload[:products].where(kind: :health)
           premiums = Operations::Products::FetchSilverProductPremiums.new.call({products: health_products, family: family, effective_date: effective_date, rating_area_id: payload[:rating_area_id]})
 
-          if premiums.success?
-            member_premiums[address_ids][:health_only] = premiums.value!
-          else
-            return Failure("unable to fetch health only premiums for - #{address_ids}")
-          end
+          return Failure("unable to fetch health only premiums for - #{address_ids}") if premiums.failure?
+          member_premiums[address_ids][:health_only] = premiums.value!
 
           if benchmark_product_model == :health_and_dental && min_age < 19
 
             premiums = Operations::Products::FetchSilverProductPremiums.new.call({products: payload[:products], family: family, effective_date: effective_date, rating_area_id: payload[:rating_area_id]})
 
-            if premiums.success?
-              member_premiums[address_ids][:health_and_dental] = premiums.value!
-            else
-              return Failure("unable to fetch health + dental premiums for - #{address_ids}")
-            end
+            return Failure("unable to fetch health only premiums for - #{address_ids}") if premiums.failure?
+            member_premiums[address_ids][:health_and_dental] = premiums.value!
           end
 
           next unless benchmark_product_model == :health_and_ped_dental && min_age < 19
@@ -94,11 +85,8 @@ module Operations
 
           premiums = Operations::Products::FetchSilverProductPremiums.new.call({products: health_and_ped_dental_products, family: family, effective_date: effective_date, rating_area_id: payload[:rating_area_id]})
 
-          if premiums.success?
-            member_premiums[address_ids][:health_and_dental] = premiums.value!
-          else
-            return Failure("unable to fetch health + dental premiums for - #{address_ids}")
-          end
+          return Failure("unable to fetch health only premiums for - #{address_ids}") if premiums.failure?
+          member_premiums[address_ids][:health_and_ped_dental] = premiums.value!
         end
 
         Success(member_premiums)
@@ -108,16 +96,13 @@ module Operations
         if family_member.present?
           rating_address_id = family_member.rating_address&.id.to_s
           member_values = member_premiums.find {|premiums| (premiums[0].include? rating_address_id) }
-          if member_values.blank?
-            return Failure('Could Not find any member premiums for the given data')
-          else
-            # Todo - get for member.
-          end
+          return Failure('Could Not find any member premiums for the given data') if member_values.blank?
+          # Todo - get for member.
         else
           lcsp_info = member_premiums.each_pair do |_address_ids, premiums|
-            premiums.each_pair do |_type, member_values|
-              member_values.each_pair do |fm_id, values|
-                member_values[fm_id] = values[0]
+            premiums.each_pair do |_type, mem_values|
+              mem_values.each_pair do |fm_id, values|
+                mem_values[fm_id] = values[0]
               end
             end
           end
