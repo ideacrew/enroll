@@ -5,10 +5,15 @@ module L10nHelper
     Rails.logger.error {"#L10nHelper passed non string key: #{translation_key.inspect}"} unless translation_key.is_a?(String)
     return "Translation Missing" unless translation_key.is_a?(String)
     # https://www.rubydoc.info/github/svenfuchs/i18n/master/I18n%2FBase:translate
+    titleized_key = translation_key.to_s&.gsub(/\W+/, '')&.titleize
     if interpolated_keys.present?
-      t(translation_key, **interpolated_keys.merge(default: translation_key.gsub(/\W+/, '').titleize), default: "Translation Missing for #{translation_key}").html_safe
+      t(
+        translation_key,
+        **interpolated_keys.merge(default: translation_key.gsub(/\W+/, '').titleize),
+        default: titleized_key
+      ).html_safe
     else
-      t(translation_key, default: "Translation Missing for #{translation_key}")
+      t(translation_key, default: titleized_key)
     end
   end
 end
