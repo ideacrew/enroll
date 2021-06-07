@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 Then(/^they should be taken to the applicant's Tax Info page \(health coverage\)$/) do
+  sleep 2
   expect(page).to have_content("Tax Info for #{consumer.person.first_name}")
 end
 
