@@ -62,12 +62,17 @@
                 <div class="row row-form-wrapper ptb no-buffer row-height form-content">
                   <div class="col-md-12 annual-income-row">
                     <%= applicant.first_name %>'s annual income for <%= @application.assistance_year %>
-                    <i class="fa fa-info-circle" data-toggle="tooltip" title="Annual Income for <%= @application.assistance_year %> This is the total of all income you told us about for this person minus any income adjustments for <%= @application.assistance_year %>. If you think this amount is incorrect, use the pencil icon to go back to the application and make changes. If a certain type of income varies, you may want to estimate it for a longer period of time (for example, monthly or annually instead of weekly)."></i> : <%= number_to_currency(applicant.net_annual_income) %>
+                    <a href="#net_annual_income" data-toggle="modal" data-target="#net_annual_income"><i class="fa fa-info-circle"></i></a>
+                    : <%= number_to_currency(applicant.net_annual_income) %>
+
+
                   </div>
                 </div>
               <% end %>
+              <%= render partial: 'financial_assistance/shared/modal_support_text_household', locals: {key: "net_annual_income"} %>
             </div>
           <% end %>
+
 
           <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bg-primary" style="padding: 0px; height: 20px">
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
