@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Operations
   module Products
     # This class is to load county zip combinations.

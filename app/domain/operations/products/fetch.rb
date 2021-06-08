@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'dry/monads'
 require 'dry/monads/do'
 
@@ -41,15 +43,13 @@ module Operations
         if geographic_rating_area_model == 'zipcode'
           query_criteria.merge!(
             {
-              :"service_area_id".in => params[:service_areas].map(&:id),
+              :service_area_id.in => params[:service_areas].map(&:id),
               :"premium_tables.rating_area_id" => BSON::ObjectId.from_string(params[:rating_area].id)
             }
           )
         end
 
-        if geographic_rating_area_model == 'county'
-          query_criteria.merge!({:"service_area_id".in => params[:service_areas].map(&:id)})
-        end
+        query_criteria.merge!({ :service_area_id.in => params[:service_areas].map(&:id) }) if geographic_rating_area_model == 'county'
 
         Success(query_criteria)
       end
