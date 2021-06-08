@@ -126,6 +126,8 @@ registry:
           - key: :forms
             item: ""
             item: ""
+          - key: :forms_name
+            item: ""
           - key: :short_url
             item: ""
           - key: :forms
