@@ -107,7 +107,7 @@ registry:
     - key: :medicaid
       is_enabled: true
     - key: :medicare
-      is_enabled: false
+      is_enabled: true
     - key: :medicare_advantage
       is_enabled: false
     - key: :medicare_part_b
