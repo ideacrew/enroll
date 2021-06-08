@@ -92,5 +92,7 @@ registry:
       settings:
         - key: :medicaid_chip
           item: "MaineCare (Medicaid)"
+    - key: :net_annual_income_display
+      is_enabled: true
   # TODO eligibility engine connectivity(HAVEN) settings
   # TODO mec service connectivity settings

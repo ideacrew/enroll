@@ -148,5 +148,7 @@ registry:
       is_enabled: true
     - key: :other_limited_benefit_coverage # new
       is_enabled: true
+    - key: :net_annual_income_display
+      is_enabled: false
   # TODO eligibility engine connectivity(HAVEN) settings
   # TODO mec service connectivity settings
