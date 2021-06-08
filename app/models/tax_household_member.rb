@@ -86,11 +86,9 @@ class TaxHouseholdMember
 
   def benchmark_product_details_for(effective_date)
     result = Operations::Products::DetermineSlcspForTaxHouseholdMember.new.call(effective_date: effective_date, tax_household_member: self)
-    if result.success?
-      result.success
-    else
-      raise result.failure
-    end
+    raise result.failure unless result.success?
+
+    result.success
   end
 
   def aptc_benchmark_amount(enrollment)

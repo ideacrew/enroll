@@ -10,7 +10,7 @@ module Operations
       # @param [RatingArea] rating_area_id
       # @param [Family] family
       # @param [Product] products
-      # @param [FamilyMember] family_member_id Passing in family_member_id will only return premiums for that particular member 
+      # @param [FamilyMember] family_member_id Passing in family_member_id will only return premiums for that particular member
       def call(params)
         values            = yield validate(params)
         family_members    = yield fetch_family_members(values[:family], values[:family_member_id])
@@ -44,8 +44,8 @@ module Operations
       def fetch_product_premiums(products, family_members, effective_date, rating_area_id)
         member_premiums = family_members.inject({}) do |member_result, family_member|
           age = family_member.age_on(effective_date)
-          age = ::Operations::AgeLookup.new.call(age).success if false && age_rated # Todo - Get age_rated through settings
-          cost_product_hash =
+          # age = ::Operations::AgeLookup.new.call(age).success if false && age_rated # Todo - Get age_rated through settings
+          product_hash =
             products.inject([]) do |result, product|
               premium_table = product.premium_tables.where({
                                                              :rating_area_id => rating_area_id,
@@ -56,8 +56,9 @@ module Operations
               tuple = premium_table.premium_tuples.where(age: age).first
               result << { cost: tuple.cost, product_id: product.id } if tuple.present?
               result
-            end.sort_by {|tuple_hash| tuple_hash[:cost]}
-          member_result[family_member.id.to_s] = cost_product_hash[1] || cost_product_hash[0]
+            end
+          sorted_product_hash = product_hash.sort_by {|tuple_hash| tuple_hash[:cost]}
+          member_result[family_member.id.to_s] = sorted_product_hash[1] || sorted_product_hash[0]
 
           member_result
         end
