@@ -184,7 +184,7 @@ And(/^the user closes the open income question modal$/) do
 end
 
 Then(/^the user should see the popup for the (.*) income question$/) do |income_type|
-  sleep 2
+  sleep 5
   case income_type
   when 'job'
     # stuff
