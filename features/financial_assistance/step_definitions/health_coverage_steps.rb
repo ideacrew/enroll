@@ -129,3 +129,12 @@ end
 Then(/they should see the immigration status question/) do
   expect(page).to have_content l10n("faa.immigration_status_changed")
 end
+
+And(/the user checks on not sure link for hra checkbox/) do
+  find(:xpath, "/html/body/div[3]/div[2]/div/div[2]/div[1]/div[2]/div[2]/div[3]/a").click
+end
+
+Then(/should see not sure modal pop up/) do
+  find('#has_enrolled_health_coverage_from_hra') if FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled_with_hra).item
+  find('#has_enrolled_health_coverage') if FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled).item
+end

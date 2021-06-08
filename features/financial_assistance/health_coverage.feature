@@ -105,3 +105,8 @@ Feature: Start a new Financial Assistance Application and answers questions on h
     Then the save button should be enabled
     And the user saves the health coverage information
     Then the health coverage should be saved on the page
+
+  Scenario: User enters hra information (currently have coverage)
+    Given the user answers yes to currently having health coverage
+    And the user checks on not sure link for hra checkbox
+    Then should see not sure modal pop up
