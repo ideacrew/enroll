@@ -126,8 +126,6 @@ registry:
           - key: :forms
             item: ""
             item: ""
-          - key: :forms_name
-            item: ""
           - key: :short_url
             item: ""
           - key: :forms
@@ -152,6 +150,7 @@ registry:
             item: 'mehl.producer@coverme.gov'
           - key: :privacy_policy
             item: ""
+<<<<<<< HEAD
           - key: :late_rates_message
             item: "Due to a delay, premiums for some coverage effective dates are not available yet. Please check again soon to see if this information has been updated. You can also contact Customer Service or your broker if you need help."
           - key: :faa_enabled
@@ -160,6 +159,8 @@ registry:
             item: true
           - key: :ivl_responsibility_url
             item: "https://dchealthlink.com/individual-responsibility-requirement"
+=======
+>>>>>>> origin/ivl_rating_area
           - key: :curam_enabled?
             item: true
           - key: :support_for_ie_browser
@@ -220,10 +221,17 @@ registry:
             item: ""
           - key: :privacy_act_statement
             item: ""
+<<<<<<< HEAD
           - key: :site_broker_attestation_link
             item: ""
           - key: :site_broker_attestation_link
             item: ""
+=======
+          - key: :site_broker_attestation_link
+            item: ""
+          - key: :site_broker_attestation_link
+            item: ""
+>>>>>>> origin/ivl_rating_area
           - key: :rating_areas
             item: "single"
           - key: :favicon_tab_icon
@@ -250,8 +258,11 @@ registry:
             item: ['']
           - key: :plan_year_tooltip
             item: ""
+<<<<<<< HEAD
           - key: :send_rating_area_for_ivl_policy_to_edi
             item: true
+=======
+>>>>>>> origin/ivl_rating_area
       - key: :rating_area
         item: :rating_area
         is_enabled: false
@@ -295,7 +306,11 @@ registry:
       - key: :special_cover_header
         item: :special_cover_header
         is_enabled: true
+<<<<<<< HEAD
         settings:
+=======
+        settings: 
+>>>>>>> origin/ivl_rating_area
           - key: :filename
             item: "CoverME_WebsiteHeader_01.jpg"
       - key: :tobacco_cost
