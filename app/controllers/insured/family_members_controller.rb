@@ -8,6 +8,8 @@ class Insured::FamilyMembersController < ApplicationController
   before_action :set_current_person, :set_family
   before_action :set_dependent, only: [:destroy, :show, :edit, :update]
 
+  rescue_from ActionController::InvalidAuthenticityToken, :with => :bad_token_due_to_session_expired
+
   def index
     set_bookmark_url
     set_admin_bookmark_url(insured_family_members_path)

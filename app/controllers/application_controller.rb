@@ -60,7 +60,7 @@ class ApplicationController < ActionController::Base
     flash[:warning] = "Session expired."
     respond_to do |format|
       format.html { redirect_to root_path }
-      format.js   { render text: "window.location.assign('#{root_path}');" }
+      format.js   { render plain: "window.location.assign('#{root_path}');" }
       format.json { render json: { :token_expired => root_url }, status: :unauthorized }
     end
   end
