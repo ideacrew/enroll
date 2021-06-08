@@ -162,7 +162,7 @@ class TaxHousehold
     family_members = unwanted_family_members(hbx_enrollment)
     unchecked_aptc_thhms = find_aptc_tax_household_members(family_members)
     deduction_amount = total_benchmark_amount(unchecked_aptc_thhms, hbx_enrollment) if unchecked_aptc_thhms
-    total = total - deduction_amount
+    total -= deduction_amount
     (total < 0.00) ? 0.00 : float_fix(total)
   end
 
