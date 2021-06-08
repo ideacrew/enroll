@@ -8,6 +8,18 @@ Given(/^the user is on the Review Your Application page$/) do
   expect(page).to have_content("Review Your Application", wait: 10)
 end
 
+Given(/net annual income display is enabled/) do
+  enable_fa_feature(:net_annual_income_display)
+end
+
+And(/the page is refreshed with feature enabled/) do
+  visit current_path
+end
+
+Then(/the user should see the net annual income displayed/) do
+  expect(page).to have_content('annual income')
+end
+
 Then(/^the user visits the Review Your Application page$/) do
   application.update_attributes!(aasm_state: "draft")
   visit financial_assistance.review_and_submit_application_path id: application.id.to_s
