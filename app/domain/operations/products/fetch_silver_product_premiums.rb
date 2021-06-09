@@ -57,8 +57,7 @@ module Operations
               result << { cost: tuple.cost, product_id: product.id } if tuple.present?
               result
             end
-          sorted_product_hash = product_hash.sort_by {|tuple_hash| tuple_hash[:cost]}
-          member_result[family_member.id.to_s] = sorted_product_hash[1] || sorted_product_hash[0]
+          member_result[family_member.hbx_id] = product_hash.sort_by {|tuple_hash| tuple_hash[:cost]}
 
           member_result
         end
