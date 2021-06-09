@@ -33,11 +33,10 @@ module Operations
       def is_ia_eligible?(family_member, tax_household_member)
         aptc_tax_household_members = tax_household_member.tax_household.aptc_members
         aptc_member = aptc_tax_household_members.detect { |aptc_tax_household_member| aptc_tax_household_member.applicant_id == family_member.id }
-        aptc_member && aptc_member.is_ia_eligible
+        !!aptc_member&.is_ia_eligible
       end
 
       def construct_member_hash(tax_household_member, effective_date)
-        aptc_tax_household_members = tax_household_member.tax_household.aptc_members
         family_members = tax_household_member.family.family_members
 
         output = family_members.inject({}) do |member_hash, family_member|
