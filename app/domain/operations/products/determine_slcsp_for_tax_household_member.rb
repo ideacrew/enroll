@@ -30,18 +30,24 @@ module Operations
         Success(params)
       end
 
-      def construct_member_hash(tax_household_member, effective_date)
-        # aptc_tax_household_members = family.latest_household.latest_active_tax_household_with_year(year).aptc_members
+      def is_ia_eligible?(family_member, tax_household_member)
         aptc_tax_household_members = tax_household_member.tax_household.aptc_members
+        aptc_member = aptc_tax_household_members.detect { |aptc_tax_household_member| aptc_tax_household_member.applicant_id == family_member.id }
+        aptc_member && aptc_member.is_ia_eligible
+      end
 
-        output = aptc_tax_household_members.inject({}) do |member_hash, aptc_tax_household_member|
-          person = aptc_tax_household_member.person
+      def construct_member_hash(tax_household_member, effective_date)
+        aptc_tax_household_members = tax_household_member.tax_household.aptc_members
+        family_members = tax_household_member.family.family_members
+
+        output = family_members.inject({}) do |member_hash, family_member|
+          person = family_member.person
           member_hash[person.id] = {}
-          member_hash[person.id].store(:is_primary, aptc_tax_household_member.is_primary_applicant?)
+          member_hash[person.id].store(:is_primary, family_member.is_primary_applicant?)
           member_hash[person.id].store(:age, person.age_on(effective_date))
           member_hash[person.id].store(:address, person.rating_address)
-          member_hash[person.id].store(:tax_household_member, aptc_tax_household_member)
-          member_hash[person.id].store(:is_ia_eligible, aptc_tax_household_member.is_ia_eligible)
+          member_hash[person.id].store(:tax_household_member, family_member)
+          member_hash[person.id].store(:is_ia_eligible, is_ia_eligible?(family_member, tax_household_member))
           member_hash
         end
 
@@ -57,9 +63,9 @@ module Operations
           if primary_member_hash[1][:is_ia_eligible]
             primary_member_hash[1][:address]
           else
-            younger_member_hash = primary_member_hash.min_by { |_k, v| v[:age] }
-            older_member_hash = primary_member_hash.max_by { |_k, v| v[:age] }
-            if primary_member_hash.detect { |_k, v| v[:is_ia_eligible] && v[:age] > 20 }
+            younger_member_hash = member_hash.min_by { |_k, v| v[:age] }
+            older_member_hash = member_hash.max_by { |_k, v| v[:age] }
+            if member_hash.detect { |_k, v| v[:is_ia_eligible] && v[:age] > 20 }
               older_member_hash[1][:address]
             else
               younger_member_hash[1][:address]
@@ -78,7 +84,7 @@ module Operations
         if silver_products.success?
           silver_products
         else
-          Failure("unable to fetch silver_products for give effective_date: #{effective_date},  county: #{address.county}, zip: #{county.zip}")
+          Failure("unable to fetch silver_products for give effective_date: #{effective_date},  county: #{address.county}, zip: #{address.zip}")
         end
       end
 
