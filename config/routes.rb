@@ -91,6 +91,9 @@ Rails.application.routes.draw do
       get :ridp_bypass, on: :collection
       get :find_sep, on: :collection
     end
+    
+    # TODO: Consider wrapping this in a preprod conditional
+    resources :seeds, only: [:index, :new, :edit, :update]
 
     if EnrollRegistry.feature_enabled?(:sep_types)
       resources :manage_sep_types do
