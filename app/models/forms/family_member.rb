@@ -11,6 +11,8 @@ module Forms
     include ::Forms::PeopleNames
     include ::Forms::ConsumerFields
     include ::Forms::SsnField
+    include ActionView::Helpers::TranslationHelper
+    include L10nHelper
     RELATIONSHIPS = ::PersonRelationship::Relationships + ::BenefitEligibilityElementGroup::INDIVIDUAL_MARKET_RELATIONSHIP_CATEGORY_KINDS
     #include ::Forms::DateOfBirthField
     #include Validations::USDate.on(:date_of_birth)
@@ -114,7 +116,7 @@ module Forms
             "Cannot remove the duplicate members as they are present on enrollments/tax households." \
             " Issue occurs on person HBX_ID #{existing_person.hbx_id} from Family with ID #{family.id}."
           )
-          return [false, "Cannot remove the duplicate members as they are present on enrollments/tax households. Please call customer service at 1-855-532-5465"]
+          return [false, l10n('insured.family_members.duplicate_error_message', contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item)]
         else
           family.remove_duplicate_members(duplicate_family_member_ids)
           family.reload
