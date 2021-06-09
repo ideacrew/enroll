@@ -3,6 +3,7 @@
 module Operations
   module Products
     # This class is to fetch lowest cost silver plan.
+    # This considers rating address for each person in the given family & gives lcsp details for all the family members at given address.
     class FetchLcsp
       include Dry::Monads[:result, :do]
 
