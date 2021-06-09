@@ -57,15 +57,15 @@
 
           </div>
           <% if FinancialAssistanceRegistry[:net_annual_income_display].enabled? %>
-            <div class="col-md-12 pz form-top-border">
+            <div class="col-md-12 pz">
               <% @applicants.each do |applicant| %>
                 <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                  <div class="col-md-12 annual-income-row">
+                  <div class="col-md-7 annual-income-row">
                     <%= applicant.first_name %>'s annual income for <%= @application.assistance_year %>
-                    <a href="#net_annual_income" data-toggle="modal" data-target="#net_annual_income"><i class="fa fa-info-circle"></i></a>
-                    : <%= number_to_currency(applicant.net_annual_income) %>
-
-
+                    <a href="#net_annual_income" data-toggle="modal" data-target="#net_annual_income"><i class="fa fa-info-circle"></i></a> :
+                  </div>
+                  <div class="col-md-5">
+                    <%= number_to_currency(applicant.net_annual_income) %>
                   </div>
                 </div>
               <% end %>
