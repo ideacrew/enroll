@@ -55,6 +55,7 @@ RSpec.describe Exchanges::SeedsController, :type => :controller, dbclean: :after
 
   describe "#create" do
     it "should successfully create a seed record from a CSV with all of the attributes from the CSV assigned to seed rows" do
+      return unless file_location.present?
       post :create, params: create_params
       expect(response).to redirect_to(exchanges_seeds_path)
       expect(Seeds::Seed.count).to be > 0
@@ -67,6 +68,7 @@ RSpec.describe Exchanges::SeedsController, :type => :controller, dbclean: :after
 
   describe "#update" do
     it "should begin to process the seed in the background" do
+      return unless file_location.pressent?
       post :create, params: create_params
       put :update, params: update_params
     end
