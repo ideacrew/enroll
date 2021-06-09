@@ -29,20 +29,21 @@ module Operations
       end
 
       def fetch_product_premiums(products, tax_household_member, effective_date, rating_area_id)
-        family_member_id = tax_household_member.family_member_id
+        family_member = tax_household_member.family_member
 
         product_hash = Operations::Products::FetchSilverProductPremiums.new.call(
           {
             products: products,
             family: tax_household_member.family,
-            family_member_id: family_member_id,
+            family_member_id: family_member.id,
             effective_date: effective_date,
             rating_area_id: rating_area_id
           }
         )
 
-        if product_hash.success? && product_hash.success[family_member_id.to_s]
-          Success(product_hash.success[family_member_id.to_s])
+        if product_hash.success? && product_hash.success[family_member.hbx_id]
+          values = product_hash.success[family_member.hbx_id]
+          Success(values[1] || values[0])
         else
           Failure("Unable to determine SLCSP premium for tax_household_member: #{tax_household_member.id} for effective_date: #{effective_date} and rating_area: #{rating_area_id}")
         end
