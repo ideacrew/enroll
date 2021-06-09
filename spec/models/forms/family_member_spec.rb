@@ -397,6 +397,7 @@ describe "checking validations on family member object" do
   subject { Forms::FamilyMember.new(member_attributes.merge({:family_id => family_id}))}
 
   before do
+    EnrollRegistry[:immigration_status_question_required].stub(:item).and_return(true)
     allow(subject.class).to receive(:individual_market_is_enabled?).and_return(true)
     allow(subject).to receive(:family).and_return family
   end
