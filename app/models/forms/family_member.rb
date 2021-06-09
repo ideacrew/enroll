@@ -107,7 +107,7 @@ module Forms
         # This will cover the use case of attempting to save a family member which has duplicate family members
         # with coverage household members, HBX enrollment members, etc.
         # will not allow the family member to be saved if thoses duplicate issues are for a current enrollment.
-        duplicate_family_members = family.family_members_with_person_id(existing_person.id)
+        duplicate_family_members = family.family_members.where(person_id: existing_person.id)
         duplicate_family_member_ids = duplicate_family_members.pluck(:id)
         if duplicate_family_members && family.duplicate_enr_members_or_tax_members_present?(duplicate_family_member_ids)
           Rails.logger.warn(
