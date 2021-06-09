@@ -26,11 +26,11 @@ RSpec.describe 'applications', type: :request do
 
         run_test!
 
-        it 'should output for troubleshooting' do
-          get '/financial_assistance/api/v1/applications'
-          pp JSON.parse(response.body)
-          expect(response.body).to_not be_nil
-        end
+        # it 'should output for troubleshooting' do
+        #   get '/financial_assistance/api/v1/applications'
+        #   puts response.body
+        #   expect(response.body).to_not be_nil
+        # end
       end
     end
   end
