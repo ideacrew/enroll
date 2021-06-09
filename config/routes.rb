@@ -93,7 +93,7 @@ Rails.application.routes.draw do
     end
     
     # TODO: Consider wrapping this in a preprod conditional
-    resources :seeds, only: [:index, :new, :edit, :update]
+    resources :seeds, only: [:index, :new, :create, :edit, :update]
 
     if EnrollRegistry.feature_enabled?(:sep_types)
       resources :manage_sep_types do

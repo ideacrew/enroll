@@ -15,13 +15,21 @@ class Exchanges::SeedsController < ApplicationController
   def create
     @seed = Seeds::Seed.new(
       user: current_user,
-      filename: params[:file] # Get filename
+      filename: params[:file], # Get filename
+      aasm_state: 'draft'
     )
-    CSV.foreach(params[:file]) do |row|
-      @seed.rows.build(data: row.to_h)
+    # TODO: need to figure out how to save the file
+    CSV.foreach(params[:file], headers: true) do |row|
+      # To avoid nil values
+      row_data = row.to_h.reject do|key, value|
+        key.blank?
+      end.transform_values! do |value|
+        "" if value.nil?
+      end.to_h.with_indifferent_access
+      @seed.rows.build(data: row_data)
     end
     if @seed.save
-      redirect_to exchanges_seeds_edit_path(@seed)
+      redirect_to exchanges_seeds_path
     else
       render 'new'
     end
