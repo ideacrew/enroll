@@ -91,7 +91,7 @@ Rails.application.routes.draw do
       get :ridp_bypass, on: :collection
       get :find_sep, on: :collection
     end
-    
+
     # TODO: Consider wrapping this in a preprod conditional
     resources :seeds, only: [:index, :new, :create, :edit, :update]
 

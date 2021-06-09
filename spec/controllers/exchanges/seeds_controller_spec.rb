@@ -10,7 +10,7 @@ RSpec.describe Exchanges::SeedsController, :type => :controller, dbclean: :after
   let(:person) { double("person", agent?: true)}
 
   render_views
-  
+
   before :each do
     allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
     allow(user).to receive(:person).and_return(person)
@@ -27,7 +27,7 @@ RSpec.describe Exchanges::SeedsController, :type => :controller, dbclean: :after
   end
   let(:create_params) do
     {
-      file: file_location,
+      file: file_location
     }
   end
   let(:update_params) do

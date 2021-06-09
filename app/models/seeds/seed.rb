@@ -1,11 +1,13 @@
-# frozen_string_lateral: true
+# frozen_string_literal: true
 
 module Seeds
+  # Provides rows which have rows from CSVs that have hashes
+  # used to provide seed data.
   class Seed
     include Mongoid::Document
     include Mongoid::Timestamps
     include AASM
-    
+
     embeds_many :rows, class_name: "Seeds::Row"
 
     belongs_to :user, class_name: "User"
