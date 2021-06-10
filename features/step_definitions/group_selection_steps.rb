@@ -716,6 +716,14 @@ Then(/the user should see that applied tax credit has been set accordingly/) do
   expect(page).to have_content("25")
 end
 
+Then(/the consumer should see the reason for ineligibility/) do
+  if ::FinancialAssistanceRegistry.feature_enabled?(:consumer_validations) == true
+    expect(page).to have_content("Since #{consumer.person.first_name} did not attest to being a US citizen or having an eligible immigration status")
+  else
+    expect(page).to have_content("eligibility failed on citizenship_status")
+  end
+end
+
 Given(/the enrollment has HIOS ID ending in (.*)/) do |id_number|
   hios_id = @family.enrollments.first.product.hios_id
   changed_id = hios_id.gsub(hios_id[-2..-1], id_number)

@@ -18,6 +18,8 @@ registry:
             item: 'DC'
           - key: :name
             item: 'District of Columbia'
+      - key: :consumer_validations
+        is_enabled: true
   - namespace:
     - :enrollment_dates
     features:
