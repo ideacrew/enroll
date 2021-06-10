@@ -366,14 +366,40 @@ describe Household, "for creating a new taxhousehold using create eligibility", 
   end
 
   context 'for apply_aggregate_to_enrollment' do
-    let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, :silver)}
+    let(:address) { person100.rating_address }
+    let(:effective_on) { TimeKeeper.date_of_record.beginning_of_year }
+    let(:application_period) { effective_on.beginning_of_year..effective_on.end_of_year }
+    let!(:rating_area) do
+      ::BenefitMarkets::Locations::RatingArea.rating_area_for(address, during: effective_on) || FactoryBot.create_default(:benefit_markets_locations_rating_area, active_year: effective_on.year)
+    end
+    let!(:service_area) do
+      ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address, during: effective_on).first || FactoryBot.create_default(:benefit_markets_locations_service_area, active_year: effective_on.year)
+    end
+    let!(:product) do
+      prod =
+        FactoryBot.create(
+          :benefit_markets_products_health_products_health_product,
+          :with_issuer_profile,
+          :silver,
+          benefit_market_kind: :aca_individual,
+          kind: :health,
+          application_period: application_period,
+          service_area: service_area,
+          csr_variant_id: '01'
+        )
+      prod.premium_tables = [premium_table]
+      prod.save
+      prod
+    end
+    let(:premium_table)        { build(:benefit_markets_products_premium_table, effective_period: application_period, rating_area: rating_area) }
     let!(:current_enr) do
       enr = FactoryBot.create(:hbx_enrollment,
                               :individual_assisted,
                               coverage_kind: 'health',
                               household: household100,
                               family: family100,
-                              effective_on: TimeKeeper.date_of_record.beginning_of_year,
+                              rating_area_id: rating_area.id,
+                              effective_on: effective_on,
                               product: product,
                               consumer_role_id: person100.consumer_role.id)
       FactoryBot.create(:hbx_enrollment_member, applicant_id: family100.primary_applicant.id, hbx_enrollment: enr)
