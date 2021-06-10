@@ -100,27 +100,49 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
     let!(:hbx_enrollment_member2) do
       FactoryBot.create(:hbx_enrollment_member, applicant_id: family10.family_members[1].id, eligibility_date: (TimeKeeper.date_of_record - 10.days), coverage_start_on: TimeKeeper.date_of_record, hbx_enrollment: hbx_enrollment10)
     end
-    let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product) }
+    let!(:rating_area) do
+      ::BenefitMarkets::Locations::RatingArea.rating_area_for(address, during: effective_on) || FactoryBot.create_default(:benefit_markets_locations_rating_area, active_year: effective_on.year)
+    end
+    let!(:service_area) do
+      ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address, during: effective_on).first || FactoryBot.create_default(:benefit_markets_locations_service_area, active_year: effective_on.year)
+    end
+    let(:application_period) { TimeKeeper.date_of_record.beginning_of_year..TimeKeeper.date_of_record.end_of_year }
+    let(:effective_on) { TimeKeeper.date_of_record.beginning_of_month }
+    let!(:product) do
+      prod =
+        FactoryBot.create(
+          :benefit_markets_products_health_products_health_product,
+          :with_issuer_profile,
+          benefit_market_kind: :aca_individual,
+          kind: :health,
+          service_area: service_area,
+          csr_variant_id: '01',
+          metal_level_kind: 'silver',
+          application_period: application_period
+        )
+      prod.premium_tables = [premium_table]
+      prod.save
+      prod
+    end
+    let(:premium_table)        { build(:benefit_markets_products_premium_table, effective_period: application_period, rating_area: rating_area) }
+
+    let(:address) { person.rating_address }
     let!(:tax_household10) { FactoryBot.create(:tax_household, household: family10.active_household, effective_ending_on: nil) }
     let!(:eligibility_determination) { FactoryBot.create(:eligibility_determination, tax_household: tax_household10, max_aptc: 2000) }
     let!(:tax_household_member1) { tax_household10.tax_household_members.create(applicant_id: family10.primary_applicant.id, is_subscriber: true, is_ia_eligible: true)}
     let!(:tax_household_member2) {tax_household10.tax_household_members.create(applicant_id: family10.family_members[1].id, is_ia_eligible: true)}
     let!(:hbx_profile) { FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period) }
     let(:person2) { family10.family_members[1].person }
-    let(:rating_area) { FactoryBot.create(:benefit_markets_locations_rating_area) }
     let(:area) { rating_area.exchange_provided_code }
 
     before :each do
-      @product = BenefitMarkets::Products::Product.all.where(benefit_market_kind: :aca_individual).first
+      @product = product
       @product.update_attributes(ehb: 0.9844)
       premium_table = @product.premium_tables.first
       premium_table.premium_tuples.where(age: 59).first.update_attributes(cost: 814.85)
       premium_table.premium_tuples.where(age: 60).first.update_attributes(cost: 846.72)
       premium_table.premium_tuples.where(age: 61).first.update_attributes(cost: 879.8)
       @product.save!
-      hbx_enrollment10.update_attributes(product: @product)
-      hbx_profile.benefit_sponsorship.benefit_coverage_periods.each{|bcp| bcp.update_attributes!(slcsp_id: @product.id)}
-
       allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, hbx_enrollment10.effective_on, 59, area, 'NA').and_return(814.85)
       allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, hbx_enrollment10.effective_on, 60, area, 'NA').and_return(846.72)
       allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, hbx_enrollment10.effective_on, 61, area, 'NA').and_return(879.8)
@@ -257,9 +279,36 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
   end
 
   describe 'ehb premiums' do
+    let!(:rating_area) do
+      ::BenefitMarkets::Locations::RatingArea.rating_area_for(address, during: effective_on) || FactoryBot.create_default(:benefit_markets_locations_rating_area, active_year: effective_on.year)
+    end
+    let!(:service_area) do
+      ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address, during: effective_on).first || FactoryBot.create_default(:benefit_markets_locations_service_area, active_year: effective_on.year)
+    end
+    let(:application_period) { TimeKeeper.date_of_record.beginning_of_year..TimeKeeper.date_of_record.end_of_year }
+    let(:effective_on) { TimeKeeper.date_of_record.beginning_of_month }
+    let!(:product) do
+      prod =
+        FactoryBot.create(
+          :benefit_markets_products_health_products_health_product,
+          :with_issuer_profile,
+          benefit_market_kind: :aca_individual,
+          kind: :health,
+          service_area: service_area,
+          csr_variant_id: '01',
+          metal_level_kind: 'silver',
+          application_period: application_period
+        )
+      prod.premium_tables = [premium_table]
+      prod.save
+      prod
+    end
+    let(:premium_table)        { build(:benefit_markets_products_premium_table, effective_period: application_period, rating_area: rating_area) }
+
+    let(:address) { person.rating_address }
     let(:person) {FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
     let!(:family10) {FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person)}
-    let!(:hbx_enrollment10) {FactoryBot.create(:hbx_enrollment, family: family10, household: family10.active_household, aasm_state: 'shopping', product: @product, consumer_role_id: person.consumer_role.id, rating_area_id: rating_area.id)}
+    let!(:hbx_enrollment10) {FactoryBot.create(:hbx_enrollment, family: family10, household: family10.active_household, aasm_state: 'shopping', product: product, consumer_role_id: person.consumer_role.id, rating_area_id: rating_area.id)}
     let!(:hbx_enrollment_member1) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family10.primary_applicant.id, is_subscriber: true, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: hbx_enrollment10)}
     let!(:hbx_enrollment_member2) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family10.family_members[1].id, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: hbx_enrollment10)}
     let!(:tax_household10) {FactoryBot.create(:tax_household, household: family10.active_household, effective_ending_on: nil)}
@@ -272,16 +321,13 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
     let(:area) { rating_area.exchange_provided_code }
 
     before :each do
-      @product = BenefitMarkets::Products::Product.all.where(benefit_market_kind: :aca_individual).first
+      @product = product
       @product.update_attributes(ehb: 0.9844)
       premium_table = @product.premium_tables.first
       premium_table.premium_tuples.where(age: 59).first.update_attributes(cost: 814.85)
       premium_table.premium_tuples.where(age: 60).first.update_attributes(cost: 846.72)
       premium_table.premium_tuples.where(age: 61).first.update_attributes(cost: 879.8)
       @product.save!
-      hbx_enrollment10.update_attributes(product: @product)
-      hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.update_attributes!(slcsp_id: @product.id)}
-
       allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, hbx_enrollment10.effective_on, 59, area, 'NA').and_return(814.85)
       allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, hbx_enrollment10.effective_on, 60, area, 'NA').and_return(846.72)
       allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, hbx_enrollment10.effective_on, 61, area, 'NA').and_return(879.8)
