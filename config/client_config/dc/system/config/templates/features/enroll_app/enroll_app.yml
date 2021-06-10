@@ -335,3 +335,5 @@ registry:
         settings:
           - key: :days
             item: 60
+      - key: :immigration_status_checkbox
+        is_enabled: false
