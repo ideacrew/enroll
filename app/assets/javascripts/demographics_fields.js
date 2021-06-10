@@ -244,7 +244,7 @@ var PersonValidations = (function(window, undefined) {
   }
 
   function validationForEligibleImmigrationStatuses(e) {
-    if ($('#immigration_status_container').is(':visible') && $('input[name="person[eligible_immigration_status]"]').not(":checked").length == 2) {
+    if ($('#immigration_status_container').is(':visible') && $('input[name="person[eligible_immigration_status]"]').not(":checked").length == 2 && !$('#immigration-checkbox').is(':visible')) {
       alert('Please provide an answer for question: Do you have eligible immigration status?');
       PersonValidations.restoreRequiredAttributes(e);
     }
