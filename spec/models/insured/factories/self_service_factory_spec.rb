@@ -125,6 +125,60 @@ module Insured
     end
     # rubocop:disable Lint/UselessAssignment
     describe "update enrollment for renewing enrollments" do
+      let(:address) { family.primary_person.rating_address }
+      let(:effective_date) { TimeKeeper.date_of_record.beginning_of_year }
+      let(:application_period) { effective_date.beginning_of_year..effective_date.end_of_year }
+      let(:rating_area) do
+        ::BenefitMarkets::Locations::RatingArea.rating_area_for(address, during: effective_date) || FactoryBot.create_default(:benefit_markets_locations_rating_area, active_year: effective_date.year)
+      end
+      let(:service_area) do
+        ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address, during: effective_date).first || FactoryBot.create_default(:benefit_markets_locations_service_area, active_year: effective_date.year)
+      end
+      let!(:renewal_rating_area) do
+        ::BenefitMarkets::Locations::RatingArea.rating_area_for(address, during: renewal_calender_date) || FactoryBot.create_default(:benefit_markets_locations_rating_area, active_year: renewal_calender_date.year)
+      end
+      let!(:renewal_service_area) do
+        ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address, during: renewal_calender_date).first || FactoryBot.create_default(:benefit_markets_locations_service_area, active_year: renewal_calender_date.year)
+      end
+
+      let!(:product) do
+        prod =
+          FactoryBot.create(
+            :benefit_markets_products_health_products_health_product,
+            :with_issuer_profile,
+            :silver,
+            benefit_market_kind: :aca_individual,
+            kind: :health,
+            application_period: application_period,
+            service_area: service_area,
+            csr_variant_id: '01',
+            renewal_product_id: renewal_individual_health_product.id
+          )
+        prod.premium_tables = [premium_table]
+        prod.save
+        prod
+      end
+      let(:premium_table)        { build(:benefit_markets_products_premium_table, effective_period: application_period, rating_area: rating_area) }
+      let(:renewal_calender_date) { TimeKeeper.date_of_record.beginning_of_year.next_year }
+      let(:renewal_application_period) { renewal_calender_date.beginning_of_year..renewal_calender_date.end_of_year }
+      let!(:renewal_individual_health_product) do
+        prod =
+          FactoryBot.create(
+            :benefit_markets_products_health_products_health_product,
+            :with_issuer_profile,
+            :silver,
+            benefit_market_kind: :aca_individual,
+            kind: :health,
+            service_area: renewal_service_area,
+            csr_variant_id: '01',
+            application_period: renewal_application_period
+          )
+        prod.premium_tables = [renewal_individual_premium_table]
+        prod.save
+        prod
+      end
+
+      let(:renewal_individual_premium_table) { build(:benefit_markets_products_premium_table, effective_period: renewal_application_period, rating_area: renewal_rating_area) }
 
       before :each do
         TimeKeeper.set_date_of_record_unprotected!(Date.new(Date.today.year, 12, 15))
@@ -134,7 +188,7 @@ module Insured
         tax_household_member1 = tax_household10.tax_household_members.create(applicant_id: family.primary_applicant.id, is_subscriber: true, is_ia_eligible: true)
         tax_household_member2 = tax_household10.tax_household_members.create(applicant_id: family.family_members[1].id, is_ia_eligible: true)
 
-        @product = BenefitMarkets::Products::Product.all.where(benefit_market_kind: :aca_individual).first
+        @product = product
         @product.update_attributes(ehb: 0.9844, application_period: Date.new(effective_on.year, 1, 1)..Date.new(effective_on.year, 1, 1).end_of_year)
         premium_table = @product.premium_tables.first
         premium_table.update_attributes(effective_period: Date.new(effective_on.year, 1, 1)..Date.new(effective_on.year, 1, 1).end_of_year)
