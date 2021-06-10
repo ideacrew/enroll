@@ -8,7 +8,10 @@ module Seeds
     include Mongoid::Timestamps
 
     embedded_in :seed, class_name: "Seeds::Seed"
-
+    
+    # Uniquee Row Identifier in case there is an element that groups
+    # rows together from a spreadsheet used for a seed
+    field :unique_row_identifier, type: String, default: ""
     field :data, type: Hash
     field :record_id, type: String, default: ""
     # Primary Person
@@ -18,6 +21,11 @@ module Seeds
 
     def seeded?
       record_id.present?
+    end
+
+    def target_record
+      return nil unless record_class_name && record_id
+      record_class_name.constantize.find(record_id)
     end
   end
 end

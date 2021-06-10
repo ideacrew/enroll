@@ -14,7 +14,7 @@ class SeedRowWorker
     @target_seed = ::Seeds::Seed.find(seed_id)
     @target_row = target_seed.rows.find(row_id)
     row_data = target_row.data
-    Rails.logger.warn("No data provided for Seed Row #{target_row.id} of seed #{target_seed.id}") if person_attributes.blank?
+    Rails.logger.warn("No data provided for Seed Row #{target_row.id} of seed #{target_seed.id}") if row_data.blank?
     return if row_data.blank?
     process_row(row_data)
   end

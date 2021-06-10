@@ -272,7 +272,7 @@ module GoldenSeedHelper
   def generate_address_and_phone(specified_attributes = {})
     primary_address = specified_attributes[:primary_person_address]
     primary_phone = specified_attributes[:primary_person_phone]
-    address_1 = primary_address.present? ? primary_address.address_1 : "60#{counter_number} #{FFaker::AddressUS.street_name}"
+    address_1 = primary_address.present? ? primary_address.address_1 : "#{Random.new.rand(100...999)} #{FFaker::AddressUS.street_name}"
     if primary_address.present?
       city = primary_address.city
       state = primary_address.state
