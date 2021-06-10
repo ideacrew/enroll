@@ -55,8 +55,6 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     let(:child2_dob) { current_date.next_month - 20.years }
     let(:child3_dob) { current_benefit_coverage_period.start_on + 2.months - 25.years}
 
-    let(:rating_area) { FactoryBot.create(:benefit_markets_locations_rating_area) }
-
     let!(:enrollment) do
       FactoryBot.create(:hbx_enrollment,
                         :with_enrollment_members,
@@ -105,9 +103,77 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     let(:coverall_enrollment_members) { coverall_family.family_members }
     let(:calender_year) { TimeKeeper.date_of_record.year }
     let(:coverage_kind) { 'health' }
-    let(:current_product) { FactoryBot.create(:active_ivl_gold_health_product, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_product_id: renewal_product.id) }
-    let(:renewal_product) { FactoryBot.create(:renewal_ivl_gold_health_product, hios_id: "11111111122302-01", csr_variant_id: "01") }
-    let(:current_cat_product) { FactoryBot.create(:active_ivl_silver_health_product, hios_base_id: "94506DC0390008", csr_variant_id: "01", metal_level_kind: :catastrophic) }
+    let!(:rating_area) do
+      ::BenefitMarkets::Locations::RatingArea.rating_area_for(address, during: start_on) || FactoryBot.create_default(:benefit_markets_locations_rating_area)
+    end
+    let!(:service_area) do
+      ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address, during: start_on).first || FactoryBot.create_default(:benefit_markets_locations_service_area)
+    end
+    let!(:renewal_rating_area) do
+      ::BenefitMarkets::Locations::RatingArea.rating_area_for(address, during: start_on.next_year) || FactoryBot.create_default(:benefit_markets_locations_rating_area)
+    end
+    let!(:renewal_service_area) do
+      ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address, during: start_on.next_year).first || FactoryBot.create_default(:benefit_markets_locations_service_area)
+    end
+    let(:start_on) { current_benefit_coverage_period.start_on }
+    let(:address) { family.primary_person.rating_address }
+    let(:application_period) { start_on.beginning_of_year..start_on.end_of_year }
+
+    let!(:current_product) do
+      prod =
+        FactoryBot.create(
+          :benefit_markets_products_health_products_health_product,
+          :with_issuer_profile,
+          benefit_market_kind: :aca_individual,
+          kind: :health,
+          service_area: service_area,
+          csr_variant_id: '01',
+          metal_level_kind: 'silver',
+          hios_id: '11111111122302-01',
+          renewal_product_id: renewal_product.id,
+          application_period: application_period
+        )
+      prod.premium_tables = [premium_table]
+      prod.save
+      prod
+    end
+    let(:premium_table)        { build(:benefit_markets_products_premium_table, effective_period: application_period, rating_area: rating_area) }
+    let!(:renewal_product) do
+      prod =
+        FactoryBot.create(
+          :benefit_markets_products_health_products_health_product,
+          :with_issuer_profile,
+          benefit_market_kind: :aca_individual,
+          kind: :health,
+          service_area: renewal_service_area,
+          csr_variant_id: '01',
+          metal_level_kind: 'silver',
+          hios_id: '11111111122302-01',
+          application_period: application_period
+        )
+      prod.premium_tables = [renewal_premium_table]
+      prod.save
+      prod
+    end
+    let(:renewal_premium_table)        { build(:benefit_markets_products_premium_table, effective_period: application_period, rating_area: renewal_rating_area) }
+    let!(:current_cat_product) do
+      prod =
+        FactoryBot.create(
+          :active_ivl_silver_health_product,
+          :with_issuer_profile,
+          benefit_market_kind: :aca_individual,
+          kind: :health,
+          service_area: service_area,
+          csr_variant_id: '01',
+          metal_level_kind: :catastrophic,
+          hios_base_id: "94506DC0390008",
+          application_period: application_period
+        )
+      prod.premium_tables = [cat_premium_table]
+      prod.save
+      prod
+    end
+    let(:cat_premium_table)        { build(:benefit_markets_products_premium_table, effective_period: application_period, rating_area: rating_area) }
 
     subject do
       enrollment_renewal = Enrollments::IndividualMarket::FamilyEnrollmentRenewal.new
@@ -239,7 +305,6 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         end
       end
     end
-
 
     describe ".renewal_product" do
       context "When consumer covered under catastrophic product" do
