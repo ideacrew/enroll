@@ -8,7 +8,7 @@ module Seeds
     include Mongoid::Timestamps
 
     embedded_in :seed, class_name: "Seeds::Seed"
-    
+
     # Uniquee Row Identifier in case there is an element that groups
     # rows together from a spreadsheet used for a seed
     field :unique_row_identifier, type: String, default: ""

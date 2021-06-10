@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, 'app/data_migrations/golden_seed_helper')
 require File.join(Rails.root, 'app/data_migrations/golden_seed_financial_assistance_helper') if EnrollRegistry.feature_enabled?(:financial_assistance)
 
@@ -11,39 +13,28 @@ module GoldenSeedWorkerConcern
 
   included do
 
-    # after_initialize do |instance|
-    # end
-
-    def find_seed_primary_person_record
-
-    end
-
-    def find_seed_family_record
-
-    end
-    
     # Row data needs to be hash
+    # rubocop:disable Metrics/AbcSize
+    # rubocop:disable Metrics/CyclomaticComplexity
     def process_row(row_data)
       remove_golden_seed_callbacks
-      
-      # TODO: Need to figure out how to get the primary family ID.
-      # Probably we'll have to set the primary person when they're created to be associated with a seed
-      # and then query that seed
-      # primary_family_for_current_case = case_collection[person_attributes["case_name"]]&.dig(:family_record)
       primary_family_for_current_case = target_seed.rows.where(unique_row_identifier: row_data[:case_name]).first&.target_record
       fa_enabled_and_required_for_case = EnrollRegistry.feature_enabled?(:financial_assistance) &&
                                          row_data['help_paying_for_coverage']
-      row_data = row_data = {person_attributes: row_data}
+      # Just using this structure since it was used in the original golden seed
+      row_data = {
+        person_attributes: row_data
+      }
       # Dependent
       if primary_family_for_current_case.present?
         row_data.merge!(
           {
-            primary_person_record: nil,# Need to calculate this,
-            family_record: nil, # need to calculate this
+            primary_person_record: primary_family_for_current_case.primary_person,
+            family_record: primary_family_for_current_case
           }
         ).with_indifferent_access
         puts("Beginning to create dependent record for #{person_attributes['case_name']}") unless Rails.env.test?
-        dependent_record = generate_and_return_dependent_record(row_data)
+        generate_and_return_dependent_record(row_data)
         if fa_enabled_and_required_for_case
           puts("Beginning to create FA Applicant record for #{person_attributes['case_name']}") unless Rails.env.test?
           add_applicant_income(row_data)
@@ -76,5 +67,7 @@ module GoldenSeedWorkerConcern
         record_class_name: "Family"
       )
     end
+    # rubocop:enable Metrics/AbcSize
+    # rubocop:enable Metrics/CyclomaticComplexity
   end
 end

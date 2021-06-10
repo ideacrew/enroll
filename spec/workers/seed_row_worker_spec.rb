@@ -20,7 +20,7 @@ describe SeedRowWorker, :dbclean => :after_each do
       # TODO: need to figure out how to save the file
       CSV.foreach(file_location, headers: true) do |row|
         # To avoid nil values
-        row_data = row.to_h.reject { |key, value| key.blank? }.transform_values { |v| v.blank? ? "" : v }.with_indifferent_access
+        row_data = row.to_h.reject { |key, _value| key.blank? }.transform_values { |v| v.blank? ? "" : v }.with_indifferent_access
         @seed.rows.build(data: row_data)
       end
       @seed.save!
