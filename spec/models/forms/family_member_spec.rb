@@ -327,7 +327,7 @@ describe Forms::FamilyMember, "which describes a new family member, and has been
   end
 
   describe "that matches an existing person" do
-    let(:existing_person) { instance_double("Person") }
+    let(:existing_person) { instance_double("Person", id: 1) }
     let(:new_family_member_id) { double }
     let(:new_family_member) { instance_double(::FamilyMember, :id => new_family_member_id, :save => true) }
 
