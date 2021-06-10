@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #insured/consumer_role/help_paying_coverage
-class IvlFaaHelpPayingForCoverage
+class IvlIapHelpPayingForCoverage
 
   def self.yes_radiobtn
     'label[for="radio1"] span'
@@ -9,6 +9,10 @@ class IvlFaaHelpPayingForCoverage
 
   def self.no_radiobtn
     'label[for="radio2"] span'
+  end
+
+  def self.not_sure_is_applying_for_assistance
+    'a[href="#is_applying_for_assistance"]'
   end
 
   def self.continue_btn
