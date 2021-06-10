@@ -60,7 +60,7 @@
       </div>
       <% if EnrollRegistry[:immigration_status_checkbox].enabled? %>
         <div class="col-lg-4 col-md-4 col-sm-8 col-xs-6 form-group form-group-lg no-pd">
-          <div class="checkbox pl-2">
+          <div id="immigration-checkbox" class="checkbox pl-2">
             <%= f.check_box :eligible_immigration_status, {}, "true", "false" %>
           </div>
         </div>
