@@ -721,8 +721,25 @@ Then(/^taxhousehold info is prepared for aptc user$/) do
 
   start_on = Date.new(TimeKeeper.date_of_record.year, 1,1)
   future_start_on = Date.new(TimeKeeper.date_of_record.year + 1, 1,1)
+  rating_address = person.rating_address
+  application_period = start_on.beginning_of_year..start_on.end_of_year
+  renewal_application_period = future_start_on.beginning_of_year..future_start_on.end_of_year
+  rating_area = BenefitMarkets::Locations::RatingArea.rating_area_for(rating_address, during: start_on) || FactoryBot.create(:benefit_markets_locations_rating_area, active_year: start_on.year)
+  service_area = BenefitMarkets::Locations::ServiceArea.service_areas_for(rating_address, during: start_on).first || FactoryBot.create(:benefit_markets_locations_service_area, active_year: start_on.year)
+  renewal_rating_area = BenefitMarkets::Locations::RatingArea.rating_area_for(rating_address, during: future_start_on) || FactoryBot.create(:benefit_markets_locations_rating_area, active_year: future_start_on.year)
+  renewal_service_area = BenefitMarkets::Locations::ServiceArea.service_areas_for(rating_address, during: future_start_on).first || FactoryBot.create(:benefit_markets_locations_service_area, active_year: future_start_on.year)
+
+  current_premium_table = FactoryBot.build(:benefit_markets_products_premium_table, effective_period: application_period, rating_area: rating_area)
   current_product = BenefitMarkets::Products::Product.all.by_year(start_on.year).where(metal_level_kind: :silver).first
+  current_product.service_area = service_area
+  current_product.premium_tables = [current_premium_table]
+  current_product.save
+
+  renewal_premium_table = FactoryBot.build(:benefit_markets_products_premium_table, effective_period: renewal_application_period, rating_area: renewal_rating_area)
   future_product = BenefitMarkets::Products::Product.all.by_year(future_start_on.year).where(metal_level_kind: :silver).first
+  future_product.service_area = renewal_service_area
+  future_product.premium_tables = [renewal_premium_table]
+  future_product.save
 
   if household.tax_households.blank?
     household.build_thh_and_eligibility(80, 0, start_on, current_product.id, 'Admin')
