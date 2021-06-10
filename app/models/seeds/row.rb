@@ -13,7 +13,7 @@ module Seeds
     # rows together from a spreadsheet used for a seed
     field :unique_row_identifier, type: String, default: ""
     field :data, type: Hash
-    field :record_id, type: String, default: ""
+    field :record_id, type: String, default: ''
     # Primary Person
     # TODO: Could be other classes in the future
     # This will be used to reference the records it creates
@@ -25,7 +25,7 @@ module Seeds
 
     def target_record
       return nil unless record_class_name && record_id
-      record_class_name.constantize.find(record_id)
+      record_class_name.constantize.where(_id: record_id).first
     end
   end
 end
