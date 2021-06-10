@@ -23,23 +23,25 @@ module GoldenSeedHelper
     @site = BenefitSponsors::Site.all.first
   end
 
-  def update_person_hbx_ids
-    @original_person_hbx_ids.each do |original_hbx_id|
-      puts("Updating original hbx id #{original_hbx_id}")
-      person_record = Person.find_by(hbx_id: original_hbx_id)
-      person_record.update_attributes!(hbx_id: HbxIdGenerator.generate_member_id)
-      puts("Person record now updated too #{person_record.hbx_id} from #{original_hbx_id}")
-    end
-  end
+  # These methods are in case you want to avoid external
+  # hbx id calls
+  # def update_person_hbx_ids
+  #  @original_person_hbx_ids.each do |original_hbx_id|
+  #    puts("Updating original hbx id #{original_hbx_id}")
+  #    person_record = Person.find_by(hbx_id: original_hbx_id)
+  #    person_record.update_attributes!(hbx_id: HbxIdGenerator.generate_member_id)
+  #    puts("Person record now updated too #{person_record.hbx_id} from #{original_hbx_id}")
+  #  end
+  # end
 
-  def update_enrollment_hbx_ids
-    @original_enrollment_hbx_ids.each do |original_hbx_id|
-      puts("Updating original enrollment hbx id #{original_hbx_id}")
-      enrollment_record = HbxEnrollment.find_by(hbx_id: original_hbx_id)
-      enrollment_record.update_attributes!(hbx_id: HbxIdGenerator.generate_policy_id)
-      puts("Enrollment record now updated too #{enrollment_record.hbx_id} from #{original_hbx_id}")
-    end
-  end
+  # def update_enrollment_hbx_ids
+  #  @original_enrollment_hbx_ids.each do |original_hbx_id|
+  #    puts("Updating original enrollment hbx id #{original_hbx_id}")
+  #    enrollment_record = HbxEnrollment.find_by(hbx_id: original_hbx_id)
+  #    enrollment_record.update_attributes!(hbx_id: HbxIdGenerator.generate_policy_id)
+  #    puts("Enrollment record now updated too #{enrollment_record.hbx_id} from #{original_hbx_id}")
+  #  end
+  # end
 
   # Only get up to date IVL products
   def ivl_products
@@ -134,10 +136,10 @@ module GoldenSeedHelper
       last_name: last_name,
       gender: gender,
       ssn: generate_and_return_unique_ssn,
-      dob: generate_random_birthday(case_info_hash),
-      hbx_id: SecureRandom.hex # To avoid external hbx id calls
+      dob: generate_random_birthday(case_info_hash)
+      # hbx_id: SecureRandom.hex # To avoid external hbx id calls
     )
-    @original_person_hbx_ids << person.hbx_id
+    # @original_person_hbx_ids << person.hbx_id
     person.save!
     raise("Unable to save person.") unless person.save
     # Set residency type
@@ -403,8 +405,8 @@ module GoldenSeedHelper
     consumer_role.skip_residency_verification = true
     effective_on = TimeKeeper.date_of_record
     enrollment = HbxEnrollment.new(kind: "individual", consumer_role_id: consumer_role.id)
-    enrollment.hbx_id = SecureRandom.hex # To avoid external hbx id calls
-    @original_enrollment_hbx_ids << enrollment.hbx_id
+    # enrollment.hbx_id = SecureRandom.hex # To avoid external hbx id calls
+    # @original_enrollment_hbx_ids << enrollment.hbx_id
     enrollment.effective_on = effective_on
     # A new product will be created for this rake task if there are none present.
     # Otherwise, a random one will be selected
@@ -431,6 +433,24 @@ module GoldenSeedHelper
     puts("#{enrollment.aasm_state} HBX Enrollment created for #{consumer_role.person.full_name}") unless Rails.env.test?
   end
   # rubocop:enable Metrics/AbcSize
+
+  def remove_golden_seed_callbacks
+    Person.skip_callback(:create, :after, :notify_created)
+    Person.skip_callback(:update, :after, :notify_updated)
+    Person.skip_callback(:update, :after, :person_create_or_update_handler)
+    PersonRelationship.skip_callback(:save, :after, :notify_updated)
+    HbxEnrollment.skip_callback(:save, :after, :notify_on_save)
+    FinancialAssistance::Relationship.skip_callback(:create, :after, :propagate_applicant) if EnrollRegistry.feature_enabled?(:financial_assistance)
+  end
+
+  def reinstate_golden_seed_callbacks
+    Person.set_callback(:create, :after, :notify_created)
+    Person.set_callback(:update, :after, :notify_updated)
+    Person.set_callback(:update, :after, :person_create_or_update_handler)
+    PersonRelationship.set_callback(:save, :after, :notify_updated)
+    HbxEnrollment.set_callback(:save, :after, :notify_on_save)
+    FinancialAssistance::Relationship.set_callback(:create, :after, :propagate_applicant) if EnrollRegistry.feature_enabled?(:financial_assistance)
+  end
 end
 
 # rubocop:enable Metrics/ModuleLength
