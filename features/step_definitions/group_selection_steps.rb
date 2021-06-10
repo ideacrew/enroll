@@ -79,14 +79,42 @@ And(/(.*) also has a health enrollment with primary person covered/) do |role|
   family = Family.all.first
   # qle = FactoryBot.create(:qualifying_life_event_kind,market_kind: @employee_role.present? ? "employer_sponsored" : "individual")
   if ["consumer","Resident","user"].include? role
+    benefit_market_kind = :aca_individual
     qle = FactoryBot.create :qualifying_life_event_kind, market_kind: "individual"
     sep = FactoryBot.create :special_enrollment_period, qualifying_life_event_kind_id: qle.id, family: family
   else
+    benefit_market_kind = :aca_shop
     sep = FactoryBot.create :special_enrollment_period, family: family
   end
   document = FactoryBot.build(:document, identifier: '525252')
-  product = FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile, sbc_document: document, :metal_level_kind => :silver)
+  rating_address = family.primary_person.rating_address
+  start_on = TimeKeeper.date_of_record
+  application_period = start_on.beginning_of_year..start_on.end_of_year
+  rating_area = BenefitMarkets::Locations::RatingArea.rating_area_for(rating_address, during: start_on) || FactoryBot.create(:benefit_markets_locations_rating_area)
+  service_area = BenefitMarkets::Locations::ServiceArea.service_areas_for(rating_address, during: start_on).first || FactoryBot.create(:benefit_markets_locations_service_area)
+  silver_premium_table = FactoryBot.build(:benefit_markets_products_premium_table, effective_period: application_period, rating_area: rating_area)
+  silver_product = FactoryBot.create(
+    :benefit_markets_products_health_products_health_product,
+    :with_issuer_profile,
+    benefit_market_kind: benefit_market_kind,
+    sbc_document: document,
+    service_area: service_area,
+    :metal_level_kind => :silver
+  )
+  silver_product.premium_tables = [silver_premium_table]
+  silver_product.save
 
+  premium_table = FactoryBot.build(:benefit_markets_products_premium_table, effective_period: application_period, rating_area: rating_area)
+  product = FactoryBot.create(
+    :benefit_markets_products_health_products_health_product,
+    :with_issuer_profile,
+    benefit_market_kind: benefit_market_kind,
+    sbc_document: document,
+    service_area: service_area,
+    :metal_level_kind => :silver
+  )
+  product.premium_tables = [premium_table]
+  product.save
   if role == 'consumer'
     FactoryBot.create(:hbx_profile, :no_open_enrollment_coverage_period)
     benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
@@ -106,7 +134,6 @@ And(/(.*) also has a health enrollment with primary person covered/) do |role|
     else
       'individual'
     end
-  rating_area = FactoryBot.create(:benefit_markets_locations_rating_area)
   enrollment =
     FactoryBot.create(
       :hbx_enrollment,
