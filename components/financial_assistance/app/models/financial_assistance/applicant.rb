@@ -61,9 +61,15 @@ module FinancialAssistance
         "I-327 (Reentry Permit)",
         "I-551 (Permanent Resident Card)",
         "I-571 (Refugee Travel Document)",
-        "I-766 (Employment Authorization Card)",
-        "Certificate of Citizenship",
-        "Naturalization Certificate",
+        "I-766 (Employment Authorization Card)"
+    ]
+    if EnrollRegistry[:enroll_app].setting(:state_abbreviation).item != "ME"
+      VLP_DOCUMENT_KINDS += [
+          "Certificate of Citizenship",
+          "Naturalization Certificate"
+      ]
+    end
+    VLP_DOCUMENT_KINDS += [
         "Machine Readable Immigrant Visa (with Temporary I-551 Language)",
         "Temporary I-551 Stamp (on passport or I-94)",
         "I-94 (Arrival/Departure Record)",
