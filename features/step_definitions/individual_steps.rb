@@ -862,6 +862,10 @@ When(/^Incarcerated field is nil for the consumer$/) do
   user.person.update_attributes(is_incarcerated: nil)
 end
 
+When(/^citizen status is false for the consumer$/) do
+  user.person.update_attributes(citizen_status: "not_lawfully_present_in_us")
+end
+
 Then(/^the consumer should see a message with incarcerated error$/) do
   expect(page).to have_content(/Incarceration question must be answered/)
 end
