@@ -54,11 +54,39 @@ module Insured
     end
 
     describe "#for_view" do
+      let!(:rating_area) do
+        ::BenefitMarkets::Locations::RatingArea.rating_area_for(address, during: start_on) || FactoryBot.create_default(:benefit_markets_locations_rating_area)
+      end
+      let!(:service_area) do
+        ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address, during: start_on).first || FactoryBot.create_default(:benefit_markets_locations_service_area)
+      end
+
+      let(:start_on) { TimeKeeper.date_of_record }
+      let(:address) { person.rating_address }
+      let(:application_period) { start_on.beginning_of_year..start_on.end_of_year }
+
+      let!(:product) do
+        prod =
+          FactoryBot.create(
+            :benefit_markets_products_health_products_health_product,
+            :with_issuer_profile,
+            benefit_market_kind: :aca_individual,
+            kind: :health,
+            service_area: service_area,
+            csr_variant_id: '01',
+            metal_level_kind: 'silver',
+            application_period: application_period
+          )
+        prod.premium_tables = [premium_table]
+        prod.save
+        prod
+      end
+      let(:premium_table)        { build(:benefit_markets_products_premium_table, effective_period: application_period, rating_area: rating_area) }
+
       let!(:person) {FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
       let!(:family) {FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person)}
       let(:sep) {FactoryBot.create(:special_enrollment_period, family: family)}
-      let(:rating_area) { FactoryBot.create(:benefit_markets_locations_rating_area) }
-      let!(:enrollment) {FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, product: @product, consumer_role_id: person.consumer_role.id, rating_area_id: rating_area.id)}
+      let!(:enrollment) {FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, product: product, consumer_role_id: person.consumer_role.id, rating_area_id: rating_area.id)}
       let!(:hbx_enrollment_member1) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, is_subscriber: true, eligibility_date: (TimeKeeper.date_of_record - 1.day), hbx_enrollment: enrollment)}
       let!(:hbx_enrollment_member2) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members[1].id, eligibility_date: (TimeKeeper.date_of_record - 1.day), hbx_enrollment: enrollment)}
       let!(:hbx_profile) {FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)}
@@ -73,7 +101,7 @@ module Insured
       before(:each) do
         # This effective on mock to compensate for new yaers
         enrollment.update_attributes!(effective_on: TimeKeeper.date_of_record - 1.day) if enrollment.effective_on.year != TimeKeeper.date_of_record.year
-        @product = BenefitMarkets::Products::Product.all.where(benefit_market_kind: :aca_individual).first
+        @product = product
         @product.update_attributes(ehb: 0.9844)
         premium_table = @product.premium_tables.first
         premium_table.premium_tuples.where(age: hbx_enrollment_member_2_age).first.update_attributes(cost: 614.85)
