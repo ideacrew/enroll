@@ -64,7 +64,7 @@ module FinancialAssistance
       def validate_citizen_status
         error_message = if @us_citizen.nil?
                           "Citizenship status is required"
-                        elsif @us_citizen == false && @eligible_immigration_status.nil?
+                        elsif @us_citizen == false && (@eligible_immigration_status.nil? && EnrollRegistry[:immigration_status_question_required].item)
                           "Eligible immigration status is required"
                         elsif @us_citizen == true && @naturalized_citizen.nil?
                           "Naturalized citizen is required"
