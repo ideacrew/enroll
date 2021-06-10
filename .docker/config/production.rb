@@ -100,12 +100,12 @@ Rails.application.configure do
   config.ga_tagmanager_id = ENV['GA_TAGMANAGER_ID'] || "dummy"
 
   #Environment URL stub
-  config.checkbook_services_base_url = "https://checkbook_url"
-  config.checkbook_services_ivl_path = "/ivl/"
-  config.checkbook_services_shop_path = "/shop/"
-  config.checkbook_services_congress_url = "https://checkbook_url/congress/"
-  config.checkbook_services_remote_access_key = "9876543210"
-  config.checkbook_services_reference_id = "0123456789"
+  config.checkbook_services_base_url = ENV['CHECKBOOK_BASE_URL'] || "https://checkbook_url"
+  config.checkbook_services_ivl_path = ENV['CHECKBOOK_IVL_PATH'] || "/ivl/"
+  config.checkbook_services_shop_path = ENV['CHECKBOOK_SHOP_PATH'] || "/shop/"
+  config.checkbook_services_congress_url = ENV['CHECKBOOK_CONGRESS_URL'] || "https://checkbook_url/congress/"
+  config.checkbook_services_remote_access_key = ENV['CHECKBOOK_REMOTE_ACCESS_KEY'] || "9876543210"
+  config.checkbook_services_reference_id = ENV['CHECKBOOK_REFERENCE_ID'] || "0123456789"
   # for Employer Auto Pay
   config.wells_fargo_api_url = ENV['WF_API_URL'] || "dummy" 
   config.wells_fargo_api_key = ENV['WF_API_KEY'] || "dummy"
