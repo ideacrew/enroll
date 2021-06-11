@@ -27,7 +27,8 @@ describe SeedRowWorker, :dbclean => :after_each do
     end
 
     it "should be able to seed the database and infer data like primary families/persons" do
-      @seed.rows.each do |seed_row|
+      # To speed up only do a few of them
+      @seed.rows.to_a[0..5].each do |seed_row|
         SeedRowWorker.new.perform(seed_row.id, @seed.id)
       end
       expect(FinancialAssistance::Application.all.count).to be > 0 if EnrollRegistry.feature_enabled?(:financial_assistance)

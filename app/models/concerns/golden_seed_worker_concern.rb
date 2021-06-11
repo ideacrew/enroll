@@ -15,7 +15,7 @@ module GoldenSeedWorkerConcern
 
     # Row data needs to be hash
     # rubocop:disable Metrics/AbcSize
-    # rubocop:disable Metrics/CyclomaticComplexity
+    # rubocop:disable Metriics/MethodLength
     def process_row(row_data)
       remove_golden_seed_callbacks
       # TODO: Weird behavior. Prevents the original hash on the row attribute from being modified
@@ -35,11 +35,14 @@ module GoldenSeedWorkerConcern
             family_record: primary_family_for_current_case
           }
         ).with_indifferent_access
-        puts("Beginning to create dependent record for #{target_row_data[:person_attributes]['case_name']}") 
-        generate_and_return_dependent_record(target_row_data)
+        puts("Beginning to create dependent record for #{target_row_data[:person_attributes]['case_name']}")
+        current_target_person = generate_and_return_dependent_record(target_row_data)
+        target_row_data[:person_attributes].merge!(current_target_person: current_target_person)
         if fa_enabled_and_required_for_case
-          puts("Beginning to create FA Applicant record for #{target_row_data[:person_attributes]['case_name']}") 
-          applicant_record = create_and_return_fa_applicant(target_row_data[:person_attributes])
+          current_fa_application = FinancialAssistance::Application.where(family_id: primary_family_for_current_case.id.to_s).first
+          target_row_data[:fa_application] = current_fa_application
+          puts("Beginning to create FA Applicant record for #{target_row_data[:person_attributes]['case_name']}")
+          applicant_record = create_and_return_fa_applicant(target_row_data)
           target_row_data[:target_fa_applicant] = applicant_record
           add_applicant_income(target_row_data)
           add_applicant_addresses(target_row_data)
@@ -50,13 +53,13 @@ module GoldenSeedWorkerConcern
         end
       # Primary person
       else
-        puts("Beginning to create records for consumer role record for #{target_row_data[:person_attributes]['case_name']}") 
+        puts("Beginning to create records for consumer role record for #{target_row_data[:person_attributes]['case_name']}")
         consumer_hash = create_and_return_matched_consumer_and_hash(target_row_data)
         target_row_data[:person_attributes][:current_target_person] = consumer_hash[:primary_person_record]
-        puts("Beginning to create HBX Enrollment record for #{target_row_data[:person_attributes]['case_name']}") 
+        puts("Beginning to create HBX Enrollment record for #{target_row_data[:person_attributes]['case_name']}")
         generate_and_return_hbx_enrollment(target_row_data)
         if fa_enabled_and_required_for_case
-          puts("Beginning to create Financial Assisstance application record for #{target_row_data[:person_attributes]['case_name']}") 
+          puts("Beginning to create Financial Assisstance application record for #{target_row_data[:person_attributes]['case_name']}")
           application = create_and_return_fa_application(target_row_data)
           target_row_data[:fa_application] = application
           applicant_record = create_and_return_fa_applicant(target_row_data, true)
@@ -72,6 +75,6 @@ module GoldenSeedWorkerConcern
       )
     end
     # rubocop:enable Metrics/AbcSize
-    # rubocop:enable Metrics/CyclomaticComplexity
+    # rubocop:enable Metriics/MethodLength
   end
 end
