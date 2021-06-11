@@ -44,6 +44,7 @@ module Operations
       def fetch_product_premiums(products, family_members, effective_date, rating_area_id)
         member_premiums = family_members.inject({}) do |member_result, family_member|
           age = family_member.age_on(effective_date)
+          hbx_id = family_member.hbx_id
           # age = ::Operations::AgeLookup.new.call(age).success if false && age_rated # Todo - Get age_rated through settings
           product_hash =
             products.inject([]) do |result, product|
@@ -54,10 +55,10 @@ module Operations
                                                            }).first
 
               tuple = premium_table.premium_tuples.where(age: age).first
-              result << { cost: tuple.cost, product_id: product.id } if tuple.present?
+              result << { cost: tuple.cost, product_id: product.id, member_identifier: hbx_id, monthly_premium: tuple.cost } if tuple.present?
               result
             end
-          member_result[family_member.hbx_id] = product_hash.sort_by {|tuple_hash| tuple_hash[:cost]}
+          member_result[hbx_id] = product_hash.sort_by {|tuple_hash| tuple_hash[:cost]}
 
           member_result
         end
