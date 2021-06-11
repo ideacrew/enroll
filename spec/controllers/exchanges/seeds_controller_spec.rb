@@ -68,7 +68,7 @@ RSpec.describe Exchanges::SeedsController, :type => :controller, dbclean: :after
 
   describe "#update" do
     it "should begin to process the seed in the background" do
-      return unless file_location.pressent?
+      return unless file_location.present?
       post :create, params: create_params
       put :update, params: update_params
     end

@@ -18,15 +18,18 @@ describe SeedRowWorker, :dbclean => :after_each do
         aasm_state: 'draft'
       )
       # TODO: need to figure out how to save the file
-      CSV.foreach(file_location, headers: true) do |row|
-        # To avoid nil values
-        row_data = row.to_h.reject { |key, _value| key.blank? }.transform_values { |v| v.blank? ? "" : v }.with_indifferent_access
-        @seed.rows.build(data: row_data)
+      if file_location.present?
+        CSV.foreach(file_location, headers: true) do |row|
+          # To avoid nil values
+          row_data = row.to_h.reject { |key, _value| key.blank? }.transform_values { |v| v.blank? ? "" : v }.with_indifferent_access
+          @seed.rows.build(data: row_data)
+        end
+        @seed.save!
       end
-      @seed.save!
     end
 
     it "should be able to seed the database and infer data like primary families/persons" do
+      return if file_location.blank?
       # To speed up only do a few of them
       @seed.rows.to_a[0..5].each do |seed_row|
         SeedRowWorker.new.perform(seed_row.id, @seed.id)
