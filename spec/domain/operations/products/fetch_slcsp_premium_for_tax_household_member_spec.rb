@@ -72,7 +72,7 @@ RSpec.describe ::Operations::Products::FetchSlcspPremiumForTaxHouseholdMember, d
 
     it 'should return premium amount & product for the member' do
       result = subject.call(params)
-      expect(result.success).to eq({ :cost => 200.0, :product_id => product.id })
+      expect(result.success).to eq({ :cost => 200.0, :product_id => product.id, :member_identifier => person.hbx_id, :monthly_premium => 200.0 })
     end
   end
 end
