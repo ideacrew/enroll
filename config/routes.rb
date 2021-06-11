@@ -13,6 +13,7 @@ Rails.application.routes.draw do
   mount TransportProfiles::Engine,    at: "/transport_profiles"
   mount Notifier::Engine,             at: "/notifier"
   mount FinancialAssistance::Engine,  at: '/financial_assistance'
+  mount MagiMedicaid::Engine,         at: '/magi_medicaid'
 
   devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions', :passwords => 'users/passwords' }
 
