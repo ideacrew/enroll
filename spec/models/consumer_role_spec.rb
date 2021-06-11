@@ -1740,4 +1740,3 @@ describe 'vlp documents' do
 end
 
 # rubocop:enable Metrics/ParameterLists
-
