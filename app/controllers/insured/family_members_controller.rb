@@ -266,7 +266,7 @@ class Insured::FamilyMembersController < ApplicationController
         family_member&.last_name == @dependent.last_name &&
         family_member&.ssn == @dependent.ssn
     end
-    return unless potential_duplicate.presesnt?
+    return unless potential_duplicate.present?
     # Families home page
     notice_message = l10n(
       'insured.family_members.duplicate_error_message',
