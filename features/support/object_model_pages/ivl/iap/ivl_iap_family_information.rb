@@ -1,53 +1,57 @@
 # frozen_string_literal: true
 
 #insured/family_members?consumer_role_id
-class IvlFamilyInformation
+class IvlIapFamilyInformation
 
   def self.add_new_person
     '#household_info_add_member'
   end
 
   def self.continue_btn
-    '#btn-continue, #btn_household_continue'
+    '#btn-continue'
   end
 
-  def self.edit_icon
-    'i.fa-pencil-alt'
+  def self.add_income_and_coverage_info_btn
+    'a[class="btn btn-default add interaction-click-control-add-income---coverage-info"]'
   end
 
-  def self.dependent_first_name
+  def self.new_person_first_name
     'applicant_first_name'
   end
 
-  def self.dependent_middle_name
+  def self.new_person_middle_name
     'applicant_middle_name'
   end
 
-  def self.dependent_last_name
+  def self.new_person_last_name
     'applicant_last_name'
   end
 
-  def self.need_coverage_yes
-    'label[for="is_applying_coverage_true"] span'
+  def self.need_coverage_no
+    'label[for="is_applying_coverage_false"]'
   end
 
-  def self.need_coverage_no
-    'label[for="is_applying_coverage_false"] span'
+  def self.need_coverage_yes
+    'label[for="is_applying_coverage_true"]'
   end
 
   def self.not_sure_need_coverage_link
     'a[href="#is_applying_coverage"]'
   end
 
-  def self.dependent_dob
+  def self.new_person_dob
     'family_member_dob_'
   end
 
-  def self.dependent_ssn
+  def self.calendar
+    'table[class="ui-datepicker-calendar"]'
+  end
+
+  def self.new_person_ssn
     'applicant_ssn'
   end
 
-  def self.dependent_no_ssn_checkbox
+  def self.new_person_no_ssn_checkbox
     'input[name="applicant[no_ssn]"]'
   end
 
@@ -59,12 +63,12 @@ class IvlFamilyInformation
     'label[for="radio_female"] span'
   end
 
-  def self.dependent_relationship_dropdown
+  def self.new_person_relationship_dropdown
     'div[class="select-relation rs_selection"]'
   end
 
-  def self.spouse
-    'div.select-relation li[data-index="1"]'
+  def self.select_spouse
+    'li[data-index="1"]'
   end
 
   def self.us_citizen_or_national_yes_radiobtn
@@ -77,6 +81,22 @@ class IvlFamilyInformation
 
   def self.not_sure_us_citizen_link
     'a[href="#us_citizen"]'
+  end
+
+  def self.immigration_status_yes_radiobtn
+    'label[for="applicant_eligible_immigration_status_true"] span'
+  end
+
+  def self.immigration_status_no_radiobtn
+    'label[for="applicant_eligible_immigration_status_false"] span'
+  end
+
+  def self.not_sure_immigration_status_link
+    'a[href="#eligible_immigration_status"]'
+  end
+
+  def self.immigration_status_select_doc_dropdown
+    '#immigration_doc_type_select span'
   end
 
   def self.naturalized_citizen_yes_radiobtn
@@ -93,18 +113,6 @@ class IvlFamilyInformation
 
   def self.naturalized_citizen_select_doc_dropdown
     '#naturalization_doc_type_select span'
-  end
-
-  def self.immigration_status_yes_radiobtn
-    'label[for="applicant_eligible_immigration_status_true"] span'
-  end
-
-  def self.immigration_status_no_radiobtn
-    'label[for="applicant_eligible_immigration_status_false"] span'
-  end
-
-  def self.immigration_status_select_doc_dropdown
-    '#immigration_doc_type_select span'
   end
 
   def self.american_or_alaskan_native_yes_radiobtn
@@ -132,7 +140,7 @@ class IvlFamilyInformation
   end
 
   def self.white_checkbox
-    'applicant_ethnicity_white'
+    '#applicant_ethnicity_white'
   end
 
   def self.black_or_african_american_checkbox
@@ -191,6 +199,30 @@ class IvlFamilyInformation
     '#applicant_ethnicity_other'
   end
 
+  def self.mexican_checkbox
+    '#applicant_ethnicity_mexican'
+  end
+
+  def self.mexican_american_checkbox
+    '#applicant_ethnicity_mexican_american'
+  end
+
+  def self.chicano_or_chicanoa_checkbox
+    '##applicant_ethnicity_chicanoa'
+  end
+
+  def self.puerto_rican_checkbox
+    '#applicant_ethnicity_puerto_rican'
+  end
+
+  def self.cuban_checkbox
+    '#applicant_ethnicity_cuban'
+  end
+
+  def self.hispanic_or_latino_other_checkbox
+    '#applicant_ethnicity_other'
+  end
+
   def self.lives_with_prim_subs_checkbox
     'input[id="applicant_same_with_primary"]'
   end
@@ -204,42 +236,42 @@ class IvlFamilyInformation
   end
 
   def self.city
-    'applicant[addresses_attributes][0][city]'
+    'applicant_addresses_attributes_0_city'
   end
 
-  def self.select_state_dropdown
-    'div.home-div span.label'
+  def self.select_va
+    'li[data-index="51"]'
   end
 
   def self.zip
     'applicant_addresses_attributes_0_zip'
   end
 
-  def self.living_outside_dc_checkbox
+  def self.select_state_dropdown
+    'div.home-div span.label'
+  end
+
+  def self.select_va_state
+    'li[data-index="51"]'
+  end
+
+  def self.applicant_is_temporarily_out_of_state_checkbox
     '#applicant_is_temporarily_out_of_state'
   end
 
-  def self.homeless_checkbox
+  def self.applicant_is_homeless_checkbox
     '#applicant_is_homeless'
   end
 
+  def self.add_mailing_address
+    'span[class="form-action btn btn-default"]'
+  end
+
   def self.confirm_member_btn
-    '#add_info_buttons_ span'
+    'span[class="btn btn-primary btn-br pull-right mz"]'
   end
 
   def self.cancel_btn
-    '#add_info_buttons_ a'
-  end
-
-  def self.previous_link
-    'a.interaction-click-control-previous'
-  end
-
-  def self.save_and_exit_link
-    'a.interaction-click-control-save---exit'
-  end
-
-  def self.help_me_sign_up_btn
-    '.help-me-sign-up'
+    'a[class="btn btn-default remove-new-employee-dependent"]'
   end
 end
