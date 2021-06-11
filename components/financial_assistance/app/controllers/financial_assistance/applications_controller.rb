@@ -48,7 +48,7 @@ module FinancialAssistance
           @model.update_attributes!(workflow: { current_step: @current_step.to_i })
           if params[:commit] == "Submit Application"
             @application.submit! if @application.complete?
-            publish_result = FinancialAssistance::Operations::Application::RequestDetermination.new.call(application_id: @application.id)
+            publish_result = determination_request_class.new.call(application_id: @application.id)
             if publish_result.success?
               redirect_to wait_for_eligibility_response_application_path(@application)
             else
@@ -191,6 +191,11 @@ module FinancialAssistance
     end
 
     private
+
+    def determination_request_class
+      return FinancialAssistance::Operations::Application::RequestDetermination if FinancialAssistanceRegistry.feature_enabled?(:haven_determination)
+      return FinancialAssistance::Operations::Applications::MedicaidGateway::RequestEligibilityDetermination if FinancialAssistanceRegistry.feature_enabled?(:medicaid_gateway_determination)
+    end
 
     def init_cfl_service
       @cfl_service = ::FinancialAssistance::Services::ConditionalFieldsLookupService.new
