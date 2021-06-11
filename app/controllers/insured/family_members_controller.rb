@@ -3,10 +3,12 @@
 class Insured::FamilyMembersController < ApplicationController
   include VlpDoc
   include ApplicationHelper
+  include ::L10nHelper
 
   before_action :dependent_person_params, only: [:create, :update]
   before_action :set_current_person, :set_family
   before_action :set_dependent, only: [:destroy, :show, :edit, :update]
+  before_action :verify_unique_dependent, only: [:create]
 
   rescue_from ActionController::InvalidAuthenticityToken, :with => :bad_token_due_to_session_expired
 
@@ -19,7 +21,8 @@ class Insured::FamilyMembersController < ApplicationController
       @type = "resident"
       @resident_role = ResidentRole.find(params[:resident_role_id])
       @family.hire_broker_agency(current_user.person.broker_role.try(:id))
-      redirect_to resident_index_insured_family_members_path(:resident_role_id => @person.resident_role.id, :change_plan => params[:change_plan], :qle_date => params[:qle_date], :qle_id => params[:qle_id], :effective_on_kind => params[:effective_on_kind], :qle_reason_choice => params[:qle_reason_choice], :commit => params[:commit])
+      redirect_to resident_index_insured_family_members_path(:resident_role_id => @person.resident_role.id, :change_plan => params[:change_plan], :qle_date => params[:qle_date], :qle_id => params[:qle_id],
+                                                             :effective_on_kind => params[:effective_on_kind], :qle_reason_choice => params[:qle_reason_choice], :commit => params[:commit])
     end
 
     if @type == "employee"
@@ -77,8 +80,6 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   def create
-    @dependent = ::Forms::FamilyMember.new(params[:dependent])
-
     @address_errors = validate_address_params(params)
     if Family.find(@dependent.family_id).primary_applicant.person.resident_role?
       if @address_errors.blank? && @dependent.save
@@ -257,6 +258,24 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   private
+
+  def verify_unique_dependent
+    @dependent = ::Forms::FamilyMember.new(params[:dependent])
+    potential_duplicate = @family&.family_members&.detect do |family_member|
+      family_member&.first_name == @dependent.first_name &&
+        family_member&.last_name == @dependent.last_name &&
+        family_member&.ssn == @dependent.ssn
+    end
+    return unless potential_duplicate.presesnt?
+    # Families home page
+    notice_message = l10n(
+      'insured.family_members.duplicate_error_message',
+      contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item
+    )
+    respond_to do |format|
+      format.html { redirect_to family_account_path, notice: notice_message }
+    end
+  end
 
   def dependent_person_params
     params.permit(:dependent => {})

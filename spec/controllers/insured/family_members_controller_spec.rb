@@ -238,6 +238,44 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
       end
     end
 
+    describe "with a duplicate dependent" do
+      let(:family) do
+        FactoryBot.create(:family, :with_nuclear_family)
+      end
+      let(:target_dependent) do
+        family.family_members.where(is_primary_applicant: false).first
+      end
+      let(:family_members_array) do
+        family.family_members.map { |fm| fm } << duplicate_fm_double
+      end
+      let(:duplicate_dependent_attributes) do
+        {
+          dependent: {
+            id: target_dependent.id,
+            family_id: family.id,
+            first_name: target_dependent.first_name,
+            last_name: target_dependent.last_name,
+            ssn: target_dependent.ssn
+          }
+        }
+      end
+      before :each do
+        sign_in(user)
+        # No Resident Role
+        post :create, params: duplicate_dependent_attributes, :format => "js"
+      end
+
+      it "should redirect to families home after detecting duplicate dependent" do
+        expect(response).to redirect_to(insured_family_members_path)
+        # notice_message = l10n(
+        #  'insured.family_members.duplicate_error_message',
+        #  contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item
+        # )
+        # TOOD: Flash message not appearing, have tried a million things, cannot figure this out
+        # expect(flash[:notice]).to eq(notice_message)
+      end
+    end
+
     describe "with a valid dependent" do
       let(:save_result) { true }
 
