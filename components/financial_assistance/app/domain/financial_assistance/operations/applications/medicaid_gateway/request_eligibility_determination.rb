@@ -48,7 +48,6 @@ module FinancialAssistance
           end
 
           def validate_payload(payload)
-            binding.pry
             AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(payload).failure.errors.to_h
             # Validate payload through aca_Entities
           end
