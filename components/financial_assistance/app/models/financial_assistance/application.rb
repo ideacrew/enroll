@@ -345,6 +345,10 @@ module FinancialAssistance
       return unless ed_updated
 
       determine! # If successfully loaded ed's move the application to determined state
+      send_determination_to_ea
+    end
+
+    def send_determination_to_ea
       result = ::Operations::Families::AddFinancialAssistanceEligibilityDetermination.new.call(params: self.attributes)
       result.failure? ? log(eligibility_response_payload, {:severity => 'critical', :error_message => "ERROR: #{result.failure}"}) : true
     end
