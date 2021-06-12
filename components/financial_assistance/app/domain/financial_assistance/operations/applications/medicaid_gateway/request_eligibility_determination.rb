@@ -61,6 +61,10 @@ module FinancialAssistance
             #                                                            })
             # Success(payload)
           end
+
+          def publish(payload)
+            FinancialAssistance::Operations::Applications::MedicaidGateway::Publish.new.call(payload)
+          end
         end
       end
     end
