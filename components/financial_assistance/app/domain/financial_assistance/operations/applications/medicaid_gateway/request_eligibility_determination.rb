@@ -23,7 +23,7 @@ module FinancialAssistance
             application    = yield validate(application)
             payload_param  = yield construct_payload(application)
             payload_value  = yield validate_payload(payload_param)
-            payload        = yield publish(payload_value, application)
+            payload        = yield publish(payload_value)
 
             Success(payload)
           end
@@ -48,18 +48,7 @@ module FinancialAssistance
           end
 
           def validate_payload(payload)
-            AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(payload).failure.errors.to_h
-            # Validate payload through aca_Entities
-          end
-
-          def request_eligibility_determination(payload, application)
-            # notify("acapi.info.events.assistance_application.submitted", {
-            #                                                                :correlation_id => SecureRandom.uuid.gsub("-",""),
-            #                                                                :body => payload,
-            #                                                                :family_id => application.family_id.to_s,
-            #                                                                :assistance_application_id => application.hbx_id.to_s
-            #                                                            })
-            # Success(payload)
+            AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(payload)
           end
 
           def publish(payload)
