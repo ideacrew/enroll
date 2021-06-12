@@ -9,7 +9,7 @@ module FinancialAssistance
       module Transformers
         module ApplicationTo
           # Application params to be transformed.
-          class Cv3Application
+          class Cv3Application # rubocop:disable Metrics/ClassLength
             # constructs cv3 payload for medicaid gateway.
 
             send(:include, Dry::Monads[:result, :do])
@@ -55,25 +55,16 @@ module FinancialAssistance
               ::Family.find(family_id)&.hbx_assigned_id.to_s
             end
 
+            # rubocop:disable Metrics/CyclomaticComplexity
+            # rubocop:disable Metrics/AbcSize
+            # rubocop:disable Metrics/MethodLength
             def applicants(application)
-              applicants = application.applicants.inject([]) do |result, applicant|
-                result << {name: {first_name: applicant.first_name,
-                                  middle_name: applicant.middle_name,
-                                  last_name: applicant.last_name,
-                                  name_sfx: applicant.name_sfx,
-                                  name_pfx: applicant.name_pfx},
+              application.applicants.inject([]) do |result, applicant|
+                result << {name: name(applicant),
                            identifying_information: {has_ssn: applicant.no_ssn,
                                                      encrypted_ssn: applicant.encrypted_ssn},
-                           demographic: {gender: applicant.gender.capitalize,
-                                         dob: applicant.dob,
-                                         ethnicity: applicant.ethnicity,
-                                         race: applicant.race,
-                                         is_veteran_or_active_military: applicant.is_veteran_or_active_military,
-                                         is_vets_spouse_or_child: applicant.is_vets_spouse_or_child},
-                           attestation: {is_incarcerated: applicant.is_incarcerated,
-                                         is_self_attested_disabled: applicant.is_self_attested_disabled,
-                                         is_self_attested_blind: applicant.is_self_attested_blind,
-                                         is_self_attested_long_term_care: applicant.is_self_attested_long_term_care},
+                           demographic: demographic(applicant),
+                           attestation: attestation(applicant),
                            is_primary_applicant: applicant.is_primary_applicant,
                            native_american_information: {indian_tribe_member: applicant.indian_tribe_member,
                                                          tribal_id: applicant.tribal_id},
@@ -91,22 +82,11 @@ module FinancialAssistance
                            is_claimed_as_tax_dependent: applicant.is_claimed_as_tax_dependent,
                            claimed_as_tax_dependent_by: applicant.claimed_as_tax_dependent_by,
                            tax_filer_kind: applicant.tax_filer_kind,
-                           student: {is_student: applicant.is_student,
-                                     student_kind: applicant.student_kind,
-                                     student_school_kind: applicant.student_school_kind,
-                                     student_status_end_on: applicant.student_status_end_on},
+                           student: student_information(applicant),
                            is_refugee: applicant.is_refugee,
                            is_trafficking_victim: applicant.is_trafficking_victim,
-                           foster_care: {is_former_foster_care: applicant.is_former_foster_care,
-                                         age_left_foster_care: applicant.age_left_foster_care,
-                                         foster_care_us_state: applicant.foster_care_us_state,
-                                         had_medicaid_during_foster_care: applicant.had_medicaid_during_foster_care},
-                           pregnancy_information: {is_pregnant: applicant.is_pregnant,
-                                                   is_enrolled_on_medicaid: applicant.is_enrolled_on_medicaid,
-                                                   is_post_partum_period: applicant.is_post_partum_period,
-                                                   expected_children_count: applicant.children_expected_count,
-                                                   pregnancy_due_on: applicant.pregnancy_due_on,
-                                                   pregnancy_end_on: applicant.pregnancy_end_on},
+                           foster_care: foster(applicant),
+                           pregnancy_information: pregnancy_information(applicant),
                            is_subject_to_five_year_bar: applicant.is_subject_to_five_year_bar,
                            is_five_year_bar_met: applicant.is_five_year_bar_met,
                            is_forty_quarters: applicant.is_forty_quarters,
@@ -125,13 +105,7 @@ module FinancialAssistance
                            has_eligible_health_coverage: applicant.has_eligible_health_coverage,
                            job_coverage_ended_in_past_3_months: applicant.has_dependent_with_coverage,
                            job_coverage_end_date: applicant.dependent_job_end_on,
-                           medicaid_and_chip: {not_eligible_in_last_90_days: applicant.has_eligible_medicaid_cubcare,
-                                               denied_on: applicant.medicaid_cubcare_due_on,
-                                               ended_as_change_in_eligibility: applicant.has_eligibility_changed,
-                                               hh_income_or_size_changed: applicant.has_household_income_changed,
-                                               medicaid_or_chip_coverage_end_date: applicant.person_coverage_end_on,
-                                               ineligible_due_to_immigration_in_last_5_years: applicant.medicaid_chip_ineligible,
-                                               immigration_status_changed_since_ineligibility: applicant.immigration_status_changed,},
+                           medicaid_and_chip: medicaid_and_chip(applicant),
                            other_health_service: {has_received: applicant.health_service_through_referral,
                                                   is_eligible: applicant.health_service_eligible},
                            addresses: addresses(applicant),
@@ -156,7 +130,66 @@ module FinancialAssistance
                            mitc_relationships: []}
                 result
               end
-              applicants
+            end
+            # rubocop:enable Metrics/CyclomaticComplexity
+            # rubocop:enable Metrics/AbcSize
+            # rubocop:enable Metrics/MethodLength
+
+            def name(applicant)
+              {first_name: applicant.first_name,
+               middle_name: applicant.middle_name,
+               last_name: applicant.last_name,
+               name_sfx: applicant.name_sfx,
+               name_pfx: applicant.name_pfx}
+            end
+
+            def medicaid_and_chip(applicant)
+              {not_eligible_in_last_90_days: applicant.has_eligible_medicaid_cubcare,
+               denied_on: applicant.medicaid_cubcare_due_on,
+               ended_as_change_in_eligibility: applicant.has_eligibility_changed,
+               hh_income_or_size_changed: applicant.has_household_income_changed,
+               medicaid_or_chip_coverage_end_date: applicant.person_coverage_end_on,
+               ineligible_due_to_immigration_in_last_5_years: applicant.medicaid_chip_ineligible,
+               immigration_status_changed_since_ineligibility: applicant.immigration_status_changed}
+            end
+
+            def student_information(applicant)
+              {is_student: applicant.is_student,
+               student_kind: applicant.student_kind,
+               student_school_kind: applicant.student_school_kind,
+               student_status_end_on: applicant.student_status_end_on}
+            end
+
+            def pregnancy_information(applicant)
+              {is_pregnant: applicant.is_pregnant,
+               is_enrolled_on_medicaid: applicant.is_enrolled_on_medicaid,
+               is_post_partum_period: applicant.is_post_partum_period,
+               expected_children_count: applicant.children_expected_count,
+               pregnancy_due_on: applicant.pregnancy_due_on,
+               pregnancy_end_on: applicant.pregnancy_end_on}
+            end
+
+            def foster(applicant)
+              {is_former_foster_care: applicant.is_former_foster_care,
+               age_left_foster_care: applicant.age_left_foster_care,
+               foster_care_us_state: applicant.foster_care_us_state,
+               had_medicaid_during_foster_care: applicant.had_medicaid_during_foster_care}
+            end
+
+            def attestation(applicant)
+              {is_incarcerated: applicant.is_incarcerated,
+               is_self_attested_disabled: applicant.is_self_attested_disabled,
+               is_self_attested_blind: applicant.is_self_attested_blind,
+               is_self_attested_long_term_care: applicant.is_self_attested_long_term_care}
+            end
+
+            def demographic(applicant)
+              {gender: applicant.gender.capitalize,
+               dob: applicant.dob,
+               ethnicity: applicant.ethnicity,
+               race: applicant.race,
+               is_veteran_or_active_military: applicant.is_veteran_or_active_military,
+               is_vets_spouse_or_child: applicant.is_vets_spouse_or_child}
             end
 
             def mitc_income(applicant)
@@ -176,8 +209,7 @@ module FinancialAssistance
                 ira_deduction: ira_deduction(applicant),
                 student_loan_interest_deduction: student_loan_interest_deduction(applicant),
                 tution_and_fees: tution_and_fees(applicant),
-                other_magi_eligible_income: 0 #TODO
-              }
+                other_magi_eligible_income: 0 }
             end
 
             def taxable_interest(applicant)
@@ -281,25 +313,27 @@ module FinancialAssistance
               end
             end
 
+            # rubocop:disable Metrics/CyclomaticComplexity
             def annual_amount(frequency, amount)
               return 0 if frequency.blank? || amount.blank?
 
               case frequency
-                when 'Weekly' then (amount * 52)
-                when 'Monthly' then (amount * 12)
-                when 'Annually' then amount
-                when 'BiWeekly' then (amount * 26)
-                when 'SemiMonthly' then (amount * 24)
-                when 'Quarterly' then (amount * 4)
-                when 'Hourly' then (amount * 8 * 5 * 52)
-                when 'Daily' then (amount * 5 * 52)
-                when 'SemiAnnually' then (amount * 2)
-                when '13xPerYear' then (amount * 13)
-                when '11xPerYear' then (amount * 11)
-                when '10xPerYear' then (amount * 10)
-                else 0
+              when 'Weekly' then (amount * 52)
+              when 'Monthly' then (amount * 12)
+              when 'Annually' then amount
+              when 'BiWeekly' then (amount * 26)
+              when 'SemiMonthly' then (amount * 24)
+              when 'Quarterly' then (amount * 4)
+              when 'Hourly' then (amount * 8 * 5 * 52)
+              when 'Daily' then (amount * 5 * 52)
+              when 'SemiAnnually' then (amount * 2)
+              when '13xPerYear' then (amount * 13)
+              when '11xPerYear' then (amount * 11)
+              when '10xPerYear' then (amount * 10)
+              else 0
               end
             end
+            # rubocop:enable Metrics/CyclomaticComplexity
 
             def monthly_amount(frequency, amount)
               annual_amount(frequency, amount) / 12
@@ -434,9 +468,8 @@ module FinancialAssistance
             def applicant_benchmark_premium(application)
               family = find_family(application.family_id) if application.family_id.present?
               return unless family.present?
-              benchmark_premium = {:health_only_lcsp_premiums => [{member_identifier: "test", monthly_premium: BigDecimal(300)}],
-                                   :health_only_slcsp_premiums => [{member_identifier: "test", monthly_premium: BigDecimal(300)}]}
-              benchmark_premium #TODO: need to use operations from ivl_rating area for actual values.
+              {:health_only_lcsp_premiums => [{member_identifier: "test", monthly_premium: BigDecimal(300)}],
+               :health_only_slcsp_premiums => [{member_identifier: "test", monthly_premium: BigDecimal(300)}]} #TODO: need to use operations from ivl_rating area for actual values.
             end
 
             def mitc_households(application)
@@ -454,8 +487,8 @@ module FinancialAssistance
               end
             end
 
-            def mitc_return(ed)
-              ed_applicants = ed.applicants
+            def mitc_return(eligibility_determination)
+              ed_applicants = eligibility_determination.applicants
               non_tax_dependents = ed_applicants.where(is_claimed_as_tax_dependent: false)
               tax_dependents = ed_applicants.where(is_claimed_as_tax_dependent: true)
               person_hbx_ids = non_tax_dependents.inject([]) do |hbx_ids, applicant|
@@ -481,8 +514,9 @@ module FinancialAssistance
               end
             end
 
-            def get_thh_member(ed, application)
+            def get_thh_member(eligibility, application)
               application.applicants.inject([]) do |result, app|
+                next result unless app.eligibility_determination_id.to_s == eligibility.id.to_s
                 result << {family_member_reference: {family_member_hbx_id: app.person_hbx_id.to_s,
                                                      first_name: app.first_name,
                                                      last_name: app.last_name,
@@ -500,34 +534,33 @@ module FinancialAssistance
                                                                magi_as_percentage_of_fpl: app.magi_as_percentage_of_fpl,
                                                                magi_medicaid_category: app.magi_medicaid_category},
                            is_subscriber: app.is_primary_applicant,
-                           reason: app.assisted_mec_reason} if app.eligibility_determination_id.to_s == ed.id.to_s
+                           reason: app.assisted_mec_reason}
                 result
               end
             end
 
             def application_relationships(application)
-              relationships = application.relationships.inject([]) do |result, rl|
+              application.relationships.inject([]) do |result, rl|
                 applicant_id = rl.applicant_id
                 relative_id = rl.relative_id
-                return unless applicant_id.present? || relative_id.present?
+                next result unless applicant_id.present? || relative_id.present?
                 applicant = FinancialAssistance::Applicant.find(applicant_id)
                 relative = FinancialAssistance::Applicant.find(relative_id)
-                return unless applicant.present? || relative.present?
+                next result unless applicant.present? || relative.present?
                 result << {kind: kind,
                            applicant_reference: {first_name: applicant.first_name,
                                                  last_name: applicant.last_name,
                                                  dob: applicant.dob,
                                                  person_hbx_id: applicant.person_hbx_id,
-                                                encrypted_ssn: applicant.encrypted_ssn },
+                                                 encrypted_ssn: applicant.encrypted_ssn },
                            relative_reference: {first_name: relative.first_name,
                                                 last_name: relative.last_name,
                                                 dob: relative.dob,
                                                 person_hbx_id: relative.person_hbx_id,
-                                                encrypted_ssn: relative.encrypted_ssn },
-                            live_with_household_member: applicant.same_with_primary}
+                                                encrypted_ssn: relative.encrypted_ssn},
+                           live_with_household_member: applicant.same_with_primary}
                 result
               end
-              relationships
             end
 
           end
