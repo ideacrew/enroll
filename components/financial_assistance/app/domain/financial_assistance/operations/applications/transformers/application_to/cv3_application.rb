@@ -83,23 +83,9 @@ module FinancialAssistance
                            is_resident_role: applicant.is_resident_role,
                            is_applying_coverage: applicant.is_applying_coverage,
                            is_consent_applicant: applicant.is_consent_applicant,
-                           vlp_document: {alien_number: applicant.alien_number,
-                                          i94_number: applicant.i94_number,
-                                          visa_number: applicant.visa_number,
-                                          passport_number: applicant.passport_number,
-                                          sevis_id: applicant.sevis_id,
-                                          naturalization_number: applicant.naturalization_number,
-                                          receipt_number: applicant.receipt_number,
-                                          citizenship_number: applicant.citizenship_number,
-                                          card_number: applicant.card_number,
-                                          country_of_citizenship: applicant.country_of_citizenship,
-                                          expiration_date: applicant.expiration_date,
-                                          issuing_country: applicant.issuing_country,
-                                          status: nil, # not sure what should be value here
-                                          verification_type: nil, #not sure of value.
-                                          comment: nil},
+                           vlp_document: vlp_document(applicant),
                            family_member_reference: {family_member_hbx_id: applicant.person_hbx_id.to_s},
-                           person_hbx_id: applicant.person.hbx_id.to_s,
+                           person_hbx_id: applicant.person_hbx_id.to_s,
                            is_required_to_file_taxes: applicant.is_required_to_file_taxes,
                            is_joint_tax_filing: applicant.is_joint_tax_filing,
                            is_claimed_as_tax_dependent: applicant.is_claimed_as_tax_dependent,
@@ -151,14 +137,14 @@ module FinancialAssistance
                            addresses: addresses(applicant),
                            emails: emails(applicant),
                            phones: phones(applicant),
-                           incomes: applicant.incomes,
-                           benefits: applicant.benefits,
-                           deductions: applicant.deductions,
+                           incomes: incomes(applicant),
+                           benefits: benefits(applicant),
+                           deductions: deductions(applicant),
                            is_medicare_eligible: applicant.is_medicare_eligible,
                            is_self_attested_long_term_care: applicant.is_self_attested_long_term_care,
                            has_insurance: applicant.is_enrolled_in_insurance?,
                            has_state_health_benefit: applicant.has_state_health_benefit?,
-                           had_prior_insurance: applicant.had_prior_insurance?,
+                           had_prior_insurance: had_prior_insurance?(applicant),
                            prior_insurance_end_date: applicant.prior_insurance_end_date,
                            age_of_applicant: applicant.age_of_the_applicant,
                            hours_worked_per_week: applicant.total_hours_worked_per_week,
@@ -171,6 +157,32 @@ module FinancialAssistance
                 result
               end
               applicants
+            end
+
+            # Was the applicant receiving coverage that has expired?
+            # Any benefits of type is_enrolled and end dated.
+            def had_prior_insurance?(applicant)
+              applicant.benefits.any?{ |b| b.is_enrolled? && b.end_on.present? }
+            end
+
+            def vlp_document(applicant)
+              return if applicant.vlp_subject.nil?
+              {subject: applicant.vlp_subject,
+               alien_number: applicant.alien_number,
+               i94_number: applicant.i94_number,
+               visa_number: applicant.visa_number,
+               passport_number: applicant.passport_number,
+               sevis_id: applicant.sevis_id,
+               naturalization_number: applicant.naturalization_number,
+               receipt_number: applicant.receipt_number,
+               citizenship_number: applicant.citizenship_number,
+               card_number: applicant.card_number,
+               country_of_citizenship: applicant.country_of_citizenship,
+               expiration_date: applicant.expiration_date.to_date,
+               issuing_country: applicant.issuing_country,
+               status: nil, # not sure what should be value here
+               verification_type: nil, #not sure of value.
+               comment: nil}
             end
 
             def addresses(applicant)
@@ -198,8 +210,9 @@ module FinancialAssistance
 
             def phones(applicant)
               applicant.phones.inject([]) do |result, phone|
+                primary_phone = phone.primary.nil? ? false : phone.primary
                 result << {kind: phone.kind,
-                           primary: phone.primary,
+                           primary: primary_phone,
                            area_code: phone.area_code,
                            number: phone.number,
                            country_code: phone.country_code,
@@ -209,19 +222,68 @@ module FinancialAssistance
               end
             end
 
+            def frequency(frequency)
+              {"biweekly": "BiWeekly", "daily": "Daily", "half_yearly": "SemiAnnually",
+               "monthly": "Monthly", "quarterly": "Quarterly", "weekly": "Weekly", "yearly": "Annually"}[frequency.to_sym]
+            end
+
+            def employer(instance)
+              return if instance.employer_name.nil?
+              {employer_name: instance.employer_name, employer_id: instance.employer_id}
+            end
+
             def incomes(applicant)
               applicant.incomes.inject([]) do |result, income|
-                result << {}
+                result << { title: income.title,
+                            kind: income.kind,
+                            wage_type: income.wage_type,
+                            hours_per_week: income.hours_per_week,
+                            amount: income.amount.to_f,
+                            amount_tax_exempt: income.amount_tax_exempt,
+                            frequency_kind: frequency(income.frequency_kind),
+                            start_on: income.start_on,
+                            end_on: income.end_on,
+                            is_projected: income.is_projected,
+                            tax_form: income.tax_form,
+                            employer: employer(income),
+                            has_property_usage_rights: income.has_property_usage_rights,
+                            submitted_at: income.submitted_at }
                 result
               end
             end
 
-            # def benefits(applicant)
-            #   applicant.benefits.inject([]) do |result, benefit|
-            #     result << {}
-            #     result
-            #   end
-            # end
+            def benefits(applicant)
+              applicant.benefits.inject([]) do |result, benefit|
+                result << { name: benefit.title,
+                            kind: benefit.insurance_kind,
+                            status: benefit.kind,
+                            is_employer_sponsored: benefit.is_employer_sponsored,
+                            employer: employer(benefit),
+                            esi_covered: benefit.esi_covered,
+                            is_esi_waiting_period: benefit.is_esi_waiting_period,
+                            is_esi_mec_met: benefit.is_esi_mec_met,
+                            employee_cost: benefit.employee_cost,
+                            employee_cost_frequency: benefit.employee_cost_frequency,
+                            start_on: benefit.start_on,
+                            end_on: benefit.end_on,
+                            submitted_at: benefit.submitted_at,
+                            hra_kind: benefit.hra_type }
+                result
+              end
+            end
+
+            def deductions(applicant)
+              applicant.deductions.inject([]) do |result, deduction|
+                result << { name: deduction.title,
+                            kind: deduction.kind,
+                            amount: deduction.amount.to_f,
+                            start_on: deduction.start_on,
+                            end_on: deduction.end_on,
+                            frequency_kind: frequency(deduction.frequency_kind),
+                            submitted_at: deduction.submitted_at}
+                result
+              end
+            end
 
             def applicant_benchmark_premium(application)
               family = find_family(application.family_id) if application.family_id.present?
@@ -231,52 +293,42 @@ module FinancialAssistance
               benchmark_premium #TODO: need to use operations from ivl_rating area for actual values.
             end
 
-            # def family_member_hbx_id(family_mem_id)
-            #   return unless family_mem_id.present?
-            #   family_member = ::FamilyMember.find(family_mem_id)
-            #   return unless family_member.present?
-            #   applicant_person = family_member&.person
-            #   return unless applicant_person.present?
-            #   hash = {family_member_hbx_id: family_member.hbx_id,
-            #           first_name: applicant_person.first_name,
-            #           last_name: applicant_person.last_name,
-            #           person_hbx_id: applicant_person.hbx_id.to_s,
-            #           is_primary_family_member: family_member.is_primary_applicant}
-            #   hash
-            # end
-
             def mitc_households(application)
               applicant_person_hbx_ids = application.applicants.map(&:person_hbx_id)
-              [{household_id: application.hbx_id, people: applicant_person_hbx_ids}]
+              people = applicant_person_hbx_ids.inject([]) do |result, id|
+                result << {person_id: id.scan(/\d/).join('').to_i}
+              end
+              [{household_id: application.hbx_id, people: people}]
             end
 
             def mitc_tax_returns(application)
               application.eligibility_determinations.inject([]) do |result, ed|
-                result << mitc_return(application)
+                result << mitc_return(ed)
                 result
               end
             end
 
-            def mitc_return(application)
-              person_hbx_ids = application.applicants.inject([]) do |hbx_ids, applicant|
-                hbx_ids << applicant.person_hbx_id
-                hbx_ids
+            def mitc_return(ed)
+              ed_applicants = ed.applicants
+              non_tax_dependents = ed_applicants.where(is_claimed_as_tax_dependent: false)
+              tax_dependents = ed_applicants.where(is_claimed_as_tax_dependent: true)
+              person_hbx_ids = non_tax_dependents.inject([]) do |hbx_ids, applicant|
+                hbx_ids << {person_id: applicant.person_hbx_id.scan(/\d/).join('').to_i}
               end
-              dependent_hbx_ids = application.applicants.where(is_primary_applicant: false).inject([]) do |hbx_ids, applicant|
-                hbx_ids << applicant.person_hbx_id
-                hbx_ids
+              dependent_hbx_ids = tax_dependents.where(is_primary_applicant: false).inject([]) do |hbx_ids, applicant|
+                hbx_ids << {person_id: applicant.person_hbx_id.scan(/\d/).join('').to_i}
               end
               {filers: person_hbx_ids, dependents: dependent_hbx_ids}
             end
 
             def tax_households(application)
               application.eligibility_determinations.inject([]) do |result, ed|
-                result << {hbx_id: "",
+                result << {hbx_id: ed.hbx_assigned_id.to_s,
                            allocated_aptc: ed.max_aptc,
                            is_elibility_determined: ed.is_eligibility_determined,
                            start_date: ed.effective_starting_on,
                            end_date: ed.effective_ending_on,
-                           tax_household_memerbs: get_thh_member(ed, application),
+                           tax_household_members: get_thh_member(ed, application),
                            eligibility_determinations: [max_aptc: ed.max_aptc,
                                                         csr_percent_as_integer: ed.csr_percent_as_integer,
                                                         determined_at: ed.determined_at]}
