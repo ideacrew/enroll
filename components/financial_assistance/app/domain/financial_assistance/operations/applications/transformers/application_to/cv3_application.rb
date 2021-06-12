@@ -152,11 +152,157 @@ module FinancialAssistance
                            is_claimed_as_dependent_by_non_applicant: false, # as per sb notes
                            benchmark_premium: applicant_benchmark_premium(application), #applicant_benchmark_premium(applicant.application),
                            is_homeless: applicant.is_homeless,
-                           mitc_income: {},
+                           mitc_income: mitc_income(applicant),
                            mitc_relationships: []}
                 result
               end
               applicants
+            end
+
+            def mitc_income(applicant)
+              { amount: 0, #TODO
+                taxable_interest: taxable_interest(applicant),
+                tax_exempt_interest: 0,
+                taxable_refunds: 0,
+                alimony: alimony(applicant),
+                capital_gain_or_loss: capital_gain_or_loss(applicant),
+                pensions_and_annuities_taxable_amount: pensions_and_annuities_taxable_amount(applicant),
+                farm_income_or_loss: farm_income_or_loss(applicant),
+                unemployment_compensation: unemployment_compensation(applicant),
+                other_income: other_income(applicant),
+                magi_deductions: magi_deductions(applicant),
+                adjusted_gross_income: 0, #TODO
+                deductible_part_of_self_employment_tax: deductible_part_of_self_employment_tax(applicant),
+                ira_deduction: ira_deduction(applicant),
+                student_loan_interest_deduction: student_loan_interest_deduction(applicant),
+                tution_and_fees: tution_and_fees(applicant),
+                other_magi_eligible_income: 0 #TODO
+              }
+            end
+
+            def taxable_interest(applicant)
+              applicant.incomes.where(kind: "interest").inject(0) do |result, income|
+                frequency = income.frequency_kind
+                result += monthly_amount(frequency(frequency), income.amount.to_i)
+                result
+              end
+            end
+
+            def alimony(applicant)
+              applicant.incomes.where(kind: "alimony_and_maintenance").inject(0) do |result, income|
+                frequency = income.frequency_kind
+                result += monthly_amount(frequency(frequency), income.amount.to_i)
+                result
+              end
+            end
+
+            def capital_gain_or_loss(applicant)
+              applicant.incomes.where(kind: "capital_gains").inject(0) do |result, income|
+                frequency = income.frequency_kind
+                result += monthly_amount(frequency(frequency), income.amount.to_i)
+                result
+              end
+            end
+
+            def pensions_and_annuities_taxable_amount(applicant)
+              applicant.incomes.where(kind: "pension_retirement_benefits").inject(0) do |result, income|
+                frequency = income.frequency_kind
+                result += monthly_amount(frequency(frequency), income.amount.to_i)
+                result
+              end
+            end
+
+            def farm_income_or_loss(applicant)
+              applicant.incomes.where(kind: "farming_and_fishing").inject(0) do |result, income|
+                frequency = income.frequency_kind
+                result += monthly_amount(frequency(frequency), income.amount.to_i)
+                result
+              end
+            end
+
+            def unemployment_compensation(applicant)
+              applicant.incomes.where(kind: "unemployment_income").inject(0) do |result, income|
+                frequency = income.frequency_kind
+                result += monthly_amount(frequency(frequency), income.amount.to_i)
+                result
+              end
+            end
+
+            def other_income(applicant)
+              other_kinds = ["dividend", "rental_and_royalty", "social_security_benefit", "american_indian_and_alaskan_native",
+                             "employer_funded_disability", "estate_trust", "foreign", "other", "prizes_and_awards"]
+              applicant.incomes.where(:kind.in => other_kinds).inject(0) do |result, income|
+                frequency = income.frequency_kind
+                result += monthly_amount(frequency(frequency), income.amount.to_i)
+                result
+              end
+            end
+
+            def magi_deductions(applicant)
+              other_kinds = ["alimony_paid", "domestic_production_activities", "penalty_on_early_withdrawal_of_savings",
+                             "educator_expenses", "self_employment_sep_simple_and_qualified_plans", "self_employed_health_insurance",
+                             "moving_expenses", "health_savings_account", "reservists_performing_artists_and_fee_basis_government_official_expenses"]
+              applicant.deductions.where(:kind.in => other_kinds).inject(0) do |result, deduction|
+                frequency = deduction.frequency_kind
+                result += monthly_amount(frequency(frequency), deduction.amount.to_i)
+                result
+              end
+            end
+
+            def deductible_part_of_self_employment_tax(applicant)
+              applicant.deductions.where(kind: "deductable_part_of_self_employment_taxes").inject(0) do |result, deduction|
+                frequency = deduction.frequency_kind
+                result += monthly_amount(frequency(frequency), deduction.amount.to_i)
+                result
+              end
+            end
+
+            def ira_deduction(applicant)
+              applicant.deductions.where(kind: "ira_deduction").inject(0) do |result, deduction|
+                frequency = deduction.frequency_kind
+                result += monthly_amount(frequency(frequency), deduction.amount.to_i)
+                result
+              end
+            end
+
+            def student_loan_interest_deduction(applicant)
+              applicant.deductions.where(kind: "student_loan_interest").inject(0) do |result, deduction|
+                frequency = deduction.frequency_kind
+                result += monthly_amount(frequency(frequency), deduction.amount.to_i)
+                result
+              end
+            end
+
+            def tution_and_fees(applicant)
+              applicant.deductions.where(kind: "tuition_and_fees").inject(0) do |result, deduction|
+                frequency = deduction.frequency_kind
+                result += monthly_amount(frequency(frequency), deduction.amount.to_i)
+                result
+              end
+            end
+
+            def annual_amount(frequency, amount)
+              return 0 if frequency.blank? || amount.blank?
+
+              case frequency
+                when 'Weekly' then (amount * 52)
+                when 'Monthly' then (amount * 12)
+                when 'Annually' then amount
+                when 'BiWeekly' then (amount * 26)
+                when 'SemiMonthly' then (amount * 24)
+                when 'Quarterly' then (amount * 4)
+                when 'Hourly' then (amount * 8 * 5 * 52)
+                when 'Daily' then (amount * 5 * 52)
+                when 'SemiAnnually' then (amount * 2)
+                when '13xPerYear' then (amount * 13)
+                when '11xPerYear' then (amount * 11)
+                when '10xPerYear' then (amount * 10)
+                else 0
+              end
+            end
+
+            def monthly_amount(frequency, amount)
+              annual_amount(frequency, amount) / 12
             end
 
             # Was the applicant receiving coverage that has expired?
@@ -296,7 +442,7 @@ module FinancialAssistance
             def mitc_households(application)
               applicant_person_hbx_ids = application.applicants.map(&:person_hbx_id)
               people = applicant_person_hbx_ids.inject([]) do |result, id|
-                result << {person_id: id.scan(/\d/).join('').to_i}
+                result << {person_id: id}
               end
               [{household_id: application.hbx_id, people: people}]
             end
@@ -313,10 +459,10 @@ module FinancialAssistance
               non_tax_dependents = ed_applicants.where(is_claimed_as_tax_dependent: false)
               tax_dependents = ed_applicants.where(is_claimed_as_tax_dependent: true)
               person_hbx_ids = non_tax_dependents.inject([]) do |hbx_ids, applicant|
-                hbx_ids << {person_id: applicant.person_hbx_id.scan(/\d/).join('').to_i}
+                hbx_ids << {person_id: applicant.person_hbx_id}
               end
               dependent_hbx_ids = tax_dependents.where(is_primary_applicant: false).inject([]) do |hbx_ids, applicant|
-                hbx_ids << {person_id: applicant.person_hbx_id.scan(/\d/).join('').to_i}
+                hbx_ids << {person_id: applicant.person_hbx_id}
               end
               {filers: person_hbx_ids, dependents: dependent_hbx_ids}
             end
