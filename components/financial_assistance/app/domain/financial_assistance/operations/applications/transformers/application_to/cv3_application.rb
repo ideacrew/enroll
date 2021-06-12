@@ -188,7 +188,7 @@ module FinancialAssistance
                dob: applicant.dob,
                ethnicity: applicant.ethnicity,
                race: applicant.race,
-               is_veteran_or_active_military: applicant.is_veteran_or_active_military,
+               is_veteran_or_active_military: applicant.is_veteran,
                is_vets_spouse_or_child: applicant.is_vets_spouse_or_child}
             end
 
@@ -503,38 +503,32 @@ module FinancialAssistance
             def tax_households(application)
               application.eligibility_determinations.inject([]) do |result, ed|
                 result << {hbx_id: ed.hbx_assigned_id.to_s,
-                           allocated_aptc: ed.max_aptc,
-                           is_elibility_determined: ed.is_eligibility_determined,
-                           start_date: ed.effective_starting_on,
-                           end_date: ed.effective_ending_on,
-                           tax_household_members: get_thh_member(ed, application),
-                           eligibility_determinations: [max_aptc: ed.max_aptc,
-                                                        csr_percent_as_integer: ed.csr_percent_as_integer,
-                                                        determined_at: ed.determined_at]}
+                           max_aptc: ed.max_aptc,
+                           is_insurance_assistance_eligible: ed.is_eligibility_determined,
+                           annual_tax_household_income: ed.aptc_csr_annual_household_income,
+                           tax_household_members: get_thh_member(ed, application)}
               end
             end
 
             def get_thh_member(eligibility, application)
               application.applicants.inject([]) do |result, app|
                 next result unless app.eligibility_determination_id.to_s == eligibility.id.to_s
-                result << {family_member_reference: {family_member_hbx_id: app.person_hbx_id.to_s,
-                                                     first_name: app.first_name,
-                                                     last_name: app.last_name,
-                                                     person_hbx_id: app.person_hbx_id,
-                                                     is_primary_family_member: app.is_primary_applicant},
+                result << {applicant_reference: { first_name: app.first_name,
+                                                  last_name: app.last_name,
+                                                  person_hbx_id: app.person_hbx_id,
+                                                  dob: app.dob,
+                                                  encrypted_ssn: app.encrypted_ssn },
                            product_eligibility_determination: {is_ia_eligible: app.is_ia_eligible?,
                                                                is_medicaid_chip_eligible: app.is_medicaid_chip_eligible,
-                                                               is_non_magi_medicaid_eligible: app.is_non_magi_medicaid_eligible,
                                                                is_totally_ineligible: app.is_totally_ineligible,
-                                                               is_without_assistance: app.is_without_assistance,
                                                                is_magi_medicaid: app.is_magi_medicaid,
+                                                               is_non_magi_medicaid_eligible: app.is_non_magi_medicaid_eligible,
+                                                               is_without_assistance: app.is_without_assistance,
                                                                magi_medicaid_monthly_household_income: app.magi_medicaid_monthly_household_income,
                                                                medicaid_household_size: app.medicaid_household_size,
                                                                magi_medicaid_monthly_income_limit: app.magi_medicaid_monthly_income_limit,
                                                                magi_as_percentage_of_fpl: app.magi_as_percentage_of_fpl,
-                                                               magi_medicaid_category: app.magi_medicaid_category},
-                           is_subscriber: app.is_primary_applicant,
-                           reason: app.assisted_mec_reason}
+                                                               magi_medicaid_category: app.magi_medicaid_category}}
                 result
               end
             end
