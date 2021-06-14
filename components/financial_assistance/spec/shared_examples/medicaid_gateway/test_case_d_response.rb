@@ -100,6 +100,10 @@ RSpec.shared_context 'cms ME simple_scenarios test_case_d', :shared_context => :
                             :other_magi_eligible_income => 0 },
                         :mitc_relationships => [] }],
       :tax_households => [{ :max_aptc => 496.0,
+                            effective_on: Date.today.next_month.beginning_of_month,
+                            determined_on: Date.today,
+                            annual_tax_household_income: 16_000.0,
+                            csr_annual_income_limit: 142_912_000.0,
                             :hbx_id => "12345",
                             :is_insurance_assistance_eligible => "Yes",
                             :tax_household_members => [{

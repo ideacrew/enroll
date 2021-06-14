@@ -20,6 +20,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
     FactoryBot.create(:financial_assistance_applicant,
                       eligibility_determination_id: ed.id,
                       person_hbx_id: '95',
+                      is_primary_applicant: true,
                       first_name: 'Gerald',
                       last_name: 'Rivers',
                       dob: Date.new(current_date.year - 22, current_date.month, current_date.day),
@@ -55,6 +56,26 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
 
       it 'should update source' do
         expect(@ed.source).to eq('Faa')
+      end
+
+      it 'should update effective_starting_on' do
+        expect(@ed.effective_starting_on).to eq(Date.today.next_month.beginning_of_month)
+      end
+
+      it 'should update determined_at' do
+        expect(@ed.determined_at).to eq(Date.today)
+      end
+
+      it 'should update aptc_csr_annual_household_income' do
+        expect(@ed.aptc_csr_annual_household_income.to_f).to eq(16_000.0)
+      end
+
+      it 'should update csr_annual_income_limit' do
+        expect(@ed.csr_annual_income_limit.to_f).to eq(142_912_000.0)
+      end
+
+      it 'should update csr_percent_as_integer value' do
+        expect(@ed.csr_percent_as_integer).to eq(94)
       end
     end
 

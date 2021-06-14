@@ -58,9 +58,12 @@ module FinancialAssistance
               ped_entity = thhm_entity.product_eligibility_determination
               # TODOs:
               # 1. Does is_uqhp_eligible maps to is_without_assistance?
+              #  'YES' and Done
               # 2. Does is_medicaid_chip_eligible maps to both is_medicaid_chip_eligible & is_magi_medicaid
               #    What happens for is_magi_medicaid?
+              #  'YES both of them means same to EA for now' and Done
               # 3. Each member is eligible for CSR. EA currently does not support this.
+              #  'New Development' - "Map Primary person's CSR to all the TaxHouseholds!" and Done
               # 4. is_eligible_for_non_magi_reasons
               applicant.update_attributes!({ medicaid_household_size: ped_entity.medicaid_household_size,
                                              magi_medicaid_category: ped_entity.magi_medicaid_category,
@@ -69,7 +72,7 @@ module FinancialAssistance
                                              magi_medicaid_monthly_household_income: ped_entity.magi_medicaid_monthly_household_income,
                                              is_without_assistance: ped_entity.is_uqhp_eligible,
                                              is_ia_eligible: ped_entity.is_ia_eligible,
-                                             is_medicaid_chip_eligible: ped_entity.is_medicaid_chip_eligible,
+                                             is_medicaid_chip_eligible: ped_entity.is_medicaid_chip_eligible || ped_entity.is_magi_medicaid,
                                              is_totally_ineligible: ped_entity.is_totally_ineligible,
                                              is_non_magi_medicaid_eligible: ped_entity.is_non_magi_medicaid_eligible })
             end
@@ -77,20 +80,29 @@ module FinancialAssistance
 
           def update_eligibility_determination(elig_d, thh_entity)
             # TODOs:
-            # 1. Csr values
-            # 2. Determined At
-            # 3. aptc_annual_income_limit
-            # 4. csr_annual_income_limit
-            # 5. Effective Starting On of TaxHousehold
-            elig_d.update_attributes!({ effective_starting_on: Date.today, # thh_entity.start_date,
+            # 1. Csr values(Done)
+            # 2. Determined At(Done)
+            # 3. aptc_annual_income_limit(Not needed now)
+            # 4. csr_annual_income_limit(Done)
+            # 5. Effective Starting On of TaxHousehold(DONE)
+            elig_d.update_attributes!({ effective_starting_on: thh_entity.effective_on,
                                         is_eligibility_determined: true,
                                         max_aptc: thh_entity.max_aptc.to_f,
-                                        csr_percent_as_integer: 0,
-                                        determined_at: Date.today, # thh_entity.start_date,
+                                        csr_percent_as_integer: get_primary_csr_value(elig_d, thh_entity),
+                                        determined_at: thh_entity.determined_on,
                                         aptc_csr_annual_household_income: thh_entity.annual_tax_household_income,
                                         aptc_annual_income_limit: nil,
-                                        csr_annual_income_limit: nil,
+                                        csr_annual_income_limit: thh_entity.csr_annual_income_limit,
                                         source: 'Faa' })
+          end
+
+          # Just for Demo
+          def get_primary_csr_value(elig_d, thh_entity)
+            primary_person_hbx_id = elig_d.application.primary_applicant.person_hbx_id
+            csr = thh_entity.tax_household_members.detect do |thhm_entity|
+              thhm_entity.applicant_reference.person_hbx_id == primary_person_hbx_id
+            end.product_eligibility_determination.csr
+            (csr == 'limited') ? 0 : csr
           end
 
           def find_matching_applicant(elig_det, applicant_ref)
