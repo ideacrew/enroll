@@ -272,7 +272,16 @@ class DocumentsController < ApplicationController
 
   def set_document
     set_verification_type
-    @document = @verification_type.vlp_documents.find(params[:id])
+    @document = @verification_type.vlp_documents.where(id: params[:id]).first
+    # Handles the specific exception where an ID of a non existing document is called.
+    if @document.blank?
+      Rails.logger.warn(
+        "Unable to find document with ID #{params[:id]} for person"\
+        " with hbx_id: #{(@person&.full_name || Person.where(_id: params[:person_id])&.first&.full_name}"
+      )
+      error_message
+      redirect_back(fallback_location: root_path, :flash => {error: error_message})
+    end
   end
 
   def set_person
