@@ -34,6 +34,7 @@ gem 'database_cleaner',       '~> 1.7'
 #######################################################
 gem 'acapi',              git: "https://github.com/ideacrew/acapi.git", branch: 'amqp_proc_title'
 gem 'aca_entities',       git: 'https://github.com/ideacrew/aca_entities.git', branch: 'fdsh'
+gem 'event_source',       git: 'https://github.com/ideacrew/event_source.git', branch: 'release_0.5.1'
 gem "benefit_markets",    path: "components/benefit_markets"
 gem "benefit_sponsors",   path: "components/benefit_sponsors"
 gem 'financial_assistance', path: 'components/financial_assistance'
@@ -102,7 +103,7 @@ gem "recaptcha",                '~> 4.13', require: 'recaptcha/rails'
 gem 'redcarpet',                '~> 3.4'
 gem 'redis',                    '~> 4.0'
 gem 'redis-rails',              '~> 5.0.2'
-gem 'resque',                   '~> 2.0'
+gem 'resque',                   '>= 1.10.0'
 gem 'roo',                      '~> 2.1'
 gem 'rubyzip', '>= 1.3.0'
 gem 'ruby-saml',                '~> 1.3'
