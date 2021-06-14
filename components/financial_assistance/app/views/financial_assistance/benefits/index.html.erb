@@ -139,6 +139,7 @@
             <div class="col-md-6">
           </div>
         </div>
+        <br>
       <% end %>
     <% end %>
 
@@ -313,7 +314,7 @@
           </div>
         </div>
       </div>
-      <br />
+      <br>
 
       <div class="driver-question row row-form-wrapper radio-align no-buffer row-height fa-align-elements" id='denied-medicaid'>
         <div class="col-md-10 labelforcoverage">
@@ -321,7 +322,7 @@
           <%= text_field_tag("medicaid_cubcare_due_on", @applicant.medicaid_cubcare_due_on, class: "jq-datepicker", placeholder: 'Select End Date', style: 'margin-left: 50px;', :'data-date-max' => "+0") %>
         </div>
       </div>
-      <br />
+      <br>
 
       <div class="driver-question row row-form-wrapper radio-align no-buffer row-height fa-align-elements" id="eligibility-change-question">
         <div class="col-md-6 labelforcoverage">
@@ -342,7 +343,7 @@
           </div>
         </div>
       </div>
-      <br />
+      <br>
 
       <div class="driver-question row row-form-wrapper radio-align no-buffer row-height fa-align-elements" id="household-income-size-changed">
         <div class="col-md-6 labelforcoverage">
@@ -363,7 +364,7 @@
           </div>
         </div>
       </div>
-      <br />
+      <br>
 
 
       <% status = @applicant.has_household_income_changed == true ? "" : "hide" %>
