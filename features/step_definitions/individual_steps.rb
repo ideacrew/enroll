@@ -1,5 +1,13 @@
 # frozen_string_literal: true
 
+class VlpDocument
+  VLP_DOCUMENT_KINDS = ["I-327 (Reentry Permit)", "I-551 (Permanent Resident Card)", "I-571 (Refugee Travel Document)", "I-766 (Employment Authorization Card)",
+                        "Certificate of Citizenship","Naturalization Certificate","Machine Readable Immigrant Visa (with Temporary I-551 Language)", "Temporary I-551 Stamp (on passport or I-94)", "I-94 (Arrival/Departure Record)",
+                        "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport", "Unexpired Foreign Passport",
+                        "I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)", "DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)",
+                        "Other (With Alien Number)", "Other (With I-94 Number)"].freeze
+end
+
 When(/^.+ visits the Consumer portal during open enrollment$/) do
   visit "/"
   find(HomePage.consumer_family_portal_btn).click
@@ -239,8 +247,8 @@ Then(/Individual resumes enrollment/) do
   click_link 'Consumer/Family Portal'
 end
 
-Then (/Individual sees previously saved address/) do
-  expect(page).to have_field('ADDRESS LINE 1 *', with: '4900 USAA BLVD NE', wait: 10)
+Then(/Individual sees previously saved address/) do
+  expect(page).to have_field('ADDRESS LINE 1 *', with: '4900 USAA BLVD', wait: 10)
   find('.btn', text: 'CONTINUE').click
 end
 
@@ -877,6 +885,10 @@ end
 
 When(/^Incarcerated field is nil for the consumer$/) do
   user.person.update_attributes(is_incarcerated: nil)
+end
+
+When(/^citizen status is false for the consumer$/) do
+  user.person.update_attributes(citizen_status: "not_lawfully_present_in_us")
 end
 
 Then(/^the consumer should see a message with incarcerated error$/) do
