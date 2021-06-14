@@ -142,4 +142,10 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       end
     end
   end
+
+  context '#is_eligible_for_non_magi_reasons' do
+    it 'should return a field on applicant model' do
+      expect(applicant.is_eligible_for_non_magi_reasons).to eq(nil)
+    end
+  end
 end
