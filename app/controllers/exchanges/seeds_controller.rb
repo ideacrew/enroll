@@ -37,6 +37,12 @@ module Exchanges
       end
     end
 
+  # Need to figure out what to do here
+  # And add actions and whatnot
+  def index
+    @seeds = Seeds::Seed.all
+  end
+
   # Kicks of the seed process
     def update
       @seed = Seeds::Seed.find(params[:id])
