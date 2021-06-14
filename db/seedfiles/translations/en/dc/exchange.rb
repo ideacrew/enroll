@@ -54,5 +54,6 @@ EXCHANGE_TRANSLATIONS = {
   "en.exchange.employer_applications.created" => "Created",
   "en.exchange.employer_applications.actions" => "Actions",
   "en.exchange.employer_applications.new_question" => "New Question",
-  "en.exchange.employer_applications.security_questions" => "Security Questions"
+  "en.exchange.employer_applications.security_questions" => "Security Questions",
+  "en.documents.controller.missing_document_message" => "Unable to find document with specified ID. Please contact customer service at %{contact_center_phone_number}."
 }.freeze
