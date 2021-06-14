@@ -267,12 +267,13 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
 
       it "should redirect to families home after detecting duplicate dependent" do
         expect(response).to redirect_to(insured_family_members_path)
-        # notice_message = l10n(
+        # error_message = l10n(
         #  'insured.family_members.duplicate_error_message',
+        #  action: "add",
         #  contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item
         # )
-        # TOOD: Flash message not appearing, have tried a million things, cannot figure this out
-        # expect(flash[:notice]).to eq(notice_message)
+        # TODO: Flash message not appearing, have tried a million things, cannot figure this out
+        # expect(flash[:error]).to eq(error_message)
       end
     end
 

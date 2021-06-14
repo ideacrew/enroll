@@ -268,12 +268,13 @@ class Insured::FamilyMembersController < ApplicationController
     end
     return unless potential_duplicate.present?
     # Families home page
-    notice_message = l10n(
+    error_message = l10n(
       'insured.family_members.duplicate_error_message',
+      action: "add",
       contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item
     )
     respond_to do |format|
-      format.html { redirect_to family_account_path, notice: notice_message }
+      format.html { redirect_to family_account_path, error: error_message }
     end
   end
 
