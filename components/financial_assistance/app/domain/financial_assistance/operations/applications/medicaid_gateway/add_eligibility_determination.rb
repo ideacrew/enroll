@@ -37,9 +37,9 @@ module FinancialAssistance
 
           def add_eligibility_determination(app_entity, application)
             app_entity.tax_households.each do |thh_entity|
-              ed = find_matching_eligibility_determination(application, thh_entity)
-              update_applicants(ed, thh_entity)
-              update_eligibility_determination(ed, thh_entity)
+              elig_d = find_matching_eligibility_determination(application, thh_entity)
+              update_applicants(elig_d, thh_entity)
+              update_eligibility_determination(elig_d, thh_entity)
             end
             # Send Determination to EA
             application.send_determination_to_ea
@@ -52,9 +52,9 @@ module FinancialAssistance
             end
           end
 
-          def update_applicants(ed, thh_entity)
+          def update_applicants(elig_d, thh_entity)
             thh_entity.tax_household_members.each do |thhm_entity|
-              applicant = find_matching_applicant(ed, thhm_entity.applicant_reference.person_hbx_id)
+              applicant = find_matching_applicant(elig_d, thhm_entity.applicant_reference.person_hbx_id)
               ped_entity = thhm_entity.product_eligibility_determination
               # TODOs:
               # 1. Does is_uqhp_eligible maps to is_without_assistance?
@@ -62,43 +62,39 @@ module FinancialAssistance
               #    What happens for is_magi_medicaid?
               # 3. Each member is eligible for CSR. EA currently does not support this.
               # 4. is_eligible_for_non_magi_reasons
-              applicant.update_attributes!({
-                medicaid_household_size: ped_entity.medicaid_household_size,
-                magi_medicaid_category: ped_entity.magi_medicaid_category,
-                magi_as_percentage_of_fpl: ped_entity.magi_as_percentage_of_fpl,
-                magi_medicaid_monthly_income_limit: ped_entity.magi_medicaid_monthly_income_limit,
-                magi_medicaid_monthly_household_income: ped_entity.magi_medicaid_monthly_household_income,
-                is_without_assistance: ped_entity.is_uqhp_eligible,
-                is_ia_eligible: ped_entity.is_ia_eligible,
-                is_medicaid_chip_eligible: ped_entity.is_medicaid_chip_eligible,
-                is_totally_ineligible: ped_entity.is_totally_ineligible,
-                is_non_magi_medicaid_eligible: ped_entity.is_non_magi_medicaid_eligible
-              })
+              applicant.update_attributes!({ medicaid_household_size: ped_entity.medicaid_household_size,
+                                             magi_medicaid_category: ped_entity.magi_medicaid_category,
+                                             magi_as_percentage_of_fpl: ped_entity.magi_as_percentage_of_fpl,
+                                             magi_medicaid_monthly_income_limit: ped_entity.magi_medicaid_monthly_income_limit,
+                                             magi_medicaid_monthly_household_income: ped_entity.magi_medicaid_monthly_household_income,
+                                             is_without_assistance: ped_entity.is_uqhp_eligible,
+                                             is_ia_eligible: ped_entity.is_ia_eligible,
+                                             is_medicaid_chip_eligible: ped_entity.is_medicaid_chip_eligible,
+                                             is_totally_ineligible: ped_entity.is_totally_ineligible,
+                                             is_non_magi_medicaid_eligible: ped_entity.is_non_magi_medicaid_eligible })
             end
           end
 
-          def update_eligibility_determination(ed, thh_entity)
+          def update_eligibility_determination(elig_d, thh_entity)
             # TODOs:
             # 1. Csr values
             # 2. Determined At
             # 3. aptc_annual_income_limit
             # 4. csr_annual_income_limit
             # 5. Effective Starting On of TaxHousehold
-            ed.update_attributes!({
-              effective_starting_on: Date.today, # thh_entity.start_date,
-              is_eligibility_determined: true,
-              max_aptc: thh_entity.max_aptc.to_f,
-              csr_percent_as_integer: 0,
-              determined_at: Date.today, # thh_entity.start_date,
-              aptc_csr_annual_household_income: thh_entity.annual_tax_household_income,
-              aptc_annual_income_limit: nil,
-              csr_annual_income_limit: nil,
-              source: 'Faa'
-            })
+            elig_d.update_attributes!({ effective_starting_on: Date.today, # thh_entity.start_date,
+                                        is_eligibility_determined: true,
+                                        max_aptc: thh_entity.max_aptc.to_f,
+                                        csr_percent_as_integer: 0,
+                                        determined_at: Date.today, # thh_entity.start_date,
+                                        aptc_csr_annual_household_income: thh_entity.annual_tax_household_income,
+                                        aptc_annual_income_limit: nil,
+                                        csr_annual_income_limit: nil,
+                                        source: 'Faa' })
           end
 
-          def find_matching_applicant(ed, applicant_ref)
-            ed.applicants.detect do |applicant|
+          def find_matching_applicant(elig_det, applicant_ref)
+            elig_det.applicants.detect do |applicant|
               applicant.person_hbx_id.to_s == applicant_ref.to_s
             end
           end
