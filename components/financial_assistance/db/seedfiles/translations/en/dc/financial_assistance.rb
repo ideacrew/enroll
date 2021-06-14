@@ -77,4 +77,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.question.other_limited_benefit_coverage" => "Other limited benefit coverage",
   "en.faa.premium_reductions" => "Do you want to apply for monthly premium reductions and lower out-of-pocket costs?*",
   "en.faa.premium_reductions2" => ""
+  "en.faa.question.type_of_hra" => "Type of HRA",
+  "en.faa.question.max_employer_reimbursement" => "What's the maximum self-only amount of reimbursement offered by this employer?",
+  "en.faa.question.not_sure" => "Not sure"
 }.freeze

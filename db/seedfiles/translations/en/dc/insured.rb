@@ -214,6 +214,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.inbox' => "Inbox",
   :'en.sent' => "Sent",
   :'en.from' => "From",
+  :'en.to' => "To",
   :'en.date' => "Date",
   :'en.name_hbx_id_ssn' => "Name, HBX ID, SSN",
   :'en.insured.switch_to_aptc_or_csr_families' => "Switch to APTC / CSR Families",
