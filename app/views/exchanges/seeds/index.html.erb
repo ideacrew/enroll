@@ -10,6 +10,7 @@
         <th scope="col">Date Created</th>
         <th scope="col">Created By</th>
         <th scope="col">Row Count</th>
+        <th scope="col">Edit Seed</th>
       </tr>
     </thead>
     <tbody>
@@ -17,6 +18,14 @@
         <td><%= data_seed.created_at.to_s %></td>
         <td><%= data_seed&.user&.email || data_seed&.user&.person&.full_name %></td>
         <td><%= data_seed.rows.count.to_s %></td>
+        <th>
+          <%= link_to(
+                  "View/Edit Seed",
+                  main_app.edit_exchanges_seed_path(data_seed._id),
+                  class: "btn btn-info"
+              )
+          %>
+        </th>
       </tr>
     </tbody>
   </table>
@@ -24,4 +33,4 @@
 
 <% end %>
 
-<%= link_to "New Seed", main_app.new_exchanges_seed_path, class: "button button-primary" %>
+<%= link_to "New Seed", main_app.new_exchanges_seed_path, class: "btn btn-primary" %>

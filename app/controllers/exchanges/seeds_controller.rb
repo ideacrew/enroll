@@ -10,13 +10,14 @@ module Exchanges
 
   # layout 'single_column'
     layout 'bootstrap_4'
+    before_action :set_seed, only: %i[edit]
 
-  # before_action :only_preprod, :check_hbx_staff_role
+    # before_action :only_preprod, :check_hbx_staff_role
     def new
       @seed = Seeds::Seed.new(user: current_user)
     end
 
-  # need to validate CSV template
+    # need to validate CSV template
     def create
       @seed = Seeds::Seed.new(
         user: current_user,
@@ -31,26 +32,35 @@ module Exchanges
         @seed.rows.build(data: row_data)
       end
       if @seed.save
-        redirect_to exchanges_seeds_path
+        redirect_to(
+          edit_exchanges_seed_path(@seed.id),
+          flash: {success: l10n("seeds_ui.seed_created_message")}
+        )
       else
         render 'new'
       end
     end
 
-  # Need to figure out what to do here
-  # And add actions and whatnot
-  def index
-    @seeds = Seeds::Seed.all
-  end
+    # Need to figure out what to do here
+    # And add actions and whatnot
+    def index
+      @seeds = Seeds::Seed.all
+    end
 
-  # Kicks of the seed process
+    # Kicks of the seed process
     def update
       @seed = Seeds::Seed.find(params[:id])
-      @seed.process! if params[:commit].downcase == 'seed'
+      @seed.process! if params[:commit].downcase == 'begin seed'
+      flash[:notice] = l10n("seeds_ui.begin_seed_message")
       render 'edit'
     end
 
-  # TODO: Make strong params
-  # def csv_params; end
+    # TODO: Make strong params
+    # def csv_params; end
+    private
+
+    def set_seed
+      @seed = Seeds::Seed.find(params[:id])
+    end
   end
 end

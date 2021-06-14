@@ -33,7 +33,7 @@ RSpec.describe Exchanges::SeedsController, :type => :controller, dbclean: :after
   let(:update_params) do
     {
       id: latest_seed.id,
-      commit: "seed"
+      commit: "begin seed"
     }
   end
   let(:latest_seed) { Seeds::Seed.last }
@@ -57,20 +57,30 @@ RSpec.describe Exchanges::SeedsController, :type => :controller, dbclean: :after
     it "should successfully create a seed record from a CSV with all of the attributes from the CSV assigned to seed rows" do
       return unless file_location.present?
       post :create, params: create_params
-      expect(response).to redirect_to(exchanges_seeds_path)
+      expect(response).to redirect_to(edit_exchanges_seed_path(latest_seed.id))
       expect(Seeds::Seed.count).to be > 0
       expect(Seeds::Seed.first.rows.count).to be > 0
     end
-  end
-  # describe "#edit" do
 
-  # end
+    it "should save the CSV file uploaded to AWS" do
+
+    end
+  end
+  describe "#edit" do
+    it "should render the edit page when seed id is passed" do
+      get :edit, params: {id: latest_seeed.id}, xhr: true
+      expect(response).to have_http_status(:success)
+      expect(response).to render_template("")
+    end
+  end
 
   describe "#update" do
     it "should begin to process the seed in the background" do
       return unless file_location.present?
       post :create, params: create_params
       put :update, params: update_params
+      expect(response).to redirect_to(edit_exchanges_seed_path(latest_seed.id))
+      expect(flash[:notice]).to eq(l10n("seeds_ui.begin_seed_message"))
     end
   end
 end
