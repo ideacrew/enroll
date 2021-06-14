@@ -21,6 +21,11 @@ registry:
       - key: :consumer_validations
         is_enabled: true
   - namespace:
+    - :eligibility_results
+    features:
+      - key: :non_magi_referral_display
+        is_enabled: true
+  - namespace:
     - :enrollment_dates
     features:
       - key: :application_new_year_effective_date
