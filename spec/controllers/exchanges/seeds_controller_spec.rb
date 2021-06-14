@@ -25,11 +25,6 @@ RSpec.describe Exchanges::SeedsController, :type => :controller, dbclean: :after
     ivl_testbed_templates = Dir.glob(filename)
     ivl_testbed_templates.first
   end
-  let(:create_params) do
-    {
-      file: file_location
-    }
-  end
   let(:update_params) do
     {
       id: latest_seed.id,
@@ -37,6 +32,8 @@ RSpec.describe Exchanges::SeedsController, :type => :controller, dbclean: :after
     }
   end
   let(:latest_seed) { Seeds::Seed.last }
+
+  let(:file_double) {double}
 
   # describe "#index" do
 
@@ -54,21 +51,33 @@ RSpec.describe Exchanges::SeedsController, :type => :controller, dbclean: :after
   end
 
   describe "#create" do
+    before do
+      allow(file_double.to_s).to receive(:send).with(:content_type).and_return('text/csv')
+      allow(file_double.to_s).to receive(:send).with(:original_filename).and_return(file_location)
+      allow(file_double.to_s).to receive(:send).with(:tempfile).and_return(file_location)
+    end
     it "should successfully create a seed record from a CSV with all of the attributes from the CSV assigned to seed rows" do
       return unless file_location.present?
-      post :create, params: create_params
+      # because it uploads a file from the UI, it will be a bit different format.
+      # TODO: Look up the API for this and mock it here better
+      post :create, params: {file: file_double}
       expect(response).to redirect_to(edit_exchanges_seed_path(latest_seed.id))
       expect(Seeds::Seed.count).to be > 0
       expect(Seeds::Seed.first.rows.count).to be > 0
     end
+    context "CSV format" do
+      xit "should show an error to user if type uploaded is not a CSV" do
 
-    it "should save the CSV file uploaded to AWS" do
+      end
 
+      xit "should show an error to user if CSV contains incorrect headers" do
+
+      end
     end
   end
   describe "#edit" do
     it "should render the edit page when seed id is passed" do
-      get :edit, params: {id: latest_seeed.id}, xhr: true
+      get :edit, params: {id: latest_seed.id}, xhr: true
       expect(response).to have_http_status(:success)
       expect(response).to render_template("")
     end

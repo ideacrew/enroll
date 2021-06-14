@@ -8,7 +8,7 @@
 
   <%= form_for(@seed, url: exchanges_seeds_path, html: { multipart: true }) do |f| %>
     <div class='form-group'>
-      <%= file_field_tag :file, accept: 'image/png,image/jpeg,application/pdf', class: "doc-upload-file"%></td>
+      <%= file_field_tag :file, accept: 'csv', class: "doc-upload-file"%></td>
       <%= f.submit "Submit", class: 'btn btn-alt-blue col-2 offset-10' %>
     </div>
   <% end %>
