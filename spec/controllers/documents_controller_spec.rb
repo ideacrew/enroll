@@ -33,6 +33,19 @@ RSpec.describe DocumentsController, :type => :controller do
       person.reload
       expect(person.verification_types.by_name("Citizenship").first.vlp_documents).to be_empty
     end
+
+    it "redirects if the document doesnt exist" do
+      # is already destroyed in the before action
+      person.reload
+      delete :destroy, params: { person_id: person.id, id: document.id, verification_type: citizenship_type.id }
+      expect(flash[:error]).to eq(
+        l10n(
+          "documents.controller.missing_document_message",
+          contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item
+        )
+      )
+      expect(response).to redirect_to(verification_insured_families_path)
+    end
   end
 
   describe 'GET show_docs' do
