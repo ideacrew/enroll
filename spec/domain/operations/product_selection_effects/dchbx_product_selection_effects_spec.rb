@@ -296,6 +296,7 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
   end
 
   it 'prior coverage gets terminated and current coverage gets canceled and new enrollment gets generated for renewal, current and prior coverage year' do
+    sep.update_attributes(end_on:Date.new(current_coverage_year, 11, 15))
     subject
     prior_ivl_enrollment.generate_hbx_signature
     allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_coverage_year, 11, 15))
