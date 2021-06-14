@@ -1086,6 +1086,10 @@ And(/^employer should see default cobra start date$/) do
   expect(find('input.text-center.date-picker').value).to eq terminated_on
 end
 
+And(/^employer sets cobra start date to two months before termination date$/) do
+  find('.text-center.date-picker').fill_in with: 2.months.ago.strftime('%m/%d/%Y')
+end
+
 And(/^employer accepts the suggested cobra date$/) do
   # Nothing to do here, suggeste date is hardcoded
 end

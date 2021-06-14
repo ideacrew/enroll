@@ -11,6 +11,8 @@ module Forms
     include ::Forms::PeopleNames
     include ::Forms::ConsumerFields
     include ::Forms::SsnField
+    include ActionView::Helpers::TranslationHelper
+    include L10nHelper
     RELATIONSHIPS = ::PersonRelationship::Relationships + ::BenefitEligibilityElementGroup::INDIVIDUAL_MARKET_RELATIONSHIP_CATEGORY_KINDS
     #include ::Forms::DateOfBirthField
     #include Validations::USDate.on(:date_of_birth)
@@ -103,6 +105,22 @@ module Forms
         end
         assign_person_address(existing_person)
         self.id = family_member.id
+        # RE exception: Updating the path 'households.0.coverage_households' would create a conflict at 'households.0.coverage_households'
+        # This will cover the use case of attempting to save a family member which has duplicate family members
+        # with coverage household members, HBX enrollment members, etc.
+        # will not allow the family member to be saved if thoses duplicate issues are for a current enrollment.
+        duplicate_family_members = family.family_members.where(person_id: existing_person.id)
+        duplicate_family_member_ids = duplicate_family_members.pluck(:id)
+        if duplicate_family_members && family.duplicate_enr_members_or_tax_members_present?(duplicate_family_member_ids)
+          Rails.logger.warn(
+            "Cannot remove the duplicate members as they are present on enrollments/tax households." \
+            " Issue occurs on person HBX_ID #{existing_person.hbx_id} from Family with ID #{family.id}."
+          )
+          return [false, l10n('insured.family_members.duplicate_error_message', contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item)]
+        else
+          family.remove_duplicate_members(duplicate_family_member_ids)
+          family.reload
+        end
         return true if family_member.save && family.save
       end
       person = Person.new(extract_person_params)
