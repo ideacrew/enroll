@@ -723,7 +723,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
       it 'should calculate and persist net annual income on applicant' do
         application.calculate_total_net_income_for_applicants
-        expect(applicant.net_annual_income.to_f).to eq(-2600.00)
+        expect(applicant.net_annual_income.to_f).to eq(-213.6)
       end
     end
 
@@ -734,7 +734,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
       it 'should calculate and persist net annual income on applicant' do
         application.calculate_total_net_income_for_applicants
-        expect(applicant.net_annual_income.to_f).to eq 5200.00
+        expect(applicant.net_annual_income.to_f).to eq 427.5
       end
     end
 
@@ -746,7 +746,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
       it 'should calculate and persist net annual income on applicant' do
         application.calculate_total_net_income_for_applicants
-        expect(applicant.net_annual_income.to_f).to eq 2600.00
+        expect(applicant.net_annual_income.to_f).to eq 213.9
       end
     end
   end

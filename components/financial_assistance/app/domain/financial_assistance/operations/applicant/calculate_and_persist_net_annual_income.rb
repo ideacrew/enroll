@@ -89,7 +89,7 @@ module FinancialAssistance
         end
 
         def persist(applicant, total_net_income)
-          applicant.update_attributes(net_annual_income: total_net_income) unless applicant.net_annual_income == total_net_income
+          applicant.update_attributes(net_annual_income: total_net_income) unless applicant.net_annual_income&.to_d == total_net_income&.to_d
           Success(applicant)
         end
 
