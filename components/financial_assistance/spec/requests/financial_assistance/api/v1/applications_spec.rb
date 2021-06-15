@@ -33,5 +33,26 @@ RSpec.describe 'applications', type: :request do
         # end
       end
     end
+    post 'creates an application' do
+      tags FinancialAssistance::Application
+      produces 'application/json'
+      # parameter name: 'Authorization', in: :header, type: :string, default: 'Bearer c36e6eadde881ca7'
+      parameter name: :application, in: :body, schema: {
+        type: :object,
+        properties: {
+          title: { type: :string },
+          body: { type: :string }
+        },
+        required: %w[title body]
+      }
+
+      response '200', 'create' do
+        schema type: object,
+               '$ref' => '#/components/schemas/application'
+      end
+      
+      run_test!
+
+    end
   end
 end
