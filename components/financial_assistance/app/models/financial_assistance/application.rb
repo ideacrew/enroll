@@ -782,7 +782,7 @@ module FinancialAssistance
 
     def calculate_total_net_income_for_applicants
       active_applicants.each do |applicant|
-        FinancialAssistance::Operations::Applicant::CalculateAndPersistNetAnnualIncome.new.call({applicant: applicant})
+        FinancialAssistance::Operations::Applicant::CalculateAndPersistNetAnnualIncome.new.call({application_assistance_year: assistance_year, applicant: applicant})
       end
     end
 
