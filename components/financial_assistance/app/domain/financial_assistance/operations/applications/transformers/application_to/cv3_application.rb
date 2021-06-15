@@ -45,7 +45,7 @@ module FinancialAssistance
                          tax_households: tax_households(application),
                          us_state: application.us_state,
                          hbx_id: application.hbx_id,
-                         oe_start_on: application.effective_date, # what is the date here for required field? # check with sarah
+                         oe_start_on: Date.new((application.effective_date.year - 1), 11, 1),
                          mitc_households: mitc_households(application),
                          mitc_tax_returns: mitc_tax_returns(application)}
               Success(payload)
@@ -513,11 +513,7 @@ module FinancialAssistance
             def get_thh_member(eligibility, application)
               application.applicants.inject([]) do |result, app|
                 next result unless app.eligibility_determination_id.to_s == eligibility.id.to_s
-                result << {applicant_reference: { first_name: app.first_name,
-                                                  last_name: app.last_name,
-                                                  person_hbx_id: app.person_hbx_id,
-                                                  dob: app.dob,
-                                                  encrypted_ssn: app.encrypted_ssn },
+                result << {applicant_reference: applicant_reference(app),
                            product_eligibility_determination: {is_ia_eligible: app.is_ia_eligible?,
                                                                is_medicaid_chip_eligible: app.is_medicaid_chip_eligible,
                                                                is_totally_ineligible: app.is_totally_ineligible,
@@ -533,6 +529,14 @@ module FinancialAssistance
               end
             end
 
+            def applicant_reference(applicant)
+              {first_name: applicant.first_name,
+               last_name: applicant.last_name,
+               dob: applicant.dob,
+               person_hbx_id: applicant.person_hbx_id,
+               encrypted_ssn: applicant.encrypted_ssn}
+            end
+
             def application_relationships(application)
               application.relationships.inject([]) do |result, rl|
                 applicant_id = rl.applicant_id
@@ -542,16 +546,8 @@ module FinancialAssistance
                 relative = FinancialAssistance::Applicant.find(relative_id)
                 next result unless applicant.present? || relative.present?
                 result << {kind: kind,
-                           applicant_reference: {first_name: applicant.first_name,
-                                                 last_name: applicant.last_name,
-                                                 dob: applicant.dob,
-                                                 person_hbx_id: applicant.person_hbx_id,
-                                                 encrypted_ssn: applicant.encrypted_ssn },
-                           relative_reference: {first_name: relative.first_name,
-                                                last_name: relative.last_name,
-                                                dob: relative.dob,
-                                                person_hbx_id: relative.person_hbx_id,
-                                                encrypted_ssn: relative.encrypted_ssn},
+                           applicant_reference: applicant_reference(applicant),
+                           relative_reference: applicant_reference(relative),
                            live_with_household_member: applicant.same_with_primary}
                 result
               end
