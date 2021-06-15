@@ -29,7 +29,7 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CalculateAndPersistNe
     it "fails" do
       result = subject.call(params)
       expect(result).not_to be_success
-      expect(result.failure).to eq "Invalid applicant"
+      expect(result.failure).to eq "Invalid Params"
       expect(applicant.net_annual_income).to eq nil
     end
   end
@@ -40,25 +40,82 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CalculateAndPersistNe
     it "fails" do
       result = subject.call(params)
       expect(result).not_to be_success
-      expect(result.failure).to eq "Invalid applicant"
+      expect(result.failure).to eq "Invalid Params"
       expect(applicant.net_annual_income).to eq nil
     end
   end
 
   describe "passing valid params" do
-    let(:params) do
-      {applicant: applicant}
+
+    context 'Income and deductions have start date and end date present in current year' do
+      let(:params) do
+        {application_assistance_year: application.assistance_year, applicant: applicant}
+      end
+
+      before do
+        applicant.incomes << income
+        applicant.deductions << deduction
+      end
+
+      it 'should pass, calculate and persist net annual income on applicant' do
+        result = subject.call(params)
+        expect(result.success).to eq applicant
+        expect(applicant.net_annual_income.to_f).to eq 213.9
+      end
     end
 
-    before do
-      applicant.incomes << income
-      applicant.deductions << deduction
+    context 'Income and deductions have start date in previous year and no end date and frequency kind is daily' do
+      let(:params) do
+        {application_assistance_year: application.assistance_year, applicant: applicant}
+      end
+
+      let(:income) do
+        FactoryBot.build(:financial_assistance_income, start_on: Date.today.prev_year.beginning_of_month, end_on: nil,
+                                                       amount: 2000, frequency_kind: "monthly")
+      end
+
+      let(:deduction) do
+        FactoryBot.build(:financial_assistance_deduction, start_on: Date.today.prev_year.beginning_of_month, end_on: nil,
+                                                          amount: 1000, frequency_kind: "monthly")
+      end
+
+      before do
+        applicant.incomes << income
+        applicant.deductions << deduction
+      end
+
+      it 'should pass, calculate and persist net annual income on applicant' do
+        result = subject.call(params)
+        expect(result.success).to eq applicant
+        expect(applicant.net_annual_income.to_f).to eq 11_997.55
+      end
     end
 
-    it 'should pass, calculate and persist net annual income on applicant' do
-      result = subject.call(params)
-      expect(result.success).to eq applicant
-      expect(applicant.net_annual_income.to_f).to eq 2600.00
+    context 'Income and deductions have start date in future year and end date in future year and frequency kind is daily' do
+      let(:params) do
+        {application_assistance_year: application.assistance_year, applicant: applicant}
+      end
+
+      let(:income) do
+        FactoryBot.build(:financial_assistance_income, start_on: Date.today.next_year.beginning_of_month, end_on: nil,
+                                                       amount: 2000, frequency_kind: "monthly")
+      end
+
+      let(:deduction) do
+        FactoryBot.build(:financial_assistance_deduction, start_on: Date.today.next_year.beginning_of_month, end_on: nil,
+                                                          amount: 1000, frequency_kind: "monthly")
+      end
+
+      before do
+        applicant.incomes << income
+        applicant.deductions << deduction
+      end
+
+      it 'should pass, and store 0 net income on applicant' do
+        result = subject.call(params)
+        expect(result.success).to eq applicant
+        expect(applicant.net_annual_income.to_f).to eq 0.0
+      end
     end
   end
 end
