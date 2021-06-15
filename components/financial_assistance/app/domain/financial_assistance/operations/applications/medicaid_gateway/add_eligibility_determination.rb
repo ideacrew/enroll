@@ -19,6 +19,7 @@ module FinancialAssistance
           def call(params)
             application_entity = yield initialize_application_entity(params)
             application = yield find_application(application_entity)
+            application = yield update_application(application, application_entity)
             result = yield add_eligibility_determination(application_entity, application)
 
             Success(result)
@@ -33,6 +34,17 @@ module FinancialAssistance
           def find_application(application_entity)
             application = ::FinancialAssistance::Application.by_hbx_id(application_entity.hbx_id).first
             application.present? ? Success(application) : Failure("Could not find application with given hbx_id: #{application_entity.hbx_id}")
+          end
+
+          def update_application(application, application_entity)
+            application.assign_attributes({ determination_http_status_code: 200,
+                                            has_eligibility_response: true,
+                                            eligibility_response_payload: application_entity.to_h.to_json })
+            if application.save
+              Success(application)
+            else
+              Failure("Unable to update application with hbx_id: #{application.hbx_id}")
+            end
           end
 
           def add_eligibility_determination(app_entity, application)
