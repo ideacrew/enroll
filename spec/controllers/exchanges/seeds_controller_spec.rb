@@ -2,15 +2,12 @@
 
 require 'rails_helper'
 
-RSpec.describe Exchanges::SeedsController, :type => :controller, dbclean: :after_each do
+RSpec.describe Exchanges::SeedsController, :type => :controller do
   let(:user) { FactoryBot.create(:user, :hbx_staff, :with_hbx_staff_role) }
   let(:hbx_staff_role) { double("hbx_staff_role", permission: hbx_permission)}
   let(:hbx_profile) { double("HbxProfile")}
   let(:hbx_permission) { FactoryBot.create(:permission, :hbx_staff) }
   let(:person) { double("person", agent?: true)}
-
-  render_views
-
   before :each do
     allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
     allow(user).to receive(:person).and_return(person)
@@ -31,13 +28,37 @@ RSpec.describe Exchanges::SeedsController, :type => :controller, dbclean: :after
       commit: "begin seed"
     }
   end
+  # Uses a CSV stored in enroll app in enroll with incompatible headers
+  let(:random_csv_in_enroll) do
+    "#{Rails.root}/spec/test_data/cancel_plan_years/CancelPlanYears.csv"
+
+  end
+  let(:create_params) do
+    {
+      file: fixture_file_upload(file_location, 'text/csv')
+    }.with_indifferent_access
+  end
+
+  let(:non_csv_create_params) do
+    {
+      file: fixture_file_upload(file_location, 'pdf')
+    }.with_indifferent_access
+  end
+
+  let(:wrong_row_csv_params) do
+    {
+      file: fixture_file_upload(random_csv_in_enroll, "text/csv")
+    }
+  end
+
   let(:latest_seed) { Seeds::Seed.last }
 
-  let(:file_double) {double}
-
-  # describe "#index" do
-
-  # end
+  describe "#index" do
+    it "should render without issues" do
+      get :index, xhr: true
+      expect(response).to have_http_status(:success)
+    end
+  end
 
   describe "#new" do
     it "should render a new form" do
@@ -51,27 +72,25 @@ RSpec.describe Exchanges::SeedsController, :type => :controller, dbclean: :after
   end
 
   describe "#create" do
-    before do
-      allow(file_double.to_s).to receive(:send).with(:content_type).and_return('text/csv')
-      allow(file_double.to_s).to receive(:send).with(:original_filename).and_return(file_location)
-      allow(file_double.to_s).to receive(:send).with(:tempfile).and_return(file_location)
-    end
+    # TODO: need to figure out how to mock the file going through. Just isn't working at the test level.
     it "should successfully create a seed record from a CSV with all of the attributes from the CSV assigned to seed rows" do
       return unless file_location.present?
       # because it uploads a file from the UI, it will be a bit different format.
       # TODO: Look up the API for this and mock it here better
-      post :create, params: {file: file_double}
+      post :create, params: create_params, as: :json
       expect(response).to redirect_to(edit_exchanges_seed_path(latest_seed.id))
       expect(Seeds::Seed.count).to be > 0
       expect(Seeds::Seed.first.rows.count).to be > 0
     end
     context "CSV format" do
-      xit "should show an error to user if type uploaded is not a CSV" do
-
+      it "should show an error to user if type uploaded is not a CSV" do
+        post :create, params: non_csv_create_params, as: :json
+        expect(flash[:error]).to eq("Unable to use CSV template. Must be in CSV format.")
       end
 
-      xit "should show an error to user if CSV contains incorrect headers" do
-
+      it "should show an error to user if CSV contains incorrect headers" do
+        post :create, params: wrong_row_csv_params, as: :json
+        expect(flash[:error]).to include("Unable to use CSV template. Contains incorrect header values:")
       end
     end
   end

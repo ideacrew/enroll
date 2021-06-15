@@ -20,11 +20,13 @@ module Exchanges
 
     # need to validate CSV template
     def create
+      binding.irb
       @seed = Seeds::Seed.new(
         user: current_user,
         filename: params[:file].send(:original_filename), # Get filename
         aasm_state: 'draft'
       )
+      binding.irb
       # TODO: need to figure out how to save the file
       CSV.foreach(params[:file].send(:tempfile), headers: true) do |row|
         # To avoid nil values
@@ -32,6 +34,7 @@ module Exchanges
         @seed.rows.build(data: row_data)
         @seed.rows.build(data: row_data)
       end
+      binding.irb
       if @seed.save
         redirect_to(
           edit_exchanges_seed_path(@seed.id),
@@ -65,21 +68,20 @@ module Exchanges
     private
 
     def csv_format_valid?
-      binding.irb
       unless params[:file].send(:content_type) == 'text/csv'
         # TODO: Refactor as translation
-        flash.error = "Unable to use CSV template. Must be in CSV format."
+        flash[:error] = "Unable to use CSV template. Must be in CSV format."
         render 'new'
         return
       end
       incorrect_header_values = []
       uploaded_csv_headers = CSV.read(params[:file].send(:tempfile), return_headers: true).first
-      uploaded_csv_headers.each do |header_value|
-        incorrect_header_values << header_value unless Seeds::Seed::REQUIRED_CSV_HEADERS.include(header_value.to_s)
+      uploaded_csv_headers.compact.each do |header_value|
+        incorrect_header_values << header_value if Seeds::Seed::REQUIRED_CSV_HEADERS.exclude?(header_value.to_s)
       end
       unless incorrect_header_values.empty?
         # TODO: Refactor as translation
-        flash.error = "Unable to use CSV template. Contains incorrect header values: #{incorrect_header_values}."
+        flash[:error] = "Unable to use CSV template. Contains incorrect header values: #{incorrect_header_values}."
         render 'new'
         return
       end
