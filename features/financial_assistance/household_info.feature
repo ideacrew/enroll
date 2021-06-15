@@ -16,3 +16,11 @@ Feature: A dedicated page that gives the user access to household member creatio
     Given that the user is on the Application Checklist page
     When the user clicks CONTINUE
     Then the user will navigate to the FAA Household Infor: Family Members page
+
+  Scenario: Eligible Immigration Status checkbox appears when feature is enabled
+    Given eligible immigration status checkbox feature is enabled
+    Given that the user is on the Application Checklist page
+    When the user clicks CONTINUE
+    And consumer clicks on pencil symbol next to primary person
+    And consumer chooses no for us citizen
+    Then consumer should see the eligible immigration status checkbox
