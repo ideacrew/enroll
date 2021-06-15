@@ -196,6 +196,7 @@ module BenefitSponsors
               redirect_to profiles_broker_agencies_broker_agency_profile_path(:id => current_user.person.broker_agency_staff_roles.first.benefit_sponsors_broker_agency_profile_id)
             else
               redirect_to new_profiles_registration_path(:profile_type => :broker_agency)
+            end
           else
             redirect_to new_profiles_registration_path(:profile_type => :broker_agency)
           end
