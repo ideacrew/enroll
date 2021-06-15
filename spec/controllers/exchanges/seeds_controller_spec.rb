@@ -48,7 +48,7 @@ RSpec.describe Exchanges::SeedsController, :type => :controller do
   let(:wrong_row_csv_params) do
     {
       file: fixture_file_upload(random_csv_in_enroll, "text/csv")
-    }
+    }.with_indifferent_access
   end
 
   let(:latest_seed) { Seeds::Seed.last }

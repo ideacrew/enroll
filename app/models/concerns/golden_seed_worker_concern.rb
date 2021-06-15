@@ -16,8 +16,10 @@ module GoldenSeedWorkerConcern
     # Row data needs to be hash
     # rubocop:disable Metrics/AbcSize
     # rubocop:disable Metriics/MethodLength
-    def process_row(row_data)
-      remove_golden_seed_callbacks
+    def process_row(row_data, seed_id, row_id)
+      target_seed = Seeds::Seed.find(seed_id)
+      target_row = target_seed.rows.find(row_id)
+      # remove_golden_seed_callbacks
       # TODO: Weird behavior. Prevents the original hash on the row attribute from being modified
       data_to_process = row_data.deep_dup.with_indifferent_access
       primary_family_for_current_case = target_seed.rows.where(unique_row_identifier: data_to_process[:case_name]).first&.target_record
@@ -67,11 +69,12 @@ module GoldenSeedWorkerConcern
           add_applicant_income(target_row_data)
         end
       end
-      reinstate_golden_seed_callbacks
+      # reinstate_golden_seed_callbacks
       target_row.update_attributes(
         unique_row_identifier: target_row_data[:person_attributes]["case_name"],
         record_id: target_row_data[:family_record]._id.to_s,
-        record_class_name: "Family"
+        record_class_name: "Family",
+        seeded_at: DateTime.now
       )
     end
     # rubocop:enable Metrics/AbcSize

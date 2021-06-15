@@ -50,10 +50,7 @@ module Seeds
     end
 
     def create_records!
-      row_ids = rows.map(&:id)
-      row_ids.map do |row_id|
-        SeedRowWorker.perform_async(row_id, self.id)
-      end
+      SeedWorker.perform_async(self.id)
       complete!
       save
     end
