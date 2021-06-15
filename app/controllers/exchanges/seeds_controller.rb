@@ -6,7 +6,8 @@ module Exchanges
   class SeedsController < ApplicationController
     include ::DataTablesAdapter #TODO: check
     include ::Pundit
-    include ::L10nHelper
+    include ActionView::Helpers::TranslationHelper
+    include L10nHelper
 
   # layout 'single_column'
     layout 'bootstrap_4'
@@ -67,7 +68,7 @@ module Exchanges
       unless params[:file].send(:content_type) == 'text/csv'
         # TODO: Refactor as translation
         flash[:error] = "Unable to use CSV template. Must be in CSV format."
-        render 'new'
+        render 'new' and return
       end
       incorrect_header_values = []
       uploaded_csv_headers = CSV.read(params[:file].send(:tempfile), return_headers: true).first
@@ -77,7 +78,7 @@ module Exchanges
       return unless incorrect_header_values.present?
       # TODO: Refactor as translation
       flash[:error] = "Unable to use CSV template. Contains incorrect header values: #{incorrect_header_values}."
-      render 'new'
+      render 'new' and return
     end
 
     def set_seed
