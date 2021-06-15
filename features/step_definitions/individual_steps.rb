@@ -145,11 +145,19 @@ end
 And(/(.*) selects eligible immigration status$/) do |text|
   if text == "Dependent"
     find(:xpath, '//label[@for="dependent_us_citizen_false"]').click
-    find(:xpath, '//label[@for="dependent_eligible_immigration_status_true"]').click
+    if EnrollRegistry[:immigration_status_checkbox].enabled?
+      find('#dependent_eligible_immigration_status').click
+    else
+      find(:xpath, '//label[@for="dependent_eligible_immigration_status_true"]').click
+    end
   else
     find(:xpath, '//label[@for="person_us_citizen_false"]').click
-    find('label[for=person_eligible_immigration_status_true]').click
-    choose 'person_eligible_immigration_status_true', visible: false, allow_label_click: true
+    if EnrollRegistry[:immigration_status_checkbox].enabled?
+      find('#person_eligible_immigration_status').click
+    else
+      find('label[for=person_eligible_immigration_status_true]').click
+      choose 'person_eligible_immigration_status_true', visible: false, allow_label_click: true
+    end
   end
 end
 
@@ -217,8 +225,12 @@ Then(/click citizen no/) do
 end
 
 When(/click eligible immigration status yes/) do
-  find('label[for=person_eligible_immigration_status_true]', wait: 20).click
-  choose 'person_eligible_immigration_status_true', visible: false, allow_label_click: true
+  if EnrollRegistry[:immigration_status_checkbox].enabled?
+    find('#person_eligible_immigration_status').click
+  else
+    find('label[for=person_eligible_immigration_status_true]', wait: 20).click
+    choose 'person_eligible_immigration_status_true', visible: false, allow_label_click: true
+  end
 end
 
 Then(/should find I-551 doc type/) do
