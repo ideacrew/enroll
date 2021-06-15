@@ -239,20 +239,16 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
     end
 
     describe "with a duplicate dependent" do
-      let(:family) do
-        FactoryBot.create(:family, :with_nuclear_family)
-      end
+      let(:test_person) { FactoryBot.create(:person, :with_nuclear_family) }
+      let(:duplicate_test_family) { test_person.primary_family }
       let(:target_dependent) do
-        family.family_members.where(is_primary_applicant: false).first
-      end
-      let(:family_members_array) do
-        family.family_members.map { |fm| fm } << duplicate_fm_double
+        duplicate_test_family.family_members.where(is_primary_applicant: false).first
       end
       let(:duplicate_dependent_attributes) do
         {
           dependent: {
             id: target_dependent.id,
-            family_id: family.id,
+            family_id: duplicate_test_family.id,
             first_name: target_dependent.first_name,
             last_name: target_dependent.last_name,
             ssn: target_dependent.ssn
@@ -260,6 +256,8 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
         }
       end
       before :each do
+        # To make it detect the test family as current family
+        allow(user).to receive(:person).and_return(test_person)
         sign_in(user)
         # No Resident Role
         post :create, params: duplicate_dependent_attributes, :format => "js"
@@ -267,13 +265,13 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
 
       it "should redirect to families home after detecting duplicate dependent" do
         expect(response).to redirect_to(insured_family_members_path)
-        # error_message = l10n(
-        #  'insured.family_members.duplicate_error_message',
-        #  action: "add",
-        #  contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item
-        # )
+        error_message = l10n(
+          'insured.family_members.duplicate_error_message',
+          action: "add",
+          contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item
+        )
         # TODO: Flash message not appearing, have tried a million things, cannot figure this out
-        # expect(flash[:error]).to eq(error_message)
+        expect(flash[:error]).to eq(error_message)
       end
     end
 

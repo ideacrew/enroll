@@ -273,9 +273,7 @@ class Insured::FamilyMembersController < ApplicationController
       action: "add",
       contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item
     )
-    respond_to do |format|
-      format.html { redirect_to family_account_path, error: error_message }
-    end
+    redirect_to insured_family_members_path, flash: { error: error_message } and return
   end
 
   def dependent_person_params
