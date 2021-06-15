@@ -7,7 +7,7 @@ module FinancialAssistance
   module Operations
     module Applications
       module MedicaidGateway
-        # This class will build event and publish payload
+        # Publish class will build event and publish the payload
         class Publish
           send(:include, Dry::Monads[:result, :do, :try])
           include EventSource::Command
@@ -21,12 +21,14 @@ module FinancialAssistance
 
           private
 
-          def build_event(params)
-            event('events.iap.application.determine_eligibility', attributes: params)
+          def build_event(payload)
+            event('events.iap.applications.determine_eligibility', attributes: payload)
           end
 
           def publish(event)
             event.publish
+
+            Success("Successfully published the payload to medicaid_gateway for determination")
           end
         end
       end

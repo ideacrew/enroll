@@ -5,7 +5,7 @@ module Events
     module Applications
       # This class will register event
       class DetermineEligibility < EventSource::Event
-        publisher_key 'enroll.iap.applications'
+        publisher_path 'publishers.application_publisher'
 
       end
     end
