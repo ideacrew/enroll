@@ -31,9 +31,7 @@ describe SeedWorker, :dbclean => :after_each do
     it "should be able to seed the database and infer data like primary families/persons" do
       return if file_location.blank?
       # To speed up only do a few of them
-      @seed.rows.to_a[6..@seed.rows.count].each do |row|
-        row.destroy
-      end
+      @seed.rows.to_a[6..@seed.rows.count].each(&:destroy)
       SeedWorker.new.perform(@seed.id)
       expect(FinancialAssistance::Application.all.count).to be > 0 if EnrollRegistry.feature_enabled?(:financial_assistance)
       expect(Family.all.count).to be > 0

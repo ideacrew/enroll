@@ -122,7 +122,6 @@ module GoldenSeedHelper
 
   # rubocop:disable Metrics/AbcSize
   # rubocop:disable Metrics/CyclomaticComplexity
-  # rubocop:disable Metrics/MethodLength
   # rubocop:disable Metrics/PerceivedComplexity
   def create_and_return_person(case_info_hash = {}, dependent = nil)
     gender = case_info_hash[:person_attributes]['gender']&.downcase || Person::GENDER_KINDS.sample
@@ -186,8 +185,7 @@ module GoldenSeedHelper
   end
   # rubocop:enable Metrics/AbcSize
   # rubocop:enable Metrics/CyclomaticComplexity
-  # rubocop:enable Metrics/MethodLength
-  # rubocop:enable Metrics/PerceivedComplexity
+    # rubocop:enable Metrics/PerceivedComplexity
 
   # TODO: Need to figure out the primary applicant thing on spreadsheet
   def create_and_return_family(case_info_hash = {})
@@ -198,12 +196,10 @@ module GoldenSeedHelper
       is_primary_applicant: case_info_hash[:person_attributes]['relationship_to_primary'].downcase == 'self'
     )
     fm.save!
-    binding.irb unless family.save
     family.save!
     family
   end
 
-  # rubocop:disable Metrics/AbcSize
   def create_and_return_user(case_info_hash = {})
     providers = ["gmail", "yahoo", "hotmail"]
     email = if case_info_hash[:person_attributes]['email']&.include?(".com")
@@ -237,7 +233,6 @@ module GoldenSeedHelper
     puts("Unable to generate user for #{case_info_hash[:primary_person_record].full_name}, email already taken.") unless user_saved == true
     user
   end
-  # rubocop:enable Metrics/AbcSize
 
   def generate_and_return_dependent_record(case_info_hash)
     dependent_person = create_and_return_person(case_info_hash, true)

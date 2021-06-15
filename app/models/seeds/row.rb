@@ -23,9 +23,7 @@ module Seeds
       record_id.present?
     end
 
-    def primary_record_rows
-
-    end
+    def primary_record_rows; end
 
     def target_record
       return nil unless record_class_name && record_id

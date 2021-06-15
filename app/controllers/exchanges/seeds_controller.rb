@@ -68,19 +68,16 @@ module Exchanges
         # TODO: Refactor as translation
         flash[:error] = "Unable to use CSV template. Must be in CSV format."
         render 'new'
-        return
       end
       incorrect_header_values = []
       uploaded_csv_headers = CSV.read(params[:file].send(:tempfile), return_headers: true).first
       uploaded_csv_headers.compact.each do |header_value|
         incorrect_header_values << header_value if Seeds::Seed::REQUIRED_CSV_HEADERS.exclude?(header_value.to_s)
       end
-      unless incorrect_header_values.empty?
-        # TODO: Refactor as translation
-        flash[:error] = "Unable to use CSV template. Contains incorrect header values: #{incorrect_header_values}."
-        render 'new'
-        return
-      end
+      return unless incorrect_header_values.present?
+      # TODO: Refactor as translation
+      flash[:error] = "Unable to use CSV template. Contains incorrect header values: #{incorrect_header_values}."
+      render 'new'
     end
 
     def set_seed
