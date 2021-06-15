@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-describe SeedRowWorker, :dbclean => :after_each do
+describe SeedWorker, :dbclean => :after_each do
   describe "#perform" do
     let(:file_location) do
       filename = "#{Rails.root}/ivl_testbed_scenarios_*.csv"
@@ -31,9 +31,10 @@ describe SeedRowWorker, :dbclean => :after_each do
     it "should be able to seed the database and infer data like primary families/persons" do
       return if file_location.blank?
       # To speed up only do a few of them
-      @seed.rows.to_a[0..5].each do |seed_row|
-        SeedRowWorker.new.perform(seed_row.id, @seed.id)
+      @seed.rows.to_a[6..@seed.rows.count].each do |row|
+        row.destroy
       end
+      SeedWorker.new.perform(@seed.id)
       expect(FinancialAssistance::Application.all.count).to be > 0 if EnrollRegistry.feature_enabled?(:financial_assistance)
       expect(Family.all.count).to be > 0
       expect(HbxEnrollment.all.count).to be > 0

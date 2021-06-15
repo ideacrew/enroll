@@ -13,17 +13,17 @@ class SeedWorker
     # Tons of stuff
     @target_seed = ::Seeds::Seed.find(seed_id)
     # need to do the primary_person first
-    target_seed.rows.order_by(:created_at.asc).each do |row|
+    target_seed.rows.each do |row|
       Rails.logger.warn("No data provided for Seed Row #{row.id} of seed #{target_seed.id}") if row.data.blank?
       next if row.data.blank?
       process_row(row.data, seed_id, row.id)
       html = ApplicationController.render(
         partial: "exchanges/seeds/row",
-        locals: { row: @target_row }
+        locals: { row: row }
       )
 
       cable_ready["seed-row-processing"].morph(
-        selector: "#seed-#{seed_id}-row-#{row_id}",
+        selector: "#seed-#{seed_id}-row-#{row.id}",
         html: html
       )
 

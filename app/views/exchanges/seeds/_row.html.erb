@@ -1,6 +1,7 @@
 <% row ||= @row %>
+<% seed = row.seed %>
 
-<div id='<%= "seed-#{row.seed.id}-row-#{row.id}" %>' class='row summary-row px-3 bg-white border-left border-right' data-row-id='<%= row.id %>'>
+<div id='<%= "seed-#{seed.id}-row-#{row.id}" %>' class='row summary-row px-3 bg-white border-left border-right' data-row-id='<%= row.id %>'>
   <div class='col-4'>
     <%= row.data['case_name'] %>
   </div>

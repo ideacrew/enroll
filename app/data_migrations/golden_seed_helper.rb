@@ -198,6 +198,7 @@ module GoldenSeedHelper
       is_primary_applicant: case_info_hash[:person_attributes]['relationship_to_primary'].downcase == 'self'
     )
     fm.save!
+    binding.irb unless family.save
     family.save!
     family
   end
