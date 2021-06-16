@@ -12,9 +12,8 @@ module FinancialAssistance
         class RequestEligibilityDetermination
           # Requests eligibility determination from medicaid gateway
 
-          send(:include, Dry::Monads[:result, :do])
+          include Dry::Monads[:result, :do]
           include Acapi::Notifiers
-          require 'securerandom'
 
           # @param [ Hash ] params Applicant Attributes
           # @return [ BenefitMarkets::Entities::Applicant ] applicant Applicant
@@ -59,7 +58,7 @@ module FinancialAssistance
           end
 
           def publish(payload)
-            FinancialAssistance::Operations::Applications::MedicaidGateway::Publish.new.call(payload)
+            FinancialAssistance::Operations::Applications::MedicaidGateway::Publish.new.call(payload.to_h)
           end
         end
       end
