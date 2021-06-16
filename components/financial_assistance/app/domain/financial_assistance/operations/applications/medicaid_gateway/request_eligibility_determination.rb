@@ -58,7 +58,7 @@ module FinancialAssistance
           end
 
           def publish(payload)
-            FinancialAssistance::Operations::Applications::MedicaidGateway::Publish.new.call(payload.to_h)
+            FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication.new.call(payload)
           end
         end
       end

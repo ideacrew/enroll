@@ -8,7 +8,7 @@ module FinancialAssistance
     module Applications
       module MedicaidGateway
         # Publish class will build event and publish the payload
-        class Publish
+        class PublishApplication
           send(:include, Dry::Monads[:result, :do, :try])
           include EventSource::Command
 
