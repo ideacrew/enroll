@@ -23,6 +23,11 @@ servers:
     protocol: :amqp
     protocolVersion: "0.9.2"
     description: RabbitMQ Test Server
+  development:
+    url: amqp://localhost:5672/
+    protocol: amqp
+    protocolVersion: 0.9.2
+    description: RabbitMQ Development Server
 channels:
   enroll.iap.applications.determine_eligibility:
     bindings:
