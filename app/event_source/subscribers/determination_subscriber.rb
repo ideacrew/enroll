@@ -42,7 +42,7 @@ module Subscribers
     end
 
     def self.persist(response)
-      payload = JSON.parse(response)
+      payload = JSON.parse(response, :symbolize_names => true)
       result = FinancialAssistance::Operations::Applications::MedicaidGateway::AddEligibilityDetermination.new.call(payload)
 
       message = if result.success?

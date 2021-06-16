@@ -69,6 +69,7 @@ module FinancialAssistance
                            native_american_information: {indian_tribe_member: applicant.indian_tribe_member,
                                                          tribal_id: applicant.tribal_id},
                            citizenship_immigration_status_information: {citizen_status: applicant.citizen_status,
+                                                                        is_lawful_presence_self_attested: false,
                                                                         is_resident_post_092296: applicant.is_resident_post_092296},
                            is_consumer_role: applicant.is_consumer_role,
                            is_resident_role: applicant.is_resident_role,
