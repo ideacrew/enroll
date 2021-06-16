@@ -245,7 +245,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
             family_id: duplicate_test_family.id,
             first_name: target_dependent.first_name,
             last_name: target_dependent.last_name,
-            ssn: target_dependent.ssn
+            dob: "#{target_dependent.dob.year}-#{target_dependent.dob.month}-#{target_dependent.dob.day}"
           }
         }
       end
@@ -259,15 +259,13 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
       end
 
       it "should redirect to families home after detecting duplicate dependent" do
-
         expect(response).to redirect_to(insured_family_members_path)
-        # alert_message = l10n(
-        #  'insured.family_members.duplicate_error_message',
-        #  action: "add",
-        #  contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item
-        # )
-        # TODO: Flash message not appearing, have tried a million things, cannot figure this out
-        # expect(flash[:alert]).to eq(alert_message)
+        alert_message = l10n(
+          'insured.family_members.duplicate_error_message',
+          action: "add",
+          contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item
+        )
+        expect(flash[:alert]).to eq(alert_message)
       end
     end
 

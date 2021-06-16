@@ -268,7 +268,7 @@ class Insured::FamilyMembersController < ApplicationController
         action: "add",
         contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item
       )
-      redirect_to insured_family_members_path, alert: alert_message and return
+      redirect_to insured_family_members_path, alert: alert_message
     end
     # rubocop:enable Style/GuardClause
   end
