@@ -32,6 +32,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
                       has_eligible_medicaid_cubcare: false,
                       is_claimed_as_tax_dependent: false,
                       is_incarcerated: false,
+                      is_student: false,
+                      is_former_foster_care: false,
                       is_post_partum_period: false)
   end
 
