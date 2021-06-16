@@ -1,7 +1,7 @@
 <% row ||= @row %>
 <% seed = row.seed %>
 
-<tr scope="row">
+<tr scope="row" id='<%= "seed-#{seed.id}-row-#{row.id}" %>' data-row-id='<%= row.id %>'>
   <div id='<%= "seed-#{seed.id}-row-#{row.id}" %>' class='row' data-row-id='<%= row.id %>'>
     <td>
       <%= row.data['case_name'] %>
