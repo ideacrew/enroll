@@ -14,7 +14,7 @@ module Exchanges
     before_action :set_seed, only: %i[edit]
     before_action :csv_format_valid?, only: %i[create]
 
-    # before_action :only_preprod, :check_hbx_staff_role
+    before_action :nonprod_environment?, :check_hbx_staff_role
     def new
       @seed = Seeds::Seed.new(user: current_user)
     end
@@ -63,6 +63,12 @@ module Exchanges
     # def csv_params; end
 
     private
+
+    def check_hbx_staff_role
+      unless current_user.has_hbx_staff_role?
+        redirect_to root_path, :flash => { :error => "You must be an HBX staff member" }
+      end
+    end
 
     def csv_format_valid?
       unless params[:file].send(:content_type) == 'text/csv'
