@@ -15,7 +15,6 @@ module FinancialAssistance::API::V1
     end
 
     def create
-      puts 'testingggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg'
       @application = FinancialAssistance::Application.where(
         aasm_state: "draft",
         family_id: get_current_person.financial_assistance_identifier
@@ -26,6 +25,30 @@ module FinancialAssistance::API::V1
       else
         render json: { errors: @application.errors.full_messages }, status: :bad_request
       end
+    end
+
+    def update
+      @application = FinancialAssistance::Application.find_by(family_id: get_current_person.financial_assistance_identifier)
+      if @application
+        @application.update(params)
+        render json: nil, status: :success
+      else
+        render json: { errors: @application.errors.full_messages }, status: :bad_request
+      end
+    end
+
+    def show
+      @application = FinancialAssistance::Application.find_by(:family_id)
+      render json: @application
+    end
+
+    def delete
+      @application = FinancialAssistance::Application.find_by(:family_id)
+      if @application
+        @application.destroy
+        render json: nil, status: :success
+      else
+        render json: { errors: @application.errors.full_messages }, status: :bad_request
     end
 
     private
@@ -61,6 +84,48 @@ module FinancialAssistance::API::V1
           :kind,
           :number,
           :area_code
+        ],
+        emails_attributes: [
+                  :kind,
+                  :address,
+        ],
+        deductions_attributes: [
+                  :amount,
+                  :frequency_kind,
+                  :start_on,
+                  :end_on,
+                  :kind
+        ],
+        incomes_attributes: [
+                  :kind,
+                  :employer_name,
+                  :amount,
+                  :frequency_kind,
+                  :start_on,
+                  :end_on,
+                  :employer_address => [
+                    :kind,
+                    :address_1,
+                    :address_2,
+                    :city,
+                    :state,
+                    :zip
+                  ],
+                  employer_phone => [
+                    :kind,
+                    :full_phone_number
+                  ]
+        ],
+        benefits_attributes: [
+                  :kind,
+                  :start_on,
+                  :end_on,
+                  :insurance_kind,
+                  :esi_covered,
+                  :employer_name,
+                  :employee_cost,
+                  :employee_id,
+                  :employee_cost_frequency
         ]
       )
     end
