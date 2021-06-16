@@ -17,11 +17,6 @@ seedfile_locations.each do |seedfile_location|
     translations_to_seed << "#{filename[/#{seedfile_location}(.*?)#{str2_markerstring}/m, 1]}_translations".upcase.constantize
   end
 end
-if EnrollRegistry.feature_enabled?(:financial_assistance)
-  require_relative File.join(Rails.root, 'components/financial_assistance/db/seedfiles/translations/en/faa_translations')
-  translations_to_seed << FaaTranslations::ASSISTANCE_TRANSLATIONS
-  translations_to_seed << FaaTranslations::ELIGIBILITY_TRANSLATIONS
-end
 
 MAIN_TRANSLATIONS = {
   :'en.shared.my_portal_links.my_insured_portal' => 'My Insured Portal',
