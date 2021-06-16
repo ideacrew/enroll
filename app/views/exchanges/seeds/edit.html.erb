@@ -20,10 +20,20 @@
         <%= f.submit 'Begin Seed', :class => 'btn btn-primary', type: 'submit' %>
       </div>
     <% end %>
-  </div>
-  <div class='container'>
-    <% @seed.rows.each do |row| %>
-      <%= render partial: 'row', locals: { row: row } %>
-    <% end %>
+    <table class='table-responsive'>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Case Name</th>
+          <th scope="col">Unique Row Identifier</th>
+          <th scope='col'>Record URL</th>
+          <th>Seeded At</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @seed.rows.each do |row| %>
+          <%= render partial: 'row', locals: { row: row } %>
+        <% end %>
+      </tbody>
   </div>
 </div>

@@ -26,7 +26,7 @@ module Seeds
     def primary_record_rows; end
 
     def target_record
-      return nil unless record_class_name && record_id
+      return nil unless record_class_name.present? && record_id.present?
       record_class_name.constantize.where(_id: record_id).first
     end
   end
