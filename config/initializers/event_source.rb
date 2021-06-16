@@ -26,7 +26,7 @@ EventSource.configure do |config|
   end
 
   config.async_api_schemas =
-    if Rails.env.test? || Rails.env.development?
+    if (Rails.env.test? || Rails.env.development?) && ENV['RABBITMQ_HOST'].nil?
       dir = Pathname.pwd.join('spec', 'test_data', 'async_api_files')
       resource_files = ::Dir[::File.join(dir, '**', '*')].reject { |p| ::File.directory? p }
 
@@ -34,7 +34,7 @@ EventSource.configure do |config|
         EventSource::AsyncApi::Operations::AsyncApiConf::LoadPath.new.call(path: file).success.to_h
       end
     else
-      ::AcaEntities.async_api_config_find_by_service_name('enroll').success
+      ::AcaEntities.async_api_config_find_by_service_name(nil).success
     end
 end
 EventSource.initialize!
