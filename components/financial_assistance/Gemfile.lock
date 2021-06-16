@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 7bbf525a66c59f397674061781b0ecca20bbe3d8
+  revision: 02d3f8ebed98e1238d7ab0795cec33355cd1de68
   branch: fdsh
   specs:
     aca_entities (0.2.2)
@@ -250,7 +250,7 @@ GEM
     faraday-net_http_persistent (1.1.0)
     faraday_middleware (1.0.0)
       faraday (~> 1.0)
-    ffi (1.15.1)
+    ffi (1.15.3)
     font-awesome-rails (4.7.0.7)
       railties (>= 3.2, < 7)
     forgery (0.7.0)
@@ -350,7 +350,7 @@ GEM
     public_suffix (4.0.6)
     pundit (2.1.0)
       activesupport (>= 3.0.0)
-    queue-bus (0.10.0)
+    queue-bus (0.11.0)
       multi_json
       redis
     raabro (1.4.0)
