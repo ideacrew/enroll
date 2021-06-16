@@ -7,7 +7,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 56238af25e5cac3184f872403ff5863e78f2b57a
+  revision: ea2ee9d6e88f12bb86fbff1f1852f2c3150dbe0e
   branch: fdsh
   specs:
     aca_entities (0.2.2)
@@ -776,7 +776,7 @@ GEM
     puma (3.12.6)
     pundit (2.1.0)
       activesupport (>= 3.0.0)
-    queue-bus (0.10.0)
+    queue-bus (0.11.0)
       multi_json
       redis
     raabro (1.4.0)
