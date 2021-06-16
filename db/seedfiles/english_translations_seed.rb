@@ -7,7 +7,8 @@ translations_to_seed = []
 # broker_agencies.rb
 # with a constant like
 # BROKER_AGENCIES_TRANSLATIONS
-seedfile_locations = ["db/seedfiles/translations/en/#{site_key}/", "components/financial_assistance/db/seedfiles/translations/en/#{site_key}/"]
+seedfile_locations = ["db/seedfiles/translations/en/#{site_key}/"]
+seedfile_locations += ["components/financial_assistance/db/seedfiles/translations/en/#{site_key}/"] if EnrollRegistry.feature_enabled?(:financial_assistance)
 seedfile_locations.each do |seedfile_location|
   Dir.glob("#{seedfile_location}*").each do |filename|
     puts("Requiring #{filename}")
@@ -16,11 +17,6 @@ seedfile_locations.each do |seedfile_location|
     str2_markerstring = ".rb"
     translations_to_seed << "#{filename[/#{seedfile_location}(.*?)#{str2_markerstring}/m, 1]}_translations".upcase.constantize
   end
-end
-if EnrollRegistry.feature_enabled?(:financial_assistance)
-  require_relative File.join(Rails.root, "components/financial_assistance/db/seedfiles/translations/en/#{site_key}/faa_translations")
-  translations_to_seed << FaaTranslations::ASSISTANCE_TRANSLATIONS
-  translations_to_seed << FaaTranslations::ELIGIBILITY_TRANSLATIONS
 end
 
 MAIN_TRANSLATIONS = {
