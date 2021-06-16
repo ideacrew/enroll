@@ -18,7 +18,7 @@ seedfile_locations.each do |seedfile_location|
   end
 end
 if EnrollRegistry.feature_enabled?(:financial_assistance)
-  require_relative File.join(Rails.root, 'components/financial_assistance/db/seedfiles/translations/en/faa_translations')
+  require_relative File.join(Rails.root, "components/financial_assistance/db/seedfiles/translations/en/#{site_key}/faa_translations")
   translations_to_seed << FaaTranslations::ASSISTANCE_TRANSLATIONS
   translations_to_seed << FaaTranslations::ELIGIBILITY_TRANSLATIONS
 end
