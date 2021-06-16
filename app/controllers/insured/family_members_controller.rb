@@ -253,19 +253,24 @@ class Insured::FamilyMembersController < ApplicationController
 
   def verify_unique_dependent
     @dependent = ::Forms::FamilyMember.new(params[:dependent])
+    # Don't use SSN in case there is no SSN
     potential_duplicate = @family&.family_members&.select do |family_member|
       family_member&.first_name == @dependent.first_name &&
         family_member&.last_name == @dependent.last_name &&
-        (family_member&.ssn == @dependent.ssn || family_member&.dob == @dependent.dob)
+        family_member&.dob == @dependent.dob
     end
-    return unless potential_duplicate.present?
-    # Families home page
-    alert_message = l10n(
-      'insured.family_members.duplicate_error_message',
-      action: "add",
-      contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item
-    )
-    redirect_to insured_family_members_path, alert: alert_message and return
+    # Disabling rubocop because it seems like a guard clause changes behavior
+    # rubocop:disable Style/GuardClause
+    if potential_duplicate.present?
+      # Manage Family Page Redirect
+      alert_message = l10n(
+        'insured.family_members.duplicate_error_message',
+        action: "add",
+        contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item
+      )
+      redirect_to insured_family_members_path, alert: alert_message and return
+    end
+    # rubocop:enable Style/GuardClause
   end
 
   def dependent_person_params
