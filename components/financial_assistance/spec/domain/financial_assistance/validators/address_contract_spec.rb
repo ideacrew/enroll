@@ -62,7 +62,7 @@ RSpec.describe FinancialAssistance::Validators::AddressContract,  dbclean: :afte
   describe "missing zip" do
 
     let(:params) { { kind: 'test', address_1: '1234', address_2: '1234', address_3: 'person', city: 'test', state: 'DC', county: '', county_name: '' }}
-    let(:error_message) {{:zip=>['is missing', 'must be a string']}}
+    let(:error_message) {{:zip => ['is missing', 'must be a string']}}
 
     it "fails" do
       expect(subject).not_to be_success
