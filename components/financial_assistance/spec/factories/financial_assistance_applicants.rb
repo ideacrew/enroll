@@ -8,6 +8,7 @@ FactoryBot.define do
   factory :financial_assistance_applicant, class: "FinancialAssistance::Applicant" do
     association :application
 
+    gender {'female'}
     is_active { true }
     is_ia_eligible { false }
     is_medicaid_chip_eligible { false }
