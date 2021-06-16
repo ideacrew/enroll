@@ -71,36 +71,36 @@ RSpec.describe FinancialAssistance::API::V1::ApplicationsController, dbclean: :a
               incomes_attributes: [
                 {
                   kind: "wages_and_salaries",
-                  "employer_name" => "sfd",
-                  "amount" => "50001",
-                  "frequency_kind" => "quarterly",
-                  "start_on" => "11/08/2017",
-                  "end_on" => "11/08/2018",
-                  "employer_address" => {
-                    "kind" => "work",
-                    "address_1" => "2nd Main St",
-                    "address_2" => "sfdsf",
-                    "city" => "Washington",
-                    "state" => "DC",
-                    "zip" => "35467"
-                  },
-                  "employer_phone" => {
-                    "kind" => "work", 
-                    "full_phone_number" => "(301)-848-8053"
-                  }
+                  employer_name: "sfd",
+                  amount: "50001",
+                  frequency_kind: "quarterly",
+                  start_on: "11/08/2017",
+                  end_on: "11/08/2018",
+                  employer_address: [
+                    kind: "work",
+                    address_1: "2nd Main St",
+                    address_2: "sfdsf",
+                    city: "Washington",
+                    state: "DC",
+                    zip: "35467"
+                  ],
+                  employer_phone: [
+                    kind: "work", 
+                    full_phone_number: "(301)-848-8053"
+                  ]
                 }
               ],
               benefits_attributes: [
                 {
-                  'kind' => 'is_eligible',
-                  'start_on' => '09/04/2017',
-                  'end_on' => '09/20/2017',
-                  'insurance_kind' => 'child_health_insurance_plan',
-                  'esi_covered' => 'self',
-                  'employer_name' => '',
-                  'employer_id' => '',
-                  'employee_cost' => '',
-                  'employee_cost_frequency' => ''
+                  kind: 'is_eligible',
+                  start_on: '09/04/2017',
+                  end_on: '09/20/2017',
+                  insurance_kind: 'child_health_insurance_plan',
+                  esi_covered: 'self',
+                  employer_name: '',
+                  employer_id: '',
+                  employee_cost: '',
+                  employee_cost_frequency: ''
                 }
               ]
             }],
