@@ -253,10 +253,10 @@ class Insured::FamilyMembersController < ApplicationController
 
   def verify_unique_dependent
     @dependent = ::Forms::FamilyMember.new(params[:dependent])
-    potential_duplicate = @family&.family_members&.detect do |family_member|
+    potential_duplicate = @family&.family_members&.select do |family_member|
       family_member&.first_name == @dependent.first_name &&
         family_member&.last_name == @dependent.last_name &&
-        family_member&.ssn == @dependent.ssn
+        (family_member&.ssn == @dependent.ssn || family_member&.dob == @dependent.dob)
     end
     return unless potential_duplicate.present?
     # Families home page
@@ -265,7 +265,7 @@ class Insured::FamilyMembersController < ApplicationController
       action: "add",
       contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item
     )
-    redirect_to insured_family_members_path, flash: { error: error_message } and return
+    redirect_to insured_family_members_path, notice: error_message and return
   end
 
   def dependent_person_params
