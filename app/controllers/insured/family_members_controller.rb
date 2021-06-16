@@ -61,14 +61,6 @@ class Insured::FamilyMembersController < ApplicationController
       @prev_url_include_intractive_identity = false
       @prev_url_include_consumer_role_id = false
     end
-  rescue StandardError => e
-    message = {}
-    message[:message] = "Application Exception - #{e.message}"
-    message[:sep_id] = params[:sep_id] if params[:sep_id]
-    message[:user_id] = current_user.id if current_user
-    message[:person_id] = params[:person_id] if params[:person_id]
-    message[:url] = request.original_url
-    Rails.logger.error(message)
   end
 
   def new

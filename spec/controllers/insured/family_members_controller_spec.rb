@@ -74,13 +74,12 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
       subject { Observers::NoticeObserver.new }
 
       let(:sep) { FactoryBot.create :special_enrollment_period, family: test_family }
-      let(:dup_sep) { double("SpecialEnrPeriod", qle_on: TimeKeeper.date_of_record - 5.days, submitted_at: "") }
+      let(:dup_sep) { double("SpecialEnrPeriod", qle_on: TimeKeeper.date_of_record - 5.days) }
 
       before :each do
         allow(person).to receive(:broker_role).and_return(nil)
         allow(user).to receive(:person).and_return(person)
         allow(user).to receive(:has_hbx_staff_role?).and_return(false)
-        allow(user).to receive(:id).and_return('1')
         sign_in(user)
         allow(controller).to receive(:validate_address_params).and_return []
         allow(controller.request).to receive(:referer).and_return(nil)
@@ -100,11 +99,6 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
         it "should not get assign with old sep" do
           get :index, params: {sep_id: sep.id, qle_id: sep.qualifying_life_event_kind_id}
           expect(assigns(:sep)).not_to eq sep
-        end
-
-        it "should handle exception gracefully when ID for non existing SEP is passed" do
-          allow(controller).to receive(:duplicate_sep).and_return dup_sep
-          get :index, params: {sep_id: '500', qle_id: sep.qualifying_life_event_kind_id}
         end
 
         it "should duplicate sep" do
