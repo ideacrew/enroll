@@ -81,7 +81,7 @@ COPY Gemfile Gemfile
 COPY Gemfile.lock Gemfile.lock
 
 RUN bundle install --jobs 20 --retry 5 --without development test 
-RUN configuration:client_configuration_toggler client=$CLIENT
+RUN bundle exec rake configuration:client_configuration_toggler client=$CLIENT
 RUN bundle exec rake assets:precompile 
 RUN rm -f /enroll/config/master.key && rm -f /enroll/config/credentials.yml.enc
 
