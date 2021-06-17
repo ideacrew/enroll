@@ -4,6 +4,7 @@ class SpecialEnrollmentPeriod
   include Mongoid::Timestamps
   include ScheduledEventService
   include TimeHelper
+  include SepAll
   include BenefitSponsors::Concerns::Observable
   include BenefitSponsors::ModelEvents::SpecialEnrollmentPeriod
 
@@ -251,7 +252,7 @@ private
   end
 
   def set_coverage_renewal_flag
-    prior_py_ivl_sep = EnrollRegistry.feature_enabled?(:prior_plan_year_ivl_sep)
+    prior_py_ivl_sep = EnrollRegistry.feature_enabled?(:prior_plan_year_ivl_sep) && admin_flag.blank? && prior_py_sep?(effective_on, qle.market_kind)
     return if coverage_renewal_flag == false || prior_py_ivl_sep == false
 
     self.assign_attributes({coverage_renewal_flag: prior_py_ivl_sep})
