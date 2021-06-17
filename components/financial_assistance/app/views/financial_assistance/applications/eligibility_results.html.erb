@@ -134,32 +134,30 @@
           </div>
         <%end%>
 
-        <% if FinancialAssistanceRegistry.feature_enabled?(:non_magi_referral_display) %>
-          <% @application.applicants.each do |applicant| %>
-            <% if applicant.is_eligible_for_non_magi_reasons %>
-              <div class="er-medicaid mt-20">
-                <div class="er-title">
-                  <h3><%= l10n("faa.referral") %></h3>
-                </div>
-                <div class="border-bottom-2px"></div>
-                <div class="er-medicaid-prsn">
-                  <p><%= l10n("faa.qualified_reason") %>:</p>
+        <% if FinancialAssistanceRegistry.feature_enabled?(:non_magi_referral_display) && @application.applicants.pluck(:is_eligible_for_non_magi_reasons).any?(true) %>
+          <div class="er-medicaid mt-20">
+            <div class="er-title">
+              <h3><%= l10n("faa.referral") %></h3>
+            </div>
+            <div class="border-bottom-2px"></div>
+            <div class="er-medicaid-prsn">
+              <p><%= l10n("faa.qualified_reason") %>:</p>
 
-                  <div class='er-prsn'>
-                    <i class="fa fa-user fa-2x" aria-hidden="true"></i>
-                    <h4><%=applicant.full_name%></h4>
-                  </div>
+              <% @application.applicants.each do |applicant| %>
+                <div class='er-prsn'>
+                  <i class="fa fa-user fa-2x" aria-hidden="true"></i>
+                  <h4><%=applicant.full_name%></h4> <% if applicant.is_eligible_for_non_magi_reasons %>
                 </div>
-                <div class="border-bottom-1px"></div>
-                <div class="er-warning bg-warning">
-                  <div><i class="fa fa-exclamation-triangle fa-lg text-warning" aria-hidden="true"></i></div>
-                  <div class="text-warning ">
-                    <%= l10n("faa.next_step_with_non_magi") %>
-                  </div>
-                </div>
+              <%end%>
+            </div>
+            <div class="border-bottom-1px"></div>
+            <div class="er-warning bg-warning">
+              <div><i class="fa fa-exclamation-triangle fa-lg text-warning" aria-hidden="true"></i></div>
+              <div class="text-warning ">
+                <%= l10n("faa.next_step_with_non_magi") %>
               </div>
-            <%end%>
-          <%end%>
+            </div>
+          </div>
         <%end%>
 
         <div class="er-summary mt-20">
