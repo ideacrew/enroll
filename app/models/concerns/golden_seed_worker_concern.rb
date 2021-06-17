@@ -13,10 +13,17 @@ module GoldenSeedWorkerConcern
 
   included do
 
+    def process_row(target_row)
+      case target_row.seed.csv_template
+      when "individual_market_seed"
+        process_row_individual_market_seed(target_row)
+      end
+    end
+
     # Row data needs to be hash
     # rubocop:disable Metrics/AbcSize
     # rubocop:disable Metriics/MethodLength
-    def process_row(target_row)
+    def process_row_individual_market_seed(target_row)
       target_seed = target_row.seed
       row_data = target_row.data
       # remove_golden_seed_callbacks
@@ -70,8 +77,17 @@ module GoldenSeedWorkerConcern
         end
       end
       # reinstate_golden_seed_callbacks
+      # TODOO: Unique identifying data
+      # Please note that some of these are TODO and may not actually be in the golden seed yet
+      unique_row_notes = ""
+      unique_row_notes += "#{target_row_data[:family_record].family_members.count} family members"
+      unique_row_notes += ", Health Program 1: #{target_row_data[:person_attributes]['health_program_1']}, " if target_row_data[:person_attributes]['health_program_1'].present?
+      unique_row_notes += "APTC Amount: #{target_row_data[:person_attributes]['aptc_amount']}, " if target_row_data[:person_attributes]['aptc_amount'].present?
+      unique_row_notes += "CSR: #{target_row_data[:person_attributes]['csr']}" if target_row_data[:person_attributes]['csr'].present?
+      unique_row_notes += target_row_data[:person_attributes]['case_notes'] if target_row_data[:person_attributes]['case_notes'].present?
       target_row.update_attributes(
         unique_row_identifier: target_row_data[:person_attributes]["case_name"],
+        unique_row_notes: unique_row_notes,
         record_id: target_row_data[:family_record]._id.to_s,
         record_class_name: "Family",
         seeded_at: DateTime.now

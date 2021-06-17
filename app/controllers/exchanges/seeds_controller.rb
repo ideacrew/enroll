@@ -24,6 +24,7 @@ module Exchanges
       @seed = Seeds::Seed.new(
         user: current_user,
         filename: params[:file].send(:original_filename), # Get filename
+        csv_template: @csv_template,
         aasm_state: 'draft'
       )
       # TODO: need to figure out how to save the file
@@ -82,13 +83,21 @@ module Exchanges
         render 'new' and return
       end
       incorrect_header_values = []
-      uploaded_csv_headers = CSV.read(params[:file].send(:tempfile), return_headers: true).first
-      uploaded_csv_headers.compact.each do |header_value|
-        incorrect_header_values << header_value if Seeds::Seed::REQUIRED_CSV_HEADERS.exclude?(header_value.to_s)
+      uploaded_csv_headers = CSV.read(params[:file].send(:tempfile), return_headers: true).first.compact
+      header_difference = nil
+      Seeds::Seed::REQUIRED_CSV_HEADER_TEMPLATES.each do |template_name, csv_headers|
+        # Same exact headers
+        # After ruby 2.6 +, get rid of the set and just use it as array methods
+        # https://stackoverflow.com/a/56739603/5331859
+        header_difference = csv_headers.uniq.sort.to_set.difference(uploaded_csv_headers.uniq.sort.to_set)
+        if header_difference.blank?
+          @csv_template = template_name.to_s
+          break          
+        end
       end
-      return unless incorrect_header_values.present?
+      return unless header_difference.present?
       # TODO: Refactor as translation
-      flash[:error] = "Unable to use CSV template. Contains incorrect header values: #{incorrect_header_values}."
+      flash[:error] = "Unable to use CSV template. Contains incorrect header values: #{header_difference.to_a}."
       render 'new' and return
     end
 
