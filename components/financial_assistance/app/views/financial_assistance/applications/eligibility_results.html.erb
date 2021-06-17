@@ -144,10 +144,12 @@
               <p><%= l10n("faa.qualified_reason") %>:</p>
 
               <% @application.applicants.each do |applicant| %>
-                <div class='er-prsn'>
-                  <i class="fa fa-user fa-2x" aria-hidden="true"></i>
-                  <h4><%=applicant.full_name%></h4> <% if applicant.is_eligible_for_non_magi_reasons %>
-                </div>
+                <% if applicant.is_eligible_for_non_magi_reasons %>
+                  <div class='er-prsn'>
+                    <i class="fa fa-user fa-2x" aria-hidden="true"></i>
+                    <h4><%=applicant.full_name%></h4>
+                  </div>
+                <%end%>
               <%end%>
             </div>
             <div class="border-bottom-1px"></div>
