@@ -10,7 +10,7 @@ RSpec.describe BenefitSponsors::Validators::SponsoredBenefits::PricingDeterminat
 
   let(:missing_params)   { {group_size: group_size, participation_rate: participation_rate} }
   let(:invalid_params)   { missing_params.merge({ pricing_determination_tiers: {}}) }
-  let(:error_message1)   { {:pricing_determination_tiers => ["is missing"]} }
+  let(:error_message1)   { {:pricing_determination_tiers => ["is missing", "must be an array"]} }
   let(:error_message2)   { {:pricing_determination_tiers => ["must be an array"]} }
 
   context "Given invalid required parameters" do

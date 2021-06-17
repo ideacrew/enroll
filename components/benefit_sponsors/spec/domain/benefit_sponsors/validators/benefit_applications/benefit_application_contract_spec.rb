@@ -14,7 +14,7 @@ RSpec.describe BenefitSponsors::Validators::BenefitApplications::BenefitApplicat
   let(:termination_reason)             { "non_payment_termination_reason"}  
   let(:missing_params)                 { {expiration_date: expiration_date, open_enrollment_period: oe_period, aasm_state: :draft, recorded_rating_area_id: BSON::ObjectId.new, benefit_sponsor_catalog_id: BSON::ObjectId.new } }
   let(:invalid_params)                 { missing_params.merge({recorded_service_area_ids: BSON::ObjectId.new, effective_period: effective_date})}
-  let(:error_message1)                 { {:effective_period => ["is missing"], :recorded_service_area_ids => ["is missing"]} }
+  let(:error_message1)                 { {:effective_period =>  ["is missing", "must be Range"], :recorded_service_area_ids => ["is missing", "must be an array"]} }
   let(:error_message2)                 { {:recorded_service_area_ids => ["must be an array"], :effective_period => ["must be Range"]} }
 
   describe "Given invalid required parameters" do
