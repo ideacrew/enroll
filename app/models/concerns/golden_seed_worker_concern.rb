@@ -22,7 +22,7 @@ module GoldenSeedWorkerConcern
 
     # Row data needs to be hash
     # rubocop:disable Metrics/AbcSize
-    # rubocop:disable Metriics/MethodLength
+    # rubocop:disable Metrics/MethodLength
     def process_row_individual_market_seed(target_row)
       target_seed = target_row.seed
       row_data = target_row.data
@@ -85,7 +85,7 @@ module GoldenSeedWorkerConcern
       unique_row_notes += "APTC Amount: #{target_row_data[:person_attributes]['aptc_amount']}, " if target_row_data[:person_attributes]['aptc_amount'].present?
       unique_row_notes += "CSR: #{target_row_data[:person_attributes]['csr']}" if target_row_data[:person_attributes]['csr'].present?
       # TODO: For somoe reason case notes from the sheet QA gave me isn't being detected and idk why.
-      unique_row_notes += (target_row_data[:person_attributes]['case_notes']).to_s if target_row_data[:person_attributes]['case_notes'].present?
+      unique_row_notes += target_row_data[:person_attributes]['case_notes'].to_s if target_row_data[:person_attributes]['case_notes'].present?
       target_row.update_attributes(
         unique_row_identifier: target_row_data[:person_attributes]["case_name"],
         unique_row_notes: unique_row_notes,
@@ -95,6 +95,6 @@ module GoldenSeedWorkerConcern
       )
     end
     # rubocop:enable Metrics/AbcSize
-    # rubocop:enable Metriics/MethodLength
+    # rubocop:enable Metrics/MethodLength
   end
 end

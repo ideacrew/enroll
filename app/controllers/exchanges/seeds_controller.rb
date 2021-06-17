@@ -28,11 +28,14 @@ module Exchanges
         aasm_state: 'draft'
       )
       # TODO: need to figure out how to save the file
-      CSV.foreach(params[:file].send(:tempfile), headers: true) do |row|
-        # To avoid nil values
-        # TODO: Make sure case notese is gooing through
-        row_data = row.to_h.reject { |key, _value| key.blank? }.transform_values { |v| v.blank? ? "" : v }.with_indifferent_access
-        @seed.rows.build(data: row_data)
+      CSV.foreach(params[:file].send(:tempfile), headers: true) do |csv_row|
+        # Conversion for CSV is weird
+        row_data_hash = {}
+        row_keys = csv_row.to_h.keys
+        row_keys.each do |row_key|
+          row_data_hash[row_key] = csv_row[row_key]
+        end
+        @seed.rows.build(data: row_data_hash.with_indifferent_access)
       end
       if @seed.save
         redirect_to(
