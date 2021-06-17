@@ -26,7 +26,7 @@ RSpec.describe Validators::SecureMessages::MessageContract,  dbclean: :after_eac
     context "sending with missing keys should return errors" do
 
       let(:invalid_params) { {} }
-      let(:error_message) { {:subject => ["is missing"], :body => ["is missing"]} }
+      let(:error_message) { {:body => ["is missing", "must be a string"], :subject => ["is missing", "must be a string"]} }
 
       it 'should throw errors' do
         expect(subject.call(invalid_params).errors.to_h).to eq error_message

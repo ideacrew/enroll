@@ -11,7 +11,7 @@ RSpec.describe Validators::BenefitGroupAssignments::BenefitGroupAssignmentContra
 
   let(:missing_params)   { {benefit_package_id: benefit_package_id, end_on: end_on, hbx_enrollment_id: hbx_enrollment_id} }
   let(:invalid_params)   { missing_params.merge({start_on: '1234'})}
-  let(:error_message1)   { {:start_on => ["is missing"]} }
+  let(:error_message1)   { {:start_on => ["is missing", "must be a date"]} }
   let(:error_message2)   { {:start_on => ["must be a date"]} }
 
   context "Given invalid required parameters" do
