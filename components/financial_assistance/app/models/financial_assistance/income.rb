@@ -150,7 +150,8 @@ module FinancialAssistance
       )
     end
 
-    def prizes_and_awards_text #TODO: needs revisit should be pulling text from translations.
+    def prizes_and_awards_text
+      #TODO: needs revisit should be pulling text from translations.
       if FinancialAssistanceRegistry[:prize_and_awards].setting(:gamble_prize).item
         'Gambling, prizes or awards'
       else
