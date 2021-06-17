@@ -9,8 +9,8 @@ RSpec.describe Validators::Documents::DocumentContract,  dbclean: :after_each do
     context 'sending with missing values should return errors' do
       let(:invalid_params) { {title: "", creator: "", subject: "", doc_identifier: "", format: ""} }
       let(:error_message) do
-        {:creator => ["is missing", "must be a string"], :doc_identifier => ["is missing", "must be a string"], 
-          :subject => ["is missing", "must be a string"], :title => ["is missing", "must be a string"]}
+        {:creator => ["is missing", "must be a string"], :doc_identifier => ["is missing", "must be a string"],
+         :subject => ["is missing", "must be a string"], :title => ["is missing", "must be a string"]}
       end
 
       it 'should be a container-ready operation' do
