@@ -2,7 +2,7 @@ class Products::QhpCostShareVariance
   include Mongoid::Document
   include Mongoid::Timestamps
 
-  embedded_in :qhp
+  embedded_in :qhp, class_name: "Products::Qhp"
 
   # Component plus variant
   field :hios_plan_and_variant_id, type: String
