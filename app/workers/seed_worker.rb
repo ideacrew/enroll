@@ -16,7 +16,8 @@ class SeedWorker
     target_seed.rows.each do |row|
       Rails.logger.warn("No data provided for Seed Row #{row.id} of seed #{target_seed.id}") if row.data.blank?
       next if row.data.blank?
-      process_row(row.data, seed_id, row.id)
+      process_row(row)
+      row.reload
       html = ApplicationController.render(
         partial: "exchanges/seeds/row",
         locals: { row: row }

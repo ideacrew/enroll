@@ -15,4 +15,11 @@ export default class extends Controller {
       }
     )
   }
+
+  processSeed(e) {
+    console.log("Hitting the processing seed thingie.");
+    e.currentTarget.disabled = true;
+    e.currentTarget.value = 'Processing Seed';
+
+  }
 }

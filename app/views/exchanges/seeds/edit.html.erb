@@ -1,6 +1,6 @@
 <div class='row' data-controller='seed-row'>
   <div class='container'>
-    <%= form_for @seed, url: exchanges_seed_path(@seed.id), method: :patch do |f| %>
+    <%= form_for @seed, url: exchanges_seed_path(@seed.id), method: :patch, remote: true do |f| %>
       <div class="form-group">
         <%= f.hidden_field :id %>
       </div>
@@ -17,7 +17,17 @@
         <%= l10n("created_at") %>: <%= @seed.created_at.to_s %> <br>
       </div>
       <div class='form-group'>
-        <%= f.submit 'Begin Seed', :class => 'btn btn-primary', type: 'submit' %>
+        <% if @seed.aasm_state == 'draft' %>
+          <%= f.submit 'Begin Seed',
+                       class: 'btn btn-primary',
+                       type: 'submit',
+                       data: { action: "click->seed-row#processSeed" } %>
+        <% else %>
+          <%= f.submit 'Seed Processed',
+                       class: 'btn btn-primary',
+                       type: 'submit',
+                       disabled: true %>
+        <% end %>
       </div>
     <% end %>
     <table class='table-responsive'>

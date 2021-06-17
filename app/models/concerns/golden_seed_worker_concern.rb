@@ -16,9 +16,9 @@ module GoldenSeedWorkerConcern
     # Row data needs to be hash
     # rubocop:disable Metrics/AbcSize
     # rubocop:disable Metriics/MethodLength
-    def process_row(row_data, seed_id, row_id)
-      target_seed = Seeds::Seed.find(seed_id)
-      target_row = target_seed.rows.find(row_id)
+    def process_row(target_row)
+      target_seed = target_row.seed
+      row_data = target_row.data
       # remove_golden_seed_callbacks
       # TODO: Weird behavior. Prevents the original hash on the row attribute from being modified
       data_to_process = row_data.deep_dup.with_indifferent_access

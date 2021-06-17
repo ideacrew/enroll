@@ -52,8 +52,13 @@ module Exchanges
     def update
       @seed = Seeds::Seed.find(params[:id])
       @seed.process! if params[:commit].downcase == 'begin seed'
-      flash[:notice] = l10n("seeds_ui.begin_seed_message")
-      render 'edit'
+      respond_to do |format|
+        format.html do
+          flash[:notice] = l10n("seeds_ui.begin_seed_message")
+          render 'edit'
+        end
+        format.js { head :ok }
+      end
     end
 
     # TODO: Need to add the template for them to download on index. Not sure if it should be here.
