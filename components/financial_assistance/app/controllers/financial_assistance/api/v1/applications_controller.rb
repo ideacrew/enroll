@@ -18,7 +18,10 @@ module FinancialAssistance::API::V1
       @application = FinancialAssistance::Application.where(
         aasm_state: "draft",
         family_id: get_current_person.financial_assistance_identifier
-      ).new(params[:application])
+      ).new(application_valid_params)
+      
+      @application.save
+      @application.errors.inspect
 
       if @application.save
         render json: @application
@@ -49,83 +52,93 @@ module FinancialAssistance::API::V1
         render json: nil, status: :success
       else
         render json: { errors: @application.errors.full_messages }, status: :bad_request
+      end
     end
 
     private
 
     def application_valid_params
       params.require(:application).permit(
-        :is_ssn_applied,
-        :non_ssn_apply_reason,
-        :is_pregnant,
-        :pregnancy_due_on,
-        :children_expected_count,
-        :is_post_partum_period,
-        :pregnancy_end_on,
-        :is_former_foster_care,
-        :foster_care_us_state,
-        :age_left_foster_care,
-        :is_student,
-        :student_kind,
-        :student_status_end_on,
-        :student_school_kind,
-        :is_self_attested_blind,
-        :has_daily_living_help,
-        :need_help_paying_bills,
-        :addresses_attributes => [
-          :kind,
-          :address_1,
-          :address_2,
-          :city,
-          :state,
-          :zip
-        ],
-        phones_attributes: [
-          :kind,
-          :number,
-          :area_code
-        ],
-        emails_attributes: [
-                  :kind,
-                  :address,
-        ],
-        deductions_attributes: [
-                  :amount,
-                  :frequency_kind,
-                  :start_on,
-                  :end_on,
-                  :kind
-        ],
-        incomes_attributes: [
-                  :kind,
-                  :employer_name,
-                  :amount,
-                  :frequency_kind,
-                  :start_on,
-                  :end_on,
-                  :employer_address => [
+        :applicants_attributes => [
+          :is_ssn_applied,
+          :non_ssn_apply_reason,
+          :is_pregnant,
+          :pregnancy_due_on,
+          :children_expected_count,
+          :is_post_partum_period,
+          :pregnancy_end_on,
+          :is_former_foster_care,
+          :foster_care_us_state,
+          :age_left_foster_care,
+          :is_student,
+          :student_kind,
+          :student_status_end_on,
+          :student_school_kind,
+          :is_self_attested_blind,
+          :has_daily_living_help,
+          :need_help_paying_bills,
+          :addresses_attributes => [
+            :kind,
+            :address_1,
+            :address_2,
+            :city,
+            :state,
+            :zip
+          ],
+          phones_attributes: [
+            :kind,
+            :number,
+            :area_code
+          ],
+          emails_attributes: [
                     :kind,
-                    :address_1,
-                    :address_2,
-                    :city,
-                    :state,
-                    :zip
-                  ],
-                  employer_phone => [
+                    :address,
+          ],
+          deductions_attributes: [
+                    :amount,
+                    :frequency_kind,
+                    :start_on,
+                    :end_on,
+                    :kind
+          ],
+          deductions_attributes: [
+                    :amount,
+                    :frequency_kind,
+                    :start_on,
+                    :end_on,
+                    :kind
+          ],
+          incomes_attributes: [
                     :kind,
-                    :full_phone_number
-                  ]
-        ],
-        benefits_attributes: [
-                  :kind,
-                  :start_on,
-                  :end_on,
-                  :insurance_kind,
-                  :esi_covered,
-                  :employer_name,
-                  :employee_cost,
-                  :employee_id,
-                  :employee_cost_frequency
+                    :employer_name,
+                    :amount,
+                    :frequency_kind,
+                    :start_on,
+                    :end_on,
+                    :employer_address => [
+                      # :kind,
+                      # :address_1,
+                      # :address_2,
+                      # :city,
+                      # :state,
+                      # :zip
+                    ],
+                    :employer_phone => [
+                      # :kind,
+                      # :full_phone_number
+                    ]
+          ],
+          benefits_attributes: [
+                    :kind,
+                    :start_on,
+                    :end_on,
+                    :insurance_kind,
+                    :esi_covered,
+                    :employer_name,
+                    :employee_cost,
+                    :employee_id,
+                    :employee_cost_frequency
+          ]
         ]
       )
     end

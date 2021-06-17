@@ -20,23 +20,23 @@ RSpec.describe FinancialAssistance::API::V1::ApplicationsController, dbclean: :a
         post :create, params: {
           application: {
             applicants_attributes: [{
-              "is_ssn_applied" => "false",
-              "non_ssn_apply_reason" => "we",
-              "is_pregnant" => "false",
-              "pregnancy_due_on" => "",
-              "children_expected_count" => "",
-              "is_post_partum_period" => "false",
-              "pregnancy_end_on" => "09/21/2017",
-              "is_former_foster_care" => "false",
-              "foster_care_us_state" => "",
-              "age_left_foster_care" => "",
-              "is_student" => "false",
-              "student_kind" => "",
-              "student_status_end_on" => "",
-              "student_school_kind" => "",
-              "is_self_attested_blind" => "false",
-              "has_daily_living_help" => "false",
-              "need_help_paying_bills" => "false",
+              is_ssn_applied: "false",
+              non_ssn_apply_reason: "we",
+              is_pregnant: "false",
+              pregnancy_due_on: "",
+              children_expected_count: "",
+              is_post_partum_period: "false",
+              pregnancy_end_on: "09/21/2017",
+              is_former_foster_care: "false",
+              foster_care_us_state: "",
+              age_left_foster_care: "",
+              is_student: "false",
+              student_kind: "",
+              student_status_end_on: "",
+              student_school_kind: "",
+              is_self_attested_blind: "false",
+              has_daily_living_help: "false",
+              need_help_paying_bills: "false",
               addresses_attributes: [
                 {
                   kind: 'home',
@@ -113,6 +113,10 @@ RSpec.describe FinancialAssistance::API::V1::ApplicationsController, dbclean: :a
 
       it 'creates the applicant' do
         expect(assigns(:application).applicants.count).to be_positive
+      end
+
+      it 'creates the income' do
+        expect(assigns(:application).applicants.flat_map(&:incomes).present?).to eq(true)
       end
 
       it "creates the applicant's address" do
