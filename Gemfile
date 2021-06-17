@@ -121,6 +121,8 @@ gem 'webpacker',                '~> 4.0.2'
 gem 'fast_jsonapi'
 gem 'loofah', '~> 2.3.1'
 gem 'stimulus_reflex', '~> 3.3'
+gem 'puma',                   '~> 3.12.4'
+
 group :doc do
   gem 'sdoc',                   '~> 1.0'
 end
@@ -151,7 +153,6 @@ group :development, :test do
   gem 'factory_bot_rails',      '~> 4.11'
   gem 'forgery',                '~> 0.7.0'
   gem 'parallel_tests',         '~> 2.26.2'
-  gem 'puma',                   '~> 3.12.4'
   gem 'rails-controller-testing'
   gem 'railroady',              '~> 1.5.3'
   gem 'rspec-rails'
