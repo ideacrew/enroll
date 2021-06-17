@@ -9,7 +9,7 @@ RSpec.describe BenefitSponsors::Validators::SponsoredBenefits::PricingDeterminat
 
   let(:missing_params)   { {pricing_unit_id: pricing_unit_id} }
   let(:invalid_params)   { {pricing_unit_id: BSON::ObjectId.new, price: 'price' } }
-  let(:error_message1)   { {:price => ['is missing']} }
+  let(:error_message1)   { {:price =>  ["is missing", "must be a float"]} }
   let(:error_message2)   { {:price => ['must be a float']} }
 
   context "Given invalid required parameters" do

@@ -18,7 +18,7 @@ RSpec.describe BenefitMarkets::Validators::BenefitSponsorCatalogs::BenefitSponso
   let(:missing_params)          { {effective_date: effective_date, effective_period: effective_period, open_enrollment_period: open_enrollment_period} }
   let(:all_params)              { {} }
 
-  let(:error_message) { { :probation_period_kinds => ["is missing"], :product_packages => ["is missing"], :service_area_ids => ["is missing"] } }
+  let(:error_message) { { :probation_period_kinds => ["is missing", "must be an array"], :product_packages => ["is missing", "must be an array"], :service_area_ids => ["is missing", "must be an array"] } }
 
   let(:result) { double(:success? => true) }
 

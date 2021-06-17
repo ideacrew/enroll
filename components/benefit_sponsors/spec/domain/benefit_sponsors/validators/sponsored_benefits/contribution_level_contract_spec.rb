@@ -14,8 +14,8 @@ RSpec.describe BenefitSponsors::Validators::SponsoredBenefits::ContributionLevel
 
   let(:missing_params)   { {display_name: display_name, contribution_unit_id: contribution_unit_id, is_offered: is_offered, contribution_factor: contribution_factor, contribution_cap: contribution_cap} }
   let(:invalid_params)   { missing_params.merge({min_contribution_factor: 'one', flat_contribution_amount: '222' })}
-  let(:error_message1)   { {:min_contribution_factor => ["is missing"], :flat_contribution_amount => ["is missing"], :order => ["is missing"]} }
-  let(:error_message2)   { {:min_contribution_factor => ["must be a float"], :order => ["is missing"]} }
+  let(:error_message1)   { {:min_contribution_factor => ["is missing", "must be a float"], :flat_contribution_amount => ["is missing", "must be a string"], :order => ["is missing", "must be an integer"]} }
+  let(:error_message2)   { {:min_contribution_factor => ["must be a float"], :order => ["is missing", "must be an integer"]} }
 
   context "Given invalid required parameters" do
     context "sending with missing parameters should fail validation with errors" do
