@@ -29,6 +29,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
                                   has_eligible_medicaid_cubcare: false,
                                   is_claimed_as_tax_dependent: false,
                                   is_incarcerated: false,
+                                  net_annual_income: 10_078.90,
                                   is_post_partum_period: false)
     applicant
   end
@@ -68,6 +69,16 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     it 'should have applicant with person hbx_id' do
       expect(result.value![:applicants].first[:person_hbx_id]).to eq person.hbx_id
     end
-  end
 
+    context 'mitc_income' do
+      before do
+        request_payload = result.success
+        @mitc_income_hash = request_payload[:applicants].first[:mitc_income]
+      end
+
+      it 'should add adjusted_gross_income' do
+        expect(@mitc_income_hash[:adjusted_gross_income]).to eq(applicant.net_annual_income)
+      end
+    end
+  end
 end
