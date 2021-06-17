@@ -30,6 +30,7 @@
 						<%= hidden_field_tag "lastName", f.primary_applicant.person.last_name %>
 						<%= hidden_field_tag "family_actions_id", "family_actions_#{f.id.to_s}" %>
             <%= hidden_field_tag "prior_year_sep_date", true,  id: 'prior_py_sep' %>
+            <%= hidden_field_tag "calculated_effective_date", "" %>
 						<div class = "kind">
 							<%= hidden_field_tag :effective_on_kind, "first_of_next_month" %>
 						</div>
