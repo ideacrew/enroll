@@ -36,6 +36,7 @@ describe SeedWorker, :dbclean => :after_each do
       expect(FinancialAssistance::Application.all.count).to be > 0 if EnrollRegistry.feature_enabled?(:financial_assistance)
       expect(Family.all.count).to be > 0
       expect(HbxEnrollment.all.count).to be > 0
+      expect(@seed.rows.where(:unique_row_notes.ne => nil).present?).to eq(true)
     end
   end
 end

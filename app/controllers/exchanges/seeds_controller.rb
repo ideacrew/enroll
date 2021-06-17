@@ -30,6 +30,7 @@ module Exchanges
       # TODO: need to figure out how to save the file
       CSV.foreach(params[:file].send(:tempfile), headers: true) do |row|
         # To avoid nil values
+        # TODO: Make sure case notese is gooing through
         row_data = row.to_h.reject { |key, _value| key.blank? }.transform_values { |v| v.blank? ? "" : v }.with_indifferent_access
         @seed.rows.build(data: row_data)
       end
@@ -71,9 +72,7 @@ module Exchanges
     private
 
     def check_hbx_staff_role
-      unless current_user.has_hbx_staff_role?
-        redirect_to root_path, :flash => { :error => "You must be an HBX staff member" }
-      end
+      redirect_to root_path, :flash => { :error => "You must be an HBX staff member" } unless current_user.has_hbx_staff_role?
     end
 
     def csv_format_valid?
@@ -82,7 +81,6 @@ module Exchanges
         flash[:error] = "Unable to use CSV template. Must be in CSV format."
         render 'new' and return
       end
-      incorrect_header_values = []
       uploaded_csv_headers = CSV.read(params[:file].send(:tempfile), return_headers: true).first.compact
       header_difference = nil
       Seeds::Seed::REQUIRED_CSV_HEADER_TEMPLATES.each do |template_name, csv_headers|
@@ -92,7 +90,7 @@ module Exchanges
         header_difference = csv_headers.uniq.sort.to_set.difference(uploaded_csv_headers.uniq.sort.to_set)
         if header_difference.blank?
           @csv_template = template_name.to_s
-          break          
+          break
         end
       end
       return unless header_difference.present?

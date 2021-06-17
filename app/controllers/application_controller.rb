@@ -96,11 +96,9 @@ class ApplicationController < ActionController::Base
 
   private
 
-    def nonprod_environment?
-      unless (ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true' || !Rails.env.production?)
-        redirect_to root_path, :flash => { :error => "Unable to run seeds on prod envirornment." }
-      end
-    end
+  def nonprod_environment?
+    redirect_to root_path, :flash => { :error => "Unable to run seeds on prod envirornment." } unless ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true' || !Rails.env.production?
+  end
 
     def strong_params
       params.permit!

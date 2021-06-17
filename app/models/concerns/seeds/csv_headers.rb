@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
-module Seeds::CsvHeaders
-  extend ActiveSupport::Concern
+module Seeds
+  # Constants that hold CSV Headers which are required for the different seeds.
+  # These may be changed/updated overtime as the code is improved.
+  module CsvHeaders
+    extend ActiveSupport::Concern
 
-  included do
     # TODO: Need to update the current template, there might be some duplicated keys
     # TODO: Make this flexiblee for other templates
     INDIVIDUAL_MARKET_SEED = [
@@ -31,6 +33,6 @@ module Seeds::CsvHeaders
 
     REQUIRED_CSV_HEADER_TEMPLATES = {
       individual_market_seed: INDIVIDUAL_MARKET_SEED
-    }
+    }.freeze
   end
 end

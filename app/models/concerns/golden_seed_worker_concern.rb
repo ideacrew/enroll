@@ -84,7 +84,7 @@ module GoldenSeedWorkerConcern
       unique_row_notes += ", Health Program 1: #{target_row_data[:person_attributes]['health_program_1']}, " if target_row_data[:person_attributes]['health_program_1'].present?
       unique_row_notes += "APTC Amount: #{target_row_data[:person_attributes]['aptc_amount']}, " if target_row_data[:person_attributes]['aptc_amount'].present?
       unique_row_notes += "CSR: #{target_row_data[:person_attributes]['csr']}" if target_row_data[:person_attributes]['csr'].present?
-      unique_row_notes += target_row_data[:person_attributes]['case_notes'] if target_row_data[:person_attributes]['case_notes'].present?
+      unique_row_notes += (target_row_data[:person_attributes]['case_notes']).to_s if target_row_data[:person_attributes]['case_notes'].present?
       target_row.update_attributes(
         unique_row_identifier: target_row_data[:person_attributes]["case_name"],
         unique_row_notes: unique_row_notes,

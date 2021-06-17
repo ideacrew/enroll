@@ -2,7 +2,7 @@
 
 <div class='container'>
 
-  <h2>Data Seeds <%= "0 present" if @seeds.blank? %></h2> <%= link_to "New Seed", main_app.new_exchanges_seed_path, class: "btn btn-lg btn-primary" %>
+  <h2>Data Seeds <%= "(0 present)" if @seeds.blank? %></h2> <%= link_to "New Seed", main_app.new_exchanges_seed_path, class: "btn btn-lg btn-primary" %>
 
   <div class="table-responsive">
   <table class="table">
