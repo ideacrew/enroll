@@ -152,5 +152,10 @@ registry:
       is_enabled: true
     - key: :net_annual_income_display
       is_enabled: false
+    - key: :prize_and_awards
+      is_enabled: true
+      settings:
+        - key: :gamble_prize
+          item: true
   # TODO eligibility engine connectivity(HAVEN) settings
   # TODO mec service connectivity settings
