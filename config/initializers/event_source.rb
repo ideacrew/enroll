@@ -8,7 +8,7 @@ EventSource.configure do |config|
   config.app_name = :enroll
 
   config.servers do |server|
-     server.http do |http|
+    server.http do |http|
       http.host = ENV['MITC_HOST'] || "http://localhost"
       http.port = ENV['MITC_PORT'] || "3000"
       http.url = ENV['MITC_URL'] || "http://localhost:3000"
