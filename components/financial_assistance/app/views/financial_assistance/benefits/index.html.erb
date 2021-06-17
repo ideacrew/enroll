@@ -175,6 +175,7 @@
       <div class="driver-question row row-form-wrapper radio-align no-buffer row-height fa-align-elements" id='denied-medicaid'>
         <div class="col-md-10 labelforcoverage">
           <span class="fa-text-color"><%=l10n("faa.medicaid_cubcare_end_date")%></span>
+
           <%= text_field_tag("medicaid_cubcare_due_on", @applicant.medicaid_cubcare_due_on, class: "jq-datepicker", placeholder: 'Select End Date', style: 'margin-left: 50px;', :'data-date-max' => "+0") %>
         </div>
       </div>
@@ -223,7 +224,7 @@
       <br>
 
 
-      <% status = @applicant.has_household_income_changed == true ? "" : "hide" %>
+      <% status = @applicant.has_eligibility_changed == true ? "" : "hide" %>
       <div class="driver-question row row-form-wrapper radio-align no-buffer row-height fa-align-elements <%= status %>" id="medicaid-chip-coverage-last-day">
         <div class="col-md-10 labelforcoverage">
           <span class="fa-text-color"><%=l10n("faa.person_medicaid_last_day")%></span>
