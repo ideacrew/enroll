@@ -61,9 +61,10 @@ module FinancialAssistance
       farming_and_fishing: 'Farming or fishing',
       foreign: 'Foreign income',
       other: 'Other taxable income',
-      prizes_and_awards: prizes_and_awards_text,
+      prizes_and_awards: FinancialAssistanceRegistry[:prize_and_awards].setting(:gamble_prize).item ? 'Gambling, prizes or awards' : 'Prizes and awards',
       scholorship_payments: 'Taxable scholarship payments'
     }.freeze
+
 
     field :title, type: String
     field :kind, as: :income_type, type: String, default: 'wages_and_salaries'
@@ -150,14 +151,6 @@ module FinancialAssistance
       )
     end
 
-    def prizes_and_awards_text
-      #TODO: needs revisit should be pulling text from translations.
-      if FinancialAssistanceRegistry[:prize_and_awards].setting(:gamble_prize).item
-        'Gambling, prizes or awards'
-      else
-        'Prizes and awards'
-      end
-    end
 
     class << self
       def find(id)
