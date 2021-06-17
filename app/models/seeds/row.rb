@@ -12,6 +12,7 @@ module Seeds
     # Uniquee Row Identifier in case there is an element that groups
     # rows together from a spreadsheet used for a seed
     field :unique_row_identifier, type: String, default: ""
+    field :unique_row_notes, type: String, default: ''
     field :data, type: Hash
     field :record_id, type: String, default: ''
     # Primary Person
