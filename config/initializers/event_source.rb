@@ -8,16 +8,10 @@ EventSource.configure do |config|
   config.app_name = :enroll
 
   config.servers do |server|
-    server.http do |http|
-      http.host = ENV['MITC_HOST'] || "http://localhost"
-      http.port = ENV['MITC_PORT'] || "3000"
-      http.url = ENV['MITC_URL'] || "http://localhost:3000"
-    end
-
     server.amqp do |rabbitmq|
       rabbitmq.host = ENV['RABBITMQ_HOST'] || "amqp://localhost"
       warn rabbitmq.host
-      rabbitmq.vhost = ENV['RABBITMQ_VHOST'] || "/"
+      rabbitmq.vhost = ENV['RABBITMQ_VHOST'] || "event_source"
       warn rabbitmq.vhost
       rabbitmq.port = ENV['RABBITMQ_PORT'] || "5672"
       warn rabbitmq.port
