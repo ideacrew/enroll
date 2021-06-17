@@ -15,6 +15,7 @@ module Seeds
     field :filename, type: String
 
     # TODO: Need to update the current template, there might be some duplicated keys
+    # TODO: Make this flexiblee for other templates
     REQUIRED_CSV_HEADERS = [
       "additional_family_relationships", "age", "age_when_left",
       "amount", "app_ref_number", "applying_for_coverage",

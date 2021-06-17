@@ -1,6 +1,8 @@
 <div class='row' data-controller='seed-row'>
   <div class='container'>
-    <%= form_for @seed, url: exchanges_seed_path(@seed.id), method: :patch, remote: true do |f| %>
+    <%= form_for @seed, url: exchanges_seed_path(@seed.id),
+                 method: :patch, remote: true,
+                 html: { data: { action: "ajax:success->seed-row#onPostSuccess" } } do |f| %>
       <div class="form-group">
         <%= f.hidden_field :id %>
       </div>
@@ -21,12 +23,13 @@
           <%= f.submit 'Begin Seed',
                        class: 'btn btn-primary',
                        type: 'submit',
-                       data: { action: "click->seed-row#processSeed" } %>
+                       data: { target: 'seed-row.submit' } %>
         <% else %>
-          <%= f.submit 'Seed Processed',
+          <%= f.submit "Seed #{@seed.aasm_state.titleize}",
                        class: 'btn btn-primary',
                        type: 'submit',
-                       disabled: true %>
+                       disabled: true,
+                       data: { target: 'seed-row.submit' } %>
         <% end %>
       </div>
     <% end %>

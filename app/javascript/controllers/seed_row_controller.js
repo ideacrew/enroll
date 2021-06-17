@@ -4,6 +4,7 @@ import CableReady from 'cable_ready'
 import consumer from '../channels/consumer';
 
 export default class extends Controller {
+  static targets = ['submit'];
   connect() {
     StimulusReflex.register(this)
     const controller = this
@@ -16,10 +17,11 @@ export default class extends Controller {
     )
   }
 
-  processSeed(e) {
-    console.log("Hitting the processing seed thingie.");
-    e.currentTarget.disabled = true;
-    e.currentTarget.value = 'Processing Seed';
-
+  onPostSuccess(e) {
+    const submit = this.submitTarget;
+    setTimeout(function () {
+      submit.disabled = true;
+      submit.value = 'Processing Seed...';
+    }, 0)
   }
 }
