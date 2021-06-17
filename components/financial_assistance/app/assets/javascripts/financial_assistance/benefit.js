@@ -418,6 +418,8 @@ document.addEventListener("turbolinks:load", function() {
          attributes[$(this).attr('name')] = " ";
        });
 
+      attributes[$(this).attr('name')] = $(this).val();
+
       $("#person_coverage_end_on").val();
       $.ajax({
         type: 'POST',
@@ -435,6 +437,7 @@ document.addEventListener("turbolinks:load", function() {
          $(this).val("");
        });
 
+       attributes[$(this).attr('name')] = $(this).val();
 
       $.ajax({
         type: 'POST',
