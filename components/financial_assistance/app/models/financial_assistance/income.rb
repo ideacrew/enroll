@@ -61,7 +61,7 @@ module FinancialAssistance
       farming_and_fishing: 'Farming or fishing',
       foreign: 'Foreign income',
       other: 'Other taxable income',
-      prizes_and_awards: 'Prizes and awards',
+      prizes_and_awards: prizes_and_awards_text,
       scholorship_payments: 'Taxable scholarship payments'
     }.freeze
 
@@ -148,6 +148,14 @@ module FinancialAssistance
         is_projected: income_data[:is_projected],
         submitted_at: income_data[:submitted_at]
       )
+    end
+
+    def prizes_and_awards_text #TODO: needs revisit should be pulling text from translations.
+      if FinancialAssistanceRegistry[:prize_and_awards].setting(:gamble_prize).item
+        'Gambling, prizes or awards'
+      else
+        'Prizes and awards'
+      end
     end
 
     class << self
