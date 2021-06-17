@@ -424,6 +424,11 @@ def employer_poc
     end
   end
 
+  def check_for_renewal_flag
+    status = check_renewal_flag
+    render json: {"renewalFlagStatus": status}
+  end
+
   def add_new_sep
     @element_to_replace_id = sep_params[:family_actions_id]
     createSep
