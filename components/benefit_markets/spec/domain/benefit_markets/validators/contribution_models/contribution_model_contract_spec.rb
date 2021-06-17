@@ -45,8 +45,8 @@ RSpec.describe BenefitMarkets::Validators::ContributionModels::ContributionModel
   end
 
   let(:invalid_params)   { missing_params.merge({many_simultaneous_contribution_units: 'abc'}) }
-  let(:error_message1)   { {:many_simultaneous_contribution_units => ["is missing"], :member_relationships => ["is missing"]} }
-  let(:error_message2)   { {:many_simultaneous_contribution_units => ["must be boolean"], :member_relationships => ["is missing"]} }
+  let(:error_message1)   { {:many_simultaneous_contribution_units => ["is missing", "must be boolean"], :member_relationships => ["is missing", "must be an array"]} }
+  let(:error_message2)   { {:many_simultaneous_contribution_units => ["must be boolean"], :member_relationships => ["is missing", "must be an array"]} }
 
   context "Given invalid required parameters" do
     context "sending with missing parameters should fail validation with errors" do

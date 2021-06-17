@@ -11,7 +11,7 @@ RSpec.describe BenefitMarkets::Validators::Products::PremiumTableContract do
 
   let(:missing_params)      { {_id: BSON::ObjectId.new, effective_period: effective_period, premium_tuples: [premium_tuples]} }
   let(:invalid_params)      { {_id: BSON::ObjectId.new, premium_tuples: [premium_tuples], effective_period: effective_date, rating_area_id: rating_area_id} }
-  let(:error_message1)      { {:rating_area_id => ["is missing"]} }
+  let(:error_message1)      { {:rating_area_id => ["is missing", "must be BSON::ObjectId"]} }
   let(:error_message2)      { {:effective_period => ["must be Range"]} }
 
   context "Given invalid required parameters" do

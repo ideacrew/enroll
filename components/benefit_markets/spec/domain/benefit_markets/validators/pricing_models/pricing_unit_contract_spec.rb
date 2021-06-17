@@ -11,7 +11,7 @@ RSpec.describe BenefitMarkets::Validators::PricingModels::PricingUnitContract do
   let(:missing_params)   { {name: name1, display_name: display_name, _id: BSON::ObjectId.new,} }
   let(:required_params)  { missing_params.merge({order: order}) }
   let(:invalid_params)   { missing_params.merge({order: 'one'})}
-  let(:error_message1)   { {:order => ["is missing"]} }
+  let(:error_message1)   { {:order => ["is missing", "must be an integer"]} }
   let(:error_message2)   { {:order => ["must be an integer"]} }
 
   context "Given invalid required parameters" do

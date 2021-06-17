@@ -23,8 +23,8 @@ RSpec.describe BenefitSponsors::Validators::SponsoredBenefits::SponsoredBenefitC
 
   let(:missing_params)   { {product_package_kind: product_package_kind, product_option_choice: product_option_choice, source_kind: source_kind, pricing_determinations: pricing_determinations} }
   let(:invalid_params)   { missing_params.merge({sponsor_contribution: {} })}
-  let(:error_message1)   { {:reference_product_id => ['is missing'], :sponsor_contribution => ['is missing']} }
-  let(:error_message2)   { {:reference_product_id => ['is missing'], :sponsor_contribution => ['must be filled']} }
+  let(:error_message1)   { {:reference_product_id => ["is missing", "must be BSON::ObjectId"], :sponsor_contribution => ["is missing", "must be a hash"]} }
+  let(:error_message2)   { {:reference_product_id => ["is missing", "must be BSON::ObjectId"], :sponsor_contribution => ['must be filled']} }
 
   context "Given invalid required parameters" do
     context "sending with missing parameters should fail validation with errors" do

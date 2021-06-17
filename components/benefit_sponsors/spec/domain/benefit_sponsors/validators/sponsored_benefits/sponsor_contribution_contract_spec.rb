@@ -16,7 +16,7 @@ RSpec.describe BenefitSponsors::Validators::SponsoredBenefits::SponsorContributi
 
   let(:missing_params)       { {} }
   let(:invalid_params)       { {contribution_levels: {}} }
-  let(:error_message1)       { {:contribution_levels => ["is missing"]} }
+  let(:error_message1)       { {:contribution_levels => ["is missing", "must be an array"]} }
   let(:error_message2)       { {:contribution_levels => ["must be an array"]} }
 
   context "Given invalid required parameters" do

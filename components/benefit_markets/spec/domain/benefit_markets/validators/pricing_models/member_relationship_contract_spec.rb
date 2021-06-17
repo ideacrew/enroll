@@ -13,7 +13,7 @@ RSpec.describe BenefitMarkets::Validators::PricingModels::MemberRelationshipCont
   let(:missing_params)          { {_id: BSON::ObjectId.new, relationship_kinds: relationship_kinds, age_threshold: age_threshold} }
   let(:required_params)         { missing_params.merge({relationship_name: relationship_name}) }
   let(:invalid_params)          { required_params.merge({relationship_name: 123})}
-  let(:error_message1)          { {:relationship_name => ["is missing"]} }
+  let(:error_message1)          { {:relationship_name => ["is missing", "must be Symbol"]} }
   let(:error_message2)          { {:relationship_name => ["must be Symbol"]} }
 
   context "Given invalid required parameters" do

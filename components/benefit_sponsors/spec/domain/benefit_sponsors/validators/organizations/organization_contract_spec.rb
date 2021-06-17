@@ -5,7 +5,7 @@ require "spec_helper"
 RSpec.describe BenefitSponsors::Validators::Organizations::OrganizationContract do
 
   let(:missing_params)   { {hbx_id: '1234321',  legal_name: 'abc_organization', entity_kind: :limited_liability_corporation} }
-  let(:error_message)    { {:site_id => ["is missing"], :fein => ["is missing"]} }
+  let(:error_message)    { {:site_id => ["is missing", "must be BSON::ObjectId"], :fein => ["is missing", "must be a string"]} }
 
   describe "Given invalid required parameters" do
     context "sending with missing parameters should fail validation with errors" do
