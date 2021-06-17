@@ -1,6 +1,6 @@
 # setup docker image config
-cp Gemfile Gemfile.tmp
-cp Gemfile.lock Gemfile.lock.tmp
+#cp Gemfile Gemfile.tmp
+#cp Gemfile.lock Gemfile.lock.tmp
 cp config/cable.yml config/cable.yml.tmp
 cp config/mongoid.yml config/mongoid.yml.tmp
 cp config/saml.yml config/saml.yml.tmp
@@ -9,8 +9,8 @@ cp config/environments/production.rb config/environments/production.rb.tmp
 cp config/initializers/devise.rb config/initializers/devise.rb.tmp
 cp config/initializers/redis.rb config/initializers/redis.rb.tmp
 
-cp .docker/config/Gemfile .
-cp .docker/config/Gemfile.lock .
+#cp .docker/config/Gemfile .
+#cp .docker/config/Gemfile.lock .
 cp .docker/config/puma.rb config/
 cp .docker/config/cable.yml config/
 cp .docker/config/mongoid.yml config/
@@ -33,8 +33,8 @@ docker build --build-arg BUNDLER_VERSION_OVERRIDE='2.0.1' \
              -f .docker/production/Dockerfile --target app -t $2:$1 .
 docker push $2:$1
 
-mv Gemfile.tmp Gemfile
-mv Gemfile.lock.tmp Gemfile.lock
+#mv Gemfile.tmp Gemfile
+#mv Gemfile.lock.tmp Gemfile.lock
 mv config/cable.yml.tmp config/cable.yml
 mv config/mongoid.yml.tmp config/mongoid.yml
 mv config/saml.yml.tmp config/saml.yml
