@@ -32,6 +32,30 @@ module SepAll
     @market_kind = qle.market_kind
   end
 
+  def check_renewal_flag
+    @family = Family.find(params[:person]) if params[:person].present?
+    qle = QualifyingLifeEventKind.find(params[:id]) if params[:id].present?
+    effective_date = Date.strptime(params[:effective_date], "%m/%d/%Y") if params[:effective_date].present?
+    date_option_1 = Date.strptime(params[:date_option1], "%m/%d/%Y") if params[:date_option1].present?
+    date_option_2 = Date.strptime(params[:date_option2], "%m/%d/%Y") if params[:date_option2].present?
+    date_option_3 = Date.strptime(params[:date_option3], "%m/%d/%Y") if params[:date_option3].present?
+
+    status = []
+    [effective_date, date_option_1, date_option_2, date_option_3].each do |date|
+      status << prior_py_sep?(date, qle.market_kind)
+    end
+    status.include?(true)
+  end
+
+  def prior_py_sep?(effective_date, market)
+    return false if effective_date.blank?
+
+    ivl_prior_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.previous_benefit_coverage_period
+    return unless market == 'individual'
+
+    ivl_prior_coverage_period&.contains?(effective_date)
+  end
+
   def calculate_rule
     fifteen_day_rule = '15th of month'
     end_month_rule = 'End of Month'
