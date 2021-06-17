@@ -198,7 +198,7 @@ module FinancialAssistance
             end
 
             def mitc_income(applicant)
-              { amount: 0, #TODO
+              { amount: 0,
                 taxable_interest: taxable_interest(applicant),
                 tax_exempt_interest: 0,
                 taxable_refunds: 0,
@@ -209,7 +209,7 @@ module FinancialAssistance
                 unemployment_compensation: unemployment_compensation(applicant),
                 other_income: other_income(applicant),
                 magi_deductions: magi_deductions(applicant),
-                adjusted_gross_income: 0, #TODO
+                adjusted_gross_income: applicant.net_annual_income || 0,
                 deductible_part_of_self_employment_tax: deductible_part_of_self_employment_tax(applicant),
                 ira_deduction: ira_deduction(applicant),
                 student_loan_interest_deduction: student_loan_interest_deduction(applicant),
