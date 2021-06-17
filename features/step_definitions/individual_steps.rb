@@ -1,5 +1,13 @@
 # frozen_string_literal: true
 
+class VlpDocument
+  VLP_DOCUMENT_KINDS = ["I-327 (Reentry Permit)", "I-551 (Permanent Resident Card)", "I-571 (Refugee Travel Document)", "I-766 (Employment Authorization Card)",
+                        "Certificate of Citizenship","Naturalization Certificate","Machine Readable Immigrant Visa (with Temporary I-551 Language)", "Temporary I-551 Stamp (on passport or I-94)", "I-94 (Arrival/Departure Record)",
+                        "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport", "Unexpired Foreign Passport",
+                        "I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)", "DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)",
+                        "Other (With Alien Number)", "Other (With I-94 Number)"].freeze
+end
+
 When(/^.+ visits the Consumer portal during open enrollment$/) do
   visit "/"
   find(HomePage.consumer_family_portal_btn).click
@@ -100,12 +108,12 @@ Then(/the individual sees form to enter personal information$/) do
   find(IvlPersonalInformation.naturalized_citizen_no_radiobtn).click
   find(IvlPersonalInformation.american_or_alaskan_native_no_radiobtn).click
   find(IvlPersonalInformation.incarcerated_no_radiobtn).click
-  fill_in IvlPersonalInformation.address_line_one, :with => "4900 USAA BLVD"
+  fill_in IvlPersonalInformation.address_line_one, :with => "4900 USAA BLVD NE"
   fill_in IvlPersonalInformation.address_line_two, :with => "212"
   fill_in IvlPersonalInformation.city, :with => "Washington"
-  find(IvlPersonalInformation.select_state_dropdown).click
-  first(IvlPersonalInformation.select_dc_state).click
-  fill_in IvlPersonalInformation.zip, :with => "20002"
+  find_all(IvlPersonalInformation.select_state_dropdown).first.click
+  find(:xpath, "//li[contains(., '#{Settings.contact_center.state}')]").click
+  fill_in IvlPersonalInformation.zip, :with => EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item
   sleep 2
   # screenshot("personal_form")
 end
@@ -239,7 +247,7 @@ Then(/Individual resumes enrollment/) do
   click_link 'Consumer/Family Portal'
 end
 
-Then (/Individual sees previously saved address/) do
+Then(/Individual sees previously saved address/) do
   expect(page).to have_field('ADDRESS LINE 1 *', with: '4900 USAA BLVD', wait: 10)
   find('.btn', text: 'CONTINUE').click
 end
@@ -721,8 +729,25 @@ Then(/^taxhousehold info is prepared for aptc user$/) do
 
   start_on = Date.new(TimeKeeper.date_of_record.year, 1,1)
   future_start_on = Date.new(TimeKeeper.date_of_record.year + 1, 1,1)
+  rating_address = person.rating_address
+  application_period = start_on.beginning_of_year..start_on.end_of_year
+  renewal_application_period = future_start_on.beginning_of_year..future_start_on.end_of_year
+  rating_area = BenefitMarkets::Locations::RatingArea.rating_area_for(rating_address, during: start_on) || FactoryBot.create(:benefit_markets_locations_rating_area, active_year: start_on.year)
+  service_area = BenefitMarkets::Locations::ServiceArea.service_areas_for(rating_address, during: start_on).first || FactoryBot.create(:benefit_markets_locations_service_area, active_year: start_on.year)
+  renewal_rating_area = BenefitMarkets::Locations::RatingArea.rating_area_for(rating_address, during: future_start_on) || FactoryBot.create(:benefit_markets_locations_rating_area, active_year: future_start_on.year)
+  renewal_service_area = BenefitMarkets::Locations::ServiceArea.service_areas_for(rating_address, during: future_start_on).first || FactoryBot.create(:benefit_markets_locations_service_area, active_year: future_start_on.year)
+
+  current_premium_table = FactoryBot.build(:benefit_markets_products_premium_table, effective_period: application_period, rating_area: rating_area)
   current_product = BenefitMarkets::Products::Product.all.by_year(start_on.year).where(metal_level_kind: :silver).first
+  current_product.service_area = service_area
+  current_product.premium_tables = [current_premium_table]
+  current_product.save
+
+  renewal_premium_table = FactoryBot.build(:benefit_markets_products_premium_table, effective_period: renewal_application_period, rating_area: renewal_rating_area)
   future_product = BenefitMarkets::Products::Product.all.by_year(future_start_on.year).where(metal_level_kind: :silver).first
+  future_product.service_area = renewal_service_area
+  future_product.premium_tables = [renewal_premium_table]
+  future_product.save
 
   if household.tax_households.blank?
     household.build_thh_and_eligibility(80, 0, start_on, current_product.id, 'Admin')
@@ -860,6 +885,10 @@ end
 
 When(/^Incarcerated field is nil for the consumer$/) do
   user.person.update_attributes(is_incarcerated: nil)
+end
+
+When(/^citizen status is false for the consumer$/) do
+  user.person.update_attributes(citizen_status: "not_lawfully_present_in_us")
 end
 
 Then(/^the consumer should see a message with incarcerated error$/) do

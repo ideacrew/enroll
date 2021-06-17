@@ -57,23 +57,7 @@ module FinancialAssistance
     DRIVER_QUESTION_ATTRIBUTES.freeze
 
     #list of the documents user can provide to verify Immigration status
-    VLP_DOCUMENT_KINDS = [
-        "I-327 (Reentry Permit)",
-        "I-551 (Permanent Resident Card)",
-        "I-571 (Refugee Travel Document)",
-        "I-766 (Employment Authorization Card)",
-        "Certificate of Citizenship",
-        "Naturalization Certificate",
-        "Machine Readable Immigrant Visa (with Temporary I-551 Language)",
-        "Temporary I-551 Stamp (on passport or I-94)",
-        "I-94 (Arrival/Departure Record)",
-        "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport",
-        "Unexpired Foreign Passport",
-        "I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)",
-        "DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)",
-        "Other (With Alien Number)",
-        "Other (With I-94 Number)"
-    ].freeze
+    VLP_DOCUMENT_KINDS = EnrollRegistry[:vlp_documents].setting(:vlp_document_kind_options).item
 
     CITIZEN_KINDS = {
       us_citizen: "US citizen",
@@ -236,6 +220,7 @@ module FinancialAssistance
     field :is_resident_post_092296, type: Boolean
     field :is_vets_spouse_or_child, type: Boolean
 
+    field :net_annual_income, type: Money
     # Driver QNs.
     field :has_job_income, type: Boolean
     field :has_self_employment_income, type: Boolean
@@ -244,6 +229,24 @@ module FinancialAssistance
     field :has_deductions, type: Boolean
     field :has_enrolled_health_coverage, type: Boolean
     field :has_eligible_health_coverage, type: Boolean
+
+    # if eligible immigration status
+    field :medicaid_chip_ineligible, type: Boolean
+    field :immigration_status_changed, type: Boolean
+    # if member of tribe
+    field :health_service_through_referral, type: Boolean
+    field :health_service_eligible, type: Boolean
+
+    field :is_medicaid_cubcare_eligible, type: Boolean
+
+    field :has_eligible_medicaid_cubcare, type: Boolean
+    field :medicaid_cubcare_due_on, type: Date
+    field :has_eligibility_changed, type: Boolean
+    field :has_household_income_changed, type: Boolean
+    field :person_coverage_end_on, type: Date
+
+    field :has_dependent_with_coverage, type: Boolean
+    field :dependent_job_end_on, type: Date
 
     field :workflow, type: Hash, default: { }
 
@@ -675,8 +678,6 @@ module FinancialAssistance
 
       questions_array << is_former_foster_care if foster_age_satisfied? && is_applying_coverage
       questions_array << is_post_partum_period unless is_pregnant
-      questions_array << has_unemployment_income if FinancialAssistanceRegistry[:unemployment_income].enabled?
-      questions_array << is_physically_disabled if is_applying_coverage
       questions_array << pregnancy_due_on << children_expected_count if is_pregnant
       questions_array << pregnancy_end_on << is_enrolled_on_medicaid if is_post_partum_period
 
@@ -744,6 +745,14 @@ module FinancialAssistance
         return deductions.present? if has_deductions
         deductions.blank?
       when :health_coverage
+        return false if indian_tribe_member && health_service_through_referral.nil? && EnrollRegistry[:indian_health_service_question].feature.is_enabled
+        if FinancialAssistanceRegistry[:medicaid_chip_driver_questions].enabled?
+          return false if eligible_immigration_status && medicaid_chip_ineligible.nil?
+          return false if eligible_immigration_status && medicaid_chip_ineligible && immigration_status_changed.nil?
+        end
+        return false if indian_tribe_member && health_service_eligible.nil? && EnrollRegistry[:indian_health_service_question].feature.is_enabled
+        return medicare_eligible_qns if FinancialAssistanceRegistry.feature_enabled?(:has_medicare_cubcare_eligible)
+        return dependent_coverage_questions if FinancialAssistanceRegistry.feature_enabled?(:has_dependent_with_coverage)
         return false if has_enrolled_health_coverage.nil? || has_eligible_health_coverage.nil?
         return benefits.enrolled.present? && benefits.eligible.present? && benefits.all? {|benefit| benefit.valid? :submission} if has_enrolled_health_coverage && has_eligible_health_coverage
         return benefits.enrolled.present? && benefits.enrolled.all? {|benefit| benefit.valid? :submission} && benefits.eligible.blank? if has_enrolled_health_coverage && !has_eligible_health_coverage
@@ -751,6 +760,29 @@ module FinancialAssistance
         benefits.enrolled.blank? && benefits.eligible.blank?
       end
     end
+
+    def dependent_coverage_questions
+      return false if has_dependent_with_coverage.nil?
+      return true if has_dependent_with_coverage == false
+      return true if has_dependent_with_coverage && dependent_job_end_on.present?
+      return false if has_dependent_with_coverage.present? && dependent_job_end_on.blank?
+    end
+
+    # rubocop:disable Metrics/CyclomaticComplexity
+    # rubocop:disable Metrics/PerceivedComplexity
+    def medicare_eligible_qns
+      return false if has_eligible_medicaid_cubcare.nil?
+      return false if has_eligible_medicaid_cubcare.present? && medicaid_cubcare_due_on.blank?
+      return true if has_eligible_medicaid_cubcare.present? && medicaid_cubcare_due_on.present?
+      return false if has_eligible_medicaid_cubcare == false && has_eligibility_changed.nil?
+      return true if has_eligible_medicaid_cubcare == false && has_eligibility_changed == false
+      return false if has_eligible_medicaid_cubcare == false && has_eligibility_changed.present? && has_household_income_changed.nil?
+      return true if  has_eligible_medicaid_cubcare == false && has_eligibility_changed.present? && has_household_income_changed == false
+      return false if has_eligible_medicaid_cubcare == false && has_eligibility_changed.present? && has_household_income_changed.present? && person_coverage_end_on.blank?
+      return true if has_eligible_medicaid_cubcare == false && has_eligibility_changed.present? && has_household_income_changed.present? && person_coverage_end_on.present?
+    end
+    # rubocop:enable Metrics/CyclomaticComplexity
+    # rubocop:enable Metrics/PerceivedComplexity
 
     def assisted_income_verified?
       assisted_income_validation == "valid"
@@ -893,6 +925,10 @@ module FinancialAssistance
       benefits.any_medicare.present?
     end
 
+    def display_student_question?
+      age_of_applicant > 17 && age_of_applicant < 23
+    end
+
     class << self
       def find(id)
         return nil unless id
@@ -912,7 +948,7 @@ module FinancialAssistance
 
     def other_questions_answers
       if is_applying_coverage
-        [:is_self_attested_blind, :has_daily_living_help, :need_help_paying_bills, :is_ssn_applied].inject([]) do |array, question|
+        [:is_ssn_applied].inject([]) do |array, question|
           no_ssn_flag = no_ssn
 
           array << send(question) if question != :is_ssn_applied || (question == :is_ssn_applied && no_ssn_flag == '1')
@@ -924,11 +960,7 @@ module FinancialAssistance
     end
 
     def validate_applicant_information
-      if is_applying_coverage
-        validates_presence_of :has_fixed_address, :is_claimed_as_tax_dependent, :is_living_in_state, :is_temporarily_out_of_state, :is_pregnant, :is_self_attested_blind, :has_daily_living_help, :need_help_paying_bills #, :tax_household_id
-      else
-        validates_presence_of :has_fixed_address, :is_claimed_as_tax_dependent, :is_living_in_state, :is_temporarily_out_of_state, :is_pregnant
-      end
+      validates_presence_of :has_fixed_address, :is_claimed_as_tax_dependent, :is_living_in_state, :is_temporarily_out_of_state, :is_pregnant
     end
 
     def driver_question_responses

@@ -103,6 +103,7 @@ module FinancialAssistance
       set_admin_bookmark_url
       @application = ::FinancialAssistance::Application.find_by(id: params[:id], family_id: get_current_person.financial_assistance_identifier)
       @all_relationships = @application.relationships
+      @application.calculate_total_net_income_for_applicants
       @applicants = @application.active_applicants if @application.present?
       redirect_to applications_path if @application.blank?
     end
@@ -134,7 +135,11 @@ module FinancialAssistance
         @income_coverage_hash = {}
 
         @applicants.each do |applicant|
-          file = File.read("./components/financial_assistance/app/views/financial_assistance/applications/raw_application.yml.erb")
+          file = if FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled).item
+                   File.read("./components/financial_assistance/app/views/financial_assistance/applications/raw_application.yml.erb")
+                 else
+                   File.read("./components/financial_assistance/app/views/financial_assistance/applications/raw_application_hra.yml.erb")
+                 end
           application_hash = YAML.safe_load(ERB.new(file).result(binding))
           @demographic_hash[applicant.id] = application_hash[0]["demographics"]
           application_hash[0]["demographics"]["ADDRESSES"] = generate_address_hash(applicant)

@@ -51,7 +51,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     let(:hbx_enrollment_member_2){ FactoryBot.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: TimeKeeper.date_of_record.beginning_of_month, applied_aptc_amount: 30)}
     let(:year) {TimeKeeper.date_of_record.year}
 
-    context "household_level aptc_csr data" do
+    context "household_level aptc_csr data", dbclean: :after_each do
 
       before(:each) do
         allow(family).to receive(:active_household).and_return household
@@ -114,7 +114,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     end
 
     # UPDATE APPLIED APTC  TO AN ENROLLMENT!
-    context "update_aptc_applied_for_enrollments" do
+    context "update_aptc_applied_for_enrollments", dbclean: :after_each do
       let(:params) do
         {
           "person" => { "person_id" => family.primary_applicant.person.id, "family_id" => family.id, "current_year" => TimeKeeper.date_of_record.year},
@@ -187,50 +187,49 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       end
     end
 
-    context 'calculate_slcsp_value' do
-      let!(:hbx_profile) {FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)}
-      let!(:person) {FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
-      let!(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
+    context 'calculate_slcsp_value', dbclean: :after_each do
+      let!(:rating_area_5) do
+        ::BenefitMarkets::Locations::RatingArea.rating_area_for(rating_address, during: effective_on) || FactoryBot.create_default(:benefit_markets_locations_rating_area)
+      end
+      let(:rating_address) { family_5.primary_person.consumer_role.rating_address }
+      let!(:service_area_5) do
+        ::BenefitMarkets::Locations::ServiceArea.service_areas_for(rating_address, during: effective_on)[0] || FactoryBot.create_default(:benefit_markets_locations_service_area)
+      end
+      let!(:person) {FactoryBot.create(:person, :with_consumer_role)}
+      let!(:family_5) {FactoryBot.create(:family, :with_primary_family_member, person: person, e_case_id: "family_test#1000")}
       let!(:person2) do
-        member = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, dob: (TimeKeeper.date_of_record - 40.years))
+        member = FactoryBot.create(:person, :with_consumer_role, dob: (TimeKeeper.date_of_record - 40.years))
         person.ensure_relationship_with(member, 'spouse')
         member.save!
         member
       end
-      let!(:household) {family.active_household}
-      let!(:family_member2) {FactoryBot.create(:family_member, family: family, person: person2)}
+      let!(:family_member2) {FactoryBot.create(:family_member, family: family_5, person: person2)}
       let(:effective_on) { TimeKeeper.date_of_record.next_month.beginning_of_month }
-      let!(:tax_household) {FactoryBot.create(:tax_household, household: family.active_household, effective_ending_on: nil, effective_starting_on: effective_on)}
-      let!(:tax_household_member1) {FactoryBot.create(:tax_household_member, applicant_id: family.family_members[0].id, tax_household: tax_household)}
-      let!(:tax_household_member2) {FactoryBot.create(:tax_household_member, applicant_id: nil, tax_household: tax_household)}
-      let!(:silver_product) {FactoryBot.create(:benefit_markets_products_health_products_health_product)}
+      let!(:tax_household_5) {FactoryBot.create(:tax_household, household: family_5.active_household, effective_ending_on: nil, effective_starting_on: effective_on)}
+      let!(:tax_household_member1) {FactoryBot.create(:tax_household_member, applicant_id: family_5.family_members[0].id, tax_household: tax_household_5)}
+      let!(:tax_household_member2) {FactoryBot.create(:tax_household_member, applicant_id: family_member2.id, tax_household: tax_household_5)}
 
+      let!(:premium_table) { build(:benefit_markets_products_premium_table, effective_period: application_period, rating_area: rating_area_5) }
       let!(:product) do
-        FactoryBot.create(:benefit_markets_products_health_products_health_product,
-                          hios_id: '11111111122301-01',
-                          csr_variant_id: '01',
-                          metal_level_kind: :silver,
-                          application_period: application_period,
-                          benefit_market_kind: :aca_individual)
+        product = FactoryBot.create(
+          :benefit_markets_products_health_products_health_product,
+          :with_issuer_profile,
+          benefit_market_kind: :aca_individual,
+          kind: :health,
+          service_area: service_area_5,
+          csr_variant_id: '01',
+          metal_level_kind: :silver,
+          application_period: application_period
+        )
+        product.premium_tables = [premium_table]
+        product.save
+        product
       end
 
       let(:application_period) {effective_on.beginning_of_year..effective_on.end_of_year}
 
-      before do
-        silver_product.update_attributes(metal_level_kind: 'silver')
-        benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods[0]
-        benefit_coverage_period.update_attributes(
-          start_on: effective_on.beginning_of_year,
-          end_on: effective_on.end_of_year,
-          open_enrollment_start_on: Date.new(effective_on.prev_year.year, 11, 1),
-          open_enrollment_end_on: Date.new(effective_on.year, 1, 31)
-        )
-        benefit_coverage_period.second_lowest_cost_silver_plan = silver_product
-        benefit_coverage_period.save!
-      end
-
       it "should calculate slcsp value" do
-        expect(Admin::Aptc.calculate_slcsp_value(TimeKeeper.date_of_record.year, family)).to eq '200.00'
+        expect(Admin::Aptc.calculate_slcsp_value(TimeKeeper.date_of_record.year, family_5)).to eq '400.00'
       end
     end
   end

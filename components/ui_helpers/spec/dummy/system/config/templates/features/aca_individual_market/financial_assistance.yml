@@ -18,3 +18,9 @@ registry:
             item: false
           - key: :ivl_application_checklist
             item: 'IVL_Application_Checklist_Final_02172021.pdf'
+      - key: :indian_health_service_question
+        is_enabled: true
+      - key: :has_medicare_cubcare_eligible
+        is_enabled: true
+      - key: :has_dependent_with_coverage
+        is_enabled: true

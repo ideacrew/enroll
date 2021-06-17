@@ -54,6 +54,7 @@ Feature: Start a new Financial Assistance Application and answers questions on h
     And the user saves the health coverage information
     Then the health coverage should be saved on the page
 
+  @flaky
   Scenario: User enters employer sponsored health coverage information (currently have access to coverage)
     Given the user answers yes to currently having access to other health coverage
     And the user checks a employer sponsored health coverage checkbox
@@ -77,3 +78,36 @@ Feature: Start a new Financial Assistance Application and answers questions on h
   Scenario: Confirmation pop-up functionality
     When the user clicks the BACK TO ALL HOUSEHOLD MEMBERS link
     Then a modal should show asking the user are you sure you want to leave this page
+
+  Scenario: Indian Health Service Eligible Question feature is enabled
+    Given Indian Health Service Question feature is enabled
+    And the user is a member of an indian tribe
+    And they visit the Health Coverage page via the left nav (also confirm they are on the Health Coverage page)
+    Then they should see the Indian Healthcare Eligible question
+
+  Scenario: Indian Health Service Question feature is enabled
+    Given Indian Health Service Question feature is enabled
+    And the user is a member of an indian tribe
+    And they visit the Health Coverage page via the left nav (also confirm they are on the Health Coverage page)
+    Then they should see the Indian Healthcare question
+
+  Scenario: MaineCare Questions feature is enabled
+    Given MaineCare questions feature is enabled
+    And the user has an eligible immigration status
+    And they visit the Health Coverage page via the left nav (also confirm they are on the Health Coverage page)
+    Then they should see the MaineCare ineligible question
+    Then they clicks yes for MaineCare ineligible
+    Then they should see the immigration status question
+
+  Scenario: User enters hra information (currently have coverage)
+    Given the user answers yes to currently having health coverage
+    And the user checks a hra checkbox
+    And the user fills out the required hra form
+    Then the save button should be enabled
+    And the user saves the health coverage information
+    Then the health coverage should be saved on the page
+
+  Scenario: User enters hra information (currently have coverage)
+    Given the user answers yes to currently having health coverage
+    And the user checks on not sure link for hra checkbox
+    Then should see not sure modal pop up

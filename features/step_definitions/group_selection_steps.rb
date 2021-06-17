@@ -79,14 +79,42 @@ And(/(.*) also has a health enrollment with primary person covered/) do |role|
   family = Family.all.first
   # qle = FactoryBot.create(:qualifying_life_event_kind,market_kind: @employee_role.present? ? "employer_sponsored" : "individual")
   if ["consumer","Resident","user"].include? role
+    benefit_market_kind = :aca_individual
     qle = FactoryBot.create :qualifying_life_event_kind, market_kind: "individual"
     sep = FactoryBot.create :special_enrollment_period, qualifying_life_event_kind_id: qle.id, family: family
   else
+    benefit_market_kind = :aca_shop
     sep = FactoryBot.create :special_enrollment_period, family: family
   end
   document = FactoryBot.build(:document, identifier: '525252')
-  product = FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile, sbc_document: document, :metal_level_kind => :silver)
+  rating_address = family.primary_person.rating_address
+  start_on = TimeKeeper.date_of_record
+  application_period = start_on.beginning_of_year..start_on.end_of_year
+  rating_area = BenefitMarkets::Locations::RatingArea.rating_area_for(rating_address, during: start_on) || FactoryBot.create(:benefit_markets_locations_rating_area)
+  service_area = BenefitMarkets::Locations::ServiceArea.service_areas_for(rating_address, during: start_on).first || FactoryBot.create(:benefit_markets_locations_service_area)
+  silver_premium_table = FactoryBot.build(:benefit_markets_products_premium_table, effective_period: application_period, rating_area: rating_area)
+  silver_product = FactoryBot.create(
+    :benefit_markets_products_health_products_health_product,
+    :with_issuer_profile,
+    benefit_market_kind: benefit_market_kind,
+    sbc_document: document,
+    service_area: service_area,
+    :metal_level_kind => :silver
+  )
+  silver_product.premium_tables = [silver_premium_table]
+  silver_product.save
 
+  premium_table = FactoryBot.build(:benefit_markets_products_premium_table, effective_period: application_period, rating_area: rating_area)
+  product = FactoryBot.create(
+    :benefit_markets_products_health_products_health_product,
+    :with_issuer_profile,
+    benefit_market_kind: benefit_market_kind,
+    sbc_document: document,
+    service_area: service_area,
+    :metal_level_kind => :silver
+  )
+  product.premium_tables = [premium_table]
+  product.save
   if role == 'consumer'
     FactoryBot.create(:hbx_profile, :no_open_enrollment_coverage_period)
     benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
@@ -116,6 +144,7 @@ And(/(.*) also has a health enrollment with primary person covered/) do |role|
       effective_on: TimeKeeper.date_of_record,
       enrollment_kind: "special_enrollment",
       special_enrollment_period_id: sep.id,
+      rating_area_id: rating_area.id,
       consumer_role_id: (consumer_role.id if consumer_role.present?),
       employee_role_id: (@employee_role.id if @employee_role.present?),
       benefit_group_id: (@benefit_group.id if @benefit_group.present?)
@@ -156,6 +185,7 @@ And(/(.*) also has a dental enrollment with primary person covered/) do |role|
            end
          end
   product = FactoryBot.create(:benefit_markets_products_dental_products_dental_product, :with_issuer_profile, dental_level: 'low', dental_plan_kind: 'ppo')
+  rating_area = FactoryBot.create(:benefit_markets_locations_rating_area)
   enrollment = FactoryBot.create(:hbx_enrollment, product: product,
                                                   household: family.active_household,
                                                   family: family,
@@ -163,6 +193,7 @@ And(/(.*) also has a dental enrollment with primary person covered/) do |role|
                                                   effective_on: TimeKeeper.date_of_record,
                                                   enrollment_kind: "special_enrollment",
                                                   special_enrollment_period_id: sep.id,
+                                                  rating_area_id: rating_area.id,
                                                   employee_role_id: (@employee_role.id if @employee_role.present?),
                                                   benefit_group_id: (@benefit_group.id if @benefit_group.present?))
   enrollment.hbx_enrollment_members << HbxEnrollmentMember.new(applicant_id: family.primary_applicant.id,
@@ -714,6 +745,14 @@ end
 
 Then(/the user should see that applied tax credit has been set accordingly/) do
   expect(page).to have_content("25")
+end
+
+Then(/the consumer should see the reason for ineligibility/) do
+  if ::FinancialAssistanceRegistry.feature_enabled?(:consumer_validations) == true
+    expect(page).to have_content("Since #{consumer.person.first_name} did not attest to being a US citizen or having an eligible immigration status")
+  else
+    expect(page).to have_content("eligibility failed on citizenship_status")
+  end
 end
 
 Given(/the enrollment has HIOS ID ending in (.*)/) do |id_number|
