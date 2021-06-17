@@ -59,6 +59,7 @@ ARG MITC_HOST
 ARG MITC_PORT
 ARG MITC_URL
 ARG REDIS_HOST_ENROLL
+ARG CLIENT
 ENV RAILS_ENV='production'
 ENV NODE_ENV='production'
 ENV ENROLL_DB_HOST=$ENROLL_DB_HOST
@@ -73,12 +74,14 @@ ENV MITC_PORT=$MITC_PORT
 ENV MITC_URL=$MITC_URL
 ENV SECRET_KEY_BASE=$SECRET_KEY_BASE
 ENV REDIS_HOST_ENROLL=$REDIS_HOST_ENROLL
+ENV CLIENT=$CLIENT
 
 # Adding gems
 COPY Gemfile Gemfile
 COPY Gemfile.lock Gemfile.lock
 
 RUN bundle install --jobs 20 --retry 5 --without development test 
+RUN configuration:client_configuration_toggler client=$CLIENT
 RUN bundle exec rake assets:precompile 
 RUN rm -f /enroll/config/master.key && rm -f /enroll/config/credentials.yml.enc
 
