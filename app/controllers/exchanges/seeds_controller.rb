@@ -78,29 +78,43 @@ module Exchanges
       redirect_to root_path, :flash => { :error => "You must be an HBX staff member" } unless current_user.has_hbx_staff_role?
     end
 
+    # TODO: Refactor this
+    # rubocop:disable Metrics/CyclomaticComplexity
     def csv_format_valid?
+      if params[:file].blank?
+        # TODO: refactoor as translation
+        flash[:error] = "Please add a CSV file."
+        @seed = Seeds::Seed.new(user: current_user)
+        render 'new' and return
+      end
       unless params[:file].send(:content_type) == 'text/csv'
         # TODO: Refactor as translation
         flash[:error] = "Unable to use CSV template. Must be in CSV format."
+        @seed = Seeds::Seed.new(user: current_user)
         render 'new' and return
       end
-      uploaded_csv_headers = CSV.read(params[:file].send(:tempfile), return_headers: true).first.compact
-      header_difference = nil
-      Seeds::Seed::REQUIRED_CSV_HEADER_TEMPLATES.each do |template_name, csv_headers|
-        # Same exact headers
-        # After ruby 2.6 +, get rid of the set and just use it as array methods
-        # https://stackoverflow.com/a/56739603/5331859
-        header_difference = csv_headers.uniq.sort.to_set.difference(uploaded_csv_headers.uniq.sort.to_set)
-        if header_difference.blank?
-          @csv_template = template_name.to_s
-          break
-        end
+      uploaded_csv_headers = CSV.read(params[:file].send(:tempfile), return_headers: true)&.first&.compact
+      if uploaded_csv_headers.blank?
+        # TODO: Refactor as translation
+        flash[:error] = "No headers detected in CSV."
+        @seed = Seeds::Seed.new(user: current_user)
+        render 'new' and return
       end
+      # they need to choose a template on the new form, and then make sure that matches one that way.
+      # Also need to add model validations.
+      chosen_template_headers = Seeds::Seed::REQUIRED_CSV_HEADER_TEMPLATES[params[:csv_template].to_sym]
+      # Same exact headers
+      # After ruby 2.6 +, get rid of the set and just use it as array methods
+      # https://stackoverflow.com/a/56739603/5331859
+      header_difference = chosen_template_headers.uniq.sort.to_set.difference(uploaded_csv_headers.uniq.sort.to_set)
       return unless header_difference.present?
       # TODO: Refactor as translation
-      flash[:error] = "Unable to use CSV template. Contains incorrect header values: #{header_difference.to_a}."
+      error_message = "CSV does not match #{params[:csv_template]} template. Must use headers (in any order) #{chosen_template_headers}."
+      flash[:error] = error_message
+      @seed = Seeds::Seed.new(user: current_user)
       render 'new' and return
     end
+    # rubocop:enable Metrics/CyclomaticComplexity
 
     def set_seed
       @seed = Seeds::Seed.find(params[:id])
