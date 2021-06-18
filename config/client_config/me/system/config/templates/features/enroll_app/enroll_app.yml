@@ -354,4 +354,6 @@ registry:
           - key: :days
             item: 60
       - key: :immigration_status_checkbox
+        is_enabled: false
+      - key: :gender_to_sex
         is_enabled: true
