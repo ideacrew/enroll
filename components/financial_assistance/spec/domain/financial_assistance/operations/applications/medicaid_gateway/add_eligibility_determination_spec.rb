@@ -9,7 +9,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
   end
 
   let!(:application) do
-    FactoryBot.create(:financial_assistance_application, hbx_id: '200000126')
+    FactoryBot.create(:financial_assistance_application, hbx_id: '200000126', aasm_state: "submitted")
   end
   let!(:ed) do
     eli_d = FactoryBot.create(:financial_assistance_eligibility_determination, application: application)
@@ -47,6 +47,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
       end
 
       context 'for Appplication' do
+        it 'should update aasm_state' do
+          expect(@application.aasm_state).to eq("determined")
+        end
+
         it 'should update determination_http_status_code' do
           expect(@application.determination_http_status_code).to eq(200)
         end

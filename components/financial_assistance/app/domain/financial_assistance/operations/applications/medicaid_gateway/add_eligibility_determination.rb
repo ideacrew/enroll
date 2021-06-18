@@ -53,6 +53,7 @@ module FinancialAssistance
               update_applicants(elig_d, thh_entity)
               update_eligibility_determination(elig_d, thh_entity)
             end
+            application.determine!
             # Send Determination to EA
             application.send_determination_to_ea
             Success('Successfully updated Application object with Full Eligibility Determination')
