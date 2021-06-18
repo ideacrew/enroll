@@ -93,7 +93,7 @@ registry:
       is_enabled: true
       settings:
         - key: :medicaid_chip
-          item: "MaineCare (Medicaid)"
+          item: "Medicaid"
     - key: :net_annual_income_display
       is_enabled: true
     - key: :has_dependent_with_coverage
