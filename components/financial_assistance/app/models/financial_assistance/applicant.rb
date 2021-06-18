@@ -173,7 +173,7 @@ module FinancialAssistance
     field :is_magi_medicaid, type: Boolean, default: false
     field :is_medicare_eligible, type: Boolean, default: false
 
-    field :is_student, type: Boolean, default: false
+    field :is_student, type: Boolean
     field :student_kind, type: String
     field :student_school_kind, type: String
     field :student_status_end_on, type: String
@@ -189,7 +189,7 @@ module FinancialAssistance
     field :is_refugee, type: Boolean, default: false
     field :is_trafficking_victim, type: Boolean, default: false
 
-    field :is_former_foster_care, type: Boolean, default: false
+    field :is_former_foster_care, type: Boolean
     field :age_left_foster_care, type: Integer, default: 0
     field :foster_care_us_state, type: String
     field :had_medicaid_during_foster_care, type: Boolean
