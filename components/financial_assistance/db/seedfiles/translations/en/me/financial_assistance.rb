@@ -78,5 +78,6 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.question.health_reimbursement_arrangement" => "Health Reimbursement Arrangement",
   "en.faa.question.retiree_health_benefits" => "Retiree Health Benefits",
   "en.faa.question.other_full_benefit_coverage" => "Other full benefit coverage",
-  "en.faa.question.other_limited_benefit_coverage" => "Other limited benefit coverage"
+  "en.faa.question.other_limited_benefit_coverage" => "Other limited benefit coverage",
+  "en.faa.premium_reductions" => "Do you want to apply for monthly premiums reductions, lower out-of-pockets costs, and see if you might qualify for #{render partial:"shared/glossary", locals: {key: "mainecare", term: "MaineCare"}}  or #{render partial:"shared/glossary", locals: {key: "cubcare", term: "CubCare"}}?"
 }.freeze
