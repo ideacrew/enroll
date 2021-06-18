@@ -2,27 +2,10 @@
 ### app/rails config ###
 ########################
 
-FROM ruby:2.5.1 AS app
+FROM public.ecr.aws/ideacrew/enroll:base  AS app
 
 LABEL author="IdeaCrew"
 
-ARG NODE_MAJOR
-
-# NodeJS download/config
-RUN curl -sL https://deb.nodesource.com/setup_$NODE_MAJOR.x | bash -
-
-# Yarn download/config
-RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
-    echo 'deb http://dl.yarnpkg.com/debian/ stable main' > /etc/apt/sources.list.d/yarn.list
-
-ARG YARN_VERSION
-# Install required packages/libraries
-RUN apt-get update && \
-    apt-get -yq dist-upgrade && \
-    apt-get install -y git gcc openssl libyaml-dev libyaml-cpp-dev libyaml-cpp0.5v5 libffi-dev libffi6 libreadline-dev \
-                       zlibc libgdbm-dev libncurses-dev autoconf fontconfig unzip zip sshpass bzip2 libxrender1 libxext6 \
-                       build-essential nodejs yarn=$YARN_VERSION-1 && \
-    apt-get autoremove -y
 
 # Configure bundler and PATH, install bundler version
 ENV LANG=C.UTF-8 \
@@ -100,4 +83,3 @@ RUN mkdir /enroll
 COPY --from=app /enroll/public /enroll/
 COPY .docker/production/nginx.conf /etc/nginx/conf.d/enroll.conf
 RUN mv /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf-bkp
-
