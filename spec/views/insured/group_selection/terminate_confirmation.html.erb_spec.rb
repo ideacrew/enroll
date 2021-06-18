@@ -7,7 +7,7 @@ module SpecHelperClassesForViews
   end
 end
 
-RSpec.describe "app/views/insured/group_selection/edit_plan.html.erb" do
+RSpec.describe "app/views/insured/group_selection/edit_plan.html.erb", :dbclean => :after_each do
   context "Enrollment information and buttons" do
 
     let(:current_user) { FactoryBot.create(:user) }
