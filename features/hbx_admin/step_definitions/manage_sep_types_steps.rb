@@ -335,6 +335,28 @@ When(/Admin should see effective on kinds checked based on (.*)$/) do |market_ki
   end
 end
 
+When(/Admin creats new SEP Type with (.*) market and (.*) select termination on kinds$/) do |market_kind, action|
+  page.find('.interaction-click-control-create-sep').click
+  expect(page).to have_content('Create SEP Type')
+  step "Admin fills Create SEP Type form with start and end dates"
+  step "Admin fills Create SEP Type form with Title"
+  step "Admin fills Create SEP Type form with Event label"
+  step "Admin fills Create SEP Type form with Tool Tip"
+  step "Admin selects #{market_kind} market radio button"
+  step "Admin fills Create SEP Type form with Reason"
+  step "Admin selects effective on kinds for Create SEP Type"
+  step "Admin #{action} select termination on kinds for #{market_kind} SEP Type"
+  step "Admin fills Create SEP Type form with Pre Event SEP and Post Event SEP dates"
+  step "Admin clicks on Create Draft button"
+end
+
+And(/Admin should see newly created SEP Type title on Datatable with Draft filter (.*)$/) do |market_kind|
+  step "Admin navigates to SEP Types List page"
+  step "Admin clicks #{market_kind} filter on SEP Types datatable"
+  step "Admin clicks on Draft filter of #{market_kind} market filter"
+  step "Admin should see newly created SEP Type title on Datatable"
+end
+
 When("Admin fills Create SEP Type form with start on date greater than end on date") do
   fill_in "Start Date *", with: sep_type_end_on.strftime('%m/%d/%Y').to_s
   fill_in "End Date", with: sep_type_start_on.strftime('%m/%d/%Y').to_s
