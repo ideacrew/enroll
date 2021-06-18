@@ -14,7 +14,7 @@ module GoldenSeedWorkerConcern
   included do
 
     def process_row(target_row)
-      case target_row.seed.csv_template
+      case target_row.seed.csv_template.to_s
       when "individual_market_seed"
         process_row_individual_market_seed(target_row)
       end

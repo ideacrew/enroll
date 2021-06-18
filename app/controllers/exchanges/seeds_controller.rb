@@ -24,7 +24,7 @@ module Exchanges
       @seed = Seeds::Seed.new(
         user: current_user,
         filename: params[:file].send(:original_filename), # Get filename
-        csv_template: @csv_template,
+        csv_template: params[:csv_template],
         aasm_state: 'draft'
       )
       # TODO: need to figure out how to save the file
