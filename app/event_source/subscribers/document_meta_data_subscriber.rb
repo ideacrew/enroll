@@ -8,7 +8,7 @@ module Subscribers
 
     subscribe(:on_document_created) do |delivery_info, _metadata, response|
       logger.info "invoked on_document_created with delivery_info: #{delivery_info}, response: #{response}"
-      binding.pry
+
       payload = JSON.parse(response, :symbolize_names => true)
       result = Operations::Documents::Create.new.call(resource: fetch_resource(payload), document_params: payload, doc_identifier: payload[:id])
 
