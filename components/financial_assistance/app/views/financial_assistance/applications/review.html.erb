@@ -11,7 +11,7 @@
             <div class="col-md-1">
             </div>
           </div>
-          <table class="table table-border-line mb0 table-grey-border" border="1" >
+          <table class="table table-border-line mb0 table-grey-border <%= 'mb0' if FinancialAssistanceRegistry[:net_annual_income_display].enabled? %>" border="1" >
             <thead>
               <tr class="form-heading">
                 <th class="no-bottom-border"> <b>PERSON </b></th>
@@ -45,6 +45,26 @@
               <% end %>
             </tbody>
           </table>
+
+          <% if FinancialAssistanceRegistry[:net_annual_income_display].enabled? %>
+            <div class="col-md-12 pz">
+              <% @applicants.each do |applicant| %>
+                <% unless applicant.net_annual_income.nil? %>
+                  <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                    <div class="col-md-7 annual-income-row">
+                      <%= applicant.first_name %>'s annual income for <%= @application.assistance_year %>
+                      <a href="#net_annual_income" data-toggle="modal" data-target="#net_annual_income"><i class="fa fa-info-circle"></i></a> :
+                    </div>
+                    <div class="col-md-5">
+                      <%= number_to_currency(applicant.net_annual_income) %>
+                    </div>
+                  </div>
+                <% end %>
+              <% end %>
+              <%= render partial: 'financial_assistance/shared/modal_support_text_household', locals: {key: "net_annual_income"} %>
+            </div>
+          <% end %>
+
           <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bg-primary" style="padding: 0px; height: 20px">
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6"></div>
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6"></div>
