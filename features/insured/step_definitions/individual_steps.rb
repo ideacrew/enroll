@@ -38,11 +38,11 @@ end
 
 When(/(.*) click the "(.*?)" in qle carousel/) do |_name, qle_event|
   expect(page).to have_content(qle_event, wait: 10)
-  click_link "#{qle_event}"
+  click_link qle_event.to_s
 end
 
 Then(/(.*) should see family members page and clicks continue/) do |_name|
-  expect(page).to have_content "#{l10n('family_information')}"
+  expect(page).to have_content l10n('family_information').to_s
   find('#dependent_buttons .interaction-click-control-continue', :wait => 5).click
 end
 
