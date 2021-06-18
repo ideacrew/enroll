@@ -37,19 +37,22 @@ RSpec.describe Exchanges::SeedsController, :type => :controller do
   end
   let(:create_params) do
     {
-      file: fixture_file_upload(file_location, 'text/csv')
+      file: fixture_file_upload(file_location, 'text/csv'),
+      csv_template: 'individual_market_seed'
     }.with_indifferent_access
   end
 
   let(:non_csv_create_params) do
     {
-      file: fixture_file_upload(file_location, 'pdf')
+      file: fixture_file_upload(file_location, 'pdf'),
+      csv_template: 'individual_market_seed'
     }.with_indifferent_access
   end
 
   let(:wrong_row_csv_params) do
     {
-      file: fixture_file_upload(random_csv_in_enroll, "text/csv")
+      file: fixture_file_upload(random_csv_in_enroll, "text/csv"),
+      csv_template: 'individual_market_seed'
     }.with_indifferent_access
   end
 
@@ -93,7 +96,7 @@ RSpec.describe Exchanges::SeedsController, :type => :controller do
 
       it "should show an error to user if CSV contains incorrect headers" do
         post :create, params: wrong_row_csv_params, as: :json
-        expect(flash[:error]).to include("Unable to use CSV template. Contains incorrect header values:")
+        expect(flash[:error]).to include("CSV does not match individual_market_seed template. Must use headers (in any order) ")
       end
     end
   end
