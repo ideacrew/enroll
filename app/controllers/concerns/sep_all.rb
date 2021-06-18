@@ -48,9 +48,10 @@ module SepAll
   end
 
   def prior_py_sep?(effective_date, market)
+    ivl_prior_coverage_period = HbxProfile.current_hbx&.benefit_sponsorship&.previous_benefit_coverage_period
+    return false if ivl_prior_coverage_period.blank?
     return false if effective_date.blank?
-
-    ivl_prior_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.previous_benefit_coverage_period
+    return false if market.blank?
     return unless market == 'individual'
 
     ivl_prior_coverage_period&.contains?(effective_date)
