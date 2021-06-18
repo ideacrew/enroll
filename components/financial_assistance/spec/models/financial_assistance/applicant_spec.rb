@@ -105,4 +105,18 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       end
     end
   end
+
+  context 'default values' do
+    before do
+      @applicant = FinancialAssistance::Applicant.new
+    end
+
+    it 'should set false for is_student' do
+      expect(@applicant.is_student).to eq(false)
+    end
+
+    it 'should set false for is_former_foster_care' do
+      expect(@applicant.is_former_foster_care).to eq(false)
+    end
+  end
 end
