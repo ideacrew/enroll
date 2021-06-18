@@ -335,10 +335,14 @@ When(/Admin should see effective on kinds checked based on (.*)$/) do |market_ki
   end
 end
 
-When(/Admin creats new SEP Type with (.*) market and (.*) select termination on kinds$/) do |market_kind, action|
+When(/Admin creats new SEP Type with (.*) market and (.*) select termination on kinds with (.*) scenario$/) do |market_kind, action, scenario|
   page.find('.interaction-click-control-create-sep').click
   expect(page).to have_content('Create SEP Type')
-  step "Admin fills Create SEP Type form with start and end dates"
+  if scenario == "success"
+    step "Admin fills Create SEP Type form with start and end dates"
+  else
+    step "Admin fills Create SEP Type form with start on date greater than end on date"
+  end
   step "Admin fills Create SEP Type form with Title"
   step "Admin fills Create SEP Type form with Event label"
   step "Admin fills Create SEP Type form with Tool Tip"

@@ -9,10 +9,10 @@ Feature: Admin has ability to create a new SEP Type
     And the Admin will see the Manage SEPs under admin dropdown
     And Admin can click Manage SEPs link
 
-  Scenario Outline: Admin will create a new <market_kind> SEP type
+  Scenario Outline: Admin will <scenario> scenario create a new <market_kind> SEP type
     Given Admin can navigate to the Manage SEPs screen
     And expired Qualifying life events of <market_kind> market is present
-    When Admin creats new SEP Type with <market_kind> market and <action> select termination on kinds
+    When Admin creats new SEP Type with <market_kind> market and <action> select termination on kinds with success scenario
     Then Admin should see SEP Type Created Successfully message
     And Admin should see newly created SEP Type title on Datatable with Draft filter <market_kind>
     And Hbx Admin logs out
@@ -26,18 +26,7 @@ Feature: Admin has ability to create a new SEP Type
   Scenario Outline: Failure scenario to create <market_kind> market SEP type
     Given Admin can navigate to the Manage SEPs screen
     And expired Qualifying life events of <market_kind> market is present
-    When Admin clicks on the Create SEP Type button
-    Then Admin navigates to Create SEP Type page
-    When Admin fills Create SEP Type form with start on date greater than end on date
-    And Admin fills Create SEP Type form with Title
-    And Admin fills Create SEP Type form with Event label
-    And Admin fills Create SEP Type form with Tool Tip
-    And Admin selects <market_kind> market radio button
-    And Admin fills Create SEP Type form with Reason
-    And Admin selects effective on kinds for Create SEP Type
-    And Admin <action> select termination on kinds for <market_kind> SEP Type
-    And Admin fills Create SEP Type form with Pre Event SEP and Post Event SEP dates
-    And Admin clicks on Create Draft button
+    When Admin creats new SEP Type with <market_kind> market and <action> select termination on kinds with failure scenario
     Then Admin should see failure for end date
     And Hbx Admin logs out
 
