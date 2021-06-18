@@ -61,9 +61,10 @@ module FinancialAssistance
       farming_and_fishing: 'Farming or fishing',
       foreign: 'Foreign income',
       other: 'Other taxable income',
-      prizes_and_awards: 'Prizes and awards',
+      prizes_and_awards: FinancialAssistanceRegistry[:prize_and_awards].setting(:gamble_prize).item ? 'Gambling, prizes or awards' : 'Prizes and awards',
       scholorship_payments: 'Taxable scholarship payments'
     }.freeze
+
 
     field :title, type: String
     field :kind, as: :income_type, type: String, default: 'wages_and_salaries'
@@ -149,6 +150,7 @@ module FinancialAssistance
         submitted_at: income_data[:submitted_at]
       )
     end
+
 
     class << self
       def find(id)
