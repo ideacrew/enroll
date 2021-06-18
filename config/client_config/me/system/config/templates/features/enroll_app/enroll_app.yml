@@ -242,6 +242,8 @@ registry:
             item: ['']
           - key: :plan_year_tooltip
             item: ""
+          - key: :medicaid_agency_phone
+            item: "(000) 000-0000"
       - key: :data_seeds_ui
         item: :data_seed_ui
         is_enabled: true
