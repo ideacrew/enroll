@@ -6,8 +6,24 @@ module Subscribers
     include EventSource::Logging
     include ::EventSource::Subscriber[amqp: 'polypress.document_builder']
 
-    subscribe(:on_document_created) do |delivery_info, _metadata, _payload|
-      logger.debug "invoked on_document_created with #{delivery_info}"
+    subscribe(:on_document_created) do |delivery_info, _metadata, response|
+      logger.info "invoked on_document_created with delivery_info: #{delivery_info}, response: #{response}"
+
+      payload = JSON.parse(response, :symbolize_names => true)
+      result = Operations::Documents::Create.new.call(resource: fetch_resource(payload), document_params: payload, doc_identifier: payload[:id])
+
+      if result.success?
+        logger.info "enroll_document_meta_data_subscriber_info Result: #{result.success} for payload: #{payload}"
+      else
+        logger.error "enroll_document_meta_data_subscriber_error: #{result.failure} for payload: #{payload}"
+      end
+    rescue StandardError => e
+      logger.error "enroll_document_meta_data_subscriber_error: #{e.backtrace}"
+    end
+
+    def self.fetch_resource(payload)
+      family = Family.where(hbx_assigned_id: payload[:resource_id]).first
+      family&.primary_person
     end
   end
 end

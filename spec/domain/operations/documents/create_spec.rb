@@ -22,21 +22,34 @@ module Operations
       let(:employer_profile) {organization.employer_profile}
       let(:doc_payload) do
         {
-          "title": "test",
-          "format": "application/pdf",
-          "creator": "hbx_staff",
-          "subject": "notice",
-          "doc_identifier": BSON::ObjectId.new.to_s
+          title: "test",
+          format: "application/pdf",
+          creator: "hbx_staff",
+          subject: "notice",
+          doc_identifier: BSON::ObjectId.new.to_s
+        }
+      end
+
+      let(:document_params) do
+        {
+          subject: 'test',
+          body: 'test',
+          file: Rack::Test::UploadedFile.new(tempfile, "application/pdf"),
+          file_name: 'Test.pdf',
+          file_content_type: 'application/pdf'
         }
       end
 
       describe 'given empty resource' do
         let(:params) do
           { resource: nil,
-            document_params: {subject: 'test', body: 'test', file: Rack::Test::UploadedFile.new(tempfile, "application/pdf")},
+            document_params: document_params,
             doc_identifier: BSON::ObjectId.new.to_s }
         end
-        let(:error_message) {{:message => ['Please find valid resource to create document.']}}
+
+        let(:error_message) do
+          { :message => ["Please find valid resource to create document for params: #{document_params}"] }
+        end
 
         it 'fails' do
           expect(subject).not_to be_success
@@ -47,7 +60,7 @@ module Operations
       describe "given empty doc_identifier" do
         let(:params) do
           { resource: employer_profile,
-            document_params: { subject: 'test', body: 'test', file: Rack::Test::UploadedFile.new(tempfile, "application/pdf")},
+            document_params: document_params,
             doc_identifier: "" }
         end
         let(:error_message) do
@@ -63,7 +76,7 @@ module Operations
       describe "given empty title" do
         let(:params) do
           { resource: employer_profile,
-            document_params: {subject: 'test', body: 'test', file: Rack::Test::UploadedFile.new(tempfile, "application/pdf")},
+            document_params: document_params,
             doc_identifier: BSON::ObjectId.new.to_s }
         end
         let(:error_message) do
@@ -81,7 +94,7 @@ module Operations
       describe "given empty title" do
         let(:params) do
           { resource: employer_profile,
-            document_params: {subject: 'test', body: 'test', file: Rack::Test::UploadedFile.new(tempfile, "application/pdf")},
+            document_params: document_params,
             doc_identifier: BSON::ObjectId.new.to_s }
         end
         let(:error_message) do
@@ -99,7 +112,7 @@ module Operations
       describe "given empty subject" do
         let(:params) do
           { resource: employer_profile,
-            document_params: {subject: 'test', body: 'test', file: Rack::Test::UploadedFile.new(tempfile, "application/pdf")},
+            document_params: document_params,
             doc_identifier: BSON::ObjectId.new.to_s }
         end
         let(:error_message) do
@@ -117,7 +130,7 @@ module Operations
       describe "given empty format" do
         let(:params) do
           { resource: employer_profile,
-            document_params: {subject: 'test', body: 'test', file: Rack::Test::UploadedFile.new(tempfile, "application/pdf")},
+            document_params: document_params,
             doc_identifier: BSON::ObjectId.new.to_s }
         end
         let(:error_message) do
