@@ -91,7 +91,7 @@ registry:
       is_enabled: false
       settings:
         - key: :medicaid_chip
-          item: "MaineCare (Medicaid)"
+          item: "Medicaid"
     - key: :net_annual_income_display
       is_enabled: false
     - key: :prize_and_awards
