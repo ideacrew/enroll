@@ -44,6 +44,7 @@ module GoldenSeedHelper
   # end
 
   # Only get up to date IVL products
+  # TODO: Consider if this should be removed for the UI factor.
   def ivl_products
     date_range = TimeKeeper.date_of_record.beginning_of_year..TimeKeeper.date_of_record.end_of_year
     ::BenefitMarkets::Products::Product.aca_individual_market.by_application_period(date_range)
@@ -57,7 +58,7 @@ module GoldenSeedHelper
     current_hbx_profile&.benefit_sponsorship
   end
 
-  # TODO: Refactor this
+  # TODO: Consider if this should be removed in non local dev environments
   def create_and_return_ivl_hbx_profile_and_sponsorship
     puts("HBX Profile and Benefit Sponsorship already present.") if !Rails.env.test? && current_hbx_profile && current_hbx_benefit_sponsorship
     return if current_hbx_profile && current_hbx_benefit_sponsorship
