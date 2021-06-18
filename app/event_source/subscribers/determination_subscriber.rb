@@ -8,20 +8,7 @@ module Subscribers
 
     subscribe(:on_magi_medicaid_mitc_eligibilities) do |delivery_info, _metadata, response|
       logger.info "invoked on_magi_medicaid_mitc_eligibilities with #{delivery_info}"
-
-      payload = JSON.parse(response, :symbolize_names => true)
-      result = FinancialAssistance::Operations::Applications::MedicaidGateway::AddEligibilityDetermination.new.call(payload)
-
-      message = if result.success?
-                  result.success
-                else
-                  result.failure
-                end
-      # TODO: log message
-      logger.info "enroll_determination_subscriber_message: #{message}"
-    rescue StandardError => e
-      # TODO: log error message
-      logger.info "enroll_determination_subscriber_error: #{e.backtrace}"
+      persist(response)
     end
 
     # subscribe(:on_determined_aptc_eligible) do |delivery_info, _metadata, response|
@@ -53,5 +40,23 @@ module Subscribers
     #   logger.debug "invoked on_determined_mixed_determination with #{delivery_info}"
     #   persist(response)
     # end
+
+    def self.persist(response)
+      logger.info "inside persist of DeterminationSubscriber: #{response}"
+      payload = JSON.parse(response, :symbolize_names => true)
+      result = FinancialAssistance::Operations::Applications::MedicaidGateway::AddEligibilityDetermination.new.call(payload)
+
+      message = if result.success?
+                  result.success
+                else
+                  result.failure
+                end
+
+      # TODO: log message
+      logger.info "enroll_determination_subscriber_message: #{message}"
+    rescue StandardError => e
+      # TODO: log error message
+      logger.info "enroll_determination_subscriber_error: #{e.backtrace}"
+    end
   end
 end
