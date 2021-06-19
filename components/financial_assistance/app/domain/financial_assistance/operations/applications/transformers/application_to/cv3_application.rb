@@ -473,8 +473,12 @@ module FinancialAssistance
             def applicant_benchmark_premium(application)
               family = find_family(application.family_id) if application.family_id.present?
               return unless family.present?
-              {:health_only_lcsp_premiums => [{member_identifier: "test", monthly_premium: BigDecimal(300)}],
-               :health_only_slcsp_premiums => [{member_identifier: "test", monthly_premium: BigDecimal(300)}]} #TODO: need to use operations from ivl_rating area for actual values.
+              person_hbx_ids = application.applicants.pluck(:person_hbx_id)
+              membr_premiums =
+                person_hbx_ids.inject([]) do |arr, person_hbx_id|
+                  arr << { member_identifier: person_hbx_id, monthly_premium: 310.50 }
+                end
+              { health_only_lcsp_premiums: membr_premiums, health_only_slcsp_premiums: membr_premiums }
             end
 
             def mitc_households(application)
