@@ -60,7 +60,7 @@ RSpec.describe Operations::GeneratePriorPlanYearShopRenewals, type: :model, dbcl
         sep.qualifying_life_event_kind = qle_kind
         sep.qle_on = expired_benefit_application.start_on + 1.month
         sep.start_on = sep.qle_on
-        sep.end_on = sep.qle_on + 30.days
+        sep.end_on = TimeKeeper.date_of_record + 30.days
         sep.coverage_renewal_flag = true
         sep.save
         sep
@@ -116,7 +116,7 @@ RSpec.describe Operations::GeneratePriorPlanYearShopRenewals, type: :model, dbcl
         sep.qualifying_life_event_kind = qle_kind
         sep.qle_on = expired_benefit_application.start_on + 1.month
         sep.start_on = sep.qle_on
-        sep.end_on = sep.qle_on + 30.days
+        sep.end_on = TimeKeeper.date_of_record + 30.days
         sep.coverage_renewal_flag = false
         sep.save
         sep
@@ -190,7 +190,7 @@ RSpec.describe Operations::GeneratePriorPlanYearShopRenewals, type: :model, dbcl
         sep.qualifying_life_event_kind = qle_kind
         sep.qle_on = expired_benefit_application.start_on + 1.month
         sep.start_on = sep.qle_on
-        sep.end_on = sep.qle_on + 30.days
+        sep.end_on = TimeKeeper.date_of_record + 30.days
         sep.coverage_renewal_flag = true
         sep.save
         sep
@@ -266,7 +266,7 @@ RSpec.describe Operations::GeneratePriorPlanYearShopRenewals, type: :model, dbcl
         sep.qualifying_life_event_kind = qle_kind
         sep.qle_on = terminated_benefit_application.start_on + 1.month
         sep.start_on = sep.qle_on
-        sep.end_on = sep.qle_on + 30.days
+        sep.end_on = TimeKeeper.date_of_record + 30.days
         sep.coverage_renewal_flag = false
         sep.save
         sep
@@ -305,7 +305,7 @@ RSpec.describe Operations::GeneratePriorPlanYearShopRenewals, type: :model, dbcl
         sep.qualifying_life_event_kind = qle_kind
         sep.qle_on = terminated_benefit_application.start_on + 1.month
         sep.start_on = sep.qle_on
-        sep.end_on = sep.qle_on + 30.days
+        sep.end_on = TimeKeeper.date_of_record + 30.days
         sep.coverage_renewal_flag = true
         sep.save
         sep
@@ -373,7 +373,7 @@ RSpec.describe Operations::GeneratePriorPlanYearShopRenewals, type: :model, dbcl
         sep.qualifying_life_event_kind = qle_kind
         sep.qle_on = expired_benefit_application.start_on + 1.month
         sep.start_on = sep.qle_on
-        sep.end_on = sep.qle_on + 30.days
+        sep.end_on = TimeKeeper.date_of_record + 30.days
         sep.coverage_renewal_flag = true
         sep.save
         sep
@@ -440,7 +440,7 @@ RSpec.describe Operations::GeneratePriorPlanYearShopRenewals, type: :model, dbcl
         sep.qualifying_life_event_kind = qle_kind
         sep.qle_on = expired_benefit_application.start_on + 1.month
         sep.start_on = sep.qle_on
-        sep.end_on = sep.qle_on + 30.days
+        sep.end_on = TimeKeeper.date_of_record + 30.days
         sep.coverage_renewal_flag = true
         sep.save
         sep
@@ -540,7 +540,7 @@ RSpec.describe Operations::GeneratePriorPlanYearShopRenewals, type: :model, dbcl
         sep.qualifying_life_event_kind = qle_kind
         sep.qle_on = expired_benefit_application.start_on + 1.month
         sep.start_on = sep.qle_on
-        sep.end_on = sep.qle_on + 30.days
+        sep.end_on = TimeKeeper.date_of_record + 30.days
         sep.coverage_renewal_flag = false
         sep.save
         sep
@@ -630,7 +630,7 @@ RSpec.describe Operations::GeneratePriorPlanYearShopRenewals, type: :model, dbcl
         sep.qualifying_life_event_kind = qle_kind
         sep.qle_on = expired_benefit_application.start_on + 1.month
         sep.start_on = sep.qle_on
-        sep.end_on = sep.qle_on + 30.days
+        sep.end_on = TimeKeeper.date_of_record + 30.days
         sep.coverage_renewal_flag = true
         sep.save
         sep
