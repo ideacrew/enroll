@@ -253,7 +253,7 @@ module FinancialAssistance
                 else
                   :other
                 end
-              ::AcaEntities::MagiMedicaid::Mitc::Types::RelationshipCodeMap[:mitc_rel] || '88'
+              ::AcaEntities::MagiMedicaid::Mitc::Types::RelationshipCodeMap[mitc_rel] || '88'
             end
 
             def taxable_interest(applicant)
