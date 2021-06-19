@@ -72,15 +72,225 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       expect(result.value![:applicants].first[:person_hbx_id]).to eq person.hbx_id
     end
 
+    context 'application' do
+      before do
+        @application = result.success
+      end
+
+      it 'should not return nil for is_ridp_verified' do
+        expect(@application[:is_ridp_verified]).not_to be_nil
+      end
+
+      it 'should not return nil for is_renewal_authorized' do
+        expect(@application[:is_renewal_authorized]).not_to be_nil
+      end
+    end
+
     context 'applicant' do
       before do
         request_payload = result.success
         @applicant = request_payload[:applicants].first
       end
 
+      it 'should not return nil for is_primary_applicant' do
+        expect(@applicant[:is_primary_applicant]).not_to be_nil
+      end
+
+      it 'should not return nil for is_consumer_role' do
+        expect(@applicant[:is_consumer_role]).not_to be_nil
+      end
+
+      it 'should not return nil for is_resident_role' do
+        expect(@applicant[:is_resident_role]).not_to be_nil
+      end
+
+      it 'should not return nil for is_applying_coverage' do
+        expect(@applicant[:is_applying_coverage]).not_to be_nil
+      end
+
+      it 'should not return nil for is_consent_applicant' do
+        expect(@applicant[:is_consent_applicant]).not_to be_nil
+      end
+
+      it 'should not return nil for is_required_to_file_taxes' do
+        expect(@applicant[:is_required_to_file_taxes]).not_to be_nil
+      end
+
+      it 'should not return nil for is_joint_tax_filing' do
+        expect(@applicant[:is_joint_tax_filing]).not_to be_nil
+      end
+
+      it 'should not return nil for is_claimed_as_tax_dependent' do
+        expect(@applicant[:is_claimed_as_tax_dependent]).not_to be_nil
+      end
+
+      it 'should not return nil for is_refugee' do
+        expect(@applicant[:is_refugee]).not_to be_nil
+      end
+
+      it 'should not return nil for is_trafficking_victim' do
+        expect(@applicant[:is_trafficking_victim]).not_to be_nil
+      end
+
+      it 'should not return nil for is_subject_to_five_year_bar' do
+        expect(@applicant[:is_subject_to_five_year_bar]).not_to be_nil
+      end
+
+      it 'should not return nil for is_five_year_bar_met' do
+        expect(@applicant[:is_five_year_bar_met]).not_to be_nil
+      end
+
+      it 'should not return nil for is_forty_quarters' do
+        expect(@applicant[:is_forty_quarters]).not_to be_nil
+      end
+
+      it 'should not return nil for is_ssn_applied' do
+        expect(@applicant[:is_ssn_applied]).not_to be_nil
+      end
+
+      it 'should not return nil for moved_on_or_after_welfare_reformed_law' do
+        expect(@applicant[:moved_on_or_after_welfare_reformed_law]).not_to be_nil
+      end
+
+      it 'should not return nil for is_currently_enrolled_in_health_plan' do
+        expect(@applicant[:is_currently_enrolled_in_health_plan]).not_to be_nil
+      end
+
+      it 'should not return nil for has_daily_living_help' do
+        expect(@applicant[:has_daily_living_help]).not_to be_nil
+      end
+
+      it 'should not return nil for need_help_paying_bills' do
+        expect(@applicant[:need_help_paying_bills]).not_to be_nil
+      end
+
+      it 'should not return nil for has_job_income' do
+        expect(@applicant[:has_job_income]).not_to be_nil
+      end
+
+      it 'should not return nil for has_self_employment_income' do
+        expect(@applicant[:has_self_employment_income]).not_to be_nil
+      end
+
+      it 'should not return nil for has_unemployment_income' do
+        expect(@applicant[:has_unemployment_income]).not_to be_nil
+      end
+
+      it 'should not return nil for has_other_income' do
+        expect(@applicant[:has_other_income]).not_to be_nil
+      end
+
+      it 'should not return nil for has_deductions' do
+        expect(@applicant[:has_deductions]).not_to be_nil
+      end
+
+      it 'should not return nil for has_enrolled_health_coverage' do
+        expect(@applicant[:has_enrolled_health_coverage]).not_to be_nil
+      end
+
+      it 'should not return nil for has_eligible_health_coverage' do
+        expect(@applicant[:has_eligible_health_coverage]).not_to be_nil
+      end
+
+      it 'should not return nil for job_coverage_ended_in_past_3_months' do
+        expect(@applicant[:job_coverage_ended_in_past_3_months]).not_to be_nil
+      end
+
+      it 'should not return nil for is_temporarily_out_of_state' do
+        expect(@applicant[:is_temporarily_out_of_state]).not_to be_nil
+      end
+
+      it 'should not return nil for is_homeless' do
+        expect(@applicant[:is_homeless]).not_to be_nil
+      end
+
+      it 'should not return nil for has_received' do
+        expect(@applicant[:other_health_service][:has_received]).not_to be_nil
+      end
+
+      it 'should not return nil for is_eligible' do
+        expect(@applicant[:other_health_service][:is_eligible]).not_to be_nil
+      end
+
+      it 'should not return nil for is_primary_family_member' do
+        expect(@applicant[:family_member_reference][:is_primary_family_member]).not_to be_nil
+      end
+
+      it 'should not return nil for is_resident_post_092296' do
+        expect(@applicant[:citizenship_immigration_status_information][:is_resident_post_092296]).not_to be_nil
+      end
+
       it 'should add is_self_attested_disabled' do
         expect(@applicant[:attestation][:is_self_attested_disabled]).to eq(applicant.is_physically_disabled)
         expect(@applicant[:attestation][:is_self_attested_disabled]).not_to eq(applicant.is_self_attested_disabled)
+      end
+
+      it 'should not return nil for not_eligible_in_last_90_days' do
+        expect(@applicant[:medicaid_and_chip][:not_eligible_in_last_90_days]).not_to be_nil
+      end
+
+      it 'should not return nil for ended_as_change_in_eligibility' do
+        expect(@applicant[:medicaid_and_chip][:ended_as_change_in_eligibility]).not_to be_nil
+      end
+
+      it 'should not return nil for hh_income_or_size_changed' do
+        expect(@applicant[:medicaid_and_chip][:hh_income_or_size_changed]).not_to be_nil
+      end
+
+      it 'should not return nil for ineligible_due_to_immigration_in_last_5_years' do
+        expect(@applicant[:medicaid_and_chip][:ineligible_due_to_immigration_in_last_5_years]).not_to be_nil
+      end
+
+      it 'should not return nil for immigration_status_changed_since_ineligibility' do
+        expect(@applicant[:medicaid_and_chip][:immigration_status_changed_since_ineligibility]).not_to be_nil
+      end
+
+      it 'should not return nil for is_student' do
+        expect(@applicant[:student][:is_student]).not_to be_nil
+      end
+
+      it 'should not return nil for is_pregnant' do
+        expect(@applicant[:pregnancy_information][:is_pregnant]).not_to be_nil
+      end
+
+      it 'should not return nil for is_enrolled_on_medicaid' do
+        expect(@applicant[:pregnancy_information][:is_enrolled_on_medicaid]).not_to be_nil
+      end
+
+      it 'should not return nil for is_post_partum_period' do
+        expect(@applicant[:pregnancy_information][:is_post_partum_period]).not_to be_nil
+      end
+
+      it 'should not return nil for is_former_foster_care' do
+        expect(@applicant[:foster_care][:is_former_foster_care]).not_to be_nil
+      end
+
+      it 'should not return nil for had_medicaid_during_foster_care' do
+        expect(@applicant[:foster_care][:had_medicaid_during_foster_care]).not_to be_nil
+      end
+
+      it 'should not return nil for is_incarcerated' do
+        expect(@applicant[:attestation][:is_incarcerated]).not_to be_nil
+      end
+
+      it 'should not return nil for is_self_attested_disabled' do
+        expect(@applicant[:attestation][:is_self_attested_disabled]).not_to be_nil
+      end
+
+      it 'should not return nil for is_self_attested_blind' do
+        expect(@applicant[:attestation][:is_self_attested_blind]).not_to be_nil
+      end
+
+      it 'should not return nil for is_self_attested_long_term_care' do
+        expect(@applicant[:attestation][:is_self_attested_long_term_care]).not_to be_nil
+      end
+
+      it 'should not return nil for is_veteran_or_active_military' do
+        expect(@applicant[:demographic][:is_veteran_or_active_military]).not_to be_nil
+      end
+
+      it 'should not return nil for is_vets_spouse_or_child' do
+        expect(@applicant[:demographic][:is_vets_spouse_or_child]).not_to be_nil
       end
     end
 

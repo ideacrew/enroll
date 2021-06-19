@@ -38,8 +38,8 @@ module FinancialAssistance
                          aptc_effective_date: application.effective_date,
                          years_to_renew: application.renewal_base_year,
                          renewal_consent_through_year: application.years_to_renew,
-                         is_ridp_verified: application.is_ridp_verified,
-                         is_renewal_authorized: application.is_renewal_authorized,
+                         is_ridp_verified: application.is_ridp_verified.present?,
+                         is_renewal_authorized: application.is_renewal_authorized.present?,
                          applicants: applicants(application),
                          relationships: application_relationships(application),
                          tax_households: tax_households(application),
@@ -65,72 +65,72 @@ module FinancialAssistance
                                                      encrypted_ssn: applicant.encrypted_ssn},
                            demographic: demographic(applicant),
                            attestation: attestation(applicant),
-                           is_primary_applicant: applicant.is_primary_applicant,
+                           is_primary_applicant: applicant.is_primary_applicant.present?,
                            native_american_information: {indian_tribe_member: applicant.indian_tribe_member,
                                                          tribal_id: applicant.tribal_id},
                            citizenship_immigration_status_information: {citizen_status: applicant.citizen_status,
                                                                         is_lawful_presence_self_attested: false,
-                                                                        is_resident_post_092296: applicant.is_resident_post_092296},
-                           is_consumer_role: applicant.is_consumer_role,
-                           is_resident_role: applicant.is_resident_role,
-                           is_applying_coverage: applicant.is_applying_coverage,
-                           is_consent_applicant: applicant.is_consent_applicant,
+                                                                        is_resident_post_092296: applicant.is_resident_post_092296.present?},
+                           is_consumer_role: applicant.is_consumer_role.present?,
+                           is_resident_role: applicant.is_resident_role.present?,
+                           is_applying_coverage: applicant.is_applying_coverage.present?,
+                           is_consent_applicant: applicant.is_consent_applicant.present?,
                            vlp_document: vlp_document(applicant),
                            family_member_reference: {family_member_hbx_id: applicant.person_hbx_id.to_s,
                                                      first_name: applicant.first_name,
                                                      last_name: applicant.last_name,
                                                      person_hbx_id: applicant.person_hbx_id,
-                                                     is_primary_family_member: applicant.is_primary_applicant},
+                                                     is_primary_family_member: applicant.is_primary_applicant.present?},
                            person_hbx_id: applicant.person_hbx_id.to_s,
-                           is_required_to_file_taxes: applicant.is_required_to_file_taxes,
-                           is_joint_tax_filing: applicant.is_joint_tax_filing,
-                           is_claimed_as_tax_dependent: applicant.is_claimed_as_tax_dependent,
+                           is_required_to_file_taxes: applicant.is_required_to_file_taxes.present?,
+                           is_joint_tax_filing: applicant.is_joint_tax_filing.present?,
+                           is_claimed_as_tax_dependent: applicant.is_claimed_as_tax_dependent.present?,
                            claimed_as_tax_dependent_by: applicant.claimed_as_tax_dependent_by,
                            tax_filer_kind: applicant.tax_filer_kind,
                            student: student_information(applicant),
-                           is_refugee: applicant.is_refugee,
-                           is_trafficking_victim: applicant.is_trafficking_victim,
+                           is_refugee: applicant.is_refugee.present?,
+                           is_trafficking_victim: applicant.is_trafficking_victim.present?,
                            foster_care: foster(applicant),
                            pregnancy_information: pregnancy_information(applicant),
-                           is_subject_to_five_year_bar: applicant.is_subject_to_five_year_bar,
-                           is_five_year_bar_met: applicant.is_five_year_bar_met,
-                           is_forty_quarters: applicant.is_forty_quarters,
-                           is_ssn_applied: applicant.is_ssn_applied,
+                           is_subject_to_five_year_bar: applicant.is_subject_to_five_year_bar.present?,
+                           is_five_year_bar_met: applicant.is_five_year_bar_met.present?,
+                           is_forty_quarters: applicant.is_forty_quarters.present?,
+                           is_ssn_applied: applicant.is_ssn_applied.present?,
                            non_ssn_apply_reason: applicant.non_ssn_apply_reason,
-                           moved_on_or_after_welfare_reformed_law: applicant.moved_on_or_after_welfare_reformed_law,
-                           is_currently_enrolled_in_health_plan: applicant.is_currently_enrolled_in_health_plan,
-                           has_daily_living_help: applicant.has_daily_living_help,
-                           need_help_paying_bills: applicant.need_help_paying_bills,
-                           has_job_income: applicant.has_job_income,
-                           has_self_employment_income: applicant.has_self_employment_income,
-                           has_unemployment_income: applicant.has_unemployment_income,
-                           has_other_income: applicant.has_other_income,
-                           has_deductions: applicant.has_deductions,
-                           has_enrolled_health_coverage: applicant.has_enrolled_health_coverage,
-                           has_eligible_health_coverage: applicant.has_eligible_health_coverage,
-                           job_coverage_ended_in_past_3_months: applicant.has_dependent_with_coverage,
+                           moved_on_or_after_welfare_reformed_law: applicant.moved_on_or_after_welfare_reformed_law.present?,
+                           is_currently_enrolled_in_health_plan: applicant.is_currently_enrolled_in_health_plan.present?,
+                           has_daily_living_help: applicant.has_daily_living_help.present?,
+                           need_help_paying_bills: applicant.need_help_paying_bills.present?,
+                           has_job_income: applicant.has_job_income.present?,
+                           has_self_employment_income: applicant.has_self_employment_income.present?,
+                           has_unemployment_income: applicant.has_unemployment_income.present?,
+                           has_other_income: applicant.has_other_income.present?,
+                           has_deductions: applicant.has_deductions.present?,
+                           has_enrolled_health_coverage: applicant.has_enrolled_health_coverage.present?,
+                           has_eligible_health_coverage: applicant.has_eligible_health_coverage.present?,
+                           job_coverage_ended_in_past_3_months: applicant.has_dependent_with_coverage.present?,
                            job_coverage_end_date: applicant.dependent_job_end_on,
                            medicaid_and_chip: medicaid_and_chip(applicant),
-                           other_health_service: {has_received: applicant.health_service_through_referral,
-                                                  is_eligible: applicant.health_service_eligible},
+                           other_health_service: {has_received: applicant.health_service_through_referral.present?,
+                                                  is_eligible: applicant.health_service_eligible.present?},
                            addresses: addresses(applicant),
                            emails: emails(applicant),
                            phones: phones(applicant),
                            incomes: incomes(applicant),
                            benefits: benefits(applicant),
                            deductions: deductions(applicant),
-                           is_medicare_eligible: applicant.is_medicare_eligible,
-                           is_self_attested_long_term_care: applicant.is_self_attested_long_term_care,
+                           is_medicare_eligible: applicant.enrolled_or_eligible_in_any_medicare?,
+                           is_self_attested_long_term_care: applicant.is_self_attested_long_term_care.present?,
                            has_insurance: applicant.is_enrolled_in_insurance?,
                            has_state_health_benefit: applicant.has_state_health_benefit?,
                            had_prior_insurance: had_prior_insurance?(applicant),
                            prior_insurance_end_date: applicant.prior_insurance_end_date,
                            age_of_applicant: applicant.age_of_the_applicant,
                            hours_worked_per_week: applicant.total_hours_worked_per_week,
-                           is_temporarily_out_of_state: applicant.is_temporarily_out_of_state,
+                           is_temporarily_out_of_state: applicant.is_temporarily_out_of_state.present?,
                            is_claimed_as_dependent_by_non_applicant: false, # as per sb notes
                            benchmark_premium: applicant_benchmark_premium(application), #applicant_benchmark_premium(applicant.application),
-                           is_homeless: applicant.is_homeless,
+                           is_homeless: applicant.is_homeless.present?,
                            mitc_income: mitc_income(applicant),
                            mitc_relationships: []}
                 result
@@ -149,44 +149,44 @@ module FinancialAssistance
             end
 
             def medicaid_and_chip(applicant)
-              {not_eligible_in_last_90_days: applicant.has_eligible_medicaid_cubcare,
+              {not_eligible_in_last_90_days: applicant.has_eligible_medicaid_cubcare.present?,
                denied_on: applicant.medicaid_cubcare_due_on,
-               ended_as_change_in_eligibility: applicant.has_eligibility_changed,
-               hh_income_or_size_changed: applicant.has_household_income_changed,
+               ended_as_change_in_eligibility: applicant.has_eligibility_changed.present?,
+               hh_income_or_size_changed: applicant.has_household_income_changed.present?,
                medicaid_or_chip_coverage_end_date: applicant.person_coverage_end_on,
-               ineligible_due_to_immigration_in_last_5_years: applicant.medicaid_chip_ineligible,
-               immigration_status_changed_since_ineligibility: applicant.immigration_status_changed}
+               ineligible_due_to_immigration_in_last_5_years: applicant.medicaid_chip_ineligible.present?,
+               immigration_status_changed_since_ineligibility: applicant.immigration_status_changed.present?}
             end
 
             def student_information(applicant)
-              {is_student: applicant.is_student,
+              {is_student: applicant.is_student.present?,
                student_kind: applicant.student_kind,
                student_school_kind: applicant.student_school_kind,
                student_status_end_on: applicant.student_status_end_on}
             end
 
             def pregnancy_information(applicant)
-              {is_pregnant: applicant.is_pregnant,
-               is_enrolled_on_medicaid: applicant.is_enrolled_on_medicaid,
-               is_post_partum_period: applicant.is_post_partum_period,
+              {is_pregnant: applicant.is_pregnant.present?,
+               is_enrolled_on_medicaid: applicant.is_enrolled_on_medicaid.present?,
+               is_post_partum_period: applicant.is_post_partum_period.present?,
                expected_children_count: applicant.children_expected_count,
                pregnancy_due_on: applicant.pregnancy_due_on,
                pregnancy_end_on: applicant.pregnancy_end_on}
             end
 
             def foster(applicant)
-              {is_former_foster_care: applicant.is_former_foster_care,
+              {is_former_foster_care: applicant.is_former_foster_care.present?,
                age_left_foster_care: applicant.age_left_foster_care,
                foster_care_us_state: applicant.foster_care_us_state,
-               had_medicaid_during_foster_care: applicant.had_medicaid_during_foster_care}
+               had_medicaid_during_foster_care: applicant.had_medicaid_during_foster_care.present?}
             end
 
             def attestation(applicant)
-              {is_incarcerated: applicant.is_incarcerated,
+              {is_incarcerated: applicant.is_incarcerated.present?,
               # Enroll's UI maps to is_physically_disabled and not is_self_attested_disabled
-               is_self_attested_disabled: applicant.is_physically_disabled,
-               is_self_attested_blind: applicant.is_self_attested_blind,
-               is_self_attested_long_term_care: applicant.is_self_attested_long_term_care}
+               is_self_attested_disabled: applicant.is_physically_disabled.present?,
+               is_self_attested_blind: applicant.is_self_attested_blind.present?,
+               is_self_attested_long_term_care: applicant.is_self_attested_long_term_care.present?}
             end
 
             def demographic(applicant)
@@ -194,8 +194,8 @@ module FinancialAssistance
                dob: applicant.dob,
                ethnicity: applicant.ethnicity,
                race: applicant.race,
-               is_veteran_or_active_military: applicant.is_veteran,
-               is_vets_spouse_or_child: applicant.is_vets_spouse_or_child}
+               is_veteran_or_active_military: applicant.is_veteran.present?,
+               is_vets_spouse_or_child: applicant.is_vets_spouse_or_child.present?}
             end
 
             def mitc_income(applicant)
@@ -396,9 +396,8 @@ module FinancialAssistance
 
             def phones(applicant)
               applicant.phones.inject([]) do |result, phone|
-                primary_phone = phone.primary.nil? ? false : phone.primary
                 result << {kind: phone.kind,
-                           primary: primary_phone,
+                           primary: phone.primary.present?,
                            area_code: phone.area_code,
                            number: phone.number,
                            country_code: phone.country_code,
@@ -429,7 +428,7 @@ module FinancialAssistance
                             frequency_kind: frequency(income.frequency_kind),
                             start_on: income.start_on,
                             end_on: income.end_on,
-                            is_projected: income.is_projected,
+                            is_projected: income.is_projected.present?,
                             tax_form: income.tax_form,
                             employer: employer(income),
                             has_property_usage_rights: income.has_property_usage_rights,
@@ -443,11 +442,11 @@ module FinancialAssistance
                 result << { name: benefit.title,
                             kind: benefit.insurance_kind,
                             status: benefit.kind,
-                            is_employer_sponsored: benefit.is_employer_sponsored,
+                            is_employer_sponsored: benefit.is_employer_sponsored.present?,
                             employer: employer(benefit),
                             esi_covered: benefit.esi_covered,
-                            is_esi_waiting_period: benefit.is_esi_waiting_period,
-                            is_esi_mec_met: benefit.is_esi_mec_met,
+                            is_esi_waiting_period: benefit.is_esi_waiting_period.present?,
+                            is_esi_mec_met: benefit.is_esi_mec_met.present?,
                             employee_cost: benefit.employee_cost,
                             employee_cost_frequency: benefit.employee_cost_frequency,
                             start_on: benefit.start_on,
