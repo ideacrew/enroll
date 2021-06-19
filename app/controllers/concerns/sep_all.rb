@@ -48,18 +48,26 @@ module SepAll
   end
 
   def prior_py_sep?(family, effective_date, market)
+    return false if market.blank?
+    return prior_py_ivl_sep?(effective_date) if market == 'individual'
+
+    prior_py_shop_sep?(family, effective_date)
+  end
+
+  def prior_py_shop_sep?(family, effective_date)
+    return false if family.blank?
+    return false if effective_date.blank?
+
+    person = family.primary_person
+    person.active_employee_roles.none?{|e| e.census_employee&.active_benefit_package&.benefit_application&.effective_period&.cover?(effective_date)}
+  end
+
+  def prior_py_ivl_sep?(effective_date)
     ivl_prior_coverage_period = HbxProfile.current_hbx&.benefit_sponsorship&.previous_benefit_coverage_period
     return false if ivl_prior_coverage_period.blank?
     return false if effective_date.blank?
-    return false if market.blank?
-    return false if family.blank?
 
-    person = family.primary_person
-    if market == 'individual'
-      ivl_prior_coverage_period&.contains?(effective_date)
-    else
-      person.active_employee_roles.none?{|e| e.census_employee&.active_benefit_package&.benefit_application&.effective_period&.cover?(effective_date)}
-    end
+    ivl_prior_coverage_period&.contains?(effective_date)
   end
 
   def calculate_rule
