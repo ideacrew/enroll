@@ -360,5 +360,21 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     it 'should be able to successfully init Application Entity' do
       expect(@entity_init).to be_success
     end
+
+    context 'mitc_relationships' do
+      before do
+        result = subject.call(application.reload)
+        @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+        @mitc_relationships = result.success[:applicants].first[:mitc_relationships]
+      end
+
+      it 'should populate mitc_relationships' do
+        expect(@mitc_relationships).not_to be_empty
+      end
+
+      it 'should be able to successfully init Application Entity' do
+        expect(@entity_init).to be_success
+      end
+    end
   end
 end

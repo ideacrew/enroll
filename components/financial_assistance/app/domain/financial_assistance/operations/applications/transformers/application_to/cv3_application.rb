@@ -2,6 +2,7 @@
 
 require 'dry/monads'
 require 'dry/monads/do'
+require 'aca_entities/magi_medicaid/libraries/iap_library'
 
 module FinancialAssistance
   module Operations
@@ -132,7 +133,7 @@ module FinancialAssistance
                            benchmark_premium: applicant_benchmark_premium(application), #applicant_benchmark_premium(applicant.application),
                            is_homeless: applicant.is_homeless.present?,
                            mitc_income: mitc_income(applicant),
-                           mitc_relationships: []}
+                           mitc_relationships: mitc_relationships(applicant)}
                 result
               end
             end
@@ -216,6 +217,43 @@ module FinancialAssistance
                 student_loan_interest_deduction: student_loan_interest_deduction(applicant),
                 tution_and_fees: tution_and_fees(applicant),
                 other_magi_eligible_income: 0 }
+            end
+
+            def mitc_relationships(applicant)
+              applicant.relationships.inject([]) do |mitc_rels, relationship|
+                rela_code = find_relationship_code(relationship)
+                mitc_rels << {
+                  other_id: relationship.relative.person_hbx_id,
+                  attest_primary_responsibility: applicant.is_primary_applicant.present? ? 'Y' : 'N',
+                  relationship_code: rela_code
+                } if relationship.relative || applicant
+                mitc_rels
+              end
+            end
+
+            def find_relationship_code(relationship)
+              mitc_rel =
+                case relationship.kind
+                when 'spouse' || 'domestic_partner'
+                  :husband_or_wife
+                when 'child'
+                  :son_or_daughter
+                when 'parent'
+                  :parent
+                when 'sibling'
+                  :brother_or_sister
+                when 'aunt_or_uncle'
+                  :aunt_or_uncle
+                when 'nephew_or_niece'
+                  :nephew_or_niece
+                when 'grandchild'
+                  :grandchild
+                when 'grandparent'
+                  :grandparent
+                else
+                  :other
+                end
+              ::AcaEntities::MagiMedicaid::Mitc::Types::RelationshipCodeMap[:mitc_rel] || '88'
             end
 
             def taxable_interest(applicant)
