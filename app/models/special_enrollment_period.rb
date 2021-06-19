@@ -251,8 +251,8 @@ private
   end
 
   def set_coverage_renewal_flag
-    prior_py_ivl_sep = EnrollRegistry.feature_enabled?(:prior_plan_year_ivl_sep) && qualifying_life_event_kind&.individual?
-    prior_py_shop_sep = EnrollRegistry.feature_enabled?(:prior_plan_year_shop_sep) && qualifying_life_event_kind&.shop_market?
+    prior_py_ivl_sep = renewal_eligible_for_ivl
+    prior_py_shop_sep = renewal_eligible_for_shop
     return if coverage_renewal_flag == false
 
     if prior_py_ivl_sep
@@ -260,6 +260,14 @@ private
     elsif prior_py_shop_sep
       self.assign_attributes({coverage_renewal_flag: prior_py_shop_sep})
     end
+  end
+
+  def renewal_eligible_for_ivl
+    EnrollRegistry.feature_enabled?(:prior_plan_year_ivl_sep) && qualifying_life_event_kind&.individual? && admin_flag.blank? && prior_py_sep?(family, effective_on, qualifying_life_event_kind&.market_kind)
+  end
+
+  def renewal_eligible_for_shop
+    EnrollRegistry.feature_enabled?(:prior_plan_year_shop_sep) && qualifying_life_event_kind&.shop_market? && admin_flag.blank? && prior_py_sep?(family, effective_on, qualifying_life_event_kind&.market_kind)
   end
 
   def set_user_id

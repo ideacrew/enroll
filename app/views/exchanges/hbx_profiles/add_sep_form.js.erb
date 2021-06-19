@@ -57,7 +57,7 @@ $(document).on('change','.admin_selected_sep_reason select',function(){
 });
 
 $(document).on('change','#option1_date, #option2_date, #option3_date', function(){
-    $.ajax({
+  $.ajax({
       type: "GET",
       url: "/exchanges/hbx_profiles/check_for_renewal_flag",
       data:{effective_date: $("#calculated_effective_date").val(), date_option1: $('#option1_date').val(), date_option2: $('#option2_date').val(), date_option3: $('#option3_date').val(), person: $('#person').val(), id: idVal },
