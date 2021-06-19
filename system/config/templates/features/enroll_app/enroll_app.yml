@@ -30,7 +30,7 @@ registry:
           - key: :submit_docs_url
             item: "https://www.dchealthlink.com/submit-docs"
           - key: :site_key
-            item: :me
+            item: :dc
           - key: :state_abbreviation
             item: "DC"
           - key: :state_residency
