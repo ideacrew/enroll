@@ -30,7 +30,7 @@ registry:
           - key: :submit_docs_url
             item: "https://www.dchealthlink.com/submit-docs"
           - key: :site_key
-            item: :dc
+            item: :me
           - key: :state_abbreviation
             item: "DC"
           - key: :state_residency
@@ -343,4 +343,6 @@ registry:
       - key: :immigration_status_checkbox
         is_enabled: false
       - key: :gender_to_sex
+        is_enabled: false
+      - key: :mainecare_cubcare_glossary
         is_enabled: false
