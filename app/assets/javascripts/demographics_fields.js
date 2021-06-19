@@ -87,7 +87,7 @@ function applyListenersFor(target) {
 
   $("input[name='" + target + "[eligible_immigration_status]']").change(function() {
     var selected_doc_type = $('#immigration_doc_type').val();
-    if ($(this).val() == 'true') {
+    if ($(this).val() == 'true' && this.checked) {
       $('#vlp_documents_container').show();
       $('#naturalization_doc_type_select').hide();
       $('#immigration_doc_type_select').show();
@@ -244,7 +244,7 @@ var PersonValidations = (function(window, undefined) {
   }
 
   function validationForEligibleImmigrationStatuses(e) {
-    if ($('#immigration_status_container').is(':visible') && $('input[name="person[eligible_immigration_status]"]').not(":checked").length == 2) {
+    if ($('#immigration_status_container').is(':visible') && $('input[name="person[eligible_immigration_status]"]').not(":checked").length == 2 && !$('#immigration-checkbox').is(':visible')) {
       alert('Please provide an answer for question: Do you have eligible immigration status?');
       PersonValidations.restoreRequiredAttributes(e);
     }

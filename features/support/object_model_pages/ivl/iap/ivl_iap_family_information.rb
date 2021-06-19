@@ -91,6 +91,10 @@ class IvlIapFamilyInformation
     'label[for="applicant_eligible_immigration_status_false"] span'
   end
 
+  def self.immigration_status_checkbox
+    '#applicant_eligible_immigration_status'
+  end
+
   def self.not_sure_immigration_status_link
     'a[href="#eligible_immigration_status"]'
   end

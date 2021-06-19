@@ -105,7 +105,7 @@
                 <thead>
                   <tr class="form-heading">
                     <th class="form-heading">AGE</th>
-                    <th class="form-heading">GENDER</th>
+                    <th class="form-heading"><%= l10n("gender").to_s.upcase %></th>
                     <% unless @all_relationships.empty? %>
                       <th class="form-heading">RELATIONSHIP</th>
                     <% end %>

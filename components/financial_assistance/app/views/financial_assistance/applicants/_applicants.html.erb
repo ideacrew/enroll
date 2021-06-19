@@ -20,7 +20,7 @@
       <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= "#{@person.age_on(Date.today)}" %></span>
     </div>
     <div class="col-md-3 col-sm-6 no-pd form-group-lg no-pd class-fa-household">
-      <label class="static_label label-floatlabel" for="name">GENDER</label>
+      <label class="static_label label-floatlabel" for="name"><%= l10n("gender").to_s.upcase %></label>
       <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= "#{@person.gender.humanize}" %></span>
     </div>
     <div class="col-md-3 col-sm-6 no-pd form-group-lg no-pd class-fa-household">
