@@ -153,7 +153,8 @@ module FinancialAssistance
     field :claimed_as_tax_dependent_by, type: BSON::ObjectId
 
     field :is_ia_eligible, type: Boolean, default: false
-    field :is_physically_disabled, type: Boolean
+    # TODO: Revist for default
+    field :is_physically_disabled, type: Boolean, default: false
     field :is_medicaid_chip_eligible, type: Boolean, default: false
     field :is_non_magi_medicaid_eligible, type: Boolean, default: false
     field :is_totally_ineligible, type: Boolean, default: false
@@ -173,6 +174,7 @@ module FinancialAssistance
     field :is_magi_medicaid, type: Boolean, default: false
     field :is_medicare_eligible, type: Boolean, default: false
 
+    # TODO: Revist for default
     field :is_student, type: Boolean, default: false
     field :student_kind, type: String
     field :student_school_kind, type: String
@@ -180,7 +182,8 @@ module FinancialAssistance
 
     #split this out : change XSD too.
     #field :is_self_attested_blind_or_disabled, type: Boolean, default: false
-    field :is_self_attested_blind, type: Boolean
+    # TODO: Revist for default
+    field :is_self_attested_blind, type: Boolean, default: false
     field :is_self_attested_disabled, type: Boolean, default: false
 
     field :is_self_attested_long_term_care, type: Boolean, default: false
@@ -189,6 +192,7 @@ module FinancialAssistance
     field :is_refugee, type: Boolean, default: false
     field :is_trafficking_victim, type: Boolean, default: false
 
+    # TODO: Revist for default
     field :is_former_foster_care, type: Boolean, default: false
     field :age_left_foster_care, type: Integer, default: 0
     field :foster_care_us_state, type: String
@@ -215,8 +219,10 @@ module FinancialAssistance
     field :is_currently_enrolled_in_health_plan, type: Boolean
 
     # Other QNs.
-    field :has_daily_living_help, type: Boolean
-    field :need_help_paying_bills, type: Boolean
+    # TODO: Revist for default
+    field :has_daily_living_help, type: Boolean, default: false
+    # TODO: Revist for default
+    field :need_help_paying_bills, type: Boolean, default: false
     field :is_resident_post_092296, type: Boolean
     field :is_vets_spouse_or_child, type: Boolean
 

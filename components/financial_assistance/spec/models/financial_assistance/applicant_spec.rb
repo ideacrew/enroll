@@ -118,5 +118,21 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
     it 'should set false for is_former_foster_care' do
       expect(@applicant.is_former_foster_care).to eq(false)
     end
+
+    it 'should set false for is_physically_disabled' do
+      expect(@applicant.is_physically_disabled).to eq(false)
+    end
+
+    it 'should set false for is_self_attested_blind' do
+      expect(@applicant.is_self_attested_blind).to eq(false)
+    end
+
+    it 'should set false for has_daily_living_help' do
+      expect(@applicant.has_daily_living_help).to eq(false)
+    end
+
+    it 'should set false for need_help_paying_bills' do
+      expect(@applicant.need_help_paying_bills).to eq(false)
+    end
   end
 end
