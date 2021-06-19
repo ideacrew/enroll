@@ -381,4 +381,73 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       end
     end
   end
+
+  context 'for relationships' do
+    let!(:person2) { FactoryBot.create(:person, hbx_id: "732021") }
+    let!(:family_member2) { FactoryBot.create(:family_member, person: person2, family: family) }
+    let!(:applicant2) do
+      FactoryBot.create(:applicant,
+                        first_name: person2.first_name,
+                        last_name: person2.last_name,
+                        dob: person2.dob,
+                        gender: person2.gender,
+                        ssn: person2.ssn,
+                        application: application,
+                        eligibility_determination_id: eligibility_determination.id,
+                        ethnicity: [],
+                        is_self_attested_blind: false,
+                        is_applying_coverage: true,
+                        is_required_to_file_taxes: false,
+                        is_claimed_as_tax_dependent: true,
+                        claimed_as_tax_dependent_by: applicant.id,
+                        is_pregnant: false,
+                        has_job_income: false,
+                        has_self_employment_income: false,
+                        has_unemployment_income: false,
+                        has_other_income: false,
+                        has_deductions: false,
+                        is_self_attested_disabled: true,
+                        is_physically_disabled: false,
+                        has_enrolled_health_coverage: false,
+                        has_eligible_health_coverage: false,
+                        has_eligible_medicaid_cubcare: false,
+                        is_claimed_as_tax_dependent: false,
+                        is_incarcerated: false,
+                        citizen_status: 'us_citizen',
+                        net_annual_income: 5_078.90,
+                        is_post_partum_period: false)
+    end
+    let!(:relationships) do
+      application.add_relationship(applicant, applicant2, 'parent')
+    end
+
+    before do
+      @result = subject.call(application.reload)
+      @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(@result.success)
+    end
+
+    it 'should return success for result' do
+      expect(@result).to be_success
+    end
+
+    it 'should be able to successfully init Application Entity' do
+      expect(@entity_init).to be_success
+    end
+
+    context 'for claimed_as_tax_dependent_by' do
+      before do
+        result = subject.call(application.reload)
+        @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+        @child_applicant = result.success[:applicants][1]
+      end
+
+      it 'should populate correct relationship_code' do
+        expect(@child_applicant[:claimed_as_tax_dependent_by][:person_hbx_id]).to eq(applicant.person_hbx_id)
+      end
+
+      it 'should be able to successfully init Application Entity' do
+        expect(@entity_init).to be_success
+      end
+    end
+  end
 end

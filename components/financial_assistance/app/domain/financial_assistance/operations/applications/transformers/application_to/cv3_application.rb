@@ -86,7 +86,7 @@ module FinancialAssistance
                            is_required_to_file_taxes: applicant.is_required_to_file_taxes.present?,
                            is_joint_tax_filing: applicant.is_joint_tax_filing.present?,
                            is_claimed_as_tax_dependent: applicant.is_claimed_as_tax_dependent.present?,
-                           claimed_as_tax_dependent_by: applicant.claimed_as_tax_dependent_by,
+                           claimed_as_tax_dependent_by: applicant_reference_by_applicant_id(application, applicant.claimed_as_tax_dependent_by),
                            tax_filer_kind: applicant.tax_filer_kind,
                            student: student_information(applicant),
                            is_refugee: applicant.is_refugee.present?,
@@ -140,6 +140,13 @@ module FinancialAssistance
             # rubocop:enable Metrics/CyclomaticComplexity
             # rubocop:enable Metrics/AbcSize
             # rubocop:enable Metrics/MethodLength
+
+            def applicant_reference_by_applicant_id(application, applicant_id)
+              return nil unless applicant_id
+              appli = application&.applicants&.find(applicant_id)
+              return nil unless appli
+              applicant_reference(appli)
+            end
 
             def name(applicant)
               {first_name: applicant.first_name,
