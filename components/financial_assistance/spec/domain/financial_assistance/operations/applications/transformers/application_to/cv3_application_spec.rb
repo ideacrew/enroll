@@ -26,6 +26,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
                                   has_deductions: false,
                                   is_self_attested_disabled: true,
                                   is_physically_disabled: false,
+                                  citizen_status: 'us_citizen',
                                   has_enrolled_health_coverage: false,
                                   has_eligible_health_coverage: false,
                                   has_eligible_medicaid_cubcare: false,
@@ -220,6 +221,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
         expect(@applicant[:citizenship_immigration_status_information][:is_resident_post_092296]).not_to be_nil
       end
 
+      it 'should not return nil for is_lawful_presence_self_attested' do
+        expect(@applicant[:citizenship_immigration_status_information][:is_lawful_presence_self_attested]).not_to be_nil
+      end
+
       it 'should add is_self_attested_disabled' do
         expect(@applicant[:attestation][:is_self_attested_disabled]).to eq(applicant.is_physically_disabled)
         expect(@applicant[:attestation][:is_self_attested_disabled]).not_to eq(applicant.is_self_attested_disabled)
@@ -303,6 +308,57 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       it 'should add adjusted_gross_income' do
         expect(@mitc_income_hash[:adjusted_gross_income]).to eq(applicant.net_annual_income)
       end
+    end
+  end
+
+  context 'for relationships' do
+    let!(:person2) { FactoryBot.create(:person, hbx_id: "732021") }
+    let!(:family_member2) { FactoryBot.create(:family_member, person: person2, family: family) }
+    let!(:applicant2) do
+      FactoryBot.create(:applicant,
+                        first_name: person2.first_name,
+                        last_name: person2.last_name,
+                        dob: person2.dob,
+                        gender: person2.gender,
+                        ssn: person2.ssn,
+                        application: application,
+                        eligibility_determination_id: eligibility_determination.id,
+                        ethnicity: [],
+                        is_self_attested_blind: false,
+                        is_applying_coverage: true,
+                        is_required_to_file_taxes: true,
+                        is_pregnant: false,
+                        has_job_income: false,
+                        has_self_employment_income: false,
+                        has_unemployment_income: false,
+                        has_other_income: false,
+                        has_deductions: false,
+                        is_self_attested_disabled: true,
+                        is_physically_disabled: false,
+                        has_enrolled_health_coverage: false,
+                        has_eligible_health_coverage: false,
+                        has_eligible_medicaid_cubcare: false,
+                        is_claimed_as_tax_dependent: false,
+                        is_incarcerated: false,
+                        citizen_status: 'us_citizen',
+                        net_annual_income: 5_078.90,
+                        is_post_partum_period: false)
+    end
+    let!(:relationships) do
+      application.add_relationship(applicant, applicant2, 'spouse')
+    end
+
+    before do
+      @result = subject.call(application.reload)
+      @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(@result.success)
+    end
+
+    it 'should return success for result' do
+      expect(@result).to be_success
+    end
+
+    it 'should be able to successfully init Application Entity' do
+      expect(@entity_init).to be_success
     end
   end
 end

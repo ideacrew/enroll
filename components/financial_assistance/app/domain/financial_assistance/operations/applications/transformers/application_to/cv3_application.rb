@@ -69,7 +69,7 @@ module FinancialAssistance
                            native_american_information: {indian_tribe_member: applicant.indian_tribe_member,
                                                          tribal_id: applicant.tribal_id},
                            citizenship_immigration_status_information: {citizen_status: applicant.citizen_status,
-                                                                        is_lawful_presence_self_attested: false,
+                                                                        is_lawful_presence_self_attested: applicant.eligible_immigration_status.present?,
                                                                         is_resident_post_092296: applicant.is_resident_post_092296.present?},
                            is_consumer_role: applicant.is_consumer_role.present?,
                            is_resident_role: applicant.is_resident_role.present?,
@@ -554,7 +554,7 @@ module FinancialAssistance
                 applicant = FinancialAssistance::Applicant.find(applicant_id)
                 relative = FinancialAssistance::Applicant.find(relative_id)
                 next result unless applicant.present? || relative.present?
-                result << {kind: kind,
+                result << {kind: rl.kind,
                            applicant_reference: applicant_reference(applicant),
                            relative_reference: applicant_reference(relative),
                            live_with_household_member: applicant.same_with_primary}
