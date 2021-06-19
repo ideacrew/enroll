@@ -183,7 +183,8 @@ module FinancialAssistance
 
             def attestation(applicant)
               {is_incarcerated: applicant.is_incarcerated,
-               is_self_attested_disabled: applicant.is_self_attested_disabled,
+              # Enroll's UI maps to is_physically_disabled and not is_self_attested_disabled
+               is_self_attested_disabled: applicant.is_physically_disabled,
                is_self_attested_blind: applicant.is_self_attested_blind,
                is_self_attested_long_term_care: applicant.is_self_attested_long_term_care}
             end

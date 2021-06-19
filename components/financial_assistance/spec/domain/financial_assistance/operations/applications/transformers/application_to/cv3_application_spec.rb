@@ -24,6 +24,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
                                   has_unemployment_income: false,
                                   has_other_income: false,
                                   has_deductions: false,
+                                  is_self_attested_disabled: true,
+                                  is_physically_disabled: false,
                                   has_enrolled_health_coverage: false,
                                   has_eligible_health_coverage: false,
                                   has_eligible_medicaid_cubcare: false,
@@ -68,6 +70,18 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
     it 'should have applicant with person hbx_id' do
       expect(result.value![:applicants].first[:person_hbx_id]).to eq person.hbx_id
+    end
+
+    context 'applicant' do
+      before do
+        request_payload = result.success
+        @applicant = request_payload[:applicants].first
+      end
+
+      it 'should add is_self_attested_disabled' do
+        expect(@applicant[:attestation][:is_self_attested_disabled]).to eq(applicant.is_physically_disabled)
+        expect(@applicant[:attestation][:is_self_attested_disabled]).not_to eq(applicant.is_self_attested_disabled)
+      end
     end
 
     context 'mitc_income' do
