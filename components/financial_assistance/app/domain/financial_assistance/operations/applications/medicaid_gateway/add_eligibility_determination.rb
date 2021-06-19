@@ -116,6 +116,8 @@ module FinancialAssistance
               thhm_entity.applicant_reference.person_hbx_id == primary_person_hbx_id
             end.product_eligibility_determination.csr
             (csr == 'limited') ? 0 : csr
+          rescue StandardError => _e
+            0
           end
 
           def find_matching_applicant(elig_det, applicant_ref)
