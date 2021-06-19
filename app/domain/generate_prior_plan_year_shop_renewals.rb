@@ -38,7 +38,7 @@ module Operations
     end
 
     def update_prior_plan_coverage(enrollment)
-      sep = enrollment.special_enrollment_period
+      sep = enrollment.family.latest_active_sep_for(enrollment)
       return nil if sep.blank?
       return nil unless sep.coverage_renewal_flag
       enrollment_benefit_application = enrollment.sponsored_benefit_package.benefit_application
