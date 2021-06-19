@@ -372,6 +372,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
         expect(@mitc_relationships).not_to be_empty
       end
 
+      it 'should populate correct relationship_code' do
+        expect(@mitc_relationships.first[:relationship_code].to_s).to eq('02')
+      end
+
       it 'should be able to successfully init Application Entity' do
         expect(@entity_init).to be_success
       end
