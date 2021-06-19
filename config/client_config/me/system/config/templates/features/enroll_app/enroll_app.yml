@@ -359,3 +359,5 @@ registry:
         is_enabled: false
       - key: :gender_to_sex
         is_enabled: true
+      - key: :mainecare_cubcare_glossary
+        is_enabled: true
