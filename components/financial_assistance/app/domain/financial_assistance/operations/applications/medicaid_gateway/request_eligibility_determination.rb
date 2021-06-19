@@ -21,8 +21,8 @@ module FinancialAssistance
             application    = yield find_application(application_id)
             application    = yield validate(application)
             payload_param  = yield construct_payload(application)
-            _application   = yield update_application(application, payload_param)
             payload_value  = yield validate_payload(payload_param)
+            _application   = yield update_application(application, payload_value)
             payload        = yield publish(payload_value)
 
             Success(payload)
@@ -47,8 +47,8 @@ module FinancialAssistance
             FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application)
           end
 
-          def update_application(application, payload_param)
-            application.assign_attributes({ eligibility_request_payload: payload_param.to_json })
+          def update_application(application, payload_value)
+            application.assign_attributes({ eligibility_request_payload: payload_value.to_h.to_json })
             return Success(application) if application.save
             Failure("Unable to update application(hbx_id: #{application.hbx_id}) with eligibility_request_payload")
           end

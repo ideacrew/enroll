@@ -414,7 +414,7 @@ module FinancialAssistance
 
             def employer(instance)
               return if instance.employer_name.nil?
-              {employer_name: instance.employer_name, employer_id: instance.employer_id}
+              {employer_name: instance.employer_name, employer_id: instance.employer_id.to_s}
             end
 
             def incomes(applicant)
