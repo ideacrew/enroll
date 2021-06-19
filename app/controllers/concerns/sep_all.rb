@@ -42,19 +42,24 @@ module SepAll
 
     status = []
     [effective_date, date_option_1, date_option_2, date_option_3].each do |date|
-      status << prior_py_sep?(date, qle.market_kind)
+      status << prior_py_sep?(@family, date, qle.market_kind)
     end
     status.include?(true)
   end
 
-  def prior_py_sep?(effective_date, market)
+  def prior_py_sep?(family, effective_date, market)
     ivl_prior_coverage_period = HbxProfile.current_hbx&.benefit_sponsorship&.previous_benefit_coverage_period
     return false if ivl_prior_coverage_period.blank?
     return false if effective_date.blank?
     return false if market.blank?
-    return unless market == 'individual'
+    return false if family.blank?
 
-    ivl_prior_coverage_period&.contains?(effective_date)
+    person = family.primary_person
+    if market == 'individual'
+      ivl_prior_coverage_period&.contains?(effective_date)
+    else
+      person.active_employee_roles.none?{|e| e.census_employee&.active_benefit_package&.benefit_application&.effective_period&.cover?(effective_date)}
+    end
   end
 
   def calculate_rule
