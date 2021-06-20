@@ -223,7 +223,7 @@
       </div>
     <% end %>
 
-    <% if !(@applicant.age_on(TimeKeeper.date_of_record) < 19) && FinancialAssistanceRegistry.feature_enabled?(:has_dependent_with_coverage) %>
+    <% if @applicant.age_on(TimeKeeper.date_of_record) < 19 && FinancialAssistanceRegistry.feature_enabled?(:has_dependent_with_coverage) %>
       <div class="driver-question row row-form-wrapper radio-align no-buffer row-height fa-align-elements">
         <div class="col-md-6 labelforcoverage">
           <span class="fa-text-color"><%=l10n("faa.has_dependent_with_coverage")%></span>
