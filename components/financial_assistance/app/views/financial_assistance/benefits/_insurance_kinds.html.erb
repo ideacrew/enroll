@@ -10,7 +10,6 @@
 </div>
 
 <br />
-
 <% insurance_kinds.each do |insurance_kind| %>
   <div id="<%= insurance_kind %>"class="benefit-kind">
     <div class="row row-form-wrapper radio-align fa-text-color lightgray no-buffer row-height">
@@ -31,7 +30,7 @@
     </div>
 
     <div class='new-benefit-form hidden <%= insurance_kind %>'>
-      <% if insurance_kind == 'employer_sponsored_insurance' || insurance_kind == 'health_reimbursement_arrangement'%>
+      <% if insurance_kind == 'employer_sponsored_insurance' || insurance_kind == 'health_reimbursement_arrangement' %>
         <%= render partial: 'financial_assistance/benefits/esi_benefit_form', locals: { benefit: @applicant.benefits.build, insurance_kind: insurance_kind, kind: kind} %>
       <% else %>
         <%= render partial: 'financial_assistance/benefits/non_esi_benefit_form', locals: { benefit: @applicant.benefits.build, insurance_kind: insurance_kind, kind: kind} %>
