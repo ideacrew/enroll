@@ -21,6 +21,11 @@ registry:
       - key: :consumer_validations
         is_enabled: true
   - namespace:
+    - :eligibility_results
+    features:
+      - key: :non_magi_referral_display
+        is_enabled: true
+  - namespace:
     - :enrollment_dates
     features:
       - key: :application_new_year_effective_date
@@ -93,7 +98,7 @@ registry:
       is_enabled: true
       settings:
         - key: :medicaid_chip
-          item: "MaineCare (Medicaid)"
+          item: "Medicaid"
     - key: :net_annual_income_display
       is_enabled: true
     - key: :has_dependent_with_coverage

@@ -254,6 +254,8 @@ registry:
             item: ""
           - key: :send_rating_area_for_ivl_policy_to_edi
             item: true
+          - key: :medicaid_agency_phone
+            item: "(000) 000-0000"
       - key: :rating_area
         item: :rating_area
         is_enabled: false
@@ -365,4 +367,6 @@ registry:
       - key: :immigration_status_checkbox
         is_enabled: false
       - key: :gender_to_sex
+        is_enabled: true
+      - key: :mainecare_cubcare_glossary
         is_enabled: true
