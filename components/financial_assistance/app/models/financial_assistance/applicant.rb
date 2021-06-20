@@ -248,6 +248,8 @@ module FinancialAssistance
     field :has_dependent_with_coverage, type: Boolean
     field :dependent_job_end_on, type: Date
 
+    field :is_eligible_for_non_magi_reasons, type: Boolean
+
     field :workflow, type: Hash, default: { }
 
     embeds_many :verification_types, class_name: "::FinancialAssistance::VerificationType"#, cascade_callbacks: true, validate: true
