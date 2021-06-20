@@ -289,7 +289,7 @@ private
   def set_effective_on
     return unless self.start_on.present? && self.qualifying_life_event_kind.present?
     self.effective_on = case effective_on_kind
-                        when "date_of_event"
+                        when "date_of_event", "exact_date"
                           qle_on
                         when "date_of_event_plus_one"
                           qle_on.next_day

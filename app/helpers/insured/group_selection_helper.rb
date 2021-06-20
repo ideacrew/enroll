@@ -118,7 +118,7 @@ module Insured
       return unless employee_role.present?
 
       employer_profile = employee_role.employer_profile
-      effective_on = family.current_sep&.effective_on
+      effective_on = @adapter.optional_effective_on.present? ? @adapter.optional_effective_on : family.current_sep&.effective_on
       benefit_application = employer_profile.benefit_applications.detect { |ba| is_covered_plan_year?(ba, effective_on)} || employer_profile.published_benefit_application
       enrollments = family.active_household&.hbx_enrollments
       if benefit_application.present? && benefit_application.is_renewing?
