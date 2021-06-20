@@ -206,8 +206,9 @@ module FinancialAssistance
                is_vets_spouse_or_child: applicant.is_vets_spouse_or_child.present?}
             end
 
+            # All MitcIncome amounts must be expressed as annual amounts.
             def mitc_income(applicant)
-              { amount: 0,
+              { amount: wages_and_salaries(applicant),
                 taxable_interest: taxable_interest(applicant),
                 tax_exempt_interest: 0,
                 taxable_refunds: 0,
@@ -263,10 +264,19 @@ module FinancialAssistance
               ::AcaEntities::MagiMedicaid::Mitc::Types::RelationshipCodeMap[mitc_rel] || '88'
             end
 
+            # JobIncome(wages_and_salaries) & SelfEmploymentIncome(net_self_employment)
+            def wages_and_salaries(applicant)
+              applicant.incomes.where(:kind.in => ['wages_and_salaries', 'net_self_employment']).inject(0) do |result, income|
+                frequency = income.frequency_kind
+                result += annual_amount(frequency(frequency), income.amount.to_i)
+                result
+              end
+            end
+
             def taxable_interest(applicant)
               applicant.incomes.where(kind: "interest").inject(0) do |result, income|
                 frequency = income.frequency_kind
-                result += monthly_amount(frequency(frequency), income.amount.to_i)
+                result += annual_amount(frequency(frequency), income.amount.to_i)
                 result
               end
             end
@@ -274,7 +284,7 @@ module FinancialAssistance
             def alimony(applicant)
               applicant.incomes.where(kind: "alimony_and_maintenance").inject(0) do |result, income|
                 frequency = income.frequency_kind
-                result += monthly_amount(frequency(frequency), income.amount.to_i)
+                result += annual_amount(frequency(frequency), income.amount.to_i)
                 result
               end
             end
@@ -282,7 +292,7 @@ module FinancialAssistance
             def capital_gain_or_loss(applicant)
               applicant.incomes.where(kind: "capital_gains").inject(0) do |result, income|
                 frequency = income.frequency_kind
-                result += monthly_amount(frequency(frequency), income.amount.to_i)
+                result += annual_amount(frequency(frequency), income.amount.to_i)
                 result
               end
             end
@@ -290,7 +300,7 @@ module FinancialAssistance
             def pensions_and_annuities_taxable_amount(applicant)
               applicant.incomes.where(kind: "pension_retirement_benefits").inject(0) do |result, income|
                 frequency = income.frequency_kind
-                result += monthly_amount(frequency(frequency), income.amount.to_i)
+                result += annual_amount(frequency(frequency), income.amount.to_i)
                 result
               end
             end
@@ -298,7 +308,7 @@ module FinancialAssistance
             def farm_income_or_loss(applicant)
               applicant.incomes.where(kind: "farming_and_fishing").inject(0) do |result, income|
                 frequency = income.frequency_kind
-                result += monthly_amount(frequency(frequency), income.amount.to_i)
+                result += annual_amount(frequency(frequency), income.amount.to_i)
                 result
               end
             end
@@ -306,7 +316,7 @@ module FinancialAssistance
             def unemployment_compensation(applicant)
               applicant.incomes.where(kind: "unemployment_income").inject(0) do |result, income|
                 frequency = income.frequency_kind
-                result += monthly_amount(frequency(frequency), income.amount.to_i)
+                result += annual_amount(frequency(frequency), income.amount.to_i)
                 result
               end
             end
@@ -316,7 +326,7 @@ module FinancialAssistance
                              "employer_funded_disability", "estate_trust", "foreign", "other", "prizes_and_awards"]
               applicant.incomes.where(:kind.in => other_kinds).inject(0) do |result, income|
                 frequency = income.frequency_kind
-                result += monthly_amount(frequency(frequency), income.amount.to_i)
+                result += annual_amount(frequency(frequency), income.amount.to_i)
                 result
               end
             end
@@ -327,7 +337,7 @@ module FinancialAssistance
                              "moving_expenses", "health_savings_account", "reservists_performing_artists_and_fee_basis_government_official_expenses"]
               applicant.deductions.where(:kind.in => other_kinds).inject(0) do |result, deduction|
                 frequency = deduction.frequency_kind
-                result += monthly_amount(frequency(frequency), deduction.amount.to_i)
+                result += annual_amount(frequency(frequency), deduction.amount.to_i)
                 result
               end
             end
@@ -335,7 +345,7 @@ module FinancialAssistance
             def deductible_part_of_self_employment_tax(applicant)
               applicant.deductions.where(kind: "deductable_part_of_self_employment_taxes").inject(0) do |result, deduction|
                 frequency = deduction.frequency_kind
-                result += monthly_amount(frequency(frequency), deduction.amount.to_i)
+                result += annual_amount(frequency(frequency), deduction.amount.to_i)
                 result
               end
             end
@@ -343,7 +353,7 @@ module FinancialAssistance
             def ira_deduction(applicant)
               applicant.deductions.where(kind: "ira_deduction").inject(0) do |result, deduction|
                 frequency = deduction.frequency_kind
-                result += monthly_amount(frequency(frequency), deduction.amount.to_i)
+                result += annual_amount(frequency(frequency), deduction.amount.to_i)
                 result
               end
             end
@@ -351,7 +361,7 @@ module FinancialAssistance
             def student_loan_interest_deduction(applicant)
               applicant.deductions.where(kind: "student_loan_interest").inject(0) do |result, deduction|
                 frequency = deduction.frequency_kind
-                result += monthly_amount(frequency(frequency), deduction.amount.to_i)
+                result += annual_amount(frequency(frequency), deduction.amount.to_i)
                 result
               end
             end
@@ -359,7 +369,7 @@ module FinancialAssistance
             def tution_and_fees(applicant)
               applicant.deductions.where(kind: "tuition_and_fees").inject(0) do |result, deduction|
                 frequency = deduction.frequency_kind
-                result += monthly_amount(frequency(frequency), deduction.amount.to_i)
+                result += annual_amount(frequency(frequency), deduction.amount.to_i)
                 result
               end
             end

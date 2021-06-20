@@ -382,7 +382,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     end
   end
 
-  context 'for relationships' do
+  context 'for claimed_as_tax_dependent_by' do
     let!(:person2) { FactoryBot.create(:person, hbx_id: "732021") }
     let!(:family_member2) { FactoryBot.create(:family_member, person: person2, family: family) }
     let!(:applicant2) do
@@ -448,6 +448,39 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       it 'should be able to successfully init Application Entity' do
         expect(@entity_init).to be_success
       end
+    end
+  end
+
+  context 'with job_income' do
+    let!(:create_job_income) do
+      inc = ::FinancialAssistance::Income.new({
+        kind: 'wages_and_salaries',
+        frequency_kind: 'yearly',
+        amount: 30000.00,
+        start_on: Date.today.prev_year,
+        employer_name: 'Testing employer',
+      })
+      applicant.incomes << inc
+      applicant.save!
+    end
+
+    before do
+      result = subject.call(application.reload)
+      @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+      @mitc_income = result.success[:applicants].first[:mitc_income]
+    end
+
+    it 'should be able to successfully init Application Entity' do
+      expect(@entity_init).to be_success
+    end
+
+    it 'should return mitc_income with amount populated' do
+      expect(@mitc_income[:amount]).not_to be_zero
+      expect(@mitc_income[:amount]).to eq(30_000.00)
+    end
+
+    it 'should return mitc_income with adjusted_gross_income populated' do
+      expect(@mitc_income[:adjusted_gross_income].to_f).not_to be_zero
     end
   end
 end
