@@ -1,5 +1,5 @@
 <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 row">
-  <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12 bottom-pd">
+  <div id="health-coverage-page" class="col-lg-9 col-md-9 col-sm-9 col-xs-12 bottom-pd">
 
     <div class="row">
       <div class="col-md-12">
@@ -32,12 +32,10 @@
         </div>
       </div>
     </div>
-    <br />
 
     <div class='benefit-kinds', id='enrolled-benefit-kinds'>
       <%= render partial: 'financial_assistance/benefits/insurance_kinds', locals: { insurance_kinds: FinancialAssistance::Benefit.valid_insurance_kinds, kind: "is_enrolled", text: "What type of coverage is this person currently enrolled in? *"} %>
     </div>
-    <br/>
 
     <!--is eligible driver question-->
     <div class="driver-question row row-form-wrapper radio-align no-buffer row-height fa-align-elements">
@@ -59,12 +57,10 @@
         </div>
       </div>
     </div>
-    <br />
 
     <div class='benefit-kinds', id='eligible-benefit-kinds'>
       <%= render partial: 'financial_assistance/benefits/insurance_kinds', locals: { insurance_kinds: FinancialAssistance::Benefit.valid_insurance_kinds, kind: "is_eligible", text: "What type of coverage does this person have access to?"} %>
     </div>
-    <br>
 
     <!--health_service_through_referral driver question-->
     <% if EnrollRegistry[:indian_health_service_question].feature.is_enabled %>
@@ -86,7 +82,7 @@
             </div>
           </div>
         </div>
-        <br><br>
+
         <div class="driver-question row row-form-wrapper radio-align no-buffer row-height fa-align-elements">
           <div class="col-md-6 labelforcoverage">
             <span class="fa-text-color"><%= l10n("faa.indian_health_service") %> *</span>
@@ -103,7 +99,6 @@
             <div class="col-md-6"></div>
           </div>
         </div>
-        <br>
       <% end %>
     <% end %>
 
@@ -146,7 +141,6 @@
           </div>
         </div>
       <% end %>
-      <br>
     <% end %>
 
     <!--is medicaid/cubcare driver question-->
@@ -170,7 +164,6 @@
           </div>
         </div>
       </div>
-      <br>
 
       <div class="driver-question row row-form-wrapper radio-align no-buffer row-height fa-align-elements" id='denied-medicaid'>
         <div class="col-md-10 labelforcoverage">
@@ -179,7 +172,6 @@
           <%= text_field_tag("medicaid_cubcare_due_on", @applicant.medicaid_cubcare_due_on, class: "jq-datepicker", placeholder: 'Select End Date', style: 'margin-left: 50px;', :'data-date-max' => "+0") %>
         </div>
       </div>
-      <br>
 
       <div class="driver-question row row-form-wrapper radio-align no-buffer row-height fa-align-elements" id="eligibility-change-question">
         <div class="col-md-6 labelforcoverage">
@@ -200,7 +192,6 @@
           </div>
         </div>
       </div>
-      <br>
 
       <div class="driver-question row row-form-wrapper radio-align no-buffer row-height fa-align-elements" id="household-income-size-changed">
         <div class="col-md-6 labelforcoverage">
@@ -221,7 +212,6 @@
           </div>
         </div>
       </div>
-      <br>
 
 
       <% status = @applicant.has_eligibility_changed == true ? "" : "hide" %>
@@ -231,10 +221,9 @@
           <%= text_field_tag("person_coverage_end_on", @applicant.person_coverage_end_on ,class: "jq-datepicker", placeholder: 'Select End Date', style: 'margin-left: 50px;') %>
         </div>
       </div>
-      <br />
     <% end %>
 
-    <% if @applicant.age_on(TimeKeeper.date_of_record) < 19 && FinancialAssistanceRegistry.feature_enabled?(:has_dependent_with_coverage) %>
+    <% if !(@applicant.age_on(TimeKeeper.date_of_record) < 19) && FinancialAssistanceRegistry.feature_enabled?(:has_dependent_with_coverage) %>
       <div class="driver-question row row-form-wrapper radio-align no-buffer row-height fa-align-elements">
         <div class="col-md-6 labelforcoverage">
           <span class="fa-text-color"><%=l10n("faa.has_dependent_with_coverage")%></span>
@@ -254,7 +243,6 @@
           </div>
         </div>
       </div>
-      <br />
 
       <div class="driver-question row row-form-wrapper radio-align no-buffer row-height fa-align-elements" id='denied-job-end-on'>
         <div class="col-md-10 labelforcoverage">
@@ -263,7 +251,6 @@
         </div>
       </div>
     <% end %>
-    <br />
 
     <div class="col-md-4 col-sm-4 col-xs-4">
       <%#= link_to "Add Health Coverage", new_application_applicant_benefit_path(@application, @applicant), class: "btn btn-default center-block" %>
