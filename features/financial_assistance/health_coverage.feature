@@ -104,7 +104,7 @@ Feature: Start a new Financial Assistance Application and answers questions on h
     And the user fills out the required hra form
     Then the save button should be enabled
     And the user saves the health coverage information
-    Then the health coverage should be saved on the page
+    Then the hra health coverage should be saved on the page
 
   Scenario: User enters hra information (currently have coverage)
     Given the user answers yes to currently having health coverage

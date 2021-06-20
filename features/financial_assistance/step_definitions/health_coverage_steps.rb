@@ -102,6 +102,11 @@ Then(/^the health coverage should be saved on the page$/) do
   expect(page).to have_content '02/01/2018'
 end
 
+Then(/^the hra health coverage should be saved on the page$/) do
+  expect(page).to have_content 'Type of HRA'
+  expect(page).to have_content 'Individual coverage HRA'
+end
+
 Then(/^the health coverage checkbox should be unchecked$/) do
   expect(find(:css, "#insurance_kind[value='acf_refugee_medical_assistance']")).not_to be_checked
 end
