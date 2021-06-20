@@ -216,7 +216,7 @@ module FinancialAssistance
       if FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible).item
         'Does this person currently have access to other health coverage that they are not enrolled in, including coverage they could get through another person? *'
       elsif FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible_with_hra).item
-        'Does this person currently have access to health coverage or a Health Reimbursement arrangement that they are not enrolled in (including through another person, like a spouse or parent)? *'
+        'Does this person currently have access to health coverage or a Health Reimbursement Arrangement that they are not enrolled in (including through another person, like a spouse or parent)? *'
       else
         ''
       end
