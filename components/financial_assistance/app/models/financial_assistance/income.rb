@@ -62,7 +62,7 @@ module FinancialAssistance
       foreign: 'Foreign income',
       other: 'Other taxable income',
       prizes_and_awards: FinancialAssistanceRegistry[:prize_and_awards].setting(:gamble_prize).item ? 'Gambling, prizes or awards' : 'Prizes and awards',
-      scholorship_payments: 'Taxable scholarship payments'
+      scholarship_payments: 'Taxable scholarship payments'
     }.freeze
 
 
