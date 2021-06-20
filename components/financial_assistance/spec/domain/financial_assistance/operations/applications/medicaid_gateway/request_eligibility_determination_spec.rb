@@ -86,17 +86,5 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
         expect(@result.failure).to eq('Application is in draft state. Please submit application.')
       end
     end
-
-    context 'invalid applicant for publish context' do
-      before do
-        applicant.update_attributes!(citizen_status: nil)
-        @result = subject.call({application_id: application.id})
-      end
-
-      it 'should return a failure with error message' do
-        err = { applicants: { 0 => { citizenship_immigration_status_information: { citizen_status: ['must be filled'] } } } }
-        expect(@result.failure.errors.to_h).to eq(err)
-      end
-    end
   end
 end
