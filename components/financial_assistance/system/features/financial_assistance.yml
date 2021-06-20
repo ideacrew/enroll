@@ -15,9 +15,9 @@ registry:
         is_enabled: true
         settings:
           - key: :abbreviation
-            item: 'DC'
+            item: 'ME'
           - key: :name
-            item: 'District of Columbia'
+            item: 'Maine Cover ME'
       - key: :consumer_validations
         is_enabled: true
   - namespace:
