@@ -6,24 +6,42 @@ module Subscribers
     include EventSource::Logging
     include ::EventSource::Subscriber[amqp: 'magi_medicaid.mitc.eligibilities']
 
+    # event_source branch: release_0.5.2
+    # subscribe(:on_magi_medicaid_mitc_eligibilities) do |delivery_info, _metadata, response|
+    #   logger.info "DeterminationSubscriber: invoked on_magi_medicaid_mitc_eligibilities with #{delivery_info}"
+
+    #   payload = JSON.parse(response, :symbolize_names => true)
+    #   result = FinancialAssistance::Operations::Applications::MedicaidGateway::AddEligibilityDetermination.new.call(payload)
+
+    #   if result.success?
+    #     ack(delivery_info.delivery_tag)
+    #     logger.info 'DeterminationSubscriber: acked with success from operation'
+    #   else
+    #     errors = result.failure.errors.to_h
+    #     nack(delivery_info.delivery_tag)
+    #     logger.info "DeterminationSubscriber: nacked due to:#{errors} with failure from operation"
+    #   end
+
+    # rescue StandardError => e
+    #   nack(delivery_info.delivery_tag)
+    #   logger.info "DeterminationSubscriber error: #{e.backtrace}"
+    # end
+
     subscribe(:on_magi_medicaid_mitc_eligibilities) do |delivery_info, _metadata, response|
-      logger.info "DeterminationSubscriber: invoked on_magi_medicaid_mitc_eligibilities with #{delivery_info}"
+      logger.info "invoked on_magi_medicaid_mitc_eligibilities with #{delivery_info}"
 
       payload = JSON.parse(response, :symbolize_names => true)
       result = FinancialAssistance::Operations::Applications::MedicaidGateway::AddEligibilityDetermination.new.call(payload)
 
-      if result.success?
-        ack(delivery_info.delivery_tag)
-        logger.info 'DeterminationSubscriber: acked with success from operation'
-      else
-        errors = result.failure.errors.to_h
-        nack(delivery_info.delivery_tag)
-        logger.info "DeterminationSubscriber: nacked due to:#{errors} with failure from operation"
-      end
+      message = if result.success?
+                  result.success
+                else
+                  result.failure
+                end
 
+      logger.info "enroll_determination_subscriber_message: #{message}"
     rescue StandardError => e
-      nack(delivery_info.delivery_tag)
-      logger.info "DeterminationSubscriber error: #{e.backtrace}"
+      logger.info "enroll_determination_subscriber_error: #{e.backtrace}"
     end
 
     # subscribe(:on_determined_aptc_eligible) do |delivery_info, _metadata, response|
