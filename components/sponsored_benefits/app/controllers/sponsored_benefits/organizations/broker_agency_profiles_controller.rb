@@ -8,7 +8,8 @@ module SponsoredBenefits
 
     def employers
       # This should be index action in plan design organizations controller
-      head :bad_request unless is_shop_or_fehb_market_enabled?
+      Rails.logger.warn("Attempted to access employers with no profile present.") if @profile.blank?
+      head :bad_request unless is_shop_or_fehb_market_enabled? && @profile.present?
       @datatable = klass.new(profile_id: @profile._id)
     end
 
