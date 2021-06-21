@@ -299,6 +299,7 @@ end
 
 Then(/^.+ is on the Help Paying for Coverage page/) do
   expect(page).to have_content IvlIapHelpPayingForCoverage.your_application_for_premium_reductions_text
+  expect(find('.pb-1')).to_not be(nil) if EnrollRegistry[:mainecare_cubcare_glossary].enabled?
 end
 
 Then(/^.+ does not apply for assistance and clicks continue/) do
