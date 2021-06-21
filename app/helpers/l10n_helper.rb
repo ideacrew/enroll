@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module L10nHelper
+  include ActionView::Helpers::TranslationHelper
   def l10n(translation_key, interpolated_keys = {})
     Rails.logger.error {"#L10nHelper passed non string key: #{translation_key.inspect}"} unless translation_key.is_a?(String)
     return "Translation Missing" unless translation_key.is_a?(String)

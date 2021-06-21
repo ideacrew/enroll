@@ -3,6 +3,7 @@
 class Insured::FamilyMembersController < ApplicationController
   include VlpDoc
   include ApplicationHelper
+  include ::L10nHelper
 
   before_action :dependent_person_params, only: [:create, :update]
   before_action :set_current_person, :set_family
@@ -19,7 +20,8 @@ class Insured::FamilyMembersController < ApplicationController
       @type = "resident"
       @resident_role = ResidentRole.find(params[:resident_role_id])
       @family.hire_broker_agency(current_user.person.broker_role.try(:id))
-      redirect_to resident_index_insured_family_members_path(:resident_role_id => @person.resident_role.id, :change_plan => params[:change_plan], :qle_date => params[:qle_date], :qle_id => params[:qle_id], :effective_on_kind => params[:effective_on_kind], :qle_reason_choice => params[:qle_reason_choice], :commit => params[:commit])
+      redirect_to resident_index_insured_family_members_path(:resident_role_id => @person.resident_role.id, :change_plan => params[:change_plan], :qle_date => params[:qle_date], :qle_id => params[:qle_id],
+                                                             :effective_on_kind => params[:effective_on_kind], :qle_reason_choice => params[:qle_reason_choice], :commit => params[:commit])
     end
 
     if @type == "employee"
@@ -70,7 +72,6 @@ class Insured::FamilyMembersController < ApplicationController
 
   def create
     @dependent = ::Forms::FamilyMember.new(params[:dependent])
-
     @address_errors = validate_address_params(params)
     if Family.find(@dependent.family_id).primary_applicant.person.resident_role?
       if @address_errors.blank? && @dependent.save
@@ -275,6 +276,7 @@ class Insured::FamilyMembersController < ApplicationController
 
     errors_array = []
     clean_address_params = params[:dependent][:addresses]&.reject{ |_key, value| value[:address_1].blank? && value[:city].blank? && value[:state].blank? && value[:zip].blank? }
+    return [] if clean_address_params.blank?
     param_indexes = clean_address_params.keys.compact
     param_indexes.each do |param_index|
       permitted_address_params = clean_address_params.require(param_index).permit(:address_1, :address_2, :city, :kind, :state, :zip)
