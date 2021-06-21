@@ -6,6 +6,7 @@ end
 
 Then(/^they visit the Health Coverage page via the left nav \(also confirm they are on the Health Coverage page\)$/) do
   visit financial_assistance.application_applicant_benefits_path(application.id, application.primary_applicant.id)
+  expect(find("#health-coverage-page")).to_not be(nil)
 end
 
 Given(/^the user answers no to currently having health coverage$/) do
