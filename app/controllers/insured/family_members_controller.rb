@@ -8,7 +8,6 @@ class Insured::FamilyMembersController < ApplicationController
   before_action :dependent_person_params, only: [:create, :update]
   before_action :set_current_person, :set_family
   before_action :set_dependent, only: [:destroy, :show, :edit, :update]
-  before_action :verify_unique_dependent, only: [:create]
 
   rescue_from ActionController::InvalidAuthenticityToken, :with => :bad_token_due_to_session_expired
 
@@ -72,6 +71,7 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   def create
+    @dependent = ::Forms::FamilyMember.new(params[:dependent])
     @address_errors = validate_address_params(params)
     if Family.find(@dependent.family_id).primary_applicant.person.resident_role?
       if @address_errors.blank? && @dependent.save

@@ -236,15 +236,16 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
       let(:test_person) { FactoryBot.create(:person, :with_nuclear_family) }
       let(:duplicate_test_family) { test_person.primary_family }
       let(:target_dependent) do
-        duplicate_test_family.family_members.where(is_primary_applicant: false).first
+        duplicate_test_family.dependents.detect { |dependent| dependent.relationship == 'child' }
       end
       let(:duplicate_dependent_attributes) do
         {
           dependent: {
-            id: target_dependent.id,
             family_id: duplicate_test_family.id,
             first_name: target_dependent.first_name,
             last_name: target_dependent.last_name,
+            relationship: target_dependent.relationship,
+            gender: target_dependent.gender,
             dob: "#{target_dependent.dob.year}-#{target_dependent.dob.month}-#{target_dependent.dob.day}"
           }
         }
@@ -259,13 +260,12 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
       end
 
       it "should redirect to families home after detecting duplicate dependent" do
-        expect(response).to redirect_to(insured_family_members_path)
         alert_message = l10n(
           'insured.family_members.duplicate_error_message',
           action: "add",
           contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item
         )
-        expect(flash[:alert]).to eq(alert_message)
+        expect(assigns(:dependent).errors[:base]).to include(alert_message)
       end
     end
 
