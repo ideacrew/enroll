@@ -23,7 +23,7 @@ module Subscribers
       end
     rescue StandardError => e
       nack(delivery_info.delivery_tag)
-      logger.error "Enroll: enroll_document_meta_data_subscriber_error: #{e.backtrace} for payload: #{payload}"
+      logger.error "Enroll: enroll_document_meta_data_subscriber_error: #{e.backtrace}"
     end
   end
 end
