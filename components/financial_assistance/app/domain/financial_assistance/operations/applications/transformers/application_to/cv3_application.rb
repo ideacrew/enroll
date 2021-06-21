@@ -503,7 +503,7 @@ module FinancialAssistance
                             is_esi_waiting_period: benefit.is_esi_waiting_period.present?,
                             is_esi_mec_met: benefit.is_esi_mec_met.present?,
                             employee_cost: benefit.employee_cost,
-                            employee_cost_frequency: benefit.employee_cost_frequency,
+                            employee_cost_frequency: frequency(benefit.employee_cost_frequency),
                             start_on: benefit.start_on,
                             end_on: benefit.end_on,
                             submitted_at: benefit.submitted_at,
