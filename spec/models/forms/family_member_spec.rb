@@ -424,11 +424,27 @@ describe "checking validations on family member object" do
       end
     end
 
-    context "when user answered us citizen as false" do
-      subject { Forms::FamilyMember.new(member_attributes.merge({:family_id => family_id, "us_citizen" => "false"})) }
+    context "when user answered us citizen as false and immigration_status_question is required" do
+      before do
+        EnrollRegistry[:immigration_status_question_required].stub(:item).and_return(true)
+      end
+
+      subject { Forms::FamilyMember.new(member_attributes.merge({:family_id => family_id, "us_citizen"=>"false"})) }
       it "should return errors with Eligible immigration, native american / alaska native and incarceration status" do
         subject.save
         expect(subject.errors.full_messages).to eq ["Eligible immigration status is required", "native american / alaska native status is required", "Incarceration status is required"]
+      end
+    end
+
+    context "when user answered us citizen as false and immigration_status_question is not required" do
+      before do
+        EnrollRegistry[:immigration_status_question_required].stub(:item).and_return(false)
+      end
+
+      subject { Forms::FamilyMember.new(member_attributes.merge({:family_id => family_id, "us_citizen" => "false"})) }
+      it "should return errors with Eligible immigration, native american / alaska native and incarceration status" do
+        subject.save
+        expect(subject.errors.full_messages).to eq ["native american / alaska native status is required", "Incarceration status is required"]
       end
     end
   end

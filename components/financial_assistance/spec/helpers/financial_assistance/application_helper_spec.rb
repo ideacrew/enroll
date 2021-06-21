@@ -150,7 +150,7 @@ RSpec.describe ::FinancialAssistance::ApplicationHelper, :type => :helper, dbcle
       end
 
       it 'should return hra text' do
-        expect(@result).to eq 'Does this person currently have access to health coverage or a Health Reimbursement arrangement that they are not enrolled in (including through another person, like a spouse or parent)? *'
+        expect(@result).to eq 'Does this person currently have access to health coverage or a Health Reimbursement Arrangement that they are not enrolled in (including through another person, like a spouse or parent)? *'
       end
     end
 
