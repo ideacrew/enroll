@@ -106,11 +106,11 @@ RSpec.describe TimeHelper, :type => :helper, dbclean: :after_each do
       it "returns minimum range as start_date of plan_year" do
         plan_year.update_attributes(effective_period: (TimeKeeper.date_of_record - 1.month)..(TimeKeeper.date_of_record - 1.month + 1.year - 1.day))
         census_employee.reload
-        expect(helper.sep_optional_date(family, 'min')).to eq(plan_year.start_on)
+        expect(helper.sep_optional_date(family, 'min', nil, plan_year.start_on)).to eq(plan_year.start_on)
       end
 
       it "returns maximum range as end_date of plan_year" do
-        expect(helper.sep_optional_date(family, 'max')).to eq(plan_year.end_on)
+        expect(helper.sep_optional_date(family, 'max', nil, plan_year.start_on)).to eq(plan_year.end_on)
       end
     end
 
@@ -238,19 +238,19 @@ RSpec.describe TimeHelper, :type => :helper, dbclean: :after_each do
       end
 
       it "returns minmum range as start_date of plan_year when market kind is shop" do
-        expect(helper.sep_optional_date(family, 'min', 'shop')).to eq(plan_year.start_on)
+        expect(helper.sep_optional_date(family, 'min', 'shop', plan_year.start_on)).to eq(plan_year.start_on)
       end
 
       it "returns maximum range as end_date of plan_year when market kind is shop" do
-        expect(helper.sep_optional_date(family, 'max', 'shop')).to eq(plan_year.end_on)
+        expect(helper.sep_optional_date(family, 'max', 'shop', plan_year.start_on)).to eq(plan_year.end_on)
       end
 
       it "returns minmum range as start_date of plan_year when market kind is shop" do
-        expect(helper.sep_optional_date(family, 'min', 'fehb')).to eq(plan_year.start_on)
+        expect(helper.sep_optional_date(family, 'min', 'fehb', plan_year.start_on)).to eq(plan_year.start_on)
       end
 
       it "returns maximum range as end_date of plan_year when market kind is shop" do
-        expect(helper.sep_optional_date(family, 'max', 'fehb')).to eq(plan_year.end_on)
+        expect(helper.sep_optional_date(family, 'max', 'fehb', plan_year.start_on)).to eq(plan_year.end_on)
       end
 
       it "returns minimum range as nil when market kind is nil" do
