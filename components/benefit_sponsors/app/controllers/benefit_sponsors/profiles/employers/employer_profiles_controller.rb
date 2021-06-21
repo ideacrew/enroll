@@ -102,7 +102,8 @@ module BenefitSponsors
         end
 
         def show_invoice
-          return unless @invoice.present?
+          redirect_to(profiles_employers_employer_profile_path(@employer_profile.id, tab: 'accounts')) if @invoice.blank? || params[:invoice_id].blank?
+          Railss.logger.warn("Attempted to open invoice without invoice and/or invoice ID present.") if @invoice.blank? || params[:invoice_id].blank?
 
           options = {}
           options[:filename] = @invoice.title
