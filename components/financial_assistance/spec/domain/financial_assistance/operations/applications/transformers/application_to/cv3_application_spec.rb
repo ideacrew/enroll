@@ -487,4 +487,53 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       expect(@mitc_income[:adjusted_gross_income].to_f).not_to be_zero
     end
   end
+
+  context 'with an esi benefit' do
+    let!(:create_esi_benefit) do
+      emp_add = FinancialAssistance::Locations::Address.new({
+        :address_1=>"123",
+        :kind=>"work",
+        :city=>"was",
+        :state=>"DC",
+        :zip=>"21312",
+      })
+      emp_phone = FinancialAssistance::Locations::Phone.new({
+        :kind=>"work",
+        :area_code=>"131",
+        :number=>"2323212",
+        :full_phone_number=>"1312323212",
+      })
+      benefit = ::FinancialAssistance::Benefit.new({
+        :employee_cost=> 500.00,
+        :employer_id=>"12-2132133",
+        :kind=>"is_enrolled",
+        :insurance_kind=>"employer_sponsored_insurance",
+        :employer_name=>"er1",
+        :is_esi_waiting_period=>false,
+        :is_esi_mec_met=>true,
+        :esi_covered=>"self",
+        :start_on=> Date.today.prev_year.beginning_of_month,
+        :end_on=>nil,
+        :employee_cost_frequency=>"monthly"
+      })
+      benefit.employer_address = emp_add
+      benefit.employer_phone = emp_phone
+      applicant.benefits << benefit
+      applicant.save!
+    end
+
+    before do
+      result = subject.call(application.reload)
+      @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+      @benefit = result.success[:applicants].first[:benefits].first
+    end
+
+    it 'should be able to successfully init Application Entity' do
+      expect(@entity_init).to be_success
+    end
+
+    it 'should be able to successfully transform employee_cost_frequency' do
+      expect(@benefit[:employee_cost_frequency]).to eq('Monthly')
+    end
+  end
 end
