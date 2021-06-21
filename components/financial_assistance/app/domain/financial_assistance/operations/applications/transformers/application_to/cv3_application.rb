@@ -13,7 +13,7 @@ module FinancialAssistance
           class Cv3Application # rubocop:disable Metrics/ClassLength
             # constructs cv3 payload for medicaid gateway.
 
-            send(:include, Dry::Monads[:result, :do])
+            include Dry::Monads[:result, :do]
             include Acapi::Notifiers
             require 'securerandom'
 

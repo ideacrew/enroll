@@ -85,6 +85,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       it 'should not return nil for is_renewal_authorized' do
         expect(@application[:is_renewal_authorized]).not_to be_nil
       end
+
+      it 'should return state abbreviation for us_state & cannot be nil' do
+        expect(@application[:us_state]).not_to be_nil
+      end
     end
 
     context 'applicant' do
