@@ -38,7 +38,7 @@ module FinancialAssistance
           @assistance_year_end = @assistance_year_start.end_of_year
 
           total_annual_income = calculate_total_annual_income(params[:applicant])
-          total_deductions = calculate_total_deductions_income(params[:applicant])
+          total_deductions = calculate_total_deductions(params[:applicant])
 
           Success(total_annual_income - total_deductions)
         end
@@ -51,7 +51,7 @@ module FinancialAssistance
           end
         end
 
-        def calculate_total_deductions_income(applicant)
+        def calculate_total_deductions(applicant)
           return Success(BigDecimal('0')) unless applicant.deductions
 
           applicant.deductions.inject(BigDecimal('0')) do |total, deduction|
@@ -67,7 +67,7 @@ module FinancialAssistance
         end
 
         def compute_annual_income(income, income_start_date, income_end_date)
-          income_per_day = annual_employee_cost(income.frequency_kind, income.amount)
+          income_per_day = daily_employee_income(income.frequency_kind, income.amount)
           ((income_end_date.yday - income_start_date.yday + 1) * income_per_day).round(2)
         end
 
@@ -93,7 +93,7 @@ module FinancialAssistance
           Success(applicant)
         end
 
-        def annual_employee_cost(employee_cost_frequency, employee_cost)
+        def daily_employee_income(employee_cost_frequency, employee_cost)
           no_of_days = @assistance_year_end.yday
           annual_amnt =  case employee_cost_frequency
                          when 'weekly' then (employee_cost * 52)
@@ -106,7 +106,7 @@ module FinancialAssistance
                          else 0
                          end
 
-          income_per_day = annual_amnt / no_of_days
+          income_per_day = annual_amnt.to_f / no_of_days
           BigDecimal(income_per_day.to_s)
         end
       end
