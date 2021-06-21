@@ -32,7 +32,6 @@ fieldset.mt-2
         .invalid-feedback
           |
             Please provide a fein.
-
     = if f&.object&.profile
       = f.fields_for :profile, f.object.profile, errors: {}, fieldset: false do |f_profile|
         .col-md-4.pl-0
