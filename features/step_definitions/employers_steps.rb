@@ -443,7 +443,7 @@ end
 
 When(/^.+ go(?:es)? to the benefits tab$/) do
   find(EmployerHomePage.benefits_link).click
-  sleep 5
+  wait: 5
 end
 
 Then(/^.+ should see the plan year$/) do
@@ -452,7 +452,7 @@ end
 
 When(/^.+ clicks? on publish plan year$/) do
   find('.interaction-click-control-publish-plan-year').click
-  sleep 2
+  wait: 2
 end
 
 Then(/^.+ should see Action Needed button/) do
@@ -610,7 +610,7 @@ end
 
 And /^employer clicked on continue button$/ do
   find(EmployerAddBenefitPackage.continue_btn).click
-  sleep 5
+  wait: 5
 end
 
 Then(/^employer should see form for benefit application and benefit package$/) do
