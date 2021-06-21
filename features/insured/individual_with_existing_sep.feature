@@ -6,7 +6,7 @@ Feature: Consumer shops for plan with existing seps
     Given there exists Patrick Doe with active individual market role and verified identity
     And Patrick Doe logged into the consumer portal
     When Patrick Doe click the "Married" in qle carousel
-    And Patrick Doe select a past qle date
+    And Patrick Doe selects a past qle date
     When Patrick Doe clicks continue from qle
     Then Patrick Doe should see family members page and clicks continue
     And Patrick Doe should see the group selection page

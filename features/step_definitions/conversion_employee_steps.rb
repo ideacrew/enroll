@@ -270,6 +270,16 @@ Then(/(.*) should see the receipt page with renewing plan year start date as eff
   end
 end
 
+When(/Employee select a past qle date/) do
+  expect(page).to have_content "Married"
+  # screenshot("past_qle_date")
+  date = [renewal_effective_date - 5.days, TimeKeeper.date_of_record - 5.days].min
+  fill_in "qle_date", :with => date.strftime("%m/%d/%Y")
+  within '#qle-date-chose' do
+    find('.interaction-click-control-continue').click
+  end
+end
+
 When(/Employee select a current qle date/) do
   expect(page).to have_content "Married"
   # screenshot("past_qle_date")

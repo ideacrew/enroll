@@ -46,7 +46,7 @@ Then(/(.*) should see family members page and clicks continue/) do |_name|
   find('#dependent_buttons .interaction-click-control-continue', :wait => 5).click
 end
 
-When(/^(.*) select a past qle date$/) do |_name|
+When(/^(.*) selects a past qle date$/) do |_name|
   expect(page).to have_content "Married"
   fill_in "qle_date", :with => (TimeKeeper.date_of_record - 5.days).strftime("%m/%d/%Y")
   click_link((TimeKeeper.date_of_record - 5.days).day)
