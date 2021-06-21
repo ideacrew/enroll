@@ -42,7 +42,6 @@ registry:
       - key: :apply_aggregate_to_enrollment
         item: Operations::Individual::ApplyAggregateToEnrollment.new
         is_enabled: true
-<<<<<<< HEAD
       - key: :vlp_documents
         is_enabled: true
         settings:
@@ -52,7 +51,6 @@ registry:
                     "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport", "Unexpired Foreign Passport",
                     "I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)", "DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)",
                     "Other (With Alien Number)", "Other (With I-94 Number)" ]
-=======
 
   - namespace:
     - :enroll_app
@@ -62,4 +60,3 @@ registry:
       - key: :immigration_status_question_required
         item: true
         is_enabled: true
->>>>>>> 1380b5642a (enable or disbale immigration status validation check based on settings)
