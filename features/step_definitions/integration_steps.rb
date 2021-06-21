@@ -1023,10 +1023,6 @@ When(/^.+ clicks? on the tab for (.+)$/) do |tab_name|
   scroll_then_click(@browser.element(class: /interaction-click-control-#{tab_name}/))
 end
 
-When(/^I click the "(.*?)" in qle carousel$/) do |qle_event|
-  click_link "#{qle_event}"
-end
-
 When(/^I click on "(.*?)" button on household info page$/) do |select_action|
   click_link "Continue"
   sleep 5
@@ -1050,16 +1046,6 @@ end
 Then(/^I should see not qualify message$/) do
   expect(page).to have_content "The date you submitted does not qualify for special enrollment"
   # screenshot("not_qualify")
-end
-
-When(/^I select a past qle date$/) do
-  expect(page).to have_content "Married"
-  # screenshot("past_qle_date")
-  fill_in "qle_date", :with => (TimeKeeper.date_of_record - 5.days).strftime("%m/%d/%Y")
-  click_link((TimeKeeper.date_of_record - 5.days).day)
-  within '#qle-date-chose' do
-    click_link "CONTINUE"
-  end
 end
 
 Then(/^I should see confirmation and continue$/) do
