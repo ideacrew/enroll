@@ -356,7 +356,7 @@ registry:
           - key: :days
             item: 60
       - key: :immigration_status_checkbox
-        is_enabled: false
+        is_enabled: true
       - key: :gender_to_sex
         is_enabled: true
       - key: :mainecare_cubcare_glossary
