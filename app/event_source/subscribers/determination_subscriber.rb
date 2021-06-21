@@ -7,20 +7,23 @@ module Subscribers
     include ::EventSource::Subscriber[amqp: 'magi_medicaid.mitc.eligibilities']
 
     subscribe(:on_magi_medicaid_mitc_eligibilities) do |delivery_info, _metadata, response|
-      logger.info "invoked on_magi_medicaid_mitc_eligibilities with #{delivery_info}"
+      logger.info "DeterminationSubscriber: invoked on_magi_medicaid_mitc_eligibilities with #{delivery_info}"
 
       payload = JSON.parse(response, :symbolize_names => true)
       result = FinancialAssistance::Operations::Applications::MedicaidGateway::AddEligibilityDetermination.new.call(payload)
 
-      message = if result.success?
-                  result.success
-                else
-                  result.failure
-                end
+      if result.success?
+        ack(delivery_info.delivery_tag)
+        logger.info 'DeterminationSubscriber: acked with success from operation'
+      else
+        errors = result.failure.errors.to_h
+        nack(delivery_info.delivery_tag)
+        logger.info "DeterminationSubscriber: nacked due to:#{errors} with failure from operation"
+      end
 
-      logger.info "enroll_determination_subscriber_message: #{message}"
     rescue StandardError => e
-      logger.info "enroll_determination_subscriber_error: #{e.backtrace}"
+      nack(delivery_info.delivery_tag)
+      logger.info "DeterminationSubscriber error: #{e.backtrace}"
     end
 
     # subscribe(:on_determined_aptc_eligible) do |delivery_info, _metadata, response|

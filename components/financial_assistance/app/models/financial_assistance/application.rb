@@ -873,8 +873,9 @@ module FinancialAssistance
       write_attribute(:is_ridp_verified, true)
     end
 
+    # TODO Check if we have to fall back to FinancialAssistanceRegistry.
     def set_us_state
-      write_attribute(:us_state, FinancialAssistanceRegistry[:us_state].setting(:abbreviation).item)
+      write_attribute(:us_state, ::EnrollRegistry[:enroll_app].setting(:state_abbreviation).item)
     end
 
     def set_submission_date
