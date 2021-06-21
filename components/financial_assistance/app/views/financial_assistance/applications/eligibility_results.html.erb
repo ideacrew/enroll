@@ -58,7 +58,6 @@
               <%  unless any_csr_ineligible_applicants?(params[:id]) %>
                 <p class="mt-10 mb-0">
                   <%= l10n("faa.qualify_for_lower_costs_1") %>
-                  <%= render partial:'shared/glossary', locals: {key: 'Out_of_Pocket_Costs', title: 'Out-of-Pocket Costs', term: 'out-of-pocket costs' } %>
                   <%= l10n("faa.silver_plan_checkmark") %>
                   <i class="fa fa-check-square-o col-green" aria-hidden="true"></i>
                   <%= l10n("faa.qualify_for_lower_costs_2") %>
