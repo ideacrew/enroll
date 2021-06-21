@@ -15,11 +15,15 @@ module Subscribers
       result = Operations::Documents::Create.new.call(resource: family&.primary_person, document_params: payload, doc_identifier: payload[:id])
 
       if result.success?
+        ack(delivery_info.delivery_tag)
         logger.info "enroll_document_meta_data_subscriber_info Result: #{result.success} for payload: #{payload}"
       else
-        logger.error "enroll_document_meta_data_subscriber_error: #{result.failure} for payload: #{payload}"
+        errors = result.failure.errors.to_h
+        nack(delivery_info.delivery_tag)
+        logger.info "enroll_document_meta_data_subscriber_error: #{errors} for payload: #{payload}"
       end
     rescue StandardError => e
+      nack(delivery_info.delivery_tag)
       logger.error "enroll_document_meta_data_subscriber_error: #{e.backtrace}"
     end
   end
