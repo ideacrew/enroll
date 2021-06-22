@@ -564,4 +564,25 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       expect(@benefit.annual_employee_cost).to eq(0)
     end
   end
+
+  context 'applicant with vlp_document' do
+    let!(:vlp_applicant) do
+      vlp_params = {
+        vlp_subject: 'I-551 (Permanent Resident Card)',
+        alien_number: '123456789',
+        card_number: 'abg1234567890',
+        expiration_date: nil
+      }
+      applicant.update_attributes!(vlp_params)
+    end
+
+    before do
+      result = subject.call(application.reload)
+      @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+    end
+
+    it 'should be able to successfully init Application Entity' do
+      expect(@entity_init).to be_success
+    end
+  end
 end
