@@ -536,4 +536,30 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       expect(@benefit[:employee_cost_frequency]).to eq('Monthly')
     end
   end
+
+  context 'with peace_corps_health_benefits benefit' do
+    let!(:create_esi_benefit) do
+      benefit = ::FinancialAssistance::Benefit.new({
+        kind: 'is_enrolled',
+        insurance_kind: 'peace_corps_health_benefits',
+        start_on: Date.today.prev_year
+      })
+      applicant.benefits << benefit
+      applicant.save!
+    end
+
+    before do
+      result = subject.call(application.reload)
+      @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+      @benefit = @entity_init.success.applicants.first.benefits.first
+    end
+
+    it 'should be able to successfully init Application Entity' do
+      expect(@entity_init).to be_success
+    end
+
+    it 'should not raise error' do
+      expect(@benefit.annual_employee_cost).to eq(0)
+    end
+  end
 end
