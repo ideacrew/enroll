@@ -99,7 +99,7 @@ module Operations
       def update_existing_service_area(service_area, issuer_provided_title, county_zip_ids)
         service_area.issuer_provided_title = issuer_provided_title
         service_area.county_zip_ids += county_zip_ids
-        service_area.county_zip_ids.uniq!
+        service_area.county_zip_ids.flatten.uniq!
         service_area.save!
       end
 
