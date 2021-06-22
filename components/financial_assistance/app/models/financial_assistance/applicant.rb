@@ -230,6 +230,7 @@ module FinancialAssistance
     field :has_enrolled_health_coverage, type: Boolean
     field :has_eligible_health_coverage, type: Boolean
 
+    # if eligible immigration status
     field :medicaid_chip_ineligible, type: Boolean
     field :immigration_status_changed, type: Boolean
     # if member of tribe
@@ -246,6 +247,7 @@ module FinancialAssistance
 
     field :has_dependent_with_coverage, type: Boolean
     field :dependent_job_end_on, type: Date
+    field :is_eligible_for_non_magi_reasons, type: Boolean
 
     field :workflow, type: Hash, default: { }
 

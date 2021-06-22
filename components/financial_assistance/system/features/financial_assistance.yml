@@ -17,8 +17,13 @@ registry:
           - key: :abbreviation
             item: 'ME'
           - key: :name
-            item: 'Maine Cover ME'
+            item: 'District of Columbia'
       - key: :consumer_validations
+        is_enabled: true
+  - namespace:
+    - :eligibility_results
+    features:
+      - key: :non_magi_referral_display
         is_enabled: true
   - namespace:
     - :enrollment_dates
@@ -93,7 +98,7 @@ registry:
       is_enabled: true
       settings:
         - key: :medicaid_chip
-          item: "MaineCare (Medicaid)"
+          item: "Medicaid"
     - key: :net_annual_income_display
       is_enabled: true
     - key: :has_dependent_with_coverage
@@ -152,6 +157,11 @@ registry:
       is_enabled: true
     - key: :other_limited_benefit_coverage # new
       is_enabled: true
+    - key: :prize_and_awards
+      is_enabled: true
+      settings:
+        - key: :gamble_prize
+          item: true
   - namespace:
     - :request_determination
     features:

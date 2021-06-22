@@ -31,6 +31,7 @@ module Forms
     validates_presence_of :dob
     validates_inclusion_of :relationship, :in => RELATIONSHIPS.uniq, :allow_blank => nil, message: ""
     validate :relationship_validation
+    validate :verify_unique_dependent
     validate :consumer_fields_validation
     validate :ssn_validation
 
@@ -116,7 +117,7 @@ module Forms
             "Cannot remove the duplicate members as they are present on enrollments/tax households." \
             " Issue occurs on person HBX_ID #{existing_person.hbx_id} from Family with ID #{family.id}."
           )
-          return [false, l10n('insured.family_members.duplicate_error_message', contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item)]
+          return [false, l10n('insured.family_members.duplicate_error_message', action: "remove", contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item)]
         else
           family.remove_duplicate_members(duplicate_family_member_ids)
           family.reload
@@ -328,6 +329,32 @@ module Forms
       end
     end
 
+    # TODO: This may have to also be in the family member model someday. Or applicant model,
+    # in the financial assistance engine. Who knows.
+    def verify_unique_dependent
+      # Only run on create
+      return if self.persisted?
+      return if family.blank? || family.family_members.blank?
+      new_dependent = self
+      # Don't use SSN in case there is no SSN
+      potential_duplicate_present = family.family_members.any? do |family_member|
+        family_member&.first_name == new_dependent.first_name &&
+          family_member&.last_name == new_dependent.last_name &&
+          family_member&.dob == new_dependent.dob
+      end
+      # Disabling rubocop because it seems like a guard clause changes behavior
+      # rubocop:disable Style/GuardClause
+      if potential_duplicate_present
+        # Manage Family Page Redirect
+        duplicate_message = l10n(
+          'insured.family_members.duplicate_error_message',
+          action: "add",
+          contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item
+        )
+        self.errors.add(:base, duplicate_message)
+      end
+      # rubocop:enable Style/GuardClause
+    end
 
     def relationship_validation
       return if family.blank? || family.family_members.blank?
@@ -341,3 +368,4 @@ module Forms
     end
   end
 end
+

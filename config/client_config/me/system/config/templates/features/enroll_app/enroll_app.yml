@@ -242,6 +242,8 @@ registry:
             item: ['']
           - key: :plan_year_tooltip
             item: ""
+          - key: :medicaid_agency_phone
+            item: "(000) 000-0000"
       - key: :rating_area
         item: :rating_area
         is_enabled: false
@@ -350,3 +352,9 @@ registry:
         settings:
           - key: :days
             item: 60
+      - key: :immigration_status_checkbox
+        is_enabled: true
+      - key: :gender_to_sex
+        is_enabled: true
+      - key: :mainecare_cubcare_glossary
+        is_enabled: true

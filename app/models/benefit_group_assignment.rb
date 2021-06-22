@@ -109,14 +109,17 @@ class BenefitGroupAssignment
 
     def filter_assignments_with_no_end_on(assignments, date)
       valid_assignments_with_no_end_on = no_end_on(assignments, date)
-      perspective_assignments = assignments.select { |assignment| assignment.start_on && assignment.start_on > date }
+      perspective_assignments = assignments.select do |assignment|
+        next if assignment.blank? || date.blank?
+        assignment.start_on && assignment.start_on > date
+      end || []
       assignment =
         if valid_assignments_with_no_end_on.size > 1
           valid_assignments_with_no_end_on.detect(&:is_active?) || valid_assignments_with_no_end_on.min_by { |valid_assignment| (valid_assignment.start_on.to_time - date.to_time).abs }
         else
           valid_assignments_with_no_end_on.first
         end
-      assignment.present? ? assignment : perspective_assignments.max_by(&:created_at)
+      assignment.present? ? assignment : perspective_assignments&.max_by(&:created_at)
     end
 
     def no_end_on(assignments, date)
