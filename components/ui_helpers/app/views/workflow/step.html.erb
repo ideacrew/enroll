@@ -18,7 +18,7 @@
           </div>
           <% if !@current_step.heading_text.nil? %>
             <% if @current_step.heading_text.present? %>
-              <p><%= @current_step.heading_text%></p>
+              <p><%= translation_placeholder_text(@current_step.heading_text) %></p>
               <p class="memo">* = required field</p>
             <% end %>
           <% end %>

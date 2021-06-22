@@ -73,7 +73,7 @@ module UIHelpers
 
         heading_text.sub! '<family-member-name-placeholder>', first_name.capitalize # rubocop:disable Style/NestedTernaryOperator TODO: Remove this
       else
-        heading_text
+        translation_placeholder_text(heading_text)
       end
     end
 
@@ -97,6 +97,21 @@ module UIHelpers
       text.gsub! '<short-name-placeholder>', Settings.site.short_name
       text.gsub! '<state-abbreviation-placeholder>', aca_state_abbreviation
       text.gsub! '<reviewed-information>', l10n('insured.review_information')
+
+      # Submit Your Application page
+      text.gsub! '<submit-your-application>', l10n('faa.submit_your_application')
+      text.gsub! '<last-step>', l10n('faa.last_step')
+      text.gsub! '<i-understand-eligibility>', l10n('faa.i_understand_eligibility')
+      text.gsub! '<renewal-process>', l10n('faa.renewal_process')
+      text.gsub! '<send-notice>', l10n('faa.send_notice')
+      text.gsub! '<i-agree>', l10n('faa.i_agree')
+      text.gsub! '<i-understand-eligibility-changes>', l10n('faa.i_understand_eligibility_changes')
+      text.gsub! '<report-changes>', l10n('faa.report_changes')
+      text.gsub! '<signature-line-below>', l10n('faa.signature_line_below')
+      text.gsub! '<i-understand-evaluation>', l10n('faa.i_understand_evaluation')
+      text.gsub! '<anyone-found-eligible>', l10n('faa.anyone_found_eligible')
+      text.gsub! '<parent-living-outside-of-home>', l10n('faa.parent_living_outside_of_home')
+
       text
     end
 
