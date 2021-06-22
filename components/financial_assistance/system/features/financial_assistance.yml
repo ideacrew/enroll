@@ -157,6 +157,11 @@ registry:
       is_enabled: true
     - key: :other_limited_benefit_coverage # new
       is_enabled: true
+    - key: :prize_and_awards
+      is_enabled: true
+      settings:
+        - key: :gamble_prize
+          item: true
   - namespace:
     - :request_determination
     features:
@@ -164,11 +169,5 @@ registry:
       is_enabled: false
     - key: :medicaid_gateway_determination
       is_enabled: true
-    - key: :prize_and_awards
-      is_enabled: true
-      settings:
-        - key: :gamble_prize
-          item: true
-
   # TODO eligibility engine connectivity(HAVEN) settings
   # TODO mec service connectivity settings

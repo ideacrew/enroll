@@ -15,6 +15,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
                                   ssn: person.ssn,
                                   application: application,
                                   ethnicity: [],
+                                  person_hbx_id: person.hbx_id,
                                   is_self_attested_blind: false,
                                   is_applying_coverage: true,
                                   is_required_to_file_taxes: true,
@@ -328,6 +329,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
                         application: application,
                         eligibility_determination_id: eligibility_determination.id,
                         ethnicity: [],
+                        person_hbx_id: person2.hbx_id,
                         is_self_attested_blind: false,
                         is_applying_coverage: true,
                         is_required_to_file_taxes: true,
@@ -399,6 +401,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
                         application: application,
                         eligibility_determination_id: eligibility_determination.id,
                         ethnicity: [],
+                        person_hbx_id: person2.hbx_id,
                         is_self_attested_blind: false,
                         is_applying_coverage: true,
                         is_required_to_file_taxes: false,
@@ -415,7 +418,6 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
                         has_enrolled_health_coverage: false,
                         has_eligible_health_coverage: false,
                         has_eligible_medicaid_cubcare: false,
-                        is_claimed_as_tax_dependent: false,
                         is_incarcerated: false,
                         citizen_status: 'us_citizen',
                         net_annual_income: 5_078.90,
@@ -458,12 +460,12 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
   context 'with job_income' do
     let!(:create_job_income) do
       inc = ::FinancialAssistance::Income.new({
-        kind: 'wages_and_salaries',
-        frequency_kind: 'yearly',
-        amount: 30000.00,
-        start_on: Date.today.prev_year,
-        employer_name: 'Testing employer',
-      })
+                                                kind: 'wages_and_salaries',
+                                                frequency_kind: 'yearly',
+                                                amount: 30_000.00,
+                                                start_on: Date.today.prev_year,
+                                                employer_name: 'Testing employer'
+                                              })
       applicant.incomes << inc
       applicant.save!
     end
@@ -491,31 +493,31 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
   context 'with an esi benefit' do
     let!(:create_esi_benefit) do
       emp_add = FinancialAssistance::Locations::Address.new({
-        :address_1=>"123",
-        :kind=>"work",
-        :city=>"was",
-        :state=>"DC",
-        :zip=>"21312",
-      })
+                                                              :address_1 => "123",
+                                                              :kind => "work",
+                                                              :city => "was",
+                                                              :state => "DC",
+                                                              :zip => "21312"
+                                                            })
       emp_phone = FinancialAssistance::Locations::Phone.new({
-        :kind=>"work",
-        :area_code=>"131",
-        :number=>"2323212",
-        :full_phone_number=>"1312323212",
-      })
+                                                              :kind => "work",
+                                                              :area_code => "131",
+                                                              :number => "2323212",
+                                                              :full_phone_number => "1312323212"
+                                                            })
       benefit = ::FinancialAssistance::Benefit.new({
-        :employee_cost=> 500.00,
-        :employer_id=>"12-2132133",
-        :kind=>"is_enrolled",
-        :insurance_kind=>"employer_sponsored_insurance",
-        :employer_name=>"er1",
-        :is_esi_waiting_period=>false,
-        :is_esi_mec_met=>true,
-        :esi_covered=>"self",
-        :start_on=> Date.today.prev_year.beginning_of_month,
-        :end_on=>nil,
-        :employee_cost_frequency=>"monthly"
-      })
+                                                     :employee_cost => 500.00,
+                                                     :employer_id => "12-2132133",
+                                                     :kind => "is_enrolled",
+                                                     :insurance_kind => "employer_sponsored_insurance",
+                                                     :employer_name => "er1",
+                                                     :is_esi_waiting_period => false,
+                                                     :is_esi_mec_met => true,
+                                                     :esi_covered => "self",
+                                                     :start_on => Date.today.prev_year.beginning_of_month,
+                                                     :end_on => nil,
+                                                     :employee_cost_frequency => "monthly"
+                                                   })
       benefit.employer_address = emp_add
       benefit.employer_phone = emp_phone
       applicant.benefits << benefit
@@ -540,10 +542,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
   context 'with peace_corps_health_benefits benefit' do
     let!(:create_esi_benefit) do
       benefit = ::FinancialAssistance::Benefit.new({
-        kind: 'is_enrolled',
-        insurance_kind: 'peace_corps_health_benefits',
-        start_on: Date.today.prev_year
-      })
+                                                     kind: 'is_enrolled',
+                                                     insurance_kind: 'peace_corps_health_benefits',
+                                                     start_on: Date.today.prev_year
+                                                   })
       applicant.benefits << benefit
       applicant.save!
     end
