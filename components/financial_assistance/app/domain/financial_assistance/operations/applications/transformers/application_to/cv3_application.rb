@@ -463,6 +463,8 @@ module FinancialAssistance
             end
 
             def frequency(frequency)
+              return nil unless frequency
+
               {"biweekly": "BiWeekly", "daily": "Daily", "half_yearly": "SemiAnnually",
                "monthly": "Monthly", "quarterly": "Quarterly", "weekly": "Weekly", "yearly": "Annually"}[frequency.to_sym]
             end
