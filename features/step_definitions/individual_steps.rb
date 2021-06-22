@@ -498,6 +498,14 @@ Then(/^Individual fills in the form$/) do
   find(:xpath, '//label[@for="radio_incarcerated_no"]').click
 end
 
+Then(/Individual confirms dependent info/) do
+  find(IvlFamilyInformation.confirm_member_btn).click
+end
+
+Then(/Individual should see three dependents on the page/) do
+  expect(find_all('.dependent_list').count).to eq 3
+end
+
 Then(/^Individual ads address for dependent$/) do
   find(:xpath, '//label[@for="dependent_same_with_primary"]').click
   fill_in 'dependent[addresses][0][address_1]', :with => '36 Campus Lane'
