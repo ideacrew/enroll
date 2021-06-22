@@ -60,7 +60,7 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CalculateAndPersistNe
       it 'should pass, calculate and persist net annual income on applicant' do
         result = subject.call(params)
         expect(result.success).to eq applicant
-        expect(applicant.net_annual_income.to_f).to eq 213.7
+        expect(applicant.net_annual_income.to_f).to eq 213.9
       end
     end
 
@@ -87,7 +87,7 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CalculateAndPersistNe
       it 'should pass, calculate and persist net annual income on applicant' do
         result = subject.call(params)
         expect(result.success).to eq applicant
-        expect(applicant.net_annual_income.to_f).to eq 12_000.0
+        expect(applicant.net_annual_income.to_f).to eq 11_997.55
       end
     end
 
