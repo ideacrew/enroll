@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 # Operations::Products::FetchBenchmarkInfo.new.call({family: family, effective_date: effective_date})
 
 module Operations
