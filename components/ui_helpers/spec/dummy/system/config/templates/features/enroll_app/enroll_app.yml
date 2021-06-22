@@ -225,7 +225,7 @@ registry:
           - key: :site_broker_attestation_link
             item: ""
           - key: :rating_areas
-            item: "single"
+            item: "county"
           - key: :favicon_tab_icon
             item: 'image/vnd.microsoft.icon'
           - key: :eligibile_immigration_statuses_url
@@ -254,6 +254,8 @@ registry:
             item: ""
           - key: :send_rating_area_for_ivl_policy_to_edi
             item: true
+          - key: :medicaid_agency_phone
+            item: "(000) 000-0000"
       - key: :rating_area
         item: :rating_area
         is_enabled: false
@@ -297,7 +299,7 @@ registry:
       - key: :special_cover_header
         item: :special_cover_header
         is_enabled: true
-        settings: 
+        settings:
           - key: :filename
             item: "CoverME_WebsiteHeader_01.jpg"
       - key: :tobacco_cost
@@ -362,3 +364,9 @@ registry:
         settings:
           - key: :days
             item: 60
+      - key: :immigration_status_checkbox
+        is_enabled: true
+      - key: :gender_to_sex
+        is_enabled: true
+      - key: :mainecare_cubcare_glossary
+        is_enabled: true

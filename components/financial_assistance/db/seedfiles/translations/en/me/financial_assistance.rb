@@ -22,7 +22,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.eligible_for_medicaid" => "These people <span>appear to be eligible</span> for ",
   "en.faa.eligible_for_medicaid2" => " or CubCare (the Children’s Health Insurance Program)",
   "en.faa.dhs_decision" => "<span>PLEASE NOTE: The Department of Health and Human Services (DHHS) will make a final decision on whether those listed qualify for <span class='run-glossary'>MaineCare or CubCare</span>.</span>",
-  "en.faa.dhs_contact" => "They will send you a letter, and may ask you to provide documents. If you haven’t heard from DHS within 45 days, you may want to ask for an update by calling us at ",  "en.faa.referral" => "Special MaineCare Referral",
+  "en.faa.dhs_contact" => "They will send you a letter, and may ask you to provide documents. If you haven’t heard from DHS within 45 days, you may want to ask for an update by calling us at ",
   "en.faa.referral" => "Special MaineCare Referral",
   "en.faa.qualified_reason" => "These people may qualify for MaineCare for reasons like age or disability.",
   "en.faa.next_step_with_non_magi" => "<b>NEXT STEP:</b> We are sending your application to the Department of Health and Human Services (DHHS). They will contact you to get more information to see if you qualify.",

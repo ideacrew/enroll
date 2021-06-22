@@ -254,9 +254,8 @@ registry:
             item: ""
           - key: :send_rating_area_for_ivl_policy_to_edi
             item: true
-            item: "Employer premium contribution for Employee Only Health Plans must be at least"
           - key: :medicaid_agency_phone
-            item: "(855) 532-5465"
+            item: "(000) 000-0000"
       - key: :rating_area
         item: :rating_area
         is_enabled: false
@@ -300,7 +299,7 @@ registry:
       - key: :special_cover_header
         item: :special_cover_header
         is_enabled: true
-        settings: 
+        settings:
           - key: :filename
             item: "CoverME_WebsiteHeader_01.jpg"
       - key: :tobacco_cost
@@ -366,8 +365,8 @@ registry:
           - key: :days
             item: 60
       - key: :immigration_status_checkbox
-        is_enabled: false
+        is_enabled: true
       - key: :gender_to_sex
-        is_enabled: false
+        is_enabled: true
       - key: :mainecare_cubcare_glossary
-        is_enabled: false
+        is_enabled: true
