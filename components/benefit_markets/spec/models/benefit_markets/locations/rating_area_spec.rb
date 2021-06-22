@@ -194,6 +194,12 @@ module BenefitMarkets
     end
 
     describe "created for a given state", :dbclean => :after_each do
+      let(:app_setting) {double(setting: double(item: :dc), settings: double(item: 'single'))}
+
+      before :each do
+        allow(EnrollRegistry).to receive(:[]).with(:enroll_app).and_return(app_setting)
+      end
+
       let(:rating_area) { ::BenefitMarkets::Locations::RatingArea.create!(active_year: TimeKeeper.date_of_record.year, covered_states: ["MA"], exchange_provided_code: "MA0") }
 
       let(:address_outside_state) {
