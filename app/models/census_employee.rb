@@ -1668,10 +1668,9 @@ class CensusEmployee < CensusMember
     assignment_by_application = [renewal_benefit_group_assignment, active_benefit_group_assignment].compact.detect do |assignment|
       assignment.benefit_application && (assignment.benefit_application == benefit_application)
     end
-    return false if assignment_by_application.blank? || assignment_by_application.hbx_enrollment.blank?
+    return false if assignment_by_application.blank? || assignment_by_application.hbx_enrollments.blank?
     health_enrollments = assignment_by_application.hbx_enrollments.select{ |hbx| hbx.coverage_kind == 'health' && hbx.is_coverage_waived? }
-    return true if health_enrollments.count == 1
-    assignment_by_application.hbx_enrollment.is_coverage_waived?
+    health_enrollments.count == 1
   end
 
   def ssn=(new_ssn)
