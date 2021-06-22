@@ -87,8 +87,8 @@ module Operations
           rating_area = ::BenefitMarkets::Locations::RatingArea.where({active_year: year, exchange_provided_code: rating_area_id }).first
 
           if rating_area.present?
-            rating_area.county_zip_ids += location_ids.flatten
-            rating_area.county_zip_ids.uniq!
+            rating_area.county_zip_ids += location_ids
+            rating_area.county_zip_ids.flatten.uniq!
             rating_area.save!
           else
             ::BenefitMarkets::Locations::RatingArea.new(

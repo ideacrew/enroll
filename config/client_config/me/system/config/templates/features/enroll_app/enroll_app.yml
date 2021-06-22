@@ -217,7 +217,7 @@ registry:
           - key: :site_broker_attestation_link
             item: ""
           - key: :rating_areas
-            item: "single"
+            item: "county"
           - key: :favicon_tab_icon
             item: 'image/vnd.microsoft.icon'
           - key: :eligibile_immigration_statuses_url
