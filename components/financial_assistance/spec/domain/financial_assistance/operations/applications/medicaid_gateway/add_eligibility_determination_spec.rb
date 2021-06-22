@@ -111,6 +111,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
         it 'should update is_non_magi_medicaid_eligible' do
           expect(@applicant.is_non_magi_medicaid_eligible).to eq(false)
         end
+
+        it 'should update is_eligible_for_non_magi_reasons' do
+          expect(@applicant.is_eligible_for_non_magi_reasons).to eq(true)
+        end
       end
     end
   end

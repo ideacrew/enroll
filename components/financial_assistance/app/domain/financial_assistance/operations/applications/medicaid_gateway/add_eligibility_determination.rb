@@ -87,6 +87,7 @@ module FinancialAssistance
                                              is_ia_eligible: ped_entity.is_ia_eligible,
                                              is_medicaid_chip_eligible: ped_entity.is_medicaid_chip_eligible || ped_entity.is_magi_medicaid,
                                              is_totally_ineligible: ped_entity.is_totally_ineligible,
+                                             is_eligible_for_non_magi_reasons: ped_entity.is_eligible_for_non_magi_reasons,
                                              is_non_magi_medicaid_eligible: ped_entity.is_non_magi_medicaid_eligible })
             end
           end

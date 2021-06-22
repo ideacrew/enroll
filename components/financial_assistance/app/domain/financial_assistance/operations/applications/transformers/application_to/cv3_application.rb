@@ -230,15 +230,18 @@ module FinancialAssistance
             def mitc_relationships(applicant)
               applicant.relationships.inject([]) do |mitc_rels, relationship|
                 rela_code = find_relationship_code(relationship)
-                mitc_rels << {
-                  other_id: relationship.relative.person_hbx_id,
-                  attest_primary_responsibility: applicant.is_primary_applicant.present? ? 'Y' : 'N',
-                  relationship_code: rela_code
-                } if relationship.relative || applicant
+                if relationship.relative || applicant
+                  mitc_rels << {
+                    other_id: relationship.relative.person_hbx_id,
+                    attest_primary_responsibility: applicant.is_primary_applicant.present? ? 'Y' : 'N',
+                    relationship_code: rela_code
+                  }
+                end
                 mitc_rels
               end
             end
 
+            # rubocop:disable Metrics/CyclomaticComplexity
             def find_relationship_code(relationship)
               mitc_rel =
                 case relationship.kind
@@ -263,6 +266,7 @@ module FinancialAssistance
                 end
               ::AcaEntities::MagiMedicaid::Mitc::Types::RelationshipCodeMap[mitc_rel] || '88'
             end
+            # rubocop:enable Metrics/CyclomaticComplexity
 
             # JobIncome(wages_and_salaries) & SelfEmploymentIncome(net_self_employment)
             def wages_and_salaries(applicant)
