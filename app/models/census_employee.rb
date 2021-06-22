@@ -1670,7 +1670,7 @@ class CensusEmployee < CensusMember
     end
     return false if assignment_by_application.blank? || assignment_by_application.hbx_enrollments.blank?
     health_enrollments = assignment_by_application.hbx_enrollments.select{ |hbx| hbx.coverage_kind == 'health' && hbx.is_coverage_waived? }
-    health_enrollments.count == 1
+    health_enrollments.count == 1 || assignment_by_application.hbx_enrollment.is_coverage_waived?
   end
 
   def ssn=(new_ssn)
