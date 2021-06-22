@@ -259,8 +259,8 @@ Then(/Individual resumes enrollment/) do
   click_link 'Consumer/Family Portal'
 end
 
-Then(/Individual sees previously saved address/) do
-  expect(page).to have_field('ADDRESS LINE 1 *', with: '4900 USAA BLVD', wait: 10)
+Then (/Individual sees previously saved address/) do
+  expect(page).to have_field('ADDRESS LINE 1 *', with: '4900 USAA BLVD NE', wait: 10)
   find('.btn', text: 'CONTINUE').click
 end
 
@@ -872,7 +872,7 @@ And(/consumer clicked on "Married" qle/) do
   click_link "Married"
 end
 
-When("consumer visits home page") do
+When(/.+ visits home page/) do
   visit "/families/home"
 end
 

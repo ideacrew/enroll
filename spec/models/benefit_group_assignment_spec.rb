@@ -116,6 +116,20 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
       end
     end
 
+    context '#filter_assignments_with_no_end_on' do
+      let(:params) {valid_params}
+      let(:benefit_group_assignment)  { BenefitGroupAssignment.new(**params) }
+      before do
+        benefit_group_assignment.save
+      end
+
+      context "blank assignments are passed" do
+        it "should not throw an exception" do
+          expect(BenefitGroupAssignment.filter_assignments_with_no_end_on([], Date.new)).to eq(nil)
+        end
+      end
+    end
+
     context "with all valid parameters" do
       let(:params) {valid_params}
       let(:benefit_group_assignment)  { BenefitGroupAssignment.new(**params) }

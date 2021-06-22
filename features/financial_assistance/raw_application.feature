@@ -7,7 +7,7 @@ Feature: Cost Savings Raw Application
   Background:
     Given the FAA feature configuration is enabled
     And a family with financial application in determined state exists
-    And the user with hbx admin role is logged in
+    And the user with hbx_staff role is logged in
 
   Scenario: FAA Feature Is Enabled - Admin logs in and clicks on Person
     When admin visits home page

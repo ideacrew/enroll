@@ -297,7 +297,7 @@ registry:
       - key: :special_cover_header
         item: :special_cover_header
         is_enabled: true
-        settings:
+        settings: 
           - key: :filename
             item: "CoverME_WebsiteHeader_01.jpg"
       - key: :tobacco_cost
