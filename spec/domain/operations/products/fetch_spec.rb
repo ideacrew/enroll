@@ -67,7 +67,6 @@ RSpec.describe ::Operations::Products::Fetch, dbclean: :after_each do
 
     it 'should return an array of slcsp for the given family' do
       value = subject.call(params).value!
-      puts "#{value}"
       expect(value.is_a?(Hash)).to eq true
       expect(value[[person.hbx_id]].keys.include?(:health_only)).to eq true
     end
