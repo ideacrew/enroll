@@ -86,7 +86,7 @@ module Config::AcaHelper
   end
 
   # Allows us to conditionally display General Agency related links and information
-  # This can be enabled or disabled with ResourceRegistry in system/config/templates/features/general_agencies/general_agency.yml
+  # This can be enabled or disabled with ResourceRegistry
   # @return { True } if EnrollRegistry.feature_enabled?(:general_agency)
   # @return { False } otherwise
   def general_agency_enabled?
