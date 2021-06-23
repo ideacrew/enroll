@@ -12,14 +12,13 @@ RSpec.describe "broker_agencies/profiles/_employers.html.erb", :dbclean => :afte
     allow(view).to receive(:controller_name).and_return 'profiles'
   end
 
-  describe 'with modify permissions for DC' do
-    before :each do
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:general_agency).and_return(true)
-      render template: "broker_agencies/profiles/_employers.html.erb"
-    end
-    context "General Agency can be enabled or disabled via resource ergistry" do
-      # passes in DC and MA based on Settings
+  describe 'with modify permissions' do
+    context "General Agency can be enabled or disabled via resource registry" do
       context "when enabled" do
+        before :each do
+          EnrollRegistry[:general_agency].feature.stub(:is_enabled).and_return(true)
+          render template: "broker_agencies/profiles/_employers.html.erb"
+        end
         it "should have general agency" do
           expect(rendered).to match(/General Agencies/)
         end
@@ -32,51 +31,18 @@ RSpec.describe "broker_agencies/profiles/_employers.html.erb", :dbclean => :afte
           expect(rendered).not_to have_selector('.blocking #assign_general_agency')
         end
       end
-    end
-  end
-
-  describe 'with modify permissions for MA' do
-    before :each do
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:general_agency).and_return(false)
-      render template: "broker_agencies/profiles/_employers.html.erb"
-    end
-    context "General Agency can be enabled or disabled via resource registry" do
-      # passes in MA and DC based on Settings
-      context "when disbaled" do
-        it "should have general agency" do
+      context "when disabled" do
+        before do
+          EnrollRegistry[:general_agency].feature.stub(:is_enabled).and_return(false)
+          render template: "broker_agencies/profiles/_employers.html.erb"
+        end
+        it "should not have general agency" do
           expect(rendered).to_not match(/General Agencies/)
         end
 
-        it "should have button for ga assign" do
+        it "should not have button for ga assign" do
           expect(rendered).to_not have_selector('#assign_general_agency')
         end
-      end
-    end
-  end
-
-  describe 'without modify permissions ' do
-    before :each do
-      render template: "broker_agencies/profiles/_employers.html.erb"
-    end
-
-    context "when GA is enabled" do
-      before do
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:general_agency).and_return(true)
-      end
-      it "should have general agency" do
-        expect(rendered).to match(/General Agencies/)
-      end
-    end
-
-    context "when GA is disabled" do
-      before do
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:general_agency).and_return(false)
-      end
-      it "should not have general agency" do
-        expect(rendered).not_to match(/General Agencies/)
-      end
-      it "should not have general agency in table" do
-        expect(rendered).not_to match(/General Agency/)
       end
     end
   end
