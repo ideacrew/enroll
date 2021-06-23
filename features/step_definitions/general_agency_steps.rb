@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Given(/general agency feauture is enabled$/) do
   enable_feature :general_agency
 end
