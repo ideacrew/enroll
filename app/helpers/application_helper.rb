@@ -1,5 +1,6 @@
 module ApplicationHelper
   include FloatHelper
+  include Rails.application.routes.url_helpers
 
   def can_employee_shop?(date)
     return false if date.blank?
@@ -376,19 +377,19 @@ module ApplicationHelper
   end
 
   def retrieve_inbox_path(provider, folder: 'inbox')
-    broker_agency_mailbox = main_app.broker_agencies_profile_inbox_path(profile_id: provider.id, folder: folder)
+    broker_agency_mailbox = broker_agencies_profile_inbox_path(profile_id: provider.id, folder: folder)
     return broker_agency_mailbox if provider.try(:broker_role)
     case(provider.model_name.name)
     when "EmployerProfile"
-      main_app.inbox_employers_employer_profiles_path(id: provider.id, folder: folder)
+      inbox_employers_employer_profiles_path(id: provider.id, folder: folder)
     when "HbxProfile"
-      main_app.inbox_exchanges_hbx_profile_path(provider, folder: folder)
+      inbox_exchanges_hbx_profile_path(provider, folder: folder)
     when "BrokerAgencyProfile"
-      main_app.broker_agencies_profile_inbox_path(profile_id: provider.id, folder: folder)
+      broker_agencies_profile_inbox_path(profile_id: provider.id, folder: folder)
     when "Person"
-      main_app.inbox_insured_families_path(profile_id: provider.id, folder: folder)
+      inbox_insured_families_path(profile_id: provider.id, folder: folder)
     when "GeneralAgencyProfile"
-      main_app.inbox_general_agencies_profiles_path(profile_id: provider.id, folder: folder)
+      inbox_general_agencies_profiles_path(profile_id: provider.id, folder: folder)
     end
   end
 
