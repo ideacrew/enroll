@@ -7,7 +7,7 @@ RSpec.describe GeneralAgencies::ProfilesController, dbclean: :after_each do
   let(:user) { FactoryBot.create(:user, person: person) }
 
   before :each do
-    allow(EnrollRegistry).to receive(:feature_enabled?).with(:general_agency).and_return(true)
+    EnrollRegistry[:general_agency].feature.stub(:is_enabled).and_return(true)
     Enroll::Application.reload_routes!
   end
 

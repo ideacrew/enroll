@@ -11,6 +11,10 @@ RSpec.describe FavoriteGeneralAgency, type: :model do
     }
   end
 
+  before do
+    EnrollRegistry[:general_agency].feature.stub(:is_enabled).and_return(true)
+  end
+
   context ".new" do
     context "with no arguments" do
       let(:params)  { {} }
