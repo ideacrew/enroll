@@ -1,5 +1,5 @@
 - content_for :horizontal_menu do
-  #uic-primary-nav
+  #uic-primary-nav class=("#{"pre_prod_nav_color" if ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true'}")
     .container
       ul#myTab.list-unstyled.list-inline role="tablist"
         li.pl-0 role="presentation"
