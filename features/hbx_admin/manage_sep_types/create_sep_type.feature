@@ -15,7 +15,6 @@ Feature: Admin has ability to create a new SEP Type
     When Admin creates new SEP Type with <market_kind> market and <action> select termination on kinds with success scenario
     Then Admin should see SEP Type Created Successfully message
     And Admin should see newly created SEP Type title on Datatable with Draft filter <market_kind>
-    And Hbx Admin logs out
 
     Examples:
       | market_kind | action |
@@ -28,7 +27,6 @@ Feature: Admin has ability to create a new SEP Type
     And expired Qualifying life events of <market_kind> market is present
     When Admin creates new SEP Type with <market_kind> market and <action> select termination on kinds with failure scenario
     Then Admin should see failure for end date
-    And Hbx Admin logs out
 
     Examples:
       | market_kind | action |
@@ -43,7 +41,6 @@ Feature: Admin has ability to create a new SEP Type
     When Admin creates new SEP Type with <market_kind> market and <action> select termination on kinds with success scenario
     Then Admin should see SEP Type Created Successfully message
     And Admin should see newly created SEP Type title on Datatable with Draft filter <market_kind>
-    And Hbx Admin logs out
 
     Examples:
       | market_kind | action       |
@@ -56,7 +53,6 @@ Feature: Admin has ability to create a new SEP Type
     Given Admin can navigate to the Manage SEPs screen
     When Admin creates new SEP Type with individual market and cannot select termination on kinds with <failure_type> scenario
     Then Admin should see failure for <failure_msg>
-    And Hbx Admin logs out
 
     Examples:
     | failure_type                | failure_msg              |
