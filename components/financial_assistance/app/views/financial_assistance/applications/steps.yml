@@ -162,7 +162,7 @@
                   classNames: span-text
                   text: <b><i-understand-eligibility-changes>*</b> <br> <br>
                         <report-changes-1><report-changes-2> <br> <br>
-                        <signature-line-below-1><signature-line-below-1> <br> <br>
+                        <signature-line-below-1><signature-line-below-2> <br> <br>
                         <reviewed-information>
             - cells:
                 - gutter: 12
