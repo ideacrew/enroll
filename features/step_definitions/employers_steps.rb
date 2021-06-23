@@ -442,8 +442,7 @@ Then(/^.+ should see the combined filter results$/) do
 end
 
 When(/^.+ go(?:es)? to the benefits tab$/) do
-  find(EmployerHomePage.benefits_link).click
-  wait: 5
+  find(EmployerHomePage.benefits_link, wait: 5).click
 end
 
 Then(/^.+ should see the plan year$/) do
@@ -451,8 +450,7 @@ Then(/^.+ should see the plan year$/) do
 end
 
 When(/^.+ clicks? on publish plan year$/) do
-  find('.interaction-click-control-publish-plan-year').click
-  wait: 2
+  find('.interaction-click-control-publish-plan-year', wait: 5).click
 end
 
 Then(/^.+ should see Action Needed button/) do
@@ -609,8 +607,7 @@ And /^employer filled all the fields on benefit application form$/ do
 end
 
 And /^employer clicked on continue button$/ do
-  find(EmployerAddBenefitPackage.continue_btn).click
-  wait: 5
+  find(EmployerAddBenefitPackage.continue_btn, wait: 5).click
 end
 
 Then(/^employer should see form for benefit application and benefit package$/) do
