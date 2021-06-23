@@ -601,10 +601,6 @@ class Family
     special_enrollment_periods.individual_market.order_by(:submitted_at.desc).to_a.detect(&:is_active?)
   end
 
-  def latest_created_sep
-    special_enrollment_periods.individual_market.order_by(:created_at.desc).to_a.detect(&:is_active?)
-  end
-
   def latest_active_sep_for(enrollment)
     return unless enrollment.is_shop?
     enrollment.fehb_profile.present? ? latest_fehb_sep : latest_shop_sep
