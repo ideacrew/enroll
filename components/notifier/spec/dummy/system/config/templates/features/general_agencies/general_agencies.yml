@@ -1,7 +1,0 @@
----
-registry:
-  - namespace:
-    - :enroll_app
-    features:
-      - key: :general_agency
-        is_enabled: true
