@@ -380,15 +380,15 @@ module ApplicationHelper
     return broker_agency_mailbox if provider.try(:broker_role)
     case(provider.model_name.name)
     when "EmployerProfile"
-      inbox_employers_employer_profiles_path(id: provider.id, folder: folder)
+      main_app.inbox_employers_employer_profiles_path(id: provider.id, folder: folder)
     when "HbxProfile"
-      inbox_exchanges_hbx_profile_path(provider, folder: folder)
+       main_app.inbox_exchanges_hbx_profile_path(provider, folder: folder)
     when "BrokerAgencyProfile"
-      broker_agencies_profile_inbox_path(profile_id: provider.id, folder: folder)
+       main_app.broker_agencies_profile_inbox_path(profile_id: provider.id, folder: folder)
     when "Person"
-      inbox_insured_families_path(profile_id: provider.id, folder: folder)
+       main_app.inbox_insured_families_path(profile_id: provider.id, folder: folder)
     when "GeneralAgencyProfile"
-      inbox_general_agencies_profiles_path(profile_id: provider.id, folder: folder)
+       main_app.inbox_general_agencies_profiles_path(profile_id: provider.id, folder: folder)
     end
   end
 
