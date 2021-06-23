@@ -23,6 +23,14 @@ module Config::SiteConcern
     Settings.site.support_for_ie_browser
   end
 
+  def is_broker_agency_enabled?
+    EnrollRegistry.feature_enabled?(:brokers)
+  end
+
+  def is_general_agency_enabled?
+    EnrollRegistry.feature_enabled?(:general_agency)
+  end
+
   def is_shop_market_enabled?
     EnrollRegistry.feature_enabled?(:aca_shop_market)
   end
