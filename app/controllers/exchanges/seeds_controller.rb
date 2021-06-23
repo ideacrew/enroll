@@ -14,7 +14,7 @@ module Exchanges
     before_action :set_seed, only: %i[edit]
     before_action :csv_format_valid?, only: %i[create]
 
-    before_action :nonprod_environment?, :check_hbx_staff_role
+    before_action :redirect_if_prod, :check_hbx_staff_role
     def new
       @seed = Seeds::Seed.new(user: current_user)
     end
