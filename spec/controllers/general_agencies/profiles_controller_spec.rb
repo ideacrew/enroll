@@ -330,4 +330,3 @@ RSpec.describe GeneralAgencies::ProfilesController, dbclean: :after_each do
     end
   end
 end
-end

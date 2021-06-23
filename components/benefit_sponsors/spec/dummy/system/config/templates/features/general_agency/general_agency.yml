@@ -1,7 +1,7 @@
 ---
 registry:
   - namespace:
-    - :enroll_app
+    - :general_gaencies
     features:
       - key: :general_agency
         is_enabled: true
