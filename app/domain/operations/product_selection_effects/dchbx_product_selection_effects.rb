@@ -57,7 +57,7 @@ module Operations
       end
 
       def renew_prior_py_ivl_enrollments(enrollment)
-        sep = enrollment.family.latest_created_sep
+        sep = enrollment.special_enrollment_period
         return nil unless sep&.coverage_renewal_flag
         return nil if enrollment.is_shop?
         @benefit_coverage_periods = fetch_bcp_gt_enr_effective_year(enrollment)
