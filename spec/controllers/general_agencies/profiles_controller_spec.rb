@@ -1,6 +1,5 @@
 require 'rails_helper'
 
-if ExchangeTestingConfigurationHelper.general_agency_enabled?
 RSpec.describe GeneralAgencies::ProfilesController, dbclean: :after_each do
   let(:general_agency_profile) { FactoryBot.create(:general_agency_profile) }
   let(:general_agency_staff) { FactoryBot.create(:general_agency_staff_role) }
@@ -8,7 +7,7 @@ RSpec.describe GeneralAgencies::ProfilesController, dbclean: :after_each do
   let(:user) { FactoryBot.create(:user, person: person) }
 
   before :each do
-    allow(Settings.aca).to receive(:general_agency_enabled).and_return(true)
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:general_agency).and_return(true)
     Enroll::Application.reload_routes!
   end
 

@@ -20,7 +20,7 @@ RSpec.describe "welcome/index.html.slim", :type => :view, dbclean: :after_each  
   describe "not signed in user" do
     context "with general agency enabled" do
       before :each do
-        allow(Settings.aca).to receive(:general_agency_enabled).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:general_agency)and_return(true)
         Enroll::Application.reload_routes!
         render
       end
@@ -43,6 +43,7 @@ RSpec.describe "welcome/index.html.slim", :type => :view, dbclean: :after_each  
 
     context "with enabled IVL market" do
       before do
+        # TODO: We need to refactor Settings.aca.market_kinds stuff
         allow(Settings.aca).to receive(:market_kinds).and_return(%w[individual shop])
         Enroll::Application.reload_routes!
 

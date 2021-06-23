@@ -1,6 +1,5 @@
 require 'rails_helper'
 
-if ExchangeTestingConfigurationHelper.general_agency_enabled?
 RSpec.describe GeneralAgencyAccount, type: :model do
   let(:employer_profile)      { FactoryBot.create(:employer_profile)}
   let(:general_agency_profile) { FactoryBot.build(:general_agency_profile) }
@@ -97,4 +96,4 @@ RSpec.describe GeneralAgencyAccount, type: :model do
     end
   end
 end
-end
+
