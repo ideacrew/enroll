@@ -1,4 +1,11 @@
+# frozen_string_literal: true
+
 # load Rails.root + "db/seeds.rb"
+
+When(/a non logged in user visits the Enroll home page$/) do
+  binding.irb
+end
+
 When(/I use unique values/) do
   require 'test/unique_value_stash.rb'
   include UniqueValueStash

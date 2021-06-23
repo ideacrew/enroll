@@ -26,7 +26,7 @@ Feature: update general agency profile
 
   Scenario: Reactivating General Agency Staff Role
     Given a CCA site exists with a benefit market
-    Given the general agency feauture is enabled
+    Given the general agency feature is enabled
 
     Given all permissions are present
     Given there is a General Agency exists for District Agency Inc

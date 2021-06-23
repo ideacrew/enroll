@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-Given(/general agency feauture is enabled$/) do
+Given(/general agency feature is enabled$/) do
   enable_feature :general_agency
 end
 
-Given(/general agency feauture is disabled$/) do
+Given(/general agency feature is disabled$/) do
   disable_feature :general_agency
 end
 
