@@ -382,13 +382,13 @@ module ApplicationHelper
     when "EmployerProfile"
       main_app.inbox_employers_employer_profiles_path(id: provider.id, folder: folder)
     when "HbxProfile"
-       main_app.inbox_exchanges_hbx_profile_path(provider, folder: folder)
+      main_app.inbox_exchanges_hbx_profile_path(provider, folder: folder)
     when "BrokerAgencyProfile"
-       main_app.broker_agencies_profile_inbox_path(profile_id: provider.id, folder: folder)
+      main_app.broker_agencies_profile_inbox_path(profile_id: provider.id, folder: folder)
     when "Person"
-       main_app.inbox_insured_families_path(profile_id: provider.id, folder: folder)
+      main_app.inbox_insured_families_path(profile_id: provider.id, folder: folder)
     when "GeneralAgencyProfile"
-       main_app.inbox_general_agencies_profiles_path(profile_id: provider.id, folder: folder)
+      main_app.inbox_general_agencies_profiles_path(profile_id: provider.id, folder: folder)
     end
   end
 
