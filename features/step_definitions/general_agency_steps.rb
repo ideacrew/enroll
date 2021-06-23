@@ -1,3 +1,11 @@
+Given(/general agency feauture is enabled$/) do
+  enable_feature :general_agency
+end
+
+Given(/general agency feauture is disabled$/) do
+  disable_feature :general_agency
+end
+
 When(/^.+ visit the HBX General Agency Registration form$/) do
   visit '/'
   find(".interaction-click-control-general-agency-registration", wait: 10).click
