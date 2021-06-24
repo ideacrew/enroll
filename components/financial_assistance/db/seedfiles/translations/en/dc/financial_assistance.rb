@@ -80,6 +80,9 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.question.type_of_hra" => "Type of HRA",
   "en.faa.question.max_employer_reimbursement" => "What's the maximum self-only amount of reimbursement offered by this employer?",
   "en.faa.question.not_sure" => "Not sure",
+  "en.faa.question.eligible_immigration_status" => "Do you have eligible immigration status? *",
+  "en.faa.question.immigration_continue_note_1" => "",
+  "en.faa.question.immigration_continue_note_2" => "",
   # Submit Your Application Page
   "en.faa.submit_your_application" => "Submit Your Application",
   "en.faa.last_step_1" => "This is the last step. Carefully read the information below. Select 'I agree' after each statement to acknowledge your agreement.",

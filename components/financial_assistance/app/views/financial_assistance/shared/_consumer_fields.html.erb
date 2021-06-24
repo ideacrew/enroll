@@ -53,12 +53,17 @@
 
   <div class="row row-form-wrapper no-buffer <%= 'hidden_field' unless show_immigration_status_container(f.object) %>" id="immigration_status_container">
     <div class="col-lg-6 col-md-6 col-sm-4 col-xs-6 form-group form-group-lg top-buffer">
-      <label>Do you have eligible immigration status? *</label>
+      <label>
+        <%= l10n('faa.question.eligible_immigration_status') %>
+        <%= l10n('faa.question.immigration_continue_note_1') %>
+        <%= l10n('faa.question.immigration_continue_note_2') %>
+      </label>
     </div>
     <% if EnrollRegistry[:immigration_status_checkbox].enabled? %>
       <div class="col-lg-4 col-md-4 col-sm-8 col-xs-6 form-group form-group-lg no-pd">
-        <div id="immigration-checkbox" class="checkbox pl-2">
+        <div id="immigration-checkbox" class="checkbox">
           <%= f.check_box :eligible_immigration_status, {}, "true", "false" %>
+          <span><%= l10n('yes') %></span>
         </div>
       </div>
     <% else %>
