@@ -1,6 +1,5 @@
 module ApplicationHelper
   include FloatHelper
-  include Routeable
 
   def can_employee_shop?(date)
     return false if date.blank?
@@ -377,7 +376,7 @@ module ApplicationHelper
   end
 
   def retrieve_inbox_path(provider, folder: 'inbox')
-    broker_agency_mailbox = broker_agencies_profile_inbox_path(profile_id: provider.id, folder: folder)
+    broker_agency_mailbox =  broker_agencies_profile_inbox_path(profile_id: provider.id, folder: folder)
     return broker_agency_mailbox if provider.try(:broker_role)
     case(provider.model_name.name)
     when "EmployerProfile"
