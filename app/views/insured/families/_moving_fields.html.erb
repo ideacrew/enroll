@@ -73,7 +73,7 @@
   $('#qle_zip_compare').on('click', function() {
     $.ajax({
       type: "GET",
-      data:{date_val: $("#qle_date").val(), qle_id: $("#qle_id").val(), qle_reason_val: $("input:radio[name=reason]:checked").val(), old_zip: $('.old_zip_code').val(), new_zip: $('.new_zip_code').val()},
+      data:{old_zip: $('.old_zip_code').val(), new_zip: $('.new_zip_code').val()},
       url: "/insured/families/sep_zip_compare.js",
       success: function(response){
         if (response.is_approved) {
