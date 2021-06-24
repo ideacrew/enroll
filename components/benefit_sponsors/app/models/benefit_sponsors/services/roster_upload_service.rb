@@ -295,9 +295,8 @@ module BenefitSponsors
       end
 
       def parse_relationship(cell, dob)
-        return nil if cell.blank? || dob.nil?
+        return nil if cell.blank?
 
-        age = Date.today.year - dob.year
         case parse_text(cell).downcase
         when "employee"
           "self"
@@ -306,6 +305,8 @@ module BenefitSponsors
         when "domestic partner"
           "domestic_partner"
         when "child"
+          return nil if dob.nil?
+          age = Date.today.year - dob.year
           if age <= 26
             "child_under_26"
           else
