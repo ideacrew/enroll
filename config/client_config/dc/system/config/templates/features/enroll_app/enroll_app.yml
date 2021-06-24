@@ -229,6 +229,8 @@ registry:
             item: ['2018', '2019']
           - key: :plan_year_tooltip
             item: "Employer premium contribution for Employee Only Health Plans must be at least"
+          - key: :sep_moved_out_zip_compare
+            item: false
       - key: :data_seeds_ui
         item: :data_seed_ui
         is_enabled: true
