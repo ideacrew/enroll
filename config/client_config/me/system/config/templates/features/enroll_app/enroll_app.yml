@@ -244,6 +244,8 @@ registry:
             item: ['']
           - key: :plan_year_tooltip
             item: ""
+          - key: :sep_moved_out_zip_compare
+            item: true
       - key: :data_seeds_ui
         item: :data_seed_ui
         is_enabled: true
