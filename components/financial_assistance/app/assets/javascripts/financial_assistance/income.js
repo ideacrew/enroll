@@ -14,7 +14,6 @@ function startEditingIncome(income_kind) {
   $('.col-md-3 > .interaction-click-control-continue').addClass('disabled');
   $("a.interaction-click-control-add-more").addClass('hide');
   $('input.interaction-choice-control-value-other-income-kind').prop('disabled', true);
-  $('.interaction-click-control-save').addClass('disabled');
 };
 
 function checkDate(income_id) {
