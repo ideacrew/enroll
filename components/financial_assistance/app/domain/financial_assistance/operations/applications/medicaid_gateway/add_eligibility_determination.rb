@@ -39,6 +39,7 @@ module FinancialAssistance
           def update_application(application, application_entity)
             application.assign_attributes({ determination_http_status_code: 200,
                                             has_eligibility_response: true,
+                                            integrated_case_id: application_entity.hbx_id,
                                             eligibility_response_payload: application_entity.to_h.to_json })
             if application.save
               Success(application)
@@ -78,8 +79,8 @@ module FinancialAssistance
               # 3. Each member is eligible for CSR. EA currently does not support this.
               #  'New Development' - "Map Primary person's CSR to all the TaxHouseholds!" and Done
               # 4. is_eligible_for_non_magi_reasons
-              applicant.update_attributes!({ medicaid_household_size: ped_entity.medicaid_household_size,
-                                             magi_medicaid_category: ped_entity.magi_medicaid_category,
+              applicant.update_attributes!({ medicaid_household_size: ped_entity.medicaid_household_size || 0,
+                                             magi_medicaid_category: ped_entity.magi_medicaid_category || 'none',
                                              magi_as_percentage_of_fpl: ped_entity.magi_as_percentage_of_fpl,
                                              magi_medicaid_monthly_income_limit: ped_entity.magi_medicaid_monthly_income_limit,
                                              magi_medicaid_monthly_household_income: ped_entity.magi_medicaid_monthly_household_income,
@@ -105,7 +106,7 @@ module FinancialAssistance
                                         csr_percent_as_integer: get_primary_csr_value(elig_d, thh_entity),
                                         determined_at: thh_entity.determined_on,
                                         aptc_csr_annual_household_income: thh_entity.annual_tax_household_income,
-                                        aptc_annual_income_limit: nil,
+                                        aptc_annual_income_limit: 0.0,
                                         csr_annual_income_limit: thh_entity.csr_annual_income_limit,
                                         source: 'Faa' })
           end
