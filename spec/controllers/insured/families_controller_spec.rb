@@ -1012,6 +1012,64 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     end
   end
 
+  describe 'GET sep_zip_compare', dbclean: :after_each do
+    let(:county_zip) { FactoryBot.create(:benefit_markets_locations_county_zip, zip: '04330', county_name: 'Kennebec')}
+    let(:approved_response) do
+      {is_approved: true}.to_json
+    end
+    let(:rejected_response) do
+      {is_approved: false}.to_json
+    end
+    let(:setting) {double}
+    before(:each) do
+      allow(EnrollRegistry).to receive(:[]).with(:enroll_app).and_return(setting)
+      allow(setting).to receive(:setting).with(:state_abbreviation).and_return(double(item: 'ME'))
+      allow(setting).to receive(:setting).with(:geographic_rating_area_model).and_return(double(item: 'county'))
+      sign_in(user)
+      get :sep_zip_compare, params: {old_zip: old_zip, new_zip: new_zip}
+    end
+
+    context 'new zip is outside state' do
+      let(:new_zip) { '11111' }
+      let(:old_zip) { '' }
+
+      it 'should return false' do
+        expect(response.body).to eq rejected_response
+      end
+    end
+
+    context 'new zip is inside state & old zip is outside' do
+      let(:new_zip) { county_zip.zip }
+      let(:old_zip) { '12312' }
+
+      it 'should return true' do
+        expect(response.body).to eq approved_response
+      end
+    end
+
+    context 'new zip & old zip is inside state' do
+      let(:new_zip) { county_zip.zip }
+
+      context 'old zip is in same county' do
+        let(:old_county_zip) { FactoryBot.create(:benefit_markets_locations_county_zip, zip: '04260', county_name: county_zip.county_name)}
+        let(:old_zip) { old_county_zip.zip }
+
+        it 'should return false' do
+          expect(response.body).to eq rejected_response
+        end
+      end
+
+      context 'old zip is in different county' do
+        let(:old_county_zip) { FactoryBot.create(:benefit_markets_locations_county_zip, zip: '04260', county_name: 'Cumberland')}
+        let(:old_zip) { old_county_zip.zip }
+
+        it 'should return true' do
+          expect(response.body).to eq approved_response
+        end
+      end
+    end
+  end
+
   describe "GET upload_notice_form", dbclean: :after_each do
     let(:user) { FactoryBot.create(:user, person: person, roles: ["hbx_staff"]) }
     let(:person) { FactoryBot.create(:person) }
