@@ -25,8 +25,7 @@ module SponsoredBenefits
 
     context "#employers" do
       before do
-        EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
-        EnrollRegistry[:fehb_market].feature.stub(:is_enabled).and_return(true)
+        allow(controller).to receive(:is_shop_or_fehb_market_enabled?).and_return(true)
         sign_in user_with_hbx_staff_role
         get :employers, xhr: true, params: {id: owner_profile.id}
       end
