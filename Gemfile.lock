@@ -7,7 +7,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 6cf14b7aab88ae3fd54da9a57d1c0ceb3a49c61f
+  revision: eb0fcc0f81dfedd50522abf263e05c74c3b39756
   branch: fdsh
   specs:
     aca_entities (0.2.2)
@@ -546,7 +546,7 @@ GEM
       railties (>= 3.0.0)
     fakeredis (0.7.0)
       redis (>= 3.2, < 5.0)
-    faraday (1.4.2)
+    faraday (1.4.3)
       faraday-em_http (~> 1.0)
       faraday-em_synchrony (~> 1.0)
       faraday-excon (~> 1.1)

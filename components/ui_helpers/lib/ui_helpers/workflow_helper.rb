@@ -73,7 +73,7 @@ module UIHelpers
 
         heading_text.sub! '<family-member-name-placeholder>', first_name.capitalize # rubocop:disable Style/NestedTernaryOperator TODO: Remove this
       else
-        heading_text
+        translation_placeholder_text(heading_text)
       end
     end
 
@@ -96,6 +96,33 @@ module UIHelpers
       text.gsub! '<short-name-placeholder>', Settings.site.short_name
       text.gsub! '<state-abbreviation-placeholder>', aca_state_abbreviation
       text.gsub! '<reviewed-information>', l10n('insured.review_information')
+
+      # Submit Your Application page
+      text.gsub! '<submit-your-application>', l10n('faa.submit_your_application')
+      text.gsub! '<last-step-1>', l10n('faa.last_step_1')
+      text.gsub! '<last-step-2>', l10n('faa.last_step_2')
+      text.gsub! '<i-understand-eligibility>', l10n('faa.i_understand_eligibility')
+      text.gsub! '<renewal-process-1>', l10n('faa.renewal_process_1')
+      text.gsub! '<renewal-process-2>', l10n('faa.renewal_process_2')
+      text.gsub! '<send-notice-1>', l10n('faa.send_notice_1')
+      text.gsub! '<send-notice-2>', l10n('faa.send_notice_2')
+      text.gsub! '<send-notice-3>', l10n('faa.send_notice_3')
+      text.gsub! '<i-agree>', l10n('faa.i_agree')
+      text.gsub! '<i-understand-eligibility-changes>', l10n('faa.i_understand_eligibility_changes')
+      text.gsub! '<report-changes-1>', l10n('faa.report_changes_1')
+      text.gsub! '<report-changes-2>', l10n('faa.report_changes_2')
+      text.gsub! '<signature-line-below-1>', l10n('faa.signature_line_below_1')
+      text.gsub! '<signature-line-below-2>', l10n('faa.signature_line_below_2')
+      text.gsub! '<i-understand-evaluation-1>', l10n('faa.i_understand_evaluation_1')
+      text.gsub! '<i-understand-evaluation-2>', l10n('faa.i_understand_evaluation_2')
+      text.gsub! '<i-understand-evaluation-3>', l10n('faa.i_understand_evaluation_3')
+      text.gsub! '<anyone-found-eligible-1>', l10n('faa.anyone_found_eligible_1')
+      text.gsub! '<anyone-found-eligible-2>', l10n('faa.anyone_found_eligible_2')
+      text.gsub! '<anyone-found-eligible-3>', l10n('faa.anyone_found_eligible_3')
+      text.gsub! '<parent-living-outside-of-home-1>', l10n('faa.parent_living_outside_of_home_1')
+      text.gsub! '<parent-living-outside-of-home-2>', l10n('faa.parent_living_outside_of_home_2')
+      text.gsub! '<parent-living-outside-of-home-3>', l10n('faa.parent_living_outside_of_home_3')
+
       text
     end
 

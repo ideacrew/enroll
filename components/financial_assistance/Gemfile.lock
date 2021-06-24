@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 6cf14b7aab88ae3fd54da9a57d1c0ceb3a49c61f
+  revision: eb0fcc0f81dfedd50522abf263e05c74c3b39756
   branch: fdsh
   specs:
     aca_entities (0.2.2)
@@ -38,7 +38,7 @@ GIT
       dry-struct (~> 1.4)
       dry-types (~> 1.5)
       dry-validation (~> 1.6)
-      faraday (~> 1.4.1)
+      faraday (~> 1.4.3)
       faraday_middleware (~> 1.0)
       logging (~> 2.3.0)
       mime-types
