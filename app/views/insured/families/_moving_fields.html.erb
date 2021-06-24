@@ -4,7 +4,7 @@
     <div class="n-radio-group">
       <div class="n-radio-row">
     	  <label class="n-radio vertically-aligned-row" for="reason_accept">
-    	    <%= radio_button_tag :reason, "",  true, id: 'reason_accept', class: "n-radio" %>
+          <%= radio_button_tag :reason, "",  true, id: 'reason_accept', class: "n-radio zip-check" %>
     	    <span class = "n-radio"></span>
     	    <span id="date-change"></span>
     	  </label>
@@ -18,7 +18,7 @@
       </div>
       <div class="n-radio-row">
         <label class="n-radio vertically-aligned-row" for="reason_accept2">
-          <%= radio_button_tag :reason, "I had income below 100% of the Federal Poverty Level and was living in a state that had not expanded Medicaid (tool-tip below)", false, id: 'reason_accept2', class: "n-radio"%>
+          <%= radio_button_tag :reason, "I had income below 100% of the Federal Poverty Level and was living in a state that had not expanded Medicaid (tool-tip below)", false, id: 'reason_accept2', class: "n-radio zip-check"%>
           <span class="n-radio"></span>
           <span data-placement="top" data-toggle="popover" data-html="true" data-content="<a href='http://www.healthcare.gov/lower-costs', target='_blank'>Use Calculator">
             <%= l10n("insured.moving_fields_had_income_below_of_the_federal_poverty_level") %> <%= link_to("(Use the calculator to see if you qualify)", 'http://www.healthcare.gov/lower-costs', target: :_blank) if individual_market_is_enabled? %>
@@ -38,3 +38,57 @@
     </div>
   </div>
 </div>
+
+<div class="zip_compare hidden form-group" style="padding: 2%">
+  <p><strong>Enter your old zipcode and your new zipcode.</strong></p>
+  <div style="display: flex; flex-direction: column; width: 50%">
+    <div>
+      <label>Old Zip Code</label>
+      <input class="form-control old_zip_code number required zip" />
+    </div>
+
+    <div>
+      <label>New Zip Code</label>
+      <input class="form-control new_zip_code number required zip" />
+    </div>
+  </div>
+
+  <div>
+    <%= link_to l10n('continue').to_s.upcase, 'javascript:;', class: 'btn btn-primary btn-md', id: 'qle_zip_compare' %>
+  </div>
+</div>
+
+<script type="text/javascript">
+  <% if EnrollRegistry[:enroll_app].setting(:sep_moved_out_zip_compare).item %>
+    $('#qle_submit_reason').on('click', function() {
+      if ($("input:radio[name=reason]:checked").hasClass('zip-check')) {
+        $('.special_qle_reasons').addClass('hidden');
+        $('.zip_compare').removeClass('hidden');
+        event.preventDefault();
+        event.stopImmediatePropagation();
+      }
+    })
+  <% end %>
+
+  $('#qle_zip_compare').on('click', function() {
+    $.ajax({
+      type: "GET",
+      data:{date_val: $("#qle_date").val(), qle_id: $("#qle_id").val(), qle_reason_val: $("input:radio[name=reason]:checked").val(), old_zip: $('.old_zip_code').val(), new_zip: $('.new_zip_code').val()},
+      url: "/insured/families/sep_zip_compare.js",
+      success: function(response){
+        if (response.is_approved) {
+          $.ajax({
+            type: "GET",
+            data:{date_val: $("#qle_date").val(), qle_id: $("#qle_id").val(), qle_reason_val: $("input:radio[name=reason]:checked").val()},
+            url: "/insured/families/check_qle_date.js"
+          });
+        } else {
+          $('#qle_reason').hide();
+          var errorNoticeAction = "Based on the information you have provided, you are not eligible for this special enrollment period. If you have questions or would like to provide additional information, please contact <%= EnrollRegistry[:enroll_app].setting(:short_name).item %> customer service at <%= EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item %>.";
+          $("#qle-details .error-text").html(errorNoticeAction);
+          $('#qle-details .error-info').removeClass('hidden');
+        }
+      }
+    });
+  })
+</script>
