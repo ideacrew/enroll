@@ -187,6 +187,39 @@ class Insured::FamiliesController < FamiliesController
     end
   end
 
+  def sep_zip_compare
+    old_zip = params[:old_zip].strip
+    new_zip = params[:new_zip].strip
+    is_approved = false
+
+    old_county_zip = BenefitMarkets::Locations::CountyZip.where(zip: old_zip).first
+    new_county_zip = BenefitMarkets::Locations::CountyZip.where(zip: new_zip).first
+
+    if new_county_zip.present?
+      if old_county_zip.present?
+        rating_model = EnrollRegistry[:enroll_app].setting(:geographic_rating_area_model).item
+
+        is_sep_valid = case rating_model
+                       when 'single'
+                         false
+                       when 'county'
+                         old_county_zip.county_name != new_county_zip.county_name
+                       when 'zipcode'
+                         old_county_zip.zip != new_county_zip.zip
+                       else
+                         old_county_zip.county_name != new_county_zip.county_name &&
+                         old_county_zip.zip != new_county_zip.zip
+                       end
+
+        is_approved = true if is_sep_valid
+      else
+        is_approved = true
+      end
+    end
+
+    render json: {is_approved: is_approved}
+  end
+
   def check_move_reason
   end
 
