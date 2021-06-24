@@ -36,6 +36,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
         @application = ::FinancialAssistance::Application.by_hbx_id(response_payload[:hbx_id]).first.reload
         @ed = @application.eligibility_determinations.first
         @applicant = @ed.applicants.first
+        @app_entity = ::AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(response_payload).success
       end
 
       it 'should return success' do
@@ -55,13 +56,16 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
           expect(@application.determination_http_status_code).to eq(200)
         end
 
+        it 'should update integrated_case_id' do
+          expect(@application.integrated_case_id).to eq(@app_entity.hbx_id)
+        end
+
         it 'should update has_eligibility_response' do
           expect(@application.has_eligibility_response).to eq(true)
         end
 
         it 'should update eligibility_response_payload' do
-          app_entity = ::AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(response_payload).success
-          expect(@application.eligibility_response_payload).to eq(app_entity.to_h.to_json)
+          expect(@application.eligibility_response_payload).to eq(@app_entity.to_h.to_json)
         end
       end
 
@@ -114,6 +118,16 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
 
         it 'should update is_eligible_for_non_magi_reasons' do
           expect(@applicant.is_eligible_for_non_magi_reasons).to eq(true)
+        end
+
+        it 'should update medicaid_household_size & not to be nil' do
+          expect(@applicant.medicaid_household_size).not_to be_nil
+          expect(@applicant.medicaid_household_size).to eq(0)
+        end
+
+        it 'should update magi_medicaid_category' do
+          expect(@applicant.magi_medicaid_category).not_to be_nil
+          expect(@applicant.magi_medicaid_category).to eq('none')
         end
       end
     end
