@@ -1,6 +1,6 @@
 module ApplicationHelper
   include FloatHelper
-  include Rails.application.routes.url_helpers
+  include Routeable
 
   def can_employee_shop?(date)
     return false if date.blank?
