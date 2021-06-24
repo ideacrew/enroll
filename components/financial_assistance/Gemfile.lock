@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 6cf14b7aab88ae3fd54da9a57d1c0ceb3a49c61f
+  revision: eb0fcc0f81dfedd50522abf263e05c74c3b39756
   branch: fdsh
   specs:
     aca_entities (0.2.2)
@@ -24,10 +24,10 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/event_source.git
-  revision: 28325ca945838e84f78090abf9429a1304bf4ae9
-  branch: release_0.5.1
+  revision: 4a4baa01544467fb97c732659c6e1ec82fa8be01
+  branch: release_0.5.2
   specs:
-    event_source (0.5.0)
+    event_source (0.5.2)
       bunny (>= 1.7.1)
       deep_merge (~> 1.2.0)
       dry-events (~> 0.3)
@@ -38,7 +38,7 @@ GIT
       dry-struct (~> 1.4)
       dry-types (~> 1.5)
       dry-validation (~> 1.6)
-      faraday (~> 1.4.1)
+      faraday (~> 1.4.3)
       faraday_middleware (~> 1.0)
       logging (~> 2.3.0)
       mime-types
@@ -347,7 +347,7 @@ GEM
       racc (~> 1.4)
     nokogiri-happymapper (0.8.1)
       nokogiri (~> 1.5)
-    oj (3.11.6)
+    oj (3.11.7)
     orm_adapter (0.5.0)
     ox (2.14.5)
     parallel (1.19.2)
