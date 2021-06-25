@@ -9,6 +9,7 @@ class SeedWorker
   attr_accessor :target_seed
 
   def perform(seed_id)
+    puts("Beginning the seed ID perform.")
     sleep 2
     # Tons of stuff
     @target_seed = ::Seeds::Seed.find(seed_id)
@@ -24,6 +25,7 @@ class SeedWorker
         partial: "exchanges/seeds/row",
         locals: { row: row }
       )
+      puts("Beginning row morph for row #{row.id}")
 
       cable_ready["seed-row-processing"].morph(
         selector: "#seed-#{seed_id}-row-#{row.id}",
