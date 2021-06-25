@@ -15,6 +15,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
                                   ssn: person.ssn,
                                   application: application,
                                   ethnicity: [],
+                                  is_primary_applicant: true,
                                   person_hbx_id: person.hbx_id,
                                   is_self_attested_blind: false,
                                   is_applying_coverage: true,
@@ -583,6 +584,239 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
     it 'should be able to successfully init Application Entity' do
       expect(@entity_init).to be_success
+    end
+  end
+
+  context 'for mitc_households' do
+    let!(:person2) { FactoryBot.create(:person, hbx_id: "732021") }
+    let!(:family_member2) { FactoryBot.create(:family_member, person: person2, family: family) }
+    let!(:applicant2) do
+      FactoryBot.create(:applicant,
+                        first_name: person2.first_name,
+                        last_name: person2.last_name,
+                        dob: person2.dob,
+                        gender: person2.gender,
+                        ssn: person2.ssn,
+                        application: application,
+                        eligibility_determination_id: eligibility_determination.id,
+                        ethnicity: [],
+                        person_hbx_id: person2.hbx_id,
+                        is_self_attested_blind: false,
+                        is_applying_coverage: true,
+                        is_required_to_file_taxes: false,
+                        is_claimed_as_tax_dependent: true,
+                        claimed_as_tax_dependent_by: applicant.id,
+                        is_pregnant: false,
+                        has_job_income: false,
+                        has_self_employment_income: false,
+                        has_unemployment_income: false,
+                        has_other_income: false,
+                        has_deductions: false,
+                        is_self_attested_disabled: true,
+                        is_physically_disabled: false,
+                        has_enrolled_health_coverage: false,
+                        has_eligible_health_coverage: false,
+                        has_eligible_medicaid_cubcare: false,
+                        is_incarcerated: false,
+                        citizen_status: 'us_citizen',
+                        net_annual_income: 5_078.90,
+                        is_post_partum_period: false)
+    end
+    let!(:relationships) do
+      application.add_relationship(applicant, applicant2, 'parent')
+    end
+    let!(:home_address1) do
+      add = ::FinancialAssistance::Locations::Address.new({
+        kind: 'home',
+        address_1: '1 Awesome Street',
+        address_2: '#100',
+        city: 'Washington',
+        state: 'DC',
+        zip: '20001'
+      })
+
+      applicant.addresses << add
+      applicant.save!
+    end
+
+    context 'same address for both applicants' do
+      let!(:home_address2) do
+        add = ::FinancialAssistance::Locations::Address.new({
+          kind: 'home',
+          address_1: '1 Awesome Street',
+          address_2: '#100',
+          city: 'Washington',
+          state: 'DC',
+          zip: '20001'
+        })
+
+        applicant2.addresses << add
+        applicant2.save!
+      end
+
+      before do
+        @result = subject.call(application.reload)
+        @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(@result.success)
+      end
+
+      it 'should return success for result' do
+        expect(@result).to be_success
+      end
+
+      it 'should be able to successfully init Application Entity' do
+        expect(@entity_init).to be_success
+      end
+
+      context 'for mitc_households' do
+        before do
+          @mitc_household = @result.success[:mitc_households].first
+        end
+
+        it 'should populate correct mitc_household' do
+          expect(@mitc_household).to eq({ household_id: '1', people: [{ person_id: '732020'}, { person_id: '732021' }] })
+        end
+      end
+    end
+
+    context 'different address for both applicants' do
+      let!(:home_address2) do
+        add = ::FinancialAssistance::Locations::Address.new({
+          kind: 'home',
+          address_1: '2 Awesome Street',
+          address_2: '#200',
+          city: 'Washington',
+          state: 'DC',
+          zip: '20001'
+        })
+
+        applicant2.addresses << add
+        applicant2.save!
+      end
+
+      before do
+        @result = subject.call(application.reload)
+        @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(@result.success)
+      end
+
+      it 'should return success for result' do
+        expect(@result).to be_success
+      end
+
+      it 'should be able to successfully init Application Entity' do
+        expect(@entity_init).to be_success
+      end
+
+      context 'for mitc_households' do
+        before do
+          mitc_households = @result.success[:mitc_households]
+          @first_mitc_hh = mitc_households[0]
+          @second_mitc_hh = mitc_households[1]
+        end
+
+        it 'should populate first mitc_household correctly' do
+          expect(@first_mitc_hh).to eq({ household_id: '1', people: [{ person_id: '732020'}] })
+        end
+
+        it 'should populate second mitc_household correctly' do
+          expect(@second_mitc_hh).to eq({ household_id: '2', people: [{ person_id: '732021' }] })
+        end
+      end
+    end
+
+    context 'child has same address as primary but spouse has a different address ' do
+      let!(:home_address2) do
+        add = ::FinancialAssistance::Locations::Address.new({
+          kind: 'home',
+          address_1: '1 Awesome Street',
+          address_2: '#100',
+          city: 'Washington',
+          state: 'DC',
+          zip: '20001'
+        })
+
+        applicant2.addresses << add
+        applicant2.save!
+      end
+
+      let!(:person3) { FactoryBot.create(:person, hbx_id: "732022") }
+      let!(:family_member3) { FactoryBot.create(:family_member, person: person3, family: family) }
+      let!(:applicant3) do
+        FactoryBot.create(:applicant,
+                          first_name: person3.first_name,
+                          last_name: person3.last_name,
+                          dob: person3.dob,
+                          gender: person3.gender,
+                          ssn: person3.ssn,
+                          application: application,
+                          eligibility_determination_id: eligibility_determination.id,
+                          ethnicity: [],
+                          person_hbx_id: person3.hbx_id,
+                          is_self_attested_blind: false,
+                          is_applying_coverage: true,
+                          is_required_to_file_taxes: false,
+                          is_claimed_as_tax_dependent: false,
+                          is_pregnant: false,
+                          has_job_income: false,
+                          has_self_employment_income: false,
+                          has_unemployment_income: false,
+                          has_other_income: false,
+                          has_deductions: false,
+                          is_self_attested_disabled: true,
+                          is_physically_disabled: false,
+                          has_enrolled_health_coverage: false,
+                          has_eligible_health_coverage: false,
+                          has_eligible_medicaid_cubcare: false,
+                          is_incarcerated: false,
+                          citizen_status: 'us_citizen',
+                          net_annual_income: 0.0,
+                          is_post_partum_period: false)
+      end
+      let!(:third_set_relationships) do
+        application.add_relationship(applicant2, applicant3, 'child')
+        application.add_relationship(applicant, applicant3, 'spouse')
+      end
+      let!(:home_address3) do
+        add = ::FinancialAssistance::Locations::Address.new({
+          kind: 'home',
+          address_1: '3 Awesome Street',
+          address_2: '#300',
+          city: 'Washington',
+          state: 'DC',
+          zip: '20001'
+        })
+
+        applicant3.addresses << add
+        applicant3.save!
+      end
+
+      before do
+        @result = subject.call(application.reload)
+        @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(@result.success)
+      end
+
+      it 'should return success for result' do
+        expect(@result).to be_success
+      end
+
+      it 'should be able to successfully init Application Entity' do
+        expect(@entity_init).to be_success
+      end
+
+      context 'for mitc_households' do
+        before do
+          mitc_households = @result.success[:mitc_households]
+          @first_mitc_hh = mitc_households[0]
+          @second_mitc_hh = mitc_households[1]
+        end
+
+        it 'should populate first mitc_household correctly' do
+          expect(@first_mitc_hh).to eq({ household_id: '1', people: [{ person_id: '732020'}, { person_id: '732021' }] })
+        end
+
+        it 'should populate second mitc_household correctly' do
+          expect(@second_mitc_hh).to eq({ household_id: '2', people: [{ person_id: '732022' }] })
+        end
+      end
     end
   end
 end

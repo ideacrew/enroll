@@ -150,6 +150,24 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
     context "when params has application key" do
       let(:success_result) { double(success?: true)}
+
+      let!(:create_home_address) do
+        [application, application2].each do |applin|
+          applin.applicants.first.update_attributes!(is_primary_applicant: true)
+          add = ::FinancialAssistance::Locations::Address.new({
+            kind: 'home',
+            address_1: '3 Awesome Street',
+            address_2: '#300',
+            city: 'Washington',
+            state: 'DC',
+            zip: '20001'
+          })
+          primary_appli = applin.reload.primary_applicant
+          primary_appli.addresses << add
+          primary_appli.save!
+        end
+      end
+
       it "When model is saved" do
         post :step, params: { id: application.id, application: application_valid_params }
         expect(application.save).to eq true

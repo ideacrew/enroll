@@ -20,6 +20,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
                       citizen_status: 'us_citizen',
                       person_hbx_id: person.hbx_id,
                       ethnicity: [],
+                      is_primary_applicant: true,
                       is_self_attested_blind: false,
                       is_applying_coverage: true,
                       is_required_to_file_taxes: true,
@@ -37,6 +38,18 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
                       is_student: false,
                       is_former_foster_care: false,
                       is_post_partum_period: false)
+  end
+  let!(:create_home_address) do
+    add = ::FinancialAssistance::Locations::Address.new({
+      kind: 'home',
+      address_1: '3 Awesome Street',
+      address_2: '#300',
+      city: 'Washington',
+      state: 'DC',
+      zip: '20001'
+    })
+    applicant.addresses << add
+    applicant.save!
   end
 
   let!(:eligibility_determination) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application) }

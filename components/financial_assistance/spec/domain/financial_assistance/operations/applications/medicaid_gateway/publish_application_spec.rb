@@ -17,6 +17,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
                                   ssn: person.ssn,
                                   application: application,
                                   ethnicity: [],
+                                  is_primary_applicant: true,
                                   is_self_attested_blind: false,
                                   is_applying_coverage: true,
                                   is_required_to_file_taxes: true,
@@ -38,12 +39,26 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
   let!(:eligibility_determination) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application) }
   let(:event) { Success(double) }
   let(:obj)  { FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication.new }
+  let!(:create_home_address) do
+    application.applicants.first.update_attributes!(is_primary_applicant: true)
+    add = ::FinancialAssistance::Locations::Address.new({
+      kind: 'home',
+      address_1: '3 Awesome Street',
+      address_2: '#300',
+      city: 'Washington',
+      state: 'DC',
+      zip: '20001'
+    })
+    primary_appli = application.reload.primary_applicant
+    primary_appli.addresses << add
+    primary_appli.save!
+  end
 
   before do
     allow(FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication).to receive(:new).and_return(obj)
     allow(obj).to receive(:build_event).and_return(event)
     allow(event.success).to receive(:publish).and_return(true)
-    application_params = ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application)
+    application_params = ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application.reload)
     @result = subject.call(application_params.success)
   end
 
