@@ -26,7 +26,6 @@ module GoldenSeedWorkerConcern
     def process_row_individual_market_seed(target_row)
       target_seed = target_row.seed
       row_data = target_row.data
-      remove_golden_seed_callbacks
       # TODO: Weird behavior. Prevents the original hash on the row attribute from being modified
       data_to_process = row_data.deep_dup.with_indifferent_access
       primary_family_for_current_case = target_seed.rows.where(unique_row_identifier: data_to_process[:case_name]).first&.target_record
@@ -76,7 +75,6 @@ module GoldenSeedWorkerConcern
           add_applicant_income(target_row_data)
         end
       end
-      reinstate_golden_seed_callbacks
       # TODOO: Unique identifying data
       # Please note that some of these are TODO and may not actually be in the golden seed yet
       unique_row_notes = ""

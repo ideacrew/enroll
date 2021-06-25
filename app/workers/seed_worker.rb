@@ -16,6 +16,7 @@ class SeedWorker
     # need to do the primary_person first
     Rails.logger.warn("No CSV Template provided for Seed #{target_seed.id}") if target_seed.csv_template.blank?
     abort if target_seed.csv_template.blank?
+    remove_golden_seed_callbacks if Rails.env.production?
     target_seed.rows.each do |row|
       Rails.logger.warn("No data provided for Seed Row #{row.id} of seed #{target_seed.id}") if row.data.blank?
       next if row.data.blank?
@@ -34,5 +35,6 @@ class SeedWorker
 
       cable_ready.broadcast
     end
+    sreinstate_golden_seed_callbacks if Rails.env.production?
   end
 end
