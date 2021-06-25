@@ -736,6 +736,7 @@ module FinancialAssistance
       when :other_income
         if FinancialAssistanceRegistry[:unemployment_income].enabled?
           return false if has_unemployment_income.nil?
+          return incomes.unemployment.first.save if incomes.unemployment.count == 1 && has_unemployment_income
           return incomes.unemployment.present? if has_unemployment_income
         end
         return false if has_other_income.nil?
