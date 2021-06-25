@@ -10,9 +10,7 @@ module Subscribers
       logger.info "Enroll: invoked on_document_created with delivery_info: #{delivery_info}, response: #{response}"
 
       payload = JSON.parse(response, :symbolize_names => true)
-      family = Family.where(hbx_assigned_id: payload[:subjects][0][:id]).first
-
-      result = Operations::Documents::Create.new.call(resource: family&.primary_person, document_params: payload, doc_identifier: payload[:id])
+      result = Operations::CreateDocumentAndNotifyRecipient.new.call(payload)
 
       if result.success?
         ack(delivery_info.delivery_tag)
