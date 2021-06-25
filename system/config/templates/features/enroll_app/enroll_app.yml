@@ -256,6 +256,8 @@ registry:
             item: true
           - key: :medicaid_agency_phone
             item: "(000) 000-0000"
+          - key: :sep_moved_out_zip_compare
+            item: true
       - key: :rating_area
         item: :rating_area
         is_enabled: false
