@@ -136,8 +136,8 @@ module GoldenSeedHelper
       last_name: last_name,
       gender: gender,
       ssn: generate_and_return_unique_ssn,
-      dob: generate_random_birthday(case_info_hash)
-      # hbx_id: SecureRandom.hex # To avoid external hbx id calls
+      dob: generate_random_birthday(case_info_hash),
+      hbx_id: SecureRandom.hex # To avoid external hbx id calls
     )
     # @original_person_hbx_ids << person.hbx_id
     person.save!
@@ -402,7 +402,7 @@ module GoldenSeedHelper
     consumer_role.skip_residency_verification = true
     effective_on = TimeKeeper.date_of_record
     enrollment = HbxEnrollment.new(kind: "individual", consumer_role_id: consumer_role.id)
-    # enrollment.hbx_id = SecureRandom.hex # To avoid external hbx id calls
+    enrollment.hbx_id = SecureRandom.hex # To avoid external hbx id calls
     # @original_enrollment_hbx_ids << enrollment.hbx_id
     enrollment.effective_on = effective_on
     # A new product will be created for this rake task if there are none present.
