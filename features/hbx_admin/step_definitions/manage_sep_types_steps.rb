@@ -338,9 +338,10 @@ end
 When(/Admin creates new SEP Type with (.*) market and (.*) select termination on kinds with (.*) scenario$/) do |market_kind, action, scenario|
   page.find('.interaction-click-control-create-sep').click
   expect(page).to have_content('Create SEP Type')
-  if scenario == "failure"
+  case scenario
+  when "failure"
     step "Admin fills Create SEP Type form with start on date greater than end on date"
-  elsif scenario == "past start date"
+  when "past start date"
     step "Admin fills Create SEP Type form with past start and end dates"
   else
     step "Admin fills Create SEP Type form with start and end dates"
@@ -353,11 +354,12 @@ When(/Admin creates new SEP Type with (.*) market and (.*) select termination on
   step "Admin selects effective on kinds for Create SEP Type"
   step "Admin #{action} select termination on kinds for #{market_kind} SEP Type"
   step "Admin fills Create SEP Type form with Pre Event SEP and Post Event SEP dates"
-  if scenario == "invalid eligibity date"
+  case scenario
+  when "invalid eligibity date"
     step "Admin fills invalid eligibility start and end dates"
-  elsif scenario == "only eligibility start date"
+  when "only eligibility start date"
     step "Admin fills eligibility start date"
-  elsif scenario == "only eligibility end date"
+  when "only eligibility end date"
     step "Admin fills eligibility end date"
   end
   step "Admin clicks on Create Draft button"
