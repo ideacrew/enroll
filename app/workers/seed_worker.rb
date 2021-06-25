@@ -34,7 +34,5 @@ class SeedWorker
 
       cable_ready.broadcast
     end
-    @target_seed.complete!
-    @target_seed.save
   end
 end
