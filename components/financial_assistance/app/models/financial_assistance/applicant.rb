@@ -930,6 +930,10 @@ module FinancialAssistance
       age_of_applicant > 17 && age_of_applicant < 23
     end
 
+    def home_address
+      addresses.where(kind: 'home').first
+    end
+
     class << self
       def find(id)
         return nil unless id

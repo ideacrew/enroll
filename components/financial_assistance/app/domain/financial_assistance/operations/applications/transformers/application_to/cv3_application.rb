@@ -542,12 +542,42 @@ module FinancialAssistance
               { health_only_lcsp_premiums: membr_premiums, health_only_slcsp_premiums: membr_premiums }
             end
 
+            # Physical households(mitc_households) are groups based on the member's Home Address.
             def mitc_households(application)
-              applicant_person_hbx_ids = application.applicants.map(&:person_hbx_id)
-              people = applicant_person_hbx_ids.inject([]) do |result, id|
-                result << {person_id: id}
+              address_people_combinations = [{ application.primary_applicant.home_address => [{ person_id: application.primary_applicant.person_hbx_id }] }]
+              non_primary_applicants = application.applicants.where(is_primary_applicant: false)
+
+              non_primary_applicants.each do |dependent|
+                home_address = dependent.home_address
+                next dependent unless home_address
+
+                all_addresses = address_people_combinations.inject([]) do |adds, add_people_combination|
+                  adds << add_people_combination.keys.first
+                end
+
+                matching_existing_address = all_addresses.detect do |address|
+                  address.matches_addresses?(home_address)
+                end
+
+                if matching_existing_address.present?
+                  matched_combi = address_people_combinations.detect do |each_combi|
+                    each_combi.keys.first.matches_addresses?(home_address)
+                  end
+
+                  address_people_combinations.delete(matched_combi)
+                  matched_combi[matched_combi.keys.first] << { person_id: dependent.person_hbx_id }
+                  address_people_combinations << matched_combi
+                else
+                  address_people_combinations << { home_address => [{ person_id: dependent.person_hbx_id }] }
+                end
               end
-              [{household_id: application.hbx_id, people: people}]
+
+              household_id_people_combinations = []
+              address_people_combinations.each_with_index do |address_people_combination, indx|
+                household_id_people_combinations << { household_id: (indx + 1).to_s, people: address_people_combination.values.first }
+              end
+
+              household_id_people_combinations
             end
 
             def mitc_tax_returns(application)
