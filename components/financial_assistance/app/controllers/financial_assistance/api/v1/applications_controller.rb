@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module FinancialAssistance::API::V1
+module FinancialAssistance::Api::V1
   class ApplicationsController < FinancialAssistance::ApplicationController
     before_action :set_current_person
 
@@ -19,9 +19,6 @@ module FinancialAssistance::API::V1
         aasm_state: "draft",
         family_id: get_current_person.financial_assistance_identifier
       ).new(application_valid_params)
-      
-      @application.save
-      @application.errors.inspect
 
       if @application.save
         render json: @application
@@ -32,9 +29,8 @@ module FinancialAssistance::API::V1
 
     def update
       @application = FinancialAssistance::Application.find_by(family_id: get_current_person.financial_assistance_identifier)
-      if @application
-        @application.update(params)
-        render json: nil, status: :success
+      if @application.update(application_valid_params)
+        render json: @application
       else
         render json: { errors: @application.errors.full_messages }, status: :bad_request
       end
@@ -49,7 +45,7 @@ module FinancialAssistance::API::V1
       @application = FinancialAssistance::Application.find_by(:family_id)
       if @application
         @application.destroy
-        render json: nil, status: :success
+        head :no_content
       else
         render json: { errors: @application.errors.full_messages }, status: :bad_request
       end
@@ -60,6 +56,8 @@ module FinancialAssistance::API::V1
     def application_valid_params
       params.require(:application).permit(
         :applicants_attributes => [
+          :id,
+          :tax_filer_kind,
           :is_ssn_applied,
           :non_ssn_apply_reason,
           :is_pregnant,
