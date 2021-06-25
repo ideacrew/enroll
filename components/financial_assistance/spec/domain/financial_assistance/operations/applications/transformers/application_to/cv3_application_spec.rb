@@ -540,6 +540,35 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     end
   end
 
+  context 'with a health_reimbursement_arrangement benefit' do
+    let!(:create_hra_benefit) do
+      benefit = ::FinancialAssistance::Benefit.new({ kind: "is_enrolled",
+                                                     insurance_kind: "health_reimbursement_arrangement",
+                                                     hra_type: 'Individual coverage HRA',
+                                                     employee_cost: 100.00,
+                                                     employee_cost_frequency: 'monthly',
+                                                     start_on: Date.today.prev_year.beginning_of_month,
+                                                     employer_name: "er1",
+                                                     employer_id: '23-2675213' })
+      applicant.benefits << benefit
+      applicant.save!
+    end
+
+    before do
+      result = subject.call(application.reload)
+      @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+      @benefit = result.success[:applicants].first[:benefits].first
+    end
+
+    it 'should be able to successfully init Application Entity' do
+      expect(@entity_init).to be_success
+    end
+
+    it 'should be able to successfully transform hra_kind' do
+      expect(@benefit[:hra_kind]).to eq(:ichra)
+    end
+  end
+
   context 'with peace_corps_health_benefits benefit' do
     let!(:create_esi_benefit) do
       benefit = ::FinancialAssistance::Benefit.new({
