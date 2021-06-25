@@ -116,7 +116,7 @@ Rails.application.configure do
   config.wells_fargo_api_date_format = '%Y-%m-%dT%H:%M:%S.0000000%z'
 
   # Cartafact config
-  #config.cartafact_document_base_url = "https://prod-cartafact.priv.dchbx.org/api/v1/documents"
+  config.cartafact_document_base_url = "http://#{ENV['CARTAFACT_HOST']}:3000/api/v1/documents"
 
   # Action_cable config values
   config.action_cable.url = "wss://#{ENV['ENROLL_FQDN']}/cable"
