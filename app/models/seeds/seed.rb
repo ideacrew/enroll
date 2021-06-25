@@ -35,8 +35,6 @@ module Seeds
     def create_records!
       puts("Beginning create records.")
       SeedWorker.perform_async(self.id)
-      complete!
-      save
     end
   end
 end
