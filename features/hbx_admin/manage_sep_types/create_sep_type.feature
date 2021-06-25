@@ -53,6 +53,7 @@ Feature: Admin has ability to create a new SEP Type
     Given Admin can navigate to the Manage SEPs screen
     When Admin creates new SEP Type with individual market and cannot select termination on kinds with <failure_type> scenario
     Then Admin should see failure for <failure_msg>
+    And Hbx Admin logs out
 
     Examples:
     | failure_type                | failure_msg              |
