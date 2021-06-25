@@ -1,7 +1,7 @@
 name: Nightly Stored Client Tests
 on:
-  schedule:
-    - cron: '0 0 * * *'
+  push:
+
 
 env:
   RSPEC_SPLIT_CONFIGURATION_PATH: 'ci/rspec-split-config.json'
