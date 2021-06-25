@@ -12,7 +12,7 @@
       <%#= f.select_tag :frequency, placeholder: 'HOW OFTEN *', required: true, class: "floatlabel" %>
       <%= f.label :frequency_kind, 'HOW OFTEN *', class: "label-color" %>
       <div class="fa-frequency-kind">
-        <%= f.select(:frequency_kind, options_for_select(frequency_kind_options, selected: income.frequency_kind), {include_blank: "Choose"}, {:disabled => false}) %>
+        <%= f.select(:frequency_kind, options_for_select(frequency_kind_options, selected: income.frequency_kind), {include_blank: "Choose"}, {:disabled => false, :required => true}) %>
       </div>
     </div>
     <div class="col-md-3">
