@@ -46,7 +46,7 @@ module Operations
     # rubocop:disable Layout/LineLength
     # rubocop:disable Style/StringConcatenation
     def send_secure_message(resource, document)
-      document_title = document.title.gsub(/[^0-9a-z.]/i,'')
+      document_title = document.title.gsub(/[^0-9a-z.]/i,'').gsub('.pdf', '')
       body = "<br>You can download the notice by clicking this link " \
              "<a href=" \
              "#{Rails.application.routes.url_helpers.cartafact_document_download_path(resource.class.to_s, resource.id.to_s, 'documents', document.id)}?content_type=#{document.format}&filename=#{document.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" \
