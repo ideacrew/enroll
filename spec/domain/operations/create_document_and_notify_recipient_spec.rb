@@ -69,11 +69,19 @@ module Operations
       end
     end
 
-    context "send secure message" do
+    context "create document" do
       it "should be success" do
         document = Operations::CreateDocumentAndNotifyRecipient.new.create_document(person, payload)
         Operations::CreateDocumentAndNotifyRecipient.new.send_secure_message(person, document.success)
         expect(person.reload.documents.count).to eq 1
+      end
+    end
+
+    context "send secure message" do
+      it "should be success" do
+        document = Operations::CreateDocumentAndNotifyRecipient.new.create_document(person, payload)
+        Operations::CreateDocumentAndNotifyRecipient.new.send_secure_message(person, document.success)
+        expect(person.reload.inbox.messages.size).to eq 2
       end
     end
   end
