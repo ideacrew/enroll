@@ -104,6 +104,4 @@ coverage
 # Ignore HUGO output dirs
 hugo/public
 hugo/static
-
-# Ignore swagger output dir
-swagger
+swagger/v1/swagger.yaml
