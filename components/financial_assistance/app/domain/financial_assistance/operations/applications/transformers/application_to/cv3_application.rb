@@ -513,9 +513,13 @@ module FinancialAssistance
                             start_on: benefit.start_on,
                             end_on: benefit.end_on,
                             submitted_at: benefit.submitted_at,
-                            hra_kind: benefit.hra_type }
+                            hra_kind: get_hra_kind(benefit.hra_type) }
                 result
               end
+            end
+
+            def get_hra_kind(hra_type)
+              { 'Individual coverage HRA' => :ichra, 'Qualified Small Employer HRA' => :qsehra }[hra_type]
             end
 
             def deductions(applicant)

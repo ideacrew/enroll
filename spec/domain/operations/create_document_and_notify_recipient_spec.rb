@@ -2,6 +2,7 @@
 
 require "rails_helper"
 
+# module Operations for class CreateDocumentAndNotifyRecipient
 module Operations
   RSpec.describe CreateDocumentAndNotifyRecipient do
     subject do
