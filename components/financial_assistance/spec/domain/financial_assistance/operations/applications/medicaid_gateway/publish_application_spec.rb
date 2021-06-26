@@ -42,13 +42,13 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
   let!(:create_home_address) do
     application.applicants.first.update_attributes!(is_primary_applicant: true)
     add = ::FinancialAssistance::Locations::Address.new({
-      kind: 'home',
-      address_1: '3 Awesome Street',
-      address_2: '#300',
-      city: 'Washington',
-      state: 'DC',
-      zip: '20001'
-    })
+                                                          kind: 'home',
+                                                          address_1: '3 Awesome Street',
+                                                          address_2: '#300',
+                                                          city: 'Washington',
+                                                          state: 'DC',
+                                                          zip: '20001'
+                                                        })
     primary_appli = application.reload.primary_applicant
     primary_appli.addresses << add
     primary_appli.save!
