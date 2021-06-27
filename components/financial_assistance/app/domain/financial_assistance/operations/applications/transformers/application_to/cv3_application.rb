@@ -208,16 +208,17 @@ module FinancialAssistance
 
             # All MitcIncome amounts must be expressed as annual amounts.
             def mitc_income(applicant)
-              { amount: wages_and_salaries(applicant),
-                taxable_interest: taxable_interest(applicant),
+              current_incomes = applicant.current_month_incomes
+              { amount: wages_and_salaries(current_incomes),
+                taxable_interest: taxable_interest(current_incomes),
                 tax_exempt_interest: 0,
                 taxable_refunds: 0,
-                alimony: alimony(applicant),
-                capital_gain_or_loss: capital_gain_or_loss(applicant),
-                pensions_and_annuities_taxable_amount: pensions_and_annuities_taxable_amount(applicant),
-                farm_income_or_loss: farm_income_or_loss(applicant),
-                unemployment_compensation: unemployment_compensation(applicant),
-                other_income: other_income(applicant),
+                alimony: alimony(current_incomes),
+                capital_gain_or_loss: capital_gain_or_loss(current_incomes),
+                pensions_and_annuities_taxable_amount: pensions_and_annuities_taxable_amount(current_incomes),
+                farm_income_or_loss: farm_income_or_loss(current_incomes),
+                unemployment_compensation: unemployment_compensation(current_incomes),
+                other_income: other_income(current_incomes),
                 magi_deductions: magi_deductions(applicant),
                 adjusted_gross_income: applicant.net_annual_income || 0,
                 deductible_part_of_self_employment_tax: deductible_part_of_self_employment_tax(applicant),
@@ -269,66 +270,90 @@ module FinancialAssistance
             # rubocop:enable Metrics/CyclomaticComplexity
 
             # JobIncome(wages_and_salaries) & SelfEmploymentIncome(net_self_employment)
-            def wages_and_salaries(applicant)
-              applicant.incomes.where(:kind.in => ['wages_and_salaries', 'net_self_employment']).inject(0) do |result, income|
+            def wages_and_salaries(current_incomes)
+              ws_incomes = current_incomes.select do |inc|
+                ['wages_and_salaries', 'net_self_employment'].include?(inc.kind)
+              end
+              ws_incomes.inject(0) do |result, income|
                 frequency = income.frequency_kind
                 result += annual_amount(frequency(frequency), income.amount.to_i)
                 result
               end
             end
 
-            def taxable_interest(applicant)
-              applicant.incomes.where(kind: "interest").inject(0) do |result, income|
+            def taxable_interest(current_incomes)
+              ti_incomes = current_incomes.select do |inc|
+                inc.kind == 'interest'
+              end
+              ti_incomes.inject(0) do |result, income|
                 frequency = income.frequency_kind
                 result += annual_amount(frequency(frequency), income.amount.to_i)
                 result
               end
             end
 
-            def alimony(applicant)
-              applicant.incomes.where(kind: "alimony_and_maintenance").inject(0) do |result, income|
+            def alimony(current_incomes)
+              ali_incomes = current_incomes.select do |inc|
+                inc.kind == 'alimony_and_maintenance'
+              end
+              ali_incomes.inject(0) do |result, income|
                 frequency = income.frequency_kind
                 result += annual_amount(frequency(frequency), income.amount.to_i)
                 result
               end
             end
 
-            def capital_gain_or_loss(applicant)
-              applicant.incomes.where(kind: "capital_gains").inject(0) do |result, income|
+            def capital_gain_or_loss(current_incomes)
+              cg_incomes = current_incomes.select do |inc|
+                inc.kind == 'capital_gains'
+              end
+              cg_incomes.inject(0) do |result, income|
                 frequency = income.frequency_kind
                 result += annual_amount(frequency(frequency), income.amount.to_i)
                 result
               end
             end
 
-            def pensions_and_annuities_taxable_amount(applicant)
-              applicant.incomes.where(kind: "pension_retirement_benefits").inject(0) do |result, income|
+            def pensions_and_annuities_taxable_amount(current_incomes)
+              pnt_incomes = current_incomes.select do |inc|
+                inc.kind == 'pension_retirement_benefits'
+              end
+              pnt_incomes.inject(0) do |result, income|
                 frequency = income.frequency_kind
                 result += annual_amount(frequency(frequency), income.amount.to_i)
                 result
               end
             end
 
-            def farm_income_or_loss(applicant)
-              applicant.incomes.where(kind: "farming_and_fishing").inject(0) do |result, income|
+            def farm_income_or_loss(current_incomes)
+              fi_incomes = current_incomes.select do |inc|
+                inc.kind == 'farming_and_fishing'
+              end
+              fi_incomes.inject(0) do |result, income|
                 frequency = income.frequency_kind
                 result += annual_amount(frequency(frequency), income.amount.to_i)
                 result
               end
             end
 
-            def unemployment_compensation(applicant)
-              applicant.incomes.where(kind: "unemployment_income").inject(0) do |result, income|
+            def unemployment_compensation(current_incomes)
+              uc_incomes = current_incomes.select do |inc|
+                inc.kind == 'unemployment_income'
+              end
+              uc_incomes.inject(0) do |result, income|
                 frequency = income.frequency_kind
                 result += annual_amount(frequency(frequency), income.amount.to_i)
                 result
               end
             end
 
-            def other_income(applicant)
+            def other_income(current_incomes)
               other_kinds = ["dividend", "rental_and_royalty", "social_security_benefit", "american_indian_and_alaskan_native",
                              "employer_funded_disability", "estate_trust", "foreign", "other", "prizes_and_awards"]
-              applicant.incomes.where(:kind.in => other_kinds).inject(0) do |result, income|
+              otr_incomes = current_incomes.select do |inc|
+                other_kinds.include?(inc.kind)
+              end
+              otr_incomes.inject(0) do |result, income|
                 frequency = income.frequency_kind
                 result += annual_amount(frequency(frequency), income.amount.to_i)
                 result
