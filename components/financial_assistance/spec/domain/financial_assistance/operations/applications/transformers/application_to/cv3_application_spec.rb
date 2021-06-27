@@ -464,7 +464,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
                                                 kind: 'wages_and_salaries',
                                                 frequency_kind: 'yearly',
                                                 amount: 30_000.00,
-                                                start_on: Date.today.prev_year,
+                                                start_on: TimeKeeper.date_of_record.beginning_of_month,
                                                 employer_name: 'Testing employer'
                                               })
       applicant.incomes << inc
@@ -475,10 +475,18 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       result = subject.call(application.reload)
       @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
       @mitc_income = result.success[:applicants].first[:mitc_income]
+      @income = result.success[:applicants].first[:incomes].first
     end
 
     it 'should be able to successfully init Application Entity' do
       expect(@entity_init).to be_success
+    end
+
+    it 'should return job_income income for applicant' do
+      expect(@income[:kind]).to eq('wages_and_salaries')
+      expect(@income[:frequency_kind]).to eq('Annually')
+      expect(@income[:amount]).to eq(30_000.00)
+      expect(@income[:employer]).to eq({ employer_name: 'Testing employer', employer_id: '' })
     end
 
     it 'should return mitc_income with amount populated' do
@@ -686,6 +694,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       before do
         @result = subject.call(application.reload)
         @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(@result.success)
+        @mitc_household = @result.success[:mitc_households].first
       end
 
       it 'should return success for result' do
@@ -696,14 +705,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
         expect(@entity_init).to be_success
       end
 
-      context 'for mitc_households' do
-        before do
-          @mitc_household = @result.success[:mitc_households].first
-        end
-
-        it 'should populate correct mitc_household' do
-          expect(@mitc_household).to eq({ household_id: '1', people: [{ person_id: '732020'}, { person_id: '732021' }] })
-        end
+      it 'should populate correct mitc_household' do
+        expect(@mitc_household).to eq({ household_id: '1', people: [{ person_id: '732020'}, { person_id: '732021' }] })
       end
     end
 
@@ -846,6 +849,69 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
           expect(@second_mitc_hh).to eq({ household_id: '2', people: [{ person_id: '732022' }] })
         end
       end
+    end
+  end
+
+  context 'for mitc_income' do
+    let!(:create_job_income1) do
+      inc = ::FinancialAssistance::Income.new({ kind: 'wages_and_salaries',
+                                                frequency_kind: 'yearly',
+                                                amount: 30_000.00,
+                                                start_on: TimeKeeper.date_of_record.beginning_of_month,
+                                                employer_name: 'Testing employer' })
+      applicant.incomes << inc
+      applicant.save!
+    end
+
+    let!(:income2) do
+      inc = ::FinancialAssistance::Income.new({ kind: 'net_self_employment',
+                                                frequency_kind: 'monthly',
+                                                amount: 100.00,
+                                                start_on: TimeKeeper.date_of_record.next_month.beginning_of_month })
+      applicant.incomes << inc
+      applicant.save!
+    end
+
+    before do
+      result = subject.call(application.reload)
+      @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+      @mitc_income = result.success[:applicants].first[:mitc_income]
+    end
+
+    it 'should be able to successfully init Application Entity' do
+      expect(@entity_init).to be_success
+    end
+
+    it 'should be able to successfully return mitc_income with amount' do
+      expect(@mitc_income[:amount]).to eq(30_000.00)
+    end
+
+    it 'should return taxable_interest for mitc_income as zero' do
+      expect(@mitc_income[:taxable_interest]).to be_zero
+    end
+
+    it 'should return alimony for mitc_income as zero' do
+      expect(@mitc_income[:alimony]).to be_zero
+    end
+
+    it 'should return capital_gain_or_loss for mitc_income as zero' do
+      expect(@mitc_income[:capital_gain_or_loss]).to be_zero
+    end
+
+    it 'should return pensions_and_annuities_taxable_amount for mitc_income as zero' do
+      expect(@mitc_income[:pensions_and_annuities_taxable_amount]).to be_zero
+    end
+
+    it 'should return farm_income_or_loss for mitc_income as zero' do
+      expect(@mitc_income[:farm_income_or_loss]).to be_zero
+    end
+
+    it 'should return unemployment_compensation for mitc_income as zero' do
+      expect(@mitc_income[:unemployment_compensation]).to be_zero
+    end
+
+    it 'should return other_income for mitc_income as zero' do
+      expect(@mitc_income[:other_income]).to be_zero
     end
   end
 end
