@@ -18,7 +18,7 @@ module Validators
         optional(:person_hbx_id).maybe(:string)
         optional(:family_member_id).maybe(Types::Bson)
 
-        required(:is_incarcerated).filled(:bool)
+        optional(:is_incarcerated).maybe(:bool)
         optional(:is_disabled).filled(:bool)
         optional(:ethnicity).maybe(:array)
         optional(:race).maybe(:string)
@@ -73,6 +73,7 @@ module Validators
           result_hash = result.to_h
           other_params = {}
           other_params[:dob] = result_hash[:dob].to_date if result_hash[:dob].present?
+          other_params[:expiration_date] = result_hash[:expiration_date].to_date if result_hash[:expiration_date].present?
           result_hash.merge(other_params)
         end
       end
@@ -94,6 +95,12 @@ module Validators
             key.failure(text: "family_member_id should be present") if values[:family_member_id].blank?
             key.failure(text: "person hbx id should be present") if values[:person_hbx_id].blank?
           end
+        end
+      end
+
+      rule(:is_incarcerated) do
+        if key? && values[:is_applying_coverage]
+          key.failure(text: "is_incarcerated should be populated for applicant applying coverage") if value.nil?
         end
       end
 
