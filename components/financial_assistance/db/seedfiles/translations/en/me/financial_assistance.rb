@@ -84,7 +84,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.question.type_of_hra" => "Type of HRA",
   "en.faa.question.max_employer_reimbursement" => "What's the maximum self-only amount of reimbursement offered by this employer?",
   "en.faa.question.not_sure" => "Not sure",
-  "en.faa.question.eligible_immigration_status" => "Does this person have eligible immigration status?",
+  "en.faa.question.eligible_immigration_status" => "Does this person have an eligible immigration status?",
   "en.faa.question.immigration_continue_note_1" => "<br><br>Note: You can continue the application without answering this question, but if you don't answer it, this person won't be eligible for full Medicaid or Marketplace coverage. ",
   "en.faa.question.immigration_continue_note_2" => "They'll only be considered for coverage of emergency services, including labor and delivery services.",
   # Submit Your Application Page
