@@ -947,7 +947,7 @@ module FinancialAssistance
       start_of_current_month = TimeKeeper.date_of_record.beginning_of_month
       end_of_current_month = TimeKeeper.date_of_record.end_of_month
       incomes.select do |inc|
-        end_on = inc.end_on || inc.start_on.end_of_year
+        end_on = inc.end_on || Date.new(application.assistance_year).end_of_year
         (start_of_current_month..end_of_current_month).any? do |cm_date|
           (inc.start_on..end_on).cover?(cm_date)
         end

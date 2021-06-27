@@ -103,11 +103,11 @@ module FinancialAssistance
             elig_d.update_attributes!({ effective_starting_on: thh_entity.effective_on,
                                         is_eligibility_determined: true,
                                         max_aptc: thh_entity.max_aptc.to_f,
-                                        csr_percent_as_integer: get_primary_csr_value(elig_d, thh_entity),
+                                        csr_percent_as_integer: get_primary_csr_value(elig_d, thh_entity) || 0,
                                         determined_at: thh_entity.determined_on,
                                         aptc_csr_annual_household_income: thh_entity.annual_tax_household_income,
-                                        aptc_annual_income_limit: 0.0,
-                                        csr_annual_income_limit: thh_entity.csr_annual_income_limit,
+                                        aptc_annual_income_limit: Money.new(0, 'USD'),
+                                        csr_annual_income_limit: thh_entity.csr_annual_income_limit || Money.new(0, 'USD'),
                                         source: 'Faa' })
           end
 
