@@ -31,6 +31,7 @@ module Operations
         :file_content_type => "application/pdf"
       }
     end
+    let(:title) { "Magi Medicaid Eligibility Notice" }
 
     context 'when valid args are passed' do
       let(:params) { payload }
@@ -73,7 +74,7 @@ module Operations
     context "create document" do
       it "should be success" do
         document = Operations::CreateDocumentAndNotifyRecipient.new.create_document(person, payload)
-        Operations::CreateDocumentAndNotifyRecipient.new.send_secure_message(person, document.success)
+        Operations::CreateDocumentAndNotifyRecipient.new.send_secure_message(person, document.success, title)
         expect(person.reload.documents.count).to eq 1
       end
     end
@@ -81,7 +82,7 @@ module Operations
     context "send secure message" do
       it "should be success" do
         document = Operations::CreateDocumentAndNotifyRecipient.new.create_document(person, payload)
-        Operations::CreateDocumentAndNotifyRecipient.new.send_secure_message(person, document.success)
+        Operations::CreateDocumentAndNotifyRecipient.new.send_secure_message(person, document.success, title)
         expect(person.reload.inbox.messages.size).to eq 2
       end
     end
