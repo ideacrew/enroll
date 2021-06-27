@@ -923,4 +923,29 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       expect(@mitc_income[:other_income]).to be_zero
     end
   end
+
+  context 'for has_daily_living_help' do
+    let!(:has_daily_living_help) do
+      applicant.update_attributes!({ has_daily_living_help: true,
+                                     is_self_attested_long_term_care: false })
+    end
+
+    before do
+      result = subject.call(application.reload)
+      @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+      @applicant = result.success[:applicants].first
+    end
+
+    it 'should be able to successfully init Application Entity' do
+      expect(@entity_init).to be_success
+    end
+
+    it "should add value of has_daily_living_help to applicant entity's is_self_attested_long_term_care" do
+      expect(@applicant[:is_self_attested_long_term_care]).to eq(applicant.reload.has_daily_living_help)
+    end
+
+    it "should not add value of is_self_attested_long_term_care to applicant entity's is_self_attested_long_term_care" do
+      expect(@applicant[:is_self_attested_long_term_care]).not_to eq(applicant.reload.is_self_attested_long_term_care)
+    end
+  end
 end

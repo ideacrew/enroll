@@ -121,7 +121,8 @@ module FinancialAssistance
                            benefits: benefits(applicant),
                            deductions: deductions(applicant),
                            is_medicare_eligible: applicant.enrolled_or_eligible_in_any_medicare?,
-                           is_self_attested_long_term_care: applicant.is_self_attested_long_term_care.present?,
+                           # Does this person need help with daily life activities, such as dressing or bathing?
+                           is_self_attested_long_term_care: applicant.has_daily_living_help.present?,
                            has_insurance: applicant.is_enrolled_in_insurance?,
                            has_state_health_benefit: applicant.has_state_health_benefit?,
                            had_prior_insurance: had_prior_insurance?(applicant),
