@@ -148,4 +148,49 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       expect(@incomes.first.kind).not_to eq('net_self_employment')
     end
   end
+
+  context 'current_month_incomes with income that started previous year and no end date' do
+    let!(:create_job_income12) do
+      inc = ::FinancialAssistance::Income.new({ kind: 'wages_and_salaries',
+                                                frequency_kind: 'yearly',
+                                                amount: 30_000.00,
+                                                start_on: TimeKeeper.date_of_record.prev_year,
+                                                employer_name: 'Testing employer' })
+      applicant.incomes << inc
+      applicant.save!
+    end
+
+    before do
+      @incomes = applicant.reload.current_month_incomes
+    end
+
+    it 'should return only one income' do
+      expect(@incomes.count).to eq(1)
+    end
+
+    it 'should return the income of kind wages_and_salaries' do
+      expect(@incomes.first.kind).to eq('wages_and_salaries')
+    end
+  end
+
+  context 'current_month_incomes with income that started previous year and ended last month' do
+    let!(:create_job_income11) do
+      inc = ::FinancialAssistance::Income.new({ kind: 'wages_and_salaries',
+                                                frequency_kind: 'yearly',
+                                                amount: 30_000.00,
+                                                start_on: TimeKeeper.date_of_record.prev_year,
+                                                end_on: TimeKeeper.date_of_record.prev_month,
+                                                employer_name: 'Testing employer' })
+      applicant.incomes << inc
+      applicant.save!
+    end
+
+    before do
+      @incomes = applicant.reload.current_month_incomes
+    end
+
+    it 'should not return any incomes as the income ended last month' do
+      expect(@incomes.count).to be_zero
+    end
+  end
 end

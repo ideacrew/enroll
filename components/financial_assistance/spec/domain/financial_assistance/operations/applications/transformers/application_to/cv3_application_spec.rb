@@ -872,6 +872,15 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       applicant.save!
     end
 
+    let!(:income3) do
+      inc = ::FinancialAssistance::Income.new({ kind: 'net_self_employment',
+                                                frequency_kind: 'monthly',
+                                                amount: 2_500.00,
+                                                start_on: TimeKeeper.date_of_record.prev_year })
+      applicant.incomes << inc
+      applicant.save!
+    end
+
     before do
       result = subject.call(application.reload)
       @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
@@ -883,7 +892,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     end
 
     it 'should be able to successfully return mitc_income with amount' do
-      expect(@mitc_income[:amount]).to eq(30_000.00)
+      expect(@mitc_income[:amount]).to eq(60_000.00)
     end
 
     it 'should return taxable_interest for mitc_income as zero' do
