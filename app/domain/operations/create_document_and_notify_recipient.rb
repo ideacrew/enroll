@@ -13,7 +13,7 @@ module Operations
       validate_params = yield validate_params(params)
       resource = yield fetch_resource(validate_params)
       document = yield create_document(resource, params)
-      _secure_message = yield send_secure_message(resource, document)
+      _secure_message = yield send_secure_message(resource, document, params[:file_name])
       result = yield send_generic_notice_alert(resource)
       Success(result)
     end
@@ -45,13 +45,13 @@ module Operations
 
     # rubocop:disable Layout/LineLength
     # rubocop:disable Style/StringConcatenation
-    def send_secure_message(resource, document)
+    def send_secure_message(resource, document, subject)
       document_title = document.title.gsub(/[^0-9a-z.]/i,'').gsub('.pdf', '')
       body = "<br>You can download the notice by clicking this link " \
              "<a href=" \
              "#{Rails.application.routes.url_helpers.cartafact_document_download_path(resource.class.to_s, resource.id.to_s, 'documents', document.id)}?content_type=#{document.format}&filename=#{document.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" \
              " target='_blank'>" + document_title + "</a>"
-      resource.inbox.messages << Message.new(body: body, subject: document_title, from: site_short_name)
+      resource.inbox.messages << Message.new(body: body, subject: subject, from: site_short_name)
       resource.save
       Success(resource)
     end
