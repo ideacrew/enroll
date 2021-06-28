@@ -563,6 +563,40 @@ module BenefitSponsors
       benefit_applications.order_by(:"created_at".desc).detect {|application| application.active?}
     end
 
+    def prior_py_benefit_application
+      fetch_prior_year_application
+    end
+
+    def fetch_prior_year_application
+      active_application = active_benefit_application
+      if active_application.present?
+        fetch_prior_py_for_active_application(active_application)
+      else
+        fetch_prior_py_expired_group
+      end
+    end
+
+    def fetch_prior_py_for_active_application(active_application)
+      expired_states = [:expired] #proj200 include expired when business confirms
+      start_date = if active_application.reinstated_id.present?
+                     active_application.benefit_sponsor_catalog.effective_period.min
+                   else
+                     active_application.effective_period.min
+                   end
+      benefit_applications.where(:"effective_period.max" => start_date - 1.day, :aasm_state.in => expired_states).max_by(&:created_at)
+    end
+
+    def fetch_prior_py_expired_group
+      expired_states = [:expired] #proj200 include expired when business confirms
+      offset_months = EnrollRegistry[:prior_plan_year_shop_sep].setting(:offset_months).item
+      start_date = TimeKeeper.date_of_record.beginning_of_month - offset_months.months
+      end_date = start_date + offset_months.months - 1.day
+      expired_application = benefit_applications.where(:aasm_state.in => expired_states).max_by(&:created_at)
+      return nil unless expired_application
+
+      (start_date..end_date).cover?(expired_application.effective_period.max) ? expired_application : nil
+    end
+
     def is_off_cycle?
       return false unless off_cycle_benefit_application
 
