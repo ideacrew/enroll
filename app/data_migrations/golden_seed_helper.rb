@@ -131,6 +131,8 @@ module GoldenSeedHelper
                 else
                   case_info_hash[:person_attributes]['last_name'] || FFaker::Name.last_name
                 end
+    puts("Instantiating a new primary person record.") if dependent.blank?
+    puts("Instantiating a new dependent person record.") if dependent.present?
     person = Person.new(
       first_name: case_info_hash[:person_attributes]['first_name'] || FFaker::Name.send("first_name_#{gender}"),
       last_name: last_name,
@@ -249,17 +251,9 @@ module GoldenSeedHelper
     dependent_person
   end
 
-  # TODO: Double check these for numbers for SHOP
-  def matching_phone_numbers
-    @matching_phone_numbers = Person.all.flat_map(&:phones).flat_map(&:number).flatten
-  end
-
   def generate_unique_phone_number
     new_person_phone_number = "#{Random.new.rand(100...999)} #{Random.new.rand(1000...9999)}"
     # rubocop:disable Style/WhileUntilModifier
-    until matching_phone_numbers.exclude?(new_person_phone_number)
-      new_person_phone_number = "#{Random.new.rand(100...999)} #{Random.new.rand(1000...9999)}"
-    end
     # rubocop:enable Style/WhileUntilModifier
     new_person_phone_number
   end
