@@ -112,6 +112,7 @@ class CensusEmployee < CensusMember
   after_update :update_hbx_enrollment_effective_on_by_hired_on
   after_save :assign_default_benefit_package
   after_save :assign_benefit_packages
+  after_save :assign_prior_plan_benefit_packages, only: [:create]
   after_save :notify_on_save
 
   before_save :allow_nil_ssn_updates_dependents
@@ -878,60 +879,29 @@ class CensusEmployee < CensusMember
     self.renewal_benefit_group_assignment = nil
   end
 
-  def fetch_approved_and_term_bas_for_date(effective_date = nil)
-    if ::EnrollRegistry.feature_enabled?(:prior_plan_year_shop_sep) && prior_py_sep?(effective_date)
-      benefit_sponsorship.benefit_applications.where(:aasm_state.in => BenefitSponsors::BenefitApplications::BenefitApplication::APPROVED_AND_EXPIRED_STATED)
-                         .select{|ba| ((ba.start_on.beginning_of_day..ba.end_on.end_of_day).cover? effective_date)}
-    else
-      benefit_sponsorship.benefit_applications.where(:aasm_state.in => BenefitSponsors::BenefitApplications::BenefitApplication::APPROVED_STATES)
+  def assign_prior_plan_benefit_packages
+    return unless ::EnrollRegistry.feature_enabled?(:prior_plan_year_shop_sep)
+    return if benefit_sponsorship.blank?
+
+    prior_py = benefit_sponsorship.prior_py_benefit_application
+    return  unless prior_py.present?
+    status = (prior_py.benefit_sponsor_catalog.effective_period).cover?(hired_on)
+    return unless status
+    benefit_group_assignment = benefit_package_assignment_on(prior_py.end_on)
+    return  if benefit_group_assignment && benefit_group_assignment.is_active?(prior_py.end_on)
+    benefit_package = fetch_benefit_package(prior_py)
+    if benefit_package.present?
+      add_benefit_group_assignment(benefit_package, benefit_package.start_on, benefit_package.end_on)
     end
   end
 
-  def prior_py_sep?(effective_date)
-    return false if effective_date.blank?
-    prior_py = fetch_prior_year_application
-    return false unless prior_py.present?
-
-    status = (prior_py.benefit_sponsor_catalog.effective_period).cover?(effective_date)
-    return false unless status
-    return false unless eligible_for?(effective_date, prior_py)
-    true
-  end
-
-  def eligible_for?(effective_date, benefit_application)
-    benefit_group_assignment = benefit_package_assignment_on(benefit_application.end_on)
-    return false unless benefit_group_assignment
-    benefit_group_assignment.benefit_package.eligible_on(hired_on) <= effective_date && benefit_group_assignment.is_active?(benefit_application.end_on)
-  end
-
-  def fetch_prior_year_application
-    active_application = benefit_sponsorship.active_benefit_application
-    if active_application.present?
-      fetch_prior_py_for_active_application(active_application)
+  def fetch_benefit_package(prior_py)
+    if active_benefit_application.predecessor == prior_py && active_benefit_group_assignment.present?
+      active_plan_hios_id = active_benefit_group_assignment.benefit_package.reference_plan.hios_id
+      prior_py.benefit_packages.select {|bg| bg.reference_plan.renewal_product.hios_id == active_plan_hios_id }.first
     else
-      fetch_prior_py_expired_group
+      benefit_packages.first
     end
-  end
-
-  def fetch_prior_py_for_active_application(active_application)
-    expired_states = [:expired] #proj200 include expired when business confirms
-    start_date = if active_application.reinstated_id.present?
-                   active_application.benefit_sponsor_catalog.effective_period.min
-                 else
-                   active_application.effective_period.min
-                 end
-    benefit_sponsorship.benefit_applications.where(:"effective_period.max" => start_date - 1.day, :aasm_state.in => expired_states).max_by(&:created_at)
-  end
-
-  def fetch_prior_py_expired_group
-    expired_states = [:expired] #proj200 include expired when business confirms
-    offset_months = EnrollRegistry[:prior_plan_year_shop_sep].setting(:offset_months).item
-    start_date = TimeKeeper.date_of_record.beginning_of_month - offset_months.months
-    end_date = start_date + offset_months.months - 1.day
-    expired_application = benefit_sponsorship.benefit_applications.where(:aasm_state.in => expired_states).max_by(&:created_at)
-    return nil unless expired_application
-
-    (start_date..end_date).cover?(expired_application.effective_period.max) ? expired_application : nil
   end
 
   def active_benefit_group_assignment=(benefit_package_id)
