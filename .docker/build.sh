@@ -8,6 +8,7 @@ cp config/saml.yml config/saml.yml.tmp
 cp config/environments/production.rb config/environments/production.rb.tmp
 cp config/initializers/devise.rb config/initializers/devise.rb.tmp
 cp config/initializers/redis.rb config/initializers/redis.rb.tmp
+cp app/models/saml_information.rb app/models/saml_information.rb.tmp
 
 #cp .docker/config/Gemfile .
 #cp .docker/config/Gemfile.lock .
@@ -15,6 +16,7 @@ cp .docker/config/puma.rb config/
 cp .docker/config/cable.yml config/
 cp .docker/config/mongoid.yml config/
 cp .docker/config/saml.yml config/
+cp .docker/config/saml_information.rb app/models/
 #cp .docker/config/symmetric-encryption.yml config/
 cp .docker/config/production.rb config/environments/
 cp .docker/config/devise.rb config/initializers/
@@ -45,6 +47,7 @@ docker push $2:$1
 mv config/cable.yml.tmp config/cable.yml
 mv config/mongoid.yml.tmp config/mongoid.yml
 mv config/saml.yml.tmp config/saml.yml
+mv app/models/saml_information.rb.tmp  app/models/saml_information.rb
 #mv config/symmetric-encryption.yml.tmp config/symmetric-encryption.yml
 mv config/environments/production.rb.tmp config/environments/production.rb
 mv config/initializers/devise.rb.tmp config/initializers/devise.rb
