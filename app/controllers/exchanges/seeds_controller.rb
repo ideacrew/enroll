@@ -106,7 +106,7 @@ module Exchanges
       # Same exact headers
       # After ruby 2.6 +, get rid of the set and just use it as array methods
       # https://stackoverflow.com/a/56739603/5331859
-      header_difference = chosen_template_headers.uniq.sort.to_set.difference(uploaded_csv_headers.uniq.sort.to_set)
+      header_difference = uploaded_csv_headers.uniq.sort.to_set.difference(chosen_template_headers.uniq.sort.to_set).present?
       return unless header_difference.present?
       # TODO: Refactor as translation
       error_message = "CSV does not match #{params[:csv_template]} template. Must use headers (in any order) #{chosen_template_headers}."
