@@ -37,8 +37,19 @@ module TimeHelper
     person = family.primary_applicant.person
     return if effective_date.nil?
     return nil unless has_employee_role?(person, market_kind)
-    benefit_applications = person.active_employee_roles.map{|ee| ee.census_employee.fetch_approved_and_term_bas_for_date(effective_date)}.flatten.compact
+
+    benefit_applications = fetch_approved_and_term_bas_for_date(person).flatten.compact
     min_or_max == 'min' ? benefit_applications.map(&:start_on).min : benefit_applications.map(&:end_on).max
+  end
+
+  def fetch_approved_and_term_bas_for_date(person)
+    plan_years = person.active_employee_roles.map(&:employer_profile).map(&:benefit_applications).map(&:published_or_renewing_published).flatten
+    if ::EnrollRegistry.feature_enabled?(:prior_plan_year_shop_sep)
+      prior_plan_years = person.active_employee_roles.map(&:employer_profile).map(&:active_benefit_sponsorship).map(&:prior_py_benefit_application)
+      plan_years + prior_plan_years
+    else
+      plan_years
+    end
   end
 
   def has_employee_role?(person, market_kind)
