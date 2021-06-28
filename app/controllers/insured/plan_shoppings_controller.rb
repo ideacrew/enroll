@@ -167,15 +167,21 @@ class Insured::PlanShoppingsController < ApplicationController
   def terminate
     hbx_enrollment = HbxEnrollment.find(params.require(:id))
     coverage_end_date = params[:terminate_date].present? ? Date.strptime(params[:terminate_date], "%m/%d/%Y") : @person.primary_family.terminate_date_for_shop_by_enrollment(hbx_enrollment)
+    # Exception is thrown buried in this method
     hbx_enrollment.terminate_enrollment(coverage_end_date, params[:terminate_reason])
-    if hbx_enrollment.coverage_terminated? || hbx_enrollment.coverage_termination_pending? || hbx_enrollment.coverage_canceled?
+    if (hbx_enrollment.coverage_terminated? || hbx_enrollment.coverage_termination_pending? || hbx_enrollment.coverage_canceled?) && hbx_enrollment.waiver_enrollment_present?
       hbx_enrollment.update_renewal_coverage
       household = @person.primary_family.active_household
       household.reload
       waiver_enrollment = household.hbx_enrollments.where(predecessor_enrollment_id: hbx_enrollment.id).first
       redirect_to print_waiver_insured_plan_shopping_path(waiver_enrollment), notice: "Waive Coverage Successful"
     else
-      redirect_back(fallback_location: :root_path)
+      # This is the unsuccessful stuff the errors probably will have to go here.
+      alert_message = hbx_enrollment.construct_waiver_enrollment&.errors&.messages&.values&.flatten&.join(", ")
+      redirect_back(
+        fallback_location: :root_path,
+        alert: alert_message
+      )
     end
   end
 
