@@ -38,7 +38,7 @@ class SamlInformation
   # TODO: I have a feeling we may be using this pattern
   #       A LOT.  Look into extracting it if we repeat.
   def initialize
-    @config = YAML.load_file(ERB.new(File.read(File.join(Rails.root,'config', 'saml.yml'))).result)
+    @config = YAML.load(ERB.new(File.read(File.join(Rails.root,'config', 'saml.yml'))).result)
     ensure_configuration_values(@config)
   end
 
