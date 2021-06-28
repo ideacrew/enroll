@@ -888,11 +888,11 @@ class CensusEmployee < CensusMember
     status = (prior_py.benefit_sponsor_catalog.effective_period).cover?(hired_on)
     return unless status
     benefit_group_assignment = benefit_package_assignment_on(prior_py.end_on)
-    return  if benefit_group_assignment && benefit_group_assignment.is_active?(prior_py.end_on)
+    return  if benefit_group_assignment&.is_active?(prior_py.end_on)
     benefit_package = fetch_benefit_package(prior_py)
-    if benefit_package.present?
-      add_benefit_group_assignment(benefit_package, benefit_package.start_on, benefit_package.end_on)
-    end
+    return unless benefit_package
+
+    add_benefit_group_assignment(benefit_package, benefit_package.start_on, benefit_package.end_on)
   end
 
   def fetch_benefit_package(prior_py)
