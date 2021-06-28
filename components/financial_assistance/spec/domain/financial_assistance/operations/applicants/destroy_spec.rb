@@ -17,15 +17,15 @@ RSpec.describe FinancialAssistance::Operations::Applicants::Destroy, dbclean: :a
                       last_name: 'bond')
   end
   let!(:applicant2) do
-    appli = FactoryBot.create(:financial_assistance_applicant,
-                              application: application,
-                              is_primary_applicant: false,
-                              family_member_id: BSON::ObjectId.new,
-                              person_hbx_id: '1001',
-                              ssn: '889984401',
-                              dob: Date.new(2000, 12, 9),
-                              first_name: 'child',
-                              last_name: 'bond')
+    FactoryBot.create(:financial_assistance_applicant,
+                      application: application,
+                      is_primary_applicant: false,
+                      family_member_id: BSON::ObjectId.new,
+                      person_hbx_id: '1001',
+                      ssn: '889984401',
+                      dob: Date.new(2000, 12, 9),
+                      first_name: 'child',
+                      last_name: 'bond')
   end
 
   before do

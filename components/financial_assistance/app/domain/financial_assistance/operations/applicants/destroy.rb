@@ -23,18 +23,10 @@ module FinancialAssistance
         private
 
         def validate(applicant)
-          unless applicant.is_a?(::FinancialAssistance::Applicant)
-            return Failure("Given input: #{applicant} is not a valid FinancialAssistance::Applicant.")
-          end
-
-          if applicant.is_primary_applicant
-            return Failure("Given applicant with person_hbx_id: #{applicant.person_hbx_id} is a primary applicant, cannot be destroyed/deleted.")
-          end
-
+          return Failure("Given input: #{applicant} is not a valid FinancialAssistance::Applicant.") unless applicant.is_a?(::FinancialAssistance::Applicant)
+          return Failure("Given applicant with person_hbx_id: #{applicant.person_hbx_id} is a primary applicant, cannot be destroyed/deleted.") if applicant.is_primary_applicant
           @application = applicant.application
-          unless @application.draft?
-            return Failure("The application with hbx_id: #{@application.hbx_id} for given applicant with person_hbx_id: #{applicant.person_hbx_id} is not a draft application, applicant cannot be destroyed/deleted.")
-          end
+          return Failure("The application with hbx_id: #{@application.hbx_id} for given applicant with person_hbx_id: #{applicant.person_hbx_id} is not a draft application, applicant cannot be destroyed/deleted.") unless @application.draft?
 
           Success(applicant)
         end
