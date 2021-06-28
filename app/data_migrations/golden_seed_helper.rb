@@ -142,7 +142,7 @@ module GoldenSeedHelper
       hbx_id: SecureRandom.hex # To avoid external hbx id calls
     )
     # @original_person_hbx_ids << person.hbx_id
-    raise("Unable to save person.") unless person.save(validate: false)
+    raise("Unable to save person.") unless person.save
     # Set residency type
     # "Same as primary" refers to having the same address as the primary
     if dependent && truthy_value?(case_info_hash[:person_attributes]['same_as_primary'])
@@ -180,7 +180,7 @@ module GoldenSeedHelper
     # Most are set to Y in spreadsheet
     applying_for_assistance = case_info_hash[:person_attributes]['help_paying_for_coverage'] || true
     person.is_applying_for_assistance = truthy_value?(applying_for_assistance)
-    person.save(validate: false)
+    person.save
     puts("Person record creation complete.") unless Rails.env.test?
     person
   end
@@ -196,8 +196,8 @@ module GoldenSeedHelper
       person_id: case_info_hash[:primary_person_record].id,
       is_primary_applicant: case_info_hash[:person_attributes]['relationship_to_primary'].downcase == 'self'
     )
-    fm.save(validate: false)
-    family.save(validate: false)
+    fm.save
+    family.save
     family
   end
 
@@ -216,7 +216,7 @@ module GoldenSeedHelper
     person_record_email = person_record.emails.build
     person_record_email.address = email
     person_record_email.kind = "home"
-    person_record_email.save(validate: false)
+    person_record_email.save
     user = User.new
     user.email = email
     user.oim_id = email
@@ -224,12 +224,12 @@ module GoldenSeedHelper
     user.person = person_record
 
     user.person.consumer_role.skip_residency_verification = true if user.person.consumer_role
-    user_saved = user.save(validate: false)
+    user_saved = user.save
     5.times do
       break if user_saved == true
       user.email = FFaker::Internet.email
       user.person.consumer_role.skip_residency_verification = true if user.person.consumer_role
-      user_saved = user.save(validate: false)
+      user_saved = user.save
     end
     puts("Unable to generate user for #{case_info_hash[:primary_person_record].full_name}, email already taken.") unless user_saved == true
     user
@@ -242,7 +242,7 @@ module GoldenSeedHelper
       person_id: dependent_person.id,
       is_primary_applicant: false
     )
-    fm.save(validate: false)
+    fm.save
     relationship_to_primary = case_info_hash[:person_attributes]['relationship_to_primary'].downcase.parameterize
     case_info_hash[:primary_person_record].person_relationships.create!(
       kind: relationship_to_primary,
@@ -312,7 +312,7 @@ module GoldenSeedHelper
     consumer_role.citizen_status = "us_citizen"
     consumer_role.citizenship_result = "us_citizen"
     consumer_role.skip_residency_verification = true
-    consumer_role.save(validate: false)
+    consumer_role.save
     # attr_accessssor to skip certain validations
     consumer_role.skip_residency_verification = true
     # Verification types needed
@@ -412,10 +412,10 @@ module GoldenSeedHelper
     # attr_accessssor to skip certain validations
     consumer_role.skip_residency_verification = true
     consumer_role.person.primary_family.active_household.hbx_enrollments << enrollment
-    consumer_role.person.primary_family.active_household.save(validate: false)
+    consumer_role.person.primary_family.active_household.save
     # attr_accessssor to skip certain validations
     consumer_role.skip_residency_verification = true
-    enrollment.save(validate: false)
+    enrollment.save
     consumer_role.skip_residency_verification = true
     # IT comes off as "unverified" after this. Why?
     enrollment.update_attributes(aasm_state: 'coverage_selected')
