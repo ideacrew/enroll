@@ -57,6 +57,18 @@ RSpec.describe IvlNotices::IvlToCoverallTransitionNoticeBuilder, dbclean: :after
     end
   end
 
+  describe "#check_for_unverified_individuals" do
+    let(:builder) do
+      IvlNotices::IvlToCoverallTransitionNoticeBuilder.new(person.consumer_role, valid_params)
+    end
+    before do
+      allow_any_instance_of(HbxEnrollment).to receive(:effective_on).and_return(nil)
+    end
+    it "should not throw an error if effective on for hbx enrollments is nil" do
+      expect(builder.check_for_unverified_individuals).to eq(nil)
+    end
+  end
+
   describe "Build" do
     before :each do
       allow(person).to receive("primary_family").and_return(family)
