@@ -212,10 +212,7 @@ Feature: SHOP employee or Admin adding a SEP which falls in prior plan year,
     And Admin clicks Families tab
     Then the Admin is navigated to the Families screen
     When a SHOP SEP is added with a prior year effective date
-    And Coverage renewal flag is checked
     And a SEP is submitted
-    Then confirmation popup is visible
-    When Admin clicks confirm on popup
     Then I see a SEP error message for Patrick Doe
 
 # TODO: enable this cucumber once terminated prior py is enabled in proj 200
