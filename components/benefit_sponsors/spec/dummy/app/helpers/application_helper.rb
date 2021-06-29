@@ -21,6 +21,10 @@ module ApplicationHelper
     summary_text.strip
   end
 
+  def fetch_benefit_application_start_year(benefit_application)
+    benefit_application.reinstated_id.present? ? benefit_application.parent_reinstate_application.start_on.to_date.year : benefit_application.start_on.to_date.year
+  end
+
   def product_rates_available?(benefit_sponsorship, date = nil)
     date = Date.strptime(date.strftime("%m/%d/%Y"), '%m/%d/%Y') if date.present?
     return false if benefit_sponsorship.present? && benefit_sponsorship.active_benefit_application.present?
