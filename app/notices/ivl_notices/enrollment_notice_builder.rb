@@ -119,7 +119,7 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
       notice.enrollments << append_enrollment_information(enrollment)
     end
 
-    notice.coverage_year = hbx_enrollments.compact.first.effective_on.year
+    notice.coverage_year = hbx_enrollments&.compact&.first&.effective_on&.year
     notice.due_date = (family.min_verification_due_date.present? && (family.min_verification_due_date > date)) ? family.min_verification_due_date : min_notice_due_date(family)
     outstanding_people.uniq!
     notice.documents_needed = outstanding_people.present?
