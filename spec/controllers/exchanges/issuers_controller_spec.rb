@@ -9,8 +9,8 @@ RSpec.describe Exchanges::IssuersController do
 
   before(:each) do
     EnrollRegistry[:issuers_tab].feature.stub(:is_enabled).and_return(true)
-    sign_in(user) 
-  end 
+    sign_in(user)
+  end
 
   context "#index" do
     before(:each) { get :index, xhr: true }
