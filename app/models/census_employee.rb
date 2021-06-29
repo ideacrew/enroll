@@ -647,8 +647,8 @@ class CensusEmployee < CensusMember
     benefit_package_ids.include?(assignment&.benefit_package&.id) ? assignment : nil
   end
 
-  def most_recent_terminated_benefit_application
-    benefit_sponsorship.most_recent_terminated_benefit_application
+  def most_recent_expired_benefit_application
+    benefit_sponsorship.most_recent_expired_benefit_application
   end
 
   # DEPRECATE IF POSSIBLE
