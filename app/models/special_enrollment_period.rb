@@ -73,7 +73,7 @@ class SpecialEnrollmentPeriod
   field :user_id, type: BSON::ObjectId
 
   #Renew coverage flag
-  field :coverage_renewal_flag, type: Boolean
+  field :coverage_renewal_flag, type: Boolean, default: true
 
   validate :optional_effective_on_dates_within_range, :next_poss_effective_date_within_range, on: :create
 
@@ -90,7 +90,7 @@ class SpecialEnrollmentPeriod
   scope :fehb_market,         ->{ where(:qualifying_life_event_kind_id.in => QualifyingLifeEventKind.fehb_market_events.map(&:id) + QualifyingLifeEventKind.fehb_market_non_self_attested_events.map(&:id) ) }
   scope :individual_market,   ->{ where(:qualifying_life_event_kind_id.in => QualifyingLifeEventKind.individual_market_events.map(&:id) + QualifyingLifeEventKind.individual_market_non_self_attested_events.map(&:id)) }
 
-  before_save :set_coverage_renewal_flag, :set_user_id
+  before_save :set_user_id
 
   after_initialize :set_submitted_at
 
@@ -248,26 +248,6 @@ private
 
   def set_submitted_at
     self.submitted_at ||= TimeKeeper.datetime_of_record
-  end
-
-  def set_coverage_renewal_flag
-    prior_py_ivl_sep = renewal_eligible_for_ivl
-    prior_py_shop_sep = renewal_eligible_for_shop
-    return if coverage_renewal_flag == false
-
-    if prior_py_ivl_sep
-      self.assign_attributes({coverage_renewal_flag: prior_py_ivl_sep})
-    elsif prior_py_shop_sep
-      self.assign_attributes({coverage_renewal_flag: prior_py_shop_sep})
-    end
-  end
-
-  def renewal_eligible_for_ivl
-    EnrollRegistry.feature_enabled?(:prior_plan_year_ivl_sep) && qualifying_life_event_kind&.individual? && admin_flag.blank? && prior_py_sep?(family, effective_on, qualifying_life_event_kind&.market_kind)
-  end
-
-  def renewal_eligible_for_shop
-    EnrollRegistry.feature_enabled?(:prior_plan_year_shop_sep) && qualifying_life_event_kind&.shop_market? && admin_flag.blank? && prior_py_sep?(family, effective_on, qualifying_life_event_kind&.market_kind)
   end
 
   def set_user_id
