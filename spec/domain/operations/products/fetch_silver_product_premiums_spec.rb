@@ -40,17 +40,6 @@ RSpec.describe ::Operations::Products::FetchSilverProductPremiums, dbclean: :aft
       }
     end
 
-    # context 'when no address found' do
-    #   before :each do
-    #     person.addresses.destroy_all
-    #   end
-
-    #   it 'should return failure' do
-    #     result = subject.call(params)
-    #     expect(result.failure?).to eq true
-    #   end
-    # end
-
     context 'when address, rating area, service area exists' do
 
       it 'should return success' do
@@ -61,6 +50,24 @@ RSpec.describe ::Operations::Products::FetchSilverProductPremiums, dbclean: :aft
       it 'should return a hash of products' do
         result = subject.call(params)
         expect(result.value!.is_a?(Hash)).to eq true
+      end
+    end
+
+    context 'when tuple does not exist for given age' do
+
+      before :each do
+        person.update_attributes(dob: TimeKeeper.date_of_record - 70.years)
+      end
+
+      it 'should return success' do
+        result = subject.call(params)
+        expect(result.success?).to eq true
+      end
+
+      it 'should return a hash of products' do
+        result = subject.call(params)
+        expect(result.value!.is_a?(Hash)).to eq true
+        expect(result.value!.values.present?).to eq true
       end
     end
   end
