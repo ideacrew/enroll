@@ -38,21 +38,6 @@ class User
     :id
   end
 
-  def switch_to_idp!
-    self.idp_verified = true
-    begin
-      self.save!
-    rescue => e
-      message = "SwitchToIdpException: #{e.message}; "
-      message += "user_id: #{self.id}, "
-      message += "person_hbx_id: #{self.person.hbx_id}, " if self.person.present?
-      message += "errors.full_messages: #{self.errors.full_messages}, "
-      message += "stacktrace: #{e.backtrace}"
-      log(message, {:severity => "error"})
-      raise e
-    end
-  end
-
   field :hints, type: Boolean, default: true
   # for i18L
   field :preferred_language, type: String, default: "en"

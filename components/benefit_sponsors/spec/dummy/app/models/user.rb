@@ -154,19 +154,6 @@ class User
     person.id
   end
 
-  def switch_to_idp!
-    self.idp_verified = true
-    begin
-      self.save!
-    rescue => e
-      message = "#{e.message}; "
-      message = message + "user: #{self}, "
-      message = message + "errors.full_messages: #{self.errors.full_messages}, "
-      message = message + "stacktrace: #{e.backtrace}"
-      log(message, {:severity => "error"})
-      raise e
-    end
-  end
   def get_announcements_by_roles_and_portal(portal_path="")
     []
   end

@@ -214,7 +214,7 @@ if ::EnrollRegistry[:aca_shop_market].enabled?
           allow(census_employee).to receive(:is_linked?).and_return(true)
           allow(employee_role).to receive(:census_employee).and_return(census_employee)
           sign_in(user)
-          allow(user).to receive(:switch_to_idp!)
+          allow(user).to receive(:update_attributes).with(idp_verified: true)
           allow(user).to receive(:has_hbx_staff_role?).and_return(false)
           allow(employment_relationship).to receive_message_chain(:census_employee,:employer_profile,:parent,:legal_name).and_return("legal_name")
           post :create, params: {employment_relationship: employment_relationship_properties}

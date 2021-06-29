@@ -142,18 +142,4 @@ class User
     return nil unless person.present?
     person.id
   end
-
-  def switch_to_idp!
-    self.idp_verified = true
-    begin
-      self.save!
-    rescue StandardError => e
-      message = "#{e.message}; "
-      message += "user: #{self}, "
-      message += "errors.full_messages: #{self.errors.full_messages}, "
-      message += "stacktrace: #{e.backtrace}"
-      log(message, {:severity => "error"})
-      raise e
-    end
-  end
 end
