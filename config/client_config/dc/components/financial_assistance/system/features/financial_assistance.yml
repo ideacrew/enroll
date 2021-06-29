@@ -105,6 +105,8 @@ registry:
       is_enabled: true
       settings:
         - key: :gamble_prize
-          item: true
+          item: false
+    - key: :full_medicaid_determination_step
+      is_enabled: true
   # TODO eligibility engine connectivity(HAVEN) settings
   # TODO mec service connectivity settings

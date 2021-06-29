@@ -145,8 +145,10 @@ Given(/^all required questions are answered$/) do
 end
 
 And(/^the user should be able to see medicaid determination question$/) do
-  expect(page).to have_content("full review of your application for Medicaid eligibility?")
-  find('#medicaid_determination_yes').click
+  if FinancialAssistanceRegistry.feature_enabled?(:full_medicaid_determination_step)
+    expect(page).to have_content("full review of your application for Medicaid eligibility?")
+    find('#medicaid_determination_yes').click
+  end
 end
 
 Given(/^all required questions are answered including report change terms field$/) do
