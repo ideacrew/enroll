@@ -52,8 +52,7 @@ module Operations
       start_on = enrollment.sponsored_benefit_package.benefit_application.end_on.next_day
       potential_renewal_applications = sponsorship.benefit_applications.where(:predecessor_id.exists => true,
                                                                               :"effective_period.min" => start_on,
-                                                                              :aasm_state.in => [:active, :termination_pending, :terminated]
-      )
+                                                                              :aasm_state.in => [:active, :termination_pending, :terminated])
 
       reinstated_app = all_applications.where(:reinstated_id.in => potential_renewal_applications.map(&:id))
       if reinstated_app.present?
@@ -63,10 +62,10 @@ module Operations
       end
     end
 
-    def census_employee_eligible?(ba, census_employee)
-      return false if census_employee.employment_terminated_on.present? && census_employee.employment_terminated_on <= ba.start_on
-      benefit_package_ids = ba.benefit_packages.map(&:id)
-      @assignment = census_employee.benefit_group_assignments.detect { |benefit_group_assignment| benefit_package_ids.include?(benefit_group_assignment.benefit_package.id) && benefit_group_assignment.is_active?(ba.end_on) }
+    def census_employee_eligible?(benefit_application, census_employee)
+      return false if census_employee.employment_terminated_on.present? && census_employee.employment_terminated_on <= benefit_application.start_on
+      benefit_package_ids = benefit_application.benefit_packages.map(&:id)
+      @assignment = census_employee.benefit_group_assignments.detect { |benefit_group_assignment| benefit_package_ids.include?(benefit_group_assignment.benefit_package.id) && benefit_group_assignment.is_active?(benefit_application.end_on) }
       return false unless @assignment
       true
     end
