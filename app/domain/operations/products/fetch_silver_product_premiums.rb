@@ -55,6 +55,14 @@ module Operations
                                                            }).first
 
               tuple = premium_table.premium_tuples.where(age: age).first
+              if tuple.blank?
+                tuple_ages = premium_table.premium_tuples.map(&:age)
+                min_age = tuple_ages.min
+                max_age = tuple_ages.max
+                age = min_age if age < min_age
+                age = max_age if age > max_age
+                tuple = premium_table.premium_tuples.where(age: age).first
+              end
               result << { cost: tuple.cost, product_id: product.id, member_identifier: hbx_id, monthly_premium: tuple.cost } if tuple.present?
               result
             end
