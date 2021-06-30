@@ -59,7 +59,7 @@ module Exchanges
       @seed.process! if params[:commit].downcase == 'begin seed'
       respond_to do |format|
         format.html do
-          flash[:notice] = l10n("seeds_ui.begin_seed_message")
+          flash.now[:notice] = l10n("seeds_ui.begin_seed_message")
           render 'edit'
         end
         format.js { head :ok }
@@ -89,14 +89,14 @@ module Exchanges
       end
       unless params[:file].send(:content_type) == 'text/csv'
         # TODO: Refactor as translation
-        flash[:error] = "Unable to use CSV template. Must be in CSV format."
+        flash.now[:error] = "Unable to use CSV template. Must be in CSV format."
         @seed = Seeds::Seed.new(user: current_user)
         render 'new' and return
       end
       uploaded_csv_headers = CSV.read(params[:file].send(:tempfile), return_headers: true)&.first&.compact
       if uploaded_csv_headers.blank?
         # TODO: Refactor as translation
-        flash[:error] = "No headers detected in CSV."
+        flash.now[:error] = "No headers detected in CSV."
         @seed = Seeds::Seed.new(user: current_user)
         render 'new' and return
       end
@@ -114,7 +114,7 @@ module Exchanges
       # TODO: Refactor as translation
       error_message = "CSV does not match #{params[:csv_template]} template. Must use headers (in any order) #{chosen_template_headers}. "\
       "Remove unnecessary headers #{incorrect_headers}"
-      flash[:error] = error_message
+      flash.now[:error] = error_message
       @seed = Seeds::Seed.new(user: current_user)
       render 'new' and return
     end
