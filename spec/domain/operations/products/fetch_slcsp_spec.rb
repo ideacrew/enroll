@@ -23,6 +23,7 @@ RSpec.describe ::Operations::Products::FetchSlcsp, dbclean: :after_each do
   describe 'valid params' do
 
     let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+
     let(:params) do
       {
         member_silver_product_premiums: member_silver_product_premiums
