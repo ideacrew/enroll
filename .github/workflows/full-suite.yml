@@ -63,6 +63,13 @@ jobs:
     needs: [rubocop, view_linter]
     runs-on: ubuntu-latest
     steps:
+      - uses: getong/rabbitmq-action@v1.2
+        with:
+          rabbitmq version: "3.8.2-management-alpine"
+          host port: 5672
+          rabbitmq user: "guest"
+          rabbitmq password: "guest"
+          rabbitmq vhost: "/"
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
       - name: Cache Gems
@@ -87,11 +94,25 @@ jobs:
     needs: [rubocop, view_linter]
     runs-on: ubuntu-latest
     steps:
+      - uses: getong/rabbitmq-action@v1.2
+        with:
+          rabbitmq version: "3.8.2-management-alpine"
+          host port: 5672
+          rabbitmq user: "guest"
+          rabbitmq password: "guest"
+          rabbitmq vhost: "/"
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
       - uses: actions/setup-node@v2
         with:
           node-version: '12'
+      - uses: getong/rabbitmq-action@v1.2
+        with:
+          rabbitmq version: "3.8.2-management-alpine"
+          host port: 5672
+          rabbitmq user: "guest"
+          rabbitmq password: "guest"
+          rabbitmq vhost: "/"
       - uses: wbari/start-mongoDB@v0.2
         with:
           mongoDBVersion: '3.6'
@@ -137,6 +158,13 @@ jobs:
             'financial_assistance',
           ]
     steps:
+      - uses: getong/rabbitmq-action@v1.2
+        with:
+          rabbitmq version: "3.8.2-management-alpine"
+          host port: 5672
+          rabbitmq user: "guest"
+          rabbitmq password: "guest"
+          rabbitmq vhost: "/"
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
       - uses: actions/setup-node@v2
