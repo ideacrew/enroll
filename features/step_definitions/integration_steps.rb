@@ -1024,7 +1024,7 @@ When(/^.+ clicks? on the tab for (.+)$/) do |tab_name|
 end
 
 When(/^I click the "(.*?)" in qle carousel$/) do |qle_event|
-  click_link "#{qle_event}"
+  click_link qle_event.to_s
 end
 
 When(/^I click on "(.*?)" button on household info page$/) do |select_action|
