@@ -346,3 +346,5 @@ registry:
         is_enabled: false
       - key: :mainecare_cubcare_glossary
         is_enabled: false
+      - key: :indian_alaskan_tribe_details
+        is_enabled: false
