@@ -13,3 +13,5 @@ registry:
           is_enabled: false
         - key: :inbox_tab
           is_enabled: false
+        - key: :notices_tab
+          is_enabled: false
