@@ -41,10 +41,9 @@ module FinancialAssistance::Api::V1
       render json: @application
     end
 
-    def delete
-      @application = FinancialAssistance::Application.find_by(:family_id)
-      if @application
-        @application.destroy
+    def destroy
+      @application = FinancialAssistance::Application.find_by(family_id: get_current_person.financial_assistance_identifier)
+      if @application.destroy
         head :no_content
       else
         render json: { errors: @application.errors.full_messages }, status: :bad_request

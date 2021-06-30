@@ -137,7 +137,7 @@ RSpec.describe 'applications', type: :request do
                   }
                 }
               }
-    }
+     }
 
       response '200', :success do
         schema type: :object,
@@ -176,6 +176,20 @@ RSpec.describe 'applications', type: :request do
         end
 
         run_test!        
+      end
+    end
+
+    delete 'Delete application by id' do
+      tags 'FinancialAssistance::Application'
+      parameter name: :id, in: :path, type: :string
+      response '204', :no_content do
+        let!(:id) { create(:financial_assistance_application, :with_applicants, family_id: family.id).id }
+        run_test!
+      end
+
+      response '404', :not_found do
+        let(:existing_application) { create(:financial_assistance_application, :with_applicants, family_id: 'invalid') }
+        run_test!
       end
     end
   end
