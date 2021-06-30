@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe FinancialAssistance::API::V1::ApplicationsController, dbclean: :after_each, type: :controller do
+RSpec.describe FinancialAssistance::Api::V1::ApplicationsController, dbclean: :after_each, type: :controller do
   routes { FinancialAssistance::Engine.routes }
 
   let(:person) { FactoryBot.create(:person, :with_consumer_role)}
@@ -56,7 +56,7 @@ RSpec.describe FinancialAssistance::API::V1::ApplicationsController, dbclean: :a
               emails_attributes: [
                 {
                   kind: "home",
-                  address: "test@test.com",
+                  address: "test@test.com"
                 }
               ],
               deductions_attributes: [
@@ -85,7 +85,7 @@ RSpec.describe FinancialAssistance::API::V1::ApplicationsController, dbclean: :a
                     zip: "35467"
                   ],
                   employer_phone: [
-                    kind: "work", 
+                    kind: "work",
                     full_phone_number: "(301)-848-8053"
                   ]
                 }
@@ -103,7 +103,7 @@ RSpec.describe FinancialAssistance::API::V1::ApplicationsController, dbclean: :a
                   employee_cost_frequency: ''
                 }
               ]
-            }],
+            }]
             #format: :json
           }
         }

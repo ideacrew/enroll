@@ -46,4 +46,4 @@ RSpec.configure do |config|
 end
 
 # Load other schema definitions like: components/financial_assistance/spec/schemas/api_schemas.rb
-Dir[Rails.root.join("components/financial_assistance/spec/schemas/*.rb")].each { |f| require f }
+Dir[Rails.root.join("components/financial_assistance/spec/schemas/*.rb")].sort.each { |f| require f }
