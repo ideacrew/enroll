@@ -86,7 +86,7 @@ module BenefitSponsors
         IdpAccountManager.create_account(user.email, user.oim_id, stashed_user_password, personish, account_role, timeout)
         session[:person_id] = personish.id
         session.delete("stashed_password")
-        user.switch_to_idp!
+        user.update_attributes(idp_verified: true)
       end
       #TODO TREY KEVIN JIM CSR HAS NO SSO_ACCOUNT
       session[:person_id] = personish.id if user.person && user.person.agent?
