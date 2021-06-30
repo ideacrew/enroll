@@ -3,6 +3,7 @@
 module FinancialAssistance
   module API
     module V1
+      # applications controller for rails frontend
       class ApplicationsController < FinancialAssistance::ApplicationController
 
         before_action :set_current_person
