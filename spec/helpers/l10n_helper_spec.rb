@@ -14,7 +14,14 @@ RSpec.describe L10nHelper, :type => :helper do
   end
 
   it "should handle non string translation keys gracefully" do
-    expect(helper.l10n({:formats => {:default => "%m/%d/%Y"}})).to eq('Translation Missing')
+    expect(helper.l10n({:formats => {:default => "%m/%d/%Y"}})).to eq("Formatsdefaultmd Y")
+  end
+
+  it "should handle non string results gracefully" do
+    allow(helper).to receive(:t).with({:formats => {:default => "%m/%d/%Y"}}, default: "Formatsdefaultmd Y").and_return(
+      {:formats => {:default => "%m/%d/%Y"}}
+    )
+    expect(helper.l10n({:formats => {:default => "%m/%d/%Y"}})).to eq("{:formats=>{:default=>\"%m/%d/%Y\"}}")
   end
 
   context "interpolated keys" do
