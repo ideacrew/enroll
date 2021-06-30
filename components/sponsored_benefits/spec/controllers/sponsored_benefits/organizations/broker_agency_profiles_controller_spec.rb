@@ -25,12 +25,29 @@ module SponsoredBenefits
 
     context "#employers" do
       before do
+        allow(controller).to receive(:is_shop_or_fehb_market_enabled?).and_return(true)
         sign_in user_with_hbx_staff_role
         get :employers, xhr: true, params: {id: owner_profile.id}
       end
 
       it "should set datatable instance variable" do
         expect(assigns(:datatable).class).to eq Effective::Datatables::BrokerAgencyPlanDesignOrganizationDatatable
+      end
+
+      context "profile blank" do
+        before do
+          allow(BenefitSponsors::Organizations::BrokerAgencyProfile).to receive(:find).with(
+            owner_profile.id
+          ).and_return(nil)
+          allow(BenefitSponsors::Organizations::GeneralAgencyProfile).to receive(:find).with(
+            owner_profile.id
+          ).and_return(nil)
+        end
+        it "safely redirects to head bad request" do
+          sign_in user_with_hbx_staff_role
+          get :employers, xhr: true, params: {id: owner_profile.id}
+          expect(response).to have_http_status :bad_request
+        end
       end
     end
   end
