@@ -32,4 +32,20 @@ Then(/^they should not see the Inbox tab$/) do
   expect(page).to_not have_content("Inbox")
 end
 
+Given(/notices feature is enabled?/) do
+  enable_feature(:notices_tab)
+end
+
+Given(/notices feature is disabled?/) do
+  disable_feature(:notices_tab)
+end
+
+Then(/^they should see the Notices tab$/) do
+  expect(page).to have_content("Notices")
+end
+
+Then(/^they should not see the Notices tab$/) do
+  expect(page).to_not have_content("Notices")
+end
+
 

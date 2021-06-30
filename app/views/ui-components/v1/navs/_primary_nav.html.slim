@@ -84,6 +84,7 @@
             = link_to(main_app.inbox_exchanges_hbx_profile_path(1), :remote => false, class: 'visible', "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab" ) do
               | Inbox
               span.badge.ml-half = @unread_messages
+        - if EnrollRegistry.feature_enabled?(:notices_tab)
           li.pl-1 role="presentation" class="#{pundit_class HbxProfile, :view_admin_tabs?}"
             = link_to(notifier.notice_kinds_path, "aria-expanded" => "true", "aria-controls" => "notices", "role" => "tab" ) do
               | Notices
