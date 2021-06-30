@@ -94,6 +94,11 @@ jobs:
     needs: [rubocop, view_linter]
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
+      - uses: ruby/setup-ruby@v1
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '12'
       - uses: getong/rabbitmq-action@v1.2
         with:
           rabbitmq version: "3.8.2-management-alpine"
@@ -101,11 +106,6 @@ jobs:
           rabbitmq user: "guest"
           rabbitmq password: "guest"
           rabbitmq vhost: "/"
-      - uses: actions/checkout@v2
-      - uses: ruby/setup-ruby@v1
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '12'
       - uses: wbari/start-mongoDB@v0.2
         with:
           mongoDBVersion: '3.6'
