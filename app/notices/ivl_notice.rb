@@ -130,7 +130,6 @@ class IvlNotice < Notice
     page_count = Prawn::Document.new(:template => path).page_count
     return unless (page_count % 2) == 1
       join_pdfs_with_path([path, blank_page], path)
-    end
   end
 
   def lawful_presence_outstanding?(person)
