@@ -17,6 +17,7 @@ RSpec.describe Exchanges::InboxesController do
       controller.instance_variable_set(:@message, message)
       allow(message).to receive(:update_attributes).and_return(true)
       allow(Person).to receive(:find).and_return(inbox_provider)
+      EnrollRegistry[:inbox_tab].feature.stub(:is_enabled).and_return(true)
     end
 
     context "as user" do
