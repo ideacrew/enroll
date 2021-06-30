@@ -161,7 +161,11 @@ module Insured
           :aasm_state.in => HbxEnrollment::TERMINATED_STATUSES,
           :coverage_kind => coverage_kind
         }
-      ).first
+      ).detect do |enr|
+        start_on = enr.effective_on
+        end_on = enr.coverage_terminated? ? enr.terminated_on : enr.sponsored_benefit_package.benefit_application.end_on
+        (start_on..end_on).cover?(effective_on - 1.day)
+      end
     end
 
     def benefit_group_assignment_by_plan_year(employee_role, benefit_group, change_plan, enrollment_kind)
