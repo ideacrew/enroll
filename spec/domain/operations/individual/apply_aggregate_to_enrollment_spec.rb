@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Operations::Individual::ApplyAggregateToEnrollment do
+RSpec.describe Operations::Individual::ApplyAggregateToEnrollment, dbclean: :after_each do
 
   context 'for invalid params' do
     it 'should return a failure with a message' do
