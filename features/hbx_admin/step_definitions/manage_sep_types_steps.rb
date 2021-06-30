@@ -361,6 +361,8 @@ When(/Admin creates new SEP Type with (.*) market and (.*) select termination on
     step "Admin fills eligibility start date"
   when "only eligibility end date"
     step "Admin fills eligibility end date"
+  else
+    step "Admin selects #{scenario} visibility radio button for #{market_kind} market"
   end
   step "Admin clicks on Create Draft button"
 end
@@ -370,6 +372,13 @@ And(/Admin should see newly created SEP Type title on Datatable with Draft filte
   step "Admin clicks #{market_kind} filter on SEP Types datatable"
   step "Admin clicks on Draft filter of #{market_kind} market filter"
   step "Admin should see newly created SEP Type title on Datatable"
+end
+
+And("Admin should publish newly created SEP Type") do
+  step "Admin clicks on newly created SEP Type"
+  step "Admin should navigate to update SEP Type page"
+  step "Admin clicks on Publish button"
+  step "Admin should see Successfully publish message"
 end
 
 When("Admin fills Create SEP Type form with start on date greater than end on date") do

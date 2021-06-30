@@ -11,34 +11,14 @@ Feature: Admin has ability to create a new SEP Type with visibility options for 
     And the Admin will see the Manage SEPs under admin dropdown
     And Admin can click Manage SEPs link
 
-  @flaky
   Scenario Outline: Admin will create a new Individual market SEP type by picking visibility option for <user_visibility>
     Given Admin can navigate to the Manage SEPs screen
     And expired Qualifying life events of individual market is present
-    When Admin clicks on the Create SEP Type button
-    Then Admin navigates to Create SEP Type page
-    When Admin fills Create SEP Type form with start and end dates
-    And Admin fills Create SEP Type form with Title
-    And Admin fills Create SEP Type form with Event label
-    And Admin fills Create SEP Type form with Tool Tip
-    And Admin selects individual market radio button
-    And Admin fills Create SEP Type form with Reason
-    And Admin selects effective on kinds for Create SEP Type
-    And Admin cannot select termination on kinds for individual SEP Type
-    And Admin fills Create SEP Type form with Pre Event SEP and Post Event SEP dates
-    And Admin selects <user_visibility> visibility radio button for individual market
-    And Admin clicks on Create Draft button
-    Then Admin should see SEP Type Created Successfully message
-    When Admin navigates to SEP Types List page
-    When Admin clicks individual filter on SEP Types datatable
-    And Admin clicks on Draft filter of individual market filter
-    Then Admin should see newly created SEP Type title on Datatable
-    When Admin clicks on newly created SEP Type
-    Then Admin should navigate to update SEP Type page
-    When Admin clicks on Publish button
-    Then Admin should see Successfully publish message
+    When Admin creates new SEP Type with individual market and <action> select termination on kinds with <user_visibility> scenario    
+    And Admin should see newly created SEP Type title on Datatable with Draft filter individual
+    And Admin should publish newly created SEP Type
     And Hbx Admin logs out
-    Given Individual has not signed up as an HBX user
+    And Individual has not signed up as an HBX user
     When Individual with known qles visits the Insured portal outside of open enrollment
     Then Individual creates a new HBX account
     Then I should see a successful sign up message
@@ -80,7 +60,6 @@ Feature: Admin has ability to create a new SEP Type with visibility options for 
       | Customer & Admin | see     |
       | Admin Only       | not see |
 
-  @flaky
   Scenario Outline: Admin will create a new Individual market SEP type by picking visibility option for <user_visibility> with future date
     Given Admin can navigate to the Manage SEPs screen
     And expired Qualifying life events of individual market is present
