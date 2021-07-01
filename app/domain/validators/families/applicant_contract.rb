@@ -99,9 +99,7 @@ module Validators
       end
 
       rule(:is_incarcerated) do
-        if key? && values[:is_applying_coverage]
-          key.failure(text: "is_incarcerated should be populated for applicant applying coverage") if value.nil?
-        end
+        key.failure(text: 'is_incarcerated should be populated for applicant applying coverage') if key? && values[:is_applying_coverage] & value.nil?
       end
 
       rule(:phones).each do
