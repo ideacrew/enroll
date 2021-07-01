@@ -106,6 +106,94 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
     end
   end
 
+  context '#is_eligible_for_non_magi_reasons' do
+    it 'should return a field on applicant model' do
+      expect(applicant.is_eligible_for_non_magi_reasons).to eq(nil)
+    end
+  end
+
+  context 'current_month_incomes' do
+    let!(:create_job_income1) do
+      inc = ::FinancialAssistance::Income.new({ kind: 'wages_and_salaries',
+                                                frequency_kind: 'yearly',
+                                                amount: 30_000.00,
+                                                start_on: TimeKeeper.date_of_record.beginning_of_month,
+                                                employer_name: 'Testing employer' })
+      applicant.incomes << inc
+      applicant.save!
+    end
+
+    let!(:income2) do
+      inc = ::FinancialAssistance::Income.new({ kind: 'net_self_employment',
+                                                frequency_kind: 'monthly',
+                                                amount: 100.00,
+                                                start_on: TimeKeeper.date_of_record.next_month.beginning_of_month })
+      applicant.incomes << inc
+      applicant.save!
+    end
+
+    before do
+      @incomes = applicant.reload.current_month_incomes
+    end
+
+    it 'should return only one income' do
+      expect(@incomes.count).to eq(1)
+    end
+
+    it 'should return the income of kind wages_and_salaries' do
+      expect(@incomes.first.kind).to eq('wages_and_salaries')
+    end
+
+    it 'should not return the income of kind net_self_employment' do
+      expect(@incomes.first.kind).not_to eq('net_self_employment')
+    end
+  end
+
+  context 'current_month_incomes with income that started previous year and no end date' do
+    let!(:create_job_income12) do
+      inc = ::FinancialAssistance::Income.new({ kind: 'wages_and_salaries',
+                                                frequency_kind: 'yearly',
+                                                amount: 30_000.00,
+                                                start_on: TimeKeeper.date_of_record.prev_year,
+                                                employer_name: 'Testing employer' })
+      applicant.incomes << inc
+      applicant.save!
+    end
+
+    before do
+      @incomes = applicant.reload.current_month_incomes
+    end
+
+    it 'should return only one income' do
+      expect(@incomes.count).to eq(1)
+    end
+
+    it 'should return the income of kind wages_and_salaries' do
+      expect(@incomes.first.kind).to eq('wages_and_salaries')
+    end
+  end
+
+  context 'current_month_incomes with income that started previous year and ended last month' do
+    let!(:create_job_income11) do
+      inc = ::FinancialAssistance::Income.new({ kind: 'wages_and_salaries',
+                                                frequency_kind: 'yearly',
+                                                amount: 30_000.00,
+                                                start_on: TimeKeeper.date_of_record.prev_year,
+                                                end_on: TimeKeeper.date_of_record.prev_month,
+                                                employer_name: 'Testing employer' })
+      applicant.incomes << inc
+      applicant.save!
+    end
+
+    before do
+      @incomes = applicant.reload.current_month_incomes
+    end
+
+    it 'should not return any incomes as the income ended last month' do
+      expect(@incomes.count).to be_zero
+    end
+  end
+
   context 'when IAP applicant is destroyed' do
     context 'should destroy their relationships of the applicants' do
       let!(:spouse_applicant) do

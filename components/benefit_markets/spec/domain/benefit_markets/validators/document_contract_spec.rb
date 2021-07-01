@@ -16,7 +16,7 @@ RSpec.describe BenefitMarkets::Validators::DocumentContract do
   let(:tags)             { 'Tags'}
   let(:required_params)  { missing_params.merge({type: type, source: source}) }
   let(:invalid_params)   {required_params.merge({tags: tags})}
-  let(:error_message1)   { {:type => ["is missing"], :source => ["is missing"]} }
+  let(:error_message1)   { {:source => ["is missing", "must be a string"], :type => ["is missing", "must be a string"]} }
   let(:error_message2)   { {:tags => ["must be an array"]} }
 
   context "Given invalid required parameters" do

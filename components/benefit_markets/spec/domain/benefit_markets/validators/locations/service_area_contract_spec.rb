@@ -25,7 +25,7 @@ RSpec.describe BenefitMarkets::Validators::Locations::ServiceAreaContract do
   end
 
   let(:invalid_params)      { missing_params.merge({issuer_profile_id: issuer_profile_id, issuer_hios_id: :issuer_hios_id}) }
-  let(:error_message1)      { {:issuer_profile_id => ["is missing"]} }
+  let(:error_message1)      { {:issuer_profile_id => ["is missing", "must be BSON::ObjectId"]} }
   let(:error_message2)      { {:issuer_hios_id => ["must be a string"]} }
 
   context "Given invalid required parameters" do

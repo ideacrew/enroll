@@ -36,7 +36,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'dry-monads'
 
   spec.add_development_dependency 'capybara',                  '~> 3.12'
-  spec.add_development_dependency 'database_cleaner'
+  spec.add_development_dependency 'database_cleaner-mongoid'
   spec.add_development_dependency 'factory_bot_rails',         '~> 4'
   spec.add_development_dependency 'forgery',                   '~> 0.7.0'
   spec.add_development_dependency 'mongoid_rails_migrations',  '~> 1.2.0'

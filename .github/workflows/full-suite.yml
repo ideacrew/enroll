@@ -12,6 +12,13 @@ jobs:
   rubocop:
     runs-on: ubuntu-latest
     steps:
+      - uses: getong/rabbitmq-action@v1.2
+        with:
+          rabbitmq version: "3.8.2-management-alpine"
+          host port: 5672
+          rabbitmq user: "guest"
+          rabbitmq password: "guest"
+          rabbitmq vhost: "/"
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
       - name: Cache Gems

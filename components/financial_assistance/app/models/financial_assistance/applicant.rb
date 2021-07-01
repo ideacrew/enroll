@@ -932,6 +932,21 @@ module FinancialAssistance
       age_of_applicant > 17 && age_of_applicant < 23
     end
 
+    def home_address
+      addresses.where(kind: 'home').first
+    end
+
+    def current_month_incomes
+      start_of_current_month = TimeKeeper.date_of_record.beginning_of_month
+      end_of_current_month = TimeKeeper.date_of_record.end_of_month
+      incomes.select do |inc|
+        end_on = inc.end_on || Date.new(application.assistance_year).end_of_year
+        (start_of_current_month..end_of_current_month).any? do |cm_date|
+          (inc.start_on..end_on).cover?(cm_date)
+        end
+      end
+    end
+
     class << self
       def find(id)
         return nil unless id

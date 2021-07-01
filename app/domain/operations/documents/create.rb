@@ -9,7 +9,7 @@ module Operations
       send(:include, Dry::Monads[:result, :do, :try])
 
       def call(resource:, document_params:, doc_identifier:)
-        return Failure({:message => ['Please find valid resource to create document.']}) if resource.blank?
+        return Failure({ :message => ["Please find valid resource to create document for params: #{document_params}"] }) if resource.blank?
 
         payload = yield construct_doc_payload(document_params, doc_identifier)
         validated_params = yield validate_params(payload)
@@ -36,17 +36,9 @@ module Operations
         Success(document)
       end
 
-      def fetch_file_name(params)
-        params[:file].original_filename
-      end
-
-      def fetch_file_content_type(params)
-        params[:file].content_type
-      end
-
       def construct_doc_payload(params, doc_identifier)
-        Success({ "title": fetch_file_name(params),
-                  "format": fetch_file_content_type(params),
+        Success({ "title": params[:file_name],
+                  "format": params[:file_content_type],
                   "creator": "hbx_staff",
                   "subject": "notice",
                   "doc_identifier": doc_identifier })

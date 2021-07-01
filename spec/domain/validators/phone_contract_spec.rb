@@ -14,7 +14,7 @@ module Validators
       let(:params) do
         { }
       end
-      let(:error_message) {{:kind => ['is missing'], :full_phone_number => ['is missing']}}
+      let(:error_message) {{:kind => ["is missing", "must be a string"], :full_phone_number => ["is missing", "must be a string"]}}
 
 
       it "fails" do

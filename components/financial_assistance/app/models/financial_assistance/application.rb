@@ -347,6 +347,10 @@ module FinancialAssistance
       return unless ed_updated
 
       determine! # If successfully loaded ed's move the application to determined state
+      send_determination_to_ea
+    end
+
+    def send_determination_to_ea
       result = ::Operations::Families::AddFinancialAssistanceEligibilityDetermination.new.call(params: self.attributes)
       result.failure? ? log(eligibility_response_payload, {:severity => 'critical', :error_message => "ERROR: #{result.failure}"}) : true
     end
@@ -889,8 +893,9 @@ module FinancialAssistance
       write_attribute(:is_ridp_verified, true)
     end
 
+    # TODO: Check if we have to fall back to FinancialAssistanceRegistry.
     def set_us_state
-      write_attribute(:us_state, FinancialAssistanceRegistry[:us_state].setting(:abbreviation).item)
+      write_attribute(:us_state, ::EnrollRegistry[:enroll_app].setting(:state_abbreviation).item)
     end
 
     def set_submission_date
