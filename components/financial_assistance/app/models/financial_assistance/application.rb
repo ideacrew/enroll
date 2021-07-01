@@ -884,7 +884,10 @@ module FinancialAssistance
     end
 
     def set_us_state
-      write_attribute(:us_state, FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item)
+      write_attribute(
+        :us_state,
+        FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item
+      )
     end
 
     def set_submission_date
@@ -892,11 +895,14 @@ module FinancialAssistance
     end
 
     def set_assistance_year
-      update_attribute(:assistance_year, FinancialAssistanceRegistry[:enrollment_dates].settings(:application_year).item.call.value!)
+      update_attribute(
+        :assistance_year,
+        FinancialAssistanceRegistry[:enrollment_dates].settings(:application_year).item.constantize.new.call.value!
+      )
     end
 
     def set_effective_date
-      effective_date = FinancialAssistanceRegistry[:enrollment_dates].settings(:earliest_effective_date).item.call.value!
+      effective_date = FinancialAssistanceRegistry[:enrollment_dates].settings(:earliest_effective_date).item.constantize.new.call.value!
       update_attribute(:effective_date, effective_date)
     end
 
@@ -906,7 +912,12 @@ module FinancialAssistance
     # end
 
     def active_approved_application
-      self.class.where(aasm_state: "determined", family_id: family_id, assistance_year: FinancialAssistanceRegistry[:enrollment_dates].settings(:application_year).item.call.value!).order_by(:submitted_at => 'desc').first if family_id.present?
+      return unless family_id.present?
+      where(
+        aasm_state: "determined",
+        family_id: family_id,
+        assistance_year: FinancialAssistanceRegistry[:enrollment_dates].settings(:application_year).item.constantize.new.call.value!
+      ).order_by(:submitted_at => 'desc').first
     end
 
     def set_external_identifiers

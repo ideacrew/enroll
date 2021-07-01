@@ -5,42 +5,38 @@ registry:
     - :aca_individual_market
     - :financial_assistance
     features:
-      - key: :faa_ext_service
-        item: :faa_ext_service
+      - key: :aceds_curam
+        item: :aceds_curam
+        is_enabled: false
+      - key: :ivl_application_checklist
         is_enabled: true
+        item: :ivl_application_checklist
         settings:
-          - key: :aceds_curamp
-            item: :aceds_curams
-            is_enabled: false
-          - key: :ivl_application_checklist
-            item: 'IVL_Application_Checklist_Final_02172021.pdf'
+          - key: :file_location
+            item: 'IVL_Application_Checklist_Final_02172021.pdf' # 'db/documents/ivl_checklist.pdf'
       - key: :enrollment_dates
         item: :enrollment_dates
         is_enabled: true
         settings:
-          - key: :application_new_year_effective_date
-            item: true
-            settings:
-              - key: :day_of_month
-                item: 1
-              - key: :month_of_year
-                item: 11
+          - key: :application_new_year_effective_date_day_of_month
+            item: 1
+          - key: :application_new_year_effective_date_month_of_year
+            item: 11
           - key: :enrollment_due_day_of_month
-            item: :enrollment_due_day_of_month
-            item: 15
             is_enabled: true
+            item: 15
           - key: :earliest_effective_date
-            item: FinancialAssistance::Operations::EnrollmentDates::EarliestEffectiveDate.new
+            item: FinancialAssistance::Operations::EnrollmentDates::EarliestEffectiveDate
             is_enabled: true
           - key: :application_year
-            item: FinancialAssistance::Operations::EnrollmentDates::ApplicationYear.new
+            item: FinancialAssistance::Operations::EnrollmentDates::ApplicationYear
             is_enabled: true
       - key: :benchmark_plans
         item: :benchmark_plans
         is_enabled: true
         settings:
           - key: :benchmark_plan_2020
-            item: :true
+            item: true
             settings:
               - key: :name
                 item: 'Plan Name'
@@ -56,21 +52,9 @@ registry:
                 item: 0.80
               - key: :carrier_name
                 item: "Carrier Name"
-      - key: :other_income
-        item: :other_income
+      - key: :unemployment_income
+        item: :unemployment_income
         is_enabled: true
-        settings:
-          - key: :unemployment_income
-            item: true
-      - key: :documents
-        item: :documents
-        is_enabled: true
-        settings:
-          - key: :financial_assistance_documents
-            item: true
-            settings:
-              - key: :ivl_application_checklist
-                item: 'db/documents/ivl_checklist.pdf'
 
     # TODO eligibility engine connectivity(HAVEN) settings
     # TODO mec service connectivity settings

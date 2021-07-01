@@ -181,7 +181,9 @@ module FinancialAssistance
 
     def checklist_pdf
       send_file(
-        FinancialAssistance::Engine.root.join(FinancialAssistanceRegistry[:financial_assistance_documents].settings(:ivl_application_checklist).item.to_s), :disposition => "inline", :type => "application/pdf"
+        FinancialAssistance::Engine.root.join(
+          FinancialAssistanceRegistry[:ivl_application_checklist].setting(:file_location).item.to_s
+        ), :disposition => "inline", :type => "application/pdf"
       )
     end
 
@@ -239,7 +241,7 @@ module FinancialAssistance
         "jobs" => generate_employment_hash(applicant.incomes.jobs),
         "Does this person expect to receive self-employment income in #{@application.assistance_year}? *" => human_boolean(applicant.has_self_employment_income)
       }
-      income_hash.merge!("Did this person receive unemployment income at any point in #{@application.assistance_year}? *" => human_boolean(applicant.has_unemployment_income)) if FinancialAssistanceRegistry[:other_income].setting(:unemployment_income).item == true
+      income_hash.merge!("Did this person receive unemployment income at any point in #{@application.assistance_year}? *" => human_boolean(applicant.has_unemployment_income)) if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income)
       income_hash.merge!("Does this person expect to have income from other sources in #{@application.assistance_year}? *" => human_boolean(applicant.has_other_income))
       income_hash
     end
