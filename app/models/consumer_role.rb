@@ -710,7 +710,7 @@ class ConsumerRole
       if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
         live_types << 'American Indian Status' if !(tribal_state.nil? || tribal_state.empty?) && !(tribal_name.nil? || tribal_name.empty?)
       else
-        live_types << 'American Indian Status' if !(tribal_id.nil? || tribal_id.empty?)
+        live_types << 'American Indian Status' unless tribal_id.nil? || tribal_id.empty?
       end
       if us_citizen
         live_types << 'Citizenship'
@@ -1181,9 +1181,9 @@ class ConsumerRole
   end
 
   def ensure_native_validation
-    if EnrollRegistry[:indian_alaskan_tribe_details].enabled? && (tribal_state.nil? || tribal_name.nil?)
-      self.native_validation = "na"
-    elsif tribal_id.nil? || tribal_id.empty?
+    self.native_validation = "na" if EnrollRegistry[:indian_alaskan_tribe_details].enabled? && (tribal_state.nil? || tribal_state.empty? || tribal_name.nil? || tribal_name.empty?)
+
+    if tribal_id.nil? || tribal_id.empty?
       self.native_validation = "na"
     else
       self.native_validation = "outstanding" if native_validation == "na"

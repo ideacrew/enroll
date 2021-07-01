@@ -42,7 +42,6 @@ module FinancialAssistance
     end
 
     def update
-      binding.pry
       if params[:financial_assistance_applicant].present?
         format_date_params params[:financial_assistance_applicant]
         @applicant.update_attributes!(permit_params(params[:financial_assistance_applicant]))

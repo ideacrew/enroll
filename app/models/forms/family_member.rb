@@ -58,13 +58,9 @@ module Forms
           self.errors.add(:base, "native american / alaska native status is required")
         end
 
-        if EnrollRegistry[:indian_alaskan_tribe_details].enabled? && (!tribal_state.present? && @indian_tribe_member)
-          self.errors.add(:tribal_state, "is required when native american / alaska native is selected")
-        end
+        self.errors.add(:tribal_state, "is required when native american / alaska native is selected") if EnrollRegistry[:indian_alaskan_tribe_details].enabled? && (!tribal_state.present? && @indian_tribe_member)
 
-        if EnrollRegistry[:indian_alaskan_tribe_details].enabled? && (!tribal_name.present? && @indian_tribe_member)
-          self.errors.add(:tribal_name, "is required when native american / alaska native is selected")
-        end
+        self.errors.add(:tribal_name, "is required when native american / alaska native is selected") if EnrollRegistry[:indian_alaskan_tribe_details].enabled? && (!tribal_name.present? && @indian_tribe_member)
 
         if !tribal_id.present? && @indian_tribe_member
           self.errors.add(:tribal_id, "is required when native american / alaska native is selected")
