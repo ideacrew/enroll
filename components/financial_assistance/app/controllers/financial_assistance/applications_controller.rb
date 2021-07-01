@@ -200,7 +200,7 @@ module FinancialAssistance
     end
 
     def call_service
-      if EnrollRegistry[:faa_ext_service].setting(:aceds_curam).item
+      if FinancialAssistanceRegistry.feature_enabled?(:aceds_curam)
         person = FinancialAssistance::Factories::AssistanceFactory.new(@person)
         @assistance_status, @message = person.search_existing_assistance
       else

@@ -913,7 +913,7 @@ module FinancialAssistance
 
     def active_approved_application
       return unless family_id.present?
-      where(
+      self.class.where(
         aasm_state: "determined",
         family_id: family_id,
         assistance_year: FinancialAssistanceRegistry[:enrollment_dates].settings(:application_year).item.constantize.new.call.value!

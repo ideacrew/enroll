@@ -16,7 +16,7 @@
     <p>Tell us about this person's other income. When you're finished, select CONTINUE.</p>
     <br>
 
-    <% if FinancialAssistanceRegistry[:other_income].setting(:unemployment_income).item == true %>
+    <% if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income) %>
       <div class="row row-form-wrapper radio-align no-buffer fa-align-elements">
         <div class='col-md-6 labelforcoverage'>
           <span class="fa-text-color">Did this person receive <b>Unemployment Income</b> at any point in <%= @application.assistance_year %>? *</span>

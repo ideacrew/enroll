@@ -121,7 +121,7 @@
               <div class="col-md-6"><%= human_boolean applicant.has_self_employment_income %></div>
             </div>
 
-            <% if FinancialAssistanceRegistry[:other_income].setting(:unemployment_income).item == true %>
+            <% if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income) %>
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">
                 <div class="col-md-6">Did this person receive unemployment income at any point in <%= @application.assistance_year %>? *
                 </div>
