@@ -21,6 +21,8 @@ require File.join(Rails.root, 'app/data_migrations/golden_seed_financial_assista
 # rubocop:disable Metrics/PerceivedComplexity
 # rubocop:disable Metrics/MethodLength
 # TODO: Need to find a solution like having multiple CSV's for the value of "NO DC Address"
+# TODO: Currently commented out as of 6/10/21
+# but add an ENV variable to avoid callbacks and only set HBX_ID callbacks at the end
 class GoldenSeedIndividual < MongoidMigrationTask
   include GoldenSeedHelper
   include GoldenSeedFinancialAssistanceHelper
@@ -82,8 +84,9 @@ class GoldenSeedIndividual < MongoidMigrationTask
       end
       @counter_number += 1
     end
-    update_person_hbx_ids
-    update_enrollment_hbx_ids
+    # These are used if you want to remove callbacks on hbx ids
+    # update_person_hbx_ids
+    # update_enrollment_hbx_ids
     return unless EnrollRegistry.feature_enabled?(:financial_assistance)
     unless Rails.env.test?
       puts(
@@ -129,8 +132,8 @@ class GoldenSeedIndividual < MongoidMigrationTask
   def migrate
     @case_collection = {}
     @counter_number = 0
-    @original_enrollment_hbx_ids = []
-    @original_person_hbx_ids = []
+    # @original_enrollment_hbx_ids = []
+    # @original_person_hbx_ids = []
     puts('Executing Golden Seed IVL migration migration.') unless Rails.env.test?
     puts("Site present, using existing site.") if site.present? && !Rails.env.test?
     ::BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_empty_benefit_market if site.blank?
@@ -139,23 +142,13 @@ class GoldenSeedIndividual < MongoidMigrationTask
     create_and_return_service_area_and_product if ivl_products.blank?
     create_and_return_ivl_hbx_profile_and_sponsorship
     @consumer_people_and_users = {}
-    Person.skip_callback(:create, :after, :notify_created)
-    Person.skip_callback(:update, :after, :notify_updated)
-    Person.skip_callback(:update, :after, :person_create_or_update_handler)
-    PersonRelationship.skip_callback(:save, :after, :notify_updated)
-    HbxEnrollment.skip_callback(:save, :after, :notify_on_save)
-    FinancialAssistance::Relationship.skip_callback(:create, :after, :propagate_applicant) if EnrollRegistry.feature_enabled?(:financial_assistance)
+    remove_golden_seed_callbacks
     if ivl_testbed_scenario_csv
       migrate_with_csv
     else
       migrate_without_csv
     end
-    Person.set_callback(:create, :after, :notify_created)
-    Person.set_callback(:update, :after, :notify_updated)
-    Person.set_callback(:update, :after, :person_create_or_update_handler)
-    PersonRelationship.set_callback(:save, :after, :notify_updated)
-    HbxEnrollment.set_callback(:save, :after, :notify_on_save)
-    FinancialAssistance::Relationship.set_callback(:create, :after, :propagate_applicant) if EnrollRegistry.feature_enabled?(:financial_assistance)
+    reinstate_golden_seed_callbacks
     puts("Site present for: #{BenefitSponsors::Site.all.map(&:site_key)}") if BenefitSponsors::Site.present? && !Rails.env.test?
     puts("Golden Seed IVL migration complete. All consumer roles are:") unless Rails.env.test?
     consumer_people_and_users.each do |person_full_name, user_record|

@@ -247,6 +247,7 @@ module FinancialAssistance
 
     field :has_dependent_with_coverage, type: Boolean
     field :dependent_job_end_on, type: Date
+
     field :is_eligible_for_non_magi_reasons, type: Boolean
 
     field :workflow, type: Hash, default: { }
@@ -289,7 +290,7 @@ module FinancialAssistance
 
     # Responsible for updating family member  when applicant is created/updated
     after_update :propagate_applicant
-    before_destroy :propagate_destroy
+    before_destroy :destroy_relationships, :propagate_destroy
 
     def generate_hbx_id
       write_attribute(:person_hbx_id, FinancialAssistance::HbxIdGenerator.generate_member_id) if person_hbx_id.blank?
@@ -1122,6 +1123,11 @@ module FinancialAssistance
       Success('A successful call was made to enroll to drop a family member')
     rescue StandardError => e
       e.message
+    end
+
+    def destroy_relationships
+      application.relationships.where(applicant_id: self.id).destroy_all
+      application.relationships.where(relative_id: self.id).destroy_all
     end
   end
 end
