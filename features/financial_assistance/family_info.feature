@@ -14,3 +14,13 @@ Feature: Start a new Financial Assistance Application
     And they should see each of their dependents listed
     And consumer clicks on pencil symbol next to primary person
     Then consumer should see today date and clicks continue
+
+  Scenario: American Indian/ Alaskan Native Details feature is enabled
+    Given AI AN Details feature is enabled
+    When a consumer visits the Get Help Paying for coverage page
+    And selects yes they would like help paying for coverage
+    Then they should see a new finanical assistance application
+    And they should see each of their dependents listed
+    And consumer clicks on pencil symbol next to primary person
+    And the user selects Indian Tribe Member on the add member form
+    Then the user should see the AI AN Details fields

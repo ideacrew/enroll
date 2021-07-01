@@ -104,6 +104,18 @@ And(/^the user fills the the add member form/) do
   expect(page).to have_content("#{l10n('family_information')}")
 end
 
+Given(/AI AN Details feature is enabled/) do
+  enable_feature :indian_alaskan_tribe_details
+end
+
+And(/^the user selects Indian Tribe Member on the add member form/) do
+  find(:xpath, '//label[@for="indian_tribe_member_yes"]').click
+end
+
+Then(/the user should see the AI AN Details fields/) do
+  expect(page).to have_content("Where is this person's tribe located?")
+end
+
 And(/^the user clicks the PREVIOUS link1/) do
   find('.interaction-click-control-previous').click
 end
