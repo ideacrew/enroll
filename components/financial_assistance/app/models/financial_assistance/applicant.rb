@@ -154,6 +154,7 @@ module FinancialAssistance
     field :aasm_state, type: String, default: :unverified
 
     field :person_hbx_id, type: String
+    field :ext_app_id, type: String
     field :family_member_id, type: BSON::ObjectId
     field :eligibility_determination_id, type: BSON::ObjectId
 

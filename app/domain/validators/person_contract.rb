@@ -5,6 +5,7 @@ module Validators
 
     params do
       optional(:hbx_id).maybe(:string)
+      optional(:ext_app_id).maybe(:string)
       optional(:name_pfx).maybe(:string)
       required(:first_name).maybe(:string)
       optional(:middle_name).maybe(:string)
