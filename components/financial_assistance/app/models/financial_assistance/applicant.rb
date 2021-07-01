@@ -655,9 +655,7 @@ module FinancialAssistance
     end
 
     def health_questions_complete?
-      if indian_tribe_member && EnrollRegistry[:indian_health_service_question].feature.is_enabled
-        return false if health_service_through_referral.nil? || health_service_eligible.nil?
-      end
+      return false if indian_tribe_member && EnrollRegistry[:indian_health_service_question].feature.is_enabled && (health_service_through_referral.nil? || health_service_eligible.nil?)
       true
     end
 
