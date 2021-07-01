@@ -15,3 +15,10 @@ registry:
           is_enabled: false
         - key: :notices_tab
           is_enabled: false
+        - key: :calendar_tab
+          is_enabled: false
+        - key: :staff_tab
+          is_enabled: false
+        - key: :orphan_accounts_tab
+          is_enabled: false
+
