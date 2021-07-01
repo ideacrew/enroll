@@ -272,7 +272,7 @@ end
 
 When(/Employee click the "(.*?)" in qle carousel/) do |qle_event|
   expect(page).to have_content(qle_event, wait: 10)
-  click_link "#{qle_event}"
+  click_link qle_event.to_s
 end
 
 When(/Employee select a past qle date/) do
@@ -309,6 +309,6 @@ Then(/Employee should see confirmation and clicks continue/) do
 end
 
 Then(/Employee should see family members page and clicks continue/) do
-  expect(page).to have_content "#{l10n('family_information')}"
+  expect(page).to have_content l10n('family_information').to_s
   find('#dependent_buttons .interaction-click-control-continue', :wait => 5).click
 end
