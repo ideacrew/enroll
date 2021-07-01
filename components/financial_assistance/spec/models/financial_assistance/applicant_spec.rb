@@ -140,6 +140,25 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         expect(application.applicants.count).to eq 2
         expect(application.relationships.count).to eq 2
       end
+
+      it 'should return true on applicant validation' do
+        EnrollRegistry[:indian_health_service_question].feature.stub(:is_enabled).and_return(true)
+        applicant_spouse = application.applicants.where(id: spouse_applicant.id).first
+        applicant_spouse.update_attributes(indian_tribe_member: true)
+        expect(applicant_spouse.health_questions_complete?).to eq(false)
+      end
+
+      it 'should return true if the setting is turned off' do
+        EnrollRegistry[:indian_health_service_question].feature.stub(:is_enabled).and_return(false)
+        expect(applicant.health_questions_complete?).to eq(true)
+      end
+
+      it 'should return false if the health service questions are nil' do
+        EnrollRegistry[:indian_health_service_question].feature.stub(:is_enabled).and_return(true)
+        applicant_spouse = application.applicants.where(id: spouse_applicant.id).first
+        applicant_spouse.update_attributes(indian_tribe_member: true, health_service_through_referral: nil)
+        expect(applicant_spouse.health_questions_complete?).to eq(false)
+      end
     end
   end
 
