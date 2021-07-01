@@ -75,6 +75,8 @@ fixture_dumps
 # Make sure no PII is accidently commited
 # add w/ git add --force if actually docs
 *.csv
+# IVL Testbed Scenarios is made up data used for golden seed.
+!ivl_testbed_scenarios_2021.csv
 *.txt
 *.xml
 *.xls

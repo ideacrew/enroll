@@ -134,8 +134,8 @@ module GoldenSeedFinancialAssistanceHelper
   end
 
   def add_applicant_addresses(case_info_hash)
-    current_or_primary_person = case_info_hash[:user_record].person || case_info_hash[:primary_person_record]
-    applicant = case_info_hash[:fa_applicants].last[:applicant_record]
+    current_or_primary_person = case_info_hash[:user_record]&.person || case_info_hash[:primary_person_record]
+    applicant = case_info_hash[:target_fa_applicant] || case_info_hash[:fa_application].applicants.last
     puts("No person record present.") if current_or_primary_person.blank?
     puts("No applicant present") if applicant.blank?
     current_or_primary_person.addresses.each do |address|
@@ -154,8 +154,8 @@ module GoldenSeedFinancialAssistanceHelper
   end
 
   def add_applicant_phones(case_info_hash)
-    current_or_primary_person = case_info_hash[:user_record].person || case_info_hash[:primary_person_record]
-    applicant = case_info_hash[:fa_applicants].last[:applicant_record]
+    current_or_primary_person = case_info_hash[:user_record]&.person || case_info_hash[:primary_person_record]
+    applicant = case_info_hash[:target_fa_applicant] || case_info_hash[:fa_application].applicants.last
     puts("No person record present.") if current_or_primary_person.blank?
     puts("No applicant present") if applicant.blank?
     current_or_primary_person.phones.each do |phone|
@@ -170,21 +170,21 @@ module GoldenSeedFinancialAssistanceHelper
   end
 
   def add_applicant_emails(case_info_hash)
-    email = case_info_hash[:user_record].email || case_info_hash[:primary_person_record].emails.first.address
-    applicant = case_info_hash[:fa_applicants].last[:applicant_record]
+    email = case_info_hash[:user_record]&.email || case_info_hash[:primary_person_record].emails.first.address
+    applicant = case_info_hash[:fa_application].applicants.last
     puts("No email address present.") if email.blank?
     puts("No applicant present") if applicant.blank?
     applicant.emails.build(address: email, kind: 'home').save!
   end
 
   def add_applicant_income_response(case_info_hash)
-    applicant = case_info_hash[:fa_applicants].last[:applicant_record]
+    applicant = case_info_hash[:target_fa_applicant] || case_info_hash[:fa_application].applicants.last
     applicant.valid_income_response
     applicant.build_income_response.save!
   end
 
   def add_applicant_mec_response(case_info_hash)
-    applicant = case_info_hash[:fa_applicants].last[:applicant_record]
+    applicant = case_info_hash[:fa_application].applicants.last
     applicant.valid_mec_response
     applicant.build_mec_response.save!
   end
