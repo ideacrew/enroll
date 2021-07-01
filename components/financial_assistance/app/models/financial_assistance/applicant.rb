@@ -737,7 +737,7 @@ module FinancialAssistance
         end
         return false if has_other_income.nil?
         return incomes.other.present? if has_other_income
-        return incomes.other.blank? || incomes.unemployment.blank? if FinancialAssistanceRegistry[:other_income].setting(:unemployment_income).item == true
+        return incomes.other.blank? || incomes.unemployment.blank? if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income)
         incomes.other.blank?
       when :income_adjustment
         return false if has_deductions.nil?

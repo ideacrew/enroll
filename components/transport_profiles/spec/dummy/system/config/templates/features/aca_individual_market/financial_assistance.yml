@@ -13,7 +13,7 @@ registry:
         item: :ivl_application_checklist
         settings:
           - key: :file_location
-            item: 'IVL_Application_Checklist_Final_02172021.pdf' # 'db/documents/ivl_checklist.pdf'
+            item: 'db/documents/ivl_checklist.pdf'
       - key: :enrollment_dates
         item: :enrollment_dates
         is_enabled: true
