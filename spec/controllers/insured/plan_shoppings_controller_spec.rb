@@ -451,6 +451,28 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
         expect(hbx_enrollment.terminated_on).to eq terminate_date
       end
     end
+
+    context "errors terminating HBX Enrollment" do
+      let(:terminate_date) { TimeKeeper.date_of_record - 1.week  }
+      before do
+        # active_plan_year = employee_role.employer_profile.show_plan_year
+        # Let's make this blank!
+        allow(hbx_enrollment.employee_role.employer_profile).to receive(:show_plan_year).and_return(nil)
+        allow(hbx_enrollment.employee_role).to receive(:can_enroll_as_new_hire?).and_return(false)
+        post(
+          :terminate,
+          params: {
+            id: 'hbx_id',
+            terminate_reason: 'Because',
+            terminate_date: terminate_date.to_s
+          }
+        )
+      end
+
+      it "should redirect without throwing exceptions and show errors in alert message" do
+        expect(flash[:alert]).to include("You may not enroll")
+      end
+    end
   end
 
   context "GET waive", :dbclean => :around_each do
@@ -593,6 +615,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       end
     end
 
+    # TODO: Fix this to run even if individual market not enabled
     if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       context "when user has_active_consumer_role" do
         let(:tax_household) {double("TaxHousehold")}
