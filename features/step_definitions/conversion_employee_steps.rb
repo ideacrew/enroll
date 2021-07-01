@@ -1,7 +1,3 @@
-# frozen_string_literal: true
-
-# rubocop:disable Style/RedundantInterpolation
-
 Given(/^Multiple Conversion Employers for (.*) exist with active and renewing plan years$/) do |named_person|
   person = people[named_person]
 
