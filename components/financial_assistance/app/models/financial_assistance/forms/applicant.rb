@@ -60,8 +60,8 @@ module FinancialAssistance
         if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
           self.errors.add(:tribal_state, "is required when native american / alaska native is selected") if !tribal_state.present? && @indian_tribe_member
           self.errors.add(:tribal_name, "is required when native american / alaska native is selected") if !tribal_name.present? && @indian_tribe_member
-        else
-          self.errors.add(:tribal_id, "is required when native american / alaska native is selected") if !tribal_id.present? && @indian_tribe_member
+        elsif !tribal_id.present? && @indian_tribe_member
+          self.errors.add(:tribal_id, "is required when native american / alaska native is selected")
         end
         self.errors.add(:base, "Incarceration status is required") if @is_incarcerated.nil?
       end
