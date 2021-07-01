@@ -34,6 +34,8 @@ class Person
                         :ethnicity,
                         :race,
                         :tribal_id,
+                        :tribal_state,
+                        :tribal_name,
                         :no_dc_address,
                         :is_homeless,
                         :is_temporarily_out_of_state,
@@ -85,6 +87,8 @@ class Person
   field :ethnicity, type: Array
   field :race, type: String
   field :tribal_id, type: String
+  field :tribal_state, type: String
+  field :tribal_name, type: String
 
   field :is_tobacco_user, type: String, default: "unknown"
   field :language_code, type: String
@@ -1135,7 +1139,12 @@ class Person
   end
 
   def indian_tribe_member=(val)
-    self.tribal_id = nil if val.to_s == false
+    if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
+      self.tribal_state = nil if val.to_s == false
+      self.tribal_name = nil if val.to_s == false
+    else
+      self.tribal_id = nil if val.to_s == false
+    end
     @indian_tribe_member = (val.to_s == "true")
   end
 
@@ -1158,7 +1167,11 @@ class Person
   def indian_tribe_member
     return @indian_tribe_member if !@indian_tribe_member.nil?
     return nil if citizen_status.blank?
-    @indian_tribe_member ||= !(tribal_id.nil? || tribal_id.empty?)
+    if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
+      @indian_tribe_member ||= !(tribal_state.nil? || tribal_state.empty? || tribal_name.nil? || tribal_name.empty?)
+    else
+      @indian_tribe_member ||= !(tribal_id.nil? || tribal_id.empty?)
+    end
   end
 
   def eligible_immigration_status
@@ -1305,7 +1318,11 @@ class Person
 
   def native_american_validation
     self.errors.add(:base, "American Indian / Alaska Native status is required.") if indian_tribe_member.to_s.blank?
-    if !tribal_id.present? && @us_citizen == true && @indian_tribe_member == true
+    if EnrollRegistry[:indian_alaskan_tribe_details].enabled? && !tribal_state.present? && @us_citizen == true && @indian_tribe_member == true
+      self.errors.add(:base, "Tribal state is required when native american / alaska native is selected")
+    elsif EnrollRegistry[:indian_alaskan_tribe_details].enabled? && !tribal_name.present? && @us_citizen == true && @indian_tribe_member == true
+      self.errors.add(:base, "Tribal name is required when native american / alaska native is selected")
+    elsif !tribal_id.present? && @us_citizen == true && @indian_tribe_member == true
       self.errors.add(:base, "Tribal id is required when native american / alaska native is selected")
     elsif tribal_id.present? && !tribal_id.match("[0-9]{9}")
       self.errors.add(:base, "Tribal id must be 9 digits")
