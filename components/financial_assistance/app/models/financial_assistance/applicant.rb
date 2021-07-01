@@ -731,7 +731,7 @@ module FinancialAssistance
         return incomes.jobs.blank? && incomes.self_employment.present? if !has_job_income && has_self_employment_income
         incomes.jobs.blank? && incomes.self_employment.blank?
       when :other_income
-        if FinancialAssistanceRegistry[:other_income].setting(:unemployment_income).item == true
+        if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income)
           return false if has_unemployment_income.nil?
           return incomes.unemployment.present? if has_unemployment_income
         end
