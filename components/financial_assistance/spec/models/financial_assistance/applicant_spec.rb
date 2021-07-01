@@ -105,4 +105,41 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       end
     end
   end
+
+  context 'when IAP applicant is destroyed' do
+    context 'should destroy their relationships of the applicants' do
+      let!(:spouse_applicant) do
+        FactoryBot.create(:applicant,
+                          application: application,
+                          dob: Date.today - 30.years,
+                          is_primary_applicant: false,
+                          family_member_id: BSON::ObjectId.new)
+      end
+
+      let!(:child_applicant) do
+        FactoryBot.create(:applicant,
+                          application: application,
+                          dob: Date.today - 10.years,
+                          is_primary_applicant: false,
+                          family_member_id: BSON::ObjectId.new)
+      end
+      before do
+        application.ensure_relationship_with_primary(spouse_applicant, 'spouse')
+        application.ensure_relationship_with_primary(child_applicant, 'child')
+        application.update_or_build_relationship(child_applicant, spouse_applicant, 'child')
+        application.update_or_build_relationship(spouse_applicant, child_applicant, 'parent')
+      end
+
+      it 'when spouse applicant is deleted it should delete their relationships' do
+        expect(application.applicants.count).to eq 3
+        expect(application.relationships.count).to eq 6
+        applicant_spouse = application.applicants.where(id: spouse_applicant.id)
+        expect(applicant_spouse.count).to eq 1
+        applicant_spouse.destroy_all
+        expect(applicant_spouse.count).to eq 0
+        expect(application.applicants.count).to eq 2
+        expect(application.relationships.count).to eq 2
+      end
+    end
+  end
 end
