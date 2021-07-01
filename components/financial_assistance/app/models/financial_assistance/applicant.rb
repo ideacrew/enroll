@@ -645,13 +645,18 @@ module FinancialAssistance
         incomes.all? {|income| income.valid? :submission} &&
         benefits.all? {|benefit| benefit.valid? :submission} &&
         deductions.all? {|deduction| deduction.valid? :submission} &&
-        other_questions_complete?
+        other_questions_complete? && health_questions_complete?
       else
         valid?(:submission) &&
           incomes.all? {|income| income.valid? :submission} &&
           deductions.all? {|deduction| deduction.valid? :submission} &&
-          other_questions_complete?
+          other_questions_complete? && health_questions_complete?
       end
+    end
+
+    def health_questions_complete?
+      return false if indian_tribe_member && EnrollRegistry[:indian_health_service_question].feature.is_enabled && (health_service_through_referral.nil? || health_service_eligible.nil?)
+      true
     end
 
     def clean_conditional_params(model_params)
