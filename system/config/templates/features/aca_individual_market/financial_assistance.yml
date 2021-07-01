@@ -9,7 +9,7 @@ registry:
         item: :faa_ext_service
         is_enabled: true
         settings:
-          - key: :aceds_curam
+          - key: :aceds_curamp
             item: :aceds_curams
             is_enabled: false
           - key: :ivl_application_checklist
