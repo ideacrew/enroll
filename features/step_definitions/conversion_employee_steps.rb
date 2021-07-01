@@ -1,3 +1,7 @@
+# frozen_string_literal: true
+
+# rubocop:disable Style/RedundantInterpolation
+
 Given(/^Multiple Conversion Employers for (.*) exist with active and renewing plan years$/) do |named_person|
   person = people[named_person]
 
@@ -302,3 +306,13 @@ Then(/Employee should see confirmation and clicks continue/) do
   # screenshot("valid_qle")
   click_button "Continue"
 end
+<<<<<<< HEAD
+=======
+
+Then(/Employee should see family members page and clicks continue/) do
+  expect(page).to have_content "#{l10n('family_information')}"
+  find('#dependent_buttons .interaction-click-control-continue', :wait => 5).click
+end
+
+# rubocop:enable Style/RedundantInterpolation
+>>>>>>> 45f407b80c (rubocop again)
