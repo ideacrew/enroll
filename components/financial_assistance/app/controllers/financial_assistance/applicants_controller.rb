@@ -42,6 +42,7 @@ module FinancialAssistance
     end
 
     def update
+      binding.pry
       if params[:financial_assistance_applicant].present?
         format_date_params params[:financial_assistance_applicant]
         @applicant.update_attributes!(permit_params(params[:financial_assistance_applicant]))
@@ -210,6 +211,8 @@ module FinancialAssistance
         :indian_tribe_member,
         :eligible_immigration_status,
         :tribal_id,
+        :tribal_state,
+        :tribal_name,
         :is_incarcerated,
         :relationship,
         :is_consumer_role,

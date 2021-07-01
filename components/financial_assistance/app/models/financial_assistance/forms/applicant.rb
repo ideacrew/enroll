@@ -57,7 +57,12 @@ module FinancialAssistance
 
         validate_citizen_status
         self.errors.add(:base, "native american / alaska native status is required") if @indian_tribe_member.nil?
-        self.errors.add(:tribal_id, "is required when native american / alaska native is selected") if !tribal_id.present? && @indian_tribe_member
+        if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
+          self.errors.add(:tribal_state, "is required when native american / alaska native is selected") if !tribal_state.present? && @indian_tribe_member
+          self.errors.add(:tribal_name, "is required when native american / alaska native is selected") if !tribal_name.present? && @indian_tribe_member
+        else
+          self.errors.add(:tribal_id, "is required when native american / alaska native is selected") if !tribal_id.present? && @indian_tribe_member
+        end
         self.errors.add(:base, "Incarceration status is required") if @is_incarcerated.nil?
       end
 
@@ -129,6 +134,8 @@ module FinancialAssistance
           ethnicity: ethnicity.to_a.reject(&:blank?),
           indian_tribe_member: indian_tribe_member,
           tribal_id: tribal_id,
+          tribal_state: tribal_state,
+          tribal_name: tribal_name,
           citizen_status: citizen_status,
           is_temporarily_out_of_state: is_temporarily_out_of_state
         }#.reject{|_k, val| val.nil?}
