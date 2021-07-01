@@ -16,11 +16,11 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CalculateAndPersistNe
   end
 
   let(:income) do
-    FactoryBot.build(:financial_assistance_income, amount: 200, frequency_kind: "biweekly")
+    FactoryBot.build(:financial_assistance_income, amount: 200, start_on: Date.new(2021,6,1), end_on: Date.new(2021, 6, 30), frequency_kind: "biweekly")
   end
 
   let(:deduction) do
-    FactoryBot.build(:financial_assistance_deduction, amount: 100, frequency_kind: "biweekly")
+    FactoryBot.build(:financial_assistance_deduction, amount: 100, start_on: Date.new(2021,6,1), end_on: Date.new(2021, 6, 30), frequency_kind: "biweekly")
   end
 
   describe "passing empty params" do
@@ -70,12 +70,12 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CalculateAndPersistNe
       end
 
       let(:income) do
-        FactoryBot.build(:financial_assistance_income, start_on: Date.today.prev_year.beginning_of_month, end_on: nil,
+        FactoryBot.build(:financial_assistance_income, start_on: Date.new(2020, 6, 1), end_on: nil,
                                                        amount: 2000, frequency_kind: "monthly")
       end
 
       let(:deduction) do
-        FactoryBot.build(:financial_assistance_deduction, start_on: Date.today.prev_year.beginning_of_month, end_on: nil,
+        FactoryBot.build(:financial_assistance_deduction, start_on: Date.new(2020, 6, 1), end_on: nil,
                                                           amount: 1000, frequency_kind: "monthly")
       end
 
@@ -97,12 +97,12 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CalculateAndPersistNe
       end
 
       let(:income) do
-        FactoryBot.build(:financial_assistance_income, start_on: Date.today.next_year.beginning_of_month, end_on: nil,
+        FactoryBot.build(:financial_assistance_income, start_on: Date.new(2022, 6, 1), end_on: nil,
                                                        amount: 2000, frequency_kind: "monthly")
       end
 
       let(:deduction) do
-        FactoryBot.build(:financial_assistance_deduction, start_on: Date.today.next_year.beginning_of_month, end_on: nil,
+        FactoryBot.build(:financial_assistance_deduction, start_on: Date.new(2022, 6, 1), end_on: nil,
                                                           amount: 1000, frequency_kind: "monthly")
       end
 
