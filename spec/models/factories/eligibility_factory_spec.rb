@@ -179,7 +179,8 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
     describe 'cases for single tax household scenarios' do
       include_context 'setup one tax household with two ia members'
 
-      let!(:enrollment1) { FactoryBot.create(:hbx_enrollment, :individual_shopping, household: family.active_household, family: family, effective_on: Date.today.beginning_of_year) }
+      let(:rating_area) { FactoryBot.create(:benefit_markets_locations_rating_area) }
+      let!(:enrollment1) { FactoryBot.create(:hbx_enrollment, :individual_shopping, household: family.active_household, family: family, effective_on: Date.today.beginning_of_year, rating_area_id: rating_area.id) }
       let!(:enrollment_member1) { FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: enrollment1, applicant_id: family_member.id) }
 
       before :all do

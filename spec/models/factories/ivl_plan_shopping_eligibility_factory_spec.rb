@@ -26,7 +26,8 @@ RSpec.describe Factories::IvlPlanShoppingEligibilityFactory do
       include_context 'setup one tax household with two ia members'
 
       let(:current_date) {TimeKeeper.date_of_record.beginning_of_month}
-      let!(:enrollment1) { FactoryBot.create(:hbx_enrollment, :individual_shopping, family: family, household: family.active_household, effective_on: current_date) }
+      let!(:rating_area) { FactoryBot.create(:benefit_markets_locations_rating_area) }
+      let!(:enrollment1) { FactoryBot.create(:hbx_enrollment, :individual_shopping, family: family, household: family.active_household, effective_on: current_date, rating_area_id: rating_area.id) }
       let!(:enrollment_member1) { FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: enrollment1, applicant_id: family_member.id, eligibility_date: current_date, coverage_start_on: current_date) }
 
       before :all do

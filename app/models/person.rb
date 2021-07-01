@@ -87,6 +87,7 @@ class Person
   field :tribal_id, type: String
 
   field :is_tobacco_user, type: String, default: "unknown"
+  field :tobacco_use, type: Boolean # TODO: use above field
   field :language_code, type: String
 
   field :no_dc_address, type: Boolean, default: false
@@ -101,6 +102,7 @@ class Person
 
   field :is_homeless, type: Boolean, default: false
   field :is_temporarily_out_of_state, type: Boolean, default: false
+  field :is_moving_to_state, type: Boolean, default: false
 
 
   delegate :is_applying_coverage, to: :consumer_role, allow_nil: true
@@ -592,6 +594,10 @@ class Person
 
   def has_mailing_address?
     addresses.any? { |adr| adr.kind == "mailing" }
+  end
+
+  def rating_address
+    home_address || mailing_address
   end
 
   def home_email
