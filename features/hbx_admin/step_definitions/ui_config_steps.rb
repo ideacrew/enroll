@@ -48,4 +48,28 @@ Then(/^they should not see the Notices tab$/) do
   expect(page).to_not have_content("Notices")
 end
 
+Given(/calendar feature is enabled?/) do
+  enable_feature(:calendar_tab)
+end
+
+Given(/calendar feature is disabled?/) do
+  disable_feature(:calendar_tab)
+end
+
+Then(/^they should see the Calendar tab$/) do
+  expect(page).to have_content("Calendar")
+end
+
+Then(/^they should not see the Calendar tab$/) do
+  expect(page).to_not have_content("Calendar")
+end
+
+And(/^the user clicks the Admin tab$/) do
+  page.find('.dropdown-toggle', text: 'Admin').click
+  
+end
+
+
+
+
 
