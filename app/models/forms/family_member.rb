@@ -58,6 +58,14 @@ module Forms
           self.errors.add(:base, "native american / alaska native status is required")
         end
 
+        if EnrollRegistry[:indian_alaskan_tribe_details].enabled? && (!tribal_state.present? && @indian_tribe_member)
+          self.errors.add(:tribal_state, "is required when native american / alaska native is selected")
+        end
+
+        if EnrollRegistry[:indian_alaskan_tribe_details].enabled? && (!tribal_name.present? && @indian_tribe_member)
+          self.errors.add(:tribal_name, "is required when native american / alaska native is selected")
+        end
+
         if !tribal_id.present? && @indian_tribe_member
           self.errors.add(:tribal_id, "is required when native american / alaska native is selected")
         end
@@ -209,6 +217,8 @@ module Forms
         :is_incarcerated => is_incarcerated,
         :citizen_status => @citizen_status,
         :tribal_id => tribal_id,
+        :tribal_state => tribal_state,
+        :tribal_name => tribal_name,
         :is_homeless => is_homeless,
         :is_temporarily_out_of_state => is_temporarily_out_of_state,
         :age_off_excluded => age_off_excluded
@@ -264,6 +274,8 @@ module Forms
         :eligible_immigration_status => found_family_member.eligible_immigration_status,
         :indian_tribe_member => found_family_member.indian_tribe_member,
         :tribal_id => found_family_member.tribal_id,
+        :tribal_state => found_family_member.tribal_state,
+        :tribal_name => found_family_member.tribal_name,
         :same_with_primary => has_same_address_with_primary.to_s,
         :is_homeless => has_same_address_with_primary ? '' : found_family_member.try(:person).try(:is_homeless),
         :is_temporarily_out_of_state => has_same_address_with_primary ? '' : found_family_member.try(:person).try(:is_temporarily_out_of_state),
@@ -368,4 +380,3 @@ module Forms
     end
   end
 end
-

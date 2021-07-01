@@ -377,6 +377,8 @@ private
       :indian_tribe_member,
       {:ethnicity => []},
       :tribal_id,
+      :tribal_state,
+      :tribal_name,
       :no_dc_address,
       :is_homeless,
       :is_temporarily_out_of_state,
