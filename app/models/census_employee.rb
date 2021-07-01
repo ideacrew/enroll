@@ -1495,7 +1495,7 @@ class CensusEmployee < CensusMember
   end
 
   def expected_to_enroll_or_valid_waive?
-    %w(enroll waive).include?  expected_selection
+    %w(enroll waive).include? expected_selection
   end
 
   def waived?
