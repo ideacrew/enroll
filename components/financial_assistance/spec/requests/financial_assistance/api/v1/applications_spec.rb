@@ -188,11 +188,6 @@ RSpec.describe 'applications', type: :request do
         let!(:id) { create(:financial_assistance_application, :with_applicants, family_id: family.id).id }
         run_test!
       end
-
-      response '404', :not_found do
-        let(:existing_application) { create(:financial_assistance_application, :with_applicants, family_id: 'invalid') }
-        run_test!
-      end
     end
   end
 end
