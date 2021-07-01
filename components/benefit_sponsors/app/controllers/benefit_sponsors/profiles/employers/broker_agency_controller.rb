@@ -31,8 +31,6 @@ module BenefitSponsors
 
           respond_to do |format|
             format.js
-            format.html { head :ok, content_type: "text/html" }
-            format.json { head :ok, content_type: "text/json" }
           end
         end
 
