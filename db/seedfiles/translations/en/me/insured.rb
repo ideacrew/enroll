@@ -451,8 +451,8 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.plan_shoppings.thankyou.you_must_complete_steps_to_enroll' => "You must complete these steps to enroll.",
   :'en.insured.plan_shoppings.thankyou.additional_administration_msg' => "* Your employer may charge an additional administration fee for your COBRA/Continuation coverage. If you have any questions, please direct them to the Employer.",
   :'en.insured.review_information' => "I have reviewed the information in this application and I attest, under penalty of perjury, that it is accurate and complete to the best of my knowledge. I understand that if I’m not truthful, there may be a penalty.",
-  :'en.insured.tribe_state' => "Where is this person's tribe located?",
-  :'en.insured.tribe_name' => "Which federally recognized tribe does this person belong to?",
-  :'en.insured.tribe_state_alert' => 'Tribe state is required',
-  :'en.insured.tribe_alert' => 'Federally recognized tribe name is required'
+  :'en.insured.tribal_state' => "Where is this person's tribe located?",
+  :'en.insured.tribal_name' => "Which federally recognized tribe does this person belong to?",
+  :'en.insured.tribal_state_alert' => 'Tribe state is required',
+  :'en.insured.tribal_name_alert' => 'Federally recognized tribe name is required'
 }.freeze
