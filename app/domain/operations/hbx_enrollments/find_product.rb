@@ -5,6 +5,7 @@ require 'dry/monads/do'
 
 module Operations
   module HbxEnrollments
+    # FindProduct
     class FindProduct
       send(:include, Dry::Monads[:result, :do])
 
@@ -18,8 +19,8 @@ module Operations
 
       private
 
-      def validate(query_hash, year)
-        if query_hash&.is_a?(Hash)
+      def validate(query_hash, _year)
+        if query_hash.is_a?(Hash)
         # TODO: Add validation for year
           Success(query_hash)
         else

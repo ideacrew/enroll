@@ -3,6 +3,8 @@
 require 'aca_entities/ffe/operations/mcr_to/enrollment'
 require 'aca_entities/ffe/transformers/mcr_to/enrollment'
 
+# rubocop:disable Metrics/AbcSize, Lint/ShadowedArgument, Lint/DuplicateBranch
+# MigrateMcrEnrollment
 class MigrateMcrEnrollment < Mongoid::Migration
   def self.up
     self.enrollments_array.each do |payload|
@@ -70,14 +72,14 @@ class MigrateMcrEnrollment < Mongoid::Migration
     hash.delete("benefit_coverage_period_reference")
 
     benefit_package = find_benefit_package(benefit_coverage_period, hash["benefit_package_reference"])
-    hash["benefit_package_id"] =  benefit_package.id
+    hash["benefit_package_id"] = benefit_package.id
     hash.delete("benefit_package_reference")
 
     hash["hbx_enrollment_members"] = sanitize_enrollment_member_hash(family, hash["hbx_enrollment_members"])
     hash
   end
 
-  def self.find_benefit_package(benefit_coverage_period, package_hash)
+  def self.find_benefit_package(benefit_coverage_period, _package_hash)
     benefit_coverage_period.benefit_packages.first
   end
 
@@ -86,16 +88,14 @@ class MigrateMcrEnrollment < Mongoid::Migration
     sponsorship.benefit_coverage_periods.where(start_on: effective_on.beginning_of_year).first
   end
 
-  def self.build_special_enrollment_period(family, sep_hash)
-
-  end
+  def self.build_special_enrollment_period(family, sep_hash); end
 
   def self.sanitize_enrollment_member_hash(family, member_hash)
     member_hash.inject([]) do |members, m_hash|
       applicant = find_family_member(family, m_hash["family_member_reference"])
       m_hash["applicant_id"] = applicant.id
       m_hash.delete("family_member_reference")
-      #TODO:
+      # TODO: .
       # hash["tobacco_use"]
       members << m_hash
     end
@@ -110,8 +110,8 @@ class MigrateMcrEnrollment < Mongoid::Migration
     # external_id = fm_hash["person_hbx_id"]
     # person = Person.where(ext_app_id: external_id).first
     person = Person.where(first_name: fm_hash["first_name"], last_name: fm_hash["last_name"]).first
-    family_member = family.family_members.active.select { |fam| fam.person_id == person.id}.first
-    family_member
+    family.family_members.active.select { |fam| fam.person_id == person.id}.first
+
 
     # TODO: verify coverage household
     # coverage_household = family.active_household.immediate_family_coverage_household
@@ -125,8 +125,8 @@ class MigrateMcrEnrollment < Mongoid::Migration
   end
 
   def self.find_product(product_hash, year)
-    #TODO for testing, revert
-    product_hash = {"hios_id"=>"94506DC0390008-01", "benefit_market_kind"=>"aca_individual", "kind"=>"health"}
+    #TODO: for testing, revert
+    product_hash = {"hios_id" => "94506DC0390008-01", "benefit_market_kind" => "aca_individual", "kind" => "health"}
     year = 2021
     result = Operations::HbxEnrollments::FindProduct.new.call(product_hash, year)
     result.success? ? result.success : result
@@ -155,10 +155,10 @@ class MigrateMcrEnrollment < Mongoid::Migration
 
   def self.file_path
     case Rails.env
-      when 'development'
-        "spec/test_data/transform_example_payloads/enrollment.json"
-      when 'test'
-        "spec/test_data/transform_example_payloads/enrollment.json"
+    when 'development'
+      "spec/test_data/transform_example_payloads/enrollment.json"
+    when 'test'
+      "spec/test_data/transform_example_payloads/enrollment.json"
     end
   end
 
@@ -168,4 +168,4 @@ class MigrateMcrEnrollment < Mongoid::Migration
 
   def self.down; end
 end
-
+# rubocop:enable Metrics/AbcSize, Lint/ShadowedArgument, Lint/DuplicateBranch

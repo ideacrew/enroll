@@ -5,6 +5,7 @@ require 'dry/monads/do'
 
 module Operations
   module HbxEnrollments
+    # find enrollment
     class Find
       send(:include, Dry::Monads[:result, :do])
 
@@ -18,8 +19,8 @@ module Operations
       private
 
       def validate(query_hash)
-        if query_hash&.is_a?(Hash)
-        Success(query_hash)
+        if query_hash.is_a?(Hash)
+          Success(query_hash)
         else
           Failure('expected input to be in Hash format')
         end

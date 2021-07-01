@@ -5,22 +5,17 @@ require 'dry/monads/do'
 
 module Operations
   module Families
+    # FindFamilyMember
     class FindFamilyMember
       send(:include, Dry::Monads[:result, :do])
 
-      def call(*args)
-
-      end
+      def call(*args); end
 
       private
 
-      def validate(id)
+      def validate(id); end
 
-      end
-
-      def find_family(family_member_id)
-
-      end
+      def find_family(family_member_id); end
 
     end
   end
