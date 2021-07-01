@@ -1142,8 +1142,8 @@ class Person
     if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
       self.tribal_state = nil if val.to_s == false
       self.tribal_name = nil if val.to_s == false
-    else
-      self.tribal_id = nil if val.to_s == false
+    elsif val.to_s == false
+      self.tribal_id = nil
     end
     @indian_tribe_member = (val.to_s == "true")
   end
@@ -1167,11 +1167,9 @@ class Person
   def indian_tribe_member
     return @indian_tribe_member if !@indian_tribe_member.nil?
     return nil if citizen_status.blank?
-    if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
-      @indian_tribe_member ||= !(tribal_state.nil? || tribal_state.empty? || tribal_name.nil? || tribal_name.empty?)
-    else
-      @indian_tribe_member ||= !(tribal_id.nil? || tribal_id.empty?)
-    end
+
+    @indian_tribe_member ||= !(tribal_id.nil? || tribal_id.empty?)
+    @indian_tribe_member ||= !(tribal_state.nil? || tribal_state.empty? || tribal_name.nil? || tribal_name.empty?) if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
   end
 
   def eligible_immigration_status
