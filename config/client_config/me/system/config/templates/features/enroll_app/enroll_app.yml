@@ -84,7 +84,7 @@ registry:
           - key: :employer_application_deadline_link
             item: ""
           - key: :s3_prefix
-            item: "cme"
+            item: "me"
           - key: :broker_quoting_enabled
             item: false
           - key: :broker_claim_quoting_enabled
