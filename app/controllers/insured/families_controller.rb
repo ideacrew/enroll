@@ -197,21 +197,15 @@ class Insured::FamiliesController < FamiliesController
 
     if new_county_zip.present?
       if old_county_zip.present?
-        rating_model = EnrollRegistry[:enroll_app].setting(:geographic_rating_area_model).item
+        old_service_area_ids = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(
+          ::Address.new(zip: old_county_zip.zip, county: old_county_zip.county_name, state: 'ME')
+        ).map(&:issuer_provided_code)
 
-        is_sep_valid = case rating_model
-                       when 'single'
-                         false
-                       when 'county'
-                         old_county_zip.county_name != new_county_zip.county_name
-                       when 'zipcode'
-                         old_county_zip.zip != new_county_zip.zip
-                       else
-                         old_county_zip.county_name != new_county_zip.county_name &&
-                         old_county_zip.zip != new_county_zip.zip
-                       end
+        new_service_area_ids = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(
+          ::Address.new(zip: new_county_zip.zip, county: new_county_zip.county_name, state: 'ME')
+        ).map(&:issuer_provided_code)
 
-        is_approved = true if is_sep_valid
+        is_approved = (old_service_area_ids.sort != new_service_area_ids.sort)
       else
         is_approved = true
       end

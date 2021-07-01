@@ -1013,6 +1013,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   end
 
   describe 'GET sep_zip_compare', dbclean: :after_each do
+    let!(:service_area) { FactoryBot.create(:benefit_markets_locations_service_area, covered_states: nil, county_zip_ids: [county_zip.id]) }
     let(:county_zip) { FactoryBot.create(:benefit_markets_locations_county_zip, zip: '04330', county_name: 'Kennebec')}
     let(:approved_response) do
       {is_approved: true}.to_json
@@ -1023,8 +1024,8 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     let(:setting) {double}
     before(:each) do
       allow(EnrollRegistry).to receive(:[]).with(:enroll_app).and_return(setting)
+      allow(EnrollRegistry).to receive(:[]).with(:service_area).and_return(double(settings: double(item: 'county')))
       allow(setting).to receive(:setting).with(:state_abbreviation).and_return(double(item: 'ME'))
-      allow(setting).to receive(:setting).with(:geographic_rating_area_model).and_return(double(item: 'county'))
       sign_in(user)
       get :sep_zip_compare, params: {old_zip: old_zip, new_zip: new_zip}
     end
@@ -1060,7 +1061,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       end
 
       context 'old zip is in different county' do
-        let(:old_county_zip) { FactoryBot.create(:benefit_markets_locations_county_zip, zip: '04260', county_name: 'Cumberland')}
+        let(:old_county_zip) { FactoryBot.create(:benefit_markets_locations_county_zip, zip: '04116', county_name: 'Cumberland')}
         let(:old_zip) { old_county_zip.zip }
 
         it 'should return true' do
