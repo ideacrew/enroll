@@ -23,25 +23,28 @@ module GoldenSeedHelper
     @site = BenefitSponsors::Site.all.first
   end
 
-  def update_person_hbx_ids
-    @original_person_hbx_ids.each do |original_hbx_id|
-      puts("Updating original hbx id #{original_hbx_id}")
-      person_record = Person.find_by(hbx_id: original_hbx_id)
-      person_record.update_attributes!(hbx_id: HbxIdGenerator.generate_member_id)
-      puts("Person record now updated too #{person_record.hbx_id} from #{original_hbx_id}")
-    end
-  end
+  # These methods are in case you want to avoid external
+  # hbx id calls
+  # def update_person_hbx_ids
+  #  @original_person_hbx_ids.each do |original_hbx_id|
+  #    puts("Updating original hbx id #{original_hbx_id}")
+  #    person_record = Person.find_by(hbx_id: original_hbx_id)
+  #    person_record.update_attributes!(hbx_id: HbxIdGenerator.generate_member_id)
+  #    puts("Person record now updated too #{person_record.hbx_id} from #{original_hbx_id}")
+  #  end
+  # end
 
-  def update_enrollment_hbx_ids
-    @original_enrollment_hbx_ids.each do |original_hbx_id|
-      puts("Updating original enrollment hbx id #{original_hbx_id}")
-      enrollment_record = HbxEnrollment.find_by(hbx_id: original_hbx_id)
-      enrollment_record.update_attributes!(hbx_id: HbxIdGenerator.generate_policy_id)
-      puts("Enrollment record now updated too #{enrollment_record.hbx_id} from #{original_hbx_id}")
-    end
-  end
+  # def update_enrollment_hbx_ids
+  #  @original_enrollment_hbx_ids.each do |original_hbx_id|
+  #    puts("Updating original enrollment hbx id #{original_hbx_id}")
+  #    enrollment_record = HbxEnrollment.find_by(hbx_id: original_hbx_id)
+  #    enrollment_record.update_attributes!(hbx_id: HbxIdGenerator.generate_policy_id)
+  #    puts("Enrollment record now updated too #{enrollment_record.hbx_id} from #{original_hbx_id}")
+  #  end
+  # end
 
   # Only get up to date IVL products
+  # TODO: Consider if this should be removed for the UI factor.
   def ivl_products
     date_range = TimeKeeper.date_of_record.beginning_of_year..TimeKeeper.date_of_record.end_of_year
     ::BenefitMarkets::Products::Product.aca_individual_market.by_application_period(date_range)
@@ -55,7 +58,7 @@ module GoldenSeedHelper
     current_hbx_profile&.benefit_sponsorship
   end
 
-  # TODO: Refactor this
+  # TODO: Consider if this should be removed in non local dev environments
   def create_and_return_ivl_hbx_profile_and_sponsorship
     puts("HBX Profile and Benefit Sponsorship already present.") if !Rails.env.test? && current_hbx_profile && current_hbx_benefit_sponsorship
     return if current_hbx_profile && current_hbx_benefit_sponsorship
@@ -120,7 +123,6 @@ module GoldenSeedHelper
 
   # rubocop:disable Metrics/AbcSize
   # rubocop:disable Metrics/CyclomaticComplexity
-  # rubocop:disable Metrics/MethodLength
   # rubocop:disable Metrics/PerceivedComplexity
   def create_and_return_person(case_info_hash = {}, dependent = nil)
     gender = case_info_hash[:person_attributes]['gender']&.downcase || Person::GENDER_KINDS.sample
@@ -129,6 +131,8 @@ module GoldenSeedHelper
                 else
                   case_info_hash[:person_attributes]['last_name'] || FFaker::Name.last_name
                 end
+    puts("Instantiating a new primary person record.") if dependent.blank?
+    puts("Instantiating a new dependent person record.") if dependent.present?
     person = Person.new(
       first_name: case_info_hash[:person_attributes]['first_name'] || FFaker::Name.send("first_name_#{gender}"),
       last_name: last_name,
@@ -137,8 +141,7 @@ module GoldenSeedHelper
       dob: generate_random_birthday(case_info_hash),
       hbx_id: SecureRandom.hex # To avoid external hbx id calls
     )
-    @original_person_hbx_ids << person.hbx_id
-    person.save!
+    # @original_person_hbx_ids << person.hbx_id
     raise("Unable to save person.") unless person.save
     # Set residency type
     # "Same as primary" refers to having the same address as the primary
@@ -177,15 +180,13 @@ module GoldenSeedHelper
     # Most are set to Y in spreadsheet
     applying_for_assistance = case_info_hash[:person_attributes]['help_paying_for_coverage'] || true
     person.is_applying_for_assistance = truthy_value?(applying_for_assistance)
-    # To avoid timeouts not do notify callbacks
-    person.save!
+    person.save
     puts("Person record creation complete.") unless Rails.env.test?
     person
   end
   # rubocop:enable Metrics/AbcSize
   # rubocop:enable Metrics/CyclomaticComplexity
-  # rubocop:enable Metrics/MethodLength
-  # rubocop:enable Metrics/PerceivedComplexity
+    # rubocop:enable Metrics/PerceivedComplexity
 
   # TODO: Need to figure out the primary applicant thing on spreadsheet
   def create_and_return_family(case_info_hash = {})
@@ -195,12 +196,11 @@ module GoldenSeedHelper
       person_id: case_info_hash[:primary_person_record].id,
       is_primary_applicant: case_info_hash[:person_attributes]['relationship_to_primary'].downcase == 'self'
     )
-    fm.save!
-    family.save!
+    fm.save
+    family.save
     family
   end
 
-  # rubocop:disable Metrics/AbcSize
   def create_and_return_user(case_info_hash = {})
     providers = ["gmail", "yahoo", "hotmail"]
     email = if case_info_hash[:person_attributes]['email']&.include?(".com")
@@ -216,7 +216,7 @@ module GoldenSeedHelper
     person_record_email = person_record.emails.build
     person_record_email.address = email
     person_record_email.kind = "home"
-    person_record_email.save!
+    person_record_email.save
     user = User.new
     user.email = email
     user.oim_id = email
@@ -234,7 +234,6 @@ module GoldenSeedHelper
     puts("Unable to generate user for #{case_info_hash[:primary_person_record].full_name}, email already taken.") unless user_saved == true
     user
   end
-  # rubocop:enable Metrics/AbcSize
 
   def generate_and_return_dependent_record(case_info_hash)
     dependent_person = create_and_return_person(case_info_hash, true)
@@ -243,7 +242,7 @@ module GoldenSeedHelper
       person_id: dependent_person.id,
       is_primary_applicant: false
     )
-    fm.save!
+    fm.save
     relationship_to_primary = case_info_hash[:person_attributes]['relationship_to_primary'].downcase.parameterize
     case_info_hash[:primary_person_record].person_relationships.create!(
       kind: relationship_to_primary,
@@ -252,17 +251,9 @@ module GoldenSeedHelper
     dependent_person
   end
 
-  # TODO: Double check these for numbers for SHOP
-  def matching_phone_numbers
-    @matching_phone_numbers = Person.all.flat_map(&:phones).flat_map(&:number).flatten
-  end
-
   def generate_unique_phone_number
     new_person_phone_number = "#{Random.new.rand(100...999)} #{Random.new.rand(1000...9999)}"
     # rubocop:disable Style/WhileUntilModifier
-    until matching_phone_numbers.exclude?(new_person_phone_number)
-      new_person_phone_number = "#{Random.new.rand(100...999)} #{Random.new.rand(1000...9999)}"
-    end
     # rubocop:enable Style/WhileUntilModifier
     new_person_phone_number
   end
@@ -270,7 +261,7 @@ module GoldenSeedHelper
   def generate_address_and_phone(specified_attributes = {})
     primary_address = specified_attributes[:primary_person_address]
     primary_phone = specified_attributes[:primary_person_phone]
-    address_1 = primary_address.present? ? primary_address.address_1 : "60#{counter_number} #{FFaker::AddressUS.street_name}"
+    address_1 = primary_address.present? ? primary_address.address_1 : "#{Random.new.rand(100...999)} #{FFaker::AddressUS.street_name}"
     if primary_address.present?
       city = primary_address.city
       state = primary_address.state
@@ -321,7 +312,7 @@ module GoldenSeedHelper
     consumer_role.citizen_status = "us_citizen"
     consumer_role.citizenship_result = "us_citizen"
     consumer_role.skip_residency_verification = true
-    consumer_role.save!
+    consumer_role.save
     # attr_accessssor to skip certain validations
     consumer_role.skip_residency_verification = true
     # Verification types needed
@@ -332,7 +323,7 @@ module GoldenSeedHelper
     state_abbreviation = EnrollRegistry[:enroll_app].setting(:state_abbreviation).item
     verification_type.type_name = "#{state_abbreviation} Residency"
     case_info_hash[:primary_person_record].verification_types << verification_type
-    case_info_hash[:primary_person_record].save!
+    case_info_hash[:primary_person_record].save(validatee: false)
     raise("Not verified") unless consumer_role.identity_verified? == true
     case_info_hash[:consumer_role] = consumer_role
     consumer_role
@@ -404,7 +395,7 @@ module GoldenSeedHelper
     effective_on = TimeKeeper.date_of_record
     enrollment = HbxEnrollment.new(kind: "individual", consumer_role_id: consumer_role.id)
     enrollment.hbx_id = SecureRandom.hex # To avoid external hbx id calls
-    @original_enrollment_hbx_ids << enrollment.hbx_id
+    # @original_enrollment_hbx_ids << enrollment.hbx_id
     enrollment.effective_on = effective_on
     # A new product will be created for this rake task if there are none present.
     # Otherwise, a random one will be selected
@@ -421,16 +412,34 @@ module GoldenSeedHelper
     # attr_accessssor to skip certain validations
     consumer_role.skip_residency_verification = true
     consumer_role.person.primary_family.active_household.hbx_enrollments << enrollment
-    consumer_role.person.primary_family.active_household.save!
+    consumer_role.person.primary_family.active_household.save
     # attr_accessssor to skip certain validations
     consumer_role.skip_residency_verification = true
-    enrollment.save!
+    enrollment.save
     consumer_role.skip_residency_verification = true
     # IT comes off as "unverified" after this. Why?
-    enrollment.update_attributes!(aasm_state: 'coverage_selected')
+    enrollment.update_attributes(aasm_state: 'coverage_selected')
     puts("#{enrollment.aasm_state} HBX Enrollment created for #{consumer_role.person.full_name}") unless Rails.env.test?
   end
   # rubocop:enable Metrics/AbcSize
+
+  def remove_golden_seed_callbacks
+    Person.skip_callback(:create, :after, :notify_created)
+    Person.skip_callback(:update, :after, :notify_updated)
+    Person.skip_callback(:update, :after, :person_create_or_update_handler)
+    PersonRelationship.skip_callback(:save, :after, :notify_updated)
+    HbxEnrollment.skip_callback(:save, :after, :notify_on_save)
+    FinancialAssistance::Relationship.skip_callback(:create, :after, :propagate_applicant) if EnrollRegistry.feature_enabled?(:financial_assistance)
+  end
+
+  def reinstate_golden_seed_callbacks
+    Person.set_callback(:create, :after, :notify_created)
+    Person.set_callback(:update, :after, :notify_updated)
+    Person.set_callback(:update, :after, :person_create_or_update_handler)
+    PersonRelationship.set_callback(:save, :after, :notify_updated)
+    HbxEnrollment.set_callback(:save, :after, :notify_on_save)
+    FinancialAssistance::Relationship.set_callback(:create, :after, :propagate_applicant) if EnrollRegistry.feature_enabled?(:financial_assistance)
+  end
 end
 
 # rubocop:enable Metrics/ModuleLength

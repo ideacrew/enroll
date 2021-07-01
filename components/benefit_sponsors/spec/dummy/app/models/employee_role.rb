@@ -108,7 +108,7 @@ class EmployeeRole
     else
       @employer_profile =  BenefitSponsors::Organizations::Organization.employer_profiles.where(
         :"profiles._id" => BSON::ObjectId.from_string(benefit_sponsors_employer_profile_id)
-      ).first.employer_profile
+      ).first&.employer_profile
     end
   end
 

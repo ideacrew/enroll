@@ -51,6 +51,7 @@ namespace :assets do
 #      execute "rm -rf #{shared_path}/public/assets/*"
       within release_path do
         with rails_env: fetch(:rails_env) do
+          puts("Setting to review environment.") if ENV['ENROLL_REVIEW_ENVIRONMENT']
           execute("cd #{release_path} && rm -rf node_modules && rm -f package-lock.json")
           execute("cd #{release_path} && nvm use 10 && yarn install")
           execute :rake, "assets:clobber"
