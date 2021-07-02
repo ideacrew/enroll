@@ -94,7 +94,7 @@ registry:
     - key: :net_annual_income_display
       is_enabled: false
     - key: :has_dependent_with_coverage
-      is_enabled: true
+      is_enabled: false
     - key: :private_individual_and_family_coverage
       is_enabled: true
     - key: :acf_refugee_medical_assistance
