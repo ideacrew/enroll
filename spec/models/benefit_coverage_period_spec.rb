@@ -223,6 +223,7 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
     let(:benefit_packages)  { [benefit_package1, benefit_package2, benefit_package3] }
     let(:rule) {double}
 
+
     before :each do
       TimeKeeper.set_date_of_record_unprotected!(Date.new(2015,10,20))
       Plan.delete_all
@@ -251,10 +252,10 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
 
     if FinancialAssistanceRegistry.feature_enabled?(:native_american_csr)
       it "when satisfied" do
-        family.family_members[0].person.update_attributes(indian_tribe_member: true)
-        family.family_members[1].person.update_attributes(indian_tribe_member: true)
-        family.save
-        person.save
+        hbx_enrollment.family.family_members.each do |fm|
+          fm.person.update_attributes(indian_tribe_member: true)
+        end
+        hbx_enrollment.save
         allow(rule).to receive(:satisfied?).and_return [true, 'ok']
         elected_plans_by_enrollment_members = benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health')
         expect(elected_plans_by_enrollment_members).to include(plan5)
