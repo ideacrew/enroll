@@ -7,7 +7,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 61d4cec3fc94e4ee6fa8de123451f438007a7a4f
+  revision: 7399b16f9596f3ef13f1b3f09c367136d6f32ab3
   branch: happymapper_example_and_test
   specs:
     aca_entities (0.3.0)
