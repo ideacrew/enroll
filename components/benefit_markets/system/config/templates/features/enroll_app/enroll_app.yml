@@ -182,7 +182,7 @@ registry:
           - key: :contact_center_county
             item: 'District of Columbia'
           - key: :contact_center_zip_code
-            item: "20024" # For DC loading rating areas, the zip uses this zip code 20024 
+            item: "20024" # For DC loading rating areas, the zip uses this zip code 20024
           - key: :contact_center_email_address
             item: "info@dchealthlink.com"
           - key: :contact_center_short_number
@@ -227,6 +227,8 @@ registry:
             item: ['2018', '2019']
           - key: :plan_year_tooltip
             item: "Employer premium contribution for Employee Only Health Plans must be at least"
+          - key: :medicaid_agency_phone
+            item: "(855) 532-5465"
       - key: :data_seeds_ui
         item: :data_seed_ui
         is_enabled: true
@@ -273,7 +275,7 @@ registry:
       - key: :special_cover_header
         item: :special_cover_header
         is_enabled: false
-        settings: 
+        settings:
           - key: :filename
             item: "CoverME_WebsiteHeader_01.jpg"
       - key: :tobacco_cost
@@ -338,4 +340,9 @@ registry:
         settings:
           - key: :days
             item: 60
-
+      - key: :immigration_status_checkbox
+        is_enabled: false
+      - key: :gender_to_sex
+        is_enabled: false
+      - key: :mainecare_cubcare_glossary
+        is_enabled: false
