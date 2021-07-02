@@ -21,6 +21,7 @@ Feature: Start a new Financial Assistance Application
     And selects yes they would like help paying for coverage
     Then they should see a new finanical assistance application
     And they should see each of their dependents listed
-    And consumer clicks on pencil symbol next to primary person
-    And the user selects Indian Tribe Member on the add member form
+    And the user clicks Add Member
+    And the user fills the the aplicant add member form with indian member yes
     Then the user should see the AI AN Details fields
+    Then the user should see an error message for indian tribal state and name

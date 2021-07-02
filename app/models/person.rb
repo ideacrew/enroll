@@ -1316,13 +1316,12 @@ class Person
 
   def native_american_validation
     self.errors.add(:base, "American Indian / Alaska Native status is required.") if indian_tribe_member.to_s.blank?
-    if EnrollRegistry[:indian_alaskan_tribe_details].enabled? && !tribal_state.present? && @us_citizen == true && @indian_tribe_member == true
-      self.errors.add(:base, "Tribal state is required when native american / alaska native is selected")
-    elsif EnrollRegistry[:indian_alaskan_tribe_details].enabled? && !tribal_name.present? && @us_citizen == true && @indian_tribe_member == true
-      self.errors.add(:base, "Tribal name is required when native american / alaska native is selected")
-    elsif !tribal_id.present? && @us_citizen == true && @indian_tribe_member == true
+    if EnrollRegistry[:indian_alaskan_tribe_details].enabled? && @us_citizen == true && @indian_tribe_member == true
+      self.errors.add(:base, "Tribal state is required when native american / alaska native is selected") unless tribal_state.present?
+      self.errors.add(:base, "Tribal name is required when native american / alaska native is selected") unless tribal_name.present?
+    elsif !EnrollRegistry[:indian_alaskan_tribe_details].enabled? && !tribal_id.present? && @us_citizen == true && @indian_tribe_member == true
       self.errors.add(:base, "Tribal id is required when native american / alaska native is selected")
-    elsif tribal_id.present? && !tribal_id.match("[0-9]{9}")
+    elsif !EnrollRegistry[:indian_alaskan_tribe_details].enabled? && tribal_id.present? && !tribal_id.match("[0-9]{9}")
       self.errors.add(:base, "Tribal id must be 9 digits")
     end
   end
