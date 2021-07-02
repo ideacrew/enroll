@@ -984,11 +984,11 @@ module FinancialAssistance
       end
 
       if FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_other_question) &&
-        age_of_applicant > 18 && is_applying_coverage == true
+         age_of_applicant > 18 && is_applying_coverage == true && is_primary_caregiver.nil?
         errors.add(
           :is_primary_caregiver,
           "' Is this person the main person taking care of any children age 18 or younger? *' should be answered"
-        ) if is_primary_caregiver.nil?
+        )
       end
 
       return unless is_applying_coverage

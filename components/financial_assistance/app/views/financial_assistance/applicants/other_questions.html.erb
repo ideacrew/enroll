@@ -284,8 +284,7 @@
               @applicant.age_of_the_applicant > 18 && @applicant.is_applying_coverage %>
           <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
             <div class='col-md-6'>
-              <span class="fa-text-color">Is this person the main person taking care of any children age 18 or younger? *
-</span>
+              <span class="fa-text-color"><%= l10n("faa.primary_caretaker_question_text") %></span>
             </div>
             <div class='col-md-2'>
               <%= f.radio_button("is_primary_caregiver", true, class: "radio-yml", id: "is_primary_caregiver_yes") %>

@@ -70,4 +70,6 @@ end
 
 Then(/^the user will navigate to the Other Questions page for the corresponding applicant$/) do
   visit financial_assistance.other_questions_application_applicant_path(application, application.primary_applicant)
+  # Conditional other questions here. Checking for appearance helps!
+  expect(page).to have_content(l10n("primary_caretaker_question_text")) if EnrollRegistry.feature_enabled?(:primary_caregiver_other_question)
 end
