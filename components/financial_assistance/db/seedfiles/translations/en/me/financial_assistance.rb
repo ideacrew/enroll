@@ -111,5 +111,6 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.anyone_found_eligible_3" => "I am also giving to the Office for Family Independence rights to pursue and get medical support from a spouse or parent.",
   "en.faa.parent_living_outside_of_home_1" => "<br><br>If yes, I know that, if anyone in my application group is found eligible for MaineCare, I will be asked to cooperate with the Child Support Agency ",
   "en.faa.parent_living_outside_of_home_2" => "to collect medical support from the parent who lives outside the home. If I think that cooperating to collect medical support will harm me or my children, ",
-  "en.faa.parent_living_outside_of_home_3" => "I can tell my caseworker and I may not have to cooperate."
+  "en.faa.parent_living_outside_of_home_3" => "I can tell my caseworker and I may not have to cooperate.",
+  "en.faa.negative_income" => "Negative Income"
 }.freeze

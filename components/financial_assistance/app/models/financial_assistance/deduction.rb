@@ -58,8 +58,8 @@ module FinancialAssistance
                         on: [:step_1, :submission]
 
     validates :amount,          presence: true,
-                                numericality: { greater_than: 0, message: "%{value} must be greater than $0" },
-                                on: [:step_1, :submission]
+                                numericality: { greater_than: 0, message: "%{value} must be greater than $0" }
+
     validates :kind,            presence: true,
                                 inclusion: { in: KINDS, message: "%{value} is not a valid deduction type" },
                                 on: [:step_1, :submission]

@@ -71,7 +71,7 @@ module FinancialAssistance
       if @income.save
         render :create
       else
-        head :ok
+        render :new
       end
     end
 
@@ -81,7 +81,7 @@ module FinancialAssistance
       if @income.update_attributes permit_params(params[:income])
         render :update
       else
-        render head: 'ok'
+        render :edit
       end
     end
 
