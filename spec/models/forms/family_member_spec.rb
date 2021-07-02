@@ -430,6 +430,7 @@ describe "checking validations on family member object" do
       end
 
       subject { Forms::FamilyMember.new(member_attributes.merge({:family_id => family_id, "us_citizen"=>"false"})) }
+
       it "should return errors with Eligible immigration, native american / alaska native and incarceration status" do
         subject.save
         expect(subject.errors.full_messages).to eq ["Eligible immigration status is required", "native american / alaska native status is required", "Incarceration status is required"]

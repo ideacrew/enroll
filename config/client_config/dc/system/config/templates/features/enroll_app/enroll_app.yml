@@ -256,9 +256,6 @@ registry:
             item: true
           - key: :medicaid_agency_phone
             item: "(000) 000-0000"
-            item: "Employer premium contribution for Employee Only Health Plans must be at least"
-          - key: :medicaid_agency_phone
-            item: "(855) 532-5465"
       - key: :rating_area
         item: :rating_area
         is_enabled: false
