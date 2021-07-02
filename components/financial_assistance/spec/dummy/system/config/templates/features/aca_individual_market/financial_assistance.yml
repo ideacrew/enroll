@@ -67,6 +67,10 @@ registry:
         settings:
           - key: :ivl_application_checklist
             item: 'db/documents/ivl_checklist.pdf'
+      - key: :consumer_validations
+        is_enabled: false
+      - key: :non_magi_referral_display
+        is_enabled: false
   - namespace:
     - :questions
     features:
