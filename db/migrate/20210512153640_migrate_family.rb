@@ -9,8 +9,8 @@ require 'aca_entities/serializers/xml/medicaid/atp'
 
 # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
 
-# rails db:migrate:up source=MCR file_path="#{Rails.root}/.." VERSION="20210512153640"
-# rails db:migrate:up source=atp file_path="#{Rails.root}/.." VERSION="20210512153640"
+# RAILS_ENV=production bundle exec rails db:migrate:up source=MCR file_path="file_path" VERSION="20210512153640"
+# RAILS_ENV=production bundle exec rails db:migrate:up source=atp file_path="file_path" VERSION="20210512153640"
 class MigrateFamily < Mongoid::Migration
   def self.up
     @source =  ENV["source"].to_s.downcase # MCR or ATP
@@ -269,7 +269,7 @@ class MigrateFamily < Mongoid::Migration
     end
 
     def extract(file_path = nil)
-      input_xml = File.read(file_path)
+      input_xml = File.read("#{Rails.root}/#{file_path}")
       result = @extract_klass.parse(input_xml)
       @ext_input_hash = result.to_hash(identifier: true)
     end
