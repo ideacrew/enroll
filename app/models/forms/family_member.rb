@@ -58,13 +58,12 @@ module Forms
           self.errors.add(:base, "native american / alaska native status is required")
         end
 
-        self.errors.add(:tribal_state, "is required when native american / alaska native is selected") if EnrollRegistry[:indian_alaskan_tribe_details].enabled? && (!tribal_state.present? && @indian_tribe_member)
-
-        self.errors.add(:tribal_name, "is required when native american / alaska native is selected") if EnrollRegistry[:indian_alaskan_tribe_details].enabled? && (!tribal_name.present? && @indian_tribe_member)
-
-        if !tribal_id.present? && @indian_tribe_member
-          self.errors.add(:tribal_id, "is required when native american / alaska native is selected")
+        if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
+          self.errors.add(:tribal_state, "is required when native american / alaska native is selected") if !tribal_state.present? && @indian_tribe_member
+          self.errors.add(:tribal_name, "is required when native american / alaska native is selected")  if !tribal_name.present? && @indian_tribe_member
         end
+
+        self.errors.add(:tribal_id, "is required when native american / alaska native is selected") if !EnrollRegistry[:indian_alaskan_tribe_details].enabled? && !tribal_id.present? && @indian_tribe_member
       end
 
       return unless (@is_resident_role.to_s == "true" || @is_consumer_role.to_s == "true") && is_applying_coverage.to_s == "true" && @is_incarcerated.nil?
