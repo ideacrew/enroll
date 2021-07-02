@@ -304,21 +304,23 @@ class TaxHousehold
 
   private
 
-  def eligibile_csr_kind_for_shopping(csr_kind_list)
-    return 'csr_0' if csr_kind_list.include?'csr_0' || (csr_kind_list.include?('csr_limited') && (csr_kind_list.include?('csr_73') || csr_kind_list.include?('csr_87') || csr_kind_list.include?('csr_94')))
-    return 'csr_limited' if csr_kind_list.include?'csr_limited'
-    return 'csr_73' if csr_kind_list.include?'csr_73'
-    return 'csr_87' if csr_kind_list.include?'csr_87'
-    return 'csr_94' if csr_kind_list.include?'csr_94'
-    return 'csr_100' if csr_kind_list.include?'csr_100'
-    'csr_0'
-  end
-
   def validate_dates
     if effective_ending_on.present? && effective_starting_on > effective_ending_on
       errors.add(:effective_ending_on, "can't occur before start date")
     end
   end
+
+  # rubocop:disable Metrics/CyclomaticComplexity
+  def eligibile_csr_kind_for_shopping(csr_kind_list)
+    return 'csr_0' if csr_kind_list.include?('csr_0') || (csr_kind_list.include?('csr_limited') && (csr_kind_list.include?('csr_73') || csr_kind_list.include?('csr_87') || csr_kind_list.include?('csr_94')))
+    return 'csr_limited' if csr_kind_list.include?('csr_limited')
+    return 'csr_73' if csr_kind_list.include?('csr_73')
+    return 'csr_87' if csr_kind_list.include?('csr_87')
+    return 'csr_94' if csr_kind_list.include?('csr_94')
+    return 'csr_100' if csr_kind_list.include?('csr_100')
+    'csr_0'
+  end
+  # rubocop:enable Metrics/CyclomaticComplexity
 
   def product_factory
     ::BenefitMarkets::Products::ProductFactory

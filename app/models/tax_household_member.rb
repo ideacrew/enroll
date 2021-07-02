@@ -5,7 +5,7 @@ class TaxHouseholdMember
   include ApplicationHelper
 
   PDC_TYPES = [['Assisted','is_ia_eligible'], ['Medicaid','is_medicaid_chip_eligible'], ['Totally Ineligible','is_totally_ineligible'], ['UQHP','is_uqhp_eligible']].freeze
-  CSR_KINDS = %w(csr_100 csr_94 csr_87 csr_73 csr_0 csr_limited).freeze
+  CSR_KINDS = ['csr_100', 'csr_94', 'csr_87', 'csr_73', 'csr_0', 'csr_limited'].freeze
 
   embedded_in :tax_household
   embeds_many :financial_statements
@@ -32,28 +32,26 @@ class TaxHouseholdMember
 
   validates :csr_eligibility_kind,
             allow_blank: false,
-            inclusion: {
-                in: CSR_KINDS,
-                message: "%{value} is not a valid cost sharing eligibility kind"
-            }
+            inclusion: { in: CSR_KINDS,
+                         message: "%{value} is not a valid cost sharing eligibility kind" }
 
   alias_method :family_member_id, :applicant_id
 
   def csr_percent_as_integer=(new_csr_percent)
     super
     self.csr_eligibility_kind = case csr_percent_as_integer
-                                  when 73
-                                    'csr_73'
-                                  when 87
-                                    'csr_87'
-                                  when 94
-                                    'csr_94'
-                                  when 100
-                                    'csr_100'
-                                  when -1
-                                    'csr_limited'
-                                  else
-                                    'csr_0'
+                                when 73
+                                  'csr_73'
+                                when 87
+                                  'csr_87'
+                                when 94
+                                  'csr_94'
+                                when 100
+                                  'csr_100'
+                                when -1
+                                  'csr_limited'
+                                else
+                                  'csr_0'
                                 end
   end
 
