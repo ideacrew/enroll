@@ -2,7 +2,7 @@
 
 require 'swagger_helper'
 
-RSpec.describe 'applications', type: :request do
+RSpec.describe 'applications', dbclean: :around_each, type: :request do
   include FinancialAssistance::Engine.routes.url_helpers
 
   let(:person) { FactoryBot.create(:person, :with_consumer_role)}
