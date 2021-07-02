@@ -251,11 +251,15 @@ registry:
           - key: :single_carriers_available
             item: ['']
           - key: :plan_year_tooltip
+            item: "Employer premium contribution for Employee Only Health Plans must be at least"
             item: ""
           - key: :send_rating_area_for_ivl_policy_to_edi
             item: true
           - key: :medicaid_agency_phone
-            item: "(000) 000-0000"
+            item: "(000) 000-0000"        
+      - key: :data_seeds_ui
+        item: :data_seed_ui
+        is_enabled: true
       - key: :rating_area
         item: :rating_area
         is_enabled: false

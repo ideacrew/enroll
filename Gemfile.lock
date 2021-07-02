@@ -7,16 +7,17 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 6c07e86b1629e87398f6e2c25ee8b5da427c7298
-  branch: fdsh
+  revision: 61d4cec3fc94e4ee6fa8de123451f438007a7a4f
+  branch: happymapper_example_and_test
   specs:
-    aca_entities (0.2.2)
+    aca_entities (0.3.0)
       deep_merge
       dry-monads (~> 1.2)
       dry-struct (~> 1.0)
       dry-transformer (~> 0.1.1)
       dry-types (~> 1.0)
       dry-validation (~> 1.2)
+      nokogiri-happymapper
       oj (~> 3.11)
 
 GIT

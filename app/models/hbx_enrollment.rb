@@ -109,6 +109,7 @@ class HbxEnrollment
   field :benefit_group_id, type: BSON::ObjectId
   field :benefit_group_assignment_id, type: BSON::ObjectId
   field :hbx_id, type: String
+  field :external_id, type: String
   field :special_enrollment_period_id, type: BSON::ObjectId
   field :predecessor_enrollment_id, type: BSON::ObjectId
   field :enrollment_signature, type: String
@@ -824,7 +825,14 @@ class HbxEnrollment
   def construct_waiver_enrollment(waiver_reason = nil)
     qle = family.is_under_special_enrollment_period? && (family.earliest_effective_shop_sep.present? || family.earliest_effective_fehb_sep.present?)
     coverage_hh = employee_role.person.primary_family.active_household.immediate_family_coverage_household
-    waived_enrollment = coverage_hh.household.new_hbx_enrollment_from(employee_role: employee_role, coverage_household: coverage_hh, benefit_package: sponsored_benefit_package, benefit_group_assignment: benefit_group_assignment, qle: qle)
+    # It starts here
+    waived_enrollment = coverage_hh.household.new_hbx_enrollment_from(
+      employee_role: employee_role,
+      coverage_household: coverage_hh,
+      benefit_package: sponsored_benefit_package,
+      benefit_group_assignment: benefit_group_assignment,
+      qle: qle
+    )
     waived_enrollment.coverage_kind = coverage_kind
     waived_enrollment.enrollment_kind = (qle ? 'special_enrollment' : 'open_enrollment')
     waived_enrollment.kind = 'employer_sponsored_cobra' if employee_role.present? && employee_role.is_cobra_status?
@@ -833,7 +841,7 @@ class HbxEnrollment
     waived_enrollment.predecessor_enrollment_id = _id
     waived_enrollment.generate_hbx_signature
     waived_enrollment.submitted_at = TimeKeeper.datetime_of_record
-    waived_enrollment.household.reload if waived_enrollment.save!
+    waived_enrollment.household.reload if waived_enrollment.errors.blank? && waived_enrollment.save!
 
     waived_enrollment
   end
@@ -913,7 +921,7 @@ class HbxEnrollment
     return if waiver_enrollment_present?
 
     waiver = construct_waiver_enrollment
-    waiver.waive_coverage! if waiver.may_waive_coverage?
+    waiver.waive_coverage! if waiver.errors.blank? && waiver.may_waive_coverage?
   end
 
   def term_or_cancel_enrollment(enrollment, coverage_end_date, term_reason = nil)
@@ -1560,9 +1568,11 @@ class HbxEnrollment
   end
 
   def self.effective_date_for_enrollment(employee_role, hbx_enrollment, qle)
-
     if employee_role.census_employee.new_hire_enrollment_period.min > TimeKeeper.date_of_record
-      raise "You're not yet eligible under your employer-sponsored benefits. Please return on #{employee_role.census_employee.new_hire_enrollment_period.min.strftime("%m/%d/%Y")} to enroll for coverage."
+      hbx_enrollment.errors.add(
+        :base,
+        "You're not yet eligible under your employer-sponsored benefits. Please return on #{employee_role.census_employee.new_hire_enrollment_period.min.strftime('%m/%d/%Y')} to enroll for coverage."
+      )
     end
 
     if employee_role.can_enroll_as_new_hire?
@@ -1573,41 +1583,63 @@ class HbxEnrollment
       active_plan_year = employee_role.employer_profile.show_plan_year
 
       if active_plan_year.blank?
-        raise "Unable to find employer-sponsored benefits."
+        hbx_enrollment.errors.add(
+          :base,
+          "Unable to find employer-sponsored benefits."
+        )
       end
 
       if !employee_role.is_under_open_enrollment?
-        raise "You may not enroll unless it’s open enrollment or you’re eligible for a special enrollment period."
+        hbx_enrollment.errors.add(
+          :base,
+          "You may not enroll unless it’s open enrollment or you’re eligible for a special enrollment period."
+        )
       end
 
-      employee_role.employer_profile.show_plan_year.start_on
+      if hbx_enrollment.errors.blank?
+        employee_role.employer_profile.show_plan_year.start_on
+      else
+        # Maybe return errors?
+        hbx_enrollment
+      end
     end
   end
 
   def self.employee_current_benefit_group(employee_role, hbx_enrollment, qle)
     effective_date = effective_date_for_enrollment(employee_role, hbx_enrollment, qle)
-    plan_year = employee_role.employer_profile.find_plan_year_by_effective_date(effective_date)
-
-    if plan_year.blank?
-      raise "Unable to find employer-sponsored benefits for enrollment year #{effective_date.year}"
+    valid_effective_on_classes = [Time, Date, DateTime]
+    if valid_effective_on_classes.include?(effective_date.class)
+      plan_year = employee_role.employer_profile.find_plan_year_by_effective_date(effective_date)
+      enrollment_errors = {}
+    else
+      # In the #effective_date_for_enrollment method signature
+      # we're returning a hbx enrollment with some errors (previously raise
+      # was used) to avoid exceptions for the end user
+      enrollment_errors = effective_date.errors
+      effective_date = nil
+      plan_year = nil
     end
 
-    if plan_year.open_enrollment_start_on > TimeKeeper.date_of_record
-      raise "Open enrollment for your employer-sponsored benefits not yet started. Please return on #{plan_year.open_enrollment_start_on.strftime("%m/%d/%Y")} to enroll for coverage."
+    if plan_year.blank?
+      enrollment_errors[:base] << " Unable to find employer-sponsored benefits for enrollment year #{effective_date&.year}"
+    end
+
+    if plan_year && plan_year.open_enrollment_start_on > TimeKeeper.date_of_record
+      enrollment_errors[:base] << "Open enrollment for your employer-sponsored benefits not yet started. Please return on #{plan_year&.open_enrollment_start_on&.strftime('%m/%d/%Y')} to enroll for coverage."
     end
 
     census_employee = employee_role.census_employee
     benefit_group_assignment =
-      if plan_year.is_renewing? && census_employee.renewal_benefit_group_assignment
+      if plan_year&.is_renewing? && census_employee.renewal_benefit_group_assignment
         census_employee.renewal_benefit_group_assignment
-      elsif plan_year.aasm_state == "expired" && qle
+      elsif plan_year&.aasm_state == "expired" && qle
         census_employee.benefit_group_assignments.order_by(:created_at.desc).detect { |bga| bga.plan_year.aasm_state == "expired"}
       else
         census_employee.active_benefit_group_assignment
       end
 
     if benefit_group_assignment.blank? || benefit_group_assignment.plan_year != plan_year
-      raise "Unable to find an active or renewing benefit group assignment for enrollment year #{effective_date.year}"
+      enrollment_errors[:base] << "Unable to find an active or renewing benefit group assignment for enrollment year #{effective_date&.year}"
     end
 
     return benefit_group_assignment.benefit_group, benefit_group_assignment
@@ -1618,7 +1650,7 @@ class HbxEnrollment
     enrollment.household = coverage_household.household
     enrollment.family = coverage_household.household.family
     enrollment.submitted_at = submitted_at
-
+    # We need to refactor the raises out of here
     case
       when employee_role.present?
         enrollment.kind = "employer_sponsored"
@@ -1628,7 +1660,10 @@ class HbxEnrollment
           benefit_group, benefit_group_assignment = employee_current_benefit_group(employee_role, enrollment, qle)
         end
         if qle && employee_role.coverage_effective_on(qle: qle) > employee_role.person.primary_family.current_sep.effective_on
-          raise "You are attempting to purchase coverage through Qualifying Life Event prior to your eligibility date. Please contact your Employer for assistance. You are eligible for employer benefits from #{employee_role.coverage_effective_on(qle: qle)} "
+          qle_error_message = "You are attempting to purchase coverage through Qualifying Life Event "\
+          "prior to your eligibility date. Please contact your Employer for assistance. "\
+          "You are eligible for employer benefits from #{employee_role.coverage_effective_on(qle: qle)} "
+          enrollment.errors.add(:base, qle_error_message)
         end
 
         if qle && enrollment.family.is_under_special_enrollment_period?
@@ -1664,7 +1699,10 @@ class HbxEnrollment
           enrollment.effective_on = benefit_sponsorship.current_benefit_period.earliest_effective_date
           enrollment.enrollment_kind = "open_enrollment"
         else
-          raise "You may not enroll unless it’s open enrollment or you’re eligible for a special enrollment period."
+          enrollment.errors.add(
+            :base,
+            "You may not enroll unless it’s open enrollment or you’re eligible for a special enrollment period."
+          )
         end
         enrollment.rating_area_id = ::BenefitMarkets::Locations::RatingArea.rating_area_for(consumer_role.rating_address, during: enrollment.effective_on)&.id
       when resident_role.present?
@@ -1680,10 +1718,13 @@ class HbxEnrollment
           enrollment.effective_on = benefit_sponsorship.current_benefit_period.earliest_effective_date
           enrollment.enrollment_kind = "open_enrollment"
         else
-          raise "You may not enroll unless it’s open enrollment or you’re eligible for a special enrollment period."
+          enrollment.errors.add(
+            :base,
+            "You may not enroll unless it’s open enrollment or you’re eligible for a special enrollment period."
+          )
         end
       else
-        raise "either employee_role or consumer_role is required" unless resident_role.present?
+        enrollment.errors.add(:base, "either employee_role or consumer_role is required") unless resident_role.present?
     end
     coverage_household.coverage_household_members.each do |coverage_member|
       enrollment_member = HbxEnrollmentMember.new_from(coverage_household_member: coverage_member)
