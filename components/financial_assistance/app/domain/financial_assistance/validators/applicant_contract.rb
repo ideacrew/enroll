@@ -16,6 +16,7 @@ module FinancialAssistance
 
         optional(:is_primary_applicant).maybe(:bool)
         optional(:person_hbx_id).maybe(:string)
+        optional(:ext_app_id).maybe(:string)
         optional(:family_member_id).maybe(Types::Bson)
 
         optional(:is_incarcerated).maybe(:bool)
