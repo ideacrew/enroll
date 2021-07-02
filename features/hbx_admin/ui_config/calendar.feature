@@ -13,6 +13,5 @@ Feature: Calendar tab
         Given calendar feature is disabled
         Given that a user with a HBX staff role with HBX staff subrole exists and is logged in
         Given user visits the HBX Portal
-        Given user visits the HBX Portal
         And the user clicks the Admin tab
         Then they should not see the Calendar tab
