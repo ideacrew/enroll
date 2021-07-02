@@ -948,4 +948,106 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       expect(@applicant[:is_self_attested_long_term_care]).not_to eq(applicant.reload.is_self_attested_long_term_care)
     end
   end
+
+  context 'for mitc_is_required_to_file_taxes' do
+    before do
+      applicant.update_attributes!(is_required_to_file_taxes: false)
+      create_income
+      result = subject.call(application.reload)
+      @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+      @applicant = result.success[:applicants].first
+    end
+
+    context 'for earned_income' do
+      context 'greater than Earned Income Filing Threshold for assistance year' do
+        let(:create_income) do
+          inc = ::FinancialAssistance::Income.new({
+                                                    kind: ['wages_and_salaries', 'net_self_employment', 'scholarship_payments'].sample,
+                                                    frequency_kind: 'yearly',
+                                                    amount: 30_000.00,
+                                                    start_on: TimeKeeper.date_of_record.beginning_of_month,
+                                                    employer_name: 'Testing employer'
+                                                  })
+          applicant.incomes = [inc]
+          applicant.save!
+        end
+
+        it 'should be able to successfully init Application Entity' do
+          expect(@entity_init).to be_success
+        end
+
+        it 'should return true for mitc_is_required_to_file_taxes' do
+          expect(@applicant[:mitc_is_required_to_file_taxes]).to eq(true)
+        end
+      end
+
+      context 'less than Earned Income Filing Threshold for assistance year' do
+        let(:create_income) do
+          inc = ::FinancialAssistance::Income.new({
+                                                    kind: ['wages_and_salaries', 'net_self_employment', 'scholarship_payments'].sample,
+                                                    frequency_kind: 'yearly',
+                                                    amount: 100.00,
+                                                    start_on: TimeKeeper.date_of_record.beginning_of_month,
+                                                    employer_name: 'Testing employer'
+                                                  })
+          applicant.incomes = [inc]
+          applicant.save!
+        end
+
+        it 'should be able to successfully init Application Entity' do
+          expect(@entity_init).to be_success
+        end
+
+        it 'should return false for mitc_is_required_to_file_taxes' do
+          expect(@applicant[:mitc_is_required_to_file_taxes]).to eq(false)
+        end
+      end
+    end
+
+    context 'for unearned_income' do
+      context 'greater than Unearned Income Filing Threshold for assistance year' do
+        let(:create_income) do
+          inc = ::FinancialAssistance::Income.new({
+                                                    kind: ::FinancialAssistance::Income::UNEARNED_INCOME_KINDS.sample,
+                                                    frequency_kind: 'yearly',
+                                                    amount: 3_000.00,
+                                                    start_on: TimeKeeper.date_of_record.beginning_of_month,
+                                                    employer_name: 'Testing employer'
+                                                  })
+          applicant.incomes = [inc]
+          applicant.save!
+        end
+
+        it 'should be able to successfully init Application Entity' do
+          expect(@entity_init).to be_success
+        end
+
+        it 'should return true for mitc_is_required_to_file_taxes' do
+          expect(@applicant[:mitc_is_required_to_file_taxes]).to eq(true)
+        end
+      end
+
+      context 'less than Unearned Income Filing Threshold for assistance year' do
+        let(:create_income) do
+          inc = ::FinancialAssistance::Income.new({
+                                                    kind: ::FinancialAssistance::Income::UNEARNED_INCOME_KINDS.sample,
+                                                    frequency_kind: 'yearly',
+                                                    amount: 100.00,
+                                                    start_on: TimeKeeper.date_of_record.beginning_of_month,
+                                                    employer_name: 'Testing employer'
+                                                  })
+          applicant.incomes = [inc]
+          applicant.save!
+        end
+
+        it 'should be able to successfully init Application Entity' do
+          expect(@entity_init).to be_success
+        end
+
+        it 'should return true for mitc_is_required_to_file_taxes' do
+          expect(@applicant[:mitc_is_required_to_file_taxes]).to eq(false)
+        end
+      end
+    end
+  end
 end

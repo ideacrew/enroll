@@ -8,6 +8,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
     FactoryBot.create(:application,
                       family_id: BSON::ObjectId.new,
                       aasm_state: 'draft',
+                      assistance_year: TimeKeeper.date_of_record.year,
                       effective_date: Date.today)
   end
 
@@ -155,6 +156,31 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
                                                 frequency_kind: 'yearly',
                                                 amount: 30_000.00,
                                                 start_on: TimeKeeper.date_of_record.prev_year,
+                                                employer_name: 'Testing employer' })
+      applicant.incomes << inc
+      applicant.save!
+    end
+
+    before do
+      @incomes = applicant.reload.current_month_incomes
+    end
+
+    it 'should return only one income' do
+      expect(@incomes.count).to eq(1)
+    end
+
+    it 'should return the income of kind wages_and_salaries' do
+      expect(@incomes.first.kind).to eq('wages_and_salaries')
+    end
+  end
+
+  context 'current_month_incomes with income that started in March & End Dated in August' do
+    let!(:create_job_income12) do
+      inc = ::FinancialAssistance::Income.new({ kind: 'wages_and_salaries',
+                                                frequency_kind: 'yearly',
+                                                amount: 30_000.00,
+                                                start_on: Date.new(TimeKeeper.date_of_record.year, 3, 1),
+                                                end_on: Date.new(TimeKeeper.date_of_record.year, 8, 31),
                                                 employer_name: 'Testing employer' })
       applicant.incomes << inc
       applicant.save!

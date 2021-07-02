@@ -134,13 +134,31 @@ module FinancialAssistance
                            benchmark_premium: applicant_benchmark_premium(application), #applicant_benchmark_premium(applicant.application),
                            is_homeless: applicant.is_homeless.present?,
                            mitc_income: mitc_income(applicant),
-                           mitc_relationships: mitc_relationships(applicant)}
+                           mitc_relationships: mitc_relationships(applicant),
+                           mitc_is_required_to_file_taxes: calculate_if_applicant_is_required_to_file_taxes(applicant)}
                 result
               end
             end
             # rubocop:enable Metrics/CyclomaticComplexity
             # rubocop:enable Metrics/AbcSize
             # rubocop:enable Metrics/MethodLength
+
+            def calculate_if_applicant_is_required_to_file_taxes(applicant)
+              return true if applicant.is_required_to_file_taxes
+
+              total_earned_income = applicant.current_month_earned_incomes.inject(0) do |tot, inc|
+                tot + inc.calculate_annual_income
+              end.to_f
+
+              total_unearned_income = applicant.current_month_unearned_incomes.inject(0) do |tot, inc|
+                tot + inc.calculate_annual_income
+              end.to_f
+
+              # Resource Registry configuration
+              # Earned Income Filing Threshold for year 2020: 12400
+              # Unearned Income Filing Threshold for year 2020: 12400
+              (total_earned_income > 12_400) || (total_unearned_income > 1_100)
+            end
 
             def applicant_reference_by_applicant_id(application, applicant_id)
               return nil unless applicant_id
