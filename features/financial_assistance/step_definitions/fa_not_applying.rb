@@ -104,12 +104,33 @@ And(/^the user fills the the add member form/) do
   expect(page).to have_content("#{l10n('family_information')}")
 end
 
-Given(/AI AN Details feature is enabled/) do
-  enable_feature :indian_alaskan_tribe_details
+And(/^the user fills the the aplicant add member form with indian member yes/) do
+  expect(page).to have_content('Lives with primary subscriber')
+  fill_in "applicant[first_name]", :with => "John"
+  fill_in "applicant[last_name]", :with => "Doe"
+  fill_in "applicant[ssn]", :with => "763434355"
+  fill_in "jq_datepicker_ignore_applicant[dob]", :with => "04/15/1988"
+  click_link('15')
+
+  find('.house .selectric span.label').click
+  find(".house .selectric-items li", text: 'Spouse').click
+
+  find(:xpath, '//label[@for="radio_female"]').click
+  find(:xpath, '//label[@for="applicant_us_citizen_true"]').click
+  find(:xpath, '//label[@for="applicant_naturalized_citizen_false"]').click
+  find(:xpath, '//label[@for="indian_tribe_member_yes"]').click
+  find(:xpath, '//label[@for="radio_incarcerated_no"]').click
+
+  all(:css, ".mz").last.click
 end
 
-And(/^the user selects Indian Tribe Member on the add member form/) do
-  find(:xpath, '//label[@for="indian_tribe_member_yes"]').click
+Then(/the user should see an error message for indian tribal state and name/) do
+  expect(page).to have_content("Tribal state is required")
+  expect(page).to have_content("Tribal name is required")
+end
+
+Given(/AI AN Details feature is enabled/) do
+  enable_feature :indian_alaskan_tribe_details
 end
 
 Then(/the user should see the AI AN Details fields/) do
