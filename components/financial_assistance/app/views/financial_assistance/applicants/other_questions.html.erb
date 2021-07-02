@@ -114,27 +114,6 @@
         </div>
       </div>
 
-        <% if FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_other_question) &&
-              @applicant.age_of_applicant > 18 %>
-          <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
-            <div class='col-md-6'>
-              <span class="fa-text-color">Is this person the main person taking care of any children age 18 or younger? *
-</span>
-            </div>
-            <div class='col-md-2'>
-              <%= f.radio_button("is_primary_caregiver", true, class: "radio-yml", id: "is_primary_caregiver_yes") %>
-              <label class="radio-yml" for="is_primary_caregiver_yes">Yes</label>
-            </div>
-            <div class='col-md-2'>
-              <%= f.radio_button("is_primary_caregiver", false, class: "radio-yml", id: "is_primary_caregiver_no")%>
-              <label class="radio-yml" for="is_primary_caregiver_no">No</label>
-            </div>
-            <div class='col-md-2 left-seprator'>
-              <a href="#is_primary_caregiver" data-toggle="modal" data-target="#is_primary_caregiver">Not sure?</a>
-              <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "is_primary_caregiver"} %>
-            </div>
-          </div>
-        <% end %>
 
       <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
         <div class='col-md-6'>
@@ -300,6 +279,28 @@
             <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "is_physically_disabled"} %>
           </div>
         </div>
+
+        <% if FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_other_question) &&
+              @applicant.age_of_the_applicant > 18 && @applicant.is_applying_coverage %>
+          <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
+            <div class='col-md-6'>
+              <span class="fa-text-color">Is this person the main person taking care of any children age 18 or younger? *
+</span>
+            </div>
+            <div class='col-md-2'>
+              <%= f.radio_button("is_primary_caregiver", true, class: "radio-yml", id: "is_primary_caregiver_yes") %>
+              <label class="radio-yml" for="is_primary_caregiver_yes">Yes</label>
+            </div>
+            <div class='col-md-2'>
+              <%= f.radio_button("is_primary_caregiver", false, class: "radio-yml", id: "is_primary_caregiver_no")%>
+              <label class="radio-yml" for="is_primary_caregiver_no">No</label>
+            </div>
+            <div class='col-md-2 left-seprator'>
+              <a href="#primary_caretaker_question" data-toggle="modal" data-target="#primary_caretaker_question">Not sure?</a>
+              <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "primary_caretaker_question"} %>
+            </div>
+          </div>
+        <% end %>
         <% if @applicant.eligible_immigration_status.present? %>
           <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
             <div class='col-md-6'>
