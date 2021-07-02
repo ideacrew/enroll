@@ -129,6 +129,10 @@
               <%= f.radio_button("is_primary_caregiver", false, class: "radio-yml", id: "is_primary_caregiver_no")%>
               <label class="radio-yml" for="is_primary_caregiver_no">No</label>
             </div>
+            <div class='col-md-2 left-seprator'>
+              <a href="#is_primary_caregiver" data-toggle="modal" data-target="#is_primary_caregiver">Not sure?</a>
+              <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "is_primary_caregiver"} %>
+            </div>
           </div>
         <% end %>
 
