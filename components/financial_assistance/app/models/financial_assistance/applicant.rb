@@ -988,7 +988,7 @@ module FinancialAssistance
         errors.add(
           :is_primary_caregiver,
           "' Is this person the main person taking care of any children age 18 or younger? *' should be answered"
-        )
+        ) if is_primary_caregiver.nil?
       end
 
       return unless is_applying_coverage
