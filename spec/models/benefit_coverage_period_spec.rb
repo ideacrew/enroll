@@ -196,13 +196,17 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
   end
 
   context "elected_plans_by_enrollment_members", dbclean: :before_each do
+
+    let(:person) {FactoryBot.create(:person, :with_family)}
+    let(:family_members){ family.family_members.where(is_primary_applicant: false).to_a }
+    let(:household){ family.active_household }
     let(:benefit_coverage_period) { BenefitCoveragePeriod.new(start_on: Date.new(Time.current.year,1,1)) }
     let(:c1) {FactoryBot.create(:consumer_role)}
     let(:c2) {FactoryBot.create(:consumer_role)}
     let(:r1) {FactoryBot.create(:resident_role)}
     let(:r2) {FactoryBot.create(:resident_role)}
     let(:family) { FactoryBot.build(:family, :with_primary_family_member_and_dependent)}
-    let(:member1) {double(person: double(consumer_role: c1),hbx_enrollment: hbx_enrollment,family_member:family.family_members.where(is_primary_applicant: true).first, applicant_id: family.family_members[0].id)}
+    let(:member1){ FactoryBot.build(:hbx_enrollment_member, hbx_enrollment: hbx_enrollment, family_member: family.family_members.where(is_primary_applicant: true).first, applicant_id: family.family_members.first.id) }
     let(:member2) {double(person: double(consumer_role: c2),hbx_enrollment: hbx_enrollment,family_member: family.family_members.where(is_primary_applicant: false).first, applicant_id: family.family_members[1].id)}
     let(:hbx_enrollment){ HbxEnrollment.new(kind: "individual", product: plan1, effective_on: TimeKeeper.date_of_record, household: family.latest_household, enrollment_signature: true) }
     let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
@@ -210,20 +214,26 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
     let(:plan2) { FactoryBot.create(:benefit_markets_products_health_products_health_product, issuer_profile: issuer_profile)}
     let(:plan3) { FactoryBot.create(:benefit_markets_products_health_products_health_product, issuer_profile: issuer_profile)}
     let(:plan4) { FactoryBot.create(:benefit_markets_products_health_products_health_product, issuer_profile: issuer_profile)}
+
+    let(:plan5) { FactoryBot.create(:benefit_markets_products_health_products_health_product, issuer_profile: issuer_profile)}
+
     let(:benefit_package1) {double(benefit_ids: [plan1.id, plan2.id])}
     let(:benefit_package2) {double(benefit_ids: [plan3.id, plan4.id])}
-    let(:benefit_packages)  { [benefit_package1, benefit_package2] }
+    let(:benefit_package3) {double(benefit_ids: [plan5.id])}
+    let(:benefit_packages)  { [benefit_package1, benefit_package2, benefit_package3] }
     let(:rule) {double}
 
     before :each do
       TimeKeeper.set_date_of_record_unprotected!(Date.new(2015,10,20))
       Plan.delete_all
-      allow(benefit_coverage_period).to receive(:benefit_packages).and_return [benefit_package1, benefit_package2]
+      allow(benefit_coverage_period).to receive(:benefit_packages).and_return [benefit_package1, benefit_package2, benefit_package3]
       allow(InsuredEligibleForBenefitRule).to receive(:new).and_return rule
       plan1.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'gold', csr_variant_id: '01')
       plan2.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'gold', csr_variant_id: '01', application_period: {"min"=>Date.new(2018,01,01), "max"=>Date.new(2018,12,31)})
       plan3.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'gold', csr_variant_id: '01')
       plan4.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'gold', csr_variant_id: '01')
+
+      plan5.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '03')
     end
 
     after do
@@ -237,6 +247,19 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
       expect(elected_plans_by_enrollment_members).to include(plan1)
       expect(elected_plans_by_enrollment_members).to include(plan3)
       expect(elected_plans_by_enrollment_members).not_to include(plan2)
+    end
+
+    if FinancialAssistanceRegistry.feature_enabled?(:native_american_csr)
+      it "when satisfied" do
+        family.family_members[0].person.update_attributes(indian_tribe_member: true)
+        family.family_members[1].person.update_attributes(indian_tribe_member: true)
+        family.save
+        person.save
+        allow(rule).to receive(:satisfied?).and_return [true, 'ok']
+        elected_plans_by_enrollment_members = benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health')
+        expect(elected_plans_by_enrollment_members).to include(plan5)
+        expect(elected_plans_by_enrollment_members).not_to include(plan2)
+      end
     end
 
     it "when not satisfied" do
