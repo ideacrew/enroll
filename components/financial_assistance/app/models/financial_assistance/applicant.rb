@@ -201,6 +201,8 @@ module FinancialAssistance
     field :pregnancy_due_on, type: Date
     field :pregnancy_end_on, type: Date
 
+    field :is_primary_caregiver, type: Boolean, default: false
+
     field :is_subject_to_five_year_bar, type: Boolean, default: false
     field :is_five_year_bar_met, type: Boolean, default: false
     field :is_forty_quarters, type: Boolean, default: false
@@ -1020,6 +1022,14 @@ module FinancialAssistance
         # Enrolled on medicaid must check if nil
         errors.add(:is_enrolled_on_medicaid, "' Was this person on Medicaid during pregnancy?' should be answered") if is_enrolled_on_medicaid.nil?
         errors.add(:pregnancy_end_on, "' Pregnancy End on date' should be answered") if pregnancy_end_on.blank?
+      end
+
+      if FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_other_question) &&
+         age_of_applicant >= 19 && is_applying_coverage == true && is_primary_caregiver.nil?
+        errors.add(
+          :is_primary_caregiver,
+          "' Is this person the main person taking care of any children age 18 or younger? *' should be answered"
+        )
       end
 
       return unless is_applying_coverage
