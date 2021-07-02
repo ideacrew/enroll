@@ -55,6 +55,9 @@ registry:
       - key: :unemployment_income
         item: :unemployment_income
         is_enabled: true
+      - key: :primary_caregiver_other_question
+        item: :primary_caregiver_other_question
+        is_enabled: true
 
     # TODO eligibility engine connectivity(HAVEN) settings
     # TODO mec service connectivity settings
