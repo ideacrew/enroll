@@ -88,7 +88,7 @@ end
 
 When(/^the person enrolls in a Kaiser plan$/) do
   # screenshot("line 161")
-  find(IvlFaaFamilyInformation.continue_btn).click
+  find(IvlIapFamilyInformation.continue_btn).click
   find(IvlSpecialEnrollmentPeriod.married_link).click
   expect(page).to have_content "Married"
   # screenshot("past_qle_date")
