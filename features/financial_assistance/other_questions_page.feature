@@ -1,9 +1,9 @@
 Feature: Start a new Financial Assistance Application and answers questions on Other Questions page
 
   Background: User logs in and visits applicant's other questions page
-    Given a consumer, with a family, exists
     And the FAA feature configuration is enabled
     And the primary caretaker question configuration is enabled
+    Given a consumer, with a family, exists
     And is logged in
     And the user SSN is nil
     And the user has an eligible immigration status

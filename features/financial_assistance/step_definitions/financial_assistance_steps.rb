@@ -371,11 +371,11 @@ And(/^they should be taken back to the application's details page for deduction$
 end
 
 Given(/^the primary caretaker question configuration is enabled$/) do
-  enable_feature :primary_caregiver_other_question
+  enable_feature :primary_caregiver_other_question, {registry_name: FinancialAssistanceRegistry}
 end
 
 Given(/^the primary caretaker question configuration is diasbled$/) do
-  disable_feature :primary_caregiver_other_question
+  disable_feature :primary_caregiver_other_question, {registry_name: FinancialAssistanceRegistry}
 end
 
 Given(/^the FAA feature configuration is disabled$/) do
@@ -467,7 +467,7 @@ And(/^user should have feature toggled questions in review$/) do
   current_applicant_id = page.current_path.split("applicants/").last.split("/other_questions").first
   current_applicant = application.applicants.find(current_applicant_id)
   age_of_applicant = current_applicant.age_of_the_applicant
-  if EnrollRegistry.feature_enabled?(:primary_caregiver_other_question) &&
+  if EnrollRegistry.feature_enabled?(:financial_assistance) && FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_other_question) &&
      age_of_applicant >= 19 && current_applicant.is_applying_coverage
     expect(page).to have_content(l10n("faa.primary_caretaker_question_text"))
   end
