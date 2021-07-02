@@ -143,7 +143,7 @@ RSpec.describe Operations::BenefitGroupAssignments::Reinstate, :type => :model, 
         expect(new_bga.end_on).to eq nil
 
         expect(reinstated_bga.start_on).to eq benefit_group_assignment.start_on
-        expect(reinstated_bga.activated_at).to eq TimeKeeper.datetime_of_record
+        expect(reinstated_bga.activated_at.to_date).to eq TimeKeeper.datetime_of_record.to_date
 
       end
     end

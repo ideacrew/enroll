@@ -38,7 +38,7 @@ Then(/^the 'Start New Application' button should be disabled$/) do
   expect(page).to have_button('Start new application', disabled: true)
 end
 
-When(/^they click 'Start New Application' button$/) do
+When(/^.+ click 'Start New Application' button$/) do
   click_button 'Start new application'
 end
 

@@ -15,10 +15,11 @@ Dir.glob("#{seedfile_location}*").each do |filename|
   str2_markerstring = ".rb"
   translations_to_seed << "#{filename[/#{seedfile_location}(.*?)#{str2_markerstring}/m, 1]}_translations".upcase.constantize
 end
-
-require_relative File.join(Rails.root, 'components/financial_assistance/db/seedfiles/translations/en/faa_translations')
-translations_to_seed << FaaTranslations::ASSISTANCE_TRANSLATIONS unless site_key.to_s == 'cca'
-translations_to_seed << FaaTranslations::ELIGIBILITY_TRANSLATIONS unless site_key.to_s == 'cca'
+if EnrollRegistry.feature_enabled?(:financial_assistance)
+  require_relative File.join(Rails.root, 'components/financial_assistance/db/seedfiles/translations/en/faa_translations')
+  translations_to_seed << FaaTranslations::ASSISTANCE_TRANSLATIONS
+  translations_to_seed << FaaTranslations::ELIGIBILITY_TRANSLATIONS
+end
 
 MAIN_TRANSLATIONS = {
   :'en.shared.my_portal_links.my_insured_portal' => 'My Insured Portal',

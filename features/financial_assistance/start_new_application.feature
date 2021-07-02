@@ -12,7 +12,9 @@ Feature: Cost Savings -  Start New Application
     When consumer visits home page
     And the Cost Savings link is visible
     And the consumer clicks on Cost Savings link
-    Then the 'Start New Application' button should be disabled
+    Then consumer should see 'Start New Application' button
+    When consumer click 'Start New Application' button
+    Then the consumer should see a modal popup
 
     Examples:
       | application_state |
@@ -29,5 +31,5 @@ Feature: Cost Savings -  Start New Application
     And the Cost Savings link is visible
     And the consumer clicks on Cost Savings link
     Then consumer should see 'Start New Application' button
-    When they click 'Start New Application' button
+    When consumer click 'Start New Application' button
     Then the consumer is navigated to Application checklist page

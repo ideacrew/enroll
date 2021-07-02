@@ -1,6 +1,19 @@
 module ApplicationHelper
   include FloatHelper
 
+  def seed_url_helper(row)
+    case row.record_class_name
+    when nil
+      "Not Yet Seeded"
+    when 'Family'
+      # TODO: Change from root url to family home page
+      link_to(
+        "#{row.target_record&.primary_person&.full_name} (Family Primary Person)",
+        resume_enrollment_exchanges_agents_path(person_id: row&.target_record&.primary_applicant&.person&.id)
+      )
+    end
+  end
+
   def can_employee_shop?(date)
     return false if date.blank?
     date = Date.strptime(date.to_s,"%m/%d/%Y")
