@@ -464,11 +464,9 @@ And(/^user should see Medicaid eligibility question$/) do
 end
 
 And(/^user should have feature toggled questions in review$/) do
-  current_applicant_id = page.current_path.split("applicants/").last.split("/other_questions").first
-  current_applicant = application.applicants.find(current_applicant_id)
-  age_of_applicant = current_applicant.age_of_the_applicant
-  if EnrollRegistry.feature_enabled?(:financial_assistance) && FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_other_question) &&
-     age_of_applicant >= 19 && current_applicant.is_applying_coverage
+  # Add more stuff here as you add more conditional questions please, fam
+  if EnrollRegistry.feature_enabled?(:financial_assistance) &&
+     FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_other_question)
     expect(page).to have_content(l10n("faa.primary_caretaker_question_text"))
   end
 end
