@@ -370,6 +370,14 @@ And(/^they should be taken back to the application's details page for deduction$
   page.should have_content("Income Adjustments for #{application.applicant.first.first_name}")
 end
 
+Given(/^the primary caretaker question configuration is enabled$/) do
+  disable_feature :primary_caregiver_other_question
+end
+
+Given(/^the primary caretaker question configuration is diasbled$/) do
+  disable_feature :primary_caregiver_other_question
+end
+
 Given(/^the FAA feature configuration is disabled$/) do
   disable_feature :financial_assistance
 end
