@@ -107,5 +107,6 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.anyone_found_eligible_3" => "I am also giving to the Medicaid agency rights to pursue and get medical support from a spouse or parent.",
   "en.faa.parent_living_outside_of_home_1" => "",
   "en.faa.parent_living_outside_of_home_2" => "",
-  "en.faa.parent_living_outside_of_home_3" => ""
+  "en.faa.parent_living_outside_of_home_3" => "",
+  "en.faa.negative_income" => "Negative Income"
 }.freeze
