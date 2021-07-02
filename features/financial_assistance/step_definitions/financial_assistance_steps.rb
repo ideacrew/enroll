@@ -371,7 +371,7 @@ And(/^they should be taken back to the application's details page for deduction$
 end
 
 Given(/^the primary caretaker question configuration is enabled$/) do
-  disable_feature :primary_caregiver_other_question
+  enable_feature :primary_caregiver_other_question
 end
 
 Given(/^the primary caretaker question configuration is diasbled$/) do
@@ -461,6 +461,16 @@ end
 
 And(/^user should see Medicaid eligibility question$/) do
   expect(page).to have_content("Medicaid eligibility")
+end
+
+And(/^user should have feature toggled questions in review$/) do
+  current_applicant_id = page.current_path.split("applicants/").last.split("/other_questions").first
+  current_applicant = application.applicants.find(current_applicant_id)
+  age_of_applicant = current_applicant.age_of_the_applicant
+  if EnrollRegistry.feature_enabled?(:primary_caregiver_other_question) &&
+     age_of_applicant >= 19 && current_applicant.is_applying_coverage
+    expect(page).to have_content(l10n("faa.primary_caretaker_question_text"))
+  end
 end
 
 And(/^the user should click on the destroy applicant icon$/) do
