@@ -121,7 +121,6 @@ registry:
             item: ""
           - key: :home_forms_url
             item: ""
-<<<<<<< HEAD
           - key: :forms_name
             item: ""
           - key: :forms
@@ -129,15 +128,6 @@ registry:
             item: ""
           - key: :forms_name
             item: ""
-=======
-          - key: :forms_name
-            item: ""
-          - key: :forms
-            item: ""
-            item: ""
-          - key: :forms_name
-            item: ""
->>>>>>> origin/ivl_rating_area
           - key: :short_url
             item: ""
           - key: :forms
@@ -162,7 +152,6 @@ registry:
             item: 'mehl.producer@coverme.gov'
           - key: :privacy_policy
             item: ""
-<<<<<<< HEAD
           - key: :late_rates_message
             item: "Due to a delay, premiums for some coverage effective dates are not available yet. Please check again soon to see if this information has been updated. You can also contact Customer Service or your broker if you need help."
           - key: :faa_enabled
@@ -171,8 +160,6 @@ registry:
             item: true
           - key: :ivl_responsibility_url
             item: "https://dchealthlink.com/individual-responsibility-requirement"
-=======
->>>>>>> origin/ivl_rating_area
           - key: :curam_enabled?
             item: true
           - key: :support_for_ie_browser
@@ -265,13 +252,10 @@ registry:
             item: ['']
           - key: :plan_year_tooltip
             item: ""
-<<<<<<< HEAD
           - key: :send_rating_area_for_ivl_policy_to_edi
             item: true
           - key: :medicaid_agency_phone
             item: "(000) 000-0000"
-=======
->>>>>>> origin/ivl_rating_area
       - key: :rating_area
         item: :rating_area
         is_enabled: false
@@ -315,11 +299,7 @@ registry:
       - key: :special_cover_header
         item: :special_cover_header
         is_enabled: true
-<<<<<<< HEAD
         settings:
-=======
-        settings: 
->>>>>>> origin/ivl_rating_area
           - key: :filename
             item: "CoverME_WebsiteHeader_01.jpg"
       - key: :tobacco_cost
@@ -384,12 +364,9 @@ registry:
         settings:
           - key: :days
             item: 60
-<<<<<<< HEAD
       - key: :immigration_status_checkbox
         is_enabled: true
       - key: :gender_to_sex
         is_enabled: true
       - key: :mainecare_cubcare_glossary
         is_enabled: true
-=======
->>>>>>> origin/ivl_rating_area
