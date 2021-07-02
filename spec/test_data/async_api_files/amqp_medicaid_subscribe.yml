@@ -25,7 +25,7 @@ servers:
     description: RabbitMQ Test Server
   development:
     url: amqp://localhost:5672/
-    protocol: amqp
+    protocol: :amqp
     protocolVersion: 0.9.2
     description: Medicaid Gateway Development Server
 channels:

@@ -21,7 +21,7 @@ EventSource.configure do |config|
       warn rabbitmq.vhost
       rabbitmq.port = ENV['RABBITMQ_PORT'] || "5672"
       warn rabbitmq.port
-      rabbitmq.url = ENV['RABBITMQ_URL'] || "amqp://localhost:5672"
+      rabbitmq.url = ENV['RABBITMQ_URL'] || "amqp://localhost:5672/"
       warn rabbitmq.url
       rabbitmq.user_name = ENV['RABBITMQ_USERNAME'] || "guest"
       warn rabbitmq.user_name
@@ -31,7 +31,7 @@ EventSource.configure do |config|
     end
   end
 
-  config.async_api_schemas =
+  async_api_resources =
     if (Rails.env.test? || Rails.env.development?) && ENV['RABBITMQ_HOST'].nil?
       dir = Pathname.pwd.join('spec', 'test_data', 'async_api_files')
       resource_files = ::Dir[::File.join(dir, '**', '*')].reject { |p| ::File.directory? p }
@@ -42,5 +42,11 @@ EventSource.configure do |config|
     else
       ::AcaEntities.async_api_config_find_by_service_name(nil).success
     end
+
+  config.async_api_schemas =
+    async_api_resources.collect do |resource|
+      EventSource.build_async_api_resource(resource)
+    end
 end
+
 EventSource.initialize!
