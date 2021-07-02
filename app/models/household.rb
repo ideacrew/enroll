@@ -508,6 +508,7 @@ class Household
       th.tax_household_members.create(
         :applicant_id => family_member.id,
         :is_subscriber => family_member.is_primary_applicant,
+        :csr_percent_as_integer => (params['csr'] == 'limited' ? '-1' : params['csr']), #TODO: Should take individual level csr kind as params to update.
         thhm_info["pdc_type"].to_sym => true,
         :reason => thhm_info["reason"]
       )
