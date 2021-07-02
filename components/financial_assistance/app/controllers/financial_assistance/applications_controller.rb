@@ -7,6 +7,7 @@ module FinancialAssistance
 
     include ::UIHelpers::WorkflowController
     include Acapi::Notifiers
+    include FinancialAssistance::L10nHelper
     require 'securerandom'
 
     before_action :check_eligibility, only: [:create, :get_help_paying_coverage_response, :copy]
