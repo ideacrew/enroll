@@ -10,12 +10,13 @@ module Operations
     module PersonTo
       # Person params to be transformed.
       class Cv3Person
-
         include Dry::Monads[:result, :do]
         include Acapi::Notifiers
         include Rails.application.routes.url_helpers
         require 'securerandom'
 
+        # @param [ Hash ] params Applicant Attributes
+        # @return [ BenefitMarkets::Entities::Applicant ] applicant Applicant
         def call(person)
           request_payload = yield construct_payload(person)
 
@@ -46,7 +47,7 @@ module Operations
             resident_role: construct_resident_role(person.resident_role),
             broker_role: construct_broker_role(person.broker_role),
             individual_market_transitions: transform_individual_market_transitions(person.individual_market_transitions),
-            verification_types: transform_verification_types(person.verification_types), # TODO
+            verification_types: transform_verification_types(person.verification_types),
             user: transform_user_params(person.user),
             addresses: transform_addresses(person.addresses),
             emails: transform_emails(person.emails),
@@ -322,6 +323,7 @@ module Operations
 
         def construct_person_name(person)
           return if person.nil?
+
           {
             first_name: person.first_name,
             middle_name: person.middle_name,
@@ -371,6 +373,7 @@ module Operations
 
         def transform_user_params(user)
           return if user.nil?
+
           {
             # attestations: construct_attestations,
             approved: user.approved,
