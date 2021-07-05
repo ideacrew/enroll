@@ -50,9 +50,6 @@ class Address
   # The name of the quadrant where this address is located
   field :quadrant, type: String, default: ""
 
-  # The name of the quadrant where this address is located
-  field :quadrant, type: String, default: ""
-
   track_history :on => [:fields],
                 :scope => :person,
                 :modifier_field => :modifier,
