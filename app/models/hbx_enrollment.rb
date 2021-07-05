@@ -1029,6 +1029,10 @@ class HbxEnrollment
     benefit_sponsorship.benefit_applications.detect{|app| app.active? && app.reinstated_id == sponsored_benefit_package.benefit_application.id}
   end
 
+  def trigger_enrollment_notice
+    Services::IvlEnrollmentService.new.trigger_enrollment_notice(self) unless EnrollRegistry[:legacy_enrollment_trigger].enabled?
+  end
+
   def update_reinstate_coverage
     return unless reinstated_app.present?
     parent_reinstated_app = reinstated_app.parent_reinstate_application
@@ -1884,7 +1888,7 @@ class HbxEnrollment
       transitions from: :shopping, to: :renewing_waived
     end
 
-    event :select_coverage, :after => [:record_transition, :propagate_selection, :update_reinstate_coverage] do
+    event :select_coverage, :after => [:record_transition, :propagate_selection, :update_reinstate_coverage, :trigger_enrollment_notice] do
       transitions from: :shopping,
                   to: :coverage_selected, :guard => :can_select_coverage?
       transitions from: [:auto_renewing, :actively_renewing],
