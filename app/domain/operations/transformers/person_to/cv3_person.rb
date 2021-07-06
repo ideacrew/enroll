@@ -9,14 +9,11 @@ module Operations
     module PersonTo
       # Person params to be transformed.
       class Cv3Person
-        # constructs cv3 payload for medicaid gateway.
 
         include Dry::Monads[:result, :do]
         include Acapi::Notifiers
         require 'securerandom'
 
-        # @param [ Hash ] params Applicant Attributes
-        # @return [ BenefitMarkets::Entities::Applicant ] applicant Applicant
         def call(person)
           request_payload = yield construct_payload(person)
 
@@ -116,7 +113,7 @@ module Operations
             ethnicity: person.ethnicity,
             race: person.race,
             tribal_id: person.tribal_id,
-            language_code: person.language_code
+            language_code: person.language_code || person.user&.preferred_language
           }
         end
 
