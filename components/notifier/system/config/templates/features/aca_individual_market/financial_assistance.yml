@@ -57,7 +57,7 @@ registry:
         is_enabled: true
       - key: :primary_caregiver_other_question
         item: :primary_caregiver_other_question
-        is_enabled: false
+        is_enabled: true
       - key: :indian_health_service_question
         is_enabled: true
       - key: :has_medicare_cubcare_eligible

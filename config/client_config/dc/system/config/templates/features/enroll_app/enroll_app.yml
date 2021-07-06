@@ -257,7 +257,7 @@ registry:
           - key: :send_rating_area_for_ivl_policy_to_edi
             item: true
           - key: :medicaid_agency_phone
-            item: "(000) 000-0000"
+            item: "(855) 532-5465"
       - key: :data_seeds_ui
         item: :data_seed_ui
         is_enabled: true

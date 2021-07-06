@@ -38,4 +38,39 @@ RSpec.describe FinancialAssistance::Income, type: :model, dbclean: :after_each d
       expect(income.valid?(:submission)).to be_falsey
     end
   end
+
+  context 'constants' do
+    let(:earned_incomes) { ['wages_and_salaries', 'net_self_employment', 'scholarship_payments'] }
+    let(:unearned_incomes) do
+      %w[alimony_and_maintenance
+         american_indian_and_alaskan_native
+         capital_gains
+         dividend
+         employer_funded_disability
+         estate_trust
+         farming_and_fishing
+         foreign
+         interest
+         lump_sum_amount
+         military
+         other
+         pension_retirement_benefits
+         permanent_workers_compensation
+         prizes_and_awards
+         rental_and_royalty
+         social_security_benefit
+         supplemental_security_income
+         tax_exempt_interest
+         unemployment_income
+         income_from_irs]
+    end
+
+    it 'should return expected result for earned incomes' do
+      expect(::FinancialAssistance::Income::EARNED_INCOME_KINDS).to eq(earned_incomes)
+    end
+
+    it 'should return expected result for unearned incomes' do
+      expect(::FinancialAssistance::Income::UNEARNED_INCOME_KINDS).to eq(unearned_incomes)
+    end
+  end
 end

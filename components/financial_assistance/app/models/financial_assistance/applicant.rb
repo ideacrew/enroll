@@ -950,14 +950,21 @@ module FinancialAssistance
     end
 
     def current_month_incomes
-      start_of_current_month = TimeKeeper.date_of_record.beginning_of_month
-      end_of_current_month = TimeKeeper.date_of_record.end_of_month
+      month_date_range = TimeKeeper.date_of_record.beginning_of_month..TimeKeeper.date_of_record.end_of_month
       incomes.select do |inc|
+        next inc unless application.assistance_year
         end_on = inc.end_on || Date.new(application.assistance_year).end_of_year
-        (start_of_current_month..end_of_current_month).any? do |cm_date|
-          (inc.start_on..end_on).cover?(cm_date)
-        end
+        income_date_range = (inc.start_on)..end_on
+        date_ranges_overlap?(income_date_range, month_date_range)
       end
+    end
+
+    def current_month_earned_incomes
+      current_month_incomes.select { |inc| ::FinancialAssistance::Income::EARNED_INCOME_KINDS.include?(inc.kind) }
+    end
+
+    def current_month_unearned_incomes
+      current_month_incomes.select { |inc| ::FinancialAssistance::Income::UNEARNED_INCOME_KINDS.include?(inc.kind) }
     end
 
     class << self
@@ -970,6 +977,10 @@ module FinancialAssistance
     end
 
     private
+
+    def date_ranges_overlap?(range_a, range_b)
+      range_b.begin <= range_a.end && range_a.begin <= range_b.end
+    end
 
     def change_validation_status
       kind = aasm.current_event.to_s.include?('income') ? 'Income' : 'MEC'

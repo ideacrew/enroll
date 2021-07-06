@@ -148,7 +148,7 @@ module FinancialAssistance
     end
 
     def destroy
-      @applicant.destroy! unless @applicant.is_primary_applicant
+      ::FinancialAssistance::Operations::Applicants::Destroy.new.call(@applicant)
       redirect_to edit_application_path(@application)
     end
 

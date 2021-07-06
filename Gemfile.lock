@@ -7,8 +7,8 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 1aeb5e7a2a14df848fa3a82ab2638cc0ef282348
-  branch: happymapper_example_and_test
+  revision: 646e68737c1e673fa86a74c9431a38d480eea468
+  branch: release_0.3.0
   specs:
     aca_entities (0.3.0)
       deep_merge
@@ -731,7 +731,7 @@ GEM
       nokogiri (~> 1.5)
     non-stupid-digest-assets (1.0.9)
       sprockets (>= 2.0)
-    oj (3.11.7)
+    oj (3.12.0)
     orm_adapter (0.5.0)
     overcommit (0.52.1)
       childprocess (>= 0.6.3, < 4)

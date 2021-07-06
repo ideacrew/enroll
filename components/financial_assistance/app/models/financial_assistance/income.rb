@@ -40,6 +40,10 @@ module FinancialAssistance
       income_from_irs
     ].freeze
 
+    # These are used specifically in the process of constructing the payload for us to send this to MedicaidGateway(including Mitc)
+    EARNED_INCOME_KINDS = %w[wages_and_salaries net_self_employment scholarship_payments].freeze
+    UNEARNED_INCOME_KINDS = (KINDS - EARNED_INCOME_KINDS).freeze
+
     JOB_INCOME_TYPE_KIND = 'wages_and_salaries'
     NET_SELF_EMPLOYMENT_INCOME_KIND = 'net_self_employment'
     UNEMPLOYMENT_INCOME_KIND = 'unemployment_income'
@@ -161,6 +165,27 @@ module FinancialAssistance
         applicants.size == 1 ? applicants.first.incomes.find(bson_id) : nil
       end
     end
+
+    # rubocop:disable Metrics/CyclomaticComplexity, Metrics/MethodLength
+    def calculate_annual_income
+      case frequency_kind.downcase
+      when 'weekly'
+        amount * 52
+      when 'monthly'
+        amount * 12
+      when 'yearly'
+        amount
+      when 'biweekly'
+        amount * 26
+      when 'quarterly'
+        amount * 4
+      when 'daily'
+        amount * 5 * 52
+      else
+        0
+      end
+    end
+    # rubocop:enable Metrics/CyclomaticComplexity, Metrics/MethodLength
 
     private
 
