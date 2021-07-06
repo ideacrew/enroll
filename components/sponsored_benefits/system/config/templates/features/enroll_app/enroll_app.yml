@@ -350,6 +350,10 @@ registry:
         is_enabled: true
       - key: :display_county
         is_enabled: true
+      - key: :moving_to_state
+        is_enabled: true
+      - key: :living_outside_state
+        is_enabled: true
       - key: :validate_quadrant
         item: :validate_quadrant
         is_enabled: true
