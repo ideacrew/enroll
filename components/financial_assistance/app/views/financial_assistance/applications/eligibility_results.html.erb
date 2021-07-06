@@ -161,6 +161,29 @@
           </div>
         <%end%>
 
+        <!-- TODO: WHy is this collapse only working when its included with that do not agree stuff? -->
+        <div class="er-phi mt-20">
+            <a class ='glyphicon glyphicon-plus pull-right' data-toggle="collapse" href="#fa_other_actions"></a>
+            <h3>Other Actions</h3>
+          <div id="fa_other_actions" class="panel-collapse collapse">
+            <div class="panel-body">
+              <!-- Sub panels -->
+              <div class="panel-group" id="accordion">
+                <div class="panel panel-default">
+                  <div class="panel-heading">
+                    <h4 class="panel-title">
+                      <a data-toggle="collapse" data-parent="#accordion" href="#collapse2">
+                        <%= l10n("faa.full_long_name_determination", program_short_name: "", program_long_name: "") %>
+                      </a>
+                        <span class="indicator glyphicon glyphicon-chevron-down  pull-right"></span>
+                    </h4>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        <!-- TODO: Should be able to close it here but it breaks the collapse -->
+
         <div class="er-summary mt-20">
           <p class="mt-10"><%= l10n("faa.do_not_agree") %></p>
           <p class="mb-0"><%= l10n("faa.your_application_reference") %><b><%= @application.hbx_id %></b>.</p>
