@@ -7,16 +7,17 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 6c07e86b1629e87398f6e2c25ee8b5da427c7298
-  branch: fdsh
+  revision: 4f92a95e691b3f9463bc5b5793fd3bb5faf184cd
+  branch: release_0.3.0
   specs:
-    aca_entities (0.2.2)
+    aca_entities (0.3.0)
       deep_merge
       dry-monads (~> 1.2)
       dry-struct (~> 1.0)
       dry-transformer (~> 0.1.1)
       dry-types (~> 1.0)
       dry-validation (~> 1.2)
+      nokogiri-happymapper
       oj (~> 3.11)
 
 GIT
@@ -31,10 +32,10 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/event_source.git
-  revision: 4a4baa01544467fb97c732659c6e1ec82fa8be01
-  branch: release_0.5.2
+  revision: 4eaf40fd6e3fffcfb3d9d05aa07035ff1beb2c10
+  branch: release_0.5.3
   specs:
-    event_source (0.5.2)
+    event_source (0.5.3)
       bunny (>= 1.7.1)
       deep_merge (~> 1.2.0)
       dry-events (~> 0.3)
@@ -661,7 +662,7 @@ GEM
     method_source (1.0.0)
     mime-types (3.3.1)
       mime-types-data (~> 3.2015)
-    mime-types-data (3.2021.0225)
+    mime-types-data (3.2021.0704)
     mimemagic (0.3.8)
       nokogiri (~> 1)
     mini_magick (4.10.1)
@@ -730,7 +731,7 @@ GEM
       nokogiri (~> 1.5)
     non-stupid-digest-assets (1.0.9)
       sprockets (>= 2.0)
-    oj (3.11.7)
+    oj (3.12.0)
     orm_adapter (0.5.0)
     overcommit (0.52.1)
       childprocess (>= 0.6.3, < 4)
