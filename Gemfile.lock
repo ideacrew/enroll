@@ -7,16 +7,17 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: bd4d55043b5d333a1cf4dd565b37dbb79f4c554c
-  branch: fdsh
+  revision: 646e68737c1e673fa86a74c9431a38d480eea468
+  branch: release_0.3.0
   specs:
-    aca_entities (0.2.2)
+    aca_entities (0.3.0)
       deep_merge
       dry-monads (~> 1.2)
       dry-struct (~> 1.0)
       dry-transformer (~> 0.1.1)
       dry-types (~> 1.0)
       dry-validation (~> 1.2)
+      nokogiri-happymapper
       oj (~> 3.11)
 
 GIT
@@ -730,7 +731,7 @@ GEM
       nokogiri (~> 1.5)
     non-stupid-digest-assets (1.0.9)
       sprockets (>= 2.0)
-    oj (3.11.7)
+    oj (3.12.0)
     orm_adapter (0.5.0)
     overcommit (0.52.1)
       childprocess (>= 0.6.3, < 4)
