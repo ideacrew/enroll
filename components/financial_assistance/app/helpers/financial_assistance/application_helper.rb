@@ -233,7 +233,7 @@ module FinancialAssistance
     end
 
     def calculated_application_year
-      FinancialAssistanceRegistry[:application_year].item.call.value!
+      FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).constantize.item.call.value!
     end
 
     def human_boolean(boolean)
