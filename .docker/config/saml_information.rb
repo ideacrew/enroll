@@ -1,5 +1,9 @@
+# frozen_string_literal: true
+
+# class for storing SamlInformation
 class SamlInformation
 
+  # class for MissingKeyError
   class MissingKeyError < StandardError
     def initialize(key)
       super("Missing required key: #{key}")
@@ -31,22 +35,20 @@ class SamlInformation
     'kp_pay_now_private_key_location',
     'kp_pay_now_x509_cert_location',
     'kp_pay_now_audience'
-  ]
+  ].freeze
 
   attr_reader :config
 
   # TODO: I have a feeling we may be using this pattern
   #       A LOT.  Look into extracting it if we repeat.
   def initialize
-    @config = YAML.load(ERB.new(File.read(File.join(Rails.root,'config', 'saml.yml'))).result)
+    @config = YAML.safe_load(ERB.new(File.read(File.join(Rails.root,'config', 'saml.yml'))).result)
     ensure_configuration_values(@config)
   end
 
-  def ensure_configuration_values(conf)
+  def ensure_configuration_values(_conf)
     REQUIRED_KEYS.each do |k|
-      if @config[k].blank?
-        raise MissingKeyError.new(k)
-      end
+      raise MissingKeyError, k if @config[k].blank?
     end
   end
 
@@ -54,10 +56,10 @@ class SamlInformation
     define_method(key.to_sym) do
       config[key.to_s]
     end
-    self.instance_eval(<<-RUBYCODE)
-      def self.#{key.to_s}
-        self.instance.#{key.to_s}
-      end
+    self.instance_eval(<<-RUBYCODE, __FILE__, __LINE__ + 1)
+      def self.#{key}         # def self.key_name
+        self.instance.#{key}  #   self.instance.key_name
+      end                     # end
     RUBYCODE
   end
 
