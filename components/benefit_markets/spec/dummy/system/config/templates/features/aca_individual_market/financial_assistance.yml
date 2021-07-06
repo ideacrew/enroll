@@ -62,11 +62,6 @@ registry:
   - namespace:
     - :documents
     features:
-      - key: financial_assistance_documents
-        is_enabled: true
-        settings:
-          - key: :ivl_application_checklist
-            item: 'db/documents/ivl_checklist.pdf'
       - key: :consumer_validations
         is_enabled: false
       - key: :non_magi_referral_display
@@ -158,5 +153,7 @@ registry:
       settings:
         - key: :gamble_prize
           item: false
+    - key: :full_medicaid_determination_step
+      is_enabled: false
 # TODO eligibility engine connectivity(HAVEN) settings
 # TODO mec service connectivity settings
