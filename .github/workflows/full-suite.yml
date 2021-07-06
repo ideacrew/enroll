@@ -121,7 +121,7 @@ jobs:
       - name: run webpack
         run: NODE_ENV=test RAILS_ENV=test ./bin/webpack
       - name: compile assets
-        run: bundle exec rake assets:precompile
+        run: RAILS_ENV=test bundle exec rake assets:precompile
   engines:
     needs: [rubocop, view_linter]
     runs-on: ubuntu-latest
