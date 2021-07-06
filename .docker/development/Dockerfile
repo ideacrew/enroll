@@ -1,4 +1,4 @@
-FROM ruby:2.5.1 AS enroll_base
+FROM public.ecr.aws/ideacrew/enroll:base as app
 
 LABEL author="IdeaCrew"
 
