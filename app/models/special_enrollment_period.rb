@@ -73,7 +73,7 @@ class SpecialEnrollmentPeriod
   field :user_id, type: BSON::ObjectId
 
   #Renew coverage flag
-  field :coverage_renewal_flag, type: Boolean
+  field :coverage_renewal_flag, type: Boolean, default: true
 
   validate :optional_effective_on_dates_within_range, :next_poss_effective_date_within_range, on: :create
 
@@ -90,7 +90,7 @@ class SpecialEnrollmentPeriod
   scope :fehb_market,         ->{ where(:qualifying_life_event_kind_id.in => QualifyingLifeEventKind.fehb_market_events.map(&:id) + QualifyingLifeEventKind.fehb_market_non_self_attested_events.map(&:id) ) }
   scope :individual_market,   ->{ where(:qualifying_life_event_kind_id.in => QualifyingLifeEventKind.individual_market_events.map(&:id) + QualifyingLifeEventKind.individual_market_non_self_attested_events.map(&:id)) }
 
-  before_save :set_coverage_renewal_flag, :set_user_id
+  before_save :set_user_id
 
   after_initialize :set_submitted_at
 
@@ -215,11 +215,10 @@ private
   def next_poss_effective_date_within_range
     return if next_poss_effective_date.blank?
     return true unless is_shop_or_fehb? && family.has_primary_active_employee?
-
-    min_date = sep_optional_date family, 'min', qualifying_life_event_kind.market_kind
-    max_date = sep_optional_date family, 'max', qualifying_life_event_kind.market_kind
+    min_date = sep_optional_date family, 'min', qualifying_life_event_kind.market_kind, next_poss_effective_date
+    max_date = sep_optional_date family, 'max', qualifying_life_event_kind.market_kind, next_poss_effective_date
     if !(min_date || max_date)
-      errors.add(:next_poss_effective_date, "No active plan years present") if !(errors.messages.values.flatten.include?("No active plan years present"))
+      errors.add(:next_poss_effective_date, "No eligible plan years present") unless errors.messages.values.flatten.include?("No eligible plan years present")
     elsif !next_poss_effective_date.between?(min_date, max_date)
       errors.add(:next_poss_effective_date, "out of range.")
     end
@@ -230,10 +229,10 @@ private
 
     optional_effective_on.each_with_index do |date_option, index|
       date_option = Date.strptime(date_option, "%m/%d/%Y")
-      min_date = sep_optional_date family, 'min', qualifying_life_event_kind.market_kind
-      max_date = sep_optional_date family, 'max', qualifying_life_event_kind.market_kind
+      min_date = sep_optional_date family, 'min', qualifying_life_event_kind.market_kind, date_option
+      max_date = sep_optional_date family, 'max', qualifying_life_event_kind.market_kind, date_option
       if !(min_date || max_date)
-        errors.add(:optional_effective_on, "No active plan years present") if !(errors.messages.values.flatten.include?("No active plan years present"))
+        errors.add(:optional_effective_on, "No eligible plan years present") unless errors.messages.values.flatten.include?("No eligible plan years present")
       elsif !date_option.between?(min_date, max_date)
         errors.add(:optional_effective_on, "Date #{index+1} option out of range.")
       end
@@ -249,13 +248,6 @@ private
 
   def set_submitted_at
     self.submitted_at ||= TimeKeeper.datetime_of_record
-  end
-
-  def set_coverage_renewal_flag
-    prior_py_ivl_sep = EnrollRegistry.feature_enabled?(:prior_plan_year_ivl_sep) && admin_flag.blank? && prior_py_sep?(effective_on, qualifying_life_event_kind&.market_kind)
-    return if coverage_renewal_flag == false || prior_py_ivl_sep == false
-
-    self.assign_attributes({coverage_renewal_flag: prior_py_ivl_sep})
   end
 
   def set_user_id
