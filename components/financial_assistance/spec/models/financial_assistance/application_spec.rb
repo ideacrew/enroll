@@ -340,7 +340,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family_id) }
     it 'updates assistance year' do
       application.send(:set_assistance_year)
-      expect(application.assistance_year).to eq(FinancialAssistanceRegistry[:application_year].item.call.value!)
+      expect(application.assistance_year).to eq(FinancialAssistanceRegistry[:enrollment_dates].settings(:application_year).item.constantize.new.call.value!)
     end
   end
 
