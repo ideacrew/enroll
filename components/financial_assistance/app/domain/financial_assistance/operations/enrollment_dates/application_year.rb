@@ -33,8 +33,9 @@ module FinancialAssistance
         end
 
         def new_year_effective_date(application_date)
-          date_values = FinancialAssistanceRegistry[:application_new_year_effective_date].item
-          Date.new(application_date.year, date_values['month_of_year'], date_values['day_of_month'])
+          day_of_month = FinancialAssistanceRegistry[:enrollment_dates].settings(:application_new_year_effective_date_day_of_month).item
+          month_of_year = FinancialAssistanceRegistry[:enrollment_dates].settings(:application_new_year_effective_date_month_of_year).item
+          Date.new(application_date.year, month_of_year, day_of_month)
         end
       end
     end
