@@ -96,6 +96,10 @@ class ApplicationController < ActionController::Base
 
   private
 
+  def redirect_if_prod
+    redirect_to root_path, :flash => { :error => "Unable to run seeds on prod environment." } unless ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true' || !Rails.env.production?
+  end
+
     def strong_params
       params.permit!
     end
