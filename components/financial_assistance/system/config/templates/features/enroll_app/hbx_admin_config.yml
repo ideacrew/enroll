@@ -22,4 +22,3 @@ registry:
         - key: :orphan_accounts_tab
           is_enabled: true
 
-
