@@ -161,28 +161,26 @@
           </div>
         <%end%>
 
-        <!-- TODO: WHy is this collapse only working when its included with that do not agree stuff? -->
-        <div class="er-phi mt-20">
-            <a class ='glyphicon glyphicon-plus pull-right' data-toggle="collapse" href="#fa_other_actions"></a>
-            <h3>Other Actions</h3>
-          <div id="fa_other_actions" class="panel-collapse collapse">
-            <div class="panel-body">
-              <!-- Sub panels -->
-              <div class="panel-group" id="accordion">
-                <div class="panel panel-default">
-                  <div class="panel-heading">
-                    <h4 class="panel-title">
-                      <a data-toggle="collapse" data-parent="#accordion" href="#collapse2">
-                        <%= l10n("faa.full_long_name_determination", program_short_name: "", program_long_name: "") %>
-                      </a>
-                        <span class="indicator glyphicon glyphicon-chevron-down  pull-right"></span>
-                    </h4>
-                  </div>
+        <!-- TODO: Wrap this in the proper logic  -->
+        <div class="er-medicaid mt-20">
+            <div class="er-title">
+              <h3>
+                <%= l10n("other_questions") %>
+                <a class ='glyphicon glyphicon-plus pull-right' data-toggle="collapse" href="#fa_other_actions"></a>
+              </h3>
+              <div class="border-bottom-2px"></div>
+            </div>
+            <div id="fa_other_actions" class="panel-collapse collapse">
+              <div class="panel-body">
+                <!-- Sub panels -->
+                <div class="panel-group" id="accordion">
+                  <%= l10n("faa.full_long_name_determination", program_short_name: "", program_long_name: "") %><br/>
+                  <br/>
+                <div><%= link_to l10n("send_to_OFI"), applications_path, class: "btn btn-small btn-primary" %></div>
                 </div>
               </div>
             </div>
-          </div>
-        <!-- TODO: Should be able to close it here but it breaks the collapse -->
+        </div>
 
         <div class="er-summary mt-20">
           <p class="mt-10"><%= l10n("faa.do_not_agree") %></p>
