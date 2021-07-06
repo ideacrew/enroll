@@ -1,9 +1,11 @@
 <% if @filter_criteria.empty? %>
-  <div id="broker_agencies_panel">
-  <%= render partial: 'index' %>
-  </div>
+  <%= content_for :broker_agencies_panel, flush: true do %>
+    <%= render partial: 'index' %>
+  <%= end %>
+  <%= content_for :broker_agencies_panel %>
 <% else %>
-  <div id="broker_agencies_listing">
-  <%= render partial: 'broker_agencies_listing' %>
-  </div>
+  <%= content_for :broker_agencies_listing, flush: true do %>
+    <%= render partial: 'broker_agencies_listing' %>
+  <%= end %>
+  <%= content_for :broker_agencies_listing %>
 <% end %>
