@@ -32,12 +32,12 @@ servers:
 defaultContentType: application/json
 
 channels:
-  enroll.individual.enrollment.submitted:
+  enroll.individual.enrollments.submitted:
     bindings:
       amqp:
         is: :routing_key
         exchange:
-          name: enroll.individual.enrollment
+          name: enroll.individual.enrollments
           type: topic
           content_type: application/json
           durable: true
@@ -45,13 +45,13 @@ channels:
           vhost: /
         binding_version: "0.2.0"
     publish:
-      operationId: enroll.individual.enrollment.submitted
+      operationId: enroll.individual.enrollments.submitted
       summary: Events - Document created
       bindings:
         amqp:
           app_id: enroll
-          type: enroll.individual.enrollment
-          routing_key: enroll.individual.enrollment.submitted
+          type: enroll.individual.enrollments
+          routing_key: enroll.individual.enrollments.submitted
           expiration: 100_000
           deliveryMode: 2
           mandatory: true

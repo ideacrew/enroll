@@ -80,12 +80,12 @@ module Operations
       # end
 
       def build_event(payload)
-        result = event('events.individual.enrollment.submitted', attributes: payload)
+        result = event('events.individual.enrollments.submitted', attributes: payload)
         unless Rails.env.test?
           logger.info('-' * 100)
           logger.info(
-            "Polypress Reponse Publisher to external systems(enroll),
-            event_key: events.documents.document_created, attributes: #{payload.to_h}, result: #{result}"
+            "Enroll Reponse Publisher to external systems(polypress),
+            event_key: events.individual.enrollments.submitted, attributes: #{payload.to_h}, result: #{result}"
           )
           logger.info('-' * 100)
         end
