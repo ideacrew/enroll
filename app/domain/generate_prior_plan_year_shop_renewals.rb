@@ -80,7 +80,6 @@ module Operations
         next if renewal_enrollment.blank?
         result = transition_enrollment(renewal_enrollment, ba)
         @enrollment = result.success
-        @enrollment.notify_of_coverage_start(true)
       rescue StandardError => e
         Rails.logger.error { "Error renewing coverage for employee #{enrollment.census_employee.full_name}'s due to #{e.backtrace}" }
       end
