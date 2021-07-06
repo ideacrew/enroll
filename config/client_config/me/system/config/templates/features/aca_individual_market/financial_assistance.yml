@@ -155,5 +155,17 @@ registry:
           item: true
     - key: :full_medicaid_determination_step
       is_enabled: false
+    - key: :fa_send_to_external_verification
+      is_enabled: true
+    - key: :medicaid_or_chip_program_short_name
+      is_enabled: true
+      settings:
+        - key: :name
+          item: 'CubCare'
+    - key: :medicaid_or_chip_agency_long_name
+      is_enabled: true
+      settings:
+        - key: :name
+          item: 'Office for Family Independence'
 # TODO eligibility engine connectivity(HAVEN) settings
 # TODO mec service connectivity settings

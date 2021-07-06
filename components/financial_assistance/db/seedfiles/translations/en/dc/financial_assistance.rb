@@ -2,6 +2,8 @@
 
 # Assistance Translations
 
+# rubocop:disable Layout/LineLength
+
 FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.curam_lookup" => "It looks like you've already completed an application for Medicaid and cost savings on DC Health Link.
      Please call DC Health Link at (855) 532-5465 to make updates to that application.
@@ -109,5 +111,9 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.parent_living_outside_of_home_2" => "to collect medical support from the parent who lives outside the home. If I think that cooperating to collect medical support will harm me or my children, ",
   "en.faa.parent_living_outside_of_home_3" => "I can tell my caseworker and I may not have to cooperate.",
   "en.faa.negative_income" => "Negative Income",
-  "en.faa.full_long_name_determination" => "Based on the information you provided, no one on this application is likely to qualify for %{program_short_name}. Do you still want us to send your application to the %{program_long_name} so they can check on %{program_short_name} eligibility?"
+  "en.faa.full_long_name_determination" => "Based on the information you provided, no one on this application is likely to qualify for %{program_short_name}. Do you still want us to send your application to the %{program_long_name} so they can check on %{program_short_name} eligibility?",
+  "en.faa.send_to_external_verification" => "Send to OFI" # TODO: This is for Maine, we don't know what it should be for DC yet, if anything
 }.freeze
+
+# rubocop:enable Layout/LineLength
+
