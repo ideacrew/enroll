@@ -371,6 +371,14 @@ And(/^they should be taken back to the application's details page for deduction$
   page.should have_content("Income Adjustments for #{application.applicant.first.first_name}")
 end
 
+Given(/^the primary caretaker question configuration is enabled$/) do
+  enable_feature :primary_caregiver_other_question, {registry_name: FinancialAssistanceRegistry}
+end
+
+Given(/^the primary caretaker question configuration is diasbled$/) do
+  disable_feature :primary_caregiver_other_question, {registry_name: FinancialAssistanceRegistry}
+end
+
 Given(/^the FAA feature configuration is disabled$/) do
   disable_feature :financial_assistance
 end
@@ -462,6 +470,14 @@ end
 
 And(/^user should see Medicaid eligibility question$/) do
   expect(page).to have_content("Medicaid eligibility")
+end
+
+And(/^user should have feature toggled questions in review$/) do
+  # Add more stuff here as you add more conditional questions please, fam
+  if EnrollRegistry.feature_enabled?(:financial_assistance) &&
+     FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_other_question)
+    expect(page).to have_content(l10n("faa.primary_caretaker_question_text"))
+  end
 end
 
 And(/^the user should click on the destroy applicant icon$/) do

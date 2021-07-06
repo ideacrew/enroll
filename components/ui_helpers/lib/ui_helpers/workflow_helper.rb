@@ -86,6 +86,7 @@ module UIHelpers
       end
     end
 
+    # TODO: All these Settings calls will have to be refactored for platformization
     def translation_placeholder_text(text)
       text.gsub! '<board_of_elections_address-placeholder>', Settings.contact_center.board_of_elections_address
       text.gsub! '<board_of_elections_email-placeholder>', Settings.contact_center.board_of_elections_email
@@ -131,7 +132,7 @@ module UIHelpers
       return "" if text.nil?
       # set application applicable year placeholder
       if text.include? '<application-applicable-year-placeholder>'
-        text.sub! '<application-applicable-year-placeholder>', FinancialAssistanceRegistry[:application_year].item.call.value!.to_s
+        text.sub! '<application-applicable-year-placeholder>', FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s
       else
         text
       end

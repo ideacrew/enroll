@@ -53,7 +53,7 @@ module FinancialAssistance
 
     DRIVER_QUESTION_ATTRIBUTES = [:has_job_income, :has_self_employment_income, :has_other_income,
                                   :has_deductions, :has_enrolled_health_coverage, :has_eligible_health_coverage]
-    DRIVER_QUESTION_ATTRIBUTES += [:has_unemployment_income] if FinancialAssistanceRegistry[:unemployment_income].enabled?
+    DRIVER_QUESTION_ATTRIBUTES += [:has_unemployment_income] if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income)
     DRIVER_QUESTION_ATTRIBUTES.freeze
 
     #list of the documents user can provide to verify Immigration status
@@ -201,6 +201,8 @@ module FinancialAssistance
     field :children_expected_count, type: Integer, default: 0
     field :pregnancy_due_on, type: Date
     field :pregnancy_end_on, type: Date
+
+    field :is_primary_caregiver, type: Boolean, default: false
 
     field :is_subject_to_five_year_bar, type: Boolean, default: false
     field :is_five_year_bar_met, type: Boolean, default: false
@@ -681,6 +683,8 @@ module FinancialAssistance
 
       questions_array << is_former_foster_care if foster_age_satisfied? && is_applying_coverage
       questions_array << is_post_partum_period unless is_pregnant
+      questions_array << has_unemployment_income if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income)
+      questions_array << is_physically_disabled if is_applying_coverage
       questions_array << pregnancy_due_on << children_expected_count if is_pregnant
       questions_array << pregnancy_end_on << is_enrolled_on_medicaid if is_post_partum_period
 
@@ -735,7 +739,7 @@ module FinancialAssistance
         return incomes.jobs.blank? && incomes.self_employment.present? if !has_job_income && has_self_employment_income
         incomes.jobs.blank? && incomes.self_employment.blank?
       when :other_income
-        if FinancialAssistanceRegistry[:unemployment_income].enabled?
+        if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income)
           return false if has_unemployment_income.nil?
           return incomes.unemployment.first.save if incomes.unemployment.count == 1 && has_unemployment_income
           return false if has_unemployment_income.nil? || has_other_income.nil?
@@ -750,7 +754,7 @@ module FinancialAssistance
         end
         return false if has_other_income.nil?
         return incomes.other.present? if has_other_income
-        return incomes.other.blank? || incomes.unemployment.blank? if FinancialAssistanceRegistry[:unemployment_income].enabled?
+        return incomes.other.blank? || incomes.unemployment.blank? if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income)
         incomes.other.blank?
       when :income_adjustment
         return false if has_deductions.nil?
@@ -1038,6 +1042,14 @@ module FinancialAssistance
         # Enrolled on medicaid must check if nil
         errors.add(:is_enrolled_on_medicaid, "' Was this person on Medicaid during pregnancy?' should be answered") if is_enrolled_on_medicaid.nil?
         errors.add(:pregnancy_end_on, "' Pregnancy End on date' should be answered") if pregnancy_end_on.blank?
+      end
+
+      if FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_other_question) &&
+         age_of_applicant >= 19 && is_applying_coverage == true && is_primary_caregiver.nil?
+        errors.add(
+          :is_primary_caregiver,
+          "' Is this person the main person taking care of any children age 18 or younger? *' should be answered"
+        )
       end
 
       return unless is_applying_coverage
