@@ -77,7 +77,7 @@
               - if EnrollRegistry.feature_enabled?(:sep_types)
                 li
                   = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {tab_name: 'manage-sep-types', link_path: main_app.sep_types_dt_exchanges_manage_sep_types_path, data: { turbolinks: false }, display_name: l10n("exchange.manage_sep_types.manage_seps"), active_tab: "manage-sep-types", remote: false, pundit_object: QualifyingLifeEventKind, pundit_method: :can_manage_qles?}
-              - if (ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true' || !Rails.env.production?)
+              - if EnrollRegistry.feature_enabled?(:data_seeds_ui) && (ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true' || !Rails.env.production?)
                 li
                   = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {tab_name: 'manage-data-seeds', link_path: main_app.exchanges_seeds_path, data: { turbolinks: false }, display_name: l10n("exchange.seeds.page_title"), active_tab: "manage-data-seeds", remote: false, pundit_object: HbxProfile, pundit_method: :view_admin_tabs?}
             - if EnrollRegistry.feature_enabled?(:inbox_tab)
