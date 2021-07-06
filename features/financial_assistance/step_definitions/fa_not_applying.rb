@@ -120,13 +120,23 @@ And(/^the user fills the the aplicant add member form with indian member yes/) d
   find(:xpath, '//label[@for="applicant_naturalized_citizen_false"]').click
   find(:xpath, '//label[@for="indian_tribe_member_yes"]').click
   find(:xpath, '//label[@for="radio_incarcerated_no"]').click
+end
 
+And(/the user clicks submit applicant form/) do
   all(:css, ".mz").last.click
 end
 
 Then(/the user should see an error message for indian tribal state and name/) do
   expect(page).to have_content("Tribal state is required")
   expect(page).to have_content("Tribal name is required")
+end
+
+And(/the user enters a tribal name with a number/) do
+  fill_in "applicant[tribal_name]", :with => "abc1"
+end
+
+Then(/the user should see an error for tribal name containing a number/) do
+  expect(page).to have_content("cannot contain numbers")
 end
 
 Given(/AI AN Details feature is enabled/) do
