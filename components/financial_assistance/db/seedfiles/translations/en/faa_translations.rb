@@ -3,6 +3,8 @@
 # Assistance Translations
 
 module FaaTranslations
+  # TODO: This translation is rendered for all clients.
+  # Either make thhis a client specific file (ideal) or pass through client specifics as arguements
   ASSISTANCE_TRANSLATIONS = {
     "en.faa.start_new_application" => 'Start New Application',
     "en.faa.cancel" => 'Cancel',
@@ -40,6 +42,7 @@ module FaaTranslations
     "en.faa.your_application_reference" => "Your application reference number is ",
     "en.faa.next_step_without_aggregate" => "<b>NEXT STEP:</b> Pick a health insurance plan.",
     "en.faa.next_step_with_aggregate_1" => "<b>NEXT STEP:</b><ul><li>If you’re already enrolled in DC Health Link’s Individual & Family plan, <b>we’ve automatically changed your premium. You don’t have to do anything else.</b></li>",
-    "en.faa.next_step_with_aggregate_2" => "<li>If you’re not enrolled or need to make changes to your plan, select CONTINUE to pick a health insurance plan or change who is covered by your plan.</li></ul>"
+    "en.faa.next_step_with_aggregate_2" => "<li>If you’re not enrolled or need to make changes to your plan, select CONTINUE to pick a health insurance plan or change who is covered by your plan.</li></ul>",
+    "en.faa.full_long_name_determination" => "Based on the information you provided, no one on this application is likely to qualify for %{program_short_name}. Do you still want us to send your application to the %{program_long_name} so they can check on %{program_short_name} eligibility? "
   }.freeze
 end
