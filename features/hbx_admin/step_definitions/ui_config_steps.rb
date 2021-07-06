@@ -81,6 +81,23 @@ Then(/^they should not see the Staff tab$/) do
   expect(page).to_not have_content("Staff")
 end
 
+Given(/orphan accounts feature is enabled?/) do
+  enable_feature(:orphan_accounts_tab)
+end
+
+Given(/orphan accounts feature is disabled?/) do
+  disable_feature(:orphan_accounts_tab)
+end
+
+Then(/^they should see the Orphan Accounts tab$/) do
+  expect(page).to have_content("Orphan Accounts")
+end
+
+
+Then(/^they should not see the Orphan Accounts tab$/) do
+  expect(page).to_not have_content("Orphan Accounts")
+end
+
 And(/^the user clicks the Admin tab$/) do
   page.find('.dropdown-toggle', text: 'Admin').click
 end
