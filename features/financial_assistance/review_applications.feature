@@ -2,6 +2,7 @@ Feature: My Financial Assistance Applications page that visit the Review Applica
   Background: Review your application page
     Given a consumer exists
     And the FAA feature configuration is enabled
+    And FAA display_medicaid_question feature is enabled
     And is logged in
 
   Scenario: Review Application link will be disabled in draft state

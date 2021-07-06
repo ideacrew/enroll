@@ -155,5 +155,8 @@ registry:
           item: false
     - key: :full_medicaid_determination_step
       is_enabled: true
+    - key: :display_medicaid_question
+      item: :display_medicaid_question
+      is_enabled: false
 # TODO eligibility engine connectivity(HAVEN) settings
 # TODO mec service connectivity settings

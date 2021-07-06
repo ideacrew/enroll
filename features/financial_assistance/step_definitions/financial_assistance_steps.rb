@@ -382,10 +382,6 @@ Given(/^Indian Health Service Question feature is enabled$/) do
   enable_feature :indian_health_service_question
 end
 
-Given(/^MaineCare questions feature is enabled$/) do
-  enable_fa_feature :medicaid_chip_driver_questions
-end
-
 Then(/^the consumer will not see the Cost Savings link$/) do
   expect(page).to have_no_link('Cost Savings')
 end
@@ -471,4 +467,11 @@ end
 Then(/^the user should see the popup for the remove applicant confirmation$/) do
   popup_text = "Are you sure you want to remove this applicant?"
   expect(page).to have_content(popup_text)
+end
+
+And(/^all applicants are not medicaid chip eligible and are non magi medicaid eligible$/) do
+  application.applicants.each do |applicant|
+    applicant.update_attributes(is_medicaid_chip_eligible: false)
+    applicant.update_attributes(is_non_magi_medicaid_eligible: false)
+  end
 end
