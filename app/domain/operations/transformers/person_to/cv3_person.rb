@@ -10,13 +10,11 @@ module Operations
     module PersonTo
       # Person params to be transformed.
       class Cv3Person
-        # constructs cv3 payload for medicaid gateway.
         include Dry::Monads[:result, :do]
         include Acapi::Notifiers
         include Rails.application.routes.url_helpers
         require 'securerandom'
-        # @param [ Hash ] params Applicant Attributes
-        # @return [ BenefitMarkets::Entities::Applicant ] applicant Applicant
+
         def call(person)
           request_payload = yield construct_payload(person)
 
