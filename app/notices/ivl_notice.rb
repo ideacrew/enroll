@@ -128,9 +128,13 @@ class IvlNotice < Notice
     path = template_path.nil? ? notice_path : template_path
     blank_page = Rails.root.join('lib/pdf_templates', 'blank.pdf')
     page_count = Prawn::Document.new(:template => path).page_count
-    if (page_count % 2) == 1
-      join_pdfs_with_path([path, blank_page], path)
-    end
+    join_pdfs_with_path([path, blank_page], path) if page_count.odd?
+  rescue StandardError => e
+    message = "Error Attaching IVL Notice PDF with Prawn: #{e.message}; "
+    message += "PDF Path: #{path}, "
+    message += "stacktrace: #{e.backtrace}"
+    log(message, {:severity => "error"})
+    raise e
   end
 
   def lawful_presence_outstanding?(person)

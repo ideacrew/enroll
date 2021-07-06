@@ -75,6 +75,7 @@ RSpec.configure do |config|
   config.include FactoryBot::Syntax::Methods
   config.include FederalHolidaysHelper
   config.include Config::AcaModelConcern
+  config.include ActionView::Helpers::TranslationHelper
   config.include L10nHelper
   config.include ViewTranslationsLinterHelper
 
