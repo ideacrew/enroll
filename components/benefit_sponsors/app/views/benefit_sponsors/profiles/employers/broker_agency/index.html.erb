@@ -1,11 +1,11 @@
 <% if @filter_criteria.empty? %>
   <%= content_for :broker_agencies_panel, flush: true do %>
     <%= render partial: 'index' %>
-  <%= end %>
+  <% end %>
   <%= content_for :broker_agencies_panel %>
 <% else %>
   <%= content_for :broker_agencies_listing, flush: true do %>
     <%= render partial: 'broker_agencies_listing' %>
-  <%= end %>
+  <% end %>
   <%= content_for :broker_agencies_listing %>
 <% end %>
