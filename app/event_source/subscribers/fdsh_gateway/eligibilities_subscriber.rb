@@ -5,9 +5,9 @@ module Subscribers
   # Subscriber will receive response payload from FDSH gateway
     class EligibilitiesSubscriber
       include EventSource::Logging
-      include ::EventSource::Subscriber[amqp: 'fdsh.eligibilities']
+      include ::EventSource::Subscriber[amqp: 'fdsh.eligibilities.ridp']
 
-      subscribe(:ridp_service_dettermined) do |delivery_info, _metadata, response|
+      subscribe(:on_determined_primary_eligible) do |delivery_info, _metadata, response|
         logger.info "Ridp::EligibilitiesSubscriber: invoked on_magi_medicaid_mitc_eligibilities with delivery_info: #{delivery_info}, response: #{response}"
         payload = JSON.parse(response, :symbolize_names => true)
         result = FinancialAssistance::Operations::Applications::MedicaidGateway::AddEligibilityDetermination.new.call(payload)

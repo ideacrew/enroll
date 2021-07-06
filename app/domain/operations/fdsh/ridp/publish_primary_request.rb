@@ -12,7 +12,7 @@ module Operations
         include EventSource::Command
 
         def call(payload)
-          event = yield build_event(payload)
+          event  = yield build_event(payload)
           result = yield publish(event)
 
           Success(result)
@@ -21,8 +21,9 @@ module Operations
         private
 
         def build_event(payload)
-          #todo
-          # event('events.iap.applications.determine_eligibility', attributes: payload)
+          event = event('events.fdsh.ridp.primary_determination_requested', attributes: payload)
+
+          Success(event)
         end
 
         def publish(event)
