@@ -8,5 +8,3 @@ FinancialAssistanceRegistry.configure do |config|
   config.load_path  = FinancialAssistance::Engine.root.join('system', 'config', 'templates', 'features').to_s.gsub("components/financial_assistance/", '')
 end
 
-binding.irb
-
