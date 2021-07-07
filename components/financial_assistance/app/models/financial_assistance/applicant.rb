@@ -50,6 +50,7 @@ module FinancialAssistance
     ].freeze
     INCOME_VALIDATION_STATES = %w[na valid outstanding pending].freeze
     MEC_VALIDATION_STATES = %w[na valid outstanding pending].freeze
+    CSR_KINDS = ['csr_100', 'csr_94', 'csr_87', 'csr_73', 'csr_0', 'csr_limited'].freeze
 
     DRIVER_QUESTION_ATTRIBUTES = [:has_job_income, :has_self_employment_income, :has_other_income,
                                   :has_deductions, :has_enrolled_health_coverage, :has_eligible_health_coverage]
@@ -230,6 +231,9 @@ module FinancialAssistance
     field :has_enrolled_health_coverage, type: Boolean
     field :has_eligible_health_coverage, type: Boolean
 
+    field :csr_percent_as_integer, type: Integer, default: 0  #values in DC: 0, 73, 87, 94
+    field :csr_eligibility_kind, type: String, default: 'csr_0'
+
     # if eligible immigration status
     field :medicaid_chip_ineligible, type: Boolean
     field :immigration_status_changed, type: Boolean
@@ -282,6 +286,11 @@ module FinancialAssistance
               inclusion: { in: TAX_FILER_KINDS, message: "%{value} is not a valid tax filer kind" },
               allow_blank: true
 
+    validates :csr_eligibility_kind,
+              allow_blank: false,
+              inclusion: { in: CSR_KINDS,
+                           message: "%{value} is not a valid cost sharing eligibility kind" }
+
     alias is_medicare_eligible? is_medicare_eligible
     alias is_joint_tax_filing? is_joint_tax_filing
 
@@ -296,6 +305,24 @@ module FinancialAssistance
 
     def generate_hbx_id
       write_attribute(:person_hbx_id, FinancialAssistance::HbxIdGenerator.generate_member_id) if person_hbx_id.blank?
+    end
+
+    def csr_percent_as_integer=(new_csr_percent)
+      super
+      self.csr_eligibility_kind = case csr_percent_as_integer
+                                  when 73
+                                    'csr_73'
+                                  when 87
+                                    'csr_87'
+                                  when 94
+                                    'csr_94'
+                                  when 100
+                                    'csr_100'
+                                  when -1
+                                    'csr_limited'
+                                  else
+                                    'csr_0'
+                                  end
     end
 
     def us_citizen=(val)
