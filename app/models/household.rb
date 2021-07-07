@@ -319,7 +319,8 @@ class Household
     th.tax_household_members.build(
         family_member: family.primary_family_member,
         is_subscriber: true,
-        is_ia_eligible: true
+        is_ia_eligible: true,
+        csr_percent_as_integer: csr
     )
 
     deter = th.eligibility_determinations.build(
