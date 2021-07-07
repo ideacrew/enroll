@@ -60,10 +60,36 @@ registry:
         is_enabled: true
       - key: :indian_health_service_question
         is_enabled: true
-      - key: :has_medicare_cubcare_eligible
-        is_enabled: true
       - key: :has_dependent_with_coverage
         is_enabled: true
+      - key: :has_enrolled_health_coverage
+        is_enabled: true
+        settings:
+          - key: :currently_enrolled
+            item: false
+          - key: :currently_enrolled_with_hra
+            item: true
+      - key: :has_eligible_health_coverage
+        is_enabled: true
+        settings:
+          - key: :currently_eligible
+            item: false
+          - key: :currently_eligible_with_hra
+            item: true
+      - key: :has_medicare_cubcare_eligible
+        is_enabled: false
+      - key: :medicaid_chip_driver_questions
+        is_enabled: false
+        settings:
+          - key: :medicaid_chip
+            item: "Medicaid"
+      - key: :net_annual_income_display
+        is_enabled: false
+      - key: :prize_and_awards
+        is_enabled: true
+        settings:
+          - key: :gamble_prize
+            item: false
+  # TODO eligibility engine connectivity(HAVEN) settings
+  # TODO mec service connectivity settings
 
-    # TODO eligibility engine connectivity(HAVEN) settings
-    # TODO mec service connectivity settings

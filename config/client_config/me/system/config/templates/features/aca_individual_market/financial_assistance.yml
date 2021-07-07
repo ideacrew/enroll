@@ -64,6 +64,18 @@ registry:
         is_enabled: true
       - key: :has_dependent_with_coverage
         is_enabled: true
+      - key: :medicaid_chip_driver_questions
+        is_enabled: false
+        settings:
+          - key: :medicaid_chip
+            item: "Medicaid"
+      - key: :net_annual_income_display
+        is_enabled: false
+      - key: :prize_and_awards
+        is_enabled: true
+        settings:
+          - key: :gamble_prize
+            item: false
 
     # TODO eligibility engine connectivity(HAVEN) settings
     # TODO mec service connectivity settings
