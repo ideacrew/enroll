@@ -70,7 +70,12 @@ module Operations
       describe "not passing keys :body and :subject" do
 
         let(:params) { {} }
-        let(:error_message) {{:subject => ['is missing'], :body => ['is missing']}}
+        let(:error_message) do
+          {
+            :body => ["is missing", "must be a string"],
+            :subject => ["is missing", "must be a string"]
+          }
+        end
 
 
         it "fails" do
