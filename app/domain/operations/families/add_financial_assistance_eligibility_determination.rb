@@ -36,7 +36,7 @@ module Operations
                                                        is_eligibility_determined: faa_ed["is_eligibility_determined"])
           applicants = values[:applicants].select{|app| app["eligibility_determination_id"] == faa_ed["_id"]}
           applicants.each do |applicant| #todo select instead
-            create_tax_household_members(family, th, applicant)
+            create_tax_household_members(family, th, applicant, faa_ed)
           end
 
           build_eligibility_determinations(th, faa_ed, benchmark_plan_id)
@@ -53,7 +53,6 @@ module Operations
         tax_household.eligibility_determinations.build(
           benchmark_plan_id: benchmark_plan_id,
           max_aptc: verified_aptc,
-          csr_percent_as_integer: faa_ed["csr_percent_as_integer"],
           determined_at: faa_ed["determined_at"],
           aptc_csr_annual_household_income: faa_ed["aptc_csr_annual_household_income"],
           aptc_annual_income_limit: faa_ed["aptc_annual_income_limit"],
@@ -62,10 +61,11 @@ module Operations
         ).save
       end
 
-      def create_tax_household_members(family, tax_household, applicant)
+      def create_tax_household_members(family, tax_household, applicant, faa_ed)
         family_member = fetch_family_member_from_applicant(family, applicant)
 
         return Failure('Unable to find family member') if family_member.blank?
+        is_ia_eligible = applicant["is_ia_eligible"] == "true" || applicant["is_ia_eligible"] == true
 
         tax_household.tax_household_members.build(
           applicant_id: family_member.id,
@@ -78,7 +78,8 @@ module Operations
           is_ia_eligible: applicant["is_ia_eligible"],
           is_medicaid_chip_eligible: applicant["is_medicaid_chip_eligible"],
           is_non_magi_medicaid_eligible: applicant["is_non_magi_medicaid_eligible"],
-          is_totally_ineligible: applicant["is_totally_ineligible"]
+          is_totally_ineligible: applicant["is_totally_ineligible"],
+          csr_percent_as_integer: is_ia_eligible ? faa_ed["csr_percent_as_integer"] : nil
         )
       end
 
