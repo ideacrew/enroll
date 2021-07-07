@@ -30,7 +30,7 @@ module FinancialAssistance
           end
 
           def update_application_and_applicant(valid_params)
-            @application  = valid_params[:application]
+            @application = valid_params[:application]
             @response_payload = @application.eligibility_response_payload
 
             return Failure('No response payload') if @response_payload.blank?
@@ -59,6 +59,7 @@ module FinancialAssistance
             Success(build_or_update_applicants_eligibility_determinations(verified_family, primary_applicant, active_verified_household))
           end
 
+          # rubocop:disable Metrics/CyclomaticComplexity
           def build_or_update_applicants_eligibility_determinations(verified_family, _primary_applicant, active_verified_household)
             verified_tax_households = active_verified_household.tax_households.select{|th| th.primary_applicant_id == verified_family.primary_family_member_id}
             return unless verified_tax_households.present?
@@ -67,7 +68,7 @@ module FinancialAssistance
             @application.eligibility_determinations.each { |ed| ed_hbx_assigned_ids << ed.hbx_assigned_id.to_s}
             verified_tax_households.each do |vthh|
               if ed_hbx_assigned_ids.include?(vthh.hbx_assigned_id)
-                eligibility_determination =  @application.eligibility_determinations.select{|ed| ed.hbx_assigned_id == vthh.hbx_assigned_id.to_i}.first
+                eligibility_determination = @application.eligibility_determinations.select{|ed| ed.hbx_assigned_id == vthh.hbx_assigned_id.to_i}.first
                 eligibility_determination.update_attributes(effective_starting_on: vthh.start_date, is_eligibility_determined: true)
                 applicants_persons_hbx_ids = []
                 @application.applicants.each { |appl| applicants_persons_hbx_ids << appl.person_hbx_id.to_s}
@@ -83,6 +84,7 @@ module FinancialAssistance
             end
             @application.save!
           end
+          # rubocop:enable Metrics/CyclomaticComplexity
 
           def update_eligibility_determinations(vthh, eligibility_determination)
             verified_eligibility_determination = vthh.eligibility_determinations.max_by(&:determination_date) #Finding the right Eligilbilty Determination
