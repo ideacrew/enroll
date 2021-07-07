@@ -26,6 +26,11 @@ registry:
       - key: :non_magi_referral_display
         is_enabled: true
   - namespace:
+    - :csr_eligibility
+    features:
+      - key: :native_american_csr
+        is_enabled: true
+  - namespace:
     - :enrollment_dates
     features:
       - key: :application_new_year_effective_date
