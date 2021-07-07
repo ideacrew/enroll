@@ -150,12 +150,12 @@ registry:
         is_enabled: false
       - key: :non_magi_referral_display
         is_enabled: false
-    - namespace:
-      - :request_determination
-      features:
-      - key: :haven_determination
-        is_enabled: true
-      - key: :medicaid_gateway_determination
-        is_enabled: false
+  - namespace:
+    - :request_determination
+    features:
+    - key: :haven_determination
+      is_enabled: true
+    - key: :medicaid_gateway_determination
+      is_enabled: false
   # TODO eligibility engine connectivity(HAVEN) settings
   # TODO mec service connectivity settings
