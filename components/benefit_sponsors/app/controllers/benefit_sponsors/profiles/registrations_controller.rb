@@ -18,6 +18,7 @@ module BenefitSponsors
         respond_to do |format|
           format.html
           format.js
+          format.json { render nothing: true, :status => 404 }
         end
       end
 
