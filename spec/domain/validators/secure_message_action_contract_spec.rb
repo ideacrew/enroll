@@ -70,7 +70,15 @@ module Validators
     describe "not passing :resource_id, :subject, :actions_id, :body :resource_name" do
 
       let(:params) { { }}
-      let(:error_message) {{:actions_id => ["is missing", "must be a string"], :body => ["is missing", "must be a string"], :resource_name => ["is missing", "must be a string"], :subject => ["is missing", "must be a string"]}}
+      let(:error_message) do
+        {
+          :actions_id => ["is missing", "must be a string"],
+          :body => ["is missing", "must be a string"],
+          :resource_id => ["is missing", "must be a string"],
+          :resource_name => ["is missing", "must be a string"],
+          :subject => ["is missing", "must be a string"]
+        }
+      end
 
       it "fails" do
         expect(subject).not_to be_success
