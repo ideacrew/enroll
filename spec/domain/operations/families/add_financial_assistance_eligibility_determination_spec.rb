@@ -152,6 +152,10 @@ RSpec.describe Operations::Families::AddFinancialAssistanceEligibilityDeterminat
     it 'should create Eligibility Determination object' do
       expect(@thhs.first.latest_eligibility_determination.max_aptc.to_f).to eq(58.26)
     end
+
+    it 'should update csr on thh member' do
+      expect(@thhs.first.tax_household_members.first.csr_eligibility_kind).to eq("csr_0")
+    end
   end
 
   context 'failure' do
