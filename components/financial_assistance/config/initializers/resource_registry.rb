@@ -5,5 +5,8 @@ FinancialAssistanceRegistry = ResourceRegistry::Registry.new
 FinancialAssistanceRegistry.configure do |config|
   config.name       = :financial_assistance
   config.created_at = DateTime.now
-  config.load_path  = FinancialAssistance::Engine.root.join('system', 'config', 'templates', 'features').to_s
+  config.load_path  = FinancialAssistance::Engine.root.join('system', 'config', 'templates', 'features').to_s.gsub("components/financial_assistance/", '')
 end
+
+binding.irb
+
