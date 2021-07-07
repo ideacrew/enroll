@@ -98,7 +98,7 @@ module Services
 
     def trigger_enrollment_notice(enrollment)
       # TODO: Publish enrollment submitted event code goes here
-      ::Operations::Notices::IvlEnrNoticeTrigger.new.call(enrollment)
+      ::Operations::Notices::IvlEnrNoticeTrigger.new.call(enrollment) unless Rails.env.test?
     end
 
     def send_reminder_notices_for_ivl(date)
