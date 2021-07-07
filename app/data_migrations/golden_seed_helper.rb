@@ -23,6 +23,10 @@ module GoldenSeedHelper
     @site = BenefitSponsors::Site.all.first
   end
 
+  def counter_number
+    (0..999).to_a.sample
+  end
+
   # These methods are in case you want to avoid external
   # hbx id calls
   # def update_person_hbx_ids
