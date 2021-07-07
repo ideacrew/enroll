@@ -11,7 +11,7 @@ module Operations
       include EventSource::Command
       include EventSource::Logging
 
-      def call(params:)
+      def call(params)
         _values = yield validate(params)
         # raw_payload = yield build_payload(values[:enrollment])
         # validated_payload = yield validate_payload(raw_payload)
