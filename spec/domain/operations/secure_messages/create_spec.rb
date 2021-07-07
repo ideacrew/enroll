@@ -72,8 +72,8 @@ module Operations
         let(:params) { {} }
         let(:error_message) do
           {
-            :body=>["is missing", "must be a string"],
-            :subject=>["is missing", "must be a string"]
+            :body => ["is missing", "must be a string"],
+            :subject => ["is missing", "must be a string"]
           }
         end
 
