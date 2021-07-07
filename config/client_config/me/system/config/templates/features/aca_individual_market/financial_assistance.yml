@@ -76,6 +76,12 @@ registry:
         settings:
           - key: :gamble_prize
             item: false
+      - key: :immigration_status_question_required
+        is_enabled: true
+      - key: :consumer_validations
+        is_enabled: true
+      - key: :non_magi_referral_display
+        is_enabled: true
 
     # TODO eligibility engine connectivity(HAVEN) settings
     # TODO mec service connectivity settings
