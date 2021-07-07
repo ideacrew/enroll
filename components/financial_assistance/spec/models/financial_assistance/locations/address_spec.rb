@@ -87,8 +87,8 @@ module FinancialAssistance
       end
 
       context 'embedded in another object', type: :model do
-        it {should validate_presence_of :address_1}
-        it {should validate_presence_of :city}
+        it {should validate_presence_of(:address_1).with_message(/Please enter address_1/)}
+        it {should validate_presence_of(:city).with_message(/Please enter city/)}
         it {should validate_presence_of :state}
         it {should validate_presence_of :zip}
 
