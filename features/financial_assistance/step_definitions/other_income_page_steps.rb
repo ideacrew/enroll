@@ -48,6 +48,10 @@ Given(/^the user checks a other income checkbox$/) do
   find(:css, "#other_income_kind[value='alimony_and_maintenance']").set(true)
 end
 
+Given(/^the user checks capital gains checkbox$/) do
+  find(:css, "#other_income_kind[value='capital_gains']").set(true)
+end
+
 Then(/^the other income form should show$/) do
   expect(page).to have_content "Amount *"
   expect(page).to have_content "HOW OFTEN *"
@@ -65,6 +69,13 @@ Given(/^the user fills out the required other income information$/) do
   find_all('.interaction-choice-control-income-frequency-kind-1')[0].click
 end
 
+And(/^the user fills out the other income information with negative income$/) do
+  fill_in 'income[amount]', with: '-100'
+  fill_in 'income[start_on]', with: '1/01/2018'
+  find_all(".interaction-choice-control-income-frequency-kind")[0].click
+  find_all('.interaction-choice-control-income-frequency-kind-1')[0].click
+end
+
 Then(/^the save button should be enabled$/) do
   expect(find(:css, '.interaction-click-control-save')[:class].include?('disabled')).to eq(false)
 end
@@ -75,6 +86,15 @@ end
 
 Then(/^the other income information should be saved on the page$/) do
   expect(page).to have_content '100.00'
+  expect(page).to have_content '1/01/2018'
+end
+
+Then(/^the other income information should not be saved$/) do
+  expect(page).to have_content 'Negative Income'
+end
+
+Then(/^the negative other income information should be saved on the page$/) do
+  expect(page).to have_content '-$100.00'
   expect(page).to have_content '1/01/2018'
 end
 

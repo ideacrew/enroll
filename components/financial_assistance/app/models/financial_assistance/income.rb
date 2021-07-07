@@ -118,6 +118,7 @@ module FinancialAssistance
 
     validates :start_on, presence: true, on: [:step_1, :submission]
     validate :start_on_must_precede_end_on
+    validate :check_if_valid_amount
 
     def hours_worked_per_week
       return 0 if end_on.blank? || end_on > TimeKeeper.date_of_record
@@ -196,6 +197,12 @@ module FinancialAssistance
     def start_on_must_precede_end_on
       return unless start_on.present? && end_on.present?
       errors.add(:end_on, "Date can't occur before start on date") if end_on < start_on
+    end
+
+    def check_if_valid_amount
+      return if negative_income_accepted?
+
+      errors.add(:amount, "#{amount} must be greater than $0") if amount.to_f < 0
     end
   end
 end

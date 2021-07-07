@@ -375,5 +375,3 @@ registry:
         is_enabled: true
       - key: :mainecare_cubcare_glossary
         is_enabled: true
-      - key: :legacy_enrollment_trigger
-        is_enabled: false

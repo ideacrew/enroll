@@ -15,9 +15,9 @@ registry:
         is_enabled: true
         settings:
           - key: :abbreviation
-            item: 'DC'
+            item: 'ME'
           - key: :name
-            item: 'District of Columbia'
+            item: 'Maine'
   - namespace:
     - :enrollment_dates
     features:
@@ -86,20 +86,20 @@ registry:
         - key: :currently_eligible_with_hra
           item: true
     - key: :has_medicare_cubcare_eligible
-      is_enabled: false
+      is_enabled: true
     - key: :medicaid_chip_driver_questions
-      is_enabled: false
+      is_enabled: true
       settings:
         - key: :medicaid_chip
-          item: "Medicaid"
+          item: "MaineCare (Medicaid)"
     - key: :net_annual_income_display
-      is_enabled: false
+      is_enabled: true
     - key: :prize_and_awards
       is_enabled: true
       settings:
         - key: :gamble_prize
-          item: false
+          item: true
     - key: :full_medicaid_determination_step
-      is_enabled: true
+      is_enabled: false
   # TODO eligibility engine connectivity(HAVEN) settings
   # TODO mec service connectivity settings
