@@ -55,6 +55,23 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     it { is_expected.to have_field(:workflow).of_type(Hash).with_default_value_of({}) }
   end
 
+  describe "after create methods" do
+    let(:primary_person) {FactoryBot.create(:person, :with_consumer_role, :with_family)}
+    let(:family_id) { BSON::ObjectId.new }
+    let(:application) { FactoryBot.create(:financial_assistance_application, family_id: primary_person.primary_family.id) }
+    before do
+      # Figure out how to mock stub it in here
+      primary_person
+      application
+    end
+    context "#create_income_verification_type" do
+      it "should create a verification type with type of income" do
+        primary_person.reload
+        expect(primary_person.verification_types.where(type_name: "Income").count).to eq(1)
+      end
+    end
+  end
+
   describe '.Validations' do
     subject { application }
 

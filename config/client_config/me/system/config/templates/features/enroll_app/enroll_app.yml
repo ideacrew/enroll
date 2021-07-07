@@ -353,3 +353,5 @@ registry:
         settings:
           - key: :days
             item: 60
+      - key: :verification_type_income_verification
+        is_enabled: true

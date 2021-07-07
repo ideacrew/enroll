@@ -6,8 +6,12 @@ class VerificationType
   embedded_in :person
 
   LOCATION_RESIDENCY = EnrollRegistry[:enroll_app].setting(:state_residency).item
-  ALL_VERIFICATION_TYPES = [LOCATION_RESIDENCY, "Social Security Number", "American Indian Status", "Citizenship", "Immigration status"].freeze
-  NON_CITIZEN_IMMIGRATION_TYPES = [LOCATION_RESIDENCY, "Social Security Number", "American Indian Status"].freeze
+  ALL_VERIFICATION_TYPES = [LOCATION_RESIDENCY, "Social Security Number", "American Indian Status", "Citizenship", "Immigration status"].tap do |types|
+    types << "Income" if EnrollRegistry.feature_enabled?(:verification_type_income_verification)
+  end.freeze
+  NON_CITIZEN_IMMIGRATION_TYPES = [LOCATION_RESIDENCY, "Social Security Number", "American Indian Status"].tap do |types|
+    types << "Income" if EnrollRegistry.feature_enabled?(:verification_type_income_verification)
+  end.freeze
   VALIDATION_STATES = %w[na unverified pending review outstanding verified attested expired curam].freeze
   OUTSTANDING_STATES = %w[outstanding].freeze
   DUE_DATE_STATES = %w[review outstanding].freeze

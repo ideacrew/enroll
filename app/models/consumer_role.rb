@@ -701,6 +701,8 @@ class ConsumerRole
       live_types << LOCATION_RESIDENCY
       live_types << 'Social Security Number' if ssn
       live_types << 'American Indian Status' if !(tribal_id.nil? || tribal_id.empty?)
+      # Supposed to be on financial assistance application
+      # live_types << 'Income' if EnrollRegistry.feature_enabled?(:verification_type_income_verification)
       if us_citizen
         live_types << 'Citizenship'
       else

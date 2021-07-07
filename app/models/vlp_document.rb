@@ -44,7 +44,8 @@ class VlpDocument < Document
       "I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)",
       "DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)",
       "Other (With Alien Number)",
-      "Other (With I-94 Number)"
+      "Other (With I-94 Number)",
+      "Income"
     ]
 
     VLP_DOCUMENTS_VERIF_STATUS = ['not submitted', 'downloaded', 'verified', 'rejected']
