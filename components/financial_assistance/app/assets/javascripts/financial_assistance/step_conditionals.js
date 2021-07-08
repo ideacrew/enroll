@@ -1,6 +1,6 @@
 document.addEventListener("turbolinks:load", function() {
   $('.step-tabs, .interaction-click-control-my-household').on('click', function(e) {
-    //Leave without saving for all side nav items - this gathers all items 
+    //Leave without saving for all side nav items - this gathers all items
     $('.btn.btn-primary').click(function() {
         window.location.href = e.target.href;
       });
@@ -24,7 +24,7 @@ document.addEventListener("turbolinks:load", function() {
 
   // To hide/show the foster care related questions based on the age_of_applicant.
   function hide_show_foster_care_related_qns(age) {
-    if (age > 18 && age < 26){
+    if (age >= 18 && age < 26){
       $('#is_former_foster_care_yes').parents('.row-form-wrapper').removeClass('hide');
     } else {
       $('#is_former_foster_care_yes').parents('.row-form-wrapper').addClass('hide');
@@ -38,9 +38,9 @@ document.addEventListener("turbolinks:load", function() {
     $.ajax({
       type: "GET",
       data:{},
-      url: window.location.href.replace(/step(\/1)?/, 'primary_applicant_has_spouse'),
-      success: function (has_spouse) {
-        if(has_spouse == 'true'){
+      url: window.location.href.replace(/step(\/1)?/, 'applicant_is_eligible_for_joint_filing'),
+      success: function (has_spouse_relationship) {
+        if(has_spouse_relationship == 'true'){
           $('#is_joint_tax_filing_no').parents('.row-form-wrapper').removeClass('hide');
         }
       }

@@ -32,6 +32,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.personal_information' => "Personal Information",
   :'en.insured.consumer_roles.help_question_info' => "Enter your personal information and answer the following questions. When you're finished, select CONTINUE.",
   :'en.required_field' => "required field",
+  :'en.insured.consumer_roles.naturalized_question' => "Is this person a naturalized citizen?",
   :'en.required_field_plural' => "required fields",
   :'en.insured.consumer_roles.select_doc_type' => "Select document type",
   :'en.insured.consumer_roles.no_match_info' => "Next, we need to verify if you or you and your family are eligible to enroll in coverage through %{site_short_name}. Select CONTINUE.",
@@ -43,7 +44,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.consumer_roles.ridp_agreement.ridp_agreement_html' => "<h2 class='darkblue'>Authorization and Consent</h2><p> Read the authorization and consent statement. You must select 'I Agree' to complete your application online. When you're finished, select CONTINUE.</p><p>For your security, we need to verify your identity before you can proceed. If you agree, you are providing consent to Experian to access your personal information to conduct identity verification on behalf of the Centers for Medicare and Medicaid Services (CMS) — part of the US Department of Health and Human Services (HHS). Below are a few items to keep in mind.</p><ul><li>Make sure that you entered your legal name, current home address, phone number, date of birth and email address correctly. We will only collect personal information to verify your identity with Experian, a third party identity verification provider.</li><br><li>To verify your identity, Experian uses information from your consumer credit report profile. As a result, you may see an entry called a “soft inquiry” on your Experian consumer report. Soft inquiries are only visible to you, are never shared with third parties, and do not affect your credit score. The soft inquiry will be titled “CMS Proofing Services” and will be removed from your Experian consumer report after 25 months.</li><br><li>You may need to have access to your personal and consumer report information, as the Experian application will pose questions to you based on data in their files.</li></ul><p><br>Select one of the following options to continue:</p>",
   :'en.insured.consumer_roles.ridp_agreement.ridp_agreement_alert_msg' => "Please contact %{site_short_name} at %{contact_center_phone_number} for more info",
   :'en.insured.consumer_roles.search.enter_personal_info_msg' => "Enter your personal information. When you're finished, select CONTINUE.",
-  :'en.insured.consumer_roles.search.no_ssn_tooltip' => "You should only select 'I don't have an SSN' if the person doesn't have a social security number. We use this information to verify your identity.",
+  :'en.insured.consumer_roles.search.no_ssn_tooltip' => "We use this information to help verify your identity. Don’t enter Individual Taxpayer Identification Numbers (ITINS) or any other numbers here if you don't have a Social Security number. Some lawfully present people may not have or be eligible for an SSN. They can still apply for health coverage without an SSN. For more information on how to get an SSN, visit socialsecurity.gov",
   :'en.insured.consumer_roles.search.gender_tooltip' => "Gender is a required field on the application. You can choose how to answer this question, and we don’t compare your response against any data sources. The gender you choose is included in the information we send to your insurance company, but it’s a violation of District of Columbia law to restrict access to health benefits based on gender expression or identity.",
   :'en.insured.home_address_tooltip' => "Your home address is where you legally reside. If you prefer to receive mail at another address such as your office or a PO Box, select 'Add Mailing Address'.",
   :'en.is_not_your_employer' => "Not your employer?",
@@ -213,6 +214,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.inbox' => "Inbox",
   :'en.sent' => "Sent",
   :'en.from' => "From",
+  :'en.to' => "To",
   :'en.date' => "Date",
   :'en.name_hbx_id_ssn' => "Name, HBX ID, SSN",
   :'en.insured.switch_to_aptc_or_csr_families' => "Switch to APTC / CSR Families",
@@ -446,5 +448,10 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.plan_shoppings.thankyou.confirm_your_plan_selection.content' => "Please review your current plan selection. Select PREVIOUS if you want to change your plan selection. When you're satisfied with your plan, carefully review and acknowledge the Agreement below along with the Terms and Conditions. You must also provide an electronic signature at the bottom of the page. When you're finished, select CONFIRM to submit your enrollment to your insurance company. You don't have to pay today.",
   :'en.important' => "Important",
   :'en.insured.plan_shoppings.thankyou.you_must_complete_steps_to_enroll' => "You must complete these steps to enroll.",
-  :'en.insured.plan_shoppings.thankyou.additional_administration_msg' => "* Your employer may charge an additional administration fee for your COBRA/Continuation coverage. If you have any questions, please direct them to the Employer."
+  :'en.insured.plan_shoppings.thankyou.additional_administration_msg' => "* Your employer may charge an additional administration fee for your COBRA/Continuation coverage. If you have any questions, please direct them to the Employer.",
+  :'en.insured.review_information' => "I have reviewed the information in this application and I attest, under penalty of perjury, that it is accurate and complete to the best of my knowledge. I understand that if I’m not truthful, there may be a penalty, including retroactive termination of my coverage and an obligation to repay all medical claims previous covered by the health insurance",
+  :'en.insured.tribal_state' => "Where is this person's tribe located?",
+  :'en.insured.tribal_name' => "Which federally recognized tribe does this person belong to?",
+  :'en.insured.tribal_state_alert' => 'Tribe state is required',
+  :'en.insured.tribal_name_alert' => 'Federally recognized tribe name is required'
 }.freeze

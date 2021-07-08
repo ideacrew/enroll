@@ -24,6 +24,8 @@ module FinancialAssistance
         optional(:race).maybe(:string)
         optional(:indian_tribe_member).maybe(:bool)
         optional(:tribal_id).maybe(:string)
+        optional(:tribal_state).maybe(:string)
+        optional(:tribal_name).maybe(:string)
 
         optional(:language_code).maybe(:string) # Fix Me
         optional(:no_dc_address).filled(:bool) # Fix Me
@@ -69,9 +71,7 @@ module FinancialAssistance
       end
 
       rule(:ssn, :no_ssn) do
-        if values[:ssn].blank? && values[:no_ssn] == '0'
-          key.failure(text: "ssn is missing")
-        end
+        key.failure(text: "ssn is missing") if values[:ssn].blank? && values[:no_ssn] == '0' && values[:is_applying_coverage]
       end
 
       rule(:is_primary_applicant) do

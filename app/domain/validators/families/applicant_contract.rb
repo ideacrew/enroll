@@ -24,6 +24,8 @@ module Validators
         optional(:race).maybe(:string)
         optional(:indian_tribe_member).maybe(:bool)
         optional(:tribal_id).maybe(:string)
+        optional(:tribal_state).maybe(:string)
+        optional(:tribal_name).maybe(:string)
 
         required(:eligibility_determination_id).filled(Types::Bson)
         required(:magi_medicaid_category).maybe(:string)

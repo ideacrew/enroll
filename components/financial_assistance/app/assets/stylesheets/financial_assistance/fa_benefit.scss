@@ -14,3 +14,13 @@
 .checklist-title-header {
 	padding: 10px 15px;
 }
+
+#health-coverage-page
+{
+	.benefit-kinds, .driver-question {
+		margin-bottom: 2rem;
+	}
+	.benefit-kinds .benefit-kind:last-child {
+		padding-bottom: 0px;
+	}
+}

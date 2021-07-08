@@ -1,5 +1,13 @@
 # frozen_string_literal: true
 
+class VlpDocument
+  VLP_DOCUMENT_KINDS = ["I-327 (Reentry Permit)", "I-551 (Permanent Resident Card)", "I-571 (Refugee Travel Document)", "I-766 (Employment Authorization Card)",
+                        "Certificate of Citizenship","Naturalization Certificate","Machine Readable Immigrant Visa (with Temporary I-551 Language)", "Temporary I-551 Stamp (on passport or I-94)", "I-94 (Arrival/Departure Record)",
+                        "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport", "Unexpired Foreign Passport",
+                        "I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)", "DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)",
+                        "Other (With Alien Number)", "Other (With I-94 Number)"].freeze
+end
+
 When(/^.+ visits the Consumer portal during open enrollment$/) do
   visit "/"
   find(HomePage.consumer_family_portal_btn).click
@@ -137,11 +145,19 @@ end
 And(/(.*) selects eligible immigration status$/) do |text|
   if text == "Dependent"
     find(:xpath, '//label[@for="dependent_us_citizen_false"]').click
-    find(:xpath, '//label[@for="dependent_eligible_immigration_status_true"]').click
+    if EnrollRegistry[:immigration_status_checkbox].enabled?
+      find('#dependent_eligible_immigration_status').click
+    else
+      find(:xpath, '//label[@for="dependent_eligible_immigration_status_true"]').click
+    end
   else
     find(:xpath, '//label[@for="person_us_citizen_false"]').click
-    find('label[for=person_eligible_immigration_status_true]').click
-    choose 'person_eligible_immigration_status_true', visible: false, allow_label_click: true
+    if EnrollRegistry[:immigration_status_checkbox].enabled?
+      find('#person_eligible_immigration_status').click
+    else
+      find('label[for=person_eligible_immigration_status_true]').click
+      choose 'person_eligible_immigration_status_true', visible: false, allow_label_click: true
+    end
   end
 end
 
@@ -209,8 +225,12 @@ Then(/click citizen no/) do
 end
 
 When(/click eligible immigration status yes/) do
-  find('label[for=person_eligible_immigration_status_true]', wait: 20).click
-  choose 'person_eligible_immigration_status_true', visible: false, allow_label_click: true
+  if EnrollRegistry[:immigration_status_checkbox].enabled?
+    find('#person_eligible_immigration_status').click
+  else
+    find('label[for=person_eligible_immigration_status_true]', wait: 20).click
+    choose 'person_eligible_immigration_status_true', visible: false, allow_label_click: true
+  end
 end
 
 Then(/should find I-551 doc type/) do
@@ -239,7 +259,7 @@ Then(/Individual resumes enrollment/) do
   click_link 'Consumer/Family Portal'
 end
 
-Then (/Individual sees previously saved address/) do
+Then(/Individual sees previously saved address/) do
   expect(page).to have_field('ADDRESS LINE 1 *', with: '4900 USAA BLVD', wait: 10)
   find('.btn', text: 'CONTINUE').click
 end
@@ -279,6 +299,7 @@ end
 
 Then(/^.+ is on the Help Paying for Coverage page/) do
   expect(page).to have_content IvlIapHelpPayingForCoverage.your_application_for_premium_reductions_text
+  expect(find('.pb-1')).to_not be(nil) if EnrollRegistry[:mainecare_cubcare_glossary].enabled?
 end
 
 Then(/^.+ does not apply for assistance and clicks continue/) do
@@ -860,6 +881,10 @@ end
 
 When(/^Incarcerated field is nil for the consumer$/) do
   user.person.update_attributes(is_incarcerated: nil)
+end
+
+When(/^citizen status is false for the consumer$/) do
+  user.person.update_attributes(citizen_status: "not_lawfully_present_in_us")
 end
 
 Then(/^the consumer should see a message with incarcerated error$/) do

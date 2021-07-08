@@ -134,8 +134,8 @@
 
 
 - step:
-    heading: Submit Your Application
-    heading_text: "This is the last step. Carefully read the information below. Select 'I agree' after each statement to acknowledge your agreement. Then, enter your name to electronically sign the application. When you're finished, select SUBMIT APPLICATION."
+    heading: <submit-your-application>
+    heading_text: <last-step-1><last-step-2>
     sections:
       - section:
           lines:
@@ -143,12 +143,12 @@
                   - gutter: 12
                     type: raw_html
                     classNames: 'small-padding-top-bottom'
-                    text: <b>I understand that eligibility for private health insurance, with or without financial assistance, or Medicaid, will be reviewed every year.</b> <br><br> This process is called renewal. <short-name-placeholder> will review eligibility by checking its records and other electronic data sources including, with my consent, information about my federal tax returns from the IRS. #{Settings.site.short_name} will send me a notice that includes the information it has found by checking its records and other electronic data sources, and I will be able to correct information that is wrong. If found eligible for private health insurance, with or without financial assistance, or Medicaid, I may also be asked to provide additional information to extend coverage for another year for myself and/or other members of my application group.
+                    text: <b><i-understand-eligibility>*</b> <br><br> <renewal-process-1><renewal-process-2> <send-notice-1><send-notice-2><send-notice-3>
             - cells:
                   - gutter: 12
                     type: checkbox
                     classNames: 'span-text'
-                    label: I agree *
+                    label: <i-agree> *
                     value: true
                     required: true
                     model: application
@@ -160,18 +160,14 @@
                 - gutter: 12
                   type: raw_html
                   classNames: span-text
-                  text: <b> I understand that I must report any changes that might affect my eligibility or the eligibility of a household member for health insurance. </b> <br> <br>
-                        I can report changes by going online and logging into "My Account", by calling "<short-name-placeholder>"'s Contact Center toll free at "<contact-center-phone_number-placeholder>" TTY&#58; 711,
-                        or by submitting information via mail or in-person at one of the Department of Human Services service centers. <br> <br>
-
-                        I'm the person whose name appears in the signature line below. I understand that I'm submitting an application for health insurance and that
-                        information that I provided will be used to decide eligibility for each member of my application group. <br> <br>
-
-                        I have reviewed the information in this application and I attest, under penalty of perjury, that it is accurate and complete to the best of my knowledge. I understand that if I’m not truthful, there may be a penalty, including retroactive termination of my coverage and an obligation to repay all medical claims previous covered by the health insurance"
+                  text: <b><i-understand-eligibility-changes>*</b> <br> <br>
+                        <report-changes-1><report-changes-2> <br> <br>
+                        <signature-line-below-1><signature-line-below-2> <br> <br>
+                        <reviewed-information>
             - cells:
                 - gutter: 12
                   type: checkbox
-                  label: I agree *
+                  label: <i-agree> *
                   value: true
                   #required: true
                   name: medicaid_terms
@@ -184,11 +180,14 @@
                 - gutter: 12
                   type: raw_html
                   classNames: 'span-text'
-                  text: "If anyone in my application group is found eligible for Medicaid, I am authorizing the Medicaid agency to pursue and get any money from other health insurance, legal settlements, or other third parties that may be legally responsible for paying for any health care received by me or members of my applicant group. I am also giving to the Medicaid agency rights to pursue and get medical support from a spouse or parent."
+                  text: <i-understand-evaluation-1><i-understand-evaluation-2><i-understand-evaluation-3>
+                        <anyone-found-eligible-1>
+                        <anyone-found-eligible-2>
+                        <anyone-found-eligible-3>
             - cells:
                 - gutter: 12
                   type: checkbox
-                  label: I agree *
+                  label: <i-agree> *
                   value: true
                   required: true
                   classNames: 'span-text'
@@ -226,12 +225,14 @@
             - cells:
                 - gutter: 12
                   type: raw_html
-                  classNames: 'span-text'
-                  text: "If yes, I know that, if anyone in my application group is found eligible for Medicaid, I will be asked to cooperate with the Child Support Agency to collect medical support from the parent who lives outside the home. If I think that cooperating to collect medical support will harm me or my children, I can tell my caseworker and I may not have to cooperate."
+                  classNames: 'span-text parent-outside-home-text'
+                  text: <parent-living-outside-of-home-1>
+                        <parent-living-outside-of-home-2>
+                        <parent-living-outside-of-home-3>
             - cells:
                 - gutter: 12
                   type: checkbox
-                  label: I agree *
+                  label: <i-agree> *
                   value: true
                   classNames: 'span-text'
                   model: application
@@ -247,7 +248,7 @@
             - cells:
                 - gutter: 12
                   type: checkbox
-                  label: I agree *
+                  label: <i-agree> *
                   value: true
                   required: true
                   classNames: 'span-text'

@@ -45,6 +45,8 @@ module FinancialAssistance
     UNEMPLOYMENT_INCOME_KIND = 'unemployment_income'
     FREQUENCY_KINDS = %w[biweekly daily half_yearly monthly quarterly weekly yearly].freeze
 
+    NEGATIVE_AMOUNT_INCOME_TYPE_KINDS = %w[net_self_employment capital_gains farming_and_fishing].freeze
+
     OTHER_INCOME_TYPE_KIND = {
       alimony_and_maintenance: 'Alimony received',
       capital_gains: 'Capital gains',
@@ -59,9 +61,10 @@ module FinancialAssistance
       farming_and_fishing: 'Farming or fishing',
       foreign: 'Foreign income',
       other: 'Other taxable income',
-      prizes_and_awards: 'Prizes and awards',
-      scholorship_payments: 'Taxable scholarship payments'
+      prizes_and_awards: FinancialAssistanceRegistry[:prize_and_awards].setting(:gamble_prize).item ? 'Gambling, prizes or awards' : 'Prizes and awards',
+      scholarship_payments: 'Taxable scholarship payments'
     }.freeze
+
 
     field :title, type: String
     field :kind, as: :income_type, type: String, default: 'wages_and_salaries'
@@ -92,12 +95,6 @@ module FinancialAssistance
                         message: "pick a name length between #{TITLE_SIZE_RANGE}",
                         on: [:step_1, :submission]
 
-    validates :amount, presence: true,
-                       numericality: {
-                         greater_than: 0, message: "%{value} must be greater than $0"
-                       },
-                       on: [:step_1, :submission]
-
     validates :kind, presence: true,
                      inclusion: {
                        in: KINDS, message: "%{value} is not a valid income type"
@@ -111,6 +108,7 @@ module FinancialAssistance
 
     validates :start_on, presence: true, on: [:step_1, :submission]
     validate :start_on_must_precede_end_on
+    validate :check_if_valid_amount
 
     def hours_worked_per_week
       return 0 if end_on.blank? || end_on > TimeKeeper.date_of_record
@@ -125,6 +123,10 @@ module FinancialAssistance
         && end_on == other.end_on \
         && is_projected == other.is_projected \
         && submitted_at == other.submitted_at
+    end
+
+    def negative_income_accepted?
+      NEGATIVE_AMOUNT_INCOME_TYPE_KINDS.include?(kind)
     end
 
     def <=>(other)
@@ -143,6 +145,7 @@ module FinancialAssistance
         submitted_at: income_data[:submitted_at]
       )
     end
+
 
     class << self
       def find(id)
@@ -163,6 +166,12 @@ module FinancialAssistance
     def start_on_must_precede_end_on
       return unless start_on.present? && end_on.present?
       errors.add(:end_on, "Date can't occur before start on date") if end_on < start_on
+    end
+
+    def check_if_valid_amount
+      return if negative_income_accepted?
+
+      errors.add(:amount, "#{amount} must be greater than $0") if amount.to_f < 0
     end
   end
 end

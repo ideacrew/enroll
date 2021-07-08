@@ -67,3 +67,15 @@ Feature: IVL plan purchase
     And consumer clicked on shop for new plan
     Then consumer should see both dependent and primary
     And individual selects high for metal level plan and metal level box appears selected
+
+  Scenario: IVL having an ineligible family member & immigration status failed
+    Given a consumer exists
+    And the consumer is logged in
+    And consumer has successful ridp
+    When consumer visits home page
+    When citizen status is false for the consumer
+    And consumer clicked on "Married" qle
+    And I select a past qle date
+    Then I should see confirmation and continue
+    When ivl clicked continue on household info page
+    And the consumer should see the reason for ineligibility

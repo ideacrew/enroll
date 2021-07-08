@@ -41,6 +41,8 @@ module Operations
                                         :gender,
                                         :ethnicity,
                                         :tribal_id,
+                                        :tribal_state,
+                                        :tribal_name,
                                         :no_ssn,
                                         :is_tobacco_user).symbolize_keys!
 
