@@ -62,8 +62,6 @@ registry:
         is_enabled: true
       - key: :mainecare_healthcare_questions
         is_enabled: true
-      - key: :full_medicaid_determination_step
-        is_enabled: false
       - key: :immigration_status_question_required
         is_enabled: false
   - namespace:
@@ -166,6 +164,10 @@ registry:
       is_enabled: true
       settings:
         - key: :gamble_prize
-          item: true
+          item: false
+    - key: :full_medicaid_determination_step
+      is_enabled: true
+    - key: :native_american_csr
+      is_enabled: false
 # TODO eligibility engine connectivity(HAVEN) settings
 # TODO mec service connectivity settings
