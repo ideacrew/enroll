@@ -10,10 +10,10 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/event_source.git
-  revision: 7685939694542915a10c3c93773ce26602a59a0f
-  branch: release_0.5.2
+  revision: b47a0f2b95c576bcb20b6bf324c595900629f49e
+  branch: release_0.5.3
   specs:
-    event_source (0.5.2)
+    event_source (0.5.3)
       bunny (>= 1.7.1)
       deep_merge (~> 1.2.0)
       dry-events (~> 0.3)
@@ -328,8 +328,8 @@ GEM
     erubis (2.7.0)
     et-orbi (1.2.4)
       tzinfo
-    ethon (0.12.0)
-      ffi (>= 1.3.0)
+    ethon (0.14.0)
+      ffi (>= 1.15.0)
     execjs (2.7.0)
     factory_bot (4.11.1)
       activesupport (>= 3.0.0)
@@ -351,7 +351,7 @@ GEM
     faraday-net_http_persistent (1.1.0)
     faraday_middleware (1.0.0)
       faraday (~> 1.0)
-    ffi (1.12.2)
+    ffi (1.15.3)
     forgery (0.7.0)
     fugit (1.5.0)
       et-orbi (~> 1.1, >= 1.1.8)
@@ -399,7 +399,7 @@ GEM
     method_source (1.0.0)
     mime-types (3.3.1)
       mime-types-data (~> 3.2015)
-    mime-types-data (3.2021.0225)
+    mime-types-data (3.2021.0704)
     mimemagic (0.3.10)
       nokogiri (~> 1)
       rake
@@ -450,7 +450,7 @@ GEM
       sprockets (>= 2.0)
     oj (3.12.0)
     orm_adapter (0.5.0)
-    ox (2.14.2)
+    ox (2.14.5)
     parallel (1.19.1)
     parser (2.7.0.4)
       ast (~> 2.4.0)

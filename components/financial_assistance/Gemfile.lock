@@ -25,10 +25,10 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/event_source.git
-  revision: 4a4baa01544467fb97c732659c6e1ec82fa8be01
-  branch: release_0.5.2
+  revision: b47a0f2b95c576bcb20b6bf324c595900629f49e
+  branch: release_0.5.3
   specs:
-    event_source (0.5.2)
+    event_source (0.5.3)
       bunny (>= 1.7.1)
       deep_merge (~> 1.2.0)
       dry-events (~> 0.3)
@@ -245,7 +245,7 @@ GEM
     factory_bot_rails (4.11.1)
       factory_bot (~> 4.11.1)
       railties (>= 3.0.0)
-    faraday (1.4.2)
+    faraday (1.4.3)
       faraday-em_http (~> 1.0)
       faraday-em_synchrony (~> 1.0)
       faraday-excon (~> 1.1)
@@ -300,7 +300,7 @@ GEM
     method_source (1.0.0)
     mime-types (3.3.1)
       mime-types-data (~> 3.2015)
-    mime-types-data (3.2021.0225)
+    mime-types-data (3.2021.0704)
     mimemagic (0.3.8)
       nokogiri (~> 1)
     mini_mime (1.0.2)
