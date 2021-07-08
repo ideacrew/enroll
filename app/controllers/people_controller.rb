@@ -203,6 +203,7 @@ class PeopleController < ApplicationController
     @info_changed, @dc_status = sensitive_info_changed?(@person.consumer_role)
     @native_status_changed = native_status_changed?(@person.consumer_role)
     respond_to do |format|
+
       if @valid_vlp != false && @person.update_attributes(person_params.except(:is_applying_coverage))
         if @person.is_consumer_role_active? && person_params[:is_applying_coverage] == "true"
           @person.consumer_role.check_native_status(@family, native_changed: @native_status_changed)
@@ -213,7 +214,7 @@ class PeopleController < ApplicationController
         @person.active_employee_roles.each { |role| role.update_attributes(contact_method: person_params[:consumer_role_attributes][:contact_method]) } if @person.has_multiple_roles?
         if params[:page].eql? "from_registration"
           format.js
-          format.html{redirect_back(fallback_location: root_path)}
+          format.html{redirect_back(fallback_location: root_path, notice: 'Person was successfully updated.')}
         else
           format.html { redirect_to redirect_path, notice: 'Person was successfully updated.' }
           format.json { head :no_content }
