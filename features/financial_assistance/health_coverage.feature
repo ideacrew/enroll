@@ -8,7 +8,6 @@ Feature: Start a new Financial Assistance Application and answers questions on h
     And is logged in
     And the FAA feature configuration is enabled
     And the user will navigate to the FAA Household Info page
-    And FAA display_medicaid_question feature is enabled
     When they click ADD INCOME & COVERAGE INFO for an applicant
     Then they should be taken to the applicant's Tax Info page (health coverage)
     And they visit the Health Coverage page via the left nav (also confirm they are on the Health Coverage page)
