@@ -43,4 +43,4 @@ EventSource.configure do |config|
       ::AcaEntities.async_api_config_find_by_service_name(nil).success
     end
 end
-EventSource.initialize!
+#EventSource.initialize!

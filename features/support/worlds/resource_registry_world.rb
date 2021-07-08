@@ -37,6 +37,17 @@ module ResourceRegistryWorld
   def fa_feature_enabled?(feature_name)
     FinancialAssistanceRegistry.feature_enabled?(feature_name)
   end
+
+  def enable_fa_feature(feature_name)
+    return if fa_feature_enabled?(feature_name)
+
+    feature_dsl = FinancialAssistanceRegistry[feature_name]
+    feature_dsl.feature.stub(:is_enabled).and_return(true)
+  end
+
+  def fa_feature_enabled?(feature_name)
+    FinancialAssistanceRegistry.feature_enabled?(feature_name)
+  end
 end
 
 World(ResourceRegistryWorld)

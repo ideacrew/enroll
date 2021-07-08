@@ -25,6 +25,8 @@ module FinancialAssistance
         optional(:race).maybe(:string)
         optional(:indian_tribe_member).maybe(:bool)
         optional(:tribal_id).maybe(:string)
+        optional(:tribal_state).maybe(:string)
+        optional(:tribal_name).maybe(:string)
 
         optional(:language_code).maybe(:string) # Fix Me
         optional(:no_dc_address).filled(:bool) # Fix Me

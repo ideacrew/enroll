@@ -193,7 +193,7 @@ registry:
           - key: :contact_center_state_and_city
             item: "Augusta, ME"
           - key: :contact_center_zip_code
-            item: "04330"
+            item: "20024" # For DC loading rating areas, the zip uses this zip code 20024
           - key: :contact_center_email_address
             item: "smallbusiness@coverme.gov"
           - key: :social_media
@@ -303,7 +303,7 @@ registry:
             item: <%= Date.new(2020,9,18)..Date.new(2021,12,31) %>
       - key: :special_cover_header
         item: :special_cover_header
-        is_enabled: true
+        is_enabled: false
         settings:
           - key: :filename
             item: "CoverME_WebsiteHeader_01.jpg"
@@ -370,8 +370,8 @@ registry:
           - key: :days
             item: 60
       - key: :immigration_status_checkbox
-        is_enabled: true
+        is_enabled: false
       - key: :gender_to_sex
-        is_enabled: true
+        is_enabled: false
       - key: :mainecare_cubcare_glossary
-        is_enabled: true
+        is_enabled: false

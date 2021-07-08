@@ -363,6 +363,10 @@ describe Household, "for creating a new taxhousehold using create eligibility", 
     it 'should match with expected csr eligibility kind' do
       expect(@determination.csr_eligibility_kind).to eq('csr_limited')
     end
+
+    it 'THH members should match with expected csr eligibility kind' do
+      expect(household100.tax_households[0].tax_household_members[0].csr_eligibility_kind).to eq('csr_limited')
+    end
   end
 
   context 'for apply_aggregate_to_enrollment' do

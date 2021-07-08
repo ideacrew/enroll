@@ -144,8 +144,8 @@
           <span class="fa-text-color">What's the maximum self-only amount of reimbursement offered by this employer?</span>
         </div>
         <div class='col-md-2 not-sure-margin'>
-          <a href="#hra_benefit" data-toggle="modal" data-target="#hra_benefit_<%= benefit.id %>" class="interaction-click-control-not-sure? benefit-support-modal">Not sure?</a>
-          <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "hra_benefit", id: "hra_benefit_#{benefit.id}"} %>
+          <a href="#hra_benefit" data-toggle="modal" data-target="#hra_benefit" class="interaction-click-control-not-sure? benefit-support-modal">Not sure?</a>
+          <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "hra_benefit"} %>
         </div>
       </div>
     <% end %>

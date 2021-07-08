@@ -210,6 +210,8 @@ module FinancialAssistance
         :indian_tribe_member,
         :eligible_immigration_status,
         :tribal_id,
+        :tribal_state,
+        :tribal_name,
         :is_incarcerated,
         :relationship,
         :is_consumer_role,

@@ -228,8 +228,10 @@
             - cells:
                 - gutter: 12
                   type: raw_html
-                  classNames: 'span-text'
-                  text: "If yes, I know that, if anyone in my application group is found eligible for Medicaid, I will be asked to cooperate with the Child Support Agency to collect medical support from the parent who lives outside the home. If I think that cooperating to collect medical support will harm me or my children, I can tell my caseworker and I may not have to cooperate."
+                  classNames: 'span-text parent-outside-home-text'
+                  text: <parent-living-outside-of-home-1>
+                        <parent-living-outside-of-home-2>
+                        <parent-living-outside-of-home-3>
             - cells:
                 - gutter: 12
                   type: checkbox
