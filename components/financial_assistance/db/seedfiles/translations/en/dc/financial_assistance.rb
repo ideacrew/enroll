@@ -108,5 +108,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.parent_living_outside_of_home_1" => "If yes, I know that, if anyone in my application group is found eligible for Medicaid, I will be asked to cooperate with the Child Support Agency ",
   "en.faa.parent_living_outside_of_home_2" => "to collect medical support from the parent who lives outside the home. If I think that cooperating to collect medical support will harm me or my children, ",
   "en.faa.parent_living_outside_of_home_3" => "I can tell my caseworker and I may not have to cooperate.",
-  "en.faa.negative_income" => "Negative Income"
+  "en.faa.negative_income" => "Negative Income",
+  # Tax Info
+  "en.faa.filing_as_head_of_household" => "Will this person be filing as head of household?"
 }.freeze

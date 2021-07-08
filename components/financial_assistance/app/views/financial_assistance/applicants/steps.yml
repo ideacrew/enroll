@@ -56,7 +56,7 @@
             - cells:
                 - gutter: 5
                   type: text
-                  text: Will this person be filing as head of household? *
+                  text: <filing-as-head-placeholder> *
                 - gutter: 2
                   type: label_radio
                   name: row2
