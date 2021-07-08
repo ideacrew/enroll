@@ -112,6 +112,7 @@ Given(/^all applicants are in Info Completed state with all types of income$/) d
     find(:xpath, '//*[@id="btn-continue"]').click
 
     find('#is_pregnant_no').click
+    find("#is_student_no", wait: 10).click
     find('#is_post_partum_period_no').click
     find('#is_self_attested_blind_no').click
     find('#has_daily_living_no').click
