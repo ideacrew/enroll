@@ -155,6 +155,9 @@ registry:
           item: false
     - key: :full_medicaid_determination_step
       is_enabled: true
+    - key: :display_medicaid_question
+      item: :display_medicaid_question
+      is_enabled: false
     - key: :fa_send_to_external_verification
       is_enabled: false
     - key: :medicaid_or_chip_program_short_name
