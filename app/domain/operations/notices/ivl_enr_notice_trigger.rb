@@ -14,11 +14,12 @@ module Operations
       def call(params)
         values = yield validate(params)
         family = yield fetch_family(values[:enrollment])
-        fm_hash = yield build_family_member_hash(family)
+        fm_hash = yield build_family_member_hash(values[:enrollment])
         household_hash = yield build_household_hash(family, values[:enrollment].effective_on.year)
-        payload = yield build_payload(fm_hash, household_hash)
+        payload = yield build_payload(fm_hash, household_hash, family, is_documents_needed(values[:enrollment]))
         validated_payload = yield validate_payload(payload)
-        event = yield build_event(validated_payload)
+        entity_result = yield thorugh_entity(validated_payload)
+        event = yield build_event(entity_result)
         result = yield publish_response(event)
 
         Success(result)
@@ -36,8 +37,9 @@ module Operations
         Success(enrollment.family)
       end
 
-      def build_family_member_hash(family)
-        family_member_hash = family.family_members.collect do |fm|
+      def build_family_member_hash(enrollment)
+        members = enrollment.hbx_enrollment_members.map(&:family_member)
+        family_member_hash = members.collect do |fm|
           person = fm.person
           outstanding_verification_types = person.consumer_role.outstanding_verification_types
           {
@@ -81,27 +83,48 @@ module Operations
             market_place_kind: enr.kind,
             enrollment_period_kind: enr.enrollment_kind,
             product_kind: enr.coverage_kind,
-            hbx_enrollment_members: enr.hbx_enrollment_members.collect do |hem|
-                                      {family_member_reference: {family_member_hbx_id: hem.hbx_id}, is_subscriber: hem.is_subscriber, eligibility_date: hem.eligibility_date, coverage_start_on: hem.coverage_start_on}
-                                    end,
+            total_premium: enr.total_premium,
+            hbx_enrollment_members: enrollment_member_hash(enr),
             product_reference: {hios_id: product.hios_id, name: product.title, active_year: product.active_year, is_dental_only: product.dental?, metal_level: product.metal_level, benefit_market_kind: product.benefit_market_kind.to_s,
-                                product_kind: product.product_kind.to_s, issuer_profile_reference: {hbx_id: issuer.hbx_id, name: issuer.legal_name, abbrev: issuer.abbrev}},
-            issuer_profile_reference: {hbx_id: issuer.hbx_id, name: issuer.legal_name, abbrev: issuer.abbrev},
+                                csr_variant_id: product.csr_variant_id, is_csr: product.is_csr?, family_deductible: product.family_deductible,
+                                individual_deductible: product.deductible, product_kind: product.product_kind.to_s, issuer_profile_reference: {hbx_id: issuer.hbx_id, name: issuer.legal_name, abbrev: issuer.abbrev}},
+            issuer_profile_reference: {hbx_id: issuer.hbx_id, name: issuer.legal_name, abbrev: issuer.abbrev, phone: issuer.office_locations.where(is_primary: true).first.phone.full_phone_number},
             consumer_role_reference: {is_active: consumer_role.is_active, is_applying_coverage: consumer_role.is_applying_coverage, is_applicant: consumer_role.is_applicant, is_state_resident: consumer_role.is_state_resident,
-                                      lawful_presence_determination: {}, citizen_status: consumer_role.citizen_status}
+                                      lawful_presence_determination: {}, citizen_status: consumer_role.citizen_status},
+            is_receiving_assistance: (enr.applied_aptc_amount > 0 || (product.is_csr? ? true : false))
           }
         end
       end
 
-      def build_payload(family_members_hash, households_hash)
-        Success({family_members: family_members_hash, households: households_hash})
+      def enrollment_member_hash(enrollment)
+        enrollment.hbx_enrollment_members.collect do |hem|
+          person = hem.person
+          {
+            family_member_reference: {family_member_hbx_id: hem.hbx_id, age: hem.age_on_effective_date, first_name: person.first_name, last_name: person.last_name, person_hbx_id: person.hbx_id,
+                                      is_primary_family_member: (hem.primary_relationship == 'self')}, is_subscriber: hem.is_subscriber, eligibility_date: hem.eligibility_date, coverage_start_on: hem.coverage_start_on
+          }
+        end
+      end
+
+      def is_documents_needed(enrollment)
+        members = enrollment.hbx_enrollment_members.map(&:family_member)
+        return true if members.any? {|member| member.person.consumer_role.outstanding_verification_types.present? }
+        false
+      end
+
+      def build_payload(family_members_hash, households_hash, family, documents_needed)
+        Success({family_members: family_members_hash, households: households_hash, hbx_id: family.hbx_assigned_id.to_s, documents_needed: documents_needed})
       end
 
       def validate_payload(payload)
         result = AcaEntities::Contracts::Families::FamilyContract.new.call(payload)
 
-        Failure('invalid payload') unless result.success?
+        return Failure('invalid payload') unless result.success?
         Success(result.to_h)
+      end
+
+      def thorugh_entity(payload)
+        Success(AcaEntities::Families::Family.new(payload).to_h)
       end
 
       def build_event(payload)

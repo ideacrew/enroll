@@ -14,7 +14,7 @@ RSpec.describe ::Operations::Notices::IvlEnrNoticeTrigger, dbclean: :after_each 
     let(:issuer) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, abbrev: 'ANTHM') }
     let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :ivl_product, issuer_profile: issuer) }
     let(:enrollment) do
-      FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :individual_unassisted, family: family, product_id: product.id, consumer_role_id: person.consumer_role.id)
+      FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :individual_unassisted, family: family, product_id: product.id, consumer_role_id: person.consumer_role.id, enrollment_members: family.family_members)
     end
 
     context 'with invalid params' do
@@ -29,8 +29,10 @@ RSpec.describe ::Operations::Notices::IvlEnrNoticeTrigger, dbclean: :after_each 
 
     context 'with valid params' do
       before :each do
+        person.consumer_role.verification_types.each {|vt| vt.update_attributes(validation_status: 'outstanding', due_date: TimeKeeper.date_of_record - 1.day)}
         allow_any_instance_of(Events::Individual::Enrollments::Submitted).to receive(:publish).and_return true
       end
+
 
       let(:params) {{enrollment: enrollment}}
 
