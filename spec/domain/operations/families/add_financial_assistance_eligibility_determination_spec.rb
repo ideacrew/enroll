@@ -59,7 +59,7 @@ RSpec.describe Operations::Families::AddFinancialAssistanceEligibilityDeterminat
            "is_consent_applicant" => false,
            "is_living_in_state" => false,
            "is_temporarily_out_of_state" => false,
-           "is_ia_eligible" => true,
+           "is_ia_eligible" => false,
            "is_medicaid_chip_eligible" => false,
            "is_non_magi_medicaid_eligible" => false,
            "is_totally_ineligible" => false,
@@ -113,7 +113,7 @@ RSpec.describe Operations::Families::AddFinancialAssistanceEligibilityDeterminat
      :eligibility_determinations =>
          [{"_id" => BSON::ObjectId('5f5eb0542e1423c05646b19b'),
            "max_aptc" => {"cents" => 5826.0, "currency_iso" => "USD"},
-           "csr_percent_as_integer" => 0,
+           "csr_percent_as_integer" => 94,
            "aptc_csr_annual_household_income" => {"cents" => 3342466.0, "currency_iso" => "USD"},
            "aptc_annual_income_limit" => {"cents" => 4752000.0, "currency_iso" => "USD"},
            "csr_annual_income_limit" => {"cents" => 2970000.0, "currency_iso" => "USD"},
@@ -151,6 +151,10 @@ RSpec.describe Operations::Families::AddFinancialAssistanceEligibilityDeterminat
 
     it 'should create Eligibility Determination object' do
       expect(@thhs.first.latest_eligibility_determination.max_aptc.to_f).to eq(58.26)
+    end
+
+    it 'should update csr on thh member' do
+      expect(@thhs.first.tax_household_members.first.csr_eligibility_kind).to eq("csr_0")
     end
   end
 
