@@ -7,12 +7,12 @@ module Operations
   module Fdsh
     module Ridp
       # Publish class will build event and publish the payload
-      class PublishPrimaryRequest
+      class PublishSecondaryRequest
         send(:include, Dry::Monads[:result, :do, :try])
         include EventSource::Command
 
         def call(payload)
-          event  = yield build_event(payload)
+          event = yield build_event(payload)
           result = yield publish(event)
 
           Success(result)
@@ -21,7 +21,7 @@ module Operations
         private
 
         def build_event(payload)
-          event('events.fdsh.ridp.primary_determination_requested', attributes: payload.to_h)
+          event('events.fdsh.ridp.secondary_determination_requested', attributes: payload)
         end
 
         def publish(event)
