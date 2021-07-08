@@ -155,5 +155,7 @@ registry:
           item: false
     - key: :full_medicaid_determination_step
       is_enabled: true
+    - key: :native_american_csr
+      is_enabled: false
 # TODO eligibility engine connectivity(HAVEN) settings
 # TODO mec service connectivity settings

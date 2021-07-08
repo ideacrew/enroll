@@ -222,6 +222,7 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
     let(:plan5) { FactoryBot.create(:benefit_markets_products_health_products_health_product, issuer_profile: issuer_profile)}
     let(:benefit_package1) {double(benefit_ids: [plan1.id, plan2.id])}
     let(:benefit_package2) {double(benefit_ids: [plan3.id, plan4.id])}
+    let(:benefit_package3) {double(benefit_ids: [plan5.id])}
     let(:benefit_packages)  { [benefit_package1, benefit_package2, benefit_package3] }
     let(:rule) {double}
     let!(:tax_household) { FactoryBot.create(:tax_household, household: family.active_household) }
