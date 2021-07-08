@@ -137,5 +137,17 @@ module UIHelpers
         text
       end
     end
+
+    def step_hidden?(line)
+      if line.cells[1].attribute == "is_filing_as_head_of_household"
+        return FinancialAssistanceRegistry.feature_enabled?(:filing_as_head_of_household) ? "hide filing-as-head-of-household" : "hide"
+      end
+      ""
+    end
+
+    def step_enabled?(section)
+      return false if section.lines.first.cells.last.attribute == "full_medicaid_determination" && !FinancialAssistanceRegistry.feature_enabled?(:full_medicaid_determination_step)
+      true
+    end
   end
 end
