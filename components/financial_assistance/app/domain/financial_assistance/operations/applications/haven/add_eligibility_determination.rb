@@ -105,18 +105,20 @@ module FinancialAssistance
             applicant = application_in_context.applicants.select { |app| app.person_hbx_id == thhm.person_id }.first
             verified_family.family_members.each do |verified_family_member|
               next unless verified_family_member.person.hbx_id == thhm.person_id
-              applicant.update_attributes({medicaid_household_size: verified_family_member.medicaid_household_size,
-                                           magi_medicaid_category: verified_family_member.magi_medicaid_category,
-                                           magi_as_percentage_of_fpl: verified_family_member.magi_as_percentage_of_fpl,
-                                           magi_medicaid_monthly_income_limit: verified_family_member.magi_medicaid_monthly_income_limit,
-                                           magi_medicaid_monthly_household_income: verified_family_member.magi_medicaid_monthly_household_income,
-                                           is_without_assistance: verified_family_member.is_without_assistance,
-                                           is_ia_eligible: verified_family_member.is_insurance_assistance_eligible,
-                                           is_medicaid_chip_eligible: verified_family_member.is_medicaid_chip_eligible,
-                                           is_non_magi_medicaid_eligible: verified_family_member.is_non_magi_medicaid_eligible,
-                                           is_totally_ineligible: verified_family_member.is_totally_ineligible})
 
-              applicant.update_attributes(csr_percent_as_integer: verified_eligibility_determination.csr_percent) if applicant.is_ia_eligible
+              attributes = {medicaid_household_size: verified_family_member.medicaid_household_size,
+                            magi_medicaid_category: verified_family_member.magi_medicaid_category,
+                            magi_as_percentage_of_fpl: verified_family_member.magi_as_percentage_of_fpl,
+                            magi_medicaid_monthly_income_limit: verified_family_member.magi_medicaid_monthly_income_limit,
+                            magi_medicaid_monthly_household_income: verified_family_member.magi_medicaid_monthly_household_income,
+                            is_without_assistance: verified_family_member.is_without_assistance,
+                            is_ia_eligible: verified_family_member.is_insurance_assistance_eligible,
+                            is_medicaid_chip_eligible: verified_family_member.is_medicaid_chip_eligible,
+                            is_non_magi_medicaid_eligible: verified_family_member.is_non_magi_medicaid_eligible,
+                            is_totally_ineligible: verified_family_member.is_totally_ineligible}
+
+              attributes.merge!(csr_percent_as_integer: verified_eligibility_determination.csr_percent) if verified_family_member.is_insurance_assistance_eligible
+              applicant.update_attributes(attributes)
             end
           end
         end
