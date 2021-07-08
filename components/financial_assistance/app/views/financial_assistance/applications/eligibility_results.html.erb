@@ -161,6 +161,36 @@
           </div>
         <%end%>
 
+        <% if FinancialAssistanceRegistry.feature_enabled?(:fa_send_to_external_verification) &&
+              @application.applicants.pluck(:is_medicaid_chip_eligible).none? &&
+              @application.applicants.pluck(:is_non_magi_medicaid_eligible).none? %>
+          <div class="er-medicaid mt-20">
+              <div class="er-title">
+                <h3>
+                  <%= l10n("other_questions") %>
+                  <a class ='glyphicon glyphicon-plus pull-right' data-toggle="collapse" href="#fa_other_actions"></a>
+                </h3>
+                <div class="border-bottom-2px"></div>
+              </div>
+              <div id="fa_other_actions" class="panel-collapse collapse">
+                <div class="panel-body">
+                  <!-- Sub panels -->
+                  <div class="panel-group" id="accordion">
+                    <%= l10n(
+                      "faa.full_long_name_determination",
+                      program_long_name: FinancialAssistanceRegistry[:medicaid_or_chip_agency_long_name].setting(:name).item,
+                      program_short_name: FinancialAssistanceRegistry[:medicaid_or_chip_program_short_name].setting(:name).item
+                      ) %><br/>
+                    <br/>
+                  <div>
+                    <%= link_to l10n("faa.send_to_external_verification"), applications_path, class: "btn btn-small btn-primary" %>
+                    </div>
+                  </div>
+                </div>
+              </div>
+          </div>
+        <% end %>
+
         <div class="er-summary mt-20">
           <p class="mt-10"><%= l10n("faa.do_not_agree") %></p>
           <p class="mb-0"><%= l10n("faa.your_application_reference") %><b><%= @application.hbx_id %></b>.</p>

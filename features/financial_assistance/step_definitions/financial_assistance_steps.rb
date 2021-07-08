@@ -386,6 +386,20 @@ Given(/^the FAA feature configuration is enabled$/) do
   enable_feature :financial_assistance
 end
 
+Then(/^the user should see the external verification link$/) do
+  # TODO: Maybe figure out how to do this with something other than glyphicon
+  other_actions_link = page.all('a').detect { |link| link[:class] == 'glyphicon glyphicon-plus pull-right' }
+  other_actions_link.click
+  expect(page).to have_content(
+    l10n(
+      "faa.full_long_name_determination",
+      program_long_name: FinancialAssistanceRegistry[:medicaid_or_chip_agency_long_name].setting(:name).item,
+      program_short_name: FinancialAssistanceRegistry[:medicaid_or_chip_program_short_name].setting(:name).item
+    )
+  )
+end
+
+# TODO: Refactor these with the resource_registry_world.rb helpers
 Given(/^Indian Health Service Question feature is enabled$/) do
   enable_feature :indian_health_service_question
 end
@@ -487,4 +501,12 @@ end
 Then(/^the user should see the popup for the remove applicant confirmation$/) do
   popup_text = "Are you sure you want to remove this applicant?"
   expect(page).to have_content(popup_text)
+end
+
+And(/^all applicants are not medicaid chip eligible and are non magi medicaid eligible$/) do
+  application.applicants.each do |applicant|
+    applicant.update_attributes(is_medicaid_chip_eligible: false)
+    applicant.update_attributes(is_non_magi_medicaid_eligible: false)
+
+  end
 end

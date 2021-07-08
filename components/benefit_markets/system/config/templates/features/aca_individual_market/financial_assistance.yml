@@ -155,6 +155,18 @@ registry:
           item: false
     - key: :full_medicaid_determination_step
       is_enabled: true
+    - key: :fa_send_to_external_verification
+      is_enabled: false
+    - key: :medicaid_or_chip_program_short_name
+      is_enabled: true
+      settings:
+        - key: :name
+          item: 'Medicaid'
+    - key: :medicaid_or_chip_agency_long_name
+      is_enabled: true
+      settings:
+        - key: :name
+          item: 'DHS'
     - key: :primary_caregiver_other_question
       item: :primary_caregiver_other_question
       is_enabled: false
