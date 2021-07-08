@@ -21,9 +21,7 @@ module Operations
         private
 
         def build_event(payload)
-          event = event('events.fdsh.ridp.primary_determination_requested', attributes: payload)
-
-          Success(event)
+          event('events.fdsh.ridp.primary_determination_requested', attributes: payload)
         end
 
         def publish(event)
