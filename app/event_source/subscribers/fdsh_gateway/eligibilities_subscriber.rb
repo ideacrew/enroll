@@ -7,7 +7,7 @@ module Subscribers
       include EventSource::Logging
       include ::EventSource::Subscriber[amqp: 'fdsh.eligibilities.ridp']
 
-      subscribe(:on_determined_primary_eligible) do |delivery_info, _metadata, response|
+      subscribe(:on_primary_determination_complete) do |delivery_info, _metadata, response|
         logger.info "Ridp::EligibilitiesSubscriber: invoked on_magi_medicaid_mitc_eligibilities with delivery_info: #{delivery_info}, response: #{response}"
         payload = JSON.parse(response, :symbolize_names => true)
         result = FinancialAssistance::Operations::Applications::MedicaidGateway::AddEligibilityDetermination.new.call(payload)
@@ -23,6 +23,9 @@ module Subscribers
       rescue StandardError => e
         nack(delivery_info.delivery_tag)
         logger.info "DeterminationSubscriber: error: #{e.backtrace}"
+      end
+
+      subscribe(:on_secondary_determination_complete) do |delivery_info, _metadata, response|
       end
     end
   end
