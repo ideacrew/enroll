@@ -1,49 +1,30 @@
 Feature: Admin has ability to create a new SEP Type with visibility options for "Customer & Admin" and "Admin Only"
   Background:
     Given both shop and fehb market configurations are enabled
-    Given all market kinds are enabled for user to select
-    Given all announcements are enabled for user to select
-    Given that a user with a HBX staff role with hbx_tier3 subrole exists
-    When Hbx Admin logs on to the Hbx Portal
-    Given the Admin is on the Main Page
+    And all market kinds are enabled for user to select
+    And all announcements are enabled for user to select
+    And that a user with a HBX staff role with hbx_tier3 subrole exists
+    And Hbx Admin logs on to the Hbx Portal
+    And the Admin is on the Main Page
     And the FAA feature configuration is enabled
     And Qualifying life events of all markets are present
     And the Admin will see the Manage SEPs under admin dropdown
     And Admin can click Manage SEPs link
 
-  Scenario Outline: Admin will create a new Individual market SEP type by picking visibility option for <user_visibility>
+  Scenario: Admin will create a new Individual market SEP type by picking visibility option for Customer & Admin
     Given Admin can navigate to the Manage SEPs screen
     And expired Qualifying life events of individual market is present
-    When Admin creates new SEP Type with individual market and <action> select termination on kinds with <user_visibility> scenario    
+    When Admin creates new SEP Type with individual market and see select termination on kinds with Customer & Admin scenario    
     And Admin should see newly created SEP Type title on Datatable with Draft filter individual
     And Admin should publish newly created SEP Type
     And Hbx Admin logs out
     And Individual has not signed up as an HBX user
-    When Individual with known qles visits the Insured portal outside of open enrollment
-    Then Individual creates a new HBX account
-    Then I should see a successful sign up message
-    And user should see your information page
-    When user goes to register as an individual
-    When user clicks on continue button
-    Then user should see heading labeled personal information
-    Then Individual should click on Individual market for plan shopping
-    Then Individual should see a form to enter personal information
-    When Individual clicks on Save and Exit
-    Then Individual resumes enrollment
-    And Individual click on Sign In
-    And I signed in
-    Then Individual sees previously saved address
-    Then Individual agrees to the privacy agreeement
-    Then Individual should see identity verification page and clicks on submit
-    Then Individual should be on the Help Paying for Coverage page
-    Then Individual does not apply for assistance and clicks continue
-    Then Individual should see the dependents form
-    And I click on continue button on household info form
-    When I click on none of the situations listed above apply checkbox
-    And I click on back to my account button
+    And Individual market is not under open enrollment period
+    And there exists Patrick Doe with active individual market role and verified identity
+    And Patrick Doe logged into the consumer portal
     Then I should land on home page
     And I should see listed individual market SEP Types
-    And I should <action> the "Entered into a legal domestic partnership" at the bottom of the ivl qle list
+    And I should see the "Entered into a legal domestic partnership" at the bottom of the ivl qle list
     And I click on log out link
     When Hbx Admin logs on to the Hbx Portal
     And the Admin is on the Main Page
@@ -54,11 +35,6 @@ Feature: Admin has ability to create a new SEP Type with visibility options for 
     And I should see listed individual market SEP Types
     And I should see the "Entered into a legal domestic partnership" at the bottom of the ivl qle list
     And Admin logs out
-
-    Examples:
-      | user_visibility  | action  |
-      | Customer & Admin | see     |
-      | Admin Only       | not see |
 
   Scenario Outline: Admin will create a new Individual market SEP type by picking visibility option for <user_visibility> with future date
     Given Admin can navigate to the Manage SEPs screen
