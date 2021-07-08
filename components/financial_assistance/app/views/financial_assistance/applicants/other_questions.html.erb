@@ -181,34 +181,36 @@
         </div>
         <% end %>
 
-        <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
-          <div class='col-md-6'>
-            <span class="fa-text-color">What is the type of student?</span>
+        <% if FinancialAssistanceRegistry.feature_enabled?(:student_follow_up_questions) %>
+          <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
+            <div class='col-md-6'>
+              <span class="fa-text-color">What is the type of student?</span>
+            </div>
+            <div class='col-md-3'>
+              <label></label>
+              <%= f.select(:student_kind, options_for_select(["Dropout", "Full Time", "Graduated", "Half Time", "Part Time", "Not In Schoool"], selected: @applicant.student_kind), {:include_blank => "SELECT TYPE"}, {:id => 'student_kind', :class => "form-control", :prompt => true}) %>
+            </div>
           </div>
-          <div class='col-md-3'>
-            <label></label>
-            <%= f.select(:student_kind, options_for_select(["Dropout", "Full Time", "Graduated", "Half Time", "Part Time", "Not In Schoool"], selected: @applicant.student_kind), {:include_blank => "SELECT TYPE"}, {:id => 'student_kind', :class => "form-control", :prompt => true}) %>
-          </div>
-        </div>
 
-        <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
-          <div class='col-md-6'>
-            <span class="fa-text-color">Student status end on date?</span>
+          <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
+            <div class='col-md-6'>
+              <span class="fa-text-color">Student status end on date?</span>
+            </div>
+            <div class='col-md-2'>
+              <%= f.text_field :student_status_end_on, class: "jq-datepicker floatlabel", id: "applicant_student_status_end_on", placeholder: "End on" %>
+            </div>
           </div>
-          <div class='col-md-2'>
-            <%= f.text_field :student_status_end_on, class: "jq-datepicker floatlabel", id: "applicant_student_status_end_on", placeholder: "End on" %>
-          </div>
-        </div>
 
-        <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
-          <div class='col-md-6'>
-            <span class="fa-text-color">What type of school do you go to?</span>
+          <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
+            <div class='col-md-6'>
+              <span class="fa-text-color">What type of school do you go to?</span>
+            </div>
+            <div class='col-md-3'>
+              <label></label>
+              <%= f.select(:student_school_kind, options_for_select(["Pre School", "Graduate School", "English Language Institute", "Open University", "Primary", "Elementary", "GED", "Junior School", "High School", "Equivalent Vocational/Tech", "Vocational", "Technical", "Undergraduate"], selected: @applicant.student_school_kind), {:include_blank => "SELECT TYPE"}, {:id => 'student_school_kind', :class => "form-control", :prompt => true}) %>
+            </div>
           </div>
-          <div class='col-md-3'>
-            <label></label>
-            <%= f.select(:student_school_kind, options_for_select(["Pre School", "Graduate School", "English Language Institute", "Open University", "Primary", "Elementary", "GED", "Junior School", "High School", "Equivalent Vocational/Tech", "Vocational", "Technical", "Undergraduate"], selected: @applicant.student_school_kind), {:include_blank => "SELECT TYPE"}, {:id => 'student_school_kind', :class => "form-control", :prompt => true}) %>
-          </div>
-        </div>
+        <% end %>
 
         <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
           <div class='col-md-6'>
