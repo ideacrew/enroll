@@ -136,6 +136,7 @@ And(/^the user fills out the rest of the other questions form and submits it$/) 
   choose('is_student_no')
   choose('is_self_attested_blind_no')
   choose('is_veteran_or_active_military_no')
+  choose('is_vets_spouse_or_child_no')
   choose("is_resident_post_092296_no")
   choose("medicaid_pregnancy_no") if page.all("#medicaid_pregnancy_no").present?
   find('[name=commit]').click
