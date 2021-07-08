@@ -158,5 +158,6 @@ registry:
     - key: :display_medicaid_question
       item: :display_medicaid_question
       is_enabled: false
-# TODO eligibility engine connectivity(HAVEN) settings
-# TODO mec service connectivity settings
+    - key: :primary_caregiver_other_question
+      item: :primary_caregiver_other_question
+      is_enabled: false

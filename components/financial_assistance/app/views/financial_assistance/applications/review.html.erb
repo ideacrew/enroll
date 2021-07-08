@@ -263,6 +263,12 @@
             <div class="col-md-6">Is the Person blind?</div>
             <div class="col-md-6"><%= human_boolean applicant.is_self_attested_blind %></div>
           </div>
+          <% if FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_other_question) %>
+            <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+              <div class="col-md-6"><%= l10n("faa.primary_caretaker_question_text") %></div>
+              <div class="col-md-6"><%= human_boolean applicant.is_primary_caregiver %></div>
+            </div>
+          <% end %>
           <div class="row row-form-wrapper ptb no-buffer row-height form-content">
             <div class="col-md-6">Does this person need help with daily life activities, such as dressing or
               bathing?
