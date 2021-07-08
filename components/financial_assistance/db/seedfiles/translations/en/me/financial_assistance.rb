@@ -115,7 +115,8 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.parent_living_outside_of_home_3" => "I can tell my caseworker and I may not have to cooperate.",
   "en.faa.negative_income" => "Negative Income",
   "en.faa.full_long_name_determination" => "Based on the information you provided, no one on this application is likely to qualify for %{program_short_name}. Do you still want us to send your application to the %{program_long_name} so they can check on %{program_short_name} eligibility?",
-  "en.faa.send_to_external_verification" => "Send to OFI"
+  "en.faa.send_to_external_verification" => "Send to OFI",
+  "en.faa.primary_caretaker_question_text" => "Is this person the main person taking care of any children age 18 or younger? *"
 }.freeze
 # rubocop:enable Layout/LineLength
 

@@ -167,5 +167,6 @@ registry:
       settings:
         - key: :name
           item: 'Office for Family Independence'
-# TODO eligibility engine connectivity(HAVEN) settings
-# TODO mec service connectivity settings
+    - key: :primary_caregiver_other_question
+      item: :primary_caregiver_other_question
+      is_enabled: true
