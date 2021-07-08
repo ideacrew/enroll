@@ -15,7 +15,7 @@ module Operations
 
         # @param [ Hash ] params Applicant Attributes
         # @return [ BenefitMarkets::Entities::Applicant ] applicant Applicant
-        def call(family, InteractiveVerification)
+        def call(family)
           payload_param = yield construct_payload_hash(params)
           payload_value = yield validate_payload(payload_param)
           payload_entity = yield create_payload_entity(payload_value)
