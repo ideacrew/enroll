@@ -1,11 +1,15 @@
 Feature: When a benefit application gets reinstated the newly created benefit application span will have a reinstated indicator on it.
 
-  Scenario Outline: when Admin goes to employer portal should see a reinstated text for reinstated benefit application
+  Background: Setting initial employer with active benefit application
     Given the Reinstate feature configuration is enabled
+    Given the shop market configuration is enabled
     And a CCA site exists with a benefit market
-    And benefit market catalog exists for <from_state> initial employer with health benefits
+    And benefit market catalog exists for active initial employer with health benefits
     And there is an employer ABC Widgets
-    And initial employer ABC Widgets has <from_state> benefit application
+    And initial employer ABC Widgets has active benefit application
+
+  Scenario Outline: when Admin goes to employer portal should see a reinstated text for reinstated benefit application
+    
     And initial employer ABC Widgets application <to_state>
     And that a user with a HBX staff role with Super Admin subrole exists and is logged in
     And the user is on the Employer Index of the Admin Dashboard
@@ -29,8 +33,8 @@ Feature: When a benefit application gets reinstated the newly created benefit ap
     And Admin logs out
 
   Examples:
-    |  from_state |    to_state          |
-    |   active    |   terminated         |
-    |   active    | termination_pending  |
-    |   active    | retroactive_canceled |
-    |   active    |  canceled            |
+    |    to_state          |
+    |   terminated         |
+    | termination_pending  |
+    | retroactive_canceled |
+    |  canceled            |

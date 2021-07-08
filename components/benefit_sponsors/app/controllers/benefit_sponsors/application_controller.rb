@@ -10,13 +10,8 @@ module BenefitSponsors
     rescue_from ActionController::InvalidAuthenticityToken, :with => :bad_token_due_to_session_expired
 
     def self.current_site
-      site_key = Settings.site.key
-      case site_key
-      when :cca
-        BenefitSponsors::Site.by_site_key(:cca).first
-      when :dc
-        BenefitSponsors::Site.by_site_key(:dc).first
-      end
+      site_key = EnrollRegistry[:enroll_app].settings(:site_key).item
+      BenefitSponsors::Site.by_site_key(site_key).first
     end
 
     protected
@@ -132,8 +127,9 @@ module BenefitSponsors
     def bad_token_due_to_session_expired
       flash[:warning] = "Session expired."
       respond_to do |format|
-        format.html { redirect_to main_app.root_path}
-        format.js   { render text: "window.location.assign('#{main_app.root_path}');"}
+        format.html { redirect_to main_app.root_path }
+        format.js   { render plain: "window.location.assign('#{root_path}');" }
+        format.json { redirect_to main_app.root_path }
       end
     end
   end

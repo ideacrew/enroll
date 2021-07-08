@@ -409,7 +409,7 @@ module BenefitSponsors
       end
 
       def trigger_zero_employees_on_roster_notice(benefit_application)
-        return unless benefit_application.benefit_sponsorship.census_employees.active.count < 1
+        return unless benefit_application.benefit_sponsorship.census_employees.active.none?
 
         deliver(recipient: benefit_application.sponsor_profile, event_object: benefit_application, notice_event: "zero_employees_on_roster_notice")
       end

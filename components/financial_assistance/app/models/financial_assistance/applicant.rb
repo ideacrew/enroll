@@ -53,7 +53,7 @@ module FinancialAssistance
 
     DRIVER_QUESTION_ATTRIBUTES = [:has_job_income, :has_self_employment_income, :has_other_income,
                                   :has_deductions, :has_enrolled_health_coverage, :has_eligible_health_coverage]
-    DRIVER_QUESTION_ATTRIBUTES += [:has_unemployment_income] if FinancialAssistanceRegistry[:unemployment_income].enabled?
+    DRIVER_QUESTION_ATTRIBUTES += [:has_unemployment_income] if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income)
     DRIVER_QUESTION_ATTRIBUTES.freeze
 
     #list of the documents user can provide to verify Immigration status
@@ -285,7 +285,7 @@ module FinancialAssistance
 
     # Responsible for updating family member  when applicant is created/updated
     after_update :propagate_applicant
-    before_destroy :propagate_destroy
+    before_destroy :destroy_relationships, :propagate_destroy
 
     def generate_hbx_id
       write_attribute(:person_hbx_id, FinancialAssistance::HbxIdGenerator.generate_member_id) if person_hbx_id.blank?
@@ -673,14 +673,14 @@ module FinancialAssistance
     def other_questions_complete?
       questions_array = []
 
-      questions_array << is_former_foster_care  if foster_age_satisfied? && is_applying_coverage
+      questions_array << is_former_foster_care if foster_age_satisfied? && is_applying_coverage
+      questions_array << is_post_partum_period unless is_pregnant
       questions_array << student_kind if is_student
       questions_array << student_status_end_on if is_student
       questions_array << student_school_kind if is_student
       questions_array << (questions_array.flatten.include?("") ? nil : true)
-      questions_array << is_post_partum_period  unless is_pregnant
-      questions_array << has_unemployment_income if FinancialAssistanceRegistry[:unemployment_income].enabled?
-      questions_array << is_physically_disabled
+      questions_array << has_unemployment_income if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income)
+      questions_array << is_physically_disabled if is_applying_coverage
       questions_array << pregnancy_due_on << children_expected_count if is_pregnant
       questions_array << pregnancy_end_on << is_enrolled_on_medicaid if is_post_partum_period
       (other_questions_answers << questions_array).flatten.include?(nil) ? false : true
@@ -734,13 +734,13 @@ module FinancialAssistance
         return incomes.jobs.blank? && incomes.self_employment.present? if !has_job_income && has_self_employment_income
         incomes.jobs.blank? && incomes.self_employment.blank?
       when :other_income
-        if FinancialAssistanceRegistry[:unemployment_income].enabled?
+        if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income)
           return false if has_unemployment_income.nil?
           return incomes.unemployment.present? if has_unemployment_income
         end
         return false if has_other_income.nil?
         return incomes.other.present? if has_other_income
-        return incomes.other.blank? || incomes.unemployment.blank? if FinancialAssistanceRegistry[:unemployment_income].enabled?
+        return incomes.other.blank? || incomes.unemployment.blank? if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income)
         incomes.other.blank?
       when :income_adjustment
         return false if has_deductions.nil?
@@ -748,9 +748,9 @@ module FinancialAssistance
         deductions.blank?
       when :health_coverage
         return false if has_enrolled_health_coverage.nil? || has_eligible_health_coverage.nil?
-        return benefits.enrolled.present? && benefits.eligible.present? if has_enrolled_health_coverage && has_eligible_health_coverage
-        return benefits.enrolled.present? && benefits.eligible.blank? if has_enrolled_health_coverage && !has_eligible_health_coverage
-        return benefits.enrolled.blank? && benefits.eligible.present? if !has_enrolled_health_coverage && has_eligible_health_coverage
+        return benefits.enrolled.present? && benefits.eligible.present? && benefits.all? {|benefit| benefit.valid? :submission} if has_enrolled_health_coverage && has_eligible_health_coverage
+        return benefits.enrolled.present? && benefits.enrolled.all? {|benefit| benefit.valid? :submission} && benefits.eligible.blank? if has_enrolled_health_coverage && !has_eligible_health_coverage
+        return benefits.enrolled.blank? && benefits.eligible.present? && benefits.eligible.all? {|benefit| benefit.valid? :submission}  if !has_enrolled_health_coverage && has_eligible_health_coverage
         benefits.enrolled.blank? && benefits.eligible.blank?
       end
     end
@@ -1076,6 +1076,11 @@ module FinancialAssistance
       Success('A successful call was made to enroll to drop a family member')
     rescue StandardError => e
       e.message
+    end
+
+    def destroy_relationships
+      application.relationships.where(applicant_id: self.id).destroy_all
+      application.relationships.where(relative_id: self.id).destroy_all
     end
   end
 end

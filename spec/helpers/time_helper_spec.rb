@@ -97,6 +97,7 @@ RSpec.describe TimeHelper, :type => :helper, dbclean: :after_each do
     context "for shop market" do
       before do
         allow(person).to receive(:active_employee_roles).and_return([employee_role])
+        allow(person).to receive(:has_active_employee_role?).and_return(true)
         allow(employer_profile).to receive(:plan_years).and_return(plan_year)
         allow(plan_year).to receive(:start_on).and_return(TimeKeeper.date_of_record - 1.month)
         allow(plan_year).to receive(:end_on).and_return(TimeKeeper.date_of_record - 1.month + 1.year - 1.day)
@@ -131,6 +132,7 @@ RSpec.describe TimeHelper, :type => :helper, dbclean: :after_each do
       before do
         allow(family).to receive_message_chain("primary_applicant.person").and_return(person)
         allow(person).to receive(:has_consumer_role?).and_return true
+        allow(person).to receive(:has_active_employee_role?).and_return(true)
         allow(person).to receive(:active_employee_roles).and_return([employee_role])
         allow(employer_profile).to receive(:plan_years).and_return(plan_year)
         allow(plan_year).to receive(:start_on).and_return(TimeKeeper.date_of_record - 1.month)

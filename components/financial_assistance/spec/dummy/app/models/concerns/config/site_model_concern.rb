@@ -15,7 +15,7 @@ module Config
       end
 
       def site_key
-        Settings.site.key
+        EnrollRegistry[:enroll_app].settings(:site_key).item
       end
     end
   end

@@ -2,12 +2,14 @@ Feature: EE with consumer role plan purchase
 
   # TODO: revisit code for background scenarios
   Background: Setup permissions, HBX Admin, users, and organizations and employer profiles
+    Given the shop market configuration is enabled
+    Given all announcements are enabled for user to select
     Given a consumer role person with family
     Given an employer with initial application
     Given all products with issuer profile
     Then  an application provides health and dental packages
     Then there are sponsored benefit offerings for spouse and child
-    When Individual visits the Insured portal during open enrollment
+    When the user visits the Consumer portal during open enrollment
 
   Scenario: when user purchase plan for self & having ineligible family member
     Given a matched Employee exists with consumer role

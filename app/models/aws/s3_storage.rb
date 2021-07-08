@@ -83,7 +83,7 @@ module Aws
     end
 
     def env_bucket_name(bucket_name)
-      "dchbx-enroll-#{bucket_name}-#{aws_env}"
+      "#{EnrollRegistry[:enroll_app].setting(:s3_prefix).item}-enroll-#{bucket_name}-#{aws_env}"
     end
 
     def setup

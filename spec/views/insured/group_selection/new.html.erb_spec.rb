@@ -795,6 +795,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
         allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
         allow(view).to receive(:can_employee_shop?).and_return(false)
         allow(coverage_household).to receive(:valid_coverage_household_members).and_return([])
+        EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
       end
 
       it "should see dental radio option" do

@@ -7,7 +7,7 @@ Feature: Cost Savings Raw Application
   Background:
     Given the FAA feature configuration is enabled
     And a family with financial application in determined state exists
-    And the user with hbx admin role is logged in
+    And the user with hbx_staff role is logged in
 
   Scenario: FAA Feature Is Enabled - Admin logs in and clicks on Person
     When admin visits home page
@@ -24,4 +24,5 @@ Feature: Cost Savings Raw Application
     And the user should see text Full Application
     When user clicks on Full application action
     Then user should land on full application page and should see 2 view my applications buttons
+    Then user should see 2 print buttons
     And user should see Medicaid eligibility question

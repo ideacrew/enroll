@@ -8,6 +8,7 @@ Feature: Employee with future date of hire
 
 
   Background: Setup site, employer, and benefit application
+    Given the shop market configuration is enabled
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for enrollment_open initial employer with health benefits
     Given Qualifying life events are present
@@ -53,7 +54,3 @@ Feature: Employee with future date of hire
     When Employee clicks continue on the family members page
     When Employee clicks shop for new plan on the group selection page
     Then Employee should see not yet eligible error message
-
-    Given I reset employee to future enrollment window
-    Then Employee tries to complete purchase of another plan
-    Then Employee should see the "my account" page

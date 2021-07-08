@@ -2,6 +2,7 @@ class Insured::FamiliesController < FamiliesController
   include VlpDoc
   include Acapi::Notifiers
   include ::ApplicationHelper
+  include Config::SiteConcern
 
   before_action :updateable?, only: [:delete_consumer_broker, :record_sep, :purchase, :upload_notice]
   before_action :init_qualifying_life_events, only: [:home, :manage_family, :find_sep]
@@ -37,7 +38,7 @@ class Insured::FamiliesController < FamiliesController
 
       # @hbx_enrollments = @hbx_enrollments.reject{ |r| !valid_display_enrollments.include? r._id }
 
-      @employee_role = @person.active_employee_roles.first
+      @employee_role = @person.active_employee_roles.first if is_shop_or_fehb_market_enabled?
       @tab = params['tab']
       @family_members = @family.active_family_members
 
@@ -176,9 +177,11 @@ class Insured::FamiliesController < FamiliesController
 
     benefit_application = employee_role.employer_profile.active_benefit_application
     reporting_deadline = @qle_date > today ? today : @qle_date + 30.days
-    if Settings.site.key == :cca
+    # TODO: Figure out how to refactor this with ResourceRegistry
+    case EnrollRegistry[:enroll_app].setting(:site_key).item
+    when :cca
       trigger_notice_observer(employee_role, benefit_application, 'employee_notice_for_sep_denial', qle_title: @qle.title, qle_reporting_deadline: reporting_deadline.strftime("%m/%d/%Y"), qle_event_on: @qle_event_date.strftime("%m/%d/%Y"))
-    elsif Settings.site.key == :dc
+    when :dc
       event_name = @person.has_multiple_active_employers? ? 'sep_denial_notice_for_ee_active_on_multiple_rosters' : 'sep_denial_notice_for_ee_active_on_single_roster'
       trigger_notice_observer(employee_role, benefit_application, event_name, qle_title: @qle.title, qle_reporting_deadline: reporting_deadline.strftime("%m/%d/%Y"), qle_event_on: @qle_event_date.strftime("%m/%d/%Y"))
     end
@@ -372,12 +375,14 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def check_employee_role
+    return unless is_shop_or_fehb_market_enabled?
     employee_role_id = (params[:employee_id].present? && params[:employee_id].include?('employee_role')) ? params[:employee_id].gsub("employee_role_", "") : nil
 
     @employee_role = employee_role_id.present? ? @person.active_employee_roles.detect{|e| e.id.to_s == employee_role_id} : @person.active_employee_roles.first
   end
 
   def build_employee_role_by_census_employee_id
+    return unless is_shop_or_fehb_market_enabled?
     census_employee_id = (params[:employee_id].present? && params[:employee_id].include?('census_employee')) ? params[:employee_id].gsub("census_employee_", "") : nil
     return if census_employee_id.nil?
 
@@ -403,26 +408,33 @@ class Insured::FamiliesController < FamiliesController
       raise e
     end
     @qualifying_life_events = []
+    employee_qle_market_scope = nil
     if @person.has_multiple_roles?
       @multiroles = @person.has_multiple_roles?
       employee_role = @person.active_employee_roles.first
       @manually_picked_role = ["individual_market_events", "fehb_market_events", "shop_market_events"].include?(params[:market]) ? params[:market] : "shop_market_events"
 
-      employee_qle_market_scope = "shop_market_events"
-      employee_qle_market_scope = "fehb_market_events" if employee_role && employee_role.market_kind == "fehb"
+      if is_shop_or_fehb_market_enabled?
+        employee_qle_market_scope = "shop_market_events"
+        employee_qle_market_scope = "fehb_market_events" if employee_role && employee_role.market_kind == "fehb"
+      end
 
       if current_user.has_hbx_staff_role?
-        @qualifying_life_events += QualifyingLifeEventKind.send employee_qle_market_scope + '_admin' if @manually_picked_role == "shop_market_events"
-        @qualifying_life_events += QualifyingLifeEventKind.send @manually_picked_role + '_without_transition_member_action' if @manually_picked_role == "individual_market_events"
+        @qualifying_life_events += QualifyingLifeEventKind.send "#{employee_qle_market_scope}_admin" if @manually_picked_role == "shop_market_events" && is_shop_or_fehb_market_enabled?
+        @qualifying_life_events += QualifyingLifeEventKind.send "#{@manually_picked_role}_without_transition_member_action" if @manually_picked_role == "individual_market_events"
       else
         if @manually_picked_role == "individual_market_events"
           @qualifying_life_events += QualifyingLifeEventKind.individual_market_events
-        elsif @manually_picked_role
+        elsif @manually_picked_role && employee_qle_market_scope.present?
           @qualifying_life_events += QualifyingLifeEventKind.send employee_qle_market_scope
         end
       end
     elsif @person.active_employee_roles.present? || @person.consumer_role.present? || @person.resident_role.present?
-      role = @person.active_employee_roles.first || @person.consumer_role || @person.resident_role
+      role = if @person.active_employee_roles.present? && is_shop_or_fehb_market_enabled?
+               @person.active_employee_roles.first
+             elsif is_individual_market_enabled?
+               @person.consumer_role || @person.resident_role
+             end
       @qualifying_life_events += QualifyingLifeEventKind.qualifying_life_events_for(role, current_user.has_hbx_staff_role?)
     end
   end

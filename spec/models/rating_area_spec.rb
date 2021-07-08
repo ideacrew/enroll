@@ -2,9 +2,10 @@ require 'rails_helper'
 
 RSpec.describe RatingArea, type: :model, dbclean: :after_each do
   subject { RatingArea.new }
+  let(:site_key) { EnrollRegistry[:enroll_app].setting(:site_key).item.upcase }
 
   it "has a valid factory" do
-    expect(create(:rating_area, zip_code: '99999')).to be_valid
+    expect(create(:rating_area)).to be_valid
   end
 
   it { is_expected.to validate_presence_of :zip_code }
@@ -41,12 +42,12 @@ RSpec.describe RatingArea, type: :model, dbclean: :after_each do
       context "with a valid search param" do
         let(:first_address) { build(:address, county: "County One", zip: "10001") }
         let(:second_address) { build(:address, county: "County One", zip: "10002") }
-        let!(:first_county_region) { create(:rating_area, county_name: first_address.county, zip_code: first_address.zip, rating_area: "R-DC001") }
-        let!(:same_county_second_region) { create(:rating_area, county_name: second_address.county, zip_code: second_address.zip, rating_area: "R-DC001") }
+        let!(:first_county_region) { create(:rating_area, county_name: first_address.county, zip_code: first_address.zip, rating_area: "R-#{site_key}001") }
+        let!(:same_county_second_region) { create(:rating_area, county_name: second_address.county, zip_code: second_address.zip, rating_area: "R-#{site_key}001") }
 
         it "returns the rating area" do
-          expect(subject.rating_area_for(first_address)).to eq("R-DC001")
-          expect(subject.rating_area_for(second_address)).to eq("R-DC001")
+          expect(subject.rating_area_for(first_address)).to eq("R-#{site_key}001")
+          expect(subject.rating_area_for(second_address)).to eq("R-#{site_key}001")
         end
       end
 

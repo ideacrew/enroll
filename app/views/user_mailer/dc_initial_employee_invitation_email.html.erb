@@ -25,7 +25,7 @@ Dear <%= census_employee.full_name.humanize.titleize %>,
   <br/>
   If you have an existing <%= "#{Settings.site.short_name}" %> account, please log in at <%= site_main_web_link %> to view the plan options chosen by your employer and complete the enrollment process. If you do not have an existing <%= "#{Settings.site.short_name}" %> account, please visit <%= site_main_web_link %> to create an account and proceed with plan shopping and enrollment.
   <br/>
-  <h2 style="color: #007bc4;">
+  <h2 style="color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>">
     For Questions or Assistance:
   </h2>
   You can contact <%= "#{Settings.site.short_name}" %> with any questions:

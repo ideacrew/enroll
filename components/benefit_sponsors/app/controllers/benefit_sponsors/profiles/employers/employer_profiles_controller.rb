@@ -102,11 +102,14 @@ module BenefitSponsors
         end
 
         def show_invoice
+          Rails.logger.warn("Attempted to open invoice without invoice and/or invoice ID present.") if @invoice.blank? || params[:invoice_id].blank?
+          redirect_to(profiles_employers_employer_profile_path(@employer_profile.id, tab: 'accounts')) and return if @invoice.blank? || params[:invoice_id].blank?
+
           options = {}
-          options[:filename] = @invoice.title
+          options[:filename] = @invoice&.title
           options[:type] = 'application/pdf'
           options[:disposition] = 'inline'
-          send_data Aws::S3Storage.find(@invoice.identifier), options
+          send_data(Aws::S3Storage.find(@invoice.identifier), options) if @invoice&.identifier
         end
 
         def bulk_employee_upload
@@ -156,6 +159,8 @@ module BenefitSponsors
         end
 
         def download_invoice
+          return unless @invoice.present?
+
           options={}
           options[:content_type] = @invoice.type
           options[:filename] = @invoice.title
@@ -209,7 +214,7 @@ module BenefitSponsors
         end
 
         def check_and_download_invoice
-          @invoice = @employer_profile.documents.find(params[:invoice_id])
+          @invoice = @employer_profile.documents.find(params[:invoice_id]) if params[:invoice_id]
         end
 
         def collect_and_sort_invoices(sort_order='ASC')

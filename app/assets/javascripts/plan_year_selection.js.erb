@@ -127,7 +127,7 @@ ready = function() {
     $('.cancel-plan-change').on('click', function() {
 
       $(this).closest('.benefit-group-fields').find('.offered-plan').show();
-      $(this).closest('.benefit-group-fields').find('.nav-tabs li label').css({borderBottom: "solid 3px #003260", borderBottomLeftRadius: "6px", borderBottomRightRadius: "6px" });
+      $(this).closest('.benefit-group-fields').find('.nav-tabs li label').css({borderBottom: "solid 3px <%= EnrollRegistry[:cancel_plan_border].settings(:color).item %>", borderBottomLeftRadius: "6px", borderBottomRightRadius: "6px" });
       $(this).closest('.benefit-group-fields').find('.edit-offering').show();
       $(this).closest('.benefit-group-fields').find('.reference-steps input').prop('checked', false);
       $(this).closest('.benefit-group-fields').find('.selected-plan').hide();
@@ -718,7 +718,7 @@ function confirmActivePlanYear() {
   var planYear = $('#plan_year_start_on').val() || "0000"
   planYear = planYear.substr(0,4);
 
-  if($.inArray(planYear, <%= Settings.aca.dental_plan_years_available %>) !== -1){
+  if($.inArray(planYear, <%= EnrollRegistry[:enroll_app].setting(:dental_plan_years_available).item %>) !== -1){
     $(".show-dental-plans").show();
   }else{
     $(".show-dental-plans").hide();
@@ -746,9 +746,9 @@ function loadCarrierNames() {
 }
 
 function onlyShowEnabledCarrierChoices() {
-  var enabledYearsForSoleSource = <%= Settings.aca.plan_option_years.sole_source_carriers_available || [TimeKeeper.date_of_record.year.to_s] %>;
-  var enabledYearsForMetalLevel = <%= Settings.aca.plan_option_years.metal_level_carriers_available || [TimeKeeper.date_of_record.year.to_s] %>;
-  var enabledYearsForSingleCarrier = <%= Settings.aca.plan_option_years.single_carriers_available || [TimeKeeper.date_of_record.year.to_s] %>;
+  var enabledYearsForSoleSource = <%= EnrollRegistry[:enroll_app].setting(:sole_source_carriers_available).item || [TimeKeeper.date_of_record.year.to_s] %>;
+  var enabledYearsForMetalLevel = <%= EnrollRegistry[:enroll_app].setting(:metal_level_carriers_available).item || [TimeKeeper.date_of_record.year.to_s] %>;
+  var enabledYearsForSingleCarrier = <%= EnrollRegistry[:enroll_app].setting(:single_carriers_available).item || [TimeKeeper.date_of_record.year.to_s] %>;
   var startOnYear = parseInt($("#plan_year_start_on").val()).toString();
   <% if Rails.env == 'test' %>
     var soleSourceEnabled = true;

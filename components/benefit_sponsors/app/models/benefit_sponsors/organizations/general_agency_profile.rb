@@ -4,15 +4,19 @@ module BenefitSponsors
       include ::SetCurrentUser
       include AASM
       include ::Config::AcaModelConcern
+      include ::Config::SiteModelConcern
 
+      MARKET_KINDS = [].tap do |a|
+        a << :individual if is_individual_market_enabled?
+        a << :shop if is_shop_or_fehb_market_enabled?
+        a << :both if is_shop_or_fehb_market_enabled?
+      end
 
-      MARKET_KINDS = individual_market_is_enabled? ? [:individual, :shop, :both] : [:shop]
-
-      ALL_MARKET_KINDS_OPTIONS = {
-        "Individual & Family Marketplace ONLY" => "individual",
-        "Small Business Marketplace ONLY" => "shop",
-        "Both – Individual & Family AND Small Business Marketplaces" => "both"
-      }
+      ALL_MARKET_KINDS_OPTIONS = {}.tap do |h|
+        h["Individual & Family Marketplace ONLY"] = "individual" if is_individual_market_enabled?
+        h["Small Business Marketplace ONLY"] = "shop" if is_shop_or_fehb_market_enabled?
+        h["Both - Individual & Family AND Small Business Marketplaces"] = "both" if is_shop_or_fehb_market_enabled?
+      end
 
       MARKET_KINDS_OPTIONS = ALL_MARKET_KINDS_OPTIONS.select { |k,v| MARKET_KINDS.include? v.to_sym }
 
@@ -43,9 +47,10 @@ module BenefitSponsors
         uniqueness: true,
         allow_blank: true
 
-      validates :market_kind,
-        inclusion: { in: Organizations::GeneralAgencyProfile::MARKET_KINDS, message: "%{value} is not a valid practice area" },
-        allow_blank: false
+      validate :validate_market_kind
+      # validates :market_kind,
+      #   inclusion: { in: Organizations::GeneralAgencyProfile::MARKET_KINDS, message: "%{value} is not a valid practice area" },
+      #   allow_blank: false
 
       after_initialize :build_nested_models
 
@@ -55,11 +60,19 @@ module BenefitSponsors
       def employer_clients
       end
 
+      def validate_market_kind
+        errors.add(:profiles, "#{market_kind} is not a valid practice area") unless BenefitSponsors::Organizations::GeneralAgencyProfile::MARKET_KINDS.include?(market_kind)
+      end
+
       def family_clients
       end
 
       def market_kinds
         MARKET_KINDS_OPTIONS
+      end
+
+      def self.all_market_kind_options
+        ALL_MARKET_KINDS_OPTIONS
       end
 
       def language_options

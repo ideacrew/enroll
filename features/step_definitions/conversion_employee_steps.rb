@@ -270,10 +270,6 @@ Then(/(.*) should see the receipt page with renewing plan year start date as eff
   end
 end
 
-When(/Employee click the "(.*?)" in qle carousel/) do |qle_event|
-  click_link "#{qle_event}"
-end
-
 When(/Employee select a past qle date/) do
   expect(page).to have_content "Married"
   # screenshot("past_qle_date")
@@ -305,9 +301,4 @@ Then(/Employee should see confirmation and clicks continue/) do
   expect(page).to have_content "Based on the information you entered, you may be eligible to enroll now but there is limited time"
   # screenshot("valid_qle")
   click_button "Continue"
-end
-
-Then(/Employee should see family members page and clicks continue/) do
-  expect(page).to have_content "#{l10n('family_information')}"
-  find('#dependent_buttons .interaction-click-control-continue', :wait => 5).click
 end

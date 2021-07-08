@@ -330,9 +330,9 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
     let(:broker_role) { FactoryBot.create(:broker_role, aasm_state: 'active', broker_agency_profile: broker_agency_profile) }
     let(:person) { broker_role.person }
     let(:user) { FactoryBot.create(:user, person: person, roles: ['broker']) }
-    context "when general agency is enabled via settings",dbclean: :after_each do
+    context "when general agency is enabled via resource registry",dbclean: :after_each do
       before :each do
-        allow(Settings.aca).to receive(:general_agency_enabled).and_return(true)
+        EnrollRegistry[:general_agency].feature.stub(:is_enabled).and_return(true)
         sign_in user
         get :assign, params: {id: broker_agency_profile.id}, format: :js, xhr: true
       end
@@ -350,9 +350,9 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
       end
     end
 
-    context "when general agency is disabled via settings",dbclean: :after_each do
+    context "when general agency is disabled via resource registry",dbclean: :after_each do
       before :each do
-        allow(Settings.aca).to receive(:general_agency_enabled).and_return(false)
+        EnrollRegistry[:general_agency].feature.stub(:is_enabled).and_return(false)
         sign_in user
         get :assign, params: {id: broker_agency_profile.id}, format: :js, xhr: true
       end
@@ -452,9 +452,9 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
     let(:person) { broker_role.person }
     let(:user) { FactoryBot.create(:user, person: person, roles: ['broker']) }
     let(:employer_profile) { FactoryBot.create(:employer_profile, general_agency_profile: general_agency_profile) }
-    context "when general agency is enabled via settings",dbclean: :after_each do
+    context "when general agency is enabled via resource registry",dbclean: :after_each do
       before do
-        allow(Settings.aca).to receive(:general_agency_enabled).and_return(true)
+        EnrollRegistry[:general_agency].feature.stub(:is_enabled).and_return(true)
       end
       context "when we Assign agency" do
         before :each do
@@ -490,9 +490,9 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
       end
     end
 
-    context "when general agency is enabled via settings",dbclean: :after_each do
+    context "when general agency is enabled via resource registry",dbclean: :after_each do
       before do
-        allow(Settings.aca).to receive(:general_agency_enabled).and_return(true)
+        EnrollRegistry[:general_agency].feature.stub(:is_enabled).and_return(true)
       end
       context "when we Assign agency" do
         before :each do
@@ -528,9 +528,9 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
       end
     end
 
-    context "when general agency is disabled via settings",dbclean: :after_each do
+    context "when general agency is disabled via resource registry",dbclean: :after_each do
       before do
-        allow(Settings.aca).to receive(:general_agency_enabled).and_return(false)
+        EnrollRegistry[:general_agency].feature.stub(:is_enabled).and_return(false)
       end
       context "when we Assign agency",dbclean: :after_each do
         before :each do
@@ -570,6 +570,7 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
     let!(:broker_agency_account) { FactoryBot.create(:broker_agency_account, employer_profile: employer_profile, broker_agency_profile_id: broker_agency_profile.id) }
 
     before :each do
+      broker_agency_profile.update(market_kind: :shop)
       allow(BrokerAgencyProfile).to receive(:find).and_return(broker_agency_profile)
     end
 

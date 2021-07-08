@@ -534,10 +534,37 @@ if EnrollRegistry.feature_enabled?(:sep_types)
         expect(response).to render_template('exchanges/manage_sep_types/sorting_sep_types.html.erb')
       end
 
-      it 'should have response body' do
+      it 'should have response body when shop is disabled' do
         expect(response.body).to match(/Individual/i)
-        expect(response.body).to match(/Shop/i)
-        expect(response.body).to match(/Congress/i)
+      end
+
+      context 'shop enabled?' do
+        before do
+          EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
+          sign_in(current_user)
+          get :sorting_sep_types
+        end
+
+        it 'should have response body when shop is enabled' do
+          expect(response.body).to match(/Individual/i)
+          expect(response.body).to match(/Shop/i)
+          expect(response.body).to match(/Congress/i)
+        end
+      end
+
+      context 'shop and congress disabled?' do
+        before do
+          EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(false)
+          EnrollRegistry[:fehb_market].feature.stub(:is_enabled).and_return(false)
+          sign_in(current_user)
+          get :sorting_sep_types
+        end
+
+        it 'should have response body when shop is enabled' do
+          expect(response.body).to match(/Individual/i)
+          expect(response.body).to_not match(/Shop/i)
+          expect(response.body).to_not match(/Congress/i)
+        end
       end
 
       context 'updateable?' do

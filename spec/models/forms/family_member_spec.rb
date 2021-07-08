@@ -312,7 +312,7 @@ describe Forms::FamilyMember, "which describes a new family member, and has been
 
   describe "where the same family member existed previously" do
     let(:previous_family_member) { existing_family_member }
-    let(:existing_family_member) { instance_double(::FamilyMember, :id => existing_family_member_id, :save! => true) }
+    let(:existing_family_member) { instance_double(::FamilyMember, :id => existing_family_member_id, :save => true) }
 
     it "should use that family member's id" do
       allow(existing_family_member).to receive(:reactivate!).with(relationship)
@@ -327,9 +327,9 @@ describe Forms::FamilyMember, "which describes a new family member, and has been
   end
 
   describe "that matches an existing person" do
-    let(:existing_person) { instance_double("Person") }
+    let(:existing_person) { instance_double("Person", id: 1) }
     let(:new_family_member_id) { double }
-    let(:new_family_member) { instance_double(::FamilyMember, :id => new_family_member_id, :save! => true) }
+    let(:new_family_member) { instance_double(::FamilyMember, :id => new_family_member_id, :save => true) }
 
     before do
       allow(subject).to receive(:assign_person_address).and_return true
@@ -344,7 +344,7 @@ describe Forms::FamilyMember, "which describes a new family member, and has been
 
   describe "for a new person" do
     let(:new_family_member_id) { double }
-    let(:new_family_member) { instance_double(::FamilyMember, :id => new_family_member_id, :save! => true) }
+    let(:new_family_member) { instance_double(::FamilyMember, :id => new_family_member_id, :save => true) }
     let(:new_person) { double(:save => true, :errors => double(:has_key? => false)) }
 
     before do
@@ -478,10 +478,20 @@ describe Forms::FamilyMember, "which describes an existing family member" do
     }
   }
   let(:person) { double(:errors => double(:has_key? => false), home_address: nil) }
-  let(:family_member) { instance_double(::FamilyMember,
-                                        person_properties.merge({
-                                        :family => family,
-                                        :family_id => family_id, :person => person, :primary_relationship => relationship, :save! => true})) }
+  let(:family_member) do
+    instance_double(
+      ::FamilyMember,
+      person_properties.merge(
+        {
+          :family => family,
+          :family_id => family_id,
+          :person => person,
+          :primary_relationship => relationship,
+          :save => true
+        }
+      )
+    )
+  end
 
   let(:update_attributes) { person_properties.merge(:family_id => family_id, :relationship => relationship, :dob => dob) }
 

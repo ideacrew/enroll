@@ -7,7 +7,7 @@ class AddContributionModelsToProductPackage < MongoidMigrationTask
   def migrate
     date = Date.new(2021,1,1)
     puts "creating contribution models for year #{date.year}" unless Rails.env.test?
-    site = BenefitSponsors::Site.by_site_key(Settings.site.key).first
+    site = BenefitSponsors::Site.by_site_key(EnrollRegistry[:enroll_app].setting(:site_key).item).first
 
     title_percentage_pair = {
       zero_percent_sponsor_fixed_percent_contribution_model: 0.0,

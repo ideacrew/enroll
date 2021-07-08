@@ -1,4 +1,5 @@
 class Employers::EmployerStaffRolesController < Employers::EmployersController
+  include ResourceConfigurator
 
   before_action :check_access_to_employer_profile,:updateable?
 

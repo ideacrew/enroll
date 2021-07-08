@@ -36,7 +36,7 @@ class IvlPersonalInformation
     'jq_datepicker_ignore_person[dob]'
   end
 
-  def self.social_security
+  def self.ssn
     'person[ssn]'
   end
 
@@ -96,6 +96,22 @@ class IvlPersonalInformation
     'div#immigration_doc_type_select span'
   end
 
+  def self.select_permanent_resident_card
+    'div[id="immigration_doc_type_select"] li[data-index="2"]'
+  end
+
+  def self.alien_number
+    'person[consumer_role][vlp_documents_attributes][0][alien_number]'
+  end
+
+  def self.card_number
+    'person[consumer_role][vlp_documents_attributes][0][card_number]'
+  end
+
+  def self.expiration_date
+    'person[consumer_role][vlp_documents_attributes][0][expiration_date]'
+  end
+
   def self.american_or_alaskan_native_yes_radiobtn
     'label[for="indian_tribe_member_yes"] span'
   end
@@ -114,6 +130,90 @@ class IvlPersonalInformation
 
   def self.incarcerated_no_radiobtn
     'label[for="radio_incarcerated_no"] span'
+  end
+
+  def self.white_checkbox
+    '#person_ethnicity_white'
+  end
+
+  def self.black_or_african_american_checkbox
+    '#person_ethnicity_black_or_african_american'
+  end
+
+  def self.asian_indian_checkbox
+    '#person_ethnicity_asian_indian'
+  end
+
+  def self.chinese_checkbox
+    '#person_ethnicity_chinese'
+  end
+
+  def self.filipino_checkbox
+    '#person_ethnicity_filipino'
+  end
+
+  def self.japanese_checkbox
+    '#person_ethnicity_japanese'
+  end
+
+  def self.korean_checkbox
+    '#person_ethnicity_korean'
+  end
+
+  def self.vietnamese_checkbox
+    '#person_ethnicity_vietnamese'
+  end
+
+  def self.other_asian_checkbox
+    '#person_ethnicity_other_asian'
+  end
+
+  def self.native_hawaiian_checkbox
+    '#person_ethnicity_native_hawaiian'
+  end
+
+  def self.samoan_checkbox
+    '#person_ethnicity_samoan'
+  end
+
+  def self.guamanian_or_chamorro_checkbox
+    '#person_ethnicity_guamanian_or_chamorro'
+  end
+
+  def self.other_pacific_islander_checkbox
+    '#person_ethnicity_other_pacific_islander'
+  end
+
+  def self.american_indian_checkbox
+    '#person_ethnicity_american_indianalaska_native'
+  end
+
+  def self.other_race_checkbox
+    'div.col-md-3.col-xs-6 input#person_ethnicity_other'
+  end
+
+  def self.mexican_checkbox
+    '#person_ethnicity_mexican'
+  end
+
+  def self.mexican_american_checkbox
+    '#person_ethnicity_mexican_american'
+  end
+
+  def self.chicano_or_chicanoa_checkbox
+    '#person_ethnicity_chicanoa'
+  end
+
+  def self.puerto_rican_checkbox
+    '#person_ethnicity_puerto_rican'
+  end
+
+  def self.cuban_checkbox
+    '#person_ethnicity_cuban'
+  end
+
+  def self.hispanic_or_latino_other_checkbox
+    'div.col-md-4.col-xs-6 input#person_ethnicity_other'
   end
 
   def self.address_line_one

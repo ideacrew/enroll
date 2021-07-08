@@ -119,7 +119,7 @@ module Factories
     def total_ehb_premium(product_id)
       product = fetch_product(product_id)
       cost_decorator = @enrollment.ivl_decorated_hbx_enrollment(product)
-      cost_decorator.total_ehb_premium
+      round_down_float_two_decimals(cost_decorator.total_ehb_premium)
     end
 
     def fetch_product(product_id)

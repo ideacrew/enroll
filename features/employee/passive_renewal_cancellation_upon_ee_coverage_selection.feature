@@ -3,6 +3,8 @@ Feature: Employee passive renewal should be canceled when Employee selected cove
   After a passive renewal if employee makes a plan selection, passive renewal should be canceled
 
   Background: Setup site, employer, and benefit application
+    Given the shop market configuration is enabled
+    Given all announcements are enabled for user to select
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for enrollment_open renewal employer with health benefits
     And there is an employer ABC Widgets

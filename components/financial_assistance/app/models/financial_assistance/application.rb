@@ -25,7 +25,8 @@ module FinancialAssistance
     MOTIVATION_KINDS  = %w[insurance_affordability].freeze
 
     SUBMITTED_STATUS  = %w[submitted verifying_income].freeze
-    REVIEWABLE_STATUSES = %w[submitted determination_response_error determined].freeze
+    REVIEWABLE_STATUSES = %w[submitted determination_response_error determined terminated].freeze
+    CLOSED_STATUSES = %w[cancelled terminated].freeze
 
     STATES_FOR_VERIFICATIONS = %w[submitted determination_response_error determined].freeze
 
@@ -119,6 +120,7 @@ module FinancialAssistance
 
     scope :submitted, ->{ any_in(aasm_state: SUBMITTED_STATUS) }
     scope :determined, ->{ any_in(aasm_state: "determined") }
+    scope :closed, ->{ any_in(aasm_state: CLOSED_STATUSES) }
     scope :by_hbx_id, ->(hbx_id) { where(hbx_id: hbx_id) }
     scope :for_verifications, -> { where(:aasm_state.in => STATES_FOR_VERIFICATIONS)}
     scope :by_year, ->(year) { where(:assistance_year => year) }
@@ -189,8 +191,7 @@ module FinancialAssistance
           matrix[yi][xi] = find_existing_relationship(id_map[yi], id_map[xi])
         end
       end
-      matrix = apply_rules_and_update_relationships(matrix)
-      matrix
+      apply_rules_and_update_relationships(matrix)
     end
 
     #update method as validate payload
@@ -293,16 +294,16 @@ module FinancialAssistance
       last_name_regex = /^#{verified_family_member.person.name_last}$/i
       first_name_regex = /^#{verified_family_member.person.name_first}$/i
 
-      if !ssn.blank?
-        applicants.where({
-                           :encrypted_ssn => FinancialAssistance::Applicant.encrypt_ssn(ssn),
-                           :dob => dob
-                         }).first
-      else
+      if ssn.blank?
         applicants.where({
                            :dob => dob,
                            :last_name => last_name_regex,
                            :first_name => first_name_regex
+                         }).first
+      else
+        applicants.where({
+                           :encrypted_ssn => FinancialAssistance::Applicant.encrypt_ssn(ssn),
+                           :dob => dob
                          }).first
       end
     end
@@ -339,7 +340,6 @@ module FinancialAssistance
     def update_response_attributes(attrs)
       update_attributes(attrs)
     end
-
 
     def add_eligibility_determination(message)
       update_response_attributes(message)
@@ -526,6 +526,16 @@ module FinancialAssistance
         transitions from: :submitted, to: :determined
       end
 
+      event :terminate, :after => :record_transition do
+        transitions from: [:submitted, :determined, :determination_response_error],
+                    to: :terminated
+      end
+
+      event :cancel, :after => :record_transition do
+        transitions from: [:draft],
+                    to: :cancelled
+      end
+
     end
 
     # def applicant
@@ -688,31 +698,36 @@ module FinancialAssistance
     end
 
     def send_failed_response
+      primary_applicant_person_hbx_id = primary_applicant.person_hbx_id
       unless has_eligibility_response
-        log("Timed Out: Eligibility Response Error", {:severity => 'critical', :error_message => "999 Eligibility Response Error for application_id #{_id}"}) if determination_http_status_code == 999
+        if determination_http_status_code == 999
+          log("Timed Out: Eligibility Response Error", {:severity => 'critical', :error_message => "999 Eligibility Response Error for application_id #{hbx_id}, primary_applicant_person_hbx_id: #{primary_applicant_person_hbx_id}"})
+        end
         message = "Timed-out waiting for eligibility determination response"
         return_status = 504
         notify("acapi.info.events.eligibility_determination.rejected",
                {:correlation_id => SecureRandom.uuid.gsub("-",""),
                 :body => { error_message: message },
                 :family_id => family_id.to_s,
-                :assistance_application_id => _id.to_s,
+                :assistance_application_id => hbx_id.to_s,
+                primary_applicant_person_hbx_id: primary_applicant_person_hbx_id,
                 :return_status => return_status.to_s,
                 :submitted_timestamp => TimeKeeper.date_of_record.strftime('%Y-%m-%dT%H:%M:%S')})
       end
 
       return unless has_eligibility_response && determination_http_status_code == 422 && determination_error_message == "Failed to validate Eligibility Determination response XML"
       message = "Invalid schema eligibility determination response provided"
+      log(message, {:severity => 'critical', :error_message => "422 Eligibility Response Error for application_id #{hbx_id}, primary_applicant_person_hbx_id: #{primary_applicant_person_hbx_id}"})
       notify("acapi.info.events.eligibility_determination.rejected",
              {:correlation_id => SecureRandom.uuid.gsub("-",""),
               :body => { error_message: message },
               :family_id => family_id.to_s,
-              :assistance_application_id => _id.to_s,
+              :assistance_application_id => hbx_id.to_s,
+              primary_applicant_person_hbx_id: primary_applicant_person_hbx_id,
               :return_status => determination_http_status_code.to_s,
               :submitted_timestamp => TimeKeeper.date_of_record.strftime('%Y-%m-%dT%H:%M:%S'),
               :haven_application_id => haven_app_id,
-              :haven_ic_id => haven_ic_id,
-              :primary_applicant_id => primary_applicant.person_hbx_id.to_s })
+              :haven_ic_id => haven_ic_id })
     end
 
     def ready_for_attestation?
@@ -736,8 +751,16 @@ module FinancialAssistance
       self.aasm_state == "determined"
     end
 
+    def is_terminated?
+      self.aasm_state == "terminated"
+    end
+
     def is_reviewable?
       REVIEWABLE_STATUSES.include?(aasm_state)
+    end
+
+    def is_closed?
+      CLOSED_STATUSES.include?(aasm_state)
     end
 
     def incomplete_applicants?
@@ -861,7 +884,10 @@ module FinancialAssistance
     end
 
     def set_us_state
-      write_attribute(:us_state, FinancialAssistanceRegistry[:us_state].setting(:abbreviation).item)
+      write_attribute(
+        :us_state,
+        FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item
+      )
     end
 
     def set_submission_date
@@ -869,11 +895,14 @@ module FinancialAssistance
     end
 
     def set_assistance_year
-      update_attribute(:assistance_year, FinancialAssistanceRegistry[:application_year].item.call.value!)
+      update_attribute(
+        :assistance_year,
+        FinancialAssistanceRegistry[:enrollment_dates].settings(:application_year).item.constantize.new.call.value!
+      )
     end
 
     def set_effective_date
-      effective_date = FinancialAssistanceRegistry[:earliest_effective_date].item.call.value!
+      effective_date = FinancialAssistanceRegistry[:enrollment_dates].settings(:earliest_effective_date).item.constantize.new.call.value!
       update_attribute(:effective_date, effective_date)
     end
 
@@ -883,7 +912,12 @@ module FinancialAssistance
     # end
 
     def active_approved_application
-      self.class.where(aasm_state: "determined", family_id: family_id, assistance_year: FinancialAssistanceRegistry[:application_year].item.call.value!).order_by(:submitted_at => 'desc').first if family_id.present?
+      return unless family_id.present?
+      self.class.where(
+        aasm_state: "determined",
+        family_id: family_id,
+        assistance_year: FinancialAssistanceRegistry[:enrollment_dates].settings(:application_year).item.constantize.new.call.value!
+      ).order_by(:submitted_at => 'desc').first
     end
 
     def set_external_identifiers
@@ -946,7 +980,7 @@ module FinancialAssistance
     end
 
     def verification_update_for_applicants
-      return unless aasm_state == "determined"
+      return unless aasm_state == "determined" || is_closed?
       if has_atleast_one_medicaid_applicant?
         update_verifications_of_applicants("external_source")
       elsif has_all_uqhp_applicants?

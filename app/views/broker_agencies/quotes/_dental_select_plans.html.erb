@@ -41,7 +41,8 @@
         </div>
 
         <div id='dental-dc_in_network'>
-             <b><%= l10n("dc_network")%></b> <br>
+             <%# TODO: Refactor the backend to in_state_network or something similar. Fix backend soon %>
+             <b><%= l10n("#{EnrollRegistry[:enroll_app].setting(:site_key).item}_network")%></b> <br>
           <%- @dental_selectors[:dc_network].each do |dc_network| %>
             <div>
             <%- if dc_network == 'any' %>

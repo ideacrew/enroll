@@ -26,5 +26,9 @@ class IvlAuthorizationAndConsent
   def self.help_me_sign_up_btn
     '.help-me-sign-up'
   end
+
+  def self.authorization_and_consent_text
+    'Authorization and Consent'
+  end
 end
 

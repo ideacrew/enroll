@@ -47,4 +47,4 @@ Feature: IVL plan purchase
     And Resident should also see the reason for ineligibility
     When Resident checks the primary person
     And Resident clicked on shop for new plan
-    Then Resident should see primary person
+    Then Resident should see coverage for primary person

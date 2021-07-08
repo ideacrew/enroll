@@ -11,6 +11,7 @@ Feature: Create Primary Broker and Broker Agency
   The Broker should be able to purchase insurance for that family
 
   Scenario: Broker can enter ACH information
+    Given the shop market configuration is enabled
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for enrollment_open initial employer with health benefits
     And there is an employer ABC Widgets

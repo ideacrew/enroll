@@ -1,6 +1,8 @@
 module Effective
   module Datatables
     class NoticesDatatable < Effective::MongoidDatatable
+      include Config::SiteModelConcern
+
       datatable do
 
         bulk_actions_column do
@@ -44,6 +46,8 @@ module Effective
       end
 
       def nested_filter_definition
+        return unless is_shop_or_fehb_market_enabled?
+
         filters = {
         market_kind:
          [

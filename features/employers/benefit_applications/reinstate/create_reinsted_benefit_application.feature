@@ -1,20 +1,21 @@
 Feature: Ability for Admin to create an Reinstated benefit application and allow employees to plan shop
 
   Background: Setup site, employer, and benefit market catalogs
+    Given the shop market configuration is enabled
     Given a CCA site exists with a benefit market
     And benefit market catalog exists for active initial employer with health benefits
     And there is an employer ABC Widgets
     And ABC Widgets employer has a staff role
     And the Reinstate feature configuration is enabled
     And Qualifying life events are present
-
-Scenario: Initial Employer is in termination pending. Admin is able to create reinstated benefit application
-          and employees are able to plan shop in both active and future reinstated applications
-
     Given initial employer ABC Widgets has active benefit application
     And there is a census employee record and employee role for Patrick Doe for employer ABC Widgets
     And census employee Patrick Doe has a past DOH
     And employees for employer ABC Widgets have selected a coverage
+
+Scenario: Initial Employer is in termination pending. Admin is able to create reinstated benefit application
+          and employees are able to plan shop in both active and future reinstated applications
+
     Given that a user with a HBX staff role with HBX staff subrole exists and is logged in
     And the user is on the Employer Index of the Admin Dashboard
     When the user clicks Action for that Employer
@@ -55,24 +56,9 @@ Scenario: Initial Employer is in termination pending. Admin is able to create re
     When Employee clicks on Confirm button on the coverage summary page
     Then Employee clicks back to my account button
     And employee Patrick Doe of employer ABC Widgets most recent HBX Enrollment should be under the future reinstated benefit application
-#TODO - Blocking based on ticket https://devops.dchbx.org/redmine/issues/92712 - uncomment when the code is reverted
-#    When Employee click the "Had a baby" in qle carousel
-#    And Employee select a past qle date
-#    Then Employee should see confirmation and clicks continue
-#    Then Employee should see family members page and clicks continue
-#    Then Employee should see the group selection page
-#    When Employee clicks continue on the group selection page
-#    Then Employee should see the list of plans
-#    When Employee selects a plan on the plan shopping page
-#    When Employee clicks on Confirm button on the coverage summary page
-#    Then Employee clicks back to my account button
-#    And employee Patrick Doe of employer ABC Widgets most recent HBX Enrollment should be under the termination pending benefit application
 
   Scenario Outline: Admin is able to create reinstated benefit application and employees are able to plan shop in the new reinstaed PY
-    Given initial employer ABC Widgets has active benefit application
-    And there is a census employee record and employee role for Patrick Doe for employer ABC Widgets
-    And census employee Patrick Doe has a past DOH
-    And employees for employer ABC Widgets have selected a coverage
+    
     And initial employer ABC Widgets application <to_state>
     And that a user with a HBX staff role with Super Admin subrole exists and is logged in
     And the user is on the Employer Index of the Admin Dashboard

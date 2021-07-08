@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :benefit_sponsors_organizations_broker_agency_profile, class: 'BenefitSponsors::Organizations::BrokerAgencyProfile' do
 
-    market_kind { :shop }
+    market_kind { is_shop_market_enabled? ? :shop : :individual }
     corporate_npn { "0989898981" }
     ach_routing_number { '123456789' }
     ach_account_number { '9999999999999999' }
@@ -30,7 +30,7 @@ FactoryBot.define do
       broker_role = profile.primary_broker_role
       if broker_role.present? && broker_role.benefit_sponsors_broker_agency_profile_id.blank?
         broker_role.benefit_sponsors_broker_agency_profile_id = profile.id
-        broker_role.save && profile.save
+        broker_role.save! && profile.save!
       end
     end
   end

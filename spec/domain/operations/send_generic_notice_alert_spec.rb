@@ -59,16 +59,18 @@ module Operations
       end
     end
 
-    describe "passing employer profile as :resource" do
+    if EnrollRegistry.feature_enabled?(:aca_shop_market)
+      describe "passing employer profile as :resource" do
 
-      let(:params) { { resource: employer_profile }}
+        let(:params) { { resource: employer_profile }}
 
-      before do
-        allow(employer_profile).to receive(:can_receive_electronic_communication?).and_return true
-      end
+        before do
+          allow(employer_profile).to receive(:can_receive_electronic_communication?).and_return true
+        end
 
-      it "passes" do
-        expect(subject).to be_success
+        it "passes" do
+          expect(subject).to be_success
+        end
       end
     end
 

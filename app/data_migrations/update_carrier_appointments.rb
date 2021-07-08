@@ -18,7 +18,7 @@ class UpdateCarrierAppointments < MongoidMigrationTask
                 "Tufts Health Plan Premier" => "Tufts Health Plan Premier"
                }
     BrokerRole.all.each do |br|
-      all_carrier_appointment = "BrokerRole::#{Settings.site.key.upcase}_BROKER_CARRIER_APPOINTMENTS".constantize.stringify_keys
+      all_carrier_appointment = EnrollRegistry[:brokers].setting(:carrier_appointments).item.stringify_keys
       data = br.carrier_appointments.map {|k, v| mappings[k] ? [mappings[k], v] : nil}.compact.to_h
       br.carrier_appointments = all_carrier_appointment.merge! data
       br.save

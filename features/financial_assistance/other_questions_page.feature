@@ -80,6 +80,12 @@ Feature: Start a new Financial Assistance Application and answers questions on O
     Then the did you move to the US question should display
     And the military veteran question should display
 
+  Scenario: Immigration related question - answered no
+    Given user does not have eligible immigration status
+    And the user answers yes to having an eligible immigration status
+    Then the did you move to the US question should display
+    And the military veteran question should NOT display
+
   Scenario: Answered yes to military question
     Given the user answers yes to having an eligible immigration status
     And user answers no to the military veteran question

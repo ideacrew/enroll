@@ -77,6 +77,7 @@ describe UpdateEmployeeRoleId, dbclean: :after_each do
 
     context 'update employee role id on the enrollments', dbclean: :after_each  do
       before :each do
+        EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
         employee_role.person.save!
       end
 
@@ -104,6 +105,7 @@ describe UpdateEmployeeRoleId, dbclean: :after_each do
 
     context 'update employee role id on the census_employee', dbclean: :after_each  do
       before :each do
+        EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
         employee_role.person.save!
         person.active_employee_roles.first.census_employee.update_attributes!(employee_role_id: employee_role.id )
       end

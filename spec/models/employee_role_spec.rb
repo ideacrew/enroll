@@ -475,6 +475,7 @@ describe EmployeeRole, dbclean: :around_each do
     let(:ee_ids) {[first_match_employee_role.id, first_non_match_employee_role.id]}
 
     before do
+      EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
       match_benefit_sponsorship
       non_match_benefit_sponsorship
       match_employee_roles.each do |ee|

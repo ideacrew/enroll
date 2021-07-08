@@ -1,6 +1,7 @@
 Feature: As an admin user I should have the ability to click reinstate button on Employer datatable
 
   Scenario Outline: Admin clicks reinstate button under plan year dropdown for <aasm_state> benefit_application
+    Given the shop market configuration is enabled
     Given the Reinstate feature configuration is enabled
     And a CCA site exists with a benefit market
     And benefit market catalog exists for <from_state> initial employer with health benefits

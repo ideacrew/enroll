@@ -35,8 +35,12 @@ module Operations
       person ? Success(person) : Failure([:danger, 'Person not found'])
     end
 
+    def local_residency
+      EnrollRegistry[:enroll_app].setting(:state_residency).item
+    end
+
     def call_fed_hub(person, verification_type)
-      if verification_type == 'DC Residency'
+      if verification_type == local_residency
         person.consumer_role.invoke_residency_verification!
       else
         person.consumer_role.redetermine_verification!(OpenStruct.new({:determined_at => Time.zone.now, :authority => 'hbx'}))
@@ -46,7 +50,7 @@ module Operations
     end
 
     def assign_message(verification_type)
-      hub = verification_type == 'DC Residency' ? 'Local Residency' : 'FedHub'
+      hub = verification_type == local_residency ? 'Local Residency' : 'FedHub'
       message = "Request was sent to #{hub}."
       Success([:success, message])
     end

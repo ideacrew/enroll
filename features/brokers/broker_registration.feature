@@ -1,6 +1,7 @@
 Feature: Broker Agency Registration
 
   Scenario: Primary Broker has not signed up on the HBX
+    Given the shop market configuration is enabled
     Given a CCA site exists with a benefit market
     When Primary Broker visits the HBX Broker Registration form
     Given Primary Broker has not signed up as an HBX user

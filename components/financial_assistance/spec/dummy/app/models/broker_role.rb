@@ -15,15 +15,6 @@ class BrokerRole
     "Both – Individual & Family AND Small Business Marketplaces" => "both"
   }.freeze
 
-  BROKER_CARRIER_APPOINTMENTS = {"Aetna Health Inc" => nil,
-                                 "Aetna Life Insurance Company" => nil,
-                                 "Carefirst Bluechoice Inc" => nil,
-                                 "Group Hospitalization and Medical Services Inc" => nil,
-                                 "Kaiser Foundation" => nil,
-                                 "Optimum Choice" => nil,
-                                 "United Health Care Insurance" => nil,
-                                 "United Health Care Mid Atlantic" => nil}.freeze
-
   embedded_in :person
 
   field :aasm_state, type: String
@@ -41,7 +32,7 @@ class BrokerRole
   field :accept_new_clients, type: Boolean
   field :license, type: Boolean
   field :training, type: Boolean
-  field :carrier_appointments, type: Hash, default: BROKER_CARRIER_APPOINTMENTS
+  field :carrier_appointments, type: Hash, default: EnrollRegistry[:brokers].setting(:carrier_appointments).item
 
   delegate :hbx_id, :hbx_id=, to: :person, allow_nil: true
 

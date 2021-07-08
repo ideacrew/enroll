@@ -1,9 +1,9 @@
-footer.footer-wrapper
+footer.footer-wrapper class=("#{"pre_prod_nav_color" if ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true'}")
   .container
     .row.pt-3.pb-3
       .col-md-6
         = copyright_notice
-      .col-md-6.pl-5
+      .col-md-6
           ul.list-unstyled.list-group.list-group-horizontal
             li.mr-3
               a.call-customer-service href="tel:#{contact_center_short_number}"

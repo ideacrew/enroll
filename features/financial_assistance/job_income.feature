@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 Feature: Start a new Financial Assistance Application and fills out the job and self employed income forms
- 
+
   Background: User logs in and visits applicant's Job income page
     Given a consumer, with a family, exists
     And is logged in
@@ -11,7 +11,13 @@ Feature: Start a new Financial Assistance Application and fills out the job and 
     And they click ADD INCOME & COVERAGE INFO for an applicant
     Then they should be taken to the applicant's Tax Info page
     And they visit the applicant's Job income page
-  
+
+  Scenario: Unemployment Cancel button functionality
+    Given the user answers yes to having and income from an employer
+    When the user cancels the form
+    And the job income form should not show
+    And NO should be selected again for job income
+
   @flaky
   Scenario: User answers no to having job income
     Given the user answers no to having an income from an employer
@@ -99,4 +105,3 @@ Feature: Start a new Financial Assistance Application and fills out the job and 
     And the user closes the open income question modal
     When the user clicks the Not sure link next to the self employment income question
     Then the user should see the popup for the self employment income question
-

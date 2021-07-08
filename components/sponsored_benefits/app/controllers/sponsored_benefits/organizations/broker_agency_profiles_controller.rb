@@ -3,18 +3,21 @@ require_dependency "sponsored_benefits/application_controller"
 module SponsoredBenefits
   class Organizations::BrokerAgencyProfilesController < ApplicationController
     include DataTablesAdapter
+    include ::Config::SiteModelConcern
     before_action :find_profile, :general_agency_profiles, only: [:employers]
 
     def employers
       # This should be index action in plan design organizations controller
-      @datatable = klass.new(profile_id: @profile._id)
+      Rails.logger.warn("Attempted to access employers with no profile present.") if is_shop_or_fehb_market_enabled? && @profile.blank?
+      head :bad_request unless is_shop_or_fehb_market_enabled? && @profile.present?
+      @datatable = klass.new(profile_id: @profile._id) if @profile.present?
     end
 
   private
 
     def find_profile
       @profile = BenefitSponsors::Organizations::BrokerAgencyProfile.find(params[:id]) || BenefitSponsors::Organizations::GeneralAgencyProfile.find(params[:id])
-      @provider = provider
+      @provider = provider if @profile
     end
 
     def general_agency_profiles

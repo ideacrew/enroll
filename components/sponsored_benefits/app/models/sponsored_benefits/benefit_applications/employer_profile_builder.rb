@@ -25,13 +25,17 @@ module SponsoredBenefits
         @organization_exists = @organization.persisted?
       end
 
+      # TODO: Figure out why this had an automatic return true for DC, and refactor eventually
       def quote_valid?
-        return true if aca_state_abbreviation == "DC"
+        # return true if aca_state_abbreviation == "DC"
+        return EnrollRegistry.feature_enabled?(:automatic_quote_validation)
         validate_effective_date
       end
 
       def validate_effective_date
-        if @organization.present? && aca_state_abbreviation == "MA"
+        # TODO: Look into this for MA, refactor if appropriate.
+        # if @organization.present? && aca_state_abbreviation == "MA"
+        if @organization.present? && EnrollRegistry.feature_enabled?(:validate_effective_date_employer)
           benefit_sponsorship = @organization.active_benefit_sponsorship
           if (benefit_sponsorship.present? && benefit_sponsorship.active_benefit_application.present?) || benefit_sponsorship.is_conversion?
             base_benefit_application = benefit_sponsorship.active_benefit_application || benefit_sponsorship.published_benefit_application

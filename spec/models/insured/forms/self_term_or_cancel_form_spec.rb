@@ -80,8 +80,9 @@ module Insured
         @product.save!
         enrollment.update_attributes(product: @product, applied_aptc_amount: applied_aptc_amount)
         hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.update_attributes!(slcsp_id: @product.id)}
-        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, hbx_enrollment_member_2_age, 'R-DC001').and_return(814.85)
-        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, primary_person_age, 'R-DC001').and_return(879.8)
+        site_key = EnrollRegistry[:enroll_app].setting(:site_key).item.upcase
+        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, hbx_enrollment_member_2_age, "R-#{site_key}001").and_return(814.85)
+        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, primary_person_age, "R-#{site_key}001").and_return(879.8)
       end
 
       it 'should create a valid form for the view' do

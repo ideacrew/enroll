@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 module BenefitMarkets
+  # TODO: Figure out how to refactor with ResourceRegistry
   RSpec.describe Locations::RatingArea do
     before :each do
       DatabaseCleaner.clean
@@ -83,7 +84,7 @@ module BenefitMarkets
       it "will return rating area based on exchange when given an address not in that county" do
         rating_area
         rating_areas = ::BenefitMarkets::Locations::RatingArea.rating_area_for(address_outside_county)
-        if Settings.site.key == :cca
+        if EnrollRegistry[:enroll_app].setting(:site_key).item == :cca
           expect(rating_areas.to_a).not_to include(rating_area)
         else
           expect(rating_areas.to_a).to include(rating_area)
@@ -93,7 +94,7 @@ module BenefitMarkets
       it "will return rating area based on exchange when given an address not in that zip code" do
         rating_area
         rating_areas = ::BenefitMarkets::Locations::RatingArea.rating_area_for(address_outside_zip)
-        if Settings.site.key == :cca
+        if EnrollRegistry[:enroll_app].setting(:site_key).item == :cca
           expect(rating_areas.to_a).not_to include(rating_area)
         else
           expect(rating_areas.to_a).to include(rating_area)
@@ -103,7 +104,7 @@ module BenefitMarkets
       it "will return rating area based on exchange when given an address not in that state" do
         rating_area
         rating_areas = ::BenefitMarkets::Locations::RatingArea.rating_area_for(address_outside_state)
-        if Settings.site.key == :cca
+        if EnrollRegistry[:enroll_app].setting(:site_key).item == :cca
           expect(rating_areas.to_a).not_to include(rating_area)
         else
           expect(rating_areas.to_a).to include(rating_area)
@@ -138,7 +139,7 @@ module BenefitMarkets
       it "will return rating area based on exchange when given an address not in that state" do
         rating_area
         rating_areas = ::BenefitMarkets::Locations::RatingArea.rating_area_for(address_outside_state)
-        if Settings.site.key == :cca
+        if EnrollRegistry[:enroll_app].setting(:site_key).item == :cca
           expect(rating_areas.to_a).not_to include(rating_area)
         else
           expect(rating_areas.to_a).to include(rating_area)

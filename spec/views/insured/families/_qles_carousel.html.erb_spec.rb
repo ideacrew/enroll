@@ -55,6 +55,7 @@ RSpec.describe "insured/families/_qles_carousel.html.erb" do
   context "QLE buttons for person with both roles" do
     before :each do
       assign(:multiroles, true)
+      EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
     end
 
     it "contain buttons group for QLE roles" do

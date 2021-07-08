@@ -4,6 +4,8 @@ module Effective
   module Datatables
     class SepTypeDataTable < Effective::MongoidDatatable
       include Config::AcaModelConcern
+      include Config::SiteModelConcern
+
       datatable do
         table_column :title, :label => l10n("datatables.sep_type_data_table.title"), :proc => proc { |row| link_to(row.title, edit_exchanges_manage_sep_type_path(row.id), data: {turbolinks: false})}, :filter => false, :sortable => true
         table_column :Market, :label => l10n("datatables.sep_type_data_table.market"), :proc => proc { |row|  market_kind(row)}, :filter => false, :sortable => false
@@ -58,12 +60,12 @@ module Effective
       end
 
       def nested_filter_definition
-        manage_qles_tab = [
-          {scope: 'all', label: l10n("datatables.sep_type_data_table.all")},
-          {scope: 'shop_qles', label: l10n("datatables.sep_type_data_table.shop_qles"), subfilter: :employer_options},
-          {scope: 'fehb_qles', label: l10n("datatables.sep_type_data_table.fehb_qles"), subfilter: :congress_options}
-        ]
-        manage_qles_tab.insert(1, {scope: 'ivl_qles', label: l10n("datatables.sep_type_data_table.ivl_qles"), subfilter: :individual_options}) if individual_market_is_enabled?
+        manage_qles_tab = [{scope: 'all', label: l10n("datatables.sep_type_data_table.all")}].tap do |a|
+          a << {scope: 'ivl_qles', label: l10n("datatables.sep_type_data_table.ivl_qles"), subfilter: :individual_options} if is_individual_market_enabled?
+          a << {scope: 'shop_qles', label: l10n("datatables.sep_type_data_table.shop_qles"), subfilter: :employer_options} if is_shop_market_enabled?
+          a << {scope: 'fehb_qles', label: l10n("datatables.sep_type_data_table.fehb_qles"), subfilter: :congress_options} if is_fehb_market_enabled?
+        end
+
         {
           employer_options: [
             {scope: 'all', label:  l10n("datatables.sep_type_data_table.all")},

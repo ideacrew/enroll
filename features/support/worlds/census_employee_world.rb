@@ -172,7 +172,7 @@ And(/^there is a census employee record and employee role for (.*?) for employer
     benefit_sponsors_employer_profile_id: employer_profile.id
   )
   expect(person_record.save!).to eq(true)
-  expect(person_record.employee_roles.count > 0).to eq(true)
+  expect(person_record.employee_roles.any?).to eq(true)
 end
 
 And(/^census employee (.*?) has a user record$/) do |named_person|

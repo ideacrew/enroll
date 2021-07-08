@@ -634,8 +634,10 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
               expect(enrollment.hbx_enrollment_members.first.coverage_start_on).to eq enrollment.effective_on
             end
           else
-            it "raises an error" do
-              expect {HbxEnrollment.new_from(consumer_role: consumer_role, coverage_household: coverage_household, benefit_package: benefit_package, qle: false)}.to raise_error(RuntimeError)
+            it "shows errors in messages" do
+              expect(
+                HbxEnrollment.new_from(consumer_role: consumer_role, coverage_household: coverage_household, benefit_package: benefit_package, qle: false).errors[:base]
+              ).to eq(["You may not enroll unless it’s open enrollment or you’re eligible for a special enrollment period."])
             end
           end
         end
@@ -2310,7 +2312,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
     end
   end
 
-  describe HbxEnrollment, '.build_plan_premium', type: :model, dbclean: :around_each do
+  describe HbxEnrollment, '.build_plan_premium', type: :model, dbclean: :around_each, :if => ::EnrollRegistry[:aca_shop_market].enabled? do
     include_context "setup benefit market with market catalogs and product packages"
     include_context "setup initial benefit application"
 

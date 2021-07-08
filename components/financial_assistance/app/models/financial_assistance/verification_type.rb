@@ -29,7 +29,7 @@ module FinancialAssistance
     scope :by_name, ->(type_name) { where(:type_name => type_name) }
 
     # embeds_many :external_service_responses  -> needs datamigration
-    embeds_many :type_history_elements
+    embeds_many :type_history_elements, class_name: "::FinancialAssistance::TypeHistoryElement"
 
 
     # embeds_many :vlp_documents, as: :documentable do
@@ -64,7 +64,7 @@ module FinancialAssistance
     end
 
     def add_type_history_element(params)
-      type_history_elements << TypeHistoryElement.new(params)
+      type_history_elements << FinancialAssistance::TypeHistoryElement.new(params)
     end
 
     def verif_due_date

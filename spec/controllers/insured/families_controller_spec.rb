@@ -2,7 +2,16 @@ require 'rails_helper'
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
+#Mock announcement class
+class Announcement
+  def self.current_msg_for_employee
+    []
+  end
 
+  def current_msg_for_employer
+    []
+  end
+end
 RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   context "set_current_user with no person" do
     let(:user) { FactoryBot.create(:user, person: person) }
@@ -196,6 +205,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
           allow(person).to receive(:has_active_consumer_role?).and_return(true)
           allow(person).to receive(:active_employee_roles).and_return(employee_roles)
           allow(user).to receive(:has_hbx_staff_role?).and_return false
+          EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
           sign_in user
         end
 
@@ -266,6 +276,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
           allow(employee_roles.first).to receive(:employer_profile).and_return abc_profile
           allow(abc_profile).to receive(:is_a?).with(BenefitSponsors::Organizations::FehbEmployerProfile).and_return true
           allow(user).to receive(:has_hbx_staff_role?).and_return false
+          EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
           sign_in user
         end
 
@@ -286,6 +297,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
           allow(person).to receive(:active_employee_roles).and_return(employee_roles)
           allow(user).to receive(:has_hbx_staff_role?).and_return true
           allow(person).to receive(:active_employee_roles).and_return([])
+          EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
           sign_in user
         end
 
@@ -318,6 +330,9 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
         allow(family).to receive(:active_family_members).and_return(family_members)
         allow(family).to receive(:check_for_consumer_role).and_return nil
         allow(employee_role).to receive(:census_employee_id).and_return census_employee.id
+        EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
+        allow(Announcement).to receive(:current_msg_for_employee).and_return(["msg for Employee"])
+        allow(Announcement).to receive(:audience_kinds).and_return(%w[Employer Employee IVL Broker GA Web_Page])
         sign_in user
         get :home
       end
@@ -442,6 +457,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
         before :each do
           allow(family).to receive(:active_family_members).and_return(family_members)
           allow(employee_role).to receive(:census_employee_id).and_return census_employee.id
+          EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
           get :home
         end
         it "should be a success" do
@@ -467,6 +483,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
         before :each do
           allow(family).to receive(:active_family_members).and_return(family_members)
           allow(employee_role).to receive(:census_employee_id).and_return census_employee.id
+          EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
           get :home
         end
         it "should be a success" do

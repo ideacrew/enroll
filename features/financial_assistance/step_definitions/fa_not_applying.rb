@@ -27,7 +27,7 @@ And(/the primary member has filled mandatory information required$/) do
   find(:xpath, '//label[@for="radio_male"]').click
   find(:xpath, '//label[@for="is_applying_coverage_true"]').click
   find('.btn', text: 'CONTINUE').click
-  expect(page).to have_content('Next, we need to verify if you or you and your family are eligible to enroll in coverage through DC Health Link. Select CONTINUE.')
+  expect(page).to have_content("Next, we need to verify if you or you and your family are eligible to enroll in coverage through #{Settings.site.short_name}. Select CONTINUE.")
   find('.btn', text: 'CONTINUE').click
   click_and_wait_on_stylized_radio('//label[@for="person_us_citizen_true"]', "person_us_citizen_true", "person[us_citizen]", "true")
   click_and_wait_on_stylized_radio('//label[@for="person_naturalized_citizen_false"]', "person_naturalized_citizen_false", "person[naturalized_citizen]", "false")
@@ -117,13 +117,23 @@ Given(/^the user navigates to the "Household Info" page with "yes" selected/) do
   create_plan
   find('.btn', text: 'CONTINUE').click
 end
-And(/^the user is navigated to Application checklist page/) do
+
+And(/^the .+ is navigated to Application checklist page/) do
   expect(page).to have_content('Application Checklist')
+end
+
+And(/^the .+ should see a modal popup/) do
+  expect(page).to have_content(l10n('faa.cost_savings.start_new_application').to_s)
+end
+
+And(/^the .+ clicks on 'Start New Application' on modal popup/) do
+  click_button 'Start new application'
 end
 
 When(/^the user clicks on CONTINUE button/) do
   find('.btn', text: 'CONTINUE').click
 end
+
 Then(/^the user will navigate to FAA Household Info: Family Members page/) do
   expect(page).to have_content("#{l10n('family_information')}")
 end

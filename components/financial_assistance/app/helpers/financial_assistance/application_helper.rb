@@ -147,7 +147,12 @@ module FinancialAssistance
     def start_to_end_dates(embedded_document)
       start_date = embedded_document.start_on
       end_date = embedded_document.end_on
-      end_date == TimeKeeper.date_of_record || !end_date ? "#{start_date} - Present" : "#{start_date} - #{end_date}"
+
+      if end_date.nil? || end_date > TimeKeeper.date_of_record
+        "#{start_date} - Present"
+      elsif end_date <= TimeKeeper.date_of_record
+        "#{start_date} - #{end_date}"
+      end
     end
 
     def income_and_deductions_edit(application, applicant, embedded_document)
@@ -228,7 +233,7 @@ module FinancialAssistance
     end
 
     def calculated_application_year
-      FinancialAssistanceRegistry[:application_year].item.call.value!
+      FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).constantize.item.call.value!
     end
 
     def human_boolean(boolean)
@@ -243,6 +248,10 @@ module FinancialAssistance
 
     def capitalize_full_name(full_name)
       full_name.split.map(&:capitalize).join(" ")
+    end
+
+    def all_applications_closed?(applications)
+      applications.count == applications.closed.count
     end
   end
 end

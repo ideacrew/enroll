@@ -276,30 +276,20 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
       expect(helper.newhire_enrollment_eligible?(employee_role)).to eq false
     end
 
-    context "with employee_role who has census_employee" do
+    context "with employee_role who has census_employee and newhire_enrollment_eligible" do
       before :each do
         allow(employee_role).to receive(:census_employee).and_return census_employee
+        allow(census_employee).to receive(:newhire_enrollment_eligible?).and_return true
       end
 
-      it "should return false when census_employee is not newhire_enrollment_eligible" do
-        allow(census_employee).to receive(:newhire_enrollment_eligible?).and_return false
+      it "should return false when person can not select coverage" do
+        allow(employee_role).to receive(:can_enroll_as_new_hire?).and_return false
         expect(helper.newhire_enrollment_eligible?(employee_role)).to eq false
       end
 
-      context "when census_employee is newhire_enrollment_eligible" do
-        before do
-          allow(census_employee).to receive(:newhire_enrollment_eligible?).and_return true
-        end
-
-        it "should return false when person can not select coverage" do
-          allow(employee_role).to receive(:can_select_coverage?).and_return false
-          expect(helper.newhire_enrollment_eligible?(employee_role)).to eq false
-        end
-
-        it "should return true when person can select coverage" do
-          allow(employee_role).to receive(:can_select_coverage?).and_return true
-          expect(helper.newhire_enrollment_eligible?(employee_role)).to eq true
-        end
+      it "should return true when person can select coverage" do
+        allow(employee_role).to receive(:can_enroll_as_new_hire?).and_return true
+        expect(helper.newhire_enrollment_eligible?(employee_role)).to eq true
       end
     end
   end
@@ -416,7 +406,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
     context "production environment" do
       it "should redirect from production environment" do
         ClimateControl.modify(AWS_ENV: 'prod') do
-          expect(helper.tax_info_url).to eq "https://dchealthlink.com/individuals/tax-documents"
+          expect(helper.tax_info_url).to eq EnrollRegistry[:enroll_app].setting(:prod_tax_info).item
         end
       end
     end
@@ -424,7 +414,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
     context "non-production environment" do
       it "should redirect from test environment" do
         ClimateControl.modify(AWS_ENV: 'preprod') do
-          expect(helper.tax_info_url).to eq "https://staging.dchealthlink.com/individuals/tax-documents"
+          expect(helper.tax_info_url).to eq EnrollRegistry[:enroll_app].setting(:staging_tax_info_url).item
         end
       end
     end

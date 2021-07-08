@@ -54,4 +54,8 @@ class IvlHomepage
   def self.married_link
     '.interaction-click-control-married'
   end
+
+  def self.aptc_amount_text
+    'APTC amount'
+  end
 end

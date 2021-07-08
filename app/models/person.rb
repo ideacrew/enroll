@@ -514,7 +514,7 @@ class Person
   end
 
   def add_new_verification_type(new_type)
-    default_status = (new_type == "DC Residency" && (consumer_role || resident_role) && age_on(TimeKeeper.date_of_record) < 18) ? "attested" : "unverified"
+    default_status = (new_type == VerificationType::LOCATION_RESIDENCY && (consumer_role || resident_role) && age_on(TimeKeeper.date_of_record) < 18) ? "attested" : "unverified"
     if verification_types.map(&:type_name).include? new_type
       verification_type_by_name(new_type).update_attributes(:inactive => false)
     else
@@ -563,9 +563,9 @@ class Person
       existing_relationship.update_attributes(:kind => relationship)
     elsif id != person.id
       self.person_relationships << PersonRelationship.new({
-        :kind => relationship,
-        :relative_id => person.id
-      })
+                                                            :kind => relationship,
+                                                            :relative_id => person.id
+                                                          })
     end
   end
 
@@ -580,6 +580,10 @@ class Person
 
   def home_address
     addresses.detect { |adr| adr.kind == "home" }
+  end
+
+  def zip
+    home_address.zip
   end
 
   def mailing_address
@@ -653,6 +657,7 @@ class Person
   end
 
   def has_active_employee_role?
+    return false unless is_shop_or_fehb_market_enabled?
     active_employee_roles.any?
   end
 
@@ -661,6 +666,7 @@ class Person
   end
 
   def active_employee_roles
+    return [] unless is_shop_or_fehb_market_enabled?
     employee_roles.select{|employee_role| employee_role.census_employee && employee_role.census_employee.is_active? }
   end
 

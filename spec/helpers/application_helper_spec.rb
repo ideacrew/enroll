@@ -144,8 +144,8 @@ RSpec.describe ApplicationHelper, :type => :helper do
       expect(network_type(nationwide_product)).to eq 'Nationwide'
     end
 
-    it 'should display DC-Metro if product is DC-Metro' do
-      expect(network_type(dcmetro_product)).to eq 'DC-Metro'
+    it "should display the statewide area according to the enroll registry" do
+      expect(network_type(dcmetro_product)).to eq ::EnrollRegistry[:enroll_app].setting(:statewide_area).item
     end
 
     it 'should display empty if metal level if its a 2016 plan' do
@@ -297,16 +297,16 @@ RSpec.describe ApplicationHelper, :type => :helper do
     let(:employer_profile) {organization.employer_profile}
     let(:employee_role) { FactoryBot.create(:employee_role, person: person, employer_profile: employer_profile)}
     let!(:broker_role) { FactoryBot.create(:broker_role, aasm_state: 'active') }
-    let!(:broker_agency_profile) { FactoryBot.create(:broker_agency_profile, aasm_state: 'is_approved', primary_broker_role: broker_role, organization: organization)}
     let!(:broker_agency_account) {FactoryBot.create(:broker_agency_account,broker_agency_profile_id: broker_agency_profile.id,writing_agent_id: broker_role.id, start_on: TimeKeeper.date_of_record)}
     let!(:broker_organization)            { FactoryBot.build(:benefit_sponsors_organizations_general_organization, site: site)}
-    let!(:broker_agency_profile)         { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile, organization: broker_organization, market_kind: 'shop', legal_name: 'Legal Name1') }
+    let!(:broker_agency_profile)         { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile, organization: broker_organization, legal_name: 'Legal Name1') }
 
     context 'person with dual roles' do
       before do
         allow(person).to receive(:employee_roles).and_return([employee_role])
         allow(person).to receive(:active_employee_roles).and_return([employee_role])
         allow(person).to receive(:consumer_role).and_return([])
+        allow(person).to receive(:has_active_employee_role?).and_return(true)
         allow(employer_profile).to receive(:broker_agency_profile).and_return([broker_agency_profile])
       end
 
@@ -441,10 +441,10 @@ RSpec.describe ApplicationHelper, :type => :helper do
 
   describe "get_key_and_bucket" do
     it "should return array with key and bucket" do
-      uri = "urn:openhbx:terms:v1:file_storage:s3:bucket:#{Settings.site.s3_prefix}-sbc#f21369fc-ae6c-4fa5-a299-370a555dc401"
+      uri = "urn:openhbx:terms:v1:file_storage:s3:bucket:#{EnrollRegistry[:enroll_app].setting(:s3_prefix).item}-sbc#f21369fc-ae6c-4fa5-a299-370a555dc401"
       key, bucket = get_key_and_bucket(uri)
       expect(key).to eq("f21369fc-ae6c-4fa5-a299-370a555dc401")
-      expect(bucket).to eq("#{Settings.site.s3_prefix}-sbc")
+      expect(bucket).to eq("#{EnrollRegistry[:enroll_app].setting(:s3_prefix).item}-sbc")
     end
   end
 
@@ -551,7 +551,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
     let(:aws_env) { ENV['AWS_ENV'] || "qa" }
     it "should return bucket name with system name prepended and environment name appended" do
       bucket_name = "sample-bucket"
-      expect(env_bucket_name(bucket_name)).to eq("#{Settings.site.s3_prefix}-enroll-#{bucket_name}-#{aws_env}")
+      expect(env_bucket_name(bucket_name)).to eq("#{EnrollRegistry[:enroll_app].setting(:s3_prefix).item}-enroll-#{bucket_name}-#{aws_env}")
     end
   end
 
@@ -623,32 +623,34 @@ RSpec.describe ApplicationHelper, :type => :helper do
 
   describe "find_plan_name", dbclean: :after_each do
     let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
-    let(:shop_enrollment) { FactoryBot.create(:hbx_enrollment,
-                                        household: family.active_household,
-                                        family:family,
-                                        kind: "employer_sponsored",
-                                        submitted_at: TimeKeeper.datetime_of_record - 3.days,
-                                        created_at: TimeKeeper.datetime_of_record - 3.days
-                                )}
-    let(:ivl_enrollment)    { FactoryBot.create(:hbx_enrollment,
-                                        household: family.latest_household,
-                                        family:family,
-                                        coverage_kind: "health",
-                                        effective_on: TimeKeeper.datetime_of_record - 10.days,
-                                        enrollment_kind: "open_enrollment",
-                                        kind: "individual",
-                                        submitted_at: TimeKeeper.datetime_of_record - 20.days
-                            )}
+    let(:shop_enrollment) do
+      FactoryBot.create(:hbx_enrollment, :with_product,
+                        household: family.active_household,
+                        family: family,
+                        kind: "employer_sponsored",
+                        submitted_at: TimeKeeper.datetime_of_record - 3.days,
+                        created_at: TimeKeeper.datetime_of_record - 3.days)
+    end
+    let(:ivl_enrollment)    do
+      FactoryBot.create(:hbx_enrollment, :with_product,
+                        household: family.latest_household,
+                        family: family,
+                        coverage_kind: "health",
+                        effective_on: TimeKeeper.datetime_of_record - 10.days,
+                        enrollment_kind: "open_enrollment",
+                        kind: "individual",
+                        submitted_at: TimeKeeper.datetime_of_record - 20.days)
+    end
     let(:valid_shop_enrollment_id)  { shop_enrollment.id }
     let(:valid_ivl_enrollment_id)   { ivl_enrollment.id }
     let(:invalid_enrollment_id)     {  }
 
     it "should return the plan name given a valid SHOP enrollment ID" do
-      expect(helper.find_plan_name(valid_shop_enrollment_id)).to eq shop_enrollment.plan.name
+      expect(helper.find_plan_name(valid_shop_enrollment_id)).to eq shop_enrollment.product.name
     end
 
     it "should return the plan name given a valid INDIVIDUAL enrollment ID" do
-      expect(helper.find_plan_name(valid_ivl_enrollment_id)).to eq  ivl_enrollment.plan.name
+      expect(helper.find_plan_name(valid_ivl_enrollment_id)).to eq  ivl_enrollment.product.name
     end
 
     it "should return nil given an invalid enrollment ID" do

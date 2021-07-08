@@ -146,7 +146,7 @@ class IvlNotices::ReminderNotice < IvlNotice
   end
 
   def residency_outstanding?(person)
-    person.consumer_role.types_include_to_notices.map(&:type_name).include?('DC Residency')
+    person.consumer_role.types_include_to_notices.map(&:type_name).include?(EnrollRegistry[:enroll_app].setting(:state_residency).item)
   end
 
   def append_unverified_individuals(people)
@@ -161,7 +161,7 @@ class IvlNotices::ReminderNotice < IvlNotice
           notice.dhs_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: verification_type.due_date, age: person.age_on(TimeKeeper.date_of_record) })
         when "American Indian Status"
           notice.american_indian_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: verification_type.due_date, age: person.age_on(TimeKeeper.date_of_record) })
-        when "DC Residency"
+        when EnrollRegistry[:enroll_app].setting(:state_residency).item
           notice.residency_inconsistency << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: verification_type.due_date, age: person.age_on(TimeKeeper.date_of_record) })
         end
       end

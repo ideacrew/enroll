@@ -1,12 +1,12 @@
 require 'rails_helper'
  
 RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerOpenEnrollmentCompleted', dbclean: :after_each do
-
+  let(:site_key) { EnrollRegistry[:enroll_app].setting(:site_key).item}
   let(:model_event) { "employer_open_enrollment_completed" }
   let(:notice_event) { "initial_employer_open_enrollment_completed" }
   let(:start_on) { TimeKeeper.date_of_record.next_month.beginning_of_month}
-  let!(:site) { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key) }
-  let!(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site) }
+  let!(:site) { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, site_key) }
+  let!(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{site_key}_employer_profile".to_sym, site: site) }
   let!(:employer_profile)    { organization.employer_profile }
   let!(:benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
   let!(:model_instance) { FactoryBot.create(:benefit_sponsors_benefit_application,

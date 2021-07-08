@@ -4,7 +4,7 @@ RSpec.describe "views/benefit_sponsors/profiles/employers/broker_agency/_active_
   let!(:site)  { FactoryBot.create(:benefit_sponsors_site, :with_owner_exempt_organization, :cca, :with_benefit_market) }
   let!(:organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site)}
   let(:employer_profile) { organization.employer_profile }
-  let!(:broker_agency_profile) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile, market_kind: 'shop', legal_name: 'Legal Name1', assigned_site: site) }
+  let!(:broker_agency_profile) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile, legal_name: 'Legal Name1', assigned_site: site) }
   let!(:broker_role) { FactoryBot.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id) }
 
   let!(:benefit_sponsorship) {FactoryBot.create(:benefit_sponsors_benefit_sponsorship, :with_broker_agency_account, profile: employer_profile, broker_agency_profile: broker_agency_profile, benefit_market: site.benefit_markets.first)}

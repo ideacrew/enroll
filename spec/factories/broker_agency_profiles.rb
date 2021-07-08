@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :broker_agency_profile do
-    market_kind { "shop" }
+    market_kind { is_shop_market_enabled? ? "shop" : "individual" }
     entity_kind { "s_corporation" }
     association :primary_broker_role, factory: :broker_role
     organization

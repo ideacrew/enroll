@@ -4,8 +4,8 @@ module BenefitMarkets
   RSpec.describe BenefitMarket, type: :model, dbclean: :after_each do
 
     let(:kind)            { :aca_shop }
-    let(:site_urn)        { 'dc' }
-    let(:title)           {  "DC Health Link SHOP Market" }
+    let(:site_urn)        { EnrollRegistry[:enroll_app].setting(:site_key).item.to_s }
+    let(:title)           {  "#{EnrollRegistry[:enroll_app].setting(:short_name).item} SHOP Market"}
     let(:description)     {  "Health Insurance Marketplace for District Employers and Employees" }
     let(:configuration)   { build :benefit_markets_aca_shop_configuration }
 

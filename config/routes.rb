@@ -92,6 +92,9 @@ Rails.application.routes.draw do
       get :find_sep, on: :collection
     end
 
+    # TODO: Consider wrapping this in a preprod conditional
+    resources :seeds, only: [:index, :new, :create, :edit, :update]
+
     if EnrollRegistry.feature_enabled?(:sep_types)
       resources :manage_sep_types do
         root 'manage_sep_types#sep_types_dt'
