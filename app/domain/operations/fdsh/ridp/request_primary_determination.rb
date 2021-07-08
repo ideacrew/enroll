@@ -7,7 +7,7 @@ module Operations
   module Fdsh
     module Ridp
       # ridp primary request
-      class PrimaryRequest
+      class RequestPrimaryDetermination
         # primary request from fdsh gateway
 
         include Dry::Monads[:result, :do, :try]
@@ -15,9 +15,8 @@ module Operations
 
         # @param [ Hash ] params Applicant Attributes
         # @return [ BenefitMarkets::Entities::Applicant ] applicant Applicant
-        def call(person_hbx_id:)
-          person = yield find_person(person_hbx_id)
-          payload_param = yield construct_payload_hash(person)
+        def call(params)
+          payload_param = yield construct_payload_hash(params)
           payload_value = yield validate_payload(payload_param)
           payload_entity = yield create_payload_entity(payload_value)
           payload = yield publish(payload_entity)
@@ -27,22 +26,26 @@ module Operations
 
         private
 
-        def find_person(hbx_id)
-          person = Person.by_hbx_id(hbx_id)
-          person.present? ? Success(person) : Failure("Person not found with hbx_id #{hbx_id}.")
-        end
-
-        def construct_payload_hash(person)
-          Operations::Transformers::PersonTo::Cv3Person.new.call(person)
+        def construct_payload_hash(family)
+          if family.is_a?(Family)
+            Operations::Transformers::FamilyTo::Cv3Family.new.call(family)
+          else
+            Failure("Invalid Family Object #{family}")
+          end
         end
 
         def validate_payload(value)
-          result = AcaEntities::Contracts::People::PersonContract.new.call(value)
-          result.success? ? Success(result) : Failure("Person with hbx_id #{hbx_id} is not valid due to #{result.errors}.")
+          result = AcaEntities::Contracts::Families::FamilyContract.new.call(value)
+          if result.success?
+            Success(result)
+          else
+            hbx_id = value[:family_members].detect{|a| a[:is_primary_applicant] == true}[:person][:hbx_id]
+            Failure("Person with hbx_id #{hbx_id} is not valid due to #{result.errors}.")
+          end
         end
 
         def create_payload_entity(value)
-          Success(AcaEntities::People::Person.new(value.to_h))
+          Success(AcaEntities::Families::Family.new(value.to_h))
         end
 
         def publish(payload)

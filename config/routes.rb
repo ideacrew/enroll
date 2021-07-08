@@ -273,6 +273,17 @@ Rails.application.routes.draw do
       end
     end
 
+    resources :fdsh_ridp, only: [:create, :new, :update] do
+      collection do
+        get 'failed_validation'
+        get 'service_unavailable'
+        get 'wait_for_primary_response'
+        get 'wait_for_secondary_response'
+        get 'check_primary_response_received'
+        get 'check_primary_response_received'
+      end
+    end
+
     resources :inboxes, only: [:new, :create, :show, :destroy]
     resources :families, only: [:show] do
       get 'new'
