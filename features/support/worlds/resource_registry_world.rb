@@ -26,16 +26,23 @@ module ResourceRegistryWorld
     registry_name = args[:registry_name] || EnrollRegistry
     registry_name[:sep_types].settings(:market_kind).meta.stub(:enum).and_return([{individual: "Individual"}, {shop: "SHOP"}, {fehb: "Congress"}])
   end
+end
 
-  def enable_fa_feature(feature_name)
-    return if fa_feature_enabled?(feature_name)
-
-    feature_dsl = FinancialAssistanceRegistry[feature_name]
-    feature_dsl.feature.stub(:is_enabled).and_return(true)
+And(/^FAA (.*) feature is (.*)$/) do |feature_key, enabled_or_disabled|
+  case enabled_or_disabled
+  when 'enabled'
+    enable_feature(feature_key.to_sym, {registry_name: FinancialAssistanceRegistry})
+  when 'disabled'
+    disable_feature(feature_key.to_sym, {registry_name: FinancialAssistanceRegistry})
   end
+end
 
-  def fa_feature_enabled?(feature_name)
-    FinancialAssistanceRegistry.feature_enabled?(feature_name)
+And(/^EnrollRegistry (.*) feature is (.*)$/) do |feature_key, enabled_or_disabled|
+  case enabled_or_disabled
+  when 'enabled'
+    enable_feature(feature_key.to_sym)
+  when 'disabled'
+    disable_feature(feature_key.to_sym)
   end
 end
 

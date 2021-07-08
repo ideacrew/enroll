@@ -91,7 +91,7 @@ Feature: Start a new Financial Assistance Application and answers questions on h
     Then they should see the Indian Healthcare question
 
   Scenario: MaineCare Questions feature is enabled
-    Given MaineCare questions feature is enabled
+    Given FAA medicaid_chip_driver_questions feature is enabled
     And the user has an eligible immigration status
     And they visit the Health Coverage page via the left nav (also confirm they are on the Health Coverage page)
     Then they should see the MaineCare ineligible question
