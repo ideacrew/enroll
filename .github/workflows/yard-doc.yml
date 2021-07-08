@@ -34,7 +34,7 @@ jobs:
           architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
       - name: Run swagger
         run: |
-          rake rswag:specs:swaggerize PATTERN="components/financial_assistance/spec/requests/financial_assistance/api/v1/applications_spec.rb"
+          bundle exec rake rswag:specs:swaggerize PATTERN="components/financial_assistance/spec/requests/financial_assistance/api/v1/applications_spec.rb"
           python swagger-yaml-to-html.py < /swagger/v1/swagger.yaml > doc.html    
       - name: Run yard
         run: bundle exec yard doc && mv ./doc ./hugo/static/yard
