@@ -11,8 +11,7 @@ module FinancialAssistance
 
     # belongs_to :family, class_name: "Family"
 
-    before_create :set_hbx_id, :set_applicant_kind, :set_request_kind, :set_motivation_kind, :set_us_state, :set_is_ridp_verified, :set_external_identifiers
-    after_create :create_income_verification_type
+    before_create :set_hbx_id, :set_applicant_kind, :set_request_kind, :set_motivation_kind, :set_us_state, :set_is_ridp_verified, :set_external_identifiers, :create_income_verification_type
     validates :application_submission_validity, presence: true, on: :submission
     validates :before_attestation_validity, presence: true, on: :before_attestation
     validate  :attestation_terms_on_parent_living_out_of_home
