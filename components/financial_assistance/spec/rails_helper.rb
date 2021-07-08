@@ -24,11 +24,6 @@ FactoryBot.definition_file_paths = [
 puts FactoryBot.definition_file_paths.inspect
 FactoryBot.find_definitions
 
-Shoulda::Matchers.configure do |config|
-  config.integrate do |with|
-    with.test_framework :rspec
-  end
-end
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
 # run as spec files by default. This means that files in spec/support that end
@@ -42,7 +37,7 @@ end
 # directory. Alternatively, in the individual `*_spec.rb` files, manually
 # require only the support files necessary.
 #
-Dir[Rails.root.join('spec/support/**/*.rb')].sort.each { |f| require f }
+Dir[FinancialAssistance::Engine.root.join('spec/support/**/*.rb')].sort.each { |f| require f }
 
 # Checks for pending migration and applies them before tests are run.
 # If you are not using ActiveRecord, you can remove this line.
@@ -80,6 +75,7 @@ RSpec.configure do |config|
 #  config.include ModelMatcherHelpers, :type => :model
   config.include Mongoid::Matchers, type: :model
   config.include Devise::Test::ControllerHelpers, :type => :controller
+  config.include Devise::Test::IntegrationHelpers, :type => :request
   config.include Devise::Test::ControllerHelpers, :type => :view
   config.include FactoryBot::Syntax::Methods
   config.include Capybara::DSL
@@ -97,4 +93,11 @@ end
 
 def main_app
   Rails.application.class.routes.url_helpers
+end
+
+Shoulda::Matchers.configure do |config|
+  config.integrate do |with|
+    with.test_framework :rspec
+    with.library :rails
+  end
 end
