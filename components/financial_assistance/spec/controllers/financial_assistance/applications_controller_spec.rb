@@ -133,6 +133,20 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
         post :step, params: { id: application.id, commit: "Submit Application", application: application_valid_params }
         expect(response).to redirect_to(wait_for_eligibility_response_application_path(application))
       end
+
+      it "should create verification types for income for all applicant person records without income" do
+        # TODO: We apparently cant do these feature.stubs at the engine level. No clue what to do.
+        # FinancialAssistanceRegistry[:verification_type_income_verification].feature.stub(:is_enabled).and_return(true)
+        if FinancialAssistanceRegistry.feature_enabled?(:verification_type_income_verification)
+          application.update_attributes(aasm_state: 'draft')
+          allow(application).to receive(:complete?).and_return(true)
+          post :step, params: { id: application.id, commit: "Submit Application", application: application_valid_params }
+          family_record = Family.find(application.family_id.to_s)
+          family_record.family_members.flat_map(&:person).each do |person|
+            expect(person.verification_types.where(type_name: "Income").count).to eq(1)
+          end
+        end
+      end
     end
 
     it "should render step if model is not saved" do

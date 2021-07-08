@@ -1055,6 +1055,15 @@ module FinancialAssistance
           %w[Income MEC].collect do |type|
             VerificationType.new(type_name: type, validation_status: 'pending')
           end
+        family_record = Family.where(id: family_id.to_s).first
+        if FinancialAssistanceRegistry.feature_enabled?(:verification_type_income_verification) &&
+           family_record.present? && applicant.incomes.blank? && applicant.family_member_id.present?
+          family_member_record = family_record.family_members.where(id: applicant.family_member_id).first
+          next if family_member_record.blank?
+          person_record = family_member_record.person
+          next if person_record.blank?
+          person_record.add_new_verification_type('Income')
+        end
         applicant.move_to_pending!
       end
     end

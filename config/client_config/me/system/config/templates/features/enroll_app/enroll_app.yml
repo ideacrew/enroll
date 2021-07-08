@@ -361,3 +361,5 @@ registry:
         is_enabled: true
       - key: :mainecare_cubcare_glossary
         is_enabled: true
+      - key: :verification_type_income_verification
+        is_enabled: true
