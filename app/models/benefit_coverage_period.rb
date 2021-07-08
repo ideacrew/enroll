@@ -176,7 +176,7 @@ class BenefitCoveragePeriod
     elected_product_ids = ivl_bgs.map(&:benefit_ids).flatten.uniq
     csr_kind = if tax_household
                  extract_csr_kind(tax_household, shopping_family_member_ids)
-               elsif hbx_enrollment.family.family_members.all?{|fm| fm.person.indian_tribe_member } && FinancialAssistanceRegistry.feature_enabled?(:native_american_csr)
+               elsif extract_american_indian_status(hbx_enrollment, shopping_family_member_ids) && FinancialAssistanceRegistry.feature_enabled?(:native_american_csr)
                  'csr_limited'
                end
     market = market.nil? || market == 'coverall' ? 'individual' : market
@@ -253,5 +253,10 @@ class BenefitCoveragePeriod
 
   def product_factory
     ::BenefitMarkets::Products::ProductFactory
+  end
+
+  def extract_american_indian_status(hbx_enrollment, shopping_family_member_ids)
+    shopping_family_members = hbx_enrollment.family.family_members.where(:id.in => shopping_family_member_ids)
+    shopping_family_members.all?{|fm| fm.person.indian_tribe_member }
   end
 end
