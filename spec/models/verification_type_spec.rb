@@ -26,16 +26,27 @@ RSpec.describe VerificationType, :type => :model, dbclean: :after_each do
         expect(person.consumer_role.verification_types.by_name(local_residency).first).not_to be nil
       end
     end
-    context "American Indian Status" do
-      it "build American Indian Status type" do
-        person.tribal_id = "4848477"
-        person.save
-        expect(person.consumer_role.verification_types.by_name("American Indian Status").first).not_to be nil
+    context "without American Indian Status" do
+      before :each do
+        EnrollRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(true)
       end
+
       it "doesn't build American Indian Status type" do
         person.tribal_id = nil
         person.save
         expect(person.consumer_role.verification_types.by_name("American Indian Status").first).to be nil
+      end
+    end
+
+    context "American Indian Status" do
+      before :each do
+        EnrollRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(false)
+      end
+
+      it "build American Indian Status type" do
+        person.tribal_id = "4848477"
+        person.save
+        expect(person.consumer_role.verification_types.by_name("American Indian Status").first).not_to be nil
       end
     end
   end
