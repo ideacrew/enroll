@@ -25,10 +25,10 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/event_source.git
-  revision: ca1738c6bec46fdea1c57379f303bee47b468cba
-  branch: release_0.5.3
+  revision: 194046a9d10a664595949624d597d69d9b6a05b3
+  branch: trunk
   specs:
-    event_source (0.5.3)
+    event_source (0.5.2)
       bunny (>= 1.7.1)
       deep_merge (~> 1.2.0)
       dry-events (~> 0.3)
