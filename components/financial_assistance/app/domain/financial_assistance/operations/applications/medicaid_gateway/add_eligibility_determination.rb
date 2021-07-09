@@ -85,6 +85,7 @@ module FinancialAssistance
                                              magi_medicaid_monthly_income_limit: ped_entity.magi_medicaid_monthly_income_limit,
                                              magi_medicaid_monthly_household_income: ped_entity.magi_medicaid_monthly_household_income,
                                              is_without_assistance: ped_entity.is_uqhp_eligible,
+                                             csr_percent_as_integer: get_csr_value(ped_entity),
                                              is_ia_eligible: ped_entity.is_ia_eligible,
                                              is_medicaid_chip_eligible: ped_entity.is_medicaid_chip_eligible || ped_entity.is_magi_medicaid,
                                              is_totally_ineligible: ped_entity.is_totally_ineligible,
@@ -103,7 +104,6 @@ module FinancialAssistance
             elig_d.update_attributes!({ effective_starting_on: thh_entity.effective_on,
                                         is_eligibility_determined: true,
                                         max_aptc: thh_entity.max_aptc.to_f,
-                                        csr_percent_as_integer: get_primary_csr_value(elig_d, thh_entity) || 0,
                                         determined_at: thh_entity.determined_on,
                                         aptc_csr_annual_household_income: thh_entity.annual_tax_household_income,
                                         aptc_annual_income_limit: Money.new(0, 'USD'),
@@ -111,15 +111,10 @@ module FinancialAssistance
                                         source: 'Faa' })
           end
 
-          # Just for Demo
-          def get_primary_csr_value(elig_d, thh_entity)
-            primary_person_hbx_id = elig_d.application.primary_applicant.person_hbx_id
-            csr = thh_entity.tax_household_members.detect do |thhm_entity|
-              thhm_entity.applicant_reference.person_hbx_id == primary_person_hbx_id
-            end.product_eligibility_determination.csr
-            (csr == 'limited') ? 0 : csr
-          rescue StandardError => _e
-            0
+          def get_csr_value(ped_entity)
+            return 0 if ped_entity.csr.blank?
+            csr = ped_entity.csr
+            (csr == 'limited') ? 0 : csr.to_i
           end
 
           def find_matching_applicant(elig_det, applicant_ref)
