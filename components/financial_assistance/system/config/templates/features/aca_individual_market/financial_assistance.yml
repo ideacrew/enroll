@@ -68,9 +68,9 @@ registry:
     - :request_determination
     features:
     - key: :haven_determination
-      is_enabled: true
-    - key: :medicaid_gateway_determination
       is_enabled: false
+    - key: :medicaid_gateway_determination
+      is_enabled: true
   - namespace:
     - :documents
     features:
