@@ -6,7 +6,6 @@
     <% if @qualifying_life_events %>
       <% slice_count = (@qualifying_life_events.count / 3.0).ceil %>
       <% slice_count = slice_count > 0 ? slice_count : 1 %>
-      <% binding.pry %>
       <% @qualifying_life_events.each_slice(slice_count) do |qles| %>
         <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
           <ul class="list-unstyled list-inline list-qle">

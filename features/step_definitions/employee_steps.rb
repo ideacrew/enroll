@@ -119,7 +119,7 @@ Then(/^\w+ should see the "(.*?)" at the (.*) of the (.*?) qle list$/) do |qle_e
   if position == 'top'
     expect(find('.qles-panel #carousel-qles .item.active').find_all('p.no-op')[0]).to have_content(qle_event)
   else
-    expect(find('.qles-panel #carousel-qles .item.active').find_all('p.no-op')[2]).to have_content(qle_event)
+    expect(find('.qles-panel #carousel-qles .item.active').find_all('p.no-op').last).to have_content(qle_event)
   end
 end
 
