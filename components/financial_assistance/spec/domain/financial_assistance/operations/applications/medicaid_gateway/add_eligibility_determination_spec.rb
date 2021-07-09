@@ -97,10 +97,6 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
         it 'should update csr_annual_income_limit' do
           expect(@ed.csr_annual_income_limit.to_f).to eq(142_912_000.0)
         end
-
-        it 'should update csr_percent_as_integer value' do
-          expect(@ed.csr_percent_as_integer).to eq(94)
-        end
       end
 
       context 'for Applicant' do
@@ -128,6 +124,14 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
         it 'should update magi_medicaid_category' do
           expect(@applicant.magi_medicaid_category).not_to be_nil
           expect(@applicant.magi_medicaid_category).to eq('none')
+        end
+
+        it 'should update csr_percent_as_integer value' do
+          expect(@applicant.csr_percent_as_integer).to eq(-1)
+        end
+
+        it 'should update csr_percent_as_integer value' do
+          expect(@applicant.csr_eligibility_kind).to eq("csr_limited")
         end
       end
     end
