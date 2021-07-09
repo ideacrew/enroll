@@ -1078,13 +1078,13 @@ module FinancialAssistance
         end
       end
 
-      if is_student
-        errors.add(:student_kind, "' What is the type of student?' should be answered") if student_kind.blank?
+      if is_student && FinancialAssistanceRegistry.feature_enabled?(:student_follow_up_questions)
+        errors.add(:student_kind, "' #{l10n('faa.other_ques.is_student')}' should be answered") if student_kind.blank?
         errors.add(:student_status_end_on, "' Student status end on date?'  should be answered") if student_status_end_on.blank?
         errors.add(:student_school_kind, "' What type of school do you go to?' should be answered") if student_school_kind.blank?
       end
 
-      errors.add(:is_student, "' Is this person a student?' should be answered") if age_of_applicant.between?(18,19) && is_student.nil?
+      errors.add(:is_student, "' #{l10n('faa.other_ques.is_student')}' should be answered") if age_of_applicant.between?(18,19) && is_student.nil?
       # TODO: Decide if these validations should be ended?
       # errors.add(:claimed_as_tax_dependent_by, "' This person will be claimed as a dependent by' can't be blank") if is_claimed_as_tax_dependent && claimed_as_tax_dependent_by.nil?
 

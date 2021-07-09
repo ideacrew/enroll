@@ -2,6 +2,7 @@
 
 # Assistance Translations
 
+# rubocop:disable Layout/LineLength
 FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.curam_lookup" => "It looks like you've already completed an application for Medicaid and cost savings
      on Maine Cover ME. Please call Maine Cover ME at (800) 965-7476 to make updates to that application.
@@ -11,8 +12,8 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
      If you keep going, we'll check to see if you qualify to enroll in a private health insurance plan on Maine Cover ME, but won't be able to tell you if you qualify for Medicaid or cost savings.",
   "en.faa.other_ques.disability_question" => "Does this person have a disability?",
   "en.faa.review_eligibility_header" => "Your Application for Premium Reductions",
-  'en.faa.other_ques.is_student' => 'Is this person a student? *',
-  "en.faa.medicaid_question" => "Do you want us to submit this application to the <state-abbreviation-placeholder> Department of Health and Human Services (DHHS) to do a full review of your application for Medicaid eligibility?",
+  'en.faa.other_ques.is_student' => '"Is this person a full-time student?*"',
+  "en.faa.medicaid_question" => "Do you want us to submit this application to the ME Department of Health and Human Services (DHHS) to do a full review of your application for Medicaid eligibility?",
   'en.faa.edit.delete_applicant' => 'Are you sure you want to remove this applicant?',
   'en.faa.edit.remove_warning' => 'This cannot be undone.',
   'en.faa.incomes.job_income_note' => "Note: For job income this person currently receives, do not enter an end date into the ‘To’ field. Only enter an end date if the job income ended.",
@@ -113,5 +114,10 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.parent_living_outside_of_home_1" => "<br><br>If yes, I know that, if anyone in my application group is found eligible for MaineCare, I will be asked to cooperate with the Child Support Agency ",
   "en.faa.parent_living_outside_of_home_2" => "to collect medical support from the parent who lives outside the home. If I think that cooperating to collect medical support will harm me or my children, ",
   "en.faa.parent_living_outside_of_home_3" => "I can tell my caseworker and I may not have to cooperate.",
-  "en.faa.negative_income" => "Negative Income"
+  "en.faa.negative_income" => "Negative Income",
+  "en.faa.full_long_name_determination" => "Based on the information you provided, no one on this application is likely to qualify for %{program_short_name}. Do you still want us to send your application to the %{program_long_name} so they can check on %{program_short_name} eligibility?",
+  "en.faa.send_to_external_verification" => "Send to OFI",
+  "en.faa.primary_caretaker_question_text" => "Is this person the main person taking care of any children age 18 or younger? *"
 }.freeze
+# rubocop:enable Layout/LineLength
+

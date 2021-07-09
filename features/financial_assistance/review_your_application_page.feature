@@ -15,7 +15,7 @@ Feature: Review your application page functionality
     Then the user should navigate to the Income Adjustments page
 
   Scenario: Net Annual Salary Displays for Applicants
-    Given net annual income display is enabled
+    Given FAA net_annual_income_display feature is enabled
     And the page is refreshed with feature enabled
     Then the user should see the net annual income displayed
 

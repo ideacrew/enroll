@@ -377,3 +377,5 @@ registry:
         is_enabled: false
       - key: :legacy_enrollment_trigger
         iss_enabled: true
+      - key: :verification_type_income_verification
+        is_enabled: false

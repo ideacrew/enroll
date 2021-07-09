@@ -3,6 +3,7 @@ Feature: Start a new Financial Assistance Application and answers questions on O
   Background: User logs in and visits applicant's other questions page
     And the FAA feature configuration is enabled
     And the primary caretaker question configuration is enabled
+    And FAA student_follow_up_questions feature is enabled
     Given a consumer, with a family, exists
     And is logged in
     And the user SSN is nil
