@@ -7,7 +7,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 61d4cec3fc94e4ee6fa8de123451f438007a7a4f
+  revision: e6bcaa93cb8b35b75b676d90fd9712c9525ef088
   branch: happymapper_example_and_test
   specs:
     aca_entities (0.3.0)
@@ -675,7 +675,7 @@ GEM
       nokogiri (~> 1.5)
     non-stupid-digest-assets (1.0.9)
       sprockets (>= 2.0)
-    oj (3.11.7)
+    oj (3.12.1)
     orm_adapter (0.5.0)
     overcommit (0.52.1)
       childprocess (>= 0.6.3, < 4)
