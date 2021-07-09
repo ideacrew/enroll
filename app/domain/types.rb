@@ -12,5 +12,5 @@ module Types
   REASONS = QualifyingLifeEventKind.non_draft.map(&:reason).uniq
   QLEKREASONS = Types::Coercible::String.enum(*REASONS)
 
-  RidpEventKinds = Types::Coercible::String.enum('primary', 'seconday')
+  RidpEventKinds = Types::Coercible::String.enum('primary', 'secondary')
 end
