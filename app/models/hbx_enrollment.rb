@@ -1780,10 +1780,57 @@ class HbxEnrollment
 
   def can_be_reinstated?
     return false if is_shop? && benefit_sponsorship.blank?
-    return false unless self.coverage_terminated? || self.coverage_termination_pending?
+    return false unless is_eligible_for_reinstatement?
     return false if is_shop? && employee_role.is_cobra_status? && self.kind == "employer_sponsored"
     return false if is_shop? && !employee_role.is_cobra_status? && self.kind == 'employer_sponsored_cobra'
-    is_shop? && benefit_sponsorship.benefit_applications.published_benefit_applications_by_date(terminated_on.next_day).present? ||is_ivl_by_kind? && is_effective_in_current_year?
+    future_reinstate_date = fetch_reinstatement_date
+    is_shop? && benefit_sponsorship.benefit_applications.approved_and_term_benefit_applications_by_date(future_reinstate_date).present? || is_ivl_by_kind? && is_effective_in_prior_or_current_year?
+  end
+
+  def is_eligible_for_reinstatement?
+    eligible_states = %w[coverage_terminated coverage_termination_pending]
+    eligible_states << 'coverage_expired' if ::EnrollRegistry.feature_enabled?(:admin_ivl_end_date_changes) || ::EnrollRegistry.feature_enabled?(:admin_shop_end_date_changes)
+    eligible_states.include?(aasm_state)
+  end
+
+  def benefit_applications_for_reinstated_date?
+    reinstate_date = fetch_reinstatement_date
+    return true if benefit_sponsorship.benefit_applications.published_benefit_applications_by_date(reinstate_date).present?
+
+    ::EnrollRegistry.feature_enabled?(:prior_plan_year_shop_sep) ? census_employee.prior_py_present_for_date?(reinstate_date) : false
+  end
+
+  def has_active_term_or_expired_exists_for_reinstated_date?
+    reinstate_date = fetch_reinstatement_date
+    is_shop? ? shop_active_term_or_expired_for_reinstated_date(reinstate_date) : ivl_active_term_or_expired_for_reinstated_date(reinstate_date)
+  end
+
+  def shop_active_term_or_expired_for_reinstated_date(reinstate_date)
+    eligible_states = ENROLLED_AND_RENEWAL_STATUSES + CAN_REINSTATE_AND_UPDATE_END_DATE
+    eligible_states << 'coverage_expired' if ::EnrollRegistry.feature_enabled?(:admin_shop_end_date_changes)
+    application = benefit_sponsorship.benefit_applications.approved_and_term_benefit_applications_by_date(reinstate_date).first
+    return false unless application
+
+    application_effective_period = application.effective_period
+    HbxEnrollment.by_effective_period(application_effective_period).where({:family_id => self.family_id,
+                                                                           :kind.in => %w[employer_sponsored employer_sponsored_cobra],
+                                                                           :effective_on.gte => reinstate_date,
+                                                                           :coverage_kind => self.coverage_kind,
+                                                                           :employee_role_id => self.employee_role_id,
+                                                                           :aasm_state.in => eligible_states}).any?
+  end
+
+  def ivl_active_term_or_expired_for_reinstated_date(reinstate_date)
+    eligible_states = ENROLLED_AND_RENEWAL_STATUSES + CAN_REINSTATE_AND_UPDATE_END_DATE
+    eligible_states << 'coverage_expired' if ::EnrollRegistry.feature_enabled?(:admin_ivl_end_date_changes)
+    benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_period_by_effective_date(reinstate_date)
+    effective_period = benefit_coverage_period.start_on..benefit_coverage_period.end_on
+    HbxEnrollment.by_effective_period(effective_period).where({:family_id => self.family_id,
+                                                               :kind.in => %w[individual coverall],
+                                                               :effective_on.gte => reinstate_date,
+                                                               :coverage_kind => self.coverage_kind,
+                                                               :consumer_role_id => consumer_role_id,
+                                                               :aasm_state.in => eligible_states}).any?
   end
 
   def has_active_or_term_exists_for_reinstated_date?
@@ -1797,6 +1844,8 @@ class HbxEnrollment
   end
 
   def notify_of_coverage_start(publish_to_carrier)
+    return if coverage_terminated? || coverage_canceled? || coverage_termination_pending? || coverage_expired?
+
     config = Rails.application.config.acapi
     notify(
         "acapi.info.events.hbx_enrollment.coverage_selected",
@@ -1809,12 +1858,35 @@ class HbxEnrollment
     )
   end
 
+  def term_or_expire_enrollment(term_date = nil)
+    if is_shop?
+      enrollment_benefit_application = sponsored_benefit_package.benefit_application
+      if enrollment_benefit_application.terminated? || enrollment_benefit_application.termination_pending?
+        term_or_cancel_enrollment(self, enrollment_benefit_application.end_on, enrollment_benefit_application.termination_reason)
+      elsif enrollment_benefit_application.expired?
+        expire_coverage!
+      end
+    elsif current_year_ivl_coverage? && term_date.present?
+      terminate_coverage!(term_date)
+    elsif  prior_year_ivl_coverage?
+      expire_coverage!
+    end
+  end
+
+  def fetch_reinstatement_date
+    if coverage_expired?
+      is_shop? ? sponsored_benefit_package.end_on.next_day : effective_on.end_of_year.next_day
+    else
+      terminated_on.next_day
+    end
+  end
+
   def reinstate(edi: false)
     return false unless can_be_reinstated?
-    return false if has_active_or_term_exists_for_reinstated_date?
-    reinstate_enrollment = Enrollments::Replicator::Reinstatement.new(self, terminated_on.next_day).build
+    return false if has_active_term_or_expired_exists_for_reinstated_date?
+    reinstate_enrollment = Enrollments::Replicator::Reinstatement.new(self, fetch_reinstatement_date).build
 
-    if self.is_shop?
+    if self.is_shop? && !prior_plan_year_coverage?
       census_employee = benefit_group_assignment.census_employee
       census_employee.reinstate_employment if census_employee.can_be_reinstated?
     end
@@ -1823,6 +1895,11 @@ class HbxEnrollment
       reinstate_enrollment.reinstate_coverage!
       # Move reinstated enrollment to "coverage selected" status
       reinstate_enrollment.begin_coverage! if reinstate_enrollment.may_begin_coverage?
+
+      #transition enrollment to expired to term state if PY is expired or terminated
+      reinstate_enrollment.term_or_expire_enrollment if ::EnrollRegistry.feature_enabled?(:admin_ivl_end_date_changes) || ::EnrollRegistry.feature_enabled?(:admin_shop_end_date_changes)
+      reinstate_enrollment.notify_enrollment_cancel_or_termination_event(edi)
+
       # Move reinstated enrollment to "coverage enrolled" status if coverage begins
       reinstate_enrollment.begin_coverage! if reinstate_enrollment.may_begin_coverage? && self.effective_on <= TimeKeeper.date_of_record
       reinstate_enrollment.notify_of_coverage_start(edi)
@@ -2037,8 +2114,11 @@ class HbxEnrollment
     is_shop? ? prior_year_shop_coverage? : prior_year_ivl_coverage?
   end
 
+  def active_plan_year_coverage?
+    is_shop? ? active_py_shop_coverage? : current_year_ivl_coverage?
+  end
+
   def prior_year_shop_coverage?
-    return false unless EnrollRegistry.feature_enabled?(:prior_plan_year_shop_sep)
     application = sponsored_benefit_package&.benefit_application
     return false if application.blank?
 
@@ -2048,11 +2128,32 @@ class HbxEnrollment
   end
 
   def prior_year_ivl_coverage?
-    return false unless EnrollRegistry.feature_enabled?(:prior_plan_year_ivl_sep)
-    return false if special_enrollment_period.blank?
     prior_bcp = HbxProfile.current_hbx&.benefit_sponsorship&.previous_benefit_coverage_period
     return false unless prior_bcp
     prior_bcp.contains?(effective_on)
+  end
+
+  def active_py_shop_coverage?
+    application = sponsored_benefit_package&.benefit_application
+    return false unless application.present?
+    return false unless application.active?
+
+    (application.start_on..application.end_on).cover?(effective_on)
+  end
+
+  def fetch_term_or_expiration_date
+    if is_shop?
+      coverage_expired? ? sponsored_benefit_package.end_on : terminated_on
+    else
+      benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_period_by_effective_date(effective_on)
+      coverage_expired? ? benefit_coverage_period.end_on : terminated_on
+    end
+  end
+
+  def current_year_ivl_coverage?
+    current_bcp = HbxProfile.current_hbx&.benefit_sponsorship&.current_benefit_coverage_period
+    return false unless current_bcp
+    current_bcp.contains?(effective_on)
   end
 
   def can_select_coverage?(qle: false)
@@ -2257,8 +2358,34 @@ class HbxEnrollment
     (TimeKeeper.date_of_record.beginning_of_year..TimeKeeper.date_of_record.end_of_year).include?(effective_on)
   end
 
+  def is_effective_in_prior_year?
+    date = TimeKeeper.date_of_record.beginning_of_year - 1.year
+    (date..date.end_of_year).include?(effective_on)
+  end
+
+  def is_effective_in_prior_or_current_year?
+    prior_year_ivl_coverage? || current_year_ivl_coverage?
+  end
+
+  def is_ivl_eligible_for_reinstatement?
+    if ::EnrollRegistry.feature_enabled?(:admin_ivl_end_date_changes)
+      is_effective_in_prior_or_current_year?
+    else
+      is_effective_in_current_year?
+    end
+  end
+
   def is_ivl_actively_outstanding?
     is_ivl_by_kind? && is_enrolled_by_aasm_state? && is_effective_in_current_year? && is_any_enrollment_member_outstanding?
+  end
+
+  def cancel_shop_enrollment
+    return unless is_shop?
+
+    previous_state = aasm_state
+    self.update_attributes(aasm_state: 'coverage_canceled')
+    workflow_state_transitions << WorkflowStateTransition.new(from_state: previous_state,
+                                                              to_state: 'coverage_canceled')
   end
 
   def is_any_member_outstanding?
@@ -2387,7 +2514,9 @@ class HbxEnrollment
   end
 
   def is_admin_reinstate_or_end_date_update_eligible?
-    CAN_REINSTATE_AND_UPDATE_END_DATE.include?(aasm_state.to_s)
+    eligible_states = CAN_REINSTATE_AND_UPDATE_END_DATE
+    eligible_states << 'coverage_expired' if ::EnrollRegistry.feature_enabled?(:admin_ivl_end_date_changes) || ::EnrollRegistry.feature_enabled?(:admin_shop_end_date_changes)
+    eligible_states.include?(aasm_state.to_s)
   end
 
   def is_admin_terminate_eligible?
