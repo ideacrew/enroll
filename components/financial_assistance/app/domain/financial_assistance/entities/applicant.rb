@@ -57,7 +57,7 @@ module FinancialAssistance
       attribute :addresses, Types::Array.of(FinancialAssistance::Entities::Address)
       attribute :emails, Types::Array.of(FinancialAssistance::Entities::Email)
       attribute :phones, Types::Array.of(FinancialAssistance::Entities::Phone)
-      attribute :incomes, Types::Array.of(FinancialAssistance::Entities::Income)
+      attribute :incomes, Types::Array.of(FinancialAssistance::Entities::Income).meta(omittable: true)
     end
   end
 end
