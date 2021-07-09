@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 6c8b2fe82c9a805414eacca75323b45ac2916506
+  revision: 4a882f64759bd66b09dab8288e5781ea4be1d14d
   branch: release_0.3.0
   specs:
     aca_entities (0.3.0)
@@ -25,7 +25,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/event_source.git
-  revision: 7c061d938904245ea37a639c73180389810593ba
+  revision: ca1738c6bec46fdea1c57379f303bee47b468cba
   branch: release_0.5.3
   specs:
     event_source (0.5.3)
@@ -349,7 +349,7 @@ GEM
       racc (~> 1.4)
     nokogiri-happymapper (0.8.1)
       nokogiri (~> 1.5)
-    oj (3.12.0)
+    oj (3.12.1)
     orm_adapter (0.5.0)
     ox (2.14.5)
     parallel (1.19.2)

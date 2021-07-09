@@ -10,7 +10,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/event_source.git
-  revision: 7c061d938904245ea37a639c73180389810593ba
+  revision: ca1738c6bec46fdea1c57379f303bee47b468cba
   branch: release_0.5.3
   specs:
     event_source (0.5.3)
@@ -448,7 +448,7 @@ GEM
       racc (~> 1.4)
     non-stupid-digest-assets (1.0.9)
       sprockets (>= 2.0)
-    oj (3.12.0)
+    oj (3.12.1)
     orm_adapter (0.5.0)
     ox (2.14.5)
     parallel (1.19.1)
