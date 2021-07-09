@@ -258,6 +258,8 @@ registry:
             item: true
           - key: :medicaid_agency_phone
             item: "(855) 532-5465"
+          - key: :verifiable_immigration_statuses
+            item: false
       - key: :data_seeds_ui
         item: :data_seed_ui
         is_enabled: true

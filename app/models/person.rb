@@ -108,6 +108,7 @@ class Person
   field :is_homeless, type: Boolean, default: false
   field :is_temporarily_out_of_state, type: Boolean, default: false
   field :is_moving_to_state, type: Boolean, default: false
+  field :immigration_doc_statuses, type: Array
 
 
   delegate :is_applying_coverage, to: :consumer_role, allow_nil: true

@@ -375,6 +375,7 @@ private
       :naturalized_citizen,
       :eligible_immigration_status,
       :indian_tribe_member,
+      {:immigration_doc_statuses => []},
       {:ethnicity => []},
       :tribal_id,
       :tribal_state,

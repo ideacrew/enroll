@@ -53,6 +53,16 @@ class ConsumerRole
       indian_tribe_member
   )
 
+  IMMIGRATION_DOCUMENT_STATUSES = [
+    'Member of a Federally Recognized Indian Tribe',
+    'Certification from U.S. Department of Health and Human Services (HHS) Office of Refugee Resettlement (ORR)',
+    'Office of Refugee Resettlement (ORR) eligibility letter (if under 18)',
+    'Cuban/Haitian Entrant',
+    'Non Citizen Who Is Lawfully Present In American Samoa',
+    'Battered spouse, child, or parent under the Violence Against Women Act',
+    'None of these'
+  ].freeze
+
   # FiveYearBarApplicabilityIndicator ??
   field :five_year_bar, type: Boolean, default: false
   field :requested_coverage_start_date, type: Date, default: TimeKeeper.date_of_record
