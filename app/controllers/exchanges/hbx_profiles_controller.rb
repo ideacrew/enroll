@@ -480,18 +480,17 @@ def employer_poc
     @person = Person.find(params[:person_id])
     @row = params[:family_actions_id]
     @element_to_replace_id = params[:family_actions_id]
-    @enrollments = @person.primary_family.terminated_enrollments
+    @enrollments = @person.primary_family.terminated_and_expired_enrollments
     @coverage_ended_enrollments = @person.primary_family.hbx_enrollments.where(:aasm_state.in=> ["coverage_terminated", "coverage_termination_pending", "coverage_expired"])
     @dup_enr_ids = fetch_duplicate_enrollment_ids(@coverage_ended_enrollments).map(&:to_s)
   end
 
-  def update_enrollment_termianted_on_date
+  def update_enrollment_terminated_on_date
     begin
-      enrollment = HbxEnrollment.find(params[:enrollment_id].strip)
       @row = params[:family_actions_id]
       @element_to_replace_id = params[:family_actions_id]
-      termination_date = Date.strptime(params["new_termination_date"], "%m/%d/%Y")
-      if enrollment.present? && enrollment.reterm_enrollment_with_earlier_date(termination_date, params["edi_required"].present?)
+      result = ::EnrollRegistry[:change_end_date]{ {params: params} }
+      if result.success?
         respond_to do |format|
           format.js
         end
@@ -585,7 +584,7 @@ def employer_poc
   def view_terminated_hbx_enrollments
     @person = Person.find(params[:person_id])
     @element_to_replace_id = params[:family_actions_id]
-    @enrollments = @person.primary_family.terminated_enrollments
+    @enrollments = @person.primary_family.terminated_and_expired_enrollments
   end
 
   def reinstate_enrollment
