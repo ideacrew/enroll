@@ -21,7 +21,7 @@ module Operations
         private
 
         def build_event(payload)
-          event('events.fdsh.ridp.primary_determination_requested', attributes: payload.to_h)
+          event('events.fdsh.ridp.primary_determination_requested', attributes: payload.to_h, headers: { correlation_id: payload.to_h[:hbx_id] })
         end
 
         def publish(event)
