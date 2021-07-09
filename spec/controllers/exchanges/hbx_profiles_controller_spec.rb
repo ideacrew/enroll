@@ -952,6 +952,46 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     end
   end
 
+
+  describe 'GET view_terminated_hbx_enrollments' do
+    let!(:person) { FactoryBot.create(:person)}
+    let(:user) { FactoryBot.create(:user, person: person, roles: ["hbx_staff"]) }
+    let!(:coverage_year) { Date.today.year - 1}
+    let!(:hbx_profile) do
+      FactoryBot.create(:hbx_profile,
+                        :no_open_enrollment_coverage_period,
+                        coverage_year: coverage_year)
+    end
+    let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+    let!(:household) { FactoryBot.create(:household, family: family) }
+    let!(:term_hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, aasm_state: 'coverage_terminated', kind: 'individual') }
+    let!(:term_pending_hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, aasm_state: 'coverage_termination_pending',kind: 'individual') }
+    let!(:expired_hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, aasm_state: 'coverage_expired', kind: 'individual', effective_on: TimeKeeper.date_of_record.prev_year.beginning_of_year) }
+    let(:params) do
+      { person_id: person.id,
+        family_actions_id: "family_actions_#{person.primary_family.id}",
+        format: 'js' }
+    end
+
+    before do
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(false)
+      allow(EnrollRegistry[:admin_ivl_end_date_changes].feature).to receive(:is_enabled).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:admin_ivl_end_date_changes).and_return(true)
+      allow(EnrollRegistry[:admin_shop_end_date_changes].feature).to receive(:is_enabled).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:admin_shop_end_date_changes).and_return(true)
+      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      sign_in(user)
+    end
+
+    it "should render the view_terminated_hbx_enrollments partial" do
+      get :view_terminated_hbx_enrollments, params: params, xhr: true, format: :js
+      expect(response).to have_http_status(:success)
+      expect(response).to render_template('view_terminated_hbx_enrollments')
+      expect(assigns(:enrollments).include?(expired_hbx_enrollment)).to eq true
+      expect(assigns(:enrollments).size).to eq 3
+    end
+  end
+
   describe "POST reinstate_enrollment", :dbclean => :around_each do
     render_views
     let(:user) { FactoryBot.create(:user, roles: ["hbx_staff"]) }
@@ -1253,7 +1293,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     end
   end
 
-  describe "POST update_enrollment_termianted_on_date", :dbclean => :around_each do
+  describe "POST update_enrollment_terminated_on_date", :dbclean => :around_each do
     render_views
     let(:user) { FactoryBot.create(:user, roles: ["hbx_staff"]) }
     let!(:person) { FactoryBot.create(:person)}
@@ -1282,9 +1322,9 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       context "with valid params" do
 
         it "should render template " do
-          post :update_enrollment_termianted_on_date, params: {enrollment_id: enrollment.id.to_s, family_actions_id: family.id, new_termination_date: TimeKeeper.date_of_record.to_s}, format: :js, xhr: true
+          post :update_enrollment_terminated_on_date, params: {enrollment_id: enrollment.id.to_s, family_actions_id: family.id, new_termination_date: TimeKeeper.date_of_record.to_s}, format: :js, xhr: true
           expect(response).to have_http_status(:success)
-          expect(response).to render_template("update_enrollment_termianted_on_date")
+          expect(response).to render_template("update_enrollment_terminated_on_date")
           expect(response.body).to have_content(/Enrollment Updated Successfully/i)
         end
 
@@ -1295,7 +1335,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
             it "should update enrollment with new end date and notify enrollment" do
               expect_any_instance_of(HbxEnrollment).to receive(:notify).with("acapi.info.events.hbx_enrollment.terminated", {:reply_to=>glue_event_queue_name, "hbx_enrollment_id" => enrollment.hbx_id, "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment", "is_trading_partner_publishable" => false})
-              post :update_enrollment_termianted_on_date, params: {enrollment_id: enrollment.id.to_s, family_actions_id: family.id, new_termination_date: terminated_date}, format: :js, xhr: true
+              post :update_enrollment_terminated_on_date, params: {enrollment_id: enrollment.id.to_s, family_actions_id: family.id, new_termination_date: terminated_date}, format: :js, xhr: true
               enrollment.reload
               expect(enrollment.aasm_state).to eq "coverage_terminated"
               expect(enrollment.terminated_on).to eq terminated_date
@@ -1310,7 +1350,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
             it "should update enrollment with new end date and notify enrollment" do
               expect_any_instance_of(HbxEnrollment).to receive(:notify).with("acapi.info.events.hbx_enrollment.terminated", {:reply_to=>glue_event_queue_name, "hbx_enrollment_id" => enrollment.hbx_id, "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment", "is_trading_partner_publishable" => false})
-              post :update_enrollment_termianted_on_date, params: {enrollment_id: enrollment.id.to_s, family_actions_id: family.id, new_termination_date: terminated_date.to_s}, format: :js, xhr: true
+              post :update_enrollment_terminated_on_date, params: {enrollment_id: enrollment.id.to_s, family_actions_id: family.id, new_termination_date: terminated_date.to_s}, format: :js, xhr: true
               enrollment.reload
               expect(enrollment.aasm_state).to eq "coverage_termination_pending"
               expect(enrollment.terminated_on).to eq(terminated_date)
@@ -1330,9 +1370,9 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       context "with valid params" do
 
         it "should render template " do
-          post :update_enrollment_termianted_on_date, params: {enrollment_id: enrollment.id.to_s, family_actions_id: family.id, new_termination_date: TimeKeeper.date_of_record.to_s}, format: :js, xhr: true
+          post :update_enrollment_terminated_on_date, params: {enrollment_id: enrollment.id.to_s, family_actions_id: family.id, new_termination_date: TimeKeeper.date_of_record.to_s}, format: :js, xhr: true
           expect(response).to have_http_status(:success)
-          expect(response).to render_template("update_enrollment_termianted_on_date")
+          expect(response).to render_template("update_enrollment_terminated_on_date")
           expect(response.body).to have_content(/Enrollment Updated Successfully/i)
         end
 
@@ -1340,7 +1380,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
           context "with new past or current termination date" do
             it "should update enrollment with new end date and notify enrollment" do
               expect_any_instance_of(HbxEnrollment).to receive(:notify).with("acapi.info.events.hbx_enrollment.terminated", {:reply_to=>glue_event_queue_name, "hbx_enrollment_id" => enrollment.hbx_id, "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment", "is_trading_partner_publishable" => false})
-              post :update_enrollment_termianted_on_date, params: {enrollment_id: enrollment.id.to_s, family_actions_id: family.id, new_termination_date: TimeKeeper.date_of_record.to_s}, format: :js, xhr: true
+              post :update_enrollment_terminated_on_date, params: {enrollment_id: enrollment.id.to_s, family_actions_id: family.id, new_termination_date: TimeKeeper.date_of_record.to_s}, format: :js, xhr: true
               enrollment.reload
               expect(enrollment.aasm_state).to eq "coverage_terminated"
               expect(enrollment.terminated_on).to eq TimeKeeper.date_of_record
@@ -1353,7 +1393,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
           context "with new future termination date" do
             it "should update enrollment with new end date and notify enrollment" do
               expect_any_instance_of(HbxEnrollment).to receive(:notify).with("acapi.info.events.hbx_enrollment.terminated", {:reply_to=>glue_event_queue_name, "hbx_enrollment_id" => enrollment.hbx_id, "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment", "is_trading_partner_publishable" => false})
-              post :update_enrollment_termianted_on_date, params: {enrollment_id: enrollment.id.to_s, family_actions_id: family.id, new_termination_date: (TimeKeeper.date_of_record + 1.day).to_s}, format: :js, xhr: true
+              post :update_enrollment_terminated_on_date, params: {enrollment_id: enrollment.id.to_s, family_actions_id: family.id, new_termination_date: (TimeKeeper.date_of_record + 1.day).to_s}, format: :js, xhr: true
               enrollment.reload
               expect(enrollment.aasm_state).to eq "coverage_terminated"
               expect(enrollment.terminated_on).to eq TimeKeeper.date_of_record + 1.day
@@ -1365,8 +1405,9 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
     context "with invalid params" do
       it "should redirect to root path" do
-        post :update_enrollment_termianted_on_date, params: {enrollment_id: '', family_actions_id: '', new_termination_date: ''}, format: :js, xhr: true
+        post :update_enrollment_terminated_on_date, params: {enrollment_id: '', family_actions_id: '', new_termination_date: ''}, format: :js, xhr: true
         expect(response).to have_http_status(:success)
+        expect(response).to redirect_to(exchanges_hbx_profiles_root_path)
       end
     end
 
