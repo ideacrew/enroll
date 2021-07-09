@@ -18,6 +18,5 @@ module Entities
     attribute :expiration_date, Types::Date.optional.meta(omittable: true)
     attribute :issuing_country, Types::String.optional.meta(omittable: true)
     attribute :description, Types::String.optional.meta(omittable: true)
-    attribute :incomes, Types::Array.optional.meta(omittable: true)
   end
 end
