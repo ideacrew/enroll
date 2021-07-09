@@ -307,6 +307,12 @@ registry:
       - key: :counties_import
         is_enabled: true
         item: "SHOP_ZipCode_CY2021_FINAL_ME.xlsx"
+      - key: :change_end_date
+        is_enabled: false
+        item: Operations::HbxEnrollments::EndDateChange.new
+        settings:
+          - key: :expired_enrollments
+            item: false
   - namespace:
       - :pay_now_feature
     features:
