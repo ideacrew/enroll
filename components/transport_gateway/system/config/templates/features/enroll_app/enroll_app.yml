@@ -378,4 +378,4 @@ registry:
       - key: :legacy_enrollment_trigger
         is_enabled: false
       - key: :verification_type_income_verification
-        is_enabled: false
+        is_enabled: true

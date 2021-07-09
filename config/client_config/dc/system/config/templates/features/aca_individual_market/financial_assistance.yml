@@ -55,9 +55,6 @@ registry:
       - key: :unemployment_income
         item: :unemployment_income
         is_enabled: true
-      - key: :primary_caregiver_other_question
-        item: :primary_caregiver_other_question
-        is_enabled: true
       - key: :indian_health_service_question
         is_enabled: true
       - key: :mainecare_healthcare_questions
