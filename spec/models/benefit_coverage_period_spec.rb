@@ -11,17 +11,17 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
   let(:open_enrollment_start_on)  { Date.new(2015,10,1).beginning_of_year - 2.months }
   let(:open_enrollment_end_on)    { Date.new(2015,10,1).beginning_of_year.end_of_month }
 
-  let(:valid_params){
-      {
-        title: title,
-        benefit_sponsorship: benefit_sponsorship,
-        service_market: service_market,
-        start_on: start_on,
-        end_on: end_on,
-        open_enrollment_start_on: open_enrollment_start_on,
-        open_enrollment_end_on: open_enrollment_end_on
-      }
+  let(:valid_params) do
+    {
+      title: title,
+      benefit_sponsorship: benefit_sponsorship,
+      service_market: service_market,
+      start_on: start_on,
+      end_on: end_on,
+      open_enrollment_start_on: open_enrollment_start_on,
+      open_enrollment_end_on: open_enrollment_end_on
     }
+  end
 
   context "a new instance" do
 
@@ -84,7 +84,7 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
 
           context "and a silver plan is provided" do
             it "should set/get the assigned silver plan" do
-              benefit_coverage_period.second_lowest_cost_silver_plan =  silver_product
+              benefit_coverage_period.second_lowest_cost_silver_plan = silver_product
               expect(benefit_coverage_period.second_lowest_cost_silver_plan).to eq silver_product
             end
           end
@@ -178,7 +178,7 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
             end
 
             it "termination date should be set to the date selected if selected date is greater than today" do
-              expect(benefit_coverage_period.termination_effective_on_for(TimeKeeper.date_of_record+7.day)).to eq(TimeKeeper.date_of_record+7.day)
+              expect(benefit_coverage_period.termination_effective_on_for(TimeKeeper.date_of_record + 7.day)).to eq(TimeKeeper.date_of_record + 7.day)
             end
 
             context "and the effective date would " do
@@ -379,181 +379,182 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
         expect(elected_plans_by_enrollment_members).not_to include(plan2)
       end
     end
+  end
 
-    context 'When tax_household members have different csr_kind 73 and 87' do
-      before :each do
-        tax_household_member1.update_attributes(csr_percent_as_integer: 73)
-        tax_household_member2.update_attributes(csr_percent_as_integer: 87)
-        plan1.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '04')
-        plan2.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '05')
-      end
-
-      it 'should return plans with csr_kind for 87' do
-        allow(rule).to receive(:satisfied?).and_return [true, 'ok']
-        elected_plans_by_enrollment_members = benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health', tax_household)
-        expect(elected_plans_by_enrollment_members).to include(plan1)
-        expect(elected_plans_by_enrollment_members).not_to include(plan2)
-      end
+  context 'When tax_household members have different csr_kind 73 and 87' do
+    before :each do
+      tax_household_member1.update_attributes(csr_percent_as_integer: 73)
+      tax_household_member2.update_attributes(csr_percent_as_integer: 87)
+      plan1.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '04')
+      plan2.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '05')
     end
 
-    context 'When tax_household members have different csr_kind 87 and 94' do
-      before :each do
-        tax_household_member1.update_attributes(csr_percent_as_integer: 87)
-        tax_household_member2.update_attributes(csr_percent_as_integer: 94)
-        plan1.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '05')
-        plan2.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '06')
-      end
+    it 'should return plans with csr_kind for 87' do
+      allow(rule).to receive(:satisfied?).and_return [true, 'ok']
+      elected_plans_by_enrollment_members = benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health', tax_household)
+      expect(elected_plans_by_enrollment_members).to include(plan1)
+      expect(elected_plans_by_enrollment_members).not_to include(plan2)
+    end
+  end
 
-      it 'should return plans with csr_kind for 87' do
-        allow(rule).to receive(:satisfied?).and_return [true, 'ok']
-        elected_plans_by_enrollment_members = benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health', tax_household)
-        expect(elected_plans_by_enrollment_members).to include(plan1)
-        expect(elected_plans_by_enrollment_members).not_to include(plan2)
-      end
+  context 'When tax_household members have different csr_kind 87 and 94' do
+    before :each do
+      tax_household_member1.update_attributes(csr_percent_as_integer: 87)
+      tax_household_member2.update_attributes(csr_percent_as_integer: 94)
+      plan1.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '05')
+      plan2.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '06')
     end
 
-    context 'When tax_household members have csr_kind 94 and 94' do
-      before :each do
-        tax_household_member1.update_attributes(csr_percent_as_integer: 94)
-        tax_household_member2.update_attributes(csr_percent_as_integer: 94)
-        plan1.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '06')
-        plan2.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '05')
-      end
+    it 'should return plans with csr_kind for 87' do
+      allow(rule).to receive(:satisfied?).and_return [true, 'ok']
+      elected_plans_by_enrollment_members = benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health', tax_household)
+      expect(elected_plans_by_enrollment_members).to include(plan1)
+      expect(elected_plans_by_enrollment_members).not_to include(plan2)
+    end
+  end
 
-      it 'should return plans with csr_kind for 94' do
-        allow(rule).to receive(:satisfied?).and_return [true, 'ok']
-        elected_plans_by_enrollment_members = benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health', tax_household)
-        expect(elected_plans_by_enrollment_members).to include(plan1)
-        expect(elected_plans_by_enrollment_members).not_to include(plan2)
-      end
+  context 'When tax_household members have csr_kind 94 and 94' do
+    before :each do
+      tax_household_member1.update_attributes(csr_percent_as_integer: 94)
+      tax_household_member2.update_attributes(csr_percent_as_integer: 94)
+      plan1.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '06')
+      plan2.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '05')
     end
 
-    context 'When tax_household members have csr_kind 100 and 100' do
-      before :each do
-        tax_household_member1.update_attributes(csr_percent_as_integer: 100)
-        tax_household_member2.update_attributes(csr_percent_as_integer: 100)
-        plan1.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '02')
-        plan2.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '05')
-      end
+    it 'should return plans with csr_kind for 94' do
+      allow(rule).to receive(:satisfied?).and_return [true, 'ok']
+      elected_plans_by_enrollment_members = benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health', tax_household)
+      expect(elected_plans_by_enrollment_members).to include(plan1)
+      expect(elected_plans_by_enrollment_members).not_to include(plan2)
+    end
+  end
 
-      it 'should return plans with csr_kind for 100' do
-        allow(rule).to receive(:satisfied?).and_return [true, 'ok']
-        elected_plans_by_enrollment_members = benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health', tax_household)
-        expect(elected_plans_by_enrollment_members).to include(plan1)
-        expect(elected_plans_by_enrollment_members).not_to include(plan2)
-      end
+  context 'When tax_household members have csr_kind 100 and 100' do
+    before :each do
+      tax_household_member1.update_attributes(csr_percent_as_integer: 100)
+      tax_household_member2.update_attributes(csr_percent_as_integer: 100)
+      plan1.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '02')
+      plan2.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '05')
     end
 
-    context 'When tax_household members have csr_kind 100 and ineligible' do
-      before :each do
-        tax_household_member1.update_attributes(is_ia_eligible: false)
-        tax_household_member2.update_attributes(csr_percent_as_integer: 100)
-        plan1.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '02')
-        plan2.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '05')
-      end
+    it 'should return plans with csr_kind for 100' do
+      allow(rule).to receive(:satisfied?).and_return [true, 'ok']
+      elected_plans_by_enrollment_members = benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health', tax_household)
+      expect(elected_plans_by_enrollment_members).to include(plan1)
+      expect(elected_plans_by_enrollment_members).not_to include(plan2)
+    end
+  end
 
-      it 'should not return plans with csr_kind for 100' do
-        allow(rule).to receive(:satisfied?).and_return [true, 'ok']
-        elected_plans_by_enrollment_members = benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health', tax_household)
-        expect(elected_plans_by_enrollment_members).not_to include(plan1)
-        expect(elected_plans_by_enrollment_members).not_to include(plan2)
-      end
+  context 'When tax_household members have csr_kind 100 and ineligible' do
+    before :each do
+      tax_household_member1.update_attributes(is_ia_eligible: false)
+      tax_household_member2.update_attributes(csr_percent_as_integer: 100)
+      plan1.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '02')
+      plan2.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '05')
     end
 
-    context 'When tax_household members do not have csr_kinds' do
-      before :each do
-        tax_household_member1.update_attributes(csr_percent_as_integer: nil)
-        tax_household_member2.update_attributes(csr_percent_as_integer: nil)
-        plan1.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '02')
-        plan2.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '05')
-      end
+    it 'should not return plans with csr_kind for 100' do
+      allow(rule).to receive(:satisfied?).and_return [true, 'ok']
+      elected_plans_by_enrollment_members = benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health', tax_household)
+      expect(elected_plans_by_enrollment_members).not_to include(plan1)
+      expect(elected_plans_by_enrollment_members).not_to include(plan2)
+    end
+  end
 
-      it 'should not return plans with csr_kind for 100' do
-        allow(rule).to receive(:satisfied?).and_return [true, 'ok']
-        elected_plans_by_enrollment_members = benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health', tax_household)
-        expect(elected_plans_by_enrollment_members).not_to include(plan1)
-        expect(elected_plans_by_enrollment_members).not_to include(plan2)
-      end
+  context 'When tax_household members do not have csr_kinds' do
+    before :each do
+      tax_household_member1.update_attributes(csr_percent_as_integer: nil)
+      tax_household_member2.update_attributes(csr_percent_as_integer: nil)
+      plan1.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '02')
+      plan2.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '05')
     end
 
-    context 'When tax_household members have csr_kind 0 and 0' do
-      before :each do
-        tax_household_member1.update_attributes(csr_percent_as_integer: 0)
-        tax_household_member2.update_attributes(csr_percent_as_integer: 0)
-        plan1.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '01')
-        plan2.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '05')
-      end
+    it 'should not return plans with csr_kind for 100' do
+      allow(rule).to receive(:satisfied?).and_return [true, 'ok']
+      elected_plans_by_enrollment_members = benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health', tax_household)
+      expect(elected_plans_by_enrollment_members).not_to include(plan1)
+      expect(elected_plans_by_enrollment_members).not_to include(plan2)
+    end
+  end
 
-      it 'should return plans with csr_kind for 100' do
-        allow(rule).to receive(:satisfied?).and_return [true, 'ok']
-        elected_plans_by_enrollment_members = benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health', tax_household)
-        expect(elected_plans_by_enrollment_members).to include(plan1)
-        expect(elected_plans_by_enrollment_members).not_to include(plan2)
-      end
+  context 'When tax_household members have csr_kind 0 and 0' do
+    before :each do
+      tax_household_member1.update_attributes(csr_percent_as_integer: 0)
+      tax_household_member2.update_attributes(csr_percent_as_integer: 0)
+      plan1.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '01')
+      plan2.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '05')
     end
 
-    context 'When tax_household members have csr_kind -1 and 0' do
-      before :each do
-        tax_household_member1.update_attributes(csr_percent_as_integer: -1)
-        tax_household_member2.update_attributes(csr_percent_as_integer: 73)
-        plan1.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '01')
-        plan2.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '04')
-      end
+    it 'should return plans with csr_kind for 100' do
+      allow(rule).to receive(:satisfied?).and_return [true, 'ok']
+      elected_plans_by_enrollment_members = benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health', tax_household)
+      expect(elected_plans_by_enrollment_members).to include(plan1)
+      expect(elected_plans_by_enrollment_members).not_to include(plan2)
+    end
+  end
 
-      it 'should return plans with csr_kind for 0' do
-        allow(rule).to receive(:satisfied?).and_return [true, 'ok']
-        elected_plans_by_enrollment_members = benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health', tax_household)
-        expect(elected_plans_by_enrollment_members).to include(plan1)
-        expect(elected_plans_by_enrollment_members).not_to include(plan2)
-      end
+  context 'When tax_household members have csr_kind -1 and 0' do
+    before :each do
+      tax_household_member1.update_attributes(csr_percent_as_integer: -1)
+      tax_household_member2.update_attributes(csr_percent_as_integer: 73)
+      plan1.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '01')
+      plan2.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '04')
     end
 
-    context 'When tax_household members have csr_kind -1 and 87' do
-      before :each do
-        tax_household_member1.update_attributes(csr_percent_as_integer: -1)
-        tax_household_member2.update_attributes(csr_percent_as_integer: 87)
-        plan1.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '01')
-        plan2.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '05')
-      end
+    it 'should return plans with csr_kind for 0' do
+      allow(rule).to receive(:satisfied?).and_return [true, 'ok']
+      elected_plans_by_enrollment_members = benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health', tax_household)
+      expect(elected_plans_by_enrollment_members).to include(plan1)
+      expect(elected_plans_by_enrollment_members).not_to include(plan2)
+    end
+  end
 
-      it 'should return plans with csr_kind for 0' do
-        allow(rule).to receive(:satisfied?).and_return [true, 'ok']
-        elected_plans_by_enrollment_members = benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health', tax_household)
-        expect(elected_plans_by_enrollment_members).to include(plan1)
-        expect(elected_plans_by_enrollment_members).not_to include(plan2)
-      end
+  context 'When tax_household members have csr_kind -1 and 87' do
+    before :each do
+      tax_household_member1.update_attributes(csr_percent_as_integer: -1)
+      tax_household_member2.update_attributes(csr_percent_as_integer: 87)
+      plan1.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '01')
+      plan2.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '05')
     end
 
-    context 'When tax_household members have csr_kind -1 and 94' do
-      before :each do
-        tax_household_member1.update_attributes(csr_percent_as_integer: -1)
-        tax_household_member2.update_attributes(csr_percent_as_integer: 94)
-        plan1.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '01')
-        plan2.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '06')
-      end
+    it 'should return plans with csr_kind for 0' do
+      allow(rule).to receive(:satisfied?).and_return [true, 'ok']
+      elected_plans_by_enrollment_members = benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health', tax_household)
+      expect(elected_plans_by_enrollment_members).to include(plan1)
+      expect(elected_plans_by_enrollment_members).not_to include(plan2)
+    end
+  end
 
-      it 'should return plans with csr_kind for 0' do
-        allow(rule).to receive(:satisfied?).and_return [true, 'ok']
-        elected_plans_by_enrollment_members = benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health', tax_household)
-        expect(elected_plans_by_enrollment_members).to include(plan1)
-        expect(elected_plans_by_enrollment_members).not_to include(plan2)
-      end
+  context 'When tax_household members have csr_kind -1 and 94' do
+    before :each do
+      tax_household_member1.update_attributes(csr_percent_as_integer: -1)
+      tax_household_member2.update_attributes(csr_percent_as_integer: 94)
+      plan1.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '01')
+      plan2.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '06')
     end
 
-    context 'When tax_household members have csr_kind -1 and 100' do
-      before :each do
-        tax_household_member1.update_attributes(csr_percent_as_integer: -1)
-        tax_household_member2.update_attributes(csr_percent_as_integer: 100)
-        plan1.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '03')
-        plan2.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '02')
-      end
+    it 'should return plans with csr_kind for 0' do
+      allow(rule).to receive(:satisfied?).and_return [true, 'ok']
+      elected_plans_by_enrollment_members = benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health', tax_household)
+      expect(elected_plans_by_enrollment_members).to include(plan1)
+      expect(elected_plans_by_enrollment_members).not_to include(plan2)
+    end
+  end
 
-      it 'should return plans with csr_kind for 0' do
-        allow(rule).to receive(:satisfied?).and_return [true, 'ok']
-        elected_plans_by_enrollment_members = benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health', tax_household)
-        expect(elected_plans_by_enrollment_members).to include(plan1)
-        expect(elected_plans_by_enrollment_members).not_to include(plan2)
-      end
+  context 'When tax_household members have csr_kind -1 and 100' do
+    before :each do
+      tax_household_member1.update_attributes(csr_percent_as_integer: -1)
+      tax_household_member2.update_attributes(csr_percent_as_integer: 100)
+      plan1.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '03')
+      plan2.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '02')
+    end
+
+    it 'should return plans with csr_kind for 0' do
+      allow(rule).to receive(:satisfied?).and_return [true, 'ok']
+      elected_plans_by_enrollment_members = benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health', tax_household)
+      expect(elected_plans_by_enrollment_members).to include(plan1)
+      expect(elected_plans_by_enrollment_members).not_to include(plan2)
+    end
 
     it "when not satisfied" do
       allow(rule).to receive(:satisfied?).and_return [false, 'ok']
