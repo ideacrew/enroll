@@ -42,7 +42,7 @@ module Operations
       end
 
       def create_or_update_vlp_document(vlp_document_params, person)
-        vlp_document_params = {subject: "Income", description: "Income Verification Needed"} if vlp_document_params[:incomes].blank?
+        vlp_document_params = {subject: "Income", description: "Income Verification Needed"} if EnrollRegistry.feature_enabled?(:verification_type_income_verification) && vlp_document_params[:incomes].blank?
         vlp_document = person.consumer_role.find_document(vlp_document_params[:subject])
         return Success(vlp_document) if no_update_needed?({vlp_object: vlp_document, vlp_document_params: vlp_document_params})
         vlp_document.assign_attributes(vlp_document_params.to_h)
