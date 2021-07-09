@@ -157,5 +157,7 @@ registry:
       is_enabled: true
     - key: :native_american_csr
       is_enabled: false
+    - key: :filing_as_head_of_household
+      is_enabled: false
 # TODO eligibility engine connectivity(HAVEN) settings
 # TODO mec service connectivity settings
