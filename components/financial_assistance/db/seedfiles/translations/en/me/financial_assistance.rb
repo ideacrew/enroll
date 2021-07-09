@@ -12,7 +12,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
      If you keep going, we'll check to see if you qualify to enroll in a private health insurance plan on Maine Cover ME, but won't be able to tell you if you qualify for Medicaid or cost savings.",
   "en.faa.other_ques.disability_question" => "Does this person have a disability?",
   "en.faa.review_eligibility_header" => "Your Application for Premium Reductions",
-  'en.faa.other_ques.is_student' => '"Is this person a full-time student?*"',
+  'en.faa.other_ques.is_student' => 'Is this person a full-time student?*',
   "en.faa.medicaid_question" => "Do you want us to submit this application to the ME Department of Health and Human Services (DHHS) to do a full review of your application for Medicaid eligibility?",
   'en.faa.edit.delete_applicant' => 'Are you sure you want to remove this applicant?',
   'en.faa.edit.remove_warning' => 'This cannot be undone.',
