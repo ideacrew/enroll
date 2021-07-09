@@ -114,7 +114,7 @@ module FinancialAssistance
           def get_csr_value(ped_entity)
             return 0 if ped_entity.csr.blank?
             csr = ped_entity.csr
-            (csr == 'limited') ? 0 : csr.to_i
+            (csr == 'limited') ? -1 : csr.to_i
           end
 
           def find_matching_applicant(elig_det, applicant_ref)

@@ -127,7 +127,11 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
         end
 
         it 'should update csr_percent_as_integer value' do
-          expect(@applicant.csr_percent_as_integer).to eq(94)
+          expect(@applicant.csr_percent_as_integer).to eq(-1)
+        end
+
+        it 'should update csr_percent_as_integer value' do
+          expect(@applicant.csr_eligibility_kind).to eq("csr_limited")
         end
       end
     end
