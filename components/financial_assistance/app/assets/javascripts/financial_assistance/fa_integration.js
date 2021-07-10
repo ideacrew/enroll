@@ -30,7 +30,7 @@ document.addEventListener("turbolinks:load", function() {
         i += 1;
       } else {
         clearInterval(repeater);
-        if ( i > 9 ){
+        if ( i > 14 ){
           window.location = window.location.href.replace(/wait_for_eligibility_response/, "eligibility_response_error")
         }
       }
