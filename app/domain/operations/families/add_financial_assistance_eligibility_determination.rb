@@ -61,7 +61,7 @@ module Operations
         ).save
       end
 
-      def create_tax_household_members(family, tax_household, applicant, faa_ed)
+      def create_tax_household_members(family, tax_household, applicant, _faa_ed)
         family_member = fetch_family_member_from_applicant(family, applicant)
 
         return Failure('Unable to find family member') if family_member.blank?
