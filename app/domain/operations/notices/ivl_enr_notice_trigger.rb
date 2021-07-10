@@ -64,7 +64,6 @@ module Operations
           {
             start_date: household.effective_starting_on,
             is_active: household.is_active,
-            irs_group_reference: {},
             coverage_households: household.coverage_households.collect { |ch| {is_immediate_family: ch.is_immediate_family, coverage_household_members: ch.coverage_household_members.collect {|chm| {is_subscriber: chm.is_subscriber}}} },
             hbx_enrollments: build_enrollments_hash(enrollments)
           }
