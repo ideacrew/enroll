@@ -148,4 +148,33 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       expect(applicant.is_eligible_for_non_magi_reasons).to eq(nil)
     end
   end
+
+  context '#tax_info_complete?' do
+    before do
+      applicant.update_attributes({is_required_to_file_taxes: true,
+                                   is_claimed_as_tax_dependent: false})
+    end
+
+    context 'is_filing_as_head_of_household feature disabled' do
+      it 'should return true without is_filing_as_head_of_household' do
+        expect(applicant.tax_info_complete?).to eq true
+      end
+    end
+
+    context 'is_filing_as_head_of_household feature enabled' do
+      before do
+        feature_dsl = FinancialAssistanceRegistry[:filing_as_head_of_household]
+        feature_dsl.feature.stub(:is_enabled).and_return(true)
+      end
+
+      it 'should return false without is_filing_as_head_of_household' do
+        expect(applicant.tax_info_complete?).to eq false
+      end
+
+      it 'should return true with is_filing_as_head_of_household' do
+        applicant.update_attributes({is_filing_as_head_of_household: true})
+        expect(applicant.tax_info_complete?).to eq true
+      end
+    end
+  end
 end
