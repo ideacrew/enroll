@@ -163,7 +163,7 @@ RSpec.describe Operations::Families::AddFinancialAssistanceEligibilityDeterminat
       appli_addnl_params = {
         "is_ia_eligible" => true,
         "csr_percent_as_integer" => 94,
-        "csr_eligibility_kind" => 'csr_94',
+        "csr_eligibility_kind" => 'csr_94'
       }
       params[:applicants].first.merge!(appli_addnl_params)
       params
