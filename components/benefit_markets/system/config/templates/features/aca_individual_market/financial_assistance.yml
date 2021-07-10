@@ -166,23 +166,23 @@ registry:
         - key: :gamble_prize
           item: true
     - key: :full_medicaid_determination_step
-      is_enabled: true
+      is_enabled: false
     - key: :native_american_csr
       is_enabled: true
     - key: :display_medicaid_question
       item: :display_medicaid_question
       is_enabled: false
     - key: :fa_send_to_external_verification
-      is_enabled: false
+      is_enabled: true
     - key: :medicaid_or_chip_program_short_name
       is_enabled: true
       settings:
         - key: :name
-          item: 'Medicaid'
+          item: 'CubCare'
     - key: :medicaid_or_chip_agency_long_name
       is_enabled: true
       settings:
         - key: :name
-          item: 'DHS'
+          item: 'Office for Family Independence'
     - key: :student_follow_up_questions
-      is_enabled: true
+      is_enabled: false
