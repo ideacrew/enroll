@@ -123,6 +123,8 @@ And(/^the user fills the the aplicant add member form with indian member yes/) d
 end
 
 And(/^the user fills the the aplicant add member form with indian member no/) do
+  sleep 5
+
   expect(page).to have_content('Lives with primary subscriber')
   fill_in "applicant[first_name]", :with => "John"
   fill_in "applicant[last_name]", :with => "Doe"

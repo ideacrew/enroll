@@ -123,6 +123,11 @@ Given(/head of household question feature is enabled/) do
   enable_fa_feature(:filing_as_head_of_household)
 end
 
+And(/user clicks household add member button/) do
+  sleep 3
+  find('#household_info_add_member').click
+end
+
 And(/user clicks primary add income and coverage/) do
   find_all('.interaction-click-control-add-income---coverage-info').first.click
 end

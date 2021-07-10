@@ -19,7 +19,7 @@ Scenario: Cannot continue from tax info page without form completely filled
 Scenario: Cannot continue from tax info page without head of household when feature enabled
   Given head of household question feature is enabled
 	Given the user is editing an application for financial assistance
-  And the user clicks on add member button
+  And user clicks household add member button
   And the user fills the the aplicant add member form with indian member no
   And user clicks primary add income and coverage
 	And question will this person file taxes for year is marked as yes for primary applicant
@@ -31,7 +31,7 @@ Scenario: Cannot continue from tax info page without head of household when feat
 Scenario: Can continue from tax info page with head of household when feature enabled
   Given head of household question feature is enabled
 	Given the user is editing an application for financial assistance
-  And the user clicks on add member button
+  And user clicks household add member button
   And the user fills the the aplicant add member form with indian member no
   And user clicks primary add income and coverage
 	And question will this person file taxes for year is marked as yes for primary applicant
