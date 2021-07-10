@@ -156,6 +156,11 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
     end
 
     context 'is_filing_as_head_of_household feature disabled' do
+      before do
+        feature_dsl = FinancialAssistanceRegistry[:filing_as_head_of_household]
+        feature_dsl.feature.stub(:is_enabled).and_return(false)
+      end
+
       it 'should return true without is_filing_as_head_of_household' do
         expect(applicant.tax_info_complete?).to eq true
       end
