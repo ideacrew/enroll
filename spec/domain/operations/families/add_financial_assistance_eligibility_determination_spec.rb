@@ -158,6 +158,34 @@ RSpec.describe Operations::Families::AddFinancialAssistanceEligibilityDeterminat
     end
   end
 
+  context 'csr_percent_as_integer' do
+    let(:csr_params) do
+      appli_addnl_params = {
+        "is_ia_eligible" => true,
+        "csr_percent_as_integer" => 94,
+        "csr_eligibility_kind" => 'csr_94',
+      }
+      params[:applicants].first.merge!(appli_addnl_params)
+      params
+    end
+
+    before do
+      bcp = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
+      bcp.update_attributes!(slcsp_id: product.id)
+      @result = subject.call(params: csr_params)
+      family.reload
+      @thhm = family.active_household.tax_households.first.tax_household_members.first
+    end
+
+    it 'should return csr_eligibility_kind value correctly' do
+      expect(@thhm.csr_eligibility_kind).to eq('csr_94')
+    end
+
+    it 'should return csr_percent_as_integer value correctly' do
+      expect(@thhm.csr_percent_as_integer).to eq(94)
+    end
+  end
+
   context 'failure' do
     before do
       bcp = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period

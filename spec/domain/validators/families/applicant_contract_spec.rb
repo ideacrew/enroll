@@ -22,7 +22,8 @@ RSpec.describe Validators::Families::ApplicantContract,  dbclean: :after_each do
       alien_number: nil, i94_number: nil, visa_number: nil, passport_number: nil, sevis_id: nil,
       naturalization_number: nil, receipt_number: nil, citizenship_number: nil, card_number: nil,
       country_of_citizenship: nil, expiration_date: nil, issuing_country: nil, no_ssn: nil,
-      addresses: [], phones: [], emails: [], same_with_primary:  true, vlp_description: nil, is_incarcerated: false
+      addresses: [], phones: [], emails: [], same_with_primary:  true, vlp_description: nil, is_incarcerated: false,
+      csr_percent_as_integer: 94, csr_eligibility_kind: 'csr_94'
     }
   end
   let(:all_params) { required_params.merge(optional_params)}
@@ -83,6 +84,24 @@ RSpec.describe Validators::Families::ApplicantContract,  dbclean: :after_each do
     it 'When an expiration date for an applicant is not date format' do
       optional_params.merge!(expiration_date: DateTime.now)
       expect(subject.call(all_params).success?).to be_truthy
+    end
+  end
+
+  context 'csr related fields' do
+    before do
+      @result = subject.call(all_params)
+    end
+
+    it 'return success' do
+      expect(@result).to be_success
+    end
+
+    it 'should return csr_percent_as_integer with correct value' do
+      expect(@result.to_h[:csr_percent_as_integer]).to eq(optional_params[:csr_percent_as_integer])
+    end
+
+    it 'should return csr_eligibility_kind with correct value' do
+      expect(@result.to_h[:csr_eligibility_kind]).to eq(optional_params[:csr_eligibility_kind])
     end
   end
 end

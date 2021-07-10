@@ -71,6 +71,9 @@ module Validators
 
         optional(:relationship).maybe(:string)
 
+        optional(:csr_percent_as_integer).maybe(:integer)
+        optional(:csr_eligibility_kind).maybe(:string)
+
         before(:value_coercer) do |result|
           result_hash = result.to_h
           other_params = {}
