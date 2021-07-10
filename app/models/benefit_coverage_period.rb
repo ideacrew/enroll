@@ -157,7 +157,8 @@ class BenefitCoveragePeriod
     shopping_family_member_ids = hbx_enrollment_members.map(&:applicant_id)
     subcriber = hbx_enrollment_members.detect(&:is_subscriber)
     family_members = hbx_enrollment_members.map(&:family_member)
-    ivl_bgs = get_benefit_packages({family_members: family_members, coverage_kind: coverage_kind, family: hbx_enrollment.family, effective_on: hbx_enrollment.effective_on, market: market}).uniq
+    ivl_bgs = get_benefit_packages({family_members: family_members, coverage_kind: coverage_kind, family: hbx_enrollment.family,
+                                    effective_on: hbx_enrollment.effective_on, market: market, shopping_family_members_ids:  shopping_family_member_ids}).uniq
     elected_product_ids = ivl_bgs.map(&:benefit_ids).flatten.uniq
     csr_kind = if tax_household
                  extract_csr_kind(tax_household, shopping_family_member_ids)
@@ -175,9 +176,10 @@ class BenefitCoveragePeriod
         consumer_role = family_member.person.consumer_role if family_member.person.is_consumer_role_active?
         resident_role = family_member.person.resident_role if family_member.person.is_resident_role_active?
         rule = if resident_role.nil?
-                 InsuredEligibleForBenefitRule.new(consumer_role, bg, { coverage_kind: attrs[:coverage_kind], family: attrs[:family], new_effective_on: attrs[:effective_on],  market_kind: attrs[:market]})
+                 InsuredEligibleForBenefitRule.new(consumer_role, bg, { coverage_kind: attrs[:coverage_kind], family: attrs[:family],
+                                                                        new_effective_on: attrs[:effective_on],  market_kind: attrs[:market], shopping_family_members_ids: attrs[:shopping_family_members_ids]})
                else
-                 InsuredEligibleForBenefitRule.new(resident_role, bg, coverage_kind: attrs[:coverage_kind], family: attrs[:family], market_kind: attrs[:market])
+                 InsuredEligibleForBenefitRule.new(resident_role, bg, coverage_kind: attrs[:coverage_kind], family: attrs[:family], market_kind: attrs[:market], shopping_family_members_ids: attrs[:shopping_family_members_ids])
                end
         satisfied = false and break unless rule.satisfied?[0]
       end

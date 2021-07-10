@@ -18,6 +18,7 @@ class InsuredEligibleForBenefitRule
     @coverage_kind = options[:coverage_kind].present? ? options[:coverage_kind] : 'health'
     @new_effective_on = options[:new_effective_on]
     @market_kind = options[:market_kind]
+    @shopping_family_member_ids = options[:shopping_family_members_ids]
   end
 
   def setup
@@ -108,7 +109,7 @@ class InsuredEligibleForBenefitRule
     return true if tax_household.blank?
 
     cost_sharing = @benefit_package.cost_sharing
-    csr_kind = tax_household.current_csr_eligibility_kind
+    csr_kind = tax_household.eligibile_csr_kind(@shopping_family_member_ids)
     return true if csr_kind.blank? || cost_sharing.blank?
     csr_kind == cost_sharing
   end
