@@ -102,7 +102,9 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model 
             is_medicaid_chip_eligible: true,
             is_totally_ineligible: true,
             is_eligible_for_non_magi_reasons: true,
-            is_non_magi_medicaid_eligible: true }
+            is_non_magi_medicaid_eligible: true,
+            csr_percent_as_integer: 94,
+            csr_eligibility_kind: 'csr_94' }
         end
 
         before do
@@ -154,6 +156,14 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model 
 
         it 'should not copy is_non_magi_medicaid_eligible' do
           expect(@duplicate_applicant.is_non_magi_medicaid_eligible).not_to be_truthy
+        end
+
+        it 'should not copy csr_percent_as_integer' do
+          expect(@duplicate_applicant.csr_percent_as_integer).not_to eq(mocked_params[:csr_percent_as_integer])
+        end
+
+        it 'should not copy csr_eligibility_kind' do
+          expect(@duplicate_applicant.csr_eligibility_kind).not_to eq(mocked_params[:csr_eligibility_kind])
         end
       end
     end
