@@ -1,8 +1,6 @@
 name: yard doc generation
 on:
   push:
-    paths:
-      - "hugo/**"
     branches:
       - trunk
 
@@ -17,10 +15,7 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: '12'
-      - name: Install global packages
-        run: |
-          yarn install
-          npm install -g postcss postcss-cli autoprefixer
+      - run: cd hugo && npm ci    
       - uses: ruby/setup-ruby@v1
       - uses: actions/cache@v2
         with:
