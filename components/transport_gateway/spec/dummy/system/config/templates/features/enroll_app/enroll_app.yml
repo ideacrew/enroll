@@ -258,6 +258,8 @@ registry:
             item: true
           - key: :medicaid_agency_phone
             item: "(000) 000-0000"
+          - key: :verifiable_immigration_statuses
+            item: true
       - key: :data_seeds_ui
         item: :data_seed_ui
         is_enabled: true

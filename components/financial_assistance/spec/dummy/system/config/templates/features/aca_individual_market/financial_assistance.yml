@@ -178,7 +178,7 @@ registry:
       is_enabled: true
       settings:
         - key: :name
-          item: 'CubCare'
+          item: "MaineCare or CubCare"
     - key: :medicaid_or_chip_agency_long_name
       is_enabled: true
       settings:
