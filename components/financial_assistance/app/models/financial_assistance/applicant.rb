@@ -739,7 +739,7 @@ module FinancialAssistance
     end
 
     def tax_info_complete?
-      filing_as_head = (FinancialAssistanceRegistry.feature_enabled?(:filing_as_head_of_household) && is_required_to_file_taxes && !is_claimed_as_tax_dependent) ? !is_filing_as_head_of_household.nil? : true
+      filing_as_head = (FinancialAssistanceRegistry.feature_enabled?(:filing_as_head_of_household) && is_required_to_file_taxes && is_joint_tax_filing == false && !is_claimed_as_tax_dependent.nil?) ? !is_filing_as_head_of_household.nil? : true
       !is_required_to_file_taxes.nil? &&
         !is_claimed_as_tax_dependent.nil? &&
         filing_as_head
