@@ -22,7 +22,7 @@ RSpec.describe ::Operations::Notices::IvlEnrNoticeTrigger, dbclean: :after_each 
 
       it 'should return failure' do
         result = subject.call(params)
-        expect(result.failure?).to eq true
+        expect(result.failure?).to be_truthy
         expect(result.failure).to eq 'Missing Enrollment'
       end
     end
@@ -33,12 +33,26 @@ RSpec.describe ::Operations::Notices::IvlEnrNoticeTrigger, dbclean: :after_each 
         allow_any_instance_of(Events::Individual::Enrollments::Submitted).to receive(:publish).and_return true
       end
 
-
       let(:params) {{enrollment: enrollment}}
 
       it 'should return success' do
         result = subject.call(params)
-        expect(result.success?).to eq true
+        expect(result.success?).to be_truthy
+      end
+    end
+
+    context 'when due date on outstanding verifications is nil' do
+      before :each do
+        person.consumer_role.verification_types.each {|vt| vt.update_attributes(validation_status: 'outstanding', due_date: nil)}
+        allow_any_instance_of(Events::Individual::Enrollments::Submitted).to receive(:publish).and_return true
+      end
+
+      let(:params) {{enrollment: enrollment}}
+
+      it 'should update due date' do
+        result = subject.call(params)
+        expect(result.success?).to be_truthy
+        expect(person.consumer_role.reload.verification_types[0].due_date.present?).to be_truthy
       end
     end
 
@@ -56,7 +70,7 @@ RSpec.describe ::Operations::Notices::IvlEnrNoticeTrigger, dbclean: :after_each 
 
       it 'should return success' do
         result = subject.call(params)
-        expect(result.success?).to eq true
+        expect(result.success?).to be_truthy
       end
     end
   end

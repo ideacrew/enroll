@@ -52,12 +52,27 @@ module Operations
         ]
       end
 
+      def update_and_build_verification_types(person)
+        date = TimeKeeper.date_of_record
+        person.consumer_role.types_include_to_notices.collect do |verification_type|
+          unless verification_type.due_date && verification_type.due_date_type
+            verification_type.update_attributes(due_date: (date + Settings.aca.individual_market.verification_due.days), due_date_type: "notice")
+            person.consumer_role.save!
+          end
+          {
+            type_name: verification_type.type_name,
+            validation_status: verification_type.validation_status,
+            due_date: verification_type.due_date
+          }
+        end
+      end
+
       def build_family_member_hash(enrollment)
         members = enrollment.hbx_enrollment_members.map(&:family_member)
-        family_member_hash = members.collect do |fm|
+        family_members_hash = members.collect do |fm|
           person = fm.person
-          outstanding_verification_types = person.consumer_role.outstanding_verification_types
-          {
+          outstanding_verification_types = person.consumer_role.types_include_to_notices
+          member_hash = {
             is_primary_applicant: fm.is_primary_applicant,
             person: {
               hbx_id: person.hbx_id,
@@ -66,12 +81,12 @@ module Operations
               person_health: { is_tobacco_user: person.is_tobacco_user },
               is_active: person.is_active,
               is_disabled: person.is_disabled,
-              addresses: build_addresses(person),
-              verification_types: outstanding_verification_types.collect {|vt| {type_name: vt.type_name, validation_status: vt.validation_status, due_date: vt.due_date}}
+              addresses: build_addresses(person)
             }
           }
+          member_hash.merge!(verification_types: update_and_build_verification_types(person)) if outstanding_verification_types.present?
         end
-        Success(family_member_hash)
+        Success(family_members_hash)
       end
 
       def build_household_hash(family, year)
@@ -183,8 +198,7 @@ module Operations
 
       def is_documents_needed(enrollment)
         members = enrollment.hbx_enrollment_members.map(&:family_member)
-        return true if members.any? {|member| member.person.consumer_role.outstanding_verification_types.present? }
-        false
+        members.any? { |member| member.person.consumer_role.types_include_to_notices.present? }
       end
 
       def build_payload(family_members_hash, households_hash, family, documents_needed)
