@@ -9,6 +9,7 @@ Then(/^they visit the other income page via the left nav$/) do
 end
 
 Then(/^the user will navigate to the Other Income page for the corresponding applicant$/) do
+  sleep 2
   expect(page).to have_content "Other Income for"
 end
 
@@ -122,4 +123,36 @@ end
 
 Then(/^a modal should show asking the user are you sure you want to leave this page$/) do
   expect(page).to have_content "Are you sure you want to leave this page?"
+end
+
+Given(/^applicant is (.*) member of an American Indian or Alaska Native Tribe$/) do |is_member|
+  if is_member == 'not a'
+    @application.applicants.update_all(indian_tribe_member: false)
+  else
+    @application.applicants.update_all(indian_tribe_member: true)
+  end
+end
+
+Then(/^user should (.*) a question about income from American Indian or Alaska Native tribal sources$/) do |status|
+  if status == 'not see'
+    expect(page).to_not have_content ' income from American Indian or Alaska Native tribal sources? *'
+  else
+    expect(page).to have_content ' income from American Indian or Alaska Native tribal sources? *'
+  end
+end
+
+And(/^user entered yes to american indian or alaska native income question$/) do
+  find("#has_american_indian_alaskan_native_income_true").click
+end
+
+And(/^user entered no to american indian or alaska native income question$/) do
+  find("#has_american_indian_alaskan_native_income_false").click
+end
+
+Then(/^the american indian or alaska native income choices should not show$/) do
+  expect(page).to_not have_content "HOW OFTEN *"
+end
+
+Then(/^the american indian or alaska native income choices should show$/) do
+  expect(page).to have_content "HOW OFTEN *"
 end

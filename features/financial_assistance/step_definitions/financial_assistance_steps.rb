@@ -387,6 +387,14 @@ Given(/^the FAA feature configuration is enabled$/) do
   enable_feature :financial_assistance
 end
 
+Given(/^american indian or alaska native income feature is enabled$/) do
+  enable_feature :american_indian_alaskan_native_income
+end
+
+Given(/^american indian or alaska native income feature is disabled$/) do
+  disable_feature :american_indian_alaskan_native_income
+end
+
 Then(/^the user should see the external verification link$/) do
   # TODO: Maybe figure out how to do this with something other than glyphicon
   other_actions_link = page.all('a').detect { |link| link[:class] == 'glyphicon glyphicon-plus pull-right' }
