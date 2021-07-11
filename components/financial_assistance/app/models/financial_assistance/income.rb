@@ -68,9 +68,8 @@ module FinancialAssistance
       scholarship_payments: 'Taxable scholarship payments'
     }
 
-    unless EnrollRegistry.feature_enabled?(:american_indian_alaskan_native_income)
-      OTHER_INCOME_TYPE_KIND.merge!(american_indian_and_alaskan_native: "American Indian/Alaska Native income")
-    end
+    OTHER_INCOME_TYPE_KIND.merge!(american_indian_and_alaskan_native: "American Indian/Alaska Native income") unless EnrollRegistry.feature_enabled?(:american_indian_alaskan_native_income)
+    OTHER_INCOME_TYPE_KIND.freeze
 
     field :title, type: String
     field :kind, as: :income_type, type: String, default: 'wages_and_salaries'
