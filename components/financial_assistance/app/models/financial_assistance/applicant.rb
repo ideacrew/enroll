@@ -402,6 +402,23 @@ module FinancialAssistance
       is_ia_eligible && !is_medicaid_chip_eligible && !is_without_assistance && !is_totally_ineligible
     end
 
+    # Checks if applicant is eligible for 73, 87 or 94.
+    def is_csr_73_87_or_94?
+      is_ia_eligible? && [73, 87, 94].include?(csr_percent_as_integer)
+    end
+
+    # Checks if applicant is eligible for 100.
+    def is_csr_100?
+      is_ia_eligible? && csr_percent_as_integer == 100
+    end
+
+    # Checks if applicant is eligible for CSR limited.
+    # Applicant is eligible for limited CSR if attested for AI/AN status if csr is not 100,
+    # as csr 100 is better than csr limited
+    def is_csr_limited?
+      (is_ia_eligible? && csr_percent_as_integer == -1) || (indian_tribe_member && csr_percent_as_integer != 100)
+    end
+
     def non_ia_eligible?
       (is_medicaid_chip_eligible || is_without_assistance || is_totally_ineligible) && !is_ia_eligible
     end

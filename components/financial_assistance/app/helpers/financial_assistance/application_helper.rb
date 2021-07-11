@@ -25,6 +25,24 @@ module FinancialAssistance
       end.include?(0)
     end
 
+    def csr_73_87_or_94_eligible_applicants?(application_id)
+      application = FinancialAssistance::Application.find(application_id)
+      full_names = application.applicants.select(&:is_csr_73_87_or_94?).map(&:full_name)
+      full_names.map{ |full_name| capitalize_full_name(full_name) }
+    end
+
+    def csr_100_eligible_applicants?(application_id)
+      application = FinancialAssistance::Application.find(application_id)
+      full_names = application.applicants.select(&:is_csr_100?).map(&:full_name)
+      full_names.map{ |full_name| capitalize_full_name(full_name) }
+    end
+
+    def csr_limited_eligible_applicants?(application_id)
+      application = FinancialAssistance::Application.find(application_id)
+      full_names = application.applicants.select(&:is_csr_limited?).map(&:full_name)
+      full_names.map{ |full_name| capitalize_full_name(full_name) }
+    end
+
     def applicant_age(applicant)
       now = Time.now.utc.to_date
       dob = applicant.dob

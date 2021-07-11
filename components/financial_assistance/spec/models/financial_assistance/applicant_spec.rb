@@ -262,4 +262,46 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       expect(applicant.is_eligible_for_non_magi_reasons).to eq(nil)
     end
   end
+
+  context 'is_csr_73_87_or_94' do
+    before do
+      applicant.update_attributes!({ is_ia_eligible: true, csr_percent_as_integer: [73, 87, 94].sample })
+    end
+
+    it 'should return true' do
+      expect(applicant.reload.is_csr_73_87_or_94?).to be_truthy
+    end
+  end
+
+  context 'is_csr_100' do
+    before do
+      applicant.update_attributes!({ is_ia_eligible: true, csr_percent_as_integer: 100 })
+    end
+
+    it 'should return true' do
+      expect(applicant.reload.is_csr_100?).to be_truthy
+    end
+  end
+
+  context 'is_csr_limited' do
+    context 'aqhp' do
+      before do
+        applicant.update_attributes!({ is_ia_eligible: true, csr_percent_as_integer: -1 })
+      end
+
+      it 'should return true' do
+        expect(applicant.reload.is_csr_limited?).to be_truthy
+      end
+    end
+
+    context 'uqhp' do
+      before do
+        applicant.update_attributes!({ indian_tribe_member: true })
+      end
+
+      it 'should return true' do
+        expect(applicant.reload.is_csr_limited?).to be_truthy
+      end
+    end
+  end
 end
