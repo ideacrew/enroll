@@ -1050,4 +1050,29 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       end
     end
   end
+
+  context 'with deductable_part_of_self_employment_taxes deduction' do
+    let!(:deduction) do
+      deduction = ::FinancialAssistance::Deduction.new({ kind: 'deductable_part_of_self_employment_taxes',
+                                                         amount: 100.00,
+                                                         start_on: Date.today.prev_year,
+                                                         frequency_kind: 'monthly' })
+      applicant.deductions << deduction
+      applicant.save!
+    end
+
+    before do
+      result = subject.call(application.reload)
+      @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+      @deduction = @entity_init.success.applicants.first.deductions.first
+    end
+
+    it 'should be able to successfully init Application Entity' do
+      expect(@entity_init).to be_success
+    end
+
+    it 'should return deduction kind which is allowed in AcaEntities' do
+      expect(::AcaEntities::MagiMedicaid::Types::DeductionKind).to include(@deduction.kind)
+    end
+  end
 end

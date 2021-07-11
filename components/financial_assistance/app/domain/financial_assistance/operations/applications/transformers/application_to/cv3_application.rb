@@ -569,7 +569,7 @@ module FinancialAssistance
             def deductions(applicant)
               applicant.deductions.inject([]) do |result, deduction|
                 result << { name: deduction.title,
-                            kind: deduction.kind,
+                            kind: get_deduction_kind(deduction.kind),
                             amount: deduction.amount.to_f,
                             start_on: deduction.start_on,
                             end_on: deduction.end_on,
@@ -577,6 +577,11 @@ module FinancialAssistance
                             submitted_at: deduction.submitted_at}
                 result
               end
+            end
+
+            # Match with AcaEntities Deduction Kind
+            def get_deduction_kind(deduction_kind)
+              deduction_kind == 'deductable_part_of_self_employment_taxes' ? 'deductible_part_of_self_employment_taxes' : deduction_kind
             end
 
             def applicant_benchmark_premium(application)
