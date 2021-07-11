@@ -246,7 +246,17 @@ document.addEventListener("turbolinks:load", function() {
     if($('#is_joint_tax_filing_no').is(':checked')) {
       $('.filing-as-head-of-household').first().removeClass('hide');
       $('#is_filing_as_head_of_household_yes, #is_filing_as_head_of_household_no').prop('required', true);
+    } else {
+      $('#is_filing_as_head_of_household_yes, #is_filing_as_head_of_household_no').prop('checked', false)
+      $('#is_filing_as_head_of_household_yes, #is_filing_as_head_of_household_no').prop('required', false);
+      $('.filing-as-head-of-household').first().addClass('hide');
     }
+  }
+
+  if(!$('#is_required_to_file_taxes_no, #is_required_to_file_taxes_yes').is(':checked')) {
+    $('#is_filing_as_head_of_household_yes, #is_filing_as_head_of_household_no').prop('checked', false)
+    $('#is_filing_as_head_of_household_yes, #is_filing_as_head_of_household_no').prop('required', false);
+    $('.filing-as-head-of-household').first().addClass('hide');
   }
 
   if($('#is_claimed_as_tax_dependent_no').is(':checked')) {
@@ -261,7 +271,8 @@ document.addEventListener("turbolinks:load", function() {
 
     if( $('.interaction-click-control-tax-info').parent('li').hasClass('active')
         && ($('#is_required_to_file_taxes_yes, #is_required_to_file_taxes_no').is(':checked') && $('#is_claimed_as_tax_dependent_yes, #is_claimed_as_tax_dependent_no').is(':checked'))
-        && ((($('.filing-as-head-of-household').length > 0) && $('#is_filing_as_head_of_household_yes, #is_filing_as_head_of_household_no').is(':checked')) || ($('.filing-as-head-of-household').length == 0) || $('#is_required_to_file_taxes_no').is(':checked') || $('#is_joint_tax_filing_yes').is(':checked'))){
+        && ($('.hide.filing-as-head-of-household').length > 0
+        || (((($('.filing-as-head-of-household').length > 0) && $('#is_filing_as_head_of_household_yes, #is_filing_as_head_of_household_no').is(':checked')) || ($('.filing-as-head-of-household').length == 0) || $('#is_required_to_file_taxes_no').is(':checked') || $('#is_joint_tax_filing_yes').is(':checked'))))){
      $('.interaction-click-control-continue').prop('disabled', false)
      //
    }
@@ -271,7 +282,8 @@ document.addEventListener("turbolinks:load", function() {
 $(document).ready(function(){
   if( $('.interaction-click-control-tax-info').parent('li').hasClass('active')
       && ($('#is_required_to_file_taxes_yes, #is_required_to_file_taxes_no').is(':checked') && $('#is_claimed_as_tax_dependent_yes, #is_claimed_as_tax_dependent_no').is(':checked'))
-      && ((($('.filing-as-head-of-household').length > 0) && $('#is_filing_as_head_of_household_yes, #is_filing_as_head_of_household_no').is(':checked')) || $('.filing-as-head-of-household').length == 0)){
+      && ($('.hide.filing-as-head-of-household').length > 0
+      || ((($('.filing-as-head-of-household').length > 0) && $('#is_filing_as_head_of_household_yes, #is_filing_as_head_of_household_no').is(':checked')) || $('.filing-as-head-of-household').length == 0))){
    $('.interaction-click-control-continue').prop('disabled', false)
  }
 })
