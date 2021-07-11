@@ -37,6 +37,21 @@ module Operations
         Success(enrollment.family)
       end
 
+      def build_addresses(person)
+        address = person.mailing_address
+        [
+          {
+            :kind => address.kind,
+            :address_1 => address.address_1,
+            :address_2 => address.address_2,
+            :address_3 => address.address_3,
+            :state => address.state,
+            :city => address.city,
+            :zip => address.zip
+          }
+        ]
+      end
+
       def build_family_member_hash(enrollment)
         members = enrollment.hbx_enrollment_members.map(&:family_member)
         family_member_hash = members.collect do |fm|
@@ -51,6 +66,7 @@ module Operations
               person_health: { is_tobacco_user: person.is_tobacco_user },
               is_active: person.is_active,
               is_disabled: person.is_disabled,
+              addresses: build_addresses(person),
               verification_types: outstanding_verification_types.collect {|vt| {type_name: vt.type_name, validation_status: vt.validation_status, due_date: vt.due_date}}
             }
           }
