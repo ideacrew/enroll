@@ -84,6 +84,7 @@ module FinancialAssistance
                                                      is_primary_family_member: applicant.is_primary_applicant.present?},
                            person_hbx_id: applicant.person_hbx_id.to_s,
                            is_required_to_file_taxes: applicant.is_required_to_file_taxes.present?,
+                           is_filing_as_head_of_household: applicant.is_filing_as_head_of_household.present?,
                            is_joint_tax_filing: applicant.is_joint_tax_filing.present?,
                            is_claimed_as_tax_dependent: applicant.is_claimed_as_tax_dependent.present?,
                            claimed_as_tax_dependent_by: applicant_reference_by_applicant_id(application, applicant.claimed_as_tax_dependent_by),

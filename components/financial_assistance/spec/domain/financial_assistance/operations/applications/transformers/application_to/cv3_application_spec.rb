@@ -20,6 +20,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
                                   is_self_attested_blind: false,
                                   is_applying_coverage: true,
                                   is_required_to_file_taxes: true,
+                                  is_filing_as_head_of_household: true,
                                   is_pregnant: false,
                                   has_job_income: false,
                                   has_self_employment_income: false,
@@ -1073,6 +1074,22 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
     it 'should return deduction kind which is allowed in AcaEntities' do
       expect(::AcaEntities::MagiMedicaid::Types::DeductionKind).to include(@deduction.kind)
+    end
+  end
+
+  context 'for is_filing_as_head_of_household' do
+    before do
+      result = subject.call(application)
+      @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+      @applicant = @entity_init.success.applicants.first
+    end
+
+    it 'should be able to successfully init Application Entity' do
+      expect(@entity_init).to be_success
+    end
+
+    it 'should return deduction kind which is allowed in AcaEntities' do
+      expect(@applicant.is_filing_as_head_of_household).to eq(applicant.is_filing_as_head_of_household)
     end
   end
 end
