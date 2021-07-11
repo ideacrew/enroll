@@ -59,7 +59,6 @@ module FinancialAssistance
       pension_retirement_benefits: 'Pension or retirement',
       rental_and_royalty: 'Rent and royalties',
       social_security_benefit: 'Social Security',
-      american_indian_and_alaskan_native: "American Indian/Alaska Native income",
       employer_funded_disability: 'Employer-funded disability payments',
       estate_trust: 'Estate and trust',
       farming_and_fishing: 'Farming or fishing',
@@ -67,8 +66,11 @@ module FinancialAssistance
       other: 'Other taxable income',
       prizes_and_awards: FinancialAssistanceRegistry[:prize_and_awards].setting(:gamble_prize).item ? 'Gambling, prizes or awards' : 'Prizes and awards',
       scholarship_payments: 'Taxable scholarship payments'
-    }.freeze
+    }
 
+    unless EnrollRegistry.feature_enabled?(:american_indian_alaskan_native_income)
+      OTHER_INCOME_TYPE_KIND.merge!(american_indian_and_alaskan_native: "American Indian/Alaska Native income")
+    end
 
     field :title, type: String
     field :kind, as: :income_type, type: String, default: 'wages_and_salaries'
@@ -92,6 +94,7 @@ module FinancialAssistance
     scope :other, -> {where(:kind.nin => [JOB_INCOME_TYPE_KIND, NET_SELF_EMPLOYMENT_INCOME_KIND, UNEMPLOYMENT_INCOME_KIND])}
     scope :of_kind, ->(kind) {where(kind: kind)}
     scope :unemployment, ->{where(kind: 'unemployment_income')}
+    scope :american_indian_and_alaskan_native, ->{where(kind: 'american_indian_and_alaskan_native')}
 
     validates_length_of :title,
                         in: TITLE_SIZE_RANGE,

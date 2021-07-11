@@ -55,6 +55,7 @@ module FinancialAssistance
     DRIVER_QUESTION_ATTRIBUTES = [:has_job_income, :has_self_employment_income, :has_other_income,
                                   :has_deductions, :has_enrolled_health_coverage, :has_eligible_health_coverage]
     DRIVER_QUESTION_ATTRIBUTES += [:has_unemployment_income] if FinancialAssistanceRegistry[:unemployment_income].enabled?
+    DRIVER_QUESTION_ATTRIBUTES += [:has_american_indian_alaskan_native_income] if EnrollRegistry[:american_indian_alaskan_native_income].enabled?
     DRIVER_QUESTION_ATTRIBUTES.freeze
 
     #list of the documents user can provide to verify Immigration status
@@ -234,6 +235,7 @@ module FinancialAssistance
     field :has_deductions, type: Boolean
     field :has_enrolled_health_coverage, type: Boolean
     field :has_eligible_health_coverage, type: Boolean
+    field :has_american_indian_alaskan_native_income, type: Boolean
 
     field :csr_percent_as_integer, type: Integer, default: 0  #values in DC: 0, 73, 87, 94
     field :csr_eligibility_kind, type: String, default: 'csr_0'
@@ -953,6 +955,10 @@ module FinancialAssistance
 
     def unemployment_income_exists?
       incomes.unemployment.present?
+    end
+
+    def american_indian_alaskan_native_income_exists?
+      incomes.american_indian_and_alaskan_native.present?
     end
 
     def deductions_exists?
