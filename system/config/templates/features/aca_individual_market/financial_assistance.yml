@@ -186,3 +186,7 @@ registry:
           item: 'Office for Family Independence'
     - key: :student_follow_up_questions
       is_enabled: false
+    - key: :filing_as_head_of_household
+      is_enabled: false
+# TODO eligibility engine connectivity(HAVEN) settings
+# TODO mec service connectivity settings

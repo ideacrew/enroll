@@ -122,6 +122,29 @@ And(/^the user fills the the aplicant add member form with indian member yes/) d
   find(:xpath, '//label[@for="radio_incarcerated_no"]').click
 end
 
+And(/^the user fills the the aplicant add member form with indian member no/) do
+  sleep 5
+
+  expect(page).to have_content('Lives with primary subscriber')
+  fill_in "applicant[first_name]", :with => "John"
+  fill_in "applicant[last_name]", :with => "Doe"
+  fill_in "applicant[ssn]", :with => "763434355"
+  fill_in "jq_datepicker_ignore_applicant[dob]", :with => "04/15/1988"
+  click_link('15')
+
+  find('.house .selectric span.label').click
+  find(".house .selectric-items li", text: 'Spouse').click
+
+  find(:xpath, '//label[@for="radio_female"]').click
+  find(:xpath, '//label[@for="applicant_us_citizen_true"]').click
+  find(:xpath, '//label[@for="applicant_naturalized_citizen_false"]').click
+  find(:xpath, '//label[@for="indian_tribe_member_no"]').click
+  find(:xpath, '//label[@for="radio_incarcerated_no"]').click
+
+  all(:css, ".mz").last.click
+  sleep 3
+end
+
 And(/the user clicks submit applicant form/) do
   all(:css, ".mz").last.click
 end

@@ -149,6 +149,7 @@ module FinancialAssistance
     field :is_living_in_state, type: Boolean, default: false
 
     field :is_required_to_file_taxes, type: Boolean
+    field :is_filing_as_head_of_household, type: Boolean
     field :tax_filer_kind, type: String, default: "tax_filer" # change to the response of is_required_to_file_taxes && is_joint_tax_filing
     field :is_joint_tax_filing, type: Boolean
     field :is_claimed_as_tax_dependent, type: Boolean
@@ -738,8 +739,10 @@ module FinancialAssistance
     end
 
     def tax_info_complete?
+      filing_as_head = (FinancialAssistanceRegistry.feature_enabled?(:filing_as_head_of_household) && is_required_to_file_taxes && !is_claimed_as_tax_dependent) ? !is_filing_as_head_of_household.nil? : true
       !is_required_to_file_taxes.nil? &&
-        !is_claimed_as_tax_dependent.nil?
+        !is_claimed_as_tax_dependent.nil? &&
+        filing_as_head
     end
 
     def incomes_complete?

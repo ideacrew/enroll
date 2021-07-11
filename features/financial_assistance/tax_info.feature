@@ -16,6 +16,31 @@ Scenario: Cannot continue from tax info page without form completely filled
 	Then the CONTINUE will be visibly disabled
 	And should not be actionable.
 
+Scenario: Cannot continue from tax info page without head of household when feature enabled
+  Given head of household question feature is enabled
+	Given the user is editing an application for financial assistance
+  And user clicks household add member button
+  And the user fills the the aplicant add member form with indian member no
+  And user clicks primary add income and coverage
+	And question will this person file taxes for year is marked as yes for primary applicant
+  And filing jointly is selected no
+	And Will this person be claimed as a tax dependent for <system year>? does not have a nil value stored
+	Then the CONTINUE will be visibly disabled
+	And should not be actionable.
+
+Scenario: Can continue from tax info page with head of household when feature enabled
+  Given head of household question feature is enabled
+	Given the user is editing an application for financial assistance
+  And user clicks household add member button
+  And the user fills the the aplicant add member form with indian member no
+  And user clicks primary add income and coverage
+	And question will this person file taxes for year is marked as yes for primary applicant
+  And filing jointly is selected no
+  And head of household is selected yes
+	And Will this person be claimed as a tax dependent for <system year>? does not have a nil value stored
+	Then the CONTINUE will be visibly enabled
+	And should be actionable.
+
 Scenario: Cannot continue from tax info page without tax dependent status filled
 	Given the user is editing an application for financial assistance
 	When the user navigates to the Tax Info page for a given applicant
