@@ -27,7 +27,7 @@ module Operations
         private
 
         def construct_payload_hash(family)
-          if family.is_a?(Family)
+          if family.is_a?(::Family)
             Operations::Transformers::FamilyTo::Cv3Family.new.call(family)
           else
             Failure("Invalid Family Object #{family}")
@@ -40,7 +40,7 @@ module Operations
             Success(result)
           else
             hbx_id = value[:family_members].detect{|a| a[:is_primary_applicant] == true}[:person][:hbx_id]
-            Failure("Person with hbx_id #{hbx_id} is not valid due to #{result.errors}.")
+            Failure("Person with hbx_id #{hbx_id} is not valid due to #{result.failure.errors.to_h}.")
           end
         end
 
