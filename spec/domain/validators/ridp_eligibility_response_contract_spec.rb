@@ -2,6 +2,7 @@
 
 require 'rails_helper'
 
+#spec for RidpEligibilityResponseContract
 module Validators
   RSpec.describe Validators::RidpEligibilityResponseContract do
     let(:primary_member_hhx_id) { '2345667789' }

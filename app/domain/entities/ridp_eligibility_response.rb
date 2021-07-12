@@ -9,7 +9,7 @@ module Entities
     attribute :ridp_eligibility do
       attribute :delivery_info, Types::String.optional.meta(omittable: true)
       attribute :metadata, Types::String.optional.meta(omittable: true)
-      attribute :event, Types::String.optional.meta(omittable: true)
+      attribute :event, Types::Hash.optional.meta(omittable: true)
     end
 
     attribute :created_at, Types::DateTime.optional.meta(omittable: true)

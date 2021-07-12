@@ -13,7 +13,7 @@ document.addEventListener("turbolinks:load", function() {
           success: function (response_received_flag) {
             if (response_received_flag == "true"){
               // redirect to the existing eligibility_results page
-              window.location = window.location.href.replace(/wait_for_secondary_response/, "eligibility_results?cur=1")
+              window.location = window.location.href.replace(/wait_for_secondary_response/, "secondary_response")
             }
           }
         });
