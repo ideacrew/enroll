@@ -7,7 +7,10 @@ RSpec.describe Exchanges::IssuersController do
   let(:issuer_profiles) { create_list(:benefit_sponsors_organizations_issuer_profile, 2, organization: site.owner_organization) }
   let(:user)            { double("user", :has_hbx_staff_role? => true) }
 
-  before(:each) { sign_in(user) }
+  before(:each) do
+    EnrollRegistry[:issuers_tab].feature.stub(:is_enabled).and_return(true)
+    sign_in(user)
+  end
 
   context "#index" do
     before(:each) { get :index, xhr: true }
