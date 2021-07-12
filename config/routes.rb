@@ -169,7 +169,7 @@ Rails.application.routes.draw do
         get :show_sep_history
         get :view_terminated_hbx_enrollments
         get :view_enrollment_to_update_end_date
-        post :update_enrollment_termianted_on_date
+        post :update_enrollment_terminated_on_date
         get :calendar_index
         get :user_account_index
         get :get_user_info

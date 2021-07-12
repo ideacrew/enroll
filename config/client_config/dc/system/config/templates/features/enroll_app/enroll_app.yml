@@ -282,6 +282,12 @@ registry:
       - key: :counties_import
         is_enabled: false
         item: ""
+      - key: :change_end_date
+        is_enabled: true
+        item: Operations::HbxEnrollments::EndDateChange.new
+        settings:
+          - key: :expired_enrollments
+            item: true
   - namespace:
       - :features
       - :enroll_app
