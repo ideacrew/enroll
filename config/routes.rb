@@ -273,7 +273,7 @@ Rails.application.routes.draw do
       end
     end
 
-    if EnrollRegistry.feature_enabled?(:ridp_h139)
+    # if EnrollRegistry.feature_enabled?(:ridp_h139)
       resources :fdsh_ridp_verifications, only: [:create, :new, :update] do
         collection do
           get 'failed_validation'
@@ -286,7 +286,7 @@ Rails.application.routes.draw do
           get 'secondary_response'
         end
       end
-    end
+    # end
 
     resources :inboxes, only: [:new, :create, :show, :destroy]
     resources :families, only: [:show] do
