@@ -10,10 +10,39 @@ RSpec.describe Operations::Individual::ApplyAggregateToEnrollment, dbclean: :aft
     end
   end
 
+
   let!(:plan) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
+
+  let!(:rating_area) do
+    ::BenefitMarkets::Locations::RatingArea.rating_area_for(address, during: start_on) || FactoryBot.create_default(:benefit_markets_locations_rating_area)
+  end
+  let!(:service_area) do
+    ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address, during: start_on).first || FactoryBot.create_default(:benefit_markets_locations_service_area)
+  end
+  let(:application_period) { start_on.beginning_of_year..start_on.end_of_year }
+  let!(:plan) do
+    prod =
+      FactoryBot.create(
+        :benefit_markets_products_health_products_health_product,
+        :with_issuer_profile,
+        benefit_market_kind: :aca_individual,
+        kind: :health,
+        service_area: service_area,
+        csr_variant_id: '01',
+        metal_level_kind: 'silver',
+        application_period: application_period
+      )
+    prod.premium_tables = [premium_table]
+    prod.save
+    prod
+  end
+  let(:premium_table)        { build(:benefit_markets_products_premium_table, effective_period: application_period, rating_area: rating_area) }
+
   # let(:benefit_coverage_period) {double(contains?: true, second_lowest_cost_silver_plan: plan)}
   let!(:hbx_profile) {FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)}
   let!(:person) {FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
+  let(:address) { person.rating_address }
+  let(:consumer_role) { person.consumer_role }
   let!(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
   let!(:primary_fm) {family.primary_applicant}
   let!(:household) {family.active_household}
@@ -27,7 +56,24 @@ RSpec.describe Operations::Individual::ApplyAggregateToEnrollment, dbclean: :aft
   let(:sample_max_aptc_1) {1200}
   let(:sample_csr_percent_1) {87}
   let!(:eligibility_determination) {FactoryBot.create(:eligibility_determination, tax_household: tax_household, max_aptc: sample_max_aptc_1, csr_percent_as_integer: sample_csr_percent_1)}
-  let(:product1) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01', metal_level_kind: :silver)}
+  let!(:product1) do
+    prod =
+      FactoryBot.create(
+        :benefit_markets_products_health_products_health_product,
+        :with_issuer_profile,
+        benefit_market_kind: :aca_individual,
+        kind: :health,
+        service_area: service_area,
+        csr_variant_id: '01',
+        metal_level_kind: 'silver',
+        application_period: application_period
+      )
+    prod.premium_tables = [premium_table1]
+    prod.save
+    prod
+  end
+  let(:premium_table1)        { build(:benefit_markets_products_premium_table, effective_period: application_period, rating_area: rating_area) }
+
   let(:hbx_with_aptc_1) do
     enr = FactoryBot.create(:hbx_enrollment,
                             product: product1,
@@ -39,6 +85,8 @@ RSpec.describe Operations::Individual::ApplyAggregateToEnrollment, dbclean: :aft
                             effective_on: start_on,
                             kind: "individual",
                             applied_aptc_amount: 100,
+                            rating_area_id: rating_area.id,
+                            consumer_role_id: consumer_role.id,
                             elected_aptc_pct: 0.7)
     FactoryBot.create(:hbx_enrollment_member, applicant_id: family_member1.id, hbx_enrollment: enr)
     enr

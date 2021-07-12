@@ -220,7 +220,6 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
 
   end
 
-
   context "POST create with failed construct_employee_role", dbclean: :after_each do
     let(:person_params) do
       {"dob" => SymmetricEncryption.encrypt("1985-10-01"),

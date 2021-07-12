@@ -30,6 +30,10 @@ And(/^clicks the “Review Application” link$/) do
 end
 
 Then(/^the user will navigate to the Review Application page$/) do
+  if EnrollRegistry.feature_enabled?(:financial_assistance) &&
+     FinancialAssistanceRegistry.feature_enabled?(:display_medicaid_question)
+    expect(page).to have_content(l10n("faa.medicaid_question"))
+  end
   expect(page).to have_content("Review Your Application")
 end
 

@@ -5,6 +5,7 @@ module Validators
 
     params do
       optional(:hbx_id).maybe(:string)
+      optional(:ext_app_id).maybe(:string)
       optional(:name_pfx).maybe(:string)
       required(:first_name).maybe(:string)
       optional(:middle_name).maybe(:string)
@@ -19,6 +20,8 @@ module Validators
       optional(:ethnicity).maybe(:array)
       optional(:race).maybe(:string)
       optional(:tribal_id).maybe(:string)
+      optional(:tribal_state).maybe(:string)
+      optional(:tribal_name).maybe(:string)
 
       optional(:language_code).maybe(:string)
       optional(:no_dc_address).filled(:bool)

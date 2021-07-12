@@ -11,7 +11,7 @@
       </h4>
       <div class="">
         <%= form_tag(main_app.help_paying_coverage_response_insured_consumer_role_index_path, method: :get, id: 'start_new_app') do %>
-          <%= hidden_field_tag :is_applying_for_assistance, true %>
+          <%= hidden_field_tag :is_applying_for_assistance, 'true' %>
           <%= submit_tag "Start new application", onclick: "StartNewAppModal()", class: "btn btn-primary pull-right"%>
         <% end %>
         <%= raw "&nbsp;" * 10%>

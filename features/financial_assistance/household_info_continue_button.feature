@@ -20,10 +20,21 @@ Feature: A dedicated page that gives the user access to household member creatio
     And all applicants are in Info Completed state
     Then Family Relationships left section WILL display
 
+  Scenario: dependent not applying will be shown the no ssn warning
+    And the primary member exists
+    And a new household member is not applying
+    Then the no ssn warning will appear
+
+  Scenario: CONTINUE button enabled when non-applying dependent does not enter ssn
+    And the primary member exists
+    And a new household member is not applying
+    And all applicants are in Info Completed state
+    Then the CONTINUE button will be ENABLED
+
   Scenario: CONTINUE button navigation
     When all applicants are in Info Completed state
     Then the CONTINUE button will be ENABLED
-  
+
   Scenario: CONTINUE button navigation
     And the primary member exists
     And at least one other household members exist

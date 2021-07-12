@@ -397,6 +397,7 @@ describe Person, :dbclean => :after_each do
 
         shared_examples_for "validate consumer_fields_validations private" do |citizenship, naturalized, immigration_status, native, tribal_id, incarceration, is_valid, error_list|
           before do
+            EnrollRegistry[:immigration_status_question_required].stub(:item).and_return(true)
             allow(person).to receive(:consumer_role).and_return consumer_role
             person.instance_variable_set(:@is_consumer_role, true)
             person.instance_variable_set(:@indian_tribe_member, native)

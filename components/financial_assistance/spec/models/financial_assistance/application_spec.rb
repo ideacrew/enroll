@@ -336,7 +336,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
   end
 
   describe '.set_assistance_year' do
-    let(:family_id)       { BSON::ObjectId.new }      
+    let(:family_id)       { BSON::ObjectId.new }
     let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family_id) }
     it 'updates assistance year' do
       application.send(:set_assistance_year)
@@ -578,14 +578,14 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
     it 'should create income and mec verification types' do
       application.send(:create_verification_documents)
-      expect(applicant1.verification_types.count). to eq 2
-      expect(applicant2.verification_types.count). to eq 2
+      expect(applicant1.verification_types.count).to eq 2
+      expect(applicant2.verification_types.count).to eq 2
     end
 
     it 'should have both income and mec in pending state' do
       application.active_applicants.each do |applicant|
         applicant.verification_types.each do |type|
-          expect(type.validation_status). to eq('pending')
+          expect(type.validation_status).to eq('pending')
         end
       end
     end
@@ -598,10 +598,10 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     end
 
     it 'should delete income and mec verification types' do
-      expect(applicant1.verification_types.count). to eq 2
+      expect(applicant1.verification_types.count).to eq 2
       application.send(:delete_verification_documents)
       application.active_applicants.each do |applicant|
-        expect(applicant.verification_types.count). to eq 0
+        expect(applicant.verification_types.count).to eq 0
       end
     end
   end
@@ -616,7 +616,8 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       FactoryBot.create(:person, :with_consumer_role, hbx_id: '20944967', last_name: 'Test', first_name: 'Domtest34', ssn: '243108282', dob: Date.new(1984, 3, 8))
     end
 
-    let(:family10_id) { BSON::ObjectId.new }
+    let(:family_10) { FactoryBot.create(:family, :with_primary_family_member, person: person10) }
+    let(:family10_id) { family_10.id }
     let(:family_member10_id) { BSON::ObjectId.new }
     let!(:application10) { FactoryBot.create(:financial_assistance_application, family_id: family10_id, hbx_id: '5979ec3cd7c2dc47ce000000', aasm_state: 'submitted') }
     let!(:ed) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application10, csr_percent_as_integer: nil, max_aptc: 0.0) }
@@ -684,6 +685,72 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     end
   end
 
+  context '#calculate_total_net_income_for_applicants' do
+    let(:family_id)    { BSON::ObjectId.new }
+    let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family_id, aasm_state: "draft") }
+    let(:applicant) do
+      FactoryBot.create(:financial_assistance_applicant,
+                        application: application,
+                        ssn: '889984400',
+                        dob: Date.new(1993,12,9),
+                        first_name: 'james',
+                        last_name: 'bond')
+    end
+
+    let(:income) do
+      FactoryBot.build(:financial_assistance_income, amount: 200, start_on: Date.new(2021,6,1), end_on: Date.new(2021, 6, 30), frequency_kind: "biweekly")
+    end
+
+    let(:deduction) do
+      FactoryBot.build(:financial_assistance_deduction, amount: 100, start_on: Date.new(2021,6,1), end_on: Date.new(2021, 6, 30), frequency_kind: "biweekly")
+    end
+
+    context "application does not have any active applicants" do
+      before do
+        applicant.update_attributes(is_active: false)
+      end
+
+      it 'should not update net annual income for applicant' do
+        application.calculate_total_net_income_for_applicants
+        expect(applicant.net_annual_income).to eq nil
+      end
+    end
+
+    context "No incomes and only deductions" do
+      before do
+        applicant.deductions << deduction
+      end
+
+      it 'should calculate and persist net annual income on applicant' do
+        application.calculate_total_net_income_for_applicants
+        expect(applicant.net_annual_income.to_f.ceil).to eq(-213)
+      end
+    end
+
+    context "No deductions and only incomes" do
+      before do
+        applicant.incomes << income
+      end
+
+      it 'should calculate and persist net annual income on applicant' do
+        application.calculate_total_net_income_for_applicants
+        expect(applicant.net_annual_income.to_f.ceil).to eq 428
+      end
+    end
+
+    context "Both deductions and incomes" do
+      before do
+        applicant.incomes << income
+        applicant.deductions << deduction
+      end
+
+      it 'should calculate and persist net annual income on applicant' do
+        application.calculate_total_net_income_for_applicants
+        expect(applicant.net_annual_income.to_f.ceil).to eq 214
+      end
+    end
+  end
+
   context 'other questions' do
     let!(:applicant) do
       FactoryBot.create(:applicant,
@@ -715,7 +782,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       end
 
       it 'should return false' do
-        expect(applicant.other_questions_complete?).to eq(false)
+        expect(applicant.other_questions_complete?).to eq(true)
       end
     end
 

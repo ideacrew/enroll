@@ -6,7 +6,9 @@ RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
   it { should validate_presence_of :max_aptc }
   it { should validate_presence_of :csr_percent_as_integer }
 
-  let(:family)                        { FactoryBot.create(:family, :with_primary_family_member) }
+  let(:person)                        { FactoryBot.create(:person, :with_consumer_role)}
+  let(:consumer_role)                 { person.consumer_role }
+  let(:family)                        { FactoryBot.create(:family, :with_primary_family_member, person: person) }
   let(:family_member) {FactoryBot.create(:family_member, family: household.family)}
   let(:household)                     { family.households.first }
   let(:tax_household)                 { FactoryBot.create(:tax_household, household: household, effective_starting_on: start_on, effective_ending_on: nil) }
@@ -36,6 +38,7 @@ RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
 
   context 'for after create' do
     let(:product1) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01', metal_level_kind: :silver)}
+    let(:rating_area) { FactoryBot.create(:benefit_markets_locations_rating_area) }
     let(:hbx_with_aptc_1) do
       enr = FactoryBot.create(:hbx_enrollment,
                               product: product1,
@@ -47,6 +50,8 @@ RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
                               effective_on: start_on,
                               kind: "individual",
                               applied_aptc_amount: 100,
+                              rating_area_id: rating_area.id,
+                              consumer_role_id: consumer_role.id,
                               elected_aptc_pct: 0.7)
       FactoryBot.create(:hbx_enrollment_member, applicant_id: family_member.id, hbx_enrollment: enr)
       enr
@@ -66,6 +71,7 @@ RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
 
   context 'for after create' do
     let(:product1) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01', metal_level_kind: :silver)}
+    let(:rating_area) { FactoryBot.create(:benefit_markets_locations_rating_area) }
     let(:hbx_with_aptc_1) do
       enr = FactoryBot.create(:hbx_enrollment,
                               product: product1,
@@ -77,6 +83,8 @@ RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
                               effective_on: start_on,
                               kind: "individual",
                               applied_aptc_amount: 100,
+                              rating_area_id: rating_area.id,
+                              consumer_role_id: consumer_role.id,
                               elected_aptc_pct: 0.7)
       FactoryBot.create(:hbx_enrollment_member, applicant_id: family_member.id, hbx_enrollment: enr)
       enr

@@ -20,19 +20,59 @@ RSpec.describe Operations::Individual::RenewEnrollment, type: :model, dbclean: :
                       dob: (TimeKeeper.date_of_record - 22.years))
   end
 
+  let(:address) { person.rating_address }
+
   let(:next_year_date) { TimeKeeper.date_of_record.next_year }
+
   let!(:renewal_product) do
-    FactoryBot.create(:benefit_markets_products_health_products_health_product,
-                      :ivl_product,
-                      :silver,
-                      application_period: next_year_date.beginning_of_year..next_year_date.end_of_year)
+    prod =
+      FactoryBot.create(
+        :benefit_markets_products_health_products_health_product,
+        :with_issuer_profile,
+        benefit_market_kind: :aca_individual,
+        kind: :health,
+        service_area: renewal_service_area,
+        csr_variant_id: '01',
+        metal_level_kind: 'silver',
+        application_period: next_year_date.beginning_of_year..next_year_date.end_of_year
+      )
+    prod.premium_tables = [renewal_premium_table]
+    prod.save
+    prod
   end
+  let(:renewal_premium_table)        { build(:benefit_markets_products_premium_table, effective_period: next_year_date.beginning_of_year..next_year_date.end_of_year, rating_area: renewal_rating_area) }
+  let(:current_application_period)   { TimeKeeper.date_of_record.beginning_of_year..TimeKeeper.date_of_record.end_of_year }
 
   let!(:product) do
-    FactoryBot.create(:benefit_markets_products_health_products_health_product,
-                      :ivl_product,
-                      :silver,
-                      renewal_product_id: renewal_product.id)
+    prod =
+      FactoryBot.create(
+        :benefit_markets_products_health_products_health_product,
+        :with_issuer_profile,
+        benefit_market_kind: :aca_individual,
+        kind: :health,
+        service_area: service_area,
+        csr_variant_id: '01',
+        metal_level_kind: 'silver',
+        renewal_product_id: renewal_product.id,
+        application_period: current_application_period
+      )
+    prod.premium_tables = [premium_table]
+    prod.save
+    prod
+  end
+  let(:premium_table)        { build(:benefit_markets_products_premium_table, effective_period: current_application_period, rating_area: rating_area) }
+
+  let!(:rating_area) do
+    ::BenefitMarkets::Locations::RatingArea.rating_area_for(address, during: TimeKeeper.date_of_record) || FactoryBot.create_default(:benefit_markets_locations_rating_area)
+  end
+  let!(:service_area) do
+    ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address, during: TimeKeeper.date_of_record).first || FactoryBot.create_default(:benefit_markets_locations_service_area)
+  end
+  let!(:renewal_service_area) do
+    ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address, during: TimeKeeper.date_of_record.year + 1).first || FactoryBot.create_default(:benefit_markets_locations_service_area, active_year: TimeKeeper.date_of_record.year + 1)
+  end
+  let!(:renewal_rating_area) do
+    ::BenefitMarkets::Locations::RatingArea.rating_area_for(address, during: TimeKeeper.date_of_record.year + 1) || FactoryBot.create(:benefit_markets_locations_rating_area, active_year: TimeKeeper.date_of_record.year + 1)
   end
 
   let!(:enrollment) do
@@ -40,6 +80,7 @@ RSpec.describe Operations::Individual::RenewEnrollment, type: :model, dbclean: :
                       product_id: product.id,
                       kind: 'individual',
                       family: family,
+                      rating_area_id: rating_area.id,
                       consumer_role_id: family.primary_person.consumer_role.id)
   end
 

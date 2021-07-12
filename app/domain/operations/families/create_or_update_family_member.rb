@@ -5,6 +5,7 @@ require 'dry/monads/do'
 
 module Operations
   module Families
+    # Class for creating and updating family members in cooperation with Financial Assistance engine
     class CreateOrUpdateFamilyMember
       send(:include, Dry::Monads[:result, :do])
 
@@ -44,6 +45,7 @@ module Operations
           @family_member = create_or_update_family_member(@person, family, applicant_params)
           create_or_update_consumer_role(applicant_params, @family_member)
           create_or_update_vlp_document(applicant_params, @person)
+          create_or_update_income_vlp_document(applicant_params, @person) if EnrollRegistry.feature_enabled?(:verification_type_income_verification) && applicant_params[:incomes].blank?
         else
           return @person
         end
@@ -73,6 +75,10 @@ module Operations
 
       def create_or_update_vlp_document(applicant_params, person)
         Operations::People::CreateOrUpdateVlpDocument.new.call(params: {applicant_params: applicant_params, person: person})
+      end
+
+      def create_or_update_income_vlp_document(applicant_params, person)
+        Operations::People::CreateOrUpdateVlpDocument.new.call(params: {applicant_params: applicant_params.merge(subject: "Income"), person: person})
       end
 
       def create_or_update_relationship(person, family, relationship_kind)

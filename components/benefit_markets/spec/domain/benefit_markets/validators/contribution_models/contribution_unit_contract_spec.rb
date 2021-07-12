@@ -15,7 +15,7 @@ RSpec.describe BenefitMarkets::Validators::ContributionModels::ContributionUnitC
   let(:invalid_params)            { missing_params.merge({order: 'one'}) }
   let(:required_params)           { missing_params.merge({ order: 1}) }
 
-  let(:error_message1)            { {:order => ["is missing"] } }
+  let(:error_message1)            { {:order => ["is missing", "must be an integer"] } }
   let(:error_message2)            { {:order => ["must be an integer"]} }
 
   context "Given invalid required parameters" do

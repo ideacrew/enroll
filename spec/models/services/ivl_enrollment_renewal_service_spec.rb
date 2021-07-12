@@ -12,6 +12,7 @@ RSpec.describe Services::IvlEnrollmentRenewalService, type: :model, :dbclean => 
   context "Assisted enrollment" do
     include_context "setup families enrollments"
 
+    let(:rating_area) { FactoryBot.create(:benefit_markets_locations_rating_area) }
     let!(:renewal_enrollment_assisted) do
       FactoryBot.create(:hbx_enrollment, :individual_assisted, :with_enrollment_members,
                         consumer_role_id: family_assisted.primary_family_member.person.consumer_role.id,
@@ -19,6 +20,7 @@ RSpec.describe Services::IvlEnrollmentRenewalService, type: :model, :dbclean => 
                         household: family_assisted.active_household,
                         family: family_assisted,
                         enrollment_members: [family_assisted.family_members.first],
+                        rating_area_id: rating_area.id,
                         product: renewal_csr_87_product)
     end
 

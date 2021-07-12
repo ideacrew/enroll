@@ -1,0 +1,312 @@
+[
+  [
+    {
+      "documentType": "INSURANCE_PLAN_POLICY",
+      "partialDataIndicator": false,
+      "lastModifiedDateTime": "2019-06-28T00:39:44+00:00",
+      "lastModifiedBy": "EE_BATCH_USER",
+      "isCurrentVersion": true,
+      "versionNumber": 2,
+      "versionDateTime": "2019-06-13T15:36:13+00:00",
+      "marketplaceGroupPolicyIdentifier": 82607,
+      "policyTrackingNumber": 479171,
+      "informingApplicationVersionNumber": 1,
+      "supersededIndicator": false,
+      "variableDeterminationIdentifier": 381339,
+      "metalLevelRestrictionAppliedIndicator": false,
+      "applicationSEPTypeName": "LAWFULSEP",
+      "enrollmentApplicationType": "EDE",
+      "associatedProductDivisionReferenceTypeCodeName": "HEALTHCARE",
+      "initiatingTransactionOriginReferenceTypeCodeName": "DIRECT_ENROLLMENT",
+      "benchmarkPolicyPremiumAmount": 1575.77,
+      "maxAPTCAmount": 1199,
+      "issuerHIOSID": 45142,
+      "issuerName": "NOT AVAILABLE",
+      "initiatingExchangeUserIdentifier": "003VA4561237890",
+      "definingSLCSPReference": "45142NV0010002|99298NV0010003",
+      "userDetail": "CancelPriorYrPendingQHPEnrollments_MGGD11737",
+      "numberOfPoliciesTiedToApplication": 1,
+      "marketplaceGroupPolicyIdentifiersTiedToApplication": [
+        82607
+      ],
+      "definedAssistor": {
+        "definedAssistorReferenceTypeCodeName": "NONE"
+      },
+      "directEnrollmentPartner": {
+        "partnerIdentifier": "04.PQR.AZ*.006.006",
+        "partnerType": "WEB_BROKER"
+      },
+      "referencedPaymentTransactionIdentifier": "NV00000352370",
+      "selectedInsurancePlan": "45142NV0010001",
+      "insurancePlanVariantName": "Ambetter Secure Care 1 (2019) with 3 Free PCP Visits",
+      "coverageYear": 2019,
+      "insurancePlanPolicyStartDate": "2019-04-01",
+      "insurancePlanPolicyEndDate": "2019-12-31",
+      "insurancePlanPolicyCreationDateTime": "2019-03-07T16:09:10+00:00",
+      "insurancePolicyStatus": {
+        "insurancePolicyStatusDateTime": "2019-06-13T04:00:00+00:00",
+        "definingInsurancePolicyStatusTypeCodeName": "ACTIVE_OR_TERMINATED",
+        "maintenanceReasons": [
+          {
+            "maintenanceType": "021",
+            "maintenanceTransactionType": "INITIAL"
+          }
+        ]
+      },
+      "insurancePolicyPremium": {
+        "monthlyPolicyPremiumAmount": 2785.94,
+        "exchangeRateAreaReference": "NV004",
+        "ehbPremiumAmount": 1709.08,
+        "allocatedAPTCAmount": 1199,
+        "receivedFromOtherQHPAmount": 0,
+        "appliedAPTCAmount": 1199,
+        "distributedToOtherQHPAmount": 0,
+        "distributedToSADPAmount": 0,
+        "systemElectedAPTCAmount": 0,
+        "individualResponsibleAmount": 1586.94
+      },
+      "isActive": false,
+      "definingPlanVariantComponentTypeCodeName": "EXCHANGE_VARIANT_NO_CSR",
+      "insuranceApplicationIdentifier": 201868,
+      "issuerConfirmationIndicator": false,
+      "associatedMetalTierTypeCodeName": "GOLD",
+      "coveredInsuredMembers": [
+        {
+          "personTrackingNumber": "1437548400634897549",
+          "definingMemberMaritalStatusTypeCodeName": "MARRIED",
+          "definingInsurancePolicyStatusTypeCodeName": "CANCELLED",
+          "definingMemberAssociationToSubscriberTypeCodeName": "SELF",
+          "subscriberIndicator": true,
+          "insuredMemberIdentifier": 699884,
+          "identifyingTobaccoUseTypeCodeName": "TOBACCO_NOT_USED",
+          "memberMonthlyPolicyPremiumAmount": 1287.05,
+          "memberEhbPremiumAmount": 1287.05,
+          "memberAllocatedAPTCAmount": 902.93,
+          "memberIndividualResponsibleAmount": 0,
+          "memberInfo": {
+            "birthDate": "1963-01-01",
+            "firstName": "Fatheroevwg",
+            "lastName": "pqlvb",
+            "gender": "MALE",
+            "writtenLanguageTypeCodeName": "ENGLISH",
+            "spokenLanguageTypeCodeName": "ENGLISH",
+            "ssn": "276728793",
+            "emailAddress": [
+              "gzowcedrig@yopmail.com"
+            ],
+            "address": [
+              {
+                "zipPlus4Code": "89316",
+                "streetName1": "1227 jkdyfdcrej",
+                "cityName": "Harrington",
+                "stateCode": "NV",
+                "countyFipsCode": "32011",
+                "definingAddressRelationshipRoleTypeCodeName": "HOME",
+                "definingAddressCategoryTypeCodeName": "DELIVERY"
+              },
+              {
+                "zipPlus4Code": "89316",
+                "streetName1": "1227 jkdyfdcrej",
+                "cityName": "Harrington",
+                "stateCode": "NV",
+                "countyFipsCode": "32011",
+                "definingAddressRelationshipRoleTypeCodeName": "MAIL",
+                "definingAddressCategoryTypeCodeName": "MAILING"
+              },
+              {
+                "zipPlus4Code": "89316",
+                "streetName1": "1227 jkdyfdcrej",
+                "cityName": "Harrington",
+                "stateCode": "NV",
+                "countyFipsCode": "32011",
+                "definingAddressRelationshipRoleTypeCodeName": "RESIDENCY",
+                "definingAddressCategoryTypeCodeName": "DELIVERY"
+              }
+            ],
+            "telephone": [
+              {
+                "telephoneNumber": "2025547416",
+                "telephonePriorityTypeCodeName": "PREFERRED",
+                "contactMethodTypeCodeName": "HOME_TELEPHONE"
+              }
+            ]
+          }
+        },
+        {
+          "personTrackingNumber": "1437548400634897550",
+          "definingMemberMaritalStatusTypeCodeName": "MARRIED",
+          "definingInsurancePolicyStatusTypeCodeName": "CANCELLED",
+          "definingMemberAssociationToSubscriberTypeCodeName": "SPOUSE",
+          "subscriberIndicator": false,
+          "insuredMemberIdentifier": 979463,
+          "identifyingTobaccoUseTypeCodeName": "TOBACCO_NOT_USED",
+          "memberMonthlyPolicyPremiumAmount": 1076.86,
+          "memberEhbPremiumAmount": 1076.86,
+          "memberAllocatedAPTCAmount": 0,
+          "memberIndividualResponsibleAmount": 0,
+          "memberInfo": {
+            "birthDate": "1967-01-01",
+            "firstName": "Spouserfmkj",
+            "lastName": "pqlvb",
+            "gender": "FEMALE",
+            "ssn": "276729990",
+            "address": [
+              {
+                "zipPlus4Code": "89316",
+                "streetName1": "1227 jkdyfdcrej",
+                "cityName": "Concord",
+                "stateCode": "NV",
+                "countyFipsCode": "32011",
+                "definingAddressRelationshipRoleTypeCodeName": "HOME",
+                "definingAddressCategoryTypeCodeName": "DELIVERY"
+              },
+              {
+                "zipPlus4Code": "89316",
+                "streetName1": "1227 jkdyfdcrej",
+                "cityName": "Concord",
+                "stateCode": "NV",
+                "countyFipsCode": "32011",
+                "definingAddressRelationshipRoleTypeCodeName": "MAIL",
+                "definingAddressCategoryTypeCodeName": "MAILING"
+              },
+              {
+                "zipPlus4Code": "89316",
+                "streetName1": "1227 jkdyfdcrej",
+                "cityName": "Concord",
+                "stateCode": "NV",
+                "countyFipsCode": "32011",
+                "definingAddressRelationshipRoleTypeCodeName": "RESIDENCY",
+                "definingAddressCategoryTypeCodeName": "DELIVERY"
+              }
+            ]
+          }
+        },
+        {
+          "personTrackingNumber": "1437548400634897551",
+          "definingMemberMaritalStatusTypeCodeName": "UNMARRIED",
+          "definingInsurancePolicyStatusTypeCodeName": "CANCELLED",
+          "definingMemberAssociationToSubscriberTypeCodeName": "SON_DAUGHTER",
+          "subscriberIndicator": false,
+          "insuredMemberIdentifier": 533016,
+          "identifyingTobaccoUseTypeCodeName": "TOBACCO_NOT_USED",
+          "memberMonthlyPolicyPremiumAmount": 422.03,
+          "memberEhbPremiumAmount": 422.03,
+          "memberAllocatedAPTCAmount": 296.07,
+          "memberIndividualResponsibleAmount": 0,
+          "insuredMemberRelationship": [
+            {
+              "insuredMemberAssociationReasonTypeCodeName": "CUSTODIAL_PARENT",
+              "personTrackingNumber": "1437548400634897550",
+              "associatedMemberInfo": {
+                "firstName": "Spouserfmkj",
+                "lastName": "pqlvb",
+                "address": [
+                  {
+                    "zipPlus4Code": "89316",
+                    "streetName1": "1227 jkdyfdcrej",
+                    "cityName": "Concord",
+                    "stateCode": "NV",
+                    "countyFipsCode": "32011",
+                    "definingAddressRelationshipRoleTypeCodeName": "HOME",
+                    "definingAddressCategoryTypeCodeName": "DELIVERY"
+                  },
+                  {
+                    "zipPlus4Code": "89316",
+                    "streetName1": "1227 jkdyfdcrej",
+                    "cityName": "Concord",
+                    "stateCode": "NV",
+                    "countyFipsCode": "32011",
+                    "definingAddressRelationshipRoleTypeCodeName": "MAIL",
+                    "definingAddressCategoryTypeCodeName": "MAILING"
+                  },
+                  {
+                    "zipPlus4Code": "89316",
+                    "streetName1": "1227 jkdyfdcrej",
+                    "cityName": "Concord",
+                    "stateCode": "NV",
+                    "countyFipsCode": "32011",
+                    "definingAddressRelationshipRoleTypeCodeName": "RESIDENCY",
+                    "definingAddressCategoryTypeCodeName": "DELIVERY"
+                  }
+                ]
+              }
+            },
+            {
+              "insuredMemberAssociationReasonTypeCodeName": "RESPONSIBLE_PERSON",
+              "personTrackingNumber": "1437548400634897549",
+              "associatedMemberInfo": {
+                "firstName": "Fatheroevwg",
+                "lastName": "pqlvb",
+                "address": [
+                  {
+                    "zipPlus4Code": "89316",
+                    "streetName1": "1227 jkdyfdcrej",
+                    "cityName": "Harrington",
+                    "stateCode": "NV",
+                    "countyFipsCode": "32011",
+                    "definingAddressRelationshipRoleTypeCodeName": "HOME",
+                    "definingAddressCategoryTypeCodeName": "DELIVERY"
+                  },
+                  {
+                    "zipPlus4Code": "89316",
+                    "streetName1": "1227 jkdyfdcrej",
+                    "cityName": "Harrington",
+                    "stateCode": "NV",
+                    "countyFipsCode": "32011",
+                    "definingAddressRelationshipRoleTypeCodeName": "MAIL",
+                    "definingAddressCategoryTypeCodeName": "MAILING"
+                  },
+                  {
+                    "zipPlus4Code": "89316",
+                    "streetName1": "1227 jkdyfdcrej",
+                    "cityName": "Harrington",
+                    "stateCode": "NV",
+                    "countyFipsCode": "32011",
+                    "definingAddressRelationshipRoleTypeCodeName": "RESIDENCY",
+                    "definingAddressCategoryTypeCodeName": "DELIVERY"
+                  }
+                ]
+              }
+            }
+          ],
+          "memberInfo": {
+            "birthDate": "2008-01-01",
+            "firstName": "Sonolsub",
+            "lastName": "pqlvb",
+            "gender": "MALE",
+            "ssn": "276740252",
+            "address": [
+              {
+                "zipPlus4Code": "89316",
+                "streetName1": "1227 jkdyfdcrej",
+                "cityName": "Concord",
+                "stateCode": "NV",
+                "countyFipsCode": "32011",
+                "definingAddressRelationshipRoleTypeCodeName": "HOME",
+                "definingAddressCategoryTypeCodeName": "DELIVERY"
+              },
+              {
+                "zipPlus4Code": "89316",
+                "streetName1": "1227 jkdyfdcrej",
+                "cityName": "Concord",
+                "stateCode": "NV",
+                "countyFipsCode": "32011",
+                "definingAddressRelationshipRoleTypeCodeName": "MAIL",
+                "definingAddressCategoryTypeCodeName": "MAILING"
+              },
+              {
+                "zipPlus4Code": "89316",
+                "streetName1": "1227 jkdyfdcrej",
+                "cityName": "Concord",
+                "stateCode": "NV",
+                "countyFipsCode": "32011",
+                "definingAddressRelationshipRoleTypeCodeName": "RESIDENCY",
+                "definingAddressCategoryTypeCodeName": "DELIVERY"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+]

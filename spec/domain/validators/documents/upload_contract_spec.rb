@@ -30,8 +30,8 @@ RSpec.describe Validators::Documents::UploadContract,  dbclean: :after_each do
 
       let(:invalid_params) { {} }
       let(:error_message) do
-        {:subjects => ['is missing'], :id => ['is missing'],
-         :document_type => ['is missing'], :source => ['is missing']}
+        {:document_type => ["is missing", "must be a string"], :id => ["is missing", "must be a string"],
+         :source => ["is missing", "must be a string"], :subjects => ["is missing", "must be an array"]}
       end
 
       it 'should throw errors' do

@@ -80,8 +80,8 @@ class Employers::PeopleController < ApplicationController
 
   private
 
-  def person_params 
-    params.require(:person).permit(:first_name, :user_id) 
+  def person_params
+    params.require(:person).permit(:first_name, :user_id)
   end
   def build_nested_models
     ["home","mobile","work","fax"].each do |kind|
@@ -172,6 +172,8 @@ class Employers::PeopleController < ApplicationController
       :indian_tribe_member,
       {:ethnicity => []},
       :tribal_id,
+      :tribal_state,
+      :tribal_name,
       :no_dc_address,
       :is_homeless,
       :is_temporarily_out_of_state,

@@ -290,6 +290,7 @@ Rails.application.routes.draw do
         get 'find_sep'
         post 'record_sep'
         get 'check_qle_date'
+        get 'sep_zip_compare'
         get 'check_move_reason'
         get 'check_insurance_reason'
         get 'check_marriage_reason'

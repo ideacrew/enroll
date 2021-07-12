@@ -16,11 +16,10 @@ RSpec.describe TaxHousehold, type: :model do
 
   context "aptc_ratio_by_member" do
     let!(:plan) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
-    #let(:current_hbx) {double(benefit_sponsorship: double(current_benefit_period: double(second_lowest_cost_silver_plan: plan)))}
     let(:current_hbx) {double(benefit_sponsorship: double(benefit_coverage_periods: [benefit_coverage_period]))}
     let(:benefit_coverage_period) {double(contains?: true, second_lowest_cost_silver_plan: plan)}
-    let(:tax_household_member1) {double(is_ia_eligible?: true, age_on_effective_date: 28, applicant_id: 'tax_member1')}
-    let(:tax_household_member2) {double(is_ia_eligible?: true, age_on_effective_date: 26, applicant_id: 'tax_member2')}
+    let(:tax_household_member1) {double(is_ia_eligible?: true, age_on_effective_date: 28, applicant_id: 'tax_member1', benchmark_product_details_for: { product_id: plan.id })}
+    let(:tax_household_member2) {double(is_ia_eligible?: true, age_on_effective_date: 26, applicant_id: 'tax_member2', benchmark_product_details_for: { product_id: plan.id })}
 
     it "can return ratio hash" do
       allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx)
@@ -139,6 +138,13 @@ RSpec.describe TaxHousehold, type: :model do
   end
 
   context 'total_aptc_available_amount_for_enrollment' do
+    let!(:rating_area) do
+      ::BenefitMarkets::Locations::RatingArea.rating_area_for(address, during: effective_on) || FactoryBot.create_default(:benefit_markets_locations_rating_area, active_year: effective_on.year)
+    end
+    let!(:service_area) do
+      ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address, during: effective_on).first || FactoryBot.create_default(:benefit_markets_locations_service_area, active_year: effective_on.year)
+    end
+    let(:address) { person.rating_address }
     let!(:hbx_profile) {FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)}
     let!(:family) { create(:family, :with_primary_family_member_and_dependent) }
     let!(:person) { family.primary_person }
@@ -152,14 +158,44 @@ RSpec.describe TaxHousehold, type: :model do
     let(:member_ids) { family.active_family_members.collect(&:id) }
     let(:benefit_sponsorship) {double("benefit sponsorship", earliest_effective_date: TimeKeeper.date_of_record.beginning_of_year)}
     let(:current_hbx) {double("current hbx", benefit_sponsorship: benefit_sponsorship, under_open_enrollment?: true)}
-    let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product) }
+
+    let(:application_period) { effective_on.beginning_of_year..effective_on.end_of_year }
+    let!(:product) do
+      prod =
+        FactoryBot.create(
+          :benefit_markets_products_health_products_health_product,
+          :with_issuer_profile,
+          benefit_market_kind: :aca_individual,
+          kind: :health,
+          service_area: service_area,
+          csr_variant_id: '01',
+          metal_level_kind: 'silver',
+          application_period: application_period
+        )
+      prod.premium_tables = [premium_table]
+      prod.save
+      prod
+    end
+    let(:premium_table)        { build(:benefit_markets_products_premium_table, effective_period: application_period, rating_area: rating_area) }
+
     let(:total_aptc_available_amount) { 210 }
     let(:monthly_available_aptc) { 1260.0 }
+    let(:effective_on) { Date.new(TimeKeeper.date_of_record.year, 11, 1) }
     let!(:hbx_enrollment_aptc) do
-      FactoryBot.create(:hbx_enrollment,  :with_health_product,
-                        waiver_reason: nil, kind: 'individual', enrollment_kind: 'special_enrollment',
-                        coverage_kind: 'health', effective_on: Date.new(TimeKeeper.date_of_record.year, 11, 1),submitted_at: TimeKeeper.date_of_record - 6.months,
-                        household: family.active_household, family: family, product: product)
+      FactoryBot.create(
+        :hbx_enrollment,
+        :with_health_product,
+        waiver_reason: nil,
+        kind: 'individual',
+        enrollment_kind: 'special_enrollment',
+        coverage_kind: 'health',
+        rating_area_id: rating_area.id,
+        effective_on: effective_on,
+        submitted_at: TimeKeeper.date_of_record - 6.months,
+        household: family.active_household,
+        family: family,
+        product: product
+      )
     end
 
     before :each do
@@ -193,7 +229,7 @@ RSpec.describe TaxHousehold, type: :model do
     context 'when family members unchecked' do
       let(:total_benchmark_amount) { 60 }
       before do
-        allow(tax_household).to receive(:unwanted_family_members).and_return [member_ids.first.to_s]
+        allow(tax_household).to receive(:unwanted_family_members).and_return [family.active_family_members[0]]
         allow(tax_household).to receive(:total_benchmark_amount).and_return total_benchmark_amount
         allow(tax_household).to receive(:is_all_non_aptc?).and_return false
         allow(tax_household).to receive(:find_aptc_family_members).and_return true
@@ -227,9 +263,66 @@ RSpec.describe TaxHousehold, type: :model do
     end
   end
 
+  context '#find_aptc_tax_household_members' do
+    let!(:person) {FactoryBot.create(:person, :with_family)}
+    let!(:family) {person.primary_family}
+    let!(:family_member1) {FactoryBot.create(:family_member, family: person.primary_family)}
+    let!(:family_member2) {FactoryBot.create(:family_member, family: person.primary_family)}
+    let!(:tax_household) {FactoryBot.create(:tax_household, household: family.active_household, created_at: TimeKeeper.date_of_record - 5.months)}
+    let!(:tax_household_member1) {tax_household.tax_household_members.create!(is_ia_eligible: true, applicant_id: person.primary_family.family_members[0].id)}
+    let!(:tax_household_member2) {tax_household.tax_household_members.create!(is_ia_eligible: true, applicant_id: family_member1.id)}
+    let!(:tax_household_member3) {tax_household.tax_household_members.create!(is_ia_eligible: false, is_medicaid_chip_eligible: true, applicant_id: family_member2.id)}
+
+    it 'should return eligible tax household members' do
+      expect(tax_household.find_aptc_tax_household_members([family_member1, family_member2])).to eq([tax_household_member2])
+    end
+  end
+
   describe "total_aptc_available_amount_for_enrollment", dbclean: :after_each do
 
     context 'for family_members with two aptc eligible and one medicaid' do
+      let(:address) { person.rating_address }
+      let!(:rating_area) do
+        ::BenefitMarkets::Locations::RatingArea.rating_area_for(address, during: effective_on) || FactoryBot.create_default(:benefit_markets_locations_rating_area, active_year: effective_on.year)
+      end
+      let!(:service_area) do
+        ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address, during: effective_on).first || FactoryBot.create_default(:benefit_markets_locations_service_area, active_year: effective_on.year)
+      end
+      let(:application_period) { effective_on.beginning_of_year..effective_on.end_of_year }
+      let!(:product) do
+        prod =
+          FactoryBot.create(
+            :benefit_markets_products_health_products_health_product,
+            :with_issuer_profile,
+            benefit_market_kind: :aca_individual,
+            kind: :health,
+            service_area: service_area,
+            csr_variant_id: '01',
+            metal_level_kind: 'silver',
+            application_period: application_period
+          )
+        prod.premium_tables = [premium_table]
+        prod.save
+        prod
+      end
+      let(:premium_table)        { build(:benefit_markets_products_premium_table, effective_period: application_period, rating_area: rating_area) }
+      let(:effective_on) { TimeKeeper.date_of_record.beginning_of_month }
+      let!(:hbx_enrollment) do
+        FactoryBot.create(
+          :hbx_enrollment,
+          :with_health_product,
+          waiver_reason: nil,
+          kind: 'individual',
+          enrollment_kind: 'special_enrollment',
+          coverage_kind: 'health',
+          submitted_at: TimeKeeper.date_of_record - 6.months,
+          rating_area_id: rating_area.id,
+          effective_on: effective_on,
+          household: family.active_household,
+          family: family,
+          product: product
+        )
+      end
 
       let!(:hbx_profile) {FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)}
       let(:plan) {FactoryBot.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'silver', csr_variant_id: '01', active_year: TimeKeeper.date_of_record.year, hios_id: '94506DC0390014-01')}
@@ -242,13 +335,6 @@ RSpec.describe TaxHousehold, type: :model do
       let!(:hbx_enrollment_member1) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: TimeKeeper.date_of_record, coverage_start_on: TimeKeeper.date_of_record, hbx_enrollment: hbx_enrollment)}
       let!(:hbx_enrollment_member2) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members.second.id, eligibility_date: TimeKeeper.date_of_record, coverage_start_on: TimeKeeper.date_of_record, hbx_enrollment: hbx_enrollment)}
       let!(:hbx_enrollment_member3) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members.last.id, eligibility_date: TimeKeeper.date_of_record, coverage_start_on: TimeKeeper.date_of_record, hbx_enrollment: hbx_enrollment)}
-      let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product) }
-      let!(:hbx_enrollment) do
-        FactoryBot.create(:hbx_enrollment,  :with_health_product,
-                          waiver_reason: nil, kind: 'individual', enrollment_kind: 'special_enrollment',
-                          coverage_kind: 'health', submitted_at: TimeKeeper.date_of_record - 6.months,
-                          household: family.active_household, family: family, product: product)
-      end
       let!(:tax_household) {FactoryBot.create(:tax_household, household: family.active_household, created_at: TimeKeeper.date_of_record - 5.months)}
       let!(:tax_household_member1) {tax_household.tax_household_members.create!(is_ia_eligible: true, applicant_id: person.primary_family.family_members[0].id)}
       let!(:tax_household_member2) {tax_household.tax_household_members.create!(is_ia_eligible: true, applicant_id: person.primary_family.family_members[1].id)}
@@ -266,13 +352,17 @@ RSpec.describe TaxHousehold, type: :model do
         context 'when one family_member in plan shopping' do
 
           let(:shopping_hbx_enrollment_member) {FactoryBot.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id)}
-          let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product) }
           let(:shopping_hbx_enrollment) do
-            FactoryBot.build(:hbx_enrollment,
-                             family: family, aasm_state: 'shopping',
-                             effective_on: TimeKeeper.date_of_record.beginning_of_month,
-                             hbx_enrollment_members: [shopping_hbx_enrollment_member],
-                             household: family.active_household, product: product)
+            FactoryBot.build(
+              :hbx_enrollment,
+              family: family,
+              aasm_state: 'shopping',
+              effective_on: TimeKeeper.date_of_record.beginning_of_month,
+              hbx_enrollment_members: [shopping_hbx_enrollment_member],
+              household: family.active_household,
+              rating_area_id: rating_area.id,
+              product: product
+            )
           end
           it 'should return available APTC amount' do
             result = tax_household.total_aptc_available_amount_for_enrollment(shopping_hbx_enrollment, shopping_hbx_enrollment.effective_on)
@@ -284,7 +374,6 @@ RSpec.describe TaxHousehold, type: :model do
 
           let(:shopping_hbx_enrollment_member) {FactoryBot.build(:hbx_enrollment_member, eligibility_date: TimeKeeper.date_of_record + 1.month, applicant_id: family.family_members.first.id)}
           let(:shopping_hbx_enrollment_member1) {FactoryBot.build(:hbx_enrollment_member, eligibility_date: TimeKeeper.date_of_record + 1.month, applicant_id: family.family_members.second.id)}
-          let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product) }
           let(:shopping_hbx_enrollment) {FactoryBot.build(:hbx_enrollment, family: family, aasm_state: 'shopping', hbx_enrollment_members: [shopping_hbx_enrollment_member, shopping_hbx_enrollment_member1], household: family.active_household, product: product)}
 
           it 'should return available APTC amount' do
@@ -298,7 +387,6 @@ RSpec.describe TaxHousehold, type: :model do
           let(:shopping_hbx_enrollment_member) {FactoryBot.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id)}
           let(:shopping_hbx_enrollment_member1) {FactoryBot.build(:hbx_enrollment_member, applicant_id: family.family_members.second.id)}
           let(:shopping_hbx_enrollment_member2) {FactoryBot.build(:hbx_enrollment_member, applicant_id: family.family_members.last.id)}
-          let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product) }
           let(:shopping_hbx_enrollment) do
             FactoryBot.build(:hbx_enrollment, aasm_state: 'shopping',family: family, hbx_enrollment_members: [shopping_hbx_enrollment_member, shopping_hbx_enrollment_member1, shopping_hbx_enrollment_member2], household: family.active_household, product: product)
           end
@@ -396,6 +484,7 @@ RSpec.describe TaxHousehold, type: :model do
                               kind: 'individual',
                               enrollment_kind: 'special_enrollment',
                               coverage_kind: 'health',
+                              rating_area_id: rating_area.id,
                               submitted_at: TimeKeeper.date_of_record - 2.months,
                               effective_on: TimeKeeper.date_of_record.beginning_of_month,
                               aasm_state: 'coverage_selected',
@@ -420,6 +509,7 @@ RSpec.describe TaxHousehold, type: :model do
                               effective_on: TimeKeeper.date_of_record.beginning_of_month,
                               household: family.active_household,
                               enrollment_kind: 'special_enrollment',
+                              rating_area_id: rating_area.id,
                               is_active: true,
                               aasm_state: 'coverage_selected',
                               changing: false,

@@ -61,3 +61,14 @@ Feature: A dedicated page that visit the eligibility determination page
 		And clicks the "Action" dropdown corresponding to the "determined" application
 		And clicks the "View Eligibility Determination" link
 		Then the user will navigate to the Eligibility Determination page and will find CSR text present
+
+  Scenario: External verification link
+    Given FAA fa_send_to_external_verification feature is enabled
+    Given that a user with a family has a Financial Assistance application with tax households
+    And the user has a 73% CSR
+    And the user navigates to the "Help Paying For Coverage" portal
+    And clicks the "Action" dropdown corresponding to the "determined" application
+    And all applicants are not medicaid chip eligible and are non magi medicaid eligible
+    And clicks the "View Eligibility Determination" link
+    Then the user should see the external verification link
+

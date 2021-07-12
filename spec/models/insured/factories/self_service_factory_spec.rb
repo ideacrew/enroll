@@ -17,7 +17,8 @@ module Insured
     let(:sep) {FactoryBot.create(:special_enrollment_period, family: family)}
     let(:sbc_document) {FactoryBot.build(:document, subject: 'SBC', identifier: 'urn:openhbx#123')}
     let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, title: 'AAA', issuer_profile_id: 'ab1233', metal_level_kind: :silver, benefit_market_kind: :aca_individual, sbc_document: sbc_document)}
-    let!(:enrollment) {FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, product: product, consumer_role_id: person.consumer_role.id)}
+    let(:rating_area) { FactoryBot.create(:benefit_markets_locations_rating_area) }
+    let!(:enrollment) {FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, product: product, consumer_role_id: person.consumer_role.id, rating_area_id: rating_area.id)}
     let!(:hbx_enrollment_member1) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, is_subscriber: true, eligibility_date: TimeKeeper.date_of_record, hbx_enrollment: enrollment, coverage_start_on: TimeKeeper.date_of_record)}
     let!(:hbx_enrollment_member2) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members[1].id, eligibility_date: TimeKeeper.date_of_record, coverage_start_on: TimeKeeper.date_of_record, hbx_enrollment: enrollment)}
     let!(:hbx_profile) {FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)}
@@ -30,9 +31,9 @@ module Insured
         @product.update_attributes(ehb: 0.9844)
         enrollment.update_attributes(product: @product)
         hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.update_attributes!(slcsp_id: @product.id)}
-        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 59, "R-#{site_key}001").and_return(814.85)
-        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 60, "R-#{site_key}001").and_return(846.72)
-        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 61, "R-#{site_key}001").and_return(879.8)
+        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 59, "R-#{site_key}001", 'NA').and_return(814.85)
+        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 60, "R-#{site_key}001", 'NA').and_return(846.72)
+        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 61, "R-#{site_key}001", 'NA').and_return(879.8)
         person.update_attributes!(dob: (enrollment.effective_on - 61.years))
         family.family_members.detect { |fm| !fm.is_primary_applicant }.person.update_attributes!(dob: (enrollment.effective_on - 59.years))
       end
@@ -109,9 +110,9 @@ module Insured
         @product.save!
         enrollment.update_attributes(product: @product, effective_on: TimeKeeper.date_of_record)
         hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.update_attributes!(slcsp_id: @product.id)}
-        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 59, "R-#{site_key}001").and_return(614.85)
-        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 60, "R-#{site_key}001").and_return(646.72)
-        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 61, "R-#{site_key}001").and_return(679.8)
+        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 59, "R-#{site_key}001", 'NA').and_return(614.85)
+        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 60, "R-#{site_key}001", 'NA').and_return(646.72)
+        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 61, "R-#{site_key}001", 'NA').and_return(679.8)
         person.update_attributes!(dob: (enrollment.effective_on - 61.years))
         family.family_members[1].person.update_attributes!(dob: (enrollment.effective_on - 59.years))
       end
@@ -124,6 +125,60 @@ module Insured
     end
     # rubocop:disable Lint/UselessAssignment
     describe "update enrollment for renewing enrollments" do
+      let(:address) { family.primary_person.rating_address }
+      let(:effective_date) { TimeKeeper.date_of_record.beginning_of_year }
+      let(:application_period) { effective_date.beginning_of_year..effective_date.end_of_year }
+      let(:rating_area) do
+        ::BenefitMarkets::Locations::RatingArea.rating_area_for(address, during: effective_date) || FactoryBot.create_default(:benefit_markets_locations_rating_area, active_year: effective_date.year)
+      end
+      let(:service_area) do
+        ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address, during: effective_date).first || FactoryBot.create_default(:benefit_markets_locations_service_area, active_year: effective_date.year)
+      end
+      let!(:renewal_rating_area) do
+        ::BenefitMarkets::Locations::RatingArea.rating_area_for(address, during: renewal_calender_date) || FactoryBot.create_default(:benefit_markets_locations_rating_area, active_year: renewal_calender_date.year)
+      end
+      let!(:renewal_service_area) do
+        ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address, during: renewal_calender_date).first || FactoryBot.create_default(:benefit_markets_locations_service_area, active_year: renewal_calender_date.year)
+      end
+
+      let!(:product) do
+        prod =
+          FactoryBot.create(
+            :benefit_markets_products_health_products_health_product,
+            :with_issuer_profile,
+            :silver,
+            benefit_market_kind: :aca_individual,
+            kind: :health,
+            application_period: application_period,
+            service_area: service_area,
+            csr_variant_id: '01',
+            renewal_product_id: renewal_individual_health_product.id
+          )
+        prod.premium_tables = [premium_table]
+        prod.save
+        prod
+      end
+      let(:premium_table)        { build(:benefit_markets_products_premium_table, effective_period: application_period, rating_area: rating_area) }
+      let(:renewal_calender_date) { TimeKeeper.date_of_record.beginning_of_year.next_year }
+      let(:renewal_application_period) { renewal_calender_date.beginning_of_year..renewal_calender_date.end_of_year }
+      let!(:renewal_individual_health_product) do
+        prod =
+          FactoryBot.create(
+            :benefit_markets_products_health_products_health_product,
+            :with_issuer_profile,
+            :silver,
+            benefit_market_kind: :aca_individual,
+            kind: :health,
+            service_area: renewal_service_area,
+            csr_variant_id: '01',
+            application_period: renewal_application_period
+          )
+        prod.premium_tables = [renewal_individual_premium_table]
+        prod.save
+        prod
+      end
+
+      let(:renewal_individual_premium_table) { build(:benefit_markets_products_premium_table, effective_period: renewal_application_period, rating_area: renewal_rating_area) }
 
       before :each do
         TimeKeeper.set_date_of_record_unprotected!(Date.new(Date.today.year, 12, 15))
@@ -133,14 +188,14 @@ module Insured
         tax_household_member1 = tax_household10.tax_household_members.create(applicant_id: family.primary_applicant.id, is_subscriber: true, is_ia_eligible: true)
         tax_household_member2 = tax_household10.tax_household_members.create(applicant_id: family.family_members[1].id, is_ia_eligible: true)
 
-        @product = BenefitMarkets::Products::Product.all.where(benefit_market_kind: :aca_individual).first
+        @product = product
         @product.update_attributes(ehb: 0.9844, application_period: Date.new(effective_on.year, 1, 1)..Date.new(effective_on.year, 1, 1).end_of_year)
         premium_table = @product.premium_tables.first
         premium_table.update_attributes(effective_period: Date.new(effective_on.year, 1, 1)..Date.new(effective_on.year, 1, 1).end_of_year)
         @product.save!
         enrollment.update_attributes(product: @product, effective_on: effective_on, aasm_state: "auto_renewing")
         hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.update_attributes!(slcsp_id: @product.id)}
-        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, effective_on, person.age_on(Date.today), "R-#{site_key}001").and_return(679.8)
+        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, effective_on, person.age_on(Date.today), "R-#{site_key}001", 'NA').and_return(679.8)
       end
 
       it 'should return the updated enrollment' do
@@ -175,9 +230,9 @@ module Insured
         @product.save!
         enrollment.update_attributes(product: @product, effective_on: TimeKeeper.date_of_record, applied_aptc_amount: applied_aptc_amount)
         hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.update_attributes!(slcsp_id: @product.id)}
-        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 59, "R-#{site_key}001").and_return(614.85)
-        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 60, "R-#{site_key}001").and_return(646.72)
-        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 61, "R-#{site_key}001").and_return(679.8)
+        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 59, "R-#{site_key}001", 'NA').and_return(614.85)
+        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 60, "R-#{site_key}001", 'NA').and_return(646.72)
+        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 61, "R-#{site_key}001", 'NA').and_return(679.8)
         person.update_attributes!(dob: (enrollment.effective_on - 61.years))
         family.family_members[1].person.update_attributes!(dob: (enrollment.effective_on - 59.years))
       end

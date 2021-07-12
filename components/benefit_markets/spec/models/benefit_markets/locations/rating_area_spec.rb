@@ -81,33 +81,108 @@ module BenefitMarkets
         )
       }
 
-      it "will return rating area based on exchange when given an address not in that county" do
-        rating_area
-        rating_areas = ::BenefitMarkets::Locations::RatingArea.rating_area_for(address_outside_county)
-        if EnrollRegistry[:enroll_app].setting(:site_key).item == :cca
-          expect(rating_areas.to_a).not_to include(rating_area)
-        else
+      after(:each) do
+        county_zip.destroy
+        rating_area.destroy
+      end
+
+      context 'single rating area model' do
+
+        before :each do
+          allow(EnrollRegistry).to receive(:[]).with(:enroll_app).and_return(double(settings: double(item: 'single')))
+        end
+
+        it "will return rating_area based on exchange when given an address not in that county" do
+          rating_area
+          rating_areas = ::BenefitMarkets::Locations::RatingArea.rating_area_for(address_outside_county)
+          expect(rating_areas.to_a).to include(rating_area)
+        end
+
+        it "will return rating_area based on exchange when given an address not in that zip code" do
+          rating_area
+          rating_areas = ::BenefitMarkets::Locations::RatingArea.rating_area_for(address_outside_zip)
+          expect(rating_areas.to_a).to include(rating_area)
+        end
+
+        it "will return rating_area based on exchange when given an address not in that state" do
+          rating_area
+          rating_areas = ::BenefitMarkets::Locations::RatingArea.rating_area_for(address_outside_state)
           expect(rating_areas.to_a).to include(rating_area)
         end
       end
 
-      it "will return rating area based on exchange when given an address not in that zip code" do
-        rating_area
-        rating_areas = ::BenefitMarkets::Locations::RatingArea.rating_area_for(address_outside_zip)
-        if EnrollRegistry[:enroll_app].setting(:site_key).item == :cca
+      context 'county based rating area model' do
+
+        before :each do
+          allow(EnrollRegistry).to receive(:[]).with(:enroll_app).and_return(double(settings: double(item: 'county')))
+        end
+
+        it "will return rating_area based on exchange when given an address not in that county" do
+          rating_area
+          rating_areas = ::BenefitMarkets::Locations::RatingArea.rating_area_for(address_outside_county)
           expect(rating_areas.to_a).not_to include(rating_area)
-        else
+        end
+
+        it "will return rating_area based on exchange when given an address not in that zip code but in county" do
+          rating_area
+          rating_areas = ::BenefitMarkets::Locations::RatingArea.rating_area_for(address_outside_zip)
           expect(rating_areas.to_a).to include(rating_area)
+        end
+
+        it "will return rating_area based on exchange when given an address not in that state" do
+          rating_area
+          rating_areas = ::BenefitMarkets::Locations::RatingArea.rating_area_for(address_outside_state)
+          expect(rating_areas.to_a).not_to include(rating_area)
         end
       end
 
-      it "will return rating area based on exchange when given an address not in that state" do
-        rating_area
-        rating_areas = ::BenefitMarkets::Locations::RatingArea.rating_area_for(address_outside_state)
-        if EnrollRegistry[:enroll_app].setting(:site_key).item == :cca
-          expect(rating_areas.to_a).not_to include(rating_area)
-        else
+      context 'zipcode based rating area model' do
+
+        before :each do
+          allow(EnrollRegistry).to receive(:[]).with(:enroll_app).and_return(double(settings: double(item: 'zipcode')))
+        end
+
+        it "will return rating_area based on exchange when given an address not in that county but in zip" do
+          rating_area
+          rating_areas = ::BenefitMarkets::Locations::RatingArea.rating_area_for(address_outside_county)
           expect(rating_areas.to_a).to include(rating_area)
+        end
+
+        it "will return rating_area based on exchange when given an address not in that zip" do
+          rating_area
+          rating_areas = ::BenefitMarkets::Locations::RatingArea.rating_area_for(address_outside_zip)
+          expect(rating_areas.to_a).not_to include(rating_area)
+        end
+
+        it "will return rating_area based on exchange when given an address not in that state" do
+          rating_area
+          rating_areas = ::BenefitMarkets::Locations::RatingArea.rating_area_for(address_outside_state)
+          expect(rating_areas.to_a).not_to include(rating_area)
+        end
+      end
+
+      context 'mixed rating area model' do
+
+        before :each do
+          allow(EnrollRegistry).to receive(:[]).with(:enroll_app).and_return(double(settings: double(item: 'mixed')))
+        end
+
+        it "will return rating_area based on exchange when given an address not in that county" do
+          rating_area
+          rating_areas = ::BenefitMarkets::Locations::RatingArea.rating_area_for(address_outside_county)
+          expect(rating_areas.to_a).not_to include(rating_area)
+        end
+
+        it "will return rating_area based on exchange when given an address not in that zip code" do
+          rating_area
+          rating_areas = ::BenefitMarkets::Locations::RatingArea.rating_area_for(address_outside_zip)
+          expect(rating_areas.to_a).not_to include(rating_area)
+        end
+
+        it "will return rating_area based on exchange when given an address not in that state" do
+          rating_area
+          rating_areas = ::BenefitMarkets::Locations::RatingArea.rating_area_for(address_outside_state)
+          expect(rating_areas.to_a).not_to include(rating_area)
         end
       end
 
@@ -119,6 +194,12 @@ module BenefitMarkets
     end
 
     describe "created for a given state", :dbclean => :after_each do
+      let(:app_setting) {double(setting: double(item: :dc), settings: double(item: 'single'))}
+
+      before :each do
+        allow(EnrollRegistry).to receive(:[]).with(:enroll_app).and_return(app_setting)
+      end
+
       let(:rating_area) { ::BenefitMarkets::Locations::RatingArea.create!(active_year: TimeKeeper.date_of_record.year, covered_states: ["MA"], exchange_provided_code: "MA0") }
 
       let(:address_outside_state) {

@@ -2,7 +2,7 @@ approved_translation_strings_in_erb_tags:
   conditional_logic_methods: [".is_shop?", ".can_be_reinstated?", ".can_shop_shop?", ".is_cobra_status?", ".is_applying_for_assistance",
   ".has_active_or_term_exists_for_reinstated_date?", "defined?", 'relationship == "child_under_26" ? "child" : relationship']
   # Do not ever include link_to or similar methods- because these oten have untranslated strings.
-  html_elements_and_helper_methods: ["add_progress_class", "first_page_tag", "asset_data_base64", "build_link_for_sep_type", "boolean_to_human", "billing_period_dropdown", "cost", "csrf_meta_tags", "cycle",
+  html_elements_and_helper_methods: ["human_boolean", "add_progress_class", "first_page_tag", "asset_data_base64", "build_link_for_sep_type", "boolean_to_human", "billing_period_dropdown", "cost", "csrf_meta_tags", "cycle",
   "display_dental_metal_level", "l10n", "I18n", "content_for", "commission_statement_formatted_date", "check_box_tag", "content_tag", "employee_dependent_form_id", "employee_relationship_map", "fields_for",
   "image_tag", "file_field_tag", "form_tag", "render", "pundit_span", "number_to_currency", "number_to_percentage", "number_with_precision", "partial", "raw", "locals", "mod_attr",
   "format_policy_purchase_date", "format_policy_purchase_time", "hidden_field_tag", "hidden_field", "javascript_include_tag", "javascript_pack_tag", "qle_date_calc", "qle_date", "qle_link_generater",
@@ -30,7 +30,7 @@ approved_translation_strings_in_erb_tags:
   # TOOD: We need to determine what to do about this- since when they're being called for a view, they can't really have a translation call associated
   # with them since we won't know what key
   string_method_calls: ["aasm_state", ".description", "mpi_indicator", "kind.capitalize", "v_type", "visit_type", "notice", "transition.to_html", "type", "('-li-',"]
-  record_method_calls: ["active_broker.", "address_kind.", "agency.", "address.", "active_sep.", "benefit_group.", "benefit.", 'bg.', "broker.", "broker_role.", "broker_or_staff_role.", "broker_agency.", benefit_sponsorship.",
+  record_method_calls: ["applicant.", "active_broker.", "address_kind.", "agency.", "address.", "active_sep.", "benefit_group.", "benefit.", 'bg.', "broker.", "broker_role.", "broker_or_staff_role.", "broker_agency.", benefit_sponsorship.",
   "benefit_application.", "benefit_package.", "benefit_group_asssignment.", "carrier.", "carrier_profile.", "cell.", "consumer_profile.", "current_step.",
   "dependent.", "doc.", "enrollee.", "family.", "census_employee.", "census_member.", "employee_role.", "employee.", "er.", "enrollment.", "hbx_enrollment.",
   "member.", "notice.", "q.", "qle.", "quote.", "person.", "plan.", "plan_level.", "plan_year.", "record.", "service_visit.", "security_question.", "scheduled_event.", "staff.", "object.",

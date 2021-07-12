@@ -15,7 +15,7 @@
             <div class="col-md-1">
             </div>
           </div>
-          <table class="table table-border-line mb0 table-grey-border" border="1">
+          <table class="table table-border-line mb0 table-grey-border <%= 'mb0' if FinancialAssistanceRegistry[:net_annual_income_display].enabled? %>" border="1">
             <thead>
             <tr class="form-heading">
               <th class="no-bottom-border"><b>PERSON </b></th>
@@ -30,7 +30,7 @@
               <% income_and_deductions_for(applicant).each do |embedded_document| %>
                 <tr>
                   <td> <%= applicant.full_name %> </td>
-                  <td> <%= embedded_document.kind.humanize %> </td>
+                  <td> <%= FinancialAssistance::Income::OTHER_INCOME_TYPE_KIND[embedded_document.kind.to_sym] %> </td>
                   <td> <%= embedded_document.frequency_kind.humanize %> </td>
                   <td>
                     <b>
@@ -49,6 +49,26 @@
             <% end %>
             </tbody>
           </table>
+
+          <% if FinancialAssistanceRegistry[:net_annual_income_display].enabled? %>
+            <div class="col-md-12 pz">
+              <% @applicants.each do |applicant| %>
+                <% unless applicant.net_annual_income.nil? %>
+                  <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                    <div class="col-md-7 annual-income-row">
+                      <%= applicant.first_name %>'s annual income for <%= @application.assistance_year %>
+                      <a href="#net_annual_income" data-toggle="modal" data-target="#net_annual_income"><i class="fa fa-info-circle"></i></a> :
+                    </div>
+                    <div class="col-md-5">
+                      <%= number_to_currency(applicant.net_annual_income) %>
+                    </div>
+                  </div>
+                <% end %>
+              <% end %>
+              <%= render partial: 'financial_assistance/shared/modal_support_text_household', locals: {key: "net_annual_income"} %>
+            </div>
+          <% end %>
+
           <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bg-primary" style="padding: 0px; height: 20px">
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6"></div>
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6"></div>
@@ -71,7 +91,7 @@
                 <thead>
                 <tr class="form-heading">
                   <th class="form-heading">DOB</th>
-                  <th class="form-heading">GENDER</th>
+                  <th class="form-heading"><%= l10n("gender").to_s.upcase %></th>
                   <th class="form-heading">RELATIONSHIP</th>
                   <th class="form-heading">NEEDS COVERAGE?</th>
                 </tr>
@@ -176,10 +196,18 @@
               <div class="col-md-6"><%= human_boolean(@application.parent_living_out_of_home_terms) %></div>
             </div>
 
-            <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-              <div class="col-md-6"><%= state_abbreviation_text(l10n("faa.medicaid_question")) %></div>
-              <div class="col-md-6"><%= human_boolean(@application.full_medicaid_determination) %></div>
-            </div>
+            <% if FinancialAssistanceRegistry.feature_enabled?(:full_medicaid_determination_step) %>
+              <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                <div class="col-md-6"><%= state_abbreviation_text(l10n("faa.medicaid_question")) %></div>
+               <div class="col-md-6"><%= human_boolean(@application.full_medicaid_determination) %></div>
+              </div>
+            <% end %>
+
+            <% if FinancialAssistanceRegistry.feature_enabled?(:display_medicaid_question) %>
+              <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                <div class="col-md-6"><%= l10n("faa.medicaid_question") %></div>
+              </div>
+            <% end %>
           <% end %>
         </div>
       </div>

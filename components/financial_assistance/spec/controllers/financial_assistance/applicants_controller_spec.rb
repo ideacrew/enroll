@@ -31,7 +31,9 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
       "is_self_attested_blind" => "false",
       "has_daily_living_help" => "false",
       "need_help_paying_bills" => "false"
-    }
+    }.tap do |params_hash|
+      params_hash['is_primary_caregiver'] = "false" if FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_other_question)
+    end
   end
   let(:financial_assistance_applicant_invalid) do
     {
@@ -50,7 +52,9 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
       "has_deductions" => "false",
       "has_enrolled_health_coverage" => "false",
       "has_eligible_health_coverage" => "false"
-    }
+    }.tap do |params_hash|
+      params_hash['is_primary_caregiver'] = "false" if FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_other_question)
+    end
   end
 
   before do
@@ -66,11 +70,18 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
   end
 
   context "GET save questions" do
+    before do
+      applicant.update_attributes(is_primary_caregiver: nil) if FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_other_question)
+    end
     it "should save questions and redirects to edit_financial_assistance_application_path", dbclean: :after_each do
       get :save_questions, params: { application_id: application.id, id: applicant.id, applicant: financial_assistance_applicant_valid }
       expect(response).to have_http_status(302)
       expect(response.headers['Location']).to have_content 'edit'
       expect(response).to redirect_to(edit_application_path(application))
+      if FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_other_question)
+        applicant.reload
+        expect(applicant.is_primary_caregiver.nil?).to eq(false)
+      end
     end
     # TODO: This is run under the save context of :other_qns which runs the method presence_of_attr_other_qns and does not validate the is_required_to_file_taxes or
     # is_claimed_as_tax_dependent, which are passed as nil here as "invalid params."
@@ -228,7 +239,9 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
           "is_former_foster_care" => true,
           "foster_care_us_state" => "DC",
           "age_left_foster_care" => 1
-        }
+        }.tap do |params_hash|
+          params_hash['is_primary_caregiver'] = "false" if FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_other_question)
+        end
       end
 
       before :each do

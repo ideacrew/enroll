@@ -32,7 +32,8 @@ input[type="radio"]:checked + label span {
     background:url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/210284/check_radio_sheet.png) -57px top no-repeat;
 }
 
-.deductions, .job_income, .new-other-income-form, .new-income-form, .new-unemployment-income-form, .edit-unemployment-income-form {
+.deductions, .job_income, .new-other-income-form, .new-income-form, .new-unemployment-income-form, .edit-unemployment-income-form,
+.new-ai-an-income-form, .edit-ai-an-income-form {
   .col-md-3, input {
     padding-left: 0px !important;
     padding-right: 0px !important;
@@ -168,6 +169,10 @@ span.span-text {
 .form-bottom-border
 {
   border-bottom: 3px solid #ddd;
+}
+.form-top-border
+{
+  border-top: 3px solid #ddd;
 }
 .complete-icon{
   color: #69A30D;
@@ -378,4 +383,24 @@ div#add-more-link {
 
 .label-max-width-renew{
   max-width: 90%;
+}
+
+.annual-income-row {
+  padding-left: 4px;
+}
+
+#immigration-checkbox {
+  padding-left: 25px;
+  span {
+    color: #545454;
+  }
+}
+
+.tribal-state {
+  padding-top: 15px;
+}
+
+.tribal-name {
+  padding-left: 5px;
+  padding-right: 5px;
 }

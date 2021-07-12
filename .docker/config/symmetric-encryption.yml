@@ -1,0 +1,13 @@
+production:
+  # List Symmetric Key files in the order of current / latest first
+  private_rsa_key: |
+    <%= printf ENV['ENROLL_SYMMETRIC_ENCRYPTION_PRIVATE_KEY'] %>
+
+  ciphers:
+    -
+      encrypted_key: "<%= ENV['ENROLL_SYMMETRIC_ENCRYPTION_ENCRYPTED_KEY'] %>"
+      encrypted_iv:  "<%= ENV['ENROLL_SYMMETRIC_ENCRYPTION_ENCRYPTED_IV'] %>"
+      cipher_name:   aes-256-cbc
+      encoding:      :base64strict
+      always_add_header: true
+      version:       1

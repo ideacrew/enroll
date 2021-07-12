@@ -14,7 +14,7 @@ module Validators
       let(:params) do
         { kind: 'test', address_2: '1234', address_3: 'person', city: 'test', county: '', state: 'DC', zip: '12345', county_name: '' }
       end
-      let(:error_message) {{:address_1 => ['is missing']}}
+      let(:error_message) {{:address_1 => ["is missing", "must be a string"]}}
 
 
       it "fails" do
@@ -28,7 +28,7 @@ module Validators
       let(:params) do
         { address_1: 'test', address_2: '1234', address_3: 'person', city: 'test', county: '', state: 'DC', zip: '12345', county_name: '' }
       end
-      let(:error_message) {{:kind => ['is missing']}}
+      let(:error_message) {{:kind => ["is missing", "must be a string"]}}
 
 
       it "fails" do
@@ -40,7 +40,7 @@ module Validators
     describe "missing city field" do
 
       let(:params) { { kind: 'test', address_1: '1234', address_2: '1234', address_3: 'person', county: '', state: 'DC', zip: '12345', county_name: '' }}
-      let(:error_message) {{:city => ['is missing']}}
+      let(:error_message) {{:city => ["is missing", "must be a string"]}}
 
 
       it "fails" do
@@ -52,7 +52,7 @@ module Validators
     describe "missing state field" do
 
       let(:params) { { kind: 'test', address_1: '1234', address_2: '1234', address_3: 'person', city: 'test', county: '', zip: '12345', county_name: '' }}
-      let(:error_message) {{:state => ['is missing']}}
+      let(:error_message) {{:state => ["is missing", "must be a string"]}}
 
 
       it "fails" do
@@ -64,7 +64,7 @@ module Validators
     describe "missing zip" do
 
       let(:params) { { kind: 'test', address_1: '1234', address_2: '1234', address_3: 'person', city: 'test', state: 'DC', county: '', county_name: '' }}
-      let(:error_message) {{:zip => ['is missing']}}
+      let(:error_message) {{:zip => ["is missing", "must be a string"]}}
 
       it "fails" do
         expect(subject).not_to be_success

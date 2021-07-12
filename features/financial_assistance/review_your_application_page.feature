@@ -14,6 +14,11 @@ Feature: Review your application page functionality
     And the user clicks the pencil icon for INCOME ADJUSTMENTS
     Then the user should navigate to the Income Adjustments page
 
+  Scenario: Net Annual Salary Displays for Applicants
+    Given FAA net_annual_income_display feature is enabled
+    And the page is refreshed with feature enabled
+    Then the user should see the net annual income displayed
+
   Scenario: Editing Wages & Salaries
     Given the pencil icon displays for each instance of income
     And the user clicks the pencil icon for income

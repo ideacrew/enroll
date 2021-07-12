@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 RSpec.describe Operations::Families::AddFinancialAssistanceEligibilityDetermination, type: :model, dbclean: :after_each do
 
   let!(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, :ivl_product)}
@@ -59,7 +60,7 @@ RSpec.describe Operations::Families::AddFinancialAssistanceEligibilityDeterminat
            "is_consent_applicant" => false,
            "is_living_in_state" => false,
            "is_temporarily_out_of_state" => false,
-           "is_ia_eligible" => true,
+           "is_ia_eligible" => false,
            "is_medicaid_chip_eligible" => false,
            "is_non_magi_medicaid_eligible" => false,
            "is_totally_ineligible" => false,
@@ -113,7 +114,7 @@ RSpec.describe Operations::Families::AddFinancialAssistanceEligibilityDeterminat
      :eligibility_determinations =>
          [{"_id" => BSON::ObjectId('5f5eb0542e1423c05646b19b'),
            "max_aptc" => {"cents" => 5826.0, "currency_iso" => "USD"},
-           "csr_percent_as_integer" => 0,
+           "csr_percent_as_integer" => 94,
            "aptc_csr_annual_household_income" => {"cents" => 3342466.0, "currency_iso" => "USD"},
            "aptc_annual_income_limit" => {"cents" => 4752000.0, "currency_iso" => "USD"},
            "csr_annual_income_limit" => {"cents" => 2970000.0, "currency_iso" => "USD"},
@@ -151,6 +152,121 @@ RSpec.describe Operations::Families::AddFinancialAssistanceEligibilityDeterminat
 
     it 'should create Eligibility Determination object' do
       expect(@thhs.first.latest_eligibility_determination.max_aptc.to_f).to eq(58.26)
+    end
+
+    it 'should update csr on thh member' do
+      expect(@thhs.first.tax_household_members.first.csr_eligibility_kind).to eq("csr_0")
+    end
+  end
+
+  context 'csr_percent_as_integer' do
+    let(:csr_params) do
+      params[:applicants].first.merge!(appli_addnl_params)
+      params
+    end
+
+    before do
+      bcp = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
+      bcp.update_attributes!(slcsp_id: product.id)
+      @result = subject.call(params: csr_params)
+      family.reload
+      @thhm = family.active_household.tax_households.first.tax_household_members.first
+    end
+
+    context "{ 73 => 'csr_73' }" do
+      let(:appli_addnl_params) do
+        { "is_ia_eligible" => true,
+          "csr_percent_as_integer" => 73,
+          "csr_eligibility_kind" => 'csr_73' }
+      end
+
+      it 'should return csr_eligibility_kind value correctly' do
+        expect(@thhm.csr_eligibility_kind).to eq('csr_73')
+      end
+
+      it 'should return csr_percent_as_integer value correctly' do
+        expect(@thhm.csr_percent_as_integer).to eq(73)
+      end
+    end
+
+    context "{ 87 => 'csr_87' }" do
+      let(:appli_addnl_params) do
+        { "is_ia_eligible" => true,
+          "csr_percent_as_integer" => 87,
+          "csr_eligibility_kind" => 'csr_87' }
+      end
+
+      it 'should return csr_eligibility_kind value correctly' do
+        expect(@thhm.csr_eligibility_kind).to eq('csr_87')
+      end
+
+      it 'should return csr_percent_as_integer value correctly' do
+        expect(@thhm.csr_percent_as_integer).to eq(87)
+      end
+    end
+
+    context "{ 94 => 'csr_94' }" do
+      let(:appli_addnl_params) do
+        { "is_ia_eligible" => true,
+          "csr_percent_as_integer" => 94,
+          "csr_eligibility_kind" => 'csr_94' }
+      end
+
+      it 'should return csr_eligibility_kind value correctly' do
+        expect(@thhm.csr_eligibility_kind).to eq('csr_94')
+      end
+
+      it 'should return csr_percent_as_integer value correctly' do
+        expect(@thhm.csr_percent_as_integer).to eq(94)
+      end
+    end
+
+    context "{ 100 => 'csr_100' }" do
+      let(:appli_addnl_params) do
+        { "is_ia_eligible" => true,
+          "csr_percent_as_integer" => 100,
+          "csr_eligibility_kind" => 'csr_100' }
+      end
+
+      it 'should return csr_eligibility_kind value correctly' do
+        expect(@thhm.csr_eligibility_kind).to eq('csr_100')
+      end
+
+      it 'should return csr_percent_as_integer value correctly' do
+        expect(@thhm.csr_percent_as_integer).to eq(100)
+      end
+    end
+
+    context "{ 0 => 'csr_0' }" do
+      let(:appli_addnl_params) do
+        { "is_ia_eligible" => true,
+          "csr_percent_as_integer" => 0,
+          "csr_eligibility_kind" => 'csr_0' }
+      end
+
+      it 'should return csr_eligibility_kind value correctly' do
+        expect(@thhm.csr_eligibility_kind).to eq('csr_0')
+      end
+
+      it 'should return csr_percent_as_integer value correctly' do
+        expect(@thhm.csr_percent_as_integer).to eq(0)
+      end
+    end
+
+    context "{ -1 => 'csr_limited' }" do
+      let(:appli_addnl_params) do
+        { "is_ia_eligible" => true,
+          "csr_percent_as_integer" => -1,
+          "csr_eligibility_kind" => 'csr_limited' }
+      end
+
+      it 'should return csr_eligibility_kind value correctly' do
+        expect(@thhm.csr_eligibility_kind).to eq('csr_limited')
+      end
+
+      it 'should return csr_percent_as_integer value correctly' do
+        expect(@thhm.csr_percent_as_integer).to eq(-1)
+      end
     end
   end
 

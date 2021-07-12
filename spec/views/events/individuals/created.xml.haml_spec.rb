@@ -25,6 +25,20 @@ RSpec.describe "events/individuals/created.haml.erb", dbclean: :after_each do
 
   end
 
+  context 'address with county fips code' do
+    let(:individual) { FactoryBot.build_stubbed :person, addresses: [address] }
+    let(:address) { FactoryBot.build_stubbed :address, county: 'Aroostook', state: 'ME'}
+    let(:contact_address) { individual.contact_addresses.first }
+    let!(:us_county) { BenefitMarkets::Locations::CountyFips.create({ state_postal_code: 'ME',  county_fips_code: '23003', county_name: 'Aroostook'}) }
+    before do
+      EnrollRegistry[:enroll_app].setting(:county_fips_code_enabled).stub(:item).and_return(true)
+      render :template => "events/individuals/created", :locals => { :individual => individual}
+    end
+    it "should be schema valid" do
+      expect(validate_with_schema(Nokogiri::XML(rendered))).to eq []
+    end
+  end
+
   describe "given a person has broker role", dbclean: :after_each do
 
     let(:broker_agency_organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization,:with_site,:with_broker_agency_profile)}

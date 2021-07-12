@@ -1812,9 +1812,16 @@ describe Family, "scopes", dbclean: :after_each do
     end
   end
 
+  # Sending Enrollment Notices for IVL is based on the legacy_enrollment_trigger RR configuration
   context 'send_enrollment_notice_for_ivl ' do
-    it '.enrollment_notice_for_ivl_families' do
-      expect(Family.send_enrollment_notice_for_ivl(created_at)).to include family
+    if EnrollRegistry[:legacy_enrollment_trigger].enabled?
+      it '.enrollment_notice_for_ivl_families' do
+        expect(Family.send_enrollment_notice_for_ivl(created_at)).to include family
+      end
+    else
+      it 'should return empty array' do
+        expect(Family.send_enrollment_notice_for_ivl(created_at)).to be_empty
+      end
     end
   end
 end

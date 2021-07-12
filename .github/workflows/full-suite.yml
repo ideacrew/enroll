@@ -85,6 +85,13 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: '12'
+      - uses: getong/rabbitmq-action@v1.2
+        with:
+          rabbitmq version: "3.8.2-management-alpine"
+          host port: 5672
+          rabbitmq user: "guest"
+          rabbitmq password: "guest"
+          rabbitmq vhost: "/"
       - uses: wbari/start-mongoDB@v0.2
         with:
           mongoDBVersion: '3.6'
@@ -114,7 +121,7 @@ jobs:
       - name: run webpack
         run: NODE_ENV=test RAILS_ENV=test ./bin/webpack
       - name: compile assets
-        run: bundle exec rake assets:precompile
+        run: RAILS_ENV=test bundle exec rake assets:precompile
   engines:
     needs: [rubocop, view_linter]
     runs-on: ubuntu-latest
@@ -135,6 +142,13 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: '12'
+      - uses: getong/rabbitmq-action@v1.2
+        with:
+          rabbitmq version: "3.8.2-management-alpine"
+          host port: 5672
+          rabbitmq user: "guest"
+          rabbitmq password: "guest"
+          rabbitmq vhost: "/"
       - uses: wbari/start-mongoDB@v0.2
         with:
           mongoDBVersion: '3.6'
@@ -192,6 +206,13 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: '12'
+      - uses: getong/rabbitmq-action@v1.2
+        with:
+          rabbitmq version: "3.8.2-management-alpine"
+          host port: 5672
+          rabbitmq user: "guest"
+          rabbitmq password: "guest"
+          rabbitmq vhost: "/"
       - uses: wbari/start-mongoDB@v0.2
         with:
           mongoDBVersion: '3.6'
@@ -240,6 +261,7 @@ jobs:
     needs: [rubocop, view_linter]
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         group: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
     steps:
@@ -248,6 +270,13 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: '12'
+      - uses: getong/rabbitmq-action@v1.2
+        with:
+          rabbitmq version: "3.8.2-management-alpine"
+          host port: 5672
+          rabbitmq user: "guest"
+          rabbitmq password: "guest"
+          rabbitmq vhost: "/"
       - uses: wbari/start-mongoDB@v0.2
         with:
           mongoDBVersion: '3.6'
@@ -286,6 +315,7 @@ jobs:
     needs: [rubocop, view_linter]
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         group: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
     steps:
@@ -294,6 +324,13 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: '12'
+      - uses: getong/rabbitmq-action@v1.2
+        with:
+          rabbitmq version: "3.8.2-management-alpine"
+          host port: 5672
+          rabbitmq user: "guest"
+          rabbitmq password: "guest"
+          rabbitmq vhost: "/"
       - uses: wbari/start-mongoDB@v0.2
         with:
           mongoDBVersion: '3.6'

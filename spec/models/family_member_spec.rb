@@ -204,22 +204,6 @@ describe FamilyMember, "given a relationship to update", dbclean: :after_each do
   end
 end
 
-describe FamilyMember, "aptc_benchmark_amount", dbclean: :after_each do
-  let(:person) { FactoryBot.create(:person, :with_consumer_role, dob: TimeKeeper.date_of_record - 46.years)}
-  let(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person, e_case_id: "family_test#1000")}
-  let(:enrollment) {FactoryBot.create(:hbx_enrollment, family: family, product: product, effective_on: TimeKeeper.date_of_record)}
-  let!(:hbx_profile) { FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period) }
-  let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product) }
-  before do
-    hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(enrollment.effective_on)}.update_attributes!(slcsp_id: product.id)
-  end
-
-  it 'should return valid benchmark value' do
-    family_member = FamilyMember.new(:person => person)
-    expect(family_member.aptc_benchmark_amount(enrollment)).to eq 198.86
-  end
-end
-
 describe FamilyMember, 'call back deactivate_tax_households on update', dbclean: :after_each do
   let!(:person) {FactoryBot.create(:person)}
   let!(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}

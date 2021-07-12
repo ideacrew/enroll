@@ -14,7 +14,7 @@ $("#add_member_list_<%= @dependent.id %>").replaceWith("<%= escape_javascript(re
 
 $("#add_member_list_<%= @dependent.id %>").attr('data-confirm', '');
 $("#dependent_buttons").addClass('hidden');
-$("select").selectric();
+$("select").not('.no-selectric').selectric();
 semantic_class();
 applyJQDatePickers();
 demographicValidations();
