@@ -195,15 +195,15 @@ Given(/^the user answers yes to being a student$/) do
 end
 
 And(/^the type of student question should display$/) do
-  expect(page).to have_content('What is the type of student?')
+  expect(page).to have_content('What type of student?')
 end
 
 And(/^student status end date question should display$/) do
-  expect(page).to have_content('Student status end on date?')
+  expect(page).to have_content('Student status end date?')
 end
 
 Then(/^type of school question should display$/) do
-  expect(page).to have_content('What type of school do you go to?')
+  expect(page).to have_content('What type of school does this person go to?')
 end
 
 Then(/^the has this person ever been in foster care question should display$/) do
