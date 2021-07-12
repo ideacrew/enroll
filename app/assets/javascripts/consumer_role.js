@@ -28,6 +28,9 @@ $(document).on('ready', function(){
       $("#person_addresses_attributes_1_zip, #person_addresses_attributes_1_address_1, #person_addresses_attributes_1_city, #dependent_addresses_1_address_1, #dependent_addresses_1_zip,  #dependent_addresses_1_city").each(function() {
         $(this).prop('required', true);
       })
+      $("#person_addresses_attributes_0_zip, #person_addresses_attributes_0_address_1, #person_addresses_attributes_0_city, #dependent_addresses_0_address_1, #dependent_addresses_0_zip,  #dependent_addresses_0_city").each(function() {
+        $(this).prop('required', false);
+      })
       $("#person_addresses_attributes_0_zip, #person_addresses_attributes_0_address_1, #person_addresses_attributes_0_address_2, #person_addresses_attributes_0_city, #dependent_addresses_0_address_1, #dependent_addresses_0_address_2, #dependent_addresses_0_zip, #dependent_addresses_0_city, #person_addresses_attributes_0_county, #dependent_addresses_0_zip, #dependent_addresses_0_county").each(function() {
         $(this).attr('disabled', true);
       })
@@ -43,6 +46,9 @@ $(document).on('ready', function(){
       })
       $("#person_addresses_attributes_0_zip, #person_addresses_attributes_0_address_1, #person_addresses_attributes_0_address_2, #person_addresses_attributes_0_city, #dependent_addresses_0_address_1, #dependent_addresses_0_address_2, #dependent_addresses_0_zip, #dependent_addresses_0_city, #person_addresses_attributes_0_county, #dependent_addresses_0_zip, #dependent_addresses_0_county").each(function() {
         $(this).attr('disabled', false);
+      })
+      $("#person_addresses_attributes_0_zip, #person_addresses_attributes_0_address_1, #person_addresses_attributes_0_city, #dependent_addresses_0_address_1, #dependent_addresses_0_zip,  #dependent_addresses_0_city").each(function() {
+        $(this).prop('required', true);
       })
       $("#address_info .home-div .selectric-wrapper").show();
     }
