@@ -1795,9 +1795,9 @@ class HbxEnrollment
 
   def benefit_applications_for_reinstated_date?
     reinstate_date = fetch_reinstatement_date
-    return true if benefit_sponsorship.benefit_applications.published_benefit_applications_by_date(reinstate_date).present?
+    return true if benefit_sponsorship.benefit_applications.approved_and_term_benefit_applications_by_date(reinstate_date).present?
 
-    ::EnrollRegistry.feature_enabled?(:prior_plan_year_shop_sep) ? census_employee.prior_py_present_for_date?(reinstate_date) : false
+    ::EnrollRegistry.feature_enabled?(:admin_shop_end_date_changes) ? benefit_sponsorship&.prior_py_benefit_application&.benefit_sponsor_catalog&.effective_period&.cover?(reinstate_date) : false
   end
 
   def has_active_term_or_expired_exists_for_reinstated_date?
