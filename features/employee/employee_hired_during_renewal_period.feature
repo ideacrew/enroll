@@ -24,7 +24,7 @@ Feature: Employee hired during renewal period
     And employee Patrick Doe already matched with employer ABC Widgets and logged into employee portal
     When Employee clicks "Shop for Plans" on my account page
     Then Employee should see the group selection page
-    When Employee clicks continue on the group selection page
+    When Employee clicks continue on group selection page
     Then Employee should see the list of plans
     And I should not see any plan which premium is 0
     When Employee selects a plan on the plan shopping page
@@ -33,9 +33,12 @@ Feature: Employee hired during renewal period
     Then Employee clicks on Continue button on receipt page
     Then Patrick Doe should see "my account" page with active enrollment
     And Patrick Doe should see passive renewal
-    Then Patrick Doe click on make changes button on passive renewal
+    When Employee should be able to see Actions dropdown
+    Then Employee clicks on the Actions button
+    Then Employee should not see able to see make changes for my new plan
+    When Employee clicks on the make changes to my coverage button
     Then Employee should see the group selection page
-    When Employee clicks continue on the group selection page
+    When Employee clicks shop for new plan on the group selection page
     Then Employee should see the list of plans
     And I should not see any plan which premium is 0
     When Employee selects a plan on the plan shopping page

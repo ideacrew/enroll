@@ -68,17 +68,17 @@ end
 
 Then(/Employee tries to complete purchase of another plan/) do
   step "I can click Shop for Plans button"
-  step "Employee clicks continue on the group selection page"
+  step "Employee clicks continue on group selection page"
   step "Employee should see the list of plans"
   step "Employee selects a plan on the plan shopping page"
-  step "Employee should see coverage summary page with employer name and plan details"
+  step "Employee should see coverqge summary page with employer name and plan details"
   step "Employee clicks on Confirm button on the coverage summary page"
   step "Employee should see receipt page with employer name and plan details"
   step "Employee clicks on Continue button on receipt page"
 end
 
 When(/(.*) clicks \"Shop for Plans\" on my account page/) do |named_person|
-  find('.interaction-click-control-shop-for-plans', wait: 10).click
+  find(EmployeeHomepage.shop_for_plans_btn, wait: 10).click
 end
 
 When(/^Employee clicks continue button on group selection page for dependents$/) do
@@ -90,7 +90,7 @@ When(/^Employee clicks continue button on group selection page for dependents$/)
 end
 
 When(/(.*) clicks continue on the group selection page/) do |named_person|
-  find_all('.interaction-click-control-continue,.interaction-click-control-shop-for-new-plan', wait: 10).first.click
+  find(EmployeeChooseCoverage.continue_btn, wait: 10).click
 end
 
 Then(/^I can click Shop for Plans button$/) do
@@ -110,11 +110,11 @@ Then(/(.*) should see (.*) page with employer name and plan details/) do |named_
 end
 
 When(/(.*) clicks back to my account button/) do |named_person|
-  find('.interaction-click-control-go-to-my-account').click
+  find(EmployeeEnrollmentSubmitted.go_to_my_account_btn).click
 end
 
 When(/(.*) clicks on Continue button on receipt page/) do |named_person|
-  find('.interaction-click-control-continue', wait: 10).click
+  find(EmployeeEnrollmentSubmitted.continue_btn, wait: 10).click
 end
 
 Then(/(.*) should see enrollment on my account page/) do |named_person|
@@ -306,7 +306,7 @@ When(/Employee clicks continue on the family members page/) do
 end
 
 When(/(.*) clicks shop for new plan on the group selection page/) do |_named_person|
-  find('.interaction-click-control-shop-for-new-plan', wait: 10).click
+  find(EmployeeChooseCoverage.shop_for_new_plan_btn, wait: 10).click
 end
 
 Then(/Employee should see not yet eligible error message/) do

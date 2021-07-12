@@ -18,7 +18,7 @@ Feature: Employee products sorted when employee click on Plan name, Premium Amou
     Given employee Patrick Doe already matched with employer Acme Inc. and logged into employee portal
     When Employee clicks "Shop for Plans" on my account page
     Then Employee should see the group selection page
-    When Employee clicks continue on the group selection page
+    When Employee clicks continue on group selection page
     Then Employee should see the list of plans
     When Employee sorts by Plan Name
     Then Employee should see plans sorted by Plan Name

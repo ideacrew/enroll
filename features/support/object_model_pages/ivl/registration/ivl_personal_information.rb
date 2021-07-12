@@ -4,6 +4,14 @@
 #insured/consumer_role/match
 class IvlPersonalInformation
 
+  def self.application_type_dropdown
+    '.col-lg-8.col-md-8 span'
+  end
+
+  def self.phone_btn
+    'div.selectric-open li[data-index="1"]'
+  end
+
   def self.first_name
     'FIRST NAME *'
   end

@@ -21,7 +21,7 @@ Feature: Employee passive renewal should be canceled when Employee selected cove
     Then Patrick Doe should see active and renewing enrollments
     When Patrick Doe clicks "Shop for Plans" on my account page
     Then Employee should see the group selection page
-    When Employee clicks continue on the group selection page
+    When Employee clicks continue on group selection page
     Then Employee should see the list of plans
     When Patrick Doe selects a plan on the plan shopping page
     Then Patrick Doe should see coverage summary page with renewing benefit application start date as effective date

@@ -25,7 +25,7 @@ Feature: Shop Employees can purchase coverage through covid QLE
     Then Employee should see family members page and clicks continue
     Then Employee should see the group selection page with "first_of_this_month" effective date
 
-    When Employee clicks continue on the group selection page
+    When Employee clicks continue on group selection page
     Then Employee should see the list of plans
     And Patrick Doe should see the plans from the active plan year
     When Patrick Doe selects a plan on the plan shopping page
@@ -44,7 +44,7 @@ Feature: Shop Employees can purchase coverage through covid QLE
     Then Employee should see family members page and clicks continue
     Then Employee should see the group selection page with "fixed_first_of_next_month" effective date
 
-    When Employee clicks continue on the group selection page
+    When Employee clicks continue on group selection page
     Then Employee should see the list of plans
     And Patrick Doe should see the plans from the active plan year
     When Patrick Doe selects a plan on the plan shopping page

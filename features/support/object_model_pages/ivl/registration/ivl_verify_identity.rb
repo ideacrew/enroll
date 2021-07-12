@@ -47,4 +47,32 @@ class IvlVerifyIdentity
   def self.documents_faq_btn
     '.interaction-click-control-documents-faq'
   end
+
+  def self.application_type_confirm_btn
+    '.btn-primary.interaction-click-control-confirm'
+  end
+
+  def self.identity_actions_dropdown
+    'div#Identity div.selectric span'
+  end
+
+  def self.identity_verify_btn
+    'div#Identity div.selectric-scroll li[data-index="1"]'
+  end
+
+  def self.application_actions_dropdown
+    'div#Application div.selectric'
+  end
+
+  def self.application_verify_btn
+    'div#Application div.selectric-scroll li[data-index="1"]'
+  end
+
+  def self.select_reason_dropdown
+    '.verification-update-reason'
+  end
+
+  def self.continue_btn
+    '#btn-continue'
+  end
 end
