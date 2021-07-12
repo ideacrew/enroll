@@ -153,7 +153,12 @@ And(/^the user fills out the required other questions and submits it$/) do
   choose('is_pregnant_no')
   choose('is_post_partum_period_no')
   choose('is_former_foster_care_no')
-  choose('is_student_no')
+  # Doing this because they shouldn't need more info if its deactivated
+  if FinancialAssistanceRegistry.feature_enabled?(:student_follow_up_questions)
+    choose('is_student_no')
+  else
+    choose('is_student_yes')
+  end
   choose('is_veteran_or_active_military_no')
   choose("is_resident_post_092296_no")
   choose("radio_physically_disabled_no")
