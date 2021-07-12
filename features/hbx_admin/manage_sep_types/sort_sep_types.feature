@@ -14,84 +14,48 @@ Feature: Admin has ability to sort SEP Types on Sort SEPs Page and save their po
     And the Admin will see the Manage SEPs under admin dropdown
     And Admin can click Manage SEPs link
 
-  @flaky
-  Scenario: Admin has ability to sort the SEP Types and saves the positions to the database
+  Scenario Outline: Admin has ability to sort the SEP Types and saves the positions to the database
     Given Admin can navigate to the Manage SEPs screen
     When Admin clicks on the Sort SEPs button
     Then Admin should see three tabs Individual, Shop and Congress markets
-    When Admin clicks on individual tab
-    Then Admin should see listed individual market SEP Types with ascending positions
-    When Admin sorts Individual SEP Types by drag and drop
+    When Admin clicks on <market_kind> tab
+    Then Admin should see listed <market_kind> market SEP Types with ascending positions
+    When Admin sorts <market_type> SEP Types by drag and drop
     Then Admin should see successful message after sorting
-    And listed Individual SEP Types ordinal postions should change
-    When Admin clicks on shop tab
-    Then Admin should see listed shop market SEP Types with ascending positions
-    When Admin sorts Shop SEP Types by drag and drop
-    Then Admin should see successful message after sorting
-    And listed Shop SEP Types ordinal postions should change
-    When Admin clicks on congress tab
-    Then Admin should see listed congress market SEP Types with ascending positions
-    When Admin sorts Congress SEP Types by drag and drop
-    Then Admin should see successful message after sorting
-    And listed Congress SEP Types ordinal postions should change
+    And listed <market_type> SEP Types ordinal postions should change
     When Admin clicks on List SEP Types link
     Then Admin navigates to SEP Type List page
     And Hbx Admin logs out
 
-  @flaky
+    Examples:
+      | market_kind | market_type |
+      | individual  | Individual  |
+      | shop        | Shop        |
+      | congress    | Congress    |
+
   Scenario: Admin will sort Individual market SEP Types and it will reflect the same order on the individual insured home page qle carousel
-    Given Admin can navigate to the Manage SEPs screen
-    When Admin clicks on the Sort SEPs button
-    Then Admin should see three tabs Individual, Shop and Congress markets
-    When Admin clicks on individual tab
-    Then Admin should see listed individual market SEP Types with ascending positions
-    And Hbx Admin logs out
     Given Individual has not signed up as an HBX user
-    When Individual with known qles visits the Insured portal outside of open enrollment
-    Then Individual creates a new HBX account
-    Then I should see a successful sign up message
-    And user should see your information page
-    When user goes to register as an individual
-    When user clicks on continue button
-    Then user should see heading labeled personal information
-    Then Individual should click on Individual market for plan shopping
-    Then Individual should see a form to enter personal information
-    When Individual clicks on Save and Exit
-    Then Individual resumes enrollment
-    And Individual click on Sign In
-    And I signed in
-    Then Individual sees previously saved address
-    Then Individual agrees to the privacy agreeement
-    Then Individual should see identity verification page and clicks on submit
-    Then Individual should be on the Help Paying for Coverage page
-    Then Individual does not apply for assistance and clicks continue
-    Then Individual should see the dependents form
-    And I click on continue button on household info form
-    When I click on none of the situations listed above apply checkbox
-    And I click on back to my account button
-    Then I should land on home page
-    And I should see listed individual market SEP Types
+    And there exists Patrick Doe with active individual market role and verified identity
+    And Patrick Doe logged into the consumer portal
+    And I should land on home page
     And I should see the "Had a baby" at the top of the ivl qle list
     And I click on log out link
-    When Hbx Admin logs on to the Hbx Portal
-    Given the Admin is on the Main Page
+    And Hbx Admin logs on to the Hbx Portal
+    And the Admin is on the Main Page
     And the Admin will see the Manage SEPs under admin dropdown
-    When Admin can click Manage SEPs link
-    Given Admin can navigate to the Manage SEPs screen
-    When Admin clicks on the Sort SEPs button
-    Then Admin should see three tabs Individual, Shop and Congress markets
-    When Admin clicks on individual tab
-    Then Admin should see listed individual market SEP Types with ascending positions
-    When Admin sorts Individual SEP Types by drag and drop
-    Then Admin should see successful message after sorting
+    And Admin can click Manage SEPs link
+    And Admin can navigate to the Manage SEPs screen
+    And Admin clicks on the Sort SEPs button
+    And Admin clicks on individual tab
+    And Admin sorts Individual SEP Types by drag and drop
     And listed Individual SEP Types ordinal postions should change
     And Hbx Admin logs out
-    Then Individual resumes enrollment
+    When Individual resumes enrollment
     And I click on Sign In
     And I signed in
-    Then I should land on home page
+    And I should land on home page
     Then I should see the "Married" at the top of the ivl qle list
-    Then Individual logs out
+    And Individual logs out
 
   Scenario: Admin will create a new Individual market SEP type with future date and try to sort the Sep Type
     Given Admin can navigate to the Manage SEPs screen

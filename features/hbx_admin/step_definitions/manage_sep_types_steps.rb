@@ -55,10 +55,11 @@ end
 
 When("Admin clicks on List SEP Types link") do
   click_link 'List SEP Types'
+  sleep 5
 end
 
 Then("Admin navigates to SEP Type List page") do
-  sleep 2
+  sleep 5
   step "Admin can navigate to the Manage SEPs screen"
 end
 
@@ -184,9 +185,9 @@ end
 Then(/^\w+ should see listed shop market SEP Types with ascending positions$/) do
   step "Admin should see listed Active shop market SEP Types on datatable"
   covid19_shop = page.all('div').detect { |div| div[:id] == 'covid-19_shop'}
-  expect(covid19_shop['data-ordinal_position']).to eq '3'
+  expect(covid19_shop['data-ordinal_position']).to eq '1'
   marraige_shop = page.all('div').detect { |div| div[:id] == 'marriage_shop'}
-  expect(marraige_shop['data-ordinal_position']).to eq '4'
+  expect(marraige_shop['data-ordinal_position']).to eq '2'
 end
 
 When("Admin sorts Shop SEP Types by drag and drop") do
@@ -206,9 +207,9 @@ end
 Then(/^\w+ should see listed congress market SEP Types with ascending positions$/) do
   step "Admin should see listed Active fehb market SEP Types on datatable"
   latm_fehb = page.all('div').detect { |div| div[:id] == 'lost_access_to_mec_fehb'}
-  expect(latm_fehb['data-ordinal_position']).to eq '5'
+  expect(latm_fehb['data-ordinal_position']).to eq '1'
   adoption_fehb = page.all('div').detect { |div| div[:id] == 'adoption_fehb'}
-  expect(adoption_fehb['data-ordinal_position']).to eq '6'
+  expect(adoption_fehb['data-ordinal_position']).to eq '2'
 end
 
 When("Admin sorts Congress SEP Types by drag and drop") do

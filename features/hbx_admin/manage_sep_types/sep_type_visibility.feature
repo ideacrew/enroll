@@ -19,7 +19,6 @@ Feature: Admin has ability to create a new SEP Type with visibility options for 
     And Admin should publish newly created SEP Type
     And Hbx Admin logs out
     And Individual has not signed up as an HBX user
-    And Individual market is not under open enrollment period
     And there exists Patrick Doe with active individual market role and verified identity
     And Patrick Doe logged into the consumer portal
     Then I should land on home page
