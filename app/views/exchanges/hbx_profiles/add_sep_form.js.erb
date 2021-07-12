@@ -22,6 +22,7 @@ $('.admin_effective_on_kind_options').hide();
 $('.init_event_date').hide();
 $('.sep_dates_filter').hide();
 $('.optional_date').hide();
+$('.coverage-renewal-flag').hide();
 var ivlTable, shopTable, ivl_shop_Table, selectedTable, idTable;
 var self_attested;
 var arrEffectiveDate;
@@ -55,11 +56,30 @@ $(document).on('change','.admin_selected_sep_reason select',function(){
   }
 });
 
+$(document).on('change','#option1_date, #option2_date, #option3_date', function(){
+  $.ajax({
+      type: "GET",
+      url: "/exchanges/hbx_profiles/check_for_renewal_flag",
+      data:{effective_date: $("#calculated_effective_date").val(), date_option1: $('#option1_date').val(), date_option2: $('#option2_date').val(), date_option3: $('#option3_date').val(), person: $('#person').val(), id: idVal },
+      success: function (response) {
+        if (response["renewalFlagStatus"]) {
+          $("#coverage_renewal_flag").attr('disabled',false);
+          $('.coverage-renewal-flag').show();
+        } else {
+          $("#coverage_renewal_flag").attr('disabled',true);
+          $(  '.coverage-renewal-flag').hide();
+        }
+      }
+    });
+});
+
+
 $(document).on('change','.admin_effective_on_kind_options select', function(){
   if($(this).val() == ''){
     $('.init_effective_date input').val("");
     $('.sep_dates_filter').hide();
     $('.optional_date').hide();
+    $('.coverage-renewal-flag').hide();
   }
   else{
     $('.init_effective_date .label-floatlabel').removeClass('dn-1');
@@ -87,6 +107,7 @@ $(document).on('change','.radio_option input', function(){
   $('.init_effective_date input').val('');
   $('.csl_num_options input').val('');
   $('.optional_date').hide();
+  $('.coverage-renewal-flag').hide();
 });
 
 $(document).on('change','.init_event_date input', function(){
@@ -106,6 +127,7 @@ $(document).on('change','.init_event_date input', function(){
     $('.sep_dates_filter').hide();
     $('.admin_effective_on_kind_options #effective_on_date').selectric("refresh");
     $('.optional_date').hide();
+    $('.coverage-renewal-flag').hide();
 });
 
 $('#tab_datatables a[data-toggle="tab"]').on("mousedown", function(){

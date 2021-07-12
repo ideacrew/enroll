@@ -1,6 +1,6 @@
 <br/><br/>
 <% url, http_method = add_new_sep_exchanges_hbx_profiles_path, :post %>
-<%= form_tag url, method: http_method, remote: true, class: 'input' do %>
+<%= form_tag url, method: http_method, remote: true, class: 'input', id: 'admin_sep_form' do %>
 <div class='radio_option'>
 	<div class="col-md-2 col-md-offset-1 col-sm-4 content-bottom">
 		<div class="col-md-8 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
@@ -29,6 +29,8 @@
 						<%= hidden_field_tag "firstName", f.primary_applicant.person.first_name %>
 						<%= hidden_field_tag "lastName", f.primary_applicant.person.last_name %>
 						<%= hidden_field_tag "family_actions_id", "family_actions_#{f.id.to_s}" %>
+            <%= hidden_field_tag "prior_year_sep_date", true,  id: 'prior_py_sep' %>
+            <%= hidden_field_tag "calculated_effective_date", "" %>
 						<div class = "kind">
 							<%= hidden_field_tag :effective_on_kind, "first_of_next_month" %>
 						</div>
@@ -83,13 +85,23 @@
 						    <%= text_field_tag :option3_date, "", :'data-date-max'=> sep_optional_date(@family, 'max'), :'data-date-min'=> sep_optional_date(@family, 'min'),class: "floatlabel required date-picker form-control", placeholder: "DATE 3 OPTION" %>
 						</div>
 					</div>
+          <% is_individual = @family.primary_person.has_consumer_role? || @family.primary_person.has_resident_role? %>
+          <% is_employee = @family.primary_person.has_employee_roles? %>
+          <% if is_individual && ::EnrollRegistry.feature_enabled?(:prior_plan_year_ivl_sep) || is_employee && ::EnrollRegistry.feature_enabled?(:prior_plan_year_shop_sep) %>
+            <div class='row row-form-wrapper no-buffer coverage-renewal-flag'>
+              <div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd">
+                <%= check_box_tag :coverage_renewal_flag, 'true' ,true, id: "coverage_renewal_flag", class: 'coverage_renewal_checkbox' %>
+                <%= l10n("hbx_profiles.coverage_renewal_flag") %>
+              </div>
+            </div>
+          <% end %>
 					<div class='row row-form-wrapper no-buffer'>
 						<div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd">
 			    			<%= text_area_tag :admin_comment, "", class: "floatlabel interaction-control-broker-message-body custom-textarea", rows: 3, placeholder: "Enter Comments Here"%>
 						</div>
 					</div>
 					<div class="no-pd" style="margin-top:10px;">
-			 			<%= submit_tag "Submit",  class: "btn btn-primary" %>
+			 			<%= submit_tag "Submit",  class: "btn btn-primary", onclick: "PriorPySepModal()", id: "confirm_add_sep"%>
 			 		</div>
 
 				</div>
@@ -98,3 +110,37 @@
 	</div>
 </div>
 <% end %>
+
+<div class="modal" id="priorSepModal" role="dialog">
+  <div class="modal-dialog" style="width: 500px;">
+    <div class="modal-content">
+      <div class="modal-body" style="text-align: center;">
+        <p>Are you sure you want to add <b>SEP</b> to prior plan year?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary btn-confirmation" onclick='confirmSep(); return false;'>Confirm</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script type="text/javascript">
+
+  function PriorPySepModal() {
+    var prior_sep = $('#prior_py_sep').val() == 'true'
+    if (prior_sep) {
+      event.preventDefault();
+      if ( $('#admin_sep_form')[0].checkValidity() ) {
+        $('#priorSepModal').modal('show')
+      }
+    }
+  }
+
+  function confirmSep() {
+    $('.modal-backdrop').removeClass('modal-backdrop');
+    $('.modal-open').removeClass('modal-open');
+    $("#admin_sep_form").submit();
+  }
+</script>

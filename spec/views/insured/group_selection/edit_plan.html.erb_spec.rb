@@ -8,7 +8,7 @@ module SpecHelperClassesForViews
 end
 
 RSpec.describe "app/views/insured/group_selection/edit_plan.html.erb" do
-  context "Enrollment information and buttons" do
+  context "Enrollment information and buttons", dbclean: :after_each  do
     let!(:person) {FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
     let!(:family) {FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person)}
     let(:sep) {FactoryBot.create(:special_enrollment_period, family: family)}

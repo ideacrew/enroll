@@ -65,5 +65,12 @@ FactoryBot.define do
       effective_on_kinds { ["date_of_event", "first_of_next_month"] }
       tool_tip { "Enroll or add a family member due to birth" }
     end
+
+    trait :medical_emergency do
+      title { "A medical emergency prevented enrollment" }
+      edi_code { "02-Emergency" }
+      effective_on_kinds { ["first_of_month"] }
+      tool_tip { "A medical emergency prevented enrollment" }
+    end
   end
 end

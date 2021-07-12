@@ -29,6 +29,45 @@ module SepAll
     @effective_on = special_enrollment_period.effective_on
     @self_attested = qle.is_self_attested
     @date_options = qle.date_options_available
+    @market_kind = qle.market_kind
+  end
+
+  def check_renewal_flag
+    @family = Family.find(params[:person]) if params[:person].present?
+    qle = QualifyingLifeEventKind.find(params[:id]) if params[:id].present?
+    effective_date = Date.strptime(params[:effective_date], "%m/%d/%Y") if params[:effective_date].present?
+    date_option_1 = Date.strptime(params[:date_option1], "%m/%d/%Y") if params[:date_option1].present?
+    date_option_2 = Date.strptime(params[:date_option2], "%m/%d/%Y") if params[:date_option2].present?
+    date_option_3 = Date.strptime(params[:date_option3], "%m/%d/%Y") if params[:date_option3].present?
+
+    status = []
+    [effective_date, date_option_1, date_option_2, date_option_3].each do |date|
+      status << prior_py_sep?(@family, date, qle.market_kind)
+    end
+    status.include?(true)
+  end
+
+  def prior_py_sep?(family, effective_date, market)
+    return false if market.blank?
+    return prior_py_ivl_sep?(effective_date) if market == 'individual'
+
+    prior_py_shop_sep?(family, effective_date)
+  end
+
+  def prior_py_shop_sep?(family, effective_date)
+    return false if family.blank?
+    return false if effective_date.blank?
+
+    person = family.primary_person
+    person.active_employee_roles.any?{|e| e.census_employee&.benefit_sponsorship&.prior_py_benefit_application&.benefit_sponsor_catalog&.effective_period&.cover?(effective_date)}
+  end
+
+  def prior_py_ivl_sep?(effective_date)
+    ivl_prior_coverage_period = HbxProfile.current_hbx&.benefit_sponsorship&.previous_benefit_coverage_period
+    return false if ivl_prior_coverage_period.blank?
+    return false if effective_date.blank?
+
+    ivl_prior_coverage_period&.contains?(effective_date)
   end
 
   def calculate_rule
@@ -177,6 +216,7 @@ module SepAll
     special_enrollment_period.optional_effective_on = date_arr if date_arr.length > 0
     special_enrollment_period.market_kind = qle.market_kind == "individual" ? "ivl" : qle.market_kind
     special_enrollment_period.admin_flag = true
+    special_enrollment_period.coverage_renewal_flag = sep_params[:coverage_renewal_flag].to_s == "true"
     
     if special_enrollment_period.save
       @message_for_partial = "SEP Added for #{@name}"

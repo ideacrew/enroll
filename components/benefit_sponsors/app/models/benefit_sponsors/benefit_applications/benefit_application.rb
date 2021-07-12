@@ -31,6 +31,7 @@ module BenefitSponsors
     TERMINATED_IMPORTED_STATES    = TERMINATED_STATES + IMPORTED_STATES
     ACTIVE_AND_TERMINATED_STATES  = COVERAGE_EFFECTIVE_STATES + [:terminated]
     APPPROVED_AND_TERMINATED_STATES   = APPROVED_STATES +  [:termination_pending, :terminated, :expired]
+    APPROVED_AND_EXPIRED_STATED = APPROVED_STATES + EXPIRED_STATES
     RENEWAL_TRANSMISSION_STATES = APPLICATION_APPROVED_STATES + APPLICATION_DRAFT_STATES + ENROLLING_STATES + ENROLLMENT_ELIGIBLE_STATES + ENROLLMENT_INELIGIBLE_STATES
 
     # Deprecated - Use SUBMITTED_STATES
@@ -826,6 +827,7 @@ module BenefitSponsors
         :binder_paid,
         :enrollment_eligible,
         :active,
+        #:terminated,
         # :termination_pending,
         :expired
       ].include?(aasm_state)

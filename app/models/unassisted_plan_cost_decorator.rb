@@ -63,8 +63,8 @@ class UnassistedPlanCostDecorator < SimpleDelegator
       EnrollRegistry[:rating_area].settings(:areas).item.first
     ) * large_family_factor(member)).round(2)
   rescue StandardError => e
-    warn e.inspect
-    warn e.backtrace
+    warn e.inspect unless Rails.env.test?
+    warn e.backtrace unless Rails.env.test?
     0
   end
 
