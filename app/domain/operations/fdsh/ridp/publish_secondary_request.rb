@@ -12,7 +12,7 @@ module Operations
         include EventSource::Command
 
         def call(payload)
-          event = yield build_event(payload)
+          event  = yield build_event(payload)
           result = yield publish(event)
 
           Success(result)
@@ -21,7 +21,7 @@ module Operations
         private
 
         def build_event(payload)
-          event('events.fdsh.ridp.secondary_determination_requested', attributes: payload)
+          event('events.fdsh.ridp.secondary_determination_requested', attributes: payload.to_h, headers: { correlation_id: payload.to_h[:hbx_id] })
         end
 
         def publish(event)
