@@ -344,6 +344,8 @@ When(/Admin creates new SEP Type with (.*) market and (.*) select termination on
     step "Admin fills Create SEP Type form with start on date greater than end on date"
   when "past start date"
     step "Admin fills Create SEP Type form with past start and end dates"
+  when "future start and end dates"
+    step "Admin fills Create SEP Type form with future start and end dates"
   else
     step "Admin fills Create SEP Type form with start and end dates"
   end
