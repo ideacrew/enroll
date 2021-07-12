@@ -1,6 +1,5 @@
 require 'rails_helper'
 
-if ExchangeTestingConfigurationHelper.general_agency_enabled?
 RSpec.describe GeneralAgencyProfile, dbclean: :after_each do
 
   it { should validate_presence_of :market_kind }
@@ -16,6 +15,7 @@ RSpec.describe GeneralAgencyProfile, dbclean: :after_each do
   let(:market_kind_error_message) {"#{bad_market_kind} is not a valid market kind"}
 
   before :each do
+    EnrollRegistry[:general_agency].feature.stub(:is_enabled).and_return(true)
     stub_const("GeneralAgencyProfile::MARKET_KINDS", ['shop', 'individual', 'both'])
   end
 
@@ -256,5 +256,4 @@ RSpec.describe GeneralAgencyProfile, dbclean: :after_each do
       end
     end
   end
-end
 end
