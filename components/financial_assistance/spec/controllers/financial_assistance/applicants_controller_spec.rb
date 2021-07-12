@@ -298,6 +298,24 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
         expect(applicant.save).to eq true
       end
 
+      context "income verification types to main app" do
+        before do
+          FinancialAssistanceRegistry[:verification_type_income_verification].feature.stub(:is_enabled).and_return(true)
+          applicant_family = Family.find(applicant.application.family_id.to_s)
+          applicant.update_attributes(family_member_id: applicant_family.family_members.first.id)
+          allow(applicant).to receive(:incomes).and_return([])
+        end
+
+        it "should create a verification type if incomes blank" do
+          post(
+            :step,
+            params: { application_id: application.id, id: applicant.id, applicant: financial_assistance_applicant_valid }
+          )
+          applicant.reload
+          expect(person.verification_types.where(type_name: "Income").count).to eq(1)
+        end
+      end
+
       it "should redirect to income index when in last step (tax_info)" do
         post :step, params: { application_id: application.id, id: applicant.id, commit: "CONTINUE", applicant: applicant_params, last_step: true }
         expect(response.headers['Location']).to have_content 'incomes'

@@ -303,7 +303,7 @@ module FinancialAssistance
     attr_accessor :relationship
     # attr_writer :us_citizen, :naturalized_citizen, :indian_tribe_member, :eligible_immigration_status
 
-    before_save :generate_hbx_id
+    before_save :generate_hbx_id, :create_verification_docs
 
     # Responsible for updating family member  when applicant is created/updated
     after_update :propagate_applicant
@@ -1034,6 +1034,23 @@ module FinancialAssistance
     end
 
     private
+
+    def create_verification_docs
+      family_id = application.family_id
+      family_record = Family.where(id: family_id.to_s).first
+      if FinancialAssistanceRegistry.feature_enabled?(:verification_type_income_verification)
+        binding.irb
+        if family_record.present? && self.incomes.blank? && self.family_member_id.present?
+          binding.irb
+          family_member_record = family_record.family_members.where(_id: family_member_id.to_s).first
+          binding.irb if family_member_record.present?
+          return if family_member_record.blank?
+          person_record = family_member_record.person
+          return if person_record.blank?
+          person_record.add_new_verification_type('Income')
+        end
+      end
+    end
 
     def date_ranges_overlap?(range_a, range_b)
       range_b.begin <= range_a.end && range_a.begin <= range_b.end
