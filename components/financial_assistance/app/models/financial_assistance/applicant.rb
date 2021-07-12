@@ -1064,6 +1064,7 @@ module FinancialAssistance
 
     def driver_question_responses
       DRIVER_QUESTION_ATTRIBUTES.each do |attribute|
+        next if attribute == :has_american_indian_alaskan_native_income && !indian_tribe_member
         next if [:has_enrolled_health_coverage, :has_eligible_health_coverage].include?(attribute) && !is_applying_coverage
 
         instance_type = attribute.to_s.gsub('has_', '')
