@@ -3,8 +3,7 @@
 module Operations
   # Checks database for RIDP eligibility responses
   class FindRidpEligibilityResponse
-    send(:include, Dry::Monads[:result, :do])
-    send(:include, Dry::Monads[:try])
+    send(:include, Dry::Monads[:result, :do, :try])
 
     # @param [String] member_id
     def call(params)
@@ -34,9 +33,7 @@ module Operations
         response.write_attribute(:deleted_at, DateTime.now)
         Success(response)
       else
-        unless response.present?
-          Failure[:ridp_eligibility_response_not_found, values: values]
-        end
+        Failure[:ridp_eligibility_response_not_found, values: values]
       end
     end
 
