@@ -82,6 +82,7 @@ RSpec.describe Insured::ConsumerRolesController do
       before do
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_individual_market).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return(true)
         sign_in user
       end
 
@@ -98,6 +99,7 @@ RSpec.describe Insured::ConsumerRolesController do
       before do
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_individual_market).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return(true)
         sign_in user
       end
 
