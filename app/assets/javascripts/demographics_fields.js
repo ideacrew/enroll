@@ -12,6 +12,11 @@ fields = "input[name='" + target + "[is_applying_coverage]']"
       if($("input[name='" + target + "[ssn]']").val() == '' && !$("input[name='" + target + "[no_ssn]']").is(":checked")){
         $("#ssn-coverage-msg").show();
       }
+      if(!($(fields).not(":checked").val() == "false") && $('.no_coverage_tribe_details').length > 0){
+        new_tribe_form = $('#indian_tribe_area').clone(true).addClass('tribe-area-clone')
+        $('#indian_tribe_area').remove()
+        new_tribe_form.insertBefore($('#consumer_fields_sets'))
+      }
 
     }
     $(fields).change(function () {
@@ -21,7 +26,17 @@ fields = "input[name='" + target + "[is_applying_coverage]']"
         if($("input[name='" + target + "[ssn]']").val() == '' && !$("input[name='" + target + "[no_ssn]']").is(":checked")){
           $("#ssn-coverage-msg").show();
         }
+        if(!($(fields).not(":checked").val() == "false") && $('.no_coverage_tribe_details').length > 0){
+          new_tribe_form = $('#indian_tribe_area').clone(true).addClass('tribe-area-clone')
+          $('#indian_tribe_area').remove()
+          new_tribe_form.insertBefore($('#consumer_fields_sets'))
+        }
       }else{
+        if($('.no_coverage_tribe_details').length > 0){
+          new_tribe_form = $('#indian_tribe_area').clone(true).removeClass('tribe-area-clone')
+          $('#indian_tribe_area').remove()
+          new_tribe_form.insertAfter($('#vlp_documents_container'))
+        }
         $("#consumer_fields_sets").show();
         $("#employer-coverage-msg").hide();
         $("#ssn-coverage-msg").hide();

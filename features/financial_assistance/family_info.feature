@@ -22,7 +22,7 @@ Feature: Start a new Financial Assistance Application
     Then they should see a new finanical assistance application
     And they should see each of their dependents listed
     And the user clicks Add Member
-    And the user fills the the aplicant add member form with indian member yes
+    And the user fills the the applicant add member form with indian member yes
     And the user clicks submit applicant form
     Then the user should see the AI AN Details fields
     Then the user should see an error message for indian tribal state and name
@@ -34,7 +34,17 @@ Feature: Start a new Financial Assistance Application
     Then they should see a new finanical assistance application
     And they should see each of their dependents listed
     And the user clicks Add Member
-    And the user fills the the aplicant add member form with indian member yes
+    And the user fills the the applicant add member form with indian member yes
     And the user enters a tribal name with a number
     And the user clicks submit applicant form
     Then the user should see an error for tribal name containing a number
+
+  Scenario: No Coverage Tribe Details feature is enabled
+    Given No coverage tribe details feature is enabled
+    When a consumer visits the Get Help Paying for coverage page
+    And selects yes they would like help paying for coverage
+    Then they should see a new finanical assistance application
+    And they should see each of their dependents listed
+    And the user clicks Add Member
+    And the user selects not applying for coverage
+    Then user should still see the member of a tribe question

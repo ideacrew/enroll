@@ -92,7 +92,7 @@
 
   <%= render :partial => "financial_assistance/shared/immigration_document_fields", locals: {f: f} %>
 
-  <div class="row row-form-wrapper no-buffer" id='indian_tribe_area'>
+  <div class="row row-form-wrapper no-buffer <%= "no_coverage_tribe_details" if FinancialAssistanceRegistry.feature_enabled?(:no_coverage_tribe_details) %>" id='indian_tribe_area'>
     <div class="row no-buffer">
       <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
       <label>Is this person a member of an <%= render partial:"shared/glossary", locals: {key: "american_indian", term: "American Indian" } %> or <%= render partial:"shared/glossary", locals: {key: "alaska_native", term: "Alaska Native" } %> Tribe? *</label>
