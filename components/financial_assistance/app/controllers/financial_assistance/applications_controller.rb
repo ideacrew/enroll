@@ -198,6 +198,7 @@ module FinancialAssistance
 
     def determination_request_class
       return FinancialAssistance::Operations::Application::RequestDetermination if FinancialAssistanceRegistry.feature_enabled?(:haven_determination)
+      # TODO: This beelow line will cause failures
       return FinancialAssistance::Operations::Applications::MedicaidGateway::RequestEligibilityDetermination if FinancialAssistanceRegistry.feature_enabled?(:medicaid_gateway_determination)
     end
 
