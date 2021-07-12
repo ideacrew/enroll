@@ -21,6 +21,42 @@ module Insured
       EnrollRegistry.feature_enabled?(:fehb_market) || EnrollRegistry.feature_enabled?(:aca_shop_market)
     end
 
+    def show_warning_popup?(tax_household, family)
+      csr_kinds = tax_household&.eligibility_determinations&.pluck(:csr_kind)
+
+      return true if csr_kinds.present? && csr_kinds.count == csr_kinds.uniq.count
+
+      nil
+    end
+
+    def prioritized_csr_kind(family_member)
+      family = family_member.family
+      tax_households = family.active_household&.tax_households
+      return unless tax_households.present?
+
+      # Get tax households of the family member
+      member_ths = tax_households.where('tax_household_members.applicant_id': family_member.id)
+
+      csr_kinds = member_ths.map(&:current_csr_eligibility_kind)
+
+      # Get the prioritized csr
+      prioritized_csr(csr_kinds)
+    end
+
+    def prioritized_csr(csr_kinds)
+      if csr_kinds.include?('csr_0')
+        'csr_0'
+      elsif csr_kinds.include?('csr_94')
+        'csr_94'
+      elsif csr_kinds.include?('csr_87')
+        'csr_87'
+      elsif csr_kinds.include?('csr_73')
+        'csr_73'
+      else
+        'csr_100'
+      end
+    end
+
     def can_shop_individual_or_resident?(person)
       return true if (can_shop_individual?(person) && person.has_active_resident_member?)
       return true if (can_shop_resident?(person) && person.has_active_consumer_member?)
