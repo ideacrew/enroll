@@ -12,8 +12,6 @@ end
 
 RSpec.describe Validators::VlpV37Contract, type: :model, dbclean: :after_each do
 
-RSpec.describe Validators::VlpV37Contract, type: :model, dbclean: :after_each do
-
   def message(subject_name)
     "is required for VLP Document type: #{subject_name}"
   end
