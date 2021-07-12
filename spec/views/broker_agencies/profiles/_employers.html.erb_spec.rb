@@ -65,7 +65,7 @@ RSpec.describe "broker_agencies/profiles/_employers.html.erb", :dbclean => :afte
       end
     end
 
-    context "when GA is disabled" , :unless => Settings.aca.general_agency_enabled do
+    context "when GA is disabled", :unless => Settings.aca.general_agency_enabled do
       it "should not have general agency" do
         expect(rendered).not_to match(/General Agencies/)
       end
