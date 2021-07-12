@@ -1,11 +1,10 @@
 require 'rails_helper'
 
-if ExchangeTestingConfigurationHelper.general_agency_enabled?
 RSpec.describe "general_agencies/profiles/_families.html.erb", dbclean: :after_each do
   let(:general_agency_profile) { FactoryBot.create(:general_agency_profile) }
   before :each do
     assign :general_agency_profiles, Kaminari.paginate_array([general_agency_profile]).page(0)
-    allow(Settings.aca).to receive(:general_agency_enabled).and_return(true)
+    EnrollRegistry[:general_agency].feature.stub(:is_enabled).and_return(false)
     Enroll::Application.reload_routes!
     render template: "general_agencies/profiles/_index.html.erb"
   end
@@ -39,5 +38,4 @@ RSpec.describe "general_agencies/profiles/_families.html.erb", dbclean: :after_e
       expect(rendered).to have_selector('input[value="all"]')
     end
   end
-end
 end
