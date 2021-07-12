@@ -84,7 +84,8 @@ module Operations
               addresses: build_addresses(person)
             }
           }
-          member_hash.merge!(verification_types: update_and_build_verification_types(person)) if outstanding_verification_types.present?
+          member_hash[:person].merge!(verification_types: update_and_build_verification_types(person)) if outstanding_verification_types.present?
+          member_hash
         end
         Success(family_members_hash)
       end
