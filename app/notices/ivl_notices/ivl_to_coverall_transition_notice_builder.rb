@@ -105,7 +105,7 @@ class IvlNotices::IvlToCoverallTransitionNoticeBuilder < IvlNotice
     hbx_enrollments.each do |enrollment|
       notice.enrollments << append_enrollment_information(enrollment)
     end
-    notice.coverage_year = hbx_enrollments.compact.first.effective_on.year
+    notice.coverage_year = hbx_enrollments&.compact&.first&.effective_on&.year
   end
 
   def append_unverified_individuals
