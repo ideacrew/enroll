@@ -27,7 +27,8 @@ module FinancialAssistance
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
 
-      @application = ::FinancialAssistance::Application.find_by(id: params[:id], family_id: get_current_person.financial_assistance_identifier)
+      # @application = ::FinancialAssistance::Application.find_by(id: params[:id], family_id: get_current_person.financial_assistance_identifier)
+      @application = ::FinancialAssistance::Application.find_by(id: params[:id])
 
       load_support_texts
     end
