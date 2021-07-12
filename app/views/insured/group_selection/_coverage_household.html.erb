@@ -18,9 +18,10 @@
       <% end %>
 
         <% is_checked = is_member_checked?(benefit_type, is_health_coverage, is_dental_coverage, is_ivl_coverage) %>
+        <% csr_kind = prioritized_csr_kind(family_member) %>
         <tr class='<%= @adapter.class_for_ineligible_row(family_member, is_ivl_coverage, (@effective_on_date || @new_effective_on), @qle) %>'>
           <td width="20">
-            <%= check_box_tag("family_member_ids[#{index}]", family_member.id, is_checked, disabled: !is_checked ) %>
+            <%= check_box_tag("family_member_ids[#{index}]", family_member.id, is_checked, disabled: !is_checked, class: 'member-checkbox', data: { csr_kind: csr_kind } ) %>
           </td>
           <td><%= label_tag("family_member_ids[#{index}]", "#{family_member.full_name} (Age : #{pluralize(calculate_age_by_dob(family_member.dob), 'year')})") %></td>
 

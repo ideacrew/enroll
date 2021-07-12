@@ -34,6 +34,8 @@
             </div>
           <% end %>
 
+        <%= render "warning_indian_selection_modal" %>
+
         <% if @adapter.can_shop_both_markets?(@person) || @adapter.can_shop_individual?(@person) || @adapter.can_shop_resident?(@person) %>
           <div id="market_kinds" class='row no-buffer'>
             <h3><%= l10n("insured.group_selection.new.marketplace") %></h3>
@@ -185,3 +187,32 @@
   </div>
   <%= render :partial => "ui-components/v1/modals/waive_confirmation", :locals => {:enrollment => @hbx_enrollment } if (@hbx_enrollment.present? && (@hbx_enrollment.employee_role.present? || @hbx_enrollment.benefit_group.present?)) %>
 </div>
+
+<script type="text/javascript">
+  let can_shop = "<%= @adapter.can_shop_both_markets?(@person) || @adapter.can_shop_individual?(@person) || @adapter.can_shop_resident?(@person) %>" === 'true'
+  let can_popup = "<%= show_warning_popup?(@tax_household, @family) %>" === 'true'
+
+  // Shows the popup when landing on the page
+  if (can_shop && can_popup) {
+    $("#WarningOnIndianSelection").modal();
+  }
+
+  // Shows the popup when check/uncheck the family member
+  $(".member-checkbox").change(function() {
+    let csr_kinds = [];
+
+    $('.member-checkbox:checked').each(function() {
+      csr_kind = $(this).data('csr-kind');
+
+      if (csr_kind !== undefined) {
+        csr_kinds.push($(this).data('csr-kind'));
+      }
+    });
+
+    $.unique(csr_kinds)
+
+    if (csr_kinds.length == 1) {
+      $("#WarningOnIndianSelection").modal();
+    }
+  });
+</script>

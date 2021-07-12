@@ -1,6 +1,7 @@
 class Insured::GroupSelectionController < ApplicationController
   include Insured::GroupSelectionHelper
   include Config::SiteConcern
+  include Aptc
 
   before_action :initialize_common_vars, only: [:new, :create, :terminate_selection]
   # before_action :set_vars_for_market, only: [:new]
@@ -64,6 +65,7 @@ class Insured::GroupSelectionController < ApplicationController
     @active_family_members.each do |family_member|
       family_member_eligibility_check(family_member)
     end
+    @tax_household = get_shopping_tax_household_from_person(@family.primary_person, @hbx_enrollment&.effective_on&.year)
     if @fm_hash.present? && @fm_hash.values.flatten.detect{|err| err.to_s.match(/incarcerated_not_answered/)}
       redirect_to manage_family_insured_families_path(tab: 'family')
       flash[:error] = "A family member has incarceration status unanswered, please answer the question by clicking on edit icon before shopping."
