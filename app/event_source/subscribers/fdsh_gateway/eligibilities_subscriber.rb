@@ -50,9 +50,6 @@ module Subscribers
         nack(delivery_info.delivery_tag)
         logger.info "FdshGateway::EligibilitiesSubscriber: on_secondary_determination error: #{e.backtrace}"
       end
-
-      subscribe(:on_secondary_determination_complete) do |delivery_info, _metadata, response|
-      end
     end
   end
 end
