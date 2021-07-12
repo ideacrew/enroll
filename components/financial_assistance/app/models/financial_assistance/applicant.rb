@@ -672,14 +672,17 @@ module FinancialAssistance
 
     def other_questions_complete?
       questions_array = []
-
       questions_array << is_former_foster_care if foster_age_satisfied? && is_applying_coverage
       questions_array << is_post_partum_period unless is_pregnant
+      questions_array << is_student if is_applying_coverage
+      questions_array << student_kind if is_student
+      questions_array << student_status_end_on if is_student
+      questions_array << student_school_kind if is_student
+      questions_array << (questions_array.flatten.include?("") ? nil : true)
       questions_array << has_unemployment_income if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income)
       questions_array << is_physically_disabled if is_applying_coverage
       questions_array << pregnancy_due_on << children_expected_count if is_pregnant
       questions_array << pregnancy_end_on << is_enrolled_on_medicaid if is_post_partum_period
-      questions_array << is_student
 
       (other_questions_answers << questions_array).flatten.include?(nil) ? false : true
     end

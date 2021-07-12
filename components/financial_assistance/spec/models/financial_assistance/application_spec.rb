@@ -698,6 +698,9 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
                         is_self_attested_blind: true,
                         has_daily_living_help: true,
                         is_student: true,
+                        student_kind: "Graduated",
+                        student_status_end_on: Date.today,
+                        student_school_kind: "Pre School",
                         need_help_paying_bills: true,
                         is_ssn_applied: true,
                         family_member_id: BSON::ObjectId.new)
