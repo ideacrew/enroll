@@ -23,7 +23,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
   context "income verification types to main app" do
     let(:person) { FactoryBot.create(:person, :with_consumer_role, dob: TimeKeeper.date_of_record - 40.years)}
     let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
-    
+
     before do
       person.verification_types.destroy_all
       expect(person.verification_types.where(type_name: "Income").count).to eq(0)
@@ -334,7 +334,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
 
     context 'is_filing_as_head_of_household feature disabled' do
       before do
-        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:filing_as_head_of_household).and_return(false)
+        FinancialAssistanceRegistry[:filing_as_head_of_household].feature.stub(:is_enabled).and_return(false)
       end
 
       it 'should return true without is_filing_as_head_of_household' do
@@ -344,7 +344,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
 
     context 'is_filing_as_head_of_household feature enabled' do
       before do
-        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:filing_as_head_of_household).and_return(true)
+        FinancialAssistanceRegistry[:filing_as_head_of_household].feature.stub(:is_enabled).and_return(true)
       end
 
       it 'should return false without is_filing_as_head_of_household' do

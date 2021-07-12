@@ -1038,15 +1038,13 @@ module FinancialAssistance
     def create_verification_docs
       family_id = application.family_id
       family_record = Family.where(id: family_id.to_s).first
-      if FinancialAssistanceRegistry.feature_enabled?(:verification_type_income_verification)
-        if family_record.present? && self.incomes.blank? && self.family_member_id.present?
-          family_member_record = family_record.family_members.where(_id: family_member_id.to_s).first
-          return if family_member_record.blank?
-          person_record = family_member_record.person
-          return if person_record.blank?
-          person_record.add_new_verification_type('Income')
-        end
-      end
+      return unless FinancialAssistanceRegistry.feature_enabled?(:verification_type_income_verification)
+      return unless family_record.present? && self.incomes.blank? && self.family_member_id.present?
+      family_member_record = family_record.family_members.where(_id: family_member_id.to_s).first
+      return if family_member_record.blank?
+      person_record = family_member_record.person
+      return if person_record.blank?
+      person_record.add_new_verification_type('Income')
     end
 
     def date_ranges_overlap?(range_a, range_b)
