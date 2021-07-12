@@ -20,6 +20,12 @@ class SamlController < ApplicationController
       if oim_user.present?
         oim_user.idp_verified = true
         oim_user.oim_id = response.name_id
+
+        unless oim_user.valid?
+          log("ERROR: #{oim_user.errors.messages}", {:severity => "error"})
+          return redirect_to URI.parse(SamlInformation.iam_login_url).to_s, flash: {error: "Invalid User Details."}
+        end
+
         oim_user.save!
         ::IdpAccountManager.update_navigation_flag(
           oim_user.oim_id,

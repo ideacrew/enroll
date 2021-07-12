@@ -2,6 +2,7 @@ class QualifyingLifeEventKind
   include Mongoid::Document
   include Mongoid::Timestamps
   include Config::AcaModelConcern
+  include Config::SiteConcern
   include AASM
 
   # Model Changes to support IVL needs

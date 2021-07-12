@@ -1,45 +1,46 @@
 class GenerateDcSite < Mongoid::Migration
   def self.up
-    if Settings.site.key.to_s == "dc"
-      say_with_time("Creating DC Site") do
-        @site = BenefitSponsors::Site.new(
-            site_key: :dc,
-            byline: "DC's Online Health Insurance Marketplace",
-            short_name: "DC Health Link",
-            domain_name: "https://enroll.dchealthlink.com",
-            long_name: "DC Health Exchange Benefit")
-        # TODO check on domain_name & long_name
+    say_with_time("Creating Site") do
+      @site = BenefitSponsors::Site.new(
+          site_key: EnrollRegistry[:enroll_app].setting(:site_key).item,
+          byline: EnrollRegistry[:enroll_app].setting(:byline).item,
+          short_name: EnrollRegistry[:enroll_app].setting(:short_name).item,
+          domain_name: EnrollRegistry[:enroll_app].setting(:domain_name).item,
+          long_name: EnrollRegistry[:enroll_app].setting(:long_name).item)
+      # TODO check on domain_name & long_name
 
-        @old_org = Organization.unscoped.exists(hbx_profile: true).first
-        @old_profile = @old_org.hbx_profile
+      @old_org = Organization.unscoped.exists(hbx_profile: true).first
+      @old_profile = @old_org.hbx_profile
 
-        new_profile = initialize_hbx_profile
-        owner_organization = initialize_exempt_organization(new_profile)
-        owner_organization.save!
+      new_profile = initialize_hbx_profile
+      owner_organization = initialize_exempt_organization(new_profile)
+      owner_organization.save!
 
-        update_hbx_staff_roles(new_profile) # updates person hbx_staff_role with new profile id
-        @site.owner_organization = owner_organization
-      end
+      update_hbx_staff_roles(new_profile) # updates person hbx_staff_role with new profile id
+      @site.owner_organization = owner_organization
+    end
 
-      say_with_time("Creating DC ACA SHOP Benefit Market") do
+    say_with_time("Creating ACA SHOP Benefit Market") do
+      if EnrollRegistry.feature_enabled?(:aca_shop_market) 
         inital_app_config = BenefitMarkets::Configurations::AcaShopInitialApplicationConfiguration.new
         renweal_app_config = BenefitMarkets::Configurations::AcaShopRenewalApplicationConfiguration.new
         configuration = BenefitMarkets::Configurations::AcaShopConfiguration.new initial_application_configuration: inital_app_config,
                                                                                  renewal_application_configuration: renweal_app_config,
                                                                                  binder_due_dom: 12
         @benefit_market = BenefitMarkets::BenefitMarket.new kind: :aca_shop,
-                                                            site_urn: 'dc',
+                                                            site_urn: EnrollRegistry[:enroll_app].setting(:site_key).item,
                                                             title: 'ACA SHOP',
-                                                            description: 'DC ACA Shop Market',
+                                                            description: "#{EnrollRegistry[:enroll_app].setting(:site_key).item} ACA Shop Market",
                                                             configuration: configuration
 
         # TODO Need to verify whether to create new configuartion for congress (or) use shop configuration
         @congress_benefit_market = BenefitMarkets::BenefitMarket.new kind: :fehb,
-                                                            site_urn: 'dc',
+                                                            site_urn: EnrollRegistry[:enroll_app].setting(:site_key).item,
                                                             title: 'ACA SHOP',
-                                                            description: 'DC ACA Shop Market',
+                                                            description: "#{EnrollRegistry[:enroll_app].setting(:site_key).item} ACA Shop Market",
                                                             configuration: configuration
       end
+    end
 
       @site.benefit_markets = [@benefit_market, @congress_benefit_market]
 
@@ -65,18 +66,14 @@ class GenerateDcSite < Mongoid::Migration
         puts @congress_benefit_market.configuration.errors.full_messages.inspect
       end
     else
-      say "Skipping for non-DC site"
+      say "Skipping for SHOP site"
     end
   end
 
   def self.down
-    if Settings.site.key.to_s == "dc"
-      ::BenefitSponsors::Organizations::Organization.hbx_profiles.delete_all
-      ::BenefitSponsors::Site.where(site_key: :dc).delete_all
-      ::BenefitMarkets::BenefitMarket.all.delete_all
-    else
-      say "Skipping for non-DC site"
-    end
+    ::BenefitSponsors::Organizations::Organization.hbx_profiles.delete_all
+    ::BenefitSponsors::Site.where(site_key: EnrollRegistry[:enroll_app].setting(:site_key).item).delete_all
+    ::BenefitMarkets::BenefitMarket.all.delete_all
   end
 
   def self.sanitize_hbx_params

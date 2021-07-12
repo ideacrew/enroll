@@ -11,6 +11,8 @@ module Forms
     include ::Forms::PeopleNames
     include ::Forms::ConsumerFields
     include ::Forms::SsnField
+    include ActionView::Helpers::TranslationHelper
+    include L10nHelper
     RELATIONSHIPS = ::PersonRelationship::Relationships + ::BenefitEligibilityElementGroup::INDIVIDUAL_MARKET_RELATIONSHIP_CATEGORY_KINDS
     #include ::Forms::DateOfBirthField
     #include Validations::USDate.on(:date_of_birth)
@@ -29,6 +31,7 @@ module Forms
     validates_presence_of :dob
     validates_inclusion_of :relationship, :in => RELATIONSHIPS.uniq, :allow_blank => nil, message: ""
     validate :relationship_validation
+    validate :verify_unique_dependent
     validate :consumer_fields_validation
     validate :ssn_validation
 
@@ -91,9 +94,7 @@ module Forms
       if existing_inactive_family_member
         self.id = existing_inactive_family_member.id
         existing_inactive_family_member.reactivate!(self.relationship)
-        existing_inactive_family_member.save!
-        family.save!
-        return true
+        return true if family.save && existing_inactive_family_member.save
       end
       existing_person = Person.match_existing_person(self)
       if existing_person
@@ -104,10 +105,24 @@ module Forms
           family_member.build_resident_role(family_member)
         end
         assign_person_address(existing_person)
-        family_member.save!
-        family.save!
         self.id = family_member.id
-        return true
+        # RE exception: Updating the path 'households.0.coverage_households' would create a conflict at 'households.0.coverage_households'
+        # This will cover the use case of attempting to save a family member which has duplicate family members
+        # with coverage household members, HBX enrollment members, etc.
+        # will not allow the family member to be saved if thoses duplicate issues are for a current enrollment.
+        duplicate_family_members = family.family_members.where(person_id: existing_person.id)
+        duplicate_family_member_ids = duplicate_family_members.pluck(:id)
+        if duplicate_family_members && family.duplicate_enr_members_or_tax_members_present?(duplicate_family_member_ids)
+          Rails.logger.warn(
+            "Cannot remove the duplicate members as they are present on enrollments/tax households." \
+            " Issue occurs on person HBX_ID #{existing_person.hbx_id} from Family with ID #{family.id}."
+          )
+          return [false, l10n('insured.family_members.duplicate_error_message', action: "remove", contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item)]
+        else
+          family.remove_duplicate_members(duplicate_family_member_ids)
+          family.reload
+        end
+        return true if family_member.save && family.save
       end
       person = Person.new(extract_person_params)
       return false unless try_create_person(person)
@@ -119,9 +134,8 @@ module Forms
       end
       assign_person_address(person)
       family.save_relevant_coverage_households
-      family.save!
       self.id = family_member.id
-      true
+      return true if family.save
     end
 
     def try_create_person(person)
@@ -299,13 +313,11 @@ module Forms
       return false unless try_update_person(family_member.person)
       if attr["is_consumer_role"] == "true"
         family_member.family.build_consumer_role(family_member, attr["vlp_document_id"])
-        return false unless assign_person_address(family_member.person)
       elsif attr["is_resident_role"] == "true"
         family_member.family.build_resident_role(family_member)
       end
       family_member.update_relationship(relationship)
-      family_member.save!
-      true
+      family_member.save
     end
 
     def age_on(date)
@@ -317,6 +329,32 @@ module Forms
       end
     end
 
+    # TODO: This may have to also be in the family member model someday. Or applicant model,
+    # in the financial assistance engine. Who knows.
+    def verify_unique_dependent
+      # Only run on create
+      return if self.persisted?
+      return if family.blank? || family.family_members.blank?
+      new_dependent = self
+      # Don't use SSN in case there is no SSN
+      potential_duplicate_present = family.family_members.any? do |family_member|
+        family_member&.first_name == new_dependent.first_name &&
+          family_member&.last_name == new_dependent.last_name &&
+          family_member&.dob == new_dependent.dob
+      end
+      # Disabling rubocop because it seems like a guard clause changes behavior
+      # rubocop:disable Style/GuardClause
+      if potential_duplicate_present
+        # Manage Family Page Redirect
+        duplicate_message = l10n(
+          'insured.family_members.duplicate_error_message',
+          action: "add",
+          contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item
+        )
+        self.errors.add(:base, duplicate_message)
+      end
+      # rubocop:enable Style/GuardClause
+    end
 
     def relationship_validation
       return if family.blank? || family.family_members.blank?
@@ -330,3 +368,4 @@ module Forms
     end
   end
 end
+

@@ -220,6 +220,37 @@ class TaxHousehold
     aptc_available_amount_hash
   end
 
+  def total_aptc_available_amount
+    aptc_available_amount_by_member.present? ? aptc_available_amount_by_member.values.sum : 0
+  end
+
+  # Pass a list of tax_household_members and get amount of APTC available
+  def aptc_available_amount_for_enrollment(hbx_enrollment, plan, elected_aptc)
+    # APTC may be used only for Health, return 0 if plan.coverage_kind == "dental"
+    aptc_available_amount_hash_for_enrollment = {}
+
+    total_aptc_available_amount = total_aptc_available_amount_for_enrollment(hbx_enrollment)
+    elected_pct = total_aptc_available_amount > 0 ? (elected_aptc / total_aptc_available_amount.to_f) : 0
+    decorated_plan = UnassistedPlanCostDecorator.new(plan, hbx_enrollment)
+    hbx_enrollment.hbx_enrollment_members.each do |enrollment_member|
+      given_aptc = (aptc_available_amount_by_member[enrollment_member.applicant_id.to_s] || 0) * elected_pct
+      ehb_premium = decorated_plan.premium_for(enrollment_member) * plan.ehb
+      aptc_available_amount_hash_for_enrollment[enrollment_member.applicant_id.to_s] = if plan.kind == 'dental'
+                                                                                         0
+                                                                                       else
+                                                                                         [given_aptc, ehb_premium].min
+                                                                                       end
+    end
+    aptc_available_amount_hash_for_enrollment
+
+    # premium_total = as_dollars(policy.pre_amt_tot)
+    # given_aptc = as_dollars(policy.applied_aptc)
+    # max_aptc = as_dollars(premium_total * plan.ehb)
+    # correct_aptc = (given_aptc > max_aptc) ? max_aptc : given_aptc
+    # policy.applied_aptc = correct_aptc
+    # $70
+  end
+
   # Income sum of all tax filers in this Household for specified year
   def total_incomes_by_year
     applicant_links.inject({}) do |acc, per|

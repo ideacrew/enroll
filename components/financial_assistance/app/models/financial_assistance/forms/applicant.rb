@@ -27,6 +27,10 @@ module FinancialAssistance
       validates_presence_of :last_name, :allow_blank => nil
       validates_presence_of :gender, :allow_blank => nil
       validates_presence_of :dob
+      validates :ssn,
+                length: {minimum: 9, maximum: 9, message: " must be 9 digits"},
+                allow_blank: true,
+                numericality: true
       # validates_inclusion_of :relationship, :in => RELATIONSHIPS.uniq, :allow_blank => nil, message: ""
       validate :relationship_validation
       validate :consumer_fields_validation
@@ -184,9 +188,13 @@ module FinancialAssistance
 
       def relationship_validation
         return if relationship.blank?
-        relations = application.relationships.where(applicant_id: application.primary_applicant, :kind.in => ['spouse', 'life_partner'])
-        true_or_false = (relations.count > 1) || (relations.count == 1 && applicant_id.present? && ['spouse', 'life_partner'].include?(relationship) && applicant_id != relations.first.relative_id)
-        self.errors.add(:base, 'can not have multiple spouse or life partner') if true_or_false
+        primary_relations = application.relationships.where(applicant_id: application.primary_applicant.id, :kind.in => ['spouse', 'life_partner'])
+        if applicant
+          other_spouses = primary_relations.reject{ |r| r.relative_id == applicant.id }
+          self.errors.add(:base, "can not have multiple spouse or life partner") if ['spouse', 'life_partner'].include?(relationship) && !other_spouses.empty?
+        elsif ['spouse', 'life_partner'].include?(relationship) && primary_relations.count >= 1
+          self.errors.add(:base, "can not have multiple spouse or life partner")
+        end
       end
     end
   end

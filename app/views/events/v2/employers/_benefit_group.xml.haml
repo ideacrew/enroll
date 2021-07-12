@@ -6,12 +6,12 @@
     - if sponsored_benefit.present? && sponsored_benefit.latest_pricing_determination.present?
       %group_size= sponsored_benefit.latest_pricing_determination.group_size
       %participation_rate= sponsored_benefit.latest_pricing_determination.participation_rate
-  - if benefit_group.rating_area.present? && Settings.site.key.to_s == "cca"
+  - if benefit_group.rating_area.present? && EnrollRegistry[:enroll_app].setting(:site_key).item.to_s == "cca"
     %rating_area= benefit_group.rating_area.exchange_provided_code
   %elected_plans
     = render :partial => "events/v2/employers/elected_plan", :collection => elected_plans
   -#%federal_contributions= " " field not available in benefit group modal
-  - if Settings.site.key.to_s == "cca" && sponsored_benefit.single_plan_type? && sponsored_benefit._type != "BenefitSponsors::SponsoredBenefits::DentalSponsoredBenefit"
+  - if EnrollRegistry[:enroll_app].setting(:site_key).item.to_s == "cca" && sponsored_benefit.single_plan_type? && sponsored_benefit._type != "BenefitSponsors::SponsoredBenefits::DentalSponsoredBenefit"
     %composite_rating_tiers
       - pricing_deter = sponsored_benefit.latest_pricing_determination
       - pricing_deter.pricing_determination_tiers.each do |deter_tier|

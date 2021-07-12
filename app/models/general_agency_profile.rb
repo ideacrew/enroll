@@ -5,6 +5,7 @@ class GeneralAgencyProfile
   include AASM
   include AgencyProfile
   include Config::AcaModelConcern
+  include Config::SiteModelConcern
 
   # for market_kind
   MARKET_KINDS = individual_market_is_enabled? ? %W[individual shop both] : %W[shop]

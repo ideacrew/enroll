@@ -5,18 +5,37 @@ FactoryBot.define do
     sequence(:address_1, 1111) { |n| "#{n} Awesome Street" }
     sequence(:address_2, 111) { |n| "##{n}" }
     city { 'Boston' }
-    state { Settings.aca.state_abbreviation }
-    zip { '20024' }
-    county { 'Suffolk' } # Suffolk County zips: 02101 -> 02137
+    state { EnrollRegistry[:enroll_app].setting(:state_abbreviation).item}
+    zip { EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item }
+    county { EnrollRegistry[:enroll_app].setting(:contact_center_county).item } # Suffolk County zips: 02101 -> 02137
 
     # This address is in rating area RMA03 and has good issuer service area coverage
+    # TODO: Refactor this
     trait :cca_shop_baseline do
       kind      { 'work' }
       address_1 { '27 Reo Road' }
-      city      { 'Maynard' }
-      state     { Settings.aca.state_abbreviation }
-      zip       { '20024' }
-      county    { 'Middlesex' }
+      city      { EnrollRegistry[:enroll_app].setting(:contact_center_city).item }
+      state     { EnrollRegistry[:enroll_app].setting(:state_abbreviation).item }
+      zip       { EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item }
+      county    { EnrollRegistry[:enroll_app].setting(:contact_center_county).item }
+    end
+
+    trait :me_shop_baseline do
+      kind      { 'work' }
+      address_1 { '210 State St' }
+      city      { EnrollRegistry[:enroll_app].setting(:contact_center_city).item }
+      state     { EnrollRegistry[:enroll_app].setting(:state_abbreviation).item }
+      zip       { EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item }
+      county    { EnrollRegistry[:enroll_app].setting(:contact_center_county).item }
+    end
+
+    trait :maine_address do
+      kind      { 'work' }
+      address_1 { '210 State St' }
+      city      { EnrollRegistry[:enroll_app].setting(:contact_center_city).item }
+      state     { EnrollRegistry[:enroll_app].setting(:state_abbreviation).item }
+      zip       { EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item }
+      county    { EnrollRegistry[:enroll_app].setting(:contact_center_county).item }
     end
 
     trait :work_kind do

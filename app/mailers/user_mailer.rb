@@ -4,9 +4,11 @@ class UserMailer < ApplicationMailer
   add_template_helper Config::AcaHelper
   add_template_helper Config::SiteHelper
   add_template_helper Config::ContactCenterHelper
+  add_template_helper ::L10nHelper
   include Config::AcaHelper
   include Config::SiteHelper
   include Config::ContactCenterHelper
+  include ::L10nHelper
 
   def welcome(user)
     if user.email.present?
@@ -33,13 +35,14 @@ class UserMailer < ApplicationMailer
   end
 
   #Email will sent to census employees as soon as they are added to the roster
+  # TODO: Refactor this as feature with ResourceRegistry
   def send_employee_open_enrollment_invitation(email, census_employee, invitation)
     # TODO - Move logic to model
     benefit_applications = census_employee.benefit_sponsorship.benefit_applications.published.select{|ba| ba.effective_period.cover?(census_employee.earliest_effective_date)}
     if email.present? && benefit_applications.any?{|ba| ba.is_submitted?}
       if (census_employee.hired_on > TimeKeeper.date_of_record)
         mail({to: email, subject: "You Have Been Invited to Sign Up for Employer-Sponsored Coverage through the #{site_short_name}"}) do |format|
-          if Settings.site.key == :dc
+          if EnrollRegistry[:enroll_app].setting(:site_key).item
             format.html { render "dc_invite_future_employee_for_open_enrollment", :locals => { :census_employee => census_employee, :invitation => invitation }}
           else
             format.html { render "invite_future_employee_for_open_enrollment", :locals => { :census_employee => census_employee, :invitation => invitation }}
@@ -47,7 +50,7 @@ class UserMailer < ApplicationMailer
         end
       else
         mail({to: email, subject: "Enroll Now: Your Plan Open Enrollment Period has Begun"}) do |format|
-          if Settings.site.key == :dc
+          if EnrollRegistry[:enroll_app].setting(:site_key).item
             format.html { render "dc_invite_initial_employee_for_open_enrollment", :locals => { :census_employee => census_employee, :invitation => invitation }}
           else
             format.html { render "invite_initial_employee_for_open_enrollment", :locals => { :census_employee => census_employee, :invitation => invitation }}
@@ -73,9 +76,10 @@ class UserMailer < ApplicationMailer
     end
   end
 
+  # TODO: Figure out how to refactor this with ResourceRegistry
   def initial_employee_invitation_email(email, census_employee, invitation)
     mail({to: email, subject: "Enroll Now: Your Plan Open Enrollment Period has Begun"}) do |format|
-      if Settings.site.key == :dc
+      if EnrollRegistry[:enroll_app].setting(:site_key).item == :dc
         format.html { render "dc_initial_employee_invitation_email", :locals => { :census_employee => census_employee, :invitation => invitation }}
       else
         format.html { render "initial_employee_invitation_email", :locals => { :census_employee => census_employee, :invitation => invitation }}
@@ -153,7 +157,7 @@ class UserMailer < ApplicationMailer
   def generic_notice_alert_to_ba_and_ga(first_name, email, employer_name)
     return if email.blank?
 
-    message = mail({to: email, subject: "You have a new message from DC Health Link", from: 'no-reply@individual.dchealthlink.com'}) do |format|
+    mail({to: email, subject: "You have a new message from #{site_short_name}", from: "no-reply@individual.#{site_domain_name}"}) do |format|
       format.html {render "generic_notice_alert_to_broker_and_ga", locals: {first_name: first_name, employer_name: employer_name}}
     end
   end

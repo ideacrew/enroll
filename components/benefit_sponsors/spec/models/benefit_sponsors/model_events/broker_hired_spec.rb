@@ -5,9 +5,9 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerAgencyHiredConfirmation', db
   
   let!(:person) { create :person }
   let(:user)    { FactoryBot.create(:user, :person => person)}
-  let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key) }
+  let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, EnrollRegistry[:enroll_app].setting(:site_key).item) }
   let!(:organization_with_hbx_profile)  { site.owner_organization }
-  let!(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site) }
+  let!(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{EnrollRegistry[:enroll_app].setting(:site_key).item}_employer_profile".to_sym, site: site) }
   let!(:employer_profile)    { organization.employer_profile }
   let!(:benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
 
@@ -40,19 +40,19 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerAgencyHiredConfirmation', db
 
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.broker.broker_hired_notice_to_broker"
-          expect(payload[:event_object_kind]).to eq "BenefitSponsors::Organizations::AcaShop#{Settings.site.key.capitalize}EmployerProfile"
+          expect(payload[:event_object_kind]).to eq "BenefitSponsors::Organizations::AcaShop#{EnrollRegistry[:enroll_app].setting(:site_key).item.capitalize}EmployerProfile"
           expect(payload[:event_object_id]).to eq employer_profile.id.to_s
         end
 
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.broker_agency.broker_agency_hired_confirmation"
-          expect(payload[:event_object_kind]).to eq "BenefitSponsors::Organizations::AcaShop#{Settings.site.key.capitalize}EmployerProfile"
+          expect(payload[:event_object_kind]).to eq "BenefitSponsors::Organizations::AcaShop#{EnrollRegistry[:enroll_app].setting(:site_key).item.capitalize}EmployerProfile"
           expect(payload[:event_object_id]).to eq employer_profile.id.to_s
         end
         
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employer.broker_hired_confirmation_to_employer"
-          expect(payload[:event_object_kind]).to eq "BenefitSponsors::Organizations::AcaShop#{Settings.site.key.capitalize}EmployerProfile"
+          expect(payload[:event_object_kind]).to eq "BenefitSponsors::Organizations::AcaShop#{EnrollRegistry[:enroll_app].setting(:site_key).item.capitalize}EmployerProfile"
           expect(payload[:event_object_id]).to eq employer_profile.id.to_s
         end
 
@@ -81,7 +81,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerAgencyHiredConfirmation', db
       let(:template)  { Notifier::Template.new(data_elements: data_elements) }
       let(:payload) do
         {
-          "event_object_kind" => "BenefitSponsors::Organizations::AcaShop#{Settings.site.key.capitalize}EmployerProfile",
+          "event_object_kind" => "BenefitSponsors::Organizations::AcaShop#{EnrollRegistry[:enroll_app].setting(:site_key).item.capitalize}EmployerProfile",
           "event_object_id" => employer_profile.id
         }
       end
@@ -153,7 +153,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerAgencyHiredConfirmation', db
       let(:template)  { Notifier::Template.new(data_elements: data_elements) }
       let(:payload) do
         {
-          "event_object_kind" => "BenefitSponsors::Organizations::AcaShop#{Settings.site.key.capitalize}EmployerProfile",
+          "event_object_kind" => "BenefitSponsors::Organizations::AcaShop#{EnrollRegistry[:enroll_app].setting(:site_key).item.capitalize}EmployerProfile",
           "event_object_id" => employer_profile.id
         }
       end
@@ -223,7 +223,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerAgencyHiredConfirmation', db
       let(:template)  { Notifier::Template.new(data_elements: data_elements) }
       let(:payload) do
         {
-          "event_object_kind" => "BenefitSponsors::Organizations::AcaShop#{Settings.site.key.capitalize}EmployerProfile",
+          "event_object_kind" => "BenefitSponsors::Organizations::AcaShop#{EnrollRegistry[:enroll_app].setting(:site_key).item.capitalize}EmployerProfile",
           "event_object_id" => employer_profile.id
         }
       end

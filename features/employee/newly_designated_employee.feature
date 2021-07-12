@@ -3,6 +3,8 @@ Feature: Newly designated employees can purchase coverage only through renewing 
   Employee should be blocked from buying coverage under previous year plan year
 
 Background: Setup site, employer, and benefit application
+    Given the shop market configuration is enabled
+    Given all announcements are enabled for user to select
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for enrollment_open renewal employer with health benefits
     And there is an employer Acme Inc.

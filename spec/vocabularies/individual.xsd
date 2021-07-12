@@ -1553,7 +1553,7 @@
 			<xs:enumeration value="urn:openhbx:terms:v1:income#permanent_workers_compensation"/>
 			<xs:enumeration value="urn:openhbx:terms:v1:income#prizes_and_awards"/>
 			<xs:enumeration value="urn:openhbx:terms:v1:income#rental_and_royalty"/>
-			<xs:enumeration value="urn:openhbx:terms:v1:income#scholorship_payments"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:income#scholarship_payments"/>
 			<xs:enumeration value="urn:openhbx:terms:v1:income#social_security_benefit"/>
 			<xs:enumeration value="urn:openhbx:terms:v1:income#social_security_disability_income"/>
 			<xs:enumeration value="urn:openhbx:terms:v1:income#social_security_retirement"/>

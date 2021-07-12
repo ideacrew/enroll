@@ -59,8 +59,9 @@ class ApplicationController < ActionController::Base
   def bad_token_due_to_session_expired
     flash[:warning] = "Session expired."
     respond_to do |format|
-      format.html { redirect_to root_path}
-      format.js   { render text: "window.location.assign('#{root_path}');"}
+      format.html { redirect_to root_path }
+      format.js   { render plain: "window.location.assign('#{root_path}');" }
+      format.json { render json: { :token_expired => root_url }, status: :unauthorized }
     end
   end
 
@@ -94,6 +95,10 @@ class ApplicationController < ActionController::Base
   end
 
   private
+
+  def redirect_if_prod
+    redirect_to root_path, :flash => { :error => "Unable to run seeds on prod environment." } unless ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true' || !Rails.env.production?
+  end
 
     def strong_params
       params.permit!

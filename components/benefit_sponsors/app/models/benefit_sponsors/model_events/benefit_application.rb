@@ -139,9 +139,8 @@ module BenefitSponsors
           #initial employers misses binder payment deadline
           scheduler = BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
           binder_next_day = scheduler.calculate_open_enrollment_date(false, TimeKeeper.date_of_record.next_month.beginning_of_month)[:binder_payment_due_date].next_day
-          if  Settings.site.key == :dc && new_date.day == Settings.aca.shop_market.initial_application.non_binder_paid_notice_day_of_month
-            is_initial_employer_no_binder_payment_received = true
-          elsif Settings.site.key == :cca && new_date.day == binder_next_day
+
+          if (Settings.site.key == :cca && new_date.day == binder_next_day) || ([:dc, :me].include?(Settings.site.key) && new_date.day == Settings.aca.shop_market.initial_application.non_binder_paid_notice_day_of_month)
             is_initial_employer_no_binder_payment_received = true
           end
 

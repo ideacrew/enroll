@@ -45,8 +45,8 @@
         <% end %>
       </tr>
 
-      <% if qhps.map(&:product).map(&:benefit_market_kind) == :aca_individual %>
-        <% if qhps.map(&:product).map(&:nationwide).compact.uniq.include?(true) %>
+      <% if qhps.map(&:product).compact.map(&:benefit_market_kind) == :aca_individual %>
+        <% if qhps.map(&:product).compact.map(&:nationwide).compact.uniq.include?(true) %>
           <tr>
             <th></th>
             <% qhps.each do |qhp| %>
@@ -62,7 +62,7 @@
         <%= render partial: "shared/plan_shoppings/provider_directory_url", locals: {qhps: qhps} %>
       <% end %>
 
-      <% if qhps.map(&:plan).map(&:rx_formulary_url).compact.present? %>
+      <% if qhps.map(&:plan).compact.map(&:rx_formulary_url).compact.present? %>
         <tr>
           <th></th>
           <% qhps.each do |qhp|%>

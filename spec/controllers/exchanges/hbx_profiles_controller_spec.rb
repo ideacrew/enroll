@@ -713,7 +713,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     let(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, site: site)}
     let(:employer_profile) {organization.employer_profile}
 
-    let(:profile_valid_params) {{resource_id: employer_profile.id, subject: 'test', body: 'test', actions_id: '1234', resource_name: employer_profile.class.to_s}}
+    let(:profile_valid_params) {{resource_id: person.id, subject: 'test', body: 'test', actions_id: '1234', resource_name: person.class.to_s}}
     let(:person_valid_params) {{resource_id: person.id, subject: 'test', body: 'test', actions_id: '1234', resource_name: person.class.to_s}}
 
     let(:invalid_params) {{resource_id: employer_profile.id, subject: '', body: '', actions_id: '1234', resource_name: employer_profile.class.to_s}}
@@ -818,6 +818,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     before do
       allow(employee_role.census_employee).to receive(:employer_profile).and_return(abc_profile)
       allow(person).to receive(:employee_roles).and_return([employee_role])
+      EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
     end
 
     it "should render back to edit_enrollment if there is a validation error on save" do
@@ -926,7 +927,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
     context "when GA is enabled in settings" do
       before do
-        allow(Settings.aca).to receive(:general_agency_enabled).and_return(true)
+        EnrollRegistry[:general_agency].feature.stub(:is_enabled).and_return(true)
         Enroll::Application.reload_routes!
       end
       it "should returns http success" do
@@ -942,7 +943,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
     context "when GA is disabled in settings" do
       before do
-        allow(Settings.aca).to receive(:general_agency_enabled).and_return(false)
+        EnrollRegistry[:general_agency].feature.stub(:is_enabled).and_return(false)
         Enroll::Application.reload_routes!
       end
       it "should returns http success" do
@@ -952,6 +953,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
   end
 
   describe "POST reinstate_enrollment", :dbclean => :around_each do
+    render_views
     let(:user) { FactoryBot.create(:user, roles: ["hbx_staff"]) }
     let!(:person) { FactoryBot.create(:person)}
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
@@ -973,7 +975,8 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     it "should redirect to root path" do
       post :reinstate_enrollment, params: {enrollment_id: enrollment.id}, format: :js, xhr: true
       expect(response).to have_http_status(:success)
-      expect(response).to redirect_to(exchanges_hbx_profiles_root_path)
+      expect(response).to render_template("reinstate_enrollment")
+      expect(response.body).to have_content(/Enrollment Reinstated successfully/i)
     end
   end
 
@@ -1251,6 +1254,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
   end
 
   describe "POST update_enrollment_termianted_on_date", :dbclean => :around_each do
+    render_views
     let(:user) { FactoryBot.create(:user, roles: ["hbx_staff"]) }
     let!(:person) { FactoryBot.create(:person)}
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
@@ -1276,10 +1280,12 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
     context "shop enrollment" do
       context "with valid params" do
+
         it "should render template " do
           post :update_enrollment_termianted_on_date, params: {enrollment_id: enrollment.id.to_s, family_actions_id: family.id, new_termination_date: TimeKeeper.date_of_record.to_s}, format: :js, xhr: true
           expect(response).to have_http_status(:success)
-          expect(response).to redirect_to(exchanges_hbx_profiles_root_path)
+          expect(response).to render_template("update_enrollment_termianted_on_date")
+          expect(response.body).to have_content(/Enrollment Updated Successfully/i)
         end
 
         context "enrollment that already terminated with past date" do
@@ -1326,7 +1332,8 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
         it "should render template " do
           post :update_enrollment_termianted_on_date, params: {enrollment_id: enrollment.id.to_s, family_actions_id: family.id, new_termination_date: TimeKeeper.date_of_record.to_s}, format: :js, xhr: true
           expect(response).to have_http_status(:success)
-          expect(response).to redirect_to(exchanges_hbx_profiles_root_path)
+          expect(response).to render_template("update_enrollment_termianted_on_date")
+          expect(response.body).to have_content(/Enrollment Updated Successfully/i)
         end
 
         context "enrollment that already terminated with past date" do
@@ -1360,7 +1367,6 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       it "should redirect to root path" do
         post :update_enrollment_termianted_on_date, params: {enrollment_id: '', family_actions_id: '', new_termination_date: ''}, format: :js, xhr: true
         expect(response).to have_http_status(:success)
-        expect(response).to redirect_to(exchanges_hbx_profiles_root_path)
       end
     end
 

@@ -4,6 +4,7 @@ Feature: Broker creates a quote for a prospect employer
     And Generate a quote
 
   Background: Set up employer, broker and their relationship
+    Given the shop market configuration is enabled
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for enrollment_open renewal employer with health benefits
     And the Plans exist

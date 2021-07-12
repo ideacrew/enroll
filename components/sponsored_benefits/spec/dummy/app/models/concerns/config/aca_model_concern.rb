@@ -1,3 +1,7 @@
+# frozen_string_literal: true
+
+# rubocop:disable Style/ClassVars
+
 module Config::AcaModelConcern
   extend ActiveSupport::Concern
 
@@ -80,7 +84,7 @@ module Config::AcaModelConcern
     end
 
     def general_agency_enabled?
-      @@genearl_agency_enabled ||= Settings.aca.general_agency_enabled
+      @@genearl_agency_enabled ||= EnrollRegistry.feature_enabled?(:general_agency)
     end
 
     def broker_carrier_appointments_enabled?
@@ -92,7 +96,7 @@ module Config::AcaModelConcern
     end
 
     def market_rating_areas
-      @@market_rating_areas ||= Settings.aca.rating_areas
+      @@market_rating_areas ||= ::EnrollRegistry[:rating_area].setting(:areas).item
     end
 
     def multiple_market_rating_areas?
@@ -168,3 +172,6 @@ module Config::AcaModelConcern
     end
   end
 end
+
+# rubocop:enable Style/ClassVars
+

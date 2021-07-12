@@ -165,13 +165,15 @@ module BenefitSponsors
           profile_factory_class.call(valid_employer_params)
         end
 
+        let(:site_key) { EnrollRegistry[:enroll_app].setting(:site_key).item }
+
         it 'should create general organization with given fein' do
           expect(profile_factory.organization.class).to eq BenefitSponsors::Organizations::GeneralOrganization
           expect(profile_factory.organization.fein).to eq fein
         end
 
         it 'should create benefit sponsor profile' do
-          expect(profile_factory.profile.class).to eq "BenefitSponsors::Organizations::AcaShop#{Settings.site.key.capitalize}EmployerProfile".constantize
+          expect(profile_factory.profile.class).to eq "BenefitSponsors::Organizations::AcaShop#{site_key.capitalize}EmployerProfile".constantize
         end
 
         it 'should create person with given data' do
@@ -242,7 +244,7 @@ module BenefitSponsors
           let(:profile_factory)           { profile_factory_class.call(invalid_broker_params) }
 
           it 'should throw an error' do
-            expect(profile_factory.errors.messages[:organization].first).to match /npn/i
+            expect(profile_factory.errors.messages[:organization].first).to match(/npn/i)
           end
         end
       end
@@ -256,6 +258,10 @@ module BenefitSponsors
         end
 
         let(:profile_factory) { profile_factory_class.call(valid_ga_params) }
+
+        before do
+          BenefitSponsors::Organizations::GeneralAgencyProfile::MARKET_KINDS << :shop
+        end
 
         it 'should create general organization' do
           expect(profile_factory.organization.class).to eq BenefitSponsors::Organizations::GeneralOrganization
@@ -295,10 +301,11 @@ module BenefitSponsors
         let(:new_organization_name) { "Texas Tech Agency" }
         let(:office_location) { abc_organization.employer_profile.primary_office_location }
         let(:broker_agency_profile) { abc_organization.profiles.first }
-        let(:plan_design_organization) { FactoryBot.create(:sponsored_benefits_plan_design_organization,
-          owner_profile_id: employer_profile.id,
-          sponsor_profile_id: broker_agency_profile.id
-        )}
+        let(:plan_design_organization) do
+          FactoryBot.create(:sponsored_benefits_plan_design_organization,
+                            owner_profile_id: employer_profile.id,
+                            sponsor_profile_id: broker_agency_profile.id)
+        end
         let!(:update_plan_design) {plan_design_organization.update_attributes!(has_active_broker_relationship: true)}
 
         let(:valid_employer_params_update) do
@@ -556,7 +563,10 @@ module BenefitSponsors
 
         let!(:profile_factory) { profile_factory_class.call(valid_ga_params_update) }
 
-        before { general_agency.reload }
+        before do
+          BenefitSponsors::Organizations::GeneralAgencyProfile::MARKET_KINDS << :shop
+          general_agency.reload
+        end
 
         it 'should update broker organization legal name' do
           expect(general_agency.legal_name).to eq new_organization_name

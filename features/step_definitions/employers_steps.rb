@@ -322,7 +322,9 @@ When(/^(.*?) go[es]+ to the benefits tab I should see plan year information$/) d
   visit  benefit_sponsors.profiles_employers_employer_profile_path(profile.id, :tab=>'benefits')
 end
 
-When(/^I go to MY Health Connector tab$/) do
+# Generic name for step for all versions of site
+# actual tab will be "My Health Connector" (with "Health Connector" referring to site sshort name)
+When(/^I go to my health tab$/) do
  find('.interaction-click-control-my-health-connector').click
  wait_for_ajax
   expect(page).to have_content('My Health Benefits Program')
@@ -540,7 +542,7 @@ Given(/^(.*?) employer is on Employee Roster page$/) do |legal_name|
 end
 
 Then(/^employer should (.*?) bulk actions dropdown in (.*?)$/) do |action, state|
-  if action == 'not see' && state == 'DC'
+  if action == 'not see'
     expect(page).not_to have_content('Bulk Actions')
   else
     expect(page).to have_content('Bulk Actions')
@@ -702,6 +704,7 @@ end
 Then("employer updates open enrollment end date to {int}") do |int|
   current_oe_date = @new_application.open_enrollment_period.max
   new_oe_date = Date.new(current_oe_date.year, current_oe_date.month, int).to_s
+  sleep 5
   fill_in 'benefit_application[open_enrollment_end_on]', :with => new_oe_date
 end
 
@@ -1079,18 +1082,16 @@ end
 
 
 And(/^employer should see default cobra start date$/) do
-  terminated_on = @census_employees.first.employment_terminated_on.next_month.beginning_of_month.to_s
+  terminated_on = @census_employees.first.suggested_cobra_effective_date.to_s
   expect(find('input.text-center.date-picker').value).to eq terminated_on
 end
 
-And(/^employer sets cobra start date to two months after termination date$/) do
-  date = @census_employees.first.employment_terminated_on + 2.months
-  page.execute_script("$('.datepicker').val(#{date.to_s})")
+And(/^employer sets cobra start date to two months before termination date$/) do
+  find('.text-center.date-picker').fill_in with: 2.months.ago.strftime('%m/%d/%Y')
 end
 
-And(/^employer sets cobra start date to two months before termination date$/) do
-  date = @census_employees.first.employment_terminated_on - 2.months
-  find('input.text-center.date-picker').set date
+And(/^employer accepts the suggested cobra date$/) do
+  # Nothing to do here, suggeste date is hardcoded
 end
 
 When(/^EnterPrise Limited employer clicks on Initiate COBRA button$/) do

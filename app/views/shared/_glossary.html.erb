@@ -1,0 +1,29 @@
+<span class="glossary" 
+      data-toggle="popover" 
+      data-placement="auto top" 
+      data-trigger="click focus" 
+      data-boundary="window" 
+      data-fallbackPlacement="flip" 
+      data-html="true" 
+      data-content="<%= l10n("glossary.#{key}") %>" 
+      data-title='<%= local_assigns[:title] || local_assigns[:term] %>'>
+  <button data-dismiss='modal'
+          type='button' 
+          class='close' 
+          aria-label='Close' 
+          onclick='$('.glossary').popover('hide');'>
+  </button>
+  <%= term %>
+</span>
+
+<script>
+$(document).click(function(e){
+  if (e.target.className == 'glossary') {
+    e.preventDefault();
+    $('.glossary').not($(e.target)).popover('hide');
+  }
+  else if (!$(e.target).parents('.popover').length) {
+    $('.glossary').popover('hide');
+  }
+});
+</script>

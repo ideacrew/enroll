@@ -766,8 +766,8 @@ class CensusEmployee < CensusMember
   end
 
   def fetch_all_enrollments(employment_terminated_on)
-    term_eligible_active_enrollments = active_benefit_group_enrollments(employment_terminated_on).show_enrollments_sans_canceled.non_terminated if active_benefit_group_enrollments(employment_terminated_on).present?
-    term_eligible_renewal_enrollments = renewal_benefit_group_enrollments(employment_terminated_on).show_enrollments_sans_canceled.non_terminated if renewal_benefit_group_enrollments(employment_terminated_on).present?
+    term_eligible_active_enrollments = active_benefit_group_enrollments.show_enrollments_sans_canceled.non_terminated if active_benefit_group_enrollments.present?
+    term_eligible_renewal_enrollments = renewal_benefit_group_enrollments.show_enrollments_sans_canceled.non_terminated if renewal_benefit_group_enrollments.present?
     term_eligible_off_cycle_enrollments = off_cycle_benefit_group_enrollments.show_enrollments_sans_canceled.non_terminated if off_cycle_benefit_group_enrollments.present?
     term_eligible_reinstated_enrollments = reinstated_benefit_group_enrollments.show_enrollments_sans_canceled.non_terminated if reinstated_benefit_group_enrollments.present?
     expired_benefit_group_assignment = benefit_group_assignments.sort_by(&:created_at).select{ |bga| (bga.benefit_group.start_on..bga.benefit_group.end_on).include?(coverage_terminated_on) && bga.plan_year.aasm_state == :expired}.last
@@ -1061,23 +1061,22 @@ class CensusEmployee < CensusMember
       ]
 
       CSV.generate(headers: true) do |csv|
-        csv << (["#{Settings.site.long_name} Employee Census Template"] +  6.times.collect{ "" } + [Date.new(2016,10,26)] + 5.times.collect{ "" } + ["1.1"])
-        csv << %w(employer_assigned_family_id employee_relationship last_name first_name  middle_name name_sfx  email ssn dob gender  hire_date termination_date  is_business_owner benefit_group plan_year kind  address_1 address_2 city  state zip)
+        csv << (["#{Settings.site.long_name} Employee Census Template"] + 6.times.collect{ "" } + [] + 5.times.collect{ "" } + [])
+        csv << %w[employer_assigned_family_id employee_relationship last_name first_name middle_name name_sfx email ssn dob gender hire_date termination_date is_business_owner benefit_group plan_year kind address_1 address_2 city state zip]
         csv << columns
         census_employees_query_criteria(employer_profile_id).each do |rec|
           is_active = rec["benefit_group_assignments"].present? ? rec["benefit_group_assignments"].any?{|bga| (bga["start_on"]..bga["end_on"]).cover?(TimeKeeper.date_of_record)} : false
           csv << insert_census_data(rec, is_active)
 
-          if rec["census_dependents"].present?
-            rec["census_dependents"].each do |dependent|
-              csv << insert_census_data(dependent, is_active)
-            end
+          next unless rec["census_dependents"].present?
+          rec["census_dependents"].each do |dependent|
+            csv << insert_census_data(dependent, is_active)
           end
         end
       end
     end
 
-    def insert_census_data(rec, is_active)
+    def insert_census_data(rec, _is_active)
       values = [
         rec["employer_assigned_family_id"],
         relationship_mapping[rec["employee_relationship"]],
@@ -1091,33 +1090,35 @@ class CensusEmployee < CensusMember
         rec["gender"]
       ]
 
-      if is_active
-        if rec["hired_on"].present?
-          values += [
-            rec["hired_on"].present? ? rec["hired_on"].strftime("%m/%d/%Y") : "",
-            rec["employment_terminated_on"].present? ? rec["employment_terminated_on"].strftime("%m/%d/%Y") : "",
-            rec["is_business_owner"] ? "yes" : "no"
-          ]
-        else
-          values += ["", "", "no"]
-        end
-
-        values += 2.times.collect{ "" }
-        if rec["address"].present?
-          array = []
-          array.push(rec["address"]["kind"])
-          array.push(rec["address"]["address_1"])
-          array.push(rec["address"]["address_2"].to_s)
-          array.push(rec["address"]["city"])
-          array.push(rec["address"]["state"])
-          array.push(rec["address"]["zip"])
-          values += array
-        else
-          values += 6.times.collect{ "" }
-        end
-      end
-
+      # if is_active #is not optional anymore
+      values += if rec["hired_on"].present?
+                  [
+                      rec["hired_on"].present? ? rec["hired_on"].strftime("%m/%d/%Y") : "",
+                      rec["employment_terminated_on"].present? ? rec["employment_terminated_on"].strftime("%m/%d/%Y") : "",
+                      rec["is_business_owner"] ? "yes" : "no"
+                    ]
+                else
+                  ["", "", "no"]
+                end
+      values += 2.times.collect{ "" }
+      values += insert_census_employees_address(rec)
       values
+      # end
+    end
+
+    def insert_census_employees_address(rec)
+      if rec["address"].present?
+        array = []
+        array.push(rec["address"]["kind"])
+        array.push(rec["address"]["address_1"])
+        array.push(rec["address"]["address_2"].to_s)
+        array.push(rec["address"]["city"])
+        array.push(rec["address"]["state"])
+        array.push(rec["address"]["zip"])
+        array
+      else
+        6.times.collect{ "" }
+      end
     end
 
     def relationship_mapping
@@ -1536,25 +1537,31 @@ class CensusEmployee < CensusMember
     employment_terminated_on <= effective_period.max
   end
 
-  # Enrollments with current active and renewal benefit applications
-  def active_benefit_group_enrollments(coverage_date = TimeKeeper.date_of_record)
-    return nil if employee_role.blank?
-
-    HbxEnrollment.where(
-      {
-        :sponsored_benefit_package_id.in => [active_benefit_group(coverage_date).try(:id)].compact,
-        :employee_role_id => self.employee_role_id,
-        :aasm_state.ne => "shopping"
-      }
-    ) || []
+  def active_benefit_application
+    active_benefit_group_assignment&.benefit_package&.benefit_application
   end
 
-  def renewal_benefit_group_enrollments(coverage_date = nil)
+  def renewal_benefit_application
+    renewal_benefit_group_assignment&.benefit_package&.benefit_application
+  end
+
+  # Enrollments with current active and renewal benefit applications
+  def active_benefit_group_enrollments
+    return nil if active_benefit_application.blank?
+    enrollments_under_benefit_application(active_benefit_application)
+  end
+
+  def renewal_benefit_group_enrollments
+    return nil if renewal_benefit_application.blank?
+    enrollments_under_benefit_application(renewal_benefit_application)
+  end
+
+  def enrollments_under_benefit_application(benefit_application)
     return nil if employee_role.blank?
 
     HbxEnrollment.where(
       {
-        :sponsored_benefit_package_id.in => [renewal_published_benefit_group(coverage_date).try(:id)].compact,
+        :sponsored_benefit_package_id.in => benefit_application.benefit_packages.map(&:id).compact,
         :employee_role_id => self.employee_role_id,
         :aasm_state.ne => "shopping"
       }
@@ -1598,8 +1605,8 @@ class CensusEmployee < CensusMember
 
   # Picking latest health & dental enrollments
   def active_benefit_group_cobra_eligible_enrollments
-    return [] if active_benefit_group_enrollments(employment_terminated_on).blank?
-    eligible_enrollments = active_benefit_group_enrollments(employment_terminated_on).non_cobra.enrollments_for_cobra
+    return [] if active_benefit_group_enrollments.blank?
+    eligible_enrollments = active_benefit_group_enrollments.non_cobra.enrollments_for_cobra
     [eligible_enrollments.by_health.first, eligible_enrollments.by_dental.first].compact
   end
 

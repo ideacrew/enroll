@@ -49,7 +49,6 @@ module Operations
           person.save!
         else
           return Success(person) if no_infomation_changed?({params: {attributes_hash: person_entity, person: person}})
-
           person.assign_attributes(person_entity.except(:addresses, :phones, :emails, :hbx_id))
           person.save!
           create_or_update_associations(person, person_entity.to_h, :addresses)
@@ -70,6 +69,7 @@ module Operations
           address_matched = person.send(assoc).detect {|adr| adr.kind == attrs[:kind]}
           if address_matched
             address_matched.update(attrs)
+            person.save!
           else
             person.send(assoc).create(attrs)
           end

@@ -124,9 +124,19 @@ describe Announcement, dbclean: :after_each do
     context "get_announcements_by_portal" do
       let(:person) { FactoryBot.create(:person) }
       let(:user) { FactoryBot.create(:user, person: person) }
+
+      def Announcement.current_msg_for_employee
+        Announcement.current.by_audience('Employee').map(&:content)
+      end
+
+      def Announcement.current_msg_for_employer
+        Announcement.current.by_audience('Employer').map(&:content)
+      end
+
       before :each do
         Announcement.destroy_all
-        Announcement::AUDIENCE_KINDS.each do |kind|
+        Announcement::AUDIENCE_KINDS << ['Employer', 'Employee']
+        Announcement::AUDIENCE_KINDS.flatten.each do |kind|
           FactoryBot.create(:announcement, content: "msg for #{kind}", audiences: [kind])
         end
       end

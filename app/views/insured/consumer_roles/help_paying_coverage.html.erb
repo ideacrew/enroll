@@ -9,7 +9,9 @@
         <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 bottom-pd">
           <div class="bottom-pd">
             <h2 class="darkblue">Your Application for Premium Reductions</h2>
-            <p><b>You can get help paying for coverage if you qualify.</b><span class="run-glossary"> If you don’t qualify for monthly premium reductions and lower out-of-pocket costs, we’ll also check if you likely qualify for Medicaid.</span></p>
+            <p><b>You can get help paying for coverage if you qualify.</b><span> If you don’t qualify for monthly <%= render partial:"shared/glossary", locals: {key: "Premium", title: "Premium", term: "premium" } %> reductions and lower
+            <%= render partial:"shared/glossary", locals: {key: "Out_of_Pocket_Costs", title: "Out-of-Pocket Costs", term: " out-of-pocket costs" } %>, we’ll also check if you likely qualify for
+            <%= render partial:"shared/glossary", locals: {key: "medicaid", term: " Medicaid" } %></p>
 
             <p class="memo">* = required field</p>
 

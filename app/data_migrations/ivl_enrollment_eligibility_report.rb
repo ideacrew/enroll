@@ -4,11 +4,12 @@ require File.join(Rails.root, 'lib/mongoid_migration_task')
 class IvlEnrollmentEligibilityReport < MongoidMigrationTask
 
   # Use same criteria as final_eligibility_notice_report_unassisted
-  def is_dc_resident(person)
+  def is_state_resident(person)
     return person.no_dc_address_reason.present? if person.no_dc_address
     return false if person.addresses.blank?
     address_to_use = person.addresses.map(&:kind).flatten.compact.include?('home') ? 'home' : 'mailing'
-    person.addresses.where(kind: address_to_use, state: 'DC').present?
+    state_abbreviation = EnrollRegistry[:enroll_app].setting(:state_abbreviation).item
+    person.addresses.where(kind: address_to_use, state: state_abbreviation).present?
   end
 
   # Checks if any applied_aptc_amount is applied on enrollment or if the product is a CSR product
@@ -29,7 +30,7 @@ class IvlEnrollmentEligibilityReport < MongoidMigrationTask
 
         enrollment.hbx_enrollment_members.each do |member|
           person = member.person
-          resident = is_dc_resident(person) ? 'YES' : 'NO'
+          resident = is_state_resident(person) ? 'YES' : 'NO'
           incarcerated = person.is_incarcerated ? 'YES' : 'NO'
           csv << [person.hbx_id, e_case_id, person.first_name,
                   person.last_name, person.dob, resident,

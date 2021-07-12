@@ -8,7 +8,7 @@ module BenefitSponsors
       TEMPLATE_DATE_CELL = 7
       TEMPLATE_VERSION_CELL = 13
 
-      CENSUS_MEMBER_RECORD = %w(
+      CENSUS_MEMBER_RECORD = %w[
         employer_assigned_family_id
         employee_relationship
         last_name
@@ -31,7 +31,7 @@ module BenefitSponsors
         state
         zip
         newly_designated
-      )
+      ].freeze
 
       EmployeeTerminationMap = Struct.new(:employee, :employment_terminated_on)
       EmployeePersistMap = Struct.new(:employee)
@@ -137,7 +137,7 @@ module BenefitSponsors
         true
       end
 
-      def map_errors_for(obj, key="", onto:)
+      def map_errors_for(obj, key = "", onto:)
         obj.errors.each do |att, err|
           row = key.present? ? "Row #{key + 4}:" : ""
           onto.errors.add(:base, row + "#{att} #{err}")
@@ -147,7 +147,7 @@ module BenefitSponsors
       def terminate_census_records
         if @terminate_queue.present?
           return false if self.errors.present?
-          @terminate_queue.each do |row, employee_termination_map|
+          @terminate_queue.each do |_row, employee_termination_map|
             employee_termination_map.employee.terminate_employment(Date.strptime(employee_termination_map.employment_terminated_on, '%m/%d/%Y'))
           end
         end
@@ -186,7 +186,7 @@ module BenefitSponsors
       end
 
       def _insert_dependent(form)
-        return nil if (@primary_census_employee.nil? || @primary_record.nil?)
+        return nil if @primary_census_employee.nil? || @primary_record.nil?
         if form.employer_assigned_family_id == @primary_record.employer_assigned_family_id
           census_dependent = find_dependent(form)
 
@@ -205,24 +205,21 @@ module BenefitSponsors
           begin
             census_employee.newly_designate
           rescue Exception => e
-            self.errors.add :base, "employee can't transition to newly designate state #{e.to_s}"
+            self.errors.add :base, "employee can't transition to newly designate state #{e}"
           end
         elsif val == '0'
-          if census_employee.may_rebase_new_designee?
-            census_employee.rebase_new_designee
-          end
+          census_employee.rebase_new_designee if census_employee.may_rebase_new_designee?
         end
       end
 
       def init_census_record(member, form)
-        params = sanitize_params(form).merge!({  hired_on: parse_date(form.hired_on),
-          is_business_owner: is_business_owner?(form),
-          email: build_email(form),
-          employee_relationship: form.employee_relationship,
-          benefit_sponsors_employer_profile_id: profile.id,
-          benefit_sponsorship_id: profile.active_benefit_sponsorship.id,
-          address: build_address(form)
-        })
+        params = sanitize_params(form).merge!({ hired_on: parse_date(form.hired_on),
+                                                is_business_owner: is_business_owner?(form),
+                                                email: build_email(form),
+                                                employee_relationship: form.employee_relationship,
+                                                benefit_sponsors_employer_profile_id: profile.id,
+                                                benefit_sponsorship_id: profile.active_benefit_sponsorship.id,
+                                                address: build_address(form)})
         member.assign_attributes(params)
         member.no_ssn_allowed = true if profile.active_benefit_sponsorship.is_no_ssn_enabled
         assign_benefit_package_assignments(form, member)
@@ -230,7 +227,7 @@ module BenefitSponsors
       end
 
       def assign_benefit_package_assignments(form, member)
-        return unless (form.benefit_group.present? || form.plan_year.present?)
+        return unless form.benefit_group.present? || form.plan_year.present?
         application = profile.benefit_applications.by_year(form.plan_year.to_i).first
         return unless application.blank?
         benefit_package = application.benefit_packages.where(title: form.benefit_group).first
@@ -264,9 +261,7 @@ module BenefitSponsors
       end
 
       def is_business_owner?(form)
-        if ["1", "true"].include? form.is_business_owner.to_s
-          return true
-        end
+        return true if ["1", "true"].include? form.is_business_owner.to_s
         false
       end
 
@@ -292,8 +287,7 @@ module BenefitSponsors
         form.attributes.slice(:employer_assigned_family_id, :employee_relationship, :last_name, :first_name, :middle_name, :name_sfx, :ssn, :gender).merge({dob: (Date.strptime(form.dob, "%m/%d/%Y") if form.dob.present?)})
       end
 
-      def sanitize_primary_params(form)
-      end
+      def sanitize_primary_params(form); end
 
       def is_employee_terminable?(census_employee)
         #this logic may become more sophisticated in future
@@ -302,24 +296,24 @@ module BenefitSponsors
 
       def parse_relationship(cell, dob)
         return nil if cell.blank?
-        age = Date.today.year - dob.year
+
         case parse_text(cell).downcase
-          when "employee"
-            "self"
-          when "spouse"
-            "spouse"
-          when "domestic partner"
-            "domestic_partner"
-          when "child"
-            if age <= 26
-              "child_under_26"
-            else
-              "child_26_and_over"
-            end
-          when "disabled child"
-            "disabled_child_26_and_over"
+        when "employee"
+          "self"
+        when "spouse"
+          "spouse"
+        when "domestic partner"
+          "domestic_partner"
+        when "child"
+          return nil if dob.nil?
+          age = Date.today.year - dob.year
+          if age <= 26
+            "child_under_26"
           else
-            nil
+            "child_26_and_over"
+          end
+        when "disabled child"
+          "disabled_child_26_and_over"
         end
       end
 
@@ -330,13 +324,13 @@ module BenefitSponsors
       def parse_date(cell)
         return nil if cell.blank?
 
-        if cell.class == String
+        if cell.instance_of?(String)
           begin
             Date.strptime(sanitize_value(cell), "%m/%d/%Y")
-          rescue
+          rescue StandardError
             begin
               Date.strptime(sanitize_value(cell), "%m-%d-%Y")
-            rescue
+            rescue StandardError
               "#{cell} Invalid Format"
             end
           end
@@ -350,12 +344,16 @@ module BenefitSponsors
       end
 
       def parse_boolean(cell)
-        cell.blank? ? nil : cell.match(/(true|t|yes|y|1)$/i) != nil ? "1" : "0"
+        if cell.blank?
+          nil
+        else
+          cell.match(/(true|t|yes|y|1)$/i).nil? ? "0" : "1"
+        end
       end
 
       def sanitize_value(value)
         value = value.to_s.split('.')[0] if value.is_a? Float
-        value.gsub(/[[:cntrl:]]|^[\p{Space}]+|[\p{Space}]+$/, '')
+        value.to_s.gsub(/[[:cntrl:]]|^\p{Space}+|\p{Space}+$/, '')
       end
     end
   end

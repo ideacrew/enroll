@@ -18,7 +18,7 @@ module BenefitSponsors
       field :published_on, type: Date
       field :aasm_state, type: String
 
-      embeds_one :profile, class_name: "BenefitSponsors::Organizations::AcaShopCcaEmployerProfile"
+      embeds_one :profile, class_name: "SponsoredBenefits::Organizations::AcaShop#{EnrollRegistry[:enroll_app].setting(:site_key).item.capitalize}EmployerProfile"
       delegate :effective_date, to: :profile
       validates_uniqueness_of :claim_code, :case_sensitive => false, :allow_nil => true
 

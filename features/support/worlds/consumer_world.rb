@@ -36,7 +36,7 @@ module ConsumerWorld
     consumer_role.save!
     consumer_family = person_rec.primary_family
     create_enrollment_for_family(consumer_family)
-    expect(consumer_family.hbx_enrollments.count > 0).to eq(true)
+    expect(consumer_family.hbx_enrollments.any?).to eq(true)
     person_rec
   end
 end

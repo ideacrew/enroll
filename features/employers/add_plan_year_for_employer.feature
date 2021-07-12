@@ -1,6 +1,8 @@
 Feature: Add Plan Year For Employer
 
   Background: Setup site, employer
+    Given the shop market configuration is enabled
+    Given all announcements are enabled for user to select
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for enrollment_open initial employer with health benefits
     And there is an employer ABC Widgets

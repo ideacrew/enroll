@@ -18,7 +18,7 @@ $(document).on 'click', 'form .add_fields', (event) ->
 
   if $('#plan_year_start_on').length
     EmployerProfile.validatePlanYear
-    <% if Settings.aca.dental_market_enabled %>
+    <% if EnrollRegistry.feature_enabled?(:dental_market) %>
     $(".show-dental-plans").show();
     <% end %>
 

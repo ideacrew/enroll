@@ -302,6 +302,7 @@ module BenefitSponsors
       end
 
       before do
+        BenefitSponsors::Organizations::BrokerAgencyProfile::MARKET_KINDS << :shop
         Person.create_indexes
       end
 
@@ -322,7 +323,7 @@ module BenefitSponsors
           end
 
           it "should search for broker agencies and return result if broker profile is approved" do
-            broker_agency_profile.update_attributes!(aasm_state: "is_approved")
+            broker_agency_profile.update_attributes!(aasm_state: "is_approved", market_kind: :shop)
             expect(broker_search_form.broker_agency_search).to eq [broker_agency_profile]
           end
 

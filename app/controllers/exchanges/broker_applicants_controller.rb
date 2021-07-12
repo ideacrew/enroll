@@ -91,7 +91,7 @@ class Exchanges::BrokerApplicantsController < ApplicationController
   end
 
   def broker_carrier_appointments
-    all_carrier_appointments = "BrokerRole::#{Settings.site.key.upcase}_BROKER_CARRIER_APPOINTMENTS".constantize.stringify_keys
+    all_carrier_appointments = EnrollRegistry[:brokers].setting(:carrier_appointments).item.stringify_keys
     broker_carrier_appointments_enabled = Settings.aca.broker_carrier_appointments_enabled
     if broker_carrier_appointments_enabled
       params[:person][:broker_role_attributes][:carrier_appointments] = all_carrier_appointments.each{ |key,_str| all_carrier_appointments[key] = "true" }

@@ -36,6 +36,7 @@ module BenefitMarkets
     field :service_area_id, type: BSON::ObjectId
     field :network_information, type: String
     field :nationwide, type: Boolean # Nationwide
+    # TODO: Refactor this to in_state_network or something similar
     field :dc_in_network, type: Boolean # DC In-Network or not
     embeds_one  :sbc_document, as: :documentable,
                 :class_name => "::Document"
@@ -155,6 +156,11 @@ module BenefitMarkets
     #Products retrieval by type
     scope :health_products,            ->{ where(:"_type" => /.*HealthProduct$/) }
     scope :dental_products,            ->{ where(:"_type" => /.*DentalProduct$/)}
+
+    # TODO: Value is hardcoded for Maine, figure out how to update this
+    def in_state_network
+      self.dc_in_network
+    end
 
     # Highly nested scopes don't behave in a way I entirely understand with
     # respect to the $elemMatch operator.  Since we are only invoking this

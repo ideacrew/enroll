@@ -46,6 +46,32 @@ When(/^the user clicks the "Action" dropdown corresponding to the "determination
   click_button('Actions')
 end
 
+Given(/^that a user with a family has a Financial Assistance application in the "cancelled" state$/) do
+  login_as consumer, scope: :user
+  visit financial_assistance.applications_path
+  create_plan
+  application
+  application.update_attributes(:aasm_state => 'cancelled')
+end
+
+When(/^the user clicks the "Action" dropdown corresponding to the "cancelled" application$/) do
+  find_button('Actions').visible?
+  click_button('Actions')
+end
+
+Given(/^that a user with a family has a Financial Assistance application in the "terminated" state$/) do
+  login_as consumer, scope: :user
+  visit financial_assistance.applications_path
+  create_plan
+  application
+  application.update_attributes(:aasm_state => 'terminated')
+end
+
+When(/^clicks the "Action" dropdown corresponding to the "terminated" application$/) do
+  find_button('Actions').visible?
+  click_button('Actions')
+end
+
 Given(/^that a user with a family has a Financial Assistance application in the "determined" state$/) do
   login_as consumer, scope: :user
   visit financial_assistance.applications_path
@@ -97,5 +123,6 @@ end
 Then(/^the user will navigate to the Eligibility Determination page and will find CSR text present$/) do
   expect(page).to have_content('Eligibility Results')
   expect(page).to have_content('These people are eligible for monthly premium reductions of')
-  expect(page).to have_content('They also qualify for lower out-of-pocket costs')
+  expect(page).to have_content('They also qualify for lower')
+  expect(page).to have_content('out-of-pocket costs')
 end

@@ -4,6 +4,7 @@ module SponsoredBenefits
     class Profile
       include Mongoid::Document
       include Mongoid::Timestamps
+      include ::Config::SiteModelConcern
 
       embedded_in :organization, class_name: "SponsoredBenefits::Organizations::Organization"
 

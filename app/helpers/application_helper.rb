@@ -1,6 +1,19 @@
 module ApplicationHelper
   include FloatHelper
 
+  def seed_url_helper(row)
+    case row.record_class_name
+    when nil
+      "Not Yet Seeded"
+    when 'Family'
+      # TODO: Change from root url to family home page
+      link_to(
+        "#{row.target_record&.primary_person&.full_name} (Family Primary Person)",
+        resume_enrollment_exchanges_agents_path(person_id: row&.target_record&.primary_applicant&.person&.id)
+      )
+    end
+  end
+
   def can_employee_shop?(date)
     return false if date.blank?
     date = Date.strptime(date.to_s,"%m/%d/%Y")
@@ -583,6 +596,26 @@ module ApplicationHelper
     HbxProfile.current_hbx.try(:benefit_sponsorship).try(:earliest_effective_date)
   end
 
+  def is_shop_market_enabled?
+    EnrollRegistry.feature_enabled?(:aca_shop_market)
+  end
+
+  def is_fehb_market_enabled?
+    EnrollRegistry.feature_enabled?(:fehb_market)
+  end
+
+  def is_individual_market_enabled?
+    EnrollRegistry.feature_enabled?(:aca_individual_market)
+  end
+
+  def is_shop_and_individual_market_enabled?
+    EnrollRegistry.feature_enabled?(:aca_shop_market) && EnrollRegistry.feature_enabled?(:aca_individual_market)
+  end
+
+  def is_shop_or_fehb_market_enabled?
+    EnrollRegistry.feature_enabled?(:aca_shop_market) || EnrollRegistry.feature_enabled?(:fehb_market)
+  end
+
   def parse_ethnicity(value)
     return "" unless value.present?
     value = value.select{|a| a.present? }  if value.present?
@@ -625,7 +658,8 @@ module ApplicationHelper
 
   def env_bucket_name(bucket_name)
     aws_env = ENV['AWS_ENV'] || "qa"
-    "dchbx-enroll-#{bucket_name}-#{aws_env}"
+    subdomain = EnrollRegistry[:enroll_app].setting(:subdomain).item
+    "#{subdomain}-enroll-#{bucket_name}-#{aws_env}"
   end
 
   def display_dental_metal_level(plan)
@@ -641,7 +675,7 @@ module ApplicationHelper
   end
 
   def ivl_metal_network(plan)
-    (plan.nationwide ? 'nationwide' : 'dc metro') if plan.benefit_market_kind == :aca_individual
+    (plan.nationwide ? 'nationwide' : EnrollRegistry[:enroll_app].setting(:statewide_area).item) if plan.benefit_market_kind == :aca_individual
   end
 
   def ivl_hsa_status(plan_hsa_status, plan)
@@ -657,8 +691,8 @@ module ApplicationHelper
   def network_type(product)
     if product.nationwide
       'Nationwide'
-    elsif product.dc_in_network
-      'DC-Metro'
+    elsif product.in_state_network
+      EnrollRegistry[:enroll_app].setting(:statewide_area).item
     end
   end
 
@@ -690,7 +724,7 @@ module ApplicationHelper
   end
 
   def find_plan_name(hbx_id)
-    HbxEnrollment.where(id: hbx_id).first.try(:plan).try(:name)
+    HbxEnrollment.where(id: hbx_id).first.try(:product).try(:name)
   end
 
   def has_new_hire_enrollment_period?(census_employee)
@@ -807,7 +841,7 @@ module ApplicationHelper
   end
 
   def exchange_icon_path(icon)
-    site_key = Settings.site.key
+    site_key = EnrollRegistry[:enroll_app].setting(:site_key).item
       "icons/#{site_key}-#{icon}"
   end
 

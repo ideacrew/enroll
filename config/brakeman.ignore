@@ -27,7 +27,7 @@
       "check_name": "SendFile",
       "message": "Model attribute used in file name",
       "file": "components/notifier/app/controllers/notifier/notice_kinds_controller.rb",
-      "line": 58,
+      "line": 59,
       "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
       "code": "send_file(\"#{Rails.root}/tmp/#{Notifier::NoticeKind.find(params[:id]).notice_recipient.hbx_id}_#{Notifier::NoticeKind.find(params[:id]).title.titleize.gsub(/\\s+/, \"_\")}.pdf\", :type => \"application/pdf\", :disposition => \"inline\")",
       "render_path": null,
@@ -123,6 +123,26 @@
     {
       "warning_type": "Command Injection",
       "warning_code": 14,
+      "fingerprint": "0d6e4d3e256f0c6ef196baa5ed9e68712d4bdffb7c9886ca5c7bae3e2687d624",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "lib/client_configuration_toggler.rb",
+      "line": 74,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`git checkout #{filename_in_config_directory.sub(\"#{old_config_folder}/\", \"\")}`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ClientConfigurationToggler",
+        "method": "checkout_straggler_files"
+      },
+      "user_input": "filename_in_config_directory.sub(\"#{old_config_folder}/\", \"\")",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
       "fingerprint": "132c37aeaaedb5c65a6e90b1ab75386acec6e2264bbcb81a0c5f780acd2e232f",
       "check_name": "Execute",
       "message": "Possible command injection",
@@ -137,6 +157,46 @@
         "method": "migrate"
       },
       "user_input": "row[\"FEIN\"]",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "19e31e4ee89d2dcf01bc2c780347bff6d398e1db69b222cd0525ee3054dc1d43",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "lib/client_configuration_toggler.rb",
+      "line": 43,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`cp -r system #{Rails.root}/#{engine_folder_name}/spec/dummy/system`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ClientConfigurationToggler",
+        "method": "copy_current_configuration_to_engines"
+      },
+      "user_input": "engine_folder_name",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "22d65d891690c434f7fb0e1b2a23f969f41a4e466fce79e60e75f6d6ccc0dce6",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "lib/client_configuration_toggler.rb",
+      "line": 35,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`cp -r #{target_config_folder}/system #{Rails.root}`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ClientConfigurationToggler",
+        "method": "copy_target_configuration_to_system_folder"
+      },
+      "user_input": "target_config_folder",
       "confidence": "Medium",
       "note": ""
     },
@@ -274,7 +334,7 @@
           "type": "controller",
           "class": "Insured::GroupSelectionController",
           "method": "edit_plan",
-          "line": 185,
+          "line": 184,
           "file": "app/controllers/insured/group_selection_controller.rb",
           "rendered": {
             "name": "insured/group_selection/edit_plan",
@@ -383,13 +443,53 @@
       "note": ""
     },
     {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "52c196492aca987de56a518ca31878406d5c8f6080dafdf920a208b717694cab",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "lib/client_configuration_toggler.rb",
+      "line": 52,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`cp -r config/settings.yml #{Rails.root}/#{engine_folder_name}/spec/dummy/config/settings.yml`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ClientConfigurationToggler",
+        "method": "copy_current_configuration_to_engines"
+      },
+      "user_input": "engine_folder_name",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "552c3f77ff5d9e92a4efe636c41cb51596c1387ff9f57ba4e19b553f874d6706",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "lib/client_configuration_toggler.rb",
+      "line": 63,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`cp -r #{filename_in_config_directory} #{filename_in_config_directory.sub(\"#{target_config_folder}/\", \"\")}`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ClientConfigurationToggler",
+        "method": "copy_app_assets_and_straggler_files"
+      },
+      "user_input": "filename_in_config_directory",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
       "warning_type": "Mass Assignment",
       "warning_code": 70,
       "fingerprint": "56568179965f83b6748d313bd0b2578a9dbfa282a0b7bd81440dd7a41aaef2f5",
       "check_name": "MassAssignment",
       "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
       "file": "app/controllers/application_controller.rb",
-      "line": 89,
+      "line": 99,
       "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
       "code": "params.permit!",
       "render_path": null,
@@ -417,7 +517,7 @@
           "type": "controller",
           "class": "Insured::GroupSelectionController",
           "method": "edit_plan",
-          "line": 185,
+          "line": 184,
           "file": "app/controllers/insured/group_selection_controller.rb",
           "rendered": {
             "name": "insured/group_selection/edit_plan",
@@ -440,7 +540,7 @@
       "check_name": "Execute",
       "message": "Possible command injection",
       "file": "lib/custom_linters/translations/view_translations_linter_helper.rb",
-      "line": 22,
+      "line": 89,
       "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
       "code": "`git diff HEAD^ HEAD  --unified=0 #{filename} | tail +6 | sed -e 's/^+//'`",
       "render_path": null,
@@ -451,6 +551,26 @@
       },
       "user_input": "filename",
       "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Remote Code Execution",
+      "warning_code": 24,
+      "fingerprint": "65fcfed30f4a5e04a15736f27beec09010b3ffedd31ea672a34ef1eb1721b917",
+      "check_name": "UnsafeReflection",
+      "message": "Unsafe reflection method `safe_constantize` called with parameter value",
+      "file": "app/controllers/documents_controller.rb",
+      "line": 35,
+      "link": "https://brakemanscanner.org/docs/warning_types/remote_code_execution/",
+      "code": "(params[:model].camelize or \"BenefitSponsors::Organizations::AcaShopCcaEmployerProfile\").safe_constantize",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "DocumentsController",
+        "method": "authorized_download"
+      },
+      "user_input": "params[:model].camelize",
+      "confidence": "High",
       "note": ""
     },
     {
@@ -468,7 +588,7 @@
           "type": "controller",
           "class": "Exchanges::HbxProfilesController",
           "method": "view_enrollment_to_update_end_date",
-          "line": 479,
+          "line": 480,
           "file": "app/controllers/exchanges/hbx_profiles_controller.rb",
           "rendered": {
             "name": "exchanges/hbx_profiles/view_enrollment_to_update_end_date",
@@ -556,6 +676,26 @@
       "note": ""
     },
     {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "77379f53e5e37a72155c2a4f0462b37b1d046c19ba0a8ac1f22c3f8d68a8162c",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "lib/client_configuration_toggler.rb",
+      "line": 48,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`cp -r system #{Rails.root}/#{engine_folder_name}/`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ClientConfigurationToggler",
+        "method": "copy_current_configuration_to_engines"
+      },
+      "user_input": "engine_folder_name",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
       "warning_type": "Mass Assignment",
       "warning_code": 70,
       "fingerprint": "8a980298a5df4d60183c689cfc1c152f4b412c6bcf03ae0ed583ecf0b7041e31",
@@ -637,6 +777,66 @@
       "note": ""
     },
     {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "8ebecce18ccfce198e0e5392f43cfe262c80691e1eb3fae619da130dee133b9f",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "lib/client_configuration_toggler.rb",
+      "line": 51,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`cp -r system #{Rails.root}/#{engine_folder_name}/spec/dummy/`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ClientConfigurationToggler",
+        "method": "copy_current_configuration_to_engines"
+      },
+      "user_input": "engine_folder_name",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "903aeb226ba113fd0ed06904529782374ad92b37155437ba5ae9f837a828eddc",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "lib/client_configuration_toggler.rb",
+      "line": 49,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`cp -r config/settings.yml #{Rails.root}/#{engine_folder_name}/config/settings.yml`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ClientConfigurationToggler",
+        "method": "copy_current_configuration_to_engines"
+      },
+      "user_input": "engine_folder_name",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "b122d2f7957b4b965ade2855ead1eda0b76571257de543ed1ead416bd5a54418",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "lib/client_configuration_toggler.rb",
+      "line": 41,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`cp -r #{target_config_folder}/config/settings.yml config/settings.yml`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ClientConfigurationToggler",
+        "method": "copy_target_configuration_to_system_folder"
+      },
+      "user_input": "target_config_folder",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
       "warning_type": "SQL Injection",
       "warning_code": 0,
       "fingerprint": "c52682082343e84c51246edb8d8ad45d30470312d9763527b2c5c5b6777ea619",
@@ -654,6 +854,26 @@
       },
       "user_input": "sql_column",
       "confidence": "Weak",
+      "note": ""
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "cd6894cae7988763b05d81ee9348df6b72d3f4b900c4db77c473c27b077d1424",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "lib/store_registry_config.rb",
+      "line": 18,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`cp -r #{Rails.root}/system #{@target_config_folder}`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "StoreRegistryConfig",
+        "method": "copy_current_system_configuration_to_storage"
+      },
+      "user_input": "@target_config_folder",
+      "confidence": "Medium",
       "note": ""
     },
     {
@@ -697,13 +917,33 @@
       "note": ""
     },
     {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "e9e458694771aedf4a65be234588a974941994ee7c88eaf8c971fd5a0a24c06a",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "lib/client_configuration_toggler.rb",
+      "line": 41,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`cp -r system #{Rails.root}/#{engine_folder_name}/system`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ClientConfigurationToggler",
+        "method": "copy_current_configuration_to_engines"
+      },
+      "user_input": "engine_folder_name",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
       "warning_type": "File Access",
       "warning_code": 16,
       "fingerprint": "ef486a2f648e540d2eb04ea78e5c6ba243cbaf21350fdec96467367fb1632736",
       "check_name": "SendFile",
       "message": "Model attribute used in file name",
       "file": "app/controllers/employers/employer_profiles_controller.rb",
-      "line": 256,
+      "line": 257,
       "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
       "code": "send_file(EmployerProfile.find(params[:id]).documents.find(params[:ids][0]).identifier, :file_name => EmployerProfile.find(params[:id]).documents.find(params[:ids][0]).title, :content_type => EmployerProfile.find(params[:id]).documents.find(params[:ids][0]).format)",
       "render_path": null,
@@ -717,6 +957,6 @@
       "note": ""
     }
   ],
-  "updated": "2021-02-05 15:24:01 -0500",
+  "updated": "2021-05-07 13:49:47 -0400",
   "brakeman_version": "5.0.0"
 }

@@ -182,6 +182,14 @@ $(document).on('turbolinks:load', function () {
             });
           });
         });
+
+        document.querySelectorAll(".deduction-kinds .deduction-kind").forEach(function(kind) {
+          kind.querySelector('input[type="checkbox"]').checked = false;
+          let addMore = kind.querySelector('[class^="interaction-click-control-add-more"]');
+          if (addMore) {
+            addMore.classList.add('hidden');
+          }
+        });
       }
     });
 

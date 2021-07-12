@@ -19,7 +19,7 @@ module Factories
       local_people = family_transcript[:people].reduce([]) { |person| process_person(person) }
 
       # Syntactic check
-      if local_people.detect { |processed_person| processed_person.errors.count > 0 }
+      if local_people.detect { |processed_person| processed_person.errors.any? }
         #     with_logging('save', local_people) { |instance | instance.save }
       end
 

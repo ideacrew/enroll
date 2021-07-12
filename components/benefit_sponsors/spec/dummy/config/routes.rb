@@ -7,6 +7,8 @@ Rails.application.routes.draw do
   root "welcome#index"
   get "document/download/:bucket/:key" => "documents#download", as: :document_download
 
+  match 'broker_registration', to: redirect('benefit_sponsors/profiles/registrations/new?profile_type=broker_agency'), via: [:get]
+
   namespace :employers do
 
     resources :employer_profiles do

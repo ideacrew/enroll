@@ -123,13 +123,14 @@ module BenefitSponsors
 
       let(:bap_id) { organization.broker_agency_profile.id }
 
-      context "search for broker agencies from employer portal" do
+      before do
+        Person.create_indexes
+        BenefitSponsors::Organizations::BrokerAgencyProfile::MARKET_KINDS << :shop
+        organization.update_attributes(legal_name: 'org1')
+        broker_agency_profile1.update_attributes(aasm_state: 'is_approved', market_kind: 'shop')
+      end
 
-        before do
-          Person.create_indexes
-          organization.update_attributes(legal_name: 'org1')
-          broker_agency_profile1.update_attributes(aasm_state: 'is_approved')
-        end
+      context "search for broker agencies from employer portal" do
 
         it "should return searched broker agency profile" do
           search_params = {q: organization.legal_name}
@@ -139,7 +140,7 @@ module BenefitSponsors
 
         it "should return all broker agency profiles if no search string is passed" do
           second_organization.update_attributes(legal_name: 'org2')
-          second_broker_agency_profile.update_attributes(aasm_state: 'is_approved')
+          second_broker_agency_profile.update_attributes(aasm_state: 'is_approved', market_kind: 'shop')
           search_params = {q: ''}
           expect(subject.broker_agencies_with_matching_agency_or_broker(search_params, nil).count). to eq 2
           expect(subject.broker_agencies_with_matching_agency_or_broker(search_params, nil).first.legal_name). to eq organization.legal_name
@@ -148,12 +149,6 @@ module BenefitSponsors
       end
 
       context "search for broker agencies from broker staff portal" do
-
-        before do
-          Person.create_indexes
-          organization.update_attributes(legal_name: 'org1')
-          broker_agency_profile1.update_attributes(aasm_state: 'is_approved')
-        end
 
         it "should return searched broker agency profile" do
           search_params = {q: organization.legal_name}

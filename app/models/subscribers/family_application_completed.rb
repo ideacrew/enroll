@@ -27,7 +27,7 @@ module Subscribers
       verified_family.parse(xml)
       verified_primary_family_member = verified_family.family_members.detect{ |fm| fm.id == verified_family.primary_family_member_id }
       verified_dependents = verified_family.family_members.reject{ |fm| fm.id == verified_family.primary_family_member_id }
-      primary_person = search_person(verified_primary_family_member)
+      primary_person = verified_primary_family_member.present? ? search_person(verified_primary_family_member) : nil
       throw(:processing_issue, "ERROR: Failed to find primary person in xml") unless primary_person.present?
       family = primary_person.primary_family
       throw(:processing_issue, "ERROR: Failed to find primary family for users person in xml") unless family.present?
@@ -58,7 +58,7 @@ module Subscribers
       rescue
         throw(:processing_issue, "Failure to update tax household")
       end
-      update_vlp_for_consumer_role(primary_person.consumer_role, verified_primary_family_member)
+      update_vlp_for_consumer_role(primary_person.consumer_role, verified_primary_family_member) if primary_person&.consumer_role.present?
       begin
         new_dependents.each do |p|
           new_family_member = family.relate_new_member(p[0], p[1])
@@ -83,7 +83,8 @@ module Subscribers
       family.save!
     end
 
-    def update_vlp_for_consumer_role(consumer_role, verified_primary_family_member )
+    def update_vlp_for_consumer_role(consumer_role, verified_primary_family_member)
+      return if consumer_role.fully_verified?
       begin
         verified_verifications = verified_primary_family_member.verifications
         consumer_role.import!(authority:"curam")

@@ -239,10 +239,11 @@ module VerificationHelper
   end
 
   def request_response_details(person, record, v_type)
+    local_residency = EnrollRegistry[:enroll_app].setting(:state_residency).item
     if record.event_request_record_id
-      v_type == "DC Residency" ? show_residency_request(person, record) : show_ssa_dhs_request(person, record)
+      v_type == local_residency ? show_residency_request(person, record) : show_ssa_dhs_request(person, record)
     elsif record.event_response_record_id
-      v_type == "DC Residency" ? show_residency_response(person, record) : show_ssa_dhs_response(person, record)
+      v_type == local_residency ? show_residency_response(person, record) : show_ssa_dhs_response(person, record)
     end
   end
 

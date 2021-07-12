@@ -128,7 +128,7 @@ namespace :reports do
       case v_type
         when 'Social Security Number'
           SSN_INVALID_EVENTS
-        when 'DC Residency'
+        when VerificationType::LOCATION_RESIDENCY
           RESIDENCY_INVALID_EVENTS
         when 'Immigration status'
           IMMIGRATION_INVALID_EVENTS

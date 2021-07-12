@@ -62,15 +62,15 @@ module BenefitSponsors
       [
         "Company went out of business/bankrupt",
         "Customer Service did not solve problem/poor experience",
-        "Connector website too difficult to use/navigate",
-        "Health Connector does not offer desired product",
+        "#{EnrollRegistry[:enroll_app].setting(:short_name).item} website too difficult to use/navigate",
+        "#{EnrollRegistry[:enroll_app].setting(:short_name).item} does not offer desired product",
         "Group is now > 50 lives",
         "Group no longer has employees",
         "Went to carrier directly",
         "Went to an association directly",
-        "Added/changed broker that does not work with Health Connector",
+        "Added/changed broker that does not work with #{EnrollRegistry[:enroll_app].setting(:short_name).item}",
         "Company is no longer offering insurance",
-        "Company moved out of Massachusetts",
+        "Company moved out of #{EnrollRegistry[:enroll_app].setting(:statewide_area).item}",
         "Other"
       ].freeze
 
@@ -505,7 +505,7 @@ module BenefitSponsors
     def is_renewing?
       required_states = (APPLICATION_APPROVED_STATES + APPLICATION_DRAFT_STATES + ENROLLING_STATES + ENROLLMENT_ELIGIBLE_STATES)
       applications = sponsor_profile.benefit_applications.where(:"effective_period.min".gt => effective_period.min, :aasm_state.in => required_states + [:active, :expired])
-      predecessor.present? && (required_states + ENROLLMENT_INELIGIBLE_STATES).include?(aasm_state) && !(applications.count > 0) && reinstated_id.blank?
+      predecessor.present? && (required_states + ENROLLMENT_INELIGIBLE_STATES).include?(aasm_state) && applications.none? && reinstated_id.blank?
     end
     # rubocop:enable Style/InverseMethods
 

@@ -5,7 +5,7 @@ FactoryBot.define do
     action_kind { "add" }
     edi_code { "32-MARRIAGE" }
     reason { "marriage" }
-    market_kind { "shop" }
+    market_kind { is_shop_market_enabled? ? "shop" : "individual" }
     effective_on_kinds { ["first_of_month"] }
     pre_event_sep_in_days { 0 }
     post_event_sep_in_days { 30 }

@@ -44,6 +44,7 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
       # allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       # allow(employer_profile).to receive(:plan_years).and_return("2015")
       allow(@hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
+      EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
       sign_in(@user)
       get :new, params:{:employer_profile_id => employer_profile_id}
       expect(response).to have_http_status(:success)
@@ -79,6 +80,7 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
       allow(controller).to receive(:census_employee_params).and_return(census_employee_params)
       allow(CensusEmployee).to receive(:new).and_return(census_employee)
       allow(census_employee).to receive(:assign_benefit_packages).and_return(true)
+      EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
     end
 
     it "should be redirect when valid" do
@@ -120,6 +122,7 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(CensusEmployee).to receive(:find).and_return(census_employee)
       allow(controller).to receive(:authorize).and_return(true)
+      EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
       post :edit, params: {id: census_employee.id, employer_profile_id: employer_profile_id, census_employee: {}}
       expect(response).to render_template("edit")
     end
@@ -183,6 +186,7 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
       sign_in @user
       census_employee.census_dependents << child1
       allow(controller).to receive(:authorize).and_return(true)
+      EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
     end
 
     it "should be redirect when valid" do
@@ -353,6 +357,7 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(census_employee.employer_profile_id)
       allow(CensusEmployee).to receive(:find).and_return(census_employee)
       allow(controller).to receive(:authorize).and_return(true)
+      EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
       get :show, params: { id: census_employee.id, employer_profile_id: employer_profile_id, census_employee: {} }
       expect(response).to render_template("show")
     end
@@ -441,6 +446,7 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(CensusEmployee).to receive(:find).and_return(census_employee)
       allow(controller).to receive(:authorize).and_return(true)
+      EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
     end
 
     it "should be redirect and successful when valid" do
@@ -466,6 +472,7 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
       sign_in @user
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(CensusEmployee).to receive(:find).and_return(census_employee)
+      EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
     end
     it "should be redirect" do
       get :terminate, params: {census_employee_id: census_employee.id, employer_profile_id: employer_profile_id}
@@ -508,6 +515,7 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
       census_employee.update(aasm_state: 'employment_terminated', hired_on: hired_on, employment_terminated_on: (hired_on + 2.days))
       allow(census_employee).to receive(:build_hbx_enrollment_for_cobra).and_return(true)
       allow(controller).to receive(:authorize).and_return(true)
+      EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
     end
 
     context 'Get cobra' do
@@ -529,7 +537,11 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
           allow(census_employee).to receive(:update_for_cobra).and_return false
           get :cobra, params: {census_employee_id: census_employee.id, employer_profile_id: employer_profile_id, cobra_date: cobra_date.to_s}, :format => :js, xhr: true
           expect(response).to have_http_status(:success)
-          expect(flash[:error]).to eq "COBRA cannot be initiated for this employee with the effective date entered. Please contact #{Settings.site.short_name} at #{Settings.contact_center.phone_number} for further assistance."
+          expect(flash[:error]).to eq(
+            "COBRA cannot be initiated for this employee with the effective date entered."\
+            " Please contact #{EnrollRegistry[:enroll_app].setting(:short_name).item} at #{EnrollRegistry[:enroll_app].setting(:contact_center_short_number)&.item} "\
+            "for further assistance."
+          )
         end
       end
 
@@ -564,6 +576,7 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
       sign_in @user
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(CensusEmployee).to receive(:find).and_return(census_employee)
+      EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
       get :rehire, params: {census_employee_id: census_employee.id, employer_profile_id: employer_profile_id}, :format => :js, xhr: true
       expect(response).to have_http_status(:success)
       expect(flash[:error]).to eq "Please enter rehiring date."
@@ -575,6 +588,7 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
         sign_in @user
         allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
         allow(CensusEmployee).to receive(:find).and_return(census_employee)
+        EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
         get :rehire, params: {census_employee_id: census_employee.id, employer_profile_id: employer_profile_id, rehiring_date: (TimeKeeper::date_of_record + 30.days).to_s}, :format => :js, xhr: true
         expect(response).to have_http_status(:success)
         expect(flash[:error]).to eq "Census Employee is already active."
@@ -593,6 +607,7 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
           allow(new_census_employee).to receive(:address).and_return(true)
           allow(new_census_employee).to receive(:construct_employee_role_for_match_person)
           allow(new_census_employee).to receive(:add_default_benefit_group_assignment).and_return(true)
+          EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
         end
 
         it "rehire success" do
@@ -601,6 +616,7 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
           allow(census_employee).to receive(:valid?).and_return(true)
           allow(census_employee).to receive(:save).and_return(true)
           allow(census_employee).to receive(:rehire_employee_role).never
+          EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
           get :rehire, params: {census_employee_id: census_employee.id, employer_profile_id: employer_profile_id, rehiring_date: (TimeKeeper::date_of_record + 30.days).to_s}, :format => :js, xhr: true
           expect(response).to have_http_status(:success)
           expect(flash[:notice]).to eq "Successfully rehired Census Employee."
@@ -612,6 +628,7 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
           allow(census_employee).to receive(:valid?).and_return(true)
           allow(census_employee).to receive(:save).and_return(true)
           allow(census_employee).to receive(:rehire_employee_role).never
+          EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
           get :rehire, params: {census_employee_id: census_employee.id, employer_profile_id: employer_profile_id, rehiring_date: (TimeKeeper::date_of_record + 30.days).to_s}, :format => :js, xhr: true
           expect(response).to have_http_status(:success)
           expect(flash[:notice]).to eq "Successfully rehired Census Employee."
@@ -620,6 +637,7 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
 
         it "when new_census_employee invalid" do
           allow(new_census_employee).to receive(:valid?).and_return(false)
+          EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
           get :rehire, params: {census_employee_id: census_employee.id, employer_profile_id: employer_profile_id, rehiring_date: (TimeKeeper::date_of_record + 30.days).to_s}, :format => :js, xhr: true
           expect(response).to have_http_status(:success)
           expect(flash[:error]).to eq "Error during rehire."
@@ -627,6 +645,7 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
 
         it "with rehiring date before terminated date" do
           allow(census_employee).to receive(:employment_terminated_on).and_return(TimeKeeper.date_of_record)
+          EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
           get :rehire, params: {census_employee_id: census_employee.id, employer_profile_id: employer_profile_id, rehiring_date: "05/01/2015"}, :format => :js, xhr: true
           expect(response).to have_http_status(:success)
           expect(flash[:error]).to eq "Rehiring date can't occur before terminated date."
@@ -640,6 +659,7 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
       sign_in @user
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(CensusEmployee).to receive(:find).and_return(census_employee)
+      EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
       post :benefit_group, params: {id: census_employee.id, employer_profile_id: employer_profile_id, census_employee: {}}
       expect(response).to render_template("benefit_group")
     end
@@ -665,6 +685,7 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
       @user.person.hbx_staff_role.permission_id = permission.id
       @user.person.hbx_staff_role.save!
       expect(@user.person.hbx_staff_role.present?).to eq(true)
+      EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
       sign_in @user
     end
 
@@ -680,5 +701,62 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
       expect(response).to_not render_template("employers/census_employees/garbage_effective_date")
     end
   end
-end
 
+  describe "POST create, for existing person and new dependent" do
+    let(:benefit_group) { double(id: "5453a544791e4bcd33000121") }
+
+    let(:husband) { FactoryBot.create(:person, :with_family, :with_consumer_role, first_name: 'Stefan') }
+    let(:h_family) { husband.primary_family }
+    let(:wife) {FactoryBot.create(:person, :with_family, first_name: 'Natascha')}
+    let(:w_family) { wife.primary_family }
+
+    let!(:husbands_family) do
+      husband.person_relationships.create!(relative_id: husband.id, kind: 'self')
+      husband.person_relationships.create!(relative_id: wife.id, kind: 'spouse')
+      husband.save!
+
+      h_family.add_family_member(wife)
+      h_family.save!
+      h_family
+    end
+
+    let(:census_employee_dependent_params) do
+      {
+        "first_name" => husband.first_name,
+        "middle_name" => "",
+        "last_name" => husband.last_name,
+        "gender" => husband.gender,
+        "dob" => husband.dob.strftime("%Y-%m-%d"),
+        "is_business_owner" => true,
+        "hired_on" => TimeKeeper.date_of_record.strftime("%Y-%m-%d"),
+        "ssn" => husband.ssn,
+        "employer_profile" => employer_profile,
+        "census_dependents_attributes" => [
+          {
+            "first_name" => "test",
+            "last_name" => "dependent",
+            "dob" => "05/02/2020",
+            "gender" => "male",
+            "employee_relationship" => "child_under_26",
+            "ssn" => "123-45-1234"
+          }
+        ]
+      }
+    end
+
+    before do
+      allow(@hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
+      sign_in @user
+      EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
+    end
+
+    it "should be redirect when valid" do
+      expect(husbands_family.active_household.immediate_family_coverage_household.coverage_household_members.size).to eq(2)
+      post :create, params: {employer_profile_id: employer_profile_id, census_employee: census_employee_dependent_params}
+      husbands_family.reload
+      expect(flash[:notice]).to eq("Census Employee is successfully created.")
+      expect(husbands_family.active_household.immediate_family_coverage_household.coverage_household_members.size).to eq(3)
+    end
+  end
+
+end

@@ -44,19 +44,19 @@
 .ui-widget-content {
 	border: 1px solid #dddddd/*{borderColorContent}*/;
 	background: #ffffff/*{bgColorContent}*/ /*{bgImgUrlContent}*/ /*{bgContentXPos}*/ /*{bgContentYPos}*/ /*{bgContentRepeat}*/;
-	color: #333333/*{fcContent}*/;
+	color: <%= EnrollRegistry[:ivl_notice_footer].settings(:color).item %>/*{fcContent}*/;
 }
 .ui-widget-content a {
-	color: #333333/*{fcContent}*/;
+	color: <%= EnrollRegistry[:ivl_notice_footer].settings(:color).item %>/*{fcContent}*/;
 }
 .ui-widget-header {
 	border: 1px solid #dddddd/*{borderColorHeader}*/;
 	background: #e9e9e9/*{bgColorHeader}*/ /*{bgImgUrlHeader}*/ /*{bgHeaderXPos}*/ /*{bgHeaderYPos}*/ /*{bgHeaderRepeat}*/;
-	color: #333333/*{fcHeader}*/;
+	color: <%= EnrollRegistry[:ivl_notice_footer].settings(:color).item %>/*{fcHeader}*/;
 	font-weight: bold;
 }
 .ui-widget-header a {
-	color: #333333/*{fcHeader}*/;
+	color: <%= EnrollRegistry[:ivl_notice_footer].settings(:color).item %>/*{fcHeader}*/;
 }
 
 /* Interaction states

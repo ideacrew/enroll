@@ -125,3 +125,6 @@ When(/^Consumer login$/) do
   find('.interaction-click-control-sign-in').click
 end
 
+Given(/announcements for shop are enabled/) do
+  announcements_for_shop_enabled
+end

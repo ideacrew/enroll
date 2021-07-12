@@ -8,8 +8,15 @@ module Admin
   class BulkNotice
     include Mongoid::Document
     include Mongoid::Timestamps
-
+    include ::Config::SiteModelConcern
     include AASM
+
+    RECIPIENTS = {}.tap do |h|
+      h["Broker Agency"] = :broker_agency if is_broker_agency_enabled?
+      h["General Agency"] = :general_agency if is_general_agency_enabled?
+      h["Employer"] = :employer if is_shop_or_fehb_market_enabled?
+      h["Employee"] = :employee if is_shop_or_fehb_market_enabled?
+    end
 
     field :user_id, type: String
     field :audience_type, type: String

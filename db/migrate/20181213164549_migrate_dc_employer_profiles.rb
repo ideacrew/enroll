@@ -180,7 +180,8 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
   end
 
   def self.initialize_new_profile(old_org, old_profile_params)
-    profile_class = is_congress?(old_org) ? BenefitSponsors::Organizations::FehbEmployerProfile : BenefitSponsors::Organizations::AcaShopDcEmployerProfile
+    site_key = EnrollRegistry[:enroll_app].setting(:site_key).item.capitalize
+    profile_class = is_congress?(old_org) ? BenefitSponsors::Organizations::FehbEmployerProfile : "BenefitSponsors::Organizations::AcaShop#{site_key}EmployerProfile".constantize
     new_profile = profile_class.new(old_profile_params)
 
     if @old_profile.contact_method == "Only Electronic communications"

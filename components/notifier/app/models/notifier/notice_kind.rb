@@ -4,6 +4,7 @@ module Notifier
     include Mongoid::Timestamps
     include AASM
     include Notifier::NoticeBuilder
+    include Config::SiteModelConcern
 
     RECIPIENTS = {
       "Employer" => "Notifier::MergeDataModels::EmployerProfile",
@@ -13,16 +14,19 @@ module Notifier
       "GeneralAgency" => "Notifier::MergeDataModels::GeneralAgency"
     }
 
-    MARKET_KINDS = [:aca_individual, :aca_shop]
+    MARKET_KINDS = [].tap do |a|
+      a << :aca_shop if is_shop_or_fehb_market_enabled?
+      a << :aca_individual if is_individual_market_enabled?
+    end
 
     field :title, type: String
     field :description, type: String
     field :identifier, type: String
     field :notice_number, type: String
-    field :recipient, type: String, default: "Notifier::MergeDataModels::EmployerProfile"
+    field :recipient, type: String, default: proc{ default_recipient }
     field :aasm_state, type: String, default: :draft
     field :event_name, type: String, default: nil
-    field :market_kind, type: Symbol, default: :aca_shop
+    field :market_kind, type: Symbol, default: proc{ default_market_kind }
 
     embeds_one :cover_page
     embeds_one :template, class_name: "Notifier::Template"
@@ -172,5 +176,18 @@ module Notifier
     # def to_html
     #   self.markdown.render(template.body)
     # end
+    private
+
+    def default_market_kind
+      is_shop_or_fehb_market_enabled? ? :aca_shop : :aca_individual
+    end
+
+    def default_recipient
+      if is_shop_or_fehb_market_enabled?
+        "Notifier::MergeDataModels::EmployerProfile"
+      else
+        "Notifier::MergeDataModels::ConsumerRole"
+      end
+    end
   end
 end

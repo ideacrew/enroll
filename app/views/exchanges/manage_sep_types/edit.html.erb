@@ -65,7 +65,7 @@
             <%= build_option_field(EnrollRegistry[:sep_types].setting(:date_options_available),f) %>
           </div>
           <div class="col-6" id= "termination_on_kinds" >
-            <%= build_option_field(EnrollRegistry[:sep_types].setting(:termination_on_kinds),f) %>
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:termination_on_kinds),f) if is_shop_or_fehb_market_enabled? %>
           </div>
         </div>
       </div>

@@ -17,7 +17,7 @@ RSpec.describe "shared/_network_data.html.erb" do
       allow(view).to receive(:offers_nationwide_plans?).and_return(true)
       allow(mock_dc_plan).to receive(:nationwide).and_return(false)
       render partial: "shared/network_data", locals: {plan: mock_dc_plan}
-      expect(rendered).to have_text("DC-Metro")
+      expect(rendered).to have_text(EnrollRegistry[:enroll_app].setting(:statewide_area).item)
     end
   end
 

@@ -4,6 +4,7 @@ class BrokerAgencyProfile
   include Mongoid::Timestamps
   include AASM
   include Config::AcaModelConcern
+  include Config::SiteModelConcern
 
   embedded_in :organization
 

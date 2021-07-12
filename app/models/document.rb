@@ -13,7 +13,7 @@ class Document
                      BenefitSponsors::Organizations::FehbEmployerProfile
                      BenefitSponsors::Organizations::AcaShopCcaEmployerProfile
                      BenefitSponsors::Organizations::GeneralAgencyProfile
-                     EmployeeRole Person ConsumerRole].freeze
+                     EmployeeRole Person ConsumerRole].push("BenefitSponsors::Organizations::#{EnrollRegistry[:enroll_app].setting(:site_key).item.capitalize}ShopEmployerProfile").uniq.freeze
 
   after_save :notify_on_save
 

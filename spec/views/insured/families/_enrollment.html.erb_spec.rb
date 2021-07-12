@@ -192,7 +192,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     let(:aws_env) { ENV['AWS_ENV'] || "qa" }
     let(:sbc_document) do
       Document.new({title: 'sbc_file_name', subject: "SBC",
-                    :identifier => "urn:openhbx:terms:v1:file_storage:s3:bucket:#{Settings.site.s3_prefix}-enroll-sbc-#{aws_env}#7816ce0f-a138-42d5-89c5-25c5a3408b82"})
+                    :identifier => "urn:openhbx:terms:v1:file_storage:s3:bucket:#{EnrollRegistry[:enroll_app].setting(:s3_prefix).item}-enroll-sbc-#{aws_env}#7816ce0f-a138-42d5-89c5-25c5a3408b82"})
     end
 
     let(:employer_profile) do
@@ -221,12 +221,16 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     end
 
     it "should open the sbc pdf" do
-      expect(rendered).to have_selector("a[href='#{"/document/download/#{Settings.site.s3_prefix}-enroll-sbc-#{aws_env}/7816ce0f-a138-42d5-89c5-25c5a3408b82?content_type=application/pdf&filename=APlanName.pdf&disposition=inline"}']")
+      expect(rendered).to have_selector(
+        "a[href='#{"/document/download/#{EnrollRegistry[:enroll_app].setting(:s3_prefix).item}"\
+        "-enroll-sbc-#{aws_env}/7816ce0f-a138-42d5-89c5-25c5a3408b82?content_type=application/pdf&filename=APlanName.pdf"\
+        '&disposition=inline'}']"
+      )
     end
 
     it "should display the title" do
-      expect(rendered).to match /#{plan_active_year} #{plan_coverage_kind.titleize} Coverage/
-      expect(rendered).to match /#{Settings.site.short_name}/
+      expect(rendered).to match(/#{plan_active_year} #{plan_coverage_kind.titleize} Coverage/)
+      expect(rendered).to match(/#{Settings.site.short_name}/)
     end
 
     it "should display the link of view detail" do
@@ -235,7 +239,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
     it "should display the plan start" do
       expect(rendered).to have_selector('strong', text: 'Plan Start:')
-      expect(rendered).to match /#{Date.new(2015,8,10)}/
+      expect(rendered).to match(/#{Date.new(2015,8,10)}/)
     end
 
     it "should not disable the Make Changes button" do
@@ -244,21 +248,21 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
     it "should display the Plan Start" do
       expect(rendered).to have_selector('strong', text: 'Plan Start:')
-      expect(rendered).to match /#{Date.new(2015,8,10)}/
+      expect(rendered).to match(/#{Date.new(2015,8,10)}/)
     end
 
     it "should display effective date when terminated enrollment" do
       allow(hbx_enrollment).to receive(:coverage_terminated?).and_return(true)
-      expect(rendered).to match /plan start/i
+      expect(rendered).to match(/plan start/i)
     end
 
     it "should display market" do
-      expect(rendered).to match /Market/
+      expect(rendered).to match(/Market/)
     end
 
     it "should not show a Plan End if cobra" do
       allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(true)
-      expect(rendered).not_to match /plan ending/i
+      expect(rendered).not_to match(/plan ending/i)
     end
 
     context "coverage_termination_pending" do
@@ -279,7 +283,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       end
 
       it 'displays future_enrollment_termination_date when enrollment is in coverage_termination_pending state' do
-        expect(rendered).to match /Future enrollment termination date:/
+        expect(rendered).to match(/Future enrollment termination date:/)
       end
 
       it 'displays terminated_on when coverage_termination_pending and not future_enrollment_termination_date' do

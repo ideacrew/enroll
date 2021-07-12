@@ -12,6 +12,7 @@ Feature: Update DOB and SSN
     And there is a census employee record and employee role for Patrick Doe for employer ABC Widgets
     And Patrick Doe has a consumer role and IVL enrollment
 
+  @flaky
   Scenario: Admin enters invalid DOB or SSN
     Given that a user with a HBX staff role with HBX staff subrole exists and is logged in
     And Admin clicks Families tab

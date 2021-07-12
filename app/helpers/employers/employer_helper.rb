@@ -10,7 +10,11 @@ module Employers::EmployerHelper
       return 'Account Linked'
     elsif employee_state == 'eligible'
       return 'No Account Linked'
-    elsif employee_state == "cobra_linked" && census_employee.has_cobra_hbx_enrollment?
+    elsif employee_state == "cobra_linked" &&
+          (
+            census_employee.has_cobra_hbx_enrollment? ||
+            census_employee.active_benefit_group_enrollments.present? && census_employee.cobra_begin_date.present?
+          )
       return "Cobra Enrolled"
     else
       return employee_state.humanize
@@ -134,19 +138,20 @@ module Employers::EmployerHelper
     else
       return "1 Plan Only" if benefit_group.single_plan_type?
       return "Sole Source Plan" if benefit_group.plan_option_kind == 'sole_source'
+
       if benefit_group.plan_option_kind == "single_carrier"
-        plan_count= if aca_state_abbreviation == "DC"
-                      Plan.shop_health_by_active_year(reference_plan.active_year).by_carrier_profile(reference_plan.carrier_profile).count
-                    else
-                      Plan.for_service_areas_and_carriers(query, start_on).shop_market.check_plan_offerings_for_single_carrier.health_coverage.and(hios_id: /-01/).count
-                    end
+        plan_count = if EnrollRegistry[:service_area].settings(:service_area_model).item == 'single'
+                       Plan.shop_health_by_active_year(reference_plan.active_year).by_carrier_profile(reference_plan.carrier_profile).count
+                     else
+                       Plan.for_service_areas_and_carriers(query, start_on).shop_market.check_plan_offerings_for_single_carrier.health_coverage.and(hios_id: /-01/).count
+                     end
         "All #{reference_plan.carrier_profile.legal_name} Plans (#{plan_count})"
       else
-        plan_count= if aca_state_abbreviation == "DC"
-                      Plan.shop_health_by_active_year(reference_plan.active_year).by_health_metal_levels([reference_plan.metal_level]).count
-                    else
-                      Plan.for_service_areas_and_carriers(profile_and_service_area_pairs, start_on).shop_market.check_plan_offerings_for_metal_level.health_coverage.by_metal_level(reference_plan.metal_level).and(hios_id: /-01/).count
-                    end
+        plan_count = if EnrollRegistry[:service_area].settings(:service_area_model).item == 'single'
+                       Plan.shop_health_by_active_year(reference_plan.active_year).by_health_metal_levels([reference_plan.metal_level]).count
+                     else
+                       Plan.for_service_areas_and_carriers(profile_and_service_area_pairs, start_on).shop_market.check_plan_offerings_for_metal_level.health_coverage.by_metal_level(reference_plan.metal_level).and(hios_id: /-01/).count
+                     end
         "#{reference_plan.metal_level.titleize} Plans (#{plan_count})"
       end
     end

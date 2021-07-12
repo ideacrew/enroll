@@ -75,7 +75,7 @@ body {
   border-bottom: solid 3px $brand-primary;
   .navbar-header {
     .navbar-brand {
-      border-right: solid 1px #d7d7d7;
+      border-right: solid 1px <%= EnrollRegistry[:my_portal_links].settings(:color).item %>;
       min-height: 70px;
       img {
         max-height: 40px;
@@ -96,7 +96,7 @@ body {
         line-height: 70px;
         padding: 23px 15px;
         font-weight: 600;
-        color: $primary-black;
+        color: <%= EnrollRegistry[:primary_black].settings(:color).item %>;
         &:hover {
           background-color: $background-hover;
           text-decoration: none;
@@ -124,9 +124,9 @@ body {
         min-height: 70px;
         padding: 15px 15px;
         display: block;
-        border-left: solid 1px #d7d7d7;
+        border-left: solid 1px <%= EnrollRegistry[:my_portal_links].settings(:color).item %>;
         .users-name {
-          color: $primary-black;
+          color: <%= EnrollRegistry[:primary_black].settings(:color).item %>;
         }
       }
     }
@@ -187,7 +187,7 @@ fieldset[disabled] .btn {
 .btn-default.active,
 .open > .dropdown-toggle.btn-default {
   color: $secondary-button-text;
-  background-color: $primary-white;
+  background-color: <%= EnrollRegistry[:primary_white].settings(:color).item %>;
   border-color: $secondary-button-border;
 }
 .btn-default:active,
@@ -217,39 +217,39 @@ fieldset[disabled] .btn-default.active {
   border-color: $secondary-button-border;
 }
 .btn-default .badge {
-  color: #337ab7;
+  color: <%= EnrollRegistry[:href_blue].settings(:color).item %>;
   background-color: $secondary-button-background;
 }
 
 
 .label-info {
-  background-color: #007bc4;
+  background-color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
 }
 .label-info[href]:hover,
 .label-info[href]:focus {
-  background-color: #007bc4;
+  background-color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
 }
 
 .label-danger {
-  background-color: #e72b2d;
+  background-color: <%= EnrollRegistry[:orange].settings(:color).item %>;
 }
 .label-danger[href]:hover,
 .label-danger[href]:focus {
-  background-color: #e72b2d;
+  background-color: <%= EnrollRegistry[:orange].settings(:color).item %>;
 }
 
 .label-success {
-  background-color: $primary-green;
+  background-color: <%= EnrollRegistry[:primary_green].settings(:color).item %>;
 }
 .label-success[href]:hover,
 .label-success[href]:focus {
-  background-color: $primary-green;
+  background-color: <%= EnrollRegistry[:primary_green].settings(:color).item %>;
 }
 .btn {
   border-radius: $primary-border-radius;
 }
 .btn-success {
-  background-color: $primary-green;
+  background-color: <%= EnrollRegistry[:primary_green].settings(:color).item %>;
   border-color: #3e8f3e;
 }
 .btn-success:hover,
@@ -261,7 +261,7 @@ fieldset[disabled] .btn-default.active {
 .btn-success:active,
 .btn-success.active {
   background-color: #419641;
-  border-color: $primary-green;
+  border-color: <%= EnrollRegistry[:primary_green].settings(:color).item %>;
 }
 .btn-success:disabled,
 .btn-success[disabled] {
@@ -319,7 +319,7 @@ fieldset[disabled] .btn-danger.active {
     margin: 0;
   }
   .btn-default {
-    color: #333;
+    color: <%= EnrollRegistry[:background_color].settings(:color).item %>;
     background-color: #fff;
     border-color: #ccc;
   }
@@ -329,7 +329,7 @@ fieldset[disabled] .btn-danger.active {
   .btn-default:active,
   .btn-default.active,
   .open > .dropdown-toggle.btn-default {
-    color: #333;
+    color: <%= EnrollRegistry[:background_color].settings(:color).item %>;
     background-color: #e6e6e6;
     border-color: #adadad;
   }
@@ -361,7 +361,7 @@ fieldset[disabled] .btn-danger.active {
   }
   .btn-default .badge {
     color: #fff;
-    background-color: #333;
+    background-color: <%= EnrollRegistry[:background_color].settings(:color).item %>;
   }
 }
 

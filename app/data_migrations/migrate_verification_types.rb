@@ -1,8 +1,13 @@
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
+# rubocop:disable Metrics/BlockNesting
 class MigrateVerificationTypes < MongoidMigrationTask
   def get_people(offset, limit)
     Person.where(:"consumer_role" => {"$exists" => true}).offset(offset).limit(limit)
+  end
+
+  def local_residency
+    EnrollRegistry[:enroll_app].setting(:state_residency).item
   end
 
   def migrate
@@ -24,7 +29,7 @@ class MigrateVerificationTypes < MongoidMigrationTask
 
   def ensure_verification_types(person)
     live_types = []
-    live_types << 'DC Residency'
+    live_types << local_residency
     live_types << 'Social Security Number' if person.ssn
     live_types << 'American Indian Status' if !(person.tribal_id.nil? || person.tribal_id.empty?)
     if person.us_citizen
@@ -88,33 +93,31 @@ class MigrateVerificationTypes < MongoidMigrationTask
 
   def type_rejected(person, type)
     case type
-      when 'DC Residency'
-        person.consumer_role.residency_rejected
-      when 'Social Security Number'
-        person.consumer_role.ssn_rejected
-      when 'American Indian Status'
-        person.consumer_role.native_rejected
-      when 'Citizenship'
-        person.consumer_role.lawful_presence_rejected
-      when 'Immigration status'
-        person.consumer_role.lawful_presence_rejected
+    when local_residency
+      person.consumer_role.residency_rejected
+    when 'Social Security Number'
+      person.consumer_role.ssn_rejected
+    when 'American Indian Status'
+      person.consumer_role.native_rejected
+    when 'Citizenship' || 'Immigration status'
+      person.consumer_role.lawful_presence_rejected
     end
   end
 
   def type_update_reason(person, type)
     case type
-      when 'DC Residency'
-        person.consumer_role.residency_update_reason
-      when 'Social Security Number'
-        person.consumer_role.ssn_update_reason
-      when 'American Indian Status'
-        person.consumer_role.native_update_reason
-      when 'Citizenship'
-        reason = person.consumer_role.lawful_presence_update_reason
-        person.consumer_role.lawful_presence_update_reason[:update_reason] if reason && reason[:v_type] == 'Citizenship'
-      when 'Immigration status'
-        reason = person.consumer_role.lawful_presence_update_reason
-        person.consumer_role.lawful_presence_update_reason[:update_reason] if reason && reason[:v_type] == 'Immigration status'
+    when local_residency
+      person.consumer_role.residency_update_reason
+    when 'Social Security Number'
+      person.consumer_role.ssn_update_reason
+    when 'American Indian Status'
+      person.consumer_role.native_update_reason
+    when 'Citizenship'
+      reason = person.consumer_role.lawful_presence_update_reason
+      person.consumer_role.lawful_presence_update_reason[:update_reason] if reason && reason[:v_type] == 'Citizenship'
+    when 'Immigration status'
+      reason = person.consumer_role.lawful_presence_update_reason
+      person.consumer_role.lawful_presence_update_reason[:update_reason] if reason && reason[:v_type] == 'Immigration status'
     end
   end
 
@@ -125,45 +128,46 @@ class MigrateVerificationTypes < MongoidMigrationTask
       "curam"
     else
       case type
-        when 'Social Security Number'
-          if consumer.ssn_verified?
-            "verified"
-          elsif consumer.has_docs_for_type?(type) && !consumer.ssn_rejected
-            "review"
-          elsif consumer.ssa_pending?
-            "pending"
-          else
-            "outstanding"
-          end
-        when 'American Indian Status'
-          if consumer.native_verified?
-            "verified"
-          elsif consumer.has_docs_for_type?(type) && !consumer.native_rejected
-            "review"
-          else
-            "outstanding"
-          end
-        when 'DC Residency'
-          if consumer.residency_verified?
-            consumer.residency_attested? ? "attested" : "verified"
-          elsif consumer.has_docs_for_type?(type) && !consumer.residency_rejected
-            "review"
-          elsif consumer.residency_pending?
-            "pending"
-          else
-            "outstanding"
-          end
+      when 'Social Security Number'
+        if consumer.ssn_verified?
+          "verified"
+        elsif consumer.has_docs_for_type?(type) && !consumer.ssn_rejected
+          "review"
+        elsif consumer.ssa_pending?
+          "pending"
         else
-          if consumer.lawful_presence_verified?
-            "verified"
-          elsif consumer.has_docs_for_type?(type) && !consumer.lawful_presence_rejected
-            "review"
-          elsif consumer.citizenship_immigration_processing?
-            "pending"
-          else
-            "outstanding"
-          end
+          "outstanding"
+        end
+      when 'American Indian Status'
+        if consumer.native_verified?
+          "verified"
+        elsif consumer.has_docs_for_type?(type) && !consumer.native_rejected
+          "review"
+        else
+          "outstanding"
+        end
+      when local_residency
+        if consumer.residency_verified?
+          consumer.residency_attested? ? "attested" : "verified"
+        elsif consumer.has_docs_for_type?(type) && !consumer.residency_rejected
+          "review"
+        elsif consumer.residency_pending?
+          "pending"
+        else
+          "outstanding"
+        end
+      else
+        if consumer.lawful_presence_verified?
+          "verified"
+        elsif consumer.has_docs_for_type?(type) && !consumer.lawful_presence_rejected
+          "review"
+        elsif consumer.citizenship_immigration_processing?
+          "pending"
+        else
+          "outstanding"
+        end
       end
     end
   end
 end
+# rubocop:enable Metrics/BlockNesting

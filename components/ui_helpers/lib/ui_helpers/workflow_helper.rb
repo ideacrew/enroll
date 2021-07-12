@@ -86,12 +86,17 @@ module UIHelpers
       end
     end
 
+    # TODO: All these Settings calls will have to be refactored for platformization
     def translation_placeholder_text(text)
-      if text.include? '<medicaid-question-translation-placeholder>'
-        text.sub! '<medicaid-question-translation-placeholder>', state_abbreviation_text(l10n("faa.medicaid_question"))
-      else
-        text
-      end
+      text.gsub! '<board_of_elections_address-placeholder>', Settings.contact_center.board_of_elections_address
+      text.gsub! '<board_of_elections_email-placeholder>', Settings.contact_center.board_of_elections_email
+      text.gsub! '<board_of_elections_entity-placeholder>', Settings.contact_center.board_of_elections_entity
+      text.gsub! '<board_of_elections_phone_number-placeholder>', Settings.contact_center.board_of_elections_phone_number
+      text.gsub! '<contact-center-phone_number-placeholder>', Settings.contact_center.phone_number
+      text.gsub! '<medicaid-question-translation-placeholder>', state_abbreviation_text(l10n("faa.medicaid_question"))
+      text.gsub! '<short-name-placeholder>', Settings.site.short_name
+      text.gsub! '<state-abbreviation-placeholder>', aca_state_abbreviation
+      text
     end
 
     # set YAML text placeholders
@@ -99,7 +104,7 @@ module UIHelpers
       return "" if text.nil?
       # set application applicable year placeholder
       if text.include? '<application-applicable-year-placeholder>'
-        text.sub! '<application-applicable-year-placeholder>', FinancialAssistanceRegistry[:application_year].item.call.value!.to_s
+        text.sub! '<application-applicable-year-placeholder>', FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s
       else
         text
       end

@@ -104,7 +104,7 @@ namespace :load_rating_factors do
               issuer_profile_id: issuer_profile_id,
               max_integer_factor_key: max_integer_factor_key
             )
-            next if existing_record.count > 0
+            next if existing_record.any?
 
             obj.new(
               active_year: @year,
@@ -189,7 +189,7 @@ namespace :load_rating_factors do
                   default_factor_value: RATING_FACTOR_DEFAULT,
                   max_integer_factor_key: max_integer_factor_key
                 )
-                next if existing_record.count > 0
+                next if existing_record.any?
 
                 rating_factor_set.new(active_year: @year,
                   carrier_profile: carrier_profile,

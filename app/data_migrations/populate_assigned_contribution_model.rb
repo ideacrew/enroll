@@ -6,7 +6,7 @@ class PopulateAssignedContributionModel < MongoidMigrationTask
 
   def migrate
     time = Date.new(2020,2,1).beginning_of_day
-    site = BenefitSponsors::Site.by_site_key(Settings.site.key).first
+    site = BenefitSponsors::Site.by_site_key(EnrollRegistry[:enroll_app].setting(:site_key).item).first
     benefit_market = site.benefit_markets.where(kind: :aca_shop).first
     benefit_market_catalog = benefit_market.benefit_market_catalogs.by_application_date(time).first
 

@@ -17,7 +17,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       let(:xml_hash2) { {residency_verification_response: 'ADDRESS_IN_AREA'} }
       let(:person) { FactoryBot.create(:person, :with_consumer_role) }
       let(:consumer_role) { person.consumer_role }
-      let(:history_elements_DC) {consumer_role.verification_types.by_name('DC Residency').first.type_history_elements}
+      let(:local_history_elements) {consumer_role.verification_types.by_name(VerificationType::LOCATION_RESIDENCY).first.type_history_elements}
 
       let(:payload) { {:individual_id => individual_id, :body => xml} }
 
@@ -26,14 +26,14 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           person.verification_types.each{|type| type.type_history_elements.delete_all }
           allow(subject).to receive(:find_person).with(individual_id).and_return(person)
           subject.call(nil, nil, nil, nil, payload)
-          expect(history_elements_DC.count).to be > 0
+          expect(local_history_elements.count).to be > 0
         end
 
         it 'stores verification history element for right verification type' do
           person.verification_types.each{|type| type.type_history_elements.delete_all }
           allow(subject).to receive(:find_person).with(individual_id).and_return(person)
           subject.call(nil, nil, nil, nil, payload)
-          expect(history_elements_DC.first.action).to eq 'Local Hub Response'
+          expect(local_history_elements.first.action).to eq 'Local Hub Response'
         end
 
         it 'stores reference to EventResponse in verification history element' do
@@ -41,7 +41,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           allow(subject).to receive(:find_person).with(individual_id).and_return(person)
           subject.call(nil, nil, nil, nil, payload)
           expect(
-            BSON::ObjectId.from_string(history_elements_DC.first.event_response_record_id)
+            BSON::ObjectId.from_string(local_history_elements.first.event_response_record_id)
           ).to eq consumer_role.local_residency_responses.first.id
         end
       end
@@ -61,7 +61,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           end
 
           it 'should attest dc residency type' do
-            expect(person.verification_type_by_name('DC Residency').validation_status).to eq('attested')
+            expect(person.verification_type_by_name(VerificationType::LOCATION_RESIDENCY).validation_status).to eq('attested')
           end
 
           it 'should store the ADDRESS_NOT_IN_AREA payload' do
@@ -69,7 +69,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           end
 
           it 'should add reason to newly created workflow_state_transition' do
-            expect(@consumer_role.workflow_state_transitions.last.reason).to eq('Self Attest DC Residency')
+            expect(@consumer_role.workflow_state_transitions.last.reason).to eq("Self Attest #{EnrollRegistry[:enroll_app].setting(:state_residency).item}")
           end
         else
           it 'should update consumer role state to outstanding' do
@@ -77,7 +77,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           end
 
           it 'should store dc residency type status to outstanding' do
-            expect(person.verification_type_by_name('DC Residency').validation_status).to eq('outstanding')
+            expect(person.verification_type_by_name(EnrollRegistry[:enroll_app].setting(:state_residency).item).validation_status).to eq('outstanding')
           end
 
           it 'should store the response payload' do

@@ -1,5 +1,8 @@
 Feature: Admin plan shopping via SEP
   Scenario: Admin can select plan for insured multiple role user through SEP
+    Given the shop market configuration is enabled
+    Given all market kinds are enabled for user to select
+    Given all announcements are enabled for user to select
     Given all permissions are present
     Given individual Qualifying life events are present
     Given a CCA site exists with a benefit market
@@ -17,6 +20,6 @@ Feature: Admin plan shopping via SEP
     When I click the "Had a baby" in qle carousel
     And I select a past qle date
     Then I should see confirmation and continue
-    When user clicks on continue button
+    When the individual clicks on the Continue button of the Family Information page
     Then I should see Shop for new plan button
 

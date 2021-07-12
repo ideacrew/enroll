@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :plan do
-    sequence(:hbx_id)    { |n| n + 12345 }
+    sequence(:hbx_id)    { |n| n + 12_345 }
     sequence(:name)      { |n| "BlueChoice Silver#{n} 2,000" }
     abbrev              { "BC Silver $2k" }
     sequence(:hios_id, (10..99).cycle)  { |n| "41842DC04000#{n}-01" }
@@ -20,31 +20,31 @@ FactoryBot.define do
     # association :premium_tables, strategy: :build
     #
     trait :with_rating_factors do
-      after :create do |plan, evaluator|
+      after :create do |plan, _evaluator|
         active_year = plan.active_year
         carrier_id = plan.carrier_profile_id
         [active_year + 1, active_year, active_year - 1].each do |year|
           SicCodeRatingFactorSet.create!({
-            :carrier_profile_id => carrier_id,
-            :active_year => year,
-            :default_factor_value => 1.0
-          })
+                                           :carrier_profile_id => carrier_id,
+                                           :active_year => year,
+                                           :default_factor_value => 1.0
+                                         })
           EmployerGroupSizeRatingFactorSet.create!({
-            :carrier_profile_id => carrier_id,
-            :active_year => year,
-            :default_factor_value => 1.0,
-            :max_integer_factor_key => 1
-          })
+                                                     :carrier_profile_id => carrier_id,
+                                                     :active_year => year,
+                                                     :default_factor_value => 1.0,
+                                                     :max_integer_factor_key => 1
+                                                   })
           EmployerParticipationRateRatingFactorSet.create!({
-            :carrier_profile_id => carrier_id,
-            :active_year => year,
-            :default_factor_value => 1.0
-          })
+                                                             :carrier_profile_id => carrier_id,
+                                                             :active_year => year,
+                                                             :default_factor_value => 1.0
+                                                           })
           crtf = CompositeRatingTierFactorSet.new({
-            :carrier_profile_id => carrier_id,
-            :active_year => year,
-            :default_factor_value => 1.0
-            })
+                                                    :carrier_profile_id => carrier_id,
+                                                    :active_year => year,
+                                                    :default_factor_value => 1.0
+                                                  })
           CompositeRatingTier::NAMES.each do |name|
             crtf.rating_factor_entries << RatingFactorEntry.new(factor_key: name, factor_value: 1.0)
           end
@@ -55,7 +55,7 @@ FactoryBot.define do
 
     trait :with_dental_coverage do
       coverage_kind { "dental" }
-       metal_level { "dental" }
+      metal_level { "dental" }
       dental_level { "high" }
     end
 
@@ -68,13 +68,13 @@ FactoryBot.define do
         start_on = Date.new(plan.active_year,1,1)
         end_on = start_on + 1.year - 1.day
 
-        unless Settings.aca.rating_areas.empty?
+        if ::EnrollRegistry[:rating_area].setting(:areas).item.blank?
+          create_list(:premium_table, evaluator.premium_tables_count, plan: plan, start_on: start_on, end_on: end_on)
+        else
           plan.service_area_id = CarrierServiceArea.for_issuer(plan.carrier_profile.issuer_hios_ids).first.service_area_id
           plan.save!
-          rating_area = RatingArea.first.try(:rating_area) || FactoryBot.create(:rating_area, rating_area: Settings.aca.rating_areas.first).rating_area
+          rating_area = RatingArea.first.try(:rating_area) || FactoryBot.create(:rating_area, rating_area: ::EnrollRegistry[:rating_area].setting(:areas).item.first).rating_area
           create_list(:premium_table, evaluator.premium_tables_count, plan: plan, start_on: start_on, end_on: end_on, rating_area: rating_area)
-        else
-          create_list(:premium_table, evaluator.premium_tables_count, plan: plan, start_on: start_on, end_on: end_on)
         end
       end
     end
@@ -88,16 +88,16 @@ FactoryBot.define do
         start_on = Date.new(plan.active_year,1,1)
         end_on = start_on + 1.year - 1.day
 
-        unless Settings.aca.rating_areas.empty?
-          plan.service_area_id = CarrierServiceArea.for_issuer(plan.carrier_profile.issuer_hios_ids).first.service_area_id
-          plan.save!
-          rating_area = RatingArea.first.try(:rating_area) || FactoryBot.create(:rating_area, rating_area: Settings.aca.rating_areas.first).rating_area
-          (14..65).each do |age|
-            create_list(:premium_table, evaluator.premium_tables_count, plan: plan, age: age, start_on: start_on, end_on: end_on, rating_area: rating_area)
-          end
-        else
+        if ::EnrollRegistry[:rating_area].setting(:areas).item.blank?
           (14..65).each do |age|
             create_list(:premium_table, evaluator.premium_tables_count, plan: plan, age: age, start_on: start_on, end_on: end_on)
+          end
+        else
+          plan.service_area_id = CarrierServiceArea.for_issuer(plan.carrier_profile.issuer_hios_ids).first.service_area_id
+          plan.save!
+          rating_area = RatingArea.first.try(:rating_area) || FactoryBot.create(:rating_area, rating_area: ::EnrollRegistry[:rating_area].setting(:areas).item.first).rating_area
+          (14..65).each do |age|
+            create_list(:premium_table, evaluator.premium_tables_count, plan: plan, age: age, start_on: start_on, end_on: end_on, rating_area: rating_area)
           end
         end
       end
@@ -203,9 +203,9 @@ FactoryBot.define do
         silver: 100.00,
         gold: 90.00,
         platinum: 80.00,
-        dental: 10.00,
+        dental: 10.00
       }
-      pt.update_attribute(:cost, (pt.age * 1001.00) / metal_hash[:"#{pt.plan.metal_level}"] )
+      pt.update_attribute(:cost, (pt.age * 1001.00) / metal_hash[:"#{pt.plan.metal_level}"])
     end
   end
 
@@ -221,9 +221,9 @@ FactoryBot.define do
         silver: 100.00,
         gold: 90.00,
         platinum: 80.00,
-        dental: 10.00,
+        dental: 10.00
       }
-      pt.update_attribute(:cost, (pt.age * 1500.50) / (metal_hash[:"#{pt.plan.metal_level}"] || 110.0)  )
+      pt.update_attribute(:cost, (pt.age * 1500.50) / (metal_hash[:"#{pt.plan.metal_level}"] || 110.0))
     end
   end
 end
@@ -232,7 +232,7 @@ FactoryBot.define do
   factory(:plan_template, {class: Plan}) do
     name { "Some plan name" }
     carrier_profile_id { BSON::ObjectId.new }
-    sequence(:hios_id, (100000..999999).cycle)  { |n| "#{n}-01" }
+    sequence(:hios_id, (100_000..999_999).cycle)  { |n| "#{n}-01" }
     active_year { Date.today.year }
     metal_level { ["bronze","silver","gold","platinum"].shuffle.sample }
 
@@ -258,7 +258,7 @@ FactoryBot.define do
       dental_level { "high" }
     end
     trait :unoffered do
-      sequence(:hios_id, (100000..999999).cycle)  { |n| "#{n}-00" }
+      sequence(:hios_id, (100_000..999_999).cycle)  { |n| "#{n}-00" }
     end
   end
 end

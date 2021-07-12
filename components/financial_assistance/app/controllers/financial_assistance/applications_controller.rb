@@ -31,7 +31,8 @@ module FinancialAssistance
       load_support_texts
     end
 
-    def step # rubocop:disable Metrics/CyclomaticComplexity
+    # rubocop:disable Metrics/AbcSize
+    def step
       save_faa_bookmark(request.original_url.gsub(%r{/step.*}, "/step/#{@current_step.to_i}"))
       set_admin_bookmark_url
       flash[:error] = nil
@@ -68,6 +69,7 @@ module FinancialAssistance
       end
       # rubocop:enable Metrics/BlockNesting
     end
+    # rubocop:enable Metrics/AbcSize
 
     def copy
       service = FinancialAssistance::Services::ApplicationService.new(application_id: params[:id])
@@ -75,8 +77,7 @@ module FinancialAssistance
       redirect_to edit_application_path(@application)
     end
 
-    def help_paying_coverage
-    end
+    def help_paying_coverage; end
 
     def render_message
       @message = params["message"]
@@ -179,7 +180,11 @@ module FinancialAssistance
     end
 
     def checklist_pdf
-      send_file(FinancialAssistance::Engine.root.join('db','documents', 'IVL_Application_Checklist_Final_02172021.pdf').to_s, :disposition => "inline", :type => "application/pdf")
+      send_file(
+        FinancialAssistance::Engine.root.join(
+          FinancialAssistanceRegistry[:ivl_application_checklist].setting(:file_location).item.to_s
+        ), :disposition => "inline", :type => "application/pdf"
+      )
     end
 
     private
@@ -195,7 +200,7 @@ module FinancialAssistance
     end
 
     def call_service
-      if EnrollRegistry[:faa_ext_service].setting(:aceds_curam).item
+      if FinancialAssistanceRegistry.feature_enabled?(:aceds_curam)
         person = FinancialAssistance::Factories::AssistanceFactory.new(@person)
         @assistance_status, @message = person.search_existing_assistance
       else
@@ -236,7 +241,7 @@ module FinancialAssistance
         "jobs" => generate_employment_hash(applicant.incomes.jobs),
         "Does this person expect to receive self-employment income in #{@application.assistance_year}? *" => human_boolean(applicant.has_self_employment_income)
       }
-      income_hash.merge!("Did this person receive unemployment income at any point in #{@application.assistance_year}? *" => human_boolean(applicant.has_unemployment_income)) if FinancialAssistanceRegistry[:unemployment_income].enabled?
+      income_hash.merge!("Did this person receive unemployment income at any point in #{@application.assistance_year}? *" => human_boolean(applicant.has_unemployment_income)) if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income)
       income_hash.merge!("Does this person expect to have income from other sources in #{@application.assistance_year}? *" => human_boolean(applicant.has_other_income))
       income_hash
     end

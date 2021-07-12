@@ -319,7 +319,7 @@ GEM
       amq-protocol (~> 1.9.2)
     cable_ready (4.3.0)
       rails (>= 5.2)
-    capistrano (3.11.0)
+    capistrano (3.14.1)
       airbrussh (>= 1.0.0)
       i18n
       rake (>= 10.0.0)
@@ -515,6 +515,7 @@ GEM
       redis (>= 3.2, < 5.0)
     fast_jsonapi (1.5)
       activesupport (>= 4.2)
+    ffaker (2.18.0)
     ffi (1.9.25)
     font-awesome-rails (4.7.0.5)
       railties (>= 3.2, < 6.1)
@@ -1025,6 +1026,7 @@ DEPENDENCIES
   factory_bot_rails (~> 4.11)
   fakeredis (~> 0.7.0)
   fast_jsonapi
+  ffaker
   financial_assistance!
   forgery (~> 0.7.0)
   haml (~> 5.0)
@@ -1124,4 +1126,4 @@ RUBY VERSION
    ruby 2.5.1p57
 
 BUNDLED WITH
-   2.2.9
+   2.2.12

@@ -232,6 +232,43 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
       end
     end
 
+    describe "with a duplicate dependent" do
+      let(:test_person) { FactoryBot.create(:person, :with_nuclear_family) }
+      let(:duplicate_test_family) { test_person.primary_family }
+      let(:target_dependent) do
+        duplicate_test_family.dependents.detect { |dependent| dependent.relationship == 'child' }
+      end
+      let(:duplicate_dependent_attributes) do
+        {
+          dependent: {
+            family_id: duplicate_test_family.id,
+            first_name: target_dependent.first_name,
+            last_name: target_dependent.last_name,
+            relationship: target_dependent.relationship,
+            gender: target_dependent.gender,
+            dob: "#{target_dependent.dob.year}-#{target_dependent.dob.month}-#{target_dependent.dob.day}"
+          }
+        }
+      end
+      before :each do
+        # To make it detect the test family as current family
+        allow(user).to receive(:person).and_return(test_person)
+        sign_in(user)
+        # No Resident Role
+
+        post :create, params: duplicate_dependent_attributes, :format => "js"
+      end
+
+      it "should redirect to families home after detecting duplicate dependent" do
+        alert_message = l10n(
+          'insured.family_members.duplicate_error_message',
+          action: "add",
+          contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item
+        )
+        expect(assigns(:dependent).errors[:base]).to include(alert_message)
+      end
+    end
+
     describe "with a valid dependent" do
       let(:save_result) { true }
 

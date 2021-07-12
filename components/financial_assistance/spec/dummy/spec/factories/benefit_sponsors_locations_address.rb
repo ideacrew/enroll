@@ -11,6 +11,7 @@ FactoryBot.define do
     zip { '20024' }
     county { 'Suffolk' } # Suffolk County zips: 02101 -> 02137
 
+    # TODO: Refactor this
     # This address is in rating area RMA03 and has good issuer service area coverage
     trait :cca_shop_baseline do
       kind      { 'work' }
@@ -20,6 +21,16 @@ FactoryBot.define do
       zip       { '20024' }
       county    { 'Middlesex' }
     end
+
+    trait :me_shop_baseline do
+      kind      { 'work' }
+      address_1 { '210 State St' }
+      city      { EnrollRegistry[:enroll_app].setting(:contact_center_zip).item }
+      state     { EnrollRegistry[:enroll_app].setting(:state_abbreviation).item }
+      zip       { EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item }
+      county    { EnrollRegistry[:enroll_app].setting(:contact_center_county).item }
+    end
+
 
     trait :work_kind do
       kind { 'work' }

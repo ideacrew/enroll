@@ -5,7 +5,10 @@ module Effective
 
       datatable do
 
-        unless aca_state_abbreviation == "DC"
+       # TODO: This sis the original code
+       #  unless aca_state_abbreviation == "DC"
+       # Make sure that it is cofigured for non DC versions!
+        if EnrollRegistry.feature_enabled?(:employee_datable_waiver_bulk_actions)
           bulk_actions_column do
             bulk_action 'Employee will enroll',
                         main_app.change_expected_selection_employers_employer_profile_census_employees_path(@employer_profile,:expected_selection => "enroll"),

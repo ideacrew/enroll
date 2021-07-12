@@ -1,5 +1,6 @@
 class Employers::PlanYearsController < ApplicationController
   include Config::AcaConcern
+  include ResourceConfigurator
   before_action :find_employer, expect: [:late_rates_check]
   before_action :generate_carriers_and_plans, only: [:create, :reference_plan_options, :update, :edit]
   before_action :updateable?, only: [:new, :edit, :create, :update, :revert, :publish, :force_publish, :make_default_benefit_group]

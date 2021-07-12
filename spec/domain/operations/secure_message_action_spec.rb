@@ -40,9 +40,16 @@ module Operations
 
       let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key) }
       let(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, site: site)}
-      let(:employer_profile) {organization.employer_profile}
+      let(:employer_profile) { organization.employer_profile }
+      let(:person)           { FactoryBot.create(:person, :with_family) }
 
-      let(:params) { { subject: 'Hello world', body: 'Hello world', actions_id: '1234', resource_id: employer_profile.id.to_s, resource_name: employer_profile.class.to_s }}
+      let(:params) do
+        if EnrollRegistry.feature_enabled?(:aca_shop_market)
+          { subject: 'Hello world', body: 'Hello world', actions_id: '1234', resource_id: employer_profile.id.to_s, resource_name: employer_profile.class.to_s }
+        else
+          { subject: 'Hello world', body: 'Hello world', actions_id: '1234', resource_id: person.id.to_s, resource_name: person.class.to_s }
+        end
+      end
 
       it "should pass" do
         expect(subject).to be_success

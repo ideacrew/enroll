@@ -57,9 +57,9 @@ describe "insured/families/check_qle_date.js.erb" do
       render file: "insured/families/check_qle_date.js.erb"
     end
 
-    it "should match error notcie" do
-      expect(render).to match /The date you submitted does not qualify for special enrollment/
-      expect(render).to match /Please double check the date or contact #{Settings.contact_center.name}: #{Settings.contact_center.phone_number}/
+    it "should match error notice" do
+      expect(render).to include("The date you submitted does not qualify for special enrollment")
+      expect(render).to include("Please double check the date or contact #{EnrollRegistry[:enroll_app].setting(:contact_center_name).item}: #{EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number)&.item}")
     end
   end
 
@@ -72,7 +72,12 @@ describe "insured/families/check_qle_date.js.erb" do
     end
 
     it "should match error notice " do
-      expect(render).to match /The date you submitted does not qualify for a special enrollment period. Qualifying life events may be reported up to 30 days after the date of the event. If you are trying to report a future event, please come back on or after the actual date of the event. For further assistance, please contact #{Settings.contact_center.name}: #{Settings.contact_center.phone_number}/
+      expect(render).to include(
+        "The date you submitted does not qualify for a special enrollment period."\
+        " Qualifying life events may be reported up to 30 days after the date of the event."\
+        " If you are trying to report a future event, please come back on or after the actual date of the event."\
+        " For further assistance, please contact #{EnrollRegistry[:enroll_app].setting(:contact_center_name).item}: #{EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number)&.item}"
+      )
     end
   end
 end
