@@ -188,5 +188,7 @@ registry:
       is_enabled: false
     - key: :filing_as_head_of_household
       is_enabled: true
+    - key: :no_coverage_tribe_details
+      is_enabled: true
 # TODO eligibility engine connectivity(HAVEN) settings
 # TODO mec service connectivity settings

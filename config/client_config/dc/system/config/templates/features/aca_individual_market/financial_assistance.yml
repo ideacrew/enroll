@@ -168,8 +168,8 @@ registry:
       is_enabled: false
     - key: :filing_as_head_of_household
       is_enabled: false
-# TODO eligibility engine connectivity(HAVEN) settings
-# TODO mec service connectivity settings
+    - key: :no_coverage_tribe_details
+      is_enabled: false
     - key: :display_medicaid_question
       item: :display_medicaid_question
       is_enabled: false
