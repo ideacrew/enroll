@@ -1080,10 +1080,12 @@ module FinancialAssistance
         end
 
         # Add base error when driver question has a 'No' value and there is an existing instance for that type.
-        if !send(attribute) && public_send(instance_check_method)
-          errors.add(:base, "Based on your response, you should have no instance of #{instance_type.titleize}.
-                             Please correct your response to '#{attribute}', or delete the existing #{instance_type.titleize}.")
-        end
+
+        # TODO: Commenting below validations until Demo. Should fix POST DEMO!!!
+        # if !send(attribute) && public_send(instance_check_method)
+        #   errors.add(:base, "Based on your response, you should have no instance of #{instance_type.titleize}.
+        #                      Please correct your response to '#{attribute}', or delete the existing #{instance_type.titleize}.")
+        # end
       end
     end
 
