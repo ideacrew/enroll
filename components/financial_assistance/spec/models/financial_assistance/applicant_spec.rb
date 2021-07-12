@@ -20,6 +20,26 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
                       family_member_id: BSON::ObjectId.new)
   end
 
+  context "income verification types to main app" do
+    let(:person) { FactoryBot.create(:person, :with_consumer_role, dob: TimeKeeper.date_of_record - 40.years)}
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+
+    before do
+      person.verification_types.destroy_all
+      expect(person.verification_types.where(type_name: "Income").count).to eq(0)
+      FinancialAssistanceRegistry[:verification_type_income_verification].feature.stub(:is_enabled).and_return(true)
+      application.update_attributes(family_id: family.id)
+      applicant.update_attributes(family_member_id: family.family_members.first.id)
+      allow(applicant).to receive(:incomes).and_return([])
+      applicant.save
+      person.reload
+    end
+
+    it "should create a verification type if incomes blank" do
+      expect(person.verification_types.where(type_name: "Income").count).to eq(1)
+    end
+  end
+
   context 'i766' do
     context 'valid i766 document exists' do
       before do
@@ -314,7 +334,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
 
     context 'is_filing_as_head_of_household feature disabled' do
       before do
-        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:filing_as_head_of_household).and_return(false)
+        FinancialAssistanceRegistry[:filing_as_head_of_household].feature.stub(:is_enabled).and_return(false)
       end
 
       it 'should return true without is_filing_as_head_of_household' do
@@ -324,7 +344,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
 
     context 'is_filing_as_head_of_household feature enabled' do
       before do
-        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:filing_as_head_of_household).and_return(true)
+        FinancialAssistanceRegistry[:filing_as_head_of_household].feature.stub(:is_enabled).and_return(true)
       end
 
       it 'should return false without is_filing_as_head_of_household' do
