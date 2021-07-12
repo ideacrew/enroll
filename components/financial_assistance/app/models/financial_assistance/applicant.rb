@@ -1039,11 +1039,8 @@ module FinancialAssistance
       family_id = application.family_id
       family_record = Family.where(id: family_id.to_s).first
       if FinancialAssistanceRegistry.feature_enabled?(:verification_type_income_verification)
-        binding.irb
         if family_record.present? && self.incomes.blank? && self.family_member_id.present?
-          binding.irb
           family_member_record = family_record.family_members.where(_id: family_member_id.to_s).first
-          binding.irb if family_member_record.present?
           return if family_member_record.blank?
           person_record = family_member_record.person
           return if person_record.blank?
