@@ -24,6 +24,9 @@ $(document).on('change', "#applicant_is_homeless", function(){
     $("#applicant_addresses_attributes_0_zip, #applicant_addresses_attributes_0_address_1, #applicant_addresses_attributes_0_address_2, #applicant_addresses_attributes_0_city, #applicant_addresses_attributes_0_county").each(function() {
       $(this).attr('disabled', true);
     })
+    $("#applicant_addresses_attributes_0_zip, #applicant_addresses_attributes_0_address_1, #applicant_addresses_attributes_0_city").each(function() {
+      $(this).prop('required', false);
+    })
     $("#address_info .home-div .selectric-wrapper").hide();
   } else {
     $('span:contains("Remove Mailing Address")').text('Add Mailing Address');
@@ -36,6 +39,9 @@ $(document).on('change', "#applicant_is_homeless", function(){
     })
     $("#applicant_addresses_attributes_0_zip, #applicant_addresses_attributes_0_address_1, #applicant_addresses_attributes_0_address_2, #applicant_addresses_attributes_0_city, #applicant_addresses_attributes_0_county").each(function() {
       $(this).attr('disabled', false);
+    })
+    $("#applicant_addresses_attributes_0_zip, #applicant_addresses_attributes_0_address_1, #applicant_addresses_attributes_0_city").each(function() {
+      $(this).prop('required', true);
     })
     $("#address_info .home-div .selectric-wrapper").show();
   }
