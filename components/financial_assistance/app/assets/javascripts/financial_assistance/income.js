@@ -117,6 +117,7 @@ document.addEventListener("turbolinks:load", function() {
     /* DELETING all Job Incomes on selcting 'no' on Driver Question */
     $('#has_unemployment_income_false').on('change', function(e) {
       var self = this;
+      stopEditingIncome();
       //$('#DestroyExistingJobIncomesWarning').modal('show');
       if ($('.unemployment-incomes-list:not(.other-incomes-list) .unemployment-income').length) {
         e.preventDefault();
