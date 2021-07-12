@@ -55,11 +55,11 @@ module FinancialAssistance
     DRIVER_QUESTION_ATTRIBUTES = [:has_job_income, :has_self_employment_income, :has_other_income,
                                   :has_deductions, :has_enrolled_health_coverage, :has_eligible_health_coverage]
     DRIVER_QUESTION_ATTRIBUTES += [:has_unemployment_income] if FinancialAssistanceRegistry[:unemployment_income].enabled?
-    DRIVER_QUESTION_ATTRIBUTES += [:has_american_indian_alaskan_native_income] if EnrollRegistry[:american_indian_alaskan_native_income].enabled?
+    DRIVER_QUESTION_ATTRIBUTES += [:has_american_indian_alaskan_native_income] if FinancialAssistanceRegistry[:american_indian_alaskan_native_income].enabled?
     DRIVER_QUESTION_ATTRIBUTES.freeze
 
     #list of the documents user can provide to verify Immigration status
-    VLP_DOCUMENT_KINDS = EnrollRegistry[:vlp_documents].setting(:vlp_document_kind_options).item
+    VLP_DOCUMENT_KINDS = FinancialAssistanceRegistry[:vlp_documents].setting(:vlp_document_kind_options).item
 
     CITIZEN_KINDS = {
       us_citizen: "US citizen",
@@ -812,12 +812,12 @@ module FinancialAssistance
         return deductions.present? if has_deductions
         deductions.blank?
       when :health_coverage
-        return false if indian_tribe_member && health_service_through_referral.nil? && EnrollRegistry[:indian_health_service_question].feature.is_enabled
+        return false if indian_tribe_member && health_service_through_referral.nil? && FinancialAssistanceRegistry[:indian_health_service_question].feature.is_enabled
         if FinancialAssistanceRegistry[:medicaid_chip_driver_questions].enabled?
           return false if eligible_immigration_status && medicaid_chip_ineligible.nil?
           return false if eligible_immigration_status && medicaid_chip_ineligible && immigration_status_changed.nil?
         end
-        return false if indian_tribe_member && health_service_eligible.nil? && EnrollRegistry[:indian_health_service_question].feature.is_enabled
+        return false if indian_tribe_member && health_service_eligible.nil? && FinancialAssistanceRegistry[:indian_health_service_question].feature.is_enabled
         return medicare_eligible_qns if FinancialAssistanceRegistry.feature_enabled?(:has_medicare_cubcare_eligible)
         return dependent_coverage_questions if FinancialAssistanceRegistry.feature_enabled?(:has_dependent_with_coverage)
         return false if has_enrolled_health_coverage.nil? || has_eligible_health_coverage.nil?
