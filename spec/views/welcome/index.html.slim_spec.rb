@@ -25,8 +25,8 @@ RSpec.describe "welcome/index.html.slim", :type => :view, dbclean: :after_each  
         render
       end
       it "shows registration if not signed in" do
-        expect(rendered).to match /Broker Registration/
-        expect(rendered).to match /General Agency Registration/
+        expect(rendered).to match(/Broker Registration/)
+        expect(rendered).to match(/General Agency Registration/)
       end
     end
 
@@ -36,8 +36,8 @@ RSpec.describe "welcome/index.html.slim", :type => :view, dbclean: :after_each  
         render
       end
       it "does not show general agency related links" do
-        expect(rendered).not_to match /General Agency Registration/
-        expect(rendered).not_to match /General Agency Portal/
+        expect(rendered).not_to match(/General Agency Registration/)
+        expect(rendered).not_to match(/General Agency Portal/)
       end
     end
 

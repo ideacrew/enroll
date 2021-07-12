@@ -7,7 +7,7 @@ module FinancialAssistance
     include AASM
     include Ssn
     include UnsetableSparseFields
-    include ActionView::Helpers::TranslationHelper 
+    include ActionView::Helpers::TranslationHelper
     include FinancialAssistance::L10nHelper
 
     embedded_in :application, class_name: "::FinancialAssistance::Application", inverse_of: :applicants
