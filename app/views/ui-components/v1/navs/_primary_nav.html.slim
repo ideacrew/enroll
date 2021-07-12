@@ -37,9 +37,10 @@
           li role="presentation"
             a.dropdown-toggle data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"
             = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'user-account', link_path: main_app.user_account_index_exchanges_hbx_profiles_path, display_name: 'User Accounts',active_tab: "user-account", remote: false, pundit_object: HbxProfile, pundit_method: :can_access_user_account_tab? }
-          li role="presentation"
-            a.dropdown-toggle data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"
-            = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'issuers', link_path: main_app.exchanges_issuers_path, display_name: 'Issuers', active_tab: "issuers", remote: true, pundit_object: HbxProfile, pundit_method: :view_admin_tabs? }
+          - if EnrollRegistry.feature_enabled?(:issuers_tab)
+            li role="presentation"
+              a.dropdown-toggle data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"
+              = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'issuers', link_path: main_app.exchanges_issuers_path, display_name: 'Issuers', active_tab: "issuers", remote: true, pundit_object: HbxProfile, pundit_method: :view_admin_tabs? }
           li.dropdown.pl-1 role="presentation"
             a.dropdown-toggle data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" Brokers
             i.fas.fa-caret-down
@@ -79,10 +80,11 @@
               - if EnrollRegistry.feature_enabled?(:data_seeds_ui) && (ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true' || !Rails.env.production?)
                 li
                   = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {tab_name: 'manage-data-seeds', link_path: main_app.exchanges_seeds_path, data: { turbolinks: false }, display_name: l10n("exchange.seeds.page_title"), active_tab: "manage-data-seeds", remote: false, pundit_object: HbxProfile, pundit_method: :view_admin_tabs?}
-          li.pl-1 role="presentation" class="#{pundit_class HbxProfile, :view_admin_tabs?}"
-            = link_to(main_app.inbox_exchanges_hbx_profile_path(1), :remote => false, class: 'visible', "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab" ) do
-              | Inbox
-              span.badge.ml-half = @unread_messages
-          li.pl-1 role="presentation" class="#{pundit_class HbxProfile, :view_admin_tabs?}"
-            = link_to(notifier.notice_kinds_path, "aria-expanded" => "true", "aria-controls" => "notices", "role" => "tab" ) do
-              | Notices
+            - if EnrollRegistry.feature_enabled?(:inbox_tab)
+              li.pl-1 role="presentation" class="#{pundit_class HbxProfile, :view_admin_tabs?}"
+                = link_to(main_app.inbox_exchanges_hbx_profile_path(1), :remote => false, class: 'visible', "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab" ) do
+                  | Inbox
+                  span.badge.ml-half = @unread_messages
+                li.pl-1 role="presentation" class="#{pundit_class HbxProfile, :view_admin_tabs?}"
+                  = link_to(notifier.notice_kinds_path, "aria-expanded" => "true", "aria-controls" => "notices", "role" => "tab" ) do
+                    | Notices
