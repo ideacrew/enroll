@@ -1,9 +1,14 @@
 # frozen_string_literal: true
 
-When(/^Individual market is not under open enrollment period$/) do
+When(/^Individual market is under (.*) period$/) do |oe_period|
   visit "/"
   find(HomePage.consumer_family_portal_btn).click
-  FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)
+
+  if oe_period == "open_enrollment"
+    FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)
+  else
+    FactoryBot.create(:hbx_profile, :no_open_enrollment_coverage_period)
+  end
   FactoryBot.create(:qualifying_life_event_kind, market_kind: "individual")
   FactoryBot.create(:qualifying_life_event_kind, :effective_on_event_date_and_first_month, market_kind: "individual")
   BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
