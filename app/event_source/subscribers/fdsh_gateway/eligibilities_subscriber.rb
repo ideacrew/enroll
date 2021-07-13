@@ -8,6 +8,7 @@ module Subscribers
       include ::EventSource::Subscriber[amqp: 'fdsh.eligibilities.ridp']
 
       subscribe(:on_primary_determination_complete) do |delivery_info, metadata, response|
+        logger.debug "Ridp::EligibilitiesSubscriber: invoked on_fdsh_eligibilities"
         logger.info "Ridp::EligibilitiesSubscriber: invoked on_fdsh_eligibilities with delivery_info: #{delivery_info}, response: #{response}"
         payload = JSON.parse(response, :symbolize_names => true)
         params = { primary_member_hbx_id: metadata.correlation_id, event_kind: 'primary',
@@ -16,12 +17,12 @@ module Subscribers
         result = Operations::Fdsh::Ridp::CreateEligibilityResponseModel.new.call(params)
 
         if result.success?
-          ack(delivery_info.delivery_tag)
           logger.info "FdshGateway::EligibilitiesSubscriber: on_primary_determination acked with success: #{result.success}"
+          ack(delivery_info.delivery_tag)
         else
           errors = result.failure.errors.to_h
-          nack(delivery_info.delivery_tag)
           logger.info "FdshGateway::EligibilitiesSubscriber: on_primary_determination nacked with failure, errors: #{errors}"
+          nack(delivery_info.delivery_tag)
         end
       rescue StandardError => e
         nack(delivery_info.delivery_tag)
@@ -37,12 +38,12 @@ module Subscribers
         result = Operations::Fdsh::Ridp::CreateEligibilityResponseModel.new.call(params)
 
         if result.success?
-          ack(delivery_info.delivery_tag)
           logger.info "FdshGateway::EligibilitiesSubscriber: on_secondary_determination acked with success: #{result.success}"
+          ack(delivery_info.delivery_tag)
         else
           errors = result.failure.errors.to_h
-          nack(delivery_info.delivery_tag)
           logger.info "FdshGateway::EligibilitiesSubscriber: on_secondary_determination nacked with failure, errors: #{errors}"
+          nack(delivery_info.delivery_tag)
         end
       rescue StandardError => e
         nack(delivery_info.delivery_tag)
