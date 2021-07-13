@@ -25,7 +25,7 @@ namespace :paynow do
       return
     end
 
-    payment_transactions = PaymentTransaction.where(submitted_at: start_date..end_date)
+    payment_transactions = PaymentTransaction.where(submitted_at: start_date.beginning_of_day..end_date.end_of_day)
 
     CSV.open(file_name, "w", force_quotes: true) do |row|
       row << field_names
