@@ -607,7 +607,7 @@ And /^employer filled all the fields on benefit application form$/ do
 end
 
 And /^employer clicked on continue button$/ do
-  find(EmployerAddBenefitPackage.continue_btn, wait: 5).click
+  find(EmployerAddBenefitPackage.continue_btn, wait: 10).click
 end
 
 Then(/^employer should see form for benefit application and benefit package$/) do
