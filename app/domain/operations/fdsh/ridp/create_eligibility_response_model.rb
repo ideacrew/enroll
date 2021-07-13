@@ -25,14 +25,16 @@ module Operations
 
         def construct_payload_hash(params)
           value = {
-            primary_member_hbx_id: a[:primary_member_hbx_id],
-            event_kind: a[:event_kind],
+            primary_member_hbx_id: params[:primary_member_hbx_id],
+            event_kind: params[:event_kind],
             ridp_eligibility: {
-              delivery_info: a[:delivery_info],
-              metadata: a[:metadata],
-              event: a[:response]
+              delivery_info: params[:delivery_info],
+              metadata: params[:metadata],
+              event: params[:response]
             }
           }
+
+          Rails.logger.info("In construct_payload_hash method #{value}")
 
           Success(value)
         end
@@ -48,7 +50,7 @@ module Operations
 
         def persist(entity)
           result = Try do
-            Rails.logger.info("Persisting EligibilityResponseModel with #{entity.to_h}")
+            Rails.logger.info("Persisting EligibilityResponseModel with #{entity}")
             ::Fdsh::Ridp::EligibilityResponseModel.create!(entity.to_h)
           end
 
