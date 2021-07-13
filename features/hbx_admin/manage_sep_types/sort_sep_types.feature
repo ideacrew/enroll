@@ -110,7 +110,7 @@ Feature: Admin has ability to sort SEP Types on Sort SEPs Page and save their po
 
   Scenario: Admin will create a new Shop market SEP type with future date and try to sort the Sep Type
     Given Admin can navigate to the Manage SEPs screen
-    When Admin creates new SEP Type with shop market and cannot select termination on kinds with future start and end dates scenario
+    When Admin creates new SEP Type with shop market and can select termination on kinds with future start and end dates scenario
     And Admin navigates to SEP Types List page
     And Admin clicks shop filter on SEP Types datatable
     And Admin clicks on Draft filter of shop market filter
