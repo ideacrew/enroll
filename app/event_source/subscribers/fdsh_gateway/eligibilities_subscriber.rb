@@ -11,10 +11,10 @@ module Subscribers
         logger.debug "Ridp::EligibilitiesSubscriber: invoked on_fdsh_eligibilities"
         logger.info "Ridp::EligibilitiesSubscriber: invoked on_fdsh_eligibilities with delivery_info: #{delivery_info.inspect}, response: #{response.inspect}"
         payload = JSON.parse(response, :symbolize_names => true)
-        params = { primary_member_hbx_id: metadata.correlation_id, event_kind: 'primary',
-                   delivery_info: delivery_info, metadata: metadata, response: payload }
+        eligibility_hash = { primary_member_hbx_id: metadata.correlation_id, event_kind: 'primary',
+                             metadata: metadata, response: payload }
 
-        result = Operations::Fdsh::Ridp::CreateEligibilityResponseModel.new.call(params)
+        result = Operations::Fdsh::Ridp::CreateEligibilityResponseModel.new.call(eligibility_hash)
 
         if result.success?
           logger.info "FdshGateway::EligibilitiesSubscriber: on_primary_determination acked with success: #{result.success}"
@@ -32,10 +32,10 @@ module Subscribers
       subscribe(:on_secondary_determination_complete) do |delivery_info, _metadata, response|
         logger.info "Ridp::EligibilitiesSubscriber: invoked on_fdsh_eligibilities with delivery_info: #{delivery_info}, response: #{response}"
         payload = JSON.parse(response, :symbolize_names => true)
-        params = { primary_member_hbx_id: metadata.correlation_id, event_kind: 'secondary',
-                   delivery_info: delivery_info, metadata: metadata, response: payload }
+        eligibility_hash = { primary_member_hbx_id: metadata.correlation_id, event_kind: 'secondary',
+                             metadata: metadata, response: payload }
 
-        result = Operations::Fdsh::Ridp::CreateEligibilityResponseModel.new.call(params)
+        result = Operations::Fdsh::Ridp::CreateEligibilityResponseModel.new.call(eligibility_hash)
 
         if result.success?
           logger.info "FdshGateway::EligibilitiesSubscriber: on_secondary_determination acked with success: #{result.success}"
