@@ -7,8 +7,8 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: c1dc80f4353e6d7f161ad6b389a16c02f795fb26
-  branch: happymapper_example_and_test
+  revision: bb81955e788a58e90870d40bb9a905c5bc0cce66
+  branch: release_0.3.0
   specs:
     aca_entities (0.3.0)
       deep_merge
