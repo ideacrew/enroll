@@ -9,7 +9,7 @@ module Subscribers
 
       subscribe(:on_primary_determination_complete) do |delivery_info, metadata, response|
         logger.debug "Ridp::EligibilitiesSubscriber: invoked on_fdsh_eligibilities"
-        logger.info "Ridp::EligibilitiesSubscriber: invoked on_fdsh_eligibilities with delivery_info: #{delivery_info}, response: #{response}"
+        logger.info "Ridp::EligibilitiesSubscriber: invoked on_fdsh_eligibilities with delivery_info: #{delivery_info.inspect}, response: #{response.inspect}"
         payload = JSON.parse(response, :symbolize_names => true)
         params = { primary_member_hbx_id: metadata.correlation_id, event_kind: 'primary',
                    delivery_info: delivery_info, metadata: metadata, response: payload }
