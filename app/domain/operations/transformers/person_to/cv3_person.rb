@@ -371,7 +371,7 @@ module Operations
         end
 
         def transform_user_params(user)
-          return if user.nil?
+          return {} unless user.present?
 
           {
             # attestations: construct_attestations,
