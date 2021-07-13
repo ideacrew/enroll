@@ -29,7 +29,7 @@ Feature: Admin has ability to create a new SEP Type with visibility options for 
     And the Admin is on the Main Page
     And Admin clicks Families tab
     And the Admin is navigated to the Families screen
-    And Admin clicks name of a ivl family person on the family datatable
+    And I click the name of Patrick Doe from family list
     Then I should see listed individual market SEP Types
     And I should see the "Entered into a legal domestic partnership" at the bottom of the ivl qle list
     And Admin logs out
