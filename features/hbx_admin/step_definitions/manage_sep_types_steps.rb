@@ -54,12 +54,10 @@ Then("Admin should see Sort SEPs button and Create SEP button") do
 end
 
 When("Admin clicks on List SEP Types link") do
-  click_link 'List SEP Types'
-  sleep 5
+  click_link('List SEP Types',  wait: 10)
 end
 
 Then("Admin navigates to SEP Type List page") do
-  sleep 5
   step "Admin can navigate to the Manage SEPs screen"
 end
 
