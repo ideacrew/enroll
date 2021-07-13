@@ -41,6 +41,7 @@ jobs:
   #         SOURCE_DIR: hugo/public
   #         DEST_DIR: ${{ env.BRANCH_NAME }}
   swagger:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
