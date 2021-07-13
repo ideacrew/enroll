@@ -12,7 +12,6 @@ module Operations
         include EventSource::Command
 
         def call(params)
-          Rails.logger.info("Invoked CreateEligibilityResponseModel with #{params.inspect}")
           value = yield construct_payload_hash(params)
           validated_params = yield validate_value(value)
           entity = yield create_entity(validated_params)
@@ -23,7 +22,6 @@ module Operations
 
         private
 
-<<<<<<< HEAD
         def construct_payload_hash(eligibility_json)
           params = JSON.parse(eligibility_json, :symbolize_names => true)
           Try do
@@ -34,16 +32,6 @@ module Operations
                 metadata: params[:metadata].to_h,
                 event: params[:response]
               }
-=======
-        def construct_payload_hash(params)
-          value = {
-            primary_member_hbx_id: a[:primary_member_hbx_id],
-            event_kind: a[:event_kind],
-            ridp_eligibility: {
-              delivery_info: a[:delivery_info],
-              metadata: a[:metadata],
-              event: a[:response]
->>>>>>> 2acebe3e3e (fixed spec and added extra logger)
             }
 
             Success(value)
@@ -61,11 +49,7 @@ module Operations
 
         def persist(entity)
           result = Try do
-<<<<<<< HEAD
             Rails.logger.info("Persisting EligibilityResponseModel with #{entity}")
-=======
-            Rails.logger.info("Persisting EligibilityResponseModel with #{entity.to_h}")
->>>>>>> 2acebe3e3e (fixed spec and added extra logger)
             ::Fdsh::Ridp::EligibilityResponseModel.create!(entity.to_h)
           end
 
