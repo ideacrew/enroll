@@ -1,10 +1,9 @@
 {
-    "name": "enroll-docs",
-    "version": "1.0.0",
-    "devDependencies": {
-      "autoprefixer": "^10.2.3",
-      "postcss": "^8.2.13",
-      "postcss-cli": "^8.3.1"
-    }
+  "name": "enroll-docs",
+  "version": "1.0.0",
+  "devDependencies": {
+    "autoprefixer": "^10.2.3",
+    "postcss": "^8.2.13",
+    "postcss-cli": "^8.3.1"
   }
-  
+}
