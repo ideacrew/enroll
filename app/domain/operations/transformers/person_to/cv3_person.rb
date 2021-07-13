@@ -137,6 +137,8 @@ module Operations
         end
 
         def transform_user_params(user)
+          return {} unless user.present?
+
           {
             # attestations: construct_attestations,
             approved: user.approved,
