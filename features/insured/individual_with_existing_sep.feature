@@ -1,7 +1,7 @@
 Feature: Consumer shops for plan with existing seps
   Background: Setup IVL benefit packages and benefit coverage periods
     Given the FAA feature configuration is enabled
-    And Individual market is not under open enrollment period
+    And Individual market is under no_open_enrollment period
   Scenario: Individual add SEP and see SHOP for Plans Banner
     Given there exists Patrick Doe with active individual market role and verified identity
     And Patrick Doe logged into the consumer portal
