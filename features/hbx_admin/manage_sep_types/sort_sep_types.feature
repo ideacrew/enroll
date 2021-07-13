@@ -59,15 +59,15 @@ Feature: Admin has ability to sort SEP Types on Sort SEPs Page and save their po
     And Admin navigates to SEP Types List page
     And Admin clicks individual filter on SEP Types datatable
     And Admin clicks on Draft filter of individual market filter
-    Then Admin should see newly created SEP Type title on Datatable
-    When Admin clicks on newly created SEP Type
-    Then Admin should navigate to update SEP Type page
-    When Admin clicks on Publish button
-    Then Admin should see Successfully publish message
-    When Admin clicks on the Sort SEPs button
-    Then Admin should see three tabs Individual, Shop and Congress markets
-    When Admin clicks on individual tab
-    And Admin should see listed individual market SEP Types
+    And Admin should see newly created SEP Type title on Datatable
+    And Admin clicks on newly created SEP Type
+    And Admin should navigate to update SEP Type page
+    And Admin clicks on Publish button
+    And Admin should see Successfully publish message
+    And Admin clicks on the Sort SEPs button
+    When Admin should see three tabs Individual, Shop and Congress markets
+    And Admin clicks on individual tab
+    Then Admin should see listed individual market SEP Types
     And Admin should not see the "Entered into a legal domestic partnership" at the bottom of the ivl qle list
     And Hbx Admin logs out
 
