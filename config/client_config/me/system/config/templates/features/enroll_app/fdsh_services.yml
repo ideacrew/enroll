@@ -7,3 +7,4 @@ registry:
         is_enabled: true
       - key: :paper_application_verification
         is_enabled: false
+
