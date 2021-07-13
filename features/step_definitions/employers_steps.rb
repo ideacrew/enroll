@@ -442,7 +442,7 @@ Then(/^.+ should see the combined filter results$/) do
 end
 
 When(/^.+ go(?:es)? to the benefits tab$/) do
-  find(".interaction-click-control-benefits").click
+  find(EmployerHomePage.benefits_link, wait: 5).click
 end
 
 Then(/^.+ should see the plan year$/) do
@@ -450,8 +450,7 @@ Then(/^.+ should see the plan year$/) do
 end
 
 When(/^.+ clicks? on publish plan year$/) do
-  find('.interaction-click-control-publish-plan-year').click
-  sleep 2
+  find('.interaction-click-control-publish-plan-year', wait: 5).click
 end
 
 Then(/^.+ should see Action Needed button/) do
@@ -601,14 +600,14 @@ Then /^employer should see continue button disabled$/ do
 end
 
 And /^employer filled all the fields on benefit application form$/ do
-  find(:xpath, "/html/body/div[3]/div/div/div[2]/form/div/div/div/div/div[3]/div/div/div[1]/div/div[2]").click
+  find(:xpath, "/html/body/div[3]/div/div/div[2]/form/div/div/div/div/div[3]/div[2]/div/div[1]/div").click
   find('li[data-index="1"]').click
   fill_in 'benefit_application[fte_count]', with: 5
   fill_in 'benefit_application[pte_count]', with: 5
 end
 
 And /^employer clicked on continue button$/ do
-  find("#benefitContinueBtn").click
+  find(EmployerAddBenefitPackage.continue_btn, wait: 10).click
 end
 
 Then(/^employer should see form for benefit application and benefit package$/) do
