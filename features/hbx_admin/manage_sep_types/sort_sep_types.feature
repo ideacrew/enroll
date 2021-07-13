@@ -46,34 +46,18 @@ Feature: Admin has ability to sort SEP Types on Sort SEPs Page and save their po
     And Admin can navigate to the Manage SEPs screen
     And Admin clicks on the Sort SEPs button
     And Admin clicks on individual tab
-    And Admin sorts Individual SEP Types by drag and drop
+    when Admin sorts Individual SEP Types by drag and drop
     And listed Individual SEP Types ordinal postions should change
     And Hbx Admin logs out
-    When Individual resumes enrollment
-    And I click on Sign In
-    And I signed in
-    And I should land on home page
+    And user Patrick Doe logs into the portal
     Then I should see the "Married" at the top of the ivl qle list
     And Individual logs out
 
   Scenario: Admin will create a new Individual market SEP type with future date and try to sort the Sep Type
     Given Admin can navigate to the Manage SEPs screen
-    And expired Qualifying life events of individual market is present
-    When Admin clicks on the Create SEP Type button
-    Then Admin navigates to Create SEP Type page
-    When Admin fills Create SEP Type form with future start and end dates
-    And Admin fills Create SEP Type form with Title
-    And Admin fills Create SEP Type form with Event label
-    And Admin fills Create SEP Type form with Tool Tip
-    And Admin selects individual market radio button
-    And Admin fills Create SEP Type form with Reason
-    And Admin selects effective on kinds for Create SEP Type
-    And Admin cannot select termination on kinds for individual SEP Type
-    And Admin fills Create SEP Type form with Pre Event SEP and Post Event SEP dates
-    And Admin clicks on Create Draft button
-    Then Admin should see SEP Type Created Successfully message
-    When Admin navigates to SEP Types List page
-    When Admin clicks individual filter on SEP Types datatable
+    When Admin creates new SEP Type with shop market and cannot select termination on kinds with future start and end dates scenario
+    And Admin navigates to SEP Types List page
+    And Admin clicks individual filter on SEP Types datatable
     And Admin clicks on Draft filter of individual market filter
     Then Admin should see newly created SEP Type title on Datatable
     When Admin clicks on newly created SEP Type
@@ -125,7 +109,7 @@ Feature: Admin has ability to sort SEP Types on Sort SEPs Page and save their po
     Then Employee logs out
 
   Scenario: Admin will create a new Shop market SEP type with future date and try to sort the Sep Type
-    GGiven Admin can navigate to the Manage SEPs screen
+    Given Admin can navigate to the Manage SEPs screen
     When Admin creates new SEP Type with shop market and cannot select termination on kinds with future start and end dates scenario
     And Admin navigates to SEP Types List page
     And Admin clicks shop filter on SEP Types datatable
