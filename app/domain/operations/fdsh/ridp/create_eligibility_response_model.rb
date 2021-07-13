@@ -12,6 +12,7 @@ module Operations
         include EventSource::Command
 
         def call(params)
+          Rails.logger.info("Invoked CreateEligibilityResponseModel with #{params}")
           value = yield construct_payload_hash(params)
           validated_params = yield validate_value(value)
           entity = yield create_entity(validated_params)
