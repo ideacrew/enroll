@@ -46,7 +46,7 @@ Feature: Admin has ability to sort SEP Types on Sort SEPs Page and save their po
     And Admin can navigate to the Manage SEPs screen
     And Admin clicks on the Sort SEPs button
     And Admin clicks on individual tab
-    when Admin sorts Individual SEP Types by drag and drop
+    When Admin sorts Individual SEP Types by drag and drop
     And listed Individual SEP Types ordinal postions should change
     And Hbx Admin logs out
     And user Patrick Doe logs into the portal
