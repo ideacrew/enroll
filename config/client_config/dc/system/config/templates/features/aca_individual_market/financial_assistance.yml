@@ -64,6 +64,9 @@ registry:
         is_enabled: true
       - key: :immigration_status_question_required
         is_enabled: false
+      - key: :primary_caregiver_other_question
+        item: :primary_caregiver_other_question
+        is_enabled: false
   - namespace:
     - :request_determination
     features:
@@ -171,8 +174,6 @@ registry:
       is_enabled: false
     - key: :filing_as_head_of_household
       is_enabled: false
-# TODO eligibility engine connectivity(HAVEN) settings
-# TODO mec service connectivity settings
     - key: :display_medicaid_question
       item: :display_medicaid_question
       is_enabled: false
@@ -188,8 +189,5 @@ registry:
       settings:
         - key: :name
           item: 'DHS'
-    - key: :primary_caregiver_other_question
-      item: :primary_caregiver_other_question
-      is_enabled: false
     - key: :student_follow_up_questions
       is_enabled: true
