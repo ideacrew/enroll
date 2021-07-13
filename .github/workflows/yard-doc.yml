@@ -3,44 +3,93 @@ on:
   push:
 
 jobs:
-  docs_deployment:
-    runs-on: ubuntu-latest
+  # docs_deployment:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #       with:
+  #         submodules: recursive
+  #     - uses: nelonoel/branch-name@v1.0.1
+  #     - uses: actions/setup-node@v2
+  #       with:
+  #         node-version: '14'
+  #     - run: cd hugo && npm ci
+  #     - uses: ruby/setup-ruby@v1
+  #     - uses: actions/cache@v2
+  #       with:
+  #         path: vendor/bundle
+  #         key: v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
+  #         restore-keys: |
+  #           v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
+  #     - name: Install project gems
+  #       run: |
+  #         bundle config path vendor/bundle
+  #         bundle install
+  #     - uses: actions/setup-python@v2
+  #       with:
+  #         python-version: '3.x' # Version range or exact version of a Python version to use, using SemVer's version range syntax
+  #         architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified  
+  #     - name: Run yard
+  #       run: bundle exec yard doc && mv ./doc ./hugo/static/yard
+  #     - run: sudo snap install hugo --channel=extended
+  #     - run: cd hugo && hugo --minify
+  #     - uses: jakejarvis/s3-sync-action@master
+  #       env:
+  #         AWS_S3_BUCKET: ${{ secrets.YARD_S3_BUCKET }}
+  #         AWS_ACCESS_KEY_ID: ${{ secrets.YARD_ACCESS_KEY_ID }}
+  #         AWS_SECRET_ACCESS_KEY: ${{ secrets.YARD_SECRET_ACCESS_KEY }}
+  #         SOURCE_DIR: hugo/public
+  #         DEST_DIR: ${{ env.BRANCH_NAME }}
+  swagger:
     steps:
       - uses: actions/checkout@v2
-        with:
-          submodules: recursive
-      - uses: nelonoel/branch-name@v1.0.1
+      - uses: ruby/setup-ruby@v1
       - uses: actions/setup-node@v2
         with:
-          node-version: '12'
-      - run: cd hugo && npm ci
-      - uses: ruby/setup-ruby@v1
-      - uses: actions/cache@v2
+          node-version: '14'
+      - uses: wbari/start-mongoDB@v0.2
+        with:
+          mongoDBVersion: '3.6'
+      - name: restore Project Gems
+        uses: actions/cache@v2
         with:
           path: vendor/bundle
-          key: v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
+          key: v5-faa-${{ hashFiles('**/Gemfile.lock') }}
           restore-keys: |
-            v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
-      - name: Install project gems
+            v5-faa-
+      - name: bundle install
         run: |
+          gem update --system --quiet --silent
           bundle config path vendor/bundle
           bundle install
+          cd components/financial_assistance
+          bundle config path ../../vendor/bundle
+          bundle install
+      - name: Restore Node Modules
+        id: npm-cache
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
+      - name: yarn install
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: |
+          yarn install
+      - name: run webpack
+        run: |
+          echo bundle config
+          bundle config path vendor/bundle
+          NODE_ENV=test RAILS_ENV=test ./bin/webpack
       - uses: actions/setup-python@v2
         with:
           python-version: '3.x' # Version range or exact version of a Python version to use, using SemVer's version range syntax
-          architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
-      # - name: Run swagger
-      #   run: |
-      #     bundle exec rake rswag:specs:swaggerize PATTERN="components/financial_assistance/spec/requests/financial_assistance/api/v1/applications_spec.rb"
-      #     python swagger-yaml-to-html.py < /swagger/v1/swagger.yaml > doc.html    
-      - name: Run yard
-        run: bundle exec yard doc && mv ./doc ./hugo/static/yard
-      - run: sudo snap install hugo --channel=extended
-      - run: cd hugo && hugo --minify
-      - uses: jakejarvis/s3-sync-action@master
-        env:
-          AWS_S3_BUCKET: ${{ secrets.YARD_S3_BUCKET }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.YARD_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.YARD_SECRET_ACCESS_KEY }}
-          SOURCE_DIR: hugo/public
-          DEST_DIR: ${{ env.BRANCH_NAME }}
+          architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified 
+      - name: test engine
+        run: |
+          root=`pwd -P`
+          cd $root/components/financial_assistance
+          bundle config path ../../vendor/bundle
+          bundle exec rake rswag:specs:swaggerize PATTERN="spec/requests/financial_assistance/api/v1/applications_spec.rb"
+          python swagger-yaml-to-html.py < /swagger/v1/swagger.yaml > doc.html  
