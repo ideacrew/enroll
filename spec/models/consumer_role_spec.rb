@@ -341,6 +341,7 @@ context 'Verification process and notices' do
     all_states = [:unverified, :ssa_pending, :dhs_pending, :verification_outstanding, :fully_verified, :sci_verified, :verification_period_ended]
     shared_examples_for 'IVL state machine transitions and workflow' do |ssn, citizen, residency, residency_status, from_state, to_state, event, tribal_id = ''|
       before do
+        EnrollRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(false)
         person.ssn = ssn
         consumer.citizen_status = citizen
         consumer.is_state_resident = residency
@@ -742,6 +743,9 @@ context 'Verification process and notices' do
     let(:consumer_role) {person.consumer_role}
     let(:family) { double("Family", :person_has_an_active_enrollment? => true)}
 
+    before do
+      EnrollRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(false)
+    end
     it 'should fail indian tribe status if person updates native status field' do
       person.update_attributes(tribal_id: "1234567")
       consumer_role.update_attributes(aasm_state: "ssa_pending")
@@ -868,13 +872,15 @@ describe "#find_document" do
 end
 
 describe "Indian tribe member" do
+  before do
+    EnrollRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(false)
+  end
   let(:person) { FactoryBot.create(:person, :with_consumer_role) }
   let(:consumer_role) { person.consumer_role }
   let(:verification_types) { consumer.verification_types }
   let(:verification_attr) { OpenStruct.new({ :determined_at => Time.zone.now, :vlp_authority => "ssa" })}
 
   context 'Responses from local hub and ssa hub' do
-
     it 'aasm state should be in verification outstanding if dc response is valid and consumer is tribe member' do
       person.update_attributes!(tribal_id: "12345")
       consumer_role.coverage_purchased!(verification_attr)
