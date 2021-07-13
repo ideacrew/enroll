@@ -415,7 +415,7 @@ end
 
 And(/I select a plan on plan shopping page/) do
   screenshot("plan_shopping")
-  find_all(IvlChoosePlan.select_plan_btn)[0].click
+  find_all(IvlChoosePlan.select_plan_btn, :wait => 5)[0].click
 end
 
 When(/^the individual selects a non silver plan on Plan Shopping page$/) do
