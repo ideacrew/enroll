@@ -12,7 +12,7 @@ module Operations
         include EventSource::Command
 
         def call(params)
-          Rails.logger.info("Invoked CreateEligibilityResponseModel with #{params}")
+          Rails.logger.info("Invoked CreateEligibilityResponseModel with #{params.inspect}")
           value = yield construct_payload_hash(params)
           validated_params = yield validate_value(value)
           entity = yield create_entity(validated_params)
@@ -25,12 +25,12 @@ module Operations
 
         def construct_payload_hash(params)
           value = {
-            primary_member_hbx_id: params[:primary_member_hbx_id],
-            event_kind: params[:event_kind],
+            primary_member_hbx_id: a[:primary_member_hbx_id],
+            event_kind: a[:event_kind],
             ridp_eligibility: {
-              delivery_info: params[:delivery_info],
-              metadata: params[:metadata],
-              event: params[:response]
+              delivery_info: a[:delivery_info],
+              metadata: a[:metadata],
+              event: a[:response]
             }
           }
 
@@ -48,6 +48,7 @@ module Operations
 
         def persist(entity)
           result = Try do
+            Rails.logger.info("Persisting EligibilityResponseModel with #{entity.to_h}")
             ::Fdsh::Ridp::EligibilityResponseModel.create!(entity.to_h)
           end
 
