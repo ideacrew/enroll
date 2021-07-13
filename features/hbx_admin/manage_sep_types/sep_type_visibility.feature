@@ -7,6 +7,9 @@ Feature: Admin has ability to create a new SEP Type with visibility options for 
     And Hbx Admin logs on to the Hbx Portal
     And the Admin is on the Main Page
     And the FAA feature configuration is enabled
+    And Qualifying life events of all markets are present
+    And the Admin will see the Manage SEPs under admin dropdown
+    And Admin can click Manage SEPs link
 
   Scenario Outline: Admin will create a new Individual market SEP type by picking visibility option for <user_visibility>
     Given Admin can navigate to the Manage SEPs screen
