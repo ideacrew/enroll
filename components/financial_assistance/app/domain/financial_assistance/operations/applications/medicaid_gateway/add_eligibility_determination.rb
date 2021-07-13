@@ -37,8 +37,7 @@ module FinancialAssistance
           end
 
           def update_application(application, application_entity)
-            application.assign_attributes({ determination_http_status_code: 200,
-                                            has_eligibility_response: true,
+            application.assign_attributes({ has_eligibility_response: true,
                                             integrated_case_id: application_entity.hbx_id,
                                             eligibility_response_payload: application_entity.to_h.to_json })
             if application.save
@@ -54,10 +53,20 @@ module FinancialAssistance
               update_applicants(elig_d, thh_entity)
               update_eligibility_determination(elig_d, thh_entity)
             end
-            application.determine!
+
+            update_http_code_and_aasm_state(application)
+
             # Send Determination to EA
             application.send_determination_to_ea
             Success('Successfully updated Application object with Full Eligibility Determination')
+          end
+
+          def update_http_code_and_aasm_state(application)
+            # Have to separatly update this one attribute for avoid seeing code
+            # 200 on EligibilityResposneError page.
+            # Tie http_status_code & aasm_state update together to aviod gap b/w both the actions.
+            application.update_attributes!(determination_http_status_code: 200)
+            application.determine!
           end
 
           def find_matching_eligibility_determination(application, thh_entity)
