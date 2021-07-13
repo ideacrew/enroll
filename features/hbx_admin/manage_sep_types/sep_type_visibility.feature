@@ -17,11 +17,9 @@ Feature: Admin has ability to create a new SEP Type with visibility options for 
     When Admin creates new SEP Type with individual market and see select termination on kinds with <user_visibility> scenario
     And Admin should see newly created SEP Type title on Datatable with Draft filter individual
     And Admin should publish newly created SEP Type
-    And Hbx Admin logs out
-    And Individual has not signed up as an HBX user
     And Patrick Doe has a consumer role and IVL enrollment
     And Patrick Doe has active individual market role and verified identity
-    And Patrick Doe logged into the consumer portal
+    And user Patrick Doe logs into the portal
     And I should see listed individual market SEP Types
     And I should <action> the "Entered into a legal domestic partnership" at the bottom of the ivl qle list
     And I click on log out link
@@ -59,7 +57,7 @@ Feature: Admin has ability to create a new SEP Type with visibility options for 
     And the Admin is on the Main Page
     And Admin clicks Families tab
     And the Admin is navigated to the Families screen
-    And Admin clicks name of a ivl family person on the family datatable
+    And I click the name of Patrick Doe from family list
     Then I should see listed individual market SEP Types
     And I should not see the "Entered into a legal domestic partnership" at the bottom of the ivl qle list
     And Admin logs out

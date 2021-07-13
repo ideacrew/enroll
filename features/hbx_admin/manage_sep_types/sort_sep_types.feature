@@ -34,10 +34,9 @@ Feature: Admin has ability to sort SEP Types on Sort SEPs Page and save their po
       | congress    | Congress    |
 
   Scenario: Admin will sort Individual market SEP Types and it will reflect the same order on the individual insured home page qle carousel
-    Given Individual has not signed up as an HBX user
-    And there exists Patrick Doe with active individual market role and verified identity
-    And Patrick Doe logged into the consumer portal
-    And I should land on home page
+    Given Patrick Doe has a consumer role and IVL enrollment
+    And Patrick Doe has active individual market role and verified identity
+    And user Patrick Doe logs into the portal
     And I should see the "Had a baby" at the top of the ivl qle list
     And I click on log out link
     And Hbx Admin logs on to the Hbx Portal
@@ -112,11 +111,9 @@ Feature: Admin has ability to sort SEP Types on Sort SEPs Page and save their po
     Given Admin can navigate to the Manage SEPs screen
     When Admin clicks on the Sort SEPs button
     Then Admin should see three tabs Individual, Shop and Congress markets
-    Then Admin should see listed individual market SEP Types with ascending positions
     When Admin sorts Individual SEP Types by drag and drop
     Then Admin should see successful message after sorting
     When Admin clicks on shop tab
-    Then Admin should see listed shop market SEP Types with ascending positions
     When Admin sorts Shop SEP Types by drag and drop
     Then Admin should see successful message after sorting
     And listed Shop SEP Types ordinal postions should change
@@ -128,23 +125,10 @@ Feature: Admin has ability to sort SEP Types on Sort SEPs Page and save their po
     Then Employee logs out
 
   Scenario: Admin will create a new Shop market SEP type with future date and try to sort the Sep Type
-    Given Admin can navigate to the Manage SEPs screen
-    And expired Qualifying life events of shop market is present
-    When Admin clicks on the Create SEP Type button
-    Then Admin navigates to Create SEP Type page
-    When Admin fills Create SEP Type form with future start and end dates
-    And Admin fills Create SEP Type form with Title
-    And Admin fills Create SEP Type form with Event label
-    And Admin fills Create SEP Type form with Tool Tip
-    And Admin selects shop market radio button
-    And Admin fills Create SEP Type form with Reason
-    And Admin selects effective on kinds for Create SEP Type
-    And Admin can select termination on kinds for shop SEP Type
-    And Admin fills Create SEP Type form with Pre Event SEP and Post Event SEP dates
-    And Admin clicks on Create Draft button
-    Then Admin should see SEP Type Created Successfully message
-    When Admin navigates to SEP Types List page
-    When Admin clicks shop filter on SEP Types datatable
+    GGiven Admin can navigate to the Manage SEPs screen
+    When Admin creates new SEP Type with shop market and cannot select termination on kinds with future start and end dates scenario
+    And Admin navigates to SEP Types List page
+    And Admin clicks shop filter on SEP Types datatable
     And Admin clicks on Draft filter of shop market filter
     Then Admin should see newly created SEP Type title on Datatable
     When Admin clicks on newly created SEP Type
@@ -161,29 +145,15 @@ Feature: Admin has ability to sort SEP Types on Sort SEPs Page and save their po
   Scenario Outline: Admin will create a new <market_kind> SEP type and publish it
     Given Admin can navigate to the Manage SEPs screen
     And expired Qualifying life events of <market_kind> market is present
-    When Admin clicks on the Create SEP Type button
-    Then Admin navigates to Create SEP Type page
-    When Admin fills Create SEP Type form with future start and end dates
-    And Admin fills Create SEP Type form with Title
-    And Admin fills Create SEP Type form with Event label
-    And Admin fills Create SEP Type form with Tool Tip
-    And Admin selects <market_kind> market radio button
-    And Admin fills Create SEP Type form with Reason
-    And Admin selects effective on kinds for Create SEP Type
-    And Admin <action> select termination on kinds for <market_kind> SEP Type
-    And Admin fills Create SEP Type form with Pre Event SEP and Post Event SEP dates
-    And Admin clicks on Create Draft button
-    Then Admin should see SEP Type Created Successfully message
-    When Admin navigates to SEP Types List page
-    When Admin clicks <market_kind> filter on SEP Types datatable
-    And Admin clicks on Draft filter of <market_kind> market filter
-    Then Admin should see newly created SEP Type title on Datatable
-    When Admin clicks on newly created SEP Type
-    Then Admin should navigate to update SEP Type page
-    When Admin clicks on Publish button
-    Then Admin should see Successfully publish message
-    When Admin clicks on the Sort SEPs button
-    Then Admin should see three tabs Individual, Shop and Congress markets
+    And Admin creates new SEP Type with <market_kind> market and <action> select termination on kinds with success scenario
+    And Admin should see SEP Type Created Successfully message
+    And Admin should see newly created SEP Type title on Datatable with Draft filter <market_kind>
+    And Admin clicks on newly created SEP Type
+    And Admin should navigate to update SEP Type page
+    And Admin clicks on Publish button
+    And Admin should see Successfully publish message
+    And Admin clicks on the Sort SEPs button
+    And Admin should see three tabs Individual, Shop and Congress markets
     When Admin clicks on <market_kind> tab
     Then Admin should see listed <market_kind> market SEP Types
     And Admin should see the Entered into a legal domestic partnership in the <market_kind> qle list
