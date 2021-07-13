@@ -32,7 +32,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/event_source.git
-  revision: 7c061d938904245ea37a639c73180389810593ba
+  revision: 61644f757c4ad19e2e345a38e85e4301c31c0671
   branch: release_0.5.3
   specs:
     event_source (0.5.3)
@@ -559,7 +559,7 @@ GEM
     faraday-em_synchrony (1.0.0)
     faraday-excon (1.1.0)
     faraday-net_http (1.0.1)
-    faraday-net_http_persistent (1.1.0)
+    faraday-net_http_persistent (1.2.0)
     faraday_middleware (1.0.0)
       faraday (~> 1.0)
     fast_jsonapi (1.5)
@@ -731,7 +731,7 @@ GEM
       nokogiri (~> 1.5)
     non-stupid-digest-assets (1.0.9)
       sprockets (>= 2.0)
-    oj (3.12.0)
+    oj (3.12.1)
     orm_adapter (0.5.0)
     overcommit (0.52.1)
       childprocess (>= 0.6.3, < 4)
