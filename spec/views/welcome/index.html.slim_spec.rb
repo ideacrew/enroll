@@ -11,8 +11,8 @@ RSpec.describe "welcome/index.html.slim", :type => :view, dbclean: :after_each  
       it "should has current_user oim_id" do
         render
         # expect(rendered).to match /#{user.oim_id}/
-        expect(rendered).not_to match /Broker Registration/
-        expect(rendered).not_to match /General Agency Registration/
+        expect(rendered).not_to match(/Broker Registration/)
+        expect(rendered).not_to match(/General Agency Registration/)
       end
     end
   end

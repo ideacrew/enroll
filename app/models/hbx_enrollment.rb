@@ -1560,9 +1560,8 @@ class HbxEnrollment
   end
 
   def self.effective_date_for_enrollment(employee_role, hbx_enrollment, qle)
-
     if employee_role.census_employee.new_hire_enrollment_period.min > TimeKeeper.date_of_record
-      raise "You're not yet eligible under your employer-sponsored benefits. Please return on #{employee_role.census_employee.new_hire_enrollment_period.min.strftime("%m/%d/%Y")} to enroll for coverage."
+      raise "You're not yet eligible under your employer-sponsored benefits. Please return on #{employee_role.census_employee.new_hire_enrollment_period.min.strftime('%m/%d/%Y')} to enroll for coverage."
     end
 
     if employee_role.can_enroll_as_new_hire?
@@ -1592,9 +1591,8 @@ class HbxEnrollment
       raise "Unable to find employer-sponsored benefits for enrollment year #{effective_date.year}"
     end
 
-    if plan_year.open_enrollment_start_on > TimeKeeper.date_of_record
-      raise "Open enrollment for your employer-sponsored benefits not yet started. Please return on #{plan_year.open_enrollment_start_on.strftime("%m/%d/%Y")} to enroll for coverage."
-    end
+    raise "Open enrollment for your employer-sponsored benefits not yet started. Please return on #{plan_year.open_enrollment_start_on.strftime('%m/%d/%Y')} to enroll for coverage." \
+      if plan_year.open_enrollment_start_on > TimeKeeper.date_of_record
 
     census_employee = employee_role.census_employee
     benefit_group_assignment =
@@ -1627,8 +1625,9 @@ class HbxEnrollment
         if benefit_group.blank? || benefit_group_assignment.blank?
           benefit_group, benefit_group_assignment = employee_current_benefit_group(employee_role, enrollment, qle)
         end
-        if qle && employee_role.coverage_effective_on(qle: qle) > employee_role.person.primary_family.current_sep.effective_on
-          raise "You are attempting to purchase coverage through Qualifying Life Event prior to your eligibility date. Please contact your Employer for assistance. You are eligible for employer benefits from #{employee_role.coverage_effective_on(qle: qle)} "
+        employee_role_effective_on = employee_role.coverage_effective_on(qle: qle)
+        if qle && employee_role_effective_on > employee_role.person.primary_family.current_sep.effective_on
+          raise "You are attempting to purchase coverage through Qualifying Life Event prior to your eligibility date. Please contact your Employer for assistance. You are eligible for employer benefits from #{employee_role_effective_on}"
         end
 
         if qle && enrollment.family.is_under_special_enrollment_period?
