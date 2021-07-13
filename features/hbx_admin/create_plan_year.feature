@@ -51,6 +51,7 @@ Feature: Create Benefit Application by admin UI
       # | Enrollment Ineligible | enrollment_ineligible | Enrollment Ineligible             | Existing plan year with overlapping coverage exists |
       | Active            | active            | Active             | Existing plan year with overlapping coverage exists |
 
+  @flaky
   Scenario: Creating New Plan Year while application is in termination_pending aasm_state
     And initial employer ABC Widgets has active benefit application
     Given that a user with a HBX staff role with HBX staff subrole exists and is logged in
@@ -68,6 +69,7 @@ Feature: Create Benefit Application by admin UI
     And staff role person logged in
     And update rating area
     When ABC Widgets is logged in and on the home page
+    And staff role person clicked on benefits tab
     And staff role person clicked on benefits tab
     Then employer should see benefit application in termination pending state
     And employer should see Add Plan Year link
