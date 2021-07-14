@@ -15,15 +15,19 @@ describe Forms::FamilyMember do
     expect(subject).to have_errors_on(:relationship)
   end
 
-
-  it "should require tribal_id when citizen_status=indian_tribe_member" do
-    if individual_market_is_enabled?
-      subject.is_consumer_role = true
-      subject.is_applying_coverage = true
-      subject.indian_tribe_member = true
-      subject.valid?
-      expect(subject).to have_errors_on(:tribal_id)
-      expect(subject.errors[:tribal_id]).to eq ["is required when native american / alaska native is selected"]
+  context 'indian alaskan tribe details' do
+    before do
+      EnrollRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(false)
+    end
+    it "should require tribal_id when citizen_status=indian_tribe_member" do
+      if individual_market_is_enabled?
+        subject.is_consumer_role = true
+        subject.is_applying_coverage = true
+        subject.indian_tribe_member = true
+        subject.valid?
+        expect(subject).to have_errors_on(:tribal_id)
+        expect(subject.errors[:tribal_id]).to eq ["is required when native american / alaska native is selected"]
+      end
     end
   end
 
