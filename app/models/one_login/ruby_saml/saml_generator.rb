@@ -32,8 +32,9 @@ module OneLogin
         @hbx_enrollment = hbx_enrollment
 
         if Rails.env.production?
-          @private_key = OpenSSL::PKey::RSA.new(File.read(SamlInformation.kp_pay_now_private_key_location))
-          @cert = OpenSSL::X509::Certificate.new(File.read(SamlInformation.kp_pay_now_x509_cert_location))
+          issuer_name = hbx_enrollment.product.issuer_profile.legal_name.downcase.gsub(' ', '_')
+          @private_key = OpenSSL::PKey::RSA.new(File.read(SamlInformation.send("#{issuer_name}_pay_now_private_key_location")))
+          @cert = OpenSSL::X509::Certificate.new(File.read(SamlInformation.send("#{issuer_name}_pay_now_x509_cert_location")))
         else
           @private_key = OpenSSL::PKey::RSA.new(File.read(Rails.root.join('spec', 'test_data').to_s + '/test_wfpk.pem'))
           @cert = OpenSSL::X509::Certificate.new(File.read(Rails.root.join('spec', 'test_data').to_s + '/test_x509.pem'))
