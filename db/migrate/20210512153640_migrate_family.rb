@@ -7,7 +7,7 @@ require 'aca_entities/atp/transformers/cv/family'
 require 'aca_entities/atp/operations/family'
 require 'aca_entities/serializers/xml/medicaid/atp'
 
-# rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/ClassLength
+# rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/ClassLength, Lint/UselessAssignment
 
 # RAILS_ENV=production bundle exec rails db:migrate:up source=MCR file_path="file_path" VERSION="20210512153640"
 # RAILS_ENV=production bundle exec rails db:migrate:up source=atp file_path="file_path" VERSION="20210512153640"
@@ -310,15 +310,14 @@ class MigrateFamily < Mongoid::Migration
       when 'atp'
         if !@dir_name&.empty?
           read_directory @dir_name do
-            begin
-              puts "Started processing file: #{@filepath}"
-              extract @filepath
-              transform ext_input_hash
-              load_data cv3_family_hash
-              puts "Ended processing file: #{@filepath}"
-            rescue => e
-              puts "Error processing file: #{@filepath} , error: e.inspect"
-            end
+            puts "Started processing file: #{@filepath}"
+            extract @filepath
+            transform ext_input_hash
+            load_data cv3_family_hash
+            puts "Ended processing file: #{@filepath}"
+          rescue StandardError => e
+            puts "Error processing file: #{@filepath} , error: e.inspect"
+
           end
         elsif !path_name&.empty?
           begin
@@ -327,7 +326,7 @@ class MigrateFamily < Mongoid::Migration
             transform ext_input_hash
             load_data cv3_family_hash
             puts "Ended processing file: #{path_name}"
-          rescue => e
+          rescue StandardError => e
             puts "Error processing file: #{path_name} , error: e.inspect"
           end
         end
@@ -487,4 +486,4 @@ class MigrateFamily < Mongoid::Migration
     end
   end
 end
-# rubocop:enable Metrics/AbcSize, Metrics/MethodLength, Metrics/ClassLength
+# rubocop:enable Metrics/AbcSize, Metrics/MethodLength, Metrics/ClassLength, Lint/UselessAssignment
