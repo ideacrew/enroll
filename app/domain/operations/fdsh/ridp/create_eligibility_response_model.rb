@@ -13,7 +13,7 @@ module Operations
 
         def call(params)
           Rails.logger.info("Invoked CreateEligibilityResponseModel with #{params.to_h.inspect}")
-          value = yield construct_payload_hash(params.to_h)
+          value = yield construct_payload_hash(params)
           validated_params = yield validate_value(value)
           entity = yield create_entity(validated_params)
           model = yield persist(entity)
@@ -23,19 +23,22 @@ module Operations
 
         private
 
-        def construct_payload_hash(params)
-          value = {
-            primary_member_hbx_id: params[:primary_member_hbx_id],
-            event_kind: params[:event_kind],
-            ridp_eligibility: {
-              metadata: params[:metadata],
-              event: params[:response]
+        def construct_payload_hash(eligibility_json)
+          params = JSON.parse(eligibility_json, :symbolize_names => true)
+          Try do
+            value = {
+              primary_member_hbx_id: params[:primary_member_hbx_id],
+              event_kind: params[:event_kind],
+              ridp_eligibility: {
+                metadata: params[:metadata],
+                event: params[:response]
+              }
             }
-          }
 
-          Rails.logger.info("In construct_payload_hash method #{value}")
+            Rails.logger.info("In construct_payload_hash method #{value}")
 
-          Success(value)
+            Success(value)
+          end.or(Failure("Invalid params to construct a payload for RidpEligibilityResponse"))
         end
 
         def validate_value(params)
