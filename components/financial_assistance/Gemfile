@@ -20,7 +20,7 @@ gem 'acapi', git: "https://github.com/ideacrew/acapi.git", branch: 'trunk'
 gem 'ui_helpers', path: '../ui_helpers'
 
 group :development, :test do
-  gem "rswag"
+  gem "rswag-specs"
   gem 'rails-controller-testing'
   gem 'nokogiri-happymapper', :require => 'happymapper'
   gem 'shoulda-matchers', '~> 4.0'
