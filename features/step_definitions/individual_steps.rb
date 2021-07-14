@@ -459,10 +459,10 @@ And(/I should see the individual home page/) do
 end
 
 And(/(.*) confirms on confirmation page/) do |person|
-  first_name, last_name = person.split(" ")
+  first_name, last_name = person.split
   find('.interaction-choice-control-value-terms-check-thank-you').click
-  fill_in 'first_name_thank_you', :with => (first_name)
-  fill_in 'last_name_thank_you', :with => (last_name)
+  fill_in 'first_name_thank_you', :with => first_name
+  fill_in 'last_name_thank_you', :with => last_name
   click_link "Confirm"
 end
 
