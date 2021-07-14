@@ -67,8 +67,9 @@ class Insured::PlanShoppingsController < ApplicationController
     # employee_mid_year_plan_change(@person, @change_plan)
     # @enrollment.ee_plan_selection_confirmation_sep_new_hire #mirror notice
     # @enrollment.mid_year_plan_change_notice #mirror notice
-    @kp_pay_now_url = SamlInformation.kp_pay_now_url
-    @kp_relay_state = SamlInformation.kp_pay_now_relay_state
+    issuer_name = @enrollment&.product&.issuer_profile&.legal_name&.downcase&.gsub(' ', '_')
+    @kp_pay_now_url = pay_now_url(issuer_name)
+    @kp_relay_state = pay_now_relay_state(issuer_name)
     send_receipt_emails if @person.emails.first
   end
 
@@ -456,6 +457,17 @@ class Insured::PlanShoppingsController < ApplicationController
       end
     end
   end
+
+  def pay_now_url(issuer_name)
+    return SamlInformation.send("#{issuer_name}_pay_now") if issuer_name.present?
+    "https://"
+  end
+
+  def pay_now_relay_state(issuer_name)
+    return SamlInformation.send("#{issuer_name}_pay_now_relay_state") if issuer_name.present?
+    "https://"
+  end
+
 
   def thousand_ceil(num)
     return 0 if num.blank?
