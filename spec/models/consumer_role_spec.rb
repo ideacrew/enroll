@@ -315,6 +315,9 @@ context 'Verification process and notices' do
   end
 
   describe 'Native American verification' do
+    before do
+      EnrollRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(false)
+    end
     shared_examples_for 'ensures native american field value' do |action, state, consumer_kind, tribe, tribe_state|
       it "#{action} #{state} for #{consumer_kind}" do
         person.update_attributes!(:tribal_id => '444444444') if tribe
@@ -693,6 +696,7 @@ context 'Verification process and notices' do
 
     shared_examples_for "collecting verification types for person" do |v_types, types_count, ssn, citizen, native, age|
       before do
+        EnrollRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(false)
         person.ssn = nil unless ssn
         person.us_citizen = citizen
         person.dob = TimeKeeper.date_of_record - age.to_i.years
