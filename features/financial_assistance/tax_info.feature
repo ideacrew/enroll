@@ -29,7 +29,7 @@ Scenario: Cannot continue from tax info page without head of household when feat
 	And should not be actionable.
 
 Scenario: Can continue from tax info page with head of household when feature enabled
-  Given head of household question feature is enabled
+  And FAA filing_as_head_of_household feature is enabled
 	Given the user is editing an application for financial assistance
   And user clicks household add member button
   And the user fills the the aplicant add member form with indian member no
