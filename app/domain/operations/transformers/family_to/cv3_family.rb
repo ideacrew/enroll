@@ -26,18 +26,18 @@ module Operations
         def construct_payload(family)
           payload = {
             hbx_id: family.primary_applicant.hbx_id,  # TODO: Need to change witth family hbx_id once hbx_id added to family
-            # foreign_keys TO DO
+            # foreign_keys TO DO ??
             family_members: transform_family_members(family.family_members),
             households: transform_households(family.households), # TO DO
             irs_groups: transform_irs_groups(family.irs_groups),
-            # magi_medicaid_applications ?
+            # magi_medicaid_applications ??
             renewal_consent_through_year: family.renewal_consent_through_year,
-            special_enrollment_periods = transform_special_enrollment_periods(family.special_enrollment_periods), # TO DO
-            general_agency_accounts = transform_general_agency_accounts(family.general_agency_accounts), #TO DO
-            broker_accounts = transform_broker_accounts(family.broker_accounts), #TO DO
+            special_enrollment_periods = transform_special_enrollment_periods(family.special_enrollment_periods),
+            # general_agency_accounts = transform_general_agency_accounts(family.general_agency_accounts), #TO DO
+            # broker_accounts = transform_broker_accounts(family.broker_accounts), #TO DO
             payment_transactions: transform_payment_transactions(family.payment_transactions),
             documents: transform_documents(person.documents),
-            # updated_by
+            #updated_by: construct_updated_by(updated_by), #
             timestamp: {created_at: family.created_at.to_datetime, modified_at: family.updated_at.to_datetime}
           }
 
@@ -47,7 +47,7 @@ module Operations
         def transform_special_enrollment_periods(special_enrollment_periods)
           special_enrollment_periods.collect do |period|
             {
-              #qualifying_life_event_kind_reference: construct_qle_reference(period.qualifying_life_event_kind_reference)TO DO,
+              qualifying_life_event_kind_reference: construct_qle_reference(period.qualifying_life_event_kind),
               qle_on: period.qle_on,
               start_on: period.start_on,
               end_on: period.end_on,
@@ -72,7 +72,11 @@ module Operations
 
         def construct_qle_reference(reference)
           {
-
+            start_on: reference.start_on,
+            end_on: reference.end_on,
+            title: reference.title,
+            reason: reference.reason,
+            market_kind: reference.market_kind
           }
         end
 
@@ -119,10 +123,14 @@ module Operations
             end_on: account.end_on,
             is_active: account.aasm_state == "active",
             aasm_state: account.aasm_state,
-            # general_agency_reference: account.general_agency_reference,
+            # general_agency_reference: construct_general_agency_reference(account.general_agency_reference),
             # broker_role_reference: account.broker_role_reference,
             # updated_by: account.updated_by
           end
+        end
+
+        def construct_general_agency_reference(general_agency_reference)
+          agency = general_agency_reference.broker_agency_profile
         end
 
         def transform_broker_accounts(broker_accounts)
@@ -223,6 +231,10 @@ module Operations
               timestamp: {created_at: member.created_at.to_datetime, modified_at: member.updated_at.to_datetime}
             }
           end
+        end
+
+        def construct_updated_by(updated_by)
+          
         end
 
         def transform_person(person)

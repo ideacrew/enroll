@@ -41,7 +41,7 @@ module Operations
             person_relationships: construct_person_relationships(person.person_relationships),
             consumer_role: construct_consumer_role(person.consumer_role),
             resident_role: construct_resident_role(person.resident_role),
-            broker_role: construct_broker_role(person.broker_role), # TODO
+            broker_role: construct_broker_role(person.broker_role),
             individual_market_transitions: individual_market_transitions(person.individual_market_transition),
             verification_types: transform_verification_types(person.verification_types), # TODO
             user: transform_user_params(person.user),
@@ -191,9 +191,21 @@ module Operations
             accept_new_clients: broker_role.accept_new_clients,
             license: broker_role.license,
             training: broker_role.training,
-            # broker_agency_reference: ,TO DO
+            broker_agency_reference: construct_broker_agency_reference(broker_role.broker_agency_reference),
             carrier_appointments: broker_role.carrier_appointments
-            
+          }
+        end
+
+        def construct_broker_agency_reference(broker_agency)
+          agency = broker_agency.broker_agency_profile
+          {
+            hbx_id: agency.hbx_id,
+            market_kind: agency.market_kind,
+            name: agency.legal_name,
+            dba: agency.dba,
+            # display_name: ,
+            fein: agency.fein,
+            corporate_npn: agency.corporate_npn
           }
         end
 
