@@ -15,10 +15,9 @@ Feature: Insured Plan Shopping on Individual market
     When Patrick Doe clicks continue from qle
     Then Patrick Doe should see family members page and clicks continue
     And Patrick Doe should see the group selection page
-    When Patrick Doe clicks Back to my account button
-    Then Patric Doe should land on Home page and should see Shop for Plans Banner
-    And I select a plan on plan shopping page
-    And I click on purchase button on confirmation page
+    And Patrick Doe clicked on shop for new plan
+    And Patrick Doe select a plan on plan shopping page
+    And Patrick Doe confirms on confirmation page
     When I click on continue on qle confirmation page
     And I should see the individual home page
     Then Individual logs out

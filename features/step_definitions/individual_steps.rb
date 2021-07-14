@@ -413,7 +413,7 @@ And(/^I click on continue button on group selection page$/) do
   click_button 'CONTINUE', :wait => 10
 end
 
-And(/I select a plan on plan shopping page/) do
+And(/(.*) select a plan on plan shopping page/) do |_person|
   screenshot("plan_shopping")
   find_all(IvlChoosePlan.select_plan_btn, :wait => 5)[0].click
 end
@@ -456,6 +456,14 @@ And(/I should see the individual home page/) do
   # click_link "Documents"
   # click_link "Manage Family"
   # click_link "My #{Settings.site.short_name}"
+end
+
+And(/(.*) confirms on confirmation page/) do |person|
+  first_name, last_name = person.split(" ")
+  find('.interaction-choice-control-value-terms-check-thank-you').click
+  fill_in 'first_name_thank_you', :with => (first_name)
+  fill_in 'last_name_thank_you', :with => (last_name)
+  click_link "Confirm"
 end
 
 Then(/^Individual edits a dependents address$/) do
