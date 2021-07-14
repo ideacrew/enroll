@@ -11,12 +11,14 @@ require 'aca_entities/serializers/xml/medicaid/atp'
 
 # RAILS_ENV=production bundle exec rails db:migrate:up source=MCR file_path="file_path" VERSION="20210512153640"
 # RAILS_ENV=production bundle exec rails db:migrate:up source=atp file_path="file_path" VERSION="20210512153640"
+# RAILS_ENV=production bundle exec rails db:migrate:up source=atp dir="file_path" VERSION="20210512153640"
 class MigrateFamily < Mongoid::Migration
   def self.up
     @source =  ENV["source"].to_s.downcase # MCR or ATP
     @file_path = ENV["file_path"].to_s || nil
+    @directory_name = ENV['dir'].to_s || nil
 
-    start migration_for: @source, path: @file_path
+    start migration_for: @source, path: @file_path, dir: @directory_name
   end
 
   def self.down; end
@@ -299,17 +301,35 @@ class MigrateFamily < Mongoid::Migration
     def start(*args)
       options = args.first
       @path_name = options[:path]
+      @dir_name = options[:dir]
       # return "there is no corresponding migration for #{options[:migration_for]}" unless respond_to?(options[:migration_for])
       define_etl_variables(options[:migration_for])
 
       # refactor below logic
       case options[:migration_for]
       when 'atp'
-        extract path_name
-        transform ext_input_hash
-        load_data cv3_family_hash
+        if !@dir_name&.empty?
+          read_directory @dir_name do
+            extract @filepath
+            transform ext_input_hash
+            load_data cv3_family_hash
+          end
+        elsif !path_name&.empty?
+          extract path_name
+          transform ext_input_hash
+          load_data cv3_family_hash
+        end
       when 'mcr'
         migrate_for_mcr
+      end
+    end
+
+    def read_directory(directory_name, &block)
+      Dir.foreach(directory_name) do |filename|
+        if File.extname(filename) == ".xml"
+          @filepath = "#{directory_name}/#{filename}"
+          instance_eval(&block) if block_given?
+        end
       end
     end
 
