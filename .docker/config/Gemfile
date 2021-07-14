@@ -6,7 +6,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 ruby '2.5.1'
 gem 'rails', '~> 5.2.4.3'
 gem 'sidekiq'
-gem 'ffaker'
+
 #######################################################
 # FIXME
 #######################################################
@@ -97,6 +97,7 @@ gem 'net-ssh',                  '= 4.2.0'
 gem 'nokogiri',                 '~> 1.10.8'
 gem 'nokogiri-happymapper',     '~> 0.8.0', :require => 'happymapper'
 gem 'non-stupid-digest-assets'
+gem 'puma',                     '~> 3.12.4'
 gem 'pundit',                   '~> 2.0'
 gem "recaptcha",                '~> 4.13', require: 'recaptcha/rails'
 gem 'redcarpet',                '~> 3.4'
@@ -150,7 +151,6 @@ group :development, :test do
   gem 'factory_bot_rails',      '~> 4.11'
   gem 'forgery',                '~> 0.7.0'
   gem 'parallel_tests',         '~> 2.26.2'
-  gem 'puma',                   '~> 3.12.4'
   gem 'rails-controller-testing'
   gem 'railroady',              '~> 1.5.3'
   gem 'rspec-rails'
@@ -183,5 +183,4 @@ group :production do
   gem 'eye',          '0.10.0'
   gem 'newrelic_rpm', '~> 5.0'
   gem 'unicorn',      '~> 4.8'
-  gem 'puma',         '~> 3.12.4'
 end
