@@ -94,6 +94,5 @@ jobs:
           bundle config path ../../vendor/bundle
           gem install bundler
           bundle install
-          bundle exec rake --tasks
           RAILS_ENV=test bundle exec rake app:rswag:specs:swaggerize PATTERN="./spec/requests/financial_assistance/api/v1/applications_spec.rb"
           python swagger-yaml-to-html.py < /swagger/v1/swagger.yaml > doc.html  
