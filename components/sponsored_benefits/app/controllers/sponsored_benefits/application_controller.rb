@@ -23,6 +23,7 @@ module SponsoredBenefits
 
       def set_broker_agency_profile_from_user
         current_uri = request.env['PATH_INFO']
+        redirect_to main_app.root_path, :flash => { :error => "You are not authorized to view this page." } unless current_user.present? && (current_user.person.broker_role.present? || current_user.has_hbx_staff_role?)
         if current_person&.broker_role.present?
           @broker_agency_profile = ::BrokerAgencyProfile.find(current_person.broker_role.broker_agency_profile_id) # Deprecate this
           @broker_agency_profile ||= BenefitSponsors::Organizations::Profile.find(current_person.broker_role.benefit_sponsors_broker_agency_profile_id)
