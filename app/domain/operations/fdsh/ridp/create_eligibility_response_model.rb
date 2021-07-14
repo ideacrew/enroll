@@ -33,7 +33,6 @@ module Operations
                 event: params[:response]
               }
             }
-
             Success(value)
           end.or(Failure("Invalid params to construct a payload for RidpEligibilityResponse"))
         end
