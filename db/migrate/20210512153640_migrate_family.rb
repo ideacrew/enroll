@@ -11,7 +11,7 @@ require 'aca_entities/serializers/xml/medicaid/atp'
 
 # RAILS_ENV=production bundle exec rails db:migrate:up source=MCR file_path="file_path" VERSION="20210512153640"
 # RAILS_ENV=production bundle exec rails db:migrate:up source=atp file_path="file_path" VERSION="20210512153640"
-# RAILS_ENV=production bundle exec rails db:migrate:up source=atp dir="file_path" VERSION="20210512153640"
+# RAILS_ENV=production bundle exec rails db:migrate:up source=atp dir="directory_path" VERSION="20210512153640"
 class MigrateFamily < Mongoid::Migration
   def self.up
     @source =  ENV["source"].to_s.downcase # MCR or ATP
@@ -310,14 +310,26 @@ class MigrateFamily < Mongoid::Migration
       when 'atp'
         if !@dir_name&.empty?
           read_directory @dir_name do
-            extract @filepath
-            transform ext_input_hash
-            load_data cv3_family_hash
+            begin
+              puts "Started processing file: #{@filepath}"
+              extract @filepath
+              transform ext_input_hash
+              load_data cv3_family_hash
+              puts "Ended processing file: #{@filepath}"
+            rescue => e
+              puts "Error processing file: #{@filepath} , error: e.inspect"
+            end
           end
         elsif !path_name&.empty?
-          extract path_name
-          transform ext_input_hash
-          load_data cv3_family_hash
+          begin
+            puts "Started processing file: #{path_name}"
+            extract path_name
+            transform ext_input_hash
+            load_data cv3_family_hash
+            puts "Ended processing file: #{path_name}"
+          rescue => e
+            puts "Error processing file: #{path_name} , error: e.inspect"
+          end
         end
       when 'mcr'
         migrate_for_mcr
