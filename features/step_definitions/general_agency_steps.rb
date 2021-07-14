@@ -1,3 +1,13 @@
+# frozen_string_literal: true
+
+Given(/general agency feature is enabled$/) do
+  enable_feature :general_agency
+end
+
+Given(/general agency feature is disabled$/) do
+  disable_feature :general_agency
+end
+
 When(/^.+ visit the HBX General Agency Registration form$/) do
   visit '/'
   find(".interaction-click-control-general-agency-registration", wait: 10).click
@@ -5,6 +15,25 @@ end
 
 When(/^.+ visit the main portal$/) do
   visit '/'
+end
+
+When(/^the user types in the GA registration URL$/) do
+  visit "/benefit_sponsors/profiles/registrations/new?profile_type=general_agency"
+end
+
+Then(/^user should not see General Agencies option for bulk notice$/) do
+  expect(all_page_select_options.exclude?('general agency')).to eq(true)
+end
+
+Then(/^the user will not be able to access GA Registration page$/) do
+  expect(page).to_not have_content("General Agency Registration")
+  expect(page).to have_content(l10n("general_agency_not_enabled"))
+end
+
+Then(/^they should not see any General Agency link$/) do
+  expect(all_page_links.exclude?('general agency registration')).to eq(true)
+  expect(all_page_links.exclude?('general agency portal')).to eq(true)
+  expect(page).to_not have_content("General Agencies")
 end
 
 Then(/^.+ should not see the New General Agency form/) do

@@ -11,10 +11,10 @@ RSpec.describe "broker_agencies/profiles/_assign.html.erb", dbclean: :after_each
   end
   describe "partial content" do
     context "General Agencies can be toggled by settings" do
-      if ExchangeTestingConfigurationHelper.general_agency_enabled?
       context "when enabled" do
         let(:general_agency_profile) { FactoryBot.create(:general_agency_profile) }
         before do
+          EnrollRegistry[:general_agency].feature.stub(:is_enabled).and_return(true)
           assign :general_agency_profiles, [general_agency_profile]
           Enroll::Application.reload_routes!
           render template: "broker_agencies/profiles/_assign.html.erb"
@@ -29,7 +29,6 @@ RSpec.describe "broker_agencies/profiles/_assign.html.erb", dbclean: :after_each
         it "does not show General Agency in the title" do
           expect(rendered).to_not have_selector('h3', text: 'General Agencies')
         end
-      end
       end
     end
 

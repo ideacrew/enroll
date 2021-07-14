@@ -1,6 +1,5 @@
 require "rails_helper"
 
-if ExchangeTestingConfigurationHelper.general_agency_enabled?
 RSpec.describe "general_agencies/profiles/edit.html.erb" do
   let(:organization) {FactoryBot.create(:organization)}
   let(:general_agency_profile) { FactoryBot.create(:general_agency_profile, organization: organization) }
@@ -12,7 +11,7 @@ RSpec.describe "general_agencies/profiles/edit.html.erb" do
     assign :organization, org_form
     assign :general_agency_profile, general_agency_profile
     assign :id, general_agency_profile.id
-    allow(Settings.aca).to receive(:general_agency_enabled).and_return(true)
+    EnrollRegistry[:general_agency].feature.stub(:is_enabled).and_return(false)
     Enroll::Application.reload_routes!
     render template: "general_agencies/profiles/edit.html.erb"
   end
@@ -31,5 +30,4 @@ RSpec.describe "general_agencies/profiles/edit.html.erb" do
   # it "should have a hidden field organization id" do
   #   expect(rendered).to have_selector("[name='organization[id]']", count: 1)
   # end
-end
 end

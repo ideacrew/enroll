@@ -1,4 +1,19 @@
+# frozen_string_literal: true
+
 # load Rails.root + "db/seeds.rb"
+
+def all_page_links
+  page.all('a').map(&:text).map(&:downcase)
+end
+
+def all_page_select_options
+  page.all('option').map(&:text).map(&:downcase)
+end
+
+When(/a non logged in user visits the Enroll home page$/) do
+  visit "/"
+end
+
 When(/I use unique values/) do
   require 'test/unique_value_stash.rb'
   include UniqueValueStash
