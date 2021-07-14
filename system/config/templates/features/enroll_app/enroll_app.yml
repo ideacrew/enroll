@@ -356,15 +356,6 @@ registry:
             item: true
           - key: :carriers_long_name
             item: 'UnitedHealthcare'
-      - key: :carefirst_pay_now
-        is_enabled: false
-        settings:
-          - key: :plan_shopping
-            item: true
-          - key: :enrollment_tile
-            item: true
-          - key: :carriers_long_name
-            item: 'Kaiser Permanante'
   - namespace:
       - :features
       - :enroll_app
