@@ -5,3 +5,5 @@ registry:
     features:
       - key: :ridp_h139
         is_enabled: true
+      - key: :paper_application_verification
+        is_enabled: false

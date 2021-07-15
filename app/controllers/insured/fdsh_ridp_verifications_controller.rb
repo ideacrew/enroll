@@ -30,7 +30,7 @@ module Insured
               @interactive_verification = result.value!
               render :primary_response
             else
-              @step = 'questions'
+              @step = ["RF1", "RF2"].include?(final_secision_code(payload)) ? 'questions' : 'start'
               redirect_to :action => "failed_validation", :step => @step, :verification_transaction_id => transaction_id(payload) || session_identification_id(payload)
             end
           end
@@ -123,6 +123,10 @@ module Insured
 
     def transaction_id(response)
       response.dig(:attestations, :ridp_attestation, :evidences, 0, :primary_response, :Response, :VerificationResponse, :DSHReferenceNumber)
+    end
+
+    def final_secision_code(response)
+      response.dig(:attestations, :ridp_attestation, :evidences, 0, :primary_response, :Response, :VerificationResponse, :FinalDecisionCode)
     end
 
     def process_successful_interactive_verification(response)
