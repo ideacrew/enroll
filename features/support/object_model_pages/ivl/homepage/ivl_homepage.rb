@@ -74,4 +74,8 @@ class IvlHomepage
   def self.make_payments_btn
     '.interaction-click-control-make-payments-for-my-plan'
   end
+
+  def self.first_payment
+    '.interaction-click-control-make-a-first-payment-for-my-new-plan'
+  end
 end
