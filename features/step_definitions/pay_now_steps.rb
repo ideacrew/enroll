@@ -281,6 +281,6 @@ end
 
 Given(/non-Kaiser enrollments exist/) do
   BenefitSponsors::Organizations::GeneralOrganization.each do |org|
-    org.update_attributes!(legal_name:"CareFirst")
+    org.update_attributes!(legal_name: "CareFirst")
   end
 end
