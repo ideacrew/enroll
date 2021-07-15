@@ -129,6 +129,10 @@ module Insured
       response.dig(:attestations, :ridp_attestation, :evidences, 0, :primary_response, :Response, :VerificationResponse, :FinalDecisionCode)
     end
 
+    def final_secision_code(response)
+      response.dig(:attestations, :ridp_attestation, :evidences, 0, :primary_response, :Response, :VerificationResponse, :FinalDecisionCode)
+    end
+
     def process_successful_interactive_verification(response)
       consumer_role = @person.consumer_role
       consumer_user = @person.user
