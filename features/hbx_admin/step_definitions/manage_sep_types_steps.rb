@@ -986,3 +986,32 @@ end
 Given(/all market kinds are enabled for user to select/) do
   add_shop_markets_to_sep_types
 end
+
+When(/Admin creates and publishes new SEP Type with (.*) market and (.*) select termination on kinds with (.*) scenario and (.*) start and end dates$/) do |market_kind, action, scenario, dates|
+  admin_id = User.where(email: "admin@dc.gov").first.id
+  case scenario
+  when "Customer & Admin"
+    is_visible = true
+  when "Admin Only"
+    is_visible = false
+  end
+
+  case dates
+  when "current"
+    sep_start_on = sep_type_start_on
+    sep_end_on = sep_type_end_on
+  when "future"
+    sep_start_on = (sep_type_start_on + 2.months).strftime('%m/%d/%Y').to_s
+    sep_end_on = (sep_type_end_on + 2.months).strftime('%m/%d/%Y').to_s
+  when "past"
+    sep_start_on = (sep_type_start_on - 2.months).strftime('%m/%d/%Y').to_s
+    sep_end_on = (sep_type_end_on - 2.months).strftime('%m/%d/%Y').to_s
+  end
+  FactoryBot.create(:qualifying_life_event_kind, :domestic_partnership,
+                                                market_kind: market_kind,
+                                                published_by: admin_id,
+                                                start_on: sep_start_on,
+                                                end_on: sep_end_on,
+                                                is_visible: is_visible,
+                                                aasm_state: :active)
+end
