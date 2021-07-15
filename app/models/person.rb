@@ -547,8 +547,10 @@ class Person
 # collect all ridp_verification_types user in case of unsuccessful ridp
   def ridp_verification_types
     ridp_verification_types = []
-    ridp_verification_types << 'Identity' if consumer_role  && !consumer_role.person.completed_identity_verification?
-    ridp_verification_types << 'Application' if consumer_role && !consumer_role.person.completed_identity_verification?
+    if consumer_role && !consumer_role.person.completed_identity_verification?
+      ridp_verification_types << 'Identity'
+      ridp_verification_types << 'Application' if EnrollRegistry.feature_enabled?(:paper_application_verification)
+    end
     ridp_verification_types
   end
 
