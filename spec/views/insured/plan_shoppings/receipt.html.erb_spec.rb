@@ -11,6 +11,20 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
     )
   end
 
+  def carrier_profile
+    instance_double(
+      "IssuerProfile",
+      legal_name: "CareFirst"
+    )
+  end
+
+  def product
+    instance_double(
+      "HealthProduct",
+      carrier_profile: carrier_profile
+    )
+  end
+
   def enrollment
     instance_double(
       "HbxEnrollment",
@@ -23,7 +37,8 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
       hbx_id: "3939393",
       is_shop?: true,
       employee_role: double("EmployeeRole"),
-      composite_rated?: true
+      composite_rated?: true,
+      product: product
     )
   end
 
