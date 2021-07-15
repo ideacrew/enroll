@@ -335,7 +335,7 @@ Then(/(.*) should see the dental enrollment with make changes button/) do |role|
 end
 
 When(/(.*) clicked on make changes button/) do |_role|
-  click_link('Make Changes',  wait: 10)
+  click_link('Make Changes',  wait: 5)
 end
 
 Then(/(.*) should see keep existing plan and select plan to terminate button/) do |_role|

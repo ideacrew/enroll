@@ -1123,7 +1123,7 @@ And(/I select three plans to compare/) do
   end
 end
 
-And(/I should not see any plan which premium is 0/) do
+And(/(.*) should not see any plan which premium is 0/) do |_person|
   page.all("h2.plan-premium").each do |premium|
     expect(premium).not_to have_content("$0.00")
   end
