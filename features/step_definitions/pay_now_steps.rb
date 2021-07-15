@@ -60,6 +60,29 @@ And(/^the person has an active consumer role$/) do
   find('.interaction-click-control-continue', text: 'CONTINUE', :wait => 10).click
 end
 
+And(/the person fills in all personal info/) do
+  expect(page).to have_content("Personal Information")
+  expect(page).to have_content("CONTINUE")
+  fill_in "person_first_name", with: "John"
+  fill_in "person_last_name", with: "Smith"
+  fill_in "jq_datepicker_ignore_person_dob", with: "11/11/1991"
+  fill_in "person_ssn", with: '212-31-3131'
+  find(:xpath, '//label[@for="radio_male"]').click
+  find(:xpath, '//label[@for="is_applying_coverage_true"]').click
+  find('.btn', text: 'CONTINUE').click
+  find('.btn', text: 'CONTINUE').click
+  find(:xpath, '//label[@for="person_us_citizen_true"]').click
+  find(:xpath, '//label[@for="person_naturalized_citizen_false"]').click
+  find(:xpath, '//label[@for="indian_tribe_member_no"]').click
+  find(:xpath, '//label[@for="radio_incarcerated_no"]').click
+  fill_in "person_addresses_attributes_0_address_1", with: "123 fake st"
+  fill_in "person_addresses_attributes_0_city", with: "DC"
+  find(:xpath, '//*[@id="address_info"]/div/div[3]/div[2]/div/div[2]/span').click
+  find('#address_info li', :text => 'DC', wait: 5).click
+  fill_in "person[addresses_attributes][0][zip]", with: '20002'
+  find('.btn', text: 'CONTINUE').click
+end
+
 And(/^the person has an active resident role$/) do
   fill_in "person_first_name", with: "John"
   fill_in "person_last_name", with: "Smith"
@@ -74,7 +97,6 @@ end
 
 And(/^the person goes plan shopping in the individual for a new plan$/) do
   wait_for_ajax
-  expect(page).to have_button("CONTINUE", visible: false)
   find('.btn', text: 'CONTINUE').click
   click_link "Continue"
   expect(page).to have_content('Verify Identity')
@@ -84,6 +106,17 @@ And(/^the person goes plan shopping in the individual for a new plan$/) do
   click_button "Submit"
   # screenshot("override")
   click_link "Continue Application"
+end
+
+And(/the person continues to plan selection/) do
+  find('.btn', text: 'CONTINUE').click
+  sleep 4
+  find('.btn', text: 'CONTINUE').click
+  sleep 4
+end
+
+And(/the person selects a plan/) do
+  find_all(IvlChoosePlan.select_plan_btn)[0].click
 end
 
 When(/^the person enrolls in a Kaiser plan$/) do
@@ -129,6 +162,22 @@ end
 
 Then(/^I should click on pay now button$/) do
   find(IvlEnrollmentSubmitted.pay_now_btn).click
+end
+
+Then(/I should see the Kaiser pop up text/) do
+  expect(page).to have_content(l10n("plans.kaiser.pay_now.redirection_message", site_short_name: Settings.site.short_name))
+end
+
+Then(/I should see the non-Kaiser pop up text/) do
+  expect(page).to have_content(l10n("plans.other.pay_now.redirection_message", site_short_name: Settings.site.short_name, carrier_name: "CareFirst"))
+end
+
+Then(/the user closes the pop up modal/) do
+  find(IvlEnrollmentSubmitted.go_back_btn).click
+end
+
+Then(/user continues to their account/) do
+  find(IvlEnrollmentSubmitted.go_to_my_acct_btn).click
 end
 
 Then(/^I should see( not)? pay now button$/) do |visible|
@@ -216,4 +265,22 @@ end
 
 Then(/consumer should the the First Payment button/) do
   expect(page).to have_content('Make a first Payment')
+end
+
+Then(/user clicks on the first payment button/) do
+  find(IvlHomepage.first_payment).click
+end
+
+Then(/consumer should the the Make Payments button/) do
+  expect(page).to have_content('Make Payments')
+end
+
+Then(/user clicks on the make payments button/) do
+  find(IvlHomepage.make_payments_btn).click
+end
+
+Given(/non-Kaiser enrollments exist/) do
+  BenefitSponsors::Organizations::GeneralOrganization.each do |org|
+    org.update_attributes!(legal_name:"CareFirst")
+  end
 end

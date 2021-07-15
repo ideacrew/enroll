@@ -15,6 +15,10 @@ class IvlEnrollmentSubmitted
     '.interaction-click-control-pay-now'
   end
 
+  def self.go_back_btn
+    '.interaction-click-control-go-back'
+  end
+
   def self.print_btn
     '#btnPrint'
   end
