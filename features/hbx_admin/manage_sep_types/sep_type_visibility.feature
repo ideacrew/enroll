@@ -26,8 +26,8 @@ Feature: Admin has ability to create a new SEP Type with visibility options for 
     Scenario Outline: Admin will create a new Individual market SEP type by picking visibility option for <user_visibility>
       Given expired Qualifying life events of individual market is present
       And Admin creates and publishes new SEP Type with individual market and see select termination on kinds with <user_visibility> scenario and current start and end dates
-      And Hbx Admin logs on to the Hbx Portal
-      And the Admin is on the Main Page
+      And Patrick Doe has a consumer role and IVL enrollment
+      And Patrick Doe has active individual market role and verified identity
       And Admin clicks Families tab
       And the Admin is navigated to the Families screen
       When I click the name of Patrick Doe from family list
@@ -56,8 +56,8 @@ Feature: Admin has ability to create a new SEP Type with visibility options for 
   Scenario Outline: Admin will create a new Individual market SEP type by picking visibility option for <user_visibility> with future date
     Given expired Qualifying life events of individual market is present
     And Admin creates and publishes new SEP Type with individual market and see select termination on kinds with <user_visibility> scenario and future start and end dates
-    And Hbx Admin logs on to the Hbx Portal
-    And the Admin is on the Main Page
+    And Patrick Doe has a consumer role and IVL enrollment
+    And Patrick Doe has active individual market role and verified identity
     And Admin clicks Families tab
     And the Admin is navigated to the Families screen
     When I click the name of Patrick Doe from family list
@@ -108,8 +108,8 @@ Feature: Admin has ability to create a new SEP Type with visibility options for 
     And employee Patrick Doe already matched with employer Acme Inc. and logged into employee portal
     And I should not see the "Entered into a legal domestic partnership" at the bottom of the shop qle list
     And Employee logs out
-    And Hbx Admin logs on to the Hbx Portal
-    And the Admin is on the Main Page
+    And Patrick Doe has a consumer role and IVL enrollment
+    And Patrick Doe has active individual market role and verified identity
     And Admin clicks Families tab
     And the Admin is navigated to the Families screen
     When Admin clicks name of a shop family person on the family datatable
