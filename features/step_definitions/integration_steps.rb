@@ -1044,7 +1044,7 @@ When(/^I click on "(.*?)" button on household info page$/) do |select_action|
   click_button "Shop for new plan"
 end
 
-When(/^I click on continue on qle confirmation page$/) do
+When(/(.*) click on continue on qle confirmation page$/) do |_person|
   expect(page).to have_content "Enrollment Submitted"
   # screenshot("qle_confirm")
   click_link "GO TO MY ACCOUNT"

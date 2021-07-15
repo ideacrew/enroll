@@ -345,7 +345,7 @@ Then(/consumer clicked on Go To My Account/) do
   click_link 'GO TO MY ACCOUNT'
 end
 
-Then(/Individual creates a new HBX account$/) do
+Then(/(.*) creates a new HBX account$/) do |_person|
   # find('.interaction-click-control-create-account').click
   sleep 5
   fill_in "user[oim_id]", :with => "testflow@test.com"
@@ -448,7 +448,7 @@ And(/the individual clicks on the Continue button to go to the Individual home p
   sleep 10
 end
 
-And(/I should see the individual home page/) do
+And(/(.*) should see the individual home page/) do |_arg|
   sleep 5
   expect(page).to have_content "My #{Settings.site.short_name}"
   # screenshot("my_account")

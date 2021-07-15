@@ -4,8 +4,8 @@ Feature: Insured Plan Shopping on Individual market
     Given Individual has not signed up as an HBX user
     Given the FAA feature configuration is enabled
     And Individual market is under open_enrollment period
-    Then Individual creates a new HBX account
-    Then Individual should see a successful sign up message
+    Then Patrick Doe creates a new HBX account
+    Then Patrick Doe should see a successful sign up message
 
   Scenario: New insured user purchases on individual market
     Given there exists Patrick Doe with active individual market role and verified identity
@@ -18,8 +18,8 @@ Feature: Insured Plan Shopping on Individual market
     And Patrick Doe clicked on shop for new plan
     And Patrick Doe select a plan on plan shopping page
     And Patrick Doe confirms on confirmation page
-    When I click on continue on qle confirmation page
-    And I should see the individual home page
+    When Patrick Doe click on continue on qle confirmation page
+    And Patrick Doe should see the individual home page
     Then Individual logs out
 
   @flaky
