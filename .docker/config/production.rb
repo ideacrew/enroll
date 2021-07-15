@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
@@ -91,10 +93,10 @@ Rails.application.configure do
   config.acapi.remote_broker_uri = "amqp://#{ENV['RABBITMQ_USERNAME']}:#{ENV['RABBITMQ_PASSWORD']}@#{ENV['RABBITMQ__HOST']}:#{ENV['RABBITMQ__PORT']}"
   config.acapi.remote_request_exchange = "#{ENV['HBX_ID']}.#{ENV['ENV_NAME']}.e.fanout.requests"
   config.acapi.remote_event_queue = "#{ENV['HBX_ID']}.#{ENV['ENV_NAME']}.q.application.enroll.inbound_events"
-  config.action_mailer.default_url_options = { :host => "#{ENV['ENROLL_FQDN']}" }
-  config.acapi.hbx_id = "#{ENV['HBX_ID']}"
-  config.acapi.environment_name = "#{ENV['ENV_NAME']}"
- 
+  config.action_mailer.default_url_options = { :host => (ENV['ENROLL_FQDN']).to_s }
+  config.acapi.hbx_id = (ENV['HBX_ID']).to_s
+  config.acapi.environment_name = (ENV['ENV_NAME']).to_s
+
   # Add Google Analytics tracking ID
   config.ga_tracking_id = ENV['GA_TRACKING_ID'] || "dummy"
   config.ga_tagmanager_id = ENV['GA_TAGMANAGER_ID'] || "dummy"
@@ -107,7 +109,7 @@ Rails.application.configure do
   config.checkbook_services_remote_access_key = ENV['CHECKBOOK_REMOTE_ACCESS_KEY'] || "9876543210"
   config.checkbook_services_reference_id = ENV['CHECKBOOK_REFERENCE_ID'] || "0123456789"
   # for Employer Auto Pay
-  config.wells_fargo_api_url = ENV['WF_API_URL'] || "dummy" 
+  config.wells_fargo_api_url = ENV['WF_API_URL'] || "dummy"
   config.wells_fargo_api_key = ENV['WF_API_KEY'] || "dummy"
   config.wells_fargo_biller_key = ENV['WF_BILLER_KEY'] || "dummy"
   config.wells_fargo_api_secret = ENV['WF_API_SECRET'] || "dummy"
@@ -120,13 +122,13 @@ Rails.application.configure do
 
   # Action_cable config values
   config.action_cable.url = "wss://#{ENV['ENROLL_FQDN']}/cable"
-  config.action_cable.allowed_request_origins = [ "http://#{ENV['ENROLL_FQDN']}", "https://#{ENV['ENROLL_FQDN']}" ]
+  config.action_cable.allowed_request_origins = ["http://#{ENV['ENROLL_FQDN']}", "https://#{ENV['ENROLL_FQDN']}"]
 
 # Mongoid logger levels
-Mongoid.logger.level = Logger::ERROR
-Mongo::Logger.logger.level = Logger::ERROR
+  Mongoid.logger.level = Logger::ERROR
+  Mongo::Logger.logger.level = Logger::ERROR
 
-::IdentityVerification::InteractiveVerificationService.slug!
+  ::IdentityVerification::InteractiveVerificationService.slug!
 
-end  
+end
 

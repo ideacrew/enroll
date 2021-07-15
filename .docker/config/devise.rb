@@ -1,11 +1,13 @@
+# frozen_string_literal: true
+
 Devise.setup do |config|
   # The secret key used by Devise. Devise uses this key to generate
   # random tokens. Changing this key will render invalid all existing
   # confirmation, reset password and unlock tokens in the database.
-  config.secret_key = "#{ENV['ENROLL_DEVISE_SECRET_KEY']}"
+  config.secret_key = (ENV['ENROLL_DEVISE_SECRET_KEY']).to_s
 
   config.jwt do |jwt|
-    jwt.secret = "#{ENV['ENROLL_JWT_SECRET']}"
+    jwt.secret = (ENV['ENROLL_JWT_SECRET']).to_s
     jwt.expiration_time = 900
   end
 
@@ -13,7 +15,7 @@ Devise.setup do |config|
   # Configure the e-mail address which will be shown in Devise::Mailer,
   # note that it will be overwritten if you use your own mailer class
   # with default "from" parameter.
-  config.mailer_sender = "#{ENV['EMAIL_FROM_ADDRESS']}"
+  config.mailer_sender = (ENV['EMAIL_FROM_ADDRESS']).to_s
 
   # Configure the class responsible to send e-mails.
   config.mailer = 'DeviseCustomMailer'
@@ -44,12 +46,12 @@ Devise.setup do |config|
   # Configure which authentication keys should be case-insensitive.
   # These keys will be downcased upon creating or modifying a user and when used
   # to authenticate or find a user. Default is :email.
-  config.case_insensitive_keys = [ :email ]
+  config.case_insensitive_keys = [:email]
 
   # Configure which authentication keys should have whitespace stripped.
   # These keys will have whitespace before and after removed upon creating or
   # modifying a user and when used to authenticate or find a user. Default is :email.
-  config.strip_whitespace_keys = [ :email ]
+  config.strip_whitespace_keys = [:email]
 
   # Tell if authentication through request.params is enabled. True by default.
   # It can be set to an array that will enable params authentication only for the
