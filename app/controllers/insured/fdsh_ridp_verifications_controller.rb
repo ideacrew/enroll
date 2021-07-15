@@ -30,8 +30,8 @@ module Insured
               @interactive_verification = result.value!
               render :primary_response
             else
-              @step = 'start'
-              redirect_to :action => "failed_validation", :step => @step, :verification_transaction_id => session_identification_id(payload)
+              @step = 'questions'
+              redirect_to :action => "failed_validation", :step => @step, :verification_transaction_id => transaction_id(payload) || session_identification_id(payload)
             end
           end
         end
@@ -53,7 +53,7 @@ module Insured
               process_successful_interactive_verification(response_metadata)
             else
               @step = 'questions'
-              redirect_to :action => "failed_validation", :step => @step, :verification_transaction_id => session_identification_id(payload)
+              redirect_to :action => "failed_validation", :step => @step, :verification_transaction_id => transaction_id(payload) || session_identification_id(payload)
             end
           end
         end
@@ -121,6 +121,10 @@ module Insured
       response.dig(:attestations, :ridp_attestation, :evidences, 0, :primary_response, :Response, :VerificationResponse, :SessionIdentification)
     end
 
+    def transaction_id(response)
+      response.dig(:attestations, :ridp_attestation, :evidences, 0, :primary_response, :Response, :VerificationResponse, :DSHReferenceNumber)
+    end
+
     def process_successful_interactive_verification(response)
       consumer_role = @person.consumer_role
       consumer_user = @person.user
@@ -129,7 +133,7 @@ module Insured
         consumer_user.identity_final_decision_code = User::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
         consumer_user.identity_response_code = User::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
         consumer_user.identity_response_description_text = response[:ResponseMetadata][:TDSResponseDescriptionText]
-        consumer_user.identity_final_decision_transaction_id = response[:VerificationResponse][:SessionIdentification]
+        consumer_user.identity_final_decision_transaction_id = response[:VerificationResponse][:DSHReferenceNumber] || response[:VerificationResponse][:SessionIdentification]
         consumer_user.identity_verified_date = TimeKeeper.date_of_record
         consumer_user.save!
       end
