@@ -25,7 +25,6 @@ Feature: Admin has ability to sort SEP Types on Sort SEPs Page and save their po
     And listed <market_type> SEP Types ordinal postions should change
     When Admin clicks on List SEP Types link
     Then Admin navigates to SEP Type List page
-    And Hbx Admin logs out
 
     Examples:
       | market_kind | market_type |
@@ -51,40 +50,31 @@ Feature: Admin has ability to sort SEP Types on Sort SEPs Page and save their po
     And Hbx Admin logs out
     And user Patrick Doe logs into the portal
     Then I should see the "Married" at the top of the ivl qle list
-    And Individual logs out
 
-  Scenario: Admin will create a new Individual market SEP type with future date and try to sort the Sep Type
-    Given Admin can navigate to the Manage SEPs screen
-    When Admin creates new SEP Type with individual market and cannot select termination on kinds with future start and end dates scenario
+  Scenario Outline: Admin will create a new <market_kind> market SEP type with future date and try to sort the Sep Type
+    Given Admin creates and publishes new SEP Type with <market_kind> market and see select termination on kinds with <user_visibility> scenario and future start and end dates
     And Admin navigates to SEP Types List page
-    And Admin clicks individual filter on SEP Types datatable
-    And Admin clicks on Draft filter of individual market filter
-    And Admin should see newly created SEP Type title on Datatable
-    And Admin clicks on newly created SEP Type
-    And Admin should navigate to update SEP Type page
-    And Admin clicks on Publish button
-    And Admin should see Successfully publish message
+    And Admin clicks <market_kind> filter on SEP Types datatable
+    And Admin clicks on Draft filter of <market_kind> market filter
     And Admin clicks on the Sort SEPs button
     When Admin should see three tabs Individual, Shop and Congress markets
-    And Admin clicks on individual tab
-    Then Admin should see listed individual market SEP Types
+    And Admin clicks on <market_kind> tab
+    Then Admin should see listed <market_kind> market SEP Types
     And Admin should not see the "Entered into a legal domestic partnership" at the bottom of the ivl qle list
-    And Hbx Admin logs out
+
+    Examples:
+      | market_kind |
+      | individual  |
+      | shop        |
 
   Scenario: Admin will sort Shop market SEP Types and it will reflect the same order on the employee home page qle carousel
-    Given Admin can navigate to the Manage SEPs screen
-    When Admin clicks on the Sort SEPs button
-    Then Admin should see three tabs Individual, Shop and Congress markets
-    When Admin clicks on shop tab
-    Then Admin should see listed Active shop market SEP Types on datatable
-    And Hbx Admin logs out
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for active initial employer with health benefits
     And there is an employer Acme Inc.
     And initial employer Acme Inc. has active benefit application
     And there is a census employee record for Patrick Doe for employer Acme Inc.
     And employee Patrick Doe has past hired on date
-    Given Employee has not signed up as an HBX user
+    And Employee has not signed up as an HBX user
     And employee Patrick Doe already matched with employer Acme Inc. and logged into employee portal
     Then Employee should see the "Covid-19" at the top of the shop qle list
     Then Employee logs out
@@ -94,37 +84,13 @@ Feature: Admin has ability to sort SEP Types on Sort SEPs Page and save their po
     When Admin can click Manage SEPs link
     Given Admin can navigate to the Manage SEPs screen
     When Admin clicks on the Sort SEPs button
-    Then Admin should see three tabs Individual, Shop and Congress markets
     When Admin sorts Individual SEP Types by drag and drop
-    Then Admin should see successful message after sorting
     When Admin clicks on shop tab
     When Admin sorts Shop SEP Types by drag and drop
-    Then Admin should see successful message after sorting
-    And listed Shop SEP Types ordinal postions should change
     And Hbx Admin logs out
     When employee visits the Employee Portal page
     And Employee signed in
-    Then Employee should land on home page
     And Employee should see the "Married" at the top of the shop qle list
-    Then Employee logs out
-
-  Scenario: Admin will create a new Shop market SEP type with future date and try to sort the Sep Type
-    Given Admin can navigate to the Manage SEPs screen
-    When Admin creates new SEP Type with shop market and can select termination on kinds with future start and end dates scenario
-    And Admin navigates to SEP Types List page
-    And Admin clicks shop filter on SEP Types datatable
-    And Admin clicks on Draft filter of shop market filter
-    Then Admin should see newly created SEP Type title on Datatable
-    When Admin clicks on newly created SEP Type
-    Then Admin should navigate to update SEP Type page
-    When Admin clicks on Publish button
-    Then Admin should see Successfully publish message
-    When Admin clicks on the Sort SEPs button
-    Then Admin should see three tabs Individual, Shop and Congress markets
-    When Admin clicks on shop tab
-    And Admin should see listed shop market SEP Types
-    And Admin should not see the "Entered into a legal domestic partnership" at the bottom of the shop qle list
-    And Hbx Admin logs out
 
   Scenario Outline: Admin will create a new <market_kind> SEP type and publish it
     Given Admin can navigate to the Manage SEPs screen
