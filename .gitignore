@@ -103,6 +103,5 @@ coverage
 
 # Ignore HUGO output dirs
 hugo/public
-hugo/static
 hugo/node_modules
 hugo/resources
