@@ -1,0 +1,15 @@
+---
+registry:
+  - namespace:
+      - :enroll_app
+    features:
+      - key: :hbx_admin_config
+        is_enabled: true
+  - namespace:
+    - :enroll_app
+    - :hbx_admin_config
+    features:
+        - key: :issuers_tab
+          is_enabled: false
+        - key: :inbox_tab
+          is_enabled: false

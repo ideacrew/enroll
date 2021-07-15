@@ -1,11 +1,10 @@
 require 'rails_helper'
 
-if ExchangeTestingConfigurationHelper.general_agency_enabled?
 RSpec.describe "general_agencies/profiles/_staffs.html.erb" do
   let(:staff) { FactoryBot.create(:general_agency_staff_role) }
   before :each do
     assign :staffs, [staff]
-    allow(Settings.aca).to receive(:general_agency_enabled).and_return(true)
+    EnrollRegistry[:general_agency].feature.stub(:is_enabled).and_return(true)
     Enroll::Application.reload_routes!
     render template: "general_agencies/profiles/_staffs.html.erb"
   end
@@ -17,5 +16,4 @@ RSpec.describe "general_agencies/profiles/_staffs.html.erb" do
   it 'should show staff info' do
     expect(rendered).to have_selector('a', text: "#{staff.person.first_name} #{staff.person.last_name}")
   end
-end
 end

@@ -3,6 +3,8 @@ module BenefitSponsors
     protect_from_forgery with: :exception
     before_action :set_last_portal_visited
     include Pundit
+    include ::L10nHelper
+
 
     helper BenefitSponsors::Engine.helpers
 

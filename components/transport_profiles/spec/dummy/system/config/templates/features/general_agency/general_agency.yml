@@ -1,0 +1,7 @@
+---
+registry:
+  - namespace:
+    - :general_agencies
+    features:
+      - key: :general_agency
+        is_enabled: true
