@@ -193,7 +193,7 @@ registry:
           - key: :contact_center_state_and_city
             item: "Augusta, ME"
           - key: :contact_center_zip_code
-            item: "04330"
+            item: "20024" # For DC loading rating areas, the zip uses this zip code 20024
           - key: :contact_center_email_address
             item: "smallbusiness@coverme.gov"
           - key: :social_media
@@ -251,17 +251,21 @@ registry:
           - key: :single_carriers_available
             item: ['']
           - key: :plan_year_tooltip
-            item: ""
+            item: "Employer premium contribution for Employee Only Health Plans must be at least"
           - key: :sep_moved_out_zip_compare
-            item: true
+            item: false
           - key: :send_rating_area_for_ivl_policy_to_edi
             item: true
           - key: :medicaid_agency_phone
-            item: "(000) 000-0000"
+            item: "(855) 532-5465"
           - key: :verifiable_immigration_statuses
-            item: true
+            item: false
       - key: :data_seeds_ui
+<<<<<<< HEAD
         item: :data_seeds_ui
+=======
+        item: :data_seed_ui
+>>>>>>> ref: config settings for DC.
         is_enabled: true
       - key: :rating_area
         item: :rating_area
@@ -305,7 +309,7 @@ registry:
             item: <%= Date.new(2020,9,18)..Date.new(2021,12,31) %>
       - key: :special_cover_header
         item: :special_cover_header
-        is_enabled: true
+        is_enabled: false
         settings:
           - key: :filename
             item: "CoverME_WebsiteHeader_01.jpg"
@@ -374,12 +378,12 @@ registry:
           - key: :days
             item: 60
       - key: :immigration_status_checkbox
-        is_enabled: true
-      - key: :gender_to_sex
-        is_enabled: true
-      - key: :mainecare_cubcare_glossary
-        is_enabled: true
-      - key: :legacy_enrollment_trigger
         is_enabled: false
-      - key: :verification_type_income_verification
+      - key: :gender_to_sex
+        is_enabled: false
+      - key: :mainecare_cubcare_glossary
+        is_enabled: false
+      - key: :legacy_enrollment_trigger
         is_enabled: true
+      - key: :verification_type_income_verification
+        is_enabled: false

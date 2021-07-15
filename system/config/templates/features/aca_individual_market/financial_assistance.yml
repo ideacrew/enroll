@@ -55,30 +55,30 @@ registry:
       - key: :unemployment_income
         item: :unemployment_income
         is_enabled: true
-      - key: :primary_caregiver_other_question
-        item: :primary_caregiver_other_question
-        is_enabled: true
       - key: :american_indian_alaskan_native_income
         item: :american_indian_alaskan_native_income
-        is_enabled: true
+        is_enabled: false
       - key: :indian_health_service_question
-        is_enabled: true
+        is_enabled: false
       - key: :mainecare_healthcare_questions
         is_enabled: true
       - key: :immigration_status_question_required
+        is_enabled: true
+      - key: :primary_caregiver_other_question
+        item: :primary_caregiver_other_question
         is_enabled: false
   - namespace:
     - :request_determination
     features:
     - key: :haven_determination
-      is_enabled: false
-    - key: :medicaid_gateway_determination
       is_enabled: true
+    - key: :medicaid_gateway_determination
+      is_enabled: false
   - namespace:
     - :documents
     features:
       - key: :consumer_validations
-        is_enabled: true
+        is_enabled: false
       - key: :non_magi_referral_display
         is_enabled: true
   - namespace:
@@ -88,33 +88,33 @@ registry:
       is_enabled: true
       settings:
         - key: :currently_enrolled
-          item: false
-        - key: :currently_enrolled_with_hra
           item: true
+        - key: :currently_enrolled_with_hra
+          item: false
     - key: :has_eligible_health_coverage
       is_enabled: true
       settings:
         - key: :currently_eligible
-          item: false
-        - key: :currently_eligible_with_hra
           item: true
+        - key: :currently_eligible_with_hra
+          item: false
     - key: :has_medicare_cubcare_eligible
-      is_enabled: true
+      is_enabled: false
     - key: :medicaid_chip_driver_questions
-      is_enabled: true
+      is_enabled: false
       settings:
         - key: :medicaid_chip
           item: "Medicaid"
     - key: :net_annual_income_display
-      is_enabled: true
+      is_enabled: false
     - key: :has_dependent_with_coverage
-      is_enabled: true
+      is_enabled: false
     - key: :private_individual_and_family_coverage
       is_enabled: true
     - key: :acf_refugee_medical_assistance
-      is_enabled: false
+      is_enabled: true
     - key: :americorps_health_benefits
-      is_enabled: false
+      is_enabled: true
     - key: :child_health_insurance_plan
       is_enabled: true
     - key: :medicaid
@@ -122,74 +122,77 @@ registry:
     - key: :medicare
       is_enabled: true
     - key: :medicare_advantage
-      is_enabled: false
+      is_enabled: true
     - key: :medicare_part_b
-      is_enabled: false
+      is_enabled: true
     - key: :state_supplementary_payment
-      is_enabled: false
+      is_enabled: true
     - key: :tricare
       is_enabled: true
     - key: :veterans_benefits
-      is_enabled: false
+      is_enabled: true
     - key: :naf_health_benefit_program
-      is_enabled: false
+      is_enabled: true
     - key: :health_care_for_peace_corp_volunteers
-      is_enabled: false
+      is_enabled: true
     - key: :department_of_defense_non_appropriated_health_benefits
-      is_enabled: false
+      is_enabled: true
     - key: :cobra_benefit_fa
       is_enabled: true
     - key: :employer_sponsored_insurance
       is_enabled: true
     - key: :self_funded_student_health_coverage
-      is_enabled: false
+      is_enabled: true
     - key: :foreign_government_health_coverage
-      is_enabled: false
+      is_enabled: true
     - key: :private_health_insurance_plan
-      is_enabled: false
+      is_enabled: true
     - key: :coverage_obtained_through_another_exchange
       is_enabled: true
     - key: :coverage_under_the_state_health_benefits_risk_pool
-      is_enabled: false
+      is_enabled: true
     - key: :veterans_administration_health_benefits
       is_enabled: true
     - key: :peace_corps_health_benefits
       is_enabled: true
     - key: :health_reimbursement_arrangement # new
-      is_enabled: true
+      is_enabled: false
     - key: :retiree_health_benefits # new
-      is_enabled: true
+      is_enabled: false
     - key: :other_full_benefit_coverage # new
-      is_enabled: true
+      is_enabled: false
     - key: :other_limited_benefit_coverage # new
-      is_enabled: true
+      is_enabled: false
     - key: :prize_and_awards
       is_enabled: true
       settings:
         - key: :gamble_prize
-          item: true
+          item: false
     - key: :full_medicaid_determination_step
+<<<<<<< HEAD
       is_enabled: true
     - key: :native_american_csr
+=======
+>>>>>>> ref: config settings for DC.
       is_enabled: true
+    - key: :native_american_csr
+      is_enabled: false
+    - key: :filing_as_head_of_household
+      is_enabled: false
     - key: :display_medicaid_question
       item: :display_medicaid_question
       is_enabled: false
     - key: :fa_send_to_external_verification
-      is_enabled: true
+      is_enabled: false
     - key: :medicaid_or_chip_program_short_name
       is_enabled: true
       settings:
         - key: :name
-          item: "MaineCare or CubCare"
+          item: 'Medicaid'
     - key: :medicaid_or_chip_agency_long_name
       is_enabled: true
       settings:
         - key: :name
-          item: 'Office for Family Independence'
+          item: 'DHS'
     - key: :student_follow_up_questions
-      is_enabled: false
-    - key: :filing_as_head_of_household
       is_enabled: true
-# TODO eligibility engine connectivity(HAVEN) settings
-# TODO mec service connectivity settings
