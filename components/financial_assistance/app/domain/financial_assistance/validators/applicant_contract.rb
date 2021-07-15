@@ -58,7 +58,6 @@ module FinancialAssistance
         optional(:addresses).maybe(:array)
         optional(:phones).maybe(:array)
         optional(:emails).maybe(:array)
-        optional(:immigration_doc_statuses).maybe(:array)
       end
 
       rule(:addresses).each do
