@@ -71,7 +71,7 @@ Feature: Admin has ability to create a new SEP Type with visibility options for 
 
   Scenario Outline: Admin will create a new Shop market SEP type by picking visibility option for <user_visibility>
     Given expired Qualifying life events of shop market is present
-    And Admin creates and publishes new SEP Type with shop market and see select termination on kinds with <user_visibility> scenario and current start and end dates
+    And Admin creates and publishes new SEP Type with shop market and see select termination on kinds with <user_visibility> scenario and <date> start and end dates
     And a CCA site exists with a benefit market
     And benefit market catalog exists for active initial employer with health benefits
     And there is an employer Acme Inc.
@@ -80,7 +80,7 @@ Feature: Admin has ability to create a new SEP Type with visibility options for 
     And employee Patrick Doe has past hired on date
     And Employee has not signed up as an HBX user
     And employee Patrick Doe already matched with employer Acme Inc. and logged into employee portal
-    Then I should <action> the "Entered into a legal domestic partnership" at the bottom of the shop qle list
+    Then I should <employee_action> the "Entered into a legal domestic partnership" at the bottom of the shop qle list
     And Employee logs out
     And Hbx Admin logs on to the Hbx Portal
     And the Admin is on the Main Page
@@ -88,35 +88,11 @@ Feature: Admin has ability to create a new SEP Type with visibility options for 
     And the Admin is navigated to the Families screen
     When Admin clicks name of a shop family person on the family datatable
     And I should see listed shop market SEP Types
-    And I should see the "Entered into a legal domestic partnership" at the bottom of the shop qle list
+    And I should <admin_action> the "Entered into a legal domestic partnership" at the bottom of the shop qle list
 
     Examples:
-      | user_visibility  | action  |
-      | Customer & Admin | see     |
-      | Admin Only       | not see |
-
-  Scenario Outline: Admin will create a new Shop market SEP type by picking visibility option for <user_visibility> with future date
-    Given expired Qualifying life events of shop market is present
-    And Admin creates and publishes new SEP Type with shop market and see select termination on kinds with <user_visibility> scenario and future start and end dates
-    And a CCA site exists with a benefit market
-    And benefit market catalog exists for active initial employer with health benefits
-    And there is an employer Acme Inc.
-    And initial employer Acme Inc. has active benefit application
-    And there is a census employee record for Patrick Doe for employer Acme Inc.
-    And employee Patrick Doe has past hired on date
-    And Employee has not signed up as an HBX user
-    And employee Patrick Doe already matched with employer Acme Inc. and logged into employee portal
-    And I should not see the "Entered into a legal domestic partnership" at the bottom of the shop qle list
-    And Employee logs out
-    And Patrick Doe has a consumer role and IVL enrollment
-    And Patrick Doe has active individual market role and verified identity
-    And Admin clicks Families tab
-    And the Admin is navigated to the Families screen
-    When Admin clicks name of a shop family person on the family datatable
-    And I should see listed shop market SEP Types
-    And I should not see the "Entered into a legal domestic partnership" at the bottom of the shop qle list
-
-    Examples:
-      | user_visibility  |
-      | Customer & Admin |
-      | Admin Only       |
+      | user_visibility  | employee_action     |  date     | admin_action |
+      | Customer & Admin | see                 | current   | see          |
+      | Admin Only       | not see             | current   | see          |
+      | Customer & Admin | not see             | future    | not see      |
+      | Admin Only       | not see             | future    | not see      |
