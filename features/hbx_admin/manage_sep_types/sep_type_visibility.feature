@@ -71,7 +71,7 @@ Feature: Admin has ability to create a new SEP Type with visibility options for 
 
   Scenario Outline: Admin will create a new Shop market SEP type by picking visibility option for <user_visibility>
     Given expired Qualifying life events of shop market is present
-    And Admin creates and publishes new SEP Type with individual market and see select termination on kinds with <user_visibility> scenario and current start and end dates
+    And Admin creates and publishes new SEP Type with shop market and see select termination on kinds with <user_visibility> scenario and current start and end dates
     And a CCA site exists with a benefit market
     And benefit market catalog exists for active initial employer with health benefits
     And there is an employer Acme Inc.
@@ -96,8 +96,8 @@ Feature: Admin has ability to create a new SEP Type with visibility options for 
       | Admin Only       | not see |
 
   Scenario Outline: Admin will create a new Shop market SEP type by picking visibility option for <user_visibility> with future date
-    Given expired Qualifying life events of individual market is present
-    And Admin creates and publishes new SEP Type with individual market and see select termination on kinds with <user_visibility> scenario and future start and end dates
+    Given expired Qualifying life events of shop market is present
+    And Admin creates and publishes new SEP Type with shop market and see select termination on kinds with <user_visibility> scenario and future start and end dates
     And a CCA site exists with a benefit market
     And benefit market catalog exists for active initial employer with health benefits
     And there is an employer Acme Inc.
