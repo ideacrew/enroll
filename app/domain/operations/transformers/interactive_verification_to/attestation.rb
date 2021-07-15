@@ -57,8 +57,8 @@ module Operations
         def construct_verification_answers(questions)
           questions.collect do |question|
             {
-              VerificationQuestionNumber: question.question_id,
-              VerificatonAnswer: question.response_id
+              VerificationQuestionNumber: question.question_id.to_i,
+              VerificatonAnswer: question.response_id.to_i
             }
           end
         end

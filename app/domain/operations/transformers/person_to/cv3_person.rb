@@ -346,7 +346,7 @@ module Operations
             ethnicity: person.ethnicity,
             race: person.race,
             tribal_id: person.tribal_id,
-            language_code: person.language_code || person.user&.preferred_language
+            language_code: person.language_code || person.user&.preferred_language || 'en'
           }
         end
 

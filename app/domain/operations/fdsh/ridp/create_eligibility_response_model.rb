@@ -12,7 +12,6 @@ module Operations
         include EventSource::Command
 
         def call(params)
-          Rails.logger.info("Invoked CreateEligibilityResponseModel with #{params.to_h.inspect}")
           value = yield construct_payload_hash(params)
           validated_params = yield validate_value(value)
           entity = yield create_entity(validated_params)
@@ -30,21 +29,17 @@ module Operations
               primary_member_hbx_id: params[:primary_member_hbx_id],
               event_kind: params[:event_kind],
               ridp_eligibility: {
-                metadata: params[:metadata],
+                metadata: params[:metadata].to_h,
                 event: params[:response]
               }
             }
-
-            Rails.logger.info("In construct_payload_hash method #{value}")
 
             Success(value)
           end.or(Failure("Invalid params to construct a payload for RidpEligibilityResponse"))
         end
 
         def validate_value(params)
-          Rails.logger.info("in validate_value &&&&&&&&&&&&&&& #{params.to_h}")
-
-          result = ::Validators::RidpEligibilityResponseContract.new.call(params.to_h)
+          result = ::Validators::RidpEligibilityResponseContract.new.call(params.value!)
           result.success? ? Success(result) : Failure("Invalid RidpEligibilitiyResponse due to #{result.errors.to_h}")
         end
 
