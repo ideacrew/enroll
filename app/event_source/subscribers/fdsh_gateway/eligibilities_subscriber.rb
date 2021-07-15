@@ -8,8 +8,7 @@ module Subscribers
       include ::EventSource::Subscriber[amqp: 'fdsh.eligibilities.ridp']
 
       subscribe(:on_primary_determination_complete) do |delivery_info, metadata, response|
-        logger.debug "Ridp::EligibilitiesSubscriber: invoked on_fdsh_eligibilities"
-        logger.info "Ridp::EligibilitiesSubscriber: invoked on_fdsh_eligibilities with delivery_info: #{delivery_info.inspect}, response: #{response.inspect}"
+        logger.info "Ridp::EligibilitiesSubscriber: invoked on_primary_determination_complete with delivery_info: #{delivery_info.inspect}, response: #{response.inspect}"
         payload = JSON.parse(response, :symbolize_names => true)
 
         eligibility_json = { primary_member_hbx_id: metadata.correlation_id, event_kind: 'primary',
@@ -17,7 +16,6 @@ module Subscribers
 
         result = Operations::Fdsh::Ridp::CreateEligibilityResponseModel.new.call(eligibility_json)
 
-        Rails.logger.info("in EligibilitiesSubscriber after result $$$$$$$$$$$ #{result}")
         if result.success?
           logger.info "FdshGateway::EligibilitiesSubscriber: on_primary_determination acked with success: #{result.success}"
           ack(delivery_info.delivery_tag)
@@ -31,9 +29,10 @@ module Subscribers
         logger.info "FdshGateway::EligibilitiesSubscriber: on_primary_determination error: #{e.backtrace}"
       end
 
-      subscribe(:on_secondary_determination_complete) do |delivery_info, _metadata, response|
+      subscribe(:on_secondary_determination_complete) do |delivery_info, metadata, response|
         logger.info "Ridp::EligibilitiesSubscriber: invoked on_fdsh_eligibilities with delivery_info: #{delivery_info}, response: #{response}"
         payload = JSON.parse(response, :symbolize_names => true)
+
         eligibility_json = { primary_member_hbx_id: metadata.correlation_id, event_kind: 'secondary',
                              metadata: metadata, response: payload }.to_json
 

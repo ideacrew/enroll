@@ -22,7 +22,7 @@ module Operations
         private
 
         def fetch_evidence(response)
-          evidence = response.dig(:attestations, :evidences, 0)
+          evidence = response.dig(:attestations, :ridp_attestation, :evidences, 0)
           evidence.present? ? Success(evidence) : Failure("No Evidence Present")
         end
 
@@ -38,12 +38,12 @@ module Operations
           q_set.each_with_index do |q, idx|
             response_attributes = {}
             q[:VerificationAnswerChoiceText].each_with_index do |ro, r_idx|
-              response_attributes[r_idx] = {
-                response_id: r_idx,
+              response_attributes[r_idx + 1] = {
+                response_id: r_idx + 1,
                 response_text: ro
               }
-              question_attributes[idx.to_s] = {
-                question_id: idx,
+              question_attributes[(idx + 1).to_s] = {
+                question_id: idx + 1,
                 question_text: q[:VerificationQuestionText],
                 responses_attributes: response_attributes
               }
