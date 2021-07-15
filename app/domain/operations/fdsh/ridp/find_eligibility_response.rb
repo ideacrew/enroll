@@ -43,7 +43,3 @@ module Operations
     end
   end
 end
-
-# ridp_eligibility = {delivery_info: 'delivery_info', metadata: 'metadata', response: response}
-
-# Fdsh::Ridp::EligibilityResponseModel.create!(event_kind: 'primary', primary_member_hbx_id: '755b07c7512047dea02e3199c55c9e92', ridp_eligibility: ridp_eligibility)

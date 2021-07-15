@@ -20,9 +20,9 @@ module Insured
     def wait_for_secondary_response; end
 
     def primary_response
-      response = received_response('primary')
-      if response.success?
-        payload = response.value![:ridp_eligibility][:event]
+      response = find_response('primary')
+      if response.present?
+        payload = response.serializable_hash.deep_symbolize_keys[:ridp_eligibility][:event]
         result = Operations::Fdsh::Ridp::PrimaryResponseToInteractiveVerification.new.call(payload)
         respond_to do |format|
           format.html do
@@ -41,10 +41,11 @@ module Insured
     end
 
     def secondary_response
-      response = received_response('secondary')
-      if response.success?
-        status = response.value!.dig(:ridp_eligibility, :event, :attestations, :ridp_attestation, :status)
-        payload = response.value!.dig(:ridp_eligibility, :event)
+      response = find_response('secondary')
+      if response.present?
+        response_hash = response.serializable_hash.deep_symbolize_keys
+        status = response_hash.dig(:ridp_eligibility, :event, :attestations, :ridp_attestation, :status)
+        payload = response_hash.dig(:ridp_eligibility, :event)
         respond_to do |format|
           format.html do
             if status == 'success'
@@ -96,6 +97,10 @@ module Insured
     def received_response(event_kind)
       find_params = {primary_member_hbx_id: @person.primary_family.primary_applicant.hbx_id, event_kind: event_kind}
       Operations::Fdsh::Ridp::FindEligibilityResponse.new.call(find_params)
+    end
+
+    def find_response(event_kind)
+      ::Fdsh::Ridp::EligibilityResponseModel.where(event_kind: event_kind, primary_member_hbx_id: @person.primary_family.primary_applicant.hbx_id).max_by(&:deleted_at)
     end
 
     def service_unavailable

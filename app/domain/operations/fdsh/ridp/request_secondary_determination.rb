@@ -39,7 +39,7 @@ module Operations
         end
 
         def merge_attestation_to_user(family, attestations)
-          family[:family_members][0][:person][:user].merge!(attestations)
+          family[:family_members][0][:person][:user].merge!({attestations: [attestations]})
 
           Success(family)
         end
