@@ -3,43 +3,30 @@ on:
   push:
 
 jobs:
-  # docs_deployment:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #       with:
-  #         submodules: recursive
-  #     - uses: nelonoel/branch-name@v1.0.1
-  #     - uses: actions/setup-node@v2
-  #       with:
-  #         node-version: '14'
-  #     - run: cd hugo && npm ci
-  #     - uses: ruby/setup-ruby@v1
-  #     - uses: actions/cache@v2
-  #       with:
-  #         path: vendor/bundle
-  #         key: v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
-  #         restore-keys: |
-  #           v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
-  #     - name: Install project gems
-  #       run: |
-  #         bundle config path vendor/bundle
-  #         bundle install
-  #     - uses: actions/setup-python@v2
-  #       with:
-  #         python-version: '3.x' # Version range or exact version of a Python version to use, using SemVer's version range syntax
-  #         architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified  
-  #     - name: Run yard
-  #       run: bundle exec yard doc && mv ./doc ./hugo/static/yard
-  #     - run: sudo snap install hugo --channel=extended
-  #     - run: cd hugo && hugo --minify
-  #     - uses: jakejarvis/s3-sync-action@master
-  #       env:
-  #         AWS_S3_BUCKET: ${{ secrets.YARD_S3_BUCKET }}
-  #         AWS_ACCESS_KEY_ID: ${{ secrets.YARD_ACCESS_KEY_ID }}
-  #         AWS_SECRET_ACCESS_KEY: ${{ secrets.YARD_SECRET_ACCESS_KEY }}
-  #         SOURCE_DIR: hugo/public
-  #         DEST_DIR: ${{ env.BRANCH_NAME }}
+  docs_deployment:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - uses: ruby/setup-ruby@v1
+      - uses: actions/cache@v2
+        with:
+          path: vendor/bundle
+          key: v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
+          restore-keys: |
+            v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
+      - name: Install project gems
+        run: |
+          bundle config path vendor/bundle
+          bundle install  
+      - name: Run yard
+        run: bundle exec yard doc
+      - uses: actions/upload-artifact@v2
+        with:
+          name: yard-doc
+          path: doc
   swagger:
     runs-on: ubuntu-latest
     steps:
@@ -99,5 +86,41 @@ jobs:
           cd ..
           cd ..
           python swagger-yaml-to-html.py < $root/components/financial_assistance/spec/dummy/components/financial_assistance/v1/swagger.yaml > doc.html
-          ls
-          cat doc.html
+      - uses: actions/upload-artifact@v2
+        with:
+          name: swagger-docs
+          path: doc.html
+  hugo-deployment:
+    needs: [swagger, docs_deployment]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: nelonoel/branch-name@v1.0.1
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Download swagger-docs
+        uses: actions/download-artifact@v2
+        with:
+          name: swagger-docs
+          path: index.html
+      - name: Download yard-doc
+        uses: actions/download-artifact@v2
+        with:
+          name: yard-doc
+          path: doc
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - run: cd hugo && npm ci
+      - run: sudo snap install hugo --channel=extended
+      - run: |
+          mv ./doc ./hugo/static/yard
+          mv ./index.html ./hugo/static/swagger/index.html
+      - run: cd hugo && hugo --minify
+      - uses: jakejarvis/s3-sync-action@master
+        env:
+          AWS_S3_BUCKET: ${{ secrets.YARD_S3_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.YARD_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.YARD_SECRET_ACCESS_KEY }}
+          SOURCE_DIR: hugo/public
+          DEST_DIR: ${{ env.BRANCH_NAME }}
