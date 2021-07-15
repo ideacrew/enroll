@@ -1,4 +1,7 @@
-<div class="modal fade" tabindex="-1" role="dialog" id="payNowModal">
+<% carrier = hbx_enrollment.product.carrier_profile.legal_name %>
+<% url = carrier == "Kaiser" ? @kp_pay_now_url : carrier_url(carrier) %>
+<% carrier_key = carrier == "Kaiser" ? carrier.downcase! : "other" %>
+<div class="modal fade" tabindex="-1" role="dialog" id="payNowModal<%= hbx_enrollment.hbx_id %>">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -8,20 +11,20 @@
       </div>
       <div class="modal-body">
         <p>
-          <%= l10n('plans.kaiser.pay_now.redirection_message', site_short_name: Settings.site.short_name) %><br/>
+          <%= l10n("plans.#{carrier_key}.pay_now.redirection_message", site_short_name: Settings.site.short_name, carrier_name: carrier) %><br/>
           <ul>
-            <li><%= l10n('plans.kaiser.pay_now.link_info')%></li>
-            <li><%= l10n('plans.kaiser.pay_now.processing')%></li>
-            <li><%= l10n('plans.kaiser.pay_now.collecting_info')%></li>
-            <li><%= l10n('plans.kaiser.pay_now.exchange_disclaimer_for_auth') %></li>
+            <li><%= l10n("plans.#{carrier_key}.pay_now.link_info")%></li>
+            <li><%= l10n("plans.#{carrier_key}.pay_now.processing", carrier_name: carrier)%></li>
+            <li><%= l10n("plans.#{carrier_key}.pay_now.collecting_info", carrier_name: carrier)%></li>
+            <li><%= l10n("plans.#{carrier_key}.pay_now.exchange_disclaimer_for_auth") %></li>
             <br/>
           </ul>
-          <%= l10n('plans.kaiser.pay_now.exchange_disclaimer') %>
+          <%= l10n("plans.#{carrier_key}.pay_now.exchange_disclaimer", carrier_name: carrier) %>
         </p>
       </div>
       <%= hidden_field_tag 'source', source %>
       <div class="modal-footer">
-        <form action=<%= @kp_pay_now_url %> method="post" target="_blank" id="pay_now_form">
+        <form action=<%= url %> method="post" target="_blank" id="pay_now_form">
           <input type="hidden" name="SAMLResponse" value="response" id="sp"/>
           <input type="hidden" name="RelayState" value=<%= @kp_relay_state %>/>
           <button type="submit" class="btn btn-primary pull-right sp interaction-click-control-print-purchase-confirmation" id="pay-now" value="<%= hbx_enrollment.hbx_id %>">
