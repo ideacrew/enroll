@@ -33,8 +33,8 @@ namespace :import do
 
       # if we need to change these dates after running this rake task in test or prod environments,
       # we should write a separate script.
-      bc_period_2022.open_enrollment_start_on = Date.new(2021,11,1)
-      bc_period_2022.open_enrollment_end_on = Date.new(2022,1,31)
+      bc_period_2022.open_enrollment_start_on = Date.new(2021,07,15)
+      bc_period_2022.open_enrollment_end_on = Date.new(2022,1,15)
 
       if slcsp_2022.present?
         bc_period_2022.slcsp = slcsp_2022.id
