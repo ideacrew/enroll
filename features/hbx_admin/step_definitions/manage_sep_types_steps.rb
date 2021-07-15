@@ -987,7 +987,7 @@ Given(/all market kinds are enabled for user to select/) do
   add_shop_markets_to_sep_types
 end
 
-When(/Admin creates and publishes new SEP Type with (.*) market and see select termination on kinds with (.*) scenario and (.*) start and end dates$/) do |market_kind, _action, scenario, dates|
+When(/Admin creates and publishes new SEP Type with (.*) market and (.*) select termination on kinds with (.*) scenario and (.*) start and end dates$/) do |market_kind, _action, scenario, dates|
   admin_id = User.where(email: "admin@dc.gov").first.id
   case scenario
   when "Customer & Admin"
