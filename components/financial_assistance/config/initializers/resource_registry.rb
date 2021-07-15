@@ -3,7 +3,7 @@
 FinancialAssistanceRegistry = ResourceRegistry::Registry.new
 
 FinancialAssistanceRegistry.configure do |config|
-  config.name       = :financial_assistance
+  config.name       = :enroll
   config.created_at = DateTime.now
-  config.load_path  = FinancialAssistance::Engine.root.join('system', 'config', 'templates', 'features').to_s
+  config.load_path = "#{Rails.root.to_s.gsub('/components/financial_assistance/spec/dummy', '')}/system/config/templates/features"
 end
