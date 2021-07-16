@@ -4,8 +4,6 @@ Feature: Insured Plan Shopping on Individual market
     Given Individual has not signed up as an HBX user
     Given the FAA feature configuration is enabled
     And Individual market is under open_enrollment period
-    Then Patrick Doe creates a new HBX account
-    Then Patrick Doe should see a successful sign up message
 
   Scenario: New insured user purchases on individual market and click on 'Make changes' button on enrollment
     Given there exists Patrick Doe with active individual market role and verified identity
@@ -24,33 +22,22 @@ Feature: Insured Plan Shopping on Individual market
     Then Patrick Doe should not see any plan which premium is 0
     Then Patrick Doe logs out
 
-  @flaky
-  Scenario: Individual should not see document errors when not applying for coverage.
-    Given Individual resumes enrollment
-    And Individual click on Sign In
-    And I signed in
-    Then Individual should see heading labeled personal information
-    Then Individual should see a form to enter personal information
-    Then Individual selects eligible immigration status
-    And Individual selects not applying for coverage
-    When Individual clicks on continue
-    Then Individual should not see error message Document type cannot be blank
-    Then Individual agrees to the privacy agreeement
-    Then Individual should see identity verification page and clicks on submit
-    Then Individual logs out
-
-  @flaky
-  Scenario: Individual should see document errors when proceeds without uploading document.
-    Given Individual resumes enrollment
-    And Individual click on Sign In
-    And I signed in
-    Then Individual should see heading labeled personal information
-    Then Individual should see a form to enter personal information
-    Then Individual selects eligible immigration status
-    And Individual selects applying for coverage
-    When Individual clicks on continue
-    Then Individual should see error message Document type cannot be blank
-    Then Individual logs out
+  Scenario Outline: Patrick Doe should not see document errors when not applying  and applying for coverage.
+    Given Patrick Doe signed up as a consumer
+    And Patrick Doe sees Your Information page
+    And Patrick Doe should see heading labeled personal information
+    And Patrick Doe registers as an individual
+    Then Patrick Doe clicks on the Continue button of the Account Setup page
+    And Patrick Doe sees form to enter personal information
+    Then Patrick Doe selects eligible immigration status
+    And Patrick Doe selects <status> for coverage
+    When Patrick Doe clicks on continue
+    Then Patrick Doe should <action> error message Document Type cannot be blank
+    Then Patrick Doe logs out
+     Examples:
+       | status            | action |
+       | applying          | see    |
+       | not applying      | not see |
 
   @flaky
   Scenario: Dependents should see document errors when proceeds without uploading document.

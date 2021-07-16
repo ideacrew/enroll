@@ -56,7 +56,7 @@ And 'I select a effective date from list' do
   find("[name='effective_on_kind'] option[value='date_of_event']").select_option
 end
 
-And(/the user sees Your Information page$/) do
+And(/.+ sees Your Information page$/) do
   expect(page).to have_content YourInformation.your_information_text
   find(YourInformation.continue_btn).click
 end
@@ -75,7 +75,7 @@ When(/^\w+ clicks? on the Continue button$/) do
   find('.interaction-click-control-continue', text: 'CONTINUE', :wait => 10).click
 end
 
-When(/^\w+ clicks? on continue$/) do
+When(/^.+ clicks? on continue$/) do
   find('.btn', text: 'CONTINUE').click
 end
 
@@ -95,7 +95,7 @@ Then(/Individual should click on Individual market for plan shopping/) do
   find('.btn', text: 'CONTINUE').click
 end
 
-Then(/the individual sees form to enter personal information$/) do
+Then(/.+ sees form to enter personal information$/) do
   find(IvlPersonalInformation.us_citizen_or_national_yes_radiobtn).click
   find(IvlPersonalInformation.naturalized_citizen_no_radiobtn).click
   find(IvlPersonalInformation.american_or_alaskan_native_no_radiobtn).click
@@ -107,7 +107,6 @@ Then(/the individual sees form to enter personal information$/) do
   first(IvlPersonalInformation.select_dc_state).click
   fill_in IvlPersonalInformation.zip, :with => "20002"
   sleep 2
-  # screenshot("personal_form")
 end
 
 Then(/the individual enters a SEP$/) do
@@ -118,6 +117,27 @@ Then(/the individual enters a SEP$/) do
   find(IvlSpecialEnrollmentPeriod.effective_date_continue_btn).click
 end
 
+Given(/(.*) signed up as a consumer/) do |name|
+  user = people[name]
+  visit '/'
+  click_link 'Consumer/Family Portal'
+  fill_in "user[oim_id]", :with => user[:email]
+  fill_in "user[password]", :with => user[:password]
+  fill_in "user[password_confirmation]", :with => user[:password]
+  find('.create-account-btn').click
+end
+
+Given(/(.*) registers as an individual/) do |name|
+  user = people[name]
+  fill_in IvlPersonalInformation.first_name, :with => user[:first_name]
+  fill_in IvlPersonalInformation.last_name, :with => user[:last_name]
+  fill_in IvlPersonalInformation.dob, :with => user[:dob]
+  fill_in IvlPersonalInformation.ssn, :with => user[:ssn]
+  find(IvlPersonalInformation.male_radiobtn).click
+  screenshot("register")
+  find(IvlPersonalInformation.continue_btn).click
+end
+
 And(/^.+ selects (.*) for coverage$/) do |coverage|
   if coverage == "applying"
     find(:xpath, '//label[@for="is_applying_coverage_true"]').click
@@ -126,13 +146,14 @@ And(/^.+ selects (.*) for coverage$/) do |coverage|
   end
 end
 
-Then(/^.+ should see error message (.*)$/) do |text|
-  page.should have_content(text)
+Then(/^.+ should (.*) error message (.*)$/) do |status, message|
+  if status == 'see'
+    page.should have_content(message)
+  else
+    page.should have_no_content(message)
+  end
 end
 
-Then(/^.+ should not see error message (.*)$/) do |text|
-  page.should have_no_content(text)
-end
 
 And(/(.*) selects eligible immigration status$/) do |text|
   if text == "Dependent"
@@ -257,7 +278,7 @@ Then(/^.+ agrees to the privacy agreeement/) do
   sleep 2
 end
 
-When(/^Individual clicks on Individual and Family link should be on verification page/) do
+When(/^.+ clicks on Individual and Family link should be on verification page/) do
   wait_for_ajax
   find('.interaction-click-control-individual-and-family').click
   expect(page).to have_content('Verify Identity')
