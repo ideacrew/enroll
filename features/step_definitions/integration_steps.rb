@@ -355,6 +355,7 @@ end
 
 Given(/^the fehb market configuration is enabled$/) do
   enable_feature :fehb_market
+  load "components/benefit_sponsors/app/models/benefit_sponsors/organizations/fehb_employer_profile.rb"
 end
 
 Given(/^the individual market configuration is disabled$/) do
