@@ -169,7 +169,8 @@ module Factories
         user, person_details.name_pfx, person_details.first_name,
         person_details.middle_name, person_details.last_name,
         person_details.name_sfx, census_employee.ssn,
-        census_employee.dob, person_details.gender, "employee", person_details.no_ssn
+        census_employee.dob, person_details.gender, "employee", person_details.no_ssn,
+        census_employee: census_employee
         )
       return nil, nil if person.blank? && person_new.blank?
       self.build_employee_role(
@@ -182,10 +183,10 @@ module Factories
           name_pfx: nil, first_name:, middle_name: nil, last_name:, name_sfx: nil,
           ssn:, dob:, gender:, hired_on:
       )
-      person, person_new = initialize_person(user, name_pfx, first_name, middle_name,
-                                             last_name, name_sfx, ssn, dob, gender, "employee")
-
       census_employee = EmployerProfile.find_census_employee_by_person(person).first
+      person, person_new = initialize_person(user, name_pfx, first_name, middle_name,
+                                             last_name, name_sfx, ssn, dob, gender, "employee", census_employee: census_employee)
+
 
       raise ArgumentError.new("census employee does not exist for provided person details") unless census_employee.present?
       raise ArgumentError.new("no census employee for provided employer profile") unless census_employee.employer_profile_id == employer_profile.id
@@ -317,7 +318,7 @@ module Factories
     private
 
     def self.initialize_person(user, name_pfx, first_name, middle_name,
-                               last_name, name_sfx, ssn, dob, gender, role_type, no_ssn=nil, is_applying_coverage=true)
+                               last_name, name_sfx, ssn, dob, gender, role_type, no_ssn=nil, is_applying_coverage=true, census_employee: nil)
         person_attrs = {
           user: user,
           name_pfx: name_pfx,
@@ -325,9 +326,9 @@ module Factories
           middle_name: middle_name,
           last_name: last_name,
           name_sfx: name_sfx,
-          ssn: ssn,
-          dob: dob,
-          gender: gender,
+          ssn: census_employee&.ssn || ssn,
+          dob: census_employee&.dob || dob,
+          gender: census_employee.gender || gender,
           no_ssn: no_ssn,
           role_type: role_type,
           is_applying_coverage: is_applying_coverage
