@@ -95,27 +95,6 @@ Feature: Insured Plan Shopping on Individual market
     Then Individual logs out
 
   @flaky
-  Scenario: Individual should see immigration details even after changing radio options
-    Given Individual resumes enrollment
-    And Individual click on Sign In
-    And I signed in
-    Then user should see heading labeled personal information
-    Then Individual should click on Individual market for plan shopping #TODO re-write this step
-    Then Individual should see a form to enter personal information
-    And Individual selects eligible immigration status
-    Then select I-551 doc and fill details
-    When Individual clicks on Save and Exit
-    Then Individual resumes enrollment
-    And Individual click on Sign In
-    And I signed in
-    Then click citizen yes
-    Then click citizen no
-    When click eligible immigration status yes
-    Then should find I-551 doc type
-    And should find alien number
-    Then Individual logs out
-
-  @flaky
   Scenario: New insured user purchases on individual market during open enrollment and see a renewal enrollment generation with initial enrollment
     Given Individual resumes enrollment
     And Individual click on Sign In
