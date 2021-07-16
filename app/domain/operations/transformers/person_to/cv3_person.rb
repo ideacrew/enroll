@@ -22,8 +22,8 @@ module Operations
 
         private
 
-
         def construct_payload(person)
+          puts person.inspect
           payload = {
             hbx_id: person.hbx_id,
             person_name: construct_person_name(person),
@@ -42,7 +42,7 @@ module Operations
             consumer_role: construct_consumer_role(person.consumer_role),
             resident_role: construct_resident_role(person.resident_role),
             broker_role: construct_broker_role(person.broker_role),
-            individual_market_transitions: individual_market_transitions(person.individual_market_transition),
+            individual_market_transitions: transform_individual_market_transitions(person.individual_market_transitions),
             verification_types: transform_verification_types(person.verification_types), # TODO
             user: transform_user_params(person.user),
             addresses: transform_addresses(person.addresses),
@@ -167,12 +167,12 @@ module Operations
           end
         end
 
-        def individual_market_transitions(individual_market_transition)
+        def transform_individual_market_transitions(individual_market_transitions)
           individual_market_transitions.collect do |transition|
             {
               role_type: transition.role_type,
-              start_on: transition.start_on,
-              end_on: transition.end_on,
+              start_on: transition.effective_starting_on,
+              end_on: transition.effective_ending_on,
               reason_code: transition.reason_code,
               submitted_at: transition.submitted_at
             }
@@ -180,6 +180,7 @@ module Operations
         end
 
         def construct_broker_role(broker_role)
+          return if broker_role.nil?
           {
             aasm_state: broker_role.aasm_state,
             npn: broker_role.npn,
@@ -210,6 +211,7 @@ module Operations
         end
 
         def construct_resident_role(resident_role)
+          return if resident_role.nil?
           {
             is_applicant: resident_role.is_applicant,
             is_active: resident_role.is_active,
@@ -223,6 +225,7 @@ module Operations
         end
 
         def construct_consumer_role(consumer_role)
+          return if consumer_role.nil?
           {
             five_year_bar: consumer_role.five_year_bar,
             requested_coverage_start_date: consumer_role.requested_coverage_start_date,
@@ -267,19 +270,20 @@ module Operations
         end
 
         def construct_lawful_presence_determination(lawful_presence_determination)
+          return if lawful_presence_determination.nil?
           {
-              vlp_verified_at: lawful_presence_determination.vlp_verified_at,
-              vlp_authority: lawful_presence_determination.vlp_authority,
-              vlp_document_id: lawful_presence_determination.vlp_document_id,
-              citizen_status: lawful_presence_determination.citizen_status,
-              citizenship_result: lawful_presence_determination.citizenship_result,
-              qualified_non_citizenship_result: lawful_presence_determination.qualified_non_citizenship_result,
-              aasm_state: lawful_presence_determination.aasm_state,
-              ssa_responses: transform_event_responses(lawful_presence_determination.ssa_responses),
-              ssa_requests: transform_event_requests(lawful_presence_determination.ssa_requests),
-              vlp_responses:  transform_event_responses(lawful_presence_determination.vlp_responses),
-              vlp_requests: transform_event_requests(lawful_presence_determination.vlp_requests)
-            }
+            vlp_verified_at: lawful_presence_determination.vlp_verified_at,
+            vlp_authority: lawful_presence_determination.vlp_authority,
+            vlp_document_id: lawful_presence_determination.vlp_document_id,
+            citizen_status: lawful_presence_determination.citizen_status,
+            citizenship_result: lawful_presence_determination.citizenship_result,
+            qualified_non_citizenship_result: lawful_presence_determination.qualified_non_citizenship_result,
+            aasm_state: lawful_presence_determination.aasm_state,
+            ssa_responses: transform_event_responses(lawful_presence_determination.ssa_responses),
+            ssa_requests: transform_event_requests(lawful_presence_determination.ssa_requests),
+            vlp_responses:  transform_event_responses(lawful_presence_determination.vlp_responses),
+            vlp_requests: transform_event_requests(lawful_presence_determination.vlp_requests)
+          }
         end
 
         def transform_event_responses(responses)
@@ -289,6 +293,7 @@ module Operations
         end
 
         def construct_event_response(response)
+          return if response.nil?
           {
             received_at: response.received_at,
             body: response.body
@@ -302,6 +307,7 @@ module Operations
         end
 
         def construct_event_request(request)
+          return if request.nil?
           {
             requested_at: request.requested_at,
             body: request.body
@@ -309,6 +315,7 @@ module Operations
         end
 
         def construct_person_name(person)
+          return if person.nil?
           {
             first_name: person.first_name,
             middle_name: person.middle_name,
@@ -356,6 +363,7 @@ module Operations
         end
 
         def transform_user_params(user)
+          return if user.nil?
           {
             # attestations: construct_attestations,
             approved: user.approved,
