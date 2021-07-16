@@ -31,7 +31,7 @@ module Insured
               render :primary_response
             else
               @step = ["RF1", "RF2"].include?(final_secision_code(payload)) ? 'questions' : 'start'
-              redirect_to :action => "failed_validation", :step => @step, :verification_transaction_id => transaction_id(payload) || session_identification_id(payload)
+              redirect_to :action => "failed_validation", :step => @step, :verification_transaction_id => transaction_id(payload, 'primary_response') || session_identification_id(payload)
             end
           end
         end
@@ -53,7 +53,7 @@ module Insured
               process_successful_interactive_verification(response_metadata)
             else
               @step = 'questions'
-              redirect_to :action => "failed_validation", :step => @step, :verification_transaction_id => transaction_id(payload) || session_identification_id(payload)
+              redirect_to :action => "failed_validation", :step => @step, :verification_transaction_id => transaction_id(payload, 'secondary_response') || session_identification_id(payload)
             end
           end
         end
@@ -121,8 +121,8 @@ module Insured
       response.dig(:attestations, :ridp_attestation, :evidences, 0, :primary_response, :Response, :VerificationResponse, :SessionIdentification)
     end
 
-    def transaction_id(response)
-      response.dig(:attestations, :ridp_attestation, :evidences, 0, :primary_response, :Response, :VerificationResponse, :DSHReferenceNumber)
+    def transaction_id(response, response_kind)
+      response.dig(:attestations, :ridp_attestation, :evidences, 0, response_kind.to_sym, :Response, :VerificationResponse, :DSHReferenceNumber)
     end
 
     def final_secision_code(response)
