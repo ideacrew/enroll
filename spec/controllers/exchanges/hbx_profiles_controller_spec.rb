@@ -927,7 +927,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
     context "when GA is enabled in settings" do
       before do
-        allow(Settings.aca).to receive(:general_agency_enabled).and_return(true)
+        EnrollRegistry[:general_agency].feature.stub(:is_enabled).and_return(true)
         Enroll::Application.reload_routes!
       end
       it "should returns http success" do
@@ -943,7 +943,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
     context "when GA is disabled in settings" do
       before do
-        allow(Settings.aca).to receive(:general_agency_enabled).and_return(false)
+        EnrollRegistry[:general_agency].feature.stub(:is_enabled).and_return(false)
         Enroll::Application.reload_routes!
       end
       it "should returns http success" do

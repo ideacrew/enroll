@@ -1,10 +1,12 @@
 require "rails_helper"
-if ExchangeTestingConfigurationHelper.general_agency_enabled?
 require File.join(Rails.root, "app", "data_migrations", "change_general_agency_staff_role")
 
 describe ChangeGeneralAgencyStaffRole, dbclean: :after_each do
   let(:given_task_name) { "change_general_agency_staff_role" }
   subject { ChangeGeneralAgencyStaffRole.new(given_task_name, double(:current_scope => nil)) }
+  before do
+    EnrollRegistry[:general_agency].feature.stub(:is_enabled).and_return(true)
+  end
   describe "given a task name" do
     it "has the given task name" do
       expect(subject.name).to eql given_task_name
@@ -28,5 +30,4 @@ describe ChangeGeneralAgencyStaffRole, dbclean: :after_each do
       end
     end
   end
-end
 end

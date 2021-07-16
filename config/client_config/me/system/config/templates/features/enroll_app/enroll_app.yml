@@ -230,16 +230,14 @@ registry:
             item: 'image/vnd.microsoft.icon'
           - key: :eligibile_immigration_statuses_url
             item: ""
-          - key: :assistance_estimate_url
-            item: ''
           - key: :header_logo
             item: "logo_me.svg"
           - key: :eligibile_immigration_statuses_url
             item: ""
-          - key: :assistance_estimate_url
-            item: ""
           - key: :geographic_rating_area_model
             item: "county"
+          - key: :assistance_estimate_url
+            item: "https://dc.checkbookhealth.org/hie/dc/2021/index.cfm?page"
           - key: :benchmark_product_model
             item: :health_only
           - key: :dental_plan_years_available
@@ -251,7 +249,7 @@ registry:
           - key: :single_carriers_available
             item: ['']
           - key: :plan_year_tooltip
-            item: ""
+            item:  "Employer premium contribution for Employee Only Health Plans must be at least"
           - key: :sep_moved_out_zip_compare
             item: true
           - key: :send_rating_area_for_ivl_policy_to_edi
@@ -259,6 +257,8 @@ registry:
           - key: :medicaid_agency_phone
             item: "(000) 000-0000"
           - key: :verifiable_immigration_statuses
+            item: true
+          - key: :sep_moved_out_zip_compare
             item: true
       - key: :data_seeds_ui
         item: :data_seed_ui
@@ -364,6 +364,8 @@ registry:
       - key: :hmo_ppo_plan_type # Should be true for MA
         is_enabled: false
       - key: :dental_market
+        is_enabled: true
+      - key: :general_agency
         is_enabled: true
       - key: :qle_within_sixty_days
         item: :qle_within_sixty_days

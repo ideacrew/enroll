@@ -1,8 +1,0 @@
----
-registry:
-  - namespace:
-      - :enroll_app
-    features:
-      - key: :financial_assistance
-        item: :financial_assistance
-        is_enabled: true
