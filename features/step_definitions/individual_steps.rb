@@ -127,7 +127,7 @@ Given(/(.*) signed up as a consumer/) do |name|
   find('.create-account-btn').click
 end
 
-Given(/(.*) registers as an individual/) do |name|
+Given(/(.*) register as an individual/) do |name|
   user = people[name]
   fill_in IvlPersonalInformation.first_name, :with => user[:first_name]
   fill_in IvlPersonalInformation.last_name, :with => user[:last_name]

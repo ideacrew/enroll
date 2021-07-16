@@ -26,7 +26,7 @@ Feature: Insured Plan Shopping on Individual market
     Given Patrick Doe signed up as a consumer
     And Patrick Doe sees Your Information page
     And Patrick Doe should see heading labeled personal information
-    And Patrick Doe registers as an individual
+    And Patrick Doe register as an individual
     Then Patrick Doe clicks on the Continue button of the Account Setup page
     And Patrick Doe sees form to enter personal information
     Then Patrick Doe selects eligible immigration status
