@@ -318,7 +318,7 @@ module Factories
     private
 
     def self.initialize_person(user, name_pfx, first_name, middle_name,
-                               last_name, name_sfx, ssn, dob, gender, role_type, no_ssn=nil, is_applying_coverage=true, census_employee: nil)
+                               last_name, name_sfx, ssn, dob, gender, role_type, no_ssn = nil, is_applying_coverage: true, census_employee: nil)
         person_attrs = {
           user: user,
           name_pfx: name_pfx,
