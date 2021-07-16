@@ -16,7 +16,6 @@ module OneLogin
       REQUIRED_ATTRIBUTES = ['Payment Transaction ID', 'Market Indicator', 'Assigned QHP Identifier', 'Total Amount Owed', 'Premium Amount Total', 'APTC Amount',
                              'Proposed Coverage Effective Date', 'First Name', 'Last Name', 'Street Name 1', 'Street Name 2', 'City Name', 'State', 'Zip Code',
                              'Contact Email Address', 'Subscriber Identifier', 'Additional Information'].freeze
-      ISSUER_NAMES = ['Delta Dental', 'Dentegra', 'Dominion National', 'BEST Life', 'MetLife', 'CareFirst', 'Aetna', 'UnitedHealthcare', 'Kaiser'].freeze
       ASSERTION = 'urn:oasis:names:tc:SAML:2.0:assertion'
       PROTOCOL = 'urn:oasis:names:tc:SAML:2.0:protocol'
       SUCCESS =  'urn:oasis:names:tc:SAML:2.0:status:Success'
@@ -31,12 +30,11 @@ module OneLogin
       def initialize(transaction_id, hbx_enrollment)
         @transaction_id = transaction_id
         @hbx_enrollment = hbx_enrollment
-        issuer_name = hbx_enrollment.product.issuer_profile.legal_name
 
-        if Rails.env.production? && ISSUER_NAMES.includes?(issuer_name)
-          issuer_key = issuer_name.downcase.gsub(' ', '_')
-          @private_key = OpenSSL::PKey::RSA.new(File.read(SamlInformation.send("#{issuer_key}_pay_now_private_key_location"))) if SamlInformation::REQUIRED_KEYS.include?("#{issuer_key}_pay_now_private_key_location")
-          @cert = OpenSSL::X509::Certificate.new(File.read(SamlInformation.send("#{issuer_key}_pay_now_x509_cert_location"))) if SamlInformation::REQUIRED_KEYS.include?("#{issuer_key}_pay_now_x509_cert_location")
+        if Rails.env.production?
+          issuer_name = hbx_enrollment.product.issuer_profile.legal_name.downcase.gsub(' ', '_')
+          @private_key = OpenSSL::PKey::RSA.new(File.read(SamlInformation.send("#{issuer_name}_pay_now_private_key_location"))) if SamlInformation.send("#{issuer_name}_pay_now_private_key_location").present?
+          @cert = OpenSSL::X509::Certificate.new(File.read(SamlInformation.send("#{issuer_name}_pay_now_x509_cert_location"))) if SamlInformation.send("#{issuer_name}_pay_now_x509_cert_location").present?
         else
           @private_key = OpenSSL::PKey::RSA.new(File.read(Rails.root.join('spec', 'test_data').to_s + '/test_wfpk.pem'))
           @cert = OpenSSL::X509::Certificate.new(File.read(Rails.root.join('spec', 'test_data').to_s + '/test_x509.pem'))
