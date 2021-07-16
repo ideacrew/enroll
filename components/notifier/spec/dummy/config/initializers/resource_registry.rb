@@ -1,7 +1,7 @@
-EnrollRegistry = ResourceRegistry::Registry.new
+NotifierRegistry = ResourceRegistry::Registry.new
 
-EnrollRegistry.configure do |config|
+NotifierRegistry.configure do |config|
   config.name       = :enroll
   config.created_at = DateTime.now
-  config.load_path  = Rails.root.join('system', 'config', 'templates', 'features').to_s
+  config.load_path = "#{Rails.root.to_s.gsub('/components/notifier/spec/dummy', '')}/system/config/templates/features"
 end

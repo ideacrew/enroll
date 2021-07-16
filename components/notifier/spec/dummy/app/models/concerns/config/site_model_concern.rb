@@ -17,7 +17,7 @@ module Config::SiteModelConcern
     end
 
     def site_key
-      EnrollRegistry[:enroll_app].settings(:site_key).item
+      NotifierRegistry[:enroll_app].settings(:site_key).item
     end
 
     def is_shop_market_enabled?

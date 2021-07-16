@@ -49,8 +49,8 @@ module BenefitSponsors
               end
               respond_to do |format|
                 format.js {render 'benefit_sponsors/profiles/employers/employer_profiles/my_account/accounts/payment_history'}
-
                 format.html
+                format.json { render nothing: true, :status => 404 }
               end
             when 'employees'
               @datatable = ::Effective::Datatables::EmployeeDatatable.new(employee_datatable_params)

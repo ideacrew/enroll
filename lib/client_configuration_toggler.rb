@@ -41,18 +41,6 @@ class ClientConfigurationToggler < MongoidMigrationTask
     `cp -r #{target_config_folder}/config/settings.yml config/settings.yml`
   end
 
-  # TODO: We will continue switching the Settings.yml until it is fully deprecated
-  def copy_current_configuration_to_engines
-    Dir.glob("components/*").each do |engine_folder_name|
-      puts("Copying current ResourceRegistry configuration and Settings.yml to #{engine_folder_name} system root folder.")
-      `cp -r system #{Rails.root}/#{engine_folder_name}/`
-      `cp -r config/settings.yml #{Rails.root}/#{engine_folder_name}/config/settings.yml`
-      puts("Copying current ResourceRegistry configuration and Settings.yml to #{engine_folder_name} spec dummy app")
-      `cp -r system #{Rails.root}/#{engine_folder_name}/spec/dummy/`
-      `cp -r config/settings.yml #{Rails.root}/#{engine_folder_name}/spec/dummy/config/settings.yml`
-    end
-  end
-
   def copy_app_assets_and_straggler_files
     # Need to make this only return files
     target_configuration_files = Dir.glob("#{target_config_folder}/**/*").select { |e| File.file? e }
@@ -79,7 +67,6 @@ class ClientConfigurationToggler < MongoidMigrationTask
     @old_configured_state_abbreviation = old_configured_state_abbreviation
     @target_client_state_abbreviation = target_client_state_abbreviation
     copy_target_configuration_to_system_folder
-    copy_current_configuration_to_engines
     copy_app_assets_and_straggler_files
     checkout_straggler_files
     puts("Client configuration toggle complete system complete. enroll_app.yml file is now set to:")
