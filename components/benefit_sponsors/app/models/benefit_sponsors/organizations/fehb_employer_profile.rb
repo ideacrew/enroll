@@ -30,7 +30,9 @@ module BenefitSponsors
         return if inbox.present?
         build_inbox
         welcome_subject = "Welcome to #{BenefitSponsorsRegistry[:enroll_app].settings(:short_name).item}"
-        welcome_body = "#{BenefitSponsorsRegistry[:enroll_app].settings(:short_name).item} is the #{BenefitSponsorsRegistry[:enroll_app].settings(:short_name).item}'s online marketplace where benefit sponsors may select and offer products that meet their member's needs and budget."
+        welcome_body = "#{BenefitSponsorsRegistry[:enroll_app].settings(:short_name).item} is the "\
+        "#{BenefitSponsorsRegistry[:enroll_app].settings(:short_name).item}'s online marketplace "\
+        "where benefit sponsors may select and offer products that meet their member's needs and budget."
         unless inbox.messages.where(body: welcome_body).present?
           inbox.messages.new(subject: welcome_subject, body: welcome_body, from: BenefitSponsorsRegistry[:enroll_app].settings(:short_name).item, created_at: Time.now.utc)
         end
