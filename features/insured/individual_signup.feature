@@ -31,7 +31,7 @@ Feature: Insured Plan Shopping on Individual market
     And Patrick Doe sees form to enter personal information
     Then Patrick Doe selects eligible immigration status
     And Patrick Doe selects <status> for coverage
-    When Patrick Doe clicks on continue
+    When Patrick Doe click on continue button on the page
     Then Patrick Doe should <action> error message Document Type cannot be blank
     Then Patrick Doe logs out
      Examples:

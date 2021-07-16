@@ -75,7 +75,7 @@ When(/^\w+ clicks? on the Continue button$/) do
   find('.interaction-click-control-continue', text: 'CONTINUE', :wait => 10).click
 end
 
-When(/^.+ clicks? on continue$/) do
+When(/^\w+ clicks? on continue$/) do
   find('.btn', text: 'CONTINUE').click
 end
 
@@ -136,6 +136,10 @@ Given(/(.*) register as an individual/) do |name|
   find(IvlPersonalInformation.male_radiobtn).click
   screenshot("register")
   find(IvlPersonalInformation.continue_btn).click
+end
+
+When(/(.*) click on continue button on the page$/) do |_person|
+  find('.btn', text: 'CONTINUE').click
 end
 
 And(/^.+ selects (.*) for coverage$/) do |coverage|
