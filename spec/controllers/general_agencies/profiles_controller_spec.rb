@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 if ExchangeTestingConfigurationHelper.general_agency_enabled?
@@ -56,10 +58,16 @@ if ExchangeTestingConfigurationHelper.general_agency_enabled?
 
       it "should update person main phone" do
         general_agency_profile.primary_staff.person.phones[0].update_attributes(kind: "work")
-        post :update, params: {id: general_agency_profile.id, organization: {id: org.id, first_name: "updated name", last_name: "updates", office_locations_attributes: {"0" =>
-                                                                                                                                                                 {"address_attributes" => {"kind" => "primary", "address_1" => "234 Main NE", "address_2" => "", "city" => "Washington", "state" => "DC", "zip" => "35645"},
-                                                                                                                                                                  "phone_attributes" => {"kind" => "phone main", "area_code" => "564", "number" => "111-1111",
-                                                                                                                                                                                         "extension" => "111"}}}}}
+        post :update, params: {id: general_agency_profile.id,
+                               organization: {
+                                 id: org.id,
+                                 first_name: "updated name",
+                                 last_name: "updates",
+                                 office_locations_attributes: {"0" =>
+                                                                     {"address_attributes" => {"kind" => "primary", "address_1" => "234 Main NE", "address_2" => "", "city" => "Washington", "state" => "DC", "zip" => "35645"},
+                                                                      "phone_attributes" => {"kind" => "phone main", "area_code" => "564", "number" => "111-1111",
+                                                                                             "extension" => "111"}}}
+                               }}
         general_agency_profile.primary_staff.person.reload
         expect(general_agency_profile.primary_staff.person.phones[0].extension).to eq "111"
       end
@@ -71,9 +79,9 @@ if ExchangeTestingConfigurationHelper.general_agency_enabled?
                          first_name: "updated name",
                          last_name: "updates",
                          office_locations_attributes: {"0" =>
-                                                                                                                                                                 {"address_attributes" => {"kind" => "primary", "address_1" => "234 Main NE", "address_2" => "", "city" => "Washington", "state" => "DC", "zip" => "35645"},
-                                                                                                                                                                  "phone_attributes" => {"kind" => "phone main", "area_code" => "564", "number" => "111-1111",
-                                                                                                                                                                                         "extension" => "111"}}}}
+                                                             {"address_attributes" => {"kind" => "primary", "address_1" => "234 Main NE", "address_2" => "", "city" => "Washington", "state" => "DC", "zip" => "35645"},
+                                                              "phone_attributes" => {"kind" => "phone main", "area_code" => "564", "number" => "111-1111",
+                                                                                     "extension" => "111"}}}}
         }
         general_agency_profile.primary_staff.person.reload
         expect(general_agency_profile.primary_staff.person.first_name).to eq "updated name"
