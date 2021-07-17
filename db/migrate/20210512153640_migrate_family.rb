@@ -316,7 +316,7 @@ class MigrateFamily < Mongoid::Migration
             load_data cv3_family_hash
             puts "Ended processing file: #{@filepath}"
           rescue StandardError => e
-            puts "Error processing file: #{@filepath} , error: e.inspect"
+            puts "Error processing file: #{@filepath} , error: #{e.inspect}"
 
           end
         elsif !path_name&.empty?
@@ -327,7 +327,7 @@ class MigrateFamily < Mongoid::Migration
             load_data cv3_family_hash
             puts "Ended processing file: #{path_name}"
           rescue StandardError => e
-            puts "Error processing file: #{path_name} , error: e.inspect"
+            puts "Error processing file: #{path_name} , error: #{e.inspect}"
           end
         end
       when 'mcr'
@@ -418,7 +418,7 @@ class MigrateFamily < Mongoid::Migration
         persisted_applicant.has_eligible_health_coverage = applicant[:has_eligible_health_coverage]
 
         persisted_applicant.incomes = applicant[:incomes]
-        persisted_applicant.benefits = applicant[:benefits].first.nil? ? [] : applicant[:benefits]
+        persisted_applicant.benefits = applicant[:benefits].first.nil? ? [] : applicant[:benefits].compact
         persisted_applicant.deductions = applicant[:deductions]
 
         persisted_applicant.is_medicare_eligible = applicant[:is_medicare_eligible]
