@@ -45,7 +45,6 @@ namespace :import do
 
       bs = hbx.benefit_sponsorship
       bs.benefit_coverage_periods << bc_period_2022
-      binding.pry
       unless bs.save
         puts 'unable to save benefits sponsorship'
         abort
