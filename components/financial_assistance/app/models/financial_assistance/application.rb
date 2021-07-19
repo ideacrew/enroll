@@ -410,12 +410,14 @@ module FinancialAssistance
     # TODO: define the states and transitions for Assisted Application workflow process
     aasm do
       state :draft, initial: true
+      state :renewal_draft # This state is initial state for a renewal application
       state :submitted
       state :determination_response_error
       state :determined
 
+      # submit is the same event that can be used in renewal context as well
       event :submit, :after => [:record_transition, :set_submit] do
-        transitions from: :draft, to: :submitted do
+        transitions from: [:draft, :renewal_draft], to: :submitted do
           guard do
             is_application_valid?
           end
@@ -426,9 +428,21 @@ module FinancialAssistance
             !is_application_valid?
           end
         end
+
+        transitions from: :renewal_draft, to: :renewal_draft, :after => :report_invalid do
+          guard do
+            !is_application_valid?
+          end
+        end
       end
 
       event :unsubmit, :after => [:record_transition, :unset_submit] do
+        transitions from: :submitted, to: :renewal_draft do
+          guard do
+            previously_renewal_draft?
+          end
+        end
+
         transitions from: :submitted, to: :draft do
           guard do
             true # add appropriate guard here
@@ -764,6 +778,10 @@ module FinancialAssistance
     end
 
     private
+
+    def previously_renewal_draft?
+      workflow_state_transitions.any? { |wst| wst.from_state == 'renewal_draft' }
+    end
 
     def clean_params(model_params)
       model_params[:attestation_terms] = nil if model_params[:parent_living_out_of_home_terms].present? && model_params[:parent_living_out_of_home_terms] == 'false'

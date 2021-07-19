@@ -788,4 +788,81 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
   end
 
+  context 'workflow_state_transitions' do
+    context 'renewal_draft' do
+      context 'event: submit' do
+        before do
+          application.update_attributes!(aasm_state: 'renewal_draft')
+        end
+
+        context 'from renewal_draft to submitted' do
+          context 'guard success' do
+            before do
+              allow(application).to receive(:is_application_valid?).and_return(true)
+              application.submit!
+            end
+
+            it 'should transition application to submit' do
+              expect(application.reload.submitted?).to be_truthy
+            end
+          end
+
+          context 'guard failure' do
+            before do
+              application.submit!
+            end
+
+            it 'should not transition application to submit' do
+              expect(application.reload.renewal_draft?).to be_truthy
+            end
+          end
+        end
+
+        context 'from renewal_draft to renewal_draft' do
+          context 'guard success' do
+            before do
+              application.submit!
+            end
+
+            it 'should transition application to renewal_draft' do
+              expect(application.reload.renewal_draft?).to be_truthy
+            end
+          end
+        end
+      end
+
+      context 'event: unsubmit' do
+        context 'from submitted to renewal_draft' do
+          before do
+            application.assign_attributes(aasm_state: 'submitted')
+            application.save!
+          end
+
+          context 'guard success' do
+            before do
+              application.workflow_state_transitions << WorkflowStateTransition.new(
+                from_state: 'renewal_draft',
+                to_state: 'submitted'
+              )
+              application.unsubmit!
+            end
+
+            it 'should transition application to renewal_draft' do
+              expect(application.reload.renewal_draft?).to be_truthy
+            end
+          end
+
+          context 'guard failure' do
+            before do
+              application.unsubmit!
+            end
+
+            it 'should not transition application to draft' do
+              expect(application.reload.draft?).to be_truthy
+            end
+          end
+        end
+      end
+    end
+  end
 end
