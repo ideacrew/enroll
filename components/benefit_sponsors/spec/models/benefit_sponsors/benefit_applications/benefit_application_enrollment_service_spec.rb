@@ -82,6 +82,8 @@ module BenefitSponsors
 
             it "should submit application with immediate open enrollment" do
               subject.submit_application
+              # the third element of array in the signature is errors
+              expect(subject.submit_application[2]).to eq({})
               initial_application.reload
               expect(initial_application.aasm_state).to eq :enrollment_open
               expect(initial_application.open_enrollment_period.begin.to_date).to eq TimeKeeper.date_of_record
