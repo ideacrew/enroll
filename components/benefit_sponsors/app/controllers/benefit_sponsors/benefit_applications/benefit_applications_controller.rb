@@ -64,7 +64,10 @@ module BenefitSponsors
         @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.fetch(params.permit(:benefit_application_id, :benefit_sponsorship_id))
         authorize @benefit_application_form, :updateable?
         if @benefit_application_form.force_submit_application_with_eligibility_errors
-          flash[:error] = "As submitted, this application is ineligible for coverage under the #{Settings.site.short_name} exchange. If information that you provided leading to this determination is inaccurate, you have 30 days from this notice to request a review by DCHL officials."
+          flash[:error] = "As submitted, this application is ineligible for coverage under the "\
+          "#{BenefitSponsorsRegistry[:enroll_app].setting(:short_name).item} exchange. "\
+          "If information that you provided leading to this determination is inaccurate, you have "\
+          "30 days from this notice to request a review by DCHL officials."
           redirect_to profiles_employers_employer_profile_path(@benefit_application_form.show_page_model.benefit_sponsorship.profile, tab: 'benefits')
         end
       end
