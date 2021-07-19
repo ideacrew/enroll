@@ -158,6 +158,15 @@ Then(/^.+ should (.*) error message (.*)$/) do |status, message|
   end
 end
 
+Then(/(.*) should be on the Help Paying for Coverage page$/) do |_person|
+  find(:xpath, '//*[@id="help_paying_coverage"]/div/div[3]/label').click
+  find('.btn', text: 'CONTINUE').click
+end
+
+And(/(.*) selects eligible immigration status for dependent$/) do |_status|
+  find(:xpath, '//label[@for="dependent_us_citizen_false"]').click
+  find(:xpath, '//label[@for="dependent_eligible_immigration_status_true"]').click
+end
 
 And(/(.*) selects eligible immigration status$/) do |text|
   if text == "Dependent"
@@ -246,12 +255,12 @@ And(/should find alien number/) do
   find('#person_consumer_role_vlp_documents_attributes_0_alien_number')
 end
 
-And(/Individual edits dependent/) do
+And(/(.*) edits dependent$/) do |_person|
   find(:xpath, './html/body/div[3]/div[2]/div/div/div[2]/div[4]/ul/li/div/div[2]/div[4]/div/div/a').click
   wait_for_ajax
 end
 
-And(/Individual clicks on confirm member/) do
+And(/(.*) clicks on confirm member$/) do |_person|
   all(:css, ".mz").last.click
 end
 
@@ -317,7 +326,7 @@ Then(/\w+ should see the dependents form/) do
   # screenshot("dependents")
 end
 
-And(/Individual clicks on add member button/) do
+And(/(.*) clicks on add member button$/) do |_person|
   find(:xpath, '//*[@id="dependent_buttons"]/div/a').click
   expect(page).to have_content('Lives with primary subscriber')
 
@@ -337,7 +346,7 @@ And(/Individual clicks on add member button/) do
   all(:css, ".mz").last.click
 end
 
-And(/Individual again clicks on add member button/) do
+And(/(.*) again clicks on add member button$/) do |_person|
   find(:xpath, '//*[@id="dependent_buttons"]/div/a').click
   expect(page).to have_content('Lives with primary subscriber')
 
