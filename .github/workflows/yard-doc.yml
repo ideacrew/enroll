@@ -117,7 +117,7 @@ jobs:
           mv ./doc ./hugo/static/yard
           mv ./index.html ./hugo/static/swagger/index.html
       - run: |
-          cd hugo/static/swagger
+          cd hugo/static/yard
           ls
       - run: cd hugo && hugo --minify
       - uses: jakejarvis/s3-sync-action@master
