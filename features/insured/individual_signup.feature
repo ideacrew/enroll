@@ -49,7 +49,7 @@ Feature: Insured Plan Shopping on Individual market
     When Patrick Doe click on continue button on the page
     Then Patrick Doe agrees to the privacy agreeement
     Then Patrick Doe answers the questions of the Identity Verification page and clicks on submit
-    Then Patrick Doe should be on the Help Paying for Coverage page
+    Then Patrick Doe should be on the Help Paying page for Coverage
     Then Patrick Doe should see the dependents form
     And Patrick Doe clicks on add member button
     And Patrick Doe edits dependent

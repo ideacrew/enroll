@@ -158,7 +158,7 @@ Then(/^.+ should (.*) error message (.*)$/) do |status, message|
   end
 end
 
-Then(/(.*) should be on the Help Paying for Coverage page$/) do |_person|
+Then(/(.*) should be on the Help Paying page for Coverage$/) do |_person|
   find(:xpath, '//*[@id="help_paying_coverage"]/div/div[3]/label').click
   find('.btn', text: 'CONTINUE').click
 end
