@@ -3,7 +3,7 @@ module BenefitSponsors
     class MessageService
 
       def self.for_show(message, current_user)
-        update_message(message) unless current_user&.has_hbx_staff_role?
+        update_message(message) unless current_user.has_hbx_staff_role?
       end
 
       def self.update_message(message)
