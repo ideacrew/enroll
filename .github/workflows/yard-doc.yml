@@ -85,11 +85,11 @@ jobs:
           RAILS_ENV=test bundle exec rake app:rswag:specs:swaggerize PATTERN="./spec/requests/financial_assistance/api/v1/applications_spec.rb"
           cd ..
           cd ..
-          python swagger-yaml-to-html.py < $root/components/financial_assistance/spec/dummy/components/financial_assistance/v1/swagger.yaml > doc.html
+          python swagger-yaml-to-html.py < $root/components/financial_assistance/spec/dummy/components/financial_assistance/v1/swagger.yaml > index.html
       - uses: actions/upload-artifact@v2
         with:
           name: swagger-docs
-          path: doc.html
+          path: index.html
   hugo-deployment:
     needs: [swagger, docs_deployment]
     runs-on: ubuntu-latest
