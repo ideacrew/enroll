@@ -42,7 +42,12 @@ module BenefitSponsors
     end
 
     def copyright_notice
-      raw("<span class='copyright'><i class='fa fa-copyright fa-lg' aria-hidden='true'></i> #{Settings.site.copyright_period_start}-#{TimeKeeper.date_of_record.year} #{Settings.site.short_name}. All Rights Reserved.</span>")
+      raw(
+        "<span class='copyright'><i class='fa fa-copyright fa-lg' aria-hidden='true'></i> "\
+        "#{BenefitSponsorsRegistry[:enroll_app].setting(:copyright_period_start).item}-"\
+        "#{TimeKeeper.date_of_record.year} #{BenefitSponsorsRegistry[:enroll_app].setting(:short_name).item}."\
+        " All Rights Reserved.</span>"
+      )
     end
 
     def amount_color_style(amount)

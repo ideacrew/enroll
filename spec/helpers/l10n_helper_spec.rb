@@ -6,7 +6,7 @@ require "rails_helper"
 RSpec.describe L10nHelper, :type => :helper do
   # All translations are configured to load before every rspec
   it "should translate existing translations" do
-    expect(helper.l10n('date')).to eq("Date")
+    expect(helper.l10n('date_label')).to eq("Date")
   end
 
   it "should handle non existent translations gracefully" do
