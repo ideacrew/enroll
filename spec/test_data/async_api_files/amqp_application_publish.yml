@@ -55,4 +55,31 @@ channels:
           timestamp: true
           content_type: application/json
           bindingVersion: 0.2.0
+
+  enroll.iap.transfers.transfer_account:
+    bindings:
+      amqp:
+        is: :routing_key
+        exchange:
+          name: enroll.iap.transfers
+          type: topic
+          content_type: application/json
+          durable: true
+          auto_delete: false
+          vhost: event_source
+        binding_version: "0.2.0"
+    publish:
+      operationId: enroll.iap.transfers.transfer_account
+      description: Events - Account Transfer from enroll
+      bindings:
+        amqp:
+          app_id: enroll
+          type: enroll.iap.transfers
+          routing_key: enroll.iap.transfers.transfer_account
+          expiration: 100_000
+          deliveryMode: 2
+          mandatory: true
+          timestamp: true
+          content_type: application/json
+          bindingVersion: 0.2.0
    
