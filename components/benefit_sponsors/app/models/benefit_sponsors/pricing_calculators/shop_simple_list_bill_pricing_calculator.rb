@@ -67,9 +67,8 @@ module BenefitSponsors
           coverage_eligibility_dates[m_en.member_id] = m_en.coverage_eligibility_on
         end
         sorted_members = roster_entry.members.sort_by do |rm|
-          coverage_age = age_calculator.calc_coverage_age_for(rm, roster_coverage.product, roster_coverage.coverage_start_on, coverage_eligibility_dates, roster_coverage.previous_product)
           begin
-            [pricing_model.map_relationship_for(rm.relationship, coverage_age, rm.is_disabled?), rm.dob]
+            coverage_age = age_calculator.calc_coverage_age_for(rm, roster_coverage.product, roster_coverage.coverage_start_on, coverage_eligibility_dates, roster_coverage.previous_product)
           rescue StandardError => e
             exception_message = "Error: #{e}"
             exception_message += "Unable to sort members for sponsored_benefit with ID: #{@sponsored_benefit&.id}"
@@ -79,6 +78,7 @@ module BenefitSponsors
             puts(exception_message)
             log(exception_message)
           end
+          [pricing_model.map_relationship_for(rm.relationship, coverage_age, rm.is_disabled?), rm.dob]
         end
         calc_state = CalculatorState.new(age_calculator, roster_coverage.product, pricing_model, pricing_unit_map, roster_coverage, coverage_eligibility_dates)
         calc_results = sorted_members.inject(calc_state) do |calc, mem|
