@@ -223,12 +223,13 @@
           </div>
           <div id="dependent-home-address-area" style="display: <%= f.object.same_with_primary.present? and f.object.same_with_primary == 'true' ? 'none' : 'block' %>">
             <% if has_active_consumer_dependent?(@person,@dependent) %>
-                <%= render 'shared/address_fields_for_dependent', f: f, show_no_dc_address: true %>
+              <%= render 'shared/address_fields_for_dependent', f: f, show_no_dc_address: true %>
             <% elsif @person.has_active_employee_role? %>
               <%= render 'shared/address_fields_for_dependent', f: f %>
             <% end %>
           </div>
         </div>
+        <% end %>
 
         <%= f.hidden_field :family_id %>
         <div id="remove_confirm" class="hidden"></div>

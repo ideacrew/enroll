@@ -172,11 +172,11 @@ aca:
   state_key : "me"
   state_name: "Maine"
   state_abbreviation: "ME"
-  market_kinds: ["shop", "individual", "fehb"]
+  market_kinds: ["individual"]
 
   hbx_abbreviation: "Maine Cover ME"
   nationwide_markets: true
-  general_agency_enabled: true
+  general_agency_enabled: false # Soon to be deprrecated
   broker_carrier_appointments_enabled: true
   dental_market_enabled: true
   calendar_enabled: true
@@ -184,6 +184,7 @@ aca:
   minimum_primary_contribution_percentage: 50
   minimum_family_contribution_percentage: 30
   address_query_county: false
+  display_county: true
   broker_routing_information: false
   recaptcha_enabled: false
   security_questions: false
