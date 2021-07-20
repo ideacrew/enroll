@@ -155,7 +155,7 @@ class MigrateFamily < Mongoid::Migration
           name_sfx: applicant_hash['name']['name_sfx'],
           name_pfx: applicant_hash['name']['name_pfx'],
           alternate_name: applicant_hash['name']['alternate_name'],
-          ssn: '123456789',
+          ssn: family_member.person.ssn,
           # "encrypted_ssn": applicant_hash['identifying_information']['encrypted_ssn'],
           has_ssn: applicant_hash['identifying_information']['has_ssn'],
           gender: applicant_hash['demographic']['gender'],
