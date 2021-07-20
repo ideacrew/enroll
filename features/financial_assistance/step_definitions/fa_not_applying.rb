@@ -79,7 +79,7 @@ Given(/^the user navigates to the "Household Info" page with "no" selected$/) do
   expect(page).to have_content("#{l10n('family_information')}")
 end
 
-When(/the user clicks on add member button/) do
+When(/the user click on add member button/) do
   find(:xpath, '//*[@id="dependent_buttons"]/div/a').click
 end
 

@@ -12,7 +12,7 @@ Feature: User is not applying for financial assistance
 
   Scenario: Consumer is not applying for financial assistance
     Given the user navigates to the "Household Info" page with "no" selected
-    When the user clicks on add member button
+    When the user click on add member button
     And the user fills the the add member form
     And the user clicks the PREVIOUS link1
     Then the user navigates to Help Paying for Coverage page
