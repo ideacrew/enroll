@@ -290,7 +290,7 @@ registry:
       - key: :special_cover_header
         item: :special_cover_header
         is_enabled: true
-        settings: 
+        settings:
           - key: :filename
             item: "CoverME_WebsiteHeader_01.jpg"
       - key: :tobacco_cost
@@ -350,21 +350,21 @@ registry:
       - key: :dental_market
         is_enabled: true
       - key: :general_agency
-        is_enabled: true
+        is_enabled: false
       - key: :display_county
         is_enabled: true
       - key: :moving_to_state
-        is_enabled: true
+        is_enabled: false
       - key: :living_outside_state
-        is_enabled: true
+        is_enabled: false
       - key: :validate_quadrant
         item: :validate_quadrant
-        is_enabled: true
+        is_enabled: false
         settings:
           - key: :exclusions
-            item: ["20515"]
+            item: []
           - key: :inclusions
-            item: ["DC"]
+            item: ["ME"]
       - key: :qle_within_sixty_days
         item: :qle_within_sixty_days
         is_enabled: true
