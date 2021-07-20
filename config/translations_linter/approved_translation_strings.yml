@@ -54,7 +54,7 @@ approved_translation_strings_in_erb_tags:
   # These are included in view_translations_linter_helper
   # exact_path_strings:
 approved_translation_strings_outside_erb_tags:
-  exact_match_string_list: ["%&gt", "0 gt", "ID",
+  exact_match_string_list: ["%&gt", "0 gt", "ID", "dataturbolinksfalse gt",
   'here is another bad string', "this is a problematic string, here this is another string we have to test it and see what happens",
   "producthiosid hbxenrollmentid hbxenrollmentid activeyear productactiveyear remote true gt",
   'dropdownmenuButton', ' rolemenu arialabelledbydropdownmenuButtongt'
