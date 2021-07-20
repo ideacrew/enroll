@@ -537,7 +537,7 @@
   }
 }
 
-.glossary + .popover {
+.glossary + .popover, .hover-glossary + .popover {
   background-color: <%= EnrollRegistry[:cancel_plan_border].settings(:color).item %>;
   color: white;
   max-width: 350px;
@@ -577,7 +577,7 @@
 span.glossary {
   border-bottom: 1px dashed <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
 }
-span.glossary:hover {
+span.glossary:hover, span.hover-glossary:hover {
   cursor: pointer;
   color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
 }
