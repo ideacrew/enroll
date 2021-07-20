@@ -136,6 +136,7 @@ module Forms
       end
       assign_person_address(person)
       family.save_relevant_coverage_households
+      family_member.save
       self.id = family_member.id
       return true if family.save
     end
