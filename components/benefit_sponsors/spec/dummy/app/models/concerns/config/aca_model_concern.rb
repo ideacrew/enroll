@@ -57,7 +57,7 @@ module Config::AcaModelConcern
     end
 
     def general_agency_enabled?
-      @@genearl_agency_enabled ||= Settings.aca.general_agency_enabled
+      @@genearl_agency_enabled ||= EnrollRegistry.feature_enabled?(:general_agency)
     end
 
     def use_simple_employer_calculation_model?

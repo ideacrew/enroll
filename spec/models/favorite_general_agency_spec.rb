@@ -1,6 +1,5 @@
 require 'rails_helper'
 
-if ExchangeTestingConfigurationHelper.general_agency_enabled?
 RSpec.describe FavoriteGeneralAgency, type: :model do
   let(:general_agency_profile) { FactoryBot.build(:general_agency_profile) }
   let(:broker_role) { FactoryBot.build(:broker_role) }
@@ -10,6 +9,10 @@ RSpec.describe FavoriteGeneralAgency, type: :model do
       general_agency_profile_id: general_agency_profile.id,
       broker_role: broker_role
     }
+  end
+
+  before do
+    EnrollRegistry[:general_agency].feature.stub(:is_enabled).and_return(true)
   end
 
   context ".new" do
@@ -38,5 +41,4 @@ RSpec.describe FavoriteGeneralAgency, type: :model do
       end
     end
   end
-end
 end
