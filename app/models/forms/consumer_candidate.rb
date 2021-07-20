@@ -119,7 +119,7 @@ module Forms
 
     # Throw Error/Warning if user age is less than 18
     def age_less_than_18
-      if self.dob_check == "false" || self.dob_check.blank?
+      if (self.dob_check == "false" || self.dob_check.blank?) && self.dob.present?
         if ::TimeKeeper.date_of_record.year - self.dob.year < 18
           errors.add(:base, "Please verify your date of birth. If it's correct, please continue.")
           self.dob_check = true
