@@ -77,6 +77,16 @@ module FinancialAssistance
 
     NATURALIZATION_DOCUMENT_TYPES = ["Certificate of Citizenship", "Naturalization Certificate"].freeze
 
+    IMMIGRATION_DOCUMENT_STATUSES = [
+      'Member of a Federally Recognized Indian Tribe',
+      'Certification from U.S. Department of Health and Human Services (HHS) Office of Refugee Resettlement (ORR)',
+      'Office of Refugee Resettlement (ORR) eligibility letter (if under 18)',
+      'Cuban/Haitian Entrant',
+      'Non Citizen Who Is Lawfully Present In American Samoa',
+      'Battered spouse, child, or parent under the Violence Against Women Act',
+      'None of these'
+    ].freeze
+
     field :name_pfx, type: String
     field :first_name, type: String
     field :middle_name, type: String
@@ -99,6 +109,7 @@ module FinancialAssistance
     field :no_dc_address, type: Boolean, default: false
     field :is_homeless, type: Boolean, default: false
     field :is_temporarily_out_of_state, type: Boolean, default: false
+    field :immigration_doc_statuses, type: Array
 
     field :no_ssn, type: String, default: '0'
     field :citizen_status, type: String
