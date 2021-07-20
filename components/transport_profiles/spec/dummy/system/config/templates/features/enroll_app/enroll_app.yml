@@ -332,8 +332,6 @@ registry:
         is_enabled: false
       - key: :dental_market
         is_enabled: true
-      - key: :general_agency
-        is_enabled: true
       - key: :qle_within_sixty_days
         item: :qle_within_sixty_days
         is_enabled: true
@@ -350,5 +348,3 @@ registry:
         is_enabled: true
       - key: :verification_type_income_verification
         is_enabled: false
-
-{"mode":"full","isActive":false}
