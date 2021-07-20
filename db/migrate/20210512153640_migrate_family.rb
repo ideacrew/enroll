@@ -254,11 +254,13 @@ class MigrateFamily < Mongoid::Migration
         last_name: person_hash['person_name']['last_name'],
         full_name: person_hash['person_name']['full_name'],
         ssn: person_hash['person_demographics']['ssn'],
-        no_ssn: "0", # person_hash['person_demographics']['no_ssn'], update in aca entities contracts to receive as string
+        no_ssn: person_hash['person_demographics']['no_ssn'], #update in aca entities contracts to receive as string
         gender: person_hash['person_demographics']['gender'],
         dob: person_hash['person_demographics']['dob'],
         date_of_death: person_hash['person_demographics']['date_of_death'],
         dob_check: person_hash['person_demographics']['dob_check'],
+        race: person_hash['race'],
+        ethnicity: [person_hash['race']],
         is_incarcerated: person_hash['person_demographics']['is_incarcerated'],
         tribal_id: person_hash['person_demographics']['tribal_id'],
         language_code: person_hash['person_demographics']['language_code'],
