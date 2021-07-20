@@ -795,11 +795,7 @@ end
 
 When(/^.+ clicks? confirm member$/) do
   all(:css, ".mz").last.click
-<<<<<<< 9a9211d6cc65a0054608b19db3372ba226fcd057
   # find_all('.btn-confirmation', wait: 5)[0].click
-=======
-  find_all('.btn-confirmation', wait: 5)[0].click
->>>>>>> fixes cucumber failures
   expect(page).to have_link('Add New Person')
 end
 
