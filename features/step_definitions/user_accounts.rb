@@ -62,7 +62,7 @@ Then(/^I should see users with any role$/) do
 end
 
 When(/^I click Employer button$/)do
-  find(:xpath, '//*[@id="Tab:all_employer_staff_roles"]').click
+  find(:xpath, '//*[@id="Tab:all_employer_staff_roles"]', wait: 10).click
 end
 
 Then(/^I should only see user with employer staff role$/)do
