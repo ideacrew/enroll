@@ -250,6 +250,8 @@ class MigrateFamily < Mongoid::Migration
 
     def sanitize_person_params(family_member_hash)
       person_hash = family_member_hash['person']
+      consumer_role_hash = person_hash["consumer_role"]
+
       {
         first_name: person_hash['person_name']['first_name'],
         last_name: person_hash['person_name']['last_name'],
@@ -260,9 +262,9 @@ class MigrateFamily < Mongoid::Migration
         dob: person_hash['person_demographics']['dob'],
         date_of_death: person_hash['person_demographics']['date_of_death'],
         dob_check: person_hash['person_demographics']['dob_check'],
-        race: person_hash['race'],
-        ethnicity: [person_hash['race']],
-        is_incarcerated: person_hash['person_demographics']['is_incarcerated'],
+        race: consumer_role_hash.is_applying_coverage ? person_hash['race'] : nil,
+        ethnicity: consumer_role_hash.is_applying_coverage ? [person_hash['race']] : nil,
+        is_incarcerated: consumer_role_hash.is_applying_coverage ? person_hash['person_demographics']['is_incarcerated'] : nil,
         tribal_id: person_hash['person_demographics']['tribal_id'],
         language_code: person_hash['person_demographics']['language_code'],
         is_tobacco_user: person_hash['person_health']['is_tobacco_user'],
@@ -319,8 +321,7 @@ class MigrateFamily < Mongoid::Migration
             load_data cv3_family_hash
             puts "Ended processing file: #{@filepath}"
           rescue StandardError => e
-            puts "Error processing file: #{@filepath} , error: #{e.inspect}"
-
+            puts "Error processing file: #{@filepath} , error: #{e.backtrace}"
           end
         elsif !path_name&.empty?
           begin
