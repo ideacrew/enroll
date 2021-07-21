@@ -4,6 +4,7 @@ class ApplicationController < ActionController::Base
   include Config::AcaConcern
   include Config::ContactCenterConcern
   include Acapi::Notifiers
+  include ::L10nHelper
 
   after_action :update_url, :unless => :format_js?
   helper BenefitSponsors::Engine.helpers
