@@ -284,3 +284,11 @@ Given(/non-Kaiser enrollments exist/) do
     org.update_attributes!(legal_name: "CareFirst")
   end
 end
+
+And(/the first payment glossary tooltip should be present/) do
+  expect(find(IvlHomepage.first_payment_glossary)).to be_truthy
+end
+
+And(/the make payments glossary tooltip should be present/) do
+  expect(find(IvlHomepage.make_payments_btn_glossary)).to be_truthy
+end
