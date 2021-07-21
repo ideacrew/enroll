@@ -255,9 +255,9 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
     let(:plan3) { FactoryBot.create(:benefit_markets_products_health_products_health_product, issuer_profile: issuer_profile)}
     let(:plan4) { FactoryBot.create(:benefit_markets_products_health_products_health_product, issuer_profile: issuer_profile)}
     let(:plan5) { FactoryBot.create(:benefit_markets_products_health_products_health_product, issuer_profile: issuer_profile)}
-    let(:benefit_package1) {double(benefit_ids: [plan1.id, plan2.id])}
-    let(:benefit_package2) {double(benefit_ids: [plan3.id, plan4.id])}
-    let(:benefit_package3) {double(benefit_ids: [plan5.id])}
+    let(:benefit_package1) {double(benefit_ids: [plan1.id, plan2.id], cost_sharing: 'csr_0')}
+    let(:benefit_package2) {double(benefit_ids: [plan3.id, plan4.id], cost_sharing: 'csr_0')}
+    let(:benefit_package3) {double(benefit_ids: [plan5.id], cost_sharing: 'csr_limited')}
     let(:benefit_packages)  { [benefit_package1, benefit_package2, benefit_package3] }
     let(:rule) {double}
     let!(:tax_household) { FactoryBot.create(:tax_household, household: family.active_household) }
@@ -392,7 +392,12 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
       end
     end
 
-    if FinancialAssistanceRegistry.feature_enabled?(:native_american_csr)
+    context 'when native american csr feature is enabled' do
+
+      before do
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:native_american_csr).and_return(true)
+      end
+
       it "when satisfied" do
         hbx_enrollment.family.family_members.each do |fm|
           fm.person.update_attributes(indian_tribe_member: true)
@@ -402,6 +407,13 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
         elected_plans_by_enrollment_members = benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health')
         expect(elected_plans_by_enrollment_members).to include(plan5)
         expect(elected_plans_by_enrollment_members).not_to include(plan2)
+        expect(elected_plans_by_enrollment_members).not_to include(plan1)
+        expect(elected_plans_by_enrollment_members).not_to include(plan4)
+      end
+
+      it 'should return csr limited plans' do
+        benefit_packages = benefit_coverage_period.fetch_benefit_packages(true)
+        expect(benefit_packages).to eq [benefit_package3]
       end
     end
   end
