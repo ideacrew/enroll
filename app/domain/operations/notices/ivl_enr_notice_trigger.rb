@@ -115,6 +115,7 @@ module Operations
             enrollment_period_kind: enr.enrollment_kind,
             product_kind: enr.coverage_kind,
             total_premium: enr.total_premium,
+            applied_aptc_amount: { cents: enr.applied_aptc_amount.cents, currency_iso: enr.applied_aptc_amount.currency.iso_code },
             hbx_enrollment_members: enrollment_member_hash(enr),
             product_reference: product_reference(product, issuer),
             issuer_profile_reference: issuer_profile_reference(issuer),

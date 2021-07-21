@@ -702,6 +702,7 @@ module FinancialAssistance
     end
 
     def send_failed_response
+      return unless FinancialAssistanceRegistry.feature_enabled?(:haven_determination)
       primary_applicant_person_hbx_id = primary_applicant.person_hbx_id
       unless has_eligibility_response
         if determination_http_status_code == 999
