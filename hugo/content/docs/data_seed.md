@@ -20,7 +20,7 @@ draft: true
 
 6.  Log in as hbx admin
 
-7.  Go to admin dropdown menu and click goldenseed
+7.  Go to admin dropdown menu and click **Data Seeds**
 
 8.  Click **New Seed** at the top of the page
 
