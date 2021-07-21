@@ -23,8 +23,13 @@ namespace :paynow do
     end_date   = Date.strptime(args['end_date'],'%m/%d/%Y').to_date
     carrier = BenefitSponsors::Organizations::IssuerProfile.find_by_abbrev(args['carrier'])
 
-    if start_date > end_date && carrier.nil? && carrier_list.include?(args['carrier'])
+    if start_date > end_date
       puts "Exception: Start Date can not be after End Date."
+      puts "Exception: Issue with Carrier Name"
+      return
+    end
+
+    if carrier.nil? && !carrier_list.include?(args['carrier'])
       puts "Exception: Issue with Carrier Name"
       return
     end
