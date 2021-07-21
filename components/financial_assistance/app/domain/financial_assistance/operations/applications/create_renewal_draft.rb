@@ -35,10 +35,10 @@ module FinancialAssistance
           service = ::FinancialAssistance::Services::ApplicationService.new(application_id: application.id)
           draft_app = service.copy!
           # Using update attributes instead of calling aasm event becuase 'renewal_draft' is the first state for a renewal application.
-          draft_app.update_attributes!(aasm_state: 'renewal_draft')
+          draft_app.update_attributes!(aasm_state: 'renewal_draft', assistance_year: application.assistance_year.next)
           Success(draft_app)
         rescue StandardError => e
-          # Log error with backtrace
+          Rails.logger.error "---CreateRenewalDraft: Unable to generate Renewal Draft Application for application with hbx_id: #{application.hbx_id}, error: #{e.backtrace}"
           Failure("Could not generate renewal draft for given application with hbx_id: #{application.hbx_id}, error: #{e.message}")
         end
       end

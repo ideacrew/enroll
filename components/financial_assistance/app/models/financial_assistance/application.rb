@@ -842,7 +842,7 @@ module FinancialAssistance
       update_attribute(
         :assistance_year,
         FinancialAssistanceRegistry[:enrollment_dates].settings(:application_year).item.constantize.new.call.value!
-      )
+      )  if assistance_year.blank?
     end
 
     def set_effective_date

@@ -342,6 +342,18 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       application.send(:set_assistance_year)
       expect(application.assistance_year).to eq(FinancialAssistanceRegistry[:enrollment_dates].settings(:application_year).item.constantize.new.call.value!)
     end
+
+    context 'for existing assistance_year' do
+      before do
+        application.update_attributes!(assistance_year: (TimeKeeper.date_of_record.year + 3))
+        application.send(:set_assistance_year)
+      end
+
+      it 'should not update assistance year' do
+        expect(application.assistance_year).not_to eq(FinancialAssistanceRegistry[:enrollment_dates].settings(:application_year).item.constantize.new.call.value!)
+        expect(application.assistance_year).to eq(TimeKeeper.date_of_record.year + 3)
+      end
+    end
   end
 
   describe '.eligibility_determinations' do

@@ -62,7 +62,8 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model 
           { determination_http_status_code: 200,
             has_eligibility_response: true,
             eligibility_response_payload: { hbx_id: application.hbx_id, us_state: 'DC' }.to_json,
-            eligibility_request_payload: { hbx_id: application.hbx_id, us_state: 'DC' }.to_json }
+            eligibility_request_payload: { hbx_id: application.hbx_id, us_state: 'DC' }.to_json,
+            assistance_year: TimeKeeper.date_of_record.year }
         end
 
         before do
@@ -85,6 +86,10 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model 
 
         it 'should not copy eligibility_request_payload' do
           expect(@duplicate_application.eligibility_request_payload).to be_nil
+        end
+
+        it 'should not copy assistance_year' do
+          expect(@duplicate_application.assistance_year).to be_nil
         end
       end
     end

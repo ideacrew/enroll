@@ -38,6 +38,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::CreateRenewalDra
     it 'should return application with renewal_draft' do
       expect(@renewal_draft_app.renewal_draft?).to be_truthy
     end
+
+    it 'should return application with assistance_year' do
+      expect(@renewal_draft_app.assistance_year).to eq(application.assistance_year.next)
+    end
   end
 
   context 'failure' do
