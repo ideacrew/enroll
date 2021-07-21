@@ -86,12 +86,12 @@ When(/^the user types in the staff index URL$/) do
 end
 
 Then(/^the user will not be able to access staff index page$/) do
-  expect(page).to_not have_content("staff index")
+  expect(page).to_not have_content("CSR, CAC and Assisters")
   expect(page).to have_content(l10n("staff_index_not_enabled"))
 end
 
 Then(/^the user will be able to access staff index page$/) do
-  expect(page).to_not have_content("CSR, CAC and Assisters")
+  expect(page).to have_content("CSR, CAC and Assisters")
 end
 
 Given(/orphan accounts feature is enabled?/) do
@@ -109,6 +109,19 @@ end
 
 Then(/^they should not see the Orphan Accounts tab$/) do
   expect(page).to_not have_content("Orphan Accounts")
+end
+
+When(/^the user types in the orphan accounts URL$/) do
+  visit "/users/orphans"
+end
+
+Then(/^the user will not be able to access orphan accounts page$/) do
+  expect(page).to_not have_content("Orphan User Accounts")
+  expect(page).to have_content(l10n("orphan_accounts_not_enabled"))
+end
+
+Then(/^the user will be able to access orphan accounts page$/) do
+  expect(page).to have_content("Orphan User Accounts")
 end
 
 And(/^the user clicks the Admin tab$/) do
