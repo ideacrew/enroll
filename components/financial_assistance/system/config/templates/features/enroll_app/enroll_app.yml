@@ -141,6 +141,8 @@ registry:
             item: "Due to a delay, premiums for some coverage effective dates are not available yet. Please check again soon to see if this information has been updated. You can also contact Customer Service or your broker if you need help."
           - key: :faa_enabled
             item: false
+          - key: :county_fips_code_enabled
+            item: false
           - key: :ivl_responsibility_url
             item: "https://dchealthlink.com/individual-responsibility-requirement"
           - key: :curam_enabled?
@@ -215,6 +217,8 @@ registry:
             item: "https://dchealthlink.com/sites/default/files/v2/forms/Eligible%20Immigration%20Status%20List_0.pdf"
           - key: :geographic_rating_area_model
             item: 'county'
+          - key: :benchmark_product_model
+            item: :health_only
           - key: :assistance_estimate_url
             item: "https://dc.checkbookhealth.org/hie/dc/2021/index.cfm?page"
           - key: :dental_plan_years_available
@@ -227,6 +231,14 @@ registry:
             item: ['2018', '2019']
           - key: :plan_year_tooltip
             item: "Employer premium contribution for Employee Only Health Plans must be at least"
+          - key: :sep_moved_out_zip_compare
+            item: false
+          - key: :send_rating_area_for_ivl_policy_to_edi
+            item: false
+          - key: :medicaid_agency_phone
+            item: "(855) 532-5465"
+          - key: :verifiable_immigration_statuses
+            item: false
       - key: :data_seeds_ui
         item: :data_seed_ui
         is_enabled: true
