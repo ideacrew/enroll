@@ -1,5 +1,6 @@
 name: Nightly Stored Client Tests
 on:
+  push:
   schedule:
     - cron: '0 0 * * *'
 
@@ -13,7 +14,7 @@ jobs:
   test_client:
     strategy:
       matrix:
-        client-name: ['dc', 'me']
+        client-name: ['dc', 'me', "ma"]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -67,7 +68,7 @@ jobs:
             'transport_profiles',
             'financial_assistance',
           ]
-        client-name: ['dc', 'me']
+        client-name: ['dc', 'me', 'ma']
     steps:
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
@@ -125,7 +126,7 @@ jobs:
     strategy:
       matrix:
         group: [1, 2]
-        client-name: ['dc', 'me']
+        client-name: ['dc', 'me', 'ma']
     steps:
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
@@ -180,7 +181,7 @@ jobs:
     strategy:
       matrix:
         group: [1, 2, 3, 4, 5, 6]
-        client-name: ['dc', 'me']
+        client-name: ['dc', 'me', 'ma']
     steps:
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
@@ -226,7 +227,7 @@ jobs:
     strategy:
       matrix:
         group: [1, 2, 3, 4, 5]
-        client-name: ['dc', 'me']
+        client-name: ['dc', 'me', 'ma']
     steps:
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
