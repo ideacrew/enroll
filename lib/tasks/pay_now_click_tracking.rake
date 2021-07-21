@@ -25,7 +25,6 @@ namespace :paynow do
 
     if start_date > end_date
       puts "Exception: Start Date can not be after End Date."
-      puts "Exception: Issue with Carrier Name"
       return
     end
 
