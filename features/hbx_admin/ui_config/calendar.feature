@@ -15,3 +15,15 @@ Feature: Calendar tab
         Given user visits the HBX Portal
         And the user clicks the Admin tab
         Then they should not see the Calendar tab
+
+    Scenario: Calendar Tab is disabled with External Routing
+        Given calendar feature is disabled
+        Given that a user with a HBX staff role with HBX staff subrole exists and is logged in
+        When the user types in the calendar URL
+        Then the user will not be able to access calendar page
+
+    Scenario: Calendar Tab is enabled with External Routing
+        Given calendar feature is enabled
+        Given that a user with a HBX staff role with HBX staff subrole exists and is logged in
+        When the user types in the calendar URL
+        Then the user will be able to access calendar page
