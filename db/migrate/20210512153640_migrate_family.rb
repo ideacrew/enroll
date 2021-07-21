@@ -184,7 +184,8 @@ class MigrateFamily < Mongoid::Migration
           is_consent_applicant: applicant_hash['is_consent_applicant'],
           vlp_document: applicant_hash['vlp_document'],
 
-          person_hbx_id: applicant_hash['person_hbx_id'],
+          person_hbx_id: family_member.person.hbx_id,
+          ext_app_id: applicant_hash['person_hbx_id'],
           is_required_to_file_taxes: applicant_hash['is_required_to_file_taxes'],
           tax_filer_kind: applicant_hash['tax_filer_kind'],
           is_joint_tax_filing: applicant_hash['is_joint_tax_filing'],
@@ -373,6 +374,7 @@ class MigrateFamily < Mongoid::Migration
 
       applicants_hash.each do |applicant|
         persisted_applicant = application.applicants.where(first_name: applicant[:first_name], last_name: applicant[:last_name]).first
+        claimed_by = application.applicants.where(ext_app_id: applicant[:claimed_as_tax_dependent_by]).first
         persisted_applicant.is_physically_disabled = applicant[:is_physically_disabled]
         persisted_applicant.is_self_attested_blind = applicant[:is_self_attested_blind]
         persisted_applicant.is_self_attested_disabled = applicant[:is_self_attested_disabled]
@@ -380,7 +382,7 @@ class MigrateFamily < Mongoid::Migration
         persisted_applicant.tax_filer_kind = applicant[:tax_filer_kind]
         persisted_applicant.is_joint_tax_filing = applicant[:is_joint_tax_filing]
         persisted_applicant.is_claimed_as_tax_dependent = applicant[:is_claimed_as_tax_dependent]
-        persisted_applicant.claimed_as_tax_dependent_by = applicant[:claimed_as_tax_dependent_by]
+        persisted_applicant.claimed_as_tax_dependent_by = claimed_by.id
 
         persisted_applicant.is_student = applicant[:is_student]
         persisted_applicant.student_kind = applicant[:student_kind]
