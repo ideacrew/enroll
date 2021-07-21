@@ -22,6 +22,7 @@ Feature: User should be able to pay for plan
     When consumer should be able to see Actions dropdown
     Then consumer clicks on the Actions button
     Then consumer should the the First Payment button
+    And the first payment glossary tooltip should be present
     And user clicks on the first payment button
     Then I should see the Kaiser pop up text
 
@@ -39,6 +40,7 @@ Feature: User should be able to pay for plan
     When consumer should be able to see Actions dropdown
     Then consumer clicks on the Actions button
     Then consumer should the the Make Payments button
+    And the make payments glossary tooltip should be present
     And user clicks on the make payments button
     Then I should see the non-Kaiser pop up text
 
