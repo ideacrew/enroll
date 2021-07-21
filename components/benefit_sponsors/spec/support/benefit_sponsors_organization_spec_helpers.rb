@@ -1,5 +1,6 @@
 require File.join(File.dirname(__FILE__), "client_organization_spec_helpers/dc")
 require File.join(File.dirname(__FILE__), "client_organization_spec_helpers/me")
+require File.join(File.dirname(__FILE__), "client_organization_spec_helpers/cca")
 
 module BenefitSponsors
   class OrganizationSpecHelpers
