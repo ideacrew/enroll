@@ -7,6 +7,8 @@ module BenefitSponsors
       include Pundit
 
       rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
+      # TODO: Let's just doo this for now
+      before_action :redirect_if_general_agency_disabled, only: %i[new create edit update destroy]
 
       layout 'two_column', :only => :edit
 
@@ -18,6 +20,7 @@ module BenefitSponsors
         respond_to do |format|
           format.html
           format.js
+          format.json { render nothing: true, :status => 404 }
         end
       end
 
@@ -80,9 +83,13 @@ module BenefitSponsors
 
       private
 
+      def redirect_if_general_agency_disabled
+        redirect_to(main_app.root_path, notice: l10n("general_agency_not_enabled")) if !EnrollRegistry.feature_enabled?(:general_agency) && is_general_profile?
+      end
+
       def profile_type
         valid_profile_types = %w[benefit_sponsor broker_agency general_agency].freeze
-        profile_type_constant_name = params[:profile_type] || params.dig(:agency, :profile_type) || @agency.profile_type
+        profile_type_constant_name = params[:profile_type] || params.dig(:agency, :profile_type) || @agency&.profile_type
         @profile_type = (profile_type_constant_name if valid_profile_types.include?(profile_type_constant_name))
       end
 

@@ -44,9 +44,6 @@ registry:
       - key: :county_zips
         item: :county_zips
         is_enabled: false
-      - key: :general_agency
-        item: :general_agency
-        is_enabled: true
       - key: :employer_datatable_source_kinds
         item: :employer_datatable_source_kinds
         is_enabled: false

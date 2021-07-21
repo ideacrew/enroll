@@ -1,6 +1,7 @@
 class IvlNotice < Notice
 
   include ActionView::Helpers::NumberHelper
+  include Acapi::Notifiers
 
   Required= Notice::Required + []
 
