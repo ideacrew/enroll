@@ -10,6 +10,9 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
   let(:family_id) { family.id}
 
+  before do
+    allow_any_instance_of(FinancialAssistance::ApplicationController).to receive(:financial_assistance_engine_enabled?).and_return(true)
+  end
 
   describe "GET index" do
 
@@ -76,6 +79,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   let!(:hbx_profile) {FactoryBot.create(:hbx_profile,:open_enrollment_coverage_period)}
 
   before do
+    allow_any_instance_of(FinancialAssistance::ApplicationController).to receive(:financial_assistance_engine_enabled?).and_return(true)
     allow(person).to receive(:financial_assistance_identifier).and_return(family_id)
     sign_in(user)
   end
@@ -89,6 +93,9 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   end
 
   context "GET new" do
+    before do
+      allow_any_instance_of(FinancialAssistance::ApplicationController).to receive(:financial_assistance_engine_enabled?).and_return(true)
+    end
     it "should assign application" do
       get :new
       expect(assigns(:application).class).to eq FinancialAssistance::Application
@@ -105,6 +112,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
   context "POST step" do
     before do
+      allow_any_instance_of(FinancialAssistance::ApplicationController).to receive(:financial_assistance_engine_enabled?).and_return(true)
       controller.instance_variable_set(:@modal, application)
     end
 
@@ -143,8 +151,8 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
   context "GET copy" do
     context "when there is not response from eligibility service" do
-
       before do
+        allow_any_instance_of(FinancialAssistance::ApplicationController).to receive(:financial_assistance_engine_enabled?).and_return(true)
         FinancialAssistance::Application.where(family_id: family_id).each {|app| app.update_attributes(aasm_state: "determined")}
       end
 
@@ -159,8 +167,8 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     context "when there is response from eligibility service" do
       include FinancialAssistance::L10nHelper
       include ActionView::Helpers::TranslationHelper
-
       before do
+        allow_any_instance_of(FinancialAssistance::ApplicationController).to receive(:financial_assistance_engine_enabled?).and_return(true)
         allow(controller).to receive(:call_service)
         controller.instance_variable_set(:@assistance_status, false)
         controller.instance_variable_set(:@message, "101")
@@ -221,6 +229,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     end
 
     before do
+      allow_any_instance_of(FinancialAssistance::ApplicationController).to receive(:financial_assistance_engine_enabled?).and_return(true)
       allow(File).to receive(:read).with("./components/financial_assistance/app/views/financial_assistance/applications/raw_application.yml.erb").and_return("")
       allow(YAML).to receive(:safe_load).with("").and_return(temp_file)
       user.update_attributes(roles: ["hbx_staff"])
@@ -260,6 +269,9 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   end
 
   context "GET wait_for_eligibility_response" do
+    before do
+      allow_any_instance_of(FinancialAssistance::ApplicationController).to receive(:financial_assistance_engine_enabled?).and_return(true)
+    end
     it "should redirect to eligibility_response_error if doesn't find the ED on wait_for_eligibility_response page" do
       get :wait_for_eligibility_response, params: { id: application.id }
       expect(assigns(:application)).to eq application
@@ -267,6 +279,9 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   end
 
   context "GET eligibility_results" do
+    before do
+      allow_any_instance_of(FinancialAssistance::ApplicationController).to receive(:financial_assistance_engine_enabled?).and_return(true)
+    end
     it 'should get eligibility results' do
       get :eligibility_results, params: {:id => application.id, :cur => 1}
       expect(assigns(:application)).to eq application

@@ -18,9 +18,12 @@ module FinancialAssistance
 
     private
 
+    def financial_assistance_engine_enabled?
+      FinancialAssistanceRegistry.feature_enabled?(:financial_assistance)
+    end
+
     def verify_financial_assistance_enabled
-      return render(file: 'public/404.html', status: 404) unless ::EnrollRegistry.feature_enabled?(:financial_assistance)
-      true
+      redirect_to "/" unless financial_assistance_engine_enabled?
     end
 
     def support_text_placeholders(raw_support_text)
