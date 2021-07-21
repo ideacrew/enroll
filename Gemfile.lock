@@ -7,7 +7,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 53127ec1091e4d9c64f559352b9292e956247f4c
+  revision: 59b467f680051cb239a2f6005488ae2bb9b3d6a4
   branch: atp_cv_transform_v2
   specs:
     aca_entities (0.3.0)
