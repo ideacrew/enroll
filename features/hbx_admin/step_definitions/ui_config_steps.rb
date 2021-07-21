@@ -64,6 +64,19 @@ Then(/^they should not see the Calendar tab$/) do
   expect(page).to_not have_content("Calendar")
 end
 
+When(/^the user types in the calendar URL$/) do
+  visit "/exchanges/scheduled_events"
+end
+
+Then(/^the user will not be able to access calendar page$/) do
+  expect(page).to_not have_content("Create Event")
+  expect(page).to have_content(l10n("calendar_not_enabled"))
+end
+
+Then(/^the user will be able to access calendar page$/) do
+  expect(page).to have_content("Create Event")
+end
+
 Given(/staff feature is enabled?/) do
   enable_feature(:staff_tab)
 end
