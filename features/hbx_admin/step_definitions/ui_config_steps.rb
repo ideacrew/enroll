@@ -81,6 +81,19 @@ Then(/^they should not see the Staff tab$/) do
   expect(page).to_not have_content("Staff")
 end
 
+When(/^the user types in the staff index URL$/) do
+  visit "/exchanges/hbx_profiles/staff_index"
+end
+
+Then(/^the user will not be able to access staff index page$/) do
+  expect(page).to_not have_content("staff index")
+  expect(page).to have_content(l10n("staff_index_not_enabled"))
+end
+
+Then(/^the user will be able to access staff index page$/) do
+  expect(page).to_not have_content("CSR, CAC and Assisters")
+end
+
 Given(/orphan accounts feature is enabled?/) do
   enable_feature(:orphan_accounts_tab)
 end
