@@ -823,11 +823,6 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
           end
         end
       end
-
-    it "when not satisfied" do
-      allow(rule).to receive(:satisfied?).and_return [false, 'ok']
-      plans = []
-      expect(benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health')).to eq plans
     end
 
     context 'When tax_household members have different csr_kind 87 and 100' do
