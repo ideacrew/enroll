@@ -75,7 +75,15 @@ class IvlHomepage
     '.interaction-click-control-make-payments-for-my-plan'
   end
 
+  def self.make_payments_btn_glossary
+    '.interaction-click-control-make-payments-for-my-plan .hover-glossary'
+  end
+
   def self.first_payment
     '.interaction-click-control-make-a-first-payment-for-my-new-plan'
+  end
+
+  def self.first_payment_glossary
+    '.interaction-click-control-make-a-first-payment-for-my-new-plan .hover-glossary'
   end
 end
