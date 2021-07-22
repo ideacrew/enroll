@@ -242,7 +242,10 @@ class MigrateFamily < Mongoid::Migration
           had_prior_insurance: applicant_hash['had_prior_insurance'],
           age_of_applicant: applicant_hash['age_of_applicant'],
           hours_worked_per_week: applicant_hash['hours_worked_per_week'],
-          indian_tribe_member: false # default value
+          indian_tribe_member: applicant_hash['indian_tribe_member'],
+          tribal_id: applicant_hash['tribal_id'],
+          tribal_name: applicant_hash['tribal_name'],
+          tribal_state: applicant_hash['tribal_state']
         }
       end
       iap_hash.except!('applicants').merge!(applicants: sanitize_params)
@@ -266,6 +269,8 @@ class MigrateFamily < Mongoid::Migration
         ethnicity: consumer_role_hash['is_applying_coverage']? [person_hash['race']] : nil,
         is_incarcerated: consumer_role_hash['is_applying_coverage'] ? person_hash['person_demographics']['is_incarcerated'] : nil,
         tribal_id: person_hash['person_demographics']['tribal_id'],
+        tribal_name: person_hash['person_demographics']['tribal_name'],
+        tribal_state: person_hash['person_demographics']['tribal_state'],
         language_code: person_hash['person_demographics']['language_code'],
         is_tobacco_user: person_hash['person_health']['is_tobacco_user'],
         is_physically_disabled: person_hash['person_health']['is_physically_disabled'],
