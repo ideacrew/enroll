@@ -109,12 +109,12 @@ module Notifier
           end
 
           context 'Notices for Employer' do
-            let(:site_key) { ::EnrollRegistry[:enroll_app].setting(:site_key).item.capitalize }
+            let(:site_key) { ::NotifierRegistry[:enroll_app].setting(:site_key).item.capitalize }
 
             let(:resource) { "BenefitSponsors::Organizations::AcaShop#{site_key}EmployerProfile".constantize.new }
 
             before :each do
-              EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
+              NotifierRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
             end
 
             if ::Settings.notices.shop.store_paper_notice

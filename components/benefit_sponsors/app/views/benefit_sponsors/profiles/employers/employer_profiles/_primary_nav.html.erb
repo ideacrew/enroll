@@ -1,7 +1,7 @@
 <nav>
   <ul id="uic-employers-right-menu">
     <li <%= menu_tab_class(active_tab, "home") %>>
-      <%= link_to "My #{Settings.site.short_name}", profiles_employers_employer_profile_path(profile.id, :tab=>'home'), "aria-expanded" => "true" %>
+      <%= link_to "My #{BenefitSponsorsRegistry[:enroll_app].settings(:short_name).item}", profiles_employers_employer_profile_path(profile.id, :tab=>'home'), "aria-expanded" => "true" %>
     </li>
     <li <%= menu_tab_class(active_tab, "employees") %>>
       <%= link_to 'Employees', profiles_employers_employer_profile_path(profile.id, :tab=>'employees'), "aria-expanded" => "true" %>

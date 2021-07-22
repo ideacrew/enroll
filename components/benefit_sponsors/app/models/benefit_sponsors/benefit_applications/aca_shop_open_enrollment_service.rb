@@ -176,7 +176,15 @@ module BenefitSponsors
       def application_eligibility_warnings
         warnings = {}
         unless benefit_sponsorship.profile.is_primary_office_local?
-          warnings.merge!({primary_office_location: "Has its principal business address in the #{Settings.aca.state_name} and offers coverage to all full time employees through #{Settings.site.short_name} or Offers coverage through #{Settings.site.short_name} to all full time employees whose Primary worksite is located in the #{Settings.aca.state_name}"})
+          office_location_warning_error = "Has its principal business address in the #{BenefitSponsorsRegistry[:enroll_app].settings(:short_name).item} and offers"\
+          " coverage to all full time employees through #{BenefitSponsorsRegistry[:enroll_app].settings(:short_name).item} or "\
+          "Offers coverage through #{BenefitSponsorsRegistry[:enroll_app].settings(:short_name).item} "\
+          "to all full time employees whose Primary worksite is located in the #{BenefitSponsorsRegistry[:enroll_app].setting(:state_name).item}"
+          warnings.merge!(
+            {
+              primary_office_location: office_location_warning_error
+            }
+          )
         end
 
         # Application is in ineligible state from prior enrollment activity

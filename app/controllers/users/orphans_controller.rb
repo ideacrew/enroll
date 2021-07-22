@@ -12,8 +12,7 @@ class Users::OrphansController < ApplicationController
     end
   end
 
-  def show
-  end
+  def show; end
 
   def destroy
     @orphan.destroy
@@ -23,20 +22,19 @@ class Users::OrphansController < ApplicationController
     end
   end
 
-private
+  private
+
   def check_agent_role
-    unless current_user.has_hbx_staff_role?
-      redirect_to root_path, :flash => { :error => "You must be an HBX Administrator" }
-    end
+    redirect_to root_path, :flash => { :error => "You must be an HBX Administrator" } unless current_user.has_hbx_staff_role?
   end
 
   def redirect_if_orphan_accounts_is_disabled
-    redirect_to(main_app.root_path, notice: l10n("orphan_accounts_not_enabled")) if !EnrollRegistry.feature_enabled?(:orphan_accounts_tab)
+    redirect_to(main_app.root_path, notice: l10n("orphan_accounts_not_enabled")) unless EnrollRegistry.feature_enabled?(:orphan_accounts_tab)
   end
 
     # Use callbacks to share common setup or constraints between actions.
-    def set_orphan
-      @orphan = User.find(params[:id])
-    end
+  def set_orphan
+    @orphan = User.find(params[:id])
+  end
 
 end

@@ -797,13 +797,12 @@ def employer_poc
       flash[:error] = "Failed to update setting, " + e.message
     end
     redirect_to exchanges_hbx_profiles_root_path
-
   end
 
   private
 
   def redirect_if_staff_tab_is_disabled
-    redirect_to(main_app.root_path, notice: l10n("staff_index_not_enabled")) if !EnrollRegistry.feature_enabled?(:staff_tab)
+    redirect_to(main_app.root_path, notice: l10n("staff_index_not_enabled")) unless EnrollRegistry.feature_enabled?(:staff_tab)
   end
 
   def group_enrollments_by_year_and_market(all_enrollments)
