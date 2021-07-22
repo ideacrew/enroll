@@ -1,7 +1,7 @@
 require File.join(Rails.root, "lib/migration_task")
 
 # Change this stuff here plz
-class DefinePermissions < MigrationTask
+class MeDefinePermissions < MigrationTask
 #All hbx_roles can view families, employers, broker_agencies, brokers and general agencies
 #The convention for a privilege group 'x' is  'modify_x', or view 'view_x'
 
@@ -22,7 +22,8 @@ class DefinePermissions < MigrationTask
       .find_or_initialize_by(name: 'hbx_csr_supervisor')
       .update_attributes!(modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
                           send_broker_agency_message: false, approve_broker: false, approve_ga: false, modify_admin_tabs: false, view_admin_tabs: false,
-                          view_the_configuration_tab: true, can_submit_time_travel_request: false, can_access_pay_now: true, can_access_age_off_excluded: true)
+                         view_the_configuration_tab: true, can_submit_time_travel_request: false, can_access_pay_now: true, can_access_age_off_excluded: true)
+    # TODO: These have to be changed to be for Maine names... maybe
     Permission
       .find_or_initialize_by(name: 'hbx_csr_tier2')
       .update_attributes!(modify_family: true, modify_employer: true, revert_application: false, list_enrollments: false,
