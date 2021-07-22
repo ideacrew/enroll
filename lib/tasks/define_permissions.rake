@@ -1,4 +1,5 @@
-require File.join(Rails.root, "app", "data_migrations", "define_permissions")
+site_key = EnrollRegistry[:enroll_app].setting(:site_key).item
+require File.join(Rails.root, "app", "data_migrations", "permissions", "#{site_key}_define_permissions")
 
 #All hbx_roles can view families, employers, broker_agencies, brokers and general agencies
 #The convention for a privilege group 'x' is  'modify_x', or view 'view_x'
