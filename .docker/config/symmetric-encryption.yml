@@ -4,10 +4,9 @@ production:
     <%= printf ENV['ENROLL_SYMMETRIC_ENCRYPTION_PRIVATE_KEY'] %>
 
   ciphers:
-    -
-      encrypted_key: "<%= ENV['ENROLL_SYMMETRIC_ENCRYPTION_ENCRYPTED_KEY'] %>"
-      encrypted_iv:  "<%= ENV['ENROLL_SYMMETRIC_ENCRYPTION_ENCRYPTED_IV'] %>"
-      cipher_name:   aes-256-cbc
-      encoding:      :base64strict
+    - encrypted_key: "<%= ENV['ENROLL_SYMMETRIC_ENCRYPTION_ENCRYPTED_KEY'] %>"
+      encrypted_iv: "<%= ENV['ENROLL_SYMMETRIC_ENCRYPTION_ENCRYPTED_IV'] %>"
+      cipher_name: aes-256-cbc
+      encoding: :base64strict
       always_add_header: true
-      version:       1
+      version: 1
