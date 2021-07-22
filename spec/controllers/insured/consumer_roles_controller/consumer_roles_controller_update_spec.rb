@@ -80,8 +80,8 @@ RSpec.describe Insured::ConsumerRolesController do
       let(:user) { FactoryBot.create :user, :with_consumer_role }
 
       before do
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_individual_market).and_return(true)
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(true)
+        EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
+        EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(true)
         sign_in user
       end
 
@@ -96,8 +96,8 @@ RSpec.describe Insured::ConsumerRolesController do
       let(:user) { FactoryBot.create :user, :with_consumer_role }
 
       before do
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_individual_market).and_return(true)
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(false)
+        EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
+        EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(false)
         sign_in user
       end
 
