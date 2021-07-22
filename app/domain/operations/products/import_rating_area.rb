@@ -96,7 +96,7 @@ module Operations
                 created_at: import_timestamp,
                 active_year: year,
                 exchange_provided_code: rating_area_id,
-                county_zip_ids: location_ids
+                county_zip_ids: location_ids.flatten
               }
             ).save!
           end
