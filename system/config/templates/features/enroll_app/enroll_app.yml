@@ -261,8 +261,8 @@ registry:
           - key: :verifiable_immigration_statuses
             item: true
       - key: :data_seeds_ui
-        item: :data_seed_ui
-        is_enabled: false
+        item: :data_seeds_ui
+        is_enabled: true
       - key: :rating_area
         item: :rating_area
         is_enabled: false
