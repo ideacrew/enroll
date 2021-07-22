@@ -1,5 +1,5 @@
 <% carrier = hbx_enrollment.product.carrier_profile.legal_name %>
-<% kaiser_first_payment = carrier == "Kaiser" && past_effective_on(hbx_enrollment) %>
+<% kaiser_first_payment = carrier == "Kaiser" && past_effective_on?(hbx_enrollment) %>
 <% url = kaiser_first_payment ? @kp_pay_now_url : carrier_url(carrier) %>
 <% carrier_key = carrier == "Kaiser" ? carrier.downcase! : "other" %>
 <div class="modal fade" tabindex="-1" role="dialog" id="payNowModal<%= hbx_enrollment.hbx_id %>">
