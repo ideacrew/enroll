@@ -102,7 +102,7 @@ class Exchanges::ScheduledEventsController < ApplicationController
   end
 
   def redirect_if_calendar_tab_is_disabled
-    redirect_to(main_app.root_path, notice: l10n("calendar_not_enabled")) if EnrollRegistry.feature_enabled?(:calendar_tab)
+    redirect_to(main_app.root_path, notice: l10n("calendar_not_enabled")) unless EnrollRegistry.feature_enabled?(:calendar_tab)
   end
 
   def scheduled_event_params

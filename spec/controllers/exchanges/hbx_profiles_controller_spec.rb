@@ -120,6 +120,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       allow(person).to receive(:hbx_staff_role).and_return(hbx_staff_role)
       allow(hbx_staff_role).to receive(:hbx_profile).and_return(hbx_profile)
       sign_in(user)
+      EnrollRegistry[:staff_tab].feature.stub(:is_enabled).and_return(true)
     end
 
     it "renders employer_invoice datatable" do
