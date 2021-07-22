@@ -1,9 +1,9 @@
 require "rails_helper"
-require File.join(Rails.root, "app", "data_migrations", "define_permissions")
+require File.join(Rails.root, "app", "data_migrations", "permissions", "dc_define_permissions")
 
 # TODO: We need to refactor this file to be conditional based on client
-describe DefinePermissions, dbclean: :around_each do
-  subject { DefinePermissions.new(given_task_name, double(:current_scope => nil))}
+describe DcDefinePermissions, dbclean: :around_each do
+  subject { DcDefinePermissions.new(given_task_name, double(:current_scope => nil))}
   let(:roles) {%w{hbx_staff hbx_read_only hbx_csr_supervisor hbx_tier3 hbx_csr_tier2 hbx_csr_tier1 developer super_admin} }
   describe 'create permissions' do
     let(:given_task_name) {':initial_hbx'}
