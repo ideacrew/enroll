@@ -1,5 +1,6 @@
 require "rails_helper"
 
+# TODO: We may need to refactor these at a per client level but not sure.
 describe FamilyPolicy, "given a user who has no properties" do
   let(:primary_person_id) { double }
   let(:family) { instance_double(Family) }

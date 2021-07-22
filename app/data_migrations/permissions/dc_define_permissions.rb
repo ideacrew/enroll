@@ -1,6 +1,6 @@
 require File.join(Rails.root, "lib/migration_task")
 
-class DefinePermissions < MigrationTask
+class DcDefinePermissions < MigrationTask
 #All hbx_roles can view families, employers, broker_agencies, brokers and general agencies
 #The convention for a privilege group 'x' is  'modify_x', or view 'view_x'
 
