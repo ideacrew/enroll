@@ -10,7 +10,7 @@ module Subscribers
     subscribe(:on_magi_medicaid_atp_enroll) do |delivery_info, _metadata, response|
       logger.info "AtpSubscriber: invoked on_magi_medicaid_atp_enroll with delivery_info: #{delivery_info}, response: #{response}"
       payload = JSON.parse(response, :symbolize_names => true)
-      # result = FinancialAssistance::Operations::Applications::MedicaidGateway::AccountTransferIn.new.call(payload)
+      result = FinancialAssistance::Operations::Transfers::MedicaidGateway::AccountTransferIn.new.call(payload)
 
       if result.success?
         ack(delivery_info.delivery_tag)

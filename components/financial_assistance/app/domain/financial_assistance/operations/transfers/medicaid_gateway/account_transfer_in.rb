@@ -26,7 +26,7 @@ module FinancialAssistance
             family = yield build_family(payload["family"])
             application = yield build_application(payload, family)
             applicants = yield fill_applicants_form(payload["family"]['magi_medicaid_applications'].first, application)
-            # Success(transformed_params)
+            Success(applicants)
           end
 
           private
@@ -66,7 +66,6 @@ module FinancialAssistance
             app_params = payload["family"]['magi_medicaid_applications'].first.merge!(family_id: family.id, benchmark_product_id: BSON::ObjectId.new, years_to_renew: 5)
             sanitize_iap_hash = sanitize_applicant_params(app_params)
             @application = ::FinancialAssistance::Operations::Application::Create.new.call(params: sanitize_iap_hash)
-            @application
           end
 
           def create_member(family_member_hash)
@@ -328,7 +327,7 @@ module FinancialAssistance
               persisted_applicant.save!
               ::FinancialAssistance::Applicant.set_callback(:update, :after, :propagate_applicant)
             end
-            Success("Successfully transferred in")
+            Success("Successfully transferred in account")
           end
         end
       end
