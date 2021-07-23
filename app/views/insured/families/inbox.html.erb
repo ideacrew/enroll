@@ -16,8 +16,9 @@
 <br/>
 <% else %>
 &nbsp;
-
+<% unless !medicaid_tax_credits_link_is_enabled? %>
 <div>
   <%= render partial: "navigate_to_curam_for_documents", :locals => {display_text: "If you applied for Medicaid and tax credit savings, view additional messages"} %>
+<% end %>
 </div>
 <% end %>
