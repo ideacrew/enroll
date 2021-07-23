@@ -817,4 +817,28 @@ describe "Enabled/Disabled IVL market" do
       expect(helper.csr_percentage_options_for_select).to eq([['100', '100'], ['94', '94'], ['87', '87'], ['73', '73'], ['0', '0'], ['limited', '-1']])
     end
   end
+
+  context 'display_family_members' do
+    let!(:person11) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
+
+    context 'person with family' do
+      let!(:family11) { FactoryBot.create(:family, :with_primary_family_member, person: person11) }
+      let!(:family_member12) do
+        per12 = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)
+        FactoryBot.create(:family_member, person: per12, family: family11)
+      end
+
+      it 'should return same family_members' do
+        with_input_fms = helper.display_family_members(family11.active_family_members, person11)
+        no_input_fms = helper.display_family_members(nil, person11)
+        expect(with_input_fms).to eq(no_input_fms)
+      end
+    end
+
+    context 'person without family' do
+      it 'should not return nil' do
+        expect(helper.display_family_members(nil, person11)).not_to be_nil
+      end
+    end
+  end
 end
