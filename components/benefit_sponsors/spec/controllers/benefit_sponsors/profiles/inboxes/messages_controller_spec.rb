@@ -23,6 +23,20 @@ module BenefitSponsors
 
 
     describe "GET show / DELETE destroy" do
+      context "redirect show message if user not signed in" do
+        before do
+          get :show, params: {id: organization.employer_profile.id, message_id: inbox.messages.first.id}
+        end
+
+        it "should render sign in page" do
+          expect(response).to redirect_to('http://test.host/users/sign_in')
+        end
+
+        it "should return http failure" do
+          expect(response).to have_http_status(:redirect)
+        end
+      end
+
       context "for employer profile" do
         before do
           sign_in user
