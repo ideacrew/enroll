@@ -170,8 +170,6 @@ registry:
           item: true
     - key: :full_medicaid_determination_step
       is_enabled: false
-    - key: :native_american_csr
-      is_enabled: true
     - key: :display_medicaid_question
       item: :display_medicaid_question
       is_enabled: false
@@ -191,5 +189,7 @@ registry:
       is_enabled: false
     - key: :filing_as_head_of_household
       is_enabled: true
+    - key: :native_american_csr
+      is_enabled: false
 # TODO eligibility engine connectivity(HAVEN) settings
 # TODO mec service connectivity settings

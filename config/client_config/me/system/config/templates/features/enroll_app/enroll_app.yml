@@ -84,7 +84,7 @@ registry:
           - key: :employer_application_deadline_link
             item: ""
           - key: :s3_prefix
-            item: "cme"
+            item: "me"
           - key: :broker_quoting_enabled
             item: false
           - key: :broker_claim_quoting_enabled
@@ -261,8 +261,8 @@ registry:
           - key: :verifiable_immigration_statuses
             item: true
       - key: :data_seeds_ui
-        item: :data_seed_ui
-        is_enabled: false
+        item: :data_seeds_ui
+        is_enabled: true
       - key: :rating_area
         item: :rating_area
         is_enabled: false
@@ -365,6 +365,8 @@ registry:
         is_enabled: false
       - key: :dental_market
         is_enabled: true
+      - key: :general_agency
+        is_enabled: false
       - key: :qle_within_sixty_days
         item: :qle_within_sixty_days
         is_enabled: true

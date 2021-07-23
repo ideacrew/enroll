@@ -717,7 +717,7 @@ class ConsumerRole
       live_types = []
       live_types << LOCATION_RESIDENCY
       live_types << 'Social Security Number' if ssn
-      if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
+      if EnrollRegistry.feature_enabled?(:indian_alaskan_tribe_details)
         live_types << 'American Indian Status' if !(tribal_state.nil? || tribal_state.empty?) && !(tribal_name.nil? || tribal_name.empty?)
       else
         live_types << 'American Indian Status' unless tribal_id.nil? || tribal_id.empty?

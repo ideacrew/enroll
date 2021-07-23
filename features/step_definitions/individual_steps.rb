@@ -256,7 +256,7 @@ end
 
 Then(/Individual resumes enrollment/) do
   visit '/'
-  click_link 'Consumer/Family Portal'
+  click_link('Consumer/Family Portal', wait: 10)
 end
 
 Then(/Individual sees previously saved address/) do

@@ -3,6 +3,8 @@ module BenefitSponsors
     protect_from_forgery with: :exception
     before_action :set_last_portal_visited
     include Pundit
+    include ::L10nHelper
+
 
     helper BenefitSponsors::Engine.helpers
 
@@ -62,7 +64,7 @@ module BenefitSponsors
     end
 
     def check_browser_compatibility
-      browser.ie? && !Settings.site.support_for_ie_browser
+      browser.ie? && BenefitSponsorsRegistry[:enroll_app].setting(:support_for_ie_browser).item
     end
 
     def cur_page_no(alph="a")

@@ -101,9 +101,3 @@ end
 And(/^the user clicks the Admin tab$/) do
   page.find('.dropdown-toggle', text: 'Admin').click
 end
-
-
-
-
-
-

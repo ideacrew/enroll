@@ -36,7 +36,6 @@ module BenefitSponsors
           if business_policy_satisfied_for?(:submit_benefit_application)
             benefit_application.approve_application!
             oe_period = benefit_application.open_enrollment_period
-
             if today >= oe_period.begin
               benefit_application.begin_open_enrollment!
               benefit_application.update(open_enrollment_period: (today..oe_period.end))

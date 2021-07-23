@@ -78,7 +78,7 @@ module BenefitSponsors
       end
 
       def is_primary_office_local?
-        primary_office_location.address.state.to_s.downcase == Settings.aca.state_abbreviation.to_s.downcase
+        primary_office_location.address.state.to_s.downcase == BenefitSponsorsRegistry[:enroll_app].settings(:site_key).item.to_s.downcase
       end
 
       def add_benefit_sponsorship

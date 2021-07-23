@@ -1,6 +1,7 @@
 module BenefitSponsors
   module Inboxes
     class MessagesController < ApplicationController
+      before_action :authenticate_user!
       before_action :set_current_user
       before_action :find_inbox_provider, except: [:msg_to_portal]
       before_action :find_message

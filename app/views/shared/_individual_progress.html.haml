@@ -72,7 +72,7 @@
     CONTINUE
 
 %ul.list-unstyled.list-right-section
-  - unless @no_previous_button
+  - unless @no_previous_button || step == 1
     %li
       %a.back{href: '#'}
         = image_tag 'icons/list.png'
