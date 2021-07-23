@@ -220,6 +220,25 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
     end
   end
 
+  context 'total_hours_worked_per_week' do
+    let!(:create_job_income12) do
+      inc = ::FinancialAssistance::Income.new({ kind: 'wages_and_salaries',
+                                                frequency_kind: 'yearly',
+                                                amount: 30_000.00,
+                                                start_on: TimeKeeper.date_of_record.prev_year,
+                                                end_on: TimeKeeper.date_of_record.prev_month,
+                                                employer_name: 'Testing employer' })
+      applicant.incomes << inc
+      applicant.save!
+    end
+
+    context 'income end_on is before TimeKeeper.date_of_record' do
+      it 'should return 0' do
+        expect(applicant.total_hours_worked_per_week).to be_zero
+      end
+    end
+  end
+
   context 'when IAP applicant is destroyed' do
     context 'should destroy their relationships of the applicants' do
       let!(:spouse_applicant) do

@@ -124,7 +124,7 @@ module FinancialAssistance
 
     def hours_worked_per_week
       return 0 if end_on.blank? || end_on > TimeKeeper.date_of_record
-      hours_per_week
+      hours_per_week || 0
     end
 
     def same_as?(other)

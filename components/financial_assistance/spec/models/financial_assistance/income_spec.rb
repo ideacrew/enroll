@@ -3,12 +3,12 @@
 require 'rails_helper'
 
 RSpec.describe FinancialAssistance::Income, type: :model, dbclean: :after_each do
-  let(:family_id) { BSON::ObjectId.new }
-  let(:application) { FactoryBot.create(:application, family_id: family_id) }
+  let!(:family_id) { BSON::ObjectId.new }
+  let!(:application) { FactoryBot.create(:application, family_id: family_id) }
   let!(:eligibility_determination) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application) }
-  let(:family_member_id) { BSON::ObjectId.new }
-  let(:applicant) {FactoryBot.create(:applicant, eligibility_determination_id: eligibility_determination.id, application: application, family_member_id: family_member_id)}
-  let(:income) do
+  let!(:family_member_id) { BSON::ObjectId.new }
+  let!(:applicant) {FactoryBot.create(:applicant, eligibility_determination_id: eligibility_determination.id, application: application, family_member_id: family_member_id)}
+  let!(:income) do
     income = FinancialAssistance::Income.new(valid_params)
     applicant.incomes << income
     income
@@ -71,6 +71,19 @@ RSpec.describe FinancialAssistance::Income, type: :model, dbclean: :after_each d
 
     it 'should return expected result for unearned incomes' do
       expect(::FinancialAssistance::Income::UNEARNED_INCOME_KINDS).to eq(unearned_incomes)
+    end
+  end
+
+  context 'hours_worked_per_week' do
+    context 'end_on is before TimeKeeper.date_of_record' do
+      before do
+        income.update_attributes!({ start_on: TimeKeeper.date_of_record.prev_year,
+                                    end_on: (TimeKeeper.date_of_record - 2.days)})
+      end
+
+      it 'should return 0' do
+        expect(income.hours_worked_per_week).to be_zero
+      end
     end
   end
 end
