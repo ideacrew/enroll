@@ -920,4 +920,9 @@ module ApplicationHelper
     employee_role ||= person.active_employee_roles.first
     (person.has_active_employee_role? && employee_role.employer_profile.broker_agency_profile.present?) || (person.has_active_consumer_role? && person.primary_family.current_broker_agency.present?)
   end
+
+  def display_family_members(family_members, primary_person)
+    return family_members if family_members.present?
+    primary_person&.primary_family&.active_family_members || []
+  end
 end
