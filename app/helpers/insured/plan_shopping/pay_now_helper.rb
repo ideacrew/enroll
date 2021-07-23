@@ -9,7 +9,7 @@ module Insured
         "CareFirst" => "https://member.carefirst.com/members/home.page",
         "Delta Dental" => "https://www1.deltadentalins.com/login.html",
         "Dominion National" => "https://www.dominionmembers.com/",
-        "Kaiser" => "http://kp.org/paypremium"
+        "Kaiser" => "https://kp.org/paypremium"
       }.freeze
 
       def show_pay_now?(source, hbx_enrollment)
