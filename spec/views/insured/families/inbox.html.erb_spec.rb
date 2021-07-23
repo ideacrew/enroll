@@ -12,6 +12,7 @@ describe "insured/families/inbox.html.erb", dbclean: :after_each do
     assign(:current_user, user)
     assign(:provider, person)
     allow(person).to receive_message_chain("inbox.unread_messages.size").and_return(3)
+    EnrollRegistry[:medicaid_tax_credits_link].feature.stub(:is_enabled).and_return(true)
   end
 
   context "as admin" do
