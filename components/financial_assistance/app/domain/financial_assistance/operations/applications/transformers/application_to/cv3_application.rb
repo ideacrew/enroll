@@ -67,8 +67,7 @@ module FinancialAssistance
                            demographic: demographic(applicant),
                            attestation: attestation(applicant),
                            is_primary_applicant: applicant.is_primary_applicant.present?,
-                           native_american_information: {indian_tribe_member: applicant.indian_tribe_member,
-                                                         tribal_id: applicant.tribal_id},
+                           native_american_information: native_american_information(applicant),
                            citizenship_immigration_status_information: {citizen_status: applicant.citizen_status,
                                                                         is_lawful_presence_self_attested: applicant.eligible_immigration_status.present?,
                                                                         is_resident_post_092296: applicant.is_resident_post_092296.present?},
@@ -143,6 +142,18 @@ module FinancialAssistance
             # rubocop:enable Metrics/CyclomaticComplexity
             # rubocop:enable Metrics/AbcSize
             # rubocop:enable Metrics/MethodLength
+
+            def native_american_information(applicant)
+              if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
+                na_information = {indian_tribe_member: applicant.indian_tribe_member,
+                                  tribal_name: applicant.tribal_name,
+                                  tribal_state: applicant.tribal_state}
+              else
+                na_information = {indian_tribe_member: applicant.indian_tribe_member,
+                                  tribal_id: applicant.tribal_id}
+              end
+              na_information
+            end
 
             def calculate_if_applicant_is_required_to_file_taxes(applicant)
               return true if applicant.is_required_to_file_taxes
