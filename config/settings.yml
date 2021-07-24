@@ -172,11 +172,11 @@ aca:
   state_key : "me"
   state_name: "Maine"
   state_abbreviation: "ME"
-  market_kinds: ["individual"]
+  market_kinds: ["shop", "individual", "fehb"]
 
   hbx_abbreviation: "Maine Cover ME"
   nationwide_markets: true
-  general_agency_enabled: false # Soon to be deprrecated
+  general_agency_enabled: true
   broker_carrier_appointments_enabled: true
   dental_market_enabled: true
   calendar_enabled: true
