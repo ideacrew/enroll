@@ -20,9 +20,7 @@ module FinancialAssistance
           # @option opts [Hash] :application_response_payload ::AcaEntities::MagiMedicaid::Application params
           # @return [Dry::Monads::Result]
           def call(params)
-            json_params = yield extract_params(params)
-            transformed_params = yield transform_params(json_params)
-            payload = yield load_data(transformed_params)
+            payload = yield load_data(params)
             family = yield build_family(payload["family"])
             application = yield build_application(payload, family)
             applicants = yield fill_applicants_form(payload["family"]['magi_medicaid_applications'].first, application)
@@ -30,17 +28,6 @@ module FinancialAssistance
           end
 
           private
-
-          def extract_params(input_xml)
-            record = ::AcaEntities::Serializers::Xml::Medicaid::Atp::AccountTransferRequest.parse(input_xml)
-            Success(record.to_hash(identifier: true))
-          end
-
-          def transform_params(input)
-            puts "transforming!"
-            family = ::AcaEntities::Atp::Transformers::Cv::Family.transform(input)
-            Success(family)
-          end
 
           def load_data(payload = {})
             puts "loading data"
