@@ -460,10 +460,6 @@ $(document).ready(function(){
   if($('#living_outside_yes').is(':checked')) {
     $('#living_outside_yes').parents(".row").next().removeClass('hide');
   }
-
-  if($('.full_medicaid_determination.hide').length > 0) {
-    $('#medicaid_determination_yes, #medicaid_determination_no').prop('required', false);
-  }
   /* Submit Application Form Related */
 
   /* Preference Application Form Related */
