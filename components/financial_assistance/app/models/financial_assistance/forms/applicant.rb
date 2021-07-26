@@ -12,8 +12,6 @@ module FinancialAssistance
 
       attr_writer :family
 
-      attr_writer :family
-
       include FinancialAssistance::Forms::PeopleNames
       include FinancialAssistance::Forms::ConsumerFields
       include FinancialAssistance::Forms::SsnField

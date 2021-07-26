@@ -20,7 +20,7 @@ RSpec.describe ::Operations::Notices::IvlEnrNoticeTrigger, dbclean: :after_each 
         :individual_unassisted,
         family: family,
         product_id: product.id,
-        applied_aptc_amount: Money.new(44500),
+        applied_aptc_amount: Money.new(44_500),
         consumer_role_id: person.consumer_role.id,
         enrollment_members: family.family_members
       )
