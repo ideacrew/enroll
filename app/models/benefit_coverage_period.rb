@@ -171,7 +171,6 @@ class BenefitCoveragePeriod
   end
 
   def get_benefit_packages(**attrs)
-    
     fetch_benefit_packages(attrs[:american_indian_members]).inject([]) do |result, bg|
       satisfied = true
       attrs[:family_members].each do |family_member|

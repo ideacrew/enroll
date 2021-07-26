@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 # rubocop:disable Layout/LineLength
 
 require 'rails_helper'
@@ -343,3 +344,5 @@ if ExchangeTestingConfigurationHelper.general_agency_enabled?
     end
   end
 end
+
+# rubocop:enable Layout/LineLength

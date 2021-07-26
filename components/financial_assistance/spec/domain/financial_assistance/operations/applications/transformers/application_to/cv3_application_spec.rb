@@ -1092,4 +1092,33 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       expect(@applicant.is_filing_as_head_of_household).to eq(applicant.is_filing_as_head_of_household)
     end
   end
+
+  context 'total_hours_worked_per_week' do
+    let!(:create_job_income12) do
+      inc = ::FinancialAssistance::Income.new({ kind: 'wages_and_salaries',
+                                                frequency_kind: 'yearly',
+                                                amount: 30_000.00,
+                                                start_on: TimeKeeper.date_of_record.prev_year,
+                                                end_on: TimeKeeper.date_of_record.prev_month,
+                                                employer_name: 'Testing employer' })
+      applicant.incomes << inc
+      applicant.save!
+    end
+
+    context 'income end_on is before TimeKeeper.date_of_record' do
+      before do
+        result = subject.call(application)
+        @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+        @applicant = @entity_init.success.applicants.first
+      end
+
+      it 'should be able to successfully init Application Entity' do
+        expect(@entity_init).to be_success
+      end
+
+      it 'should return zero for applicant hours_worked_per_week' do
+        expect(@applicant.hours_worked_per_week).to be_zero
+      end
+    end
+  end
 end
