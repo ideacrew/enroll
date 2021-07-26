@@ -200,9 +200,6 @@
               - gutter: 12
                 type: raw_html
                 text: <b>Does any child on this application have a parent living outside of the home?&nbsp;*</b>
-                      <parent-living-outside-of-home-1>
-                      <parent-living-outside-of-home-2>
-                      <parent-living-outside-of-home-3>
               - gutter: 2
                 type: label_radio
                 name: row1
