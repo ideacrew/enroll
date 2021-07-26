@@ -2,15 +2,14 @@
   <h3 class='title'><%= l10n("hbx_profiles.sep_history_for", name: @family.primary_person.full_name) %></h3>
   <div class="panel-heading" role="tab">
     <div class="row">
-      <div class="col-md-8">
-        <i class="fas fa-chevron-down"></i>
-        <span><%= l10n("hbx_profiles.sep_reason") %></span>
+      <div class="col-md-6">
+        <span style="margin-left: 75px"><b><%= l10n("hbx_profiles.sep_reason") %></b></span>
       </div>
-      <div class="col-md-2">
-        <%= l10n("hbx_profiles.sep_start_date") %>
+      <div class="col-md-3">
+        <b><%= l10n("hbx_profiles.sep_start_date") %></b>
       </div>
-      <div class="col-md-2">
-        <%= l10n("hbx_profiles.sep_end_date") %>
+      <div class="col-md-3">
+        <b><%= l10n("hbx_profiles.sep_end_date") %></b>
       </div>
     </div>
   </div>
