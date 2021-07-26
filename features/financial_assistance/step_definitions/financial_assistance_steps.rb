@@ -398,7 +398,7 @@ When(/^the consumer clicks the Cost Savings link$/) do
   find_link('Cost Savings').click
 end
 
-And /^the consumer waits for (\d+) seconds?$/ do |n|
+And(/^the consumer waits for (\d+) seconds?$/) do |n|
   sleep(n.to_i)
 end
 
