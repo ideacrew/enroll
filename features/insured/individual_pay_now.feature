@@ -17,6 +17,7 @@ Feature: User should be able to pay for plan
     Then I should see pay now button
     And I should click on pay now button
     Then I should see the Kaiser pop up text
+    And the Kaiser user form should be active
     Then the user closes the pop up modal
     Then user continues to their account
     When consumer should be able to see Actions dropdown
