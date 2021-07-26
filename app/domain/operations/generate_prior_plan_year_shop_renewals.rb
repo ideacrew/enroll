@@ -80,6 +80,8 @@ module Operations
         next if renewal_enrollment.blank?
         result = transition_enrollment(renewal_enrollment, ba)
         @enrollment = result.success
+        notifier = BenefitSponsors::Services::NoticeService.new
+        notifier.deliver(recipient: @enrollment.employee_role, event_object: @enrollment, notice_event: "employee_plan_selection_confirmation_sep_new_hire")
       rescue StandardError => e
         Rails.logger.error { "Error renewing coverage for employee #{enrollment.census_employee.full_name}'s due to #{e.backtrace}" }
       end
