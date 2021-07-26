@@ -3,7 +3,8 @@ Feature: Broker quote creation
   Background: Broker Quoting Tool
     Given the shop market configuration is enabled
     And a CCA site exists with a benefit market
-    And the Plans exist
+    And Health and Dental plans exist
+    And there is a Broker Agency exists for District Brokers Inc
     And the broker Max Planck is primary broker for District Brokers Inc
 
   Scenario: Broker should be able to create an Employer
@@ -14,9 +15,10 @@ Feature: Broker quote creation
     Then Primary Broker should see successful message
     
   Scenario Outline: Roster does not populate even if employer has prior quotes with rosters completed
-    Given Max Planck logs on to the Broker Agency Portal
-    And prospect employer exist
-    When Primary broker clicks Actions dropdown and clicks Create Quote
+    Given prospect employer exist for District Brokers Inc
+    And Max Planck logs on to the Broker Agency Portal
+    When Primary Broker clicks on the Employers tab
+    And Primary broker clicks Actions dropdown and clicks Create Quote
     And Primary Broker enters quote name
     And Primary broker clicks on Select Health Benefits button
     And Primary broker selects plan offerings by metal level and enters <contribution_pct> for employee and deps
@@ -28,9 +30,10 @@ Feature: Broker quote creation
       | 100              |
 
   Scenario Outline: Broker should be able to create a quote for prospect employer with flexible rules
-    Given Max Planck logs on to the Broker Agency Portal
-    And prospect employer exist
-    When Primary broker clicks Actions dropdown and clicks Create Quote
+    Given prospect employer exist for District Brokers Inc
+    And Max Planck logs on to the Broker Agency Portal
+    When Primary Broker clicks on the Employers tab
+    And Primary broker clicks Actions dropdown and clicks Create Quote
     And Primary Broker enters quote name
     And Primary broker clicks on Select Health Benefits button
     And Primary broker selects plan offerings by metal level and enters <contribution_pct> for employee and deps

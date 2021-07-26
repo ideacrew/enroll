@@ -2,7 +2,7 @@
 
 #sponsored_benefits/organizations/plan_design_organizations/new?broker_agency_id=60e4460a297c6a786b63dd0d
 class BrokerAddProspectEmployerPage
-    
+
   def self.legal_name
     'organization_legal_name'
   end
@@ -40,7 +40,7 @@ class BrokerAddProspectEmployerPage
   end
 
   def self.area_code
-    'AREA CODE'
+    'organization[office_locations_attributes][0][phone_attributes][area_code]'
   end
 
   def self.number
@@ -54,39 +54,39 @@ class BrokerAddProspectEmployerPage
   def self.entity_kind_dropdown
     '#organization_entity_kind'
   end
-    
+
   def self.select_tax_exempt_organization
     '.interaction-choice-control-organization-entity-kind-1'
   end
-    
+
   def self.select_c_corporation
-  '.interaction-choice-control-organization-entity-kind-2'
+    '.interaction-choice-control-organization-entity-kind-2'
   end
-    
+
   def self.select_s_corporation
     '.interaction-choice-control-organization-entity-kind-3'
   end
-    
+
   def self.select_partnership
     '.interaction-choice-control-organization-entity-kind-4'
   end
-    
+
   def self.select_limited_liability_corporation
     '.interaction-choice-control-organization-entity-kind-5'
   end
-    
+
   def self.select_limited_liability_partnership
     '.interaction-choice-control-organization-entity-kind-6'
   end
-    
+
   def self.select_household_employer
     '.interaction-choice-control-organization-entity-kind-7'
   end
-    
+
   def self.select_governmental_employer
     '.interaction-choice-control-organization-entity-kind-8'
   end
-    
+
   def self.select_foreign_embassy_or_consulate
     '.interaction-choice-control-organization-entity-kind-9'
   end
@@ -99,7 +99,7 @@ class BrokerAddProspectEmployerPage
     '.interaction-choice-control-organization-office-locations-attributes-0-address-attributes-kind-0'
   end
 
-  def self.select_monthly
+  def self.select_mailing
     'option[value="mailing"]'
   end
 
@@ -114,4 +114,4 @@ class BrokerAddProspectEmployerPage
   def self.add_office_location
     '.btn.btn-default.pull-left'
   end
-end    
+end

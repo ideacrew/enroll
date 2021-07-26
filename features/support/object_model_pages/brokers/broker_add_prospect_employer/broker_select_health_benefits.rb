@@ -2,11 +2,11 @@
 
 #sponsored_benefits/organizations/plan_design_proposals/60e466ce1548433bbf45cf08/plan_selections/new?profile_id=60e4460a297c6a786b63dd0d
 class BrokerHealthBenefitsPage
- 
+
   def self.by_carrier_tab
     '.col-xs-4.single-carrier-tab'
   end
-    
+
   def self.by_meta_level_tab
     '.col-xs-4.metal-level-tab'
   end
@@ -74,4 +74,4 @@ class BrokerHealthBenefitsPage
   def self.select_refrence_plan
     'input[name="reference_plan"]'
   end
-end    
+end

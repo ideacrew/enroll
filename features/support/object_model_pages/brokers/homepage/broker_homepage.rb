@@ -4,7 +4,7 @@
 class BrokerHomePage
 
   def self.edit_broker_agency_profile_btn
-    'a[class="btn btn-primary  interaction-click-control-edit-broker-agency-profile"]'   
+    'a[class="btn btn-primary  interaction-click-control-edit-broker-agency-profile"]'
   end
 
   def self.add_broker_staff_role_btn

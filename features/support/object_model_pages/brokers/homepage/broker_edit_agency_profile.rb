@@ -6,7 +6,7 @@ class BrokerEditProfilePage
   def self.first_name
     'agency_staff_roles_attributes_0_first_name'
   end
-  
+
   def self.last_name
     'agency_staff_roles_attributes_0_last_name'
   end
