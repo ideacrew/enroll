@@ -468,7 +468,7 @@ describe Person, :dbclean => :after_each do
           end
         end
 
-        it_behaves_like "validate consumer_fields_validations private", true, true, false, true, "ME", "test", false, false, [errors[:tribal_state]]
+        it_behaves_like "validate consumer_fields_validations private", true, true, false, true, "ME", "test", false, false, [errors[:tribal_id]]
       end
       #rubocop:enable Metrics/ParameterLists
 
