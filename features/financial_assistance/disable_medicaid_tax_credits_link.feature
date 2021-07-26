@@ -9,11 +9,15 @@ Feature: Assisted consumer home page medicaid and tax credits link
       Given medicaid tax credits link feature is enabled
       Given consumer visits home page
       Then they should see the Medicaid and Tax Credits Link tile 
+      
 
    Scenario: consumer is logged in and the the medicaid tax credits link is disabled
       Given medicaid tax credits link feature is disabled
       Given consumer visits home page
-      Then they should not see the Medicaid and Tax Credits Link tile  
+      Then they should not see the Medicaid and Tax Credits Link tile 
+
+   
+ 
 
 
 
