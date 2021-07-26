@@ -65,8 +65,11 @@ module BenefitMarkets
           # Skipping because we are not creating contribution models for dental as they don't have relaxed rules.
           product_package_params[:contribution_models]           = contribution_models_for(contribution_models_params) if product_package[:product_kind] == :health
           product_package_params[:contribution_model]            = build_contribution_model_entity(contribution_model_params)
-          product_package_params[:pricing_model][:pricing_units] = build_pricing_units_entities(pricing_units_params, package_kind)
-
+          product_package_params[:pricing_model][:pricing_units] = if EnrollRegistry[:enroll_app].setting(:site_key).item == :cca && package_kind == :single_product
+                                                                     build_pricing_units_entities(pricing_units_params, package_kind, enrollment_eligibility.send(:member_relationship_maps))
+                                                                   else
+                                                                     build_pricing_units_entities(pricing_units_params, package_kind, enrollment_eligibility)
+                                                                   end
           ::BenefitMarkets::Operations::ProductPackages::Create.new.call(product_package_params: product_package_params, enrollment_eligibility: enrollment_eligibility)
         end
 
@@ -102,9 +105,11 @@ module BenefitMarkets
           end
         end
 
-        def build_pricing_units_entities(pricing_units_params, package_kind)
+        def build_pricing_units_entities(pricing_units_params, package_kind, member_relationship_maps = nil)
           pricing_units_params.collect do |pricing_unit_params|
-            ::BenefitMarkets::Operations::PricingUnits::Create.new.call(pricing_unit_params: pricing_unit_params, package_kind: package_kind).value!
+            pricing_unit_params.merge!(member_relationship_maps: member_relationship_maps) if EnrollRegistry[:enroll_app].setting(:site_key).item == :cca && package_kind == :single_product
+            call_params = {pricing_unit_params: pricing_unit_params, package_kind: package_kind}
+            ::BenefitMarkets::Operations::PricingUnits::Create.new.call(call_params).value!
           end
         end
 

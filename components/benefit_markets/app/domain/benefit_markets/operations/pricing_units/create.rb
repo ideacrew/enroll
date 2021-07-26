@@ -31,7 +31,7 @@ module BenefitMarkets
           if result.success?
             Success(result.to_h)
           else
-            Failure("Unable to validate pricing unit due to #{result.errors}")
+            Failure("Unable to validate pricing unit due to #{result.errors.messages}")
           end
         end
 

@@ -17,11 +17,13 @@ RSpec.describe BenefitMarkets::Operations::BenefitMarkets::CreateBenefitSponsorC
   let(:effective_date) { TimeKeeper.date_of_record.next_month.beginning_of_month }
   let(:market_kind)    { :aca_shop }
   let(:service_areas)  { FactoryBot.create(:benefit_markets_locations_service_area).to_a }
-  let(:params)         { {enrollment_eligibility: double(effective_date: effective_date, market_kind: market_kind, benefit_application_kind: :initial, service_areas: service_areas)} }
+  let(:params)         { {enrollment_eligibility: double(effective_date: effective_date, market_kind: market_kind, benefit_application_kind: :initial, service_areas: service_areas, member_relationship_maps: [member_relationship_map])} }
+  let(:member_relationship_map)   { {_id: BSON::ObjectId.new, relationship_name: :employee, operator: :==, count: 1} }
 
   context 'sending required parameters' do
 
     it 'should create BenefitSponsorCatalog' do
+      # TODO: Refactoor this with resource registry beter
       expect(subject.call(params).success?).to be_truthy
       expect(subject.call(params).success).to be_a BenefitMarkets::Entities::BenefitSponsorCatalog
     end

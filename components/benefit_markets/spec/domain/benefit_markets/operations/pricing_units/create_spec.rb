@@ -6,14 +6,14 @@ RSpec.describe BenefitMarkets::Operations::PricingUnits::Create, dbclean: :after
 
   let(:ee_pricing_unit) do
     {
-      "_id"=>BSON::ObjectId.new,
-      "created_at"=>nil,
-      "discounted_above_threshold"=>nil,
-      "display_name"=>"Employee",
-      "eligible_for_threshold_discount"=>false,
-      "name"=>"employee",
-      "order"=>0,
-      "updated_at"=>nil
+      "_id" => BSON::ObjectId.new,
+      "created_at" => nil,
+      "discounted_above_threshold" => nil,
+      "display_name" => "Employee",
+      "eligible_for_threshold_discount" => false,
+      "name" => "employee",
+      "order" => 0,
+      "updated_at" => nil
     }
   end
   let(:member_relationship_map)   { {_id: BSON::ObjectId.new, relationship_name: :employee, operator: :==, count: 1} }
@@ -25,14 +25,14 @@ RSpec.describe BenefitMarkets::Operations::PricingUnits::Create, dbclean: :after
 
       it "should be successful for #{package_kind} package_kind" do
         ee_pricing_unit.merge!(member_relationship_maps: [member_relationship_map]) if package_kind == :single_product && EnrollRegistry[:enroll_app].setting(:site_key).item == :cca
-        params ={pricing_unit_params: ee_pricing_unit, package_kind: package_kind}
+        params = {pricing_unit_params: ee_pricing_unit, package_kind: package_kind}
         expect(subject.call(params).success?).to be_truthy
       end
 
       it "should create appropriate pricing unit entity for #{package_kind} package_kind" do
         # TODO: Figure out how to refactor this with ResourceRegistry if possible
         ee_pricing_unit.merge!(member_relationship_maps: [member_relationship_map]) if package_kind == :single_product && EnrollRegistry[:enroll_app].setting(:site_key).item == :cca
-        params ={pricing_unit_params: ee_pricing_unit, package_kind: package_kind}
+        params = {pricing_unit_params: ee_pricing_unit, package_kind: package_kind}
         if package_kind == :single_product && EnrollRegistry[:enroll_app].setting(:site_key).item == :cca
           expect(subject.call(params).success).to be_a BenefitMarkets::Entities::TieredPricingUnit
         else
