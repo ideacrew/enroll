@@ -16,19 +16,23 @@ RSpec.describe BenefitMarkets::Operations::PricingUnits::Create, dbclean: :after
       "updated_at"=>nil
     }
   end
+  let(:member_relationship_map)   { {_id: BSON::ObjectId.new, relationship_name: :employee, operator: :==, count: 1} }
+
 
   context 'sending required parameters for pricing unit' do
 
     [:single_product, :single_issuer, :metal_level, :multi_product].each do |package_kind|
 
-      let(:params)                      { {pricing_unit_params: ee_pricing_unit, package_kind: package_kind} }
-
       it "should be successful for #{package_kind} package_kind" do
+        ee_pricing_unit.merge!(member_relationship_maps: [member_relationship_map]) if package_kind == :single_product && EnrollRegistry[:enroll_app].setting(:site_key).item == :cca
+        params ={pricing_unit_params: ee_pricing_unit, package_kind: package_kind}
         expect(subject.call(params).success?).to be_truthy
       end
 
       it "should create appropriate pricing unit entity for #{package_kind} package_kind" do
         # TODO: Figure out how to refactor this with ResourceRegistry if possible
+        ee_pricing_unit.merge!(member_relationship_maps: [member_relationship_map]) if package_kind == :single_product && EnrollRegistry[:enroll_app].setting(:site_key).item == :cca
+        params ={pricing_unit_params: ee_pricing_unit, package_kind: package_kind}
         if package_kind == :single_product && EnrollRegistry[:enroll_app].setting(:site_key).item == :cca
           expect(subject.call(params).success).to be_a BenefitMarkets::Entities::TieredPricingUnit
         else
