@@ -3,7 +3,7 @@
 NotifierRegistry = ResourceRegistry::Registry.new
 
 NotifierRegistry.configure do |config|
-  config.name       = :financial_assistance
+  config.name       = :enroll
   config.created_at = DateTime.now
-  config.load_path  = Notifier::Engine.root.join('system', 'config', 'templates', 'features').to_s
+  config.load_path = "#{Rails.root.to_s.gsub('/components/notifier/', '')}/system/config/templates/features"
 end
