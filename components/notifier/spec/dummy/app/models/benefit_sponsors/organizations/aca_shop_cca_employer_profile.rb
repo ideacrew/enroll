@@ -1,6 +1,7 @@
 module BenefitSponsors
   module Organizations
     class AcaShopCcaEmployerProfile
+      include Mongoid::Document
 
       # TODO: This needs some thought
       embeds_one :employer_attestation, class_name: '::EmployerAttestation' if NotifierRegistry.feature_enabled?(:employer_attestation)
