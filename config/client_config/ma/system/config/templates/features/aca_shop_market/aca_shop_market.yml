@@ -49,7 +49,7 @@ registry:
         is_enabled: false
       - key: :employer_attestation
         item: :employer_attestation
-        is_enabled: false
+        is_enabled: true
       - key: :cobra_enrollment_period
         item: :cobra_enrollment_period
         is_enabled: true
