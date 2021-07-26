@@ -2,16 +2,18 @@
   <div class="add-default-class-<%= f.id.to_s %>">
     <div class="panel-heading sep-heading-<%= f.id.to_s %>" role="tab">
       <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-6">
           <a role="button" class='btn-nav-accordion collapsed' data-toggle="collapse" data-target="#viewSepPanel_<%= f.id.to_s %>" aria-expanded="false" style="color: black;" onclick='addStyleToPanel("<%= f.id.to_s %>")' >
-            <i class="fas fa-chevron-down"></i>
-            <%= f.title %>
+             <span style="margin-left: 75px">
+                <i class="fas fa-chevron-down"></i>
+              <%= f.title %>
+             </span>
           </a>
         </div>
-        <div class="col-md-2">
+        <div class="col-md-3">
           <%= f.start_on %>
         </div>
-        <div class="col-md-2">
+        <div class="col-md-3">
           <%= f.end_on %>
         </div>
       </div>
