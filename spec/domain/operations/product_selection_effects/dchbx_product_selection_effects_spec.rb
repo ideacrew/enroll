@@ -301,6 +301,7 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
     prior_ivl_enrollment.generate_hbx_signature
     allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_coverage_year, 11, 15))
     allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_ivl_sep).and_return(true)
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
     subject.call(product_selection)
     family.reload
     enrollments = family.hbx_enrollments.sort_by(&:effective_on)
