@@ -24,6 +24,7 @@ RSpec.describe FinancialAssistance::DeductionsController, dbclean: :after_each, 
   end
 
   before do
+    allow(controller).to receive(:financial_assistance_engine_enabled?).and_return(true)
     sign_in(user)
   end
 

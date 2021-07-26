@@ -27,6 +27,7 @@ RSpec.describe FinancialAssistance::IncomesController, dbclean: :after_each, typ
   let(:income_employer_phone_params) {{"full_phone_number" => ""}}
 
   before do
+    allow(controller).to receive(:financial_assistance_engine_enabled?).and_return(true)
     sign_in(user)
   end
 
