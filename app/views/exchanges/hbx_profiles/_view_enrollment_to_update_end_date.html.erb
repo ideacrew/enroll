@@ -58,7 +58,7 @@
       var formData = new FormData($('#termiante_with_earlier_date-form')[0]);
 
       $.ajax({
-        url: '/exchanges/hbx_profiles/update_enrollment_termianted_on_date.js',
+        url: '/exchanges/hbx_profiles/update_enrollment_terminated_on_date.js',
         type: "POST",
         data : formData,
         contentType: false,
@@ -78,8 +78,8 @@
               <th>HBX ID</th>
               <th>Plan</th>
               <th>Effective Date</th>
-              <th>Previous Terminated Date</th>
-              <th>Termination Date</th>
+              <th>End Date</th>
+              <th>New End Date</th>
               <th>Transmit to Carrier ?</th>
             </tr>
             <% @enrollments.each_with_index do |hbx, index| %>
@@ -88,7 +88,6 @@
                   <td><%= hbx.hbx_id %></td>
                   <td><%= hbx.product.name %></td>
                   <td id="enrollment_effective_on"><%= hbx.effective_on %></td>
-                  <td><%= hbx.terminated_on %></td>
                   <% term_or_expire_date = hbx.fetch_term_or_expiration_date %>
                   <td><%= term_or_expire_date %></td>
                   <% if hbx.prior_plan_year_coverage? || hbx.active_plan_year_coverage? %>
