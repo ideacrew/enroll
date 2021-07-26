@@ -2784,10 +2784,9 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     end
 
     context "when dental waived and health enrolled" do
-
-      before do
-        health_enrollment = benefit_group_assignment.hbx_enrollment
-        dental_enrollment = FactoryBot.create(
+      let(:health_enrollment) { benefit_group_assignment.hbx_enrollment }
+      let(:dental_enrollment) do
+        FactoryBot.create(
           :hbx_enrollment, family: census_employee.family,
                            household: census_employee.family.active_household,
                            coverage_kind: "dental",
@@ -2795,11 +2794,20 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
                            benefit_group_assignment: census_employee.benefit_group_assignments.first,
                            sponsored_benefit_package_id: census_employee.benefit_group_assignments.first.benefit_package.id
         )
+      end
+
+      before do
         allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([health_enrollment, dental_enrollment])
       end
 
-      it "should return false for employees waive the dental coverage" do
+      it "should return false for employee waive dental and select health coverage" do
         expect(census_employee.is_waived_under?(benefit_group_assignment.benefit_application)).to be_falsey
+      end
+
+      it "should return true for employee waive health and select dental coverage" do
+        health_enrollment.update(aasm_state: 'inactive')
+        dental_enrollment.update(aasm_state: 'coverage_selected')
+        expect(census_employee.is_waived_under?(benefit_group_assignment.benefit_application)).to be_truthy
       end
     end
   end
