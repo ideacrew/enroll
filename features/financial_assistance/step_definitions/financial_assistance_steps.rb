@@ -398,12 +398,8 @@ When(/^the consumer clicks the Cost Savings link$/) do
   find_link('Cost Savings').click
 end
 
-And(/^the consumer waits for (\d+) seconds?$/) do |n|
-  sleep(n.to_i)
-end
-
 Then(/^the consumer will navigate to the Cost Savings page$/) do
-  expect(page).to have_content('Cost Savings Applications')
+  expect(page).to have_content('Cost Savings Applications', wait: 5)
 end
 
 When(/^the consumer manually enters the "Help Paying for Coverage" url in the browser search bar$/) do
