@@ -138,7 +138,11 @@ module BenefitSponsors
         @pdf.go_to_page(i+1)
         @pdf.font_size 9
         @pdf.bounding_box([0, @pdf.bounds.bottom + 25], :width => @pdf.bounds.width) {
-          @pdf.text_box "Questions? Call the #{Settings.site.short_name} Customer Service at #{contact_center_phone_number}, go online to #{site_home_url}, or contact your broker.", :at => [address_x, @pdf.bounds.height], :align => :center
+          @pdf.text_box(
+            "Questions? Call the #{BenefitSponsorsRegistry[:enroll_app].settings(:short_name).item} Customer Service at #{contact_center_phone_number}, go online to #{site_home_url}, or contact your broker.",
+            :at => [address_x, @pdf.bounds.height],
+            :align => :center
+          )
         }
       end
 
