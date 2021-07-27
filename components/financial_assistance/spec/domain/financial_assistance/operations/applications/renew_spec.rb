@@ -17,7 +17,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Renew, dbclean: 
   end
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
   let!(:application10) do
-    FactoryBot.create(:financial_assistance_application, hbx_id: '111000222', family_id: family.id)
+    FactoryBot.create(:financial_assistance_application, hbx_id: '111000222', family_id: family.id, assistance_year: TimeKeeper.date_of_record.year)
   end
   let!(:create_appli) do
     appli = FactoryBot.build(:financial_assistance_applicant,
@@ -52,7 +52,9 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Renew, dbclean: 
 
   context 'success' do
     before do
-      @renewal_draft = ::FinancialAssistance::Operations::Applications::CreateRenewalDraft.new.call(application10).success
+      @renewal_draft = ::FinancialAssistance::Operations::Applications::CreateRenewalDraft.new.call(
+        { family_id: application10.family_id, renewal_year: application10.assistance_year.next }
+      ).success
       @result = subject.call(@renewal_draft)
       @renewed_app = @result.success
     end
@@ -111,7 +113,9 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Renew, dbclean: 
 
     context 'incomplete application' do
       before do
-        @renewal_draft = ::FinancialAssistance::Operations::Applications::CreateRenewalDraft.new.call(application10).success
+        @renewal_draft = ::FinancialAssistance::Operations::Applications::CreateRenewalDraft.new.call(
+          { family_id: application10.family_id, renewal_year: application10.assistance_year.next }
+        ).success
         allow(@renewal_draft).to receive(:complete?).and_return(false)
         @result = subject.call(@renewal_draft)
       end

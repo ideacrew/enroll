@@ -30,6 +30,8 @@ module FinancialAssistance
 
     STATES_FOR_VERIFICATIONS = %w[submitted determination_response_error determined].freeze
 
+    RENEWAL_ELIGIBLE_STATES = %w[submitted determined].freeze
+
     # TODO: Need enterprise ID assignment call for Assisted Application
     field :hbx_id, type: String
 
@@ -89,6 +91,10 @@ module FinancialAssistance
     field :full_medicaid_determination, type: Boolean
     field :workflow, type: Hash, default: { }
 
+    # predecessor_id is the application id of the renewed application only if the new application is system generated renewal
+    # predecessor_id is the application preceding this current application
+    field :predecessor_id, type: BSON::ObjectId
+
     embeds_many :eligibility_determinations, inverse_of: :application, class_name: '::FinancialAssistance::EligibilityDetermination'
     embeds_many :relationships, inverse_of: :application, class_name: '::FinancialAssistance::Relationship'
     embeds_many :applicants, inverse_of: :application, class_name: '::FinancialAssistance::Applicant'
@@ -124,6 +130,7 @@ module FinancialAssistance
     scope :by_hbx_id, ->(hbx_id) { where(hbx_id: hbx_id) }
     scope :for_verifications, -> { where(:aasm_state.in => STATES_FOR_VERIFICATIONS)}
     scope :by_year, ->(year) { where(:assistance_year => year) }
+    scope :created_asc,      -> { order(created_at: :asc) }
 
     alias is_joint_tax_filing? is_joint_tax_filing
     alias is_renewal_authorized? is_renewal_authorized
@@ -410,7 +417,12 @@ module FinancialAssistance
     # TODO: define the states and transitions for Assisted Application workflow process
     aasm do
       state :draft, initial: true
-      state :renewal_draft # This state is initial state for a renewal application
+      # :renewal_draft State where the previous year's application is renewed
+      # :renewal_draft state is the initial state for a renewal application
+      state :renewal_draft
+      # :submission_pending is a state where some corrective action is required
+      # :submission_pending is a state where we are unable to submit the application for some reason
+      state :submission_pending
       state :submitted
       state :determination_response_error
       state :determined
@@ -468,6 +480,10 @@ module FinancialAssistance
                     to: :cancelled
       end
 
+      # Currently, this event will be used during renewal generations
+      event :fail_submission, :after => :record_transition do
+        transitions from: :renewal_draft, to: :submission_pending
+      end
     end
 
     # def applicant
@@ -775,6 +791,16 @@ module FinancialAssistance
 
     def has_atleast_one_assisted_but_no_medicaid_applicant?
       active_applicants.map(&:is_ia_eligible).include?(true) && !active_applicants.map(&:is_medicaid_chip_eligible).include?(true)
+    end
+
+    # Set the financial_assistance application instance that preceded this one
+    def predecessor=(fa_application)
+      if fa_application.nil?
+        write_attribute(:predecessor_id, nil)
+      else
+        raise ArgumentError.new("expected FinancialAssistance::Application") unless fa_application.is_a?(::FinancialAssistance::Application)
+        write_attribute(:predecessor_id, fa_application._id)
+      end
     end
 
     private
