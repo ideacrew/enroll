@@ -345,7 +345,7 @@ registry:
       - key: :dental_market
         is_enabled: true
       - key: :general_agency
-        is_enabled: false
+        is_enabled: true
       - key: :qle_within_sixty_days
         item: :qle_within_sixty_days
         is_enabled: true
