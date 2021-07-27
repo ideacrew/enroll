@@ -33,7 +33,6 @@ And(/the primary member has filled mandatory information required$/) do
   click_and_wait_on_stylized_radio('//label[@for="person_naturalized_citizen_false"]', "person_naturalized_citizen_false", "person[naturalized_citizen]", "false")
   click_and_wait_on_stylized_radio('//label[@for="indian_tribe_member_no"]', "indian_tribe_member_no", "person[indian_tribe_member]", "false")
   click_and_wait_on_stylized_radio('//label[@for="radio_incarcerated_no"]', "radio_incarcerated_no", "person[is_incarcerated]", "false")
-  find('label[for=person_is_tobacco_user_no]', wait: 10).click
   fill_in "person_addresses_attributes_0_address_1", with: personal_information[:address_1]
   fill_in "person_addresses_attributes_0_address_2", with: personal_information[:address_2]
   fill_in "person_addresses_attributes_0_city", with: personal_information[:city]

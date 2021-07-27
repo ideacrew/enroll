@@ -108,7 +108,6 @@ Then(/the individual sees form to enter personal information$/) do
   find(IvlPersonalInformation.naturalized_citizen_no_radiobtn).click
   find(IvlPersonalInformation.american_or_alaskan_native_no_radiobtn).click
   find(IvlPersonalInformation.incarcerated_no_radiobtn).click
-  find('label[for=person_is_tobacco_user_no]', wait: 10).click
   fill_in IvlPersonalInformation.address_line_one, :with => "4900 USAA BLVD NE"
   fill_in IvlPersonalInformation.address_line_two, :with => "212"
   fill_in IvlPersonalInformation.city, :with => "Washington"
@@ -197,7 +196,6 @@ And(/should fill in valid sevis, passport expiration_date, tribe_member and inca
   click_link((TimeKeeper.date_of_record + 10.days).day.to_s)
   find('label[for=indian_tribe_member_no]', wait: 20).click
   find('label[for=radio_incarcerated_no]', wait: 10).click
-  find('label[for=person_is_tobacco_user_no]', wait: 10).click
   choose 'radio_incarcerated_no', visible: false, allow_label_click: true
 end
 
