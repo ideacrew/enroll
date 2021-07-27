@@ -66,11 +66,11 @@ When(/^I click Employer button$/)do
 end
 
 Then(/^I should only see user with employer staff role$/)do
-  expect(page).not_to have_content(employee_role.oim_id)
-  expect(page).not_to have_content(broker.oim_id)
-  expect(page).to have_content(employer_staff.oim_id)
+  expect(page).to have_content(employer_staff.oim_id, wait: 10)
   expect(page).to have_content("Locked")
   expect(page).to have_content("Unlocked")
+  expect(page).not_to have_content(employee_role.oim_id)
+  expect(page).not_to have_content(broker.oim_id)
 end
 
 When(/^I click Broker button$/)do
