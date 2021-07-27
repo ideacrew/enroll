@@ -395,11 +395,12 @@ Then(/^the consumer will not have access to the (.*) page$/) do |_title|
 end
 
 When(/^the consumer clicks the Cost Savings link$/) do
-  find_link('Cost Savings').click
+  find('a', text: 'Cost Savings').click
+
 end
 
 Then(/^the consumer will navigate to the Cost Savings page$/) do
-  expect(page).to have_content('Cost Savings Applications', wait: 5)
+  expect(page).to have_content('Cost Savings Applications', wait: 10)
 end
 
 When(/^the consumer manually enters the "Help Paying for Coverage" url in the browser search bar$/) do
