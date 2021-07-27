@@ -257,6 +257,16 @@ var PersonValidations = (function(window, undefined) {
     }
   }
 
+  function validationForTobaccoUser(e) {
+    if ($('input[name="person[is_applying_coverage]"]').length > 0 && $('input[name="person[is_applying_coverage]"]').not(":checked").val() == "true"){
+      return true;
+    }
+    if (!$('#tobacco_user_container').hasClass('hidden_field') && $('input[name="person[is_tobacco_user]"]').not(":checked").length == 2) {
+      alert('Please provide an answer for question: Is this person a tobacco user?');
+      PersonValidations.restoreRequiredAttributes(e);
+    }
+  }
+
   function validationForNaturalizedCitizen(e) {
     if ($('input[name="person[is_applying_coverage]"]').length > 0 && $('input[name="person[is_applying_coverage]"]').not(":checked").val() == "true"){
       return true;
@@ -384,6 +394,7 @@ var PersonValidations = (function(window, undefined) {
     validationForEligibleImmigrationStatuses: validationForEligibleImmigrationStatuses,
     validationForVlpDocuments: validationForVlpDocuments,
     validationForIncarcerated: validationForIncarcerated,
+    validationForTobaccoUser: validationForTobaccoUser,
     restoreRequiredAttributes: restoreRequiredAttributes
 
   };
@@ -403,6 +414,7 @@ function demographicValidations(){
     PersonValidations.validationForNaturalizedCitizen(e);
     PersonValidations.validationForEligibleImmigrationStatuses(e);
     PersonValidations.validationForIncarcerated(e);
+    PersonValidations.validationForTobaccoUser(e);
     PersonValidations.validationForVlpDocuments(e);
   });
 

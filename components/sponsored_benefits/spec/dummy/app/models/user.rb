@@ -136,6 +136,10 @@ class User
     has_role?(:broker_agency_staff)
   end
 
+  def has_general_agency_staff_role?
+    has_role?(:general_agency_staff)
+  end
+
   def has_broker_role?
     has_role?(:broker)
   end

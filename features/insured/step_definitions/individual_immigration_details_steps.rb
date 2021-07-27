@@ -1,6 +1,7 @@
 Then(/Individual fills demographic details/) do
   find(:xpath, '//label[@for="indian_tribe_member_no"]').click
   find('label[for=radio_incarcerated_no]', wait: 20).click
+  find('label[for=person_is_tobacco_user_no]', wait: 10).click
   choose 'radio_incarcerated_no', visible: false, allow_label_click: true
   fill_in "person_addresses_attributes_0_address_1", :with => "4900 USA BLVD NE"
   fill_in "person_addresses_attributes_0_address_2", :with => "212"

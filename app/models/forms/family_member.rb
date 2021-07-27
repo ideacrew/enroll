@@ -4,7 +4,7 @@ module Forms
     include ActiveModel::Validations
     include Config::AcaModelConcern
 
-    attr_accessor :id, :family_id, :is_consumer_role, :is_resident_role, :vlp_document_id, :gender, :relationship, :tobacco_use,
+    attr_accessor :id, :family_id, :is_consumer_role, :is_resident_role, :vlp_document_id, :gender, :relationship, :is_tobacco_user,
                   :addresses, :is_homeless, :is_temporarily_out_of_state, :is_moving_to_state, :same_with_primary, :is_applying_coverage, :age_off_excluded
     attr_writer :family
     include ::Forms::PeopleNames
@@ -217,7 +217,7 @@ module Forms
         :is_temporarily_out_of_state => is_temporarily_out_of_state,
         :is_moving_to_state => is_moving_to_state,
         :age_off_excluded => age_off_excluded,
-        :tobacco_use => tobacco_use
+        :is_tobacco_user => is_tobacco_user
       }
     end
 
@@ -278,7 +278,7 @@ module Forms
         :addresses => [home_address, mailing_address],
         :age_off_excluded => found_family_member.try(:person).try(:age_off_excluded),
         :is_moving_to_state => found_family_member.try(:person).try(:is_moving_to_state),
-        :tobacco_use => found_family_member&.person&.tobacco_use
+        :is_tobacco_user => found_family_member&.person&.is_tobacco_user
       })
     end
 

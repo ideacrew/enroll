@@ -47,9 +47,6 @@ class Address
   # The name of the quadrant where this address is located
   field :quadrant, type: String, default: ""
 
-  # The name of the quadrant where this address is located
-  field :quadrant, type: String, default: ""
-
   track_history :on => [:fields],
                 :scope => :person,
                 :modifier_field => :modifier,
@@ -75,11 +72,15 @@ class Address
   validate :quadrant_check
 
   def detect_quadrant
-    self.quadrant = QUADRANTS.map { |word| self.address_1&.upcase&.scan(/\b#{word}\b/) }.flatten.first if Settings.aca.validate_quadrant
+    self.quadrant = QUADRANTS.map { |word| self.address_1&.upcase&.scan(/\b#{word}\b/) }.flatten.first if EnrollRegistry.feature_enabled?(:validate_quadrant)
   end
 
   def quadrant_check
-    errors.add(:quadrant, "not present") if Settings.aca.validate_quadrant && Settings.aca.quadrant_state_inclusion.include?(self.state) && Settings.aca.quadrant_zip_codes_exclusions.exclude?(self.zip) && self.quadrant.blank?
+    return unless EnrollRegistry.feature_enabled?(:validate_quadrant)
+    return unless EnrollRegistry[:validate_quadrant].settings(:inclusions).item.include?(self.state)
+    return unless EnrollRegistry[:validate_quadrant].settings(:exclusions).item.exclude?(self.zip)
+    return unless self.quadrant.blank?
+    errors.add(:quadrant, "not present")
   end
 
   # @note Add support for GIS location

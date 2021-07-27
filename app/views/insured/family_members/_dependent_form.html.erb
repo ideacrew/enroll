@@ -2,7 +2,6 @@
   <div id="add_info_<%= dependent.id %>" class="<%= pundit_class Family, :updateable?%>">
 
     <%= form_for dependent, employee_dependent_submission_options_for(dependent) do |f| %>
-
       <%= hidden_field_tag :consumer_role_id, params[:consumer_role_id] %>
       <%= hidden_field_tag :employee_role_id, params[:employee_role_id] %>
 
@@ -20,11 +19,9 @@
           </ul>
         </div>
       <% end %>
-
       <% if @address_errors.present? %>
         <%= render partial: 'shared/address_error_messages', locals: {address_errors: @address_errors} %>
       <% end %>
-
       <%if
         @dependent.first_name &&
             @dependent.last_name &&
@@ -53,7 +50,6 @@
           </div>
         </div>
       <%end %>
-
       <%= token_tag form_authenticity_token %>
 
       <div class="house col-md-12 col-sm-12 col-xs-12 no-pd">
@@ -230,7 +226,6 @@
         <% else %>
           <%= link_to "<span class='glyphicon glyphicon-remove-circle' aria-hidden='true'></span> #{l10n("cancel")}".html_safe, insured_family_member_path(dependent), :remote => true %>
         <% end %>
-
         <%= f.button(id: 'confirm-member', class: "btn btn-primary btn-br pull-right mz hidden", onclick: "$('#btn-continue').removeClass('disabled');") do %>
           <%= l10n("confirm_member") %>
         <% end %>

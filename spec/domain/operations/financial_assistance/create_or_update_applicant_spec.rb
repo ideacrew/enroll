@@ -9,6 +9,7 @@ RSpec.describe ::Operations::FinancialAssistance::CreateOrUpdateApplicant, type:
 
   before do
     EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(true)
+    EnrollRegistry[:validate_quadrant].feature.stub(:is_enabled).and_return(true)
   end
 
   it 'should be a container-ready operation' do

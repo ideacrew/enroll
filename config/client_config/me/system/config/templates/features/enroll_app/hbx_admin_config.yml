@@ -10,9 +10,9 @@ registry:
     - :hbx_admin_config
     features:
         - key: :issuers_tab
-          is_enabled: false
+          is_enabled: true
         - key: :inbox_tab
-          is_enabled: false
+          is_enabled: true
         - key: :notices_tab
           is_enabled: false
         - key: :calendar_tab

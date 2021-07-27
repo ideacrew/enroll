@@ -387,7 +387,7 @@ private
       :consumer_role,
       :is_applying_coverage,
       :age_off_excluded,
-      :tobacco_use
+      :is_tobacco_user
     ]
   end
 

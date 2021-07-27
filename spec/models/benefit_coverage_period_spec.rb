@@ -274,6 +274,7 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
       plan3.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'gold', csr_variant_id: '01')
       plan4.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'gold', csr_variant_id: '01')
       plan5.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'silver', csr_variant_id: '03')
+      allow(EnrollRegistry).to receive(:[]).with(:enroll_app).and_return(double(settings: double(item: 'DC Health Link')))
     end
 
     after do
@@ -281,6 +282,9 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
     end
 
     context 'single rating area model' do
+      before :each do
+        allow(EnrollRegistry).to receive(:[]).with(:service_area).and_return(double(settings: double(item: 'single')))
+      end
       context 'when satisfied' do
 
         it 'should return plans' do
@@ -308,6 +312,9 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
         # let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, issuer_profile: issuer_profile, service_area_id: service_area.id ) }
 
         let(:service_area) { ::BenefitMarkets::Locations::ServiceArea.all.first }
+        before :each do
+          allow(EnrollRegistry).to receive(:[]).with(:service_area).and_return(double(settings: double(item: rating_type)))
+        end
         context 'when satisfied' do
 
           it 'should return plans' do

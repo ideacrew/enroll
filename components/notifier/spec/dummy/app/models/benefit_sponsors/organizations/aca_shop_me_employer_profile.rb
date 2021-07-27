@@ -3,7 +3,7 @@ module BenefitSponsors
     class AcaShopMeEmployerProfile
 
       # TODO: This needs some thought
-      embeds_one :employer_attestation, class_name: '::EmployerAttestation' if NotifierRegistry.feature_enabled?(:employer_attestation)
+      # embeds_one :employer_attestation, class_name: '::EmployerAttestation' if EnrollRegistry.feature_enabled?(:employer_attestation)
 
       def organization; end
 
