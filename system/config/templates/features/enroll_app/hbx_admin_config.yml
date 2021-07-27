@@ -14,10 +14,10 @@ registry:
         - key: :inbox_tab
           is_enabled: true
         - key: :notices_tab
-          is_enabled: true
+          is_enabled: false
         - key: :calendar_tab
-          is_enabled: true
+          is_enabled: false
         - key: :staff_tab
-          is_enabled: true
+          is_enabled: false
         - key: :orphan_accounts_tab
-          is_enabled: true
+          is_enabled: false
