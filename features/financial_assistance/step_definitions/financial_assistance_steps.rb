@@ -396,7 +396,6 @@ end
 
 When(/^the consumer clicks the Cost Savings link$/) do
   find('a', text: 'Cost Savings').click
-
 end
 
 Then(/^the consumer will navigate to the Cost Savings page$/) do
