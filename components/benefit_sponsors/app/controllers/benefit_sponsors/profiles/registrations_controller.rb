@@ -21,7 +21,7 @@ module BenefitSponsors
           format.html
           format.js
           format.json { head :not_acceptable }
-        end  
+        end
       end
 
       def create
