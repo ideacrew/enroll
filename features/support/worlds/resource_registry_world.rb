@@ -28,7 +28,6 @@ module ResourceRegistryWorld
   end
 end
 
-
 And(/^FAA (.*) feature is (.*)$/) do |feature_key, enabled_or_disabled|
   case enabled_or_disabled
   when 'enabled'
