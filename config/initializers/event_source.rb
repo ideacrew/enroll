@@ -44,4 +44,4 @@ EventSource.configure do |config|
   #     EventSource.build_async_api_resource(resource)
   #   end
 end
-EventSource.initialize!
+# EventSource.initialize!
