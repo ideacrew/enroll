@@ -7,6 +7,7 @@ module FinancialAssistance
 
     include ::UIHelpers::WorkflowController
     include Acapi::Notifiers
+    include FinancialAssistance::L10nHelper
     require 'securerandom'
 
     before_action :check_eligibility, only: [:create, :get_help_paying_coverage_response, :copy]
@@ -26,7 +27,8 @@ module FinancialAssistance
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
 
-      @application = ::FinancialAssistance::Application.find_by(id: params[:id], family_id: get_current_person.financial_assistance_identifier)
+      # @application = ::FinancialAssistance::Application.find_by(id: params[:id], family_id: get_current_person.financial_assistance_identifier)
+      @application = ::FinancialAssistance::Application.find_by(id: params[:id])
 
       load_support_texts
     end
@@ -48,7 +50,7 @@ module FinancialAssistance
           @model.update_attributes!(workflow: { current_step: @current_step.to_i })
           if params[:commit] == "Submit Application"
             @application.submit! if @application.complete?
-            publish_result = FinancialAssistance::Operations::Application::RequestDetermination.new.call(application_id: @application.id)
+            publish_result = determination_request_class.new.call(application_id: @application.id)
             if publish_result.success?
               redirect_to wait_for_eligibility_response_application_path(@application)
             else
@@ -103,6 +105,7 @@ module FinancialAssistance
       set_admin_bookmark_url
       @application = ::FinancialAssistance::Application.find_by(id: params[:id], family_id: get_current_person.financial_assistance_identifier)
       @all_relationships = @application.relationships
+      @application.calculate_total_net_income_for_applicants
       @applicants = @application.active_applicants if @application.present?
       redirect_to applications_path if @application.blank?
     end
@@ -134,7 +137,11 @@ module FinancialAssistance
         @income_coverage_hash = {}
 
         @applicants.each do |applicant|
-          file = File.read("./components/financial_assistance/app/views/financial_assistance/applications/raw_application.yml.erb")
+          file = if FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled).item
+                   File.read("./components/financial_assistance/app/views/financial_assistance/applications/raw_application.yml.erb")
+                 else
+                   File.read("./components/financial_assistance/app/views/financial_assistance/applications/raw_application_hra.yml.erb")
+                 end
           application_hash = YAML.safe_load(ERB.new(file).result(binding))
           @demographic_hash[applicant.id] = application_hash[0]["demographics"]
           application_hash[0]["demographics"]["ADDRESSES"] = generate_address_hash(applicant)
@@ -188,6 +195,12 @@ module FinancialAssistance
     end
 
     private
+
+    def determination_request_class
+      return FinancialAssistance::Operations::Application::RequestDetermination if FinancialAssistanceRegistry.feature_enabled?(:haven_determination)
+      # TODO: This beelow line will cause failures
+      return FinancialAssistance::Operations::Applications::MedicaidGateway::RequestEligibilityDetermination if FinancialAssistanceRegistry.feature_enabled?(:medicaid_gateway_determination)
+    end
 
     def init_cfl_service
       @cfl_service = ::FinancialAssistance::Services::ConditionalFieldsLookupService.new

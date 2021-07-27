@@ -9,9 +9,9 @@ module Transcripts
 
     def initialize
       @transcript = transcript_template
-      @fields_to_ignore ||= ['_id', 'user_id', 'version', 'created_at', 'updated_at', 'encrypted_ssn', 'ethnicity', 
-        'updated_by', 'no_ssn', 'location_state_code', 'updated_by_id', 'is_incarcerated', 'no_dc_address',
-        "is_homeless", "is_temporarily_out_of_state", "tribal_id"]
+      @fields_to_ignore ||= ['_id', 'user_id', 'version', 'created_at', 'updated_at', 'encrypted_ssn', 'ethnicity',
+                             'updated_by', 'no_ssn', 'location_state_code', 'updated_by_id', 'is_incarcerated', 'no_dc_address',
+                             "is_homeless", "is_temporarily_out_of_state", "tribal_id", "tribal_state", "tribal_name"]
 
       @custom_templates = []
     end

@@ -5,6 +5,7 @@ class TaxHouseholdMember
   include ApplicationHelper
 
   PDC_TYPES = [['Assisted','is_ia_eligible'], ['Medicaid','is_medicaid_chip_eligible'], ['Totally Ineligible','is_totally_ineligible'], ['UQHP','is_uqhp_eligible']].freeze
+  CSR_KINDS = ['csr_100', 'csr_94', 'csr_87', 'csr_73', 'csr_0', 'csr_limited'].freeze
 
   embedded_in :tax_household
   embeds_many :financial_statements
@@ -24,10 +25,35 @@ class TaxHouseholdMember
   field :magi_medicaid_monthly_income_limit, type: Money, default: 0.00
   field :medicaid_household_size, type: Integer
   field :is_without_assistance, type: Boolean, default: false
+  field :csr_percent_as_integer, type: Integer, default: 0  #values in DC: 0, 73, 87, 94
+  field :csr_eligibility_kind, type: String, default: 'csr_0'
 
   validate :strictly_boolean
 
+  validates :csr_eligibility_kind,
+            allow_blank: false,
+            inclusion: { in: CSR_KINDS,
+                         message: "%{value} is not a valid cost sharing eligibility kind" }
+
   alias_method :family_member_id, :applicant_id
+
+  def csr_percent_as_integer=(new_csr_percent)
+    super
+    self.csr_eligibility_kind = case csr_percent_as_integer
+                                when 73
+                                  'csr_73'
+                                when 87
+                                  'csr_87'
+                                when 94
+                                  'csr_94'
+                                when 100
+                                  'csr_100'
+                                when -1
+                                  'csr_limited'
+                                else
+                                  'csr_0'
+                                end
+  end
 
   def eligibility_determinations
     return nil unless tax_household
@@ -82,6 +108,23 @@ class TaxHouseholdMember
   def person
     return @person unless @person.blank?
     @person = family_member.person
+  end
+
+  def benchmark_product_details_for(effective_date)
+    result = Operations::Products::DetermineSlcspForTaxHouseholdMember.new.call(effective_date: effective_date, tax_household_member: self)
+    raise result.failure unless result.success?
+
+    result.success
+  end
+
+  def aptc_benchmark_amount(enrollment)
+    date = enrollment.effective_on
+    slcsp_id = benchmark_product_details_for(date)[:product_id]
+    benchmark_product = BenefitMarkets::Products::Product.find(slcsp_id)
+    ehb = benchmark_product.ehb
+    product = ::BenefitMarkets::Products::ProductFactory.new({product_id: slcsp_id})
+    cost = product.cost_for(date, person.age_on(date))
+    round_down_float_two_decimals(cost * ehb)
   end
 
   def age_on_effective_date

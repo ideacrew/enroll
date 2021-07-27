@@ -13,7 +13,15 @@ module Operations
     describe "not passing :resource_id, :subject, :actions_id, :body :resource_name" do
 
       let(:params) { { }}
-      let(:error_message) {{:resource_id => ['is missing'], :resource_name => ['is missing'], :actions_id => ['is missing'], :subject => ['is missing'], :body => ['is missing']}}
+      let(:error_message) do
+        {
+          :resource_id => ['is missing', 'must be a string'],
+          :resource_name => ['is missing', 'must be a string'],
+          :actions_id => ['is missing', 'must be a string'],
+          :subject => ['is missing', 'must be a string'],
+          :body => ['is missing', 'must be a string']
+        }
+      end
 
       it "fails" do
         expect(subject).not_to be_success

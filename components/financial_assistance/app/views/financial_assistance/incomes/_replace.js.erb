@@ -6,6 +6,8 @@ stopEditingIncome();
   $('<%= id %>').replaceWith("<%= escape_javascript render(partial: 'self_employed_income', locals: { income: @income }) %>");
 <% elsif @income.kind == 'unemployment_income' %>
   $('<%= id %>').replaceWith("<%= escape_javascript render(partial: 'unemployment_income', locals: { income: @income }) %>");
+<% elsif @income.kind == 'american_indian_and_alaskan_native' %>
+$('<%= id %>').replaceWith("<%= escape_javascript render(partial: 'ai_an_income', locals: { income: @income }) %>");
 <% else %>
 	// handle other income here!
 	$("<%= id %>").closest(".other-income-kind").find('.add-more-link-<%= @income.kind %> > a').removeClass("hidden");

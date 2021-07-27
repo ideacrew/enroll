@@ -23,6 +23,10 @@ module GoldenSeedHelper
     @site = BenefitSponsors::Site.all.first
   end
 
+  def counter_number
+    (0..999).to_a.sample
+  end
+
   # These methods are in case you want to avoid external
   # hbx id calls
   # def update_person_hbx_ids
@@ -72,7 +76,7 @@ module GoldenSeedHelper
     ol = org.office_locations.build
     address = ol.build_address(
       kind: "mailing",
-      address_1: "Main St",
+      address_1: "Main St NE",
       city: EnrollRegistry[:enroll_app].setting(:contact_center_city).item,
       state: state_abbreviation,
       zip: EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item
@@ -277,10 +281,10 @@ module GoldenSeedHelper
     end
     address = Address.new(
       kind: "primary",
-      address_1: address_1,
-      city: city,
-      state: state,
-      zip: zip
+      address_1: "60#{counter_number} #{('a'..'z').to_a.sample} #{['Street NE', 'Ave NE', 'Drive NE'].sample}",
+      city: EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item,
+      state: EnrollRegistry[:enroll_app].setting(:state_abbreviation).item,
+      zip: EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item
     )
     area_code = primary_phone.present? ? primary_phone.area_code : FFaker::PhoneNumber.area_code
     phone_number = primary_phone.present? ? primary_phone.number : generate_unique_phone_number

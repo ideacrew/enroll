@@ -16,12 +16,15 @@ module FinancialAssistance
       attribute :is_primary_applicant, Types::Strict::Bool.meta(omittable: true)
       attribute :family_member_id, Types::Bson.optional.meta(omittable: true)
       attribute :person_hbx_id, Types::String.optional.meta(omittable: true)
+      attribute :ext_app_id, Types::String.optional.meta(omittable: true)
       attribute :is_incarcerated, Types::Strict::Bool.optional.meta(omittable: true)
       attribute :is_disabled, Types::Strict::Bool.meta(omittable: true)
       attribute :ethnicity, Types::Array.optional.meta(omittable: true)
       attribute :race, Types::String.optional.meta(omittable: true)
       attribute :indian_tribe_member, Types::Bool.optional.meta(omittable: true)
       attribute :tribal_id, Types::String.optional.meta(omittable: true)
+      attribute :tribal_state, Types::String.optional.meta(omittable: true)
+      attribute :tribal_name, Types::String.optional.meta(omittable: true)
 
       attribute :language_code, Types::String.optional.meta(omittable: true)
       attribute :no_dc_address, Types::Strict::Bool.meta(omittable: true)
@@ -51,10 +54,12 @@ module FinancialAssistance
       attribute :expiration_date, Types::Date.optional.meta(omittable: true)
       attribute :issuing_country, Types::String.optional.meta(omittable: true)
       attribute :relationship, Types::String.optional.meta(omittable: true)
+      attribute :immigration_doc_statuses, Types::Array.of(Types::String).meta(omittable: true)
 
       attribute :addresses, Types::Array.of(FinancialAssistance::Entities::Address)
       attribute :emails, Types::Array.of(FinancialAssistance::Entities::Email)
       attribute :phones, Types::Array.of(FinancialAssistance::Entities::Phone)
+      attribute :incomes, Types::Array.of(FinancialAssistance::Entities::Income).meta(omittable: true)
     end
   end
 end

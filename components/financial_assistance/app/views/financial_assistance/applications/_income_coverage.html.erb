@@ -1,7 +1,6 @@
 <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
   <div class="form-heading"><strong><%= income_coverage[0] %></strong></div>
 </div>
-
 <% income_coverage[1].each do |k, v| %>
     <% if k == "jobs" %>
         <% v.each do |k, v| %>
@@ -15,9 +14,9 @@
           </div>
           <div class="col-md-6"><%= v == true ? "Yes" : v == false ? "No" : v.nil? ? "N/A" : v %></div>
         </div>
-        <% if income_coverage[0] == "HEALTH COVERAGE" &&  k.include?("enrolled")  && applicant.has_enrolled_health_coverage  %>
+        <% if income_coverage[0] == "HEALTH COVERAGE" && k.include?("enrolled") && k == applicant_currently_enrolled.gsub(" *", "") && applicant.has_enrolled_health_coverage  %>
             <%= render partial: 'financial_assistance/applications/review_benefits', locals: {kind: 'is_enrolled', applicant: applicant} %>
-        <% elsif income_coverage[0]== "HEALTH COVERAGE" && applicant.has_eligible_health_coverage%>
+        <% elsif income_coverage[0]== "HEALTH COVERAGE" && k == applicant_eligibly_enrolled.gsub(" *", "") && applicant.has_eligible_health_coverage %>
             <%= render partial: 'financial_assistance/applications/review_benefits', locals: {kind: 'is_eligible', applicant: applicant} %>
         <% end %>
     <% end %>

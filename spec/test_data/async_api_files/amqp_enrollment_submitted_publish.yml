@@ -1,0 +1,60 @@
+---
+asyncapi: 2.0.0
+info:
+  title: Enroll
+  version: 0.1.0
+  description: AMQP Publishconfiguration for the Enroll services
+  contact:
+    name: IdeaCrew
+    url: https://ideacrew.com
+    email: info@ideacrew.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  production:
+    url: "amqp://localhost:5672/"
+    protocol: :amqp
+    protocolVersion: "0.9.2"
+    description: RabbitMQ Production Server
+  development:
+    url: "amqp://localhost:5672/"
+    protocol: :amqp
+    protocolVersion: "0.9.2"
+    description: RabbitMQ Test Server
+  test:
+    url: "amqp://localhost:5672/"
+    protocol: :amqp
+    protocolVersion: "0.9.2"
+    description: RabbitMQ Test Server
+
+defaultContentType: application/json
+
+channels:
+  enroll.individual.enrollments.submitted:
+    bindings:
+      amqp:
+        is: :routing_key
+        exchange:
+          name: enroll.individual.enrollments
+          type: topic
+          content_type: application/json
+          durable: true
+          auto_delete: false
+          vhost: /
+        binding_version: "0.2.0"
+    publish:
+      operationId: enroll.individual.enrollments.submitted
+      summary: Events - Document created
+      bindings:
+        amqp:
+          app_id: enroll
+          type: enroll.individual.enrollments
+          routing_key: enroll.individual.enrollments.submitted
+          expiration: 100_000
+          deliveryMode: 2
+          mandatory: true
+          timestamp: true
+          content_type: application/json
+          bindingVersion: 0.2.0

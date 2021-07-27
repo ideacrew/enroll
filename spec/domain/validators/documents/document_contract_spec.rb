@@ -9,9 +9,13 @@ RSpec.describe Validators::Documents::DocumentContract,  dbclean: :after_each do
     context 'sending with missing values should return errors' do
       let(:invalid_params) { {title: "", creator: "", subject: "", doc_identifier: "", format: ""} }
       let(:error_message) do
-        {:title => ['Missing title for document.'], :creator => ['Missing creator for document.'],
-         :subject => ['Missing subject for document.'], :doc_identifier => ['Response missing doc identifier.'],
-         :format => ['Invalid file format.']}
+        {
+          :creator => ["Missing creator for document."],
+          :doc_identifier => ["Response missing doc identifier."],
+          :format => ["Invalid file format."],
+          :subject => ["Missing subject for document."],
+          :title => ["Missing title for document."]
+        }
       end
 
       it 'should be a container-ready operation' do
@@ -31,8 +35,8 @@ RSpec.describe Validators::Documents::DocumentContract,  dbclean: :after_each do
 
       let(:invalid_params) { {} }
       let(:error_message) do
-        {:title => ['is missing'], :creator => ['is missing'],
-         :subject => ['is missing'], :doc_identifier => ['is missing'], :format => ['is missing']}
+        {:title => ['is missing', 'must be a string'], :creator => ['is missing', 'must be a string'],
+         :subject => ['is missing', 'must be a string'], :doc_identifier => ['is missing', 'must be a string'], :format => ['is missing', 'must be a string']}
       end
 
       it 'should throw errors' do

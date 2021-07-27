@@ -63,8 +63,8 @@ module Operations
           'source': 'enroll_system',
           'language': 'en',
           'date_submitted': TimeKeeper.date_of_record,
-          'title': file_params[:file].original_filename,
-          'format': file_params[:file].content_type
+          'title': fetch_file_name(file_params),
+          'format': fetch_file_content_type(file_params)
         }
         document_body[:subjects] = subjects unless subjects.nil?
         Success({ document: document_body.to_json,
@@ -88,7 +88,24 @@ module Operations
       end
 
       def create_document(resource, file_params, file_entity)
-        Operations::Documents::Create.new.call(resource: resource, document_params: file_params, doc_identifier: file_entity[:id])
+        Operations::Documents::Create.new.call(resource: resource, document_params: document_params(file_params), doc_identifier: file_entity[:id])
+      end
+
+      def document_params(file_params)
+        file_params.merge(
+          {
+            file_name: fetch_file_name(file_params),
+            file_content_type: fetch_file_content_type(file_params)
+          }
+        )
+      end
+
+      def fetch_file_name(params)
+        params[:file].original_filename
+      end
+
+      def fetch_file_content_type(params)
+        params[:file].content_type
       end
 
       def test_env_response(resource)

@@ -16,6 +16,8 @@ RSpec.describe DocumentsController, :type => :controller do
   let(:native_type) { FactoryBot.build(:verification_type, type_name: "American Indian Status") }
 
   before :each do
+    # Needed for the American indian status type
+    EnrollRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(false)
     sign_in user
     person.verification_types = [ssn_type, local_type, citizenship_type, native_type, immigration_type]
   end

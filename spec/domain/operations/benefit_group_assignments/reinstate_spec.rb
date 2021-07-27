@@ -110,7 +110,7 @@ RSpec.describe Operations::BenefitGroupAssignments::Reinstate, :type => :model, 
       it "reinstated bga start date == old bga end date + 1" do
         reinstated_bga = subject.call({benefit_group_assignment: benefit_group_assignment, options: {benefit_package: reinstated_benefit_package}}).success
         expect(reinstated_bga.start_on).to eq benefit_group_assignment.end_on.next_day
-        expect(reinstated_bga.activated_at).to eq TimeKeeper.datetime_of_record
+        expect(reinstated_bga.activated_at.to_date).to eq TimeKeeper.datetime_of_record.to_date
       end
     end
 

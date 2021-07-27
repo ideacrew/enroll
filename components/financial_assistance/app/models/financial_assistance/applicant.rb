@@ -7,6 +7,8 @@ module FinancialAssistance
     include AASM
     include Ssn
     include UnsetableSparseFields
+    include ActionView::Helpers::TranslationHelper
+    include FinancialAssistance::L10nHelper
 
     embedded_in :application, class_name: "::FinancialAssistance::Application", inverse_of: :applicants
 
@@ -50,30 +52,16 @@ module FinancialAssistance
     ].freeze
     INCOME_VALIDATION_STATES = %w[na valid outstanding pending].freeze
     MEC_VALIDATION_STATES = %w[na valid outstanding pending].freeze
+    CSR_KINDS = ['csr_100', 'csr_94', 'csr_87', 'csr_73', 'csr_0', 'csr_limited'].freeze
 
     DRIVER_QUESTION_ATTRIBUTES = [:has_job_income, :has_self_employment_income, :has_other_income,
                                   :has_deductions, :has_enrolled_health_coverage, :has_eligible_health_coverage]
-    DRIVER_QUESTION_ATTRIBUTES += [:has_unemployment_income] if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income)
+    DRIVER_QUESTION_ATTRIBUTES += [:has_unemployment_income] if FinancialAssistanceRegistry[:unemployment_income].enabled?
+    DRIVER_QUESTION_ATTRIBUTES += [:has_american_indian_alaskan_native_income] if FinancialAssistanceRegistry[:american_indian_alaskan_native_income].enabled?
     DRIVER_QUESTION_ATTRIBUTES.freeze
 
     #list of the documents user can provide to verify Immigration status
-    VLP_DOCUMENT_KINDS = [
-        "I-327 (Reentry Permit)",
-        "I-551 (Permanent Resident Card)",
-        "I-571 (Refugee Travel Document)",
-        "I-766 (Employment Authorization Card)",
-        "Certificate of Citizenship",
-        "Naturalization Certificate",
-        "Machine Readable Immigrant Visa (with Temporary I-551 Language)",
-        "Temporary I-551 Stamp (on passport or I-94)",
-        "I-94 (Arrival/Departure Record)",
-        "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport",
-        "Unexpired Foreign Passport",
-        "I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)",
-        "DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)",
-        "Other (With Alien Number)",
-        "Other (With I-94 Number)"
-    ].freeze
+    VLP_DOCUMENT_KINDS = FinancialAssistanceRegistry[:vlp_documents].setting(:vlp_document_kind_options).item
 
     CITIZEN_KINDS = {
       us_citizen: "US citizen",
@@ -88,6 +76,16 @@ module FinancialAssistance
     }.freeze
 
     NATURALIZATION_DOCUMENT_TYPES = ["Certificate of Citizenship", "Naturalization Certificate"].freeze
+
+    IMMIGRATION_DOCUMENT_STATUSES = [
+      'Member of a Federally Recognized Indian Tribe',
+      'Certification from U.S. Department of Health and Human Services (HHS) Office of Refugee Resettlement (ORR)',
+      'Office of Refugee Resettlement (ORR) eligibility letter (if under 18)',
+      'Cuban/Haitian Entrant',
+      'Non Citizen Who Is Lawfully Present In American Samoa',
+      'Battered spouse, child, or parent under the Violence Against Women Act',
+      'None of these'
+    ].freeze
 
     field :name_pfx, type: String
     field :first_name, type: String
@@ -111,6 +109,7 @@ module FinancialAssistance
     field :no_dc_address, type: Boolean, default: false
     field :is_homeless, type: Boolean, default: false
     field :is_temporarily_out_of_state, type: Boolean, default: false
+    field :immigration_doc_statuses, type: Array
 
     field :no_ssn, type: String, default: '0'
     field :citizen_status, type: String
@@ -154,6 +153,7 @@ module FinancialAssistance
     field :aasm_state, type: String, default: :unverified
 
     field :person_hbx_id, type: String
+    field :ext_app_id, type: String
     field :family_member_id, type: BSON::ObjectId
     field :eligibility_determination_id, type: BSON::ObjectId
 
@@ -163,6 +163,7 @@ module FinancialAssistance
     field :is_living_in_state, type: Boolean, default: false
 
     field :is_required_to_file_taxes, type: Boolean
+    field :is_filing_as_head_of_household, type: Boolean
     field :tax_filer_kind, type: String, default: "tax_filer" # change to the response of is_required_to_file_taxes && is_joint_tax_filing
     field :is_joint_tax_filing, type: Boolean
     field :is_claimed_as_tax_dependent, type: Boolean
@@ -217,6 +218,8 @@ module FinancialAssistance
     field :pregnancy_due_on, type: Date
     field :pregnancy_end_on, type: Date
 
+    field :is_primary_caregiver, type: Boolean, default: false
+
     field :is_subject_to_five_year_bar, type: Boolean, default: false
     field :is_five_year_bar_met, type: Boolean, default: false
     field :is_forty_quarters, type: Boolean, default: false
@@ -236,6 +239,7 @@ module FinancialAssistance
     field :is_resident_post_092296, type: Boolean
     field :is_vets_spouse_or_child, type: Boolean
 
+    field :net_annual_income, type: Money
     # Driver QNs.
     field :has_job_income, type: Boolean
     field :has_self_employment_income, type: Boolean
@@ -244,6 +248,32 @@ module FinancialAssistance
     field :has_deductions, type: Boolean
     field :has_enrolled_health_coverage, type: Boolean
     field :has_eligible_health_coverage, type: Boolean
+    field :has_american_indian_alaskan_native_income, type: Boolean
+
+    field :csr_percent_as_integer, type: Integer, default: 0  #values in DC: 0, 73, 87, 94
+    field :csr_eligibility_kind, type: String, default: 'csr_0'
+
+    # if eligible immigration status
+    field :medicaid_chip_ineligible, type: Boolean
+    field :immigration_status_changed, type: Boolean
+    # if member of tribe
+    field :health_service_through_referral, type: Boolean
+    field :health_service_eligible, type: Boolean
+    field :tribal_state, type: String
+    field :tribal_name, type: String
+
+    field :is_medicaid_cubcare_eligible, type: Boolean
+
+    field :has_eligible_medicaid_cubcare, type: Boolean
+    field :medicaid_cubcare_due_on, type: Date
+    field :has_eligibility_changed, type: Boolean
+    field :has_household_income_changed, type: Boolean
+    field :person_coverage_end_on, type: Date
+
+    field :has_dependent_with_coverage, type: Boolean
+    field :dependent_job_end_on, type: Date
+
+    field :is_eligible_for_non_magi_reasons, type: Boolean
 
     field :workflow, type: Hash, default: { }
 
@@ -275,6 +305,11 @@ module FinancialAssistance
               inclusion: { in: TAX_FILER_KINDS, message: "%{value} is not a valid tax filer kind" },
               allow_blank: true
 
+    validates :csr_eligibility_kind,
+              allow_blank: false,
+              inclusion: { in: CSR_KINDS,
+                           message: "%{value} is not a valid cost sharing eligibility kind" }
+
     alias is_medicare_eligible? is_medicare_eligible
     alias is_joint_tax_filing? is_joint_tax_filing
 
@@ -289,6 +324,24 @@ module FinancialAssistance
 
     def generate_hbx_id
       write_attribute(:person_hbx_id, FinancialAssistance::HbxIdGenerator.generate_member_id) if person_hbx_id.blank?
+    end
+
+    def csr_percent_as_integer=(new_csr_percent)
+      super
+      self.csr_eligibility_kind = case csr_percent_as_integer
+                                  when 73
+                                    'csr_73'
+                                  when 87
+                                    'csr_87'
+                                  when 94
+                                    'csr_94'
+                                  when 100
+                                    'csr_100'
+                                  when -1
+                                    'csr_limited'
+                                  else
+                                    'csr_0'
+                                  end
     end
 
     def us_citizen=(val)
@@ -363,6 +416,23 @@ module FinancialAssistance
 
     def is_ia_eligible?
       is_ia_eligible && !is_medicaid_chip_eligible && !is_without_assistance && !is_totally_ineligible
+    end
+
+    # Checks if applicant is eligible for 73, 87 or 94.
+    def is_csr_73_87_or_94?
+      is_ia_eligible? && [73, 87, 94].include?(csr_percent_as_integer)
+    end
+
+    # Checks if applicant is eligible for 100.
+    def is_csr_100?
+      is_ia_eligible? && csr_percent_as_integer == 100
+    end
+
+    # Checks if applicant is eligible for CSR limited.
+    # Applicant is eligible for limited CSR if attested for AI/AN status if csr is not 100,
+    # as csr 100 is better than csr limited
+    def is_csr_limited?
+      (is_ia_eligible? && csr_percent_as_integer == -1) || (indian_tribe_member && csr_percent_as_integer != 100)
     end
 
     def non_ia_eligible?
@@ -684,8 +754,10 @@ module FinancialAssistance
     end
 
     def tax_info_complete?
+      filing_as_head = (FinancialAssistanceRegistry.feature_enabled?(:filing_as_head_of_household) && is_required_to_file_taxes && is_joint_tax_filing == false && !is_claimed_as_tax_dependent.nil?) ? !is_filing_as_head_of_household.nil? : true
       !is_required_to_file_taxes.nil? &&
-        !is_claimed_as_tax_dependent.nil?
+        !is_claimed_as_tax_dependent.nil? &&
+        filing_as_head
     end
 
     def incomes_complete?
@@ -733,6 +805,15 @@ module FinancialAssistance
       when :other_income
         if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income)
           return false if has_unemployment_income.nil?
+          return incomes.unemployment.first.save if incomes.unemployment.count == 1 && has_unemployment_income
+          return false if has_unemployment_income.nil? || has_other_income.nil?
+          return true if has_unemployment_income == false && has_other_income == false
+          return true if has_unemployment_income == true && incomes.unemployment.present? && has_other_income == false
+          return true if has_unemployment_income == false && has_other_income == true && incomes.other.present?
+          return incomes.unemployment.present? && incomes.other.present? if incomes.unemployment && incomes.other
+          return incomes.unemployment.present? && incomes.other.blank? if incomes.unemployment && !incomes.other
+          return incomes.unemployment.blank? && incomes.other.present? if !incomes.unemployment && incomes.other
+          incomes.unemployment.blank? && incomes.other.blank?
           return incomes.unemployment.present? if has_unemployment_income
         end
         return false if has_other_income.nil?
@@ -744,6 +825,14 @@ module FinancialAssistance
         return deductions.present? if has_deductions
         deductions.blank?
       when :health_coverage
+        return false if indian_tribe_member && health_service_through_referral.nil? && FinancialAssistanceRegistry[:indian_health_service_question].feature.is_enabled
+        if FinancialAssistanceRegistry[:medicaid_chip_driver_questions].enabled?
+          return false if eligible_immigration_status && medicaid_chip_ineligible.nil?
+          return false if eligible_immigration_status && medicaid_chip_ineligible && immigration_status_changed.nil?
+        end
+        return false if indian_tribe_member && health_service_eligible.nil? && FinancialAssistanceRegistry[:indian_health_service_question].feature.is_enabled
+        return medicare_eligible_qns if FinancialAssistanceRegistry.feature_enabled?(:has_medicare_cubcare_eligible)
+        return dependent_coverage_questions if FinancialAssistanceRegistry.feature_enabled?(:has_dependent_with_coverage)
         return false if has_enrolled_health_coverage.nil? || has_eligible_health_coverage.nil?
         return benefits.enrolled.present? && benefits.eligible.present? && benefits.all? {|benefit| benefit.valid? :submission} if has_enrolled_health_coverage && has_eligible_health_coverage
         return benefits.enrolled.present? && benefits.enrolled.all? {|benefit| benefit.valid? :submission} && benefits.eligible.blank? if has_enrolled_health_coverage && !has_eligible_health_coverage
@@ -751,6 +840,29 @@ module FinancialAssistance
         benefits.enrolled.blank? && benefits.eligible.blank?
       end
     end
+
+    def dependent_coverage_questions
+      return false if has_dependent_with_coverage.nil?
+      return true if has_dependent_with_coverage == false
+      return true if has_dependent_with_coverage && dependent_job_end_on.present?
+      return false if has_dependent_with_coverage.present? && dependent_job_end_on.blank?
+    end
+
+    # rubocop:disable Metrics/CyclomaticComplexity
+    # rubocop:disable Metrics/PerceivedComplexity
+    def medicare_eligible_qns
+      return false if has_eligible_medicaid_cubcare.nil?
+      return false if has_eligible_medicaid_cubcare.present? && medicaid_cubcare_due_on.blank?
+      return true if has_eligible_medicaid_cubcare.present? && medicaid_cubcare_due_on.present?
+      return false if has_eligible_medicaid_cubcare == false && has_eligibility_changed.nil?
+      return true if has_eligible_medicaid_cubcare == false && has_eligibility_changed == false
+      return false if has_eligible_medicaid_cubcare == false && has_eligibility_changed.present? && has_household_income_changed.nil?
+      return true if  has_eligible_medicaid_cubcare == false && has_eligibility_changed.present? && has_household_income_changed == false
+      return false if has_eligible_medicaid_cubcare == false && has_eligibility_changed.present? && has_household_income_changed.present? && person_coverage_end_on.blank?
+      return true if has_eligible_medicaid_cubcare == false && has_eligibility_changed.present? && has_household_income_changed.present? && person_coverage_end_on.present?
+    end
+    # rubocop:enable Metrics/CyclomaticComplexity
+    # rubocop:enable Metrics/PerceivedComplexity
 
     def assisted_income_verified?
       assisted_income_validation == "valid"
@@ -858,6 +970,10 @@ module FinancialAssistance
       incomes.unemployment.present?
     end
 
+    def american_indian_alaskan_native_income_exists?
+      incomes.american_indian_and_alaskan_native.present?
+    end
+
     def deductions_exists?
       deductions.present?
     end
@@ -872,11 +988,13 @@ module FinancialAssistance
 
     def attributes_for_export
       applicant_params = attributes.transform_keys(&:to_sym).slice(:family_member_id,:person_hbx_id,:name_pfx,:first_name,:middle_name,:last_name,:name_sfx,
-                                          :gender,:is_incarcerated,:is_disabled,:ethnicity,:race,:tribal_id,:language_code,:no_dc_address,:is_homeless,
-                                          :is_temporarily_out_of_state,:no_ssn,:citizen_status,:is_consumer_role,:vlp_document_id,:is_applying_coverage,
-                                          :vlp_subject,:alien_number,:i94_number,:visa_number,:passport_number,:sevis_id,:naturalization_number,
-                                          :receipt_number,:citizenship_number,:card_number,:country_of_citizenship, :issuing_country,:status,
-                                          :indian_tribe_member, :same_with_primary,:vlp_description)
+                                                                   :gender,:is_incarcerated,:is_disabled,:ethnicity,:race,:tribal_id,:language_code,
+                                                                   :no_dc_address,:is_homeless,:is_temporarily_out_of_state,:no_ssn,:citizen_status,
+                                                                   :is_consumer_role,:vlp_document_id,:is_applying_coverage,:vlp_subject,:alien_number,
+                                                                   :i94_number,:visa_number,:passport_number,:sevis_id,:naturalization_number,
+                                                                   :receipt_number,:citizenship_number,:card_number,:country_of_citizenship,
+                                                                   :issuing_country,:status,:indian_tribe_member,
+                                                                   :same_with_primary,:vlp_description,:tribal_state,:tribal_name)
       applicant_params.merge!({dob: dob.strftime('%d/%m/%Y'), ssn: ssn, relationship: relation_with_primary})
       applicant_params.merge!(expiration_date: expiration_date.strftime('%d/%m/%Y')) if expiration_date.present?
       applicant_params[:addresses] = construct_association_fields(addresses)
@@ -893,6 +1011,32 @@ module FinancialAssistance
       benefits.any_medicare.present?
     end
 
+    def display_student_question?
+      age_of_applicant > 17 && age_of_applicant < 23
+    end
+
+    def home_address
+      addresses.where(kind: 'home').first
+    end
+
+    def current_month_incomes
+      month_date_range = TimeKeeper.date_of_record.beginning_of_month..TimeKeeper.date_of_record.end_of_month
+      incomes.select do |inc|
+        next inc unless application.assistance_year
+        end_on = inc.end_on || Date.new(application.assistance_year).end_of_year
+        income_date_range = (inc.start_on)..end_on
+        date_ranges_overlap?(income_date_range, month_date_range)
+      end
+    end
+
+    def current_month_earned_incomes
+      current_month_incomes.select { |inc| ::FinancialAssistance::Income::EARNED_INCOME_KINDS.include?(inc.kind) }
+    end
+
+    def current_month_unearned_incomes
+      current_month_incomes.select { |inc| ::FinancialAssistance::Income::UNEARNED_INCOME_KINDS.include?(inc.kind) }
+    end
+
     class << self
       def find(id)
         return nil unless id
@@ -904,6 +1048,10 @@ module FinancialAssistance
 
     private
 
+    def date_ranges_overlap?(range_a, range_b)
+      range_b.begin <= range_a.end && range_a.begin <= range_b.end
+    end
+
     def change_validation_status
       kind = aasm.current_event.to_s.include?('income') ? 'Income' : 'MEC'
       status = aasm.current_event.to_s.include?('outstanding') ? 'outstanding' : 'verified'
@@ -912,7 +1060,7 @@ module FinancialAssistance
 
     def other_questions_answers
       if is_applying_coverage
-        [:is_self_attested_blind, :has_daily_living_help, :need_help_paying_bills, :is_ssn_applied].inject([]) do |array, question|
+        [:is_ssn_applied].inject([]) do |array, question|
           no_ssn_flag = no_ssn
 
           array << send(question) if question != :is_ssn_applied || (question == :is_ssn_applied && no_ssn_flag == '1')
@@ -924,15 +1072,12 @@ module FinancialAssistance
     end
 
     def validate_applicant_information
-      if is_applying_coverage
-        validates_presence_of :has_fixed_address, :is_claimed_as_tax_dependent, :is_living_in_state, :is_temporarily_out_of_state, :is_pregnant, :is_self_attested_blind, :has_daily_living_help, :need_help_paying_bills #, :tax_household_id
-      else
-        validates_presence_of :has_fixed_address, :is_claimed_as_tax_dependent, :is_living_in_state, :is_temporarily_out_of_state, :is_pregnant
-      end
+      validates_presence_of :has_fixed_address, :is_claimed_as_tax_dependent, :is_living_in_state, :is_temporarily_out_of_state, :is_pregnant
     end
 
     def driver_question_responses
       DRIVER_QUESTION_ATTRIBUTES.each do |attribute|
+        next if attribute == :has_american_indian_alaskan_native_income && !indian_tribe_member
         next if [:has_enrolled_health_coverage, :has_eligible_health_coverage].include?(attribute) && !is_applying_coverage
 
         instance_type = attribute.to_s.gsub('has_', '')
@@ -948,10 +1093,12 @@ module FinancialAssistance
         end
 
         # Add base error when driver question has a 'No' value and there is an existing instance for that type.
-        if !send(attribute) && public_send(instance_check_method)
-          errors.add(:base, "Based on your response, you should have no instance of #{instance_type.titleize}.
-                             Please correct your response to '#{attribute}', or delete the existing #{instance_type.titleize}.")
-        end
+
+        # TODO: Commenting below validations until Demo. Should fix POST DEMO!!!
+        # if !send(attribute) && public_send(instance_check_method)
+        #   errors.add(:base, "Based on your response, you should have no instance of #{instance_type.titleize}.
+        #                      Please correct your response to '#{attribute}', or delete the existing #{instance_type.titleize}.")
+        # end
       end
     end
 
@@ -981,6 +1128,14 @@ module FinancialAssistance
         errors.add(:pregnancy_end_on, "' Pregnancy End on date' should be answered") if pregnancy_end_on.blank?
       end
 
+      if FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_other_question) &&
+         age_of_applicant >= 19 && is_applying_coverage == true && is_primary_caregiver.nil?
+        errors.add(
+          :is_primary_caregiver,
+          "' Is this person the main person taking care of any children age 18 or younger? *' should be answered"
+        )
+      end
+
       return unless is_applying_coverage
 
       if age_of_applicant > 18 && age_of_applicant < 26
@@ -992,13 +1147,13 @@ module FinancialAssistance
         end
       end
 
-      if is_student
-        errors.add(:student_kind, "' What is the type of student?' should be answered") if student_kind.blank?
+      if is_student && FinancialAssistanceRegistry.feature_enabled?(:student_follow_up_questions)
+        errors.add(:student_kind, "' #{l10n('faa.other_ques.is_student')}' should be answered") if student_kind.blank?
         errors.add(:student_status_end_on, "' Student status end on date?'  should be answered") if student_status_end_on.blank?
         errors.add(:student_school_kind, "' What type of school do you go to?' should be answered") if student_school_kind.blank?
       end
 
-      errors.add(:is_student, "' Is this person a student?' should be answered") if age_of_applicant.between?(18,19) && is_student.nil?
+      errors.add(:is_student, "' #{l10n('faa.other_ques.is_student')}' should be answered") if age_of_applicant.between?(18,19) && is_student.nil?
       # TODO: Decide if these validations should be ended?
       # errors.add(:claimed_as_tax_dependent_by, "' This person will be claimed as a dependent by' can't be blank") if is_claimed_as_tax_dependent && claimed_as_tax_dependent_by.nil?
 
@@ -1056,7 +1211,8 @@ module FinancialAssistance
     def propagate_applicant
       # return if incomes_changed? || benefits_changed? || deductions_changed?
       if is_active
-        Operations::Families::CreateOrUpdateMember.new.call(params: {applicant_params: self.attributes_for_export, family_id: application.family_id})
+        create_or_update_member_params = { applicant_params: self.attributes_for_export, family_id: application.family_id }
+        create_or_update_result = Operations::Families::CreateOrUpdateMember.new.call(params: create_or_update_member_params)
         if create_or_update_result.success?
           response_family_member_id = create_or_update_result.success[:family_member_id]
           update_attributes!(family_member_id: response_family_member_id) if family_member_id.nil?

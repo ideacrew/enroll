@@ -2,6 +2,7 @@ Feature: As a Super Admin I will have the ability to see and access "Send Secure
 
   Background: Setup site, employer, and benefit application
     Given the shop market configuration is enabled
+    And EnrollRegistry hbx_admin_config feature is enabled
     Given all announcements are enabled for user to select
     Given a ACA site exists with a benefit market
     Given send secure message to employer is enabled

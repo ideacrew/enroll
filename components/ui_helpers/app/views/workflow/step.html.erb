@@ -18,7 +18,7 @@
           </div>
           <% if !@current_step.heading_text.nil? %>
             <% if @current_step.heading_text.present? %>
-              <p><%= @current_step.heading_text%></p>
+              <p><%= translation_placeholder_text(@current_step.heading_text) %></p>
               <p class="memo">* = required field</p>
             <% end %>
           <% end %>
@@ -26,9 +26,13 @@
 
         <div class="focus_effect module">
           <% @current_step.sections.each do |section| %>
-            <div class="margin-bottom-30 margin-bottom-adjustment">
-              <%= render 'workflow/section', :lines => section.lines, :heading => section.heading, :heading_text => section.heading_text, :classNames => section.classNames %>
-            </div>
+            <% if step_enabled?(section) %>
+              <% unless !FinancialAssistanceRegistry.feature_enabled?(:full_medicaid_determination_step) && section.lines.first.cells.last.attribute == "full_medicaid_determination" %>
+                <div class="margin-bottom-30 margin-bottom-adjustment">
+                  <%= render 'workflow/section', :lines => section.lines, :heading => section.heading, :heading_text => section.heading_text, :classNames => section.classNames %>
+                </div>
+              <% end %>
+            <% end %>
           <% end %>
         </div>
       </div>

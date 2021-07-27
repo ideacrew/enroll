@@ -347,6 +347,10 @@ module FinancialAssistance
       return unless ed_updated
 
       determine! # If successfully loaded ed's move the application to determined state
+      send_determination_to_ea
+    end
+
+    def send_determination_to_ea
       result = ::Operations::Families::AddFinancialAssistanceEligibilityDetermination.new.call(params: self.attributes)
       result.failure? ? log(eligibility_response_payload, {:severity => 'critical', :error_message => "ERROR: #{result.failure}"}) : true
     end
@@ -698,6 +702,7 @@ module FinancialAssistance
     end
 
     def send_failed_response
+      return unless FinancialAssistanceRegistry.feature_enabled?(:haven_determination)
       primary_applicant_person_hbx_id = primary_applicant.person_hbx_id
       unless has_eligibility_response
         if determination_http_status_code == 999
@@ -778,6 +783,12 @@ module FinancialAssistance
 
     def active_applicants
       applicants.where(:is_active => true)
+    end
+
+    def calculate_total_net_income_for_applicants
+      active_applicants.each do |applicant|
+        FinancialAssistance::Operations::Applicant::CalculateAndPersistNetAnnualIncome.new.call({application_assistance_year: assistance_year, applicant: applicant})
+      end
     end
 
     def non_primary_applicants
@@ -883,6 +894,7 @@ module FinancialAssistance
       write_attribute(:is_ridp_verified, true)
     end
 
+    # TODO: Check if we have to fall back to FinancialAssistanceRegistry.
     def set_us_state
       write_attribute(
         :us_state,
@@ -1049,6 +1061,15 @@ module FinancialAssistance
           %w[Income MEC].collect do |type|
             VerificationType.new(type_name: type, validation_status: 'pending')
           end
+        family_record = Family.where(id: family_id.to_s).first
+        if FinancialAssistanceRegistry.feature_enabled?(:verification_type_income_verification) &&
+           family_record.present? && applicant.incomes.blank? && applicant.family_member_id.present?
+          family_member_record = family_record.family_members.where(id: applicant.family_member_id).first
+          next if family_member_record.blank?
+          person_record = family_member_record.person
+          next if person_record.blank?
+          person_record.add_new_verification_type('Income')
+        end
         applicant.move_to_pending!
       end
     end

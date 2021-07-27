@@ -21,6 +21,7 @@ gem 'acapi', git: "https://github.com/ideacrew/acapi.git", branch: 'trunk'
 gem 'webpacker', '~> 4.0.2'
 gem 'resource_registry',  git:  'https://github.com/ideacrew/resource_registry.git', branch: 'trunk'
 # gem 'resource_registry',  git: '../../../resource_registry'
+gem 'event_source',       git:  'https://github.com/ideacrew/event_source.git', branch: 'trunk'
 
 group :development, :test do
   gem 'rails-controller-testing'

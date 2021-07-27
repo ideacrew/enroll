@@ -2,7 +2,9 @@ Feature: As an admin user I should not have the ability to extend the OE
   of a given Employer with a draft enrollment.
 
   Background: Setup site, employer, and benefit application
+    Given the shop market configuration is enabled
     Given a CCA site exists with a benefit market
+    And EnrollRegistry hbx_admin_config feature is enabled
     Given benefit market catalog exists for draft initial employer with health benefits
     And there is an employer ABC Widgets
     And initial employer ABC Widgets has draft benefit application

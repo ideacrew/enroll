@@ -6,6 +6,7 @@ Feature: Cost Savings Raw Application
 
   Background:
     Given the FAA feature configuration is enabled
+    And FAA display_medicaid_question feature is enabled
     And a family with financial application in determined state exists
     And the user with hbx_staff role is logged in
 
