@@ -56,6 +56,12 @@ module Operations
           Success(payload)
         end
 
+        def transform_consumer_role(consumer_role)
+          return nil unless consumer_role
+            
+          consumer_role.serializable_hash.deep_symbolize_keys
+        end
+
         def transform_addresses(addresses)
           addresses.collect do |address|
             {
