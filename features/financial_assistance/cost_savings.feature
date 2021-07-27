@@ -40,7 +40,7 @@ Feature: Cost Savings
   Scenario: FAA Feature Is Enabled - Consumer has nil fields for Incarcerated status
     Given the FAA feature configuration is enabled
     Given consumer visits home page
-    When the consumer clicks the Cost Savings link 
+    When the consumer clicks the Cost Savings link
     Then the consumer will navigate to the Cost Savings page
     When Incarcerated field is nil for the consumer
     When consumer click 'Start New Application' button
