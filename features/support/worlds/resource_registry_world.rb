@@ -28,23 +28,6 @@ module ResourceRegistryWorld
   end
 end
 
-And(/^FAA (.*) feature is (.*)$/) do |feature_key, enabled_or_disabled|
-  case enabled_or_disabled
-  when 'enabled'
-    enable_feature(feature_key.to_sym, {registry_name: FinancialAssistanceRegistry})
-  when 'disabled'
-    disable_feature(feature_key.to_sym, {registry_name: FinancialAssistanceRegistry})
-  end
-end
-
-And(/^EnrollRegistry (.*) feature is (.*)$/) do |feature_key, enabled_or_disabled|
-  case enabled_or_disabled
-  when 'enabled'
-    enable_feature(feature_key.to_sym)
-  when 'disabled'
-    disable_feature(feature_key.to_sym)
-  end
-end
 
 And(/^FAA (.*) feature is (.*)$/) do |feature_key, enabled_or_disabled|
   case enabled_or_disabled
