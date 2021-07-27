@@ -180,10 +180,12 @@ And(/should fill in valid sevis, passport expiration_date, tribe_member and inca
   click_link((TimeKeeper.date_of_record + 10.days).day.to_s)
   find('label[for=indian_tribe_member_no]', wait: 20).click
   find('label[for=radio_incarcerated_no]', wait: 10).click
+  find('label[for=person_is_tobacco_user_no]', wait: 10).click
   choose 'radio_incarcerated_no', visible: false, allow_label_click: true
 end
 
 Then(/^Individual (.*) go to Authorization and Consent page$/) do |argument|
+
   if argument == 'does'
     expect(page).to have_content('Authorization and Consent')
   else
