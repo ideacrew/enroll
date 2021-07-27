@@ -191,3 +191,5 @@ registry:
           item: 'DHS'
     - key: :student_follow_up_questions
       is_enabled: true
+# TODO eligibility engine connectivity(HAVEN) settings
+# TODO mec service connectivity settings
