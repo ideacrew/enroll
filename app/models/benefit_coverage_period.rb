@@ -157,12 +157,13 @@ class BenefitCoveragePeriod
     shopping_family_member_ids = hbx_enrollment_members.map(&:applicant_id)
     subcriber = hbx_enrollment_members.detect(&:is_subscriber)
     family_members = hbx_enrollment_members.map(&:family_member)
-    ivl_bgs = get_benefit_packages({family_members: family_members, coverage_kind: coverage_kind, family: hbx_enrollment.family,
+    american_indian_members = extract_american_indian_status(hbx_enrollment, shopping_family_member_ids)
+    ivl_bgs = get_benefit_packages({family_members: family_members, coverage_kind: coverage_kind, family: hbx_enrollment.family, american_indian_members: american_indian_members,
                                     effective_on: hbx_enrollment.effective_on, market: market, shopping_family_members_ids:  shopping_family_member_ids}).uniq
     elected_product_ids = ivl_bgs.map(&:benefit_ids).flatten.uniq
     csr_kind = if tax_household
                  extract_csr_kind(tax_household, shopping_family_member_ids)
-               elsif extract_american_indian_status(hbx_enrollment, shopping_family_member_ids) && FinancialAssistanceRegistry.feature_enabled?(:native_american_csr)
+               elsif american_indian_members && FinancialAssistanceRegistry.feature_enabled?(:native_american_csr)
                  'csr_limited'
                end
     market = market.nil? || market == 'coverall' ? 'individual' : market
@@ -170,7 +171,7 @@ class BenefitCoveragePeriod
   end
 
   def get_benefit_packages(**attrs)
-    benefit_packages.inject([]) do |result, bg|
+    fetch_benefit_packages(attrs[:american_indian_members]).inject([]) do |result, bg|
       satisfied = true
       attrs[:family_members].each do |family_member|
         consumer_role = family_member.person.consumer_role if family_member.person.is_consumer_role_active?
@@ -200,6 +201,12 @@ class BenefitCoveragePeriod
       service_area_ids = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address, during: attrs[:effective_on]).map(&:id)
       elected_products.where(:service_area_id.in => service_area_ids).entries
     end
+  end
+
+  def fetch_benefit_packages(american_indian_members)
+    return benefit_packages unless american_indian_members && FinancialAssistanceRegistry.feature_enabled?(:native_american_csr)
+
+    benefit_packages.select{|bg| bg.cost_sharing == 'csr_limited'}
   end
 
   ## Class methods
@@ -273,8 +280,8 @@ class BenefitCoveragePeriod
     ::BenefitMarkets::Products::ProductFactory
   end
 
-  def extract_american_indian_status(hbx_enrollment, shopping_family_member_ids)
-    shopping_family_members = hbx_enrollment.family.family_members.where(:id.in => shopping_family_member_ids)
+  def extract_american_indian_status(hbx_enrollment, shopping_family_members_ids)
+    shopping_family_members = hbx_enrollment.family.family_members.where(:id.in => shopping_family_members_ids)
     shopping_family_members.all?{|fm| fm.person.indian_tribe_member }
   end
 end

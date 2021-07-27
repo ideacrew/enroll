@@ -169,7 +169,7 @@ registry:
         - key: :gamble_prize
           item: true
     - key: :full_medicaid_determination_step
-      is_enabled: false
+      is_enabled: true
     - key: :native_american_csr
       is_enabled: true
     - key: :display_medicaid_question

@@ -240,11 +240,11 @@
                   </div>
                 <% end %>
 
-                <% if FinancialAssistanceRegistry.feature_enabled?(:american_indian_and_alskan_native) %>
+                <% if EnrollRegistry.feature_enabled?(:american_indian_alaskan_native_income) %>
                   <div class="row row-form-wrapper ptb no-buffer row-height form-content">
                     <div class="col-md-6">Is any of this person's income from American Indian or Alaska Native tribal sources? *
                     </div>
-                    <div class="col-md-6"><%= human_boolean applicant.is_american_indian_alskan_native %></div>
+                    <div class="col-md-6"><%= human_boolean applicant.has_american_indian_alaskan_native_income %></div>
                   </div>
                 <% end %>
 

@@ -72,7 +72,7 @@ end
 
 Then (/^a (less than or equal|more than) warning message will appear$/) do |compare|
   if compare == 'less than or equal'
-    expect(page).to have_content("Small business NOT located in #{Settings.aca.state_name}")
+    expect(page).to have_content("Small business NOT located in #{EnrollRegistry[:enroll_app].setting(:state_name).item}")
   elsif compare == 'more than'
     expect(page).to have_content("Small business should have 1 - #{Settings.aca.shop_market.small_market_employee_count_maximum} full time equivalent employees")
   end

@@ -12,11 +12,11 @@ class Insured::RidpDocumentsController < ApplicationController
       params[:file].each do |file|
         doc_uri = Aws::S3Storage.save(file_path(file), 'id-verification')
         if doc_uri.present?
-          if update_ridp_documents(file_name(file), doc_uri)
+          if update_ridp_documents(file_name(file), doc_uri) == true
             flash[:notice] = "File Saved"
           else
-            flash[:error] = "Could not save file. " + @doc_errors.join(". ")
-            redirect_to(:back)
+            flash[:error] = "Could not save file. #{@doc_errors&.join('. ')}"
+            redirect_back fallback_location: '/'
             return
           end
         else
@@ -57,6 +57,7 @@ class Insured::RidpDocumentsController < ApplicationController
   end
 
   private
+
   def updateable?
     authorize Family, :updateable?
   end
@@ -81,22 +82,26 @@ class Insured::RidpDocumentsController < ApplicationController
     file.original_filename
   end
 
-
   def set_document
     @document = @person.consumer_role.ridp_documents.find(params[:id])
   end
 
   def update_ridp_documents(title, file_uri)
     ridp_type = params[:ridp_verification_type]
-    document = @docs_owner.consumer_role.ridp_documents.build
-    success = document.update_attributes({:identifier=>file_uri, :subject => title, :title=>title, :status=>"downloaded", :ridp_verification_type=>ridp_type, :uploaded_at => TimeKeeper.date_of_record})
-
+    duplicate_document = @docs_owner.consumer_role.ridp_documents.where(:subject => title, :title => title).first
+    new_document = duplicate_document.present? ? nil : @docs_owner.consumer_role.ridp_documents.build
+    success = if duplicate_document.present?
+                duplicate_document.update_attributes({:identifier => file_uri, :subject => title, :title => title, :status => "downloaded", :ridp_verification_type => ridp_type, :uploaded_at => TimeKeeper.date_of_record})
+              else
+                new_document.attributes = {:identifier => file_uri, :subject => title, :title => title, :status => "downloaded", :ridp_verification_type => ridp_type, :uploaded_at => TimeKeeper.date_of_record}
+                new_document.save
+              end
     if success
       person_consumer_role.mark_ridp_doc_uploaded(ridp_type)
+      @docs_owner.save
     else
-      @doc_errors = document.errors.full_messages
+      @doc_errors = @docs_owner.consumer_role.ridp_documents.last.errors&.full_messages
     end
-    @docs_owner.save
   end
 
   def get_document(key)
@@ -113,7 +118,7 @@ class Insured::RidpDocumentsController < ApplicationController
   def ridp_docs_clean(person)
     existing_documents = person.consumer_role.ridp_documents
     person_consumer_role = Person.find(person.id).consumer_role
-    person_consumer_role.ridp_documents =[]
+    person_consumer_role.ridp_documents = []
     person_consumer_role.save
     person_consumer_role = Person.find(person.id).consumer_role
     person_consumer_role.ridp_documents = existing_documents.uniq

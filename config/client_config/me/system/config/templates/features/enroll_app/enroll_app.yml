@@ -261,7 +261,7 @@ registry:
           - key: :verifiable_immigration_statuses
             item: true
       - key: :data_seeds_ui
-        item: :data_seed_ui
+        item: :data_seeds_ui
         is_enabled: true
       - key: :rating_area
         item: :rating_area
@@ -365,6 +365,8 @@ registry:
         is_enabled: false
       - key: :dental_market
         is_enabled: true
+      - key: :general_agency
+        is_enabled: false
       - key: :qle_within_sixty_days
         item: :qle_within_sixty_days
         is_enabled: true

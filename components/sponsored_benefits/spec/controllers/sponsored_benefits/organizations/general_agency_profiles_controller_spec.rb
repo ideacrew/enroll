@@ -6,11 +6,15 @@ module SponsoredBenefits
     include_context "set up broker agency profile for BQT, by using configuration settings"
     routes { SponsoredBenefits::Engine.routes }
 
-    let(:user) { FactoryBot.create(:user)}
-    let(:person) { FactoryBot.create(:person, user: user)}
+    let(:user) { FactoryBot.create(:user, person: person)}
+    let(:person) do
+      FactoryBot.create(:person, :with_broker_role).tap do |person|
+        person.broker_role.update_attributes(broker_agency_profile_id: broker_agency_profile.id.to_s)
+      end
+    end
 
     before do
-      sign_in person.user
+      sign_in user
     end
 
     describe "GET index" do

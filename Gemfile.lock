@@ -7,7 +7,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: be0f4c42a3b49d337cb49b450cbb7b66cf5e2fa2
+  revision: 3138eeccf1029cb8480d366f89805e834737b044
   branch: release_0.3.0
   specs:
     aca_entities (0.3.0)
@@ -17,6 +17,7 @@ GIT
       dry-transformer (~> 0.1.1)
       dry-types (~> 1.0)
       dry-validation (~> 1.2)
+      iso_country_codes
       nokogiri-happymapper
       oj (~> 3.11)
 
@@ -618,6 +619,7 @@ GEM
     interactor-rails (2.2.1)
       interactor (~> 3.0)
       rails (>= 4.2)
+    iso_country_codes (0.7.8)
     jbuilder (2.10.0)
       activesupport (>= 5.0.0)
     jmespath (1.4.0)

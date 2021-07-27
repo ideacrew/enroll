@@ -27,7 +27,8 @@ module FinancialAssistance
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
 
-      @application = ::FinancialAssistance::Application.find_by(id: params[:id], family_id: get_current_person.financial_assistance_identifier)
+      # @application = ::FinancialAssistance::Application.find_by(id: params[:id], family_id: get_current_person.financial_assistance_identifier)
+      @application = ::FinancialAssistance::Application.find_by(id: params[:id])
 
       load_support_texts
     end
@@ -197,6 +198,7 @@ module FinancialAssistance
 
     def determination_request_class
       return FinancialAssistance::Operations::Application::RequestDetermination if FinancialAssistanceRegistry.feature_enabled?(:haven_determination)
+      # TODO: This beelow line will cause failures
       return FinancialAssistance::Operations::Applications::MedicaidGateway::RequestEligibilityDetermination if FinancialAssistanceRegistry.feature_enabled?(:medicaid_gateway_determination)
     end
 

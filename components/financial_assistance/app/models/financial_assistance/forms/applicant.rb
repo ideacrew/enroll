@@ -7,12 +7,8 @@ module FinancialAssistance
       include ActiveModel::Validations
       include Config::AcaModelConcern
 
-      attr_accessor :id, :family_id, :is_consumer_role, :is_resident_role, :vlp_document_id
-      attr_accessor :application_id, :applicant_id
-      attr_accessor :gender, :relationship, :relation_with_primary
-      attr_accessor :no_dc_address, :is_homeless, :is_temporarily_out_of_state, :same_with_primary, :is_applying_coverage
-      attr_accessor :addresses, :phones, :emails
-      attr_accessor :addresses_attributes, :phones_attributes, :emails_attributes
+      attr_accessor :id, :family_id, :is_consumer_role, :is_resident_role, :vlp_document_id, :application_id, :applicant_id, :gender, :relationship, :relation_with_primary, :no_dc_address, :is_homeless, :is_temporarily_out_of_state,
+                    :same_with_primary, :is_applying_coverage, :immigration_doc_statuses, :addresses, :phones, :emails, :addresses_attributes, :phones_attributes, :emails_attributes
 
       attr_writer :family
 
@@ -138,7 +134,8 @@ module FinancialAssistance
           tribal_state: tribal_state,
           tribal_name: tribal_name,
           citizen_status: citizen_status,
-          is_temporarily_out_of_state: is_temporarily_out_of_state
+          is_temporarily_out_of_state: is_temporarily_out_of_state,
+          immigration_doc_statuses: immigration_doc_statuses.to_a.reject(&:blank?)
         }#.reject{|_k, val| val.nil?}
 
         if same_with_primary == 'true'

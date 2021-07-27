@@ -43,10 +43,10 @@ describe "insured/family_members/_dependent_form.html.erb" do
       end
 
       it "should have show tribal_container" do
-        expect(rendered).to have_selector('div#tribal_container')
-        expect(rendered).to have_content("Is this person a member")
-        expect(rendered).to have_content("American Indian")
-        expect(rendered).to have_content("Alaska Native")
+        expect(rendered).to have_selector('div#tribal_container') unless EnrollRegistry.feature_enabled?(:indian_alaskan_tribe_details)
+        expect(rendered).to have_content("Is this person a member") unless EnrollRegistry.feature_enabled?(:indian_alaskan_tribe_details)
+        expect(rendered).to have_content("American Indian") unless EnrollRegistry.feature_enabled?(:indian_alaskan_tribe_details)
+        expect(rendered).to have_content("Alaska Native") unless EnrollRegistry.feature_enabled?(:indian_alaskan_tribe_details)
       end
 
       it "should display the is_applying_coverage field option" do

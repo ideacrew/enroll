@@ -7,6 +7,8 @@ module FinancialAssistance
     include AASM
     include Ssn
     include UnsetableSparseFields
+    include ActionView::Helpers::TranslationHelper
+    include FinancialAssistance::L10nHelper
 
     embedded_in :application, class_name: "::FinancialAssistance::Application", inverse_of: :applicants
 
@@ -55,11 +57,11 @@ module FinancialAssistance
     DRIVER_QUESTION_ATTRIBUTES = [:has_job_income, :has_self_employment_income, :has_other_income,
                                   :has_deductions, :has_enrolled_health_coverage, :has_eligible_health_coverage]
     DRIVER_QUESTION_ATTRIBUTES += [:has_unemployment_income] if FinancialAssistanceRegistry[:unemployment_income].enabled?
-    DRIVER_QUESTION_ATTRIBUTES += [:has_american_indian_alaskan_native_income] if EnrollRegistry[:american_indian_alaskan_native_income].enabled?
+    DRIVER_QUESTION_ATTRIBUTES += [:has_american_indian_alaskan_native_income] if FinancialAssistanceRegistry[:american_indian_alaskan_native_income].enabled?
     DRIVER_QUESTION_ATTRIBUTES.freeze
 
     #list of the documents user can provide to verify Immigration status
-    VLP_DOCUMENT_KINDS = EnrollRegistry[:vlp_documents].setting(:vlp_document_kind_options).item
+    VLP_DOCUMENT_KINDS = FinancialAssistanceRegistry[:vlp_documents].setting(:vlp_document_kind_options).item
 
     CITIZEN_KINDS = {
       us_citizen: "US citizen",
@@ -74,6 +76,16 @@ module FinancialAssistance
     }.freeze
 
     NATURALIZATION_DOCUMENT_TYPES = ["Certificate of Citizenship", "Naturalization Certificate"].freeze
+
+    IMMIGRATION_DOCUMENT_STATUSES = [
+      'Member of a Federally Recognized Indian Tribe',
+      'Certification from U.S. Department of Health and Human Services (HHS) Office of Refugee Resettlement (ORR)',
+      'Office of Refugee Resettlement (ORR) eligibility letter (if under 18)',
+      'Cuban/Haitian Entrant',
+      'Non Citizen Who Is Lawfully Present In American Samoa',
+      'Battered spouse, child, or parent under the Violence Against Women Act',
+      'None of these'
+    ].freeze
 
     field :name_pfx, type: String
     field :first_name, type: String
@@ -97,6 +109,7 @@ module FinancialAssistance
     field :no_dc_address, type: Boolean, default: false
     field :is_homeless, type: Boolean, default: false
     field :is_temporarily_out_of_state, type: Boolean, default: false
+    field :immigration_doc_statuses, type: Array
 
     field :no_ssn, type: String, default: '0'
     field :citizen_status, type: String
@@ -812,12 +825,12 @@ module FinancialAssistance
         return deductions.present? if has_deductions
         deductions.blank?
       when :health_coverage
-        return false if indian_tribe_member && health_service_through_referral.nil? && EnrollRegistry[:indian_health_service_question].feature.is_enabled
+        return false if indian_tribe_member && health_service_through_referral.nil? && FinancialAssistanceRegistry[:indian_health_service_question].feature.is_enabled
         if FinancialAssistanceRegistry[:medicaid_chip_driver_questions].enabled?
           return false if eligible_immigration_status && medicaid_chip_ineligible.nil?
           return false if eligible_immigration_status && medicaid_chip_ineligible && immigration_status_changed.nil?
         end
-        return false if indian_tribe_member && health_service_eligible.nil? && EnrollRegistry[:indian_health_service_question].feature.is_enabled
+        return false if indian_tribe_member && health_service_eligible.nil? && FinancialAssistanceRegistry[:indian_health_service_question].feature.is_enabled
         return medicare_eligible_qns if FinancialAssistanceRegistry.feature_enabled?(:has_medicare_cubcare_eligible)
         return dependent_coverage_questions if FinancialAssistanceRegistry.feature_enabled?(:has_dependent_with_coverage)
         return false if has_enrolled_health_coverage.nil? || has_eligible_health_coverage.nil?
@@ -1064,6 +1077,7 @@ module FinancialAssistance
 
     def driver_question_responses
       DRIVER_QUESTION_ATTRIBUTES.each do |attribute|
+        next if attribute == :has_american_indian_alaskan_native_income && !indian_tribe_member
         next if [:has_enrolled_health_coverage, :has_eligible_health_coverage].include?(attribute) && !is_applying_coverage
 
         instance_type = attribute.to_s.gsub('has_', '')
@@ -1079,10 +1093,12 @@ module FinancialAssistance
         end
 
         # Add base error when driver question has a 'No' value and there is an existing instance for that type.
-        if !send(attribute) && public_send(instance_check_method)
-          errors.add(:base, "Based on your response, you should have no instance of #{instance_type.titleize}.
-                             Please correct your response to '#{attribute}', or delete the existing #{instance_type.titleize}.")
-        end
+
+        # TODO: Commenting below validations until Demo. Should fix POST DEMO!!!
+        # if !send(attribute) && public_send(instance_check_method)
+        #   errors.add(:base, "Based on your response, you should have no instance of #{instance_type.titleize}.
+        #                      Please correct your response to '#{attribute}', or delete the existing #{instance_type.titleize}.")
+        # end
       end
     end
 
@@ -1195,7 +1211,8 @@ module FinancialAssistance
     def propagate_applicant
       # return if incomes_changed? || benefits_changed? || deductions_changed?
       if is_active
-        Operations::Families::CreateOrUpdateMember.new.call(params: {applicant_params: self.attributes_for_export, family_id: application.family_id})
+        create_or_update_member_params = { applicant_params: self.attributes_for_export, family_id: application.family_id }
+        create_or_update_result = Operations::Families::CreateOrUpdateMember.new.call(params: create_or_update_member_params)
         if create_or_update_result.success?
           response_family_member_id = create_or_update_result.success[:family_member_id]
           update_attributes!(family_member_id: response_family_member_id) if family_member_id.nil?

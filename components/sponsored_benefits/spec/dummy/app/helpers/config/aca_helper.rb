@@ -70,11 +70,11 @@ module Config::AcaHelper
   end
 
   # Allows us to conditionally display General Agency related links and information
-  # This can be enabled or disabled in config/settings.yml
-  # @return { True } if Settings.aca.general_agency_enabled
+  # This can be enabled or disabled with ResourceRegistry
+  # @return { True } if EnrollRegistry.feature_enabled?(:general_agency)
   # @return { False } otherwise
   def general_agency_enabled?
-    Settings.aca.general_agency_enabled
+    EnrollRegistry.feature_enabled?(:general_agency)
   end
 
   def broker_carrier_appointments_enabled?

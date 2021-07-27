@@ -2,7 +2,7 @@ Feature: A dedicated page that gives the user access to Tax Info page for a give
 
 Background: User can edit tax info page for a household member
   Given a plan year, with premium tables, exists
-    Given the FAA feature configuration is enabled
+  Given the FAA feature configuration is enabled
 	Given that the user is on the FAA Household Info page
 	And the applicant has no saved data
 	When the user clicks the ADD Info Button for a given household member
@@ -17,7 +17,7 @@ Scenario: Cannot continue from tax info page without form completely filled
 	And should not be actionable.
 
 Scenario: Cannot continue from tax info page without head of household when feature enabled
-  Given head of household question feature is enabled
+  And FAA filing_as_head_of_household feature is enabled
 	Given the user is editing an application for financial assistance
   And user clicks household add member button
   And the user fills the the aplicant add member form with indian member no
@@ -29,7 +29,7 @@ Scenario: Cannot continue from tax info page without head of household when feat
 	And should not be actionable.
 
 Scenario: Can continue from tax info page with head of household when feature enabled
-  Given head of household question feature is enabled
+  And FAA filing_as_head_of_household feature is enabled
 	Given the user is editing an application for financial assistance
   And user clicks household add member button
   And the user fills the the aplicant add member form with indian member no

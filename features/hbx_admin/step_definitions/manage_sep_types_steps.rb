@@ -54,11 +54,10 @@ Then("Admin should see Sort SEPs button and Create SEP button") do
 end
 
 When("Admin clicks on List SEP Types link") do
-  click_link 'List SEP Types'
+  click_link('List SEP Types',  wait: 10)
 end
 
 Then("Admin navigates to SEP Type List page") do
-  sleep 2
   step "Admin can navigate to the Manage SEPs screen"
 end
 
@@ -184,9 +183,9 @@ end
 Then(/^\w+ should see listed shop market SEP Types with ascending positions$/) do
   step "Admin should see listed Active shop market SEP Types on datatable"
   covid19_shop = page.all('div').detect { |div| div[:id] == 'covid-19_shop'}
-  expect(covid19_shop['data-ordinal_position']).to eq '3'
+  expect(covid19_shop['data-ordinal_position']).to eq '1'
   marraige_shop = page.all('div').detect { |div| div[:id] == 'marriage_shop'}
-  expect(marraige_shop['data-ordinal_position']).to eq '4'
+  expect(marraige_shop['data-ordinal_position']).to eq '2'
 end
 
 When("Admin sorts Shop SEP Types by drag and drop") do
@@ -206,9 +205,9 @@ end
 Then(/^\w+ should see listed congress market SEP Types with ascending positions$/) do
   step "Admin should see listed Active fehb market SEP Types on datatable"
   latm_fehb = page.all('div').detect { |div| div[:id] == 'lost_access_to_mec_fehb'}
-  expect(latm_fehb['data-ordinal_position']).to eq '5'
+  expect(latm_fehb['data-ordinal_position']).to eq '1'
   adoption_fehb = page.all('div').detect { |div| div[:id] == 'adoption_fehb'}
-  expect(adoption_fehb['data-ordinal_position']).to eq '6'
+  expect(adoption_fehb['data-ordinal_position']).to eq '2'
 end
 
 When("Admin sorts Congress SEP Types by drag and drop") do
@@ -333,6 +332,54 @@ When(/Admin should see effective on kinds checked based on (.*)$/) do |market_ki
   elsif is_fehb_market_enabled?
     expect(find("input[type='checkbox'][name='forms_qualifying_life_event_kind_form[effective_on_kinds][]'][value='fixed_first_of_next_month']")).to be_checked
   end
+end
+
+When(/Admin creates new SEP Type with (.*) market and (.*) select termination on kinds with (.*) scenario$/) do |market_kind, action, scenario|
+  page.find('.interaction-click-control-create-sep').click
+  expect(page).to have_content('Create SEP Type')
+  case scenario
+  when "failure"
+    step "Admin fills Create SEP Type form with start on date greater than end on date"
+  when "past start date"
+    step "Admin fills Create SEP Type form with past start and end dates"
+  when "future start and end dates"
+    step "Admin fills Create SEP Type form with future start and end dates"
+  else
+    step "Admin fills Create SEP Type form with start and end dates"
+  end
+  step "Admin fills Create SEP Type form with Title"
+  step "Admin fills Create SEP Type form with Event label"
+  step "Admin fills Create SEP Type form with Tool Tip"
+  step "Admin selects #{market_kind} market radio button"
+  step "Admin fills Create SEP Type form with Reason"
+  step "Admin selects effective on kinds for Create SEP Type"
+  step "Admin #{action} select termination on kinds for #{market_kind} SEP Type"
+  step "Admin fills Create SEP Type form with Pre Event SEP and Post Event SEP dates"
+  case scenario
+  when "invalid eligibity date"
+    step "Admin fills invalid eligibility start and end dates"
+  when "only eligibility start date"
+    step "Admin fills eligibility start date"
+  when "only eligibility end date"
+    step "Admin fills eligibility end date"
+  else
+    step "Admin selects #{scenario} visibility radio button for #{market_kind} market"
+  end
+  step "Admin clicks on Create Draft button"
+end
+
+And(/Admin should see newly created SEP Type title on Datatable with Draft filter (.*)$/) do |market_kind|
+  step "Admin navigates to SEP Types List page"
+  step "Admin clicks #{market_kind} filter on SEP Types datatable"
+  step "Admin clicks on Draft filter of #{market_kind} market filter"
+  step "Admin should see newly created SEP Type title on Datatable"
+end
+
+And("Admin should publish newly created SEP Type") do
+  step "Admin clicks on newly created SEP Type"
+  step "Admin should navigate to update SEP Type page"
+  step "Admin clicks on Publish button"
+  step "Admin should see Successfully publish message"
 end
 
 When("Admin fills Create SEP Type form with start on date greater than end on date") do
@@ -938,4 +985,34 @@ end
 
 Given(/all market kinds are enabled for user to select/) do
   add_shop_markets_to_sep_types
+end
+
+When(/Admin creates and publishes new SEP Type with (.*) market and (.*) select termination on kinds with (.*) scenario and (.*) start and end dates$/) do |market_kind, _action, scenario, dates|
+  admin_id = User.where(email: "admin@dc.gov").first.id
+  case scenario
+  when "Customer & Admin"
+    is_visible = true
+  when "Admin Only"
+    is_visible = false
+  end
+
+  case dates
+  when "current"
+    sep_start_on = sep_type_start_on
+    sep_end_on = sep_type_end_on
+  when "future"
+    sep_start_on = (sep_type_start_on + 2.months).strftime('%m/%d/%Y').to_s
+    sep_end_on = (sep_type_end_on + 2.months).strftime('%m/%d/%Y').to_s
+  when "past"
+    sep_start_on = (sep_type_start_on - 2.months).strftime('%m/%d/%Y').to_s
+    sep_end_on = (sep_type_end_on - 2.months).strftime('%m/%d/%Y').to_s
+  end
+  FactoryBot.create(:qualifying_life_event_kind,
+                    :domestic_partnership,
+                    market_kind: market_kind,
+                    published_by: admin_id,
+                    start_on: sep_start_on,
+                    end_on: sep_end_on,
+                    is_visible: is_visible,
+                    aasm_state: :active)
 end

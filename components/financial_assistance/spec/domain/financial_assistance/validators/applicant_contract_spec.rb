@@ -19,7 +19,7 @@ RSpec.describe FinancialAssistance::Validators::ApplicantContract,  dbclean: :af
       naturalization_number: nil, receipt_number: nil, citizenship_number: nil, card_number: nil,
       vlp_description: nil, country_of_citizenship: nil, expiration_date: nil, issuing_country: nil,
       no_ssn: nil, addresses: [], phones: [], emails: [],same_with_primary:  true,
-      indian_tribe_member: false, is_incarcerated: false
+      indian_tribe_member: false, is_incarcerated: false, immigration_doc_statuses: []
     }
   end
   let(:all_params) { required_params.merge(optional_params)}

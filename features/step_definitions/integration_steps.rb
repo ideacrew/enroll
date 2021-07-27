@@ -1,4 +1,19 @@
+# frozen_string_literal: true
+
 # load Rails.root + "db/seeds.rb"
+
+def all_page_links
+  page.all('a').map(&:text).map(&:downcase)
+end
+
+def all_page_select_options
+  page.all('option').map(&:text).map(&:downcase)
+end
+
+When(/a non logged in user visits the Enroll home page$/) do
+  visit "/"
+end
+
 When(/I use unique values/) do
   require 'test/unique_value_stash.rb'
   include UniqueValueStash
@@ -344,6 +359,7 @@ end
 
 Given(/^the fehb market configuration is enabled$/) do
   enable_feature :fehb_market
+  load "components/benefit_sponsors/app/models/benefit_sponsors/organizations/fehb_employer_profile.rb"
 end
 
 Given(/^the individual market configuration is disabled$/) do
