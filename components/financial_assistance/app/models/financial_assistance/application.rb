@@ -798,7 +798,7 @@ module FinancialAssistance
       if fa_application.nil?
         write_attribute(:predecessor_id, nil)
       else
-        raise ArgumentError.new("expected FinancialAssistance::Application") unless fa_application.is_a?(::FinancialAssistance::Application)
+        raise ArgumentError, 'expected an instance of FinancialAssistance::Application' unless fa_application.is_a?(::FinancialAssistance::Application)
         write_attribute(:predecessor_id, fa_application._id)
       end
     end
