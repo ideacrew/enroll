@@ -2847,7 +2847,7 @@ describe '#can_make_changes?', :dbclean => :after_each do
     it 'should return true if enr is active and is not in open enrollment period and family has active shop sep which falls under benefit package effective period' do
       allow(hbx_enrollment).to receive(:open_enrollment_period_available?).and_return false
       allow(hbx_enrollment.family).to receive(:earliest_effective_shop_sep).and_return(double("SpecialEnrollmentPeriod", effective_on: current_benefit_package.start_on,
-                                                                                              start_on: current_benefit_package.start_on, end_on: current_benefit_package.end_on))
+                                                                                                                         start_on: current_benefit_package.start_on, end_on: current_benefit_package.end_on))
       hbx_enrollment.update_attributes(kind: 'employer_sponsored', aasm_state: 'coverage_enrolled', sponsored_benefit_package_id: current_benefit_package.id)
       expect(hbx_enrollment.can_make_changes?). to eq true
     end
