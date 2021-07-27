@@ -240,11 +240,7 @@ registry:
           - key: :verifiable_immigration_statuses
             item: false
       - key: :data_seeds_ui
-<<<<<<< HEAD
-        item: :data_seeds_ui
-=======
         item: :data_seed_ui
->>>>>>> ref: config settings for DC.
         is_enabled: true
       - key: :rating_area
         item: :rating_area

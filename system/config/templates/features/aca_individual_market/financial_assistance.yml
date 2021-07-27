@@ -169,11 +169,6 @@ registry:
         - key: :gamble_prize
           item: false
     - key: :full_medicaid_determination_step
-<<<<<<< HEAD
-      is_enabled: true
-    - key: :native_american_csr
-=======
->>>>>>> ref: config settings for DC.
       is_enabled: true
     - key: :native_american_csr
       is_enabled: false

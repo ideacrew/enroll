@@ -147,17 +147,10 @@ invoices:
   minimum_invoice_display_year: 2015
 
 aca:
-<<<<<<< HEAD
-  state_key : "me"
-  state_name: "Maine"
-  state_abbreviation: "ME"
-  market_kinds: ["individual"]
-=======
   state_key : "dc"
   state_name: "District of Columbia"
   state_abbreviation: "DC"
   market_kinds: ["shop", "individual", "fehb"]
->>>>>>> ref: config settings for DC.
 
   hbx_abbreviation: "DC Health Benefit Exchange"
   nationwide_markets: true
