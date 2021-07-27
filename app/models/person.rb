@@ -183,6 +183,8 @@ class Person
   before_save :update_full_name
   before_save :strip_empty_fields
 
+  before_save :check_indian if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
+
   #after_save :generate_family_search
   after_create :create_inbox
 
@@ -1140,12 +1142,22 @@ class Person
 
   def indian_tribe_member=(val)
     if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
-      self.tribal_state = nil if val.to_s == false
-      self.tribal_name = nil if val.to_s == false
+      if val.to_s == 'false'
+        self.tribal_state = nil
+        self.tribal_name = nil
+        self.tribal_id = nil
+      end
     elsif val.to_s == false
       self.tribal_id = nil
     end
     @indian_tribe_member = (val.to_s == "true")
+  end
+
+  def check_indian
+    return unless @indian_tribe_member.to_s == 'false'
+    self.tribal_id = nil
+    self.tribal_state = nil
+    self.tribal_name = nil
   end
 
   def eligible_immigration_status=(val)
@@ -1168,8 +1180,10 @@ class Person
     return @indian_tribe_member if !@indian_tribe_member.nil?
     return nil if citizen_status.blank?
 
-    @indian_tribe_member ||= !(tribal_id.nil? || tribal_id.empty?)
-    @indian_tribe_member ||= !(tribal_state.nil? || tribal_state.empty? || tribal_name.nil? || tribal_name.empty?) if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
+    result = @indian_tribe_member ||= !(tribal_id.nil? || tribal_id.empty?)
+    result = @indian_tribe_member ||= !(tribal_state.nil? || tribal_state.empty? || tribal_name.nil? || tribal_name.empty?) if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
+
+    result
   end
 
   def eligible_immigration_status
