@@ -692,10 +692,10 @@ class ConsumerRole
 
   def is_tribe_member?
     if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
-      return false if tribal_state.nil? || tribal_name.nil?
-      !tribal_state.nil? && !tribal_name.nil?
+      return false if tribal_state.blank? || tribal_name.blank?
+      !tribal_state.blank? && !tribal_name.blank?
     else
-      return false if tribal_id.nil?
+      return false if tribal_id.blank?
       !tribal_id.empty?
     end
   end
