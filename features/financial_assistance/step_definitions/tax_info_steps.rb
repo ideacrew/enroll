@@ -14,7 +14,7 @@ Given(/^that the user is on the FAA Household Info page$/) do
   find('button.interaction-click-control-continue').click
 
   # should be on checklist page now
-  find('a.interaction-click-control-continue').click
+  find('a.interaction-click-control-continue', wait:  5).click
 end
 
 Given(/^the applicant has no saved data$/) do
@@ -26,7 +26,7 @@ When(/^the user clicks the ADD Info Button for a given household member$/) do
 end
 
 Given(/^the user is editing an application for financial assistance$/) do
-  click_link 'My Household'
+  click_link('My Household', wait: 5)
 end
 
 When(/^the user navigates to the Tax Info page for a given applicant$/) do
