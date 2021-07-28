@@ -8,7 +8,7 @@ module Operations
     module Vlp
       module H92
         # This class will update the person and consumer role based on response
-        class InitialResponseProcesser
+        class InitialResponseProcessor
           send(:include, Dry::Monads[:result, :do, :try])
           include EventSource::Command
 
@@ -28,22 +28,23 @@ module Operations
           end
 
           def update_consumer_role(consumer_role, response)
-            inittial_response = AcaEntities::Fdsh::Vlp::H92::InitialVerificationResponse.new(response)
             args = OpenStruct.new
             args.determined_at = Time.now
             args.vlp_authority = 'fdsh'
-            if inittial_response.ResponseMetadata.ResponseCode == "HS000000"
-              individual_response = inittial_response&.InitialVerificationResponseSet&.InitialVerificationIndividualResponses.first
-              args.qualified_non_citizenship_result = individual_response&.InitialVerificationIndividualResponseSet&.QualifiedNonCitizenCode
-              if individual_response&.ResponseMetadata.ResponseCode == "HS000000" && individual_response.LawfulPresenceVerifiedCode == "Y"
-                args.citizenship_result = get_citizen_status(individual_response&.InitialVerificationIndividualResponseSet.EligStatementTxt)
-                consumer_role.pass_dhs!(args)
-              elsif individual_response&.ResponseMetadata.ResponseCode == "HS000000" && individual_response.LawfulPresenceVerifiedCode != "Y"
-                args.citizenship_result = ::ConsumerRole::NOT_LAWFULLY_PRESENT_STATUS
-                consumer_role.fail_dhs!(args)
+            if response.dig(:ResponseMetadata, :ResponseCode) == "HS000000"
+              individual_response = response.dig(:InitialVerificationResponseSet, :InitialVerificationIndividualResponses).first
+              args.qualified_non_citizenship_result = individual_response.dig(:InitialVerificationIndividualResponseSet, :QualifiedNonCitizenCode)
+              if individual_response.dig(:ResponseMetadata, :ResponseCode) == "HS000000"
+                if individual_response[:LawfulPresenceVerifiedCode] == "Y"
+                  args.citizenship_result = get_citizen_status(individual_response.dig(:InitialVerificationIndividualResponseSet, :EligStatementTxt))
+                  consumer_role.pass_dhs!(args) if consumer_role.may_pass_dhs?
+                else
+                  args.citizenship_result = ::ConsumerRole::NOT_LAWFULLY_PRESENT_STATUS
+                  consumer_role.fail_dhs!(args) if consumer_role.fail_dhs?
+                end
               end
             else
-              consumer_role.fail_dhs!(args)
+              consumer_role.fail_dhs!(args) if consumer_role.fail_dhs?
             end
             consumer_role.save
             Success(consumer_role)

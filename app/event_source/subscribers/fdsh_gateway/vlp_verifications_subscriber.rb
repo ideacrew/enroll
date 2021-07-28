@@ -13,7 +13,7 @@ module Subscribers
 
         verification_payload = { person_hbx_id: metadata.correlation_id, metadata: metadata, response: payload }
 
-        result = Operations::Fdsh::Vlp::H92::InitialResponseProcesser.new.call(verification_payload)
+        result = Operations::Fdsh::Vlp::H92::InitialResponseProcessor.new.call(verification_payload)
 
         if result.success?
           logger.info "Vlp::VlpverificationsSubscriber: on_initial_verification_complete acked with success: #{result.success}"

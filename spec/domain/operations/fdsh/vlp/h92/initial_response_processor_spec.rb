@@ -4,7 +4,7 @@ require "rails_helper"
 
 # module Operations for class CreateDocumentAndNotifyRecipient
 module Operations
-  RSpec.describe Fdsh::Vlp::H92::InitialResponseProcesser do
+  RSpec.describe Fdsh::Vlp::H92::InitialResponseProcessor do
 
     let(:person) {FactoryBot.create(:person, :with_consumer_role)}
 
