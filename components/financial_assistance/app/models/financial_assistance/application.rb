@@ -15,6 +15,7 @@ module FinancialAssistance
     validates :application_submission_validity, presence: true, on: :submission
     validates :before_attestation_validity, presence: true, on: :before_attestation
     validate  :attestation_terms_on_parent_living_out_of_home
+    validate :check_for_valid_predecessor
 
     YEARS_TO_RENEW_RANGE = (0..5).freeze
     RENEWAL_BASE_YEAR_RANGE = (2013..TimeKeeper.date_of_record.year + 1).freeze
@@ -91,7 +92,8 @@ module FinancialAssistance
     field :full_medicaid_determination, type: Boolean
     field :workflow, type: Hash, default: { }
 
-    # predecessor_id is the application id of the renewed application only if the new application is system generated renewal
+    # predecessor_id is the application id of the application which was renewed
+    # predecessor_id is populated if the new application is system generated renewal
     # predecessor_id is the application preceding this current application
     field :predecessor_id, type: BSON::ObjectId
 
@@ -793,17 +795,14 @@ module FinancialAssistance
       active_applicants.map(&:is_ia_eligible).include?(true) && !active_applicants.map(&:is_medicaid_chip_eligible).include?(true)
     end
 
-    # Set the financial_assistance application instance that preceded this one
-    def predecessor=(fa_application)
-      if fa_application.nil?
-        write_attribute(:predecessor_id, nil)
-      else
-        raise ArgumentError, 'expected an instance of FinancialAssistance::Application' unless fa_application.is_a?(::FinancialAssistance::Application)
-        write_attribute(:predecessor_id, fa_application._id)
+    private
+
+    def check_for_valid_predecessor
+      if self.predecessor_id.present?
+        pred_appli = FinancialAssistance::Application.where(id: predecessor_id).first
+        self.errors.add(:predecessor_id, 'expected an instance of FinancialAssistance::Application.') if pred_appli.blank?
       end
     end
-
-    private
 
     def previously_renewal_draft?
       workflow_state_transitions.any? { |wst| wst.from_state == 'renewal_draft' }

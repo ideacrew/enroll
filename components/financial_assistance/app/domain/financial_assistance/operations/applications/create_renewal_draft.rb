@@ -56,10 +56,12 @@ module FinancialAssistance
         end
 
         def attach_additional_data(draft_app, application, validated_params)
-          # Using assign attributes instead of calling aasm event becuase 'renewal_draft' is the first state for a renewal application.
-          draft_app.assign_attributes({ aasm_state: 'renewal_draft', assistance_year: validated_params[:renewal_year] })
-          draft_app.predecessor = application
-          draft_app.save!
+          # Using update attributes instead of calling aasm event becuase 'renewal_draft' is the first state for a renewal application.
+          draft_app.update_attributes!({
+            aasm_state: 'renewal_draft',
+            assistance_year: validated_params[:renewal_year],
+            predecessor_id: application.id
+          })
         end
       end
     end
