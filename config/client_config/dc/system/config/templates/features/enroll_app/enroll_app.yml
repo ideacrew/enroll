@@ -216,7 +216,7 @@ registry:
           - key: :eligibile_immigration_statuses_url
             item: "https://dchealthlink.com/sites/default/files/v2/forms/Eligible%20Immigration%20Status%20List_0.pdf"
           - key: :geographic_rating_area_model
-            item: 'county'
+            item: 'single'
           - key: :benchmark_product_model
             item: :health_only
           - key: :assistance_estimate_url
@@ -347,7 +347,7 @@ registry:
       - key: :general_agency
         is_enabled: true
       - key: :display_county
-        is_enabled: true
+        is_enabled: false
       - key: :moving_to_state
         is_enabled: true
       - key: :living_outside_state
