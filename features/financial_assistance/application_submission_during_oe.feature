@@ -21,7 +21,6 @@ Feature: Consumer landing on Group selection page during OE after continuing fro
     And the user should be able to see medicaid determination question
     And the user has signed their name
     And the user clicks SUBMIT
-    And the user waits for eligibility results
-    And the user is on the Eligibility Response page
+    And the user waits on the Eligibility Response page
     When the user clicks on CONTINUE button
     Then the user should land on Coverage Household page
