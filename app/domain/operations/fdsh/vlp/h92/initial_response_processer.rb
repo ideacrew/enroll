@@ -28,11 +28,12 @@ module Operations
           end
 
           def update_consumer_role(consumer_role, response)
+            inittial_response = AcaEntities::Fdsh::Vlp::H92::InitialVerificationResponse.new(response)
             args = OpenStruct.new
             args.determined_at = Time.now
-            args.vlp_authority = 'dhs'
-            if response.ResponseMetadata.ResponseCode == "HS000000"
-              individual_response = response&.InitialVerificationResponseSet&.InitialVerificationIndividualResponses.first
+            args.vlp_authority = 'fdsh'
+            if inittial_response.ResponseMetadata.ResponseCode == "HS000000"
+              individual_response = inittial_response&.InitialVerificationResponseSet&.InitialVerificationIndividualResponses.first
               args.qualified_non_citizenship_result = individual_response&.InitialVerificationIndividualResponseSet&.QualifiedNonCitizenCode
               if individual_response&.ResponseMetadata.ResponseCode == "HS000000" && individual_response.LawfulPresenceVerifiedCode == "Y"
                 args.citizenship_result = get_citizen_status(individual_response&.InitialVerificationIndividualResponseSet.EligStatementTxt)
@@ -67,12 +68,13 @@ module Operations
             end
             type = person.verification_types.active.where(type_name:type_name).first
             if type
-              type.add_type_history_element(action: "DHS Hub response",
+              type.add_type_history_element(action: "FDSH Hub response",
                                             modifier: "external Hub",
                                             update_reason: "Hub response",
                                             event_response_record_id: event_response_record.id)
             end
 
+            consumer_role.save
             Success(consumer_role)
           end
         end

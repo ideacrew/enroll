@@ -48,7 +48,7 @@ module Operations
     end
 
     subject do
-      described_class.new.call({person_hbx_id: person.hbx_id, response: response})
+      described_class.new.call({person_hbx_id: person.hbx_id, response: response.to_h})
     end
 
     it "should pass" do
