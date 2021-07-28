@@ -169,16 +169,12 @@ Then(/^the user is on the Error Submitting Application page$/) do
   expect(page).to have_content('Error Submitting Application')
 end
 
-Then(/^the user is on the Eligibility Response page$/) do
-  expect(page).to have_content('Eligibility Response Error')
+Then(/^the user waits on the Eligibility Response page$/) do
+  expect(page).to have_content('Eligibility Response Error', wait 60)
 end
 
 Given(/^the user clicks SUBMIT$/) do
   find('.interaction-click-control-submit-application').click
-end
-
-And(/^the user waits for eligibility results$/) do
-  sleep 20
 end
 
 Then(/^the user should land on sep page$/) do
