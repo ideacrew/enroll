@@ -157,7 +157,12 @@ class BenefitCoveragePeriod
     hbx_enrollment = hbx_enrollment_members.first.hbx_enrollment
     shopping_family_member_ids = hbx_enrollment_members.map(&:applicant_id)
     american_indian_members = extract_american_indian_status(hbx_enrollment, shopping_family_member_ids)
-    fetch_benefit_packages(american_indian_members).each do |bg|
+    csr_kind = if tax_household
+                 extract_csr_kind(tax_household, shopping_family_member_ids)
+               elsif american_indian_members && FinancialAssistanceRegistry.feature_enabled?(:native_american_csr)
+                 'csr_limited'
+               end
+    fetch_benefit_packages(american_indian_members, csr_kind).each do |bg|
       satisfied = true
       family = hbx_enrollment.family
       hbx_enrollment_members.map(&:family_member).each do |family_member|
@@ -175,20 +180,15 @@ class BenefitCoveragePeriod
 
     ivl_bgs = ivl_bgs.uniq
     elected_product_ids = ivl_bgs.map(&:benefit_ids).flatten.uniq
-    csr_kind = if tax_household
-                 extract_csr_kind(tax_household, shopping_family_member_ids)
-               elsif american_indian_members && FinancialAssistanceRegistry.feature_enabled?(:native_american_csr)
-                 'csr_limited'
-               end
     market = market.nil? || market == 'coverall' ? 'individual' : market
     products = product_factory.new({market_kind: market})
     products.by_coverage_kind_year_and_csr(coverage_kind, start_on.year, csr_kind: csr_kind).by_product_ids(elected_product_ids).entries
   end
 
-  def fetch_benefit_packages(american_indian_members)
+  def fetch_benefit_packages(american_indian_members, csr_kind)
     return benefit_packages unless american_indian_members && FinancialAssistanceRegistry.feature_enabled?(:native_american_csr)
-
-    benefit_packages.select{|bg| bg.cost_sharing == 'csr_limited'}
+binding.pry
+    benefit_packages.select{|bg| bg.cost_sharing == csr_kind}
   end
 
   ## Class methods
