@@ -13,3 +13,5 @@ registry:
           is_enabled: false
         - key: :inbox_tab
           is_enabled: false
+        - key: :aca_individual_market_feature
+          is_enabled: false

@@ -18,6 +18,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   #before_action :authorize_for_instance, only: [:edit, :update, :destroy]
   before_action :check_csr_or_hbx_staff, only: [:family_index]
   before_action :find_benefit_sponsorship, only: [:oe_extendable_applications, :oe_extended_applications, :edit_open_enrollment, :extend_open_enrollment, :close_extended_open_enrollment, :edit_fein, :update_fein, :force_publish, :edit_force_publish]
+  before_action :redirect_if_aca_individual_market_feature_is_disabled, only: [:family_index_dt]
   # GET /exchanges/hbx_profiles
   # GET /exchanges/hbx_profiles.json
   layout 'single_column'
@@ -816,6 +817,10 @@ def employer_poc
       hash_map["shop_#{year}"] = shop_enrs if shop_enrs.present?
       hash_map
     end
+  end
+
+  def redirect_if_aca_individual_market_feature_is_disabled
+    redirect_to(main_app.root_path, notice: l10n("transfer_familiy_members_link_is_disabled")) unless EnrollRegistry.feature_enabled?(:aca_individual_market_feature)
   end
 
   def get_duplicate_enrs(dup_enrollments)
