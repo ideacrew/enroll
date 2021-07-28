@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+unless ENV['RABBITMQ_URL'].blank?
+
 EventSource.configure do |config|
   config.protocols = %w[amqp http]
   config.pub_sub_root =
@@ -45,3 +47,5 @@ EventSource.configure do |config|
   #   end
 end
 # EventSource.initialize!
+
+end
