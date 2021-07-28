@@ -58,7 +58,10 @@ module FinancialAssistance
           end
 
           def publish(payload)
-            FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication.new.call(payload.to_h)
+            FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication.new.call(
+              payload: payload.to_h,
+              event_name: 'determine_eligibility'
+            )
           end
         end
       end

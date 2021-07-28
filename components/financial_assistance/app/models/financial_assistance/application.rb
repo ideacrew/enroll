@@ -125,6 +125,7 @@ module FinancialAssistance
                                     message: "must fall within range: #{YEARS_TO_RENEW_RANGE}"
                                   }
 
+    index({ 'family_id' => 1 })
 
     scope :submitted, ->{ any_in(aasm_state: SUBMITTED_STATUS) }
     scope :determined, ->{ any_in(aasm_state: "determined") }
@@ -133,6 +134,7 @@ module FinancialAssistance
     scope :for_verifications, -> { where(:aasm_state.in => STATES_FOR_VERIFICATIONS)}
     scope :by_year, ->(year) { where(:assistance_year => year) }
     scope :created_asc,      -> { order(created_at: :asc) }
+    scope :renewal_draft,    ->{ any_in(aasm_state: 'renewal_draft') }
 
     alias is_joint_tax_filing? is_joint_tax_filing
     alias is_renewal_authorized? is_renewal_authorized
@@ -793,6 +795,17 @@ module FinancialAssistance
 
     def has_atleast_one_assisted_but_no_medicaid_applicant?
       active_applicants.map(&:is_ia_eligible).include?(true) && !active_applicants.map(&:is_medicaid_chip_eligible).include?(true)
+    end
+
+    class << self
+      def self.advance_day(new_date)
+        adv_day_logger = Logger.new("#{Rails.root}/log/fa_application_advance_day_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
+        ope_result = FinancialAssistance::Operations::Applications::ProcessDateChangeEvents.new.call({
+          events_execution_date: new_date, logger: adv_day_logger, renewal_year: TimeKeeper.date_of_record.year
+        })
+        binding.pry
+        adv_day_logger.info ope_result
+      end
     end
 
     private

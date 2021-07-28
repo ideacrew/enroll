@@ -87,9 +87,90 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
   end
 
   context 'When connection is available' do
+    before do
+      application_params = ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application.reload)
+      @result = subject.call({ payload: application_params.success, event_name: 'determine_eligibility' })
+    end
+
     it 'should return success' do
       application_params = ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application.reload)
       expect(subject.call(application_params.success)).to be_success
+    end
+  end
+
+  context 'failure' do
+    context 'missing keys' do
+      context 'missing payload' do
+        before do
+          @result = subject.call({ event_name: 'determine_eligibility' })
+        end
+
+        it 'should return failure with error message' do
+          expect(@result.failure).to eq('Missing payload key')
+        end
+      end
+
+      context 'missing event_name' do
+        before do
+          @result = subject.call({ payload: { test: 'test' } })
+        end
+
+        it 'should return failure with error message' do
+          expect(@result.failure).to eq('Missing event_name key')
+        end
+      end
+    end
+
+    context 'missing values or invalid values' do
+      context 'missing value for payload' do
+        before do
+          @result = subject.call({ payload: nil, event_name: 'determine_eligibility' })
+        end
+
+        it 'should return failure with error message' do
+          expect(@result.failure).to eq("Invalid value:  for key payload, must be a Hash object")
+        end
+      end
+
+      context 'missing value for event_name' do
+        before do
+          @result = subject.call({ payload: { test: 'test' }, event_name: nil })
+        end
+
+        it 'should return failure with error message' do
+          expect(@result.failure).to eq("Invalid value:  for key event_name, must be an String")
+        end
+      end
+
+      context 'invalid value for payload' do
+        before do
+          @result = subject.call({ payload: { test: 'test' }.to_s, event_name: 'determine_eligibility' })
+        end
+
+        it 'should return failure with error message' do
+          expect(@result.failure).to match(/for key payload, must be a Hash object/)
+        end
+      end
+
+      context 'invalid value for event_name' do
+        before do
+          @result = subject.call({ payload: { test: 'test' }, event_name: :determine_eligibility })
+        end
+
+        it 'should return failure with error message' do
+          expect(@result.failure).to match(/for key event_name, must be an String/)
+        end
+      end
+
+      context 'invalid value for event_name' do
+        before do
+          @result = subject.call({ payload: { test: 'test' }, event_name: 'test_event' })
+        end
+
+        it 'should return failure with error message' do
+          expect(@result.failure).to eq("Invalid event_name: test_event for key event_name, must be one of [\"determine_eligibility\", \"generate_renewal_draft\"]")
+        end
+      end
     end
   end
 end
