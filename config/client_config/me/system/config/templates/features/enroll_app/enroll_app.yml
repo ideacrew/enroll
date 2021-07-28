@@ -155,9 +155,9 @@ registry:
           - key: :curam_enabled?
             item: true
           - key: :support_for_ie_browser
-            item: true
-          - key: :block_ie_browser
             item: false
+          - key: :block_ie_browser
+            item: true
           - key: :block_ie_browser_after
             item: Mon, 01 Jun 2020
           - key: :publisher
