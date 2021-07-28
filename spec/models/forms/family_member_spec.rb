@@ -529,7 +529,7 @@ describe Forms::FamilyMember, "which describes an existing family member" do
       tribal_name: nil
     }
   end
-  let(:person) { double(:errors => double(:has_key? => false), home_address: nil, tobacco_use: nil) }
+  let(:person) { double(:errors => double(:has_key? => false), home_address: nil, is_tobacco_user: nil) }
 
   let(:family_member) do
     instance_double(::FamilyMember, person_properties.merge({ :family => family,
