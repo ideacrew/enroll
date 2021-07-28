@@ -57,11 +57,10 @@ namespace :assets do
           execute :rake, "assets:clobber"
           execute("cd #{release_path} && nvm use 10 && RAILS_ENV=production NODE_ENV=production bundle exec rake assets:precompile")
           execute :rake, "seed:translations[db/seedfiles/english_translations_seed.rb]"
-          # TODO: ME is committed to this branch by default
-          # client_variabe = ENV['CLIENT'].downcase || ENV['client'].downcase
-          # puts("Switching to #{client_variabe} configuration.") unless client_variabe.nil?
-          # execute :rake, "configuration:client_configuration_toggler client='#{client_variabe}'" unless client_variabe.nil?
-          # puts("No client configuration present, using current committed configuration.") if client_variabe.nil?
+          client_variable = ENV['CLIENT'].downcase || ENV['client'].downcase
+          puts("Switching to #{client_variable} configuration.") unless client_variable.nil?
+          execute :rake, "configuration:client_configuration_toggler client='#{client_variable}'" unless client_variable.nil?
+          puts("No client configuration present, using current committed configuration.") if client_variable.nil?
         end
       end
     end
