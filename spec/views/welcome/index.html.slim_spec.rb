@@ -49,6 +49,7 @@ RSpec.describe "welcome/index.html.slim", :type => :view, dbclean: :after_each  
         # TODO: We need to refactor Settings.aca.market_kinds stuff
         allow(Settings.aca).to receive(:market_kinds).and_return(%w[individual shop])
         Enroll::Application.reload_routes!
+        EnrollRegistry[:medicaid_tax_credits_link].feature.stub(:is_enabled).and_return(true)
 
         # allow(view).to receive(:general_agency_enabled?).and_return(false)
         render
@@ -67,6 +68,7 @@ RSpec.describe "welcome/index.html.slim", :type => :view, dbclean: :after_each  
       before do
         # allow(view).to receive(:general_agency_enabled?).and_return(false)
         allow(view).to receive(:individual_market_is_enabled?).and_return(false)
+        EnrollRegistry[:medicaid_tax_credits_link].feature.stub(:is_enabled).and_return(false)
         render
       end
       it "does not show the Consumer portal links" do
