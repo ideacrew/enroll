@@ -68,7 +68,7 @@ module Effective
                         ]
                       end
 
-          dropdown.pop unless aca_individual_market_feature_is_enabled?
+          dropdown.last.pop unless aca_individual_market_feature_is_enabled?
 
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "family_actions_#{row.id}"}, formats: :html
         }, :filter => false, :sortable => false
