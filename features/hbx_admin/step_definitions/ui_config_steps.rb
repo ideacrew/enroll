@@ -48,11 +48,11 @@ Then(/^they should not see the Notices tab$/) do
   expect(page).to_not have_content("Notices")
 end
 
-Given(/calendar feature is enabled?/) do
+And(/calendar feature is enabled?/) do
   enable_feature(:calendar_tab)
 end
 
-Given(/calendar feature is disabled?/) do
+And(/calendar feature is disabled?/) do
   disable_feature(:calendar_tab)
 end
 
@@ -77,11 +77,11 @@ Then(/^the user will be able to access calendar page$/) do
   expect(page).to have_content("Create Event")
 end
 
-Given(/staff feature is enabled?/) do
+And(/staff feature is enabled?/) do
   enable_feature(:staff_tab)
 end
 
-Given(/staff feature is disabled?/) do
+And(/staff feature is disabled?/) do
   disable_feature(:staff_tab)
 end
 
@@ -107,11 +107,11 @@ Then(/^the user will be able to access staff index page$/) do
   expect(page).to have_content("CSR, CAC and Assisters")
 end
 
-Given(/orphan accounts feature is enabled?/) do
+And(/orphan accounts feature is enabled?/) do
   enable_feature(:orphan_accounts_tab)
 end
 
-Given(/orphan accounts feature is disabled?/) do
+And(/orphan accounts feature is disabled?/) do
   disable_feature(:orphan_accounts_tab)
 end
 
