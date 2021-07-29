@@ -13,7 +13,7 @@ registry:
         is_enabled: false
       - key: :benefit_application_reinstate
         item: BenefitSponsors::Operations::BenefitApplications::Reinstate.new
-        is_enabled: false
+        is_enabled: true
         settings:
            - key: :offset_months
              item: 0
