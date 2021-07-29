@@ -798,23 +798,21 @@ module FinancialAssistance
     end
 
     class << self
-      def self.advance_day(new_date)
+      def advance_day(new_date)
         adv_day_logger = Logger.new("#{Rails.root}/log/fa_application_advance_day_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
-        ope_result = FinancialAssistance::Operations::Applications::ProcessDateChangeEvents.new.call({
-          events_execution_date: new_date, logger: adv_day_logger, renewal_year: TimeKeeper.date_of_record.year
-        })
-        binding.pry
-        adv_day_logger.info ope_result
+        ope_result = FinancialAssistance::Operations::Applications::ProcessDateChangeEvents.new.call(
+          { events_execution_date: new_date, logger: adv_day_logger, renewal_year: TimeKeeper.date_of_record.year.next }
+        )
+        adv_day_logger.info ope_result.success
       end
     end
 
     private
 
     def check_for_valid_predecessor
-      if self.predecessor_id.present?
-        pred_appli = FinancialAssistance::Application.where(id: predecessor_id).first
-        self.errors.add(:predecessor_id, 'expected an instance of FinancialAssistance::Application.') if pred_appli.blank?
-      end
+      return if self.predecessor_id.nil?
+      pred_appli = FinancialAssistance::Application.where(id: predecessor_id).first
+      self.errors.add(:predecessor_id, 'expected an instance of FinancialAssistance::Application.') if pred_appli.blank?
     end
 
     def previously_renewal_draft?

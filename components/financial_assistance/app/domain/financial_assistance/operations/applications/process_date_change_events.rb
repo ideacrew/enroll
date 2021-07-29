@@ -13,9 +13,11 @@ module FinancialAssistance
         # @param [Hash] opts The options to submit renewal_draft application
         # @option opts [Date] :events_execution_date (required)
         # @option opts [Logger] :logger (required)
+        # @option opts [Integer] :renewal_year (required)
         # @return [Dry::Monads::Result]
         def call(params)
-          # { events_execution_date: new_date, logger: @logger }
+          # adv_day_logger = Logger.new("#{Rails.root}/log/fa_application_advance_day_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
+          # { events_execution_date: TimeKeeper.date_of_record, logger: adv_day_logger, renewal_year: TimeKeeper.date_of_record.year.next }
           _validated_params = yield validate_input_params(params)
           _renewals_result  = yield process_renewals
 
@@ -46,26 +48,25 @@ module FinancialAssistance
           Success('Processed application renewals successfully')
         end
 
-        def publish_generate_draft_renewals(applications)
+        def publish_generate_draft_renewals
           @logger.info 'Started publish_generate_draft_renewals process'
-          applications = FinancialAssistance::Application.where(assistance_year: @renewal_year.pred).distinct(:family_id)
-          @logger.info "Total number of applications with assistance_year: #{@renewal_year.pred} are #{applications.count}"
-
-          applications.inject([]) do |_arr, application|
-            payload = { family_id: application.family_id, renewal_year: @renewal_year }
-            result = ::FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication.new.call(payload.to_h, 'generate_renewal_draft')
+          family_ids = FinancialAssistance::Application.where(assistance_year: @renewal_year.pred).distinct(:family_id)
+          @logger.info "Total number of applications with assistance_year: #{@renewal_year.pred} are #{family_ids.count}"
+          family_ids.inject([]) do |_arr, family_id|
+            params = { payload: { family_id: family_id, renewal_year: @renewal_year }, event_name: 'generate_renewal_draft' }
+            result = ::FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication.new.call(params)
             @logger.info "Successfully Published for event generate_renewal_draft, with payload: #{payload}" if result.success?
             @logger.info "Failed to publish for event generate_renewal_draft, with payload: #{payload}, failure: #{result.failure}" if result.failure?
-          rescue => err
+          rescue StandardError => e
             @logger.info "Failed to publish for event generate_renewal_draft, with payload: #{payload}, error: #{e.backtrace}"
           end
 
           @logger.info 'Ended publish_generate_draft_renewals process'
-        rescue => e
+        rescue StandardError => e
           @logger.info "Failed to execute publish_generate_draft_renewals, error: #{e.backtrace}"
         end
-  
-        def publish_renew_draft_renewals(applications)
+
+        def publish_renew_draft_renewals
           @logger.info 'Started publish_renew_draft_renewals process'
           applications = FinancialAssistance::Application.renewal_draft.where(assistance_year: @renewal_year)
           @logger.info "Total number of renewal_draft applications with assistance_year: #{@renewal_year.pred} are #{applications.count}"

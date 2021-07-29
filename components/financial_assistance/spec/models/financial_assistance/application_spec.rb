@@ -4,6 +4,7 @@ require 'rails_helper'
 require 'aasm/rspec'
 
 RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after_each do
+  include Dry::Monads[:result, :do]
 
   let(:family_id) { BSON::ObjectId.new }
   let!(:year) { TimeKeeper.date_of_record.year }
@@ -882,11 +883,35 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
     context 'invalid predecessor_id' do
       it 'should return validation errors' do
-        expect {
+        expect do
           application.update_attributes!({ predecessor_id: BSON::ObjectId.new })
-        }.to raise_error(Mongoid::Errors::Validations,
-                         /Predecessor expected an instance of FinancialAssistance::Application./)
+        end.to raise_error(Mongoid::Errors::Validations,
+                           /Predecessor expected an instance of FinancialAssistance::Application./)
       end
+    end
+  end
+
+  context 'advance_day' do
+    let(:event) { Success(double) }
+    let(:obj)  { ::FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication.new }
+
+    before do
+      allow(::FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication).to receive(:new).and_return(obj)
+      allow(obj).to receive(:build_event).and_return(event)
+      allow(event.success).to receive(:publish).and_return(true)
+    end
+
+    it 'should not raise error with input date' do
+      expect{ ::FinancialAssistance::Application.advance_day(TimeKeeper.date_of_record) }.not_to raise_error
+    end
+
+    it 'should not raise error without any input' do
+      expect{ ::FinancialAssistance::Application.advance_day(nil) }.not_to raise_error
+    end
+
+    after :all do
+      file_name = "#{Rails.root}/log/fa_application_advance_day_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
+      File.delete(file_name) if File.exist?(file_name)
     end
   end
 end
