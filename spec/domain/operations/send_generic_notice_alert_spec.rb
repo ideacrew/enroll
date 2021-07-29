@@ -10,7 +10,7 @@ module Operations
     end
 
     let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key) }
-    let(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, site: site)}
+    let(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site)}
     let(:employer_profile) {organization.employer_profile}
 
     let(:general_agency_person) { FactoryBot.create :person }

@@ -170,7 +170,7 @@ Then(/^the user is on the Error Submitting Application page$/) do
 end
 
 Then(/^the user is on the Eligibility Response page$/) do
-  expect(page).to have_content('Eligibility Response Error')
+  expect(page).to have_content('Eligibility Response Error', wait: 60)
 end
 
 Given(/^the user clicks SUBMIT$/) do

@@ -152,14 +152,6 @@ registry:
             item: 'mehl.producer@coverme.gov'
           - key: :privacy_policy
             item: ""
-          - key: :late_rates_message
-            item: "Due to a delay, premiums for some coverage effective dates are not available yet. Please check again soon to see if this information has been updated. You can also contact Customer Service or your broker if you need help."
-          - key: :faa_enabled
-            item: false
-          - key: :county_fips_code_enabled
-            item: true
-          - key: :ivl_responsibility_url
-            item: "https://dchealthlink.com/individual-responsibility-requirement"
           - key: :curam_enabled?
             item: true
           - key: :support_for_ie_browser
@@ -225,7 +217,7 @@ registry:
           - key: :site_broker_attestation_link
             item: ""
           - key: :rating_areas
-            item: "county"
+            item: "single"
           - key: :favicon_tab_icon
             item: 'image/vnd.microsoft.icon'
           - key: :eligibile_immigration_statuses_url
@@ -252,17 +244,6 @@ registry:
             item: ['']
           - key: :plan_year_tooltip
             item: ""
-          - key: :sep_moved_out_zip_compare
-            item: true
-          - key: :send_rating_area_for_ivl_policy_to_edi
-            item: true
-          - key: :medicaid_agency_phone
-            item: "(000) 000-0000"
-          - key: :verifiable_immigration_statuses
-            item: true
-      - key: :data_seeds_ui
-        item: :data_seed_ui
-        is_enabled: false
       - key: :rating_area
         item: :rating_area
         is_enabled: false
@@ -306,7 +287,7 @@ registry:
       - key: :special_cover_header
         item: :special_cover_header
         is_enabled: true
-        settings:
+        settings: 
           - key: :filename
             item: "CoverME_WebsiteHeader_01.jpg"
       - key: :tobacco_cost
@@ -367,19 +348,23 @@ registry:
         is_enabled: true
       - key: :general_agency
         is_enabled: true
+      - key: :display_county
+        is_enabled: true
+      - key: :moving_to_state
+        is_enabled: true
+      - key: :living_outside_state
+        is_enabled: true
+      - key: :validate_quadrant
+        item: :validate_quadrant
+        is_enabled: true
+        settings:
+          - key: :exclusions
+            item: ["20515"]
+          - key: :inclusions
+            item: ["DC"]
       - key: :qle_within_sixty_days
         item: :qle_within_sixty_days
         is_enabled: true
         settings:
           - key: :days
             item: 60
-      - key: :immigration_status_checkbox
-        is_enabled: true
-      - key: :gender_to_sex
-        is_enabled: true
-      - key: :mainecare_cubcare_glossary
-        is_enabled: true
-      - key: :legacy_enrollment_trigger
-        is_enabled: false
-      - key: :verification_type_income_verification
-        is_enabled: true

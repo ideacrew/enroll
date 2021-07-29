@@ -3,7 +3,7 @@
 # class for storing SamlInformation
 class SamlInformation
 
-  # class for MissingKeyError
+  # This class is used to check if there is any missing key
   class MissingKeyError < StandardError
     def initialize(key)
       super("Missing required key: #{key}")
@@ -52,6 +52,8 @@ class SamlInformation
     end
   end
 
+  #rubocop:disable Style/EvalWithLocation
+  #rubocop:disable Style/DocumentDynamicEvalDefinition
   def self.define_key(key)
     define_method(key.to_sym) do
       config[key.to_s]
@@ -62,6 +64,8 @@ class SamlInformation
       end                     # end
     RUBYCODE
   end
+  #rubocop:enable Style/EvalWithLocation
+  #rubocop:enable Style/DocumentDynamicEvalDefinition
 
   REQUIRED_KEYS.each do |k|
     define_key k

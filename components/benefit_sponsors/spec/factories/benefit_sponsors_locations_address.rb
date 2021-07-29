@@ -20,6 +20,15 @@ FactoryBot.define do
       county    { EnrollRegistry[:enroll_app].setting(:contact_center_county).item }
     end
 
+    trait :dc_shop_baseline do
+      kind      { 'work' }
+      address_1 { '27 Reo Road' }
+      city      { EnrollRegistry[:enroll_app].setting(:contact_center_city).item }
+      state     { EnrollRegistry[:enroll_app].setting(:state_abbreviation).item }
+      zip       { EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item }
+      county    { EnrollRegistry[:enroll_app].setting(:contact_center_county).item }
+    end
+
     trait :me_shop_baseline do
       kind      { 'work' }
       address_1 { '210 State St' }
