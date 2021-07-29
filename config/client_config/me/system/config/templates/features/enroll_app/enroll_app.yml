@@ -247,6 +247,7 @@ registry:
         is_enabled: true
       - key: :county_fips_code_enabled
         item: true
+        is_enabled: true
       - key: :rating_area
         item: :rating_area
         is_enabled: false
