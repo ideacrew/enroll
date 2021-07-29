@@ -103,6 +103,8 @@ module Services
           "family": consumer_build_family,
           "aptc": elected_aptc.to_s,
           "csr": csr_value,
+          "environment": checkbook_env_key,
+          "from": EnrollRegistry[:enroll_app].setting(:site_key).item.to_s,
           "enrollmentId": @hbx_enrollment.id.to_s # Host Name will be static as Checkbook suports static URL's and hostname should be changed before going to production.
         }
       end
@@ -204,6 +206,11 @@ module Services
           family << {'dob': dependent.family_member.person.dob.strftime("%Y-%m-%d") ,'relationship': dependent.primary_relationship}
         end
         family
+      end
+
+      def checkbook_env_key
+        config = Rails.application.config
+        config.respond_to?(:checkbook_services_environment_key) ? config.checkbook_services_environment_key : nil
       end
     end
   end
