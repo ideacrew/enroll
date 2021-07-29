@@ -12,7 +12,7 @@ FactoryBot.define do
     end
 
     after(:build) do |profile, evaluator|
-      profile.office_locations << build_list(:benefit_sponsors_locations_office_location, evaluator.office_locations_count, :with_massachusetts_address)
+      profile.office_locations << build_list(:benefit_sponsors_locations_office_location, evaluator.office_locations_count, "with_#{EnrollRegistry[:enroll_app].setting(:site_key).item.downcase}_address".to_sym)
     end
 
     trait :with_benefit_sponsorship do
