@@ -330,7 +330,7 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   def redirect_if_medicaid_tax_credits_link_is_disabled
-    redirect_to(main_app.root_path, notice: l10n("medicaid_and_tax_credits_link_is_disabled")) unless EnrollRegistry.feature_enabled?(:medicaid_tax_credits_link) || params[:aqhp].present?
+    redirect_to(main_app.root_path, notice: l10n("medicaid_and_tax_credits_link_is_disabled")) if params[:aqhp].present? && !EnrollRegistry.feature_enabled?(:medicaid_tax_credits_link)
   end
 
   def decrypt_params
