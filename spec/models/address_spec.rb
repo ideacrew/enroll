@@ -165,6 +165,45 @@ describe '#home?' do
   end
 end
 
+describe '#fetch_county_fips_code' do
+  let!(:us_county) { BenefitMarkets::Locations::CountyFips.create({ state_postal_code: 'ME',  county_fips_code: '23003', county_name: 'Aroostook'}) }
+
+  context 'fips code for county exists' do
+    let(:address) do
+      Address.new(
+        address_1: "An address line 1",
+        address_2: "An address line 2",
+        city: "A City",
+        state: "ME",
+        county: 'Aroostook',
+        zip: "21222"
+      )
+    end
+
+    it ' should return county fips code' do
+      expect(address.fetch_county_fips_code).to eq '23003'
+    end
+  end
+
+  context 'fips code for county does not exists' do
+    let(:address) do
+      Address.new(
+        address_1: "An address line 1",
+        address_2: "An address line 2",
+        city: "A City",
+        state: "test",
+        county: 'test',
+        zip: "21222"
+      )
+    end
+
+    it ' should return nil' do
+      expect(address.fetch_county_fips_code).to eq nil
+    end
+  end
+
+end
+
 describe '#clean_fields' do
   it 'removes trailing and leading whitespace from fields' do
 
