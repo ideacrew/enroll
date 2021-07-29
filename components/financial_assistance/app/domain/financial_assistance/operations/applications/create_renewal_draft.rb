@@ -28,7 +28,8 @@ module FinancialAssistance
         def validate_input_params(params)
           return Failure('Missing family_id key') unless params.key?(:family_id)
           return Failure('Missing renewal_year key') unless params.key?(:renewal_year)
-          return Failure("Invalid value: #{params[:family_id]} for key family_id, must be a BSON object") if params[:family_id].nil? || !params[:family_id].is_a?(BSON::ObjectId)
+          return Failure("Invalid value: #{params[:family_id]} for key family_id, must be a valid object identifier") if params[:family_id].nil?
+          return Failure("Cannot find family with input value: #{params[:family_id]} for key family_id") if ::Family.where(id: params[:family_id]).first.nil?
           return Failure("Invalid value: #{params[:renewal_year]} for key renewal_year, must be an Integer") if params[:renewal_year].nil? || !params[:renewal_year].is_a?(Integer)
           Success(params)
         end

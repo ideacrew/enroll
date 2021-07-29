@@ -7,10 +7,12 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::CreateRenewalDra
     DatabaseCleaner.clean
   end
 
+  let!(:person) { FactoryBot.create(:person, :with_consumer_role, hbx_id: '100095')}
+  let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
   let!(:application) do
     FactoryBot.create(:financial_assistance_application,
                       hbx_id: '111000222',
-                      family_id: BSON::ObjectId.new,
+                      family_id: family.id,
                       is_renewal_authorized: false,
                       is_requesting_voter_registration_application_in_mail: true,
                       years_to_renew: 5,
@@ -28,6 +30,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::CreateRenewalDra
     FactoryBot.create(:financial_assistance_applicant,
                       person_hbx_id: '100095',
                       is_primary_applicant: true,
+                      family_member_id: family.primary_applicant.id,
                       first_name: 'Gerald',
                       last_name: 'Rivers',
                       dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.day),
@@ -242,33 +245,33 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::CreateRenewalDra
         end
 
         it 'should return failure with error message' do
-          expect(@result.failure).to eq("Invalid value:  for key family_id, must be a BSON object")
+          expect(@result.failure).to eq("Invalid value:  for key family_id, must be a valid object identifier")
         end
       end
 
       context 'missing value for renewal_year' do
         before do
-          @result = subject.call({ family_id: BSON::ObjectId.new, renewal_year: nil })
+          @result = subject.call({ family_id: family.id, renewal_year: nil })
         end
 
         it 'should return failure with error message' do
-          expect(@result.failure).to eq("Invalid value:  for key renewal_year, must be an Integer")
+          expect(@result.failure).to eq('Invalid value:  for key renewal_year, must be an Integer')
         end
       end
 
       context 'invalid value for family_id' do
         before do
-          @result = subject.call({ family_id: BSON::ObjectId.new.to_s, renewal_year: TimeKeeper.date_of_record.year })
+          @result = subject.call({ family_id: 'test', renewal_year: TimeKeeper.date_of_record.year })
         end
 
         it 'should return failure with error message' do
-          expect(@result.failure).to match(/for key family_id, must be a BSON object/)
+          expect(@result.failure).to match('Cannot find family with input value: test for key family_id')
         end
       end
 
       context 'invalid value for renewal_year' do
         before do
-          @result = subject.call({ family_id: BSON::ObjectId.new, renewal_year: TimeKeeper.date_of_record.year.to_s })
+          @result = subject.call({ family_id: family.id, renewal_year: TimeKeeper.date_of_record.year.to_s })
         end
 
         it 'should return failure with error message' do
@@ -279,7 +282,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::CreateRenewalDra
 
     context 'no applications for given inputs' do
       before do
-        @result = subject.call({ family_id: BSON::ObjectId.new, renewal_year: TimeKeeper.date_of_record.year })
+        ::FinancialAssistance::Application.destroy_all
+        @result = subject.call({ family_id: family.id, renewal_year: TimeKeeper.date_of_record.year })
       end
 
       it 'should return failure with error message' do
