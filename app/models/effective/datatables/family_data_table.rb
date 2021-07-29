@@ -67,6 +67,7 @@ module Effective
                            transition_family_members_link_type(row, pundit_allow(Family, :can_transition_family_members?)) ? 'ajax' : 'disabled']
                         ]
                       end
+
           dropdown.pop unless aca_individual_market_feature_is_enabled?
 
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "family_actions_#{row.id}"}, formats: :html
