@@ -144,7 +144,7 @@ module FinancialAssistance
             # rubocop:enable Metrics/MethodLength
 
             def native_american_information(applicant)
-              if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
+              if EnrollRegistry.feature_enabled?(:indian_alaskan_tribe_details)
                 na_information = {indian_tribe_member: applicant.indian_tribe_member,
                                   tribal_name: applicant.tribal_name,
                                   tribal_state: applicant.tribal_state}
