@@ -56,8 +56,8 @@ site:
   faa_enabled: false # TODO: Remove this after configuring the settings.
   ivl_responsibility_url: ""
   curam_enabled?: true
-  support_for_ie_browser: true
-  block_ie_browser: false
+  support_for_ie_browser: false
+  block_ie_browser: true
   block_ie_browser_after: <%= Date.new(2020,6,1) %>
   publisher: "dchl"
   prod_tax_info: ""
