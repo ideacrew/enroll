@@ -10,6 +10,7 @@ class Insured::ConsumerRolesController < ApplicationController
   before_action :individual_market_is_enabled?
   before_action :decrypt_params, only: [:create]
   before_action :set_cache_headers, only: [:edit]
+  before_action :redirect_if_medicaid_tax_credits_link_is_disabled, only: [:privacy, :search]
 
   FIELDS_TO_ENCRYPT = [:ssn,:dob,:first_name,:middle_name,:last_name,:gender,:user_id].freeze
 
@@ -326,6 +327,12 @@ class Insured::ConsumerRolesController < ApplicationController
       end
     end
     message_array
+  end
+
+  def redirect_if_medicaid_tax_credits_link_is_disabled
+    if params[:aqhp].present?
+      redirect_to(main_app.root_path, notice: l10n("medicaid_and_tax_credits_link_is_disabled")) unless EnrollRegistry.feature_enabled?(:medicaid_tax_credits_link)
+    end
   end
 
   def decrypt_params
