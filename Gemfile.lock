@@ -7,7 +7,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 1ee402b663075de4fb3adfec893d82740441eedd
+  revision: cf8a1c1ab4123140636d1ea783a969572e231800
   branch: atp_cv_transform_v2
   specs:
     aca_entities (0.3.0)
@@ -813,7 +813,7 @@ GEM
       rails (>= 3.2)
       sass-rails (>= 4.0)
     redcarpet (3.4.0)
-    redis (4.3.1)
+    redis (4.4.0)
     redis-actionpack (5.2.0)
       actionpack (>= 5, < 7)
       redis-rack (>= 2.1.0, < 3)
