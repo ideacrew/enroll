@@ -797,7 +797,6 @@ def employer_poc
       flash[:error] = "Failed to update setting, " + e.message
     end
     redirect_to exchanges_hbx_profiles_root_path
-
   end
 
   private

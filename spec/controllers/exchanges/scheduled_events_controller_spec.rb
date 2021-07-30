@@ -16,6 +16,7 @@ RSpec.describe Exchanges::ScheduledEventsController do
   end
   before do
     sign_in(user)
+    EnrollRegistry[:calendar_tab].feature.stub(:is_enabled).and_return(true)
   end
 
   describe "GET new" do

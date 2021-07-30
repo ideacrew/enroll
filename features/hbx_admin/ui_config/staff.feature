@@ -23,8 +23,13 @@ Feature: Staff tab
         Then the user will not be able to access staff index page
 
     Scenario: Staff Tab is enabled with External Routing
+<<<<<<< HEAD
         Given that a user with a HBX staff role with HBX staff subrole exists and is logged in
         And staff feature is enabled
+=======
+        Given staff feature is enabled
+        Given that a user with a HBX staff role with HBX staff subrole exists and is logged in
+>>>>>>> 57077f1d8921f53d0995c3df6180018ef7e75c0c
         When the user types in the staff index URL
         Then the user will be able to access staff index page
         

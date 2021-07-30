@@ -23,7 +23,12 @@ Feature: Calendar tab
         Then the user will not be able to access calendar page
 
     Scenario: Calendar Tab is enabled with External Routing
+<<<<<<< HEAD
         Given that a user with a HBX staff role with HBX staff subrole exists and is logged in
         And calendar feature is enabled
+=======
+        Given calendar feature is enabled
+        Given that a user with a HBX staff role with HBX staff subrole exists and is logged in
+>>>>>>> 57077f1d8921f53d0995c3df6180018ef7e75c0c
         When the user types in the calendar URL
         Then the user will be able to access calendar page
