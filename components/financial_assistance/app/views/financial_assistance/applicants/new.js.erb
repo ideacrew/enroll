@@ -1,5 +1,6 @@
 $('#dependents_info_wrapper h4:first').text("Please enter the information requested below. When you\'re finished, select \'Confirm Member\' at the bottom of the page.");
 $('#btn-continue').addClass('disabled');
+$('#confirm-member').prop( "disabled", false );
 
 <% if @applicant.errors.present?  %>
   var dependent_response = $("<%= escape_javascript(render 'dependent_form') %>");
