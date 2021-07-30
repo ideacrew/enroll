@@ -145,14 +145,13 @@ module FinancialAssistance
 
             def native_american_information(applicant)
               if EnrollRegistry.feature_enabled?(:indian_alaskan_tribe_details)
-                na_information = {indian_tribe_member: applicant.indian_tribe_member,
-                                  tribal_name: applicant.tribal_name,
-                                  tribal_state: applicant.tribal_state}
+                {indian_tribe_member: applicant.indian_tribe_member,
+                 tribal_name: applicant.tribal_name,
+                 tribal_state: applicant.tribal_state}
               else
-                na_information = {indian_tribe_member: applicant.indian_tribe_member,
-                                  tribal_id: applicant.tribal_id}
+                {indian_tribe_member: applicant.indian_tribe_member,
+                 tribal_id: applicant.tribal_id}
               end
-              na_information
             end
 
             def calculate_if_applicant_is_required_to_file_taxes(applicant)
