@@ -22,6 +22,13 @@ FactoryBot.define do
       end
     end
 
+    trait :with_attestations do
+      medicaid_terms { true }
+      medicaid_insurance_collection_terms { true }
+      submission_terms { true }
+      report_change_terms { true }
+    end
+
     after(:create) do |application, _evaluator|
       application.non_primary_applicants.each{|applicant| application.ensure_relationship_with_primary(applicant, applicant.relationship) }
       application.save

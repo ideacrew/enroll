@@ -17,7 +17,11 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Renew, dbclean: 
   end
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
   let!(:application10) do
-    FactoryBot.create(:financial_assistance_application, hbx_id: '111000222', family_id: family.id, assistance_year: TimeKeeper.date_of_record.year)
+    FactoryBot.create(:financial_assistance_application,
+                      :with_attestations,
+                      hbx_id: '111000222',
+                      family_id: family.id,
+                      assistance_year: TimeKeeper.date_of_record.year)
   end
   let!(:create_appli) do
     appli = FactoryBot.build(:financial_assistance_applicant,
@@ -26,8 +30,9 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Renew, dbclean: 
                              is_primary_applicant: true,
                              first_name: 'Gerald',
                              last_name: 'Rivers',
+                             citizen_status: 'us_citizen',
                              family_member_id: family.primary_applicant.id,
-                             gender: 'Male',
+                             gender: 'male',
                              ethnicity: [],
                              dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.day))
     appli.phones = [FactoryBot.build(:financial_assistance_phone,
