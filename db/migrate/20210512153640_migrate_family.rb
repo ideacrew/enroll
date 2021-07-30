@@ -7,7 +7,7 @@ require 'aca_entities/atp/transformers/cv/family'
 require 'aca_entities/atp/operations/family'
 require 'aca_entities/serializers/xml/medicaid/atp'
 
-# rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/ClassLength, Lint/UselessAssignment
+# rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/ClassLength
 
 # RAILS_ENV=production bundle exec rails db:migrate:up source=MCR file_path="file_path" VERSION="20210512153640"
 # RAILS_ENV=production bundle exec rails db:migrate:up source=atp file_path="file_path" VERSION="20210512153640"
@@ -266,7 +266,7 @@ class MigrateFamily < Mongoid::Migration
         date_of_death: person_hash['person_demographics']['date_of_death'],
         dob_check: person_hash['person_demographics']['dob_check'],
         race: consumer_role_hash['is_applying_coverage'] ? person_hash['race'] : nil,
-        ethnicity: consumer_role_hash['is_applying_coverage']? [person_hash['race']] : nil,
+        ethnicity: consumer_role_hash['is_applying_coverage'] ? [person_hash['race']] : nil,
         is_incarcerated: consumer_role_hash['is_applying_coverage'] ? person_hash['person_demographics']['is_incarcerated'] : nil,
         tribal_id: person_hash['person_demographics']['tribal_id'],
         tribal_name: person_hash['person_demographics']['tribal_name'],
@@ -496,4 +496,4 @@ class MigrateFamily < Mongoid::Migration
     end
   end
 end
-# rubocop:enable Metrics/AbcSize, Metrics/MethodLength, Metrics/ClassLength, Lint/UselessAssignment
+# rubocop:enable Metrics/AbcSize, Metrics/MethodLength, Metrics/ClassLength
