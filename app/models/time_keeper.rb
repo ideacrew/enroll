@@ -99,6 +99,7 @@ class TimeKeeper
 
   def push_date_of_record
     notify_logger("TimeKeeper advance day started at #{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%m-%d-%Y %H:%M:%S')}")
+    FinancialAssistance::Application.advance_day(self.date_of_record)
     BenefitSponsorship.advance_day(self.date_of_record)
     BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.advance_day(self.date_of_record)
     # EmployerProfile.advance_day(self.date_of_record)
@@ -107,7 +108,6 @@ class TimeKeeper
     CensusEmployee.advance_day(self.date_of_record)
     ConsumerRole.advance_day(self.date_of_record)
     QualifyingLifeEventKind.advance_day(self.date_of_record)
-    FinancialAssistance::Application.advance_day(self.date_of_record)
     notify_logger("TimeKeeper advance day ended at #{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%m-%d-%Y %H:%M:%S')}")
   end
 

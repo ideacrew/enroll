@@ -42,10 +42,19 @@ module FinancialAssistance
 
         def process_renewals
           @logger.info 'Started process_renewals process'
-          publish_generate_draft_renewals
-          publish_renew_draft_renewals
+          publish_generate_draft_renewals if can_generate_draft_renewals?
+          publish_renew_draft_renewals if can_renew_draft_renewals?
           @logger.info 'Ended process_renewals process'
           Success('Processed application renewals successfully')
+        end
+
+        def can_generate_draft_renewals?
+          FinancialAssistanceRegistry.feature_enabled?(:generate_draft_renewals) &&
+            TimeKeeper.date_of_record == date_of_draft_renewals_generation
+        end
+
+        def can_renew_draft_renewals?
+          false
         end
 
         def publish_generate_draft_renewals
@@ -79,6 +88,12 @@ module FinancialAssistance
           # end
 
           @logger.info 'Ended publish_renew_draft_renewals process'
+        end
+
+        def date_of_draft_renewals_generation
+          day = FinancialAssistanceRegistry[:generate_draft_renewals].settings(:draft_renewal_generation_day).item
+          month = FinancialAssistanceRegistry[:generate_draft_renewals].settings(:draft_renewal_generation_month).item
+          Date.new(TimeKeeper.date_of_record.year, month, day)
         end
       end
     end

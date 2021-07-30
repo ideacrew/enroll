@@ -196,5 +196,15 @@ registry:
           item: 'DHS'
     - key: :student_follow_up_questions
       is_enabled: true
+  - namespace:
+    - :renewals
+    features:
+    - key: :generate_draft_renewals
+      is_enabled: true
+      settings:
+        - key: :draft_renewal_generation_day
+          item: 5
+        - key: :draft_renewal_generation_month
+          item: 10
 # TODO eligibility engine connectivity(HAVEN) settings
 # TODO mec service connectivity settings
