@@ -13,5 +13,5 @@ registry:
           is_enabled: true
         - key: :inbox_tab
           is_enabled: true
-        - key: :non_aca_individual_market_feature
+        - key: :no_transition_families
           is_enabled: true
