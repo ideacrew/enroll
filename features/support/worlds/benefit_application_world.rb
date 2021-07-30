@@ -61,17 +61,16 @@ module BenefitApplicationWorld
     }
   end
 
-  def create_application(new_application_status:)
-    application_dates = application_dates_for(current_effective_date, new_application_status)
-
+  def create_application(new_application_status:, effective_date: nil, recorded_rating_area: nil, recorded_service_area: nil)
+    application_dates = application_dates_for(effective_date || current_effective_date, new_application_status)
     @new_application = FactoryBot.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog,
                        :with_benefit_package,
                        benefit_sponsorship: @employer_profile.active_benefit_sponsorship,
                        effective_period: application_dates[:effective_period],
                        aasm_state: new_application_status,
                        open_enrollment_period: application_dates[:open_enrollment_period],
-                       recorded_rating_area: rating_area,
-                       recorded_service_areas: [service_area],
+                       recorded_rating_area: recorded_rating_area || rating_area,
+                       recorded_service_areas: [recorded_service_area || service_area],
                        package_kind: package_kind)
     @new_application.benefit_sponsor_catalog.benefit_application = @new_application
     @new_application.benefit_sponsor_catalog.save!
@@ -99,6 +98,20 @@ module BenefitApplicationWorld
                        recorded_service_areas: [renewal_service_area],
                        package_kind: package_kind,
                        predecessor_application_catalog: true)
+  end
+
+  def terminate_application(application, date)
+    service = BenefitSponsors::Services::BenefitApplicationActionService.new(application, { end_on: date, termination_kind: 'voluntary', termination_reason: 'Non-payment of premium'})
+    service.terminate_application
+  end
+
+  def reinstate_application(application)
+    terminate_application(application, application.end_on - 4.months)
+    application.reload
+    EnrollRegistry[:benefit_application_reinstate].feature.stub(:is_enabled).and_return(true)
+    EnrollRegistry[:benefit_application_reinstate].setting(:offset_months).stub(:item).and_return(12)
+    EnrollRegistry[:benefit_application_reinstate]{ {params: {benefit_application: application, options: {transmit_to_carrier: true} } } }
+    application.benefit_sponsorship.benefit_applications.detect{|app| app.reinstated_id.present?}
   end
 
   def initial_application
@@ -181,6 +194,40 @@ And(/^renewal employer (.*) has (.*) and renewal (.*) benefit applications$/) do
   # Following code will create renewal application but its assigning the wrong contribution to the product_packages and hence cukes will fail
   # For now, creating the renewal application using the service so that it assigns the correct contribution model.
   # create_applications(predecessor_status: earlier_application_status.to_sym, new_application_status: new_application_status.to_sym)
+end
+
+And(/^employer (.*) has (.*) and (.*) benefit applications$/) do |legal_name, earlier_application_status, new_application_status|
+  @employer_profile = employer_profile(legal_name)
+  effective_date = TimeKeeper.date_of_record.beginning_of_year.prev_year
+  earlier_status = earlier_application_status == 'reinstated_expired' ? 'expired' : earlier_application_status
+  @prior_application = create_application(new_application_status: earlier_status.to_sym, effective_date: effective_date,
+                                          recorded_rating_area: @rating_area, recorded_service_area: @service_area)
+
+  if earlier_application_status == 'reinstated_expired'
+    @prior_application = reinstate_application(@prior_application)
+    @prior_application.update_attributes(aasm_state: earlier_status)
+  end
+  state = new_application_status == 'reinstated_active' ? 'active' : new_application_status
+  @active_application = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(@prior_application).renew_application[1]
+  @active_application.update_attributes!(aasm_state: state.to_sym)
+  @active_application = reinstate_application(@active_application) if new_application_status == 'reinstated_active'
+  @prior_application.update_attributes!(aasm_state: :active) if earlier_application_status == 'terminated'
+  terminate_application(@prior_application, @prior_application.end_on - 3.months) if earlier_application_status == 'terminated'
+end
+
+And(/^employer (.*) has (.*) and (.*) and renewal (.*) py's$/) do |legal_name, earlier_application_status, new_application_status, renewal_application_status|
+  @employer_profile = employer_profile(legal_name)
+  effective_date = TimeKeeper.date_of_record.beginning_of_year.prev_year
+  @prior_application = create_application(new_application_status: earlier_application_status.to_sym, effective_date: effective_date,
+                                          recorded_rating_area: @rating_area, recorded_service_area: @service_area)
+
+
+  @active_application = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(@prior_application).renew_application[1]
+  @active_application.update_attributes!(aasm_state: new_application_status.to_sym)
+  @prior_application.update_attributes!(aasm_state: :active) if earlier_application_status == 'terminated'
+  terminate_application(@prior_application, @prior_application.end_on - 3.months) if earlier_application_status == 'terminated'
+  @renewal_application = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(@active_application).renew_application[1]
+  @renewal_application.update_attributes!(aasm_state: renewal_application_status.to_sym)
 end
 
 # Following step will create initial benefit application with given state

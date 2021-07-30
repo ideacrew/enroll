@@ -407,10 +407,10 @@ RSpec.describe EnrollmentPeriod::SpecialEnrollment, :type => :model do
     end
 
     it "should not return true" do
+      census_employee.update_attributes!(employee_role_id: employee_role.id)
+      employee_role.update_attributes!(census_employee_id: census_employee.id)
       initial_application.update_attributes!(aasm_state: 'draft')
-      allow(person).to receive(:active_employee_roles).and_return person.employee_roles
-      allow(family).to receive(:has_primary_active_employee?).and_return true
-      expect(shop_sep.send(:next_poss_effective_date_within_range)).to eq ["No active plan years present"]
+      expect(shop_sep.send(:next_poss_effective_date_within_range)).to eq ["No eligible plan years present"]
     end
   end
 end

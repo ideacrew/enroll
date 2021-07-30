@@ -4,3 +4,14 @@ $('.end_btn input').datepicker({changeMonth: true, changeYear: true}).datepicker
 $('.init_effective_date input').datepicker({changeMonth: true, changeYear: true}).datepicker('setDate', "<%= @effective_on %>");
 $('.kind input').val("<%= @eff_kind %>")
 "<%= @date_options %>" == "true" ? $('.optional_date').show() : $('.optional_date').hide();
+if ("<%= prior_py_sep?(@family, @effective_on, @market_kind) %>" == "true") {
+  $("#coverage_renewal_flag").attr('disabled',false);
+  $('.coverage-renewal-flag').show()
+} else {
+  $("#coverage_renewal_flag").attr('disabled',true);
+  $('.coverage-renewal-flag').hide();
+}
+"<%= prior_py_sep?(@family, @effective_on, @market_kind) %>" == "true"  ? $('.coverage-renewal-flag').show() : $('.coverage-renewal-flag').hide();
+$('#prior_py_sep').val("<%= (::EnrollRegistry.feature_enabled?(:prior_plan_year_ivl_sep) || ::EnrollRegistry.feature_enabled?(:prior_plan_year_shop_sep)) &&
+                             prior_py_sep?(@family, @effective_on, @market_kind)  %>")
+$("#calculated_effective_date").val("<%= @effective_on.to_s %>")

@@ -222,6 +222,10 @@ class QualifyingLifeEventKind
     market_kind == "fehb"
   end
 
+  def shop_market?
+    shop? || fehb?
+  end
+
   def family_structure_changed?
     #["I've had a baby", "I've adopted a child", "I've married", "I've divorced or ended domestic partnership", "I've entered into a legal domestic partnership"].include? title
     %w(birth adoption marriage divorce domestic_partnership).include? reason
