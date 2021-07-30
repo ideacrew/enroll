@@ -7,13 +7,8 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-<<<<<<< HEAD
-  revision: 3138eeccf1029cb8480d366f89805e834737b044
+  revision: efcf9d012578b8a6c2672022f52af8d12fa1f8d3
   branch: release_0.3.0
-=======
-  revision: 1ee402b663075de4fb3adfec893d82740441eedd
-  branch: atp_cv_transform_v2
->>>>>>> data_migration_v1
   specs:
     aca_entities (0.3.0)
       deep_merge
@@ -818,7 +813,7 @@ GEM
       rails (>= 3.2)
       sass-rails (>= 4.0)
     redcarpet (3.4.0)
-    redis (4.3.1)
+    redis (4.4.0)
     redis-actionpack (5.2.0)
       actionpack (>= 5, < 7)
       redis-rack (>= 2.1.0, < 3)
