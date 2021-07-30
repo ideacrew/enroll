@@ -354,7 +354,7 @@ registry:
         is_enabled: true
       - key: :validate_quadrant
         item: :validate_quadrant
-        is_enabled: true
+        is_enabled: false
         settings:
           - key: :exclusions
             item: ["20515"]
