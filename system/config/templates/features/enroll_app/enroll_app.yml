@@ -141,8 +141,6 @@ registry:
             item: "Due to a delay, premiums for some coverage effective dates are not available yet. Please check again soon to see if this information has been updated. You can also contact Customer Service or your broker if you need help."
           - key: :faa_enabled
             item: false
-          - key: :county_fips_code_enabled
-            item: false
           - key: :ivl_responsibility_url
             item: "https://dchealthlink.com/individual-responsibility-requirement"
           - key: :curam_enabled?
@@ -242,6 +240,9 @@ registry:
       - key: :data_seeds_ui
         item: :data_seed_ui
         is_enabled: true
+      - key: :county_fips_code_enabled
+        item: false
+        is_enabled: false
       - key: :rating_area
         item: :rating_area
         is_enabled: false
