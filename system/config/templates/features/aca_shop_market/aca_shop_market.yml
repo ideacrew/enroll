@@ -62,3 +62,5 @@ registry:
         settings:
           - key: :offset_months
             item: 12
+      - key: :admin_shop_end_date_changes
+        is_enabled: true
