@@ -47,7 +47,8 @@
             </div>
             <div class="border-bottom-2px"></div>
             <div class="er-medicaid-prsn">
-              <p><%= l10n("faa.premium_reductions_1") %> <%= number_to_currency(total_aptc_across_eligibility_determinations(params[:id])) %> <%= l10n("faa.premium_reductions_2") %></p>
+              <%= total_aptc_amount =  number_to_currency(total_aptc_across_eligibility_determinations(params[:id])) %>
+              <p><%= l10n("faa.premium_reductions_1", reduction_amount: total_aptc_amount.present? ? total_aptc_amount.to_s : "0") %></p>
 
               <%eligible_applicants(params[:id], :is_ia_eligible).each do |applicant_name| %>
                 <div class="er-prsn mt-15">
@@ -62,10 +63,9 @@
               <% csr_73_87_or_94_applicants = csr_73_87_or_94_eligible_applicants?(params[:id]) %>
               <% if csr_73_87_or_94_applicants.present? %>
                 <p class="mt-10 mb-0">
-                  <%= l10n("faa.qualify_for_lower_costs_1") %>
-                  <%= l10n("faa.silver_plan_checkmark") %>
+                  They also <strong>qualify for lower <%= render partial:"shared/glossary", locals: {key: "Out_of_Pocket_Costs", title: "Out-of-Pocket Costs", term: "out-of-pocket costs" } %></strong> including lower <%= render partial:"shared/glossary", locals: {key: "deductible", title: "annual deductibles", term: "annual deductibles" } %> and lower <%= render partial:"shared/glossary", locals: {key: "copayment", title: "Copayments", term: "copayments" } %>. This <strong>benefit is only available for a silver plan.</strong> To select a <%= render partial:"shared/glossary", locals: {key: "Silver_Health_Plan", title: "Silver Health Plan", term: "Silver Health Plan" } %>, look for a checkmark
                   <i class="fa fa-check-square-o col-green" aria-hidden="true"></i>
-                  <%= l10n("faa.qualify_for_lower_costs_2") %>
+                  next to the plan name.
                 </p>
 
                 <% csr_73_87_or_94_applicants.each do |applicant_name| %>
@@ -223,9 +223,9 @@
           </div>
         <%end%>
 
-        <% if FinancialAssistanceRegistry.feature_enabled?(:fa_send_to_external_verification) &&
-              @application.applicants.pluck(:is_medicaid_chip_eligible).none? &&
-              @application.applicants.pluck(:is_non_magi_medicaid_eligible).none? %>
+          <% if FinancialAssistanceRegistry.feature_enabled?(:fa_send_to_external_verification) &&
+             @application.applicants.pluck(:is_medicaid_chip_eligible).none? &&
+             @application.applicants.pluck(:is_non_magi_medicaid_eligible).none? %>
           <div class="er-medicaid mt-20">
               <div class="er-title">
                 <h3>
