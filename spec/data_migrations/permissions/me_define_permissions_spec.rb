@@ -68,9 +68,9 @@ describe MeDefinePermissions, dbclean: :around_each do
         subject.hbx_admin_can_access_pay_now
         expect(Person.all.to_a.count).to eq(7)
         expect(@hbx_staff_person.hbx_staff_role.permission.can_access_pay_now).to be true
-        expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_access_pay_now).to be true
-        expect(@hbx_csr_tier1_person.hbx_staff_role.permission.can_access_pay_now).to be true
-        expect(@hbx_csr_tier2_person.hbx_staff_role.permission.can_access_pay_now).to be true
+        expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_access_pay_now).to be false
+        expect(@hbx_csr_tier1_person.hbx_staff_role.permission.can_access_pay_now).to be false
+        expect(@hbx_csr_tier2_person.hbx_staff_role.permission.can_access_pay_now).to be false
       end
 
       it "updates can_view_username_and_email to true" do
@@ -639,7 +639,7 @@ describe MeDefinePermissions, dbclean: :around_each do
         expect(@hbx_read_only_person.hbx_staff_role.permission.can_add_sep).to be false
         expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_add_sep).to be true
         #verifying that the rake task updated only the correct subroles
-        expect(Permission.hbx_csr_tier1.can_add_sep).to be false
+        expect(Permission.hbx_csr_tier1.can_add_sep).to be true
         expect(Permission.hbx_csr_tier2.can_add_sep).to be true
         expect(Permission.developer.can_add_sep).to be false
       end
