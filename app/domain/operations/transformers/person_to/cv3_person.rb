@@ -23,7 +23,6 @@ module Operations
         private
 
         def construct_payload(person)
-          puts person.inspect
           payload = {
             hbx_id: person.hbx_id,
             person_name: construct_person_name(person),

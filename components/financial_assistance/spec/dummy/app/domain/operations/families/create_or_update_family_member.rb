@@ -39,7 +39,7 @@ module Operations
       def create_member(applicant_attributes, family)
         applicant_id_mappings = {}
         applicant_params = sanitize_params(applicant_attributes)
-
+        puts "applicant_params #{applicant_params}"
         if applicant_params[:family_member_id].present?
           applicant_id_mappings[applicant_params[:_id]] = {
               family_member_id: applicant_params[:family_member_id],

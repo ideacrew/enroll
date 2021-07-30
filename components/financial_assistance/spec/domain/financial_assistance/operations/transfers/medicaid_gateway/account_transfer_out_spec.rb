@@ -58,7 +58,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
   context 'success' do
     context 'with valid application' do
       before do
-        @result = subject.call({application_id: application.id})
+        @result = subject.call({application_id: application})
       end
 
       it 'should return success' do
@@ -66,7 +66,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
       end
 
       it 'should return success with message' do
-        expect(@result.success).to eq('Successfully published the payload to medicaid_gateway for determination')
+        expect(@result.success).to eq('Successfully published the payload to medicaid_gateway to be transferred out to ACES')
       end
     end
   end

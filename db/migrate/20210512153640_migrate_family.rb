@@ -75,7 +75,7 @@ class MigrateFamily < Mongoid::Migration
         puts "sorting member primary: #{family_member_hash['is_primary_applicant']}"
         create_member(family_member_hash)
       end
-
+      puts "got to this point!"
       @family.save!
     end
 

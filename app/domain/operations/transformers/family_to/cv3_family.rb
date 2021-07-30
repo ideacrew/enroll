@@ -32,15 +32,14 @@ module Operations
             renewal_consent_through_year: family.renewal_consent_through_year,
             special_enrollment_periods: transform_special_enrollment_periods(family.special_enrollment_periods),
             payment_transactions: transform_payment_transactions(family.payment_transactions),
+            magi_medicaid_applications: transform_applications(family.id),
             documents: transform_documents(family.documents),
-            timestamp: {created_at: family.created_at.to_datetime, modified_at: family.updated_at.to_datetime},
+            timestamp: {created_at: family.created_at.to_datetime, modified_at: family.updated_at.to_datetime} # ,
             # foreign_keys TO DO ??
-            magi_medicaid_applications: transform_applications(family.id)
             # general_agency_accounts = transform_general_agency_accounts(family.general_agency_accounts), #TO DO
             # broker_accounts = transform_broker_accounts(family.broker_accounts), #TO DO
             # updated_by: construct_updated_by(updated_by)
           }
-
           Success(payload)
         end
 
@@ -263,7 +262,7 @@ module Operations
         end
 
         def construct_updated_by(updated_by)
-          
+          # To do
         end
 
         def transform_person(person)
