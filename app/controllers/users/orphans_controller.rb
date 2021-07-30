@@ -31,7 +31,7 @@ private
   end
 
   def redirect_if_orphan_accounts_is_disabled
-    redirect_to(main_app.root_path, notice: l10n("orphan_accounts_not_enabled")) if !EnrollRegistry.feature_enabled?(:orphan_accounts_tab)
+    redirect_to(main_app.root_path, notice: l10n("orphan_accounts_not_enabled")) unless EnrollRegistry.feature_enabled?(:orphan_accounts_tab)
   end
 
     # Use callbacks to share common setup or constraints between actions.
