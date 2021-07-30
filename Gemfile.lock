@@ -7,8 +7,8 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: cf8a1c1ab4123140636d1ea783a969572e231800
-  branch: atp_cv_transform_v2
+  revision: 1360f1d961ec32d67d705ee512125be5a1fe861b
+  branch: atp_cv_transform_and_events
   specs:
     aca_entities (0.3.0)
       deep_merge
@@ -1208,4 +1208,4 @@ RUBY VERSION
    ruby 2.5.1p57
 
 BUNDLED WITH
-   2.2.12
+   2.2.16
