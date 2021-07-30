@@ -2,6 +2,7 @@ require File.join(Rails.root, "app", "data_migrations", "permissions", "dc_defin
 
 #All hbx_roles can view families, employers, broker_agencies, brokers and general agencies
 #The convention for a privilege group 'x' is  'modify_x', or view 'view_x'
+#These rakes applies for both sites DC & MA as permissions applies for both sites
 
 namespace :dc_permissions do
   desc 'define the permissions'
