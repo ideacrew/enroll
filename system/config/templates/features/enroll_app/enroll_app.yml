@@ -242,6 +242,9 @@ registry:
       - key: :data_seeds_ui
         item: :data_seed_ui
         is_enabled: true
+      - key: :county_fips_code_enabled
+        item: false
+        is_enabled: false
       - key: :rating_area
         item: :rating_area
         is_enabled: false
