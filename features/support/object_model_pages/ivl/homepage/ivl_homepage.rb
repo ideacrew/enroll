@@ -19,8 +19,12 @@ class IvlHomepage
     '.interaction-click-control-manage-family'
   end
 
+  def self.actions_dropdown
+    '#dropdownMenuButton'
+  end
+
   def self.make_changes_btn
-    '.interaction-click-control-make-changes'
+    '.interaction-click-control-make-changes, .interaction-click-control-make-changes-to-my-coverage'
   end
 
   def self.view_details_btn
@@ -57,5 +61,29 @@ class IvlHomepage
 
   def self.aptc_amount_text
     'APTC amount'
+  end
+
+  def self.actions_dropdwon
+    '#dropdownMenuButton'
+  end
+
+  def self.view_my_coverage_btn
+    '.interaction-click-control-view-my-coverage-details'
+  end
+
+  def self.make_payments_btn
+    '.interaction-click-control-make-payments-for-my-plan'
+  end
+
+  def self.make_payments_btn_glossary
+    '.interaction-click-control-make-payments-for-my-plan .hover-glossary'
+  end
+
+  def self.first_payment
+    '.interaction-click-control-make-a-first-payment-for-my-new-plan'
+  end
+
+  def self.first_payment_glossary
+    '.interaction-click-control-make-a-first-payment-for-my-new-plan .hover-glossary'
   end
 end
