@@ -7,7 +7,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 3138eeccf1029cb8480d366f89805e834737b044
+  revision: efcf9d012578b8a6c2672022f52af8d12fa1f8d3
   branch: release_0.3.0
   specs:
     aca_entities (0.3.0)
@@ -813,7 +813,7 @@ GEM
       rails (>= 3.2)
       sass-rails (>= 4.0)
     redcarpet (3.4.0)
-    redis (4.3.1)
+    redis (4.4.0)
     redis-actionpack (5.2.0)
       actionpack (>= 5, < 7)
       redis-rack (>= 2.1.0, < 3)
