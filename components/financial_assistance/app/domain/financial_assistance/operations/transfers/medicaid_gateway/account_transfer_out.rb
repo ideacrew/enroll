@@ -15,17 +15,17 @@ module FinancialAssistance
           include Dry::Monads[:result, :do]
           include Acapi::Notifiers
 
-          # 
+          # add comment here
           def call(application_id:)
             application           = yield find_application(application_id)
             application           = yield validate(application)
             family                = yield find_family(application)
-            payload_param         = yield construct_payload(family)
+            payload_params        = yield construct_payload(family, application)
             #transformed_payload  = yield transform_payload(payload_param)
             #validated_payload    = yield validate_payload(transformed_payload)
-            #payload              = yield publish(validated_payload)
+            payload              = yield publish(payload_params)
 
-            Success(payload_param) #switch variable as methods done
+            Success(payload) #switch variable as methods done
           end
 
           private
@@ -51,8 +51,10 @@ module FinancialAssistance
             Failure("Unable to find Family with ID #{application.family_id}.")
           end
 
-          def construct_payload(family)
-            ::Operations::Transformers::FamilyTo::Cv3Family.new.call(family)
+          def construct_payload(family, application)
+            family_hash = ::Operations::Transformers::FamilyTo::Cv3Family.new.call(family).value!
+            family_hash[:magi_medicaid_applications] = family_hash[:magi_medicaid_applications].select{ |a| a[:hbx_id] == application.hbx_id }
+            Success(family_hash)
           end
 
           # def transform_payload(payload_value)
@@ -60,7 +62,7 @@ module FinancialAssistance
           # end
 
           # def validate_payload(payload)
-            # validate transformed against atp cv3 (same things with schema validation etc.)?
+            # validate transformed against atp cv3
             # This may be built into the transforms and/or on the MG side, in which case don't need to do it twice and this can come out!
           # end
 
