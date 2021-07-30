@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # TODO: need to get this change verified by Trey
-if (!Rails.env.production? || ENV['RABBITMQ_URL'].present?)
+if !Rails.env.production? || ENV['RABBITMQ_URL'].present?
 
   EventSource.configure do |config|
     config.protocols = %w[amqp http]
