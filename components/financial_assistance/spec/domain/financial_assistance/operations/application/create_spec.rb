@@ -23,7 +23,7 @@ RSpec.describe ::FinancialAssistance::Operations::Application::Create, dbclean: 
          :indian_tribe_member => false,
          :is_incarcerated => true,
          :addresses =>
-          [{"address_2" => "#123", "address_3" => "", "county" => "Hampden", "country_name" => "", "kind" => "home", "address_1" => "1123 Awesome Street NE", "city" => "Washington", "state" => "DC", "zip" => "01001"}.merge(quadrant: "SE") if FinancialAssistanceRegistry.feature_enabled?(:validate_quadrant),
+          [{"address_2" => "#123", "address_3" => "", "county" => "Hampden", "country_name" => "", "kind" => "home", "address_1" => "1123 Awesome Street NE", "city" => "Washington", "state" => "DC", "zip" => "01001"}.merge(quadrant: "SE") if FinancialAssistanceRegistry.feature_enabled?(:validate_quadrant)],
            {"address_2" => "#124", "address_3" => "", "county" => "Hampden", "country_name" => "", "kind" => "home", "address_1" => "1124 Awesome Street NE", "city" => "Washington", "state" => "DC", "zip" => "01001"}.merge(quadrant: "SE") if FinancialAssistanceRegistry.feature_enabled?(:validate_quadrant)],
          :phones =>
           [{"country_code" => "", "area_code" => "202", "number" => "1111123", "extension" => "13", "full_phone_number" => "202111112313", "kind" => "home"},
