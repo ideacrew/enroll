@@ -23,8 +23,8 @@ RSpec.describe ::FinancialAssistance::Operations::Application::Create, dbclean: 
          :indian_tribe_member => false,
          :is_incarcerated => true,
          :addresses =>
-          [{"address_2" => "#123", "address_3" => "", "county" => "Hampden", "country_name" => "", "kind" => "home", "address_1" => "1123 Awesome Street NE", "city" => "Washington", "state" => "DC", "zip" => "01001"}.merge(quadrant: "SE") if FinancialAssistanceRegistry.feature_enabled?(:validate_quadrant)],
-           {"address_2" => "#124", "address_3" => "", "county" => "Hampden", "country_name" => "", "kind" => "home", "address_1" => "1124 Awesome Street NE", "city" => "Washington", "state" => "DC", "zip" => "01001"}.merge(quadrant: "SE") if FinancialAssistanceRegistry.feature_enabled?(:validate_quadrant)],
+          [{"address_2" => "#123", "address_3" => "", "county" => "Hampden", "country_name" => "", "kind" => "home", "address_1" => "1123 Awesome Street NE", "city" => "Washington", "state" => "DC", "zip" => "01001"},
+           {"address_2" => "#124", "address_3" => "", "county" => "Hampden", "country_name" => "", "kind" => "home", "address_1" => "1124 Awesome Street NE", "city" => "Washington", "state" => "DC", "zip" => "01001"}],
          :phones =>
           [{"country_code" => "", "area_code" => "202", "number" => "1111123", "extension" => "13", "full_phone_number" => "202111112313", "kind" => "home"},
            {"country_code" => "", "area_code" => "202", "number" => "1111124", "extension" => "14", "full_phone_number" => "202111112414", "kind" => "home"}],
@@ -47,8 +47,8 @@ RSpec.describe ::FinancialAssistance::Operations::Application::Create, dbclean: 
          :indian_tribe_member => false,
          :is_incarcerated => false,
          :addresses =>
-          [{"address_2" => "#125", "address_3" => "", "county" => "Hampden", "country_name" => "", "kind" => "home", "address_1" => "1125 Awesome Street", "city" => "Washington", "state" => "DC", "zip" => "01001"}.merge(quadrant: "SE") if FinancialAssistanceRegistry.feature_enabled?(:validate_quadrant)],
-           {"address_2" => "#126", "address_3" => "", "county" => "Hampden", "country_name" => "", "kind" => "home", "address_1" => "1126 Awesome Street", "city" => "Washington", "state" => "DC", "zip" => "01001"}.merge(quadrant: "SE") if FinancialAssistanceRegistry.feature_enabled?(:validate_quadrant)],
+          [{"address_2" => "#125", "address_3" => "", "county" => "Hampden", "country_name" => "", "kind" => "home", "address_1" => "1125 Awesome Street", "city" => "Washington", "state" => "DC", "zip" => "01001"},
+           {"address_2" => "#126", "address_3" => "", "county" => "Hampden", "country_name" => "", "kind" => "home", "address_1" => "1126 Awesome Street", "city" => "Washington", "state" => "DC", "zip" => "01001"}],
          :phones =>
           [{"country_code" => "", "area_code" => "202", "number" => "1111125", "extension" => "15", "full_phone_number" => "202111112515", "kind" => "home"},
            {"country_code" => "", "area_code" => "202", "number" => "1111126", "extension" => "16", "full_phone_number" => "202111112616", "kind" => "home"}],
@@ -59,7 +59,16 @@ RSpec.describe ::FinancialAssistance::Operations::Application::Create, dbclean: 
          :relationship => "child"}]}
   end
 
-  let(:result) { subject.call(params: params) }
+  let(:result) do
+    if FinancialAssistanceRegistry.feature_enabled?(:validate_quadrant)
+      params[:applicants].each do |applicant_hash|
+        applicant_hash[:addresses].each do |address_hash|
+          address_hash.merge!(quadrant: "se")
+        end
+      end
+    end
+    subject.call(params: params)
+  end
   let(:application) { FinancialAssistance::Application.find(result.success) }
 
   it 'exports payload successfully' do
