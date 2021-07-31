@@ -14,6 +14,7 @@ module FinancialAssistance
       attribute :state, Types::String.optional
       attribute :zip, Types::String.optional
       attribute :country_name, Types::String.optional.meta(omittable: true)
+      attribute :quadrant, Types::String.optional
 
     end
   end
