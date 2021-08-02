@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-Given(/aca individual market feature is enabled?/) do
-  enable_feature(:non_aca_individual_market_feature)
+Given(/no transition families feature is enabled?/) do
+  enable_feature(:no_transition_families)
 end
 
-Given(/non aca individual market feature is disabled?/) do
-  disable_feature(:non_aca_individual_market_feature)
+Given(/no transition families feature is disabled?/) do
+  disable_feature(:no_transition_families)
 end
 
 And(/^the user clicks the Families tab$/) do
