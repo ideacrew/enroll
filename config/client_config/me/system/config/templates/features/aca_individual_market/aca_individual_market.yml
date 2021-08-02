@@ -53,3 +53,31 @@ registry:
                     "Other (With Alien Number)", "Other (With I-94 Number)" ]
       - key: :indian_alaskan_tribe_details
         is_enabled: false
+      - key: :state_resident_application
+        is_enabled: true
+      - key: :individual_verification_due_days
+        is_enabled: true
+        item: 95
+      - key: :transition_family_members_link
+        is_enabled: true
+      - key: :verification_outstanding_window
+        is_enabled: true
+        item: 0
+      - key: :upcoming_open_enrollment_start_on
+        is_enabled: true
+        settings:
+          - key: :month
+            item: 11
+          - key: :day
+            item: 1
+          - key: :year
+            item: 2021
+      - key: :upcoming_open_enrollment_end_on
+        is_enabled: true
+        settings: 
+          - key: :month
+            item: 1
+          - key: :day
+            item: 31
+          - key: :year
+            item: 2022
