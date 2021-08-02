@@ -106,7 +106,7 @@ module Config::AcaHelper
   end
 
   def aca_individual_market_feature_is_enabled?
-    EnrollRegistry.feature_enabled?(:non_aca_individual_market_feature)
+    EnrollRegistry.feature_enabled?(:no_transition_families)
   end
 
   def self_attest_residency_enabled?
