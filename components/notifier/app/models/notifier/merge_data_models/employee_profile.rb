@@ -47,7 +47,7 @@ module Notifier
         employer_name: 'Whitmore, Inc',
         email: 'johnwhitmore@yahoo.com',
         ivl_oe_start_date: start_on_date,
-        ivl_oe_end_date: Settings.aca.individual_market.upcoming_open_enrollment.end_on,
+        ivl_oe_end_date: end_on_date,
         # coverage_begin_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
         date_of_hire: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
         termination_of_employment: TimeKeeper.date_of_record.prev_day.strftime('%m/%d/%Y'),
