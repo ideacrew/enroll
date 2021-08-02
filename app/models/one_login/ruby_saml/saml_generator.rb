@@ -32,8 +32,8 @@ module OneLogin
         @hbx_enrollment = hbx_enrollment
 
         if Rails.env.production?
-          @private_key = OpenSSL::PKey::RSA.new(File.read(SamlInformation.kp_pay_now_private_key_location))
-          @cert = OpenSSL::X509::Certificate.new(File.read(SamlInformation.kp_pay_now_x509_cert_location))
+          @private_key = OpenSSL::PKey::RSA.new(File.read(SamlInformation.pay_now_private_key_location))
+          @cert = OpenSSL::X509::Certificate.new(File.read(SamlInformation.pay_now_x509_cert_location))
         else
           @private_key = OpenSSL::PKey::RSA.new(File.read(Rails.root.join('spec', 'test_data').to_s + '/test_wfpk.pem'))
           @cert = OpenSSL::X509::Certificate.new(File.read(Rails.root.join('spec', 'test_data').to_s + '/test_x509.pem'))
@@ -50,14 +50,14 @@ module OneLogin
 
         root = response_doc.add_element 'samlp:Response', { 'xmlns:samlp' => PROTOCOL }
         root.attributes['ID'] = "_#{generate_uuid}"
-        # root.attributes['Issuer'] = SamlInformation.kp_pay_now_issuer
+        # root.attributes['Issuer'] = SamlInformation.pay_now_issuer
         root.attributes['IssueInstant'] = time
         root.attributes['Version'] = '2.0'
         root.attributes['Destination'] = SamlInformation.kp_pay_now_url
 
         issuer = root.add_element 'saml:Issuer', { 'xmlns:saml' => ASSERTION }
         #issuer.attributes['Format'] = NAME_ID_FORMAT
-        issuer.text = SamlInformation.kp_pay_now_issuer
+        issuer.text = SamlInformation.pay_now_issuer
 
         # add success message
         status = root.add_element 'samlp:Status'
@@ -73,7 +73,7 @@ module OneLogin
         assertion.attributes['Version'] = '2.0'
 
         issuer = assertion.add_element 'saml:Issuer' #, { 'Format' => NAME_ID_FORMAT }
-        issuer.text = SamlInformation.kp_pay_now_issuer
+        issuer.text = SamlInformation.pay_now_issuer
 
         # subject
         subject = assertion.add_element 'saml:Subject'
@@ -90,7 +90,7 @@ module OneLogin
         conditions = assertion.add_element 'saml:Conditions', { 'NotBefore' => not_before.to_s,  'NotOnOrAfter' => not_on_or_after_condition.to_s }
         audience_restriction = conditions.add_element 'saml:AudienceRestriction'
         audience = audience_restriction.add_element 'saml:Audience'
-        audience.text = SamlInformation.kp_pay_now_audience
+        audience.text = SamlInformation.send("#{hbx_enrollment.product.issuer_profile.legal_name}_pay_now_audience")
 
         # auth statements
         auth_statement = assertion.add_element 'saml:AuthnStatement', { 'AuthnInstant' => "#{now_iso}",  'SessionIndex' => "_#{generate_uuid}", 'SessionNotOnOrAfter' => "#{not_on_or_after_condition}" }
