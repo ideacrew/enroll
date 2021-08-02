@@ -109,6 +109,10 @@ module Config::AcaHelper
     EnrollRegistry.feature_enabled?(:no_transition_families)
   end
 
+  def medicaid_tax_credits_link_is_enabled?
+    EnrollRegistry.feature_enabled?(:medicaid_tax_credits_link)
+  end
+
   def self_attest_residency_enabled?
     ::EnrollRegistry.feature_enabled?(:residency_self_attestation) && ::EnrollRegistry[:residency_self_attestation].setting(:effective_period).item.cover?(TimeKeeper.date_of_record)
   end
