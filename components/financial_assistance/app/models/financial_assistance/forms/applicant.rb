@@ -112,6 +112,13 @@ module FinancialAssistance
         end
       end
 
+      # rubocop:disable Metrics/CyclomaticComplexity
+      def update_relationship_and_relative_relationship(relationship)
+        self&.applicant&.relationships&.last&.update_attributes(kind: relationship)
+        self&.applicant&.relationships&.last&.relative&.relationships&.where(relative_id: self.applicant.id)&.first&.update_attributes(kind: FinancialAssistance::Relationship::INVERSE_MAP[relationship])
+      end
+      # rubocop:enable Metrics/CyclomaticComplexity
+
       def extract_applicant_params
         assign_citizen_status
 
@@ -137,6 +144,10 @@ module FinancialAssistance
           is_temporarily_out_of_state: is_temporarily_out_of_state,
           immigration_doc_statuses: immigration_doc_statuses.to_a.reject(&:blank?)
         }#.reject{|_k, val| val.nil?}
+
+        # This will update both the relationship being passed through,
+        # and the corresponding relative inverse relationship
+        update_relationship_and_relative_relationship(relationship) if relationship
 
         if same_with_primary == 'true'
           primary = application.primary_applicant
