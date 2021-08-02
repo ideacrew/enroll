@@ -20,18 +20,6 @@ Given(/inbox feature is enabled?/) do
   enable_feature(:inbox_tab)
 end
 
-Given(/inbox feature is disabled?/) do
-  disable_feature(:inbox_tab)
-end
-
-Then(/^they should see the Inbox tab$/) do
-  expect(page).to have_content("Inbox")
-end
-
-Then(/^they should not see the Inbox tab$/) do
-  expect(page).to_not have_content("Inbox")
-end
-
 Given(/notices feature is enabled?/) do
   enable_feature(:notices_tab)
 end
@@ -48,11 +36,23 @@ Then(/^they should not see the Notices tab$/) do
   expect(page).to_not have_content("Notices")
 end
 
-Given(/calendar feature is enabled?/) do
+Given(/inbox feature is disabled?/) do
+  disable_feature(:inbox_tab)
+end
+
+Then(/^they should see the Inbox tab$/) do
+  expect(page).to have_content("Inbox")
+end
+
+Then(/^they should not see the Inbox tab$/) do
+  expect(page).to_not have_content("Inbox")
+end
+
+And(/calendar feature is enabled?/) do
   enable_feature(:calendar_tab)
 end
 
-Given(/calendar feature is disabled?/) do
+And(/calendar feature is disabled?/) do
   disable_feature(:calendar_tab)
 end
 
@@ -64,8 +64,47 @@ Then(/^they should not see the Calendar tab$/) do
   expect(page).to_not have_content("Calendar")
 end
 
-Given(/staff feature is enabled?/) do
+When(/^the user types in the calendar URL$/) do
+  visit "/exchanges/scheduled_events"
+end
+
+Then(/^the user will not be able to access calendar page$/) do
+  expect(page).to_not have_content("Create Event")
+  expect(page).to have_content(l10n("calendar_not_enabled"))
+end
+
+Then(/^the user will be able to access calendar page$/) do
+  expect(page).to have_content("Create Event")
+end
+
+And(/staff feature is enabled?/) do
   enable_feature(:staff_tab)
+end
+
+When(/^the user types in the staff index URL$/) do
+  visit "/exchanges/hbx_profiles/staff_index"
+end
+
+Then(/^the user will not be able to access staff index page$/) do
+  expect(page).to_not have_content("CSR, CAC and Assisters")
+  expect(page).to have_content(l10n("staff_index_not_enabled"))
+end
+
+Then(/^the user will be able to access staff index page$/) do
+  expect(page).to have_content("CSR, CAC and Assisters")
+end
+
+When(/^the user types in the orphan accounts URL$/) do
+  visit "/users/orphans"
+end
+
+Then(/^the user will not be able to access orphan accounts page$/) do
+  expect(page).to_not have_content("Orphan User Accounts")
+  expect(page).to have_content(l10n("orphan_accounts_not_enabled"))
+end
+
+Then(/^the user will be able to access orphan accounts page$/) do
+  expect(page).to have_content("Orphan User Accounts")
 end
 
 Given(/staff feature is disabled?/) do

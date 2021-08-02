@@ -123,7 +123,7 @@ And(/the individual enters address information$/) do
   fill_in IvlPersonalInformation.address_line_two, :with => "212"
   fill_in IvlPersonalInformation.city, :with => EnrollRegistry[:enroll_app].setting(:contact_center_city).item
   find_all(IvlPersonalInformation.select_state_dropdown).first.click
-  find(:xpath, "//li[contains(., '#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item}')]").click
+  find_all(:xpath, "//li[contains(., '#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item}')]").last.click
   fill_in IvlPersonalInformation.zip, :with => EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item
 end
 

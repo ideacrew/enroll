@@ -253,6 +253,9 @@ module FinancialAssistance
     field :csr_percent_as_integer, type: Integer, default: 0  #values in DC: 0, 73, 87, 94
     field :csr_eligibility_kind, type: String, default: 'csr_0'
 
+    field :csr_percent_as_integer, type: Integer, default: 0  #values in DC: 0, 73, 87, 94
+    field :csr_eligibility_kind, type: String, default: 'csr_0'
+
     # if eligible immigration status
     field :medicaid_chip_ineligible, type: Boolean
     field :immigration_status_changed, type: Boolean

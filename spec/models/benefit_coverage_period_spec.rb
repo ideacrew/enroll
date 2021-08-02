@@ -412,7 +412,8 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
       end
 
       it 'should return csr limited plans' do
-        benefit_packages = benefit_coverage_period.fetch_benefit_packages(true)
+        benefit_packages = benefit_coverage_period.fetch_benefit_packages(true, 'csr_limited')
+
         expect(benefit_packages).to eq [benefit_package3]
       end
     end
