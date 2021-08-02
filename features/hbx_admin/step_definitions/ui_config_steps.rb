@@ -65,19 +65,6 @@ And(/staff feature is enabled?/) do
   enable_feature(:staff_tab)
 end
 
-And(/staff feature is disabled?/) do
-  disable_feature(:staff_tab)
-end
-
-Then(/^they should see the Staff tab$/) do
-  expect(page).to have_content("Staff")
-end
-
-
-Then(/^they should not see the Staff tab$/) do
-  expect(page).to_not have_content("Staff")
-end
-
 When(/^the user types in the staff index URL$/) do
   visit "/exchanges/hbx_profiles/staff_index"
 end
@@ -91,22 +78,6 @@ Then(/^the user will be able to access staff index page$/) do
   expect(page).to have_content("CSR, CAC and Assisters")
 end
 
-And(/orphan accounts feature is enabled?/) do
-  enable_feature(:orphan_accounts_tab)
-end
-
-And(/orphan accounts feature is disabled?/) do
-  disable_feature(:orphan_accounts_tab)
-end
-
-Then(/^they should see the Orphan Accounts tab$/) do
-  expect(page).to have_content("Orphan Accounts")
-end
-
-Then(/^they should not see the Orphan Accounts tab$/) do
-  expect(page).to_not have_content("Orphan Accounts")
-end
-
 When(/^the user types in the orphan accounts URL$/) do
   visit "/users/orphans"
 end
@@ -118,10 +89,6 @@ end
 
 Then(/^the user will be able to access orphan accounts page$/) do
   expect(page).to have_content("Orphan User Accounts")
-end
-
-And(/^the user clicks the Admin tab$/) do
-  page.find('.dropdown-toggle', text: 'Admin').click
 end
 
 Given(/staff feature is disabled?/) do
