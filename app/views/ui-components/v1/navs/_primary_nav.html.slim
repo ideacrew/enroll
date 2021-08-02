@@ -19,8 +19,9 @@
                 = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {tab_name: 'new-consumer-application', link_path: main_app.begin_consumer_enrollment_exchanges_agents_path(original_application_type: 'phone'), display_name: 'New Consumer Application', active_tab: "new-consumer-application", remote: false, pundit_object: ConsumerRole, pundit_method: :access_new_consumer_application_sub_tab?}
               li
                 = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {tab_name: 'identity_verification', link_path: main_app.identity_verification_exchanges_hbx_profiles_path, display_name: 'Identity Verification', active_tab: "identity_verification", remote: false, pundit_object: HbxProfile, pundit_method: :access_identity_verification_sub_tab?}
-              li
-                = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {tab_name: 'dc-resident-application', link_path: main_app.begin_resident_enrollment_exchanges_residents_path(original_application_type: 'paper'), display_name: "#{EnrollRegistry[:enroll_app].settings(:site_key).item.upcase} Resident Application", active_tab: "dc-resident-application", remote: false, pundit_object: ResidentRole, pundit_method: :begin_resident_enrollment?}
+              - if EnrollRegistry.feature_enabled?(:aca_individual_market_feature)
+                li
+                 = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {tab_name: 'dc-resident-application', link_path: main_app.begin_resident_enrollment_exchanges_residents_path(original_application_type: 'paper'), display_name: "#{EnrollRegistry[:enroll_app].settings(:site_key).item.upcase} Resident Application", active_tab: "dc-resident-application", remote: false, pundit_object: ResidentRole, pundit_method: :begin_resident_enrollment?}
 
           - if ::EnrollRegistry[:aca_shop_market].enabled?
             li role="presentation"
