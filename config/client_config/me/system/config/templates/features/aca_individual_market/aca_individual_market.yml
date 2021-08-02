@@ -63,6 +63,24 @@ registry:
       - key: :verification_outstanding_window
         is_enabled: true
         item: 0
+      - key: :open_enrollment_start_on
+        is_enabled: true
+        settings:
+          - key: :month
+            item: 11
+          - key: :day
+            item: 1
+          - key: :year
+            item: 2020
+      - key: :open_enrollment_end_on
+        is_enabled: true
+        settings:
+          - key: :month
+            item: 1
+          - key: :day
+            item: 31
+          - key: :year
+            item: 2022
       - key: :upcoming_open_enrollment_start_on
         is_enabled: true
         settings:

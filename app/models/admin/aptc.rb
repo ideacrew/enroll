@@ -480,7 +480,7 @@ class Admin::Aptc < ApplicationController
     def years_with_tax_household(family)
       year_set = family.active_household.tax_households.map(&:effective_starting_on).map(&:year)
       current_hbx = HbxProfile.current_hbx
-      oe_start_year = EnrollRegistry[:upcoming_open_enrollment_start_on].settings(:year).item
+      oe_start_year = EnrollRegistry[:open_enrollment_start_on].settings(:year).item
       current_year = TimeKeeper.date_of_record.year
 
       if current_hbx && current_hbx.under_open_enrollment? && oe_start_year == current_year
