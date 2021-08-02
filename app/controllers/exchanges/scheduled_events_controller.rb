@@ -2,6 +2,7 @@ class Exchanges::ScheduledEventsController < ApplicationController
   layout "single_column"
 
   before_action :scheduled_event_params, only: [:create, :update]
+  before_action :redirect_if_calendar_tab_is_disabled
 
   def new
     @scheduled_event = ScheduledEvent.new
@@ -96,6 +97,10 @@ class Exchanges::ScheduledEventsController < ApplicationController
   private
 
     helper_method :scheduled_event, :scheduled_events
+
+  def redirect_if_calendar_tab_is_disabled
+    redirect_to(main_app.root_path, notice: l10n("calendar_not_enabled")) unless EnrollRegistry.feature_enabled?(:calendar_tab)
+  end
 
     def load_calendar_events
       scheduled_events.flat_map do |e|
