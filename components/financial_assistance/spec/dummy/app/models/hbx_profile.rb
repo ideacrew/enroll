@@ -124,7 +124,7 @@ class HbxProfile
   CallCenterPhoneNumber = "1-855-532-5465"
   ShortName = "DC Health Link"
 
-  IndividualEnrollmentDueDayOfMonth = Settings.aca.individual_market.monthly_enrollment_due_on
+  IndividualEnrollmentDueDayOfMonth = EnrollRegistry[:special_enrollment_period].setting(:fifteenth_of_the_month).item
 
 
   ShopOpenEnrollmentBeginDueDayOfMonth = Settings.aca.shop_market.open_enrollment.monthly_end_on - Settings.aca.shop_market.open_enrollment.minimum_length.days

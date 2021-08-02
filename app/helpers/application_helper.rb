@@ -808,7 +808,7 @@ module ApplicationHelper
   end
 
   def resident_application_enabled?
-    if Settings.aca.individual_market.dc_resident_application
+    if EnrollRegistry.feature_enabled?(:state_resident_application)
       policy(:family).hbx_super_admin_visible?
     else
       false
@@ -823,7 +823,7 @@ module ApplicationHelper
   end
 
   def transition_family_members_link_type row, allow
-    if Settings.aca.individual_market.transition_family_members_link
+    if EnrollRegistry.feature_enabled?(:transition_family_members_link)
       allow && row.primary_applicant.person.has_consumer_or_resident_role? ? 'ajax' : 'disabled'
     else
       "disabled"

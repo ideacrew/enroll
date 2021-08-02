@@ -134,7 +134,7 @@ class IvlNotices::EnrollmentNoticeBuilderWithDateRange < IvlNotice
   def update_individual_due_date(person, date)
     person.consumer_role.types_include_to_notices.each do |verification_type|
       unless verification_type.due_date
-        verification_type.update_attributes(due_date: (date + Settings.aca.individual_market.verification_due.days), due_date_type: "notice")
+        verification_type.update_attributes(due_date: (date + EnrollRegistry[:individual_verification_due_days].item), due_date_type: "notice")
         person.consumer_role.save!
       end
     end

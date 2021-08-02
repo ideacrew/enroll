@@ -228,8 +228,8 @@ class InsuredEligibleForBenefitRule
   private
 
   def is_verification_satisfied?
-    return true if Settings.aca.individual_market.verification_outstanding_window.days == 0
-    !(@role.lawful_presence_determination.aasm_state == "verification_outstanding" && !@role.lawful_presence_determination.latest_denial_date.try(:+, Settings.aca.individual_market.verification_outstanding_window.days).try(:>, TimeKeeper.date_of_record))
+    return true if EnrollRegistry[:verification_outstanding_window].item == 0
+    !(@role.lawful_presence_determination.aasm_state == "verification_outstanding" && !@role.lawful_presence_determination.latest_denial_date.try(:+, EnrollRegistry[:verification_outstanding_window].item).try(:>, TimeKeeper.date_of_record))
   end
 
   def is_person_vlp_verified?

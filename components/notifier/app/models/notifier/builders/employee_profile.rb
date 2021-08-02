@@ -58,11 +58,19 @@ module Notifier
     end
 
     def ivl_oe_start_date
-      merge_model.ivl_oe_start_date = format_date(Settings.aca.individual_market.upcoming_open_enrollment.start_on)
+      month = EnrollRegistry[:upcoming_open_enrollment_start_on].settings(:month).item
+      day = EnrollRegistry[:upcoming_open_enrollment_start_on].settings(:day).item
+      year = EnrollRegistry[:upcoming_open_enrollment_start_on].settings(:year).item
+      date = Date.new(year,month,day)
+      merge_model.ivl_oe_start_date = format_date(date)
     end
 
     def ivl_oe_end_date
-      merge_model.ivl_oe_end_date = format_date(Settings.aca.individual_market.upcoming_open_enrollment.end_on)
+      month = EnrollRegistry[:upcoming_open_enrollment_end_on].settings(:month).item
+      day = EnrollRegistry[:upcoming_open_enrollment_end_on].settings(:day).item
+      year = EnrollRegistry[:upcoming_open_enrollment_end_on].settings(:year).item
+      date = Date.new(year,month,day)
+      merge_model.ivl_oe_end_date = format_date(date)
     end
 
     def email
