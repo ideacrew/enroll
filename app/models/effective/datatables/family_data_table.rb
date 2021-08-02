@@ -62,13 +62,12 @@ module Effective
                           ['Edit APTC / CSR', edit_aptc_csr_path(family_id: row.id, person_id: row.primary_applicant.person.id),
                            aptc_csr_link_type(row, pundit_allow(Family, :can_update_ssn?))],
                           ['Paper', resume_enrollment_exchanges_agents_path(person_id: row.primary_applicant.person.id, original_application_type: 'paper'), 'static'],
-                          ['Phone', resume_enrollment_exchanges_agents_path(person_id: row.primary_applicant.person.id, original_application_type: 'phone'), 'static'],
-                          ['Transition Family Members', transition_family_members_insured_families_path(family: row.id, family_actions_id: "family_actions_#{row.id}"),
-                           transition_family_members_link_type(row, pundit_allow(Family, :can_transition_family_members?)) ? 'ajax' : 'disabled']
+                          ['Phone', resume_enrollment_exchanges_agents_path(person_id: row.primary_applicant.person.id, original_application_type: 'phone'), 'static']
                         ]
                       end
 
-          dropdown.last.pop unless aca_individual_market_feature_is_enabled?
+          dropdown << ['Transition Family Members', transition_family_members_insured_families_path(family: row.id, family_actions_id: "family_actions_#{row.id}"),
+            transition_family_members_link_type(row, pundit_allow(Family, :can_transition_family_members?)) ? 'ajax' : 'disabled']if aca_individual_market_feature_is_enabled?
 
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "family_actions_#{row.id}"}, formats: :html
         }, :filter => false, :sortable => false
