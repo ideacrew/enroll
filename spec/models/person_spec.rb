@@ -441,49 +441,6 @@ describe Person, :dbclean => :after_each do
         end
       end
 
-      if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
-        context "consumer fields validation" do
-          let(:params) {valid_params}
-          let(:person) { Person.new(**params) }
-          let!(:consumer_role) { FactoryBot.create(:consumer_role, citizen_status: nil)}
-          errors = { citizenship: "Citizenship status is required.",
-                     naturalized: "Naturalized citizen is required.",
-                     immigration: "Eligible immigration status is required.",
-                     native: "American Indian / Alaska Native status is required.",
-                     tribal_id_presence: "Tribal id is required when native american / alaska native is selected",
-                     tribal_state: "Tribal state is required when native american / alaska native is selected",
-                     tribal_name: "Tribal name is required when native american / alaska native is selected",
-                     incarceration: "Incarceration status is required." }
-
-          shared_examples_for "validate consumer_fields_validations private" do |citizenship, naturalized, immigration_status, native, tribal_state, tribal_name, incarceration, is_valid, error_list|
-            before do
-              allow(person).to receive(:consumer_role).and_return consumer_role
-              person.instance_variable_set(:@is_consumer_role, true)
-              person.instance_variable_set(:@indian_tribe_member, native)
-              person.instance_variable_set(:@us_citizen, citizenship)
-              person.instance_variable_set(:@eligible_immigration_status, immigration_status)
-              person.instance_variable_set(:@naturalized_citizen, naturalized)
-              person.instance_variable_set(:@tribal_state, tribal_state)
-              person.instance_variable_set(:@tribal_name, tribal_name)
-              person.is_incarcerated = incarceration
-              person.valid?
-            end
-
-           it "#{is_valid ? 'pass' : 'fails'} validation" do
-              expect(person.valid?).to eq is_valid
-            end
-
-            it "#{is_valid ? 'does not raise' : 'raises'} the errors  with  errors" do
-              expect(person.errors[:base].count).to eq error_list.count
-              expect(person.errors[:base]).to eq error_list
-            end
-          end
-
-          it_behaves_like "validate consumer_fields_validations private", true, true, false, true, "ME", "test", false, false, [errors[:tribal_state], errors[:tribal_name]]
-        end
-      end
-      #rubocop:enable Metrics/ParameterLists
-
       if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         context 'consumer fields validation - applying for coverage false' do
           let(:params) {valid_params}

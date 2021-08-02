@@ -158,8 +158,6 @@ class BenefitCoveragePeriod
     subcriber = hbx_enrollment_members.detect(&:is_subscriber)
     family_members = hbx_enrollment_members.map(&:family_member)
     american_indian_members = extract_american_indian_status(hbx_enrollment, shopping_family_member_ids)
-    ivl_bgs = get_benefit_packages({family_members: family_members, coverage_kind: coverage_kind, family: hbx_enrollment.family, american_indian_members: american_indian_members,
-                                    effective_on: hbx_enrollment.effective_on, market: market, shopping_family_members_ids:  shopping_family_member_ids}).uniq
     csr_kind = if tax_household
                  extract_csr_kind(tax_household, shopping_family_member_ids)
                elsif american_indian_members && FinancialAssistanceRegistry.feature_enabled?(:native_american_csr)
