@@ -12,6 +12,11 @@ module FinancialAssistance
         # @param [ Date ] application_date Application Created Date
         # @return [ Date ] earliest_effective_date Application Earliest Effective Date
         def call(application_date: TimeKeeper.date_of_record)
+          application_date = if FinancialAssistanceRegistry[:enrollment_dates].settings(:custom_enrollment_date_year).item.present?
+                               FinancialAssistanceRegistry[:enrollment_dates].settings(:custom_enrollment_date_year).item
+                             else
+                               application_date
+                             end
           earliest_effective_date = yield calculate(application_date)
 
           Success(earliest_effective_date)
@@ -24,10 +29,10 @@ module FinancialAssistance
           enrollment_start_on_year = new_year_effective_date(application_date)
 
           application_year = if application_date >= enrollment_start_on_year && calender_year == enrollment_start_on_year.year
-            calender_year + 1
-          else
-            calender_year
-          end
+                               calender_year + 1
+                             else
+                               calender_year
+                             end
 
           Success(application_year)
         end

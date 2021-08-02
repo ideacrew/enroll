@@ -31,6 +31,9 @@ registry:
           - key: :application_year
             item: FinancialAssistance::Operations::EnrollmentDates::ApplicationYear
             is_enabled: true
+          - key: :custom_enrollment_date_year # Seems to be for testing only in application_year.rb
+            is_enabled: false
+            item: ''
       - key: :benchmark_plans
         item: :benchmark_plans
         is_enabled: true
