@@ -6,6 +6,7 @@ class Exchanges::ResidentsController < ApplicationController
 
   before_action :find_resident_role, only: [:edit, :update]
   before_action :authorize_user
+  before_action :redirect_if_aca_individual_market_feature_is_disabled, only: [:search]
 
   def index
     @resident_enrollments = Person.where(:resident_enrollment_id.nin =>  ['', nil]).map(&:resident_enrollment)
@@ -168,6 +169,10 @@ class Exchanges::ResidentsController < ApplicationController
       format.html { redirect_to destroy_user_session_path }
       format.js   { redirect_to destroy_user_session_path }
     end
+  end
+
+  def redirect_if_aca_individual_market_feature_is_disabled
+    redirect_to(main_app.root_path, notice: l10n("resident_application_link_is_disabled")) unless EnrollRegistry.feature_enabled?(:aca_individual_market_feature)
   end
 
   def authorize_user
