@@ -9,3 +9,5 @@ registry:
         is_enabled: true
       - key: :vlp_h92
         is_enabled: false
+      - key: :ssa_h3
+        is_enabled: false
