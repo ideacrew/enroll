@@ -459,7 +459,7 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def pay_now_url(issuer_name)
-    return SamlInformation.send("#{issuer_name}_pay_now") if issuer_name.present?
+    return SamlInformation.send("#{issuer_name}_pay_now_url") if issuer_name.present?
     "https://"
   end
 
