@@ -79,14 +79,17 @@ module Notifier
     end
 
     def ivl_oe_start_date_value
-      Settings.aca.individual_market.open_enrollment.start_on.strftime('%B %d, %Y')
+      start_on_month = EnrollRegistry[:upcoming_open_enrollment_start_on].settings(:month).item
+      start_on_day = EnrollRegistry[:upcoming_open_enrollment_start_on].settings(:day).item
+      start_on_year = EnrollRegistry[:upcoming_open_enrollment_start_on].settings(:year).item
+      Date.new(start_on_year,start_on_month,start_on_day)
     end
 
     def ivl_oe_end_date_value
-      Settings.aca
-              .individual_market
-              .open_enrollment
-              .end_on.strftime('%B %d, %Y')
+      end_on_month = EnrollRegistry[:upcoming_open_enrollment_end_on].settings(:month).item
+      end_on_day = EnrollRegistry[:upcoming_open_enrollment_end_on].settings(:day).item
+      end_on_year = EnrollRegistry[:upcoming_open_enrollment_end_on].settings(:year).item
+      Date.new(end_on_year,end_on_month,end_on_day)
     end
 
     def min_notice_due_date(family)
