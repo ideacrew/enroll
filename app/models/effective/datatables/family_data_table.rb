@@ -66,7 +66,7 @@ module Effective
                         ]
                       end
 
-          if aca_individual_market_feature_is_enabled?
+          if no_transition_families_is_enabled?
             dropdown << ['Transition Family Members', transition_family_members_insured_families_path(family: row.id, family_actions_id: "family_actions_#{row.id}"),
                          transition_family_members_link_type(row, pundit_allow(Family, :can_transition_family_members?)) ? 'ajax' : 'disabled']
           end
