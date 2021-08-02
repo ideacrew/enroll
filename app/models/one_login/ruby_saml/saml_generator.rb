@@ -53,7 +53,7 @@ module OneLogin
         # root.attributes['Issuer'] = SamlInformation.pay_now_issuer
         root.attributes['IssueInstant'] = time
         root.attributes['Version'] = '2.0'
-        root.attributes['Destination'] = SamlInformation.kp_pay_now_url
+        root.attributes['Destination'] = SamlInformation.send("#{hbx_enrollment.product.issuer_profile.legal_name}_pay_now_url")
 
         issuer = root.add_element 'saml:Issuer', { 'xmlns:saml' => ASSERTION }
         #issuer.attributes['Format'] = NAME_ID_FORMAT
@@ -84,7 +84,7 @@ module OneLogin
         subject_confirmation = subject.add_element 'saml:SubjectConfirmation', { 'Method' => BEARER }
         confirmation_data = subject_confirmation.add_element 'saml:SubjectConfirmationData'
         confirmation_data.attributes['NotOnOrAfter'] = not_on_or_after_condition.to_s
-        confirmation_data.attributes['Recipient'] = SamlInformation.kp_pay_now_url
+        confirmation_data.attributes['Recipient'] = SamlInformation.send("#{hbx_enrollment.product.issuer_profile.legal_name}_pay_now_url")
 
         # conditions
         conditions = assertion.add_element 'saml:Conditions', { 'NotBefore' => not_before.to_s,  'NotOnOrAfter' => not_on_or_after_condition.to_s }
