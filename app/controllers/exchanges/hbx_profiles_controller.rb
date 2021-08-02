@@ -823,10 +823,6 @@ def employer_poc
     end
   end
 
-  def redirect_if_aca_individual_market_feature_is_disabled
-    redirect_to(main_app.root_path, notice: l10n("transfer_familiy_members_link_is_disabled")) unless EnrollRegistry.feature_enabled?(:aca_individual_market_feature)
-  end
-
   def get_duplicate_enrs(dup_enrollments)
     product_ids = dup_enrollments.flatten.pluck(:product_id)
     return [] if product_ids.uniq.count == product_ids.count
