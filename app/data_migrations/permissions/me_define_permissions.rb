@@ -11,7 +11,7 @@ class MeDefinePermissions < MigrationTask
   def initial_hbx
     Permission
       .find_or_initialize_by(name: 'hbx_csr_tier1')
-      .update_attributes!(modify_family: true, modify_employer: false, revert_application: false, list_enrollments: true, can_add_sep: true,
+      .update_attributes!(modify_family: true, modify_employer: false, revert_application: false, list_enrollments: true, can_add_sep: false,
                           send_broker_agency_message: false, approve_broker: false, approve_ga: false, modify_admin_tabs: false, view_admin_tabs: true,
                           view_the_configuration_tab: false, can_submit_time_travel_request: false, can_access_age_off_excluded: true,
                           can_update_ssn: true, can_lock_unlock: true, can_complete_resident_application: true, can_add_pdc: true, can_view_username_and_email: true,
@@ -117,7 +117,8 @@ class MeDefinePermissions < MigrationTask
     user6 = User.create(email: 'developer@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: "ex#{rand(5_999_999) + a}")
     user7 = User.create(email: 'themanda.csr_tier3@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: "ex#{rand(5_999_999) + a}")
     user8 = User.create(email: 'themanda.super_admin@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: "ex#{rand(5_999_999) + a}")
-    hbx_profile_id = FactoryBot.create(:hbx_profile).id
+    state_abbreviation = EnrollRegistry[:enroll_app].setting(:state_abbreviation).item
+    hbx_profile_id = HbxProfile.all.detect { |profile| profile&.us_state_abbreviation == state_abbreviation }&.id&.to_s || HbxProfile.all&.last&.id&.to_s
     build_test_person_hbxstaff_set1(user1, user2, user3, user4, hbx_profile_id)
     build_test_person_hbxstaff_set2(user5, user6, user7, user8, hbx_profile_id)
   end
@@ -127,7 +128,7 @@ class MeDefinePermissions < MigrationTask
     p2 = Person.create(first_name: 'read_only', last_name: "amanda#{rand(1_000_000)}", user: user2)
     p3 = Person.create(first_name: 'supervisor', last_name: "amanda#{rand(1_000_000)}", user: user3)
     p4 = Person.create(first_name: 'tier1', last_name: "amanda#{rand(1_000_000)}", user: user4)
-
+    return if hbx_profile_id.nil?
     HbxStaffRole.create!(person: p1, permission_id: Permission.hbx_staff.id, subrole: 'hbx_staff', hbx_profile_id: hbx_profile_id)
     HbxStaffRole.create!(person: p2, permission_id: Permission.hbx_read_only.id, subrole: 'hbx_read_only', hbx_profile_id: hbx_profile_id)
     HbxStaffRole.create!(person: p3, permission_id: Permission.hbx_csr_supervisor.id, subrole: 'hbx_csr_supervisor', hbx_profile_id: hbx_profile_id)
@@ -139,7 +140,8 @@ class MeDefinePermissions < MigrationTask
     p6 = Person.create(first_name: 'developer', last_name: "developer#{rand(1_000_000)}", user: user6)
     p7 = Person.create(first_name: 'tier3', last_name: "amanda#{rand(1_000_000)}", user: user7)
     p8 = Person.create(first_name: 'super_admin', last_name: "amanda#{rand(1_000_000)}", user: user8)
-
+    return puts("No HBX profile loaded into the database. Test users have been created, but please manually create an HBX Profile for them.") if hbx_profile_id.nil?
+    puts "Creating HBX staff roles for test users." unless Rails.env.test?
     HbxStaffRole.create!(person: p5, permission_id: Permission.hbx_csr_tier2.id, subrole: 'hbx_csr_tier2', hbx_profile_id: hbx_profile_id)
     HbxStaffRole.create!(person: p6, permission_id: Permission.developer.id, subrole: 'developer', hbx_profile_id: hbx_profile_id)
     HbxStaffRole.create!(person: p7, permission_id: Permission.hbx_tier3.id, subrole: 'hbx_tier3', hbx_profile_id: hbx_profile_id)

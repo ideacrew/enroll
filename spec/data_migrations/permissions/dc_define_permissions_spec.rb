@@ -1408,6 +1408,7 @@ describe DcDefinePermissions, dbclean: :around_each do
       allow(Permission).to receive_message_chain('developer.id'){FactoryBot.create(:permission,  :developer).id}
       allow(Permission).to receive_message_chain('hbx_tier3.id'){FactoryBot.create(:permission,  :hbx_tier3).id}
       allow(Permission).to receive_message_chain('super_admin.id'){FactoryBot.create(:permission,  :super_admin).id}
+      FactoryBot.create(:hbx_profile).id
       subject.build_test_roles
     end
     it "creates permissions" do
