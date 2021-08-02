@@ -94,7 +94,7 @@ module FinancialAssistance
     end
 
     def check_if_valid_amount
-      errors.add(:amount, "#{amount} must be greater than $0") if amount.to_f < 0
+      errors.add(:amount, "$#{amount} must be greater than $0.") if amount.to_f < 0
     end
   end
 end

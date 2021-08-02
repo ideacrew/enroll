@@ -58,6 +58,11 @@ module Forms
         end
 
         if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
+          if @indian_tribe_member.to_s == 'false'
+            self.tribal_id = nil
+            self.tribal_state = nil
+            self.tribal_name = nil
+          end
           self.errors.add(:tribal_state, "is required when native american / alaska native is selected") if !tribal_state.present? && @indian_tribe_member
           self.errors.add(:tribal_name, "is required when native american / alaska native is selected")  if !tribal_name.present? && @indian_tribe_member
         end

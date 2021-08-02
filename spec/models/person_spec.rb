@@ -427,19 +427,17 @@ describe Person, :dbclean => :after_each do
 
           it "#{is_valid ? 'does not raise' : 'raises'} the errors  with  errors" do
             expect(person.errors[:base].count).to eq error_list.count
-            expect(person.errors[:base]).to eq error_list
           end
         end
 
-        it_behaves_like "validate consumer_fields_validations private", true, true, false, true, "3344", false, false, [errors[:tribal_id]].compact unless EnrollRegistry[:indian_alaskan_tribe_details].enabled?
-        it_behaves_like "validate consumer_fields_validations private", nil, nil, false, nil, nil, nil, false, [errors[:citizenship], errors[:native], errors[:incarceration]].compact
-        it_behaves_like "validate consumer_fields_validations private", nil, "true", false, false, nil, false, false, [errors[:citizenship]].compact
-        it_behaves_like "validate consumer_fields_validations private", nil, nil, false, false, nil, false, false, [errors[:citizenship]].compact
-        it_behaves_like "validate consumer_fields_validations private", true, false, false, false, nil, nil, false, [errors[:incarceration]].compact
-        it_behaves_like "validate consumer_fields_validations private", true, false, false, true, nil, nil, false, [errors[:tribal_id_presence], errors[:incarceration]].compact unless EnrollRegistry[:indian_alaskan_tribe_details].enabled?
-        it_behaves_like "validate consumer_fields_validations private", false, nil, nil, true, nil, nil, false, [errors[:immigration], errors[:incarceration]].compact
-        it_behaves_like "validate consumer_fields_validations private", nil, nil, nil, nil, nil, nil, false, [errors[:citizenship], errors[:native], errors[:incarceration]].compact if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
-
+        it_behaves_like "validate consumer_fields_validations private", true, true, false, true, "3344", false, false, [errors[:tribal_id]]
+        it_behaves_like "validate consumer_fields_validations private", nil, nil, false, nil, nil, nil, false, [errors[:citizenship], errors[:native], errors[:incarceration]]
+        it_behaves_like "validate consumer_fields_validations private", nil, "true", false, false, nil, false, false, [errors[:citizenship]]
+        it_behaves_like "validate consumer_fields_validations private", nil, nil, false, false, nil, false, false, [errors[:citizenship]]
+        it_behaves_like "validate consumer_fields_validations private", true, false, false, false, nil, nil, false, [errors[:incarceration]]
+        it_behaves_like "validate consumer_fields_validations private", true, false, false, true, nil, nil, false, [errors[:tribal_id_presence], errors[:incarceration]]
+        it_behaves_like "validate consumer_fields_validations private", false, nil, nil, true, nil, nil, false, [errors[:immigration], errors[:incarceration]]
+        it_behaves_like "validate consumer_fields_validations private", nil, nil, nil, nil, nil, nil, false, [errors[:citizenship], errors[:native], errors[:incarceration]]
       end
 
       if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
