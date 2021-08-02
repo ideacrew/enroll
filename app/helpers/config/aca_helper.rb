@@ -98,11 +98,15 @@ module Config::AcaHelper
   end
 
   def dental_market_enabled?
-    Settings.aca.dental_market_enabled
+    Settings.aca.dentalmarket_enabled
   end
 
   def individual_market_is_enabled?
     @individual_market_is_enabled ||= Settings.aca.market_kinds.include?("individual")
+  end
+
+  def no_transition_families_is_enabled?
+    EnrollRegistry.feature_enabled?(:no_transition_families)
   end
 
   def self_attest_residency_enabled?
