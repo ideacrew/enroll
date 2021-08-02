@@ -31,6 +31,14 @@ module Notifier
     attribute :special_enrollment_period, MergeDataModels::SpecialEnrollmentPeriod
 
     def self.stubbed_object
+      start_on_month = EnrollRegistry[:upcoming_open_enrollment_start_on].settings(:month).item
+      start_on_day = EnrollRegistry[:upcoming_open_enrollment_start_on].settings(:day).item
+      start_on_year = EnrollRegistry[:upcoming_open_enrollment_start_on].settings(:year).item
+      start_on_date = Date.new(start_on_year,start_on_month,start_on_day)
+      end_on_month = EnrollRegistry[:upcoming_open_enrollment_end_on].settings(:month).item
+      end_on_day = EnrollRegistry[:upcoming_open_enrollment_end_on].settings(:day).item
+      end_on_year = EnrollRegistry[:upcoming_open_enrollment_end_on].settings(:year).item
+      end_on_date = Date.new(end_on_year,end_on_month,end_on_day)
       notice = Notifier::MergeDataModels::EmployeeProfile.new({
         notice_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
         first_name: 'John',
@@ -38,7 +46,7 @@ module Notifier
         enrollment_plan_name: 'Aetna GOLD',
         employer_name: 'Whitmore, Inc',
         email: 'johnwhitmore@yahoo.com',
-        ivl_oe_start_date: Settings.aca.individual_market.upcoming_open_enrollment.start_on,
+        ivl_oe_start_date: start_on_date,
         ivl_oe_end_date: Settings.aca.individual_market.upcoming_open_enrollment.end_on,
         # coverage_begin_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
         date_of_hire: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
