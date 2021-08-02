@@ -639,7 +639,7 @@ describe MeDefinePermissions, dbclean: :around_each do
         expect(@hbx_read_only_person.hbx_staff_role.permission.can_add_sep).to be false
         expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_add_sep).to be true
         #verifying that the rake task updated only the correct subroles
-        expect(Permission.hbx_csr_tier1.can_add_sep).to be true
+        expect(Permission.hbx_csr_tier1.can_add_sep).to be false
         expect(Permission.hbx_csr_tier2.can_add_sep).to be true
         expect(Permission.developer.can_add_sep).to be false
       end
@@ -1409,6 +1409,7 @@ describe MeDefinePermissions, dbclean: :around_each do
       allow(Permission).to receive_message_chain('developer.id'){FactoryBot.create(:permission,  :developer).id}
       allow(Permission).to receive_message_chain('hbx_tier3.id'){FactoryBot.create(:permission,  :hbx_tier3).id}
       allow(Permission).to receive_message_chain('super_admin.id'){FactoryBot.create(:permission,  :super_admin).id}
+      FactoryBot.create(:hbx_profile).id
       subject.build_test_roles
     end
     it "creates permissions" do
