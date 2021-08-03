@@ -459,13 +459,19 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def pay_now_url(issuer_name)
-    return SamlInformation.send("#{issuer_name}_pay_now_url") if issuer_name.present?
-    "https://"
+    if issuer_name.present? && EnrollRegistry.key?("feature_index.#{issuer_name}_pay_now") && EnrollRegistry["#{issuer_name}_pay_now".to_sym].feature.is_enabled
+      SamlInformation.send("#{issuer_name}_pay_now_url")
+    else
+      "https://"
+    end
   end
 
   def pay_now_relay_state(issuer_name)
-    return SamlInformation.send("#{issuer_name}_pay_now_relay_state") if issuer_name.present?
-    "https://"
+    if issuer_name.present? && EnrollRegistry.key?("feature_index.#{issuer_name}_pay_now") && EnrollRegistry["#{issuer_name}_pay_now".to_sym].feature.is_enabled
+      SamlInformation.send("#{issuer_name}_pay_now_relay_state")
+    else
+      "https://"
+    end
   end
 
 

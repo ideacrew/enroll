@@ -66,7 +66,7 @@ module Insured
 
       def carrier_display_text(issuer)
         issuer = issuer.downcase&.gsub(' ', '_')
-        issuer.present? || EnrollRegistry.key?("feature_index.#{issuer}_pay_now") || EnrollRegistry["#{issuer}_pay_now".to_sym].feature.is_enabled
+        issuer.present? && EnrollRegistry.key?("feature_index.#{issuer}_pay_now") && EnrollRegistry["#{issuer}_pay_now".to_sym].feature.is_enabled
       end
     end
   end
