@@ -20,8 +20,8 @@ class PaymentTransactionsController < ApplicationController
   private
 
   def issuer_name(enr_id)
-    enrollment = HbxEnrollment.find(enr_id) if enr_id.present?
+    enrollment = HbxEnrollment.by_hbx_id(enr_id).last if enr_id.present?
     return unless enrollment.present?
-    enrollment.product.issuer_profile.legal_name
+    enrollment.product.issuer_profile.legal_name&.downcase&.gsub(' ', '_')
   end
 end
