@@ -23,6 +23,10 @@ module Insured
       end
       # rubocop:enable Metrics/CyclomaticComplexity
 
+      def issuer_key(enrollment)
+        enrollment&.product&.issuer_profile&.legal_name&.downcase&.gsub(' ', '_')
+      end
+
       def can_pay_now?(hbx_enrollment)
         return true if individual?(hbx_enrollment) && (has_break_in_coverage_enrollments?(hbx_enrollment) || !has_any_previous_enrollments?(hbx_enrollment))
       end
