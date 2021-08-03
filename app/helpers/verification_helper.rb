@@ -269,8 +269,10 @@ module VerificationHelper
 
   def show_ssa_dhs_response(person, record)
     responses = person.consumer_role.lawful_presence_determination.ssa_responses + person.consumer_role.lawful_presence_determination.vlp_responses
-    raw_request = responses.select{|response| response.id == BSON::ObjectId.from_string(record.event_response_record_id)} if responses.any?
-    raw_request.any? ? Nokogiri::XML(raw_request.first.body) : "no response record"
+    raw_response = responses.select{|response| response.id == BSON::ObjectId.from_string(record.event_response_record_id)} if responses.any?
+    return "no response record" unless raw_response.any?
+
+    EnrollRegistry.feature_enabled?(:ssa_h3) ? JSON.parse(raw_response.first.body) : Nokogiri::XML(raw_response.first.body)
   end
 
   def display_documents_tab?(family_members, person)
