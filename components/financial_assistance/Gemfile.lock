@@ -1,7 +1,7 @@
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: d59791d3983af63e513054dc822caf68a924c1f6
-  branch: release_0.3.0
+  revision: 50f83337c387a52ad9387eacc5eb11ffa8bacc13
+  branch: release_0.4.0
   specs:
     aca_entities (0.3.0)
       deep_merge
@@ -26,8 +26,8 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/event_source.git
-  revision: 7f4864116338abcc5ab2e7c4340778abfe9999be
-  branch: release_0.5.3
+  revision: 7f261d5a8f985b8434572390b50065b02b6bcfcd
+  branch: trunk
   specs:
     event_source (0.5.3)
       bunny (>= 1.7.1)
@@ -259,7 +259,7 @@ GEM
     faraday-excon (1.1.0)
     faraday-net_http (1.0.1)
     faraday-net_http_persistent (1.2.0)
-    faraday_middleware (1.0.0)
+    faraday_middleware (1.1.0)
       faraday (~> 1.0)
     ffi (1.15.3)
     font-awesome-rails (4.7.0.5)
@@ -307,7 +307,7 @@ GEM
       nokogiri (~> 1)
       rake
     mini_mime (1.0.2)
-    mini_portile2 (2.5.3)
+    mini_portile2 (2.6.1)
     minitest (5.14.1)
     monetize (1.9.4)
       money (~> 6.12)
@@ -346,12 +346,12 @@ GEM
     mustermann (1.1.1)
       ruby2_keywords (~> 0.0.1)
     nio4r (2.5.2)
-    nokogiri (1.11.7)
-      mini_portile2 (~> 2.5.0)
+    nokogiri (1.12.1)
+      mini_portile2 (~> 2.6.1)
       racc (~> 1.4)
     nokogiri-happymapper (0.8.1)
       nokogiri (~> 1.5)
-    oj (3.12.2)
+    oj (3.12.3)
     orm_adapter (0.5.0)
     ox (2.14.5)
     parallel (1.19.2)
