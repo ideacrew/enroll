@@ -70,7 +70,7 @@ class LawfulPresenceDetermination
   end
 
   def start_ssa_process
-    if EnrollRegistry.feature_enabled?(:ssac_h3)
+    if EnrollRegistry.feature_enabled?(:ssa_h3)
       Operations::Fdsh::Ssa::H3::RequestSsaVerification.new.call(self.ivl_role.person)
     else
       notify(SSA_VERIFICATION_REQUEST_EVENT_NAME, {:person => self.ivl_role.person})
