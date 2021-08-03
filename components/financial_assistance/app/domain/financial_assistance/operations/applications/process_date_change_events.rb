@@ -43,7 +43,7 @@ module FinancialAssistance
         def process_renewals
           @logger.info 'Started process_renewals process'
           publish_generate_draft_renewals if can_generate_draft_renewals?
-          publish_renew_draft_renewals if can_renew_draft_renewals?
+          publish_submit_renewal_drafts if can_submit_renewal_drafts?
           @logger.info 'Ended process_renewals process'
           Success('Processed application renewals successfully')
         end
@@ -53,8 +53,9 @@ module FinancialAssistance
             TimeKeeper.date_of_record == date_of_draft_renewals_generation
         end
 
-        def can_renew_draft_renewals?
-          false
+        def can_submit_renewal_drafts?
+          FinancialAssistanceRegistry.feature_enabled?(:submit_renewal_drafts) &&
+            TimeKeeper.date_of_record == date_of_submit_renewal_drafts
         end
 
         def publish_generate_draft_renewals
@@ -75,24 +76,34 @@ module FinancialAssistance
           @logger.info "Failed to execute publish_generate_draft_renewals, error: #{e.backtrace}"
         end
 
-        def publish_renew_draft_renewals
-          @logger.info 'Started publish_renew_draft_renewals process'
+        def publish_submit_renewal_drafts
+          @logger.info 'Started publish_submit_renewal_drafts process'
           applications = FinancialAssistance::Application.renewal_draft.where(assistance_year: @renewal_year)
           @logger.info "Total number of renewal_draft applications with assistance_year: #{@renewal_year.pred} are #{applications.count}"
 
-          # applications.inject([]) do |_arr, application|
-          #   payload = { family_id: application.family_id, renewal_year: @renewal_year }
-          #   result = ::FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication.new.call(payload.to_h, 'generate_renewal_draft')
-          #   @logger.info "Successfully Published for event generate_renewal_draft, with payload: #{payload}" if result.success?
-          #   @logger.info "Failed to publish for event generate_renewal_draft, with payload: #{payload}, failure: #{result.failure}" if result.failure?
-          # end
+          applications.inject([]) do |_arr, application|
+            params = { payload: { application_hbx_id: application.hbx_id }, event_name: 'submit_renewal_draft' }
+            result = ::FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication.new.call(params)
+            @logger.info "Successfully Published for event submit_renewal_draft, with payload: #{payload}" if result.success?
+            @logger.info "Failed to publish for event submit_renewal_draft, with payload: #{payload}, failure: #{result.failure}" if result.failure?
+          rescue StandardError => e
+            @logger.info "Failed to publish for event submit_renewal_draft, with payload: #{payload}, error: #{e.backtrace}"
+          end
 
-          @logger.info 'Ended publish_renew_draft_renewals process'
+          @logger.info 'Ended publish_submit_renewal_drafts process'
+        rescue StandardError => e
+          @logger.info "Failed to execute publish_submit_renewal_drafts, error: #{e.backtrace}"
         end
 
         def date_of_draft_renewals_generation
           day = FinancialAssistanceRegistry[:generate_draft_renewals].settings(:draft_renewal_generation_day).item
           month = FinancialAssistanceRegistry[:generate_draft_renewals].settings(:draft_renewal_generation_month).item
+          Date.new(TimeKeeper.date_of_record.year, month, day)
+        end
+
+        def date_of_submit_renewal_drafts
+          day = FinancialAssistanceRegistry[:submit_renewal_drafts].settings(:renewal_draft_submission_day).item
+          month = FinancialAssistanceRegistry[:submit_renewal_drafts].settings(:renewal_draft_submission_month).item
           Date.new(TimeKeeper.date_of_record.year, month, day)
         end
       end

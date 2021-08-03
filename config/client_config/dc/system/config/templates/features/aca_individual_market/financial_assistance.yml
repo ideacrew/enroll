@@ -206,5 +206,12 @@ registry:
           item: 5
         - key: :draft_renewal_generation_month
           item: 10
+    - key: :submit_renewal_drafts
+      is_enabled: true
+      settings:
+        - key: :renewal_draft_submission_day
+          item: 5
+        - key: :renewal_draft_submission_month
+          item: 10
 # TODO eligibility engine connectivity(HAVEN) settings
 # TODO mec service connectivity settings

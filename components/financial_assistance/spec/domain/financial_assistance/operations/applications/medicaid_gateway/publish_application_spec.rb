@@ -168,7 +168,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
         end
 
         it 'should return failure with error message' do
-          expect(@result.failure).to eq("Invalid event_name: test_event for key event_name, must be one of [\"determine_eligibility\", \"generate_renewal_draft\"]")
+          expect(@result.failure).to eq("Invalid event_name: test_event for key event_name, must be one of [\"determine_eligibility\", \"generate_renewal_draft\", \"submit_renewal_draft\"]")
         end
       end
     end

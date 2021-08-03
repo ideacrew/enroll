@@ -10,7 +10,7 @@ module Publishers
     # This event is to generate renewal draft applications
     register_event 'generate_renewal_draft'
 
-    # # This event is to renew/submit generated renewal draft applications
-    # register_event 'renew_renewal_draft'
+    # This event is to renew/submit generated renewal draft applications
+    register_event 'submit_renewal_draft'
   end
 end

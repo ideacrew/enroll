@@ -21,7 +21,15 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Renew, dbclean: 
                       :with_attestations,
                       hbx_id: '111000222',
                       family_id: family.id,
-                      assistance_year: TimeKeeper.date_of_record.year)
+                      assistance_year: TimeKeeper.date_of_record.year,
+                      is_requesting_voter_registration_application_in_mail: true,
+                      is_renewal_authorized: true,
+                      medicaid_terms: true,
+                      report_change_terms: true,
+                      medicaid_insurance_collection_terms: true,
+                      parent_living_out_of_home_terms: false,
+                      submission_terms: true,
+                      full_medicaid_determination: true)
   end
   let!(:create_appli) do
     appli = FactoryBot.build(:financial_assistance_applicant,
@@ -56,28 +64,57 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Renew, dbclean: 
   end
 
   context 'success' do
-    before do
-      @renewal_draft = ::FinancialAssistance::Operations::Applications::CreateRenewalDraft.new.call(
-        { family_id: application10.family_id, renewal_year: application10.assistance_year.next }
-      ).success
-      @result = subject.call(@renewal_draft)
-      @renewed_app = @result.success
+    context 'is_renewal_authorized set to true' do
+      before do
+        @renewal_draft = ::FinancialAssistance::Operations::Applications::CreateRenewalDraft.new.call(
+          { family_id: application10.family_id, renewal_year: application10.assistance_year.next }
+        ).success
+        @result = subject.call({ application_hbx_id: @renewal_draft.hbx_id })
+        @renewed_app = @result.success
+      end
+
+      it 'should return success' do
+        expect(@result).to be_success
+      end
+
+      it 'should return application' do
+        expect(@renewed_app).to be_a(::FinancialAssistance::Application)
+      end
+
+      it 'should return application with submitted' do
+        expect(@renewed_app.submitted?).to be_truthy
+      end
+
+      it 'should return application with assistance_year' do
+        expect(@renewed_app.assistance_year).to eq(application10.assistance_year.next)
+      end
     end
 
-    it 'should return success' do
-      expect(@result).to be_success
-    end
+    context 'is_renewal_authorized set to false with remaining years_to_renew' do
+      before do
+        application10.update_attributes!({ is_renewal_authorized: false, years_to_renew: [1, 2, 3, 4, 5].sample })
+        @renewal_draft = ::FinancialAssistance::Operations::Applications::CreateRenewalDraft.new.call(
+          { family_id: application10.family_id, renewal_year: application10.assistance_year.next }
+        ).success
+        @result = subject.call({ application_hbx_id: @renewal_draft.hbx_id })
+        @renewed_app = @result.success
+      end
 
-    it 'should return application' do
-      expect(@renewed_app).to be_a(::FinancialAssistance::Application)
-    end
+      it 'should return success' do
+        expect(@result).to be_success
+      end
 
-    it 'should return application with submitted' do
-      expect(@renewed_app.submitted?).to be_truthy
-    end
+      it 'should return application' do
+        expect(@renewed_app).to be_a(::FinancialAssistance::Application)
+      end
 
-    it 'should return application with assistance_year' do
-      expect(@renewed_app.assistance_year).to eq(application10.assistance_year.next)
+      it 'should return application with submitted' do
+        expect(@renewed_app.submitted?).to be_truthy
+      end
+
+      it 'should return application with assistance_year' do
+        expect(@renewed_app.assistance_year).to eq(application10.assistance_year.next)
+      end
     end
   end
 
@@ -88,7 +125,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Renew, dbclean: 
       end
 
       it 'should return failure with error message' do
-        expect(@result.failure).to eq("Given input: test is not a valid FinancialAssistance::Application.")
+        expect(@result.failure).to eq('Input params is not a hash: test')
       end
     end
 
@@ -96,7 +133,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Renew, dbclean: 
       shared_examples_for 'non renewal_draft state application' do |app_state|
         before do
           application10.update_attributes!(aasm_state: app_state)
-          @result = subject.call(application10)
+          @result = subject.call({ application_hbx_id: application10.hbx_id })
         end
 
         it 'should return failure' do
@@ -116,17 +153,48 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Renew, dbclean: 
       end
     end
 
-    context 'incomplete application' do
+    context 'ineligible application' do
       before do
         @renewal_draft = ::FinancialAssistance::Operations::Applications::CreateRenewalDraft.new.call(
           { family_id: application10.family_id, renewal_year: application10.assistance_year.next }
         ).success
-        allow(@renewal_draft).to receive(:complete?).and_return(false)
-        @result = subject.call(@renewal_draft)
       end
 
-      it 'should return failure with error message' do
-        expect(@result.failure).to eq("Given application with hbx_id: #{@renewal_draft.hbx_id} is not valid for submission")
+      context 'incomplete application by validation' do
+        before do
+          @renewal_draft.update_attributes!(us_state: nil)
+          @result = subject.call({ application_hbx_id: @renewal_draft.hbx_id })
+        end
+
+        it 'should return failure with error message' do
+          expect(@result.failure).to eq("Application with hbx_id: #{@renewal_draft.hbx_id} is incomplete(validations/attestations) for submission.")
+        end
+      end
+
+      context 'incomplete application by attestation' do
+        before do
+          @renewal_draft.update_attributes!(is_requesting_voter_registration_application_in_mail: nil)
+          @result = subject.call({ application_hbx_id: @renewal_draft.hbx_id })
+        end
+
+        it 'should return failure with error message' do
+          expect(@result.failure).to eq("Application with hbx_id: #{@renewal_draft.hbx_id} is incomplete(validations/attestations) for submission.")
+        end
+      end
+
+      context 'expired permission for renewal' do
+        before do
+          @renewal_draft.update_attributes!(is_renewal_authorized: false, years_to_renew: 0)
+          @result = subject.call({ application_hbx_id: @renewal_draft.hbx_id })
+        end
+
+        it 'should return failure with error message' do
+          expect(@result.failure).to eq("Unable to submit the application for given application hbx_id: #{@renewal_draft.hbx_id}")
+        end
+
+        it 'should also transition application to submission_pending' do
+          expect(@renewal_draft.reload.submission_pending?).to be_truthy
+        end
       end
     end
   end

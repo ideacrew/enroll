@@ -807,7 +807,38 @@ module FinancialAssistance
       end
     end
 
+    def attesations_complete?
+      !is_requesting_voter_registration_application_in_mail.nil? &&
+        (is_renewal_authorized.present? || (is_renewal_authorized.is_a?(FalseClass) && years_to_renew.present?)) &&
+        check_medicaid_terms_attestation &&
+        !report_change_terms.nil? &&
+        !medicaid_insurance_collection_terms.nil? &&
+        check_parent_living_out_of_home_terms &&
+        !submission_terms.nil? &&
+        check_full_medicaid_determination
+    end
+
+    def have_permission_to_renew?
+      is_renewal_authorized.present? ||
+        (is_renewal_authorized.is_a?(FalseClass) && !years_to_renew.zero?)
+    end
+
     private
+
+    def check_medicaid_terms_attestation
+      # return true unless FinancialAssistanceRegistry.feature_enabled?(:display_medicaid_question)
+      !medicaid_terms.nil?
+    end
+
+    def check_full_medicaid_determination
+      # return true unless FinancialAssistanceRegistry.feature_enabled?(:full_medicaid_determination)
+      !full_medicaid_determination.nil?
+    end
+
+    def check_parent_living_out_of_home_terms
+      (parent_living_out_of_home_terms.present? && !attestation_terms.nil?) ||
+        parent_living_out_of_home_terms.is_a?(FalseClass)
+    end
 
     def check_for_valid_predecessor
       return if self.predecessor_id.nil?
