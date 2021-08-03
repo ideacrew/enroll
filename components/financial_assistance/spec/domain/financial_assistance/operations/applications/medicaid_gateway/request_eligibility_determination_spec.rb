@@ -80,7 +80,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
     context 'with indian_alaskan_tribe_details feature' do
       context 'enabled' do
         before do
-          FinancialAssistanceRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(true)
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:indian_alaskan_tribe_details).and_return(true)
+          # FinancialAssistanceRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(true)
           applicant.update_attributes!(tribal_name: "tribe name", tribal_state: "ME")
           @result = subject.call({application_id: application.id})
         end
@@ -96,7 +97,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
 
       context 'disabled' do
         before do
-          FinancialAssistanceRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(false)
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:indian_alaskan_tribe_details).and_return(false)
+          # FinancialAssistanceRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(false)
           applicant.update_attributes!(tribal_id: "4848477")
           @result = subject.call({application_id: application.id})
         end
