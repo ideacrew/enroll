@@ -153,6 +153,11 @@ module BenefitMarkets
                       {:metal_level_kind => :silver, :csr_variant_id => CSR_KIND_TO_PRODUCT_VARIANT_MAP[csr_kind]}])
     }
 
+    scope :by_csr_kind_with_02_03_variant, lambda {|csr_kind = 'csr_0'|
+      where('$or' => [{:metal_level_kind.in => [:platinum, :gold, :bronze, :catastrophic], :csr_variant_id => '01'},
+                      {:metal_level_kind.in => [:silver, :platinum, :gold, :bronze, :catastrophic], :csr_variant_id => CSR_KIND_TO_PRODUCT_VARIANT_MAP[csr_kind]}])
+    }
+
     #Products retrieval by type
     scope :health_products,            ->{ where(:"_type" => /.*HealthProduct$/) }
     scope :dental_products,            ->{ where(:"_type" => /.*DentalProduct$/)}

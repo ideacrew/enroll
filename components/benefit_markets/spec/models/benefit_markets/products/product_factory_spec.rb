@@ -52,6 +52,16 @@ module BenefitMarkets
       let!(:product3) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, metal_level_kind: :bronze, csr_variant_id: '01')}
       let!(:product4) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, metal_level_kind: :silver, csr_variant_id: '05')}
 
+      let!(:product5) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, metal_level_kind: :silver, csr_variant_id: '02')}
+      let!(:product6) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, metal_level_kind: :gold, csr_variant_id: '02')}
+      let!(:product7) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, metal_level_kind: :bronze, csr_variant_id: '02')}
+      let!(:product8) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, metal_level_kind: :platinum, csr_variant_id: '02')}
+
+      let!(:product9) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, metal_level_kind: :silver, csr_variant_id: '03')}
+      let!(:product10) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, metal_level_kind: :gold, csr_variant_id: '03')}
+      let!(:product11) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, metal_level_kind: :bronze, csr_variant_id: '03')}
+      let!(:product12) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, metal_level_kind: :platinum, csr_variant_id: '03')}
+
       before do
         @products = product_factory.new({market_kind: "individual"})
       end
@@ -64,11 +74,19 @@ module BenefitMarkets
         it 'should return all product along with product having csr 87' do
           expect(@products.by_coverage_kind_year_and_csr('health', TimeKeeper.date_of_record.year, csr_kind: "csr_87").count).to eq 4
         end
+
+        it 'should return all product along with product having csr 100' do
+          expect(@products.by_coverage_kind_year_and_csr('health', TimeKeeper.date_of_record.year, csr_kind: "csr_100").count).to eq 7
+        end
+
+        it 'should return all product along with product having csr limited' do
+          expect(@products.by_coverage_kind_year_and_csr('health', TimeKeeper.date_of_record.year, csr_kind: "csr_limited").count).to eq 7
+        end
       end
 
       context 'by_coverage_kind_and_year' do
         it 'should return health products' do
-          expect(@products.by_coverage_kind_and_year('health', TimeKeeper.date_of_record.year).count).to eq 4
+          expect(@products.by_coverage_kind_and_year('health', TimeKeeper.date_of_record.year).count).to eq 12
         end
 
         it 'should return deltal products' do

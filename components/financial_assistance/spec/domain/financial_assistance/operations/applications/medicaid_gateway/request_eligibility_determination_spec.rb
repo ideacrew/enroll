@@ -76,6 +76,40 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
         expect(@result.success).to eq('Successfully published the payload to medicaid_gateway for determination')
       end
     end
+
+    context 'with indian_alaskan_tribe_details feature' do
+      context 'enabled' do
+        before do
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:indian_alaskan_tribe_details).and_return(true)
+          applicant.update_attributes!(tribal_name: "tribe name", tribal_state: "ME")
+          @result = subject.call({application_id: application.id})
+        end
+
+        it 'should return success' do
+          expect(@result).to be_success
+        end
+
+        it 'should return success with message' do
+          expect(@result.success).to eq('Successfully published the payload to medicaid_gateway for determination')
+        end
+      end
+
+      context 'disabled' do
+        before do
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:indian_alaskan_tribe_details).and_return(false)
+          applicant.update_attributes!(tribal_id: "4848477")
+          @result = subject.call({application_id: application.id})
+        end
+
+        it 'should return success' do
+          expect(@result).to be_success
+        end
+
+        it 'should return success with message' do
+          expect(@result.success).to eq('Successfully published the payload to medicaid_gateway for determination')
+        end
+      end
+    end
   end
 
   context 'failure' do
