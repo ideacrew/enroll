@@ -5,6 +5,6 @@ And(/^consumer clicks on pencil symbol next to primary person$/) do
 end
 
 Then(/^consumer should see today date and clicks continue$/) do
-  expect(page.find("#applicant_ssn")[:disabled]).to eq "true"
-  expect(page.find("input[name='jq_datepicker_ignore_applicant[dob]'")[:disabled]).to eq "true"
+  expect(page.find("#applicant_ssn")[:readonly]).to eq "true"
+  expect(page.find("input[name='jq_datepicker_ignore_applicant[dob]'")[:readonly]).to eq "true"
 end
