@@ -65,10 +65,10 @@ module FinancialAssistance
           family_ids.inject([]) do |_arr, family_id|
             params = { payload: { family_id: family_id, renewal_year: @renewal_year }, event_name: 'generate_renewal_draft' }
             result = ::FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication.new.call(params)
-            @logger.info "Successfully Published for event generate_renewal_draft, with payload: #{payload}" if result.success?
-            @logger.info "Failed to publish for event generate_renewal_draft, with payload: #{payload}, failure: #{result.failure}" if result.failure?
+            @logger.info "Successfully Published for event generate_renewal_draft, with params: #{params}" if result.success?
+            @logger.info "Failed to publish for event generate_renewal_draft, with params: #{params}, failure: #{result.failure}" if result.failure?
           rescue StandardError => e
-            @logger.info "Failed to publish for event generate_renewal_draft, with payload: #{payload}, error: #{e.backtrace}"
+            @logger.info "Failed to publish for event generate_renewal_draft, with params: #{params}, error: #{e.backtrace}"
           end
 
           @logger.info 'Ended publish_generate_draft_renewals process'
@@ -84,10 +84,10 @@ module FinancialAssistance
           applications.inject([]) do |_arr, application|
             params = { payload: { application_hbx_id: application.hbx_id }, event_name: 'submit_renewal_draft' }
             result = ::FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication.new.call(params)
-            @logger.info "Successfully Published for event submit_renewal_draft, with payload: #{payload}" if result.success?
-            @logger.info "Failed to publish for event submit_renewal_draft, with payload: #{payload}, failure: #{result.failure}" if result.failure?
+            @logger.info "Successfully Published for event submit_renewal_draft, with params: #{params}" if result.success?
+            @logger.info "Failed to publish for event submit_renewal_draft, with params: #{params}, failure: #{result.failure}" if result.failure?
           rescue StandardError => e
-            @logger.info "Failed to publish for event submit_renewal_draft, with payload: #{payload}, error: #{e.backtrace}"
+            @logger.info "Failed to publish for event submit_renewal_draft, with params: #{params}, error: #{e.backtrace}"
           end
 
           @logger.info 'Ended publish_submit_renewal_drafts process'
