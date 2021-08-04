@@ -34,7 +34,7 @@ module FinancialAssistance
             end
 
             def construct_payload(application)
-              payload = {family_reference: {hbx_id: find_family(application.family_id)},
+              payload = {family_reference: {hbx_id: find_family(application.family_id)&.hbx_assigned_id.to_s},
                          assistance_year: application.assistance_year,
                          aptc_effective_date: application.effective_date,
                          years_to_renew: application.renewal_base_year,
@@ -53,7 +53,7 @@ module FinancialAssistance
             end
 
             def find_family(family_id)
-              ::Family.find(family_id)&.hbx_assigned_id.to_s
+              ::Family.find(family_id)
             end
 
             # rubocop:disable Metrics/CyclomaticComplexity
@@ -589,11 +589,19 @@ module FinancialAssistance
               family = find_family(application.family_id) if application.family_id.present?
               return unless family.present?
               person_hbx_ids = application.applicants.pluck(:person_hbx_id)
-              membr_premiums =
-                person_hbx_ids.inject([]) do |arr, person_hbx_id|
-                  arr << { member_identifier: person_hbx_id, monthly_premium: 310.50 }
-                end
-              { health_only_lcsp_premiums: membr_premiums, health_only_slcsp_premiums: membr_premiums }
+              premiums = ::Operations::Products::Fetch.new.call({family: family, effective_date: application.effective_date})
+              slcsp_info = ::Operations::Products::FetchSlcsp.new.call(member_silver_product_premiums: premiums.value!).value!
+              lcsp_info = ::Operations::Products::FetchLcsp.new.call(member_silver_product_premiums: premiums.value!).value!
+
+              slcsp_member_premiums = person_hbx_ids.inject([]) do |result, person_hbx_id|
+                result << slcsp_info[person_hbx_id][:health_only_slcsp_premiums]
+              end
+
+              lcsp_member_premiums = person_hbx_ids.inject([]) do |result, person_hbx_id|
+                result << lcsp_info[person_hbx_id][:health_only_lcsp_premiums]
+              end
+
+              { health_only_lcsp_premiums: slcsp_member_premiums, health_only_slcsp_premiums: lcsp_member_premiums }
             end
 
             # Physical households(mitc_households) are groups based on the member's Home Address.
