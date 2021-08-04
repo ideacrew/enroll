@@ -368,7 +368,7 @@ registry:
       - key: :display_county
         is_enabled: true
       - key: :moving_to_state
-        is_enabled: false
+        is_enabled: true
       - key: :living_outside_state
         is_enabled: false
       - key: :validate_quadrant

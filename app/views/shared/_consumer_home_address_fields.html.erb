@@ -69,7 +69,7 @@
 
           <% required = kind=='home' ? "address_required" : '' %>
 
-          <%= address.text_field :address_1, placeholder: "#{kind.upcase} ADDRESS LINE 1 (NUMBER, STREET, QUADRANT) #{'*' if required.present?}", class: "floatlabel form-control #{required}", required: required.present? %>
+          <%= address.text_field :address_1, placeholder: "#{kind.upcase}" + l10n("address_1") + "#{'*' if required.present?}", class: "floatlabel form-control #{required}", required: required.present? %>
       </div>
       <div style="<%= style %>" class="row row-form-wrapper no-buffer address-row <%= div_class %>">
         </div>
