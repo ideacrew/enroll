@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 # RAILS_ENV=production bundle exec rails db:migrate:up VERSION="20210803162052"
+# rubocop:disable Metrics/CyclomaticComplexity
 class MigrateThmCsrVariant < Mongoid::Migration
   def self.up
     @logger = Logger.new("#{Rails.root}/log/migrate_thm_csr_variant.log") unless Rails.env.test?
@@ -9,7 +10,7 @@ class MigrateThmCsrVariant < Mongoid::Migration
     people.each do |person|
       if person.primary_family.nil? || person.primary_family.active_household.nil? || person.primary_family.active_household.latest_active_tax_household.nil?
         puts "No primary_family or active househod or latest_active_household exists for person with the given hbx_id #{person.hbx_id}" unless Rails.env.test?
-        return
+        next
       end
       active_household = person.primary_family.active_household
       latest_tax_household = active_household.latest_active_tax_household_with_year(TimeKeeper.date_of_record.year)
@@ -27,6 +28,7 @@ class MigrateThmCsrVariant < Mongoid::Migration
       @logger.info "End of the script" unless Rails.env.test?
     end
   end
+# rubocop:enable Metrics/CyclomaticComplexity
 
   def self.down; end
 end
