@@ -58,9 +58,6 @@ registry:
       - key: :primary_caregiver_other_question
         item: :primary_caregiver_other_question
         is_enabled: true
-      - key: :american_indian_alaskan_native_income
-        item: :american_indian_alaskan_native_income
-        is_enabled: true
       - key: :indian_health_service_question
         is_enabled: true
       - key: :mainecare_healthcare_questions
@@ -169,7 +166,7 @@ registry:
         - key: :gamble_prize
           item: true
     - key: :full_medicaid_determination_step
-      is_enabled: true
+      is_enabled: false
     - key: :native_american_csr
       is_enabled: true
     - key: :display_medicaid_question
