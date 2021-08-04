@@ -172,7 +172,7 @@ Given(/AI AN Details feature is enabled/) do
 end
 
 Given(/No coverage tribe details feature is enabled/) do
-  enable_fa_feature :no_coverage_tribe_details
+  enable_feature :no_coverage_tribe_details, {registry_name: FinancialAssistanceRegistry}
 end
 
 Then(/the user should see the AI AN Details fields/) do
