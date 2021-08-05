@@ -28,7 +28,6 @@ Feature: User Account page
     And user with Broker role is unlocked
     And user visits the Hbx Portal
     And Hbx Admin click on User Accounts
-
     When I click Employee and Locked button
     Then I should only see user with employee role
 
@@ -43,13 +42,13 @@ Feature: User Account page
   Scenario: Search for User by OIM ID string
     Given user visits the Hbx Portal
     And Hbx Admin click on User Accounts
-    Then Hbx Admin should see search box
+    And Hbx Admin should see search box
     When a user enters Employee Role user oim_id in search box
     Then a user should see a result with Employee Role user oim_id and not Broker user oim_id
     When a user enters Employee Role user email
     Then a user should see a result with Employee Role user email and not Broker user email
 
   Scenario: Should see subrole field on datatable
-    And user visits the Hbx Portal
-    And Hbx Admin click on User Accounts
+    Given user visits the Hbx Portal
+    When Hbx Admin click on User Accounts
     Then I should see subrole field on datatable
