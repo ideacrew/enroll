@@ -93,6 +93,22 @@ module SponsoredBenefits
           expect(flash[:error]).to eq("You are not authorized to view this page.")
         end
       end
+
+      context "user without general agency and broker staff roles" do
+        before do
+          person = person(nil)
+          user = user(person)
+          allow(subject).to receive(:current_user).and_return(user)
+          allow(user).to receive(:has_hbx_staff_role?).and_return(false)
+          allow(user).to receive(:has_general_agency_staff_role?).and_return(false)
+          allow(user).to receive(:has_broker_agency_staff_role?).and_return(false)
+        end
+        it "should be redirected to root path with error message" do
+          get :new, params: {broker_agency_id: broker_agency_profile.id.to_s}
+          expect(response).to redirect_to("http://test.host/")
+          expect(flash[:error]).to eq("You are not authorized to view this page.")
+        end
+      end
     end
 
     describe "GET new" do

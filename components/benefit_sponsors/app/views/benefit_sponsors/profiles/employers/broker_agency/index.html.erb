@@ -1,0 +1,8 @@
+<% if @filter_criteria.empty? %>
+  <% content_for :broker_agencies_panel do %>
+    <%= render "index" %>
+  <% end %>
+  <%= render "active_broker" %>
+<% else %>
+  <%= render 'index' %>
+<% end %>
