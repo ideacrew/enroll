@@ -8,7 +8,8 @@ Given(/medicaid tax credits link feature is disabled?/) do
   disable_feature(:medicaid_tax_credits_link)
 end
 
-And(/^the consumer navigates to the (.*?) page$/) do |page|  expect(page).to have_content(page)
+And(/^the consumer navigates to the (.*?) page$/) do |page|  
+  expect(page).to have_content(page)
 end
 
 Then(/^they should see the Medicaid and Tax Credits Link tile$/) do
