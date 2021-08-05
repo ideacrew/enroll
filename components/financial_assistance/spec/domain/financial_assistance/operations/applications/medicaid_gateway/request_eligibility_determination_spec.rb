@@ -114,7 +114,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
         end
 
         it 'should return success with message' do
-          expect(@result.success).to eq('Successfully published the payload to medicaid_gateway for determination')
+          expect(@result.success).to eq('Successfully published the payload for event: determine_eligibility')
         end
       end
 
@@ -130,7 +130,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
         end
 
         it 'should return success with message' do
-          expect(@result.success).to eq('Successfully published the payload to medicaid_gateway for determination')
+          expect(@result.success).to eq('Successfully published the payload for event: determine_eligibility')
         end
       end
     end
