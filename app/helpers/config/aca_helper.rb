@@ -98,7 +98,7 @@ module Config::AcaHelper
   end
 
   def dental_market_enabled?
-    Settings.aca.dentalmarket_enabled
+    Settings.aca.dental_market_enabled
   end
 
   def individual_market_is_enabled?
