@@ -256,18 +256,24 @@ module FinancialAssistance
 
           def sanitize_person_params(family_member_hash)
             person_hash = family_member_hash['person']
+            consumer_role_hash = person_hash["consumer_role"]
+
             {
               first_name: person_hash['person_name']['first_name'],
               last_name: person_hash['person_name']['last_name'],
               full_name: person_hash['person_name']['full_name'],
               ssn: person_hash['person_demographics']['ssn'],
-              no_ssn: "0", # person_hash['person_demographics']['no_ssn'], update in aca entities contracts to receive as string
+              no_ssn: person_hash['person_demographics']['no_ssn'], #update in aca entities contracts to receive as string
               gender: person_hash['person_demographics']['gender'],
               dob: person_hash['person_demographics']['dob'],
               date_of_death: person_hash['person_demographics']['date_of_death'],
               dob_check: person_hash['person_demographics']['dob_check'],
-              is_incarcerated: person_hash['person_demographics']['is_incarcerated'],
+              race: consumer_role_hash['is_applying_coverage'] ? person_hash['race'] : nil,
+              ethnicity: consumer_role_hash['is_applying_coverage']? [person_hash['race']] : nil,
+              is_incarcerated: consumer_role_hash['is_applying_coverage'] ? person_hash['person_demographics']['is_incarcerated'] : nil,
               tribal_id: person_hash['person_demographics']['tribal_id'],
+              tribal_name: person_hash['person_demographics']['tribal_name'],
+              tribal_state: person_hash['person_demographics']['tribal_state'],
               language_code: person_hash['person_demographics']['language_code'],
               is_tobacco_user: person_hash['person_health']['is_tobacco_user'],
               is_physically_disabled: person_hash['person_health']['is_physically_disabled'],
@@ -299,22 +305,27 @@ module FinancialAssistance
               persisted_applicant.is_joint_tax_filing = applicant[:is_joint_tax_filing]
               persisted_applicant.is_claimed_as_tax_dependent = applicant[:is_claimed_as_tax_dependent]
               persisted_applicant.claimed_as_tax_dependent_by = claimed_by.id
+
               persisted_applicant.is_student = applicant[:is_student]
               persisted_applicant.student_kind = applicant[:student_kind]
               persisted_applicant.student_school_kind = applicant[:student_school_kind]
               persisted_applicant.student_status_end_on = applicant[:student_status_end_on]
+
               persisted_applicant.is_refugee = applicant[:is_refugee]
               persisted_applicant.is_trafficking_victim = applicant[:is_trafficking_victim]
+
               persisted_applicant.is_former_foster_care = applicant[:is_former_foster_care]
               persisted_applicant.age_left_foster_care = applicant[:age_left_foster_care]
               persisted_applicant.foster_care_us_state = applicant[:foster_care_us_state]
               persisted_applicant.had_medicaid_during_foster_care = applicant[:had_medicaid_during_foster_care]
+
               persisted_applicant.is_pregnant = applicant[:is_pregnant]
               persisted_applicant.is_enrolled_on_medicaid = applicant[:is_enrolled_on_medicaid]
               persisted_applicant.is_post_partum_period = applicant[:is_post_partum_period]
               persisted_applicant.children_expected_count = applicant[:children_expected_count]
               persisted_applicant.pregnancy_due_on = applicant[:pregnancy_due_on]
               persisted_applicant.pregnancy_end_on = applicant[:pregnancy_end_on]
+
               persisted_applicant.is_subject_to_five_year_bar = applicant[:is_subject_to_five_year_bar]
               persisted_applicant.is_five_year_bar_met = applicant[:is_five_year_bar_met]
               persisted_applicant.is_forty_quarters = applicant[:is_forty_quarters]
@@ -331,9 +342,11 @@ module FinancialAssistance
               persisted_applicant.has_deductions = applicant[:has_deductions]
               persisted_applicant.has_enrolled_health_coverage = applicant[:has_enrolled_health_coverage]
               persisted_applicant.has_eligible_health_coverage = applicant[:has_eligible_health_coverage]
+
               persisted_applicant.incomes = applicant[:incomes]
               persisted_applicant.benefits = applicant[:benefits].first.nil? ? [] : applicant[:benefits].compact
               persisted_applicant.deductions = applicant[:deductions]
+
               persisted_applicant.is_medicare_eligible = applicant[:is_medicare_eligible]
               ::FinancialAssistance::Applicant.skip_callback(:update, :after, :propagate_applicant)
               persisted_applicant.save!
