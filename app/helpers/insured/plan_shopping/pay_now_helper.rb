@@ -72,6 +72,22 @@ module Insured
         issuer = issuer.downcase&.gsub(' ', '_')
         issuer.present? && EnrollRegistry.key?("feature_index.#{issuer}_pay_now") && EnrollRegistry["#{issuer}_pay_now".to_sym].feature.is_enabled
       end
+
+      def pay_now_url(issuer_name)
+        if issuer_name.present? && EnrollRegistry.key?("feature_index.#{issuer_name}_pay_now") && EnrollRegistry["#{issuer_name}_pay_now".to_sym].feature.is_enabled
+          SamlInformation.send("#{issuer_name}_pay_now_url")
+        else
+          "https://"
+        end
+      end
+
+      def pay_now_relay_state(issuer_name)
+        if issuer_name.present? && EnrollRegistry.key?("feature_index.#{issuer_name}_pay_now") && EnrollRegistry["#{issuer_name}_pay_now".to_sym].feature.is_enabled
+          SamlInformation.send("#{issuer_name}_pay_now_relay_state")
+        else
+          "https://"
+        end
+      end
     end
   end
 end
