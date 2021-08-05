@@ -43,8 +43,3 @@ end
 Then(/^they should not see the Transition Family Members Link$/) do
   expect(page).to_not have_content("Transition Family Members")
 end
-
-
-
-
-
