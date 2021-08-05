@@ -21,8 +21,6 @@ module FinancialAssistance
             application           = yield validate(application)
             family                = yield find_family(application)
             payload_params        = yield construct_payload(family, application)
-            #transformed_payload  = yield transform_payload(payload_param)
-            #validated_payload    = yield validate_payload(transformed_payload)
             payload              = yield publish(payload_params)
 
             Success(payload) #switch variable as methods done
@@ -31,6 +29,7 @@ module FinancialAssistance
           private
 
           def find_application(application_id)
+            "finding application"
             application = FinancialAssistance::Application.find(application_id)
 
             Success(application)
@@ -56,15 +55,6 @@ module FinancialAssistance
             family_hash[:magi_medicaid_applications] = family_hash[:magi_medicaid_applications].select{ |a| a[:hbx_id] == application.hbx_id }
             Success(family_hash)
           end
-
-          # def transform_payload(payload_value)
-            # use ace entities to transform to json and then to atp cv3 and then to xml
-          # end
-
-          # def validate_payload(payload)
-            # validate transformed against atp cv3
-            # This may be built into the transforms and/or on the MG side, in which case don't need to do it twice and this can come out!
-          # end
 
           # publish xml to medicaid gateway using event source
           def publish(payload)
