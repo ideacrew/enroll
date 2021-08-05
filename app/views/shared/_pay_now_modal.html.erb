@@ -1,8 +1,8 @@
 <% carrier = hbx_enrollment.product.carrier_profile.legal_name %>
-<% first_payment = carrier_display_text(carrier) && past_effective_on?(hbx_enrollment) %>
-<% plan_shopping = carrier_display_text(carrier) && source == "Plan Shopping"  %>
-<% url = first_payment || plan_shopping ? pay_now_url(carrier.downcase.gsub(' ', '_')) : carrier_url(carrier) %>
-<% carrier_key = carrier_display_text(carrier) ? carrier.downcase! : "other" %>
+<% first_payment = carrier_paynow_enabled(carrier) && past_effective_on?(hbx_enrollment) %>
+<% plan_shopping = carrier_paynow_enabled(carrier) && source == "Plan Shopping"  %>
+<% url = first_payment || plan_shopping ? pay_now_url(carrier) : carrier_url(carrier) %>
+<% carrier_key = carrier_paynow_enabled(carrier) ? carrier.downcase.gsub(' ', '_') : "other" %>
 <div class="modal fade" tabindex="-1" role="dialog" id="payNowModal<%= hbx_enrollment.hbx_id %>">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -29,7 +29,7 @@
         <form action=<%= url %> method="<%= first_payment || plan_shopping ? 'post' : 'get' %>" target="_blank" id="pay_now_form">
           <% if first_payment || plan_shopping %>
             <input type="hidden" name="SAMLResponse" value="response" id="sp"/>
-            <input type="hidden" name="RelayState" value=<%= pay_now_relay_state(carrier.downcase.gsub(' ', '_')) %>/>
+            <input type="hidden" name="RelayState" value=<%= pay_now_relay_state(carrier) %>/>
           <% end %>
           <button type="submit" class="btn btn-primary pull-right sp interaction-click-control-print-purchase-confirmation" id="pay-now" value="<%= hbx_enrollment.hbx_id %>">
             <%= l10n("leave_dc_health_link")%>

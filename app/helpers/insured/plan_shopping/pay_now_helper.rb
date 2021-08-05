@@ -15,7 +15,7 @@ module Insured
       # rubocop:disable Metrics/CyclomaticComplexity
       def show_pay_now?(source, hbx_enrollment)
         @issuer_key = hbx_enrollment&.product&.issuer_profile&.legal_name&.downcase&.gsub(' ', '_')
-        return false unless carrier_display_text(@issuer_key) && can_pay_now?(hbx_enrollment)
+        return false unless carrier_paynow_enabled(@issuer_key) && can_pay_now?(hbx_enrollment)
         rr_feature = EnrollRegistry["#{@issuer_key}_pay_now".to_sym]
         return !pay_now_button_timed_out?(hbx_enrollment) if source == "Plan Shopping" && rr_feature.setting(:plan_shopping).item
         return past_effective_on?(hbx_enrollment) if source == "Enrollment Tile" && rr_feature.setting(:enrollment_tile).item
@@ -68,13 +68,14 @@ module Insured
         enrollments.any? { |enr| enr.terminated_on.year == hbx_enrollment.effective_on.year && (hbx_enrollment.effective_on - enr.terminated_on) > 1 }
       end
 
-      def carrier_display_text(issuer)
+      def carrier_paynow_enabled(issuer)
         issuer = issuer.downcase&.gsub(' ', '_')
         issuer.present? && EnrollRegistry.key?("feature_index.#{issuer}_pay_now") && EnrollRegistry["#{issuer}_pay_now".to_sym].feature.is_enabled
       end
 
       def pay_now_url(issuer_name)
-        if issuer_name.present? && EnrollRegistry.key?("feature_index.#{issuer_name}_pay_now") && EnrollRegistry["#{issuer_name}_pay_now".to_sym].feature.is_enabled
+        if carrier_paynow_enabled(issuer_name)
+          issuer_name = issuer_name.downcase&.gsub(' ', '_')
           SamlInformation.send("#{issuer_name}_pay_now_url")
         else
           "https://"
@@ -82,7 +83,8 @@ module Insured
       end
 
       def pay_now_relay_state(issuer_name)
-        if issuer_name.present? && EnrollRegistry.key?("feature_index.#{issuer_name}_pay_now") && EnrollRegistry["#{issuer_name}_pay_now".to_sym].feature.is_enabled
+        if carrier_paynow_enabled(issuer)
+          issuer_name = issuer_name.downcase&.gsub(' ', '_')
           SamlInformation.send("#{issuer_name}_pay_now_relay_state")
         else
           "https://"
