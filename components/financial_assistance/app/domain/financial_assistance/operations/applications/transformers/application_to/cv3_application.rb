@@ -9,16 +9,16 @@ module FinancialAssistance
     module Applications
       module Transformers
         module ApplicationTo
-          # Application params to be transformed.
+          # Params of an instance(persistance object) of ::FinancialAssistance::Application to be transformed.
           class Cv3Application # rubocop:disable Metrics/ClassLength
             # constructs cv3 payload for medicaid gateway.
 
             include Dry::Monads[:result, :do]
             include Acapi::Notifiers
-            require 'securerandom'
 
-            # @param [ Hash ] params Applicant Attributes
-            # @return [ BenefitMarkets::Entities::Applicant ] applicant Applicant
+            # @param [Hash] opts The options to construct params mapping to ::AcaEntities::MagiMedicaid::Contracts::ApplicationContract
+            # @option opts [::FinancialAssistance::Application] :application
+            # @return [Dry::Monads::Result]
             def call(application)
               application = yield validate(application)
               request_payload = yield construct_payload(application)

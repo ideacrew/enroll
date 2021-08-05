@@ -877,10 +877,28 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
         end
       end
     end
+
+    context 'submission_pending' do
+      context 'event: fail_submission' do
+        before do
+          application.update_attributes!(aasm_state: 'renewal_draft')
+        end
+
+        context 'from renewal_draft to submission_pending' do
+          before do
+            allow(application).to receive(:is_application_valid?).and_return(true)
+            application.fail_submission!
+          end
+
+          it 'should transition application to submission_pending' do
+            expect(application.reload.submission_pending?).to be_truthy
+          end
+        end
+      end
+    end
   end
 
   context 'check_for_valid_predecessor' do
-
     context 'invalid predecessor_id' do
       it 'should return validation errors' do
         expect do
@@ -912,6 +930,79 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     after :all do
       file_name = "#{Rails.root}/log/fa_application_advance_day_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
       File.delete(file_name) if File.exist?(file_name)
+    end
+  end
+
+  context 'attesations_complete' do
+    context 'application invalid by one of the attestation' do
+      [:is_requesting_voter_registration_application_in_mail, :is_renewal_authorized,
+       :medicaid_terms, :report_change_terms, :medicaid_insurance_collection_terms,
+       :parent_living_out_of_home_terms, :submission_terms, :full_medicaid_determination].each do |key|
+        before do
+          application.send("#{key}=", nil)
+          application.save!
+        end
+
+        it 'should return false' do
+          expect(application.reload.attesations_complete?).to be_falsey
+        end
+      end
+    end
+
+    context 'application valid by attestation' do
+      before do
+        keys = [:is_requesting_voter_registration_application_in_mail,
+                :is_renewal_authorized,
+                :medicaid_terms,
+                :report_change_terms,
+                :medicaid_insurance_collection_terms,
+                :parent_living_out_of_home_terms,
+                :submission_terms,
+                :full_medicaid_determination,
+                :attestation_terms]
+        keys.each do |key|
+          application.send("#{key}=", true)
+        end
+        application.save!
+      end
+
+      it 'should return true' do
+        expect(application.reload.attesations_complete?).to be_truthy
+      end
+    end
+  end
+
+  context 'have_permission_to_renew' do
+    context 'expired permission for renewal' do
+      before do
+        application.update_attributes!({ is_renewal_authorized: false, years_to_renew: 0})
+      end
+
+      it 'should return false' do
+        expect(application.reload.have_permission_to_renew?).to be_falsey
+      end
+    end
+
+    context 'indefinite permission for renewal' do
+      before do
+        application.update_attributes!({ is_renewal_authorized: true})
+      end
+
+      it 'should return true' do
+        expect(application.reload.have_permission_to_renew?).to be_truthy
+      end
+    end
+
+    context 'limited permission for renewal' do
+      [1, 2, 3, 4, 5].each do |year|
+        before do
+          application.update_attributes!({ is_renewal_authorized: false, years_to_renew: year})
+        end
+
+        it 'should return true' do
+          expect(application.reload.have_permission_to_renew?).to be_truthy
+        end
+      end
     end
   end
 end

@@ -15,8 +15,9 @@ module FinancialAssistance
           include Dry::Monads[:result, :do]
           include Acapi::Notifiers
 
-          # @param [ Hash ] params Applicant Attributes
-          # @return [ BenefitMarkets::Entities::Applicant ] applicant Applicant
+          # @param [Hash] opts The options to request eligibility determination from MedicaidGateway system
+          # @option opts [BSON::ObjectId] :application_id id ofFinancialAssistance::Application
+          # @return [Dry::Monads::Result]
           def call(application_id:)
             application    = yield find_application(application_id)
             application    = yield validate(application)
