@@ -56,6 +56,12 @@ module FinancialAssistance
 
             update_http_code_and_aasm_state(application)
 
+            # Transfer account to Medicaid Gateway if necessary
+            if is_transferrable(application)
+              puts application.inspect
+              transfer_account(application)
+            end
+
             # Send Determination to EA
             application.send_determination_to_ea
             Success('Successfully updated Application object with Full Eligibility Determination')
@@ -101,6 +107,18 @@ module FinancialAssistance
                                              is_eligible_for_non_magi_reasons: ped_entity.is_eligible_for_non_magi_reasons,
                                              is_non_magi_medicaid_eligible: ped_entity.is_non_magi_medicaid_eligible })
             end
+          end
+
+          def transfer_account(application)
+            ::FinancialAssistance::Operations::Transfers::MedicaidGateway::AccountTransferOut.new.call(application)
+          end
+
+          def is_transferrable(application)
+            # TODO Add resource registry check to see if immediately transferring or saving to be batched
+            applicants = application.applicants.select do |applicant| 
+              applicant.is_medicaid_chip_eligible || applicant.is_magi_medicaid || applicant.is_non_magi_medicaid_eligible
+            end
+            applicants.any?
           end
 
           def update_eligibility_determination(elig_d, thh_entity)
