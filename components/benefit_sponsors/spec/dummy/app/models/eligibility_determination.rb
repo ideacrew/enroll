@@ -12,7 +12,7 @@ class EligibilityDetermination
     'csr_87' => '05',
     'csr_73' => '04',
     'csr_100' => '02',
-    'limited' => '03'
+    'csr_limited' => '03'
   }.freeze
 
 end

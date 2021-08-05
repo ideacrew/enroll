@@ -140,6 +140,18 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
     end
   end
 
+  describe "#check_for_unverified_individuals" do
+    let(:builder) do
+      IvlNotices::EnrollmentNoticeBuilder.new(person.consumer_role, valid_params)
+    end
+    before do
+      allow(HbxEnrollment).to receive(:where).with({family_id: person.primary_family.id}).and_return([])
+    end
+    it "should not throw an error if effective on for hbx enrollments are blank" do
+      expect{ builder.check_for_unverified_individuals }.to raise_error(StandardError)
+    end
+  end
+
   describe "min_notice_due_date", dbclean: :after_each do
     before do
       allow(person).to receive("primary_family").and_return(family)
