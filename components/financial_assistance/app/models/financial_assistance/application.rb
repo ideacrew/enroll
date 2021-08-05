@@ -18,7 +18,11 @@ module FinancialAssistance
     validate :check_for_valid_predecessor
 
     YEARS_TO_RENEW_RANGE = (0..5).freeze
-    RENEWAL_BASE_YEAR_RANGE = (2013..TimeKeeper.date_of_record.year + 1).freeze
+
+    # Max of this range is set as below because during OE the user can authorize state to renew for up to 5 years from the assistance_year.
+    # Example:
+    #   On 11/15/2021(during OE), user can submit application for 2022 and can authorize renewal for next 5 years i.e. 2022 + 5
+    RENEWAL_BASE_YEAR_RANGE = (2013..TimeKeeper.date_of_record.year.next + YEARS_TO_RENEW_RANGE.max).freeze
 
     APPLICANT_KINDS   = ["user and/or family", "call center rep or case worker", "authorized representative"].freeze
     SOURCE_KINDS      = %w[paper source in-person].freeze
@@ -810,7 +814,7 @@ module FinancialAssistance
     def attesations_complete?
       !is_requesting_voter_registration_application_in_mail.nil? &&
         (is_renewal_authorized.present? || (is_renewal_authorized.is_a?(FalseClass) && years_to_renew.present?)) &&
-        check_medicaid_terms_attestation &&
+        !medicaid_terms.nil? &&
         !report_change_terms.nil? &&
         !medicaid_insurance_collection_terms.nil? &&
         check_parent_living_out_of_home_terms &&
@@ -825,13 +829,22 @@ module FinancialAssistance
 
     private
 
-    def check_medicaid_terms_attestation
-      # return true unless FinancialAssistanceRegistry.feature_enabled?(:display_medicaid_question)
-      !medicaid_terms.nil?
+    def set_renewal_base_year
+      renewal_year = calculate_renewal_base_year
+      update_attribute(:renewal_base_year, renewal_year) if renewal_year.present?
+    end
+
+    def calculate_renewal_base_year
+      ass_year = assistance_year.present? ? assistance_year : TimeKeeper.date_of_record.year
+      if is_renewal_authorized.present?
+        ass_year + YEARS_TO_RENEW_RANGE.max
+      elsif is_renewal_authorized.is_a?(FalseClass)
+        ass_year + years_to_renew
+      end
     end
 
     def check_full_medicaid_determination
-      # return true unless FinancialAssistanceRegistry.feature_enabled?(:full_medicaid_determination)
+      return true unless FinancialAssistanceRegistry.feature_enabled?(:full_medicaid_determination_step)
       !full_medicaid_determination.nil?
     end
 
@@ -1008,6 +1021,7 @@ module FinancialAssistance
       set_effective_date
       create_eligibility_determinations
       create_verification_documents
+      set_renewal_base_year
     end
 
     def unset_submit

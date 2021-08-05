@@ -96,7 +96,9 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
     it 'should have renewal basse year range constant' do
       expect(class_constants.include?(:RENEWAL_BASE_YEAR_RANGE)).to be_truthy
-      expect(described_class::RENEWAL_BASE_YEAR_RANGE).to eq(2013..TimeKeeper.date_of_record.year + 1)
+      # Open Enrollment case where user can submit application for next_year and can authorize
+      # renewal for next 5 years which can be current_year + 6 years.
+      expect(described_class::RENEWAL_BASE_YEAR_RANGE).to eq(2013..TimeKeeper.date_of_record.year + 6)
     end
 
     it 'should have applicant kinds constant' do
@@ -1002,6 +1004,56 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
         it 'should return true' do
           expect(application.reload.have_permission_to_renew?).to be_truthy
         end
+      end
+    end
+  end
+
+  context 'set_renewal_base_year' do
+    let(:applicant2) { application.applicants[1] }
+    let(:applicant3) { application.applicants[2] }
+
+    before do
+      application.applicants.first.update_attributes!(is_primary_applicant: true)
+      application.ensure_relationship_with_primary(applicant2, 'spouse')
+      application.ensure_relationship_with_primary(applicant3, 'child')
+      application.update_or_build_relationship(applicant2, applicant3, 'parent')
+      application.update_or_build_relationship(applicant3, applicant2, 'child')
+      application.save!
+    end
+
+    context 'expired permission for renewal' do
+      before do
+        application.update_attributes!({ aasm_state: 'draft', is_renewal_authorized: false, years_to_renew: 0 })
+        application.submit!
+      end
+
+      it 'should return value same as assistance_year' do
+        expect(application.reload.renewal_base_year).to eq(application.reload.assistance_year)
+      end
+    end
+
+    context 'indefinite permission for renewal' do
+      before do
+        application.update_attributes!({ aasm_state: 'draft', is_renewal_authorized: true })
+        application.submit!
+      end
+
+      it 'should return teh sum of assistance_year & max of YEARS_TO_RENEW_RANGE' do
+        expect(application.reload.renewal_base_year).to eq(
+          application.reload.assistance_year +
+            FinancialAssistance::Application::YEARS_TO_RENEW_RANGE.max
+        )
+      end
+    end
+
+    context 'limited permission for renewal' do
+      before do
+        application.update_attributes!({ aasm_state: 'draft', is_renewal_authorized: false, years_to_renew: 3 })
+        application.submit!
+      end
+
+      it 'should return teh sum of assistance_year & years_to_renew' do
+        expect(application.reload.renewal_base_year).to eq(application.reload.assistance_year + 3)
       end
     end
   end
