@@ -83,7 +83,7 @@ module Insured
       end
 
       def pay_now_relay_state(issuer_name)
-        if carrier_paynow_enabled(issuer)
+        if carrier_paynow_enabled(issuer_name)
           issuer_name = issuer_name.downcase&.gsub(' ', '_')
           SamlInformation.send("#{issuer_name}_pay_now_relay_state")
         else
