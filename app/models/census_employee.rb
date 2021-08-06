@@ -885,7 +885,7 @@ class CensusEmployee < CensusMember
 
     prior_py = benefit_sponsorship.prior_py_benefit_application
     return  unless prior_py.present?
-    status = (prior_py.benefit_sponsor_catalog.effective_period).cover?(hired_on)
+    status = hired_on <= prior_py.end_on
     return unless status
     benefit_group_assignment = benefit_package_assignment_on(prior_py.end_on)
     return  if benefit_group_assignment&.is_active?(prior_py.end_on)
@@ -898,7 +898,7 @@ class CensusEmployee < CensusMember
   def fetch_benefit_package(prior_py)
     if active_benefit_application.predecessor == prior_py && active_benefit_group_assignment.present?
       active_plan_hios_id = active_benefit_group_assignment.benefit_package.reference_plan.hios_id
-      prior_py.benefit_packages.select {|bg| bg.reference_plan.renewal_product.hios_id == active_plan_hios_id }.first
+      prior_py.benefit_packages.select {|bg| bg&.reference_plan&.renewal_product&.hios_id == active_plan_hios_id }.first
     else
       benefit_packages.first
     end
