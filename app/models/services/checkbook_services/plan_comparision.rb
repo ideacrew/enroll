@@ -193,7 +193,7 @@ module Services
         end
         @hbx_enrollment.hbx_enrollment_members.each do |member|
           age = member.family_member.person.age_on(today)
-          family << {"age": age, "pregnant": false, "AIAN": tribal_id, "smoker": member.tobacco_use, "relationship": member.primary_relationship}
+          family << {"age": age, "pregnant": false, "AIAN": tribal_details, "smoker": member.tobacco_use, "relationship": member.primary_relationship}
         end
         family
       end
