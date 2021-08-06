@@ -96,7 +96,11 @@ module Services
       end
 
       def construct_body_ivl
+        address = @person&.rating_address
+
         {
+          "county": address&.county,
+          "zipcode": county&.zip,
           "remote_access_key": Rails.application.config.checkbook_services_remote_access_key,
           "reference_id": Rails.application.config.checkbook_services_reference_id,
           "enrollment_year": enrollment_year,
@@ -184,7 +188,7 @@ module Services
         tribal_id = @hbx_enrollment.consumer_role.person.tribal_id.present?
         @hbx_enrollment.hbx_enrollment_members.each do |member|
           age = member.family_member.person.age_on(today)
-          family << {"age": age, "pregnant": false, "AIAN": tribal_id}
+          family << {"age": age, "pregnant": false, "AIAN": tribal_id, "smoker": member.tobacco_use, "relationship": member.primary_relationship}
         end
         family
       end
