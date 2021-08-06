@@ -152,7 +152,6 @@ module FinancialAssistance
         if same_with_primary == 'true'
           primary = application.primary_applicant
           attrs.merge!(no_dc_address: primary.no_dc_address, is_homeless: primary.is_homeless?, is_temporarily_out_of_state: primary.is_temporarily_out_of_state?)
-          nested_parameters[:addresses_attributes] = primary.addresses.first.attributes.except(:_id, :created_at, :updated_at) if primary.addresses.present?
         end
 
         attrs.merge!(vlp_parameters)
