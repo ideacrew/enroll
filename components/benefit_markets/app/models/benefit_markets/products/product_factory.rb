@@ -46,9 +46,11 @@ module BenefitMarkets
     #   DC "health", 2019, "csr_87":
     #     .by_coverage_kind_and_year("health", 2019,  "csr_87")
     def by_coverage_kind_year_and_csr(coverage_kind, active_year, csr_kind:)
+      csr_list = ['csr_100','csr_limited']
       products_with_premium_tables = by_coverage_kind_and_year(coverage_kind, active_year).with_premium_tables
-      products_with_premium_tables = products_with_premium_tables.by_csr_kind_with_catastrophic(csr_kind) if coverage_kind == 'health'
-      products_with_premium_tables
+      return products_with_premium_tables if coverage_kind != 'health'
+      return products_with_premium_tables.by_csr_kind_with_02_03_variant(csr_kind) if csr_list.include?(csr_kind)
+      products_with_premium_tables.by_csr_kind_with_catastrophic(csr_kind)
     end
 
     def cost_for(schedule_date, age)
