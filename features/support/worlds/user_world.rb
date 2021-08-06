@@ -13,7 +13,7 @@ module UserWorld
     if @employer_staff
       @employer_staff
     else
-      @employer_staff = FactoryBot.create(:user, :employer_staff)
+      @employer_staff = FactoryBot.create(:user, :employer_staff, email: "employer@example.com")
     end
   end
 
@@ -21,7 +21,7 @@ module UserWorld
     if @employee_role
       @employee_role
     else
-      @employee_role = FactoryBot.create(:user, :employee)
+      @employee_role = FactoryBot.create(:user, :employee, email: "employee@example.com")
     end
   end
 
@@ -76,7 +76,7 @@ Given(/^that a user with a (.*?) role(?: with (.*?) subrole)? exists and (.*?) l
       user = employee(employer)
     when "Broker"
       # in features/step_definitions/broker_employee_quote_steps.rb BrokerWorld module
-      user = broker
+      user = broker(email: "broker@example.com")
     when "HBX staff"
       user = admin(subrole)
     when 'Employer Role'
