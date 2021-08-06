@@ -35,6 +35,6 @@ unless ENV['RABBITMQ_URL'].blank?
       end
   end
 
-  # EventSource.initialize!
+  EventSource.initialize!
 
 end
