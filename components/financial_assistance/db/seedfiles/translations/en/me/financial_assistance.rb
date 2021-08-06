@@ -11,7 +11,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
      Please call Maine Cover ME at (800) 965-7476 to make updates to your case.
      If you keep going, we'll check to see if you qualify to enroll in a private health insurance plan on Maine Cover ME, but won't be able to tell you if you qualify for Medicaid or cost savings.",
   "en.faa.other_ques.disability_question" => "Does this person have a disability?",
-  "en.faa.review_eligibility_header" => "Your Application for Premium Reductions",
+  "en.faa.review_eligibility_header" => "Your Application for Lower Premiums",
   'en.faa.other_ques.is_student' => 'Is this person a full-time student?*',
   "en.faa.medicaid_question" => "Do you want us to submit this application to the ME Department of Health and Human Services (DHHS) to do a full review of your application for Medicaid eligibility?",
   'en.faa.edit.delete_applicant' => 'Are you sure you want to remove this applicant?',
@@ -28,23 +28,25 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.referral" => "Special MaineCare Referral",
   "en.faa.qualified_reason" => "These people may qualify for MaineCare for reasons like age or disability.",
   "en.faa.next_step_with_non_magi" => "<b>NEXT STEP:</b> We are sending your application to the Department of Health and Human Services (DHHS). They will contact you to get more information to see if you qualify.",
-  "en.faa.premium_reductions_1" => "These people are <span>eligible for monthly premium reductions of",
+  "en.faa.premium_reductions_1" => "These people <strong>qualify for lower monthly premiums of $%{reduction_amount} per month </strong>.",
   "en.faa.premium_reductions_2" => "per month.</span> This means they won't have to pay full price for health insurance.",
   "en.faa.qualify_for_lower_costs_1" => "These people also qualify for lower out-of-pocket costs - a benefit that lowers other costs like the annual deductible and copayments. ",
   "en.faa.qualify_for_csr_100" => "They also won’t pay anything for services they receive from an Indian Health Service provider.",
   "en.faa.qualify_for_csr_limited" => "These people won’t pay anything for services they receive from an Indian Health Service provider.",
   "en.faa.silver_plan_checkmark" => "This benefit is only available if these people select a silver plan. Look for this check mark ",
-  "en.faa.qualify_for_lower_costs_2" => " on plans that have this benefit.",
+  "en.faa.qualify_for_lower_costs_2" => " next to the plan name.",
   "en.faa.does_not_qualify" => "Does not qualify",
   "en.faa.likely_does_not_qualify" => "These people <span> likely don't qualify for ",
   "en.faa.likely_does_not_qualify2" => "</span>, and don't qualify for private health insurance through Maine Cover ME:",
   "en.faa.private_health_insurance" => "Private health insurance",
   "en.faa.qualified_to_enroll" => "These people <span> qualify to enroll </span> in a private health insurance plan:",
-  "en.faa.do_not_agree" => "If you do not agree with this determination, you have the right to appeal. <a href=''>Find out more about the appeal process</a> or <a href=''>get assistance</a> by contacting us directly.",
+  "en.faa.do_not_agree" => "If you do not agree with this determination, you have the right to appeal. Find out more about the appeal process or get assistance by contacting us directly.",
   "en.faa.your_application_reference" => "Your application reference number is ",
   "en.faa.next_step_without_aggregate" => "<b>NEXT STEP:</b> Pick a health insurance plan.",
   "en.faa.next_step_with_aggregate_1" => "<b>NEXT STEP:</b><ul><li><b>If you’re already enrolled in a plan</b>, we’ve automatically changed your premium. You don’t have to do anything else.</li>",
   "en.faa.next_step_with_aggregate_2" => "<br><li><b>If you’re not enrolled or need to make changes to your plan</b>, select CONTINUE to pick a health insurance plan or change who is covered by your plan.</li></ul>",
+  "en.faa.next_step_medicaid_eligible" => "<b>Medicaid coverage is free. If you would like to enroll and pay full price for private health insurance instead, select CONTINUE to…:</b><ul><li>pick a plan, or</li><li>,add or remove someone from your plan.</li>",
+  "en.faa.next_step_medicaid_eligible_at_least_one_other_eligible" => "<b>Select CONTINUE to…:</b><ul><li>add or remove someone from your plan, or</li><li> pick a plan because you do not have coverage.</li>",
   "en.faa.indian_health_service" => "Has this person ever gotten a health service from the Indian Health Service, a tribal health program, or urban Indian health program or through a referral from one of these programs?",
   "en.faa.indian_health_service_eligible" => "Is this person eligible to get health services from the Indian Health Service, a tribal health program, or an urban Indian health program or through referral from one of these programs?",
   "en.faa.medicaid_not_eligible" => "Was this person found not eligible for MaineCare (Medicaid) or CubCare (Children's Health Insurance Program) within the last 90 days? *",
@@ -119,7 +121,8 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.negative_income" => "Negative Income",
   "en.faa.full_long_name_determination" => "Based on the information you provided, no one on this application is likely to qualify for %{program_short_name}. Do you still want us to send your application to the %{program_long_name} so they can check on %{program_short_name} eligibility?",
   "en.faa.send_to_external_verification" => "Send to OFI",
-  "en.faa.filing_as_head_of_household" => "Will this person be filing as head of household?"
+  "en.faa.filing_as_head_of_household" => "Will this person be filing as head of household?",
+  "en.faa.eligibility_go_to_my_account_message" => "If you’re already enrolled in CoverME.gov Individual & Family plan, you’re finished! To see your plan information, select GO TO MY ACCOUNT."
 }.freeze
 # rubocop:enable Layout/LineLength
 
