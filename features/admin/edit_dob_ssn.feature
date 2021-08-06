@@ -20,7 +20,6 @@ Feature: Update DOB and SSN
     When user clicks on edit DOB/SSN link
     When user enters an invalid SSN and clicks on update
     Then Hbx Admin should see the edit form being rendered again with a validation error message
-    And Hbx Admin logs out
 
   Scenario: Admin enters valid DOB or SSN
     Given that a user with a HBX staff role with HBX staff subrole exists and is logged in
@@ -30,5 +29,3 @@ Feature: Update DOB and SSN
     When user clicks on edit DOB/SSN link
     When Hbx Admin enters a valid DOB and SSN and clicks on update
     Then Hbx Admin should see the update partial rendered with update sucessful message
-    And Hbx Admin logs out
-
