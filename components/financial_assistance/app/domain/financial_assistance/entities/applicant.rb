@@ -2,6 +2,7 @@
 
 module FinancialAssistance
   module Entities
+    # FinancialAssistance Applicant Entities for DC and ME
     class Applicant < Dry::Struct
       transform_keys(&:to_sym)
 
@@ -29,7 +30,6 @@ module FinancialAssistance
       attribute :language_code, Types::String.optional.meta(omittable: true)
       attribute :no_dc_address, Types::Strict::Bool.meta(omittable: true)
       attribute :is_homeless, Types::Strict::Bool.meta(omittable: true)
-      attribute :is_temporarily_out_of_state, Types::Strict::Bool.meta(omittable: true)
 
       attribute :no_ssn, Types::String.optional.meta(omittable: true)
       attribute :citizen_status, Types::String.optional
@@ -60,6 +60,8 @@ module FinancialAssistance
       attribute :emails, Types::Array.of(FinancialAssistance::Entities::Email)
       attribute :phones, Types::Array.of(FinancialAssistance::Entities::Phone)
       attribute :incomes, Types::Array.of(FinancialAssistance::Entities::Income).meta(omittable: true)
+
+      attribute :is_temporarily_out_of_state, Types::Strict::Bool.meta(omittable: true) if EnrollRegistry[:enroll_app].settings(:site_key).item == :dc
     end
   end
 end
