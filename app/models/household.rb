@@ -22,7 +22,7 @@ class Household
   embeds_many :coverage_households, cascade_callbacks: true
 
   accepts_nested_attributes_for :hbx_enrollments, :tax_households, :coverage_households
-  
+
   before_validation :set_effective_starting_on
   before_validation :set_effective_ending_on #, :if => lambda {|household| household.effective_ending_on.blank? } # set_effective_starting_on should be done before this
   before_validation :reset_is_active_for_previous
@@ -506,13 +506,14 @@ class Household
     params["family_members"].each do |person_hbx_id, thhm_info|
       person_id = Person.by_hbx_id(person_hbx_id).first.id
       family_member = family.family_members.where(person_id: person_id).first
-      th.tax_household_members.create(
+      thm = th.tax_household_members.create(
         :applicant_id => family_member.id,
         :is_subscriber => family_member.is_primary_applicant,
-        :csr_percent_as_integer => (params['csr'] == 'limited' ? '-1' : params['csr']), #TODO: Should take individual level csr kind as params to update.
         thhm_info["pdc_type"].to_sym => true,
         :reason => thhm_info["reason"]
       )
+      thm.update_attributes!(csr_percent_as_integer: (params['csr'] == 'limited' ? '-1' : params['csr'])) if thm.is_ia_eligible?
+      #TODO: Should take individual level csr kind as params to update.
     end
 
     th.eligibility_determinations.create(
