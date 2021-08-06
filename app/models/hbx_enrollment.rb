@@ -2110,6 +2110,7 @@ class HbxEnrollment
   end
 
   def prior_year_shop_coverage?
+    return false unless EnrollRegistry.feature_enabled?(:prior_plan_year_shop_sep)
     application = sponsored_benefit_package&.benefit_application
     return false if application.blank?
 
@@ -2119,6 +2120,8 @@ class HbxEnrollment
   end
 
   def prior_year_ivl_coverage?
+    return false unless EnrollRegistry.feature_enabled?(:prior_plan_year_ivl_sep)
+    return false if special_enrollment_period.blank?
     prior_bcp = HbxProfile.current_hbx&.benefit_sponsorship&.previous_benefit_coverage_period
     return false unless prior_bcp
     prior_bcp.contains?(effective_on)
