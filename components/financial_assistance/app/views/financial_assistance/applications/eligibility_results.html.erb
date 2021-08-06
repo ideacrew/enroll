@@ -16,7 +16,7 @@
                 <%= l10n("faa.eligible_for_medicaid") %>
                 <%= render partial:'shared/glossary', locals: {key: 'medicaid', title: FinancialAssistanceRegistry[:medicaid_chip_driver_questions].setting(:medicaid_chip).item, term:  FinancialAssistanceRegistry[:medicaid_chip_driver_questions].setting(:medicaid_chip).item } %>
                 <% if EnrollRegistry[:enroll_app].setting(:site_key).item == :me %>
-                  <%= l10n("faa.eligible_for_medicaid2") %>:
+                 <%= l10n("faa.eligible_for_medicaid2") %>:
                 <% else %>
                   :
                 <% end %>
