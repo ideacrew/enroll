@@ -30,7 +30,7 @@
                   <% income_and_deductions_for(applicant).each do |embedded_document| %>
                     <tr>
                       <td> <%= applicant.full_name %> </td>
-                      <td> <%= FinancialAssistance::Income::OTHER_INCOME_TYPE_KIND[embedded_document.kind.to_sym] %> </td>
+                      <td> <%= l10n("faa.#{embedded_document.kind}") %> </td>
                       <td> <%= embedded_document.frequency_kind.humanize %> </td>
                       <td>
                       <b>
