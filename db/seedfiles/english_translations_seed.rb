@@ -20,6 +20,18 @@ seedfile_locations.each do |seedfile_location|
   end
 end
 
+# This will be used for translations for displaying certain constants/database values from FAA on the view
+if EnrollRegistry.feature_enabled?(:financial_assistance)
+  fa_translation_hash = {}
+  # This is a hash
+  other_income_type_kinds = ::FinancialAssistance::Income::ALL_INCOME_KINDS_MAPPED
+  other_income_type_kinds.each do |symbolized_key, humanized_value|
+    translation_record_key = "en.faa.income.#{symbolized_key}"
+    fa_translation_hash[translation_record_key] = humanized_value
+  end
+  translations_to_seed << fa_translation_hash
+end
+
 MAIN_TRANSLATIONS = {
   :'en.shared.my_portal_links.my_insured_portal' => 'My Insured Portal',
   :'en.shared.my_portal_links.my_broker_agency_portal' => 'My Broker Agency Portal',
