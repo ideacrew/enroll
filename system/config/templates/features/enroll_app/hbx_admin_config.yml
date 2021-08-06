@@ -21,9 +21,5 @@ registry:
           is_enabled: true
         - key: :orphan_accounts_tab
           is_enabled: true
-<<<<<<< HEAD
-=======
         - key: :no_transition_families
           is_enabled: true
-        
->>>>>>> origin/checkbook_integration
