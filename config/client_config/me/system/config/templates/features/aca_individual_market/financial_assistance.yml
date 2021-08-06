@@ -154,7 +154,7 @@ registry:
         - key: :gamble_prize
           item: true
     - key: :full_medicaid_determination_step
-      is_enabled: true
+      is_enabled: false
     - key: :native_american_csr
       is_enabled: true
 # TODO eligibility engine connectivity(HAVEN) settings
