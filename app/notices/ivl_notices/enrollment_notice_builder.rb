@@ -85,9 +85,9 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
     start_time = (date - 2.days).in_time_zone("Eastern Time (US & Canada)").beginning_of_day
     end_time = (date - 2.days).in_time_zone("Eastern Time (US & Canada)").end_of_day
     enrollments = HbxEnrollment.where(family_id: family.id).select do |hbx_en|
-      (!hbx_en.is_shop?) && (!["coverage_canceled", "shopping", "inactive"].include?(hbx_en.aasm_state)) &&
-      (hbx_en.terminated_on.blank? || hbx_en.terminated_on >= TimeKeeper.date_of_record) &&
-      (hbx_en.created_at >= start_time && hbx_en.created_at <= end_time)
+      !hbx_en.is_shop? && !["coverage_canceled", "shopping", "inactive"].include?(hbx_en.aasm_state) &&
+        (hbx_en.terminated_on.blank? || hbx_en.terminated_on >= TimeKeeper.date_of_record) &&
+        (hbx_en.created_at >= start_time && hbx_en.created_at <= end_time)
     end
     enrollments.reject!{|e| e.coverage_terminated? }
     family_members = enrollments.inject([]) do |family_members, enrollment|
