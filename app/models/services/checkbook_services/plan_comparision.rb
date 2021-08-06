@@ -96,13 +96,19 @@ module Services
       end
 
       def construct_body_ivl
+        address = @person&.rating_address
+
         {
+          "county": address&.county,
+          "zipcode": county&.zip,
           "remote_access_key": Rails.application.config.checkbook_services_remote_access_key,
           "reference_id": Rails.application.config.checkbook_services_reference_id,
           "enrollment_year": enrollment_year,
           "family": consumer_build_family,
           "aptc": elected_aptc.to_s,
           "csr": csr_value,
+          "environment": checkbook_env_key,
+          "from": EnrollRegistry[:enroll_app].setting(:site_key).item.to_s,
           "enrollmentId": @hbx_enrollment.id.to_s # Host Name will be static as Checkbook suports static URL's and hostname should be changed before going to production.
         }
       end
@@ -187,7 +193,7 @@ module Services
         end
         @hbx_enrollment.hbx_enrollment_members.each do |member|
           age = member.family_member.person.age_on(today)
-          family << {"age": age, "pregnant": false, "AIAN": tribal_details}
+          family << {"age": age, "pregnant": false, "AIAN": tribal_id, "smoker": member.tobacco_use, "relationship": member.primary_relationship}
         end
         family
       end
@@ -209,6 +215,11 @@ module Services
           family << {'dob': dependent.family_member.person.dob.strftime("%Y-%m-%d") ,'relationship': dependent.primary_relationship}
         end
         family
+      end
+
+      def checkbook_env_key
+        config = Rails.application.config
+        config.respond_to?(:checkbook_services_environment_key) ? config.checkbook_services_environment_key : nil
       end
     end
   end

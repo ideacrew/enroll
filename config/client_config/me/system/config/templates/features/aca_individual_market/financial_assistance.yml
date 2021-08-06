@@ -55,6 +55,9 @@ registry:
       - key: :unemployment_income
         item: :unemployment_income
         is_enabled: true
+      - key: :medicaid_tax_credits_link
+        item: :medicaid_tax_credits_link
+        is_enabled: false
       - key: :primary_caregiver_other_question
         item: :primary_caregiver_other_question
         is_enabled: true
