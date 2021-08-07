@@ -2,6 +2,7 @@ Feature: Hbx Admin as Paper Application for ivl- User Disagrees to Experian Iden
 
 Background: Hbx Admin navigates into the new consumer application with paper application option and goes forward till DOCUMENT UPLOAD page
   Given an HBX admin exists
+  And EnrollRegistry paper_application_enabled feature is enabled
   And the HBX admin is logged in
   And admin has navigated into the NEW CONSUMER APPLICATION
   And the Admin is on the Personal Info page for the family
