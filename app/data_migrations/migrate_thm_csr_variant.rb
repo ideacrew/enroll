@@ -50,7 +50,7 @@ class MigrateThmCsrVariant < MongoidMigrationTask
                 Rails.logger.info "Updated csr variant for family for - #{thm.applicant_id} - is - #{thm.csr_percent_as_integer}" unless Rails.env.test?
               end
             end
-            puts "Update csr variant for family of #{family.id.to_s}" unless Rails.env.test?
+            puts "Update csr variant for family of #{family.id}" unless Rails.env.test?
             Rails.logger.info "End of the script" unless Rails.env.test?
           end
           offset += batch_size
