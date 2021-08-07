@@ -355,3 +355,5 @@ registry:
         settings:
           - key: :days
             item: 60
+      - key: :checkbook_integration
+        is_enabled: true

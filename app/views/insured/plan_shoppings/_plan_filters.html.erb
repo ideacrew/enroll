@@ -11,7 +11,7 @@
           <%= link_to l10n("estimate_your_cost"), '',data: {toggle: "modal", target: "#plan_match_dental_redirection"} %>
         <% end %>
         </br>
-        <% if plan_match_dc %>
+        <% if checkbook_integration_enabled? %>
         <%= estimate_your_costs %>
         <% end %>
       </br>

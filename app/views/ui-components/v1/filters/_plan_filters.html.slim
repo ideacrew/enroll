@@ -8,7 +8,7 @@
       - if @market_kind == "individual" && @coverage_kind == "dental" && @hbx_enrollment.effective_on.year == Settings.checkbook_services.current_year
         h4 = link_to l10n("estimate_your_cost"), '',data: {toggle: "modal", target: "#plan_match_dental_redirection"}
         br
-      - if plan_match_dc
+      - if checkbook_integration_enabled?
         h4 = estimate_your_costs
 
   #plan_match_redirection.modal.fade role="document" tabindex="-1"
