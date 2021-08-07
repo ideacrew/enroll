@@ -826,6 +826,10 @@ module FinancialAssistance
       renewal_base_year >= assistance_year if assistance_year && renewal_base_year
     end
 
+    def previously_renewal_draft?
+      workflow_state_transitions.any? { |wst| wst.from_state == 'renewal_draft' }
+    end
+
     private
 
     def set_renewal_base_year
@@ -856,10 +860,6 @@ module FinancialAssistance
       return if self.predecessor_id.nil?
       pred_appli = FinancialAssistance::Application.where(id: predecessor_id).first
       self.errors.add(:predecessor_id, 'expected an instance of FinancialAssistance::Application.') if pred_appli.blank?
-    end
-
-    def previously_renewal_draft?
-      workflow_state_transitions.any? { |wst| wst.from_state == 'renewal_draft' }
     end
 
     def clean_params(model_params)
