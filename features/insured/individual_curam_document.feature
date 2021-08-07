@@ -1,3 +1,4 @@
+
 Feature: Customers go to Curam to view notices and verifications
 
   Background: Set up features

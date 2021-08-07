@@ -243,6 +243,7 @@ module Insured::FamiliesHelper
   end
 
   def show_download_tax_documents_button?
+    return false unless EnrollRegistry.feature_enabled?(:show_download_tax_documents)
     if @person.ssn.blank?
       false
     elsif @person.consumer_role.blank?
