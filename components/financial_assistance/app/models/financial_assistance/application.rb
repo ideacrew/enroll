@@ -823,8 +823,7 @@ module FinancialAssistance
     end
 
     def have_permission_to_renew?
-      is_renewal_authorized.present? ||
-        (is_renewal_authorized.is_a?(FalseClass) && !years_to_renew.zero?)
+      renewal_base_year >= assistance_year if assistance_year && renewal_base_year
     end
 
     private

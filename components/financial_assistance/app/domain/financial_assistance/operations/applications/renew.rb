@@ -52,7 +52,7 @@ module FinancialAssistance
             request_result.failure? ? request_result : Success(application)
           else
             application.fail_submission!
-            Failure("Unable to submit the application for given application hbx_id: #{application.hbx_id}")
+            Failure("Expired Submission or unable to submit the application for given application hbx_id: #{application.hbx_id}")
           end
         end
 

@@ -45,12 +45,10 @@ RSpec.describe ::Subscribers::ApplicationGenerateRenewalDraftSubscriber, dbclean
 
   after { channel_proxy.queue_delete(queue_proxy.name) }
 
-  context 'exchanges, queues, consumers & routing_key' do
-    it 'should create exchanges and queues, consumers' do
+  context 'exchanges, queues' do
+    it 'should create exchanges and queues' do
       expect(bunny_exchange).to be_present
       expect(bunny_queue).to be_present
-      expect(bunny_queue.consumer_count).to eq 2
-      expect(routing_key).to eq('enroll.iap.applications.generate_renewal_draft')
     end
   end
 

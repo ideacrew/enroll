@@ -17,19 +17,22 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Renew, dbclean: 
   end
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
   let!(:application10) do
-    FactoryBot.create(:financial_assistance_application,
-                      :with_attestations,
-                      hbx_id: '111000222',
-                      family_id: family.id,
-                      assistance_year: TimeKeeper.date_of_record.year,
-                      is_requesting_voter_registration_application_in_mail: true,
-                      is_renewal_authorized: true,
-                      medicaid_terms: true,
-                      report_change_terms: true,
-                      medicaid_insurance_collection_terms: true,
-                      parent_living_out_of_home_terms: false,
-                      submission_terms: true,
-                      full_medicaid_determination: true)
+    appli = FactoryBot.create(:financial_assistance_application,
+                              :with_attestations,
+                              hbx_id: '111000222',
+                              family_id: family.id,
+                              assistance_year: TimeKeeper.date_of_record.year,
+                              is_requesting_voter_registration_application_in_mail: true,
+                              is_renewal_authorized: true,
+                              aasm_state: 'draft',
+                              medicaid_terms: true,
+                              report_change_terms: true,
+                              medicaid_insurance_collection_terms: true,
+                              parent_living_out_of_home_terms: false,
+                              submission_terms: true,
+                              full_medicaid_determination: true)
+    appli.submit!
+    appli
   end
   let!(:create_appli) do
     appli = FactoryBot.build(:financial_assistance_applicant,
@@ -64,7 +67,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Renew, dbclean: 
   end
 
   context 'success' do
-    context 'is_renewal_authorized set to true' do
+    context 'is_renewal_authorized set to true i.e. renewal authorized for next 5 years' do
       before do
         @renewal_draft = ::FinancialAssistance::Operations::Applications::CreateRenewalDraft.new.call(
           { family_id: application10.family_id, renewal_year: application10.assistance_year.next }
@@ -184,12 +187,12 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Renew, dbclean: 
 
       context 'expired permission for renewal' do
         before do
-          @renewal_draft.update_attributes!(is_renewal_authorized: false, years_to_renew: 0)
+          @renewal_draft.update_attributes!(renewal_base_year: @renewal_draft.assistance_year.pred)
           @result = subject.call({ application_hbx_id: @renewal_draft.hbx_id })
         end
 
         it 'should return failure with error message' do
-          expect(@result.failure).to eq("Unable to submit the application for given application hbx_id: #{@renewal_draft.hbx_id}")
+          expect(@result.failure).to eq("Expired Submission or unable to submit the application for given application hbx_id: #{@renewal_draft.hbx_id}")
         end
 
         it 'should also transition application to submission_pending' do

@@ -975,9 +975,10 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
   end
 
   context 'have_permission_to_renew' do
-    context 'expired permission for renewal' do
+    context 'no value for aasistance_year' do
       before do
-        application.update_attributes!({ is_renewal_authorized: false, years_to_renew: 0})
+        application.update_attributes!({ assistance_year: nil,
+                                         renewal_base_year: TimeKeeper.date_of_record.year })
       end
 
       it 'should return false' do
@@ -985,9 +986,32 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       end
     end
 
-    context 'indefinite permission for renewal' do
+    context 'no value for renewal_base_year' do
       before do
-        application.update_attributes!({ is_renewal_authorized: true})
+        application.update_attributes!({ assistance_year: TimeKeeper.date_of_record.year,
+                                         renewal_base_year: nil })
+      end
+
+      it 'should return false' do
+        expect(application.reload.have_permission_to_renew?).to be_falsey
+      end
+    end
+
+    context 'expired permission for renewal' do
+      before do
+        application.update_attributes!({ assistance_year: TimeKeeper.date_of_record.year.next,
+                                         renewal_base_year: TimeKeeper.date_of_record.year })
+      end
+
+      it 'should return false' do
+        expect(application.reload.have_permission_to_renew?).to be_falsey
+      end
+    end
+
+    context 'maximum number of years(5) permission for renewal' do
+      before do
+        application.update_attributes!({ assistance_year: TimeKeeper.date_of_record.year.next,
+                                         renewal_base_year: TimeKeeper.date_of_record.year + 5 })
       end
 
       it 'should return true' do
@@ -998,7 +1022,8 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     context 'limited permission for renewal' do
       [1, 2, 3, 4, 5].each do |year|
         before do
-          application.update_attributes!({ is_renewal_authorized: false, years_to_renew: year})
+          application.update_attributes!({ assistance_year: TimeKeeper.date_of_record.year.next,
+                                           renewal_base_year: TimeKeeper.date_of_record.year + year })
         end
 
         it 'should return true' do
@@ -1032,7 +1057,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       end
     end
 
-    context 'indefinite permission for renewal' do
+    context 'maximum number of years(5) permission for renewal' do
       before do
         application.update_attributes!({ aasm_state: 'draft', is_renewal_authorized: true })
         application.submit!
