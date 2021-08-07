@@ -11,7 +11,7 @@ class MigrateThmCsrVariant < MongoidMigrationTask
     @logger = Logger.new("#{Rails.root}/log/migrate_thm_csr_variant.log") unless Rails.env.test?
     Rails.logger.info "Script Start - #{TimeKeeper.datetime_of_record}" unless Rails.env.test?
 
-    field_names = %w[Person_HBX_Id Family_ID Tax_Household_ID TH_Member_ID CSR_Percent_as_Integer]
+    field_names = %w[Person_ID Family_Id Tax_Household_ID TH_Member_ID CSR_Percent_as_Integer]
 
     report_file_name = "#{Rails.root}/updated_csr_list_report_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv"
     logger_file_name = "#{Rails.root}/existing_csr_list_before_update_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv"
@@ -31,22 +31,26 @@ class MigrateThmCsrVariant < MongoidMigrationTask
             end
 
             family.active_household.tax_households.each do |tax_household|
+              if tax_household.latest_eligibility_determination.nil? || tax_household.tax_household_members.nil?
+                puts "No eligibility detemination or tax household members exists for person with the given hbx_id #{family.id}" unless Rails.env.test?
+                next
+              end
               ed = tax_household.latest_eligibility_determination # check two determinations created at determined
-              Rails.logger.info "No Eligibility determinaton found for the family of - #{family.primary_applicant.person.full_name}" if ed.nil?
+              Rails.logger.info "No Eligibility determinaton found for the family of - #{family.id}" if ed.nil?
               csr_percent = ed.csr_percent_as_integer
 
               thhms = tax_household.tax_household_members.where(is_ia_eligible: true)
-              Rails.logger.info "Tax household members not present for given tax household of - #{family.primary_applicant.person.full_name}" if thhms.nil?
+              Rails.logger.info "Tax household members not present for given tax household of - #{family.id}" if thhms.nil?
 
               thhms&.each do |thm|
                 Rails.logger.info "Csr Variant Before Update for - #{thm.id} - is - #{thm.csr_percent_as_integer}" unless Rails.env.test?
-                logger_csv << [family&.primary_person&.hbx_id.to_s, family.id.to_s, tax_household.id.to_s, thm.id.to_s, thm.csr_percent_as_integer]
+                logger_csv << [family.primary_applicant&.person_id&.to_s, family.id.to_s, tax_household.id.to_s, thm.id.to_s, thm.csr_percent_as_integer]
                 thm.update_attributes!(csr_percent_as_integer: csr_percent)
-                report_csv << [family&.primary_person&.hbx_id.to_s, family.id.to_s, tax_household.id.to_s, thm.id.to_s, thm.csr_percent_as_integer]
+                report_csv << [family.primary_applicant&.person_id&.to_s, family.id.to_s, tax_household.id.to_s, thm.id.to_s, thm.csr_percent_as_integer]
                 Rails.logger.info "Updated csr variant for family for - #{thm.applicant_id} - is - #{thm.csr_percent_as_integer}" unless Rails.env.test?
               end
             end
-            puts "Update csr variant for family of #{family.primary_applicant.person.full_name}" unless Rails.env.test?
+            puts "Update csr variant for family of #{family.id.to_s}" unless Rails.env.test?
             Rails.logger.info "End of the script" unless Rails.env.test?
           end
           offset += batch_size
@@ -55,7 +59,7 @@ class MigrateThmCsrVariant < MongoidMigrationTask
       end
     end
   rescue StandardError => e
-    puts "Errored processing person with hbx_id: #{family&.primary_applicant&.person&.hbx_id}, error: #{e.message}" unless Rails.env.test?
+    puts "error: #{e.message}" unless Rails.env.test?
   end
 end
 # rubocop:enable Metrics/AbcSize
