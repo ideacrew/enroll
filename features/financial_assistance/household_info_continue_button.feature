@@ -1,6 +1,8 @@
 Feature: A dedicated page that gives the user access to household member creation/edit as well as Financial application forms for each household member.
 
   Background: Household Info page
+    Given EnrollRegistry show_download_tax_documents feature is enabled
+    And EnrollRegistry show_upload_notices feature is enabled
     And EnrollRegistry medicaid_tax_credits_link feature is enabled
     Given the FAA feature configuration is enabled
     Given a plan year, with premium tables, exists
