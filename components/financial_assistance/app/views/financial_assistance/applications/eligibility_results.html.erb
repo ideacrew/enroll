@@ -47,7 +47,7 @@
             </div>
             <div class="border-bottom-2px"></div>
             <div class="er-medicaid-prsn">
-              <%= total_aptc_amount =  number_to_currency(total_aptc_across_eligibility_determinations(params[:id])) %>
+              <% total_aptc_amount =  number_to_currency(total_aptc_across_eligibility_determinations(params[:id])) %>
               <p><%= l10n("faa.premium_reductions_1", reduction_amount: total_aptc_amount.present? ? total_aptc_amount.to_s : "0") %></p>
 
               <%eligible_applicants(params[:id], :is_ia_eligible).each do |applicant_name| %>
