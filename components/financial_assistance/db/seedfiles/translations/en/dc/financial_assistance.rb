@@ -37,7 +37,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.likely_does_not_qualify2" => "</span>, and don't qualify for private health insurance through DC Health Link:",
   "en.faa.private_health_insurance" => "Private health insurance",
   "en.faa.qualified_to_enroll" => "These people <span> qualify to enroll </span> in a private health insurance plan:",
-  "en.faa.do_not_agree" => "If you do not agree with this determination, you have the right to appeal. <a href=''>Find out more about the appeal process</a> or <a href=''>get assistance</a> by contacting us directly.",
+  "en.faa.do_not_agree" => "If you do not agree with the determination, you have the right to appeal. Find out more about the appeal process or get help by contacting us directly.",
   "en.faa.your_application_reference" => "Your application reference number is ",
   "en.faa.next_step_without_aggregate" => "<b>NEXT STEP:</b> Pick a health insurance plan.",
   "en.faa.next_step_with_aggregate_1" => "<b>NEXT STEP:</b><ul><li><b>If you’re already enrolled in DC Health Link’s Individual & Family plan</b>, we’ve automatically changed your premium. You don’t have to do anything else.</li>",
