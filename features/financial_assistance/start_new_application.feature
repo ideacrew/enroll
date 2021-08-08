@@ -32,4 +32,4 @@ Feature: Cost Savings -  Start New Application
     And the consumer clicks on Cost Savings link
     Then consumer should see 'Start New Application' button
     When consumer click 'Start New Application' button
-    Then the consumer is navigated to Application checklist page
+    Then the user will navigate to the assistance year selection page
