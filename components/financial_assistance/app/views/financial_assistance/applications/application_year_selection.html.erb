@@ -1,0 +1,47 @@
+<div class="container">
+  <div id="new_person_wrapper">
+    <div class="row">
+      <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+        <%= render :partial => 'shared/left_nav' %>
+      </div>
+      <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 row">
+
+        <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 bottom-pd">
+          <h2 class="darkblue"><%= l10n("faa.year_selection_header") %></h2>
+          <p><%= l10n("faa.year_selection_subheader") %></p>
+          <div class="faa-year-selection mt-20">
+            <div class="faays-title">
+              <div>
+                <i class="far fa-check-square"></i>
+              </div>
+              <div>
+                <h3><%= l10n("faa.year_selection_oe_year") %></h3>
+              </div>
+            </div>
+            <div class="border-bottom-2px"></div>
+            <div class="faays-body">
+              <p><%= l10n("faa.see_if_you_qualify") %></p>
+              <p><b><%= l10n("faa.year_selection_oe_range") %></b></p>
+            </div>
+            <div class="border-bottom-2px"></div>
+            <div class="faays-body">
+              <div>
+                <i class="fas fa-info-circle"></i>
+              </div>
+              <div>
+                <p><%= l10n("faa.year_selection_learn_more") %></p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+          <%= render partial: 'financial_assistance/shared/right_nav', locals: {
+            previous_url: main_app.help_paying_coverage_insured_consumer_role_index_path,
+            next_url: financial_assistance.application_checklist_application_path(@application)
+          } %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
