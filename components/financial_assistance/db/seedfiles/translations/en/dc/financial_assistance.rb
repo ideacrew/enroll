@@ -120,9 +120,9 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.filing_as_head_of_household" => "Will this person be filing as head of household?",
   # Year Selection page
   "en.faa.year_selection_header" => "You’re About to Sign Up for a New Plan Year",
-  "en.faa.year_selection_subheader" => "Select CONTINUE to start a new application for lower premiums or #{EnrollRegistry[:medicaid_chip_driver_questions].setting(:medicaid_chip).item}.",
+  "en.faa.year_selection_subheader" => "Select CONTINUE to start a new application for lower premiums or Medicaid.",
   "en.faa.year_selection_oe_year" => "2022 Open Enrollment", # TODO: dynamic date
-  "en.faa.see_if_you_qualify" => "See if you qualify for lower monthly premiums for 2022 #{Settings.site.short_name} health insurance or free #{EnrollRegistry[:medicaid_chip_driver_questions].setting(:medicaid_chip).item} coverage.", # TODO: dynamic date
+  "en.faa.see_if_you_qualify" => "See if you qualify for lower monthly premiums for 2022 #{Settings.site.short_name} health insurance or free Medicaid coverage.", # TODO: dynamic date
   "en.faa.year_selection_oe_range" => "Open enrollment is from November 1, 2021 through January 31, 2022", # TODO: dynamic date
   "en.faa.year_selection_learn_more" => "If you need health insurance, lower premiums, or #{ FinancialAssistanceRegistry[:medicaid_chip_driver_questions].setting(:medicaid_chip).item} now, you can <a href='#'>submit a webform</a> or call #{Settings.site.short_name} at (855) 532-5465 / TTY: 711. <a href='https://www.dchealthlink.com/individuals/life-changes'>Learn more about Life Changes</a>.", # TODO: Update URL and phones
   'en.faa.publish_error.second_error_message' => 'There is an error while submitting the application for assistance determination.',
