@@ -395,3 +395,5 @@ registry:
         is_enabled: false
       - key: :verification_type_income_verification
         is_enabled: true
+      - key: :checkbook_integration
+        is_enabled: true
