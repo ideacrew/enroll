@@ -15,7 +15,7 @@ Feature: A dedicated page that gives the user prior notice that that application
   Scenario: User clicks previous or the back browser button.
     Given that the user is on the Application Checklist page
     When the user clicks the PREVIOUS link
-    Then the user will navigate to the Help Paying for Coverage page
+    Then the user will navigate to the assistance year selection page
 
   Scenario: User clicks the application checklist link.
     Given that the user is on the Application Checklist page
