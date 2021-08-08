@@ -118,9 +118,15 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.full_long_name_determination" => "Based on the information you provided, no one on this application is likely to qualify for %{program_short_name}. Do you still want us to send your application to the %{program_long_name} so they can check on %{program_short_name} eligibility?",
   "en.faa.send_to_external_verification" => "Send to OFI", # TODO: This is for Maine, we don't know what it should be for DC yet, if anything,
   "en.faa.filing_as_head_of_household" => "Will this person be filing as head of household?",
+  # Year Selection page
+  "en.faa.year_selection_header" => "You’re About to Sign Up for a New Plan Year",
+  "en.faa.year_selection_subheader" => "Select CONTINUE to start a new application for lower premiums or #{ FinancialAssistanceRegistry[:medicaid_chip_driver_questions].setting(:medicaid_chip).item}.",
+  "en.faa.year_selection_oe_year" => "2022 Open Enrollment", # TODO: dynamic date
+  "en.faa.see_if_you_qualify" => "See if you qualify for lower monthly premiums for 2022 #{Settings.site.short_name} health insurance or free #{ FinancialAssistanceRegistry[:medicaid_chip_driver_questions].setting(:medicaid_chip).item} coverage.", # TODO: dynamic date
+  "en.faa.year_selection_oe_range" => "Open enrollment is from November 1, 2021 through January 31, 2022", # TODO: dynamic date
+  "en.faa.year_selection_learn_more" => "If you need health insurance, lower premiums, or #{ FinancialAssistanceRegistry[:medicaid_chip_driver_questions].setting(:medicaid_chip).item} now, you can <a href='#'>submit a webform</a> or call #{Settings.site.short_name} at (855) 532-5465 / TTY: 711. <a href='https://www.dchealthlink.com/individuals/life-changes'>Learn more about Life Changes</a>.", # TODO: Update URL and phones
   'en.faa.publish_error.second_error_message' => 'There is an error while submitting the application for assistance determination.',
   "en.faa.eligibility_go_to_my_account_message" => "<b>If you’re already enrolled in DC Health Link’s Individual & Family plan</b>, you’re finished! To see your plan information, select <b>GO TO MY ACCOUNT</b>."
 }.freeze
 
 # rubocop:enable Layout/LineLength
-
