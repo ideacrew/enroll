@@ -68,6 +68,10 @@ When(/^the Experian returns a VERIFIED response$/) do
   click_link "Continue Application"
 end
 
+Then(/the user will navigate to the assistance year selection page/) do
+  expect(page).to have_content(l10n("faa.year_selection_header"))
+end
+
 Then(/^the user will navigate to the Help Paying for Coverage page$/) do
   expect(page).to have_content('Your Application for Premium Reductions')
 end
@@ -190,6 +194,10 @@ end
 Given(/^the user navigates to the "Household Info" page with "yes" selected/) do
   find(:xpath, '//label[@for="radio1"]').click
   create_plan
+  find('.btn', text: 'CONTINUE').click
+
+  # TODO: Will need to be updated when year select logic implemented
+  sleep 2
   find('.btn', text: 'CONTINUE').click
 end
 

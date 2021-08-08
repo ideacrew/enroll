@@ -35,6 +35,10 @@ When(/^selects yes they would like help paying for coverage$/) do
   choose('radio1', allow_label_click: true)
   find('button.interaction-click-control-continue').click
 
+  # should be on application year select page now
+  # TODO: Will need to be updated when year select logic implemented 
+  find('a.interaction-click-control-continue').click
+  sleep 2
   # should be on checklist page now
   find('a.interaction-click-control-continue').click
 end
