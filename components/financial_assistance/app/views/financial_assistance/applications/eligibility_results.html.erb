@@ -265,21 +265,6 @@
           </div>
         <% end %>
 
-        <div class="border-bottom-1px"></div>
-          <div class="er-success bg-success">
-            <div><i class="fa fa-info-circle fa-lg text-success" aria-hidden="true"></i></div>
-            <div class="text-success">
-              <% if EnrollRegistry[:apply_aggregate_to_enrollment].feature.is_enabled %>
-                <span>
-                  <%= l10n("faa.next_step_with_aggregate_1") %>
-                  <%= l10n("faa.next_step_with_aggregate_2") %>
-                </span>
-              <% else %>
-                <span><%= l10n("faa.next_step_without_aggregate") %></span>
-              <% end %>
-            </div>
-        </div>
-
         <div class="er-summary mt-20">
           <p class="mt-10"><%= l10n("faa.do_not_agree") %></p>
           <p class="mb-0"><%= l10n("faa.your_application_reference") %><b><%= @application.hbx_id %></b>.</p>
