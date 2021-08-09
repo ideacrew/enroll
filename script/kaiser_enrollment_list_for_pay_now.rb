@@ -25,7 +25,8 @@ CSV.open(logger_file_name, 'w', force_quotes: true) do |logger_csv|
                                           :product_id.ne => nil,
                                           :coverage_kind.in => ['health'])
     enrollments.each do |enrollment|
-      next unless enrollment.product.issuer_profile.legal_name == EnrollRegistry[:pay_now_functionality].setting(:carriers).item
+      issuer_name = enrollment.product.issuer_profile.legal_name.downcase.gsub(' ', '_')
+      next unless EnrollRegistry.feature_enabled?("#{issuer_name}_pay_now".to_sym)
       primary_person = enrollment.family.primary_person
       report_csv << [primary_person.first_name, primary_person.last_name,
               primary_person.hbx_id, enrollment.effective_on.year,

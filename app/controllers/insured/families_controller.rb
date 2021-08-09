@@ -41,8 +41,6 @@ class Insured::FamiliesController < FamiliesController
       @employee_role = @person.active_employee_roles.first if is_shop_or_fehb_market_enabled?
       @tab = params['tab']
       @family_members = @family.active_family_members
-      @kp_pay_now_url = SamlInformation.kp_pay_now_url
-      @kp_relay_state = SamlInformation.kp_pay_now_relay_state
 
       respond_to do |format|
         format.html

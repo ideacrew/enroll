@@ -10,10 +10,11 @@
           <h1 class="darkblue">Enrollment Submitted</h1>
           <p>Your enrollment has been submitted as of <%= format_datetime(@enrollment.updated_at) %>.</p>
           <p>Please print this page for your records. A copy of this confirmation has also been emailed to you.</p>
+          <% issuer_name = issuer_key(@enrollment) %>
           <% if @enrollment.employee_role.present? %>
           <% else %>
             <% if show_pay_now?("plan_shopping", @enrollment) %>
-              <p><strong>Important:</strong> You must pay your first month’s premium directly to <%= EnrollRegistry[:pay_now_functionality].setting(:carriers_long_name).item %>
+              <p><strong>Important:</strong> You must pay your first month’s premium directly to <%= EnrollRegistry["#{issuer_name}_pay_now".to_sym]&.setting(:carriers_long_name)&.item %>
                 to activate your coverage. Select PAY NOW to make your first premium payment online. To learn about
                 other payment options, select ‘How to Pay’.</p>
             <% else %>
@@ -72,7 +73,7 @@
               <ol>
                 <li>
                   <% if show_pay_now?("plan_shopping", @enrollment) %>
-                    You must pay your first month’s premium directly to <%= EnrollRegistry[:pay_now_functionality].setting(:carriers_long_name).item %> to activate your
+                    You must pay your first month’s premium directly to <%= EnrollRegistry["#{issuer_name}_pay_now".to_sym]&.setting(:carriers_long_name)&.item %> to activate your
                     coverage. <%= site_short_name %> does not collect premium payments.<br/><br/>
                     There are two ways to pay your first month’s premium and activate your coverage:
                     <br/>
@@ -84,12 +85,12 @@
                       </li>
                       <li>
                         <strong>Pay when you receive your invoice. </strong>We sent your enrollment information to
-                        <%= EnrollRegistry[:pay_now_functionality].setting(:carriers_long_name).item %> electronically. They will send you an invoice. If you don’t receive an
-                        invoice within 2 weeks, call <%= EnrollRegistry[:pay_now_functionality].setting(:carriers_long_name).item %> at (844) 524-7370 to make your payment.
+                        <%= EnrollRegistry["#{issuer_name}_pay_now".to_sym]&.setting(:carriers_long_name)&.item %> electronically. They will send you an invoice. If you don’t receive an
+                        invoice within 2 weeks, call <%= EnrollRegistry["#{issuer_name}_pay_now".to_sym]&.setting(:carriers_long_name)&.item %> at (844) 524-7370 to make your payment.
                       </li>
                     </ul>
                     <br/>
-                    Once your coverage is activated, <%= EnrollRegistry[:pay_now_functionality].setting(:carriers_long_name).item %> will send you your insurance cards and
+                    Once your coverage is activated, <%= EnrollRegistry["#{issuer_name}_pay_now".to_sym]&.setting(:carriers_long_name)&.item %> will send you your insurance cards and
                     member number. You can start using your benefits on the day your coverage begins.
                   <% else %>
                     <strong>Make your first premium payment directly to <%= @plan.issuer_profile.legal_name %>.</strong>  Your enrollment information was electronically submitted

@@ -8,6 +8,7 @@ Feature: User should be able to pay for plan
 
   Scenario: User can see pay now button and pop up for Kaiser enrollment
     Given the FAA feature configuration is disabled
+    Given the kaiser paynow feature configuration is enabled
     And that a person exists in EA
     And the person fills in all personal info
     And the person goes plan shopping in the individual for a new plan
@@ -26,6 +27,17 @@ Feature: User should be able to pay for plan
     And the first payment glossary tooltip should be present
     And user clicks on the first payment button
     Then I should see the Kaiser pop up text
+
+  Scenario: User cannot see pay now button and pop up for Kaiser enrollment when feature is turned off
+    Given the FAA feature configuration is disabled
+    Given the kaiser paynow feature configuration is disabled
+    And that a person exists in EA
+    And the person fills in all personal info
+    And the person goes plan shopping in the individual for a new plan
+    And the person continues to plan selection
+    And the person selects a plan
+    And I click on purchase confirm button for matched person
+    Then I should see not pay now button
 
   Scenario: User can see pay now pop up for non-Kaiser enrollment
     Given the FAA feature configuration is disabled
