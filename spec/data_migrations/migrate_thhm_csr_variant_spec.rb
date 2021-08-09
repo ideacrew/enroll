@@ -3,10 +3,10 @@
 require 'rails_helper'
 require File.join(Rails.root, 'app', 'data_migrations', 'migrate_thhm_csr_variant')
 
-describe MigrateThmCsrVariant do
+describe MigrateThhmCsrVariant do
 
   let(:given_task_name) { 'migrate_thm_csr_variant' }
-  subject { MigrateThmCsrVariant.new(given_task_name, double(:current_scope => nil)) }
+  subject { MigrateThhmCsrVariant.new(given_task_name, double(:current_scope => nil)) }
 
   describe 'given a task name' do
     it 'has the given task name' do
