@@ -10,28 +10,27 @@ module Operations
 
     let(:response_payload) do
       {
-        :ResponseMetadata => {:ResponseCode=>"HS000000", :ResponseDescriptionText=>"Successful."},
+        :ResponseMetadata => {:ResponseCode => "HS000000", :ResponseDescriptionText => "Successful."},
         :InitialVerificationResponseSet => {
-          :InitialVerificationIndividualResponses=>[
-            { :ResponseMetadata=>{:ResponseCode=>"HS000000", :ResponseDescriptionText=>"Successful."},
-              :ArrayOfErrorResponseMetadata=>nil,
-              :LawfulPresenceVerifiedCode=>"Y",
-              :InitialVerificationIndividualResponseSet=> {
-                :CaseNumber=>"6000060033064OC", :NonCitLastName=>"Benstce",
-                :NonCitFirstName=>"Jamison", :NonCitMiddleName=>nil,
-                :NonCitBirthDate=>Date.new(1993, 10, 21), :NonCitEntryDate=>nil,
-                :AdmittedToDate=>nil, :AdmittedToText=>nil, :NonCitCountryBirthCd=>"IND",
-                :NonCitCountryCitCd=>nil, :NonCitCoaCode=>nil, :NonCitProvOfLaw=>"A02",
-                :NonCitEadsExpireDate=>Date.new(2025, 10, 21), :EligStatementCd=>10,
-                :EligStatementTxt=>"TEMPORARY EMPLOYMENT AUTHORIZED", :IAVTypeCode=>nil,
-                :IAVTypeTxt=>nil, :WebServSftwrVer=>"37", :GrantDate=>nil,
-                :GrantDateReasonCd=>"Not Applicable", :SponsorDataFoundIndicator=>false,
-                :ArrayOfSponsorshipData=>nil, :SponsorshipReasonCd=>nil,
-                :AgencyAction=>"Invoke CloseCase Web method to close the case.",
-                :FiveYearBarApplyCode=>"X", :QualifiedNonCitizenCode=>"N",
-                :FiveYearBarMetCode=>"X", :USCitizenCode=>"X"
-              }
-            }
+          :InitialVerificationIndividualResponses => [
+            { :ResponseMetadata => {:ResponseCode => "HS000000", :ResponseDescriptionText => "Successful."},
+              :ArrayOfErrorResponseMetadata => nil,
+              :LawfulPresenceVerifiedCode => "Y",
+              :InitialVerificationIndividualResponseSet => {
+                :CaseNumber => "6000060033064OC", :NonCitLastName => "Benstce",
+                :NonCitFirstName => "Jamison", :NonCitMiddleName => nil,
+                :NonCitBirthDate => Date.new(1993, 10, 21), :NonCitEntryDate => nil,
+                :AdmittedToDate => nil, :AdmittedToText => nil, :NonCitCountryBirthCd => "IND",
+                :NonCitCountryCitCd => nil, :NonCitCoaCode => nil, :NonCitProvOfLaw => "A02",
+                :NonCitEadsExpireDate => Date.new(2025, 10, 21), :EligStatementCd => 10,
+                :EligStatementTxt => "TEMPORARY EMPLOYMENT AUTHORIZED", :IAVTypeCode => nil,
+                :IAVTypeTxt => nil, :WebServSftwrVer => "37", :GrantDate => nil,
+                :GrantDateReasonCd => "Not Applicable", :SponsorDataFoundIndicator => false,
+                :ArrayOfSponsorshipData => nil, :SponsorshipReasonCd => nil,
+                :AgencyAction => "Invoke CloseCase Web method to close the case.",
+                :FiveYearBarApplyCode => "X", :QualifiedNonCitizenCode => "N",
+                :FiveYearBarMetCode => "X", :USCitizenCode => "X"
+              }}
           ]
         }
       }
