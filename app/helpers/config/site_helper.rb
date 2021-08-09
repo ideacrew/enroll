@@ -319,6 +319,10 @@ module Config
     def broker_course_administering_organization_link
       EnrollRegistry[:enroll_app].setting(:broker_course_administering_organization_link).item
     end
+
+    def disable_form_phone_and_paper_dropdown?
+      EnrollRegistry.feature_enabled?(:disable_form_phone_and_paper_dropdown)
+    end
   end
 end
 # rubocop:enable Metrics/ModuleLength
