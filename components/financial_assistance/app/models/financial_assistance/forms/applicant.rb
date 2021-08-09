@@ -30,6 +30,7 @@ module FinancialAssistance
       # validates_inclusion_of :relationship, :in => RELATIONSHIPS.uniq, :allow_blank => nil, message: ""
       validate :relationship_validation
       validate :consumer_fields_validation
+      validate :check_same_ssn
 
       attr_reader :dob
 
@@ -212,6 +213,15 @@ module FinancialAssistance
           self.errors.add(:base, "can not have multiple spouse or life partner")
         end
       end
+
+      def check_same_ssn
+        return if ssn.blank?
+        return if applicant && applicant.ssn == ssn
+        encrypted_ssn = FinancialAssistance::Applicant.encrypt_ssn(ssn)
+        same_ssn = FinancialAssistance::Applicant.where(encrypted_ssn: encrypted_ssn)
+        self.errors.add(:base, "ssn is already taken")  if same_ssn
+      end
+
     end
   end
 end

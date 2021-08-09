@@ -22,6 +22,7 @@ RSpec.describe ::FinancialAssistance::Forms::Applicant, type: :model, dbclean: :
     appl = FactoryBot.create(:applicant,
                              application: application,
                              dob: Date.today - 40.years,
+                             ssn: '889984400',
                              family_member_id: BSON::ObjectId.new)
     application.ensure_relationship_with_primary(appl, 'spouse')
     appl
@@ -113,6 +114,26 @@ RSpec.describe ::FinancialAssistance::Forms::Applicant, type: :model, dbclean: :
 
       it 'should add error when checked for validation errors' do
         expect(@applicant_form.errors.full_messages).to include('can not have multiple spouse or life partner')
+      end
+    end
+  end
+
+  context 'relationship_validation' do
+    context 'applicant spouse update' do
+      let!(:child_applicant) do
+        appl = FactoryBot.create(:applicant,
+                                 application: application,
+                                 dob: Date.today - 40.years,
+                                 ssn: spouse_applicant.ssn,
+                                 family_member_id: BSON::ObjectId.new)
+        application.ensure_relationship_with_primary(appl, 'child')
+        appl
+      end
+      let(:input_applicant) {child_applicant}
+      let(:relationship) {'child'}
+
+      it 'should add error when ssn is matching' do
+        expect(@applicant_form.errors.full_messages).to include('ssn is already taken')
       end
     end
   end
