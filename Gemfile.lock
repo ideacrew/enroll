@@ -7,7 +7,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 672ab9be03ecc3298336af8d4bf499ac9df37ce4
+  revision: 802b71a098c46709c3f06f88b3b1dec02882c51b
   branch: atp_cv_transform_v3
   specs:
     aca_entities (0.3.0)
@@ -847,7 +847,7 @@ GEM
       resque (>= 1.10.0, < 2.0)
       resque-retry
       resque-scheduler (>= 2.0.1)
-    resque-retry (1.7.4)
+    resque-retry (1.7.6)
       resque (>= 1.25, < 3.0)
       resque-scheduler (~> 4.0)
     resque-scheduler (4.4.0)
