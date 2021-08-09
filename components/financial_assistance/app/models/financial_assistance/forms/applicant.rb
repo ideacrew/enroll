@@ -218,8 +218,8 @@ module FinancialAssistance
         return if ssn.blank?
         return if applicant && applicant.ssn == ssn
         encrypted_ssn = FinancialAssistance::Applicant.encrypt_ssn(ssn)
-        same_ssn = FinancialAssistance::Applicant.where(encrypted_ssn: encrypted_ssn)
-        self.errors.add(:base, "ssn is already taken")  if same_ssn
+        same_ssn = ::FinancialAssistance::Application.where("applicants.encrypted_ssn" => encrypted_ssn)
+        self.errors.add(:base, "ssn is already taken") if same_ssn.present?
       end
 
     end
