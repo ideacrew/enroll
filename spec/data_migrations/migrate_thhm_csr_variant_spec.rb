@@ -5,7 +5,7 @@ require File.join(Rails.root, 'app', 'data_migrations', 'migrate_thhm_csr_varian
 
 describe MigrateThhmCsrVariant do
 
-  let(:given_task_name) { 'migrate_thm_csr_variant' }
+  let(:given_task_name) { 'migrate_thhm_csr_variant' }
   subject { MigrateThhmCsrVariant.new(given_task_name, double(:current_scope => nil)) }
 
   describe 'given a task name' do
