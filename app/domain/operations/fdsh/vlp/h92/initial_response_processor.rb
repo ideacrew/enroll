@@ -23,10 +23,11 @@ module Operations
           private
 
           def find_person(person_hbx_id)
-            person = Person.where(hbx_id:person_hbx_id).first
+            person = Person.where(hbx_id: person_hbx_id).first
             person.present? ? Success(person) : Failure("person not found with hbx_id: #{person_hbx_id}")
           end
 
+          # rubocop:disable Metrics/BlockNesting
           def update_consumer_role(consumer_role, response)
             args = OpenStruct.new
             args.determined_at = Time.now
@@ -43,12 +44,13 @@ module Operations
                   consumer_role.fail_dhs!(args) if consumer_role.fail_dhs?
                 end
               end
-            else
-              consumer_role.fail_dhs!(args) if consumer_role.fail_dhs?
+            elsif consumer_role.fail_dhs?
+              consumer_role.fail_dhs!(args)
             end
             consumer_role.save
             Success(consumer_role)
           end
+          # rubocop:enable Metrics/BlockNesting
 
           def get_citizen_status(status)
             return "us_citizen" if status.eql? "UNITED STATES CITIZEN"
@@ -67,13 +69,11 @@ module Operations
             elsif person.verification_types.active.map(&:type_name).include? "Immigration status"
               type_name = "Immigration status"
             end
-            type = person.verification_types.active.where(type_name:type_name).first
-            if type
-              type.add_type_history_element(action: "FDSH Hub response",
-                                            modifier: "external Hub",
-                                            update_reason: "Hub response",
-                                            event_response_record_id: event_response_record.id)
-            end
+            type = person.verification_types.active.where(type_name: type_name).first
+            type&.add_type_history_element(action: "FDSH Hub response",
+                                           modifier: "external Hub",
+                                           update_reason: "Hub response",
+                                           event_response_record_id: event_response_record.id)
 
             consumer_role.save
             Success(consumer_role)

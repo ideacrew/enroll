@@ -83,9 +83,9 @@ Rails.application.configure do
   config.acapi.remote_broker_uri = "amqp://#{ENV['RABBITMQ_USERNAME']}:#{ENV['RABBITMQ_PASSWORD']}@#{ENV['RABBITMQ_HOST']}:#{ENV['RABBITMQ_PORT']}"
   config.acapi.remote_request_exchange = "#{ENV['HBX_ID']}.#{ENV['ENV_NAME']}.e.fanout.requests"
   config.acapi.remote_event_queue = "#{ENV['HBX_ID']}.#{ENV['ENV_NAME']}.q.application.enroll.inbound_events"
-  config.action_mailer.default_url_options = { :host => "#{ENV['ENROLL_FQDN']}" }
-  config.acapi.hbx_id = "#{ENV['HBX_ID']}"
-  config.acapi.environment_name = "#{ENV['ENV_NAME']}"
+  config.action_mailer.default_url_options = { :host => ENV['ENROLL_FQDN'].to_s }
+  config.acapi.hbx_id = ENV['HBX_ID'].to_s
+  config.acapi.environment_name = ENV['ENV_NAME'].to_s
 
   # Cartafact config
   config.cartafact_document_base_url = "http://#{ENV['CARTAFACT_HOST']}:3000/api/v1/documents"

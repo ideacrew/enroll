@@ -23,7 +23,7 @@ module Operations
           private
 
           def find_person(person_hbx_id)
-            person = Person.where(hbx_id:person_hbx_id).first
+            person = Person.where(hbx_id: person_hbx_id).first
             person.present? ? Success(person) : Failure("person not found with hbx_id: #{person_hbx_id}")
           end
 
@@ -47,8 +47,8 @@ module Operations
               elsif !ssn_verification_indicator
                 consumer_role.ssn_invalid!(args)
               end
-            else
-              consumer_role.ssn_invalid!(args) if consumer_role.may_ssn_invalid?
+            elsif consumer_role.may_ssn_invalid?
+              consumer_role.ssn_invalid!(args)
             end
             consumer_role.save
             Success(consumer_role)
