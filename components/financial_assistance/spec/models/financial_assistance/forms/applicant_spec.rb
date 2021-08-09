@@ -22,7 +22,6 @@ RSpec.describe ::FinancialAssistance::Forms::Applicant, type: :model, dbclean: :
     appl = FactoryBot.create(:applicant,
                              application: application,
                              dob: Date.today - 40.years,
-                             ssn: '889984400',
                              family_member_id: BSON::ObjectId.new)
     application.ensure_relationship_with_primary(appl, 'spouse')
     appl
@@ -64,14 +63,15 @@ RSpec.describe ::FinancialAssistance::Forms::Applicant, type: :model, dbclean: :
       ethnicity: ['', '', '', '', '', '', '']}
   end
 
-  before do
-    @applicant_form = described_class.new(params)
-    @applicant_form.application_id = application.id
-    @applicant_form.applicant_id = input_applicant.id
-    @applicant_form.relationship_validation
-  end
-
   context 'relationship_validation' do
+
+    before do
+      @applicant_form = described_class.new(params)
+      @applicant_form.application_id = application.id
+      @applicant_form.applicant_id = input_applicant.id
+      @applicant_form.relationship_validation
+    end
+
     context 'applicant spouse update' do
       let(:input_applicant) {spouse_applicant}
       let(:relationship) {'spouse'}
@@ -118,17 +118,20 @@ RSpec.describe ::FinancialAssistance::Forms::Applicant, type: :model, dbclean: :
     end
   end
 
-  context 'relationship_validation' do
-    context 'applicant spouse update' do
-      let!(:child_applicant) do
-        appl = FactoryBot.create(:applicant,
-                                 application: application,
-                                 dob: Date.today - 40.years,
-                                 ssn: spouse_applicant.ssn,
-                                 family_member_id: BSON::ObjectId.new)
-        application.ensure_relationship_with_primary(appl, 'child')
-        appl
+  context 'check_same_ssn' do
+    context 'applicant child update with same ssn' do
+      let!(:application2) { FactoryBot.create(:financial_assistance_application, family_id: BSON::ObjectId.new) }
+      let!(:other_applicant) { FactoryBot.create(:financial_assistance_applicant, application: application2, ssn: '889984400', family_member_id: BSON::ObjectId.new) }
+      let!(:child_applicant) { FactoryBot.create(:financial_assistance_applicant, application: application, dob: Date.today - 40.years, family_member_id: BSON::ObjectId.new) }
+
+      before do
+        @applicant_form = described_class.new(params.except(:ssn).merge({ssn: '889984400'}))
+        @applicant_form.application_id = application.id
+        @applicant_form.applicant_id = input_applicant.id
+        @applicant_form.relationship_validation
+        @applicant_form.check_same_ssn
       end
+
       let(:input_applicant) {child_applicant}
       let(:relationship) {'child'}
 
