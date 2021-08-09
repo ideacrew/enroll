@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require File.join(Rails.root, 'lib/mongoid_migration_task')
-# Add new
+# new rake task to update csr list
 class MigrateThhmCsrVariant < MongoidMigrationTask
 
   def process_families(families, logger, offset_count)
@@ -9,7 +9,7 @@ class MigrateThhmCsrVariant < MongoidMigrationTask
       person = family.primary_person
       next unless person.present?
       family.active_household.tax_households.where(:"eligibility_determinations.csr_percent_as_integer".ne => nil).each do |thh|
-        csr_percent_as_integer = thh.eligibility_determinations.last.csr_percent_as_integer
+        csr_percent_as_integer = thh.latest_eligibility_determination.csr_percent_as_integer
         thh.tax_household_members.where(:is_ia_eligible => true).each do |thhm|
           thhm.update_attributes!(csr_percent_as_integer: csr_percent_as_integer)
         end
@@ -36,6 +36,7 @@ class MigrateThhmCsrVariant < MongoidMigrationTask
       counter += 1
     end
     end_time = DateTime.current
+
     logger.info "IndividualthhmCsr end_time: #{end_time}, total_time_taken_in_minutes: #{((end_time - start_time) * 24 * 60).to_i}" unless Rails.env.test?
   end
 end
