@@ -318,6 +318,8 @@ module FinancialAssistance
 
     attr_accessor :relationship
     # attr_writer :us_citizen, :naturalized_citizen, :indian_tribe_member, :eligible_immigration_status
+    # Avoid propagation loop
+    attr_accessor :skip_create_or_update_operation
 
     before_save :generate_hbx_id
 
@@ -1215,7 +1217,11 @@ module FinancialAssistance
       # return if incomes_changed? || benefits_changed? || deductions_changed?
       if is_active
         create_or_update_member_params = { applicant_params: self.attributes_for_export, family_id: application.family_id }
-        create_or_update_result = Operations::Families::CreateOrUpdateMember.new.call(params: create_or_update_member_params)
+        create_or_update_result = if self.skip_create_or_update_operation.present?
+                                    FinancialAssistance::Validators::ApplicantContract.new.call(params)
+                                  else
+                                    Operations::Families::CreateOrUpdateMember.new.call(params: create_or_update_member_params)
+                                  end
         if create_or_update_result.success?
           response_family_member_id = create_or_update_result.success[:family_member_id]
           update_attributes!(family_member_id: response_family_member_id) if family_member_id.nil?

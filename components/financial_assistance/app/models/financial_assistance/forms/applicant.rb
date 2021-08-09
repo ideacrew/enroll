@@ -105,19 +105,13 @@ module FinancialAssistance
           application.ensure_relationship_with_primary(applicant, relationship) if relationship.present?
           [true, applicant]
         else
+          application.ensure_relationship_with_primary(applicant, relationship) if relationship.present?
           applicant_entity.failure.errors.to_h.collect{|key, msg| "#{key} #{msg[0]}"}.each do |error_msg|
             errors.add(:base, error_msg)
           end
           [false, applicant_entity.failure]
         end
       end
-
-      # rubocop:disable Metrics/CyclomaticComplexity
-      def update_relationship_and_relative_relationship(relationship)
-        self&.applicant&.relationships&.last&.update_attributes(kind: relationship)
-        self&.applicant&.relationships&.last&.relative&.relationships&.where(relative_id: self.applicant.id)&.first&.update_attributes(kind: FinancialAssistance::Relationship::INVERSE_MAP[relationship])
-      end
-      # rubocop:enable Metrics/CyclomaticComplexity
 
       def extract_applicant_params
         assign_citizen_status
@@ -143,11 +137,9 @@ module FinancialAssistance
           citizen_status: citizen_status,
           is_temporarily_out_of_state: is_temporarily_out_of_state,
           immigration_doc_statuses: immigration_doc_statuses.to_a.reject(&:blank?)
-        }#.reject{|_k, val| val.nil?}
-
-        # This will update both the relationship being passed through,
-        # and the corresponding relative inverse relationship
-        update_relationship_and_relative_relationship(relationship) if relationship
+        }.tap do |app_attributes|
+          app_attributes[:skip_create_or_update_operation] = true if persisted?
+        end
 
         if same_with_primary == 'true'
           primary = application.primary_applicant
