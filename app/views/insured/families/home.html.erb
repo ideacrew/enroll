@@ -28,7 +28,7 @@
                  :as => :hbx_enrollment,
                  locals: { read_only: false } %>
       <%= render partial: 'shop_for_plans_widget' %>
-      <% if individual_market_is_enabled? %>
+      <% if individual_market_is_enabled? && medicaid_tax_credits_link_is_enabled? %>
       <%= render partial: 'apply_for_medicaid_widget' %>
       <% end %>
     </div>
