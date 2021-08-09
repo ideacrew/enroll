@@ -110,6 +110,22 @@
 
             </div>
           </div>
+        <%# The "Go Back To My Account" text box will NOT display if all applicants are determined medicaid eligible. It will appear for any other combination of applicant determinations. %>
+        <% unless @application.applicants.all? { |applicant| applicant.is_medicaid_chip_eligible? }  %>
+          <div class="border-bottom-1px"></div>
+          <div class="er-medicaid mt-20">
+            <div class="er-medicaid-prsn">
+              <%= l10n("faa.eligibility_go_to_my_account_message") %>    
+              <div class='row'>
+                <div class="col-md-8">
+                </div>
+                <div class='col-md-4'>
+                  <%= link_to 'GO TO MY ACCOUNT', main_app.family_account_path, class: 'btn btn-small btn-primary', id: 'btn-continue', style: 'width: 100%;' %>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
           <div class="er-medicaid mt-20">
             <div class="border-bottom-1px"></div>
             <div class="er-success bg-success">
@@ -130,20 +146,6 @@
         <% end %>
 
         <%if eligible_applicants(params[:id], :is_totally_ineligible).present?%>
-          <div class="er-notqualify mt-20">
-            <div class="er-title">
-              <p>
-                <%= l10n("faa.eligibility_go_to_my_account_message") %>    
-              </p>
-              <div class='row'>
-                <div class="col-md-6">
-                </div>
-                <div class='col-md-6'>
-                  <%= link_to 'GO TO MY ACCOUNT', main_app.family_account_path, class: 'btn btn-lg btn-primary', id: 'btn-continue', style: 'width: 100%;' %>
-                </div>
-              </div>
-            </div>
-          </div>
           <div class="er-notqualify mt-20">
             <div class="er-title">
               <h3><%= l10n("faa.does_not_qualify") %></h3>
