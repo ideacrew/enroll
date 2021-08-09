@@ -29,6 +29,19 @@
               <%end%>
             </div>
             <div class="border-bottom-1px"></div>
+            <div class="er-success bg-success">
+              <div><i class="fa fa-info-circle fa-lg text-success" aria-hidden="true"></i></div>
+              <div class="text-success">
+                <% if eligible_applicants(params[:id], :is_medicaid_chip_eligible).present? %>
+                  <span>
+                    <%= l10n("faa.next_step_medicaid_eligible") %>
+                  </span>
+                <% else %>
+                  <span><%= l10n("faa.next_step_medicaid_eligible_at_least_one_other_eligible") %></span>
+                <% end %>
+              </div>
+            </div>
+            <div class="border-bottom-1px"></div>
             <div class="er-warning bg-warning">
               <div><i class="fa fa-exclamation-triangle fa-lg text-warning" aria-hidden="true"></i></div>
               <div class="text-warning ">
@@ -176,21 +189,6 @@
                 <% end %>
               <% end %>
             </div>
-
-            <div class="border-bottom-1px"></div>
-            <div class="er-success bg-success">
-              <div><i class="fa fa-info-circle fa-lg text-success" aria-hidden="true"></i></div>
-              <div class="text-success">
-                <% if EnrollRegistry[:apply_aggregate_to_enrollment].feature.is_enabled %>
-                  <span>
-                    <%= l10n("faa.next_step_with_aggregate_1") %>
-                    <%= l10n("faa.next_step_with_aggregate_2") %>
-                  </span>
-                <% else %>
-                  <span><%= l10n("faa.next_step_without_aggregate") %></span>
-                <% end %>
-              </div>
-            </div>
           </div>
         <%end%>
 
@@ -251,6 +249,21 @@
               </div>
           </div>
         <% end %>
+
+        <div class="border-bottom-1px"></div>
+          <div class="er-success bg-success">
+            <div><i class="fa fa-info-circle fa-lg text-success" aria-hidden="true"></i></div>
+            <div class="text-success">
+              <% if EnrollRegistry[:apply_aggregate_to_enrollment].feature.is_enabled %>
+                <span>
+                  <%= l10n("faa.next_step_with_aggregate_1") %>
+                  <%= l10n("faa.next_step_with_aggregate_2") %>
+                </span>
+              <% else %>
+                <span><%= l10n("faa.next_step_without_aggregate") %></span>
+              <% end %>
+            </div>
+        </div>
 
         <div class="er-summary mt-20">
           <p class="mt-10"><%= l10n("faa.do_not_agree") %></p>

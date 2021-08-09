@@ -42,6 +42,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
   let!(:eligibility_determination) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application) }
 
+  let!(:products) { FactoryBot.create_list(:benefit_markets_products_health_products_health_product, 5, :silver) }
+
   describe 'When Application in draft state is passed' do
     let(:result) { subject.call(application) }
 
@@ -58,7 +60,6 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     let(:result) { subject.call(application) }
 
     before :each do
-      family.family_members.first.update_attributes(person_id: person.hbx_id)
       applicant.update_attributes(person_hbx_id: person.hbx_id, citizen_status: 'alien_lawfully_present', eligibility_determination_id: eligibility_determination.id)
     end
 
