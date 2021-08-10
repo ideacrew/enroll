@@ -9,8 +9,8 @@ module FinancialAssistance
     module Applications
       module Esi
         module H14
+          # Requests esi mec details from h14 hub service
           class EsiMecRequest
-            # Requests esi mec details from h14 hub service
 
             include Dry::Monads[:result, :do]
             include Acapi::Notifiers
