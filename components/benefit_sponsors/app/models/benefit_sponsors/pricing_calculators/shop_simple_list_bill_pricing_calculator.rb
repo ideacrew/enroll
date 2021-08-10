@@ -2,10 +2,12 @@ module BenefitSponsors
   module PricingCalculators
     class ShopSimpleListBillPricingCalculator < PricingCalculator
       class CalculatorState
+        include Acapi::Notifiers
         attr_reader :total
         attr_reader :member_totals
 
-        def initialize(p_calculator, product, p_model, p_unit_map, r_coverage, c_eligibility_dates)
+        # rubocop:disable Metrics/ParameterLists
+        def initialize(p_calculator, product, p_model, p_unit_map, r_coverage, c_eligibility_dates, sponsored_benefit = nil)
           @pricing_calculator = p_calculator
           @pricing_unit_map = p_unit_map
           @pricing_model = p_model
@@ -19,7 +21,9 @@ module BenefitSponsors
           @product = product
           @previous_product = r_coverage.previous_product
           @discount_kid_count = 0
+          @sponsored_benefit = sponsored_benefit
         end
+        # rubocop:enable Metrics/ParameterLists
 
         def add(member)
           coverage_age = @pricing_calculator.calc_coverage_age_for(member, @product, @coverage_start_date, @eligibility_dates, @previous_product)
@@ -63,7 +67,17 @@ module BenefitSponsors
           coverage_eligibility_dates[m_en.member_id] = m_en.coverage_eligibility_on
         end
         sorted_members = roster_entry.members.sort_by do |rm|
-          coverage_age = age_calculator.calc_coverage_age_for(rm, roster_coverage.product, roster_coverage.coverage_start_on, coverage_eligibility_dates, roster_coverage.previous_product)
+          begin
+            coverage_age = age_calculator.calc_coverage_age_for(rm, roster_coverage.product, roster_coverage.coverage_start_on, coverage_eligibility_dates, roster_coverage.previous_product)
+          rescue StandardError => e
+            exception_message = "Error: #{e}"
+            exception_message += "Unable to sort members for sponsored_benefit with ID: #{@sponsored_benefit&.id}"
+            exception_message += " and benefit package with ID:  #{@sponsored_benefit&.benefit_package&.id}" if @sponsored_benefit&.benefit_package
+            exception_message += " and benefit_coverage_period with ID: #{@sponsored_benefit&.benefit_package&.benefit_coverage_period&.id}" if @sponsored_benefit&.benefit_package&.benefit_coverage_period
+            exception_message += " and benefit_sponsorship with ID: #{@sponsored_benefit&.benefit_package&.benefit_coverage_period&.benefit_sponsorship&.id}" if @sponsored_benefit&.benefit_package&.benefit_coverage_period&.benefit_sponsorship
+            puts(exception_message)
+            log(exception_message)
+          end
           [pricing_model.map_relationship_for(rm.relationship, coverage_age, rm.is_disabled?), rm.dob]
         end
         calc_state = CalculatorState.new(age_calculator, roster_coverage.product, pricing_model, pricing_unit_map, roster_coverage, coverage_eligibility_dates)
