@@ -30,7 +30,8 @@
                   <% income_and_deductions_for(applicant).each do |embedded_document| %>
                     <tr>
                       <td> <%= applicant.full_name %> </td>
-                      <td> <%= l10n("faa.#{embedded_document.kind}") %> </td>
+                      <% binding.pry %>
+                      <td> <%= l10n("faa.income.#{embedded_document.kind}") %> </td>
                       <td> <%= embedded_document.frequency_kind.humanize %> </td>
                       <td>
                       <b>
@@ -490,7 +491,7 @@
                 <div class="col-md-6">Is this person blind?</div>
                 <div class="col-md-6"><%= human_boolean applicant.is_self_attested_blind %></div>
               </div>
-              
+
               <% if FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_other_question) %>
                 <div class="row row-form-wrapper ptb no-buffer row-height form-content">
                   <div class="col-md-6"><%= l10n("faa.primary_caretaker_question_text") %></div>
