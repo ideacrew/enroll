@@ -57,6 +57,10 @@ module Config
       EnrollRegistry[:enroll_app].setting(:producer_email_address).item
     end
 
+    def contact_center_email_address_is_enabled?
+      EnrollRegistry.feature_enabled?(:contact_email_feature)
+    end
+
     def contact_center_email_address
       EnrollRegistry[:enroll_app].setting(:contact_center_email_address).item
     end
