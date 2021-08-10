@@ -47,6 +47,7 @@ module FinancialAssistance
       # rubocop:disable Metrics/BlockNesting
       if params.key?(model_name)
         if @model.save
+          @application.publish_esi_mec_request
           @current_step = @current_step.next_step if @current_step.next_step.present?
           @model.update_attributes!(workflow: { current_step: @current_step.to_i })
           if params[:commit] == "Submit Application"
