@@ -105,6 +105,17 @@ describe ConsumerRole, dbclean: :after_each do
         end
       end
     end
+
+    context 'location_residency_verification_type feature is disabled' do
+      let(:consumer_role) { saved_person.build_consumer_role(valid_params) }
+      before do
+        EnrollRegistry[:location_residency_verification_type].feature.stub(:is_enabled).and_return(false)
+      end
+
+      it "should not create a location_residency verification type when turned off" do
+        expect(consumer_role.verification_types.where(type_name: EnrollRegistry[:enroll_app].setting(:state_residency).item).present?).to eq(false)
+      end
+    end
   end
 end
 
@@ -176,16 +187,6 @@ describe "#find_vlp_document_by_key" do
     end
   end
 
-  context 'location_residency_verification_type feature is disabled' do
-    let(:consumer_role) { saved_person.build_consumer_role(valid_params) }
-    before do
-      EnrollRegistry[:location_residency_verification_type].feature.stub(:is_enabled).and_return(false)
-    end
-
-    it "should not create a location_residency verification type when turned off" do
-      expect(consumer_role.verification_types.where(type_name: EnrollRegistry[:enroll_app].setting(:state_residency).item).present?).to eq(false)
-    end
-  end
 end
 
 describe "#move_identity_documents_to_outstanding" do
