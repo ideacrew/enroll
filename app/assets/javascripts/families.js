@@ -5,7 +5,7 @@ $(document).ready(function() {
       e.preventDefault();
       $.ajax({
           type: "GET",
-          url: "/payment_transactions/",
+          url: "/payment_transactions/generate_saml_response",
           data: {enrollment_id: $(this).val(), source: $("#source").val()},
           success: function (response) {
             if (response["error"] != null){
