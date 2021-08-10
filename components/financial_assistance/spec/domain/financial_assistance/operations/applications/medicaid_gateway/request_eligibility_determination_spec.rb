@@ -64,7 +64,33 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
 
   context 'success' do
     context 'with valid application' do
+
+      let(:premiums_hash) do
+        {
+          [person.hbx_id] => {:health_only => {person.hbx_id => [{:cost => 200.0, :member_identifier => person.hbx_id, :monthly_premium => 200.0}]}}
+        }
+      end
+
+      let(:slcsp_info) do
+        {
+          person.hbx_id => {:health_only_slcsp_premiums => {:cost => 200.0, :member_identifier => person.hbx_id, :monthly_premium => 200.0}}
+        }
+      end
+
+      let(:lcsp_info) do
+        {
+          person.hbx_id => {:health_only_lcsp_premiums => {:cost => 100.0, :member_identifier => person.hbx_id, :monthly_premium => 100.0}}
+        }
+      end
+
+      let(:fetch_double) { double(:new => double(call: double(:value! => premiums_hash)))}
+      let(:fetch_slcsp_double) { double(:new => double(call: double(:value! => slcsp_info)))}
+      let(:fetch_lcsp_double) { double(:new => double(call: double(:value! => lcsp_info)))}
+
       before do
+        stub_const('::Operations::Products::Fetch', fetch_double)
+        stub_const('::Operations::Products::FetchSlcsp', fetch_slcsp_double)
+        stub_const('::Operations::Products::FetchLcsp', fetch_lcsp_double)
         @result = subject.call({application_id: application.id})
       end
 
