@@ -58,7 +58,7 @@ module Config
     end
 
     def contact_center_email_address_is_enabled?
-      EnrollRegistry.feature_enabled?(:contact_email_feature)
+      EnrollRegistry.feature_enabled?(:contact_email_header_footer_feature)
     end
 
     def contact_center_email_address
