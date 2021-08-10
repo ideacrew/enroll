@@ -658,6 +658,12 @@ module FinancialAssistance
       (alternate_benefit.start_date.year..alternate_benefit.end_date.year).include? TimeKeeper.date_of_record.year
     end
 
+    def publish_esi_mec_request
+      return unless FinancialAssistanceRegistry.feature_enabled?(:esi_mec_determination)
+
+      Operations::Applications::Esi::H14::PublishEsiMecRequest.new.call(application_id: id)
+    end
+
     def total_incomes_by_year
       incomes_by_year = compute_yearwise(incomes)
       deductions_by_year = compute_yearwise(deductions)
