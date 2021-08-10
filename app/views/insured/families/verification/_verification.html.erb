@@ -23,7 +23,12 @@
             <%= f_member.person.full_name %>
           </div>
           <div class="verification-types col-md-12">
-            <% person.verification_types.active.all.each do |verif_type| %>
+            <% verification_filter = if EnrollRegistry.feature_enabled?(:location_residency_verification_type) %>
+              <% person.verification_types.active.all%> 
+            <% else %>
+              <% person.verification_types.active.all.select {|v_type| v_type.type_name != EnrollRegistry[:enroll_app].setting(:state_residency).item} %> 
+            <% end %>
+            <% verification_filter.each do |verif_type| %>
               <% v_type = verif_type.type_name %>
               <div class="row">
                 <div class="v-type col-md-12">
