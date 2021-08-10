@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-# require 'aca_entities'
-# require 'aca_entities/ffe/operations/process_mcr_application'
-# require 'aca_entities/ffe/transformers/mcr_to/family'
+require 'aca_entities'
+require 'aca_entities/ffe/operations/process_mcr_application'
+require 'aca_entities/ffe/transformers/mcr_to/family'
 require 'aca_entities/atp/transformers/cv/family'
 require 'aca_entities/atp/operations/family'
 require 'aca_entities/serializers/xml/medicaid/atp'
@@ -15,7 +15,7 @@ require 'aca_entities/serializers/xml/medicaid/atp'
 class MigrateFamily < Mongoid::Migration
   def self.up
     @source =  ENV["source"].to_s.downcase # MCR or ATP
-    @file_path = ENV["file_path"].to_s || nil
+    @file_path = Pathname.pwd.join('spec/test_data/transform_example_payloads/application_test.json')
     @directory_name = ENV['dir'].to_s || nil
 
     start migration_for: @source, path: @file_path, dir: @directory_name
@@ -46,18 +46,19 @@ class MigrateFamily < Mongoid::Migration
         build_iap(family_hash['magi_medicaid_applications'].first.merge!(family_id: @family.id, benchmark_product_id: BSON::ObjectId.new,
                                                                          years_to_renew: 5))
         print "."
-      rescue StandardError => e
+        rescue StandardError => e
         puts "E: #{payload[:insuranceApplicationIdentifier]}, f: @family.hbx_id  error: #{e.message.split('.').first}"
       end
     end
 
     def file_path
-      case Rails.env
-      when 'development'
-        "spec/test_data/transform_example_payloads/mcr_applications.json"
-      when 'test'
-        "spec/test_data/transform_example_payloads/application.json"
-      end
+      @file_path
+      # case Rails.env
+      # when 'development'
+      #   "spec/test_data/transform_example_payloads/mcr_applications.json"
+      # when 'test'
+      #   "spec/test_data/transform_example_payloads/application.json"
+      # end
     end
 
     def build_iap(iap_hash)
@@ -95,6 +96,7 @@ class MigrateFamily < Mongoid::Migration
     end
 
     def create_or_update_person(person_params)
+      person_params[:is_temporarily_out_of_state] = false # TODO
       Operations::People::CreateOrUpdate.new.call(params: person_params)
     end
 
