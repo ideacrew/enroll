@@ -29,7 +29,6 @@ module FinancialAssistance
           private
 
           def find_application(application_id)
-            "finding application"
             application = FinancialAssistance::Application.find(application_id)
 
             Success(application)

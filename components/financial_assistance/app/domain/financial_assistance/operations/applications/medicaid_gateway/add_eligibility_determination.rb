@@ -114,8 +114,8 @@ module FinancialAssistance
           end
 
           def is_transferrable(application)
-            # TODO Add resource registry check to see if immediately transferring or saving to be batched
-            applicants = application.applicants.select do |applicant| 
+            # TODO: Add resource registry check to see if immediately transferring or saving to be batched
+            applicants = application.applicants.select do |applicant|
               applicant.is_medicaid_chip_eligible || applicant.is_magi_medicaid || applicant.is_non_magi_medicaid_eligible
             end
             applicants.any?

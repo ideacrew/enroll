@@ -4,6 +4,7 @@ require 'dry/monads'
 require 'dry/monads/do'
 require 'aca_entities/magi_medicaid/libraries/iap_library'
 
+# rubocop:disable Metrics/ClassLength
 module Operations
   module Transformers
     module PersonTo
@@ -131,9 +132,7 @@ module Operations
           end
         end
 
-        def construct_updated_by(updated_by)
-          
-        end
+        def construct_updated_by(updated_by); end
 
         def transform_vlp_documents(vlp_documents)
           vlp_documents.collect do |vlp_document|
@@ -262,7 +261,7 @@ module Operations
               action: element.action,
               modifier: element.modifier,
               update_reason: element.update_reason,
-              event_response_record:construct_event_response(element.event_response_record),
+              event_response_record: construct_event_response(element.event_response_record),
               event_request_record: construct_event_response(element.event_request_record)
             }
           end
@@ -280,7 +279,7 @@ module Operations
             aasm_state: lawful_presence_determination.aasm_state,
             ssa_responses: transform_event_responses(lawful_presence_determination.ssa_responses),
             ssa_requests: transform_event_requests(lawful_presence_determination.ssa_requests),
-            vlp_responses:  transform_event_responses(lawful_presence_determination.vlp_responses),
+            vlp_responses: transform_event_responses(lawful_presence_determination.vlp_responses),
             vlp_requests: transform_event_requests(lawful_presence_determination.vlp_requests)
           }
         end
@@ -388,3 +387,4 @@ module Operations
     end
   end
 end
+# rubocop:enable Metrics/ClassLength

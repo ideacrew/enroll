@@ -40,12 +40,12 @@ module FinancialAssistance
             primary = family_hash['family_members'].select { |a| a["is_primary_applicant"] == true}.first
             person_params = sanitize_person_params(primary)
             candidate = PersonCandidate.new(person_params[:ssn], person_params[:dob], person_params[:first_name], person_params[:last_name])
-            if primary[:no_ssn] == '1'
-              person = Person.where(first_name: /^#{candidate.first_name}$/i, last_name: /^#{candidate.last_name}$/i,
+            person = if primary[:no_ssn] == '1'
+                       Person.where(first_name: /^#{candidate.first_name}$/i, last_name: /^#{candidate.last_name}$/i,
                                     dob: candidate.dob).first
-            else
-              person = Person.match_existing_person(candidate)
-            end
+                     else
+                       Person.match_existing_person(candidate)
+                     end
 
             if person
               Family.where(
@@ -65,12 +65,12 @@ module FinancialAssistance
           def build_family(family_hash)
             found_families = find_family(family_hash)
 
-            if found_families.any?
-              @family = found_families.first
-            else
-              @family = ::Family.new(family_hash.except('hbx_id', 'foreign_keys', 'broker_accounts', 'magi_medicaid_applications', 'family_members',
+            @family = if found_families.any?
+                        found_families.first
+                      else
+                        ::Family.new(family_hash.except('hbx_id', 'foreign_keys', 'broker_accounts', 'magi_medicaid_applications', 'family_members',
                                                         'households'))
-            end
+                      end
 
             family_hash['family_members'].sort_by { |a| a["is_primary_applicant"] ? 0 : 1 }.each do |family_member_hash|
               create_member(family_member_hash)
@@ -143,7 +143,7 @@ module FinancialAssistance
             primary_person.ensure_relationship_with(person, relationship_kind)
           end
 
-          def sanitize_applicant_params(iap_hash)
+          def sanitize_applicant_params(iap_hash) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
             applicants_hash = iap_hash['applicants']
             sanitize_params = []
             applicants_hash.each do |applicant_hash|
@@ -269,7 +269,7 @@ module FinancialAssistance
               date_of_death: person_hash['person_demographics']['date_of_death'],
               dob_check: person_hash['person_demographics']['dob_check'],
               race: consumer_role_hash['is_applying_coverage'] ? person_hash['race'] : nil,
-              ethnicity: consumer_role_hash['is_applying_coverage']? [person_hash['race']] : nil,
+              ethnicity: consumer_role_hash['is_applying_coverage'] ? [person_hash['race']] : nil,
               is_incarcerated: consumer_role_hash['is_applying_coverage'] ? person_hash['person_demographics']['is_incarcerated'] : nil,
               tribal_id: person_hash['person_demographics']['tribal_id'],
               tribal_name: person_hash['person_demographics']['tribal_name'],
@@ -290,7 +290,7 @@ module FinancialAssistance
             }
           end
 
-          def fill_applicants_form(applications, app_id)
+          def fill_applicants_form(applications, app_id) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
             applicants_hash = applications[:applicants]
             application = FinancialAssistance::Application.where(id: app_id).first
 

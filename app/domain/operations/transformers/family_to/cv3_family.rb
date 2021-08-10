@@ -44,11 +44,11 @@ module Operations
         end
 
         def transform_applications(primary_id)
-          if EnrollRegistry.feature_enabled?(:financial_assistance)
-            applications = ::FinancialAssistance::Application.where(family_id: primary_id).where(aasm_state: 'submitted')
-            applications.collect do |application|
-              ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application).value!
-            end
+          return unless EnrollRegistry.feature_enabled?(:financial_assistance)
+
+          applications = ::FinancialAssistance::Application.where(family_id: primary_id).where(aasm_state: 'submitted')
+          applications.collect do |application|
+            ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application).value!
           end
         end
 
@@ -150,7 +150,7 @@ module Operations
               start_on: account.start_on,
               end_on: account.end_on,
               is_active: account.aasm_state == "active",
-              aasm_state: account.aasm_state,
+              aasm_state: account.aasm_state
               # general_agency_reference: account.general_agency_reference,
               # broker_role_reference: account.broker_role_reference,
               # updated_by: account.updated_by
@@ -182,7 +182,7 @@ module Operations
               is_active: household.is_active,
               irs_groups: construct_irs_group(household.irs_group),
               tax_households: transform_tax_households(household.tax_households), # TO DO
-              coverage_households: transform_coverage_households(household.coverage_households), # TO DO
+              coverage_households: transform_coverage_households(household.coverage_households) # TO DO
               # hbx_enrollments: hbx_enrollments
             }
           end
@@ -194,7 +194,7 @@ module Operations
               is_immediate_family: household.is_immediate_family,
               is_determination_split_household: household.is_determination_split_household,
               submitted_at: household.submitted_at,
-              aasm_state: household.aasm_state,
+              aasm_state: household.aasm_state
               # coverage_household_members: household.coverage_household_members,
               # broker_agency_reference: household.broker_agency_reference,
               # broker_role_reference: household.broker_role_reference

@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 require 'aca_entities/serializers/xml/medicaid/atp'
-require 'aca_entities/atp/transformers/cv/family.rb'
+require 'aca_entities/atp/transformers/cv/family'
 
 RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::AccountTransferIn, dbclean: :after_each do
   include Dry::Monads[:result, :do]
