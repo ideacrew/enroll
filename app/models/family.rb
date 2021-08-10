@@ -100,7 +100,7 @@ class Family
             numericality: {only_integer: true, inclusion: 2014..2025},
             :allow_nil => true
 
-  validate :family_integrity
+  # validate :family_integrity
 
   after_initialize :build_household
 

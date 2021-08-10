@@ -15,7 +15,7 @@ require 'aca_entities/serializers/xml/medicaid/atp'
 class MigrateFamily < Mongoid::Migration
   def self.up
     @source =  ENV["source"].to_s.downcase # MCR or ATP
-    @file_path = Pathname.pwd.join('spec/test_data/transform_example_payloads/application_test.json')
+    @file_path = "/Users/saidineshmekala/Downloads/app.json"
     @directory_name = ENV['dir'].to_s || nil
 
     start migration_for: @source, path: @file_path, dir: @directory_name
@@ -97,6 +97,8 @@ class MigrateFamily < Mongoid::Migration
 
     def create_or_update_person(person_params)
       person_params[:is_temporarily_out_of_state] = false # TODO
+      person_params[:is_disabled] = false # TODO
+      person_params[:addresses].nil? ? [] : person_params[:addresses] # TODO
       Operations::People::CreateOrUpdate.new.call(params: person_params)
     end
 
@@ -267,8 +269,8 @@ class MigrateFamily < Mongoid::Migration
         dob: person_hash['person_demographics']['dob'],
         date_of_death: person_hash['person_demographics']['date_of_death'],
         dob_check: person_hash['person_demographics']['dob_check'],
-        race: consumer_role_hash['is_applying_coverage'] ? person_hash['race'] : nil,
-        ethnicity: consumer_role_hash['is_applying_coverage'] ? [person_hash['race']] : nil,
+        race: "",
+        ethnicity: person_hash['person_demographics']['ethnicity'],
         is_incarcerated: consumer_role_hash['is_applying_coverage'] ? person_hash['person_demographics']['is_incarcerated'] : nil,
         tribal_id: person_hash['person_demographics']['tribal_id'],
         tribal_name: person_hash['person_demographics']['tribal_name'],
