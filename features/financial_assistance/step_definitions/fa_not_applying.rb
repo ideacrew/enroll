@@ -68,10 +68,6 @@ When(/^the Experian returns a VERIFIED response$/) do
   click_link "Continue Application"
 end
 
-Then(/the user will navigate to the assistance year selection page/) do
-  expect(page).to have_content(l10n("faa.year_selection_header"))
-end
-
 Then(/^the user will navigate to the Help Paying for Coverage page$/) do
   expect(page).to have_content('Your Application for Premium Reductions')
 end

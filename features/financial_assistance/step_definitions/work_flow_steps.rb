@@ -122,6 +122,10 @@ Then(/the user will navigate to the Application Checklist/) do
   expect(page).to have_content("Application Checklist")
 end
 
+Then(/the user will navigate to the assistance year selection page/) do
+  expect(page).to have_content(l10n("faa.year_selection_header"))
+end
+
 # When(/^navigates to the Verify Identity page$/) do
 #   visit new_insured_interactive_identity_verification_path
 #   expect(page).to have_content('Verify Identity')
