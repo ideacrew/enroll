@@ -15,7 +15,8 @@ require 'aca_entities/serializers/xml/medicaid/atp'
 class MigrateFamily < Mongoid::Migration
   def self.up
     @source =  ENV["source"].to_s.downcase # MCR or ATP
-    @file_path = "/Users/saidineshmekala/Downloads/app.json"
+    # @file_path = "/Users/saidineshmekala/Downloads/app.json"
+    @file_path = "/db/application.json"
     @directory_name = ENV['dir'].to_s || nil
 
     start migration_for: @source, path: @file_path, dir: @directory_name
