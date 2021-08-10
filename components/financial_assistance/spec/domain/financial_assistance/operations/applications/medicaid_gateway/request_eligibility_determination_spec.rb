@@ -55,42 +55,40 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
   let!(:eligibility_determination) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application) }
   let(:event) { Success(double) }
   let(:obj)  { FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication.new }
+  let(:premiums_hash) do
+    {
+      [person.hbx_id] => {:health_only => {person.hbx_id => [{:cost => 200.0, :member_identifier => person.hbx_id, :monthly_premium => 200.0}]}}
+    }
+  end
+
+  let(:slcsp_info) do
+    {
+      person.hbx_id => {:health_only_slcsp_premiums => {:cost => 200.0, :member_identifier => person.hbx_id, :monthly_premium => 200.0}}
+    }
+  end
+
+  let(:lcsp_info) do
+    {
+      person.hbx_id => {:health_only_lcsp_premiums => {:cost => 100.0, :member_identifier => person.hbx_id, :monthly_premium => 100.0}}
+    }
+  end
+
+  let(:fetch_double) { double(:new => double(call: double(:value! => premiums_hash)))}
+  let(:fetch_slcsp_double) { double(:new => double(call: double(:value! => slcsp_info)))}
+  let(:fetch_lcsp_double) { double(:new => double(call: double(:value! => lcsp_info)))}
 
   before do
     allow(FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication).to receive(:new).and_return(obj)
     allow(obj).to receive(:build_event).and_return(event)
     allow(event.success).to receive(:publish).and_return(true)
+    stub_const('::Operations::Products::Fetch', fetch_double)
+    stub_const('::Operations::Products::FetchSlcsp', fetch_slcsp_double)
+    stub_const('::Operations::Products::FetchLcsp', fetch_lcsp_double)
   end
 
   context 'success' do
     context 'with valid application' do
-
-      let(:premiums_hash) do
-        {
-          [person.hbx_id] => {:health_only => {person.hbx_id => [{:cost => 200.0, :member_identifier => person.hbx_id, :monthly_premium => 200.0}]}}
-        }
-      end
-
-      let(:slcsp_info) do
-        {
-          person.hbx_id => {:health_only_slcsp_premiums => {:cost => 200.0, :member_identifier => person.hbx_id, :monthly_premium => 200.0}}
-        }
-      end
-
-      let(:lcsp_info) do
-        {
-          person.hbx_id => {:health_only_lcsp_premiums => {:cost => 100.0, :member_identifier => person.hbx_id, :monthly_premium => 100.0}}
-        }
-      end
-
-      let(:fetch_double) { double(:new => double(call: double(:value! => premiums_hash)))}
-      let(:fetch_slcsp_double) { double(:new => double(call: double(:value! => slcsp_info)))}
-      let(:fetch_lcsp_double) { double(:new => double(call: double(:value! => lcsp_info)))}
-
       before do
-        stub_const('::Operations::Products::Fetch', fetch_double)
-        stub_const('::Operations::Products::FetchSlcsp', fetch_slcsp_double)
-        stub_const('::Operations::Products::FetchLcsp', fetch_lcsp_double)
         @result = subject.call({application_id: application.id})
       end
 
