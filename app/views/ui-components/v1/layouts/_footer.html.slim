@@ -18,7 +18,7 @@ footer.footer-wrapper#footer-uic class=("#{"pre_prod_nav_color" if ENV['ENROLL_R
                 span
                   i.fas.fa-envelope.fa-lg
                   | &nbsp;
-                  = EnrollRegistry[:enroll_app].setting(:contact_center_email_address).item
+                  = EnrollRegistry[:enroll_app].setting(:mail_address).item
           li 
             = link_to site_faqs_url, target: '_blank' do
               i.fas.fa-question.fa-lg
