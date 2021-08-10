@@ -115,13 +115,19 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.anyone_found_eligible_1" => "If anyone in my application group is found eligible for MaineCare, I am authorizing the Office for Family Independence to pursue and get any money from other health insurance, ",
   "en.faa.anyone_found_eligible_2" => "legal settlements, or other third parties that may be legally responsible for paying for any health care received by me or members of my applicant group. ",
   "en.faa.anyone_found_eligible_3" => "I am also giving to the Office for Family Independence rights to pursue and get medical support from a spouse or parent.",
-  "en.faa.parent_living_outside_of_home_1" => "<br><br>If yes, I know that, if anyone in my application group is found eligible for MaineCare, I will be asked to cooperate with the Child Support Agency ",
+  "en.faa.parent_living_outside_of_home_1" => "If yes, I know that, if anyone in my application group is found eligible for MaineCare, I will be asked to cooperate with the Child Support Agency ",
   "en.faa.parent_living_outside_of_home_2" => "to collect medical support from the parent who lives outside the home. If I think that cooperating to collect medical support will harm me or my children, ",
   "en.faa.parent_living_outside_of_home_3" => "I can tell my caseworker and I may not have to cooperate.",
   "en.faa.negative_income" => "Negative Income",
   "en.faa.full_long_name_determination" => "Based on the information you provided, no one on this application is likely to qualify for %{program_short_name}. Do you still want us to send your application to the %{program_long_name} so they can check on %{program_short_name} eligibility?",
   "en.faa.send_to_external_verification" => "Send to OFI",
-  "en.faa.filing_as_head_of_household" => "Will this person be filing as head of household?"
+  "en.faa.filing_as_head_of_household" => "Will this person be filing as head of household?",
+  # Year Selection page
+  "en.faa.year_selection_header" => "You’re About to Sign Up for a New Plan Year",
+  "en.faa.year_selection_subheader" => "Select CONTINUE to start a new application for lower premiums or Medicaid.",
+  "en.faa.year_selection_oe_year" => "2022 Open Enrollment", # TODO: dynamic date
+  "en.faa.see_if_you_qualify" => "See if you qualify for lower monthly premiums for 2022 #{Settings.site.short_name} health insurance or free Medicaid coverage.", # TODO: dynamic date
+  "en.faa.year_selection_oe_range" => "Open enrollment is from November 1, 2021 through January 31, 2022", # TODO: dynamic date
+  "en.faa.year_selection_learn_more" => "If you need health insurance, lower premiums, or Medicaid now, you can <a href='#'>submit a webform</a> or call #{Settings.site.short_name} at (855) 532-5465 / TTY: 711. <a href='https://www.dchealthlink.com/individuals/life-changes'>Learn more about Life Changes</a>." # TODO: Update URL and phones
 }.freeze
 # rubocop:enable Layout/LineLength
-
