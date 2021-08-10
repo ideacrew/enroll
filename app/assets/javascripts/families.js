@@ -1,25 +1,27 @@
 
 $(document).ready(function() {
-  $("#pay-now").on('click', function (e) {
-    e.preventDefault();
-    $.ajax({
-        type: "GET",
-        url: "/payment_transactions/generate_saml_response",
-        data: {enrollment_id: $("#pay-now").val(), source: $("#source").val()},
-        success: function (response) {
-          if (response["error"] != null){
-            alert("We're sorry, but something went wrong. You can try again, or pay once you receive your invoice.")}
-          else if (response["status"] == 404){
-            alert("We're sorry, but something went wrong. You can try again, or pay once you receive your invoice.")}
-          else{
-            document.getElementById("sp").value = response["SAMLResponse"];
-            $("#pay_now_form").submit();
+  $(".interaction-click-control-leave-dc-health-link").on('click', function (e) {
+    if ($(this).parent('form').attr('method') == 'post') {
+      e.preventDefault();
+      $.ajax({
+          type: "GET",
+          url: "/payment_transactions/generate_saml_response",
+          data: {enrollment_id: $(this).val(), source: $("#source").val()},
+          success: function (response) {
+            if (response["error"] != null){
+              alert("We're sorry, but something went wrong. You can try again, or pay once you receive your invoice.")}
+            else if (response["status"] == 404){
+              alert("We're sorry, but something went wrong. You can try again, or pay once you receive your invoice.")}
+            else{
+              $(this).siblings('#sp').val(response["SAMLResponse"]);
+              $(this).parent('form').submit();
+            }
+          },
+          error: function (response) {
+              // error handling
           }
-        },
-        error: function (response) {
-            // error handling
-        }
-    });
+      });
+    }
   });
 });
 
