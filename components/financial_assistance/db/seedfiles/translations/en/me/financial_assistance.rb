@@ -21,10 +21,10 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.we_have_your_results" => "We have your results",
   "en.faa.medicaid" => "MaineCare and CubCare",
   "en.faa.eligible_for_medicaid" => "These people <span>appear to be eligible</span> for ",
-  "en.faa.eligible_for_medicaid2" => " or CubCare (the Children’s Health Insurance Program)",
-  "en.faa.dhs_decision" => "<span>NEXT STEP: The Department of Health and Human Services (DHHS) will make a final decision on whether those listed qualify for <span class='run-glossary'>MaineCare or CubCare</span>.</span>",
+  "en.faa.eligible_for_medicaid2" => "MaineCare (Medicaid) or CubCare (the Children's Health Insurance Program)",
+  "en.faa.dhs_decision" => "<span>Next step: The Office for Family Independence will make a final decision on whether those listed qualify for <span class='run-glossary'>MaineCare and CubCare</span>.</span>",
   "en.faa.primary_caretaker_question_text" => "Is this person the main person taking care of any children age 18 or younger? *",
-  "en.faa.dhs_contact" => "They will send you a letter, and may ask you to provide documents. If you haven’t heard from DHS within 45 days, you may want to ask for an update by calling us at ",
+  "en.faa.dhs_contact" => "They will send you a letter, and may ask you to provide documents. If you haven’t heard from OFI within 45 days, you may want to ask for an update by calling",
   "en.faa.referral" => "Special MaineCare Referral",
   "en.faa.qualified_reason" => "These people may qualify for MaineCare for reasons like age or disability.",
   "en.faa.next_step_with_non_magi" => "<b>NEXT STEP:</b> We are sending your application to the Department of Health and Human Services (DHHS). They will contact you to get more information to see if you qualify.",
@@ -115,7 +115,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.anyone_found_eligible_1" => "If anyone in my application group is found eligible for MaineCare, I am authorizing the Office for Family Independence to pursue and get any money from other health insurance, ",
   "en.faa.anyone_found_eligible_2" => "legal settlements, or other third parties that may be legally responsible for paying for any health care received by me or members of my applicant group. ",
   "en.faa.anyone_found_eligible_3" => "I am also giving to the Office for Family Independence rights to pursue and get medical support from a spouse or parent.",
-  "en.faa.parent_living_outside_of_home_1" => "<br><br>If yes, I know that, if anyone in my application group is found eligible for MaineCare, I will be asked to cooperate with the Child Support Agency ",
+  "en.faa.parent_living_outside_of_home_1" => "If yes, I know that, if anyone in my application group is found eligible for MaineCare, I will be asked to cooperate with the Child Support Agency ",
   "en.faa.parent_living_outside_of_home_2" => "to collect medical support from the parent who lives outside the home. If I think that cooperating to collect medical support will harm me or my children, ",
   "en.faa.parent_living_outside_of_home_3" => "I can tell my caseworker and I may not have to cooperate.",
   "en.faa.negative_income" => "Negative Income",
@@ -123,6 +123,12 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.send_to_external_verification" => "Send to OFI",
   "en.faa.filing_as_head_of_household" => "Will this person be filing as head of household?",
   "en.faa.eligibility_go_to_my_account_message" => "If you’re already enrolled in CoverME.gov Individual & Family plan, you’re finished! To see your plan information, select GO TO MY ACCOUNT."
+  # Year Selection page
+  "en.faa.year_selection_header" => "You’re About to Sign Up for a New Plan Year",
+  "en.faa.year_selection_subheader" => "Select CONTINUE to start a new application for lower premiums or Medicaid.",
+  "en.faa.year_selection_oe_year" => "2022 Open Enrollment", # TODO: dynamic date
+  "en.faa.see_if_you_qualify" => "See if you qualify for lower monthly premiums for 2022 #{Settings.site.short_name} health insurance or free Medicaid coverage.", # TODO: dynamic date
+  "en.faa.year_selection_oe_range" => "Open enrollment is from November 1, 2021 through January 31, 2022", # TODO: dynamic date
+  "en.faa.year_selection_learn_more" => "If you need health insurance, lower premiums, or Medicaid now, you can <a href='#'>submit a webform</a> or call #{Settings.site.short_name} at (855) 532-5465 / TTY: 711. <a href='https://www.dchealthlink.com/individuals/life-changes'>Learn more about Life Changes</a>." # TODO: Update URL and phones
 }.freeze
 # rubocop:enable Layout/LineLength
-

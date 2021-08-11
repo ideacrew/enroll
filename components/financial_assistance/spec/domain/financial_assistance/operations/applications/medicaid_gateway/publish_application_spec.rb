@@ -16,6 +16,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
                                   gender: person.gender,
                                   ssn: person.ssn,
                                   application: application,
+                                  person_hbx_id: person.hbx_id,
                                   ethnicity: [],
                                   is_primary_applicant: true,
                                   is_self_attested_blind: false,
@@ -54,17 +55,41 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
     primary_appli.save!
   end
 
+  let(:premiums_hash) do
+    {
+      [person.hbx_id] => {:health_only => {person.hbx_id => [{:cost => 200.0, :member_identifier => person.hbx_id, :monthly_premium => 200.0}]}}
+    }
+  end
+
+  let(:slcsp_info) do
+    {
+      person.hbx_id => {:health_only_slcsp_premiums => {:cost => 200.0, :member_identifier => person.hbx_id, :monthly_premium => 200.0}}
+    }
+  end
+
+  let(:lcsp_info) do
+    {
+      person.hbx_id => {:health_only_lcsp_premiums => {:cost => 100.0, :member_identifier => person.hbx_id, :monthly_premium => 100.0}}
+    }
+  end
+
+  let(:fetch_double) { double(:new => double(call: double(:value! => premiums_hash)))}
+  let(:fetch_slcsp_double) { double(:new => double(call: double(:value! => slcsp_info)))}
+  let(:fetch_lcsp_double) { double(:new => double(call: double(:value! => lcsp_info)))}
+
   before do
+    stub_const('::Operations::Products::Fetch', fetch_double)
+    stub_const('::Operations::Products::FetchSlcsp', fetch_slcsp_double)
+    stub_const('::Operations::Products::FetchLcsp', fetch_lcsp_double)
     allow(FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication).to receive(:new).and_return(obj)
     allow(obj).to receive(:build_event).and_return(event)
     allow(event.success).to receive(:publish).and_return(true)
-    application_params = ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application.reload)
-    @result = subject.call(application_params.success)
   end
 
   context 'When connection is available' do
     it 'should return success' do
-      expect(@result).to be_success
+      application_params = ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application.reload)
+      expect(subject.call(application_params.success)).to be_success
     end
   end
 end

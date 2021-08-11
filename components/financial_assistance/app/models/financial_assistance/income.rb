@@ -68,6 +68,10 @@ module FinancialAssistance
       scholarship_payments: 'Taxable scholarship payments'
     }
 
+    ALL_INCOME_KINDS_MAPPED = OTHER_INCOME_TYPE_KIND.merge(
+      JOB_INCOME_TYPE_KIND.to_sym => 'Wages and Salaries'
+    )
+
     OTHER_INCOME_TYPE_KIND.merge!(american_indian_and_alaskan_native: "American Indian/Alaska Native income") unless EnrollRegistry.feature_enabled?(:american_indian_alaskan_native_income)
     OTHER_INCOME_TYPE_KIND.freeze
 
