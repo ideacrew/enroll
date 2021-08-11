@@ -26,6 +26,12 @@ class Permission
   field :can_create_benefit_application, type: Boolean, default: false
   field :can_change_fein, type: Boolean, default: false
   field :can_force_publish, type: Boolean, default: false
+  field :can_edit_aptc, type: Boolean, default: false
+  field :can_view_sep_history, type: Boolean, default: false
+  field :can_reinstate_enrollment, type: Boolean, default: false
+  field :can_cancel_enrollment, type: Boolean, default: false
+  field :can_terminate_enrollment, type: Boolean, default: false
+  field :change_enrollment_end_date, type: Boolean, default: false
 
   class << self
     def hbx_staff
