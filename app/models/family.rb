@@ -1192,14 +1192,11 @@ private
   end
 
   def family_integrity
-    #puts "checking family integrity"
-    #puts "only_one_active_primary_family #{only_one_active_primary_family}"
-    #only_one_active_primary_family
-    #puts "single_primary_family_member #{single_primary_family_member}"
-    #single_primary_family_member
-    #all_family_member_relations_defined
-    #single_active_household
-    #no_duplicate_family_members
+    only_one_active_primary_family
+    single_primary_family_member
+    all_family_member_relations_defined
+    single_active_household
+    no_duplicate_family_members
   end
 
   def primary_applicant_person
