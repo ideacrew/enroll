@@ -9,7 +9,7 @@ RSpec.describe "_footer.html.slim", :type => :view, dbclean: :after_each  do
     end
 
     it "should display email link" do
-      expect(rendered).to have_text(Settings.contact_center.email_address)
+      expect(rendered).to have_text(EnrollRegistry[:enroll_app].setting(:mail_address).item)
     end
 
     it "should display Phone numer" do
