@@ -1417,5 +1417,95 @@ describe MeDefinePermissions, dbclean: :around_each do
       expect(Person.all.to_a.count).to eq(8)
       expect(Person.all.to_a.map{|p| p.hbx_staff_role.subrole}).to match_array roles
     end
+
+    context "user and their permission attributes" do
+      it "user with 'hbx_staff' as permission" do
+        permission = User.all.detect { |u| u.permission.name == 'hbx_staff'}.permission
+        expect(permission.name).to eq 'hbx_staff'
+        expect(permission.can_edit_aptc).to eq true
+        expect(permission.can_view_sep_history).to eq true
+        expect(permission.can_reinstate_enrollment).to eq true
+        expect(permission.can_cancel_enrollment).to eq true
+        expect(permission.can_terminate_enrollment).to eq true
+        expect(permission.change_enrollment_end_date).to eq true
+      end
+
+      it "user with 'hbx_read_only' as permission" do
+        permission = User.all.detect { |u| u.permission.name == 'hbx_read_only'}.permission
+        expect(permission.name).to eq 'hbx_read_only'
+        expect(permission.can_edit_aptc).to eq false
+        expect(permission.can_view_sep_history).to eq true
+        expect(permission.can_reinstate_enrollment).to eq true
+        expect(permission.can_cancel_enrollment).to eq true
+        expect(permission.can_terminate_enrollment).to eq true
+        expect(permission.change_enrollment_end_date).to eq true
+      end
+
+      it "user with 'hbx_csr_supervisor' as permission" do
+        permission = User.all.detect { |u| u.permission.name == 'hbx_csr_supervisor'}.permission
+        expect(permission.name).to eq 'hbx_csr_supervisor'
+        expect(permission.can_edit_aptc).to eq false
+        expect(permission.can_view_sep_history).to eq true
+        expect(permission.can_reinstate_enrollment).to eq true
+        expect(permission.can_cancel_enrollment).to eq true
+        expect(permission.can_terminate_enrollment).to eq true
+        expect(permission.change_enrollment_end_date).to eq true
+      end
+
+      it "user with 'hbx_csr_tier2' as permission" do
+        permission = User.all.detect { |u| u.permission.name == 'hbx_csr_tier2'}.permission
+        expect(permission.name).to eq 'hbx_csr_tier2'
+        expect(permission.can_edit_aptc).to eq false
+        expect(permission.can_view_sep_history).to eq true
+        expect(permission.can_reinstate_enrollment).to eq true
+        expect(permission.can_cancel_enrollment).to eq true
+        expect(permission.can_terminate_enrollment).to eq true
+        expect(permission.change_enrollment_end_date).to eq true
+      end
+
+      it "user with 'hbx_csr_tier1' as permission" do
+        permission = User.all.detect { |u| u.permission.name == 'hbx_csr_tier1'}.permission
+        expect(permission.name).to eq 'hbx_csr_tier1'
+        expect(permission.can_edit_aptc).to eq false
+        expect(permission.can_view_sep_history).to eq true
+        expect(permission.can_reinstate_enrollment).to eq false
+        expect(permission.can_cancel_enrollment).to eq false
+        expect(permission.can_terminate_enrollment).to eq false
+        expect(permission.change_enrollment_end_date).to eq false
+      end
+
+      it "user with 'developer' as permission" do
+        permission = User.all.detect { |u| u.permission.name == 'developer'}.permission
+        expect(permission.name).to eq 'developer'
+        expect(permission.can_edit_aptc).to eq false
+        expect(permission.can_view_sep_history).to eq true
+        expect(permission.can_reinstate_enrollment).to eq false
+        expect(permission.can_cancel_enrollment).to eq false
+        expect(permission.can_terminate_enrollment).to eq false
+        expect(permission.change_enrollment_end_date).to eq false
+      end
+
+      it "user with 'hbx_tier3' as permission" do
+        permission = User.all.detect { |u| u.permission.name == 'hbx_tier3'}.permission
+        expect(permission.name).to eq 'hbx_tier3'
+        expect(permission.can_edit_aptc).to eq true
+        expect(permission.can_view_sep_history).to eq true
+        expect(permission.can_reinstate_enrollment).to eq true
+        expect(permission.can_cancel_enrollment).to eq true
+        expect(permission.can_terminate_enrollment).to eq true
+        expect(permission.change_enrollment_end_date).to eq true
+      end
+
+      it "user with 'super_admin' as permission" do
+        permission = User.all.detect { |u| u.permission.name == 'super_admin'}.permission
+        expect(permission.name).to eq 'super_admin'
+        expect(permission.can_edit_aptc).to eq true
+        expect(permission.can_view_sep_history).to eq true
+        expect(permission.can_reinstate_enrollment).to eq true
+        expect(permission.can_cancel_enrollment).to eq true
+        expect(permission.can_terminate_enrollment).to eq true
+        expect(permission.change_enrollment_end_date).to eq true
+      end
+    end
   end
 end

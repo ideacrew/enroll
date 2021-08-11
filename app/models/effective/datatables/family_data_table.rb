@@ -29,15 +29,15 @@ module Effective
             add_sep_link_type(pundit_allow(HbxProfile, :can_add_sep?))],
            ['Create Eligibility', new_eligibility_exchanges_hbx_profiles_path(person_id: row.primary_applicant.person.id,
                                                                               family: row.id, family_actions_id: "family_actions_#{row.id}"), new_eligibility_family_member_link_type(row, pundit_allow(HbxProfile, :can_add_pdc?))],
-           ['View SEP History', show_sep_history_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id}"), 'ajax'],
-           ['Cancel Enrollment', cancel_enrollment_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id}"), cancel_enrollment_type(row, pundit_allow(Family, :can_update_ssn?))],
+           ["<div class='#{pundit_class(Family, :can_view_sep_history?)}'> View SEP History </div>".html_safe, show_sep_history_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id}"), 'ajax'],
+           ['Cancel Enrollment', cancel_enrollment_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id}"), cancel_enrollment_type(row, pundit_allow(Family, :can_cancel_enrollment?))],
            #cancel_enrollment_type(row, pundit_allow(Family, :can_update_ssn?))],
-           ['Terminate Enrollment', terminate_enrollment_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id}"), terminate_enrollment_type(row, pundit_allow(Family, :can_update_ssn?))],
+           ['Terminate Enrollment', terminate_enrollment_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id}"), terminate_enrollment_type(row, pundit_allow(Family, :can_terminate_enrollment?))],
            #terminate_enrollment_type(row, pundit_allow(Family, :can_update_ssn?))],
            ['Change Enrollment End Date', view_enrollment_to_update_end_date_exchanges_hbx_profiles_path(family: row.id, person_id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id}"),
-            update_terminated_enrollment_type(row, pundit_allow(Family, :can_update_ssn?))],
+            update_terminated_enrollment_type(row, pundit_allow(Family, :change_enrollment_end_date?))],
            ['Reinstate', view_terminated_hbx_enrollments_exchanges_hbx_profiles_path(family: row.id, person_id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id}"),
-            reinstate_enrollment_type(row, pundit_allow(Family, :can_update_ssn?))],
+            reinstate_enrollment_type(row, pundit_allow(Family, :can_reinstate_enrollment?))],
            ["<div class='#{pundit_class(Family, :can_update_ssn?)}'> Edit DOB / SSN </div>".html_safe, edit_dob_ssn_path(id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id}"), 'ajax'],
            ['View Username and Email', get_user_info_exchanges_hbx_profiles_path(person_id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id}"),
             (individual_market_is_enabled? && pundit_allow(Family, :can_view_username_and_email?)) ? 'ajax' : 'disabled'],
@@ -60,7 +60,7 @@ module Effective
           dropdown += if individual_market_is_enabled?
                         [
                           ['Edit APTC / CSR', edit_aptc_csr_path(family_id: row.id, person_id: row.primary_applicant.person.id),
-                           aptc_csr_link_type(row, pundit_allow(Family, :can_update_ssn?))],
+                           aptc_csr_link_type(row, pundit_allow(Family, :can_edit_aptc?))],
                           ['Paper', resume_enrollment_exchanges_agents_path(person_id: row.primary_applicant.person.id, original_application_type: 'paper'), 'static'],
                           ['Phone', resume_enrollment_exchanges_agents_path(person_id: row.primary_applicant.person.id, original_application_type: 'phone'), 'static']
                         ]

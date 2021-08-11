@@ -48,6 +48,12 @@ class Permission
   field :can_access_age_off_excluded, type: Boolean, default: false
   field :can_send_secure_message, type: Boolean, default: false
   field :can_manage_qles, type: Boolean, default: false
+  field :can_edit_aptc, type: Boolean, default: false
+  field :can_view_sep_history, type: Boolean, default: false
+  field :can_reinstate_enrollment, type: Boolean, default: false
+  field :can_cancel_enrollment, type: Boolean, default: false
+  field :can_terminate_enrollment, type: Boolean, default: false
+  field :change_enrollment_end_date, type: Boolean, default: false
 
   class << self
     def hbx_staff
