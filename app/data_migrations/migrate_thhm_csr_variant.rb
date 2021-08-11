@@ -5,7 +5,7 @@ require File.join(Rails.root, 'lib/mongoid_migration_task')
 class MigrateThhmCsrVariant < MongoidMigrationTask
 
   def process_families(families, logger, offset_count)
-    families.no_timeout.limit(5_000).offset(offset_count).inject([]) do |_dummy, family|
+    families.no_timeout.limit(5_00).offset(offset_count).inject([]) do |_dummy, family|
       person = family.primary_person
       next unless person.present?
       family.active_household.tax_households.where(:"eligibility_determinations.csr_percent_as_integer".ne => nil).each do |thh|
@@ -15,7 +15,7 @@ class MigrateThhmCsrVariant < MongoidMigrationTask
         end
       end
     rescue StandardError => e
-      logger.info "error processing family with primary person hbx_id: #{person.hbx_id}, error: #{e.message}" unless Rails.env.test?
+      logger.info "error processing family with primary person hbx_id: #{person&.hbx_id}, error: #{e.message}" unless Rails.env.test?
     end
   end
 
@@ -26,7 +26,7 @@ class MigrateThhmCsrVariant < MongoidMigrationTask
     families = Family.all_tax_households
     total_count = families.count
     logger.info "Total number of families to be processed #{total_count}"
-    familes_per_iteration = 5_000.0
+    familes_per_iteration = 5_00.0
     number_of_iterations = (total_count / familes_per_iteration).ceil
     counter = 0
 
