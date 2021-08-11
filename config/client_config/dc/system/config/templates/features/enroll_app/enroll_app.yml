@@ -508,4 +508,9 @@ registry:
         is_enabled: true
       - key: contact_email_header_footer_feature
         is_enabled: true
-      
+      - key: :show_download_tax_documents
+        item: :show_download_tax_documents
+        is_enabled: true
+      - key: :show_upload_notices
+        item: :show_upload_notices
+        is_enabled: true
