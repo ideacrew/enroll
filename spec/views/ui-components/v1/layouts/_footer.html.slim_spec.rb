@@ -4,6 +4,7 @@ RSpec.describe "_footer.html.slim", :type => :view, dbclean: :after_each  do
 
   describe "footer content" do
     before :each do
+      EnrollRegistry[:contact_email_header_footer_feature].feature.stub(:is_enabled).and_return(true)
       render "ui-components/v1/layouts/footer.html.slim"
     end
 
