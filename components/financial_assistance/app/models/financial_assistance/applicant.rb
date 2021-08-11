@@ -280,7 +280,7 @@ module FinancialAssistance
 
     field :workflow, type: Hash, default: { }
 
-    embeds_many :verification_types, class_name: "::FinancialAssistance::VerificationType"#, cascade_callbacks: true, validate: true
+    embeds_many :verification_types, class_name: "::FinancialAssistance::VerificationType" #, cascade_callbacks: true, validate: true
     embeds_many :incomes,     class_name: "::FinancialAssistance::Income"
     embeds_many :deductions,  class_name: "::FinancialAssistance::Deduction"
     embeds_many :benefits,    class_name: "::FinancialAssistance::Benefit"
@@ -317,6 +317,7 @@ module FinancialAssistance
     alias is_joint_tax_filing? is_joint_tax_filing
 
     attr_accessor :relationship
+
     # attr_writer :us_citizen, :naturalized_citizen, :indian_tribe_member, :eligible_immigration_status
 
     before_save :generate_hbx_id
@@ -672,7 +673,6 @@ module FinancialAssistance
       person.is_tobacco_user || "unknown"
     end
 
-
     def eligibility_determination=(eg)
       self.eligibility_determination_id = eg.id
     end
@@ -709,11 +709,11 @@ module FinancialAssistance
 
     def applicant_validation_complete?
       if is_applying_coverage
-      valid?(:submission) &&
-        incomes.all? {|income| income.valid? :submission} &&
-        benefits.all? {|benefit| benefit.valid? :submission} &&
-        deductions.all? {|deduction| deduction.valid? :submission} &&
-        other_questions_complete?
+        valid?(:submission) &&
+          incomes.all? {|income| income.valid? :submission} &&
+          benefits.all? {|benefit| benefit.valid? :submission} &&
+          deductions.all? {|deduction| deduction.valid? :submission} &&
+          other_questions_complete?
       else
         valid?(:submission) &&
           incomes.all? {|income| income.valid? :submission} &&
@@ -799,11 +799,11 @@ module FinancialAssistance
 
     def embedded_document_section_entry_complete?(embedded_document) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity TODO: Remove this
       case embedded_document
-      when :income       
+      when :income
         return false if has_job_income.nil? || has_self_employment_income.nil?
         return incomes.jobs.present? && valid_embedded_fields(:has_job_income) && incomes.self_employment.present? && valid_embedded_fields(:has_self_employment_income) if has_job_income && has_self_employment_income
         return incomes.jobs.present? && valid_embedded_fields(:has_job_income) && incomes.self_employment.blank? if has_job_income && !has_self_employment_income
-        return incomes.jobs.blank? && incomes.self_employment.present? && valid_embedded_fields(:has_self_employment_income)if !has_job_income && has_self_employment_income
+        return incomes.jobs.blank? && incomes.self_employment.present? && valid_embedded_fields(:has_self_employment_income) if !has_job_income && has_self_employment_income
         incomes.jobs.blank? && incomes.self_employment.blank?
       when :other_income
         if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income)
@@ -817,13 +817,13 @@ module FinancialAssistance
           return incomes.unemployment.present? && valid_embedded_fields(:has_unemployment_income) && incomes.other.blank? if incomes.unemployment && !incomes.other
           return incomes.unemployment.blank? && valid_embedded_fields(:has_unemployment_income) && incomes.other.present? if !incomes.unemployment && incomes.other
           incomes.unemployment.blank? && incomes.other.blank?
-          return incomes.unemployment.present? && valid_embedded_fields(:has_unemployment_income) if has_unemployment_income          
-        end     
+          return incomes.unemployment.present? && valid_embedded_fields(:has_unemployment_income) if has_unemployment_income
+        end
         return false if has_other_income.nil?
         return incomes.other.present? && valid_embedded_fields(:other_income) if has_other_income
         return incomes.other.blank? || incomes.unemployment.blank? if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income)
         incomes.other.blank?
-      when :income_adjustment 
+      when :income_adjustment
         return false if has_deductions.nil?
         return deductions.present? && valid_embedded_fields(:has_income_adjustment) if has_deductions
         deductions.blank?
@@ -841,27 +841,27 @@ module FinancialAssistance
         return benefits.enrolled.present? && benefits.enrolled.all? {|benefit| benefit.valid? :submission} && benefits.eligible.blank? if has_enrolled_health_coverage && !has_eligible_health_coverage
         return benefits.enrolled.blank? && benefits.eligible.present? && benefits.eligible.all? {|benefit| benefit.valid? :submission}  if !has_enrolled_health_coverage && has_eligible_health_coverage
         benefits.enrolled.blank? && benefits.eligible.blank?
-      end      
+      end
     end
 
-    def valid_embedded_fields(embedded_document)
+    def valid_embedded_fields(embedded_document) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity TODO: Remove this
       validations = []
       case embedded_document
       when :has_job_income
-        if has_job_income          
-          incomes.jobs.select {|j| j.persisted? }.each do |job|            
+        if has_job_income
+          incomes.jobs.select(&:persisted?).each do |job|
             address = job[:employer_address]
             validations << (address[:address_1].present? && address[:city].present? && address[:state].present? && address[:zip].present?)
             validations << (job[:employer_name].present? && job[:employer_phone].present?)
-            validations << (job[:amount].present? && job[:frequency_kind].present? && job[:start_on].present?)            
+            validations << (job[:amount].present? && job[:frequency_kind].present? && job[:start_on].present?)
           end
-        end 
+        end
       when :has_self_employment_income
         if has_self_employment_income
           incomes.self_employment.each do |self_employment|
             validations << (self_employment[:amount].present? && self_employment[:frequency_kind].present? && self_employment[:start_on].present?)
           end
-        end 
+        end
       when :has_unemployment_income
         if has_unemployment_income
           incomes.unemployment.each do |unemployment|
@@ -877,8 +877,8 @@ module FinancialAssistance
       when :has_income_adjustment
         deductions.each do |deduction|
           validations << (deduction[:amount].present? && deduction[:frequency_kind].present? && deduction[:start_on].present?)
-        end  
-      end      
+        end
+      end
       !validations.include?(false)
     end
 
