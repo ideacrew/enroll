@@ -1,5 +1,6 @@
 class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
   include ApplicationHelper
+  include Acapi::Notifiers
 
   def initialize(consumer_role, args = {})
     args[:recipient] = consumer_role.person.families.first.primary_applicant.person
@@ -118,14 +119,18 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
     hbx_enrollments.each do |enrollment|
       notice.enrollments << append_enrollment_information(enrollment)
     end
-
+    if hbx_enrollments.compact.blank?
+      message = "Error checking unverified individuals in Enrollment Notice Builder."
+      message += " There are no enrollments available for family with ID #{family.id}."
+      log(message, {:severity => "error"})
+      raise StandardError, message
+    end
     notice.coverage_year = hbx_enrollments.compact.first.effective_on.year
     notice.due_date = (family.min_verification_due_date.present? && (family.min_verification_due_date > date)) ? family.min_verification_due_date : min_notice_due_date(family)
     outstanding_people.uniq!
     notice.documents_needed = outstanding_people.present?
     append_unverified_individuals(outstanding_people)
   end
-
   def min_notice_due_date(family)
     due_dates = []
     family.contingent_enrolled_active_family_members.each do |family_member|
