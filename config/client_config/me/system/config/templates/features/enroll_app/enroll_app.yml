@@ -355,3 +355,9 @@ registry:
         settings:
           - key: :days
             item: 60
+      - key: :show_download_tax_documents
+        item: :show_download_tax_documents
+        is_enabled: false
+      - key: :show_upload_notices
+        item: :show_upload_notices
+        is_enabled: false
