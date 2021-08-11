@@ -38,4 +38,14 @@ RSpec.describe L10nHelper, :type => :helper do
       end
     end
   end
+
+  context "FAA database values" do
+    before do
+      EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(true)
+    end
+
+    it "should load wage types" do
+      expect(l10n('faa.income.wages_and_salaries')).to eq("Wages and Salaries")
+    end
+  end
 end

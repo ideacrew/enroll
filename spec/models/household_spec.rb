@@ -367,6 +367,17 @@ describe Household, "for creating a new taxhousehold using create eligibility", 
     it 'THH members should match with expected csr eligibility kind' do
       expect(household100.tax_households[0].tax_household_members[0].csr_eligibility_kind).to eq('csr_limited')
     end
+
+    before do
+      params.merge!({'csr' => 0})
+      household100.tax_households.first.tax_household_members.first.update_attributes!(is_ia_eligible: false)
+      household100.create_new_tax_household(params)
+    end
+
+    it 'should not update csr for ia ineligible tax household member' do
+      expect(household100.tax_households.last.eligibility_determinations.first.csr_percent_as_integer).to eq(0)
+      expect(household100.tax_households[0].tax_household_members[0].csr_percent_as_integer).to eq(-1)
+    end
   end
 
   context 'for apply_aggregate_to_enrollment' do

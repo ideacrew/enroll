@@ -84,11 +84,13 @@ module Operations
             county_zips.map(&:_id)
           end
 
+          location_ids = location_ids.flatten.uniq
+
           rating_area = ::BenefitMarkets::Locations::RatingArea.where({active_year: year, exchange_provided_code: rating_area_id }).first
 
           if rating_area.present?
             rating_area.county_zip_ids += location_ids
-            rating_area.county_zip_ids.flatten.uniq!
+            rating_area.county_zip_ids = rating_area.county_zip_ids.flatten.uniq
             rating_area.save!
           else
             ::BenefitMarkets::Locations::RatingArea.new(
@@ -96,7 +98,7 @@ module Operations
                 created_at: import_timestamp,
                 active_year: year,
                 exchange_provided_code: rating_area_id,
-                county_zip_ids: location_ids.flatten
+                county_zip_ids: location_ids
               }
             ).save!
           end
