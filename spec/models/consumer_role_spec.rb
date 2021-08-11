@@ -28,15 +28,15 @@ describe ConsumerRole, dbclean: :after_each do
   let(:is_applicant)          { true }
   let(:citizen_error_message) { 'test citizen_status is not a valid citizen status' }
   let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+  let(:valid_params) do
+    { is_applicant: is_applicant, person: saved_person }
+  end
 
   before :each do
     EnrollRegistry[:aca_individual_market].feature.stub(:is_enabled).and_return(true)
   end
 
   describe '.new' do
-    let(:valid_params) do
-      { is_applicant: is_applicant, person: saved_person }
-    end
 
     context 'with no person' do
       let(:params) {valid_params.except(:person)}
