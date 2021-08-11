@@ -1435,10 +1435,10 @@ describe MeDefinePermissions, dbclean: :around_each do
         expect(permission.name).to eq 'hbx_read_only'
         expect(permission.can_edit_aptc).to eq false
         expect(permission.can_view_sep_history).to eq true
-        expect(permission.can_reinstate_enrollment).to eq true
-        expect(permission.can_cancel_enrollment).to eq true
-        expect(permission.can_terminate_enrollment).to eq true
-        expect(permission.change_enrollment_end_date).to eq true
+        expect(permission.can_reinstate_enrollment).to eq false
+        expect(permission.can_cancel_enrollment).to eq false
+        expect(permission.can_terminate_enrollment).to eq false
+        expect(permission.change_enrollment_end_date).to eq false
       end
 
       it "user with 'hbx_csr_supervisor' as permission" do
@@ -1446,10 +1446,12 @@ describe MeDefinePermissions, dbclean: :around_each do
         expect(permission.name).to eq 'hbx_csr_supervisor'
         expect(permission.can_edit_aptc).to eq false
         expect(permission.can_view_sep_history).to eq true
-        expect(permission.can_reinstate_enrollment).to eq true
-        expect(permission.can_cancel_enrollment).to eq true
-        expect(permission.can_terminate_enrollment).to eq true
-        expect(permission.change_enrollment_end_date).to eq true
+        if EnrollRegistry[:enroll_app].setting(:state_abbreviation).item == 'ME'
+          expect(permission.can_reinstate_enrollment).to eq true
+          expect(permission.can_cancel_enrollment).to eq true
+          expect(permission.can_terminate_enrollment).to eq true
+          expect(permission.change_enrollment_end_date).to eq true
+        end
       end
 
       it "user with 'hbx_csr_tier2' as permission" do
@@ -1457,10 +1459,12 @@ describe MeDefinePermissions, dbclean: :around_each do
         expect(permission.name).to eq 'hbx_csr_tier2'
         expect(permission.can_edit_aptc).to eq false
         expect(permission.can_view_sep_history).to eq true
-        expect(permission.can_reinstate_enrollment).to eq true
-        expect(permission.can_cancel_enrollment).to eq true
-        expect(permission.can_terminate_enrollment).to eq true
-        expect(permission.change_enrollment_end_date).to eq true
+        if EnrollRegistry[:enroll_app].setting(:state_abbreviation).item == 'ME'
+          expect(permission.can_reinstate_enrollment).to eq true
+          expect(permission.can_cancel_enrollment).to eq true
+          expect(permission.can_terminate_enrollment).to eq true
+          expect(permission.change_enrollment_end_date).to eq true
+        end
       end
 
       it "user with 'hbx_csr_tier1' as permission" do

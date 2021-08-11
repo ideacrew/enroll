@@ -89,8 +89,7 @@ class MeDefinePermissions < MigrationTask
       .find_or_initialize_by(name: 'hbx_read_only')
       .update_attributes!(modify_family: true, modify_employer: false, revert_application: false, list_enrollments: true,
                           send_broker_agency_message: false, approve_broker: false, approve_ga: false, modify_admin_tabs: false, view_admin_tabs: true,
-                          view_the_configuration_tab: true, can_submit_time_travel_request: false, can_edit_aptc: true, can_view_sep_history: true,
-                          can_reinstate_enrollment: true, can_cancel_enrollment: true, can_terminate_enrollment: true, change_enrollment_end_date: true)
+                          view_the_configuration_tab: true, can_submit_time_travel_request: false, can_edit_aptc: true, can_view_sep_history: true)
   end
 
   def assign_current_permissions
