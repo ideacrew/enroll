@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 # TODO: We may need to refactor these at a per client level but not sure.
@@ -18,7 +20,7 @@ describe FamilyPolicy, "given a user who is the primary member" do
   let(:family) { instance_double(Family, :primary_applicant => primary_member) }
   let(:person) { instance_double(Person, :id => primary_person_id) }
   let(:user) { instance_double(User, :person => person) }
-  let(:primary_member) { instance_double(FamilyMember, :person_id => primary_person_id) } 
+  let(:primary_member) { instance_double(FamilyMember, :person_id => primary_person_id) }
 
   subject { FamilyPolicy.new(user, family) }
 
@@ -31,7 +33,7 @@ describe FamilyPolicy, "given a family with an active broker agency account", :d
   let(:broker_person_id) { double }
   let(:broker_agency_profile_id) { double }
   let(:person) { FactoryBot.create(:person, :with_family)}
-  let(:family) { (person.primary_family) }
+  let(:family) { person.primary_family }
   let(:site)  { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
   let(:broker_agency_profile) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile, market_kind: 'shop', legal_name: 'Legal Name1', assigned_site: site) }
   let(:broker_person) { instance_double(Person, :id => broker_person_id, :active_broker_staff_roles => [broker_agency_staff_role], :active_general_agency_staff_roles => [], :hbx_staff_role => nil) }
@@ -74,7 +76,7 @@ describe FamilyPolicy, "given a family where the primary has an active employer 
   let(:employer_profile)    { organization.employer_profile }
   let(:employee_role) {FactoryBot.create(:employee_role, employer_profile: employer_profile)}
   let(:person) { FactoryBot.create(:person, :with_family)}
-  let(:family) { (person.primary_family) }
+  let(:family) { person.primary_family }
   let(:broker_agency_profile) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile, market_kind: 'shop', legal_name: 'Legal Name1', assigned_site: site) }
   let(:broker_person) { instance_double(Person, :id => broker_person_id, :active_broker_staff_roles => [broker_agency_staff_role], :active_general_agency_staff_roles => [], :hbx_staff_role => nil) }
   let(:broker_agency_staff_role) { instance_double(BrokerAgencyStaffRole, :benefit_sponsors_broker_agency_profile_id => broker_agency_profile_id) }
@@ -218,6 +220,59 @@ describe 'can_broker_modify_family' do
     it 'can modify family' do
       allow(family).to receive(:active_broker_agency_account).and_return broker_agency_account
       expect(subject.can_broker_modify_family?(nil, person.active_broker_staff_roles)).to be_truthy
+    end
+  end
+end
+
+describe 'user permission' do
+  let(:primary_person_id) { double }
+  let(:family) { instance_double(Family, :primary_applicant => primary_member, :active_broker_agency_account => nil) }
+  let(:person) { instance_double(Person, :id => primary_person_id) }
+  let(:user) { instance_double(User, :person => permissioned_person) }
+  let(:permissioned_person) { instance_double(Person, :id => double, :hbx_staff_role => hbx_staff_role) }
+  let(:primary_member) { instance_double(FamilyMember, :person_id => primary_person_id, :person => person) }
+  let(:hbx_staff_role) { instance_double(HbxStaffRole, :permission => permission) }
+  subject { FamilyPolicy.new(user, family) }
+
+  context 'can_edit_aptc?' do
+    let(:permission) { instance_double(Permission, :can_edit_aptc => true) }
+    it 'should return true' do
+      expect(subject.can_edit_aptc?).to be_truthy
+    end
+  end
+
+  context 'can_view_sep_history?' do
+    let(:permission) { instance_double(Permission, :can_view_sep_history => true) }
+    it 'should return true' do
+      expect(subject.can_view_sep_history?).to be_truthy
+    end
+  end
+
+  context 'can_reinstate_enrollment?' do
+    let(:permission) { instance_double(Permission, :can_reinstate_enrollment => true) }
+    it 'should return true' do
+      expect(subject.can_reinstate_enrollment?).to be_truthy
+    end
+  end
+
+  context 'can_cancel_enrollment?' do
+    let(:permission) { instance_double(Permission, :can_cancel_enrollment => true) }
+    it 'should return true' do
+      expect(subject.can_cancel_enrollment?).to be_truthy
+    end
+  end
+
+  context 'can_terminate_enrollment?' do
+    let(:permission) { instance_double(Permission, :can_terminate_enrollment => true) }
+    it 'should return true' do
+      expect(subject.can_terminate_enrollment?).to be_truthy
+    end
+  end
+
+  context 'change_enrollment_end_date?' do
+    let(:permission) { instance_double(Permission, :change_enrollment_end_date => true) }
+    it 'should return true' do
+      expect(subject.change_enrollment_end_date?).to be_truthy
     end
   end
 end
