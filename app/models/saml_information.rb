@@ -54,7 +54,19 @@ class SamlInformation
     'aetna_pay_now_relay_state',
     'unitedhealthcare_pay_now_url',
     'unitedhealthcare_pay_now_audience',
-    'unitedhealthcare_pay_now_relay_state'
+    'unitedhealthcare_pay_now_relay_state',
+    'northeast_delta_dental_pay_now_url',
+    'northeast_delta_dental_pay_now_audience',
+    'northeast_delta_dental_pay_now_relay_state',
+    'anthem_blue_cross_and_blue_shield_pay_now_url',
+    'anthem_blue_cross_and_blue_shield_pay_now_audience',
+    'anthem_blue_cross_and_blue_shield_pay_now_relay_state',
+    'harvard_pilgrim_health_care_pay_now_url',
+    'harvard_pilgrim_health_care_pay_now_audience',
+    'harvard_pilgrim_health_care_pay_now_relay_state',
+    'community_health_options_pay_now_url',
+    'community_health_options_pay_now_audience',
+    'community_health_options_pay_now_relay_state'
   ]
 
   attr_reader :config
