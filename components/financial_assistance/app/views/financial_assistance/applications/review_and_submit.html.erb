@@ -30,7 +30,6 @@
                   <% income_and_deductions_for(applicant).each do |embedded_document| %>
                     <tr>
                       <td> <%= applicant.full_name %> </td>
-                      <% binding.pry %>
                       <td> <%= l10n("faa.income.#{embedded_document.kind}") %> </td>
                       <td> <%= embedded_document.frequency_kind.humanize %> </td>
                       <td>
