@@ -68,7 +68,6 @@ RSpec.describe ::Operations::FinancialAssistance::CreateOrUpdateApplicant, type:
 
     context 'for creation of objects' do
       before do
-        
         create_data_for_call_backs
       end
 
