@@ -366,11 +366,8 @@ registry:
         settings:
           - key: :days
             item: 60
-<<<<<<< HEAD
       - key: :checkbook_integration
         is_enabled: true
-
-=======
       - key: :immigration_status_checkbox
         is_enabled: false
       - key: :gender_to_sex
@@ -381,4 +378,3 @@ registry:
         is_enabled: true
       - key: :verification_type_income_verification
         is_enabled: false
->>>>>>> origin/release_5.10.0
