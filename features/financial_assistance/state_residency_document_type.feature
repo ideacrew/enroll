@@ -16,5 +16,4 @@ Feature: State Residency Document Type
      And consumer visits home page
      When the consumer visits the Documents page
      Then they should not see the state residency tile  
-
    
