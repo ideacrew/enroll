@@ -307,7 +307,7 @@ registry:
       - :pay_now_feature
     features:
       - key: :kaiser_pay_now
-        is_enabled: true
+        is_enabled: false
         settings:
           - key: :plan_shopping
             item: true
