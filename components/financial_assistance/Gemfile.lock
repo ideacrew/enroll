@@ -1,15 +1,16 @@
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 23a6f43b50561023fcda9b676710ed6fceb00ee3
-  branch: release_0.3.0
+  revision: 951fd32c259b9524c9597ef0a4c7b01f35c1e9ba
+  branch: atp_cv_transform_v3
   specs:
-    aca_entities (0.3.0)
+    aca_entities (0.4.0)
       deep_merge
       dry-monads (~> 1.2)
       dry-struct (~> 1.0)
       dry-transformer (~> 0.1.1)
       dry-types (~> 1.0)
       dry-validation (~> 1.2)
+      iso_country_codes
       nokogiri-happymapper
       oj (~> 3.11)
 
@@ -286,6 +287,7 @@ GEM
     i18n (1.8.5)
       concurrent-ruby (~> 1.0)
     ice_nine (0.11.2)
+    iso_country_codes (0.7.8)
     little-plugger (1.1.4)
     logging (2.3.0)
       little-plugger (~> 1.1)
@@ -305,7 +307,7 @@ GEM
       nokogiri (~> 1)
       rake
     mini_mime (1.0.2)
-    mini_portile2 (2.5.3)
+    mini_portile2 (2.6.1)
     minitest (5.14.1)
     monetize (1.9.4)
       money (~> 6.12)
@@ -344,12 +346,12 @@ GEM
     mustermann (1.1.1)
       ruby2_keywords (~> 0.0.1)
     nio4r (2.5.2)
-    nokogiri (1.11.7)
-      mini_portile2 (~> 2.5.0)
+    nokogiri (1.12.3)
+      mini_portile2 (~> 2.6.1)
       racc (~> 1.4)
     nokogiri-happymapper (0.8.1)
       nokogiri (~> 1.5)
-    oj (3.12.1)
+    oj (3.13.1)
     orm_adapter (0.5.0)
     ox (2.14.5)
     parallel (1.19.2)
