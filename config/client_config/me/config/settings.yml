@@ -2,7 +2,7 @@ site:
   key: :me
   subdomain: "cme"
   domain_name: "cme.enroll.openhbx.org"
-  site_title: "Maine Cover ME"
+  site_title: "CoverME.gov"
   home_url: "https://cme.enroll.openhbx.org/"
   home_business_url: "https://www.accesshealthct.com/AHCT/LandingPageCTHIX"
   # copyright_period_start: "2013"
@@ -19,9 +19,9 @@ site:
   main_web_address: "https://www.accesshealthct.com/AHCT/LandingPageCTHIX"
   health_care_website: "www.healthcare.gov"
   health_care_website_url: "https://www.healthcare.gov"
-  short_name: "Maine Cover ME"
+  short_name: "CoverME.gov"
   byline: "Maine's Official Health Insurance Marketplace"
-  long_name: "Maine Cover ME"
+  long_name: "CoverME.gov"
   header_message: "Maine's Official Health Insurance Marketplace"
   logo_file_name: "logo_me.svg"
   make_their_premium_payments_online: "https://www.e-billexpress.com/ebpp/DCHEALTHPAY/"
@@ -65,14 +65,14 @@ site:
   statewide_area: "DC Metro"
   elligibile_immigration_statuses_url: ""
 
-  exchange_name: "Maine Cover ME"
+  exchange_name: "CoverME.gov"
   social_media:
     facebook_url: ""
 
 contact_center:
   state_and_city: "Augusta, ME"
-  name: "Maine Cover ME's Customer Care Center"
-  alt_name: "Maine Cover ME Customer Service"
+  name: "CoverME.gov's Customer Care Center"
+  alt_name: "CoverME.gov Customer Service"
   po_box: "PO Box 97022"
   phone_number: "1-800-965-7476"
   fax: "1-617-933-3099"
@@ -103,7 +103,7 @@ contact_center:
   board_of_elections_phone_number: "(207) 624-7650"
 
   mailing_address:
-    name: "Maine Cover ME"
+    name: "CoverME.gov"
     address_1: "PO Box 97022"
     address_2:
     city: "Washington"
@@ -111,7 +111,7 @@ contact_center:
     zip_code: "20090"
 
   appeal_center:
-    name: "Maine Cover ME"
+    name: "CoverME.gov"
     address_1: "PO Box 97022"
     address_2:
     city: "Washington"
@@ -154,7 +154,7 @@ aca:
   state_abbreviation: "ME"
   market_kinds: ["individual"]
 
-  hbx_abbreviation: "Maine Cover ME"
+  hbx_abbreviation: "CoverME.gov"
   nationwide_markets: true
   general_agency_enabled: false # Soon to be deprrecated
   broker_carrier_appointments_enabled: true

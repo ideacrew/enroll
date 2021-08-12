@@ -1,11 +1,12 @@
 class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
   include ApplicationHelper
+  include Acapi::Notifiers
 
   def initialize(consumer_role, args = {})
     args[:recipient] = consumer_role.person.families.first.primary_applicant.person
     args[:notice] = PdfTemplates::ConditionalEligibilityNotice.new
     args[:market_kind] = 'individual'
-    args[:recipient_document_store]= consumer_role.person.families.first.primary_applicant.person
+    args[:recipient_document_store] = consumer_role.person.families.first.primary_applicant.person
     args[:to] = consumer_role.person.families.first.primary_applicant.person.work_email_or_best
     self.header = "notices/shared/header_ivl.html.erb"
     super(args)
@@ -29,18 +30,14 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
     attach_taglines
     upload_and_send_secure_message
 
-    if recipient.consumer_role.can_receive_electronic_communication?
-      send_generic_notice_alert
-    end
+    send_generic_notice_alert if recipient.consumer_role.can_receive_electronic_communication?
 
-    if recipient.consumer_role.can_receive_paper_communication?
-      store_paper_notice
-    end
+    store_paper_notice if recipient.consumer_role.can_receive_paper_communication?
     clear_tmp(notice_path)
   end
 
   def attach_docs
-    attach_required_documents if (notice.documents_needed && !notice.cover_all?)
+    attach_required_documents if notice.documents_needed && !notice.cover_all?
   end
 
   def build
@@ -58,8 +55,6 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
     end
   end
 
-
-
   def append_open_enrollment_data
     hbx = HbxProfile.current_hbx
     bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if (bcp.start_on..bcp.end_on).cover?(TimeKeeper.date_of_record.next_year) }
@@ -70,12 +65,12 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
   def append_member_information(people)
     people.each do |member|
       notice.individuals << PdfTemplates::Individual.new({
-        :first_name => member.first_name.titleize,
-        :last_name => member.last_name.titleize,
-        :full_name => member.full_name.titleize,
-        :age => calculate_age_by_dob(member.dob),
-        :residency_verified => member.consumer_role.residency_verified?
-        })
+                                                           :first_name => member.first_name.titleize,
+                                                           :last_name => member.last_name.titleize,
+                                                           :full_name => member.full_name.titleize,
+                                                           :age => calculate_age_by_dob(member.dob),
+                                                           :residency_verified => member.consumer_role.residency_verified?
+                                                         })
     end
   end
 
@@ -118,14 +113,18 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
     hbx_enrollments.each do |enrollment|
       notice.enrollments << append_enrollment_information(enrollment)
     end
-
+    if hbx_enrollments.compact.blank?
+      message = "Error checking unverified individuals in Enrollment Notice Builder."
+      message += " There are no enrollments available for family with ID #{family.id}."
+      log(message, {:severity => "error"})
+      raise StandardError, message
+    end
     notice.coverage_year = hbx_enrollments.compact.first.effective_on.year
     notice.due_date = (family.min_verification_due_date.present? && (family.min_verification_due_date > date)) ? family.min_verification_due_date : min_notice_due_date(family)
     outstanding_people.uniq!
     notice.documents_needed = outstanding_people.present?
     append_unverified_individuals(outstanding_people)
   end
-
   def min_notice_due_date(family)
     due_dates = []
     family.contingent_enrolled_active_family_members.each do |family_member|
@@ -135,17 +134,13 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
     end
     due_dates.compact!
     earliest_future_due_date = due_dates.select{ |d| d > TimeKeeper.date_of_record }.min
-    if due_dates.present? && earliest_future_due_date.present?
-      earliest_future_due_date.to_date
-    else
-      nil
-    end
+    earliest_future_due_date.to_date if due_dates.present? && earliest_future_due_date.present?
   end
 
   def update_individual_due_date(person, date)
     person.consumer_role.types_include_to_notices.each do |verification_type|
       unless verification_type.due_date && verification_type.due_date_type
-        verification_type.update_attributes(due_date:(date + Settings.aca.individual_market.verification_due.days), due_date_type: "notice")
+        verification_type.update_attributes(due_date: (date + Settings.aca.individual_market.verification_due.days), due_date_type: "notice")
         person.consumer_role.save!
       end
     end
@@ -199,24 +194,24 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
                                     deductible: enrollment.product.deductible
                                   })
     PdfTemplates::Enrollment.new({
-      created_at: enrollment.created_at,
-      premium: enrollment.total_premium.round(2),
-      aptc_amount: enrollment.applied_aptc_amount.round(2),
-      responsible_amount: (enrollment.total_premium - enrollment.applied_aptc_amount.to_f).round(2),
-      phone: phone_number(enrollment.product.issuer_profile.legal_name),
-      is_receiving_assistance: enrollment.applied_aptc_amount > 0 || enrollment.product.is_csr? ? true : false,
-      coverage_kind: enrollment.coverage_kind,
-      kind: enrollment.kind,
-      effective_on: enrollment.effective_on,
-      plan: plan,
-      enrollees: enrollment.hbx_enrollment_members.inject([]) do |enrollees, member|
-        enrollee = PdfTemplates::Individual.new({
-          full_name: member.person.full_name.titleize,
-          age: member.person.age_on(TimeKeeper.date_of_record)
-        })
-        enrollees << enrollee
-      end
-    })
+                                   created_at: enrollment.created_at,
+                                   premium: enrollment.total_premium.round(2),
+                                   aptc_amount: enrollment.applied_aptc_amount.round(2),
+                                   responsible_amount: (enrollment.total_premium - enrollment.applied_aptc_amount.to_f).round(2),
+                                   phone: phone_number(enrollment.product.issuer_profile.legal_name),
+                                   is_receiving_assistance: enrollment.applied_aptc_amount > 0 || enrollment.product.is_csr? ? true : false,
+                                   coverage_kind: enrollment.coverage_kind,
+                                   kind: enrollment.kind,
+                                   effective_on: enrollment.effective_on,
+                                   plan: plan,
+                                   enrollees: enrollment.hbx_enrollment_members.inject([]) do |enrollees, member|
+                                                enrollee = PdfTemplates::Individual.new({
+                                                                                          full_name: member.person.full_name.titleize,
+                                                                                          age: member.person.age_on(TimeKeeper.date_of_record)
+                                                                                        })
+                                                enrollees << enrollee
+                                              end
+                                 })
   end
 
 end

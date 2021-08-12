@@ -20,12 +20,20 @@ namespace :xml do
 
   def process_plans(cross_walks)
     cross_walks.each do |row|
-      old_hios_id = row["plan_id_#{@previous_year}_hios".to_sym].squish
-      new_hios_id = row["plan_id_#{@current_year}_hios".to_sym].squish
-      is_this_plan_catastrophic_or_child_only_plan = row[:is_this_plan_catastrophic_or_child_only_plan].squish.downcase
-      cat_hios_id = row["plan_id_#{@current_year}_for_enrollees_aging_off_catastrophic_or_child_only_plan".to_sym].squish
-      new_plans =  Plan.where(hios_id: /#{new_hios_id}/, active_year: @current_year)
+      old_hios_id = if row["plan_id_#{@previous_year}_hios".to_sym].present?
+        row["plan_id_#{@previous_year}_hios".to_sym]
+      else
+        row["plan_id_cy".to_sym]
+      end.squish
+      new_hios_id = if row["plan_id_#{@current_year}_hios".to_sym].present?
+        row["plan_id_#{@current_year}_hios".to_sym]
+      else
+        row["plan_id_fy".to_sym]
+      end.squish
 
+      is_this_plan_catastrophic_or_child_only_plan = row[:is_this_plan_catastrophic_or_child_only_plan]&.squish&.downcase
+      cat_hios_id = row["plan_id_#{@current_year}_for_enrollees_aging_off_catastrophic_or_child_only_plan".to_sym]&.squish
+      new_plans =  Plan.where(hios_id: /#{new_hios_id}/, active_year: @current_year)
       # to handle cases when business provides us with a renewal mapping
       # and then updates the template to say that the old plan got retired with no new mapping.
       if new_hios_id.blank?
@@ -55,7 +63,7 @@ namespace :xml do
     end
     # for scenarios where plan cross walk templates were not provided because
     # there were no plans retired or no new plans present for the renewing year.
-    plan_mapping_hash = { "2017" => "2018", "2018" => "2019", "2019" => "2020" }
+    plan_mapping_hash = { "2017" => "2018", "2018" => "2019", "2019" => "2020", "2020" => "2021", "2021" => "2022"}
     plan_mapping_hash.each do |previous_year, current_year|
       old_plans = Plan.where(active_year: previous_year, renewal_plan_id: nil)
       old_plans.each do |old_plan|
@@ -71,10 +79,18 @@ namespace :xml do
 
   def process_products(cross_walks)
     cross_walks.each do |row|
-      old_hios_id = row["plan_id_#{@previous_year}_hios".to_sym].squish
-      new_hios_id = row["plan_id_#{@current_year}_hios".to_sym].squish
-      is_this_plan_catastrophic_or_child_only_plan = row[:is_this_plan_catastrophic_or_child_only_plan].squish.downcase
-      cat_hios_id = row["plan_id_#{@current_year}_for_enrollees_aging_off_catastrophic_or_child_only_plan".to_sym].squish
+      old_hios_id = if row["plan_id_#{@previous_year}_hios".to_sym].present?
+        row["plan_id_#{@previous_year}_hios".to_sym]
+      else
+        row["plan_id_cy".to_sym]
+      end.squish
+      new_hios_id = if row["plan_id_#{@current_year}_hios".to_sym].present?
+        row["plan_id_#{@current_year}_hios".to_sym]
+      else
+        row["plan_id_fy".to_sym]
+      end.squish
+      is_this_plan_catastrophic_or_child_only_plan = row[:is_this_plan_catastrophic_or_child_only_plan]&.squish&.downcase
+      cat_hios_id = row["plan_id_#{@current_year}_for_enrollees_aging_off_catastrophic_or_child_only_plan".to_sym]&.squish
       new_products =  ::BenefitMarkets::Products::Product.where(
         hios_id: /#{new_hios_id}/
       ).by_year(@current_year)
@@ -116,7 +132,7 @@ namespace :xml do
     end
     # for scenarios where plan cross walk templates were not provided because
     # there were no plans retired or no new plans present for the renewing year.
-    product_mapping_hash = { "2017" => "2018", "2018" => "2019", "2019" => "2020" }
+    product_mapping_hash = { "2017" => "2018", "2018" => "2019", "2019" => "2020", "2020" => "2021", "2021" => "2022"}
     product_mapping_hash.each do |previous_year, current_year|
       old_products = ::BenefitMarkets::Products::Product.where(
         renewal_product_id: nil

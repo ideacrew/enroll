@@ -42,14 +42,12 @@ module Operations
         result = {}
 
         lcsp_info.each_pair do |person_hbx_ids, premiums|
-          premium_hash = {}
-
-          premium_hash[:health_only_lcsp_premiums] = premiums[:health_only].values.compact if premiums[:health_only].present?
-          premium_hash[:health_and_dental_lcsp_premiums] = premiums[:health_and_dental].values.compact if premiums[:health_and_dental].present?
-          premium_hash[:health_and_ped_dental_lcsp_premiums] = premiums[:health_and_ped_dental].values.compact if premiums[:health_and_ped_dental].present?
-
-
           person_hbx_ids.each do |hbx_id|
+            premium_hash = {}
+            premium_hash[:health_only_lcsp_premiums] = premiums[:health_only].values.compact.find {|v| v[:member_identifier].to_s == hbx_id} if premiums[:health_only].present?
+            premium_hash[:health_and_dental_lcsp_premiums] = premiums[:health_and_dental].values.compact.find {|v| v[:member_identifier].to_s == hbx_id} if premiums[:health_and_dental].present?
+            premium_hash[:health_and_ped_dental_lcsp_premiums] = premiums[:health_and_ped_dental].values.compact.find {|v| v[:member_identifier].to_s == hbx_id} if premiums[:health_and_ped_dental].present?
+
             result[hbx_id] = premium_hash
           end
         end

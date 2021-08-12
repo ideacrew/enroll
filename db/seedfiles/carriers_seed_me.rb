@@ -13,9 +13,6 @@ cp = org.create_carrier_profile(id: "53e67210eb899a4603000045", abbrev: "CHO", h
 org = Organization.new(fein: "042452600", legal_name: "Harvard Pilgrim Health Care", office_locations: [hbx_office])
 cp = org.create_carrier_profile(id: "53e67210eb899a4603000029", abbrev: "HPHC", hbx_carrier_id: 30_002, ivl_health: true, ivl_dental: true, shop_health: false, shop_dental: false, issuer_hios_ids: ['96667'])
 
-org = Organization.new(fein: "470397286", legal_name: "Renaissance Dental", office_locations: [hbx_office])
-cp = org.create_carrier_profile(id: "53e67210eb899a4603000061", abbrev: "RNSD", hbx_carrier_id: 30_003, ivl_health: true, ivl_dental: true, shop_health: false, shop_dental: false, issuer_hios_ids: ['76302'])
-
 org = Organization.new(fein: "311705652", legal_name: "Anthem Blue Cross and Blue Shield", office_locations: [hbx_office])
 cp = org.create_carrier_profile(id: "53e67210eb899a4603000037", abbrev: "ANTHM", hbx_carrier_id: 30_004, ivl_health: true, ivl_dental: true, shop_health: false, shop_dental: false, issuer_hios_ids: ['48396'])
 

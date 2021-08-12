@@ -14,7 +14,6 @@
             <div class="er-medicaid-prsn">
               <p>
                 <%= l10n("faa.eligible_for_medicaid") %>
-                <%= render partial:'shared/glossary', locals: {key: 'medicaid', title: FinancialAssistanceRegistry[:medicaid_chip_driver_questions].setting(:medicaid_chip).item, term:  FinancialAssistanceRegistry[:medicaid_chip_driver_questions].setting(:medicaid_chip).item } %>
                 <% if EnrollRegistry[:enroll_app].setting(:site_key).item == :me %>
                   <%= l10n("faa.eligible_for_medicaid2") %>:
                 <% else %>
@@ -30,11 +29,24 @@
               <%end%>
             </div>
             <div class="border-bottom-1px"></div>
+            <div class="er-success bg-success">
+              <div><i class="fa fa-info-circle fa-lg text-success" aria-hidden="true"></i></div>
+              <div class="text-success">
+                <% if eligible_applicants(params[:id], :is_medicaid_chip_eligible).present? %>
+                  <span>
+                    <%= l10n("faa.next_step_medicaid_eligible") %>
+                  </span>
+                <% else %>
+                  <span><%= l10n("faa.next_step_medicaid_eligible_at_least_one_other_eligible") %></span>
+                <% end %>
+              </div>
+            </div>
+            <div class="border-bottom-1px"></div>
             <div class="er-warning bg-warning">
               <div><i class="fa fa-exclamation-triangle fa-lg text-warning" aria-hidden="true"></i></div>
               <div class="text-warning ">
                 <%= l10n("faa.dhs_decision") %>
-                <%= l10n("faa.dhs_contact") %><%= "#{EnrollRegistry[:enroll_app].setting(:medicaid_agency_phone).item}." %>
+                <%= l10n("faa.dhs_contact") %><%= " #{EnrollRegistry[:enroll_app].setting(:medicaid_agency_phone).item}." %>
               </div>
             </div>
           </div>
@@ -47,7 +59,8 @@
             </div>
             <div class="border-bottom-2px"></div>
             <div class="er-medicaid-prsn">
-              <p><%= l10n("faa.premium_reductions_1") %> <%= number_to_currency(total_aptc_across_eligibility_determinations(params[:id])) %> <%= l10n("faa.premium_reductions_2") %></p>
+              <%= total_aptc_amount =  number_to_currency(total_aptc_across_eligibility_determinations(params[:id])) %>
+              <p><%= l10n("faa.premium_reductions_1", reduction_amount: total_aptc_amount.present? ? total_aptc_amount.to_s : "0") %></p>
 
               <%eligible_applicants(params[:id], :is_ia_eligible).each do |applicant_name| %>
                 <div class="er-prsn mt-15">
@@ -62,10 +75,9 @@
               <% csr_73_87_or_94_applicants = csr_73_87_or_94_eligible_applicants?(params[:id]) %>
               <% if csr_73_87_or_94_applicants.present? %>
                 <p class="mt-10 mb-0">
-                  <%= l10n("faa.qualify_for_lower_costs_1") %>
-                  <%= l10n("faa.silver_plan_checkmark") %>
+                  They also <strong>qualify for lower <%= render partial:"shared/glossary", locals: {key: "Out_of_Pocket_Costs", title: "Out-of-Pocket Costs", term: "out-of-pocket costs" } %></strong> including lower <%= render partial:"shared/glossary", locals: {key: "deductible", title: "annual deductibles", term: "annual deductibles" } %> and lower <%= render partial:"shared/glossary", locals: {key: "copayment", title: "Copayments", term: "copayments" } %>. This <strong>benefit is only available for a silver plan.</strong> To select a <%= render partial:"shared/glossary", locals: {key: "Silver_Health_Plan", title: "Silver Health Plan", term: "Silver Health Plan" } %>, look for a checkmark
                   <i class="fa fa-check-square-o col-green" aria-hidden="true"></i>
-                  <%= l10n("faa.qualify_for_lower_costs_2") %>
+                  next to the plan name.
                 </p>
 
                 <% csr_73_87_or_94_applicants.each do |applicant_name| %>
@@ -177,21 +189,6 @@
                 <% end %>
               <% end %>
             </div>
-
-            <div class="border-bottom-1px"></div>
-            <div class="er-success bg-success">
-              <div><i class="fa fa-info-circle fa-lg text-success" aria-hidden="true"></i></div>
-              <div class="text-success">
-                <% if EnrollRegistry[:apply_aggregate_to_enrollment].feature.is_enabled %>
-                  <span>
-                    <%= l10n("faa.next_step_with_aggregate_1") %>
-                    <%= l10n("faa.next_step_with_aggregate_2") %>
-                  </span>
-                <% else %>
-                  <span><%= l10n("faa.next_step_without_aggregate") %></span>
-                <% end %>
-              </div>
-            </div>
           </div>
         <%end%>
 
@@ -223,9 +220,9 @@
           </div>
         <%end%>
 
-        <% if FinancialAssistanceRegistry.feature_enabled?(:fa_send_to_external_verification) &&
-              @application.applicants.pluck(:is_medicaid_chip_eligible).none? &&
-              @application.applicants.pluck(:is_non_magi_medicaid_eligible).none? %>
+          <% if FinancialAssistanceRegistry.feature_enabled?(:fa_send_to_external_verification) &&
+             @application.applicants.pluck(:is_medicaid_chip_eligible).none? &&
+             @application.applicants.pluck(:is_non_magi_medicaid_eligible).none? %>
           <div class="er-medicaid mt-20">
               <div class="er-title">
                 <h3>
@@ -252,6 +249,21 @@
               </div>
           </div>
         <% end %>
+
+        <div class="border-bottom-1px"></div>
+          <div class="er-success bg-success">
+            <div><i class="fa fa-info-circle fa-lg text-success" aria-hidden="true"></i></div>
+            <div class="text-success">
+              <% if EnrollRegistry[:apply_aggregate_to_enrollment].feature.is_enabled %>
+                <span>
+                  <%= l10n("faa.next_step_with_aggregate_1") %>
+                  <%= l10n("faa.next_step_with_aggregate_2") %>
+                </span>
+              <% else %>
+                <span><%= l10n("faa.next_step_without_aggregate") %></span>
+              <% end %>
+            </div>
+        </div>
 
         <div class="er-summary mt-20">
           <p class="mt-10"><%= l10n("faa.do_not_agree") %></p>

@@ -1,5 +1,6 @@
 class SamlController < ApplicationController
   skip_before_action :verify_authenticity_token
+  before_action :redirect_if_medicaid_tax_credits_link_is_disabled, only: [:navigate_to_assistance]
   include Acapi::Notifiers
   # def init
   #   request = OneLogin::RubySaml::Authrequest.new
@@ -109,6 +110,10 @@ class SamlController < ApplicationController
   end
 
   private
+
+  def redirect_if_medicaid_tax_credits_link_is_disabled
+    redirect_to(main_app.root_path, notice: l10n("medicaid_and_tax_credits_link_is_disabled")) unless EnrollRegistry.feature_enabled?(:medicaid_tax_credits_link)
+  end
 
   def saml_settings
     settings = OneLogin::RubySaml::Settings.new
