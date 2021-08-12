@@ -37,17 +37,17 @@ RSpec.describe ::Operations::Products::FetchSlcsp, dbclean: :after_each do
             person.hbx_id => [
               {
                 :monthly_premium => 200.0,
-                :member_identifier => BSON::ObjectId.new,
+                :member_identifier => person.hbx_id,
                 :product_id => BSON::ObjectId.new
               },
               {
                 :monthly_premium => 300.0,
-                :member_identifier => BSON::ObjectId.new,
+                :member_identifier => person.hbx_id,
                 :product_id => BSON::ObjectId.new
               },
               {
                 :monthly_premium => 400.0,
-                :member_identifier => BSON::ObjectId.new,
+                :member_identifier => person.hbx_id,
                 :product_id => BSON::ObjectId.new
               }
             ]
@@ -68,7 +68,7 @@ RSpec.describe ::Operations::Products::FetchSlcsp, dbclean: :after_each do
     end
 
     it 'should return details of second lowest plan' do
-      values = subject.call(params).value![person.hbx_id][:health_only_slcsp_premiums][0]
+      values = subject.call(params).value![person.hbx_id][:health_only_slcsp_premiums]
       expect(values[:monthly_premium]).to eq 300.0
       expect(values[:member_identifier]).not_to eq nil
       expect(values[:product_id]).not_to eq nil

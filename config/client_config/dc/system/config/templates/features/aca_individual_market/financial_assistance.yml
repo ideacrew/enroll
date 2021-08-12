@@ -55,6 +55,9 @@ registry:
       - key: :unemployment_income
         item: :unemployment_income
         is_enabled: true
+      - key: :medicaid_tax_credits_link
+        item: :medicaid_tax_credits_link
+        is_enabled: true
       - key: :american_indian_alaskan_native_income
         item: :american_indian_alaskan_native_income
         is_enabled: false
@@ -173,6 +176,8 @@ registry:
     - key: :native_american_csr
       is_enabled: false
     - key: :filing_as_head_of_household
+      is_enabled: false
+    - key: :no_coverage_tribe_details
       is_enabled: false
     - key: :display_medicaid_question
       item: :display_medicaid_question

@@ -2,6 +2,7 @@ require 'rails_helper'
 
 RSpec.describe SamlController do
 
+
   describe "POST login", db_clean: :after_each do
     let(:user) { FactoryBot.create(:user, last_portal_visited: family_account_path)}
 
@@ -172,6 +173,9 @@ RSpec.describe SamlController do
   end
 
   describe "GET navigate_to_assistance", db_clean: :after_each do
+    before :each do
+      EnrollRegistry[:medicaid_tax_credits_link].feature.stub(:is_enabled).and_return(true)
+    end
 
     context "logged on user" do
       let(:user) { FactoryBot.create(:user, last_portal_visited: family_account_path, oim_id: 'some_curam_id')}
