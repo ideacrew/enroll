@@ -523,4 +523,3 @@ registry:
         is_enabled: true
       - key: :disable_form_phone_and_paper_dropdown
         is_enabled: true
-
