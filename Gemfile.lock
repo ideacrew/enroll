@@ -7,7 +7,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 0f9d2dab97dd1f25459d6440099c43efcecb7f5c
+  revision: b5a48249c9fbcbb580f748ce32342893fef68475
   branch: atp_cv_transform_v3
   specs:
     aca_entities (0.3.0)
@@ -1208,4 +1208,4 @@ RUBY VERSION
    ruby 2.5.1p57
 
 BUNDLED WITH
-   2.2.12
+   2.2.19
