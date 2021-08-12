@@ -16,7 +16,8 @@ class MigrateFamily < Mongoid::Migration
   def self.up
     @source =  ENV["source"].to_s.downcase # MCR or ATP
     # @file_path = "/Users/saidineshmekala/Downloads/app.json"
-    @file_path = "/db/application.json"
+    @file_path = "db/application.json"
+    # @file_path = "/Users/saidineshmekala/IDEACREW/aca_entities/spec/support/transform_example_payloads/test.json"
     @directory_name = ENV['dir'].to_s || nil
 
     start migration_for: @source, path: @file_path, dir: @directory_name
@@ -44,8 +45,9 @@ class MigrateFamily < Mongoid::Migration
         end
 
         build_family(family_hash.merge!(ext_app_id: payload[:insuranceApplicationIdentifier])) # remove this after fixing ext_app_id in aca entities
-        build_iap(family_hash['magi_medicaid_applications'].first.merge!(family_id: @family.id, benchmark_product_id: BSON::ObjectId.new,
-                                                                         years_to_renew: 5))
+        app_id = build_iap(family_hash['magi_medicaid_applications'].first.merge!(family_id: @family.id, benchmark_product_id: BSON::ObjectId.new, years_to_renew: 5))
+        fill_applicants_form(app_id, family_hash['magi_medicaid_applications'].first)
+
         print "."
         rescue StandardError => e
         puts "E: #{payload[:insuranceApplicationIdentifier]}, f: @family.hbx_id  error: #{e.message.split('.').first}"
@@ -122,11 +124,17 @@ class MigrateFamily < Mongoid::Migration
                   is_coverage_applicant: family_member_hash['is_coverage_applicant'],
                   is_active: family_member_hash['is_active'] }
 
-      family_member = family.add_family_member(person, fm_attr)
-      family_member.save!
+      if family_member_hash['is_primary_applicant']
+        family_member = family.add_family_member(person, fm_attr)
+        create_or_update_relationship(person, family, family_member_hash['person']['person_relationships'][0]['kind'])
+      else
+        create_or_update_relationship(person, family, family_member_hash['person']['person_relationships'][0]['kind'])
+        family_member = family.add_family_member(person, fm_attr)
+      end
 
-      create_or_update_relationship(person, family, family_member_hash['person']['person_relationships'][0]['kind'])
+      family_member.save!
       family.save!
+
       family_member
     end
 
@@ -237,8 +245,8 @@ class MigrateFamily < Mongoid::Migration
           addresses: applicant_hash['addresses'],
           emails: applicant_hash['emails'],
           phones: applicant_hash['phones'],
-          incomes: applicant_hash['incomes'],
-          benefits: applicant_hash['benefits'],
+          incomes: sanitize_income_params(applicant_hash['incomes']),
+          benefits: sanitize_benefit_params(applicant_hash['benefits']),
           deductions: applicant_hash['deductions'],
 
           is_medicare_eligible: applicant_hash['is_medicare_eligible'],
@@ -247,13 +255,36 @@ class MigrateFamily < Mongoid::Migration
           had_prior_insurance: applicant_hash['had_prior_insurance'],
           age_of_applicant: applicant_hash['age_of_applicant'],
           hours_worked_per_week: applicant_hash['hours_worked_per_week'],
-          indian_tribe_member: applicant_hash['indian_tribe_member'],
+          indian_tribe_member: applicant_hash['indian_tribe_member'] || false,
           tribal_id: applicant_hash['tribal_id'],
           tribal_name: applicant_hash['tribal_name'],
           tribal_state: applicant_hash['tribal_state']
         }
       end
       iap_hash.except!('applicants').merge!(applicants: sanitize_params)
+    end
+
+    def sanitize_income_params(incomes)
+      incomes.map do |income|
+        income["frequency_kind"] = income["frequency_kind"].downcase
+        income
+      end
+    end
+
+    def sanitize_benefit_params(benefits)
+      benefits.map do |benefit|
+        if benefit["status"]
+          benefit["insurance_kind"] = benefit["kind"]
+          benefit["kind"] = benefit["status"]
+        end
+
+        if benefit['employer'].present?
+          benefit['employer_name']
+          benefit['employer_id'] = benefit['employer']['employer_id']
+        end
+
+        benefit.except("status", "employer")
+      end
     end
 
     def sanitize_person_params(family_member_hash)
@@ -376,6 +407,7 @@ class MigrateFamily < Mongoid::Migration
       fill_applicants_form(app_id, result_payload["family"]['magi_medicaid_applications'].first)
       print "."
     rescue StandardError => e
+      # binding.pry
       puts "E: #{payload[:insuranceApplicationIdentifier]}, f: @family.hbx_id  error: #{e}"
     end
 
@@ -393,7 +425,7 @@ class MigrateFamily < Mongoid::Migration
         persisted_applicant.tax_filer_kind = applicant[:tax_filer_kind]
         persisted_applicant.is_joint_tax_filing = applicant[:is_joint_tax_filing]
         persisted_applicant.is_claimed_as_tax_dependent = applicant[:is_claimed_as_tax_dependent]
-        persisted_applicant.claimed_as_tax_dependent_by = claimed_by.id
+        persisted_applicant.claimed_as_tax_dependent_by = claimed_by.try(:id)
 
         persisted_applicant.is_student = applicant[:is_student]
         persisted_applicant.student_kind = applicant[:student_kind]
@@ -438,7 +470,7 @@ class MigrateFamily < Mongoid::Migration
 
         persisted_applicant.is_medicare_eligible = applicant[:is_medicare_eligible]
         ::FinancialAssistance::Applicant.skip_callback(:update, :after, :propagate_applicant)
-        persisted_applicant.save!
+        persisted_applicant.save!(validate: false)
         ::FinancialAssistance::Applicant.set_callback(:update, :after, :propagate_applicant)
         # persisted_applicant.has_insurance = applicant[:has_insurance]
         # persisted_applicant.has_state_health_benefit = applicant[:has_state_health_benefit]
