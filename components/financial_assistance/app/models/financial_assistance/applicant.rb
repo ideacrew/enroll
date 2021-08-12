@@ -801,9 +801,9 @@ module FinancialAssistance
       case embedded_document
       when :income
         return false if has_job_income.nil? || has_self_employment_income.nil?
-        return incomes.jobs.present? && valid_embedded_fields(:has_job_income) && incomes.self_employment.present? && valid_embedded_fields(:has_self_employment_income) if has_job_income && has_self_employment_income
-        return incomes.jobs.present? && valid_embedded_fields(:has_job_income) && incomes.self_employment.blank? if has_job_income && !has_self_employment_income
-        return incomes.jobs.blank? && incomes.self_employment.present? && valid_embedded_fields(:has_self_employment_income) if !has_job_income && has_self_employment_income
+        return incomes.jobs.present? && job_fields_complete && incomes.self_employment.present? && self_employment_fields_complete if has_job_income && has_self_employment_income
+        return incomes.jobs.present? && job_fields_complete && incomes.self_employment.blank? if has_job_income && !has_self_employment_income
+        return incomes.jobs.blank? && incomes.self_employment.present? && self_employment_fields_complete if !has_job_income && has_self_employment_income
         incomes.jobs.blank? && incomes.self_employment.blank?
       when :other_income
         if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income)
@@ -813,19 +813,19 @@ module FinancialAssistance
           return true if has_unemployment_income == false && has_other_income == false
           return true if has_unemployment_income == true && incomes.unemployment.present? && has_other_income == false
           return true if has_unemployment_income == false && has_other_income == true && incomes.other.present?
-          return incomes.unemployment.present? && valid_embedded_fields(:has_unemployment_income) && incomes.other.present? if incomes.unemployment && incomes.other
-          return incomes.unemployment.present? && valid_embedded_fields(:has_unemployment_income) && incomes.other.blank? if incomes.unemployment && !incomes.other
-          return incomes.unemployment.blank? && valid_embedded_fields(:has_unemployment_income) && incomes.other.present? if !incomes.unemployment && incomes.other
+          return incomes.unemployment.present? && unemployment_fields_complete && incomes.other.present? if incomes.unemployment && incomes.other
+          return incomes.unemployment.present? && unemployment_fields_complete && incomes.other.blank? if incomes.unemployment && !incomes.other
+          return incomes.unemployment.blank? && unemployment_fields_complete && incomes.other.present? if !incomes.unemployment && incomes.other
           incomes.unemployment.blank? && incomes.other.blank?
-          return incomes.unemployment.present? && valid_embedded_fields(:has_unemployment_income) if has_unemployment_income
+          return incomes.unemployment.present? && unemployment_fields_complete if has_unemployment_income
         end
         return false if has_other_income.nil?
-        return incomes.other.present? && valid_embedded_fields(:other_income) if has_other_income
+        return incomes.other.present? && other_income_fields_complete if has_other_income
         return incomes.other.blank? || incomes.unemployment.blank? if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income)
         incomes.other.blank?
       when :income_adjustment
         return false if has_deductions.nil?
-        return deductions.present? && valid_embedded_fields(:has_income_adjustment) if has_deductions
+        return deductions.present? && income_adjustment_fields_complete if has_deductions
         deductions.blank?
       when :health_coverage
         return false if indian_tribe_member && health_service_through_referral.nil? && FinancialAssistanceRegistry[:indian_health_service_question].feature.is_enabled
@@ -844,43 +844,48 @@ module FinancialAssistance
       end
     end
 
-    def valid_embedded_fields(embedded_document) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity TODO: Remove this
+    def job_fields_complete
       validations = []
-      case embedded_document
-      when :has_job_income
-        if has_job_income
-          incomes.jobs.select(&:persisted?).each do |job|
-            address = job[:employer_address]
-            validations << (address[:address_1].present? && address[:city].present? && address[:state].present? && address[:zip].present?)
-            validations << (job[:employer_name].present? && job[:employer_phone].present?)
-            validations << (job[:amount].present? && job[:frequency_kind].present? && job[:start_on].present?)
-          end
-        end
-      when :has_self_employment_income
-        if has_self_employment_income
-          incomes.self_employment.each do |self_employment|
-            validations << (self_employment[:amount].present? && self_employment[:frequency_kind].present? && self_employment[:start_on].present?)
-          end
-        end
-      when :has_unemployment_income
-        if has_unemployment_income
-          incomes.unemployment.each do |unemployment|
-            validations << (unemployment[:amount].present? && unemployment[:frequency_kind].present? && unemployment[:start_on].present?)
-          end
-        end
-      when :has_other_income
-        if has_other_income
-          incomes.other.each do |other|
-            validations << (other[:amount].present? && other[:frequency_kind].present? && other[:start_on].present?)
-          end
-        end
-      when :has_income_adjustment
-        deductions.each do |deduction|
-          validations << (deduction[:amount].present? && deduction[:frequency_kind].present? && deduction[:start_on].present?)
-        end
+      incomes.jobs.select(&:persisted?).each do |job|
+        address = job[:employer_address]
+        validations << (address[:address_1].present? && address[:city].present? && address[:state].present? && address[:zip].present?)
+        validations << (job[:employer_name].present? && job[:employer_phone].present?)
+        validations << (job[:amount].present? && job[:frequency_kind].present? && job[:start_on].present?)
       end
       !validations.include?(false)
     end
+
+    def self_employment_fields_complete
+      validations = []
+      incomes.self_employment.each do |self_employment|
+        validations << (self_employment[:amount].present? && self_employment[:frequency_kind].present? && self_employment[:start_on].present?)
+      end
+      !validations.include?(false)
+    end
+
+    def unemployment_fields_complete
+      validations = []
+      incomes.unemployment.each do |unemployment|
+        validations << (unemployment[:amount].present? && unemployment[:frequency_kind].present? && unemployment[:start_on].present?)
+      end
+      !validations.include?(false)
+    end
+
+    def other_income_fields_complete
+      validations = []
+      incomes.other.each do |other|
+        validations << (other[:amount].present? && other[:frequency_kind].present? && other[:start_on].present?)
+      end
+      !validations.include?(false)
+    end
+
+    def income_adjustment_fields_complete
+      validations = []
+      deductions.each do |deduction|
+        validations << (deduction[:amount].present? && deduction[:frequency_kind].present? && deduction[:start_on].present?)
+      end
+      !validations.include?(false)
+    end   
 
     def dependent_coverage_questions
       return false if has_dependent_with_coverage.nil?
