@@ -105,6 +105,10 @@ module Config::AcaHelper
     @individual_market_is_enabled ||= Settings.aca.market_kinds.include?("individual")
   end
 
+  def no_transition_families_is_enabled?
+    EnrollRegistry.feature_enabled?(:no_transition_families)
+  end
+
   def medicaid_tax_credits_link_is_enabled?
     EnrollRegistry.feature_enabled?(:medicaid_tax_credits_link)
   end

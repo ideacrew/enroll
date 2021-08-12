@@ -39,19 +39,3 @@ end
 Then(/^they should be redirected to the enroll app home page$/) do
   expect(page).to have_content("Medicaid And Tax Credits Link Is Disabled")
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
