@@ -1,6 +1,5 @@
 name: Nightly Stored Client Tests
 on:
-  push:
   schedule:
     - cron: '0 0 * * *'
 
