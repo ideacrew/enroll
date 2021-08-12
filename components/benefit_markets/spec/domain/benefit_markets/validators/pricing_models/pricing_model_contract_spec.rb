@@ -13,7 +13,7 @@ RSpec.describe BenefitMarkets::Validators::PricingModels::PricingModelContract d
   let(:missing_params)   { {name: name1, price_calculator_kind: price_calculator_kind, pricing_units: pricing_units, _id: BSON::ObjectId.new,} }
   let(:required_params)  { missing_params.merge({product_multiplicities: product_multiplicities, member_relationships: member_relationships}) }
   let(:invalid_params)   { missing_params.merge({product_multiplicities: [{}], member_relationships: [:member_relationships]}) }
-  let(:error_message1)   { {:product_multiplicities => ["is missing"], :member_relationships => ["is missing"]} }
+  let(:error_message1)   { {:member_relationships => ["is missing", "must be an array"], :product_multiplicities => ["is missing", "must be an array"]} }
   let(:error_message2)   { {:member_relationships => {0 => ["must be a hash"]}, :product_multiplicities => {0 => ["must be Symbol"]}} }
 
   context "Given invalid required parameters" do

@@ -46,4 +46,25 @@ RSpec.describe "broker_agencies/profiles/_employers.html.erb", :dbclean => :afte
       end
     end
   end
+
+  describe 'without modify permissions ' do
+    before :each do
+      render template: "broker_agencies/profiles/_employers.html.erb"
+    end
+
+    context "when GA is enabled", :if => EnrollRegistry.feature_enabled?(:general_agency)  do
+      it "should have general agency" do
+        expect(rendered).to match(/General Agencies/)
+      end
+    end
+
+    context "when GA is disabled", :unless => EnrollRegistry.feature_enabled?(:general_agency) do
+      it "should not have general agency" do
+        expect(rendered).not_to match(/General Agencies/)
+      end
+      it "should not have general agency in table" do
+        expect(rendered).not_to match(/General Agency/)
+      end
+    end
+  end
 end

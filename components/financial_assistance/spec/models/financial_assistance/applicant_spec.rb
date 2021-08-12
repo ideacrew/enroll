@@ -8,6 +8,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
     FactoryBot.create(:application,
                       family_id: BSON::ObjectId.new,
                       aasm_state: 'draft',
+                      assistance_year: TimeKeeper.date_of_record.year,
                       effective_date: Date.today)
   end
 
@@ -106,6 +107,138 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
     end
   end
 
+  context '#is_eligible_for_non_magi_reasons' do
+    it 'should return a field on applicant model' do
+      expect(applicant.is_eligible_for_non_magi_reasons).to eq(nil)
+    end
+  end
+
+  context 'current_month_incomes' do
+    let!(:create_job_income1) do
+      inc = ::FinancialAssistance::Income.new({ kind: 'wages_and_salaries',
+                                                frequency_kind: 'yearly',
+                                                amount: 30_000.00,
+                                                start_on: TimeKeeper.date_of_record.beginning_of_month,
+                                                employer_name: 'Testing employer' })
+      applicant.incomes << inc
+      applicant.save!
+    end
+
+    let!(:income2) do
+      inc = ::FinancialAssistance::Income.new({ kind: 'net_self_employment',
+                                                frequency_kind: 'monthly',
+                                                amount: 100.00,
+                                                start_on: TimeKeeper.date_of_record.next_month.beginning_of_month })
+      applicant.incomes << inc
+      applicant.save!
+    end
+
+    before do
+      @incomes = applicant.reload.current_month_incomes
+    end
+
+    it 'should return only one income' do
+      expect(@incomes.count).to eq(1)
+    end
+
+    it 'should return the income of kind wages_and_salaries' do
+      expect(@incomes.first.kind).to eq('wages_and_salaries')
+    end
+
+    it 'should not return the income of kind net_self_employment' do
+      expect(@incomes.first.kind).not_to eq('net_self_employment')
+    end
+  end
+
+  context 'current_month_incomes with income that started previous year and no end date' do
+    let!(:create_job_income12) do
+      inc = ::FinancialAssistance::Income.new({ kind: 'wages_and_salaries',
+                                                frequency_kind: 'yearly',
+                                                amount: 30_000.00,
+                                                start_on: TimeKeeper.date_of_record.prev_year,
+                                                employer_name: 'Testing employer' })
+      applicant.incomes << inc
+      applicant.save!
+    end
+
+    before do
+      @incomes = applicant.reload.current_month_incomes
+    end
+
+    it 'should return only one income' do
+      expect(@incomes.count).to eq(1)
+    end
+
+    it 'should return the income of kind wages_and_salaries' do
+      expect(@incomes.first.kind).to eq('wages_and_salaries')
+    end
+  end
+
+  context 'current_month_incomes with income that started in March & End Dated in August' do
+    let!(:create_job_income12) do
+      inc = ::FinancialAssistance::Income.new({ kind: 'wages_and_salaries',
+                                                frequency_kind: 'yearly',
+                                                amount: 30_000.00,
+                                                start_on: Date.new(TimeKeeper.date_of_record.year, 3, 1),
+                                                end_on: Date.new(TimeKeeper.date_of_record.year, 8, 31),
+                                                employer_name: 'Testing employer' })
+      applicant.incomes << inc
+      applicant.save!
+    end
+
+    before do
+      @incomes = applicant.reload.current_month_incomes
+    end
+
+    it 'should return only one income' do
+      expect(@incomes.count).to eq(1)
+    end
+
+    it 'should return the income of kind wages_and_salaries' do
+      expect(@incomes.first.kind).to eq('wages_and_salaries')
+    end
+  end
+
+  context 'current_month_incomes with income that started previous year and ended last month' do
+    let!(:create_job_income11) do
+      inc = ::FinancialAssistance::Income.new({ kind: 'wages_and_salaries',
+                                                frequency_kind: 'yearly',
+                                                amount: 30_000.00,
+                                                start_on: TimeKeeper.date_of_record.prev_year,
+                                                end_on: TimeKeeper.date_of_record.prev_month,
+                                                employer_name: 'Testing employer' })
+      applicant.incomes << inc
+      applicant.save!
+    end
+
+    before do
+      @incomes = applicant.reload.current_month_incomes
+    end
+
+    it 'should not return any incomes as the income ended last month' do
+      expect(@incomes.count).to be_zero
+    end
+  end
+
+  context 'total_hours_worked_per_week' do
+    let!(:create_job_income12) do
+      inc = ::FinancialAssistance::Income.new({ kind: 'wages_and_salaries',
+                                                frequency_kind: 'yearly',
+                                                amount: 30_000.00,
+                                                start_on: TimeKeeper.date_of_record.prev_year,
+                                                end_on: TimeKeeper.date_of_record.prev_month,
+                                                employer_name: 'Testing employer' })
+      applicant.incomes << inc
+      applicant.save!
+    end
+
+    context 'income end_on is before TimeKeeper.date_of_record' do
+      it 'should return 0' do
+        expect(applicant.total_hours_worked_per_week).to be_zero
+      end
+    end
+  end
+
   context 'when IAP applicant is destroyed' do
     context 'should destroy their relationships of the applicants' do
       let!(:spouse_applicant) do
@@ -139,6 +272,87 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         expect(applicant_spouse.count).to eq 0
         expect(application.applicants.count).to eq 2
         expect(application.relationships.count).to eq 2
+      end
+    end
+  end
+
+  context '#is_eligible_for_non_magi_reasons' do
+    it 'should return a field on applicant model' do
+      expect(applicant.is_eligible_for_non_magi_reasons).to eq(nil)
+    end
+  end
+
+  context 'is_csr_73_87_or_94' do
+    before do
+      applicant.update_attributes!({ is_ia_eligible: true, csr_percent_as_integer: [73, 87, 94].sample })
+    end
+
+    it 'should return true' do
+      expect(applicant.reload.is_csr_73_87_or_94?).to be_truthy
+    end
+  end
+
+  context 'is_csr_100' do
+    before do
+      applicant.update_attributes!({ is_ia_eligible: true, csr_percent_as_integer: 100 })
+    end
+
+    it 'should return true' do
+      expect(applicant.reload.is_csr_100?).to be_truthy
+    end
+  end
+
+  context 'is_csr_limited' do
+    context 'aqhp' do
+      before do
+        applicant.update_attributes!({ is_ia_eligible: true, csr_percent_as_integer: -1 })
+      end
+
+      it 'should return true' do
+        expect(applicant.reload.is_csr_limited?).to be_truthy
+      end
+    end
+
+    context 'uqhp' do
+      before do
+        applicant.update_attributes!({ indian_tribe_member: true })
+      end
+
+      it 'should return true' do
+        expect(applicant.reload.is_csr_limited?).to be_truthy
+      end
+    end
+  end
+
+  context '#tax_info_complete?' do
+    before do
+      applicant.update_attributes({is_required_to_file_taxes: true,
+                                   is_joint_tax_filing: false,
+                                   is_claimed_as_tax_dependent: false})
+    end
+
+    context 'is_filing_as_head_of_household feature disabled' do
+      before do
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:filing_as_head_of_household).and_return(false)
+      end
+
+      it 'should return true without is_filing_as_head_of_household' do
+        expect(applicant.tax_info_complete?).to eq true
+      end
+    end
+
+    context 'is_filing_as_head_of_household feature enabled' do
+      before do
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:filing_as_head_of_household).and_return(true)
+      end
+
+      it 'should return false without is_filing_as_head_of_household' do
+        expect(applicant.tax_info_complete?).to eq false
+      end
+
+      it 'should return true with is_filing_as_head_of_household' do
+        applicant.update_attributes({is_filing_as_head_of_household: true})
+        expect(applicant.tax_info_complete?).to eq true
       end
     end
   end

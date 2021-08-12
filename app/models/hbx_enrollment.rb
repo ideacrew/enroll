@@ -109,6 +109,7 @@ class HbxEnrollment
   field :benefit_group_id, type: BSON::ObjectId
   field :benefit_group_assignment_id, type: BSON::ObjectId
   field :hbx_id, type: String
+  field :external_id, type: String
   field :special_enrollment_period_id, type: BSON::ObjectId
   field :predecessor_enrollment_id, type: BSON::ObjectId
   field :enrollment_signature, type: String
@@ -1028,6 +1029,10 @@ class HbxEnrollment
     benefit_sponsorship.benefit_applications.detect{|app| app.active? && app.reinstated_id == sponsored_benefit_package.benefit_application.id}
   end
 
+  def trigger_enrollment_notice
+    Services::IvlEnrollmentService.new.trigger_enrollment_notice(self) unless EnrollRegistry[:legacy_enrollment_trigger].enabled?
+  end
+
   def update_reinstate_coverage
     return unless reinstated_app.present?
     parent_reinstated_app = reinstated_app.parent_reinstate_application
@@ -1694,9 +1699,11 @@ class HbxEnrollment
         if qle && enrollment.family.is_under_special_enrollment_period?
           enrollment.effective_on = opt_effective_on.present? ? opt_effective_on : enrollment.family.current_sep.effective_on
           enrollment.enrollment_kind = "special_enrollment"
+          enrollment.rating_area_id = ::BenefitMarkets::Locations::RatingArea.rating_area_for(consumer_role.rating_address, during: enrollment.effective_on)&.id
         elsif enrollment.family.is_under_ivl_open_enrollment?
           enrollment.effective_on = benefit_sponsorship.current_benefit_period.earliest_effective_date
           enrollment.enrollment_kind = "open_enrollment"
+          enrollment.rating_area_id = ::BenefitMarkets::Locations::RatingArea.rating_area_for(consumer_role.rating_address, during: enrollment.effective_on)&.id
         else
           enrollment.errors.add(
             :base,
@@ -1882,7 +1889,7 @@ class HbxEnrollment
       transitions from: :shopping, to: :renewing_waived
     end
 
-    event :select_coverage, :after => [:record_transition, :propagate_selection, :update_reinstate_coverage] do
+    event :select_coverage, :after => [:record_transition, :propagate_selection, :update_reinstate_coverage, :trigger_enrollment_notice] do
       transitions from: :shopping,
                   to: :coverage_selected, :guard => :can_select_coverage?
       transitions from: [:auto_renewing, :actively_renewing],

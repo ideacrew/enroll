@@ -185,7 +185,12 @@ module Services
       def consumer_build_family
         family = []
         today = @hbx_enrollment.effective_on
-        tribal_id = @hbx_enrollment.consumer_role.person.tribal_id.present?
+        if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
+          person = @hbx_enrollment.consumer_role.person
+          tribal_details = person.tribal_state.present? && person.tribal_name.present?
+        else
+          tribal_details = @hbx_enrollment.consumer_role.person.tribal_id.present?
+        end
         @hbx_enrollment.hbx_enrollment_members.each do |member|
           age = member.family_member.person.age_on(today)
           family << {"age": age, "pregnant": false, "AIAN": tribal_id, "smoker": member.tobacco_use, "relationship": member.primary_relationship}

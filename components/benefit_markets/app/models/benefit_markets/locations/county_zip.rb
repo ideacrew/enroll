@@ -11,6 +11,12 @@ module BenefitMarkets
       field :state, type: String
 
       index({state: 1, county_name: 1, zip: 1})
+
+      def self.county_names
+        Rails.cache.fetch("county-names", expires_in: 12.hours) do
+          self.all.map(&:county_name).uniq
+        end
+      end
     end
   end
 end

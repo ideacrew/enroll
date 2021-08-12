@@ -18,7 +18,7 @@ describe "insured/family_members/_dependent.html.erb", dbclean: :after_each do
     render "insured/family_members/dependent", dependent: dependent
     expect(rendered).to have_selector("label", text: 'NAME')
     expect(rendered).to have_selector("label", text: 'AGE')
-    expect(rendered).to have_selector("label", text: 'GENDER')
+    expect(rendered).to have_selector("label", text: l10n("gender").to_s.upcase)
     expect(rendered).to have_selector("label", text: 'RELATIONSHIP')
   end
 

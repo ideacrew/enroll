@@ -103,6 +103,10 @@ class IvlFamilyInformation
     'label[for="applicant_eligible_immigration_status_false"] span'
   end
 
+  def self.immigration_status_checkbox
+    '#applicant_eligible_immigration_status'
+  end
+
   def self.immigration_status_select_doc_dropdown
     '#immigration_doc_type_select span'
   end

@@ -2,6 +2,9 @@ Feature: Consumer landing on Group selection page during OE after continuing fro
 
   Background: Submit Your Application page
     Given the FAA feature configuration is enabled
+    And FAA haven_determination feature is enabled
+    # There needs to be a version of this with this instead
+    # medicaid_gateway_determination
     And the user visits the portal during OE
     And the user is on FAA Household Info: Family Members page
     And all applicants are in Info Completed state with all types of income

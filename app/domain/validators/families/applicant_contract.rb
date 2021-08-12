@@ -18,12 +18,14 @@ module Validators
         optional(:person_hbx_id).maybe(:string)
         optional(:family_member_id).maybe(Types::Bson)
 
-        required(:is_incarcerated).filled(:bool)
+        optional(:is_incarcerated).maybe(:bool)
         optional(:is_disabled).filled(:bool)
         optional(:ethnicity).maybe(:array)
         optional(:race).maybe(:string)
         optional(:indian_tribe_member).maybe(:bool)
         optional(:tribal_id).maybe(:string)
+        optional(:tribal_state).maybe(:string)
+        optional(:tribal_name).maybe(:string)
 
         required(:eligibility_determination_id).filled(Types::Bson)
         required(:magi_medicaid_category).maybe(:string)
@@ -69,10 +71,14 @@ module Validators
 
         optional(:relationship).maybe(:string)
 
+        optional(:csr_percent_as_integer).maybe(:integer)
+        optional(:csr_eligibility_kind).maybe(:string)
+
         before(:value_coercer) do |result|
           result_hash = result.to_h
           other_params = {}
           other_params[:dob] = result_hash[:dob].to_date if result_hash[:dob].present?
+          other_params[:expiration_date] = result_hash[:expiration_date].to_date if result_hash[:expiration_date].present?
           result_hash.merge(other_params)
         end
       end
@@ -89,12 +95,14 @@ module Validators
       end
 
       rule(:is_primary_applicant) do
-        if key? && value
-          if value
-            key.failure(text: "family_member_id should be present") if values[:family_member_id].blank?
-            key.failure(text: "person hbx id should be present") if values[:person_hbx_id].blank?
-          end
+        if key? && value && value
+          key.failure(text: "family_member_id should be present") if values[:family_member_id].blank?
+          key.failure(text: "person hbx id should be present") if values[:person_hbx_id].blank?
         end
+      end
+
+      rule(:is_incarcerated) do
+        key.failure(text: 'is_incarcerated should be populated for applicant applying coverage') if key? && values[:is_applying_coverage] & value.nil?
       end
 
       rule(:phones).each do

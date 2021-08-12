@@ -40,10 +40,16 @@ module FinancialAssistance
       income_from_irs
     ].freeze
 
+    # These are used specifically in the process of constructing the payload for us to send this to MedicaidGateway(including Mitc)
+    EARNED_INCOME_KINDS = %w[wages_and_salaries net_self_employment scholarship_payments].freeze
+    UNEARNED_INCOME_KINDS = (KINDS - EARNED_INCOME_KINDS).freeze
+
     JOB_INCOME_TYPE_KIND = 'wages_and_salaries'
     NET_SELF_EMPLOYMENT_INCOME_KIND = 'net_self_employment'
     UNEMPLOYMENT_INCOME_KIND = 'unemployment_income'
     FREQUENCY_KINDS = %w[biweekly daily half_yearly monthly quarterly weekly yearly].freeze
+
+    NEGATIVE_AMOUNT_INCOME_TYPE_KINDS = %w[net_self_employment capital_gains farming_and_fishing].freeze
 
     OTHER_INCOME_TYPE_KIND = {
       alimony_and_maintenance: 'Alimony received',
@@ -53,15 +59,21 @@ module FinancialAssistance
       pension_retirement_benefits: 'Pension or retirement',
       rental_and_royalty: 'Rent and royalties',
       social_security_benefit: 'Social Security',
-      american_indian_and_alaskan_native: "American Indian/Alaska Native income",
       employer_funded_disability: 'Employer-funded disability payments',
       estate_trust: 'Estate and trust',
       farming_and_fishing: 'Farming or fishing',
       foreign: 'Foreign income',
       other: 'Other taxable income',
-      prizes_and_awards: 'Prizes and awards',
-      scholorship_payments: 'Taxable scholarship payments'
-    }.freeze
+      prizes_and_awards: FinancialAssistanceRegistry[:prize_and_awards].setting(:gamble_prize).item ? 'Gambling, prizes or awards' : 'Prizes and awards',
+      scholarship_payments: 'Taxable scholarship payments'
+    }
+
+    ALL_INCOME_KINDS_MAPPED = OTHER_INCOME_TYPE_KIND.merge(
+      JOB_INCOME_TYPE_KIND.to_sym => 'Wages and Salaries'
+    )
+
+    OTHER_INCOME_TYPE_KIND.merge!(american_indian_and_alaskan_native: "American Indian/Alaska Native income") unless EnrollRegistry.feature_enabled?(:american_indian_alaskan_native_income)
+    OTHER_INCOME_TYPE_KIND.freeze
 
     field :title, type: String
     field :kind, as: :income_type, type: String, default: 'wages_and_salaries'
@@ -85,6 +97,7 @@ module FinancialAssistance
     scope :other, -> {where(:kind.nin => [JOB_INCOME_TYPE_KIND, NET_SELF_EMPLOYMENT_INCOME_KIND, UNEMPLOYMENT_INCOME_KIND])}
     scope :of_kind, ->(kind) {where(kind: kind)}
     scope :unemployment, ->{where(kind: 'unemployment_income')}
+    scope :american_indian_and_alaskan_native, ->{where(kind: 'american_indian_and_alaskan_native')}
 
     validates_length_of :title,
                         in: TITLE_SIZE_RANGE,
@@ -96,7 +109,7 @@ module FinancialAssistance
                        numericality: {
                          greater_than: 0, message: "%{value} must be greater than $0"
                        },
-                       on: [:step_1, :submission]
+                       on: [:step_1, :submission], unless: :negative_income_accepted?
 
     validates :kind, presence: true,
                      inclusion: {
@@ -111,10 +124,11 @@ module FinancialAssistance
 
     validates :start_on, presence: true, on: [:step_1, :submission]
     validate :start_on_must_precede_end_on
+    validate :check_if_valid_amount
 
     def hours_worked_per_week
       return 0 if end_on.blank? || end_on > TimeKeeper.date_of_record
-      hours_per_week
+      hours_per_week || 0
     end
 
     def same_as?(other)
@@ -125,6 +139,10 @@ module FinancialAssistance
         && end_on == other.end_on \
         && is_projected == other.is_projected \
         && submitted_at == other.submitted_at
+    end
+
+    def negative_income_accepted?
+      NEGATIVE_AMOUNT_INCOME_TYPE_KINDS.include?(kind)
     end
 
     def <=>(other)
@@ -144,6 +162,7 @@ module FinancialAssistance
       )
     end
 
+
     class << self
       def find(id)
         bson_id = BSON::ObjectId.from_string(id.to_s)
@@ -154,6 +173,27 @@ module FinancialAssistance
       end
     end
 
+    # rubocop:disable Metrics/CyclomaticComplexity, Metrics/MethodLength
+    def calculate_annual_income
+      case frequency_kind.downcase
+      when 'weekly'
+        amount * 52
+      when 'monthly'
+        amount * 12
+      when 'yearly'
+        amount
+      when 'biweekly'
+        amount * 26
+      when 'quarterly'
+        amount * 4
+      when 'daily'
+        amount * 5 * 52
+      else
+        0
+      end
+    end
+    # rubocop:enable Metrics/CyclomaticComplexity, Metrics/MethodLength
+
     private
 
     def set_submission_timestamp
@@ -163,6 +203,12 @@ module FinancialAssistance
     def start_on_must_precede_end_on
       return unless start_on.present? && end_on.present?
       errors.add(:end_on, "Date can't occur before start on date") if end_on < start_on
+    end
+
+    def check_if_valid_amount
+      return if negative_income_accepted?
+
+      errors.add(:amount, "$#{amount} must be greater than $0.") if amount.to_f < 0
     end
   end
 end

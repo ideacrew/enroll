@@ -194,92 +194,6 @@ module FinancialAssistance
       apply_rules_and_update_relationships(matrix)
     end
 
-    #update method as validate payload
-    def update_application_and_applicant_attributes(payload)
-      verified_family = Parsers::Xml::Cv::HavenVerifiedFamilyParser.new
-      verified_family.parse(payload)
-
-      update_response_attributes(integrated_case_id: verified_family.integrated_case_id)
-      verified_primary_family_member = verified_family.family_members.detect{ |fm| fm.person.hbx_id == verified_family.primary_family_member_id }
-      verified_dependents = verified_family.family_members.reject{ |fm| fm.person.hbx_id == verified_family.primary_family_member_id }
-      primary_applicant = search_applicant(verified_primary_family_member)
-
-      if primary_applicant.blank?
-        update_application("Failed to find Primary Applicant on an Application", 422)
-        return false
-      end
-
-      active_verified_household = verified_family.households.max_by(&:start_date)
-
-      verified_dependents.each do |verified_family_member|
-        if search_applicant(verified_family_member).blank?
-          update_application("Failed to find Dependent Applicant on an Application", 422)
-          return false
-        end
-      end
-      build_or_update_applicants_eligibility_determinations(verified_family, primary_applicant, active_verified_household)
-    end
-
-    def build_or_update_applicants_eligibility_determinations(verified_family, _primary_applicant, active_verified_household)
-      verified_tax_households = active_verified_household.tax_households.select{|th| th.primary_applicant_id == verified_family.primary_family_member_id}
-      return unless verified_tax_households.present?
-
-      ed_hbx_assigned_ids = []
-      eligibility_determinations.each { |ed| ed_hbx_assigned_ids << ed.hbx_assigned_id.to_s}
-      verified_tax_households.each do |vthh|
-        if ed_hbx_assigned_ids.include?(vthh.hbx_assigned_id)
-          eligibility_determination = eligibility_determinations.select{|ed| ed.hbx_assigned_id == vthh.hbx_assigned_id.to_i}.first
-          #Update required attributes for that particular eligibility determination
-          eligibility_determination.update_attributes(effective_starting_on: vthh.start_date, is_eligibility_determined: true)
-          applicants_persons_hbx_ids = []
-          applicants.each { |appl| applicants_persons_hbx_ids << appl.person_hbx_id.to_s}
-          vthh.tax_household_members.each do |thhm|
-            next unless applicants_persons_hbx_ids.include?(thhm.person_id)
-            update_verified_applicants(self, verified_family, thhm)
-          end
-          update_eligibility_determinations(vthh, eligibility_determination) unless verified_tax_households.map(&:eligibility_determinations).map(&:present?).include?(false)
-        else
-          update_application("Failed to find eligibility determinations in our DB with the ids in xml", 422)
-          return false
-        end
-      end
-      self.save!
-    end
-
-    def update_eligibility_determinations(vthh, eligibility_determination)
-      verified_eligibility_determination = vthh.eligibility_determinations.max_by(&:determination_date) #Finding the right Eligilbilty Determination
-      #TODO: find the right source Curam/Haven.
-      source = "Faa"
-
-      verified_aptc = verified_eligibility_determination.maximum_aptc.to_f > 0.00 ? verified_eligibility_determination.maximum_aptc : 0.00
-      eligibility_determination.update_attributes(
-        max_aptc: verified_aptc,
-        csr_percent_as_integer: verified_eligibility_determination.csr_percent,
-        determined_at: verified_eligibility_determination.determination_date,
-        aptc_csr_annual_household_income: verified_eligibility_determination.aptc_csr_annual_household_income,
-        aptc_annual_income_limit: verified_eligibility_determination.aptc_annual_income_limit,
-        csr_annual_income_limit: verified_eligibility_determination.csr_annual_income_limit,
-        source: source
-      )
-    end
-
-    def update_verified_applicants(application_in_context, verified_family, thhm)
-      applicant = application_in_context.applicants.select { |app| app.person_hbx_id == thhm.person_id }.first
-      verified_family.family_members.each do |verified_family_member|
-        next unless verified_family_member.person.hbx_id == thhm.person_id
-        applicant.update_attributes({medicaid_household_size: verified_family_member.medicaid_household_size,
-                                     magi_medicaid_category: verified_family_member.magi_medicaid_category,
-                                     magi_as_percentage_of_fpl: verified_family_member.magi_as_percentage_of_fpl,
-                                     magi_medicaid_monthly_income_limit: verified_family_member.magi_medicaid_monthly_income_limit,
-                                     magi_medicaid_monthly_household_income: verified_family_member.magi_medicaid_monthly_household_income,
-                                     is_without_assistance: verified_family_member.is_without_assistance,
-                                     is_ia_eligible: verified_family_member.is_insurance_assistance_eligible,
-                                     is_medicaid_chip_eligible: verified_family_member.is_medicaid_chip_eligible,
-                                     is_non_magi_medicaid_eligible: verified_family_member.is_non_magi_medicaid_eligible,
-                                     is_totally_ineligible: verified_family_member.is_totally_ineligible})
-      end
-    end
-
     def find_existing_relationship(member_a_id, member_b_id)
       return 'self' if member_a_id == member_b_id
 
@@ -343,10 +257,14 @@ module FinancialAssistance
 
     def add_eligibility_determination(message)
       update_response_attributes(message)
-      ed_updated = update_application_and_applicant_attributes(message[:eligibility_response_payload])
-      return unless ed_updated
+      ed_updated = FinancialAssistance::Operations::Applications::Haven::AddEligibilityDetermination.new.call(application: self, eligibility_response_payload: eligibility_response_payload)
+      return if ed_updated.failure? || ed_updated.value! == false
 
       determine! # If successfully loaded ed's move the application to determined state
+      send_determination_to_ea
+    end
+
+    def send_determination_to_ea
       result = ::Operations::Families::AddFinancialAssistanceEligibilityDetermination.new.call(params: self.attributes)
       result.failure? ? log(eligibility_response_payload, {:severity => 'critical', :error_message => "ERROR: #{result.failure}"}) : true
     end
@@ -698,6 +616,7 @@ module FinancialAssistance
     end
 
     def send_failed_response
+      return unless FinancialAssistanceRegistry.feature_enabled?(:haven_determination)
       primary_applicant_person_hbx_id = primary_applicant.person_hbx_id
       unless has_eligibility_response
         if determination_http_status_code == 999
@@ -778,6 +697,12 @@ module FinancialAssistance
 
     def active_applicants
       applicants.where(:is_active => true)
+    end
+
+    def calculate_total_net_income_for_applicants
+      active_applicants.each do |applicant|
+        FinancialAssistance::Operations::Applicant::CalculateAndPersistNetAnnualIncome.new.call({application_assistance_year: assistance_year, applicant: applicant})
+      end
     end
 
     def non_primary_applicants
@@ -883,6 +808,7 @@ module FinancialAssistance
       write_attribute(:is_ridp_verified, true)
     end
 
+    # TODO: Check if we have to fall back to FinancialAssistanceRegistry.
     def set_us_state
       write_attribute(
         :us_state,
@@ -1049,6 +975,15 @@ module FinancialAssistance
           %w[Income MEC].collect do |type|
             VerificationType.new(type_name: type, validation_status: 'pending')
           end
+        family_record = Family.where(id: family_id.to_s).first
+        if FinancialAssistanceRegistry.feature_enabled?(:verification_type_income_verification) &&
+           family_record.present? && applicant.incomes.blank? && applicant.family_member_id.present?
+          family_member_record = family_record.family_members.where(id: applicant.family_member_id).first
+          next if family_member_record.blank?
+          person_record = family_member_record.person
+          next if person_record.blank?
+          person_record.add_new_verification_type('Income')
+        end
         applicant.move_to_pending!
       end
     end

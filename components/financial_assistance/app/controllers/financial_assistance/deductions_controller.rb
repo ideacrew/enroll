@@ -58,7 +58,7 @@ module FinancialAssistance
       if @deduction.save
         render :create
       else
-        render head: 'ok'
+        render :new
       end
     end
 
@@ -69,7 +69,7 @@ module FinancialAssistance
       if @deduction.update_attributes permit_params(params[:deduction])
         render :update
       else
-        render head: 'ok'
+        render :edit
       end
     end
 

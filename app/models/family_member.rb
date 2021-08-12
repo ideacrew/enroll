@@ -52,6 +52,7 @@ class FamilyMember
   delegate :ssn, to: :person, allow_nil: true
   delegate :no_ssn, to: :person, allow_nil: true
   delegate :gender, to: :person, allow_nil: true
+  delegate :rating_address, to: :person, allow_nil: true
   # consumer fields
   delegate :race, to: :person, allow_nil: true
   delegate :ethnicity, to: :person, allow_nil: true
@@ -59,6 +60,8 @@ class FamilyMember
   delegate :is_tobacco_user, to: :person, allow_nil: true
   delegate :is_incarcerated, to: :person, allow_nil: true
   delegate :tribal_id, to: :person, allow_nil: true
+  delegate :tribal_state, to: :person, allow_nil: true
+  delegate :tribal_name, to: :person, allow_nil: true
   delegate :is_disabled, to: :person, allow_nil: true
   delegate :citizen_status, to: :person, allow_nil: true
   delegate :indian_tribe_member, to: :person, allow_nil: true
@@ -90,18 +93,6 @@ class FamilyMember
 
   def households
     # TODO parent.households.coverage_households.where()
-  end
-
-  def aptc_benchmark_amount(enrollment)
-    date = enrollment.effective_on
-    benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
-    benefit_coverage_period = benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(date)}
-    # slcsp is a product
-    slcsp = benefit_coverage_period.second_lowest_cost_silver_plan
-    ehb = slcsp.ehb
-    product = product_factory.new({product_id: slcsp.id})
-    cost = product.cost_for(date, person.age_on(date))
-    round_down_float_two_decimals(cost * ehb)
   end
 
   def broker=(new_broker)

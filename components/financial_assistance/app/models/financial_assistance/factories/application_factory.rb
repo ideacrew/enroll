@@ -171,11 +171,16 @@ module FinancialAssistance
       end
 
       def reject_application_params
-        %w[_id created_at updated_at submitted_at workflow_state_transitions applicants relationships]
+        %w[_id created_at updated_at submitted_at workflow_state_transitions applicants relationships
+           determination_http_status_code has_eligibility_response eligibility_response_payload eligibility_request_payload]
       end
 
       def reject_applicant_params
-        %w[_id created_at updated_at workflow_state_transitions incomes benefits deductions verification_types]
+        %w[_id created_at updated_at workflow_state_transitions incomes benefits deductions verification_types
+           medicaid_household_size magi_medicaid_category magi_as_percentage_of_fpl magi_medicaid_monthly_income_limit
+           magi_medicaid_monthly_household_income is_without_assistance is_ia_eligible is_medicaid_chip_eligible
+           is_totally_ineligible is_eligible_for_non_magi_reasons is_non_magi_medicaid_eligible
+           csr_percent_as_integer csr_eligibility_kind]
       end
 
       def reject_embed_params

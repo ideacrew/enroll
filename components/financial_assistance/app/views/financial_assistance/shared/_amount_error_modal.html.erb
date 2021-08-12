@@ -1,0 +1,13 @@
+<div class="modal fade" id="post-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
+        <h4 class="modal-title darkblue" id="myModalLabel"><%= l10n('faa.negative_income') %></h4>
+      </div>
+      <div class="modal-body">
+        <%= benefit_type.errors.full_messages[0] %>
+      </div>
+    </div>
+  </div>
+</div>

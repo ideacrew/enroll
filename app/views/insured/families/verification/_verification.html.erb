@@ -28,7 +28,11 @@
               <div class="row">
                 <div class="v-type col-md-12">
                   <div class="v-type-name col-md-2">
-                    <%= v_type %>
+                    <% if v_type == "ME Residency" %>
+                      Income
+                    <% else %>
+                      <%= v_type %>
+                    <% end %>
                   </div>
                   <div class="v-type-status col-md-2 text-center">
                     <% if f_member.is_applying_coverage %>

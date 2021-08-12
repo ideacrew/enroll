@@ -56,6 +56,31 @@
             - cells:
                 - gutter: 5
                   type: text
+                  text: <filing-as-head-placeholder> *
+                - gutter: 2
+                  type: label_radio
+                  name: row2
+                  value: true
+                  id: 'is_filing_as_head_of_household_yes'
+                  required: true
+                  label: 'Yes'
+                  model: applicant
+                  attribute: is_filing_as_head_of_household
+                - gutter: 2
+                  type: label_radio
+                  name: row2
+                  value: false
+                  id: 'is_filing_as_head_of_household_no'
+                  required: true
+                  label: 'No'
+                  model: applicant
+                  attribute: is_filing_as_head_of_household
+                - gutter: 3
+                  type: support_text_raw_html
+                  support_text_key: is_filing_as_head_of_household
+            - cells:
+                - gutter: 5
+                  type: text
                   text: Will this person be claimed as a tax dependent for <application-applicable-year-placeholder>? *
                 - gutter: 2
                   type: label_radio

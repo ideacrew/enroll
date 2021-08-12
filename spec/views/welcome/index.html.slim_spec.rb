@@ -3,20 +3,17 @@ require 'rails_helper'
 RSpec.describe "welcome/index.html.slim", :type => :view, dbclean: :after_each  do
   let(:user) { FactoryBot.create(:user, oim_id: "test@enroll.com") }
 
-  # TODO: Does it need to be enabled or disabled anywhere else?
-  # TODO: We might be able to get rid of some, or all of these with the new
-  # cucumber: features/general_agencies/disabled_general_agency.feature
-  # That cucumber checks the appearance of general registration and all that
-  # we just need to do one with resource registry to check broker registration.
-  xdescribe "a signed in user" do
-    before :each do
-      sign_in user
-    end
-    xit "should has current_user oim_id" do
-      render
-      # expect(rendered).to match /#{user.oim_id}/
-      expect(rendered).not_to match 'Broker Registration'
-      expect(rendered).not_to match 'General Agency Registration'
+  unless Settings.site.key == :cca
+    describe "a signed in user" do
+      before :each do
+        sign_in user
+      end
+      it "should has current_user oim_id" do
+        render
+        # expect(rendered).to match /#{user.oim_id}/
+        expect(rendered).not_to match(/Broker Registration/)
+        expect(rendered).not_to match(/General Agency Registration/)
+      end
     end
   end
 
@@ -28,8 +25,8 @@ RSpec.describe "welcome/index.html.slim", :type => :view, dbclean: :after_each  
         render
       end
       it "shows registration if not signed in" do
-        expect(rendered).to match /Broker Registration/
-        expect(rendered).to match /General Agency Registration/
+        expect(rendered).to match(/Broker Registration/)
+        expect(rendered).to match(/General Agency Registration/)
       end
     end
 
@@ -38,9 +35,9 @@ RSpec.describe "welcome/index.html.slim", :type => :view, dbclean: :after_each  
         allow(view).to receive(:general_agency_enabled?).and_return(false)
         render
       end
-      xit "does not show general agency related links" do
-        expect(rendered).not_to match /General Agency Registration/
-        expect(rendered).not_to match /General Agency Portal/
+      it "does not show general agency related links" do
+        expect(rendered).not_to match(/General Agency Registration/)
+        expect(rendered).not_to match(/General Agency Portal/)
       end
     end
 

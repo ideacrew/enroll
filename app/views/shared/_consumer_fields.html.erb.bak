@@ -27,7 +27,7 @@
 
   <div class="row row-form-wrapper no-buffer" id="naturalized_citizen_container" style="display: <%= (f.object.us_citizen.present? and f.object.us_citizen) ? 'block' : 'none' %>">
     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg">
-      <label>Is this person a naturalized citizen? *</label>
+      <label>Is this person a naturalized or derived citizen? *</label>
     </div>
 
     <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
@@ -52,22 +52,30 @@
     <div class="col-lg-6 col-md-6 col-sm-4 col-xs-6 form-group form-group-lg">
       <label>Do you have eligible immigration status? *</label>
     </div>
-    <div class="col-lg-3 col-md-3 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
-      <div class="radio skinned-form-controls skinned-form-controls-mac">
-        <%= f.radio_button :eligible_immigration_status, true, class: "required floatlabel" %>
-        <%= f.label :eligible_immigration_status, :value => true do %>
-          <span>Yes</span>
-        <% end %>
+    <% if EnrollRegistry[:immigration_status_checkbox].enabled? %>
+      <div class="col-lg-4 col-md-4 col-sm-8 col-xs-6 form-group form-group-lg no-pd">
+        <div class="checkbox pl-2">
+          <%= f.check_box :eligible_immigration_status, {}, "true", "false" %>
+        </div>
       </div>
-    </div>
-    <div class="col-lg-3 col-md-3 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
-      <div class="radio skinned-form-controls skinned-form-controls-mac">
-        <%= f.radio_button :eligible_immigration_status, false, class: "required floatlabel" %>
-        <%= f.label :eligible_immigration_status, :value => false do %>
-          <span>No</span>
-        <% end %>
+    <% else %>
+      <div class="col-lg-3 col-md-3 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
+        <div class="radio skinned-form-controls skinned-form-controls-mac">
+          <%= f.radio_button :eligible_immigration_status, true, class: "required floatlabel" %>
+          <%= f.label :eligible_immigration_status, :value => true do %>
+            <span>Yes</span>
+          <% end %>
+        </div>
       </div>
-    </div>
+      <div class="col-lg-3 col-md-3 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
+        <div class="radio skinned-form-controls skinned-form-controls-mac">
+          <%= f.radio_button :eligible_immigration_status, false, class: "required floatlabel" %>
+          <%= f.label :eligible_immigration_status, :value => false do %>
+            <span>No</span>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
   </div>
 
   <% if f.object.is_a? Person %>

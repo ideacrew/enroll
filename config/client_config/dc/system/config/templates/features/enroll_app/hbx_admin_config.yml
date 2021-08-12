@@ -13,6 +13,8 @@ registry:
           is_enabled: true
         - key: :inbox_tab
           is_enabled: true
+        - key: :notices_tab
+          is_enabled: true
         - key: :calendar_tab
           is_enabled: true
         - key: :staff_tab
@@ -21,4 +23,3 @@ registry:
           is_enabled: true
         - key: :no_transition_families
           is_enabled: true
-        

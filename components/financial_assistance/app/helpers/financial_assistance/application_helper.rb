@@ -25,6 +25,24 @@ module FinancialAssistance
       end.include?(0)
     end
 
+    def csr_73_87_or_94_eligible_applicants?(application_id)
+      application = FinancialAssistance::Application.find(application_id)
+      full_names = application.applicants.select(&:is_csr_73_87_or_94?).map(&:full_name)
+      full_names.map{ |full_name| capitalize_full_name(full_name) }
+    end
+
+    def csr_100_eligible_applicants?(application_id)
+      application = FinancialAssistance::Application.find(application_id)
+      full_names = application.applicants.select(&:is_csr_100?).map(&:full_name)
+      full_names.map{ |full_name| capitalize_full_name(full_name) }
+    end
+
+    def csr_limited_eligible_applicants?(application_id)
+      application = FinancialAssistance::Application.find(application_id)
+      full_names = application.applicants.select(&:is_csr_limited?).map(&:full_name)
+      full_names.map{ |full_name| capitalize_full_name(full_name) }
+    end
+
     def applicant_age(applicant)
       now = Time.now.utc.to_date
       dob = applicant.dob
@@ -190,6 +208,46 @@ module FinancialAssistance
     def faa_relationship_options(dependent, _referer)
       relationships = FinancialAssistance::Relationship::RELATIONSHIPS_UI
       options_for_select(relationships.map{|r| [r.to_s.humanize, r.to_s] }, selected: dependent.relation_with_primary)
+    end
+
+    def applicant_currently_enrolled
+      if FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled).item
+        'Is this person currently enrolled in health coverage? *'
+      elsif FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled_with_hra).item
+        'Is this person currently enrolled in health coverage or getting help paying for health coverage through a Health Reimbursement Arrangement? *'
+      else
+        ''
+      end
+    end
+
+    def applicant_currently_enrolled_key
+      if FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled).item
+        'has_enrolled_health_coverage'
+      elsif FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled_with_hra).item
+        'has_enrolled_health_coverage_from_hra'
+      else
+        ''
+      end
+    end
+
+    def applicant_eligibly_enrolled
+      if FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible).item
+        'Does this person currently have access to other health coverage that they are not enrolled in, including coverage they could get through another person? *'
+      elsif FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible_with_hra).item
+        'Does this person currently have access to health coverage or a Health Reimbursement Arrangement that they are not enrolled in (including through another person, like a spouse or parent)? *'
+      else
+        ''
+      end
+    end
+
+    def applicant_eligibly_enrolled_key
+      if FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible).item
+        'has_eligible_health_coverage'
+      elsif FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible_with_hra).item
+        'has_eligible_health_coverage_from_hra'
+      else
+        ''
+      end
     end
 
     def show_naturalized_citizen_container(applicant)

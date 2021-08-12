@@ -33,8 +33,14 @@ module Operations
 
       describe 'given empty params' do
         let(:params) {{params: {}, user: user}}
-        let(:error_message) {{:model => ["is missing"], :model_id => ["is missing"], :relation => ["is missing"], :relation_id => ["is missing"]}}
-
+        let(:error_message) do
+          {
+            :model => ["is missing", "must be a string"],
+            :model_id => ["is missing", "must be a string"],
+            :relation => ["is missing", "must be a string"],
+            :relation_id => ["is missing", "must be a string"]
+          }
+        end
         it 'fails' do
           expect(subject).not_to be_success
           expect(subject.failure).to eq error_message
@@ -43,7 +49,14 @@ module Operations
 
       describe 'pass params with invalid type' do
         let(:params) {{params: {:model => 1234, :model_id => true, :relation => true, :relation_id => 1234}, user: user}}
-        let(:error_message) {{:model => ["must be a string"], :model_id => ["must be a string"], :relation => ["must be a string"], :relation_id => ["must be a string"]}}
+        let(:error_message) do
+          {
+            :model => ["must be a string"],
+            :model_id => ["must be a string"],
+            :relation => ["must be a string"],
+            :relation_id => ["must be a string"]
+          }
+        end
 
         it 'fails' do
           expect(subject).not_to be_success

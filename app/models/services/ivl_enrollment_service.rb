@@ -79,6 +79,8 @@ module Services
     end
 
     def send_enrollment_notice_for_ivl(new_date)
+      return [] unless EnrollRegistry[:legacy_enrollment_trigger].enabled?
+
       @logger.info '*' * 50
       @logger.info "Started send_enrollment_notice_for_ivl process at #{TimeKeeper.datetime_of_record}"
       families = enrollment_notice_for_ivl_families(new_date)
@@ -92,6 +94,10 @@ module Services
       end
       @logger.info "Ended send_enrollment_notice_for_ivl process at #{TimeKeeper.datetime_of_record}"
       families
+    end
+
+    def trigger_enrollment_notice(enrollment)
+      ::Operations::Notices::IvlEnrNoticeTrigger.new.call(enrollment: enrollment) unless Rails.env.test?
     end
 
     def send_reminder_notices_for_ivl(date)

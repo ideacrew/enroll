@@ -40,7 +40,7 @@ registry:
           - key: :domain_name
             item: "cme.enroll.openhbx.org"
           - key: :site_title
-            item: "Maine Cover ME"
+            item: "CoverME.gov"
           - key: :home_url
             item: "https://cme.enroll.openhbx.org/"
           - key: :home_business_url
@@ -66,11 +66,11 @@ registry:
           - key: :state_name
             item: "Maine"
           - key: :short_name
-            item: "Maine Cover ME"
+            item: "CoverME.gov"
           - key: :byline
             item: "Maine's Official Health Insurance Marketplace"
           - key: :long_name
-            item: "Maine Cover ME"
+            item: "CoverME.gov"
           - key: :header_message
             item: "Maine's Official Health Insurance Marketplace"
           - key: :byline
@@ -152,6 +152,14 @@ registry:
             item: 'mehl.producer@coverme.gov'
           - key: :privacy_policy
             item: ""
+          - key: :late_rates_message
+            item: "Due to a delay, premiums for some coverage effective dates are not available yet. Please check again soon to see if this information has been updated. You can also contact Customer Service or your broker if you need help."
+          - key: :faa_enabled
+            item: false
+          - key: :county_fips_code_enabled
+            item: true
+          - key: :ivl_responsibility_url
+            item: "https://dchealthlink.com/individual-responsibility-requirement"
           - key: :curam_enabled?
             item: true
           - key: :support_for_ie_browser
@@ -169,7 +177,7 @@ registry:
           - key: :statewide_area
             item: "Maine"
           - key: :exchange_name
-            item: "Cover ME Health Benefit Exchange"
+            item: "CoverME.gov Health Benefit Exchange"
           - key: :social_media
             item: ''
           - key: :state_long_title
@@ -193,7 +201,7 @@ registry:
           - key: :health_benefit_exchange_authority_phone_number
             item: "1-800-965-7476"
           - key: :contact_center_name
-            item: "Cover ME's Customer Care Center"
+            item: "CoverME.gov's Customer Care Center"
           - key: :contact_center_short_number
             item: "(855) 532-5465"
           - key: :contact_center_tty_number # Need to figure out what this should be for Maine
@@ -217,21 +225,21 @@ registry:
           - key: :site_broker_attestation_link
             item: ""
           - key: :rating_areas
-            item: "single"
+            item: "county"
           - key: :favicon_tab_icon
             item: 'image/vnd.microsoft.icon'
           - key: :eligibile_immigration_statuses_url
             item: ""
-          - key: :assistance_estimate_url
-            item: ''
           - key: :header_logo
             item: "logo_me.svg"
           - key: :eligibile_immigration_statuses_url
             item: ""
-          - key: :assistance_estimate_url
-            item: ""
           - key: :geographic_rating_area_model
             item: "county"
+          - key: :assistance_estimate_url
+            item: "https://dc.checkbookhealth.org/hie/dc/2021/index.cfm?page"
+          - key: :benchmark_product_model
+            item: :health_only
           - key: :dental_plan_years_available
             item: [""]
           - key: :sole_source_carriers_available
@@ -242,8 +250,16 @@ registry:
             item: ['']
           - key: :plan_year_tooltip
             item: ""
+          - key: :sep_moved_out_zip_compare
+            item: true
+          - key: :send_rating_area_for_ivl_policy_to_edi
+            item: true
+          - key: :medicaid_agency_phone
+            item: "(855) 797-4357"
+          - key: :verifiable_immigration_statuses
+            item: true
       - key: :data_seeds_ui
-        item: :data_seed_ui
+        item: :data_seeds_ui
         is_enabled: true
       - key: :rating_area
         item: :rating_area
@@ -256,7 +272,7 @@ registry:
         is_enabled: true
         settings:
           - key: :service_area_model
-            item: 'single'
+            item: 'county'
       - key: :site_database_seed
         item: :site_database_seed
         is_enabled: true
@@ -288,7 +304,7 @@ registry:
       - key: :special_cover_header
         item: :special_cover_header
         is_enabled: true
-        settings: 
+        settings:
           - key: :filename
             item: "CoverME_WebsiteHeader_01.jpg"
       - key: :tobacco_cost
@@ -348,7 +364,21 @@ registry:
       - key: :dental_market
         is_enabled: true
       - key: :general_agency
+        is_enabled: true
+      - key: :display_county
+        is_enabled: true
+      - key: :moving_to_state
         is_enabled: false
+      - key: :living_outside_state
+        is_enabled: false
+      - key: :validate_quadrant
+        item: :validate_quadrant
+        is_enabled: false
+        settings:
+          - key: :exclusions
+            item: []
+          - key: :inclusions
+            item: ["ME"]
       - key: :qle_within_sixty_days
         item: :qle_within_sixty_days
         is_enabled: true
@@ -356,4 +386,14 @@ registry:
           - key: :days
             item: 60
       - key: :checkbook_integration
+        is_enabled: true
+      - key: :immigration_status_checkbox
+        is_enabled: true
+      - key: :gender_to_sex
+        is_enabled: true
+      - key: :mainecare_cubcare_glossary
+        is_enabled: true
+      - key: :legacy_enrollment_trigger
+        is_enabled: false
+      - key: :verification_type_income_verification
         is_enabled: true
