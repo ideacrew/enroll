@@ -393,13 +393,14 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       let(:active_year)               {TimeKeeper.date_of_record.year}
 
       before :each do
+        EnrollRegistry[:location_residency_verification_type].feature.stub(:is_enabled).and_return(true)
         allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
         allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(benefit_coverage_period)
       end
 
       it "should check for outstanding members" do
         person.consumer_role.update_attribute("aasm_state","verification_outstanding")
-        person.consumer_role.verification_types[2].update_attribute("validation_status","verification_outstanding")
+        person.consumer_role.verification_types.last.update_attribute("validation_status","verification_outstanding")
         hbx_enrollment.reload
         expect(hbx_enrollment.is_any_member_outstanding?).to be_truthy
       end

@@ -26,6 +26,7 @@ describe Subscribers::SsaVerification do
 
     before :each do
       consumer_role.aasm_state="ssa_pending"
+      EnrollRegistry[:location_residency_verification_type].feature.stub(:is_enabled).and_return(true)
     end
 
     context "stores SSA response in verification history" do
