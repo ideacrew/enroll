@@ -40,12 +40,6 @@ module FinancialAssistance
               FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application)
             end
 
-            def update_application(application, payload_value)
-              application.assign_attributes({ eligibility_request_payload: payload_value.to_h.to_json })
-              return Success(application) if application.save
-              Failure("Unable to update application(hbx_id: #{application.hbx_id}) with eligibility_request_payload")
-            end
-
             def validate_payload(payload)
               AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(payload)
             end
