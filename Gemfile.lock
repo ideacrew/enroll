@@ -7,10 +7,10 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: b5a48249c9fbcbb580f748ce32342893fef68475
+  revision: 951fd32c259b9524c9597ef0a4c7b01f35c1e9ba
   branch: atp_cv_transform_v3
   specs:
-    aca_entities (0.3.0)
+    aca_entities (0.4.0)
       deep_merge
       dry-monads (~> 1.2)
       dry-struct (~> 1.0)
