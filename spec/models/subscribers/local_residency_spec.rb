@@ -22,7 +22,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       let(:payload) { {:individual_id => individual_id, :body => xml} }
 
       before :each do
-         EnrollRegistry[:location_residency_verification_type].feature.stub(:is_enabled).and_return(true)
+        EnrollRegistry[:location_residency_verification_type].feature.stub(:is_enabled).and_return(true)
       end
 
       context 'stores Local Hub response in verification history' do
