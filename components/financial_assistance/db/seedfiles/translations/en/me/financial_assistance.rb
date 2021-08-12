@@ -122,7 +122,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.full_long_name_determination" => "Based on the information you provided, no one on this application is likely to qualify for %{program_short_name}. Do you still want us to send your application to the %{program_long_name} so they can check on %{program_short_name} eligibility?",
   "en.faa.send_to_external_verification" => "Send to OFI",
   "en.faa.filing_as_head_of_household" => "Will this person be filing as head of household?",
-  "en.faa.eligibility_go_to_my_account_message" => "If you’re already enrolled in CoverME.gov Individual & Family plan, you’re finished! To see your plan information, select GO TO MY ACCOUNT."
+  "en.faa.eligibility_go_to_my_account_message" => "If you’re already enrolled in CoverME.gov Individual & Family plan, you’re finished! To see your plan information, select GO TO MY ACCOUNT.",
   # Year Selection page
   "en.faa.year_selection_header" => "You’re About to Sign Up for a New Plan Year",
   "en.faa.year_selection_subheader" => "Select CONTINUE to start a new application for lower premiums or Medicaid.",
