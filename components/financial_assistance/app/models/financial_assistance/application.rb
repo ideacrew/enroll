@@ -739,6 +739,7 @@ module FinancialAssistance
 
     def calculate_total_net_income_for_applicants
       active_applicants.each do |applicant|
+        next applicant if applicant.net_annual_income.present?
         FinancialAssistance::Operations::Applicant::CalculateAndPersistNetAnnualIncome.new.call({application_assistance_year: assistance_year, applicant: applicant})
       end
     end
@@ -1015,6 +1016,7 @@ module FinancialAssistance
 
     def set_submit
       return unless submitted?
+      calculate_total_net_income_for_applicants
       set_submission_date
       set_assistance_year
       set_effective_date

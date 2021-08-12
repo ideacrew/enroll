@@ -1082,4 +1082,47 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       end
     end
   end
+
+  describe 'calculate_total_net_income_for_applicants' do
+    before do
+      application.applicants.first.update_attributes!(is_primary_applicant: true, net_annual_income: nil)
+      primary_appli = application.primary_applicant
+      primary_appli.incomes << FinancialAssistance::Income.new(
+        { title: 'Financial Income',
+          kind: 'net_self_employment',
+          amount: 500.00,
+          start_on: Date.new(application.assistance_year || TimeKeeper.date_of_record.year.pred),
+          frequency_kind: 'yearly' }
+      )
+      primary_appli.save!
+      application.ensure_relationship_with_primary(applicant2, 'spouse')
+      application.ensure_relationship_with_primary(applicant3, 'child')
+      application.update_or_build_relationship(applicant2, applicant3, 'parent')
+      application.update_or_build_relationship(applicant3, applicant2, 'child')
+      application.save!
+    end
+
+    context 'with existing value for net_annual_income' do
+      before do
+        application.primary_applicant.update_attributes!(net_annual_income: 1000.00)
+        application.update_attributes!({ aasm_state: 'draft' })
+        application.submit!
+      end
+
+      it 'should not set value for net_annual_income again as there is existing value' do
+        expect(application.primary_applicant.reload.net_annual_income.to_f).to eq(1000.00)
+      end
+    end
+
+    context 'without existing value for net_annual_income' do
+      before do
+        application.update_attributes!({ aasm_state: 'draft' })
+        application.submit!
+      end
+
+      it 'should set value for net_annual_income as it is nil' do
+        expect(application.primary_applicant.reload.net_annual_income.to_f).to eq(500.00)
+      end
+    end
+  end
 end

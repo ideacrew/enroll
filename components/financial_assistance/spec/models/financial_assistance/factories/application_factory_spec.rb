@@ -92,10 +92,35 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model 
           expect(@duplicate_application.assistance_year).to be_nil
         end
       end
+
+      context 'for predecessor_id' do
+        let(:predecessor_application) do
+          FactoryBot.create(:application,
+                            family_id: application.family_id,
+                            aasm_state: "determined",
+                            effective_date: TimeKeeper.date_of_record)
+        end
+
+        let(:mocked_params) { { predecessor_id: predecessor_application.id } }
+
+        before do
+          application.update_attributes!(mocked_params)
+          factory = described_class.new(application)
+          @duplicate_application = factory.duplicate
+        end
+
+        it 'should not copy predecessor_id' do
+          expect(@duplicate_application.predecessor_id).to be_nil
+        end
+      end
     end
 
     context 'for applicant' do
-      context 'for determination_http_status_code, has_eligibility_response, eligibility_response_payload & eligibility_request_payload' do
+      context 'for medicaid_household_size, magi_medicaid_category, magi_as_percentage_of_fpl,
+               magi_medicaid_monthly_income_limit, magi_medicaid_monthly_household_income,
+               is_without_assistance, is_ia_eligible, is_medicaid_chip_eligible,
+               is_totally_ineligible, is_eligible_for_non_magi_reasons, is_non_magi_medicaid_eligible,
+               csr_percent_as_integer & csr_eligibility_kind' do
         let(:mocked_params) do
           { medicaid_household_size: 1,
             magi_medicaid_category: 'residency',
@@ -169,6 +194,21 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model 
 
         it 'should not copy csr_eligibility_kind' do
           expect(@duplicate_applicant.csr_eligibility_kind).not_to eq(mocked_params[:csr_eligibility_kind])
+        end
+      end
+
+      context 'for net_annual_income' do
+        let(:mocked_params) { { net_annual_income: 10_012.00 } }
+
+        before do
+          applicant.update_attributes!(mocked_params)
+          factory = described_class.new(application)
+          duplicate_application = factory.duplicate
+          @duplicate_applicant = duplicate_application.applicants.first
+        end
+
+        it 'should not copy net_annual_income' do
+          expect(@duplicate_applicant.net_annual_income).to be_nil
         end
       end
     end
