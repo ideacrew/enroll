@@ -885,7 +885,7 @@ module FinancialAssistance
         validations << (deduction[:amount].present? && deduction[:frequency_kind].present? && deduction[:start_on].present?)
       end
       !validations.include?(false)
-    end   
+    end
 
     def dependent_coverage_questions
       return false if has_dependent_with_coverage.nil?
