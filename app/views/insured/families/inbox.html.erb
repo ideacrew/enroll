@@ -11,13 +11,12 @@
   </div>
   <%= render 'inbox', provider: @person %>
 </div>
-<% unless individual_market_is_enabled? %>
-<br/>
-<br/>
+<% if individual_market_is_enabled? && medicaid_tax_credits_link_is_enabled? %>
+  &nbsp;
+    <div>
+      <%= render partial: "navigate_to_curam_for_documents", :locals => {display_text: "If you applied for Medicaid and tax credit savings, view additional messages"} %>
+    </div>
 <% else %>
-&nbsp;
-
-<div>
-  <%= render partial: "navigate_to_curam_for_documents", :locals => {display_text: "If you applied for Medicaid and tax credit savings, view additional messages"} %>
-</div>
+  <br/>
+  <br/>
 <% end %>

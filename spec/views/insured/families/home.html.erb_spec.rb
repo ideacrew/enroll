@@ -34,6 +34,7 @@ RSpec.describe "insured/families/home.html.erb" do
     allow(view).to receive(:current_user).and_return(user_with_employer_role)
     allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", can_view_entire_family_enrollment_history?: true))
     assign(:family, family)
+    EnrollRegistry[:medicaid_tax_credits_link].feature.stub(:is_enabled).and_return(true)
   end
 
   it "should display the title" do

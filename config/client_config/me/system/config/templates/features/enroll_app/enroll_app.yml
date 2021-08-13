@@ -40,7 +40,7 @@ registry:
           - key: :domain_name
             item: "cme.enroll.openhbx.org"
           - key: :site_title
-            item: "Maine Cover ME"
+            item: "CoverME.gov"
           - key: :home_url
             item: "https://cme.enroll.openhbx.org/"
           - key: :home_business_url
@@ -66,11 +66,11 @@ registry:
           - key: :state_name
             item: "Maine"
           - key: :short_name
-            item: "Maine Cover ME"
+            item: "CoverME.gov"
           - key: :byline
             item: "Maine's Official Health Insurance Marketplace"
           - key: :long_name
-            item: "Maine Cover ME"
+            item: "CoverME.gov"
           - key: :header_message
             item: "Maine's Official Health Insurance Marketplace"
           - key: :byline
@@ -177,7 +177,7 @@ registry:
           - key: :statewide_area
             item: "Maine"
           - key: :exchange_name
-            item: "Cover ME Health Benefit Exchange"
+            item: "CoverME.gov Health Benefit Exchange"
           - key: :social_media
             item: ''
           - key: :state_long_title
@@ -201,7 +201,7 @@ registry:
           - key: :health_benefit_exchange_authority_phone_number
             item: "1-800-965-7476"
           - key: :contact_center_name
-            item: "Cover ME's Customer Care Center"
+            item: "CoverME.gov's Customer Care Center"
           - key: :contact_center_short_number
             item: "(855) 532-5465"
           - key: :contact_center_tty_number # Need to figure out what this should be for Maine
@@ -395,3 +395,9 @@ registry:
         is_enabled: false
       - key: :verification_type_income_verification
         is_enabled: true
+      - key: :show_download_tax_documents
+        item: :show_download_tax_documents
+        is_enabled: false
+      - key: :show_upload_notices
+        item: :show_upload_notices
+        is_enabled: false
