@@ -111,7 +111,7 @@
           </div>
         </div>
         <%# The "Go Back To My Account" text box will NOT display if all applicants are determined medicaid eligible. It will appear for any other combination of applicant determinations. %>
-        <% unless @application.applicants.all? { |applicant| applicant.is_medicaid_chip_eligible? }  %>
+        <% unless eligible_applicants(params[:id], :is_medicaid_chip_eligible).length == @application.active_applicants.length }  %>
           <div class="border-bottom-1px"></div>
           <div class="er-medicaid mt-20">
             <div class="er-medicaid-prsn">
