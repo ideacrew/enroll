@@ -267,7 +267,7 @@ And(/^creates a consumer with SEP$/) do
   FactoryBot.create(:qualifying_life_event_kind, :effective_on_event_date_and_first_month, market_kind: "individual")
 end
 
-Then(/consumer should the the First Payment button/) do
+Then(/^\w+ should the the First Payment button/) do
   expect(page).to have_content('Make a first Payment')
 end
 
@@ -295,4 +295,36 @@ end
 
 And(/the make payments glossary tooltip should be present/) do
   expect(find(IvlHomepage.make_payments_btn_glossary)).to be_truthy
+end
+
+And(/the person lands on home page/) do
+  visit "families/home"
+end
+
+And(/^\w+ tries to purchase with a break in coverage$/) do
+  person = Person.where(first_name: /John/i, last_name: /Smith/i).to_a.first
+  enrollment = person.primary_family.hbx_enrollments.first
+  enrollment&.update_attributes(aasm_state: "coverage_terminated", terminated_on: (TimeKeeper.date_of_record + 10.day))
+  sleep 3
+  visit 'families/home'
+end
+
+When(/^the consumer select a future qle date$/) do
+  expect(page).to have_content "Had a baby"
+  # screenshot("past_qle_date")
+  fill_in IvlSpecialEnrollmentPeriod.qle_date, :with => (TimeKeeper.date_of_record).strftime("%m/%d/%Y")
+  click_link(TimeKeeper.date_of_record.day)
+  within '#qle-date-chose' do
+    find(IvlSpecialEnrollmentPeriod.continue_qle_btn).click
+  end
+  find("[name='effective_on_kind'] option[value='date_of_event']").select_option
+  find(IvlSpecialEnrollmentPeriod.effective_date_continue_btn).click
+end
+
+And(/^the person click on qle continue$/) do
+  fill_in IvlSpecialEnrollmentPeriod.qle_date, :with => (TimeKeeper.date_of_record).strftime("%m/%d/%Y")
+  within '#qle-date-chose' do
+    find(IvlSpecialEnrollmentPeriod.continue_qle_btn).click
+  end
+  find(IvlSpecialEnrollmentPeriod.effective_date_continue_btn).click
 end
