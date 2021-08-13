@@ -1,4 +1,8 @@
+
 Feature: Customers go to Curam to view notices and verifications
+
+  Background: Set up features
+    And EnrollRegistry medicaid_tax_credits_link feature is enabled
 
   Scenario: Consumer can see the Navigation Button
     Given a consumer exists

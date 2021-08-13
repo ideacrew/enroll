@@ -5,6 +5,9 @@ Feature: Consumer requests enrollment in CoverAll
   be enrolled in CoverAll. The HBX admin can then enter their information and
   process their application through the families index page.
 
+  Background: Enables features
+    Given EnrollRegistry no_transition_families feature is enabled
+
   @flaky
   Scenario: When we login as Hbx admin with read and write permissions then on family tab we should see link DC Resident Application
     Given a Hbx admin with super admin access exists
