@@ -537,8 +537,10 @@ registry:
         item: :in_person_application_enabled
         is_enabled: false
       - key: :contact_email_header_footer_feature
+        item: :contact_email_header_footer_feature
         is_enabled: false
       - key: :contact_customer_service_representative
+        item: :contact_customer_service_representative
         is_enabled: false  
 
 
