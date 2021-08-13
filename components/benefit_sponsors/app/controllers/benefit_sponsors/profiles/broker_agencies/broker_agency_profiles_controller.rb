@@ -62,6 +62,10 @@ module BenefitSponsors
                    else
                      @staff.where(last_name: /^#{Regexp.escape(@q)}/i)
                    end
+
+          respond_to do |format|
+            format.html
+          end
         end
 
         # TODO: need to refactor for cases around SHOP broker agencies
