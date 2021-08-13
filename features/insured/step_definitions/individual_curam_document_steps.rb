@@ -24,7 +24,7 @@ When(/^the user clicks on the MEDICAID & TAX CREDITS button$/) do
 end
 
 Then(/^EA sets a flag in IAM to direct the consumer to the curam\/ drupal login$/) do
-  expect(page).to have_content(EnrollRegistry[:enroll_app].setting(:contact_center_email_address).item)
+  expect(page).to have_content(EnrollRegistry[:enroll_app].setting(:mail_address).item)
 end
 
 When(/^selects a Person account and navigates to Verification page$/) do
