@@ -4,7 +4,8 @@
       <div class="eligibility-results">
         <h1 class="darkblue"><%= l10n("faa.eligibility_results") %></h1>
         <p><b><%= l10n("faa.we_have_your_results") %>!</b></p>
-
+        
+        <!-- This appears if at least some (not necessarily all) applicants are medicaid eligible -->
         <%if eligible_applicants(params[:id], :is_medicaid_chip_eligible).present?%>
           <div class="er-medicaid mt-20">
             <div class="er-title">
@@ -39,8 +40,10 @@
             </div>
           </div>
         <% end %>
+        <!-- Meidcaid eligible ends here -->
       </div>
-
+      
+      <!-- Appears if any are ia eligible -->
       <%if eligible_applicants(params[:id], :is_ia_eligible).present?%>
         <div class="er-phi mt-20">
           <div class="er-title">
@@ -110,41 +113,44 @@
 
           </div>
         </div>
-        <%# The "Go Back To My Account" text box will NOT display if all applicants are determined medicaid eligible. It will appear for any other combination of applicant determinations. %>
-        <% unless eligible_applicants(params[:id], :is_medicaid_chip_eligible).length == @application.active_applicants.length  %>
-          <div class="border-bottom-1px"></div>
-          <div class="er-medicaid mt-20">
-            <div class="er-medicaid-prsn">
-              <%= l10n("faa.eligibility_go_to_my_account_message") %>    
-              <div class='row'>
-                <div class="col-md-8">
-                </div>
-                <div class='col-md-4'>
-                  <%= link_to 'GO TO MY ACCOUNT', main_app.family_account_path, class: 'btn btn-small btn-primary', id: 'btn-continue', style: 'width: 100%;' %>
-                </div>
-              </div>
-            </div>
-          </div>
-        <% end %>
-          <div class="er-medicaid mt-20">
-            <div class="border-bottom-1px"></div>
-            <div class="er-success bg-success">
-              <div><i class="fa fa-info-circle fa-lg text-success" aria-hidden="true"></i></div>
-              <div class="text-success">
-                <%# If all members are MAGI Medicaid eligible, show next_step_medicaid_eligible. If one applicant is
-                    determined something other than the medicaid, default to next_step_medicaid_eligible_at_least_one_other_eligible %>
-                <% if eligible_applicants(params[:id], :is_medicaid_chip_eligible).present? %>
-                  <span>
-                    <%= l10n("faa.next_step_medicaid_eligible") %>
-                  </span>
-                <% else %>
-                  <span><%= l10n("faa.next_step_medicaid_eligible_at_least_one_other_eligible") %></span>
-                <% end %>
-              </div>
-            </div>
-          </div>
       <% end %>
-
+      <!-- End ia eligible stuff -->
+      <%# The "Go Back To My Account" text box will NOT display if all applicants are determined medicaid eligible. It will appear for any other combination of applicant determinations. %>
+      <% unless eligible_applicants(params[:id], :is_medicaid_chip_eligible).length == @application.active_applicants.length  %>
+        <div class="border-bottom-1px"></div>
+        <div class="er-medicaid mt-20">
+          <div class="er-medicaid-prsn">
+            <%= l10n("faa.eligibility_go_to_my_account_message") %>    
+            <div class='row'>
+              <div class="col-md-8">
+              </div>
+              <div class='col-md-4'>
+                <%= link_to 'GO TO MY ACCOUNT', main_app.family_account_path, class: 'btn btn-small btn-primary', id: 'btn-continue', style: 'width: 100%;' %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+      <!-- Green next step box -->
+      <div class="er-medicaid mt-20">
+        <div class="border-bottom-1px"></div>
+        <div class="er-success bg-success">
+          <div><i class="fa fa-info-circle fa-lg text-success" aria-hidden="true"></i></div>
+          <div class="text-success">
+            <%# If all members are MAGI Medicaid eligible, show next_step_medicaid_eligible. If one applicant is
+                determined something other than the medicaid, default to next_step_medicaid_eligible_at_least_one_other_eligible %>
+            <% if eligible_applicants(params[:id], :is_medicaid_chip_eligible).length == @application.active_applicants.length  %>
+              <span>
+                <%= l10n("faa.next_step_medicaid_eligible") %>
+              </span>
+            <% else %>
+              <span><%= l10n("faa.next_step_medicaid_eligible_at_least_one_other_eligible") %></span>
+            <% end %>
+          </div>
+        </div>
+      </div>
+      <!-- End Green next step box -->
+      <!-- Totally ineligible -->
       <%if eligible_applicants(params[:id], :is_totally_ineligible).present?%>
         <div class="er-notqualify mt-20">
           <div class="er-title">
@@ -164,6 +170,7 @@
           </div>
         </div>
       <%end%>
+      <!-- End totally ineligible -->
 
       <%if eligible_applicants(params[:id], :is_without_assistance).present?%>
         <div class="er-notqualify mt-20">
