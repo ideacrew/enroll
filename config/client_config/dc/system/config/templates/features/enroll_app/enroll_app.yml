@@ -514,6 +514,10 @@ registry:
         is_enabled: true
       - key: :show_upload_notices
         item: :show_upload_notices
+        is_enabled: true
+      - key: :contact_email_header_footer_feature
+        item: :contact_email_header_footer_feature
+        is_enabled: true
       - key: :contact_customer_service_representative
         item: :contact_customer_service_representative
         is_enabled: true
