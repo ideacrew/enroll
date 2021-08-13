@@ -1,4 +1,5 @@
 GLOSSARY_TRANSLATIONS = {
+<<<<<<< HEAD
     "en.glossary.aca" => "The acronym for the Affordable Care Act.",
     "en.glossary.accredidation" => "All health plans available through Maine Cover ME have been reviewed by an independent, third-party organization to validate (accredit) that the plans meet quality standards required by the Affordable Care Act and Maine.",
     "en.glossary.actuarial_value" => "A measurement of the average amount each plan will pay for all people enrolled in a plan (not just you) towards out-of-pocket costs for covered services. Since it\u2019s an average for all people, your out-of-pocket costs could be higher or lower depending on your health care usage; how other costs like your premium, deductible, copayments, coinsurance and out-of-pocket limit are structured in your plan; and other terms of your insurance policy. Bronze means the plan is expected to pay 60 percent of in-network expenses for an average population of consumers, Silver 70 percent, Gold 80 percent and Platinum 90 percent.",
@@ -264,4 +265,8 @@ GLOSSARY_TRANSLATIONS = {
     "en.glossary.Zero_Cost_Sharing_Plan" => "Federally recognized Tribes and Alaska Native Claims Settlement Act (ANCSA) Corporation shareholders whose income is at or below 300 percent of the Federal poverty level are eligible for a zero cost sharing plan. With this plan, there are no copayments, deductibles or coinsurance when care is received from Indian health care providers, which include health programs operated by the Indian Health Service, tribes and tribal organizations, and urban Indian organizations. This is also true when receiving essential health benefits through a Maine Cover ME plan, and you won't need a referral from an Indian health care provider to receive these benefits. Zero cost sharing is available for any metal level plan.",
     "en.glossary.mainecare" => "maincare",
     "en.glossary.cubcare" => "cubcare"
-}
+    # Pay Now Glossary
+    "en.glossary.make_a_first_payment" => "This payment will confirm your enrollment and allow you to begin your coverage. Please note it typically takes up to 3-5 business days after you sign up, for you to be able to make a first payment.",
+    "en.glossary.make_changes_to_coverage" => "Make changes to my plan.",
+    "en.glossary.view_coverage_details" => "Learn more about what my plan covers.",
+    "en.glossary.make_payments_for_my_plan" => "If you have already made your first premium payment for your plan, and are looking to make your monthly premium payment, you may log into your payment account here."
