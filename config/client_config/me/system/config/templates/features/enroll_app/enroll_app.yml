@@ -100,7 +100,7 @@ registry:
           - key: :sign_in_routes
             item: ["/families/home"]
           - key: :shop_find_your_doctor_url
-            item: ""
+            item: "https://staging.checkbookhealth.org/me/"
           - key: :document_verification_checklist_url
             item: ""
           - key: :terms_and_conditions_url

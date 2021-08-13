@@ -53,7 +53,7 @@
         .modal-footer style="padding:10px"
           center
             button.btn.btn-default.btn-default data-dismiss="modal" type="button"  Cancel
-            = link_to l10n("confirm") , 'https://dc.checkbookhealth.org/dc/', class: "btn btn-primary  mtz", target: '_blank'
+            = link_to l10n("confirm"), EnrollRegistry[:enroll_app].setting(:shop_find_your_doctor_url).item, class: "btn btn-primary  mtz", target: '_blank'
 
   #plan_match_doctor_shop.modal.fade role="document" tabindex="-1"
     .modal-dialog
