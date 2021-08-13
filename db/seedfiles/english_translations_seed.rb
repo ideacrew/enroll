@@ -29,6 +29,13 @@ if EnrollRegistry.feature_enabled?(:financial_assistance)
     translation_record_key = "en.faa.income.#{symbolized_key}"
     fa_translation_hash[translation_record_key] = humanized_value
   end
+
+  deduction_kinds = ::FinancialAssistance::Deduction::DEDUCTION_TYPE
+  deduction_kinds.each do |symbolized_key, humanized_value|
+    translation_record_key = "en.faa.income.#{symbolized_key}"
+    fa_translation_hash[translation_record_key] = humanized_value
+  end
+
   translations_to_seed << fa_translation_hash
 end
 
