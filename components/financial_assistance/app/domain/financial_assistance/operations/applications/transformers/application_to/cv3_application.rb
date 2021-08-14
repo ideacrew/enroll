@@ -119,7 +119,9 @@ module FinancialAssistance
                 prior_insurance_benefit = prior_insurance(applicant)
                 result << {name: name(applicant),
                            identifying_information: {has_ssn: applicant.no_ssn,
-                                                     encrypted_ssn: applicant.encrypted_ssn},
+                                                     encrypted_ssn: applicant.encrypted_ssn,
+                                                     ssn: applicant.ssn
+                                                    },
                            demographic: demographic(applicant),
                            attestation: attestation(applicant),
                            is_primary_applicant: applicant.is_primary_applicant.present?,
