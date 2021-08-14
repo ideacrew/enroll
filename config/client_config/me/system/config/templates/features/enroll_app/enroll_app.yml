@@ -364,7 +364,7 @@ registry:
       - key: :dental_market
         is_enabled: true
       - key: :general_agency
-        is_enabled: true
+        is_enabled: false
       - key: :display_county
         is_enabled: true
       - key: :moving_to_state
