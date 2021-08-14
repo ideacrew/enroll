@@ -42,7 +42,7 @@ module Services
             if @result.parsed_response.is_a?(String)
               JSON.parse(@result.parsed_response)["URL"]
             else
-              @result.parsed_response["URL"]
+              @result.parsed_response["URL"] || @result.parsed_response["url"]
             end
           if uri.present?
             return uri
@@ -189,7 +189,7 @@ module Services
             "age": person.age_on(@hbx_enrollment.effective_on),
             "pregnant": false,
             "AIAN": get_tribal_details(person),
-            "smoker": member.tobacco_use,
+            "smoker": member.tobacco_use == 'Y',
             "relationship": member.primary_relationship
           }
         end
