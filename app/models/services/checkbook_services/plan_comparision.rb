@@ -182,18 +182,24 @@ module Services
 
       def consumer_build_family
         family = []
-        today = @hbx_enrollment.effective_on
-        if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
-          person = @hbx_enrollment.consumer_role.person
-          _tribal_details = person.tribal_state.present? && person.tribal_name.present?
-        else
-          _tribal_details = @hbx_enrollment.consumer_role.person.tribal_id.present?
-        end
         @hbx_enrollment.hbx_enrollment_members.each do |member|
-          age = member.family_member.person.age_on(today)
-          family << {"age": age, "pregnant": false, "AIAN": tribal_id, "smoker": member.tobacco_use, "relationship": member.primary_relationship}
+          person = member.person
+
+          family << {
+            "age": person.age_on(@hbx_enrollment.effective_on),
+            "pregnant": false,
+            "AIAN": get_tribal_details(person),
+            "smoker": member.tobacco_use,
+            "relationship": member.primary_relationship
+          }
         end
         family
+      end
+
+      def get_tribal_details(person)
+        return person.tribal_id.present? unless EnrollRegistry[:indian_alaskan_tribe_details].enabled?
+
+        person.tribal_state.present? && person.tribal_name.present?
       end
 
       def build_congress_employee_age
