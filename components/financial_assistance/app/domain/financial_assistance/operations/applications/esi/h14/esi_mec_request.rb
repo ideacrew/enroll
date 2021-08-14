@@ -21,7 +21,7 @@ module FinancialAssistance
               application    = yield find_application(application_id)
               payload_param  = yield construct_payload(application)
               payload_value  = yield validate_payload(payload_param)
-              payload        = yield publish(payload_value)
+              payload        = yield publish(payload_value, application_id)
 
               Success(payload)
             end
@@ -44,8 +44,8 @@ module FinancialAssistance
               AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(payload)
             end
 
-            def publish(payload)
-              FinancialAssistance::Operations::Applications::Esi::H14::PublishEsiMecRequest.new.call(payload.to_h)
+            def publish(payload, application_id)
+              FinancialAssistance::Operations::Applications::Esi::H14::PublishEsiMecRequest.new.call(payload, application_id)
             end
           end
         end

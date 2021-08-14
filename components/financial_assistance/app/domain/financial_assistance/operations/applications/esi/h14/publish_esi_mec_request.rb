@@ -13,7 +13,7 @@ module FinancialAssistance
             send(:include, Dry::Monads[:result, :do, :try])
             include EventSource::Command
 
-            def call(payload)
+            def call(payload, application_id)
               event = yield build_event(payload)
               result = yield publish(event)
 
@@ -22,8 +22,8 @@ module FinancialAssistance
 
             private
 
-            def build_event(payload)
-              event('events.iap.esi.h14.determine_esi_mec_eligibility', attributes: payload)
+            def build_event(payload, application_id)
+              event('events.fdsh.esi.h14.determine_esi_mec_eligibility', attributes: payload.to_h, headers: { correlation_id: application_id })
             end
 
             def publish(event)
