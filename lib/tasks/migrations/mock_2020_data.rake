@@ -1,151 +1,178 @@
-# these rake tasks should only be run for mocking 2020 data, these should not be run for anything else.
+# frozen_string_literal: true
+
+# these rake tasks should only be run for mocking data, these should not be run for anything else.
 
 namespace :new_model do
 
+
   desc "new model mock data rake tasks"
-  task :mock_data => :environment do
-    puts "game started" unless Rails.env.test?
-    Rake::Task['new_model:rating_areas'].invoke
-    Rake::Task['new_model:service_areas'].invoke
+  task :reset_data, [:year] => :environment do |_t, args|
 
-    puts "loading 2020 plans" unless Rails.env.test?
-    Rake::Task['xml:plans'].invoke
+    mock_year = args[:year].present? ? args[:year].to_i : 2022
+    puts "Reset for #{mock_year} started" unless Rails.env.test?
 
-    Rake::Task['new_model:rating_factors'].invoke
-    Rake::Task['new_model:plan_cross_walk'].invoke
+    puts "Reseting service areas for #{mock_year}" unless Rails.env.test?
+    ::BenefitMarkets::Locations::ServiceArea.where(active_year: mock_year).delete_all
+    puts "Reseting rating areas for #{mock_year}" unless Rails.env.test?
+    ::BenefitMarkets::Locations::RatingArea.where(active_year: mock_year).delete_all
+    puts "Reseting ParticipationRateActuarialFactor for #{mock_year}" unless Rails.env.test?
+    ::BenefitMarkets::Products::ActuarialFactors::ParticipationRateActuarialFactor.where(active_year: mock_year).delete_all
+    puts "Reseting GroupSizeActuarialFactor for #{mock_year}" unless Rails.env.test?
+    ::BenefitMarkets::Products::ActuarialFactors::GroupSizeActuarialFactor.where(active_year: mock_year).delete_all
 
-    puts "updating provider/rx formulary urls, marking standard and network info " unless Rails.env.test?
-    Rake::Task['import:common_data_from_master_xml'].invoke
+    puts "Reseting Products for #{mock_year}" unless Rails.env.test?
+    ::BenefitMarkets::Products::Product.by_year(mock_year).delete_all
 
-    puts "loading 2020 rates" unless Rails.env.test?
-    Rake::Task['xml:rates'].invoke
+    puts "Reseting IVL Benefit coverage Period for #{mock_year}" unless Rails.env.test?
+    HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.select { |bcp| bcp.start_on.year == mock_year }&.first&.delete
 
-    puts "loading 2020 benefit market catalog" unless Rails.env.test?
-    Rake::Task['load:dc_benefit_market_catalog'].invoke
+    [:aca_shop, :fehb].each do |kind|
+      puts "Reseting #{kind} benefit_market_catalog for Period #{mock_year}" unless Rails.env.test?
+      BenefitMarkets::BenefitMarket.where(:site_urn => Settings.site.key, kind: kind)
+                                   .first
+                                   .benefit_market_catalogs
+                                   .select { |a| a.application_period.first.year.to_s == mock_year.to_s }
+                                   &.first&.delete
+    end
 
-    puts "loading 2020 ivl benefit pacakges" unless Rails.env.test?
-    Rake::Task['import:create_2020_ivl_packages'].invoke
-
-    Rake::Task['new_model:map_sbc'].invoke
+    puts "Reset for #{mock_year} completed" unless Rails.env.test?
   end
 
-  desc "rating factors"
-  task :rating_factors => :environment do
-    if Settings.site.key.to_s == "dc"
-      [2020].each do |year|
-        puts "creating rating factors for #{year}" unless Rails.env.test?
-        ::BenefitSponsors::Organizations::Organization.issuer_profiles.each do |issuer_organization|
-          issuer_profile = issuer_organization.issuer_profile
-            # participation rate factor
-          ::BenefitMarkets::Products::ActuarialFactors::ParticipationRateActuarialFactor.create!(
-              active_year: year,
-              default_factor_value: 1.0,
-              max_integer_factor_key: 100,
-              issuer_profile_id: issuer_profile.id,
-              actuarial_factor_entries: []
-          )
-          # group size factor
-          ::BenefitMarkets::Products::ActuarialFactors::GroupSizeActuarialFactor.create!(
-              active_year: year,
-              default_factor_value: 1.0,
-              max_integer_factor_key: 1,
-              issuer_profile_id: issuer_profile.id,
-              actuarial_factor_entries: []
-          )
-        end
-      end
+  desc "new model mock data rake tasks"
+  task :mock_data, [:year] => :environment do |_t, args|
+
+    mock_year = args[:year].present? ? args[:year].to_i : 2022
+
+    puts "Mock Data for #{mock_year} started" unless Rails.env.test?
+    Rake::Task['new_model:rating_areas'].invoke(mock_year)
+    Rake::Task['new_model:service_areas'].invoke(mock_year)
+
+    puts "loading #{mock_year} plans" unless Rails.env.test?
+    Rake::Task['new_model:plans_and_rates'].invoke(mock_year)
+
+    Rake::Task['new_model:rating_factors'].invoke(mock_year)
+    Rake::Task['new_model:plan_cross_walk'].invoke(mock_year)
+
+    puts "loading #{mock_year} benefit market catalog" unless Rails.env.test?
+    Rake::Task['load:dc_benefit_market_catalog'].invoke(mock_year)
+
+    puts "loading #{mock_year} ivl benefit pacakges" unless Rails.env.test?
+    Rake::Task["import:create_ivl_packages_DC"].invoke(mock_year)
+
+    Rake::Task['new_model:map_sbc'].invoke(mock_year)
+    puts "Mock Data for #{mock_year} completed" unless Rails.env.test?
+  end
+
+  desc "rating areas"
+  task :rating_areas, [:year] => :environment do |_t, args|
+    [args[:year]].each do |year|
+      puts "Creating Rating areas for new model #{year}" unless Rails.env.test?
+      ::BenefitMarkets::Locations::RatingArea.find_or_create_by!({
+                                                                   active_year: args[:year],
+                                                                   exchange_provided_code: 'R-DC001',
+                                                                   county_zip_ids: [],
+                                                                   covered_states: ['DC']
+                                                                 })
     end
   end
 
   desc "service areas"
-  task :service_areas => :environment do
-    if Settings.site.key.to_s == "dc"
-      [2020].each do |year|
-        puts "Creating Service areas for new model #{year}" unless Rails.env.test?
-        ::BenefitSponsors::Organizations::Organization.issuer_profiles.each do |issuer_organization|
-          issuer_profile = issuer_organization.issuer_profile
-          issuer_profile.issuer_hios_ids.each do |issuer_hios_id|
-            ::BenefitMarkets::Locations::ServiceArea.create!({
-               active_year: year,
-               issuer_provided_code: "DCS001",
-               covered_states: ["DC"],
-               county_zip_ids: [],
-               issuer_profile_id: issuer_profile.id,
-               issuer_hios_id: issuer_hios_id,
-               issuer_provided_title: issuer_profile.legal_name
-            })
-          end
+  task :service_areas, [:year] => :environment do |_t, args|
+    [args[:year]].each do |year|
+      puts "Creating Service areas for new model #{year}" unless Rails.env.test?
+      ::BenefitSponsors::Organizations::Organization.issuer_profiles.each do |issuer_organization|
+        issuer_profile = issuer_organization.issuer_profile
+        issuer_profile.issuer_hios_ids.each do |issuer_hios_id|
+          ::BenefitMarkets::Locations::ServiceArea.find_or_create_by!({
+                                                                        active_year: args[:year],
+                                                                        issuer_provided_code: "DCS001",
+                                                                        covered_states: ["DC"],
+                                                                        county_zip_ids: [],
+                                                                        issuer_profile_id: issuer_profile.id,
+                                                                        issuer_hios_id: issuer_hios_id,
+                                                                        issuer_provided_title: issuer_profile.legal_name
+                                                                      })
         end
       end
     end
   end
 
-  desc "rating areas"
-    task :rating_areas => :environment do
-    if Settings.site.key.to_s == "dc"
-      [2020].each do |year|
-        puts "Creating Rating areas for new model #{year}" unless Rails.env.test?
-        ::BenefitMarkets::Locations::RatingArea.create!({
-          active_year: year,
-          exchange_provided_code: 'R-DC001',
-          county_zip_ids: [],
-          covered_states: ['DC']
-        })
+  desc "mock plans_and_rates"
+  task :plans_and_rates, [:year] => :environment do |_t, args|
+    mock_year = args[:year]
+    previous_year = mock_year - 1
+
+    rating_area = ::BenefitMarkets::Locations::RatingArea.where(active_year: mock_year).first
+
+    ::BenefitMarkets::Products::Product.by_year(previous_year).each do |product|
+      new_service_area = ::BenefitMarkets::Locations::ServiceArea.where(
+        active_year: mock_year,
+        issuer_profile_id: product.issuer_profile_id
+      ).first
+
+      next if ::BenefitMarkets::Products::Product.by_year(2022).where(hios_id: product.hios_id, benefit_market_kind: product.benefit_market_kind).present?
+
+      new_product = product.dup
+      new_product.application_period = (product.application_period.min + 1.year..product.application_period.max + 1.year)
+      new_product.service_area_id = new_service_area.id
+
+
+      new_product.premium_tables.each do |new_premium_table|
+        new_premium_table.effective_period = (new_premium_table.effective_period.min + 1.year..new_premium_table.effective_period.max + 1.year)
+        new_premium_table.rating_area_id = rating_area.id
       end
+
+      new_product.save
     end
   end
 
-  # map sbc documents
-  desc "map sbc documents"
-  task :map_sbc => :environment do
-    puts "mapping sbc docs for 2020" unless Rails.env.test?
-    Plan.where(active_year: 2019).each do |old_plan|
-      new_plan = Plan.where(active_year: 2020, hios_id: old_plan.hios_id).first
-      if new_plan.present?
-        new_plan.sbc_document = old_plan.sbc_document
-        new_plan.save
-        puts "updated sbc document for old model 2020 #{new_plan.hios_id}" unless Rails.env.test?
-      else
-        puts "no plan present #{old_plan.hios_id}" unless Rails.env.test?
-      end
-    end
-
-    ::BenefitMarkets::Products::Product.by_year(2019).each do |old_product|
-      new_product = ::BenefitMarkets::Products::Product.where(
-        hios_id: old_product.hios_id,
-        benefit_market_kind: old_product.benefit_market_kind,
-        metal_level_kind: old_product.metal_level_kind,
-        ).by_year(2020).first
-      if new_product.present?
-        new_product.sbc_document = old_product.sbc_document
-        new_product.save
-        puts "updated sbc document for new model 2020 #{new_product.hios_id}" unless Rails.env.test?
-      else
-        puts "product not present: #{old_product.hios_id}"
+  desc "rating factors"
+  task :rating_factors, [:year] => :environment do |_t, args|
+    [args[:year]].each do |year|
+      puts "creating rating factors for #{year}" unless Rails.env.test?
+      ::BenefitSponsors::Organizations::Organization.issuer_profiles.each do |issuer_organization|
+        issuer_profile = issuer_organization.issuer_profile
+          # participation rate factor
+        ::BenefitMarkets::Products::ActuarialFactors::ParticipationRateActuarialFactor.find_or_create_by!(
+          active_year: year,
+          default_factor_value: 1.0,
+          max_integer_factor_key: 100,
+          issuer_profile_id: issuer_profile.id,
+          actuarial_factor_entries: []
+        )
+        # group size factor
+        ::BenefitMarkets::Products::ActuarialFactors::GroupSizeActuarialFactor.find_or_create_by!(
+          active_year: year,
+          default_factor_value: 1.0,
+          max_integer_factor_key: 1,
+          issuer_profile_id: issuer_profile.id,
+          actuarial_factor_entries: []
+        )
       end
     end
   end
 
   # plan cross walk
   desc "Import plan crosswalk"
-  task :plan_cross_walk => :environment do
-    puts "mapping plans from 2019 -> 2010" unless Rails.env.test?
+  task :plan_cross_walk, [:year] => :environment do |_t, args|
+    year = args[:year]
+    previous_year = year - 1
+    puts "mapping plans from #{previous_year} -> #{year}" unless Rails.env.test?
     # old plans
-    Plan.where(active_year: 2019).each do |old_plan|
-      new_plan = Plan.where(active_year: 2020, hios_id: old_plan.hios_id).first
-      if new_plan.present?
-        old_plan.renewal_plan_id = new_plan.id
-        old_plan.save
-        puts "Old #{old_plan.active_year} plan hios_id #{old_plan.hios_id} renewed with New #{new_plan.hios_id} plan hios_id: #{new_plan.hios_id}" unless Rails.env.test?
-      end
+    Plan.where(active_year: previous_year).each do |old_plan|
+      new_plan = Plan.where(active_year: year, hios_id: old_plan.hios_id).first
+      next unless new_plan.present?
+      old_plan.renewal_plan_id = new_plan.id
+      old_plan.save
+      puts "Old #{old_plan.active_year} plan hios_id #{old_plan.hios_id} renewed with New #{new_plan.hios_id} plan hios_id: #{new_plan.hios_id}" unless Rails.env.test?
     end
     # end old plans
-    ::BenefitMarkets::Products::Product.by_year(2019).each do |old_product|
+    ::BenefitMarkets::Products::Product.by_year(previous_year).each do |old_product|
       new_product = ::BenefitMarkets::Products::Product.where(
         hios_id: old_product.hios_id,
         benefit_market_kind: old_product.benefit_market_kind,
-        metal_level_kind: old_product.metal_level_kind,
-        ).by_year(2020).first
+        metal_level_kind: old_product.metal_level_kind
+      ).by_year(year).first
       if new_product.present?
         old_product.renewal_product_id = new_product.id
         old_product.save
@@ -156,5 +183,38 @@ namespace :new_model do
     end
     # new plans
     # end new plans
+  end
+
+  # map sbc documents
+  desc "map sbc documents"
+  task :map_sbc, [:year] => :environment do |_t, args|
+    year = args[:year]
+    previous_year = year - 1
+    puts "mapping sbc docs for #{year}" unless Rails.env.test?
+    Plan.where(active_year: previous_year).each do |old_plan|
+      new_plan = Plan.where(active_year: year, hios_id: old_plan.hios_id).first
+      if new_plan.present?
+        new_plan.sbc_document = old_plan.sbc_document
+        new_plan.save
+        puts "updated sbc document for old model #{year} #{new_plan.hios_id}" unless Rails.env.test?
+      else
+        puts "no plan present #{old_plan.hios_id}" unless Rails.env.test?
+      end
+    end
+
+    ::BenefitMarkets::Products::Product.by_year(previous_year).each do |old_product|
+      new_product = ::BenefitMarkets::Products::Product.where(
+        hios_id: old_product.hios_id,
+        benefit_market_kind: old_product.benefit_market_kind,
+        metal_level_kind: old_product.metal_level_kind
+      ).by_year(year).first
+      if new_product.present?
+        new_product.sbc_document = old_product.sbc_document
+        new_product.save
+        puts "updated sbc document for new model #{year} #{new_product.hios_id}" unless Rails.env.test?
+      else
+        puts "product not present: #{old_product.hios_id}"
+      end
+    end
   end
 end
