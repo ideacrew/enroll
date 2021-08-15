@@ -258,6 +258,10 @@ registry:
             item: "(855) 797-4357"
           - key: :verifiable_immigration_statuses
             item: true
+          - key: :appeal_link
+            item: ""
+          - key: :find_expert_link
+            item: ""
       - key: :data_seeds_ui
         item: :data_seeds_ui
         is_enabled: true
