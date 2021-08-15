@@ -1,4 +1,4 @@
-<div class="dropdown pull-right" id="<%= row_actions_id %>">
+<div class="dropdown <%= 'pull-right' if !defined? pull_left %>" id="<%= row_actions_id %>">
 	<button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="dropdown_for_<%= row_actions_id %>">
     Actions
     <span class="caret"></span>
