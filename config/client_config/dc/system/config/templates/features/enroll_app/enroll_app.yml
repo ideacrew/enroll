@@ -239,6 +239,10 @@ registry:
             item: "(855) 532-5465"
           - key: :verifiable_immigration_statuses
             item: false
+          - key: :appeal_link
+            item: "https://www.dchealthlink.com/file-appeal"
+          - key: :find_expert_link
+            item: "https://www.dchealthlink.com/find-expert"
       - key: :data_seeds_ui
         item: :data_seed_ui
         is_enabled: true

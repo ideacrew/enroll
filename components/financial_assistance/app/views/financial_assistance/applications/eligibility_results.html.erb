@@ -251,25 +251,27 @@
       <% end %>
 
       <!-- Green next step box -->
-      <div class="er-medicaid mt-20">
-        <div class="border-bottom-1px"></div>
-        <div class="er-success bg-success">
-          <div><i class="fa fa-info-circle fa-lg text-success" aria-hidden="true"></i></div>
-          <div class="text-success">
-            <%# If all members are MAGI Medicaid eligible, show next_step_medicaid_eligible. If one applicant is
-                determined something other than the medicaid, default to next_step_medicaid_eligible_at_least_one_other_eligible %>
-            <% if eligible_applicants(params[:id], :is_medicaid_chip_eligible).length == @application.active_applicants.length  %>
-              <span>
-                <%= l10n("faa.next_step_medicaid_eligible") %>
-              </span>
-            <% else %>
-              <% unless eligible_applicants(params[:id], :is_totally_ineligible).length == @application.active_applicants.length %>
-                <span><%= l10n("faa.next_step_medicaid_eligible_at_least_one_other_eligible") %></span>
+      <% unless (action_name == "eligibility_results" || action_name == "review") && (params.keys.exclude?"cur") %>
+        <div class="er-medicaid mt-20">
+          <div class="border-bottom-1px"></div>
+          <div class="er-success bg-success">
+            <div><i class="fa fa-info-circle fa-lg text-success" aria-hidden="true"></i></div>
+            <div class="text-success">
+              <%# If all members are MAGI Medicaid eligible, show next_step_medicaid_eligible. If one applicant is
+                  determined something other than the medicaid, default to next_step_medicaid_eligible_at_least_one_other_eligible %>
+              <% if eligible_applicants(params[:id], :is_medicaid_chip_eligible).length == @application.active_applicants.length  %>
+                <span>
+                  <%= l10n("faa.next_step_medicaid_eligible") %>
+                </span>
+              <% else %>
+                <% unless eligible_applicants(params[:id], :is_totally_ineligible).length == @application.active_applicants.length %>
+                  <span><%= l10n("faa.next_step_medicaid_eligible_at_least_one_other_eligible") %></span>
+                <% end %>
               <% end %>
-            <% end %>
+            </div>
           </div>
         </div>
-      </div>
+      <% end %>
       <!-- End Green next step box -->
 
       <div class="er-summary mt-20">
