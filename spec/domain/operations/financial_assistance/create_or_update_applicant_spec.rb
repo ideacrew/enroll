@@ -8,7 +8,7 @@ RSpec.describe ::Operations::FinancialAssistance::CreateOrUpdateApplicant, type:
   let!(:family_member) { FactoryBot.create(:family_member, family: family, person: person2) }
 
   before do
-    allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(true)
+    EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(true)
   end
 
   it 'should be a container-ready operation' do
