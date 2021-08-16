@@ -1,7 +1,12 @@
 # frozen_string_literal: true
 
+require File.join(Rails.root, 'app/data_migrations/golden_seed_financial_assistance_helper')
+require File.join(Rails.root, 'app/data_migrations/golden_seed_helper')
+
 module FinancialAssistance
   module FinancialAssistanceWorld
+    include GoldenSeedHelper
+    include GoldenSeedFinancialAssistanceHelper
     def consumer(*traits)
       attributes = traits.extract_options!
       @consumer ||= FactoryBot.create :user, :consumer, *traits, :with_consumer_role, attributes
@@ -77,6 +82,80 @@ module FinancialAssistance
       end
       application.applicants.each { |applicant| applicant.update_attributes!(is_medicaid_chip_eligible: false, is_ia_eligible: true, is_without_assistance: false) }
       application.update_attributes!(aasm_state: 'determined')
+    end
+
+    def create_completed_fa_application_with_two_applicants
+      case_family = golden_seed_rows.select { |row| row['case_name'] == "QA-CORE-2-IA-008" }
+      primary_family_for_current_case = nil
+      case_array_for_relationships = {
+        fa_application: nil,
+        fa_applicants: []
+      }
+      case_family.each do |case_info_hash|
+        row_data = case_info_hash
+        # TODO: Weird behavior. Prevents the original hash on the row attribute from being modified
+        data_to_process = row_data.to_h.deep_dup.with_indifferent_access
+        # Just using this structure since it was used in the original golden seed
+        target_row_data = {
+          person_attributes: data_to_process
+        }
+        # Dependent
+        if primary_family_for_current_case.present?
+          target_row_data.merge!(
+            {
+              primary_person_record: primary_family_for_current_case.primary_person,
+              family_record: primary_family_for_current_case
+            }
+          ).with_indifferent_access
+          puts("Beginning to create dependent record for #{target_row_data[:person_attributes]['case_name']}")
+          current_target_person = generate_and_return_dependent_record(target_row_data)
+          target_row_data[:person_attributes].merge!(current_target_person: current_target_person)
+          target_row_data[:fa_application] = @target_fa_application
+          puts("Beginning to create FA Applicant record for #{target_row_data[:person_attributes]['case_name']}")
+          applicant_record = create_and_return_fa_applicant(target_row_data)
+          target_row_data[:target_fa_applicant] = applicant_record
+          case_array_for_relationships[:fa_applicants] << target_row_data
+          add_applicant_income(target_row_data)
+          add_applicant_addresses(target_row_data)
+          add_applicant_phones(target_row_data)
+          add_applicant_emails(target_row_data)
+          add_applicant_income_response(target_row_data)
+          add_applicant_mec_response(target_row_data)
+        # Primary person
+        else
+          puts("Beginning to create records for consumer role record for #{target_row_data[:person_attributes]['case_name']}")
+          consumer_hash = create_and_return_matched_consumer_and_hash(target_row_data)
+          @financial_assistance_applicant_user = consumer_hash[:user_record]
+          primary_family_for_current_case = consumer_hash[:family_record]
+          target_row_data[:person_attributes][:current_target_person] = consumer_hash[:primary_person_record]
+          puts("Beginning to create HBX Enrollment record for #{target_row_data[:person_attributes]['case_name']}")
+          # generate_and_return_hbx_enrollment(target_row_data)
+          puts("Beginning to create Financial Assisstance application record for #{target_row_data[:person_attributes]['case_name']}")
+          target_fa_application = create_and_return_fa_application(target_row_data)
+          @target_fa_application = target_fa_application
+          case_array_for_relationships[:fa_application] = target_fa_application
+          target_row_data[:fa_application] = target_fa_application
+          applicant_record = create_and_return_fa_applicant(target_row_data, true)
+          target_row_data[:target_fa_applicant] = applicant_record
+          case_array_for_relationships[:fa_applicants] << target_row_data
+          add_applicant_income(target_row_data)
+          add_applicant_addresses(target_row_data)
+          add_applicant_phones(target_row_data)
+          add_applicant_emails(target_row_data)
+          add_applicant_income_response(target_row_data)
+          add_applicant_mec_response(target_row_data)
+        end
+      end
+      create_fa_relationships(case_array_for_relationships)
+    end
+
+    def golden_seed_rows
+      spreadsheet_location = "#{Rails.root}/ivl_testbed_scenarios_2021.csv"
+      spreadsheet_rows = []
+      CSV.foreach(spreadsheet_location, headers: true) do |row|
+        spreadsheet_rows << row
+      end
+      spreadsheet_rows
     end
   end
 end

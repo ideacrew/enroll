@@ -1,5 +1,10 @@
 # frozen_string_literal: true
 
+
+And(/^a financial assistance application and two applicants in info completed state exist$/) do
+  create_completed_fa_application_with_two_applicants
+end
+
 Given(/^at least two other household members exist$/) do
   click_link "Add New Person"
 
@@ -55,6 +60,8 @@ Then(/^Review & Submit left section WILL display$/) do
 end
 
 Given(/^there is a nil value for at least one relationship$/) do
+  @target_fa_application.relationships.destroy_all
+  visit page.current_path
   expect(find_all(:css, ".selectric .label").map{ |selector| selector.text }).to include("choose")
 end
 
