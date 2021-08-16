@@ -301,7 +301,11 @@ class Insured::ConsumerRolesController < ApplicationController
       begin
         result = Operations::FinancialAssistance::Apply.new.call(family_id: @person.primary_family.id)
         if result.success?
-          redirect_to financial_assistance.application_year_selection_application_path(id: result.success)
+          if EnrollRegistry.feature_enabled?(:iap_year_selection)
+            redirect_to financial_assistance.application_year_selection_application_path(id: result.success)
+          else
+            redirect_to financial_assistance.application_checklist_application_path(id: result.success)
+          end
         else
           flash[:error] = get_error_messages(result)
           redirect_back fallback_location: '/'
