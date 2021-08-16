@@ -717,9 +717,8 @@ module FinancialAssistance
         end
       end
 
-      # submit is the same event that can be used in renewal context as well
-      event :submit, :after => [:record_transition, :set_submit] do
-        transitions from: [:draft, :renewal_draft], to: :submitted do
+      event :submit, :after => [:record_transition, :set_submit, :trigger_fdsh_hub_calls] do
+        transitions from: :draft, to: :submitted do
           guard do
             is_application_valid?
           end
@@ -885,7 +884,7 @@ module FinancialAssistance
     def publish_esi_mec_request
       return unless FinancialAssistanceRegistry.feature_enabled?(:esi_mec_determination)
 
-      Operations::Applications::Esi::H14::PublishEsiMecRequest.new.call(application_id: id)
+      Operations::Applications::Esi::H14::EsiMecRequest.new.call(application_id: id)
     end
 
     def total_incomes_by_year
@@ -1392,8 +1391,12 @@ module FinancialAssistance
       set_assistance_year
       set_effective_date
       create_eligibility_determinations
-      create_verification_documents
+      create_evidences
       set_renewal_base_year
+    end
+
+    def trigger_fdsh_hub_calls
+      publish_esi_mec_request
     end
 
     def unset_submit
@@ -1401,7 +1404,6 @@ module FinancialAssistance
       unset_assistance_year
       unset_effective_date
       delete_eligibility_determinations
-      delete_verification_documents
     end
 
     def create_eligibility_determinations
@@ -1440,12 +1442,16 @@ module FinancialAssistance
       eligibility_determinations.destroy_all
     end
 
-    def create_verification_documents
-      active_applicants.each do |applicant|
-        applicant.verification_types =
-          %w[Income MEC].collect do |type|
-            VerificationType.new(type_name: type, validation_status: 'pending')
+    def create_evidences
+      test = []
+      test << [:esi_mec, "MEC"] if FinancialAssistanceRegistry.feature_enabled?(:esi_mec_determination)
+      application.active_applicants.each do |applicant|
+        applicant.evidences =
+          test.collect do |type|
+            key, title = type
+            FinancialAssistance::Evidence.new(key: key, title: title, eligibility_status: "attested")
           end
+<<<<<<< HEAD
         if FinancialAssistanceRegistry.feature_enabled?(:verification_type_income_verification) &&
            family.present? && applicant.incomes.blank? && applicant.family_member_id.present?
           family_member_record = family.family_members.where(id: applicant.family_member_id).first
@@ -1462,6 +1468,20 @@ module FinancialAssistance
           to_state: 'verification_pending',
           event: 'move_to_pending!'
         )
+=======
+
+        #TODO: Not sure why we are doing this
+        # family_record = Family.where(id: family_id.to_s).first
+        # if FinancialAssistanceRegistry.feature_enabled?(:verification_type_income_verification) &&
+        #    family_record.present? && applicant.incomes.blank? && applicant.family_member_id.present?
+        #   family_member_record = family_record.family_members.where(id: applicant.family_member_id).first
+        #   next if family_member_record.blank?
+        #   person_record = family_member_record.person
+        #   next if person_record.blank?
+        #   person_record.add_new_verification_type('Income')
+        # end
+        applicant.move_to_pending! if applicant.evidences.present?
+>>>>>>> a5e7940bb2 (Update aca entities and add evidence models)
       end
     end
 
