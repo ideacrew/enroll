@@ -251,7 +251,7 @@
       <% end %>
 
       <!-- Green next step box -->
-      <% unless (action_name == "eligibility_results" || action_name == "review") && (params.keys.exclude?"cur") %>
+      <% unless ((action_name == "eligibility_results" || action_name == "review") && (params.keys.exclude?"cur")) || all_ineligible_applicants %>
         <div class="er-medicaid mt-20">
           <div class="border-bottom-1px"></div>
           <div class="er-success bg-success">
@@ -264,9 +264,7 @@
                   <%= l10n("faa.next_step_medicaid_eligible") %>
                 </span>
               <% else %>
-                <% unless eligible_applicants(params[:id], :is_totally_ineligible).length == @application.active_applicants.length %>
                   <span><%= l10n("faa.next_step_medicaid_eligible_at_least_one_other_eligible") %></span>
-                <% end %>
               <% end %>
             </div>
           </div>
