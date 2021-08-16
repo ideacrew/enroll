@@ -37,6 +37,15 @@ Feature: Cost Savings
     When the consumer manually enters the "Cost Savings" url in the browser search bar
     Then the consumer will navigate to the Cost Savings page
 
+  Scenario: FAA Feature Is Enabled - Consumer can access the Cost Savings Page
+    Given the FAA feature configuration is enabled
+    And a family with financial application in <application_state> state exists
+    And the user with consumer role is logged in
+    When consumer visits home page
+    And the Cost Savings link is visible
+    And the consumer clicks on Cost Savings link
+    Then the application year will be present on the table
+
   Scenario: FAA Feature Is Enabled - Consumer has nil fields for Incarcerated status
     Given the FAA feature configuration is enabled
     Given consumer visits home page
