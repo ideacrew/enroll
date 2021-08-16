@@ -1,0 +1,7 @@
+# https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/creating-a-repository-on-github/about-code-owners
+
+*.feature               @ideacrew/testing-team
+.github/workflows/*     @ideacrew/maintenance
+Gemfile                 @ideacrew/maintenance
+Gemfile.lock            @ideacrew/maintenance
+config/                 @ideacrew/maintenance
