@@ -518,3 +518,7 @@ registry:
       - key: :contact_customer_service_representative
         item: :contact_customer_service_representative
         is_enabled: true
+      - key: :location_residency_verification_type
+        is_enabled: true
+          
+      
