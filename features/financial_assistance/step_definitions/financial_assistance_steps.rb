@@ -416,6 +416,16 @@ Given(/^american indian or alaska native income feature is disabled$/) do
   disable_feature :american_indian_alaskan_native_income
 end
 
+Given(/the iap year selection feature is enabled/) do
+  enable_feature :iap_year_selection, {registry_name: FinancialAssistanceRegistry}
+  enable_feature :iap_year_selection
+end
+
+Given(/the iap year selection feature is disabled/) do
+  disable_feature :iap_year_selection, {registry_name: FinancialAssistanceRegistry}
+  disable_feature :iap_year_selection
+end
+
 Then(/^the user should see the external verification link$/) do
   # TODO: Maybe figure out how to do this with something other than glyphicon
   other_actions_link = page.all('a').detect { |link| link[:class] == 'glyphicon glyphicon-plus pull-right' }
@@ -456,6 +466,10 @@ end
 
 Then(/^the consumer will navigate to the Cost Savings page$/) do
   expect(page).to have_content('Cost Savings Applications', wait: 10)
+end
+
+Then(/the application year will be present on the table/) do
+  expect(page).to have_content('APPLICATION YEAR')
 end
 
 When(/^the consumer manually enters the "Help Paying for Coverage" url in the browser search bar$/) do
