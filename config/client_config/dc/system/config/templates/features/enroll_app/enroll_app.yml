@@ -520,5 +520,5 @@ registry:
         is_enabled: true
       - key: :location_residency_verification_type
         is_enabled: true
-          
-      
+      - key: :state_residency_tab
+        is_enabled: true
