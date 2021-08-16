@@ -547,7 +547,6 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           end
 
           it "should build a new household with 3 coverage household members and 3 taxhousehold members" do
-            # person.primary_family.active_household
             # updated_tax_household = tax_household_db.household.latest_active_tax_household
             # expect(tax_household_db.tax_household_members.length).to eq 3
             # expect(tax_household_db.tax_household_members.map(&:is_primary_applicant?)).to eq [true,false,false]
