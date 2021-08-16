@@ -166,6 +166,7 @@ module FinancialAssistance
                            benchmark_premium: applicant_benchmark_premium(application), #applicant_benchmark_premium(applicant.application),
                            is_homeless: applicant.is_homeless.present?,
                            mitc_income: mitc_income(applicant),
+                           evidences: applicant.evidences.serializable_hash.map(&:symbolize_keys),
                            mitc_relationships: mitc_relationships(applicant),
                            mitc_is_required_to_file_taxes: calculate_if_applicant_is_required_to_file_taxes(applicant)}
                 result
