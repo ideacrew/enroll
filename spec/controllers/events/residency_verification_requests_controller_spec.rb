@@ -9,6 +9,7 @@ describe Events::ResidencyVerificationRequestsController do
     let(:mock_now) { Time.mktime(2015,5,21,12,29,39) }
 
     before do
+      EnrollRegistry[:location_residency_verification_type].feature.stub(:is_enabled).and_return(true)
       person.consumer_role.verification_type_history_elements.delete_all
       @event_name = ""
       @body = nil
@@ -23,6 +24,7 @@ describe Events::ResidencyVerificationRequestsController do
       }}).and_return(rendered_template)
       controller.call(ConsumerRole::RESIDENCY_VERIFICATION_REQUEST_EVENT_NAME, nil, nil, nil, {:person => person} )
       ActiveSupport::Notifications.unsubscribe(event_subscriber)
+      EnrollRegistry[:location_residency_verification_type].feature.stub(:is_enabled).and_return(true)
     end
 
     it "should send out a message to the bus with the request to validate local residency" do
