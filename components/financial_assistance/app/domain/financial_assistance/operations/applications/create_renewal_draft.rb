@@ -61,13 +61,13 @@ module FinancialAssistance
           draft_app.update_attributes!(
             { aasm_state: 'renewal_draft',
               assistance_year: validated_params[:renewal_year],
-              years_to_renew: calculate_years_to_renew(draft_app, application),
+              years_to_renew: calculate_years_to_renew(application),
               predecessor_id: application.id }
           )
         end
 
         # Deduct one year from years_to_renew as this is a renewal application(application for prospective year)
-        def calculate_years_to_renew(draft_app, application)
+        def calculate_years_to_renew(application)
           return 0 if application.years_to_renew.nil? || !application.years_to_renew.positive?
           application.years_to_renew.pred
         end
