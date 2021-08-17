@@ -939,7 +939,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     context 'application invalid by one of the attestation' do
       [:is_requesting_voter_registration_application_in_mail, :is_renewal_authorized,
        :medicaid_terms, :report_change_terms, :medicaid_insurance_collection_terms,
-       :parent_living_out_of_home_terms, :submission_terms, :full_medicaid_determination].each do |key|
+       :parent_living_out_of_home_terms, :submission_terms].each do |key|
         before do
           application.send("#{key}=", nil)
           application.save!
@@ -960,7 +960,6 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
                 :medicaid_insurance_collection_terms,
                 :parent_living_out_of_home_terms,
                 :submission_terms,
-                :full_medicaid_determination,
                 :attestation_terms]
         keys.each do |key|
           application.send("#{key}=", true)

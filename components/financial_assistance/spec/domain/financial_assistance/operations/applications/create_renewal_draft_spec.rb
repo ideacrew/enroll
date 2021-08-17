@@ -81,8 +81,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::CreateRenewalDra
             expect(@renewal_draft_app.is_requesting_voter_registration_application_in_mail).to eq(application.is_requesting_voter_registration_application_in_mail)
           end
 
-          it 'should return application with years_to_renew' do
-            expect(@renewal_draft_app.years_to_renew).to eq(application.years_to_renew)
+          it 'should return application with years_to_renew one less than previous application' do
+            expect(@renewal_draft_app.years_to_renew).to eq(application.years_to_renew.pred)
           end
         end
 
@@ -128,7 +128,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::CreateRenewalDra
 
     context 'determined application' do
       before do
-        application.update_attributes!(aasm_state: 'determined')
+        application.update_attributes!({ aasm_state: 'determined', years_to_renew: [0, nil].sample })
         application.reload
         @result = subject.call({ family_id: application.family_id, renewal_year: application.assistance_year.next })
         @renewal_draft_app = @result.success
@@ -169,8 +169,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::CreateRenewalDra
             expect(@renewal_draft_app.is_requesting_voter_registration_application_in_mail).to eq(application.is_requesting_voter_registration_application_in_mail)
           end
 
-          it 'should return application with years_to_renew' do
-            expect(@renewal_draft_app.years_to_renew).to eq(application.years_to_renew)
+          it 'should return application with years_to_renew as zero' do
+            expect(@renewal_draft_app.years_to_renew).to be_zero
           end
         end
 

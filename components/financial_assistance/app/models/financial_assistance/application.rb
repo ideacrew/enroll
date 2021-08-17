@@ -819,8 +819,7 @@ module FinancialAssistance
         !report_change_terms.nil? &&
         !medicaid_insurance_collection_terms.nil? &&
         check_parent_living_out_of_home_terms &&
-        !submission_terms.nil? &&
-        check_full_medicaid_determination
+        !submission_terms.nil?
     end
 
     def have_permission_to_renew?
@@ -845,11 +844,6 @@ module FinancialAssistance
       elsif is_renewal_authorized.is_a?(FalseClass)
         ass_year + years_to_renew
       end
-    end
-
-    def check_full_medicaid_determination
-      return true unless FinancialAssistanceRegistry.feature_enabled?(:full_medicaid_determination_step)
-      !full_medicaid_determination.nil?
     end
 
     def check_parent_living_out_of_home_terms
