@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module FinancialAssistance
+  #Evidences for an applicant to detrmine his status
   class Evidence
     include Mongoid::Document
     include Mongoid::Timestamps
@@ -17,5 +18,17 @@ module FinancialAssistance
 
     embeds_one :verification_status, class_name: "::FinancialAssistance::VerificationStatus"
     embeds_many :verification_history, class_name: "::FinancialAssistance::VerificationHistory"
+    embeds_many :eligibility_results, class_name: "::FinancialAssistance::EligibilityResult"
+
+    scope :by_name, ->(type_name) { where(:key => type_name) }
+
+
+    def type_unverified?
+      !type_verified?
+    end
+
+    def type_verified?
+      ["verified", "attested"].include? eligibility_status
+    end
   end
 end

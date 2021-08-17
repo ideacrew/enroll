@@ -13,7 +13,7 @@ module FinancialAssistance
             send(:include, Dry::Monads[:result, :do, :try])
             include EventSource::Command
 
-            def call(payload, application_id)
+            def call(payload, _application_id)
               event = yield build_event(payload)
               result = yield publish(event)
 

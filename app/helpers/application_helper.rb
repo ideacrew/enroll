@@ -1,5 +1,6 @@
 module ApplicationHelper
   include FloatHelper
+  include ::FinancialAssistance::VerificationHelper
 
   def seed_url_helper(row)
     case row.record_class_name
