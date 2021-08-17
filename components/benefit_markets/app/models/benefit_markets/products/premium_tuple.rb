@@ -3,6 +3,8 @@ module BenefitMarkets
     include Mongoid::Document
     include Mongoid::Timestamps
 
+    TOBACCO_USE_VALUES = ['Y', 'N', 'nil', 'NA'].freeze
+
     embedded_in :premium_table,
                 class_name: "BenefitMarkets::Products::PremiumTable"
 
