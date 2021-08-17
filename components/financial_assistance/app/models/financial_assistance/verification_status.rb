@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module FinancialAssistance
+  #verification status for an applicant
   class VerificationStatus
     include Mongoid::Document
     include Mongoid::Timestamps
@@ -16,7 +17,7 @@ module FinancialAssistance
 
     embeds_many :documents, as: :documentable, class_name: '::FinancialAssistance::Document' do
       def uploaded
-        @target.select{|document| document.doc_identifier }
+        @target.select(&:doc_identifier)
       end
     end
   end

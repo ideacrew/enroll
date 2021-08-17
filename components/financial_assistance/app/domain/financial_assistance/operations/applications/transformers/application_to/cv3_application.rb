@@ -111,8 +111,7 @@ module FinancialAssistance
               ::Family.find(family_id)
             end
 
-            # rubocop:disable Metrics/CyclomaticComplexity
-            # rubocop:disable Metrics/AbcSize
+                        # rubocop:disable Metrics/AbcSize
             # rubocop:disable Metrics/MethodLength
             def applicants(application, benchmark_premiums)
               application.applicants.inject([]) do |result, applicant|
@@ -120,8 +119,7 @@ module FinancialAssistance
                 result << {name: name(applicant),
                            identifying_information: {has_ssn: applicant.no_ssn,
                                                      encrypted_ssn: applicant.encrypted_ssn,
-                                                     ssn: applicant.ssn
-                                                    },
+                                                     ssn: applicant.ssn},
                            demographic: demographic(applicant),
                            attestation: attestation(applicant),
                            is_primary_applicant: applicant.is_primary_applicant.present?,
@@ -198,8 +196,7 @@ module FinancialAssistance
                 result
               end
             end
-            # rubocop:enable Metrics/CyclomaticComplexity
-            # rubocop:enable Metrics/AbcSize
+                        # rubocop:enable Metrics/AbcSize
             # rubocop:enable Metrics/MethodLength
 
             def native_american_information(applicant)

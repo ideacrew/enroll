@@ -755,7 +755,7 @@ module FinancialAssistance
         transitions from: :submitted, to: :determination_response_error
       end
 
-      event :determine, :after => [:record_transition] do
+      event :determine, :after => [:record_transition, :create_evidences, :trigger_fdsh_hub_calls] do
         transitions from: :submitted, to: :determined
       end
 
@@ -1443,13 +1443,13 @@ module FinancialAssistance
     end
 
     def create_evidences
-      test = []
-      test << [:esi_mec, "MEC"] if FinancialAssistanceRegistry.feature_enabled?(:esi_mec_determination)
-      application.active_applicants.each do |applicant|
+      types = []
+      types << [:esi_mec, "MEC"] if FinancialAssistanceRegistry.feature_enabled?(:esi_mec_determination)
+      active_applicants.each do |applicant|
         applicant.evidences =
-          test.collect do |type|
+          types.collect do |type|
             key, title = type
-            FinancialAssistance::Evidence.new(key: key, title: title, eligibility_status: "attested")
+            FinancialAssistance::Evidence.new(key: key, title: title, eligibility_status: "attested") if applicant.evidences.by_name(key).blank?
           end
 <<<<<<< HEAD
         if FinancialAssistanceRegistry.feature_enabled?(:verification_type_income_verification) &&
