@@ -48,6 +48,22 @@ class TaxHousehold
     (thh_members.pluck(:is_ia_eligible).include?(false) || thh_m_eligibility_kind.count == 0) ? 'csr_0' : eligibile_csr_kind_for_shopping(thh_m_eligibility_kind)
   end
 
+  def eligible_csr_percent_as_integer(family_member_ids)
+    csr_kind = eligibile_csr_kind(family_member_ids)
+    fetch_csr_percent(csr_kind)
+  end
+
+  def fetch_csr_percent(csr_kind)
+    {
+      "csr_0" => 0,
+      "csr_limited" => -1,
+      'csr_100' => 100,
+      "csr_94" => 94,
+      "csr_87" => 87,
+      "csr_73" => 74
+    }.stringify_keys[csr_kind] || 0
+  end
+
   def current_csr_eligibility_kind
     latest_eligibility_determination.csr_eligibility_kind
   end

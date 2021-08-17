@@ -60,7 +60,7 @@ module Operations
           data = { applied_percentage: applied_percentage,
                    applied_aptc: applied_aptc,
                    max_aptc: max_aptc,
-                   csr_amt: tax_household.current_csr_percent_as_integer }
+                   csr_amt: eligibile_csr_percent_as_integer(hbx_enrollment.HbxEnrollmentMembers.map(&:applicant_id)) }
         end
 
         Success(data || {})

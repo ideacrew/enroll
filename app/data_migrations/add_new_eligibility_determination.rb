@@ -8,13 +8,12 @@ class AddNewEligibilityDetermination < MongoidMigrationTask
         puts "No primary_family or active househod or latest_active_household exists for person with the given hbx_id #{person.hbx_id}" unless Rails.env.test?
         return
       end
-      active_household= person.primary_family.active_household
-      date = Date.strptime(ENV['effective_date'].to_s, "%m/%d/%Y")
-      if active_household.latest_active_tax_household_with_year(date.year).nil?
-        latest_active_tax_household = active_household.latest_active_tax_household
-      else
-        latest_active_tax_household = active_household.latest_active_tax_household_with_year(date.year)
-      end
+      active_household = person.primary_family.active_household
+      latest_active_tax_household = if active_household.latest_active_tax_household_with_year(TimeKeeper.date_of_record.year).nil?
+                                      active_household.latest_active_tax_household
+                                    else
+                                      active_household.latest_active_tax_household_with_year(date.year)
+                                    end
       latest_eligibility_determination = latest_active_tax_household.latest_eligibility_determination
       latest_active_tax_household.eligibility_determinations.build({"determined_at"                 => date,
                                                                     "determined_on"                 => date,
