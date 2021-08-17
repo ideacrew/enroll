@@ -12,9 +12,9 @@
               <!-- <a href="#"><%= image_tag 'icons/phone.png' %> &nbsp;(855) 532-5465</a> -->
             </li>
             <li>
-              <a class="call-customer-service" href="tel:<%= contact_center_phone_number %>">
+              <a class="call-customer-service" href="tel:<%= EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item %>">
                 <span>
-                  <i class="fa fa-phone fa-lg"></i> &nbsp;<%= contact_center_phone_number %>
+                  <i class="fa fa-phone fa-lg"></i> &nbsp;<%= EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item %>
                 </span>
               </a>
             </li>
