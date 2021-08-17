@@ -1062,7 +1062,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
         application.submit!
       end
 
-      it 'should return teh sum of assistance_year & max of YEARS_TO_RENEW_RANGE' do
+      it 'should return the sum of assistance_year & max of YEARS_TO_RENEW_RANGE' do
         expect(application.reload.renewal_base_year).to eq(
           application.reload.assistance_year +
             FinancialAssistance::Application::YEARS_TO_RENEW_RANGE.max
@@ -1076,8 +1076,26 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
         application.submit!
       end
 
-      it 'should return teh sum of assistance_year & years_to_renew' do
+      it 'should return the sum of assistance_year & years_to_renew' do
         expect(application.reload.renewal_base_year).to eq(application.reload.assistance_year + 3)
+      end
+    end
+
+    context 'for renewal_base_year already set' do
+      before do
+        application.update_attributes!(
+          { aasm_state: 'draft',
+            is_renewal_authorized: false,
+            years_to_renew: 0,
+            assistance_year: TimeKeeper.date_of_record.year.next,
+            renewal_base_year: TimeKeeper.date_of_record.year.pred }
+        )
+        application.submit!
+      end
+
+      it 'should not update renewal_base_year' do
+        expect(application.reload.renewal_base_year).to eq(TimeKeeper.date_of_record.year.pred)
+        expect(application.reload.renewal_base_year).not_to eq(TimeKeeper.date_of_record.year.next)
       end
     end
   end

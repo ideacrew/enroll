@@ -173,7 +173,7 @@ module FinancialAssistance
       def reject_application_params
         %w[_id created_at updated_at submitted_at workflow_state_transitions applicants relationships
            determination_http_status_code has_eligibility_response eligibility_response_payload eligibility_request_payload
-           assistance_year predecessor_id]
+           assistance_year predecessor_id renewal_base_year]
       end
 
       def reject_applicant_params

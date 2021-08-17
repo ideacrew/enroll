@@ -213,6 +213,19 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::CreateRenewalDra
         end
       end
     end
+
+    context 'renewal_base_year' do
+      before do
+        application.update_attributes!({ aasm_state: 'draft', years_to_renew: rand(0..5), is_renewal_authorized: false })
+        application.submit!
+        @result = subject.call({ family_id: application.family_id, renewal_year: application.assistance_year.next })
+        @renewal_draft_app = @result.success
+      end
+
+      it 'should return renewal_base_year for renewal_draft_app same as input_application' do
+        expect(@renewal_draft_app.renewal_base_year).to eq(application.renewal_base_year)
+      end
+    end
   end
 
   context 'failure' do

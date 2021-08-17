@@ -831,6 +831,7 @@ module FinancialAssistance
     end
 
     def set_renewal_base_year
+      return if renewal_base_year.present?
       renewal_year = calculate_renewal_base_year
       update_attribute(:renewal_base_year, renewal_year) if renewal_year.present?
     end

@@ -57,11 +57,13 @@ module FinancialAssistance
         end
 
         def attach_additional_data(draft_app, application, validated_params)
+          years_to_renew = calculate_years_to_renew(application)
           # Using update attributes instead of calling aasm event becuase 'renewal_draft' is the first state for a renewal application.
           draft_app.update_attributes!(
             { aasm_state: 'renewal_draft',
               assistance_year: validated_params[:renewal_year],
-              years_to_renew: calculate_years_to_renew(application),
+              years_to_renew: years_to_renew,
+              renewal_base_year: application.renewal_base_year,
               predecessor_id: application.id }
           )
         end
