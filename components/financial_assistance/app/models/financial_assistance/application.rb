@@ -830,12 +830,12 @@ module FinancialAssistance
       workflow_state_transitions.any? { |wst| wst.from_state == 'renewal_draft' }
     end
 
-    private
-
     def set_renewal_base_year
       renewal_year = calculate_renewal_base_year
       update_attribute(:renewal_base_year, renewal_year) if renewal_year.present?
     end
+
+    private
 
     def calculate_renewal_base_year
       ass_year = assistance_year.present? ? assistance_year : TimeKeeper.date_of_record.year

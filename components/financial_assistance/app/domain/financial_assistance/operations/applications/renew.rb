@@ -47,6 +47,8 @@ module FinancialAssistance
         end
 
         def renew_application(application)
+          # Set Renewal Base Year before submission, then check if we have permission to renew the application.
+          application.set_renewal_base_year
           if application.have_permission_to_renew? && application.submit!
             request_result = determination_request_class.new.call(application_id: application.id)
             request_result.failure? ? request_result : Success(application)
