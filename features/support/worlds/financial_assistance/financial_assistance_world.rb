@@ -3,6 +3,9 @@
 require File.join(Rails.root, 'app/data_migrations/golden_seed_financial_assistance_helper')
 require File.join(Rails.root, 'app/data_migrations/golden_seed_helper')
 
+# rubocop:disable Metrics/ModuleLength
+# Cucumber steps to be used with the Financial Assistance Engine
+# A few of the methods of Golden Seed Helper are included to facilitate quick generation of data
 module FinancialAssistance
   module FinancialAssistanceWorld
     include GoldenSeedHelper
@@ -84,6 +87,7 @@ module FinancialAssistance
       application.update_attributes!(aasm_state: 'determined')
     end
 
+    # rubocop:disable Metrics/AbcSize
     def create_completed_fa_application_with_two_applicants
       case_family = golden_seed_rows.select { |row| row['case_name'] == "QA-CORE-2-IA-008" }
       primary_family_for_current_case = nil
@@ -113,14 +117,6 @@ module FinancialAssistance
           target_row_data[:fa_application] = @target_fa_application
           puts("Beginning to create FA Applicant record for #{target_row_data[:person_attributes]['case_name']}")
           applicant_record = create_and_return_fa_applicant(target_row_data)
-          target_row_data[:target_fa_applicant] = applicant_record
-          case_array_for_relationships[:fa_applicants] << target_row_data
-          add_applicant_income(target_row_data)
-          add_applicant_addresses(target_row_data)
-          add_applicant_phones(target_row_data)
-          add_applicant_emails(target_row_data)
-          add_applicant_income_response(target_row_data)
-          add_applicant_mec_response(target_row_data)
         # Primary person
         else
           puts("Beginning to create records for consumer role record for #{target_row_data[:person_attributes]['case_name']}")
@@ -136,18 +132,18 @@ module FinancialAssistance
           case_array_for_relationships[:fa_application] = target_fa_application
           target_row_data[:fa_application] = target_fa_application
           applicant_record = create_and_return_fa_applicant(target_row_data, true)
-          target_row_data[:target_fa_applicant] = applicant_record
-          case_array_for_relationships[:fa_applicants] << target_row_data
-          add_applicant_income(target_row_data)
-          add_applicant_addresses(target_row_data)
-          add_applicant_phones(target_row_data)
-          add_applicant_emails(target_row_data)
-          add_applicant_income_response(target_row_data)
-          add_applicant_mec_response(target_row_data)
         end
+        target_row_data[:target_fa_applicant] = applicant_record
+        case_array_for_relationships[:fa_applicants] << target_row_data
+        add_applicant_income(target_row_data)
+        add_applicant_addresses(target_row_data)
+        add_applicant_phones(target_row_data)
+        add_applicant_emails(target_row_data)
+        add_applicant_income_response(target_row_data)
       end
       create_fa_relationships(case_array_for_relationships)
     end
+    # rubocop:enable Metrics/AbcSize
 
     def golden_seed_rows
       spreadsheet_location = "#{Rails.root}/ivl_testbed_scenarios_2021.csv"
@@ -159,4 +155,6 @@ module FinancialAssistance
     end
   end
 end
+# rubocop:enable Metrics/ModuleLength
+
 World(FinancialAssistance::FinancialAssistanceWorld)
