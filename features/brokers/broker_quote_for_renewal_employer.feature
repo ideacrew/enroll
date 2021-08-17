@@ -7,7 +7,7 @@ Feature: Broker creates a quote for a prospect employer
     Given the shop market configuration is enabled
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for enrollment_open renewal employer with health benefits
-    And the Plans exist
+    And Health and Dental plans exist
     And there is an employer ABC Widgets
     And ABC Widgets employer has a staff role
     And renewal employer ABC Widgets has active and renewal enrollment_open benefit applications
