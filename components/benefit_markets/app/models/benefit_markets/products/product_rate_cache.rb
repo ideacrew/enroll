@@ -29,14 +29,16 @@ module BenefitMarkets
           product.premium_tables.each do |pt|
             r_area_tag = rating_area_cache[pt.rating_area_id]
             pt.premium_tuples.each do |tuple|
-              $product_rate_calculation_cache[product.id][r_area_tag][tuple.age][tuple.tobacco_use_value] = (
-                $product_rate_calculation_cache[product.id][r_area_tag][tuple.age][tuple.tobacco_use_value] +
-                [{
-                  start_on: pt.effective_period.min,
-                  end_on: pt.effective_period.max,
-                  cost: tuple.cost
-                }]
-              )
+              ::BenefitMarkets::Products::PremiumTuple::TOBACCO_USE_VALUES.each do |tobacco_value|
+                $product_rate_calculation_cache[product.id][r_area_tag][tuple.age][tobacco_value] = (
+                  $product_rate_calculation_cache[product.id][r_area_tag][tuple.age][tobacco_value] +
+                  [{
+                    start_on: pt.effective_period.min,
+                    end_on: pt.effective_period.max,
+                    cost: tuple.cost
+                  }]
+                )
+              end
             end
           end
         end
