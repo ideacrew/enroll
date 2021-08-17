@@ -9,6 +9,7 @@ class AddNewEligibilityDetermination < MongoidMigrationTask
         return
       end
       active_household = person.primary_family.active_household
+      date = Date.strptime(ENV['effective_date'].to_s, "%m/%d/%Y")
       latest_active_tax_household = if active_household.latest_active_tax_household_with_year(TimeKeeper.date_of_record.year).nil?
                                       active_household.latest_active_tax_household
                                     else
