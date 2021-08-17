@@ -62,7 +62,7 @@ module FinancialAssistance
           def send_determination_to_enroll(application)
             # Send Determination to EA
             application.send_determination_to_ea
-          rescue => e
+          rescue StandardError => e
             Rails.logger.info "FAA: error raised in send_determination_to_ea, error: #{e.backtrace}"
           end
 
