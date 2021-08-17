@@ -19,4 +19,5 @@ registry:
           is_enabled: false
         - key: :orphan_accounts_tab
           is_enabled: false
-
+        - key: :no_transition_families
+          is_enabled: false

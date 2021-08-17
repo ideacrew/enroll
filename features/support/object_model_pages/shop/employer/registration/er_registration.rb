@@ -39,8 +39,8 @@ class EmployerRegistration
     'agency[organization][fein]'
   end
 
-  def self.kind_employer_information
-    'agency[organization][entity_kind]'
+  def self.kind_employer_information_dropdown
+    'select[name="agency[organization][entity_kind]"]'
   end
 
   def self.address

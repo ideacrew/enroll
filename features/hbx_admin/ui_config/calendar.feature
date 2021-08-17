@@ -27,7 +27,3 @@ Feature: Calendar tab
          And calendar feature is enabled
          When the user types in the calendar URL
          Then the user will be able to access calendar page
-
-
-
-

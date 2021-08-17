@@ -1,6 +1,7 @@
 Feature: can Transition family members
 
 	Background: Hbx Admin can Transition family members
+		Given EnrollRegistry no_transition_families feature is enabled
 		Given a Hbx admin with hbx_staff role exists
 		And a consumer exists
 		And a Hbx admin logs on to Portal

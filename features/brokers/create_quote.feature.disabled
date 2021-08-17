@@ -65,7 +65,7 @@ Feature: Create Employee Roster
   @broken
   Scenario: Broker should create a quote with health and dental plans
     Given that a broker exists
-    And the Plans exist
+    And Health and Dental plans exist
     And the broker is signed in
     When he visits the Roster Quoting tool
     And click on the New Quote button

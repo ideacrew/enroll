@@ -3,7 +3,7 @@ Feature: HBX Admin Edits a Broker Applicant
   Scenario: Primary Broker has not signed up on the HBX
     Given a CCA site exists with a benefit market
     Given all permissions are present
-    And the Plans exist
+    And Health and Dental plans exist
     And there is a Broker Agency exists for District Brokers Inc
     And the broker Max Planck is primary broker for District Brokers Inc
 
