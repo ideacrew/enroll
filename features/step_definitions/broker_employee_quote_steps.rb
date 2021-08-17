@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #Capybara.ignore_hidden_elements = false
 
 module BrokerWorld
@@ -14,7 +16,7 @@ end
 
 World(BrokerWorld)
 
-Given (/^that a broker exists$/) do
+Given(/^that a broker exists$/) do
   broker_agency
   broker :with_family, :broker_with_person, organization: broker_agency
   broker_agency_profile = broker_agency.broker_agency_profile
@@ -43,7 +45,7 @@ end
 And(/^Primary Broker creates new Prospect Employer with default_office_location$/) do
   find('#organization_legal_name').click
   fill_in 'organization[legal_name]', :with => "emp1"
-  fill_in 'organization[dba]', :with => 101010
+  fill_in 'organization[dba]', :with => 101_010
 
   find('.interaction-choice-control-organization-entity-kind').click
   find(".interaction-choice-control-organization-entity-kind-2").click
@@ -51,8 +53,9 @@ And(/^Primary Broker creates new Prospect Employer with default_office_location$
   find(:xpath, "//select[@name='organization[entity_kind]']/option[@value='c_corporation']")
   fill_in 'organization[office_locations_attributes][0][address_attributes][address_1]', :with => "1818"
   fill_in 'organization[office_locations_attributes][0][address_attributes][address_2]', :with => "exp st"
-  fill_in 'organization[office_locations_attributes][0][address_attributes][city]', :with => "Washington"
-  fill_in 'organization[office_locations_attributes][0][address_attributes][zip]', :with => "20002"
+  fill_in 'organization[office_locations_attributes][0][address_attributes][city]', :with => EnrollRegistry[:enroll_app].setting(:contact_center_city).item
+  fill_in 'organization[office_locations_attributes][0][address_attributes][zip]', :with => EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item
+  select EnrollRegistry[:enroll_app].setting(:state_abbreviation).item, from: "organization_office_locations_attributes_0_address_attributes_state"
   fill_in 'organization[office_locations_attributes][0][phone_attributes][area_code]', :with => "202"
   fill_in 'organization[office_locations_attributes][0][phone_attributes][number]', :with => "5551212"
   fill_in 'organization[office_locations_attributes][0][phone_attributes][extension]', :with => "22332"
@@ -65,7 +68,7 @@ end
 
 And(/^the broker clicks Actions dropdown and clicks View Quotes from dropdown menu$/) do
   path = SponsoredBenefits::Organizations::PlanDesignOrganization.all.first.id.to_s
-  find("#dropdown_for_plan_design_" + path, :text => "Actions").click
+  find("#dropdown_for_plan_design_#{path}", :text => "Actions").click
   find("#plan_design_#{path}> ul > li:nth-child(1) > a", :text => "View Quotes").click
   wait_for_ajax(3, 2)
 end
@@ -77,7 +80,7 @@ end
 And(/^the broker clicks Actions dropdown and clicks Create Quote from dropdown menu$/) do
   #plan = FactoryBot.create(:plan, :with_premium_tables, active_year: TimeKeeper.date_of_record.year)
   path = SponsoredBenefits::Organizations::PlanDesignOrganization.all.first.id.to_s
-  find("#dropdown_for_plan_design_" + path, :text => "Actions").click
+  find("#dropdown_for_plan_design_#{path}", :text => "Actions").click
   find("#plan_design_#{path}> ul > li:nth-child(2) > a", :text => "Create Quote").click
   wait_for_ajax(3, 2)
 end
@@ -92,7 +95,7 @@ And(/^Primary Broker enters quote name$/) do
 
   find(:xpath, "//*[@id='new_forms_plan_design_proposal']/div[1]/div/div[1]/div[2]/div/div[2]/div").click
   expect(page).to have_content((TimeKeeper.date_of_record + 2.months).strftime("%B %Y"))
-  find('li', :text => "#{(TimeKeeper.date_of_record + 2.months).strftime('%B %Y')}").click
+  find('li', :text => (TimeKeeper.date_of_record + 2.months).strftime('%B %Y').to_s).click
   wait_for_ajax(3, 2)
 end
 
@@ -190,13 +193,13 @@ Then(/^the broker should see the data in the table$/) do
 end
 
 Then(/^the broker enters the quote effective date$/) do
-  select "#{(TimeKeeper.date_of_record+3.month).strftime("%B %Y")}", :from => "quote_start_on"
+  select (TimeKeeper.date_of_record + 3.month).strftime('%B %Y').to_s, :from => "quote_start_on"
 end
 
 When(/^the broker selects employer type$/) do
  #find('.interaction-choice-control-quote-employer-type').click()
- select "Prospect", :from => "quote_employer_type"
- fill_in 'quote[employer_name]', with: "prospect test Employee"
+  select "Prospect", :from => "quote_employer_type"
+  fill_in 'quote[employer_name]', with: "prospect test Employee"
 end
 
 When(/^broker enters valid information$/) do
@@ -225,7 +228,7 @@ Then(/^the broker clicks Actions dropdown$/) do
 end
 
 When(/^the broker clicks delete$/) do
-  find('a', text: "Delete"). click
+  find('a', text: "Delete").click
 end
 
 Then(/^the broker sees the confirmation$/) do
