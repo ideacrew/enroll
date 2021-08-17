@@ -6,6 +6,7 @@ Feature: User should be able to pay for plan
   #   And Hbx Admin creates a consumer application
   #   Then Hbx Admin logs out
 
+  @flaky
   Scenario: User can see pay now button and pop up for gap between Kaiser enrollment
     Given the FAA feature configuration is disabled
     Given the kaiser paynow feature configuration is enabled
