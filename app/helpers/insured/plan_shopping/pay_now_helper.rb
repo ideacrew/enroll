@@ -28,7 +28,7 @@ module Insured
       end
 
       def can_pay_now?(hbx_enrollment)
-        return true if individual?(hbx_enrollment) && (has_break_in_coverage_enrollments?(hbx_enrollment) || !has_any_previous_enrollments?(hbx_enrollment))
+        individual?(hbx_enrollment) && (has_break_in_coverage_enrollments?(hbx_enrollment) || !has_any_previous_enrollments?(hbx_enrollment))
       end
 
       def carrier_url(legal_name)
@@ -47,7 +47,7 @@ module Insured
       def has_any_previous_enrollments?(hbx_enrollment)
         all_carrier_enrollments = hbx_enrollment.family.hbx_enrollments.where(:aasm_state.nin => ["inactive", "shopping", "coverage_canceled"]).select do |enr|
           next if enr.product.blank? || enr.subscriber.blank? || enr.is_shop?
-          enr.product.issuer_profile.legal_name.downcase&.gsub(' ', '_') == @issuer_key && enr.effective_on.year == hbx_enrollment.effective_on.year && enr.subscriber.id == hbx_enrollment.subscriber.id
+          enr.product.issuer_profile.legal_name.downcase&.gsub(' ', '_') == @issuer_key && enr.effective_on.year == hbx_enrollment.effective_on.year && enr.subscriber.applicant_id == hbx_enrollment.subscriber.applicant_id
         end
         enrollments = all_carrier_enrollments - hbx_enrollment.to_a
         enrollments.present? ? true : false
