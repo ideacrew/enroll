@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module FinancialAssistance
+  #Store the history of each transaction a user or admin has performed on an evidence
   class VerificationHistory
     include Mongoid::Document
     include Mongoid::Timestamps
