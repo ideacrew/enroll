@@ -8,6 +8,7 @@ require File.join(Rails.root, 'app/data_migrations/golden_seed_helper')
 module GoldenSeedFinancialAssistanceHelper
   def create_and_return_fa_application(case_info_hash = nil)
     application = FinancialAssistance::Application.new
+    application.parent_living_out_of_home_terms = false
     application.family_id = case_info_hash[:family_record].id
     application.is_joint_tax_filing = case_info_hash[:person_attributes]["tax_filing_status"].downcase == 'joint'
     application.save!
@@ -17,7 +18,7 @@ module GoldenSeedFinancialAssistanceHelper
   # TODO: NEED TO DO MEDICAID AND OTHER STUFF
   # rubocop:disable Metrics/CyclomaticComplexity
   def create_and_return_fa_applicant(case_info_hash, is_primary_applicant = nil)
-    applicant = case_info_hash[:fa_application].applicants.build
+    applicant = case_info_hash[:fa_applicant] || case_info_hash[:fa_application].applicants.build
     target_person = case_info_hash[:person_attributes][:current_target_person]
     applicant.is_primary_applicant = is_primary_applicant
     applicant.is_claimed_as_tax_dependent = truthy_value?(case_info_hash[:person_attributes]["claimed_by"])
@@ -38,7 +39,7 @@ module GoldenSeedFinancialAssistanceHelper
     applicant.is_required_to_file_taxes = ["non_filer", "dependent"].exclude?(
       case_info_hash[:person_attributes]["tax_filing_status"].downcase
     )
-    applicant.tax_filer_kind = case_info_hash[:person_attributes]["tax_filing_status"].downcase
+    applicant.tax_filer_kind = applicant.is_required_to_file_taxes == false ? 'non_filer' : case_info_hash[:person_attributes]["tax_filing_status"].downcase
     applicant.claimed_as_tax_dependent_by = case_info_hash[:fa_application].applicants.all.detect(&:is_primary_applicant)&.id
     applicant.is_applying_coverage = truthy_value?(case_info_hash[:person_attributes]['applying_for_coverage'])
     # applicant.
@@ -76,22 +77,22 @@ module GoldenSeedFinancialAssistanceHelper
   end
   # rubocop:enable Metrics/CyclomaticComplexity
 
-  def create_fa_relationships(case_array = nil)
-    application = case_array[1][:fa_application]
+  def create_fa_relationships(case_array)
+    application = case_array[:fa_application]
     primary_applicant = application.applicants.detect(&:is_primary_applicant)
-    applicants = case_array[1][:fa_applicants].reject { |applicant| applicant == primary_applicant }
+    applicants = case_array[:fa_applicants].reject { |applicant| applicant[:applicant_record] == primary_applicant }
     return if applicants.blank?
     applicants.each do |applicant|
-      relationship_to_primary = applicant[:relationship_to_primary].downcase
+      relationship_to_primary = applicant[:person_attributes][:relationship_to_primary].downcase
       next if relationship_to_primary == 'self'
       application.relationships.create!(
-        applicant_id: applicant[:applicant_record].id,
+        applicant_id: applicant[:target_fa_applicant].id,
         relative_id: primary_applicant.id,
         kind: FinancialAssistance::Relationship::INVERSE_MAP[relationship_to_primary]
       )
       application.relationships.create!(
         applicant_id: primary_applicant.id,
-        relative_id: applicant[:applicant_record].id,
+        relative_id: applicant[:target_fa_applicant].id,
         kind: relationship_to_primary
       )
     end
@@ -100,13 +101,14 @@ module GoldenSeedFinancialAssistanceHelper
   def add_applicant_income(case_info_hash)
     return if case_info_hash[:person_attributes]["tax_filing_status"].nil? ||
               case_info_hash[:person_attributes]["tax_filing_status"] == 'non_filer' ||
-              !truthy_value?(case_info_hash[:person_attributes]['income_frequency'])
+              !truthy_value?(case_info_hash[:person_attributes]['income_frequency']) ||
+              case_info_hash[:target_fa_applicant].is_required_to_file_taxes.blank?
     income = case_info_hash[:target_fa_applicant].incomes.build
     income.employer_name = FFaker::Company.name if case_info_hash[:person_attributes]["income_type"].downcase == 'job'
-    income.amount = case_info_hash[:person_attributes]['income_amount']
+    income.amount = case_info_hash[:person_attributes]['income_amount'].to_money
     income.frequency_kind = case_info_hash[:person_attributes]['income_frequency'].downcase
     income.start_on = case_info_hash[:person_attributes]['income_from']
-    income.kind = case_info_hash[:person_attributes]["income_type"]
+    income.kind = 'wages_and_salaries'
     income.save!
     if case_info_hash[:person_attributes]["income_type"].downcase == 'job'
       employer_address = income.build_employer_address
@@ -170,10 +172,11 @@ module GoldenSeedFinancialAssistanceHelper
   end
 
   def add_applicant_emails(case_info_hash)
-    email = case_info_hash[:user_record]&.email || case_info_hash[:primary_person_record].emails.first.address
+    email = case_info_hash[:user_record]&.email || case_info_hash[:primary_person_record]&.emails&.first&.address
     applicant = case_info_hash[:fa_application].applicants.last
     puts("No email address present.") if email.blank?
     puts("No applicant present") if applicant.blank?
+    return if email.blank? || applicant.blank?
     applicant.emails.build(address: email, kind: 'home').save!
   end
 
