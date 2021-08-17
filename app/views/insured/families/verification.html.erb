@@ -11,7 +11,7 @@
   <% end %>
 
   <% if EnrollRegistry.feature_enabled?(:financial_assistance) %>
-    <%= render "financial_assistance/applications/verifications/verification", locals: {family_id: @family.id} %>
+    <%= render partial: "financial_assistance/applications/verifications/verification", locals: {family_id: @family.id} %>
   <% end %>
 </div>
 &nbsp;
