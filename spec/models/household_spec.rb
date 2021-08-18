@@ -333,7 +333,7 @@ describe Household, "for creating a new taxhousehold using create eligibility", 
                           "csr"=>"94",
                           "effective_date"=> "#{current_date.year}-#{current_date.month}-#{current_date.day}",
                           "family_members"=>
-                            { family100.primary_applicant.person.hbx_id => {"pdc_type"=>"is_ia_eligible", "reason"=>"7hvgds", "csr"=>"100"} }
+                            { family100.primary_applicant.person.hbx_id => {"pdc_type" => "is_ia_eligible", "reason" => "7hvgds", "csr" => "100"} }
                         }
                       }
 
