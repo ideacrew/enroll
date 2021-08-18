@@ -5,6 +5,7 @@ Feature: Create Eligibility
     Background:
         Given User with tax household exists
         Given Hbx Admin exists
+        And Hbx Admin can add pdc
         When Hbx Admin logs on to the Hbx Portal
         When Hbx Admin click Families link
         And Hbx Admin clicks Actions button

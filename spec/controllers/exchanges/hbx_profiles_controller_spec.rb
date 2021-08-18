@@ -698,7 +698,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       expect(response).to have_http_status(:success)
       expect(eligibility_deter.max_aptc.to_f).to eq(max_aptc.to_f)
       expect(eligibility_deter.csr_percent_as_integer).to eq(0)
-      expect(tax_household_member.csr_percent_as_integer).to eq(csr)
+      expect(tax_household_member.csr_percent_as_integer).to eq(0)
       expect(tax_household_member.is_medicaid_chip_eligible).to be_truthy
       expect(tax_household_member.is_ia_eligible).to be_falsy
       expect(tax_household_member.reason).to eq(reason)
