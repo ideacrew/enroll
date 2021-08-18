@@ -9,7 +9,11 @@ module Insured
         "CareFirst" => "https://member.carefirst.com/members/home.page",
         "Delta Dental" => "https://www1.deltadentalins.com/login.html",
         "Dominion National" => "https://www.dominionmembers.com/",
-        "Kaiser" => "https://kp.org/paypremium"
+        "Kaiser" => "https://kp.org/paypremium",
+        "Community Health Options" => "https://uatmcho.onlineinsight.com/ehp/eapp/samlpaymentacs",
+        "Harvard Pilgrim Health Care" => "https://b2bu.harvardpilgrim.org/CMSInitalPayments",
+        "Anthem Blue Cross and Blue Shield" => "https://payment.sit2.va.anthem.com/sales/payment/exchange?state=ME",
+        "Northeast Delta Dental" => "https://qaaca.deltadentalcoversme.com/acapayment/"
       }.freeze
 
       # rubocop:disable Metrics/CyclomaticComplexity
