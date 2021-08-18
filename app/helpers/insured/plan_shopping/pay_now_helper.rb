@@ -90,6 +90,11 @@ module Insured
           "https://"
         end
       end
+
+      def is_continous_coverage_enrollment?(hbx_enrollment)
+        enrollments = hbx_enrollment.family.enrollments.current_year.where(aasm_state: "coverage_terminated", kind: "individual", terminated_on: hbx_enrollment.effective_on - 1.day)
+        enrollments.present?
+      end
     end
   end
 end
