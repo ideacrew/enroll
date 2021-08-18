@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Then(/^Hbx Admin should see a Create Eligibility link$/) do
   find_link('Create Eligibility').visible?
 end
