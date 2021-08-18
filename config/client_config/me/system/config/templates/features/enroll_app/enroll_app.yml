@@ -313,6 +313,16 @@ registry:
       - key: :counties_import
         is_enabled: true
         item: "SHOP_ZipCode_CY2021_FINAL_ME.xlsx"
+      - key: :individual_market_notice
+        item: :individual_market_notice
+        is_enabled: false
+        settings:
+          - key: :mailing_address_1
+            item: ""
+          - key: :mailing_address_city
+            item: ""
+          - key: :mailing_address_zip
+            item: ""
   - namespace:
       - :features
       - :enroll_app
