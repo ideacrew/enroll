@@ -614,9 +614,18 @@ RSpec.shared_context 'prior and current benefit coverage periods and products', 
   let(:current_benefit_coverage_period) {prior_benefit_coverage_period.successor}
   let(:current_benefit_package) { current_benefit_coverage_period.benefit_packages.first}
 
+  let!(:prior_service_area) do
+    FactoryBot.create_default(:benefit_markets_locations_service_area,  active_year: Date.new(prior_coverage_year,1,1).year)
+  end
+
+  let!(:current_service_area) do
+    FactoryBot.create_default(:benefit_markets_locations_service_area,  active_year: Date.new(TimeKeeper.date_of_record.year,1,1).year)
+  end
+
   let(:prior_product) do
     product = BenefitMarkets::Products::Product.find(prior_benefit_package.benefit_ids.first)
     product.update_attributes(application_period: Date.new(prior_coverage_year,1,1)..Date.new(prior_coverage_year,12,31))
+    product.update_attributes(service_area: prior_service_area)
     product
   end
 
@@ -625,6 +634,7 @@ RSpec.shared_context 'prior and current benefit coverage periods and products', 
     prior_product.renewal_product_id = r_product.id
     prior_product.save!
     prior_product.reload
+    r_product.update_attributes(service_area: current_service_area)
     r_product
   end
 end
@@ -638,8 +648,17 @@ RSpec.shared_context 'family has no current year coverage and not in open enroll
                       :with_primary_family_member,
                       person: consumer_role.person)
   end
+  let(:current_renewal_date) { TimeKeeper.date_of_record.beginning_of_year.year }
+  let(:renewal_calender_date) { TimeKeeper.date_of_record.beginning_of_year.next_year }
+  let!(:renewal_rating_area) do
+    ::BenefitMarkets::Locations::RatingArea.rating_area_for(consumer_role.person.rating_address, during: current_renewal_date) || FactoryBot.create_default(:benefit_markets_locations_rating_area, active_year: current_renewal_date.year)
+  end
+  let!(:current_rating_area) do
+    ::BenefitMarkets::Locations::RatingArea.rating_area_for(consumer_role.person.rating_address, during: renewal_calender_date) || FactoryBot.create_default(:benefit_markets_locations_rating_area, active_year: renewal_calender_date.year)
+  end
   let(:qle) { FactoryBot.create(:qualifying_life_event_kind, market_kind: "individual") }
   let(:sep) {  FactoryBot.create(:special_enrollment_period, effective_on: Date.new(prior_coverage_year, 11, 1), family: family, coverage_renewal_flag: true, qualifying_life_event_kind_id: qle.id)}
+
   let(:prior_ivl_enrollment) do
     FactoryBot.create(:hbx_enrollment,
                       :individual_unassisted,
@@ -649,6 +668,7 @@ RSpec.shared_context 'family has no current year coverage and not in open enroll
                       household: family.active_household,
                       effective_on: Date.new(prior_coverage_year, 11, 1),
                       family: family,
+                      consumer_role_id: consumer_role.id,
                       product: prior_product)
   end
 end
@@ -662,6 +682,14 @@ RSpec.shared_context 'family has no current year coverage and not in open enroll
                       :with_primary_family_member,
                       person: consumer_role.person)
   end
+  let(:current_renewal_date) { TimeKeeper.date_of_record.beginning_of_year.year }
+  let(:renewal_calender_date) { TimeKeeper.date_of_record.beginning_of_year.next_year }
+  let!(:renewal_rating_area) do
+    ::BenefitMarkets::Locations::RatingArea.rating_area_for(consumer_role.person.rating_address, during: current_renewal_date) || FactoryBot.create_default(:benefit_markets_locations_rating_area, active_year: current_renewal_date.year)
+  end
+  let!(:current_rating_area) do
+    ::BenefitMarkets::Locations::RatingArea.rating_area_for(consumer_role.person.rating_address, during: renewal_calender_date) || FactoryBot.create_default(:benefit_markets_locations_rating_area, active_year: renewal_calender_date.year)
+  end
   let(:qle) { FactoryBot.create(:qualifying_life_event_kind, market_kind: "individual") }
   let(:sep) {  FactoryBot.create(:special_enrollment_period, effective_on: Date.new(prior_coverage_year, 11, 1), family: family, admin_flag: true, coverage_renewal_flag: false, qualifying_life_event_kind_id: qle.id)}
   let(:prior_ivl_enrollment) do
@@ -673,6 +701,7 @@ RSpec.shared_context 'family has no current year coverage and not in open enroll
                       household: family.active_household,
                       effective_on: Date.new(prior_coverage_year, 11, 1),
                       family: family,
+                      consumer_role_id: consumer_role.id,
                       product: prior_product)
   end
 end
@@ -689,6 +718,15 @@ RSpec.shared_context 'family has current year coverage and not in open enrollmen
   let(:qle) { FactoryBot.create(:qualifying_life_event_kind, market_kind: "individual") }
   let(:sep) {  FactoryBot.create(:special_enrollment_period, effective_on: Date.new(prior_coverage_year, 11, 1), family: family, coverage_renewal_flag: true, qualifying_life_event_kind_id: qle.id)}
 
+  let(:current_renewal_date) { TimeKeeper.date_of_record.beginning_of_year.year }
+  let(:renewal_calender_date) { TimeKeeper.date_of_record.beginning_of_year.next_year }
+  let!(:renewal_rating_area) do
+    ::BenefitMarkets::Locations::RatingArea.rating_area_for(consumer_role.person.rating_address, during: current_renewal_date) || FactoryBot.create_default(:benefit_markets_locations_rating_area, active_year: current_renewal_date.year)
+  end
+  let!(:current_rating_area) do
+    ::BenefitMarkets::Locations::RatingArea.rating_area_for(consumer_role.person.rating_address, during: renewal_calender_date) || FactoryBot.create_default(:benefit_markets_locations_rating_area, active_year: renewal_calender_date.year)
+  end
+
   let(:current_ivl_enrollment) do
     FactoryBot.create(:hbx_enrollment,
                       :individual_unassisted,
@@ -697,7 +735,9 @@ RSpec.shared_context 'family has current year coverage and not in open enrollmen
                       household: family.active_household,
                       effective_on: Date.new(current_coverage_year, 11, 1),
                       family: family,
-                      product: current_product)
+                      product: current_product,
+                      consumer_role_id: consumer_role.id,
+                      rating_area_id: current_rating_area.id)
   end
 
   let(:prior_ivl_enrollment) do
@@ -709,6 +749,7 @@ RSpec.shared_context 'family has current year coverage and not in open enrollmen
                       household: family.active_household,
                       effective_on: Date.new(prior_coverage_year, 11, 1),
                       family: family,
+                      consumer_role_id: consumer_role.id,
                       product: prior_product)
   end
 end
@@ -725,6 +766,15 @@ RSpec.shared_context 'family has current year and prior year coverage and not in
   let(:qle) { FactoryBot.create(:qualifying_life_event_kind, market_kind: "individual") }
   let(:sep) {  FactoryBot.create(:special_enrollment_period, effective_on: Date.new(prior_coverage_year, 11, 1), family: family, coverage_renewal_flag: true, qualifying_life_event_kind_id: qle.id)}
 
+  let(:current_renewal_date) { TimeKeeper.date_of_record.beginning_of_year.year }
+  let(:renewal_calender_date) { TimeKeeper.date_of_record.beginning_of_year.next_year }
+  let!(:renewal_rating_area) do
+    ::BenefitMarkets::Locations::RatingArea.rating_area_for(consumer_role.person.rating_address, during: current_renewal_date) || FactoryBot.create_default(:benefit_markets_locations_rating_area, active_year: current_renewal_date.year)
+  end
+  let!(:current_rating_area) do
+    ::BenefitMarkets::Locations::RatingArea.rating_area_for(consumer_role.person.rating_address, during: renewal_calender_date) || FactoryBot.create_default(:benefit_markets_locations_rating_area, active_year: renewal_calender_date.year)
+  end
+
   let(:current_ivl_enrollment) do
     FactoryBot.create(:hbx_enrollment,
                       :individual_unassisted,
@@ -733,7 +783,9 @@ RSpec.shared_context 'family has current year and prior year coverage and not in
                       household: family.active_household,
                       effective_on: Date.new(current_coverage_year, 2, 1),
                       family: family,
-                      product: current_product)
+                      product: current_product,
+                      consumer_role_id: consumer_role.id,
+                      rating_area_id: current_rating_area.id)
   end
 
   let(:prior_ivl_enrollment) do
@@ -745,6 +797,7 @@ RSpec.shared_context 'family has current year and prior year coverage and not in
                       household: family.active_household,
                       effective_on: Date.new(prior_coverage_year, 11, 1),
                       family: family,
+                      consumer_role_id: consumer_role.id,
                       product: prior_product)
   end
 
@@ -758,6 +811,7 @@ RSpec.shared_context 'family has current year and prior year coverage and not in
                       effective_on: Date.new(prior_coverage_year, 2, 1),
                       family: family,
                       product: prior_product,
+                      consumer_role_id: consumer_role.id,
                       aasm_state: 'coverage_expired')
   end
 end
@@ -786,17 +840,32 @@ RSpec.shared_context 'prior, current and next year benefit coverage periods and 
   let(:renewal_benefit_coverage_period) {current_benefit_coverage_period.successor}
   let(:renewal_benefit_package) { renewal_benefit_coverage_period.benefit_packages.first}
 
+  let!(:prior_service_area) do
+    FactoryBot.create_default(:benefit_markets_locations_service_area,  active_year: Date.new(prior_coverage_year,1,1).year)
+  end
+
+  let!(:current_service_area) do
+    FactoryBot.create_default(:benefit_markets_locations_service_area,  active_year: Date.new(TimeKeeper.date_of_record.year,1,1).year)
+  end
+
+  let!(:renewal_service_area) do
+    FactoryBot.create_default(:benefit_markets_locations_service_area,  active_year: Date.new(renewal_coverage_year,1,1).year)
+  end
+
   let(:prior_product) do
     product = BenefitMarkets::Products::Product.find(prior_benefit_package.benefit_ids.first)
     product.update_attributes(application_period: Date.new(prior_coverage_year,1,1)..Date.new(prior_coverage_year,12,31))
+    product.update_attributes(service_area: prior_service_area)
     product
   end
+
 
   let(:current_product) do
     r_product = BenefitMarkets::Products::Product.find(current_benefit_package.benefit_ids.first)
     prior_product.renewal_product_id = r_product.id
     prior_product.save!
     prior_product.reload
+    r_product.update_attributes(service_area: current_service_area)
     r_product
   end
 
@@ -806,6 +875,7 @@ RSpec.shared_context 'prior, current and next year benefit coverage periods and 
     current_product.renewal_product_id = r_product.id
     current_product.save!
     current_product.reload
+    r_product.update_attributes(service_area: renewal_service_area)
     r_product
   end
 end
@@ -821,6 +891,14 @@ RSpec.shared_context 'family has prior, current and renewal year coverage and in
   end
   let(:qle) { FactoryBot.create(:qualifying_life_event_kind, market_kind: "individual") }
   let(:sep) {  FactoryBot.create(:special_enrollment_period, effective_on: Date.new(prior_coverage_year, 11, 1), family: family, coverage_renewal_flag: true, qualifying_life_event_kind_id: qle.id)}
+  let(:current_renewal_date) { TimeKeeper.date_of_record.beginning_of_year.year }
+  let(:renewal_calender_date) { TimeKeeper.date_of_record.beginning_of_year.next_year }
+  let!(:renewal_rating_area) do
+    ::BenefitMarkets::Locations::RatingArea.rating_area_for(consumer_role.person.rating_address, during: current_renewal_date) || FactoryBot.create_default(:benefit_markets_locations_rating_area, active_year: current_renewal_date.year)
+  end
+  let!(:current_rating_area) do
+    ::BenefitMarkets::Locations::RatingArea.rating_area_for(consumer_role.person.rating_address, during: renewal_calender_date) || FactoryBot.create_default(:benefit_markets_locations_rating_area, active_year: renewal_calender_date.year)
+  end
 
   let(:current_ivl_enrollment) do
     FactoryBot.create(:hbx_enrollment,
@@ -828,9 +906,11 @@ RSpec.shared_context 'family has prior, current and renewal year coverage and in
                       :with_enrollment_members,
                       enrollment_members: family.family_members,
                       household: family.active_household,
+                      consumer_role_id: consumer_role.id,
                       effective_on: Date.new(current_coverage_year, 2, 1),
                       family: family,
-                      product: current_product)
+                      product: current_product,
+                      rating_area_id: current_rating_area.id)
   end
 
   let(:prior_ivl_enrollment) do
@@ -839,6 +919,7 @@ RSpec.shared_context 'family has prior, current and renewal year coverage and in
                       :with_enrollment_members,
                       enrollment_members: family.family_members,
                       special_enrollment_period_id: sep.id,
+                      consumer_role_id: consumer_role.id,
                       household: family.active_household,
                       effective_on: Date.new(prior_coverage_year, 11, 1),
                       family: family,
@@ -852,6 +933,7 @@ RSpec.shared_context 'family has prior, current and renewal year coverage and in
                       :with_enrollment_members,
                       enrollment_members: family.family_members,
                       household: family.active_household,
+                      consumer_role_id: consumer_role.id,
                       effective_on: Date.new(prior_coverage_year, 2, 1),
                       family: family,
                       product: prior_product,
@@ -864,8 +946,10 @@ RSpec.shared_context 'family has prior, current and renewal year coverage and in
                       :with_enrollment_members,
                       enrollment_members: family.family_members,
                       household: family.active_household,
+                      consumer_role_id: consumer_role.id,
                       effective_on: Date.new(renewal_coverage_year, 1, 1),
                       family: family,
-                      product: renewal_product)
+                      product: renewal_product,
+                      rating_area_id: renewal_rating_area.id)
   end
 end

@@ -1053,6 +1053,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
           allow(::EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_ivl_sep).and_return(true)
           allow(::EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_shop_sep).and_return(true)
           allow(::EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
         end
 
         it "should cancel the enrollment" do
@@ -1081,6 +1082,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
           allow(::EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_ivl_sep).and_return(true)
           allow(::EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_shop_sep).and_return(true)
           allow(::EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
         end
 
         it "should cancel the enrollment" do
@@ -3776,6 +3778,7 @@ describe "#cancel_coverage event for shop", dbclean: :after_each do
 
     before do
       allow(::EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_shop_sep).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
     end
 
     let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_year.prev_year }
@@ -3806,6 +3809,7 @@ describe "#cancel_coverage event for shop", dbclean: :after_each do
 
     before do
       allow(::EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_shop_sep).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
     end
 
     let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_year.prev_year }
@@ -3919,6 +3923,7 @@ describe "#select_coverage event for shop", dbclean: :after_each do
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(false)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_ivl_sep).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_shop_sep).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
       census_employee.benefit_group_assignments << expired_bga
       census_employee.benefit_group_assignments << active_bga
       census_employee.save
@@ -4014,6 +4019,7 @@ describe "#select_coverage event for shop", dbclean: :after_each do
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(false)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_ivl_sep).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_shop_sep).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
       census_employee.benefit_group_assignments << terminated_bga
       census_employee.benefit_group_assignments << active_bga
       census_employee.save
