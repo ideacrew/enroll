@@ -755,7 +755,7 @@ module FinancialAssistance
         transitions from: :submitted, to: :determination_response_error
       end
 
-      event :determine, :after => [:record_transition, :create_evidences, :trigger_fdsh_hub_calls] do
+      event :determine, :after => :record_transition do
         transitions from: :submitted, to: :determined
       end
 
