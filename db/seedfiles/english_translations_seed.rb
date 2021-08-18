@@ -6,19 +6,30 @@ translations_to_seed = []
 # All filenames should be in a pattern such as
 # broker_agencies.rb
 # with a constant like
-# BROKER_AGENCIES_TRASLATIONS
-seedfile_location = "db/seedfiles/translations/en/#{site_key}/"
-Dir.glob("#{seedfile_location}*").each do |filename|
-  puts("Requiring #{filename}")
-  require Rails.root.to_s + "/" + filename
-  # Save the constant from the file
-  str2_markerstring = ".rb"
-  translations_to_seed << "#{filename[/#{seedfile_location}(.*?)#{str2_markerstring}/m, 1]}_translations".upcase.constantize
+# BROKER_AGENCIES_TRANSLATIONS
+seedfile_locations = ["db/seedfiles/translations/en/#{site_key}/"]
+seedfile_locations += ["components/financial_assistance/db/seedfiles/translations/en/#{site_key}/"] if EnrollRegistry.feature_enabled?(:financial_assistance)
+
+seedfile_locations.each do |seedfile_location|
+  Dir.glob("#{seedfile_location}*").each do |filename|
+    puts("Requiring #{filename}")
+    require Rails.root.to_s + "/" + filename
+    # Save the constant from the file
+    str2_markerstring = ".rb"
+    translations_to_seed << "#{filename[/#{seedfile_location}(.*?)#{str2_markerstring}/m, 1]}_translations".upcase.constantize
+  end
 end
+
+# This will be used for translations for displaying certain constants/database values from FAA on the view
 if EnrollRegistry.feature_enabled?(:financial_assistance)
-  require_relative File.join(Rails.root, 'components/financial_assistance/db/seedfiles/translations/en/faa_translations')
-  translations_to_seed << FaaTranslations::ASSISTANCE_TRANSLATIONS
-  translations_to_seed << FaaTranslations::ELIGIBILITY_TRANSLATIONS
+  fa_translation_hash = {}
+  # This is a hash
+  other_income_type_kinds = ::FinancialAssistance::Income::ALL_INCOME_KINDS_MAPPED
+  other_income_type_kinds.each do |symbolized_key, humanized_value|
+    translation_record_key = "en.faa.income.#{symbolized_key}"
+    fa_translation_hash[translation_record_key] = humanized_value
+  end
+  translations_to_seed << fa_translation_hash
 end
 
 MAIN_TRANSLATIONS = {

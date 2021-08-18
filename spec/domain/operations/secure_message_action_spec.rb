@@ -13,7 +13,15 @@ module Operations
     describe "not passing :resource_id, :subject, :actions_id, :body :resource_name" do
 
       let(:params) { { }}
-      let(:error_message) {{:resource_id => ['is missing'], :resource_name => ['is missing'], :actions_id => ['is missing'], :subject => ['is missing'], :body => ['is missing']}}
+      let(:error_message) do
+        {
+          :resource_id => ['is missing', 'must be a string'],
+          :resource_name => ['is missing', 'must be a string'],
+          :actions_id => ['is missing', 'must be a string'],
+          :subject => ['is missing', 'must be a string'],
+          :body => ['is missing', 'must be a string']
+        }
+      end
 
       it "fails" do
         expect(subject).not_to be_success
@@ -39,7 +47,7 @@ module Operations
     describe "passing all params but with valid data" do
 
       let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key) }
-      let(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, site: site)}
+      let(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :"with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site)}
       let(:employer_profile) { organization.employer_profile }
       let(:person)           { FactoryBot.create(:person, :with_family) }
 

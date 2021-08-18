@@ -83,6 +83,13 @@ Given(/^the user has an eligible immigration status$/) do
   end
 end
 
+Given(/^the user is a member of an indian tribe$/) do
+  consumer.person.consumer_role.update_attributes(indian_tribe_member: true)
+  application.applicants.each do |applicant|
+    applicant.update_attributes(indian_tribe_member: true)
+  end
+end
+
 Given(/^the user has an age between (\d+) and (\d+) years old$/) do |_arg1, _arg2|
   dob = TimeKeeper.date_of_record - 19.years
   consumer.person.update_attributes(dob: dob)
@@ -137,6 +144,19 @@ And(/^the user fills out the rest of the other questions form and submits it$/) 
   choose('is_self_attested_blind_no')
   choose('is_veteran_or_active_military_no')
   choose("is_resident_post_092296_no")
+  choose("medicaid_pregnancy_no") if page.all("#medicaid_pregnancy_no").present?
+  find('[name=commit]').click
+end
+
+And(/^the user fills out the required other questions and submits it$/) do
+  choose('is_ssn_applied_no')
+  choose('is_pregnant_no')
+  choose('is_post_partum_period_no')
+  choose('is_former_foster_care_no')
+  choose('is_student_no')
+  choose('is_veteran_or_active_military_no')
+  choose("is_resident_post_092296_no")
+  choose("radio_physically_disabled_no")
   choose("medicaid_pregnancy_no") if page.all("#medicaid_pregnancy_no").present?
   find('[name=commit]').click
 end

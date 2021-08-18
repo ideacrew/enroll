@@ -69,8 +69,8 @@ module Factories
     def fetch_member_ratio
       return @fetch_member_ratio if @fetch_member_ratio.present?
 
-      aptc_enr_members = aptc_enrolling_members(all_aptc_thhms)
-      @fetch_member_ratio ||= aptc_benchmark_ratio_hash_test(aptc_enr_members)
+      # aptc_enr_members = aptc_enrolling_members(all_aptc_thhms)
+      @fetch_member_ratio ||= aptc_benchmark_ratio_hash_test
     end
 
     def applicable_aptc(product_id)
@@ -149,7 +149,7 @@ module Factories
 
     def enrollment_eligible_benchmark_hash(thhms, enrollment)
       thhms.inject({}) do |benchmark_hash, thhm|
-        benchmark_hash.merge!({ thhm.applicant_id.to_s => thhm.family_member.aptc_benchmark_amount(enrollment) })
+        benchmark_hash.merge!({ thhm.applicant_id.to_s => thhm.aptc_benchmark_amount(enrollment) })
       end
     end
 
@@ -163,14 +163,14 @@ module Factories
       @enrollment.hbx_enrollment_members.select{ |member| aptc_fm_ids.include?(member.applicant_id.to_s) }
     end
 
-    def aptc_benchmark_ratio_hash_test(aptc_enr_members)
-      member_benchmark_hash = aptc_enr_members.map(&:family_member).inject({}) do |b_hash, member|
-        b_hash[member.id.to_s] = member.aptc_benchmark_amount(@enrollment)
+    def aptc_benchmark_ratio_hash_test
+      member_benchmark_hash = all_aptc_thhms.inject({}) do |b_hash, aptc_thhm|
+        b_hash[aptc_thhm.family_member_id.to_s] = aptc_thhm.aptc_benchmark_amount(@enrollment)
         b_hash
       end
       total_benchmark = member_benchmark_hash.values.sum
-      aptc_enr_members.inject({}) do |members_ratio_hash, member|
-        family_member_id = member.applicant_id.to_s
+      all_aptc_thhms.inject({}) do |members_ratio_hash, aptc_thhm|
+        family_member_id = aptc_thhm.applicant_id.to_s
         members_ratio_hash[family_member_id] = (member_benchmark_hash[family_member_id] / total_benchmark)
         members_ratio_hash
       end

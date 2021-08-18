@@ -12,7 +12,7 @@ RSpec.describe "_footer.html.slim", :type => :view, dbclean: :after_each  do
     end
 
     it "should display Phone numer" do
-      expect(rendered).to have_text(Settings.contact_center.short_number)
+      expect(rendered).to have_text(EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item)
     end
 
     it "should display TTY numer" do

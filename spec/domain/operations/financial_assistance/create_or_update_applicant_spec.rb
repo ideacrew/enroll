@@ -8,7 +8,8 @@ RSpec.describe ::Operations::FinancialAssistance::CreateOrUpdateApplicant, type:
   let!(:family_member) { FactoryBot.create(:family_member, family: family, person: person2) }
 
   before do
-    allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(true)
+    EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(true)
+    EnrollRegistry[:validate_quadrant].feature.stub(:is_enabled).and_return(true)
   end
 
   it 'should be a container-ready operation' do
@@ -87,10 +88,10 @@ def create_data_for_call_backs
   @application10 = FactoryBot.create(:financial_assistance_application, family_id: @family10.id, aasm_state: 'draft')
   applicant10 = FactoryBot.create(:financial_assistance_applicant, :with_work_phone, :with_work_email,
                                   :with_home_address, family_member_id: @family10.primary_applicant.id,
-                                  application: @application10, gender: person10.gender, is_incarcerated: person10.is_incarcerated,
-                                  ssn: person10.ssn, dob: person10.dob, first_name: person10.first_name,
-                                  last_name: person10.last_name, is_primary_applicant: true, person_hbx_id: person10.hbx_id,
-                                  is_applying_coverage: true, citizen_status: 'us_citizen', indian_tribe_member: false)
+                                                      application: @application10, gender: person10.gender, is_incarcerated: person10.is_incarcerated,
+                                                      ssn: person10.ssn, dob: person10.dob, first_name: person10.first_name,
+                                                      last_name: person10.last_name, is_primary_applicant: true, person_hbx_id: person10.hbx_id,
+                                                      is_applying_coverage: true, citizen_status: 'us_citizen', indian_tribe_member: false)
 
   person2 = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, is_incarcerated: false)
   person10.ensure_relationship_with(person2, 'child')

@@ -342,9 +342,9 @@ aca:
 notices:
   individual_market:
     mail_address:
-      address_1: "PO Box 44018"
+      address_1: "1225 I Street NW, Suite 400"
       city: "Washington"
-      zip_code: "20026"
+      zip_code: "20005"
 
   shop_market:
     mail_address:

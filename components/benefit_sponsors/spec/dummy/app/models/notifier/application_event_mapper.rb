@@ -12,7 +12,9 @@ module Notifier
     }
 
     RESOURCE_MAP = {
-      "BenefitSponsors::Organizations::AcaShop#{EnrollRegistry[:enroll_app].setting(:site_key).item.capitalize}EmployerProfile" => Resource.new(:employer, :hbx_id, :employer_id, :by_hbx_id),
+      # these are set at startup so we need both for specs in this dummy file
+      "BenefitSponsors::Organizations::AcaShopMeEmployerProfile" => Resource.new(:employer, :hbx_id, :employer_id, :by_hbx_id),
+      "BenefitSponsors::Organizations::AcaShopDcEmployerProfile" => Resource.new(:employer, :hbx_id, :employer_id, :by_hbx_id),
       "BenefitSponsors::Organizations::BrokerAgencyProfile" => Resource.new(:broker_agency, :id, :broker_agency_id, :find),
       "ConsumerRole" => Resource.new(:consumer_role, :id, :consumer_role_id, :find),
       "CensusEmployee" => Resource.new(:census_employee, :id, :census_employee_id, :find),

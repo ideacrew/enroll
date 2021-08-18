@@ -118,3 +118,25 @@ And(/^the dependent should now be claimed by the primary dependent$/) do
   dependent = application.applicants.last
   expect(dependent.claimed_as_tax_dependent_by.to_s).to eq(primary_applicant.id.to_s)
 end
+
+Given(/head of household question feature is enabled/) do
+  enable_fa_feature(:filing_as_head_of_household)
+end
+
+And(/user clicks household add member button/) do
+  sleep 3
+  find('#household_info_add_member').click
+end
+
+And(/user clicks primary add income and coverage/) do
+  find_all('.interaction-click-control-add-income---coverage-info').first.click
+end
+
+And(/filing jointly is selected no/) do
+  sleep 3
+  choose('is_joint_tax_filing_no')
+end
+
+And(/head of household is selected yes/) do
+  choose('is_filing_as_head_of_household_yes')
+end

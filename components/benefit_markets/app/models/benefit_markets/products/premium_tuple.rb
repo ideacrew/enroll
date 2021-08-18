@@ -3,12 +3,17 @@ module BenefitMarkets
     include Mongoid::Document
     include Mongoid::Timestamps
 
+    TOBACCO_USE_VALUES = ['Y', 'N', 'nil', 'NA'].freeze
+
     embedded_in :premium_table,
                 class_name: "BenefitMarkets::Products::PremiumTable"
 
     field :age,   type: Integer
     field :cost,  type: Float
     field :tobacco_cost, type: Float # if ::EnrollRegistry.feature_enabled?(:tobacco_cost)
+
+    # Allowed values are 'Y', 'N', or nil for 'NA'
+    field :tobacco_use, type: String
 
     validates_presence_of :age, :cost
 
@@ -27,6 +32,10 @@ module BenefitMarkets
       else
         other.updated_at.blank? || (updated_at < other.updated_at) ? -1 : 1
       end
+    end
+
+    def tobacco_use_value
+      tobacco_use.blank? ? "NA" : tobacco_use
     end
   end
 end

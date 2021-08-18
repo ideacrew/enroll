@@ -287,8 +287,9 @@ Given(/^a Hbx admin with read and write permissions exists$/) do
   person = people['Hbx Admin']
   hbx_profile = FactoryBot.create :hbx_profile
   user = FactoryBot.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
+  rating_area = FactoryBot.create(:benefit_markets_locations_rating_area)
   FactoryBot.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
-  FactoryBot.create :hbx_enrollment,family: user.primary_family, household: user.primary_family.active_household
+  FactoryBot.create :hbx_enrollment,family: user.primary_family, household: user.primary_family.active_household, rating_area_id: rating_area.id
 end
 
 Given(/^a Hbx admin with super admin access exists$/) do
@@ -301,8 +302,9 @@ Given(/^a Hbx admin with super admin access exists$/) do
   person = people['Hbx Admin']
   hbx_profile = FactoryBot.create :hbx_profile, :no_open_enrollment_coverage_period
   user = FactoryBot.create :user, :with_family, :with_hbx_staff_role, email: person[:email], password: person[:password], password_confirmation: person[:password]
+  rating_area = FactoryBot.create(:benefit_markets_locations_rating_area)
   FactoryBot.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
-  FactoryBot.create :hbx_enrollment,family:user.primary_family, household:user.primary_family.active_household
+  FactoryBot.create :hbx_enrollment, family: user.primary_family, household: user.primary_family.active_household, rating_area_id: rating_area.id
 end
 
 Given(/^a Hbx admin with tier 3 access exists$/) do
@@ -314,8 +316,9 @@ Given(/^a Hbx admin with tier 3 access exists$/) do
   person = people['Hbx Admin']
   hbx_profile = FactoryBot.create :hbx_profile, :no_open_enrollment_coverage_period
   user = FactoryBot.create :user, :with_family, :with_hbx_staff_role, email: person[:email], password: person[:password], password_confirmation: person[:password]
+  rating_area = FactoryBot.create(:benefit_markets_locations_rating_area)
   FactoryBot.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
-  FactoryBot.create :hbx_enrollment,family: user.primary_family, household: user.primary_family.active_household
+  FactoryBot.create :hbx_enrollment,family: user.primary_family, household: user.primary_family.active_household, rating_area_id: rating_area.id
 end
 
 Given(/^a Hbx admin with read only permissions exists$/) do
@@ -326,8 +329,9 @@ Given(/^a Hbx admin with read only permissions exists$/) do
   person = people['Hbx Admin']
   hbx_profile = FactoryBot.create :hbx_profile
   user = FactoryBot.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
+  rating_area = FactoryBot.create(:benefit_markets_locations_rating_area)
   FactoryBot.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
-  FactoryBot.create :hbx_enrollment,family:user.primary_family, household:user.primary_family.active_household
+  FactoryBot.create :hbx_enrollment, family: user.primary_family, household: user.primary_family.active_household, rating_area_id: rating_area.id
 end
 
 Given(/^Employer Attestation feature is enabled/) do
@@ -479,7 +483,7 @@ Then(/^.+ creates (.+) as a roster employee$/) do |named_person|
   fill_in 'jq_datepicker_ignore_census_employee[hired_on]', with: (Time.now - 1.week).strftime('%m/%d/%Y')
   find('#census_employee_is_business_owner', wait: 5).click
 
-  fill_in 'census_employee[address_attributes][address_1]', :with => '1026 Potomac'
+  fill_in 'census_employee[address_attributes][address_1]', :with => '1026 Potomac NE'
   fill_in 'census_employee[address_attributes][address_2]', :with => 'Apt ABC'
   fill_in 'census_employee[address_attributes][city]', :with => 'Alpharetta'
 
@@ -776,6 +780,7 @@ When(/^.+ enters? the dependent info of Patrick wife$/) do
   find("span", :text => "choose").click
   find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Spouse')]").click
   find(:xpath, "//label[@for='radio_female']").click
+  find(:xpath, '//label[@for="dependent_same_with_primary"]').click
   fill_in 'dependent[addresses][0][address_1]', with: '123 STREET'
   fill_in 'dependent[addresses][0][city]', with: 'WASHINGTON'
   find(:xpath, "//span[@class='label'][contains(., 'SELECT STATE')]").click
@@ -785,6 +790,7 @@ end
 
 When(/^.+ clicks? confirm member$/) do
   all(:css, ".mz").last.click
+  # find_all('.btn-confirmation', wait: 5)[0].click
   expect(page).to have_link('Add New Person')
 end
 

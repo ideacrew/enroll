@@ -375,15 +375,19 @@ private
       :naturalized_citizen,
       :eligible_immigration_status,
       :indian_tribe_member,
+      {:immigration_doc_statuses => []},
       {:ethnicity => []},
       :tribal_id,
+      :tribal_state,
+      :tribal_name,
       :no_dc_address,
       :is_homeless,
       :is_temporarily_out_of_state,
       :id,
       :consumer_role,
       :is_applying_coverage,
-      :age_off_excluded
+      :age_off_excluded,
+      :is_tobacco_user
     ]
   end
 

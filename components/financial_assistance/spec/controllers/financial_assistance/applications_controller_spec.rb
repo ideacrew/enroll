@@ -54,24 +54,55 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 end
 
 RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each, type: :controller do
+  include Dry::Monads[:result, :do]
+
+  before :all do
+    DatabaseCleaner.clean
+  end
+
   routes { FinancialAssistance::Engine.routes }
-  let(:person) { FactoryBot.create(:person, :with_consumer_role)}
+  let(:event) { Success(double) }
+  let(:obj)  { FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication.new }
+  let(:person) { FactoryBot.create(:person, :with_consumer_role, hbx_id: 1234)}
   let!(:user) { FactoryBot.create(:user, :person => person) }
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
   let(:family_id) { family.id}
   let(:family_member_id) { family.primary_applicant.id }
-  let!(:application) { FactoryBot.create(:application, family_id: family_id, aasm_state: "draft", effective_date: TimeKeeper.date_of_record) }
+  let!(:application) { FactoryBot.create(:application, hbx_id: 1234, assistance_year: Date.today.year, family_id: family_id, aasm_state: "draft", effective_date: TimeKeeper.date_of_record) }
   let!(:applicant) do
-    FactoryBot.create(:financial_assistance_applicant, application: application,
-                                  is_claimed_as_tax_dependent: false,
+    applicant = FactoryBot.create(:applicant,
+                                  person_hbx_id: 1234,
+                                  family_member_id: family_member_id,
+                                  first_name: person.first_name,
+                                  last_name: person.last_name,
+                                  dob: person.dob,
+                                  gender: person.gender,
+                                  ssn: person.ssn,
+                                  application: application,
+                                  ethnicity: [],
                                   is_self_attested_blind: false,
+                                  is_primary_applicant: true,
+                                  is_applying_coverage: true,
+                                  is_required_to_file_taxes: true,
+                                  is_pregnant: false,
+                                  has_job_income: false,
+                                  has_self_employment_income: false,
+                                  has_unemployment_income: false,
+                                  has_other_income: false,
+                                  has_deductions: false,
                                   has_daily_living_help: false,
                                   need_help_paying_bills: false,
-                                  is_primary_applicant: true,
-                                  family_member_id: family_member_id)
+                                  has_enrolled_health_coverage: false,
+                                  has_eligible_health_coverage: false,
+                                  has_eligible_medicaid_cubcare: false,
+                                  is_claimed_as_tax_dependent: false,
+                                  is_incarcerated: false,
+                                  is_post_partum_period: false,
+                                  citizen_status: 'us_citizen')
+    applicant
   end
-  let!(:application2) { FactoryBot.create(:application, family_id: family_id, aasm_state: "draft", effective_date: TimeKeeper.date_of_record) }
-  let!(:applicant2) { FactoryBot.create(:applicant, application: application2, family_member_id: family_member_id) }
+  let!(:application2) { FactoryBot.create(:application, hbx_id: 3456, assistance_year: Date.today.year, family_id: family_id, aasm_state: "draft", effective_date: TimeKeeper.date_of_record) }
+  let!(:applicant2) { FactoryBot.create(:applicant, application: application2,  family_member_id: family_member_id) }
   let(:application_valid_params) { {"medicaid_terms" => "yes", "report_change_terms" => "yes", "medicaid_insurance_collection_terms" => "yes", "parent_living_out_of_home_terms" => "true", "attestation_terms" => "yes", "submission_terms" => "yes"} }
   let!(:hbx_profile) {FactoryBot.create(:hbx_profile,:open_enrollment_coverage_period)}
 
@@ -105,7 +136,11 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
   context "POST step" do
     before do
-      controller.instance_variable_set(:@modal, application)
+      setup_faa_data
+      allow(FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication).to receive(:new).and_return(obj)
+      allow(obj).to receive(:build_event).and_return(event)
+      allow(event.success).to receive(:publish).and_return(true)
+      controller.instance_variable_set(:@modal, application.reload)
     end
 
     it "should render step if no key present in params with modal_name" do
@@ -115,6 +150,22 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
     context "when params has application key" do
       let(:success_result) { double(success?: true)}
+
+      let!(:create_home_address) do
+        [application, application2].each do |applin|
+          applin.applicants.first.update_attributes!(is_primary_applicant: true)
+          add = ::FinancialAssistance::Locations::Address.new({ kind: 'home',
+                                                                address_1: '3 Awesome Street',
+                                                                address_2: '#300',
+                                                                city: 'Washington',
+                                                                state: 'DC',
+                                                                zip: '20001' })
+          primary_appli = applin.reload.primary_applicant
+          primary_appli.addresses << add
+          primary_appli.save!
+        end
+      end
+
       it "When model is saved" do
         post :step, params: { id: application.id, application: application_valid_params }
         expect(application.save).to eq true
@@ -126,6 +177,8 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       end
 
       it "should successfully publish application and redirects to wait_for_eligibility" do
+        application.update_attributes!(aasm_state: 'submitted')
+        application.reload
         allow(application).to receive(:complete?).and_return(true)
         allow(application).to receive(:submit!).and_return(true)
         allow(FinancialAssistance::Operations::Application::RequestDetermination).to receive_message_chain(:new, :call).and_return(success_result)
@@ -221,6 +274,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     end
 
     before do
+      allow(File).to receive(:read).with("./components/financial_assistance/app/views/financial_assistance/applications/raw_application_hra.yml.erb").and_return("")
       allow(File).to receive(:read).with("./components/financial_assistance/app/views/financial_assistance/applications/raw_application.yml.erb").and_return("")
       allow(YAML).to receive(:safe_load).with("").and_return(temp_file)
       user.update_attributes(roles: ["hbx_staff"])
@@ -254,7 +308,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
         application.update_attributes(:aasm_state => "submitted")
         get :raw_application, params: { id: application.id }
-        expect(assigns(:income_coverage_hash)[applicant.id]["INCOME"]).to have_key("Did this person receive unemployment income at any point in ? *")
+        expect(assigns(:income_coverage_hash)[applicant.id]["INCOME"]).to have_key("Did this person receive unemployment income at any point in #{Date.today.year}? *")
       end
     end
   end
@@ -299,4 +353,17 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       end
     end
   end
+end
+
+def setup_faa_data
+  FinancialAssistance::Application.all.each do |faa|
+    faa.applicants.each do |appl|
+      params = {gender: 'female', dob: Date.today - 30.years}
+      appl.update_attributes!(params)
+    end
+  end
+end
+
+def main_app
+  Rails.application.class.routes.url_helpers
 end

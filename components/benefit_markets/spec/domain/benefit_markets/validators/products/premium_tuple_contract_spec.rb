@@ -9,7 +9,7 @@ RSpec.describe BenefitMarkets::Validators::Products::PremiumTupleContract do
 
   let(:missing_params)   { {_id: BSON::ObjectId.new, age: age} }
   let(:required_params)  { missing_params.merge({cost: cost}) }
-  let(:error_message)   { {:cost => ["is missing"]} }
+  let(:error_message)   { {:cost => ["is missing", "must be a float"]} }
 
   context "Given invalid required parameters" do
     context "sending with missing parameters should fail validation with errors" do

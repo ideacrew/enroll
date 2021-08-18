@@ -51,12 +51,12 @@
             <% readonly_status = @applicant.is_primary_applicant? %>
             <div class="form-group form-group-lg">
               <%= datepicker_control f, :dob, {:class => "floatlabel form-control", :placeholder => "#{l10n("date_of_birth").to_s.upcase} *",
-                                               :'data-date-min' => "-110y", :'data-date-max' => "+0", required: true, disabled: readonly_status, id: "family_member_dob_#{@applicant.id}"}, @applicant.dob %>
+                                               :'data-date-min' => "-110y", :'data-date-max' => "+0", required: true, readonly: readonly_status, id: "family_member_dob_#{@applicant.id}"}, @applicant.dob %>
             </div>
           </div>
          <div class="col-md-3 col-sm-3 no-pd">
            <div class="form-group form-group-lg">
-             <%= f.text_field :ssn, class: "home required floatlabel form-control mask-ssn", placeholder: "#{l10n("social_security").to_s.upcase}", disabled: readonly_status %>
+             <%= f.text_field :ssn, class: "home required floatlabel form-control mask-ssn", placeholder: "#{l10n("social_security").to_s.upcase}", readonly: readonly_status %>
            </div>
          </div>
 
@@ -68,7 +68,7 @@
                    <%= f.label :no_ssn, :value => true do %>
                    <span class='no_ssn twelve'>&nbsp;<%= l10n("do_not_have_ssn") %></span>
                    <% end %>
-                   <!-- <span><i class='fa fa-question-circle'></i></span> -->
+                   <!-- <span><i class='fa fa-question-circle' id="no_ssn_tooltip" data-toggle="tooltip" title="<%#=l10n("insured.consumer_roles.search.no_ssn_tooltip")%>"></i></span> -->
                  </div>
                </div>
              </div>
@@ -102,7 +102,14 @@
             </div>
             <div class="col-md-5 mt18">
               <div class="select-positioning ml-label"> <label>is</label> </div>
-              <label class="static_label label-floatlabel mt-label">RELATIONSHIP</label>
+              <label class="static_label label-floatlabel mt-label">RELATIONSHIP |
+                <% if FinancialAssistanceRegistry[:enroll_app].settings(:site_key).item.to_s.downcase == 'me' %>
+                  <a href="#relationship" data-toggle="modal" data-target="#relationship">Not sure?</a>
+                <% else %>
+                  <a class='hidden'></a>
+                <% end %>
+              </label>
+              <%= render partial: 'shared/modal_support_text_household', locals: {key: "relationship"} %>
               <div class="select-relation rs_selection">
                 <%= f.select :relationship, faa_relationship_options(f.object, request.referer), :class => "floatlabel form-control", :prompt => 'choose' %>
               </div>

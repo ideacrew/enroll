@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #Capybara.ignore_hidden_elements = false
 
 module BrokerWorld
@@ -41,18 +43,23 @@ When(/^.+ clicks on the Add Prospect Employer button$/) do
 end
 
 And(/^Primary Broker creates new Prospect Employer with default_office_location$/) do
-  fill_in BrokerAddProspectEmployerPage.legal_name, :with => "emp1"
-  fill_in BrokerAddProspectEmployerPage.dba, :with => 101_010
-  find(BrokerAddProspectEmployerPage.entity_kind_dropdown).click
-  find(BrokerAddProspectEmployerPage.select_c_corporation).click
-  fill_in BrokerAddProspectEmployerPage.address_1, :with => "1818"
-  fill_in BrokerAddProspectEmployerPage.address_2, :with => "exp st"
-  fill_in BrokerAddProspectEmployerPage.city, :with => "Washington"
-  fill_in BrokerAddProspectEmployerPage.zip, :with => "20002"
-  fill_in BrokerAddProspectEmployerPage.area_code, :with => "202"
-  fill_in BrokerAddProspectEmployerPage.number, :with => "5551212"
-  fill_in BrokerAddProspectEmployerPage.extension, :with => "22332"
-  find(BrokerAddProspectEmployerPage.confirm_btn).click
+  find('#organization_legal_name').click
+  fill_in 'organization[legal_name]', :with => "emp1"
+  fill_in 'organization[dba]', :with => 101_010
+
+  find('.interaction-choice-control-organization-entity-kind').click
+  find(".interaction-choice-control-organization-entity-kind-2").click
+
+  find(:xpath, "//select[@name='organization[entity_kind]']/option[@value='c_corporation']")
+  fill_in 'organization[office_locations_attributes][0][address_attributes][address_1]', :with => "1818"
+  fill_in 'organization[office_locations_attributes][0][address_attributes][address_2]', :with => "exp st"
+  fill_in 'organization[office_locations_attributes][0][address_attributes][city]', :with => EnrollRegistry[:enroll_app].setting(:contact_center_city).item
+  fill_in 'organization[office_locations_attributes][0][address_attributes][zip]', :with => EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item
+  select EnrollRegistry[:enroll_app].setting(:state_abbreviation).item, from: "organization_office_locations_attributes_0_address_attributes_state"
+  fill_in 'organization[office_locations_attributes][0][phone_attributes][area_code]', :with => "202"
+  fill_in 'organization[office_locations_attributes][0][phone_attributes][number]', :with => "5551212"
+  fill_in 'organization[office_locations_attributes][0][phone_attributes][extension]', :with => "22332"
+  find('.interaction-click-control-confirm').click
 end
 
 And(/^.+ should see successful message$/) do
@@ -61,7 +68,7 @@ end
 
 And(/^the broker clicks Actions dropdown and clicks View Quotes from dropdown menu$/) do
   path = SponsoredBenefits::Organizations::PlanDesignOrganization.all.first.id.to_s
-  find("#dropdown_for_plan_design_" + path, :text => "Actions").click
+  find("#dropdown_for_plan_design_#{path}", :text => "Actions").click
   find("#plan_design_#{path}> ul > li:nth-child(1) > a", :text => "View Quotes").click
   wait_for_ajax(3, 2)
 end
@@ -73,7 +80,7 @@ end
 And(/^the broker clicks Actions dropdown and clicks Create Quote from dropdown menu$/) do
   #plan = FactoryBot.create(:plan, :with_premium_tables, active_year: TimeKeeper.date_of_record.year)
   path = SponsoredBenefits::Organizations::PlanDesignOrganization.all.first.id.to_s
-  find("#dropdown_for_plan_design_" + path, :text => "Actions").click
+  find("#dropdown_for_plan_design_#{path}", :text => "Actions").click
   find("#plan_design_#{path}> ul > li:nth-child(2) > a", :text => "Create Quote").click
   wait_for_ajax(3, 2)
 end
