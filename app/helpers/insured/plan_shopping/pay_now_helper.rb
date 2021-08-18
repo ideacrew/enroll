@@ -65,6 +65,7 @@ module Insured
 
       def has_break_in_coverage_enrollments?(hbx_enrollment)
         enrollments = hbx_enrollment.family.enrollments.current_year.where(aasm_state: "coverage_terminated")
+        return true unless enrollments.present?
         enrollments.any? { |enr| enr.terminated_on.year == hbx_enrollment.effective_on.year && (hbx_enrollment.effective_on - enr.terminated_on) > 1 }
       end
 

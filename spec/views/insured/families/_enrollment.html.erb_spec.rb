@@ -134,12 +134,12 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
           render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
         end
 
-        # it "should have all expected renders" do
-        #   expect(rendered).to have_content('Individual & Family')
-        #   expect(rendered).to have_selector('strong', text: HbxProfile::ShortName.to_s)
-        #   expect(rendered).to have_content(/#{hbx_enrollment.hbx_id}/)
-        #   expect(rendered).to have_content('Make Payments')
-        # end
+        it "should have all expected renders" do
+          expect(rendered).to have_content('Individual & Family')
+          expect(rendered).to have_selector('strong', text: HbxProfile::ShortName.to_s)
+          expect(rendered).to have_content(/#{hbx_enrollment.hbx_id}/)
+          expect(rendered).to have_content('Make Payments')
+        end
 
       end
     end
