@@ -512,15 +512,13 @@ class Household
         thhm_info["pdc_type"].to_sym => true,
         :reason => thhm_info["reason"]
       )
-      thm.update_attributes!(csr_percent_as_integer: (params['csr'] == 'limited' ? '-1' : params['csr'])) if thm.is_ia_eligible?
-      #TODO: Should take individual level csr kind as params to update.
+      thm.update_attributes!(csr_percent_as_integer: params['family_members'][thm.person.hbx_id]['csr'])
     end
 
     th.eligibility_determinations.create(
       source: 'Admin',
       benchmark_plan_id: slcsp_id,
       max_aptc: params['max_aptc'].to_f,
-      csr_percent_as_integer: (params['csr'] == 'limited' ? '-1' : params['csr']),
       determined_at: TimeKeeper.datetime_of_record
     )
 

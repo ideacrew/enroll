@@ -6,16 +6,12 @@
     <table class="table table-border">
       <thead>
         <th>Max APTC</th>
-        <th>CSR</th>
         <th>Effective Date</th>
       </thead>
       <tbody>
         <tr>
           <td>
             <%= text_field_tag "person[max_aptc]", nil, class: "required input_txt", :input_html => { width: '100%' } %>
-          </td>
-          <td class="select_person_csr">
-            <%= select_tag "person[csr]", options_for_select(csr_percentage_options_for_select), prompt: 'Select one' %>
           </td>
           <td>
             <%= datepicker_control f, :effective_date, {:class => "interaction-field-control-census-employee-dob input_txt", :value => params[:effective_date].present? ? Date.strptime(params[:effective_date], '%m/%d/%Y') : nil, :placeholder => "EFFECTIVE DATE", required: true} %>
@@ -32,6 +28,7 @@
         <th>HBX ID</th>
         <th>Current Eligibility</th>
         <th>PDC Type</th>
+        <th>CSR</th>
         <th>Reason</th>
       </thead>
       <tbody>
@@ -43,6 +40,7 @@
             <td><h5><%= family_member.person.hbx_id %></h5></td>
             <td><%= active_eligibility?(f.object.primary_family) %></td>
             <td><%= select_tag "person[family_members][#{family_member.person.hbx_id}][pdc_type]",options_for_select(TaxHouseholdMember::PDC_TYPES) %></td>
+            <td><%= select_tag "person[family_members][#{family_member.person.hbx_id}][csr]", options_for_select(csr_percentage_options_for_select), prompt: 'Select one', class: 'thm_csr' %></td>
             <td><%= text_field_tag "person[family_members][#{family_member.person.hbx_id}][reason]", nil, class: "required input_txt" %></td>
           </tr>
         <% end %>
