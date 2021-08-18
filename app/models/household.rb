@@ -512,7 +512,7 @@ class Household
         thhm_info["pdc_type"].to_sym => true,
         :reason => thhm_info["reason"]
       )
-      thm.update_attributes!(csr_percent_as_integer: params['family_members'][thm.person.hbx_id]['csr'])
+      thm.update_attributes!(csr_percent_as_integer: params['family_members'][thm.person.hbx_id]['csr']) if thm.is_ia_eligible?
     end
 
     th.eligibility_determinations.create(

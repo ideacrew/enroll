@@ -333,13 +333,12 @@ describe Household, "for creating a new taxhousehold using create eligibility", 
                           "csr"=>"94",
                           "effective_date"=> "#{current_date.year}-#{current_date.month}-#{current_date.day}",
                           "family_members"=>
-                            { family100.primary_applicant.person.hbx_id => {"pdc_type"=>"is_ia_eligible", "reason"=>"7hvgds"} }
+                            { family100.primary_applicant.person.hbx_id => {"pdc_type"=>"is_ia_eligible", "reason"=>"7hvgds", "csr"=>"100"} }
                         }
                       }
 
   context "create_new_tax_household" do
     before :each do
-      params.merge!({'csr' => 'limited'})
       household100.create_new_tax_household(params)
       @determination = household100.tax_households.active_tax_household.first.latest_eligibility_determination
     end
@@ -357,26 +356,26 @@ describe Household, "for creating a new taxhousehold using create eligibility", 
     end
 
     it 'should match with expected csr percent' do
-      expect(@determination.csr_percent_as_integer).to eq(-1)
+      expect(@determination.csr_percent_as_integer).to eq(0)
     end
 
     it 'should match with expected csr eligibility kind' do
-      expect(@determination.csr_eligibility_kind).to eq('csr_limited')
+      expect(@determination.csr_eligibility_kind).to eq('csr_0')
     end
 
     it 'THH members should match with expected csr eligibility kind' do
-      expect(household100.tax_households[0].tax_household_members[0].csr_eligibility_kind).to eq('csr_limited')
+      expect(household100.tax_households[0].tax_household_members[0].csr_eligibility_kind).to eq('csr_100')
     end
 
     before do
-      params.merge!({'csr' => 0})
+      params['family_members'][family100.primary_applicant.person.hbx_id]['csr'] = "0"
       household100.tax_households.first.tax_household_members.first.update_attributes!(is_ia_eligible: false)
       household100.create_new_tax_household(params)
     end
 
     it 'should not update csr for ia ineligible tax household member' do
       expect(household100.tax_households.last.eligibility_determinations.first.csr_percent_as_integer).to eq(0)
-      expect(household100.tax_households[0].tax_household_members[0].csr_percent_as_integer).to eq(-1)
+      expect(household100.tax_households[0].tax_household_members[0].csr_percent_as_integer).to eq(100)
     end
   end
 

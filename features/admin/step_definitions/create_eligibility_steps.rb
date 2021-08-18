@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+And(/Hbx Admin can add pdc/) do
+  Permission.first.update_attributes!(can_add_pdc: true)
+end
+
 Then(/^Hbx Admin should see a Create Eligibility link$/) do
   find_link('Create Eligibility').visible?
 end
