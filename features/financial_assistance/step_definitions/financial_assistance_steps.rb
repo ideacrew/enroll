@@ -37,8 +37,10 @@ When(/^selects yes they would like help paying for coverage$/) do
 
   # should be on application year select page now
   # TODO: Will need to be updated when year select logic implemented
-  find('a.interaction-click-control-continue').click
-  sleep 2
+  if EnrollRegistry.feature_enabled?(:iap_year_selection)
+    find('a.interaction-click-control-continue').click
+    sleep 2
+  end
   # should be on checklist page now
   find('a.interaction-click-control-continue').click
 end
