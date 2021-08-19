@@ -65,7 +65,7 @@ class Person
   NON_SHOP_ROLES = ['Individual','Coverall']
 
   field :hbx_id, type: String
-  field :ext_app_id, type: String
+  field :external_person_id, type: String
   field :name_pfx, type: String
   field :first_name, type: String
   field :middle_name, type: String

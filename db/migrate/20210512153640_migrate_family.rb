@@ -45,13 +45,54 @@ class MigrateFamily < Mongoid::Migration
         end
 
         build_family(family_hash.merge!(ext_app_id: payload[:insuranceApplicationIdentifier])) # remove this after fixing ext_app_id in aca entities
-        app_id = build_iap(family_hash['magi_medicaid_applications'].first.merge!(family_id: @family.id, benchmark_product_id: BSON::ObjectId.new, years_to_renew: 5))
-        fill_applicants_form(app_id, family_hash['magi_medicaid_applications'].first)
 
+        if @family.primary_applicant.person.is_applying_for_assistance
+          app_id = build_iap(family_hash['magi_medicaid_applications'].first.merge!(family_id: @family.id, benchmark_product_id: BSON::ObjectId.new, years_to_renew: 5))
+          fill_applicants_form(app_id, family_hash['magi_medicaid_applications'].first)
+          fix_iap_relationship(app_id, family_hash)
+        end
         print "."
         rescue StandardError => e
+        # binding.pry
         puts "E: #{payload[:insuranceApplicationIdentifier]}, f: @family.hbx_id  error: #{e.message.split('.').first}"
       end
+    end
+
+    def fix_iap_relationship(app_id, family_hash)
+      @application = FinancialAssistance::Application.where(id: app_id).first
+      @matrix = @application.build_relationship_matrix
+      @missing_relationships = @application.find_missing_relationships(@matrix)
+      @all_relationships = @application.find_all_relationships(@matrix)
+
+      @missing_relationships.each do |rel|
+        from_relation = rel.first[0]
+        to_relation = rel.first[1]
+        from_applicant = @application.applicants.find(from_relation)
+        to_applicant =  @application.applicants.find(to_relation)
+        from_family_member = ::FamilyMember.find(from_applicant.family_member_id)
+        to_family_member = ::FamilyMember.find(to_applicant.family_member_id)
+        member_hash = family_hash["family_members"].select { |member| member["hbx_id"] == from_family_member.external_member_id}.first
+        relationship = member_hash["person"]["person_relationships"].select { |p_rel| p_rel["relative"]["hbx_id"] == to_family_member.external_member_id }.first
+        relation_kind = relationship["kind"]
+        @application.update_or_build_relationship(from_applicant, to_applicant, relation_kind)
+      end
+
+      @all_relationships.each do |all_rel|
+        next if all_rel[:relation].present?
+        from_relation = all_rel[:applicant]
+        to_relation = all_rel[:relative]
+        from_applicant = @application.applicants.find(from_relation)
+        to_applicant =  @application.applicants.find(to_relation)
+        from_family_member = ::FamilyMember.find(from_applicant.family_member_id)
+        to_family_member = ::FamilyMember.find(to_applicant.family_member_id)
+        member_hash = family_hash["family_members"].select { |member| member["hbx_id"] == from_family_member.external_member_id}.first
+        relationship = member_hash["person"]["person_relationships"].select { |p_rel| p_rel["relative"]["hbx_id"] == to_family_member.external_member_id }.first
+        relation_kind = relationship["kind"]
+        relation = ::FinancialAssistance::Relationship::INVERSE_MAP[relation_kind]
+        @application.update_or_build_relationship(from_applicant, to_applicant, relation)
+      end
+
+      @application.save!
     end
 
     def file_path
@@ -89,6 +130,7 @@ class MigrateFamily < Mongoid::Migration
 
       if person_result.success?
         @person = person_result.success
+        @person.update_attributes(is_applying_for_assistance: person_params[:is_applying_for_assistance])
         @family_member = create_or_update_family_member(@person, @family, family_member_hash)
         consumer_role_params = family_member_hash['person']['consumer_role']
         create_or_update_consumer_role(consumer_role_params.merge(is_consumer_role: true), @family_member)
@@ -122,7 +164,9 @@ class MigrateFamily < Mongoid::Migration
       fm_attr = { is_primary_applicant: family_member_hash['is_primary_applicant'],
                   is_consent_applicant: family_member_hash['is_consent_applicant'],
                   is_coverage_applicant: family_member_hash['is_coverage_applicant'],
-                  is_active: family_member_hash['is_active'] }
+                  is_active: family_member_hash['is_active']}
+
+      external_member_id = family_member_hash['hbx_id']
 
       if family_member_hash['is_primary_applicant']
         family_member = family.add_family_member(person, fm_attr)
@@ -132,6 +176,7 @@ class MigrateFamily < Mongoid::Migration
         family_member = family.add_family_member(person, fm_attr)
       end
 
+      family_member.external_member_id = external_member_id
       family_member.save!
       family.save!
 
@@ -158,6 +203,7 @@ class MigrateFamily < Mongoid::Migration
           fm.person.first_name == applicant_hash['name']['first_name'] && fm.person.last_name == applicant_hash['name']['last_name']
         end.first
 
+        binding.pry
         sanitize_params << {
           family_member_id: family_member.id,
           relationship: family_member.relationship,
@@ -165,8 +211,8 @@ class MigrateFamily < Mongoid::Migration
           middle_name: applicant_hash['name']['middle_name'],
           last_name: applicant_hash['name']['last_name'],
           full_name: applicant_hash['name']['full_name'],
-          name_sfx: applicant_hash['name']['name_sfx'],
-          name_pfx: applicant_hash['name']['name_pfx'],
+          name_sfx: applicant_hash['name']['name_sfx'].present? ? applicant_hash['name']['name_sfx']: "",
+          name_pfx: applicant_hash['name']['name_pfx'].present? ? applicant_hash['name']['name_pfx']: "",
           alternate_name: applicant_hash['name']['alternate_name'],
           ssn: family_member.person.ssn,
           # "encrypted_ssn": applicant_hash['identifying_information']['encrypted_ssn'],
@@ -203,7 +249,7 @@ class MigrateFamily < Mongoid::Migration
           tax_filer_kind: applicant_hash['tax_filer_kind'],
           is_joint_tax_filing: applicant_hash['is_joint_tax_filing'],
           is_claimed_as_tax_dependent: applicant_hash['is_claimed_as_tax_dependent'],
-          claimed_as_tax_dependent_by: applicant_hash['claimed_as_tax_dependent_by'],
+          claimed_as_tax_dependent_by: sanitize_claimed_as_tax_dependent_by_params(applicant_hash),
 
           is_student: applicant_hash['student']['is_student'],
           student_kind: applicant_hash['student']['student_kind'],
@@ -264,6 +310,12 @@ class MigrateFamily < Mongoid::Migration
       iap_hash.except!('applicants').merge!(applicants: sanitize_params)
     end
 
+    def sanitize_claimed_as_tax_dependent_by_params(applicant_hash)
+      return nil unless applicant_hash['is_claimed_as_tax_dependent']
+      claimed_as_tax_dependent_by = applicant_hash['claimed_as_tax_dependent_by']
+      claimed_as_tax_dependent_by.class == Hash ? claimed_as_tax_dependent_by["person_hbx_id"] : claimed_as_tax_dependent_by
+    end
+
     def sanitize_income_params(incomes)
       incomes.map do |income|
         income["frequency_kind"] = income["frequency_kind"].downcase
@@ -310,6 +362,7 @@ class MigrateFamily < Mongoid::Migration
         language_code: person_hash['person_demographics']['language_code'],
         is_tobacco_user: person_hash['person_health']['is_tobacco_user'],
         is_physically_disabled: person_hash['person_health']['is_physically_disabled'],
+        is_applying_for_assistance: person_hash['is_applying_for_assistance'],
         is_homeless: person_hash['is_homeless'],
         is_temporarily_out_of_state: person_hash['is_temporarily_out_of_state'],
         age_off_excluded: person_hash['age_off_excluded'],
@@ -414,7 +467,7 @@ class MigrateFamily < Mongoid::Migration
     def fill_applicants_form(app_id, applications)
       applicants_hash = applications[:applicants]
       application = FinancialAssistance::Application.where(id: app_id).first
-
+      binding.pry
       applicants_hash.each do |applicant|
         persisted_applicant = application.applicants.where(first_name: applicant[:first_name], last_name: applicant[:last_name]).first
         claimed_by = application.applicants.where(ext_app_id: applicant[:claimed_as_tax_dependent_by]).first
