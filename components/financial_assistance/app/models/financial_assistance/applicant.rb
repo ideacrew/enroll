@@ -847,7 +847,8 @@ module FinancialAssistance
     def job_fields_complete
       validations = []
       incomes.jobs.select(&:persisted?).each do |job|
-        address = job[:employer_address]
+        # address = job[:employer_address]
+        address = job[:employer_address].nil? ? {} : job[:employer_address]
         validations << (address[:address_1].present? && address[:city].present? && address[:state].present? && address[:zip].present?)
         validations << (job[:employer_name].present? && job[:employer_phone].present?)
         validations << (job[:amount].present? && job[:frequency_kind].present? && job[:start_on].present?)

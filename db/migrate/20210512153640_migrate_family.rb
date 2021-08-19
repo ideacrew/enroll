@@ -83,9 +83,10 @@ class MigrateFamily < Mongoid::Migration
     def create_member(family_member_hash)
       person_params = sanitize_person_params(family_member_hash)
       person_result = create_or_update_person(person_params)
-
+binding.pry
       if person_result.success?
         @person = person_result.success
+        binding.pry
         @family_member = create_or_update_family_member(@person, @family, family_member_hash)
         consumer_role_params = family_member_hash['person']['consumer_role']
         create_or_update_consumer_role(consumer_role_params.merge(is_consumer_role: true), @family_member)
@@ -337,12 +338,13 @@ class MigrateFamily < Mongoid::Migration
             puts "Started processing file: #{@filepath}"
             extract @filepath
             transform ext_input_hash
-            result = validate cv3_family_hash
-            puts "CV validation failed" if result.errors.present?
-            load_data cv3_family_hash unless result.errors.present?
+            # result = validate cv3_family_hash
+            binding.pry
+            # puts "CV validation failed: #{result.errors.to_h}" if result.errors.present?
+            load_data cv3_family_hash #unless result.errors.present?
             puts "Ended processing file: #{@filepath}"
-          rescue StandardError => e
-            puts "Error processing file: #{@filepath} , error: #{e.backtrace}"
+          # rescue StandardError => e
+            # puts "Error processing file: #{@filepath} , error: #{e.backtrace}"
           end
         elsif !path_name&.empty?
           begin
