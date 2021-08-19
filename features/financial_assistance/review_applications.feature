@@ -2,6 +2,8 @@ Feature: My Financial Assistance Applications page that visit the Review Applica
   Background: Review your application page
     Given a consumer exists
     And the FAA feature configuration is enabled
+    And FAA display_medicaid_question feature is enabled
+    And the primary caretaker question configuration is enabled
     And is logged in
 
   Scenario: Review Application link will be disabled in draft state
@@ -48,3 +50,4 @@ Feature: My Financial Assistance Applications page that visit the Review Applica
     And clicks the “Review Application” link
     Then the user will navigate to the Review Application page
     Then user should see Medicaid eligibility question
+    And user should have feature toggled questions in review

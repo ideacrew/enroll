@@ -90,6 +90,9 @@ if (ENV["type"] != "fixtures") && missing_plan_dumps
   end
   puts "::: complete :::"
 
+  # To load us counties and county fips
+  system "bundle exec rails runner db/seedfiles/load_us_counties.rb "
+
   puts "*"*80
   puts "Loading Carrier Service Areas."
   system "bundle exec rake load_service_reference:run_all_service_areas"

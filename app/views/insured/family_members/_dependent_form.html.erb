@@ -2,7 +2,6 @@
   <div id="add_info_<%= dependent.id %>" class="<%= pundit_class Family, :updateable?%>">
 
     <%= form_for dependent, employee_dependent_submission_options_for(dependent) do |f| %>
-
       <%= hidden_field_tag :consumer_role_id, params[:consumer_role_id] %>
       <%= hidden_field_tag :employee_role_id, params[:employee_role_id] %>
 
@@ -14,16 +13,15 @@
           </h4>
           <ul>
             <% dependent.errors.full_messages.each do |msg| %>
+              <% msg = (msg == "Gender can't be blank" && EnrollRegistry.feature_enabled?(:gender_to_sex)) ? "Sex can't be blank" : msg %>
               <li> <%= msg %> </li>
             <% end %>
           </ul>
         </div>
       <% end %>
-
       <% if @address_errors.present? %>
         <%= render partial: 'shared/address_error_messages', locals: {address_errors: @address_errors} %>
       <% end %>
-
       <%if
         @dependent.first_name &&
             @dependent.last_name &&
@@ -52,7 +50,6 @@
           </div>
         </div>
       <%end %>
-
       <%= token_tag form_authenticity_token %>
 
       <div class="house col-md-12 col-sm-12 col-xs-12 no-pd">
@@ -120,7 +117,7 @@
                   <%= f.label :no_ssn, :value => true do %>
                     <span class='no_ssn twelve'>&nbsp;<%= l10n("do_not_have_ssn") %></span>
                   <% end %>
-                  <!-- <span><i class='fa fa-question-circle'></i></span> -->
+                  <span><i class='fa fa-question-circle' id="no_ssn_tooltip" data-toggle="tooltip" title="<%=l10n("insured.consumer_roles.search.no_ssn_tooltip")%>"></i></span>
                 </div>
               </div>
             </div>
@@ -156,7 +153,14 @@
           <% end %>
           <div class="col-md-5 mt18">
             <div class="select-positioning ml-label"> <label>is</label> </div>
-            <label class="static_label label-floatlabel mt-label">RELATIONSHIP</label>
+            <label class="static_label label-floatlabel mt-label">RELATIONSHIP |
+              <% if FinancialAssistanceRegistry[:enroll_app].settings(:site_key).item.to_s.downcase == 'me' %>
+                <a href="#relationship" data-toggle="modal" data-target="#relationship">Not sure?</a>
+              <% else %>
+                <a class='hidden'></a>
+              <% end %>
+            </label>
+            <%= render partial: 'shared/modal_support_text_household', locals: {key: "relationship"} %>
             <div class="select-relation rs_selection">
               <%= f.select :relationship, relationship_options(f.object, request.referer), :class => "floatlabel form-control", :prompt => 'choose' %>
             </div>
@@ -181,32 +185,40 @@
         <% end %>
         <% if has_active_consumer_dependent?(@person,@dependent) %>
           <%= render 'shared/ssn_coverage_msg' %>
-        <% end %>
-
-        <% if has_active_consumer_dependent?(@person,@dependent) %>
           <br>
           <div id="consumer_fields_sets">
             <%= render 'shared/consumer_fields', f: f %>
           </div>
-          <div id="dependent-address">
-            <div class="row row-form-wrapper no-buffer">
-              <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 form-group form-group-lg top-buffer">
-                <%= f.check_box :same_with_primary, {}, "true", "false" %>
-                <label for="dependent_same_with_primary"><%=l10n("live_with_primary_subscriber") %></label>
-              </div>
-            </div>
-            <div id="dependent-home-address-area" style="display: <%= f.object.same_with_primary.present? and f.object.same_with_primary == 'true' ? 'none' : 'block' %>">
-              <%= render 'shared/address_fields_for_dependent', f: f, show_no_dc_address: true %>
+        <% end %>
+        <br>
+        <div id="dependent-address">
+          <div class="row row-form-wrapper no-buffer">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 form-group form-group-lg">
+              <strong>Home address</strong><br>
+              <%= f.check_box :same_with_primary, {}, "true", "false" %>
+              <!-- <label for="dependent_same_with_primary"><%#=l10n("dependent_lives_with_primary_subscriber") %></label> -->
+              <label for="dependent_same_with_primary"><%=l10n("dependent_lives_with_primary_subscriber") %></label>
             </div>
           </div>
-        <% elsif @person.has_active_employee_role? %>
-          <%= f.hidden_field :same_with_primary, value: 'false' %>
-          <%= render 'shared/address_fields_for_dependent', f: f %>
-        <% end %>
+          <div class="row row-form-wrapper no-buffer" id="home-info" style="display: <%= f.object.same_with_primary.present? and f.object.same_with_primary == 'true' ? 'none' : 'block' %>">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 form-group form-group-lg">
+              <i class="fa fa-info-circle"></i> <%= l10n('insured.dependent_home_address_info') %>
+            </div>
+          </div>
+          <div id="dependent-home-address-area" style="display: <%= f.object.same_with_primary.present? and f.object.same_with_primary == 'true' ? 'none' : 'block' %>">
+            <% if has_active_consumer_dependent?(@person,@dependent) %>
+                <%= render 'shared/address_fields_for_dependent', f: f, show_no_dc_address: true %>
+            <% elsif @person.has_active_employee_role? %>
+              <%= render 'shared/address_fields_for_dependent', f: f %>
+            <% end %>
+          </div>
+        </div>
 
         <%= f.hidden_field :family_id %>
         <div id="remove_confirm" class="hidden"></div>
       </div>
+
+      <%= render partial: 'shared/address_change_confirmation_modal' %>
 
       <div class="clearfix"></div>
       <div id="add_info_buttons_<%= dependent.id %>" style="padding-top: 20px;">
@@ -218,17 +230,17 @@
         <% else %>
           <%= link_to "<span class='glyphicon glyphicon-remove-circle' aria-hidden='true'></span> #{l10n("cancel")}".html_safe, insured_family_member_path(dependent), :remote => true %>
         <% end %>
-
         <%= f.button(id: 'confirm-member', class: "btn btn-primary btn-br pull-right mz hidden", onclick: "$('#btn-continue').removeClass('disabled');") do %>
           <%= l10n("confirm_member") %>
         <% end %>
 
-        <span class="btn btn-primary btn-br pull-right mz" onclick="PersonValidations.manageRequiredValidations($(this));">
+        <span id='confirm-dependent' class="btn btn-primary btn-br pull-right mz">
           <%= l10n("confirm_member") %>
         </span>
       </div>
     <% end %>
   </div>
+  <!-- onclick="PersonValidations.manageRequiredValidations($(this));" -->
 
   <script>
     $(document).ready(function() {
@@ -243,5 +255,30 @@
         $("#is_applying_coverage_value_dep_1").text(text);
       });
     });
+
+    $(document).off('click', '#confirm-dependent');
+    $(document).on('click', '#confirm-dependent', function(e) {
+      $(".btn-confirmation").removeAttr('disabled');
+
+      var form = $('#new_dependent')[0] || $('#edit_dependent')[0];
+
+      if ( form.checkValidity() && !$("input#dependent_same_with_primary").is(":checked")) {
+        $('#addressChangeConfirmation').modal('show');
+      }
+      else {
+       PersonValidations.manageRequiredValidations($('#confirm-dependent'));
+      }
+
+    });
+
+    function confirmChange(event){
+      $(".btn-confirmation").attr('disabled', 'disabled');
+      $('.modal-backdrop').removeClass('modal-backdrop');
+      $('.modal-open').removeClass('modal-open');
+
+      PersonValidations.manageRequiredValidations($('#confirm-dependent'));
+      $('#addressChangeConfirmation').modal('hide');
+    }
+
   </script>
 </li>

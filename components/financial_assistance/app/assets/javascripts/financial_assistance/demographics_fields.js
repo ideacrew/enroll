@@ -12,6 +12,11 @@ fields = "input[name='" + target + "[is_applying_coverage]']"
       if($("input[name='" + target + "[ssn]']").val() == '' && !$("input[name='" + target + "[no_ssn]']").is(":checked")){
         $("#ssn-coverage-msg").show();
       }
+      if(!($(fields).not(":checked").val() == "false") && $('.no_coverage_tribe_details').length > 0){
+        new_tribe_form = $('#indian_tribe_area').clone(true).addClass('tribe-area-clone')
+        $('#indian_tribe_area').remove()
+        new_tribe_form.insertBefore($('#consumer_fields_sets'))
+      }
 
     }
     $(fields).change(function () {
@@ -21,7 +26,17 @@ fields = "input[name='" + target + "[is_applying_coverage]']"
         if($("input[name='" + target + "[ssn]']").val() == '' && !$("input[name='" + target + "[no_ssn]']").is(":checked")){
           $("#ssn-coverage-msg").show();
         }
+        if(!($(fields).not(":checked").val() == "false") && $('.no_coverage_tribe_details').length > 0){
+          new_tribe_form = $('#indian_tribe_area').clone(true).addClass('tribe-area-clone')
+          $('#indian_tribe_area').remove()
+          new_tribe_form.insertBefore($('#consumer_fields_sets'))
+        }
       }else{
+        if($('.no_coverage_tribe_details').length > 0){
+          new_tribe_form = $('#indian_tribe_area').clone(true).removeClass('tribe-area-clone')
+          $('#indian_tribe_area').remove()
+          new_tribe_form.insertAfter($('#vlp_documents_container'))
+        }
         $("#consumer_fields_sets").show();
         $("#employer-coverage-msg").hide();
         $("#ssn-coverage-msg").hide();
@@ -87,7 +102,7 @@ function applyFaaListenersFor(target) {
 
   $("input[name='" + target + "[eligible_immigration_status]']").change(function() {
     var selected_doc_type = $('#immigration_doc_type').val();
-    if ($(this).val() == 'true') {
+    if ($(this).val() == 'true' && this.checked) {
       $('#vlp_documents_container').show();
       $('#naturalization_doc_type_select').hide();
       $('#immigration_doc_type_select').show();
@@ -103,8 +118,10 @@ function applyFaaListenersFor(target) {
   $("input[name='" + target + "[indian_tribe_member]']").change(function() {
     if ($(this).val() == 'true') {
       $('#tribal_container').show();
+      $('.tribal_container').show();
     } else {
       $('#tribal_container').hide();
+      $('.tribal_container').hide();
       $('#tribal_id').val("");
     }
   });
@@ -180,6 +197,8 @@ function validationForIndianTribeMember() {
   };
   $('.close').click(function() {
     $('#tribal_id_alert').hide()
+    $('#tribal-state-alert').hide();
+    $('#tribal-name-alert').hide();
   });
   $('form.new_applicant, form.edit_applicant').submit(function(e) {
     if ($('input[name="applicant[is_applying_coverage]"]').length > 0 && $('input[name="applicant[is_applying_coverage]"]').not(":checked").val() == "true"){
@@ -197,6 +216,26 @@ function validationForIndianTribeMember() {
       $('#tribal_id_alert').show();
       e.preventDefault && e.preventDefault();
       return false;
+    }
+
+    // for tribal_state
+    if ($('.tribal-state').length) {
+      var tribal_state_val = $('#tribal_state').val();
+      if ($("input#indian_tribe_member_yes").is(':checked') && (tribal_state_val == "undefined" || tribal_state_val == '')) {
+        $('#tribal-state-alert').show();
+        e.preventDefault && e.preventDefault();
+        return false;
+      }
+    }
+
+    // for tribal_name
+    if ($('.tribal-name').length) {
+      var tribal_name = $('#tribal-name').val();
+      if ($("input#indian_tribe_member_yes").is(':checked') && (tribal_name == "undefined" || tribal_name == '')) {
+        $('#tribal-name-alert').show();
+        e.preventDefault && e.preventDefault();
+        return false;
+      }
     }
   });
 }
@@ -247,7 +286,7 @@ var ApplicantValidations = (function(window, undefined) {
   }
 
   function validationForEligibleImmigrationStatuses(e) {
-    if ($('#immigration_status_container').is(':visible') && $('input[name="applicant[eligible_immigration_status]"]').not(":checked").length == 2) {
+    if ($('#immigration_status_container').is(':visible') && $('input[name="applicant[eligible_immigration_status]"]').not(":checked").length == 2 && !$('#immigration-checkbox').is(':visible')) {
       alert('Please provide an answer for question: Do you have eligible immigration status?');
       ApplicantValidations.restoreRequiredAttributes(e);
     }
@@ -380,6 +419,6 @@ $(document).on('turbolinks:load', function () {
     ApplicantValidations.validationForIncarcerated(e);
     ApplicantValidations.validationForVlpDocuments(e);
   });
-  
+
   isApplyingCoverage("applicant");
 });

@@ -47,8 +47,8 @@ And(/^Primary Broker creates new Prospect Employer with default_office_location$
   find(BrokerAddProspectEmployerPage.select_c_corporation).click
   fill_in BrokerAddProspectEmployerPage.address_1, :with => "1818"
   fill_in BrokerAddProspectEmployerPage.address_2, :with => "exp st"
-  fill_in BrokerAddProspectEmployerPage.city, :with => "Washington"
-  fill_in BrokerAddProspectEmployerPage.zip, :with => "20002"
+  fill_in BrokerAddProspectEmployerPage.city, :with => EnrollRegistry[:enroll_app].setting(:contact_center_city).item
+  fill_in BrokerAddProspectEmployerPage.zip, :with => EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item
   fill_in BrokerAddProspectEmployerPage.area_code, :with => "202"
   fill_in BrokerAddProspectEmployerPage.number, :with => "5551212"
   fill_in BrokerAddProspectEmployerPage.extension, :with => "22332"

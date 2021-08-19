@@ -6,6 +6,7 @@
 				<% if attr == :base %>
 					<li><%= "#{msg}" %></li>
 				<% else %>
+          <% attr = (attr == :gender && EnrollRegistry.feature_enabled?(:gender_to_sex)) ? "sex" : attr %>
 					<li><%= "#{attr.to_s.titleize} #{msg}" %></li>
 				<% end %>
 			<% end %>

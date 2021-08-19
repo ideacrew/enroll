@@ -141,6 +141,8 @@ registry:
             item: "Due to a delay, premiums for some coverage effective dates are not available yet. Please check again soon to see if this information has been updated. You can also contact Customer Service or your broker if you need help."
           - key: :faa_enabled
             item: false
+          - key: :county_fips_code_enabled
+            item: false
           - key: :ivl_responsibility_url
             item: "https://dchealthlink.com/individual-responsibility-requirement"
           - key: :curam_enabled?
@@ -182,7 +184,7 @@ registry:
           - key: :contact_center_county
             item: 'District of Columbia'
           - key: :contact_center_zip_code
-            item: "20024" # For DC loading rating areas, the zip uses this zip code 20024 
+            item: "20024" # For DC loading rating areas, the zip uses this zip code 20024
           - key: :contact_center_email_address
             item: "info@dchealthlink.com"
           - key: :contact_center_short_number
@@ -214,7 +216,9 @@ registry:
           - key: :eligibile_immigration_statuses_url
             item: "https://dchealthlink.com/sites/default/files/v2/forms/Eligible%20Immigration%20Status%20List_0.pdf"
           - key: :geographic_rating_area_model
-            item: 'county'
+            item: 'single'
+          - key: :benchmark_product_model
+            item: :health_only
           - key: :assistance_estimate_url
             item: "https://dc.checkbookhealth.org/hie/dc/2021/index.cfm?page"
           - key: :dental_plan_years_available
@@ -227,6 +231,14 @@ registry:
             item: ['2018', '2019']
           - key: :plan_year_tooltip
             item: "Employer premium contribution for Employee Only Health Plans must be at least"
+          - key: :sep_moved_out_zip_compare
+            item: false
+          - key: :send_rating_area_for_ivl_policy_to_edi
+            item: false
+          - key: :medicaid_agency_phone
+            item: "(855) 532-5465"
+          - key: :verifiable_immigration_statuses
+            item: false
       - key: :data_seeds_ui
         item: :data_seed_ui
         is_enabled: true
@@ -273,7 +285,7 @@ registry:
       - key: :special_cover_header
         item: :special_cover_header
         is_enabled: false
-        settings: 
+        settings:
           - key: :filename
             item: "CoverME_WebsiteHeader_01.jpg"
       - key: :tobacco_cost
@@ -334,16 +346,39 @@ registry:
         is_enabled: true
       - key: :general_agency
         is_enabled: true
+      - key: :display_county
+        is_enabled: false
+      - key: :moving_to_state
+        is_enabled: true
+      - key: :living_outside_state
+        is_enabled: true
+      - key: :validate_quadrant
+        item: :validate_quadrant
+        is_enabled: false
+        settings:
+          - key: :exclusions
+            item: ["20515"]
+          - key: :inclusions
+            item: ["DC"]
       - key: :qle_within_sixty_days
         item: :qle_within_sixty_days
         is_enabled: true
         settings:
           - key: :days
             item: 60
+      - key: :immigration_status_checkbox
+        is_enabled: false
+      - key: :gender_to_sex
+        is_enabled: false
+      - key: :mainecare_cubcare_glossary
+        is_enabled: false
+      - key: :legacy_enrollment_trigger
+        is_enabled: true
+      - key: :verification_type_income_verification
+        is_enabled: false
       - key: :show_download_tax_documents
         item: :show_download_tax_documents
         is_enabled: true
       - key: :show_upload_notices
         item: :show_upload_notices
         is_enabled: true
-

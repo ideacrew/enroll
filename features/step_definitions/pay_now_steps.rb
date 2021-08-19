@@ -39,7 +39,7 @@ Given(/^Hbx Admin creates a consumer application$/) do
   find(:xpath, '//label[@for="person_naturalized_citizen_false"]', wait: 10).click
   find(:xpath, '//label[@for="indian_tribe_member_no"]', wait: 10).click
   find(:xpath, '//label[@for="radio_incarcerated_no"]', wait: 10).click
-  fill_in "person_addresses_attributes_0_address_1", with: "123 Main St"
+  fill_in "person_addresses_attributes_0_address_1", with: "123 Main St NE"
   fill_in "person_addresses_attributes_0_address_2", with: "apt 1005"
   fill_in "person_addresses_attributes_0_city", with: "Washington"
   find(:xpath, "//span[@class='label'][contains(., 'SELECT STATE')]", wait: 10).click
@@ -176,13 +176,13 @@ And(/^creates a consumer with SEP$/) do
   find(:xpath, '//label[@for="person_naturalized_citizen_false"]', wait: 10).click
   find(:xpath, '//label[@for="indian_tribe_member_no"]', wait: 10).click
   find(:xpath, '//label[@for="radio_incarcerated_no"]', wait: 10).click
-  fill_in "person_addresses_attributes_0_address_1", with: "123 Main St"
+  fill_in "person_addresses_attributes_0_address_1", with: "123 Main St NE"
   fill_in "person_addresses_attributes_0_address_2", with: "apt 1005"
   # May have to refactor this for the specific state
   fill_in "person_addresses_attributes_0_city", with: "Washington"
-  find(:xpath, "//span[@class='label'][contains(., 'SELECT STATE')]", wait: 10).click
-  find(:xpath, '//*[@id="address_info"]/div/div[3]/div[2]/div/div[3]/div/ul/li[10]', wait: 10).click
-  fill_in "person[addresses_attributes][0][zip]", with: "35465"
+  find_all(IvlPersonalInformation.select_state_dropdown).first.click
+  find_all(:xpath, "//li[contains(., '#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item}')]").last.click
+  fill_in "person[addresses_attributes][0][zip]", with: Settings.contact_center.zip_code
   find('.btn', text: 'CONTINUE', wait: 10).click
   visit '/insured/consumer_role/upload_ridp_document'
   visit '/insured/consumer_role/upload_ridp_document'

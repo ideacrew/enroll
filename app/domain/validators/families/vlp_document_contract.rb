@@ -19,6 +19,7 @@ module Validators
         optional(:expiration_date).maybe(:date)
         optional(:issuing_country).maybe(:string)
         optional(:description).maybe(:string)
+        optional(:incomes).maybe(:array)
       end
     end
   end

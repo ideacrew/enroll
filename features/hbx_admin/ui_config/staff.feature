@@ -27,4 +27,3 @@ Feature: Staff tab
         And staff feature is enabled
         When the user types in the staff index URL
         Then the user will be able to access staff index page
-

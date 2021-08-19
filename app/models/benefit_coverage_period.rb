@@ -152,32 +152,61 @@ class BenefitCoveragePeriod
   # @param tax_household [ TaxHousehold ] the tax household members belong to if eligible for financial assistance
   #
   # @return [ Array<Plan> ] the list of eligible products
-  def elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, tax_household=nil, market=nil)
-    ivl_bgs = []
+  def elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, tax_household = nil, market = nil)
     hbx_enrollment = hbx_enrollment_members.first.hbx_enrollment
     shopping_family_member_ids = hbx_enrollment_members.map(&:applicant_id)
-    benefit_packages.each do |bg|
+    subcriber = hbx_enrollment_members.detect(&:is_subscriber)
+    family_members = hbx_enrollment_members.map(&:family_member)
+    american_indian_members = extract_american_indian_status(hbx_enrollment, shopping_family_member_ids)
+    csr_kind = if tax_household
+                 extract_csr_kind(tax_household, shopping_family_member_ids)
+               elsif american_indian_members && FinancialAssistanceRegistry.feature_enabled?(:native_american_csr)
+                 'csr_limited'
+               end
+    ivl_bgs = get_benefit_packages({family_members: family_members, coverage_kind: coverage_kind, family: hbx_enrollment.family, american_indian_members: american_indian_members,
+                                    effective_on: hbx_enrollment.effective_on, market: market, shopping_family_members_ids: shopping_family_member_ids, csr_kind: csr_kind }).uniq
+    elected_product_ids = ivl_bgs.map(&:benefit_ids).flatten.uniq
+    market = market.nil? || market == 'coverall' ? 'individual' : market
+    product_entries({market: market, coverage_kind: coverage_kind, csr_kind: csr_kind, elected_product_ids: elected_product_ids, subcriber: subcriber, effective_on: hbx_enrollment.effective_on})
+  end
+
+  def get_benefit_packages(**attrs)
+    fetch_benefit_packages(attrs[:american_indian_members], attrs[:csr_kind]).inject([]) do |result, bg|
       satisfied = true
-      family = hbx_enrollment.family
-      hbx_enrollment_members.map(&:family_member).each do |family_member|
+      attrs[:family_members].each do |family_member|
         consumer_role = family_member.person.consumer_role if family_member.person.is_consumer_role_active?
         resident_role = family_member.person.resident_role if family_member.person.is_resident_role_active?
-        unless resident_role.nil?
-          rule = InsuredEligibleForBenefitRule.new(resident_role, bg, coverage_kind: coverage_kind, family: family, market_kind: market)
-        else
-          rule = InsuredEligibleForBenefitRule.new(consumer_role, bg, { coverage_kind: coverage_kind, family: family, new_effective_on: hbx_enrollment.effective_on,  market_kind: market})
-        end
+        rule = if resident_role.nil?
+                 InsuredEligibleForBenefitRule.new(consumer_role, bg, { coverage_kind: attrs[:coverage_kind], family: attrs[:family],
+                                                                        new_effective_on: attrs[:effective_on],  market_kind: attrs[:market], shopping_family_members_ids: attrs[:shopping_family_members_ids]})
+               else
+                 InsuredEligibleForBenefitRule.new(resident_role, bg, coverage_kind: attrs[:coverage_kind], family: attrs[:family], market_kind: attrs[:market], shopping_family_members_ids: attrs[:shopping_family_members_ids])
+               end
         satisfied = false and break unless rule.satisfied?[0]
       end
-      ivl_bgs << bg if satisfied
+      result << bg if satisfied
+      result
     end
+  end
 
-    ivl_bgs = ivl_bgs.uniq
-    elected_product_ids = ivl_bgs.map(&:benefit_ids).flatten.uniq
-    csr_kind = extract_csr_kind(tax_household, shopping_family_member_ids) if tax_household
-    market = market.nil? || market == 'coverall' ? 'individual' : market
-    products = product_factory.new({market_kind: market})
-    products.by_coverage_kind_year_and_csr(coverage_kind, start_on.year, csr_kind: csr_kind).by_product_ids(elected_product_ids).entries
+  def product_entries(**attrs)
+    factory = product_factory.new({market_kind: attrs[:market]})
+    elected_products = factory.by_coverage_kind_year_and_csr(attrs[:coverage_kind], start_on.year, csr_kind: attrs[:csr_kind]).by_product_ids(attrs[:elected_product_ids])
+
+    if EnrollRegistry[:service_area].settings(:service_area_model).item == 'single'
+      elected_products.entries
+    else
+      person = attrs[:subcriber].family_member.person
+      address = person.home_address || person.mailing_address
+      service_area_ids = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address, during: attrs[:effective_on]).map(&:id)
+      elected_products.where(:service_area_id.in => service_area_ids).entries
+    end
+  end
+
+  def fetch_benefit_packages(american_indian_members, csr_kind)
+    return benefit_packages unless american_indian_members && FinancialAssistanceRegistry.feature_enabled?(:native_american_csr)
+
+    benefit_packages.select{|bg| bg.cost_sharing == csr_kind}
   end
 
   ## Class methods
@@ -232,8 +261,7 @@ class BenefitCoveragePeriod
   private
 
   def extract_csr_kind(tax_household, shopping_family_member_ids)
-    csr_kind = tax_household.latest_eligibility_determination.csr_eligibility_kind
-    tax_household.tax_household_members.where(:applicant_id.in => shopping_family_member_ids).map(&:is_ia_eligible).include?(false) ? 'csr_0' : csr_kind
+    tax_household.eligibile_csr_kind(shopping_family_member_ids)
   end
 
   def end_date_follows_start_date
@@ -250,5 +278,10 @@ class BenefitCoveragePeriod
 
   def product_factory
     ::BenefitMarkets::Products::ProductFactory
+  end
+
+  def extract_american_indian_status(hbx_enrollment, shopping_family_members_ids)
+    shopping_family_members = hbx_enrollment.family.family_members.where(:id.in => shopping_family_members_ids)
+    shopping_family_members.all?{|fm| fm.person.indian_tribe_member }
   end
 end

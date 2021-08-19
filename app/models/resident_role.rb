@@ -28,6 +28,8 @@ class ResidentRole
   delegate :dob, :dob=,       to: :person, allow_nil: true
   delegate :gender, :gender=, to: :person, allow_nil: true
   delegate :tribal_id,          :tribal_id=,         to: :person, allow_nil: true
+  delegate :tribal_state,       :tribal_state=,      to: :person, allow_nil: true
+  delegate :tribal_name,        :tribal_name=,       to: :person, allow_nil: true
   delegate :is_incarcerated,    :is_incarcerated=,   to: :person, allow_nil: true
 
   delegate :citizen_status, :citizenship_result,:vlp_verified_date, :vlp_authority, :vlp_document_id, to: :lawful_presence_determination_instance
@@ -43,6 +45,7 @@ class ResidentRole
   after_create :create_initial_market_transition
 
   alias_method :is_incarcerated?,   :is_incarcerated
+  delegate :addresses, to: :person, allow_nil: true
 
   track_history :on => [:fields],
                 :scope => :person,
@@ -173,4 +176,7 @@ class ResidentRole
     is_state_resident?
   end
 
+  def rating_address
+    (addresses.detect { |adr| adr.kind == "home" }) || (addresses.detect { |adr| adr.kind == "mailing" })
+  end
 end

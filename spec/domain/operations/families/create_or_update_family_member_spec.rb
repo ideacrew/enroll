@@ -38,8 +38,15 @@ RSpec.describe Operations::Families::CreateOrUpdateFamilyMember, type: :model, d
      :expiration_date => '2020-09-30 00:00:00 UTC',
      :ssn => '873672163',
      :relationship => 'unrelated',
+     :incomes => [
+      {
+        title: "Job Income",
+        wage_type: "wages_and_salaries",
+        amount: 10
+      }
+     ],
      :addresses =>
-         [{'address_1' => '123',
+         [{'address_1' => '123 NE',
            'address_2' => '',
            'address_3' => '',
            'county' => '',
@@ -86,6 +93,25 @@ RSpec.describe Operations::Families::CreateOrUpdateFamilyMember, type: :model, d
       it 'should create vlp documents' do
         expect(@person.consumer_role.vlp_documents.present?).to be_truthy
       end
+    end
+  end
+
+  describe "VLP documents incomes" do
+    let(:target_person) do
+      Person.by_hbx_id(applicant_params[:hbx_id]).first
+    end
+    before do
+      EnrollRegistry[:verification_type_income_verification].feature.stub(:is_enabled).and_return(true)
+    end
+    it "should not create an income vlp document if incomes are present on applicant" do
+      @result = subject.call(applicant_params)
+      target_person.reload
+      expect(target_person.consumer_role.vlp_documents.where(subject: "Income").count).to eq(0)
+    end
+    it "should create an income vlp document if no incomes are present" do
+      @result = subject.call(applicant_params.merge!(incomes: []))
+      target_person.reload
+      expect(target_person.consumer_role.vlp_documents.where(subject: "Income").count).to eq(1)
     end
   end
 

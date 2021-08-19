@@ -114,6 +114,7 @@
         </div>
       </div>
 
+
       <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
         <div class='col-md-6'>
           <span class="fa-text-color">Was this person in foster care at age 18 or older? *</span>
@@ -164,6 +165,7 @@
           </div>
         </div>
 
+        <% if @applicant.display_student_question? %>
         <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
           <div class='col-md-6'>
             <span class="fa-text-color"><%= l10n('faa.other_ques.is_student') %></span>
@@ -177,35 +179,38 @@
             <label class="radio-yml" for="is_student_no">No</label>
           </div>
         </div>
+        <% end %>
 
-        <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
-          <div class='col-md-6'>
-            <span class="fa-text-color">What is the type of student?</span>
+        <% if FinancialAssistanceRegistry.feature_enabled?(:student_follow_up_questions) %>
+          <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
+            <div class='col-md-6'>
+              <span class="fa-text-color">What is the type of student?</span>
+            </div>
+            <div class='col-md-3'>
+              <label></label>
+              <%= f.select(:student_kind, options_for_select(["Dropout", "Full Time", "Graduated", "Half Time", "Part Time", "Not In Schoool"], selected: @applicant.student_kind), {:include_blank => "SELECT TYPE"}, {:id => 'student_kind', :class => "form-control", :prompt => true}) %>
+            </div>
           </div>
-          <div class='col-md-3'>
-            <label></label>
-            <%= f.select(:student_kind, options_for_select(["Dropout", "Full Time", "Graduated", "Half Time", "Part Time", "Not In Schoool"], selected: @applicant.student_kind), {:include_blank => "SELECT TYPE"}, {:id => 'student_kind', :class => "form-control", :prompt => true}) %>
-          </div>
-        </div>
 
-        <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
-          <div class='col-md-6'>
-            <span class="fa-text-color">Student status end on date?</span>
+          <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
+            <div class='col-md-6'>
+              <span class="fa-text-color">Student status end on date?</span>
+            </div>
+            <div class='col-md-2'>
+              <%= f.text_field :student_status_end_on, class: "jq-datepicker floatlabel", id: "applicant_student_status_end_on", placeholder: "End on" %>
+            </div>
           </div>
-          <div class='col-md-2'>
-            <%= f.text_field :student_status_end_on, class: "jq-datepicker floatlabel", id: "applicant_student_status_end_on", placeholder: "End on" %>
-          </div>
-        </div>
 
-        <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
-          <div class='col-md-6'>
-            <span class="fa-text-color">What type of school do you go to?</span>
+          <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
+            <div class='col-md-6'>
+              <span class="fa-text-color">What type of school do you go to?</span>
+            </div>
+            <div class='col-md-3'>
+              <label></label>
+              <%= f.select(:student_school_kind, options_for_select(["Pre School", "Graduate School", "English Language Institute", "Open University", "Primary", "Elementary", "GED", "Junior School", "High School", "Equivalent Vocational/Tech", "Vocational", "Technical", "Undergraduate"], selected: @applicant.student_school_kind), {:include_blank => "SELECT TYPE"}, {:id => 'student_school_kind', :class => "form-control", :prompt => true}) %>
+            </div>
           </div>
-          <div class='col-md-3'>
-            <label></label>
-            <%= f.select(:student_school_kind, options_for_select(["Pre School", "Graduate School", "English Language Institute", "Open University", "Primary", "Elementary", "GED", "Junior School", "High School", "Equivalent Vocational/Tech", "Vocational", "Technical", "Undergraduate"], selected: @applicant.student_school_kind), {:include_blank => "SELECT TYPE"}, {:id => 'student_school_kind', :class => "form-control", :prompt => true}) %>
-          </div>
-        </div>
+        <% end %>
 
         <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
           <div class='col-md-6'>
@@ -263,7 +268,7 @@
 
         <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
           <div class='col-md-6'>
-            <span class="fa-text-color"><%= l10n("faa.other_ques.disability_question") %></span>
+            <span class="fa-text-color"><%= l10n("faa.other_ques.disability_question") %> *</span>
           </div>
           <div class='col-md-2'>
             <%= f.radio_button("is_physically_disabled", true, class: "radio-yml", id: 'radio_physically_disabled_yes') %>
@@ -278,6 +283,27 @@
             <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "is_physically_disabled"} %>
           </div>
         </div>
+
+        <% if FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_other_question) &&
+              @applicant.age_of_the_applicant >= 19 && @applicant.is_applying_coverage %>
+          <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
+            <div class='col-md-6'>
+              <span class="fa-text-color"><%= l10n("faa.primary_caretaker_question_text") %></span>
+            </div>
+            <div class='col-md-2'>
+              <%= f.radio_button("is_primary_caregiver", true, class: "radio-yml", id: "is_primary_caregiver_yes") %>
+              <label class="radio-yml" for="is_primary_caregiver_yes"><%= l10n("yes") %></label>
+            </div>
+            <div class='col-md-2'>
+              <%= f.radio_button("is_primary_caregiver", false, class: "radio-yml", id: "is_primary_caregiver_no")%>
+              <label class="radio-yml" for="is_primary_caregiver_no"><%= l10n("no") %></label>
+            </div>
+            <div class='col-md-2 left-seprator'>
+              <a href="#primary_caretaker_question" data-toggle="modal" data-target="#primary_caretaker_question"><%= l10n("not_sure?") %></a>
+              <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "primary_caretaker_question"} %>
+            </div>
+          </div>
+        <% end %>
         <% if @applicant.eligible_immigration_status.present? %>
           <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
             <div class='col-md-6'>

@@ -9,9 +9,11 @@ RSpec.describe "insured/families/personal.html.erb" do
     assign(:person, person)
     sign_in(current_user)
     allow(person).to receive_message_chain("primary_family.current_broker_agency.present?").and_return(false)
+    allow(person).to receive_message_chain("primary_family.active_family_members").and_return([])
     allow(view).to receive(:enrollment_group_unverified?).and_return true
     allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
     allow(view).to receive(:display_documents_tab?).and_return true
+    allow(view).to receive(:display_family_members).and_return([])
   end
 
   shared_examples_for "display_heading" do

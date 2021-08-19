@@ -36,8 +36,9 @@ When(/^.+ enters? the info of his dependent wife$/) do
   fill_in 'jq_datepicker_ignore_dependent[dob]', with: '09/15/1994'
   find(:xpath, "//label[@for='radio_female']").click
   sleep 1
-  find(:xpath, '//*[@id="new_dependent"]/div[1]/div[5]/div[1]/div[2]/div/div[2]/span').click
-  find(:xpath, '//*[@id="new_dependent"]/div[1]/div[5]/div[1]/div[2]/div/div[3]/div/ul/li[2]').click
+  find(:xpath, '//*[@id="new_dependent"]/div[1]/div[5]/div[1]/div[3]/div/div[2]/span').click
+  find(:xpath, '//*[@id="new_dependent"]/div[1]/div[5]/div[1]/div[3]/div/div[3]/div/ul/li[2]').click
+  find(:xpath, '//label[@for="dependent_same_with_primary"]').click
   fill_in 'dependent[addresses][0][address_1]', with: '123 STREET'
   fill_in 'dependent[addresses][0][city]', with: 'WASHINGTON'
   find(:xpath, "//span[@class='label'][contains(., 'SELECT STATE')]").click

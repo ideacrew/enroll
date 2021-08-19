@@ -9,9 +9,10 @@ document.addEventListener("turbolinks:load", function() {
   });
 
   // Check for Eligibility Result response every "interval_time" seconds a total of "number_of_times" times.
+  // Change number_of_times 20 and the wait time changes 40 seconds.
   if (/wait_for_eligibility_response/.test(window.location.href)) {
     var i = 1;
-    var number_of_times = 10;
+    var number_of_times = 20;
     var interval_time = 2000;
     var repeater = setInterval(function () {
       if ( i < number_of_times) {
@@ -29,7 +30,7 @@ document.addEventListener("turbolinks:load", function() {
         i += 1;
       } else {
         clearInterval(repeater);
-        if ( i > 9 ){
+        if ( i > 14 ){
           window.location = window.location.href.replace(/wait_for_eligibility_response/, "eligibility_response_error")
         }
       }

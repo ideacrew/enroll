@@ -34,6 +34,8 @@ class Person
                         :ethnicity,
                         :race,
                         :tribal_id,
+                        :tribal_state,
+                        :tribal_name,
                         :no_dc_address,
                         :is_homeless,
                         :is_temporarily_out_of_state,
@@ -63,6 +65,7 @@ class Person
   NON_SHOP_ROLES = ['Individual','Coverall']
 
   field :hbx_id, type: String
+  field :ext_app_id, type: String
   field :name_pfx, type: String
   field :first_name, type: String
   field :middle_name, type: String
@@ -85,8 +88,11 @@ class Person
   field :ethnicity, type: Array
   field :race, type: String
   field :tribal_id, type: String
+  field :tribal_state, type: String
+  field :tribal_name, type: String
 
   field :is_tobacco_user, type: String, default: "unknown"
+  field :tobacco_use, type: Boolean # TODO: use above field
   field :language_code, type: String
 
   field :no_dc_address, type: Boolean, default: false
@@ -101,6 +107,8 @@ class Person
 
   field :is_homeless, type: Boolean, default: false
   field :is_temporarily_out_of_state, type: Boolean, default: false
+  field :is_moving_to_state, type: Boolean, default: false
+  field :immigration_doc_statuses, type: Array
 
 
   delegate :is_applying_coverage, to: :consumer_role, allow_nil: true
@@ -178,6 +186,8 @@ class Person
   before_save :generate_hbx_id
   before_save :update_full_name
   before_save :strip_empty_fields
+
+  before_save :check_indian if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
 
   #after_save :generate_family_search
   after_create :create_inbox
@@ -592,6 +602,10 @@ class Person
 
   def has_mailing_address?
     addresses.any? { |adr| adr.kind == "mailing" }
+  end
+
+  def rating_address
+    home_address || mailing_address
   end
 
   def home_email
@@ -1135,8 +1149,23 @@ class Person
   end
 
   def indian_tribe_member=(val)
-    self.tribal_id = nil if val.to_s == false
+    if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
+      if val.to_s == 'false'
+        self.tribal_state = nil
+        self.tribal_name = nil
+        self.tribal_id = nil
+      end
+    elsif val.to_s == false
+      self.tribal_id = nil
+    end
     @indian_tribe_member = (val.to_s == "true")
+  end
+
+  def check_indian
+    return unless @indian_tribe_member.to_s == 'false'
+    self.tribal_id = nil
+    self.tribal_state = nil
+    self.tribal_name = nil
   end
 
   def eligible_immigration_status=(val)
@@ -1158,7 +1187,11 @@ class Person
   def indian_tribe_member
     return @indian_tribe_member if !@indian_tribe_member.nil?
     return nil if citizen_status.blank?
-    @indian_tribe_member ||= !(tribal_id.nil? || tribal_id.empty?)
+
+    result = @indian_tribe_member ||= !(tribal_id.nil? || tribal_id.empty?)
+    result = @indian_tribe_member ||= !(tribal_state.nil? || tribal_state.empty? || tribal_name.nil? || tribal_name.empty?) if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
+
+    result
   end
 
   def eligible_immigration_status
@@ -1305,9 +1338,12 @@ class Person
 
   def native_american_validation
     self.errors.add(:base, "American Indian / Alaska Native status is required.") if indian_tribe_member.to_s.blank?
-    if !tribal_id.present? && @us_citizen == true && @indian_tribe_member == true
+    if EnrollRegistry[:indian_alaskan_tribe_details].enabled? && @us_citizen == true && @indian_tribe_member == true
+      self.errors.add(:base, "Tribal state is required when native american / alaska native is selected") unless tribal_state.present?
+      self.errors.add(:base, "Tribal name is required when native american / alaska native is selected") unless tribal_name.present?
+    elsif !EnrollRegistry[:indian_alaskan_tribe_details].enabled? && !tribal_id.present? && @us_citizen == true && @indian_tribe_member == true
       self.errors.add(:base, "Tribal id is required when native american / alaska native is selected")
-    elsif tribal_id.present? && !tribal_id.match("[0-9]{9}")
+    elsif !EnrollRegistry[:indian_alaskan_tribe_details].enabled? && tribal_id.present? && !tribal_id.match("[0-9]{9}")
       self.errors.add(:base, "Tribal id must be 9 digits")
     end
   end
@@ -1315,7 +1351,7 @@ class Person
   def citizenship_validation
     if @us_citizen.to_s.blank?
       self.errors.add(:base, "Citizenship status is required.")
-    elsif @us_citizen == false && @eligible_immigration_status.nil?
+    elsif @us_citizen == false && (@eligible_immigration_status.nil? && EnrollRegistry.feature_enabled?(:immigration_status_question_required))
       self.errors.add(:base, "Eligible immigration status is required.")
     elsif @us_citizen == true && @naturalized_citizen.nil?
       self.errors.add(:base, "Naturalized citizen is required.")

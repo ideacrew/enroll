@@ -83,7 +83,7 @@ module FinancialAssistance
                    determined_at: TimeKeeper.datetime_of_record - 30.days,
                    source: "Faa").save!
       end
-      application.applicants.each { |applicant| applicant.update_attributes!(is_medicaid_chip_eligible: false, is_ia_eligible: true, is_without_assistance: false) }
+      application.applicants.each { |applicant| applicant.update_attributes!(is_medicaid_chip_eligible: false, is_ia_eligible: true, is_without_assistance: false, csr_percent_as_integer: 73) }
       application.update_attributes!(aasm_state: 'determined')
     end
 

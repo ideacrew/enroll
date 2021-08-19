@@ -67,6 +67,7 @@ When(/^they click ADD INCOME & COVERAGE INFO for an applicant$/) do
 end
 
 Then(/^they should be taken to the applicant's Tax Info page$/) do
+  sleep 5
   expect(page).to have_content("Tax Info for #{consumer.person.first_name}")
 end
 
@@ -375,12 +376,46 @@ And(/^they should be taken back to the application's details page for deduction$
   page.should have_content("Income Adjustments for #{application.applicant.first.first_name}")
 end
 
+Given(/^the primary caretaker question configuration is enabled$/) do
+  enable_feature :primary_caregiver_other_question, {registry_name: FinancialAssistanceRegistry}
+end
+
+Given(/^the primary caretaker question configuration is diasbled$/) do
+  disable_feature :primary_caregiver_other_question, {registry_name: FinancialAssistanceRegistry}
+end
+
 Given(/^the FAA feature configuration is disabled$/) do
   disable_feature :financial_assistance
 end
 
 Given(/^the FAA feature configuration is enabled$/) do
   enable_feature :financial_assistance
+end
+
+Given(/^american indian or alaska native income feature is enabled$/) do
+  enable_feature :american_indian_alaskan_native_income
+end
+
+Given(/^american indian or alaska native income feature is disabled$/) do
+  disable_feature :american_indian_alaskan_native_income
+end
+
+Then(/^the user should see the external verification link$/) do
+  # TODO: Maybe figure out how to do this with something other than glyphicon
+  other_actions_link = page.all('a').detect { |link| link[:class] == 'glyphicon glyphicon-plus pull-right' }
+  other_actions_link.click
+  expect(page).to have_content(
+    l10n(
+      "faa.full_long_name_determination",
+      program_long_name: FinancialAssistanceRegistry[:medicaid_or_chip_agency_long_name].setting(:name).item,
+      program_short_name: FinancialAssistanceRegistry[:medicaid_or_chip_program_short_name].setting(:name).item
+    )
+  )
+end
+
+# TODO: Refactor these with the resource_registry_world.rb helpers
+Given(/^Indian Health Service Question feature is enabled$/) do
+  enable_feature :indian_health_service_question
 end
 
 Then(/^the consumer will not see the Cost Savings link$/) do
@@ -460,6 +495,14 @@ And(/^user should see Medicaid eligibility question$/) do
   expect(page).to have_content("Medicaid eligibility")
 end
 
+And(/^user should have feature toggled questions in review$/) do
+  # Add more stuff here as you add more conditional questions please, fam
+  if EnrollRegistry.feature_enabled?(:financial_assistance) &&
+     FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_other_question)
+    expect(page).to have_content(l10n("faa.primary_caretaker_question_text"))
+  end
+end
+
 And(/^the user should click on the destroy applicant icon$/) do
   find_all('.close-2')[2].click
   find('.fa-times').click
@@ -468,4 +511,11 @@ end
 Then(/^the user should see the popup for the remove applicant confirmation$/) do
   popup_text = "Are you sure you want to remove this applicant?"
   expect(page).to have_content(popup_text)
+end
+
+And(/^all applicants are not medicaid chip eligible and are non magi medicaid eligible$/) do
+  application.applicants.each do |applicant|
+    applicant.update_attributes(is_medicaid_chip_eligible: false)
+    applicant.update_attributes(is_non_magi_medicaid_eligible: false)
+  end
 end

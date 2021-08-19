@@ -22,7 +22,8 @@ describe Household, "given a coverage household with a dependent", :dbclean => :
 
   context "new_hbx_enrollment_from" do
     let(:consumer_role) {FactoryBot.create(:consumer_role)}
-    let(:person) { double(primary_family: family)}
+    let(:address) { FactoryBot.build(:address) }
+    let(:person) { double(primary_family: family, addresses: [address])}
     let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
     let!(:hbx_profile) { FactoryBot.create(:hbx_profile) }
     let(:benefit_package) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first }
@@ -362,17 +363,58 @@ describe Household, "for creating a new taxhousehold using create eligibility", 
     it 'should match with expected csr eligibility kind' do
       expect(@determination.csr_eligibility_kind).to eq('csr_limited')
     end
+
+    it 'THH members should match with expected csr eligibility kind' do
+      expect(household100.tax_households[0].tax_household_members[0].csr_eligibility_kind).to eq('csr_limited')
+    end
+
+    before do
+      params.merge!({'csr' => 0})
+      household100.tax_households.first.tax_household_members.first.update_attributes!(is_ia_eligible: false)
+      household100.create_new_tax_household(params)
+    end
+
+    it 'should not update csr for ia ineligible tax household member' do
+      expect(household100.tax_households.last.eligibility_determinations.first.csr_percent_as_integer).to eq(0)
+      expect(household100.tax_households[0].tax_household_members[0].csr_percent_as_integer).to eq(-1)
+    end
   end
 
   context 'for apply_aggregate_to_enrollment' do
-    let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, :silver)}
+    let(:address) { person100.rating_address }
+    let(:effective_on) { TimeKeeper.date_of_record.beginning_of_year }
+    let(:application_period) { effective_on.beginning_of_year..effective_on.end_of_year }
+    let!(:rating_area) do
+      ::BenefitMarkets::Locations::RatingArea.rating_area_for(address, during: effective_on) || FactoryBot.create_default(:benefit_markets_locations_rating_area, active_year: effective_on.year)
+    end
+    let!(:service_area) do
+      ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address, during: effective_on).first || FactoryBot.create_default(:benefit_markets_locations_service_area, active_year: effective_on.year)
+    end
+    let!(:product) do
+      prod =
+        FactoryBot.create(
+          :benefit_markets_products_health_products_health_product,
+          :with_issuer_profile,
+          :silver,
+          benefit_market_kind: :aca_individual,
+          kind: :health,
+          application_period: application_period,
+          service_area: service_area,
+          csr_variant_id: '01'
+        )
+      prod.premium_tables = [premium_table]
+      prod.save
+      prod
+    end
+    let(:premium_table)        { build(:benefit_markets_products_premium_table, effective_period: application_period, rating_area: rating_area) }
     let!(:current_enr) do
       enr = FactoryBot.create(:hbx_enrollment,
                               :individual_assisted,
                               coverage_kind: 'health',
                               household: household100,
                               family: family100,
-                              effective_on: TimeKeeper.date_of_record.beginning_of_year,
+                              rating_area_id: rating_area.id,
+                              effective_on: effective_on,
                               product: product,
                               consumer_role_id: person100.consumer_role.id)
       FactoryBot.create(:hbx_enrollment_member, applicant_id: family100.primary_applicant.id, hbx_enrollment: enr)

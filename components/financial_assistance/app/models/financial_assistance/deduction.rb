@@ -57,9 +57,6 @@ module FinancialAssistance
                         message: "pick a name length between #{TITLE_SIZE_RANGE}",
                         on: [:step_1, :submission]
 
-    validates :amount,          presence: true,
-                                numericality: { greater_than: 0, message: "%{value} must be greater than $0" },
-                                on: [:step_1, :submission]
     validates :kind,            presence: true,
                                 inclusion: { in: KINDS, message: "%{value} is not a valid deduction type" },
                                 on: [:step_1, :submission]
@@ -69,6 +66,7 @@ module FinancialAssistance
     validates :start_on,        presence: true, on: [:step_1, :submission]
 
     validate :start_on_must_precede_end_on, on: [:step_1, :submission]
+    validate :check_if_valid_amount
 
     before_create :set_submission_timestamp
 
@@ -93,6 +91,10 @@ module FinancialAssistance
     def start_on_must_precede_end_on
       return unless start_on.present? && end_on.present?
       errors.add(:end_on, "End On date can't occur before Start On Date") if end_on < start_on
+    end
+
+    def check_if_valid_amount
+      errors.add(:amount, "$#{amount} must be greater than $0.") if amount.to_f < 0
     end
   end
 end
