@@ -35,7 +35,7 @@ module Operations
       end
 
       def fetch_enrollment(enrollment_id)
-        Operations::HbxEnrollments::Find.new.call(enrollment_id: enrollment_id)
+        Operations::HbxEnrollments::Find.new.call(id: enrollment_id)
       end
 
       def check_enrollment_eligibility(termination_date)
