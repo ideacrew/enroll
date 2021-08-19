@@ -232,7 +232,8 @@
 
       <%# The "Go Back To My Account" text box will NOT display if all applicants are determined medicaid eligible or ineligible. It will appear for any other combination of applicant determinations. %>
       <% all_medicaid_applicants = eligible_applicants(params[:id], :is_medicaid_chip_eligible).length == @application.active_applicants.length %>
-      <% unless all_medicaid_applicants.present? %>
+      <% all_ineligible_applicants = eligible_applicants(params[:id], :is_totally_ineligible).length == @application.active_applicants.length %>
+      <% unless all_medicaid_applicants == true || all_ineligible_applicants == true %>
         <div class="border-bottom-1px"></div>
         <div class="er-medicaid mt-20">
           <div class="er-medicaid-prsn">
@@ -249,7 +250,6 @@
       <% end %>
 
       <!-- Green next step box -->
-      <% all_ineligible_applicants = eligible_applicants(params[:id], :is_totally_ineligible).length == @application.active_applicants.length %>
       <% unless ((action_name == "eligibility_results" || action_name == "review") && (params.keys.exclude?"cur")) || all_ineligible_applicants %>
         <div class="er-medicaid mt-20">
           <div class="border-bottom-1px"></div>
