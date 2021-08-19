@@ -64,17 +64,19 @@ class MigrateFamily < Mongoid::Migration
       @missing_relationships = @application.find_missing_relationships(@matrix)
       @all_relationships = @application.find_all_relationships(@matrix)
 
+      missing_relationships = []
       @missing_relationships.each do |rel|
         from_relation = rel.first[0]
         to_relation = rel.first[1]
-        from_applicant = @application.applicants.find(from_relation)
-        to_applicant =  @application.applicants.find(to_relation)
+        from_applicant = @application.applicants.where(id: from_relation).first
+        to_applicant =  @application.applicants.where(id: to_relation).first
         from_family_member = ::FamilyMember.find(from_applicant.family_member_id)
         to_family_member = ::FamilyMember.find(to_applicant.family_member_id)
         member_hash = family_hash["family_members"].select { |member| member["hbx_id"] == from_family_member.external_member_id}.first
         relationship = member_hash["person"]["person_relationships"].select { |p_rel| p_rel["relative"]["hbx_id"] == to_family_member.external_member_id }.first
         relation_kind = relationship["kind"]
-        @application.update_or_build_relationship(from_applicant, to_applicant, relation_kind)
+        missing_relationships << ::FinancialAssistance::Relationship.new({kind: relation_kind, applicant_id: from_applicant.id, relative_id: to_applicant.id})
+        # @application.update_or_build_relationship(from_applicant, to_applicant, relation_kind)
       end
 
       @all_relationships.each do |all_rel|
@@ -89,10 +91,12 @@ class MigrateFamily < Mongoid::Migration
         relationship = member_hash["person"]["person_relationships"].select { |p_rel| p_rel["relative"]["hbx_id"] == to_family_member.external_member_id }.first
         relation_kind = relationship["kind"]
         relation = ::FinancialAssistance::Relationship::INVERSE_MAP[relation_kind]
-        @application.update_or_build_relationship(from_applicant, to_applicant, relation)
+        missing_relationships << ::FinancialAssistance::Relationship.new({kind: relation, applicant_id: from_applicant.id, relative_id: to_applicant.id})
+        # @application.update_or_build_relationship(from_applicant, to_applicant, relation)
       end
 
-      @application.save!
+      @application.relationships << missing_relationships
+      @application.save!(validate: false)
     end
 
     def file_path
