@@ -7,7 +7,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 951fd32c259b9524c9597ef0a4c7b01f35c1e9ba
+  revision: 7ba3ac4c0b1e0a792fbff3f1b0b3067a2bf1b411
   branch: atp_cv_transform_v3
   specs:
     aca_entities (0.4.0)
@@ -733,7 +733,7 @@ GEM
       nokogiri (~> 1.5)
     non-stupid-digest-assets (1.0.9)
       sprockets (>= 2.0)
-    oj (3.13.1)
+    oj (3.13.2)
     orm_adapter (0.5.0)
     overcommit (0.52.1)
       childprocess (>= 0.6.3, < 4)
