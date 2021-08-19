@@ -900,7 +900,7 @@ class CensusEmployee < CensusMember
       active_plan_hios_id = active_benefit_group_assignment.benefit_package.reference_plan.hios_id
       prior_py.benefit_packages.select {|bg| bg&.reference_plan&.renewal_product&.hios_id == active_plan_hios_id }.first
     else
-      benefit_packages.first
+      prior_py.benefit_packages.first
     end
   end
 
