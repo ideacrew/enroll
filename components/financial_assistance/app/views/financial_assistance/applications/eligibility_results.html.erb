@@ -249,6 +249,7 @@
       <% end %>
 
       <!-- Green next step box -->
+      <% all_ineligible_applicants = eligible_applicants(params[:id], :is_totally_ineligible).length == @application.active_applicants.length %>
       <% unless ((action_name == "eligibility_results" || action_name == "review") && (params.keys.exclude?"cur")) || all_ineligible_applicants %>
         <div class="er-medicaid mt-20">
           <div class="border-bottom-1px"></div>
