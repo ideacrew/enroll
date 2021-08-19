@@ -164,11 +164,13 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
   end
 
   describe "GET show" do
-    let(:dependent) { double("Dependent") }
+    let(:dependent) { double("Dependent", family_id: '1') }
     let(:family_member) {double("FamilyMember", id: double("id"))}
 
     before(:each) do
       allow(Forms::FamilyMember).to receive(:find).and_return(dependent)
+      allow(dependent).to receive(:family_id).and_return(test_family.id)
+      allow(Family).to receive(:find).with(dependent.family_id).and_return(test_family)
       sign_in(user)
       get :show, params: {id: family_member.id}
     end
@@ -376,11 +378,12 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
   describe "DELETE destroy" do
     # let(:family) { double(Family, active_family_members: [])}
 
-    let(:dependent) { double }
+    let(:dependent) { double(family_id: test_family.id) }
     let(:dependent_id) { "234dlfjadsklfj" }
 
     before :each do
       sign_in(user)
+      allow(Family).to receive(:find).with(dependent.family_id).and_return(test_family)
       # subject.instance_variable_set(:@family, family)
     end
 
@@ -415,6 +418,10 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
         dup_fm
       end
 
+      before do
+        allow(Family).to receive(:find).and_return(family)
+      end
+
       it 'should destroy the duplicate dependents if exists' do
         expect(family.family_members.active.count).to eq 5
         delete :destroy, params: {id: dependent1.id}
@@ -427,12 +434,13 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
   end
 
   describe "GET edit" do
-    let(:dependent) { double(family_member: double) }
+    let(:dependent) { double(family_member: double, family_id: test_family.id) }
     let(:dependent_id) { "234dlfjadsklfj" }
 
     before :each do
       sign_in(user)
       allow(Forms::FamilyMember).to receive(:find).with(dependent_id).and_return(dependent)
+      allow(Family).to receive(:find).with(dependent.family_id).and_return(test_family)
       get :edit, params: {id: dependent_id}
     end
 
