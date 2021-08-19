@@ -150,7 +150,7 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
             active_enrollment_ids: active_enrollments.pluck(:hbx_id),
             renewing_enrollment_ids: renewing_enrollments.pluck(:hbx_id),
             uqhp_event: eligibility_kind
-          }
+          }.with_indifferent_access
         )
 
         csv << [
