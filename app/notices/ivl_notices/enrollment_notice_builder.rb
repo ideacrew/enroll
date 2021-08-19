@@ -19,11 +19,11 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
     clear_tmp(custom_notice_path)
   end
 
-  def deliver
+  def deliver(person_id)
     append_hbe
     build
     generate_pdf_notice
-    attach_blank_page(notice_path)
+    attach_blank_page(notice_path, person_id)
     attach_docs
     attach_appeals
     attach_non_discrimination
