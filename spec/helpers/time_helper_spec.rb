@@ -218,6 +218,8 @@ RSpec.describe TimeHelper, :type => :helper, dbclean: :after_each do
       before do
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_sep).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_shop_sep).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
         census_employee.benefit_group_assignments << build(:benefit_group_assignment, benefit_group: current_benefit_package, census_employee: census_employee, start_on: initial_application.start_on, end_on: initial_application.end_on)
         census_employee.link_employee_role!
         census_employee.update_attributes(employee_role_id: employee_role.id)
@@ -253,7 +255,8 @@ RSpec.describe TimeHelper, :type => :helper, dbclean: :after_each do
           initial_application.terminate_enrollment!
           census_employee.reload
         end
-        it "returns maximum range when py is terminated" do
+        #TODO: Enable this when terminated enrollments are allowed for prior year end date changes
+        xit "returns maximum range when py is terminated" do
           expect(helper.sep_optional_date(family, 'max', nil, TimeKeeper.date_of_record.beginning_of_month - 5.days)).to eq(initial_application.end_on)
         end
       end
@@ -268,6 +271,8 @@ RSpec.describe TimeHelper, :type => :helper, dbclean: :after_each do
       before do
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_sep).and_return(false)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_shop_sep).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
         census_employee.benefit_group_assignments << build(:benefit_group_assignment, benefit_group: current_benefit_package, census_employee: census_employee, start_on: initial_application.start_on, end_on: initial_application.end_on)
         census_employee.link_employee_role!
         census_employee.update_attributes(employee_role_id: employee_role.id)
