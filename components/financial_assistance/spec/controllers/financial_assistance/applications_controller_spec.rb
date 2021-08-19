@@ -173,6 +173,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
       it "should fail during publish application and redirects to error_page" do
         post :step, params: { id: application2.id, commit: "Submit Application", application: application_valid_params }
+        expect(flash[:error]).to match(/Submission Error: /)
         expect(response).to redirect_to(application_publish_error_application_path(application2))
       end
 
