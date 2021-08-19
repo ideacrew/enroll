@@ -3,26 +3,6 @@
     {
       "warning_type": "File Access",
       "warning_code": 16,
-      "fingerprint": "00d1d72ecb08946b193000f8183baca7e5bf6d0b22b298917e1b0875377fb139",
-      "check_name": "FileAccess",
-      "message": "Model attribute used in file name",
-      "file": "app/models/one_login/ruby_saml/saml_generator.rb",
-      "line": 36,
-      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
-      "code": "File.read(SamlInformation.kp_pay_now_x509_cert_location)",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "OneLogin::RubySaml::SamlGenerator",
-        "method": "initialize"
-      },
-      "user_input": "SamlInformation.kp_pay_now_x509_cert_location",
-      "confidence": "Medium",
-      "note": ""
-    },
-    {
-      "warning_type": "File Access",
-      "warning_code": 16,
       "fingerprint": "021dc1028a18cbbf921ce7bedbe8f2e573e9ea81cd7e4b31c89122ddabd1bf87",
       "check_name": "SendFile",
       "message": "Model attribute used in file name",
@@ -37,26 +17,6 @@
         "method": "preview"
       },
       "user_input": "Notifier::NoticeKind.find(params[:id]).notice_recipient.hbx_id",
-      "confidence": "Medium",
-      "note": ""
-    },
-    {
-      "warning_type": "File Access",
-      "warning_code": 16,
-      "fingerprint": "0565754b8cc588469e0e02abcf8d894f9ceaa0c9971281fde053bb44cbda716a",
-      "check_name": "FileAccess",
-      "message": "Model attribute used in file name",
-      "file": "app/models/one_login/ruby_saml/saml_generator.rb",
-      "line": 35,
-      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
-      "code": "File.read(SamlInformation.kp_pay_now_private_key_location)",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "OneLogin::RubySaml::SamlGenerator",
-        "method": "initialize"
-      },
-      "user_input": "SamlInformation.kp_pay_now_private_key_location",
       "confidence": "Medium",
       "note": ""
     },
@@ -127,7 +87,7 @@
       "check_name": "Execute",
       "message": "Possible command injection",
       "file": "lib/client_configuration_toggler.rb",
-      "line": 74,
+      "line": 62,
       "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
       "code": "`git checkout #{filename_in_config_directory.sub(\"#{old_config_folder}/\", \"\")}`",
       "render_path": null,
@@ -157,26 +117,6 @@
         "method": "migrate"
       },
       "user_input": "row[\"FEIN\"]",
-      "confidence": "Medium",
-      "note": ""
-    },
-    {
-      "warning_type": "Command Injection",
-      "warning_code": 14,
-      "fingerprint": "19e31e4ee89d2dcf01bc2c780347bff6d398e1db69b222cd0525ee3054dc1d43",
-      "check_name": "Execute",
-      "message": "Possible command injection",
-      "file": "lib/client_configuration_toggler.rb",
-      "line": 43,
-      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
-      "code": "`cp -r system #{Rails.root}/#{engine_folder_name}/spec/dummy/system`",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "ClientConfigurationToggler",
-        "method": "copy_current_configuration_to_engines"
-      },
-      "user_input": "engine_folder_name",
       "confidence": "Medium",
       "note": ""
     },
@@ -351,37 +291,6 @@
       "note": ""
     },
     {
-      "warning_type": "Cross-Site Scripting",
-      "warning_code": 2,
-      "fingerprint": "43c92b0ecc7550a360ac5f73e3e5c476a11c568ee2ab0db5949016af103cabb8",
-      "check_name": "CrossSiteScripting",
-      "message": "Unescaped parameter value",
-      "file": "app/views/exchanges/hbx_profiles/family_index_datatable.html.erb",
-      "line": 8,
-      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
-      "code": "render_datatable(Effective::Datatables::FamilyDataTable.new(params[:scopes].to_h))",
-      "render_path": [
-        {
-          "type": "controller",
-          "class": "Exchanges::HbxProfilesController",
-          "method": "family_index_dt",
-          "line": 354,
-          "file": "app/controllers/exchanges/hbx_profiles_controller.rb",
-          "rendered": {
-            "name": "exchanges/hbx_profiles/family_index_datatable",
-            "file": "app/views/exchanges/hbx_profiles/family_index_datatable.html.erb"
-          }
-        }
-      ],
-      "location": {
-        "type": "template",
-        "template": "exchanges/hbx_profiles/family_index_datatable"
-      },
-      "user_input": "params[:scopes].to_h",
-      "confidence": "Weak",
-      "note": ""
-    },
-    {
       "warning_type": "File Access",
       "warning_code": 16,
       "fingerprint": "49f890491d7c2afee6adea867d0d98443cdb5c3b778e2830afb39614ce7362c7",
@@ -443,22 +352,22 @@
       "note": ""
     },
     {
-      "warning_type": "Command Injection",
-      "warning_code": 14,
-      "fingerprint": "52c196492aca987de56a518ca31878406d5c8f6080dafdf920a208b717694cab",
-      "check_name": "Execute",
-      "message": "Possible command injection",
-      "file": "lib/client_configuration_toggler.rb",
-      "line": 52,
-      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
-      "code": "`cp -r config/settings.yml #{Rails.root}/#{engine_folder_name}/spec/dummy/config/settings.yml`",
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "50aa7bd54085347f6528d46a9b45c5211cde34856f8b5c760de6de5be822a7bc",
+      "check_name": "FileAccess",
+      "message": "Model attribute used in file name",
+      "file": "app/models/one_login/ruby_saml/saml_generator.rb",
+      "line": 36,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "File.read(SamlInformation.pay_now_private_key_location)",
       "render_path": null,
       "location": {
         "type": "method",
-        "class": "ClientConfigurationToggler",
-        "method": "copy_current_configuration_to_engines"
+        "class": "OneLogin::RubySaml::SamlGenerator",
+        "method": "initialize"
       },
-      "user_input": "engine_folder_name",
+      "user_input": "SamlInformation.pay_now_private_key_location",
       "confidence": "Medium",
       "note": ""
     },
@@ -469,7 +378,7 @@
       "check_name": "Execute",
       "message": "Possible command injection",
       "file": "lib/client_configuration_toggler.rb",
-      "line": 63,
+      "line": 51,
       "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
       "code": "`cp -r #{filename_in_config_directory} #{filename_in_config_directory.sub(\"#{target_config_folder}/\", \"\")}`",
       "render_path": null,
@@ -489,7 +398,7 @@
       "check_name": "MassAssignment",
       "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
       "file": "app/controllers/application_controller.rb",
-      "line": 99,
+      "line": 104,
       "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
       "code": "params.permit!",
       "render_path": null,
@@ -499,6 +408,26 @@
         "method": "strong_params"
       },
       "user_input": null,
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "5780d54a2dbd5a30bde660af7ec862c6f5e718821a944c9f9aebb0a7fd6f2b3c",
+      "check_name": "FileAccess",
+      "message": "Model attribute used in file name",
+      "file": "app/models/one_login/ruby_saml/saml_generator.rb",
+      "line": 37,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "File.read(SamlInformation.pay_now_x509_cert_location)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "OneLogin::RubySaml::SamlGenerator",
+        "method": "initialize"
+      },
+      "user_input": "SamlInformation.pay_now_x509_cert_location",
       "confidence": "Medium",
       "note": ""
     },
@@ -560,7 +489,7 @@
       "check_name": "UnsafeReflection",
       "message": "Unsafe reflection method `safe_constantize` called with parameter value",
       "file": "app/controllers/documents_controller.rb",
-      "line": 35,
+      "line": 37,
       "link": "https://brakemanscanner.org/docs/warning_types/remote_code_execution/",
       "code": "(params[:model].camelize or \"BenefitSponsors::Organizations::AcaShopCcaEmployerProfile\").safe_constantize",
       "render_path": null,
@@ -676,26 +605,6 @@
       "note": ""
     },
     {
-      "warning_type": "Command Injection",
-      "warning_code": 14,
-      "fingerprint": "77379f53e5e37a72155c2a4f0462b37b1d046c19ba0a8ac1f22c3f8d68a8162c",
-      "check_name": "Execute",
-      "message": "Possible command injection",
-      "file": "lib/client_configuration_toggler.rb",
-      "line": 48,
-      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
-      "code": "`cp -r system #{Rails.root}/#{engine_folder_name}/`",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "ClientConfigurationToggler",
-        "method": "copy_current_configuration_to_engines"
-      },
-      "user_input": "engine_folder_name",
-      "confidence": "Medium",
-      "note": ""
-    },
-    {
       "warning_type": "Mass Assignment",
       "warning_code": 70,
       "fingerprint": "8a980298a5df4d60183c689cfc1c152f4b412c6bcf03ae0ed583ecf0b7041e31",
@@ -763,7 +672,7 @@
       "check_name": "SendFile",
       "message": "Model attribute used in file name",
       "file": "app/controllers/documents_controller.rb",
-      "line": 19,
+      "line": 21,
       "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
       "code": "send_file(BenefitSponsors::Documents::EmployerAttestationDocument.find_by(:identifier => params[:path]).identifier)",
       "render_path": null,
@@ -773,46 +682,6 @@
         "method": "download_employer_document"
       },
       "user_input": "BenefitSponsors::Documents::EmployerAttestationDocument.find_by(:identifier => params[:path]).identifier",
-      "confidence": "Medium",
-      "note": ""
-    },
-    {
-      "warning_type": "Command Injection",
-      "warning_code": 14,
-      "fingerprint": "8ebecce18ccfce198e0e5392f43cfe262c80691e1eb3fae619da130dee133b9f",
-      "check_name": "Execute",
-      "message": "Possible command injection",
-      "file": "lib/client_configuration_toggler.rb",
-      "line": 51,
-      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
-      "code": "`cp -r system #{Rails.root}/#{engine_folder_name}/spec/dummy/`",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "ClientConfigurationToggler",
-        "method": "copy_current_configuration_to_engines"
-      },
-      "user_input": "engine_folder_name",
-      "confidence": "Medium",
-      "note": ""
-    },
-    {
-      "warning_type": "Command Injection",
-      "warning_code": 14,
-      "fingerprint": "903aeb226ba113fd0ed06904529782374ad92b37155437ba5ae9f837a828eddc",
-      "check_name": "Execute",
-      "message": "Possible command injection",
-      "file": "lib/client_configuration_toggler.rb",
-      "line": 49,
-      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
-      "code": "`cp -r config/settings.yml #{Rails.root}/#{engine_folder_name}/config/settings.yml`",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "ClientConfigurationToggler",
-        "method": "copy_current_configuration_to_engines"
-      },
-      "user_input": "engine_folder_name",
       "confidence": "Medium",
       "note": ""
     },
@@ -917,26 +786,6 @@
       "note": ""
     },
     {
-      "warning_type": "Command Injection",
-      "warning_code": 14,
-      "fingerprint": "e9e458694771aedf4a65be234588a974941994ee7c88eaf8c971fd5a0a24c06a",
-      "check_name": "Execute",
-      "message": "Possible command injection",
-      "file": "lib/client_configuration_toggler.rb",
-      "line": 41,
-      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
-      "code": "`cp -r system #{Rails.root}/#{engine_folder_name}/system`",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "ClientConfigurationToggler",
-        "method": "copy_current_configuration_to_engines"
-      },
-      "user_input": "engine_folder_name",
-      "confidence": "Medium",
-      "note": ""
-    },
-    {
       "warning_type": "File Access",
       "warning_code": 16,
       "fingerprint": "ef486a2f648e540d2eb04ea78e5c6ba243cbaf21350fdec96467367fb1632736",
@@ -957,6 +806,6 @@
       "note": ""
     }
   ],
-  "updated": "2021-05-07 13:49:47 -0400",
+  "updated": "2021-08-02 10:50:56 -0400",
   "brakeman_version": "5.0.0"
 }

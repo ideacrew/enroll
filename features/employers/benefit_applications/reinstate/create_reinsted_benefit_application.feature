@@ -50,7 +50,7 @@ Scenario: Initial Employer is in termination pending. Admin is able to create re
     Then Employee should see confirmation and clicks continue
     Then Employee should see family members page and clicks continue
     Then Employee should see the group selection page
-    When Employee clicks continue on the group selection page
+    When Employee clicks continue on group selection page
     Then Employee should see the list of plans
     When Employee selects a plan on the plan shopping page
     When Employee clicks on Confirm button on the coverage summary page
@@ -82,7 +82,7 @@ Scenario: Initial Employer is in termination pending. Admin is able to create re
     Then Employee should see confirmation and clicks continue
     Then Employee should see family members page and clicks continue
     Then Employee should see the group selection page
-    When Employee clicks continue on the group selection page
+    When Employee clicks continue on group selection page
     Then Employee should see the list of plans
     When Employee selects a plan on the plan shopping page
     When Employee clicks on Confirm button on the coverage summary page

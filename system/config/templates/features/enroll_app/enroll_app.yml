@@ -260,16 +260,6 @@ registry:
         settings:
           - key: :seed_issuer_profiles
             item: true
-      - key: :pay_now_functionality
-        item: "kaiser_enabled"
-        is_enabled: true
-        settings:
-        - key: :carriers
-          item: 'Kaiser'
-        - key: :carriers_long_name
-          item: 'Kaiser Permanante'
-        - key: :carriers_registration_website
-          item: "https://healthy.kaiserpermanente.org/new-members/#register-to-kp-org"
       - key: :agency_staff
         item: :agency_staff
         is_enabled: true
@@ -294,6 +284,90 @@ registry:
       - key: :counties_import
         is_enabled: false
         item: ""
+  - namespace:
+      - :pay_now_feature
+    features:
+      - key: :kaiser_pay_now
+        is_enabled: true
+        settings:
+          - key: :plan_shopping
+            item: true
+          - key: :enrollment_tile
+            item: true
+          - key: :carriers_long_name
+            item: 'Kaiser Permanante'
+      - key: :delta_dental_pay_now
+        is_enabled: false
+        settings:
+          - key: :plan_shopping
+            item: true
+          - key: :enrollment_tile
+            item: true
+          - key: :carriers_long_name
+            item: 'Delta Dental'
+      - key: :dentegra_pay_now
+        is_enabled: false
+        settings:
+          - key: :plan_shopping
+            item: true
+          - key: :enrollment_tile
+            item: true
+          - key: :carriers_long_name
+            item: 'Dentegra'
+      - key: :dominion_national_pay_now
+        is_enabled: false
+        settings:
+          - key: :plan_shopping
+            item: true
+          - key: :enrollment_tile
+            item: true
+          - key: :carriers_long_name
+            item: 'Dominion National'
+      - key: :best_life_pay_now
+        is_enabled: false
+        settings:
+          - key: :plan_shopping
+            item: true
+          - key: :enrollment_tile
+            item: true
+          - key: :carriers_long_name
+            item: 'BEST Life'
+      - key: :metlife_pay_now
+        is_enabled: false
+        settings:
+          - key: :plan_shopping
+            item: true
+          - key: :enrollment_tile
+            item: true
+          - key: :carriers_long_name
+            item: 'MetLife'
+      - key: :carefirst_pay_now
+        is_enabled: false
+        settings:
+          - key: :plan_shopping
+            item: true
+          - key: :enrollment_tile
+            item: true
+          - key: :carriers_long_name
+            item: 'CareFirst'
+      - key: :aetna_pay_now
+        is_enabled: false
+        settings:
+          - key: :plan_shopping
+            item: true
+          - key: :enrollment_tile
+            item: true
+          - key: :carriers_long_name
+            item: 'Aetna'
+      - key: :unitedhealthcare_pay_now
+        is_enabled: false
+        settings:
+          - key: :plan_shopping
+            item: true
+          - key: :enrollment_tile
+            item: true
+          - key: :carriers_long_name
+            item: 'UnitedHealthcare'
   - namespace:
       - :features
       - :enroll_app

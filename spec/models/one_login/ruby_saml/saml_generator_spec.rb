@@ -4,7 +4,8 @@ module OneLogin
   RSpec.describe RubySaml::SamlGenerator do
     let(:transaction_id)   { '1234' }
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member_and_dependent) }
-    let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
+    let!(:issuer_profile) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, legal_name: 'Kaiser') }
+    let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01', issuer_profile: issuer_profile)}
     let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, hbx_id: "123456789", household: family.active_household, aasm_state: 'shopping', family: family, product: product) }
     let!(:hbx_enrollment_member1) { FactoryBot.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, is_subscriber: true, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: hbx_enrollment) }
     let!(:hbx_enrollment_member2) { FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members[1].id, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: hbx_enrollment) }
