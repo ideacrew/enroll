@@ -3165,10 +3165,12 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:admin_shop_end_date_changes).and_return(true)
       allow(::EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_shop_sep).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:indian_alaskan_tribe_details).and_return true
     end
 
     context "for Individual market" do
-      let(:ivl_family)        { FactoryBot.create(:family, :with_primary_family_member) }
+      let(:person)   { FactoryBot.create(:person, :with_consumer_role, :with_family) }
+      let(:ivl_family)        { person.families.first }
       let(:coverage_year) { Date.today.year - 1}
 
       let!(:hbx_profile) do
@@ -3185,6 +3187,7 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
                           effective_on: TimeKeeper.date_of_record.beginning_of_year.last_year,
                           enrollment_kind: "open_enrollment",
                           kind: "individual",
+                          consumer_role_id: person.consumer_role.id,
                           aasm_state: "coverage_expired")
       end
 
@@ -3259,9 +3262,11 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:admin_shop_end_date_changes).and_return(true)
       allow(::EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_shop_sep).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:indian_alaskan_tribe_details).and_return true
     end
     context "for Individual market" do
-      let(:ivl_family)        { FactoryBot.create(:family, :with_primary_family_member) }
+      let(:person)   { FactoryBot.create(:person, :with_consumer_role, :with_family) }
+      let(:ivl_family)        { person.families.first }
       let(:coverage_year) { Date.today.year - 1}
 
       let!(:hbx_profile) do
@@ -3279,6 +3284,7 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
                           enrollment_kind: "open_enrollment",
                           kind: "individual",
                           aasm_state: "coverage_terminated",
+                          consumer_role_id: person.consumer_role.id,
                           terminated_on: (TimeKeeper.date_of_record.beginning_of_year.last_year + 2.months).end_of_month)
       end
 
