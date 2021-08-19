@@ -979,6 +979,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:admin_ivl_end_date_changes).and_return(true)
       allow(EnrollRegistry[:admin_shop_end_date_changes].feature).to receive(:is_enabled).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:admin_shop_end_date_changes).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return(true)
       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
       sign_in(user)
     end

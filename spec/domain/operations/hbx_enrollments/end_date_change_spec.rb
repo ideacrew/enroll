@@ -38,7 +38,7 @@ RSpec.describe ::Operations::HbxEnrollments::EndDateChange, dbclean: :after_each
 
       it 'fails' do
         expect(subject).not_to be_success
-        expect(subject.failure).to eq({:message => ["Enrollment not found"]})
+        expect(subject.failure).to eq("Enrollment not found")
       end
     end
   end
@@ -57,7 +57,8 @@ RSpec.describe ::Operations::HbxEnrollments::EndDateChange, dbclean: :after_each
   end
 
   context 'IVL market' do
-    let(:family)   { FactoryBot.create(:family, :with_primary_family_member) }
+    let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_family)}
+    let(:family)   { person.families.first }
 
     context 'current year terminated enrollment termination date is greater than enrollment termination' do
       let(:terminated_enrollment) {FactoryBot.create(:hbx_enrollment, family: family, aasm_state: 'coverage_terminated', kind: 'individual', terminated_on: TimeKeeper.date_of_record.end_of_month)}
@@ -81,6 +82,11 @@ RSpec.describe ::Operations::HbxEnrollments::EndDateChange, dbclean: :after_each
     end
 
     context 'prior year terminated enrollment where termination date is greater than than enrollment termination' do
+      let(:address) { family.primary_person.rating_address }
+      let(:current_year) { TimeKeeper.date_of_record.beginning_of_year.year }
+      let!(:current_rating_area) do
+        ::BenefitMarkets::Locations::RatingArea.rating_area_for(address, during: current_year) || FactoryBot.create_default(:benefit_markets_locations_rating_area, active_year: current_year)
+      end
       let(:prior_coverage_year) { Date.today.year - 1}
       let!(:prior_hbx_profile) do
         FactoryBot.create(:hbx_profile,
@@ -89,7 +95,10 @@ RSpec.describe ::Operations::HbxEnrollments::EndDateChange, dbclean: :after_each
       end
       let(:start_date) {(TimeKeeper.date_of_record - 1.year).beginning_of_month}
       let(:termination_date) { (TimeKeeper.date_of_record - 1.year).end_of_month }
-      let(:terminated_enrollment) {FactoryBot.create(:hbx_enrollment, family: family, aasm_state: 'coverage_terminated', kind: 'individual', effective_on: start_date, terminated_on: termination_date)}
+      let(:terminated_enrollment) do
+        FactoryBot.create(:hbx_enrollment, family: family, aasm_state: 'coverage_terminated', kind: 'individual',
+                                           effective_on: start_date, terminated_on: termination_date, consumer_role_id: family.primary_person.consumer_role.id)
+      end
       let(:params) {{ "enrollment_id" => terminated_enrollment.id.to_s, "new_termination_date" => (termination_date + 10.days).to_s}}
 
       it 'should return success and create a new terminated enrollment' do
