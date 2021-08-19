@@ -132,7 +132,7 @@ class IvlNotice < Notice
     join_pdfs_with_path([path, blank_page], path) if page_count.odd?
   rescue StandardError => e
     message = "Error Attaching IVL Notice PDF with Prawn: #{e.message}; "
-    message+= "User ID: #{person_id}; "
+    message += "Person ID: #{person_id}; "
     message += "PDF Path: #{path}, "
     message += "stacktrace: #{e.backtrace}"
     log(message, {:severity => "error"})
