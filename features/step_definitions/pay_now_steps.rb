@@ -169,7 +169,9 @@ Then(/I should see the Kaiser pop up text/) do
 end
 
 And(/the Kaiser user form should be active/) do
-  expect(page).to have_selector('#sp', visible: false)
+  person = Person.where(first_name: /John/i, last_name: /Smith/i).to_a.first
+  enrollment = person.primary_family.hbx_enrollments.first
+  expect(page).to have_selector("#sp-#{enrollment.hbx_id}", visible: false)
 end
 
 Then(/I should see the non-Kaiser pop up text/) do
