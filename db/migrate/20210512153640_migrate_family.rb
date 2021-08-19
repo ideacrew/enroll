@@ -203,7 +203,6 @@ class MigrateFamily < Mongoid::Migration
           fm.person.first_name == applicant_hash['name']['first_name'] && fm.person.last_name == applicant_hash['name']['last_name']
         end.first
 
-        binding.pry
         sanitize_params << {
           family_member_id: family_member.id,
           relationship: family_member.relationship,
@@ -467,7 +466,7 @@ class MigrateFamily < Mongoid::Migration
     def fill_applicants_form(app_id, applications)
       applicants_hash = applications[:applicants]
       application = FinancialAssistance::Application.where(id: app_id).first
-      binding.pry
+
       applicants_hash.each do |applicant|
         persisted_applicant = application.applicants.where(first_name: applicant[:first_name], last_name: applicant[:last_name]).first
         claimed_by = application.applicants.where(ext_app_id: applicant[:claimed_as_tax_dependent_by]).first
