@@ -19,7 +19,7 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
     clear_tmp(custom_notice_path)
   end
 
-  def deliver(person_id)
+  def deliver(person_id = nil)
     append_hbe
     build
     generate_pdf_notice
