@@ -11,7 +11,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.acdes_lookup" => "It looks like you're already covered by Medicaid. Please call DC Health Link at (855) 532-5465 to make updates to your case.
      If you keep going, we'll check to see if you qualify to enroll in a private health insurance plan on DC Health Link, but won't be able to tell you if you qualify for Medicaid or cost savings.",
   "en.faa.other_ques.disability_question" => "Does this person have a disability?",
-  "en.faa.review_eligibility_header" => "Your Application for Premium Reductions",
+  "en.faa.review_eligibility_header" => "Your Application for Lower Premiums",
   'en.faa.other_ques.is_student' => 'Is this person a student? *',
   "en.faa.medicaid_question" => "Do you want us to submit this application to the DC Department of Human Services (DHS) to do a full review of your application for Medicaid eligibility?",
   'en.faa.edit.delete_applicant' => 'Are you sure you want to remove this applicant?',
