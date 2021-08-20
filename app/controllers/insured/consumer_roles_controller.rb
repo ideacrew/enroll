@@ -10,6 +10,7 @@ class Insured::ConsumerRolesController < ApplicationController
   before_action :individual_market_is_enabled?
   before_action :decrypt_params, only: [:create]
   before_action :set_cache_headers, only: [:edit]
+  before_action :redirect_if_medicaid_tax_credits_link_is_disabled, only: [:privacy, :search]
 
   FIELDS_TO_ENCRYPT = [:ssn,:dob,:first_name,:middle_name,:last_name,:gender,:user_id].freeze
 
@@ -329,6 +330,10 @@ class Insured::ConsumerRolesController < ApplicationController
     message_array
   end
 
+  def redirect_if_medicaid_tax_credits_link_is_disabled
+    redirect_to(main_app.root_path, notice: l10n("medicaid_and_tax_credits_link_is_disabled")) if params[:aqhp].present? && !EnrollRegistry.feature_enabled?(:medicaid_tax_credits_link)
+  end
+
   def decrypt_params
     return unless SymmetricEncryption.encrypted?(params[:person][:first_name]) #temporary fix, need better handling of encryption.
       # Decrypt encrypted fields
@@ -362,7 +367,7 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def person_parameters_list
     [
-      { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :id, :_destroy] },
+      { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :county, :id, :_destroy] },
       { :phones_attributes => [:kind, :full_phone_number, :id, :_destroy] },
       { :emails_attributes => [:kind, :address, :id, :_destroy] },
       { :consumer_role_attributes => [:contact_method, :language_preference]},
@@ -381,17 +386,21 @@ class Insured::ConsumerRolesController < ApplicationController
       :race,
       :is_consumer_role,
       :is_resident_role,
+      {:immigration_doc_statuses => []},
       {:ethnicity => []},
       :us_citizen,
       :naturalized_citizen,
       :eligible_immigration_status,
       :indian_tribe_member,
       :tribal_id,
+      :tribal_state,
+      :tribal_name,
       :no_dc_address,
       :no_dc_address_reason,
       :is_applying_coverage,
       :is_homeless,
       :is_temporarily_out_of_state,
+      :is_moving_to_state,
       :user_id,
       :dob_check
     ]

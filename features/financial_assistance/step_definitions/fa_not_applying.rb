@@ -84,7 +84,7 @@ When(/the user clicks on add member button/) do
 end
 
 And(/^the user fills the the add member form/) do
-  expect(page).to have_content('Lives with primary subscriber')
+  expect(page).to have_content(/lives with primary subscriber/i)
   fill_in "dependent[first_name]", :with => "John"
   fill_in "dependent[last_name]", :with => "Doe"
   fill_in "dependent[ssn]", :with => "763434355"
@@ -102,6 +102,81 @@ And(/^the user fills the the add member form/) do
   # screenshot("add_member")
   all(:css, ".mz").last.click
   expect(page).to have_content("#{l10n('family_information')}")
+end
+
+And(/^the user fills the the applicant add member form with indian member yes/) do
+  expect(page).to have_content('Lives with primary subscriber')
+  fill_in "applicant[first_name]", :with => "John"
+  fill_in "applicant[last_name]", :with => "Doe"
+  fill_in "applicant[ssn]", :with => "763434355"
+  fill_in "jq_datepicker_ignore_applicant[dob]", :with => "04/15/1988"
+  click_link('15')
+
+  find('.house .selectric span.label').click
+  find(".house .selectric-items li", text: 'Spouse').click
+
+  find(:xpath, '//label[@for="radio_female"]').click
+  find(:xpath, '//label[@for="applicant_us_citizen_true"]').click
+  find(:xpath, '//label[@for="applicant_naturalized_citizen_false"]').click
+  find(:xpath, '//label[@for="indian_tribe_member_yes"]').click
+  find(:xpath, '//label[@for="radio_incarcerated_no"]').click
+end
+
+And(/^the user fills the the aplicant add member form with indian member no/) do
+  sleep 5
+
+  expect(page).to have_content('Lives with primary subscriber')
+  fill_in "applicant[first_name]", :with => "John"
+  fill_in "applicant[last_name]", :with => "Doe"
+  fill_in "applicant[ssn]", :with => "763434355"
+  fill_in "jq_datepicker_ignore_applicant[dob]", :with => "04/15/1988"
+  click_link('15')
+
+  find('.house .selectric span.label').click
+  find(".house .selectric-items li", text: 'Spouse').click
+
+  find(:xpath, '//label[@for="radio_female"]').click
+  find(:xpath, '//label[@for="applicant_us_citizen_true"]').click
+  find(:xpath, '//label[@for="applicant_naturalized_citizen_false"]').click
+  find(:xpath, '//label[@for="indian_tribe_member_no"]').click
+  find(:xpath, '//label[@for="radio_incarcerated_no"]').click
+
+  all(:css, ".mz").last.click
+  sleep 3
+end
+
+Then(/user should still see the member of a tribe question/) do
+  expect(page).to have_content('Is this person a member of an')
+  expect(page).to_not have_content('Are you a US Citizen or US National?')
+end
+
+And(/the user clicks submit applicant form/) do
+  all(:css, ".mz").last.click
+end
+
+Then(/the user should see an error message for indian tribal state and name/) do
+  expect(page).to have_content("Tribal state is required")
+  expect(page).to have_content("Tribal name is required")
+end
+
+And(/the user enters a tribal name with a number/) do
+  fill_in "applicant[tribal_name]", :with => "abc1"
+end
+
+Then(/the user should see an error for tribal name containing a number/) do
+  expect(page).to have_content("cannot contain numbers")
+end
+
+Given(/AI AN Details feature is enabled/) do
+  enable_feature :indian_alaskan_tribe_details
+end
+
+Given(/No coverage tribe details feature is enabled/) do
+  enable_feature :no_coverage_tribe_details, {registry_name: FinancialAssistanceRegistry}
+end
+
+Then(/the user should see the AI AN Details fields/) do
+  expect(page).to have_content("Where is this person's tribe located?")
 end
 
 And(/^the user clicks the PREVIOUS link1/) do

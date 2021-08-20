@@ -47,7 +47,7 @@ RSpec.describe BenefitMarkets::Validators::Products::ProductContract do
   end
 
   let(:invalid_params)      { missing_params.merge({kind: kind, premium_tables: 'premium_tables'}) }
-  let(:error_message1)      { {:premium_tables => ["is missing"], :kind => ["is missing"]} }
+  let(:error_message1)      { {:kind => ["is missing", "must be Symbol"], :premium_tables => ["is missing", "must be an array"]} }
   let(:error_message2)      { {:premium_tables => ["must be an array"]} }
 
   context "Given invalid required parameters" do

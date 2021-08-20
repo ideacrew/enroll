@@ -3,6 +3,7 @@ Feature: Phone and Paper Enrollment options exist
   Links are provided that will track phone and paper enrollments
 
   Background:
+    Given EnrollRegistry no_transition_families feature is enabled
     Given a Hbx admin with read and write permissions exists
     When Hbx Admin logs on to the Hbx Portal
     When Hbx Admin click Families dropdown

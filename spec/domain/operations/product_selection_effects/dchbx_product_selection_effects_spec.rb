@@ -93,6 +93,7 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
     product.reload
     r_product
   end
+  let(:rating_area) { FactoryBot.create(:benefit_markets_locations_rating_area) }
   let(:ivl_enrollment) do
     FactoryBot.create(:hbx_enrollment,
                       :individual_unassisted,
@@ -101,6 +102,8 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
                       household: family.active_household,
                       effective_on: Date.new(coverage_year, 11, 1),
                       family: family,
+                      consumer_role_id: consumer_role.id,
+                      rating_area_id: rating_area.id,
                       product: product)
   end
 

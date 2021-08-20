@@ -2,6 +2,7 @@ Feature: Create General Agency and General Agency Staff Role
 
   Scenario: A General Agency Submits Application
     Given the shop market configuration is enabled
+    Given the general agency feature is enabled
     Given a CCA site exists with a benefit market
     Given a general agency agent visits the DCHBX
     When they click the 'New General Agency' button
@@ -12,6 +13,8 @@ Feature: Create General Agency and General Agency Staff Role
 
   Scenario: A General Agency is Approved
     Given a CCA site exists with a benefit market
+    Given the general agency feature is enabled
+
     When that a user with a HBX staff role with HBX Staff subrole exists and is logged in
     And a general agency, pending approval, exists
     And Hbx Admin is on Broker Index of the Admin Dashboard
@@ -27,6 +30,7 @@ Feature: Create General Agency and General Agency Staff Role
 
   Scenario: A General Agency Creates an Account
     Given a CCA site exists with a benefit market
+    Given the general agency feature is enabled
     Given a general agency, approved, awaiting account creation, exists
     When the HBX admin visits the link received in the approval email
     Then they should see an account creation form

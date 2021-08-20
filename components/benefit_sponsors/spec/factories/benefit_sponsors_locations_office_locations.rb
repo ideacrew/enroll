@@ -10,7 +10,7 @@ FactoryBot.define do
     end
 
     # TODO: Refactor this with Maine info
-    trait :with_maine_address do
+    trait :with_me_address do
       is_primary { true }
       address { FactoryBot.build(:benefit_sponsors_locations_address, :me_shop_baseline) }
       phone   do
@@ -21,7 +21,18 @@ FactoryBot.define do
       end
     end
 
-    trait :with_massachusetts_address do
+    trait :with_dc_address do
+      is_primary { true }
+      address { FactoryBot.build(:benefit_sponsors_locations_address, :dc_shop_baseline) }
+      phone   do
+        FactoryBot.build(:benefit_sponsors_locations_phone,
+                         kind: "work",
+                         area_code: 207,
+                         number: 5_551_212)
+      end
+    end
+
+    trait :with_cca_address do
       is_primary { true }
       address { FactoryBot.build(:benefit_sponsors_locations_address, :cca_shop_baseline) }
       phone   { FactoryBot.build(:benefit_sponsors_locations_phone,

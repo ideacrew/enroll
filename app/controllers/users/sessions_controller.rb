@@ -1,7 +1,7 @@
 class Users::SessionsController < Devise::SessionsController
   layout 'bootstrap_4'
   include RecaptchaConcern if Settings.aca.recaptcha_enabled
-
+  respond_to :html, :js
   after_action :log_failed_login, :only => :new
   before_action :set_ie_flash_by_announcement, only: [:new]
 

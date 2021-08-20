@@ -180,7 +180,7 @@ registry:
           - key: :contact_center_county
             item: 'District of Columbia'
           - key: :contact_center_zip_code
-            item: "20024" # For DC loading rating areas, the zip uses this zip code 20024 
+            item: "20024" # For DC loading rating areas, the zip uses this zip code 20024
           - key: :contact_center_email_address
             item: "info@dchealthlink.com"
           - key: :contact_center_short_number
@@ -254,7 +254,7 @@ registry:
       - key: :special_cover_header
         item: :special_cover_header
         is_enabled: false
-        settings: 
+        settings:
           - key: :filename
             item: "CoverME_WebsiteHeader_01.jpg"
       - key: :tobacco_cost
@@ -311,3 +311,27 @@ registry:
         is_enabled: false # Should return true for MA, see employer_profile_builder.rb
       - key: :hmo_ppo_plan_type # Should be true for MA
         is_enabled: false
+      - key: :dental_market
+        is_enabled: true
+      - key: :general_agency
+        is_enabled: true
+      - key: :display_county
+        is_enabled: true
+      - key: :moving_to_state
+        is_enabled: true
+      - key: :living_outside_state
+        is_enabled: true
+      - key: :validate_quadrant
+        item: :validate_quadrant
+        is_enabled: true
+        settings:
+          - key: :exclusions
+            item: ["20515"]
+          - key: :inclusions
+            item: ["DC"]
+      - key: :qle_within_sixty_days
+        item: :qle_within_sixty_days
+        is_enabled: true
+        settings:
+          - key: :days
+            item: 60

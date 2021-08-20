@@ -14,7 +14,6 @@ function startEditingIncome(income_kind) {
   $('.col-md-3 > .interaction-click-control-continue').addClass('disabled');
   $("a.interaction-click-control-add-more").addClass('hide');
   $('input.interaction-choice-control-value-other-income-kind').prop('disabled', true);
-  $('.interaction-click-control-save').addClass('disabled');
 };
 
 function checkDate(income_id) {
@@ -34,7 +33,7 @@ function currentlyEditing() {
 
 document.addEventListener("turbolinks:load", function() {
   var faWindow = $('.incomes');
-  if ($('.incomes-list, .other-incomes-list, .unemployment-incomes').length) {
+  if ($('.incomes-list, .other-incomes-list, .unemployment-incomes .ai-an-incomes').length) {
     $(faWindow).bind('beforeunload', function(e) {
       if (!currentlyEditing() || $('#unsavedIncomeChangesWarning:visible').length)
         return undefined;
@@ -72,7 +71,7 @@ document.addEventListener("turbolinks:load", function() {
     });
 
     /* Saving Responses to Other Income Driver Questions */
-    $('#has_other_income_true, #has_other_income_false, #has_unemployment_income_true, #has_unemployment_income_false').on('change', function(e) {
+    $('#has_other_income_true, #has_other_income_false, #has_unemployment_income_true, #has_unemployment_income_false, #has_american_indian_alaskan_native_income_true, #has_american_indian_alaskan_native_income_false').on('change', function(e) {
       var attributes = {};
       attributes[$(this).attr('name')] = $(this).val();
       $.ajax({
@@ -114,9 +113,40 @@ document.addEventListener("turbolinks:load", function() {
       }
     });
 
+    /* DELETING all American Indian/Alaskan Native Incomes on selcting 'no' on Driver Question */
+    $('#has_american_indian_alaskan_native_income_false').on('change', function(e) {
+      var self = this;
+      //$('#DestroyExistingJobIncomesWarning').modal('show');
+      if ($('.ai-an-incomes-list:not(.other-incomes-list) .ai-an-income').length) {
+        e.preventDefault();
+        // prompt to delete all these dedcutions
+        $("#destroyAllAIANIncomes").modal();
+
+        $("#destroyAllAIANIncomes .modal-cancel-button").click(function(e) {
+          $("#destroyAllAIAN").modal('hide');
+          $('#has_american_indian_alaskan_native_income_true').prop('checked', true).trigger('change');
+        });
+
+        $("#destroyAllAIANIncomes .modal-continue-button").click(function(e) {
+          $("#destroyAllAIANIncomes").modal('hide');
+          //$(self).prop('checked', false);
+
+          $('#ai_an_income').find('.ai-an-incomes-list > .ai-an-income').each(function(i, ai_an_income) {
+            var url = $(ai_an_income).attr('id').replace('income_', 'incomes/');
+            $(ai_an_income).remove();
+            $.ajax({
+              type: 'DELETE',
+              url: url
+            });
+          });
+        });
+      }
+    });
+
     /* DELETING all Job Incomes on selcting 'no' on Driver Question */
     $('#has_unemployment_income_false').on('change', function(e) {
       var self = this;
+      stopEditingIncome();
       //$('#DestroyExistingJobIncomesWarning').modal('show');
       if ($('.unemployment-incomes-list:not(.other-incomes-list) .unemployment-income').length) {
         e.preventDefault();
@@ -286,6 +316,24 @@ document.addEventListener("turbolinks:load", function() {
       /* TODO: Handle unchecking boxes if there are no more incomes of that kind */
     });
 
+    $(document).on('click','a.ai-an-income-cancel', function(e) {
+      e.preventDefault();
+
+      if ($(this).parents('.new-ai-an-income-form').length) {
+        $(this).parents('.new-ai-an-income-form').addClass('hidden');
+      } else {
+        var incomeEl = $(this).parents('.income');
+      }
+
+      if (document.querySelectorAll('.ai-an-incomes-list:not(.other-incomes-list) .ai-an-income').length == 0) {
+        document.getElementById('has_american_indian_alaskan_native_income_false').click();
+      }
+
+      stopEditingIncome();
+
+      /* TODO: Handle unchecking boxes if there are no more incomes of that kind */
+    });
+
     /* new job incomes */
     $('a.new-income').click(function(e) {
         e.preventDefault();
@@ -331,6 +379,24 @@ document.addEventListener("turbolinks:load", function() {
         clonedForm.find('.interaction-click-control-save').addClass("disabled");
     });
 
+    /* new AI/AN incomes */
+    $('a.new-ai-an-income').click(function(e) {
+      e.preventDefault();
+      startEditingIncome($(this).parents('.ai-an-income').attr('id'));
+      var form = $(this).parents();
+      var  newIncomeForm = $(this).parents('#ai_an_income').children('.new-ai-an-income-form')
+      var  incomeListEl =  $(this).parents('#ai_an_income').find('.ai-an-incomes-list');
+
+      if (newIncomeForm.find('select').data('selectric')) newIncomeForm.find('select').selectric('destroy');
+      var clonedForm = newIncomeForm.clone(true, true)
+          .removeClass('hidden')
+          .appendTo(incomeListEl);
+      var length = incomeListEl.find(".ai-an-income").length;
+      $(clonedForm).find('select').selectric();
+      $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110"});
+      clonedForm.find('.interaction-click-control-save').addClass("disabled");
+    });
+
     $('#has_job_income_true').click(function(e) {
       startEditingIncome($(this).parents('.income').attr('id'));
       if ($('#job_income').children('.new-income-form').length) {
@@ -369,6 +435,26 @@ document.addEventListener("turbolinks:load", function() {
       $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110"});
     });
 
+    $('#has_american_indian_alaskan_native_income_true').click(function(e) {
+      startEditingIncome($(this).parents('.income').attr('id'));
+      if ($('#ai_an_income').children('.new-ai-an-income-form').length) {
+        var  newIncomeForm = $('#ai_an_income').children('.new-ai-an-income-form')
+      }
+
+      if ($('#ai_an_income').find('.ai-an-incomes-list').length) {
+        var  incomeListEl =  $('#ai_an_income').find('.ai-an-incomes-list');
+      }
+      if (newIncomeForm.find('select').data('selectric')) newIncomeForm.find('select').selectric('destroy');
+      if (!$('.ai-an-incomes-list').children('.new-ai-an-income-form').length) {
+        var clonedForm = newIncomeForm.clone(true, true)
+            .removeClass('hidden')
+            .appendTo(incomeListEl);
+      }
+      var length = incomeListEl.find(".ai-an-income").length;
+      $(clonedForm).find('select').selectric();
+      $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110"});
+    });
+
     $('#has_self_employment_income_true').click(function(e) {
       startEditingIncome($(this).parents('.income').attr('id'));
       if ($('#self_employed_incomes').children('.new-income-form').length) {
@@ -391,6 +477,7 @@ document.addEventListener("turbolinks:load", function() {
     if (!$("#has_self_employment_income_true").is(':checked')) $("#self_employed_incomes").addClass('hidden');
     if (!$("#has_other_income_true").is(':checked')) $(".other_income_kinds").addClass('hidden');
     if (!$("#has_unemployment_income_true").is(':checked')) $("#unemployment_income").addClass('hidden');
+    if (!$("#has_american_indian_alaskan_native_income_true").is(':checked')) $("#ai_an_income").addClass('hidden');
 
     $("body").on("change", "#has_job_income_true", function(){
       if ($('#has_job_income_true').is(':checked')) {
@@ -421,6 +508,22 @@ document.addEventListener("turbolinks:load", function() {
         $("#unemployment_income").addClass('hidden');
       } else{
         $("#unemployment_income").removeClass('hidden');
+      }
+    });
+
+    $("body").on("change", "#has_american_indian_alaskan_native_income_true", function(){
+      if ($('#has_american_indian_alaskan_native_income_true').is(':checked')) {
+        $("#ai_an_income").removeClass('hidden');
+      } else{
+        $("#ai_an_income").addClass('hidden');
+      }
+    });
+
+    $("body").on("change", "#has_american_indian_alaskan_native_income_false", function(){
+      if ($('#has_american_indian_alaskan_native_income_false').is(':checked')) {
+        $("#ai_an_income").addClass('hidden');
+      } else{
+        $("#ai_an_income").removeClass('hidden');
       }
     });
 
@@ -698,6 +801,62 @@ $(document).on('turbolinks:load', function () {
       }
       $(this).parents('.new-unemployment-income-form').remove();
       $(this).parents('.edit-unemployment-income-form').remove();
+    }
+  });
+
+  /* edit existing AI/AN income */
+  $('.ai-an-incomes-list').on('click', 'a.ai-an-income-edit:not(.disabled)', function(e) {
+    e.preventDefault();
+    var aianIncomeEl = $(this).parents('.ai-an-income');
+    aianIncomeEl.find('.ai-an-income-show').addClass('hidden');
+    aianIncomeEl.find('.edit-ai-an-income-form').removeClass('hidden');
+    startEditingIncome($(this).parents('.ai-an-income-kind').attr('id'));
+
+    $(aianIncomeEl).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110"});
+  });
+
+  /* destroy existing AI/AN income */
+  $('.ai-an-incomes-list').on('click', 'a.ai-an-income-delete:not(.disabled)', function(e) {
+    var self = this;
+    e.preventDefault();
+    $("#destroyAIANIncome").modal();
+
+    $("#destroyAIANIncome .modal-cancel-button").click(function(e) {
+      $("#destroyAIANIncome").modal('hide');
+    });
+
+    $("#destroyAIANIncome .modal-continue-button").click(function(e) {
+      $("#destroyAIANIncome").modal('hide');
+      $(self).parents('.ai-an-income').remove();
+      $("a.interaction-click-control-add-more").addClass('hide');
+
+      var url = $(self).parents('.ai-an-income').attr('id').replace('financial_assistance_income_', '');
+      console.log(url);
+      $.ajax({
+        type: 'DELETE',
+        url: url,
+        dataType: 'script',
+      })
+    });
+  });
+
+  /* cancel unemployment income edits */
+  $('.ai-an-incomes-list').on('click', 'a.ai-an-income-cancel', function(e) {
+    e.preventDefault();
+    stopEditingIncome();
+
+    var aianIncomeEl = $(this).parents('.ai-an-income');
+    if (aianIncomeEl.length) {
+      $(this).closest('.ai-an-income-kind').find('a#add_new_ai_an_income_kind').removeClass("hidden");
+      aianIncomeEl.find('.ai-an-income-show').removeClass('hidden');
+      aianIncomeEl.find('.edit-ai-an-income-form').addClass('hidden');
+    } else {
+      if (!$(this).parents('.ai-an-incomes-list > div.ai-an-income').length) {
+        $(this).parents('.ai-an-income-kind').find('input[type="checkbox"]').prop('checked', false);
+        $(this).closest('.ai-an-income-kind').find('a#add_new_ai_an_income_kind').addClass("hidden");
+      }
+      $(this).parents('.new-ai-an-income-form').remove();
+      $(this).parents('.edit-ai-an-income-form').remove();
     }
   });
 // disable save button logic

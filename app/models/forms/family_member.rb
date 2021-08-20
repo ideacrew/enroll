@@ -4,9 +4,8 @@ module Forms
     include ActiveModel::Validations
     include Config::AcaModelConcern
 
-    attr_accessor :id, :family_id, :is_consumer_role, :is_resident_role, :vlp_document_id
-    attr_accessor :gender, :relationship
-    attr_accessor :addresses, :is_homeless, :is_temporarily_out_of_state, :same_with_primary, :is_applying_coverage, :age_off_excluded # rubocop:disable Style/AccessorGrouping
+    attr_accessor :id, :family_id, :is_consumer_role, :is_resident_role, :vlp_document_id, :gender, :relationship, :is_tobacco_user,
+                  :addresses, :is_homeless, :is_temporarily_out_of_state, :is_moving_to_state, :same_with_primary, :is_applying_coverage, :age_off_excluded
     attr_writer :family
     include ::Forms::PeopleNames
     include ::Forms::ConsumerFields
@@ -48,7 +47,7 @@ module Forms
       if (@is_consumer_role.to_s == "true" && is_applying_coverage.to_s == "true")#only check this for consumer flow.
         if @us_citizen.nil?
           self.errors.add(:base, "Citizenship status is required")
-        elsif @us_citizen == false && @eligible_immigration_status.nil?
+        elsif @us_citizen == false && (@eligible_immigration_status.nil? && EnrollRegistry[:immigration_status_question_required].item)
           self.errors.add(:base, "Eligible immigration status is required")
         elsif @us_citizen == true && @naturalized_citizen.nil?
           self.errors.add(:base, "Naturalized citizen is required")
@@ -58,9 +57,17 @@ module Forms
           self.errors.add(:base, "native american / alaska native status is required")
         end
 
-        if !tribal_id.present? && @indian_tribe_member
-          self.errors.add(:tribal_id, "is required when native american / alaska native is selected")
+        if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
+          if @indian_tribe_member.to_s == 'false'
+            self.tribal_id = nil
+            self.tribal_state = nil
+            self.tribal_name = nil
+          end
+          self.errors.add(:tribal_state, "is required when native american / alaska native is selected") if !tribal_state.present? && @indian_tribe_member
+          self.errors.add(:tribal_name, "is required when native american / alaska native is selected")  if !tribal_name.present? && @indian_tribe_member
         end
+
+        self.errors.add(:tribal_id, "is required when native american / alaska native is selected") if !EnrollRegistry[:indian_alaskan_tribe_details].enabled? && !tribal_id.present? && @indian_tribe_member
       end
 
       return unless (@is_resident_role.to_s == "true" || @is_consumer_role.to_s == "true") && is_applying_coverage.to_s == "true" && @is_incarcerated.nil?
@@ -134,6 +141,7 @@ module Forms
       end
       assign_person_address(person)
       family.save_relevant_coverage_households
+      family_member.save
       self.id = family_member.id
       return true if family.save
     end
@@ -209,9 +217,13 @@ module Forms
         :is_incarcerated => is_incarcerated,
         :citizen_status => @citizen_status,
         :tribal_id => tribal_id,
+        :tribal_state => tribal_state,
+        :tribal_name => tribal_name,
         :is_homeless => is_homeless,
         :is_temporarily_out_of_state => is_temporarily_out_of_state,
-        :age_off_excluded => age_off_excluded
+        :is_moving_to_state => is_moving_to_state,
+        :age_off_excluded => age_off_excluded,
+        :is_tobacco_user => is_tobacco_user
       }
     end
 
@@ -264,11 +276,15 @@ module Forms
         :eligible_immigration_status => found_family_member.eligible_immigration_status,
         :indian_tribe_member => found_family_member.indian_tribe_member,
         :tribal_id => found_family_member.tribal_id,
+        :tribal_state => found_family_member.tribal_state,
+        :tribal_name => found_family_member.tribal_name,
         :same_with_primary => has_same_address_with_primary.to_s,
         :is_homeless => has_same_address_with_primary ? '' : found_family_member.try(:person).try(:is_homeless),
         :is_temporarily_out_of_state => has_same_address_with_primary ? '' : found_family_member.try(:person).try(:is_temporarily_out_of_state),
         :addresses => [home_address, mailing_address],
-        :age_off_excluded => found_family_member.try(:person).try(:age_off_excluded)
+        :age_off_excluded => found_family_member.try(:person).try(:age_off_excluded),
+        :is_moving_to_state => found_family_member.try(:person).try(:is_moving_to_state),
+        :is_tobacco_user => found_family_member&.person&.is_tobacco_user
       })
     end
 
@@ -368,4 +384,3 @@ module Forms
     end
   end
 end
-

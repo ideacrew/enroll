@@ -6,6 +6,7 @@ class Exchanges::ResidentsController < ApplicationController
 
   before_action :find_resident_role, only: [:edit, :update]
   before_action :authorize_user
+  before_action :redirect_if_no_transition_families_is_disabled, only: [:search]
 
   def index
     @resident_enrollments = Person.where(:resident_enrollment_id.nin =>  ['', nil]).map(&:resident_enrollment)
@@ -171,6 +172,10 @@ class Exchanges::ResidentsController < ApplicationController
     end
   end
 
+  def redirect_if_no_transition_families_is_disabled
+    redirect_to(main_app.root_path, notice: l10n("resident_application_link_is_disabled")) unless EnrollRegistry.feature_enabled?(:no_transition_families)
+  end
+
   def authorize_user
     authorize ResidentRole
   end
@@ -202,9 +207,12 @@ class Exchanges::ResidentsController < ApplicationController
       :eligible_immigration_status,
       :indian_tribe_member,
       :tribal_id,
+      :tribal_state,
+      :tribal_name,
       :no_dc_address,
       :is_homeless,
-      :is_temporarily_out_of_state
+      :is_temporarily_out_of_state,
+      :is_moving_to_state
     ]
   end
 

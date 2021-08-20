@@ -11,7 +11,7 @@ RSpec.describe BenefitMarkets::Validators::Locations::RatingAreaContract do
 
   let(:missing_params)      { {_id: BSON::ObjectId.new, county_zip_ids: county_zip_ids, exchange_provided_code: exchange_provided_code} }
   let(:invalid_params)      { missing_params.merge({active_year: 'year', covered_states: {}}) }
-  let(:error_message1)      { {:covered_states => ["is missing"], :active_year => ["is missing"]} }
+  let(:error_message1)      { {:active_year => ["is missing", "must be an integer"], :covered_states => ["is missing", "must be an array"]} }
   let(:error_message2)      { {:active_year => ["must be an integer"], :covered_states => ["must be an array"]} }
 
   context "Given invalid required parameters" do

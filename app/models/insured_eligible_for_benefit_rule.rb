@@ -18,6 +18,7 @@ class InsuredEligibleForBenefitRule
     @coverage_kind = options[:coverage_kind].present? ? options[:coverage_kind] : 'health'
     @new_effective_on = options[:new_effective_on]
     @market_kind = options[:market_kind]
+    @shopping_family_member_ids = options[:shopping_family_members_ids]
   end
 
   def setup
@@ -51,7 +52,9 @@ class InsuredEligibleForBenefitRule
           true && eligible
         else
           if "#{element}" == "active_consumer"
-             @errors << ["eligibility failed on market kind"]
+            @errors << ["eligibility failed on market kind"]
+          elsif FinancialAssistanceRegistry[:consumer_validations].enabled?
+            @errors << [eligibility_errors(element)]
           else
             @errors << ["eligibility failed on #{element}"]
           end
@@ -63,6 +66,22 @@ class InsuredEligibleForBenefitRule
       return status, @errors
     end
     [false]
+  end
+
+  def eligibility_errors(element)
+    person = @role.person
+    pronoun = person.try(:gender) == 'male' ? ' he ' : ' she '
+    name = person.try(:first_name) || ''
+    case element
+    when "citizenship_status"
+      "Since #{name} did not attest to being a US citizen or having an eligible immigration status,#{pronoun}is not eligible to purchase a plan on #{Settings.site.short_name}.<br/> Other family members may still be eligible to enroll"
+    when "residency_status"
+      "Since #{name} is not currently a state resident,#{pronoun} is not eligible to purchase a plan on #{Settings.site.short_name}.<br/> Other family members may still be eligible to enroll."
+    when "incarceration_status"
+      "Since #{name} is currently incarcerated, #{pronoun} is not eligible to purchase a plan on #{Settings.site.short_name}.<br/> Other family members may still be eligible to enroll."
+    else
+      "eligibility failed on #{element}"
+    end
   end
 
   def set_status_and_error_if_not_applying_coverage
@@ -90,7 +109,7 @@ class InsuredEligibleForBenefitRule
     return true if tax_household.blank?
 
     cost_sharing = @benefit_package.cost_sharing
-    csr_kind = tax_household.current_csr_eligibility_kind
+    csr_kind = tax_household.eligibile_csr_kind(@shopping_family_member_ids)
     return true if csr_kind.blank? || cost_sharing.blank?
     csr_kind == cost_sharing
   end

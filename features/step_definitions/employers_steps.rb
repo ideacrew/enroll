@@ -144,7 +144,7 @@ Then(/^.+ should see a form to enter information about employee, address and dep
   find(:xpath, "//div[div/select[@name='census_employee[benefit_group_assignments_attributes][0][benefit_group_id]']]//li[@data-index='1']").click
 
   # Address
-  fill_in 'census_employee[address_attributes][address_1]', :with => "1026 Potomac"
+  fill_in 'census_employee[address_attributes][address_1]', :with => "1026 Potomac NE"
   fill_in 'census_employee[address_attributes][address_2]', :with => "Apt ABC"
   fill_in 'census_employee[address_attributes][city]', :with => "Alpharetta"
 
@@ -442,7 +442,7 @@ Then(/^.+ should see the combined filter results$/) do
 end
 
 When(/^.+ go(?:es)? to the benefits tab$/) do
-  find(".interaction-click-control-benefits").click
+  find(EmployerHomePage.benefits_link, wait: 5).click
 end
 
 Then(/^.+ should see the plan year$/) do
@@ -450,8 +450,7 @@ Then(/^.+ should see the plan year$/) do
 end
 
 When(/^.+ clicks? on publish plan year$/) do
-  find('.interaction-click-control-publish-plan-year').click
-  sleep 2
+  find('.interaction-click-control-publish-plan-year', wait: 5).click
 end
 
 Then(/^.+ should see Action Needed button/) do
@@ -601,14 +600,14 @@ Then /^employer should see continue button disabled$/ do
 end
 
 And /^employer filled all the fields on benefit application form$/ do
-  find(:xpath, "/html/body/div[3]/div/div/div[2]/form/div/div/div/div/div[3]/div/div/div[1]/div/div[2]").click
+  find(:xpath, "/html/body/div[3]/div/div/div[2]/form/div/div/div/div/div[3]/div[2]/div/div[1]/div", wait: 10).click
   find('li[data-index="1"]').click
   fill_in 'benefit_application[fte_count]', with: 5
   fill_in 'benefit_application[pte_count]', with: 5
 end
 
 And /^employer clicked on continue button$/ do
-  find("#benefitContinueBtn").click
+  find(EmployerAddBenefitPackage.continue_btn, wait: 10).click
 end
 
 Then(/^employer should see form for benefit application and benefit package$/) do
@@ -777,7 +776,7 @@ Then /^employer should see the address on the roster$/ do
 end
 
 And /^employer populates the address field$/ do
-  fill_in 'census_employee[address_attributes][address_1]', :with => "1026 Potomac"
+  fill_in 'census_employee[address_attributes][address_1]', :with => " NE"
   fill_in 'census_employee[address_attributes][address_2]', :with => "Apt ABC"
   fill_in 'census_employee[address_attributes][city]', :with => "Alpharetta"
   find(:xpath, "//span[@class='label'][contains(., 'SELECT STATE')]").click

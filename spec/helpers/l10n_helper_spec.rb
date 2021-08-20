@@ -6,7 +6,7 @@ require "rails_helper"
 RSpec.describe L10nHelper, :type => :helper do
   # All translations are configured to load before every rspec
   it "should translate existing translations" do
-    expect(helper.l10n('date')).to eq("Date")
+    expect(helper.l10n('date_label')).to eq("Date")
   end
 
   it "should handle non existent translations gracefully" do
@@ -36,6 +36,16 @@ RSpec.describe L10nHelper, :type => :helper do
       it "should handle everything passed" do
         expect(l10n('fake_translation', fake_key: "Fake")).to eq("Fake Translation")
       end
+    end
+  end
+
+  context "FAA database values" do
+    before do
+      EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(true)
+    end
+
+    it "should load wage types" do
+      expect(l10n('faa.income.wages_and_salaries')).to eq("Wages and Salaries")
     end
   end
 end

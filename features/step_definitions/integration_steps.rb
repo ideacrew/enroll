@@ -1,4 +1,19 @@
+# frozen_string_literal: true
+
 # load Rails.root + "db/seeds.rb"
+
+def all_page_links
+  page.all('a').map(&:text).map(&:downcase)
+end
+
+def all_page_select_options
+  page.all('option').map(&:text).map(&:downcase)
+end
+
+When(/a non logged in user visits the Enroll home page$/) do
+  visit "/"
+end
+
 When(/I use unique values/) do
   require 'test/unique_value_stash.rb'
   include UniqueValueStash
@@ -272,8 +287,9 @@ Given(/^a Hbx admin with read and write permissions exists$/) do
   person = people['Hbx Admin']
   hbx_profile = FactoryBot.create :hbx_profile
   user = FactoryBot.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
+  rating_area = FactoryBot.create(:benefit_markets_locations_rating_area)
   FactoryBot.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
-  FactoryBot.create :hbx_enrollment,family: user.primary_family, household: user.primary_family.active_household
+  FactoryBot.create :hbx_enrollment,family: user.primary_family, household: user.primary_family.active_household, rating_area_id: rating_area.id
 end
 
 Given(/^a Hbx admin with super admin access exists$/) do
@@ -286,8 +302,9 @@ Given(/^a Hbx admin with super admin access exists$/) do
   person = people['Hbx Admin']
   hbx_profile = FactoryBot.create :hbx_profile, :no_open_enrollment_coverage_period
   user = FactoryBot.create :user, :with_family, :with_hbx_staff_role, email: person[:email], password: person[:password], password_confirmation: person[:password]
+  rating_area = FactoryBot.create(:benefit_markets_locations_rating_area)
   FactoryBot.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
-  FactoryBot.create :hbx_enrollment,family:user.primary_family, household:user.primary_family.active_household
+  FactoryBot.create :hbx_enrollment, family: user.primary_family, household: user.primary_family.active_household, rating_area_id: rating_area.id
 end
 
 Given(/^a Hbx admin with tier 3 access exists$/) do
@@ -299,8 +316,9 @@ Given(/^a Hbx admin with tier 3 access exists$/) do
   person = people['Hbx Admin']
   hbx_profile = FactoryBot.create :hbx_profile, :no_open_enrollment_coverage_period
   user = FactoryBot.create :user, :with_family, :with_hbx_staff_role, email: person[:email], password: person[:password], password_confirmation: person[:password]
+  rating_area = FactoryBot.create(:benefit_markets_locations_rating_area)
   FactoryBot.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
-  FactoryBot.create :hbx_enrollment,family: user.primary_family, household: user.primary_family.active_household
+  FactoryBot.create :hbx_enrollment,family: user.primary_family, household: user.primary_family.active_household, rating_area_id: rating_area.id
 end
 
 Given(/^a Hbx admin with read only permissions exists$/) do
@@ -311,8 +329,9 @@ Given(/^a Hbx admin with read only permissions exists$/) do
   person = people['Hbx Admin']
   hbx_profile = FactoryBot.create :hbx_profile
   user = FactoryBot.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
+  rating_area = FactoryBot.create(:benefit_markets_locations_rating_area)
   FactoryBot.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
-  FactoryBot.create :hbx_enrollment,family:user.primary_family, household:user.primary_family.active_household
+  FactoryBot.create :hbx_enrollment, family: user.primary_family, household: user.primary_family.active_household, rating_area_id: rating_area.id
 end
 
 Given(/^Employer Attestation feature is enabled/) do
@@ -340,6 +359,7 @@ end
 
 Given(/^the fehb market configuration is enabled$/) do
   enable_feature :fehb_market
+  load "components/benefit_sponsors/app/models/benefit_sponsors/organizations/fehb_employer_profile.rb"
 end
 
 Given(/^the individual market configuration is disabled$/) do
@@ -400,29 +420,24 @@ end
 
 When(/^(.+) creates? a new employer profile with (.+)$/) do |named_person, primary_location|
   employer = people[named_person]
-  fill_in 'organization[first_name]', :with => employer[:first_name]
-  fill_in 'organization[last_name]', :with => employer[:last_name]
-  fill_in 'jq_datepicker_ignore_organization[dob]', :with => employer[:dob]
-
-  find('#organization_legal_name').click
-  fill_in 'organization[legal_name]', :with => employer[:legal_name]
-  fill_in 'organization[dba]', :with => employer[:dba]
-  fill_in 'organization[fein]', :with => employer[:fein]
-  select_from_chosen '0111', from: 'Select Industry Code'
-
-  find('.selectric-interaction-choice-control-organization-entity-kind').click
-  find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'C Corporation')]").click
-
-  find(:xpath, "//select[@name='organization[entity_kind]']/option[@value='c_corporation']")
-  step "I enter office location for #{primary_location}"
-  fill_in 'organization[email]', :with => Forgery('email').address
-  fill_in 'organization[area_code]', :with => '202'
-  fill_in 'organization[number]', :with => '5551212'
-  fill_in 'organization[extension]', :with => '22332'
-  find(:xpath, "//div[contains(@class, 'selectric')][p[contains(text(), 'Only Electronic communications')]]").click
-  find(:xpath, "//select[@name='organization[contact_method]']/option[@value='Paper and Electronic communications']")
-
-  find('.interaction-click-control-save').click
+  fill_in EmployerRegistration.first_name, :with => employer[:first_name]
+  fill_in EmployerRegistration.last_name, :with => employer[:last_name]
+  fill_in EmployerRegistration.date_of_birth, :with => employer[:dob]
+  fill_in EmployerRegistration.legal_name, :with => employer[:legal_name]
+  fill_in EmployerRegistration.dba, :with => employer[:dba]
+  fill_in EmployerRegistration.fein, :with => employer[:fein]
+  fill_in EmployerRegistration.email, :with => employer[:email]
+#  select_from_chosen '0111', from: 'Select Industry Code'
+  find(EmployerRegistration.kind_employer_information_dropdown).click
+  select 'C Corporation', from: 'agency[organization][entity_kind]'
+  #step "I enter office location for #{primary_location}"
+  #fill_in 'organization[email]', :with => Forgery('email').address
+  fill_in EmployerRegistration.area_code_office_location, :with => '202'
+  fill_in EmployerRegistration.number_office_location, :with => '5551212'
+  #fill_in 'organization[extension]', :with => '22332'
+  #find(:xpath, "//div[contains(@class, 'selectric')][p[contains(text(), 'Only Electronic communications')]]").click
+  #find(:xpath, "//select[@name='organization[contact_method]']/option[@value='Paper and Electronic communications']")
+  find(EmployerRegistration.confirm_btn).click
 end
 
 When(/^(.*) logs on to the (.*)?/) do |named_person, portal|
@@ -434,12 +449,12 @@ When(/^(.*) logs on to the (.*)?/) do |named_person, portal|
   # portal_uri = find('a', text: portal, wait: 5)["href"]#find("a.#{portal_class}")["href"]
 
   visit "/users/sign_in"
-  fill_in "user[login]", :with => person[:email]
+  fill_in SignIn.username, :with => person[:email]
   find('#user_login').set(person[:email])
-  fill_in "user[password]", :with => person[:password]
+  fill_in SignIn.password, :with => person[:password]
   #TODO this fixes the random login fails b/c of empty params on email
-  fill_in "user[login]", :with => person[:email] unless find(:xpath, '//*[@id="user_login"]').value == person[:email]
-  find('.sign-in-btn').click
+  fill_in SignIn.username, :with => person[:email] unless find(:xpath, '//*[@id="user_login"]').value == person[:email]
+  find(SignIn.sign_in_btn).click
 
   # visit portal_uri
   # Adding sleep seems to help prevent the AuthenticityToken error
@@ -468,7 +483,7 @@ Then(/^.+ creates (.+) as a roster employee$/) do |named_person|
   fill_in 'jq_datepicker_ignore_census_employee[hired_on]', with: (Time.now - 1.week).strftime('%m/%d/%Y')
   find('#census_employee_is_business_owner', wait: 5).click
 
-  fill_in 'census_employee[address_attributes][address_1]', :with => '1026 Potomac'
+  fill_in 'census_employee[address_attributes][address_1]', :with => '1026 Potomac NE'
   fill_in 'census_employee[address_attributes][address_2]', :with => 'Apt ABC'
   fill_in 'census_employee[address_attributes][city]', :with => 'Alpharetta'
 
@@ -765,6 +780,7 @@ When(/^.+ enters? the dependent info of Patrick wife$/) do
   find("span", :text => "choose").click
   find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Spouse')]").click
   find(:xpath, "//label[@for='radio_female']").click
+  find(:xpath, '//label[@for="dependent_same_with_primary"]').click
   fill_in 'dependent[addresses][0][address_1]', with: '123 STREET'
   fill_in 'dependent[addresses][0][city]', with: 'WASHINGTON'
   find(:xpath, "//span[@class='label'][contains(., 'SELECT STATE')]").click
@@ -774,6 +790,7 @@ end
 
 When(/^.+ clicks? confirm member$/) do
   all(:css, ".mz").last.click
+  # find_all('.btn-confirmation', wait: 5)[0].click
   expect(page).to have_link('Add New Person')
 end
 

@@ -50,7 +50,7 @@ RSpec.describe HbxAdminController, :type => :controller do
       allow(Admin::Aptc).to receive(:find_enrollment_effective_on_date).and_return(valid_date)
       post(
         :update_aptc_csr,
-        params: { 
+        params: {
           person: { person_id: person_with_family.id, family_id: family.id, current_year: valid_date.year },
           max_aptc: '1000',
           csr_percentage: 50
@@ -70,6 +70,12 @@ RSpec.describe HbxAdminController, :type => :controller do
 
     it 'should end date the old tax_households' do
       expect(family.active_household.tax_households.active_tax_household.count).to eq(1)
+    end
+
+    it 'should update individual csr percentages' do
+      family.active_household.tax_households.active_tax_household.first.tax_household_members.each do |thm|
+        expect(thm.csr_percent_as_integer).to eq(50)
+      end
     end
   end
 

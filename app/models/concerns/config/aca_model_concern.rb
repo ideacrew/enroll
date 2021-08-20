@@ -53,7 +53,7 @@ module Config::AcaModelConcern
     end
 
     def aca_state_abbreviation
-      @aca_state_abbreviation ||= Settings.aca.state_abbreviation
+      @aca_state_abbreviation ||= EnrollRegistry[:enroll_app].setting(:state_abbreviation).item
     end
 
     def aca_state_name
@@ -97,7 +97,7 @@ module Config::AcaModelConcern
     end
 
     def general_agency_enabled?
-      @@genearl_agency_enabled ||= Settings.aca.general_agency_enabled
+      @@genearl_agency_enabled ||= EnrollRegistry.feature_enabled?(:general_agency)
     end
 
     def broker_carrier_appointments_enabled?

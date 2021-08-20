@@ -48,67 +48,96 @@
       </div>
     </div>
 
-    <div class="row row-form-wrapper radio-align no-buffer fa-align-elements">
-      <div class='col-md-6 labelforcoverage'>
-        <span class="fa-text-color">Is the employee currently in a waiting period and eligible to enroll in the next 3 months ? *</span>
+    <% unless insurance_kind == 'health_reimbursement_arrangement' %>
+      <div class="row row-form-wrapper radio-align no-buffer fa-align-elements">
+        <div class='col-md-6 labelforcoverage'>
+          <span class="fa-text-color">Is the employee currently in a waiting period and eligible to enroll in the next 3 months ? *</span>
+        </div>
+        <div class='col-md-6'>
+          <div class='col-md-4'>
+            <%= radio_button_tag("is_esi_waiting_period_#{benefit.id}", true, benefit.is_esi_waiting_period , class: "radio-yml" ) %>
+            <label class="radio-yml" for="is_esi_waiting_period_yes">Yes</label>
+          </div>
+          <div class='col-md-4'>
+            <%= radio_button_tag("is_esi_waiting_period_#{benefit.id}", false, !benefit.is_esi_waiting_period ,class: "radio-yml" )%>
+            <label class="radio-yml" for="is_esi_waiting_period_no">No</label>
+          </div>
+          <div class='col-md-4'>
+            <a href="#" data-toggle="modal" data-target="#">Not sure?</a>
+          </div>
+        </div>
       </div>
-      <div class='col-md-6'>
-        <div class='col-md-4'>
-          <%= radio_button_tag("is_esi_waiting_period_#{benefit.id}", true, benefit.is_esi_waiting_period , class: "radio-yml" ) %>
-          <label class="radio-yml" for="is_esi_waiting_period_yes">Yes</label>
+
+      <div class="row row-form-wrapper radio-align no-buffer fa-align-elements">
+        <div class='col-md-6 labelforcoverage'>
+          <span class="fa-text-color">Does this employer offer a health plan that meets the minimum value standard ? *</span>
         </div>
-        <div class='col-md-4'>
-          <%= radio_button_tag("is_esi_waiting_period_#{benefit.id}", false, !benefit.is_esi_waiting_period ,class: "radio-yml" )%>
-          <label class="radio-yml" for="is_esi_waiting_period_no">No</label>
+        <div class='col-md-6'>
+          <div class='col-md-4'>
+            <%= radio_button_tag("is_esi_mec_met_#{benefit.id}", true, benefit.is_esi_mec_met,class: "radio-yml" ) %>
+            <label class="radio-yml" for="is_esi_mec_met_yes">Yes</label>
+          </div>
+          <div class='col-md-4'>
+            <%= radio_button_tag("is_esi_mec_met_#{benefit.id}", false, !benefit.is_esi_mec_met, class: "radio-yml" )%>
+            <label class="radio-yml" for="is_esi_mec_met_no">No</label>
+          </div>
+          <div class='col-md-4'>
+            <a href="#" data-toggle="modal" data-target="#">Not sure?</a>
+          </div>
         </div>
-        <div class='col-md-4'>
+      </div>
+
+      <div class="row row-form-wrapper no-buffer row-height">
+        <div class="col-md-6 no-pd form-group-lg no-pd class-fa-household">
+          <label class="static_label label-floatlabel">Who Can be Covered? *</label>
+          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.esi_covered.titleize %></span>
+        </div>
+        <div class="col-md-3 no-pd form-group-lg no-pd class-fa-household">
+          <label class="static_label label-floatlabel">FROM</label>
+          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.start_on %></span>
+        </div>
+        <div class="col-md-3 no-pd form-group-lg no-pd class-fa-household">
+          <label class="static_label label-floatlabel">TO</label>
+          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.end_on %></span>
+        </div>
+      </div>
+
+      <div class="row row-form-wrapper radio-align no-buffer">
+        <div class='col-md-9 labelforcoverage'>
+          <span class="fa-text-color">How much would the employee only pay for the lowest cost minimum value standard plan ? *</span>
+        </div>
+        <div class='col-md-3 not-sure-margin'>
           <a href="#" data-toggle="modal" data-target="#">Not sure?</a>
         </div>
       </div>
-    </div>
+    <% end %>
 
-    <div class="row row-form-wrapper radio-align no-buffer fa-align-elements">
-      <div class='col-md-6 labelforcoverage'>
-        <span class="fa-text-color">Does this employer offer a health plan that meets the minimum value standard ? *</span>
-      </div>
-      <div class='col-md-6'>
-        <div class='col-md-4'>
-          <%= radio_button_tag("is_esi_mec_met_#{benefit.id}", true, benefit.is_esi_mec_met,class: "radio-yml" ) %>
-          <label class="radio-yml" for="is_esi_mec_met_yes">Yes</label>
+    <% if insurance_kind == 'health_reimbursement_arrangement'%>
+      <div class="row row-form-wrapper no-buffer row-height">
+        <div class="col-md-6 no-pd form-group-lg no-pd class-fa-household">
+          <label class="static_label label-floatlabel"><%= l10n("faa.question.type_of_hra") %> *</label>
+          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.hra_type %></span>
         </div>
-        <div class='col-md-4'>
-          <%= radio_button_tag("is_esi_mec_met_#{benefit.id}", false, !benefit.is_esi_mec_met, class: "radio-yml" )%>
-          <label class="radio-yml" for="is_esi_mec_met_no">No</label>
+        <div class="col-md-3 no-pd form-group-lg no-pd class-fa-household">
+          <label class="static_label label-floatlabel"><%= l10n("from").upcase %></label>
+          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.start_on %></span>
         </div>
-        <div class='col-md-4'>
-          <a href="#" data-toggle="modal" data-target="#">Not sure?</a>
+        <div class="col-md-3 no-pd form-group-lg no-pd class-fa-household">
+          <label class="static_label label-floatlabel"><%= l10n("to").upcase %></label>
+          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.end_on %></span>
         </div>
       </div>
-    </div>
 
-    <div class="row row-form-wrapper no-buffer row-height">
-      <div class="col-md-6 no-pd form-group-lg no-pd class-fa-household">
-        <label class="static_label label-floatlabel">Who Can be Covered? *</label>
-        <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.esi_covered.titleize %></span>
+      <div class="row row-form-wrapper radio-align no-buffer">
+        <div class='col-md-9 labelforcoverage'>
+          <span class="fa-text-color"><%= l10n("faa.question.max_employer_reimbursement") %></span>
+        </div>
+        <div class='col-md-2 not-sure-margin'>
+          <a href="#hra_benefit" data-toggle="modal" data-target="#hra_benefit" class="interaction-click-control-not-sure? benefit-support-modal"><%= l10n("faa.question.not_sure") %>?</a>
+          <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "hra_benefit"} %>
+        </div>
       </div>
-      <div class="col-md-3 no-pd form-group-lg no-pd class-fa-household">
-        <label class="static_label label-floatlabel">FROM</label>
-        <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.start_on %></span>
-      </div>
-      <div class="col-md-3 no-pd form-group-lg no-pd class-fa-household">
-        <label class="static_label label-floatlabel">TO</label>
-        <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.end_on %></span>
-      </div>
-    </div>
-
-    <div class="row row-form-wrapper radio-align no-buffer">
-      <div class='col-md-9 labelforcoverage'>
-        <span class="fa-text-color">How much would the employee only pay for the lowest cost minimum value standard plan ? *</span>
-      </div>
-      <div class='col-md-3 not-sure-margin'>
-        <a href="#" data-toggle="modal" data-target="#">Not sure?</a>
-      </div>
-    </div>
+    <% end %>
 
     <div class="row row-form-wrapper radio-align no-buffer">
       <div class="col-md-3 no-pd form-group-lg no-pd class-fa-household">

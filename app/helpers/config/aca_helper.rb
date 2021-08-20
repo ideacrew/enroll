@@ -86,11 +86,11 @@ module Config::AcaHelper
   end
 
   # Allows us to conditionally display General Agency related links and information
-  # This can be enabled or disabled in config/settings.yml
-  # @return { True } if Settings.aca.general_agency_enabled
+  # This can be enabled or disabled with ResourceRegistry
+  # @return { True } if EnrollRegistry.feature_enabled?(:general_agency)
   # @return { False } otherwise
   def general_agency_enabled?
-    Settings.aca.general_agency_enabled
+    EnrollRegistry.feature_enabled?(:general_agency)
   end
 
   def broker_carrier_appointments_enabled?
@@ -103,6 +103,14 @@ module Config::AcaHelper
 
   def individual_market_is_enabled?
     @individual_market_is_enabled ||= Settings.aca.market_kinds.include?("individual")
+  end
+
+  def no_transition_families_is_enabled?
+    EnrollRegistry.feature_enabled?(:no_transition_families)
+  end
+
+  def medicaid_tax_credits_link_is_enabled?
+    EnrollRegistry.feature_enabled?(:medicaid_tax_credits_link)
   end
 
   def self_attest_residency_enabled?

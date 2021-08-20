@@ -55,6 +55,10 @@ class BenefitPackage
     start_on.year
   end
 
+  def cost_sharing
+    benefit_eligibility_element_group&.cost_sharing
+  end
+
   # def initialize(*args)
   #   self.build_benefit_eligibility_element_group
   #   super(*args)

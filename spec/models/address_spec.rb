@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe Address, "with proper validations" do
   let(:address_kind) { "home" }
-  let(:address_1) { "1 Clear Crk" }
+  let(:address_1) { "1 Clear Crk NE" }
   let(:city) { "Irvine" }
   let(:state) { "CA" }
   let(:zip) { "20171" }
@@ -112,7 +112,7 @@ end
 describe 'view helpers/presenters' do
   let(:address) {
      Address.new(
-       address_1: "An address line 1",
+       address_1: "An address line 1 NE",
        address_2: "An address line 2",
        city: "A City",
        state: "CA",
@@ -139,12 +139,12 @@ describe 'view helpers/presenters' do
 
   describe "#to_html" do
     it "returns the address with html tags" do
-      expect(address.to_html).to eq "<div>An address line 1</div><div>An address line 2</div><div>A City, CA 21222</div>"
+      expect(address.to_html).to eq "<div>An address line 1 NE</div><div>An address line 2</div><div>A City, CA 21222</div>"
     end
 
     it "retuns address with html tags if no address_2 field is present" do
       address.address_2 = ""
-      expect(address.to_html).to eq "<div>An address line 1</div><div>A City, CA 21222</div>"
+      expect(address.to_html).to eq "<div>An address line 1 NE</div><div>A City, CA 21222</div>"
     end
   end
 end
@@ -163,6 +163,45 @@ describe '#home?' do
       expect(address.home?).to be true
     end
   end
+end
+
+describe '#fetch_county_fips_code' do
+  let!(:us_county) { BenefitMarkets::Locations::CountyFips.create({ state_postal_code: 'ME',  county_fips_code: '23003', county_name: 'Aroostook'}) }
+
+  context 'fips code for county exists' do
+    let(:address) do
+      Address.new(
+        address_1: "An address line 1",
+        address_2: "An address line 2",
+        city: "A City",
+        state: "ME",
+        county: 'Aroostook',
+        zip: "21222"
+      )
+    end
+
+    it ' should return county fips code' do
+      expect(address.fetch_county_fips_code).to eq '23003'
+    end
+  end
+
+  context 'fips code for county does not exists' do
+    let(:address) do
+      Address.new(
+        address_1: "An address line 1",
+        address_2: "An address line 2",
+        city: "A City",
+        state: "test",
+        county: 'test',
+        zip: "21222"
+      )
+    end
+
+    it ' should return nil' do
+      expect(address.fetch_county_fips_code).to eq nil
+    end
+  end
+
 end
 
 describe '#clean_fields' do

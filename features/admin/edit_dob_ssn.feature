@@ -12,7 +12,6 @@ Feature: Update DOB and SSN
     And there is a census employee record and employee role for Patrick Doe for employer ABC Widgets
     And Patrick Doe has a consumer role and IVL enrollment
 
-  @flaky
   Scenario: Admin enters invalid DOB or SSN
     Given that a user with a HBX staff role with HBX staff subrole exists and is logged in
     And Admin clicks Families tab
@@ -21,7 +20,6 @@ Feature: Update DOB and SSN
     When user clicks on edit DOB/SSN link
     When user enters an invalid SSN and clicks on update
     Then Hbx Admin should see the edit form being rendered again with a validation error message
-    And Hbx Admin logs out
 
   Scenario: Admin enters valid DOB or SSN
     Given that a user with a HBX staff role with HBX staff subrole exists and is logged in
@@ -31,5 +29,3 @@ Feature: Update DOB and SSN
     When user clicks on edit DOB/SSN link
     When Hbx Admin enters a valid DOB and SSN and clicks on update
     Then Hbx Admin should see the update partial rendered with update sucessful message
-    And Hbx Admin logs out
-

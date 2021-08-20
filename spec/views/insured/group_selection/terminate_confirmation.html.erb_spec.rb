@@ -29,8 +29,8 @@ RSpec.describe "app/views/insured/group_selection/edit_plan.html.erb" do
       @product.save!
       hbx_enrollment.update_attributes(product: @product)
       hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.update_attributes!(slcsp_id: @product.id)}
-      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, hbx_enrollment.effective_on, 59, area).and_return(814.85)
-      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, hbx_enrollment.effective_on, 61, area).and_return(879.8)
+      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, hbx_enrollment.effective_on, 59, area, 'NA').and_return(814.85)
+      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, hbx_enrollment.effective_on, 61, area, 'NA').and_return(879.8)
       person.update_attributes!(dob: (hbx_enrollment.effective_on - 61.years))
       family.family_members[1].person.update_attributes!(dob: (hbx_enrollment.effective_on - 59.years))
 

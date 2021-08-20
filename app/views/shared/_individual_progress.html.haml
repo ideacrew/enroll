@@ -70,16 +70,15 @@
 - else
   %button.btn.btn-lg.btn-primary.btn-block#btn-continue{type: 'submit'}
     CONTINUE
-
 %ul.list-unstyled.list-right-section
-  - unless @no_previous_button
+  - unless @no_previous_button || step == 1
     %li
       %a.back{href: '#'}
         = image_tag 'icons/list.png'
         PREVIOUS
   - unless @no_save_button
     %li
-      %a{href: '#'}
+      %a{href: destroy_user_session_path}
         = image_tag 'icons/list.png'
         SAVE &amp; EXIT
       %br

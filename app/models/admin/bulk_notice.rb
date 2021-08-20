@@ -11,7 +11,9 @@ module Admin
     include ::Config::SiteModelConcern
     include AASM
 
-    RECIPIENTS = {'Broker Agency' => :broker_agency, 'General Agency' => :general_agency}.tap do |h|
+    RECIPIENTS = {}.tap do |h|
+      h["Broker Agency"] = :broker_agency if is_broker_agency_enabled?
+      h["General Agency"] = :general_agency if is_general_agency_enabled?
       h["Employer"] = :employer if is_shop_or_fehb_market_enabled?
       h["Employee"] = :employee if is_shop_or_fehb_market_enabled?
     end

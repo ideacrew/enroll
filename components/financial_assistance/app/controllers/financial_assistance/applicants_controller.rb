@@ -43,6 +43,7 @@ module FinancialAssistance
 
     def update
       if params[:financial_assistance_applicant].present?
+        format_date_params params[:financial_assistance_applicant]
         @applicant.update_attributes!(permit_params(params[:financial_assistance_applicant]))
         head :ok, content_type: "text/html"
       else
@@ -113,6 +114,21 @@ module FinancialAssistance
       render :plain => applicant.age_of_the_applicant.to_s
     end
 
+    def applicant_is_eligible_for_joint_filing
+      applicant_id = params[:applicant_id]
+      applicant = FinancialAssistance::Applicant.find(applicant_id)
+
+      # applicant is primary and spouse exists?
+      return primary_applicant_has_spouse if applicant.is_primary_applicant
+      # applicant is spouse of primary?
+      applicant_is_spouse_of_primary(applicant)
+    end
+
+    def applicant_is_spouse_of_primary(applicant)
+      has_spouse_relationship = applicant.relationships.where(kind: 'spouse', relative_id: @application.primary_applicant.id).count > 0
+      render :plain => has_spouse_relationship.to_s
+    end
+
     def primary_applicant_has_spouse
       has_spouse =  @application.primary_applicant.relationships.where(kind: 'spouse').present? ? 'true' : 'false'
       render :plain => has_spouse.to_s
@@ -132,7 +148,7 @@ module FinancialAssistance
     end
 
     def destroy
-      @applicant.destroy! unless @applicant.is_primary_applicant
+      ::FinancialAssistance::Operations::Applicants::Destroy.new.call(@applicant)
       redirect_to edit_application_path(@application)
     end
 
@@ -142,6 +158,14 @@ module FinancialAssistance
       model_params["pregnancy_due_on"] = Date.strptime(model_params["pregnancy_due_on"].to_s, "%m/%d/%Y") if model_params["pregnancy_due_on"].present?
       model_params["pregnancy_end_on"] = Date.strptime(model_params["pregnancy_end_on"].to_s, "%m/%d/%Y") if model_params["pregnancy_end_on"].present?
       model_params["student_status_end_on"] = Date.strptime(model_params["student_status_end_on"].to_s, "%m/%d/%Y") if model_params["student_status_end_on"].present?
+
+      model_params["person_coverage_end_on"] = Date.strptime(model_params["person_coverage_end_on"].to_s, "%m/%d/%Y") if model_params["person_coverage_end_on"].present?
+      model_params["medicaid_cubcare_due_on"] = Date.strptime(model_params["medicaid_cubcare_due_on"].to_s, "%m/%d/%Y") if model_params["medicaid_cubcare_due_on"].present?
+      model_params["medicaid_cubcare_due_on"] = nil if model_params.key?("medicaid_cubcare_due_on") && model_params["medicaid_cubcare_due_on"].blank?
+      model_params["has_eligibility_changed"] = nil if model_params.key?("has_eligibility_changed") && model_params["has_eligibility_changed"].blank? && !model_params["has_eligibility_changed"].nil?
+      model_params["has_household_income_changed"] = nil if model_params.key?("has_household_income_changed") && model_params["has_household_income_changed"].blank? && !model_params["has_household_income_changed"].nil?
+
+      model_params["dependent_job_end_on"] = Date.strptime(model_params["dependent_job_end_on"].to_s, "%m/%d/%Y") if model_params["dependent_job_end_on"].present?
     end
 
     def build_error_messages(model)
@@ -186,6 +210,8 @@ module FinancialAssistance
         :indian_tribe_member,
         :eligible_immigration_status,
         :tribal_id,
+        :tribal_state,
+        :tribal_name,
         :is_incarcerated,
         :relationship,
         :is_consumer_role,
@@ -201,7 +227,7 @@ module FinancialAssistance
         { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :id, :_destroy] },
         { :phones_attributes => [:kind, :full_phone_number, :id, :_destroy] },
         { :emails_attributes => [:kind, :address, :id, :_destroy],
-          :ethnicity => [] }
+          :ethnicity => [], :immigration_doc_statuses => [] }
       ]
     end
   end

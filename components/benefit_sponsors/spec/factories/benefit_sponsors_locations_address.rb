@@ -2,7 +2,7 @@ FactoryBot.define do
   factory :benefit_sponsors_locations_address, class: 'BenefitSponsors::Locations::Address' do
 
     kind { 'home' }
-    sequence(:address_1, 1111) { |n| "#{n} Awesome Street" }
+    sequence(:address_1, 1111) { |n| "#{n} Awesome Street NE" }
     sequence(:address_2, 111) { |n| "##{n}" }
     city { 'Boston' }
     state { EnrollRegistry[:enroll_app].setting(:state_abbreviation).item}
@@ -12,6 +12,15 @@ FactoryBot.define do
     # This address is in rating area RMA03 and has good issuer service area coverage
     # TODO: Refactor this
     trait :cca_shop_baseline do
+      kind      { 'work' }
+      address_1 { '27 Reo Road' }
+      city      { EnrollRegistry[:enroll_app].setting(:contact_center_city).item }
+      state     { EnrollRegistry[:enroll_app].setting(:state_abbreviation).item }
+      zip       { EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item }
+      county    { EnrollRegistry[:enroll_app].setting(:contact_center_county).item }
+    end
+
+    trait :dc_shop_baseline do
       kind      { 'work' }
       address_1 { '27 Reo Road' }
       city      { EnrollRegistry[:enroll_app].setting(:contact_center_city).item }

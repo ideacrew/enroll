@@ -29,6 +29,10 @@ class HbxAdminController < ApplicationController
       if @family.present? #&& TimeKeeper.date_of_record.year == year
         @eligibility_redetermination_result = Admin::Aptc.redetermine_eligibility_with_updated_values(@family, params, @hbxs, @current_year)
         @enrollment_update_result = Admin::Aptc.update_aptc_applied_for_enrollments(@family, params, @current_year)
+        active_tax_household_for_current_year = @family.active_household.latest_active_tax_household_with_year(@current_year)
+        active_tax_household_for_current_year.tax_household_members.each do |thm|
+          thm.update_attributes!(csr_percent_as_integer: params['csr_percentage']) if thm.is_ia_eligible?
+        end
       end
       respond_to do |format|
         format.js {render "update_aptc_csr", person: @person}

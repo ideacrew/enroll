@@ -23,6 +23,10 @@ module GoldenSeedHelper
     @site = BenefitSponsors::Site.all.first
   end
 
+  def counter_number
+    (0..999).to_a.sample
+  end
+
   # These methods are in case you want to avoid external
   # hbx id calls
   # def update_person_hbx_ids
@@ -72,7 +76,7 @@ module GoldenSeedHelper
     ol = org.office_locations.build
     address = ol.build_address(
       kind: "mailing",
-      address_1: "Main St",
+      address_1: "Main St NE",
       city: EnrollRegistry[:enroll_app].setting(:contact_center_city).item,
       state: state_abbreviation,
       zip: EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item
@@ -104,7 +108,7 @@ module GoldenSeedHelper
     if case_info_hash[:person_attributes]['age']
       birth_year = (TimeKeeper.date_of_record.year - case_info_hash[:person_attributes]['age'].to_i)
       birthday = FFaker::Time.between(Date.new(birth_year, 1, 1), Date.new(birth_year, 12, 30))
-    elsif case_info_hash[:person_attributes]['relationship_to_primary'].downcase == 'child'
+    elsif case_info_hash[:person_attributes]['relationship_to_primary']&.downcase == 'child'
       birthday = FFaker::Time.between(Date.new(2005, 0o1, 0o1), Date.new(2020, 0o1, 0o1))
     else # attributes[:person_type] == 'adult'
       birthday = FFaker::Time.between(Date.new(1950, 0o1, 0o1), Date.new(2000, 0o1, 0o1))
@@ -127,7 +131,7 @@ module GoldenSeedHelper
   def create_and_return_person(case_info_hash = {}, dependent = nil)
     gender = case_info_hash[:person_attributes]['gender']&.downcase || Person::GENDER_KINDS.sample
     last_name = if dependent
-                  case_info_hash[:primary_person_record].last_name
+                  case_info_hash[:primary_person_record]&.last_name
                 else
                   case_info_hash[:person_attributes]['last_name'] || FFaker::Name.last_name
                 end
@@ -204,7 +208,7 @@ module GoldenSeedHelper
   def create_and_return_user(case_info_hash = {})
     providers = ["gmail", "yahoo", "hotmail"]
     email = if case_info_hash[:person_attributes]['email']&.include?(".com")
-              attributes["email"]
+              case_info_hash[:person_attributes]['email']
             elsif case_info_hash[:person_attributes]['email']
               "#{case_info_hash[:person_attributes]['email']}#{@counter_number}@#{providers.sample}.com"
             else
@@ -278,9 +282,9 @@ module GoldenSeedHelper
     address = Address.new(
       kind: "primary",
       address_1: address_1,
-      city: city,
-      state: state,
-      zip: zip
+      city: EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item,
+      state: EnrollRegistry[:enroll_app].setting(:state_abbreviation).item,
+      zip: EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item
     )
     area_code = primary_phone.present? ? primary_phone.area_code : FFaker::PhoneNumber.area_code
     phone_number = primary_phone.present? ? primary_phone.number : generate_unique_phone_number
@@ -323,7 +327,7 @@ module GoldenSeedHelper
     state_abbreviation = EnrollRegistry[:enroll_app].setting(:state_abbreviation).item
     verification_type.type_name = "#{state_abbreviation} Residency"
     case_info_hash[:primary_person_record].verification_types << verification_type
-    case_info_hash[:primary_person_record].save(validatee: false)
+    case_info_hash[:primary_person_record].save(validate: false)
     raise("Not verified") unless consumer_role.identity_verified? == true
     case_info_hash[:consumer_role] = consumer_role
     consumer_role

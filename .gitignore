@@ -42,6 +42,9 @@ config/saml.yml
 config/symmetric-encryption.yml
 config/symmetric-encryption*
 
+components/**/system
+components/**/spec/dummy/system
+
 # Ignore the gem folder
 /gems
 
