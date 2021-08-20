@@ -203,7 +203,7 @@ registry:
           - key: :contact_center_name
             item: "CoverME.gov's Customer Care Center"
           - key: :contact_center_short_number
-            item: "(855) 532-5465"
+            item: "1-866 636 0355"
           - key: :contact_center_tty_number # Need to figure out what this should be for Maine
             item: "711"
           - key: :producer_advisory_committee_url
@@ -313,6 +313,16 @@ registry:
       - key: :counties_import
         is_enabled: true
         item: "SHOP_ZipCode_CY2021_FINAL_ME.xlsx"
+      - key: :individual_market_notice
+        item: :individual_market_notice
+        is_enabled: false
+        settings:
+          - key: :mailing_address_1
+            item: ""
+          - key: :mailing_address_city
+            item: ""
+          - key: :mailing_address_zip
+            item: ""
   - namespace:
       - :features
       - :enroll_app
