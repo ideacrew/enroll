@@ -55,9 +55,7 @@ module FinancialAssistance
 
               applicant_esi_evidence = applicant.evidences.by_name(:esi_mec).first
               applicant_esi_evidence.update_attributes(eligibility_status: response_esi_evidence.eligibility_status)
-              if response_esi_evidence.eligibility_results.present?
-                applicant_esi_evidence.eligibility_results << FinancialAssistance::EligibilityResult.new(response_esi_evidence.eligibility_results.first.to_h)
-              end
+              applicant_esi_evidence.eligibility_results << FinancialAssistance::EligibilityResult.new(response_esi_evidence.eligibility_results.first.to_h) if response_esi_evidence.eligibility_results.present?
               applicant.save!
 
               Success(applicant)
