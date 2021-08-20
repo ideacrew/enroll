@@ -9,6 +9,11 @@ Given(/^a consumer, with a family, exists$/) do
   end
 end
 
+And(/^financial assistance primary applicant logs in$/) do
+  login_as @financial_assistance_applicant_user
+  visit financial_assistance.edit_application_path(@target_fa_application)
+end
+
 Given(/^is logged in$/) do
   login_as consumer, scope: :user
 end

@@ -420,29 +420,24 @@ end
 
 When(/^(.+) creates? a new employer profile with (.+)$/) do |named_person, primary_location|
   employer = people[named_person]
-  fill_in 'organization[first_name]', :with => employer[:first_name]
-  fill_in 'organization[last_name]', :with => employer[:last_name]
-  fill_in 'jq_datepicker_ignore_organization[dob]', :with => employer[:dob]
-
-  find('#organization_legal_name').click
-  fill_in 'organization[legal_name]', :with => employer[:legal_name]
-  fill_in 'organization[dba]', :with => employer[:dba]
-  fill_in 'organization[fein]', :with => employer[:fein]
-  select_from_chosen '0111', from: 'Select Industry Code'
-
-  find('.selectric-interaction-choice-control-organization-entity-kind').click
-  find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'C Corporation')]").click
-
-  find(:xpath, "//select[@name='organization[entity_kind]']/option[@value='c_corporation']")
-  step "I enter office location for #{primary_location}"
-  fill_in 'organization[email]', :with => Forgery('email').address
-  fill_in 'organization[area_code]', :with => '202'
-  fill_in 'organization[number]', :with => '5551212'
-  fill_in 'organization[extension]', :with => '22332'
-  find(:xpath, "//div[contains(@class, 'selectric')][p[contains(text(), 'Only Electronic communications')]]").click
-  find(:xpath, "//select[@name='organization[contact_method]']/option[@value='Paper and Electronic communications']")
-
-  find('.interaction-click-control-save').click
+  fill_in EmployerRegistration.first_name, :with => employer[:first_name]
+  fill_in EmployerRegistration.last_name, :with => employer[:last_name]
+  fill_in EmployerRegistration.date_of_birth, :with => employer[:dob]
+  fill_in EmployerRegistration.legal_name, :with => employer[:legal_name]
+  fill_in EmployerRegistration.dba, :with => employer[:dba]
+  fill_in EmployerRegistration.fein, :with => employer[:fein]
+  fill_in EmployerRegistration.email, :with => employer[:email]
+#  select_from_chosen '0111', from: 'Select Industry Code'
+  find(EmployerRegistration.kind_employer_information_dropdown).click
+  select 'C Corporation', from: 'agency[organization][entity_kind]'
+  #step "I enter office location for #{primary_location}"
+  #fill_in 'organization[email]', :with => Forgery('email').address
+  fill_in EmployerRegistration.area_code_office_location, :with => '202'
+  fill_in EmployerRegistration.number_office_location, :with => '5551212'
+  #fill_in 'organization[extension]', :with => '22332'
+  #find(:xpath, "//div[contains(@class, 'selectric')][p[contains(text(), 'Only Electronic communications')]]").click
+  #find(:xpath, "//select[@name='organization[contact_method]']/option[@value='Paper and Electronic communications']")
+  find(EmployerRegistration.confirm_btn).click
 end
 
 When(/^(.*) logs on to the (.*)?/) do |named_person, portal|

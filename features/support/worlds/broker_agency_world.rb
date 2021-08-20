@@ -1,4 +1,31 @@
 module BrokerAgencyWorld
+  def create_prospect_employer(broker_agency_name)
+    broker_agency_profile = broker_agency_profile(broker_agency_name)
+    organization_params = {
+      "legal_name" => "emp1",
+      "dba" => "101010",
+      "entity_kind" => "c_corporation",
+      "office_locations_attributes" => {
+        "0" => {
+          "address_attributes" => {
+            "kind" => "primary",
+            "address_1" => "1818 exp st",
+            "address_2" => "",
+            "city" => EnrollRegistry[:enroll_app].setting(:contact_center_city).item,
+            "state" => EnrollRegistry[:enroll_app].setting(:state_abbreviation).item,
+            "zip" => EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item
+          },
+          "phone_attributes" => {
+            "kind" => "work", "area_code" => "202", "number" => "555-2121", "extension" => ""
+          }
+        }
+      }
+    }
+    SponsoredBenefits::Organizations::BrokerAgencyProfile.init_prospect_organization(
+      broker_agency_profile,
+      organization_params.merge(owner_profile_id: broker_agency_profile.id)
+    )
+  end
 
   def assign_broker_agency_account(broker_name, broker_agency_name)
     broker_agency_profile = broker_agency_profile(broker_agency_name)
