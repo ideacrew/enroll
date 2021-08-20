@@ -9,7 +9,7 @@ module Subscribers
 
       subscribe(:on_non_esi_determination_complete) do |delivery_info, _metadata, response|
         logger.info "FdshGateway::NONESIMECDeterminationSubscriber: invoked on_non_esi_determination_complete with delivery_info: #{delivery_info.inspect}, response: #{response.inspect}"
-        payload = JSON.parse(response, :symbolize_names => true)
+        _payload = JSON.parse(response, :symbolize_names => true)
 
 
         # result = FinancialAssistance::Operations::Applications::Esi::H14::AddEsiMecDetermination.new.call(payload: payload)
