@@ -1,19 +1,12 @@
 @import "variables";
 /* Layout Specifics */
+@import "barlow";
 
-@font-face {
-        font-family: 'Barlow';
-        font-style: normal;
-        font-weight: 300;
-        font-display: swap;
-        src: font-url('Barlow400.woff2');
-        src: font-url('Barlow400.woff2') format('woff2');
-}
 html {
   height: 100%;
 }
 * {
-    font-family: 'Barlow', sans-serif;
+  font-family: $application-font, sans-serif;
 }
 
 body {
@@ -25,7 +18,7 @@ body {
 
 h1, h2, h3, h4, h5, h6
   {
-    font-family: $primary-header-font;
+    font-family: $application-font;
     font-weight: 300;
     line-height: 1.6em;
     }
