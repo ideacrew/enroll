@@ -426,6 +426,8 @@ registry:
         is_enabled: true
       - key: :living_outside_state
         is_enabled: true
+      - key: :import_network_data
+        is_enabled: false
       - key: :validate_quadrant
         item: :validate_quadrant
         is_enabled: false
