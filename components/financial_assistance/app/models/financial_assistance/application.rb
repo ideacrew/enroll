@@ -494,7 +494,7 @@ module FinancialAssistance
       state :imported
 
       event :submit, :after => [:record_transition, :set_submit, :trigger_fdsh_hub_calls] do
-        transitions from: :draft, to: :submitted do
+        transitions from: [:draft, :renewal_draft], to: :submitted do
           guard do
             is_application_valid?
           end
@@ -661,6 +661,12 @@ module FinancialAssistance
       return unless FinancialAssistanceRegistry.feature_enabled?(:esi_mec_determination)
 
       Operations::Applications::Esi::H14::EsiMecRequest.new.call(application_id: id)
+    end
+
+    def publish_non_esi_mec_request
+      return unless FinancialAssistanceRegistry.feature_enabled?(:non_esi_mec_determination)
+
+      Operations::Applications::NonEsi::H31::NonEsiMecRequest.new.call(application_id: id)
     end
 
     def total_incomes_by_year
@@ -1148,6 +1154,7 @@ module FinancialAssistance
 
     def trigger_fdsh_hub_calls
       publish_esi_mec_request
+      publish_non_esi_mec_request
     end
 
     def unset_submit
