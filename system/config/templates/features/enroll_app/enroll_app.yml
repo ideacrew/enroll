@@ -440,6 +440,8 @@ registry:
         settings:
           - key: :days
             item: 60
+      - key: :checkbook_integration
+        is_enabled: true
       - key: :immigration_status_checkbox
         is_enabled: false
       - key: :gender_to_sex

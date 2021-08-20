@@ -31,7 +31,7 @@ describe Services::CheckbookServices::PlanComparision, dbclean: :after_each do
     end
 
     it "should generate non-congressional link" do
-      if ApplicationHelperModStubber.plan_match_dc
+      if ApplicationHelperModStubber.checkbook_integration_enabled?
         allow(subject).to receive(:construct_body_shop).and_return({})
         allow(HTTParty).to receive(:post).and_return(result)
         hbx_enrollment.household = ce_household 
@@ -48,7 +48,7 @@ describe Services::CheckbookServices::PlanComparision, dbclean: :after_each do
     let(:result) {double("HttpResponse", :parsed_response => {"URL" => checkbook_url})}
 
     it "should generate consumer link" do
-      if ApplicationHelperModStubber.plan_match_dc
+      if ApplicationHelperModStubber.checkbook_integration_enabled?
         allow(subject).to receive(:construct_body_ivl).and_return({})
         allow(HTTParty).to receive(:post)
           .with(
@@ -72,7 +72,7 @@ describe Services::CheckbookServices::PlanComparision, dbclean: :after_each do
     let(:result) {double("HttpResponse", :parsed_response => {"URL" => ""})}
     before { Rails.env.stub(:test? => false) }
     it "should generate consumer link" do
-      if ApplicationHelperModStubber.plan_match_dc
+      if ApplicationHelperModStubber.checkbook_integration_enabled?
         allow(subject).to receive(:construct_body_ivl).and_return({})
         allow(HTTParty).to receive(:post)
           .with(
@@ -176,7 +176,7 @@ describe Services::CheckbookServices::PlanComparision, dbclean: :after_each do
     let(:checkbook_url) {"http://checkbook_url"}
 
     it "should generate congressional url" do
-      if ApplicationHelperModStubber.plan_match_dc
+      if ApplicationHelperModStubber.checkbook_integration_enabled?
         allow(subject).to receive(:construct_body_shop).and_return({})
         expect(subject.generate_url).to eq checkbook_url
       end

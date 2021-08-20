@@ -42,7 +42,7 @@ module Services
             if @result.parsed_response.is_a?(String)
               JSON.parse(@result.parsed_response)["URL"]
             else
-              @result.parsed_response["URL"]
+              @result.parsed_response["URL"] || @result.parsed_response["url"]
             end
           if uri.present?
             return uri
@@ -96,7 +96,11 @@ module Services
       end
 
       def construct_body_ivl
+        address = @person&.rating_address
+
         {
+          "county": address&.county,
+          "zipcode": address&.zip,
           "remote_access_key": Rails.application.config.checkbook_services_remote_access_key,
           "reference_id": Rails.application.config.checkbook_services_reference_id,
           "enrollment_year": enrollment_year,
@@ -178,18 +182,24 @@ module Services
 
       def consumer_build_family
         family = []
-        today = @hbx_enrollment.effective_on
-        if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
-          person = @hbx_enrollment.consumer_role.person
-          tribal_details = person.tribal_state.present? && person.tribal_name.present?
-        else
-          tribal_details = @hbx_enrollment.consumer_role.person.tribal_id.present?
-        end
         @hbx_enrollment.hbx_enrollment_members.each do |member|
-          age = member.family_member.person.age_on(today)
-          family << {"age": age, "pregnant": false, "AIAN": tribal_details}
+          person = member.person
+
+          family << {
+            "age": person.age_on(@hbx_enrollment.effective_on),
+            "pregnant": false,
+            "AIAN": get_tribal_details(person),
+            "smoker": member.tobacco_use == 'Y',
+            "relationship": member.primary_relationship
+          }
         end
         family
+      end
+
+      def get_tribal_details(person)
+        return person.tribal_id.present? unless EnrollRegistry[:indian_alaskan_tribe_details].enabled?
+
+        person.tribal_state.present? && person.tribal_name.present?
       end
 
       def build_congress_employee_age

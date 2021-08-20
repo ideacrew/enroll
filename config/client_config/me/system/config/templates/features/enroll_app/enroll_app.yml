@@ -100,7 +100,7 @@ registry:
           - key: :sign_in_routes
             item: ["/families/home"]
           - key: :shop_find_your_doctor_url
-            item: ""
+            item: "https://staging.checkbookhealth.org/me/"
           - key: :document_verification_checklist_url
             item: ""
           - key: :terms_and_conditions_url
@@ -459,6 +459,8 @@ registry:
         settings:
           - key: :days
             item: 60
+      - key: :checkbook_integration
+        is_enabled: true
       - key: :immigration_status_checkbox
         is_enabled: true
       - key: :gender_to_sex

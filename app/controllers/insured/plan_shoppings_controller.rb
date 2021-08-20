@@ -259,9 +259,9 @@ class Insured::PlanShoppingsController < ApplicationController
     @products = @member_groups.map(&:group_enrollment).map(&:product)
     extract_from_shop_products
 
-    if plan_match_dc
+    if checkbook_integration_enabled?
       is_congress_employee = @hbx_enrollment.fehb_profile ? true : false
-      @dc_checkbook_url = ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment, is_congress_employee).generate_url
+      @plan_comparison_checkbook_url = ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment, is_congress_employee).generate_url
     end
 
     @networks = @products.map(&:network).uniq.compact if offers_nationwide_plans?
