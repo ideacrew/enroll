@@ -92,7 +92,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     end
   end
 
-  describe 'When Application is in submitted state passed' do
+  describe 'When Application is in submitted state' do
     let(:result) { subject.call(application) }
 
     before :each do
@@ -107,6 +107,14 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
     it 'should have oe date for year before effective date' do
       expect(result.value![:oe_start_on]).to eq Date.new((application.effective_date.year - 1), 11, 1)
+    end
+
+    it 'should have notice_options with send_eligibility_notices set to true' do
+      expect(result.value![:notice_options][:send_eligibility_notices]).to be_truthy
+    end
+
+    it 'should have notice_options with send_open_enrollment_notices set to false' do
+      expect(result.value![:notice_options][:send_open_enrollment_notices]).to be_falsey
     end
 
     it 'should have applicant with person hbx_id' do
@@ -352,6 +360,28 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       it 'should add adjusted_gross_income' do
         expect(@mitc_income_hash[:adjusted_gross_income]).to eq(applicant.net_annual_income)
       end
+    end
+  end
+
+  context 'for renewal application' do
+    let(:result) { subject.call(application) }
+
+    before :each do
+      family.family_members.first.update_attributes(person_id: person.hbx_id)
+      applicant.update_attributes(person_hbx_id: person.hbx_id, citizen_status: 'alien_lawfully_present', eligibility_determination_id: eligibility_determination.id)
+      application.workflow_state_transitions << WorkflowStateTransition.new(
+        from_state: 'renewal_draft',
+        to_state: 'submitted'
+      )
+      application.save!
+    end
+
+    it 'should have notice_options with send_eligibility_notices set to false' do
+      expect(result.value![:notice_options][:send_eligibility_notices]).to be_falsey
+    end
+
+    it 'should have notice_options with send_open_enrollment_notices set to true' do
+      expect(result.value![:notice_options][:send_open_enrollment_notices]).to be_truthy
     end
   end
 
