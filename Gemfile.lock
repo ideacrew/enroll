@@ -7,8 +7,8 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 7ba3ac4c0b1e0a792fbff3f1b0b3067a2bf1b411
-  branch: atp_cv_transform_v3
+  revision: 9f007a5cef799be0548e89e137409ed24e0a95b8
+  branch: release_0.4.0
   specs:
     aca_entities (0.4.0)
       deep_merge
