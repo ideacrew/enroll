@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #Capybara.ignore_hidden_elements = false
 
 module BrokerWorld
@@ -14,7 +16,7 @@ end
 
 World(BrokerWorld)
 
-Given (/^that a broker exists$/) do
+Given(/^that a broker exists$/) do
   broker_agency
   broker :with_family, :broker_with_person, organization: broker_agency
   broker_agency_profile = broker_agency.broker_agency_profile
@@ -37,27 +39,22 @@ When(/^click on the New Quote button$/) do
 end
 
 When(/^.+ clicks on the Add Prospect Employer button$/) do
-  find(:xpath, "//*[@id='myTabContent']/div/div[4]/div/a").click
+  find(BrokerEmployersPage.add_prospect_employer_btn).click
 end
 
 And(/^Primary Broker creates new Prospect Employer with default_office_location$/) do
-  find('#organization_legal_name').click
-  fill_in 'organization[legal_name]', :with => "emp1"
-  fill_in 'organization[dba]', :with => 101010
-
-  find('.interaction-choice-control-organization-entity-kind').click
-  find(".interaction-choice-control-organization-entity-kind-2").click
-
-  find(:xpath, "//select[@name='organization[entity_kind]']/option[@value='c_corporation']")
-  fill_in 'organization[office_locations_attributes][0][address_attributes][address_1]', :with => "1818"
-  fill_in 'organization[office_locations_attributes][0][address_attributes][address_2]', :with => "exp st"
-  fill_in 'organization[office_locations_attributes][0][address_attributes][city]', :with => EnrollRegistry[:enroll_app].setting(:contact_center_city).item
-  fill_in 'organization[office_locations_attributes][0][address_attributes][zip]', :with => EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item
-  select EnrollRegistry[:enroll_app].setting(:state_abbreviation).item, from: "organization_office_locations_attributes_0_address_attributes_state"
-  fill_in 'organization[office_locations_attributes][0][phone_attributes][area_code]', :with => "202"
-  fill_in 'organization[office_locations_attributes][0][phone_attributes][number]', :with => "5551212"
-  fill_in 'organization[office_locations_attributes][0][phone_attributes][extension]', :with => "22332"
-  find('.interaction-click-control-confirm').click
+  fill_in BrokerAddProspectEmployerPage.legal_name, :with => "emp1"
+  fill_in BrokerAddProspectEmployerPage.dba, :with => 101_010
+  find(BrokerAddProspectEmployerPage.entity_kind_dropdown).click
+  find(BrokerAddProspectEmployerPage.select_c_corporation).click
+  fill_in BrokerAddProspectEmployerPage.address_1, :with => "1818"
+  fill_in BrokerAddProspectEmployerPage.address_2, :with => "exp st"
+  fill_in BrokerAddProspectEmployerPage.city, :with => EnrollRegistry[:enroll_app].setting(:contact_center_city).item
+  fill_in BrokerAddProspectEmployerPage.zip, :with => EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item
+  fill_in BrokerAddProspectEmployerPage.area_code, :with => "202"
+  fill_in BrokerAddProspectEmployerPage.number, :with => "5551212"
+  fill_in BrokerAddProspectEmployerPage.extension, :with => "22332"
+  find(BrokerAddProspectEmployerPage.confirm_btn).click
 end
 
 And(/^.+ should see successful message$/) do
@@ -66,7 +63,7 @@ end
 
 And(/^the broker clicks Actions dropdown and clicks View Quotes from dropdown menu$/) do
   path = SponsoredBenefits::Organizations::PlanDesignOrganization.all.first.id.to_s
-  find("#dropdown_for_plan_design_" + path, :text => "Actions").click
+  find("#dropdown_for_plan_design_#{path}", :text => "Actions").click
   find("#plan_design_#{path}> ul > li:nth-child(1) > a", :text => "View Quotes").click
   wait_for_ajax(3, 2)
 end
@@ -78,7 +75,7 @@ end
 And(/^the broker clicks Actions dropdown and clicks Create Quote from dropdown menu$/) do
   #plan = FactoryBot.create(:plan, :with_premium_tables, active_year: TimeKeeper.date_of_record.year)
   path = SponsoredBenefits::Organizations::PlanDesignOrganization.all.first.id.to_s
-  find("#dropdown_for_plan_design_" + path, :text => "Actions").click
+  find("#dropdown_for_plan_design_#{path}", :text => "Actions").click
   find("#plan_design_#{path}> ul > li:nth-child(2) > a", :text => "Create Quote").click
   wait_for_ajax(3, 2)
 end
@@ -88,12 +85,10 @@ Then(/^Primary Broker should be on the Roster page of a Create quote$/) do
 end
 
 And(/^Primary Broker enters quote name$/) do
-  find('#forms_plan_design_proposal_title').click
-  fill_in 'forms_plan_design_proposal[title]', :with => "Test Quote"
-
-  find(:xpath, "//*[@id='new_forms_plan_design_proposal']/div[1]/div/div[1]/div[2]/div/div[2]/div").click
+  fill_in BrokerCreateQuotePage.quote_name, :with => "Test Quote"
+  find(BrokerCreateQuotePage.select_start_on_dropdown).click
   expect(page).to have_content((TimeKeeper.date_of_record + 2.months).strftime("%B %Y"))
-  find('li', :text => "#{(TimeKeeper.date_of_record + 2.months).strftime('%B %Y')}").click
+  find('li', :text => (TimeKeeper.date_of_record + 2.months).strftime('%B %Y').to_s).click
   wait_for_ajax(3, 2)
 end
 
@@ -112,8 +107,8 @@ And(/^.+ sees quote for (.*) employer$/) do |employer_name|
   expect(page).to have_content("Quote for #{employer_name}")
 end
 
-And(/^the broker clicks on Select Health Benefits button$/) do
-  find('.interaction-click-control-select-health-benefits').click
+And(/^.+ clicks on Select Health Benefits button$/) do
+  find(BrokerCreateQuotePage.select_health_benefits_btn).click
 end
 
 When(/^.+ clicks Actions for that Employer$/) do
@@ -131,25 +126,25 @@ end
 
 
 
-Then(/^broker publishes the quote$/) do
+Then(/^.+ publishes the quote$/) do
   wait_for_ajax(3, 2)
-  find(:xpath, "//*[@id='new_forms_plan_design_proposal']/div[9]", :visible => false).click
-  find(:xpath,"//*[@id='new_forms_plan_design_proposal']/div[3]/div/div/div[2]/div[1]/div/div[1]/label/div/div[2]/div/div[1]/h3").click
+  find(BrokerHealthBenefitsPage.select_refrence_plan).click
   wait_for_ajax(3, 2)
-  find('.interaction-click-control-publish-quote').click
+  find(BrokerHealthBenefitsPage.publish_quote_btn).click
+  expect(page).to have_content("Quote Published")
 end
 
-Then(/^the broker selects plan offerings by metal level and enters (.*) for employee and deps$/) do |int|
+Then(/^.+ selects plan offerings by metal level and enters (.*) for employee and deps$/) do |int|
   wait_for_ajax(3, 2)
-  find(:xpath, "//*[@id='pdp-bms']/div/ul/li[2]/label/div").click
+  find(BrokerHealthBenefitsPage.by_meta_level_tab).click
   wait_for_ajax(3, 2)
   expect(page).to have_content("Gold")
-  find(:xpath, "//*[@id='metalLevelCarrierList']/div[3]/div[2]/label/h3").click
+  choose(BrokerHealthBenefitsPage.gold_radiobtn)
   wait_for_ajax(3, 2)
-  fill_in "forms_plan_design_proposal[profile][benefit_sponsorship][benefit_application][benefit_group][relationship_benefits_attributes][0][premium_pct]", with: int.to_i
-  fill_in "forms_plan_design_proposal[profile][benefit_sponsorship][benefit_application][benefit_group][relationship_benefits_attributes][1][premium_pct]", with: int.to_i
-  fill_in "forms_plan_design_proposal[profile][benefit_sponsorship][benefit_application][benefit_group][relationship_benefits_attributes][2][premium_pct]", with: int.to_i
-  fill_in "forms_plan_design_proposal[profile][benefit_sponsorship][benefit_application][benefit_group][relationship_benefits_attributes][3][premium_pct]", with: int.to_i
+  fill_in BrokerHealthBenefitsPage.employer_employee_contribution, with: int.to_i
+  fill_in BrokerHealthBenefitsPage.employer_spouse_contribution, with: int.to_i
+  fill_in BrokerHealthBenefitsPage.employer_domestic_partner_contribution, with: int.to_i
+  fill_in BrokerHealthBenefitsPage.employer_child_under_26_contribution, with: int.to_i
 end
 
 Then(/^the broker should see that the save benefits button is enabled$/) do
@@ -191,13 +186,13 @@ Then(/^the broker should see the data in the table$/) do
 end
 
 Then(/^the broker enters the quote effective date$/) do
-  select "#{(TimeKeeper.date_of_record+3.month).strftime("%B %Y")}", :from => "quote_start_on"
+  select (TimeKeeper.date_of_record + 3.month).strftime('%B %Y').to_s, :from => "quote_start_on"
 end
 
 When(/^the broker selects employer type$/) do
  #find('.interaction-choice-control-quote-employer-type').click()
- select "Prospect", :from => "quote_employer_type"
- fill_in 'quote[employer_name]', with: "prospect test Employee"
+  select "Prospect", :from => "quote_employer_type"
+  fill_in 'quote[employer_name]', with: "prospect test Employee"
 end
 
 When(/^broker enters valid information$/) do
@@ -226,7 +221,7 @@ Then(/^the broker clicks Actions dropdown$/) do
 end
 
 When(/^the broker clicks delete$/) do
-  find('a', text: "Delete"). click
+  find('a', text: "Delete").click
 end
 
 Then(/^the broker sees the confirmation$/) do
@@ -258,7 +253,7 @@ When(/^the broker clicks on quote$/) do
   click_link 'Test Quote'
 end
 
-Given(/^the Plans exist$/) do
+Given(/^Health and Dental plans exist$/) do
   sys_year = TimeKeeper.date_of_record.year
 
   # TODO: create bcps with proper OE dates and check the TimeKeeper against it.
@@ -337,4 +332,14 @@ end
 
 When(/^the broker clicks Dental Features$/) do
   find('.interaction-click-control-dental-features-and-cost-criteria').click
+end
+
+And(/^prospect employer exist for (.*?)$/) do |broker_agency_name|
+  create_prospect_employer(broker_agency_name)
+end
+
+And(/^Primary broker clicks Actions dropdown and clicks Create Quote$/) do
+  find(BrokerEmployersPage.actions_dropdown).click
+  expect(page).to have_css('.btn.btn-xs', text: 'Create Quote')
+  find(BrokerEmployersPage.create_quote).click
 end

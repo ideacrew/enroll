@@ -645,7 +645,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
         vlp_subject: 'I-551 (Permanent Resident Card)',
         alien_number: '123456789',
         card_number: 'abg1234567890',
-        expiration_date: nil
+        expiration_date: TimeKeeper.date_of_record.to_datetime
       }
       applicant.update_attributes!(vlp_params)
     end

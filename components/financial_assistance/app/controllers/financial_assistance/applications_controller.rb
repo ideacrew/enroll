@@ -55,7 +55,7 @@ module FinancialAssistance
               redirect_to wait_for_eligibility_response_application_path(@application)
             else
               @application.unsubmit!
-              redirect_to application_publish_error_application_path(@application)
+              redirect_to application_publish_error_application_path(@application), flash: { error: "Submission Error: #{publish_result.failure}" }
             end
           else
             render 'workflow/step'

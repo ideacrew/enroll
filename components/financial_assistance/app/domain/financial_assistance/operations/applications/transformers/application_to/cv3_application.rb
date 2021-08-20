@@ -478,7 +478,7 @@ module FinancialAssistance
                citizenship_number: applicant.citizenship_number,
                card_number: applicant.card_number,
                country_of_citizenship: applicant.country_of_citizenship,
-               expiration_date: applicant.expiration_date&.to_date,
+               expiration_date: applicant.expiration_date&.to_datetime,
                issuing_country: applicant.issuing_country,
                status: nil, # not sure what should be value here
                verification_type: nil, #not sure of value.

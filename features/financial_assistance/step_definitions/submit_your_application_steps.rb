@@ -166,6 +166,7 @@ Then(/^the submit button will be enabled$/) do
 end
 
 Then(/^the user is on the Error Submitting Application page$/) do
+  expect(page).to have_content('Submission Error:')
   expect(page).to have_content('Error Submitting Application')
 end
 
