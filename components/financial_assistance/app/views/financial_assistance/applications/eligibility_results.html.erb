@@ -67,7 +67,7 @@
             <% csr_73_87_or_94_applicants = csr_73_87_or_94_eligible_applicants?(params[:id]) %>
             <% if csr_73_87_or_94_applicants.present? %>
               <p class="mt-10 mb-0">
-                They also <strong>qualify for lower <%= render partial:"shared/glossary", locals: {key: "Out_of_Pocket_Costs", title: "Out-of-Pocket Costs", term: "out-of-pocket costs" } %></strong> including lower <%= render partial:"shared/glossary", locals: {key: "deductible", title: "annual deductibles", term: "annual deductibles" } %> and lower <%= render partial:"shared/glossary", locals: {key: "copayment", title: "Copayments", term: "copayments" } %>. This <strong>benefit is only available for a silver plan.</strong> To select a <%= render partial:"shared/glossary", locals: {key: "Silver_Health_Plan", title: "Silver Health Plan", term: "Silver Health Plan" } %>, look for a checkmark
+                These people <strong>qualify for lower <%= render partial:"shared/glossary", locals: {key: "Out_of_Pocket_Costs", title: "Out-of-Pocket Costs", term: "out-of-pocket costs" } %></strong> including lower <%= render partial:"shared/glossary", locals: {key: "deductible", title: "annual deductibles", term: "annual deductibles" } %> and lower <%= render partial:"shared/glossary", locals: {key: "copayment", title: "Copayments", term: "copayments" } %>. This <strong>benefit is only available for a silver plan.</strong> To select a <%= render partial:"shared/glossary", locals: {key: "Silver_Health_Plan", title: "silver health plan", term: "silver health plan" } %>, look for a checkmark
                 <i class="fa fa-check-square-o col-green" aria-hidden="true"></i>
                 next to the plan name.
               </p>
@@ -237,7 +237,9 @@
         <div class="border-bottom-1px"></div>
         <div class="er-medicaid mt-20">
           <div class="er-medicaid-prsn">
-            <%= l10n("faa.eligibility_go_to_my_account_message") %>    
+            <p>
+              <%= l10n("faa.eligibility_go_to_my_account_message") %>  
+            </p>  
             <div class='row'>
               <div class="col-md-8">
               </div>
