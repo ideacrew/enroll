@@ -8,7 +8,7 @@ require 'aca_entities/atp/transformers/cv/family'
 require 'aca_entities/atp/operations/family'
 require 'aca_entities/serializers/xml/medicaid/atp'
 
-# rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/ClassLength, Metrics/CyclomaticComplexity
+# rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/ClassLength
 
 # RAILS_ENV=production bundle exec rails db:migrate:up source=MCR file_path="file_path" VERSION="20210512153640"
 # RAILS_ENV=production bundle exec rails db:migrate:up source=atp file_path="file_path" VERSION="20210512153640"
@@ -84,7 +84,7 @@ class MigrateFamily < Mongoid::Migration
       person_params = sanitize_person_params(family_member_hash)
       person_result = create_or_update_person(person_params)
       if person_result.success?
-        @person = person_result.success     
+        @person = person_result.success
         @family_member = create_or_update_family_member(@person, @family, family_member_hash)
         consumer_role_params = family_member_hash['person']['consumer_role']
         create_or_update_consumer_role(consumer_role_params.merge(is_consumer_role: true), @family_member)
@@ -336,7 +336,7 @@ class MigrateFamily < Mongoid::Migration
             puts "Started processing file: #{@filepath}"
             extract @filepath
             transform ext_input_hash
-            # result = validate cv3_family_hash          
+            # result = validate cv3_family_hash
             # puts "CV validation failed: #{result.errors.to_h}" if result.errors.present?
             load_data cv3_family_hash #unless result.errors.present?
             puts "Ended processing file: #{@filepath}"
@@ -523,4 +523,4 @@ class MigrateFamily < Mongoid::Migration
     end
   end
 end
-# rubocop:enable Metrics/AbcSize, Metrics/MethodLength, Metrics/ClassLength, Metrics/CyclomaticComplexity
+# rubocop:enable Metrics/AbcSize, Metrics/MethodLength, Metrics/ClassLength
