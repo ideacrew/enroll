@@ -232,6 +232,19 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model 
         end
       end
 
+      context 'for applicant evidences' do
+        before do
+          applicant.evidences << FinancialAssistance::Evidence.new(key: :esi, title: "MEC", eligibility_status: "Verified")
+          factory = described_class.new(application)
+          duplicate_application = factory.duplicate
+          @duplicate_applicant = duplicate_application.applicants.first
+        end
+
+        it 'should not hbae evidences' do
+          expect(@duplicate_applicant.evidences).to eq []
+        end
+      end
+
       context 'for claimed_as_tax_dependent_by' do
         let(:mocked_params) { { claimed_as_tax_dependent_by: BSON::ObjectId.new } }
 
