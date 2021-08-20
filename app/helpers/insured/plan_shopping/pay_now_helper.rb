@@ -94,6 +94,18 @@ module Insured
           "https://"
         end
       end
+
+      #this method checks the settings
+      #around enrollment tile for paynow functionality
+      # rubocop:disable Metrics/CyclomaticComplexity
+      def enable_pay_now(hbx_enrollment)
+        @issuer_key = hbx_enrollment&.product&.issuer_profile&.legal_name&.downcase&.gsub(' ', '_')
+        return false unless individual?(hbx_enrollment) && EnrollRegistry.key?("#{@issuer_key}_pay_now")
+        rr_feature = EnrollRegistry["#{@issuer_key}_pay_now".to_sym]
+        return false unless rr_feature&.enabled?
+        rr_feature.setting(:enrollment_tile)&.item
+      end
+      # rubocop:enable Metrics/CyclomaticComplexity
     end
   end
 end
