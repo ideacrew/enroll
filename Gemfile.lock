@@ -7,10 +7,10 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 1d042c6b6c43189fa86a3b8609b79f3b23cb60d7
+  revision: 9f007a5cef799be0548e89e137409ed24e0a95b8
   branch: release_0.4.0
   specs:
-    aca_entities (0.3.0)
+    aca_entities (0.4.0)
       deep_merge
       dry-monads (~> 1.2)
       dry-struct (~> 1.0)
@@ -1208,4 +1208,4 @@ RUBY VERSION
    ruby 2.5.1p57
 
 BUNDLED WITH
-   2.2.12
+   2.2.19
