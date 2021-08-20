@@ -212,6 +212,20 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model 
           expect(@duplicate_applicant.net_annual_income).to be_nil
         end
       end
+
+      context 'for applicant evidences' do
+
+        before do
+          applicant.evidences << FinancialAssistance::Evidence.new(key: :esi, title: "MEC", eligibility_status: "Verified")
+          factory = described_class.new(application)
+          duplicate_application = factory.duplicate
+          @duplicate_applicant = duplicate_application.applicants.first
+        end
+
+        it 'should not copy net_annual_income' do
+          expect(@duplicate_applicant.evidences).to be []
+        end
+      end
     end
   end
 end
