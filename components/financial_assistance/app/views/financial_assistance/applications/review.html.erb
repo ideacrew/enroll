@@ -26,7 +26,7 @@
                 <% income_and_deductions_for(applicant).each do |embedded_document| %>
                   <tr>
                     <td> <%= applicant.full_name %> </td>
-                    <td> <%= FinancialAssistance::Income::OTHER_INCOME_TYPE_KIND[embedded_document.kind.to_sym] %> </td>
+                    <td> <%= l10n("faa.income.#{embedded_document.kind}") %> </td>
                     <td> <%= embedded_document.frequency_kind.humanize %> </td>
                     <td>
                     <b>
@@ -295,7 +295,7 @@
           <% if FinancialAssistanceRegistry.feature_enabled?(:full_medicaid_determination_step) %>
             <div class="row row-form-wrapper ptb no-buffer row-height form-content">
                <div class="col-md-6"><%= human_boolean @application.full_medicaid_determination %></div>
-               <div>     
+               <div>
             </div>
           <% end %>
           <% if FinancialAssistanceRegistry.feature_enabled?(:display_medicaid_question) %>
