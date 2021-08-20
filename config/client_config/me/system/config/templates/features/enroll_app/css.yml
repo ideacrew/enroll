@@ -3,6 +3,11 @@ registry:
   - namespace:
       - :css_components
     features:
+      - key: :application_font
+        is_enabled: true
+        settings:
+          - key: :font_family
+            item: 'Barlow'
       - key: :selectric_hover
         is_enabled: true
         settings:
