@@ -1,7 +1,7 @@
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 23a6f43b50561023fcda9b676710ed6fceb00ee3
-  branch: release_0.3.0
+  revision: 1d042c6b6c43189fa86a3b8609b79f3b23cb60d7
+  branch: release_0.4.0
   specs:
     aca_entities (0.3.0)
       deep_merge
@@ -10,6 +10,7 @@ GIT
       dry-transformer (~> 0.1.1)
       dry-types (~> 1.0)
       dry-validation (~> 1.2)
+      iso_country_codes
       nokogiri-happymapper
       oj (~> 3.11)
 
@@ -25,10 +26,10 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/event_source.git
-  revision: 194046a9d10a664595949624d597d69d9b6a05b3
+  revision: 7f261d5a8f985b8434572390b50065b02b6bcfcd
   branch: trunk
   specs:
-    event_source (0.5.2)
+    event_source (0.5.3)
       bunny (>= 1.7.1)
       deep_merge (~> 1.2.0)
       dry-events (~> 0.3)
@@ -257,8 +258,8 @@ GEM
     faraday-em_synchrony (1.0.0)
     faraday-excon (1.1.0)
     faraday-net_http (1.0.1)
-    faraday-net_http_persistent (1.1.0)
-    faraday_middleware (1.0.0)
+    faraday-net_http_persistent (1.2.0)
+    faraday_middleware (1.1.0)
       faraday (~> 1.0)
     ffi (1.15.3)
     font-awesome-rails (4.7.0.5)
@@ -286,6 +287,7 @@ GEM
     i18n (1.8.5)
       concurrent-ruby (~> 1.0)
     ice_nine (0.11.2)
+    iso_country_codes (0.7.8)
     little-plugger (1.1.4)
     logging (2.3.0)
       little-plugger (~> 1.1)
@@ -305,7 +307,7 @@ GEM
       nokogiri (~> 1)
       rake
     mini_mime (1.0.2)
-    mini_portile2 (2.5.3)
+    mini_portile2 (2.6.1)
     minitest (5.14.1)
     monetize (1.9.4)
       money (~> 6.12)
@@ -344,12 +346,12 @@ GEM
     mustermann (1.1.1)
       ruby2_keywords (~> 0.0.1)
     nio4r (2.5.2)
-    nokogiri (1.11.7)
-      mini_portile2 (~> 2.5.0)
+    nokogiri (1.12.2)
+      mini_portile2 (~> 2.6.1)
       racc (~> 1.4)
     nokogiri-happymapper (0.8.1)
       nokogiri (~> 1.5)
-    oj (3.12.1)
+    oj (3.13.0)
     orm_adapter (0.5.0)
     ox (2.14.5)
     parallel (1.19.2)
@@ -405,7 +407,7 @@ GEM
       thor (>= 0.19.0, < 2.0)
     rainbow (3.0.0)
     rake (13.0.1)
-    redis (4.3.1)
+    redis (4.4.0)
     redis-namespace (1.8.1)
       redis (>= 3.0.4)
     regexp_parser (1.7.1)
@@ -467,10 +469,10 @@ GEM
     rubocop-rspec (1.43.1)
       rubocop (~> 0.87)
     ruby-progressbar (1.10.1)
-    ruby2_keywords (0.0.4)
+    ruby2_keywords (0.0.5)
     ruby_parser (3.14.2)
       sexp_processor (~> 4.9)
-    rufus-scheduler (3.7.0)
+    rufus-scheduler (3.8.0)
       fugit (~> 1.1, >= 1.1.6)
     serverengine (1.5.11)
       sigdump (~> 0.2.2)

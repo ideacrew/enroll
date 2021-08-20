@@ -4,6 +4,7 @@ RSpec.shared_context 'cms ME simple_scenarios test_case_d', :shared_context => :
   let(:current_date) { Date.today }
   let(:member_dob) { Date.new(current_date.year - 22, current_date.month, current_date.day) }
   let(:aptc_effective_date) { Date.today.next_month.beginning_of_month }
+  let(:notice_options) { { send_eligibility_notices: true, send_open_enrollment_notices: false } }
   let(:response_payload) do
     { :family_reference => {:hbx_id => "10011"},
       :assistance_year => current_date.year,
@@ -126,6 +127,7 @@ RSpec.shared_context 'cms ME simple_scenarios test_case_d', :shared_context => :
       :us_state => "DC",
       :hbx_id => "200000126",
       :oe_start_on => Date.new(current_date.year, 11, 1),
+      notice_options: notice_options,
       :mitc_households => [{ :household_id => "1", :people => [{ :person_id => 95 }] }],
       :mitc_tax_returns => [{ :filers => [{ :person_id => 95 }], :dependents => [] }] }
   end

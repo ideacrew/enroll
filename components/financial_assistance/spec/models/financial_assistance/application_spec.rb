@@ -4,6 +4,7 @@ require 'rails_helper'
 require 'aasm/rspec'
 
 RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after_each do
+  include Dry::Monads[:result, :do]
 
   let(:family_id) { BSON::ObjectId.new }
   let!(:year) { TimeKeeper.date_of_record.year }
@@ -95,7 +96,9 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
     it 'should have renewal basse year range constant' do
       expect(class_constants.include?(:RENEWAL_BASE_YEAR_RANGE)).to be_truthy
-      expect(described_class::RENEWAL_BASE_YEAR_RANGE).to eq(2013..TimeKeeper.date_of_record.year + 1)
+      # Open Enrollment case where user can submit application for next_year and can authorize
+      # renewal for next 5 years which can be current_year + 6 years.
+      expect(described_class::RENEWAL_BASE_YEAR_RANGE).to eq(2013..TimeKeeper.date_of_record.year + 6)
     end
 
     it 'should have applicant kinds constant' do
@@ -341,6 +344,18 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     it 'updates assistance year' do
       application.send(:set_assistance_year)
       expect(application.assistance_year).to eq(FinancialAssistanceRegistry[:enrollment_dates].settings(:application_year).item.constantize.new.call.value!)
+    end
+
+    context 'for existing assistance_year' do
+      before do
+        application.update_attributes!(assistance_year: (TimeKeeper.date_of_record.year + 3))
+        application.send(:set_assistance_year)
+      end
+
+      it 'should not update assistance year' do
+        expect(application.assistance_year).not_to eq(FinancialAssistanceRegistry[:enrollment_dates].settings(:application_year).item.constantize.new.call.value!)
+        expect(application.assistance_year).to eq(TimeKeeper.date_of_record.year + 3)
+      end
     end
   end
 
@@ -788,4 +803,343 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
   end
 
+  context 'workflow_state_transitions' do
+    context 'renewal_draft' do
+      context 'event: submit' do
+        before do
+          application.update_attributes!(aasm_state: 'renewal_draft')
+        end
+
+        context 'from renewal_draft to submitted' do
+          context 'guard success' do
+            before do
+              allow(application).to receive(:is_application_valid?).and_return(true)
+              application.submit!
+            end
+
+            it 'should transition application to submit' do
+              expect(application.reload.submitted?).to be_truthy
+            end
+          end
+
+          context 'guard failure' do
+            before do
+              application.submit!
+            end
+
+            it 'should not transition application to submit' do
+              expect(application.reload.renewal_draft?).to be_truthy
+            end
+          end
+        end
+
+        context 'from renewal_draft to renewal_draft' do
+          context 'guard success' do
+            before do
+              application.submit!
+            end
+
+            it 'should transition application to renewal_draft' do
+              expect(application.reload.renewal_draft?).to be_truthy
+            end
+          end
+        end
+      end
+
+      context 'event: unsubmit' do
+        context 'from submitted to renewal_draft' do
+          before do
+            application.assign_attributes(aasm_state: 'submitted')
+            application.save!
+          end
+
+          context 'guard success' do
+            before do
+              application.workflow_state_transitions << WorkflowStateTransition.new(
+                from_state: 'renewal_draft',
+                to_state: 'submitted'
+              )
+              application.unsubmit!
+            end
+
+            it 'should transition application to renewal_draft' do
+              expect(application.reload.renewal_draft?).to be_truthy
+            end
+          end
+
+          context 'guard failure' do
+            before do
+              application.unsubmit!
+            end
+
+            it 'should not transition application to draft' do
+              expect(application.reload.draft?).to be_truthy
+            end
+          end
+        end
+      end
+    end
+
+    context 'submission_pending' do
+      context 'event: fail_submission' do
+        before do
+          application.update_attributes!(aasm_state: 'renewal_draft')
+        end
+
+        context 'from renewal_draft to submission_pending' do
+          before do
+            allow(application).to receive(:is_application_valid?).and_return(true)
+            application.fail_submission!
+          end
+
+          it 'should transition application to submission_pending' do
+            expect(application.reload.submission_pending?).to be_truthy
+          end
+        end
+      end
+    end
+  end
+
+  context 'check_for_valid_predecessor' do
+    context 'invalid predecessor_id' do
+      it 'should return validation errors' do
+        expect do
+          application.update_attributes!({ predecessor_id: BSON::ObjectId.new })
+        end.to raise_error(Mongoid::Errors::Validations,
+                           /Predecessor expected an instance of FinancialAssistance::Application./)
+      end
+    end
+  end
+
+  context 'advance_day' do
+    let(:event) { Success(double) }
+    let(:obj)  { ::FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication.new }
+
+    before do
+      allow(::FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication).to receive(:new).and_return(obj)
+      allow(obj).to receive(:build_event).and_return(event)
+      allow(event.success).to receive(:publish).and_return(true)
+    end
+
+    it 'should not raise error with input date' do
+      expect{ ::FinancialAssistance::Application.advance_day(TimeKeeper.date_of_record) }.not_to raise_error
+    end
+
+    it 'should not raise error without any input' do
+      expect{ ::FinancialAssistance::Application.advance_day(nil) }.not_to raise_error
+    end
+
+    after :all do
+      file_name = "#{Rails.root}/log/fa_application_advance_day_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
+      File.delete(file_name) if File.exist?(file_name)
+    end
+  end
+
+  context 'attesations_complete' do
+    context 'application invalid by one of the attestation' do
+      [:is_requesting_voter_registration_application_in_mail, :is_renewal_authorized,
+       :medicaid_terms, :report_change_terms, :medicaid_insurance_collection_terms,
+       :parent_living_out_of_home_terms, :submission_terms].each do |key|
+        before do
+          application.send("#{key}=", nil)
+          application.save!
+        end
+
+        it 'should return false' do
+          expect(application.reload.attesations_complete?).to be_falsey
+        end
+      end
+    end
+
+    context 'application valid by attestation' do
+      before do
+        keys = [:is_requesting_voter_registration_application_in_mail,
+                :is_renewal_authorized,
+                :medicaid_terms,
+                :report_change_terms,
+                :medicaid_insurance_collection_terms,
+                :parent_living_out_of_home_terms,
+                :submission_terms,
+                :attestation_terms]
+        keys.each do |key|
+          application.send("#{key}=", true)
+        end
+        application.save!
+      end
+
+      it 'should return true' do
+        expect(application.reload.attesations_complete?).to be_truthy
+      end
+    end
+  end
+
+  context 'have_permission_to_renew' do
+    context 'no value for aasistance_year' do
+      before do
+        application.update_attributes!({ assistance_year: nil,
+                                         renewal_base_year: TimeKeeper.date_of_record.year })
+      end
+
+      it 'should return false' do
+        expect(application.reload.have_permission_to_renew?).to be_falsey
+      end
+    end
+
+    context 'no value for renewal_base_year' do
+      before do
+        application.update_attributes!({ assistance_year: TimeKeeper.date_of_record.year,
+                                         renewal_base_year: nil })
+      end
+
+      it 'should return false' do
+        expect(application.reload.have_permission_to_renew?).to be_falsey
+      end
+    end
+
+    context 'expired permission for renewal' do
+      before do
+        application.update_attributes!({ assistance_year: TimeKeeper.date_of_record.year.next,
+                                         renewal_base_year: TimeKeeper.date_of_record.year })
+      end
+
+      it 'should return false' do
+        expect(application.reload.have_permission_to_renew?).to be_falsey
+      end
+    end
+
+    context 'maximum number of years(5) permission for renewal' do
+      before do
+        application.update_attributes!({ assistance_year: TimeKeeper.date_of_record.year.next,
+                                         renewal_base_year: TimeKeeper.date_of_record.year + 5 })
+      end
+
+      it 'should return true' do
+        expect(application.reload.have_permission_to_renew?).to be_truthy
+      end
+    end
+
+    context 'limited permission for renewal' do
+      [1, 2, 3, 4, 5].each do |year|
+        before do
+          application.update_attributes!({ assistance_year: TimeKeeper.date_of_record.year.next,
+                                           renewal_base_year: TimeKeeper.date_of_record.year + year })
+        end
+
+        it 'should return true' do
+          expect(application.reload.have_permission_to_renew?).to be_truthy
+        end
+      end
+    end
+  end
+
+  context 'set_renewal_base_year' do
+    let(:applicant2) { application.applicants[1] }
+    let(:applicant3) { application.applicants[2] }
+
+    before do
+      application.applicants.first.update_attributes!(is_primary_applicant: true)
+      application.ensure_relationship_with_primary(applicant2, 'spouse')
+      application.ensure_relationship_with_primary(applicant3, 'child')
+      application.update_or_build_relationship(applicant2, applicant3, 'parent')
+      application.update_or_build_relationship(applicant3, applicant2, 'child')
+      application.save!
+    end
+
+    context 'expired permission for renewal' do
+      before do
+        application.update_attributes!({ aasm_state: 'draft', is_renewal_authorized: false, years_to_renew: 0 })
+        application.submit!
+      end
+
+      it 'should return value same as assistance_year' do
+        expect(application.reload.renewal_base_year).to eq(application.reload.assistance_year)
+      end
+    end
+
+    context 'maximum number of years(5) permission for renewal' do
+      before do
+        application.update_attributes!({ aasm_state: 'draft', is_renewal_authorized: true })
+        application.submit!
+      end
+
+      it 'should return the sum of assistance_year & max of YEARS_TO_RENEW_RANGE' do
+        expect(application.reload.renewal_base_year).to eq(
+          application.reload.assistance_year +
+            FinancialAssistance::Application::YEARS_TO_RENEW_RANGE.max
+        )
+      end
+    end
+
+    context 'limited permission for renewal' do
+      before do
+        application.update_attributes!({ aasm_state: 'draft', is_renewal_authorized: false, years_to_renew: 3 })
+        application.submit!
+      end
+
+      it 'should return the sum of assistance_year & years_to_renew' do
+        expect(application.reload.renewal_base_year).to eq(application.reload.assistance_year + 3)
+      end
+    end
+
+    context 'for renewal_base_year already set' do
+      before do
+        application.update_attributes!(
+          { aasm_state: 'draft',
+            is_renewal_authorized: false,
+            years_to_renew: 0,
+            assistance_year: TimeKeeper.date_of_record.year.next,
+            renewal_base_year: TimeKeeper.date_of_record.year.pred }
+        )
+        application.submit!
+      end
+
+      it 'should not update renewal_base_year' do
+        expect(application.reload.renewal_base_year).to eq(TimeKeeper.date_of_record.year.pred)
+        expect(application.reload.renewal_base_year).not_to eq(TimeKeeper.date_of_record.year.next)
+      end
+    end
+  end
+
+  describe 'calculate_total_net_income_for_applicants' do
+    before do
+      application.applicants.first.update_attributes!(is_primary_applicant: true, net_annual_income: nil)
+      primary_appli = application.primary_applicant
+      primary_appli.incomes << FinancialAssistance::Income.new(
+        { title: 'Financial Income',
+          kind: 'net_self_employment',
+          amount: 500.00,
+          start_on: Date.new(application.assistance_year || TimeKeeper.date_of_record.year.pred),
+          frequency_kind: 'yearly' }
+      )
+      primary_appli.save!
+      application.ensure_relationship_with_primary(applicant2, 'spouse')
+      application.ensure_relationship_with_primary(applicant3, 'child')
+      application.update_or_build_relationship(applicant2, applicant3, 'parent')
+      application.update_or_build_relationship(applicant3, applicant2, 'child')
+      application.save!
+    end
+
+    context 'with existing value for net_annual_income' do
+      before do
+        application.primary_applicant.update_attributes!(net_annual_income: 1000.00)
+        application.update_attributes!({ aasm_state: 'draft' })
+        application.submit!
+      end
+
+      it 'should not set value for net_annual_income again as there is existing value' do
+        expect(application.primary_applicant.reload.net_annual_income.to_f).to eq(1000.00)
+      end
+    end
+
+    context 'without existing value for net_annual_income' do
+      before do
+        application.update_attributes!({ aasm_state: 'draft' })
+        application.submit!
+      end
+
+      it 'should set value for net_annual_income as it is nil' do
+        expect(application.primary_applicant.reload.net_annual_income.to_f).to eq(500.00)
+      end
+    end
+  end
 end

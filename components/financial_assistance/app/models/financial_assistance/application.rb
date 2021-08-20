@@ -15,9 +15,14 @@ module FinancialAssistance
     validates :application_submission_validity, presence: true, on: :submission
     validates :before_attestation_validity, presence: true, on: :before_attestation
     validate  :attestation_terms_on_parent_living_out_of_home
+    validate :check_for_valid_predecessor
 
     YEARS_TO_RENEW_RANGE = (0..5).freeze
-    RENEWAL_BASE_YEAR_RANGE = (2013..TimeKeeper.date_of_record.year + 1).freeze
+
+    # Max of this range is set as below because during OE the user can authorize state to renew for up to 5 years from the assistance_year.
+    # Example:
+    #   On 11/15/2021(during OE), user can submit application for 2022 and can authorize renewal for next 5 years i.e. 2022 + 5
+    RENEWAL_BASE_YEAR_RANGE = (2013..TimeKeeper.date_of_record.year.next + YEARS_TO_RENEW_RANGE.max).freeze
 
     APPLICANT_KINDS   = ["user and/or family", "call center rep or case worker", "authorized representative"].freeze
     SOURCE_KINDS      = %w[paper source in-person].freeze
@@ -29,6 +34,8 @@ module FinancialAssistance
     CLOSED_STATUSES = %w[cancelled terminated].freeze
 
     STATES_FOR_VERIFICATIONS = %w[submitted determination_response_error determined].freeze
+
+    RENEWAL_ELIGIBLE_STATES = %w[submitted determined].freeze
 
     # TODO: Need enterprise ID assignment call for Assisted Application
     field :hbx_id, type: String
@@ -89,6 +96,11 @@ module FinancialAssistance
     field :full_medicaid_determination, type: Boolean
     field :workflow, type: Hash, default: { }
 
+    # predecessor_id is the application id of the application which was renewed
+    # predecessor_id is populated if the new application is system generated renewal
+    # predecessor_id is the application preceding this current application
+    field :predecessor_id, type: BSON::ObjectId
+
     embeds_many :eligibility_determinations, inverse_of: :application, class_name: '::FinancialAssistance::EligibilityDetermination'
     embeds_many :relationships, inverse_of: :application, class_name: '::FinancialAssistance::Relationship'
     embeds_many :applicants, inverse_of: :application, class_name: '::FinancialAssistance::Applicant'
@@ -117,6 +129,7 @@ module FinancialAssistance
                                     message: "must fall within range: #{YEARS_TO_RENEW_RANGE}"
                                   }
 
+    index({ 'family_id' => 1 })
 
     scope :submitted, ->{ any_in(aasm_state: SUBMITTED_STATUS) }
     scope :determined, ->{ any_in(aasm_state: "determined") }
@@ -124,6 +137,8 @@ module FinancialAssistance
     scope :by_hbx_id, ->(hbx_id) { where(hbx_id: hbx_id) }
     scope :for_verifications, -> { where(:aasm_state.in => STATES_FOR_VERIFICATIONS)}
     scope :by_year, ->(year) { where(:assistance_year => year) }
+    scope :created_asc,      -> { order(created_at: :asc) }
+    scope :renewal_draft,    ->{ any_in(aasm_state: 'renewal_draft') }
 
     alias is_joint_tax_filing? is_joint_tax_filing
     alias is_renewal_authorized? is_renewal_authorized
@@ -410,12 +425,19 @@ module FinancialAssistance
     # TODO: define the states and transitions for Assisted Application workflow process
     aasm do
       state :draft, initial: true
+      # :renewal_draft State where the previous year's application is renewed
+      # :renewal_draft state is the initial state for a renewal application
+      state :renewal_draft
+      # :submission_pending is a state where some corrective action is required
+      # :submission_pending is a state where we are unable to submit the application for some reason
+      state :submission_pending
       state :submitted
       state :determination_response_error
       state :determined
 
+      # submit is the same event that can be used in renewal context as well
       event :submit, :after => [:record_transition, :set_submit] do
-        transitions from: :draft, to: :submitted do
+        transitions from: [:draft, :renewal_draft], to: :submitted do
           guard do
             is_application_valid?
           end
@@ -426,9 +448,21 @@ module FinancialAssistance
             !is_application_valid?
           end
         end
+
+        transitions from: :renewal_draft, to: :renewal_draft, :after => :report_invalid do
+          guard do
+            !is_application_valid?
+          end
+        end
       end
 
       event :unsubmit, :after => [:record_transition, :unset_submit] do
+        transitions from: :submitted, to: :renewal_draft do
+          guard do
+            previously_renewal_draft?
+          end
+        end
+
         transitions from: :submitted, to: :draft do
           guard do
             true # add appropriate guard here
@@ -454,6 +488,10 @@ module FinancialAssistance
                     to: :cancelled
       end
 
+      # Currently, this event will be used during renewal generations
+      event :fail_submission, :after => :record_transition do
+        transitions from: :renewal_draft, to: :submission_pending
+      end
     end
 
     # def applicant
@@ -701,6 +739,7 @@ module FinancialAssistance
 
     def calculate_total_net_income_for_applicants
       active_applicants.each do |applicant|
+        next applicant if applicant.net_annual_income.present?
         FinancialAssistance::Operations::Applicant::CalculateAndPersistNetAnnualIncome.new.call({application_assistance_year: assistance_year, applicant: applicant})
       end
     end
@@ -763,7 +802,61 @@ module FinancialAssistance
       active_applicants.map(&:is_ia_eligible).include?(true) && !active_applicants.map(&:is_medicaid_chip_eligible).include?(true)
     end
 
+    class << self
+      def advance_day(new_date)
+        adv_day_logger = Logger.new("#{Rails.root}/log/fa_application_advance_day_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
+        ope_result = FinancialAssistance::Operations::Applications::ProcessDateChangeEvents.new.call(
+          { events_execution_date: new_date, logger: adv_day_logger, renewal_year: TimeKeeper.date_of_record.year.next }
+        )
+        adv_day_logger.info ope_result.success
+      end
+    end
+
+    def attesations_complete?
+      !is_requesting_voter_registration_application_in_mail.nil? &&
+        (is_renewal_authorized.present? || (is_renewal_authorized.is_a?(FalseClass) && years_to_renew.present?)) &&
+        !medicaid_terms.nil? &&
+        !report_change_terms.nil? &&
+        !medicaid_insurance_collection_terms.nil? &&
+        check_parent_living_out_of_home_terms &&
+        !submission_terms.nil?
+    end
+
+    def have_permission_to_renew?
+      renewal_base_year >= assistance_year if assistance_year && renewal_base_year
+    end
+
+    def previously_renewal_draft?
+      workflow_state_transitions.any? { |wst| wst.from_state == 'renewal_draft' }
+    end
+
+    def set_renewal_base_year
+      return if renewal_base_year.present?
+      renewal_year = calculate_renewal_base_year
+      update_attribute(:renewal_base_year, renewal_year) if renewal_year.present?
+    end
+
     private
+
+    def calculate_renewal_base_year
+      ass_year = assistance_year.present? ? assistance_year : TimeKeeper.date_of_record.year
+      if is_renewal_authorized.present?
+        ass_year + YEARS_TO_RENEW_RANGE.max
+      elsif is_renewal_authorized.is_a?(FalseClass)
+        ass_year + years_to_renew
+      end
+    end
+
+    def check_parent_living_out_of_home_terms
+      (parent_living_out_of_home_terms.present? && !attestation_terms.nil?) ||
+        parent_living_out_of_home_terms.is_a?(FalseClass)
+    end
+
+    def check_for_valid_predecessor
+      return if self.predecessor_id.nil?
+      pred_appli = FinancialAssistance::Application.where(id: predecessor_id).first
+      self.errors.add(:predecessor_id, 'expected an instance of FinancialAssistance::Application.') if pred_appli.blank?
+    end
 
     def clean_params(model_params)
       model_params[:attestation_terms] = nil if model_params[:parent_living_out_of_home_terms].present? && model_params[:parent_living_out_of_home_terms] == 'false'
@@ -824,7 +917,7 @@ module FinancialAssistance
       update_attribute(
         :assistance_year,
         FinancialAssistanceRegistry[:enrollment_dates].settings(:application_year).item.constantize.new.call.value!
-      )
+      )  if assistance_year.blank?
     end
 
     def set_effective_date
@@ -918,11 +1011,13 @@ module FinancialAssistance
 
     def set_submit
       return unless submitted?
+      calculate_total_net_income_for_applicants
       set_submission_date
       set_assistance_year
       set_effective_date
       create_eligibility_determinations
       create_verification_documents
+      set_renewal_base_year
     end
 
     def unset_submit

@@ -9,19 +9,20 @@ module FinancialAssistance
     module Applications
       module Transformers
         module ApplicationTo
-          # Application params to be transformed.
+          # Params of an instance(persistance object) of ::FinancialAssistance::Application to be transformed.
           class Cv3Application # rubocop:disable Metrics/ClassLength
             # constructs cv3 payload for medicaid gateway.
 
             include Dry::Monads[:result, :do]
             include Acapi::Notifiers
-            require 'securerandom'
 
-            # @param [ Hash ] params Applicant Attributes
-            # @return [ BenefitMarkets::Entities::Applicant ] applicant Applicant
+            # @param [Hash] opts The options to construct params mapping to ::AcaEntities::MagiMedicaid::Contracts::ApplicationContract
+            # @option opts [::FinancialAssistance::Application] :application
+            # @return [Dry::Monads::Result]
             def call(application)
               application = yield validate(application)
-              request_payload = yield construct_payload(application)
+              notice_options = yield notice_options_for_app(application)
+              request_payload = yield construct_payload(application, notice_options)
 
               Success(request_payload)
             end
@@ -33,7 +34,12 @@ module FinancialAssistance
               Failure("Application is in #{application.aasm_state} state. Please submit application.")
             end
 
-            def construct_payload(application)
+            def notice_options_for_app(application)
+              renewal_app = application.previously_renewal_draft?
+              Success({ send_eligibility_notices: !renewal_app, send_open_enrollment_notices: renewal_app })
+            end
+
+            def construct_payload(application, notice_options)
               payload = {family_reference: {hbx_id: find_family(application.family_id)&.hbx_assigned_id.to_s},
                          assistance_year: application.assistance_year,
                          aptc_effective_date: application.effective_date,
@@ -47,6 +53,7 @@ module FinancialAssistance
                          us_state: application.us_state,
                          hbx_id: application.hbx_id,
                          oe_start_on: Date.new((application.effective_date.year - 1), 11, 1),
+                         notice_options: notice_options,
                          mitc_households: mitc_households(application),
                          mitc_tax_returns: mitc_tax_returns(application)}
               Success(payload)

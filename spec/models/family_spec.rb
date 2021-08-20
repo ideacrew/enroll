@@ -1936,6 +1936,60 @@ describe "#currently_enrolled_products", dbclean: :after_each do
       expect(family.currently_enrolled_products(shopping_enrollment)).to eq []
     end
   end
+
+  describe 'application_applicable_year' do
+    let(:current_year) { TimeKeeper.date_of_record.year }
+    let!(:hbx_profile) do
+      FactoryBot.create(:hbx_profile,
+                        :normal_ivl_open_enrollment,
+                        us_state_abbreviation: EnrollRegistry[:enroll_app].setting(:state_abbreviation).item,
+                        cms_id: "#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.upcase}0")
+    end
+
+    context 'system date within OE' do
+      context 'after start of OE and end of current year i.e usually b/w 11/1, 12/31' do
+        before do
+          allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 11, 5))
+        end
+
+        it 'should return benefit_coverage_period with start_on year as current_year + 1' do
+          expect(Family.application_applicable_year).to eq(current_year.next)
+        end
+      end
+
+      context 'after start of prospective year and end of OE end on i.e usually b/w 1/1, 1/31' do
+        before do
+          allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year.next, 1, 5))
+        end
+
+        it 'should return benefit_coverage_period with start_on year as current_year + 1' do
+          expect(Family.application_applicable_year).to eq(current_year.next)
+        end
+      end
+    end
+
+    context 'system date outside OE' do
+      context 'before start of OE start i.e usually before 11/1' do
+        before do
+          allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 9, 5))
+        end
+
+        it 'should return benefit_coverage_period with start_on year same as current_year' do
+          expect(Family.application_applicable_year).to eq(current_year)
+        end
+      end
+
+      context 'after end of OE i.e usually after 1/31' do
+        before do
+          allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year.next, 4, 5))
+        end
+
+        it 'should return benefit_coverage_period with start_on year as current_year + 1' do
+          expect(Family.application_applicable_year).to eq(current_year.next)
+        end
+      end
+    end
+  end
 end
 
 shared_examples_for 'has aptc enrollment' do |created_at, applied_aptc, market_kind, result|
