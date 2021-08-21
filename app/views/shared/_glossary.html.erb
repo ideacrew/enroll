@@ -1,3 +1,9 @@
+<% if local_assigns[:punctuation].present? %>
+  <% term_display = "#{term}#{local_assigns[:punctuation]}" %>
+<% else %>
+  <% term_display = term %>
+<% end %>
+
 <span class="glossary"
       data-toggle="popover"
       data-placement="auto top"
@@ -13,7 +19,7 @@
           aria-label='Close'
           onclick='$('.glossary').popover('hide');'>
   </button>
-<%= term %></span>
+<%= term_display %></span>
 
 <script>
 $(document).click(function(e){

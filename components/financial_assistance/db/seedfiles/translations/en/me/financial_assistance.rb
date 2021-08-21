@@ -28,7 +28,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.referral" => "Special MaineCare Referral",
   "en.faa.qualified_reason" => "These people may qualify for MaineCare for reasons like age or disability.",
   "en.faa.next_step_with_non_magi" => "<b>NEXT STEP:</b> We are sending your application to the Department of Health and Human Services (DHHS). They will contact you to get more information to see if you qualify.",
-  "en.faa.premium_reductions_1" => "These people are <span>eligible for monthly premium reductions of",
+  "en.faa.premium_reductions_1" => "These people <strong>qualify for lower monthly premiums of %{reduction_amount} per month </strong>.",
   "en.faa.premium_reductions_2" => "per month.</span> This means they won't have to pay full price for health insurance.",
   "en.faa.qualify_for_lower_costs_1" => "These people also qualify for lower out-of-pocket costs - a benefit that lowers other costs like the annual deductible and copayments. ",
   "en.faa.qualify_for_csr_100" => "They also won’t pay anything for services they receive from an Indian Health Service provider.",
@@ -38,15 +38,15 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.does_not_qualify" => "Does not qualify",
   "en.faa.likely_does_not_qualify" => "These people <span> likely don't qualify for ",
   "en.faa.likely_does_not_qualify2" => "</span>, and don't qualify for private health insurance through Maine Cover ME:",
-  "en.faa.private_health_insurance" => "Private health insurance",
+  "en.faa.private_health_insurance" => "Private Health Insurance",
   "en.faa.qualified_to_enroll" => "These people <span> qualify to enroll </span> in a private health insurance plan:",
-  "en.faa.do_not_agree" => "If you do not agree with this determination, you have the right to appeal. <a href=''>Find out more about the appeal process</a> or <a href=''>get assistance</a> by contacting us directly.",
+  "en.faa.do_not_agree" => "If you do not agree with the determination, you have the right to appeal. Find out more about the appeal process or get assistance by contacting us directly.",
   "en.faa.your_application_reference" => "Your application reference number is ",
   "en.faa.next_step_without_aggregate" => "<b>NEXT STEP:</b> Pick a health insurance plan.",
   "en.faa.next_step_with_aggregate_1" => "<b>NEXT STEP:</b><ul><li><b>If you’re already enrolled in a plan</b>, we’ve automatically changed your premium. You don’t have to do anything else.</li>",
   "en.faa.next_step_with_aggregate_2" => "<br><li><b>If you’re not enrolled or need to make changes to your plan</b>, select CONTINUE to pick a health insurance plan or change who is covered by your plan.</li></ul>",
-  "en.faa.next_step_medicaid_eligible" => "<b>Medicaid coverage is free. If you would like to enroll and pay full price for private health insurance instead, select CONTINUE to…:</b><ul><li>pick a plan, or</li><li>,add or remove someone from your plan.</li>",
-  "en.faa.next_step_medicaid_eligible_at_least_one_other_eligible" => "<b>Select CONTINUE to…:</b><ul><li>add or remove someone from your plan, or</li><li> pick a plan because you do not have coverage.</li>",
+  "en.faa.next_step_medicaid_eligible" => "<b>Medicaid coverage is free. If you would like to enroll and pay full price for private health insurance instead, select CONTINUE to:</b><ul><li>pick a plan, or</li><li>add or remove someone from your plan.</li>",
+  "en.faa.next_step_medicaid_eligible_at_least_one_other_eligible" => "<b>Select CONTINUE to:</b><ul><li>add or remove someone from your plan, or</li><li> pick a plan because you do not have coverage.</li>",
   "en.faa.indian_health_service" => "Has this person ever gotten a health service from the Indian Health Service, a tribal health program, or urban Indian health program or through a referral from one of these programs?",
   "en.faa.indian_health_service_eligible" => "Is this person eligible to get health services from the Indian Health Service, a tribal health program, or an urban Indian health program or through referral from one of these programs?",
   "en.faa.medicaid_not_eligible" => "Was this person found not eligible for MaineCare (Medicaid) or CubCare (Children's Health Insurance Program) within the last 90 days? *",
@@ -129,6 +129,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.see_if_you_qualify" => "See if you qualify for lower monthly premiums for 2022 #{Settings.site.short_name} health insurance or free Medicaid coverage.", # TODO: dynamic date
   "en.faa.year_selection_oe_range" => "Open enrollment is from November 1, 2021 through January 31, 2022", # TODO: dynamic date
   "en.faa.year_selection_learn_more" => "If you need health insurance, lower premiums, or Medicaid now, you can <a href='#'>submit a webform</a> or call #{Settings.site.short_name} at (855) 532-5465 / TTY: 711. <a href='https://www.dchealthlink.com/individuals/life-changes'>Learn more about Life Changes</a>.", # TODO: Update URL and phones
-  'en.faa.publish_error.second_error_message' => 'There is an error while submitting the application for assistance determination.'
+  'en.faa.publish_error.second_error_message' => 'There is an error while submitting the application for assistance determination.',
+  "en.faa.eligibility_go_to_my_account_message" => "If you’re already enrolled in CoverME.gov Individual & Family plan, you’re finished! To see your plan information, select <b>GO TO MY ACCOUNT</b>."
 }.freeze
 # rubocop:enable Layout/LineLength
