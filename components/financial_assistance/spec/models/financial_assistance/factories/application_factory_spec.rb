@@ -223,7 +223,7 @@ RSpec.describe FinancialAssistance::Factories::ApplicationFactory, type: :model 
         end
 
         it 'should not copy net_annual_income' do
-          expect(@duplicate_applicant.evidences).to be []
+          expect(@duplicate_applicant.evidences).to eq []
         end
       end
     end
