@@ -622,18 +622,22 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     end
   end
 
-  describe '.create_verification_documents' do
+  describe '.create_evidences' do
 
-    it 'should create income and mec verification types' do
-      application.send(:create_verification_documents)
-      expect(applicant1.verification_types.count).to eq 2
-      expect(applicant2.verification_types.count).to eq 2
+    before do
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:esi_mec_determination).and_return(true)
+    end
+
+    it 'should create MEC evidences' do
+      application.send(:create_evidences)
+      expect(applicant1.evidences.count).to eq 1
+      expect(applicant2.evidences.count).to eq 1
     end
 
     it 'should have both income and mec in pending state' do
       application.active_applicants.each do |applicant|
-        applicant.verification_types.each do |type|
-          expect(type.validation_status).to eq('pending')
+        applicant.evidences.each do |type|
+          expect(type.eligibility_status).to eq('attested')
         end
       end
     end
@@ -645,7 +649,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       application.send(:create_verification_documents)
     end
 
-    it 'should delete income and mec verification types' do
+    xit 'should delete income and mec verification types' do
       expect(applicant1.verification_types.count).to eq 2
       application.send(:delete_verification_documents)
       application.active_applicants.each do |applicant|
