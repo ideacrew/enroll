@@ -277,11 +277,11 @@ Then(/user clicks on the first payment button/) do
   find(IvlHomepage.first_payment).click
 end
 
-Then(/consumer should the the Make Payments button/) do
+Then(/^\w+ should the the Make Payments button/) do
   expect(page).to have_content('Make Payments')
 end
 
-Then(/consumer should not see the Make Payments button/) do
+Then(/^\w+ should not see the Make Payments button/) do
   expect(page).not_to have_content('Make Payments')
 end
 
