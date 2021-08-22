@@ -36,6 +36,7 @@ module Enroll
     config.assets.enabled = true
     config.assets.paths << Rails.root.join('app', 'assets', 'fonts')
     config.assets.precompile << /\.(?:svg|eot|woff2|ttf)$/
+    config.assets.check_precompiled_asset = false
     I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)
     config.i18n.fallbacks = {'am' => 'en', 'es' => 'en', 'ja' => 'en'}
     config.paths.add "app/api", glob: "**/*.rb"
