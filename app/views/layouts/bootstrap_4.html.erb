@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
   
-      
+
     <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -18,7 +18,7 @@
     <title><%= content_for?(:title) ? yield(:title) : "Welcome to #{site_short_name} | #{site_short_name}" %></title>
     <%= javascript_pack_tag 'application' %>
     <%= stylesheet_pack_tag 'application' %>
-   
+   <%= stylesheet_link_tag 'fonts' %>
     <%= action_cable_meta_tag %>
     <%= csrf_meta_tags %>
 
