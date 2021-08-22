@@ -6,6 +6,7 @@ module FinancialAssistance
   module VerificationHelper
 
     def fetch_latest_determined_application(family_id)
+      FinancialAssistance::Application.where(family_id: family_id).determined.order_by(:created_at => 'desc').first ||
       FinancialAssistance::Application.where(family_id: family_id).submitted.order_by(:created_at => 'desc').first
     end
 
