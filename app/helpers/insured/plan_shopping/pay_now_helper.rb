@@ -25,7 +25,7 @@ module Insured
       #this method checks the settings
       #around enrollment tile for paynow functionality
       def enable_pay_now(hbx_enrollment)
-        issuer = hbx_enrollment&.product&.issuer_profile&.legal_name&.downcase&.gsub(' ', '_')
+        issuer = issuer_key(hbx_enrollment)
         return false unless individual?(hbx_enrollment) && EnrollRegistry.key?("feature_index.#{issuer}_pay_now")
         rr_feature = EnrollRegistry["#{@issuer_key}_pay_now".to_sym]
         return false unless rr_feature&.enabled?
