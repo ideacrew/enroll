@@ -9,11 +9,7 @@ module Insured
         "CareFirst" => "https://member.carefirst.com/members/home.page",
         "Delta Dental" => "https://www1.deltadentalins.com/login.html",
         "Dominion National" => "https://www.dominionmembers.com/",
-        "Kaiser" => "https://kp.org/paypremium",
-        "Community Health Options" => "https://uatmcho.onlineinsight.com/ehp/eapp/samlpaymentacs",
-        "Harvard Pilgrim Health Care" => "https://b2bu.harvardpilgrim.org/CMSInitalPayments",
-        "Anthem Blue Cross and Blue Shield" => "https://payment.sit2.va.anthem.com/sales/payment/exchange?state=ME",
-        "Northeast Delta Dental" => "https://qaaca.deltadentalcoversme.com/acapayment/"
+        "Kaiser" => "https://kp.org/paypremium"
       }.freeze
 
       # rubocop:disable Metrics/CyclomaticComplexity
@@ -98,8 +94,8 @@ module Insured
       #this method checks the settings
       #around enrollment tile for paynow functionality
       def enable_pay_now(hbx_enrollment)
-        @issuer_key = hbx_enrollment&.product&.issuer_profile&.legal_name&.downcase&.gsub(' ', '_')
-        return false unless individual?(hbx_enrollment)
+        issuer = hbx_enrollment&.product&.issuer_profile&.legal_name&.downcase&.gsub(' ', '_')
+        return false unless individual?(hbx_enrollment) && EnrollRegistry.key?("feature_index.#{issuer}_pay_now")
         rr_feature = EnrollRegistry["#{@issuer_key}_pay_now".to_sym]
         return false unless rr_feature&.enabled?
         rr_feature.setting(:enrollment_tile)&.item
