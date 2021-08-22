@@ -1,8 +1,4 @@
-$application-font: <% if EnrollRegistry.feature_enabled?(:application_font) %>
-<%= EnrollRegistry[:application_font].settings(:font_family).item %>
-<% else %>
-<%= "Open Sans" %>
-<% end %>;
+$application-font: <%= EnrollRegistry.feature_enabled?(:application_font) ? EnrollRegistry[:application_font].settings(:font_family).item : "Open Sans" %>;
 
 $dark-blue: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
 $blue: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
