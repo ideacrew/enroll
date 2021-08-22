@@ -92,7 +92,7 @@ module Insured
       end
 
       #this method checks the settings
-      #around enrollment tile for paynow functionality
+      #around enrollment tile for paynow functionality.
       # rubocop:disable Metrics/CyclomaticComplexity
       def enable_pay_now(hbx_enrollment)
         issuer = hbx_enrollment&.product&.issuer_profile&.legal_name&.downcase&.gsub(' ', '_')
