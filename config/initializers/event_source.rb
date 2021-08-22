@@ -15,7 +15,7 @@ EventSource.configure do |config|
       warn rabbitmq.vhost
       rabbitmq.port = ENV['RABBITMQ_PORT'] || '5672'
       warn rabbitmq.port
-      rabbitmq.url = ENV['RABBITMQ_URL_EVENT_SOURCE'] || 'amqp://localhost:5672/'
+      rabbitmq.url = ENV['RABBITMQ_URL'] || 'amqp://localhost:5672/'
       warn rabbitmq.url
       rabbitmq.user_name = ENV['RABBITMQ_USERNAME'] || 'guest'
       warn rabbitmq.user_name
