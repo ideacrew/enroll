@@ -626,12 +626,13 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
     before do
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:esi_mec_determination).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_esi_mec_determination).and_return(true)
     end
 
     it 'should create MEC evidences' do
       application.send(:create_evidences)
-      expect(applicant1.evidences.count).to eq 1
-      expect(applicant2.evidences.count).to eq 1
+      expect(applicant1.evidences.count).to eq 2
+      expect(applicant2.evidences.count).to eq 2
     end
 
     it 'should have both income and mec in pending state' do
