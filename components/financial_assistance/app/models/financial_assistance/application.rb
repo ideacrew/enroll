@@ -1202,11 +1202,13 @@ module FinancialAssistance
 
     def create_evidences
       types = []
-      types << [:esi_mec, "MEC"] if FinancialAssistanceRegistry.feature_enabled?(:esi_mec_determination)
+      types << [:esi_mec, "ESI MEC"] if FinancialAssistanceRegistry.feature_enabled?(:esi_mec_determination)
+      types << [:non_esi_mec, "Non ESI MEC"] if FinancialAssistanceRegistry.feature_enabled?(:non_esi_mec_determination)
       active_applicants.each do |applicant|
         applicant.evidences =
           types.collect do |type|
             key, title = type
+            FinancialAssistance::Evidence.new(key: key, title: title, eligibility_status: "attested") if applicant.evidences.by_name(key).blank?
             FinancialAssistance::Evidence.new(key: key, title: title, eligibility_status: "attested") if applicant.evidences.by_name(key).blank?
           end
 
