@@ -337,7 +337,8 @@ RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
     end
 
     it 'should return true if current date is less than enrollment effective date' do
-      expect(helper.show_pay_now?("Enrollment Tile", hbx_enrollment)).to eq true
+      #TODO: Remove this consition when setting is turned on
+      expect(helper.show_pay_now?("Enrollment Tile", hbx_enrollment)).to eq true if EnrollRegistry[:kaiser_pay_now].setting(:enrollment_tile).item
     end
 
     it 'should return true if current date is equal to enrollment effective date' do

@@ -7,6 +7,7 @@ Feature: User should be able to pay for plan
   #   Then Hbx Admin logs out
 
   Scenario: User can see pay now button and pop up for Kaiser enrollment
+    Given the enrollment tile feature is enabled
     Given the FAA feature configuration is disabled
     Given the kaiser paynow feature configuration is enabled
     And that a person exists in EA
@@ -29,6 +30,7 @@ Feature: User should be able to pay for plan
     Then I should see the Kaiser pop up text
 
   Scenario: User cannot see pay now button and pop up for Kaiser enrollment when feature is turned off
+    Given the enrollment tile feature is enabled
     Given the FAA feature configuration is disabled
     Given the kaiser paynow feature configuration is disabled
     And that a person exists in EA
@@ -40,6 +42,7 @@ Feature: User should be able to pay for plan
     Then I should see not pay now button
 
   Scenario: User can see pay now pop up for non-Kaiser enrollment
+    Given the enrollment tile feature is enabled
     Given the FAA feature configuration is disabled
     And that a person exists in EA
     Given non-Kaiser enrollments exist

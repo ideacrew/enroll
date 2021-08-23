@@ -297,7 +297,7 @@ registry:
           - key: :plan_shopping
             item: true
           - key: :enrollment_tile
-            item: true
+            item: false
           - key: :carriers_long_name
             item: 'Kaiser Permanante'
       - key: :delta_dental_pay_now
