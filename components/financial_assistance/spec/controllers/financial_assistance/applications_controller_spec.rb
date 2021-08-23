@@ -166,9 +166,11 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
             state: FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item,
             zip: FinancialAssistanceRegistry[:enroll_app].setting(:contact_center_zip_code).item
           }
-          address_attributes.merge!(
-            county: FinancialAssistanceRegistry[:enroll_app].setting(:contact_center_county).item
-          ) if EnrollRegistry[:enroll_app].setting(:geographic_rating_area_model).item == 'county'
+          if EnrollRegistry[:enroll_app].setting(:geographic_rating_area_model).item == 'county'
+            address_attributes.merge!(
+              county: FinancialAssistanceRegistry[:enroll_app].setting(:contact_center_county).item
+            )
+          end
           financial_assistance_address = ::FinancialAssistance::Locations::Address.new(address_attributes)
           applin.reload
           applin.applicants.each do |applicant|
@@ -177,12 +179,11 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
           end
           family_id = applin.family_id
           family = Family.find(family_id) if family_id.present?
-          if family
-            family.family_members.each do |fm|
-              main_app_address = Address.new(address_attributes)
-              fm.person.addresses << main_app_address
-              fm.person.save!
-            end
+          next unless family
+          family.family_members.each do |fm|
+            main_app_address = Address.new(address_attributes)
+            fm.person.addresses << main_app_address
+            fm.person.save!
           end
         end
       end

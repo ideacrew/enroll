@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 module BenefitMarkets
+  # locations::RatingArea for dummy purposes
   class Locations::RatingArea
     include Mongoid::Document
     include Mongoid::Timestamps
@@ -24,9 +27,7 @@ module BenefitMarkets
     index({covered_state_codes: 1})
 
     def location_specified
-      if county_zip_ids.blank? && covered_states.blank?
-        errors.add(:base, "a location covered by the rating area must be specified")
-      end
+      errors.add(:base, "a location covered by the rating area must be specified") if county_zip_ids.blank? && covered_states.blank?
       true
     end
 
@@ -51,6 +52,11 @@ module BenefitMarkets
             {'covered_states' =>  state_abbrev}
           ]
         ).first
+        rating_area_helper(model, address)
+    end
+
+    def rating_area_helper(model, address)
+      case model
       when 'zipcode'
         zip_code = address.zip
         state_abbrev = address.state.blank? ? '' : address.state.upcase
@@ -85,6 +91,5 @@ module BenefitMarkets
         ).first
       end
     end
-
   end
 end
