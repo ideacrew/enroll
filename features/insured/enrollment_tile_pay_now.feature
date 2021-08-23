@@ -7,6 +7,7 @@ Feature: User should be able to pay for plan
   #   Then Hbx Admin logs out
 
   Scenario: User can see pay now button and pop up for gap between Kaiser enrollment
+    Given the enrollment tile feature is enabled
     Given the FAA feature configuration is disabled
     Given the kaiser paynow feature configuration is enabled
     And that a person exists in EA
