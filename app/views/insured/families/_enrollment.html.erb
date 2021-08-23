@@ -223,8 +223,6 @@
                   </a>
                 </span>
               <% end %>
-              <% binding.pry %>
-
                 <div class="dropdown-divider" style="border-top: 1px solid #e9ecef"></div>
                 <% if show_pay_now?("Enrollment Tile", hbx_enrollment) %>
                   <button class="btn-link btn-block" data-toggle="modal" data-target="#payNowModal<%= hbx_enrollment.hbx_id %>" style="padding: 6px 12px; margin: 4px 0; text-align: left;" data-enrollment="<%= hbx_enrollment.hbx_id %>">
