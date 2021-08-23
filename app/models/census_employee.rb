@@ -1664,12 +1664,14 @@ class CensusEmployee < CensusMember
     assignments.select { |assignment| assignment.is_active?(coverage_date) }.sort_by(&:created_at).reverse.first || assignments.sort_by(&:created_at).reverse.first
   end
 
+  # checking health enrollment's waived status to determine group's eligibility
   def is_waived_under?(benefit_application)
     assignment_by_application = [renewal_benefit_group_assignment, active_benefit_group_assignment].compact.detect do |assignment|
       assignment.benefit_application && (assignment.benefit_application == benefit_application)
     end
-    return false if assignment_by_application.blank? || assignment_by_application.hbx_enrollment.blank?
-    assignment_by_application.hbx_enrollment.is_coverage_waived?
+    return false if assignment_by_application.blank? || assignment_by_application.hbx_enrollments.blank?
+    health_enrollments = assignment_by_application.hbx_enrollments.select{ |hbx| hbx.coverage_kind == 'health' && hbx.is_coverage_waived? }
+    health_enrollments.count == 1 || (assignment_by_application.hbx_enrollment.is_coverage_waived? && assignment_by_application.hbx_enrollment.coverage_kind == 'health')
   end
 
   def ssn=(new_ssn)
