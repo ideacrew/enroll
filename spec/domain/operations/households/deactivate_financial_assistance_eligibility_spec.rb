@@ -1,11 +1,10 @@
 # frozen_string_literal: true
 
 RSpec.describe Operations::Households::DeactivateFinancialAssistanceEligibility, type: :model, dbclean: :after_each do
-  let(:family) {FactoryBot.create(:family, :with_primary_family_member)}
-  let(:family2) {FactoryBot.create(:family, :with_primary_family_member)}
-  let(:household) {FactoryBot.create(:household, family: family)}
-  let(:tax_household) {FactoryBot.create(:tax_household, household: household)}
-  let(:eligibility_determination) {FactoryBot.create(:eligibility_determination, tax_household: tax_household, csr_percent_as_integer: 10, effective_starting_on: Date.new(2020, 1, 1), effective_ending_on: nil)}
+  let!(:family) {FactoryBot.create(:family, :with_primary_family_member)}
+  let!(:family2) {FactoryBot.create(:family, :with_primary_family_member)}
+  let!(:tax_household) { FactoryBot.create(:tax_household, household: family.active_household, effective_ending_on: nil, is_eligibility_determined: true) }
+  let!(:eligibility_determination) {FactoryBot.create(:eligibility_determination, tax_household: tax_household, csr_percent_as_integer: 0)}
 
   it 'should be a container-ready operation' do
     expect(subject.respond_to?(:call)).to be_truthy
@@ -22,14 +21,26 @@ RSpec.describe Operations::Households::DeactivateFinancialAssistanceEligibility,
   context 'no tax_households' do
     it 'should return success' do
       result = subject.call(params: {family_id: family2.id, date: Date.new(2020, 1, 1)})
-      expect(result.success).to eq nil
+      expect(result.success).to eq 'No Active Tax Households to deactivate'
     end
   end
 
   context 'update tax households' do
     it 'should success for update' do
       result = subject.call(params: {family_id: family.id, date: Date.new(2020, 1, 1)})
-      expect(result.success).to eq nil
+      expect(result.success).to eq "End dated all the Active Tax Households for given family with bson_id: #{family.id}"
+    end
+  end
+
+  context 'success' do
+    context 'input date falls before effective_starting_on' do
+      before do
+        @result = subject.call(params: { family_id: family.id, date: tax_household.effective_starting_on.prev_month })
+      end
+
+      it 'should end date thh' do
+        expect(tax_household.reload.effective_ending_on).to eq(tax_household.effective_starting_on)
+      end
     end
   end
 end

@@ -11,6 +11,6 @@ module Insured::PlanFilterHelper
   end
 
   def estimate_your_costs
-    link_to(l10n("estimate_your_costs"),'',data: {toggle: "modal", target: "#plan_match_shop"}) if (@market_kind == "shop" || @market_kind == 'fehb') && @coverage_kind == "health" && @dc_checkbook_url != false
+    link_to(l10n("estimate_your_costs"),'',data: {toggle: "modal", target: "#plan_match_shop"}) if (@market_kind == "shop" || @market_kind == 'fehb') && @coverage_kind == "health" && @plan_comparison_checkbook_url != false
   end
 end

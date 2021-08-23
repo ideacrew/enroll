@@ -1,9 +1,12 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe PaymentTransactionsController, :type => :controller do
   let(:user){ FactoryBot.create(:user, :consumer) }
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member_and_dependent) }
-  let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
+  let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, legal_name: 'Kaiser') }
+  let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01', issuer_profile: issuer_profile)}
   let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, aasm_state: 'shopping', product: product) }
   let(:build_saml_repsonse) {double}
   let(:encode_saml_response) {double}
@@ -19,17 +22,17 @@ RSpec.describe PaymentTransactionsController, :type => :controller do
     end
 
     it 'should generate saml response' do
-      get :generate_saml_response, params: {:enrollment_id => hbx_enrollment.hbx_id}
+      get :generate_saml_response, params: { :enrollment_id => hbx_enrollment.hbx_id, :source => source }
       expect(response).to have_http_status(:success)
     end
 
     it 'should build payment transacations for a family' do
-      get :generate_saml_response, params: {:enrollment_id => hbx_enrollment.hbx_id}
+      get :generate_saml_response, params: { :enrollment_id => hbx_enrollment.hbx_id, :source => source }
       expect(family.payment_transactions.count).to eq 1
     end
 
     it 'should build payment transaction with enrollment effective date and carrier id' do
-      get :generate_saml_response, params: {:enrollment_id => hbx_enrollment.hbx_id}
+      get :generate_saml_response, params: { :enrollment_id => hbx_enrollment.hbx_id, :source => source }
       expect(family.payment_transactions.first.enrollment_effective_date).to eq hbx_enrollment.effective_on
       expect(family.payment_transactions.first.carrier_id).to eq hbx_enrollment.product.issuer_profile_id
     end

@@ -103,7 +103,11 @@
             <div class="col-md-5 mt18">
               <div class="select-positioning ml-label"> <label>is</label> </div>
               <label class="static_label label-floatlabel mt-label">RELATIONSHIP |
-                <a href="#relationship" data-toggle="modal" data-target="#relationship">Not sure?</a>
+                <% if FinancialAssistanceRegistry[:enroll_app].settings(:site_key).item.to_s.downcase == 'me' %>
+                  <a href="#relationship" data-toggle="modal" data-target="#relationship">Not sure?</a>
+                <% else %>
+                  <a class='hidden'></a>
+                <% end %>
               </label>
               <%= render partial: 'shared/modal_support_text_household', locals: {key: "relationship"} %>
               <div class="select-relation rs_selection">

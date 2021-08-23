@@ -7,7 +7,14 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
 
   let!(:person) { FactoryBot.create(:person, hbx_id: "732020") }
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
-  let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id, aasm_state: 'submitted', hbx_id: "830293", effective_date: DateTime.new(2021,1,1,4,5,6)) }
+  let!(:application) do
+    FactoryBot.create(:financial_assistance_application,
+                      family_id: family.id,
+                      aasm_state: 'submitted',
+                      hbx_id: "830293",
+                      assistance_year: TimeKeeper.date_of_record.year,
+                      effective_date: DateTime.new(2021,1,1,4,5,6))
+  end
   let!(:applicant) do
     applicant = FactoryBot.create(:applicant,
                                   first_name: person.first_name,
@@ -16,6 +23,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
                                   gender: person.gender,
                                   ssn: person.ssn,
                                   application: application,
+                                  person_hbx_id: person.hbx_id,
                                   ethnicity: [],
                                   is_primary_applicant: true,
                                   is_self_attested_blind: false,
@@ -54,17 +62,146 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
     primary_appli.save!
   end
 
+  let(:premiums_hash) do
+    {
+      [person.hbx_id] => {:health_only => {person.hbx_id => [{:cost => 200.0, :member_identifier => person.hbx_id, :monthly_premium => 200.0}]}}
+    }
+  end
+
+  let(:slcsp_info) do
+    {
+      person.hbx_id => {:health_only_slcsp_premiums => {:cost => 200.0, :member_identifier => person.hbx_id, :monthly_premium => 200.0}}
+    }
+  end
+
+  let(:lcsp_info) do
+    {
+      person.hbx_id => {:health_only_lcsp_premiums => {:cost => 100.0, :member_identifier => person.hbx_id, :monthly_premium => 100.0}}
+    }
+  end
+
+  let(:fetch_double) { double(:new => double(call: double(:value! => premiums_hash)))}
+  let(:fetch_slcsp_double) { double(:new => double(call: double(:value! => slcsp_info)))}
+  let(:fetch_lcsp_double) { double(:new => double(call: double(:value! => lcsp_info)))}
+
   before do
+    stub_const('::Operations::Products::Fetch', fetch_double)
+    stub_const('::Operations::Products::FetchSlcsp', fetch_slcsp_double)
+    stub_const('::Operations::Products::FetchLcsp', fetch_lcsp_double)
     allow(FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication).to receive(:new).and_return(obj)
     allow(obj).to receive(:build_event).and_return(event)
     allow(event.success).to receive(:publish).and_return(true)
-    application_params = ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application.reload)
-    @result = subject.call(application_params.success)
   end
 
   context 'When connection is available' do
-    it 'should return success' do
-      expect(@result).to be_success
+    context 'determine_eligibility' do
+      before do
+        application_params = ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application.reload)
+        @result = subject.call({ payload: application_params.success, event_name: 'determine_eligibility' })
+      end
+
+      it 'should return success' do
+        expect(@result).to be_success
+      end
+    end
+
+    context 'generate_renewal_draft' do
+      before do
+        params = { payload: { family_id: application.family_id, renewal_year: application.assistance_year.next }, event_name: 'generate_renewal_draft' }
+        @result = subject.call(params)
+      end
+
+      it 'should return success' do
+        expect(@result).to be_success
+      end
+    end
+
+    context 'submit_renewal_draft' do
+      before do
+        application.update_attributes!(aasm_state: 'renewal_draft')
+        params = { payload: { application_hbx_id: application.hbx_id }, event_name: 'submit_renewal_draft' }
+        @result = subject.call(params)
+      end
+
+      it 'should return success' do
+        expect(@result).to be_success
+      end
+    end
+  end
+
+  context 'failure' do
+    context 'missing keys' do
+      context 'missing payload' do
+        before do
+          @result = subject.call({ event_name: ['determine_eligibility', 'generate_renewal_draft', 'submit_renewal_draft'].sample })
+        end
+
+        it 'should return failure with error message' do
+          expect(@result.failure).to eq('Missing payload key')
+        end
+      end
+
+      context 'missing event_name' do
+        before do
+          @result = subject.call({ payload: { test: 'test' } })
+        end
+
+        it 'should return failure with error message' do
+          expect(@result.failure).to eq('Missing event_name key')
+        end
+      end
+    end
+
+    context 'missing values or invalid values' do
+      context 'missing value for payload' do
+        before do
+          @result = subject.call({ payload: nil, event_name: ['determine_eligibility', 'generate_renewal_draft', 'submit_renewal_draft'].sample })
+        end
+
+        it 'should return failure with error message' do
+          expect(@result.failure).to eq("Invalid value:  for key payload, must be a Hash object")
+        end
+      end
+
+      context 'missing value for event_name' do
+        before do
+          @result = subject.call({ payload: { test: 'test' }, event_name: nil })
+        end
+
+        it 'should return failure with error message' do
+          expect(@result.failure).to eq("Invalid value:  for key event_name, must be an String")
+        end
+      end
+
+      context 'invalid value for payload' do
+        before do
+          @result = subject.call({ payload: { test: 'test' }.to_s, event_name: ['determine_eligibility', 'generate_renewal_draft', 'submit_renewal_draft'].sample })
+        end
+
+        it 'should return failure with error message' do
+          expect(@result.failure).to match(/for key payload, must be a Hash object/)
+        end
+      end
+
+      context 'invalid value for event_name' do
+        before do
+          @result = subject.call({ payload: { test: 'test' }, event_name: :determine_eligibility })
+        end
+
+        it 'should return failure with error message' do
+          expect(@result.failure).to match(/for key event_name, must be an String/)
+        end
+      end
+
+      context 'invalid value for event_name' do
+        before do
+          @result = subject.call({ payload: { test: 'test' }, event_name: 'test_event' })
+        end
+
+        it 'should return failure with error message' do
+          expect(@result.failure).to eq("Invalid event_name: test_event for key event_name, must be one of [\"determine_eligibility\", \"generate_renewal_draft\", \"submit_renewal_draft\"]")
+        end
+      end
     end
   end
 end

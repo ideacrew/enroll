@@ -11,7 +11,7 @@
           <%= link_to l10n("estimate_your_cost"), '',data: {toggle: "modal", target: "#plan_match_dental_redirection"} %>
         <% end %>
         </br>
-        <% if plan_match_dc %>
+        <% if checkbook_integration_enabled? %>
         <%= estimate_your_costs %>
         <% end %>
       </br>
@@ -100,7 +100,7 @@
             <div class="modal-footer" style="padding:10px">
               <center>
               <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Cancel</button>
-              <%=link_to l10n("confirm"), @dc_checkbook_url , class: "btn btn-primary" %>
+              <%=link_to l10n("confirm"), @plan_comparison_checkbook_url , class: "btn btn-primary" %>
             </div>
           </center>
          </div>

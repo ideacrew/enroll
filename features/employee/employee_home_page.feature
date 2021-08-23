@@ -1,6 +1,7 @@
 Feature: Employee only user should be able to enroll in IVL market
 
   Scenario: User with only employee role
+    Given EnrollRegistry medicaid_tax_credits_link feature is enabled
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for enrollment_open renewal employer with health benefits
     And there is an employer ABC Widgets
@@ -16,6 +17,7 @@ Feature: Employee only user should be able to enroll in IVL market
     And Employee logs out
 
   Scenario: User exists with dual roles
+    Given EnrollRegistry medicaid_tax_credits_link feature is enabled
     Given a person exists with dual roles
     Then Dual Role Person sign in to portal
     Then Dual Role Person should not see any button to enroll in ivl market

@@ -62,15 +62,15 @@ Then(/^I should see users with any role$/) do
 end
 
 When(/^I click Employer button$/)do
-  find(:xpath, '//*[@id="Tab:all_employer_staff_roles"]').click
+  find(:xpath, '//*[@id="Tab:all_employer_staff_roles"]', wait: 10).click
 end
 
 Then(/^I should only see user with employer staff role$/)do
-  expect(page).not_to have_content(employee_role.oim_id)
-  expect(page).not_to have_content(broker.oim_id)
-  expect(page).to have_content(employer_staff.oim_id)
+  expect(page).to have_content(employer_staff.oim_id, wait: 10)
   expect(page).to have_content("Locked")
   expect(page).to have_content("Unlocked")
+  expect(page).not_to have_content(employee_role.oim_id)
+  expect(page).not_to have_content(broker.oim_id)
 end
 
 When(/^I click Broker button$/)do

@@ -4,6 +4,8 @@ require 'rails_helper'
 
 RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application, dbclean: :after_each do
   let!(:person) { FactoryBot.create(:person, hbx_id: "732020")}
+  let!(:person2) { FactoryBot.create(:person, hbx_id: "732021") }
+  let!(:person3) { FactoryBot.create(:person, hbx_id: "732022") }
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
   let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id, aasm_state: 'submitted', hbx_id: "830293", effective_date: DateTime.new(2021,1,1,4,5,6)) }
   let!(:applicant) do
@@ -42,6 +44,42 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
   let!(:eligibility_determination) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application) }
 
+  # let!(:products) { FactoryBot.create_list(:benefit_markets_products_health_products_health_product, 5, :silver) }
+
+  let(:premiums_hash) do
+    {
+      [person.hbx_id] => {:health_only => {person.hbx_id => [{:cost => 200.0, :member_identifier => person.hbx_id, :monthly_premium => 200.0}]}},
+      [person2.hbx_id] => {:health_only => {person2.hbx_id => [{:cost => 200.0, :member_identifier => person2.hbx_id, :monthly_premium => 200.0}]}},
+      [person3.hbx_id] => {:health_only => {person3.hbx_id => [{:cost => 200.0, :member_identifier => person3.hbx_id, :monthly_premium => 200.0}]}}
+    }
+  end
+
+  let(:slcsp_info) do
+    {
+      person.hbx_id => {:health_only_slcsp_premiums => {:cost => 200.0, :member_identifier => person.hbx_id, :monthly_premium => 200.0}},
+      person2.hbx_id => {:health_only_slcsp_premiums => {:cost => 200.0, :member_identifier => person2.hbx_id, :monthly_premium => 200.0}},
+      person3.hbx_id => {:health_only_slcsp_premiums => {:cost => 200.0, :member_identifier => person3.hbx_id, :monthly_premium => 200.0}}
+    }
+  end
+
+  let(:lcsp_info) do
+    {
+      person.hbx_id => {:health_only_lcsp_premiums => {:cost => 100.0, :member_identifier => person.hbx_id, :monthly_premium => 100.0}},
+      person2.hbx_id => {:health_only_lcsp_premiums => {:cost => 100.0, :member_identifier => person2.hbx_id, :monthly_premium => 100.0}},
+      person3.hbx_id => {:health_only_lcsp_premiums => {:cost => 100.0, :member_identifier => person3.hbx_id, :monthly_premium => 100.0}}
+    }
+  end
+
+  let(:fetch_double) { double(:new => double(call: double(:value! => premiums_hash)))}
+  let(:fetch_slcsp_double) { double(:new => double(call: double(:value! => slcsp_info)))}
+  let(:fetch_lcsp_double) { double(:new => double(call: double(:value! => lcsp_info)))}
+
+  before do
+    stub_const('::Operations::Products::Fetch', fetch_double)
+    stub_const('::Operations::Products::FetchSlcsp', fetch_slcsp_double)
+    stub_const('::Operations::Products::FetchLcsp', fetch_lcsp_double)
+  end
+
   describe 'When Application in draft state is passed' do
     let(:result) { subject.call(application) }
 
@@ -54,11 +92,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     end
   end
 
-  describe 'When Application is in submitted state passed' do
+  describe 'When Application is in submitted state' do
     let(:result) { subject.call(application) }
 
     before :each do
-      family.family_members.first.update_attributes(person_id: person.hbx_id)
       applicant.update_attributes(person_hbx_id: person.hbx_id, citizen_status: 'alien_lawfully_present', eligibility_determination_id: eligibility_determination.id)
     end
 
@@ -70,6 +107,14 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
     it 'should have oe date for year before effective date' do
       expect(result.value![:oe_start_on]).to eq Date.new((application.effective_date.year - 1), 11, 1)
+    end
+
+    it 'should have notice_options with send_eligibility_notices set to true' do
+      expect(result.value![:notice_options][:send_eligibility_notices]).to be_truthy
+    end
+
+    it 'should have notice_options with send_open_enrollment_notices set to false' do
+      expect(result.value![:notice_options][:send_open_enrollment_notices]).to be_falsey
     end
 
     it 'should have applicant with person hbx_id' do
@@ -318,8 +363,29 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     end
   end
 
+  context 'for renewal application' do
+    let(:result) { subject.call(application) }
+
+    before :each do
+      family.family_members.first.update_attributes(person_id: person.hbx_id)
+      applicant.update_attributes(person_hbx_id: person.hbx_id, citizen_status: 'alien_lawfully_present', eligibility_determination_id: eligibility_determination.id)
+      application.workflow_state_transitions << WorkflowStateTransition.new(
+        from_state: 'renewal_draft',
+        to_state: 'submitted'
+      )
+      application.save!
+    end
+
+    it 'should have notice_options with send_eligibility_notices set to false' do
+      expect(result.value![:notice_options][:send_eligibility_notices]).to be_falsey
+    end
+
+    it 'should have notice_options with send_open_enrollment_notices set to true' do
+      expect(result.value![:notice_options][:send_open_enrollment_notices]).to be_truthy
+    end
+  end
+
   context 'for relationships' do
-    let!(:person2) { FactoryBot.create(:person, hbx_id: "732021") }
     let!(:family_member2) { FactoryBot.create(:family_member, person: person2, family: family) }
     let!(:applicant2) do
       FactoryBot.create(:applicant,
@@ -391,7 +457,6 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
   end
 
   context 'for claimed_as_tax_dependent_by' do
-    let!(:person2) { FactoryBot.create(:person, hbx_id: "732021") }
     let!(:family_member2) { FactoryBot.create(:family_member, person: person2, family: family) }
     let!(:applicant2) do
       FactoryBot.create(:applicant,
@@ -610,7 +675,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
         vlp_subject: 'I-551 (Permanent Resident Card)',
         alien_number: '123456789',
         card_number: 'abg1234567890',
-        expiration_date: nil
+        expiration_date: TimeKeeper.date_of_record.to_datetime
       }
       applicant.update_attributes!(vlp_params)
     end
@@ -626,7 +691,6 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
   end
 
   context 'for mitc_households' do
-    let!(:person2) { FactoryBot.create(:person, hbx_id: "732021") }
     let!(:family_member2) { FactoryBot.create(:family_member, person: person2, family: family) }
     let!(:applicant2) do
       FactoryBot.create(:applicant,
@@ -771,7 +835,6 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
         applicant2.save!
       end
 
-      let!(:person3) { FactoryBot.create(:person, hbx_id: "732022") }
       let!(:family_member3) { FactoryBot.create(:family_member, person: person3, family: family) }
       let!(:applicant3) do
         FactoryBot.create(:applicant,

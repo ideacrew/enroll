@@ -9,19 +9,20 @@ module FinancialAssistance
     module Applications
       module Transformers
         module ApplicationTo
-          # Application params to be transformed.
+          # Params of an instance(persistance object) of ::FinancialAssistance::Application to be transformed.
           class Cv3Application # rubocop:disable Metrics/ClassLength
             # constructs cv3 payload for medicaid gateway.
 
             include Dry::Monads[:result, :do]
             include Acapi::Notifiers
-            require 'securerandom'
 
-            # @param [ Hash ] params Applicant Attributes
-            # @return [ BenefitMarkets::Entities::Applicant ] applicant Applicant
+            # @param [Hash] opts The options to construct params mapping to ::AcaEntities::MagiMedicaid::Contracts::ApplicationContract
+            # @option opts [::FinancialAssistance::Application] :application
+            # @return [Dry::Monads::Result]
             def call(application)
               application = yield validate(application)
-              request_payload = yield construct_payload(application)
+              notice_options = yield notice_options_for_app(application)
+              request_payload = yield construct_payload(application, notice_options)
 
               Success(request_payload)
             end
@@ -33,8 +34,13 @@ module FinancialAssistance
               Failure("Application is in #{application.aasm_state} state. Please submit application.")
             end
 
-            def construct_payload(application)
-              payload = {family_reference: {hbx_id: find_family(application.family_id)},
+            def notice_options_for_app(application)
+              renewal_app = application.previously_renewal_draft?
+              Success({ send_eligibility_notices: !renewal_app, send_open_enrollment_notices: renewal_app })
+            end
+
+            def construct_payload(application, notice_options)
+              payload = {family_reference: {hbx_id: find_family(application.family_id)&.hbx_assigned_id.to_s},
                          assistance_year: application.assistance_year,
                          aptc_effective_date: application.effective_date,
                          years_to_renew: application.renewal_base_year,
@@ -47,13 +53,14 @@ module FinancialAssistance
                          us_state: application.us_state,
                          hbx_id: application.hbx_id,
                          oe_start_on: Date.new((application.effective_date.year - 1), 11, 1),
+                         notice_options: notice_options,
                          mitc_households: mitc_households(application),
                          mitc_tax_returns: mitc_tax_returns(application)}
               Success(payload)
             end
 
             def find_family(family_id)
-              ::Family.find(family_id)&.hbx_assigned_id.to_s
+              ::Family.find(family_id)
             end
 
             # rubocop:disable Metrics/CyclomaticComplexity
@@ -67,8 +74,7 @@ module FinancialAssistance
                            demographic: demographic(applicant),
                            attestation: attestation(applicant),
                            is_primary_applicant: applicant.is_primary_applicant.present?,
-                           native_american_information: {indian_tribe_member: applicant.indian_tribe_member,
-                                                         tribal_id: applicant.tribal_id},
+                           native_american_information: native_american_information(applicant),
                            citizenship_immigration_status_information: {citizen_status: applicant.citizen_status,
                                                                         is_lawful_presence_self_attested: applicant.eligible_immigration_status.present?,
                                                                         is_resident_post_092296: applicant.is_resident_post_092296.present?},
@@ -143,6 +149,17 @@ module FinancialAssistance
             # rubocop:enable Metrics/CyclomaticComplexity
             # rubocop:enable Metrics/AbcSize
             # rubocop:enable Metrics/MethodLength
+
+            def native_american_information(applicant)
+              if FinancialAssistanceRegistry.feature_enabled?(:indian_alaskan_tribe_details)
+                {indian_tribe_member: applicant.indian_tribe_member,
+                 tribal_name: applicant.tribal_name,
+                 tribal_state: applicant.tribal_state}
+              else
+                {indian_tribe_member: applicant.indian_tribe_member,
+                 tribal_id: applicant.tribal_id}
+              end
+            end
 
             def calculate_if_applicant_is_required_to_file_taxes(applicant)
               return true if applicant.is_required_to_file_taxes
@@ -468,7 +485,7 @@ module FinancialAssistance
                citizenship_number: applicant.citizenship_number,
                card_number: applicant.card_number,
                country_of_citizenship: applicant.country_of_citizenship,
-               expiration_date: applicant.expiration_date&.to_date,
+               expiration_date: applicant.expiration_date&.to_datetime,
                issuing_country: applicant.issuing_country,
                status: nil, # not sure what should be value here
                verification_type: nil, #not sure of value.
@@ -589,11 +606,19 @@ module FinancialAssistance
               family = find_family(application.family_id) if application.family_id.present?
               return unless family.present?
               person_hbx_ids = application.applicants.pluck(:person_hbx_id)
-              membr_premiums =
-                person_hbx_ids.inject([]) do |arr, person_hbx_id|
-                  arr << { member_identifier: person_hbx_id, monthly_premium: 310.50 }
-                end
-              { health_only_lcsp_premiums: membr_premiums, health_only_slcsp_premiums: membr_premiums }
+              premiums = ::Operations::Products::Fetch.new.call({family: family, effective_date: application.effective_date})
+              slcsp_info = ::Operations::Products::FetchSlcsp.new.call(member_silver_product_premiums: premiums.value!).value!
+              lcsp_info = ::Operations::Products::FetchLcsp.new.call(member_silver_product_premiums: premiums.value!).value!
+
+              slcsp_member_premiums = person_hbx_ids.inject([]) do |result, person_hbx_id|
+                result << slcsp_info[person_hbx_id][:health_only_slcsp_premiums]
+              end
+
+              lcsp_member_premiums = person_hbx_ids.inject([]) do |result, person_hbx_id|
+                result << lcsp_info[person_hbx_id][:health_only_lcsp_premiums]
+              end
+
+              { health_only_lcsp_premiums: slcsp_member_premiums, health_only_slcsp_premiums: lcsp_member_premiums }
             end
 
             # Physical households(mitc_households) are groups based on the member's Home Address.

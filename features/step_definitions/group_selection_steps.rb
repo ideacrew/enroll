@@ -301,13 +301,12 @@ And(/(.*) should also see the reason for ineligibility/) do |named_person|
 end
 
 And(/(.*) should see the dental radio button/) do |role|
-  expect(page).to have_content "Dental"
+  expect(page).to have_css EmployeeChooseCoverage.dental_radio_btn
 end
 
 And(/(.*) switched to dental benefits/) do |role|
-  # choose("coverage_kind_dental")
   wait_for_ajax
-  find(:xpath, '//*[@id="dental-radio-button"]/label').click
+  find(EmployeeChooseCoverage.dental_radio_btn).click
 end
 
 Then(/the primary person checkbox should be in unchecked status/) do
@@ -474,14 +473,14 @@ When(/employee switched to (.*) employer/) do |employer|
 end
 
 When(/employee clicked on shop for plans/) do
-  find(".interaction-click-control-shop-for-plans", :wait => 10).click
+  find(EmployeeHomepage.shop_for_plans_btn, :wait => 10).click
 end
 
 When(/employee switched for (.*) benefits/) do |market_kind|
   if market_kind == "individual"
-    find(:label, 'Individual Benefits').click
+    find(EmployeeChooseCoverage.individual_benefits_radiobtn).click
   else
-    find(:xpath, '//*[@id="market_kinds"]/div/div[1]/label').click
+    find(EmployeeChooseCoverage.employer_sponsored_benefits_radio_btn).click
   end
 end
 
@@ -498,7 +497,7 @@ And(/(.*) should not see the dental radio button/) do |role|
 end
 
 And(/(.*) clicked on continue for plan shopping$/) do |_user|
-  find(".interaction-click-control-continue").click
+  find(EmployeeChooseCoverage.continue_btn).click
 end
 
 When(/employee clicked on make changes of health enrollment from first employer/) do
@@ -563,13 +562,45 @@ end
 #   click_link 'Edit Plan'
 # end
 
+When(/^\w+ should be able to see Actions dropdown$/) do
+  page.all(EmployeeHomepage.actions_dropdown).count > 0
+end
+
+Then(/^\w+ clicks on the Actions button$/) do
+  page.all(EmployeeHomepage.actions_dropdown).first.click
+end
+
+Then(/^\w+ clicks on the Actions button for active enrollment$/) do
+  page.all(EmployeeHomepage.actions_dropdown).last.click
+end
+
+And(/^\w+ should see able to see make changes to my coverage button$/) do
+  page.all('a', text: 'Make changes to my coverage').first
+end
+
+Then(/^\w+ should not see able to see make changes for my new plan$/) do
+  expect(page).not_to have_content("Make a first payment for my new plan")
+end
+
+When(/^\w+ clicks on the make changes to my coverage button/) do
+  enable_change_tax_credit_button
+  page.execute_script("document.querySelector('#make-changes-btn').click()")
+  wait_for_ajax
+end
+
+When(/^\w+ clicks on the active enrollment make changes to my coverage button/) do
+  enable_change_tax_credit_button
+  page.execute_script("document.querySelectorAll('#make-changes-btn')[1].click()")
+  wait_for_ajax
+end
+
 Given(/^the automatic application of aptc on enrollment feature configuration is disabled$/) do
   disable_feature :apply_aggregate_to_enrollment
 end
 
 When(/(.*) clicks on the make changes button/) do |_role|
   enable_change_tax_credit_button
-  click_link('Make Changes')
+  page.all('a', text: 'Make changes to my coverage').first.click
   wait_for_ajax
 end
 

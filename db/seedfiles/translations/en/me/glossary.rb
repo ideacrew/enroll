@@ -263,5 +263,9 @@ GLOSSARY_TRANSLATIONS = {
     "en.glossary.Yearly_Cost_Estimate_for_Health_Coverage" => "A feature of Maine Cover ME's Plan Match tool that shows the estimated amount you might pay in a given year for premiums, deductibles, copayments and coinsurance based on the number of people covered, your health status and any expected medical procedures. ",
     "en.glossary.Zero_Cost_Sharing_Plan" => "Federally recognized Tribes and Alaska Native Claims Settlement Act (ANCSA) Corporation shareholders whose income is at or below 300 percent of the Federal poverty level are eligible for a zero cost sharing plan. With this plan, there are no copayments, deductibles or coinsurance when care is received from Indian health care providers, which include health programs operated by the Indian Health Service, tribes and tribal organizations, and urban Indian organizations. This is also true when receiving essential health benefits through a Maine Cover ME plan, and you won't need a referral from an Indian health care provider to receive these benefits. Zero cost sharing is available for any metal level plan.",
     "en.glossary.mainecare" => "maincare",
-    "en.glossary.cubcare" => "cubcare"
+    "en.glossary.cubcare" => "cubcare",
+    "en.glossary.make_a_first_payment" => "This payment will confirm your enrollment and allow you to begin your coverage. Please note it typically takes up to 3-5 business days after you sign up, for you to be able to make a first payment.",
+    "en.glossary.make_changes_to_coverage" => "Make changes to my plan.",
+    "en.glossary.view_coverage_details" => "Learn more about what my plan covers.",
+    "en.glossary.make_payments_for_my_plan" => "If you have already made your first premium payment for your plan, and are looking to make your monthly premium payment, you may log into your payment account here."
 }

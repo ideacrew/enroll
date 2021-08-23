@@ -949,6 +949,11 @@ class Family
     def find_by_case_id(id)
       where({"e_case_id" => id}).to_a
     end
+
+    def application_applicable_year
+      bcp = HbxProfile.bcp_by_oe_dates
+      bcp&.start_on&.year || TimeKeeper.date_of_record.year
+    end
   end
 
   def build_consumer_role(family_member, opts = {})
@@ -1179,8 +1184,7 @@ class Family
   end
 
   def application_applicable_year
-    bcp = HbxProfile.bcp_by_oe_dates
-    bcp.present? ? bcp.start_on.year : TimeKeeper.date_of_record.year
+    Family.application_applicable_year
   end
 
 private

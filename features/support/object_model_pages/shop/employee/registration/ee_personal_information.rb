@@ -40,6 +40,14 @@ class EmployeePersonalInformation
   end
 
   def self.continue_btn
-    'button[id="btn-continue"]'
+    '#btn-continue'
+  end
+
+  def self.enroll_as_employee_radiobtn
+    'label[for^="new_employee-sponsored-benefits"] span'
+  end
+
+  def self.enroll_as_individual_radiobtn
+    'label[for="individual-benefits"] span'
   end
 end

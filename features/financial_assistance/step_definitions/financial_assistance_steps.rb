@@ -9,6 +9,11 @@ Given(/^a consumer, with a family, exists$/) do
   end
 end
 
+And(/^financial assistance primary applicant logs in$/) do
+  login_as @financial_assistance_applicant_user
+  visit financial_assistance.edit_application_path(@target_fa_application)
+end
+
 Given(/^is logged in$/) do
   login_as consumer, scope: :user
 end
@@ -381,6 +386,14 @@ end
 
 Given(/^the FAA feature configuration is disabled$/) do
   disable_feature :financial_assistance
+end
+
+Given(/^the kaiser paynow feature configuration is enabled$/) do
+  enable_feature :kaiser_pay_now
+end
+
+Given(/^the kaiser paynow feature configuration is disabled$/) do
+  disable_feature :kaiser_pay_now
 end
 
 Given(/^the FAA feature configuration is enabled$/) do
