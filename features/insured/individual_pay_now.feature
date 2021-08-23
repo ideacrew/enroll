@@ -42,6 +42,7 @@ Feature: User should be able to pay for plan
     Then I should see not pay now button
 
   Scenario: User can see pay now pop up for non-Kaiser enrollment
+    Given the enrollment tile feature is enabled
     Given the FAA feature configuration is disabled
     And that a person exists in EA
     Given non-Kaiser enrollments exist
