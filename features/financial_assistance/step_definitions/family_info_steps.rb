@@ -6,7 +6,7 @@ end
 
 Then(/^consumer should see today date and clicks continue$/) do
   expect(page).to have_field('applicant_ssn', readonly: true)
-  expect(page.find("input[name='jq_datepicker_ignore_applicant[dob]'")[:disabled]).to eq "true"
+  expect(page.find("input[name='jq_datepicker_ignore_applicant[dob]'")[:readonly]).to eq "true"
 end
 
 Given(/eligible immigration status checkbox feature is enabled/) do
