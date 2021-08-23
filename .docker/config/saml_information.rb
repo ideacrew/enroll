@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SamlInformation
 
   class MissingKeyError < StandardError
@@ -67,7 +69,7 @@ class SamlInformation
     'community_health_options_pay_now_url',
     'community_health_options_pay_now_audience',
     'community_health_options_pay_now_relay_state'
-  ]
+  ].freeze
 
   attr_reader :config
 
@@ -78,11 +80,9 @@ class SamlInformation
     ensure_configuration_values(@config)
   end
 
-  def ensure_configuration_values(conf)
+  def ensure_configuration_values(_conf)
     REQUIRED_KEYS.each do |k|
-      if @config[k].blank?
-        raise MissingKeyError.new(k)
-      end
+      raise MissingKeyError, k if @config[k].blank?
     end
   end
 
@@ -90,10 +90,10 @@ class SamlInformation
     define_method(key.to_sym) do
       config[key.to_s]
     end
-    self.instance_eval(<<-RUBYCODE)
-      def self.#{key.to_s}
-        self.instance.#{key.to_s}
-      end
+    self.instance_eval(<<-RUBYCODE, __FILE__, __LINE__ + 1)
+      def self.#{key}         # def self.key_name
+        self.instance.#{key}  #   self.instance.key_name
+      end                     # end
     RUBYCODE
   end
 
