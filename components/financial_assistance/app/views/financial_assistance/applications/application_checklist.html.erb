@@ -35,9 +35,8 @@
         </div>
 
         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-          <% previous_url = FinancialAssistanceRegistry.feature_enabled?(:iap_year_selection) ? financial_assistance.application_year_selection_application_path(@application) : main_app.help_paying_coverage_insured_consumer_role_index_path %>
           <%= render partial: 'financial_assistance/shared/right_nav', locals: {
-            previous_url: previous_url,
+            previous_url: application_checklist_previous_url(@application),
             next_url: financial_assistance.edit_application_path(@application)
           } %>
         </div>

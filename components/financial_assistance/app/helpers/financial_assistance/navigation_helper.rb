@@ -29,5 +29,10 @@ module FinancialAssistance
       return true if controller_name == "family_relationships" && action_name == "index"
       return true if controller_name == "family_members" && action_name == "index"
     end
+
+    def application_checklist_previous_url(application)
+      return financial_assistance.application_year_selection_application_path(application) if FinancialAssistanceRegistry.feature_enabled?(:iap_year_selection)
+      main_app.help_paying_coverage_insured_consumer_role_index_path
+    end
   end
 end
