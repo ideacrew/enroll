@@ -140,6 +140,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
   context "POST step" do
     before do
+      FinancialAssistanceRegistry[:haven_determination].feature.stub(:is_enabled).and_return(true)
       setup_faa_data
       allow(FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication).to receive(:new).and_return(obj)
       allow(obj).to receive(:build_event).and_return(event)
