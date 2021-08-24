@@ -1005,7 +1005,9 @@ class HbxEnrollment
   end
 
   def generate_prior_py_shop_renewals
-    EnrollRegistry[:prior_plan_year_shop_sep]{ {enrollment: self} }
+    return unless EnrollRegistry.feature_enabled?(:prior_plan_year_shop_sep)
+
+    Operations::GeneratePriorPlanYearShopRenewals.new.call(enrollment: self)
   end
 
   def update_renewal_coverage(options = nil)  # rubocop:disable Metrics/CyclomaticComplexity
