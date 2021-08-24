@@ -286,7 +286,7 @@ module FinancialAssistance
     end
 
     def transfer_account
-      ::FinancialAssistance::Operations::Transfers::MedicaidGateway::AccountTransferOut.new.call(self)
+      ::FinancialAssistance::Operations::Transfers::MedicaidGateway::AccountTransferOut.new.call(application_id: self.id)
     end
 
     def is_rt_transferrable?
