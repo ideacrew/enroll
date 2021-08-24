@@ -80,9 +80,10 @@ RSpec.describe Insured::ConsumerRolesController do
       let(:user) { FactoryBot.create :user, :with_consumer_role }
 
       before do
-        EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
+        EnrollRegistry[:aca_individual_market].feature.stub(:is_enabled).and_return(true)
         EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(true)
         EnrollRegistry[:validate_quadrant].feature.stub(:is_enabled).and_return(true)
+        # allow(EnrollRegistry).to receive(:feature_enabled?).with(:location_residency_verification_type).and_return(true)
         sign_in user
       end
 
@@ -97,9 +98,10 @@ RSpec.describe Insured::ConsumerRolesController do
       let(:user) { FactoryBot.create :user, :with_consumer_role }
 
       before do
-        EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
+        EnrollRegistry[:aca_individual_market].feature.stub(:is_enabled).and_return(true)
         EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(false)
         EnrollRegistry[:validate_quadrant].feature.stub(:is_enabled).and_return(true)
+        # allow(EnrollRegistry).to receive(:feature_enabled?).with(:location_residency_verification_type).and_return(true)
         sign_in user
       end
 
