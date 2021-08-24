@@ -119,7 +119,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.send_to_external_verification" => "Send to OFI", # TODO: This is for Maine, we don't know what it should be for DC yet, if anything,
   "en.faa.filing_as_head_of_household" => "Will this person be filing as head of household?",
   'en.faa.publish_error.second_error_message' => 'There is an error while submitting the application for assistance determination.',
-  "en.faa.eligibility_go_to_my_account_message" => "<b>If you’re already enrolled in DC Health Link’s Individual & Family plan</b>, you’re finished! To see your plan information, select GO TO MY ACCOUNT."
+  "en.faa.eligibility_go_to_my_account_message" => "<b>If you’re already enrolled in DC Health Link’s Individual & Family plan</b>, you’re finished! To see your plan information, select <b>GO TO MY ACCOUNT</b>."
 }.freeze
 
 # rubocop:enable Layout/LineLength
