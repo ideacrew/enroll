@@ -5,7 +5,7 @@ namespace :load do
 
       benefit_market = BenefitMarkets::BenefitMarket.where(:site_urn => Settings.site.key, kind: kind).first
 
-      calender_year = args[:year].present? ? args[:year].to_i : 2021
+      calender_year = args[:year].present? ? args[:year].to_i : 2022
 
       puts "Creating #{kind.to_s} Benefit Market Catalog for #{calender_year}" unless Rails.env.test?
 

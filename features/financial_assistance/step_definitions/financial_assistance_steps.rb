@@ -388,6 +388,18 @@ Given(/^the FAA feature configuration is disabled$/) do
   disable_feature :financial_assistance
 end
 
+Given(/^the kaiser paynow feature configuration is enabled$/) do
+  enable_feature :kaiser_pay_now
+end
+
+Given(/^the kaiser paynow feature configuration is disabled$/) do
+  disable_feature :kaiser_pay_now
+end
+
+Given(/^the enrollment tile feature is enabled$/) do
+  skip_this_scenario unless EnrollRegistry[:kaiser_pay_now].setting(:enrollment_tile).item
+end
+
 Given(/^the FAA feature configuration is enabled$/) do
   enable_feature :financial_assistance
 end

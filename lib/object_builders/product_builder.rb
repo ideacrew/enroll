@@ -91,6 +91,16 @@ class ProductBuilder
       metal_level_kind: retrieve_metal_level.to_sym
     }
 
+    # Dont import for DC as it comes from master excel
+    if EnrollRegistry.feature_enabled?(:import_network_data)
+      nationwide, dc_in_network = @qhp.national_network.downcase.strip == "yes" ? ["true", "false"] : ["false", "true"]
+
+      shared_attributes.merge!(
+        nationwide: nationwide,
+        dc_in_network: dc_in_network
+      )
+    end
+
     if is_health_product?
       {
         health_plan_kind: @qhp.plan_type.downcase,

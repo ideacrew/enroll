@@ -1,4 +1,29 @@
 
+$(document).on('click', ".interaction-click-control-leave-dc-health-link", function(e) {
+  if ($(this).parent('form').attr('method') == 'post') {
+    e.preventDefault();
+    let hbx_id = $(this).val();
+    $.ajax({
+        type: "GET",
+        url: "/payment_transactions/generate_saml_response",
+        data: {enrollment_id: hbx_id, source: $("#source").val()},
+        success: function (response) {
+          if (response["error"] != null){
+            alert("We're sorry, but something went wrong. You can try again, or pay once you receive your invoice.")}
+          else if (response["status"] == 404){
+            alert("We're sorry, but something went wrong. You can try again, or pay once you receive your invoice.")}
+          else{
+            $('#sp-' + hbx_id).val(response["SAMLResponse"]);
+            $('#pay_now_form_' + hbx_id).submit();
+          }
+        },
+        error: function (response) {
+            // error handling
+        }
+    });
+  }
+});
+
 function enableTransition() {
 
   $('#tansition_family_submit').addClass("disabled");

@@ -6,8 +6,11 @@ module Publishers
     include ::EventSource::Publisher[amqp: 'enroll.iap.applications']
 
     register_event 'determine_eligibility'
+
+    # This event is to generate renewal draft applications
+    register_event 'generate_renewal_draft'
+
+    # This event is to renew/submit generated renewal draft applications
+    register_event 'submit_renewal_draft'
   end
 end
-
-
-

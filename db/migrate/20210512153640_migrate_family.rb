@@ -3,6 +3,7 @@
 # require 'aca_entities'
 # require 'aca_entities/ffe/operations/process_mcr_application'
 # require 'aca_entities/ffe/transformers/mcr_to/family'
+
 require 'aca_entities/atp/transformers/cv/family'
 require 'aca_entities/atp/operations/family'
 require 'aca_entities/serializers/xml/medicaid/atp'
@@ -82,7 +83,6 @@ class MigrateFamily < Mongoid::Migration
     def create_member(family_member_hash)
       person_params = sanitize_person_params(family_member_hash)
       person_result = create_or_update_person(person_params)
-
       if person_result.success?
         @person = person_result.success
         @family_member = create_or_update_family_member(@person, @family, family_member_hash)
@@ -130,11 +130,22 @@ class MigrateFamily < Mongoid::Migration
     end
 
     def create_or_update_relationship(person, family, relationship_kind)
-      primary_person = family.primary_person
-      exiting_relationship = primary_person.person_relationships.detect { |rel| rel.relative_id.to_s == person.id.to_s }
+      @primary_person = family.primary_person
+      exiting_relationship = @primary_person.person_relationships.detect { |rel| rel.relative_id.to_s == person.id.to_s }
       return if exiting_relationship && exiting_relationship.kind == relationship_kind
 
-      primary_person.ensure_relationship_with(person, relationship_kind)
+      @primary_person.ensure_relationship_with(person, relationship_kind)
+    end
+
+    def same_address_with_primary(family_member)
+      member = family_member.person
+
+      compare_keys = ["address_1", "address_2", "city", "state", "zip"]
+      member.is_homeless? == @primary_person.is_homeless? &&
+        member.is_temporarily_out_of_state? == @primary_person.is_temporarily_out_of_state? &&
+        member.home_address.attributes.select {|k, _v| compare_keys.include? k} == @primary_person.home_address.attributes.select do |k, _v|
+                                                                                     compare_keys.include? k
+                                                                                   end
     end
 
     def sanitize_applicant_params(iap_hash)
@@ -144,6 +155,8 @@ class MigrateFamily < Mongoid::Migration
         family_member = @family.family_members.select do |fm|
           fm.person.first_name == applicant_hash['name']['first_name'] && fm.person.last_name == applicant_hash['name']['last_name']
         end.first
+
+        citizen_status_info = applicant_hash['citizenship_immigration_status_information']
 
         sanitize_params << {
           family_member_id: family_member.id,
@@ -164,19 +177,19 @@ class MigrateFamily < Mongoid::Migration
           race: applicant_hash['demographic']['race'],
           is_veteran_or_active_military: applicant_hash['demographic']['is_veteran_or_active_military'],
           is_vets_spouse_or_child: applicant_hash['demographic']['is_vets_spouse_or_child'],
-
-          is_incarcerated: applicant_hash['attestation']['is_incarcerated'],
-          is_physically_disabled: applicant_hash['attestation']['is_self_attested_disabled'],
-          is_self_attested_disabled: applicant_hash['attestation']['is_self_attested_disabled'],
-          is_self_attested_blind: applicant_hash['attestation']['is_self_attested_blind'],
-          is_self_attested_long_term_care: applicant_hash['attestation']['is_self_attested_long_term_care'],
+          same_with_primary: same_address_with_primary(family_member),
+          is_incarcerated: applicant_hash['is_applying_coverage'] ? (applicant_hash.dig('attestation', 'is_incarcerated') || false) : nil,
+          is_physically_disabled: applicant_hash.dig('attestation', 'is_self_attested_disabled'),
+          is_self_attested_disabled: applicant_hash.dig('attestation', 'is_self_attested_disabled'),
+          is_self_attested_blind: applicant_hash.dig('attestation', 'is_self_attested_blind'),
+          is_self_attested_long_term_care: applicant_hash.dig('attestation', 'is_self_attested_long_term_care'),
 
           is_primary_applicant: applicant_hash['is_primary_applicant'],
           native_american_information: applicant_hash['native_american_information'],
 
-          citizen_status: applicant_hash['citizenship_immigration_status_information']['citizen_status'],
-          is_resident_post_092296: applicant_hash['citizenship_immigration_status_information']['is_resident_post_092296'],
-          is_lawful_presence_self_attested: applicant_hash['citizenship_immigration_status_information']['is_lawful_presence_self_attested'],
+          citizen_status: citizen_status_info ? citizen_status_info['citizen_status'] : nil,
+          is_resident_post_092296: citizen_status_info ? citizen_status_info['is_resident_post_092296'] : nil,
+          is_lawful_presence_self_attested: citizen_status_info ? citizen_status_info['is_lawful_presence_self_attested'] : nil,
 
           is_consumer_role: true, # applicant_hash['is_consumer_role'],
           is_resident_role: applicant_hash['is_resident_role'],
@@ -192,25 +205,25 @@ class MigrateFamily < Mongoid::Migration
           is_claimed_as_tax_dependent: applicant_hash['is_claimed_as_tax_dependent'],
           claimed_as_tax_dependent_by: applicant_hash['claimed_as_tax_dependent_by'],
 
-          is_student: applicant_hash['student']['is_student'],
-          student_kind: applicant_hash['student']['student_kind'],
-          student_school_kind: applicant_hash['student']['student_school_kind'],
-          student_status_end_on: applicant_hash['student']['student_status_end_on'],
+          is_student: applicant_hash.dig('student', 'is_student'),
+          student_kind: applicant_hash.dig('student', 'student_kind'),
+          student_school_kind: applicant_hash.dig('student', 'student_school_kind'),
+          student_status_end_on: applicant_hash.dig('student', 'student_status_end_on'),
 
           is_refugee: applicant_hash['is_refugee'],
           is_trafficking_victim: applicant_hash['is_trafficking_victim'],
 
-          is_former_foster_care: applicant_hash['foster_care']['is_former_foster_care'],
-          age_left_foster_care: applicant_hash['foster_care']['age_left_foster_care'],
-          foster_care_us_state: applicant_hash['foster_care']['foster_care_us_state'],
-          had_medicaid_during_foster_care: applicant_hash['foster_care']['had_medicaid_during_foster_care'],
+          is_former_foster_care: applicant_hash.dig('foster_care', 'is_former_foster_care'),
+          age_left_foster_care: applicant_hash.dig('foster_care', 'age_left_foster_care'),
+          foster_care_us_state: applicant_hash.dig('foster_care', 'foster_care_us_state'),
+          had_medicaid_during_foster_care: applicant_hash.dig('foster_care', 'had_medicaid_during_foster_care'),
 
-          is_pregnant: applicant_hash['pregnancy_information']['is_pregnant'],
-          is_enrolled_on_medicaid: applicant_hash['pregnancy_information']['is_enrolled_on_medicaid'],
-          is_post_partum_period: applicant_hash['pregnancy_information']['is_post_partum_period'],
-          children_expected_count: applicant_hash['pregnancy_information']['expected_children_count'],
-          pregnancy_due_on: applicant_hash['pregnancy_information']['pregnancy_due_on'],
-          pregnancy_end_on: applicant_hash['pregnancy_information']['pregnancy_end_on'],
+          is_pregnant: applicant_hash.dig('pregnancy_information', 'is_pregnant'),
+          is_enrolled_on_medicaid: applicant_hash.dig('pregnancy_information', 'is_enrolled_on_medicaid'),
+          is_post_partum_period: applicant_hash.dig('pregnancy_information', 'is_post_partum_period'),
+          children_expected_count: applicant_hash.dig('pregnancy_information', 'expected_children_count'),
+          pregnancy_due_on: applicant_hash.dig('pregnancy_information', 'pregnancy_due_on'),
+          pregnancy_end_on: applicant_hash.dig('pregnancy_information', 'pregnancy_end_on'),
 
           is_subject_to_five_year_bar: applicant_hash['is_refugee'],
           is_five_year_bar_met: applicant_hash['is_refugee'],
@@ -260,7 +273,7 @@ class MigrateFamily < Mongoid::Migration
         last_name: person_hash['person_name']['last_name'],
         full_name: person_hash['person_name']['full_name'],
         ssn: person_hash['person_demographics']['ssn'],
-        no_ssn: person_hash['person_demographics']['no_ssn'], #update in aca entities contracts to receive as string
+        no_ssn: person_hash['person_demographics']['no_ssn'], # update in aca entities contracts to receive as string
         gender: person_hash['person_demographics']['gender'],
         dob: person_hash['person_demographics']['dob'],
         date_of_death: person_hash['person_demographics']['date_of_death'],
@@ -323,10 +336,12 @@ class MigrateFamily < Mongoid::Migration
             puts "Started processing file: #{@filepath}"
             extract @filepath
             transform ext_input_hash
-            load_data cv3_family_hash
+            # result = validate cv3_family_hash
+            # puts "CV validation failed: #{result.errors.to_h}" if result.errors.present?
+            load_data cv3_family_hash #unless result.errors.present?
             puts "Ended processing file: #{@filepath}"
-          rescue StandardError => e
-            puts "Error processing file: #{@filepath} , error: #{e.backtrace}"
+          # rescue StandardError => e
+            # puts "Error processing file: #{@filepath} , error: #{e.backtrace}"
           end
         elsif !path_name&.empty?
           begin
@@ -342,6 +357,10 @@ class MigrateFamily < Mongoid::Migration
       when 'mcr'
         migrate_for_mcr
       end
+    end
+
+    def validate(cv3_family_hash)
+      AcaEntities::Contracts::Families::FamilyContract.new.call(cv3_family_hash[:family].except(:magi_medicaid_applications))
     end
 
     def read_directory(directory_name, &block)
@@ -367,11 +386,12 @@ class MigrateFamily < Mongoid::Migration
         # next
       end
       build_family(result_payload["family"])
-      app_id = build_iap(result_payload["family"]['magi_medicaid_applications'].first.merge!(family_id: @family.id, benchmark_product_id: BSON::ObjectId.new, years_to_renew: 5))
+      app_id = build_iap(result_payload["family"]['magi_medicaid_applications'].first.merge!(family_id: @family.id,
+                                                                                             benchmark_product_id: BSON::ObjectId.new, years_to_renew: 5))
       fill_applicants_form(app_id, result_payload["family"]['magi_medicaid_applications'].first)
       print "."
     rescue StandardError => e
-      puts "E: #{payload[:insuranceApplicationIdentifier]}, f: @family.hbx_id  error: #{e}"
+      puts "E: #{payload[:insuranceApplicationIdentifier]}, f: #{@family.hbx_id}  error: #{e}"
     end
 
     def fill_applicants_form(app_id, applications)
@@ -429,8 +449,7 @@ class MigrateFamily < Mongoid::Migration
 
         persisted_applicant.incomes = applicant[:incomes]
         persisted_applicant.benefits = applicant[:benefits].first.nil? ? [] : applicant[:benefits].compact
-        persisted_applicant.deductions = applicant[:deductions]
-
+        persisted_applicant.deductions = applicant[:deductions].collect {|d| d.except("amount_tax_exempt", "is_projected")}
         persisted_applicant.is_medicare_eligible = applicant[:is_medicare_eligible]
         ::FinancialAssistance::Applicant.skip_callback(:update, :after, :propagate_applicant)
         persisted_applicant.save!
@@ -492,6 +511,14 @@ class MigrateFamily < Mongoid::Migration
         # persisted_applicant.is_veteran = applicant.
         # persisted_applicant.is_refugee = applicant.
         # persisted_applicant.is_trafficking_victim = applicant.
+      end
+    end
+
+    def validate_applicant_information(*args)
+      array = args[0][:params]
+
+      array.each_with_object([]) do  |params, collect|
+        collect << "AcaEntities::MagiMedicaid::#{args[0][:class]}".constantize.new(params.except(:kind))
       end
     end
   end

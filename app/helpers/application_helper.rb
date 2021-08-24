@@ -836,8 +836,8 @@ module ApplicationHelper
     raise(ArgumentError, "invalid value for Boolean: \"#{val}\"")
   end
 
-  def plan_match_dc
-    Settings.checkbook_services.plan_match == "DC"
+  def checkbook_integration_enabled?
+    ::EnrollRegistry[:checkbook_integration].enabled?
   end
 
   def exchange_icon_path(icon)

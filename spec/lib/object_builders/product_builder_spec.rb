@@ -70,6 +70,42 @@ describe "qhp builder" do
     end
   end
 
+  describe '.network_data' do
+
+    context 'when feature is enabled' do
+      before(:each) do
+        ::BenefitMarkets::Products::Product.delete_all
+        EnrollRegistry[:import_network_data].feature.stub(:is_enabled).and_return(true)
+        xml = Nokogiri::XML(File.open(@files.first))
+        product_parser = Parser::PlanBenefitTemplateParser.parse(xml.root.canonicalize, :single => true)
+        product = ProductBuilder.new({})
+        product.add(product_parser.to_hash)
+        product.run
+      end
+
+      it 'should import the network information' do
+        expect(::BenefitMarkets::Products::Product.pluck(:dc_in_network, :nationwide)).to eq [[true, false], [true, false], [true, false]]
+      end
+    end
+
+    context 'when feature is disabled' do
+      before(:each) do
+        ::BenefitMarkets::Products::Product.delete_all
+        EnrollRegistry[:import_network_data].feature.stub(:is_enabled).and_return(false)
+        xml = Nokogiri::XML(File.open(@files.first))
+        product_parser = Parser::PlanBenefitTemplateParser.parse(xml.root.canonicalize, :single => true)
+        product = ProductBuilder.new({})
+        product.add(product_parser.to_hash)
+        product.run
+      end
+
+      it 'should not import the network information' do
+        expect(::BenefitMarkets::Products::Product.pluck(:dc_in_network, :nationwide)).to eq [[nil, nil], [nil, nil], [nil, nil]]
+      end
+    end
+
+  end
+
   context "new model having product with qhp" do
     before :all do
       BenefitMarkets::Products::Product.all.delete
