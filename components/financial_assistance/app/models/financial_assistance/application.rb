@@ -281,7 +281,29 @@ module FinancialAssistance
 
     def send_determination_to_ea
       result = ::Operations::Families::AddFinancialAssistanceEligibilityDetermination.new.call(params: self.attributes)
+      transfer_account if result.success? && is_rt_transferrable?
       result.failure? ? log(eligibility_response_payload, {:severity => 'critical', :error_message => "ERROR: #{result.failure}"}) : true
+    end
+
+    def transfer_account
+      ::FinancialAssistance::Operations::Transfers::MedicaidGateway::AccountTransferOut.new.call(self)
+    end
+
+    def is_rt_transferrable?
+      return unless FinancialAssistanceRegistry.feature_enabled?(:real_time_transfer)
+      is_transferrable?
+    end
+
+    def is_batch_transferrable?
+      return unless FinancialAssistanceRegistry.feature_enabled?(:batch_transfer)
+      is_transferrable?
+    end
+
+    def is_transferrable?
+      applicants = self.applicants.select do |applicant|
+        applicant.is_medicaid_chip_eligible || applicant.is_magi_medicaid || applicant.is_non_magi_medicaid_eligible
+      end
+      applicants.any?
     end
 
     def update_application(error_message, status_code)
