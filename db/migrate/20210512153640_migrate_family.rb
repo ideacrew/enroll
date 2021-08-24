@@ -541,9 +541,7 @@ class MigrateFamily < Mongoid::Migration
 
         persisted_applicant.incomes = applicant[:incomes]
         persisted_applicant.benefits = applicant[:benefits].first.nil? ? [] : applicant[:benefits].compact
-        # persisted_applicant.deductions = applicant[:deductions].collect {|d| d.except("amount_tax_exempt", "is_projected")}
-        # TODO
-        persisted_applicant.deductions = applicant[:deductions]
+        persisted_applicant.deductions = applicant[:deductions].collect {|d| d.except("amount_tax_exempt", "is_projected")}
         persisted_applicant.is_medicare_eligible = applicant[:is_medicare_eligible]
         ::FinancialAssistance::Applicant.skip_callback(:update, :after, :propagate_applicant)
         persisted_applicant.save!(validate: false)
