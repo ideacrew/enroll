@@ -3,6 +3,7 @@
 module Operations
   module Validators
     module Families
+      # dummy file for specs
       class ConsumerRoleContract < Dry::Validation::Contract
         params do
           optional(:is_applying_coverage).filled(:bool)

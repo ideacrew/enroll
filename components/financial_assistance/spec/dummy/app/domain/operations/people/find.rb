@@ -5,6 +5,7 @@ require 'dry/monads/do'
 
 module Operations
   module People
+    # find a person
     class Find
       include Dry::Monads[:result, :do]
 
