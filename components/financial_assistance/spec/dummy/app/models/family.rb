@@ -48,7 +48,7 @@ class Family
 
   field :is_applying_for_assistance, type: Boolean
 
-  belongs_to  :person
+  belongs_to  :person, optional: true
 
   # Collection of insured:  employees, consumers, residents
 

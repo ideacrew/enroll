@@ -74,7 +74,6 @@ module FinancialAssistance
             family_hash['family_members'].sort_by { |a| a["is_primary_applicant"] ? 0 : 1 }.each do |family_member_hash|
               create_member(family_member_hash)
             end
-
             @family.save!
 
             Success(@family)
