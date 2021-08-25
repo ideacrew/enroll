@@ -6,13 +6,14 @@ require 'dry/monads/do'
 module FinancialAssistance
   module Operations
     module Families
+      # Create of update a family member
       class CreateOrUpdateMember
         send(:include, Dry::Monads[:result, :do])
 
         def call(params:)
           values = yield validate(params[:applicant_params])
           applicant_params = yield build(values)
-          result = yield create_or_update_family_member( applicant_params.to_h.merge(family_id: params[:family_id]))
+          result = yield create_or_update_family_member(applicant_params.to_h.merge(family_id: params[:family_id]))
 
           Success(result)
         end
