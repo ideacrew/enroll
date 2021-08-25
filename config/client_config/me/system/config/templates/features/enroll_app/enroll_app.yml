@@ -519,3 +519,6 @@ registry:
       - key: :show_upload_notices
         item: :show_upload_notices
         is_enabled: false
+      - key: :tobacco_user_field
+        item: :tobacco_user_field
+        is_enabled: true 

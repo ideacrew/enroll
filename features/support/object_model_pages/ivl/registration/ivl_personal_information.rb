@@ -72,6 +72,14 @@ class IvlPersonalInformation
     '.interaction-click-control-previous'
   end
 
+  def self.tobacco_user_yes_radiobtn
+    'label[for="person_is_tobacco_user_y"] span'
+  end
+
+  def self.tobacco_user_no_radiobtn
+    'label[for="person_is_tobacco_user_n"] span'
+  end
+
   def self.us_citizen_or_national_yes_radiobtn
     'label[for="person_us_citizen_true"] span'
   end
