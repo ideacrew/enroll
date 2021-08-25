@@ -199,7 +199,7 @@ class ApplicationController < ActionController::Base
           session[:portal] = url_for(strong_params)
         end
         if site_uses_default_devise_path?
-          check_for_special_path || redirect_to main_app.new_user_session_path
+          check_for_special_path || redirect_to(main_app.new_user_session_path)
         else
           redirect_to main_app.new_user_registration_path
         end
