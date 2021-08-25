@@ -17,8 +17,10 @@ class MigrateFamily < Mongoid::Migration
   def self.up
     @source =  ENV["source"].to_s.downcase # MCR or ATP
     # @file_path = "/Users/saidineshmekala/Downloads/app.json"
-    @file_path = "db/application.json"
+    @file_path = "db/app1.json"
     # @file_path = "/Users/saidineshmekala/IDEACREW/aca_entities/spec/support/transform_example_payloads/test.json"
+    # @file_path = "/Users/saidineshmekala/Downloads/app_migration/app1.json"
+    # @file_path = "/Users/saidineshmekala/Downloads/app_migration/test.json
     @directory_name = ENV['dir'].to_s || nil
 
     start migration_for: @source, path: @file_path, dir: @directory_name
@@ -97,7 +99,11 @@ class MigrateFamily < Mongoid::Migration
       end
 
       @application.relationships << missing_relationships
-      @application.save!(validate: false)
+      # unless @application.valid?
+      #   binding.pry
+      # end
+      # @application.save!(validate: false)
+      @application.save!
     end
 
     def file_path
@@ -147,7 +153,7 @@ class MigrateFamily < Mongoid::Migration
     def create_or_update_person(person_params)
       person_params[:is_temporarily_out_of_state] = false # TODO
       person_params[:is_disabled] = false # TODO
-      person_params[:addresses].nil? ? [] : person_params[:addresses] # TODO
+      person_params[:addresses] = person_params[:addresses].nil? ? [] : person_params[:addresses] # TODO
       Operations::People::CreateOrUpdate.new.call(params: person_params)
     end
 
@@ -204,7 +210,7 @@ class MigrateFamily < Mongoid::Migration
 
       compare_keys = ["address_1", "address_2", "city", "state", "zip"]
       member.is_homeless? == @primary_person.is_homeless? &&
-        member.is_temporarily_out_of_state? == @primary_person.is_temporarily_out_of_state? &&
+        member.is_temporarily_out_of_state? == @primary_person.is_temporarily_out_of_state? && member.home_address &&
         member.home_address.attributes.select {|k, _v| compare_keys.include? k} == @primary_person.home_address.attributes.select do |k, _v|
                                                                                      compare_keys.include? k
                                                                                    end
@@ -379,7 +385,7 @@ class MigrateFamily < Mongoid::Migration
         is_tobacco_user: person_hash['person_health']['is_tobacco_user'],
         is_physically_disabled: person_hash['person_health']['is_physically_disabled'],
         is_applying_for_assistance: person_hash['is_applying_for_assistance'],
-        is_homeless: person_hash['is_homeless'],
+        is_homeless: person_hash['is_homeless'] || false, # TODO update match with primary
         is_temporarily_out_of_state: person_hash['is_temporarily_out_of_state'],
         age_off_excluded: person_hash['age_off_excluded'],
         is_active: person_hash['is_active'],
@@ -544,7 +550,13 @@ class MigrateFamily < Mongoid::Migration
         persisted_applicant.deductions = applicant[:deductions].collect {|d| d.except("amount_tax_exempt", "is_projected")}
         persisted_applicant.is_medicare_eligible = applicant[:is_medicare_eligible]
         ::FinancialAssistance::Applicant.skip_callback(:update, :after, :propagate_applicant)
-        persisted_applicant.save!(validate: false)
+
+        # unless persisted_applicant.valid?
+        #   binding.pry
+        # end
+        # persisted_applicant.save!(validate: false)
+
+        persisted_applicant.save!
         ::FinancialAssistance::Applicant.set_callback(:update, :after, :propagate_applicant)
         # persisted_applicant.has_insurance = applicant[:has_insurance]
         # persisted_applicant.has_state_health_benefit = applicant[:has_state_health_benefit]
