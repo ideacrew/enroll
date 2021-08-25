@@ -211,7 +211,7 @@ When(/^.+ assign employer to general agency$/) do
 end
 
 Then(/^.+ should see assign successful message$/) do
-  expect(page).to have_content('Assign successful.')
+  expect(page).to have_content('Succesfully Assigned General Agency')
 end
 
 Then(/^.+ should see the assigned general agency$/) do
@@ -244,4 +244,11 @@ end
 
 When(/^General Agency clicks on the link of employers$/) do
   find('.interaction-click-control-employers').click
+end
+
+When(/^Primary broker selects (.*?) from dropdown$/) do |general_agency_name|
+  find(BrokerEmployersPage.select_general_agency_dropdown).click
+  expect(page).to have_content(general_agency_name)
+  find("option", text: general_agency_name).click
+  find(BrokerEmployersPage.submit_btn).click
 end

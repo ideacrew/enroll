@@ -451,3 +451,8 @@ end
 Then(/Primary Broker should see Employer and click on legal name$/) do
   click_link(employer.legal_name)
 end
+
+Then(/Primary Broker clicks shop for plans$/) do
+  find('.interaction-click-control-shop-for-plans').click
+  find("#btn-continue").click
+end
