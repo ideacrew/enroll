@@ -21,7 +21,7 @@ module BenefitSponsors
     def set_current_person(required: true)
       if current_user.try(:person).try(:agent?) && session[:person_id].present?
         @person = Person.find(session[:person_id])
-      else
+      elsif current_user
         @person = current_user.person
       end
       redirect_to logout_saml_index_path if required && !set_current_person_succeeded?
