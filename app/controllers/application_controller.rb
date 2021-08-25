@@ -184,12 +184,12 @@ class ApplicationController < ActionController::Base
     def check_for_special_path
       if site_sign_in_routes.include? request.path
         redirect_to main_app.new_user_session_path
-        return
+        true
       elsif site_create_routes.include? request.path
         redirect_to main_app.new_user_registration_path
-        return
+        true
       else
-        return
+        false
       end
     end
 
@@ -199,12 +199,20 @@ class ApplicationController < ActionController::Base
           session[:portal] = url_for(strong_params)
         end
         if site_uses_default_devise_path?
-          check_for_special_path
-          redirect_to main_app.new_user_session_path
+          check_for_special_path || redirect_to main_app.new_user_session_path
         else
           redirect_to main_app.new_user_registration_path
         end
       end
+    rescue Exception => e
+      message = {}
+      message[:message] = "Application Exception - #{e.message}"
+      message[:session_person_id] = session[:person_id] if session[:person_id]
+      message[:user_id] = current_user.id if current_user
+      message[:oim_id] = current_user.oim_id if current_user
+      message[:url] = request.original_url
+      message[:params] = params if params
+      log(message, :severity=>'error')
     end
 
     def confirm_last_portal(request, resource)
