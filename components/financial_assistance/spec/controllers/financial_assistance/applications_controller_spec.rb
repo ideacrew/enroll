@@ -2,7 +2,6 @@
 
 require 'rails_helper'
 
-
 RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each, type: :controller do
   routes { FinancialAssistance::Engine.routes }
 
