@@ -22,8 +22,7 @@ module FinancialAssistance
           private
 
           def build_event(payload)
-            service = FinancialAssistanceRegistry.feature_enabled?(:batch_transfer) ? "aces" : "curam"
-            payload[:service] = service
+            payload[:service] = FinancialAssistanceRegistry[:transfer_service].item
             event('events.iap.transfers.transfer_account', attributes: payload)
           end
 

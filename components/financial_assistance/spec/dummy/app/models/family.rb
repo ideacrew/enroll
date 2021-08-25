@@ -32,6 +32,7 @@ class Family
   increments :hbx_assigned_id, seed: 9999
 
   field :e_case_id, type: String # Eligibility system foreign key
+  field :ext_app_id, type: String # External system foreign key
   #field :fin_app_id, type: String # Financial Application ID, Use Family ID instead
   field :haven_app_id, type: String
   field :e_status_code, type: String
