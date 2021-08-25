@@ -89,13 +89,17 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
         @result = subject.call({application_id: application})
       end
 
-      it 'should return success' do
-        expect(@result).to be_success
+      it "fails when the request fails" do
+        expect(@result.success?).not_to be_truthy
       end
 
-      it 'should return success with message' do
-        expect(@result.success).to eq('Successfully published the payload to medicaid_gateway to be transferred out to ACES')
-      end
+      # it 'should return success' do
+        # expect(@result).to be_success
+      # end
+
+      # it 'should return success with message' do
+        # expect(@result.success).to eq('Successfully published the payload to medicaid_gateway to be transferred out to ACES')
+      # end
     end
   end
 
