@@ -7,7 +7,7 @@ require 'aca_entities/atp/transformers/cv/family'
 RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::AccountTransferIn, dbclean: :after_each do
   include Dry::Monads[:result, :do]
 
-  let(:xml) do{ File.read(::FinancialAssistance::Engine.root.join('spec', 'shared_examples', 'medicaid_gateway', 'Simple_Test_Case_E_New.xml')) }
+  let(:xml) { File.read(::FinancialAssistance::Engine.root.join('spec', 'shared_examples', 'medicaid_gateway', 'Simple_Test_Case_E_New.xml')) }
 
   let(:record) { ::AcaEntities::Serializers::Xml::Medicaid::Atp::AccountTransferRequest.parse(xml) }
 
