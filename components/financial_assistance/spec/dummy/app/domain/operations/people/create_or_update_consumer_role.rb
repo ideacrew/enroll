@@ -5,6 +5,7 @@ require 'dry/monads/do'
 
 module Operations
   module People
+    # create or update a consumer role
     class CreateOrUpdateConsumerRole
       include Dry::Monads[:result, :do]
 

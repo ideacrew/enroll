@@ -2,6 +2,7 @@
 
 module Operations
   module Validators
+    # dummy file for specs
     class PersonContract < Dry::Validation::Contract
 
       params do
