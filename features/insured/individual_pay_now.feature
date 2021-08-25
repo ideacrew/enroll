@@ -43,6 +43,7 @@ Feature: User should be able to pay for plan
     Then consumer clicks on the Actions button
     Then consumer should not see the Make Payments button
 
+  @flaky
   Scenario: User should not see pay now pop up for non-Kaiser enrollment
     Given the FAA feature configuration is disabled
     And that a person exists in EA
