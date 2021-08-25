@@ -26,7 +26,7 @@ module Operations
       end
 
       def validate(params)
-        result = Validators::PersonContract.new.call(sanitize_params(params))
+        result = ::Operations::Validators::PersonContract.new.call(sanitize_params(params))
 
         if result.success?
           Success(result)
