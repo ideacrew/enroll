@@ -239,7 +239,7 @@ class MigrateFamily < Mongoid::Migration
           ssn: family_member.person.ssn,
           # "encrypted_ssn": applicant_hash['identifying_information']['encrypted_ssn'],
           has_ssn: applicant_hash['identifying_information']['has_ssn'],
-          gender: applicant_hash['demographic']['gender'],
+          gender: applicant_hash['demographic']['gender'].to_s.downcase,
           dob: applicant_hash['demographic']['dob'],
           ethnicity: applicant_hash['demographic']['ethnicity'],
           race: applicant_hash['demographic']['race'],
@@ -454,6 +454,10 @@ class MigrateFamily < Mongoid::Migration
         end
       when 'mcr'
         migrate_for_mcr
+        # TODO refactor and enable accordingly
+        # read_directory @dir_name do
+        #   migrate_for_mcr
+        # end
       end
     end
 
@@ -464,6 +468,9 @@ class MigrateFamily < Mongoid::Migration
     def read_directory(directory_name, &block)
       Dir.foreach(directory_name) do |filename|
         if File.extname(filename) == ".xml"
+          @filepath = "#{directory_name}/#{filename}"
+          instance_eval(&block) if block_given?
+        elsif File.extname(filename) == ".json"
           @filepath = "#{directory_name}/#{filename}"
           instance_eval(&block) if block_given?
         end
