@@ -55,7 +55,7 @@ class MigrateFamily < Mongoid::Migration
           fix_iap_relationship(app_id, family_hash)
         end
         print "."
-        rescue StandardError => e
+      rescue StandardError => e
         # binding.pry
         puts "E: #{payload[:insuranceApplicationIdentifier]}, f: @family.hbx_id  error: #{e.message.split('.').first}"
       end
@@ -72,7 +72,7 @@ class MigrateFamily < Mongoid::Migration
         from_relation = rel.first[0]
         to_relation = rel.first[1]
         from_applicant = @application.applicants.where(id: from_relation).first
-        to_applicant =  @application.applicants.where(id: to_relation).first
+        to_applicant = @application.applicants.where(id: to_relation).first
         from_family_member = ::FamilyMember.find(from_applicant.family_member_id)
         to_family_member = ::FamilyMember.find(to_applicant.family_member_id)
         member_hash = family_hash["family_members"].select { |member| member["hbx_id"] == from_family_member.external_member_id}.first
@@ -87,7 +87,7 @@ class MigrateFamily < Mongoid::Migration
         from_relation = all_rel[:applicant]
         to_relation = all_rel[:relative]
         from_applicant = @application.applicants.find(from_relation)
-        to_applicant =  @application.applicants.find(to_relation)
+        to_applicant = @application.applicants.find(to_relation)
         from_family_member = ::FamilyMember.find(from_applicant.family_member_id)
         to_family_member = ::FamilyMember.find(to_applicant.family_member_id)
         member_hash = family_hash["family_members"].select { |member| member["hbx_id"] == from_family_member.external_member_id}.first
@@ -233,8 +233,8 @@ class MigrateFamily < Mongoid::Migration
           middle_name: applicant_hash['name']['middle_name'],
           last_name: applicant_hash['name']['last_name'],
           full_name: applicant_hash['name']['full_name'],
-          name_sfx: applicant_hash['name']['name_sfx'].present? ? applicant_hash['name']['name_sfx']: "",
-          name_pfx: applicant_hash['name']['name_pfx'].present? ? applicant_hash['name']['name_pfx']: "",
+          name_sfx: applicant_hash['name']['name_sfx'].present? ? applicant_hash['name']['name_sfx'] : "",
+          name_pfx: applicant_hash['name']['name_pfx'].present? ? applicant_hash['name']['name_pfx'] : "",
           alternate_name: applicant_hash['name']['alternate_name'],
           ssn: family_member.person.ssn,
           # "encrypted_ssn": applicant_hash['identifying_information']['encrypted_ssn'],
@@ -335,7 +335,7 @@ class MigrateFamily < Mongoid::Migration
     def sanitize_claimed_as_tax_dependent_by_params(applicant_hash)
       return nil unless applicant_hash['is_claimed_as_tax_dependent']
       claimed_as_tax_dependent_by = applicant_hash['claimed_as_tax_dependent_by']
-      claimed_as_tax_dependent_by.class == Hash ? claimed_as_tax_dependent_by["person_hbx_id"] : claimed_as_tax_dependent_by
+      claimed_as_tax_dependent_by.instance_of?(Hash) ? claimed_as_tax_dependent_by["person_hbx_id"] : claimed_as_tax_dependent_by
     end
 
     def sanitize_income_params(incomes)
@@ -454,7 +454,7 @@ class MigrateFamily < Mongoid::Migration
         end
       when 'mcr'
         migrate_for_mcr
-        # TODO refactor and enable accordingly
+        # TODO: refactor and enable accordingly
         # read_directory @dir_name do
         #   migrate_for_mcr
         # end
@@ -467,10 +467,11 @@ class MigrateFamily < Mongoid::Migration
 
     def read_directory(directory_name, &block)
       Dir.foreach(directory_name) do |filename|
-        if File.extname(filename) == ".xml"
+        case File.extname(filename)
+        when ".xml"
           @filepath = "#{directory_name}/#{filename}"
           instance_eval(&block) if block_given?
-        elsif File.extname(filename) == ".json"
+        when ".json"
           @filepath = "#{directory_name}/#{filename}"
           instance_eval(&block) if block_given?
         end
